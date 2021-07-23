@@ -107,6 +107,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 
 // gatewayConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
 func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logger) map[string]interface{} {
+	storageRules := rules(cfg, logger)
 	rcfg := map[string]interface{}{
 		"core": map[string]interface{}{
 			"max_cpus":             cfg.Reva.Users.MaxCPUs,
@@ -125,6 +126,7 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"gateway": map[string]interface{}{
+					"storage_rules": storageRules,
 					// registries is located on the gateway
 					"authregistrysvc":    cfg.Reva.Gateway.Endpoint,
 					"storageregistrysvc": cfg.Reva.Gateway.Endpoint,
@@ -165,7 +167,7 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 					"drivers": map[string]interface{}{
 						"static": map[string]interface{}{
 							"home_provider": cfg.Reva.StorageRegistry.HomeProvider,
-							"rules":         rules(cfg, logger),
+							"rules":         storageRules,
 						},
 					},
 				},
@@ -204,11 +206,12 @@ func rules(cfg *config.Config, logger log.Logger) map[string]map[string]interfac
 
 	// generate rules based on default config
 	return map[string]map[string]interface{}{
-		cfg.Reva.StorageHome.MountPath:       {"address": cfg.Reva.StorageHome.Endpoint},
-		cfg.Reva.StorageHome.MountID:         {"address": cfg.Reva.StorageHome.Endpoint},
-		cfg.Reva.StorageUsers.MountPath:      {"address": cfg.Reva.StorageUsers.Endpoint},
-		cfg.Reva.StorageUsers.MountID + ".*": {"address": cfg.Reva.StorageUsers.Endpoint},
-		cfg.Reva.StoragePublicLink.MountPath: {"address": cfg.Reva.StoragePublicLink.Endpoint},
+		cfg.Reva.StorageShares.MountPath:         {"address": cfg.Reva.StorageShares.Endpoint},
+		cfg.Reva.StorageHome.MountPath:           {"address": cfg.Reva.StorageHome.Endpoint},
+		cfg.Reva.StorageHome.MountID:             {"address": cfg.Reva.StorageHome.Endpoint},
+		cfg.Reva.StorageUsers.MountPath:          {"address": cfg.Reva.StorageUsers.Endpoint},
+		cfg.Reva.StorageUsers.MountID + "\\!?.*": {"address": cfg.Reva.StorageUsers.Endpoint},
+		cfg.Reva.StoragePublicLink.MountPath:     {"address": cfg.Reva.StoragePublicLink.Endpoint},
 		// public link storage returns the mount id of the actual storage
 		// medatada storage not part of the global namespace
 	}

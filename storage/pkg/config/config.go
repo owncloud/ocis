@@ -44,6 +44,7 @@ type Sharing struct {
 	Port
 	UserDriver                       string
 	UserJSONFile                     string
+	UserStorageMountId               string
 	UserSQLUsername                  string
 	UserSQLPassword                  string
 	UserSQLHost                      string
@@ -156,6 +157,11 @@ type PublicStorage struct {
 
 	PublicShareProviderAddr string
 	UserProviderAddr        string
+}
+
+// PublicShares configures a shares storage provider
+type SharesStorage struct {
+	StoragePort
 }
 
 // StorageConfig combines all available storage driver configuration parts.
@@ -387,6 +393,7 @@ type Reva struct {
 	StorageHome       StoragePort
 	StorageUsers      StoragePort
 	StoragePublicLink PublicStorage
+	StorageShares     SharesStorage
 	StorageMetadata   StoragePort
 	// Configs can be used to configure the reva instance.
 	// Services and Ports will be ignored if this is used

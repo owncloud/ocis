@@ -110,6 +110,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["storage-home"] = storage.NewStorageHome
 	s.ServicesRegistry["storage-users"] = storage.NewStorageUsers
 	s.ServicesRegistry["storage-public-link"] = storage.NewStoragePublicLink
+	s.ServicesRegistry["storage-shares"] = storage.NewStorageShares
 
 	// populate delayed services
 	s.Delayed["storage-sharing"] = storage.NewSharing
