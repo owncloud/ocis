@@ -221,6 +221,12 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
 		),
 
+		middleware.SelectorCookie(
+			middleware.Logger(l),
+			middleware.UserProvider(userProvider),
+			middleware.PolicySelectorConfig(*cfg.PolicySelector),
+		),
+
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(l),

@@ -1,15 +1,16 @@
 package oidc
 
 const (
-	Iss = "iss"
-	Sub = "sub"
-	Email = "email"
-	Name = "name"
+	Iss               = "iss"
+	Sub               = "sub"
+	Email             = "email"
+	Name              = "name"
 	PreferredUsername = "preferred_username"
-	UIDNumber = "uidnumber"
-	GIDNumber = "gidnumber"
-	Groups = "groups"
-	OwncloudUUID = "ownclouduuid"
+	UIDNumber         = "uidnumber"
+	GIDNumber         = "gidnumber"
+	Groups            = "groups"
+	OwncloudUUID      = "ownclouduuid"
+	OcisRoutingPolicy = "ocis.routing.policy"
 )
 
 // The ProviderMetadata describes an idp.
@@ -192,4 +193,7 @@ type StandardClaims struct {
 
 	// OcisID is a unique, persistent, non reassignable user id
 	OcisID string `json:"ownclouduuid,omitempty"`
+
+	// OcisRoutingPolicy is used to specify the routing policy to use for the ocis proxy
+	OcisRoutingPolicy string `json:"ocis.routing.policy,omitempty"`
 }

@@ -26,7 +26,7 @@ func AccountResolver(optionSetters ...Option) func(next http.Handler) http.Handl
 			"expires": int64(60),
 		})
 		if err != nil {
-			logger.Fatal().Err(err).Msgf("Could not initialize token-manager")
+			logger.Fatal().Err(err).Msg("Could not initialize token-manager")
 		}
 
 		return &accountResolver{
@@ -53,8 +53,10 @@ type accountResolver struct {
 
 // TODO do not use the context to store values: https://medium.com/@cep21/how-to-correctly-use-context-context-in-go-1-7-8f2c0fafdf39
 func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	claims := oidc.FromContext(req.Context())
-	u, ok := revauser.ContextGetUser(req.Context())
+	ctx := req.Context()
+	claims := oidc.FromContext(ctx)
+	u, ok := revauser.ContextGetUser(ctx)
+	// TODO what if an X-Access-Token is set? happens eg for download requests to the /data endpoint in the reva frontend
 
 	if claims == nil && !ok {
 		m.next.ServeHTTP(w, req)
@@ -83,6 +85,8 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			}
 			m.logger.Debug().Interface("claims", claims).Msg("Autoprovisioning user")
 			u, err = m.userProvider.CreateUserFromClaims(req.Context(), claims)
+			// TODO instead of creating an account create a personal storage via the CS3 admin api?
+			// see https://cs3org.github.io/cs3apis/#cs3.admin.user.v1beta1.CreateUserRequest
 		}
 
 		if errors.Is(err, backend.ErrAccountDisabled) {
@@ -97,6 +101,10 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
+		// add user to context for selectors
+		ctx = revauser.ContextSetUser(ctx, u)
+		req = req.WithContext(ctx)
+
 		m.logger.Debug().Interface("claims", claims).Interface("user", u).Msg("associated claims with user")
 	}
 
@@ -105,7 +113,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		m.logger.Error().Err(err).Msg("could not get owner scope")
 		return
 	}
-	token, err := m.tokenManager.MintToken(req.Context(), u, s)
+	token, err := m.tokenManager.MintToken(ctx, u, s)
 	if err != nil {
 		m.logger.Error().Err(err).Msg("could not mint token")
 		w.WriteHeader(http.StatusInternalServerError)
