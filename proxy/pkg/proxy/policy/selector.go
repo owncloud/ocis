@@ -1,7 +1,6 @@
 package policy
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -52,7 +51,7 @@ const (
 //    }
 //  ]
 //}
-type Selector func(ctx context.Context, r *http.Request) (string, error)
+type Selector func(r *http.Request) (string, error)
 
 // LoadSelector constructs a specific policy-selector from a given configuration
 func LoadSelector(cfg *config.PolicySelector) (Selector, error) {
@@ -113,7 +112,7 @@ func LoadSelector(cfg *config.PolicySelector) (Selector, error) {
 //    "static": {"policy" : "ocis"}
 //  },
 func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
-	return func(ctx context.Context, r *http.Request) (s string, err error) {
+	return func(r *http.Request) (s string, err error) {
 		return cfg.Policy, nil
 	}
 }
@@ -132,9 +131,9 @@ func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
 // thus have an entry in ocis-accounts. All users without accounts entry are routed to the legacy ownCloud10 instance.
 func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.AccountsService) Selector {
 	var acc = ss
-	return func(ctx context.Context, r *http.Request) (s string, err error) {
+	return func(r *http.Request) (s string, err error) {
 		var claims map[string]interface{}
-		if claims = oidc.FromContext(ctx); claims == nil {
+		if claims = oidc.FromContext(r.Context()); claims == nil {
 			return cfg.UnauthenticatedPolicy, nil
 		}
 
@@ -145,7 +144,7 @@ func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.Account
 			return cfg.AccNotFoundPolicy, nil
 		}
 
-		if _, err := acc.GetAccount(ctx, &accounts.GetAccountRequest{Id: userID}); err != nil {
+		if _, err := acc.GetAccount(r.Context(), &accounts.GetAccountRequest{Id: userID}); err != nil {
 			return cfg.AccNotFoundPolicy, nil
 		}
 		return cfg.AccFoundPolicy, nil
@@ -164,7 +163,7 @@ func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.Account
 //
 // This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OCIS and
 func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
-	return func(ctx context.Context, r *http.Request) (s string, err error) {
+	return func(r *http.Request) (s string, err error) {
 		// use cookie first if provided
 		selectorCookie, err := r.Cookie(cfg.SelectorCookieName)
 		if err == nil {
@@ -172,7 +171,7 @@ func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
 		}
 
 		// if no cookie is present, try to route by selector
-		if claims := oidc.FromContext(ctx); claims != nil {
+		if claims := oidc.FromContext(r.Context()); claims != nil {
 			if p, ok := claims[oidc.OcisRoutingPolicy].(string); ok && p != "" {
 				// TODO check we know the routing policy?
 				return p, nil
@@ -213,7 +212,7 @@ func NewRegexSelector(cfg *config.RegexSelectorConf) Selector {
 			policy:   cfg.MatchesPolicies[i].Policy,
 		})
 	}
-	return func(ctx context.Context, r *http.Request) (s string, err error) {
+	return func(r *http.Request) (s string, err error) {
 		// use cookie first if provided
 		selectorCookie, err := r.Cookie(cfg.SelectorCookieName)
 		if err == nil {
@@ -221,7 +220,7 @@ func NewRegexSelector(cfg *config.RegexSelectorConf) Selector {
 		}
 
 		// if no cookie is present, try to route by selector
-		if u, ok := revauser.ContextGetUser(ctx); ok {
+		if u, ok := revauser.ContextGetUser(r.Context()); ok {
 			for i := range regexRules {
 				switch regexRules[i].property {
 				case "mail":

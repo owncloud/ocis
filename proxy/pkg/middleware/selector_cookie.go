@@ -37,9 +37,6 @@ func (m selectorCookie) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	ctx := req.Context()
-	claims := oidc.FromContext(ctx)
-
 	selectorCookieName := ""
 	if m.policySelector.Regex != nil {
 		selectorCookieName = m.policySelector.Regex.SelectorCookieName
@@ -50,14 +47,14 @@ func (m selectorCookie) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	_, err := req.Cookie(selectorCookieName)
 	if err != nil {
 		// no cookie there - try to add one
-		if claims != nil {
+		if oidc.FromContext(req.Context()) != nil {
 
 			selectorFunc, err := policy.LoadSelector(&m.policySelector)
 			if err != nil {
 				m.logger.Err(err)
 			}
 
-			selector, err := selectorFunc(ctx, req)
+			selector, err := selectorFunc(req)
 			if err != nil {
 				m.logger.Err(err)
 			}

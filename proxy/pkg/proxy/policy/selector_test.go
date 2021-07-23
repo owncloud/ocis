@@ -3,6 +3,7 @@ package policy
 import (
 	"context"
 	"fmt"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/asim/go-micro/v3/client"
@@ -47,9 +48,9 @@ func TestLoadSelector(t *testing.T) {
 
 func TestStaticSelector(t *testing.T) {
 	sel := NewStaticSelector(&config.StaticSelectorConf{Policy: "ocis"})
-	ctx := context.Background()
+	req := httptest.NewRequest("GET", "https://example.org/foo", nil)
 	want := "ocis"
-	got, err := sel(ctx)
+	got, err := sel(req)
 	if got != want {
 		t.Errorf("Expected policy %v got %v", want, got)
 	}
@@ -61,7 +62,7 @@ func TestStaticSelector(t *testing.T) {
 	sel = NewStaticSelector(&config.StaticSelectorConf{Policy: "foo"})
 
 	want = "foo"
-	got, err = sel(ctx)
+	got, err = sel(req)
 	if got != want {
 		t.Errorf("Expected policy %v got %v", want, got)
 	}
@@ -93,9 +94,11 @@ func TestMigrationSelector(t *testing.T) {
 	for _, tc := range tests {
 		tc := tc
 		sut := NewMigrationSelector(&cfg, mockAccSvc(tc.AccSvcShouldReturnError))
-		ctx := oidc.NewContext(context.Background(), tc.Claims)
+		r := httptest.NewRequest("GET", "https://example.com", nil)
+		ctx := oidc.NewContext(r.Context(), tc.Claims)
+		nr := r.WithContext(ctx)
 
-		got, err := sut(ctx)
+		got, err := sut(nr)
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}
@@ -141,7 +144,9 @@ func TestClaimsSelector(t *testing.T) {
 		{"claim-value", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: "ocis.routing.policy-value"}), "ocis.routing.policy-value"},
 	}
 	for _, tc := range tests {
-		got, err := sel(tc.Context)
+		r := httptest.NewRequest("GET", "https://example.com", nil)
+		nr := r.WithContext(tc.Context)
+		got, err := sel(nr)
 		if err != nil {
 			t.Errorf("Unexpected error: %v", err)
 		}
@@ -182,7 +187,9 @@ func TestRegexSelector(t *testing.T) {
 	for _, tc := range tests {
 		tc := tc // capture range variable
 		t.Run(tc.Name, func(t *testing.T) {
-			got, err := sel(tc.Context)
+			r := httptest.NewRequest("GET", "https://example.com", nil)
+			nr := r.WithContext(tc.Context)
+			got, err := sel(nr)
 			if err != nil {
 				t.Errorf("Unexpected error: %v", err)
 			}
