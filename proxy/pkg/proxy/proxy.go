@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"context"
 	"crypto/tls"
 	"net"
 	"net/http"
@@ -67,7 +66,7 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 
 	if options.Config.PolicySelector == nil {
 		firstPolicy := options.Config.Policies[0].Name
-		rp.logger.Warn().Msgf("policy-selector not configured. Will always use first policy: '%v'", firstPolicy)
+		rp.logger.Warn().Str("policy", firstPolicy).Msg("policy-selector not configured. Will always use first policy")
 		options.Config.PolicySelector = &config.PolicySelector{
 			Static: &config.StaticSelectorConf{
 				Policy: firstPolicy,
@@ -92,9 +91,10 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 			uri, err := url.Parse(route.Backend)
 			if err != nil {
 				rp.logger.
-					Fatal().
+					Fatal(). // fail early on misconfiguration
 					Err(err).
-					Msgf("malformed url: %v", route.Backend)
+					Str("backend", route.Backend).
+					Msg("malformed url")
 			}
 
 			rp.logger.
@@ -110,16 +110,17 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 }
 
 func (p *MultiHostReverseProxy) directorSelectionDirector(r *http.Request) {
-	pol, err := p.PolicySelector(r.Context(), r)
+	pol, err := p.PolicySelector(r)
 	if err != nil {
-		p.logger.Error().Msgf("Error while selecting pol %v", err)
+		p.logger.Error().Err(err).Msg("Error while selecting pol")
 		return
 	}
 
 	if _, ok := p.Directors[pol]; !ok {
 		p.logger.
 			Error().
-			Msgf("policy %v is not configured", pol)
+			Str("policy", pol).
+			Msg("policy is not configured")
 		return
 	}
 
@@ -213,12 +214,12 @@ func (p *MultiHostReverseProxy) AddHost(policy string, target *url.URL, rt confi
 }
 
 func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := context.Background()
+	ctx := r.Context()
 	var span *trace.Span
 
 	// Start root span.
 	if p.config.Tracing.Enabled {
-		ctx, span = trace.StartSpan(context.Background(), r.URL.String())
+		ctx, span = trace.StartSpan(ctx, r.URL.String())
 		defer span.End()
 		p.propagator.SpanContextToRequest(span.SpanContext(), r)
 	}
@@ -248,7 +249,7 @@ func (p MultiHostReverseProxy) queryRouteMatcher(endpoint string, target url.URL
 func (p *MultiHostReverseProxy) regexRouteMatcher(pattern string, target url.URL) bool {
 	matched, err := regexp.MatchString(pattern, target.String())
 	if err != nil {
-		p.logger.Warn().Err(err).Msgf("regex with pattern %s failed", pattern)
+		p.logger.Warn().Err(err).Str("pattern", pattern).Msg("regex with pattern failed")
 	}
 	return matched
 }

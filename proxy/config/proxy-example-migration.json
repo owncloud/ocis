@@ -1,6 +1,7 @@
 {
-  "HTTP": {
-    "Namespace": "com.owncloud"
+  "http": {
+    "addr": "0.0.0.0:9200",
+    "root": "/"
   },
   "oidc": {
     "issuer": "https://localhost:9200",

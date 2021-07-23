@@ -1,9 +1,10 @@
 package middleware
 
 import (
-	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	"net/http"
 	"time"
+
+	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 
@@ -23,6 +24,8 @@ type Options struct {
 	Logger log.Logger
 	// TokenManagerConfig for communicating with the reva token manager
 	TokenManagerConfig config.TokenManager
+	// PolicySelectorConfig for using the policy selector
+	PolicySelector config.PolicySelector
 	// HTTPClient to use for communication with the oidcAuth provider
 	HTTPClient *http.Client
 	// AccountsClient for resolving accounts
@@ -79,6 +82,13 @@ func Logger(l log.Logger) Option {
 func TokenManagerConfig(cfg config.TokenManager) Option {
 	return func(o *Options) {
 		o.TokenManagerConfig = cfg
+	}
+}
+
+// PolicySelectorConfig provides a function to set the policy selector config option.
+func PolicySelectorConfig(cfg config.PolicySelector) Option {
+	return func(o *Options) {
+		o.PolicySelector = cfg
 	}
 }
 

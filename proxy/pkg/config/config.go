@@ -1,6 +1,8 @@
 package config
 
-import "context"
+import (
+	"context"
+)
 
 // Log defines the available logging configuration.
 type Log struct {
@@ -141,6 +143,8 @@ type OIDC struct {
 type PolicySelector struct {
 	Static    *StaticSelectorConf
 	Migration *MigrationSelectorConf
+	Claims    *ClaimsSelectorConf
+	Regex     *RegexSelectorConf
 }
 
 // StaticSelectorConf is the config for the static-policy-selector
@@ -164,6 +168,27 @@ type MigrationSelectorConf struct {
 	AccFoundPolicy        string `mapstructure:"acc_found_policy"`
 	AccNotFoundPolicy     string `mapstructure:"acc_not_found_policy"`
 	UnauthenticatedPolicy string `mapstructure:"unauthenticated_policy"`
+}
+
+// ClaimsSelectorConf is the config for the claims-selector
+type ClaimsSelectorConf struct {
+	DefaultPolicy         string `mapstructure:"default_policy"`
+	UnauthenticatedPolicy string `mapstructure:"unauthenticated_policy"`
+	SelectorCookieName    string `mapstructure:"selector_cookie_name"`
+}
+
+// RegexSelectorConf is the config for the regex-selector
+type RegexSelectorConf struct {
+	DefaultPolicy         string          `mapstructure:"default_policy"`
+	MatchesPolicies       []RegexRuleConf `mapstructure:"matches_policies"`
+	UnauthenticatedPolicy string          `mapstructure:"unauthenticated_policy"`
+	SelectorCookieName    string          `mapstructure:"selector_cookie_name"`
+}
+type RegexRuleConf struct {
+	Priority int    `mapstructure:"priority"`
+	Property string `mapstructure:"property"`
+	Match    string `mapstructure:"match"`
+	Policy   string `mapstructure:"policy"`
 }
 
 // New initializes a new configuration
