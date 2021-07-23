@@ -1,5 +1,6 @@
 ---
 title: "7. Open Graph API for oCIS File Spaces"
+weight: 7
 date: 2021-05-03T09:00:00+01:00
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr

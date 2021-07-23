@@ -1,42 +1,15 @@
 ---
 title: "8. Configuration"
+weight: 8
 date: 2021-05-03T15:00:00+01:00
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0008-configuration.md
 ---
 
-## 5. Configuration Management for oCIS
-
 * Status: proposed
 * Deciders: @refs, @butonic, @micbar, @dragotin, @pmaier1
 * Date: 2021-05-03
-
-- [5. Configuration Management for oCIS](#5-configuration-management-for-ocis)
-  * [Context and Problem Statement](#context-and-problem-statement)
-  * [Decision Drivers](#decision-drivers)
-  * [Considered Options](#considered-options)
-  * [Decision Outcome](#decision-outcome)
-    + [Positive Consequences](#positive-consequences)
-  * [Pros and Cons of the Options](#pros-and-cons-of-the-options)
-    + [Extend FlagInputSourceExtension interface](#extend-flaginputsourceextension-interface)
-    + [Feature request: support for structured configuration (urfave/cli).](#feature-request-support-for-structured-configuration-urfavecli)
-    + [Clearly defined boundaries of what can and cannot be done.](#clearly-defined-boundaries-of-what-can-and-cannot-be-done)
-    + [Expose structured field values as CLI flags](#expose-structured-field-values-as-cli-flags)
-    + [Drop support for structure configuration](#drop-support-for-structure-configuration)
-    + [Adapt the "structured config files have the highest priority" within oCIS](#adapt-the-structured-config-files-have-the-highest-priority-within-ocis)
-  * [Notes](#notes)
-    + [Use Cases and Expected Behaviors](#use-cases-and-expected-behaviors)
-      - [Supervised (`ocis server` or `ocis run extension`)](#supervised-ocis-server-or-ocis-run-extension)
-        * [Known Gotchas](#known-gotchas)
-      - [Unsupervised (`ocis proxy`)](#unsupervised-ocis-proxy)
-    + [Other known use cases](#other-known-use-cases)
-    + [Use Cases for Development](#use-cases-for-development)
-    + [Config Loading](#config-loading)
-    + [Start an extension multiple times with different configs (in Supervised mode)](#start-an-extension-multiple-times-with-different-configs-in-supervised-mode)
-    + [Developing Considered Alternatives Further](#developing-considered-alternatives-further)
-    + [Follow up PR's](#follow-up-prs)
-    + [State of the Art](#state-of-the-art)
 
 ## Context and Problem Statement
 
