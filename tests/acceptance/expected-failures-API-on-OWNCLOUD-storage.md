@@ -24,15 +24,11 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiTrashbinRestore/trashbinRestore.feature:330](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbinRestore/trashbinRestore.feature#L330)
 
 #### [The version number is reset after moving a file](https://github.com/owncloud/ocis/issues/1238)
--   [apiVersions/fileVersions.feature:347](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L347)
--   [apiVersions/fileVersions.feature:393](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L393)
-
-The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
-
--   [apiVersions/fileVersions.feature:104](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L104)
+-   [apiVersions/fileVersions.feature:359](https://github.com/owncloud/core/blob/master/tests/a59eptance/features/apiVersions/fileVersions.feature#L359)
+-   [apiVersions/fileVersions.feature:405](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L405)
 
 #### [Version count is 1 more than on oC10](https://github.com/owncloud/ocis/issues/1633)
--   [apiVersions/fileVersions.feature:384](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L384)
+-   [apiVersions/fileVersions.feature:396](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L396)
 -   [apiVersions/fileVersionsSharingToShares.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L178)
 
 #### [PUT request with missing parent must return status code 409](https://github.com/owncloud/ocis/issues/824)
@@ -123,19 +119,12 @@ _ocdav: double check the webdav property parsing when custom namespaces are used
 -   [apiWebdavProperties2/getFileProperties.feature:266](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L266)
 
 #### [downloading an old version of a file returns 501](https://github.com/owncloud/ocis/issues/2261)
--    [apiVersions/fileVersions.feature:420](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L420)
--    [apiVersions/fileVersions.feature:438](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L438)
+-    [apiVersions/fileVersions.feature:432](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L432)
+-    [apiVersions/fileVersions.feature:450](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L450)
 -    [apiVersions/fileVersionsSharingToShares.feature:301](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L301)
 
 ### Sync
 Synchronization features like etag propagation, setting mtime and locking files
-
-#### [Remote.php/dav/uploads endpoint does not exist](https://github.com/owncloud/ocis/issues/1321)
-_ocdav: return checksum in upload response for chunked upload_
--   [apiMain/checksums.feature:144](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L144) Scenario: Upload new dav chunked file where checksum matches
--   [apiMain/checksums.feature:153](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L153) Scenario: Upload new dav chunked file where checksum does not match
--   [apiMain/checksums.feature:319](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L319) Scenario: Upload overwriting a file with new chunking and correct checksum
--   [apiMain/checksums.feature:331](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L331) Scenario: Upload overwriting a file with new chunking and invalid checksum
 
 #### [Uploading with old-chunking does not work](https://github.com/owncloud/ocis/issues/1343)
 -   [apiMain/checksums.feature:263](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L263) Scenario: Uploading an old method chunked file with checksum should fail using new DAV path
@@ -919,9 +908,6 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiTrashbin/trashbinSharingToShares.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L102)
 -   [apiTrashbin/trashbinSharingToShares.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L103)
 
-#### [remote.php/dav/uploads endpoint does not exist](https://github.com/owncloud/ocis/issues/1321)
--   [apiShareOperationsToShares2/uploadToShare.feature:256](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L256)
-
 #### [No way to set default folder for received shares](https://github.com/owncloud/ocis/issues/1327)
 Scenario Outline: delete a folder when there is a default folder for received shares
 -   [apiWebdavOperations/deleteFolder.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/deleteFolder.feature#L67)
@@ -947,24 +933,24 @@ Scenario: Try to create a folder named Share
 
 #### [changing user quota gives ocs status 103 / cannot set user quota using the ocs endpoint](https://github.com/owncloud/product/issues/247)
 _getting and setting quota_
--   [apiMain/quota.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L10) Scenario: Uploading a file as owner having enough quota
--   [apiMain/quota.feature:16](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L16) Scenario: Uploading a file as owner having insufficient quota
--   [apiMain/quota.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L22) Scenario: Overwriting a file as owner having enough quota
--   [apiMain/quota.feature:28](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L28) Scenario: Overwriting a file as owner having insufficient quota
--   [apiMain/quota.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L38) Scenario: Uploading a file in received folder having enough quota
--   [apiMain/quota.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L48) Scenario: Uploading a file in received folder having insufficient quota
--   [apiMain/quota.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L59) Scenario: Overwriting a file in received folder having enough quota
--   [apiMain/quota.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L70) Scenario: Overwriting a file in received folder having insufficient quota
--   [apiMain/quota.feature:84](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L84) Scenario: Overwriting a received file having enough quota
--   [apiMain/quota.feature:94](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#94) Scenario: Overwriting a received file having insufficient quota
--   [apiMain/quota.feature:105](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#105) Scenario: User with zero quota cannot upload a file
--   [apiMain/quota.feature:112](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#112) Scenario: User with zero quota can create a folder
--   [apiMain/quota.feature:119](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#119) Scenario: user cannot create file on shared folder by a user with zero quota
--   [apiMain/quota.feature:134](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#134) Scenario: share receiver with 0 quota should not be able to move file from shared folder to home folder
--   [apiMain/quota.feature:148](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#148) Scenario: sharer should be able to upload to a folder shared with user having zero quota
--   [apiMain/quota.feature:164](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#164) Scenario: share receiver with 0 quota should be able to upload on shared folder
--   [apiMain/quota.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#178) Scenario: User should retain their old files even if their quota is set to 0
--   [apiMain/quota.feature:184](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#184) Scenario: User should be able to restore their deleted file when their quota is set to zero
+-   [apiMain/quota.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L10)
+-   [apiMain/quota.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L23)
+-   [apiMain/quota.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L38)
+-   [apiMain/quota.feature:53](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L53)
+-   [apiMain/quota.feature:72](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L72)
+-   [apiMain/quota.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L93)
+-   [apiMain/quota.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L116)
+-   [apiMain/quota.feature:139](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L139)
+-   [apiMain/quota.feature:166](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L166)
+-   [apiMain/quota.feature:187](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L187)
+-   [apiMain/quota.feature:210](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L210)
+-   [apiMain/quota.feature:217](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L217)
+-   [apiMain/quota.feature:224](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L224)
+-   [apiMain/quota.feature:239](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L239)
+-   [apiMain/quota.feature:253](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L253)
+-   [apiMain/quota.feature:269](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L269)
+-   [apiMain/quota.feature:283](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L283)
+-   [apiMain/quota.feature:289](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L289)
     Scenario Outline: Retrieving folder quota of shared folder with quota when no quota is set for recipient
 -   [apiWebdavProperties1/getQuota.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L48)
 -   [apiWebdavProperties1/getQuota.feature:49](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L49)
@@ -1957,44 +1943,15 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 #### [uploading with old-chunking does not work](https://github.com/owncloud/ocis/issues/1343)
 #### [remote.php/dav/uploads endpoint does not exist](https://github.com/owncloud/ocis/issues/1321)
--   [apiVersions/fileVersions.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L15)
--   [apiVersions/fileVersions.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L23)
--   [apiVersions/fileVersions.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L36)
--   [apiVersions/fileVersions.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L45)
--   [apiVersions/fileVersions.feature:88](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L88)
--   [apiVersions/fileVersions.feature:89](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L89)
--   [apiVersions/fileVersions.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L93)
--   [apiVersions/fileVersions.feature:276](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L276)
--   [apiWebdavUpload2/uploadFileUsingNewChunking.feature:13](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingNewChunking.feature#L13)
--   [apiWebdavUpload2/uploadFileUsingNewChunking.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingNewChunking.feature#L31)
--   [apiWebdavUpload2/uploadFileUsingNewChunking.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingNewChunking.feature#L46)
--   [apiWebdavUpload2/uploadFileUsingNewChunking.feature:86](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingNewChunking.feature#L86)
--   [apiWebdavUpload2/uploadFileUsingNewChunking.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingNewChunking.feature#L93)
--   [apiWebdavUpload2/uploadFileUsingNewChunking.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingNewChunking.feature#L103)
--   [apiWebdavUpload2/uploadFileUsingNewChunking.feature:108](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingNewChunking.feature#L108)
--   [apiWebdavUpload2/uploadFileUsingNewChunking.feature:117](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingNewChunking.feature#L117)
--   [apiWebdavUpload2/uploadFileUsingNewChunking.feature:146](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingNewChunking.feature#L146)
--   [apiWebdavUpload2/uploadFileUsingNewChunking.feature:147](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingNewChunking.feature#L147)
--   [apiWebdavUpload2/uploadFileUsingNewChunking.feature:148](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingNewChunking.feature#L148)
--   [apiWebdavUpload2/uploadFileUsingNewChunking.feature:169](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingNewChunking.feature#L169)
--   [apiWebdavUpload2/uploadFileUsingNewChunking.feature:170](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileUsingNewChunking.feature#L170)
+-   [apiVersions/fileVersions.feature:97](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L97)
+-   [apiVersions/fileVersions.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L116)
+-   [apiVersions/fileVersions.feature:288](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L288)
 -   [apiWebdavUpload1/uploadFileToExcludedDirectory.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToExcludedDirectory.feature#L20)
 -   [apiWebdavUpload1/uploadFileToExcludedDirectory.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToExcludedDirectory.feature#L21)
 -   [apiWebdavUpload1/uploadFileToExcludedDirectory.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToExcludedDirectory.feature#L34)
 -   [apiWebdavUpload1/uploadFileToExcludedDirectory.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToExcludedDirectory.feature#L35)
 -   [apiWebdavUpload1/uploadFileToExcludedDirectory.feature:71](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToExcludedDirectory.feature#L71)
 -   [apiWebdavUpload1/uploadFileToExcludedDirectory.feature:72](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToExcludedDirectory.feature#L72)
--   [apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature#L22)
--   [apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature#L46)
--   [apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature#L47)
--   [apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature#L48)
--   [apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature:51](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature#L51)
--   [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:12](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature#L12)
--   [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature#L22)
--   [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature#L48)
--   [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:49](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature#L49)
--   [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:50](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature#L50)
--   [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:53](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature#L53)
 
 #### [Blacklist files extensions](https://github.com/owncloud/ocis/issues/2177)
 -   [apiWebdavProperties1/copyFile.feature:107](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L107)
