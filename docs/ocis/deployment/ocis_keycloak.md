@@ -21,7 +21,7 @@ The docker stack consists 4 containers. One of them is Traefik, a proxy which is
 
 Keykloak add two containers: Keycloak itself and a PostgreSQL as database. Keycloak will be configured as oCIS' IDP instead of the internal IDP [LibreGraph Connect]({{< ref "../../extensions/idp" >}})
 
-The other container is oCIS itself running all extensions in one container. In this example oCIS uses [oCIS storage driver]({{< ref "../../extensions/storage/storages#storage-drivers" >}})
+The other container is oCIS itself running all extensions in one container. In this example oCIS uses the [oCIS storage driver]({{< ref "../../extensions/storage/storagedrivers" >}})
 
 ## Server Deployment
 

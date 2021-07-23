@@ -1,15 +1,18 @@
 ---
-title: "Storages"
+title: "Storage drivers"
 date: 2020-04-27T18:46:00+01:00
-weight: 37
+weight: 12
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/extensions/storage
 geekdocFilePath: storages.md
 ---
 
-## Storage commands
+A *storage driver* implements access to a [*storage system*]({{< ref "#storage-systems" >}}):
 
-`storage` has multiple storage provider commands to preconfigure different default configurations for the reva *storage provider* service. While you could rerun `storage storage-oc` multiple times with different flags to get multiple instances we are giving the different commands the necessary default configuration to allow the `ocis` binary to simply start them and not deal with configuration.
+It maps the *path* and *id* based CS3 *references* to an appropriate [*storage system*]({{< ref "#storage-systems" >}}) specific reference, e.g.:
+- eos file ids
+- posix inodes or paths
+- deconstructed filesystem nodes
 
 ## Storage providers
 
@@ -24,7 +27,6 @@ While the *storage provider* is responsible for managing the tree, file up- and 
 A lot of different storage technologies exist, ranging from general purpose file systems with POSIX semantics to software defined storage with multiple APIs. Choosing any of them is making a tradeoff decision. Or, if a storage technology is already in place it automatically predetermines the capabilities that can be made available. *Not all storage systems are created equal.*
 
 Unfortunately, no POSIX filesystem natively supports all storage aspects that ownCloud 10 requires:
-
 
 ### A hierarchical file tree
 An important aspect of a filesystem is organizing files and directories in a file hierarchy, or tree. It allows you to create, move and delete nodes. Beside the name a node also has well known metadata like size and mtime that are persisted in the tree as well.
