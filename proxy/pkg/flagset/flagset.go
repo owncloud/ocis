@@ -254,7 +254,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "user-cs3-claim",
 			Value:       flags.OverrideDefaultString(cfg.UserCS3Claim, "mail"),
-			Usage:       "The claim to use when looking up a user in the CS3 API, eg. 'userid' or 'mail'",
+			Usage:       "The CS3 claim to use when looking up a user in the CS3 users API, eg. 'userid', 'username' or 'mail'",
 			EnvVars:     []string{"PROXY_USER_CS3_CLAIM"},
 			Destination: &cfg.UserCS3Claim,
 		},
