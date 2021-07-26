@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-26T08:57:08+0000"
+date: "2021-07-26T13:22:19+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/glauth/templates
