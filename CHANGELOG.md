@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Forward basic auth to OpenID connect token authentication endpoint: [#2095](https://github.com/owncloud/ocis/issues/2095)
 * Bugfix - Log all requests in the proxy access log: [#2301](https://github.com/owncloud/ocis/pull/2301)
 * Enhancement - Proxy: Add claims policy selector: [#2248](https://github.com/owncloud/ocis/pull/2248)
 * Enhancement - Refactor graph API: [#2277](https://github.com/owncloud/ocis/pull/2277)
@@ -13,6 +14,14 @@ The following sections list the changes for unreleased.
 * Enhancement - Update REVA to v1.10.0: [#2295](https://github.com/owncloud/ocis/pull/2295)
 
 ## Details
+
+* Bugfix - Forward basic auth to OpenID connect token authentication endpoint: [#2095](https://github.com/owncloud/ocis/issues/2095)
+
+   When using `PROXY_ENABLE_BASIC_AUTH=true` we now forward request to the idp instead of
+   trying to authenticate the request ourself.
+
+   https://github.com/owncloud/ocis/issues/2095
+   https://github.com/owncloud/ocis/issues/2094
 
 * Bugfix - Log all requests in the proxy access log: [#2301](https://github.com/owncloud/ocis/pull/2301)
 
