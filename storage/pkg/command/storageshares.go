@@ -99,26 +99,9 @@ func storageSharesConfigFromStruct(c *cli.Context, cfg *config.Config) map[strin
 			},
 			"services": map[string]interface{}{
 				"sharesstorageprovider": map[string]interface{}{
-					"mount_path":   cfg.Reva.StorageShares.MountPath,
-					"gateway_addr": cfg.Reva.Gateway.Endpoint,
-					"driver":       cfg.Reva.Sharing.UserDriver,
-					"drivers": map[string]interface{}{
-						"json": map[string]interface{}{
-							"file": cfg.Reva.Sharing.UserJSONFile,
-						},
-						"sql": map[string]interface{}{
-							"gateway_addr":                  cfg.Reva.Gateway.Endpoint,
-							"storage_mount_id":              cfg.Reva.Sharing.UserStorageMountId,
-							"db_username":                   cfg.Reva.Sharing.UserSQLUsername,
-							"db_password":                   cfg.Reva.Sharing.UserSQLPassword,
-							"db_host":                       cfg.Reva.Sharing.UserSQLHost,
-							"db_port":                       cfg.Reva.Sharing.UserSQLPort,
-							"db_name":                       cfg.Reva.Sharing.UserSQLName,
-							"password_hash_cost":            cfg.Reva.Sharing.PublicPasswordHashCost,
-							"enable_expired_shares_cleanup": cfg.Reva.Sharing.PublicEnableExpiredSharesCleanup,
-							"janitor_run_interval":          cfg.Reva.Sharing.PublicJanitorRunInterval,
-						},
-					},
+					"mount_path":           cfg.Reva.StorageShares.MountPath,
+					"gateway_addr":         cfg.Reva.Gateway.Endpoint,
+					"usershareprovidersvc": cfg.Reva.Sharing.Endpoint,
 				},
 			},
 		},
