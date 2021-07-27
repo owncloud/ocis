@@ -68,17 +68,17 @@ func AppProviderWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "wopiurl",
-			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiUrl, ""),
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiURL, ""),
 			Usage:       "WOPI server URL",
 			EnvVars:     []string{"APP_PROVIDER_WOPI_URL"},
-			Destination: &cfg.Reva.AppProvider.WopiUrl,
+			Destination: &cfg.Reva.AppProvider.WopiURL,
 		},
 		&cli.StringFlag{
 			Name:        "wopibridgeurl",
-			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiBridgeUrl, ""),
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiBridgeURL, ""),
 			Usage:       "WOPI bridge URL",
 			EnvVars:     []string{"APP_PROVIDER_WOPI_BRIDGE_URL"},
-			Destination: &cfg.Reva.AppProvider.WopiBridgeUrl,
+			Destination: &cfg.Reva.AppProvider.WopiBridgeURL,
 		},
 
 		// Gateway

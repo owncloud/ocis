@@ -45,8 +45,8 @@ type AppProvider struct {
 	Driver        string
 	IopSecret     string
 	WopiInsecure  bool
-	WopiUrl       string
-	WopiBridgeUrl string
+	WopiURL       string
+	WopiBridgeURL string
 }
 
 // Sharing defines the available sharing configuration.
