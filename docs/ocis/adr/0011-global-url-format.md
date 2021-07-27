@@ -116,12 +116,12 @@ Chosen option: "[option 1]", because [justification. e.g., only option, which me
 The existing ownCloud 10 URLs look like this
 
 | URL | comment |
-|-|-|
+|-----|---------|
 | `https://<host>/apps/files/?dir=<path>&fileid=<fileid>` | pattern |
 | `https://demo.owncloud.com/apps/files/?dir=/&fileid=18` | root of the currently logged in user |
 | `https://demo.owncloud.com/index.php/apps/files/?dir=/path/to/resource&fileid=192` | sub folder `/path/to/resource` |
 
-It contains a path and a `fileid` (which takes precedence). 
+It contains a path and a `fileid` (which takes precedence).
 
 * Good, because the `fileid` prevents bookmarks from breaking
 * Good, because the `dir` reveals context in the form of a path
@@ -136,7 +136,7 @@ It contains a path and a `fileid` (which takes precedence).
 MS OneDrive has URLs like this:
 
 | URL | comment |
-|-|-|
+|-----|---------|
 | `https://<host>/?id=<fileid>(&cid=<cid>)` | pattern, the `cid` is optional but added automatically |
 | `https://onedrive.live.com/?id=root&cid=A12345A14B0A7750` | root of a personal drive |
 | `https://onedrive.live.com/?id=A12345A14B0A7750%21359&cid=A12345A14B0A7750` | sub folder in a personal drive |
@@ -153,7 +153,7 @@ It contains only IDs but no folder names. The `fileid` is a URL encoded `<cid>!<
 There is a customized ownCloud instance that uses path only based URLs:
 
 | URL | comment |
-|-|-|
+|-----|---------|
 | `https://<host>/apps/files/?dir=/&` | root of the currently logged in user |
 | `https://demo.owncloud.com/apps/files/?dir=/&` | root of the currently logged in user |
 | `https://demo.owncloud.com/apps/files/?dir=/path/to/resource&` | sub folder `/path/to/resource` |
@@ -168,7 +168,7 @@ There is a customized ownCloud instance that uses path only based URLs:
 ### Space based URLs
 
 | URL | comment |
-|-|-|
+|-----|---------|
 | `https://<host>/#/s/<space_id>(/<relative/path>)(?id=<resource_id>)` | the pattern, relative `path` and `resource_id` are optional |
 | `https://demo.owncloud.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607` | root of a storage space, might be the currently logged in users home |
 | `https://demo.owncloud.com/#/s/b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607/relative/path/to/resource` | sub folder `/relative/path/to/resource` in the storage with id `b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607`, works ***only*** if path still exists  |
@@ -239,32 +239,35 @@ While ID based space URLs can be made more readable by shortening the IDs they o
 When every space has a namespaced alias and a relative path we can build a global namespace:
 
 | URL | comment |
-|-|-|
+|-----|---------|
 | `https://<host>/files</namespaced/alias></relative/path/to/resource>?id=<resource_id>` | the pattern, `/files` might become optional |
 | `https://demo.owncloud.com/files/personal/einstein/?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21607` | root of user `einstein` |
 | `https://demo.owncloud.com/files/personal/einstein/relative/path/to/resource?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | sub folder `/relative/path/to/resource` |
 | `https://demo.owncloud.com/files/shares/einstein/somesharename?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | shared URL for `/relative/path/to/resource` |
-| `https://demo.owncloud.com/files/public/kcZVYaXr7oZ66bg/relative/path/to/resource` | sub folder `/relative/path/to/resource` in public link with token `kcZVYaXr7oZ66bg` |
-| `https://demo.owncloud.com/files/public/kcZVYaXr7oZ66bg/relative/path/to/resource` | sub folder `/relative/path/to/resource` in public link with token `kcZVYaXr7oZ66bg` |
 | `https://demo.owncloud.com/files/personal/einstein/marie is stupid/and richard as well/resource?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | sub folder `marie is stupid/and richard as well/resource` ... something einstein might not want to reveal |
 | `https://demo.owncloud.com/files/shares/einstein/resource (2)?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | named link URL for `/marie is stupid/and richard as well/resource`, does not disclose the actual hierarchy, has an appended counter to avaid a collision |
 | `https://demo.owncloud.com/files/shares/einstein/mybestfriends?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | named link URL for `/marie is stupid/and richard as well/resource`, does not disclose the actual hierarchy, has a custom alias for the share |
+| `https://demo.owncloud.com/files/public/kcZVYaXr7oZ66bg/relative/path/to/resource` | sub folder `/relative/path/to/resource` in public link with token `kcZVYaXr7oZ66bg` |
+| `https://demo.owncloud.com/files/public/kcZVYaXr7oZ66bg/relative/path/to/resource` | sub folder `/relative/path/to/resource` in public link with token `kcZVYaXr7oZ66bg` |
+| `https://demo.owncloud.com/s/kcZVYaXr7oZ66bg/` | shortened link to a resource. This is needed to be able to copy a link to a resource whithout leaking any metadata. |
+
 
 `</namespaced/alias></relative/path/to/resource>` is the global path in the CS3 api. The CS3 Storage Registry is responsible by managing the mount points.
 
 In order to be able to copy and paste URLs all resources must be uniquely identifiable:
 
 * Instead of `/home` the URL always has to reflect the user: `/personal/einstein`
-* Public links can use `/public/<token>`
-* workspaces can use `/workspaces/<alias>` or `/workspaces/<additional>/<classification>/<alias>` where the hierarchy is given by the organization
-* experiments can use `/experiments/<alias>`
-* research institutes could set up `/papers/<researchgroup>/<alias>`
-* trash could be accessed by prefixing the namespace alias with `/trash`? or using `/trash/<space_id>`
-* instead of a namespaced alias a storage space id could be used with a generic `/space/<space_id>` namespace
+* Workspaces can use `/workspaces/<alias>` or `/workspaces/<additional>/<classification>/<alias>` where the hierarchy is given by the organization
+* Experiments can use `/experiments/<alias>`
+* Research institutes could set up `/papers/<researchgroup>/<alias>`
+* Trash could be accessed by prefixing the namespace alias with `/trash`? or using `/trash/<space_id>`
+* Instead of a namespaced alias a storage space id could be used with a generic `/space/<space_id>` namespace
+* An url shortener can create urls like `/s/<token>` which could be used as a stable link to a resource.
+* Links for anonymous users will resolve to `/public/<token>`
 
-The alias namespace hierarchy and depth can be pre determined by the admin. Even if aliases change the `id` parameter prevents bookmarks from breaking. A user can decide to build a different hierarchy by using his own registry. 
+The alias namespace hierarchy and depth can be pre determined by the admin. Even if aliases change the `id` parameter prevents bookmarks from breaking. A user can decide to build a different hierarchy by using his own registry.
 
-What about shares? Similar to `/home` it must reflect the user: `/shares/einstein` would list all shares *by* einstein for the currently logged in user. The ui needs to apply the same URL rewriting as for space based URLs: when navigating into a share the URL has to switch from `/personal/einstein/relative/path/to/shared/resource` to `/shares/einstein/<unique and potentially namespaced alias for shared resource>`. When more than one `resource` was shared a name collision would occur. To prevent this we can use ids `/shares/einstein/id/<resource_id` or namespaced aliases `/shares/einstein/files/alias`. Similar to the `/trash` prefix we could treat `/shares` as a filter for the shared resources a user has access to, but that would disclose unshared path segments in personal spaces. We could make that a feature and let users create an alias for a shared resource, similar as for public links. Then they can decide if they want to disclose the full path in their personal space (or another workspace) or if they want to use an alias which is then accessed at `/shares/einstein/<alias>`. As a default we could take the alias at creation time from the filename. That way two shares to a resource with the same name, eg.: `/personal/einstein/project AAA/foo` and `/personal/einstein/project BBB/foo` would lead to `/shares/einstein/foo` (a CS3 internal reference to `/personal/einstein/project AAA/foo`) and `/shares/einstein/foo (2)` (a CS3 internal reference to `/personal/einstein/project BBB/foo`). `foo (2)` would keep its name even when `foo` is deleted or renamed. Well an id as the alias might be better then, because users might rename these aliases, which would break URLs if they have been bookmarked. In any case this would make end user more aware of what they share AND it would allow them to choose an arbitrary context for the links they want to send out: personal internal share URLs. 
+What about shares? Similar to `/home` it must reflect the user: `/shares/einstein` would list all shares *by* einstein for the currently logged in user. The ui needs to apply the same URL rewriting as for space based URLs: when navigating into a share the URL has to switch from `/personal/einstein/relative/path/to/shared/resource` to `/shares/einstein/<unique and potentially namespaced alias for shared resource>`. When more than one `resource` was shared a name collision would occur. To prevent this we can use ids `/shares/einstein/id/<resource_id` or namespaced aliases `/shares/einstein/files/alias`. Similar to the `/trash` prefix we could treat `/shares` as a filter for the shared resources a user has access to, but that would disclose unshared path segments in personal spaces. We could make that a feature and let users create an alias for a shared resource, similar as for public links. Then they can decide if they want to disclose the full path in their personal space (or another workspace) or if they want to use an alias which is then accessed at `/shares/einstein/<alias>`. As a default we could take the alias at creation time from the filename. That way two shares to a resource with the same name, eg.: `/personal/einstein/project AAA/foo` and `/personal/einstein/project BBB/foo` would lead to `/shares/einstein/foo` (a CS3 internal reference to `/personal/einstein/project AAA/foo`) and `/shares/einstein/foo (2)` (a CS3 internal reference to `/personal/einstein/project BBB/foo`). `foo (2)` would keep its name even when `foo` is deleted or renamed. Well an id as the alias might be better then, because users might rename these aliases, which would break URLs if they have been bookmarked. In any case this would make end user more aware of what they share AND it would allow them to choose an arbitrary context for the links they want to send out: personal internal share URLs.
 
 With these different namespaces the `/files` part in the URL becomes obsolete, because the files application can be registered for multiple namespaces: `/personal`, `/workspaces`, `/shares`, `/trash` ...
 
@@ -273,6 +276,7 @@ With these different namespaces the `/files` part in the URL becomes obsolete, b
 * Good, because the UI can detect broken paths and notify the user to update his bookmark if the resource could be found by `id`
 * Good, because the `/files` part might only be required for `id` only based lookup to let the web ui know which app is responsible for the route
 * Good, because it turns shares into deliberately named spaces in `/shares/<owner>/<alias>`
+* Good, because all urls can be shortened to hide any metadata like path, resource name and query parameters
 * Bad, because the web UI needs to look up the space alias in a registry to build an API request for the `/dav/space` endpoint
 
 
@@ -282,7 +286,7 @@ Not every deployment may have the requirement to have the path in the URL. We co
 
 
 | URL | comment |
-|-|-|
+|-----|---------|
 | `https://<host>/files?id=<resource_id>` | default id based navigation |
 | `https://<host>/files</namespaced/alias></relative/path/to/resource>?id=<resource_id>` | optional path based navigation with fallback to id |
 
