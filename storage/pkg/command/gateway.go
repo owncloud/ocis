@@ -162,12 +162,6 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 				},
 				"appregistry": map[string]interface{}{
 					"driver": "static",
-					"static": map[string]interface{}{
-						"rules": map[string]interface{}{
-							//TODO: add types configuration
-							"application/vnd.oasis.opendocument.text": cfg.Reva.AppProvider.Endpoint,
-						},
-					},
 				},
 				"storageregistry": map[string]interface{}{
 					"driver": cfg.Reva.StorageRegistry.Driver,

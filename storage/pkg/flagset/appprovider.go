@@ -39,50 +39,52 @@ func AppProviderWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"APP_PROVIDER_BASIC_GRPC_ADDR"},
 			Destination: &cfg.Reva.AppProvider.GRPCAddr,
 		},
+		&cli.StringFlag{
+			Name:        "external-addr",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.ExternalAddr, "127.0.0.1:9164"),
+			Usage:       "Address to connect to the storage service for other services",
+			EnvVars:     []string{"APP_PROVIDER_BASIC_EXTERNAL_ADDR"},
+			Destination: &cfg.Reva.AppProvider.ExternalAddr,
+		},
 		&cli.StringSliceFlag{
 			Name:    "service",
 			Value:   cli.NewStringSlice("appprovider"),
 			Usage:   "--service appprovider [--service otherservice]",
 			EnvVars: []string{"APP_PROVIDER_BASIC_SERVICES"},
 		},
+
+		// WOPI driver
 		&cli.StringFlag{
-			Name:        "driver",
-			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.Driver, "demo"),
-			Usage:       "app provider driver",
-			EnvVars:     []string{"APP_PROVIDER_DRIVER"},
-			Destination: &cfg.Reva.AppProvider.Driver,
-		},
-		&cli.StringFlag{
-			Name:        "iopsecret",
-			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.IopSecret, ""),
+			Name:        "wopi-driver-iopsecret",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiDriver.IopSecret, ""),
 			Usage:       "IOP Secret (Shared with WOPI server)",
-			EnvVars:     []string{"APP_PROVIDER_IOP_SECRET"},
-			Destination: &cfg.Reva.AppProvider.IopSecret,
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_IOP_SECRET"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.IopSecret,
 		},
 		&cli.BoolFlag{
-			Name:        "wopiinsecure",
-			Value:       flags.OverrideDefaultBool(cfg.Reva.AppProvider.WopiInsecure, false),
+			Name:        "wopi-driver-insecure",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.AppProvider.WopiDriver.Insecure, false),
 			Usage:       "Disable SSL certificate verification of WOPI server and WOPI bridge",
-			EnvVars:     []string{"APP_PROVIDER_WOPI_INSECURE"},
-			Destination: &cfg.Reva.AppProvider.WopiInsecure,
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_INSECURE"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.Insecure,
 		},
 		&cli.StringFlag{
-			Name:        "wopiurl",
-			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiURL, ""),
+			Name:        "wopi-driver-wopiurl",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiDriver.WopiURL, ""),
 			Usage:       "WOPI server URL",
-			EnvVars:     []string{"APP_PROVIDER_WOPI_URL"},
-			Destination: &cfg.Reva.AppProvider.WopiURL,
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_WOPI_URL"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.WopiURL,
 		},
+
 		&cli.StringFlag{
-			Name:        "wopibridgeurl",
-			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiBridgeURL, ""),
-			Usage:       "WOPI bridge URL",
-			EnvVars:     []string{"APP_PROVIDER_WOPI_BRIDGE_URL"},
-			Destination: &cfg.Reva.AppProvider.WopiBridgeURL,
+			Name:        "wopi-driver-appurl",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiDriver.AppURL, ""),
+			Usage:       "App server URL",
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_APP_URL"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.AppURL,
 		},
 
 		// Gateway
-
 		&cli.StringFlag{
 			Name:        "gateway-url",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142"),

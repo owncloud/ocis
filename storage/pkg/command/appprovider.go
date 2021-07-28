@@ -98,12 +98,17 @@ func appProviderConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"appprovider": map[string]interface{}{
-					"driver":        cfg.Reva.AppProvider.Driver,
-					"demo":          map[string]interface{}{},
-					"wopiinsecure":  cfg.Reva.AppProvider.WopiInsecure,
-					"iopsecret":     cfg.Reva.AppProvider.IopSecret,
-					"wopiurl":       cfg.Reva.AppProvider.WopiURL,
-					"wopibridgeurl": cfg.Reva.AppProvider.WopiBridgeURL,
+					"app_provider_url": cfg.Reva.AppProvider.ExternalAddr,
+					"driver":           "wopi", //TODO: make configurable
+					"drivers": map[string]interface{}{
+						"wopi": map[string]interface{}{
+							"app_name":             "CS3 WOPI server",
+							"insecure_connections": cfg.Reva.AppProvider.WopiDriver.Insecure,
+							"iop_secret":           cfg.Reva.AppProvider.WopiDriver.IopSecret,
+							"wopi_url":             cfg.Reva.AppProvider.WopiDriver.WopiURL,
+							"app_url":              cfg.Reva.AppProvider.WopiDriver.AppURL,
+						},
+					},
 				},
 			},
 		},
