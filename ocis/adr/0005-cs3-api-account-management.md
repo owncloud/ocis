@@ -1,5 +1,6 @@
 ---
 title: "5. Account Management through CS3 API"
+weight: 5
 date: 2021-04-12T15:00:00+01:00
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr
