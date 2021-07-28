@@ -53,6 +53,14 @@ func AppProviderWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars: []string{"APP_PROVIDER_BASIC_SERVICES"},
 		},
 
+		&cli.StringFlag{
+			Name:        "driver",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.Driver, ""),
+			Usage:       "Driver to use for app provider",
+			EnvVars:     []string{"APP_PROVIDER_DRIVER"},
+			Destination: &cfg.Reva.AppProvider.Driver,
+		},
+
 		// WOPI driver
 		&cli.StringFlag{
 			Name:        "wopi-driver-iopsecret",

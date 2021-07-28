@@ -43,6 +43,7 @@ type StorageRegistry struct {
 type AppProvider struct {
 	Port
 	ExternalAddr string
+	Driver       string
 	WopiDriver   WopiDriver
 }
 

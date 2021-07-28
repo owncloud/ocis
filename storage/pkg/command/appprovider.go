@@ -81,6 +81,19 @@ func AppProvider(cfg *config.Config) *cli.Command {
 
 // appProviderConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
 func appProviderConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
+	drivers := map[string]interface{}{}
+	if cfg.Reva.AppProvider.Driver == "wopi" {
+		drivers = map[string]interface{}{
+			"wopi": map[string]interface{}{
+				"app_name":             "CS3 WOPI server",
+				"insecure_connections": cfg.Reva.AppProvider.WopiDriver.Insecure,
+				"iop_secret":           cfg.Reva.AppProvider.WopiDriver.IopSecret,
+				"wopi_url":             cfg.Reva.AppProvider.WopiDriver.WopiURL,
+				"app_url":              cfg.Reva.AppProvider.WopiDriver.AppURL,
+			},
+		}
+	}
+
 	rcfg := map[string]interface{}{
 		"core": map[string]interface{}{
 			"max_cpus":             cfg.Reva.AppProvider.MaxCPUs,
@@ -99,16 +112,8 @@ func appProviderConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 			"services": map[string]interface{}{
 				"appprovider": map[string]interface{}{
 					"app_provider_url": cfg.Reva.AppProvider.ExternalAddr,
-					"driver":           "wopi", //TODO: make configurable
-					"drivers": map[string]interface{}{
-						"wopi": map[string]interface{}{
-							"app_name":             "CS3 WOPI server",
-							"insecure_connections": cfg.Reva.AppProvider.WopiDriver.Insecure,
-							"iop_secret":           cfg.Reva.AppProvider.WopiDriver.IopSecret,
-							"wopi_url":             cfg.Reva.AppProvider.WopiDriver.WopiURL,
-							"app_url":              cfg.Reva.AppProvider.WopiDriver.AppURL,
-						},
-					},
+					"driver":           cfg.Reva.AppProvider.Driver,
+					"drivers":          drivers,
 				},
 			},
 		},
