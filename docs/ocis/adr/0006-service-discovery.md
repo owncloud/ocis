@@ -1,5 +1,6 @@
 ---
 title: "6. Service Discovery within oCIS and Reva"
+weight: 6
 date: 2021-04-19T13:00:00+01:00
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr

@@ -1,5 +1,10 @@
 ---
-title: "8. Extension Template"
+title: "9. Extension Template"
+weight: 9
+date: 2021-06-10T15:00:00+01:00
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/ocis/adr
+geekdocFilePath: 0009-extension-template.md
 ---
 
 * Status: proposed

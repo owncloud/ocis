@@ -1,5 +1,6 @@
 ---
 title: "2. Persist accounts in a CS3 storage"
+weight: 2
 date: 2020-08-21T20:21:00+01:00
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr
