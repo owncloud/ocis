@@ -76,6 +76,7 @@ services:
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       # change default secrets
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      OCIS_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
     volumes:
       - ./config/ocis/proxy-config.json:/config/proxy-config.json
       - ocis-data:/var/tmp/ocis
