@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-29T05:03:52+0000"
+date: "2021-07-29T14:43:38+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -34,6 +34,107 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### thumbnails server
+
+Start integrated server
+
+Usage: `thumbnails server [command options] [arguments...]`
+
+
+
+-log-file |  $THUMBNAILS_LOG_FILE , $OCIS_LOG_FILE
+: Enable log to file.
+
+
+-log-level |  $THUMBNAILS_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+
+-log-pretty |  $THUMBNAILS_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+
+-log-color |  $THUMBNAILS_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
+
+-config-file |  $THUMBNAILS_CONFIG_FILE
+: Path to config file.
+
+
+-tracing-enabled |  $THUMBNAILS_TRACING_ENABLED
+: Enable sending traces.
+
+
+-tracing-type |  $THUMBNAILS_TRACING_TYPE
+: Tracing backend type. Default: `"jaeger"`.
+
+
+-tracing-endpoint |  $THUMBNAILS_TRACING_ENDPOINT
+: Endpoint for the agent. Default: `""`.
+
+
+-tracing-collector |  $THUMBNAILS_TRACING_COLLECTOR
+: Endpoint for the collector. Default: `""`.
+
+
+-tracing-service |  $THUMBNAILS_TRACING_SERVICE
+: Service name for tracing. Default: `"thumbnails"`.
+
+
+-debug-addr |  $THUMBNAILS_DEBUG_ADDR
+: Address to bind debug server. Default: `"0.0.0.0:9189"`.
+
+
+-debug-token |  $THUMBNAILS_DEBUG_TOKEN
+: Token to grant metrics access. Default: `""`.
+
+
+-debug-pprof |  $THUMBNAILS_DEBUG_PPROF
+: Enable pprof debugging.
+
+
+-debug-zpages |  $THUMBNAILS_DEBUG_ZPAGES
+: Enable zpages debugging.
+
+
+-grpc-name |  $THUMBNAILS_GRPC_NAME
+: Name of the service. Default: `"thumbnails"`.
+
+
+-grpc-addr |  $THUMBNAILS_GRPC_ADDR
+: Address to bind grpc server. Default: `"0.0.0.0:9185"`.
+
+
+-grpc-namespace |  $THUMBNAILS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
+
+-filesystemstorage-root |  $THUMBNAILS_FILESYSTEMSTORAGE_ROOT
+: Root path of the filesystem storage directory. Default: `/var/tmp/ocis/thumbnails`.
+
+
+-reva-gateway-addr |  $THUMBNAILS_REVA_GATEWAY , $PROXY_REVA_GATEWAY_ADDR
+: Reva gateway address. Default: `"127.0.0.1:9142"`.
+
+
+-webdavsource-insecure |  $THUMBNAILS_WEBDAVSOURCE_INSECURE
+: Whether to skip certificate checks. Default: `true`.
+
+
+-thumbnail-resolution |  $THUMBNAILS_RESOLUTIONS
+: --thumbnail-resolution 16x16 [--thumbnail-resolution 32x32]. Default: `cli.NewStringSlice("16x16", "32x32", "64x64", "128x128", "1920x1080", "3840x2160", "7680x4320")`.
+
+
+-webdav-namespace |  $STORAGE_WEBDAV_NAMESPACE
+: Namespace prefix for the webdav endpoint. Default: `"/home"`.
+
+
+-extensions | 
+: Run specific extensions during supervised mode.
+
+
 
 ### thumbnails version
 
@@ -137,107 +238,6 @@ Usage: `thumbnails ocis-thumbnails [command options] [arguments...]`
 
 
 
-
-
-
-### thumbnails server
-
-Start integrated server
-
-Usage: `thumbnails server [command options] [arguments...]`
-
-
-
--log-file |  $THUMBNAILS_LOG_FILE , $OCIS_LOG_FILE
-: Enable log to file.
-
-
--log-level |  $THUMBNAILS_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
-
--log-pretty |  $THUMBNAILS_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
-
--log-color |  $THUMBNAILS_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
-
-
--config-file |  $THUMBNAILS_CONFIG_FILE
-: Path to config file.
-
-
--tracing-enabled |  $THUMBNAILS_TRACING_ENABLED
-: Enable sending traces.
-
-
--tracing-type |  $THUMBNAILS_TRACING_TYPE
-: Tracing backend type. Default: `"jaeger"`.
-
-
--tracing-endpoint |  $THUMBNAILS_TRACING_ENDPOINT
-: Endpoint for the agent. Default: `""`.
-
-
--tracing-collector |  $THUMBNAILS_TRACING_COLLECTOR
-: Endpoint for the collector. Default: `""`.
-
-
--tracing-service |  $THUMBNAILS_TRACING_SERVICE
-: Service name for tracing. Default: `"thumbnails"`.
-
-
--debug-addr |  $THUMBNAILS_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9189"`.
-
-
--debug-token |  $THUMBNAILS_DEBUG_TOKEN
-: Token to grant metrics access. Default: `""`.
-
-
--debug-pprof |  $THUMBNAILS_DEBUG_PPROF
-: Enable pprof debugging.
-
-
--debug-zpages |  $THUMBNAILS_DEBUG_ZPAGES
-: Enable zpages debugging.
-
-
--grpc-name |  $THUMBNAILS_GRPC_NAME
-: Name of the service. Default: `"thumbnails"`.
-
-
--grpc-addr |  $THUMBNAILS_GRPC_ADDR
-: Address to bind grpc server. Default: `"0.0.0.0:9185"`.
-
-
--grpc-namespace |  $THUMBNAILS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
-
-
--filesystemstorage-root |  $THUMBNAILS_FILESYSTEMSTORAGE_ROOT
-: Root path of the filesystem storage directory. Default: `/var/tmp/ocis/thumbnails`.
-
-
--reva-gateway-addr |  $THUMBNAILS_REVA_GATEWAY , $PROXY_REVA_GATEWAY_ADDR
-: Reva gateway address. Default: `"127.0.0.1:9142"`.
-
-
--webdavsource-insecure |  $THUMBNAILS_WEBDAVSOURCE_INSECURE
-: Whether to skip certificate checks. Default: `true`.
-
-
--thumbnail-resolution |  $THUMBNAILS_RESOLUTIONS
-: --thumbnail-resolution 16x16 [--thumbnail-resolution 32x32]. Default: `cli.NewStringSlice("16x16", "32x32", "64x64", "128x128", "1920x1080", "3840x2160", "7680x4320")`.
-
-
--webdav-namespace |  $STORAGE_WEBDAV_NAMESPACE
-: Namespace prefix for the webdav endpoint. Default: `"/home"`.
-
-
--extensions | 
-: Run specific extensions during supervised mode.
 
 
 
