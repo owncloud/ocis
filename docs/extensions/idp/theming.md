@@ -23,6 +23,16 @@ Kopano Konnect is built with [kpop](https://github.com/Kopano-dev/kpop), a colle
 ### Containers
 Layouts of all pages are located in the `idp/ui/src/containers` folder. By editing any of files in that folder, you can do any kind of changes in the layout and create advanced themes. It is, however, important to be careful when touching this code as it imports also actions which are responsible for the login flow.
 
+#### What pages to theme
+- Login
+  - Login - login form used to authenticate the users
+  - Consent - consent page used to authorise apps for already signed in users
+  - Chooseaccount - page with a list of accounts to choose from
+- Goodbye
+  - Goodbyescreen - goodbye message displayed to users after they signed out
+- Welcome
+  - Welcomescreen - welcome message displayed to users after they signed in
+
 ### Components
 `idp/ui/src/components` folder contains all custom components which are then imported into containers.
 
