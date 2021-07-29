@@ -79,8 +79,8 @@ _ocdav: double check the webdav property parsing when custom namespaces are used
 -   [apiWebdavProperties2/getFileProperties.feature:266](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L266)
 
 #### [downloading an old version of a file returns 501](https://github.com/owncloud/ocis/issues/2261)
--    [apiVersions/fileVersions.feature:432](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L432)
--    [apiVersions/fileVersions.feature:450](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L450)
+-    [apiVersions/fileVersions.feature:437](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L437)
+-    [apiVersions/fileVersions.feature:455](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L455)
 -    [apiVersions/fileVersionsSharingToShares.feature:301](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L301)
 
 ### Sync
@@ -575,7 +575,7 @@ cannot share a folder with create permission
 
 #### [different error message detail for previews of folder](https://github.com/owncloud/ocis/issues/2064)
 
--   [apiWebdavPreviews/previews.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L116)
+-   [apiWebdavPreviews/previews.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L125)
 
 #### [creating public links with permissions fails](https://github.com/owncloud/product/issues/252)
 
@@ -1159,20 +1159,20 @@ special character username not valid
 -   [apiProvisioning-v1/enableUser.feature:98](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L98)
 -   [apiProvisioning-v1/enableUser.feature:108](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/enableUser.feature#L108)
 -   [apiProvisioning-v1/enableUser.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/enableUser.feature#L135)
--   [apiProvisioning-v1/disableUser.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L102)
--   [apiProvisioning-v1/disableUser.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L132)
--   [apiProvisioning-v1/disableUser.feature:168](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L168)
--   [apiProvisioning-v1/disableUser.feature:175](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L175)
--   [apiProvisioning-v1/disableUser.feature:206](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L206)
--   [apiProvisioning-v1/disableUser.feature:222](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L222)
+-   [apiProvisioning-v1/disableUser.feature:104](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L104)
+-   [apiProvisioning-v1/disableUser.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L135)
+-   [apiProvisioning-v1/disableUser.feature:177](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L177)
+-   [apiProvisioning-v1/disableUser.feature:185](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L185)
+-   [apiProvisioning-v1/disableUser.feature:239](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L239)
+-   [apiProvisioning-v1/disableUser.feature:256](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L256)
 -   [apiProvisioning-v2/disableUser.feature:82](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L82)
 -   [apiProvisioning-v2/disableUser.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L102)
 -   [apiProvisioning-v2/disableUser.feature:111](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L111)
 -   [apiProvisioning-v2/disableUser.feature:133](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L133)
--   [apiProvisioning-v2/disableUser.feature:169](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L169)
--   [apiProvisioning-v2/disableUser.feature:176](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L176)
--   [apiProvisioning-v2/disableUser.feature:207](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L207)
--   [apiProvisioning-v2/disableUser.feature:223](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L223)
+-   [apiProvisioning-v2/disableUser.feature:174](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L174)
+-   [apiProvisioning-v2/disableUser.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L182)
+-   [apiProvisioning-v2/disableUser.feature:236](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L236)
+-   [apiProvisioning-v2/disableUser.feature:253](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L253)
 
 #### [Update displayname to empty value is successful](https://github.com/owncloud/ocis/issues/2167)
 -   [apiProvisioning-v1/editUser.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L47)
@@ -1214,7 +1214,7 @@ _ocs: api compatibility, return correct status code_
 -   [apiProvisioning-v1/addUser.feature:189](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/addUser.feature#L189)
 -   [apiProvisioning-v1/createSubAdmin.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/createSubAdmin.feature#L48)
 -   [apiProvisioning-v1/deleteUser.feature:76](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/deleteUser.feature#L76)
--   [apiProvisioning-v1/disableUser.feature:225](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L225)
+-   [apiProvisioning-v1/disableUser.feature:260](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L260)
 -   [apiProvisioning-v1/editUser.feature:131](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L131)
 -   [apiProvisioning-v1/editUser.feature:143](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L143)
 -   [apiProvisioning-v1/getUser.feature:170](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L170)
@@ -1244,8 +1244,8 @@ _ocs: api compatibility, return correct status code_
 -   [apiProvisioning-v2/deleteUser.feature:118](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/deleteUser.feature#L118)
 -   [apiProvisioning-v2/disableUser.feature:51](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L51)
 -   [apiProvisioning-v2/disableUser.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L67)
--   [apiProvisioning-v2/disableUser.feature:226](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L226)
--   [apiProvisioning-v2/disableUser.feature:240](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L240)
+-   [apiProvisioning-v2/disableUser.feature:257](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L257)
+-   [apiProvisioning-v2/disableUser.feature:272](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L272)
 -   [apiProvisioning-v2/editUser.feature:131](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L131)
 -   [apiProvisioning-v2/editUser.feature:143](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L143)
 -   [apiProvisioning-v2/editUser.feature:159](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L159)
@@ -1746,9 +1746,6 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiWebdavProperties1/copyFile.feature:464](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L464)
 -   [apiWebdavProperties1/copyFile.feature:465](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L465)
 
-#### [The version number is reset after moving a file](https://github.com/owncloud/ocis/issues/1238)
--   [apiVersions/fileVersions.feature:359](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L359)
-
 ### Won't fix
 Not everything needs to be implemented for ocis. While the oc10 testsuite covers these things we are not looking at them right now.
 
@@ -1758,7 +1755,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 #### [uploading with old-chunking does not work](https://github.com/owncloud/ocis/issues/1343)
 #### [remote.php/dav/uploads endpoint does not exist](https://github.com/owncloud/ocis/issues/1321)
 -   [apiVersions/fileVersions.feature:97](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L97)
--   [apiVersions/fileVersions.feature:288](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L288)
 -   [apiWebdavUpload1/uploadFileToExcludedDirectory.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToExcludedDirectory.feature#L20)
 -   [apiWebdavUpload1/uploadFileToExcludedDirectory.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToExcludedDirectory.feature#L21)
 -   [apiWebdavUpload1/uploadFileToExcludedDirectory.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToExcludedDirectory.feature#L34)
@@ -1819,3 +1815,7 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 ### [not possible to overwrite a received shared file](https://github.com/owncloud/ocis/issues/2267)
 -   [apiShareOperationsToShares1/changingFilesShare.feature:114](https://github.com/owncloud/web/blob/master/tests/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L114)
+
+### [Allow public link sharing only for certain groups feature not implemented]
+- [apiSharePublicLink2/allowGroupToCreatePublicLinks.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/allowGroupToCreatePublicLinks.feature#L35)
+- [apiSharePublicLink2/allowGroupToCreatePublicLinks.feature:91](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/allowGroupToCreatePublicLinks.feature#L91)
