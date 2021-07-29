@@ -3,6 +3,7 @@ package glauth
 import (
 	"net"
 
+	"github.com/glauth/glauth/pkg/config"
 	"github.com/glauth/glauth/pkg/handler"
 	"github.com/nmcclain/ldap"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -98,6 +99,11 @@ func (h chainHandler) Modify(boundDN string, req ldap.ModifyRequest, conn net.Co
 // Delete is not yet supported for the chain backend
 func (h chainHandler) Delete(boundDN string, deleteDN string, conn net.Conn) (result ldap.LDAPResultCode, err error) {
 	return ldap.LDAPResultInsufficientAccessRights, nil
+}
+
+// FindUser with the given username. Called by the ldap backend to authenticate the bind. Optional
+func (h chainHandler) FindUser(userName string) (bool, config.User, error) {
+	return false, config.User{}, nil
 }
 
 // NewChainHandler implements a chain backend with two backends

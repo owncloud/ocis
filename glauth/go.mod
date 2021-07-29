@@ -8,11 +8,11 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
-	github.com/glauth/glauth v1.1.3-0.20201110124627-fd3ac7e4bbdc
-	github.com/go-logr/logr v0.1.0
+	github.com/glauth/glauth v1.1.3-0.20210729125545-b9aecdfcac31
+	github.com/go-logr/logr v0.4.0
 	github.com/micro/cli/v2 v2.1.2
 	github.com/nmcclain/asn1-ber v0.0.0-20170104154839-2661553a0484
-	github.com/nmcclain/ldap v0.0.0-20191021200707-3b3b69a7e9e3
+	github.com/nmcclain/ldap v0.0.0-20210720162743-7f8d1e44eeba
 	github.com/oklog/run v1.1.0
 	github.com/openzipkin/zipkin-go v0.2.5
 	github.com/owncloud/ocis/accounts v0.5.3-0.20210216094451-dc73176dc62d

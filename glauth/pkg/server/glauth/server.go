@@ -63,12 +63,12 @@ func Server(opts ...Option) (*LdapSvc, error) {
 	case "ldap":
 		bh = handler.NewLdapHandler(
 			handler.Logger(s.log),
-			handler.Config(s.backend),
+			handler.Backend(s.backend.Backend),
 		)
 	case "owncloud":
 		bh = handler.NewOwnCloudHandler(
 			handler.Logger(s.log),
-			handler.Config(s.backend),
+			handler.Backend(s.backend.Backend),
 		)
 	case "accounts":
 		bh = NewOCISHandler(
@@ -101,12 +101,12 @@ func Server(opts ...Option) (*LdapSvc, error) {
 		case "ldap":
 			fh = handler.NewLdapHandler(
 				handler.Logger(s.log),
-				handler.Config(s.fallback),
+				handler.Backend(s.fallback.Backend),
 			)
 		case "owncloud":
 			fh = handler.NewOwnCloudHandler(
 				handler.Logger(s.log),
-				handler.Config(s.fallback),
+				handler.Backend(s.fallback.Backend),
 			)
 		case "accounts":
 			fh = NewOCISHandler(

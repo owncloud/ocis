@@ -26,7 +26,7 @@ require (
 	go.opencensus.io v0.23.0
 	golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8
 	google.golang.org/grpc v1.39.0
-	google.golang.org/grpc/examples v0.0.0-20210720175814-65cabd74d8e1 // indirect
+	google.golang.org/grpc/examples v0.0.0-20210728214646-ad0a2a847cdf // indirect
 	google.golang.org/protobuf v1.27.1
 )
 

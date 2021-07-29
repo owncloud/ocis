@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/asim/go-micro/v3/metadata"
+	"github.com/glauth/glauth/pkg/config"
 	"github.com/glauth/glauth/pkg/handler"
 	"github.com/glauth/glauth/pkg/stats"
 	ber "github.com/nmcclain/asn1-ber"
@@ -523,6 +524,11 @@ func (h ocisHandler) Modify(boundDN string, req ldap.ModifyRequest, conn net.Con
 // Delete is not yet supported for the ocis backend
 func (h ocisHandler) Delete(boundDN string, deleteDN string, conn net.Conn) (result ldap.LDAPResultCode, err error) {
 	return ldap.LDAPResultInsufficientAccessRights, nil
+}
+
+// FindUser with the given username
+func (h ocisHandler) FindUser(userName string) (found bool, user config.User, err error) {
+	return false, config.User{}, nil
 }
 
 // NewOCISHandler implements a glauth backend with ocis-accounts as the datasource
