@@ -36,6 +36,9 @@ The new password for the Reva Inter Operability Platform user must be made avail
 Furthermore, oCIS uses a shared secret to sign JWT tokens for inter service authorization, which also needs to be changed by the user.
 You can change it by setting the `OCIS_JWT_SECRET` environment variable for oCIS to a random string.
 
+Another is used secret for singing JWT tokens for uploads and downloads, which also needs to be changed by the user.
+You can change it by setting the `STORAGE_TRANSFER_SECRET` environment variable for oCIS to a random string.
+
 ### Delete demo users
 
 {{< hint info >}}
