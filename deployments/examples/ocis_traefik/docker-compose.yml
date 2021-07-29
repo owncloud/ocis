@@ -3,19 +3,25 @@ version: "3.7"
 
 services:
   traefik:
-    image: traefik:v2.4
+    image: traefik:v2.5
     networks:
       ocis-net:
         aliases:
           - ${OCIS_DOMAIN:-ocis.owncloud.test}
     command:
-      #- "--log.level=DEBUG"
+      - "--log.level=${TRAEFIK_LOG_LEVEL:-ERROR}"
+      # letsencrypt configuration
       - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@example.org}"
       - "--certificatesResolvers.http.acme.storage=/certs/acme.json"
       - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
+      # enable dasbhoard
       - "--api.dashboard=true"
+      # define entrypoints
       - "--entryPoints.http.address=:80"
+      - "--entryPoints.http.http.redirections.entryPoint.to=https"
+      - "--entryPoints.http.http.redirections.entryPoint.scheme=https"
       - "--entryPoints.https.address=:443"
+      # docker provider (get configuration from container labels)
       - "--providers.docker.endpoint=unix:///var/run/docker.sock"
       - "--providers.docker.exposedByDefault=false"
     ports:
@@ -26,17 +32,12 @@ services:
       - "certs:/certs"
     labels:
       - "traefik.enable=${TRAEFIK_DASHBOARD:-false}"
-      - "traefik.http.routers.traefik.entrypoints=http"
-      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN:-traefik.owncloud.test}`)"
       - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS:-admin:$apr1$4vqie50r$YQAmQdtmz5n9rEALhxJ4l.}" # defaults to admin:admin
-      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
-      - "traefik.http.routers.traefik-secure.entrypoints=https"
-      - "traefik.http.routers.traefik-secure.rule=Host(`${TRAEFIK_DOMAIN:-traefik.owncloud.test}`)"
-      - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
-      - "traefik.http.routers.traefik-secure.tls=true"
-      - "traefik.http.routers.traefik-secure.tls.certresolver=http"
-      - "traefik.http.routers.traefik-secure.service=api@internal"
+      - "traefik.http.routers.traefik.entrypoints=https"
+      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN:-traefik.owncloud.test}`)"
+      - "traefik.http.routers.traefik.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik.tls.certresolver=http"
+      - "traefik.http.routers.traefik.service=api@internal"
     logging:
       driver: "local"
     restart: always
@@ -62,15 +63,10 @@ services:
       - ocis-data:/var/tmp/ocis
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ocis.entrypoints=http"
+      - "traefik.http.routers.ocis.entrypoints=https"
       - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`)"
-      - "traefik.http.middlewares.ocis-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.ocis.middlewares=ocis-https-redirect"
-      - "traefik.http.routers.ocis-secure.entrypoints=https"
-      - "traefik.http.routers.ocis-secure.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`)"
-      - "traefik.http.routers.ocis-secure.tls=true"
-      - "traefik.http.routers.ocis-secure.tls.certresolver=http"
-      - "traefik.http.routers.ocis-secure.service=ocis"
+      - "traefik.http.routers.ocis.tls.certresolver=http"
+      - "traefik.http.routers.ocis.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
     logging:
       driver: "local"

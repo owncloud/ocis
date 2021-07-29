@@ -36,7 +36,7 @@ Install and introduce [ownCloud Web](https://github.com/owncloud/web/) and let u
 
 #### Steps
 Deploy web and enable switching to and from it.
-For more details see: [ownCloud 10 with ownCloud Web]({{< ref "deployment/owncloud10_with_oc_web.md" >}})
+For more details see: [ownCloud 10 with ownCloud Web](https://owncloud.dev/clients/web/deployments/oc10-app/)
 
 <div class="editpage">
 
