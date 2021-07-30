@@ -28,21 +28,14 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 
 #### [Version count is 1 more than on oC10](https://github.com/owncloud/ocis/issues/1633)
 -   [apiVersions/fileVersions.feature:400](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L400)
--   [apiVersions/fileVersionsSharingToShares.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L178)
 
 #### [PUT request with missing parent must return status code 409](https://github.com/owncloud/ocis/issues/824)
 -   [apiWebdavUpload1/uploadFile.feature:112](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L112)
 -   [apiWebdavUpload1/uploadFile.feature:113](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L113)
 
 #### [invalid file-names should not be created using the TUS protocol](https://github.com/owncloud/ocis/issues/1001)
--   [apiWebdavUploadTUS/uploadFile.feature:143](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L143)
--   [apiWebdavUploadTUS/uploadFile.feature:144](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L144)
--   [apiWebdavUploadTUS/uploadFile.feature:145](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L145)
--   [apiWebdavUploadTUS/uploadFile.feature:146](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L146)
--   [apiWebdavUploadTUS/uploadFile.feature:147](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L147)
--   [apiWebdavUploadTUS/uploadFile.feature:148](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L148)
--   [apiWebdavUploadTUS/uploadFile.feature:149](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L149)
--   [apiWebdavUploadTUS/uploadFile.feature:150](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L150)
+- [apiWebdavUploadTUS/uploadFile.feature:145](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L145)
+- [apiWebdavUploadTUS/uploadFile.feature:149](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L149)
 
 #### [500 Internal Server Error on Post request for TUS upload](https://github.com/owncloud/ocis/issues/1047)
 
@@ -60,24 +53,12 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiWebdavUploadTUS/optionsRequest.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L46)
 
 #### [renaming to banned name works](https://github.com/owncloud/ocis/issues/1295)
--   [apiWebdavMove1/moveFolder.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L21)
--   [apiWebdavMove1/moveFolder.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L22)
--   [apiWebdavMove1/moveFolder.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L34)
--   [apiWebdavMove1/moveFolder.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L35)
--   [apiWebdavMove1/moveFolder.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L47)
--   [apiWebdavMove1/moveFolder.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L48)
 
 #### [Getting information about a folder overwritten by a file gives 500 error instead of 404](https://github.com/owncloud/ocis/issues/1239)
 -   [apiWebdavProperties1/copyFile.feature:121](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L121)
 -   [apiWebdavProperties1/copyFile.feature:122](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L122)
--   [apiWebdavProperties1/copyFile.feature:134](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L134)
--   [apiWebdavProperties1/copyFile.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L135)
--   [apiWebdavProperties1/copyFile.feature:151](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L151)
--   [apiWebdavProperties1/copyFile.feature:152](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L152)
 -   [apiWebdavProperties1/copyFile.feature:170](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L170)
 -   [apiWebdavProperties1/copyFile.feature:171](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L171)
--   [apiWebdavProperties1/copyFile.feature:207](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L207)
--   [apiWebdavProperties1/copyFile.feature:208](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L208)
 -   [apiWebdavProperties1/copyFile.feature:226](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L226)
 -   [apiWebdavProperties1/copyFile.feature:227](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L227)
 -   [apiWebdavProperties1/copyFile.feature:244](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L244)
@@ -94,13 +75,6 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiWebdavProperties1/copyFile.feature:363](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L363)
 
 #### [creating a folder that already exists returns an empty body](https://github.com/owncloud/ocis/issues/1283)
-Scenario Outline: try to create a folder that already exists
--   [apiWebdavProperties1/createFolder.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L85)
--   [apiWebdavProperties1/createFolder.feature:86](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L86)
-    Scenario Outline: try to create a folder with a name of an existing file
--   [apiWebdavProperties1/createFolder.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L99)
--   [apiWebdavProperties1/createFolder.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L100)
-
     Scenario Outline: Propfind the size of a folder using webdav api `Property "oc:size" found with value "10", expected "#^0$#" or "#^0$#"`
 -   [apiWebdavProperties2/getFileProperties.feature:376](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L376)
 -   [apiWebdavProperties2/getFileProperties.feature:377](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L377)
@@ -1021,9 +995,6 @@ Scenario Outline: Moving a file into a shared folder as the sharee and as the sh
     Scenario Outline: Moving a file to overwrite a file in a shared folder with no permissions
 -   [apiWebdavMove2/moveFile.feature:213](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L213)
 -   [apiWebdavMove2/moveFile.feature:214](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L214)
-    Scenario Outline: rename a file into an invalid filename
--   [apiWebdavMove2/moveFile.feature:234](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L234)
--   [apiWebdavMove2/moveFile.feature:235](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L235)
     Scenario Outline: Checking file id after a move between received shares
 -   [apiWebdavMove2/moveFile.feature:272](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L272)
 -   [apiWebdavMove2/moveFile.feature:273](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L273)
@@ -1044,7 +1015,6 @@ Scenario Outline: Moving a file into a shared folder as the sharee and as the sh
 -   [apiVersions/fileVersionsSharingToShares.feature:252](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L252)
 
 #### [getting the metadata without permission results in a 403 error](https://github.com/owncloud/ocis/issues/773)
--   [apiVersions/fileVersionsSharingToShares.feature:255](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L255)
 
 #### [Expiration date for user shares is not implemented](https://github.com/owncloud/ocis/issues/1250)
 -   [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:58](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L58)
@@ -1934,7 +1904,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 #### [uploading with old-chunking does not work](https://github.com/owncloud/ocis/issues/1343)
 #### [remote.php/dav/uploads endpoint does not exist](https://github.com/owncloud/ocis/issues/1321)
--   [apiVersions/fileVersions.feature:97](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L97)
 -   [apiVersions/fileVersions.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L116)
 -   [apiWebdavUpload1/uploadFileToExcludedDirectory.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToExcludedDirectory.feature#L20)
 -   [apiWebdavUpload1/uploadFileToExcludedDirectory.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToExcludedDirectory.feature#L21)

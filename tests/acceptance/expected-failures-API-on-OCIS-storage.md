@@ -8,44 +8,21 @@ Basic file management like up and download, move, copy, properties, trash, versi
 -   [apiTrashbinRestore/trashbinRestore.feature:310](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbinRestore/trashbinRestore.feature#L310)
 
 #### [Version count is 1 more than on oC10](https://github.com/owncloud/ocis/issues/1633)
--   [apiVersions/fileVersionsSharingToShares.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L178)
 
 #### [Implement Versions Feature for ocis storage](https://github.com/owncloud/product/issues/210)
 -   [apiWebdavEtagPropagation2/restoreVersion.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreVersion.feature#L10)
 
 #### [PUT request with missing parent must return status code 409](https://github.com/owncloud/ocis/issues/824)
--   [apiWebdavUpload1/uploadFile.feature:112](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L112)
--   [apiWebdavUpload1/uploadFile.feature:113](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L113)
 
 #### [invalid file-names should not be created using the TUS protocol](https://github.com/owncloud/ocis/issues/1001)
--   [apiWebdavUploadTUS/uploadFile.feature:143](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L143)
--   [apiWebdavUploadTUS/uploadFile.feature:144](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L144)
--   [apiWebdavUploadTUS/uploadFile.feature:145](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L145)
--   [apiWebdavUploadTUS/uploadFile.feature:146](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L146)
--   [apiWebdavUploadTUS/uploadFile.feature:147](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L147)
--   [apiWebdavUploadTUS/uploadFile.feature:148](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L148)
--   [apiWebdavUploadTUS/uploadFile.feature:149](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L149)
--   [apiWebdavUploadTUS/uploadFile.feature:150](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L150)
 
 #### [TUS OPTIONS requests do not reply with TUS headers when invalid password](https://github.com/owncloud/ocis/issues/1012)
 -   [apiWebdavUploadTUS/optionsRequest.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L33)
 -   [apiWebdavUploadTUS/optionsRequest.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L46)
 
 #### [renaming to banned name works](https://github.com/owncloud/ocis/issues/1295)
--   [apiWebdavMove1/moveFolder.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L21)
--   [apiWebdavMove1/moveFolder.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L22)
--   [apiWebdavMove1/moveFolder.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L34)
--   [apiWebdavMove1/moveFolder.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L35)
--   [apiWebdavMove1/moveFolder.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L47)
--   [apiWebdavMove1/moveFolder.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L48)
 
 #### [Getting information about a folder overwritten by a file gives 500 error instead of 404](https://github.com/owncloud/ocis/issues/1239)
--   [apiWebdavProperties1/copyFile.feature:134](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L134)
--   [apiWebdavProperties1/copyFile.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L135)
--   [apiWebdavProperties1/copyFile.feature:151](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L151)
--   [apiWebdavProperties1/copyFile.feature:152](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L152)
--   [apiWebdavProperties1/copyFile.feature:207](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L207)
--   [apiWebdavProperties1/copyFile.feature:208](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L208)
 -   [apiWebdavProperties1/copyFile.feature:226](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L226)
 -   [apiWebdavProperties1/copyFile.feature:227](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L227)
 -   [apiWebdavProperties1/copyFile.feature:244](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L244)
@@ -60,12 +37,6 @@ Basic file management like up and download, move, copy, properties, trash, versi
 -   [apiWebdavProperties1/copyFile.feature:341](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L341)
 
 #### [creating a folder that already exists returns an empty body](https://github.com/owncloud/ocis/issues/1283)
-Scenario Outline: try to create a folder that already exists
--   [apiWebdavProperties1/createFolder.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L85)
--   [apiWebdavProperties1/createFolder.feature:86](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L86)
-    Scenario Outline: try to create a folder with a name of an existing file
--   [apiWebdavProperties1/createFolder.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L99)
--   [apiWebdavProperties1/createFolder.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFolder.feature#L100)
 
 #### [Custom dav properties with namespaces are rendered incorrectly](https://github.com/owncloud/ocis/issues/2140)
 _ocdav: double check the webdav property parsing when custom namespaces are used_
@@ -734,13 +705,7 @@ cannot share a folder with create permission
 
 #### [deleting a received share-folder moves it to trash-bin but does not unshare it](https://github.com/owncloud/ocis/issues/1123)
 
--   [apiShareManagementToShares/acceptShares.feature:491](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L491)
--   [apiShareManagementToShares/acceptShares.feature:494](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L494)
-
 #### [Deleting a received folder moves it to trashbin](https://github.com/owncloud/ocis/issues/2217)
-
--   [apiTrashbin/trashbinSharingToShares.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L23)
--   [apiTrashbin/trashbinSharingToShares.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L24)
 
 #### [deleting a file inside a received shared folder is moved to the trash-bin of the sharer not the receiver](https://github.com/owncloud/ocis/issues/1124)
 
@@ -858,9 +823,6 @@ Scenario Outline: Moving a file into a shared folder as the sharee and as the sh
     Scenario Outline: Moving a file to overwrite a file in a shared folder with no permissions
 -   [apiWebdavMove2/moveFile.feature:213](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L213)
 -   [apiWebdavMove2/moveFile.feature:214](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L214)
-    Scenario Outline: rename a file into an invalid filename
--   [apiWebdavMove2/moveFile.feature:234](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L234)
--   [apiWebdavMove2/moveFile.feature:235](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L235)
     Scenario Outline: Checking file id after a move between received shares
 -   [apiWebdavMove2/moveFile.feature:272](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L272)
 -   [apiWebdavMove2/moveFile.feature:273](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L273)
@@ -872,7 +834,7 @@ Scenario Outline: Moving a file into a shared folder as the sharee and as the sh
 -   [apiVersions/fileVersionsSharingToShares.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L32)
 
 #### [restoring an older version of a shared file deletes the share](https://github.com/owncloud/ocis/issues/765)
--   [apiShareManagementToShares/acceptShares.feature:490](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L490)
+-   [apiShareManagementToShares/acceptShares.feature:494](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L490)
 -   [apiVersions/fileVersionsSharingToShares.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L43)
 
 #### [not possible to move file into a received folder](https://github.com/owncloud/ocis/issues/764)
@@ -880,7 +842,6 @@ Scenario Outline: Moving a file into a shared folder as the sharee and as the sh
 -   [apiVersions/fileVersionsSharingToShares.feature:222](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L222)
 
 #### [getting the metadata without permission results in a 403 error](https://github.com/owncloud/ocis/issues/773)
--   [apiVersions/fileVersionsSharingToShares.feature:255](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L255)
 
 #### [Expiration date for user shares is not implemented](https://github.com/owncloud/ocis/issues/1250)
 -   [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:58](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L58)
@@ -1385,8 +1346,6 @@ _ocdav: api compatibility, return correct status code_
 -   [apiAuthWebDav/webDavPOSTAuth.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavPOSTAuth.feature#L40)  Scenario: send POST requests to another user's webDav endpoints as normal user
 
 #### [PUT request with missing parent must return status code 409](https://github.com/owncloud/ocis/issues/824)
-_ocdav: api compatibility, return correct status code_
--   [apiAuthWebDav/webDavPUTAuth.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavPUTAuth.feature#L40) Scenario: send PUT requests to another user's webDav endpoints as normal user
 
 #### [Using double slash in URL to access a folder gives 501 and other status codes](https://github.com/owncloud/ocis/issues/1667)
 -   [apiAuthWebDav/webDavSpecialURLs.feature:13](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavSpecialURLs.feature#L13)
@@ -1751,7 +1710,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 #### [uploading with old-chunking does not work](https://github.com/owncloud/ocis/issues/1343)
 #### [remote.php/dav/uploads endpoint does not exist](https://github.com/owncloud/ocis/issues/1321)
--   [apiVersions/fileVersions.feature:97](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L97)
 -   [apiWebdavUpload1/uploadFileToExcludedDirectory.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToExcludedDirectory.feature#L20)
 -   [apiWebdavUpload1/uploadFileToExcludedDirectory.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToExcludedDirectory.feature#L21)
 -   [apiWebdavUpload1/uploadFileToExcludedDirectory.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToExcludedDirectory.feature#L34)

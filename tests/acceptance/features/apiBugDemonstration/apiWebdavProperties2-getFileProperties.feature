@@ -51,13 +51,3 @@ Feature: get file properties
       | dav_version |
       | old         |
       | new         |
-
-  @issue-ocis-reva-163
-  # after fixing all issues delete this Scenario and use the one from oC10 core
-  Scenario Outline: Do a PROPFIND to a non-existing URL
-    And user "Alice" requests "<url>" with "PROPFIND" using basic auth
-    Then the body of the response should be empty
-    Examples:
-      | url                                  |
-      | /remote.php/dav/files/does-not-exist |
-      | /remote.php/dav/does-not-exist       |
