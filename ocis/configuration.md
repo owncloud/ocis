@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-30T08:37:00+0000"
+date: "2021-07-30T10:04:32+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -108,13 +108,11 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### ocis run
+### ocis health
 
-Runs an extension
+Check health status
 
-Usage: `ocis run [command options] [arguments...]`
-
-
+Usage: `ocis health [command options] [arguments...]`
 
 
 
@@ -127,6 +125,11 @@ Usage: `ocis run [command options] [arguments...]`
 
 
 
+
+
+
+-debug-addr |  $OCIS_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9010`.
 
 
 
@@ -192,13 +195,11 @@ Usage: `ocis list [command options] [arguments...]`
 
 
 
-### ocis health
+### ocis run
 
-Check health status
+Runs an extension
 
-Usage: `ocis health [command options] [arguments...]`
-
-
+Usage: `ocis run [command options] [arguments...]`
 
 
 
@@ -212,8 +213,7 @@ Usage: `ocis health [command options] [arguments...]`
 
 
 
--debug-addr |  $OCIS_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9010`.
+
 
 
 
@@ -279,53 +279,29 @@ Usage: `ocis server [command options] [arguments...]`
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
-#### ocis proxy
+#### ocis accounts
 
-Start proxy server
-
-#### ocis storage-sharing
-
-Start storage sharing service
-
-#### ocis thumbnails
-
-Start thumbnails server
-
-#### ocis webdav
-
-Start webdav server
-
-#### ocis ocs
-
-Start ocs server
+Start accounts server
 
 #### ocis storage-groupprovider
 
 Start storage groupprovider service
 
-#### ocis storage-home
+#### ocis settings
 
-Start storage and data provider for /home mount
+Start settings server
 
-#### ocis version
+#### ocis storage-public-link
 
-Lists running services with version
-
-#### ocis accounts
-
-Start accounts server
-
-#### ocis storage-frontend
-
-Start storage frontend
-
-#### ocis idp
-
-Start idp server
+Start storage public link storage
 
 #### ocis storage-auth-bearer
 
 Start storage auth-bearer service
+
+#### ocis web
+
+Start web server
 
 #### ocis storage-gateway
 
@@ -339,35 +315,59 @@ Start storage and data service for metadata
 
 Start a go-micro store
 
-#### ocis web
+#### ocis storage-home
 
-Start web server
+Start storage and data provider for /home mount
+
+#### ocis thumbnails
+
+Start thumbnails server
+
+#### ocis idp
+
+Start idp server
 
 #### ocis onlyoffice
 
 Start onlyoffice server
 
-#### ocis storage-auth-basic
+#### ocis proxy
 
-Start storage auth-basic service
-
-#### ocis storage-users
-
-Start storage and data provider for /users mount
-
-#### ocis storage-userprovider
-
-Start storage userprovider service
+Start proxy server
 
 #### ocis glauth
 
 Start glauth server
 
-#### ocis settings
+#### ocis ocs
 
-Start settings server
+Start ocs server
 
-#### ocis storage-public-link
+#### ocis storage-users
 
-Start storage public link storage
+Start storage and data provider for /users mount
+
+#### ocis storage-frontend
+
+Start storage frontend
+
+#### ocis webdav
+
+Start webdav server
+
+#### ocis storage-auth-basic
+
+Start storage auth-basic service
+
+#### ocis storage-sharing
+
+Start storage sharing service
+
+#### ocis storage-userprovider
+
+Start storage userprovider service
+
+#### ocis version
+
+Lists running services with version
 
