@@ -35,10 +35,13 @@ require (
 	github.com/spf13/viper v1.8.1
 	github.com/thejerf/suture/v4 v4.0.1
 	go.opencensus.io v0.23.0
+	go.opentelemetry.io/otel/exporters/jaeger v1.0.0-RC2 // indirect
+	go.opentelemetry.io/otel/metric v0.20.0 // indirect
 )
 
 replace (
 	github.com/crewjam/saml => github.com/crewjam/saml v0.4.5
+	github.com/cs3org/reva => ../../../refs/reva
 	// broken dependency chain for konnect v0.34.0
 	github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.2
 	github.com/owncloud/ocis/accounts => ../accounts

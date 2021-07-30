@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"time"
 
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 
 	"github.com/go-chi/chi"
@@ -144,6 +146,7 @@ type Ocs struct {
 	RoleService settings.RoleService
 	RoleManager *roles.Manager
 	mux         *chi.Mux
+	tracer      trace.Tracer
 }
 
 // ServeHTTP implements the Service interface.

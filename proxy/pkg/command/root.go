@@ -126,6 +126,13 @@ func NewSutureService(cfg *ociscfg.Config) suture.Service {
 		cfg.Proxy.Supervised = true
 	}
 	cfg.Proxy.Log.File = cfg.Log.File
+	//if cfg.Tracing.Enabled {
+	//	cfg.Proxy.Tracing.Enabled = cfg.Tracing.Enabled
+	//	cfg.Proxy.Tracing.Collector = cfg.Tracing.Collector
+	//	cfg.Proxy.Tracing.Service = cfg.Tracing.Service
+	//	cfg.Proxy.Tracing.Endpoint = cfg.Tracing.Endpoint
+	//	cfg.Proxy.Tracing.Type = cfg.Tracing.Type
+	//}
 	return SutureService{
 		cfg: cfg.Proxy,
 	}

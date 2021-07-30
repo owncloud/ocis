@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"context"
 	"crypto/tls"
 	"net"
 	"net/http"
@@ -10,12 +11,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/owncloud/ocis/proxy/pkg/proxy/policy"
-	"go.opencensus.io/plugin/ochttp/propagation/tracecontext"
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/otel/propagation"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/proxy/pkg/config"
+	"github.com/owncloud/ocis/proxy/pkg/proxy/policy"
+	"go.opencensus.io/plugin/ochttp/propagation/tracecontext"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // MultiHostReverseProxy extends httputil to support multiple hosts with diffent policies
@@ -215,13 +219,19 @@ func (p *MultiHostReverseProxy) AddHost(policy string, target *url.URL, rt confi
 
 func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	var span *trace.Span
+	var span trace.Span
 
-	// Start root span.
 	if p.config.Tracing.Enabled {
-		ctx, span = trace.StartSpan(ctx, r.URL.String())
+		tracer := otel.Tracer("proxy")
+		ctx, span = tracer.Start(context.Background(), r.URL.Path)
 		defer span.End()
-		p.propagator.SpanContextToRequest(span.SpanContext(), r)
+
+		span.SetAttributes(
+			attribute.String("user-agent", r.Header.Get("User-Agent")),
+		)
+
+		p := otel.GetTextMapPropagator()
+		p.Inject(ctx, propagation.HeaderCarrier(r.Header))
 	}
 
 	// Call upstream ServeHTTP

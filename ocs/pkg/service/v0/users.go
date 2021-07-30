@@ -9,14 +9,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cs3org/reva/pkg/auth/scope"
-
 	"github.com/asim/go-micro/plugins/client/grpc/v3"
 	merrors "github.com/asim/go-micro/v3/errors"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/pkg/auth/scope"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
@@ -26,6 +25,7 @@ import (
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
+	ocstracing "github.com/owncloud/ocis/ocs/pkg/tracing"
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
 	"github.com/pkg/errors"
 	"google.golang.org/genproto/protobuf/field_mask"
@@ -90,6 +90,9 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
 	var account *accounts.Account
 	var err error
+
+	_, span := ocstracing.TP.Tracer("ocs").Start(r.Context(), r.URL.Path)
+	defer span.End()
 
 	switch {
 	case userid == "":
