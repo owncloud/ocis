@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Forward basic auth to OpenID connect token authentication endpoint: [#2095](https://github.com/owncloud/ocis/issues/2095)
 * Bugfix - Log all requests in the proxy access log: [#2301](https://github.com/owncloud/ocis/pull/2301)
+* Bugfix - Update glauth to 20210729125545-b9aecdfcac31: [#2336](https://github.com/owncloud/ocis/pull/2336)
 * Enhancement - Proxy: Add claims policy selector: [#2248](https://github.com/owncloud/ocis/pull/2248)
 * Enhancement - Refactor graph API: [#2277](https://github.com/owncloud/ocis/pull/2277)
 * Enhancement - Update REVA to v1.10.1-0.20210721075634-57d692feea7b: [#2314](https://github.com/owncloud/ocis/pull/2314)
@@ -31,6 +32,17 @@ The following sections list the changes for unreleased.
    `directorSelectionDirector`, as per the `ReverseProxy.Director` documentation.
 
    https://github.com/owncloud/ocis/pull/2301
+
+* Bugfix - Update glauth to 20210729125545-b9aecdfcac31: [#2336](https://github.com/owncloud/ocis/pull/2336)
+
+  * Fixes the backend config not being passed correctly in ocis
+  * Fixes a mutex being copied, leading to concurrent writes
+  * Fixes UTF8 chars in filters
+  * Fixes case insensitive strings
+
+   https://github.com/owncloud/ocis/pull/2336
+   https://github.com/glauth/glauth/pull/198
+   https://github.com/glauth/glauth/pull/194
 
 * Enhancement - Proxy: Add claims policy selector: [#2248](https://github.com/owncloud/ocis/pull/2248)
 
