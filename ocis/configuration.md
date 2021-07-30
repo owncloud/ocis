@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-07-29T14:43:37+0000"
+date: "2021-07-30T08:37:00+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -136,89 +136,6 @@ Usage: `ocis run [command options] [arguments...]`
 
 
 
-### ocis server
-
-Start fullstack server
-
-Usage: `ocis server [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $OCIS_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9010`.
-
-
--debug-token |  $OCIS_DEBUG_TOKEN
-: Token to grant metrics access.
-
-
--debug-pprof |  $OCIS_DEBUG_PPROF
-: Enable pprof debugging.
-
-
--debug-zpages |  $OCIS_DEBUG_ZPAGES
-: Enable zpages debugging.
-
-
--http-addr |  $OCIS_HTTP_ADDR
-: Address to bind http server. Default: `0.0.0.0:9000`.
-
-
--http-root |  $OCIS_HTTP_ROOT
-: Root path of http server. Default: `/`.
-
-
--grpc-addr |  $OCIS_GRPC_ADDR
-: Address to bind grpc server. Default: `0.0.0.0:9001`.
-
-
--extensions |  $OCIS_RUN_EXTENSIONS
-: Run specific extensions during supervised mode.
-
-### ocis health
-
-Check health status
-
-Usage: `ocis health [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $OCIS_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9010`.
-
-
-
-
-
-
-
-
-
 ### ocis kill
 
 Kill an extension by name
@@ -275,81 +192,120 @@ Usage: `ocis list [command options] [arguments...]`
 
 
 
+### ocis health
+
+Check health status
+
+Usage: `ocis health [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $OCIS_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9010`.
+
+
+
+
+
+
+
+
+
+### ocis server
+
+Start fullstack server
+
+Usage: `ocis server [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $OCIS_DEBUG_ADDR
+: Address to bind debug server. Default: `0.0.0.0:9010`.
+
+
+-debug-token |  $OCIS_DEBUG_TOKEN
+: Token to grant metrics access.
+
+
+-debug-pprof |  $OCIS_DEBUG_PPROF
+: Enable pprof debugging.
+
+
+-debug-zpages |  $OCIS_DEBUG_ZPAGES
+: Enable zpages debugging.
+
+
+-http-addr |  $OCIS_HTTP_ADDR
+: Address to bind http server. Default: `0.0.0.0:9000`.
+
+
+-http-root |  $OCIS_HTTP_ROOT
+: Root path of http server. Default: `/`.
+
+
+-grpc-addr |  $OCIS_GRPC_ADDR
+: Address to bind grpc server. Default: `0.0.0.0:9001`.
+
+
+-extensions |  $OCIS_RUN_EXTENSIONS
+: Run specific extensions during supervised mode.
+
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
-
-#### ocis store
-
-Start a go-micro store
-
-#### ocis thumbnails
-
-Start thumbnails server
-
-#### ocis storage-metadata
-
-Start storage and data service for metadata
-
-#### ocis storage-auth-basic
-
-Start storage auth-basic service
-
-#### ocis storage-frontend
-
-Start storage frontend
-
-#### ocis web
-
-Start web server
-
-#### ocis settings
-
-Start settings server
-
-#### ocis storage-auth-bearer
-
-Start storage auth-bearer service
-
-#### ocis idp
-
-Start idp server
-
-#### ocis ocs
-
-Start ocs server
-
-#### ocis onlyoffice
-
-Start onlyoffice server
-
-#### ocis storage-home
-
-Start storage and data provider for /home mount
-
-#### ocis storage-sharing
-
-Start storage sharing service
 
 #### ocis proxy
 
 Start proxy server
 
-#### ocis storage-userprovider
+#### ocis storage-sharing
 
-Start storage userprovider service
+Start storage sharing service
 
-#### ocis storage-users
+#### ocis thumbnails
 
-Start storage and data provider for /users mount
+Start thumbnails server
+
+#### ocis webdav
+
+Start webdav server
+
+#### ocis ocs
+
+Start ocs server
 
 #### ocis storage-groupprovider
 
 Start storage groupprovider service
 
-#### ocis storage-public-link
+#### ocis storage-home
 
-Start storage public link storage
+Start storage and data provider for /home mount
 
 #### ocis version
 
@@ -359,15 +315,59 @@ Lists running services with version
 
 Start accounts server
 
-#### ocis webdav
+#### ocis storage-frontend
 
-Start webdav server
+Start storage frontend
+
+#### ocis idp
+
+Start idp server
+
+#### ocis storage-auth-bearer
+
+Start storage auth-bearer service
+
+#### ocis storage-gateway
+
+Start storage gateway
+
+#### ocis storage-metadata
+
+Start storage and data service for metadata
+
+#### ocis store
+
+Start a go-micro store
+
+#### ocis web
+
+Start web server
+
+#### ocis onlyoffice
+
+Start onlyoffice server
+
+#### ocis storage-auth-basic
+
+Start storage auth-basic service
+
+#### ocis storage-users
+
+Start storage and data provider for /users mount
+
+#### ocis storage-userprovider
+
+Start storage userprovider service
 
 #### ocis glauth
 
 Start glauth server
 
-#### ocis storage-gateway
+#### ocis settings
 
-Start storage gateway
+Start settings server
+
+#### ocis storage-public-link
+
+Start storage public link storage
 
