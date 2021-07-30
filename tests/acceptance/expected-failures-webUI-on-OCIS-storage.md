@@ -543,3 +543,9 @@ Other free text and markdown formatting can be used elsewhere in the document if
 ### [not possible to overwrite a received shared file](https://github.com/owncloud/ocis/issues/2267)
 -   [webUISharingInternalGroups/shareWithGroups.feature:77](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L77)
 -   [webUISharingInternalUsers/shareWithUsers.feature:57](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L57)
+
+### [remove tests, testing wrong behaviour](https://github.com/owncloud/ocis/issues/5595)
+-   [webUIRenameFiles/renameFiles.feature:129](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#129)
+-   [webUIRenameFiles/renameFiles.feature:128](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#128)
+-   [webUIRenameFolders/renameFolders.feature:118](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFolders/renameFolders.feature#118)
+-   [webUIRenameFolders/renameFolders.feature:117](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFolders/renameFolders.feature#117)
