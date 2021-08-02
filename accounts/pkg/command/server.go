@@ -7,7 +7,6 @@ import (
 
 	"github.com/imdario/mergo"
 	"github.com/jinzhu/copier"
-	"github.com/mitchellh/cli"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"github.com/micro/cli/v2"

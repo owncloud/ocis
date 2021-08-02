@@ -40,11 +40,14 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0
 	github.com/iancoleman/strcase v0.1.3
+	github.com/imdario/mergo v0.3.9
+	github.com/jinzhu/copier v0.0.0-20190924061706-b57f9002281a
 	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/justinas/alice v1.2.0
 	github.com/libregraph/lico v0.34.1-0.20210803054646-b584e0372224
 	github.com/mennanov/fieldmask-utils v0.3.3
 	github.com/micro/cli/v2 v2.1.2
+	github.com/mitchellh/cli v1.0.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nmcclain/asn1-ber v0.0.0-20170104154839-2661553a0484
 	github.com/nmcclain/ldap v0.0.0-20210720162743-7f8d1e44eeba
