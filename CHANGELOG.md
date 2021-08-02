@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Improve IDP Login Accessibility: [#5376](https://github.com/owncloud/web/issues/5376)
 * Bugfix - Forward basic auth to OpenID connect token authentication endpoint: [#2095](https://github.com/owncloud/ocis/issues/2095)
 * Bugfix - Log all requests in the proxy access log: [#2301](https://github.com/owncloud/ocis/pull/2301)
 * Bugfix - Update glauth to 20210729125545-b9aecdfcac31: [#2336](https://github.com/owncloud/ocis/pull/2336)
@@ -16,6 +17,14 @@ The following sections list the changes for unreleased.
 * Enhancement - Update REVA to v1.10.0: [#2295](https://github.com/owncloud/ocis/pull/2295)
 
 ## Details
+
+* Bugfix - Improve IDP Login Accessibility: [#5376](https://github.com/owncloud/web/issues/5376)
+
+   We have addressed the feedback from the `a11y` audit and improved the IDP login screen
+   accordingly.
+
+   https://github.com/owncloud/web/issues/5376
+   https://github.com/owncloud/web/issues/5377
 
 * Bugfix - Forward basic auth to OpenID connect token authentication endpoint: [#2095](https://github.com/owncloud/ocis/issues/2095)
 
