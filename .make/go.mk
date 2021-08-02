@@ -42,8 +42,9 @@ ifndef DATE
 	DATE := $(shell date -u '+%Y%m%d')
 endif
 
-LDFLAGS += -s -w -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
-DEBUG_LDFLAGS += -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
+LDFLAGS += -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn -s -w -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
+DEBUG_LDFLAGS += -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
+
 GCFLAGS += all=-N -l
 
 .PHONY: all

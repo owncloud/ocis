@@ -126,6 +126,20 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_FRONTEND_OCS_HOME_NAMESPACE"},
 			Destination: &cfg.Reva.Frontend.OCSHomeNamespace,
 		},
+		&cli.IntFlag{
+			Name:        "ocs-resource-info-cache-ttl",
+			Value:       flags.OverrideDefaultInt(cfg.Reva.Frontend.OCSResourceInfoCacheTTL, 0),
+			Usage:       "the TTL for statted resources in the share cache",
+			EnvVars:     []string{"STORAGE_FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL"},
+			Destination: &cfg.Reva.Frontend.OCSResourceInfoCacheTTL,
+		},
+		&cli.StringFlag{
+			Name:        "ocs-cache-warmup-driver",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.OCSCacheWarmupDriver, ""),
+			Usage:       "the driver to be used for warming up the share cache",
+			EnvVars:     []string{"STORAGE_FRONTEND_OCS_CACHE_WARMUP_DRIVER"},
+			Destination: &cfg.Reva.Frontend.OCSCacheWarmupDriver,
+		},
 		// Gateway
 
 		&cli.StringFlag{
@@ -183,6 +197,8 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 	flags = append(flags, TracingWithConfig(cfg)...)
 	flags = append(flags, DebugWithConfig(cfg)...)
 	flags = append(flags, SecretWithConfig(cfg)...)
+	flags = append(flags, SharingSQLWithConfig(cfg)...)
+	flags = append(flags, DriverEOSWithConfig(cfg)...)
 
 	return flags
 }
