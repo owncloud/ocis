@@ -106,7 +106,7 @@ class Login extends React.PureComponent {
                   id="oc-login-password"
                   {...extraPropsPassword}
               />
-              {hasError && <Typography id="oc-login-error-message" variant="subtitle2" color="error"
+              {hasError && <Typography id="oc-login-error-message" variant="subtitle2" component="span" color="error"
                                        className={classes.message}>{errorMessage}</Typography>}
               <div className={classes.wrapper}>
                 <Button
