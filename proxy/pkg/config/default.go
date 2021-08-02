@@ -1,6 +1,6 @@
 package config
 
-// Default are values stored in the flagset, but moved to a struct.
+// DefaultConfig are values stored in the flagset, but moved to a struct.
 func DefaultConfig() Config {
 	return Config{
 		File: "",

@@ -3,6 +3,8 @@
 package command
 
 import (
+	"github.com/imdario/mergo"
+	"github.com/jinzhu/copier"
 	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/accounts/pkg/command"
 	svcconfig "github.com/owncloud/ocis/accounts/pkg/config"
@@ -28,7 +30,20 @@ func AccountsCommand(cfg *config.Config) *cli.Command {
 			command.PrintVersion(cfg.Accounts),
 		},
 		Before: func(ctx *cli.Context) error {
-			return ParseConfig(ctx, cfg)
+			beforeOverride := config.Config{}
+			if err := copier.Copy(&beforeOverride, cfg); err != nil {
+				return err
+			}
+
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
+			}
+
+			if err := mergo.Merge(cfg, beforeOverride, mergo.WithOverride); err != nil {
+				return err
+			}
+
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 			origCmd := command.Server(configureAccounts(cfg))
