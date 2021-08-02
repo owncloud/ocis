@@ -1795,8 +1795,6 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiWebdavUploadTUS/checksums.feature:218](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L218)
 -   [apiWebdavUploadTUS/optionsRequest.feature:7](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L7)
 -   [apiWebdavUploadTUS/optionsRequest.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L20)
--   [apiWebdavUploadTUS/optionsRequest.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L33)
--   [apiWebdavUploadTUS/optionsRequest.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L46)
 -   [apiWebdavUploadTUS/uploadToShare.feature:173](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L173)
 -   [apiWebdavUploadTUS/uploadToShare.feature:174](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L174)
 -   [apiWebdavUploadTUS/uploadToShare.feature:192](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L192)
