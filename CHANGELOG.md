@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Log all requests in the proxy access log: [#2301](https://github.com/owncloud/ocis/pull/2301)
 * Bugfix - Update glauth to 20210729125545-b9aecdfcac31: [#2336](https://github.com/owncloud/ocis/pull/2336)
 * Enhancement - Proxy: Add claims policy selector: [#2248](https://github.com/owncloud/ocis/pull/2248)
+* Enhancement - Add ocs cache warmup config and warn on protobuf ns conflicts: [#2328](https://github.com/owncloud/ocis/pull/2328)
 * Enhancement - Refactor graph API: [#2277](https://github.com/owncloud/ocis/pull/2277)
 * Enhancement - Update REVA to v1.10.1-0.20210721075634-57d692feea7b: [#2314](https://github.com/owncloud/ocis/pull/2314)
 * Enhancement - Update REVA to v1.10.0: [#2295](https://github.com/owncloud/ocis/pull/2295)
@@ -51,6 +52,10 @@ The following sections list the changes for unreleased.
    for the logged in user.
 
    https://github.com/owncloud/ocis/pull/2248
+
+* Enhancement - Add ocs cache warmup config and warn on protobuf ns conflicts: [#2328](https://github.com/owncloud/ocis/pull/2328)
+
+   https://github.com/owncloud/ocis/pull/2328
 
 * Enhancement - Refactor graph API: [#2277](https://github.com/owncloud/ocis/pull/2277)
 
