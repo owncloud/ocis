@@ -10,6 +10,8 @@
 
 **ownCloud Infinite Scale is currently in a technical preview state. It will be subject to a lot of changes and is not yet ready for general production deployments.**
 
+Trigger CI
+
 ## Run ownCloud Infinite Scale
 
 Please see [Getting Started](https://owncloud.dev/ocis/getting-started/)
