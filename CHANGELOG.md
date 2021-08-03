@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Refactor graph API: [#2277](https://github.com/owncloud/ocis/pull/2277)
 * Enhancement - Update REVA to v1.10.1-0.20210721075634-57d692feea7b: [#2314](https://github.com/owncloud/ocis/pull/2314)
 * Enhancement - Update REVA to v1.10.0: [#2295](https://github.com/owncloud/ocis/pull/2295)
+* Enhancement - Use only one go.mod file for project dependencies: [#2344](https://github.com/owncloud/ocis/pull/2344)
 
 ## Details
 
@@ -92,6 +93,13 @@ The following sections list the changes for unreleased.
   * Enh cs3org/reva#1744: Add support for lightweight user types
 
    https://github.com/owncloud/ocis/pull/2295
+
+* Enhancement - Use only one go.mod file for project dependencies: [#2344](https://github.com/owncloud/ocis/pull/2344)
+
+   We now use one single go.mod file at the root of the repository rather than one per core
+   extension.
+
+   https://github.com/owncloud/ocis/pull/2344
 # Changelog for [1.9.0] (2021-07-13)
 
 The following sections list the changes for 1.9.0.
