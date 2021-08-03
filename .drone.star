@@ -125,7 +125,8 @@ def main(ctx):
     test_pipelines = \
         [buildOcisBinaryForTesting(ctx)] + \
         testOcisModules(ctx) + \
-        testPipelines(ctx)
+        testPipelines(ctx) + \
+        checkForRecentBuilds(ctx)
 
     build_release_pipelines = \
         dockerReleases(ctx) + \
@@ -189,6 +190,53 @@ def testOcisModules(ctx):
     scan_result_upload["depends_on"] = getPipelineNames(pipelines)
 
     return pipelines + [scan_result_upload]
+
+def checkForRecentBuilds(ctx):
+    pipelines = []
+
+    result = {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "stop-recent-builds",
+        "steps": stopRecentBuilds(ctx),
+        "depends_on": [],
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/tags/**",
+                "refs/pull/**",
+            ],
+        },
+    }
+
+    pipelines.append(result)
+
+    return pipelines
+
+def stopRecentBuilds(ctx):
+    repo_slug = ctx.build.source_repo if ctx.build.source_repo else ctx.repo.slug
+
+    return [{
+        "name": "stop-recent-builds",
+        "image": "drone/cli:alpine",
+        "pull": "always",
+        "environment": {
+            "DRONE_SERVER": "https://drone.owncloud.com",
+            "DRONE_TOKEN": {
+                "from_secret": "drone_token",
+            },
+        },
+        "commands": [
+            "drone build ls %s --status running > /drone/src/recentBuilds.txt" % repo_slug,
+            "drone build info %s ${DRONE_BUILD_NUMBER} > /drone/src/thisBuildInfo.txt" % repo_slug,
+            "cd /drone/src && ./tests/acceptance/cancelBuilds.sh",
+        ],
+        "when": {
+            "event": [
+                "pull_request",
+            ],
+        },
+    }]
 
 def testPipelines(ctx):
     pipelines = []
