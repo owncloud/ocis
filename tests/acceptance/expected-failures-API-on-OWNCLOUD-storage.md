@@ -48,10 +48,6 @@ The following scenarios fail on OWNCLOUD storage but not on OCIS storage:
 -   [apiWebdavUploadTUS/uploadToNonExistingFolder.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToNonExistingFolder.feature#L60)
 -   [apiWebdavUploadTUS/uploadToNonExistingFolder.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToNonExistingFolder.feature#L61)
 
-#### [TUS OPTIONS requests do not reply with TUS headers when invalid password](https://github.com/owncloud/ocis/issues/1012)
--   [apiWebdavUploadTUS/optionsRequest.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L33)
--   [apiWebdavUploadTUS/optionsRequest.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L46)
-
 #### [renaming to banned name works](https://github.com/owncloud/ocis/issues/1295)
 
 #### [Getting information about a folder overwritten by a file gives 500 error instead of 404](https://github.com/owncloud/ocis/issues/1239)
@@ -1795,8 +1791,6 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiWebdavUploadTUS/checksums.feature:218](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L218)
 -   [apiWebdavUploadTUS/optionsRequest.feature:7](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L7)
 -   [apiWebdavUploadTUS/optionsRequest.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L20)
--   [apiWebdavUploadTUS/optionsRequest.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L33)
--   [apiWebdavUploadTUS/optionsRequest.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L46)
 -   [apiWebdavUploadTUS/uploadToShare.feature:173](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L173)
 -   [apiWebdavUploadTUS/uploadToShare.feature:174](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L174)
 -   [apiWebdavUploadTUS/uploadToShare.feature:192](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L192)
@@ -1807,6 +1801,9 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiWebdavUploadTUS/uploadToShare.feature:249](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L249)
 -   [apiWebdavUploadTUS/uploadToShare.feature:289](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L289)
 -   [apiWebdavUploadTUS/uploadToShare.feature:290](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L290)
+#### [TUS OPTIONS requests do not reply with TUS headers when invalid password](https://github.com/owncloud/ocis/issues/1012)
+-   [apiWebdavUploadTUS/optionsRequest.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L33)
+-   [apiWebdavUploadTUS/optionsRequest.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/optionsRequest.feature#L46)
 
 #### [Trying to accept a share with invalid ID gives incorrect OCS and HTTP status](https://github.com/owncloud/ocis/issues/2111)
 -   [apiShareOperationsToShares2/shareAccessByID.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L85)
