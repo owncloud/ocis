@@ -29,23 +29,6 @@ default:
         - TrashbinContext:
         - WebDavPropertiesContext:
 
-    apiBugDemonstration:
-      paths:
-        - '%paths.base%/../features/apiBugDemonstration'
-      context: *common_ldap_suite_context
-      contexts:
-        - RevaContext:
-        - OccContext:
-        - FeatureContext: *common_feature_context_params
-        - CapabilitiesContext:
-        - ChecksumContext:
-        - FavoritesContext:
-        - FilesVersionsContext:
-        - PublicWebDavContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
-        - TUSContext:
-
   extensions:
     jarnaiz\JUnitFormatter\JUnitFormatterExtension:
       filename: report.xml

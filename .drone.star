@@ -242,8 +242,6 @@ def testPipelines(ctx):
     pipelines = []
     if "skip" not in config["localApiTests"] or not config["localApiTests"]["skip"]:
         pipelines = [
-            localApiTests(ctx, "owncloud", "apiBugDemonstration"),
-            localApiTests(ctx, "ocis", "apiBugDemonstration"),
             localApiTests(ctx, "owncloud", "apiAccountsHashDifficulty", "default"),
             localApiTests(ctx, "ocis", "apiAccountsHashDifficulty", "default"),
         ]
@@ -435,7 +433,7 @@ def uploadScanResults(ctx):
         },
     }
 
-def localApiTests(ctx, storage = "owncloud", suite = "apiBugDemonstration", accounts_hash_difficulty = 4):
+def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
     earlyFail = config["localApiTests"]["earlyFail"] if "earlyFail" in config["localApiTests"] else False
 
     if ("full-ci" in ctx.build.title.lower()):
