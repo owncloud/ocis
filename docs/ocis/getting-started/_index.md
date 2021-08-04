@@ -19,6 +19,12 @@ We also have some more variations of oCIS running and [continuously deployed]({{
 
 We are distributing oCIS as binaries and Docker images.
 
+{{< hint warning >}}
+The examples in this document assume that oCIS is accessed from the same host as it is running on (`localhost`). If you would like
+to access oCIS remotely please refer to the [Basic Remote Setup]({{< ref "../deployment/basic-remote-setup" >}}) section. Especially
+to the notes about setting the `PROXY_HTTP_ADDR` and `OCIS_URL` enviroment variables.
+{{< /hint >}}
+
 You can find more deployment examples in the [deployment section]({{< ref "../deployment" >}}).
 
 ### Binaries
