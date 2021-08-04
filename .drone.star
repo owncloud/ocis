@@ -242,7 +242,6 @@ def testPipelines(ctx):
     pipelines = []
     if "skip" not in config["localApiTests"] or not config["localApiTests"]["skip"]:
         pipelines = [
-            localApiTests(ctx, "owncloud", "apiAccountsHashDifficulty", "default"),
             localApiTests(ctx, "ocis", "apiAccountsHashDifficulty", "default"),
         ]
 
@@ -485,7 +484,7 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
         "volumes": [pipelineVolumeOC10Tests],
     }
 
-def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "owncloud", accounts_hash_difficulty = 4):
+def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
     earlyFail = config["apiTests"]["earlyFail"] if "earlyFail" in config["apiTests"] else False
 
     if ("full-ci" in ctx.build.title.lower()):
@@ -544,7 +543,6 @@ def apiTests(ctx):
     debugPartsEnabled = (len(debugParts) != 0)
     for runPart in range(1, config["apiTests"]["numberOfParts"] + 1):
         if (not debugPartsEnabled or (debugPartsEnabled and runPart in debugParts)):
-            pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "owncloud"))
             pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "ocis"))
 
     return pipelines
