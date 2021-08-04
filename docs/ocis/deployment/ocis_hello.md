@@ -122,6 +122,4 @@ After that you're ready to start the application stack:
 
 `docker-compose up -d`
 
-Open https://collabora.owncloud.test and https://wopisever.owncloud.test in your browser and accept the invalid certificate warning.
-
 Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You are now able to switch to the Hello extension by using the application switcher on the top right corner of ownCloud Web.
