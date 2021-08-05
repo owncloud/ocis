@@ -405,9 +405,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUITrashbinDelete/trashbinDelete.feature:85](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L85)
 -   [webUITrashbinDelete/trashbinDelete.feature:49](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L49)
 
-### [Trying to create a (public) link share of the Shares folder throws an error](https://github.com/owncloud/web/issues/5152)
--   [webUISharingPublicBasic/publicLinkCreate.feature:190](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicBasic/publicLinkCreate.feature#L190)
-
 ### [Tags page not implemented yet](https://github.com/owncloud/web/issues/5017)
 -   [webUIDeleteFilesFolders/deleteFilesFolders.feature:144](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L144)
 -   [webUIFilesSearch/search.feature:63](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L63)
