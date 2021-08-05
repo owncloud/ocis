@@ -23,7 +23,7 @@ config = {
         "earlyFail": True,
     },
     "apiTests": {
-        "numberOfParts": 10,
+        "numberOfParts": 20,
         "skip": False,
         "skipExceptParts": [],
         "earlyFail": True,
