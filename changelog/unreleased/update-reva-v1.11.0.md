@@ -1,6 +1,6 @@
-Enhancement: update REVA to v1.11.0
+Enhancement: update REVA
 
-REVA v1.11.0
+Update REVA from v1.10.1-0.20210730095301-fcb7a30a44a6 to v1.11.0
 * Fix cs3org/reva#1899: Fix chunked uploads for new versions
 * Fix cs3org/reva#1906: Fix copy over existing resource
 * Fix cs3org/reva#1891: Delete Shared Resources as Receiver
@@ -27,14 +27,10 @@ REVA v1.11.0
 * Enh cs3org/reva#1888: Refactoring of the webdav code
 * Enh cs3org/reva#1900: Check for illegal names while uploading or moving files
 * Enh cs3org/reva#1925: Refactor listing and statting across providers for virtual views
-
-REVA v1.10.0
 * Fix cs3org/reva#1883: Pass directories with trailing slashes to eosclient.GenerateToken
 * Fix cs3org/reva#1878: Improve the webdav error handling in the trashbin
 * Fix cs3org/reva#1884: Do not send body on failed range request
 * Enh cs3org/reva#1744: Add support for lightweight user types
-
-REVA v1.10.1-0.20210721075634-57d692feea7b
 * Fix cs3org/reva#1904: Set Content-Length to 0 when swallowing body in the datagateway
 * Fix cs3org/reva#1899: Bugfix: Fix chunked uploads for new versions
 * Enh cs3org/reva#1888: Refactoring of the webdav code
