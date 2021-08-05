@@ -13,7 +13,8 @@
         "files",
         "draw-io",
         "markdown-editor",
-        "media-viewer"
+        "media-viewer",
+	"search"
     ],
     "external_apps": [
         {
