@@ -23,8 +23,8 @@ require (
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
 	github.com/blevesearch/bleve v1.0.9
 	github.com/coreos/go-oidc v2.2.1+incompatible
-	github.com/cs3org/go-cs3apis v0.0.0-20210726064751-4e567a2c8df1
-	github.com/cs3org/reva v1.10.1-0.20210730095301-fcb7a30a44a6
+	github.com/cs3org/go-cs3apis v0.0.0-20210802070913-970eec344e59
+	github.com/cs3org/reva v1.11.0
 	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/disintegration/imaging v1.6.2
