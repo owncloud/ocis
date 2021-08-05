@@ -3,10 +3,6 @@
 ### File
 Basic file management like up and download, move, copy, properties, trash, versions and chunking.
 
-#### [cannot restore to a different file-name](https://github.com/owncloud/ocis/issues/1122)
--   [apiTrashbinRestore/trashbinRestore.feature:309](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbinRestore/trashbinRestore.feature#L309)
--   [apiTrashbinRestore/trashbinRestore.feature:310](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbinRestore/trashbinRestore.feature#L310)
-
 #### [Version count is 1 more than on oC10](https://github.com/owncloud/ocis/issues/1633)
 
 #### [Implement Versions Feature for ocis storage](https://github.com/owncloud/product/issues/210)
@@ -1017,10 +1013,6 @@ _ocs: api compatibility, return correct status code_
 -   [apiShareReshareToShares2/reShareSubfolder.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareSubfolder.feature#L156)
 
 
-#### [No way to set default folder for received shares](https://github.com/owncloud/ocis/issues/1327)
--   [apiShareCreateSpecialToShares2/createShareDefaultFolderForReceivedShares.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareDefaultFolderForReceivedShares.feature#L22)
--   [apiShareCreateSpecialToShares2/createShareDefaultFolderForReceivedShares.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareDefaultFolderForReceivedShares.feature#L23)
-
 #### [various sharing settings cannot be set](https://github.com/owncloud/ocis/issues/1328)
 -   [apiShareUpdateToShares/updateShare.feature:270](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L270)
 -   [apiShareUpdateToShares/updateShare.feature:271](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L271)
@@ -1648,8 +1640,6 @@ Scenario Outline: Do a PROPFIND to a non-existing URL
 -   [apiShareReshareToShares1/reShare.feature:306](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L306)
 
 #### [PROPFIND on trashbin with Depth: infinity only shows the first level](https://github.com/owncloud/ocis/issues/1116)
--   [apiTrashbinRestore/trashbinRestore.feature:478](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbinRestore/trashbinRestore.feature#L478)
--   [apiTrashbinRestore/trashbinRestore.feature:479](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbinRestore/trashbinRestore.feature#L479)
 -   [apiWebdavOperations/listFiles.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L182)
 
 #### [Trying to accept a share with invalid ID gives incorrect OCS and HTTP status](https://github.com/owncloud/ocis/issues/2111)
