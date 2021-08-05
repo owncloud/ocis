@@ -18,7 +18,7 @@ geekdocFilePath: ocis_traefik.md
 
 The docker stack consists of two containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
 
-The other one is oCIS itself running all extensions in one container. In this example oCIS uses its internal IDP [Konnectd]({{< ref "../../extensions/idp" >}}) and the [oCIS storage driver]({{< ref "../../extensions/storage/storages#storage-drivers" >}})
+The other one is oCIS itself running all extensions in one container. In this example oCIS uses its internal IDP [LibreGraph Connect]({{< ref "../../extensions/idp" >}}) and the [oCIS storage driver]({{< ref "../../extensions/storage/storages#storage-drivers" >}})
 
 ## Server Deployment
 
