@@ -555,7 +555,7 @@ def uiTests(ctx):
         "skip": False,
         "earlyFail": False,
         # only used if 'full-ci' is in build title
-        "numberOfParts": 10,
+        "numberOfParts": 20,
         "skipExceptParts": [],
     }
     params = {}
@@ -582,11 +582,12 @@ def uiTests(ctx):
     # For ordinary PRs, always run the "minimal" UI test pipeline
     # That has its own expected-failures file, and we always want to know that it is correct,
     if (ctx.build.event != "tag"):
-        pipelines.append(uiTestPipeline(ctx, filterTags, earlyFail))
+        pipelines.append(uiTestPipeline(ctx, filterTags, earlyFail, 1, 2, "ocis", "smoke"))
+        pipelines.append(uiTestPipeline(ctx, filterTags, earlyFail, 2, 2, "ocis", "smoke"))
 
     return pipelines
 
-def uiTestPipeline(ctx, filterTags, earlyFail, runPart = 1, numberOfParts = 1, storage = "ocis", accounts_hash_difficulty = 4):
+def uiTestPipeline(ctx, filterTags, earlyFail, runPart = 1, numberOfParts = 1, storage = "ocis", uniqueName = "", accounts_hash_difficulty = 4):
     standardFilterTags = "not @skipOnOCIS and not @skip and not @notToImplementOnOCIS and not @federated-server-needed"
     if filterTags == "":
         finalFilterTags = standardFilterTags
@@ -595,10 +596,16 @@ def uiTestPipeline(ctx, filterTags, earlyFail, runPart = 1, numberOfParts = 1, s
         finalFilterTags = filterTags + " and " + standardFilterTags
         expectedFailuresFileFilterTags = "-" + filterTags.lstrip("@")
 
-    if numberOfParts == 1:
-        pipelineName = "Web-Tests-ocis-%s-storage" % storage
+    if uniqueName == "":
+        uniqueNameString = ""
     else:
-        pipelineName = "Web-Tests-ocis-%s-storage-%s" % (storage, runPart)
+        finalFilterTags = filterTags + " and " + standardFilterTags
+        uniqueNameString = "-" + uniqueName
+
+    if numberOfParts == 1:
+        pipelineName = "Web-Tests-ocis%s-%s-storage" % (uniqueNameString, storage)
+    else:
+        pipelineName = "Web-Tests-ocis%s-%s-storage-%s" % (uniqueNameString, storage, runPart)
 
     return {
         "kind": "pipeline",
