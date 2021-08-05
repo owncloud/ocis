@@ -13,16 +13,16 @@ Version 1.10.0 brings new features, usability improvements and bug fixes. ownClo
 
 The most prominent changes in ownCloud Infinite Scale 1.10.0 and ownCloud Web 4.0.0 comprise:
 
-- ownCloud Web now supports ONLYOFFICE document editors when used with ownCloud Classic Server
+- ownCloud Web now supports ONLYOFFICE document editors when used with ownCloud Classic Server.
 - ownCloud Web now supports global search and filtering for the current folder via the search bar. Both will work when ownCloud Web is used with ownCloud Classic. The Infinite Scale capabilities are currently limited to filtering the current folder. [#5415](https://github.com/owncloud/web/pull/5415)
-- A context menu for a file/folder which contains related actions has been introduced to ownCloud Web (in addition to the actions in the right sidebar) [#5160](https://github.com/owncloud/web/issues/5160)
-- The context menu for a file/folder in ownCloud Web can be opened via right click and using the "..." menu [#5102](https://github.com/owncloud/web/issues/5102)
-- As a first step of a larger redesign of the sharing dialog in ownCloud Web, the autocomplete and share recipient selection have been redesigned [#5554](https://github.com/owncloud/web/pull/5554)
+- A context menu for a file/folder which contains related actions has been introduced to ownCloud Web (in addition to the actions in the right sidebar). [#5160](https://github.com/owncloud/web/issues/5160)
+- The context menu for a file/folder in ownCloud Web can be opened via right click and using the "..." menu. [#5102](https://github.com/owncloud/web/issues/5102)
+- As a first step of a larger redesign of the sharing dialog in ownCloud Web, the autocomplete and share recipient selection have been redesigned. [#5554](https://github.com/owncloud/web/pull/5554)
 - The right sidebar navigation in ownCloud Web has been redesigned. Moving away from structuring all functionality on a single view using accordions, each section now has their own, dedicated view. [#5549](https://github.com/owncloud/web/pull/5549)
 - The maximum number of sharing autocomplete suggestions in ownCloud Web can now be configured. See [the documentation](https://owncloud.dev/clients/web/getting-started/#options) for more information. [#5506](https://github.com/owncloud/web/pull/5506)
-- ownCloud Web works now with ownCloud Classic when OpenID Connect authentication is used [#5536](https://github.com/owncloud/web/pull/5536)
-- ownCloud Web now respects the server-side capability for user avatars [#5178](https://github.com/owncloud/web/pull/5178)
-- The login page has been optimized in regards of accessibility [#5376](https://github.com/owncloud/web/issues/5376)
+- ownCloud Web works now with ownCloud Classic when OpenID Connect authentication is used. [#5536](https://github.com/owncloud/web/pull/5536)
+- ownCloud Web now respects the server-side capability for user avatars. [#5178](https://github.com/owncloud/web/pull/5178)
+- The login page has been optimized in regards of accessibility. [#5376](https://github.com/owncloud/web/issues/5376)
 - The Infinite Scale backend is being further hardened by fixing known issues, improving error handling and stabilizing existing features. 
 
 You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.10.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v4.0.0) for further details on what has changed.
@@ -38,14 +38,14 @@ Version 1.9.0 is a feature and maintenance release. More features have been adde
 
 The most prominent changes in ownCloud Infinite Scale 1.9.0 and ownCloud Web 3.4.1 comprise:
 
-- The right sidebar in ownCloud Web now shows details about the selected file/folder (e.g., size, owner, sharing status, modification time) [#5161](https://github.com/owncloud/web/issues/5161)
-- The right sidebar in ownCloud Web now shows previews for images [#5501](https://github.com/owncloud/web/pull/5501)
-- View options for the file list have been introduced in ownCloud Web. Currently this allows to change the number of files/folders per page and to show/hide hidden files [#5408]https://github.com/owncloud/web/pull/5408 [#5470](https://github.com/owncloud/web/pull/5470)
+- The right sidebar in ownCloud Web now shows details about the selected file/folder (e.g., size, owner, sharing status, modification time). [#5161](https://github.com/owncloud/web/issues/5161)
+- The right sidebar in ownCloud Web now shows previews for images. [#5501](https://github.com/owncloud/web/pull/5501)
+- View options for the file list have been introduced in ownCloud Web. Currently this allows to change the number of files/folders per page and to show/hide hidden files. [#5408]https://github.com/owncloud/web/pull/5408 [#5470](https://github.com/owncloud/web/pull/5470)
 - A feedback button has been added to the top bar. It guides to user to an ownCloud Web feedback survey. If undesired, this feature [can be disabled in the ownCloud Web configuration](https://owncloud.dev/clients/web/getting-started/#options). [#5468](https://github.com/owncloud/web/pull/5468)
-- Received shares can now be accepted/declined as batches in the "Shared with me" view [#5374](https://github.com/owncloud/web/pull/5374)
-- The oCIS backend now supports to enable extensions by name: [#2229](https://github.com/owncloud/ocis/pull/2229)
+- Received shares can now be accepted/declined as batches in the "Shared with me" view. [#5374](https://github.com/owncloud/web/pull/5374)
+- The oCIS backend now supports to enable extensions by name. [#2229](https://github.com/owncloud/ocis/pull/2229)
 - Storage drivers can be set to read only. [#2230](https://github.com/owncloud/ocis/pull/2230)
-- A more direct micro service init for faster startup: [#1705](https://github.com/owncloud/ocis/pull/1705)
+- Micro service init has been improved for faster startup. [#1705](https://github.com/owncloud/ocis/pull/1705)
 
 You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.9.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v3.4.1) for further details on what has changed.
 
