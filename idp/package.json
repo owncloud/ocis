@@ -20,7 +20,7 @@
     "case-sensitive-paths-webpack-plugin": "2.4.0",
     "classnames": "^2.3.1",
     "css-loader": "5.2.6",
-    "dotenv": "8.2.0",
+    "dotenv": "10.0.0",
     "dotenv-expand": "5.1.0",
     "eslint": "^7.21.0",
     "eslint-config-react-app": "^6.0.0",
