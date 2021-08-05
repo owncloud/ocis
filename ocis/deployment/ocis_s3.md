@@ -4,7 +4,7 @@ date: 2020-10-12T14:04:00+01:00
 weight: 24
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/deployment
-geekdocFilePath: ocis_wopi.md
+geekdocFilePath: ocis_s3.md
 ---
 
 {{< toc >}}
@@ -16,7 +16,7 @@ geekdocFilePath: ocis_wopi.md
 * oCIS is configured to use S3 as user storage provider
 * Traefik generating self signed certificates for local setup or obtaining valid SSL certificates for a server setup
 
-[Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_wopi)
+[Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_s3)
 
 The docker stack consists 3 containers. One of them is Traefik, a proxy which is terminating SSL and forwards the requests to oCIS in the internal docker network.
 
@@ -45,7 +45,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
 * Go to the deployment example
 
-  `cd ocis/deployment/examples/ocis_s3
+  `cd ocis/deployment/examples/ocis_s3`
 
 * Open the `.env` file in a text editor
   The file by default looks like this:

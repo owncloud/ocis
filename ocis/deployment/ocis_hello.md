@@ -4,7 +4,7 @@ date: 2020-10-12T14:04:00+01:00
 weight: 24
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/deployment
-geekdocFilePath: ocis_wopi.md
+geekdocFilePath: ocis_hello.md
 ---
 
 {{< toc >}}
@@ -42,7 +42,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
 - Go to the deployment example
 
-  `cd ocis/deployment/examples/ocis_hello
+  `cd ocis/deployment/examples/ocis_hello`
 
 - Open the `.env` file in a text editor
   The file by default looks like this:
@@ -121,7 +121,5 @@ On Linux and macOS you can add them to your `/etc/hosts` files like this:
 After that you're ready to start the application stack:
 
 `docker-compose up -d`
-
-Open https://collabora.owncloud.test and https://wopisever.owncloud.test in your browser and accept the invalid certificate warning.
 
 Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You are now able to switch to the Hello extension by using the application switcher on the top right corner of ownCloud Web.
