@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"go.opentelemetry.io/otel/propagation"
+
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/proxy/policy"
@@ -222,6 +224,7 @@ func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request
 		tracer := proxytracing.TraceProvider.Tracer("proxy")
 		ctx, span = tracer.Start(ctx, fmt.Sprintf("%s %v", r.Method, r.URL.Path))
 		defer span.End()
+		proxytracing.Propagator.Inject(ctx, propagation.HeaderCarrier(r.Header))
 	}
 	p.ReverseProxy.ServeHTTP(w, r.WithContext(ctx))
 }
