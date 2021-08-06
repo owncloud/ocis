@@ -13,7 +13,7 @@ Version 1.10.0 brings new features, usability improvements and bug fixes. ownClo
 
 The most prominent changes in ownCloud Infinite Scale 1.10.0 and ownCloud Web 4.0.0 comprise:
 
-- ownCloud Web now supports ONLYOFFICE document editors when used with ownCloud Classic Server.
+- ownCloud Web now supports ONLYOFFICE document editors when used with ownCloud Classic Server. See the [documentation](https://owncloud.dev/clients/web/deployments/oc10-app/#onlyoffice) for more information on requirements and configuration.
 - ownCloud Web now supports global search and filtering for the current folder via the search bar. Both will work when ownCloud Web is used with ownCloud Classic. The Infinite Scale capabilities are currently limited to filtering the current folder. [#5415](https://github.com/owncloud/web/pull/5415)
 - A context menu for a file/folder which contains related actions has been introduced to ownCloud Web (in addition to the actions in the right sidebar). [#5160](https://github.com/owncloud/web/issues/5160)
 - The context menu for a file/folder in ownCloud Web can be opened via right click and using the "..." menu. [#5102](https://github.com/owncloud/web/issues/5102)
