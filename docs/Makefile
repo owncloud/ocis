@@ -19,6 +19,7 @@ docs-init:
 	@cd hugo && git remote add origin https://github.com/owncloud/owncloud.github.io
 	@cd hugo && git fetch --depth=1
 	@cd hugo && git checkout origin/source -f
+	@make -C hugo theme
 
 .PHONY: docs-serve
 docs-serve: docs-init docs-generate docs-copy ## serve docs with hugo
