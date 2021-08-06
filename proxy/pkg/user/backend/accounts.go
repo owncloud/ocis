@@ -144,6 +144,7 @@ func (a *accountsServiceBackend) accountToUser(account *accounts.Account) *cs3.U
 		Id: &cs3.UserId{
 			OpaqueId: account.Id,
 			Idp:      a.OIDCIss,
+			Type:     cs3.UserType_USER_TYPE_PRIMARY,  // TODO: once we have support for other user types, this needs to be inferred
 		},
 		Username:     account.OnPremisesSamAccountName,
 		DisplayName:  account.DisplayName,
