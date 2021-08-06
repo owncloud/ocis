@@ -6,6 +6,37 @@ geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
+## ownCloud Infinite Scale 1.10.0 Technology Preview
+
+Version 1.10.0 is another Tech Preview release of ownCloud Infinite Scale. More enhancements were added and the platform was more matured.
+
+As usual many improvements go into REVA which is the base system of oCIS.
+
+### Updated subsystems
+
+- Updated REVA to [v1.11.0](https://github.com/cs3org/reva/releases/tag/v1.11.0): [#2355](https://github.com/owncloud/ocis/pull/2355)
+- Updated ownCloud Web to [v4.0.0](https://github.com/owncloud/web/releases/tag/v4.0.0): [#2353](https://github.com/owncloud/ocis/pull/2353)
+- Update glauth to [20210729125545-b9aecdfcac31](https://github.com/glauth/glauth/commits/b9aecdfcac31)
+
+Please refer to the linked projects for details on changes and fixes.
+
+### oCIS Enhancements
+
+- Proxy: Add claims policy selector: [#2248](https://github.com/owncloud/ocis/pull/2248)
+- Add ocs cache warmup config and warn on protobuf ns conflicts: [#2328](https://github.com/owncloud/ocis/pull/2328)
+- Refactor graph API: [PR #2277](https://github.com/owncloud/ocis/pull/2277)
+- Use only one go.mod file for project dependencies: [PR #2344](https://github.com/owncloud/ocis/pull/2344)
+
+### Bugfixes
+
+- Improve IDP Login Accessibility: [#5376](https://github.com/owncloud/web/issues/5376) and [#5377](https://github.com/owncloud/web/issues/5377)
+- Forward basic auth to OpenID connect token authentication endpoint: [#2095](https://github.com/owncloud/ocis/issues/2095) and [#2094](https://github.com/owncloud/ocis/issues/2094)
+- Log all requests in the proxy access log: [PR #2301](https://github.com/owncloud/ocis/pull/2301)
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
 
 ## ownCloud Infinite Scale 1.9.0 Technology Preview
 
