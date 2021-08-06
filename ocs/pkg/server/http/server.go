@@ -25,6 +25,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
+			middleware.Trace,
 			middleware.RealIP,
 			middleware.RequestID,
 			middleware.NoCache,
