@@ -178,6 +178,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 
 	return alice.New(
 		// first make sure we log all requests and redirect to https if necessary
+		pkgmiddleware.Trace,
 		pkgmiddleware.RealIP,
 		pkgmiddleware.RequestID,
 		middleware.AccessLog(l),
