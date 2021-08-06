@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-08-06T13:23:57+0000"
+date: "2021-08-06T13:54:26+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/storage/templates
@@ -40,76 +40,6 @@ If you prefer to configure the service with commandline flags you can see the av
 Storage service for oCIS
 
 Usage: `storage [global options] command [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -300,14 +230,923 @@ Usage: `storage [global options] command [command options] [arguments...]`
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Sub Commands
+
+### storage storage
+
+Storage service for oCIS
+
+Usage: `storage storage [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-config-file |  $STORAGE_CONFIG_FILE
+: Path to config file.
+
+
+-log-level |  $STORAGE_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+
+-log-pretty |  $STORAGE_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+
+-log-color |  $STORAGE_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### storage storage-home
+
+Start storage-home service
+
+Usage: `storage storage-home [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $STORAGE_HOME_DEBUG_ADDR
+: Address to bind debug server. Default: `"0.0.0.0:9156"`.
+
+
+-grpc-network |  $STORAGE_HOME_GRPC_NETWORK
+: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `"tcp"`.
+
+
+-grpc-addr |  $STORAGE_HOME_GRPC_ADDR
+: Address to bind storage service. Default: `"0.0.0.0:9154"`.
+
+
+-http-network |  $STORAGE_HOME_HTTP_NETWORK
+: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `"tcp"`.
+
+
+-http-addr |  $STORAGE_HOME_HTTP_ADDR
+: Address to bind storage service. Default: `"0.0.0.0:9155"`.
+
+
+-driver |  $STORAGE_HOME_DRIVER
+: storage driver for home mount: eg. local, eos, owncloud, ocis or s3. Default: `"ocis"`.
+
+
+-read-only |  $STORAGE_HOME_READ_ONLY , $OCIS_STORAGE_READ_ONLY
+: use storage driver in read-only mode. Default: `false`.
+
+
+-mount-path |  $STORAGE_HOME_MOUNT_PATH
+: mount path. Default: `"/home"`.
+
+
+-mount-id |  $STORAGE_HOME_MOUNT_ID
+: mount id. Default: `"1284d238-aa92-42ce-bdc4-0b0000009157"`.
+
+
+-expose-data-server |  $STORAGE_HOME_EXPOSE_DATA_SERVER
+: exposes a dedicated data server. Default: `false`.
+
+
+-data-server-url |  $STORAGE_HOME_DATA_SERVER_URL
+: data server url. Default: `"http://localhost:9155/data"`.
+
+
+-http-prefix |  $STORAGE_HOME_HTTP_PREFIX
+: prefix for the http endpoint, without leading slash. Default: `"data"`.
+
+
+-tmp-folder |  $STORAGE_HOME_TMP_FOLDER
+: path to tmp folder. Default: `"/var/tmp/ocis/tmp/home"`.
+
+
+-enable-home |  $STORAGE_HOME_ENABLE_HOME
+: enable the creation of home directories. Default: `true`.
+
+
+-gateway-endpoint |  $STORAGE_GATEWAY_ENDPOINT
+: endpoint to use for the storage gateway service. Default: `"localhost:9142"`.
+
+
+-users-endpoint |  $STORAGE_USERPROVIDER_ENDPOINT
+: endpoint to use for the storage service. Default: `"localhost:9144"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### storage auth-basic
+
+Start authprovider for basic auth
+
+Usage: `storage auth-basic [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $STORAGE_AUTH_BASIC_DEBUG_ADDR
+: Address to bind debug server. Default: `"0.0.0.0:9147"`.
+
+
+-auth-driver |  $STORAGE_AUTH_DRIVER
+: auth driver: 'demo', 'json' or 'ldap'. Default: `"ldap"`.
+
+
+-auth-json |  $STORAGE_AUTH_JSON
+: Path to users.json file. Default: `""`.
+
+
+-network |  $STORAGE_AUTH_BASIC_GRPC_NETWORK
+: Network to use for the storage auth-basic service, can be 'tcp', 'udp' or 'unix'. Default: `"tcp"`.
+
+
+-addr |  $STORAGE_AUTH_BASIC_GRPC_ADDR
+: Address to bind storage service. Default: `"0.0.0.0:9146"`.
+
+
+-service |  $STORAGE_AUTH_BASIC_SERVICES
+: --service authprovider [--service otherservice]. Default: `cli.NewStringSlice("authprovider")`.
+
+
+-gateway-url |  $STORAGE_GATEWAY_ENDPOINT
+: URL to use for the storage gateway service. Default: `"localhost:9142"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### storage auth-bearer
 
 Start authprovider for bearer auth
 
 Usage: `storage auth-bearer [command options] [arguments...]`
-
 
 
 
@@ -585,11 +1424,349 @@ Usage: `storage auth-bearer [command options] [arguments...]`
 
 
 
+
+### storage sharing
+
+Start sharing service
+
+Usage: `storage sharing [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $STORAGE_SHARING_DEBUG_ADDR
+: Address to bind debug server. Default: `"0.0.0.0:9151"`.
+
+
+-network |  $STORAGE_SHARING_GRPC_NETWORK
+: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `"tcp"`.
+
+
+-addr |  $STORAGE_SHARING_GRPC_ADDR
+: Address to bind storage service. Default: `"0.0.0.0:9150"`.
+
+
+-service |  $STORAGE_SHARING_SERVICES
+: --service usershareprovider [--service publicshareprovider]. Default: `cli.NewStringSlice("usershareprovider", "publicshareprovider")`.
+
+
+-user-driver |  $STORAGE_SHARING_USER_DRIVER
+: driver to use for the UserShareProvider. Default: `"json"`.
+
+
+-user-json-file |  $STORAGE_SHARING_USER_JSON_FILE
+: file used to persist shares for the UserShareProvider. Default: `"/var/tmp/ocis/storage/shares.json"`.
+
+
+-public-driver |  $STORAGE_SHARING_PUBLIC_DRIVER
+: driver to use for the PublicShareProvider. Default: `"json"`.
+
+
+-public-json-file |  $STORAGE_SHARING_PUBLIC_JSON_FILE
+: file used to persist shares for the PublicShareProvider. Default: `"/var/tmp/ocis/storage/publicshares.json"`.
+
+
+-public-password-hash-cost |  $STORAGE_SHARING_PUBLIC_PASSWORD_HASH_COST
+: the cost of hashing the public shares passwords. Default: `11`.
+
+
+-public-enable-expired-shares-cleanup |  $STORAGE_SHARING_PUBLIC_ENABLE_EXPIRED_SHARES_CLEANUP
+: whether to periodically delete expired public shares. Default: `true`.
+
+
+-public-janitor-run-interval |  $STORAGE_SHARING_PUBLIC_JANITOR_RUN_INTERVAL
+: the time period in seconds after which to start a janitor run. Default: `60`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### storage frontend
 
 Start frontend service
 
 Usage: `storage frontend [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -853,8 +2030,11 @@ Usage: `storage frontend [command options] [arguments...]`
 
 
 
+### storage health
 
+Check health status
 
+Usage: `storage health [command options] [arguments...]`
 
 
 
@@ -904,11 +2084,8 @@ Usage: `storage frontend [command options] [arguments...]`
 
 
 
-### storage storage-users
 
-Start storage-users service
 
-Usage: `storage storage-users [command options] [arguments...]`
 
 
 
@@ -966,6 +2143,8 @@ Usage: `storage storage-users [command options] [arguments...]`
 
 
 
+-debug-addr |  $STORAGE_DEBUG_ADDR
+: Address to debug endpoint. Default: `"0.0.0.0:9109"`.
 
 
 
@@ -1093,101 +2272,6 @@ Usage: `storage storage-users [command options] [arguments...]`
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $STORAGE_USERS_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9159"`.
-
-
--grpc-network |  $STORAGE_USERS_GRPC_NETWORK
-: Network to use for the users storage, can be 'tcp', 'udp' or 'unix'. Default: `"tcp"`.
-
-
--grpc-addr |  $STORAGE_USERS_GRPC_ADDR
-: GRPC Address to bind users storage. Default: `"0.0.0.0:9157"`.
-
-
--http-network |  $STORAGE_USERS_HTTP_NETWORK
-: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `"tcp"`.
-
-
--http-addr |  $STORAGE_USERS_HTTP_ADDR
-: HTTP Address to bind users storage. Default: `"0.0.0.0:9158"`.
-
-
--driver |  $STORAGE_USERS_DRIVER
-: storage driver for users mount: eg. local, eos, owncloud, ocis or s3. Default: `"ocis"`.
-
-
--read-only |  $STORAGE_USERS_READ_ONLY , $OCIS_STORAGE_READ_ONLY
-: use storage driver in read-only mode. Default: `false`.
-
-
--mount-path |  $STORAGE_USERS_MOUNT_PATH
-: mount path. Default: `"/users"`.
-
-
--mount-id |  $STORAGE_USERS_MOUNT_ID
-: mount id. Default: `"1284d238-aa92-42ce-bdc4-0b0000009157"`.
-
-
--expose-data-server |  $STORAGE_USERS_EXPOSE_DATA_SERVER
-: exposes a dedicated data server. Default: `false`.
-
-
--data-server-url |  $STORAGE_USERS_DATA_SERVER_URL
-: data server url. Default: `"http://localhost:9158/data"`.
-
-
--http-prefix |  $STORAGE_USERS_HTTP_PREFIX
-: prefix for the http endpoint, without leading slash. Default: `"data"`.
-
-
--tmp-folder |  $STORAGE_USERS_TMP_FOLDER
-: path to tmp folder. Default: `"/var/tmp/ocis/tmp/users"`.
-
-
--gateway-endpoint |  $STORAGE_GATEWAY_ENDPOINT
-: endpoint to use for the storage gateway service. Default: `"localhost:9142"`.
-
-
--users-endpoint |  $STORAGE_USERPROVIDER_ENDPOINT
-: endpoint to use for the storage service. Default: `"localhost:9144"`.
 
 
 
@@ -1207,6 +2291,33 @@ Usage: `storage storage-users [command options] [arguments...]`
 Start gateway
 
 Usage: `storage gateway [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1524,1438 +2635,16 @@ Usage: `storage gateway [command options] [arguments...]`
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### storage storage
-
-Storage service for oCIS
-
-Usage: `storage storage [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--config-file |  $STORAGE_CONFIG_FILE
-: Path to config file.
-
-
--log-level |  $STORAGE_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
-
--log-pretty |  $STORAGE_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
-
--log-color |  $STORAGE_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### storage sharing
-
-Start sharing service
-
-Usage: `storage sharing [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $STORAGE_SHARING_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9151"`.
-
-
--network |  $STORAGE_SHARING_GRPC_NETWORK
-: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `"tcp"`.
-
-
--addr |  $STORAGE_SHARING_GRPC_ADDR
-: Address to bind storage service. Default: `"0.0.0.0:9150"`.
-
-
--service |  $STORAGE_SHARING_SERVICES
-: --service usershareprovider [--service publicshareprovider]. Default: `cli.NewStringSlice("usershareprovider", "publicshareprovider")`.
-
-
--user-driver |  $STORAGE_SHARING_USER_DRIVER
-: driver to use for the UserShareProvider. Default: `"json"`.
-
-
--user-json-file |  $STORAGE_SHARING_USER_JSON_FILE
-: file used to persist shares for the UserShareProvider. Default: `"/var/tmp/ocis/storage/shares.json"`.
-
-
--public-driver |  $STORAGE_SHARING_PUBLIC_DRIVER
-: driver to use for the PublicShareProvider. Default: `"json"`.
-
-
--public-json-file |  $STORAGE_SHARING_PUBLIC_JSON_FILE
-: file used to persist shares for the PublicShareProvider. Default: `"/var/tmp/ocis/storage/publicshares.json"`.
-
-
--public-password-hash-cost |  $STORAGE_SHARING_PUBLIC_PASSWORD_HASH_COST
-: the cost of hashing the public shares passwords. Default: `11`.
-
-
--public-enable-expired-shares-cleanup |  $STORAGE_SHARING_PUBLIC_ENABLE_EXPIRED_SHARES_CLEANUP
-: whether to periodically delete expired public shares. Default: `true`.
-
-
--public-janitor-run-interval |  $STORAGE_SHARING_PUBLIC_JANITOR_RUN_INTERVAL
-: the time period in seconds after which to start a janitor run. Default: `60`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### storage storage-metadata
-
-Start storage-metadata service
-
-Usage: `storage storage-metadata [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $STORAGE_METADATA_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9217"`.
-
-
--grpc-network |  $STORAGE_METADATA_GRPC_NETWORK
-: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `"tcp"`.
-
-
--grpc-addr |  $STORAGE_METADATA_GRPC_PROVIDER_ADDR
-: Address to bind storage service. Default: `"0.0.0.0:9215"`.
-
-
--data-server-url |  $STORAGE_METADATA_DATA_SERVER_URL
-: URL of the data-provider the storage-provider uses. Default: `"http://localhost:9216"`.
-
-
--http-network |  $STORAGE_METADATA_HTTP_NETWORK
-: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `"tcp"`.
-
-
--http-addr |  $STORAGE_METADATA_HTTP_ADDR
-: Address to bind storage service. Default: `"0.0.0.0:9216"`.
-
-
--tmp-folder |  $STORAGE_METADATA_TMP_FOLDER
-: path to tmp folder. Default: `"/var/tmp/ocis/tmp/metadata"`.
-
-
--driver |  $STORAGE_METADATA_DRIVER
-: storage driver for metadata mount: eg. local, eos, owncloud, ocis or s3. Default: `"ocis"`.
-
-
--gateway-endpoint |  $STORAGE_GATEWAY_ENDPOINT
-: endpoint to use for the gateway service. Default: `"localhost:9142"`.
-
-
--userprovider-endpoint |  $STORAGE_USERPROVIDER_ENDPOINT
-: endpoint to use for the userprovider service. Default: `"localhost:9144"`.
-
-
--storage-root |  $STORAGE_METADATA_ROOT
-: the path to the metadata storage root. Default: `"/var/tmp/ocis/storage/metadata"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--config-file |  $STORAGE_CONFIG_FILE
-: Path to config file.
-
-
--log-level |  $STORAGE_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
-
--log-pretty |  $STORAGE_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
-
--log-color |  $STORAGE_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### storage users
-
-Start users service
-
-Usage: `storage users [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $STORAGE_SHARING_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9145"`.
-
-
--network |  $STORAGE_USERPROVIDER_NETWORK
-: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `"tcp"`.
-
-
--addr |  $STORAGE_USERPROVIDER_ADDR
-: Address to bind storage service. Default: `"0.0.0.0:9144"`.
-
-
--endpoint |  $STORAGE_USERPROVIDER_ENDPOINT
-: URL to use for the storage service. Default: `"localhost:9144"`.
-
-
--service |  $STORAGE_USERPROVIDER_SERVICES
-: --service userprovider [--service otherservice]. Default: `cli.NewStringSlice("userprovider")`.
-
-
--driver |  $STORAGE_USERPROVIDER_DRIVER
-: user driver: 'demo', 'json', 'ldap', or 'rest'. Default: `"ldap"`.
-
-
--json-config |  $STORAGE_USERPROVIDER_JSON
-: Path to users.json file. Default: `""`.
-
-
--user-groups-cache-expiration |  $STORAGE_USER_CACHE_EXPIRATION
-: Time in minutes for redis cache expiration.. Default: `5`.
-
-### storage auth-basic
-
-Start authprovider for basic auth
-
-Usage: `storage auth-basic [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $STORAGE_AUTH_BASIC_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9147"`.
-
-
--auth-driver |  $STORAGE_AUTH_DRIVER
-: auth driver: 'demo', 'json' or 'ldap'. Default: `"ldap"`.
-
-
--auth-json |  $STORAGE_AUTH_JSON
-: Path to users.json file. Default: `""`.
-
-
--network |  $STORAGE_AUTH_BASIC_GRPC_NETWORK
-: Network to use for the storage auth-basic service, can be 'tcp', 'udp' or 'unix'. Default: `"tcp"`.
-
-
--addr |  $STORAGE_AUTH_BASIC_GRPC_ADDR
-: Address to bind storage service. Default: `"0.0.0.0:9146"`.
-
-
--service |  $STORAGE_AUTH_BASIC_SERVICES
-: --service authprovider [--service otherservice]. Default: `cli.NewStringSlice("authprovider")`.
-
-
--gateway-url |  $STORAGE_GATEWAY_ENDPOINT
-: URL to use for the storage gateway service. Default: `"localhost:9142"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### storage groups
 
 Start groups service
 
 Usage: `storage groups [command options] [arguments...]`
+
+
+
+
+
 
 
 
@@ -3223,474 +2912,210 @@ Usage: `storage groups [command options] [arguments...]`
 
 
 
+### storage storage-metadata
 
+Start storage-metadata service
 
+Usage: `storage storage-metadata [command options] [arguments...]`
 
 
 
-### storage health
 
-Check health status
 
-Usage: `storage health [command options] [arguments...]`
 
 
 
 
 
+-debug-addr |  $STORAGE_METADATA_DEBUG_ADDR
+: Address to bind debug server. Default: `"0.0.0.0:9217"`.
 
 
-
-
--debug-addr |  $STORAGE_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9109"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### storage storage-home
-
-Start storage-home service
-
-Usage: `storage storage-home [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $STORAGE_HOME_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9156"`.
-
-
--grpc-network |  $STORAGE_HOME_GRPC_NETWORK
+-grpc-network |  $STORAGE_METADATA_GRPC_NETWORK
 : Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `"tcp"`.
 
 
--grpc-addr |  $STORAGE_HOME_GRPC_ADDR
-: Address to bind storage service. Default: `"0.0.0.0:9154"`.
+-grpc-addr |  $STORAGE_METADATA_GRPC_PROVIDER_ADDR
+: Address to bind storage service. Default: `"0.0.0.0:9215"`.
 
 
--http-network |  $STORAGE_HOME_HTTP_NETWORK
+-data-server-url |  $STORAGE_METADATA_DATA_SERVER_URL
+: URL of the data-provider the storage-provider uses. Default: `"http://localhost:9216"`.
+
+
+-http-network |  $STORAGE_METADATA_HTTP_NETWORK
 : Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `"tcp"`.
 
 
--http-addr |  $STORAGE_HOME_HTTP_ADDR
-: Address to bind storage service. Default: `"0.0.0.0:9155"`.
+-http-addr |  $STORAGE_METADATA_HTTP_ADDR
+: Address to bind storage service. Default: `"0.0.0.0:9216"`.
 
 
--driver |  $STORAGE_HOME_DRIVER
-: storage driver for home mount: eg. local, eos, owncloud, ocis or s3. Default: `"ocis"`.
+-tmp-folder |  $STORAGE_METADATA_TMP_FOLDER
+: path to tmp folder. Default: `"/var/tmp/ocis/tmp/metadata"`.
 
 
--read-only |  $STORAGE_HOME_READ_ONLY , $OCIS_STORAGE_READ_ONLY
-: use storage driver in read-only mode. Default: `false`.
-
-
--mount-path |  $STORAGE_HOME_MOUNT_PATH
-: mount path. Default: `"/home"`.
-
-
--mount-id |  $STORAGE_HOME_MOUNT_ID
-: mount id. Default: `"1284d238-aa92-42ce-bdc4-0b0000009157"`.
-
-
--expose-data-server |  $STORAGE_HOME_EXPOSE_DATA_SERVER
-: exposes a dedicated data server. Default: `false`.
-
-
--data-server-url |  $STORAGE_HOME_DATA_SERVER_URL
-: data server url. Default: `"http://localhost:9155/data"`.
-
-
--http-prefix |  $STORAGE_HOME_HTTP_PREFIX
-: prefix for the http endpoint, without leading slash. Default: `"data"`.
-
-
--tmp-folder |  $STORAGE_HOME_TMP_FOLDER
-: path to tmp folder. Default: `"/var/tmp/ocis/tmp/home"`.
-
-
--enable-home |  $STORAGE_HOME_ENABLE_HOME
-: enable the creation of home directories. Default: `true`.
+-driver |  $STORAGE_METADATA_DRIVER
+: storage driver for metadata mount: eg. local, eos, owncloud, ocis or s3. Default: `"ocis"`.
 
 
 -gateway-endpoint |  $STORAGE_GATEWAY_ENDPOINT
-: endpoint to use for the storage gateway service. Default: `"localhost:9142"`.
+: endpoint to use for the gateway service. Default: `"localhost:9142"`.
 
 
--users-endpoint |  $STORAGE_USERPROVIDER_ENDPOINT
-: endpoint to use for the storage service. Default: `"localhost:9144"`.
+-userprovider-endpoint |  $STORAGE_USERPROVIDER_ENDPOINT
+: endpoint to use for the userprovider service. Default: `"localhost:9144"`.
+
+
+-storage-root |  $STORAGE_METADATA_ROOT
+: the path to the metadata storage root. Default: `"/var/tmp/ocis/storage/metadata"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-config-file |  $STORAGE_CONFIG_FILE
+: Path to config file.
+
+
+-log-level |  $STORAGE_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+
+-log-pretty |  $STORAGE_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+
+-log-color |  $STORAGE_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
+
+
+
+
+
 
 
 
@@ -3790,6 +3215,121 @@ Usage: `storage storage-home [command options] [arguments...]`
 Start storage-public-link service
 
 Usage: `storage storage-public-link [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3938,8 +3478,11 @@ Usage: `storage storage-public-link [command options] [arguments...]`
 
 
 
+### storage storage-users
 
+Start storage-users service
 
+Usage: `storage storage-users [command options] [arguments...]`
 
 
 
@@ -4007,6 +3550,463 @@ Usage: `storage storage-public-link [command options] [arguments...]`
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $STORAGE_USERS_DEBUG_ADDR
+: Address to bind debug server. Default: `"0.0.0.0:9159"`.
+
+
+-grpc-network |  $STORAGE_USERS_GRPC_NETWORK
+: Network to use for the users storage, can be 'tcp', 'udp' or 'unix'. Default: `"tcp"`.
+
+
+-grpc-addr |  $STORAGE_USERS_GRPC_ADDR
+: GRPC Address to bind users storage. Default: `"0.0.0.0:9157"`.
+
+
+-http-network |  $STORAGE_USERS_HTTP_NETWORK
+: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `"tcp"`.
+
+
+-http-addr |  $STORAGE_USERS_HTTP_ADDR
+: HTTP Address to bind users storage. Default: `"0.0.0.0:9158"`.
+
+
+-driver |  $STORAGE_USERS_DRIVER
+: storage driver for users mount: eg. local, eos, owncloud, ocis or s3. Default: `"ocis"`.
+
+
+-read-only |  $STORAGE_USERS_READ_ONLY , $OCIS_STORAGE_READ_ONLY
+: use storage driver in read-only mode. Default: `false`.
+
+
+-mount-path |  $STORAGE_USERS_MOUNT_PATH
+: mount path. Default: `"/users"`.
+
+
+-mount-id |  $STORAGE_USERS_MOUNT_ID
+: mount id. Default: `"1284d238-aa92-42ce-bdc4-0b0000009157"`.
+
+
+-expose-data-server |  $STORAGE_USERS_EXPOSE_DATA_SERVER
+: exposes a dedicated data server. Default: `false`.
+
+
+-data-server-url |  $STORAGE_USERS_DATA_SERVER_URL
+: data server url. Default: `"http://localhost:9158/data"`.
+
+
+-http-prefix |  $STORAGE_USERS_HTTP_PREFIX
+: prefix for the http endpoint, without leading slash. Default: `"data"`.
+
+
+-tmp-folder |  $STORAGE_USERS_TMP_FOLDER
+: path to tmp folder. Default: `"/var/tmp/ocis/tmp/users"`.
+
+
+-gateway-endpoint |  $STORAGE_GATEWAY_ENDPOINT
+: endpoint to use for the storage gateway service. Default: `"localhost:9142"`.
+
+
+-users-endpoint |  $STORAGE_USERPROVIDER_ENDPOINT
+: endpoint to use for the storage service. Default: `"localhost:9144"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### storage users
+
+Start users service
+
+Usage: `storage users [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $STORAGE_SHARING_DEBUG_ADDR
+: Address to bind debug server. Default: `"0.0.0.0:9145"`.
+
+
+-network |  $STORAGE_USERPROVIDER_NETWORK
+: Network to use for the storage service, can be 'tcp', 'udp' or 'unix'. Default: `"tcp"`.
+
+
+-addr |  $STORAGE_USERPROVIDER_ADDR
+: Address to bind storage service. Default: `"0.0.0.0:9144"`.
+
+
+-endpoint |  $STORAGE_USERPROVIDER_ENDPOINT
+: URL to use for the storage service. Default: `"localhost:9144"`.
+
+
+-service |  $STORAGE_USERPROVIDER_SERVICES
+: --service userprovider [--service otherservice]. Default: `cli.NewStringSlice("userprovider")`.
+
+
+-driver |  $STORAGE_USERPROVIDER_DRIVER
+: user driver: 'demo', 'json', 'ldap', or 'rest'. Default: `"ldap"`.
+
+
+-json-config |  $STORAGE_USERPROVIDER_JSON
+: Path to users.json file. Default: `""`.
+
+
+-user-groups-cache-expiration |  $STORAGE_USER_CACHE_EXPIRATION
+: Time in minutes for redis cache expiration.. Default: `5`.
 
 
 
