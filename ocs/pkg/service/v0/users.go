@@ -9,6 +9,10 @@ import (
 	"strconv"
 	"strings"
 
+	"go.opentelemetry.io/otel/attribute"
+
+	ocstracing "github.com/owncloud/ocis/ocs/pkg/tracing"
+
 	"github.com/asim/go-micro/plugins/client/grpc/v3"
 	merrors "github.com/asim/go-micro/v3/errors"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -25,7 +29,6 @@ import (
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
-	ocstracing "github.com/owncloud/ocis/ocs/pkg/tracing"
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
 	"github.com/pkg/errors"
 	"google.golang.org/genproto/protobuf/field_mask"
@@ -91,16 +94,13 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	var account *accounts.Account
 	var err error
 
-	ctx, span := ocstracing.TraceProvider.Tracer("ocs").Start(r.Context(), "GetUser")
-	defer span.End()
-
 	switch {
 	case userid == "":
 		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context")))
 	case o.config.AccountBackend == "accounts":
-		account, err = o.fetchAccountByUsername(ctx, userid)
+		account, err = o.fetchAccountByUsername(r.Context(), userid)
 	case o.config.AccountBackend == "cs3":
-		account, err = o.fetchAccountFromCS3Backend(ctx, userid)
+		account, err = o.fetchAccountFromCS3Backend(r.Context(), userid)
 	default:
 		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
 	}
@@ -147,6 +147,16 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 			Definition: "default",
 		},
 	}
+
+	if o.config.Tracing.Enabled {
+		_, span := ocstracing.TraceProvider.
+			Tracer("ocs").
+			Start(r.Context(), "GetUser")
+		defer span.End()
+
+		span.SetAttributes(attribute.Any("user", d))
+	}
+
 	mustNotFail(render.Render(w, r, response.DataRender(d)))
 }
 

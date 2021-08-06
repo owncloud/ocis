@@ -4,6 +4,7 @@ import (
 	"github.com/asim/go-micro/v3"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
+	ocsmw "github.com/owncloud/ocis/ocs/pkg/middleware"
 	svc "github.com/owncloud/ocis/ocs/pkg/service/v0"
 )
 
@@ -25,19 +26,15 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
-			middleware.Trace,
+			middleware.TraceContext,
 			middleware.RealIP,
+			ocsmw.LogTrace,
 			middleware.RequestID,
 			middleware.NoCache,
 			middleware.Cors,
 			middleware.Secure,
-			middleware.Version(
-				options.Config.Service.Name,
-				options.Config.Service.Version,
-			),
-			middleware.Logger(
-				options.Logger,
-			),
+			middleware.Version(options.Config.Service.Name, options.Config.Service.Version),
+			middleware.Logger(options.Logger),
 		),
 	)
 

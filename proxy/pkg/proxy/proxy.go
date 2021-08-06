@@ -226,6 +226,7 @@ func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request
 		defer span.End()
 		proxytracing.Propagator.Inject(ctx, propagation.HeaderCarrier(r.Header))
 	}
+
 	p.ReverseProxy.ServeHTTP(w, r.WithContext(ctx))
 }
 

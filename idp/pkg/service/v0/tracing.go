@@ -19,5 +19,5 @@ type tracing struct {
 
 // ServeHTTP implements the Service interface.
 func (t tracing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	middleware.Trace(t.next).ServeHTTP(w, r)
+	middleware.TraceContext(t.next).ServeHTTP(w, r)
 }
