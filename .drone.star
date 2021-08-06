@@ -396,8 +396,14 @@ def uploadScanResults(ctx):
             },
             {
                 "name": "codacy",
-                "image": "plugins/codacy:1",
-                "pull": "always",
+                "image": "codacy/codacy-coverage-reporter:12.2.3",
+                "commands": [
+                    "export CODACY_PROJECT_TOKEN=$PLUGIN_TOKEN",
+                    "apk add findutils",
+                    "find cache/coverage/*_coverage.out -printf '-r %p '",
+                    "find cache/coverage/*_coverage.out -size 0 -print -delete",
+                    "/app/codacy-coverage-reporter report --commit-uuid " + ctx.build.commit + " --force-coverage-parser go $(find cache/coverage/*_coverage.out -printf '-r %p ')",
+                ],
                 "settings": {
                     "token": {
                         "from_secret": "codacy_token",
