@@ -26,15 +26,14 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
-			middleware.TraceContext,
 			middleware.RealIP,
-			ocsmw.LogTrace,
 			middleware.RequestID,
 			middleware.NoCache,
 			middleware.Cors,
 			middleware.Secure,
 			middleware.Version(options.Config.Service.Name, options.Config.Service.Version),
 			middleware.Logger(options.Logger),
+			ocsmw.LogTrace,
 		),
 	)
 
