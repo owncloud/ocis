@@ -44,6 +44,8 @@ func Static(root string, fs http.FileSystem) func(http.Handler) http.Handler {
 			}
 			span.SetAttributes(attribute.KeyValue{Key: "path", Value: attribute.StringValue(r.URL.Path)})
 			span.SetStatus(codes.Ok, "ok")
+
+			next.ServeHTTP(w, r)
 		})
 	}
 }
