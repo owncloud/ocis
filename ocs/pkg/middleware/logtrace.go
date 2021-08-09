@@ -12,7 +12,7 @@ var propagator = propagation.NewCompositeTextMapPropagator(
 	propagation.TraceContext{},
 )
 
-// LogTrace unpacks the request context looking for an existing trace id.
+// LogTrace Sets the initial trace in the ocs service.
 func LogTrace(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx, span := ocstracing.TraceProvider.Tracer("ocs").Start(r.Context(), r.URL.Path)
