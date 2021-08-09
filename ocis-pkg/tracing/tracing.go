@@ -4,10 +4,14 @@ import (
 	"fmt"
 
 	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 )
+
+// Propagator ensures the importer module uses the same trace propagation strategy.
+var Propagator propagation.TextMapPropagator
 
 // GetTraceProvider returns a configured open-telemetry trace provider.
 func GetTraceProvider(collectorEndpoint, traceType, serviceName string) (*sdktrace.TracerProvider, error) {

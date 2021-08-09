@@ -31,10 +31,10 @@ func (t tracing) GetThumbnail(ctx context.Context, req *v0proto.GetThumbnailRequ
 		defer span.End()
 
 		span.SetAttributes(
-			attribute.KeyValue{"filepath", attribute.StringValue(req.Filepath)},
-			attribute.KeyValue{"thumbnail_type", attribute.StringValue(req.ThumbnailType.String())},
-			attribute.KeyValue{"width", attribute.IntValue(int(req.Width))},
-			attribute.KeyValue{"height", attribute.IntValue(int(req.Height))},
+			attribute.KeyValue{Key: "filepath", Value: attribute.StringValue(req.Filepath)},
+			attribute.KeyValue{Key: "thumbnail_type", Value: attribute.StringValue(req.ThumbnailType.String())},
+			attribute.KeyValue{Key: "width", Value: attribute.IntValue(int(req.Width))},
+			attribute.KeyValue{Key: "height", Value: attribute.IntValue(int(req.Height))},
 		)
 	}
 
