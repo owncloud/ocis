@@ -11,30 +11,36 @@ import (
 )
 
 // Propagator ensures the importer module uses the same trace propagation strategy.
-var Propagator propagation.TextMapPropagator
+var Propagator = propagation.NewCompositeTextMapPropagator(
+	propagation.Baggage{},
+	propagation.TraceContext{},
+)
 
 // GetTraceProvider returns a configured open-telemetry trace provider.
 func GetTraceProvider(collectorEndpoint, traceType, serviceName string) (*sdktrace.TracerProvider, error) {
 	switch t := traceType; t {
 	case "jaeger":
-		{
-			exp, err := jaeger.New(
-				jaeger.WithCollectorEndpoint(
-					jaeger.WithEndpoint(collectorEndpoint),
-				),
-			)
-			if err != nil {
-				return nil, err
-			}
-
-			return sdktrace.NewTracerProvider(
-				sdktrace.WithBatcher(exp),
-				sdktrace.WithResource(resource.NewWithAttributes(
-					semconv.SchemaURL,
-					semconv.ServiceNameKey.String(serviceName)),
-				),
-			), nil
+		if collectorEndpoint == "" {
+			return sdktrace.NewTracerProvider(), nil
 		}
+
+		exp, err := jaeger.New(
+			jaeger.WithCollectorEndpoint(
+				jaeger.WithEndpoint(collectorEndpoint),
+			),
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		return sdktrace.NewTracerProvider(
+			sdktrace.WithBatcher(exp),
+			sdktrace.WithResource(resource.NewWithAttributes(
+				semconv.SchemaURL,
+				semconv.ServiceNameKey.String(serviceName)),
+			),
+		), nil
+
 	case "agent":
 		fallthrough
 	case "zipkin":

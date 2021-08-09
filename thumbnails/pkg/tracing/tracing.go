@@ -8,7 +8,7 @@ import (
 
 var (
 	// TraceProvider is the global trace provider for the thumbnails service.
-	TraceProvider = sdktrace.NewTracerProvider()
+	TraceProvider *sdktrace.TracerProvider
 )
 
 func Configure(cfg *config.Config) error {
