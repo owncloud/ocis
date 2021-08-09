@@ -41,7 +41,7 @@ The most prominent changes in ownCloud Infinite Scale 1.9.0 and ownCloud Web 3.4
 - The right sidebar in ownCloud Web now shows details about the selected file/folder (e.g., size, owner, sharing status, modification time). [#5161](https://github.com/owncloud/web/issues/5161)
 - The right sidebar in ownCloud Web now shows previews for images. [#5501](https://github.com/owncloud/web/pull/5501)
 - View options for the file list have been introduced in ownCloud Web. Currently this allows to change the number of files/folders per page and to show/hide hidden files. [#5408]https://github.com/owncloud/web/pull/5408 [#5470](https://github.com/owncloud/web/pull/5470)
-- A feedback button has been added to the top bar. It guides to user to an ownCloud Web feedback survey. If undesired, this feature [can be disabled in the ownCloud Web configuration](https://owncloud.dev/clients/web/getting-started/#options). [#5468](https://github.com/owncloud/web/pull/5468)
+- A feedback button has been added to the top bar. It guides the user to an ownCloud Web feedback survey. If undesired, this feature [can be disabled in the ownCloud Web configuration](https://owncloud.dev/clients/web/getting-started/#options). [#5468](https://github.com/owncloud/web/pull/5468)
 - Received shares can now be accepted/declined as batches in the "Shared with me" view. [#5374](https://github.com/owncloud/web/pull/5374)
 - The oCIS backend now supports to enable extensions by name. [#2229](https://github.com/owncloud/ocis/pull/2229)
 - Storage drivers can be set to read only. [#2230](https://github.com/owncloud/ocis/pull/2230)
