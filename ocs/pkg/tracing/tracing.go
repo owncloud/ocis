@@ -15,7 +15,7 @@ var (
 	Propagator propagation.TextMapPropagator
 
 	// TraceProvider is the global trace provider for the proxy service.
-	TraceProvider *sdktrace.TracerProvider
+	TraceProvider = sdktrace.NewTracerProvider()
 )
 
 func Configure(cfg *config.Config, logger log.Logger) error {

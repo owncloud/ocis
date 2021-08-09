@@ -3,6 +3,8 @@ package svc
 import (
 	"context"
 
+	"go.opentelemetry.io/otel/trace"
+
 	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 	thumbnailsTracing "github.com/owncloud/ocis/thumbnails/pkg/tracing"
 	"go.opentelemetry.io/otel/attribute"
@@ -21,16 +23,20 @@ type tracing struct {
 
 // GetThumbnail implements the ThumbnailServiceHandler interface.
 func (t tracing) GetThumbnail(ctx context.Context, req *v0proto.GetThumbnailRequest, rsp *v0proto.GetThumbnailResponse) error {
-	tracer := thumbnailsTracing.TraceProvider.Tracer("thumbnails")
-	ctx, span := tracer.Start(ctx, "Thumbnails.GetThumbnail")
-	defer span.End()
+	var span trace.Span
 
-	span.SetAttributes(
-		attribute.KeyValue{"filepath", attribute.StringValue(req.Filepath)},
-		attribute.KeyValue{"thumbnail_type", attribute.StringValue(req.ThumbnailType.String())},
-		attribute.KeyValue{"width", attribute.IntValue(int(req.Width))},
-		attribute.KeyValue{"height", attribute.IntValue(int(req.Height))},
-	)
+	if thumbnailsTracing.TraceProvider != nil {
+		tracer := thumbnailsTracing.TraceProvider.Tracer("thumbnails")
+		ctx, span = tracer.Start(ctx, "Thumbnails.GetThumbnail")
+		defer span.End()
+
+		span.SetAttributes(
+			attribute.KeyValue{"filepath", attribute.StringValue(req.Filepath)},
+			attribute.KeyValue{"thumbnail_type", attribute.StringValue(req.ThumbnailType.String())},
+			attribute.KeyValue{"width", attribute.IntValue(int(req.Width))},
+			attribute.KeyValue{"height", attribute.IntValue(int(req.Height))},
+		)
+	}
 
 	return t.next.GetThumbnail(ctx, req, rsp)
 }
