@@ -148,14 +148,12 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	if o.config.Tracing.Enabled {
-		_, span := ocstracing.TraceProvider.
-			Tracer("ocs").
-			Start(r.Context(), "GetUser")
-		defer span.End()
+	_, span := ocstracing.TraceProvider.
+		Tracer("ocs").
+		Start(r.Context(), "GetUser")
+	defer span.End()
 
-		span.SetAttributes(attribute.Any("user", d))
-	}
+	span.SetAttributes(attribute.Any("user", d))
 
 	mustNotFail(render.Render(w, r, response.DataRender(d)))
 }

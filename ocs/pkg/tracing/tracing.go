@@ -3,12 +3,12 @@ package tracing
 import (
 	pkgtrace "github.com/owncloud/ocis/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/ocs/pkg/config"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var (
 	// TraceProvider is the global trace provider for the ocs service.
-	TraceProvider *sdktrace.TracerProvider
+	TraceProvider = trace.NewNoopTracerProvider()
 )
 
 func Configure(cfg *config.Config) error {

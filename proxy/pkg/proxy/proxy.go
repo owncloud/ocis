@@ -222,10 +222,11 @@ func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request
 		span trace.Span
 	)
 
+	tracer := proxytracing.TraceProvider.Tracer("proxy")
+	ctx, span = tracer.Start(ctx, fmt.Sprintf("%s %v", r.Method, r.URL.Path))
+	defer span.End()
+
 	if p.config.Tracing.Enabled {
-		tracer := proxytracing.TraceProvider.Tracer("proxy")
-		ctx, span = tracer.Start(ctx, fmt.Sprintf("%s %v", r.Method, r.URL.Path))
-		defer span.End()
 		pkgtrace.Propagator.Inject(ctx, propagation.HeaderCarrier(r.Header))
 	}
 

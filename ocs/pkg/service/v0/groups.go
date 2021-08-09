@@ -33,14 +33,12 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 			// the OCS API is a REST API and it uses the username to look for groups. If the id from the user in the context
 			// differs from that of the url we can assume we are an admin because we are past the selfOrAdmin middleware.
 
-			if o.config.Tracing.Enabled {
-				_, span := ocstracing.TraceProvider.
-					Tracer("ocs").
-					Start(r.Context(), "ListUserGroups")
-				defer span.End()
+			_, span := ocstracing.TraceProvider.
+				Tracer("ocs").
+				Start(r.Context(), "ListUserGroups")
+			defer span.End()
 
-				span.SetAttributes(attribute.Any("groups", u.Groups))
-			}
+			span.SetAttributes(attribute.Any("groups", u.Groups))
 
 			if len(u.Groups) > 0 {
 				mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: u.Groups})))
@@ -93,14 +91,12 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 
 	o.logger.Error().Err(err).Int("count", len(groups)).Str("userid", account.Id).Msg("listing groups for user")
 
-	if o.config.Tracing.Enabled {
-		_, span := ocstracing.TraceProvider.
-			Tracer("ocs").
-			Start(r.Context(), "ListUserGroups")
-		defer span.End()
+	_, span := ocstracing.TraceProvider.
+		Tracer("ocs").
+		Start(r.Context(), "ListUserGroups")
+	defer span.End()
 
-		span.SetAttributes(attribute.Any("groups", groups))
-	}
+	span.SetAttributes(attribute.Any("groups", groups))
 
 	mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: groups})))
 }
@@ -265,14 +261,12 @@ func (o Ocs) ListGroups(w http.ResponseWriter, r *http.Request) {
 		groups = append(groups, res.Groups[i].OnPremisesSamAccountName)
 	}
 
-	if o.config.Tracing.Enabled {
-		_, span := ocstracing.TraceProvider.
-			Tracer("ocs").
-			Start(r.Context(), "ListGroups")
-		defer span.End()
+	_, span := ocstracing.TraceProvider.
+		Tracer("ocs").
+		Start(r.Context(), "ListGroups")
+	defer span.End()
 
-		span.SetAttributes(attribute.Any("groups", groups))
-	}
+	span.SetAttributes(attribute.Any("groups", groups))
 
 	mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: groups})))
 }
