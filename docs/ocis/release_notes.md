@@ -7,25 +7,45 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.10.0 Technology Preview
+
+Version 1.10.0 brings new features, usability improvements and bug fixes. ownCloud Web 4.0.0 now supports ONLYOFFICE document editors and can search/filter files and folders. Furthermore it brings a new context menu for file actions that can be accessed via right click and comes with a big bunch of other notable improvements and fixes.
+
+The most prominent changes in ownCloud Infinite Scale 1.10.0 and ownCloud Web 4.0.0 comprise:
+
+- ownCloud Web now supports ONLYOFFICE document editors when used with ownCloud Classic Server. See the [documentation](https://owncloud.dev/clients/web/deployments/oc10-app/#onlyoffice) for more information on requirements and configuration.
+- ownCloud Web now supports global search and filtering for the current folder via the search bar. Both will work when ownCloud Web is used with ownCloud Classic. The Infinite Scale capabilities are currently limited to filtering the current folder. [#5415](https://github.com/owncloud/web/pull/5415)
+- A context menu for a file/folder which contains related actions has been introduced to ownCloud Web (in addition to the actions in the right sidebar). [#5160](https://github.com/owncloud/web/issues/5160)
+- The context menu for a file/folder in ownCloud Web can be opened via right click and using the "..." menu. [#5102](https://github.com/owncloud/web/issues/5102)
+- As a first step of a larger redesign of the sharing dialog in ownCloud Web, the autocomplete and share recipient selection have been redesigned. [#5554](https://github.com/owncloud/web/pull/5554)
+- The right sidebar navigation in ownCloud Web has been redesigned. Moving away from structuring all functionality on a single view using accordions, each section now has their own, dedicated view. [#5549](https://github.com/owncloud/web/pull/5549)
+- The maximum number of sharing autocomplete suggestions in ownCloud Web can now be configured. See [the documentation](https://owncloud.dev/clients/web/getting-started/#options) for more information. [#5506](https://github.com/owncloud/web/pull/5506)
+- ownCloud Web works now with ownCloud Classic when OpenID Connect authentication is used. [#5536](https://github.com/owncloud/web/pull/5536)
+- ownCloud Web now respects the server-side capability for user avatars. [#5178](https://github.com/owncloud/web/pull/5178)
+- The login page has been optimized in regards of accessibility. [#5376](https://github.com/owncloud/web/issues/5376)
+- The Infinite Scale backend is being further hardened by fixing known issues, improving error handling and stabilizing existing features. 
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.10.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v4.0.0) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.9.0 Technology Preview
 
-Version 1.9.0 is a Tech Preview release of ownCloud Infinite Scale. More features were added and the platform was more matured.
+Version 1.9.0 is a feature and maintenance release. More features have been added and the platform was matured further. ownCloud Web 3.4.1 brings usability improvements and new features. The right sidebar now shows details about the selected resource and offers previews for images. View options for the file list and a feedback button have been added.
 
-These are the highlights of the preview:
+The most prominent changes in ownCloud Infinite Scale 1.9.0 and ownCloud Web 3.4.1 comprise:
 
-- The oCIS backend now supports to enable extensions by name: [#2229](https://github.com/owncloud/ocis/pull/2229)
+- The right sidebar in ownCloud Web now shows details about the selected file/folder (e.g., size, owner, sharing status, modification time). [#5161](https://github.com/owncloud/web/issues/5161)
+- The right sidebar in ownCloud Web now shows previews for images. [#5501](https://github.com/owncloud/web/pull/5501)
+- View options for the file list have been introduced in ownCloud Web. Currently this allows to change the number of files/folders per page and to show/hide hidden files. [#5408]https://github.com/owncloud/web/pull/5408 [#5470](https://github.com/owncloud/web/pull/5470)
+- A feedback button has been added to the top bar. It guides the user to an ownCloud Web feedback survey. If undesired, this feature [can be disabled in the ownCloud Web configuration](https://owncloud.dev/clients/web/getting-started/#options). [#5468](https://github.com/owncloud/web/pull/5468)
+- Received shares can now be accepted/declined as batches in the "Shared with me" view. [#5374](https://github.com/owncloud/web/pull/5374)
+- The oCIS backend now supports to enable extensions by name. [#2229](https://github.com/owncloud/ocis/pull/2229)
 - Storage drivers can be set to read only. [#2230](https://github.com/owncloud/ocis/pull/2230)
-- A more direct micro service init for faster startup: [#1705](https://github.com/owncloud/ocis/pull/1705)
-
-### Updated subsystems:
-
-- Updated REVA to [v1.9.1](https://github.com/cs3org/reva/releases/tag/v1.9.1): [#2280](https://github.com/owncloud/ocis/pull/2280)
-- Updated ownCloud Web to [v3.4.1](https://github.com/owncloud/web/releases/tag/v3.4.1): [#2283](https://github.com/owncloud/ocis/pull/2283)
-
-### Bugfixes:
-
-- Do not panic when service fails to start: [#2252](https://github.com/owncloud/ocis/issues/2252)
-- Dont use port 80 as debug for GroupsProvider: #2271
+- Micro service init has been improved for faster startup. [#1705](https://github.com/owncloud/ocis/pull/1705)
 
 You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.9.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v3.4.1) for further details on what has changed.
 
@@ -38,7 +58,7 @@ We are currently in a Tech Preview state and breaking changes may occur at any t
 
 Version 1.8.0 is a maintenance and bug fix release. ownCloud Web 3.3.0 has received further performance and major accessibility improvements.
 
-The most prominent changes in version 1.8.0 comprise:
+The most prominent changes in ownCloud Infinite Scale 1.8.0 and ownCloud Web 3.3.0 comprise:
 
 - ownCloud Web is now fully translatable on Transifex [#5042](https://github.com/owncloud/web/pull/5042)
 - ownCloud Web now supports keyboard navigation [#4937](https://github.com/owncloud/web/pull/4937) [#5013](https://github.com/owncloud/web/pull/5013) [#5027](https://github.com/owncloud/web/pull/5027) [#5147](https://github.com/owncloud/web/pull/5147)
@@ -58,7 +78,7 @@ We are currently in a Tech Preview state and breaking changes may occur at any t
 
 Version 1.7.0 is a maintenance and bug fix release. ownCloud Web 3.2.0 has received further performance improvements and minor usability tweaks.
 
-The most prominent changes in version 1.7.0 comprise:
+The most prominent changes in ownCloud Infinite Scale 1.7.0 and ownCloud Web 3.2.0 comprise:
 
 - The S3 storage driver can now be used for testing using the configuration values in the [documentation](https://owncloud.dev/extensions/storage/configuration/#s3ng-driver) [#1886](https://github.com/owncloud/ocis/pull/1886)
 - A confirmation dialog for public link deletion has been added [#5125](https://github.com/owncloud/web/pull/5125)
@@ -76,7 +96,7 @@ We are currently in a Tech Preview state and breaking changes may occur at any t
 
 To get the full potential out of the microservice architecture, version 1.6.0 introduces a dynamic service registry to ownCloud Infinite Scale. The dynamic service registry facilitates the configuration and contributes to the scalability of the platform. ownCloud Web 3.1.0 has received further improvements for accessibility like keyboard navigation and it comes with performance improvements by loading certain elements asynchronously.
 
-The most prominent changes in version 1.6.0 comprise:
+The most prominent changes in ownCloud Infinite Scale 1.6.0 and ownCloud Web 3.1.0 comprise:
 
 - Introducing a dynamic service registry: The dynamic service registry takes care of dynamically assigning network addresses between the oCIS services and enables the services to find and work with each other automatically. It replaces the previous hardcoded service configuration which simplifies the initial setup and makes distributed, scale-out environments a lot easier to handle. [#1509](https://github.com/cs3org/reva/pull/1509)
 - User avatars are now fetched asynchronously, enabling a non-blocking loading of the file list and improving user experience [#1295](https://github.com/owncloud/owncloud-design-system/pull/1295)
@@ -133,7 +153,7 @@ This may lead to faulty behaviour since both the metadata and user storage drive
 
 Version 1.5.0 is a maintenance release for the Infinite Scale backend with a number of bug fixes and smaller improvements. For ownCloud Web it brings further accessibility improvements and a whole bunch of new features. The web interface can now be branded and there is a new, dedicated view in the left sidebar to list all link shares of a user.
 
-The most prominent changes in version 1.5.0 comprise:
+The most prominent changes in ownCloud Infinite Scale 1.5.0 and ownCloud Web 3.0.0 comprise:
 
 - Config file based theming for ownCloud Web (see https://owncloud.dev/clients/web/theming/ for more information) [#4822](https://github.com/owncloud/web/pull/4822)
 - A dedicated view for "Shared by link" has been added [#4881](https://github.com/owncloud/web/pull/4881)
@@ -153,7 +173,7 @@ We are currently in a Tech Preview state and breaking changes may occur at any t
 
 Version 1.4.0 brings new features, bug fixes and further improvements. The accessibility of ownCloud Web has greatly improved, paving the way for WCAG 2.1 compliance. The Infinite Scale platform has received major improvements regarding memory consumption. The user storage quota feature has been implemented and folder sizes are now properly calculated. It is now possible to write log messages to log files and to specify configuration values using a config file.
 
-The most prominent changes in version 1.4.0 comprise:
+The most prominent changes in ownCloud Infinite Scale 1.4.0 and ownCloud Web 2.1.0 comprise:
 
 - ownCloud Web is now able to use pre-signed url downloads for password protected shares [#38376](https://github.com/owncloud/core/pull/38376)
 - Reduced the memory consumption of the runtime drastically (by a factor of 24) [#1762](https://github.com/owncloud/ocis/pull/1762)
@@ -234,7 +254,7 @@ We are currently in a Tech Preview state and breaking changes may occur at any t
 ## ownCloud Infinite Scale 1.2.0 Technology Preview
 Version 1.2.0 brings more functionality and stability to ownCloud Infinite Scale. ownCloud Web now loads a lot faster and is prepared for the introduction of accessibility features. An initial implementation for S3 storage support is available and file integrity checking has been introduced.
 
-The most prominent changes in version 1.2.0 comprise:
+The most prominent changes in ownCloud Infinite Scale 1.2.0 and ownCloud Web 2.0.0 comprise:
 
 - The initial loading time for ownCloud Web has been reduced by handling dependencies more efficiently (the bundle size of ownCloud Web has been drastically reduced) [#4584](https://github.com/owncloud/web/pull/4584)
 - Preparations for accessibility features have been implemented to work towards WCAG 2.1 compliance [#4594](https://github.com/owncloud/web/pull/4594)
@@ -288,7 +308,8 @@ Migration steps:
 
 Version 1.1.0 is a hardening and patch release. It ships with the latest version of ownCloud Web and brings a couple of minor improvements. The minor version increase is needed due to non-backwards compatible changes in configuration. The documentation has been updated to reflect the changes. Please note that this version is still a Technology Preview and not suited for production use.
 
-The most prominent changes in version 1.1.0 comprise
+The most prominent changes in ownCloud Infinite Scale 1.1.0 and ownCloud Web 1.0.1 comprise:
+
 - Performance and stability improvements for installations with multiple concurrent users
 - Simplified configuration by introducing the new environment variable OCIS_URL
 - Beta release of [ownCloud performance scripts](https://github.com/owncloud/cdperf)
