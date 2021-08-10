@@ -24,7 +24,7 @@ require (
 	github.com/blevesearch/bleve v1.0.9
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/cs3org/go-cs3apis v0.0.0-20210802070913-970eec344e59
-	github.com/cs3org/reva v1.11.0
+	github.com/cs3org/reva v1.11.1-0.20210809134415-3fe79c870fb5
 	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/disintegration/imaging v1.6.2
@@ -50,7 +50,7 @@ require (
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.4
-	github.com/onsi/gomega v1.14.0
+	github.com/onsi/gomega v1.15.0
 	github.com/openzipkin/zipkin-go v0.2.5
 	github.com/owncloud/open-graph-api-go v0.0.0-20210511151655-57894f7d46fb
 	github.com/pkg/errors v0.9.1
@@ -73,7 +73,7 @@ require (
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
 	golang.org/x/tools v0.1.2 // indirect
 	google.golang.org/genproto v0.0.0-20210402141018-6c239bbf2bb1
-	google.golang.org/grpc v1.39.0
+	google.golang.org/grpc v1.39.1
 	google.golang.org/grpc/examples v0.0.0-20210802225658-edb9b3bc2266 // indirect
 	google.golang.org/protobuf v1.27.1
 	gotest.tools v2.2.0+incompatible

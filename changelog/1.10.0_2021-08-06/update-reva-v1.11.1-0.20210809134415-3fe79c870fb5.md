@@ -1,6 +1,7 @@
 Enhancement: update REVA
 
-Update REVA from v1.10.1-0.20210730095301-fcb7a30a44a6 to v1.11.0
+Update REVA from v1.10.1-0.20210730095301-fcb7a30a44a6 to v1.11.1-0.20210809134415-3fe79c870fb5
+* Fix cs3org/reva#1978: Fix owner type is optional
 * Fix cs3org/reva#1899: Fix chunked uploads for new versions
 * Fix cs3org/reva#1906: Fix copy over existing resource
 * Fix cs3org/reva#1891: Delete Shared Resources as Receiver
