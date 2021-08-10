@@ -11,10 +11,10 @@ For simplicity reasons, this document mostly refers to the ownCloud [Infinite Sc
 [What should I know before I get started](#what-should-i-know-before-i-get-started)
 *   [ownCloud is hosted on Github](#owncloud-is-hosted-on-github)
 *   [ownCloud Company, Engineering Partners and Community](#owncloud-company,-engineering-partners-and-community)
-*   [Licensing and CLA](licensing-and-cla)
+*   [Licensing and CLA](#licensing-and-cla)
 
 [How Can I Contribute](#how-can-i-contribute)
-*   [Help spreading the word](help-spreading-the-word!)
+*   [Help spreading the word](#help-spreading-the-word)
 *   [Reporting Bugs](#reporting-bugs)
 *   [Suggesting Enhancements](#suggesting-enhancements)
 *   [Your First Code Contribution](#your-first-code-contribution)
