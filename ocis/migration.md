@@ -81,7 +81,7 @@ When introducing OpenID Connect, the clients will detect the new authentication 
 reauthorize at the OpenID Connecd IdP, which again, may be configured to skip the consent step for trusted clients.
 
 #### Steps
-1. There are multiple products that can be used as an OpenID Connect IdP. We test with [kopano konnect](https://stash.kopano.io/projects/KC/repos/konnect/browse), which is also [embedded in oCIS](https://github.com/owncloud/web/). Other alternatives include [Keycloak](https://www.keycloak.org/) or [Ping](https://www.pingidentity.com/). Please refer to the corresponding setup instructions for the product you intent to use.
+1. There are multiple products that can be used as an OpenID Connect IdP. We test with [LibreGraph Connect](https://github.com/libregraph/lico), which is also [embedded in oCIS](https://github.com/owncloud/web/). Other alternatives include [Keycloak](https://www.keycloak.org/) or [Ping](https://www.pingidentity.com/). Please refer to the corresponding setup instructions for the product you intent to use.
 
 <div class="editpage">
 
