@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/cs3org/reva/pkg/token"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
@@ -29,7 +29,7 @@ func TestTokenIsAddedWithMailClaim(t *testing.T) {
 
 	sut.ServeHTTP(rw, req)
 
-	token := req.Header.Get(token.TokenHeader)
+	token := req.Header.Get(revactx.TokenHeader)
 	assert.NotEmpty(t, token)
 	assert.Contains(t, token, "eyJ")
 }
@@ -47,7 +47,7 @@ func TestTokenIsAddedWithUsernameClaim(t *testing.T) {
 
 	sut.ServeHTTP(rw, req)
 
-	token := req.Header.Get(token.TokenHeader)
+	token := req.Header.Get(revactx.TokenHeader)
 	assert.NotEmpty(t, token)
 
 	assert.Contains(t, token, "eyJ")
@@ -73,7 +73,7 @@ func TestUnauthorizedOnUserNotFound(t *testing.T) {
 
 	sut.ServeHTTP(rw, req)
 
-	token := req.Header.Get(token.TokenHeader)
+	token := req.Header.Get(revactx.TokenHeader)
 	assert.Empty(t, token)
 	assert.Equal(t, http.StatusUnauthorized, rw.Code)
 }
@@ -87,7 +87,7 @@ func TestUnauthorizedOnUserDisabled(t *testing.T) {
 
 	sut.ServeHTTP(rw, req)
 
-	token := req.Header.Get(token.TokenHeader)
+	token := req.Header.Get(revactx.TokenHeader)
 	assert.Empty(t, token)
 	assert.Equal(t, http.StatusUnauthorized, rw.Code)
 }
@@ -100,7 +100,7 @@ func TestInternalServerErrorOnMissingMailAndUsername(t *testing.T) {
 
 	sut.ServeHTTP(rw, req)
 
-	token := req.Header.Get(token.TokenHeader)
+	token := req.Header.Get(revactx.TokenHeader)
 	assert.Empty(t, token)
 	assert.Equal(t, http.StatusInternalServerError, rw.Code)
 }

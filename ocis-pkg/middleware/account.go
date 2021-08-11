@@ -3,12 +3,13 @@ package middleware
 import (
 	"context"
 	"encoding/json"
-	"github.com/cs3org/reva/pkg/auth/scope"
 	"net/http"
 
+	"github.com/cs3org/reva/pkg/auth/scope"
+
 	"github.com/asim/go-micro/v3/metadata"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
-	"github.com/cs3org/reva/pkg/user"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 )
 
@@ -65,7 +66,7 @@ func ExtractAccountUUID(opts ...account.Option) func(http.Handler) http.Handler 
 			}
 
 			// store user in context for request
-			ctx := user.ContextSetUser(r.Context(), u)
+			ctx := revactx.ContextSetUser(r.Context(), u)
 
 			// Important: user.Id.OpaqueId is the AccountUUID. Set this way in the account uuid middleware in ocis-proxy.
 			// https://github.com/owncloud/ocis-proxy/blob/ea254d6036592cf9469d757d1295e0c4309d1e63/pkg/middleware/account_uuid.go#L109

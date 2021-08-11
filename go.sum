@@ -288,8 +288,10 @@ github.com/crewjam/saml v0.4.5/go.mod h1:qCJQpUtZte9R1ZjUBcW8qtCNlinbO363ooNl02S
 github.com/cs3org/cato v0.0.0-20200828125504-e418fc54dd5e/go.mod h1:XJEZ3/EQuI3BXTp/6DUzFr850vlxq11I6satRtz0YQ4=
 github.com/cs3org/go-cs3apis v0.0.0-20210802070913-970eec344e59 h1:cj9HxIbmbGn+HPpFP8nZ8oaNUsoFa0+cheCO8FUNoMc=
 github.com/cs3org/go-cs3apis v0.0.0-20210802070913-970eec344e59/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
-github.com/cs3org/reva v1.11.1-0.20210809134415-3fe79c870fb5 h1:JFBmuZwnsShEuAA3U6BL+AY8mwKc5NnKUB7WkCeD5+8=
-github.com/cs3org/reva v1.11.1-0.20210809134415-3fe79c870fb5/go.mod h1:9DgwsoB4cqlPaEC3hT7/NCdgJO7T1bY3kpxvWXc1DkA=
+github.com/cs3org/reva v1.11.1-0.20210811142901-ec4099da830e h1:/gJanj5PuKzY51Z2Cp01DjHT2U1HLnEUSDrMf9kC7b8=
+github.com/cs3org/reva v1.11.1-0.20210811142901-ec4099da830e/go.mod h1:9DgwsoB4cqlPaEC3hT7/NCdgJO7T1bY3kpxvWXc1DkA=
+github.com/cs3org/reva v1.11.1-0.20210812105259-756bdced1d22 h1:RZxu/fWJiTmu8fT6pWfu0fdKq7ZUXAZI4TndUfiUIYI=
+github.com/cs3org/reva v1.11.1-0.20210812105259-756bdced1d22/go.mod h1:9DgwsoB4cqlPaEC3hT7/NCdgJO7T1bY3kpxvWXc1DkA=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d h1:SwD98825d6bdB+pEuTxWOXiSjBrHdOl/UVp75eI7JT8=
 github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d/go.mod h1:URriBxXwVq5ijiJ12C7iIZqlA69nTlI+LgI6/pwftG8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -365,7 +367,6 @@ github.com/glycerine/goconvey v0.0.0-20190410193231-58a59202ab31 h1:gclg6gY70GLy
 github.com/glycerine/goconvey v0.0.0-20190410193231-58a59202ab31/go.mod h1:Ogl1Tioa0aV7gstGFO7KhffUsb9M4ydbEbbxpcEDc24=
 github.com/go-acme/lego/v3 v3.4.0/go.mod h1:xYbLDuxq3Hy4bMUT1t9JIuz6GWIWb3m5X+TeTHYaT7M=
 github.com/go-asn1-ber/asn1-ber v1.3.1/go.mod h1:hEBeB/ic+5LoWskz+yKT7vGhhPYkProFKoKdwZRWMe0=
-github.com/go-asn1-ber/asn1-ber v1.4.1/go.mod h1:hEBeB/ic+5LoWskz+yKT7vGhhPYkProFKoKdwZRWMe0=
 github.com/go-asn1-ber/asn1-ber v1.5.1 h1:pDbRAunXzIUXfx4CB2QJFv5IuPiuoW+sWvr/Us009o8=
 github.com/go-asn1-ber/asn1-ber v1.5.1/go.mod h1:hEBeB/ic+5LoWskz+yKT7vGhhPYkProFKoKdwZRWMe0=
 github.com/go-chi/chi v4.1.2+incompatible h1:fGFk2Gmi/YKXk0OmGfBh0WgmN3XB8lVnEyNz34tQRec=
@@ -955,7 +956,6 @@ github.com/prometheus/procfs v0.0.2/go.mod h1:TjEm7ze935MbeOT/UhFTIMYKhuLP4wbCsT
 github.com/prometheus/procfs v0.0.3/go.mod h1:4A/X28fw3Fc593LaREMrKMqOKvUAntwMDaekg4FpcdQ=
 github.com/prometheus/procfs v0.0.5/go.mod h1:4A/X28fw3Fc593LaREMrKMqOKvUAntwMDaekg4FpcdQ=
 github.com/prometheus/procfs v0.0.8/go.mod h1:7Qr8sr6344vo1JqZ6HhLceV9o3AJ1Ff+GxbHq6oeK9A=
-github.com/prometheus/procfs v0.0.10/go.mod h1:7Qr8sr6344vo1JqZ6HhLceV9o3AJ1Ff+GxbHq6oeK9A=
 github.com/prometheus/procfs v0.0.11/go.mod h1:lV6e/gmhEcM9IjHGsFOCxxuZ+z1YqCvr4OA4YeYWdaU=
 github.com/prometheus/procfs v0.1.3/go.mod h1:lV6e/gmhEcM9IjHGsFOCxxuZ+z1YqCvr4OA4YeYWdaU=
 github.com/prometheus/procfs v0.2.0/go.mod h1:lV6e/gmhEcM9IjHGsFOCxxuZ+z1YqCvr4OA4YeYWdaU=
@@ -1755,8 +1755,6 @@ sigs.k8s.io/yaml v1.2.0/go.mod h1:yfXDCHCao9+ENCvLSE62v9VSji2MKu5jeNfTrofGhJc=
 sourcegraph.com/sourcegraph/appdash v0.0.0-20190731080439-ebfcffb1b5c0/go.mod h1:hI742Nqp5OhwiqlzhgfbWU4mW4yO10fP+LoT9WOswdU=
 sourcegraph.com/sourcegraph/go-diff v0.5.0/go.mod h1:kuch7UrkMzY0X+p9CRK03kfuPQ2zzQcaEFbx8wA8rck=
 sourcegraph.com/sqs/pbtypes v0.0.0-20180604144634-d3ebe8f20ae4/go.mod h1:ketZ/q3QxT9HOBeFhu6RdvsftgpsbFHBF5Cas6cDKZ0=
-stash.kopano.io/kc/konnect v0.34.0 h1:aKjZpLu8fvrrqVvNU9b2vKZOn8lUusXLoycLWgMi3o0=
-stash.kopano.io/kc/konnect v0.34.0/go.mod h1:GV6AxroXyHte83EsiJXA5ZygzofQ48zXCJ3qX9bK1JY=
 stash.kopano.io/kgol/kcc-go/v5 v5.0.1 h1:urR9hOR6TnTKjGkzZKac/a9cA8ws1WecWLTgiYubLQw=
 stash.kopano.io/kgol/kcc-go/v5 v5.0.1/go.mod h1:0ZmjWapy3zp+TAjZI6iCrcfh+BthZbB2WM1VfhDgNB4=
 stash.kopano.io/kgol/ksurveyclient-go v0.6.0/go.mod h1:LJMDQBROS2oXxBN04eSI6j1KhgWlqMFd8xKjXV4Irtw=

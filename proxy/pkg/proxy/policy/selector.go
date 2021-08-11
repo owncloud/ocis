@@ -7,7 +7,7 @@ import (
 	"sort"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v3"
-	revauser "github.com/cs3org/reva/pkg/user"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
@@ -220,7 +220,7 @@ func NewRegexSelector(cfg *config.RegexSelectorConf) Selector {
 		}
 
 		// if no cookie is present, try to route by selector
-		if u, ok := revauser.ContextGetUser(r.Context()); ok {
+		if u, ok := revactx.ContextGetUser(r.Context()); ok {
 			for i := range regexRules {
 				switch regexRules[i].property {
 				case "mail":
