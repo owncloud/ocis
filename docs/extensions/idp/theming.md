@@ -9,7 +9,7 @@ geekdocFilePath: theming.md
 {{< toc >}}
 
 ## Intro
-Our default IDP UI is built with the [Kopano Konnect](https://github.com/Kopano-dev/konnect) React app. Even though this app comes already with a simple theming options, we have compiled our own edited version of the app with more advanced changes than the default theming offers. Because of that, it is not possible at the moment to do any kind of easy theming and including custom theme means again compiling custom assets.
+Our default IDP UI is built with the [LibreGraph Connect](https://github.com/libregraph/lico) React app. Even though this app comes already with a simple theming options, we have compiled our own edited version of the app with more advanced changes than the default theming offers. Because of that, it is not possible at the moment to do any kind of easy theming and including custom theme means again compiling custom assets.
 
 ## Customizing assets
 Depending on what changes you wish to do with the theme, there are several files you can edit. All of them are located in the `idp/ui` folder.
@@ -18,7 +18,7 @@ Depending on what changes you wish to do with the theme, there are several files
 If you wish to add static assets like images, CSS, etc., you can add them to `idp/ui/public/static`. The `public` folder also contains the `index.html` file which can be adjusted to your needs.
 
 ### CSS
-Kopano Konnect is built with [kpop](https://github.com/Kopano-dev/kpop), a collection of React UI components. To include any custom styles on top of that collection, you can define them in the `idp/ui/src/app.css` file. These rules will take precedence over the kpop.
+LibreGraph Connect is built with [kpop](https://github.com/Kopano-dev/kpop), a collection of React UI components. To include any custom styles on top of that collection, you can define them in the `idp/ui/src/app.css` file. These rules will take precedence over the kpop.
 
 ### Containers
 Layouts of all pages are located in the `idp/ui/src/containers` folder. By editing any of files in that folder, you can do any kind of changes in the layout and create advanced themes. It is, however, important to be careful when touching this code as it imports also actions which are responsible for the login flow.

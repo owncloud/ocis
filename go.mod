@@ -42,6 +42,7 @@ require (
 	github.com/iancoleman/strcase v0.1.3
 	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/justinas/alice v1.2.0
+	github.com/libregraph/lico v0.34.1-0.20210803054646-b584e0372224 // indirect
 	github.com/mennanov/fieldmask-utils v0.3.3
 	github.com/micro/cli/v2 v2.1.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
@@ -77,7 +78,6 @@ require (
 	google.golang.org/grpc/examples v0.0.0-20210802225658-edb9b3bc2266 // indirect
 	google.golang.org/protobuf v1.27.1
 	gotest.tools v2.2.0+incompatible
-	stash.kopano.io/kc/konnect v0.34.0
 	stash.kopano.io/kgol/rndm v1.1.0
 )
 
