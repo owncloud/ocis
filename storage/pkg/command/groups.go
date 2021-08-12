@@ -7,18 +7,16 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/owncloud/ocis/storage/pkg/tracing"
-
-	"github.com/owncloud/ocis/ocis-pkg/sync"
-
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
+	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
 )
 
@@ -101,6 +99,7 @@ func groupsConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inter
 			"tracing_enabled":      cfg.Tracing.Enabled,
 			"tracing_endpoint":     cfg.Tracing.Endpoint,
 			"tracing_collector":    cfg.Tracing.Collector,
+			"tracing_service":      ociscfg.TracingService(cfg.Tracing.Enabled),
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{

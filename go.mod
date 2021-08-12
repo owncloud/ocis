@@ -3,9 +3,9 @@ module github.com/owncloud/ocis
 go 1.16
 
 require (
-	contrib.go.opencensus.io/exporter/jaeger v0.2.1
-	contrib.go.opencensus.io/exporter/ocagent v0.7.0
-	contrib.go.opencensus.io/exporter/zipkin v0.1.2
+	contrib.go.opencensus.io/exporter/jaeger v0.2.1 // indirect
+	contrib.go.opencensus.io/exporter/ocagent v0.7.0 // indirect
+	contrib.go.opencensus.io/exporter/zipkin v0.1.2 // indirect
 	github.com/CiscoM31/godata v0.0.0-20201003040028-eadcd34e7f06
 	github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e
 	github.com/ascarter/requestid v0.0.0-20170313220838-5b76ab3d4aee
@@ -50,8 +50,8 @@ require (
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.4
-	github.com/onsi/gomega v1.14.0
-	github.com/openzipkin/zipkin-go v0.2.5
+	github.com/onsi/gomega v1.15.0
+	github.com/openzipkin/zipkin-go v0.2.5 // indirect
 	github.com/owncloud/open-graph-api-go v0.0.0-20210511151655-57894f7d46fb
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.10.0
@@ -66,6 +66,7 @@ require (
 	github.com/yaegashi/msgraph.go v0.1.4
 	go.etcd.io/etcd/pkg/v3 v3.5.0-pre // indirect
 	go.opencensus.io v0.23.0
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.22.0
 	go.opentelemetry.io/otel v1.0.0-RC2
 	go.opentelemetry.io/otel/exporters/jaeger v1.0.0-RC2
 	go.opentelemetry.io/otel/sdk v1.0.0-RC2
@@ -77,7 +78,7 @@ require (
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
 	golang.org/x/tools v0.1.2 // indirect
 	google.golang.org/genproto v0.0.0-20210402141018-6c239bbf2bb1
-	google.golang.org/grpc v1.39.0
+	google.golang.org/grpc v1.39.1
 	google.golang.org/grpc/examples v0.0.0-20210802225658-edb9b3bc2266 // indirect
 	google.golang.org/protobuf v1.27.1
 	gotest.tools v2.2.0+incompatible
@@ -87,6 +88,7 @@ require (
 
 replace (
 	github.com/crewjam/saml => github.com/crewjam/saml v0.4.5
+	github.com/cs3org/reva => ../../refs/reva
 	go.etcd.io/etcd/api/v3 => go.etcd.io/etcd/api/v3 v3.0.0-20210204162551-dae29bb719dd
 	go.etcd.io/etcd/pkg/v3 => go.etcd.io/etcd/pkg/v3 v3.0.0-20210204162551-dae29bb719dd
 )
