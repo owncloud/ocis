@@ -9,18 +9,16 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cs3org/reva/pkg/auth/scope"
-
 	"github.com/asim/go-micro/plugins/client/grpc/v3"
 	merrors "github.com/asim/go-micro/v3/errors"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/pkg/auth/scope"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
-	"github.com/cs3org/reva/pkg/user"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
@@ -37,7 +35,7 @@ import (
 func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 	var account *accounts.Account
 	var err error
-	u, ok := user.ContextGetUser(r.Context())
+	u, ok := revactx.ContextGetUser(r.Context())
 	if !ok || u.Id == nil || u.Id.OpaqueId == "" {
 		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id")))
 		return
@@ -373,7 +371,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		ctx := metadata.AppendToOutgoingContext(r.Context(), token.TokenHeader, t)
+		ctx := metadata.AppendToOutgoingContext(r.Context(), revactx.TokenHeader, t)
 
 		gwc, err := pool.GetGatewayServiceClient(o.config.RevaAddress)
 		if err != nil {
@@ -603,7 +601,7 @@ func (o Ocs) DisableUser(w http.ResponseWriter, r *http.Request) {
 // The signing key is part of the user settings and is used by the proxy to authenticate requests
 // Currently, the username is used as the OC-Credential
 func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
-	u, ok := user.ContextGetUser(r.Context())
+	u, ok := revactx.ContextGetUser(r.Context())
 	if !ok {
 		//o.logger.Error().Msg("missing user in context")
 		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context")))

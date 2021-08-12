@@ -289,6 +289,10 @@ func defaultPolicies() []config.Policy {
 					Backend:  "http://localhost:9140",
 				},
 				{
+					Endpoint: "/ocs/v[12].php/cloud/users/signing-key",
+					Backend:  "http://localhost:9110",
+				},
+				{
 					Type:     config.QueryRoute,
 					Endpoint: "/remote.php/?preview=1",
 					Backend:  "http://localhost:9115",

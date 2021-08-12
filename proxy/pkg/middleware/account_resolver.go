@@ -7,9 +7,9 @@ import (
 	"github.com/cs3org/reva/pkg/auth/scope"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 
-	tokenPkg "github.com/cs3org/reva/pkg/token"
+	revactx "github.com/cs3org/reva/pkg/ctx"
+	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
-	revauser "github.com/cs3org/reva/pkg/user"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 )
@@ -44,7 +44,7 @@ func AccountResolver(optionSetters ...Option) func(next http.Handler) http.Handl
 type accountResolver struct {
 	next                  http.Handler
 	logger                log.Logger
-	tokenManager          tokenPkg.Manager
+	tokenManager          token.Manager
 	userProvider          backend.UserBackend
 	autoProvisionAccounts bool
 	userOIDCClaim         string
@@ -55,7 +55,7 @@ type accountResolver struct {
 func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 	claims := oidc.FromContext(ctx)
-	u, ok := revauser.ContextGetUser(ctx)
+	u, ok := revactx.ContextGetUser(ctx)
 	// TODO what if an X-Access-Token is set? happens eg for download requests to the /data endpoint in the reva frontend
 
 	if claims == nil && !ok {
@@ -102,7 +102,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 
 		// add user to context for selectors
-		ctx = revauser.ContextSetUser(ctx, u)
+		ctx = revactx.ContextSetUser(ctx, u)
 		req = req.WithContext(ctx)
 
 		m.logger.Debug().Interface("claims", claims).Interface("user", u).Msg("associated claims with user")
@@ -120,7 +120,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	req.Header.Set(tokenPkg.TokenHeader, token)
+	req.Header.Set(revactx.TokenHeader, token)
 
 	m.next.ServeHTTP(w, req)
 }
