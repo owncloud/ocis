@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/asim/go-micro/v3"
+	chimiddleware "github.com/go-chi/chi/middleware"
 	graphMiddleware "github.com/owncloud/ocis/graph/pkg/middleware"
 	svc "github.com/owncloud/ocis/graph/pkg/service/v0"
 	"github.com/owncloud/ocis/graph/pkg/version"
@@ -28,7 +29,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
-			middleware.RequestID,
+			chimiddleware.RequestID,
 			middleware.Version(
 				"graph",
 				version.String,

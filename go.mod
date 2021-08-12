@@ -8,7 +8,6 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/CiscoM31/godata v0.0.0-20201003040028-eadcd34e7f06
 	github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e
-	github.com/ascarter/requestid v0.0.0-20170313220838-5b76ab3d4aee
 	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210408173139-0d57213d3f5c
 	github.com/asim/go-micro/plugins/logger/zerolog/v3 v3.0.0-20210217182006-0f0ace1a44a9
 	github.com/asim/go-micro/plugins/registry/etcd/v3 v3.0.0-20210408173139-0d57213d3f5c
@@ -63,7 +62,6 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
 	github.com/thejerf/suture/v4 v4.0.1
-	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce
 	github.com/yaegashi/msgraph.go v0.1.4
 	go.etcd.io/etcd/pkg/v3 v3.5.0-pre // indirect
 	go.opencensus.io v0.23.0
