@@ -40,7 +40,7 @@ ENV GLAUTH_LDAPS_CERT=/var/tmp/ocis/.config/ldap/ldaps.crt \
 VOLUME [ "/var/tmp/ocis" ]
 WORKDIR /var/tmp/ocis
 
-USER ocis-user
+USER 700
 
 EXPOSE 9200/tcp
 
