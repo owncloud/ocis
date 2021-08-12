@@ -21,11 +21,10 @@ require (
 	github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v3 v3.0.0-20210408173139-0d57213d3f5c
 	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3 v3.0.0-20210408173139-0d57213d3f5c
 	github.com/asim/go-micro/v3 v3.5.1-0.20210217182006-0f0ace1a44a9
-	github.com/blevesearch/bleve v1.0.9
+	github.com/blevesearch/bleve/v2 v2.1.0
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/cs3org/go-cs3apis v0.0.0-20210802070913-970eec344e59
 	github.com/cs3org/reva v1.11.1-0.20210812105259-756bdced1d22
-	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth v1.1.3-0.20210729125545-b9aecdfcac31
 	github.com/go-chi/chi v4.1.2+incompatible
@@ -40,7 +39,6 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0
 	github.com/iancoleman/strcase v0.1.3
-	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/justinas/alice v1.2.0
 	github.com/libregraph/lico v0.34.1-0.20210803054646-b584e0372224
 	github.com/mennanov/fieldmask-utils v0.3.3
@@ -61,7 +59,6 @@ require (
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.8.1
 	github.com/stretchr/testify v1.7.0
-	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
 	github.com/thejerf/suture/v4 v4.0.1
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce
 	github.com/yaegashi/msgraph.go v0.1.4
