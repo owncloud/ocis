@@ -7,13 +7,27 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Specify primary user type for all accounts: [#2364](https://github.com/owncloud/ocis/pull/2364)
+* Enhancement - Use non root user for the owncloud/ocis docker image: [#2380](https://github.com/owncloud/ocis/pull/2380)
 * Enhancement - Replace unmaintained jwt library: [#2386](https://github.com/owncloud/ocis/pull/2386)
+* Enhancement - Update bleve to version 2.1.0: [#2391](https://github.com/owncloud/ocis/pull/2391)
 
 ## Details
 
 * Bugfix - Specify primary user type for all accounts: [#2364](https://github.com/owncloud/ocis/pull/2364)
 
    https://github.com/owncloud/ocis/pull/2364
+
+* Enhancement - Use non root user for the owncloud/ocis docker image: [#2380](https://github.com/owncloud/ocis/pull/2380)
+
+   The owncloud/ocis docker image now uses a non root user and enables you to set a different user
+   with the docker `--user` parameter. The default user has the UID 1000 is part of a group with the
+   GID 1000.
+
+   This is a breaking change for existing docker deployments. The permission on the files and
+   folders in persistent volumes need to be changed to the UID and GID used for oCIS (default
+   1000:1000 if not changed by the user).
+
+   https://github.com/owncloud/ocis/pull/2380
 
 * Enhancement - Replace unmaintained jwt library: [#2386](https://github.com/owncloud/ocis/pull/2386)
 
@@ -22,6 +36,12 @@ The following sections list the changes for unreleased.
    [github.com/golang-jwt/jwt](https://github.com/golang-jwt/jwt).
 
    https://github.com/owncloud/ocis/pull/2386
+
+* Enhancement - Update bleve to version 2.1.0: [#2391](https://github.com/owncloud/ocis/pull/2391)
+
+   Updated bleve to the current version.
+
+   https://github.com/owncloud/ocis/pull/2391
 # Changelog for [1.10.0] (2021-08-06)
 
 The following sections list the changes for 1.10.0.
