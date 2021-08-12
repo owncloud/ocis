@@ -7,12 +7,21 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Specify primary user type for all accounts: [#2364](https://github.com/owncloud/ocis/pull/2364)
+* Enhancement - Replace unmaintained jwt library: [#2386](https://github.com/owncloud/ocis/pull/2386)
 
 ## Details
 
 * Bugfix - Specify primary user type for all accounts: [#2364](https://github.com/owncloud/ocis/pull/2364)
 
    https://github.com/owncloud/ocis/pull/2364
+
+* Enhancement - Replace unmaintained jwt library: [#2386](https://github.com/owncloud/ocis/pull/2386)
+
+   The old library [github.com/dgrijalva/jwt-go](https://github.com/dgrijalva/jwt-go)
+   is unmaintained and was replaced by the community maintained fork
+   [github.com/golang-jwt/jwt](https://github.com/golang-jwt/jwt).
+
+   https://github.com/owncloud/ocis/pull/2386
 # Changelog for [1.10.0] (2021-08-06)
 
 The following sections list the changes for 1.10.0.
