@@ -3,9 +3,6 @@ module github.com/owncloud/ocis
 go 1.16
 
 require (
-	contrib.go.opencensus.io/exporter/jaeger v0.2.1 // indirect
-	contrib.go.opencensus.io/exporter/ocagent v0.7.0 // indirect
-	contrib.go.opencensus.io/exporter/zipkin v0.1.2 // indirect
 	github.com/CiscoM31/godata v0.0.0-20201003040028-eadcd34e7f06
 	github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e
 	github.com/ascarter/requestid v0.0.0-20170313220838-5b76ab3d4aee
@@ -42,7 +39,7 @@ require (
 	github.com/iancoleman/strcase v0.1.3
 	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/justinas/alice v1.2.0
-	github.com/libregraph/lico v0.34.1-0.20210803054646-b584e0372224 // indirect
+	github.com/libregraph/lico v0.34.1-0.20210803054646-b584e0372224
 	github.com/mennanov/fieldmask-utils v0.3.3
 	github.com/micro/cli/v2 v2.1.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
@@ -52,7 +49,6 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.15.0
-	github.com/openzipkin/zipkin-go v0.2.5 // indirect
 	github.com/owncloud/open-graph-api-go v0.0.0-20210511151655-57894f7d46fb
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.10.0
