@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc"
+	chimiddleware "github.com/go-chi/chi/middleware"
 	"github.com/justinas/alice"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	pkgmiddleware "github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/proxy/pkg/config"
@@ -178,8 +178,8 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 
 	return alice.New(
 		// first make sure we log all requests and redirect to https if necessary
-		pkgmiddleware.RealIP,
-		pkgmiddleware.RequestID,
+		chimiddleware.RealIP,
+		chimiddleware.RequestID,
 		middleware.AccessLog(l),
 		middleware.HTTPSRedirect,
 
