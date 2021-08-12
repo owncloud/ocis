@@ -33,6 +33,10 @@
           "backend": "http://localhost:9110"
         },
         {
+          "endpoint": "/app/",
+          "backend": "http://localhost:9140"
+        },
+        {
           "endpoint": "/ocs/",
           "backend": "http://localhost:9140"
         },
