@@ -63,11 +63,46 @@ func AppProviderWithConfig(cfg *config.Config) []cli.Flag {
 
 		// WOPI driver
 		&cli.StringFlag{
-			Name:        "wopi-driver-iopsecret",
-			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiDriver.IopSecret, ""),
+			Name:        "wopi-driver-app-apikey",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiDriver.AppAPIKey, ""),
+			Usage:       "The API key used by the app, if applicable.",
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_APP_API_KEY"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.AppAPIKey,
+		},
+		&cli.BoolFlag{
+			Name:        "wopi-driver-app-desktop-only",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.AppProvider.WopiDriver.AppDesktopOnly, false),
+			Usage:       "Whether the app can be opened only on desktop",
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_APP_DESKTOP_ONLY"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.AppDesktopOnly,
+		},
+		&cli.StringFlag{
+			Name:        "wopi-driver-app-icon-uri",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiDriver.AppIconURI, ""),
 			Usage:       "IOP Secret (Shared with WOPI server)",
-			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_IOP_SECRET"},
-			Destination: &cfg.Reva.AppProvider.WopiDriver.IopSecret,
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_APP_ICON_URI"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.AppIconURI,
+		},
+		&cli.StringFlag{
+			Name:        "wopi-driver-app-internal-url",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiDriver.AppInternalURL, ""),
+			Usage:       "The internal app URL in case of dockerized deployments. Defaults to AppURL",
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_APP_INTERNAL_URL"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.AppInternalURL,
+		},
+		&cli.StringFlag{
+			Name:        "wopi-driver-app-name",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiDriver.AppName, ""),
+			Usage:       "The App user-friendly name.",
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_APP_NAME"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.AppName,
+		},
+		&cli.StringFlag{
+			Name:        "wopi-driver-app-url",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiDriver.AppURL, ""),
+			Usage:       "App server URL",
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_APP_URL"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.AppURL,
 		},
 		&cli.BoolFlag{
 			Name:        "wopi-driver-insecure",
@@ -77,19 +112,18 @@ func AppProviderWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.AppProvider.WopiDriver.Insecure,
 		},
 		&cli.StringFlag{
+			Name:        "wopi-driver-iopsecret",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiDriver.IopSecret, ""),
+			Usage:       "IOP Secret (Shared with WOPI server)",
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_IOP_SECRET"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.IopSecret,
+		},
+		&cli.StringFlag{
 			Name:        "wopi-driver-wopiurl",
 			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiDriver.WopiURL, ""),
 			Usage:       "WOPI server URL",
 			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_WOPI_URL"},
 			Destination: &cfg.Reva.AppProvider.WopiDriver.WopiURL,
-		},
-
-		&cli.StringFlag{
-			Name:        "wopi-driver-appurl",
-			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.WopiDriver.AppURL, ""),
-			Usage:       "App server URL",
-			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_APP_URL"},
-			Destination: &cfg.Reva.AppProvider.WopiDriver.AppURL,
 		},
 
 		// Gateway

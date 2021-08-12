@@ -85,11 +85,16 @@ func appProviderConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 	if cfg.Reva.AppProvider.Driver == "wopi" {
 		drivers = map[string]interface{}{
 			"wopi": map[string]interface{}{
-				"app_name":             "CS3 WOPI server",
+				"app_api_key":          cfg.Reva.AppProvider.WopiDriver.AppAPIKey,
+				"app_desktop_only":     cfg.Reva.AppProvider.WopiDriver.AppDesktopOnly,
+				"app_icon_uri":         cfg.Reva.AppProvider.WopiDriver.AppIconURI,
+				"app_int_url":          cfg.Reva.AppProvider.WopiDriver.AppInternalURL,
+				"app_name":             cfg.Reva.AppProvider.WopiDriver.AppName,
+				"app_url":              cfg.Reva.AppProvider.WopiDriver.AppURL,
 				"insecure_connections": cfg.Reva.AppProvider.WopiDriver.Insecure,
 				"iop_secret":           cfg.Reva.AppProvider.WopiDriver.IopSecret,
+				"jwt_secret":           cfg.Reva.AppProvider.WopiDriver.JWTSecret,
 				"wopi_url":             cfg.Reva.AppProvider.WopiDriver.WopiURL,
-				"app_url":              cfg.Reva.AppProvider.WopiDriver.AppURL,
 			},
 		}
 	}
@@ -111,6 +116,7 @@ func appProviderConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"appprovider": map[string]interface{}{
+					"gatewaysvc":       cfg.Reva.Gateway.Endpoint,
 					"app_provider_url": cfg.Reva.AppProvider.ExternalAddr,
 					"driver":           cfg.Reva.AppProvider.Driver,
 					"drivers":          drivers,

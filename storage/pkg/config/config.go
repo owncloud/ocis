@@ -48,10 +48,16 @@ type AppProvider struct {
 }
 
 type WopiDriver struct {
-	IopSecret string
-	Insecure  bool
-	WopiURL   string
-	AppURL    string
+	AppAPIKey      string
+	AppDesktopOnly bool
+	AppIconURI     string
+	AppInternalURL string
+	AppName        string
+	AppURL         string
+	Insecure       bool
+	IopSecret      string
+	JWTSecret      string
+	WopiURL        string
 }
 
 // Sharing defines the available sharing configuration.
