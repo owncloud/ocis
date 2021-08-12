@@ -26,7 +26,6 @@ require (
 	github.com/cs3org/go-cs3apis v0.0.0-20210802070913-970eec344e59
 	github.com/cs3org/reva v1.11.1-0.20210809134415-3fe79c870fb5
 	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth v1.1.3-0.20210729125545-b9aecdfcac31
 	github.com/go-chi/chi v4.1.2+incompatible
@@ -34,6 +33,7 @@ require (
 	github.com/go-logr/logr v0.4.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.2.1
 	github.com/gofrs/uuid v3.3.0+incompatible
+	github.com/golang-jwt/jwt/v4 v4.0.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/golang/protobuf v1.5.2
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
@@ -42,7 +42,7 @@ require (
 	github.com/iancoleman/strcase v0.1.3
 	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/justinas/alice v1.2.0
-	github.com/libregraph/lico v0.34.1-0.20210803054646-b584e0372224 // indirect
+	github.com/libregraph/lico v0.34.1-0.20210803054646-b584e0372224
 	github.com/mennanov/fieldmask-utils v0.3.3
 	github.com/micro/cli/v2 v2.1.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826

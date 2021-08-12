@@ -2,17 +2,17 @@ package middleware
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 
 	gOidc "github.com/coreos/go-oidc"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/proxy/pkg/config"
 	"golang.org/x/oauth2"
 )
 
@@ -27,12 +27,13 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	tokenCache := sync.NewCache(options.UserinfoCacheSize)
 
 	h := oidcAuth{
-		logger:        options.Logger,
-		providerFunc:  options.OIDCProviderFunc,
-		httpClient:    options.HTTPClient,
-		oidcIss:       options.OIDCIss,
-		tokenCache:    &tokenCache,
-		tokenCacheTTL: options.UserinfoCacheTTL,
+		logger:             options.Logger,
+		providerFunc:       options.OIDCProviderFunc,
+		httpClient:         options.HTTPClient,
+		oidcIss:            options.OIDCIss,
+		TokenManagerConfig: options.TokenManagerConfig,
+		tokenCache:         &tokenCache,
+		tokenCacheTTL:      options.UserinfoCacheTTL,
 	}
 
 	return func(next http.Handler) http.Handler {
@@ -69,13 +70,14 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 }
 
 type oidcAuth struct {
-	logger        log.Logger
-	provider      OIDCProvider
-	providerFunc  func() (OIDCProvider, error)
-	httpClient    *http.Client
-	oidcIss       string
-	tokenCache    *sync.Cache
-	tokenCacheTTL time.Duration
+	logger             log.Logger
+	provider           OIDCProvider
+	providerFunc       func() (OIDCProvider, error)
+	httpClient         *http.Client
+	oidcIss            string
+	tokenCache         *sync.Cache
+	tokenCacheTTL      time.Duration
+	TokenManagerConfig config.TokenManager
 }
 
 func (m oidcAuth) getClaims(token string, req *http.Request) (claims map[string]interface{}, status int) {
@@ -124,19 +126,15 @@ func (m oidcAuth) getClaims(token string, req *http.Request) (claims map[string]
 func (m oidcAuth) extractExpiration(token string) time.Time {
 	defaultExpiration := time.Now().Add(m.tokenCacheTTL)
 
-	s := strings.SplitN(token, ".", 4)
-	if len(s) != 3 {
-		return defaultExpiration
-	}
-
-	b, err := jwt.DecodeSegment(s[1])
+	t, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
+		return []byte(m.TokenManagerConfig.JWTSecret), nil
+	})
 	if err != nil {
 		return defaultExpiration
 	}
 
-	at := &jwt.StandardClaims{}
-	err = json.Unmarshal(b, at)
-	if err != nil || at.ExpiresAt == 0 {
+	at, ok := t.Claims.(jwt.StandardClaims)
+	if !ok || at.ExpiresAt == 0 {
 		return defaultExpiration
 	}
 
