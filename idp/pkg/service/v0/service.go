@@ -11,14 +11,14 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/gorilla/mux"
+	"github.com/libregraph/lico/bootstrap"
+	licoconfig "github.com/libregraph/lico/config"
+	"github.com/libregraph/lico/server"
 	"github.com/owncloud/ocis/idp/pkg/assets"
 	"github.com/owncloud/ocis/idp/pkg/config"
 	logw "github.com/owncloud/ocis/idp/pkg/log"
 	"github.com/owncloud/ocis/idp/pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	"stash.kopano.io/kc/konnect/bootstrap"
-	kcconfig "stash.kopano.io/kc/konnect/config"
-	"stash.kopano.io/kc/konnect/server"
 	"stash.kopano.io/kgol/rndm"
 )
 
@@ -37,7 +37,7 @@ func NewService(opts ...Option) Service {
 		assets.Config(options.Config),
 	)
 
-	if err := initKonnectInternalEnvVars(&options.Config.Ldap); err != nil {
+	if err := initLicoInternalEnvVars(&options.Config.Ldap); err != nil {
 		logger.Fatal().Err(err).Msg("could not initialize env vars")
 	}
 
@@ -45,7 +45,7 @@ func NewService(opts ...Option) Service {
 		logger.Fatal().Err(err).Msg("could not create default config")
 	}
 
-	bs, err := bootstrap.Boot(ctx, &options.Config.IDP, &kcconfig.Config{
+	bs, err := bootstrap.Boot(ctx, &options.Config.IDP, &licoconfig.Config{
 		Logger: logw.Wrap(logger),
 	})
 
@@ -109,7 +109,7 @@ func createConfigsIfNotExist(assets http.FileSystem, ocisURL string) error {
 }
 
 // Init vars which are currently not accessible via idp api
-func initKonnectInternalEnvVars(ldap *config.Ldap) error {
+func initLicoInternalEnvVars(ldap *config.Ldap) error {
 	var defaults = map[string]string{
 		"LDAP_URI":                 ldap.URI,
 		"LDAP_BINDDN":              ldap.BindDN,
@@ -142,7 +142,7 @@ type IDP struct {
 }
 
 // initMux initializes the internal idp gorilla mux and mounts it in to a ocis chi-router
-func (k *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handler, options Options) {
+func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handler, options Options) {
 	gm := mux.NewRouter()
 	for _, route := range r {
 		route.AddRoutes(ctx, gm)
@@ -153,10 +153,10 @@ func (k *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handler
 		gm.NotFoundHandler = h
 	}
 
-	k.mux = chi.NewMux()
-	k.mux.Use(options.Middleware...)
+	idp.mux = chi.NewMux()
+	idp.mux.Use(options.Middleware...)
 
-	k.mux.Use(middleware.Static(
+	idp.mux.Use(middleware.Static(
 		"/signin/v1/",
 		assets.New(
 			assets.Logger(options.Logger),
@@ -165,32 +165,32 @@ func (k *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handler
 	))
 
 	// handle / | index.html with a template that needs to have the BASE_PREFIX replaced
-	k.mux.Get("/signin/v1/identifier", k.Index())
-	k.mux.Get("/signin/v1/identifier/", k.Index())
-	k.mux.Get("/signin/v1/identifier/index.html", k.Index())
+	idp.mux.Get("/signin/v1/identifier", idp.Index())
+	idp.mux.Get("/signin/v1/identifier/", idp.Index())
+	idp.mux.Get("/signin/v1/identifier/index.html", idp.Index())
 
-	k.mux.Mount("/", gm)
+	idp.mux.Mount("/", gm)
 }
 
 // ServeHTTP implements the Service interface.
-func (k IDP) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	k.mux.ServeHTTP(w, r)
+func (idp IDP) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	idp.mux.ServeHTTP(w, r)
 }
 
 // Index renders the static html with the
-func (k IDP) Index() http.HandlerFunc {
+func (idp IDP) Index() http.HandlerFunc {
 
-	f, err := k.assets.Open("/identifier/index.html")
+	f, err := idp.assets.Open("/identifier/index.html")
 	if err != nil {
-		k.logger.Fatal().Err(err).Msg("Could not open index template")
+		idp.logger.Fatal().Err(err).Msg("Could not open index template")
 	}
 
 	template, err := ioutil.ReadAll(f)
 	if err != nil {
-		k.logger.Fatal().Err(err).Msg("Could not read index template")
+		idp.logger.Fatal().Err(err).Msg("Could not read index template")
 	}
 	if err = f.Close(); err != nil {
-		k.logger.Fatal().Err(err).Msg("Could not close body")
+		idp.logger.Fatal().Err(err).Msg("Could not close body")
 	}
 
 	// TODO add environment variable to make the path prefix configurable
@@ -203,7 +203,7 @@ func (k IDP) Index() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write(indexHTML); err != nil {
-			k.logger.Error().Err(err).Msg("could not write to response writer")
+			idp.logger.Error().Err(err).Msg("could not write to response writer")
 		}
 	})
 }

@@ -2,11 +2,25 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.9.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.10.0...master
 
 ## Summary
 
 * Bugfix - Specify primary user type for all accounts: [#2364](https://github.com/owncloud/ocis/pull/2364)
+
+## Details
+
+* Bugfix - Specify primary user type for all accounts: [#2364](https://github.com/owncloud/ocis/pull/2364)
+
+   https://github.com/owncloud/ocis/pull/2364
+# Changelog for [1.10.0] (2021-08-06)
+
+The following sections list the changes for 1.10.0.
+
+[1.10.0]: https://github.com/owncloud/ocis/compare/v1.9.0...v1.10.0
+
+## Summary
+
 * Bugfix - Improve IDP Login Accessibility: [#5376](https://github.com/owncloud/web/issues/5376)
 * Bugfix - Forward basic auth to OpenID connect token authentication endpoint: [#2095](https://github.com/owncloud/ocis/issues/2095)
 * Bugfix - Log all requests in the proxy access log: [#2301](https://github.com/owncloud/ocis/pull/2301)
@@ -19,10 +33,6 @@ The following sections list the changes for unreleased.
 * Enhancement - Use only one go.mod file for project dependencies: [#2344](https://github.com/owncloud/ocis/pull/2344)
 
 ## Details
-
-* Bugfix - Specify primary user type for all accounts: [#2364](https://github.com/owncloud/ocis/pull/2364)
-
-   https://github.com/owncloud/ocis/pull/2364
 
 * Bugfix - Improve IDP Login Accessibility: [#5376](https://github.com/owncloud/web/issues/5376)
 
@@ -93,9 +103,10 @@ The following sections list the changes for unreleased.
 
 * Enhancement - Update REVA: [#2355](https://github.com/owncloud/ocis/pull/2355)
 
-   Update REVA from v1.10.1-0.20210730095301-fcb7a30a44a6 to v1.11.0 * Fix
-   cs3org/reva#1899: Fix chunked uploads for new versions * Fix cs3org/reva#1906: Fix copy over
-   existing resource * Fix cs3org/reva#1891: Delete Shared Resources as Receiver * Fix
+   Update REVA from v1.10.1-0.20210730095301-fcb7a30a44a6 to
+   v1.11.1-0.20210809134415-3fe79c870fb5 * Fix cs3org/reva#1978: Fix owner type is optional
+   * Fix cs3org/reva#1899: Fix chunked uploads for new versions * Fix cs3org/reva#1906: Fix copy
+   over existing resource * Fix cs3org/reva#1891: Delete Shared Resources as Receiver * Fix
    cs3org/reva#1907: Error when creating folder with existing name * Fix cs3org/reva#1937: Do
    not overwrite more specific matches when finding storage providers * Fix cs3org/reva#1939:
    Fix the share jail permissions in the decomposedfs * Fix cs3org/reva#1932: Numerous fixes to

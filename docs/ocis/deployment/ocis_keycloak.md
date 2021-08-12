@@ -19,7 +19,7 @@ geekdocFilePath: ocis_keycloak.md
 
 The docker stack consists 4 containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
 
-Keykloak add two containers: Keycloak itself and a PostgreSQL as database. Keycloak will be configured as oCIS' IDP instead of the internal IDP [Konnectd]({{< ref "../../extensions/idp" >}})
+Keykloak add two containers: Keycloak itself and a PostgreSQL as database. Keycloak will be configured as oCIS' IDP instead of the internal IDP [LibreGraph Connect]({{< ref "../../extensions/idp" >}})
 
 The other container is oCIS itself running all extensions in one container. In this example oCIS uses [oCIS storage driver]({{< ref "../../extensions/storage/storages#storage-drivers" >}})
 

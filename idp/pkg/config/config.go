@@ -3,7 +3,7 @@ package config
 import (
 	"context"
 
-	"stash.kopano.io/kc/konnect/bootstrap"
+	"github.com/libregraph/lico/bootstrap"
 )
 
 // Log defines the available logging configuration.
