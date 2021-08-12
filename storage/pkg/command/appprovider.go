@@ -81,23 +81,6 @@ func AppProvider(cfg *config.Config) *cli.Command {
 
 // appProviderConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
 func appProviderConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
-	drivers := map[string]interface{}{}
-	if cfg.Reva.AppProvider.Driver == "wopi" {
-		drivers = map[string]interface{}{
-			"wopi": map[string]interface{}{
-				"app_api_key":          cfg.Reva.AppProvider.WopiDriver.AppAPIKey,
-				"app_desktop_only":     cfg.Reva.AppProvider.WopiDriver.AppDesktopOnly,
-				"app_icon_uri":         cfg.Reva.AppProvider.WopiDriver.AppIconURI,
-				"app_int_url":          cfg.Reva.AppProvider.WopiDriver.AppInternalURL,
-				"app_name":             cfg.Reva.AppProvider.WopiDriver.AppName,
-				"app_url":              cfg.Reva.AppProvider.WopiDriver.AppURL,
-				"insecure_connections": cfg.Reva.AppProvider.WopiDriver.Insecure,
-				"iop_secret":           cfg.Reva.AppProvider.WopiDriver.IopSecret,
-				"jwt_secret":           cfg.Reva.AppProvider.WopiDriver.JWTSecret,
-				"wopi_url":             cfg.Reva.AppProvider.WopiDriver.WopiURL,
-			},
-		}
-	}
 
 	rcfg := map[string]interface{}{
 		"core": map[string]interface{}{
@@ -119,7 +102,20 @@ func appProviderConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 					"gatewaysvc":       cfg.Reva.Gateway.Endpoint,
 					"app_provider_url": cfg.Reva.AppProvider.ExternalAddr,
 					"driver":           cfg.Reva.AppProvider.Driver,
-					"drivers":          drivers,
+					"drivers": map[string]interface{}{
+						"wopi": map[string]interface{}{
+							"app_api_key":          cfg.Reva.AppProvider.WopiDriver.AppAPIKey,
+							"app_desktop_only":     cfg.Reva.AppProvider.WopiDriver.AppDesktopOnly,
+							"app_icon_uri":         cfg.Reva.AppProvider.WopiDriver.AppIconURI,
+							"app_int_url":          cfg.Reva.AppProvider.WopiDriver.AppInternalURL,
+							"app_name":             cfg.Reva.AppProvider.WopiDriver.AppName,
+							"app_url":              cfg.Reva.AppProvider.WopiDriver.AppURL,
+							"insecure_connections": cfg.Reva.AppProvider.WopiDriver.Insecure,
+							"iop_secret":           cfg.Reva.AppProvider.WopiDriver.IopSecret,
+							"jwt_secret":           cfg.Reva.AppProvider.WopiDriver.JWTSecret,
+							"wopi_url":             cfg.Reva.AppProvider.WopiDriver.WopiURL,
+						},
+					},
 				},
 			},
 		},
