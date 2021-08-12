@@ -105,14 +105,20 @@ The following sections list the changes for 1.10.0.
 
    Update REVA from v1.10.1-0.20210730095301-fcb7a30a44a6 to
    v1.11.1-0.20210809134415-3fe79c870fb5 * Fix cs3org/reva#1978: Fix owner type is optional
-   * Fix cs3org/reva#1899: Fix chunked uploads for new versions * Fix cs3org/reva#1906: Fix copy
-   over existing resource * Fix cs3org/reva#1891: Delete Shared Resources as Receiver * Fix
-   cs3org/reva#1907: Error when creating folder with existing name * Fix cs3org/reva#1937: Do
-   not overwrite more specific matches when finding storage providers * Fix cs3org/reva#1939:
-   Fix the share jail permissions in the decomposedfs * Fix cs3org/reva#1932: Numerous fixes to
-   the owncloudsql storage driver * Fix cs3org/reva#1912: Fix response when listing versions of
-   another user * Fix cs3org/reva#1910: Get user groups recursively in the cbox rest user driver *
-   Fix cs3org/reva#1904: Set Content-Length to 0 when swallowing body in the datagateway * Fix
+   * Fix cs3org/reva#1965: fix value of file_target in shares * Fix cs3org/reva#1960: fix
+   updating shares in the memory share manager * Fix cs3org/reva#1956: fix trashbin listing with
+   depth 0 * Fix cs3org/reva#1957: fix etag propagation on deletes * Enh cs3org/reva#1861: [WIP]
+   Runtime plugins * Fix cs3org/reva#1954: fix response format of the sharees API * Fix
+   cs3org/reva#1819: Remove notifications key from ocs response * Enh cs3org/reva#1946: Add a
+   share manager that connects to oc10 databases * Fix cs3org/reva#1899: Fix chunked uploads for
+   new versions * Fix cs3org/reva#1906: Fix copy over existing resource * Fix cs3org/reva#1891:
+   Delete Shared Resources as Receiver * Fix cs3org/reva#1907: Error when creating folder with
+   existing name * Fix cs3org/reva#1937: Do not overwrite more specific matches when finding
+   storage providers * Fix cs3org/reva#1939: Fix the share jail permissions in the decomposedfs
+   * Fix cs3org/reva#1932: Numerous fixes to the owncloudsql storage driver * Fix
+   cs3org/reva#1912: Fix response when listing versions of another user * Fix
+   cs3org/reva#1910: Get user groups recursively in the cbox rest user driver * Fix
+   cs3org/reva#1904: Set Content-Length to 0 when swallowing body in the datagateway * Fix
    cs3org/reva#1911: Fix version order in propfind responses * Fix cs3org/reva#1926: Trash Bin
    in oCIS Storage Operations * Fix cs3org/reva#1901: Fix response code when folder doesnt exist
    on upload * Enh cs3org/reva#1785: Extend app registry with AddProvider method and mimetype
