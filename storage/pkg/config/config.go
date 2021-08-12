@@ -130,6 +130,7 @@ type Groups struct {
 type FrontendPort struct {
 	Port
 
+	AppProviderPrefix       string
 	DatagatewayPrefix       string
 	OCDavPrefix             string
 	OCSPrefix               string
