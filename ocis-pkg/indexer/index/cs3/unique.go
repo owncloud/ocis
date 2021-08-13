@@ -16,6 +16,7 @@ import (
 
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
@@ -112,7 +113,7 @@ func (idx *Unique) Init() error {
 	if err != nil {
 		return err
 	}
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, tk)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, tk)
 
 	if err := idx.makeDirIfNotExists(ctx, idx.indexBaseDir); err != nil {
 		return err
@@ -188,7 +189,7 @@ func (idx *Unique) Remove(id string, v string) error {
 	}
 
 	deletePath := path.Join("/meta", idx.indexRootDir, v)
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	resp, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
 			Path: deletePath,
@@ -237,7 +238,7 @@ func (idx *Unique) Search(pattern string) ([]string, error) {
 		return nil, err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
 			Path: path.Join("/meta", idx.indexRootDir),
@@ -350,7 +351,7 @@ func (idx *Unique) getAuthenticatedContext(ctx context.Context) (context.Context
 	if err != nil {
 		return nil, err
 	}
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	return ctx, nil
 }
 

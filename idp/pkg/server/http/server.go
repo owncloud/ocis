@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/asim/go-micro/v3"
+	chimiddleware "github.com/go-chi/chi/middleware"
 	svc "github.com/owncloud/ocis/idp/pkg/service/v0"
 	pkgcrypto "github.com/owncloud/ocis/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
@@ -57,9 +58,9 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
+			chimiddleware.RealIP,
+			chimiddleware.RequestID,
 			middleware.TraceContext,
-			middleware.RealIP,
-			middleware.RequestID,
 			middleware.NoCache,
 			middleware.Cors,
 			middleware.Secure,
@@ -74,7 +75,6 @@ func Server(opts ...Option) (http.Service, error) {
 	)
 
 	{
-		//handle = svc.NewTracing(handle)
 		handle = svc.NewInstrument(handle, options.Metrics)
 		handle = svc.NewLogging(handle, options.Logger)
 	}

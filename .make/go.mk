@@ -16,9 +16,7 @@ else
 	GOBUILD ?= go build
 endif
 
-PACKAGES ?= $(shell go list ./...)
 SOURCES ?= $(shell find . -name "*.go" -type f -not -path "./node_modules/*")
-GENERATE ?= $(PACKAGES)
 
 TAGS ?=
 
@@ -78,16 +76,11 @@ ci-golangci-lint: $(GOLANGCI_LINT)
 	$(GOLANGCI_LINT) run -E gosec -E bodyclose -E dogsled -E durationcheck -E golint -E ifshort -E makezero -E prealloc -E predeclared --path-prefix $(NAME) --timeout 10m0s --issues-exit-code 0 --out-format checkstyle > checkstyle.xml
 
 .PHONY: test
-test: $(GOVERAGE)
-	@echo
-	@echo
-	@echo "$(NAME): test"
-	@echo
-	@$(GOVERAGE) -v -coverprofile coverage.out $(PACKAGES)
+test:
+	@go test -v -coverprofile coverage.out ./...
 
 .PHONY: go-coverage
 go-coverage:
-	@echo "$(NAME): go-coverage"
 	@if [ ! -f coverage.out ]; then $(MAKE) test  &>/dev/null; fi;
 	@go tool cover -func coverage.out | tail -1 | grep -Eo "[0-9]+\.[0-9]+"
 

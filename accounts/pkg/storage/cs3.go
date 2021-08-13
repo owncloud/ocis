@@ -16,6 +16,7 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
@@ -67,7 +68,7 @@ func (r CS3Repo) WriteAccount(ctx context.Context, a *proto.Account) (err error)
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	if err := r.makeRootDirIfNotExist(ctx, accountsFolder); err != nil {
 		return err
 	}
@@ -104,7 +105,7 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err err
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
 			Path: path.Join("/meta", accountsFolder),
@@ -154,7 +155,7 @@ func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
@@ -181,7 +182,7 @@ func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	if err := r.makeRootDirIfNotExist(ctx, groupsFolder); err != nil {
 		return err
 	}
@@ -218,7 +219,7 @@ func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) 
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
 			Path: path.Join("/meta", groupsFolder),
@@ -268,7 +269,7 @@ func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
@@ -371,7 +372,7 @@ func (d dataProviderClient) put(url string, body io.Reader, token string) (*http
 		return nil, err
 	}
 
-	req.Header.Add("x-access-token", token)
+	req.Header.Add(revactx.TokenHeader, token)
 	return d.client.Do(req)
 }
 
@@ -381,6 +382,6 @@ func (d dataProviderClient) get(url string, token string) (*http.Response, error
 		return nil, err
 	}
 
-	req.Header.Add("x-access-token", token)
+	req.Header.Add(revactx.TokenHeader, token)
 	return d.client.Do(req)
 }

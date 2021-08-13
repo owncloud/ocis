@@ -9,10 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	"go.opentelemetry.io/otel/attribute"
-
-	ocstracing "github.com/owncloud/ocis/ocs/pkg/tracing"
-
 	"github.com/asim/go-micro/plugins/client/grpc/v3"
 	merrors "github.com/asim/go-micro/v3/errors"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -20,17 +16,18 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/pkg/auth/scope"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
-	"github.com/cs3org/reva/pkg/user"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
+	ocstracing "github.com/owncloud/ocis/ocs/pkg/tracing"
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
 	"github.com/pkg/errors"
+	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
@@ -40,7 +37,7 @@ import (
 func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 	var account *accounts.Account
 	var err error
-	u, ok := user.ContextGetUser(r.Context())
+	u, ok := revactx.ContextGetUser(r.Context())
 	if !ok || u.Id == nil || u.Id.OpaqueId == "" {
 		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id")))
 		return
@@ -384,7 +381,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		ctx := metadata.AppendToOutgoingContext(r.Context(), token.TokenHeader, t)
+		ctx := metadata.AppendToOutgoingContext(r.Context(), revactx.TokenHeader, t)
 
 		gwc, err := pool.GetGatewayServiceClient(o.config.RevaAddress)
 		if err != nil {
@@ -614,7 +611,7 @@ func (o Ocs) DisableUser(w http.ResponseWriter, r *http.Request) {
 // The signing key is part of the user settings and is used by the proxy to authenticate requests
 // Currently, the username is used as the OC-Credential
 func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
-	u, ok := user.ContextGetUser(r.Context())
+	u, ok := revactx.ContextGetUser(r.Context())
 	if !ok {
 		//o.logger.Error().Msg("missing user in context")
 		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context")))

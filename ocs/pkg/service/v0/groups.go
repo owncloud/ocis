@@ -10,7 +10,7 @@ import (
 	"strconv"
 
 	merrors "github.com/asim/go-micro/v3/errors"
-	"github.com/cs3org/reva/pkg/user"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
@@ -27,7 +27,7 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	// short circuit if there is a user already in the context
-	if u, ok := user.ContextGetUser(r.Context()); ok {
+	if u, ok := revactx.ContextGetUser(r.Context()); ok {
 		// we are not sure whether the current user in the context is the admin or the authenticated user.
 		if u.Username == userid {
 			// the OCS API is a REST API and it uses the username to look for groups. If the id from the user in the context

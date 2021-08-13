@@ -6,7 +6,7 @@ import (
 
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	"github.com/cs3org/reva/pkg/user"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
@@ -63,7 +63,7 @@ func (g Graph) UserCtx(next http.Handler) http.Handler {
 // GetMe implements the Service interface.
 func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 
-	u, ok := user.ContextGetUser(r.Context())
+	u, ok := revactx.ContextGetUser(r.Context())
 	if !ok {
 		g.logger.Error().Msg("user not in context")
 		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "user not in context")

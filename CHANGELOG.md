@@ -7,12 +7,41 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Specify primary user type for all accounts: [#2364](https://github.com/owncloud/ocis/pull/2364)
+* Enhancement - Use non root user for the owncloud/ocis docker image: [#2380](https://github.com/owncloud/ocis/pull/2380)
+* Enhancement - Replace unmaintained jwt library: [#2386](https://github.com/owncloud/ocis/pull/2386)
+* Enhancement - Update bleve to version 2.1.0: [#2391](https://github.com/owncloud/ocis/pull/2391)
 
 ## Details
 
 * Bugfix - Specify primary user type for all accounts: [#2364](https://github.com/owncloud/ocis/pull/2364)
 
    https://github.com/owncloud/ocis/pull/2364
+
+* Enhancement - Use non root user for the owncloud/ocis docker image: [#2380](https://github.com/owncloud/ocis/pull/2380)
+
+   The owncloud/ocis docker image now uses a non root user and enables you to set a different user
+   with the docker `--user` parameter. The default user has the UID 1000 is part of a group with the
+   GID 1000.
+
+   This is a breaking change for existing docker deployments. The permission on the files and
+   folders in persistent volumes need to be changed to the UID and GID used for oCIS (default
+   1000:1000 if not changed by the user).
+
+   https://github.com/owncloud/ocis/pull/2380
+
+* Enhancement - Replace unmaintained jwt library: [#2386](https://github.com/owncloud/ocis/pull/2386)
+
+   The old library [github.com/dgrijalva/jwt-go](https://github.com/dgrijalva/jwt-go)
+   is unmaintained and was replaced by the community maintained fork
+   [github.com/golang-jwt/jwt](https://github.com/golang-jwt/jwt).
+
+   https://github.com/owncloud/ocis/pull/2386
+
+* Enhancement - Update bleve to version 2.1.0: [#2391](https://github.com/owncloud/ocis/pull/2391)
+
+   Updated bleve to the current version.
+
+   https://github.com/owncloud/ocis/pull/2391
 # Changelog for [1.10.0] (2021-08-06)
 
 The following sections list the changes for 1.10.0.
@@ -105,14 +134,20 @@ The following sections list the changes for 1.10.0.
 
    Update REVA from v1.10.1-0.20210730095301-fcb7a30a44a6 to
    v1.11.1-0.20210809134415-3fe79c870fb5 * Fix cs3org/reva#1978: Fix owner type is optional
-   * Fix cs3org/reva#1899: Fix chunked uploads for new versions * Fix cs3org/reva#1906: Fix copy
-   over existing resource * Fix cs3org/reva#1891: Delete Shared Resources as Receiver * Fix
-   cs3org/reva#1907: Error when creating folder with existing name * Fix cs3org/reva#1937: Do
-   not overwrite more specific matches when finding storage providers * Fix cs3org/reva#1939:
-   Fix the share jail permissions in the decomposedfs * Fix cs3org/reva#1932: Numerous fixes to
-   the owncloudsql storage driver * Fix cs3org/reva#1912: Fix response when listing versions of
-   another user * Fix cs3org/reva#1910: Get user groups recursively in the cbox rest user driver *
-   Fix cs3org/reva#1904: Set Content-Length to 0 when swallowing body in the datagateway * Fix
+   * Fix cs3org/reva#1965: fix value of file_target in shares * Fix cs3org/reva#1960: fix
+   updating shares in the memory share manager * Fix cs3org/reva#1956: fix trashbin listing with
+   depth 0 * Fix cs3org/reva#1957: fix etag propagation on deletes * Enh cs3org/reva#1861: [WIP]
+   Runtime plugins * Fix cs3org/reva#1954: fix response format of the sharees API * Fix
+   cs3org/reva#1819: Remove notifications key from ocs response * Enh cs3org/reva#1946: Add a
+   share manager that connects to oc10 databases * Fix cs3org/reva#1899: Fix chunked uploads for
+   new versions * Fix cs3org/reva#1906: Fix copy over existing resource * Fix cs3org/reva#1891:
+   Delete Shared Resources as Receiver * Fix cs3org/reva#1907: Error when creating folder with
+   existing name * Fix cs3org/reva#1937: Do not overwrite more specific matches when finding
+   storage providers * Fix cs3org/reva#1939: Fix the share jail permissions in the decomposedfs
+   * Fix cs3org/reva#1932: Numerous fixes to the owncloudsql storage driver * Fix
+   cs3org/reva#1912: Fix response when listing versions of another user * Fix
+   cs3org/reva#1910: Get user groups recursively in the cbox rest user driver * Fix
+   cs3org/reva#1904: Set Content-Length to 0 when swallowing body in the datagateway * Fix
    cs3org/reva#1911: Fix version order in propfind responses * Fix cs3org/reva#1926: Trash Bin
    in oCIS Storage Operations * Fix cs3org/reva#1901: Fix response code when folder doesnt exist
    on upload * Enh cs3org/reva#1785: Extend app registry with AddProvider method and mimetype

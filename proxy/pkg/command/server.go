@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc"
+	chimiddleware "github.com/go-chi/chi/middleware"
 	"github.com/justinas/alice"
 	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
@@ -179,8 +180,8 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 	return alice.New(
 		// first make sure we log all requests and redirect to https if necessary
 		pkgmiddleware.TraceContext,
-		pkgmiddleware.RealIP,
-		pkgmiddleware.RequestID,
+		chimiddleware.RealIP,
+		chimiddleware.RequestID,
 		middleware.AccessLog(l),
 		middleware.HTTPSRedirect,
 

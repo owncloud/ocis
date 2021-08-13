@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/asim/go-micro/v3"
 	"github.com/go-chi/chi"
+	chimiddleware "github.com/go-chi/chi/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
@@ -36,8 +37,8 @@ func Server(opts ...Option) http.Service {
 
 	mux := chi.NewMux()
 
-	mux.Use(middleware.RealIP)
-	mux.Use(middleware.RequestID)
+	mux.Use(chimiddleware.RealIP)
+	mux.Use(chimiddleware.RequestID)
 	mux.Use(middleware.NoCache)
 	mux.Use(middleware.Cors)
 	mux.Use(middleware.Secure)

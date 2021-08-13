@@ -18,6 +18,7 @@ import (
 
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
@@ -363,7 +364,7 @@ func (idx *Autoincrement) getAuthenticatedContext(ctx context.Context) (context.
 	if err != nil {
 		return nil, err
 	}
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	return ctx, nil
 }
 

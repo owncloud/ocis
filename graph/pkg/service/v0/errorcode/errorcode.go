@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
-	"github.com/ascarter/requestid"
 	msgraph "github.com/owncloud/open-graph-api-go"
 )
 
@@ -72,13 +72,12 @@ func (e ErrorCode) Render(w http.ResponseWriter, r *http.Request, status int, ms
 		"date": time.Now().UTC().Format(time.RFC3339),
 		// TODO return client-request-id?
 	}
-	if id, ok := requestid.FromContext(r.Context()); ok {
-		innererror["request-id"] = id
-	}
+
+	innererror["request-id"] = middleware.GetReqID(r.Context())
 	resp := &msgraph.OdataError{
 		Error: msgraph.OdataErrorMain{
-			Code:    e.String(),
-			Message: msg,
+			Code:       e.String(),
+			Message:    msg,
 			Innererror: &innererror,
 		},
 	}

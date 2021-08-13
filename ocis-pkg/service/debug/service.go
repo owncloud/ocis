@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/pprof"
 
+	chimiddleware "github.com/go-chi/chi/middleware"
 	"github.com/justinas/alice"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -47,8 +48,8 @@ func NewService(opts ...Option) *http.Server {
 	return &http.Server{
 		Addr: dopts.Address,
 		Handler: alice.New(
-			middleware.RealIP,
-			middleware.RequestID,
+			chimiddleware.RealIP,
+			chimiddleware.RequestID,
 			middleware.NoCache,
 			middleware.Cors,
 			middleware.Secure,

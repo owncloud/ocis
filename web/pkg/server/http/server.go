@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/asim/go-micro/v3"
+	chimiddleware "github.com/go-chi/chi/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
 	webmid "github.com/owncloud/ocis/web/pkg/middleware"
@@ -27,8 +28,8 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
-			middleware.RealIP,
-			middleware.RequestID,
+			chimiddleware.RealIP,
+			chimiddleware.RequestID,
 			middleware.NoCache,
 			middleware.Cors,
 			middleware.Secure,

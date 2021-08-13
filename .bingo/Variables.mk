@@ -59,12 +59,6 @@ $(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
 	@echo "(re)installing $(GOBIN)/golangci-lint-v1.37.1"
 	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v1.37.1 "github.com/golangci/golangci-lint/cmd/golangci-lint"
 
-GOVERAGE := $(GOBIN)/goverage-v0.0.0-20180129164344-eec3514a20b5
-$(GOVERAGE): $(BINGO_DIR)/goverage.mod
-	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/goverage-v0.0.0-20180129164344-eec3514a20b5"
-	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=goverage.mod -o=$(GOBIN)/goverage-v0.0.0-20180129164344-eec3514a20b5 "github.com/haya14busa/goverage"
-
 GOX := $(GOBIN)/gox-v1.0.1
 $(GOX): $(BINGO_DIR)/gox.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.

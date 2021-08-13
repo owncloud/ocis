@@ -2,6 +2,14 @@ Enhancement: update REVA
 
 Update REVA from v1.10.1-0.20210730095301-fcb7a30a44a6 to v1.11.1-0.20210809134415-3fe79c870fb5
 * Fix cs3org/reva#1978: Fix owner type is optional
+* Fix cs3org/reva#1965: fix value of file_target in shares
+* Fix cs3org/reva#1960: fix updating shares in the memory share manager
+* Fix cs3org/reva#1956: fix trashbin listing with depth 0
+* Fix cs3org/reva#1957: fix etag propagation on deletes
+* Enh cs3org/reva#1861: [WIP] Runtime plugins
+* Fix cs3org/reva#1954: fix response format of the sharees API
+* Fix cs3org/reva#1819: Remove notifications key from ocs response
+* Enh cs3org/reva#1946: Add a share manager that connects to oc10 databases
 * Fix cs3org/reva#1899: Fix chunked uploads for new versions
 * Fix cs3org/reva#1906: Fix copy over existing resource
 * Fix cs3org/reva#1891: Delete Shared Resources as Receiver

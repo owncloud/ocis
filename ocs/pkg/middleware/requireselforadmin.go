@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/cs3org/reva/pkg/user"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	accounts "github.com/owncloud/ocis/accounts/pkg/service/v0"
@@ -19,7 +19,7 @@ func RequireSelfOrAdmin(opts ...Option) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-			u, ok := user.ContextGetUser(r.Context())
+			u, ok := revactx.ContextGetUser(r.Context())
 			if !ok {
 				mustNotFail(render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized")))
 				return

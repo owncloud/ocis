@@ -10,10 +10,16 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rhttp"
-	"github.com/cs3org/reva/pkg/token"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/metadata"
+)
+
+const (
+	// "github.com/cs3org/reva/internal/http/services/datagateway" is internal so we redeclare it here
+	// TokenTransportHeader holds the header key for the reva transfer token
+	TokenTransportHeader = "X-Reva-Transfer"
 )
 
 type CS3 struct {
@@ -33,7 +39,7 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	if !ok {
 		return nil, errors.New("cs3source: authorization missing")
 	}
-	ctx = metadata.AppendToOutgoingContext(context.Background(), token.TokenHeader, auth)
+	ctx = metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
 	rsp, err := s.client.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{
 		Ref: &provider.Reference{
 			Path: path,
@@ -58,8 +64,8 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	if err != nil {
 		return nil, err
 	}
-	httpReq.Header.Set(token.TokenHeader, auth)
-	httpReq.Header.Set("X-REVA-TRANSFER", tk)
+	httpReq.Header.Set(revactx.TokenHeader, auth)
+	httpReq.Header.Set(TokenTransportHeader, tk)
 
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec
 	client := &http.Client{}

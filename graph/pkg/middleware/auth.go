@@ -4,9 +4,8 @@ import (
 	"net/http"
 
 	"github.com/cs3org/reva/pkg/auth/scope"
-	"github.com/cs3org/reva/pkg/token"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
-	"github.com/cs3org/reva/pkg/user"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	"google.golang.org/grpc/metadata"
@@ -68,9 +67,9 @@ func Auth(opts ...account.Option) func(http.Handler) http.Handler {
 				return
 			}
 
-			ctx = token.ContextSetToken(ctx, t)
-			ctx = user.ContextSetUser(ctx, u)
-			ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+			ctx = revactx.ContextSetToken(ctx, t)
+			ctx = revactx.ContextSetUser(ctx, u)
+			ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

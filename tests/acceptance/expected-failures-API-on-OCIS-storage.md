@@ -5,9 +5,6 @@ Basic file management like up and download, move, copy, properties, trash, versi
 
 #### [Version count is 1 more than on oC10](https://github.com/owncloud/ocis/issues/1633)
 
-#### [Implement Versions Feature for ocis storage](https://github.com/owncloud/product/issues/210)
--   [apiWebdavEtagPropagation2/restoreVersion.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/restoreVersion.feature#L10)
-
 #### [PUT request with missing parent must return status code 409](https://github.com/owncloud/ocis/issues/824)
 
 #### [invalid file-names should not be created using the TUS protocol](https://github.com/owncloud/ocis/issues/1001)

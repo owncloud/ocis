@@ -11,7 +11,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/pkg/token"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/thumbnails/pkg/preprocessor"
 	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
@@ -201,7 +201,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *v0proto.GetThumb
 }
 
 func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
-	ctx := metadata.AppendToOutgoingContext(context.Background(), token.TokenHeader, auth)
+	ctx := metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
 
 	req := &provider.StatRequest{
 		Ref: &provider.Reference{

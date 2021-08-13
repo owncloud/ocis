@@ -8,7 +8,7 @@ import (
 
 	"github.com/asim/go-micro/v3/client"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	revauser "github.com/cs3org/reva/pkg/user"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
@@ -173,15 +173,15 @@ func TestRegexSelector(t *testing.T) {
 
 	var tests = []testCase{
 		{"unauthenticated", context.Background(), "unauthenticated"},
-		{"default", revauser.ContextSetUser(context.Background(), &userv1beta1.User{}), "default"},
-		{"mail-ocis", revauser.ContextSetUser(context.Background(), &userv1beta1.User{Mail: "marie@example.org"}), "ocis"},
-		{"mail-oc10", revauser.ContextSetUser(context.Background(), &userv1beta1.User{Mail: "einstein@example.org"}), "oc10"},
-		{"username-einstein", revauser.ContextSetUser(context.Background(), &userv1beta1.User{Username: "einstein"}), "ocis"},
-		{"username-feynman", revauser.ContextSetUser(context.Background(), &userv1beta1.User{Username: "feynman"}), "ocis"},
-		{"username-marie", revauser.ContextSetUser(context.Background(), &userv1beta1.User{Username: "marie"}), "oc10"},
-		{"id-nil", revauser.ContextSetUser(context.Background(), &userv1beta1.User{Id: &userv1beta1.UserId{}}), "default"},
-		{"id-1", revauser.ContextSetUser(context.Background(), &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: "4c510ada-c86b-4815-8820-42cdf82c3d51"}}), "ocis"},
-		{"id-2", revauser.ContextSetUser(context.Background(), &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"}}), "oc10"},
+		{"default", revactx.ContextSetUser(context.Background(), &userv1beta1.User{}), "default"},
+		{"mail-ocis", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Mail: "marie@example.org"}), "ocis"},
+		{"mail-oc10", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Mail: "einstein@example.org"}), "oc10"},
+		{"username-einstein", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Username: "einstein"}), "ocis"},
+		{"username-feynman", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Username: "feynman"}), "ocis"},
+		{"username-marie", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Username: "marie"}), "oc10"},
+		{"id-nil", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Id: &userv1beta1.UserId{}}), "default"},
+		{"id-1", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: "4c510ada-c86b-4815-8820-42cdf82c3d51"}}), "ocis"},
+		{"id-2", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"}}), "oc10"},
 	}
 
 	for _, tc := range tests {
