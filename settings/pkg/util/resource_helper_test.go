@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/owncloud/ocis/settings/pkg/proto/v0"
-	"gotest.tools/assert"
+	"gotest.tools/v3/assert"
 )
 
 func TestIsResourceMatched(t *testing.T) {
