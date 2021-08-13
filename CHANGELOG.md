@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Use non root user for the owncloud/ocis docker image: [#2380](https://github.com/owncloud/ocis/pull/2380)
 * Enhancement - Replace unmaintained jwt library: [#2386](https://github.com/owncloud/ocis/pull/2386)
 * Enhancement - Update bleve to version 2.1.0: [#2391](https://github.com/owncloud/ocis/pull/2391)
+* Enhancement - Update github.com/coreos/go-oidc to v3.0.0: [#2393](https://github.com/owncloud/ocis/pull/2393)
 
 ## Details
 
@@ -42,6 +43,12 @@ The following sections list the changes for unreleased.
    Updated bleve to the current version.
 
    https://github.com/owncloud/ocis/pull/2391
+
+* Enhancement - Update github.com/coreos/go-oidc to v3.0.0: [#2393](https://github.com/owncloud/ocis/pull/2393)
+
+   Updated the github.com/coreos/go-oidc library to the version 3.0.0.
+
+   https://github.com/owncloud/ocis/pull/2393
 # Changelog for [1.10.0] (2021-08-06)
 
 The following sections list the changes for 1.10.0.
