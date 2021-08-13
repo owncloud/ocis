@@ -15,7 +15,7 @@ func UsersWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "debug-addr",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Users.DebugAddr, "0.0.0.0:9145"),
 			Usage:       "Address to bind debug server",
-			EnvVars:     []string{"STORAGE_SHARING_DEBUG_ADDR"},
+			EnvVars:     []string{"STORAGE_USERPROVIDER_DEBUG_ADDR"},
 			Destination: &cfg.Reva.Users.DebugAddr,
 		},
 
