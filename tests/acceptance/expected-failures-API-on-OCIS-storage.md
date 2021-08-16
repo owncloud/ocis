@@ -1312,11 +1312,6 @@ Scenario Outline: Unauthenticated call
 -   [apiWebdavOperations/refuseAccess.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L22)
     Scenario Outline: A disabled user cannot use webdav
 
-#### [trying to access a non-existing resource returns an empty body](https://github.com/owncloud/ocis/issues/1282)
-Scenario Outline: Do a PROPFIND to a non-existing URL
--   [apiWebdavProperties2/getFileProperties.feature:242](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L242)
--   [apiWebdavProperties2/getFileProperties.feature:243](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L243)
-
 #### [wildcard Access-Control-Allow-Origin](https://github.com/owncloud/ocis/issues/1340)
 -   [apiAuth/cors.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L24)
 -   [apiAuth/cors.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L25)
