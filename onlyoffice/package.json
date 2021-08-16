@@ -47,7 +47,7 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-promise": "^4.3.1",
     "eslint-plugin-standard": "^5.0.0",
-    "eslint-plugin-vue": "^7.8.0",
+    "eslint-plugin-vue": "^7.16.0",
     "fs-extra": "^9.0.1",
     "join-path": "^1.1.1",
     "ldap": "^0.7.1",
