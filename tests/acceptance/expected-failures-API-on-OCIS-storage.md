@@ -27,8 +27,8 @@ _ocdav: double check the webdav property parsing when custom namespaces are used
 -   [apiWebdavProperties1/setFileProperties.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L64)
 
 #### [Cannot set custom webDav properties](https://github.com/owncloud/product/issues/264)
--   [apiWebdavProperties2/getFileProperties.feature:246](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L246)
--   [apiWebdavProperties2/getFileProperties.feature:266](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L266)
+-   [apiWebdavProperties2/getFileProperties.feature:252](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L252)
+-   [apiWebdavProperties2/getFileProperties.feature:272](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L272)
 
 #### [downloading an old version of a file returns 501](https://github.com/owncloud/ocis/issues/2261)
 -    [apiVersions/fileVersions.feature:437](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L437)
@@ -296,7 +296,6 @@ Synchronization features like etag propagation, setting mtime and locking files
 -   [apiWebdavLocksUnlock/unlockSharingToShares.feature:148](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L148)
 -   [apiWebdavLocksUnlock/unlockSharingToShares.feature:149](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L149)
 -   [apiWebdavLocksUnlock/unlockSharingToShares.feature:150](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L150)
-
 
 ### Share
 File and sync features in a shared scenario
@@ -589,16 +588,6 @@ cannot share a folder with create permission
 -   [apiTrashbin/trashbinSharingToShares.feature:83](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L83)
 -   [apiTrashbin/trashbinSharingToShares.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L102)
 -   [apiTrashbin/trashbinSharingToShares.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L103)
-
-#### [No way to set default folder for received shares](https://github.com/owncloud/ocis/issues/1327)
-Scenario Outline: delete a folder when there is a default folder for received shares
--   [apiWebdavOperations/deleteFolder.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/deleteFolder.feature#L67)
--   [apiWebdavOperations/deleteFolder.feature:68](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/deleteFolder.feature#L68)
--   [apiWebdavOperations/deleteFolder.feature:69](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/deleteFolder.feature#L69)
--   [apiWebdavOperations/deleteFolder.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/deleteFolder.feature#L70)
-    Scenario Outline: delete a folder when there is a default folder for received shares that is a multi-level path
--   [apiWebdavOperations/deleteFolder.feature:91](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/deleteFolder.feature#L91)
--   [apiWebdavOperations/deleteFolder.feature:92](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/deleteFolder.feature#L92)
 
 #### [changing user quota gives ocs status 103 / cannot set user quota using the ocs endpoint](https://github.com/owncloud/product/issues/247)
 _getting and setting quota_
@@ -1313,11 +1302,6 @@ Scenario Outline: Unauthenticated call
 -   [apiWebdavOperations/refuseAccess.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L21)
 -   [apiWebdavOperations/refuseAccess.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L22)
     Scenario Outline: A disabled user cannot use webdav
-
-#### [trying to access a non-existing resource returns an empty body](https://github.com/owncloud/ocis/issues/1282)
-Scenario Outline: Do a PROPFIND to a non-existing URL
--   [apiWebdavProperties2/getFileProperties.feature:242](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L242)
--   [apiWebdavProperties2/getFileProperties.feature:243](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L243)
 
 #### [wildcard Access-Control-Allow-Origin](https://github.com/owncloud/ocis/issues/1340)
 -   [apiAuth/cors.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L24)
