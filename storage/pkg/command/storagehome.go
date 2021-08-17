@@ -104,7 +104,6 @@ func storageHomeConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 			"tracing_enabled":      cfg.Tracing.Enabled,
 			"tracing_endpoint":     cfg.Tracing.Endpoint,
 			"tracing_collector":    cfg.Tracing.Collector,
-			"tracing_service":      ociscfg.TracingService(cfg.Tracing.Enabled),
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
