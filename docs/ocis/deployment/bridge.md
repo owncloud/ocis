@@ -15,7 +15,7 @@ This document is a work in progress of the current setup.
 
 ## Current status
 
-Using ocis and the ownCloud 10 openidconnect and graphapi plugins it is possible today to introduce openid connect based authentication to existing instances. That is a prerequisite for migrating to ocis.
+Using ocis and the ownCloud 10 [graphapi app](https://github.com/owncloud/graphapi/) it is possible today to use an existing owncloud 10 instance as a userbackend and storage backend for ocis.
 
 ## How to do it
 
@@ -36,11 +36,8 @@ occ a:e graphapi
 
 No configuration necessary. You can test with `curl`:
 ```console
-$ curl https://cloud.example.com/index.php/apps/graphapi/v1.0/users -u admin | jq
+$ curl https://cloud.ocis.test/index.php/apps/graphapi/v1.0/users -u admin -s | jq
 Enter host password for user 'admin':
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100   694  100   694    0     0   4283      0 --:--:-- --:--:-- --:--:--  4283
 {
   "value": [
     {
@@ -56,64 +53,136 @@ Enter host password for user 'admin':
     ...
 
   ],
-  "@odata.nextLink": "https://oc.butonic.de/apps/graphapi/v1.0/users?$top=10&$skip=10"
+  "@odata.nextLink": "https://cloud.ocis.test/apps/graphapi/v1.0/users?$top=10&$skip=10"
 }
 ```
 
-> Note: The MS graph api actually asks for `Bearer` auth, but in order to check users passwords during an LDAP bind we are exploiting ownClouds authentication implementation that will grant access when `Basic` auth is used. An LDAP Bind you may ask? Read on!
+{{< hint >}}
+The MS graph api actually asks for `Bearer` auth, but in order to check users passwords during an LDAP bind we are exploiting ownClouds authentication implementation that will grant access when `Basic` auth is used. An LDAP Bind you may ask? Read on!
+{{< /hint >}}
+
+### Grab ocis!
+
+```
+$ git clone git@github.com:owncloud/ocis.git
+$ cd ocis
+$ make -C ocis build
+```
+This should give you an `ocis/bin/ocis` binary. Try listing the help with `ocis/bin/ocis --help`.
+
+{{< hint >}}
+You can check out a custom branch and build a custom binary which can then be used for the below steps.
+{{< /hint >}}
 
 ### Start ocis-glauth
 
-We are going to use the above ownCloud 10 and graphapi app to turn it into the datastore for an LDAP proxy.
-
-#### Grab it!
-
-In an `ocis` folder
-```
-$ git clone git@github.com:owncloud/ocis-glauth.git
-$ cd ocis-glauth
-$ make
-```
-This should give you a `bin/ocis-glauth` binary. Try listing the help with `bin/ocis-glauth --help`.
-
+We are going to use the built binary and ownCloud 10 graphapi app to turn ownCloud 10 into the datastore for an LDAP proxy.
 
 #### Run it!
 
-You need to point `ocis-glauth` to your owncloud domain:
+You need to point `ocis/bin/ocis glauth` to your owncloud domain:
 ```console
-$ bin/ocis-glauth --log-level debug server --backend-datastore owncloud --backend-server https://cloud.example.com --backend-basedn dc=example,dc=com
+$ ocis/bin/ocis --ocis-log-level debug glauth --backend-datastore owncloud --backend-server https://cloud.ocis.test/apps/graphapi/v1.0 --backend-basedn dc=ocis,dc=test
 ```
 
-`--log-level debug` is only used to generate more verbose output
-`--backend-datastore owncloud` switches to tho owncloud datastore
-`--backend-server https://cloud.example.com` is the url to an ownCloud instance with an enabled graphapi app
-`--backend-basedn dc=example,dc=com` is used to construct the LDAP dn. The user `admin` will become `cn=admin,dc=example,dc=com`.
+`--ocis-log-level debug` is only used to generate more verbose output
+`--backend-datastore owncloud` switches to the owncloud datastore
+`--backend-server https://cloud.ocis.test/apps/graphapi/v1.0` is the URL to a graphapi endpoint of an existing ownCloud 10 instance
+`--backend-basedn dc=ocis,dc=test` is used to construct the LDAP dn. The user `admin` will become `cn=admin,dc=ocis,dc=test`.
 
 #### Check it is up and running
 
 You should now be able to list accounts from your ownCloud 10 oc_accounts table using:
 ```console
-$ ldapsearch -x -H ldap://localhost:9125 -b dc=example,dc=com -D "cn=admin,dc=example,dc=com" -W '(objectclass=posixaccount)'
+$ ldapsearch -x -H ldap://127.0.0.1:9125 -b dc=ocis,dc=test -D "cn=admin,dc=ocis,dc=test" -W '(objectclass=posixaccount)'
 ```
 
 Groups should work as well:
 ```console
-$ ldapsearch -x -H ldap://localhost:9125 -b dc=example,dc=com -D "cn=admin,dc=example,dc=com" -W '(objectclass=posixgroup)'
+$ ldapsearch -x -H ldap://127.0.0.1:9125 -b dc=ocis,dc=test -D "cn=admin,dc=ocis,dc=test" -W '(objectclass=posixgroup)'
 ```
 
-> Note: This is currently a readonly implementation and minimal to the usecase of authenticating users with idp.
+{{< hint >}}
+This is currently a readonly implementation and minimal to the usecase of authenticating users with an IDP.
+{{< /hint >}}
+
+### Start ocis idp
+
+#### Set environment variables
+
+The build in [libregraph/lico](https://github.com/libregraph/lico) needs environment variables to configure the LDAP server:
+```console
+export OCIS_URL=https://ocis.ocis.test
+export IDP_LDAP_URI=ldap://127.0.0.1:9125
+export IDP_LDAP_BASE_DN="dc=ocis,dc=test"
+export IDP_LDAP_BIND_DN="cn=admin,dc=ocis,dc=test"
+export IDP_LDAP_BIND_PASSWORD="its-a-secret"
+export IDP_LDAP_SCOPE=sub
+export IDP_LDAP_LOGIN_ATTRIBUTE=uid
+export IDP_LDAP_NAME_ATTRIBUTE=givenName
+```
+Don't forget to use an existing user with admin permissions (only admins are allowed to list all users via the graph api) and the correct password.
+
+{{< hint warning >}}
+* TODO: change the default values in glauth & ocis to use an `ownclouduuid` attribute.
+* TODO: split `OCIS_URL` and `IDP_ISS` env vars and use `OCIS_URL` to generate the clients in the `identifier-registration.yaml`.
+{{< /hint >}}
+
+### Configure clients
+
+When the `identifier-registration.yaml` does not exist it will be generated based on the `OCIS_URL` environment variable.
+
+#### Run it!
+
+You can now bring up `ocis/bin/ocis idp` with:
+```console
+$ ocis/bin/ocis idp server --iss http://127.0.0.1:9130 --signing-kid gen1-2020-02-27
+```
+
+`ocis/bin/ocis idp` needs to know
+- `--iss http://127.0.0.1:9130` the issuer, which must be a reachable http endpoint. For testing an ip works. For openid connect HTTPS is NOT optional. This URL is exposed in the `http://127.0.0.1:9130/.well-known/openid-configuration` endpoint and clients need to be able to connect to it, securely. We will change this when introducing the proxy.
+- `--signing-kid gen1-2020-02-27` a signature key id, otherwise the jwks key has no name, which might cause problems with clients. a random key is ok, but it should change when the actual signing key changes.
+
+{{< hint warning >}}
+* TODO: the port in the `--iss` needs to be changed when hiding the idp behind the proxy
+* TODO: the signing keys and encryption keys should be precerated so they are reused between restarts. Otherwise all client sessions will become invalid when restarting the IdP.
+{{< /hint >}}
+
+
+#### Check it is up and running
+
+1. Try getting the configuration:
+```console
+$ curl http://127.0.0.1:9130/.well-known/openid-configuration
+```
+
+2. Check if the login works at http://127.0.0.1:9130/signin/v1/identifier
+
+{{< hint >}}
+If you later get a `Unable to find a key for (algorithm, kid):PS256, )` Error make sure you did set a `--signing-kid` when starting `ocis/bin/ocis idp` by checking it is present in http://127.0.0.1:9130/konnect/v1/jwks.json
+{{< /hint >}}
+
+### Start ocis proxy
+
+
+{{< hint >}}
+Everything below this hint is outdated. Next steps are roughly:
+* directly after glauth start the `ocis storage-userporvider`?
+  - how to verify that works?
+  - https://github.com/fullstorydev/grpcurl
+* start proxy
+  - the ocis ipd url can be changed to https
+  - when do we hide oc10 behind ocis? -> advanced bridge at the end? for now run it without touching the existing oc10 instance
+* start web
+  - verify the login works, but how?
+    - TODO the login works, but then the capabilities requests will fail ... unless we make the proxy answer them by talking to oc10?
+
+Other ideas:
+* the owncloud backend in glauth also works with the user provisioning api ... no changes to a running production instance? db access could be done with a read only account as well...
+{{< /hint >}}
+
 
 ### Start ocis-web
-
-#### Get it!
-
-In an `ocis` folder
-```
-$ git clone git@github.com:owncloud/ocis.git
-$ cd web
-$ make
-```
-This should give you a `bin/web` binary. Try listing the help with `bin/web --help`.
 
 #### Run it!
 
@@ -127,80 +196,6 @@ $ bin/web server --web-config-server https://cloud.example.com --oidc-authority 
 - `--oidc-authority https://192.168.1.100:9130` the openid connect issuing authority, in our case `oidc-idp`, running on port 9130
 - `--oidc-metadata-url https://192.168.1.100:9130/.well-known/openid-configuration` the openid connect configuration endpoint, typically the issuer host with `.well-known/openid-configuration`, but there are cases when another endpoint is used, eg. ping identity provides multiple endpoints to separate domains
 - `--oidc-client-id ocis` the client id we will register later with `ocis-idp` in the `identifier-registration.yaml`
-
-### Start ocis-idp
-
-#### Get it!
-
-In an `ocis` folder
-```
-$ git clone git@github.com:owncloud/ocis-idp.git
-$ cd ocis-idp
-$ make
-```
-This should give you a `bin/ocis-idp` binary. Try listing the help with `bin/ocis-idp --help`.
-
-#### Set environment variables
-
-Konnectd needs environment variables to configure the LDAP server:
-```console
-export LDAP_URI=ldap://192.168.1.100:9125
-export LDAP_BINDDN="cn=admin,dc=example,dc=com"
-export LDAP_BINDPW="its-a-secret"
-export LDAP_BASEDN="dc=example,dc=com"
-export LDAP_SCOPE=sub
-export LDAP_LOGIN_ATTRIBUTE=uid
-export LDAP_EMAIL_ATTRIBUTE=mail
-export LDAP_NAME_ATTRIBUTE=givenName
-export LDAP_UUID_ATTRIBUTE=uid
-export LDAP_UUID_ATTRIBUTE_TYPE=text
-export LDAP_FILTER="(objectClass=posixaccount)"
-```
-Don't forget to use an existing user and the correct password.
-
-### Configure clients
-
-Now we need to configure a client we can later use to configure the ownCloud 10 openidconnect app. In the `assets/identifier-registration.yaml` have:
-```yaml
----
-
-# OpenID Connect client registry.
-clients:
-  - id: ocis
-    name: ownCloud Infinite Scale
-    application_type: web
-    redirect_uris:
-      - https://cloud.example.com/apps/openidconnect/redirect
-      - http://localhost:9100/oidc-callback.html
-      - http://localhost:9100
-      - http://localhost:9100/
-```
-Replace `cloud.example.com` in the redirect URI with your ownCloud 10 host and port.
-Replace `localhost:9100` in the redirect URIs with your `ocis-web` host and port.
-
-#### Run it!
-
-You can now bring up `ocis-idp` with:
-```console
-$ bin/ocis-idp server --iss https://192.168.1.100:9130 --identifier-registration-conf assets/identifier-registration.yaml --signing-kid gen1-2020-02-27
-```
-
-`ocis-idp` needs to know
-- `--iss https://192.168.1.100:9130` the issuer, which must be a reachable https endpoint. For testing an ip works. HTTPS is NOT optional. This url is exposed in the `https://192.168.1.100:9130/.well-known/openid-configuration` endpoint and clients need to be able to connect to it
-- `--identifier-registration-conf assets/identifier-registration.yaml` the identifier-registration.yaml you created
-- `--signing-kid gen1-2020-02-27` a signature key id, otherwise the jwks key has no name, which might cause problems with clients. a random key is ok, but it should change when the actual signing key changes.
-
-
-#### Check it is up and running
-
-1. Try getting the configuration:
-```console
-$ curl https://192.168.1.100:9130/.well-known/openid-configuration
-```
-
-2. Check if the login works at https://192.168.1.100:9130/signin/v1/identifier
-
-> Note: If you later get a `Unable to find a key for (algorithm, kid):PS256, )` Error make sure you did set a `--signing-kid` when starting `ocis-idp` by checking it is present in https://192.168.1.100:9130/konnect/v1/jwks.json
 
 ### Patch owncloud
 
