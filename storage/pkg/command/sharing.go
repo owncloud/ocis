@@ -113,6 +113,7 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 		},
 		"shared": map[string]interface{}{
 			"jwt_secret": cfg.Reva.JWTSecret,
+			"gatewaysvc": cfg.Reva.Gateway.Endpoint,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.Sharing.GRPCNetwork,
@@ -125,7 +126,7 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 						"json": map[string]interface{}{
 							"file": cfg.Reva.Sharing.UserJSONFile,
 						},
-						"sql": map[string]interface{}{
+						"sql": map[string]interface{}{ // cernbox sql
 							"db_username":                   cfg.Reva.Sharing.UserSQLUsername,
 							"db_password":                   cfg.Reva.Sharing.UserSQLPassword,
 							"db_host":                       cfg.Reva.Sharing.UserSQLHost,
@@ -134,6 +135,15 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 							"password_hash_cost":            cfg.Reva.Sharing.PublicPasswordHashCost,
 							"enable_expired_shares_cleanup": cfg.Reva.Sharing.PublicEnableExpiredSharesCleanup,
 							"janitor_run_interval":          cfg.Reva.Sharing.PublicJanitorRunInterval,
+						},
+						"oc10-sql": map[string]interface{}{
+							"gateway_addr":     cfg.Reva.Gateway.Endpoint,
+							"storage_mount_id": cfg.Reva.Sharing.UserStorageMountID,
+							"db_username":      cfg.Reva.Sharing.UserSQLUsername,
+							"db_password":      cfg.Reva.Sharing.UserSQLPassword,
+							"db_host":          cfg.Reva.Sharing.UserSQLHost,
+							"db_port":          cfg.Reva.Sharing.UserSQLPort,
+							"db_name":          cfg.Reva.Sharing.UserSQLName,
 						},
 					},
 				},
@@ -144,6 +154,18 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 							"file": cfg.Reva.Sharing.PublicJSONFile,
 						},
 						"sql": map[string]interface{}{
+							"db_username":                   cfg.Reva.Sharing.UserSQLUsername,
+							"db_password":                   cfg.Reva.Sharing.UserSQLPassword,
+							"db_host":                       cfg.Reva.Sharing.UserSQLHost,
+							"db_port":                       cfg.Reva.Sharing.UserSQLPort,
+							"db_name":                       cfg.Reva.Sharing.UserSQLName,
+							"password_hash_cost":            cfg.Reva.Sharing.PublicPasswordHashCost,
+							"enable_expired_shares_cleanup": cfg.Reva.Sharing.PublicEnableExpiredSharesCleanup,
+							"janitor_run_interval":          cfg.Reva.Sharing.PublicJanitorRunInterval,
+						},
+						"oc10-sql": map[string]interface{}{
+							"gateway_addr":                  cfg.Reva.Gateway.Endpoint,
+							"storage_mount_id":              cfg.Reva.Sharing.UserStorageMountID,
 							"db_username":                   cfg.Reva.Sharing.UserSQLUsername,
 							"db_password":                   cfg.Reva.Sharing.UserSQLPassword,
 							"db_host":                       cfg.Reva.Sharing.UserSQLHost,
