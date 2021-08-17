@@ -1,9 +1,9 @@
 version: 2
 updates:
   - package-ecosystem: "gomod"
-    directory: "/ocis"
+    directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     open-pull-requests-limit: 2
 
   - package-ecosystem: "npm"
