@@ -35,10 +35,10 @@ func AccessLog(logger log.Logger) func(http.Handler) http.Handler {
 // ExtractRequestID extracts the request ID from the context. Since we now use the go-chi middleware to write the request
 // id, this is propagated using the context, therefore read it from there.
 func ExtractRequestID(ctx context.Context) string {
-	var requestId string
+	var rid string
 	if v, ok := ctx.Value(chimiddleware.RequestIDKey).(string); ok {
-		requestId = v
+		rid = v
 	}
 
-	return requestId
+	return rid
 }
