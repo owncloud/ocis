@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-08-18T11:10:13+0000"
+date: "2021-08-18T14:13:59+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -34,6 +34,42 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### settings health
+
+Check health status
+
+Usage: `settings health [command options] [arguments...]`
+
+
+
+
+
+-debug-addr |  $SETTINGS_DEBUG_ADDR
+: Address to debug endpoint. Default: `"0.0.0.0:9194"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### settings ocis-settings
 
@@ -92,19 +128,19 @@ Usage: `settings server [command options] [arguments...]`
 : Path to config file.
 
 
--tracing-enabled |  $SETTINGS_TRACING_ENABLED
+-tracing-enabled |  $SETTINGS_TRACING_ENABLED , $OCIS_TRACING_ENABLED
 : Enable sending traces.
 
 
--tracing-type |  $SETTINGS_TRACING_TYPE
+-tracing-type |  $SETTINGS_TRACING_TYPE , $OCIS_TRACING_TYPE
 : Tracing backend type. Default: `"jaeger"`.
 
 
--tracing-endpoint |  $SETTINGS_TRACING_ENDPOINT
+-tracing-endpoint |  $SETTINGS_TRACING_ENDPOINT , $OCIS_TRACING_ENDPOINT
 : Endpoint for the agent. Default: `""`.
 
 
--tracing-collector |  $SETTINGS_TRACING_COLLECTOR
+-tracing-collector |  $SETTINGS_TRACING_COLLECTOR , $OCIS_TRACING_COLLECTOR
 : Endpoint for the collector. Default: `""`.
 
 
@@ -211,40 +247,4 @@ Usage: `settings version [command options] [arguments...]`
 
 -name |  $SETTINGS_NAME
 : service name. Default: `"settings"`.
-
-### settings health
-
-Check health status
-
-Usage: `settings health [command options] [arguments...]`
-
-
-
-
-
--debug-addr |  $SETTINGS_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9194"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

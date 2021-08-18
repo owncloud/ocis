@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-08-18T11:10:13+0000"
+date: "2021-08-18T14:14:00+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/store/templates
@@ -120,19 +120,19 @@ Usage: `store server [command options] [arguments...]`
 : Enable log to file.
 
 
--tracing-enabled |  $STORE_TRACING_ENABLED
+-tracing-enabled |  $STORE_TRACING_ENABLED , $OCIS_TRACING_ENABLED
 : Enable sending traces.
 
 
--tracing-type |  $STORE_TRACING_TYPE
+-tracing-type |  $STORE_TRACING_TYPE , $OCIS_TRACING_TYPE
 : Tracing backend type. Default: `"jaeger"`.
 
 
--tracing-endpoint |  $STORE_TRACING_ENDPOINT
+-tracing-endpoint |  $STORE_TRACING_ENDPOINT , $OCIS_TRACING_ENDPOINT
 : Endpoint for the agent. Default: `""`.
 
 
--tracing-collector |  $STORE_TRACING_COLLECTOR
+-tracing-collector |  $STORE_TRACING_COLLECTOR , $OCIS_TRACING_COLLECTOR
 : Endpoint for the collector. Default: `""`.
 
 

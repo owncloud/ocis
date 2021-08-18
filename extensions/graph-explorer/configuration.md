@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-08-18T11:10:13+0000"
+date: "2021-08-18T14:13:59+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/graph-explorer/templates
@@ -118,19 +118,19 @@ Usage: `graph-explorer server [command options] [arguments...]`
 : Enable log to file.
 
 
--tracing-enabled |  $GRAPH_EXPLORER_TRACING_ENABLED
+-tracing-enabled |  $GRAPH_EXPLORER_TRACING_ENABLED , $OCIS_TRACING_ENABLED
 : Enable sending traces.
 
 
--tracing-type |  $GRAPH_EXPLORER_TRACING_TYPE
+-tracing-type |  $GRAPH_EXPLORER_TRACING_TYPE , $OCIS_TRACING_TYPE
 : Tracing backend type. Default: `"jaeger"`.
 
 
--tracing-endpoint |  $GRAPH_EXPLORER_TRACING_ENDPOINT
+-tracing-endpoint |  $GRAPH_EXPLORER_TRACING_ENDPOINT , $OCIS_TRACING_ENDPOINT
 : Endpoint for the agent. Default: `""`.
 
 
--tracing-collector |  $GRAPH_EXPLORER_TRACING_COLLECTOR
+-tracing-collector |  $GRAPH_EXPLORER_TRACING_COLLECTOR , $OCIS_TRACING_COLLECTOR
 : Endpoint for the collector. Default: `""`.
 
 

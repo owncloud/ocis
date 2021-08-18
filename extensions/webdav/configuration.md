@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-08-18T11:10:14+0000"
+date: "2021-08-18T14:14:01+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/webdav/templates
@@ -67,6 +67,39 @@ Usage: `webdav [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
+### webdav health
+
+Check health status
+
+Usage: `webdav health [command options] [arguments...]`
+
+
+-debug-addr |  $WEBDAV_DEBUG_ADDR
+: Address to debug endpoint. Default: `"0.0.0.0:9119"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### webdav server
 
 Start integrated server
@@ -95,19 +128,19 @@ Usage: `webdav server [command options] [arguments...]`
 : Path to config file.
 
 
--tracing-enabled |  $WEBDAV_TRACING_ENABLED
+-tracing-enabled |  $WEBDAV_TRACING_ENABLED , $OCIS_TRACING_ENABLED
 : Enable sending traces.
 
 
--tracing-type |  $WEBDAV_TRACING_TYPE
+-tracing-type |  $WEBDAV_TRACING_TYPE , $OCIS_TRACING_TYPE
 : Tracing backend type. Default: `"jaeger"`.
 
 
--tracing-endpoint |  $WEBDAV_TRACING_ENDPOINT
+-tracing-endpoint |  $WEBDAV_TRACING_ENDPOINT , $OCIS_TRACING_ENDPOINT
 : Endpoint for the agent. Default: `""`.
 
 
--tracing-collector |  $WEBDAV_TRACING_COLLECTOR
+-tracing-collector |  $WEBDAV_TRACING_COLLECTOR , $OCIS_TRACING_COLLECTOR
 : Endpoint for the collector. Default: `""`.
 
 
@@ -195,37 +228,4 @@ Usage: `webdav version [command options] [arguments...]`
 
 -service-name |  $WEBDAV_SERVICE_NAME
 : Service name. Default: `"webdav"`.
-
-### webdav health
-
-Check health status
-
-Usage: `webdav health [command options] [arguments...]`
-
-
--debug-addr |  $WEBDAV_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9119"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
