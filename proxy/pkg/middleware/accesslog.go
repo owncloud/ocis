@@ -1,10 +1,12 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/middleware"
+	chimiddleware "github.com/go-chi/chi/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
@@ -18,7 +20,7 @@ func AccessLog(logger log.Logger) func(http.Handler) http.Handler {
 
 			logger.Info().
 				Str("proto", r.Proto).
-				Str("request", r.Header.Get("X-Request-ID")).
+				Str("request", ExtractRequestID(r.Context())).
 				Str("remote-addr", r.RemoteAddr).
 				Str("method", r.Method).
 				Int("status", wrap.Status()).
@@ -28,4 +30,15 @@ func AccessLog(logger log.Logger) func(http.Handler) http.Handler {
 				Msg("access-log")
 		})
 	}
+}
+
+// ExtractRequestID extracts the request ID from the context. Since we now use the go-chi middleware to write the request
+// id, this is propagated using the context, therefore read it from there.
+func ExtractRequestID(ctx context.Context) string {
+	var requestId string
+	if v, ok := ctx.Value(chimiddleware.RequestIDKey).(string); ok {
+		requestId = v
+	}
+
+	return requestId
 }
