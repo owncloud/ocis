@@ -20,7 +20,7 @@ func AccessLog(logger log.Logger) func(http.Handler) http.Handler {
 
 			logger.Info().
 				Str("proto", r.Proto).
-				Str("request", ExtractRequestID(r.Context())).
+				Str("request", chimiddleware.GetReqID(r.Context())).
 				Str("remote-addr", r.RemoteAddr).
 				Str("method", r.Method).
 				Int("status", wrap.Status()).
