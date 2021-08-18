@@ -50,7 +50,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
-			tracing.Configure(cfg, logger)
+			tracing.Configure(cfg)
 
 			var (
 				gr          = run.Group{}

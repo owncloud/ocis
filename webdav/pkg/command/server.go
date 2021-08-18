@@ -36,7 +36,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
-			if err := tracing.Configure(cfg, logger); err != nil {
+			if err := tracing.Configure(cfg); err != nil {
 				return err
 			}
 

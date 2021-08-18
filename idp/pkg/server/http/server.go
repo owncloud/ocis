@@ -60,6 +60,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Middleware(
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,
+			middleware.TraceContext,
 			middleware.NoCache,
 			middleware.Cors,
 			middleware.Secure,
@@ -74,7 +75,6 @@ func Server(opts ...Option) (http.Service, error) {
 	)
 
 	{
-		handle = svc.NewTracing(handle)
 		handle = svc.NewInstrument(handle, options.Metrics)
 		handle = svc.NewLogging(handle, options.Logger)
 	}

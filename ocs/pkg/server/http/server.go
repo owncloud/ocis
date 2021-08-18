@@ -5,6 +5,7 @@ import (
 	chimiddleware "github.com/go-chi/chi/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
+	ocsmw "github.com/owncloud/ocis/ocs/pkg/middleware"
 	svc "github.com/owncloud/ocis/ocs/pkg/service/v0"
 )
 
@@ -31,13 +32,9 @@ func Server(opts ...Option) (http.Service, error) {
 			middleware.NoCache,
 			middleware.Cors,
 			middleware.Secure,
-			middleware.Version(
-				options.Config.Service.Name,
-				options.Config.Service.Version,
-			),
-			middleware.Logger(
-				options.Logger,
-			),
+			middleware.Version(options.Config.Service.Name, options.Config.Service.Version),
+			middleware.Logger(options.Logger),
+			ocsmw.LogTrace,
 		),
 	)
 

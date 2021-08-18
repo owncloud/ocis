@@ -31,6 +31,7 @@ func Server(opts ...Option) http.Service {
 
 	mux.Use(chimiddleware.RealIP)
 	mux.Use(chimiddleware.RequestID)
+	mux.Use(middleware.TraceContext)
 	mux.Use(middleware.NoCache)
 	mux.Use(middleware.Cors)
 	mux.Use(middleware.Secure)

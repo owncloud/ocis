@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/middleware"
+	chimiddleware "github.com/go-chi/chi/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
@@ -18,7 +19,7 @@ func AccessLog(logger log.Logger) func(http.Handler) http.Handler {
 
 			logger.Info().
 				Str("proto", r.Proto).
-				Str("request", r.Header.Get("X-Request-ID")).
+				Str("request", chimiddleware.GetReqID(r.Context())).
 				Str("remote-addr", r.RemoteAddr).
 				Str("method", r.Method).
 				Int("status", wrap.Status()).

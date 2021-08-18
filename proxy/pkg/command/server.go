@@ -16,6 +16,7 @@ import (
 	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	pkgmiddleware "github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/proxy/pkg/config"
@@ -59,7 +60,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
-			if err := tracing.Configure(cfg, logger); err != nil {
+			if err := tracing.Configure(cfg); err != nil {
 				return err
 			}
 
@@ -178,6 +179,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 
 	return alice.New(
 		// first make sure we log all requests and redirect to https if necessary
+		pkgmiddleware.TraceContext,
 		chimiddleware.RealIP,
 		chimiddleware.RequestID,
 		middleware.AccessLog(l),

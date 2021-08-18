@@ -12,10 +12,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/owncloud/ocis/ocis-pkg/sync"
-	"golang.org/x/crypto/bcrypt"
+	"go.opentelemetry.io/otel/trace"
 
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"go.opentelemetry.io/otel/attribute"
 
 	merrors "github.com/asim/go-micro/v3/errors"
 	"github.com/asim/go-micro/v3/metadata"
@@ -24,11 +23,15 @@ import (
 	fieldmask_utils "github.com/mennanov/fieldmask-utils"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
+	accTracing "github.com/owncloud/ocis/accounts/pkg/tracing"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	settings_svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"github.com/rs/zerolog"
+	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/genproto/protobuf/field_mask"
 	p "google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -124,6 +127,15 @@ func (s Service) getInMemoryServiceUser() proto.Account {
 // ListAccounts implements the AccountsServiceHandler interface
 // the query contains account properties
 func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest, out *proto.ListAccountsResponse) (err error) {
+	var span trace.Span
+	ctx, span = accTracing.TraceProvider.Tracer("accounts").Start(ctx, "Accounts.ListAccounts")
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.KeyValue{Key: "page_size", Value: attribute.Int64Value(int64(in.PageSize))},
+		attribute.KeyValue{Key: "page_token", Value: attribute.StringValue(in.PageToken)},
+	)
+
 	hasSelf := s.hasSelfManagementPermissions(ctx)
 	hasManagement := s.hasAccountManagementPermissions(ctx)
 	if !hasSelf && !hasManagement {
@@ -269,6 +281,15 @@ func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]strin
 
 // GetAccount implements the AccountsServiceHandler interface
 func (s Service) GetAccount(ctx context.Context, in *proto.GetAccountRequest, out *proto.Account) (err error) {
+	var span trace.Span
+
+	ctx, span = accTracing.TraceProvider.Tracer("accounts").Start(ctx, "Accounts.GetAccount")
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.KeyValue{Key: "account_id", Value: attribute.StringValue(in.Id)},
+	)
+
 	hasSelf := s.hasSelfManagementPermissions(ctx)
 	hasManagement := s.hasAccountManagementPermissions(ctx)
 	if !hasSelf && !hasManagement {
@@ -317,6 +338,15 @@ func (s Service) GetAccount(ctx context.Context, in *proto.GetAccountRequest, ou
 
 // CreateAccount implements the AccountsServiceHandler interface
 func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountRequest, out *proto.Account) (err error) {
+	var span trace.Span
+
+	ctx, span = accTracing.TraceProvider.Tracer("accounts").Start(ctx, "Accounts.CreateAccount")
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.KeyValue{Key: "account", Value: attribute.StringValue(in.Account.String())},
+	)
+
 	if !s.hasAccountManagementPermissions(ctx) {
 		return merrors.Forbidden(s.id, "no permission for CreateAccount")
 	}
@@ -449,6 +479,15 @@ func (s Service) rollbackCreateAccount(ctx context.Context, acc *proto.Account) 
 // read only fields are ignored
 // TODO how can we unset specific values? using the update mask
 func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountRequest, out *proto.Account) (err error) {
+	var span trace.Span
+
+	ctx, span = accTracing.TraceProvider.Tracer("accounts").Start(ctx, "Accounts.UpdateAccount")
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.KeyValue{Key: "account", Value: attribute.StringValue(in.Account.String())},
+	)
+
 	hasSelf := s.hasSelfManagementPermissions(ctx)
 	hasManagement := s.hasAccountManagementPermissions(ctx)
 	if !hasSelf && !hasManagement {
@@ -615,6 +654,11 @@ var updatableAccountPaths = map[string]struct{}{
 
 // DeleteAccount implements the AccountsServiceHandler interface
 func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountRequest, out *empty.Empty) (err error) {
+	var span trace.Span
+
+	ctx, span = accTracing.TraceProvider.Tracer("accounts").Start(ctx, "Accounts.DeleteAccount")
+	defer span.End()
+
 	if !s.hasAccountManagementPermissions(ctx) {
 		return merrors.Forbidden(s.id, "no permission for DeleteAccount")
 	}

@@ -3,9 +3,6 @@ module github.com/owncloud/ocis
 go 1.16
 
 require (
-	contrib.go.opencensus.io/exporter/jaeger v0.2.1
-	contrib.go.opencensus.io/exporter/ocagent v0.7.0
-	contrib.go.opencensus.io/exporter/zipkin v0.1.2
 	github.com/CiscoM31/godata v1.0.4
 	github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e
 	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210408173139-0d57213d3f5c
@@ -49,7 +46,6 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.15.0
-	github.com/openzipkin/zipkin-go v0.2.5
 	github.com/owncloud/open-graph-api-go v0.0.0-20210511151655-57894f7d46fb
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
@@ -62,6 +58,11 @@ require (
 	github.com/yaegashi/msgraph.go v0.1.4
 	go.etcd.io/etcd/pkg/v3 v3.5.0-pre // indirect
 	go.opencensus.io v0.23.0
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.22.0
+	go.opentelemetry.io/otel v1.0.0-RC2
+	go.opentelemetry.io/otel/exporters/jaeger v1.0.0-RC2
+	go.opentelemetry.io/otel/sdk v1.0.0-RC2
+	go.opentelemetry.io/otel/trace v1.0.0-RC2
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
 	golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e

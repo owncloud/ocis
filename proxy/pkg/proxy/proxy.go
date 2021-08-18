@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -10,21 +11,25 @@ import (
 	"strings"
 	"time"
 
-	"github.com/owncloud/ocis/proxy/pkg/proxy/policy"
-	"go.opencensus.io/plugin/ochttp/propagation/tracecontext"
-	"go.opencensus.io/trace"
+	chimiddleware "github.com/go-chi/chi/middleware"
+
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	pkgtrace "github.com/owncloud/ocis/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/proxy/pkg/config"
+	"github.com/owncloud/ocis/proxy/pkg/proxy/policy"
+	proxytracing "github.com/owncloud/ocis/proxy/pkg/tracing"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/trace"
 )
 
-// MultiHostReverseProxy extends httputil to support multiple hosts with diffent policies
+// MultiHostReverseProxy extends "httputil" to support multiple hosts with different policies
 type MultiHostReverseProxy struct {
 	httputil.ReverseProxy
 	Directors      map[string]map[config.RouteType]map[string]func(req *http.Request)
 	PolicySelector policy.Selector
 	logger         log.Logger
-	propagator     tracecontext.HTTPFormat
 	config         *config.Config
 }
 
@@ -214,17 +219,23 @@ func (p *MultiHostReverseProxy) AddHost(policy string, target *url.URL, rt confi
 }
 
 func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	var span *trace.Span
+	var (
+		ctx  = r.Context()
+		span trace.Span
+	)
 
-	// Start root span.
-	if p.config.Tracing.Enabled {
-		ctx, span = trace.StartSpan(ctx, r.URL.String())
-		defer span.End()
-		p.propagator.SpanContextToRequest(span.SpanContext(), r)
-	}
+	tracer := proxytracing.TraceProvider.Tracer("proxy")
+	ctx, span = tracer.Start(ctx, fmt.Sprintf("%s %v", r.Method, r.URL.Path))
+	defer span.End()
 
-	// Call upstream ServeHTTP
+	span.SetAttributes(
+		attribute.KeyValue{
+			Key:   "x-request-id",
+			Value: attribute.StringValue(chimiddleware.GetReqID(r.Context())),
+		})
+
+	pkgtrace.Propagator.Inject(ctx, propagation.HeaderCarrier(r.Header))
+
 	p.ReverseProxy.ServeHTTP(w, r.WithContext(ctx))
 }
 
