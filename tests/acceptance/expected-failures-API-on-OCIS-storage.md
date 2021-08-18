@@ -1375,8 +1375,6 @@ Scenario Outline: Unauthenticated call
 -   [apiAuth/cors.feature:184](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L184)
 -   [apiAuth/cors.feature:185](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L185)
 
-#### [No way to enforce token auth](https://github.com/owncloud/ocis/issues/1332)
--   [apiAuthOcs/ocsGETAuth.feature:243](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L243)
 
 #### [App Passwords/Tokens for legacy WebDAV clients](https://github.com/owncloud/ocis/issues/197)
 -   [apiAuthWebDav/webDavDELETEAuth.feature:80](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavDELETEAuth.feature#L80)
