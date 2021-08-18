@@ -7,7 +7,7 @@ geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0011-global-url-format.md
 ---
 
-* Status: proposed
+* Status: accepted
 * Deciders: @refs, @butonic, @micbar, @dragotin, @hodyroff, @pmaier1, @fschade, @tbsbdr, @kulmann
 * Date: 2021-07-07
 
