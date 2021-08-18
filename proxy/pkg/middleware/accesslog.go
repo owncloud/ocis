@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"net/http"
 	"time"
 
@@ -30,15 +29,4 @@ func AccessLog(logger log.Logger) func(http.Handler) http.Handler {
 				Msg("access-log")
 		})
 	}
-}
-
-// ExtractRequestID extracts the request ID from the context. Since we now use the go-chi middleware to write the request
-// id, this is propagated using the context, therefore read it from there.
-func ExtractRequestID(ctx context.Context) string {
-	var rid string
-	if v, ok := ctx.Value(chimiddleware.RequestIDKey).(string); ok {
-		rid = v
-	}
-
-	return rid
 }

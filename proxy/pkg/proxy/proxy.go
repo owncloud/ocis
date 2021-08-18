@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/owncloud/ocis/proxy/pkg/middleware"
+	chimiddleware "github.com/go-chi/chi/middleware"
 
 	"go.opentelemetry.io/otel/attribute"
 
@@ -231,7 +231,7 @@ func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request
 	span.SetAttributes(
 		attribute.KeyValue{
 			Key:   "x-request-id",
-			Value: attribute.StringValue(middleware.ExtractRequestID(r.Context())),
+			Value: attribute.StringValue(chimiddleware.GetReqID(r.Context())),
 		})
 
 	pkgtrace.Propagator.Inject(ctx, propagation.HeaderCarrier(r.Header))
