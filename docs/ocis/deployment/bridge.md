@@ -74,21 +74,35 @@ This should give you an `ocis/bin/ocis` binary. Try listing the help with `ocis/
 You can check out a custom branch and build a custom binary which can then be used for the below steps.
 {{< /hint >}}
 
-### Start ocis-glauth
+### Start ocis glauth
 
 We are going to use the built binary and ownCloud 10 graphapi app to turn ownCloud 10 into the datastore for an LDAP proxy.
 
-#### Run it!
+#### configure it
 
-You need to point `ocis/bin/ocis glauth` to your owncloud domain:
-```console
-$ ocis/bin/ocis --ocis-log-level debug glauth --backend-datastore owncloud --backend-server https://cloud.ocis.test/apps/graphapi/v1.0 --backend-basedn dc=ocis,dc=test
+While ocis can be configured using environment variables, eg. for a docker compose setup we are going to use a more traditional config file here.
+Create a config file for ocis in either `/etc/ocis`, `$HOME/.ocis` or `./.config`. You can use `.json`, `.yaml` or `.toml`. I will use toml here, because ... reasons.
+
+```toml
+[glauth.backend]
+datastore = "owncloud"                                   # switch to the owncloud datastore
+servers = ["https://cloud.ocis.test/apps/graphapi/v1.0"] # the graph api endpoint to connect to
+basedn = "dc=ocis,dc=test"                               # base dn to construct the LDAP dn. The user `admin` will become `cn=admin,dc=ocis,dc=test`
 ```
 
-`--ocis-log-level debug` is only used to generate more verbose output
-`--backend-datastore owncloud` switches to the owncloud datastore
-`--backend-server https://cloud.ocis.test/apps/graphapi/v1.0` is the URL to a graphapi endpoint of an existing ownCloud 10 instance
-`--backend-basedn dc=ocis,dc=test` is used to construct the LDAP dn. The user `admin` will become `cn=admin,dc=ocis,dc=test`.
+{{< hint >}}
+There is a bug in the config merging for environment variables, cli flags and config files causing log settings not to be picked up from the config file when specifying `--extensions`. That is why I will
+* configure most of the config in a file, 
+* adjust logging using `OCIS_LOG_*` environment variables and
+* specify which extension to run using `ocis/bin/ocis server --extensions "comma, separated, list, of, extensions"`. 
+{{< /hint >}}
+
+#### Run it!
+
+For now, we only start the glauth extension:
+```console
+$ OCIS_LOG_PRETTY=true OCIS_LOG_COLOR=true ocis/bin/ocis server --extensions "glauth"
+```
 
 #### Check it is up and running
 
@@ -106,11 +120,78 @@ $ ldapsearch -x -H ldap://127.0.0.1:9125 -b dc=ocis,dc=test -D "cn=admin,dc=ocis
 This is currently a readonly implementation and minimal to the usecase of authenticating users with an IDP.
 {{< /hint >}}
 
+### Start ocis storage-gateway, storage-authbasic and storage-userprovider
+
+We are going to set up reva to authenticate users against our glauth LDAP proxy. This allows us to log in and use the reva cli. The ocis storage-gateway starts the reva gateway which will authenticate basic auth requests using the storage-authbasic service. Furthermore, users have to be available in the storage-userprovider to retrieve displayname, email address and other user metadata.
+
+To configure LDAP to use our glauth we add this section to the config file:
+
+```toml
+[storage.reva.ldap]
+idp = "https://ocis.ocis.test"
+basedn = "dc=ocis,dc=test" 
+binddn = "cn=admin,dc=ocis,dc=test" # an admin user in your oc10
+bindpassword = "secret"
+userschema = { uid = "uid", displayname = "givenname" } # TODO make glauth return an ownclouduuid and displayname attribute
+```
+
+Now we can start all necessary services.
+
+```console
+$ OCIS_LOG_PRETTY=true OCIS_LOG_COLOR=true ocis/bin/ocis server --extensions "glauth, storage-gateway, storage-authbasic, storage-userprovider"
+```
+
+
+{{< hint warning >}}
+Here I ran out of time. I tried to verify this step with the reva cli:
+`cmd/reva/reva -insecure -host localhost:9142`
+`login basic`
+but it tries to create the user home, which cannot be disabled in a config file: https://github.com/owncloud/ocis/issues/2416#issuecomment-901197053
+
+starting `STORAGE_GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN=true OCIS_LOG_LEVEL=debug OCIS_LOG_PRETTY=true OCIS_LOG_COLOR=true ocis/bin/ocis server --extensions "storage-gateway, storage-authbasic, storage-userprovider"` let me login:
+
+```console
+✗ cmd/reva/reva -insecure -host localhost:9142
+reva-cli v1.11.0-27-g95b1f2ee (rev-95b1f2ee)
+Please use `exit` or `Ctrl-D` to exit this program.
+>> login basic
+username: jfd
+password: OK
+>> whoami
+id:<idp:"https://ocis.ocis.test" opaque_id:"jfd" type:USER_TYPE_PRIMARY > username:"jfd" mail:"jfd@butonic.de" display_name:"J\303\266rn" uid_number:99 gid_number:99 
+>> exit
+```
+
+I hope https://github.com/owncloud/ocis/pull/2024 fixes the parsing order of things.
+
+everything below this is outdated
+
+... gotta run
+{{< /hint >}}
+
+
+### Start ocis storage-userprovider
+
+```console
+ocis/bin/ocis storage-userprovider --ldap-port 19126 --ldap-user-schema-uid uid --ldap-user-schema-displayName givenName --addr :19144
+```
+
+TODO clone `git clone git@github.com:cs3org/cs3apis.git`
+
+query users using [grpcurl](https://github.com/fullstorydev/grpcurl)
+```console
+grpcurl -import-path ./cs3apis/ -proto ./cs3apis/cs3/identity/user/v1beta1/user_api.proto -plaintext localhost:19144 cs3.identity.user.v1beta1.UserAPI/FindUsers
+ERROR:
+  Code: Unauthenticated
+  Message: auth: core access token not found
+```
+
+
 ### Start ocis idp
 
 #### Set environment variables
 
-The build in [libregraph/lico](https://github.com/libregraph/lico) needs environment variables to configure the LDAP server:
+The built in [libregraph/lico](https://github.com/libregraph/lico) needs environment variables to configure the LDAP server:
 ```console
 export OCIS_URL=https://ocis.ocis.test
 export IDP_LDAP_URI=ldap://127.0.0.1:9125

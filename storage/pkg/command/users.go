@@ -52,6 +52,10 @@ func Users(cfg *config.Config) *cli.Command {
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
 			rcfg := usersConfigFromStruct(c, cfg)
+			logger.Debug().
+				Str("server", "users").
+				Interface("reva-config", rcfg).
+				Msg("config")
 
 			gr.Add(func() error {
 				runtime.RunWithOptions(

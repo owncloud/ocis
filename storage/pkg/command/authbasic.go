@@ -49,6 +49,10 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
 			rcfg := authBasicConfigFromStruct(c, cfg)
+			logger.Debug().
+				Str("server", "authbasic").
+				Interface("reva-config", rcfg).
+				Msg("config")
 
 			gr.Add(func() error {
 				runtime.RunWithOptions(rcfg, pidFile, runtime.WithLogger(&logger.Logger))

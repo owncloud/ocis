@@ -25,7 +25,7 @@ func LDAPWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldap-base-dn",
-			Value:       flags.OverrideDefaultString(cfg.Reva.LDAP.BaseDN, "dc=example,dc=org"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.LDAP.BaseDN, "dc=ocis,dc=test"),
 			Usage:       "LDAP basedn",
 			EnvVars:     []string{"STORAGE_LDAP_BASE_DN"},
 			Destination: &cfg.Reva.LDAP.BaseDN,
@@ -105,7 +105,7 @@ func LDAPWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldap-bind-dn",
-			Value:       flags.OverrideDefaultString(cfg.Reva.LDAP.BindDN, "cn=reva,ou=sysusers,dc=example,dc=org"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.LDAP.BindDN, "cn=reva,ou=sysusers,dc=ocis,dc=test"),
 			Usage:       "LDAP bind dn",
 			EnvVars:     []string{"STORAGE_LDAP_BIND_DN"},
 			Destination: &cfg.Reva.LDAP.BindDN,
