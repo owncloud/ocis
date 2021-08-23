@@ -7,6 +7,25 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.11.0 Technology Preview
+
+Version 1.11.0 brings new features, usability improvements and bug fixes. ownCloud Web 4.1.0 now supports drag & drop and allows users to do actions (e.g., sharing) for the folder they are currently in.
+
+The most prominent changes in ownCloud Infinite Scale 1.11.0 and ownCloud Web 4.1.0 comprise:
+
+- ownCloud Web now supports drag & drop to move files/folders. [#5592](https://github.com/owncloud/web/issues/5592)
+- The right sidebar in ownCloud Web can now be collapsed and expanded. This change also allows to open the sidebar without selecting a file/folder which will select the current folder and enable the user to do actions (e.g., sharing) for it. [#5165](https://github.com/owncloud/web/issues/5165)
+- The right sidebar in ownCloud Web now presents details for multiple selected files/folders. [#5164](https://github.com/owncloud/web/issues/5164)
+- The owncloud/ocis Docker image now uses a non-root user for improved security. This is a breaking change for existing Docker deployments. The permission on the files and folders in persistent volumes need to be changed to the UID and GID used for oCIS (default 1000:1000 if not changed by the user). [#2380](https://github.com/owncloud/ocis/pull/2380)
+- The Infinite Scale backend has been further hardened by fixing known issues, improving error handling and stabilizing existing features.
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.11.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v4.1.0) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.10.0 Technology Preview
 
 Version 1.10.0 brings new features, usability improvements and bug fixes. ownCloud Web 4.0.0 now supports ONLYOFFICE document editors and can search/filter files and folders. Furthermore it brings a new context menu for file actions that can be accessed via right click and comes with a big bunch of other notable improvements and fixes.
