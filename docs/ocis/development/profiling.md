@@ -106,7 +106,7 @@ $ go get -u github.com/google/pprof
 Collect 30 seconds of samples:
 
 ```console
-$ prof -web http://:1234/debug/pprof/profile\?seconds\=30
+$ pprof -web http://:1234/debug/pprof/profile\?seconds\=30
 ```
 
 Once the collection is done a browser tab will open with the result `svg`, looking similar to this:
