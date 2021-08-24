@@ -17,7 +17,10 @@ The most prominent changes in ownCloud Infinite Scale 1.11.0 and ownCloud Web 4.
 - The right sidebar in ownCloud Web can now be collapsed and expanded. This change also allows to open the sidebar without selecting a file/folder which will select the current folder and enable the user to do actions (e.g., sharing) for it. [#5165](https://github.com/owncloud/web/issues/5165)
 - The right sidebar in ownCloud Web now presents details for multiple selected files/folders. [#5164](https://github.com/owncloud/web/issues/5164)
 - The owncloud/ocis Docker image now uses a non-root user for improved security. This is a breaking change for existing Docker deployments. The permission on the files and folders in persistent volumes need to be changed to the UID and GID used for oCIS (default 1000:1000 if not changed by the user). [#2380](https://github.com/owncloud/ocis/pull/2380)
+- Infinite Scale now supports request tracing through the whole stack to facilitate debugging. [#1984](https://github.com/cs3org/reva/pull/1984)
+- Infinite Scale now provides a WebDAV endpoint for the new Spaces feature [#1803](https://github.com/cs3org/reva/pull/1803)
 - The Infinite Scale backend has been further hardened by fixing known issues, improving error handling and stabilizing existing features.
+- All test scenarios for file-related operations now pass in Infinite Scale (e.g., file operations, trash bin).
 
 You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.11.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v4.1.0) for further details on what has changed.
 
