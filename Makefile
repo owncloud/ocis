@@ -24,7 +24,6 @@ OCIS_MODULES = \
 	ocis \
 	ocis-pkg \
 	ocs \
-	onlyoffice \
 	proxy \
 	settings \
 	storage \

@@ -88,10 +88,6 @@
         {
           "endpoint": "/settings.js",
           "backend": "http://localhost:9190"
-        },
-        {
-          "endpoint": "/onlyoffice.js",
-          "backend": "http://localhost:9220"
         }
       ]
     }
