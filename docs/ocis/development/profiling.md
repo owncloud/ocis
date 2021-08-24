@@ -55,7 +55,7 @@ The previous patch will:
 
 With everything running one should have access to http://localhost:1234/debug/pprof/
 
-## 3. Replace ocis go.mod to local reva and build a new binary
+## 3. Replace reva in oCIS go.mod with local version and build a new binary
 
 ```diff
 diff --git a/go.mod b/go.mod
