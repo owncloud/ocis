@@ -2,7 +2,7 @@ package http
 
 import (
 	"github.com/asim/go-micro/v3"
-	chimiddleware "github.com/go-chi/chi/middleware"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	graphMiddleware "github.com/owncloud/ocis/graph/pkg/middleware"
 	svc "github.com/owncloud/ocis/graph/pkg/service/v0"
 	"github.com/owncloud/ocis/graph/pkg/version"
