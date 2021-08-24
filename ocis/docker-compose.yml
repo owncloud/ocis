@@ -33,7 +33,6 @@ services:
       - ../thumbnails:/thumbnails
       - ../webdav:/webdav
       - ../storage:/storage
-      - ../onlyoffice:/onlyoffice
     environment:
       # ocis log level will be used for all services
       OCIS_LOG_LEVEL: debug

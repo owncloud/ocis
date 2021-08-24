@@ -90,10 +90,6 @@
           "backend": "http://localhost:9190"
         },
         {
-          "endpoint": "/onlyoffice.js",
-          "backend": "http://localhost:9220"
-        },
-        {
           "endpoint": "/api/v0/greet",
           "backend": "http://ocis-hello:9105"
         },

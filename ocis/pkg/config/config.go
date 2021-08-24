@@ -8,7 +8,6 @@ import (
 	idp "github.com/owncloud/ocis/idp/pkg/config"
 	pman "github.com/owncloud/ocis/ocis/pkg/runtime/config"
 	ocs "github.com/owncloud/ocis/ocs/pkg/config"
-	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/config"
 	proxy "github.com/owncloud/ocis/proxy/pkg/config"
 	settings "github.com/owncloud/ocis/settings/pkg/config"
 	storage "github.com/owncloud/ocis/storage/pkg/config"
@@ -74,7 +73,6 @@ type Config struct {
 	GraphExplorer *graphExplorer.Config
 	IDP           *idp.Config
 	OCS           *ocs.Config
-	Onlyoffice    *onlyoffice.Config
 	Web           *web.Config
 	Proxy         *proxy.Config
 	Settings      *settings.Config
@@ -94,7 +92,6 @@ func New() *Config {
 		GraphExplorer: graphExplorer.New(),
 		IDP:           idp.New(),
 		OCS:           ocs.New(),
-		Onlyoffice:    onlyoffice.New(),
 		Web:           web.New(),
 		Proxy:         proxy.New(),
 		Settings:      settings.New(),

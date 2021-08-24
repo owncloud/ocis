@@ -9,7 +9,6 @@ config = {
         "ocis-pkg",
         "ocis",
         "ocs",
-        "onlyoffice",
         "proxy",
         "settings",
         "storage",
