@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Replace unmaintained jwt library: [#2386](https://github.com/owncloud/ocis/pull/2386)
 * Enhancement - Update bleve to version 2.1.0: [#2391](https://github.com/owncloud/ocis/pull/2391)
 * Enhancement - Update github.com/coreos/go-oidc to v3.0.0: [#2393](https://github.com/owncloud/ocis/pull/2393)
+* Enhancement - Update reva to v1.12: [#2423](https://github.com/owncloud/ocis/pull/2423)
 
 ## Details
 
@@ -68,6 +69,28 @@ The following sections list the changes for unreleased.
    Updated the github.com/coreos/go-oidc library to the version 3.0.0.
 
    https://github.com/owncloud/ocis/pull/2393
+
+* Enhancement - Update reva to v1.12: [#2423](https://github.com/owncloud/ocis/pull/2423)
+
+  * Enhancement cs3org/reva#1803: Introduce new webdav spaces endpoint
+  * Bugfix cs3org/reva#1819: Disable notifications
+  * Enhancement cs3org/reva#1861: Add support for runtime plugins
+  * Bugfix cs3org/reva#1913: Logic to restore files to readonly nodes
+  * Enhancement cs3org/reva#1946: Add share manager that connects to oc10 databases
+  * Bugfix cs3org/reva#1954: Fix response format of the sharees API
+  * Bugfix cs3org/reva#1956: Fix trashbin listing with depth 0
+  * Bugfix cs3org/reva#1957: Fix etag propagation on deletes
+  * Bugfix cs3org/reva#1960: Return the updated share after updating
+  * Bugfix cs3org/reva#1965 cs3org/reva#1967: Fix the file target of user and group shares
+  * Bugfix cs3org/reva#1980: Propagate the etag after restoring a file version
+  * Enhancement cs3org/reva#1984: Replace OpenCensus with OpenTelemetry
+  * Bugfix cs3org/reva#1985: Add quota stubs
+  * Bugfix cs3org/reva#1987: Fix windows build
+  * Bugfix cs3org/reva#1990: Increase oc10 compatibility of owncloudsql
+  * Bugfix cs3org/reva#1992: Check if symlink exists instead of spamming the console
+  * Bugfix cs3org/reva#1993: fix owncloudsql GetMD
+
+   https://github.com/owncloud/ocis/pull/2423
 # Changelog for [1.10.0] (2021-08-06)
 
 The following sections list the changes for 1.10.0.
