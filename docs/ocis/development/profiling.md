@@ -9,6 +9,15 @@ geekdocFilePath: profiling.md
 
 {{< toc >}}
 
+# 0. Prerequisites
+
+- Go development kit of a [supported version](https://golang.org/doc/devel/release.html#policy).
+  Follow [these instructions](http://golang.org/doc/code.html) to install the
+  go tool and set up GOPATH.
+
+- Graphviz: http://www.graphviz.org/
+  Optional, used to generate graphic visualizations of profiles
+
 The only way to enable the profiler currently is to explicitly select which areas to collect samples for. In order to do this, the following steps have to be followed.
 
 ## 1. Clone Reva
@@ -118,4 +127,4 @@ For references on how to interpret this graph, [continue reading here](https://g
 ## References
 
 - https://medium.com/swlh/go-profile-your-code-like-a-master-1505be38fdba
-- https://dave.cheney.net/
+- https://dave.cheney.net/2013/07/07/introducing-profile-super-simple-profiling-for-go-programs
