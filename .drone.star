@@ -121,22 +121,27 @@ def main(ctx):
 
     pipelines = []
 
+    # test_pipelines = \
+    #     [buildOcisBinaryForTesting(ctx)] + \
+    #     testOcisModules(ctx) + \
+    #     testPipelines(ctx) + \
+    #     checkForRecentBuilds(ctx)
+
     test_pipelines = \
         [buildOcisBinaryForTesting(ctx)] + \
-        testOcisModules(ctx) + \
         testPipelines(ctx) + \
         checkForRecentBuilds(ctx)
 
-    build_release_pipelines = \
-        dockerReleases(ctx) + \
-        [dockerEos(ctx)] + \
-        binaryReleases(ctx) + \
-        [releaseSubmodule(ctx)]
+    # build_release_pipelines = \
+    #     dockerReleases(ctx) + \
+    #     [dockerEos(ctx)] + \
+    #     binaryReleases(ctx) + \
+    #     [releaseSubmodule(ctx)]
 
-    build_release_helpers = [
-        changelog(ctx),
-        docs(ctx),
-    ]
+    # build_release_helpers = [
+    #     changelog(ctx),
+    #     docs(ctx),
+    # ]
 
     if ctx.build.event == "cron":
         pipelines = test_pipelines + [
@@ -159,7 +164,8 @@ def main(ctx):
             ),
         )
 
-        pipelines = test_pipelines + build_release_pipelines + build_release_helpers
+        # pipelines = test_pipelines + build_release_pipelines + build_release_helpers
+        pipelines = test_pipelines
 
         pipelines = \
             pipelines + \
@@ -237,22 +243,22 @@ def stopRecentBuilds(ctx):
 
 def testPipelines(ctx):
     pipelines = []
-    if "skip" not in config["localApiTests"] or not config["localApiTests"]["skip"]:
-        pipelines = [
-            localApiTests(ctx, "ocis", "apiAccountsHashDifficulty", "default"),
-        ]
+    # if "skip" not in config["localApiTests"] or not config["localApiTests"]["skip"]:
+    #     pipelines = [
+    #         localApiTests(ctx, "ocis", "apiAccountsHashDifficulty", "default"),
+    #     ]
 
-    if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
-        pipelines += apiTests(ctx)
+    # if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
+    #     pipelines += apiTests(ctx)
 
     if "skip" not in config["uiTests"] or not config["uiTests"]["skip"]:
         pipelines += uiTests(ctx)
 
-    if "skip" not in config["accountsUITests"] or not config["accountsUITests"]["skip"]:
-        pipelines.append(accountsUITests(ctx))
+    # if "skip" not in config["accountsUITests"] or not config["accountsUITests"]["skip"]:
+    #     pipelines.append(accountsUITests(ctx))
 
-    if "skip" not in config["settingsUITests"] or not config["settingsUITests"]["skip"]:
-        pipelines.append(settingsUITests(ctx))
+    # if "skip" not in config["settingsUITests"] or not config["settingsUITests"]["skip"]:
+    #     pipelines.append(settingsUITests(ctx))
 
     return pipelines
 
