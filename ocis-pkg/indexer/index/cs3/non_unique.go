@@ -133,7 +133,7 @@ func (idx *NonUnique) Lookup(v string) ([]string, error) {
 
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Path: path.Join("/meta", idx.indexRootDir, v),
+			Path: path.Join(idx.indexRootDir, v),
 		},
 	})
 
@@ -190,7 +190,7 @@ func (idx *NonUnique) Remove(id string, v string) error {
 		return err
 	}
 
-	deletePath := path.Join("/meta", idx.indexRootDir, v, id)
+	deletePath := path.Join(idx.indexRootDir, v, id)
 	resp, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
 			Path: deletePath,
@@ -205,7 +205,7 @@ func (idx *NonUnique) Remove(id string, v string) error {
 		return &idxerrs.NotFoundErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
 	}
 
-	toStat := path.Join("/meta", idx.indexRootDir, v)
+	toStat := path.Join(idx.indexRootDir, v)
 	lcResp, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
 			Path: toStat,
@@ -216,7 +216,7 @@ func (idx *NonUnique) Remove(id string, v string) error {
 	}
 
 	if len(lcResp.Infos) == 0 {
-		deletePath = path.Join("/meta", idx.indexRootDir, v)
+		deletePath = path.Join(idx.indexRootDir, v)
 		_, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
 			Ref: &provider.Reference{
 				Path: deletePath,
@@ -263,7 +263,7 @@ func (idx *NonUnique) Search(pattern string) ([]string, error) {
 	matches := make([]string, 0)
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Path: path.Join("/meta", idx.indexRootDir),
+			Path: idx.indexRootDir,
 		},
 	})
 
