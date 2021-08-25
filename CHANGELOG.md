@@ -2,18 +2,45 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.10.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.11.0...master
+
+## Summary
+
+* Change - Remove OnlyOffice extension: [#2433](https://github.com/owncloud/ocis/pull/2433)
+* Enhancement - Update go-chi/chi to version 5.0.3: [#2429](https://github.com/owncloud/ocis/pull/2429)
+
+## Details
+
+* Change - Remove OnlyOffice extension: [#2433](https://github.com/owncloud/ocis/pull/2433)
+
+   Tags: OnlyOffice
+
+   We've removed the OnlyOffice extension in oCIS. OnlyOffice has their own web extension for
+   OC10 backend now with [a dedicated
+   guide](https://owncloud.dev/clients/web/deployments/oc10-app/#onlyoffice). In
+   oCIS, we will follow up with a guide on how to start a WOPI server providing OnlyOffice soon.
+
+   https://github.com/owncloud/ocis/pull/2433
+
+* Enhancement - Update go-chi/chi to version 5.0.3: [#2429](https://github.com/owncloud/ocis/pull/2429)
+
+   Updated go-chi/chi to the lastest release
+
+   https://github.com/owncloud/ocis/pull/2429
+# Changelog for [1.11.0] (2021-08-24)
+
+The following sections list the changes for 1.11.0.
+
+[1.11.0]: https://github.com/owncloud/ocis/compare/v1.10.0...v1.11.0
 
 ## Summary
 
 * Bugfix - Specify primary user type for all accounts: [#2364](https://github.com/owncloud/ocis/pull/2364)
 * Bugfix - Fix naming of the user- and groupprovider services: [#2388](https://github.com/owncloud/ocis/pull/2388)
-* Change - Remove OnlyOffice extension: [#2433](https://github.com/owncloud/ocis/pull/2433)
 * Change - Update ownCloud Web to v4.1.0: [#2426](https://github.com/owncloud/ocis/pull/2426)
 * Enhancement - Use non root user for the owncloud/ocis docker image: [#2380](https://github.com/owncloud/ocis/pull/2380)
 * Enhancement - Replace unmaintained jwt library: [#2386](https://github.com/owncloud/ocis/pull/2386)
 * Enhancement - Update bleve to version 2.1.0: [#2391](https://github.com/owncloud/ocis/pull/2391)
-* Enhancement - Update go-chi/chi to version 5.0.3: [#2429](https://github.com/owncloud/ocis/pull/2429)
 * Enhancement - Update github.com/coreos/go-oidc to v3.0.0: [#2393](https://github.com/owncloud/ocis/pull/2393)
 * Enhancement - Update reva to v1.12: [#2423](https://github.com/owncloud/ocis/pull/2423)
 
@@ -29,17 +56,6 @@ The following sections list the changes for unreleased.
    help' output was misleading.
 
    https://github.com/owncloud/ocis/pull/2388
-
-* Change - Remove OnlyOffice extension: [#2433](https://github.com/owncloud/ocis/pull/2433)
-
-   Tags: OnlyOffice
-
-   We've removed the OnlyOffice extension in oCIS. OnlyOffice has their own web extension for
-   OC10 backend now with [a dedicated
-   guide](https://owncloud.dev/clients/web/deployments/oc10-app/#onlyoffice). In
-   oCIS, we will follow up with a guide on how to start a WOPI server providing OnlyOffice soon.
-
-   https://github.com/owncloud/ocis/pull/2433
 
 * Change - Update ownCloud Web to v4.1.0: [#2426](https://github.com/owncloud/ocis/pull/2426)
 
@@ -76,12 +92,6 @@ The following sections list the changes for unreleased.
    Updated bleve to the current version.
 
    https://github.com/owncloud/ocis/pull/2391
-
-* Enhancement - Update go-chi/chi to version 5.0.3: [#2429](https://github.com/owncloud/ocis/pull/2429)
-
-   Updated go-chi/chi to the lastest release
-
-   https://github.com/owncloud/ocis/pull/2429
 
 * Enhancement - Update github.com/coreos/go-oidc to v3.0.0: [#2393](https://github.com/owncloud/ocis/pull/2393)
 
