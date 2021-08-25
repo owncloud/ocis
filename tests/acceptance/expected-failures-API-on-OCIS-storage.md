@@ -27,8 +27,8 @@ _ocdav: double check the webdav property parsing when custom namespaces are used
 -   [apiWebdavProperties1/setFileProperties.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L64)
 
 #### [Cannot set custom webDav properties](https://github.com/owncloud/product/issues/264)
--   [apiWebdavProperties2/getFileProperties.feature:252](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L252)
--   [apiWebdavProperties2/getFileProperties.feature:272](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L272)
+-   [apiWebdavProperties2/getFileProperties.feature:254](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L254)
+-   [apiWebdavProperties2/getFileProperties.feature:274](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L274)
 
 #### [downloading an old version of a file returns 501](https://github.com/owncloud/ocis/issues/2261)
 -    [apiVersions/fileVersions.feature:437](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L437)
