@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/pprof"
 
-	chimiddleware "github.com/go-chi/chi/middleware"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"

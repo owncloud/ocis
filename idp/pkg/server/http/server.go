@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/asim/go-micro/v3"
-	chimiddleware "github.com/go-chi/chi/middleware"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	svc "github.com/owncloud/ocis/idp/pkg/service/v0"
 	pkgcrypto "github.com/owncloud/ocis/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"

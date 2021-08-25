@@ -11,7 +11,7 @@ import (
 
 	merrors "github.com/asim/go-micro/v3/errors"
 	revactx "github.com/cs3org/reva/pkg/ctx"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"

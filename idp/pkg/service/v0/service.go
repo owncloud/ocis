@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/mux"
 	"github.com/libregraph/lico/bootstrap"
 	licoconfig "github.com/libregraph/lico/config"
