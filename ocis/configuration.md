@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-08-27T10:22:16+0000"
+date: "2021-08-30T06:43:42+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -167,58 +167,6 @@ Usage: `ocis kill [command options] [arguments...]`
 
 
 
-### ocis server
-
-Start fullstack server
-
-Usage: `ocis server [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $OCIS_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9010`.
-
-
--debug-token |  $OCIS_DEBUG_TOKEN
-: Token to grant metrics access.
-
-
--debug-pprof |  $OCIS_DEBUG_PPROF
-: Enable pprof debugging.
-
-
--debug-zpages |  $OCIS_DEBUG_ZPAGES
-: Enable zpages debugging.
-
-
--http-addr |  $OCIS_HTTP_ADDR
-: Address to bind http server. Default: `0.0.0.0:9000`.
-
-
--http-root |  $OCIS_HTTP_ROOT
-: Root path of http server. Default: `/`.
-
-
--grpc-addr |  $OCIS_GRPC_ADDR
-: Address to bind grpc server. Default: `0.0.0.0:9001`.
-
-
--extensions |  $OCIS_RUN_EXTENSIONS
-: Run specific extensions during supervised mode.
-
 ### ocis list
 
 Lists running ocis extensions
@@ -275,45 +223,65 @@ Usage: `ocis run [command options] [arguments...]`
 
 
 
+### ocis server
+
+Start fullstack server
+
+Usage: `ocis server [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $OCIS_DEBUG_ADDR
+: Address to bind debug server. Default: `0.0.0.0:9010`.
+
+
+-debug-token |  $OCIS_DEBUG_TOKEN
+: Token to grant metrics access.
+
+
+-debug-pprof |  $OCIS_DEBUG_PPROF
+: Enable pprof debugging.
+
+
+-debug-zpages |  $OCIS_DEBUG_ZPAGES
+: Enable zpages debugging.
+
+
+-http-addr |  $OCIS_HTTP_ADDR
+: Address to bind http server. Default: `0.0.0.0:9000`.
+
+
+-http-root |  $OCIS_HTTP_ROOT
+: Root path of http server. Default: `/`.
+
+
+-grpc-addr |  $OCIS_GRPC_ADDR
+: Address to bind grpc server. Default: `0.0.0.0:9001`.
+
+
+-extensions |  $OCIS_RUN_EXTENSIONS
+: Run specific extensions during supervised mode.
+
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
-#### ocis settings
+#### ocis accounts
 
-Start settings server
-
-#### ocis storage-frontend
-
-Start storage frontend
-
-#### ocis storage-gateway
-
-Start storage gateway
-
-#### ocis storage-groupprovider
-
-Start storage groupprovider service
-
-#### ocis storage-metadata
-
-Start storage and data service for metadata
-
-#### ocis webdav
-
-Start webdav server
-
-#### ocis ocs
-
-Start ocs server
-
-#### ocis storage-auth-basic
-
-Start storage auth-basic service
-
-#### ocis storage-auth-bearer
-
-Start storage auth-bearer service
+Start accounts server
 
 #### ocis storage-home
 
@@ -327,6 +295,26 @@ Start storage userprovider service
 
 Start storage and data provider for /users mount
 
+#### ocis web
+
+Start web server
+
+#### ocis webdav
+
+Start webdav server
+
+#### ocis glauth
+
+Start glauth server
+
+#### ocis settings
+
+Start settings server
+
+#### ocis store
+
+Start a go-micro store
+
 #### ocis thumbnails
 
 Start thumbnails server
@@ -335,35 +323,47 @@ Start thumbnails server
 
 Lists running services with version
 
-#### ocis accounts
+#### ocis storage-auth-basic
 
-Start accounts server
+Start storage auth-basic service
 
-#### ocis glauth
+#### ocis storage-frontend
 
-Start glauth server
+Start storage frontend
 
-#### ocis proxy
+#### ocis storage-gateway
 
-Start proxy server
+Start storage gateway
+
+#### ocis idp
+
+Start idp server
+
+#### ocis storage-metadata
+
+Start storage and data service for metadata
 
 #### ocis storage-public-link
 
 Start storage public link storage
 
-#### ocis store
-
-Start a go-micro store
-
-#### ocis web
-
-Start web server
-
 #### ocis storage-sharing
 
 Start storage sharing service
 
-#### ocis idp
+#### ocis ocs
 
-Start idp server
+Start ocs server
+
+#### ocis proxy
+
+Start proxy server
+
+#### ocis storage-auth-bearer
+
+Start storage auth-bearer service
+
+#### ocis storage-groupprovider
+
+Start storage groupprovider service
 
