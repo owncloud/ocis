@@ -63,12 +63,12 @@ services:
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       OCIS_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
       # web ui
-      WEB_UI_CONFIG: "/config/config.json"
+      WEB_UI_CONFIG: "/var/tmp/ocis/.config/web-config.json"
       # proxy
-      PROXY_CONFIG_FILE: "/config/proxy-config.json"
+      PROXY_CONFIG_FILE: "/var/tmp/ocis/.config/proxy-config.json"
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
-      - ./config/ocis/config.dist.json:/config/config.dist.json
+      - ./config/ocis/web-config.dist.json:/config/web-config.dist.json
       - ./config/ocis/proxy-config.json:/config/proxy-config.json
       - ocis-data:/var/tmp/ocis
     labels:
