@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import isNil from 'lodash/isNil'
+import isNil from 'lodash-es/isNil'
 export default {
   name: 'SettingBoolean',
   props: {

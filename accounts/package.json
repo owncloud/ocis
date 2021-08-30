@@ -20,7 +20,7 @@
     "acceptance-tests": "cucumber-js --retry 1 --require-module @babel/register --require-module @babel/polyfill --require ${TEST_INFRA_DIRECTORY}/acceptance/setup.js --require ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/acceptance/stepDefinitions --format node_modules/cucumber-pretty -t \"${TEST_TAGS:-not @skip and not @skipOnOC10}\""
   },
   "devDependencies": {
-    "@babel/core": "^7.14.0",
+    "@babel/core": "^7.15.0",
     "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/plugin-proposal-export-default-from": "^7.7.4",
     "@babel/plugin-proposal-object-rest-spread": "^7.7.7",
@@ -35,7 +35,7 @@
     "@rollup/plugin-replace": "^2.3.0",
     "archiver": "^5.3.0",
     "axios": "^0.21.1",
-    "core-js": "3",
+    "core-js": "^3.16.1",
     "cross-env": "^7.0.3",
     "cucumber": "^6.0.5",
     "cucumber-pretty": ">=6.0.0",
@@ -51,8 +51,8 @@
     "fs-extra": "^9.0.1",
     "join-path": "^1.1.1",
     "ldapjs": "^2.2.3",
-    "nightwatch": "^1.6.0",
-    "nightwatch-api": "^3.0.1",
+    "nightwatch": "1.5.1",
+    "nightwatch-api": "3.0.1",
     "nightwatch-vrt": "^0.2.10",
     "node-fetch": "^2.6.1",
     "qs": "^6.10.1",
@@ -76,7 +76,7 @@
     "not dead"
   ],
   "peerDependencies": {
-    "owncloud-design-system": "^7.4.2"
+    "owncloud-design-system": "^9.3.0"
   },
   "dependencies": {
     "validator": "^13.1.1"
