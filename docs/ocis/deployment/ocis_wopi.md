@@ -135,7 +135,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   `docker-compose up -d`
 
-* You now can visit oCIS and are able to open an office document in your browser.
+* You now can visit oCIS and are able to open an office document in your browser. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
 
 ## Local setup
 For a more simple local ocis setup see [Getting started]({{< ref "../getting-started" >}})
@@ -156,4 +156,4 @@ After that you're ready to start the application stack:
 
 Open https://collabora.owncloud.test and https://wopiserver.owncloud.test  in your browser and accept the invalid certificate warning.
 
-Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You are now able to open an office document in your browser.
+Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You are now able to open an office document in your browser. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.

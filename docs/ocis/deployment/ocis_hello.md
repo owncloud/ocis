@@ -103,7 +103,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   `docker-compose up -d`
 
-- You now can visit oCIS and are able to switch to the Hello extension by using the application switcher on the top right corner of ownCloud Web.
+- You now can visit oCIS and are able to switch to the Hello extension by using the application switcher on the top right corner of ownCloud Web. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
 
 ## Local setup
 
@@ -122,4 +122,4 @@ After that you're ready to start the application stack:
 
 `docker-compose up -d`
 
-Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You are now able to switch to the Hello extension by using the application switcher on the top right corner of ownCloud Web.
+Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You are now able to switch to the Hello extension by using the application switcher on the top right corner of ownCloud Web. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
