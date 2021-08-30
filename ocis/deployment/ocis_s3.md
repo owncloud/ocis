@@ -116,7 +116,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   `docker-compose up -d`
 
-* You now can visit oCIS and are able to use it just normally. If you log into the web UI of MinIO, you will see blobs of files you uploaded.
+* You now can visit oCIS and are able to use it just normally. If you log into the web UI of MinIO, you will see blobs of files you uploaded. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
 
 ## Local setup
 For a more simple local ocis setup see [Getting started]({{< ref "../getting-started" >}})
@@ -134,4 +134,4 @@ After that you're ready to start the application stack:
 
 `docker-compose up -d`
 
- Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You now can use oCIS normally and should now upload a file. Open https://minio.owncloud.test in your browser and accept the invalid certificate warning, after that you will see blobs of files you have uploaded to oCIS.
+ Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You now can use oCIS normally and should now upload a file. Open https://minio.owncloud.test in your browser and accept the invalid certificate warning, after that you will see blobs of files you have uploaded to oCIS. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.

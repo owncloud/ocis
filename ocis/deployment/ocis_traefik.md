@@ -94,7 +94,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   `docker-compose up -d`
 
-* You now can visit oCIS and Traefik dashboard on your configured domains
+* You now can visit oCIS and Traefik dashboard on your configured domains. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
 
 ## Local setup
 For a more simple local ocis setup see [Getting started]({{< ref "../getting-started" >}})
@@ -111,4 +111,4 @@ After that you're ready to start the application stack:
 
 `docker-compose up -d`
 
-Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You now can login to oCIS with the default users, which also can be found here: [Getting started]({{< ref "../getting-started#login-to-ocis-web" >}})
+Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You now can login to oCIS with the default users, which also can be found here: [Getting started]({{< ref "../getting-started#login-to-ocis-web" >}}). You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
