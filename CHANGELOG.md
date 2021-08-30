@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Change - Remove OnlyOffice extension: [#2433](https://github.com/owncloud/ocis/pull/2433)
 * Enhancement - Update go-chi/chi to version 5.0.3: [#2429](https://github.com/owncloud/ocis/pull/2429)
+* Enhancement - Upgrade go micro to v3.6.0: [#2451](https://github.com/owncloud/ocis/pull/2451)
 
 ## Details
 
@@ -27,6 +28,12 @@ The following sections list the changes for unreleased.
    Updated go-chi/chi to the lastest release
 
    https://github.com/owncloud/ocis/pull/2429
+
+* Enhancement - Upgrade go micro to v3.6.0: [#2451](https://github.com/owncloud/ocis/pull/2451)
+
+   Go micro and all go micro plugins are now on v3.6.0
+
+   https://github.com/owncloud/ocis/pull/2451
 # Changelog for [1.11.0] (2021-08-24)
 
 The following sections list the changes for 1.11.0.
