@@ -13,7 +13,7 @@ var (
 
 func Configure(cfg *config.Config) error {
 	var err error
-	if TraceProvider, err = pkgtrace.GetTraceProvider(cfg.Tracing.Collector, cfg.Tracing.Type, "webdav"); err != nil {
+	if TraceProvider, err = pkgtrace.GetTraceProvider(cfg.Tracing.Endpoint, cfg.Tracing.Collector, "webdav", cfg.Tracing.Type); err != nil {
 		return err
 	}
 

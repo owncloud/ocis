@@ -13,7 +13,7 @@ var (
 
 func Configure(cfg *config.Config) error {
 	var err error
-	if TraceProvider, err = pkgtrace.GetTraceProvider(cfg.Tracing.Collector, cfg.Tracing.Type, "graph-explorer"); err != nil {
+	if TraceProvider, err = pkgtrace.GetTraceProvider(cfg.Tracing.Endpoint, cfg.Tracing.Collector, "graph-explorer", cfg.Tracing.Type); err != nil {
 		return err
 	}
 
