@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Change - Remove OnlyOffice extension: [#2433](https://github.com/owncloud/ocis/pull/2433)
+* Enhancement - Add set space quota permission: [#2459](https://github.com/owncloud/ocis/pull/2459)
 * Enhancement - Update go-chi/chi to version 5.0.3: [#2429](https://github.com/owncloud/ocis/pull/2429)
 * Enhancement - Upgrade go micro to v3.6.0: [#2451](https://github.com/owncloud/ocis/pull/2451)
 
@@ -22,6 +23,12 @@ The following sections list the changes for unreleased.
    oCIS, we will follow up with a guide on how to start a WOPI server providing OnlyOffice soon.
 
    https://github.com/owncloud/ocis/pull/2433
+
+* Enhancement - Add set space quota permission: [#2459](https://github.com/owncloud/ocis/pull/2459)
+
+   In preparation for the upcoming spaces features a `SetSpaceQuota` permission was added.
+
+   https://github.com/owncloud/ocis/pull/2459
 
 * Enhancement - Update go-chi/chi to version 5.0.3: [#2429](https://github.com/owncloud/ocis/pull/2429)
 
