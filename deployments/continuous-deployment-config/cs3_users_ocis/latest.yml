@@ -17,6 +17,16 @@
     - "*.ocis-cs3-users.latest.owncloud.works"
 
   vars:
+    ssh_authorized_keys:
+      - https://github.com/butonic.keys
+      - https://github.com/C0rby.keys
+      - https://github.com/fschade.keys
+      - https://github.com/kulmann.keys
+      - https://github.com/micbar.keys
+      - https://github.com/pascalwengerter.keys
+      - https://github.com/paulcod3.keys
+      - https://github.com/refs.keys
+      - https://github.com/wkloucek.keys
     docker_compose_projects:
       - name: ocis
         git_url: https://github.com/owncloud/ocis.git
