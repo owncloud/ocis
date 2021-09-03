@@ -75,6 +75,7 @@ type Sharing struct {
 	PublicPasswordHashCost           int
 	PublicEnableExpiredSharesCleanup bool
 	PublicJanitorRunInterval         int
+	UserStorageMountID               string
 }
 
 // Port defines the available port configuration.
@@ -361,6 +362,20 @@ type UserGroupRest struct {
 	TargetAPI         string
 }
 
+// UserOwnCloudSQL defines the available ownCloudSQL user provider configuration.
+type UserOwnCloudSQL struct {
+	DBUsername         string
+	DBPassword         string
+	DBHost             string
+	DBPort             int
+	DBName             string
+	Idp                string
+	Nobody             int64
+	JoinUsername       bool
+	JoinOwnCloudUUID   bool
+	EnableMedialSearch bool
+}
+
 // LDAPUserSchema defines the available ldap user schema configuration.
 type LDAPUserSchema struct {
 	UID         string
@@ -395,6 +410,7 @@ type Reva struct {
 	OIDC            OIDC
 	LDAP            LDAP
 	UserGroupRest   UserGroupRest
+	UserOwnCloudSQL UserOwnCloudSQL
 	OCDav           OCDav
 	Storages        StorageConfig
 	// Ports are used to configure which services to start on which port
