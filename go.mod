@@ -3,6 +3,7 @@ module github.com/owncloud/ocis
 go 1.16
 
 require (
+	contrib.go.opencensus.io/exporter/jaeger v0.2.1 // indirect
 	github.com/CiscoM31/godata v1.0.4
 	github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e
 	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210812172626-c7195aae9817
@@ -20,11 +21,12 @@ require (
 	github.com/blevesearch/bleve/v2 v2.1.0
 	github.com/coreos/go-oidc/v3 v3.0.0
 	github.com/cs3org/go-cs3apis v0.0.0-20210812121411-f18cf19614e8
-	github.com/cs3org/reva v1.12.1-0.20210901093814-b54f42d242fd
+	github.com/cs3org/reva v1.12.1-0.20210903075054-73f10ed5ab21
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth v1.1.3-0.20210729125545-b9aecdfcac31
 	github.com/go-chi/chi/v5 v5.0.3
 	github.com/go-chi/render v1.0.1
+	github.com/go-kit/kit v0.10.0 // indirect
 	github.com/go-logr/logr v0.4.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/gofrs/uuid v4.0.0+incompatible
@@ -34,6 +36,7 @@ require (
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.5.0
+	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/iancoleman/strcase v0.2.0
 	github.com/justinas/alice v1.2.0
 	github.com/libregraph/lico v0.34.1-0.20210803054646-b584e0372224
@@ -60,6 +63,7 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.22.0
 	go.opentelemetry.io/otel v1.0.0-RC2
 	go.opentelemetry.io/otel/exporters/jaeger v1.0.0-RC2
+	go.opentelemetry.io/otel/metric v0.20.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.0.0-RC2
 	go.opentelemetry.io/otel/trace v1.0.0-RC2
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
