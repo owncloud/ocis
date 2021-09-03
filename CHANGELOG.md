@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Change - Remove OnlyOffice extension: [#2433](https://github.com/owncloud/ocis/pull/2433)
+* Enhancement - Add app provider and app provider registry: [#2204](https://github.com/owncloud/ocis/pull/2204)
 * Enhancement - Add the create space permission: [#2461](https://github.com/owncloud/ocis/pull/2461)
 * Enhancement - Add set space quota permission: [#2459](https://github.com/owncloud/ocis/pull/2459)
 * Enhancement - Update go-chi/chi to version 5.0.3: [#2429](https://github.com/owncloud/ocis/pull/2429)
@@ -24,6 +25,14 @@ The following sections list the changes for unreleased.
    oCIS, we will follow up with a guide on how to start a WOPI server providing OnlyOffice soon.
 
    https://github.com/owncloud/ocis/pull/2433
+
+* Enhancement - Add app provider and app provider registry: [#2204](https://github.com/owncloud/ocis/pull/2204)
+
+   We added the app provider and app provider registry. Now the CS3org WOPI server can be
+   registered and OpenInApp requests can be done.
+
+   https://github.com/owncloud/ocis/pull/2204
+   https://github.com/cs3org/reva/pull/1785
 
 * Enhancement - Add the create space permission: [#2461](https://github.com/owncloud/ocis/pull/2461)
 
