@@ -141,6 +141,12 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 			},
 			// TODO build services dynamically
 			"services": map[string]interface{}{
+				"appprovider": map[string]interface{}{
+					"prefix":                 cfg.Reva.Frontend.AppProviderPrefix,
+					"transfer_shared_secret": cfg.Reva.TransferSecret,
+					"timeout":                86400,
+					"insecure":               true,
+				},
 				"datagateway": map[string]interface{}{
 					"prefix":                 cfg.Reva.Frontend.DatagatewayPrefix,
 					"transfer_shared_secret": cfg.Reva.TransferSecret,

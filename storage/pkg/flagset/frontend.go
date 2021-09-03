@@ -87,9 +87,16 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringSliceFlag{
 			Name:    "service",
-			Value:   cli.NewStringSlice("datagateway", "ocdav", "ocs"),
+			Value:   cli.NewStringSlice("datagateway", "ocdav", "ocs", "appprovider"),
 			Usage:   "--service ocdav [--service ocs]",
 			EnvVars: []string{"STORAGE_FRONTEND_SERVICES"},
+		},
+		&cli.StringFlag{
+			Name:        "approvider-prefix",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.AppProviderPrefix, ""),
+			Usage:       "approvider prefix",
+			EnvVars:     []string{"STORAGE_FRONTEND_APPPROVIDER_PREFIX"},
+			Destination: &cfg.Reva.Frontend.AppProviderPrefix,
 		},
 		&cli.StringFlag{
 			Name:        "datagateway-prefix",
