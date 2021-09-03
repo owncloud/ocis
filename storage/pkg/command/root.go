@@ -76,6 +76,7 @@ func Execute(cfg *config.Config) error {
 			Gateway(cfg),
 			Users(cfg),
 			Groups(cfg),
+			AppProvider(cfg),
 			AuthBasic(cfg),
 			AuthBearer(cfg),
 			Sharing(cfg),

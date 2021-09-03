@@ -24,6 +24,16 @@ const (
 	// SettingsManagementPermissionName is the hardcoded setting name for the settings management permission
 	SettingsManagementPermissionName string = "settings-management"
 
+	// SetSpaceQuotaPermissionID is the hardcoded setting UUID for the set space quota permission
+	SetSpaceQuotaPermissionID string = "4e6f9709-f9e7-44f1-95d4-b762d27b7896"
+	// SetSpaceQuotaPermissionName is the hardcoded setting name for the set space quota permission
+	SetSpaceQuotaPermissionName string = "set-space-quota"
+
+	// CreateSpacePermissionID is the hardcoded setting UUID for the create space permission
+	CreateSpacePermissionID string = "79e13b30-3e22-11eb-bc51-0b9f0bad9a58"
+	// CreateSpacePermissionName is the hardcoded setting name for the create space permission
+	CreateSpacePermissionName string = "create-space"
+
 	settingUUIDProfileLanguage = "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f"
 
 	// AccountManagementPermissionID is the hardcoded setting UUID for the account management permission
@@ -327,6 +337,42 @@ func generatePermissionRequests() []*settings.AddSettingToBundleRequest {
 					PermissionValue: &settings.Permission{
 						Operation:  settings.Permission_OPERATION_READWRITE,
 						Constraint: settings.Permission_CONSTRAINT_OWN,
+					},
+				},
+			},
+		},
+		{
+			BundleId: BundleUUIDRoleAdmin,
+			Setting: &settings.Setting{
+				Id:          SetSpaceQuotaPermissionID,
+				Name:        SetSpaceQuotaPermissionName,
+				DisplayName: "Set Space Quota",
+				Description: "This permission allows to manage space quotas.",
+				Resource: &settings.Resource{
+					Type: settings.Resource_TYPE_SYSTEM,
+				},
+				Value: &settings.Setting_PermissionValue{
+					PermissionValue: &settings.Permission{
+						Operation:  settings.Permission_OPERATION_READWRITE,
+						Constraint: settings.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+		},
+		{
+			BundleId: BundleUUIDRoleAdmin,
+			Setting: &settings.Setting{
+				Id:          CreateSpacePermissionID,
+				Name:        CreateSpacePermissionName,
+				DisplayName: "Create Space",
+				Description: "This permission allows to create new spaces.",
+				Resource: &settings.Resource{
+					Type: settings.Resource_TYPE_SYSTEM,
+				},
+				Value: &settings.Setting_PermissionValue{
+					PermissionValue: &settings.Permission{
+						Operation:  settings.Permission_OPERATION_READWRITE,
+						Constraint: settings.Permission_CONSTRAINT_ALL,
 					},
 				},
 			},

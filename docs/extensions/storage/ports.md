@@ -34,6 +34,8 @@ For now, the storage service uses these ports to preconfigure those services:
 | 9159      | storage users debug                           |
 | 9160      | groups                                        |
 | 9161      | groups debug                                  |
+| 9164      | storage appprovider                                   |
+| 9165      | storage appprovider debug                             |
 | 9178      | storage public link                           |
 | 9179      | storage public link data                      |
 | 9215      | storage meta grpc                             |
