@@ -53,7 +53,7 @@
     "ldapjs": "^2.2.4",
     "lodash-es": "^4.17.21",
     "nightwatch": "1.5.1",
-    "nightwatch-api": "3.0.1",
+    "nightwatch-api": "3.0.2",
     "nightwatch-vrt": "^0.2.10",
     "node-fetch": "^2.6.1",
     "qs": "^6.10.1",
