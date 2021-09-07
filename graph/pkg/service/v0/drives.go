@@ -1,15 +1,21 @@
 package svc
 
 import (
+	"fmt"
 	"math"
 	"net/http"
 	"net/url"
 	"path"
 	"time"
 
+	ctxpkg "github.com/cs3org/reva/pkg/ctx"
+
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 	msgraph "github.com/owncloud/open-graph-api-go"
@@ -126,6 +132,42 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &listResponse{Value: files})
+}
+
+func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
+	us, ok := ctxpkg.ContextGetUser(r.Context())
+	if !ok {
+		errorcode.GeneralException.Render(w, r, http.StatusUnauthorized, "invalid user")
+		return
+	}
+
+	client, err := g.GetClient()
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	spaceName := chi.URLParam(r, "drive-name")
+
+	csr := provider.CreateStorageSpaceRequest{
+		Owner: us,
+		Type:  "share",
+		Name:  spaceName,
+		Quota: &provider.Quota{
+			QuotaMaxBytes: 65536,
+			QuotaMaxFiles: 20,
+		},
+	}
+
+	resp, err := client.CreateStorageSpace(r.Context(), &csr)
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Errorf("").Error())
+	}
 }
 
 func cs3TimestampToTime(t *types.Timestamp) time.Time {
