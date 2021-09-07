@@ -3,6 +3,9 @@ package svc
 import (
 	"net/http"
 
+	"github.com/owncloud/ocis/ocis-pkg/account"
+	opkgm "github.com/owncloud/ocis/ocis-pkg/middleware"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -51,6 +54,10 @@ func NewService(opts ...Option) Service {
 				})
 			})
 			r.Route("/drives", func(r chi.Router) {
+				r.Use(opkgm.ExtractAccountUUID(
+					account.Logger(options.Logger),
+					account.JWTSecret(options.Config.TokenManager.JWTSecret)),
+				)
 				// This route is non-compliant with MS Graph implementation; creating a drive is not supported. There
 				// is no official MS SDK support for this method.
 				r.Post("/{drive-name}", svc.CreateDrive)

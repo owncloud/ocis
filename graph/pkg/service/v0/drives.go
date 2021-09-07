@@ -8,16 +8,18 @@ import (
 	"path"
 	"time"
 
-	ctxpkg "github.com/cs3org/reva/pkg/ctx"
-
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	ctxpkg "github.com/cs3org/reva/pkg/ctx"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
+	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+	sproto "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsSvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	msgraph "github.com/owncloud/open-graph-api-go"
 )
 
@@ -139,6 +141,17 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	us, ok := ctxpkg.ContextGetUser(r.Context())
 	if !ok {
 		errorcode.GeneralException.Render(w, r, http.StatusUnauthorized, "invalid user")
+		return
+	}
+
+	s := sproto.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
+
+	_, err := s.GetPermissionByID(r.Context(), &sproto.GetPermissionByIDRequest{
+		PermissionId: settingsSvc.CreateSpacePermissionID,
+	})
+	if err != nil {
+		// if the permission is not existing for the user in context we can assume we don't have it. Return 401.
+		errorcode.GeneralException.Render(w, r, http.StatusUnauthorized, "insufficient permissions to create a space.")
 		return
 	}
 

@@ -79,6 +79,7 @@ require (
 )
 
 replace (
+	github.com/cs3org/reva => ../../refs/reva
 	github.com/crewjam/saml => github.com/crewjam/saml v0.4.5
 	go.etcd.io/etcd/api/v3 => go.etcd.io/etcd/api/v3 v3.0.0-20210204162551-dae29bb719dd
 	go.etcd.io/etcd/pkg/v3 => go.etcd.io/etcd/pkg/v3 v3.0.0-20210204162551-dae29bb719dd
