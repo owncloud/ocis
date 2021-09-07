@@ -134,6 +134,7 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &listResponse{Value: files})
 }
 
+// CreateDrive creates a storage drive (space).
 func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	us, ok := ctxpkg.ContextGetUser(r.Context())
 	if !ok {
