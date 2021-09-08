@@ -6,6 +6,8 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Remove non working proxy route and fix cs3 users example: [#2474](https://github.com/owncloud/ocis/pull/2474)
+* Bugfix - Set English as default language in the dropdown in the settings page: [#2465](https://github.com/owncloud/ocis/pull/2465)
 * Change - Remove OnlyOffice extension: [#2433](https://github.com/owncloud/ocis/pull/2433)
 * Enhancement - Add app provider and app provider registry: [#2204](https://github.com/owncloud/ocis/pull/2204)
 * Enhancement - Add the create space permission: [#2461](https://github.com/owncloud/ocis/pull/2461)
@@ -14,6 +16,21 @@ The following sections list the changes for unreleased.
 * Enhancement - Upgrade go micro to v3.6.0: [#2451](https://github.com/owncloud/ocis/pull/2451)
 
 ## Details
+
+* Bugfix - Remove non working proxy route and fix cs3 users example: [#2474](https://github.com/owncloud/ocis/pull/2474)
+
+   We removed a non working route from the proxy default configuration and fixed the cs3 users
+   deployment example since it still used the accounts service. It now only uses the configured
+   LDAP.
+
+   https://github.com/owncloud/ocis/pull/2474
+
+* Bugfix - Set English as default language in the dropdown in the settings page: [#2465](https://github.com/owncloud/ocis/pull/2465)
+
+   The language dropdown didn't have a default language selected, and it was showing an empty
+   value. Now it shows English instead.
+
+   https://github.com/owncloud/ocis/pull/2465
 
 * Change - Remove OnlyOffice extension: [#2433](https://github.com/owncloud/ocis/pull/2433)
 

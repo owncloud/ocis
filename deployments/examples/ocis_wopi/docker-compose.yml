@@ -69,6 +69,7 @@ services:
       # app provider
       APP_PROVIDER_DRIVER: wopi
       APP_PROVIDER_WOPI_DRIVER_APP_NAME: Collabora
+      APP_PROVIDER_WOPI_DRIVER_APP_ICON_URI: https://www.collaboraoffice.com/wp-content/uploads/2019/01/CP-icon.png
       APP_PROVIDER_WOPI_DRIVER_APP_URL: https://${COLLABORA_DOMAIN:-collabora.owncloud.test}
       APP_PROVIDER_WOPI_DRIVER_INSECURE: "${INSECURE:-false}"
       APP_PROVIDER_WOPI_DRIVER_IOP_SECRET: ${WOPI_IOP_SECRET:-LoremIpsum123}

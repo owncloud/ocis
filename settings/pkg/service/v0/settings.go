@@ -128,6 +128,7 @@ var languageSetting = settings.Setting_SingleChoiceValue{
 					},
 				},
 				DisplayValue: "English",
+				Default:      true,
 			},
 			{
 				Value: &settings.ListOptionValue{
