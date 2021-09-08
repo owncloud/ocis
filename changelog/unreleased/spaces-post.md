@@ -1,6 +1,6 @@
 Enhancement: Create a Space using the Graph API
 
-Spaces can now be created on `POST /drive/{drive-name}`. Only users with the `create-space` permissions can perform this operation.
+Spaces can now be created on `POST /drives/{drive-name}`. Only users with the `create-space` permissions can perform this operation.
 
 Allowed body form values are:
 

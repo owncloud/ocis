@@ -49,7 +49,7 @@ This is the status of a DecomposedFS `users` tree. As we can see it is empty bec
 
 Let's start with creating a space:
 
-`curl -k -X POST 'https://localhost:9200/graph/v1.0/drive/marketing' -u einstein:relativity -v`
+`curl -k -X POST 'https://localhost:9200/graph/v1.0/drives/marketing' -u einstein:relativity -v`
 
 ```
 ❯ tree -a /var/tmp/ocis/storage/users
