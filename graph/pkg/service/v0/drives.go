@@ -145,7 +145,10 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	r.ParseForm()
+	if err := r.ParseForm(); err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusUnauthorized, err.Error())
+		return
+	}
 
 	s := sproto.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
 
