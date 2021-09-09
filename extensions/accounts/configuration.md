@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-09-08T12:34:44+0000"
+date: "2021-09-09T18:49:47+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -178,123 +178,6 @@ Usage: `accounts server [command options] [arguments...]`
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### accounts update
-
-Make changes to an existing account
-
-Usage: `accounts update [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
-
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `"accounts"`.
-
-
--enabled | 
-: Enable the account.
-
-
--displayname | 
-: Set the displayname for the account.
-
-
--preferred-name | 
-: Set the preferred-name for the account.
-
-
--on-premises-sam-account-name | 
-: Set the on-premises-sam-account-name.
-
-
--uidnumber | 
-: Set the uidnumber for the account.
-
-
--gidnumber | 
-: Set the gidnumber for the account.
-
-
--mail | 
-: Set the mail for the account.
-
-
--description | 
-: Set the description for the account.
-
-
--password | 
-: Set the password for the account.
-
-
--password-policies | 
-: Possible policies: DisableStrongPassword, DisablePasswordExpiration.
-
-
--force-password-change | 
-: Force password change on next sign-in.
-
-
--force-password-change-mfa | 
-: Force password change on next sign-in with mfa.
 
 
 
@@ -901,6 +784,123 @@ Usage: `accounts ocis-accounts [command options] [arguments...]`
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### accounts update
+
+Make changes to an existing account
+
+Usage: `accounts update [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `"accounts"`.
+
+
+-enabled | 
+: Enable the account.
+
+
+-displayname | 
+: Set the displayname for the account.
+
+
+-preferred-name | 
+: Set the preferred-name for the account.
+
+
+-on-premises-sam-account-name | 
+: Set the on-premises-sam-account-name.
+
+
+-uidnumber | 
+: Set the uidnumber for the account.
+
+
+-gidnumber | 
+: Set the gidnumber for the account.
+
+
+-mail | 
+: Set the mail for the account.
+
+
+-description | 
+: Set the description for the account.
+
+
+-password | 
+: Set the password for the account.
+
+
+-password-policies | 
+: Possible policies: DisableStrongPassword, DisablePasswordExpiration.
+
+
+-force-password-change | 
+: Force password change on next sign-in.
+
+
+-force-password-change-mfa | 
+: Force password change on next sign-in with mfa.
 
 
 
