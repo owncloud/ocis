@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add app provider and app provider registry: [#2204](https://github.com/owncloud/ocis/pull/2204)
 * Enhancement - Add the create space permission: [#2461](https://github.com/owncloud/ocis/pull/2461)
 * Enhancement - Add set space quota permission: [#2459](https://github.com/owncloud/ocis/pull/2459)
+* Enhancement - Create a Space using the Graph API: [#2471](https://github.com/owncloud/ocis/pull/2471)
 * Enhancement - Update go-chi/chi to version 5.0.3: [#2429](https://github.com/owncloud/ocis/pull/2429)
 * Enhancement - Upgrade go micro to v3.6.0: [#2451](https://github.com/owncloud/ocis/pull/2451)
 
@@ -62,6 +63,18 @@ The following sections list the changes for unreleased.
    In preparation for the upcoming spaces features a `SetSpaceQuota` permission was added.
 
    https://github.com/owncloud/ocis/pull/2459
+
+* Enhancement - Create a Space using the Graph API: [#2471](https://github.com/owncloud/ocis/pull/2471)
+
+   Spaces can now be created on `POST /drives/{drive-name}`. Only users with the `create-space`
+   permissions can perform this operation.
+
+   Allowed body form values are:
+
+   - `quota` (bytes) maximum amount of bytes stored in the space. - `maxQuotaFiles` (integer)
+   maximum amount of files supported by the space.
+
+   https://github.com/owncloud/ocis/pull/2471
 
 * Enhancement - Update go-chi/chi to version 5.0.3: [#2429](https://github.com/owncloud/ocis/pull/2429)
 
