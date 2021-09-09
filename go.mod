@@ -20,11 +20,11 @@ require (
 	github.com/asim/go-micro/v3 v3.6.0
 	github.com/blevesearch/bleve/v2 v2.1.0
 	github.com/coreos/go-oidc/v3 v3.0.0
-	github.com/cs3org/go-cs3apis v0.0.0-20210812121411-f18cf19614e8
-	github.com/cs3org/reva v1.12.1-0.20210903075054-73f10ed5ab21
+	github.com/cs3org/go-cs3apis v0.0.0-20210906133842-03e4a408c1f3
+	github.com/cs3org/reva v1.12.1-0.20210908153040-a1a5d61a9ac0
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth v1.1.3-0.20210729125545-b9aecdfcac31
-	github.com/go-chi/chi/v5 v5.0.3
+	github.com/go-chi/chi/v5 v5.0.4
 	github.com/go-chi/render v1.0.1
 	github.com/go-kit/kit v0.10.0 // indirect
 	github.com/go-logr/logr v0.4.0
@@ -61,11 +61,11 @@ require (
 	github.com/yaegashi/msgraph.go v0.1.4
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.22.0
-	go.opentelemetry.io/otel v1.0.0-RC2
+	go.opentelemetry.io/otel v1.0.0-RC3
 	go.opentelemetry.io/otel/exporters/jaeger v1.0.0-RC2
 	go.opentelemetry.io/otel/metric v0.20.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.0.0-RC2
-	go.opentelemetry.io/otel/trace v1.0.0-RC2
+	go.opentelemetry.io/otel/sdk v1.0.0-RC3
+	go.opentelemetry.io/otel/trace v1.0.0-RC3
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
 	golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e

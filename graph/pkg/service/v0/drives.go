@@ -1,17 +1,26 @@
 package svc
 
 import (
+	"fmt"
 	"math"
 	"net/http"
 	"net/url"
 	"path"
+	"strconv"
 	"time"
 
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	ctxpkg "github.com/cs3org/reva/pkg/ctx"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
+	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+	sproto "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsSvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	msgraph "github.com/owncloud/open-graph-api-go"
 )
 
@@ -126,6 +135,73 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &listResponse{Value: files})
+}
+
+// CreateDrive creates a storage drive (space).
+func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
+	us, ok := ctxpkg.ContextGetUser(r.Context())
+	if !ok {
+		errorcode.GeneralException.Render(w, r, http.StatusUnauthorized, "invalid user")
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	s := sproto.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
+
+	_, err := s.GetPermissionByID(r.Context(), &sproto.GetPermissionByIDRequest{
+		PermissionId: settingsSvc.CreateSpacePermissionID,
+	})
+	if err != nil {
+		// if the permission is not existing for the user in context we can assume we don't have it. Return 401.
+		errorcode.GeneralException.Render(w, r, http.StatusUnauthorized, "insufficient permissions to create a space.")
+		return
+	}
+
+	client, err := g.GetClient()
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	spaceName := chi.URLParam(r, "drive-name")
+	if spaceName == "" {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Errorf("invalid name").Error())
+		return
+	}
+
+	quota, _ := strconv.ParseUint(r.Form.Get("quota"), 10, 64)
+	if quota == 0 {
+		quota = 65536 // set default quota if no form value was sent.
+	}
+
+	quotaMaxFiles, _ := strconv.ParseUint(r.Form.Get("quotaMaxFiles"), 10, 64)
+	if quotaMaxFiles == 0 {
+		quotaMaxFiles = 20 // set default quotaMaxFiles if no form value was sent.
+	}
+
+	csr := provider.CreateStorageSpaceRequest{
+		Owner: us,
+		Type:  "share",
+		Name:  spaceName,
+		Quota: &provider.Quota{
+			QuotaMaxBytes: quota,
+			QuotaMaxFiles: quotaMaxFiles,
+		},
+	}
+
+	resp, err := client.CreateStorageSpace(r.Context(), &csr)
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Errorf("").Error())
+	}
 }
 
 func cs3TimestampToTime(t *types.Timestamp) time.Time {
