@@ -300,12 +300,6 @@ Synchronization features like etag propagation, setting mtime and locking files
 ### Share
 File and sync features in a shared scenario
 
-#### [etags don't change for a share receiver](https://github.com/owncloud/product/issues/243)
--   [apiWebdavEtagPropagation1/moveFileFolder.feature:244](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L244)
--   [apiWebdavEtagPropagation1/moveFileFolder.feature:245](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L245)
--   [apiWebdavEtagPropagation1/moveFileFolder.feature:314](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L314)
--   [apiWebdavEtagPropagation1/moveFileFolder.feature:315](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L315)
-
 #### [Searching sharee with displayname](https://github.com/owncloud/ocis/issues/547)
 -   [apiSharees/sharees.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L32)
 -   [apiSharees/sharees.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L33)
@@ -335,10 +329,8 @@ File and sync features in a shared scenario
 -   [apiShareManagementToShares/acceptShares.feature:310](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L310)
 
 #### [cannot accept identical pending shares from different user serially](https://github.com/owncloud/ocis/issues/2131)
-- [apiShareManagementToShares/acceptShares.feature:82](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L82)
 - [apiShareManagementToShares/acceptShares.feature:261](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L261)
 - [apiShareCreateSpecialToShares1/createShareUniqueReceivedNames.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareUniqueReceivedNames.feature#L15)
-- [apiShareManagementToShares/acceptShares.feature:82](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L82)
 - [apiShareManagementToShares/acceptShares.feature:504](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L504)
 - [apiShareManagementToShares/acceptShares.feature:565](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L565)
 - [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:153](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L153)
@@ -347,9 +339,6 @@ File and sync features in a shared scenario
 - [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:194](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L194)
 - [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L47)
 - [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L48)
-
-#### [a declined share still exists in Shares directory](https://github.com/owncloud/ocis/issues/2128)
--   [apiShareManagementToShares/acceptShares.feature:207](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L207)
 
 #### [file_target of a auto-renamed file is not correct directly after sharing](https://github.com/owncloud/core/issues/32322)
 -   [apiShareManagementBasicToShares/deleteShareFromShares.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L46)
@@ -361,11 +350,6 @@ File and sync features in a shared scenario
 
 #### [Cannot move a file to a shared folder](https://github.com/owncloud/ocis/issues/2146)
 -   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:515](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L515)
-
-#### [deleting share response does not contain `data` field](https://github.com/owncloud/ocis/issues/721)
-
--   [apiShareManagementBasicToShares/deleteShareFromShares.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L43)
--   [apiShareManagementBasicToShares/deleteShareFromShares.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L44)
 
 #### [sharing via API and changing the cases in the username does not work correctly](https://github.com/owncloud/core/issues/35484)
 -   [apiShareManagementBasicToShares/createShareToSharesFolder.feature:373](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L373)
@@ -662,7 +646,6 @@ _getting and setting quota_
 #### [not possible to move file into a received folder](https://github.com/owncloud/ocis/issues/764)
 -   [apiShareOperationsToShares1/changingFilesShare.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L24)
 -   [apiShareOperationsToShares1/changingFilesShare.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L25)
--   [apiShareOperationsToShares1/changingFilesShare.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L66)
 -   [apiShareOperationsToShares1/changingFilesShare.feature:82](https://github.com/owncloud/core/blob/master/test/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L82)
 -   [apiShareOperationsToShares1/changingFilesShare.feature:98](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L98)
 
@@ -1423,10 +1406,6 @@ Scenario Outline: Unauthenticated call
 -   [apiShareOperationsToShares2/shareAccessByID.feature:143](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L143)
 -   [apiShareOperationsToShares2/shareAccessByID.feature:155](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L155)
 -   [apiShareOperationsToShares2/shareAccessByID.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L156)
-
-#### [File is still present in the file list after declining a share](https://github.com/owncloud/ocis/issues/2112)
--   [apiShareOperationsToShares2/shareAccessByID.feature:123](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L123)
--   [apiShareOperationsToShares2/shareAccessByID.feature:124](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L124)
 
 #### [[OC-storage] share-types field empty for shared file folder in webdav response](https://github.com/owncloud/ocis/issues/2144)
 -   [apiWebdavProperties2/getFileProperties.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L156)
