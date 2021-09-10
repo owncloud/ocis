@@ -91,6 +91,7 @@ services:
     entrypoint:
       - /bin/sh
       - /entrypoint-override.sh
+    #command: storage-app-provider server
     environment:
       STORAGE_GATEWAY_ENDPOINT: ocis:9142
       APP_PROVIDER_BASIC_EXTERNAL_ADDR: ocis-appdriver-onlyoffice:9164
@@ -112,9 +113,7 @@ services:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
-    entrypoint:
-      - /bin/sh
-      - /entrypoint-override.sh
+    command: storage-app-provider server
     environment:
       STORAGE_GATEWAY_ENDPOINT: ocis:9142
       APP_PROVIDER_BASIC_EXTERNAL_ADDR: ocis-appdriver-collabora:9164
@@ -126,8 +125,6 @@ services:
       APP_PROVIDER_WOPI_DRIVER_INSECURE: "${INSECURE:-false}"
       APP_PROVIDER_WOPI_DRIVER_IOP_SECRET: ${WOPI_IOP_SECRET:-LoremIpsum123}
       APP_PROVIDER_WOPI_DRIVER_WOPI_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
-    volumes:
-      - ./config/ocis-appdriver-collabora/entrypoint-override.sh:/entrypoint-override.sh
     logging:
       driver: "local"
     restart: always
@@ -160,6 +157,7 @@ services:
     volumes:
       - ./config/wopiserver/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/wopiserver/wopiserver.conf.dist:/etc/wopi/wopiserver.conf.dist
+      # TODO: remove this hack and add contribution upstream
       - /home/kloucek/Projects/github.com/cs3org/wopiserver/src/core/wopi.py:/app/core/wopi.py
       - wopi-data:/var/wopi_local_storage
       - wopi-logs:/var/log/wopi
@@ -211,7 +209,7 @@ services:
       - "traefik.http.routers.onlyoffice.service=onlyoffice"
       - "traefik.http.services.onlyoffice.loadbalancer.server.port=80"
       # websockets can't be opend when this is ommitted
-      - traefik.http.middlewares.onlyoffice.headers.customrequestheaders.X-Forwarded-Proto=https
+      - "traefik.http.middlewares.onlyoffice.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.onlyoffice.middlewares=onlyoffice"
     logging:
       driver: "local"
