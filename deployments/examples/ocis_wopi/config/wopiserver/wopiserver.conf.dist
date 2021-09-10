@@ -125,4 +125,4 @@ authtokenvalidity = 3600
 
 # SSL certificate check for Reva
 # oCIS uses self signed certificate in this example
-#sslverify = false
+sslverify = false
