@@ -17,16 +17,25 @@ The cephfs development happens in a [reva branch](https://github.com/cs3org/reva
 
 ## Architecture
 
-In the original approach the driver was based on the localfs driver, relying on a locally mounted cephfs. It would interface with it using the POSIX apis. This has been changed to direct Ceph API access using https://github.com/ceph/go-ceph. It allows using the ceph admin APIs to create subvolumes for user homes and maintain a file id to path mapping using symlinks.
+In the original approach the driver was based on the localfs driver, relying on a locally mounted cephfs. It would interface with it using the POSIX apis. This has been changed to directly call the Ceph API using https://github.com/ceph/go-ceph. It allows using the ceph admin APIs to create subvolumes for user homes and maintain a file id to path mapping using symlinks.
 
-It also uses the `.snap` folder built into Ceph to provide versions.
+## Implemented Aspects
+The recursive change time built ino cephfs is used to implement the etag propagation expected by the ownCloud clients. This allows ocis to pick up changes that have been made by external tools, bypassing any oCIS APIs. 
 
-Trash is not implemented, as cephfs has no native recycle bin.
+Like other filesystems cephfs uses inodes and like most other filesystems inodes are reused. To get stable file identifiers the current cephfs driver assigns every node a file id and maintains a fileid to path mapping in a system directory.
+
+Versions are not file but snapshot based, a native feature of cephfs. The driver maps entries in the native cephfs `.snap` folder available in the web UI using the versions sidebar.    
+
+Trash is not implemented, as cephfs has no native recycle bin and instead relies on the snapshot functionality that can be triggered by endusers. It should be possible to automatically create a snapshot before deleting a file. This needs to be explored.
+
+Shares can be mapped to ACLs supported by cephfs. The share manager is used to persist the intent of a share and can be used to periodically verify or reset the ACLs on cephfs.
 
 ## Future work
-- The spaces concept matches subvolumes, implement the CreateStorageSpace call with that, keep track of the list of storage spaces using symlings, like for the id based lookup
-- The Share manager needs a persistence layer.
-  - currently we persist using a json file. An sqlite db would be more robust.
-  - As it basically provides two lists, *shared with me* and *shared with others* we could persist this directly on cephfs!
-  - To allow deprovisioning a user the data should by sharded by userid.
-  - Backups are then done using snapshots.
+- The spaces concept matches cephfs subvolumes. We can implement the CreateStorageSpace call with that, keep track of the list of storage spaces using symlinks, like for the id based lookup.
+- The share manager needs a persistence layer.
+- Currently we persist using a single json file.
+- As it basically provides two lists, *shared with me* and *shared with others*, we could persist them directly on cephfs!
+- A good tradeoff would be a folder for each user with a json file for each list. That way, we only have to open and read a single file when the user want's to list the shares.    
+- To allow deprovisioning a user the data should by sharded by userid.
+- Backups are then done using snapshots.
+
