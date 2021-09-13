@@ -20,9 +20,9 @@ The cephfs development happens in a [reva branch](https://github.com/cs3org/reva
 In the original approach the driver was based on the localfs driver, relying on a locally mounted cephfs. It would interface with it using the POSIX apis. This has been changed to directly call the Ceph API using https://github.com/ceph/go-ceph. It allows using the ceph admin APIs to create subvolumes for user homes and maintain a file id to path mapping using symlinks.
 
 ## Implemented Aspects
-The recursive change time built ino cephfs is used to implement the etag propagation expected by the ownCloud clients. This allows ocis to pick up changes that have been made by external tools, bypassing any oCIS APIs. 
+The recursive change time built ino cephfs is used to implement the etag propagation expected by the ownCloud clients. This allows oCIS to pick up changes that have been made by external tools, bypassing any oCIS APIs. 
 
-Like other filesystems cephfs uses inodes and like most other filesystems inodes are reused. To get stable file identifiers the current cephfs driver assigns every node a file id and maintains a fileid to path mapping in a system directory:
+Like other filesystems cephfs uses inodes and like most other filesystems inodes are reused. To get stable file identifiers the current cephfs driver assigns every node a file id and maintains a custom fileid to path mapping in a system directory:
 ```
 /tmp/cephfs $ tree -a
 .
@@ -38,11 +38,11 @@ Like other filesystems cephfs uses inodes and like most other filesystems inodes
     └── .uploads
 ```
 
-Versions are not file but snapshot based, a native feature of cephfs. The driver maps entries in the native cephfs `.snap` folder available in the web UI using the versions sidebar.    
+Versions are not file but snapshot based, a [native feature of cephfs](https://docs.ceph.com/en/latest/dev/cephfs-snapshots/). The driver maps entries in the native cephfs `.snap` folder to the CS3 api recycle bin concept and makes them available in the web UI using the versions sidebar. Snepshots cen be triggered by users themselves or on a schedule.
 
-Trash is not implemented, as cephfs has no native recycle bin and instead relies on the snapshot functionality that can be triggered by endusers. It should be possible to automatically create a snapshot before deleting a file. This needs to be explored.
+Trash is not implemented, as cephfs has no native recycle bin and instead relies on the snapshot functionality that can be triggered by end users. It should be possible to automatically create a snapshot before deleting a file. This needs to be explored.
 
-Shares can be mapped to ACLs supported by cephfs. The share manager is used to persist the intent of a share and can be used to periodically verify or reset the ACLs on cephfs.
+Shares [are be mapped to ACLs](https://github.com/cs3org/reva/pull/1209/files#diff-5e532e61f99bffb5754263bc6ce75f84a30c6f507a58ba506b0b487a50eda1d9R168-R224) supported by cephfs. The share manager is used to persist the intent of a share and can be used to periodically verify or reset the ACLs on cephfs.
 
 ## Future work
 - The spaces concept matches cephfs subvolumes. We can implement the CreateStorageSpace call with that, keep track of the list of storage spaces using symlinks, like for the id based lookup.
@@ -54,7 +54,7 @@ Shares can be mapped to ACLs supported by cephfs. The share manager is used to p
 - A good tradeoff would be a folder for each user with a json file for each list. That way, we only have to open and read a single file when the user want's to list the shares.    
 - To allow deprovisioning a user the data should by sharded by userid.
 - For consistency over metadata any file blob data, backups can be done using snapshots.
-- An example where einstein has sherad a file with marie would look like this on disk:
+- An example where einstein has shared a file with marie would look like this on disk:
 ```
 /tmp/cephfs $ tree -a
 .
@@ -74,3 +74,4 @@ Shares can be mapped to ACLs supported by cephfs. The share manager is used to p
     └── marie
         └── sharedWithMe.json
 ```
+- The fileids should [not be based on the path](https://github.com/cs3org/reva/pull/1209/files#diff-eba5c8b77ccdd1ac570c54ed86dfa7643b6b30e5625af191f789727874850172R125-R127) and instead use a uuid that is also persisted in the extended attributes to allow rebuilding the index from scratch if necessary.
