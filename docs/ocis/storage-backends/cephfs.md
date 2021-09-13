@@ -22,7 +22,21 @@ In the original approach the driver was based on the localfs driver, relying on 
 ## Implemented Aspects
 The recursive change time built ino cephfs is used to implement the etag propagation expected by the ownCloud clients. This allows ocis to pick up changes that have been made by external tools, bypassing any oCIS APIs. 
 
-Like other filesystems cephfs uses inodes and like most other filesystems inodes are reused. To get stable file identifiers the current cephfs driver assigns every node a file id and maintains a fileid to path mapping in a system directory.
+Like other filesystems cephfs uses inodes and like most other filesystems inodes are reused. To get stable file identifiers the current cephfs driver assigns every node a file id and maintains a fileid to path mapping in a system directory:
+```
+/tmp/cephfs $ tree -a
+.
+├── reva
+│   └── einstein
+│       ├── Pictures
+│       └── welcome.txt
+└── .reva_hidden
+    ├── .fileids
+    │   ├── 50BC39D364A4703A20C58ED50E4EADC3_570078 -> /tmp/cephfs/reva/einstein
+    │   ├── 571EFB3F0ACAE6762716889478E40156_570081 -> /tmp/cephfs/reva/einstein/Pictures
+    │   └── C7A1397524D0419B38D04D539EA531F8_588108 -> /tmp/cephfs/reva/einstein/welcome.txt
+    └── .uploads
+```
 
 Versions are not file but snapshot based, a native feature of cephfs. The driver maps entries in the native cephfs `.snap` folder available in the web UI using the versions sidebar.    
 
@@ -35,7 +49,28 @@ Shares can be mapped to ACLs supported by cephfs. The share manager is used to p
 - The share manager needs a persistence layer.
 - Currently we persist using a single json file.
 - As it basically provides two lists, *shared with me* and *shared with others*, we could persist them directly on cephfs!
+  - If needed for redundancy, the share manager can be run multiple times, backed by the same cephfs
+  - To save disk io the data can be cached in memory, and invalidated using stat requests.
 - A good tradeoff would be a folder for each user with a json file for each list. That way, we only have to open and read a single file when the user want's to list the shares.    
 - To allow deprovisioning a user the data should by sharded by userid.
-- Backups are then done using snapshots.
-
+- For consistency over metadata any file blob data, backups can be done using snapshots.
+- An example where einstein has sherad a file with marie would look like this on disk:
+```
+/tmp/cephfs $ tree -a
+.
+├── reva
+│   └── einstein
+│       ├── Pictures
+│       └── welcome.txt
+├── .reva_hidden
+│   ├── .fileids
+│   │   ├── 50BC39D364A4703A20C58ED50E4EADC3_570078 -> /tmp/cephfs/reva/einstein
+│   │   ├── 571EFB3F0ACAE6762716889478E40156_570081 -> /tmp/cephfs/reva/einstein/Pictures
+│   │   └── C7A1397524D0419B38D04D539EA531F8_588108 -> /tmp/cephfs/reva/einstein/welcome.txt
+│   └── .uploads
+└── .reva_share_manager
+    ├── einstein
+    │   └── sharedWithOthers.json
+    └── marie
+        └── sharedWithMe.json
+```
