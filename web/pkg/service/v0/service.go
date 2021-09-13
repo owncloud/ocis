@@ -133,14 +133,15 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 	if !strings.HasSuffix(rootWithSlash, "/") {
 		rootWithSlash = rootWithSlash + "/"
 	}
-
+	assets := assets.New(
+		assets.Logger(p.logger),
+		assets.Config(p.config),
+	)
 	static := http.StripPrefix(
 		rootWithSlash,
-		http.FileServer(
-			assets.New(
-				assets.Logger(p.logger),
-				assets.Config(p.config),
-			),
+		interceptNotFound(
+			http.FileServer(assets),
+			rootWithSlash,
 		),
 	)
 
@@ -181,4 +182,34 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 
 		static.ServeHTTP(w, r)
 	}
+}
+
+func interceptNotFound(h http.Handler, root string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		notFoundInterceptor := &NotFoundInterceptor{ResponseWriter: w}
+		h.ServeHTTP(notFoundInterceptor, r)
+		if notFoundInterceptor.status == http.StatusNotFound {
+			http.Redirect(w, r, root, http.StatusTemporaryRedirect)
+			// TODO: replace the redirect with a not found page containing a link to the Web UI
+		}
+	}
+}
+
+type NotFoundInterceptor struct {
+	http.ResponseWriter
+	status int
+}
+
+func (w *NotFoundInterceptor) WriteHeader(status int) {
+	w.status = status
+	if status != http.StatusNotFound {
+		w.ResponseWriter.WriteHeader(status)
+	}
+}
+
+func (w *NotFoundInterceptor) Write(p []byte) (int, error) {
+	if w.status != http.StatusNotFound {
+		return w.ResponseWriter.Write(p)
+	}
+	return len(p), nil
 }
