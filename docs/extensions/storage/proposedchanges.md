@@ -13,29 +13,21 @@ Some architectural changes still need to be clarified or changed. Maybe an ADR i
 
 ## A dedicated shares storage provider
 
-Currently, the *gateway* treats `/home/shares` different than any other path: it will stat all children and calculate an etag to allow clients to discover changes in accepted shares. This requires the storage provider to cooperate and provide this special `/shares` folder in the root of a users home when it is accessed as a home storage, which is a config flag that needs to be set for every storage driver.
+Currently, when a user accepts a share, a cs3 reference is created in the users `/home/shares` folder. This reference represents the mount point of a share and can be renamed, similar to the share jail in ownCloud 10. This spreads the metadata of a share in two places:
+- the share is persisted in the *share manager*
+- the mount point of a share is persisted in the home *storage provider*
 
-The `enable_home` flag will cause drivers to jail path based requests into a `<userlayout>` subfolder. In effect it divides a storage provider into multiple [*storage spaces*]({{< ref "#storage-spaces" >}}): when calling `CreateHome` a subfolder following the `<userlayout>` is created and market as the root of a users home. Both, the eos and ocis storage drivers use extended attributes to mark the folder as the end of the size aggregation and tree mtime propagation mechanism. Even setting the quota is possible like that. All this literally is a [*storage space*]({{< ref "#storage-spaces" >}}).
+Furthermore, the *gateway* treats `/home/shares` different than any other path: it will stat all children and calculate an etag to allow clients to discover changes in accepted shares. This requires the storage provider to cooperate and provide this special `/shares` folder in the root of a users home when it is accessed as a home storage. That is the origin of the `enable_home` config flag that needs to be implemented for every storage driver.
 
-We can implement [ListStorageSpaces](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.ListStorageSpacesRequest) by either
-- iterating over the root of the storage and treating every folder following the `<userlayout>` as a `home` *storage space*, 
-- iterating over the root of the storage and treating every folder following a new `<projectlayout>` as a `project` *storage space*, or
-- iterating over the root of the storage and treating every folder following a generic `<layout>` as a *storage space* for a configurable space type, or
-- we allow configuring a map of `space type` to `layout` (based on the [CreateStorageSpaceRequest](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.CreateStorageSpaceRequest)) which would allow things like
-```
-home=/var/lib/ocis/storage/home/{{substr 0 1 .Owner.Username}}/{{.Owner.Username}}
-spaces=/spaces/var/lib/ocis/storage/projects/{{.Name}}
-```
+In order to have a single source of truth we need to make the *share manager* aware of the mount point. We can then move all the logic that aggregates the etag in the share folder to a dedicated *shares storage provider* that is using the *share manager* for persistence. The *shares storage provider* would provide a `/shares` namespace outside of `/home` that lists all accepted shares for the current user. As a result the storage drivers no longer need to have a `enable_home` flag that jails users into their home. The `/home/shares` folder would move outside of the `/home`. In fact `/home` will no longer be needed, because the home folder concept can be implemented as a space: `CreateHome` would create a `personal` space on the. 
 
-This would make the `GetHome()` call return the path to the *storage provider* including the relative path to the *storage space*. No need for a *storage provider* mounted at `/home`. This is just a UI alias for `/users/<userlayout>`. Just like a normal `/home/<username>` on a linux machine.
+Work on this is done in https://github.com/cs3org/reva/pull/2023
 
-But if we have no `/home` where do we find the shares, and how can clients discover changes in accepted shares?
-
-The `/shares` namespace should be provided by a *shares storage provider* that lists all accepted shares for the current user... but what about copy pasting links from the browser? Well this storage is only really needed to have a path to ocm shares that actually reside on other instances. In the UI the shares would be listed by querying a *share manager*. It returns ResourceIds, which can be stated to fetch a path that is then accessible in the CS3 global namespace. Two caveats:
+{{< hint warning >}}
+What about copy pasting links from the browser? Well this storage is only really needed to have a path to ocm shares that actually reside on other instances. In the UI the shares would be listed by querying a *share manager*. It returns ResourceIds, which can be stated to fetch a path that is then accessible in the CS3 global namespace. Two caveats:
 - This only works for resources that are actually hosted by the current instance. For those it would leak the parent path segments to a shared resource.
 - For accepted OCM shares there must be a path in the [*CS3 global namespace*]({{< ref "./namespaces.md#cs3-global-namespaces" >}}) that has to be the same for all users, otherwise they cannot copy and share those URLs.
-
-Work on this is done in https://github.com/cs3org/reva/pull/1846
+{{< /hint >}}
 
 ### The gateway should be responsible for path transformations
 
@@ -47,9 +39,9 @@ Work is done in https://github.com/cs3org/reva/pull/1866
 
 ## URL escaped string representation of a CS3 reference
 
-For the `/dav/spaces/` endpoint we need to encode the *reference* in a url compatible way. 
+For the spaces concept we introduced the `/dav/spaces/` endpoint. It encodes a cs3 *reference* in a URL compatible way. 
 1. We can separate the path using a `/`: `/dav/spaces/<spaceid>/<path>`
-2. The `spaceid` currently is a cs3 resourceid, consisting of `<storageid>` and `<nodeid>`. Since the nodeid might contain `/` eg. for the local driver we have to urlencode the spaceid.
+2. The `spaceid` currently is a cs3 resourceid, consisting of `<storageid>` and `<opaqueid>`. Since the opaqueid might contain `/` eg. for the local driver we have to urlencode the spaceid.
 
 To access resources by id we need to make the `/dav/meta/<resourceid>` able to list directories... Otherwise id based navigation first has to look up the path. Or we use the libregraph api for id based navigation.
 

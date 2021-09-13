@@ -49,7 +49,7 @@ The ocdav service not only handles all WebDAV requests under `(remote.php/)(web)
 | *Note: existing folder sync pairs in legacy clients will break when moving the user home down in the path hierarchy* |||||
 | `(remote.php/)webdav/home` | ocdav | storageprovider | `/home` |  |  |
 | `(remote.php/)webdav/users` | ocdav | storageprovider | `/users` |  |  |
-| `(remote.php/)dav/files/<username>` | ocdav | storageprovider | `/users/<userlayout>` |  |  |
+| `(remote.php/)dav/files/<username>` | ocdav | storageprovider | `/users/<user_layout>` |  |  |
 | *Spaces concept also needs a new endpoint:* |||||
 | `(remote.php/)dav/spaces/<spaceid>/<relative_path>` | ocdav | storageregistry & storageprovider | bypass path based namespace and directly talk to the responsible storage provider using a relative path | [spaces concept](https://github.com/owncloud/ocis/pull/1827) needs to point to storage [*spaces*]({{< ref "./spaces.md" >}}) | allow accessing spaces, listing is done by the graph api |
 

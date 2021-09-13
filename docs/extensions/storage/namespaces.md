@@ -16,7 +16,7 @@ The different paths in the namespaces need to be translated while passing [*refe
 
 | oc10 namespace                                   | CS3 global namespace                   | storage provider | reference | content |
 |--------------------------------------------------|----------------------------------------|------------------|-----------|---------|
-| `/webdav/path/to/file.ext` `/dav/files/<username>/path/to/file.ext`                       | `/home/path/to/file.ext` | home | `/<userlayout>/path/to/file.ext` | currently logged in users home |
+| `/webdav/path/to/file.ext` `/dav/files/<username>/path/to/file.ext`                       | `/home/path/to/file.ext` | home | `/<user_layout>/path/to/file.ext` | currently logged in users home |
 | `/webdav/Shares/foo` `/dav/files/<username>/Shares/foo` | `/home/Shares/foo`              | users | id based access | all users, used to access collaborative shares |
 | `/dav/public-files/<token>/rel/path/to/file.ext` | `/public/<token>/rel/path/to/file.ext` | public | id based access | publicly shared files, used to access public links |
 
@@ -43,7 +43,7 @@ The *CS3 global namespace* in oCIS is configured in the storage [*spaces registr
 | global namespace | description |
 |-|-|
 | `/home` | an alias for the currently logged in uses private space |
-| `/users/<userlayout>` | user private spaces |
+| `/users/<user_layout>` | user private spaces |
 | `/shares` | a virtual listing of share spaces a user has access to |
 | `/public/<token>` | a virtual folder listing public shares |
 | `/spaces/<spacename>` | *TODO: project or group spaces* |
@@ -51,7 +51,7 @@ The *CS3 global namespace* in oCIS is configured in the storage [*spaces registr
 Technically, the `/home` namespace is not necessary: the storage [*spaces registry*]({{< ref "./spacesregistry" >}}) knows the path to a users private space in the `/users` namespace and the gateway can forward the requests to the responsible storage provider.
 
 {{< hint warning >}}
-*@jfd: Why don't we use `/home/<userlayout>` instead of `/users/<userlayout>`. Then the paths would be consistent with most unix systems.
+*@jfd: Why don't we use `/home/<user_layout>` instead of `/users/<user_layout>`. Then the paths would be consistent with most unix systems.
 {{< /hint >}}
 
 The `/shares` namespace is used to solve two problems:
