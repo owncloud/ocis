@@ -121,6 +121,8 @@ func usersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interf
 						"ldap": map[string]interface{}{
 							"hostname":        cfg.Reva.LDAP.Hostname,
 							"port":            cfg.Reva.LDAP.Port,
+							"cacert":          cfg.Reva.LDAP.CACert,
+							"insecure":        cfg.Reva.LDAP.Insecure,
 							"base_dn":         cfg.Reva.LDAP.BaseDN,
 							"userfilter":      cfg.Reva.LDAP.UserFilter,
 							"attributefilter": cfg.Reva.LDAP.UserAttributeFilter,

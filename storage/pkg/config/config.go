@@ -332,6 +332,8 @@ type OIDC struct {
 type LDAP struct {
 	Hostname             string
 	Port                 int
+	CACert               string
+	Insecure             bool
 	BaseDN               string
 	LoginFilter          string
 	UserFilter           string
