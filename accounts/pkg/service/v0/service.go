@@ -73,11 +73,11 @@ func New(opts ...Option) (s *Service, err error) {
 		return nil, err
 	}
 
-	if err = s.createDefaultAccounts(); err != nil {
+	if err = s.createDefaultAccounts(cfg.Server.DemoUsersAndGroups); err != nil {
 		return nil, err
 	}
 
-	if err = s.createDefaultGroups(); err != nil {
+	if err = s.createDefaultGroups(cfg.Server.DemoUsersAndGroups); err != nil {
 		return nil, err
 	}
 	return
@@ -152,7 +152,7 @@ func configFromSvc(cfg *config.Config) (*idxcfg.Config, error) {
 	return c, nil
 }
 
-func (s Service) createDefaultAccounts() (err error) {
+func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 	accounts := []proto.Account{
 		{
 			Id:                       "4c510ada-c86b-4815-8820-42cdf82c3d51",
@@ -278,8 +278,19 @@ func (s Service) createDefaultAccounts() (err error) {
 			},
 		},
 	}
+
+	mustHaveAccounts := map[string]bool{
+		"bc596f3c-c955-4328-80a0-60d018b4ad57": true, // Reva IOP
+		"820ba2a1-3f54-4538-80a4-2d73007e30bf": true, // Kopano IDP
+		"ddc2004c-0977-11eb-9d3f-a793888cd0f8": true, // admin
+	}
+
 	// this only deals with the metadata service.
 	for i := range accounts {
+		if !withDemoAccounts && !mustHaveAccounts[accounts[i].Id] {
+			continue
+		}
+
 		a := &proto.Account{}
 		err := s.repo.LoadAccount(context.Background(), accounts[i].Id, a)
 		if !storage.IsNotFoundErr(err) {
@@ -323,7 +334,7 @@ func (s Service) createDefaultAccounts() (err error) {
 	return nil
 }
 
-func (s Service) createDefaultGroups() (err error) {
+func (s Service) createDefaultGroups(withDemoGroups bool) (err error) {
 	groups := []proto.Group{
 		{Id: "34f38767-c937-4eb6-b847-1c175829a2a0", GidNumber: 15000, OnPremisesSamAccountName: "sysusers", DisplayName: "Technical users", Description: "A group for technical users. They should not show up in sharing dialogs.", Members: []*proto.Account{
 			{Id: "820ba2a1-3f54-4538-80a4-2d73007e30bf"}, // idp
@@ -358,7 +369,17 @@ func (s Service) createDefaultGroups() (err error) {
 			{Id: "932b4540-8d16-481e-8ef4-588e4b6b151c"}, // feynman
 		}},
 	}
+
+	mustHaveGroups := map[string]bool{
+		"34f38767-c937-4eb6-b847-1c175829a2a0": true, // sysusers
+		"509a9dcd-bb37-4f4f-a01a-19dca27d9cfa": true, // users
+	}
+
 	for i := range groups {
+		if !withDemoGroups && !mustHaveGroups[groups[i].Id] {
+			continue
+		}
+
 		g := &proto.Group{}
 		err := s.repo.LoadGroup(context.Background(), groups[i].Id, g)
 		if !storage.IsNotFoundErr(err) {
