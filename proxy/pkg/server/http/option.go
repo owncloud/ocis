@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	"github.com/justinas/alice"
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/metrics"
+	"github.com/urfave/cli/v2"
 )
 
 // Option defines a single option function.

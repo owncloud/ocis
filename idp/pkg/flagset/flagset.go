@@ -3,10 +3,10 @@ package flagset
 import (
 	"path"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/idp/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
+	"github.com/urfave/cli/v2"
 )
 
 // RootWithConfig applies cfg to the root flagset

@@ -8,13 +8,13 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/thejerf/suture/v4"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/graph/pkg/config"
 	"github.com/owncloud/ocis/graph/pkg/flagset"
 	"github.com/owncloud/ocis/graph/pkg/version"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/spf13/viper"
+	"github.com/urfave/cli/v2"
 )
 
 // Execute is the entry point for the ocis-graph command.

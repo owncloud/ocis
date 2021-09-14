@@ -3,10 +3,10 @@ package http
 import (
 	"context"
 
-	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocs/pkg/config"
 	"github.com/owncloud/ocis/ocs/pkg/metrics"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/urfave/cli/v2"
 )
 
 // Option defines a single option function.

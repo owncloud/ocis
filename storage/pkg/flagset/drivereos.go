@@ -5,8 +5,8 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // DriverEOSWithConfig applies cfg to the root flagset

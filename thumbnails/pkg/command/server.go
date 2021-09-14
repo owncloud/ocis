@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
@@ -13,6 +12,7 @@ import (
 	"github.com/owncloud/ocis/thumbnails/pkg/server/debug"
 	"github.com/owncloud/ocis/thumbnails/pkg/server/grpc"
 	"github.com/owncloud/ocis/thumbnails/pkg/tracing"
+	"github.com/urfave/cli/v2"
 )
 
 // Server is the entrypoint for the server command.
