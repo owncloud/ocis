@@ -119,10 +119,10 @@ _Feel free to add your question as a PR to this document using the link at the t
 
 ### Stage 3: introduce oCIS interally
 
-Befor letting oCIS handle end user requests we will first make it available in the internal network. By subsequently adding services we can add functionality and verify the services work as intended.
+Before letting oCIS handle end user requests we will first make it available in the internal network. By subsequently adding services we can add functionality and verify the services work as intended.
 
 Start oCIS backend and make read only tests on existing data using the `owncloudsql` storage driver which will read (and write)
-- blobs from the same datadirectory layout as in ownCloud 10
+- blobs from the same data directory layout as in ownCloud 10
 - metadata from the ownCloud 10 database: 
 The oCIS share manager will read share information from the ownCloud database using an `owncloud` driver as well.
 
@@ -139,11 +139,11 @@ None, only administrators will be able to explore oCIS during this stage.
 
 #### Steps and verifications
 
-We are going to run and explore a series of services that will together handle the same requests as ownCloud 10. For initial exploration the oCIS binary is recommended. The services can later be deployed using a single oCIS runtime or in multiple cotainers.
+We are going to run and explore a series of services that will together handle the same requests as ownCloud 10. For initial exploration the oCIS binary is recommended. The services can later be deployed using a single oCIS runtime or in multiple containers.
 
 
 ##### Storage provider for file metadata
-1. Deploy OCIS storage provider with owncloudsql driver.
+1. Deploy OCIS storage provider with the `owncloudsql` driver.
 2. Set `read_only: true` in the storage provider config. <div class="editpage">_TODO @butonic add read only flag to storage drivers_</div>
 3. Use cli tool to list files using the CS3 api
 
@@ -194,7 +194,7 @@ When reading the files from oCIS return the same `uuid`. It can be migrated to a
 2. Use curl to list spaces using graph drives endpoint
 
 ##### owncloud flavoured WebDAV endpoint
-1. Deploy Ocdav
+1. Deploy ocdav
 2. Use curl to send PROPFIND
 
 ##### data provider for up and download
@@ -205,13 +205,13 @@ When reading the files from oCIS return the same `uuid`. It can be migrated to a
 Deploy ...
 
 ##### share manager
-Deploy share manager with owncloud driver
+Deploy share manager with ownCloud driver
 
 ##### reva gateway
 1. Deploy gateway to authenticate requests? I guess we need that first... Or we need the to mint a token. Might be a good exercise.
 
 ##### automated deployment
-Finally, deploy OCIS with a config to set up everything running in a single oCIS runtime or in multiple containers.
+Finally, deploy oCIS with a config to set up everything running in a single oCIS runtime or in multiple containers.
 
 #### Rollback
 You can stop the oCIS process at any time.
@@ -280,7 +280,7 @@ The IP address of the ownCloud host changes. There is no change for the file syn
 2. Verify the requests are routed based on the ownCloud 10 routing policy `oc10` by default
 
 ##### Test user based routing
-1. Change the routing policy for a user or an early adoptors group to `ocis` <div class="editpage">_TODO @butonic currently, the migration selector will use the `ocis` policy for users that have been added to the accounts service. IMO we need to evaluate a claim from the IdP._</div>
+1. Change the routing policy for a user or an early adopters group to `ocis` <div class="editpage">_TODO @butonic currently, the migration selector will use the `ocis` policy for users that have been added to the accounts service. IMO we need to evaluate a claim from the IdP._</div>
 2. Verify the requests are routed based on the oCIS routing policy `oc10` for 'migrated' users.
 
 At this point you are ready to rock & roll!
@@ -340,8 +340,7 @@ _TODO @butonic we need a canary app that allows users to decide for themself whi
 <div style="break-after: page"></div>
 
 #### Notes
-Running the two systems in parallel stage 
-Try to keep the duration of this stage short. Until now we only added services and made the system more complex. oCIS aims to reduce the maintenance cost of an ownCloud instance. You will not get there if you keep both systems alive.
+Running the two systems in parallel requires additional maintenance effort. Try to keep the duration of this stage short. Until now, we only added services and made the system more complex. oCIS aims to reduce the maintenance cost of an ownCloud instance. You will not get there if you keep both systems alive.
 
 <div class="editpage">
 
@@ -352,7 +351,29 @@ _Feel free to add your question as a PR to this document using the link at the t
 
 <div style="break-after: page"></div>
 
-### Stage-7: shut down ownCloud 10 
+### Stage-7: introduce spaces using ocis
+To encourage users to switch you can promote the workspaces feature that is built into oCIS. The ownCloud 10 storage backend can be used for existing users. New users and group or project spaces can be provided by storage providers that better suit the underlying storage system.
+
+#### Steps
+First, the admin needs to 
+- deploy a storage provider with the storage driver that best fits the underlying storage system and requirements. 
+- register the storage in the storage registry with a new storage id (we recommend a uuid).
+
+Then a user with the necessary create storage space role can create a storage space and assign Managers.
+
+<div class="editpage">
+
+_TODO @butonic a user with management permission needs to be presented with a list of storage spaces where he can see the amount of free space and decide on which storage provider the storage space should be created. For now a config option for the default storage provider for a specific type might be good enough._
+
+</div>
+
+#### Verification
+The new storage space should show up in the `/graph/drives` endpoint for the managers and the creator of the space.
+
+#### Notes
+Depending on the requirements and acceptable tradeoffs, a database less deployment using the ocis or s3ng storage driver is possible. There is also a [cephfs driver](https://github.com/cs3org/reva/pull/1209) on the way, that directly works on the API level instead of POSIX.
+
+### Stage-8: shut down ownCloud 10 
 Disable ownCloud 10 in the proxy, all requests are now handled by oCIS, shut down oc10 web servers and redis (or keep for calendar & contacts only? rip out files from oCIS?)
 
 #### User impact
@@ -387,7 +408,7 @@ _Feel free to add your question as a PR to this document using the link at the t
 
 <div style="break-after: page"></div>
 
-### Stage 8: storage migration
+### Stage 9: storage migration
 To get rid of the database we will move the metadata from the old ownCloud 10 database into dedicated storage providers. This can happen in a user by user fashion. group drives can properly be migrated to group, project or workspaces in this stage.
 
 #### User impact
@@ -401,12 +422,12 @@ Noticeable performance improvements because we effectively shard the storage log
 
 _TODO @butonic implement `ownclouds3` based on `s3ng`_
 _TODO @butonic implement tiered storage provider for seamless migration_
-_TODO @butonic document how to manually do that until the storge registry can discover that on its own._
+_TODO @butonic document how to manually do that until the storage registry can discover that on its own._
 
 </div>
 
 #### Verification
-Start with a test user, then move to early adoptors and finally migrate all users.
+Start with a test user, then move to early adopters and finally migrate all users.
 
 #### Rollback
 To switch the storage provider again the same storage space migration can be performed again: copy medatata and blob data using the CS3 api, then change the responsible storage provider in the storage registry.
@@ -426,13 +447,13 @@ _Feel free to add your question as a PR to this document using the link at the t
 
 <div style="break-after: page"></div>
 
-### Stage-9: share metadata migration
+### Stage-10: share metadata migration
 Migrate share data to _yet to determine_ share manager backend and shut down ownCloud database.
 
 The ownCloud 10 database still holds share information in the `oc_share` and `oc_share_external` tables. They are used to efficiently answer queries about who shared what with whom. In oCIS shares are persisted using a share manager and if desired these grants are also sent to the storage provider so it can set ACLs if possible. Only one system should be responsible for the shares, which in case of treating the storage as the primary source effectively turns the share manager into a cache.
 
 #### User impact
-Depending on chosen the share manager provider some sharing requests should be faster: listing incoming and outgoing shares is no longer bound to the ownCloud 10 database but to whatever technology is used by the share provdier:
+Depending on chosen the share manager provider some sharing requests should be faster: listing incoming and outgoing shares is no longer bound to the ownCloud 10 database but to whatever technology is used by the share provider:
   - For non HA scenarios they can be served from memory, backed by a simple json file.
   - TODO: implement share manager with redis / nats / ... key value store backend: use the micro store interface please ...
 
@@ -452,7 +473,7 @@ _TODO for storage provider as source of truth persist ALL share data in the stor
 </div>
 
 #### Verification
-After copying all metadata start a dedicated gateway and change the configuration to use the new share manager. Route a test user, a test group and early adoptors to the new gateway. When no problems occur you can stirt the desired number of share managers and roll out the change to all gateways.
+After copying all metadata start a dedicated gateway and change the configuration to use the new share manager. Route a test user, a test group and early adoptors to the new gateway. When no problems occur you can start the desired number of share managers and roll out the change to all gateways.
 
 <div class="editpage">
 
@@ -465,8 +486,8 @@ To switch the share manager to the database one revert routing users to the new 
 
 <div class="editpage">
 
-### Stage-10
-Profit! Well, on the one hand you do not need to maintain a clustered database setup and can rely on the storage system. On the other hand you are now in microservice wonderland and will have to relearn how to identify bottlenecks and scale oCIS accordingly. The good thing is that tools like jaeger and prometheus have evolved and will help you understand what is going on. But this is a different Topic. See you on the other side!
+### Stage-11
+Profit! Well, on the one hand you do not need to maintain a clustered database setup and can rely on the storage system. On the other hand you are now in microservice wonderland and will have to relearn how to identify bottlenecks and scale oCIS accordingly. The good thing is that tools like jaeger and prometheus have evolved and will help you understand what is going on. But this is a different topic. See you on the other side!
 
 #### FAQ
 _Feel free to add your question as a PR to this document using the link at the top of this page!_ 
