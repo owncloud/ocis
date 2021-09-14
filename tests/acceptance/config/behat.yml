@@ -6,6 +6,7 @@ default:
     apiAccountsHashDifficulty:
       paths:
         - '%paths.base%/../features/apiAccountsHashDifficulty'
+        - '%paths.base%/../features/apiSpaces'
       context: &common_ldap_suite_context
         parameters:
           ldapAdminPassword: admin
@@ -13,7 +14,7 @@ default:
           ldapGroupsOU: TestGroups
           ldapInitialUserFilePath: /../../config/ldap-users.ldif
       contexts:
-        - RevaContext:
+        - GraphApiContext:
         - OccContext:
         - FeatureContext: &common_feature_context_params
             baseUrl:  http://localhost:8080

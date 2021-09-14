@@ -1506,6 +1506,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
     environment = {
         #'OCIS_LOG_LEVEL': 'debug',
         "OCIS_URL": "https://ocis-server:9200",
+        "GRAPH_SPACES_WEBDAV_BASE": "https://ocis-server:9200/dav/spaces/",
         "STORAGE_HOME_DRIVER": "%s" % (storage),
         "STORAGE_USERS_DRIVER": "%s" % (storage),
         "STORAGE_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/users",
