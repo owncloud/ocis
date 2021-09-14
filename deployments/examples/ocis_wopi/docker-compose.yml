@@ -157,8 +157,6 @@ services:
     volumes:
       - ./config/wopiserver/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/wopiserver/wopiserver.conf.dist:/etc/wopi/wopiserver.conf.dist
-      # TODO: remove this hack and add contribution upstream
-      - /home/kloucek/Projects/github.com/cs3org/wopiserver/src/core/wopi.py:/app/core/wopi.py
       - wopi-data:/var/wopi_local_storage
       - wopi-logs:/var/log/wopi
     labels:
