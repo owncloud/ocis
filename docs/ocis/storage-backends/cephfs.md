@@ -13,11 +13,11 @@ oCIS intends to make the aspects of existing storage systems available as transp
 
 ## Development
 
-The cephfs development happens in a [reva branch](https://github.com/cs3org/reva/pull/1209) and is currently driven by CERN. 
+The cephfs development happens in a [Reva branch](https://github.com/cs3org/reva/pull/1209) and is currently driven by CERN. 
 
 ## Architecture
 
-In the original approach the driver was based on the localfs driver, relying on a locally mounted cephfs. It would interface with it using the POSIX apis. This has been changed to directly call the Ceph API using https://github.com/ceph/go-ceph. It allows using the ceph admin APIs to create subvolumes for user homes and maintain a file id to path mapping using symlinks.
+In the original approach the driver was based on the [localfs](https://github.com/cs3org/reva/blob/a8c61401b662d8e09175416c0556da8ef3ba8ed6/pkg/storage/utils/localfs/localfs.go) driver, relying on a locally mounted cephfs. It would interface with it using the POSIX apis. This has been changed to directly call the Ceph API using https://github.com/ceph/go-ceph. It allows using the ceph admin APIs to create subvolumes for user homes and maintain a file id to path mapping using symlinks.
 
 ## Implemented Aspects
 The recursive change time built ino cephfs is used to implement the etag propagation expected by the ownCloud clients. This allows oCIS to pick up changes that have been made by external tools, bypassing any oCIS APIs. 
@@ -38,7 +38,7 @@ Like other filesystems cephfs uses inodes and like most other filesystems inodes
     └── .uploads
 ```
 
-Versions are not file but snapshot based, a [native feature of cephfs](https://docs.ceph.com/en/latest/dev/cephfs-snapshots/). The driver maps entries in the native cephfs `.snap` folder to the CS3 api recycle bin concept and makes them available in the web UI using the versions sidebar. Snepshots cen be triggered by users themselves or on a schedule.
+Versions are not file but snapshot based, a [native feature of cephfs](https://docs.ceph.com/en/latest/dev/cephfs-snapshots/). The driver maps entries in the native cephfs `.snap` folder to the CS3 api recycle bin concept and makes them available in the web UI using the versions sidebar. Snapshots can be triggered by users themselves or on a schedule.
 
 Trash is not implemented, as cephfs has no native recycle bin and instead relies on the snapshot functionality that can be triggered by end users. It should be possible to automatically create a snapshot before deleting a file. This needs to be explored.
 
