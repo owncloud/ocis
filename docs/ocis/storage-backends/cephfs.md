@@ -52,7 +52,7 @@ Shares [are be mapped to ACLs](https://github.com/cs3org/reva/pull/1209/files#di
   - If needed for redundancy, the share manager can be run multiple times, backed by the same cephfs
   - To save disk io the data can be cached in memory, and invalidated using stat requests.
 - A good tradeoff would be a folder for each user with a json file for each list. That way, we only have to open and read a single file when the user want's to list the shares.    
-- To allow deprovisioning a user the data should by sharded by userid.
+- To allow deprovisioning a user the data should by sharded by userid. That way all share information belonging to a user can easily be removed from the system. If necessary it can also be restored easily by copying the user specific folder back in place.
 - For consistency over metadata any file blob data, backups can be done using snapshots.
 - An example where einstein has shared a file with marie would look like this on disk:
 ```
