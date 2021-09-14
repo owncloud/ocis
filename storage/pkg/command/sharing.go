@@ -138,7 +138,7 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 						},
 						"oc10-sql": map[string]interface{}{
 							"gateway_addr":     cfg.Reva.Gateway.Endpoint,
-							"storage_mount_id": cfg.Reva.Sharing.UserStorageMountID,
+							"storage_mount_id": cfg.Reva.Sharing.UserStorageMountId,
 							"db_username":      cfg.Reva.Sharing.UserSQLUsername,
 							"db_password":      cfg.Reva.Sharing.UserSQLPassword,
 							"db_host":          cfg.Reva.Sharing.UserSQLHost,
