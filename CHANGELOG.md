@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Create a Space using the Graph API: [#2471](https://github.com/owncloud/ocis/pull/2471)
 * Enhancement - Update go-chi/chi to version 5.0.3: [#2429](https://github.com/owncloud/ocis/pull/2429)
 * Enhancement - Upgrade go micro to v3.6.0: [#2451](https://github.com/owncloud/ocis/pull/2451)
+* Enhancement - Update reva to v1.13.0: [#2477](https://github.com/owncloud/ocis/pull/2477)
 
 ## Details
 
@@ -87,6 +88,23 @@ The following sections list the changes for unreleased.
    Go micro and all go micro plugins are now on v3.6.0
 
    https://github.com/owncloud/ocis/pull/2451
+
+* Enhancement - Update reva to v1.13.0: [#2477](https://github.com/owncloud/ocis/pull/2477)
+
+   This update includes:
+
+  * Bugfix [cs3org/reva#2054](https://github.com/cs3org/reva/pull/2054): Fix the response after deleting a share
+  * Bugfix [cs3org/reva#2026](https://github.com/cs3org/reva/pull/2026): Fix moving of a shared file
+  * Bugfix [cs3org/reva#1605](https://github.com/cs3org/reva/pull/1605): Allow to expose full paths in OCS API
+  * Bugfix [cs3org/reva#2033](https://github.com/cs3org/reva/pull/2033): Fix the storage id of shares
+  * Bugfix [cs3org/reva#1991](https://github.com/cs3org/reva/pull/1991): Remove share references when declining shares
+  * Enhancement [cs3org/reva#1994](https://github.com/cs3org/reva/pull/1994): Add owncloudsql driver for the userprovider
+  * Enhancement [cs3org/reva#2065](https://github.com/cs3org/reva/pull/2065): New sharing role Manager
+  * Enhancement [cs3org/reva#2015](https://github.com/cs3org/reva/pull/2015): Add spaces to the list of capabilities
+  * Enhancement [cs3org/reva#2041](https://github.com/cs3org/reva/pull/2041): Create operations for Spaces
+  * Enhancement [cs3org/reva#2029](https://github.com/cs3org/reva/pull/2029): Tracing agent configuration
+
+   https://github.com/owncloud/ocis/pull/2477
 # Changelog for [1.11.0] (2021-08-24)
 
 The following sections list the changes for 1.11.0.
