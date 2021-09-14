@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-09-09T18:50:49+0000"
+date: "2021-09-14T07:54:15+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -139,58 +139,6 @@ Usage: `ocis health [command options] [arguments...]`
 
 
 
-### ocis server
-
-Start fullstack server
-
-Usage: `ocis server [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $OCIS_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9010`.
-
-
--debug-token |  $OCIS_DEBUG_TOKEN
-: Token to grant metrics access.
-
-
--debug-pprof |  $OCIS_DEBUG_PPROF
-: Enable pprof debugging.
-
-
--debug-zpages |  $OCIS_DEBUG_ZPAGES
-: Enable zpages debugging.
-
-
--http-addr |  $OCIS_HTTP_ADDR
-: Address to bind http server. Default: `0.0.0.0:9000`.
-
-
--http-root |  $OCIS_HTTP_ROOT
-: Root path of http server. Default: `/`.
-
-
--grpc-addr |  $OCIS_GRPC_ADDR
-: Address to bind grpc server. Default: `0.0.0.0:9001`.
-
-
--extensions |  $OCIS_RUN_EXTENSIONS
-: Run specific extensions during supervised mode.
-
 ### ocis list
 
 Lists running ocis extensions
@@ -275,33 +223,81 @@ Usage: `ocis run [command options] [arguments...]`
 
 
 
+### ocis server
+
+Start fullstack server
+
+Usage: `ocis server [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $OCIS_DEBUG_ADDR
+: Address to bind debug server. Default: `0.0.0.0:9010`.
+
+
+-debug-token |  $OCIS_DEBUG_TOKEN
+: Token to grant metrics access.
+
+
+-debug-pprof |  $OCIS_DEBUG_PPROF
+: Enable pprof debugging.
+
+
+-debug-zpages |  $OCIS_DEBUG_ZPAGES
+: Enable zpages debugging.
+
+
+-http-addr |  $OCIS_HTTP_ADDR
+: Address to bind http server. Default: `0.0.0.0:9000`.
+
+
+-http-root |  $OCIS_HTTP_ROOT
+: Root path of http server. Default: `/`.
+
+
+-grpc-addr |  $OCIS_GRPC_ADDR
+: Address to bind grpc server. Default: `0.0.0.0:9001`.
+
+
+-extensions |  $OCIS_RUN_EXTENSIONS
+: Run specific extensions during supervised mode.
+
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
-#### ocis storage-metadata
+#### ocis settings
 
-Start storage and data service for metadata
+Start settings server
 
-#### ocis storage-sharing
+#### ocis storage-groupprovider
 
-Start storage sharing service
+Start storage groupprovider service
 
-#### ocis proxy
+#### ocis storage-userprovider
 
-Start proxy server
-
-#### ocis web
-
-Start web server
+Start storage userprovider service
 
 #### ocis webdav
 
 Start webdav server
 
-#### ocis settings
+#### ocis storage-home
 
-Start settings server
+Start storage and data provider for /home mount
 
 #### ocis thumbnails
 
@@ -311,9 +307,17 @@ Start thumbnails server
 
 Lists running services with version
 
-#### ocis storage-groupprovider
+#### ocis idp
 
-Start storage groupprovider service
+Start idp server
+
+#### ocis ocs
+
+Start ocs server
+
+#### ocis storage-metadata
+
+Start storage and data service for metadata
 
 #### ocis storage-public-link
 
@@ -322,6 +326,26 @@ Start storage public link storage
 #### ocis storage-users
 
 Start storage and data provider for /users mount
+
+#### ocis web
+
+Start web server
+
+#### ocis proxy
+
+Start proxy server
+
+#### ocis storage-auth-basic
+
+Start storage auth-basic service
+
+#### ocis storage-sharing
+
+Start storage sharing service
+
+#### ocis storage-app-provider
+
+Start storage app-provider service
 
 #### ocis storage-frontend
 
@@ -335,10 +359,6 @@ Start storage gateway
 
 Start glauth server
 
-#### ocis ocs
-
-Start ocs server
-
 #### ocis store
 
 Start a go-micro store
@@ -347,27 +367,7 @@ Start a go-micro store
 
 Start accounts server
 
-#### ocis storage-auth-basic
-
-Start storage auth-basic service
-
-#### ocis storage-userprovider
-
-Start storage userprovider service
-
-#### ocis idp
-
-Start idp server
-
-#### ocis storage-app-provider
-
-Start storage app-provider service
-
 #### ocis storage-auth-bearer
 
 Start storage auth-bearer service
-
-#### ocis storage-home
-
-Start storage and data provider for /home mount
 
