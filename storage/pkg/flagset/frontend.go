@@ -57,6 +57,23 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.OCDav.DavFilesNamespace,
 		},
 
+		// Archiver
+
+		&cli.Int64Flag{
+			Name:        "archiver-max-num-files",
+			Value:       flags.OverrideDefaultInt64(cfg.Reva.Archiver.MaxNumFiles, 10000),
+			Usage:       "Maximum number of files to be included in the archiver",
+			EnvVars:     []string{"STORAGE_ARCHIVER_MAX_NUM_FILES"},
+			Destination: &cfg.Reva.Archiver.MaxNumFiles,
+		},
+		&cli.Int64Flag{
+			Name:        "archiver-max-size",
+			Value:       flags.OverrideDefaultInt64(cfg.Reva.Archiver.MaxSize, 1073741824), // 1GB
+			Usage:       "Maximum size for the sum of the sizes of all the files included in the archive",
+			EnvVars:     []string{"STORAGE_ARCHIVER_MAX_SIZE"},
+			Destination: &cfg.Reva.Archiver.MaxSize,
+		},
+
 		// Services
 
 		// Frontend
@@ -97,6 +114,13 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "approvider prefix",
 			EnvVars:     []string{"STORAGE_FRONTEND_APPPROVIDER_PREFIX"},
 			Destination: &cfg.Reva.Frontend.AppProviderPrefix,
+		},
+		&cli.StringFlag{
+			Name:        "archiver-prefix",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.ArchiverPrefix, "archiver"),
+			Usage:       "archiver prefix",
+			EnvVars:     []string{"STORAGE_FRONTEND_ARCHIVER_PREFIX"},
+			Destination: &cfg.Reva.Frontend.ArchiverPrefix,
 		},
 		&cli.StringFlag{
 			Name:        "datagateway-prefix",

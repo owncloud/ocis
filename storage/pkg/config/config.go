@@ -132,6 +132,7 @@ type FrontendPort struct {
 	Port
 
 	AppProviderPrefix       string
+	ArchiverPrefix          string
 	DatagatewayPrefix       string
 	OCDavPrefix             string
 	OCSPrefix               string
@@ -401,6 +402,12 @@ type OCDav struct {
 	DavFilesNamespace string
 }
 
+// Archiver defines the available archiver configuration.
+type Archiver struct {
+	MaxNumFiles int64
+	MaxSize     int64
+}
+
 // Reva defines the available reva configuration.
 type Reva struct {
 	// JWTSecret used to sign jwt tokens between services
@@ -412,6 +419,7 @@ type Reva struct {
 	UserGroupRest   UserGroupRest
 	UserOwnCloudSQL UserOwnCloudSQL
 	OCDav           OCDav
+	Archiver        Archiver
 	Storages        StorageConfig
 	// Ports are used to configure which services to start on which port
 	Frontend          FrontendPort
