@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Remove non working proxy route and fix cs3 users example: [#2474](https://github.com/owncloud/ocis/pull/2474)
 * Bugfix - Set English as default language in the dropdown in the settings page: [#2465](https://github.com/owncloud/ocis/pull/2465)
 * Change - Remove OnlyOffice extension: [#2433](https://github.com/owncloud/ocis/pull/2433)
+* Change - Update ownCloud Web to v4.2.0: [#2501](https://github.com/owncloud/ocis/pull/2501)
 * Enhancement - Add app provider and app provider registry: [#2204](https://github.com/owncloud/ocis/pull/2204)
 * Enhancement - Add the create space permission: [#2461](https://github.com/owncloud/ocis/pull/2461)
 * Enhancement - Add set space quota permission: [#2459](https://github.com/owncloud/ocis/pull/2459)
@@ -44,6 +45,16 @@ The following sections list the changes for unreleased.
    oCIS, we will follow up with a guide on how to start a WOPI server providing OnlyOffice soon.
 
    https://github.com/owncloud/ocis/pull/2433
+
+* Change - Update ownCloud Web to v4.2.0: [#2501](https://github.com/owncloud/ocis/pull/2501)
+
+   Tags: web
+
+   We updated ownCloud Web to v4.2.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2501
+   https://github.com/owncloud/web/releases/tag/v4.2.0
 
 * Enhancement - Add app provider and app provider registry: [#2204](https://github.com/owncloud/ocis/pull/2204)
 
