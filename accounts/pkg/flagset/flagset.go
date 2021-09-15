@@ -136,6 +136,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "demo-users-and-groups",
+			Value:       flags.OverrideDefaultBool(cfg.Server.DemoUsersAndGroups, true),
 			Usage:       "Enable demo users and groups",
 			EnvVars:     []string{"ACCOUNTS_DEMO_USERS_AND_GROUPS"},
 			Destination: &cfg.Server.DemoUsersAndGroups,
