@@ -1,6 +1,6 @@
 const assert = require('assert')
 const { client } = require('nightwatch-api')
-const { Given, When, Then } = require('cucumber')
+const { Given, When, Then } = require('@cucumber/cucumber')
 
 When('the user browses to the accounts page', function () {
   return client.page.accountsPage().navigateAndWaitUntilMounted()
