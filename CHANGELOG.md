@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
 * Bugfix - Remove non working proxy route and fix cs3 users example: [#2474](https://github.com/owncloud/ocis/pull/2474)
 * Bugfix - Set English as default language in the dropdown in the settings page: [#2465](https://github.com/owncloud/ocis/pull/2465)
 * Change - Remove OnlyOffice extension: [#2433](https://github.com/owncloud/ocis/pull/2433)
@@ -21,6 +22,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Update reva to v1.13.0: [#2477](https://github.com/owncloud/ocis/pull/2477)
 
 ## Details
+
+* Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
+
+   We now properly decode the username when reading it from a url parameter
+
+   https://github.com/owncloud/ocis/pull/2511
 
 * Bugfix - Remove non working proxy route and fix cs3 users example: [#2474](https://github.com/owncloud/ocis/pull/2474)
 
