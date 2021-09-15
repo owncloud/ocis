@@ -137,11 +137,17 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 		assets.Logger(p.logger),
 		assets.Config(p.config),
 	)
+
+	notFoundFunc := func(w http.ResponseWriter, r *http.Request) {
+		// TODO: replace the redirect with a not found page containing a link to the Web UI
+		http.Redirect(w, r, rootWithSlash, http.StatusTemporaryRedirect)
+	}
+
 	static := http.StripPrefix(
 		rootWithSlash,
 		interceptNotFound(
 			http.FileServer(assets),
-			rootWithSlash,
+			notFoundFunc,
 		),
 	)
 
@@ -158,16 +164,11 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 				rootWithSlash,
 				http.StatusMovedPermanently,
 			)
-
 			return
 		}
 
 		if r.URL.Path != rootWithSlash && strings.HasSuffix(r.URL.Path, "/") {
-			http.NotFound(
-				w,
-				r,
-			)
-
+			notFoundFunc(w, r)
 			return
 		}
 
@@ -184,13 +185,12 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 	}
 }
 
-func interceptNotFound(h http.Handler, root string) http.HandlerFunc {
+func interceptNotFound(h http.Handler, notFoundFunc func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		notFoundInterceptor := &NotFoundInterceptor{ResponseWriter: w}
 		h.ServeHTTP(notFoundInterceptor, r)
 		if notFoundInterceptor.status == http.StatusNotFound {
-			http.Redirect(w, r, root, http.StatusTemporaryRedirect)
-			// TODO: replace the redirect with a not found page containing a link to the Web UI
+			notFoundFunc(w, r)
 		}
 	}
 }
