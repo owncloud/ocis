@@ -12,6 +12,8 @@ The following sections list the changes for unreleased.
 * Change - Update ownCloud Web to v4.2.0: [#2501](https://github.com/owncloud/ocis/pull/2501)
 * Enhancement - Add app provider and app provider registry: [#2204](https://github.com/owncloud/ocis/pull/2204)
 * Enhancement - Add the create space permission: [#2461](https://github.com/owncloud/ocis/pull/2461)
+* Enhancement - Allow overriding the cookie based route by claim: [#2508](https://github.com/owncloud/ocis/pull/2508)
+* Enhancement - Redirect invalid links to oC Web: [#2493](https://github.com/owncloud/ocis/pull/2493)
 * Enhancement - Add set space quota permission: [#2459](https://github.com/owncloud/ocis/pull/2459)
 * Enhancement - Create a Space using the Graph API: [#2471](https://github.com/owncloud/ocis/pull/2471)
 * Enhancement - Update go-chi/chi to version 5.0.3: [#2429](https://github.com/owncloud/ocis/pull/2429)
@@ -69,6 +71,20 @@ The following sections list the changes for unreleased.
    In preparation for the upcoming spaces features a `Create Space` permission was added.
 
    https://github.com/owncloud/ocis/pull/2461
+
+* Enhancement - Allow overriding the cookie based route by claim: [#2508](https://github.com/owncloud/ocis/pull/2508)
+
+   When determining the routing policy we now let the claim override the cookie so that users are
+   routed to the correct backend after login.
+
+   https://github.com/owncloud/ocis/pull/2508
+
+* Enhancement - Redirect invalid links to oC Web: [#2493](https://github.com/owncloud/ocis/pull/2493)
+
+   Invalid links (eg. https://foo.bar/index.php/apps/pdfviewer) will be redirect to
+   ownCloud Web instead of displaying a blank page with a "not found" message.
+
+   https://github.com/owncloud/ocis/pull/2493
 
 * Enhancement - Add set space quota permission: [#2459](https://github.com/owncloud/ocis/pull/2459)
 
