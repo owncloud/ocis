@@ -250,9 +250,6 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 									"incoming": true,
 								},
 							},
-							"notifications": map[string]interface{}{
-								"endpoints": []string{"disable"},
-							},
 						},
 						"version": map[string]interface{}{
 							"edition": "reva",
