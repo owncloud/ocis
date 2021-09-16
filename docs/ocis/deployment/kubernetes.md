@@ -60,32 +60,38 @@ For a guide on how to set minikube up follow the [official minikube start guide]
 First off, verify your installation is correct:
 
 ```console
-~/code/refs/ocis-charts/ocis
+~/code/refs/ocis-charts
 ❯ minikube status
-m01
+minikube
+type: Control Plane
 host: Stopped
 kubelet: Stopped
 apiserver: Stopped
 kubeconfig: Stopped
 ```
 
-After that, start it:
+After that, start the cluster:
 
 ```console
-~/code/refs/ocis-charts/ocis
+~/code/refs/ocis-charts
 ❯ minikube start
-😄  minikube v1.9.2 on Darwin 11.4
-✨  Using the hyperkit driver based on existing profile
-👍  Starting control plane node m01 in cluster minikube
-🔄  Restarting existing hyperkit VM for "minikube" ...
-🐳  Preparing Kubernetes v1.18.0 on Docker 19.03.8 ...
-🌟  Enabling addons: default-storageclass, storage-provisioner
-🏄  Done! kubectl is now configured to use "minikube"
+😄  minikube v1.23.0 on Darwin 11.4
+✨  Using the docker driver based on existing profile
+👍  Starting control plane node minikube in cluster minikube
+🚜  Pulling base image ...
+🔄  Restarting existing docker container for "minikube" ...
+🐳  Preparing Kubernetes v1.22.1 on Docker 20.10.8 ...
+🔎  Verifying Kubernetes components...
+    ▪ Using image gcr.io/k8s-minikube/storage-provisioner:v5
+🌟  Enabled addons: storage-provisioner, default-storageclass
+🏄  Done! kubectl is now configured to use "minikube" cluster and "default" namespace by default
 ```
+
+_On these docs, we are using the Docker driver on Mac._
 
 ## Run a chart
 
-The easiest way to run the entire package is by using the available charts on https://github.com/refs/ocis-charts. It is not the purpose of this guide to explain the inner working of Kubernetes or its resources, as Helm builds an abstraction oon top of it, letting you interact with a simplified UI that roughly translates as "helm install" and "helm uninstall".
+The easiest way to run the entire package is by using the available charts on https://github.com/refs/ocis-charts. It is not the purpose of this guide to explain the inner working of Kubernetes or its resources, as Helm builds an abstraction oon top of it, letting you interact with a refined interface that roughly translates as "helm install" and "helm uninstall".
 
 In order to host charts one can create a [charts repository](https://helm.sh/docs/topics/chart_repository/), but this is outside the scope of this documentation. Having said that, we will assume you have access to a cli and git.
 
@@ -105,37 +111,33 @@ In order to host charts one can create a [charts repository](https://helm.sh/doc
 
 ```console
 ❯ kubectl get pods
-NAME                          READY   STATUS    RESTARTS   AGE
-glauth-67b6d89577-zcf65       1/1     Running   0          23s
-konnectd-85b9d6db59-s9wxq     1/1     Running   0          23s
-ocis-proxy-6f6667986d-htdgq   1/1     Running   0          23s
-ocs-6756757547-vqdb9          1/1     Running   0          23s
-settings-9776fd95c-tx7dg      1/1     Running   0          23s
-storages-6df6d479-j8t4k       10/10   Running   1          23s
-store-85844f776f-fnsb2        1/1     Running   0          23s
-web-56cb5c95b5-vr8qf          1/1     Running   0          23s
-webdav-785b9f9ccc-4ll5n       1/1     Running   0          23s
+NAME                          READY   STATUS    RESTARTS         AGE
+glauth-5fb678b9cb-zs5qh       1/1     Running   3 (10m ago)      3h33m
+ocis-proxy-848f988687-g7fmb   1/1     Running   2 (10m ago)      130m
+ocs-6bb8896dd6-t4bkx          1/1     Running   3 (10m ago)      3h33m
+settings-6bf77f978d-27rdf     1/1     Running   3 (10m ago)      3h33m
+storages-6b45f9c4-2j696       10/10   Running   23 (4m43s ago)   112m
+store-cf79db94d-hvb7z         1/1     Running   3 (10m ago)      3h33m
+web-8685fdd574-tmkfb          1/1     Running   2 (10m ago)      157m
+webdav-f8d4dd7c6-vv4n7        1/1     Running   3 (10m ago)      3h33m
 ```
 
-5. get the exposed port for the kubernetes service: `minikube service list`
+5. expose the proxy as a service to the host
 
 ```console
-|-------------|------------------|--------------|---------------------------|
-|  NAMESPACE  |       NAME       | TARGET PORT  |            URL            |
-|-------------|------------------|--------------|---------------------------|
-| default     | konnectd-service | No node port |
-| default     | kubernetes       | No node port |
-| default     | ldap-service     | No node port |
-| default     | ocs-service      | No node port |
-| default     | proxy-service    |         9200 | http://192.168.64.5:30325 |
-| default     | settings-service | No node port |
-| default     | storages-service | No node port |
-| default     | web-service      | No node port |
-| kube-system | kube-dns         | No node port |
-|-------------|------------------|--------------|---------------------------|
+~/code/refs/ocis-charts
+❯ minikube service proxy-service --url
+🏃  Starting tunnel for service proxy-service.
+|-----------|---------------|-------------|------------------------|
+| NAMESPACE |     NAME      | TARGET PORT |          URL           |
+|-----------|---------------|-------------|------------------------|
+| default   | proxy-service |             | http://127.0.0.1:63633 |
+|-----------|---------------|-------------|------------------------|
+http://127.0.0.1:63633
+❗  Because you are using a Docker driver on darwin, the terminal needs to be open to run it.
 ```
 
-6. attempt a `PROPFIND` WebDAV request to the storage: `curl -v -k -u einstein:relativity -H "depth: 0" -X PROPFIND https://192.168.64.5:30325/remote.php/dav/files/ | xmllint --format -`
+6. attempt a `PROPFIND` WebDAV request to the storage: `curl -v -k -u einstein:relativity -H "depth: 0" -X PROPFIND https://127.0.0.1:63633/remote.php/dav/files/ | xmllint --format -`
 
 If all is correctly setup, you should expect a response back:
 
@@ -164,13 +166,82 @@ If all is correctly setup, you should expect a response back:
 </d:multistatus>
 ```
 
+## Setting up an external identity provider
+
+The previous setup works because the proxy is configured to run using basic auth, but if we want to actually use the WebUI we will need an external identity provider. From here on the setup is composed of:
+
+- keycloak
+  - traefik
+  - postgresql
+
+Running on i.e: `https://keycloak.owncloud.works`. Because of this we have to adjust some of `values.yaml` key / values to:
+
+```diff
+diff --git a/ocis/values.yaml b/ocis/values.yaml
+index fbc229c..5b36fbd 100644
+--- a/ocis/values.yaml
++++ b/ocis/values.yaml
+@@ -1,9 +1,9 @@
+ # when in local tunnel mode, ingressDomain is the proxy address.
+ # sadly when in combination with --set, anchors are lost.
+-ingressDomain: &ingressDomain "https://stale-wasp-86.loca.lt"
++ingressDomain: &ingressDomain "https://keycloak.owncloud.works"
+
+ # base ocis image
+-image: owncloud/ocis:1.0.0-rc8-linux-amd64
++image: owncloud/ocis:1.11.0-linux-amd64
+
+ # set of ocis services to create deployments objects.
+ services:
+@@ -22,6 +22,8 @@ services:
+       value: "debug"
+     - name: "PROXY_REVA_GATEWAY_ADDR"
+       value: "storages-service:9142"
++    - name: "PROXY_OIDC_ISSUER"
++      value: "https://keycloak.ocis-keycloak.released.owncloud.works/auth/realms/oCIS"
+     - name: "PROXY_ENABLE_BASIC_AUTH"
+       value: "'true'" # see https://stackoverflow.com/a/44692213/2295410
+     volumeMounts:
+@@ -81,34 +85,6 @@ services:
+     labels:
+       app: "glauth"
+     args: ["glauth"]
+   settings:
+     metadata:
+       name: "settings"
+@@ -135,11 +111,11 @@ services:
+     args: ["web"]
+     env:
+     - name: "WEB_UI_CONFIG_SERVER"
+-      value: *ingressDomain
++      value: "https://127.0.0.1:51559/"
+     - name: "WEB_OIDC_METADATA_URL"
+-      value: *ingressDomain
++      value: "https://keycloak.owncloud.works/auth/realms/oCIS/.well-known/openid-configuration"
+     - name: "WEB_OIDC_AUTHORITY"
+-      value: *ingressDomain
++      value: "https://keycloak.owncloud.works/auth/realms/oCIS/.well-known/openid-configuration"
+     ports:
+       values:
+       - name: "http"
+@@ -231,4 +207,4 @@ kubeServices:
+       - protocol: TCP
+         port: 9100
+         targetPort: 9100
+```
+
+NOTE: the IDP has to be properly configure with an oCIS realm and a `web` client configured. There are example config file that have to be adjusted depending on your environment on our [docker-compose examples](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_keycloak/config/keycloak).
+
 ## What is GCP
+
+> Google Cloud Platform (GCP), offered by Google, is a suite of cloud computing services that runs on the same infrastructure that Google uses internally for its end-user products
+
+One of such offered services are [Google Kubernetes Engines (GKE)](https://cloud.google.com/kubernetes-engine).
 
 ### Can Helm charts run on GCP?
 
-## Running on GCP (Google Cloud Platform)
+Yes. The next logical step would be to deploy this charts on GKE. There is a pretty thorough guide [at shippable.com](http://docs.shippable.com/deploy/tutorial/deploy-to-gcp-gke-helm/) that, for the purposes of our docs, we are only interested on step 5, as we already explain the previous concepts, and provide with the Charts.
 
-## TODO
+## TODOs
 
-- setup an external IDP?
-- make it work using the WebUI...
+- while log-in works and creating folders work, uploading fails, most likely a configuration issue that has to be solved.
