@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Redirect invalid links to oC Web: [#2493](https://github.com/owncloud/ocis/pull/2493)
 * Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
 * Bugfix - Remove non working proxy route and fix cs3 users example: [#2474](https://github.com/owncloud/ocis/pull/2474)
 * Bugfix - Set English as default language in the dropdown in the settings page: [#2465](https://github.com/owncloud/ocis/pull/2465)
@@ -23,6 +24,15 @@ The following sections list the changes for unreleased.
 * Enhancement - Update reva to v1.13.0: [#2477](https://github.com/owncloud/ocis/pull/2477)
 
 ## Details
+
+* Bugfix - Redirect invalid links to oC Web: [#2493](https://github.com/owncloud/ocis/pull/2493)
+
+   Invalid links ending with a slash(eg. https://foo.bar/index.php/apps/pdfviewer/) have
+   not been redirected to ownCloud Web. Instead the former 404 not found status page was
+   displayed.
+
+   https://github.com/owncloud/ocis/pull/2493
+   https://github.com/owncloud/ocis/pull/2512
 
 * Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
 
