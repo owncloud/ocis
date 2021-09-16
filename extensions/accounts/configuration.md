@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-09-16T14:41:18+0000"
+date: "2021-09-16T21:50:17+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -34,170 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Commandline flags
 
 If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### accounts inspect
-
-Show detailed data on an existing account
-
-Usage: `accounts inspect [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
-
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `"accounts"`.
-
-### accounts list
-
-List existing accounts
-
-Usage: `accounts list [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
-
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `"accounts"`.
-
-
-
-
 
 ### accounts remove
 
@@ -364,6 +200,252 @@ Usage: `accounts ocis-accounts [command options] [arguments...]`
 
 
 
+
+
+
+
+
+### accounts version
+
+Print the versions of the running instances
+
+Usage: `accounts version [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `"accounts"`.
+
+
+
+
+
+### accounts inspect
+
+Show detailed data on an existing account
+
+Usage: `accounts inspect [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `"accounts"`.
+
+### accounts list
+
+List existing accounts
+
+Usage: `accounts list [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `"accounts"`.
 
 
 
@@ -772,88 +854,6 @@ Usage: `accounts add [command options] [arguments...]`
 : Force password change on next sign-in with mfa.
 
 
-
-
-
-
-
-### accounts version
-
-Print the versions of the running instances
-
-Usage: `accounts version [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
-
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `"accounts"`.
 
 
 
