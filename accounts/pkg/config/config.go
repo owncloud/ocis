@@ -42,9 +42,10 @@ type GRPC struct {
 
 // Server configures a server.
 type Server struct {
-	Version        string
-	Name           string
-	HashDifficulty int
+	Version            string
+	Name               string
+	HashDifficulty     int
+	DemoUsersAndGroups bool
 }
 
 // Asset defines the available asset configuration.
