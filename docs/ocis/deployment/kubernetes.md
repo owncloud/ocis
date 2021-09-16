@@ -230,7 +230,12 @@ index fbc229c..5b36fbd 100644
          targetPort: 9100
 ```
 
-NOTE: the IDP has to be properly configure with an oCIS realm and a `web` client configured. There are example config file that have to be adjusted depending on your environment on our [docker-compose examples](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_keycloak/config/keycloak).
+NOTE: The IDP has to be properly configure with an oCIS realm and a `web` client configured. There are example config file that have to be adjusted depending on your environment on our [docker-compose examples](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_keycloak/config/keycloak).
+
+You might still need to adjust the IDP:
+
+- Valid Redirect URIs (under clients > web)
+- Web Origins (under clients > web)
 
 ## What is GCP
 
