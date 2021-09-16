@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Redirect invalid links to oC Web: [#2493](https://github.com/owncloud/ocis/pull/2493)
 * Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
+* Bugfix - Remove notifications placeholder: [#2514](https://github.com/owncloud/ocis/pull/2514)
 * Bugfix - Remove non working proxy route and fix cs3 users example: [#2474](https://github.com/owncloud/ocis/pull/2474)
 * Bugfix - Set English as default language in the dropdown in the settings page: [#2465](https://github.com/owncloud/ocis/pull/2465)
 * Change - Remove OnlyOffice extension: [#2433](https://github.com/owncloud/ocis/pull/2433)
@@ -39,6 +40,16 @@ The following sections list the changes for unreleased.
    We now properly decode the username when reading it from a url parameter
 
    https://github.com/owncloud/ocis/pull/2511
+
+* Bugfix - Remove notifications placeholder: [#2514](https://github.com/owncloud/ocis/pull/2514)
+
+   Since Reva was communicating its notification capabilities incorrectly, oCIS relied on a
+   hardcoding string to overwrite them. This has been fixed in
+   [reva#1819](https://github.com/cs3org/reva/pull/1819) so we now removed the hardcoded
+   string and don't modify Reva's notification capabilities anymore in order to fix clients
+   having to poll a (non-existent) notifications endpoint.
+
+   https://github.com/owncloud/ocis/pull/2514
 
 * Bugfix - Remove non working proxy route and fix cs3 users example: [#2474](https://github.com/owncloud/ocis/pull/2474)
 
