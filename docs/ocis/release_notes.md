@@ -15,13 +15,13 @@ The most prominent changes in ownCloud Infinite Scale 1.12.0 and ownCloud Web 4.
 
 - The Infinite Scale backend now supports the first parts of the 'Spaces' feature
   - Creating a new Space is now possible via Graph API [#2471](https://github.com/owncloud/ocis/pull/2471)
-  - A new sharing role 'Manager' has been introduced for Spaces [cs3org/reva#2065](https://github.com/cs3org/reva/pull/2065)
+  - A new sharing role, `Manager`, has been introduced for Spaces [cs3org/reva#2065](https://github.com/cs3org/reva/pull/2065)
   - A capability for Spaces has been added [cs3org/reva#2015](https://github.com/cs3org/reva/pull/2015)
 - Infinite Scale now provides an app provider and an app registry as a foundation for integrations with viewer/editor applications. [#2204](https://github.com/owncloud/ocis/pull/2204)
 - ownCloud Web now has a re-designed sharing role selection. [#5632](https://github.com/owncloud/web/pull/5632)
 - ownCloud Web now shows people in sharing as a collapsed list of avatars to save space. This can be expanded to show more details and the full list. [#5758](https://github.com/owncloud/web/pull/5758)
 - ownCloud Web now shows sharing information in file/folder details. [#5735](https://github.com/owncloud/web/issues/5735)
-- The file size calculation in ownCloud Web has been changed from base-2 (e.g., KB / Kibibyte) to base-10 (e.g., kB / Kilobyte) to match better with user expecations. [#5739](https://github.com/owncloud/web/pull/5739)
+- The file size calculation in ownCloud Web has been changed from base-2 (e.g., KB / Kibibyte) to base-10 (e.g., kB / Kilobyte) to match better with user expectations. [#5739](https://github.com/owncloud/web/pull/5739)
 - The URL encoding/decoding in ownCloud Web has been improved. [#5714](https://github.com/owncloud/web/issues/5714)
 - ownCloud Web now provides a robots.txt file. [#5762](https://github.com/owncloud/web/pull/5762)
 
