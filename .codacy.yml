@@ -16,6 +16,6 @@ exclude_paths:
   - 'ocis/docker/eos-ocis-dev/Dockerfile'
   - 'deployments/**'
   - 'tests/acceptance/expected-failures-*.md'
-  - 'tests/acceptance/bootstrap/**'
+  - 'tests/acceptance/features/bootstrap/**'
 
 ...
