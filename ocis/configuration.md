@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-09-16T14:06:04+0000"
+date: "2021-09-16T14:41:51+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -160,11 +160,42 @@ Usage: `ocis server [command options] [arguments...]`
 -extensions |  $OCIS_RUN_EXTENSIONS
 : Run specific extensions during supervised mode.
 
-### ocis run
+### ocis health
 
-Runs an extension
+Check health status
 
-Usage: `ocis run [command options] [arguments...]`
+Usage: `ocis health [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $OCIS_DEBUG_ADDR
+: Address to debug endpoint. Default: `0.0.0.0:9010`.
+
+
+
+
+
+
+
+
+
+### ocis kill
+
+Kill an extension by name
+
+Usage: `ocis kill [command options] [arguments...]`
 
 
 
@@ -216,13 +247,11 @@ Usage: `ocis list [command options] [arguments...]`
 
 
 
-### ocis kill
+### ocis run
 
-Kill an extension by name
+Runs an extension
 
-Usage: `ocis kill [command options] [arguments...]`
-
-
+Usage: `ocis run [command options] [arguments...]`
 
 
 
@@ -237,35 +266,6 @@ Usage: `ocis kill [command options] [arguments...]`
 
 
 
-
-
-
-
-
-
-
-### ocis health
-
-Check health status
-
-Usage: `ocis health [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $OCIS_DEBUG_ADDR
-: Address to debug endpoint. Default: `0.0.0.0:9010`.
 
 
 
@@ -279,95 +279,95 @@ Usage: `ocis health [command options] [arguments...]`
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
-#### ocis idp
+#### ocis storage-auth-bearer
 
-Start idp server
+Start storage auth-bearer service
 
 #### ocis storage-groupprovider
 
 Start storage groupprovider service
 
-#### ocis ocs
+#### ocis storage-sharing
 
-Start ocs server
-
-#### ocis storage-auth-bearer
-
-Start storage auth-bearer service
-
-#### ocis store
-
-Start a go-micro store
-
-#### ocis storage-auth-basic
-
-Start storage auth-basic service
+Start storage sharing service
 
 #### ocis storage-frontend
 
 Start storage frontend
 
+#### ocis idp
+
+Start idp server
+
+#### ocis ocs
+
+Start ocs server
+
+#### ocis storage-auth-basic
+
+Start storage auth-basic service
+
+#### ocis accounts
+
+Start accounts server
+
 #### ocis thumbnails
 
 Start thumbnails server
-
-#### ocis storage-app-provider
-
-Start storage app-provider service
-
-#### ocis storage-public-link
-
-Start storage public link storage
-
-#### ocis storage-sharing
-
-Start storage sharing service
-
-#### ocis version
-
-Lists running services with version
-
-#### ocis webdav
-
-Start webdav server
-
-#### ocis glauth
-
-Start glauth server
-
-#### ocis storage-gateway
-
-Start storage gateway
-
-#### ocis storage-metadata
-
-Start storage and data service for metadata
-
-#### ocis settings
-
-Start settings server
-
-#### ocis proxy
-
-Start proxy server
-
-#### ocis storage-home
-
-Start storage and data provider for /home mount
-
-#### ocis storage-userprovider
-
-Start storage userprovider service
-
-#### ocis storage-users
-
-Start storage and data provider for /users mount
 
 #### ocis web
 
 Start web server
 
-#### ocis accounts
+#### ocis webdav
 
-Start accounts server
+Start webdav server
+
+#### ocis storage-metadata
+
+Start storage and data service for metadata
+
+#### ocis storage-users
+
+Start storage and data provider for /users mount
+
+#### ocis version
+
+Lists running services with version
+
+#### ocis storage-home
+
+Start storage and data provider for /home mount
+
+#### ocis storage-public-link
+
+Start storage public link storage
+
+#### ocis store
+
+Start a go-micro store
+
+#### ocis storage-app-provider
+
+Start storage app-provider service
+
+#### ocis storage-gateway
+
+Start storage gateway
+
+#### ocis storage-userprovider
+
+Start storage userprovider service
+
+#### ocis glauth
+
+Start glauth server
+
+#### ocis proxy
+
+Start proxy server
+
+#### ocis settings
+
+Start settings server
 
