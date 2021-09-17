@@ -30,7 +30,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 		Flags: flagset.FrontendWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Frontend.Services = c.StringSlice("service")
-			cfg.Reva.ChecksumSupportedTypes = c.StringSlice("checksum-suppored-type")
+			cfg.Reva.ChecksumSupportedTypes = c.StringSlice("checksum-supported-type")
 			return loadUserAgent(c, cfg)
 		},
 		Action: func(c *cli.Context) error {

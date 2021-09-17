@@ -169,10 +169,10 @@ func getAccountService(expectedResponse []*accounts.Account, err error) *account
 	}
 }
 
-func getRoleService(expectedRespone []*settings.UserRoleAssignment, err error) *settings.MockRoleService {
+func getRoleService(expectedResponse []*settings.UserRoleAssignment, err error) *settings.MockRoleService {
 	return &settings.MockRoleService{
 		ListRoleAssignmentsFunc: func(ctx context.Context, req *settings.ListRoleAssignmentsRequest, opts ...client.CallOption) (*settings.ListRoleAssignmentsResponse, error) {
-			return &settings.ListRoleAssignmentsResponse{Assignments: expectedRespone}, err
+			return &settings.ListRoleAssignmentsResponse{Assignments: expectedResponse}, err
 		},
 	}
 

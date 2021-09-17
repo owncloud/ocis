@@ -689,7 +689,7 @@
           "description": "Any refresh tokens or sessions tokens (session cookies) issued before this time are invalid, and applications will get\nan error when using an invalid refresh or sessions token to acquire a delegated access token (to access APIs such as Microsoft Graph).\nIf this happens, the application will need to acquire a new refresh token by making a request to the authorize endpoint.\nRead-only. Use revokeSignInSessions to reset."
         }
       },
-      "title": "Account follows the properties of the ms graph api user resuorce.\nSee https://docs.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#properties"
+      "title": "Account follows the properties of the ms graph api user resource.\nSee https://docs.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#properties"
     },
     "v0AddMemberRequest": {
       "type": "object",

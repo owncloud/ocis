@@ -179,7 +179,7 @@ The following sections list the changes for 1.12.0.
 
 * Enhancement - Update go-chi/chi to version 5.0.3: [#2429](https://github.com/owncloud/ocis/pull/2429)
 
-   Updated go-chi/chi to the lastest release
+   Updated go-chi/chi to the latest release
 
    https://github.com/owncloud/ocis/pull/2429
 
@@ -379,7 +379,7 @@ The following sections list the changes for 1.10.0.
 
 * Enhancement - Refactor graph API: [#2277](https://github.com/owncloud/ocis/pull/2277)
 
-   We refactored the `/graph/v1.0/` endpoint which now relies on the internal acces token fer
+   We refactored the `/graph/v1.0/` endpoint which now relies on the internal access token for
    authentication, getting rid of any LDAP or OIDC code to authenticate requests. This allows
    using the graph api when using basic auth or any other auth mechanism provided by the CS3 auth
    providers / reva gateway / ocis proxy.
@@ -529,7 +529,7 @@ The following sections list the changes for 1.9.0.
   * Fix cs3org/reva#1808: Use empty array in OCS Notifications endpoints
   * Fix cs3org/reva#1825: Raise max grpc message size
   * Fix cs3org/reva#1828: Send a proper XML header with error messages
-  * Chg cs3org/reva#1828: Remove the oidc provider in order to upgrad mattn/go-sqlite3 to v1.14.7
+  * Chg cs3org/reva#1828: Remove the oidc provider in order to upgrade mattn/go-sqlite3 to v1.14.7
   * Enh cs3org/reva#1834: Add API key to Mentix GOCDB connector
   * Enh cs3org/reva#1855: Minor optimization in parsing EOS ACLs
   * Enh cs3org/reva#1873: Update the EOS image tag to be for revad-eos image
@@ -645,7 +645,7 @@ The following sections list the changes for 1.7.0.
 * Bugfix - Change the groups index to be case sensitive: [#2109](https://github.com/owncloud/ocis/pull/2109)
 
    Groups are considered to be case sensitive. The index must handle them case sensitive too
-   otherwise we will have undeterministic behavior while editing or deleting groups.
+   otherwise we will have nondeterministic behavior while editing or deleting groups.
 
    https://github.com/owncloud/ocis/pull/2109
 
@@ -661,7 +661,7 @@ The following sections list the changes for 1.7.0.
 
 * Enhancement - Enable the s3ng storage driver: [#1886](https://github.com/owncloud/ocis/pull/1886)
 
-   We made it possible to use the new s3ng storage driver by adding according commandline flags and
+   We made it possible to use the new s3ng storage driver by adding according command-line flags and
    environment variables.
 
    https://github.com/owncloud/ocis/pull/1886
@@ -856,7 +856,7 @@ The following sections list the changes for 1.5.0.
 
 * Enhancement - Parse config on supervised mode with run subcommand: [#1931](https://github.com/owncloud/ocis/pull/1931)
 
-   Currenntly it is not possible to parse a single config file from an extension when running on
+   Currently it is not possible to parse a single config file from an extension when running on
    supervised mode.
 
    https://github.com/owncloud/ocis/pull/1931
@@ -888,7 +888,7 @@ The following sections list the changes for 1.5.0.
 * Enhancement - Update reva to v1.6.1-0.20210414111318-a4b5148cbfb2: [#1872](https://github.com/owncloud/ocis/pull/1872)
 
   * enforce quota (https://github.com/cs3org/reva/pull/1557)
-  * Make additional info attribute configureable (https://github.com/cs3org/reva/pull/1588)
+  * Make additional info attribute configurable (https://github.com/cs3org/reva/pull/1588)
   * check ENOTDIR for readlink (https://github.com/cs3org/reva/pull/1597)
   * Add wrappers for EOS and EOS Home storage drivers (https://github.com/cs3org/reva/pull/1624)
   * eos: fixes for enabling file sharing (https://github.com/cs3org/reva/pull/1619)
@@ -958,7 +958,7 @@ The following sections list the changes for 1.4.0.
 
 * Enhancement - Clarify expected failures: [#1790](https://github.com/owncloud/ocis/pull/1790)
 
-   Some features, while covered by the ownCloud 10 acceptance tests, will not be implmented for
+   Some features, while covered by the ownCloud 10 acceptance tests, will not be implemented for
    now: - blacklisted / ignored files, because ocis does not need to blacklist `.htaccess` files -
    `OC-LazyOps` support was [removed from the
    clients](https://github.com/owncloud/client/pull/8398). We are thinking about [a state
@@ -1057,7 +1057,7 @@ The following sections list the changes for 1.3.0.
 * Bugfix - Add missing gateway config: [#1716](https://github.com/owncloud/ocis/pull/1716)
 
    The auth provider `ldap` and `oidc` drivers now need to be able talk to the reva gateway. We added
-   the `gatewayscv` to the config that is passed to reva.
+   the `gatewaysvc` to the config that is passed to reva.
 
    https://github.com/owncloud/ocis/pull/1716
 
@@ -1070,12 +1070,12 @@ The following sections list the changes for 1.3.0.
    We inverted this dependency and moved the default initialization data (i.e: creating roles,
    permissions, settings bundles) and instead of notifying the settings service that the
    account has to provide with such options, the settings is instead initialized with the options
-   the accounts rely on. Essentially saving bandwith as there is no longer a gRPC call to the
+   the accounts rely on. Essentially saving bandwidth as there is no longer a gRPC call to the
    settings service.
 
    For the `storage-metadata` a retry mechanism was added that retries by default 20 times to
    fetch the `com.owncloud.storage.metadata` from the service registry every `500`
-   miliseconds. If this retry expires the accounts panics, as its dependency on the
+   milliseconds. If this retry expires the accounts panics, as its dependency on the
    `storage-metadata` service cannot be resolved.
 
    We also introduced a client wrapper that acts as middleware between a client and a server. For
@@ -1251,7 +1251,7 @@ The following sections list the changes for 1.2.0.
 
 * Enhancement - Introduce ADR: [#1042](https://github.com/owncloud/ocis/pull/1042)
 
-   We will keep track of [Architectual Decision Records using
+   We will keep track of [Architectural Decision Records using
    Markdown](https://adr.github.io/madr/) in `/docs/adr`.
 
    https://github.com/owncloud/ocis/pull/1042
@@ -1657,7 +1657,7 @@ The following sections list the changes for 1.0.0.
    Tags: docker
 
    Without setting `REVA_FRONTEND_URL` and `REVA_DATAGATEWAY_URL` uploads would default to
-   locahost and fail if `OCIS_DOMAIN` was used to run ocis on a remote host.
+   localhost and fail if `OCIS_DOMAIN` was used to run ocis on a remote host.
 
    https://github.com/owncloud/ocis/pull/392
 
@@ -1699,7 +1699,7 @@ The following sections list the changes for 1.0.0.
    Tags: accounts
 
    With the phoenix update to v0.17.0 a new ODS version was released which has a breaking change for
-   buttons regarding their layouting. We adjusted the button layout in the accounts UI
+   buttons regarding their layout. We adjusted the button layout in the accounts UI
    accordingly.
 
    https://github.com/owncloud/ocis/pull/625
@@ -2432,7 +2432,7 @@ The following sections list the changes for 1.0.0.
   * Change - Roles manager: [#60](https://github.com/owncloud/ocis-pkg/pull/60)
   * Change - Use go-micro's metadata context for account id: [#56](https://github.com/owncloud/ocis-pkg/pull/56)
   * Bugfix - Remove redigo 2.0.0+incompatible dependency: [#33](https://github.com/owncloud/ocis-graph/pull/33)
-  * Change - Add middleware for x-access-token distmantling: [#46](https://github.com/owncloud/ocis-pkg/pull/46)
+  * Change - Add middleware for x-access-token dismantling: [#46](https://github.com/owncloud/ocis-pkg/pull/46)
   * Enhancement - Add `ocis.id` and numeric id claims: [#50](https://github.com/owncloud/ocis-pkg/pull/50)
   * Bugfix - Pass flags to micro service: [#44](https://github.com/owncloud/ocis-pkg/pull/44)
   * Change - Add header to cors handler: [#41](https://github.com/owncloud/ocis-pkg/issues/41)
@@ -2461,7 +2461,7 @@ The following sections list the changes for 1.0.0.
   * Bugfix - Use opaque ID of a user for signing keys: [#436](https://github.com/owncloud/ocis/issues/436)
   * Enhancement - Add option to create user with uidnumber and gidnumber: [#34](https://github.com/owncloud/ocis-ocs/pull/34)
   * Bugfix - Fix file descriptor leak: [#79](https://github.com/owncloud/ocis-accounts/issues/79)
-  * Enhancement - Add Group management for OCS Povisioning API: [#25](https://github.com/owncloud/ocis-ocs/pull/25)
+  * Enhancement - Add Group management for OCS Provisioning API: [#25](https://github.com/owncloud/ocis-ocs/pull/25)
   * Enhancement - Basic Support for the User Provisioning API: [#23](https://github.com/owncloud/ocis-ocs/pull/23)
   * Bugfix - Build docker images with alpine:latest instead of alpine:edge: [#20](https://github.com/owncloud/ocis-ocs/pull/20)
   * Change - Initial release of basic version: [#1](https://github.com/owncloud/ocis-ocs/issues/1)
@@ -3135,7 +3135,7 @@ The following sections list the changes for 1.0.0.
 
    Currently, cross storage etag propagation is not yet implemented, which prevents the desktop
    client from detecting changes via the PROPFIND to /. / is managed by the root storage provider
-   which is independend of the home and oc storage providers. If a file changes in /home/foo, the
+   which is independent of the home and oc storage providers. If a file changes in /home/foo, the
    etag change will only be propagated to the root of the home storage provider.
 
    This change jails users into the `/home` namespace, and allows configuring the namespace to
@@ -3206,7 +3206,7 @@ The following sections list the changes for 1.0.0.
   * Enhancement - Update reva to v0.0.2-0.20200212114015-0dbce24f7e8b: [#91](https://github.com/owncloud/ocis-reva/pull/91)
 
    Reva has seen a lot of changes that allow us to - reduce the configuration overhead - use the
-   autocreato home folder option - use the home folder path layout option - no longer start the root
+   autocreate home folder option - use the home folder path layout option - no longer start the root
    storage
 
    Https://github.com/owncloud/ocis-reva/pull/91 related:
@@ -3427,7 +3427,7 @@ The following sections list the changes for 1.0.0.
    - Generate random endsession state for external authority - Update dependencies in
    Dockerfile - Set prompt=None to avoid loops with external authority - Update Jenkins
    reporting plugin from checkstyle to recordIssues - Remove extra kty key from JWKS top level
-   document - Fix regression which encodes URL fragments twice - Avoid generating fragmet/query
+   document - Fix regression which encodes URL fragments twice - Avoid generating fragment/query
    URLs with wrong order - Return state for oidc endsession response redirects - Use server
    provided username to avoid case mismatch - Use signed-out-uri if set as fallback for goodbye
    redirect on saml slo - Add checks to ensure post_logout_redirect_uri is not empty - Fix SAML2

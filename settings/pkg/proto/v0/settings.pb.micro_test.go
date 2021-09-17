@@ -808,7 +808,7 @@ func TestCreateRoleAndAssign(t *testing.T) {
 }
 
 // // TODO this tests are non-deterministic at least on my machine. Find a way to make them deterministic.
-// func TestListBudlesOnAuthorizedUser(t *testing.T) {
+// func TestListBundlesOnAuthorizedUser(t *testing.T) {
 // 	client := service.Client()
 // 	client2 := service.Client()
 // 	cl := proto.NewBundleService("com.owncloud.api.settings", client)

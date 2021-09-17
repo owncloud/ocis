@@ -89,7 +89,7 @@ The OCS service makes a stat request to the storage provider to get a [ResourceI
 
 {{< hint >}}
 The user and public share provider implementations identify the file using the [`ResourceId`](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.ResourceId). The [`ResourceInfo`](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.ResourceInfo) is passed so the share provider can also store who the owner of the resource is. The *path* is not part of the other API calls, e.g. when listing shares.
-The OCM API takes an id based reference on the CS3 api, even if the OCM HTTP endpoint takes a path argument. *@jfd: Why? Does it not need the owner? It only stores the owner of the share, which is always the currently looged in user, when creating a share. Afterwards only the owner can update a share ... so collaborative management of shares is not possible. At least for OCM shares.*
+The OCM API takes an id based reference on the CS3 api, even if the OCM HTTP endpoint takes a path argument. *@jfd: Why? Does it not need the owner? It only stores the owner of the share, which is always the currently logged in user, when creating a share. Afterwards only the owner can update a share ... so collaborative management of shares is not possible. At least for OCM shares.*
 {{< /hint >}}
 
 ### User and Group provisioning

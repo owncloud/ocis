@@ -60,7 +60,7 @@ The migration happens while the service is offline. File metadata, blobs and sha
 - Good, because oCIS can be tested in a staging system without writing to the production system.
 - Good, because file layout on disk can be changed to support new storage driver capabilities.
 - Bad, because the export and import might require significant amounts of storage.
-- Bad, because a rollback to the state before the migration might cause data loss of the changes that happend in between.
+- Bad, because a rollback to the state before the migration might cause data loss of the changes that happened in between.
 - Bad, because the cold migration can mean significant downtime.
 
 ### Hot Migration

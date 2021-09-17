@@ -2,7 +2,7 @@ SHELL := bash
 NAME := thumbnails
 
 ############ tooling ############
-ifneq (, $(shell which go 2> /dev/null)) # supress `command not found warnings` for non go targets in CI
+ifneq (, $(shell which go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../.bingo/Variables.mk
 endif
 

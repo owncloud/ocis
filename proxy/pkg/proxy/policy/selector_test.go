@@ -141,7 +141,7 @@ func TestClaimsSelector(t *testing.T) {
 	})
 
 	var tests = []testCase{
-		{"unatuhenticated", context.Background(), nil, "unauthenticated"},
+		{"unauthenticated", context.Background(), nil, "unauthenticated"},
 		{"default", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: ""}), nil, "default"},
 		{"claim-value", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: "ocis.routing.policy-value"}), nil, "ocis.routing.policy-value"},
 		{"cookie-only", context.Background(), &http.Cookie{Name: SelectorCookieName, Value: "cookie"}, "cookie"},

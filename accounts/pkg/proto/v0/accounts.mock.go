@@ -9,7 +9,7 @@ import (
 
 // MockAccountsService can be used to write tests
 /*
-To creata a mock overwrite the functions of an instance like this:
+To create a mock overwrite the functions of an instance like this:
 
 ```go
 func mockAccSvc(retErr bool) proto.AccountsService {
