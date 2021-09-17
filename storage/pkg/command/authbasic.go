@@ -114,6 +114,8 @@ func authBasicConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 						"ldap": map[string]interface{}{
 							"hostname":      cfg.Reva.LDAP.Hostname,
 							"port":          cfg.Reva.LDAP.Port,
+							"cacert":        cfg.Reva.LDAP.CACert,
+							"insecure":      cfg.Reva.LDAP.Insecure,
 							"base_dn":       cfg.Reva.LDAP.BaseDN,
 							"loginfilter":   cfg.Reva.LDAP.LoginFilter,
 							"bind_username": cfg.Reva.LDAP.BindDN,
