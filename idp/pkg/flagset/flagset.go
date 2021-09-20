@@ -270,7 +270,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "validation-keys-path",
-			Usage:       "Full path to a folder containg PEM encoded private or public key files used for token validaton (file name without extension is used as kid)",
+			Usage:       "Full path to a folder containing PEM encoded private or public key files used for token validation (file name without extension is used as kid)",
 			EnvVars:     []string{"IDP_VALIDATION_KEYS_PATH"},
 			Value:       flags.OverrideDefaultString(cfg.IDP.ValidationKeysPath, ""),
 			Destination: &cfg.IDP.ValidationKeysPath,

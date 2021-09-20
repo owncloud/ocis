@@ -23,11 +23,11 @@ There should be a way to impose certain limitations in areas of the code that re
 ## Considered Options
 
 1. Build the evaluation engine in-house.
-2. Use third party libraries such as Open Policy Agent (a CNCF aproved project written in Go)
+2. Use third party libraries such as Open Policy Agent (a CNCF approved project written in Go)
 
 ## Decision Outcome
 
-Chosen option: option 2; Use third party libraries such as Open Policy Agent (a CNCF aproved project written in Go)
+Chosen option: option 2; Use third party libraries such as Open Policy Agent (a CNCF approved project written in Go)
 
 ### Positive Consequences
 

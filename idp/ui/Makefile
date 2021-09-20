@@ -40,7 +40,7 @@ lint-checkstyle: vendor ; $(info running eslint checkstyle ...)	@
 .PHONY: vendor
 vendor: .yarninstall
 
-.yarninstall: package.json ; $(info getting depdencies with yarn ...)   @
+.yarninstall: package.json ; $(info getting dependencies with yarn ...)   @
 	@$(YARN) install --silent
 	@touch $@
 

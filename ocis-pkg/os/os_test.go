@@ -30,7 +30,7 @@ func TestMustUserConfigDir(t *testing.T) {
 			want: filepath.Join(configDir, "ocis", "testing"),
 		},
 		{
-			name: "location cannot be determined becahse $HOME is not set",
+			name: "location cannot be determined because $HOME is not set",
 			args: args{
 				prefix:    "ocis",
 				extension: "testing",

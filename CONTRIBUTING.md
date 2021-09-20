@@ -44,7 +44,7 @@ We also have a [Rocket Chat Server](https://talk.owncloud.com/channel/ocis) to a
 
 ### ownCloud is hosted on Github
 
-To effectivly contribute to ownCloud Infinite Scale, you need a Github account. You can get that for free at [Github](https://github.com/join). You can find howtos on the internet, for example [here](https://www.wikihow.com/Create-an-Account-on-GitHub).
+To effectively contribute to ownCloud Infinite Scale, you need a Github account. You can get that for free at [Github](https://github.com/join). You can find howtos on the internet, for example [here](https://www.wikihow.com/Create-an-Account-on-GitHub).
 
 For other ways of contributing, for example with translations, other systems require you to have an account as well, for example [Transifex](https://www.transifex.com).
 
