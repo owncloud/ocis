@@ -78,7 +78,7 @@ _TODO @butonic add ADR for OpenID Connect_
 
 #### User impact
 When introducing OpenID Connect, the clients will detect the new authentication scheme when their current way of authenticating returns an error. Users will then have to
-reauthorize at the OpenID Connecd IdP, which again, may be configured to skip the consent step for trusted clients.
+reauthorize at the OpenID Connect IdP, which again, may be configured to skip the consent step for trusted clients.
 
 #### Steps
 1. There are multiple products that can be used as an OpenID Connect IdP. We test with [LibreGraph Connect](https://github.com/libregraph/lico), which is also [embedded in oCIS](https://github.com/owncloud/web/). Other alternatives include [Keycloak](https://www.keycloak.org/) or [Ping](https://www.pingidentity.com/). Please refer to the corresponding setup instructions for the product you intent to use.
@@ -106,7 +106,7 @@ Should there be problems with OpenID Connect at this point you can disable the a
 <div style="break-after: avoid"></div>
 Legacy clients relying on Basic auth or app passwords need to be migrated to OpenId Connect to work with oCIS. For a transition period Basic auth in oCIS can be enabled with `PROXY_ENABLE_BASIC_AUTH=true`, but we strongly recommend adopting OpenID Connect for other tools as well.
 
-While OpenID Connect providers will send an `iss` and `sub` claim that relying parties (services like oCIS or ownCloud 10) can use to identify users we recommend introducing a dedicated, globally unique, persistent, non-reassignable user identifier like a UUID for every user. This `ownclouduuid` shold be sent as an additional claim to save additional lookups on the server side. It will become the user id in oCIS, e.g. when searching for recipients the `ownclouduuid` will be used to persist permissions with the share manager. It has a different purpose than the ownCloud 10 username, which is used to login. Using UUIDs we can not only mitigate username collisions when merging multiple instances but also allow renaming usernames after the migration to oCIS has been completed.
+While OpenID Connect providers will send an `iss` and `sub` claim that relying parties (services like oCIS or ownCloud 10) can use to identify users we recommend introducing a dedicated, globally unique, persistent, non-reassignable user identifier like a UUID for every user. This `ownclouduuid` should be sent as an additional claim to save additional lookups on the server side. It will become the user id in oCIS, e.g. when searching for recipients the `ownclouduuid` will be used to persist permissions with the share manager. It has a different purpose than the ownCloud 10 username, which is used to login. Using UUIDs we can not only mitigate username collisions when merging multiple instances but also allow renaming usernames after the migration to oCIS has been completed.
 
 <div class="editpage">
 
@@ -322,8 +322,8 @@ _TODO @butonic update performance comparisons nightly_
 
 #### Steps
 There are several options to move users to the oCIS backend:
-- Use a canary app to let users decide thamselves
-- Use an early adoptors group with an opt in
+- Use a canary app to let users decide themselves
+- Use an early adopters group with an opt in
 - Force migrate users in batch or one by one at the administrators will
 
 #### Verification
@@ -333,7 +333,7 @@ The same verification steps as for the internal testing stage apply. Just from t
 Until now, the oCIS configuration mimics ownCloud 10 and uses the old data directory layout and the ownCloud 10 database. Users can seamlessly be switched from ownCloud 10 to oCIS and back again.
 <div class="editpage">
 
-_TODO @butonic we need a canary app that allows users to decide for themself which backend to use_
+_TODO @butonic we need a canary app that allows users to decide for themselves which backend to use_
 
 </div>
 
@@ -430,7 +430,7 @@ _TODO @butonic document how to manually do that until the storage registry can d
 Start with a test user, then move to early adopters and finally migrate all users.
 
 #### Rollback
-To switch the storage provider again the same storage space migration can be performed again: copy medatata and blob data using the CS3 api, then change the responsible storage provider in the storage registry.
+To switch the storage provider again the same storage space migration can be performed again: copy metadata and blob data using the CS3 api, then change the responsible storage provider in the storage registry.
 
 #### Notes
 <div style="break-after: avoid"></div>
@@ -473,7 +473,7 @@ _TODO for storage provider as source of truth persist ALL share data in the stor
 </div>
 
 #### Verification
-After copying all metadata start a dedicated gateway and change the configuration to use the new share manager. Route a test user, a test group and early adoptors to the new gateway. When no problems occur you can start the desired number of share managers and roll out the change to all gateways.
+After copying all metadata start a dedicated gateway and change the configuration to use the new share manager. Route a test user, a test group and early adopters to the new gateway. When no problems occur you can start the desired number of share managers and roll out the change to all gateways.
 
 <div class="editpage">
 
@@ -568,7 +568,7 @@ The `filecache` table itself has more metadata:
 
 | Field              | Type          | Null | Key | Default | Extra          | Comment        | Migration         |
 |--------------------|---------------|------|-----|---------|----------------|----------------|----------------|
-| `fileid`           | bigint(20)    | NO   | PRI | NULL    | auto_increment |                | MUST become the oCIS `opaqueid` of a file reference. `ocis` driver stores it in extendet attributes and can use numbers as node ids on disk. for eos see note below table |
+| `fileid`           | bigint(20)    | NO   | PRI | NULL    | auto_increment |                | MUST become the oCIS `opaqueid` of a file reference. `ocis` driver stores it in extended attributes and can use numbers as node ids on disk. for eos see note below table |
 | `storage`          | int(11)       | NO   | MUL | 0       |                | *the filecache holds metadata for multiple storages* | corresponds to an oCIS *storage space* |
 | `path`             | varchar(4000) | YES  |     | NULL    |                | *the path relative to the storages root* | MUST become the `path` relative to the storage root. `files` prefix needs to be trimmed. |
 | `path_hash`        | varchar(32)   | NO   |     |         |                | *mysql once had problems indexing long paths, so we stored a hash for lookup by path. | - |

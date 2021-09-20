@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-09-17T14:50:53+0000"
+date: "2021-09-20T13:03:28+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/idp/templates
@@ -31,9 +31,9 @@ If you prefer to configure the service with environment variables you can see th
 
 If multiple variables are listed for one option, they are in order of precedence. This means the leftmost variable will always win if given.
 
-### Commandline flags
+### Command-line flags
 
-If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
 ### idp health
 
@@ -321,7 +321,7 @@ Usage: `idp server [command options] [arguments...]`
 
 
 -validation-keys-path |  $IDP_VALIDATION_KEYS_PATH
-: Full path to a folder containg PEM encoded private or public key files used for token validaton (file name without extension is used as kid). Default: `""`.
+: Full path to a folder containing PEM encoded private or public key files used for token validation (file name without extension is used as kid). Default: `""`.
 
 
 -encryption-secret |  $IDP_ENCRYPTION_SECRET

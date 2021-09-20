@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-09-17T14:50:55+0000"
+date: "2021-09-20T13:03:29+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -31,9 +31,9 @@ If you prefer to configure the service with environment variables you can see th
 
 If multiple variables are listed for one option, they are in order of precedence. This means the leftmost variable will always win if given.
 
-### Commandline flags
+### Command-line flags
 
-If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
 ### thumbnails health
 

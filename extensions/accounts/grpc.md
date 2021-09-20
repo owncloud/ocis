@@ -13,7 +13,7 @@ geekdocFilePath: grpc.md
 
 ### Account
 
-Account follows the properties of the ms graph api user resuorce.
+Account follows the properties of the ms graph api user resource.
 See https://docs.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#properties
 
 | Field | Type | Label | Description |

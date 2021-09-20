@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-09-17T14:50:56+0000"
+date: "2021-09-20T13:03:29+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/webdav/templates
@@ -31,9 +31,9 @@ If you prefer to configure the service with environment variables you can see th
 
 If multiple variables are listed for one option, they are in order of precedence. This means the leftmost variable will always win if given.
 
-### Commandline flags
+### Command-line flags
 
-If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
 ## Root Command
 
@@ -66,6 +66,75 @@ Usage: `webdav [global options] command [command options] [arguments...]`
 
 
 ## Sub Commands
+
+### webdav version
+
+Print the versions of the running instances
+
+Usage: `webdav version [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-http-namespace |  $WEBDAV_HTTP_NAMESPACE
+: Set the base namespace for service discovery. Default: `"com.owncloud.web"`.
+
+
+-service-name |  $WEBDAV_SERVICE_NAME
+: Service name. Default: `"webdav"`.
+
+### webdav health
+
+Check health status
+
+Usage: `webdav health [command options] [arguments...]`
+
+
+-debug-addr |  $WEBDAV_DEBUG_ADDR
+: Address to debug endpoint. Default: `"0.0.0.0:9119"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### webdav server
 
@@ -157,75 +226,6 @@ Usage: `webdav server [command options] [arguments...]`
 
 -extensions | 
 : Run specific extensions during supervised mode. This flag is set by the runtime.
-
-
-
-### webdav version
-
-Print the versions of the running instances
-
-Usage: `webdav version [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--http-namespace |  $WEBDAV_HTTP_NAMESPACE
-: Set the base namespace for service discovery. Default: `"com.owncloud.web"`.
-
-
--service-name |  $WEBDAV_SERVICE_NAME
-: Service name. Default: `"webdav"`.
-
-### webdav health
-
-Check health status
-
-Usage: `webdav health [command options] [arguments...]`
-
-
--debug-addr |  $WEBDAV_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9119"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
