@@ -166,6 +166,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.RevaAddress,
 		},
 		&cli.StringFlag{
+			Name:        "machine-auth-api-key",
+			Value:       flags.OverrideDefaultString(cfg.MachineAuthAPIKey, "change-me-please"),
+			Usage:       "the API key to be used for the machine auth driver in reva",
+			EnvVars:     []string{"OCS_MACHINE_AUTH_API_KEY", "OCIS_MACHINE_AUTH_API_KEY"},
+			Destination: &cfg.MachineAuthAPIKey,
+		},
+		&cli.StringFlag{
 			Name:        "idm-address",
 			Value:       flags.OverrideDefaultString(cfg.IdentityManagement.Address, "https://localhost:9200"),
 			EnvVars:     []string{"OCS_IDM_ADDRESS", "OCIS_URL"},

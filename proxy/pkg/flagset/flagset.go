@@ -295,7 +295,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "machine-auth-api-key",
 			Value:       flags.OverrideDefaultString(cfg.MachineAuthAPIKey, "change-me-please"),
 			Usage:       "the API key to be used for the machine auth driver in reva",
-			EnvVars:     []string{"PROXY_MACHINE_AUTH_API_KEY"},
+			EnvVars:     []string{"PROXY_MACHINE_AUTH_API_KEY", "OCIS_MACHINE_AUTH_API_KEY"},
 			Destination: &cfg.MachineAuthAPIKey,
 		},
 

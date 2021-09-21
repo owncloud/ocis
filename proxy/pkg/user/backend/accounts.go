@@ -178,7 +178,7 @@ func (a *accountsServiceBackend) getAccount(ctx context.Context, query string) (
 	})
 
 	if err != nil {
-		a.logger.Error().Err(err).Str("query", query).Msgf("error fetching from accounts-service")
+		a.logger.Error().Err(err).Str("query", query).Msgf("error fetching from accounts-service %+v", a.tokenManager)
 		status = http.StatusInternalServerError
 		return
 	}

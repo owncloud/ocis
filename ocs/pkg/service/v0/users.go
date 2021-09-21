@@ -736,7 +736,7 @@ func (o Ocs) fetchAccountByUsername(ctx context.Context, name string) (*accounts
 
 func (o Ocs) fetchAccountFromCS3Backend(ctx context.Context, name string) (*accounts.Account, error) {
 	backend := o.getCS3Backend()
-	u, err := backend.GetUserByClaims(ctx, "username", name, false)
+	u, _, err := backend.GetUserByClaims(ctx, "username", name, false)
 	if err != nil {
 		return nil, err
 	}
