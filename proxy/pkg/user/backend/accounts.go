@@ -8,6 +8,8 @@ import (
 
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/pkg/auth/scope"
+	"github.com/cs3org/reva/pkg/token"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
@@ -15,11 +17,12 @@ import (
 )
 
 // NewAccountsServiceUserBackend creates a user-provider which fetches users from the ocis accounts-service
-func NewAccountsServiceUserBackend(ac accounts.AccountsService, rs settings.RoleService, oidcISS string, logger log.Logger) UserBackend {
+func NewAccountsServiceUserBackend(ac accounts.AccountsService, rs settings.RoleService, oidcISS string, tokenManager token.Manager, logger log.Logger) UserBackend {
 	return &accountsServiceBackend{
 		accountsClient:      ac,
 		settingsRoleService: rs,
 		OIDCIss:             oidcISS,
+		tokenManager:        tokenManager,
 		logger:              logger,
 	}
 }
@@ -29,9 +32,10 @@ type accountsServiceBackend struct {
 	settingsRoleService settings.RoleService
 	OIDCIss             string
 	logger              log.Logger
+	tokenManager        token.Manager
 }
 
-func (a accountsServiceBackend) GetUserByClaims(ctx context.Context, claim, value string, withRoles bool) (*cs3.User, error) {
+func (a accountsServiceBackend) GetUserByClaims(ctx context.Context, claim, value string, withRoles bool) (*cs3.User, string, error) {
 	var account *accounts.Account
 	var status int
 	var query string
@@ -44,38 +48,43 @@ func (a accountsServiceBackend) GetUserByClaims(ctx context.Context, claim, valu
 	case "id":
 		query = fmt.Sprintf("id eq '%s'", strings.ReplaceAll(value, "'", "''"))
 	default:
-		return nil, fmt.Errorf("invalid user by claim lookup must be  'mail', 'username' or 'id")
+		return nil, "", fmt.Errorf("invalid user by claim lookup must be  'mail', 'username' or 'id")
 	}
 
 	account, status = a.getAccount(ctx, query)
 	if status == http.StatusNotFound {
-		return nil, ErrAccountNotFound
+		return nil, "", ErrAccountNotFound
 	}
 
 	if status != 0 || account == nil {
-		return nil, fmt.Errorf("could not get account, got status: %d", status)
+		return nil, "", fmt.Errorf("could not get account, got status: %d", status)
 	}
 
 	if !account.AccountEnabled {
-		return nil, ErrAccountDisabled
+		return nil, "", ErrAccountDisabled
 	}
 
 	user := a.accountToUser(account)
 
+	token, err := a.generateToken(ctx, user)
+	if err != nil {
+		return nil, "", err
+	}
+
 	if !withRoles {
-		return user, nil
+		return user, token, nil
 	}
 
 	if err := injectRoles(ctx, user, a.settingsRoleService); err != nil {
 		a.logger.Warn().Err(err).Msgf("Could not load roles... continuing without")
 	}
 
-	return user, nil
+	return user, token, nil
 
 }
 
 // Authenticate authenticates against the accounts services and returns the user on success
-func (a *accountsServiceBackend) Authenticate(ctx context.Context, username string, password string) (*cs3.User, error) {
+func (a *accountsServiceBackend) Authenticate(ctx context.Context, username string, password string) (*cs3.User, string, error) {
 	query := fmt.Sprintf(
 		"login eq '%s' and password eq '%s'",
 		strings.ReplaceAll(username, "'", "''"),
@@ -84,23 +93,28 @@ func (a *accountsServiceBackend) Authenticate(ctx context.Context, username stri
 	account, status := a.getAccount(ctx, query)
 
 	if status != 0 {
-		return nil, fmt.Errorf("could not authenticate with username, password for user %s. Status: %d", username, status)
+		return nil, "", fmt.Errorf("could not authenticate with username, password for user %s. Status: %d", username, status)
 	}
 
 	user := a.accountToUser(account)
+
+	token, err := a.generateToken(ctx, user)
+	if err != nil {
+		return nil, "", err
+	}
 
 	if err := injectRoles(ctx, user, a.settingsRoleService); err != nil {
 		a.logger.Warn().Err(err).Msgf("Could not load roles... continuing without")
 	}
 
-	return user, nil
+	return user, token, nil
 }
 
 func (a accountsServiceBackend) CreateUserFromClaims(ctx context.Context, claims map[string]interface{}) (*cs3.User, error) {
 	req := &accounts.CreateAccountRequest{
 		Account: &accounts.Account{
-			CreationType:             "LocalAccount",
-			AccountEnabled:           true,
+			CreationType:   "LocalAccount",
+			AccountEnabled: true,
 		},
 	}
 	var ok bool
@@ -144,7 +158,7 @@ func (a *accountsServiceBackend) accountToUser(account *accounts.Account) *cs3.U
 		Id: &cs3.UserId{
 			OpaqueId: account.Id,
 			Idp:      a.OIDCIss,
-			Type:     cs3.UserType_USER_TYPE_PRIMARY,  // TODO: once we have support for other user types, this needs to be inferred
+			Type:     cs3.UserType_USER_TYPE_PRIMARY, // TODO: once we have support for other user types, this needs to be inferred
 		},
 		Username:     account.OnPremisesSamAccountName,
 		DisplayName:  account.DisplayName,
@@ -183,6 +197,21 @@ func (a *accountsServiceBackend) getAccount(ctx context.Context, query string) (
 
 	account = resp.Accounts[0]
 	return
+}
+
+func (a *accountsServiceBackend) generateToken(ctx context.Context, u *cs3.User) (string, error) {
+	s, err := scope.AddOwnerScope(nil)
+	if err != nil {
+		a.logger.Error().Err(err).Msg("could not get owner scope")
+		return "", err
+	}
+
+	token, err := a.tokenManager.MintToken(ctx, u, s)
+	if err != nil {
+		a.logger.Error().Err(err).Msg("could not mint token")
+		return "", err
+	}
+	return token, nil
 }
 
 func expandGroups(account *accounts.Account) []string {

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
 	"github.com/micro/cli/v2"
@@ -148,14 +149,23 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 	var userProvider backend.UserBackend
 	switch cfg.AccountBackend {
 	case "accounts":
+		tokenManager, err := jwt.New(map[string]interface{}{
+			"secret":  cfg.TokenManager.JWTSecret,
+			"expires": int64(24 * 60 * 60),
+		})
+		if err != nil {
+			l.Error().Err(err).
+				Msg("Failed to create token manager")
+		}
 		userProvider = backend.NewAccountsServiceUserBackend(
 			acc.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient),
 			rolesClient,
 			cfg.OIDC.Issuer,
+			tokenManager,
 			l,
 		)
 	case "cs3":
-		userProvider = backend.NewCS3UserBackend(revaClient, rolesClient, revaClient, l)
+		userProvider = backend.NewCS3UserBackend(rolesClient, revaClient, cfg.MachineAuthAPIKey, l)
 	default:
 		l.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)
 	}
@@ -217,7 +227,6 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 		middleware.AccountResolver(
 			middleware.Logger(l),
 			middleware.UserProvider(userProvider),
-			middleware.TokenManagerConfig(cfg.TokenManager),
 			middleware.UserOIDCClaim(cfg.UserOIDCClaim),
 			middleware.UserCS3Claim(cfg.UserCS3Claim),
 			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
@@ -232,7 +241,6 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(l),
-			middleware.TokenManagerConfig(cfg.TokenManager),
 			middleware.RevaGatewayClient(revaClient),
 		),
 	)

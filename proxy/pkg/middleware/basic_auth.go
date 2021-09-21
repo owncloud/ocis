@@ -41,7 +41,7 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 
 				removeSuperfluousAuthenticate(w)
 				login, password, _ := req.BasicAuth()
-				user, err := h.userProvider.Authenticate(req.Context(), login, password)
+				user, _, err := h.userProvider.Authenticate(req.Context(), login, password)
 
 				// touch is a user agent locking guard, when touched changes to true it indicates the User-Agent on the
 				// request is configured to support only one challenge, it it remains untouched, there are no considera-

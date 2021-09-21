@@ -23,8 +23,8 @@ var (
 
 // UserBackend allows the proxy to retrieve users from different user-backends (accounts-service, CS3)
 type UserBackend interface {
-	GetUserByClaims(ctx context.Context, claim, value string, withRoles bool) (*cs3.User, error)
-	Authenticate(ctx context.Context, username string, password string) (*cs3.User, error)
+	GetUserByClaims(ctx context.Context, claim, value string, withRoles bool) (*cs3.User, string, error)
+	Authenticate(ctx context.Context, username string, password string) (*cs3.User, string, error)
 	CreateUserFromClaims(ctx context.Context, claims map[string]interface{}) (*cs3.User, error)
 	GetUserGroups(ctx context.Context, userID string)
 }
