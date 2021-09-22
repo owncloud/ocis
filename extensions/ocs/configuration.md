@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-09-21T00:07:45+0000"
+date: "2021-09-22T16:25:48+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocs/templates
@@ -35,11 +35,49 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
+### ocs health
+
+Check health status
+
+Usage: `ocs health [command options] [arguments...]`
+
+
+-debug-addr |  $OCS_DEBUG_ADDR
+: Address to debug endpoint. Default: `"0.0.0.0:9114"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### ocs ocis-ocs
 
 Serve OCS API for oCIS
 
 Usage: `ocs ocis-ocs [command options] [arguments...]`
+
 
 
 
@@ -160,6 +198,10 @@ Usage: `ocs server [command options] [arguments...]`
 : REVA Gateway Endpoint. Default: `"127.0.0.1:9142"`.
 
 
+-machine-auth-api-key |  $OCS_MACHINE_AUTH_API_KEY , $OCIS_MACHINE_AUTH_API_KEY
+: the API key to be used for the machine auth driver in reva. Default: `"change-me-please"`.
+
+
 -idm-address |  $OCS_IDM_ADDRESS , $OCIS_URL
 : keeps track of the IDM Address. Needed because of Reva requisite of uniqueness for users. Default: `"https://localhost:9200"`.
 
@@ -205,46 +247,11 @@ Usage: `ocs version [command options] [arguments...]`
 
 
 
+
 -http-namespace |  $OCS_NAMESPACE
 : Set the base namespace for the http namespace. Default: `"com.owncloud.web"`.
 
 
 -name |  $OCS_NAME
 : Service name. Default: `"ocs"`.
-
-### ocs health
-
-Check health status
-
-Usage: `ocs health [command options] [arguments...]`
-
-
--debug-addr |  $OCS_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9114"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
