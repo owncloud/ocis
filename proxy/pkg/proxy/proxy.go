@@ -291,7 +291,7 @@ func defaultPolicies() []config.Policy {
 					Backend:  "http://localhost:9130",
 				},
 				{
-					Endpoint: "/archiver/",
+					Endpoint: "/archiver",
 					Backend:  "http://localhost:9140",
 				},
 				{
@@ -384,7 +384,7 @@ func defaultPolicies() []config.Policy {
 					Backend:  "http://localhost:9130",
 				},
 				{
-					Endpoint: "/archiver/",
+					Endpoint: "/archiver",
 					Backend:  "http://localhost:9140",
 				},
 				{
