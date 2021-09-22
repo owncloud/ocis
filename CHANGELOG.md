@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add option to skip generation of demo users and groups: [#2495](https://github.com/owncloud/ocis/pull/2495)
 * Enhancement - Allow overriding the cookie based route by claim: [#2508](https://github.com/owncloud/ocis/pull/2508)
 * Enhancement - Redirect invalid links to oC Web: [#2493](https://github.com/owncloud/ocis/pull/2493)
+* Enhancement - Use reva's Authenticate method instead of spawning token managers: [#2528](https://github.com/owncloud/ocis/pull/2528)
 * Enhancement - TLS config options for ldap in reva: [#2492](https://github.com/owncloud/ocis/pull/2492)
 
 ## Details
@@ -65,6 +66,17 @@ The following sections list the changes for unreleased.
    ownCloud Web instead of displaying a blank page with a "not found" message.
 
    https://github.com/owncloud/ocis/pull/2493
+
+* Enhancement - Use reva's Authenticate method instead of spawning token managers: [#2528](https://github.com/owncloud/ocis/pull/2528)
+
+   When using the CS3 proxy backend, we previously obtained the user from reva's userprovider
+   service and minted the token ourselves. This required maintaining a shared JWT secret between
+   ocis and reva, as well duplication of logic. This PR delegates this logic by using the
+   `Authenticate` method provided by the reva gateway service to obtain this token, making it an
+   arbitrary, indestructible entry. Currently, the changes have been made to the proxy service
+   but will be extended to others as well.
+
+   https://github.com/owncloud/ocis/pull/2528
 
 * Enhancement - TLS config options for ldap in reva: [#2492](https://github.com/owncloud/ocis/pull/2492)
 
