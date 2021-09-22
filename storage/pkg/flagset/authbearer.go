@@ -19,6 +19,15 @@ func AuthBearerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.AuthBearer.DebugAddr,
 		},
 
+		// Driver
+		&cli.StringFlag{
+			Name:        "auth-driver",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AuthBearerConfig.Driver, "oidc"),
+			Usage:       "bearer auth driver: 'oidc' or 'machine'",
+			EnvVars:     []string{"STORAGE_AUTH_BEARER_DRIVER"},
+			Destination: &cfg.Reva.AuthBearerConfig.Driver,
+		},
+
 		// OIDC
 
 		&cli.StringFlag{
@@ -61,6 +70,16 @@ func AuthBearerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "OIDC gid claim",
 			EnvVars:     []string{"STORAGE_OIDC_GID_CLAIM"},
 			Destination: &cfg.Reva.OIDC.GIDClaim,
+		},
+
+		// Machine Auth
+
+		&cli.StringFlag{
+			Name:        "machine-auth-api-key",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AuthBearerConfig.MachineAuthAPIKey, "change-me-please"),
+			Usage:       "the API key to be used for the machine auth driver in reva",
+			EnvVars:     []string{"STORAGE_AUTH_BEARER_MACHINE_AUTH_API_KEY", "OCIS_MACHINE_AUTH_API_KEY"},
+			Destination: &cfg.Reva.AuthBearerConfig.MachineAuthAPIKey,
 		},
 
 		// Services
