@@ -31,6 +31,10 @@ _[extracted from k8s docs](https://kubernetes.io/docs/concepts/overview/what-is-
 
 If that is still too abstract, [here is an ELI5 writeup](https://dev.to/miguelmota/comment/filh).
 
+### References and further reads
+
+- [Marcel Wunderlich's](https://github.com/Deaddy) [4 series articles](http://deaddy.net/introduction-to-kubernetes-pt-1.html) on Kubernetes clarifying its declarative nature, deep diving into ingress networking, storage and monitoring.
+
 ### How does oCIS fit in the Kubernetes model
 
 oCIS was designed with running on Kubernetes in mind. We set up to adopt the [Twelve-Factor App](https://12factor.net/) principles regarding configuration, with almost every aspect of oCIS being modifiable via environment variables. This comes in handy when you especially have a look at how a helm chart's (we will introduce this concept shortly) [list of values](https://github.com/refs/ocis-charts/blob/d8735e3222d2050504303851d3461909c86fcc89/ocis/values.yaml) looks like.
@@ -249,4 +253,4 @@ Yes. The next logical step would be to deploy this charts on GKE. There is a pre
 
 ## TODOs
 
-- while log-in works and creating folders work, uploading fails, most likely a configuration issue that has to be solved.
+- While log-in works and creating folders work, uploading fails, most likely a configuration issue that has to be solved.
