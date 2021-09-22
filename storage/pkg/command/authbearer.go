@@ -101,7 +101,7 @@ func authBearerConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]i
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"authprovider": map[string]interface{}{
-					"auth_manager": "oidc",
+					"auth_manager": cfg.Reva.AuthBearerConfig.Driver,
 					"auth_managers": map[string]interface{}{
 						"oidc": map[string]interface{}{
 							"issuer":     cfg.Reva.OIDC.Issuer,
@@ -110,6 +110,9 @@ func authBearerConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]i
 							"uid_claim":  cfg.Reva.OIDC.UIDClaim,
 							"gid_claim":  cfg.Reva.OIDC.GIDClaim,
 							"gatewaysvc": cfg.Reva.Gateway.Endpoint,
+						},
+						"machine": map[string]interface{}{
+							"api_key": cfg.Reva.AuthBearerConfig.MachineAuthAPIKey,
 						},
 					},
 				},

@@ -5,9 +5,10 @@ package test
 
 import (
 	"context"
-	"github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	"sync"
+
+	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 )
 
 // Ensure, that UserBackendMock does implement UserBackend.
@@ -40,13 +41,13 @@ var _ backend.UserBackend = &UserBackendMock{}
 //     }
 type UserBackendMock struct {
 	// AuthenticateFunc mocks the Authenticate method.
-	AuthenticateFunc func(ctx context.Context, username string, password string) (*userv1beta1.User, error)
+	AuthenticateFunc func(ctx context.Context, username string, password string) (*userv1beta1.User, string, error)
 
 	// CreateUserFromClaimsFunc mocks the CreateUserFromClaims method.
 	CreateUserFromClaimsFunc func(ctx context.Context, claims map[string]interface{}) (*userv1beta1.User, error)
 
 	// GetUserByClaimsFunc mocks the GetUserByClaims method.
-	GetUserByClaimsFunc func(ctx context.Context, claim string, value string, withRoles bool) (*userv1beta1.User, error)
+	GetUserByClaimsFunc func(ctx context.Context, claim string, value string, withRoles bool) (*userv1beta1.User, string, error)
 
 	// GetUserGroupsFunc mocks the GetUserGroups method.
 	GetUserGroupsFunc func(ctx context.Context, userID string)
@@ -95,7 +96,7 @@ type UserBackendMock struct {
 }
 
 // Authenticate calls AuthenticateFunc.
-func (mock *UserBackendMock) Authenticate(ctx context.Context, username string, password string) (*userv1beta1.User, error) {
+func (mock *UserBackendMock) Authenticate(ctx context.Context, username string, password string) (*userv1beta1.User, string, error) {
 	if mock.AuthenticateFunc == nil {
 		panic("UserBackendMock.AuthenticateFunc: method is nil but UserBackend.Authenticate was just called")
 	}
@@ -169,7 +170,7 @@ func (mock *UserBackendMock) CreateUserFromClaimsCalls() []struct {
 }
 
 // GetUserByClaims calls GetUserByClaimsFunc.
-func (mock *UserBackendMock) GetUserByClaims(ctx context.Context, claim string, value string, withRoles bool) (*userv1beta1.User, error) {
+func (mock *UserBackendMock) GetUserByClaims(ctx context.Context, claim string, value string, withRoles bool) (*userv1beta1.User, string, error) {
 	if mock.GetUserByClaimsFunc == nil {
 		panic("UserBackendMock.GetUserByClaimsFunc: method is nil but UserBackend.GetUserByClaims was just called")
 	}

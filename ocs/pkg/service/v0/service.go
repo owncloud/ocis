@@ -165,7 +165,7 @@ func (o Ocs) getCS3Backend() backend.UserBackend {
 	if err != nil {
 		o.logger.Fatal().Msgf("could not get reva client at address %s", o.config.RevaAddress)
 	}
-	return backend.NewCS3UserBackend(revaClient, nil, revaClient, o.logger)
+	return backend.NewCS3UserBackend(nil, revaClient, o.config.MachineAuthAPIKey, o.logger)
 }
 
 func (o Ocs) getGroupsService() accounts.GroupsService {

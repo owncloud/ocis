@@ -45,9 +45,9 @@ type Options struct {
 	// PreSignedURLConfig to configure the middleware
 	PreSignedURLConfig config.PreSignedURL
 	// UserOIDCClaim to read from the oidc claims
-	UserOIDCClaim             string
+	UserOIDCClaim string
 	// UserCS3Claim to use when looking up a user in the CS3 API
-	UserCS3Claim         string
+	UserCS3Claim string
 	// AutoprovisionAccounts when an accountResolver does not exist.
 	AutoprovisionAccounts bool
 	// EnableBasicAuth to allow basic auth

@@ -291,6 +291,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.AccountBackend,
 		},
 
+		&cli.StringFlag{
+			Name:        "machine-auth-api-key",
+			Value:       flags.OverrideDefaultString(cfg.MachineAuthAPIKey, "change-me-please"),
+			Usage:       "the API key to be used for the machine auth driver in reva",
+			EnvVars:     []string{"PROXY_MACHINE_AUTH_API_KEY", "OCIS_MACHINE_AUTH_API_KEY"},
+			Destination: &cfg.MachineAuthAPIKey,
+		},
+
 		// Reva Middlewares Config
 		&cli.StringSliceFlag{
 			Name:    "proxy-user-agent-lock-in",
