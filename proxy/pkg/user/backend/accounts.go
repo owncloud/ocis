@@ -66,17 +66,15 @@ func (a accountsServiceBackend) GetUserByClaims(ctx context.Context, claim, valu
 
 	user := a.accountToUser(account)
 
+	if withRoles {
+		if err := injectRoles(ctx, user, a.settingsRoleService); err != nil {
+			a.logger.Warn().Err(err).Msgf("Could not load roles... continuing without")
+		}
+	}
+
 	token, err := a.generateToken(ctx, user)
 	if err != nil {
 		return nil, "", err
-	}
-
-	if !withRoles {
-		return user, token, nil
-	}
-
-	if err := injectRoles(ctx, user, a.settingsRoleService); err != nil {
-		a.logger.Warn().Err(err).Msgf("Could not load roles... continuing without")
 	}
 
 	return user, token, nil
@@ -178,7 +176,7 @@ func (a *accountsServiceBackend) getAccount(ctx context.Context, query string) (
 	})
 
 	if err != nil {
-		a.logger.Error().Err(err).Str("query", query).Msgf("error fetching from accounts-service %+v", a.tokenManager)
+		a.logger.Error().Err(err).Str("query", query).Msgf("error fetching from accounts-service")
 		status = http.StatusInternalServerError
 		return
 	}

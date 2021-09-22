@@ -227,6 +227,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 		middleware.AccountResolver(
 			middleware.Logger(l),
 			middleware.UserProvider(userProvider),
+			middleware.TokenManagerConfig(cfg.TokenManager),
 			middleware.UserOIDCClaim(cfg.UserOIDCClaim),
 			middleware.UserCS3Claim(cfg.UserCS3Claim),
 			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
@@ -241,6 +242,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(l),
+			middleware.TokenManagerConfig(cfg.TokenManager),
 			middleware.RevaGatewayClient(revaClient),
 		),
 	)
