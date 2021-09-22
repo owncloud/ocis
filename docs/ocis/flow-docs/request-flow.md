@@ -50,7 +50,7 @@ sequenceDiagram
             end
 
             proxy->>+accounts: TODO API call to exchange sub@iss with account UUID
-            Note over proxy,accounts: does not autoprovision users. They are explicitly provsioned later.
+            Note over proxy,accounts: does not autoprovision users. They are explicitly provisioned later.
 
             alt account exists or has been migrated
 

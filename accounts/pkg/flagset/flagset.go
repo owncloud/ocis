@@ -134,6 +134,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"ACCOUNTS_HASH_DIFFICULTY"},
 			Destination: &cfg.Server.HashDifficulty,
 		},
+		&cli.BoolFlag{
+			Name:        "demo-users-and-groups",
+			Value:       flags.OverrideDefaultBool(cfg.Server.DemoUsersAndGroups, true),
+			Usage:       "Enable demo users and groups",
+			EnvVars:     []string{"ACCOUNTS_DEMO_USERS_AND_GROUPS"},
+			Destination: &cfg.Server.DemoUsersAndGroups,
+		},
 		&cli.StringFlag{
 			Name:        "asset-path",
 			Value:       flags.OverrideDefaultString(cfg.Asset.Path, ""),

@@ -16,7 +16,7 @@ services:
       - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@example.org}"
       - "--certificatesResolvers.http.acme.storage=/certs/acme.json"
       - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
-      # enable dasbhoard
+      # enable dashboard
       - "--api.dashboard=true"
       # define entrypoints
       - "--entryPoints.http.address=:80"

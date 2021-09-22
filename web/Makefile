@@ -2,7 +2,7 @@ SHELL := bash
 NAME := web
 
 ############ tooling ############
-ifneq (, $(shell which go 2> /dev/null)) # supress `command not found warnings` for non go targets in CI
+ifneq (, $(shell which go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../.bingo/Variables.mk
 endif
 
@@ -28,7 +28,7 @@ ci-go-generate: pull-assets # CI runs ci-node-generate automatically before this
 .PHONY: ci-node-generate
 ci-node-generate:
 
-WEB_ASSETS_VERSION = v4.1.0
+WEB_ASSETS_VERSION = v4.2.0
 
 .PHONY: pull-assets
 pull-assets:

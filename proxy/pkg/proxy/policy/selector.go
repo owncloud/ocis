@@ -164,19 +164,20 @@ func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.Account
 // This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OCIS and
 func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
 	return func(r *http.Request) (s string, err error) {
-		// use cookie first if provided
-		selectorCookie, err := r.Cookie(cfg.SelectorCookieName)
-		if err == nil {
-			return selectorCookie.Value, nil
-		}
 
-		// if no cookie is present, try to route by selector
+		// first, try to route by selector
 		if claims := oidc.FromContext(r.Context()); claims != nil {
 			if p, ok := claims[oidc.OcisRoutingPolicy].(string); ok && p != "" {
 				// TODO check we know the routing policy?
 				return p, nil
 			}
 			return cfg.DefaultPolicy, nil
+		}
+
+		// use cookie if provided
+		selectorCookie, err := r.Cookie(cfg.SelectorCookieName)
+		if err == nil {
+			return selectorCookie.Value, nil
 		}
 
 		return cfg.UnauthenticatedPolicy, nil

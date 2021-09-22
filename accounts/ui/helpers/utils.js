@@ -1,5 +1,5 @@
 /**
- * Asserts wheter the given object is empty
+ * Asserts whether the given object is empty
  * @param {Object} obj Object to be checked
  * @returns {Boolean}
  */

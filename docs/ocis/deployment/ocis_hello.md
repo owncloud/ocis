@@ -115,7 +115,7 @@ On Linux and macOS you can add them to your `/etc/hosts` files like this:
 
 ```
 127.0.0.1 ocis.owncloud.test
-127.0.0.1 traefik.owncloud.testt
+127.0.0.1 traefik.owncloud.test
 ```
 
 After that you're ready to start the application stack:

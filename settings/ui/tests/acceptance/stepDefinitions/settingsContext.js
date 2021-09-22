@@ -2,7 +2,7 @@ const assert = require('assert')
 const path = require('path')
 const fs = require('fs-extra')
 const { client } = require('nightwatch-api')
-const { Given, When, Then, After, Before } = require('cucumber')
+const { Given, When, Then } = require('@cucumber/cucumber')
 const languageHelper = require('../helpers/language')
 
 const initialLanguageAssignments = []

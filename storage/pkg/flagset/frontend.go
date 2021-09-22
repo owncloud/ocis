@@ -180,9 +180,9 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.UploadHTTPMethodOverride,
 		},
 		&cli.StringSliceFlag{
-			Name:    "checksum-suppored-type",
+			Name:    "checksum-supported-type",
 			Value:   cli.NewStringSlice("sha1", "md5", "adler32"),
-			Usage:   "--checksum-suppored-type sha1 [--checksum-suppored-type adler32]",
+			Usage:   "--checksum-supported-type sha1 [--checksum-supported-type adler32]",
 			EnvVars: []string{"STORAGE_FRONTEND_CHECKSUM_SUPPORTED_TYPES"},
 		},
 		&cli.StringFlag{

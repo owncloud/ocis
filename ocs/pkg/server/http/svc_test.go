@@ -538,7 +538,9 @@ func init() {
 	)
 
 	c := &accountsCfg.Config{
-		Server: accountsCfg.Server{},
+		Server: accountsCfg.Server{
+			DemoUsersAndGroups: true,
+		},
 		Repo: accountsCfg.Repo{
 			Disk: accountsCfg.Disk{
 				Path: dataPath,

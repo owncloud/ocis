@@ -457,7 +457,7 @@ func (x *DeleteAccountRequest) GetId() string {
 	return ""
 }
 
-// Account follows the properties of the ms graph api user resuorce.
+// Account follows the properties of the ms graph api user resource.
 // See https://docs.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#properties
 type Account struct {
 	state         protoimpl.MessageState

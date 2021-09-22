@@ -44,31 +44,25 @@ func (m selectorCookie) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		selectorCookieName = m.policySelector.Claims.SelectorCookieName
 	}
 
-	_, err := req.Cookie(selectorCookieName)
-	if err != nil {
-		// no cookie there - try to add one
-		if oidc.FromContext(req.Context()) != nil {
+	// update cookie
+	if oidc.FromContext(req.Context()) != nil {
 
-			selectorFunc, err := policy.LoadSelector(&m.policySelector)
-			if err != nil {
-				m.logger.Err(err)
-			}
-
-			selector, err := selectorFunc(req)
-			if err != nil {
-				m.logger.Err(err)
-			}
-
-			cookie := http.Cookie{
-				Name:     selectorCookieName,
-				Value:    selector,
-				Domain:   req.Host,
-				Path:     "/",
-				MaxAge:   60 * 60,
-				HttpOnly: true,
-			}
-			http.SetCookie(w, &cookie)
+		selectorFunc, err := policy.LoadSelector(&m.policySelector)
+		if err != nil {
+			m.logger.Err(err)
 		}
+
+		selector, err := selectorFunc(req)
+		if err != nil {
+			m.logger.Err(err)
+		}
+
+		cookie := http.Cookie{
+			Name:  selectorCookieName,
+			Value: selector,
+			Path:  "/",
+		}
+		http.SetCookie(w, &cookie)
 	}
 
 	m.next.ServeHTTP(w, req)

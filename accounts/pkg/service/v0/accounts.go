@@ -625,7 +625,7 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 	return
 }
 
-// whitelist of all paths/fields which can be updated by users themself
+// whitelist of all paths/fields which can be updated by users themselves
 var selfUpdatableAccountPaths = map[string]struct{}{
 	"DisplayName":              {},
 	"Description":              {},
@@ -741,7 +741,7 @@ func validateAccountEmail(serviceID string, a *proto.Account) error {
 	return nil
 }
 
-// We want to allow email addresses as usernames so they show up when using them in ACLs on storages that allow intergration with our glauth LDAP service
+// We want to allow email addresses as usernames so they show up when using them in ACLs on storages that allow integration with our glauth LDAP service
 // so we are adding a few restrictions from https://stackoverflow.com/questions/6949667/what-are-the-real-rules-for-linux-usernames-on-centos-6-and-rhel-6
 // names should not start with numbers
 var usernameRegex = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]*(@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)*$")

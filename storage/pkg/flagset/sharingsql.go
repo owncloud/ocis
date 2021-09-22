@@ -6,7 +6,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/config"
 )
 
-// SharingSQLWithConfig applies the Shring SQL driver cfg to the flagset
+// SharingSQLWithConfig applies the Sharing SQL driver cfg to the flagset
 func SharingSQLWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{

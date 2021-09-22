@@ -22,7 +22,7 @@ func authOptions(opts ...account.Option) account.Options {
 	return opt
 }
 
-// Auth provides a middleware to authenticate requestrs using the x-access-token header value
+// Auth provides a middleware to authenticate requests using the x-access-token header value
 // and write it to the context. If there is no x-access-token the middleware prevents access and renders a json document.
 func Auth(opts ...account.Option) func(http.Handler) http.Handler {
 	opt := authOptions(opts...)

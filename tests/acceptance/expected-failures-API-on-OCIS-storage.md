@@ -508,7 +508,7 @@ cannot share a folder with create permission
 -   [apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:181](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature#L181)
 -   [apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature#L182)
 
-#### [Adding public upload to a read only shared folder as a receipient is allowed ](https://github.com/owncloud/ocis/issues/2164)
+#### [Adding public upload to a read only shared folder as a recipient is allowed ](https://github.com/owncloud/ocis/issues/2164)
 
 -   [apiSharePublicLink2/updatePublicLinkShare.feature:332](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L332)
 -   [apiSharePublicLink2/updatePublicLinkShare.feature:333](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L333)
@@ -849,7 +849,7 @@ _ocs: api compatibility, return correct status code_
 - [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:407](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L407)
 - [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:439](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L439)
 
-#### [Empy OCS response for a share create request using a disabled user](https://github.com/owncloud/ocis/issues/2212)
+#### [Empty OCS response for a share create request using a disabled user](https://github.com/owncloud/ocis/issues/2212)
 -   [apiShareCreateSpecialToShares2/createShareWithDisabledUser.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareWithDisabledUser.feature#L20)
 -   [apiShareCreateSpecialToShares2/createShareWithDisabledUser.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareWithDisabledUser.feature#L23)
 
@@ -1437,7 +1437,7 @@ Scenario Outline: Unauthenticated call
 ### Won't fix
 Not everything needs to be implemented for ocis. While the oc10 testsuite covers these things we are not looking at them right now.
 
-* _The `OC-LazyOps` header is [no longer supported by the client](https://github.com/owncloud/client/pull/8398), implmenting this is not necessary for a first production release. We plan to have an uploed state machine to visualize the state of a file, see https://github.com/owncloud/ocis/issues/214_
+* _The `OC-LazyOps` header is [no longer supported by the client](https://github.com/owncloud/client/pull/8398), implementing this is not necessary for a first production release. We plan to have an upload state machine to visualize the state of a file, see https://github.com/owncloud/ocis/issues/214_
 * _Blacklisted ignored files are no longer required because ocis can handle `.htaccess` files without security implications introduced by serving user provided files with apache._
 
 #### [uploading with old-chunking does not work](https://github.com/owncloud/ocis/issues/1343)
