@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Redirect invalid links to oC Web: [#2493](https://github.com/owncloud/ocis/pull/2493)
 * Enhancement - Use reva's Authenticate method instead of spawning token managers: [#2528](https://github.com/owncloud/ocis/pull/2528)
 * Enhancement - TLS config options for ldap in reva: [#2492](https://github.com/owncloud/ocis/pull/2492)
+* Enhancement - Set reva JWT token expiration time to 24 hours by default: [#2527](https://github.com/owncloud/ocis/pull/2527)
 
 ## Details
 
@@ -94,6 +95,10 @@ The following sections list the changes for unreleased.
    used to disable certificate checks (only advisable for development and test enviroments).
 
    https://github.com/owncloud/ocis/pull/2492
+
+* Enhancement - Set reva JWT token expiration time to 24 hours by default: [#2527](https://github.com/owncloud/ocis/pull/2527)
+
+   https://github.com/owncloud/ocis/pull/2527
 # Changelog for [1.12.0] (2021-09-14)
 
 The following sections list the changes for 1.12.0.
