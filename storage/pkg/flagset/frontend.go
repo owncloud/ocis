@@ -219,11 +219,27 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 
 		// Archiver
 		&cli.StringFlag{
-			Name:        "default-upload-protocol",
-			Value:       flags.OverrideDefaultString(cfg.Reva.DefaultUploadProtocol, "tus"),
-			Usage:       "Default upload chunking protocol to be used out of tus/v1/ng",
-			EnvVars:     []string{"STORAGE_FRONTEND_DEFAULT_UPLOAD_PROTOCOL"},
-			Destination: &cfg.Reva.Archiver.,
+			Name:        "archiver-url",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Archiver.ArchiverURL, "/archiver"),
+			Usage:       "URL where the archiver is reachable",
+			EnvVars:     []string{"STORAGE_FRONTEND_ARCHIVER_URL"},
+			Destination: &cfg.Reva.Archiver.ArchiverURL,
+		},
+
+		// App Provider
+		&cli.StringFlag{
+			Name:        "appprovider-apps-url",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.AppsURL, "/app/list"),
+			Usage:       "URL where the archiver is reachable",
+			EnvVars:     []string{"STORAGE_FRONTEND_APP_PROVIDER_APPS_URL"},
+			Destination: &cfg.Reva.AppProvider.AppsURL,
+		},
+		&cli.StringFlag{
+			Name:        "appprovider-open-url",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.OpenURL, "/app/open"),
+			Usage:       "URL where the archiver is reachable",
+			EnvVars:     []string{"STORAGE_FRONTEND_APP_PROVIDER_OPEN_URL"},
+			Destination: &cfg.Reva.AppProvider.OpenURL,
 		},
 
 		// Reva Middlewares Config

@@ -59,16 +59,16 @@ func Frontend(cfg *config.Config) *cli.Command {
 					"enabled":      true,
 					"version":      "2.0.0",
 					"formats":      []string{"tar", "zip"},
-					"archiver_url": "/archiver",
+					"archiver_url": cfg.Reva.Archiver.ArchiverURL,
 				},
 			}
 
-			appproviders := []map[string]interface{}{
+			appProviders := []map[string]interface{}{
 				{
 					"enabled":  true,
 					"version":  "1.0.0",
-					"apps_url": "/app/list",
-					"open_url": "/app/open",
+					"apps_url": cfg.Reva.AppProvider.AppsURL,
+					"open_url": cfg.Reva.AppProvider.OpenURL,
 				},
 			}
 
@@ -79,7 +79,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 				"undelete":          true,
 				"versioning":        true,
 				"archivers":         archivers,
-				"app_providers":     appproviders,
+				"app_providers":     appProviders,
 			}
 
 			if cfg.Reva.DefaultUploadProtocol == "tus" {
