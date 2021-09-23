@@ -222,10 +222,6 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			middleware.OIDCIss(cfg.OIDC.Issuer),
 			middleware.CredentialsByUserAgent(cfg.Reva.Middleware.Auth.CredentialsByUserAgent),
 		),
-		middleware.PublicShareAuth(
-			middleware.Logger(logger),
-			middleware.RevaGatewayClient(revaClient),
-		),
 		middleware.SignedURLAuth(
 			middleware.Logger(logger),
 			middleware.PreSignedURLConfig(cfg.PreSignedURL),
@@ -251,6 +247,10 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		middleware.CreateHome(
 			middleware.Logger(logger),
 			middleware.TokenManagerConfig(cfg.TokenManager),
+			middleware.RevaGatewayClient(revaClient),
+		),
+		middleware.PublicShareAuth(
+			middleware.Logger(logger),
 			middleware.RevaGatewayClient(revaClient),
 		),
 	)
