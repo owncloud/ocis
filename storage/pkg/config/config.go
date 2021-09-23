@@ -45,6 +45,8 @@ type AppProvider struct {
 	ExternalAddr string
 	Driver       string
 	WopiDriver   WopiDriver
+	AppsURL      string
+	OpenURL      string
 }
 
 type WopiDriver struct {
@@ -415,6 +417,7 @@ type OCDav struct {
 type Archiver struct {
 	MaxNumFiles int64
 	MaxSize     int64
+	ArchiverURL string
 }
 
 // Reva defines the available reva configuration.

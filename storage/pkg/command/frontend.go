@@ -54,12 +54,32 @@ func Frontend(cfg *config.Config) *cli.Command {
 				desktopRedirectURIs[port] = fmt.Sprintf("http://localhost:%d", (port + 1024))
 			}
 
+			archivers := []map[string]interface{}{
+				{
+					"enabled":      true,
+					"version":      "2.0.0",
+					"formats":      []string{"tar", "zip"},
+					"archiver_url": cfg.Reva.Archiver.ArchiverURL,
+				},
+			}
+
+			appProviders := []map[string]interface{}{
+				{
+					"enabled":  true,
+					"version":  "1.0.0",
+					"apps_url": cfg.Reva.AppProvider.AppsURL,
+					"open_url": cfg.Reva.AppProvider.OpenURL,
+				},
+			}
+
 			filesCfg := map[string]interface{}{
 				"private_links":     false,
 				"bigfilechunking":   false,
 				"blacklisted_files": []string{},
 				"undelete":          true,
 				"versioning":        true,
+				"archivers":         archivers,
+				"app_providers":     appProviders,
 			}
 
 			if cfg.Reva.DefaultUploadProtocol == "tus" {

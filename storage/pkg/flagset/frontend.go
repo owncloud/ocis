@@ -217,6 +217,31 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.ChecksumPreferredUploadType,
 		},
 
+		// Archiver
+		&cli.StringFlag{
+			Name:        "archiver-url",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Archiver.ArchiverURL, "/archiver"),
+			Usage:       "URL where the archiver is reachable",
+			EnvVars:     []string{"STORAGE_FRONTEND_ARCHIVER_URL"},
+			Destination: &cfg.Reva.Archiver.ArchiverURL,
+		},
+
+		// App Provider
+		&cli.StringFlag{
+			Name:        "appprovider-apps-url",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.AppsURL, "/app/list"),
+			Usage:       "URL where the app listing of the app provider is reachable",
+			EnvVars:     []string{"STORAGE_FRONTEND_APP_PROVIDER_APPS_URL"},
+			Destination: &cfg.Reva.AppProvider.AppsURL,
+		},
+		&cli.StringFlag{
+			Name:        "appprovider-open-url",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.OpenURL, "/app/open"),
+			Usage:       "URL where files can be handed over to an application from the app provider",
+			EnvVars:     []string{"STORAGE_FRONTEND_APP_PROVIDER_OPEN_URL"},
+			Destination: &cfg.Reva.AppProvider.OpenURL,
+		},
+
 		// Reva Middlewares Config
 		&cli.StringSliceFlag{
 			Name:    "user-agent-whitelist-lock-in",
