@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Redirect invalid links to oC Web: [#2493](https://github.com/owncloud/ocis/pull/2493)
 * Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
 * Bugfix - Remove notifications placeholder: [#2514](https://github.com/owncloud/ocis/pull/2514)
+* Change - Make the drives create method odata compliant: [#2531](https://github.com/owncloud/ocis/pull/2531)
 * Enhancement - Expose the reva archiver in OCIS: [#2509](https://github.com/owncloud/ocis/pull/2509)
 * Enhancement - Add option to skip generation of demo users and groups: [#2495](https://github.com/owncloud/ocis/pull/2495)
 * Enhancement - Allow overriding the cookie based route by claim: [#2508](https://github.com/owncloud/ocis/pull/2508)
@@ -43,6 +44,13 @@ The following sections list the changes for unreleased.
    having to poll a (non-existent) notifications endpoint.
 
    https://github.com/owncloud/ocis/pull/2514
+
+* Change - Make the drives create method odata compliant: [#2531](https://github.com/owncloud/ocis/pull/2531)
+
+   When creating a space on the graph API we now use the POST Body to provide the parameters.
+
+   https://github.com/owncloud/ocis/pull/2531
+   https://www.odata.org/getting-started/basic-tutorial/#modifyData
 
 * Enhancement - Expose the reva archiver in OCIS: [#2509](https://github.com/owncloud/ocis/pull/2509)
 
