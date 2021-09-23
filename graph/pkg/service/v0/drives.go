@@ -170,6 +170,17 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Errorf("invalid name").Error())
 		return
 	}
+	var driveType string
+	if drive.DriveType != nil {
+		driveType = *drive.DriveType
+	}
+
+	if driveType == "" {
+		driveType = "project"
+	}
+	if driveType == "share" {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Errorf("drives of type share cannot be created via this api").Error())
+	}
 	var quota uint64
 	if drive.Quota != nil && drive.Quota.Total != nil {
 		quota = uint64(*drive.Quota.Total)
@@ -179,7 +190,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 
 	csr := provider.CreateStorageSpaceRequest{
 		Owner: us,
-		Type:  "share",
+		Type:  driveType,
 		Name:  spaceName,
 		Quota: &provider.Quota{
 			QuotaMaxBytes: quota,
@@ -270,6 +281,11 @@ func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpac
 				},
 			},
 		},
+	}
+
+	// project spaces have no single owner, therefore we don't return a value
+	if space.SpaceType == "project" {
+		drive.Owner = nil
 	}
 
 	if baseURL != nil {
