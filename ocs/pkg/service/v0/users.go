@@ -486,7 +486,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 func (o Ocs) mintTokenForUser(ctx context.Context, account *accounts.Account) (string, error) {
 	tm, _ := jwt.New(map[string]interface{}{
 		"secret":  o.config.TokenManager.JWTSecret,
-		"expires": int64(60),
+		"expires": int64(24 * 60 * 60),
 	})
 
 	u := &revauser.User{

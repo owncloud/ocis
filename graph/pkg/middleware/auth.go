@@ -28,7 +28,7 @@ func Auth(opts ...account.Option) func(http.Handler) http.Handler {
 	opt := authOptions(opts...)
 	tokenManager, err := jwt.New(map[string]interface{}{
 		"secret":  opt.JWTSecret,
-		"expires": int64(60),
+		"expires": int64(24 * 60 * 60),
 	})
 	if err != nil {
 		opt.Logger.Fatal().Err(err).Msgf("Could not initialize token-manager")
