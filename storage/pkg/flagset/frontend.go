@@ -217,6 +217,15 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.ChecksumPreferredUploadType,
 		},
 
+		// Archiver
+		&cli.StringFlag{
+			Name:        "default-upload-protocol",
+			Value:       flags.OverrideDefaultString(cfg.Reva.DefaultUploadProtocol, "tus"),
+			Usage:       "Default upload chunking protocol to be used out of tus/v1/ng",
+			EnvVars:     []string{"STORAGE_FRONTEND_DEFAULT_UPLOAD_PROTOCOL"},
+			Destination: &cfg.Reva.Archiver.,
+		},
+
 		// Reva Middlewares Config
 		&cli.StringSliceFlag{
 			Name:    "user-agent-whitelist-lock-in",
