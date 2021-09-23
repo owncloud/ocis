@@ -1,12 +1,12 @@
 package svc
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"net/http"
 	"net/url"
 	"path"
-	"strconv"
 	"time"
 
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -15,7 +15,6 @@ import (
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/pkg/ctx"
-	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
@@ -145,11 +144,6 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := r.ParseForm(); err != nil {
-		errorcode.GeneralException.Render(w, r, http.StatusUnauthorized, err.Error())
-		return
-	}
-
 	s := sproto.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
 
 	_, err := s.GetPermissionByID(r.Context(), &sproto.GetPermissionByIDRequest{
@@ -166,21 +160,21 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	spaceName := chi.URLParam(r, "drive-name")
+	drive := msgraph.Drive{}
+	if err := json.NewDecoder(r.Body).Decode(&drive); err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Errorf("invalid schema definition").Error())
+		return
+	}
+	spaceName := *drive.Name
 	if spaceName == "" {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Errorf("invalid name").Error())
 		return
 	}
-
-	quota, _ := strconv.ParseUint(r.Form.Get("quota"), 10, 64)
-	if quota == 0 {
-		quota = 65536 // set default quota if no form value was sent.
-	}
-
-	quotaMaxFiles, _ := strconv.ParseUint(r.Form.Get("quotaMaxFiles"), 10, 64)
-	if quotaMaxFiles == 0 {
-		quotaMaxFiles = 20 // set default quotaMaxFiles if no form value was sent.
+	var quota uint64
+	if drive.Quota != nil && drive.Quota.Total != nil {
+		quota = uint64(*drive.Quota.Total)
+	} else {
+		quota = 65536 // set default quota if no value was sent.
 	}
 
 	csr := provider.CreateStorageSpaceRequest{
@@ -189,7 +183,6 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		Name:  spaceName,
 		Quota: &provider.Quota{
 			QuotaMaxBytes: quota,
-			QuotaMaxFiles: quotaMaxFiles,
 		},
 	}
 
