@@ -16,5 +16,12 @@ func SecretWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_JWT_SECRET", "OCIS_JWT_SECRET"},
 			Destination: &cfg.Reva.JWTSecret,
 		},
+		&cli.BoolFlag{
+			Name:        "skip-user-groups-in-token",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.SkipUserGroupsInToken, false),
+			Usage:       "Whether to skip encoding user groups in reva's JWT token",
+			EnvVars:     []string{"STORAGE_SKIP_USER_GROUPS_IN_TOKEN"},
+			Destination: &cfg.Reva.SkipUserGroupsInToken,
+		},
 	}
 }

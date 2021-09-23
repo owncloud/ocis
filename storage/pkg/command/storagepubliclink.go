@@ -88,8 +88,9 @@ func storagePublicLinkConfigFromStruct(c *cli.Context, cfg *config.Config) map[s
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret": cfg.Reva.JWTSecret,
-			"gatewaysvc": cfg.Reva.Gateway.Endpoint,
+			"jwt_secret":                cfg.Reva.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
+			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.StoragePublicLink.GRPCNetwork,

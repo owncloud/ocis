@@ -430,17 +430,18 @@ type Archiver struct {
 // Reva defines the available reva configuration.
 type Reva struct {
 	// JWTSecret used to sign jwt tokens between services
-	JWTSecret       string
-	TransferSecret  string
-	TransferExpires int
-	OIDC            OIDC
-	LDAP            LDAP
-	UserGroupRest   UserGroupRest
-	UserOwnCloudSQL UserOwnCloudSQL
-	OCDav           OCDav
-	Archiver        Archiver
-	UserStorage     StorageConfig
-	MetadataStorage StorageConfig
+	JWTSecret             string
+	SkipUserGroupsInToken bool
+	TransferSecret        string
+	TransferExpires       int
+	OIDC                  OIDC
+	LDAP                  LDAP
+	UserGroupRest         UserGroupRest
+	UserOwnCloudSQL       UserOwnCloudSQL
+	OCDav                 OCDav
+	Archiver              Archiver
+	UserStorage           StorageConfig
+	MetadataStorage       StorageConfig
 	// Ports are used to configure which services to start on which port
 	Frontend          FrontendPort
 	DataGateway       DataGatewayPort

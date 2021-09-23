@@ -124,8 +124,9 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret": cfg.Reva.JWTSecret,
-			"gatewaysvc": cfg.Reva.Gateway.Endpoint,
+			"jwt_secret":                cfg.Reva.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
+			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.Gateway.GRPCNetwork,

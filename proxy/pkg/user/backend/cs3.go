@@ -37,7 +37,7 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 	}
 
 	res, err := c.authProvider.Authenticate(ctx, &gateway.AuthenticateRequest{
-		Type:         "machine",
+		Type:         "bearer",
 		ClientId:     value,
 		ClientSecret: c.machineAuthAPIKey,
 	})
