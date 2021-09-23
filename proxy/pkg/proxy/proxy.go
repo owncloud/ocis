@@ -291,6 +291,10 @@ func defaultPolicies() []config.Policy {
 					Backend:  "http://localhost:9130",
 				},
 				{
+					Endpoint: "/archiver",
+					Backend:  "http://localhost:9140",
+				},
+				{
 					Type:     config.RegexRoute,
 					Endpoint: "/ocs/v[12].php/cloud/(users?|groups)", // we have `user`, `users` and `groups` in ocis-ocs
 					Backend:  "http://localhost:9110",
@@ -378,6 +382,10 @@ func defaultPolicies() []config.Policy {
 				{
 					Endpoint: "/signin/",
 					Backend:  "http://localhost:9130",
+				},
+				{
+					Endpoint: "/archiver",
+					Backend:  "http://localhost:9140",
 				},
 				{
 					Endpoint:    "/ocs/",

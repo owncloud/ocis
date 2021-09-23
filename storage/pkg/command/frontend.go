@@ -147,6 +147,13 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 					"timeout":                86400,
 					"insecure":               true,
 				},
+				"archiver": map[string]interface{}{
+					"prefix":        cfg.Reva.Frontend.ArchiverPrefix,
+					"timeout":       86400,
+					"insecure":      true,
+					"max_num_files": cfg.Reva.Archiver.MaxNumFiles,
+					"max_size":      cfg.Reva.Archiver.MaxSize,
+				},
 				"datagateway": map[string]interface{}{
 					"prefix":                 cfg.Reva.Frontend.DatagatewayPrefix,
 					"transfer_shared_secret": cfg.Reva.TransferSecret,
