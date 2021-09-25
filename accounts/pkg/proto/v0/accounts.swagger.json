@@ -396,7 +396,13 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v0AddMemberRequest"
+              "type": "object",
+              "properties": {
+                "accountId": {
+                  "type": "string",
+                  "title": "The account id to add"
+                }
+              }
             }
           }
         ],
@@ -443,7 +449,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v0RemoveMemberRequest"
+              "type": "object"
             }
           }
         ],
@@ -483,7 +489,26 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v0ListMembersRequest"
+              "type": "object",
+              "properties": {
+                "pageSize": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "pageToken": {
+                  "type": "string",
+                  "title": "Optional. A pagination token returned from a previous call to `Get`\nthat indicates from where search should continue"
+                },
+                "fieldMask": {
+                  "type": "string",
+                  "description": "Optional. Used to specify a subset of fields that should be\nreturned by a get operation or modified by an update operation."
+                },
+                "query": {
+                  "type": "string",
+                  "description": "TODO update query language\nQuery expressions can be used to restrict results based upon\nthe account properties where the operators `=`, `NOT`, `AND` and `OR`\ncan be used along with the suffix wildcard symbol `*`.\n\nThe string properties in a query expression should use escaped quotes\nfor values that include whitespace to prevent unexpected behavior.\n\nSome example queries are:\n\n* Query `display_name=Th*` returns accounts whose display_name\nstarts with \"Th\"\n* Query `display_name=\\\\\"Test String\\\\\"` returns groups with\ndisplay names that include both \"Test\" and \"String\"",
+                  "title": "Optional. Search criteria used to select the groups to return.\nIf no search criteria is specified then all groups will be\nreturned"
+                }
+              }
             }
           }
         ],
@@ -529,14 +554,11 @@
     "protobufAny": {
       "type": "object",
       "properties": {
-        "typeUrl": {
+        "@type": {
           "type": "string"
-        },
-        "value": {
-          "type": "string",
-          "format": "byte"
         }
-      }
+      },
+      "additionalProperties": {}
     },
     "rpcStatus": {
       "type": "object",
@@ -690,19 +712,6 @@
         }
       },
       "title": "Account follows the properties of the ms graph api user resource.\nSee https://docs.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#properties"
-    },
-    "v0AddMemberRequest": {
-      "type": "object",
-      "properties": {
-        "groupId": {
-          "type": "string",
-          "title": "The id of the group to add a member to"
-        },
-        "accountId": {
-          "type": "string",
-          "title": "The account id to add"
-        }
-      }
     },
     "v0CreateAccountRequest": {
       "type": "object",
@@ -948,32 +957,6 @@
         }
       }
     },
-    "v0ListMembersRequest": {
-      "type": "object",
-      "properties": {
-        "pageSize": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "pageToken": {
-          "type": "string",
-          "title": "Optional. A pagination token returned from a previous call to `Get`\nthat indicates from where search should continue"
-        },
-        "fieldMask": {
-          "type": "string",
-          "description": "Optional. Used to specify a subset of fields that should be\nreturned by a get operation or modified by an update operation."
-        },
-        "query": {
-          "type": "string",
-          "description": "TODO update query language\nQuery expressions can be used to restrict results based upon\nthe account properties where the operators `=`, `NOT`, `AND` and `OR`\ncan be used along with the suffix wildcard symbol `*`.\n\nThe string properties in a query expression should use escaped quotes\nfor values that include whitespace to prevent unexpected behavior.\n\nSome example queries are:\n\n* Query `display_name=Th*` returns accounts whose display_name\nstarts with \"Th\"\n* Query `display_name=\\\\\"Test String\\\\\"` returns groups with\ndisplay names that include both \"Test\" and \"String\"",
-          "title": "Optional. Search criteria used to select the groups to return.\nIf no search criteria is specified then all groups will be\nreturned"
-        },
-        "id": {
-          "type": "string",
-          "title": "The id of the group to list members from"
-        }
-      }
-    },
     "v0ListMembersResponse": {
       "type": "object",
       "properties": {
@@ -1046,19 +1029,6 @@
     },
     "v0RebuildIndexResponse": {
       "type": "object"
-    },
-    "v0RemoveMemberRequest": {
-      "type": "object",
-      "properties": {
-        "groupId": {
-          "type": "string",
-          "title": "The id of the group to remove a member from"
-        },
-        "accountId": {
-          "type": "string",
-          "title": "The account id to remove"
-        }
-      }
     },
     "v0UpdateAccountRequest": {
       "type": "object",
