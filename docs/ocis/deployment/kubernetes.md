@@ -1,6 +1,6 @@
 ---
 title: "Kubernetes"
-date: 2021-10-14T11:04:00+01:00
+date: 2021-09-23T11:04:00+01:00
 weight: 25
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/deployment
