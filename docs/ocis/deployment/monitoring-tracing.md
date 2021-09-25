@@ -31,6 +31,8 @@ For more information and how to deploy it, see [monitoring & tracing client](htt
 
 ## Monitoring & tracing server
 
+A live version of the monitoring and tracing server for our demo instances is available here: [Grafana](https://grafana.infra.owncloud.works), [Prometheus](https://prometheus.infra.owncloud.works) and [Jaeger Query](https://jaeger.infra.owncloud.works).
+
 The monitoring & tracing server is considered as shared infrastructure and is normally used for different services. This means that oCIS is not the only software whose metrics and traces are available on the monitoring server. It is also possible that data of multiple oCIS instances are available on the monitoring server.
 
 Metrics are scraped, stored and can be queried with Prometheus. For the visualization of these metrics Grafana is used. Because Prometheus is scraping the metrics from the oCIS server (pull model instead of a push model), the Prometheus server must have access to the exposed endpoint of the Telegraf Prometheus output plugin.
