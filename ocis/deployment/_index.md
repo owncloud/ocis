@@ -20,6 +20,7 @@ oCIS deployments are super simple, yet there are many configurations possible fo
 - [oCIS setup with Traefik for SSL termination]({{< ref "ocis_traefik" >}})
 - [oCIS setup with Keycloak as identity provider]({{< ref "ocis_keycloak" >}})
 - [oCIS setup with WOPI server to open office documents in your browser]({{< ref "ocis_wopi" >}})
+- [Parallel deployment of oC10 and oCIS]({{< ref "oc10_ocis_parallel" >}})
 - [oCIS with S3 storage backend (MinIO)]({{< ref "ocis_s3" >}})
 - [oCIS with the Hello extension example]({{< ref "ocis_hello" >}})
 
