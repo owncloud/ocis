@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/web/pkg/config"
 	"github.com/owncloud/ocis/web/pkg/flagset"
+	"github.com/urfave/cli/v2"
 )
 
 // Health is the entrypoint for the health command.

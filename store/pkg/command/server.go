@@ -7,13 +7,13 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/store/pkg/config"
 	"github.com/owncloud/ocis/store/pkg/flagset"
 	"github.com/owncloud/ocis/store/pkg/metrics"
 	"github.com/owncloud/ocis/store/pkg/server/debug"
 	"github.com/owncloud/ocis/store/pkg/server/grpc"
+	"github.com/urfave/cli/v2"
 )
 
 // Server is the entrypoint for the server command.

@@ -12,7 +12,6 @@ import (
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
@@ -32,6 +31,7 @@ import (
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
+	"github.com/urfave/cli/v2"
 	"golang.org/x/oauth2"
 )
 

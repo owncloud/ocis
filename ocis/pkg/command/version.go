@@ -5,11 +5,11 @@ import (
 	"os"
 
 	mreg "github.com/asim/go-micro/v3/registry"
-	"github.com/micro/cli/v2"
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/registry"
 	"github.com/owncloud/ocis/ocis/pkg/register"
+	"github.com/urfave/cli/v2"
 )
 
 // VersionCommand is the entrypoint for the version command.

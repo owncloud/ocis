@@ -6,11 +6,11 @@ import (
 	"strconv"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v3"
-	"github.com/micro/cli/v2"
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/flagset"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	"github.com/urfave/cli/v2"
 )
 
 // ListAccounts command lists all accounts

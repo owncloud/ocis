@@ -16,7 +16,7 @@ require (
 	github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v3 v3.0.0-20210812172626-c7195aae9817
 	github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v3 v3.0.0-20210812172626-c7195aae9817
 	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3 v3.0.0-20210812172626-c7195aae9817
-	github.com/asim/go-micro/v3 v3.6.0
+	github.com/asim/go-micro/v3 v3.6.1-0.20210924081004-8c39b1e1204d
 	github.com/blevesearch/bleve/v2 v2.1.0
 	github.com/coreos/go-oidc/v3 v3.0.0
 	github.com/cs3org/go-cs3apis v0.0.0-20210922150613-cb9e3c99f8de
@@ -38,7 +38,6 @@ require (
 	github.com/justinas/alice v1.2.0
 	github.com/libregraph/lico v0.34.1-0.20210803054646-b584e0372224
 	github.com/mennanov/fieldmask-utils v0.4.0
-	github.com/micro/cli/v2 v2.1.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nmcclain/asn1-ber v0.0.0-20170104154839-2661553a0484
 	github.com/nmcclain/ldap v0.0.0-20210720162743-7f8d1e44eeba
@@ -55,6 +54,7 @@ require (
 	github.com/spf13/viper v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/thejerf/suture/v4 v4.0.1
+	github.com/urfave/cli/v2 v2.3.0
 	github.com/yaegashi/msgraph.go v0.1.4
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.23.0

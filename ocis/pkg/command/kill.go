@@ -7,9 +7,9 @@ import (
 	"net/rpc"
 	"os"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
+	"github.com/urfave/cli/v2"
 )
 
 // KillCommand is the entrypoint for the kill command.

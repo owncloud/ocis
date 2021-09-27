@@ -6,7 +6,6 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/flagset"
@@ -15,6 +14,7 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/server/http"
 	svc "github.com/owncloud/ocis/accounts/pkg/service/v0"
 	"github.com/owncloud/ocis/accounts/pkg/tracing"
+	"github.com/urfave/cli/v2"
 )
 
 // Server is the entry point for the server command.

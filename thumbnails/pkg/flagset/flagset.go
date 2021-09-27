@@ -3,8 +3,8 @@ package flagset
 import (
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // HealthWithConfig applies cfg to the root flagset
