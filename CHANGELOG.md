@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
 * Bugfix - Remove notifications placeholder: [#2514](https://github.com/owncloud/ocis/pull/2514)
 * Change - Make the drives create method odata compliant: [#2531](https://github.com/owncloud/ocis/pull/2531)
+* Enhancement - Add maximum files and size to archiver capabilities: [#2544](https://github.com/owncloud/ocis/pull/2544)
 * Enhancement - Expose the reva archiver in OCIS: [#2509](https://github.com/owncloud/ocis/pull/2509)
 * Enhancement - Add option to skip generation of demo users and groups: [#2495](https://github.com/owncloud/ocis/pull/2495)
 * Enhancement - Allow overriding the cookie based route by claim: [#2508](https://github.com/owncloud/ocis/pull/2508)
@@ -51,6 +52,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/2531
    https://www.odata.org/getting-started/basic-tutorial/#modifyData
+
+* Enhancement - Add maximum files and size to archiver capabilities: [#2544](https://github.com/owncloud/ocis/pull/2544)
+
+   We added the maximum files count and maximum archive size of the archiver to the capabilities
+   endpoint. Clients can use this to generate warnings before the actual archive creation fails.
+
+   https://github.com/owncloud/ocis/issues/2537
+   https://github.com/owncloud/ocis/pull/2544
+   https://github.com/cs3org/reva/pull/2105
 
 * Enhancement - Expose the reva archiver in OCIS: [#2509](https://github.com/owncloud/ocis/pull/2509)
 
