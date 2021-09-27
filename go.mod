@@ -19,8 +19,8 @@ require (
 	github.com/asim/go-micro/v3 v3.6.0
 	github.com/blevesearch/bleve/v2 v2.1.0
 	github.com/coreos/go-oidc/v3 v3.0.0
-	github.com/cs3org/go-cs3apis v0.0.0-20210916072651-dd30db9dbe58
-	github.com/cs3org/reva v1.13.1-0.20210923072026-e96fa872a8f5
+	github.com/cs3org/go-cs3apis v0.0.0-20210922150613-cb9e3c99f8de
+	github.com/cs3org/reva v1.13.1-0.20210927074430-7c8d9947ad32
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth v1.1.3-0.20210729125545-b9aecdfcac31
 	github.com/go-chi/chi/v5 v5.0.4
@@ -62,12 +62,12 @@ require (
 	go.opentelemetry.io/otel/exporters/jaeger v1.0.0-RC3
 	go.opentelemetry.io/otel/sdk v1.0.0-RC3
 	go.opentelemetry.io/otel/trace v1.0.0-RC3
-	golang.org/x/crypto v0.0.0-20210915214749-c084706c2272
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
 	google.golang.org/genproto v0.0.0-20210624195500-8bfb893ecb84
-	google.golang.org/grpc v1.40.0
+	google.golang.org/grpc v1.41.0
 	google.golang.org/grpc/examples v0.0.0-20210802225658-edb9b3bc2266 // indirect
 	google.golang.org/protobuf v1.27.1
 	gotest.tools/v3 v3.0.3
