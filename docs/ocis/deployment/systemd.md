@@ -1,6 +1,6 @@
 ---
 title: "Systemd service"
-date: 2020-02-27T20:35:00+01:00
+date: 2020-09-27T06:00:00+01:00
 weight: 16
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/deployment
@@ -23,7 +23,6 @@ Create the Systemd service definition for oCIS in the file `/etc/systemd/system/
 ```
 [Unit]
 Description=OCIS server
-After=syslog.target
 
 [Service]
 Type=simple
