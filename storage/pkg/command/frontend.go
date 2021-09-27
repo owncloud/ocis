@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
@@ -56,10 +57,12 @@ func Frontend(cfg *config.Config) *cli.Command {
 
 			archivers := []map[string]interface{}{
 				{
-					"enabled":      true,
-					"version":      "2.0.0",
-					"formats":      []string{"tar", "zip"},
-					"archiver_url": cfg.Reva.Archiver.ArchiverURL,
+					"enabled":       true,
+					"version":       "2.0.0",
+					"formats":       []string{"tar", "zip"},
+					"archiver_url":  cfg.Reva.Archiver.ArchiverURL,
+					"max_num_files": strconv.FormatInt(cfg.Reva.Archiver.MaxNumFiles, 10),
+					"max_size":      strconv.FormatInt(cfg.Reva.Archiver.MaxSize, 10),
 				},
 			}
 
