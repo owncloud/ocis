@@ -10,7 +10,7 @@ geekdocFilePath: oc10_ocis_parallel.md
 {{< toc >}}
 
 {{< hint warning >}}
-This deployment example might not fully working yet. See [github.com/owncloud/ocis/issues/2549](https://github.com/owncloud/ocis/issues/2549) for more information.
+This deployment example currently has known issues. See [github.com/owncloud/ocis/issues/2549](https://github.com/owncloud/ocis/issues/2549) for more information.
 {{< /hint >}}
 
 ## Overview
