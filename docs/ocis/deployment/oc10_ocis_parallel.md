@@ -9,6 +9,10 @@ geekdocFilePath: oc10_ocis_parallel.md
 
 {{< toc >}}
 
+{{< hint warning >}}
+This deployment example might not fully working yet. See [github.com/owncloud/ocis/issues/2549](https://github.com/owncloud/ocis/issues/2549) for more information.
+{{< /hint >}}
+
 ## Overview
 
 - This setup reflects [stage 6 of the oC10 to oCIS migration plan]({{< ref "migration#stage-6-parallel-deployment" >}})
