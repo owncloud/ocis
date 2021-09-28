@@ -170,7 +170,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "web-config-theme",
-			Value:       flags.OverrideDefaultString(cfg.Web.Config.Theme, "owncloud"),
+			Value:       flags.OverrideDefaultString(cfg.Web.Config.Theme, "https://localhost:9200/themes/owncloud/theme.json"),
 			Usage:       "Theme",
 			EnvVars:     []string{"WEB_UI_CONFIG_THEME"},
 			Destination: &cfg.Web.Config.Theme,
