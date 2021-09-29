@@ -39,6 +39,12 @@ type StorageRegistry struct {
 	JSON         string
 }
 
+// AppRegistry defines the available app registry configuration
+type AppRegistry struct {
+	Driver        string
+	MimetypesJSON string
+}
+
 // AppProvider defines the available app provider configuration
 type AppProvider struct {
 	Port
@@ -438,6 +444,7 @@ type Reva struct {
 	DataGateway       DataGatewayPort
 	Gateway           Gateway
 	StorageRegistry   StorageRegistry
+	AppRegistry       AppRegistry
 	Users             Users
 	Groups            Groups
 	AuthProvider      Users
