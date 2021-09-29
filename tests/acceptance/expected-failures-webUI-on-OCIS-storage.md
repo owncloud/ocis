@@ -16,12 +16,18 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUIPreview/imageMediaViewer.feature:141](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L141)
 -   [webUIPreview/imageMediaViewer.feature:159](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L159)
 
+### [Endless loading when opening a file in section "Shared with me" or "Shared with other"](https://github.com/owncloud/web/issues/5324)
+-   [webUIPreview/imageMediaViewer.feature:182](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L182)
+-   [webUIPreview/imageMediaViewer.feature:191](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L191)
+
+### [[oCIS] Previewing video from mediaviewer pops up a sign-in dialog](https://github.com/owncloud/web/issues/5840)
+-   [webUIPreview/imageMediaViewer.feature:56](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L56)
 
 ### [Exit page re-appears in loop when logged in user is deleted](https://github.com/owncloud/web/issues/4677)
--   [webUILogin/openidLogin.feature:51](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/openidLogin.feature#L51)
+-   [webUILogin/openidLogin.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/openidLogin.feature#L50)
 
 ### [REPORT request not implemented](https://github.com/owncloud/ocis/issues/1330)
--   [webUIDeleteFilesFolders/deleteFilesFolders.feature:295](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L295)
+-   [webUIDeleteFilesFolders/deleteFilesFolders.feature:298](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L298)
 -   [webUIFavorites/favoritesFile.feature:14](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/favoritesFile.feature#L14)
 -   [webUIFavorites/favoritesFile.feature:30](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/favoritesFile.feature#L30)
 -   [webUIFavorites/favoritesFile.feature:46](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/favoritesFile.feature#L46)
@@ -49,9 +55,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUIRenameFiles/renameFiles.feature:252](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L252)
 -   [webUISharingInternalUsersShareWithPage/shareWithUsers.feature:118](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersShareWithPage/shareWithUsers.feature#L118)
 -   [webUIResharing1/reshareUsers.feature:230](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing1/reshareUsers.feature#L230)
-
-### [delete pending share option is not available for sharee](https://github.com/owncloud/web/issues/5435)
--   [webUIDeleteFilesFolders/deleteFilesFolders.feature:235](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L235)
 
 ### [file_path property is not unique for a share created with same resource name i.e already present in sharee](https://github.com/owncloud/ocis/issues/2249)
 -   [webUIRenameFiles/renameFiles.feature:205](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L205)
@@ -134,9 +137,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingPublicManagement/publicLinkIndicator.feature:81](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkIndicator.feature#L81)
 -   [webUISharingPublicManagement/publicLinkIndicator.feature:98](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkIndicator.feature#L98)
 
-### [different button to unshare self from a shared resource in ocis-web and web](https://github.com/owncloud/ocis/issues/2266)
--   [webUISharingInternalUsersShareWithPage/shareWithUsers.feature:91](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersShareWithPage/shareWithUsers.feature#L91)
-
 ### [Copy private link option not available](https://github.com/owncloud/ocis/issues/1409)
 -   [webUIFilesCopy/copyPrivateLinks.feature:20](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copyPrivateLinks.feature#L20)
 -   [webUIFilesCopy/copyPrivateLinks.feature:21](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copyPrivateLinks.feature#L21)
@@ -196,16 +196,13 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:82](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L82)
 -   [webUISharingInternalGroups/shareWithGroups.feature:200](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L200)
 
-### [Can login with invalid password while logging in with openidconnect in oc10](https://github.com/owncloud/ocis/issues/1428)
--   [webUILogin/openidLogin.feature:44](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/openidLogin.feature#L44)
-
 
 ### webUI-Private-Links
 -   [webUIPrivateLinks/accessingPrivateLinks.feature:9](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L9)
 -   [webUIPrivateLinks/accessingPrivateLinks.feature:17](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L17)
 -   [webUIPrivateLinks/accessingPrivateLinks.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L25)
--   [webUIPrivateLinks/accessingPrivateLinks.feature:34](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L34)
--   [webUIPrivateLinks/accessingPrivateLinks.feature:44](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L44)
+-   [webUIPrivateLinks/accessingPrivateLinks.feature:35](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L34)
+-   [webUIPrivateLinks/accessingPrivateLinks.feature:45](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L44)
 
 ### [various sharing settings cannot be set](https://github.com/owncloud/ocis/issues/1328)
 -   [webUIRestrictSharing/disableSharing.feature:16](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/disableSharing.feature#L16)
@@ -245,8 +242,8 @@ Other free text and markdown formatting can be used elsewhere in the document if
 ### [Share Permissions](https://github.com/owncloud/ocis/issues/1277)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:61](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L61)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L62)
+-   [webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:60](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature#L60)
 -   [webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:61](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature#L61)
--   [webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature#L62)
 -   [webUISharingFolderPermissionMultipleUsers/shareFolderWithMultipleUsers.feature:61](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionMultipleUsers/shareFolderWithMultipleUsers.feature#L61)
 -   [webUISharingFolderPermissionMultipleUsers/shareFolderWithMultipleUsers.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionMultipleUsers/shareFolderWithMultipleUsers.feature#L62)
 -   [webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:61](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature#L61)
@@ -259,7 +256,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:63](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature#L63)
 -   [webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:64](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature#L64)
 -   [webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:65](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature#L65)
--   [webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:66](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature#L66)
+-   [webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionsGroups/sharePermissionsGroup.feature#L62)
 -   [webUISharingInternalGroups/shareWithGroups.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L74)
 -   [webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:64](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature#L64)
 -   [webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:65](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature#L65)
@@ -498,11 +495,11 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUIWebdavLockProtection/upload.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L72)
 
 ### [Resources inside locked public shared folder can be altered using new public webdav API](https://github.com/owncloud/core/issues/38912)
--   [webUIWebdavLockProtection/delete.feature:75](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/delete.feature#L75)
--   [webUIWebdavLockProtection/delete.feature:76](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/delete.feature#L76)
+-   [webUIWebdavLockProtection/delete.feature:73](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/delete.feature#L73)
+-   [webUIWebdavLockProtection/delete.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/delete.feature#L74)
 -   [webUIWebdavLockProtection/move.feature:123](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L123)
 -   [webUIWebdavLockProtection/move.feature:124](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L124)
--   [webUIWebdavLockProtection/move.feature:145](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L145)
+-   [webUIWebdavLockProtection/move.feature:147](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L147)
 -   [webUIWebdavLockProtection/move.feature:146](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L146)
 -   [webUIWebdavLockProtection/upload.feature:90](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L90)
 -   [webUIWebdavLockProtection/upload.feature:91](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L91)

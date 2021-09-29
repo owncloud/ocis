@@ -5,12 +5,12 @@ package proto
 
 import (
 	fmt "fmt"
-	proto "github.com/golang/protobuf/proto"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	_ "github.com/golang/protobuf/ptypes/timestamp"
 	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	_ "google.golang.org/genproto/protobuf/field_mask"
+	proto "google.golang.org/protobuf/proto"
 	math "math"
 )
 
@@ -26,12 +26,6 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
-
 // Reference imports to suppress errors if they are not otherwise used.
 var _ api.Endpoint
 var _ context.Context
@@ -42,35 +36,35 @@ var _ server.Option
 
 func NewAccountsServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
-		&api.Endpoint{
+		{
 			Name:    "AccountsService.ListAccounts",
 			Path:    []string{"/api/v0/accounts/accounts-list"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "AccountsService.GetAccount",
 			Path:    []string{"/api/v0/accounts/accounts-get"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "AccountsService.CreateAccount",
 			Path:    []string{"/api/v0/accounts/accounts-create"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "AccountsService.UpdateAccount",
 			Path:    []string{"/api/v0/accounts/accounts-update"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "AccountsService.DeleteAccount",
 			Path:    []string{"/api/v0/accounts/accounts-delete"},
 			Method:  []string{"POST"},
@@ -250,56 +244,56 @@ func (h *accountsServiceHandler) DeleteAccount(ctx context.Context, in *DeleteAc
 
 func NewGroupsServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
-		&api.Endpoint{
+		{
 			Name:    "GroupsService.ListGroups",
 			Path:    []string{"/api/v0/accounts/groups-list"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "GroupsService.GetGroup",
 			Path:    []string{"/api/v0/accounts/groups-get"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "GroupsService.CreateGroup",
 			Path:    []string{"/api/v0/accounts/groups-create"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "GroupsService.UpdateGroup",
 			Path:    []string{"/api/v0/accounts/groups-update"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "GroupsService.DeleteGroup",
 			Path:    []string{"/api/v0/accounts/groups-delete"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "GroupsService.AddMember",
 			Path:    []string{"/api/v0/groups/{group_id=*}/members/$ref"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "GroupsService.RemoveMember",
 			Path:    []string{"/api/v0/groups/{group_id=*}/members/{account_id}/$ref"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "GroupsService.ListMembers",
 			Path:    []string{"/api/v0/groups/{id=*}/members/$ref"},
 			Method:  []string{"POST"},
@@ -557,7 +551,7 @@ func (h *groupsServiceHandler) ListMembers(ctx context.Context, in *ListMembersR
 
 func NewIndexServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
-		&api.Endpoint{
+		{
 			Name:    "IndexService.RebuildIndex",
 			Path:    []string{"/api/v0/index/rebuild"},
 			Method:  []string{"POST"},

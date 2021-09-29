@@ -3,8 +3,11 @@ package svc
 import (
 	"net/http"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/owncloud/ocis/ocis-pkg/account"
+	opkgm "github.com/owncloud/ocis/ocis-pkg/middleware"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 // Service defines the extension handlers.
@@ -49,6 +52,13 @@ func NewService(opts ...Option) Service {
 					r.Use(svc.GroupCtx)
 					r.Get("/", svc.GetGroup)
 				})
+			})
+			r.Route("/drives", func(r chi.Router) {
+				r.Use(opkgm.ExtractAccountUUID(
+					account.Logger(options.Logger),
+					account.JWTSecret(options.Config.TokenManager.JWTSecret)),
+				)
+				r.Post("/", svc.CreateDrive)
 			})
 		})
 	})

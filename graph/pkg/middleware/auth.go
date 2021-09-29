@@ -22,13 +22,13 @@ func authOptions(opts ...account.Option) account.Options {
 	return opt
 }
 
-// Auth provides a middleware to authenticate requestrs using the x-access-token header value
+// Auth provides a middleware to authenticate requests using the x-access-token header value
 // and write it to the context. If there is no x-access-token the middleware prevents access and renders a json document.
 func Auth(opts ...account.Option) func(http.Handler) http.Handler {
 	opt := authOptions(opts...)
 	tokenManager, err := jwt.New(map[string]interface{}{
 		"secret":  opt.JWTSecret,
-		"expires": int64(60),
+		"expires": int64(24 * 60 * 60),
 	})
 	if err != nil {
 		opt.Logger.Fatal().Err(err).Msgf("Could not initialize token-manager")

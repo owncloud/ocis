@@ -74,7 +74,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
       # JWT secret which is used for the storage provider. Must be changed in order to have a secure oCIS. Defaults to "Pive-Fumkiu4"
       OCIS_JWT_SECRET=
       # JWT secret which is used for uploads to create transfer tokens. Must be changed in order to have a secure oCIS. Defaults to "replace-me-with-a-transfer-secret"
-      OCIS_TRANSFER_SECRET=
+      STORAGE_TRANSFER_SECRET=
 
       ### oCIS Hello settings ###
       # oCIS Hello version. Defaults to "latest"
@@ -103,7 +103,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   `docker-compose up -d`
 
-- You now can visit oCIS and are able to switch to the Hello extension by using the application switcher on the top right corner of ownCloud Web.
+- You now can visit oCIS and are able to switch to the Hello extension by using the application switcher on the top right corner of ownCloud Web. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
 
 ## Local setup
 
@@ -115,11 +115,11 @@ On Linux and macOS you can add them to your `/etc/hosts` files like this:
 
 ```
 127.0.0.1 ocis.owncloud.test
-127.0.0.1 traefik.owncloud.testt
+127.0.0.1 traefik.owncloud.test
 ```
 
 After that you're ready to start the application stack:
 
 `docker-compose up -d`
 
-Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You are now able to switch to the Hello extension by using the application switcher on the top right corner of ownCloud Web.
+Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You are now able to switch to the Hello extension by using the application switcher on the top right corner of ownCloud Web. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.

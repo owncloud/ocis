@@ -4,12 +4,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/version"
 	"github.com/spf13/viper"
+	"github.com/urfave/cli/v2"
 )
 
 // Execute is the entry point for the storage command.
@@ -76,6 +76,7 @@ func Execute(cfg *config.Config) error {
 			Gateway(cfg),
 			Users(cfg),
 			Groups(cfg),
+			AppProvider(cfg),
 			AuthBasic(cfg),
 			AuthBearer(cfg),
 			Sharing(cfg),

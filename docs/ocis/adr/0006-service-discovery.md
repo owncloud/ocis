@@ -37,7 +37,7 @@ Chosen option: "Dynamic service registration". There were some drawbacks regardi
 * Having dynamic service registration delegates the entire lifecycle of finding a process to the service registry.
 * Removing a-priori knowledge of hostname + port for services.
 * Marrying go-micro's registry and a newly defined registry abstraction on Reva.
-* We will embrace go-micro interfaces by defining a third merger interface in order to marry go-micro registry and rega revistry.
+* We will embrace go-micro interfaces by defining a third merger interface in order to marry go-micro registry and reva registry.
 * The ability to fetch a service node relying only on its name (i.e: com.owncloud.proxy) and not on a tuple hostname + port that we rely on being preconfigured during runtime.
 * Conceptually speaking, a better framework to tie all the services together. Referring to services by names is less overall confusing than having to add a service name + where it is running. A registry is agnostic to "where is it running" because it, by definition, keeps track of this specific question, so when speaking about design or functionality, it will ease communication.
 

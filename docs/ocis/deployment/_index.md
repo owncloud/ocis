@@ -20,6 +20,7 @@ oCIS deployments are super simple, yet there are many configurations possible fo
 - [oCIS setup with Traefik for SSL termination]({{< ref "ocis_traefik" >}})
 - [oCIS setup with Keycloak as identity provider]({{< ref "ocis_keycloak" >}})
 - [oCIS setup with WOPI server to open office documents in your browser]({{< ref "ocis_wopi" >}})
+- [Parallel deployment of oC10 and oCIS]({{< ref "oc10_ocis_parallel" >}})
 - [oCIS with S3 storage backend (MinIO)]({{< ref "ocis_s3" >}})
 - [oCIS with the Hello extension example]({{< ref "ocis_hello" >}})
 
@@ -45,6 +46,9 @@ You can change it by setting the `STORAGE_TRANSFER_SECRET` environment variable 
 
 {{< hint info >}}
 Before deleting the demo users mentioned below, you must create a new account for yourself and assign it to the administrator role.
+
+To skip the generation of demo users in the first place, run the inital setup step with an additional environment variable.
+`ACCOUNTS_DEMO_USERS_AND_GROUPS=false ./bin/ocis server` generates only the admin, and one user for IDP and Reva respectively.
 {{< /hint >}}
 
 oCIS ships with a few demo users besides the system users:

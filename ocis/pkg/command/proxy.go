@@ -1,15 +1,16 @@
+//go:build !simple
 // +build !simple
 
 package command
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/ocis/pkg/version"
 	"github.com/owncloud/ocis/proxy/pkg/command"
 	svcconfig "github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/flagset"
+	"github.com/urfave/cli/v2"
 )
 
 // ProxyCommand is the entry point for the proxy command.

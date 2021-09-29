@@ -70,7 +70,7 @@ type RouteType string
 const (
 	// PrefixRoute are routes matched by a prefix
 	PrefixRoute RouteType = "prefix"
-	// QueryRoute are routes machted by a prefix and query parameters
+	// QueryRoute are routes matched by a prefix and query parameters
 	QueryRoute RouteType = "query"
 	// RegexRoute are routes matched by a pattern
 	RegexRoute RouteType = "regex"
@@ -123,6 +123,7 @@ type Config struct {
 	AccountBackend        string
 	UserOIDCClaim         string
 	UserCS3Claim          string
+	MachineAuthAPIKey     string
 	AutoprovisionAccounts bool
 	EnableBasicAuth       bool
 	InsecureBackends      bool

@@ -23,6 +23,18 @@ labels:
   - name: OCIS-Fastlane
     color: "#deadbf"
     description: Planned outside of the sprint
+  - name: Storage:EOS
+    color: "#3F7A62"
+  - name: Storage:S3NG
+    color: "#3F7A62"
+  - name: Storage:CephFS
+    color: "#3F7A62"
+  - name: Storage:OCIS
+    color: "#3F7A62"
+  - name: Storage:POSIX
+    color: "#3F7A62"
+  - name: Storage:ownCloudSQL
+    color: "#3F7A62"
   
 teams:
   - name: ci

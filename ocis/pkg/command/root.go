@@ -6,8 +6,8 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/urfave/cli/v2"
 
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/flagset"

@@ -29,7 +29,7 @@
         },
         {
           "type": "regex",
-          "endpoint": "/ocs/v[12].php/cloud/(users?|groups)",
+          "endpoint": "/ocs/v[12].php/cloud/user/signing-key",
           "backend": "http://localhost:9110"
         },
         {
@@ -74,24 +74,12 @@
           "backend": "http://localhost:9135"
         },
         {
-          "endpoint": "/api/v0/accounts",
-          "backend": "http://localhost:9181"
-        },
-        {
-          "endpoint": "/accounts.js",
-          "backend": "http://localhost:9181"
-        },
-        {
           "endpoint": "/api/v0/settings",
           "backend": "http://localhost:9190"
         },
         {
           "endpoint": "/settings.js",
           "backend": "http://localhost:9190"
-        },
-        {
-          "endpoint": "/onlyoffice.js",
-          "backend": "http://localhost:9220"
         }
       ]
     }

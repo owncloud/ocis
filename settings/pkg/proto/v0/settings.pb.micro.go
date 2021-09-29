@@ -5,10 +5,10 @@ package proto
 
 import (
 	fmt "fmt"
-	proto "github.com/golang/protobuf/proto"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
+	proto "google.golang.org/protobuf/proto"
 	math "math"
 )
 
@@ -24,12 +24,6 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
-
 // Reference imports to suppress errors if they are not otherwise used.
 var _ api.Endpoint
 var _ context.Context
@@ -40,35 +34,35 @@ var _ server.Option
 
 func NewBundleServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
-		&api.Endpoint{
+		{
 			Name:    "BundleService.SaveBundle",
 			Path:    []string{"/api/v0/settings/bundle-save"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "BundleService.GetBundle",
 			Path:    []string{"/api/v0/settings/bundle-get"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "BundleService.ListBundles",
 			Path:    []string{"/api/v0/settings/bundles-list"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "BundleService.AddSettingToBundle",
 			Path:    []string{"/api/v0/settings/bundles-add-setting"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "BundleService.RemoveSettingFromBundle",
 			Path:    []string{"/api/v0/settings/bundles-remove-setting"},
 			Method:  []string{"POST"},
@@ -238,28 +232,28 @@ func (h *bundleServiceHandler) RemoveSettingFromBundle(ctx context.Context, in *
 
 func NewValueServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
-		&api.Endpoint{
+		{
 			Name:    "ValueService.SaveValue",
 			Path:    []string{"/api/v0/settings/values-save"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "ValueService.GetValue",
 			Path:    []string{"/api/v0/settings/values-get"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "ValueService.ListValues",
 			Path:    []string{"/api/v0/settings/values-list"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "ValueService.GetValueByUniqueIdentifiers",
 			Path:    []string{"/api/v0/settings/values-get-by-unique-identifiers"},
 			Method:  []string{"POST"},
@@ -405,28 +399,28 @@ func (h *valueServiceHandler) GetValueByUniqueIdentifiers(ctx context.Context, i
 
 func NewRoleServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
-		&api.Endpoint{
+		{
 			Name:    "RoleService.ListRoles",
 			Path:    []string{"/api/v0/settings/roles-list"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "RoleService.ListRoleAssignments",
 			Path:    []string{"/api/v0/settings/assignments-list"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "RoleService.AssignRoleToUser",
 			Path:    []string{"/api/v0/settings/assignments-add"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "RoleService.RemoveRoleFromUser",
 			Path:    []string{"/api/v0/settings/assignments-remove"},
 			Method:  []string{"POST"},
@@ -572,14 +566,14 @@ func (h *roleServiceHandler) RemoveRoleFromUser(ctx context.Context, in *RemoveR
 
 func NewPermissionServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
-		&api.Endpoint{
+		{
 			Name:    "PermissionService.ListPermissionsByResource",
 			Path:    []string{"/api/v0/settings/permissions-list-by-resource"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
-		&api.Endpoint{
+		{
 			Name:    "PermissionService.GetPermissionByID",
 			Path:    []string{"/api/v0/settings/permissions-get-by-id"},
 			Method:  []string{"POST"},

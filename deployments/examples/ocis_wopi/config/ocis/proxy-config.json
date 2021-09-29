@@ -33,6 +33,10 @@
           "backend": "http://localhost:9110"
         },
         {
+          "endpoint": "/app/",
+          "backend": "http://localhost:9140"
+        },
+        {
           "endpoint": "/ocs/",
           "backend": "http://localhost:9140"
         },
@@ -88,10 +92,6 @@
         {
           "endpoint": "/settings.js",
           "backend": "http://localhost:9190"
-        },
-        {
-          "endpoint": "/onlyoffice.js",
-          "backend": "http://localhost:9220"
         },
         {
           "endpoint": "/api/v0/wopi",

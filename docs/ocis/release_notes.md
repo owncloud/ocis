@@ -7,6 +7,53 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.12.0 Technology Preview
+
+Version 1.12.0 is a maintenance release with the foundations for the 'Spaces' feature and for viewer/editor application integrations. The Infinite Scale backend has been further hardened by fixing known issues, improving error handling and stabilizing existing features. Apart from bugfixing, ownCloud Web 4.2.0 has received a number of usability and design improvements for sharing and the file list.
+
+The most prominent changes in ownCloud Infinite Scale 1.12.0 and ownCloud Web 4.2.0 comprise:
+
+- The Infinite Scale backend now supports the first parts of the 'Spaces' feature
+  - Creating a new Space is now possible via Graph API [#2471](https://github.com/owncloud/ocis/pull/2471)
+  - A new sharing role, `Manager`, has been introduced for Spaces [cs3org/reva#2065](https://github.com/cs3org/reva/pull/2065)
+  - A capability for Spaces has been added [cs3org/reva#2015](https://github.com/cs3org/reva/pull/2015)
+- Infinite Scale now provides an app provider and an app registry as a foundation for integrations with viewer/editor applications. [#2204](https://github.com/owncloud/ocis/pull/2204)
+- ownCloud Web now has a re-designed sharing role selection. [#5632](https://github.com/owncloud/web/pull/5632)
+- ownCloud Web now shows people in sharing as a collapsed list of avatars to save space. This can be expanded to show more details and the full list. [#5758](https://github.com/owncloud/web/pull/5758)
+- ownCloud Web now shows sharing information in file/folder details. [#5735](https://github.com/owncloud/web/issues/5735)
+- The file size calculation in ownCloud Web has been changed from base-2 (e.g., KB / Kibibyte) to base-10 (e.g., kB / Kilobyte) to match better with user expectations. [#5739](https://github.com/owncloud/web/pull/5739)
+- The URL encoding/decoding in ownCloud Web has been improved. [#5714](https://github.com/owncloud/web/issues/5714)
+- ownCloud Web now provides a robots.txt file. [#5762](https://github.com/owncloud/web/pull/5762)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.12.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v4.2.0) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
+## ownCloud Infinite Scale 1.11.0 Technology Preview
+
+Version 1.11.0 brings new features, usability improvements and bug fixes. ownCloud Web 4.1.0 now supports drag & drop and allows users to do actions (e.g., sharing) for the folder they are currently in.
+
+The most prominent changes in ownCloud Infinite Scale 1.11.0 and ownCloud Web 4.1.0 comprise:
+
+- ownCloud Web now supports drag & drop to move files/folders. [#5592](https://github.com/owncloud/web/issues/5592)
+- The right sidebar in ownCloud Web can now be collapsed and expanded. This change also allows to open the sidebar without selecting a file/folder which will select the current folder and enable the user to do actions (e.g., sharing) for it. [#5165](https://github.com/owncloud/web/issues/5165)
+- The right sidebar in ownCloud Web now presents details for multiple selected files/folders. [#5164](https://github.com/owncloud/web/issues/5164)
+- The owncloud/ocis Docker image now uses a non-root user for improved security. This is a breaking change for existing Docker deployments. The permission on the files and folders in persistent volumes need to be changed to the UID and GID used for oCIS (default 1000:1000 if not changed by the user). [#2380](https://github.com/owncloud/ocis/pull/2380)
+- Infinite Scale now supports request tracing through the whole stack to facilitate debugging. [#1984](https://github.com/cs3org/reva/pull/1984)
+- Infinite Scale now provides a WebDAV endpoint for the new Spaces feature [#1803](https://github.com/cs3org/reva/pull/1803)
+- The Infinite Scale backend has been further hardened by fixing known issues, improving error handling and stabilizing existing features.
+- All test scenarios for file-related operations now pass in Infinite Scale (e.g., file operations, trash bin).
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.11.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v4.1.0) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.10.0 Technology Preview
 
 Version 1.10.0 brings new features, usability improvements and bug fixes. ownCloud Web 4.0.0 now supports ONLYOFFICE document editors and can search/filter files and folders. Furthermore it brings a new context menu for file actions that can be accessed via right click and comes with a big bunch of other notable improvements and fixes.

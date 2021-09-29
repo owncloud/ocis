@@ -2,9 +2,10 @@ package middleware
 
 import (
 	"net/http"
+	"net/url"
 
 	revactx "github.com/cs3org/reva/pkg/ctx"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	accounts "github.com/owncloud/ocis/accounts/pkg/service/v0"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
@@ -44,6 +45,11 @@ func RequireSelfOrAdmin(opts ...Option) func(next http.Handler) http.Handler {
 			// check if self management permission is present in roles of the authenticated account
 			if opt.RoleManager.FindPermissionByID(r.Context(), roleIDs, accounts.SelfManagementPermissionID) != nil {
 				userid := chi.URLParam(r, "userid")
+				var err error
+				if userid, err = url.PathUnescape(userid); err != nil {
+					mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "malformed username")))
+				}
+
 				if userid == "" || userid == u.Id.OpaqueId || userid == u.Username {
 					next.ServeHTTP(w, r)
 					return

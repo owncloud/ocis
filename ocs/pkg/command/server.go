@@ -8,13 +8,13 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/ocs/pkg/config"
 	"github.com/owncloud/ocis/ocs/pkg/flagset"
 	"github.com/owncloud/ocis/ocs/pkg/metrics"
 	"github.com/owncloud/ocis/ocs/pkg/server/debug"
 	"github.com/owncloud/ocis/ocs/pkg/server/http"
+	"github.com/urfave/cli/v2"
 )
 
 // Server is the entrypoint for the server command.
@@ -38,7 +38,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
-			if err := tracing.Configure(cfg, logger); err != nil {
+			if err := tracing.Configure(cfg); err != nil {
 				return err
 			}
 

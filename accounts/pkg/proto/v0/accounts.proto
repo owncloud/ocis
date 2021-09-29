@@ -247,7 +247,7 @@ message DeleteAccountRequest {
     string id = 1;
 }
 
-// Account follows the properties of the ms graph api user resuorce.
+// Account follows the properties of the ms graph api user resource.
 // See https://docs.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#properties
 message Account {
 
@@ -383,7 +383,7 @@ message Account {
     repeated OnPremisesProvisioningError on_premises_provisioning_errors = 29;
 
     // TODO do we need to sync uidnumber and gidnumber from the external ldap? we may assign different numbers so eos has a non colliding namespace.
-    // we can sync them to the (uid|gid)_number fileds but what if they changed in the external ldap and now collide?
+    // we can sync them to the (uid|gid)_number fields but what if they changed in the external ldap and now collide?
     // move those properties to a posixaccount message so we can exchange that part with an external (readonly or writeable) ldap server?
 
     // For an external user invited to the tenant using the invitation API, this property represents the invited user's invitation status.

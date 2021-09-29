@@ -47,6 +47,7 @@ func NewService(opts ...Option) grpc.Service {
 		)
 		thumbnail = svc.NewInstrument(thumbnail, options.Metrics)
 		thumbnail = svc.NewLogging(thumbnail, options.Logger)
+		thumbnail = svc.NewTracing(thumbnail)
 	}
 
 	_ = proto.RegisterThumbnailServiceHandler(

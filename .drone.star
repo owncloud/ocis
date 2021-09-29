@@ -9,7 +9,6 @@ config = {
         "ocis-pkg",
         "ocis",
         "ocs",
-        "onlyoffice",
         "proxy",
         "settings",
         "storage",
@@ -150,7 +149,7 @@ def main(ctx):
     elif (ctx.build.event == "pull_request" and "[docs-only]" in ctx.build.title) or \
          (ctx.build.event != "pull_request" and "[docs-only]" in (ctx.build.title + ctx.build.message)):
         # [docs-only] is not taken from PR messages, but from commit messages
-        pipelines = [docs(ctx)]
+        pipelines = [docs(ctx), changelog(ctx)]
 
     else:
         test_pipelines.append(
@@ -1620,6 +1619,7 @@ def example_deploys(ctx):
         "ocis_wopi/latest.yml",
         "ocis_hello/latest.yml",
         "ocis_s3/latest.yml",
+        "oc10_ocis_parallel/latest.yml",
     ]
     released_configs = [
         "cs3_users_ocis/released.yml",

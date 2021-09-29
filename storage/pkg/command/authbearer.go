@@ -8,7 +8,6 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
@@ -17,6 +16,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // AuthBearer is the entrypoint for the auth-bearer command.
@@ -101,7 +101,7 @@ func authBearerConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]i
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"authprovider": map[string]interface{}{
-					"auth_manager": "oidc",
+					"auth_manager": cfg.Reva.AuthBearerConfig.Driver,
 					"auth_managers": map[string]interface{}{
 						"oidc": map[string]interface{}{
 							"issuer":     cfg.Reva.OIDC.Issuer,
@@ -110,6 +110,9 @@ func authBearerConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]i
 							"uid_claim":  cfg.Reva.OIDC.UIDClaim,
 							"gid_claim":  cfg.Reva.OIDC.GIDClaim,
 							"gatewaysvc": cfg.Reva.Gateway.Endpoint,
+						},
+						"machine": map[string]interface{}{
+							"api_key": cfg.Reva.AuthBearerConfig.MachineAuthAPIKey,
 						},
 					},
 				},

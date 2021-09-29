@@ -5,7 +5,7 @@ import {
   ValueService_SaveValue
 } from '../client/settings'
 import axios from 'axios'
-import keyBy from 'lodash/keyBy'
+import keyBy from 'lodash-es/keyBy'
 
 const state = {
   config: null,

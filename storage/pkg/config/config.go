@@ -39,6 +39,29 @@ type StorageRegistry struct {
 	JSON         string
 }
 
+// AppProvider defines the available app provider configuration
+type AppProvider struct {
+	Port
+	ExternalAddr string
+	Driver       string
+	WopiDriver   WopiDriver
+	AppsURL      string
+	OpenURL      string
+}
+
+type WopiDriver struct {
+	AppAPIKey      string
+	AppDesktopOnly bool
+	AppIconURI     string
+	AppInternalURL string
+	AppName        string
+	AppURL         string
+	Insecure       bool
+	IopSecret      string
+	JWTSecret      string
+	WopiURL        string
+}
+
 // Sharing defines the available sharing configuration.
 type Sharing struct {
 	Port
@@ -54,6 +77,7 @@ type Sharing struct {
 	PublicPasswordHashCost           int
 	PublicEnableExpiredSharesCleanup bool
 	PublicJanitorRunInterval         int
+	UserStorageMountID               string
 }
 
 // Port defines the available port configuration.
@@ -97,6 +121,13 @@ type Users struct {
 	UserGroupsCacheExpiration int
 }
 
+// AuthBearerConfig defines the available configuration for the bearer auth drivers.
+type AuthBearerConfig struct {
+	Port
+	Driver            string
+	MachineAuthAPIKey string
+}
+
 // Groups defines the available groups configuration.
 type Groups struct {
 	Port
@@ -109,6 +140,8 @@ type Groups struct {
 type FrontendPort struct {
 	Port
 
+	AppProviderPrefix       string
+	ArchiverPrefix          string
 	DatagatewayPrefix       string
 	OCDavPrefix             string
 	OCSPrefix               string
@@ -309,6 +342,8 @@ type OIDC struct {
 type LDAP struct {
 	Hostname             string
 	Port                 int
+	CACert               string
+	Insecure             bool
 	BaseDN               string
 	LoginFilter          string
 	UserFilter           string
@@ -339,6 +374,20 @@ type UserGroupRest struct {
 	TargetAPI         string
 }
 
+// UserOwnCloudSQL defines the available ownCloudSQL user provider configuration.
+type UserOwnCloudSQL struct {
+	DBUsername         string
+	DBPassword         string
+	DBHost             string
+	DBPort             int
+	DBName             string
+	Idp                string
+	Nobody             int64
+	JoinUsername       bool
+	JoinOwnCloudUUID   bool
+	EnableMedialSearch bool
+}
+
 // LDAPUserSchema defines the available ldap user schema configuration.
 type LDAPUserSchema struct {
 	UID         string
@@ -364,6 +413,13 @@ type OCDav struct {
 	DavFilesNamespace string
 }
 
+// Archiver defines the available archiver configuration.
+type Archiver struct {
+	MaxNumFiles int64
+	MaxSize     int64
+	ArchiverURL string
+}
+
 // Reva defines the available reva configuration.
 type Reva struct {
 	// JWTSecret used to sign jwt tokens between services
@@ -373,7 +429,9 @@ type Reva struct {
 	OIDC            OIDC
 	LDAP            LDAP
 	UserGroupRest   UserGroupRest
+	UserOwnCloudSQL UserOwnCloudSQL
 	OCDav           OCDav
+	Archiver        Archiver
 	Storages        StorageConfig
 	// Ports are used to configure which services to start on which port
 	Frontend          FrontendPort
@@ -383,6 +441,7 @@ type Reva struct {
 	Users             Users
 	Groups            Groups
 	AuthProvider      Users
+	AuthBearerConfig  AuthBearerConfig
 	AuthBasic         Port
 	AuthBearer        Port
 	Sharing           Sharing
@@ -390,6 +449,7 @@ type Reva struct {
 	StorageUsers      StoragePort
 	StoragePublicLink PublicStorage
 	StorageMetadata   StoragePort
+	AppProvider       AppProvider
 	// Configs can be used to configure the reva instance.
 	// Services and Ports will be ignored if this is used
 	Configs map[string]interface{}

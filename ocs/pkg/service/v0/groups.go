@@ -11,11 +11,13 @@ import (
 
 	merrors "github.com/asim/go-micro/v3/errors"
 	revactx "github.com/cs3org/reva/pkg/ctx"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
+	ocstracing "github.com/owncloud/ocis/ocs/pkg/tracing"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 // ListUserGroups lists a users groups
@@ -30,6 +32,14 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 		if u.Username == userid {
 			// the OCS API is a REST API and it uses the username to look for groups. If the id from the user in the context
 			// differs from that of the url we can assume we are an admin because we are past the selfOrAdmin middleware.
+
+			_, span := ocstracing.TraceProvider.
+				Tracer("ocs").
+				Start(r.Context(), "ListUserGroups")
+			defer span.End()
+
+			span.SetAttributes(attribute.Any("groups", u.Groups))
+
 			if len(u.Groups) > 0 {
 				mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: u.Groups})))
 				return
@@ -80,6 +90,14 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 	}
 
 	o.logger.Error().Err(err).Int("count", len(groups)).Str("userid", account.Id).Msg("listing groups for user")
+
+	_, span := ocstracing.TraceProvider.
+		Tracer("ocs").
+		Start(r.Context(), "ListUserGroups")
+	defer span.End()
+
+	span.SetAttributes(attribute.Any("groups", groups))
+
 	mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: groups})))
 }
 
@@ -242,6 +260,13 @@ func (o Ocs) ListGroups(w http.ResponseWriter, r *http.Request) {
 	for i := range res.Groups {
 		groups = append(groups, res.Groups[i].OnPremisesSamAccountName)
 	}
+
+	_, span := ocstracing.TraceProvider.
+		Tracer("ocs").
+		Start(r.Context(), "ListGroups")
+	defer span.End()
+
+	span.SetAttributes(attribute.Any("groups", groups))
 
 	mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: groups})))
 }

@@ -8,7 +8,7 @@ import (
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 
 	//msgraph "github.com/owncloud/open-graph-api-go" // FIXME add groups to open graph, needs OnPremisesSamAccountName and OnPremisesDomainName

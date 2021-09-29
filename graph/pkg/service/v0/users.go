@@ -7,7 +7,7 @@ import (
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	revactx "github.com/cs3org/reva/pkg/ctx"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 

@@ -34,7 +34,7 @@ export function propertyFromStylesheet(selector, attribute, asURL=false) {
         return false;
       });
     } catch(e) {
-      // Ignore sheels which caused errors. This for example can happen if an
+      // Ignore sheets which caused errors. This for example can happen if an
       // extension injected styles from an other origin.
       return false;
     }

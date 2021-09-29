@@ -3,10 +3,10 @@ package flagset
 import (
 	"path"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
 	"github.com/owncloud/ocis/proxy/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // RootWithConfig applies cfg to the root flagset
@@ -69,28 +69,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
 			Usage:       "Enable sending traces",
-			EnvVars:     []string{"PROXY_TRACING_ENABLED"},
+			EnvVars:     []string{"PROXY_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
-			EnvVars:     []string{"PROXY_TRACING_TYPE"},
+			EnvVars:     []string{"PROXY_TRACING_TYPE", "OCIS_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
 			Value:       "",
 			Usage:       "Endpoint for the agent",
-			EnvVars:     []string{"PROXY_TRACING_ENDPOINT"},
+			EnvVars:     []string{"PROXY_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
 			Value:       "",
 			Usage:       "Endpoint for the collector",
-			EnvVars:     []string{"PROXY_TRACING_COLLECTOR"},
+			EnvVars:     []string{"PROXY_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
@@ -289,6 +289,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "account-backend-type",
 			EnvVars:     []string{"PROXY_ACCOUNT_BACKEND_TYPE"},
 			Destination: &cfg.AccountBackend,
+		},
+
+		&cli.StringFlag{
+			Name:        "machine-auth-api-key",
+			Value:       flags.OverrideDefaultString(cfg.MachineAuthAPIKey, "change-me-please"),
+			Usage:       "the API key to be used for the machine auth driver in reva",
+			EnvVars:     []string{"PROXY_MACHINE_AUTH_API_KEY", "OCIS_MACHINE_AUTH_API_KEY"},
+			Destination: &cfg.MachineAuthAPIKey,
 		},
 
 		// Reva Middlewares Config

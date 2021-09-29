@@ -9,13 +9,14 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
-	chimiddleware "github.com/go-chi/chi/middleware"
+	"github.com/cs3org/reva/pkg/token/manager/jwt"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	pkgmiddleware "github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/proxy/pkg/config"
@@ -30,6 +31,7 @@ import (
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
+	"github.com/urfave/cli/v2"
 	"golang.org/x/oauth2"
 )
 
@@ -63,7 +65,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
-			if err := tracing.Configure(cfg, logger); err != nil {
+			if err := tracing.Configure(cfg); err != nil {
 				return err
 			}
 
@@ -151,14 +153,23 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 	var userProvider backend.UserBackend
 	switch cfg.AccountBackend {
 	case "accounts":
+		tokenManager, err := jwt.New(map[string]interface{}{
+			"secret":  cfg.TokenManager.JWTSecret,
+			"expires": int64(24 * 60 * 60),
+		})
+		if err != nil {
+			l.Error().Err(err).
+				Msg("Failed to create token manager")
+		}
 		userProvider = backend.NewAccountsServiceUserBackend(
 			acc.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient),
 			rolesClient,
 			cfg.OIDC.Issuer,
+			tokenManager,
 			l,
 		)
 	case "cs3":
-		userProvider = backend.NewCS3UserBackend(revaClient, rolesClient, revaClient, l)
+		userProvider = backend.NewCS3UserBackend(rolesClient, revaClient, cfg.MachineAuthAPIKey, l)
 	default:
 		l.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)
 	}
@@ -182,6 +193,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 
 	return alice.New(
 		// first make sure we log all requests and redirect to https if necessary
+		pkgmiddleware.TraceContext,
 		chimiddleware.RealIP,
 		chimiddleware.RequestID,
 		middleware.AccessLog(l),

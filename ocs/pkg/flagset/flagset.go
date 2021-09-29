@@ -1,9 +1,9 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/ocs/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // HealthWithConfig applies cfg to the root flagset
@@ -57,28 +57,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "tracing-enabled",
 			Value:       flags.OverrideDefaultBool(cfg.Tracing.Enabled, false),
 			Usage:       "Enable sending traces",
-			EnvVars:     []string{"OCS_TRACING_ENABLED"},
+			EnvVars:     []string{"OCS_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
-			EnvVars:     []string{"OCS_TRACING_TYPE"},
+			EnvVars:     []string{"OCS_TRACING_TYPE", "OCIS_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Endpoint, ""),
 			Usage:       "Endpoint for the agent",
-			EnvVars:     []string{"OCS_TRACING_ENDPOINT"},
+			EnvVars:     []string{"OCS_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Collector, ""),
 			Usage:       "Endpoint for the collector",
-			EnvVars:     []string{"OCS_TRACING_COLLECTOR"},
+			EnvVars:     []string{"OCS_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
@@ -164,6 +164,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "REVA Gateway Endpoint",
 			EnvVars:     []string{"OCS_REVA_GATEWAY_ADDR"},
 			Destination: &cfg.RevaAddress,
+		},
+		&cli.StringFlag{
+			Name:        "machine-auth-api-key",
+			Value:       flags.OverrideDefaultString(cfg.MachineAuthAPIKey, "change-me-please"),
+			Usage:       "the API key to be used for the machine auth driver in reva",
+			EnvVars:     []string{"OCS_MACHINE_AUTH_API_KEY", "OCIS_MACHINE_AUTH_API_KEY"},
+			Destination: &cfg.MachineAuthAPIKey,
 		},
 		&cli.StringFlag{
 			Name:        "idm-address",

@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import assign from 'lodash/assign'
+import assign from 'lodash-es/assign'
 import { mapGetters, mapActions } from 'vuex'
 import SettingBoolean from './settings/SettingBoolean.vue'
 import SettingMultiChoice from './settings/SettingMultiChoice.vue'

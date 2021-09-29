@@ -1,12 +1,12 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
-// SharingSQLWithConfig applies the Shring SQL driver cfg to the flagset
+// SharingSQLWithConfig applies the Sharing SQL driver cfg to the flagset
 func SharingSQLWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{

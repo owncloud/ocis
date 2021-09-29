@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
@@ -20,6 +20,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // Frontend is the entrypoint for the frontend command.
@@ -30,7 +31,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 		Flags: flagset.FrontendWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Frontend.Services = c.StringSlice("service")
-			cfg.Reva.ChecksumSupportedTypes = c.StringSlice("checksum-suppored-type")
+			cfg.Reva.ChecksumSupportedTypes = c.StringSlice("checksum-supported-type")
 			return loadUserAgent(c, cfg)
 		},
 		Action: func(c *cli.Context) error {
@@ -54,12 +55,34 @@ func Frontend(cfg *config.Config) *cli.Command {
 				desktopRedirectURIs[port] = fmt.Sprintf("http://localhost:%d", (port + 1024))
 			}
 
+			archivers := []map[string]interface{}{
+				{
+					"enabled":       true,
+					"version":       "2.0.0",
+					"formats":       []string{"tar", "zip"},
+					"archiver_url":  cfg.Reva.Archiver.ArchiverURL,
+					"max_num_files": strconv.FormatInt(cfg.Reva.Archiver.MaxNumFiles, 10),
+					"max_size":      strconv.FormatInt(cfg.Reva.Archiver.MaxSize, 10),
+				},
+			}
+
+			appProviders := []map[string]interface{}{
+				{
+					"enabled":  true,
+					"version":  "1.0.0",
+					"apps_url": cfg.Reva.AppProvider.AppsURL,
+					"open_url": cfg.Reva.AppProvider.OpenURL,
+				},
+			}
+
 			filesCfg := map[string]interface{}{
 				"private_links":     false,
 				"bigfilechunking":   false,
 				"blacklisted_files": []string{},
 				"undelete":          true,
 				"versioning":        true,
+				"archivers":         archivers,
+				"app_providers":     appProviders,
 			}
 
 			if cfg.Reva.DefaultUploadProtocol == "tus" {
@@ -141,6 +164,19 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 			},
 			// TODO build services dynamically
 			"services": map[string]interface{}{
+				"appprovider": map[string]interface{}{
+					"prefix":                 cfg.Reva.Frontend.AppProviderPrefix,
+					"transfer_shared_secret": cfg.Reva.TransferSecret,
+					"timeout":                86400,
+					"insecure":               true,
+				},
+				"archiver": map[string]interface{}{
+					"prefix":        cfg.Reva.Frontend.ArchiverPrefix,
+					"timeout":       86400,
+					"insecure":      true,
+					"max_num_files": cfg.Reva.Archiver.MaxNumFiles,
+					"max_size":      cfg.Reva.Archiver.MaxSize,
+				},
 				"datagateway": map[string]interface{}{
 					"prefix":                 cfg.Reva.Frontend.DatagatewayPrefix,
 					"transfer_shared_secret": cfg.Reva.TransferSecret,
@@ -243,9 +279,6 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 									"outgoing": true,
 									"incoming": true,
 								},
-							},
-							"notifications": map[string]interface{}{
-								"endpoints": []string{"disable"},
 							},
 						},
 						"version": map[string]interface{}{

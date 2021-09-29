@@ -19,13 +19,15 @@ import (
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
+	ocstracing "github.com/owncloud/ocis/ocs/pkg/tracing"
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
 	"github.com/pkg/errors"
+	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
@@ -142,6 +144,14 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 			Definition: "default",
 		},
 	}
+
+	_, span := ocstracing.TraceProvider.
+		Tracer("ocs").
+		Start(r.Context(), "GetUser")
+	defer span.End()
+
+	span.SetAttributes(attribute.Any("user", d))
+
 	mustNotFail(render.Render(w, r, response.DataRender(d)))
 }
 
@@ -476,7 +486,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 func (o Ocs) mintTokenForUser(ctx context.Context, account *accounts.Account) (string, error) {
 	tm, _ := jwt.New(map[string]interface{}{
 		"secret":  o.config.TokenManager.JWTSecret,
-		"expires": int64(60),
+		"expires": int64(24 * 60 * 60),
 	})
 
 	u := &revauser.User{
@@ -726,7 +736,7 @@ func (o Ocs) fetchAccountByUsername(ctx context.Context, name string) (*accounts
 
 func (o Ocs) fetchAccountFromCS3Backend(ctx context.Context, name string) (*accounts.Account, error) {
 	backend := o.getCS3Backend()
-	u, err := backend.GetUserByClaims(ctx, "username", name, false)
+	u, _, err := backend.GetUserByClaims(ctx, "username", name, false)
 	if err != nil {
 		return nil, err
 	}

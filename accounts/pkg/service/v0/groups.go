@@ -270,7 +270,7 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 			break
 		}
 	}
-	// only store the reference to prevent recurision when marshaling json
+	// only store the reference to prevent recursion when marshaling json
 	gref := &proto.Group{
 		Id: g.Id,
 	}

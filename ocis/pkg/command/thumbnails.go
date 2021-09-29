@@ -1,14 +1,15 @@
+//go:build !simple
 // +build !simple
 
 package command
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/ocis/pkg/version"
 	"github.com/owncloud/ocis/thumbnails/pkg/command"
 	"github.com/owncloud/ocis/thumbnails/pkg/flagset"
+	"github.com/urfave/cli/v2"
 
 	svcconfig "github.com/owncloud/ocis/thumbnails/pkg/config"
 )

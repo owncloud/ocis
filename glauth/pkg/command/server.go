@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	glauthcfg "github.com/glauth/glauth/pkg/config"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/glauth/pkg/config"
@@ -17,6 +16,7 @@ import (
 	pkgcrypto "github.com/owncloud/ocis/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/urfave/cli/v2"
 )
 
 // Server is the entrypoint for the server command.
@@ -47,7 +47,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
-			if err := tracing.Configure(cfg, logger); err != nil {
+			if err := tracing.Configure(cfg); err != nil {
 				return err
 			}
 

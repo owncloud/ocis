@@ -26,7 +26,6 @@ import (
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	ocs "github.com/owncloud/ocis/ocs/pkg/command"
-	onlyoffice "github.com/owncloud/ocis/onlyoffice/pkg/command"
 	proxy "github.com/owncloud/ocis/proxy/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
 	storage "github.com/owncloud/ocis/storage/pkg/command"
@@ -96,7 +95,6 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["graph-explorer"] = graphExplorer.NewSutureService
 	s.ServicesRegistry["idp"] = idp.NewSutureService
 	s.ServicesRegistry["ocs"] = ocs.NewSutureService
-	s.ServicesRegistry["onlyoffice"] = onlyoffice.NewSutureService
 	s.ServicesRegistry["store"] = store.NewSutureService
 	s.ServicesRegistry["thumbnails"] = thumbnails.NewSutureService
 	s.ServicesRegistry["web"] = web.NewSutureService
@@ -110,6 +108,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["storage-home"] = storage.NewStorageHome
 	s.ServicesRegistry["storage-users"] = storage.NewStorageUsers
 	s.ServicesRegistry["storage-public-link"] = storage.NewStoragePublicLink
+	s.ServicesRegistry["storage-appprovider"] = storage.NewAppProvider
 
 	// populate delayed services
 	s.Delayed["storage-sharing"] = storage.NewSharing

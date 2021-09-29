@@ -79,7 +79,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
     # JWT secret which is used for the storage provider. Must be changed in order to have a secure oCIS. Defaults to "Pive-Fumkiu4"
     OCIS_JWT_SECRET=
     # JWT secret which is used for uploads to create transfer tokens. Must be changed in order to have a secure oCIS. Defaults to "replace-me-with-a-transfer-secret"
-    OCIS_TRANSFER_SECRET=
+    STORAGE_TRANSFER_SECRET=
 
     ### Wopi server settings ###
     # oCIS Wopi server version. Defaults to "latest"
@@ -135,7 +135,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   `docker-compose up -d`
 
-* You now can visit oCIS and are able to open an office document in your browser.
+* You now can visit oCIS and are able to open an office document in your browser. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
 
 ## Local setup
 For a more simple local ocis setup see [Getting started]({{< ref "../getting-started" >}})
@@ -156,4 +156,4 @@ After that you're ready to start the application stack:
 
 Open https://collabora.owncloud.test and https://wopiserver.owncloud.test  in your browser and accept the invalid certificate warning.
 
-Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You are now able to open an office document in your browser.
+Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You are now able to open an office document in your browser. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
