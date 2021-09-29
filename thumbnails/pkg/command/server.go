@@ -23,7 +23,12 @@ func Server(cfg *config.Config) *cli.Command {
 		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
 			logger := NewLogger(cfg)
-			cfg.Thumbnail.Resolutions = ctx.StringSlice("thumbnail-resolution")
+
+			// StringSliceFlag doesn't support Destination
+			// UPDATE Destination on string flags supported. Wait for https://github.com/urfave/cli/pull/1078 to get to micro/cli
+			if len(ctx.StringSlice("thumbnail-resolution")) > 0 {
+				cfg.Thumbnail.Resolutions = ctx.StringSlice("thumbnail-resolution")
+			}
 
 			if !cfg.Supervised {
 				return ParseConfig(ctx, cfg)

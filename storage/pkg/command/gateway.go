@@ -50,6 +50,11 @@ func Gateway(cfg *config.Config) *cli.Command {
 			uuid := uuid.Must(uuid.NewV4())
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 			rcfg := gatewayConfigFromStruct(c, cfg, logger)
+			logger.Debug().
+				Str("server", "gateway").
+				Interface("reva-config", rcfg).
+				Msg("config")
+
 			defer cancel()
 
 			gr.Add(func() error {

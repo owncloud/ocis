@@ -166,7 +166,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldap-bind-dn",
-			Value:       flags.OverrideDefaultString(cfg.Ldap.BindDN, "cn=idp,ou=sysusers,dc=example,dc=org"),
+			Value:       flags.OverrideDefaultString(cfg.Ldap.BindDN, "cn=idp,ou=sysusers,dc=ocis,dc=test"),
 			Usage:       "Bind DN for the LDAP server (glauth)",
 			EnvVars:     []string{"IDP_LDAP_BIND_DN"},
 			Destination: &cfg.Ldap.BindDN,
@@ -180,7 +180,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldap-base-dn",
-			Value:       flags.OverrideDefaultString(cfg.Ldap.BaseDN, "ou=users,dc=example,dc=org"),
+			Value:       flags.OverrideDefaultString(cfg.Ldap.BaseDN, "ou=users,dc=ocis,dc=test"),
 			Usage:       "LDAP base DN of the oCIS users",
 			EnvVars:     []string{"IDP_LDAP_BASE_DN"},
 			Destination: &cfg.Ldap.BaseDN,

@@ -3,7 +3,7 @@
 set -x
 
 echo "----- [ocis] LDAP setup -----"
-authconfig --enableldap --enableldapauth --ldapserver=${EOS_LDAP_HOST} --ldapbasedn="dc=example,dc=org" --update
+authconfig --enableldap --enableldapauth --ldapserver=${EOS_LDAP_HOST} --ldapbasedn="dc=ocis,dc=test" --update
 sed -i "s/#binddn cn=.*/binddn ${LDAP_BINDDN}/" /etc/nslcd.conf
 sed -i "s/#bindpw .*/bindpw ${LDAP_BINDPW}/" /etc/nslcd.conf
 # start in debug mode
