@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix the account resolver middleware: [#2557](https://github.com/owncloud/ocis/pull/2557)
 * Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
 * Bugfix - Remove notifications placeholder: [#2514](https://github.com/owncloud/ocis/pull/2514)
 * Change - Make the drives create method odata compliant: [#2531](https://github.com/owncloud/ocis/pull/2531)
@@ -19,6 +20,13 @@ The following sections list the changes for unreleased.
 * Enhancement - Set reva JWT token expiration time to 24 hours by default: [#2527](https://github.com/owncloud/ocis/pull/2527)
 
 ## Details
+
+* Bugfix - Fix the account resolver middleware: [#2557](https://github.com/owncloud/ocis/pull/2557)
+
+   The accounts resolver middleware put an empty token into the request when the user was already
+   present. Added a step to get the token for the user.
+
+   https://github.com/owncloud/ocis/pull/2557
 
 * Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
 
