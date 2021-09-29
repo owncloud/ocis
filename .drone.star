@@ -432,7 +432,7 @@ def uploadScanResults(ctx):
 def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
     earlyFail = config["localApiTests"]["earlyFail"] if "earlyFail" in config["localApiTests"] else False
 
-    if ("full-ci" in ctx.build.title.lower()):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
         earlyFail = False
 
     return {
@@ -484,7 +484,7 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
     earlyFail = config["apiTests"]["earlyFail"] if "earlyFail" in config["apiTests"] else False
 
-    if ("full-ci" in ctx.build.title.lower()):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
         earlyFail = False
 
     return {
@@ -549,7 +549,7 @@ def uiTests(ctx):
         "filterTags": "",
         "skip": False,
         "earlyFail": False,
-        # only used if 'full-ci' is in build title
+        # only used if 'full-ci' is in build title or if run by cron
         "numberOfParts": 20,
         "skipExceptParts": [],
     }
@@ -562,10 +562,10 @@ def uiTests(ctx):
     filterTags = params["filterTags"]
     earlyFail = params["earlyFail"]
 
-    if ("full-ci" in ctx.build.title.lower()):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
         earlyFail = False
 
-    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "tag"):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "tag" or ctx.build.event == "cron"):
         numberOfParts = params["numberOfParts"]
         skipExceptParts = params["skipExceptParts"]
         debugPartsEnabled = (len(skipExceptParts) != 0)
@@ -667,7 +667,7 @@ def uiTestPipeline(ctx, filterTags, earlyFail, runPart = 1, numberOfParts = 1, s
 def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
     earlyFail = config["accountsUITests"]["earlyFail"] if "earlyFail" in config["accountsUITests"] else False
 
-    if ("full-ci" in ctx.build.title.lower()):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
         earlyFail = False
 
     return {
@@ -736,7 +736,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
 def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
     earlyFail = config["settingsUITests"]["earlyFail"] if "earlyFail" in config["settingsUITests"] else False
 
-    if ("full-ci" in ctx.build.title.lower()):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
         earlyFail = False
 
     return {
