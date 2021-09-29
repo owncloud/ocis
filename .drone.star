@@ -149,7 +149,7 @@ def main(ctx):
     elif (ctx.build.event == "pull_request" and "[docs-only]" in ctx.build.title) or \
          (ctx.build.event != "pull_request" and "[docs-only]" in (ctx.build.title + ctx.build.message)):
         # [docs-only] is not taken from PR messages, but from commit messages
-        pipelines = [docs(ctx)]
+        pipelines = [docs(ctx), changelog(ctx)]
 
     else:
         test_pipelines.append(
