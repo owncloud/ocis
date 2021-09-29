@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-09-29T10:05:07+0000"
+date: "2021-09-29T11:21:16+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/idp/templates
@@ -261,7 +261,7 @@ Usage: `idp server [command options] [arguments...]`
 
 
 -ldap-bind-dn |  $IDP_LDAP_BIND_DN
-: Bind DN for the LDAP server (glauth). Default: `"cn=idp,ou=sysusers,dc=example,dc=org"`.
+: Bind DN for the LDAP server (glauth). Default: `"cn=idp,ou=sysusers,dc=ocis,dc=test"`.
 
 
 -ldap-bind-password |  $IDP_LDAP_BIND_PASSWORD
@@ -269,7 +269,7 @@ Usage: `idp server [command options] [arguments...]`
 
 
 -ldap-base-dn |  $IDP_LDAP_BASE_DN
-: LDAP base DN of the oCIS users. Default: `"ou=users,dc=example,dc=org"`.
+: LDAP base DN of the oCIS users. Default: `"ou=users,dc=ocis,dc=test"`.
 
 
 -ldap-scope |  $IDP_LDAP_SCOPE
