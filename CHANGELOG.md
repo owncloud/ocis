@@ -6,7 +6,6 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
-* Bugfix - Redirect invalid links to oC Web: [#2493](https://github.com/owncloud/ocis/pull/2493)
 * Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
 * Bugfix - Remove notifications placeholder: [#2514](https://github.com/owncloud/ocis/pull/2514)
 * Change - Make the drives create method odata compliant: [#2531](https://github.com/owncloud/ocis/pull/2531)
@@ -20,15 +19,6 @@ The following sections list the changes for unreleased.
 * Enhancement - Set reva JWT token expiration time to 24 hours by default: [#2527](https://github.com/owncloud/ocis/pull/2527)
 
 ## Details
-
-* Bugfix - Redirect invalid links to oC Web: [#2493](https://github.com/owncloud/ocis/pull/2493)
-
-   Invalid links ending with a slash(eg. https://foo.bar/index.php/apps/pdfviewer/) have
-   not been redirected to ownCloud Web. Instead the former 404 not found status page was
-   displayed.
-
-   https://github.com/owncloud/ocis/pull/2493
-   https://github.com/owncloud/ocis/pull/2512
 
 * Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
 
@@ -92,6 +82,7 @@ The following sections list the changes for unreleased.
    ownCloud Web instead of displaying a blank page with a "not found" message.
 
    https://github.com/owncloud/ocis/pull/2493
+   https://github.com/owncloud/ocis/pull/2512
 
 * Enhancement - Use reva's Authenticate method instead of spawning token managers: [#2528](https://github.com/owncloud/ocis/pull/2528)
 
