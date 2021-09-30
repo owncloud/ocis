@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-09-29T13:43:59+0000"
+date: "2021-09-30T05:18:16+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -108,6 +108,58 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
+### ocis server
+
+Start fullstack server
+
+Usage: `ocis server [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $OCIS_DEBUG_ADDR
+: Address to bind debug server. Default: `0.0.0.0:9010`.
+
+
+-debug-token |  $OCIS_DEBUG_TOKEN
+: Token to grant metrics access.
+
+
+-debug-pprof |  $OCIS_DEBUG_PPROF
+: Enable pprof debugging.
+
+
+-debug-zpages |  $OCIS_DEBUG_ZPAGES
+: Enable zpages debugging.
+
+
+-http-addr |  $OCIS_HTTP_ADDR
+: Address to bind http server. Default: `0.0.0.0:9000`.
+
+
+-http-root |  $OCIS_HTTP_ROOT
+: Root path of http server. Default: `/`.
+
+
+-grpc-addr |  $OCIS_GRPC_ADDR
+: Address to bind grpc server. Default: `0.0.0.0:9001`.
+
+
+-extensions |  $OCIS_RUN_EXTENSIONS
+: Run specific extensions during supervised mode.
+
 ### ocis list
 
 Lists running ocis extensions
@@ -195,58 +247,6 @@ Usage: `ocis run [command options] [arguments...]`
 
 
 
-### ocis server
-
-Start fullstack server
-
-Usage: `ocis server [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $OCIS_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9010`.
-
-
--debug-token |  $OCIS_DEBUG_TOKEN
-: Token to grant metrics access.
-
-
--debug-pprof |  $OCIS_DEBUG_PPROF
-: Enable pprof debugging.
-
-
--debug-zpages |  $OCIS_DEBUG_ZPAGES
-: Enable zpages debugging.
-
-
--http-addr |  $OCIS_HTTP_ADDR
-: Address to bind http server. Default: `0.0.0.0:9000`.
-
-
--http-root |  $OCIS_HTTP_ROOT
-: Root path of http server. Default: `/`.
-
-
--grpc-addr |  $OCIS_GRPC_ADDR
-: Address to bind grpc server. Default: `0.0.0.0:9001`.
-
-
--extensions |  $OCIS_RUN_EXTENSIONS
-: Run specific extensions during supervised mode.
-
 ### ocis kill
 
 Kill an extension by name
@@ -283,91 +283,91 @@ There are more subcommands to start the individual extensions. Please check the 
 
 Start storage groupprovider service
 
-#### ocis storage-metadata
-
-Start storage and data service for metadata
-
-#### ocis storage-public-link
-
-Start storage public link storage
-
-#### ocis storage-home
-
-Start storage and data provider for /home mount
-
-#### ocis proxy
-
-Start proxy server
-
-#### ocis storage-users
-
-Start storage and data provider for /users mount
-
 #### ocis store
 
 Start a go-micro store
-
-#### ocis accounts
-
-Start accounts server
-
-#### ocis storage-auth-basic
-
-Start storage auth-basic service
-
-#### ocis storage-userprovider
-
-Start storage userprovider service
-
-#### ocis storage-app-provider
-
-Start storage app-provider service
-
-#### ocis storage-frontend
-
-Start storage frontend
 
 #### ocis storage-gateway
 
 Start storage gateway
 
-#### ocis web
+#### ocis accounts
 
-Start web server
-
-#### ocis glauth
-
-Start glauth server
-
-#### ocis storage-sharing
-
-Start storage sharing service
-
-#### ocis version
-
-Lists running services with version
+Start accounts server
 
 #### ocis idp
 
 Start idp server
 
-#### ocis settings
+#### ocis storage-auth-basic
 
-Start settings server
+Start storage auth-basic service
 
 #### ocis storage-auth-bearer
 
 Start storage auth-bearer service
 
+#### ocis storage-frontend
+
+Start storage frontend
+
+#### ocis storage-userprovider
+
+Start storage userprovider service
+
+#### ocis storage-users
+
+Start storage and data provider for /users mount
+
+#### ocis version
+
+Lists running services with version
+
+#### ocis glauth
+
+Start glauth server
+
 #### ocis ocs
 
 Start ocs server
+
+#### ocis storage-metadata
+
+Start storage and data service for metadata
+
+#### ocis storage-home
+
+Start storage and data provider for /home mount
+
+#### ocis storage-public-link
+
+Start storage public link storage
+
+#### ocis web
+
+Start web server
+
+#### ocis proxy
+
+Start proxy server
 
 #### ocis thumbnails
 
 Start thumbnails server
 
+#### ocis settings
+
+Start settings server
+
 #### ocis webdav
 
 Start webdav server
+
+#### ocis storage-app-provider
+
+Start storage app-provider service
+
+#### ocis storage-sharing
+
+Start storage sharing service
 
