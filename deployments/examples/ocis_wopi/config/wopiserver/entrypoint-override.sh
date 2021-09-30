@@ -3,6 +3,8 @@ set -e
 
 echo "${WOPISECRET}" > /etc/wopi/wopisecret
 echo "${IOPSECRET}" > /etc/wopi/iopsecret
+mkdir -p /var/run/secrets
+echo "$CODIMDSECRET" > /var/run/secrets/codimd_apikey
 
 cp /etc/wopi/wopiserver.conf.dist /etc/wopi/wopiserver.conf
 sed -i 's/ocis.owncloud.test/'${OCIS_DOMAIN}'/g' /etc/wopi/wopiserver.conf

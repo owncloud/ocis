@@ -20,8 +20,8 @@ port = 8880
 #codeurl = https://collabora.owncloud.test
 
 # URL of your CodiMD service
-#codimdurl = https://your-codimd-server.org
-#codimdinturl = https://your-internal-codimd-server:3000
+codimdurl = https://codimd.owncloud.test
+codimdinturl = http://codimd:3000
 
 # URL of your WOPI server or your HA proxy in front of it
 wopiurl = https://wopiserver.owncloud.test
@@ -82,7 +82,7 @@ wopikey = /etc/grid-security/host.key
 
 [bridge]
 # SSL certificate check for the connected apps
-#sslverify = True
+sslverify = False
 
 # Minimal time interval between two consecutive save operations [seconds]
 #saveinterval = 200

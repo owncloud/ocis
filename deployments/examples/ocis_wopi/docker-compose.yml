@@ -11,6 +11,7 @@ services:
           - ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
           - ${COLLABORA_DOMAIN:-collabora.owncloud.test}
           - ${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
+          - ${CODIMD_DOMAIN:-codimd.owncloud.test}
     command:
       - "--log.level=${TRAEFIK_LOG_LEVEL:-ERROR}"
       # letsencrypt configuration
@@ -53,6 +54,7 @@ services:
       - /bin/sh
       - /entrypoint-override.sh
     environment:
+      PROXY_ENABLE_BASIC_AUTH: "true"
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
@@ -63,15 +65,15 @@ services:
       STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
-      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
-      # web ui
-      WEB_UI_CONFIG: "/var/tmp/ocis/.config/web-config.json"
-      # proxy
-      PROXY_CONFIG_FILE: "/var/tmp/ocis/.config/proxy-config.json"
+      OCIS_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
+      # app registry
+      STORAGE_APP_REGISTRY_MIMETYPES_JSON: /var/tmp/ocis/.config/mimetypes.json
+      WEB_ASSET_PATH: /var/tmp/web # TODO: remove
+      WEB_UI_CONFIG_APPS: files, search, media-viewer, external # TODO: remove
     volumes:
+      - /home/kloucek/Projects/github.com/owncloud/web/dist:/var/tmp/web # TODO: remove
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
-      - ./config/ocis/web-config.dist.json:/config/web-config.dist.json
-      - ./config/ocis/proxy-config.json:/config/proxy-config.json
+      - ./config/ocis/mimetypes.json:/var/tmp/ocis/.config/mimetypes.json
       - ocis-data:/var/tmp/ocis
     labels:
       - "traefik.enable=true"
@@ -88,14 +90,15 @@ services:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
-    entrypoint:
-      - /bin/sh
-      - /entrypoint-override.sh
-    #command: storage-app-provider server
+    #entrypoint:
+    #  - /bin/sh
+    #  - /entrypoint-override.sh
+    command: storage-app-provider server
     environment:
-      STORAGE_GATEWAY_ENDPOINT: ocis:9142
+      STORAGE_GATEWAY_ENDPOINT: ${OCIS_ADDRESS:-ocis:9142}
       APP_PROVIDER_BASIC_EXTERNAL_ADDR: ocis-appdriver-onlyoffice:9164
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       APP_PROVIDER_DRIVER: wopi
       APP_PROVIDER_WOPI_DRIVER_APP_NAME: OnlyOffice
       APP_PROVIDER_WOPI_DRIVER_APP_ICON_URI: https://www.pikpng.com/pngl/m/343-3435764_onlyoffice-desktop-editors-onlyoffice-logo-clipart.png
@@ -115,9 +118,10 @@ services:
       ocis-net:
     command: storage-app-provider server
     environment:
-      STORAGE_GATEWAY_ENDPOINT: ocis:9142
+      STORAGE_GATEWAY_ENDPOINT: ${OCIS_ADDRESS:-ocis:9142}
       APP_PROVIDER_BASIC_EXTERNAL_ADDR: ocis-appdriver-collabora:9164
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       APP_PROVIDER_DRIVER: wopi
       APP_PROVIDER_WOPI_DRIVER_APP_NAME: Collabora
       APP_PROVIDER_WOPI_DRIVER_APP_ICON_URI: https://www.collaboraoffice.com/wp-content/uploads/2019/01/CP-icon.png
@@ -129,15 +133,24 @@ services:
       driver: "local"
     restart: always
 
-  ocis-wopiserver:
-    image: owncloud/ocis-wopiserver:${OCIS_WOPISERVER_DOCKER_TAG:-latest}
+  ocis-appdriver-codimd:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
+    command: storage-app-provider server
     environment:
-      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
-      WOPISERVER_REVA_GATEWAY_ADDR: ocis:9142
+      STORAGE_GATEWAY_ENDPOINT: ${OCIS_ADDRESS:-ocis:9142}
+      APP_PROVIDER_BASIC_EXTERNAL_ADDR: ocis-appdriver-codimd:9164
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
+      APP_PROVIDER_DRIVER: wopi
+      APP_PROVIDER_WOPI_DRIVER_APP_NAME: CodiMD
+      APP_PROVIDER_WOPI_DRIVER_APP_API_KEY: ${CODIMD_SECRET:-LoremIpsum456}
+      APP_PROVIDER_WOPI_DRIVER_APP_ICON_URI: https://avatars.githubusercontent.com/u/67865462?v=4
+      APP_PROVIDER_WOPI_DRIVER_APP_URL: https://${CODIMD_DOMAIN:-codimd.owncloud.test}
+      APP_PROVIDER_WOPI_DRIVER_INSECURE: "${INSECURE:-false}"
+      APP_PROVIDER_WOPI_DRIVER_IOP_SECRET: ${WOPI_IOP_SECRET:-LoremIpsum123}
+      APP_PROVIDER_WOPI_DRIVER_WOPI_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
     logging:
       driver: "local"
     restart: always
@@ -152,9 +165,11 @@ services:
     environment:
       WOPISECRET: ${WOPI_JWT_SECRET:-LoremIpsum567}
       IOPSECRET: ${WOPI_IOP_SECRET:-LoremIpsum123}
+      CODIMDSECRET: ${CODIMD_SECRET:-LoremIpsum456}
       WOPISERVER_DOMAIN: ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
       COLLABORA_DOMAIN: ${COLLABORA_DOMAIN:-collabora.owncloud.test}
     volumes:
+      #- /home/kloucek/Projects/github.com/cs3org/wopiserver/src/wopiserver.py:/app/wopiserver.py # TODO: remove
       - ./config/wopiserver/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/wopiserver/wopiserver.conf.dist:/etc/wopi/wopiserver.conf.dist
       - wopi-data:/var/wopi_local_storage
@@ -213,11 +228,58 @@ services:
       driver: "local"
     restart: always
 
+  codimd-db:
+    image: postgres:11.6-alpine
+    networks:
+      ocis-net:
+    environment:
+      POSTGRES_USER: codimd
+      POSTGRES_PASSWORD: codimd
+      POSTGRES_DB: codimd
+    volumes:
+      - codimd-db-data:/var/lib/postgresql/data
+    logging:
+      driver: "local"
+    restart: always
+
+  codimd:
+    image: gitlab-registry.cern.ch/authoring/notes/codimd:cernbox-integration
+    #image: gitlab-registry.cern.ch/authoring/notes/codimd:2.4.1 # TODO: remove
+    networks:
+      ocis-net:
+    environment:
+      CMD_DB_URL: postgres://codimd:codimd@codimd-db/codimd
+      CMD_AUTO_VERSION_CHECK: "false"
+      CMD_ALLOW_ANONYMOUS: "true"
+      CMD_ALLOW_ANONYMOUS_EDITS: "true"
+      CMD_ALLOW_ANONYMOUS_VIEWS: "true"
+      CMD_ALLOW_FREEURL: "true"
+      CMD_EMAIL: "false"
+      CMD_ALLOW_EMAIL_REGISTER: "false"
+      CMD_USESSL: "false"
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+      CMD_APPLIANCE_MODE: "true"
+      CMD_SAVE_WEBHOOK: https:/${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}/wopi/bridge
+      CMD_API_KEY: ${CODIMD_SECRET:-LoremIpsum456}
+      #CMD_DOMAIN: ocis.owncloud.test # TODO: remove
+      #CMD_URL_PATH: "byoa/codimd" # TODO: remove
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.codimd.entrypoints=https"
+      - "traefik.http.routers.codimd.rule=Host(`${CODIMD_DOMAIN:-codimd.owncloud.test}`)"
+      - "traefik.http.routers.codimd.tls.certresolver=http"
+      - "traefik.http.routers.codimd.service=codimd"
+      - "traefik.http.services.codimd.loadbalancer.server.port=3000"
+    logging:
+      driver: "local"
+    restart: always
+
 volumes:
   certs:
   ocis-data:
   wopi-data:
   wopi-logs:
+  codimd-db-data:
 
 networks:
   ocis-net:
