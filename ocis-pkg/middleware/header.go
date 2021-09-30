@@ -38,7 +38,6 @@ func Secure(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("X-Frame-Options", "DENY")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
-		w.Header().Set("X-XSS-Protection", "1; mode=block")
 
 		if r.TLS != nil {
 			w.Header().Set("Strict-Transport-Security", "max-age=31536000")
