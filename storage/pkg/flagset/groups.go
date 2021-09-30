@@ -21,6 +21,16 @@ func GroupsWithConfig(cfg *config.Config) []cli.Flag {
 
 		// Services
 
+		// Gateway
+
+		&cli.StringFlag{
+			Name:        "gateway-url",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142"),
+			Usage:       "URL to use for the storage gateway service",
+			EnvVars:     []string{"STORAGE_GATEWAY_ENDPOINT"},
+			Destination: &cfg.Reva.Gateway.Endpoint,
+		},
+
 		// Groupprovider
 
 		&cli.StringFlag{
