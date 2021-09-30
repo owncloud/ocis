@@ -38,7 +38,7 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 				Start(r.Context(), "ListUserGroups")
 			defer span.End()
 
-			span.SetAttributes(attribute.Any("groups", u.Groups))
+			span.SetAttributes(attribute.StringSlice("groups", u.Groups))
 
 			if len(u.Groups) > 0 {
 				mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: u.Groups})))
@@ -96,7 +96,7 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 		Start(r.Context(), "ListUserGroups")
 	defer span.End()
 
-	span.SetAttributes(attribute.Any("groups", groups))
+	span.SetAttributes(attribute.StringSlice("groups", groups))
 
 	mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: groups})))
 }
@@ -266,7 +266,7 @@ func (o Ocs) ListGroups(w http.ResponseWriter, r *http.Request) {
 		Start(r.Context(), "ListGroups")
 	defer span.End()
 
-	span.SetAttributes(attribute.Any("groups", groups))
+	span.SetAttributes(attribute.StringSlice("groups", groups))
 
 	mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: groups})))
 }

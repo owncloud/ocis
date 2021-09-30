@@ -27,7 +27,6 @@ import (
 	ocstracing "github.com/owncloud/ocis/ocs/pkg/tracing"
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
 	"github.com/pkg/errors"
-	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
@@ -149,8 +148,6 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 		Tracer("ocs").
 		Start(r.Context(), "GetUser")
 	defer span.End()
-
-	span.SetAttributes(attribute.Any("user", d))
 
 	mustNotFail(render.Render(w, r, response.DataRender(d)))
 }
