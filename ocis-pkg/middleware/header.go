@@ -35,11 +35,15 @@ func Cors(next http.Handler) http.Handler {
 // Secure writes required access headers to all requests.
 func Secure(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		// Indicates whether the browser is allowed to render this page in a <frame>, <iframe>, <embed> or <object>.
 		w.Header().Set("X-Frame-Options", "DENY")
+		// Does basically the same as X-Frame-Options.
+		w.Header().Set("Content-Security-Policy", "frame-ancestors 'none'")
+		// This header inidicates that MIME types advertised in the Content-Type headers should not be changed and be followed.
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 
 		if r.TLS != nil {
+			// Tell browsers that the website should only be accessed  using HTTPS.
 			w.Header().Set("Strict-Transport-Security", "max-age=31536000")
 		}
 
