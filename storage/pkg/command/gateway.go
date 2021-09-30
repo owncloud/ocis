@@ -167,6 +167,12 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 				},
 				"appregistry": map[string]interface{}{
 					"driver": "static",
+					"drivers": map[string]interface{}{
+						"static": map[string]interface{}{
+							"providers":  cfg.Reva.AppRegistry.Providers,
+							"mime_types": cfg.Reva.AppRegistry.MimeTypes,
+						},
+					},
 				},
 				"storageregistry": map[string]interface{}{
 					"driver": cfg.Reva.StorageRegistry.Driver,

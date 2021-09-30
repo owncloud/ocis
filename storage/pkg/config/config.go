@@ -1,6 +1,10 @@
 package config
 
-import "context"
+import (
+	"context"
+
+	registrypb "github.com/cs3org/go-cs3apis/cs3/app/registry/v1beta1"
+)
 
 // Log defines the available logging configuration.
 type Log struct {
@@ -60,6 +64,21 @@ type WopiDriver struct {
 	IopSecret      string
 	JWTSecret      string
 	WopiURL        string
+}
+
+// AppRegistry defines the available app registry configuration
+type AppRegistry struct {
+	Providers map[string]registrypb.ProviderInfo
+	MimeTypes map[string]MimeTypeConfig
+}
+
+// MimeTypeConfig defines the config for a mime type
+type MimeTypeConfig struct {
+	Extension   string
+	Name        string
+	Description string
+	Icon        string
+	DefaultApp  string
 }
 
 // Sharing defines the available sharing configuration.
@@ -450,6 +469,7 @@ type Reva struct {
 	StoragePublicLink PublicStorage
 	StorageMetadata   StoragePort
 	AppProvider       AppProvider
+	AppRegistry       AppRegistry
 	// Configs can be used to configure the reva instance.
 	// Services and Ports will be ignored if this is used
 	Configs map[string]interface{}
