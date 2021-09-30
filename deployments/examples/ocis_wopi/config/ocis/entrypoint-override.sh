@@ -21,8 +21,4 @@ ocis accounts update --password $STORAGE_LDAP_BIND_PASSWORD $REVA_USER_UUID
 echo "default secrets changed"
 echo "##################################################"
 
-ocis kill proxy
-sleep 10
-ocis proxy server # workaround for loading proxy configuration
-
 wait # wait for oCIS to exit
