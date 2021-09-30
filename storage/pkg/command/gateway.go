@@ -228,7 +228,7 @@ func rules(cfg *config.Config, logger log.Logger) map[string]map[string]interfac
 	}
 }
 
-func mimetypes(cfg *config.Config, logger log.Logger) (m map[string]map[string]string) {
+func mimetypes(cfg *config.Config, logger log.Logger) map[string]map[string]string {
 
 	type mimeTypeConfig struct {
 		Extension   string `json:"extension" mapstructure:"extension"`
@@ -252,7 +252,9 @@ func mimetypes(cfg *config.Config, logger log.Logger) (m map[string]map[string]s
 			logger.Error().Err(err).Msg("Failed to unmarshal storage registry rules")
 			return nil
 		}
+		var m map[string]map[string]string
 		if err := mapstructure.Decode(mimetypes, &m); err != nil {
+			logger.Error().Err(err).Msg("Failed to decode defaultapp registry mimetypes to mapstructure")
 			return nil
 		}
 		return m
@@ -333,7 +335,9 @@ func mimetypes(cfg *config.Config, logger log.Logger) (m map[string]map[string]s
 		},
 	}
 
+	var m map[string]map[string]string
 	if err := mapstructure.Decode(mimetypes, &m); err != nil {
+		logger.Error().Err(err).Msg("Failed to decode defaultapp registry mimetypes to mapstructure")
 		return nil
 	}
 	return m
