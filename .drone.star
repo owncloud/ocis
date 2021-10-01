@@ -282,7 +282,7 @@ def testOcisModule(ctx, module):
         },
         {
             "name": "scan-result-cache",
-            "image": "plugins/s3:1",
+            "image": "plugins/s3:latest",
             "settings": {
                 "endpoint": {
                     "from_secret": "cache_s3_endpoint",
@@ -1111,7 +1111,7 @@ def binaryRelease(ctx, name):
             },
             {
                 "name": "upload",
-                "image": "plugins/s3:1",
+                "image": "plugins/s3:latest",
                 "pull": "always",
                 "settings": settings,
                 "when": {
