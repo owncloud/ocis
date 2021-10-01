@@ -155,6 +155,23 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.StorageRegistry.JSON,
 		},
 
+		// app registry
+
+		&cli.StringFlag{
+			Name:        "app-registry-driver",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppRegistry.Driver, "static"),
+			Usage:       "driver of the app registry",
+			EnvVars:     []string{"STORAGE_APP_REGISTRY_DRIVER"},
+			Destination: &cfg.Reva.AppRegistry.Driver,
+		},
+		&cli.StringFlag{
+			Name:        "app-registry-mimetypes-json",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppRegistry.MimetypesJSON, ""),
+			Usage:       "JSON file containing the storage registry rules",
+			EnvVars:     []string{"STORAGE_APP_REGISTRY_MIMETYPES_JSON"},
+			Destination: &cfg.Reva.AppRegistry.MimetypesJSON,
+		},
+
 		// please note that STORAGE_FRONTEND_PUBLIC_URL is also defined in
 		// storage/pkg/flagset/frontend.go because this setting may be consumed
 		// by both the gateway and frontend service
