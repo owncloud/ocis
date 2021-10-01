@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Change - Make the drives create method odata compliant: [#2531](https://github.com/owncloud/ocis/pull/2531)
 * Enhancement - Add maximum files and size to archiver capabilities: [#2544](https://github.com/owncloud/ocis/pull/2544)
 * Enhancement - Expose the reva archiver in OCIS: [#2509](https://github.com/owncloud/ocis/pull/2509)
+* Enhancement - Make mimetype allow list configurable for app provider: [#2553](https://github.com/owncloud/ocis/pull/2553)
 * Enhancement - Add option to skip generation of demo users and groups: [#2495](https://github.com/owncloud/ocis/pull/2495)
 * Enhancement - Allow overriding the cookie based route by claim: [#2508](https://github.com/owncloud/ocis/pull/2508)
 * Enhancement - Redirect invalid links to oC Web: [#2493](https://github.com/owncloud/ocis/pull/2493)
@@ -65,6 +66,16 @@ The following sections list the changes for unreleased.
    The reva archiver can now be accessed through the storage frontend service
 
    https://github.com/owncloud/ocis/pull/2509
+
+* Enhancement - Make mimetype allow list configurable for app provider: [#2553](https://github.com/owncloud/ocis/pull/2553)
+
+   We've added a configuration option to configure the mimetype allow list introduced in
+   cs3org/reva#2095. This also makes it possible to set one application per mime type as a
+   default.
+
+   https://github.com/owncloud/ocis/issues/2563
+   https://github.com/owncloud/ocis/pull/2553
+   https://github.com/cs3org/reva/pull/2095
 
 * Enhancement - Add option to skip generation of demo users and groups: [#2495](https://github.com/owncloud/ocis/pull/2495)
 
