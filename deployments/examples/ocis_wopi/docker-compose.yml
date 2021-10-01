@@ -67,13 +67,13 @@ services:
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       OCIS_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
       # app registry
-      STORAGE_APP_REGISTRY_MIMETYPES_JSON: /var/tmp/ocis/.config/mimetypes.json
+      STORAGE_APP_REGISTRY_MIMETYPES_JSON: /var/tmp/ocis/app-config/mimetypes.json
       WEB_ASSET_PATH: /var/tmp/web # TODO: remove
       WEB_UI_CONFIG_APPS: files, search, media-viewer, external # TODO: remove
     volumes:
       - /home/kloucek/Projects/github.com/owncloud/web/dist:/var/tmp/web # TODO: remove
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
-      - ./config/ocis/mimetypes.json:/var/tmp/ocis/.config/mimetypes.json
+      - ./config/ocis/mimetypes.json:/var/tmp/ocis/app-config/mimetypes.json
       - ocis-data:/var/tmp/ocis
     labels:
       - "traefik.enable=true"
@@ -209,7 +209,7 @@ services:
     restart: always
 
   onlyoffice:
-    image: onlyoffice/documentserver:latest
+    image: onlyoffice/documentserver:6.4.0
     networks:
       ocis-net:
     environment:
