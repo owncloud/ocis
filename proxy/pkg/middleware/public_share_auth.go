@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"net/http"
-	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 )
@@ -10,7 +9,6 @@ import (
 const (
 	headerRevaAccessToken   = "x-access-token"
 	headerShareToken        = "public-token"
-	appProviderPathPrefix   = "/app/open"
 	basicAuthPasswordPrefix = "basic|"
 	authenticationType      = "publicshares"
 )
@@ -24,7 +22,7 @@ func PublicShareAuth(opts ...Option) func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Currently we only want to authenticate app open request coming from public shares.
 			shareToken := r.Header.Get(headerShareToken)
-			if shareToken == "" || !strings.HasPrefix(appProviderPathPrefix, r.URL.Path) {
+			if shareToken == "" {
 				// Don't authenticate
 				next.ServeHTTP(w, r)
 				return
