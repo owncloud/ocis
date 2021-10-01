@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-01T06:27:23+0000"
+date: "2021-10-01T07:05:52+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -108,13 +108,11 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### ocis server
+### ocis list
 
-Start fullstack server
+Lists running ocis extensions
 
-Usage: `ocis server [command options] [arguments...]`
-
-
+Usage: `ocis list [command options] [arguments...]`
 
 
 
@@ -129,36 +127,14 @@ Usage: `ocis server [command options] [arguments...]`
 
 
 
--debug-addr |  $OCIS_DEBUG_ADDR
-: Address to bind debug server. Default: `0.0.0.0:9010`.
 
 
--debug-token |  $OCIS_DEBUG_TOKEN
-: Token to grant metrics access.
 
 
--debug-pprof |  $OCIS_DEBUG_PPROF
-: Enable pprof debugging.
 
 
--debug-zpages |  $OCIS_DEBUG_ZPAGES
-: Enable zpages debugging.
 
 
--http-addr |  $OCIS_HTTP_ADDR
-: Address to bind http server. Default: `0.0.0.0:9000`.
-
-
--http-root |  $OCIS_HTTP_ROOT
-: Root path of http server. Default: `/`.
-
-
--grpc-addr |  $OCIS_GRPC_ADDR
-: Address to bind grpc server. Default: `0.0.0.0:9001`.
-
-
--extensions |  $OCIS_RUN_EXTENSIONS
-: Run specific extensions during supervised mode.
 
 ### ocis kill
 
@@ -216,6 +192,58 @@ Usage: `ocis run [command options] [arguments...]`
 
 
 
+### ocis server
+
+Start fullstack server
+
+Usage: `ocis server [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $OCIS_DEBUG_ADDR
+: Address to bind debug server. Default: `0.0.0.0:9010`.
+
+
+-debug-token |  $OCIS_DEBUG_TOKEN
+: Token to grant metrics access.
+
+
+-debug-pprof |  $OCIS_DEBUG_PPROF
+: Enable pprof debugging.
+
+
+-debug-zpages |  $OCIS_DEBUG_ZPAGES
+: Enable zpages debugging.
+
+
+-http-addr |  $OCIS_HTTP_ADDR
+: Address to bind http server. Default: `0.0.0.0:9000`.
+
+
+-http-root |  $OCIS_HTTP_ROOT
+: Root path of http server. Default: `/`.
+
+
+-grpc-addr |  $OCIS_GRPC_ADDR
+: Address to bind grpc server. Default: `0.0.0.0:9001`.
+
+
+-extensions |  $OCIS_RUN_EXTENSIONS
+: Run specific extensions during supervised mode.
+
 ### ocis health
 
 Check health status
@@ -247,34 +275,6 @@ Usage: `ocis health [command options] [arguments...]`
 
 
 
-### ocis list
-
-Lists running ocis extensions
-
-Usage: `ocis list [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
@@ -283,21 +283,57 @@ There are more subcommands to start the individual extensions. Please check the 
 
 Start storage and data provider for /home mount
 
-#### ocis storage-metadata
+#### ocis storage-public-link
 
-Start storage and data service for metadata
+Start storage public link storage
 
-#### ocis idp
+#### ocis storage-userprovider
 
-Start idp server
+Start storage userprovider service
+
+#### ocis accounts
+
+Start accounts server
+
+#### ocis glauth
+
+Start glauth server
+
+#### ocis ocs
+
+Start ocs server
+
+#### ocis storage-groupprovider
+
+Start storage groupprovider service
+
+#### ocis web
+
+Start web server
+
+#### ocis storage-sharing
+
+Start storage sharing service
+
+#### ocis store
+
+Start a go-micro store
+
+#### ocis webdav
+
+Start webdav server
 
 #### ocis storage-auth-basic
 
 Start storage auth-basic service
 
-#### ocis storage-groupprovider
+#### ocis storage-auth-bearer
 
-Start storage groupprovider service
+Start storage auth-bearer service
+
+#### ocis storage-metadata
+
+Start storage and data service for metadata
 
 #### ocis storage-users
 
@@ -307,9 +343,17 @@ Start storage and data provider for /users mount
 
 Start thumbnails server
 
-#### ocis glauth
+#### ocis version
 
-Start glauth server
+Lists running services with version
+
+#### ocis idp
+
+Start idp server
+
+#### ocis storage-frontend
+
+Start storage frontend
 
 #### ocis settings
 
@@ -319,55 +363,11 @@ Start settings server
 
 Start storage gateway
 
-#### ocis storage-sharing
-
-Start storage sharing service
-
-#### ocis storage-userprovider
-
-Start storage userprovider service
-
-#### ocis store
-
-Start a go-micro store
-
-#### ocis storage-app-provider
-
-Start storage app-provider service
-
-#### ocis storage-frontend
-
-Start storage frontend
-
-#### ocis version
-
-Lists running services with version
-
-#### ocis web
-
-Start web server
-
-#### ocis storage-auth-bearer
-
-Start storage auth-bearer service
-
-#### ocis accounts
-
-Start accounts server
-
-#### ocis ocs
-
-Start ocs server
-
-#### ocis storage-public-link
-
-Start storage public link storage
-
 #### ocis proxy
 
 Start proxy server
 
-#### ocis webdav
+#### ocis storage-app-provider
 
-Start webdav server
+Start storage app-provider service
 
