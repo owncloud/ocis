@@ -1142,18 +1142,12 @@ Scenario Outline: search for entry by pattern
 -   [apiWebdavOperations/search.feature:255](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L255) Scenario: search for entries across various folders by tags using REPORT method
 
 And other missing implementation of favorites
--   [apiFavorites/favorites.feature:91](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L91)
--   [apiFavorites/favorites.feature:92](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L92)
--   [apiFavorites/favorites.feature:112](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L112)
--   [apiFavorites/favorites.feature:113](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L113)
 -   [apiFavorites/favorites.feature:128](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L128)
 -   [apiFavorites/favorites.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L129)
 -   [apiFavorites/favorites.feature:148](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L148)
 -   [apiFavorites/favorites.feature:149](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L149)
 -   [apiFavorites/favorites.feature:176](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L176)
 -   [apiFavorites/favorites.feature:177](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L177)
--   [apiFavorites/favorites.feature:217](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L217)
--   [apiFavorites/favorites.feature:218](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L218)
 -   [apiFavorites/favoritesSharingToShares.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favoritesSharingToShares.feature#L21)
 -   [apiFavorites/favoritesSharingToShares.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favoritesSharingToShares.feature#L22)
 -   [apiFavorites/favoritesSharingToShares.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favoritesSharingToShares.feature#L35)
