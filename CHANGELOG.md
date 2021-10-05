@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the account resolver middleware: [#2557](https://github.com/owncloud/ocis/pull/2557)
 * Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
 * Bugfix - Remove notifications placeholder: [#2514](https://github.com/owncloud/ocis/pull/2514)
+* Bugfix - Race condition in config parsing: [#2574](https://github.com/owncloud/ocis/pull/2574)
 * Change - Make the drives create method odata compliant: [#2531](https://github.com/owncloud/ocis/pull/2531)
 * Enhancement - Add maximum files and size to archiver capabilities: [#2544](https://github.com/owncloud/ocis/pull/2544)
 * Enhancement - Expose the reva archiver in OCIS: [#2509](https://github.com/owncloud/ocis/pull/2509)
@@ -45,6 +46,13 @@ The following sections list the changes for unreleased.
    having to poll a (non-existent) notifications endpoint.
 
    https://github.com/owncloud/ocis/pull/2514
+
+* Bugfix - Race condition in config parsing: [#2574](https://github.com/owncloud/ocis/pull/2574)
+
+   There was a race condition in the config parsing when configuring the storage services caused
+   by services overwriting a pointer to a config value. We fixed it by setting sane defaults.
+
+   https://github.com/owncloud/ocis/pull/2574
 
 * Change - Make the drives create method odata compliant: [#2531](https://github.com/owncloud/ocis/pull/2531)
 
