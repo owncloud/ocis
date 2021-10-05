@@ -201,8 +201,9 @@ func NewSharing(cfg *ociscfg.Config) suture.Service {
 func (s SharingSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.Sharing.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range Sharing(s.cfg).Flags {
-		if err := Sharing(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := Sharing(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

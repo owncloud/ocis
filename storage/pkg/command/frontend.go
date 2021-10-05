@@ -338,8 +338,9 @@ func NewFrontend(cfg *ociscfg.Config) suture.Service {
 func (s FrontendSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.Frontend.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range Frontend(s.cfg).Flags {
-		if err := Frontend(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := Frontend(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}
