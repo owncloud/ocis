@@ -22,6 +22,7 @@ The following sections list the changes for unreleased.
 * Enhancement - TLS config options for ldap in reva: [#2492](https://github.com/owncloud/ocis/pull/2492)
 * Enhancement - Set reva JWT token expiration time to 24 hours by default: [#2527](https://github.com/owncloud/ocis/pull/2527)
 * Enhancement - Update reva to v1.13.1-0.20211001063718-477bb18843a9: [#2566](https://github.com/owncloud/ocis/pull/2566)
+* Enhancement - Update reva to v1.13.1-0.20210917065320-df33e69a6bdc: [#2520](https://github.com/owncloud/ocis/pull/2520)
 
 ## Details
 
@@ -168,6 +169,17 @@ The following sections list the changes for unreleased.
   * Enhancement [cs3org/reva#2100](https://github.com/cs3org/reva/pull/2100): Resource id based archiver for zip/tar downloads
 
    https://github.com/owncloud/ocis/pull/2566
+
+* Enhancement - Update reva to v1.13.1-0.20210917065320-df33e69a6bdc: [#2520](https://github.com/owncloud/ocis/pull/2520)
+
+   Updated reva to version v1.13.1-0.20210917065320-df33e69a6bdc This update includes:
+
+   Enhancement [cs3org#reva#2071](https://github.com/cs3org/reva/pull/2071):
+   Implement listing favorites via the dav report API Enhancement
+   [cs3org#reva#2053](https://github.com/cs3org/reva/pull/2053): Use safer defaults for
+   TLS verification on LDAP connections
+
+   https://github.com/owncloud/ocis/pull/2520
 # Changelog for [1.12.0] (2021-09-14)
 
 The following sections list the changes for 1.12.0.
