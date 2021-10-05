@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix the account resolver middleware: [#2557](https://github.com/owncloud/ocis/pull/2557)
+* Bugfix - Fix version information for extensions: [#2575](https://github.com/owncloud/ocis/pull/2575)
 * Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
 * Bugfix - Remove notifications placeholder: [#2514](https://github.com/owncloud/ocis/pull/2514)
 * Bugfix - Race condition in config parsing: [#2574](https://github.com/owncloud/ocis/pull/2574)
@@ -30,6 +31,13 @@ The following sections list the changes for unreleased.
    present. Added a step to get the token for the user.
 
    https://github.com/owncloud/ocis/pull/2557
+
+* Bugfix - Fix version information for extensions: [#2575](https://github.com/owncloud/ocis/pull/2575)
+
+   We've fixed the behavior for `ocis version` which previously always showed `0.0.0` as version
+   for extensions. Now the real version of the extensions are shown.
+
+   https://github.com/owncloud/ocis/pull/2575
 
 * Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
 
