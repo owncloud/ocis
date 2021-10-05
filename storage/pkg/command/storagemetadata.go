@@ -201,8 +201,9 @@ func NewStorageMetadata(cfg *ociscfg.Config) suture.Service {
 func (s SutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.StorageMetadata.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range StorageMetadata(s.cfg).Flags {
-		if err := StorageMetadata(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := StorageMetadata(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

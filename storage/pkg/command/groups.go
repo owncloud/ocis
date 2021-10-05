@@ -175,8 +175,9 @@ func NewGroupProvider(cfg *ociscfg.Config) suture.Service {
 func (s GroupProvider) Serve(ctx context.Context) error {
 	s.cfg.Reva.Groups.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range Groups(s.cfg).Flags {
-		if err := Groups(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := Groups(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

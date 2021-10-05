@@ -141,8 +141,9 @@ func NewAppProvider(cfg *ociscfg.Config) suture.Service {
 func (s AppProviderSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.AppProvider.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range AppProvider(s.cfg).Flags {
-		if err := AppProvider(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := AppProvider(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

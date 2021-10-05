@@ -195,8 +195,9 @@ func NewUserProvider(cfg *ociscfg.Config) suture.Service {
 func (s UserProvider) Serve(ctx context.Context) error {
 	s.cfg.Reva.Users.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range Users(s.cfg).Flags {
-		if err := Users(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := Users(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

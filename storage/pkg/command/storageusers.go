@@ -169,8 +169,9 @@ func NewStorageUsers(cfg *ociscfg.Config) suture.Service {
 func (s StorageUsersSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.StorageUsers.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range StorageUsers(s.cfg).Flags {
-		if err := StorageUsers(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := StorageUsers(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

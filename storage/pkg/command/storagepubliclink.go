@@ -134,8 +134,9 @@ func NewStoragePublicLink(cfg *ociscfg.Config) suture.Service {
 func (s StoragePublicLinkSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.StoragePublicLink.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range StoragePublicLink(s.cfg).Flags {
-		if err := StoragePublicLink(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := StoragePublicLink(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

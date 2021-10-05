@@ -169,8 +169,9 @@ func NewStorageHome(cfg *ociscfg.Config) suture.Service {
 func (s StorageHomeSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.StorageHome.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range StorageHome(s.cfg).Flags {
-		if err := StorageHome(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := StorageHome(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

@@ -160,8 +160,9 @@ func NewAuthBasic(cfg *ociscfg.Config) suture.Service {
 func (s AuthBasicSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.AuthBasic.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range AuthBasic(s.cfg).Flags {
-		if err := AuthBasic(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := AuthBasic(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

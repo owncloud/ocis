@@ -139,8 +139,9 @@ func NewAuthBearer(cfg *ociscfg.Config) suture.Service {
 func (s AuthBearerSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.AuthBearer.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range AuthBearer(s.cfg).Flags {
-		if err := AuthBearer(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := AuthBearer(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}
