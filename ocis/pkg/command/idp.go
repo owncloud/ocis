@@ -5,8 +5,8 @@ import (
 	svcconfig "github.com/owncloud/ocis/idp/pkg/config"
 	"github.com/owncloud/ocis/idp/pkg/flagset"
 	"github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/ocis/pkg/register"
-	"github.com/owncloud/ocis/ocis/pkg/version"
 	"github.com/urfave/cli/v2"
 )
 

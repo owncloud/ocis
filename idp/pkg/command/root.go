@@ -7,10 +7,10 @@ import (
 
 	"github.com/owncloud/ocis/idp/pkg/config"
 	"github.com/owncloud/ocis/idp/pkg/flagset"
-	"github.com/owncloud/ocis/idp/pkg/version"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/spf13/viper"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"

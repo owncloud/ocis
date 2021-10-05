@@ -9,9 +9,9 @@ import (
 
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/settings/pkg/config"
 	"github.com/owncloud/ocis/settings/pkg/flagset"
-	"github.com/owncloud/ocis/settings/pkg/version"
 	"github.com/spf13/viper"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"

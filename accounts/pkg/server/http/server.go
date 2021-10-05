@@ -6,10 +6,10 @@ import (
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/accounts/pkg/assets"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
-	"github.com/owncloud/ocis/accounts/pkg/version"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 )
 
 // Server initializes the http service and server.

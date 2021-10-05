@@ -5,9 +5,9 @@ import (
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	webmid "github.com/owncloud/ocis/web/pkg/middleware"
 	svc "github.com/owncloud/ocis/web/pkg/service/v0"
-	"github.com/owncloud/ocis/web/pkg/version"
 )
 
 // Server initializes the http service and server.
