@@ -103,6 +103,7 @@ func authBasicConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 		},
 		"shared": map[string]interface{}{
 			"jwt_secret": cfg.Reva.JWTSecret,
+			"gatewaysvc": cfg.Reva.Gateway.Endpoint,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.AuthBasic.GRPCNetwork,

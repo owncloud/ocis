@@ -145,6 +145,16 @@ func UsersWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_USERPROVIDER_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH"},
 			Destination: &cfg.Reva.UserOwnCloudSQL.EnableMedialSearch,
 		},
+
+		// Gateway
+
+		&cli.StringFlag{
+			Name:        "gateway-url",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142"),
+			Usage:       "URL to use for the storage gateway service",
+			EnvVars:     []string{"STORAGE_GATEWAY_ENDPOINT"},
+			Destination: &cfg.Reva.Gateway.Endpoint,
+		},
 	}
 
 	flags = append(flags, TracingWithConfig(cfg)...)

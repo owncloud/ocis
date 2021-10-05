@@ -110,6 +110,7 @@ func usersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interf
 		},
 		"shared": map[string]interface{}{
 			"jwt_secret": cfg.Reva.JWTSecret,
+			"gatewaysvc": cfg.Reva.Gateway.Endpoint,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.Users.GRPCNetwork,
