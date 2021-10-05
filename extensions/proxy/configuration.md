@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-05T16:03:36+0000"
+date: "2021-10-05T17:08:40+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -34,66 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Command-line flags
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### proxy ocis-proxy
-
-proxy for oCIS
-
-Usage: `proxy ocis-proxy [command options] [arguments...]`
-
-
--log-level |  $PROXY_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
-
--log-pretty |  $PROXY_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
-
--log-color |  $PROXY_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
-
-
--extensions | 
-: Run specific extensions during supervised mode.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### proxy server
 
@@ -169,10 +109,6 @@ Usage: `proxy server [command options] [arguments...]`
 
 -http-root |  $PROXY_HTTP_ROOT
 : Root path of http server. Default: `"/"`.
-
-
--asset-path |  $PROXY_ASSET_PATH
-: Path to custom assets. Default: `""`.
 
 
 -service-namespace |  $PROXY_SERVICE_NAMESPACE
@@ -306,7 +242,6 @@ Usage: `proxy version [command options] [arguments...]`
 
 
 
-
 -service-namespace |  $PROXY_SERVICE_NAMESPACE
 : Set the base namespace for the service namespace. Default: `"com.owncloud.web"`.
 
@@ -327,6 +262,64 @@ Usage: `proxy health [command options] [arguments...]`
 
 -debug-addr |  $PROXY_DEBUG_ADDR
 : Address to debug endpoint. Default: `"0.0.0.0:9109"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### proxy ocis-proxy
+
+proxy for oCIS
+
+Usage: `proxy ocis-proxy [command options] [arguments...]`
+
+
+-log-level |  $PROXY_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+
+-log-pretty |  $PROXY_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+
+-log-color |  $PROXY_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
+
+-extensions | 
+: Run specific extensions during supervised mode.
 
 
 
