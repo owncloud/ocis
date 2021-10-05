@@ -141,13 +141,6 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.HTTP.Root,
 		},
 		&cli.StringFlag{
-			Name:        "asset-path",
-			Value:       flags.OverrideDefaultString(cfg.Asset.Path, ""),
-			Usage:       "Path to custom assets",
-			EnvVars:     []string{"PROXY_ASSET_PATH"},
-			Destination: &cfg.Asset.Path,
-		},
-		&cli.StringFlag{
 			Name:        "service-namespace",
 			Value:       flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web"),
 			Usage:       "Set the base namespace for the service namespace",

@@ -45,11 +45,6 @@ type Tracing struct {
 	Service   string
 }
 
-// Asset defines the available asset configuration.
-type Asset struct {
-	Path string
-}
-
 // Policy enables us to use multiple directors.
 type Policy struct {
 	Name   string
@@ -113,7 +108,6 @@ type Config struct {
 	HTTP                  HTTP
 	Service               Service
 	Tracing               Tracing
-	Asset                 Asset
 	Policies              []Policy
 	OIDC                  OIDC
 	TokenManager          TokenManager
