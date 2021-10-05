@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-05T16:03:15+0000"
+date: "2021-10-05T16:03:36+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -34,6 +34,102 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Command-line flags
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### settings server
+
+Start integrated server
+
+Usage: `settings server [command options] [arguments...]`
+
+
+
+
+
+
+-config-file |  $SETTINGS_CONFIG_FILE
+: Path to config file.
+
+
+-tracing-enabled |  $SETTINGS_TRACING_ENABLED , $OCIS_TRACING_ENABLED
+: Enable sending traces.
+
+
+-tracing-type |  $SETTINGS_TRACING_TYPE , $OCIS_TRACING_TYPE
+: Tracing backend type. Default: `"jaeger"`.
+
+
+-tracing-endpoint |  $SETTINGS_TRACING_ENDPOINT , $OCIS_TRACING_ENDPOINT
+: Endpoint for the agent. Default: `""`.
+
+
+-tracing-collector |  $SETTINGS_TRACING_COLLECTOR , $OCIS_TRACING_COLLECTOR
+: Endpoint for the collector. Default: `""`.
+
+
+-tracing-service |  $SETTINGS_TRACING_SERVICE
+: Service name for tracing. Default: `"settings"`.
+
+
+-debug-addr |  $SETTINGS_DEBUG_ADDR
+: Address to bind debug server. Default: `"0.0.0.0:9194"`.
+
+
+-debug-token |  $SETTINGS_DEBUG_TOKEN
+: Token to grant metrics access. Default: `""`.
+
+
+-debug-pprof |  $SETTINGS_DEBUG_PPROF
+: Enable pprof debugging.
+
+
+-debug-zpages |  $SETTINGS_DEBUG_ZPAGES
+: Enable zpages debugging.
+
+
+-http-addr |  $SETTINGS_HTTP_ADDR
+: Address to bind http server. Default: `"0.0.0.0:9190"`.
+
+
+-http-namespace |  $SETTINGS_HTTP_NAMESPACE
+: Set the base namespace for the http namespace. Default: `"com.owncloud.web"`.
+
+
+-http-root |  $SETTINGS_HTTP_ROOT
+: Root path of http server. Default: `"/"`.
+
+
+-http-cache-ttl |  $SETTINGS_CACHE_TTL
+: Set the static assets caching duration in seconds. Default: `604800`.
+
+
+-grpc-addr |  $SETTINGS_GRPC_ADDR
+: Address to bind grpc server. Default: `"0.0.0.0:9191"`.
+
+
+-asset-path |  $SETTINGS_ASSET_PATH
+: Path to custom assets. Default: `""`.
+
+
+-grpc-namespace |  $SETTINGS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
+
+-name |  $SETTINGS_NAME
+: service name. Default: `"settings"`.
+
+
+-data-path |  $SETTINGS_DATA_PATH
+: Mount path for the storage. Default: `"/var/tmp/ocis/settings"`.
+
+
+-jwt-secret |  $SETTINGS_JWT_SECRET , $OCIS_JWT_SECRET
+: Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `"Pive-Fumkiu4"`.
+
+
+-extensions | 
+: Run specific extensions during supervised mode. This flag is set by the runtime.
+
+
 
 ### settings version
 
@@ -149,102 +245,6 @@ Usage: `settings ocis-settings [command options] [arguments...]`
 
 
 
-
-
-
-### settings server
-
-Start integrated server
-
-Usage: `settings server [command options] [arguments...]`
-
-
-
-
-
-
--config-file |  $SETTINGS_CONFIG_FILE
-: Path to config file.
-
-
--tracing-enabled |  $SETTINGS_TRACING_ENABLED , $OCIS_TRACING_ENABLED
-: Enable sending traces.
-
-
--tracing-type |  $SETTINGS_TRACING_TYPE , $OCIS_TRACING_TYPE
-: Tracing backend type. Default: `"jaeger"`.
-
-
--tracing-endpoint |  $SETTINGS_TRACING_ENDPOINT , $OCIS_TRACING_ENDPOINT
-: Endpoint for the agent. Default: `""`.
-
-
--tracing-collector |  $SETTINGS_TRACING_COLLECTOR , $OCIS_TRACING_COLLECTOR
-: Endpoint for the collector. Default: `""`.
-
-
--tracing-service |  $SETTINGS_TRACING_SERVICE
-: Service name for tracing. Default: `"settings"`.
-
-
--debug-addr |  $SETTINGS_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9194"`.
-
-
--debug-token |  $SETTINGS_DEBUG_TOKEN
-: Token to grant metrics access. Default: `""`.
-
-
--debug-pprof |  $SETTINGS_DEBUG_PPROF
-: Enable pprof debugging.
-
-
--debug-zpages |  $SETTINGS_DEBUG_ZPAGES
-: Enable zpages debugging.
-
-
--http-addr |  $SETTINGS_HTTP_ADDR
-: Address to bind http server. Default: `"0.0.0.0:9190"`.
-
-
--http-namespace |  $SETTINGS_HTTP_NAMESPACE
-: Set the base namespace for the http namespace. Default: `"com.owncloud.web"`.
-
-
--http-root |  $SETTINGS_HTTP_ROOT
-: Root path of http server. Default: `"/"`.
-
-
--http-cache-ttl |  $SETTINGS_CACHE_TTL
-: Set the static assets caching duration in seconds. Default: `604800`.
-
-
--grpc-addr |  $SETTINGS_GRPC_ADDR
-: Address to bind grpc server. Default: `"0.0.0.0:9191"`.
-
-
--asset-path |  $SETTINGS_ASSET_PATH
-: Path to custom assets. Default: `""`.
-
-
--grpc-namespace |  $SETTINGS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
-
-
--name |  $SETTINGS_NAME
-: service name. Default: `"settings"`.
-
-
--data-path |  $SETTINGS_DATA_PATH
-: Mount path for the storage. Default: `"/var/tmp/ocis/settings"`.
-
-
--jwt-secret |  $SETTINGS_JWT_SECRET , $OCIS_JWT_SECRET
-: Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `"Pive-Fumkiu4"`.
-
-
--extensions | 
-: Run specific extensions during supervised mode. This flag is set by the runtime.
 
 
 
