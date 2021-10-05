@@ -1,4 +1,5 @@
-IMPORT := github.com/owncloud/ocis/$(NAME)
+OCIS_REPO := github.com/owncloud/ocis
+IMPORT := ($OCIS_REPO)/$(NAME)
 BIN := bin
 DIST := dist
 
@@ -40,8 +41,8 @@ ifndef DATE
 	DATE := $(shell date -u '+%Y%m%d')
 endif
 
-LDFLAGS += -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn -s -w -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
-DEBUG_LDFLAGS += -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
+LDFLAGS += -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn -s -w -X "$(OCIS_REPO)/ocis-pkg/version.String=$(VERSION)" -X "$(OCIS_REPO)/ocis-pkg/version.Date=$(DATE)"
+DEBUG_LDFLAGS += -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn -X "$(OCIS_REPO)/ocis-pkg/version.String=$(VERSION)" -X "$(OCIS_REPO)/ocis-pkg/version.Date=$(DATE)"
 
 GCFLAGS += all=-N -l
 

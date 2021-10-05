@@ -12,6 +12,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
@@ -124,6 +125,7 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 				"com.owncloud.storage.metadata",
 				uuid.Must(uuid.NewV4()).String(),
 				cfg.Reva.StorageMetadata.GRPCAddr,
+				version.String,
 				logger,
 			); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the grpc endpoint")

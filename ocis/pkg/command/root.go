@@ -10,9 +10,9 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/ocis/pkg/flagset"
 	"github.com/owncloud/ocis/ocis/pkg/register"
-	"github.com/owncloud/ocis/ocis/pkg/version"
 	"github.com/spf13/viper"
 )
 

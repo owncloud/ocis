@@ -13,6 +13,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 
 	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
@@ -64,6 +65,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 					"com.owncloud.storage",
 					uuid.String(),
 					cfg.Reva.Gateway.GRPCAddr,
+					version.String,
 					logger,
 				)
 
