@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix version information for extensions: [#2575](https://github.com/owncloud/ocis/pull/2575)
 * Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
 * Bugfix - Remove notifications placeholder: [#2514](https://github.com/owncloud/ocis/pull/2514)
+* Bugfix - Remove asset path configuration option from proxy: [#2576](https://github.com/owncloud/ocis/pull/2576)
 * Bugfix - Race condition in config parsing: [#2574](https://github.com/owncloud/ocis/pull/2574)
 * Change - Make the drives create method odata compliant: [#2531](https://github.com/owncloud/ocis/pull/2531)
 * Enhancement - Add maximum files and size to archiver capabilities: [#2544](https://github.com/owncloud/ocis/pull/2544)
@@ -56,6 +57,13 @@ The following sections list the changes for unreleased.
    having to poll a (non-existent) notifications endpoint.
 
    https://github.com/owncloud/ocis/pull/2514
+
+* Bugfix - Remove asset path configuration option from proxy: [#2576](https://github.com/owncloud/ocis/pull/2576)
+
+   We've remove the asset path configuration option (`--asset-path` or `PROXY_ASSET_PATH`)
+   since it didn't do anything at all.
+
+   https://github.com/owncloud/ocis/pull/2576
 
 * Bugfix - Race condition in config parsing: [#2574](https://github.com/owncloud/ocis/pull/2574)
 
