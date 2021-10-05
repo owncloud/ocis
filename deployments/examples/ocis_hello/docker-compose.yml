@@ -60,6 +60,7 @@ services:
       STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
+      OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       # web ui
       WEB_UI_CONFIG: "/var/tmp/ocis/.config/web-config.json"
       # proxy

@@ -77,6 +77,8 @@ See also [example server setup]({{< ref "preparing_server" >}})
       OCIS_JWT_SECRET=
       # JWT secret which is used for uploads to create transfer tokens. Must be changed in order to have a secure oCIS. Defaults to "replace-me-with-a-transfer-secret"
       STORAGE_TRANSFER_SECRET=
+      # Machine auth api key secret. Must be changed in order to have a secure oCIS. Defaults to "change-me-please"
+      OCIS_MACHINE_AUTH_API_KEY=
 
       ### MINIO / S3 settings ###
       # Domain of MinIO where the Web UI is accessible. Defaults to "minio.owncloud.test".
