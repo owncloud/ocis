@@ -42,6 +42,9 @@ You can change it by setting the `OCIS_JWT_SECRET` environment variable for oCIS
 Another is used secret for singing JWT tokens for uploads and downloads, which also needs to be changed by the user.
 You can change it by setting the `STORAGE_TRANSFER_SECRET` environment variable for oCIS to a random string.
 
+One more secret is used for machine auth, so that external applications can authenticate with an API key.
+You can change it by setting the `OCIS_MACHINE_AUTH_API_KEY` environment variable for oCIS to a random string.
+
 ### Delete demo users
 
 {{< hint info >}}
