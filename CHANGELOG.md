@@ -77,6 +77,7 @@ The following sections list the changes for unreleased.
    When creating a space on the graph API we now use the POST Body to provide the parameters.
 
    https://github.com/owncloud/ocis/pull/2531
+   https://github.com/owncloud/ocis/pull/2535
    https://www.odata.org/getting-started/basic-tutorial/#modifyData
 
 * Enhancement - Add maximum files and size to archiver capabilities: [#2544](https://github.com/owncloud/ocis/pull/2544)
