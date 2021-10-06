@@ -17,6 +17,7 @@
     - "*.oc10-ocis-parallel.latest.owncloud.works"
 
   vars:
+    os_env_umask: 022 # https://github.com/dev-sec/ansible-collection-hardening/blob/master/roles/os_hardening/README.md#variables
     ssh_authorized_keys:
       - https://github.com/butonic.keys
       - https://github.com/C0rby.keys
