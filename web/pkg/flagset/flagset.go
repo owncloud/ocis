@@ -184,7 +184,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringSliceFlag{
 			Name:    "web-config-app",
-			Value:   cli.NewStringSlice("files", "search", "media-viewer"),
+			Value:   cli.NewStringSlice("files", "search", "media-viewer", "external"),
 			Usage:   `--web-config-app files [--web-config-app draw-io]`,
 			EnvVars: []string{"WEB_UI_CONFIG_APPS"},
 		},
