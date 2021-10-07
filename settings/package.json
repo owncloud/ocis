@@ -77,6 +77,6 @@
     "not dead"
   ],
   "peerDependencies": {
-    "owncloud-design-system": "^9.3.0"
+    "owncloud-design-system": "^10.0.0"
   }
 }
