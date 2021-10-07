@@ -11,14 +11,14 @@ geekdocFilePath: release_notes.md
 
 Version 1.13.0 brings progress on the backend for the 'Spaces' feature. ownCloud Web and Infinite Scale now provide ZIP/TAR download for multiple files/folders and can integrate external file viewer/editor applications (e.g., Collabora Online, ONLYOFFICE, CodiMD, Microsoft Office Online). 
 
-The most prominent changes in ownCloud Infinite Scale 1.13.0 and ownCloud Web 5.0.0 comprise:
+The most prominent changes in ownCloud Infinite Scale 1.13.0 and ownCloud Web 4.3.0 comprise:
 
 - Infinite Scale and Web now allow downloading multiple files or folders as archives [ocis#2509](https://github.com/owncloud/ocis/pull/2509) [cs3org/reva#2088](https://github.com/cs3org/reva/pull/2088)
 - Infinite Scale and Web can now integrate external applications like file viewers/editors via the [cs3org/wopiserver](https://github.com/cs3org/wopiserver) (e.g., Collabora Online, ONLYOFFICE, CodiMD, Microsoft Office Online). The feature has been integrated for authenticated users and public links. [web#5805](https://github.com/owncloud/web/pull/5805)
 - The 'Shared with me' page in ownCloud Web now clearly separates pending, declined and accepted shares. Pending shares are always displayed prominently so that users are aware and can react accordingly. [web#5814](https://github.com/owncloud/web/pull/5814)
 - Legacy URLs (e.g., from the address bar, public links) from ownCloud Classic are now properly resolved after migrating to Infinite Scale and Web [cs3org/reva#1089](https://github.com/cs3org/reva/pull/1989)
 
-You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.13.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v5.0.0) for further details on what has changed.
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.13.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v4.3.0) for further details on what has changed.
 
 ### Breaking changes
 {{< hint warning >}}
