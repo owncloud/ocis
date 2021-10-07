@@ -161,8 +161,8 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "reva-gateway-addr",
 			Value:       flags.OverrideDefaultString(cfg.RevaAddress, "127.0.0.1:9142"),
-			Usage:       "REVA Gateway Endpoint",
-			EnvVars:     []string{"OCS_REVA_GATEWAY_ADDR"},
+			Usage:       "Address of REVA gateway endpoint",
+			EnvVars:     []string{"REVA_GATEWAY"},
 			Destination: &cfg.RevaAddress,
 		},
 		&cli.StringFlag{

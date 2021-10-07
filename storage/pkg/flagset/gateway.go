@@ -49,15 +49,15 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "addr",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.GRPCAddr, "0.0.0.0:9142"),
-			Usage:       "Address to bind storage service",
+			Usage:       "Address to bind REVA service",
 			EnvVars:     []string{"STORAGE_GATEWAY_GRPC_ADDR"},
 			Destination: &cfg.Reva.Gateway.GRPCAddr,
 		},
 		&cli.StringFlag{
-			Name:        "endpoint",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142"),
-			Usage:       "endpoint to use for the storage service",
-			EnvVars:     []string{"STORAGE_GATEWAY_ENDPOINT"},
+			Name:        "reva-gateway-addr",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "127.0.0.1:9142"),
+			Usage:       "Address of REVA gateway endpoint",
+			EnvVars:     []string{"REVA_GATEWAY"},
 			Destination: &cfg.Reva.Gateway.Endpoint,
 		},
 		&cli.StringSliceFlag{
