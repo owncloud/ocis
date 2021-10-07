@@ -47,10 +47,10 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.Gateway.GRPCNetwork,
 		},
 		&cli.StringFlag{
-			Name:        "reva-gateway-bind-addr",
+			Name:        "addr",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.GRPCAddr, "0.0.0.0:9142"),
 			Usage:       "Address to bind REVA service",
-			EnvVars:     []string{"REVA_GATEWAY_BIND_ADDR"},
+			EnvVars:     []string{"STORAGE_GATEWAY_GRPC_ADDR"},
 			Destination: &cfg.Reva.Gateway.GRPCAddr,
 		},
 		&cli.StringFlag{
