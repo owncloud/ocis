@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Remove asset path configuration option from proxy: [#2576](https://github.com/owncloud/ocis/pull/2576)
 * Bugfix - Race condition in config parsing: [#2574](https://github.com/owncloud/ocis/pull/2574)
 * Change - Make the drives create method odata compliant: [#2531](https://github.com/owncloud/ocis/pull/2531)
+* Change - Update ownCloud Web to v4.3.0: [#2589](https://github.com/owncloud/ocis/pull/2589)
 * Enhancement - Add maximum files and size to archiver capabilities: [#2544](https://github.com/owncloud/ocis/pull/2544)
 * Enhancement - Reduced repository size: [#2579](https://github.com/owncloud/ocis/pull/2579)
 * Enhancement - Expose the reva archiver in OCIS: [#2509](https://github.com/owncloud/ocis/pull/2509)
@@ -79,6 +80,16 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/2531
    https://github.com/owncloud/ocis/pull/2535
    https://www.odata.org/getting-started/basic-tutorial/#modifyData
+
+* Change - Update ownCloud Web to v4.3.0: [#2589](https://github.com/owncloud/ocis/pull/2589)
+
+   Tags: web
+
+   We updated ownCloud Web to v4.3.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2589
+   https://github.com/owncloud/web/releases/tag/v4.3.0
 
 * Enhancement - Add maximum files and size to archiver capabilities: [#2544](https://github.com/owncloud/ocis/pull/2544)
 
