@@ -1,4 +1,4 @@
-Technical Debt: Unify Envvar names configuring REVA gateway address
+Enhancement: Unify Envvar names configuring REVA gateway address
 
 We've renamed all envvars configuring REVA gateway address to `REVA_GATEWAY`, 
 additionally we renamed the cli parameters to `--reva-gateway-addr` and adjusted the description
