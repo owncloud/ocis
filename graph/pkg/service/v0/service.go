@@ -83,6 +83,7 @@ func NewService(opts ...Option) Service {
 
 						3. How are uploading images to the space being handled? Since an image is not a property of the Drive (speaking OData)
 						it can be handled directly by doing an upload to the storage itself.
+						4. Ditto for descriptions. We want to persist a space's description on a file inside the `.space` reserved folder.
 					*/
 					_, _ = w.Write([]byte(d))
 					w.WriteHeader(http.StatusOK)
