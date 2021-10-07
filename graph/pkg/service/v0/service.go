@@ -1,8 +1,17 @@
 package svc
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
+
+	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+
+	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
+	msgraph "github.com/owncloud/open-graph-api-go"
 
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	opkgm "github.com/owncloud/ocis/ocis-pkg/middleware"
@@ -67,7 +76,48 @@ func NewService(opts ...Option) Service {
 					account.JWTSecret(options.Config.TokenManager.JWTSecret)),
 				)
 				r.Patch("/", func(w http.ResponseWriter, r *http.Request) {
+					drive := msgraph.Drive{}
+
+					if err := json.NewDecoder(r.Body).Decode(&drive); err != nil {
+						errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Errorf("invalid schema definition").Error())
+						return
+					}
+
 					d := strings.ReplaceAll(chi.URLParam(r, "id"), `"`, "")
+
+					idParts := strings.Split(d, "!")
+					if len(idParts) != 2 {
+						errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Errorf("invalid resource id").Error())
+						w.WriteHeader(http.StatusInternalServerError)
+					}
+
+					storageID := idParts[0]
+					opaqueID := idParts[1]
+
+					client, err := svc.GetClient()
+					if err != nil {
+						errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+						return
+					}
+
+					updateSpaceRequest := &provider.UpdateStorageSpaceRequest{
+						StorageSpace: &provider.StorageSpace{
+							Root: &provider.ResourceId{
+								StorageId: storageID,
+								OpaqueId:  opaqueID,
+							},
+							Name: *drive.Name,
+						},
+					}
+
+					resp, err := client.UpdateStorageSpace(r.Context(), updateSpaceRequest)
+					if err != nil {
+						w.WriteHeader(http.StatusInternalServerError)
+					}
+
+					if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
+						errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Errorf("").Error())
+					}
 					/*
 						1. get storage space by id
 						2. prepare UpdateStorageSpaceRequest
