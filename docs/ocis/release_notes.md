@@ -14,7 +14,7 @@ Version 1.13.0 brings progress on the backend for the 'Spaces' feature. ownCloud
 The most prominent changes in ownCloud Infinite Scale 1.13.0 and ownCloud Web 4.3.0 comprise:
 
 - Infinite Scale and Web now allow downloading multiple files or folders as archives [ocis#2509](https://github.com/owncloud/ocis/pull/2509) [cs3org/reva#2088](https://github.com/cs3org/reva/pull/2088)
-- Infinite Scale and Web can now integrate external applications like file viewers/editors via the [cs3org/wopiserver](https://github.com/cs3org/wopiserver) (e.g., Collabora Online, ONLYOFFICE, CodiMD, Microsoft Office Online). The feature has been integrated for authenticated users and public links. [web#5805](https://github.com/owncloud/web/pull/5805)
+- Infinite Scale and Web can now integrate external applications like file viewers/editors via the [cs3org/wopiserver](https://github.com/cs3org/wopiserver) (e.g., Collabora Online, ONLYOFFICE, CodiMD, Microsoft Office Online). [web#5805](https://github.com/owncloud/web/pull/5805)
 - The 'Shared with me' page in ownCloud Web now clearly separates pending, declined and accepted shares. Pending shares are always displayed prominently so that users are aware and can react accordingly. [web#5814](https://github.com/owncloud/web/pull/5814)
 - Legacy URLs (e.g., from the address bar, public links) from ownCloud Classic are now properly resolved after migrating to Infinite Scale and Web [cs3org/reva#1089](https://github.com/cs3org/reva/pull/1989)
 
