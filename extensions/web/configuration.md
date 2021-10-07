@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-07T14:00:23+0000"
+date: "2021-10-07T16:12:11+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/web/templates
@@ -215,7 +215,7 @@ Usage: `web server [command options] [arguments...]`
 
 
 -web-config-app |  $WEB_UI_CONFIG_APPS
-: `--web-config-app files [--web-config-app draw-io]`. Default: `cli.NewStringSlice("files", "search", "media-viewer")`.
+: `--web-config-app files [--web-config-app draw-io]`. Default: `cli.NewStringSlice("files", "search", "media-viewer", "external")`.
 
 
 -oidc-metadata-url |  $WEB_OIDC_METADATA_URL
