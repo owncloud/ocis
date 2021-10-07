@@ -1452,7 +1452,9 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 -   [apiSharePublicLink2/allowGroupToCreatePublicLinks.feature:91](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/allowGroupToCreatePublicLinks.feature#L91)
 
 ### [Cannot download preview of shared received file after the shareowner has changed the file content](https://github.com/owncloud/ocis/issues/2538)
--   [apiWebdavPreviews/previews.feature:196](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L196)
+- [apiWebdavPreviews/previews.feature:196](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L196)
+- [apiWebdavPreviews/previews.feature:217](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L217)
+- [apiWebdavPreviews/previews.feature:233](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L233)
 
 ### [Preview of text file with UTF content does not render correctly](https://github.com/owncloud/ocis/issues/2570)
 -   [apiWebdavPreviews/previews.feature:208](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L208)
