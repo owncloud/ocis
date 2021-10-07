@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-07T11:35:32+0000"
+date: "2021-10-07T14:00:21+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocs/templates
@@ -194,8 +194,8 @@ Usage: `ocs server [command options] [arguments...]`
 : account-backend-type. Default: `"accounts"`.
 
 
--reva-gateway-addr |  $OCS_REVA_GATEWAY_ADDR
-: REVA Gateway Endpoint. Default: `"127.0.0.1:9142"`.
+-reva-gateway-addr |  $REVA_GATEWAY
+: Address of REVA gateway endpoint. Default: `"127.0.0.1:9142"`.
 
 
 -machine-auth-api-key |  $OCS_MACHINE_AUTH_API_KEY , $OCIS_MACHINE_AUTH_API_KEY

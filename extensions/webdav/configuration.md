@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-07T11:35:33+0000"
+date: "2021-10-07T14:00:23+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/webdav/templates
@@ -66,42 +66,6 @@ Usage: `webdav [global options] command [command options] [arguments...]`
 
 
 ## Sub Commands
-
-### webdav version
-
-Print the versions of the running instances
-
-Usage: `webdav version [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--http-namespace |  $WEBDAV_HTTP_NAMESPACE
-: Set the base namespace for service discovery. Default: `"com.owncloud.web"`.
-
-
--service-name |  $WEBDAV_SERVICE_NAME
-: Service name. Default: `"webdav"`.
 
 ### webdav health
 
@@ -228,4 +192,40 @@ Usage: `webdav server [command options] [arguments...]`
 : Run specific extensions during supervised mode. This flag is set by the runtime.
 
 
+
+### webdav version
+
+Print the versions of the running instances
+
+Usage: `webdav version [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-http-namespace |  $WEBDAV_HTTP_NAMESPACE
+: Set the base namespace for service discovery. Default: `"com.owncloud.web"`.
+
+
+-service-name |  $WEBDAV_SERVICE_NAME
+: Service name. Default: `"webdav"`.
 

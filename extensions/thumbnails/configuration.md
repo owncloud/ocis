@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-07T11:35:33+0000"
+date: "2021-10-07T14:00:22+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -34,6 +34,73 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Command-line flags
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### thumbnails health
+
+Check health status
+
+Usage: `thumbnails health [command options] [arguments...]`
+
+
+-debug-addr |  $THUMBNAILS_DEBUG_ADDR
+: Address to debug endpoint. Default: `"0.0.0.0:9189"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### thumbnails ocis-thumbnails
+
+Example usage
+
+Usage: `thumbnails ocis-thumbnails [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### thumbnails server
 
@@ -115,8 +182,8 @@ Usage: `thumbnails server [command options] [arguments...]`
 : Root path of the filesystem storage directory. Default: `/var/tmp/ocis/thumbnails`.
 
 
--reva-gateway-addr |  $THUMBNAILS_REVA_GATEWAY , $PROXY_REVA_GATEWAY_ADDR
-: Reva gateway address. Default: `"127.0.0.1:9142"`.
+-reva-gateway-addr |  $REVA_GATEWAY
+: Address of REVA gateway endpoint. Default: `"127.0.0.1:9142"`.
 
 
 -webdavsource-insecure |  $THUMBNAILS_WEBDAVSOURCE_INSECURE
@@ -173,71 +240,4 @@ Usage: `thumbnails version [command options] [arguments...]`
 
 -grpc-namespace |  $THUMBNAILS_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
-
-### thumbnails health
-
-Check health status
-
-Usage: `thumbnails health [command options] [arguments...]`
-
-
--debug-addr |  $THUMBNAILS_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9189"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### thumbnails ocis-thumbnails
-
-Example usage
-
-Usage: `thumbnails ocis-thumbnails [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

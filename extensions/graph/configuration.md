@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-07T11:35:32+0000"
+date: "2021-10-07T14:00:20+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/graph/templates
@@ -178,8 +178,8 @@ Usage: `graph server [command options] [arguments...]`
 : Used to validate the reva access JWT, should equal reva's jwt-secret. Default: `"Pive-Fumkiu4"`.
 
 
--reva-gateway-addr |  $REVA_GATEWAY_ADDR
-: REVA Gateway Endpoint. Default: `"127.0.0.1:9142"`.
+-reva-gateway-addr |  $REVA_GATEWAY
+: Address of REVA gateway endpoint. Default: `"127.0.0.1:9142"`.
 
 
 -extensions | 

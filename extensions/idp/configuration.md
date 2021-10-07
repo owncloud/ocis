@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-07T11:35:32+0000"
+date: "2021-10-07T14:00:21+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/idp/templates
@@ -34,79 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Command-line flags
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### idp version
-
-Print the versions of the running instances
-
-Usage: `idp version [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--http-namespace |  $IDP_HTTP_NAMESPACE
-: Set the base namespace for service discovery. Default: `"com.owncloud.web"`.
-
-
--name |  $IDP_NAME
-: Service name. Default: `"idp"`.
 
 ### idp health
 
@@ -485,4 +412,77 @@ Usage: `idp server [command options] [arguments...]`
 : Run specific extensions during supervised mode. This flag is set by the runtime.
 
 
+
+### idp version
+
+Print the versions of the running instances
+
+Usage: `idp version [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-http-namespace |  $IDP_HTTP_NAMESPACE
+: Set the base namespace for service discovery. Default: `"com.owncloud.web"`.
+
+
+-name |  $IDP_NAME
+: Service name. Default: `"idp"`.
 
