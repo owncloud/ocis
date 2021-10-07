@@ -72,7 +72,7 @@ services:
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/ocis/mimetypes.json:/var/tmp/ocis/app-config/mimetypes.json
-      - ocis-data:/var/tmp/ocis
+      - ocis-data:/var/lib/ocis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=https"

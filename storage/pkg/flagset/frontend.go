@@ -1,6 +1,9 @@
 package flagset
 
 import (
+	"path"
+
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset/userdrivers"
@@ -32,13 +35,13 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 
 		// OCDav
 
-		//&cli.StringFlag{
-		//	Name:        "chunk-folder",
-		//	Value:       flags.OverrideDefaultString(cfg.Reva.OCDav.WebdavNamespace, "/var/tmp/ocis/tmp/chunks"),
-		//	Usage:       "temp directory for chunked uploads",
-		//	EnvVars:     []string{"STORAGE_CHUNK_FOLDER"},
-		//	Destination: &cfg.Reva.OCDav.WebdavNamespace,
-		//},
+		&cli.StringFlag{
+			Name:        "chunk-folder",
+			Value:       flags.OverrideDefaultString(cfg.Reva.OCDav.WebdavNamespace, path.Join(defaults.BaseDataPath(), "tmp", "chunks")),
+			Usage:       "temp directory for chunked uploads",
+			EnvVars:     []string{"STORAGE_CHUNK_FOLDER"},
+			Destination: &cfg.Reva.OCDav.WebdavNamespace,
+		},
 
 		&cli.StringFlag{
 			Name:        "webdav-namespace",

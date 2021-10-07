@@ -9,6 +9,14 @@ import (
 func RootWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
+			// this is just a dummy config flag do document the existence
+			// of this environment variable
+			// the environment variable itself is used in `ocis-pkg/config/defaults/paths.go`
+			Name:    "ocis-base-data-path",
+			Usage:   "Set the base path where oCIS stores data",
+			EnvVars: []string{"OCIS_BASE_DATA_PATH"},
+		},
+		&cli.StringFlag{
 			Name:        "config-file",
 			Usage:       "Load config file from a non standard location.",
 			EnvVars:     []string{"OCIS_CONFIG_FILE"},

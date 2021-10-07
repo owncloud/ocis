@@ -73,7 +73,7 @@ services:
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
-      - ocis-data:/var/tmp/ocis
+      - ocis-data:/var/lib/ocis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=https"

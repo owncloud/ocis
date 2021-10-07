@@ -1,6 +1,9 @@
 package flagset
 
 import (
+	"path"
+
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/urfave/cli/v2"
@@ -62,7 +65,7 @@ func SharingWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "user-json-file",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Sharing.UserJSONFile, "/var/tmp/ocis/storage/shares.json"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Sharing.UserJSONFile, path.Join(defaults.BaseDataPath(), "storage", "shares.json")),
 			Usage:       "file used to persist shares for the UserShareProvider",
 			EnvVars:     []string{"STORAGE_SHARING_USER_JSON_FILE"},
 			Destination: &cfg.Reva.Sharing.UserJSONFile,
@@ -76,7 +79,7 @@ func SharingWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "public-json-file",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Sharing.PublicJSONFile, "/var/tmp/ocis/storage/publicshares.json"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Sharing.PublicJSONFile, path.Join(defaults.BaseDataPath(), "storage", "publicshares.json")),
 			Usage:       "file used to persist shares for the PublicShareProvider",
 			EnvVars:     []string{"STORAGE_SHARING_PUBLIC_JSON_FILE"},
 			Destination: &cfg.Reva.Sharing.PublicJSONFile,

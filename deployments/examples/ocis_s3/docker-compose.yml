@@ -72,7 +72,7 @@ services:
       STORAGE_USERS_DRIVER_S3NG_BUCKET: ${MINIO_BUCKET:-ocis-bucket}
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
-      - ocis-data:/var/tmp/ocis
+      - ocis-data:/var/lib/ocis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=https"

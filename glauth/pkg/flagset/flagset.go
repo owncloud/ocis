@@ -4,8 +4,8 @@ import (
 	"path"
 
 	"github.com/owncloud/ocis/glauth/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
-	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
 	"github.com/urfave/cli/v2"
 )
 
@@ -148,27 +148,27 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "ldaps-addr",
 			Value:       flags.OverrideDefaultString(cfg.Ldaps.Addr, "127.0.0.1:9126"),
-			Usage:       "Address to bind ldap server",
+			Usage:       "Address to bind ldaps server",
 			EnvVars:     []string{"GLAUTH_LDAPS_ADDR"},
 			Destination: &cfg.Ldaps.Addr,
 		},
 		&cli.BoolFlag{
 			Name:        "ldaps-enabled",
 			Value:       flags.OverrideDefaultBool(cfg.Ldaps.Enabled, true),
-			Usage:       "Enable ldap server",
+			Usage:       "Enable ldaps server",
 			EnvVars:     []string{"GLAUTH_LDAPS_ENABLED"},
 			Destination: &cfg.Ldaps.Enabled,
 		},
 		&cli.StringFlag{
 			Name:        "ldaps-cert",
-			Value:       flags.OverrideDefaultString(cfg.Ldaps.Cert, path.Join(pkgos.MustUserConfigDir("ocis", "ldap"), "ldap.crt")),
+			Value:       flags.OverrideDefaultString(cfg.Ldaps.Cert, path.Join(defaults.BaseDataPath(), "ldap", "ldap.crt")),
 			Usage:       "path to ldaps certificate in PEM format",
 			EnvVars:     []string{"GLAUTH_LDAPS_CERT"},
 			Destination: &cfg.Ldaps.Cert,
 		},
 		&cli.StringFlag{
 			Name:        "ldaps-key",
-			Value:       flags.OverrideDefaultString(cfg.Ldaps.Key, path.Join(pkgos.MustUserConfigDir("ocis", "ldap"), "ldap.key")),
+			Value:       flags.OverrideDefaultString(cfg.Ldaps.Key, path.Join(defaults.BaseDataPath(), "ldap", "ldap.key")),
 			Usage:       "path to ldaps key in PEM format",
 			EnvVars:     []string{"GLAUTH_LDAPS_KEY"},
 			Destination: &cfg.Ldaps.Key,

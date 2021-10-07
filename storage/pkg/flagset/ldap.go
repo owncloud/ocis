@@ -3,8 +3,8 @@ package flagset
 import (
 	"path"
 
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
-	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/urfave/cli/v2"
 )
@@ -28,7 +28,7 @@ func LDAPWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldap-cacert",
-			Value:       flags.OverrideDefaultString(cfg.Reva.LDAP.CACert, path.Join(pkgos.MustUserConfigDir("ocis", "ldap"), "ldap.crt")),
+			Value:       flags.OverrideDefaultString(cfg.Reva.LDAP.CACert, path.Join(defaults.BaseDataPath(), "ldap", "ldap.crt")),
 			Usage:       "Path to a trusted Certificate file (in PEM format) for the LDAP Connection",
 			EnvVars:     []string{"STORAGE_LDAP_CACERT"},
 			Destination: &cfg.Reva.LDAP.CACert,

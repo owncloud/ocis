@@ -18,20 +18,15 @@ func Server(opts ...Option) (http.Service, error) {
 
 	var tlsConfig *tls.Config
 	if options.Config.HTTP.TLS {
-		if options.Config.HTTP.TLSCert == "" || options.Config.HTTP.TLSKey == "" {
-			_, certErr := os.Stat("./server.crt")
-			_, keyErr := os.Stat("./server.key")
+		_, certErr := os.Stat(options.Config.HTTP.TLSCert)
+		_, keyErr := os.Stat(options.Config.HTTP.TLSKey)
 
-			if os.IsNotExist(certErr) || os.IsNotExist(keyErr) {
-				options.Logger.Info().Msgf("Generating certs")
-				if err := pkgcrypto.GenCert(options.Config.HTTP.TLSCert, options.Config.HTTP.TLSKey, options.Logger); err != nil {
-					options.Logger.Fatal().Err(err).Msg("Could not setup TLS")
-					os.Exit(1)
-				}
+		if os.IsNotExist(certErr) || os.IsNotExist(keyErr) {
+			options.Logger.Info().Msgf("Generating certs")
+			if err := pkgcrypto.GenCert(options.Config.HTTP.TLSCert, options.Config.HTTP.TLSKey, options.Logger); err != nil {
+				options.Logger.Fatal().Err(err).Msg("Could not setup TLS")
+				os.Exit(1)
 			}
-
-			options.Config.HTTP.TLSCert = "server.crt"
-			options.Config.HTTP.TLSKey = "server.key"
 		}
 
 		cer, err := tls.LoadX509KeyPair(options.Config.HTTP.TLSCert, options.Config.HTTP.TLSKey)

@@ -89,7 +89,7 @@ services:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/ocis/web-config.dist.json:/config/web-config.dist.json
       - ./config/ocis/proxy-config.json:/config/proxy-config.json
-      - ocis-data:/var/tmp/ocis
+      - ocis-data:/var/lib/ocis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=https"

@@ -4,8 +4,8 @@ import (
 	"path"
 
 	"github.com/owncloud/ocis/idp/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
-	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
 	"github.com/urfave/cli/v2"
 )
 
@@ -236,14 +236,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-cert",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(pkgos.MustUserConfigDir("ocis", "idp"), "server.crt")),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(defaults.BaseDataPath(), "idp", "server.crt")),
 			Usage:       "Certificate file for transport encryption",
 			EnvVars:     []string{"IDP_TRANSPORT_TLS_CERT"},
 			Destination: &cfg.HTTP.TLSCert,
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-key",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(pkgos.MustUserConfigDir("ocis", "idp"), "server.key")),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(defaults.BaseDataPath(), "idp", "server.key")),
 			Usage:       "Secret file for transport encryption",
 			EnvVars:     []string{"IDP_TRANSPORT_TLS_KEY"},
 			Destination: &cfg.HTTP.TLSKey,
@@ -335,14 +335,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "identifier-client-path",
 			Usage:       "Path to the identifier web client base folder",
 			EnvVars:     []string{"IDP_IDENTIFIER_CLIENT_PATH"},
-			Value:       flags.OverrideDefaultString(cfg.IDP.IdentifierClientPath, "/var/tmp/ocis/idp"),
+			Value:       flags.OverrideDefaultString(cfg.IDP.IdentifierClientPath, path.Join(defaults.BaseDataPath(), "idp")),
 			Destination: &cfg.IDP.IdentifierClientPath,
 		},
 		&cli.StringFlag{
 			Name:        "identifier-registration-conf",
 			Usage:       "Path to a identifier-registration.yaml configuration file",
 			EnvVars:     []string{"IDP_IDENTIFIER_REGISTRATION_CONF"},
-			Value:       flags.OverrideDefaultString(cfg.IDP.IdentifierRegistrationConf, "./config/identifier-registration.yaml"),
+			Value:       flags.OverrideDefaultString(cfg.IDP.IdentifierRegistrationConf, path.Join(defaults.BaseDataPath(), "idp", "identifier-registration.yaml")),
 			Destination: &cfg.IDP.IdentifierRegistrationConf,
 		},
 		&cli.StringFlag{

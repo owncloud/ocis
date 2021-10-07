@@ -23,7 +23,7 @@ import (
 	"go-micro.dev/v4/metadata"
 )
 
-const dataPath = "/var/tmp/ocis-accounts-tests"
+const dataPath = "/tmp/ocis-accounts-tests"
 
 var (
 	roleServiceMock settings.RoleService
