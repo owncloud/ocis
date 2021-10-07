@@ -24,10 +24,10 @@ func UsersWithConfig(cfg *config.Config) []cli.Flag {
 		// Gateway
 
 		&cli.StringFlag{
-			Name:        "gateway-endpoint",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142"),
-			Usage:       "URL to use for the storage gateway service",
-			EnvVars:     []string{"STORAGE_GATEWAY_ENDPOINT"},
+			Name:        "reva-gateway-addr",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "127.0.0.1:9142"),
+			Usage:       "Address of REVA gateway endpoint",
+			EnvVars:     []string{"REVA_GATEWAY_ADDR"},
 			Destination: &cfg.Reva.Gateway.Endpoint,
 		},
 

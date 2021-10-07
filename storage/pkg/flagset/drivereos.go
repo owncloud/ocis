@@ -125,10 +125,10 @@ func DriverEOSWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.Storages.EOS.UserLayout,
 		},
 		&cli.StringFlag{
-			Name:        "storage-eos-gatewaysvc",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.EOS.GatewaySVC, "localhost:9142"),
-			Usage:       "URL to use for the storage gateway service",
-			EnvVars:     []string{"STORAGE_DRIVER_EOS_GATEWAYSVC"},
+			Name:        "reva-gateway-addr",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.EOS.GatewaySVC, "127.0.0.1:9142"),
+			Usage:       "Address of REVA gateway endpoint",
+			EnvVars:     []string{"REVA_GATEWAY_ADDR"},
 			Destination: &cfg.Reva.Storages.EOS.GatewaySVC,
 		},
 	}
