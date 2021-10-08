@@ -247,7 +247,7 @@ services:
       CMD_USESSL: "false"
       NODE_TLS_REJECT_UNAUTHORIZED: 0
       CMD_APPLIANCE_MODE: "true"
-      CMD_SAVE_WEBHOOK: https:/${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}/wopi/bridge
+      CMD_SAVE_WEBHOOK: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}/wopi/bridge
       CMD_API_KEY: ${CODIMD_SECRET:-LoremIpsum456}
     labels:
       - "traefik.enable=true"
