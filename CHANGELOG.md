@@ -22,6 +22,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow overriding the cookie based route by claim: [#2508](https://github.com/owncloud/ocis/pull/2508)
 * Enhancement - Redirect invalid links to oC Web: [#2493](https://github.com/owncloud/ocis/pull/2493)
 * Enhancement - Use reva's Authenticate method instead of spawning token managers: [#2528](https://github.com/owncloud/ocis/pull/2528)
+* Enhancement - Unify Envvar names configuring REVA gateway address: [#2587](https://github.com/owncloud/ocis/pull/2587)
 * Enhancement - TLS config options for ldap in reva: [#2492](https://github.com/owncloud/ocis/pull/2492)
 * Enhancement - Set reva JWT token expiration time to 24 hours by default: [#2527](https://github.com/owncloud/ocis/pull/2527)
 * Enhancement - Update reva to v1.13.1-0.20211001063718-477bb18843a9: [#2566](https://github.com/owncloud/ocis/pull/2566)
@@ -158,6 +159,14 @@ The following sections list the changes for unreleased.
    but will be extended to others as well.
 
    https://github.com/owncloud/ocis/pull/2528
+
+* Enhancement - Unify Envvar names configuring REVA gateway address: [#2587](https://github.com/owncloud/ocis/pull/2587)
+
+   We've renamed all envvars configuring REVA gateway address to `REVA_GATEWAY`, additionally
+   we renamed the cli parameters to `--reva-gateway-addr` and adjusted the description
+
+   https://github.com/owncloud/ocis/issues/2091
+   https://github.com/owncloud/ocis/pull/2587
 
 * Enhancement - TLS config options for ldap in reva: [#2492](https://github.com/owncloud/ocis/pull/2492)
 
