@@ -18,6 +18,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Reduced repository size: [#2579](https://github.com/owncloud/ocis/pull/2579)
 * Enhancement - Expose the reva archiver in OCIS: [#2509](https://github.com/owncloud/ocis/pull/2509)
 * Enhancement - Make mimetype allow list configurable for app provider: [#2553](https://github.com/owncloud/ocis/pull/2553)
+* Enhancement - Add allow_creation parameter to mime type config: [#2591](https://github.com/owncloud/ocis/pull/2591)
 * Enhancement - Add option to skip generation of demo users and groups: [#2495](https://github.com/owncloud/ocis/pull/2495)
 * Enhancement - Allow overriding the cookie based route by claim: [#2508](https://github.com/owncloud/ocis/pull/2508)
 * Enhancement - Redirect invalid links to oC Web: [#2493](https://github.com/owncloud/ocis/pull/2493)
@@ -122,6 +123,10 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/2563
    https://github.com/owncloud/ocis/pull/2553
    https://github.com/cs3org/reva/pull/2095
+
+* Enhancement - Add allow_creation parameter to mime type config: [#2591](https://github.com/owncloud/ocis/pull/2591)
+
+   https://github.com/owncloud/ocis/pull/2591
 
 * Enhancement - Add option to skip generation of demo users and groups: [#2495](https://github.com/owncloud/ocis/pull/2495)
 
