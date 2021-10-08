@@ -94,6 +94,7 @@ func authBearerConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]i
 		},
 		"shared": map[string]interface{}{
 			"jwt_secret": cfg.Reva.JWTSecret,
+			"gatewaysvc": cfg.Reva.Gateway.Endpoint,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.AuthBearer.GRPCNetwork,
