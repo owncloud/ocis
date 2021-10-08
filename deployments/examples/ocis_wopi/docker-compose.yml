@@ -160,7 +160,7 @@ services:
     restart: always
 
   wopiserver:
-    image: cs3org/wopiserver:${CS3ORG_WOPISERVER_DOCKER_TAG:-latest}
+    image: cs3org/wopiserver:${WOPISERVER_DOCKER_TAG:-latest}
     networks:
       ocis-net:
     entrypoint:
