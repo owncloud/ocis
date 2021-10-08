@@ -149,6 +149,7 @@ type FrontendPort struct {
 	AppProviderPrefix       string
 	ArchiverPrefix          string
 	DatagatewayPrefix       string
+	Favorites               bool
 	OCDavPrefix             string
 	OCSPrefix               string
 	OCSSharePrefix          string

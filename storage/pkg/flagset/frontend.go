@@ -129,6 +129,13 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_FRONTEND_DATAGATEWAY_PREFIX"},
 			Destination: &cfg.Reva.Frontend.DatagatewayPrefix,
 		},
+		&cli.BoolFlag{
+			Name:        "favorites",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.Frontend.Favorites, false),
+			Usage:       "announces favorites support to clients",
+			EnvVars:     []string{"STORAGE_FRONTEND_FAVORITES"},
+			Destination: &cfg.Reva.Frontend.Favorites,
+		},
 		&cli.StringFlag{
 			Name:        "ocdav-prefix",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.OCDavPrefix, ""),
