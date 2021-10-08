@@ -68,10 +68,7 @@ services:
       OCIS_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
       # app registry
       STORAGE_APP_REGISTRY_MIMETYPES_JSON: /var/tmp/ocis/app-config/mimetypes.json
-      WEB_ASSET_PATH: /var/tmp/web # TODO: remove
-      WEB_UI_CONFIG_APPS: files, search, media-viewer, external # TODO: remove
     volumes:
-      - /home/kloucek/Projects/github.com/owncloud/web/dist:/var/tmp/web # TODO: remove
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/ocis/mimetypes.json:/var/tmp/ocis/app-config/mimetypes.json
       - ocis-data:/var/tmp/ocis
@@ -86,16 +83,38 @@ services:
       driver: "local"
     restart: always
 
+  ocis-appdriver-collabora:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    networks:
+      ocis-net:
+    command: storage-app-provider server
+    environment:
+      REVA_GATEWAY: ${REVA_GATEWAY:-ocis:9142}
+      APP_PROVIDER_BASIC_EXTERNAL_ADDR: ocis-appdriver-collabora:9164
+      OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
+      APP_PROVIDER_DRIVER: wopi
+      APP_PROVIDER_WOPI_DRIVER_APP_NAME: Collabora
+      APP_PROVIDER_WOPI_DRIVER_APP_ICON_URI: https://www.collaboraoffice.com/wp-content/uploads/2019/01/CP-icon.png
+      APP_PROVIDER_WOPI_DRIVER_APP_URL: https://${COLLABORA_DOMAIN:-collabora.owncloud.test}
+      APP_PROVIDER_WOPI_DRIVER_INSECURE: "${INSECURE:-false}"
+      APP_PROVIDER_WOPI_DRIVER_IOP_SECRET: ${WOPI_IOP_SECRET:-LoremIpsum123}
+      APP_PROVIDER_WOPI_DRIVER_WOPI_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
+    logging:
+      driver: "local"
+    restart: always
+
   ocis-appdriver-onlyoffice:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
-    #entrypoint:
-    #  - /bin/sh
-    #  - /entrypoint-override.sh
-    command: storage-app-provider server
+    user: "0" # needed for apk add in entrypoint script
+    entrypoint:
+      - /bin/sh
+      - /entrypoint-override.sh
+    #command: storage-app-provider server
     environment:
-      STORAGE_GATEWAY_ENDPOINT: ${OCIS_ADDRESS:-ocis:9142}
+      REVA_GATEWAY: ${REVA_GATEWAY:-ocis:9142}
       APP_PROVIDER_BASIC_EXTERNAL_ADDR: ocis-appdriver-onlyoffice:9164
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
@@ -112,34 +131,17 @@ services:
       driver: "local"
     restart: always
 
-  ocis-appdriver-collabora:
-    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
-    networks:
-      ocis-net:
-    command: storage-app-provider server
-    environment:
-      STORAGE_GATEWAY_ENDPOINT: ${OCIS_ADDRESS:-ocis:9142}
-      APP_PROVIDER_BASIC_EXTERNAL_ADDR: ocis-appdriver-collabora:9164
-      OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
-      APP_PROVIDER_DRIVER: wopi
-      APP_PROVIDER_WOPI_DRIVER_APP_NAME: Collabora
-      APP_PROVIDER_WOPI_DRIVER_APP_ICON_URI: https://www.collaboraoffice.com/wp-content/uploads/2019/01/CP-icon.png
-      APP_PROVIDER_WOPI_DRIVER_APP_URL: https://${COLLABORA_DOMAIN:-collabora.owncloud.test}
-      APP_PROVIDER_WOPI_DRIVER_INSECURE: "${INSECURE:-false}"
-      APP_PROVIDER_WOPI_DRIVER_IOP_SECRET: ${WOPI_IOP_SECRET:-LoremIpsum123}
-      APP_PROVIDER_WOPI_DRIVER_WOPI_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
-    logging:
-      driver: "local"
-    restart: always
-
   ocis-appdriver-codimd:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
-    command: storage-app-provider server
+    user: "0" # needed for apk add in entrypoint script
+    entrypoint:
+      - /bin/sh
+      - /entrypoint-override.sh
+    #command: storage-app-provider server
     environment:
-      STORAGE_GATEWAY_ENDPOINT: ${OCIS_ADDRESS:-ocis:9142}
+      REVA_GATEWAY: ${REVA_GATEWAY:-ocis:9142}
       APP_PROVIDER_BASIC_EXTERNAL_ADDR: ocis-appdriver-codimd:9164
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
@@ -151,6 +153,8 @@ services:
       APP_PROVIDER_WOPI_DRIVER_INSECURE: "${INSECURE:-false}"
       APP_PROVIDER_WOPI_DRIVER_IOP_SECRET: ${WOPI_IOP_SECRET:-LoremIpsum123}
       APP_PROVIDER_WOPI_DRIVER_WOPI_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
+    volumes:
+      - ./config/ocis-appdriver-codimd/entrypoint-override.sh:/entrypoint-override.sh
     logging:
       driver: "local"
     restart: always
@@ -169,7 +173,6 @@ services:
       WOPISERVER_DOMAIN: ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
       COLLABORA_DOMAIN: ${COLLABORA_DOMAIN:-collabora.owncloud.test}
     volumes:
-      #- /home/kloucek/Projects/github.com/cs3org/wopiserver/src/wopiserver.py:/app/wopiserver.py # TODO: remove
       - ./config/wopiserver/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/wopiserver/wopiserver.conf.dist:/etc/wopi/wopiserver.conf.dist
       - wopi-data:/var/wopi_local_storage
@@ -186,7 +189,7 @@ services:
     restart: always
 
   collabora:
-    image: collabora/code:latest
+    image: collabora/code:6.4.11.3
     networks:
       ocis-net:
     environment:
@@ -228,23 +231,8 @@ services:
       driver: "local"
     restart: always
 
-  codimd-db:
-    image: postgres:11.6-alpine
-    networks:
-      ocis-net:
-    environment:
-      POSTGRES_USER: codimd
-      POSTGRES_PASSWORD: codimd
-      POSTGRES_DB: codimd
-    volumes:
-      - codimd-db-data:/var/lib/postgresql/data
-    logging:
-      driver: "local"
-    restart: always
-
   codimd:
     image: gitlab-registry.cern.ch/authoring/notes/codimd:cernbox-integration
-    #image: gitlab-registry.cern.ch/authoring/notes/codimd:2.4.1 # TODO: remove
     networks:
       ocis-net:
     environment:
@@ -261,8 +249,6 @@ services:
       CMD_APPLIANCE_MODE: "true"
       CMD_SAVE_WEBHOOK: https:/${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}/wopi/bridge
       CMD_API_KEY: ${CODIMD_SECRET:-LoremIpsum456}
-      #CMD_DOMAIN: ocis.owncloud.test # TODO: remove
-      #CMD_URL_PATH: "byoa/codimd" # TODO: remove
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.codimd.entrypoints=https"
@@ -270,6 +256,20 @@ services:
       - "traefik.http.routers.codimd.tls.certresolver=http"
       - "traefik.http.routers.codimd.service=codimd"
       - "traefik.http.services.codimd.loadbalancer.server.port=3000"
+    logging:
+      driver: "local"
+    restart: always
+
+  codimd-db:
+    image: postgres:11.6-alpine
+    networks:
+      ocis-net:
+    environment:
+      POSTGRES_USER: codimd
+      POSTGRES_PASSWORD: codimd
+      POSTGRES_DB: codimd
+    volumes:
+      - codimd-db-data:/var/lib/postgresql/data
     logging:
       driver: "local"
     restart: always
