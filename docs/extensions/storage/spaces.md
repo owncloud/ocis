@@ -7,6 +7,8 @@ geekdocEditPath: edit/master/docs/extensions/storage
 geekdocFilePath: spaces.md
 ---
 
+{{< toc >}}
+
 ## Editing a Storage Space
 
 The OData specification allows for a mirage of ways of addressing an entity. We will support addressing a Drive entity by its unique identifier, which is the one the graph-api returns when listing spaces, and its format is:
@@ -40,6 +42,8 @@ This is an extract of an element of the list spaces response. An entire object h
 }
 ```
 
+### Updating a space property
+
 Having introduced the above, one can refer to a Drive with the following URL format:
 
 ```console
@@ -55,7 +59,7 @@ curl -X PATCH 'https://localhost:9200/graph/v1.0/Drive("1284d238-aa92-42ce-bdc4-
 The previous URL resource path segment (`Drive(1284d238-aa92-42ce-bdc4-0b0000009157!07c26b3a-9944-4f2b-ab33-b0b326fc7570)`) is parsed and handed over to the storage registry in order to apply the patch changes in the body, in this case update the space name attribute to `42`. Since space names are not unique we only support addressing them by their unique identifiers, any other query would render too ambiguous and explode in complexity.
 
 
-## Updating a space description
+### Updating a space description
 
 Since every space is the root of a webdav directory, following some conventions we can make use of this to set a default storage description and image. In order to do so, every space is created with a hidden `.space` folder at its root, which can be used to store such data.
 
