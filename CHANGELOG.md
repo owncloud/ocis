@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix the account resolver middleware: [#2557](https://github.com/owncloud/ocis/pull/2557)
 * Bugfix - Fix version information for extensions: [#2575](https://github.com/owncloud/ocis/pull/2575)
+* Bugfix - Add the gatewaysvc to all shared configuration in REVA services: [#2597](https://github.com/owncloud/ocis/pull/2597)
 * Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
 * Bugfix - Remove notifications placeholder: [#2514](https://github.com/owncloud/ocis/pull/2514)
 * Bugfix - Remove asset path configuration option from proxy: [#2576](https://github.com/owncloud/ocis/pull/2576)
@@ -44,6 +45,14 @@ The following sections list the changes for unreleased.
    for extensions. Now the real version of the extensions are shown.
 
    https://github.com/owncloud/ocis/pull/2575
+
+* Bugfix - Add the gatewaysvc to all shared configuration in REVA services: [#2597](https://github.com/owncloud/ocis/pull/2597)
+
+   We've fixed the configuration for REVA services which didn't have a gatewaysvc in their shared
+   configuration. This could lead to default gatewaysvc addresses in the auth middleware. Now it
+   is set everywhere.
+
+   https://github.com/owncloud/ocis/pull/2597
 
 * Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
 
