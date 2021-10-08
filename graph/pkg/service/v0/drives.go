@@ -7,8 +7,10 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 	"time"
 
+	"github.com/CiscoM31/godata"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -207,6 +209,69 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Errorf("").Error())
 	}
+}
+
+func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
+	// wildcards however addressed here is not yet supported. We want to address drives by their unique
+	// identifiers. Any open queries need to be implemented. Same applies for sub-entities.
+	// For further reading: http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#sec_AddressingaSubsetofaCollection
+
+	// strip "/graph/v1.0/" out and parse the rest. This is how godata input is expected.
+	//https://github.com/CiscoM31/godata/blob/d70e191d2908191623be84401fecc40d6af4afde/url_parser_test.go#L10
+	sanitized := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+
+	req, err := godata.ParseRequest(sanitized, r.URL.Query(), true)
+	if err != nil {
+		panic(err)
+	}
+
+	if req.FirstSegment.Identifier.Get() == "" {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Errorf("identifier cannot be empty").Error())
+		return
+	}
+
+	drive := msgraph.Drive{}
+	if err = json.NewDecoder(r.Body).Decode(&drive); err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Errorf("invalid request body: %v", r.Body).Error())
+		return
+	}
+
+	identifierParts := strings.Split(req.FirstSegment.Identifier.Get(), "!")
+	if len(identifierParts) != 2 {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Errorf("invalid resource id: %v", req.FirstSegment.Identifier.Get()).Error())
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	storageID, opaqueID := identifierParts[0], identifierParts[1]
+
+	client, err := g.GetClient()
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	updateSpaceRequest := &provider.UpdateStorageSpaceRequest{
+		// Prepare the object to apply the diff from. The properties on StorageSpace will overwrite
+		// the original storage space.
+		StorageSpace: &provider.StorageSpace{
+			Root: &provider.ResourceId{
+				StorageId: storageID,
+				OpaqueId:  opaqueID,
+			},
+			Name: *drive.Name,
+		},
+	}
+
+	resp, err := client.UpdateStorageSpace(r.Context(), updateSpaceRequest)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Errorf("").Error())
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func cs3TimestampToTime(t *types.Timestamp) time.Time {
