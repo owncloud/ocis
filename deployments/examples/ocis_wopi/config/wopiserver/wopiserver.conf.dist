@@ -17,10 +17,11 @@ port = 8880
 #oosurl = https://officeonline.owncloud.test
 
 # URL of your Collabora Online service
-codeurl = https://collabora.owncloud.test
+#codeurl = https://collabora.owncloud.test
 
-# URL of your WOPI bridge service (for CodiMD)
-#wopibridgeurl = https://your-wopi-bridge-server.org:8000
+# URL of your CodiMD service
+codimdurl = https://codimd.owncloud.test
+codimdinturl = http://codimd:3000
 
 # URL of your WOPI server or your HA proxy in front of it
 wopiurl = https://wopiserver.owncloud.test
@@ -45,6 +46,12 @@ tokenvalidity = 86400
 
 # WOPI lock expiration time [seconds]
 wopilockexpiration = 7200
+
+# WOPI lock strict check: if True, WOPI locks will be compared according to specs,
+# that is their representation must match. False (default) allows for a more relaxed
+# comparison, which compensates incorrect lock requests from Microsoft Office Online
+# on-premise setups.
+#wopilockstrictcheck = False
 
 # Logging level. Debug enables the Flask debug mode as well.
 # Valid values are: Debug, Info, Warning, Error.
@@ -73,8 +80,19 @@ wopicert = /etc/grid-security/host.crt
 wopikey = /etc/grid-security/host.key
 
 
+[bridge]
+# SSL certificate check for the connected apps
+sslverify = False
+
+# Minimal time interval between two consecutive save operations [seconds]
+#saveinterval = 200
+
+# Minimal time interval before a closed file is WOPI-unlocked [seconds]
+#unlockinterval = 90
+
+
 [io]
-# Size used for buffered xroot reads [bytes]
+# Size used for buffered reads [bytes]
 chunksize = 4194304
 
 
@@ -99,12 +117,12 @@ chunksize = 4194304
 revagateway = ocis:9142
 
 # HTTP (WebDAV) endpoint for uploading files
-#datagateway = http://172.17.0.1:9100
+#datagateway = https://your-reva-server.org:port/data
 
 # Reva/gRPC authentication token expiration time [seconds]
 # The default value matches Reva's default
 authtokenvalidity = 3600
 
-# SSL certificate check for reva
- # oCIS uses self signed certificate in this example
+# SSL certificate check for Reva
+# oCIS uses self signed certificate in this example
 sslverify = false
