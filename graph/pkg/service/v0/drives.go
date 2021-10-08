@@ -218,7 +218,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 
 	// strip "/graph/v1.0/" out and parse the rest. This is how godata input is expected.
 	//https://github.com/CiscoM31/godata/blob/d70e191d2908191623be84401fecc40d6af4afde/url_parser_test.go#L10
-	sanitized := strings.TrimLeft(r.URL.Path, "/graph/v1.0/")
+	sanitized := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
 
 	req, err := godata.ParseRequest(sanitized, r.URL.Query(), true)
 	if err != nil {
