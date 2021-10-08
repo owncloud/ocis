@@ -13,6 +13,7 @@ import (
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/version"
+	"github.com/owncloud/ocis/storage/pkg/command/storagedrivers"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
@@ -32,17 +33,6 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 		// TODO(refs) at this point it might make sense delegate log flags to each individual storage command.
 		Flags:    append(flagset.StorageMetadata(cfg), flagset.RootWithConfig(cfg)...),
 		Category: "Extensions",
-		Before: func(c *cli.Context) error {
-			storageRoot := c.String("storage-root")
-
-			cfg.Reva.Storages.OwnCloud.Root = storageRoot
-			cfg.Reva.Storages.EOS.Root = storageRoot
-			cfg.Reva.Storages.Local.Root = storageRoot
-			cfg.Reva.Storages.S3.Root = storageRoot
-			cfg.Reva.Storages.Home.Root = storageRoot
-
-			return nil
-		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 			tracing.Configure(cfg, logger)
@@ -58,23 +48,6 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
-
-			// Disable home because the metadata is stored independently
-			// of the user. This also means that a valid-token without any user-id
-			// is allowed to write to the metadata-storage.
-			cfg.Reva.Storages.Common.EnableHome = false
-			cfg.Reva.Storages.EOS.EnableHome = false
-			cfg.Reva.Storages.Local.EnableHome = false
-			cfg.Reva.Storages.OwnCloud.EnableHome = false
-			cfg.Reva.Storages.S3.EnableHome = false
-
-			// We need this hack because the metadata storage can define STORAGE_METADATA_ROOT which has the same destination as
-			// STORAGE_DRIVER_OCIS_ROOT. When both variables are set one storage will always be out of sync. Ensure the
-			// metadata storage root is never overridden. This is the kind of stateful code that make you want to cry blood.
-			if os.Getenv("STORAGE_METADATA_ROOT") != "" && os.Getenv("STORAGE_DRIVER_OCIS_ROOT") != "" {
-				cfg.Reva.Storages.Common.Root = os.Getenv("STORAGE_METADATA_ROOT")
-			}
-
 			rcfg := storageMetadataFromStruct(c, cfg)
 
 			gr.Add(func() error {
@@ -160,7 +133,7 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 				"storageprovider": map[string]interface{}{
 					"mount_path":      "/meta",
 					"driver":          cfg.Reva.StorageMetadata.Driver,
-					"drivers":         drivers(cfg),
+					"drivers":         storagedrivers.MetadataDrivers(cfg),
 					"data_server_url": cfg.Reva.StorageMetadata.DataServerURL,
 					"tmp_folder":      cfg.Reva.StorageMetadata.TempFolder,
 				},
@@ -174,7 +147,7 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 				"dataprovider": map[string]interface{}{
 					"prefix":      "data",
 					"driver":      cfg.Reva.StorageMetadata.Driver,
-					"drivers":     drivers(cfg),
+					"drivers":     storagedrivers.MetadataDrivers(cfg),
 					"timeout":     86400,
 					"insecure":    true,
 					"disable_tus": true,

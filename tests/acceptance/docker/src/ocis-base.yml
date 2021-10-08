@@ -4,13 +4,10 @@ services:
       OCIS_URL: "https://ocis-server:9200"
       STORAGE_HOME_DRIVER: $STORAGE_DRIVER
       STORAGE_USERS_DRIVER: $STORAGE_DRIVER
-      STORAGE_DRIVER_OCIS_ROOT: /srv/app/tmp/ocis/storage/users
-      STORAGE_DRIVER_LOCAL_ROOT: /srv/app/tmp/ocis/local/root
-      STORAGE_METADATA_ROOT: /srv/app/tmp/ocis/metadata
-      STORAGE_DRIVER_OWNCLOUD_DATADIR: /srv/app/tmp/ocis/owncloud/data
-      STORAGE_DRIVER_OWNCLOUD_REDIS_ADDR: redis:6379
-      STORAGE_HOME_DATA_SERVER_URL: http://ocis-server:9155/data
-      STORAGE_USERS_DATA_SERVER_URL: http://ocis-server:9158/data
+      STORAGE_USERS_DRIVER_LOCAL_ROOT: /srv/app/tmp/ocis/local/root
+      STORAGE_USERS_DRIVER_OWNCLOUD_DATADIR: /srv/app/tmp/ocis/owncloud/data
+      STORAGE_USERS_DRIVER_OCIS_ROOT: /srv/app/tmp/ocis/storage/users
+      STORAGE_METADATA_DRIVER_OCIS_ROOT: /srv/app/tmp/ocis/storage/metadata
       STORAGE_SHARING_USER_JSON_FILE: /srv/app/tmp/ocis/shares.json
       SETTINGS_DATA_PATH: "/srv/app/tmp/ocis/settings"
       PROXY_ENABLE_BASIC_AUTH: "true"
@@ -18,11 +15,11 @@ services:
       IDP_IDENTIFIER_REGISTRATION_CONF: /drone/src/tests/config/drone/identifier-registration.yml
       ACCOUNTS_HASH_DIFFICULTY: 4
       # s3ng specific settings
-      STORAGE_DRIVER_S3NG_ENDPOINT: http://ceph:8080
-      STORAGE_DRIVER_S3NG_REGION: default
-      STORAGE_DRIVER_S3NG_ACCESS_KEY: test
-      STORAGE_DRIVER_S3NG_SECRET_KEY: test
-      STORAGE_DRIVER_S3NG_BUCKET: test
+      STORAGE_USERS_DRIVER_S3NG_ENDPOINT: http://ceph:8080
+      STORAGE_USERS_DRIVER_S3NG_REGION: default
+      STORAGE_USERS_DRIVER_S3NG_ACCESS_KEY: test
+      STORAGE_USERS_DRIVER_S3NG_SECRET_KEY: test
+      STORAGE_USERS_DRIVER_S3NG_BUCKET: test
     volumes:
       - ../../../config:/drone/src/tests/config
       - oCISownCloud10testsuite:/srv

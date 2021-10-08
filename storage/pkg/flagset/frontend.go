@@ -3,6 +3,7 @@ package flagset
 import (
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/owncloud/ocis/storage/pkg/flagset/userdrivers"
 	"github.com/urfave/cli/v2"
 )
 
@@ -254,7 +255,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 	flags = append(flags, DebugWithConfig(cfg)...)
 	flags = append(flags, SecretWithConfig(cfg)...)
 	flags = append(flags, SharingSQLWithConfig(cfg)...)
-	flags = append(flags, DriverEOSWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverEOSWithConfig(cfg)...)
 
 	return flags
 }
