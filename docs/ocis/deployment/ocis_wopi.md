@@ -9,6 +9,10 @@ geekdocFilePath: ocis_wopi.md
 
 {{< toc >}}
 
+{{< hint warning >}}
+OnlyOffice and CodiMD are not yet fully integrated and there are known issues. For the current state please have a lot at [owncloud/ocis#2595](https://github.com/owncloud/ocis/issues/2595)
+{{< /hint >}}
+
 ## Overview
 
 * oCIS, Wopi server, Collabora, OnlyOffice and CodiMD running behind Traefik as reverse proxy
