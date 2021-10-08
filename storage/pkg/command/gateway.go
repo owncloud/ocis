@@ -230,18 +230,18 @@ func rules(cfg *config.Config, logger log.Logger) map[string]map[string]interfac
 	}
 }
 
-func mimetypes(cfg *config.Config, logger log.Logger) map[string]map[string]string {
+func mimetypes(cfg *config.Config, logger log.Logger) map[string]map[string]interface{} {
 
 	type mimeTypeConfig struct {
-		Extension   string `json:"extension" mapstructure:"extension"`
-		Name        string `json:"name" mapstructure:"name"`
-		Description string `json:"description" mapstructure:"description"`
-		Icon        string `json:"icon" mapstructure:"icon"`
-		DefaultApp  string `json:"default_app" mapstructure:"default_app"`
+		Extension     string `json:"extension" mapstructure:"extension"`
+		Name          string `json:"name" mapstructure:"name"`
+		Description   string `json:"description" mapstructure:"description"`
+		Icon          string `json:"icon" mapstructure:"icon"`
+		DefaultApp    string `json:"default_app" mapstructure:"default_app"`
+		AllowCreation bool   `json:"allow_creation" mapstructure:"allow_creation"`
 	}
-	type mimetypesConfig map[string]mimeTypeConfig
-
-	var mimetypes mimetypesConfig
+	var mimetypes map[string]mimeTypeConfig
+	var m map[string]map[string]interface{}
 
 	// load default app mimetypes from a json file
 	if cfg.Reva.AppRegistry.MimetypesJSON != "" {
@@ -254,7 +254,6 @@ func mimetypes(cfg *config.Config, logger log.Logger) map[string]map[string]stri
 			logger.Error().Err(err).Msg("Failed to unmarshal storage registry rules")
 			return nil
 		}
-		var m map[string]map[string]string
 		if err := mapstructure.Decode(mimetypes, &m); err != nil {
 			logger.Error().Err(err).Msg("Failed to decode defaultapp registry mimetypes to mapstructure")
 			return nil
@@ -271,34 +270,40 @@ func mimetypes(cfg *config.Config, logger log.Logger) map[string]map[string]stri
 			Description: "PDF document",
 		},
 		"application/vnd.oasis.opendocument.text": {
-			Extension:   "odt",
-			Name:        "OpenDocument",
-			Description: "OpenDocument text document",
+			Extension:     "odt",
+			Name:          "OpenDocument",
+			Description:   "OpenDocument text document",
+			AllowCreation: true,
 		},
 		"application/vnd.oasis.opendocument.spreadsheet": {
-			Extension:   "ods",
-			Name:        "OpenSpreadsheet",
-			Description: "OpenDocument spreadsheet document",
+			Extension:     "ods",
+			Name:          "OpenSpreadsheet",
+			Description:   "OpenDocument spreadsheet document",
+			AllowCreation: true,
 		},
 		"application/vnd.oasis.opendocument.presentation": {
-			Extension:   "odp",
-			Name:        "OpenPresentation",
-			Description: "OpenDocument presentation document",
+			Extension:     "odp",
+			Name:          "OpenPresentation",
+			Description:   "OpenDocument presentation document",
+			AllowCreation: true,
 		},
 		"application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
-			Extension:   "docx",
-			Name:        "Microsoft Word",
-			Description: "Microsoft Word document",
+			Extension:     "docx",
+			Name:          "Microsoft Word",
+			Description:   "Microsoft Word document",
+			AllowCreation: true,
 		},
 		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
-			Extension:   "xlsx",
-			Name:        "Microsoft Excel",
-			Description: "Microsoft Excel document",
+			Extension:     "xlsx",
+			Name:          "Microsoft Excel",
+			Description:   "Microsoft Excel document",
+			AllowCreation: true,
 		},
 		"application/vnd.openxmlformats-officedocument.presentationml.presentation": {
-			Extension:   "pptx",
-			Name:        "Microsoft PowerPoint",
-			Description: "Microsoft PowerPoint document",
+			Extension:     "pptx",
+			Name:          "Microsoft PowerPoint",
+			Description:   "Microsoft PowerPoint document",
+			AllowCreation: true,
 		},
 		"application/vnd.jupyter": {
 			Extension:   "ipynb",
@@ -306,9 +311,10 @@ func mimetypes(cfg *config.Config, logger log.Logger) map[string]map[string]stri
 			Description: "Jupyter Notebook",
 		},
 		"text/markdown": {
-			Extension:   "md",
-			Name:        "Markdown file",
-			Description: "Markdown file",
+			Extension:     "md",
+			Name:          "Markdown file",
+			Description:   "Markdown file",
+			AllowCreation: true,
 		},
 		"application/compressed-markdown": {
 			Extension:   "zmd",
@@ -317,7 +323,6 @@ func mimetypes(cfg *config.Config, logger log.Logger) map[string]map[string]stri
 		},
 	}
 
-	var m map[string]map[string]string
 	if err := mapstructure.Decode(mimetypes, &m); err != nil {
 		logger.Error().Err(err).Msg("Failed to decode defaultapp registry mimetypes to mapstructure")
 		return nil
