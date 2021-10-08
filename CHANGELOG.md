@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Remove asset path configuration option from proxy: [#2576](https://github.com/owncloud/ocis/pull/2576)
 * Bugfix - Race condition in config parsing: [#2574](https://github.com/owncloud/ocis/pull/2574)
 * Change - Make the drives create method odata compliant: [#2531](https://github.com/owncloud/ocis/pull/2531)
+* Change - Unify Envvar names configuring REVA gateway address: [#2587](https://github.com/owncloud/ocis/pull/2587)
 * Change - Update ownCloud Web to v4.3.0: [#2589](https://github.com/owncloud/ocis/pull/2589)
 * Enhancement - Add maximum files and size to archiver capabilities: [#2544](https://github.com/owncloud/ocis/pull/2544)
 * Enhancement - Reduced repository size: [#2579](https://github.com/owncloud/ocis/pull/2579)
@@ -23,7 +24,6 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow overriding the cookie based route by claim: [#2508](https://github.com/owncloud/ocis/pull/2508)
 * Enhancement - Redirect invalid links to oC Web: [#2493](https://github.com/owncloud/ocis/pull/2493)
 * Enhancement - Use reva's Authenticate method instead of spawning token managers: [#2528](https://github.com/owncloud/ocis/pull/2528)
-* Enhancement - Unify Envvar names configuring REVA gateway address: [#2587](https://github.com/owncloud/ocis/pull/2587)
 * Enhancement - TLS config options for ldap in reva: [#2492](https://github.com/owncloud/ocis/pull/2492)
 * Enhancement - Set reva JWT token expiration time to 24 hours by default: [#2527](https://github.com/owncloud/ocis/pull/2527)
 * Enhancement - Update reva to v1.13.1-0.20211001063718-477bb18843a9: [#2566](https://github.com/owncloud/ocis/pull/2566)
@@ -82,6 +82,14 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/2531
    https://github.com/owncloud/ocis/pull/2535
    https://www.odata.org/getting-started/basic-tutorial/#modifyData
+
+* Change - Unify Envvar names configuring REVA gateway address: [#2587](https://github.com/owncloud/ocis/pull/2587)
+
+   We've renamed all envvars configuring REVA gateway address to `REVA_GATEWAY`, additionally
+   we renamed the cli parameters to `--reva-gateway-addr` and adjusted the description
+
+   https://github.com/owncloud/ocis/issues/2091
+   https://github.com/owncloud/ocis/pull/2587
 
 * Change - Update ownCloud Web to v4.3.0: [#2589](https://github.com/owncloud/ocis/pull/2589)
 
@@ -164,14 +172,6 @@ The following sections list the changes for unreleased.
    but will be extended to others as well.
 
    https://github.com/owncloud/ocis/pull/2528
-
-* Enhancement - Unify Envvar names configuring REVA gateway address: [#2587](https://github.com/owncloud/ocis/pull/2587)
-
-   We've renamed all envvars configuring REVA gateway address to `REVA_GATEWAY`, additionally
-   we renamed the cli parameters to `--reva-gateway-addr` and adjusted the description
-
-   https://github.com/owncloud/ocis/issues/2091
-   https://github.com/owncloud/ocis/pull/2587
 
 * Enhancement - TLS config options for ldap in reva: [#2492](https://github.com/owncloud/ocis/pull/2492)
 
