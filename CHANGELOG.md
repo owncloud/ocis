@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Remove notifications placeholder: [#2514](https://github.com/owncloud/ocis/pull/2514)
 * Bugfix - Remove asset path configuration option from proxy: [#2576](https://github.com/owncloud/ocis/pull/2576)
 * Bugfix - Race condition in config parsing: [#2574](https://github.com/owncloud/ocis/pull/2574)
+* Change - Configure users and metadata storage separately: [#2598](https://github.com/owncloud/ocis/pull/2598)
 * Change - Make the drives create method odata compliant: [#2531](https://github.com/owncloud/ocis/pull/2531)
 * Change - Unify Envvar names configuring REVA gateway address: [#2587](https://github.com/owncloud/ocis/pull/2587)
 * Change - Update ownCloud Web to v4.3.0: [#2589](https://github.com/owncloud/ocis/pull/2589)
@@ -84,6 +85,16 @@ The following sections list the changes for unreleased.
    by services overwriting a pointer to a config value. We fixed it by setting sane defaults.
 
    https://github.com/owncloud/ocis/pull/2574
+
+* Change - Configure users and metadata storage separately: [#2598](https://github.com/owncloud/ocis/pull/2598)
+
+   We've fixed the configuration behaviour of the user and metadata service writing in the same
+   directory when using oCIS storage.
+
+   Therefore we needed to separate the configuration of the users and metadata storage so that
+   they now can be configured totally separate.
+
+   https://github.com/owncloud/ocis/pull/2598
 
 * Change - Make the drives create method odata compliant: [#2531](https://github.com/owncloud/ocis/pull/2531)
 
