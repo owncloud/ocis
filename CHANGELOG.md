@@ -21,6 +21,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Reduced repository size: [#2579](https://github.com/owncloud/ocis/pull/2579)
 * Enhancement - Expose the reva archiver in OCIS: [#2509](https://github.com/owncloud/ocis/pull/2509)
 * Enhancement - Favorites capability: [#2599](https://github.com/owncloud/ocis/pull/2599)
+* Enhancement - Upgrade to GO 1.17: [#2605](https://github.com/owncloud/ocis/pull/2605)
 * Enhancement - Make mimetype allow list configurable for app provider: [#2553](https://github.com/owncloud/ocis/pull/2553)
 * Enhancement - Add allow_creation parameter to mime type config: [#2591](https://github.com/owncloud/ocis/pull/2591)
 * Enhancement - Add option to skip generation of demo users and groups: [#2495](https://github.com/owncloud/ocis/pull/2495)
@@ -150,6 +151,12 @@ The following sections list the changes for unreleased.
    favorites doesn't survive service restarts at the moment.
 
    https://github.com/owncloud/ocis/pull/2599
+
+* Enhancement - Upgrade to GO 1.17: [#2605](https://github.com/owncloud/ocis/pull/2605)
+
+   We've upgraded the used GO version from 1.16 to 1.17.
+
+   https://github.com/owncloud/ocis/pull/2605
 
 * Enhancement - Make mimetype allow list configurable for app provider: [#2553](https://github.com/owncloud/ocis/pull/2553)
 
