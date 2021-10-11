@@ -36,7 +36,7 @@
     "@rollup/plugin-json": "^4.0.1",
     "@rollup/plugin-replace": "^2.4.2",
     "archiver": "^5.3.0",
-    "axios": "^0.21.4",
+    "axios": "^0.22.0",
     "core-js": "^3.17.3",
     "cross-env": "^7.0.3",
     "debounce": "^1.2.1",
