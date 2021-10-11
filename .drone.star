@@ -260,7 +260,7 @@ def testOcisModule(ctx, module):
     steps = makeGenerate(module) + [
         {
             "name": "golangci-lint",
-            "image": "owncloudci/golang:1.16",
+            "image": "owncloudci/golang:1.17",
             "pull": "always",
             "commands": [
                 "mkdir -p cache/checkstyle",
@@ -271,7 +271,7 @@ def testOcisModule(ctx, module):
         },
         {
             "name": "test",
-            "image": "owncloudci/golang:1.16",
+            "image": "owncloudci/golang:1.17",
             "pull": "always",
             "commands": [
                 "mkdir -p cache/coverage",
@@ -915,7 +915,7 @@ def dockerRelease(ctx, arch):
         "steps": makeGenerate("") + [
             {
                 "name": "build",
-                "image": "owncloudci/golang:1.16",
+                "image": "owncloudci/golang:1.17",
                 "pull": "always",
                 "commands": [
                     "make -C ocis release-linux-docker",
@@ -1089,7 +1089,7 @@ def binaryRelease(ctx, name):
         "steps": makeGenerate("") + [
             {
                 "name": "build",
-                "image": "owncloudci/golang:1.16",
+                "image": "owncloudci/golang:1.17",
                 "pull": "always",
                 "commands": [
                     "make -C ocis release-%s" % (name),
@@ -1097,7 +1097,7 @@ def binaryRelease(ctx, name):
             },
             {
                 "name": "finish",
-                "image": "owncloudci/golang:1.16",
+                "image": "owncloudci/golang:1.17",
                 "pull": "always",
                 "commands": [
                     "make -C ocis release-finish",
@@ -1123,7 +1123,7 @@ def binaryRelease(ctx, name):
             },
             {
                 "name": "changelog",
-                "image": "owncloudci/golang:1.16",
+                "image": "owncloudci/golang:1.17",
                 "pull": "always",
                 "commands": [
                     "make changelog CHANGELOG_VERSION=%s" % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
@@ -1259,7 +1259,7 @@ def changelog(ctx):
         "steps": [
             {
                 "name": "generate",
-                "image": "owncloudci/golang:1.16",
+                "image": "owncloudci/golang:1.17",
                 "pull": "always",
                 "commands": [
                     "make -C ocis changelog",
@@ -1366,19 +1366,19 @@ def docs(ctx):
         "steps": [
             {
                 "name": "docs-generate",
-                "image": "owncloudci/golang:1.16",
+                "image": "owncloudci/golang:1.17",
                 "commands": ["make -C %s docs-generate" % (module) for module in config["modules"]],
             },
             {
                 "name": "prepare",
-                "image": "owncloudci/golang:1.16",
+                "image": "owncloudci/golang:1.17",
                 "commands": [
                     "make -C docs docs-copy",
                 ],
             },
             {
                 "name": "test",
-                "image": "owncloudci/golang:1.16",
+                "image": "owncloudci/golang:1.17",
                 "commands": [
                     "make -C docs test",
                 ],
@@ -1459,7 +1459,7 @@ def makeGenerate(module):
         },
         {
             "name": "generate go",
-            "image": "owncloudci/golang:1.16",
+            "image": "owncloudci/golang:1.17",
             "pull": "always",
             "commands": [
                 "%s ci-go-generate" % (make),
@@ -1598,7 +1598,7 @@ def build():
     return [
         {
             "name": "build",
-            "image": "owncloudci/golang:1.16",
+            "image": "owncloudci/golang:1.17",
             "pull": "always",
             "commands": [
                 "make -C ocis build",
