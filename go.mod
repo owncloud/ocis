@@ -19,7 +19,7 @@ require (
 	github.com/asim/go-micro/v3 v3.6.1-0.20210924081004-8c39b1e1204d
 	github.com/blevesearch/bleve/v2 v2.1.0
 	github.com/coreos/go-oidc/v3 v3.0.0
-	github.com/cs3org/go-cs3apis v0.0.0-20210922150613-cb9e3c99f8de
+	github.com/cs3org/go-cs3apis v0.0.0-20211007101428-6d142794ec11
 	github.com/cs3org/reva v1.13.1-0.20211006080436-67f39be571fa
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth v1.1.3-0.20210729125545-b9aecdfcac31
@@ -77,3 +77,5 @@ require (
 
 // this is a transitive replace. See https://github.com/libregraph/lico/blob/master/go.mod#L38
 replace github.com/crewjam/saml => github.com/crewjam/saml v0.4.5
+
+replace github.com/cs3org/reva => ../reva
