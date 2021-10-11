@@ -3,6 +3,7 @@ package flagset
 import (
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/owncloud/ocis/storage/pkg/flagset/userdrivers"
 	"github.com/urfave/cli/v2"
 )
 
@@ -149,12 +150,13 @@ func StorageUsersWithConfig(cfg *config.Config) []cli.Flag {
 	flags = append(flags, TracingWithConfig(cfg)...)
 	flags = append(flags, DebugWithConfig(cfg)...)
 	flags = append(flags, SecretWithConfig(cfg)...)
-	flags = append(flags, DriverEOSWithConfig(cfg)...)
-	flags = append(flags, DriverLocalWithConfig(cfg)...)
-	flags = append(flags, DriverOwnCloudWithConfig(cfg)...)
-	flags = append(flags, DriverOwnCloudSQLWithConfig(cfg)...)
-	flags = append(flags, DriverOCISWithConfig(cfg)...)
-	flags = append(flags, DriverS3NGWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverEOSWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverLocalWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverOwnCloudWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverOwnCloudSQLWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverOCISWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverS3NGWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverS3WithConfig(cfg)...)
 
 	return flags
 }

@@ -205,7 +205,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 							"db_host":     cfg.Reva.Sharing.UserSQLHost,
 							"db_port":     cfg.Reva.Sharing.UserSQLPort,
 							"db_name":     cfg.Reva.Sharing.UserSQLName,
-							"namespace":   cfg.Reva.Storages.EOS.Root,
+							"namespace":   cfg.Reva.UserStorage.EOS.Root,
 							"gatewaysvc":  cfg.Reva.Gateway.Endpoint,
 						},
 					},

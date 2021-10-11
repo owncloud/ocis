@@ -1,4 +1,4 @@
-package flagset
+package metadatadrivers
 
 import (
 	"github.com/owncloud/ocis/ocis-pkg/flags"
@@ -11,10 +11,10 @@ func DriverLocalWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "storage-local-root",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.Local.Root, "/var/tmp/ocis/storage/local"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.MetadataStorage.Local.Root, "/var/tmp/ocis/storage/local"),
 			Usage:       "the path to the local storage root",
-			EnvVars:     []string{"STORAGE_DRIVER_LOCAL_ROOT"},
-			Destination: &cfg.Reva.Storages.Local.Root,
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_LOCAL_ROOT"},
+			Destination: &cfg.Reva.MetadataStorage.Local.Root,
 		},
 	}
 }

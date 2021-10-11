@@ -202,14 +202,12 @@ type PublicStorage struct {
 
 // StorageConfig combines all available storage driver configuration parts.
 type StorageConfig struct {
-	Home        DriverCommon
 	EOS         DriverEOS
 	Local       DriverCommon
 	OwnCloud    DriverOwnCloud
 	OwnCloudSQL DriverOwnCloudSQL
 	S3          DriverS3
 	S3NG        DriverS3NG
-	Common      DriverCommon
 	OCIS        DriverOCIS
 	// TODO checksums ... figure out what that is supposed to do
 }
@@ -290,6 +288,8 @@ type DriverEOS struct {
 
 // DriverOCIS defines the available oCIS storage driver configuration.
 type DriverOCIS struct {
+	DriverCommon
+
 	ServiceUserUUID string
 }
 
@@ -439,7 +439,8 @@ type Reva struct {
 	UserOwnCloudSQL UserOwnCloudSQL
 	OCDav           OCDav
 	Archiver        Archiver
-	Storages        StorageConfig
+	UserStorage     StorageConfig
+	MetadataStorage StorageConfig
 	// Ports are used to configure which services to start on which port
 	Frontend          FrontendPort
 	DataGateway       DataGatewayPort

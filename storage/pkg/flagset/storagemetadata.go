@@ -3,6 +3,7 @@ package flagset
 import (
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/owncloud/ocis/storage/pkg/flagset/metadatadrivers"
 	"github.com/urfave/cli/v2"
 )
 
@@ -89,23 +90,14 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 		},
 	}
 
-	f = append(f,
-		&cli.StringFlag{
-			Name:        "storage-root",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.Common.Root, "/var/tmp/ocis/storage/metadata"),
-			Usage:       "the path to the metadata storage root",
-			EnvVars:     []string{"STORAGE_METADATA_ROOT"},
-			Destination: &cfg.Reva.Storages.Common.Root,
-		},
-	)
 	f = append(f, TracingWithConfig(cfg)...)
 	f = append(f, DebugWithConfig(cfg)...)
 	f = append(f, SecretWithConfig(cfg)...)
-	f = append(f, DriverEOSWithConfig(cfg)...)
-	f = append(f, DriverLocalWithConfig(cfg)...)
-	f = append(f, DriverOwnCloudWithConfig(cfg)...)
-	f = append(f, DriverOCISWithConfig(cfg)...)
-	f = append(f, DriverS3NGWithConfig(cfg)...)
+	f = append(f, metadatadrivers.DriverEOSWithConfig(cfg)...)
+	f = append(f, metadatadrivers.DriverLocalWithConfig(cfg)...)
+	f = append(f, metadatadrivers.DriverOCISWithConfig(cfg)...)
+	f = append(f, metadatadrivers.DriverS3NGWithConfig(cfg)...)
+	f = append(f, metadatadrivers.DriverS3WithConfig(cfg)...)
 
 	return f
 

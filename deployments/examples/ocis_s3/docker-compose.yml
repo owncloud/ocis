@@ -65,11 +65,11 @@ services:
       STORAGE_USERS_DRIVER: s3ng
       STORAGE_METADATA_DRIVER: ocis # keep metadata on ocis storage since this are only small files atm
       # s3ng specific settings
-      STORAGE_DRIVER_S3NG_ENDPOINT: http://minio:9000
-      STORAGE_DRIVER_S3NG_REGION: default
-      STORAGE_DRIVER_S3NG_ACCESS_KEY: ${MINIO_ACCESS_KEY:-ocis}
-      STORAGE_DRIVER_S3NG_SECRET_KEY: ${MINIO_SECRET_KEY:-ocis-secret-key}
-      STORAGE_DRIVER_S3NG_BUCKET: ${MINIO_BUCKET:-ocis-bucket}
+      STORAGE_USERS_DRIVER_S3NG_ENDPOINT: http://minio:9000
+      STORAGE_USERS_DRIVER_S3NG_REGION: default
+      STORAGE_USERS_DRIVER_S3NG_ACCESS_KEY: ${MINIO_ACCESS_KEY:-ocis}
+      STORAGE_USERS_DRIVER_S3NG_SECRET_KEY: ${MINIO_SECRET_KEY:-ocis-secret-key}
+      STORAGE_USERS_DRIVER_S3NG_BUCKET: ${MINIO_BUCKET:-ocis-bucket}
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-data:/var/tmp/ocis

@@ -11,6 +11,7 @@ import (
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/storage/pkg/command/storagedrivers"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
@@ -43,16 +44,6 @@ func StorageUsers(cfg *config.Config) *cli.Command {
 			uuid := uuid.Must(uuid.NewV4())
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
-			// override driver enable home option with home config
-			if cfg.Reva.Storages.Home.EnableHome {
-				cfg.Reva.Storages.Common.EnableHome = true
-				cfg.Reva.Storages.EOS.EnableHome = true
-				cfg.Reva.Storages.Local.EnableHome = true
-				cfg.Reva.Storages.OwnCloud.EnableHome = true
-				cfg.Reva.Storages.OwnCloudSQL.EnableHome = true
-				cfg.Reva.Storages.S3.EnableHome = true
-				cfg.Reva.Storages.S3NG.EnableHome = true
-			}
 			rcfg := storageUsersConfigFromStruct(c, cfg)
 
 			gr.Add(func() error {
@@ -117,7 +108,7 @@ func storageUsersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string
 			"services": map[string]interface{}{
 				"storageprovider": map[string]interface{}{
 					"driver":             cfg.Reva.StorageUsers.Driver,
-					"drivers":            drivers(cfg),
+					"drivers":            storagedrivers.UserDrivers(cfg),
 					"mount_path":         cfg.Reva.StorageUsers.MountPath,
 					"mount_id":           cfg.Reva.StorageUsers.MountID,
 					"expose_data_server": cfg.Reva.StorageUsers.ExposeDataServer,
@@ -134,7 +125,7 @@ func storageUsersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string
 				"dataprovider": map[string]interface{}{
 					"prefix":      cfg.Reva.StorageUsers.HTTPPrefix,
 					"driver":      cfg.Reva.StorageUsers.Driver,
-					"drivers":     drivers(cfg),
+					"drivers":     storagedrivers.UserDrivers(cfg),
 					"timeout":     86400,
 					"insecure":    true,
 					"disable_tus": false,
