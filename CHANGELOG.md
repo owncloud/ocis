@@ -19,6 +19,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add maximum files and size to archiver capabilities: [#2544](https://github.com/owncloud/ocis/pull/2544)
 * Enhancement - Reduced repository size: [#2579](https://github.com/owncloud/ocis/pull/2579)
 * Enhancement - Expose the reva archiver in OCIS: [#2509](https://github.com/owncloud/ocis/pull/2509)
+* Enhancement - Favorites capability: [#2599](https://github.com/owncloud/ocis/pull/2599)
 * Enhancement - Make mimetype allow list configurable for app provider: [#2553](https://github.com/owncloud/ocis/pull/2553)
 * Enhancement - Add allow_creation parameter to mime type config: [#2591](https://github.com/owncloud/ocis/pull/2591)
 * Enhancement - Add option to skip generation of demo users and groups: [#2495](https://github.com/owncloud/ocis/pull/2495)
@@ -130,6 +131,14 @@ The following sections list the changes for unreleased.
    The reva archiver can now be accessed through the storage frontend service
 
    https://github.com/owncloud/ocis/pull/2509
+
+* Enhancement - Favorites capability: [#2599](https://github.com/owncloud/ocis/pull/2599)
+
+   We've added a capability for the storage frontend which can be used to announce to clients
+   whether or not favorites are supported. By default this is disabled because the listing of
+   favorites doesn't survive service restarts at the moment.
+
+   https://github.com/owncloud/ocis/pull/2599
 
 * Enhancement - Make mimetype allow list configurable for app provider: [#2553](https://github.com/owncloud/ocis/pull/2553)
 
