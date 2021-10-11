@@ -95,9 +95,9 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 	f = append(f, SecretWithConfig(cfg)...)
 	f = append(f, metadatadrivers.DriverEOSWithConfig(cfg)...)
 	f = append(f, metadatadrivers.DriverLocalWithConfig(cfg)...)
-	f = append(f, metadatadrivers.DriverOwnCloudWithConfig(cfg)...)
 	f = append(f, metadatadrivers.DriverOCISWithConfig(cfg)...)
 	f = append(f, metadatadrivers.DriverS3NGWithConfig(cfg)...)
+	f = append(f, metadatadrivers.DriverS3WithConfig(cfg)...)
 
 	return f
 

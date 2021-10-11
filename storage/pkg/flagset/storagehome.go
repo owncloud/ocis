@@ -159,6 +159,7 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 	flags = append(flags, userdrivers.DriverOwnCloudSQLWithConfig(cfg)...)
 	flags = append(flags, userdrivers.DriverOCISWithConfig(cfg)...)
 	flags = append(flags, userdrivers.DriverS3NGWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverS3WithConfig(cfg)...)
 
 	return flags
 }

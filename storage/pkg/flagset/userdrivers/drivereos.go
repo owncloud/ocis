@@ -28,6 +28,13 @@ func DriverEOSWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.UserStorage.EOS.ShadowNamespace,
 		},
 		&cli.StringFlag{
+			Name: "storage-eos-uploads-namespace",
+			// Defaults to path.Join(c.Namespace, ".uploads")
+			Usage:       "Uploads namespace",
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_UPLOADS_NAMESPACE"},
+			Destination: &cfg.Reva.UserStorage.EOS.UploadsNamespace,
+		},
+		&cli.StringFlag{
 			Name:        "storage-eos-share-folder",
 			Value:       flags.OverrideDefaultString(cfg.Reva.UserStorage.EOS.ShareFolder, "/Shares"),
 			Usage:       "name of the share folder",
@@ -92,12 +99,6 @@ func DriverEOSWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "authenticate requests by using an EOS keytab",
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_USE_KEYTAB"},
 			Destination: &cfg.Reva.UserStorage.EOS.UseKeytab,
-		},
-		&cli.BoolFlag{
-			Name:        "storage-eos-enable-home",
-			Usage:       "enable the creation of home directories",
-			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_ENABLE_HOME"},
-			Destination: &cfg.Reva.UserStorage.EOS.EnableHome,
 		},
 		&cli.StringFlag{
 			Name:        "storage-eos-sec-protocol",

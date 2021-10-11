@@ -16,13 +16,6 @@ func DriverS3NGWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_ROOT"},
 			Destination: &cfg.Reva.UserStorage.S3NG.Root,
 		},
-		&cli.BoolFlag{
-			Name:        "storage-s3ng-enable-home",
-			Value:       flags.OverrideDefaultBool(cfg.Reva.UserStorage.S3NG.EnableHome, true),
-			Usage:       "enable the creation of home storages",
-			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_ENABLE_HOME"},
-			Destination: &cfg.Reva.UserStorage.S3NG.EnableHome,
-		},
 		&cli.StringFlag{
 			Name:        "storage-s3ng-layout",
 			Value:       flags.OverrideDefaultString(cfg.Reva.UserStorage.S3NG.UserLayout, "{{.Id.OpaqueId}}"),
@@ -39,7 +32,7 @@ func DriverS3NGWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "storage-s3ng-region",
-			Value:       flags.OverrideDefaultString(cfg.Reva.UserStorage.S3NG.Root, "default"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.UserStorage.S3NG.Region, "default"),
 			Usage:       `"the s3 region" `,
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_REGION"},
 			Destination: &cfg.Reva.UserStorage.S3NG.Region,

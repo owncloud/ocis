@@ -44,13 +44,6 @@ func DriverOwnCloudWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_REDIS_ADDR"},
 			Destination: &cfg.Reva.UserStorage.OwnCloud.Redis,
 		},
-		&cli.BoolFlag{
-			Name:        "storage-owncloud-enable-home",
-			Value:       flags.OverrideDefaultBool(cfg.Reva.UserStorage.OwnCloud.EnableHome, false),
-			Usage:       "enable the creation of home storages",
-			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_ENABLE_HOME"},
-			Destination: &cfg.Reva.UserStorage.OwnCloud.EnableHome,
-		},
 		&cli.StringFlag{
 			Name:        "storage-owncloud-layout",
 			Value:       flags.OverrideDefaultString(cfg.Reva.UserStorage.OwnCloud.UserLayout, "{{.Id.OpaqueId}}"),

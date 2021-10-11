@@ -16,13 +16,6 @@ func DriverOCISWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_OCIS_ROOT"},
 			Destination: &cfg.Reva.UserStorage.OCIS.Root,
 		},
-		&cli.BoolFlag{
-			Name:        "storage-ocis-enable-home",
-			Value:       flags.OverrideDefaultBool(cfg.Reva.UserStorage.OCIS.EnableHome, true),
-			Usage:       "enable the creation of home storages",
-			EnvVars:     []string{"STORAGE_USERS_DRIVER_OCIS_ENABLE_HOME"},
-			Destination: &cfg.Reva.UserStorage.OCIS.EnableHome,
-		},
 		&cli.StringFlag{
 			Name:        "storage-ocis-layout",
 			Value:       flags.OverrideDefaultString(cfg.Reva.UserStorage.OCIS.UserLayout, "{{.Id.OpaqueId}}"),

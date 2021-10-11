@@ -30,13 +30,6 @@ func DriverOwnCloudSQLWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUDSQL_SHARE_FOLDER"},
 			Destination: &cfg.Reva.UserStorage.OwnCloudSQL.ShareFolder,
 		},
-		&cli.BoolFlag{
-			Name:        "storage-owncloudsql-enable-home",
-			Value:       flags.OverrideDefaultBool(cfg.Reva.UserStorage.OwnCloudSQL.EnableHome, true),
-			Usage:       "enable the creation of home storages",
-			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUDSQL_ENABLE_HOME"},
-			Destination: &cfg.Reva.UserStorage.OwnCloudSQL.EnableHome,
-		},
 		&cli.StringFlag{
 			Name:        "storage-owncloudsql-layout",
 			Value:       flags.OverrideDefaultString(cfg.Reva.UserStorage.OwnCloudSQL.UserLayout, "{{.Username}}"),
