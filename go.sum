@@ -289,11 +289,8 @@ github.com/crewjam/httperr v0.2.0/go.mod h1:Jlz+Sg/XqBQhyMjdDiC+GNNRzZTD7x39Gu3p
 github.com/crewjam/saml v0.4.5 h1:H9u+6CZAESUKHxMyxUbVn0IawYvKZn4nt3d4ccV4O/M=
 github.com/crewjam/saml v0.4.5/go.mod h1:qCJQpUtZte9R1ZjUBcW8qtCNlinbO363ooNl02S68bk=
 github.com/cs3org/cato v0.0.0-20200828125504-e418fc54dd5e/go.mod h1:XJEZ3/EQuI3BXTp/6DUzFr850vlxq11I6satRtz0YQ4=
-github.com/cs3org/go-cs3apis v0.0.0-20210922150613-cb9e3c99f8de h1:N+AI8wz7yhDDqHDuq9EGaqQoFhAOi9XW37xt0ormflw=
-github.com/cs3org/go-cs3apis v0.0.0-20210922150613-cb9e3c99f8de/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
+github.com/cs3org/go-cs3apis v0.0.0-20211007101428-6d142794ec11 h1:cc/8fdzWdr/wAZOXb29J8bnXjo1poCMCLwhlFBlvhfI=
 github.com/cs3org/go-cs3apis v0.0.0-20211007101428-6d142794ec11/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
-github.com/cs3org/reva v1.13.1-0.20211006080436-67f39be571fa h1:sKNIaZ7rZFi+32Wnv8Z8Tc+J4gh0AYrUjaxl0Uk8JCQ=
-github.com/cs3org/reva v1.13.1-0.20211006080436-67f39be571fa/go.mod h1:z1GjBB1gBv2olyqhWpTbL+JOobb2Q+GCSebR09x797A=
 github.com/cs3org/reva v1.13.1-0.20211008145821-26bc95fed373 h1:Jou8sOwgbGQNly3iNILthROl4mI8r9kIsKkEGNY35ng=
 github.com/cs3org/reva v1.13.1-0.20211008145821-26bc95fed373/go.mod h1:ko7v/cGPrNI7XKcEuvZ3HgKVLj0sGuoclyE5wkQIUp0=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
@@ -1116,6 +1113,8 @@ github.com/vinyldns/go-vinyldns v0.0.0-20200917153823-148a5f6b8f14/go.mod h1:RWc
 github.com/vultr/govultr v0.1.4/go.mod h1:9H008Uxr/C4vFNGLqKx232C206GL0PBHzOP0809bGNA=
 github.com/vultr/govultr/v2 v2.0.0/go.mod h1:2PsEeg+gs3p/Fo5Pw8F9mv+DUBEOlrNZ8GmCTGmhOhs=
 github.com/willf/bitset v1.1.10/go.mod h1:RjeCKbqT1RxIR/KWY6phxZiaY1IyutSBfGjNPySAYV4=
+github.com/wk8/go-ordered-map v0.2.0 h1:KlvGyHstD1kkGZkPtHCyCfRYS0cz84uk6rrW/Dnhdtk=
+github.com/wk8/go-ordered-map v0.2.0/go.mod h1:9ZIbRunKbuvfPKyBP1SIKLcXNlv74YCOZ3t3VTS6gRk=
 github.com/xanzy/ssh-agent v0.2.1/go.mod h1:mLlQY/MoOhWBj+gOGMQkOeiEvkx+8pJSI+0Bx9h2kr4=
 github.com/xanzy/ssh-agent v0.3.0 h1:wUMzuKtKilRgBAD1sUb8gOwwRr2FGoBVumcjoOACClI=
 github.com/xanzy/ssh-agent v0.3.0/go.mod h1:3s9xbODqPuuhK9JV1R321M/FlMZSBvE5aY6eAcqrDh0=
