@@ -83,6 +83,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 				"versioning":        true,
 				"archivers":         archivers,
 				"app_providers":     appProviders,
+				"favorites":         cfg.Reva.Frontend.Favorites,
 			}
 
 			if cfg.Reva.DefaultUploadProtocol == "tus" {
