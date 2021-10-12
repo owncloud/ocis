@@ -20,6 +20,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Updated MimeTypes configuration for AppRegistry: [#2603](https://github.com/owncloud/ocis/pull/2603)
 * Enhancement - Add maximum files and size to archiver capabilities: [#2544](https://github.com/owncloud/ocis/pull/2544)
 * Enhancement - Reduced repository size: [#2579](https://github.com/owncloud/ocis/pull/2579)
+* Enhancement - Return the newly created space: [#2610](https://github.com/owncloud/ocis/pull/2610)
 * Enhancement - Expose the reva archiver in OCIS: [#2509](https://github.com/owncloud/ocis/pull/2509)
 * Enhancement - Favorites capability: [#2599](https://github.com/owncloud/ocis/pull/2599)
 * Enhancement - Upgrade to GO 1.17: [#2605](https://github.com/owncloud/ocis/pull/2605)
@@ -144,6 +145,13 @@ The following sections list the changes for unreleased.
    We removed leftover artifacts from the migration to a single repository.
 
    https://github.com/owncloud/ocis/pull/2579
+
+* Enhancement - Return the newly created space: [#2610](https://github.com/owncloud/ocis/pull/2610)
+
+   Changed the response of the CreateSpace method to include the newly created space.
+
+   https://github.com/owncloud/ocis/pull/2610
+   https://github.com/cs3org/reva/pull/2158
 
 * Enhancement - Expose the reva archiver in OCIS: [#2509](https://github.com/owncloud/ocis/pull/2509)
 
