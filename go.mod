@@ -20,7 +20,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.1.0
 	github.com/coreos/go-oidc/v3 v3.0.0
 	github.com/cs3org/go-cs3apis v0.0.0-20211007101428-6d142794ec11
-	github.com/cs3org/reva v1.13.1-0.20211011133845-d39f89cdcc60
+	github.com/cs3org/reva v1.13.1-0.20211012070754-5dbb87c8e084
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth v1.1.3-0.20210729125545-b9aecdfcac31
 	github.com/go-chi/chi/v5 v5.0.4
@@ -58,7 +58,7 @@ require (
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/yaegashi/msgraph.go v0.1.4
 	go.opencensus.io v0.23.0
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.24.0
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.25.0
 	go.opentelemetry.io/otel v1.0.1
 	go.opentelemetry.io/otel/exporters/jaeger v1.0.1
 	go.opentelemetry.io/otel/sdk v1.0.1
