@@ -217,6 +217,7 @@ require (
 	github.com/studio-b12/gowebdav v0.0.0-20210917133250-a3a86976a1df // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/tus/tusd v1.6.0 // indirect
+	github.com/wk8/go-ordered-map v0.2.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.0 // indirect
 	go.etcd.io/bbolt v1.3.5 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.0 // indirect

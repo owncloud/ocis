@@ -988,15 +988,22 @@ def dockerEos(ctx):
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": makeGenerate("ocis") +
-                 build() + [
+        "steps": makeGenerate("") + [
+            {
+                "name": "build",
+                "image": "owncloudci/golang:1.17",
+                "pull": "always",
+                "commands": [
+                    "make -C ocis release-linux-docker",
+                ],
+            },
             {
                 "name": "dryrun-eos-ocis",
                 "image": "plugins/docker:latest",
                 "pull": "always",
                 "settings": {
                     "dry_run": True,
-                    "context": "ocis/docker/eos-ocis",
+                    "context": "ocis",
                     "tags": "linux-eos-ocis",
                     "dockerfile": "ocis/docker/eos-ocis/Dockerfile",
                     "repo": "owncloud/eos-ocis",
@@ -1021,7 +1028,7 @@ def dockerEos(ctx):
                         "from_secret": "docker_password",
                     },
                     "auto_tag": True,
-                    "context": "ocis/docker/eos-ocis",
+                    "context": "ocis",
                     "dockerfile": "ocis/docker/eos-ocis/Dockerfile",
                     "repo": "owncloud/eos-ocis",
                 },
