@@ -1,9 +1,10 @@
 package store
 
 import (
+	"io/ioutil"
 	"os"
 
-	"github.com/gogo/protobuf/jsonpb"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -15,8 +16,12 @@ func (s Store) parseRecordFromFile(record proto.Message, filePath string) error 
 	}
 	defer file.Close()
 
-	decoder := jsonpb.Unmarshaler{}
-	if err = decoder.Unmarshal(file, record); err != nil {
+	b, err := ioutil.ReadAll(file)
+	if err != nil {
+		return err
+	}
+
+	if err := protojson.Unmarshal(b, record); err != nil {
 		return err
 	}
 	return nil
@@ -30,8 +35,8 @@ func (s Store) writeRecordToFile(record proto.Message, filePath string) error {
 	}
 	defer file.Close()
 
-	encoder := jsonpb.Marshaler{}
-	if err = encoder.Marshal(file, record); err != nil {
+	if v, err := protojson.Marshal(record); err != nil {
+		file.Write(v)
 		return err
 	}
 
