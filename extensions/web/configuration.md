@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-12T09:40:04+0000"
+date: "2021-10-12T15:30:47+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/web/templates
@@ -72,6 +72,7 @@ Usage: `web [global options] command [command options] [arguments...]`
 
 
 
+
 ## Sub Commands
 
 ### web health
@@ -86,6 +87,7 @@ Usage: `web health [command options] [arguments...]`
 
 -debug-addr |  $WEB_DEBUG_ADDR
 : Address to debug endpoint. Default: `"0.0.0.0:9104"`.
+
 
 
 
@@ -203,11 +205,15 @@ Usage: `web server [command options] [arguments...]`
 
 
 -web-config-server |  $WEB_UI_CONFIG_SERVER , $OCIS_URL
-: Server URL. Default: `"https://localhost:9200"`.
+: Configuration server URL. Default: `"https://localhost:9200"`.
 
 
--web-config-theme |  $WEB_UI_CONFIG_THEME
-: Theme. Default: `"owncloud"`.
+-web-theme-server |  $WEB_UI_THEME_SERVER , $OCIS_URL
+: Theme server URL. Default: `"https://localhost:9200"`.
+
+
+-web-config-theme |  $WEB_UI_THEME_PATH
+: Theme path on the theme server. Default: `"/themes/owncloud/theme.json"`.
 
 
 -web-config-version |  $WEB_UI_CONFIG_VERSION
