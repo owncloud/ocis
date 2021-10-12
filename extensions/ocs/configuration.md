@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-12T15:30:45+0000"
+date: "2021-10-12T16:25:20+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocs/templates
@@ -34,77 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Command-line flags
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### ocs health
-
-Check health status
-
-Usage: `ocs health [command options] [arguments...]`
-
-
--debug-addr |  $OCS_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9114"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### ocs ocis-ocs
-
-Serve OCS API for oCIS
-
-Usage: `ocs ocis-ocs [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### ocs server
 
@@ -254,4 +183,75 @@ Usage: `ocs version [command options] [arguments...]`
 
 -name |  $OCS_NAME
 : Service name. Default: `"ocs"`.
+
+### ocs health
+
+Check health status
+
+Usage: `ocs health [command options] [arguments...]`
+
+
+-debug-addr |  $OCS_DEBUG_ADDR
+: Address to debug endpoint. Default: `"0.0.0.0:9114"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### ocs ocis-ocs
+
+Serve OCS API for oCIS
+
+Usage: `ocs ocis-ocs [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
