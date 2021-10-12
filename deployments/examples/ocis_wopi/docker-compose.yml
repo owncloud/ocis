@@ -54,7 +54,6 @@ services:
       - /bin/sh
       - /entrypoint-override.sh
     environment:
-      PROXY_ENABLE_BASIC_AUTH: "true"
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
@@ -87,7 +86,10 @@ services:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
-    command: storage-app-provider server
+    entrypoint:
+      - /bin/sh
+      - /entrypoint-override.sh
+    #command: storage-app-provider server
     environment:
       REVA_GATEWAY: ${REVA_GATEWAY:-ocis:9142}
       APP_PROVIDER_BASIC_EXTERNAL_ADDR: ocis-appdriver-collabora:9164
@@ -100,6 +102,8 @@ services:
       APP_PROVIDER_WOPI_DRIVER_INSECURE: "${INSECURE:-false}"
       APP_PROVIDER_WOPI_DRIVER_IOP_SECRET: ${WOPI_IOP_SECRET:-LoremIpsum123}
       APP_PROVIDER_WOPI_DRIVER_WOPI_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
+    volumes:
+      - ./config/ocis-appdriver-collabora/entrypoint-override.sh:/entrypoint-override.sh
     logging:
       driver: "local"
     restart: always
