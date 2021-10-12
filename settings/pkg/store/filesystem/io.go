@@ -3,8 +3,8 @@ package store
 import (
 	"os"
 
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
+	"github.com/gogo/protobuf/jsonpb"
+	"google.golang.org/protobuf/proto"
 )
 
 // Unmarshal file into record

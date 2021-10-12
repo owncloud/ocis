@@ -3,7 +3,7 @@ package proto
 import (
 	"context"
 
-	"github.com/golang/protobuf/ptypes/empty"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	"go-micro.dev/v4/client"
 )
 

@@ -3,8 +3,8 @@ package proto
 import (
 	context "context"
 
-	empty "github.com/golang/protobuf/ptypes/empty"
 	client "go-micro.dev/v4/client"
+	empty "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // MockAccountsService can be used to write tests

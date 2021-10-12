@@ -11,8 +11,8 @@ import (
 	"testing"
 
 	mgrpcc "github.com/asim/go-micro/plugins/client/grpc/v3"
+	empty "github.com/golang/protobuf/ptypes/empty"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/owncloud/ocis/accounts/pkg/command"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
