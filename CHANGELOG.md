@@ -17,6 +17,7 @@ The following sections list the changes for unreleased.
 * Change - Make the drives create method odata compliant: [#2531](https://github.com/owncloud/ocis/pull/2531)
 * Change - Unify Envvar names configuring REVA gateway address: [#2587](https://github.com/owncloud/ocis/pull/2587)
 * Change - Update ownCloud Web to v4.3.0: [#2589](https://github.com/owncloud/ocis/pull/2589)
+* Enhancement - Updated MimeTypes configuration for AppRegistry: [#2603](https://github.com/owncloud/ocis/pull/2603)
 * Enhancement - Add maximum files and size to archiver capabilities: [#2544](https://github.com/owncloud/ocis/pull/2544)
 * Enhancement - Reduced repository size: [#2579](https://github.com/owncloud/ocis/pull/2579)
 * Enhancement - Expose the reva archiver in OCIS: [#2509](https://github.com/owncloud/ocis/pull/2509)
@@ -122,6 +123,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/2589
    https://github.com/owncloud/web/releases/tag/v4.3.0
+
+* Enhancement - Updated MimeTypes configuration for AppRegistry: [#2603](https://github.com/owncloud/ocis/pull/2603)
+
+   We updated the type of the mime types config to a list, to keep the order of mime types from the
+   config.
+
+   https://github.com/owncloud/ocis/pull/2603
 
 * Enhancement - Add maximum files and size to archiver capabilities: [#2544](https://github.com/owncloud/ocis/pull/2544)
 
