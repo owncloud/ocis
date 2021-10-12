@@ -7,12 +7,12 @@ import (
 	"os"
 	"path/filepath"
 
-	merrors "github.com/asim/go-micro/v3/errors"
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/keyword"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/store/pkg/config"
 	"github.com/owncloud/ocis/store/pkg/proto/v0"
+	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 

@@ -1,7 +1,6 @@
 package http
 
 import (
-	"github.com/asim/go-micro/v3"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/account"
@@ -11,6 +10,7 @@ import (
 	"github.com/owncloud/ocis/settings/pkg/assets"
 	"github.com/owncloud/ocis/settings/pkg/proto/v0"
 	svc "github.com/owncloud/ocis/settings/pkg/service/v0"
+	"go-micro.dev/v4"
 )
 
 // Server initializes the http service and server.

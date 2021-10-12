@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/asim/go-micro/v3/client"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
@@ -13,6 +12,7 @@ import (
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
+	"go-micro.dev/v4/client"
 )
 
 var mockAccResp = []*accounts.Account{

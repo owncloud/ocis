@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	merrors "github.com/asim/go-micro/v3/errors"
-	"github.com/asim/go-micro/v3/metadata"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
@@ -14,6 +12,8 @@ import (
 	"github.com/owncloud/ocis/settings/pkg/proto/v0"
 	"github.com/owncloud/ocis/settings/pkg/settings"
 	store "github.com/owncloud/ocis/settings/pkg/store/filesystem"
+	merrors "go-micro.dev/v4/errors"
+	"go-micro.dev/v4/metadata"
 )
 
 // Service represents a service.

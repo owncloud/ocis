@@ -16,8 +16,6 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 
-	merrors "github.com/asim/go-micro/v3/errors"
-	"github.com/asim/go-micro/v3/metadata"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
 	fieldmask_utils "github.com/mennanov/fieldmask-utils"
@@ -31,6 +29,8 @@ import (
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	settings_svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"github.com/rs/zerolog"
+	merrors "go-micro.dev/v4/errors"
+	"go-micro.dev/v4/metadata"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/genproto/protobuf/field_mask"
 	p "google.golang.org/protobuf/proto"

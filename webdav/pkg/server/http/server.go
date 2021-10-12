@@ -1,11 +1,11 @@
 package http
 
 import (
-	"github.com/asim/go-micro/v3"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
 	svc "github.com/owncloud/ocis/webdav/pkg/service/v0"
+	"go-micro.dev/v4"
 )
 
 // Server initializes the http service and server.

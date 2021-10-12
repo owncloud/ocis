@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/asim/go-micro/v3/metadata"
 	"github.com/glauth/glauth/pkg/config"
 	"github.com/glauth/glauth/pkg/handler"
 	"github.com/glauth/glauth/pkg/stats"
@@ -17,6 +16,7 @@ import (
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
+	"go-micro.dev/v4/metadata"
 )
 
 type queryType string
