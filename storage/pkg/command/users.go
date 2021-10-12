@@ -178,22 +178,22 @@ func usersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interf
 	return rcfg
 }
 
-// UserProvider allows for the storage-userprovider command to be embedded and supervised by a suture supervisor tree.
-type UserProvider struct {
+// UserProviderSutureService allows for the storage-userprovider command to be embedded and supervised by a suture supervisor tree.
+type UserProviderSutureService struct {
 	cfg *config.Config
 }
 
-// NewUserProvider creates a new storage.UserProvider
+// NewUserProviderSutureService creates a new storage.UserProvider
 func NewUserProvider(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Storage.Reva.Users.Supervised = true
 	}
-	return UserProvider{
+	return UserProviderSutureService{
 		cfg: cfg.Storage,
 	}
 }
 
-func (s UserProvider) Serve(ctx context.Context) error {
+func (s UserProviderSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.Users.Context = ctx
 	f := &flag.FlagSet{}
 	cmdFlags := Users(s.cfg).Flags

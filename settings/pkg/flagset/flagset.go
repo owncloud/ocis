@@ -35,7 +35,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9194"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9194"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"SETTINGS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -89,7 +89,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9194"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9194"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"SETTINGS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -115,7 +115,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9190"),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "127.0.0.1:9190"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"SETTINGS_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
@@ -143,7 +143,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "grpc-addr",
-			Value:       flags.OverrideDefaultString(cfg.GRPC.Addr, "0.0.0.0:9191"),
+			Value:       flags.OverrideDefaultString(cfg.GRPC.Addr, "127.0.0.1:9191"),
 			Usage:       "Address to bind grpc server",
 			EnvVars:     []string{"SETTINGS_GRPC_ADDR"},
 			Destination: &cfg.GRPC.Addr,

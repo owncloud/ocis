@@ -13,7 +13,7 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.AuthBasic.DebugAddr, "0.0.0.0:9147"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.AuthBasic.DebugAddr, "127.0.0.1:9147"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_AUTH_BASIC_DEBUG_ADDR"},
 			Destination: &cfg.Reva.AuthBasic.DebugAddr,
@@ -49,7 +49,7 @@ func AuthBasicWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.AuthBasic.GRPCAddr, "0.0.0.0:9146"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.AuthBasic.GRPCAddr, "127.0.0.1:9146"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_AUTH_BASIC_GRPC_ADDR"},
 			Destination: &cfg.Reva.AuthBasic.GRPCAddr,

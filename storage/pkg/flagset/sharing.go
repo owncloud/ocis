@@ -13,7 +13,7 @@ func SharingWithConfig(cfg *config.Config) []cli.Flag {
 		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Sharing.DebugAddr, "0.0.0.0:9151"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Sharing.DebugAddr, "127.0.0.1:9151"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_SHARING_DEBUG_ADDR"},
 			Destination: &cfg.Reva.Sharing.DebugAddr,
@@ -42,7 +42,7 @@ func SharingWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Sharing.GRPCAddr, "0.0.0.0:9150"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Sharing.GRPCAddr, "127.0.0.1:9150"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_SHARING_GRPC_ADDR"},
 			Destination: &cfg.Reva.Sharing.GRPCAddr,

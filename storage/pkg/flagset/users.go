@@ -13,7 +13,7 @@ func UsersWithConfig(cfg *config.Config) []cli.Flag {
 		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Users.DebugAddr, "0.0.0.0:9145"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Users.DebugAddr, "127.0.0.1:9145"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_USERPROVIDER_DEBUG_ADDR"},
 			Destination: &cfg.Reva.Users.DebugAddr,
@@ -42,7 +42,7 @@ func UsersWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Users.GRPCAddr, "0.0.0.0:9144"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Users.GRPCAddr, "127.0.0.1:9144"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_USERPROVIDER_ADDR"},
 			Destination: &cfg.Reva.Users.GRPCAddr,

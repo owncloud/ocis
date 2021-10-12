@@ -14,7 +14,7 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StorageHome.DebugAddr, "0.0.0.0:9156"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageHome.DebugAddr, "127.0.0.1:9156"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_HOME_DEBUG_ADDR"},
 			Destination: &cfg.Reva.StorageHome.DebugAddr,
@@ -33,7 +33,7 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "grpc-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StorageHome.GRPCAddr, "0.0.0.0:9154"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageHome.GRPCAddr, "127.0.0.1:9154"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_HOME_GRPC_ADDR"},
 			Destination: &cfg.Reva.StorageHome.GRPCAddr,
@@ -47,7 +47,7 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StorageHome.HTTPAddr, "0.0.0.0:9155"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageHome.HTTPAddr, "127.0.0.1:9155"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_HOME_HTTP_ADDR"},
 			Destination: &cfg.Reva.StorageHome.HTTPAddr,
