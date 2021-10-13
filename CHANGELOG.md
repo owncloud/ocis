@@ -1,8 +1,8 @@
-# Changelog for [1.14.0] (2021-10-13)
+# Changelog for [1.13.0] (2021-10-13)
 
-The following sections list the changes for 1.14.0.
+The following sections list the changes for 1.13.0.
 
-[1.14.0]: https://github.com/owncloud/ocis/compare/v1.12.0...v1.14.0
+[1.13.0]: https://github.com/owncloud/ocis/compare/v1.12.0...v1.13.0
 
 ## Summary
 
