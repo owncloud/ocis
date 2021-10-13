@@ -7,11 +7,11 @@
 package proto
 
 import (
-	empty "github.com/golang/protobuf/ptypes/empty"
 	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -3285,7 +3285,7 @@ var file_settings_proto_goTypes = []interface{}{
 	(*Value)(nil),                              // 42: com.owncloud.ocis.settings.v0.Value
 	(*ListValue)(nil),                          // 43: com.owncloud.ocis.settings.v0.ListValue
 	(*ListOptionValue)(nil),                    // 44: com.owncloud.ocis.settings.v0.ListOptionValue
-	(*empty.Empty)(nil),                        // 45: google.protobuf.Empty
+	(*emptypb.Empty)(nil),                      // 45: google.protobuf.Empty
 }
 var file_settings_proto_depIdxs = []int32{
 	33, // 0: com.owncloud.ocis.settings.v0.SaveBundleRequest.bundle:type_name -> com.owncloud.ocis.settings.v0.Bundle

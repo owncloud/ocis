@@ -4,12 +4,18 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/owncloud/ocis/settings/pkg/store/errortypes"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
 
 // Unmarshal file into record
 func (s Store) parseRecordFromFile(record proto.Message, filePath string) error {
+	_, err := os.Stat(filePath)
+	if err != nil {
+		return errortypes.BundleNotFound(err.Error())
+	}
+
 	file, err := os.Open(filePath)
 	if err != nil {
 		return err
@@ -19,6 +25,10 @@ func (s Store) parseRecordFromFile(record proto.Message, filePath string) error 
 	b, err := ioutil.ReadAll(file)
 	if err != nil {
 		return err
+	}
+
+	if len(b) == 0 {
+		return errortypes.BundleNotFound(filePath)
 	}
 
 	if err := protojson.Unmarshal(b, record); err != nil {
@@ -35,10 +45,12 @@ func (s Store) writeRecordToFile(record proto.Message, filePath string) error {
 	}
 	defer file.Close()
 
-	if v, err := protojson.Marshal(record); err != nil {
-		file.Write(v)
+	v, err := protojson.Marshal(record)
+	if err != nil {
 		return err
 	}
+
+	file.Write(v)
 
 	return nil
 }

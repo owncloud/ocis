@@ -544,7 +544,7 @@ func TestUpdateAccount(t *testing.T) {
 			resp, err := updateAccount(t, tt.userAccount, updateMask)
 			if tt.expectedErrOnUpdate != nil {
 				assert.Error(t, err)
-				assert.Equal(t, tt.expectedErrOnUpdate, err)
+				assert.Equal(t, tt.expectedErrOnUpdate.Error(), err.Error())
 			} else {
 				assert.NoError(t, err)
 				assert.IsType(t, &proto.Account{}, resp)
