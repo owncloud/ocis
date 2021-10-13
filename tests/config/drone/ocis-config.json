@@ -1,6 +1,6 @@
 {
     "server": "https://ocis-server:9200",
-    "theme": "owncloud",
+    "theme": "https://ocis-server:9200/themes/owncloud/theme.json",
     "version": "0.1.0",
     "openIdConnect": {
         "metadata_url": "https://ocis-server:9200/.well-known/openid-configuration",

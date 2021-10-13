@@ -1,4 +1,4 @@
-FROM owncloudci/golang:1.16 as build
+FROM owncloudci/golang:1.17 as build
 
 COPY ./ /ocis/
 

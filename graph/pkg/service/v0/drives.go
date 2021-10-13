@@ -165,12 +165,12 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 	drive := msgraph.Drive{}
 	if err := json.NewDecoder(r.Body).Decode(&drive); err != nil {
-		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Errorf("invalid schema definition").Error())
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "invalid schema definition")
 		return
 	}
 	spaceName := *drive.Name
 	if spaceName == "" {
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Errorf("invalid name").Error())
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "invalid name")
 		return
 	}
 
@@ -182,7 +182,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	case "":
 		driveType = "project"
 	case "share":
-		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Errorf("drives of type share cannot be created via this api").Error())
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "drives of type share cannot be created via this api")
 	}
 
 	var quota uint64
@@ -208,8 +208,24 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Errorf("").Error())
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "")
 	}
+
+	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error parsing url")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	newDrive, err := cs3StorageSpaceToDrive(wdu, resp.StorageSpace)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error parsing url")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+	render.Status(r, http.StatusCreated)
+	render.JSON(w, r, newDrive)
 }
 
 func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
@@ -227,19 +243,19 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.FirstSegment.Identifier.Get() == "" {
-		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Errorf("identifier cannot be empty").Error())
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "identifier cannot be empty")
 		return
 	}
 
 	drive := msgraph.Drive{}
 	if err = json.NewDecoder(r.Body).Decode(&drive); err != nil {
-		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Errorf("invalid request body: %v", r.Body).Error())
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %v", r.Body))
 		return
 	}
 
 	identifierParts := strings.Split(req.FirstSegment.Identifier.Get(), "!")
 	if len(identifierParts) != 2 {
-		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Errorf("invalid resource id: %v", req.FirstSegment.Identifier.Get()).Error())
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid resource id: %v", req.FirstSegment.Identifier.Get()))
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
@@ -263,13 +279,19 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
+	if drive.Quota.HasTotal() {
+		updateSpaceRequest.StorageSpace.Quota = &storageprovider.Quota{
+			QuotaMaxBytes: uint64(*drive.Quota.Total),
+		}
+	}
+
 	resp, err := client.UpdateStorageSpace(r.Context(), updateSpaceRequest)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
 	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Errorf("").Error())
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "")
 	}
 
 	w.WriteHeader(http.StatusNoContent)
