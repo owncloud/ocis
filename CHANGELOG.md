@@ -1,8 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [1.13.0] (2021-10-13)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 1.13.0.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.12.0...master
+[1.13.0]: https://github.com/owncloud/ocis/compare/v1.12.0...v1.13.0
 
 ## Summary
 
