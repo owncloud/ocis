@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -184,20 +185,27 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "drives of type share cannot be created via this api")
 	}
 
-	var quota uint64
-	if drive.Quota != nil && drive.Quota.Total != nil {
-		quota = uint64(*drive.Quota.Total)
-	} else {
-		quota = 65536 // set default quota if no value was sent.
+	var maxBytes *int64
+	switch {
+	case drive.Quota != nil && drive.Quota.Total != nil && *drive.Quota.Total >= 0:
+		maxBytes = drive.Quota.Total
+	case g.config.Spaces.DefaultQuota != "":
+		q, err := strconv.ParseInt(g.config.Spaces.DefaultQuota, 10, 64)
+		if err == nil && q >= 0 {
+			maxBytes = &q
+		}
+	}
+
+	var quota provider.Quota
+	if maxBytes != nil {
+		quota.QuotaMaxBytes = uint64(*maxBytes)
 	}
 
 	csr := provider.CreateStorageSpaceRequest{
 		Owner: us,
 		Type:  driveType,
 		Name:  spaceName,
-		Quota: &provider.Quota{
-			QuotaMaxBytes: quota,
-		},
+		Quota: &quota,
 	}
 
 	resp, err := client.CreateStorageSpace(r.Context(), &csr)
@@ -208,6 +216,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 
 	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "")
+		return
 	}
 
 	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
