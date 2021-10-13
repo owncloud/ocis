@@ -14,7 +14,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.DebugAddr, "0.0.0.0:9141"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.DebugAddr, "127.0.0.1:9141"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_FRONTEND_DEBUG_ADDR"},
 			Destination: &cfg.Reva.Frontend.DebugAddr,
@@ -88,7 +88,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.HTTPAddr, "0.0.0.0:9140"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.HTTPAddr, "127.0.0.1:9140"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_FRONTEND_HTTP_ADDR"},
 			Destination: &cfg.Reva.Frontend.HTTPAddr,

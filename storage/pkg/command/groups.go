@@ -157,22 +157,22 @@ func groupsConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inter
 	}
 }
 
-// GroupProvider allows for the storage-groupprovider command to be embedded and supervised by a suture supervisor tree.
-type GroupProvider struct {
+// GroupSutureService allows for the storage-groupprovider command to be embedded and supervised by a suture supervisor tree.
+type GroupSutureService struct {
 	cfg *config.Config
 }
 
-// NewGroupProvider creates a new storage.GroupProvider
+// NewGroupProviderSutureService creates a new storage.GroupProvider
 func NewGroupProvider(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Storage.Reva.Groups.Supervised = true
 	}
-	return GroupProvider{
+	return GroupSutureService{
 		cfg: cfg.Storage,
 	}
 }
 
-func (s GroupProvider) Serve(ctx context.Context) error {
+func (s GroupSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.Groups.Context = ctx
 	f := &flag.FlagSet{}
 	cmdFlags := Groups(s.cfg).Flags

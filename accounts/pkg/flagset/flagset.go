@@ -87,7 +87,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9181"),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "127.0.0.1:9181"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"ACCOUNTS_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
@@ -115,7 +115,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "grpc-addr",
-			Value:       flags.OverrideDefaultString(cfg.GRPC.Addr, "0.0.0.0:9180"),
+			Value:       flags.OverrideDefaultString(cfg.GRPC.Addr, "127.0.0.1:9180"),
 			Usage:       "Address to bind grpc server",
 			EnvVars:     []string{"ACCOUNTS_GRPC_ADDR"},
 			Destination: &cfg.GRPC.Addr,

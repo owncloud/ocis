@@ -13,7 +13,7 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.DebugAddr, "0.0.0.0:9143"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.DebugAddr, "127.0.0.1:9143"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_GATEWAY_DEBUG_ADDR"},
 			Destination: &cfg.Reva.Gateway.DebugAddr,
@@ -48,7 +48,7 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.GRPCAddr, "0.0.0.0:9142"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.GRPCAddr, "127.0.0.1:9142"),
 			Usage:       "Address to bind REVA service",
 			EnvVars:     []string{"STORAGE_GATEWAY_GRPC_ADDR"},
 			Destination: &cfg.Reva.Gateway.GRPCAddr,

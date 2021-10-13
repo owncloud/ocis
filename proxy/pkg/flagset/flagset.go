@@ -42,7 +42,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9109"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9109"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"PROXY_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -102,7 +102,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9205"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9205"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"PROXY_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,

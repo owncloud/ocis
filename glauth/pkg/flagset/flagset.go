@@ -38,7 +38,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9129"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9129"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"GLAUTH_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -98,7 +98,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9129"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9129"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"GLAUTH_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -132,7 +132,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "ldap-addr",
-			Value:       flags.OverrideDefaultString(cfg.Ldap.Addr, "0.0.0.0:9125"),
+			Value:       flags.OverrideDefaultString(cfg.Ldap.Addr, "127.0.0.1:9125"),
 			Usage:       "Address to bind ldap server",
 			EnvVars:     []string{"GLAUTH_LDAP_ADDR"},
 			Destination: &cfg.Ldap.Addr,
@@ -147,7 +147,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "ldaps-addr",
-			Value:       flags.OverrideDefaultString(cfg.Ldaps.Addr, "0.0.0.0:9126"),
+			Value:       flags.OverrideDefaultString(cfg.Ldaps.Addr, "127.0.0.1:9126"),
 			Usage:       "Address to bind ldap server",
 			EnvVars:     []string{"GLAUTH_LDAPS_ADDR"},
 			Destination: &cfg.Ldaps.Addr,

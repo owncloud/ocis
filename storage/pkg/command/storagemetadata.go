@@ -159,7 +159,7 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 }
 
 // SutureService allows for the storage-metadata command to be embedded and supervised by a suture supervisor tree.
-type SutureService struct {
+type MetadataSutureService struct {
 	cfg *config.Config
 }
 
@@ -168,12 +168,12 @@ func NewStorageMetadata(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Storage.Reva.StorageMetadata.Supervised = true
 	}
-	return SutureService{
+	return MetadataSutureService{
 		cfg: cfg.Storage,
 	}
 }
 
-func (s SutureService) Serve(ctx context.Context) error {
+func (s MetadataSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.StorageMetadata.Context = ctx
 	f := &flag.FlagSet{}
 	cmdFlags := StorageMetadata(s.cfg).Flags

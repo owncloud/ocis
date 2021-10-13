@@ -12,7 +12,7 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 	f := []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StorageMetadata.DebugAddr, "0.0.0.0:9217"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageMetadata.DebugAddr, "127.0.0.1:9217"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_METADATA_DEBUG_ADDR"},
 			Destination: &cfg.Reva.StorageMetadata.DebugAddr,
@@ -26,7 +26,7 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "grpc-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StorageMetadata.GRPCAddr, "0.0.0.0:9215"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageMetadata.GRPCAddr, "127.0.0.1:9215"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_METADATA_GRPC_PROVIDER_ADDR"},
 			Destination: &cfg.Reva.StorageMetadata.GRPCAddr,
@@ -47,7 +47,7 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StorageMetadata.HTTPAddr, "0.0.0.0:9216"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageMetadata.HTTPAddr, "127.0.0.1:9216"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_METADATA_HTTP_ADDR"},
 			Destination: &cfg.Reva.StorageMetadata.HTTPAddr,
