@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-13T11:50:21+0000"
+date: "2021-10-13T13:45:46+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -47,7 +47,7 @@ Usage: `proxy health [command options] [arguments...]`
 
 
 -debug-addr |  $PROXY_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9109"`.
+: Address to debug endpoint. Default: `"127.0.0.1:9109"`.
 
 
 
@@ -197,7 +197,7 @@ Usage: `proxy server [command options] [arguments...]`
 
 
 -debug-addr |  $PROXY_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9205"`.
+: Address to bind debug server. Default: `"127.0.0.1:9205"`.
 
 
 -debug-token |  $PROXY_DEBUG_TOKEN

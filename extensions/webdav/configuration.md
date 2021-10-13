@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-13T11:50:23+0000"
+date: "2021-10-13T13:45:47+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/webdav/templates
@@ -75,7 +75,7 @@ Usage: `webdav health [command options] [arguments...]`
 
 
 -debug-addr |  $WEBDAV_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9119"`.
+: Address to debug endpoint. Default: `"127.0.0.1:9119"`.
 
 
 
@@ -149,7 +149,7 @@ Usage: `webdav server [command options] [arguments...]`
 
 
 -debug-addr |  $WEBDAV_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9119"`.
+: Address to bind debug server. Default: `"127.0.0.1:9119"`.
 
 
 -debug-token |  $WEBDAV_DEBUG_TOKEN
@@ -165,7 +165,7 @@ Usage: `webdav server [command options] [arguments...]`
 
 
 -http-addr |  $WEBDAV_HTTP_ADDR
-: Address to bind http server. Default: `"0.0.0.0:9115"`.
+: Address to bind http server. Default: `"127.0.0.1:9115"`.
 
 
 -http-namespace |  $WEBDAV_HTTP_NAMESPACE

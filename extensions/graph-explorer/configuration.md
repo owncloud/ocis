@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-13T11:50:21+0000"
+date: "2021-10-13T13:45:45+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/graph-explorer/templates
@@ -84,7 +84,7 @@ Usage: `graph-explorer health [command options] [arguments...]`
 
 
 -debug-addr |  $GRAPH_EXPLORER_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9136"`.
+: Address to debug endpoint. Default: `"127.0.0.1:9136"`.
 
 
 
@@ -139,7 +139,7 @@ Usage: `graph-explorer server [command options] [arguments...]`
 
 
 -debug-addr |  $GRAPH_EXPLORER_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9136"`.
+: Address to bind debug server. Default: `"127.0.0.1:9136"`.
 
 
 -debug-token |  $GRAPH_EXPLORER_DEBUG_TOKEN
@@ -155,7 +155,7 @@ Usage: `graph-explorer server [command options] [arguments...]`
 
 
 -http-addr |  $GRAPH_EXPLORER_HTTP_ADDR
-: Address to bind http server. Default: `"0.0.0.0:9135"`.
+: Address to bind http server. Default: `"127.0.0.1:9135"`.
 
 
 -http-root |  $GRAPH_EXPLORER_HTTP_ROOT

@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-13T11:50:22+0000"
+date: "2021-10-13T13:45:47+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -35,6 +35,44 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
+### thumbnails version
+
+Print the versions of the running instances
+
+Usage: `thumbnails version [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-grpc-name |  $THUMBNAILS_GRPC_NAME
+: Name of the service. Default: `"thumbnails"`.
+
+
+-grpc-namespace |  $THUMBNAILS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
 ### thumbnails health
 
 Check health status
@@ -43,7 +81,7 @@ Usage: `thumbnails health [command options] [arguments...]`
 
 
 -debug-addr |  $THUMBNAILS_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9189"`.
+: Address to debug endpoint. Default: `"127.0.0.1:9189"`.
 
 
 
@@ -151,7 +189,7 @@ Usage: `thumbnails server [command options] [arguments...]`
 
 
 -debug-addr |  $THUMBNAILS_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9189"`.
+: Address to bind debug server. Default: `"127.0.0.1:9189"`.
 
 
 -debug-token |  $THUMBNAILS_DEBUG_TOKEN
@@ -171,7 +209,7 @@ Usage: `thumbnails server [command options] [arguments...]`
 
 
 -grpc-addr |  $THUMBNAILS_GRPC_ADDR
-: Address to bind grpc server. Default: `"0.0.0.0:9185"`.
+: Address to bind grpc server. Default: `"127.0.0.1:9185"`.
 
 
 -grpc-namespace |  $THUMBNAILS_GRPC_NAMESPACE
@@ -202,42 +240,4 @@ Usage: `thumbnails server [command options] [arguments...]`
 : Run specific extensions during supervised mode.
 
 
-
-### thumbnails version
-
-Print the versions of the running instances
-
-Usage: `thumbnails version [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--grpc-name |  $THUMBNAILS_GRPC_NAME
-: Name of the service. Default: `"thumbnails"`.
-
-
--grpc-namespace |  $THUMBNAILS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
 

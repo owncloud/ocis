@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-13T11:50:21+0000"
+date: "2021-10-13T13:45:46+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -46,7 +46,7 @@ Usage: `settings health [command options] [arguments...]`
 
 
 -debug-addr |  $SETTINGS_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9194"`.
+: Address to debug endpoint. Default: `"127.0.0.1:9194"`.
 
 
 
@@ -149,7 +149,7 @@ Usage: `settings server [command options] [arguments...]`
 
 
 -debug-addr |  $SETTINGS_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9194"`.
+: Address to bind debug server. Default: `"127.0.0.1:9194"`.
 
 
 -debug-token |  $SETTINGS_DEBUG_TOKEN
@@ -165,7 +165,7 @@ Usage: `settings server [command options] [arguments...]`
 
 
 -http-addr |  $SETTINGS_HTTP_ADDR
-: Address to bind http server. Default: `"0.0.0.0:9190"`.
+: Address to bind http server. Default: `"127.0.0.1:9190"`.
 
 
 -http-namespace |  $SETTINGS_HTTP_NAMESPACE
@@ -181,7 +181,7 @@ Usage: `settings server [command options] [arguments...]`
 
 
 -grpc-addr |  $SETTINGS_GRPC_ADDR
-: Address to bind grpc server. Default: `"0.0.0.0:9191"`.
+: Address to bind grpc server. Default: `"127.0.0.1:9191"`.
 
 
 -asset-path |  $SETTINGS_ASSET_PATH

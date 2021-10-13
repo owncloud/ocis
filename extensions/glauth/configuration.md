@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-13T11:50:21+0000"
+date: "2021-10-13T13:45:45+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/glauth/templates
@@ -46,7 +46,7 @@ Usage: `glauth health [command options] [arguments...]`
 
 
 -debug-addr |  $GLAUTH_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9129"`.
+: Address to debug endpoint. Default: `"127.0.0.1:9129"`.
 
 
 
@@ -177,7 +177,7 @@ Usage: `glauth server [command options] [arguments...]`
 
 
 -debug-addr |  $GLAUTH_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9129"`.
+: Address to bind debug server. Default: `"127.0.0.1:9129"`.
 
 
 -debug-token |  $GLAUTH_DEBUG_TOKEN
@@ -197,7 +197,7 @@ Usage: `glauth server [command options] [arguments...]`
 
 
 -ldap-addr |  $GLAUTH_LDAP_ADDR
-: Address to bind ldap server. Default: `"0.0.0.0:9125"`.
+: Address to bind ldap server. Default: `"127.0.0.1:9125"`.
 
 
 -ldap-enabled |  $GLAUTH_LDAP_ENABLED
@@ -205,7 +205,7 @@ Usage: `glauth server [command options] [arguments...]`
 
 
 -ldaps-addr |  $GLAUTH_LDAPS_ADDR
-: Address to bind ldap server. Default: `"0.0.0.0:9126"`.
+: Address to bind ldap server. Default: `"127.0.0.1:9126"`.
 
 
 -ldaps-enabled |  $GLAUTH_LDAPS_ENABLED

@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-13T11:50:21+0000"
+date: "2021-10-13T13:45:45+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/idp/templates
@@ -46,7 +46,7 @@ Usage: `idp health [command options] [arguments...]`
 
 
 -debug-addr |  $IDP_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9134"`.
+: Address to debug endpoint. Default: `"127.0.0.1:9134"`.
 
 
 
@@ -221,7 +221,7 @@ Usage: `idp server [command options] [arguments...]`
 
 
 -debug-addr |  $IDP_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9134"`.
+: Address to bind debug server. Default: `"127.0.0.1:9134"`.
 
 
 -debug-token |  $IDP_DEBUG_TOKEN
@@ -237,7 +237,7 @@ Usage: `idp server [command options] [arguments...]`
 
 
 -http-addr |  $IDP_HTTP_ADDR
-: Address to bind http server. Default: `"0.0.0.0:9130"`.
+: Address to bind http server. Default: `"127.0.0.1:9130"`.
 
 
 -http-root |  $IDP_HTTP_ROOT

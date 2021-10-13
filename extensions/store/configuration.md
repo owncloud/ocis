@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-13T11:50:22+0000"
+date: "2021-10-13T13:45:46+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/store/templates
@@ -47,7 +47,8 @@ Usage: `store health [command options] [arguments...]`
 
 
 -debug-addr |  $STORE_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9460"`.
+: Address to debug endpoint. Default: `"127.0.0.1:9464"`.
+
 
 
 
@@ -104,6 +105,7 @@ Usage: `store ocis-store [command options] [arguments...]`
 
 
 
+
 ### store server
 
 Start integrated server
@@ -141,7 +143,7 @@ Usage: `store server [command options] [arguments...]`
 
 
 -debug-addr |  $STORE_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9460"`.
+: Address to bind debug server. Default: `"127.0.0.1:9464"`.
 
 
 -debug-token |  $STORE_DEBUG_TOKEN
@@ -158,6 +160,10 @@ Usage: `store server [command options] [arguments...]`
 
 -grpc-namespace |  $STORE_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
+
+-grpc-addr |  $STORE_GRPC_ADDR
+: Address to bind grpc server. Default: `"127.0.0.1:9460"`.
 
 
 -name |  $STORE_NAME
@@ -178,6 +184,7 @@ Usage: `store server [command options] [arguments...]`
 Print the versions of the running instances
 
 Usage: `store version [command options] [arguments...]`
+
 
 
 

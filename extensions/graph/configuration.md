@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-13T11:50:21+0000"
+date: "2021-10-13T13:45:45+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/graph/templates
@@ -35,6 +35,85 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
+### graph server
+
+Start integrated server
+
+Usage: `graph server [command options] [arguments...]`
+
+
+
+
+
+
+
+-log-file |  $GRAPH_LOG_FILE , $OCIS_LOG_FILE
+: Enable log to file.
+
+
+-tracing-enabled |  $GRAPH_TRACING_ENABLED , $OCIS_TRACING_ENABLED
+: Enable sending traces.
+
+
+-tracing-type |  $GRAPH_TRACING_TYPE , $OCIS_TRACING_TYPE
+: Tracing backend type. Default: `"jaeger"`.
+
+
+-tracing-endpoint |  $GRAPH_TRACING_ENDPOINT , $OCIS_TRACING_ENDPOINT
+: Endpoint for the agent. Default: `""`.
+
+
+-tracing-collector |  $GRAPH_TRACING_COLLECTOR , $OCIS_TRACING_COLLECTOR
+: Endpoint for the collector. Default: `""`.
+
+
+-tracing-service |  $GRAPH_TRACING_SERVICE
+: Service name for tracing. Default: `"graph"`.
+
+
+-debug-addr |  $GRAPH_DEBUG_ADDR
+: Address to bind debug server. Default: `"127.0.0.1:9124"`.
+
+
+-debug-token |  $GRAPH_DEBUG_TOKEN
+: Token to grant metrics access. Default: `""`.
+
+
+-debug-pprof |  $GRAPH_DEBUG_PPROF
+: Enable pprof debugging.
+
+
+-debug-zpages |  $GRAPH_DEBUG_ZPAGES
+: Enable zpages debugging.
+
+
+-http-addr |  $GRAPH_HTTP_ADDR
+: Address to bind http server. Default: `"127.0.0.1:9120"`.
+
+
+-http-root |  $GRAPH_HTTP_ROOT
+: Root path of http server. Default: `"/graph"`.
+
+
+-http-namespace |  $GRAPH_HTTP_NAMESPACE
+: Set the base namespace for the http service for service discovery. Default: `"com.owncloud.web"`.
+
+
+-spaces-webdav-base |  $GRAPH_SPACES_WEBDAV_BASE
+: spaces webdav base URL to use when rendering drive WabDAV URLs. Default: `"https://localhost:9200/dav/spaces/"`.
+
+
+-jwt-secret |  $GRAPH_JWT_SECRET , $OCIS_JWT_SECRET
+: Used to validate the reva access JWT, should equal reva's jwt-secret. Default: `"Pive-Fumkiu4"`.
+
+
+-reva-gateway-addr |  $REVA_GATEWAY
+: Address of REVA gateway endpoint. Default: `"127.0.0.1:9142"`.
+
+
+-extensions | 
+: Run specific extensions during supervised mode. This flag is set by the runtime.
+
 ### graph health
 
 Check health status
@@ -47,7 +126,7 @@ Usage: `graph health [command options] [arguments...]`
 
 
 -debug-addr |  $GRAPH_DEBUG_ADDR
-: Address to debug endpoint. Default: `"0.0.0.0:9124"`.
+: Address to debug endpoint. Default: `"127.0.0.1:9124"`.
 
 
 
@@ -105,83 +184,4 @@ Usage: `graph ocis-graph [command options] [arguments...]`
 
 
 
-
-### graph server
-
-Start integrated server
-
-Usage: `graph server [command options] [arguments...]`
-
-
-
-
-
-
-
--log-file |  $GRAPH_LOG_FILE , $OCIS_LOG_FILE
-: Enable log to file.
-
-
--tracing-enabled |  $GRAPH_TRACING_ENABLED , $OCIS_TRACING_ENABLED
-: Enable sending traces.
-
-
--tracing-type |  $GRAPH_TRACING_TYPE , $OCIS_TRACING_TYPE
-: Tracing backend type. Default: `"jaeger"`.
-
-
--tracing-endpoint |  $GRAPH_TRACING_ENDPOINT , $OCIS_TRACING_ENDPOINT
-: Endpoint for the agent. Default: `""`.
-
-
--tracing-collector |  $GRAPH_TRACING_COLLECTOR , $OCIS_TRACING_COLLECTOR
-: Endpoint for the collector. Default: `""`.
-
-
--tracing-service |  $GRAPH_TRACING_SERVICE
-: Service name for tracing. Default: `"graph"`.
-
-
--debug-addr |  $GRAPH_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9124"`.
-
-
--debug-token |  $GRAPH_DEBUG_TOKEN
-: Token to grant metrics access. Default: `""`.
-
-
--debug-pprof |  $GRAPH_DEBUG_PPROF
-: Enable pprof debugging.
-
-
--debug-zpages |  $GRAPH_DEBUG_ZPAGES
-: Enable zpages debugging.
-
-
--http-addr |  $GRAPH_HTTP_ADDR
-: Address to bind http server. Default: `"0.0.0.0:9120"`.
-
-
--http-root |  $GRAPH_HTTP_ROOT
-: Root path of http server. Default: `"/graph"`.
-
-
--http-namespace |  $GRAPH_HTTP_NAMESPACE
-: Set the base namespace for the http service for service discovery. Default: `"com.owncloud.web"`.
-
-
--spaces-webdav-base |  $GRAPH_SPACES_WEBDAV_BASE
-: spaces webdav base URL to use when rendering drive WabDAV URLs. Default: `"https://localhost:9200/dav/spaces/"`.
-
-
--jwt-secret |  $GRAPH_JWT_SECRET , $OCIS_JWT_SECRET
-: Used to validate the reva access JWT, should equal reva's jwt-secret. Default: `"Pive-Fumkiu4"`.
-
-
--reva-gateway-addr |  $REVA_GATEWAY
-: Address of REVA gateway endpoint. Default: `"127.0.0.1:9142"`.
-
-
--extensions | 
-: Run specific extensions during supervised mode. This flag is set by the runtime.
 
