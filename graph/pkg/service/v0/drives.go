@@ -55,6 +55,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		}
 		g.logger.Error().Err(err).Msg("error sending list storage spaces grpc request")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		return
 	}
 
 	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
@@ -179,10 +180,11 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		driveType = *drive.DriveType
 	}
 	switch driveType {
-	case "":
+	case "", "project":
 		driveType = "project"
-	case "share":
-		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "drives of type share cannot be created via this api")
+	default:
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("drives of type %s cannot be created via this api", driveType))
+		return
 	}
 
 	var maxBytes *int64
@@ -196,16 +198,16 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var quota provider.Quota
+	var quota *provider.Quota
 	if maxBytes != nil {
-		quota.QuotaMaxBytes = uint64(*maxBytes)
+		quota = &provider.Quota{QuotaMaxBytes: uint64(*maxBytes)}
 	}
 
 	csr := provider.CreateStorageSpaceRequest{
 		Owner: us,
 		Type:  driveType,
 		Name:  spaceName,
-		Quota: &quota,
+		Quota: quota,
 	}
 
 	resp, err := client.CreateStorageSpace(r.Context(), &csr)
