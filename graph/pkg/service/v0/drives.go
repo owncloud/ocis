@@ -238,7 +238,8 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 
 	req, err := godata.ParseRequest(sanitized, r.URL.Query(), true)
 	if err != nil {
-		panic(err)
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())
+		return
 	}
 
 	if req.FirstSegment.Identifier.Get() == "" {
@@ -256,6 +257,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	if len(identifierParts) != 2 {
 		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid resource id: %v", req.FirstSegment.Identifier.Get()))
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	storageID, opaqueID := identifierParts[0], identifierParts[1]
@@ -287,10 +289,12 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	resp, err := client.UpdateStorageSpace(r.Context(), updateSpaceRequest)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "")
+		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
