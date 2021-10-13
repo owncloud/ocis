@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-12T18:36:28+0000"
+date: "2021-10-13T08:44:56+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocs/templates
@@ -34,115 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Command-line flags
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### ocs server
-
-Start integrated server
-
-Usage: `ocs server [command options] [arguments...]`
-
-
-
--log-file |  $OCS_LOG_FILE , $OCIS_LOG_FILE
-: Enable log to file.
-
-
--log-level |  $OCS_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
-
--log-pretty |  $OCS_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
-
--log-color |  $OCS_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
-
-
--config-file |  $OCS_CONFIG_FILE
-: Path to config file.
-
-
--tracing-enabled |  $OCS_TRACING_ENABLED , $OCIS_TRACING_ENABLED
-: Enable sending traces. Default: `false`.
-
-
--tracing-type |  $OCS_TRACING_TYPE , $OCIS_TRACING_TYPE
-: Tracing backend type. Default: `"jaeger"`.
-
-
--tracing-endpoint |  $OCS_TRACING_ENDPOINT , $OCIS_TRACING_ENDPOINT
-: Endpoint for the agent. Default: `""`.
-
-
--tracing-collector |  $OCS_TRACING_COLLECTOR , $OCIS_TRACING_COLLECTOR
-: Endpoint for the collector. Default: `""`.
-
-
--tracing-service |  $OCS_TRACING_SERVICE
-: Service name for tracing. Default: `"ocs"`.
-
-
--debug-addr |  $OCS_DEBUG_ADDR
-: Address to bind debug server. Default: `"0.0.0.0:9114"`.
-
-
--debug-token |  $OCS_DEBUG_TOKEN
-: Token to grant metrics access. Default: `""`.
-
-
--debug-pprof |  $OCS_DEBUG_PPROF
-: Enable pprof debugging.
-
-
--debug-zpages |  $OCS_DEBUG_ZPAGES
-: Enable zpages debugging.
-
-
--http-addr |  $OCS_HTTP_ADDR
-: Address to bind http server. Default: `"0.0.0.0:9110"`.
-
-
--http-namespace |  $OCS_NAMESPACE
-: Set the base namespace for the http namespace. Default: `"com.owncloud.web"`.
-
-
--name |  $OCS_NAME
-: Service name. Default: `"ocs"`.
-
-
--http-root |  $OCS_HTTP_ROOT
-: Root path of http server. Default: `"/ocs"`.
-
-
--jwt-secret |  $OCS_JWT_SECRET , $OCIS_JWT_SECRET
-: Used to dismantle the access token, should equal reva's jwt-secret. Default: `"Pive-Fumkiu4"`.
-
-
--account-backend-type |  $OCS_ACCOUNT_BACKEND_TYPE
-: account-backend-type. Default: `"accounts"`.
-
-
--reva-gateway-addr |  $REVA_GATEWAY
-: Address of REVA gateway endpoint. Default: `"127.0.0.1:9142"`.
-
-
--machine-auth-api-key |  $OCS_MACHINE_AUTH_API_KEY , $OCIS_MACHINE_AUTH_API_KEY
-: the API key to be used for the machine auth driver in reva. Default: `"change-me-please"`.
-
-
--idm-address |  $OCS_IDM_ADDRESS , $OCIS_URL
-: keeps track of the IDM Address. Needed because of Reva requisite of uniqueness for users. Default: `"https://localhost:9200"`.
-
-
--users-driver |  $OCS_STORAGE_USERS_DRIVER , $STORAGE_USERS_DRIVER
-: storage driver for users mount: eg. local, eos, owncloud, ocis or s3. Default: `"ocis"`.
-
-
--extensions | 
-: Run specific extensions during supervised mode.
-
-
 
 ### ocs version
 
@@ -252,6 +143,115 @@ Usage: `ocs ocis-ocs [command options] [arguments...]`
 
 
 
+
+
+
+### ocs server
+
+Start integrated server
+
+Usage: `ocs server [command options] [arguments...]`
+
+
+
+-log-file |  $OCS_LOG_FILE , $OCIS_LOG_FILE
+: Enable log to file.
+
+
+-log-level |  $OCS_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+
+-log-pretty |  $OCS_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+
+-log-color |  $OCS_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
+
+-config-file |  $OCS_CONFIG_FILE
+: Path to config file.
+
+
+-tracing-enabled |  $OCS_TRACING_ENABLED , $OCIS_TRACING_ENABLED
+: Enable sending traces. Default: `false`.
+
+
+-tracing-type |  $OCS_TRACING_TYPE , $OCIS_TRACING_TYPE
+: Tracing backend type. Default: `"jaeger"`.
+
+
+-tracing-endpoint |  $OCS_TRACING_ENDPOINT , $OCIS_TRACING_ENDPOINT
+: Endpoint for the agent. Default: `""`.
+
+
+-tracing-collector |  $OCS_TRACING_COLLECTOR , $OCIS_TRACING_COLLECTOR
+: Endpoint for the collector. Default: `""`.
+
+
+-tracing-service |  $OCS_TRACING_SERVICE
+: Service name for tracing. Default: `"ocs"`.
+
+
+-debug-addr |  $OCS_DEBUG_ADDR
+: Address to bind debug server. Default: `"0.0.0.0:9114"`.
+
+
+-debug-token |  $OCS_DEBUG_TOKEN
+: Token to grant metrics access. Default: `""`.
+
+
+-debug-pprof |  $OCS_DEBUG_PPROF
+: Enable pprof debugging.
+
+
+-debug-zpages |  $OCS_DEBUG_ZPAGES
+: Enable zpages debugging.
+
+
+-http-addr |  $OCS_HTTP_ADDR
+: Address to bind http server. Default: `"0.0.0.0:9110"`.
+
+
+-http-namespace |  $OCS_NAMESPACE
+: Set the base namespace for the http namespace. Default: `"com.owncloud.web"`.
+
+
+-name |  $OCS_NAME
+: Service name. Default: `"ocs"`.
+
+
+-http-root |  $OCS_HTTP_ROOT
+: Root path of http server. Default: `"/ocs"`.
+
+
+-jwt-secret |  $OCS_JWT_SECRET , $OCIS_JWT_SECRET
+: Used to dismantle the access token, should equal reva's jwt-secret. Default: `"Pive-Fumkiu4"`.
+
+
+-account-backend-type |  $OCS_ACCOUNT_BACKEND_TYPE
+: account-backend-type. Default: `"accounts"`.
+
+
+-reva-gateway-addr |  $REVA_GATEWAY
+: Address of REVA gateway endpoint. Default: `"127.0.0.1:9142"`.
+
+
+-machine-auth-api-key |  $OCS_MACHINE_AUTH_API_KEY , $OCIS_MACHINE_AUTH_API_KEY
+: the API key to be used for the machine auth driver in reva. Default: `"change-me-please"`.
+
+
+-idm-address |  $OCS_IDM_ADDRESS , $OCIS_URL
+: keeps track of the IDM Address. Needed because of Reva requisite of uniqueness for users. Default: `"https://localhost:9200"`.
+
+
+-users-driver |  $OCS_STORAGE_USERS_DRIVER , $STORAGE_USERS_DRIVER
+: storage driver for users mount: eg. local, eos, owncloud, ocis or s3. Default: `"ocis"`.
+
+
+-extensions | 
+: Run specific extensions during supervised mode.
 
 
 
