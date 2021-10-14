@@ -245,4 +245,4 @@ require (
 // this is a transitive replace. See https://github.com/libregraph/lico/blob/master/go.mod#L38
 replace github.com/crewjam/saml => github.com/crewjam/saml v0.4.5
 
-replace github.com/cs3org/reva => ../reva
+replace github.com/cs3org/reva => github.com/micbar/reva v1.9.1-0.20211014111217-0edd79fd6531
