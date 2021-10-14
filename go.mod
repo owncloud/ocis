@@ -38,7 +38,6 @@ require (
 	github.com/justinas/alice v1.2.0
 	github.com/libregraph/lico v0.34.1-0.20210803054646-b584e0372224
 	github.com/mennanov/fieldmask-utils v0.4.0
-	github.com/micro/cli/v2 v2.1.2
 	github.com/mitchellh/mapstructure v1.4.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nmcclain/asn1-ber v0.0.0-20170104154839-2661553a0484
@@ -217,6 +216,7 @@ require (
 	github.com/steveyen/gtreap v0.1.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/tus/tusd v1.6.0 // indirect
+	github.com/wk8/go-ordered-map v0.2.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.0 // indirect
 	go.etcd.io/bbolt v1.3.5 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.0 // indirect
@@ -241,10 +241,7 @@ require (
 	stash.kopano.io/kgol/oidc-go v0.3.1 // indirect
 )
 
-replace (
-	github.com/cs3org/go-cs3apis => ../go-cs3apis
-	github.com/cs3org/reva => ../reva
-)
+replace github.com/cs3org/reva => ../reva
 
 // this is a transitive replace. See https://github.com/libregraph/lico/blob/master/go.mod#L38
 replace github.com/crewjam/saml => github.com/crewjam/saml v0.4.5
