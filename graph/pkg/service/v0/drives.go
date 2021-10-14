@@ -451,3 +451,21 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 
 	return qta, nil
 }
+
+func getQuota(quota *msgraph.Quota, defaultQuota string) *provider.Quota {
+	switch {
+	case quota != nil && quota.Total != nil:
+		if q := *quota.Total; q >= 0 {
+			return &provider.Quota{QuotaMaxBytes: uint64(q)}
+		}
+		fallthrough
+	case defaultQuota != "":
+		if q, err := strconv.ParseInt(defaultQuota, 10, 64); err == nil && q >= 0 {
+			return &provider.Quota{QuotaMaxBytes: uint64(q)}
+		}
+		fallthrough
+	default:
+		return nil
+	}
+
+}
