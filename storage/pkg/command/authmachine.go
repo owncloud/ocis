@@ -19,14 +19,14 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// AuthBearer is the entrypoint for the auth-bearer command.
-func AuthBearer(cfg *config.Config) *cli.Command {
+// AuthMachine is the entrypoint for the auth-machine command.
+func AuthMachine(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "auth-bearer",
-		Usage: "Start authprovider for bearer auth",
-		Flags: flagset.AuthBearerWithConfig(cfg),
+		Name:  "auth-machine",
+		Usage: "Start authprovider for machine auth",
+		Flags: flagset.AuthMachineWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.AuthBearer.Services = c.StringSlice("service")
+			cfg.Reva.AuthMachine.Services = c.StringSlice("service")
 
 			return nil
 		},
@@ -39,7 +39,7 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 
 			uuid := uuid.Must(uuid.NewV4())
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
-			rcfg := authBearerConfigFromStruct(c, cfg)
+			rcfg := authMachineConfigFromStruct(c, cfg)
 
 			gr.Add(func() error {
 				runtime.RunWithOptions(
@@ -58,7 +58,7 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 
 			debugServer, err := debug.Server(
 				debug.Name(c.Command.Name+"-debug"),
-				debug.Addr(cfg.Reva.AuthBearer.DebugAddr),
+				debug.Addr(cfg.Reva.AuthMachine.DebugAddr),
 				debug.Logger(logger),
 				debug.Context(ctx),
 				debug.Config(cfg),
@@ -73,7 +73,7 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.AuthBearer.Supervised {
+			if !cfg.Reva.AuthMachine.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
@@ -82,11 +82,11 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 	}
 }
 
-// authBearerConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
-func authBearerConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
+// authMachineConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+func authMachineConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"core": map[string]interface{}{
-			"max_cpus":             cfg.Reva.AuthBearer.MaxCPUs,
+			"max_cpus":             cfg.Reva.AuthMachine.MaxCPUs,
 			"tracing_enabled":      cfg.Tracing.Enabled,
 			"tracing_endpoint":     cfg.Tracing.Endpoint,
 			"tracing_collector":    cfg.Tracing.Collector,
@@ -98,20 +98,16 @@ func authBearerConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]i
 			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
-			"network": cfg.Reva.AuthBearer.GRPCNetwork,
-			"address": cfg.Reva.AuthBearer.GRPCAddr,
+			"network": cfg.Reva.AuthMachine.GRPCNetwork,
+			"address": cfg.Reva.AuthMachine.GRPCAddr,
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"authprovider": map[string]interface{}{
-					"auth_manager": "oidc",
+					"auth_manager": "machine",
 					"auth_managers": map[string]interface{}{
-						"oidc": map[string]interface{}{
-							"issuer":     cfg.Reva.OIDC.Issuer,
-							"insecure":   cfg.Reva.OIDC.Insecure,
-							"id_claim":   cfg.Reva.OIDC.IDClaim,
-							"uid_claim":  cfg.Reva.OIDC.UIDClaim,
-							"gid_claim":  cfg.Reva.OIDC.GIDClaim,
-							"gatewaysvc": cfg.Reva.Gateway.Endpoint,
+						"machine": map[string]interface{}{
+							"api_key":      cfg.Reva.AuthMachineConfig.MachineAuthAPIKey,
+							"gateway_addr": cfg.Reva.Gateway.Endpoint,
 						},
 					},
 				},
@@ -120,37 +116,37 @@ func authBearerConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]i
 	}
 }
 
-// AuthBearerSutureService allows for the storage-gateway command to be embedded and supervised by a suture supervisor tree.
-type AuthBearerSutureService struct {
+// AuthMachineSutureService allows for the storage-gateway command to be embedded and supervised by a suture supervisor tree.
+type AuthMachineSutureService struct {
 	cfg *config.Config
 }
 
-// NewAuthBearerSutureService creates a new gateway.AuthBearerSutureService
-func NewAuthBearer(cfg *ociscfg.Config) suture.Service {
+// NewAuthMachineSutureService creates a new gateway.AuthMachineSutureService
+func NewAuthMachine(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
-		cfg.Storage.Reva.AuthBearer.Supervised = true
+		cfg.Storage.Reva.AuthMachine.Supervised = true
 	}
-	return AuthBearerSutureService{
+	return AuthMachineSutureService{
 		cfg: cfg.Storage,
 	}
 }
 
-func (s AuthBearerSutureService) Serve(ctx context.Context) error {
-	s.cfg.Reva.AuthBearer.Context = ctx
+func (s AuthMachineSutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.AuthMachine.Context = ctx
 	f := &flag.FlagSet{}
-	cmdFlags := AuthBearer(s.cfg).Flags
+	cmdFlags := AuthMachine(s.cfg).Flags
 	for k := range cmdFlags {
 		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}
 	cliCtx := cli.NewContext(nil, f, nil)
-	if AuthBearer(s.cfg).Before != nil {
-		if err := AuthBearer(s.cfg).Before(cliCtx); err != nil {
+	if AuthMachine(s.cfg).Before != nil {
+		if err := AuthMachine(s.cfg).Before(cliCtx); err != nil {
 			return err
 		}
 	}
-	if err := AuthBearer(s.cfg).Action(cliCtx); err != nil {
+	if err := AuthMachine(s.cfg).Action(cliCtx); err != nil {
 		return err
 	}
 

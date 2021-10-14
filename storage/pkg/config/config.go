@@ -127,10 +127,8 @@ type Users struct {
 	UserGroupsCacheExpiration int
 }
 
-// AuthBearerConfig defines the available configuration for the bearer auth drivers.
-type AuthBearerConfig struct {
-	Port
-	Driver            string
+// AuthMachineConfig defines the available configuration for the machine auth driver.
+type AuthMachineConfig struct {
 	MachineAuthAPIKey string
 }
 
@@ -451,9 +449,10 @@ type Reva struct {
 	Users             Users
 	Groups            Groups
 	AuthProvider      Users
-	AuthBearerConfig  AuthBearerConfig
 	AuthBasic         Port
 	AuthBearer        Port
+	AuthMachine       Port
+	AuthMachineConfig AuthMachineConfig
 	Sharing           Sharing
 	StorageHome       StoragePort
 	StorageUsers      StoragePort
