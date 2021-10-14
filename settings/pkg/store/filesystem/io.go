@@ -50,7 +50,10 @@ func (s Store) writeRecordToFile(record proto.Message, filePath string) error {
 		return err
 	}
 
-	file.Write(v)
+	_, err = file.Write(v)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
