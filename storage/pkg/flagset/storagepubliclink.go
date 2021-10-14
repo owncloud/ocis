@@ -12,7 +12,7 @@ func StoragePublicLink(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.DebugAddr, "0.0.0.0:9179"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.DebugAddr, "127.0.0.1:9179"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_PUBLIC_LINK_DEBUG_ADDR"},
 			Destination: &cfg.Reva.StoragePublicLink.DebugAddr,
@@ -27,7 +27,7 @@ func StoragePublicLink(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.GRPCAddr, "0.0.0.0:9178"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.GRPCAddr, "127.0.0.1:9178"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_PUBLIC_LINK_GRPC_ADDR"},
 			Destination: &cfg.Reva.StoragePublicLink.GRPCAddr,

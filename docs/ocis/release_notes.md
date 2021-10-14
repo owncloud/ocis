@@ -7,6 +7,25 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.13.0 Technology Preview
+
+Version 1.13.0 brings progress on the backend for the 'Spaces' feature. ownCloud Web and Infinite Scale now provide ZIP/TAR download for multiple files/folders and can integrate external file viewer/editor applications (e.g., Collabora Online, ONLYOFFICE, CodiMD, Microsoft Office Online). 
+
+The most prominent changes in ownCloud Infinite Scale 1.13.0 and ownCloud Web 4.3.0 comprise:
+
+- Infinite Scale and Web now allow downloading multiple files or folders as archives [ocis#2509](https://github.com/owncloud/ocis/pull/2509) [cs3org/reva#2088](https://github.com/cs3org/reva/pull/2088)
+- Infinite Scale and Web can now integrate external applications like file viewers/editors via the [cs3org/wopiserver](https://github.com/cs3org/wopiserver) (e.g., Collabora Online, ONLYOFFICE, CodiMD, Microsoft Office Online). [web#5805](https://github.com/owncloud/web/pull/5805)
+- The 'Shared with me' page in ownCloud Web now clearly separates pending, declined and accepted shares. Pending shares are always displayed prominently so that users are aware and can react accordingly. [web#5814](https://github.com/owncloud/web/pull/5814)
+- Legacy URLs (e.g., from the address bar, public links) from ownCloud Classic are now properly resolved after migrating to Infinite Scale and Web [cs3org/reva#1089](https://github.com/cs3org/reva/pull/1989)
+- A capability for the Favorites feature has been added [ocis#2599](https://github.com/owncloud/ocis/pull/2599)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.13.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v4.3.0) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.12.0 Technology Preview
 
 Version 1.12.0 is a maintenance release with the foundations for the 'Spaces' feature and for viewer/editor application integrations. The Infinite Scale backend has been further hardened by fixing known issues, improving error handling and stabilizing existing features. Apart from bugfixing, ownCloud Web 4.2.0 has received a number of usability and design improvements for sharing and the file list.

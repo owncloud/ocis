@@ -13,7 +13,7 @@ func AuthBearerWithConfig(cfg *config.Config) []cli.Flag {
 		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.AuthBearer.DebugAddr, "0.0.0.0:9149"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.AuthBearer.DebugAddr, "127.0.0.1:9149"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_AUTH_BEARER_DEBUG_ADDR"},
 			Destination: &cfg.Reva.AuthBearer.DebugAddr,
@@ -95,7 +95,7 @@ func AuthBearerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.AuthBearer.GRPCAddr, "0.0.0.0:9148"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.AuthBearer.GRPCAddr, "127.0.0.1:9148"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_AUTH_BEARER_GRPC_ADDR"},
 			Destination: &cfg.Reva.AuthBearer.GRPCAddr,

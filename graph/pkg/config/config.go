@@ -51,7 +51,8 @@ type TokenManager struct {
 }
 
 type Spaces struct {
-	WebDavBase string
+	WebDavBase   string
+	DefaultQuota string
 }
 
 // Config combines all available configuration parts.

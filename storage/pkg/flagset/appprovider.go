@@ -13,7 +13,7 @@ func AppProviderWithConfig(cfg *config.Config) []cli.Flag {
 		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.DebugAddr, "0.0.0.0:9165"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.DebugAddr, "127.0.0.1:9165"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"APP_PROVIDER_BASIC_DEBUG_ADDR"},
 			Destination: &cfg.Reva.AppProvider.DebugAddr,
@@ -34,7 +34,7 @@ func AppProviderWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.GRPCAddr, "0.0.0.0:9164"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.GRPCAddr, "127.0.0.1:9164"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"APP_PROVIDER_BASIC_GRPC_ADDR"},
 			Destination: &cfg.Reva.AppProvider.GRPCAddr,

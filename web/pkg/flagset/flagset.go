@@ -35,7 +35,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9104"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9104"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"WEB_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -95,7 +95,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9104"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9104"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"WEB_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -121,7 +121,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9100"),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "127.0.0.1:9100"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"WEB_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,

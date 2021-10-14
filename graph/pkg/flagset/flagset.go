@@ -42,7 +42,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9124"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9124"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"GRAPH_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -95,7 +95,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9124"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9124"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"GRAPH_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -121,7 +121,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9120"),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "127.0.0.1:9120"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"GRAPH_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
@@ -147,6 +147,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "spaces webdav base URL to use when rendering drive WabDAV URLs",
 			EnvVars:     []string{"GRAPH_SPACES_WEBDAV_BASE"},
 			Destination: &cfg.Spaces.WebDavBase,
+		},
+
+		&cli.StringFlag{
+			Name:        "default-space-quota",
+			Value:       flags.OverrideDefaultString(cfg.Spaces.DefaultQuota, "1000000000"),
+			Usage:       "default quota used for all spaces if no custom quota was given",
+			EnvVars:     []string{"GRAPH_SPACES_DEFAULT_QUOTA"},
+			Destination: &cfg.Spaces.DefaultQuota,
 		},
 
 		&cli.StringFlag{

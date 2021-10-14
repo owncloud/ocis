@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -56,6 +57,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		}
 		g.logger.Error().Err(err).Msg("error sending list storage spaces grpc request")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		return
 	}
 
 	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
@@ -179,26 +181,18 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		driveType = *drive.DriveType
 	}
 	switch driveType {
-	case "":
+	case "", "project":
 		driveType = "project"
-	case "share":
-		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "drives of type share cannot be created via this api")
-	}
-
-	var quota uint64
-	if drive.Quota != nil && drive.Quota.Total != nil {
-		quota = uint64(*drive.Quota.Total)
-	} else {
-		quota = 65536 // set default quota if no value was sent.
+	default:
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("drives of type %s cannot be created via this api", driveType))
+		return
 	}
 
 	csr := provider.CreateStorageSpaceRequest{
 		Owner: us,
 		Type:  driveType,
 		Name:  spaceName,
-		Quota: &provider.Quota{
-			QuotaMaxBytes: quota,
-		},
+		Quota: getQuota(drive.Quota, g.config.Spaces.DefaultQuota),
 	}
 
 	resp, err := client.CreateStorageSpace(r.Context(), &csr)
@@ -209,6 +203,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 
 	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "")
+		return
 	}
 
 	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
@@ -239,7 +234,8 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 
 	req, err := godata.ParseRequest(sanitized, r.URL.Query(), true)
 	if err != nil {
-		panic(err)
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())
+		return
 	}
 
 	if req.FirstSegment.Identifier.Get() == "" {
@@ -257,6 +253,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	if len(identifierParts) != 2 {
 		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid resource id: %v", req.FirstSegment.Identifier.Get()))
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	storageID, opaqueID := identifierParts[0], identifierParts[1]
@@ -288,10 +285,12 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	resp, err := client.UpdateStorageSpace(r.Context(), updateSpaceRequest)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "")
+		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)

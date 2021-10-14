@@ -2,7 +2,35 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.12.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.13.0...master
+
+## Summary
+
+* Security - Don't expose services by default: [#2612](https://github.com/owncloud/ocis/issues/2612)
+* Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
+
+## Details
+
+* Security - Don't expose services by default: [#2612](https://github.com/owncloud/ocis/issues/2612)
+
+   We've changed the bind behaviour for all non public facing services. Before this PR all
+   services would listen on all interfaces. After this PR, all services listen on 127.0.0.1 only,
+   except the proxy which is listening on 0.0.0.0:9200.
+
+   https://github.com/owncloud/ocis/issues/2612
+
+* Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
+
+   When creating a new space a (configurable) default quota will be used (instead the hardcoded
+   one) One can set the EnvVar `GRAPH_SPACES_DEFAULT_QUOTA` to configure it
+
+   https://github.com/owncloud/ocis/issues/2621
+   https://jira.owncloud.com/browse/OCIS-2070
+# Changelog for [1.13.0] (2021-10-13)
+
+The following sections list the changes for 1.13.0.
+
+[1.13.0]: https://github.com/owncloud/ocis/compare/v1.12.0...v1.13.0
 
 ## Summary
 

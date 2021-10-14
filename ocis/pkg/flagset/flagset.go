@@ -104,7 +104,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9010",
+			Value:       "127.0.0.1:9010",
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"OCIS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -117,7 +117,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       "0.0.0.0:9010",
+			Value:       "127.0.0.1:9010",
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"OCIS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -143,7 +143,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       "0.0.0.0:9000",
+			Value:       "127.0.0.1:9000",
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"OCIS_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
@@ -157,7 +157,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "grpc-addr",
-			Value:       "0.0.0.0:9001",
+			Value:       "127.0.0.1:9001",
 			Usage:       "Address to bind grpc server",
 			EnvVars:     []string{"OCIS_GRPC_ADDR"},
 			Destination: &cfg.GRPC.Addr,
