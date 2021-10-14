@@ -150,6 +150,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 
 		&cli.StringFlag{
+			Name:        "default-space-quota",
+			Value:       flags.OverrideDefaultString(cfg.Spaces.DefaultQuota, "1000000000"),
+			Usage:       "default quota used for all spaces if no custom quota was given",
+			EnvVars:     []string{"GRAPH_SPACES_DEFAULT_QUOTA"},
+			Destination: &cfg.Spaces.DefaultQuota,
+		},
+
+		&cli.StringFlag{
 			Name:        "jwt-secret",
 			Value:       flags.OverrideDefaultString(cfg.TokenManager.JWTSecret, "Pive-Fumkiu4"),
 			Usage:       "Used to validate the reva access JWT, should equal reva's jwt-secret",

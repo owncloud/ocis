@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -54,6 +55,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		}
 		g.logger.Error().Err(err).Msg("error sending list storage spaces grpc request")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		return
 	}
 
 	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
@@ -178,26 +180,18 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		driveType = *drive.DriveType
 	}
 	switch driveType {
-	case "":
+	case "", "project":
 		driveType = "project"
-	case "share":
-		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "drives of type share cannot be created via this api")
-	}
-
-	var quota uint64
-	if drive.Quota != nil && drive.Quota.Total != nil {
-		quota = uint64(*drive.Quota.Total)
-	} else {
-		quota = 65536 // set default quota if no value was sent.
+	default:
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("drives of type %s cannot be created via this api", driveType))
+		return
 	}
 
 	csr := provider.CreateStorageSpaceRequest{
 		Owner: us,
 		Type:  driveType,
 		Name:  spaceName,
-		Quota: &provider.Quota{
-			QuotaMaxBytes: quota,
-		},
+		Quota: getQuota(drive.Quota, g.config.Spaces.DefaultQuota),
 	}
 
 	resp, err := client.CreateStorageSpace(r.Context(), &csr)
@@ -208,6 +202,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 
 	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "")
+		return
 	}
 
 	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
@@ -414,4 +409,22 @@ func formatDrives(baseURL *url.URL, mds []*storageprovider.StorageSpace) ([]*msg
 	}
 
 	return responses, nil
+}
+
+func getQuota(quota *msgraph.Quota, defaultQuota string) *provider.Quota {
+	switch {
+	case quota != nil && quota.Total != nil:
+		if q := *quota.Total; q >= 0 {
+			return &provider.Quota{QuotaMaxBytes: uint64(q)}
+		}
+		fallthrough
+	case defaultQuota != "":
+		if q, err := strconv.ParseInt(defaultQuota, 10, 64); err == nil && q >= 0 {
+			return &provider.Quota{QuotaMaxBytes: uint64(q)}
+		}
+		fallthrough
+	default:
+		return nil
+	}
+
 }
