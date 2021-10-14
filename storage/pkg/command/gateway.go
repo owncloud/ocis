@@ -164,6 +164,7 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 							"rules": map[string]interface{}{
 								"basic":        cfg.Reva.AuthBasic.Endpoint,
 								"bearer":       cfg.Reva.AuthBearer.Endpoint,
+								"machine":      cfg.Reva.AuthMachine.Endpoint,
 								"publicshares": cfg.Reva.StoragePublicLink.Endpoint,
 							},
 						},
