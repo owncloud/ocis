@@ -419,6 +419,10 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storag
 
 func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (msgraph.Quota, error) {
 	client, err := g.GetClient()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error creating grpc client")
+		return msgraph.Quota{}, err
+	}
 
 	req := &gateway.GetQuotaRequest{
 		Ref: &provider.Reference{
