@@ -5,34 +5,23 @@ set -e
 ocis server&
 sleep 10
 
-# stop builtin idp since we use Keycloak as a replacement
+# stop builtin IDP since we use Keycloak as a replacement
 ocis kill idp
 
 echo "##################################################"
 echo "change default secrets:"
 
-# REVA
-REVA_USER_UUID=$(ocis accounts list | grep " | Reva Inter " | egrep '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}' -o)
-echo "  Reva user UUID: $REVA_USER_UUID"
-ocis accounts update --password $STORAGE_LDAP_BIND_PASSWORD $REVA_USER_UUID
+ocis accounts update --password $STORAGE_LDAP_BIND_PASSWORD bc596f3c-c955-4328-80a0-60d018b4ad57 # REVA
 
-echo "default secrets changed"
 echo "##################################################"
 
 echo "##################################################"
-echo "delete demo users" # demo users are provided by keycloak
+echo "delete demo users" # users are provided by keycloak
 
 set +e # accounts can only delete once, so it will fail the second time
-# IDP
-IDP_USER_UUID=$(ocis accounts list | grep "| Kopano IDP " | egrep '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}' -o)
-echo "  IDP user UUID: $IDP_USER_UUID"
-ocis accounts remove $IDP_USER_UUID
-
-ocis accounts remove 4c510ada-c86b-4815-8820-42cdf82c3d51
-ocis accounts remove ddc2004c-0977-11eb-9d3f-a793888cd0f8
-ocis accounts remove 932b4540-8d16-481e-8ef4-588e4b6b151c
-ocis accounts remove 058bff95-6708-4fe5-91e4-9ea3d377588b
-ocis accounts remove f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c
+# only admin, IDP and REVA user will be created because of ACCOUNTS_DEMO_USERS_AND_GROUPS=false
+ocis accounts remove  820ba2a1-3f54-4538-80a4-2d73007e30bf # IDP user
+ocis accounts remove ddc2004c-0977-11eb-9d3f-a793888cd0f8 # admin
 set -e
 
 echo "##################################################"
