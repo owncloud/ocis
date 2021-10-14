@@ -187,27 +187,11 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var maxBytes *int64
-	switch {
-	case drive.Quota != nil && drive.Quota.Total != nil && *drive.Quota.Total >= 0:
-		maxBytes = drive.Quota.Total
-	case g.config.Spaces.DefaultQuota != "":
-		q, err := strconv.ParseInt(g.config.Spaces.DefaultQuota, 10, 64)
-		if err == nil && q >= 0 {
-			maxBytes = &q
-		}
-	}
-
-	var quota *provider.Quota
-	if maxBytes != nil {
-		quota = &provider.Quota{QuotaMaxBytes: uint64(*maxBytes)}
-	}
-
 	csr := provider.CreateStorageSpaceRequest{
 		Owner: us,
 		Type:  driveType,
 		Name:  spaceName,
-		Quota: quota,
+		Quota: getQuota(drive.Quota, g.config.Spaces.DefaultQuota),
 	}
 
 	resp, err := client.CreateStorageSpace(r.Context(), &csr)
@@ -425,4 +409,22 @@ func formatDrives(baseURL *url.URL, mds []*storageprovider.StorageSpace) ([]*msg
 	}
 
 	return responses, nil
+}
+
+func getQuota(quota *msgraph.Quota, defaultQuota string) *provider.Quota {
+	switch {
+	case quota != nil && quota.Total != nil:
+		if q := *quota.Total; q >= 0 {
+			return &provider.Quota{QuotaMaxBytes: uint64(q)}
+		}
+		fallthrough
+	case defaultQuota != "":
+		if q, err := strconv.ParseInt(defaultQuota, 10, 64); err == nil && q >= 0 {
+			return &provider.Quota{QuotaMaxBytes: uint64(q)}
+		}
+		fallthrough
+	default:
+		return nil
+	}
+
 }
