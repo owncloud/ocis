@@ -29,10 +29,7 @@ ci-go-generate: # CI runs ci-node-generate automatically before this target
 ci-node-generate: yarn-build
 
 .PHONY: yarn-build
-yarn-build:
-	yarn lint
-	yarn test
-	yarn build
+yarn-build: node_modules
 
 .PHONY: node_modules
 node_modules:
