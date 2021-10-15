@@ -43,8 +43,6 @@ type Asset struct {
 // WebConfig defines the available web configuration for a dynamically rendered config.json.
 type WebConfig struct {
 	Server        string                 `json:"server,omitempty"`
-	ThemeServer   string                 `json:"omit"` // only used to build Theme
-	ThemePath     string                 `json:"omit"` // only used to build Theme
 	Theme         string                 `json:"theme,omitempty"`
 	Version       string                 `json:"version,omitempty"` // TODO what is version used for?
 	OpenIDConnect OIDC                   `json:"openIdConnect,omitempty"`
@@ -84,8 +82,10 @@ type ExternalAppConfig struct {
 
 // Web defines the available web configuration.
 type Web struct {
-	Path   string
-	Config WebConfig
+	Path        string
+	ThemeServer string // used to build Theme in WebConfig
+	ThemePath   string // used to build Theme in WebConfig
+	Config      WebConfig
 }
 
 // Config combines all available configuration parts.

@@ -170,17 +170,17 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "web-theme-server",
-			Value:       flags.OverrideDefaultString(cfg.Web.Config.ThemeServer, "https://localhost:9200"),
+			Value:       flags.OverrideDefaultString(cfg.Web.ThemeServer, "https://localhost:9200"),
 			Usage:       "Theme server URL",
 			EnvVars:     []string{"WEB_UI_THEME_SERVER", "OCIS_URL"}, // WEB_UI_THEME_SERVER takes precedence over OCIS_URL
-			Destination: &cfg.Web.Config.ThemeServer,
+			Destination: &cfg.Web.ThemeServer,
 		},
 		&cli.StringFlag{
 			Name:        "web-config-theme",
-			Value:       flags.OverrideDefaultString(cfg.Web.Config.ThemePath, "/themes/owncloud/theme.json"),
+			Value:       flags.OverrideDefaultString(cfg.Web.ThemePath, "/themes/owncloud/theme.json"),
 			Usage:       "Theme path on the theme server",
 			EnvVars:     []string{"WEB_UI_THEME_PATH"},
-			Destination: &cfg.Web.Config.ThemePath,
+			Destination: &cfg.Web.ThemePath,
 		},
 		&cli.StringFlag{
 			Name:        "web-config-version",

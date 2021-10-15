@@ -71,10 +71,10 @@ func (p Web) getPayload() (payload []byte, err error) {
 		}
 
 		// build theme url
-		if themeServer, err := url.Parse(p.config.Web.Config.ThemeServer); err == nil {
-			p.config.Web.Config.Theme = themeServer.String() + p.config.Web.Config.ThemePath
+		if themeServer, err := url.Parse(p.config.Web.ThemeServer); err == nil {
+			p.config.Web.Config.Theme = themeServer.String() + p.config.Web.ThemePath
 		} else {
-			p.config.Web.Config.Theme = p.config.Web.Config.ThemePath
+			p.config.Web.Config.Theme = p.config.Web.ThemePath
 		}
 
 		if p.config.Web.Config.ExternalApps == nil {
