@@ -26,12 +26,5 @@ ci-go-generate: # CI runs ci-node-generate automatically before this target
 	@go generate ./...
 
 .PHONY: ci-node-generate
-ci-node-generate: yarn-build
+ci-node-generate: 
 	@make -C ../accounts generate
-
-.PHONY: yarn-build
-yarn-build: node_modules
-
-.PHONY: node_modules
-node_modules:
-	yarn install --frozen-lockfile
