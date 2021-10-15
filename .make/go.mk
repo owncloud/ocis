@@ -1,4 +1,5 @@
-IMPORT := github.com/owncloud/ocis/$(NAME)
+OCIS_REPO := github.com/owncloud/ocis
+IMPORT := ($OCIS_REPO)/$(NAME)
 BIN := bin
 DIST := dist
 
@@ -16,9 +17,7 @@ else
 	GOBUILD ?= go build
 endif
 
-PACKAGES ?= $(shell go list ./...)
 SOURCES ?= $(shell find . -name "*.go" -type f -not -path "./node_modules/*")
-GENERATE ?= $(PACKAGES)
 
 TAGS ?=
 
@@ -42,8 +41,9 @@ ifndef DATE
 	DATE := $(shell date -u '+%Y%m%d')
 endif
 
-LDFLAGS += -s -w -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
-DEBUG_LDFLAGS += -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
+LDFLAGS += -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn -s -w -X "$(OCIS_REPO)/ocis-pkg/version.String=$(VERSION)" -X "$(OCIS_REPO)/ocis-pkg/version.Date=$(DATE)"
+DEBUG_LDFLAGS += -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn -X "$(OCIS_REPO)/ocis-pkg/version.String=$(VERSION)" -X "$(OCIS_REPO)/ocis-pkg/version.Date=$(DATE)"
+
 GCFLAGS += all=-N -l
 
 .PHONY: all
@@ -77,16 +77,11 @@ ci-golangci-lint: $(GOLANGCI_LINT)
 	$(GOLANGCI_LINT) run -E gosec -E bodyclose -E dogsled -E durationcheck -E golint -E ifshort -E makezero -E prealloc -E predeclared --path-prefix $(NAME) --timeout 10m0s --issues-exit-code 0 --out-format checkstyle > checkstyle.xml
 
 .PHONY: test
-test: $(GOVERAGE)
-	@echo
-	@echo
-	@echo "$(NAME): test"
-	@echo
-	@$(GOVERAGE) -v -coverprofile coverage.out $(PACKAGES)
+test:
+	@go test -v -coverprofile coverage.out ./...
 
 .PHONY: go-coverage
 go-coverage:
-	@echo "$(NAME): go-coverage"
 	@if [ ! -f coverage.out ]; then $(MAKE) test  &>/dev/null; fi;
 	@go tool cover -func coverage.out | tail -1 | grep -Eo "[0-9]+\.[0-9]+"
 

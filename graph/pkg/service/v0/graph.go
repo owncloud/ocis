@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/graph/pkg/config"
 	"github.com/owncloud/ocis/graph/pkg/cs3"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -31,8 +31,10 @@ func (g Graph) GetClient() (gateway.GatewayAPIClient, error) {
 // other packages.
 type key int
 
-const userIDKey key = 0
-const groupIDKey key = 1
+const (
+	userKey key = iota
+	groupKey
+)
 
 type listResponse struct {
 	Value interface{} `json:"value,omitempty"`

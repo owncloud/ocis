@@ -1,9 +1,12 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
+	"path"
+
 	"github.com/owncloud/ocis/ocis-pkg/flags"
+	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
 	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // LDAPWithConfig applies LDAP cfg to the flagset
@@ -24,8 +27,22 @@ func LDAPWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.LDAP.Port,
 		},
 		&cli.StringFlag{
+			Name:        "ldap-cacert",
+			Value:       flags.OverrideDefaultString(cfg.Reva.LDAP.CACert, path.Join(pkgos.MustUserConfigDir("ocis", "ldap"), "ldap.crt")),
+			Usage:       "Path to a trusted Certificate file (in PEM format) for the LDAP Connection",
+			EnvVars:     []string{"STORAGE_LDAP_CACERT"},
+			Destination: &cfg.Reva.LDAP.CACert,
+		},
+		&cli.BoolFlag{
+			Name:        "ldap-insecure",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.LDAP.Insecure, false),
+			Usage:       "Disable TLS certificate and hostname validation",
+			EnvVars:     []string{"STORAGE_LDAP_INSECURE"},
+			Destination: &cfg.Reva.LDAP.Insecure,
+		},
+		&cli.StringFlag{
 			Name:        "ldap-base-dn",
-			Value:       flags.OverrideDefaultString(cfg.Reva.LDAP.BaseDN, "dc=example,dc=org"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.LDAP.BaseDN, "dc=ocis,dc=test"),
 			Usage:       "LDAP basedn",
 			EnvVars:     []string{"STORAGE_LDAP_BASE_DN"},
 			Destination: &cfg.Reva.LDAP.BaseDN,
@@ -105,7 +122,7 @@ func LDAPWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldap-bind-dn",
-			Value:       flags.OverrideDefaultString(cfg.Reva.LDAP.BindDN, "cn=reva,ou=sysusers,dc=example,dc=org"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.LDAP.BindDN, "cn=reva,ou=sysusers,dc=ocis,dc=test"),
 			Usage:       "LDAP bind dn",
 			EnvVars:     []string{"STORAGE_LDAP_BIND_DN"},
 			Destination: &cfg.Reva.LDAP.BindDN,

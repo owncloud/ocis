@@ -3,7 +3,7 @@ import { injectIntl, defineMessages } from 'react-intl';
 export const ERROR_LOGIN_VALIDATE_MISSINGUSERNAME = 'konnect.error.login.validate.missingUsername';
 export const ERROR_LOGIN_VALIDATE_MISSINGPASSWORD = 'konnect.error.login.validate.missingPassword';
 export const ERROR_LOGIN_FAILED = 'konnect.error.login.failed';
-export const ERROR_HTTP_NETWORK_ERROR = 'konnet.error.http.networkError';
+export const ERROR_HTTP_NETWORK_ERROR = 'konnect.error.http.networkError';
 export const ERROR_HTTP_UNEXPECTED_RESPONSE_STATUS = 'konnect.error.http.unexpectedResponseStatus';
 export const ERROR_HTTP_UNEXPECTED_RESPONSE_STATE = 'konnect.error.http.unexpectedResponseState';
 

@@ -22,13 +22,27 @@ repository:
 labels:
   - name: OCIS-Fastlane
     color: "#deadbf"
-    description: Something isn't working
+    description: Planned outside of the sprint
+  - name: Storage:EOS
+    color: "#3F7A62"
+  - name: Storage:S3NG
+    color: "#3F7A62"
+  - name: Storage:CephFS
+    color: "#3F7A62"
+  - name: Storage:OCIS
+    color: "#3F7A62"
+  - name: Storage:POSIX
+    color: "#3F7A62"
+  - name: Storage:ownCloudSQL
+    color: "#3F7A62"
   
 teams:
   - name: ci
     permission: admin
   - name: employees
     permission: push
+  - name: cern
+    permission: triage
 
 branches:
   - name: master
@@ -37,16 +51,17 @@ branches:
         required_approving_review_count: 1
         dismiss_stale_reviews: false
         require_code_owner_reviews: false
-        dismissal_restrictions: {}
       required_status_checks:
         strict: false
         contexts:
           - continuous-integration/drone/pr
-      enforce_admins: false
+      enforce_admins: null
       restrictions:
+        apps: []
         users: []
         teams:
           - ci
           - employees
 
 ...
+

@@ -30,26 +30,23 @@
   ],
   "paths": {},
   "definitions": {
-    "GetRequestFileType": {
+    "GetThumbnailRequestThumbnailType": {
       "type": "string",
       "enum": [
         "PNG",
         "JPG"
       ],
       "default": "PNG",
-      "description": "The file types to which the thumbnail cna get encoded to."
+      "description": "The file types to which the thumbnail can get encoded to."
     },
     "protobufAny": {
       "type": "object",
       "properties": {
-        "typeUrl": {
+        "@type": {
           "type": "string"
-        },
-        "value": {
-          "type": "string",
-          "format": "byte"
         }
-      }
+      },
+      "additionalProperties": {}
     },
     "rpcStatus": {
       "type": "object",
@@ -69,7 +66,18 @@
         }
       }
     },
-    "v0GetResponse": {
+    "v0CS3Source": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "authorization": {
+          "type": "string"
+        }
+      }
+    },
+    "v0GetThumbnailResponse": {
       "type": "object",
       "properties": {
         "thumbnail": {
@@ -83,6 +91,31 @@
         }
       },
       "title": "The service response"
+    },
+    "v0WebdavSource": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "REQUIRED."
+        },
+        "isPublicLink": {
+          "type": "boolean",
+          "description": "REQUIRED."
+        },
+        "webdavAuthorization": {
+          "type": "string",
+          "description": "OPTIONAL."
+        },
+        "revaAuthorization": {
+          "type": "string",
+          "description": "OPTIONAL."
+        },
+        "publicLinkToken": {
+          "type": "string",
+          "description": "OPTIONAL."
+        }
+      }
     }
   },
   "externalDocs": {

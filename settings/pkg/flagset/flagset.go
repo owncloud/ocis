@@ -1,9 +1,9 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/settings/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // RootWithConfig applies cfg to the root flagset
@@ -35,7 +35,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9194"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9194"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"SETTINGS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -56,28 +56,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
 			Usage:       "Enable sending traces",
-			EnvVars:     []string{"SETTINGS_TRACING_ENABLED"},
+			EnvVars:     []string{"SETTINGS_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
-			EnvVars:     []string{"SETTINGS_TRACING_TYPE"},
+			EnvVars:     []string{"SETTINGS_TRACING_TYPE", "OCIS_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Endpoint, ""),
 			Usage:       "Endpoint for the agent",
-			EnvVars:     []string{"SETTINGS_TRACING_ENDPOINT"},
+			EnvVars:     []string{"SETTINGS_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Collector, ""),
 			Usage:       "Endpoint for the collector",
-			EnvVars:     []string{"SETTINGS_TRACING_COLLECTOR"},
+			EnvVars:     []string{"SETTINGS_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
@@ -89,7 +89,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9194"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9194"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"SETTINGS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -115,7 +115,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9190"),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "127.0.0.1:9190"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"SETTINGS_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
@@ -143,7 +143,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "grpc-addr",
-			Value:       flags.OverrideDefaultString(cfg.GRPC.Addr, "0.0.0.0:9191"),
+			Value:       flags.OverrideDefaultString(cfg.GRPC.Addr, "127.0.0.1:9191"),
 			Usage:       "Address to bind grpc server",
 			EnvVars:     []string{"SETTINGS_GRPC_ADDR"},
 			Destination: &cfg.GRPC.Addr,
@@ -182,6 +182,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "Used to create JWT to talk to reva, should equal reva's jwt-secret",
 			EnvVars:     []string{"SETTINGS_JWT_SECRET", "OCIS_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode. This flag is set by the runtime",
 		},
 	}
 }

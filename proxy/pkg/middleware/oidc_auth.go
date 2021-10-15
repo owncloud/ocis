@@ -2,17 +2,17 @@ package middleware
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 
-	gOidc "github.com/coreos/go-oidc"
+	gOidc "github.com/coreos/go-oidc/v3/oidc"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/proxy/pkg/config"
 	"golang.org/x/oauth2"
 )
 
@@ -27,12 +27,13 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	tokenCache := sync.NewCache(options.UserinfoCacheSize)
 
 	h := oidcAuth{
-		logger:        options.Logger,
-		providerFunc:  options.OIDCProviderFunc,
-		httpClient:    options.HTTPClient,
-		oidcIss:       options.OIDCIss,
-		tokenCache:    &tokenCache,
-		tokenCacheTTL: options.UserinfoCacheTTL,
+		logger:             options.Logger,
+		providerFunc:       options.OIDCProviderFunc,
+		httpClient:         options.HTTPClient,
+		oidcIss:            options.OIDCIss,
+		TokenManagerConfig: options.TokenManagerConfig,
+		tokenCache:         &tokenCache,
+		tokenCacheTTL:      options.UserinfoCacheTTL,
 	}
 
 	return func(next http.Handler) http.Handler {
@@ -59,26 +60,27 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 			}
 
 			// inject claims to the request context for the account_uuid middleware.
-			req = req.WithContext(oidc.NewContext(req.Context(), &claims))
+			req = req.WithContext(oidc.NewContext(req.Context(), claims))
 
 			// store claims in context
 			// uses the original context, not the one with probably reduced security
-			next.ServeHTTP(w, req.WithContext(oidc.NewContext(req.Context(), &claims)))
+			next.ServeHTTP(w, req.WithContext(oidc.NewContext(req.Context(), claims)))
 		})
 	}
 }
 
 type oidcAuth struct {
-	logger        log.Logger
-	provider      OIDCProvider
-	providerFunc  func() (OIDCProvider, error)
-	httpClient    *http.Client
-	oidcIss       string
-	tokenCache    *sync.Cache
-	tokenCacheTTL time.Duration
+	logger             log.Logger
+	provider           OIDCProvider
+	providerFunc       func() (OIDCProvider, error)
+	httpClient         *http.Client
+	oidcIss            string
+	tokenCache         *sync.Cache
+	tokenCacheTTL      time.Duration
+	TokenManagerConfig config.TokenManager
 }
 
-func (m oidcAuth) getClaims(token string, req *http.Request) (claims oidc.StandardClaims, status int) {
+func (m oidcAuth) getClaims(token string, req *http.Request) (claims map[string]interface{}, status int) {
 	hit := m.tokenCache.Load(token)
 	if hit == nil {
 		// TODO cache userinfo for access token if we can determine the expiry (which works in case it is a jwt based access token)
@@ -102,9 +104,6 @@ func (m oidcAuth) getClaims(token string, req *http.Request) (claims oidc.Standa
 			return
 		}
 
-		//TODO: This should be read from the token instead of config
-		claims.Iss = m.oidcIss
-
 		expiration := m.extractExpiration(token)
 		m.tokenCache.Store(token, claims, expiration)
 
@@ -113,7 +112,7 @@ func (m oidcAuth) getClaims(token string, req *http.Request) (claims oidc.Standa
 	}
 
 	var ok bool
-	if claims, ok = hit.V.(oidc.StandardClaims); !ok {
+	if claims, ok = hit.V.(map[string]interface{}); !ok {
 		status = http.StatusInternalServerError
 		return
 	}
@@ -127,19 +126,15 @@ func (m oidcAuth) getClaims(token string, req *http.Request) (claims oidc.Standa
 func (m oidcAuth) extractExpiration(token string) time.Time {
 	defaultExpiration := time.Now().Add(m.tokenCacheTTL)
 
-	s := strings.SplitN(token, ".", 4)
-	if len(s) != 3 {
-		return defaultExpiration
-	}
-
-	b, err := jwt.DecodeSegment(s[1])
+	t, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
+		return []byte(m.TokenManagerConfig.JWTSecret), nil
+	})
 	if err != nil {
 		return defaultExpiration
 	}
 
-	at := &jwt.StandardClaims{}
-	err = json.Unmarshal(b, at)
-	if err != nil || at.ExpiresAt == 0 {
+	at, ok := t.Claims.(jwt.StandardClaims)
+	if !ok || at.ExpiresAt == 0 {
 		return defaultExpiration
 	}
 
@@ -155,7 +150,7 @@ func (m oidcAuth) shouldServe(req *http.Request) bool {
 
 	// todo: looks dirty, check later
 	// TODO: make a PR to coreos/go-oidc for exposing userinfo endpoint on provider, see https://github.com/coreos/go-oidc/issues/248
-	for _, ignoringPath := range []string{"/konnect/v1/userinfo"} {
+	for _, ignoringPath := range []string{"/konnect/v1/userinfo", "/status.php"} {
 		if req.URL.Path == ignoringPath {
 			return false
 		}

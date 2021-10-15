@@ -1,8 +1,8 @@
 package proxy
 
 import (
-	"context"
 	"crypto/tls"
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -11,21 +11,25 @@ import (
 	"strings"
 	"time"
 
-	"github.com/owncloud/ocis/proxy/pkg/proxy/policy"
-	"go.opencensus.io/plugin/ochttp/propagation/tracecontext"
-	"go.opencensus.io/trace"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
+
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	pkgtrace "github.com/owncloud/ocis/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/proxy/pkg/config"
+	"github.com/owncloud/ocis/proxy/pkg/proxy/policy"
+	proxytracing "github.com/owncloud/ocis/proxy/pkg/tracing"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/trace"
 )
 
-// MultiHostReverseProxy extends httputil to support multiple hosts with diffent policies
+// MultiHostReverseProxy extends "httputil" to support multiple hosts with different policies
 type MultiHostReverseProxy struct {
 	httputil.ReverseProxy
 	Directors      map[string]map[config.RouteType]map[string]func(req *http.Request)
 	PolicySelector policy.Selector
 	logger         log.Logger
-	propagator     tracecontext.HTTPFormat
 	config         *config.Config
 }
 
@@ -67,7 +71,7 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 
 	if options.Config.PolicySelector == nil {
 		firstPolicy := options.Config.Policies[0].Name
-		rp.logger.Warn().Msgf("policy-selector not configured. Will always use first policy: '%v'", firstPolicy)
+		rp.logger.Warn().Str("policy", firstPolicy).Msg("policy-selector not configured. Will always use first policy")
 		options.Config.PolicySelector = &config.PolicySelector{
 			Static: &config.StaticSelectorConf{
 				Policy: firstPolicy,
@@ -92,9 +96,10 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 			uri, err := url.Parse(route.Backend)
 			if err != nil {
 				rp.logger.
-					Fatal().
+					Fatal(). // fail early on misconfiguration
 					Err(err).
-					Msgf("malformed url: %v", route.Backend)
+					Str("backend", route.Backend).
+					Msg("malformed url")
 			}
 
 			rp.logger.
@@ -110,16 +115,17 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 }
 
 func (p *MultiHostReverseProxy) directorSelectionDirector(r *http.Request) {
-	pol, err := p.PolicySelector(r.Context(), r)
+	pol, err := p.PolicySelector(r)
 	if err != nil {
-		p.logger.Error().Msgf("Error while selecting pol %v", err)
+		p.logger.Error().Err(err).Msg("Error while selecting pol")
 		return
 	}
 
 	if _, ok := p.Directors[pol]; !ok {
 		p.logger.
 			Error().
-			Msgf("policy %v is not configured", pol)
+			Str("policy", pol).
+			Msg("policy is not configured")
 		return
 	}
 
@@ -145,12 +151,6 @@ func (p *MultiHostReverseProxy) directorSelectionDirector(r *http.Request) {
 					Str("path", r.URL.Path).
 					Str("routeType", string(rt)).
 					Msg("director found")
-
-				p.logger.Info().
-					Str("method", r.Method).
-					Str("path", r.Method).
-					Str("from", r.RemoteAddr).
-					Msg("access-log")
 
 				p.Directors[pol][rt][endpoint](r)
 				return
@@ -219,17 +219,23 @@ func (p *MultiHostReverseProxy) AddHost(policy string, target *url.URL, rt confi
 }
 
 func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := context.Background()
-	var span *trace.Span
+	var (
+		ctx  = r.Context()
+		span trace.Span
+	)
 
-	// Start root span.
-	if p.config.Tracing.Enabled {
-		ctx, span = trace.StartSpan(context.Background(), r.URL.String())
-		defer span.End()
-		p.propagator.SpanContextToRequest(span.SpanContext(), r)
-	}
+	tracer := proxytracing.TraceProvider.Tracer("proxy")
+	ctx, span = tracer.Start(ctx, fmt.Sprintf("%s %v", r.Method, r.URL.Path))
+	defer span.End()
 
-	// Call upstream ServeHTTP
+	span.SetAttributes(
+		attribute.KeyValue{
+			Key:   "x-request-id",
+			Value: attribute.StringValue(chimiddleware.GetReqID(r.Context())),
+		})
+
+	pkgtrace.Propagator.Inject(ctx, propagation.HeaderCarrier(r.Header))
+
 	p.ReverseProxy.ServeHTTP(w, r.WithContext(ctx))
 }
 
@@ -254,7 +260,7 @@ func (p MultiHostReverseProxy) queryRouteMatcher(endpoint string, target url.URL
 func (p *MultiHostReverseProxy) regexRouteMatcher(pattern string, target url.URL) bool {
 	matched, err := regexp.MatchString(pattern, target.String())
 	if err != nil {
-		p.logger.Warn().Err(err).Msgf("regex with pattern %s failed", pattern)
+		p.logger.Warn().Err(err).Str("pattern", pattern).Msg("regex with pattern failed")
 	}
 	return matched
 }
@@ -285,9 +291,17 @@ func defaultPolicies() []config.Policy {
 					Backend:  "http://localhost:9130",
 				},
 				{
+					Endpoint: "/archiver",
+					Backend:  "http://localhost:9140",
+				},
+				{
 					Type:     config.RegexRoute,
 					Endpoint: "/ocs/v[12].php/cloud/(users?|groups)", // we have `user`, `users` and `groups` in ocis-ocs
 					Backend:  "http://localhost:9110",
+				},
+				{
+					Endpoint: "/app/",
+					Backend:  "http://localhost:9140",
 				},
 				{
 					Endpoint: "/ocs/",
@@ -348,10 +362,6 @@ func defaultPolicies() []config.Policy {
 					Endpoint: "/settings.js",
 					Backend:  "http://localhost:9190",
 				},
-				{
-					Endpoint: "/onlyoffice.js",
-					Backend:  "http://localhost:9220",
-				},
 			},
 		},
 		{
@@ -372,6 +382,10 @@ func defaultPolicies() []config.Policy {
 				{
 					Endpoint: "/signin/",
 					Backend:  "http://localhost:9130",
+				},
+				{
+					Endpoint: "/archiver",
+					Backend:  "http://localhost:9140",
 				},
 				{
 					Endpoint:    "/ocs/",

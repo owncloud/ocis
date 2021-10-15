@@ -6,15 +6,15 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	revauser "github.com/cs3org/reva/pkg/user"
-	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/proxy/pkg/config"
+	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	store "github.com/owncloud/ocis/store/pkg/proto/v0"
 	"golang.org/x/crypto/pbkdf2"
 )
@@ -48,13 +48,13 @@ func (m signedURLAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user, err := m.userProvider.GetUserByClaims(req.Context(), "username", req.URL.Query().Get("OC-Credential"), true)
+	user, _, err := m.userProvider.GetUserByClaims(req.Context(), "username", req.URL.Query().Get("OC-Credential"), true)
 	if err != nil {
 		m.logger.Error().Err(err).Msg("Could not get user by claim")
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
-	ctx := revauser.ContextSetUser(req.Context(), user)
+	ctx := revactx.ContextSetUser(req.Context(), user)
 
 	req = req.WithContext(ctx)
 
@@ -164,7 +164,7 @@ func (m signedURLAuth) urlIsExpired(query url.Values, now func() time.Time) (exp
 }
 
 func (m signedURLAuth) signatureIsValid(req *http.Request) (ok bool, err error) {
-	u := revauser.ContextMustGetUser(req.Context())
+	u := revactx.ContextMustGetUser(req.Context())
 	signingKey, err := m.getSigningKey(req.Context(), u.Id.OpaqueId)
 	if err != nil {
 		m.logger.Error().Err(err).Msg("could not retrieve signing key")

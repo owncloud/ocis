@@ -31,6 +31,19 @@ module.exports = {
       let output
       switch (key) {
         case 'Language':
+          let elemfound = true
+
+          // Language value is set to empty at beginning
+          // In that case just return false
+          await this.api.element('@languageValue', result => {
+            if (result.status < 0) {
+              elemfound = false
+            }
+          })
+          if (!elemfound) {
+            output = false
+            break
+          }
           await this.waitForElementVisible('@languageValue')
             .getText('@languageValue', (result) => {
               output = result.value
@@ -42,16 +55,11 @@ module.exports = {
       return output
     },
     changeSettings: async function (key, value) {
-      const selectXpath = util.format(this.elements.languageSelect.selector, value)
       switch (key) {
         case 'Language':
-          await this.waitForElementVisible('@languageValue')
-            .click('@languageValue')
-            .useXpath()
-            .waitForElementVisible(this.elements.languageDropdown.selector)
-            .click(selectXpath)
-            .waitForElementNotVisible(this.elements.languageDropdown.selector)
-            .useCss()
+          await this
+            .waitForElementVisible('@languageInput')
+            .setValue('@languageInput', value + '\n')
           break
         default:
           throw new Error('failed to find the setting')
@@ -64,16 +72,12 @@ module.exports = {
       selector: '.oc-page-title'
     },
     languageValue: {
-      selector: "//label[.='Language']/..//button[starts-with(@id, 'single-choice-toggle')]",
+      selector: "//label[.='Language']/..//span[@class='vs__selected']",
       locateStrategy: 'xpath'
     },
-    languageDropdown: {
-      selector: "//label[.='Language']/..//div[starts-with(@id, 'single-choice-drop')]",
+    languageInput: {
+      selector: "//label[.='Language']/..//input",
       locateStrategy: 'xpath'
     },
-    languageSelect: {
-      selector: "//label[.='Language']/..//div[starts-with(@id, 'single-choice-drop')]//label[normalize-space()='%s']",
-      locateStrategy: 'xpath'
-    }
   }
 }

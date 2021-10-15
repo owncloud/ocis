@@ -1,10 +1,10 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
+	"github.com/urfave/cli/v2"
 )
 
 // RootWithConfig applies cfg to the root flagset
@@ -28,6 +28,10 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"ACCOUNTS_LOG_COLOR", "OCIS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode",
+		},
 	}
 }
 
@@ -43,28 +47,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
 			Usage:       "Enable sending traces",
-			EnvVars:     []string{"ACCOUNTS_TRACING_ENABLED"},
+			EnvVars:     []string{"ACCOUNTS_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
-			EnvVars:     []string{"ACCOUNTS_TRACING_TYPE"},
+			EnvVars:     []string{"ACCOUNTS_TRACING_TYPE", "OCIS_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Endpoint, ""),
 			Usage:       "Endpoint for the agent",
-			EnvVars:     []string{"ACCOUNTS_TRACING_ENDPOINT"},
+			EnvVars:     []string{"ACCOUNTS_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Collector, ""),
 			Usage:       "Endpoint for the collector",
-			EnvVars:     []string{"ACCOUNTS_TRACING_COLLECTOR"},
+			EnvVars:     []string{"ACCOUNTS_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
@@ -83,7 +87,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9181"),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "127.0.0.1:9181"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"ACCOUNTS_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
@@ -111,7 +115,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "grpc-addr",
-			Value:       flags.OverrideDefaultString(cfg.GRPC.Addr, "0.0.0.0:9180"),
+			Value:       flags.OverrideDefaultString(cfg.GRPC.Addr, "127.0.0.1:9180"),
 			Usage:       "Address to bind grpc server",
 			EnvVars:     []string{"ACCOUNTS_GRPC_ADDR"},
 			Destination: &cfg.GRPC.Addr,
@@ -129,6 +133,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "accounts password hash difficulty",
 			EnvVars:     []string{"ACCOUNTS_HASH_DIFFICULTY"},
 			Destination: &cfg.Server.HashDifficulty,
+		},
+		&cli.BoolFlag{
+			Name:        "demo-users-and-groups",
+			Value:       flags.OverrideDefaultBool(cfg.Server.DemoUsersAndGroups, true),
+			Usage:       "Enable demo users and groups",
+			EnvVars:     []string{"ACCOUNTS_DEMO_USERS_AND_GROUPS"},
+			Destination: &cfg.Server.DemoUsersAndGroups,
 		},
 		&cli.StringFlag{
 			Name:        "asset-path",
@@ -234,6 +245,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "define an ending point for the account GID",
 			EnvVars:     []string{"ACCOUNTS_GID_INDEX_UPPER_BOUND"},
 			Destination: &cfg.Index.GID.Upper,
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode",
 		},
 	}
 }

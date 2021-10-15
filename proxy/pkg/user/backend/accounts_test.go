@@ -6,6 +6,7 @@ import (
 
 	"github.com/asim/go-micro/v3/client"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
@@ -51,7 +52,7 @@ func TestGetUserByClaimsFound(t *testing.T) {
 
 	for k := range tests {
 		t.Run(tests[k].id, func(t *testing.T) {
-			u, err := accBackend.GetUserByClaims(context.Background(), tests[k].claim, tests[k].value, true)
+			u, _, err := accBackend.GetUserByClaims(context.Background(), tests[k].claim, tests[k].value, true)
 
 			assert.NoError(t, err)
 			assert.NotNil(t, u)
@@ -64,7 +65,7 @@ func TestGetUserByClaimsFound(t *testing.T) {
 func TestGetUserByClaimsNotFound(t *testing.T) {
 	accBackend := newAccountsBackend([]*accounts.Account{}, expectedRoles)
 
-	u, err := accBackend.GetUserByClaims(context.Background(), "mail", "foo@example.com", true)
+	u, _, err := accBackend.GetUserByClaims(context.Background(), "mail", "foo@example.com", true)
 
 	assert.Error(t, err)
 	assert.Nil(t, u)
@@ -73,7 +74,7 @@ func TestGetUserByClaimsNotFound(t *testing.T) {
 
 func TestGetUserByClaimsInvalidClaim(t *testing.T) {
 	accBackend := newAccountsBackend([]*accounts.Account{}, expectedRoles)
-	u, err := accBackend.GetUserByClaims(context.Background(), "invalidClaimName", "efwfwfwfe", true)
+	u, _, err := accBackend.GetUserByClaims(context.Background(), "invalidClaimName", "efwfwfwfe", true)
 
 	assert.Nil(t, u)
 	assert.Error(t, err)
@@ -81,7 +82,7 @@ func TestGetUserByClaimsInvalidClaim(t *testing.T) {
 
 func TestGetUserByClaimsDisabledAccount(t *testing.T) {
 	accBackend := newAccountsBackend([]*accounts.Account{{AccountEnabled: false}}, expectedRoles)
-	u, err := accBackend.GetUserByClaims(context.Background(), "mail", "foo@example.com", true)
+	u, _, err := accBackend.GetUserByClaims(context.Background(), "mail", "foo@example.com", true)
 
 	assert.Nil(t, u)
 	assert.Error(t, err)
@@ -90,7 +91,7 @@ func TestGetUserByClaimsDisabledAccount(t *testing.T) {
 
 func TestAuthenticate(t *testing.T) {
 	accBackend := newAccountsBackend(mockAccResp, expectedRoles)
-	u, err := accBackend.Authenticate(context.Background(), "foo", "secret")
+	u, _, err := accBackend.Authenticate(context.Background(), "foo", "secret")
 
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
@@ -99,7 +100,7 @@ func TestAuthenticate(t *testing.T) {
 
 func TestAuthenticateFailed(t *testing.T) {
 	accBackend := newAccountsBackend([]*accounts.Account{}, expectedRoles)
-	u, err := accBackend.Authenticate(context.Background(), "foo", "secret")
+	u, _, err := accBackend.Authenticate(context.Background(), "foo", "secret")
 
 	assert.Nil(t, u)
 	assert.Error(t, err)
@@ -108,13 +109,13 @@ func TestAuthenticateFailed(t *testing.T) {
 func TestCreateUserFromClaims(t *testing.T) {
 	exp := mockAccResp[0]
 	accBackend := newAccountsBackend([]*accounts.Account{}, expectedRoles)
-	act, _ := accBackend.CreateUserFromClaims(context.Background(), &oidc.StandardClaims{
-		DisplayName:       mockAccResp[0].DisplayName,
-		PreferredUsername: mockAccResp[0].OnPremisesSamAccountName,
-		Email:             mockAccResp[0].Mail,
-		UIDNumber:         "1",
-		GIDNumber:         "2",
-		Groups:            []string{"g1", "g2"},
+	act, _ := accBackend.CreateUserFromClaims(context.Background(), map[string]interface{}{
+		oidc.Name:              mockAccResp[0].DisplayName,
+		oidc.PreferredUsername: mockAccResp[0].OnPremisesSamAccountName,
+		oidc.Email:             mockAccResp[0].Mail,
+		oidc.UIDNumber:         "1",
+		oidc.GIDNumber:         "2",
+		oidc.Groups:            []string{"g1", "g2"},
 	})
 
 	assert.NotNil(t, act.Id)
@@ -145,16 +146,17 @@ func assertUserMatchesAccount(t *testing.T, exp *accounts.Account, act *userv1be
 	assert.Equal(t, `["a","b"]`, string(act.Opaque.Map["roles"].GetValue()))
 
 	// UID/GID
-	assert.NotNil(t, act.Opaque.Map["uid"])
-	assert.Equal(t, "1", string(act.Opaque.Map["uid"].GetValue()))
-
-	assert.NotNil(t, act.Opaque.Map["gid"])
-	assert.Equal(t, "2", string(act.Opaque.Map["gid"].GetValue()))
+	assert.Equal(t, int64(1), act.UidNumber)
+	assert.Equal(t, int64(2), act.GidNumber)
 }
 
 func newAccountsBackend(mockAccounts []*accounts.Account, mockRoles []*settings.UserRoleAssignment) UserBackend {
 	accSvc, roleSvc := getAccountService(mockAccounts, nil), getRoleService(mockRoles, nil)
-	accBackend := NewAccountsServiceUserBackend(accSvc, roleSvc, "https://idp.example.org", log.NewLogger())
+	tokenManager, _ := jwt.New(map[string]interface{}{
+		"secret":  "change-me",
+		"expires": int64(24 * 60 * 60),
+	})
+	accBackend := NewAccountsServiceUserBackend(accSvc, roleSvc, "https://idp.example.org", tokenManager, log.NewLogger())
 	zerolog.SetGlobalLevel(zerolog.Disabled)
 	return accBackend
 }
@@ -172,10 +174,10 @@ func getAccountService(expectedResponse []*accounts.Account, err error) *account
 	}
 }
 
-func getRoleService(expectedRespone []*settings.UserRoleAssignment, err error) *settings.MockRoleService {
+func getRoleService(expectedResponse []*settings.UserRoleAssignment, err error) *settings.MockRoleService {
 	return &settings.MockRoleService{
 		ListRoleAssignmentsFunc: func(ctx context.Context, req *settings.ListRoleAssignmentsRequest, opts ...client.CallOption) (*settings.ListRoleAssignmentsResponse, error) {
-			return &settings.ListRoleAssignmentsResponse{Assignments: expectedRespone}, err
+			return &settings.ListRoleAssignmentsResponse{Assignments: expectedResponse}, err
 		},
 	}
 

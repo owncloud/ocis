@@ -1,5 +1,6 @@
 */coverage.out
 */checkstyle.xml
+*/package-lock.json
 
 ocis/config/identifier-registration.yaml
 */bin
@@ -12,6 +13,7 @@ node_modules/
 ocis/ocis
 ocis/cmd/ocis/__debug_bin
 ocis/cmd/ocis/config/
+config/
 
 .idea
 

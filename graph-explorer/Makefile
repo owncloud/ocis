@@ -2,7 +2,7 @@ SHELL := bash
 NAME := graph-explorer
 
 ############ tooling ############
-ifneq (, $(shell which go 2> /dev/null)) # supress `command not found warnings` for non go targets in CI
+ifneq (, $(shell which go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../.bingo/Variables.mk
 endif
 
@@ -23,7 +23,7 @@ include ../.make/generate.mk
 
 .PHONY: ci-go-generate
 ci-go-generate: pull-assets # CI runs ci-node-generate automatically before this target
-	@go generate $(GENERATE)
+	@go generate ./...
 
 .PHONY: ci-node-generate
 ci-node-generate:

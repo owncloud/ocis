@@ -1,92 +1,75 @@
 package svc
 
 import (
-	"github.com/go-chi/render"
-	"google.golang.org/grpc/metadata"
+	"context"
+	"encoding/json"
+	"fmt"
+	"math"
 	"net/http"
+	"net/url"
+	"path"
+	"strconv"
 	"strings"
 	"time"
 
+	"github.com/CiscoM31/godata"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/pkg/token"
-	msgraph "github.com/yaegashi/msgraph.go/v1.0"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	ctxpkg "github.com/cs3org/reva/pkg/ctx"
+	"github.com/go-chi/render"
+	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
+	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+	sproto "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsSvc "github.com/owncloud/ocis/settings/pkg/service/v0"
+	msgraph "github.com/owncloud/open-graph-api-go"
 )
 
-func getToken(r *http.Request) string {
-	// 1. check Authorization header
-	hdr := r.Header.Get("Authorization")
-	t := strings.TrimPrefix(hdr, "Bearer ")
-	if t != "" {
-		return t
-	}
-	// TODO 2. check form encoded body parameter for POST requests, see https://tools.ietf.org/html/rfc6750#section-2.2
-
-	// 3. check uri query parameter, see https://tools.ietf.org/html/rfc6750#section-2.3
-	tokens, ok := r.URL.Query()["access_token"]
-	if !ok || len(tokens[0]) < 1 {
-		return ""
-	}
-
-	return tokens[0]
-}
-
-// GetRootDriveChildren implements the Service interface.
-func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
-	g.logger.Info().Msgf("Calling GetRootDriveChildren")
-	accessToken := getToken(r)
-	if accessToken == "" {
-		g.logger.Error().Msg("no access token provided in request")
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
+// GetDrives implements the Service interface.
+func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
+	g.logger.Info().Msg("Calling GetDrives")
 	ctx := r.Context()
-
-	fn := "/home"
 
 	client, err := g.GetClient()
 	if err != nil {
 		g.logger.Err(err).Msg("error getting grpc client")
-		w.WriteHeader(http.StatusInternalServerError)
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	// get reva token
-	authReq := &gateway.AuthenticateRequest{
-		Type:         "bearer",
-		ClientSecret: accessToken,
+	res, err := client.ListStorageSpaces(ctx, &storageprovider.ListStorageSpacesRequest{
+		// TODO add filters?
+	})
+	switch {
+	case err != nil:
+		g.logger.Error().Err(err).Msg("error sending list storage spaces grpc request")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	case res.Status.Code != cs3rpc.Code_CODE_OK:
+		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
+			// return an empty list
+			render.Status(r, http.StatusOK)
+			render.JSON(w, r, &listResponse{})
+			return
+		}
+		g.logger.Error().Err(err).Msg("error sending list storage spaces grpc request")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		return
 	}
 
-	authRes, _ := client.Authenticate(ctx, authReq);
-	ctx = token.ContextSetToken(ctx, authRes.Token)
-	ctx = metadata.AppendToOutgoingContext(ctx, "x-access-token", authRes.Token)
-
-	g.logger.Info().Msgf("provides access token %v", ctx)
-
-	ref := &storageprovider.Reference{
-		Spec: &storageprovider.Reference_Path{Path: fn},
-	}
-
-	req := &storageprovider.ListContainerRequest{
-		Ref: ref,
-	}
-	res, err := client.ListContainer(ctx, req)
+	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
 	if err != nil {
-		g.logger.Error().Err(err).Msgf("error sending list container grpc request %s", fn)
-		w.WriteHeader(http.StatusInternalServerError)
+		g.logger.Error().Err(err).Msg("error parsing url")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if res.Status.Code != cs3rpc.Code_CODE_OK {
-		g.logger.Error().Err(err).Msgf("error calling grpc list container %s", fn)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	files, err := formatDriveItems(res.Infos)
+	files, err := g.formatDrives(ctx, wdu, res.StorageSpaces)
 	if err != nil {
-		g.logger.Error().Err(err).Msgf("error encoding response as json %s", err)
-		w.WriteHeader(http.StatusInternalServerError)
+		g.logger.Error().Err(err).Msg("error encoding response as json")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -94,34 +77,255 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &listResponse{Value: files})
 }
 
+// GetRootDriveChildren implements the Service interface.
+func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
+	g.logger.Info().Msg("Calling GetRootDriveChildren")
+	ctx := r.Context()
+
+	client, err := g.GetClient()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("could not get client")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	res, err := client.GetHome(ctx, &storageprovider.GetHomeRequest{})
+	switch {
+	case err != nil:
+		g.logger.Error().Err(err).Msg("error sending get home grpc request")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	case res.Status.Code != cs3rpc.Code_CODE_OK:
+		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
+			return
+		}
+		g.logger.Error().Err(err).Msg("error sending get home grpc request")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		return
+	}
+
+	lRes, err := client.ListContainer(ctx, &storageprovider.ListContainerRequest{
+		Ref: &storageprovider.Reference{
+			Path: res.Path,
+		},
+	})
+	switch {
+	case err != nil:
+		g.logger.Error().Err(err).Msg("error sending list container grpc request")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	case res.Status.Code != cs3rpc.Code_CODE_OK:
+		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
+			return
+		}
+		if res.Status.Code == cs3rpc.Code_CODE_PERMISSION_DENIED {
+			// TODO check if we should return 404 to not disclose existing items
+			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, res.Status.Message)
+			return
+		}
+		g.logger.Error().Err(err).Msg("error sending list container grpc request")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		return
+	}
+
+	files, err := formatDriveItems(lRes.Infos)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error encoding response as json")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, &listResponse{Value: files})
+}
+
+// CreateDrive creates a storage drive (space).
+func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
+	us, ok := ctxpkg.ContextGetUser(r.Context())
+	if !ok {
+		errorcode.GeneralException.Render(w, r, http.StatusUnauthorized, "invalid user")
+		return
+	}
+
+	s := sproto.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
+
+	_, err := s.GetPermissionByID(r.Context(), &sproto.GetPermissionByIDRequest{
+		PermissionId: settingsSvc.CreateSpacePermissionID,
+	})
+	if err != nil {
+		// if the permission is not existing for the user in context we can assume we don't have it. Return 401.
+		errorcode.GeneralException.Render(w, r, http.StatusUnauthorized, "insufficient permissions to create a space.")
+		return
+	}
+
+	client, err := g.GetClient()
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+	drive := msgraph.Drive{}
+	if err := json.NewDecoder(r.Body).Decode(&drive); err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "invalid schema definition")
+		return
+	}
+	spaceName := *drive.Name
+	if spaceName == "" {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "invalid name")
+		return
+	}
+
+	var driveType string
+	if drive.DriveType != nil {
+		driveType = *drive.DriveType
+	}
+	switch driveType {
+	case "", "project":
+		driveType = "project"
+	default:
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("drives of type %s cannot be created via this api", driveType))
+		return
+	}
+
+	csr := provider.CreateStorageSpaceRequest{
+		Owner: us,
+		Type:  driveType,
+		Name:  spaceName,
+		Quota: getQuota(drive.Quota, g.config.Spaces.DefaultQuota),
+	}
+
+	resp, err := client.CreateStorageSpace(r.Context(), &csr)
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "")
+		return
+	}
+
+	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error parsing url")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	newDrive, err := cs3StorageSpaceToDrive(wdu, resp.StorageSpace)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error parsing url")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+	render.Status(r, http.StatusCreated)
+	render.JSON(w, r, newDrive)
+}
+
+func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
+	// wildcards however addressed here is not yet supported. We want to address drives by their unique
+	// identifiers. Any open queries need to be implemented. Same applies for sub-entities.
+	// For further reading: http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#sec_AddressingaSubsetofaCollection
+
+	// strip "/graph/v1.0/" out and parse the rest. This is how godata input is expected.
+	//https://github.com/CiscoM31/godata/blob/d70e191d2908191623be84401fecc40d6af4afde/url_parser_test.go#L10
+	sanitized := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+
+	req, err := godata.ParseRequest(sanitized, r.URL.Query(), true)
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if req.FirstSegment.Identifier.Get() == "" {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "identifier cannot be empty")
+		return
+	}
+
+	drive := msgraph.Drive{}
+	if err = json.NewDecoder(r.Body).Decode(&drive); err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %v", r.Body))
+		return
+	}
+
+	identifierParts := strings.Split(req.FirstSegment.Identifier.Get(), "!")
+	if len(identifierParts) != 2 {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid resource id: %v", req.FirstSegment.Identifier.Get()))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	storageID, opaqueID := identifierParts[0], identifierParts[1]
+
+	client, err := g.GetClient()
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	updateSpaceRequest := &provider.UpdateStorageSpaceRequest{
+		// Prepare the object to apply the diff from. The properties on StorageSpace will overwrite
+		// the original storage space.
+		StorageSpace: &provider.StorageSpace{
+			Root: &provider.ResourceId{
+				StorageId: storageID,
+				OpaqueId:  opaqueID,
+			},
+			Name: *drive.Name,
+		},
+	}
+
+	if drive.Quota.HasTotal() {
+		updateSpaceRequest.StorageSpace.Quota = &storageprovider.Quota{
+			QuotaMaxBytes: uint64(*drive.Quota.Total),
+		}
+	}
+
+	resp, err := client.UpdateStorageSpace(r.Context(), updateSpaceRequest)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "")
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func cs3TimestampToTime(t *types.Timestamp) time.Time {
+	return time.Unix(int64(t.Seconds), int64(t.Nanos))
+}
 
 func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*msgraph.DriveItem, error) {
-	size := new(int)
-	*size = int(res.Size) // uint64 -> int :boom:
-	name := strings.TrimPrefix(res.Path, "/home/")
-	lastModified := new(time.Time)
-	*lastModified = time.Unix(int64(res.Mtime.Seconds), int64(res.Mtime.Nanos))
+	size := new(int64)
+	*size = int64(res.Size) // uint64 -> int :boom:
+	name := path.Base(res.Path)
 
 	driveItem := &msgraph.DriveItem{
 		BaseItem: msgraph.BaseItem{
 			Entity: msgraph.Entity{
-				Object: msgraph.Object{},
-				ID:     &res.Id.OpaqueId,
+				Id: &res.Id.OpaqueId,
 			},
 			Name: &name,
-			LastModifiedDateTime: lastModified,
 			ETag: &res.Etag,
 		},
 		Size: size,
 	}
+	if res.Mtime != nil {
+		lastModified := cs3TimestampToTime(res.Mtime)
+		driveItem.BaseItem.LastModifiedDateTime = &lastModified
+	}
 	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_FILE {
-		driveItem.File = &msgraph.File{
+		driveItem.File = &msgraph.OpenGraphFile{ // FIXME We cannot use msgraph.File here because the openapi codegenerator autodetects 'File' as a go type ...
 			MimeType: &res.MimeType,
 		}
 	}
 	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER {
-		driveItem.Folder = &msgraph.Folder{
-		}
+		driveItem.Folder = &msgraph.Folder{}
 	}
 	return driveItem, nil
 }
@@ -137,4 +341,135 @@ func formatDriveItems(mds []*storageprovider.ResourceInfo) ([]*msgraph.DriveItem
 	}
 
 	return responses, nil
+}
+
+func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpace) (*msgraph.Drive, error) {
+	rootID := space.Root.StorageId + "!" + space.Root.OpaqueId
+	drive := &msgraph.Drive{
+		BaseItem: msgraph.BaseItem{
+			Entity: msgraph.Entity{
+				Id: &space.Id.OpaqueId,
+			},
+			Name: &space.Name,
+			//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
+			//"description": "string", // TODO read from StorageSpace ... needs Opaque for now
+		},
+		Owner: &msgraph.IdentitySet{
+			User: &msgraph.Identity{
+				Id: &space.Owner.Id.OpaqueId,
+				// DisplayName: , TODO read and cache from users provider
+			},
+		},
+
+		DriveType: &space.SpaceType,
+		Root: &msgraph.DriveItem{
+			BaseItem: msgraph.BaseItem{
+				Entity: msgraph.Entity{
+					Id: &rootID,
+				},
+			},
+		},
+	}
+
+	if baseURL != nil {
+		// TODO read from StorageSpace ... needs Opaque for now
+		// TODO how do we build the url?
+		// for now: read from request
+		webDavURL := baseURL.String() + rootID
+		drive.Root.WebDavUrl = &webDavURL
+	}
+
+	if space.Mtime != nil {
+		lastModified := cs3TimestampToTime(space.Mtime)
+		drive.BaseItem.LastModifiedDateTime = &lastModified
+	}
+	if space.Quota != nil {
+		var t int64
+		if space.Quota.QuotaMaxBytes > math.MaxInt64 {
+			t = math.MaxInt64
+		} else {
+			t = int64(space.Quota.QuotaMaxBytes)
+		}
+		drive.Quota = &msgraph.Quota{
+			Total: &t,
+		}
+	}
+	// FIXME use coowner from https://github.com/owncloud/open-graph-api
+
+	return drive, nil
+}
+
+func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storageprovider.StorageSpace) ([]*msgraph.Drive, error) {
+	responses := make([]*msgraph.Drive, 0, len(mds))
+	for i := range mds {
+		res, err := cs3StorageSpaceToDrive(baseURL, mds[i])
+		if err != nil {
+			return nil, err
+		}
+		qta, err := g.getDriveQuota(ctx, mds[i])
+		if err != nil {
+			return nil, err
+		}
+		res.Quota = &qta
+		responses = append(responses, res)
+	}
+
+	return responses, nil
+}
+
+func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (msgraph.Quota, error) {
+	client, err := g.GetClient()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error creating grpc client")
+		return msgraph.Quota{}, err
+	}
+
+	req := &gateway.GetQuotaRequest{
+		Ref: &provider.Reference{
+			ResourceId: &provider.ResourceId{
+				StorageId: space.Root.StorageId,
+				OpaqueId:  space.Root.OpaqueId,
+			},
+			Path: ".",
+		},
+	}
+	res, err := client.GetQuota(ctx, req)
+	switch {
+	case err != nil:
+		g.logger.Error().Err(err).Msg("error sending get quota grpc request")
+		return msgraph.Quota{}, err
+	case res.Status.Code != cs3rpc.Code_CODE_OK:
+		g.logger.Error().Err(err).Msg("error sending sending get quota grpc request")
+		return msgraph.Quota{}, err
+	}
+
+	total := int64(res.TotalBytes)
+
+	used := int64(res.UsedBytes)
+	remaining := total - used
+	qta := msgraph.Quota{
+		Remaining: &remaining,
+		Total:     &total,
+		Used:      &used,
+	}
+
+	return qta, nil
+}
+
+func getQuota(quota *msgraph.Quota, defaultQuota string) *provider.Quota {
+	switch {
+	case quota != nil && quota.Total != nil:
+		if q := *quota.Total; q >= 0 {
+			return &provider.Quota{QuotaMaxBytes: uint64(q)}
+		}
+		fallthrough
+	case defaultQuota != "":
+		if q, err := strconv.ParseInt(defaultQuota, 10, 64); err == nil && q >= 0 {
+			return &provider.Quota{QuotaMaxBytes: uint64(q)}
+		}
+		fallthrough
+	default:
+		return nil
+	}
+
 }

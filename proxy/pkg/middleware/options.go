@@ -1,9 +1,10 @@
 package middleware
 
 import (
-	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	"net/http"
 	"time"
+
+	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 
@@ -23,6 +24,8 @@ type Options struct {
 	Logger log.Logger
 	// TokenManagerConfig for communicating with the reva token manager
 	TokenManagerConfig config.TokenManager
+	// PolicySelectorConfig for using the policy selector
+	PolicySelector config.PolicySelector
 	// HTTPClient to use for communication with the oidcAuth provider
 	HTTPClient *http.Client
 	// AccountsClient for resolving accounts
@@ -41,6 +44,10 @@ type Options struct {
 	Store storepb.StoreService
 	// PreSignedURLConfig to configure the middleware
 	PreSignedURLConfig config.PreSignedURL
+	// UserOIDCClaim to read from the oidc claims
+	UserOIDCClaim string
+	// UserCS3Claim to use when looking up a user in the CS3 API
+	UserCS3Claim string
 	// AutoprovisionAccounts when an accountResolver does not exist.
 	AutoprovisionAccounts bool
 	// EnableBasicAuth to allow basic auth
@@ -75,6 +82,13 @@ func Logger(l log.Logger) Option {
 func TokenManagerConfig(cfg config.TokenManager) Option {
 	return func(o *Options) {
 		o.TokenManagerConfig = cfg
+	}
+}
+
+// PolicySelectorConfig provides a function to set the policy selector config option.
+func PolicySelectorConfig(cfg config.PolicySelector) Option {
+	return func(o *Options) {
+		o.PolicySelector = cfg
 	}
 }
 
@@ -138,6 +152,20 @@ func Store(sc storepb.StoreService) Option {
 func PreSignedURLConfig(cfg config.PreSignedURL) Option {
 	return func(o *Options) {
 		o.PreSignedURLConfig = cfg
+	}
+}
+
+// UserOIDCClaim provides a function to set the UserClaim config
+func UserOIDCClaim(val string) Option {
+	return func(o *Options) {
+		o.UserOIDCClaim = val
+	}
+}
+
+// UserCS3Claim provides a function to set the UserClaimType config
+func UserCS3Claim(val string) Option {
+	return func(o *Options) {
+		o.UserCS3Claim = val
 	}
 }
 

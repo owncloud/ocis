@@ -1,9 +1,9 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/graph-explorer/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
+	"github.com/urfave/cli/v2"
 )
 
 // RootWithConfig applies cfg to the root flagset
@@ -35,7 +35,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9136"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9136"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"GRAPH_EXPLORER_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -55,28 +55,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
 			Usage:       "Enable sending traces",
-			EnvVars:     []string{"GRAPH_EXPLORER_TRACING_ENABLED"},
+			EnvVars:     []string{"GRAPH_EXPLORER_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
-			EnvVars:     []string{"GRAPH_EXPLORER_TRACING_TYPE"},
+			EnvVars:     []string{"GRAPH_EXPLORER_TRACING_TYPE", "OCIS_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Endpoint, ""),
 			Usage:       "Endpoint for the agent",
-			EnvVars:     []string{"GRAPH_EXPLORER_TRACING_ENDPOINT"},
+			EnvVars:     []string{"GRAPH_EXPLORER_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Collector, ""),
 			Usage:       "Endpoint for the collector",
-			EnvVars:     []string{"GRAPH_EXPLORER_TRACING_COLLECTOR"},
+			EnvVars:     []string{"GRAPH_EXPLORER_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
@@ -88,7 +88,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9136"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9136"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"GRAPH_EXPLORER_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -114,7 +114,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9135"),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "127.0.0.1:9135"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"GRAPH_EXPLORER_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
@@ -153,6 +153,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "Set the url to the graph api service",
 			EnvVars:     []string{"GRAPH_EXPLORER_GRAPH_URL"},
 			Destination: &cfg.GraphExplorer.GraphURL,
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode. This flag is set by the runtime",
 		},
 	}
 }

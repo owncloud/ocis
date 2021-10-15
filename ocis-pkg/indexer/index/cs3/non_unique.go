@@ -14,6 +14,7 @@ import (
 
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
@@ -106,7 +107,7 @@ func (idx *NonUnique) Init() error {
 	if err != nil {
 		return err
 	}
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, tk)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, tk)
 
 	if err := idx.makeDirIfNotExists(ctx, idx.indexBaseDir); err != nil {
 		return err
@@ -132,7 +133,7 @@ func (idx *NonUnique) Lookup(v string) ([]string, error) {
 
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir, v)},
+			Path: path.Join("/meta", idx.indexRootDir, v),
 		},
 	})
 
@@ -192,7 +193,7 @@ func (idx *NonUnique) Remove(id string, v string) error {
 	deletePath := path.Join("/meta", idx.indexRootDir, v, id)
 	resp, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: deletePath},
+			Path: deletePath,
 		},
 	})
 
@@ -207,7 +208,7 @@ func (idx *NonUnique) Remove(id string, v string) error {
 	toStat := path.Join("/meta", idx.indexRootDir, v)
 	lcResp, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: toStat},
+			Path: toStat,
 		},
 	})
 	if err != nil {
@@ -218,7 +219,7 @@ func (idx *NonUnique) Remove(id string, v string) error {
 		deletePath = path.Join("/meta", idx.indexRootDir, v)
 		_, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
 			Ref: &provider.Reference{
-				Spec: &provider.Reference_Path{Path: deletePath},
+				Path: deletePath,
 			},
 		})
 		if err != nil {
@@ -262,7 +263,7 @@ func (idx *NonUnique) Search(pattern string) ([]string, error) {
 	matches := make([]string, 0)
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", idx.indexRootDir)},
+			Path: path.Join("/meta", idx.indexRootDir),
 		},
 	})
 
@@ -283,7 +284,7 @@ func (idx *NonUnique) Search(pattern string) ([]string, error) {
 	for i := range foldersMatched {
 		res, _ := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 			Ref: &provider.Reference{
-				Spec: &provider.Reference_Path{Path: foldersMatched[i]},
+				Path: foldersMatched[i],
 			},
 		})
 
@@ -374,7 +375,7 @@ func (idx *NonUnique) getAuthenticatedContext(ctx context.Context) (context.Cont
 	if err != nil {
 		return nil, err
 	}
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	return ctx, nil
 }
 

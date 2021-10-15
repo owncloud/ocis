@@ -82,8 +82,10 @@ type ExternalAppConfig struct {
 
 // Web defines the available web configuration.
 type Web struct {
-	Path   string
-	Config WebConfig
+	Path        string
+	ThemeServer string // used to build Theme in WebConfig
+	ThemePath   string // used to build Theme in WebConfig
+	Config      WebConfig
 }
 
 // Config combines all available configuration parts.

@@ -1,9 +1,12 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
+	"path"
+
 	"github.com/owncloud/ocis/idp/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
+	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
+	"github.com/urfave/cli/v2"
 )
 
 // RootWithConfig applies cfg to the root flagset
@@ -35,7 +38,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9134"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9134"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"IDP_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -62,28 +65,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
 			Usage:       "Enable sending traces",
-			EnvVars:     []string{"IDP_TRACING_ENABLED"},
+			EnvVars:     []string{"IDP_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
-			EnvVars:     []string{"IDP_TRACING_TYPE"},
+			EnvVars:     []string{"IDP_TRACING_TYPE", "OCIS_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Endpoint, ""),
 			Usage:       "Endpoint for the agent",
-			EnvVars:     []string{"IDP_TRACING_ENDPOINT"},
+			EnvVars:     []string{"IDP_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Collector, ""),
 			Usage:       "Endpoint for the collector",
-			EnvVars:     []string{"IDP_TRACING_COLLECTOR"},
+			EnvVars:     []string{"IDP_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
@@ -95,7 +98,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9134"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9134"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"IDP_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -121,7 +124,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9130"),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "127.0.0.1:9130"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"IDP_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
@@ -163,7 +166,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldap-bind-dn",
-			Value:       flags.OverrideDefaultString(cfg.Ldap.BindDN, "cn=idp,ou=sysusers,dc=example,dc=org"),
+			Value:       flags.OverrideDefaultString(cfg.Ldap.BindDN, "cn=idp,ou=sysusers,dc=ocis,dc=test"),
 			Usage:       "Bind DN for the LDAP server (glauth)",
 			EnvVars:     []string{"IDP_LDAP_BIND_DN"},
 			Destination: &cfg.Ldap.BindDN,
@@ -177,7 +180,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldap-base-dn",
-			Value:       flags.OverrideDefaultString(cfg.Ldap.BaseDN, "ou=users,dc=example,dc=org"),
+			Value:       flags.OverrideDefaultString(cfg.Ldap.BaseDN, "ou=users,dc=ocis,dc=test"),
 			Usage:       "LDAP base DN of the oCIS users",
 			EnvVars:     []string{"IDP_LDAP_BASE_DN"},
 			Destination: &cfg.Ldap.BaseDN,
@@ -233,14 +236,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-cert",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, ""),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(pkgos.MustUserConfigDir("ocis", "idp"), "server.crt")),
 			Usage:       "Certificate file for transport encryption",
 			EnvVars:     []string{"IDP_TRANSPORT_TLS_CERT"},
 			Destination: &cfg.HTTP.TLSCert,
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-key",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, ""),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(pkgos.MustUserConfigDir("ocis", "idp"), "server.key")),
 			Usage:       "Secret file for transport encryption",
 			EnvVars:     []string{"IDP_TRANSPORT_TLS_KEY"},
 			Destination: &cfg.HTTP.TLSKey,
@@ -267,7 +270,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "validation-keys-path",
-			Usage:       "Full path to a folder containg PEM encoded private or public key files used for token validaton (file name without extension is used as kid)",
+			Usage:       "Full path to a folder containing PEM encoded private or public key files used for token validation (file name without extension is used as kid)",
 			EnvVars:     []string{"IDP_VALIDATION_KEYS_PATH"},
 			Value:       flags.OverrideDefaultString(cfg.IDP.ValidationKeysPath, ""),
 			Destination: &cfg.IDP.ValidationKeysPath,
@@ -384,7 +387,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "allow-dynamic-client-registration",
 			Usage:       "Allow dynamic OAuth2 client registration",
 			EnvVars:     []string{"IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION"},
-			Value:       flags.OverrideDefaultBool(cfg.IDP.AllowDynamicClientRegistration, true),
+			Value:       flags.OverrideDefaultBool(cfg.IDP.AllowDynamicClientRegistration, false),
 			Destination: &cfg.IDP.AllowDynamicClientRegistration,
 		},
 		&cli.BoolFlag{
@@ -414,7 +417,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"IDP_REFRESH_TOKEN_EXPIRATION"},
 			Destination: &cfg.IDP.RefreshTokenDurationSeconds,
 			Value:       flags.OverrideDefaultUint64(cfg.IDP.RefreshTokenDurationSeconds, 60*60*24*365*3), // 1 year
-
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode. This flag is set by the runtime",
 		},
 	}
 }

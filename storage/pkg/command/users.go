@@ -9,7 +9,6 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
@@ -18,6 +17,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // Users is the entrypoint for the sharing command.
@@ -52,6 +52,10 @@ func Users(cfg *config.Config) *cli.Command {
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
 			rcfg := usersConfigFromStruct(c, cfg)
+			logger.Debug().
+				Str("server", "users").
+				Interface("reva-config", rcfg).
+				Msg("config")
 
 			gr.Add(func() error {
 				runtime.RunWithOptions(
@@ -85,7 +89,7 @@ func Users(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageMetadata.Supervised {
+			if !cfg.Reva.Users.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
@@ -106,6 +110,7 @@ func usersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interf
 		},
 		"shared": map[string]interface{}{
 			"jwt_secret": cfg.Reva.JWTSecret,
+			"gatewaysvc": cfg.Reva.Gateway.Endpoint,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.Users.GRPCNetwork,
@@ -121,6 +126,8 @@ func usersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interf
 						"ldap": map[string]interface{}{
 							"hostname":        cfg.Reva.LDAP.Hostname,
 							"port":            cfg.Reva.LDAP.Port,
+							"cacert":          cfg.Reva.LDAP.CACert,
+							"insecure":        cfg.Reva.LDAP.Insecure,
 							"base_dn":         cfg.Reva.LDAP.BaseDN,
 							"userfilter":      cfg.Reva.LDAP.UserFilter,
 							"attributefilter": cfg.Reva.LDAP.UserAttributeFilter,
@@ -151,6 +158,18 @@ func usersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interf
 							"oidc_token_endpoint":          cfg.Reva.UserGroupRest.OIDCTokenEndpoint,
 							"target_api":                   cfg.Reva.UserGroupRest.TargetAPI,
 						},
+						"owncloudsql": map[string]interface{}{
+							"dbusername":           cfg.Reva.UserOwnCloudSQL.DBUsername,
+							"dbpassword":           cfg.Reva.UserOwnCloudSQL.DBPassword,
+							"dbhost":               cfg.Reva.UserOwnCloudSQL.DBHost,
+							"dbport":               cfg.Reva.UserOwnCloudSQL.DBPort,
+							"dbname":               cfg.Reva.UserOwnCloudSQL.DBName,
+							"idp":                  cfg.Reva.UserOwnCloudSQL.Idp,
+							"nobody":               cfg.Reva.UserOwnCloudSQL.Nobody,
+							"join_username":        cfg.Reva.UserOwnCloudSQL.JoinUsername,
+							"join_ownclouduuid":    cfg.Reva.UserOwnCloudSQL.JoinOwnCloudUUID,
+							"enable_medial_search": cfg.Reva.UserOwnCloudSQL.EnableMedialSearch,
+						},
 					},
 				},
 			},
@@ -159,26 +178,27 @@ func usersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interf
 	return rcfg
 }
 
-// UsersProviderService allows for the storage-userprovider command to be embedded and supervised by a suture supervisor tree.
-type UsersProviderService struct {
+// UserProviderSutureService allows for the storage-userprovider command to be embedded and supervised by a suture supervisor tree.
+type UserProviderSutureService struct {
 	cfg *config.Config
 }
 
-// NewUsersProviderService creates a new storage.UsersProviderService
-func NewUsersProviderService(cfg *ociscfg.Config) suture.Service {
+// NewUserProviderSutureService creates a new storage.UserProvider
+func NewUserProvider(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Storage.Reva.Users.Supervised = true
 	}
-	return UsersProviderService{
+	return UserProviderSutureService{
 		cfg: cfg.Storage,
 	}
 }
 
-func (s UsersProviderService) Serve(ctx context.Context) error {
+func (s UserProviderSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.Users.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range Users(s.cfg).Flags {
-		if err := Users(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := Users(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

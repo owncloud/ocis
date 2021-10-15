@@ -2,12 +2,954 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.5.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.13.0...master
+
+## Summary
+
+* Security - Don't expose services by default: [#2612](https://github.com/owncloud/ocis/issues/2612)
+* Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
+
+## Details
+
+* Security - Don't expose services by default: [#2612](https://github.com/owncloud/ocis/issues/2612)
+
+   We've changed the bind behaviour for all non public facing services. Before this PR all
+   services would listen on all interfaces. After this PR, all services listen on 127.0.0.1 only,
+   except the proxy which is listening on 0.0.0.0:9200.
+
+   https://github.com/owncloud/ocis/issues/2612
+
+* Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
+
+   When creating a new space a (configurable) default quota will be used (instead the hardcoded
+   one) One can set the EnvVar `GRAPH_SPACES_DEFAULT_QUOTA` to configure it
+
+   https://github.com/owncloud/ocis/issues/2621
+   https://jira.owncloud.com/browse/OCIS-2070
+# Changelog for [1.13.0] (2021-10-13)
+
+The following sections list the changes for 1.13.0.
+
+[1.13.0]: https://github.com/owncloud/ocis/compare/v1.12.0...v1.13.0
+
+## Summary
+
+* Bugfix - Fix the account resolver middleware: [#2557](https://github.com/owncloud/ocis/pull/2557)
+* Bugfix - Fix version information for extensions: [#2575](https://github.com/owncloud/ocis/pull/2575)
+* Bugfix - Add the gatewaysvc to all shared configuration in REVA services: [#2597](https://github.com/owncloud/ocis/pull/2597)
+* Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
+* Bugfix - Remove notifications placeholder: [#2514](https://github.com/owncloud/ocis/pull/2514)
+* Bugfix - Remove asset path configuration option from proxy: [#2576](https://github.com/owncloud/ocis/pull/2576)
+* Bugfix - Race condition in config parsing: [#2574](https://github.com/owncloud/ocis/pull/2574)
+* Change - Configure users and metadata storage separately: [#2598](https://github.com/owncloud/ocis/pull/2598)
+* Change - Make the drives create method odata compliant: [#2531](https://github.com/owncloud/ocis/pull/2531)
+* Change - Unify Envvar names configuring REVA gateway address: [#2587](https://github.com/owncloud/ocis/pull/2587)
+* Change - Update ownCloud Web to v4.3.0: [#2589](https://github.com/owncloud/ocis/pull/2589)
+* Enhancement - Updated MimeTypes configuration for AppRegistry: [#2603](https://github.com/owncloud/ocis/pull/2603)
+* Enhancement - Add maximum files and size to archiver capabilities: [#2544](https://github.com/owncloud/ocis/pull/2544)
+* Enhancement - Reduced repository size: [#2579](https://github.com/owncloud/ocis/pull/2579)
+* Enhancement - Return the newly created space: [#2610](https://github.com/owncloud/ocis/pull/2610)
+* Enhancement - Expose the reva archiver in OCIS: [#2509](https://github.com/owncloud/ocis/pull/2509)
+* Enhancement - Favorites capability: [#2599](https://github.com/owncloud/ocis/pull/2599)
+* Enhancement - Upgrade to GO 1.17: [#2605](https://github.com/owncloud/ocis/pull/2605)
+* Enhancement - Make mimetype allow list configurable for app provider: [#2553](https://github.com/owncloud/ocis/pull/2553)
+* Enhancement - Add allow_creation parameter to mime type config: [#2591](https://github.com/owncloud/ocis/pull/2591)
+* Enhancement - Add option to skip generation of demo users and groups: [#2495](https://github.com/owncloud/ocis/pull/2495)
+* Enhancement - Allow overriding the cookie based route by claim: [#2508](https://github.com/owncloud/ocis/pull/2508)
+* Enhancement - Redirect invalid links to oC Web: [#2493](https://github.com/owncloud/ocis/pull/2493)
+* Enhancement - Use reva's Authenticate method instead of spawning token managers: [#2528](https://github.com/owncloud/ocis/pull/2528)
+* Enhancement - TLS config options for ldap in reva: [#2492](https://github.com/owncloud/ocis/pull/2492)
+* Enhancement - Set reva JWT token expiration time to 24 hours by default: [#2527](https://github.com/owncloud/ocis/pull/2527)
+* Enhancement - Update reva to v1.14.0: [#2615](https://github.com/owncloud/ocis/pull/2615)
+
+## Details
+
+* Bugfix - Fix the account resolver middleware: [#2557](https://github.com/owncloud/ocis/pull/2557)
+
+   The accounts resolver middleware put an empty token into the request when the user was already
+   present. Added a step to get the token for the user.
+
+   https://github.com/owncloud/ocis/pull/2557
+
+* Bugfix - Fix version information for extensions: [#2575](https://github.com/owncloud/ocis/pull/2575)
+
+   We've fixed the behavior for `ocis version` which previously always showed `0.0.0` as version
+   for extensions. Now the real version of the extensions are shown.
+
+   https://github.com/owncloud/ocis/pull/2575
+
+* Bugfix - Add the gatewaysvc to all shared configuration in REVA services: [#2597](https://github.com/owncloud/ocis/pull/2597)
+
+   We've fixed the configuration for REVA services which didn't have a gatewaysvc in their shared
+   configuration. This could lead to default gatewaysvc addresses in the auth middleware. Now it
+   is set everywhere.
+
+   https://github.com/owncloud/ocis/pull/2597
+
+* Bugfix - Use proper url path decode on the username: [#2511](https://github.com/owncloud/ocis/pull/2511)
+
+   We now properly decode the username when reading it from a url parameter
+
+   https://github.com/owncloud/ocis/pull/2511
+
+* Bugfix - Remove notifications placeholder: [#2514](https://github.com/owncloud/ocis/pull/2514)
+
+   Since Reva was communicating its notification capabilities incorrectly, oCIS relied on a
+   hardcoded string to overwrite them. This has been fixed in
+   [reva#1819](https://github.com/cs3org/reva/pull/1819) so we now removed the hardcoded
+   string and don't modify Reva's notification capabilities anymore in order to fix clients
+   having to poll a (non-existent) notifications endpoint.
+
+   https://github.com/owncloud/ocis/pull/2514
+
+* Bugfix - Remove asset path configuration option from proxy: [#2576](https://github.com/owncloud/ocis/pull/2576)
+
+   We've remove the asset path configuration option (`--asset-path` or `PROXY_ASSET_PATH`)
+   since it didn't do anything at all.
+
+   https://github.com/owncloud/ocis/pull/2576
+
+* Bugfix - Race condition in config parsing: [#2574](https://github.com/owncloud/ocis/pull/2574)
+
+   There was a race condition in the config parsing when configuring the storage services caused
+   by services overwriting a pointer to a config value. We fixed it by setting sane defaults.
+
+   https://github.com/owncloud/ocis/pull/2574
+
+* Change - Configure users and metadata storage separately: [#2598](https://github.com/owncloud/ocis/pull/2598)
+
+   We've fixed the configuration behaviour of the user and metadata service writing in the same
+   directory when using oCIS storage.
+
+   Therefore we needed to separate the configuration of the users and metadata storage so that
+   they now can be configured totally separate.
+
+   https://github.com/owncloud/ocis/pull/2598
+
+* Change - Make the drives create method odata compliant: [#2531](https://github.com/owncloud/ocis/pull/2531)
+
+   When creating a space on the graph API we now use the POST Body to provide the parameters.
+
+   https://github.com/owncloud/ocis/pull/2531
+   https://github.com/owncloud/ocis/pull/2535
+   https://www.odata.org/getting-started/basic-tutorial/#modifyData
+
+* Change - Unify Envvar names configuring REVA gateway address: [#2587](https://github.com/owncloud/ocis/pull/2587)
+
+   We've renamed all envvars configuring REVA gateway address to `REVA_GATEWAY`, additionally
+   we renamed the cli parameters to `--reva-gateway-addr` and adjusted the description
+
+   https://github.com/owncloud/ocis/issues/2091
+   https://github.com/owncloud/ocis/pull/2587
+
+* Change - Update ownCloud Web to v4.3.0: [#2589](https://github.com/owncloud/ocis/pull/2589)
+
+   Tags: web
+
+   We updated ownCloud Web to v4.3.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2589
+   https://github.com/owncloud/web/releases/tag/v4.3.0
+
+* Enhancement - Updated MimeTypes configuration for AppRegistry: [#2603](https://github.com/owncloud/ocis/pull/2603)
+
+   We updated the type of the mime types config to a list, to keep the order of mime types from the
+   config.
+
+   https://github.com/owncloud/ocis/pull/2603
+
+* Enhancement - Add maximum files and size to archiver capabilities: [#2544](https://github.com/owncloud/ocis/pull/2544)
+
+   We added the maximum files count and maximum archive size of the archiver to the capabilities
+   endpoint. Clients can use this to generate warnings before the actual archive creation fails.
+
+   https://github.com/owncloud/ocis/issues/2537
+   https://github.com/owncloud/ocis/pull/2544
+   https://github.com/cs3org/reva/pull/2105
+
+* Enhancement - Reduced repository size: [#2579](https://github.com/owncloud/ocis/pull/2579)
+
+   We removed leftover artifacts from the migration to a single repository.
+
+   https://github.com/owncloud/ocis/pull/2579
+
+* Enhancement - Return the newly created space: [#2610](https://github.com/owncloud/ocis/pull/2610)
+
+   Changed the response of the CreateSpace method to include the newly created space.
+
+   https://github.com/owncloud/ocis/pull/2610
+   https://github.com/cs3org/reva/pull/2158
+
+* Enhancement - Expose the reva archiver in OCIS: [#2509](https://github.com/owncloud/ocis/pull/2509)
+
+   The reva archiver can now be accessed through the storage frontend service
+
+   https://github.com/owncloud/ocis/pull/2509
+
+* Enhancement - Favorites capability: [#2599](https://github.com/owncloud/ocis/pull/2599)
+
+   We've added a capability for the storage frontend which can be used to announce to clients
+   whether or not favorites are supported. By default this is disabled because the listing of
+   favorites doesn't survive service restarts at the moment.
+
+   https://github.com/owncloud/ocis/pull/2599
+
+* Enhancement - Upgrade to GO 1.17: [#2605](https://github.com/owncloud/ocis/pull/2605)
+
+   We've upgraded the used GO version from 1.16 to 1.17.
+
+   https://github.com/owncloud/ocis/pull/2605
+
+* Enhancement - Make mimetype allow list configurable for app provider: [#2553](https://github.com/owncloud/ocis/pull/2553)
+
+   We've added a configuration option to configure the mimetype allow list introduced in
+   cs3org/reva#2095. This also makes it possible to set one application per mime type as a
+   default.
+
+   https://github.com/owncloud/ocis/issues/2563
+   https://github.com/owncloud/ocis/pull/2553
+   https://github.com/cs3org/reva/pull/2095
+
+* Enhancement - Add allow_creation parameter to mime type config: [#2591](https://github.com/owncloud/ocis/pull/2591)
+
+   https://github.com/owncloud/ocis/pull/2591
+
+* Enhancement - Add option to skip generation of demo users and groups: [#2495](https://github.com/owncloud/ocis/pull/2495)
+
+   We've added a new environment variable to decide whether we should generate the demo users and
+   groups or not. This environment variable is set to `true` by default, so the demo users and
+   groups will get generated by default as long as oCIS is in its "technical preview" stage.
+
+   In any case, there are still some users and groups automatically generated: for users: Reva
+   IOP, Kopano IDP, admin; for groups: sysusers and users.
+
+   https://github.com/owncloud/ocis/pull/2495
+
+* Enhancement - Allow overriding the cookie based route by claim: [#2508](https://github.com/owncloud/ocis/pull/2508)
+
+   When determining the routing policy we now let the claim override the cookie so that users are
+   routed to the correct backend after login.
+
+   https://github.com/owncloud/ocis/pull/2508
+
+* Enhancement - Redirect invalid links to oC Web: [#2493](https://github.com/owncloud/ocis/pull/2493)
+
+   Invalid links (eg. https://foo.bar/index.php/apps/pdfviewer) will be redirect to
+   ownCloud Web instead of displaying a blank page with a "not found" message.
+
+   https://github.com/owncloud/ocis/pull/2493
+   https://github.com/owncloud/ocis/pull/2512
+
+* Enhancement - Use reva's Authenticate method instead of spawning token managers: [#2528](https://github.com/owncloud/ocis/pull/2528)
+
+   When using the CS3 proxy backend, we previously obtained the user from reva's userprovider
+   service and minted the token ourselves. This required maintaining a shared JWT secret between
+   ocis and reva, as well duplication of logic. This PR delegates this logic by using the
+   `Authenticate` method provided by the reva gateway service to obtain this token, making it an
+   arbitrary, indestructible entry. Currently, the changes have been made to the proxy service
+   but will be extended to others as well.
+
+   https://github.com/owncloud/ocis/pull/2528
+
+* Enhancement - TLS config options for ldap in reva: [#2492](https://github.com/owncloud/ocis/pull/2492)
+
+   We added the new config options "ldap-cacert" and "ldap-insecure" to the auth-, users- and
+   groups-provider services to be able to do proper TLS configuration for the LDAP clients.
+   "ldap-cacert" is by default configured to add the bundled glauth LDAP servers certificate to
+   the trusted set for the LDAP clients. "ldap-insecure" is set to "false" by default and can be
+   used to disable certificate checks (only advisable for development and test enviroments).
+
+   https://github.com/owncloud/ocis/pull/2492
+
+* Enhancement - Set reva JWT token expiration time to 24 hours by default: [#2527](https://github.com/owncloud/ocis/pull/2527)
+
+   https://github.com/owncloud/ocis/pull/2527
+
+* Enhancement - Update reva to v1.14.0: [#2615](https://github.com/owncloud/ocis/pull/2615)
+
+   This update includes:
+
+  * Bugfix [cs3org/reva#2103](https://github.com/cs3org/reva/pull/2103): AppProvider: propagate back errors reported by WOPI
+  * Bugfix [cs3org/reva#2149](https://github.com/cs3org/reva/pull/2149): Remove excess info from the http list app providers endpoint
+  * Bugfix [cs3org/reva#2114](https://github.com/cs3org/reva/pull/2114): Add as default app while registering and skip unset mimetypes
+  * Bugfix [cs3org/reva#2095](https://github.com/cs3org/reva/pull/2095): Fix app open when multiple app providers are present
+  * Bugfix [cs3org/reva#2135](https://github.com/cs3org/reva/pull/2135): Make TUS capabilities configurable
+  * Bugfix [cs3org/reva#2076](https://github.com/cs3org/reva/pull/2076): Fix chi routing
+  * Bugfix [cs3org/reva#2077](https://github.com/cs3org/reva/pull/2077): Fix concurrent registration of mimetypes
+  * Bugfix [cs3org/reva#2154](https://github.com/cs3org/reva/pull/2154): Return OK when trying to delete a non existing reference
+  * Bugfix [cs3org/reva#2078](https://github.com/cs3org/reva/pull/2078): Fix nil pointer exception in stat
+  * Bugfix [cs3org/reva#2073](https://github.com/cs3org/reva/pull/2073): Fix opening a readonly filetype with WOPI
+  * Bugfix [cs3org/reva#2140](https://github.com/cs3org/reva/pull/2140): Map GRPC error codes to REVA errors
+  * Bugfix [cs3org/reva#2147](https://github.com/cs3org/reva/pull/2147): Follow up of #2138: this is the new expected format
+  * Bugfix [cs3org/reva#2116](https://github.com/cs3org/reva/pull/2116): Differentiate share types when retrieving received shares in sql driver
+  * Bugfix [cs3org/reva#2074](https://github.com/cs3org/reva/pull/2074): Fix Stat() for EOS storage provider
+  * Bugfix [cs3org/reva#2151](https://github.com/cs3org/reva/pull/2151): Fix return code for webdav uploads when the token expired
+  * Change [cs3org/reva#2121](https://github.com/cs3org/reva/pull/2121): Sharemanager API change
+  * Enhancement [cs3org/reva#2090](https://github.com/cs3org/reva/pull/2090): Return space name during list storage spaces
+  * Enhancement [cs3org/reva#2138](https://github.com/cs3org/reva/pull/2138): Default AppProvider on top of the providers list
+  * Enhancement [cs3org/reva#2137](https://github.com/cs3org/reva/pull/2137): Revamp app registry and add parameter to control file creation
+  * Enhancement [cs3org/reva#145](https://github.com/cs3org/reva/pull/2137): UI improvements for the AppProviders
+  * Enhancement [cs3org/reva#2088](https://github.com/cs3org/reva/pull/2088): Add archiver and app provider to ocs capabilities
+  * Enhancement [cs3org/reva#2537](https://github.com/cs3org/reva/pull/2537): Add maximum files and size to archiver capabilities
+  * Enhancement [cs3org/reva#2100](https://github.com/cs3org/reva/pull/2100): Add support for resource id to the archiver
+  * Enhancement [cs3org/reva#2158](https://github.com/cs3org/reva/pull/2158): Augment the Id of new spaces
+  * Enhancement [cs3org/reva#2085](https://github.com/cs3org/reva/pull/2085): Make encoding user groups in access tokens configurable
+  * Enhancement [cs3org/reva#146](https://github.com/cs3org/reva/pull/146): Filter the denial shares (permission = 0) out of
+  * Enhancement [cs3org/reva#2141](https://github.com/cs3org/reva/pull/2141): Use golang v1.17
+  * Enhancement [cs3org/reva#2053](https://github.com/cs3org/reva/pull/2053): Safer defaults for TLS verification on LDAP connections
+  * Enhancement [cs3org/reva#2115](https://github.com/cs3org/reva/pull/2115): Reduce code duplication in LDAP related drivers
+  * Enhancement [cs3org/reva#1989](https://github.com/cs3org/reva/pull/1989): Add redirects from OC10 URL formats
+  * Enhancement [cs3org/reva#2479](https://github.com/cs3org/reva/pull/2479): Limit publicshare and resourceinfo scope content
+  * Enhancement [cs3org/reva#2071](https://github.com/cs3org/reva/pull/2071): Implement listing favorites via the dav report API
+  * Enhancement [cs3org/reva#2091](https://github.com/cs3org/reva/pull/2091): Nextcloud share managers
+  * Enhancement [cs3org/reva#2070](https://github.com/cs3org/reva/pull/2070): More unit tests for the Nextcloud storage provider
+  * Enhancement [cs3org/reva#2087](https://github.com/cs3org/reva/pull/2087): More unit tests for the Nextcloud auth and user managers
+  * Enhancement [cs3org/reva#2075](https://github.com/cs3org/reva/pull/2075): Make owncloudsql leverage existing filecache index
+  * Enhancement [cs3org/reva#2050](https://github.com/cs3org/reva/pull/2050): Add a share types filter to the OCS API
+  * Enhancement [cs3org/reva#2134](https://github.com/cs3org/reva/pull/2134): Use space Type from request
+  * Enhancement [cs3org/reva#2132](https://github.com/cs3org/reva/pull/2132): Align local tests with drone setup
+  * Enhancement [cs3org/reva#2095](https://github.com/cs3org/reva/pull/2095): Whitelisting for apps
+  * Enhancement [cs3org/reva#2155](https://github.com/cs3org/reva/pull/2155): Pass an extra query parameter to WOPI /openinapp with a
+
+   https://github.com/owncloud/ocis/pull/2615
+   https://github.com/owncloud/ocis/pull/2566
+   https://github.com/owncloud/ocis/pull/2520
+# Changelog for [1.12.0] (2021-09-14)
+
+The following sections list the changes for 1.12.0.
+
+[1.12.0]: https://github.com/owncloud/ocis/compare/v1.11.0...v1.12.0
+
+## Summary
+
+* Bugfix - Remove non working proxy route and fix cs3 users example: [#2474](https://github.com/owncloud/ocis/pull/2474)
+* Bugfix - Set English as default language in the dropdown in the settings page: [#2465](https://github.com/owncloud/ocis/pull/2465)
+* Change - Remove OnlyOffice extension: [#2433](https://github.com/owncloud/ocis/pull/2433)
+* Change - Remove OnlyOffice extension: [#2433](https://github.com/owncloud/ocis/pull/2433)
+* Change - Update ownCloud Web to v4.2.0: [#2501](https://github.com/owncloud/ocis/pull/2501)
+* Enhancement - Add app provider and app provider registry: [#2204](https://github.com/owncloud/ocis/pull/2204)
+* Enhancement - Add the create space permission: [#2461](https://github.com/owncloud/ocis/pull/2461)
+* Enhancement - Add set space quota permission: [#2459](https://github.com/owncloud/ocis/pull/2459)
+* Enhancement - Create a Space using the Graph API: [#2471](https://github.com/owncloud/ocis/pull/2471)
+* Enhancement - Update go-chi/chi to version 5.0.3: [#2429](https://github.com/owncloud/ocis/pull/2429)
+* Enhancement - Upgrade go micro to v3.6.0: [#2451](https://github.com/owncloud/ocis/pull/2451)
+* Enhancement - Update reva to v1.13.0: [#2477](https://github.com/owncloud/ocis/pull/2477)
+
+## Details
+
+* Bugfix - Remove non working proxy route and fix cs3 users example: [#2474](https://github.com/owncloud/ocis/pull/2474)
+
+   We removed a non working route from the proxy default configuration and fixed the cs3 users
+   deployment example since it still used the accounts service. It now only uses the configured
+   LDAP.
+
+   https://github.com/owncloud/ocis/pull/2474
+
+* Bugfix - Set English as default language in the dropdown in the settings page: [#2465](https://github.com/owncloud/ocis/pull/2465)
+
+   The language dropdown didn't have a default language selected, and it was showing an empty
+   value. Now it shows English instead.
+
+   https://github.com/owncloud/ocis/pull/2465
+
+* Change - Remove OnlyOffice extension: [#2433](https://github.com/owncloud/ocis/pull/2433)
+
+   Tags: OnlyOffice
+
+   We've removed the OnlyOffice extension in oCIS. OnlyOffice has their own web extension for
+   OC10 backend now with [a dedicated
+   guide](https://owncloud.dev/clients/web/deployments/oc10-app/#onlyoffice). In
+   oCIS, we will follow up with a guide on how to start a WOPI server providing OnlyOffice soon.
+
+   https://github.com/owncloud/ocis/pull/2433
+
+* Change - Remove OnlyOffice extension: [#2433](https://github.com/owncloud/ocis/pull/2433)
+
+   Tags: OnlyOffice
+
+   We've removed the OnlyOffice extension in oCIS. OnlyOffice has their own web extension for
+   OC10 backend now with [a dedicated
+   guide](https://owncloud.dev/clients/web/deployments/oc10-app/#onlyoffice). In
+   oCIS, we will follow up with a guide on how to start a WOPI server providing OnlyOffice soon.
+
+   https://github.com/owncloud/ocis/pull/2433
+
+* Change - Update ownCloud Web to v4.2.0: [#2501](https://github.com/owncloud/ocis/pull/2501)
+
+   Tags: web
+
+   We updated ownCloud Web to v4.2.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2501
+   https://github.com/owncloud/web/releases/tag/v4.2.0
+
+* Enhancement - Add app provider and app provider registry: [#2204](https://github.com/owncloud/ocis/pull/2204)
+
+   We added the app provider and app provider registry. Now the CS3org WOPI server can be
+   registered and OpenInApp requests can be done.
+
+   https://github.com/owncloud/ocis/pull/2204
+   https://github.com/cs3org/reva/pull/1785
+
+* Enhancement - Add the create space permission: [#2461](https://github.com/owncloud/ocis/pull/2461)
+
+   In preparation for the upcoming spaces features a `Create Space` permission was added.
+
+   https://github.com/owncloud/ocis/pull/2461
+
+* Enhancement - Add set space quota permission: [#2459](https://github.com/owncloud/ocis/pull/2459)
+
+   In preparation for the upcoming spaces features a `SetSpaceQuota` permission was added.
+
+   https://github.com/owncloud/ocis/pull/2459
+
+* Enhancement - Create a Space using the Graph API: [#2471](https://github.com/owncloud/ocis/pull/2471)
+
+   Spaces can now be created on `POST /drives/{drive-name}`. Only users with the `create-space`
+   permissions can perform this operation.
+
+   Allowed body form values are:
+
+   - `quota` (bytes) maximum amount of bytes stored in the space. - `maxQuotaFiles` (integer)
+   maximum amount of files supported by the space.
+
+   https://github.com/owncloud/ocis/pull/2471
+
+* Enhancement - Update go-chi/chi to version 5.0.3: [#2429](https://github.com/owncloud/ocis/pull/2429)
+
+   Updated go-chi/chi to the latest release
+
+   https://github.com/owncloud/ocis/pull/2429
+
+* Enhancement - Upgrade go micro to v3.6.0: [#2451](https://github.com/owncloud/ocis/pull/2451)
+
+   Go micro and all go micro plugins are now on v3.6.0
+
+   https://github.com/owncloud/ocis/pull/2451
+
+* Enhancement - Update reva to v1.13.0: [#2477](https://github.com/owncloud/ocis/pull/2477)
+
+   This update includes:
+
+  * Bugfix [cs3org/reva#2054](https://github.com/cs3org/reva/pull/2054): Fix the response after deleting a share
+  * Bugfix [cs3org/reva#2026](https://github.com/cs3org/reva/pull/2026): Fix moving of a shared file
+  * Bugfix [cs3org/reva#1605](https://github.com/cs3org/reva/pull/1605): Allow to expose full paths in OCS API
+  * Bugfix [cs3org/reva#2033](https://github.com/cs3org/reva/pull/2033): Fix the storage id of shares
+  * Bugfix [cs3org/reva#1991](https://github.com/cs3org/reva/pull/1991): Remove share references when declining shares
+  * Enhancement [cs3org/reva#1994](https://github.com/cs3org/reva/pull/1994): Add owncloudsql driver for the userprovider
+  * Enhancement [cs3org/reva#2065](https://github.com/cs3org/reva/pull/2065): New sharing role Manager
+  * Enhancement [cs3org/reva#2015](https://github.com/cs3org/reva/pull/2015): Add spaces to the list of capabilities
+  * Enhancement [cs3org/reva#2041](https://github.com/cs3org/reva/pull/2041): Create operations for Spaces
+  * Enhancement [cs3org/reva#2029](https://github.com/cs3org/reva/pull/2029): Tracing agent configuration
+
+   https://github.com/owncloud/ocis/pull/2477
+# Changelog for [1.11.0] (2021-08-24)
+
+The following sections list the changes for 1.11.0.
+
+[1.11.0]: https://github.com/owncloud/ocis/compare/v1.10.0...v1.11.0
+
+## Summary
+
+* Bugfix - Specify primary user type for all accounts: [#2364](https://github.com/owncloud/ocis/pull/2364)
+* Bugfix - Fix naming of the user- and groupprovider services: [#2388](https://github.com/owncloud/ocis/pull/2388)
+* Change - Update ownCloud Web to v4.1.0: [#2426](https://github.com/owncloud/ocis/pull/2426)
+* Enhancement - Use non root user for the owncloud/ocis docker image: [#2380](https://github.com/owncloud/ocis/pull/2380)
+* Enhancement - Replace unmaintained jwt library: [#2386](https://github.com/owncloud/ocis/pull/2386)
+* Enhancement - Update bleve to version 2.1.0: [#2391](https://github.com/owncloud/ocis/pull/2391)
+* Enhancement - Update github.com/coreos/go-oidc to v3.0.0: [#2393](https://github.com/owncloud/ocis/pull/2393)
+* Enhancement - Update reva to v1.12: [#2423](https://github.com/owncloud/ocis/pull/2423)
+
+## Details
+
+* Bugfix - Specify primary user type for all accounts: [#2364](https://github.com/owncloud/ocis/pull/2364)
+
+   https://github.com/owncloud/ocis/pull/2364
+
+* Bugfix - Fix naming of the user- and groupprovider services: [#2388](https://github.com/owncloud/ocis/pull/2388)
+
+   The services are called "storage-userprovider" and "storage-groupprovider". The 'ocis
+   help' output was misleading.
+
+   https://github.com/owncloud/ocis/pull/2388
+
+* Change - Update ownCloud Web to v4.1.0: [#2426](https://github.com/owncloud/ocis/pull/2426)
+
+   Tags: web
+
+   We updated ownCloud Web to v4.1.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2426
+   https://github.com/owncloud/web/releases/tag/v4.1.0
+
+* Enhancement - Use non root user for the owncloud/ocis docker image: [#2380](https://github.com/owncloud/ocis/pull/2380)
+
+   The owncloud/ocis docker image now uses a non root user and enables you to set a different user
+   with the docker `--user` parameter. The default user has the UID 1000 is part of a group with the
+   GID 1000.
+
+   This is a breaking change for existing docker deployments. The permission on the files and
+   folders in persistent volumes need to be changed to the UID and GID used for oCIS (default
+   1000:1000 if not changed by the user).
+
+   https://github.com/owncloud/ocis/pull/2380
+
+* Enhancement - Replace unmaintained jwt library: [#2386](https://github.com/owncloud/ocis/pull/2386)
+
+   The old library [github.com/dgrijalva/jwt-go](https://github.com/dgrijalva/jwt-go)
+   is unmaintained and was replaced by the community maintained fork
+   [github.com/golang-jwt/jwt](https://github.com/golang-jwt/jwt).
+
+   https://github.com/owncloud/ocis/pull/2386
+
+* Enhancement - Update bleve to version 2.1.0: [#2391](https://github.com/owncloud/ocis/pull/2391)
+
+   Updated bleve to the current version.
+
+   https://github.com/owncloud/ocis/pull/2391
+
+* Enhancement - Update github.com/coreos/go-oidc to v3.0.0: [#2393](https://github.com/owncloud/ocis/pull/2393)
+
+   Updated the github.com/coreos/go-oidc library to the version 3.0.0.
+
+   https://github.com/owncloud/ocis/pull/2393
+
+* Enhancement - Update reva to v1.12: [#2423](https://github.com/owncloud/ocis/pull/2423)
+
+  * Enhancement cs3org/reva#1803: Introduce new webdav spaces endpoint
+  * Bugfix cs3org/reva#1819: Disable notifications
+  * Enhancement cs3org/reva#1861: Add support for runtime plugins
+  * Bugfix cs3org/reva#1913: Logic to restore files to readonly nodes
+  * Enhancement cs3org/reva#1946: Add share manager that connects to oc10 databases
+  * Bugfix cs3org/reva#1954: Fix response format of the sharees API
+  * Bugfix cs3org/reva#1956: Fix trashbin listing with depth 0
+  * Bugfix cs3org/reva#1957: Fix etag propagation on deletes
+  * Bugfix cs3org/reva#1960: Return the updated share after updating
+  * Bugfix cs3org/reva#1965 cs3org/reva#1967: Fix the file target of user and group shares
+  * Bugfix cs3org/reva#1980: Propagate the etag after restoring a file version
+  * Enhancement cs3org/reva#1984: Replace OpenCensus with OpenTelemetry
+  * Bugfix cs3org/reva#1985: Add quota stubs
+  * Bugfix cs3org/reva#1987: Fix windows build
+  * Bugfix cs3org/reva#1990: Increase oc10 compatibility of owncloudsql
+  * Bugfix cs3org/reva#1992: Check if symlink exists instead of spamming the console
+  * Bugfix cs3org/reva#1993: fix owncloudsql GetMD
+
+   https://github.com/owncloud/ocis/pull/2423
+# Changelog for [1.10.0] (2021-08-06)
+
+The following sections list the changes for 1.10.0.
+
+[1.10.0]: https://github.com/owncloud/ocis/compare/v1.9.0...v1.10.0
+
+## Summary
+
+* Bugfix - Improve IDP Login Accessibility: [#5376](https://github.com/owncloud/web/issues/5376)
+* Bugfix - Forward basic auth to OpenID connect token authentication endpoint: [#2095](https://github.com/owncloud/ocis/issues/2095)
+* Bugfix - Log all requests in the proxy access log: [#2301](https://github.com/owncloud/ocis/pull/2301)
+* Bugfix - Update glauth to 20210729125545-b9aecdfcac31: [#2336](https://github.com/owncloud/ocis/pull/2336)
+* Change - Update ownCloud Web to v4.0.0: [#2353](https://github.com/owncloud/ocis/pull/2353)
+* Enhancement - Proxy: Add claims policy selector: [#2248](https://github.com/owncloud/ocis/pull/2248)
+* Enhancement - Add ocs cache warmup config and warn on protobuf ns conflicts: [#2328](https://github.com/owncloud/ocis/pull/2328)
+* Enhancement - Refactor graph API: [#2277](https://github.com/owncloud/ocis/pull/2277)
+* Enhancement - Update REVA: [#2355](https://github.com/owncloud/ocis/pull/2355)
+* Enhancement - Use only one go.mod file for project dependencies: [#2344](https://github.com/owncloud/ocis/pull/2344)
+
+## Details
+
+* Bugfix - Improve IDP Login Accessibility: [#5376](https://github.com/owncloud/web/issues/5376)
+
+   We have addressed the feedback from the `a11y` audit and improved the IDP login screen
+   accordingly.
+
+   https://github.com/owncloud/web/issues/5376
+   https://github.com/owncloud/web/issues/5377
+
+* Bugfix - Forward basic auth to OpenID connect token authentication endpoint: [#2095](https://github.com/owncloud/ocis/issues/2095)
+
+   When using `PROXY_ENABLE_BASIC_AUTH=true` we now forward request to the idp instead of
+   trying to authenticate the request ourself.
+
+   https://github.com/owncloud/ocis/issues/2095
+   https://github.com/owncloud/ocis/issues/2094
+
+* Bugfix - Log all requests in the proxy access log: [#2301](https://github.com/owncloud/ocis/pull/2301)
+
+   We now use a dedicated middleware to log all requests, regardless of routing selector outcome.
+   While the log now includes the remote address, the selected routing policy is only logged when
+   log level is set to debug because the request context cannot be changed in the
+   `directorSelectionDirector`, as per the `ReverseProxy.Director` documentation.
+
+   https://github.com/owncloud/ocis/pull/2301
+
+* Bugfix - Update glauth to 20210729125545-b9aecdfcac31: [#2336](https://github.com/owncloud/ocis/pull/2336)
+
+  * Fixes the backend config not being passed correctly in ocis
+  * Fixes a mutex being copied, leading to concurrent writes
+  * Fixes UTF8 chars in filters
+  * Fixes case insensitive strings
+
+   https://github.com/owncloud/ocis/pull/2336
+   https://github.com/glauth/glauth/pull/198
+   https://github.com/glauth/glauth/pull/194
+
+* Change - Update ownCloud Web to v4.0.0: [#2353](https://github.com/owncloud/ocis/pull/2353)
+
+   Tags: web
+
+   We updated ownCloud Web to v4.0.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2353
+   https://github.com/owncloud/web/releases/tag/v4.0.0
+
+* Enhancement - Proxy: Add claims policy selector: [#2248](https://github.com/owncloud/ocis/pull/2248)
+
+   Using the proxy config file, it is now possible to let let the IdP determine the routing policy by
+   sending an `ocis.routing.policy` claim. Its value will be used to determine the set of routes
+   for the logged in user.
+
+   https://github.com/owncloud/ocis/pull/2248
+
+* Enhancement - Add ocs cache warmup config and warn on protobuf ns conflicts: [#2328](https://github.com/owncloud/ocis/pull/2328)
+
+   https://github.com/owncloud/ocis/pull/2328
+
+* Enhancement - Refactor graph API: [#2277](https://github.com/owncloud/ocis/pull/2277)
+
+   We refactored the `/graph/v1.0/` endpoint which now relies on the internal acces token fer
+   authentication, getting rid of any LDAP or OIDC code to authenticate requests. This allows
+   using the graph api when using basic auth or any other auth mechanism provided by the CS3 auth
+   providers / reva gateway / ocis proxy.
+
+   https://github.com/owncloud/ocis/pull/2277
+
+* Enhancement - Update REVA: [#2355](https://github.com/owncloud/ocis/pull/2355)
+
+   Update REVA from v1.10.1-0.20210730095301-fcb7a30a44a6 to
+   v1.11.1-0.20210809134415-3fe79c870fb5 * Fix cs3org/reva#1978: Fix owner type is optional
+   * Fix cs3org/reva#1965: fix value of file_target in shares * Fix cs3org/reva#1960: fix
+   updating shares in the memory share manager * Fix cs3org/reva#1956: fix trashbin listing with
+   depth 0 * Fix cs3org/reva#1957: fix etag propagation on deletes * Enh cs3org/reva#1861: [WIP]
+   Runtime plugins * Fix cs3org/reva#1954: fix response format of the sharees API * Fix
+   cs3org/reva#1819: Remove notifications key from ocs response * Enh cs3org/reva#1946: Add a
+   share manager that connects to oc10 databases * Fix cs3org/reva#1899: Fix chunked uploads for
+   new versions * Fix cs3org/reva#1906: Fix copy over existing resource * Fix cs3org/reva#1891:
+   Delete Shared Resources as Receiver * Fix cs3org/reva#1907: Error when creating folder with
+   existing name * Fix cs3org/reva#1937: Do not overwrite more specific matches when finding
+   storage providers * Fix cs3org/reva#1939: Fix the share jail permissions in the decomposedfs
+   * Fix cs3org/reva#1932: Numerous fixes to the owncloudsql storage driver * Fix
+   cs3org/reva#1912: Fix response when listing versions of another user * Fix
+   cs3org/reva#1910: Get user groups recursively in the cbox rest user driver * Fix
+   cs3org/reva#1904: Set Content-Length to 0 when swallowing body in the datagateway * Fix
+   cs3org/reva#1911: Fix version order in propfind responses * Fix cs3org/reva#1926: Trash Bin
+   in oCIS Storage Operations * Fix cs3org/reva#1901: Fix response code when folder doesnt exist
+   on upload * Enh cs3org/reva#1785: Extend app registry with AddProvider method and mimetype
+   filters * Enh cs3org/reva#1938: Add methods to get and put context values * Enh
+   cs3org/reva#1798: Add support for a deny-all permission on references * Enh
+   cs3org/reva#1916: Generate updated protobuf bindings for EOS GRPC * Enh cs3org/reva#1887:
+   Add "a" and "l" filter for grappa queries * Enh cs3org/reva#1919: Run gofmt before building *
+   Enh cs3org/reva#1927: Implement RollbackToVersion for eosgrpc (needs a newer EOS MGM) * Enh
+   cs3org/reva#1944: Implement listing supported mime types in app registry * Enh
+   cs3org/reva#1870: Be defensive about wrongly quoted etags * Enh cs3org/reva#1940: Reduce
+   memory usage when uploading with S3ng storage * Enh cs3org/reva#1888: Refactoring of the
+   webdav code * Enh cs3org/reva#1900: Check for illegal names while uploading or moving files *
+   Enh cs3org/reva#1925: Refactor listing and statting across providers for virtual views * Fix
+   cs3org/reva#1883: Pass directories with trailing slashes to eosclient.GenerateToken * Fix
+   cs3org/reva#1878: Improve the webdav error handling in the trashbin * Fix cs3org/reva#1884:
+   Do not send body on failed range request * Enh cs3org/reva#1744: Add support for lightweight
+   user types * Fix cs3org/reva#1904: Set Content-Length to 0 when swallowing body in the
+   datagateway * Fix cs3org/reva#1899: Bugfix: Fix chunked uploads for new versions * Enh
+   cs3org/reva#1888: Refactoring of the webdav code * Enh cs3org/reva#1887: Add "a" and "l"
+   filter for grappa queries
+
+   https://github.com/owncloud/ocis/pull/2355
+   https://github.com/owncloud/ocis/pull/2295
+   https://github.com/owncloud/ocis/pull/2314
+
+* Enhancement - Use only one go.mod file for project dependencies: [#2344](https://github.com/owncloud/ocis/pull/2344)
+
+   We now use one single go.mod file at the root of the repository rather than one per core
+   extension.
+
+   https://github.com/owncloud/ocis/pull/2344
+# Changelog for [1.9.0] (2021-07-13)
+
+The following sections list the changes for 1.9.0.
+
+[1.9.0]: https://github.com/owncloud/ocis/compare/v1.8.0...v1.9.0
+
+## Summary
+
+* Bugfix - Panic when service fails to start: [#2252](https://github.com/owncloud/ocis/pull/2252)
+* Bugfix - Dont use port 80 as debug for GroupsProvider: [#2271](https://github.com/owncloud/ocis/pull/2271)
+* Change - Update ownCloud Web to v3.4.0: [#2276](https://github.com/owncloud/ocis/pull/2276)
+* Change - Update WEB to v3.4.1: [#2283](https://github.com/owncloud/ocis/pull/2283)
+* Enhancement - Runtime support for cherry picking extensions: [#2229](https://github.com/owncloud/ocis/pull/2229)
+* Enhancement - Add readonly mode for storagehome and storageusers: [#2230](https://github.com/owncloud/ocis/pull/2230)
+* Enhancement - Remove unnecessary Service.Init(): [#1705](https://github.com/owncloud/ocis/pull/1705)
+* Enhancement - Update REVA to v1.9.1-0.20210628143859-9d29c36c0c3f: [#2227](https://github.com/owncloud/ocis/pull/2227)
+* Enhancement - Update REVA to v1.9.1: [#2280](https://github.com/owncloud/ocis/pull/2280)
+
+## Details
+
+* Bugfix - Panic when service fails to start: [#2252](https://github.com/owncloud/ocis/pull/2252)
+
+   Tags: runtime
+
+   When attempting to run a service through the runtime that is currently running and fails to
+   start, a race condition still redirect os Interrupt signals to a closed channel.
+
+   https://github.com/owncloud/ocis/pull/2252
+
+* Bugfix - Dont use port 80 as debug for GroupsProvider: [#2271](https://github.com/owncloud/ocis/pull/2271)
+
+   A copy/paste error where the configuration for the groupsprovider's debug address was not
+   present leaves go-micro to start the debug service in port 80 by default.
+
+   https://github.com/owncloud/ocis/pull/2271
+
+* Change - Update ownCloud Web to v3.4.0: [#2276](https://github.com/owncloud/ocis/pull/2276)
+
+   Tags: web
+
+   We updated ownCloud Web to v3.4.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2276
+   https://github.com/owncloud/web/releases/tag/v3.4.0
+
+* Change - Update WEB to v3.4.1: [#2283](https://github.com/owncloud/ocis/pull/2283)
+
+  * Fix [5501](https://github.com/owncloud/web/pull/5501): loading previews in the right sidebar
+  * Fix [5493](https://github.com/owncloud/web/pull/5493): view options position
+
+   https://github.com/owncloud/ocis/pull/2283
+   https://github.com/owncloud/web/releases/tag/v3.4.1
+
+* Enhancement - Runtime support for cherry picking extensions: [#2229](https://github.com/owncloud/ocis/pull/2229)
+
+   Support for running certain extensions supervised via cli flags. Example usage:
+
+   ``` > ocis server --extensions="proxy, idp, storage-metadata, accounts" ```
+
+   https://github.com/owncloud/ocis/pull/2229
+
+* Enhancement - Add readonly mode for storagehome and storageusers: [#2230](https://github.com/owncloud/ocis/pull/2230)
+
+   To enable the readonly mode use `STORAGE_HOME_READ_ONLY=true` and
+   `STORAGE_USERS_READ_ONLY=true`. Alternative: use `OCIS_STORAGE_READ_ONLY=true`
+
+   https://github.com/owncloud/ocis/pull/2230
+
+* Enhancement - Remove unnecessary Service.Init(): [#1705](https://github.com/owncloud/ocis/pull/1705)
+
+   As it turns out oCIS already calls this method. Invoking it twice would end in accidentally
+   resetting values.
+
+   https://github.com/owncloud/ocis/pull/1705
+
+* Enhancement - Update REVA to v1.9.1-0.20210628143859-9d29c36c0c3f: [#2227](https://github.com/owncloud/ocis/pull/2227)
+
+   https://github.com/owncloud/ocis/pull/2227
+
+* Enhancement - Update REVA to v1.9.1: [#2280](https://github.com/owncloud/ocis/pull/2280)
+
+  * Fix cs3org/reva#1843: Correct Dockerfile path for the reva CLI and alpine3.13 as builder
+  * Fix cs3org/reva#1835: Cleanup owncloudsql driver
+  * Fix cs3org/reva#1868: Minor fixes to the grpc/http plugin: checksum, url escaping
+  * Fix cs3org/reva#1885: Fix template in eoshomewrapper to use context user rather than resource
+  * Fix cs3org/reva#1833: Properly handle name collisions for deletes in the owncloud driver
+  * Fix cs3org/reva#1874: Use the original file mtime during upload
+  * Fix cs3org/reva#1854: Add the uid/gid to the url for eos
+  * Fix cs3org/reva#1848: Fill in missing gid/uid number with nobody
+  * Fix cs3org/reva#1831: Make the ocm-provider endpoint in the ocmd service unprotected
+  * Fix cs3org/reva#1808: Use empty array in OCS Notifications endpoints
+  * Fix cs3org/reva#1825: Raise max grpc message size
+  * Fix cs3org/reva#1828: Send a proper XML header with error messages
+  * Chg cs3org/reva#1828: Remove the oidc provider in order to upgrad mattn/go-sqlite3 to v1.14.7
+  * Enh cs3org/reva#1834: Add API key to Mentix GOCDB connector
+  * Enh cs3org/reva#1855: Minor optimization in parsing EOS ACLs
+  * Enh cs3org/reva#1873: Update the EOS image tag to be for revad-eos image
+  * Enh cs3org/reva#1802: Introduce list spaces
+  * Enh cs3org/reva#1849: Add readonly interceptor
+  * Enh cs3org/reva#1875: Simplify resource comparison
+  * Enh cs3org/reva#1827: Support trashbin sub paths in the recycle API
+
+   https://github.com/owncloud/ocis/pull/2280
+# Changelog for [1.8.0] (2021-06-28)
+
+The following sections list the changes for 1.8.0.
+
+[1.8.0]: https://github.com/owncloud/ocis/compare/v1.7.0...v1.8.0
+
+## Summary
+
+* Bugfix - External storage registration used wrong config: [#2120](https://github.com/owncloud/ocis/pull/2120)
+* Bugfix - Remove authentication from /status.php completely: [#2188](https://github.com/owncloud/ocis/pull/2188)
+* Bugfix - Make webdav namespace configurable across services: [#2198](https://github.com/owncloud/ocis/pull/2198)
+* Change - Update ownCloud Web to v3.3.0: [#2187](https://github.com/owncloud/ocis/pull/2187)
+* Enhancement - Properly configure graph-explorer client registration: [#2118](https://github.com/owncloud/ocis/pull/2118)
+* Enhancement - Use system default location to store TLS artefacts: [#2129](https://github.com/owncloud/ocis/pull/2129)
+* Enhancement - Update REVA to v1.9: [#2205](https://github.com/owncloud/ocis/pull/2205)
+
+## Details
+
+* Bugfix - External storage registration used wrong config: [#2120](https://github.com/owncloud/ocis/pull/2120)
+
+   The go-micro registry-singleton ignores the ocis configuration and defaults to mdns
+
+   https://github.com/owncloud/ocis/pull/2120
+
+* Bugfix - Remove authentication from /status.php completely: [#2188](https://github.com/owncloud/ocis/pull/2188)
+
+   Despite requests without Authentication header being successful, requests with an invalid
+   bearer token in the Authentication header were rejected in the proxy with an 401
+   unauthenticated. Now the Authentication header is completely ignored for the /status.php
+   route.
+
+   https://github.com/owncloud/client/issues/8538
+   https://github.com/owncloud/ocis/pull/2188
+
+* Bugfix - Make webdav namespace configurable across services: [#2198](https://github.com/owncloud/ocis/pull/2198)
+
+   The WebDAV namespace is used across various services, but it was previously hardcoded in some
+   of the services. This PR uses the same environment variable to set the config correctly across
+   the services.
+
+   https://github.com/owncloud/ocis/pull/2198
+
+* Change - Update ownCloud Web to v3.3.0: [#2187](https://github.com/owncloud/ocis/pull/2187)
+
+   Tags: web
+
+   We updated ownCloud Web to v3.3.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2187
+   https://github.com/owncloud/web/releases/tag/v3.3.0
+
+* Enhancement - Properly configure graph-explorer client registration: [#2118](https://github.com/owncloud/ocis/pull/2118)
+
+   The client registration in the `identifier-registration.yaml` for the graph-explorer
+   didn't contain `redirect_uris` nor `origins`. Both were added to prevent exploitation.
+
+   https://github.com/owncloud/ocis/pull/2118
+
+* Enhancement - Use system default location to store TLS artefacts: [#2129](https://github.com/owncloud/ocis/pull/2129)
+
+   This used to default to the current location of the binary, which is not ideal after a first run as
+   it leaves traces behind. It now uses the system's location for artefacts with the help of
+   https://golang.org/pkg/os/#UserConfigDir.
+
+   https://github.com/owncloud/ocis/pull/2129
+
+* Enhancement - Update REVA to v1.9: [#2205](https://github.com/owncloud/ocis/pull/2205)
+
+   This update includes * [set Content-Type
+   correctly](https://github.com/cs3org/reva/pull/1750) * [Return file checksum
+   available from the metadata for the EOS
+   driver](https://github.com/cs3org/reva/pull/1755) * [Sort share entries
+   alphabetically](https://github.com/cs3org/reva/pull/1772) * [Initial work on the
+   owncloudsql driver](https://github.com/cs3org/reva/pull/1710) * [Add user ID cache
+   warmup to EOS storage driver](https://github.com/cs3org/reva/pull/1774) * [Use
+   UidNumber and GidNumber fields in User
+   objects](https://github.com/cs3org/reva/pull/1573) * [EOS GRPC
+   interface](https://github.com/cs3org/reva/pull/1471) * [switch
+   references](https://github.com/cs3org/reva/pull/1721) * [remove user's uuid from
+   trashbin file key](https://github.com/cs3org/reva/pull/1793) * [fix restore behavior of
+   the trashbin API](https://github.com/cs3org/reva/pull/1795) * [eosfs: add arbitrary
+   metadata support](https://github.com/cs3org/reva/pull/1811)
+
+   https://github.com/owncloud/ocis/pull/2205
+   https://github.com/owncloud/ocis/pull/2210
+# Changelog for [1.7.0] (2021-06-04)
+
+The following sections list the changes for 1.7.0.
+
+[1.7.0]: https://github.com/owncloud/ocis/compare/v1.6.0...v1.7.0
+
+## Summary
+
+* Bugfix - Change the groups index to be case sensitive: [#2109](https://github.com/owncloud/ocis/pull/2109)
+* Change - Update ownCloud Web to v3.2.0: [#2096](https://github.com/owncloud/ocis/pull/2096)
+* Enhancement - Enable the s3ng storage driver: [#1886](https://github.com/owncloud/ocis/pull/1886)
+* Enhancement - Color contrasts on IDP/OIDC login pages: [#2088](https://github.com/owncloud/ocis/pull/2088)
+* Enhancement - Announce user profile picture capability: [#2036](https://github.com/owncloud/ocis/pull/2036)
+* Enhancement - Update reva to v1.7.1-0.20210531093513-b74a2b156af6: [#2104](https://github.com/owncloud/ocis/pull/2104)
+
+## Details
+
+* Bugfix - Change the groups index to be case sensitive: [#2109](https://github.com/owncloud/ocis/pull/2109)
+
+   Groups are considered to be case sensitive. The index must handle them case sensitive too
+   otherwise we will have undeterministic behavior while editing or deleting groups.
+
+   https://github.com/owncloud/ocis/pull/2109
+
+* Change - Update ownCloud Web to v3.2.0: [#2096](https://github.com/owncloud/ocis/pull/2096)
+
+   Tags: web
+
+   We updated ownCloud Web to v3.2.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2096
+   https://github.com/owncloud/web/releases/tag/v3.2.0
+
+* Enhancement - Enable the s3ng storage driver: [#1886](https://github.com/owncloud/ocis/pull/1886)
+
+   We made it possible to use the new s3ng storage driver by adding according commandline flags and
+   environment variables.
+
+   https://github.com/owncloud/ocis/pull/1886
+
+* Enhancement - Color contrasts on IDP/OIDC login pages: [#2088](https://github.com/owncloud/ocis/pull/2088)
+
+   We have updated the color contrasts on the IDP pages in order to improve accessibility.
+
+   https://github.com/owncloud/ocis/pull/2088
+
+* Enhancement - Announce user profile picture capability: [#2036](https://github.com/owncloud/ocis/pull/2036)
+
+   Added a new capability (through https://github.com/cs3org/reva/pull/1694) to prevent the
+   web frontend from fetching (nonexistent) user avatar profile pictures which added latency &
+   console errors.
+
+   https://github.com/owncloud/ocis/pull/2036
+
+* Enhancement - Update reva to v1.7.1-0.20210531093513-b74a2b156af6: [#2104](https://github.com/owncloud/ocis/pull/2104)
+
+   This reva update includes: * [fix move in the owncloud storage
+   driver](https://github.com/cs3org/reva/pull/1696) * [add checksum header to the tus
+   preflight response](https://github.com/cs3org/reva/pull/1702) * [Add reliability
+   calculations support to Mentix](https://github.com/cs3org/reva/pull/1649) * [fix
+   response format when accepting shares](https://github.com/cs3org/reva/pull/1724) *
+   [Datatx createtransfershare](https://github.com/cs3org/reva/pull/1725)
+
+   https://github.com/owncloud/ocis/issues/2102
+   https://github.com/owncloud/ocis/pull/2104
+# Changelog for [1.6.0] (2021-05-12)
+
+The following sections list the changes for 1.6.0.
+
+[1.6.0]: https://github.com/owncloud/ocis/compare/v1.5.0...v1.6.0
 
 ## Summary
 
 * Bugfix - Fix STORAGE_METADATA_ROOT default value override: [#1956](https://github.com/owncloud/ocis/pull/1956)
 * Bugfix - Stop the supervisor if a service fails to start: [#1963](https://github.com/owncloud/ocis/pull/1963)
+* Change - Update ownCloud Web to v3.1.0: [#2045](https://github.com/owncloud/ocis/pull/2045)
+* Enhancement - Added dictionary files: [#2003](https://github.com/owncloud/ocis/pull/2003)
+* Enhancement - Introduce login form with h1 tag for screen readers only: [#1991](https://github.com/owncloud/ocis/pull/1991)
+* Enhancement - User Deprovisioning for the OCS API: [#1962](https://github.com/owncloud/ocis/pull/1962)
+* Enhancement - Support thumbnails for txt files: [#1988](https://github.com/owncloud/ocis/pull/1988)
+* Enhancement - Update reva to v1.7.1-0.20210430154404-69bd21f2cc97: [#2010](https://github.com/owncloud/ocis/pull/2010)
+* Enhancement - Update reva to v1.7.1-0.20210507160327-e2c3841d0dbc: [#2044](https://github.com/owncloud/ocis/pull/2044)
+* Enhancement - Use oc-select: [#1979](https://github.com/owncloud/ocis/pull/1979)
+* Enhancement - Set SameSite settings to Strict for Web: [#2019](https://github.com/owncloud/ocis/pull/2019)
 
 ## Details
 
@@ -25,6 +967,80 @@ The following sections list the changes for unreleased.
    `PROXY_HTTP_ADDR=0.0.0.0:9144 bin/ocis server`
 
    https://github.com/owncloud/ocis/pull/1963
+
+* Change - Update ownCloud Web to v3.1.0: [#2045](https://github.com/owncloud/ocis/pull/2045)
+
+   Tags: web
+
+   We updated ownCloud Web to v3.1.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2045
+   https://github.com/owncloud/web/releases/tag/v3.1.0
+
+* Enhancement - Added dictionary files: [#2003](https://github.com/owncloud/ocis/pull/2003)
+
+   Added the dictionary.js file for package settings and accounts which contains strings that
+   should be synced to transifex but not exist in the UI directly.
+
+   https://github.com/owncloud/ocis/pull/2003
+
+* Enhancement - Introduce login form with h1 tag for screen readers only: [#1991](https://github.com/owncloud/ocis/pull/1991)
+
+   https://github.com/owncloud/ocis/pull/1991
+
+* Enhancement - User Deprovisioning for the OCS API: [#1962](https://github.com/owncloud/ocis/pull/1962)
+
+   Use the CS3 API and Reva to deprovision users completely.
+
+   Two new environment variables introduced: ``` OCS_IDM_ADDRESS OCS_STORAGE_USERS_DRIVER
+   ```
+
+   `OCS_IDM_ADDRESS` is also an alias for `OCIS_URL`; allows the OCS service to mint jwt tokens
+   for the authenticated user that will be read by the reva authentication middleware.
+
+   `OCS_STORAGE_USERS_DRIVER` determines how a user is deprovisioned. This kind of behavior is
+   needed since every storage driver deals with deleting differently.
+
+   https://github.com/owncloud/ocis/pull/1962
+
+* Enhancement - Support thumbnails for txt files: [#1988](https://github.com/owncloud/ocis/pull/1988)
+
+   Implemented support for thumbnails for txt files in the thumbnails service.
+
+   https://github.com/owncloud/ocis/pull/1988
+
+* Enhancement - Update reva to v1.7.1-0.20210430154404-69bd21f2cc97: [#2010](https://github.com/owncloud/ocis/pull/2010)
+
+  * Fix recycle to different locations (https://github.com/cs3org/reva/pull/1541)
+  * Fix user share as grantee in json backend (https://github.com/cs3org/reva/pull/1650)
+  * Introduce named services (https://github.com/cs3org/reva/pull/1509)
+  * Improve json marshalling of share protobuf messages (https://github.com/cs3org/reva/pull/1655)
+  * Cache resources from share getter methods in OCS (https://github.com/cs3org/reva/pull/1643)
+  * Fix public file shares (https://github.com/cs3org/reva/pull/1666)
+
+   https://github.com/owncloud/ocis/pull/2010
+
+* Enhancement - Update reva to v1.7.1-0.20210507160327-e2c3841d0dbc: [#2044](https://github.com/owncloud/ocis/pull/2044)
+
+  * Add user profile picture to capabilities (https://github.com/cs3org/reva/pull/1694)
+  * Mint scope-based access tokens for RBAC (https://github.com/cs3org/reva/pull/1669)
+  * Add cache warmup strategy for OCS resource infos (https://github.com/cs3org/reva/pull/1664)
+  * Filter shares based on type in OCS (https://github.com/cs3org/reva/pull/1683)
+
+   https://github.com/owncloud/ocis/pull/2044
+
+* Enhancement - Use oc-select: [#1979](https://github.com/owncloud/ocis/pull/1979)
+
+   Replace oc-drop with oc select in settings
+
+   https://github.com/owncloud/ocis/pull/1979
+
+* Enhancement - Set SameSite settings to Strict for Web: [#2019](https://github.com/owncloud/ocis/pull/2019)
+
+   Changed SameSite settings to Strict for Web to prevent warnings in Firefox
+
+   https://github.com/owncloud/ocis/pull/2019
 # Changelog for [1.5.0] (2021-04-21)
 
 The following sections list the changes for 1.5.0.

@@ -38,15 +38,15 @@ If the below defaults don't match your environment change them accordingly:
 ```
 export STORAGE_LDAP_HOSTNAME=localhost
 export STORAGE_LDAP_PORT=9126
-export STORAGE_LDAP_BASE_DN='dc=example,dc=org'
+export STORAGE_LDAP_BASE_DN='dc=ocis,dc=test'
 export STORAGE_LDAP_USERFILTER='(&(objectclass=posixAccount)(cn=%s))'
 export STORAGE_LDAP_GROUPFILTER='(&(objectclass=posixGroup)(cn=%s))'
-export STORAGE_LDAP_BIND_DN='cn=reva,ou=sysusers,dc=example,dc=org'
+export STORAGE_LDAP_BIND_DN='cn=reva,ou=sysusers,dc=ocis,dc=test'
 export STORAGE_LDAP_BIND_PASSWORD=reva
-export STORAGE_LDAP_SCHEMA_UID=uid
-export STORAGE_LDAP_SCHEMA_MAIL=mail
-export STORAGE_LDAP_SCHEMA_DISPLAYNAME=sn
-export STORAGE_LDAP_SCHEMA_CN=cn
+export STORAGE_LDAP_USER_SCHEMA_UID=uid
+export STORAGE_LDAP_USER_SCHEMA_MAIL=mail
+export STORAGE_LDAP_USER_SCHEMA_DISPLAYNAME=sn
+export STORAGE_LDAP_USER_SCHEMA_CN=cn
 ```
 
 Then restart the `bin/storage users` and `bin/storage auth-basic` services for the changes to take effect.

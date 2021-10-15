@@ -36,15 +36,16 @@ type Tracing struct {
 
 // Ldap defined the available LDAP configuration.
 type Ldap struct {
-	Address string
+	Addr    string
 	Enabled bool
 }
 
 // Ldaps defined the available LDAPS configuration.
 type Ldaps struct {
-	Ldap
-	Cert string
-	Key  string
+	Addr    string
+	Enabled bool
+	Cert    string
+	Key     string
 }
 
 // Backend defined the available backend configuration.

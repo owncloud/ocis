@@ -1,6 +1,8 @@
 package config
 
-import "context"
+import (
+	"context"
+)
 
 // Log defines the available logging configuration.
 type Log struct {
@@ -43,11 +45,6 @@ type Tracing struct {
 	Service   string
 }
 
-// Asset defines the available asset configuration.
-type Asset struct {
-	Path string
-}
-
 // Policy enables us to use multiple directors.
 type Policy struct {
 	Name   string
@@ -68,7 +65,7 @@ type RouteType string
 const (
 	// PrefixRoute are routes matched by a prefix
 	PrefixRoute RouteType = "prefix"
-	// QueryRoute are routes machted by a prefix and query parameters
+	// QueryRoute are routes matched by a prefix and query parameters
 	QueryRoute RouteType = "query"
 	// RegexRoute are routes matched by a pattern
 	RegexRoute RouteType = "regex"
@@ -111,7 +108,6 @@ type Config struct {
 	HTTP                  HTTP
 	Service               Service
 	Tracing               Tracing
-	Asset                 Asset
 	Policies              []Policy
 	OIDC                  OIDC
 	TokenManager          TokenManager
@@ -119,6 +115,9 @@ type Config struct {
 	Reva                  Reva
 	PreSignedURL          PreSignedURL
 	AccountBackend        string
+	UserOIDCClaim         string
+	UserCS3Claim          string
+	MachineAuthAPIKey     string
 	AutoprovisionAccounts bool
 	EnableBasicAuth       bool
 	InsecureBackends      bool
@@ -139,6 +138,8 @@ type OIDC struct {
 type PolicySelector struct {
 	Static    *StaticSelectorConf
 	Migration *MigrationSelectorConf
+	Claims    *ClaimsSelectorConf
+	Regex     *RegexSelectorConf
 }
 
 // StaticSelectorConf is the config for the static-policy-selector
@@ -164,7 +165,30 @@ type MigrationSelectorConf struct {
 	UnauthenticatedPolicy string `mapstructure:"unauthenticated_policy"`
 }
 
+// ClaimsSelectorConf is the config for the claims-selector
+type ClaimsSelectorConf struct {
+	DefaultPolicy         string `mapstructure:"default_policy"`
+	UnauthenticatedPolicy string `mapstructure:"unauthenticated_policy"`
+	SelectorCookieName    string `mapstructure:"selector_cookie_name"`
+}
+
+// RegexSelectorConf is the config for the regex-selector
+type RegexSelectorConf struct {
+	DefaultPolicy         string          `mapstructure:"default_policy"`
+	MatchesPolicies       []RegexRuleConf `mapstructure:"matches_policies"`
+	UnauthenticatedPolicy string          `mapstructure:"unauthenticated_policy"`
+	SelectorCookieName    string          `mapstructure:"selector_cookie_name"`
+}
+type RegexRuleConf struct {
+	Priority int    `mapstructure:"priority"`
+	Property string `mapstructure:"property"`
+	Match    string `mapstructure:"match"`
+	Policy   string `mapstructure:"policy"`
+}
+
 // New initializes a new configuration
 func New() *Config {
-	return &Config{}
+	return &Config{
+		HTTP: HTTP{},
+	}
 }

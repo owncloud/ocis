@@ -2,11 +2,13 @@ package middleware
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
-	"net/http"
-	"strings"
+	"github.com/owncloud/ocis/proxy/pkg/webdav"
 )
 
 const publicFilesEndpoint = "/remote.php/dav/public-files/"
@@ -29,7 +31,7 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(
 			func(w http.ResponseWriter, req *http.Request) {
-				if h.isPublicLink(req) || !h.isBasicAuth(req) {
+				if h.isPublicLink(req) || !h.isBasicAuth(req) || h.isOIDCTokenAuth(req) {
 					if !h.isPublicLink(req) {
 						userAgentAuthenticateLockIn(w, req, options.CredentialsByUserAgent, "basic")
 					}
@@ -39,7 +41,7 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 
 				removeSuperfluousAuthenticate(w)
 				login, password, _ := req.BasicAuth()
-				user, err := h.userProvider.Authenticate(req.Context(), login, password)
+				user, _, err := h.userProvider.Authenticate(req.Context(), login, password)
 
 				// touch is a user agent locking guard, when touched changes to true it indicates the User-Agent on the
 				// request is configured to support only one challenge, it it remains untouched, there are no considera-
@@ -61,15 +63,31 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 						writeSupportedAuthenticateHeader(w, req)
 					}
 
+					// if the request is a PROPFIND return a WebDAV error code.
+					// TODO: The proxy has to be smart enough to detect when a request is directed towards a webdav server
+					// and react accordingly.
+
 					w.WriteHeader(http.StatusUnauthorized)
+
+					if webdav.IsWebdavRequest(req) {
+						b, err := webdav.Marshal(webdav.Exception{
+							Code:    webdav.SabredavPermissionDenied,
+							Message: "Authentication error",
+						})
+
+						webdav.HandleWebdavError(w, b, err)
+						return
+					}
+
 					return
 				}
 
-				claims := &oidc.StandardClaims{
-					OcisID:            user.Id.OpaqueId,
-					Iss:               user.Id.Idp,
-					PreferredUsername: user.Username,
-					Email:             user.Mail,
+				// fake oidc claims
+				claims := map[string]interface{}{
+					oidc.OwncloudUUID:      user.Id.OpaqueId,
+					oidc.Iss:               user.Id.Idp,
+					oidc.PreferredUsername: user.Username,
+					oidc.Email:             user.Mail,
 				}
 
 				next.ServeHTTP(w, req.WithContext(oidc.NewContext(req.Context(), claims)))
@@ -89,7 +107,13 @@ func (m basicAuth) isPublicLink(req *http.Request) bool {
 	return ok && login == "public" && strings.HasPrefix(req.URL.Path, publicFilesEndpoint)
 }
 
+// The token auth endpoint uses basic auth for clients, see https://openid.net/specs/openid-connect-basic-1_0.html#TokenRequest
+// > The Client MUST authenticate to the Token Endpoint using the HTTP Basic method, as described in 2.3.1 of OAuth 2.0.
+func (m basicAuth) isOIDCTokenAuth(req *http.Request) bool {
+	return req.URL.Path == "/konnect/v1/token"
+}
+
 func (m basicAuth) isBasicAuth(req *http.Request) bool {
-	login, password, ok := req.BasicAuth()
-	return m.enabled && ok && login != "" && password != ""
+	_, _, ok := req.BasicAuth()
+	return m.enabled && ok
 }

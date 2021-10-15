@@ -81,6 +81,7 @@ func init() {
 
 	cfg := config.New()
 	cfg.Repo.Disk.Path = dataPath
+	cfg.Server.DemoUsersAndGroups = true
 	var hdlr *svc.Service
 	var err error
 
@@ -616,7 +617,7 @@ func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
 				errMsg := fmt.Sprintf("can not update field %s, either unknown or readonly", tt.updateMask[0])
 				assert.Equal(t, errMsg, e.Detail)
 			} else {
-				t.Fatal("Expected merror errors but found something else.")
+				t.Fatal("Expected merrors errors but found something else.")
 			}
 		})
 	}

@@ -1,6 +1,7 @@
 {
-  "HTTP": {
-    "Namespace": "com.owncloud"
+  "http": {
+    "addr": "0.0.0.0:9200",
+    "root": "/"
   },
   "oidc": {
     "issuer": "https://localhost:9200",
@@ -8,7 +9,7 @@
   },
   "policy_selector": {
     "migration": {
-      "acc_found_policy" : "ocis",
+      "acc_found_policy": "ocis",
       "acc_not_found_policy": "oc10",
       "unauthenticated_policy": "oc10"
     }
@@ -34,8 +35,18 @@
           "backend": "http://localhost:9130"
         },
         {
+          "type": "regex",
+          "endpoint": "/ocs/v[12].php/cloud/(users?|groups)",
+          "backend": "http://localhost:9110"
+        },
+        {
           "endpoint": "/ocs/",
           "backend": "http://localhost:9140"
+        },
+        {
+          "type": "query",
+          "endpoint": "/remote.php/?preview=1",
+          "backend": "http://localhost:9115"
         },
         {
           "endpoint": "/remote.php/",
@@ -62,20 +73,28 @@
           "backend": "http://localhost:9140"
         },
         {
-					"endpoint": "/api/v0/accounts",
-					"backend":  "http://localhost:9181"
-				},
-				{
+          "endpoint": "/graph/",
+          "backend": "http://localhost:9120"
+        },
+        {
+          "endpoint": "/graph-explorer/",
+          "backend": "http://localhost:9135"
+        },
+        {
+          "endpoint": "/api/v0/accounts",
+          "backend": "http://localhost:9181"
+        },
+        {
           "endpoint": "/accounts.js",
-					"backend":  "http://localhost:9181"
-				},
+          "backend": "http://localhost:9181"
+        },
         {
           "endpoint": "/api/v0/settings",
-          "backend":  "http://localhost:9190"
+          "backend": "http://localhost:9190"
         },
         {
           "endpoint": "/settings.js",
-          "backend":  "http://localhost:9190"
+          "backend": "http://localhost:9190"
         }
       ]
     },

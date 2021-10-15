@@ -1,5 +1,6 @@
 ---
 title: "3. Use external User Management"
+weight: 3
 date: 2020-12-09T20:21:00+01:00
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr
@@ -68,7 +69,7 @@ Chosen option: "Move accounts functionality to GLAuth and name it accounts", by 
 
 ### Negative Consequences
 
-* If users want to store users in their IDM and at the same time guests in a seperate user management we need to implement GLAuth backends that support more than one LDAP server.
+* If users want to store users in their IDM and at the same time guests in a separate user management we need to implement GLAuth backends that support more than one LDAP server.
 
 ## Pros and Cons of the Options
 

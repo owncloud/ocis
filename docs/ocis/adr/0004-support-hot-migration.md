@@ -1,12 +1,11 @@
 ---
 title: "4. Support Hot Migration"
+weight: 4
 date: 2020-12-09T20:21:00+01:00
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0004-support-hot-migration.md
 ---
-
-# 4. Support Hot Migration
 
 * Status: proposed
 * Deciders: @butonic, @micbar, @dragotin, @hodyroff, @pmaier1
@@ -61,7 +60,7 @@ The migration happens while the service is offline. File metadata, blobs and sha
 - Good, because oCIS can be tested in a staging system without writing to the production system.
 - Good, because file layout on disk can be changed to support new storage driver capabilities.
 - Bad, because the export and import might require significant amounts of storage.
-- Bad, because a rollback to the state before the migration might cause data loss of the changes that happend in between.
+- Bad, because a rollback to the state before the migration might cause data loss of the changes that happened in between.
 - Bad, because the cold migration can mean significant downtime.
 
 ### Hot Migration

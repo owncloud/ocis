@@ -7,13 +7,15 @@ geekdocEditPath: edit/master/proxy/templates
 geekdocFilePath: CONFIGURATION.tmpl
 ---
 {{- define "options"}}
-{{ $fnName := (last . ).Flags -}}
-{{ range $opt := first . }}{{ with list $fnName $opt -}}
+{{ $fnNames := (last . ).Flags -}}
+{{ range $opt := first . }}
+{{ range $fnName := $fnNames }}{{ with list $fnName $opt -}}
 {{ $o := last . -}}
 {{ if eq $o.FnName $fnName -}}
---{{ $o.Name }} | {{ range $i, $e := $o.Env }} {{ if $i }}, {{ end }}${{ $e }}{{ end }}
+-{{ $o.Name }} | {{ range $i, $e := $o.Env }} {{ if $i }}, {{ end }}${{ $e }}{{ end }}
 : {{ $o.Usage }}. {{- if $o.Default }} Default: `{{ $o.Default }}`.{{ end }}
 
+{{ end -}}
 {{ end -}}
 {{ end -}}
 {{ end -}}
@@ -43,9 +45,9 @@ If you prefer to configure the service with environment variables you can see th
 
 If multiple variables are listed for one option, they are in order of precedence. This means the leftmost variable will always win if given.
 
-### Commandline flags
+### Command-line flags
 
-If you prefer to configure the service with commandline flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
 {{ $options := .Options -}}
 {{ range $com := .Commands }}{{ with (list $options $com) -}}

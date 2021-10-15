@@ -1,9 +1,9 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/store/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // RootWithConfig applies cfg to the root flagset
@@ -42,7 +42,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9460"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9464"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"STORE_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -62,28 +62,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
 			Usage:       "Enable sending traces",
-			EnvVars:     []string{"STORE_TRACING_ENABLED"},
+			EnvVars:     []string{"STORE_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
-			EnvVars:     []string{"STORE_TRACING_TYPE"},
+			EnvVars:     []string{"STORE_TRACING_TYPE", "OCIS_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Endpoint, ""),
 			Usage:       "Endpoint for the agent",
-			EnvVars:     []string{"STORE_TRACING_ENDPOINT"},
+			EnvVars:     []string{"STORE_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Collector, ""),
 			Usage:       "Endpoint for the collector",
-			EnvVars:     []string{"STORE_TRACING_COLLECTOR"},
+			EnvVars:     []string{"STORE_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
@@ -95,7 +95,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9460"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9464"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORE_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -127,6 +127,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Service.Namespace,
 		},
 		&cli.StringFlag{
+			Name:        "grpc-addr",
+			Value:       flags.OverrideDefaultString(cfg.GRPC.Addr, "127.0.0.1:9460"),
+			Usage:       "Address to bind grpc server",
+			EnvVars:     []string{"STORE_GRPC_ADDR"},
+			Destination: &cfg.GRPC.Addr,
+		},
+		&cli.StringFlag{
 			Name:        "name",
 			Value:       flags.OverrideDefaultString(cfg.Service.Name, "store"),
 			Usage:       "Service name",
@@ -139,6 +146,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "location of the store data path",
 			EnvVars:     []string{"STORE_DATA_PATH"},
 			Destination: &cfg.Datapath,
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode. This flag is set by the runtime",
 		},
 	}
 }

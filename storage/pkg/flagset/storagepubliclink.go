@@ -1,9 +1,9 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // StoragePublicLink applies cfg to the root flagset
@@ -12,7 +12,7 @@ func StoragePublicLink(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.DebugAddr, "0.0.0.0:9179"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.DebugAddr, "127.0.0.1:9179"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_PUBLIC_LINK_DEBUG_ADDR"},
 			Destination: &cfg.Reva.StoragePublicLink.DebugAddr,
@@ -27,7 +27,7 @@ func StoragePublicLink(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.GRPCAddr, "0.0.0.0:9178"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.GRPCAddr, "127.0.0.1:9178"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_PUBLIC_LINK_GRPC_ADDR"},
 			Destination: &cfg.Reva.StoragePublicLink.GRPCAddr,
@@ -42,10 +42,10 @@ func StoragePublicLink(cfg *config.Config) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Name:        "gateway-endpoint",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142"),
-			Usage:       "endpoint to use for the storage gateway service",
-			EnvVars:     []string{"STORAGE_GATEWAY_ENDPOINT"},
+			Name:        "reva-gateway-addr",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "127.0.0.1:9142"),
+			Usage:       "Address of REVA gateway endpoint",
+			EnvVars:     []string{"REVA_GATEWAY"},
 			Destination: &cfg.Reva.Gateway.Endpoint,
 		},
 	}

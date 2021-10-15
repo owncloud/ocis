@@ -1,9 +1,9 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/graph/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
+	"github.com/urfave/cli/v2"
 )
 
 // RootWithConfig applies cfg to the root flagset
@@ -42,7 +42,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9124"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9124"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"GRAPH_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -62,28 +62,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
 			Usage:       "Enable sending traces",
-			EnvVars:     []string{"GRAPH_TRACING_ENABLED"},
+			EnvVars:     []string{"GRAPH_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
-			EnvVars:     []string{"GRAPH_TRACING_TYPE"},
+			EnvVars:     []string{"GRAPH_TRACING_TYPE", "OCIS_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Endpoint, ""),
 			Usage:       "Endpoint for the agent",
-			EnvVars:     []string{"GRAPH_TRACING_ENDPOINT"},
+			EnvVars:     []string{"GRAPH_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Collector, ""),
 			Usage:       "Endpoint for the collector",
-			EnvVars:     []string{"GRAPH_TRACING_COLLECTOR"},
+			EnvVars:     []string{"GRAPH_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
@@ -95,7 +95,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9124"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9124"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"GRAPH_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -121,7 +121,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9120"),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "127.0.0.1:9120"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"GRAPH_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
@@ -140,74 +140,40 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"GRAPH_HTTP_NAMESPACE"},
 			Destination: &cfg.HTTP.Namespace,
 		},
+
 		&cli.StringFlag{
-			Name:        "ldap-network",
-			Value:       flags.OverrideDefaultString(cfg.Ldap.Network, "tcp"),
-			Usage:       "Network protocol to use to connect to the Ldap server",
-			EnvVars:     []string{"GRAPH_LDAP_NETWORK"},
-			Destination: &cfg.Ldap.Network,
+			Name:        "spaces-webdav-base",
+			Value:       flags.OverrideDefaultString(cfg.Spaces.WebDavBase, "https://localhost:9200/dav/spaces/"),
+			Usage:       "spaces webdav base URL to use when rendering drive WabDAV URLs",
+			EnvVars:     []string{"GRAPH_SPACES_WEBDAV_BASE"},
+			Destination: &cfg.Spaces.WebDavBase,
 		},
+
 		&cli.StringFlag{
-			Name:        "ldap-address",
-			Value:       flags.OverrideDefaultString(cfg.Ldap.Address, "0.0.0.0:9125"),
-			Usage:       "Address to connect to the Ldap server",
-			EnvVars:     []string{"GRAPH_LDAP_ADDRESS"},
-			Destination: &cfg.Ldap.Address,
+			Name:        "default-space-quota",
+			Value:       flags.OverrideDefaultString(cfg.Spaces.DefaultQuota, "1000000000"),
+			Usage:       "default quota used for all spaces if no custom quota was given",
+			EnvVars:     []string{"GRAPH_SPACES_DEFAULT_QUOTA"},
+			Destination: &cfg.Spaces.DefaultQuota,
 		},
+
 		&cli.StringFlag{
-			Name:        "ldap-username",
-			Value:       flags.OverrideDefaultString(cfg.Ldap.UserName, "cn=admin,dc=example,dc=org"),
-			Usage:       "User to bind to the Ldap server",
-			EnvVars:     []string{"GRAPH_LDAP_USERNAME"},
-			Destination: &cfg.Ldap.UserName,
-		},
-		&cli.StringFlag{
-			Name:        "ldap-password",
-			Value:       flags.OverrideDefaultString(cfg.Ldap.Password, "admin"),
-			Usage:       "Password to bind to the Ldap server",
-			EnvVars:     []string{"GRAPH_LDAP_PASSWORD"},
-			Destination: &cfg.Ldap.Password,
-		},
-		&cli.StringFlag{
-			Name:        "ldap-basedn-users",
-			Value:       flags.OverrideDefaultString(cfg.Ldap.BaseDNUsers, "ou=users,dc=example,dc=org"),
-			Usage:       "BaseDN to look for users",
-			EnvVars:     []string{"GRAPH_LDAP_BASEDN_USERS"},
-			Destination: &cfg.Ldap.BaseDNUsers,
-		},
-		&cli.StringFlag{
-			Name:        "ldap-basedn-groups",
-			Value:       flags.OverrideDefaultString(cfg.Ldap.BaseDNGroups, "ou=groups,dc=example,dc=org"),
-			Usage:       "BaseDN to look for users",
-			EnvVars:     []string{"GRAPH_LDAP_BASEDN_GROUPS"},
-			Destination: &cfg.Ldap.BaseDNGroups,
-		},
-		&cli.StringFlag{
-			Name:        "oidc-endpoint",
-			Value:       flags.OverrideDefaultString(cfg.OpenIDConnect.Endpoint, "https://localhost:9200"),
-			Usage:       "OpenIDConnect endpoint",
-			EnvVars:     []string{"GRAPH_OIDC_ENDPOINT", "OCIS_URL"},
-			Destination: &cfg.OpenIDConnect.Endpoint,
-		},
-		&cli.BoolFlag{
-			Name:        "oidc-insecure",
-			Usage:       "OpenIDConnect endpoint",
-			EnvVars:     []string{"GRAPH_OIDC_INSECURE"},
-			Destination: &cfg.OpenIDConnect.Insecure,
-		},
-		&cli.StringFlag{
-			Name:        "oidc-realm",
-			Value:       flags.OverrideDefaultString(cfg.OpenIDConnect.Realm, ""),
-			Usage:       "OpenIDConnect realm",
-			EnvVars:     []string{"GRAPH_OIDC_REALM"},
-			Destination: &cfg.OpenIDConnect.Realm,
+			Name:        "jwt-secret",
+			Value:       flags.OverrideDefaultString(cfg.TokenManager.JWTSecret, "Pive-Fumkiu4"),
+			Usage:       "Used to validate the reva access JWT, should equal reva's jwt-secret",
+			EnvVars:     []string{"GRAPH_JWT_SECRET", "OCIS_JWT_SECRET"},
+			Destination: &cfg.TokenManager.JWTSecret,
 		},
 		&cli.StringFlag{
 			Name:        "reva-gateway-addr",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Address, "127.0.0.1:9142"),
-			Usage:       "REVA Gateway Endpoint",
-			EnvVars:     []string{"REVA_GATEWAY_ADDR"},
+			Usage:       "Address of REVA gateway endpoint",
+			EnvVars:     []string{"REVA_GATEWAY"},
 			Destination: &cfg.Reva.Address,
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode. This flag is set by the runtime",
 		},
 	}
 }

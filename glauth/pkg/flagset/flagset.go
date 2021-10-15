@@ -1,9 +1,12 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
+	"path"
+
 	"github.com/owncloud/ocis/glauth/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
+	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
+	"github.com/urfave/cli/v2"
 )
 
 // RootWithConfig applies cfg to the root flagset
@@ -35,7 +38,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9129"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9129"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"GLAUTH_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -62,28 +65,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
 			Usage:       "Enable sending traces",
-			EnvVars:     []string{"GLAUTH_TRACING_ENABLED"},
+			EnvVars:     []string{"GLAUTH_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
-			EnvVars:     []string{"GLAUTH_TRACING_TYPE"},
+			EnvVars:     []string{"GLAUTH_TRACING_TYPE", "OCIS_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Endpoint, ""),
 			Usage:       "Endpoint for the agent",
-			EnvVars:     []string{"GLAUTH_TRACING_ENDPOINT"},
+			EnvVars:     []string{"GLAUTH_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Collector, ""),
 			Usage:       "Endpoint for the collector",
-			EnvVars:     []string{"GLAUTH_TRACING_COLLECTOR"},
+			EnvVars:     []string{"GLAUTH_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
@@ -95,7 +98,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9129"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9129"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"GLAUTH_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -129,10 +132,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "ldap-addr",
-			Value:       flags.OverrideDefaultString(cfg.Ldap.Address, "0.0.0.0:9125"),
+			Value:       flags.OverrideDefaultString(cfg.Ldap.Addr, "127.0.0.1:9125"),
 			Usage:       "Address to bind ldap server",
 			EnvVars:     []string{"GLAUTH_LDAP_ADDR"},
-			Destination: &cfg.Ldap.Address,
+			Destination: &cfg.Ldap.Addr,
 		},
 		&cli.BoolFlag{
 			Name:        "ldap-enabled",
@@ -144,10 +147,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "ldaps-addr",
-			Value:       flags.OverrideDefaultString(cfg.Ldaps.Address, "0.0.0.0:9126"),
+			Value:       flags.OverrideDefaultString(cfg.Ldaps.Addr, "127.0.0.1:9126"),
 			Usage:       "Address to bind ldap server",
 			EnvVars:     []string{"GLAUTH_LDAPS_ADDR"},
-			Destination: &cfg.Ldaps.Address,
+			Destination: &cfg.Ldaps.Addr,
 		},
 		&cli.BoolFlag{
 			Name:        "ldaps-enabled",
@@ -158,14 +161,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldaps-cert",
-			Value:       flags.OverrideDefaultString(cfg.Ldaps.Cert, "./ldap.crt"),
+			Value:       flags.OverrideDefaultString(cfg.Ldaps.Cert, path.Join(pkgos.MustUserConfigDir("ocis", "ldap"), "ldap.crt")),
 			Usage:       "path to ldaps certificate in PEM format",
 			EnvVars:     []string{"GLAUTH_LDAPS_CERT"},
 			Destination: &cfg.Ldaps.Cert,
 		},
 		&cli.StringFlag{
 			Name:        "ldaps-key",
-			Value:       flags.OverrideDefaultString(cfg.Ldaps.Key, "./ldap.key"),
+			Value:       flags.OverrideDefaultString(cfg.Ldaps.Key, path.Join(pkgos.MustUserConfigDir("ocis", "ldap"), "ldap.key")),
 			Usage:       "path to ldaps key in PEM format",
 			EnvVars:     []string{"GLAUTH_LDAPS_KEY"},
 			Destination: &cfg.Ldaps.Key,
@@ -175,7 +178,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "backend-basedn",
-			Value:       flags.OverrideDefaultString(cfg.Backend.BaseDN, "dc=example,dc=org"),
+			Value:       flags.OverrideDefaultString(cfg.Backend.BaseDN, "dc=ocis,dc=test"),
 			Usage:       "base distinguished name to expose",
 			EnvVars:     []string{"GLAUTH_BACKEND_BASEDN"},
 			Destination: &cfg.Backend.BaseDN,
@@ -218,8 +221,8 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringSliceFlag{
 			Name:    "backend-server",
-			Value:   cli.NewStringSlice("https://demo.owncloud.com/apps/graphapi/v1.0"),
-			Usage:   `--backend-server http://internal1.example.com [--backend-server http://internal2.example.com]`,
+			Value:   cli.NewStringSlice(),
+			Usage:   `--backend-server https://demo.owncloud.com/apps/graphapi/v1.0 [--backend-server "https://demo2.owncloud.com/apps/graphapi/v1.0"]`,
 			EnvVars: []string{"GLAUTH_BACKEND_SERVERS"},
 		},
 		&cli.BoolFlag{
@@ -234,7 +237,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "fallback-basedn",
-			Value:       flags.OverrideDefaultString(cfg.Fallback.BaseDN, "dc=example,dc=org"),
+			Value:       flags.OverrideDefaultString(cfg.Fallback.BaseDN, "dc=ocis,dc=test"),
 			Usage:       "base distinguished name to expose",
 			EnvVars:     []string{"GLAUTH_FALLBACK_BASEDN"},
 			Destination: &cfg.Fallback.BaseDN,
@@ -287,6 +290,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "use Graph API, only for owncloud datastore",
 			EnvVars:     []string{"GLAUTH_FALLBACK_USE_GRAPHAPI"},
 			Destination: &cfg.Fallback.UseGraphAPI,
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode. This flag is set by the runtime",
 		},
 	}
 }

@@ -9,53 +9,61 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	settingsSvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
 
 type cs3backend struct {
-	userProvider        cs3.UserAPIClient
 	settingsRoleService settings.RoleService
 	authProvider        RevaAuthenticator
+	machineAuthAPIKey   string
 	logger              log.Logger
 }
 
 // NewCS3UserBackend creates a user-provider which fetches users from a CS3 UserBackend
-func NewCS3UserBackend(up cs3.UserAPIClient, rs settings.RoleService, ap RevaAuthenticator, logger log.Logger) UserBackend {
+func NewCS3UserBackend(rs settings.RoleService, ap RevaAuthenticator, machineAuthAPIKey string, logger log.Logger) UserBackend {
 	return &cs3backend{
-		userProvider:        up,
 		settingsRoleService: rs,
 		authProvider:        ap,
+		machineAuthAPIKey:   machineAuthAPIKey,
 		logger:              logger,
 	}
 }
 
-func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, withRoles bool) (*cs3.User, error) {
-	res, err := c.userProvider.GetUserByClaim(ctx, &cs3.GetUserByClaimRequest{
-		Claim: claim,
-		Value: value,
+func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, withRoles bool) (*cs3.User, string, error) {
+	// We only support authentication via username for now
+	if claim != "username" {
+		return nil, "", fmt.Errorf("claim: %s not supported", claim)
+	}
+
+	res, err := c.authProvider.Authenticate(ctx, &gateway.AuthenticateRequest{
+		Type:         "machine",
+		ClientId:     value,
+		ClientSecret: c.machineAuthAPIKey,
 	})
 
 	switch {
 	case err != nil:
-		return nil, fmt.Errorf("could not get user by claim %v with value %v: %w", claim, value, err)
+		return nil, "", fmt.Errorf("could not get user by claim %v with value %v: %w", claim, value, err)
 	case res.Status.Code != rpcv1beta1.Code_CODE_OK:
 		if res.Status.Code == rpcv1beta1.Code_CODE_NOT_FOUND {
-			return nil, ErrAccountNotFound
+			return nil, "", ErrAccountNotFound
 		}
-		return nil, fmt.Errorf("could not get user by claim %v with value %v : %w ", claim, value, err)
+		return nil, "", fmt.Errorf("could not get user by claim %v with value %v : %w ", claim, value, err)
 	}
 
 	user := res.User
 
 	if !withRoles {
-		return user, nil
+		return user, res.Token, nil
 	}
 
-	roleIDs, err := loadRolesIDs(ctx, user.Id.OpaqueId, c.settingsRoleService)
-	if err != nil {
-		c.logger.Error().Err(err).Msg("Could not load roles")
+	var roleIDs []string
+	if user.Id.Type != cs3.UserType_USER_TYPE_LIGHTWEIGHT {
+		roleIDs, err = loadRolesIDs(ctx, user.Id.OpaqueId, c.settingsRoleService)
+		if err != nil {
+			c.logger.Error().Err(err).Msgf("Could not load roles")
+		}
 	}
 
 	if len(roleIDs) == 0 {
@@ -80,10 +88,10 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 		user.Opaque.Map["roles"] = enc
 	}
 
-	return res.User, nil
+	return user, res.Token, nil
 }
 
-func (c *cs3backend) Authenticate(ctx context.Context, username string, password string) (*cs3.User, error) {
+func (c *cs3backend) Authenticate(ctx context.Context, username string, password string) (*cs3.User, string, error) {
 	res, err := c.authProvider.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         "basic",
 		ClientId:     username,
@@ -92,15 +100,15 @@ func (c *cs3backend) Authenticate(ctx context.Context, username string, password
 
 	switch {
 	case err != nil:
-		return nil, fmt.Errorf("could not authenticate with username and password user: %s, %w", username, err)
+		return nil, "", fmt.Errorf("could not authenticate with username and password user: %s, %w", username, err)
 	case res.Status.Code != rpcv1beta1.Code_CODE_OK:
-		return nil, fmt.Errorf("could not authenticate with username and password user: %s, got code: %d", username, res.Status.Code)
+		return nil, "", fmt.Errorf("could not authenticate with username and password user: %s, got code: %d", username, res.Status.Code)
 	}
 
-	return res.User, nil
+	return res.User, res.Token, nil
 }
 
-func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims *oidc.StandardClaims) (*cs3.User, error) {
+func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string]interface{}) (*cs3.User, error) {
 	return nil, fmt.Errorf("CS3 Backend does not support creating users from claims")
 }
 

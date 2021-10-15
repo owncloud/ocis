@@ -8,15 +8,16 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/storage/pkg/command/storagedrivers"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // StorageUsers is the entrypoint for the storage-users command.
@@ -43,14 +44,6 @@ func StorageUsers(cfg *config.Config) *cli.Command {
 			uuid := uuid.Must(uuid.NewV4())
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
-			// override driver enable home option with home config
-			if cfg.Reva.Storages.Home.EnableHome {
-				cfg.Reva.Storages.Common.EnableHome = true
-				cfg.Reva.Storages.EOS.EnableHome = true
-				cfg.Reva.Storages.Local.EnableHome = true
-				cfg.Reva.Storages.OwnCloud.EnableHome = true
-				cfg.Reva.Storages.S3.EnableHome = true
-			}
 			rcfg := storageUsersConfigFromStruct(c, cfg)
 
 			gr.Add(func() error {
@@ -85,7 +78,7 @@ func StorageUsers(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageMetadata.Supervised {
+			if !cfg.Reva.StorageUsers.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
@@ -115,7 +108,7 @@ func storageUsersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string
 			"services": map[string]interface{}{
 				"storageprovider": map[string]interface{}{
 					"driver":             cfg.Reva.StorageUsers.Driver,
-					"drivers":            drivers(cfg),
+					"drivers":            storagedrivers.UserDrivers(cfg),
 					"mount_path":         cfg.Reva.StorageUsers.MountPath,
 					"mount_id":           cfg.Reva.StorageUsers.MountID,
 					"expose_data_server": cfg.Reva.StorageUsers.ExposeDataServer,
@@ -132,13 +125,19 @@ func storageUsersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string
 				"dataprovider": map[string]interface{}{
 					"prefix":      cfg.Reva.StorageUsers.HTTPPrefix,
 					"driver":      cfg.Reva.StorageUsers.Driver,
-					"drivers":     drivers(cfg),
+					"drivers":     storagedrivers.UserDrivers(cfg),
 					"timeout":     86400,
 					"insecure":    true,
 					"disable_tus": false,
 				},
 			},
 		},
+	}
+	if cfg.Reva.StorageUsers.ReadOnly {
+		gcfg := rcfg["grpc"].(map[string]interface{})
+		gcfg["interceptors"] = map[string]interface{}{
+			"readonly": map[string]interface{}{},
+		}
 	}
 	return rcfg
 }
@@ -161,8 +160,9 @@ func NewStorageUsers(cfg *ociscfg.Config) suture.Service {
 func (s StorageUsersSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.StorageUsers.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range StorageUsers(s.cfg).Flags {
-		if err := StorageUsers(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := StorageUsers(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

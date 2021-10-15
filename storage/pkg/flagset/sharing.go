@@ -1,9 +1,9 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // SharingWithConfig applies cfg to the root flagset
@@ -13,13 +13,23 @@ func SharingWithConfig(cfg *config.Config) []cli.Flag {
 		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Sharing.DebugAddr, "0.0.0.0:9151"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Sharing.DebugAddr, "127.0.0.1:9151"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_SHARING_DEBUG_ADDR"},
 			Destination: &cfg.Reva.Sharing.DebugAddr,
 		},
 
 		// Services
+
+		// Gateway
+
+		&cli.StringFlag{
+			Name:        "reva-gateway-addr",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "127.0.0.1:9142"),
+			Usage:       "Address of REVA gateway endpoint",
+			EnvVars:     []string{"REVA_GATEWAY"},
+			Destination: &cfg.Reva.Gateway.Endpoint,
+		},
 
 		// Sharing
 
@@ -32,7 +42,7 @@ func SharingWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Sharing.GRPCAddr, "0.0.0.0:9150"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Sharing.GRPCAddr, "127.0.0.1:9150"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_SHARING_GRPC_ADDR"},
 			Destination: &cfg.Reva.Sharing.GRPCAddr,

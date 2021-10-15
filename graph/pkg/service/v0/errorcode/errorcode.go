@@ -2,9 +2,11 @@ package errorcode
 
 import (
 	"net/http"
+	"time"
 
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
-	msgraph "github.com/yaegashi/msgraph.go/v1.0"
+	msgraph "github.com/owncloud/open-graph-api-go"
 )
 
 // ErrorCode defines code as used in MS Graph - see https://docs.microsoft.com/en-us/graph/errors?context=graph%2Fapi%2F1.0&view=graph-rest-1.0
@@ -17,6 +19,8 @@ const (
 	ActivityLimitReached
 	// GeneralException defines the error if an unspecified error has occurred.
 	GeneralException
+	// InvalidAuthenticationToken defines the error if the access token is missing
+	InvalidAuthenticationToken
 	// InvalidRange defines the error if the specified byte range is invalid or unavailable.
 	InvalidRange
 	// InvalidRequest defines the error if the request is malformed or incorrect.
@@ -47,6 +51,7 @@ var errorCodes = [...]string{
 	"accessDenied",
 	"activityLimitReached",
 	"generalException",
+	"InvalidAuthenticationToken",
 	"invalidRange",
 	"invalidRequest",
 	"itemNotFound",
@@ -62,9 +67,19 @@ var errorCodes = [...]string{
 }
 
 // Render writes an Graph ErrorObject to the response writer
-func (e ErrorCode) Render(w http.ResponseWriter, r *http.Request, status int) {
-	resp := &msgraph.ErrorObject{
-		Code: e.String(),
+func (e ErrorCode) Render(w http.ResponseWriter, r *http.Request, status int, msg string) {
+	innererror := map[string]interface{}{
+		"date": time.Now().UTC().Format(time.RFC3339),
+		// TODO return client-request-id?
+	}
+
+	innererror["request-id"] = middleware.GetReqID(r.Context())
+	resp := &msgraph.OdataError{
+		Error: msgraph.OdataErrorMain{
+			Code:       e.String(),
+			Message:    msg,
+			Innererror: &innererror,
+		},
 	}
 	render.Status(r, status)
 	render.JSON(w, r, resp)

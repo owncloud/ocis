@@ -8,13 +8,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coreos/go-oidc"
+	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/cs3org/reva/pkg/token/manager/jwt"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	pkgmiddleware "github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/proxy/pkg/config"
@@ -29,6 +31,7 @@ import (
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
+	"github.com/urfave/cli/v2"
 	"golang.org/x/oauth2"
 )
 
@@ -43,7 +46,11 @@ func Server(cfg *config.Config) *cli.Command {
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
-			cfg.PreSignedURL.AllowedHTTPMethods = ctx.StringSlice("presignedurl-allow-method")
+			// StringSliceFlag doesn't support Destination
+			// UPDATE Destination on string flags supported. Wait for https://github.com/urfave/cli/pull/1078 to get to micro/cli
+			if len(ctx.StringSlice("presignedurl-allow-method")) > 0 {
+				cfg.PreSignedURL.AllowedHTTPMethods = ctx.StringSlice("presignedurl-allow-method")
+			}
 
 			if err := loadUserAgent(ctx, cfg); err != nil {
 				return err
@@ -58,7 +65,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
-			if err := tracing.Configure(cfg, logger); err != nil {
+			if err := tracing.Configure(cfg); err != nil {
 				return err
 			}
 
@@ -146,14 +153,23 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 	var userProvider backend.UserBackend
 	switch cfg.AccountBackend {
 	case "accounts":
+		tokenManager, err := jwt.New(map[string]interface{}{
+			"secret":  cfg.TokenManager.JWTSecret,
+			"expires": int64(24 * 60 * 60),
+		})
+		if err != nil {
+			l.Error().Err(err).
+				Msg("Failed to create token manager")
+		}
 		userProvider = backend.NewAccountsServiceUserBackend(
 			acc.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient),
 			rolesClient,
 			cfg.OIDC.Issuer,
+			tokenManager,
 			l,
 		)
 	case "cs3":
-		userProvider = backend.NewCS3UserBackend(revaClient, rolesClient, revaClient, l)
+		userProvider = backend.NewCS3UserBackend(rolesClient, revaClient, cfg.MachineAuthAPIKey, l)
 	default:
 		l.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)
 	}
@@ -176,7 +192,14 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 	}
 
 	return alice.New(
+		// first make sure we log all requests and redirect to https if necessary
+		pkgmiddleware.TraceContext,
+		chimiddleware.RealIP,
+		chimiddleware.RequestID,
+		middleware.AccessLog(l),
 		middleware.HTTPSRedirect,
+
+		// now that we established the basics, on with authentication middleware
 		middleware.Authentication(
 			// OIDC Options
 			middleware.OIDCProviderFunc(func() (middleware.OIDCProvider, error) {
@@ -209,8 +232,18 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 			middleware.Logger(l),
 			middleware.UserProvider(userProvider),
 			middleware.TokenManagerConfig(cfg.TokenManager),
+			middleware.UserOIDCClaim(cfg.UserOIDCClaim),
+			middleware.UserCS3Claim(cfg.UserCS3Claim),
 			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
 		),
+
+		middleware.SelectorCookie(
+			middleware.Logger(l),
+			middleware.UserProvider(userProvider),
+			middleware.PolicySelectorConfig(*cfg.PolicySelector),
+		),
+
+		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(l),
 			middleware.TokenManagerConfig(cfg.TokenManager),

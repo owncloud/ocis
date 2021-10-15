@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/asim/go-micro/v3"
-
-	"github.com/owncloud/ocis/idp/pkg/crypto"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	svc "github.com/owncloud/ocis/idp/pkg/service/v0"
+	pkgcrypto "github.com/owncloud/ocis/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
 )
@@ -24,7 +24,7 @@ func Server(opts ...Option) (http.Service, error) {
 
 			if os.IsNotExist(certErr) || os.IsNotExist(keyErr) {
 				options.Logger.Info().Msgf("Generating certs")
-				if err := crypto.GenCert(options.Logger); err != nil {
+				if err := pkgcrypto.GenCert(options.Config.HTTP.TLSCert, options.Config.HTTP.TLSKey, options.Logger); err != nil {
 					options.Logger.Fatal().Err(err).Msg("Could not setup TLS")
 					os.Exit(1)
 				}
@@ -58,8 +58,9 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
-			middleware.RealIP,
-			middleware.RequestID,
+			chimiddleware.RealIP,
+			chimiddleware.RequestID,
+			middleware.TraceContext,
 			middleware.NoCache,
 			middleware.Cors,
 			middleware.Secure,
@@ -74,7 +75,6 @@ func Server(opts ...Option) (http.Service, error) {
 	)
 
 	{
-		handle = svc.NewTracing(handle)
 		handle = svc.NewInstrument(handle, options.Metrics)
 		handle = svc.NewLogging(handle, options.Logger)
 	}
@@ -83,6 +83,5 @@ func Server(opts ...Option) (http.Service, error) {
 		return http.Service{}, err
 	}
 
-	service.Init()
 	return service, nil
 }

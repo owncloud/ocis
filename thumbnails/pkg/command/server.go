@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
@@ -13,6 +12,7 @@ import (
 	"github.com/owncloud/ocis/thumbnails/pkg/server/debug"
 	"github.com/owncloud/ocis/thumbnails/pkg/server/grpc"
 	"github.com/owncloud/ocis/thumbnails/pkg/tracing"
+	"github.com/urfave/cli/v2"
 )
 
 // Server is the entrypoint for the server command.
@@ -23,7 +23,12 @@ func Server(cfg *config.Config) *cli.Command {
 		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
 			logger := NewLogger(cfg)
-			cfg.Thumbnail.Resolutions = ctx.StringSlice("thumbnail-resolution")
+
+			// StringSliceFlag doesn't support Destination
+			// UPDATE Destination on string flags supported. Wait for https://github.com/urfave/cli/pull/1078 to get to micro/cli
+			if len(ctx.StringSlice("thumbnail-resolution")) > 0 {
+				cfg.Thumbnail.Resolutions = ctx.StringSlice("thumbnail-resolution")
+			}
 
 			if !cfg.Supervised {
 				return ParseConfig(ctx, cfg)
@@ -33,7 +38,7 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
-			if err := tracing.Configure(cfg, logger); err != nil {
+			if err := tracing.Configure(cfg); err != nil {
 				return err
 			}
 

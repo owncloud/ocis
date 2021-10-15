@@ -10,14 +10,15 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/storage/pkg/command/storagedrivers"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // StorageHome is the entrypoint for the storage-home command.
@@ -43,14 +44,6 @@ func StorageHome(cfg *config.Config) *cli.Command {
 			uuid := uuid.Must(uuid.NewV4())
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
-			// override driver enable home option with home config
-			if cfg.Reva.Storages.Home.EnableHome {
-				cfg.Reva.Storages.Common.EnableHome = true
-				cfg.Reva.Storages.EOS.EnableHome = true
-				cfg.Reva.Storages.Local.EnableHome = true
-				cfg.Reva.Storages.OwnCloud.EnableHome = true
-				cfg.Reva.Storages.S3.EnableHome = true
-			}
 			rcfg := storageHomeConfigFromStruct(c, cfg)
 
 			gr.Add(func() error {
@@ -85,7 +78,7 @@ func StorageHome(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageMetadata.Supervised {
+			if !cfg.Reva.StorageHome.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
@@ -115,7 +108,7 @@ func storageHomeConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 			"services": map[string]interface{}{
 				"storageprovider": map[string]interface{}{
 					"driver":             cfg.Reva.StorageHome.Driver,
-					"drivers":            drivers(cfg),
+					"drivers":            storagedrivers.HomeDrivers(cfg),
 					"mount_path":         cfg.Reva.StorageHome.MountPath,
 					"mount_id":           cfg.Reva.StorageHome.MountID,
 					"expose_data_server": cfg.Reva.StorageHome.ExposeDataServer,
@@ -132,13 +125,19 @@ func storageHomeConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 				"dataprovider": map[string]interface{}{
 					"prefix":      cfg.Reva.StorageHome.HTTPPrefix,
 					"driver":      cfg.Reva.StorageHome.Driver,
-					"drivers":     drivers(cfg),
+					"drivers":     storagedrivers.HomeDrivers(cfg),
 					"timeout":     86400,
 					"insecure":    true,
 					"disable_tus": false,
 				},
 			},
 		},
+	}
+	if cfg.Reva.StorageHome.ReadOnly {
+		gcfg := rcfg["grpc"].(map[string]interface{})
+		gcfg["interceptors"] = map[string]interface{}{
+			"readonly": map[string]interface{}{},
+		}
 	}
 	return rcfg
 }
@@ -161,8 +160,9 @@ func NewStorageHome(cfg *ociscfg.Config) suture.Service {
 func (s StorageHomeSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.StorageHome.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range StorageHome(s.cfg).Flags {
-		if err := StorageHome(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := StorageHome(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

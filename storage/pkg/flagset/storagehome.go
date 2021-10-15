@@ -1,9 +1,10 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/owncloud/ocis/storage/pkg/flagset/userdrivers"
+	"github.com/urfave/cli/v2"
 )
 
 // StorageHomeWithConfig applies cfg to the root flagset
@@ -13,7 +14,7 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StorageHome.DebugAddr, "0.0.0.0:9156"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageHome.DebugAddr, "127.0.0.1:9156"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_HOME_DEBUG_ADDR"},
 			Destination: &cfg.Reva.StorageHome.DebugAddr,
@@ -32,7 +33,7 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "grpc-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StorageHome.GRPCAddr, "0.0.0.0:9154"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageHome.GRPCAddr, "127.0.0.1:9154"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_HOME_GRPC_ADDR"},
 			Destination: &cfg.Reva.StorageHome.GRPCAddr,
@@ -46,7 +47,7 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StorageHome.HTTPAddr, "0.0.0.0:9155"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageHome.HTTPAddr, "127.0.0.1:9155"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_HOME_HTTP_ADDR"},
 			Destination: &cfg.Reva.StorageHome.HTTPAddr,
@@ -74,6 +75,13 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "storage driver for home mount: eg. local, eos, owncloud, ocis or s3",
 			EnvVars:     []string{"STORAGE_HOME_DRIVER"},
 			Destination: &cfg.Reva.StorageHome.Driver,
+		},
+		&cli.BoolFlag{
+			Name:        "read-only",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.StorageHome.ReadOnly, false),
+			Usage:       "use storage driver in read-only mode",
+			EnvVars:     []string{"STORAGE_HOME_READ_ONLY", "OCIS_STORAGE_READ_ONLY"},
+			Destination: &cfg.Reva.StorageHome.ReadOnly,
 		},
 		&cli.StringFlag{
 			Name:        "mount-path",
@@ -119,23 +127,16 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_HOME_TMP_FOLDER"},
 			Destination: &cfg.Reva.StorageHome.TempFolder,
 		},
-		&cli.BoolFlag{
-			Name:        "enable-home",
-			Value:       flags.OverrideDefaultBool(cfg.Reva.Storages.Home.EnableHome, true),
-			Usage:       "enable the creation of home directories",
-			EnvVars:     []string{"STORAGE_HOME_ENABLE_HOME"},
-			Destination: &cfg.Reva.Storages.Home.EnableHome,
-		},
 
 		// some drivers need to look up users at the gateway
 
 		// Gateway
 
 		&cli.StringFlag{
-			Name:        "gateway-endpoint",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142"),
-			Usage:       "endpoint to use for the storage gateway service",
-			EnvVars:     []string{"STORAGE_GATEWAY_ENDPOINT"},
+			Name:        "reva-gateway-addr",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "127.0.0.1:9142"),
+			Usage:       "Address of REVA gateway endpoint",
+			EnvVars:     []string{"REVA_GATEWAY"},
 			Destination: &cfg.Reva.Gateway.Endpoint,
 		},
 		// User provider
@@ -152,10 +153,13 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 	flags = append(flags, TracingWithConfig(cfg)...)
 	flags = append(flags, DebugWithConfig(cfg)...)
 	flags = append(flags, SecretWithConfig(cfg)...)
-	flags = append(flags, DriverEOSWithConfig(cfg)...)
-	flags = append(flags, DriverLocalWithConfig(cfg)...)
-	flags = append(flags, DriverOwnCloudWithConfig(cfg)...)
-	flags = append(flags, DriverOCISWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverEOSWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverLocalWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverOwnCloudWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverOwnCloudSQLWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverOCISWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverS3NGWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverS3WithConfig(cfg)...)
 
 	return flags
 }

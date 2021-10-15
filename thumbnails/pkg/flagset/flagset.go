@@ -3,8 +3,8 @@ package flagset
 import (
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // HealthWithConfig applies cfg to the root flagset
@@ -12,7 +12,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9189"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9189"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"THUMBNAILS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -57,28 +57,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
 			Usage:       "Enable sending traces",
-			EnvVars:     []string{"THUMBNAILS_TRACING_ENABLED"},
+			EnvVars:     []string{"THUMBNAILS_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
-			EnvVars:     []string{"THUMBNAILS_TRACING_TYPE"},
+			EnvVars:     []string{"THUMBNAILS_TRACING_TYPE", "OCIS_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Endpoint, ""),
 			Usage:       "Endpoint for the agent",
-			EnvVars:     []string{"THUMBNAILS_TRACING_ENDPOINT"},
+			EnvVars:     []string{"THUMBNAILS_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Collector, ""),
 			Usage:       "Endpoint for the collector",
-			EnvVars:     []string{"THUMBNAILS_TRACING_COLLECTOR"},
+			EnvVars:     []string{"THUMBNAILS_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
@@ -90,7 +90,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9189"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9189"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"THUMBNAILS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -123,7 +123,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "grpc-addr",
-			Value:       flags.OverrideDefaultString(cfg.Server.Address, "0.0.0.0:9185"),
+			Value:       flags.OverrideDefaultString(cfg.Server.Address, "127.0.0.1:9185"),
 			Usage:       "Address to bind grpc server",
 			EnvVars:     []string{"THUMBNAILS_GRPC_ADDR"},
 			Destination: &cfg.Server.Address,
@@ -145,8 +145,8 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "reva-gateway-addr",
 			Value:       flags.OverrideDefaultString(cfg.Thumbnail.RevaGateway, "127.0.0.1:9142"),
-			Usage:       "Reva gateway address",
-			EnvVars:     []string{"THUMBNAILS_REVA_GATEWAY", "PROXY_REVA_GATEWAY_ADDR"},
+			Usage:       "Address of REVA gateway endpoint",
+			EnvVars:     []string{"REVA_GATEWAY"},
 			Destination: &cfg.Thumbnail.RevaGateway,
 		},
 		&cli.BoolFlag{
@@ -161,6 +161,17 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Value:   cli.NewStringSlice("16x16", "32x32", "64x64", "128x128", "1920x1080", "3840x2160", "7680x4320"),
 			Usage:   "--thumbnail-resolution 16x16 [--thumbnail-resolution 32x32]",
 			EnvVars: []string{"THUMBNAILS_RESOLUTIONS"},
+		},
+		&cli.StringFlag{
+			Name:        "webdav-namespace",
+			Value:       flags.OverrideDefaultString(cfg.Thumbnail.WebdavNamespace, "/home"),
+			Usage:       "Namespace prefix for the webdav endpoint",
+			EnvVars:     []string{"STORAGE_WEBDAV_NAMESPACE"},
+			Destination: &cfg.Thumbnail.WebdavNamespace,
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode",
 		},
 	}
 }

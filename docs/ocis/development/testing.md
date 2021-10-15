@@ -39,7 +39,7 @@ You can invoke two types of test suite runs:
 
 The names of the full test suite make targets have the same naming as in the CI pipeline.
 
-For example `make -C tests/acceptance/docker localApiTests-apiBugDemonstration-ocis` runs the same tests as the `localApiTests-apiBugDemonstration-ocis` CI pipeline, which runs the oCIS test suite "apiBugDemonstration" against an oCIS with oCIS storage.
+For example `make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-ocis` runs the same tests as the `localApiTests-apiAccountsHashDifficulty-ocis` CI pipeline, which runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with oCIS storage.
 
 For example `make -C tests/acceptance/docker Core-API-Tests-owncloud-storage-3`runs the same tests as the `Core-API-Tests-owncloud-storage-3` CI pipeline, which runs the third (out of ten) ownCloud test suite against an oCIS with owncloud storage.
 
@@ -48,7 +48,7 @@ For example `make -C tests/acceptance/docker Core-API-Tests-owncloud-storage-3`r
 The single feature tests can also be run against the different storage backends. Therefore multiple make targets with the schema test-<test source>-feature-<storage backend> exists. For selecting a single feature test you have to add an additional `BEHAT_FEATURE=...` parameter when invoking the make command:
 
 ```
-make -C tests/acceptance/docker test-ocis-feature-ocis BEHAT_FEATURE='tests/acceptance/features/apiBugDemonstration/apiAuthOcs-ocsDELETEAuth.feature'
+make -C tests/acceptance/docker test-ocis-feature-ocis BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature'
 ```
 
 This must be pointing to a valid feature definition.
@@ -58,7 +58,7 @@ This must be pointing to a valid feature definition.
 By default the tests will be run against docker image built from your current working state of the oCIS repository. For some purposes it might also be handy to use a oCIS image from Docker Hub. Therefore you can provide the optional flag `OCIS_IMAGE_TAG=...` which must contain an available docker tag of the [owncloud/ocis registry on Docker Hub](https://hub.docker.com/r/owncloud/ocis) (eg. 'latest').
 
 ```
-make -C tests/acceptance/docker localApiTests-apiBugDemonstration-ocis OCIS_IMAGE_TAG=latest
+make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-ocis OCIS_IMAGE_TAG=latest
 ```
 
 ### Test log output
@@ -117,8 +117,8 @@ Then run the api acceptance tests with the following command from the root of th
 make test-acceptance-api \
 TEST_SERVER_URL=https://localhost:9200 \
 TEST_OCIS=true \
+STORAGE_DRIVER=OCIS \
 SKELETON_DIR=apps/testing/data/apiSkeleton \
-DELETE_USER_DATA_CMD='rm -rf /var/tmp/ocis/storage/users/nodes/root/* /var/tmp/ocis/storage/users/nodes/*-*-*-*' \
 BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS'
 ```
 
@@ -127,6 +127,8 @@ Make sure to adjust the settings `TEST_SERVER_URL` and `OCIS_REVA_DATA_ROOT` acc
 This will run all tests that are relevant to oCIS.
 
 To run a single test add `BEHAT_FEATURE=<feature file>`
+
+To run tests with a different storage driver set `STORAGE_DRIVER` to the correct value. It can be set to `OCIS` or `OWNCLOUD` and uses `OWNCLOUD` as the default value.
 
 ### use existing tests for BDD
 
@@ -137,20 +139,17 @@ Every scenario that does not work in oCIS with "ocis" storage, is listed in `tes
 Those scenarios are run in the ordinary acceptance test pipeline in CI. The scenarios that fail are checked against the
 expected failures. If there are any differences then the CI pipeline fails.
 Similarly, scenarios that do not work in oCIS with EOS storage are listed in `tests/acceptance/expected-failures-on-EOS-storage.md`.
-Additionally, some issues have scenarios that demonstrate the current buggy behaviour in ocis(reva).
-Those scenarios are in this ocis repository in `tests/acceptance/features/apiBugDemonstration`.
-Have a look into the [documentation](https://doc.owncloud.com/server/developer_manual/testing/acceptance-tests.html#writing-scenarios-for-bugs) to understand why we are writing those tests.
 
 If you want to work on a specific issue
 
-1.  adjust the core commit id to the latest commit in core so that CI will run the latest test code and scenarios from core.
+1. adjust the core commit id to the latest commit in core so that CI will run the latest test code and scenarios from core.
     For that change `CORE_COMMITID` in `.drone.env`:
 
         # The test runner source for API tests
         CORE_COMMITID=38c91e5cf5fc4ffdc0536ba1d147a2a618ef83b5
         CORE_BRANCH=master
 
-2.  locally run each of the tests marked with that issue in the expected failures file.
+2. locally run each of the tests marked with that issue in the expected failures file.
 
     E.g.:
 
@@ -158,14 +157,12 @@ If you want to work on a specific issue
     make test-acceptance-api \
     TEST_SERVER_URL=https://localhost:9200 \
     TEST_OCIS=true \
-    DELETE_USER_DATA_CMD='rm -rf /var/tmp/ocis/storage/users/nodes/root/* /var/tmp/ocis/storage/users/nodes/*-*-*-*' \
+    STORAGE_DRIVER=OCIS \
     BEHAT_FEATURE='tests/acceptance/features/apiComments/comments.feature:123'
     ```
 
-3.  the tests will fail, try to understand how and why they are failing
-4.  fix the code
-5.  go back to 2. and repeat till the tests are passing.
-6.  remove those tests from the expected failures file
-7.  run each of the local tests that were demonstrating the **buggy** behavior. They should fail.
-8.  delete each of the local tests that were demonstrating the **buggy** behavior.
-9.  make a PR that has the fixed code, relevant lines removed from the expected failures file and bug demonstration tests deleted.
+3. the tests will fail, try to understand how and why they are failing
+4. fix the code
+5. go back to 2. and repeat till the tests are passing.
+6. remove those tests from the expected failures file
+7. make a PR that has the fixed code, and the relevant lines removed from the expected failures file.

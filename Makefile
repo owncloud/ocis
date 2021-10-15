@@ -24,7 +24,6 @@ OCIS_MODULES = \
 	ocis \
 	ocis-pkg \
 	ocs \
-	onlyoffice \
 	proxy \
 	settings \
 	storage \
@@ -33,7 +32,7 @@ OCIS_MODULES = \
 	web \
 	webdav
 
-ifneq (, $(shell which go 2> /dev/null)) # supress `command not found warnings` for non go targets in CI
+ifneq (, $(shell which go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include .bingo/Variables.mk
 endif
 
@@ -191,3 +190,7 @@ l10n-write:
 	@for extension in $(L10N_MODULES); do \
     	make -C $$extension l10n-write; \
     done
+
+.PHONY: ci-format
+ci-format: $(BUILDIFIER)
+	$(BUILDIFIER) --mode=fix .drone.star

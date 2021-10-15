@@ -39,6 +39,35 @@ type StorageRegistry struct {
 	JSON         string
 }
 
+// AppRegistry defines the available app registry configuration
+type AppRegistry struct {
+	Driver        string
+	MimetypesJSON string
+}
+
+// AppProvider defines the available app provider configuration
+type AppProvider struct {
+	Port
+	ExternalAddr string
+	Driver       string
+	WopiDriver   WopiDriver
+	AppsURL      string
+	OpenURL      string
+}
+
+type WopiDriver struct {
+	AppAPIKey      string
+	AppDesktopOnly bool
+	AppIconURI     string
+	AppInternalURL string
+	AppName        string
+	AppURL         string
+	Insecure       bool
+	IopSecret      string
+	JWTSecret      string
+	WopiURL        string
+}
+
 // Sharing defines the available sharing configuration.
 type Sharing struct {
 	Port
@@ -54,6 +83,7 @@ type Sharing struct {
 	PublicPasswordHashCost           int
 	PublicEnableExpiredSharesCleanup bool
 	PublicJanitorRunInterval         int
+	UserStorageMountID               string
 }
 
 // Port defines the available port configuration.
@@ -97,6 +127,13 @@ type Users struct {
 	UserGroupsCacheExpiration int
 }
 
+// AuthBearerConfig defines the available configuration for the bearer auth drivers.
+type AuthBearerConfig struct {
+	Port
+	Driver            string
+	MachineAuthAPIKey string
+}
+
 // Groups defines the available groups configuration.
 type Groups struct {
 	Port
@@ -109,13 +146,18 @@ type Groups struct {
 type FrontendPort struct {
 	Port
 
-	DatagatewayPrefix string
-	OCDavPrefix       string
-	OCSPrefix         string
-	OCSSharePrefix    string
-	OCSHomeNamespace  string
-	PublicURL         string
-	Middleware        Middleware
+	AppProviderPrefix       string
+	ArchiverPrefix          string
+	DatagatewayPrefix       string
+	Favorites               bool
+	OCDavPrefix             string
+	OCSPrefix               string
+	OCSSharePrefix          string
+	OCSHomeNamespace        string
+	PublicURL               string
+	OCSCacheWarmupDriver    string
+	OCSResourceInfoCacheTTL int
+	Middleware              Middleware
 }
 
 // Middleware configures reva middlewares.
@@ -147,6 +189,7 @@ type StoragePort struct {
 	// for HTTP ports with only one http service
 	HTTPPrefix string
 	TempFolder string
+	ReadOnly   bool
 }
 
 // PublicStorage configures a public storage provider
@@ -159,13 +202,13 @@ type PublicStorage struct {
 
 // StorageConfig combines all available storage driver configuration parts.
 type StorageConfig struct {
-	Home     DriverCommon
-	EOS      DriverEOS
-	Local    DriverCommon
-	OwnCloud DriverOwnCloud
-	S3       DriverS3
-	Common   DriverCommon
-	OCIS     DriverOCIS
+	EOS         DriverEOS
+	Local       DriverCommon
+	OwnCloud    DriverOwnCloud
+	OwnCloudSQL DriverOwnCloudSQL
+	S3          DriverS3
+	S3NG        DriverS3NG
+	OCIS        DriverOCIS
 	// TODO checksums ... figure out what that is supposed to do
 }
 
@@ -245,6 +288,8 @@ type DriverEOS struct {
 
 // DriverOCIS defines the available oCIS storage driver configuration.
 type DriverOCIS struct {
+	DriverCommon
+
 	ServiceUserUUID string
 }
 
@@ -257,8 +302,31 @@ type DriverOwnCloud struct {
 	Scan          bool
 }
 
+// DriverOwnCloudSQL defines the available ownCloudSQL storage driver configuration.
+type DriverOwnCloudSQL struct {
+	DriverCommon
+
+	UploadInfoDir string
+	DBUsername    string
+	DBPassword    string
+	DBHost        string
+	DBPort        int
+	DBName        string
+}
+
 // DriverS3 defines the available S3 storage driver configuration.
 type DriverS3 struct {
+	DriverCommon
+
+	Region    string
+	AccessKey string
+	SecretKey string
+	Endpoint  string
+	Bucket    string
+}
+
+// DriverS3NG defines the available s3ng storage driver configuration.
+type DriverS3NG struct {
 	DriverCommon
 
 	Region    string
@@ -281,6 +349,8 @@ type OIDC struct {
 type LDAP struct {
 	Hostname             string
 	Port                 int
+	CACert               string
+	Insecure             bool
 	BaseDN               string
 	LoginFilter          string
 	UserFilter           string
@@ -311,6 +381,20 @@ type UserGroupRest struct {
 	TargetAPI         string
 }
 
+// UserOwnCloudSQL defines the available ownCloudSQL user provider configuration.
+type UserOwnCloudSQL struct {
+	DBUsername         string
+	DBPassword         string
+	DBHost             string
+	DBPort             int
+	DBName             string
+	Idp                string
+	Nobody             int64
+	JoinUsername       bool
+	JoinOwnCloudUUID   bool
+	EnableMedialSearch bool
+}
+
 // LDAPUserSchema defines the available ldap user schema configuration.
 type LDAPUserSchema struct {
 	UID         string
@@ -336,6 +420,13 @@ type OCDav struct {
 	DavFilesNamespace string
 }
 
+// Archiver defines the available archiver configuration.
+type Archiver struct {
+	MaxNumFiles int64
+	MaxSize     int64
+	ArchiverURL string
+}
+
 // Reva defines the available reva configuration.
 type Reva struct {
 	// JWTSecret used to sign jwt tokens between services
@@ -345,16 +436,21 @@ type Reva struct {
 	OIDC            OIDC
 	LDAP            LDAP
 	UserGroupRest   UserGroupRest
+	UserOwnCloudSQL UserOwnCloudSQL
 	OCDav           OCDav
-	Storages        StorageConfig
+	Archiver        Archiver
+	UserStorage     StorageConfig
+	MetadataStorage StorageConfig
 	// Ports are used to configure which services to start on which port
 	Frontend          FrontendPort
 	DataGateway       DataGatewayPort
 	Gateway           Gateway
 	StorageRegistry   StorageRegistry
+	AppRegistry       AppRegistry
 	Users             Users
 	Groups            Groups
 	AuthProvider      Users
+	AuthBearerConfig  AuthBearerConfig
 	AuthBasic         Port
 	AuthBearer        Port
 	Sharing           Sharing
@@ -362,6 +458,7 @@ type Reva struct {
 	StorageUsers      StoragePort
 	StoragePublicLink PublicStorage
 	StorageMetadata   StoragePort
+	AppProvider       AppProvider
 	// Configs can be used to configure the reva instance.
 	// Services and Ports will be ignored if this is used
 	Configs map[string]interface{}

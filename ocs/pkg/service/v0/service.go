@@ -6,8 +6,8 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
@@ -165,7 +165,7 @@ func (o Ocs) getCS3Backend() backend.UserBackend {
 	if err != nil {
 		o.logger.Fatal().Msgf("could not get reva client at address %s", o.config.RevaAddress)
 	}
-	return backend.NewCS3UserBackend(revaClient, nil, revaClient, o.logger)
+	return backend.NewCS3UserBackend(nil, revaClient, o.config.MachineAuthAPIKey, o.logger)
 }
 
 func (o Ocs) getGroupsService() accounts.GroupsService {

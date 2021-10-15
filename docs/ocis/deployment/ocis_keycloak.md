@@ -19,7 +19,7 @@ geekdocFilePath: ocis_keycloak.md
 
 The docker stack consists 4 containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
 
-Keykloak add two containers: Keycloak itself and a PostgreSQL as database. Keycloak will be configured as oCIS' IDP instead of the internal IDP [Konnectd]({{< ref "../../extensions/idp" >}})
+Keycloak add two containers: Keycloak itself and a PostgreSQL as database. Keycloak will be configured as oCIS' IDP instead of the internal IDP [LibreGraph Connect]({{< ref "../../extensions/idp" >}})
 
 The other container is oCIS itself running all extensions in one container. In this example oCIS uses [oCIS storage driver]({{< ref "../../extensions/storage/storages#storage-drivers" >}})
 
@@ -76,6 +76,10 @@ See also [example server setup]({{< ref "preparing_server" >}})
   STORAGE_LDAP_BIND_PASSWORD=
   # JWT secret which is used for the storage provider. Must be changed in order to have a secure oCIS. Defaults to "Pive-Fumkiu4"
   OCIS_JWT_SECRET=
+  # JWT secret which is used for uploads to create transfer tokens. Must be changed in order to have a secure oCIS. Defaults to "replace-me-with-a-transfer-secret"
+  STORAGE_TRANSFER_SECRET=
+  # Machine auth api key secret. Must be changed in order to have a secure oCIS. Defaults to "change-me-please"
+  OCIS_MACHINE_AUTH_API_KEY=
 
   ### Keycloak ###
   # Domain of Keycloak, where you can find the management and authentication frontend. Defaults to "keycloak.owncloud.test"
@@ -117,7 +121,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   `docker-compose up -d`
 
-* You now can visit oCIS, Keycloak and Traefik dashboard on your configured domains
+* You now can visit oCIS, Keycloak and Traefik dashboard on your configured domains. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
 
 ## Local setup
 For a more simple local ocis setup see [Getting started]({{< ref "../getting-started" >}})
@@ -137,4 +141,4 @@ After that you're ready to start the application stack:
 
 Open https://keycloak.owncloud.test in your browser and accept the invalid certificate warning.
 
-Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You now can login to oCIS with the demo users.
+Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You now can login to oCIS with the demo users. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.

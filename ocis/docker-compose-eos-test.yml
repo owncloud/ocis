@@ -47,7 +47,7 @@ services:
       # the eos end xrdcopy binaries use this env var to find the eos mgm
       EOS_MGM_URL: ${EOS_MGM_URL:-root://mgm-master.testnet:1094}
       # TODO without this the /etc/nclcd.conf file is empty
-      LDAP_BINDDN: "cn=reva,ou=sysusers,dc=example,dc=org"
+      LDAP_BINDDN: "cn=reva,ou=sysusers,dc=ocis,dc=test"
       LDAP_BINDPW: "reva"
 
   mgm-master:

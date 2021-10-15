@@ -1,9 +1,12 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
+	"path"
+
 	"github.com/owncloud/ocis/ocis-pkg/flags"
+	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
 	"github.com/owncloud/ocis/proxy/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // RootWithConfig applies cfg to the root flagset
@@ -27,6 +30,10 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"PROXY_LOG_COLOR", "OCIS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode",
+		},
 	}
 }
 
@@ -35,7 +42,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9109"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9109"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"PROXY_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -62,28 +69,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.BoolFlag{
 			Name:        "tracing-enabled",
 			Usage:       "Enable sending traces",
-			EnvVars:     []string{"PROXY_TRACING_ENABLED"},
+			EnvVars:     []string{"PROXY_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
-			EnvVars:     []string{"PROXY_TRACING_TYPE"},
+			EnvVars:     []string{"PROXY_TRACING_TYPE", "OCIS_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
 			Value:       "",
 			Usage:       "Endpoint for the agent",
-			EnvVars:     []string{"PROXY_TRACING_ENDPOINT"},
+			EnvVars:     []string{"PROXY_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
 			Value:       "",
 			Usage:       "Endpoint for the collector",
-			EnvVars:     []string{"PROXY_TRACING_COLLECTOR"},
+			EnvVars:     []string{"PROXY_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
@@ -95,7 +102,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9205"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9205"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"PROXY_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -134,13 +141,6 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.HTTP.Root,
 		},
 		&cli.StringFlag{
-			Name:        "asset-path",
-			Value:       flags.OverrideDefaultString(cfg.Asset.Path, ""),
-			Usage:       "Path to custom assets",
-			EnvVars:     []string{"PROXY_ASSET_PATH"},
-			Destination: &cfg.Asset.Path,
-		},
-		&cli.StringFlag{
 			Name:        "service-namespace",
 			Value:       flags.OverrideDefaultString(cfg.Service.Namespace, "com.owncloud.web"),
 			Usage:       "Set the base namespace for the service namespace",
@@ -156,14 +156,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-cert",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, ""),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(pkgos.MustUserConfigDir("ocis", "proxy"), "server.crt")),
 			Usage:       "Certificate file for transport encryption",
 			EnvVars:     []string{"PROXY_TRANSPORT_TLS_CERT"},
 			Destination: &cfg.HTTP.TLSCert,
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-key",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, ""),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(pkgos.MustUserConfigDir("ocis", "proxy"), "server.key")),
 			Usage:       "Secret file for transport encryption",
 			EnvVars:     []string{"PROXY_TRANSPORT_TLS_KEY"},
 			Destination: &cfg.HTTP.TLSKey,
@@ -185,8 +185,8 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "reva-gateway-addr",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Address, "127.0.0.1:9142"),
-			Usage:       "REVA Gateway Endpoint",
-			EnvVars:     []string{"PROXY_REVA_GATEWAY_ADDR"},
+			Usage:       "Address of REVA gateway endpoint",
+			EnvVars:     []string{"REVA_GATEWAY"},
 			Destination: &cfg.Reva.Address,
 		},
 		&cli.BoolFlag{
@@ -228,12 +228,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.OIDC.UserinfoCache.Size,
 		},
 
+		// account related config
+
 		&cli.BoolFlag{
 			Name:        "autoprovision-accounts",
 			Value:       flags.OverrideDefaultBool(cfg.AutoprovisionAccounts, false),
 			Usage:       "create accounts from OIDC access tokens to learn new users",
 			EnvVars:     []string{"PROXY_AUTOPROVISION_ACCOUNTS"},
 			Destination: &cfg.AutoprovisionAccounts,
+		},
+		&cli.StringFlag{
+			Name:        "user-oidc-claim",
+			Value:       flags.OverrideDefaultString(cfg.UserOIDCClaim, "email"),
+			Usage:       "The OIDC claim that is used to identify users, eg. 'ownclouduuid', 'uid', 'cn' or 'email'",
+			EnvVars:     []string{"PROXY_USER_OIDC_CLAIM"},
+			Destination: &cfg.UserOIDCClaim,
+		},
+		&cli.StringFlag{
+			Name:        "user-cs3-claim",
+			Value:       flags.OverrideDefaultString(cfg.UserCS3Claim, "mail"),
+			Usage:       "The CS3 claim to use when looking up a user in the CS3 users API, eg. 'userid', 'username' or 'mail'",
+			EnvVars:     []string{"PROXY_USER_CS3_CLAIM"},
+			Destination: &cfg.UserCS3Claim,
 		},
 
 		// Pre Signed URLs
@@ -266,6 +282,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "account-backend-type",
 			EnvVars:     []string{"PROXY_ACCOUNT_BACKEND_TYPE"},
 			Destination: &cfg.AccountBackend,
+		},
+
+		&cli.StringFlag{
+			Name:        "machine-auth-api-key",
+			Value:       flags.OverrideDefaultString(cfg.MachineAuthAPIKey, "change-me-please"),
+			Usage:       "the API key to be used for the machine auth driver in reva",
+			EnvVars:     []string{"PROXY_MACHINE_AUTH_API_KEY", "OCIS_MACHINE_AUTH_API_KEY"},
+			Destination: &cfg.MachineAuthAPIKey,
 		},
 
 		// Reva Middlewares Config

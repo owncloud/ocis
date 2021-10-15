@@ -12,20 +12,19 @@ import (
 	"github.com/asim/go-micro/plugins/client/grpc/v3"
 	merrors "github.com/asim/go-micro/v3/errors"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/pkg/auth/scope"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
-	"github.com/cs3org/reva/pkg/user"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
+	ocstracing "github.com/owncloud/ocis/ocs/pkg/tracing"
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
 	"github.com/pkg/errors"
 	"google.golang.org/genproto/protobuf/field_mask"
@@ -37,7 +36,7 @@ import (
 func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 	var account *accounts.Account
 	var err error
-	u, ok := user.ContextGetUser(r.Context())
+	u, ok := revactx.ContextGetUser(r.Context())
 	if !ok || u.Id == nil || u.Id.OpaqueId == "" {
 		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id")))
 		return
@@ -52,14 +51,13 @@ func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 		// TODO(someone) this fix is in place because if the user backend (PROXY_ACCOUNT_BACKEND_TYPE) is set to, for instance,
 		// cs3, we cannot count with the accounts service.
 		if u != nil {
-			uid, gid := o.extractUIDAndGID(u)
 			d := &data.User{
 				UserID:            u.Username,
 				DisplayName:       u.DisplayName,
 				LegacyDisplayName: u.DisplayName,
 				Email:             u.Mail,
-				UIDNumber:         uid,
-				GIDNumber:         gid,
+				UIDNumber:         u.UidNumber,
+				GIDNumber:         u.GidNumber,
 			}
 			mustNotFail(render.Render(w, r, response.DataRender(d)))
 			return
@@ -145,6 +143,12 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 			Definition: "default",
 		},
 	}
+
+	_, span := ocstracing.TraceProvider.
+		Tracer("ocs").
+		Start(r.Context(), "GetUser")
+	defer span.End()
+
 	mustNotFail(render.Render(w, r, response.DataRender(d)))
 }
 
@@ -374,7 +378,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		ctx := metadata.AppendToOutgoingContext(r.Context(), token.TokenHeader, t)
+		ctx := metadata.AppendToOutgoingContext(r.Context(), revactx.TokenHeader, t)
 
 		gwc, err := pool.GetGatewayServiceClient(o.config.RevaAddress)
 		if err != nil {
@@ -397,9 +401,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 		statResp, err := gwc.Stat(ctx, &provider.StatRequest{
 			Ref: &provider.Reference{
-				Spec: &provider.Reference_Path{
-					Path: homeResp.Path,
-				},
+				Path: homeResp.Path,
 			},
 		})
 
@@ -418,9 +420,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 		delReq := &provider.DeleteRequest{
 			Ref: &provider.Reference{
-				Spec: &provider.Reference_Id{
-					Id: statResp.Info.Id,
-				},
+				ResourceId: statResp.Info.Id,
 			},
 		}
 
@@ -440,9 +440,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 		req := &gateway.PurgeRecycleRequest{
 			Ref: &provider.Reference{
-				Spec: &provider.Reference_Path{
-					Path: homeResp.Path,
-				},
+				Path: homeResp.Path,
 			},
 		}
 
@@ -485,7 +483,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 func (o Ocs) mintTokenForUser(ctx context.Context, account *accounts.Account) (string, error) {
 	tm, _ := jwt.New(map[string]interface{}{
 		"secret":  o.config.TokenManager.JWTSecret,
-		"expires": int64(60),
+		"expires": int64(24 * 60 * 60),
 	})
 
 	u := &revauser.User{
@@ -493,21 +491,15 @@ func (o Ocs) mintTokenForUser(ctx context.Context, account *accounts.Account) (s
 			OpaqueId: account.Id,
 			Idp:      o.config.IdentityManagement.Address,
 		},
-		Groups: []string{},
-		Opaque: &types.Opaque{
-			Map: map[string]*types.OpaqueEntry{
-				"uid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.FormatInt(account.UidNumber, 10)),
-				},
-				"gid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.FormatInt(account.GidNumber, 10)),
-				},
-			},
-		},
+		Groups:    []string{},
+		UidNumber: account.UidNumber,
+		GidNumber: account.GidNumber,
 	}
-	return tm.MintToken(ctx, u)
+	s, err := scope.AddOwnerScope(nil)
+	if err != nil {
+		return "", err
+	}
+	return tm.MintToken(ctx, u, s)
 }
 
 // EnableUser enables a user
@@ -616,7 +608,7 @@ func (o Ocs) DisableUser(w http.ResponseWriter, r *http.Request) {
 // The signing key is part of the user settings and is used by the proxy to authenticate requests
 // Currently, the username is used as the OC-Credential
 func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
-	u, ok := user.ContextGetUser(r.Context())
+	u, ok := revactx.ContextGetUser(r.Context())
 	if !ok {
 		//o.logger.Error().Msg("missing user in context")
 		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context")))
@@ -741,40 +733,15 @@ func (o Ocs) fetchAccountByUsername(ctx context.Context, name string) (*accounts
 
 func (o Ocs) fetchAccountFromCS3Backend(ctx context.Context, name string) (*accounts.Account, error) {
 	backend := o.getCS3Backend()
-	u, err := backend.GetUserByClaims(ctx, "username", name, false)
+	u, _, err := backend.GetUserByClaims(ctx, "username", name, false)
 	if err != nil {
 		return nil, err
 	}
-	uid, gid := o.extractUIDAndGID(u)
 	return &accounts.Account{
 		OnPremisesSamAccountName: u.Username,
 		DisplayName:              u.DisplayName,
 		Mail:                     u.Mail,
-		UidNumber:                uid,
-		GidNumber:                gid,
+		UidNumber:                u.UidNumber,
+		GidNumber:                u.GidNumber,
 	}, nil
-}
-
-func (o Ocs) extractUIDAndGID(u *cs3.User) (int64, int64) {
-	var uid, gid int64
-	var err error
-	if u.Opaque != nil && u.Opaque.Map != nil {
-		if uidObj, ok := u.Opaque.Map["uid"]; ok {
-			if uidObj.Decoder == "plain" {
-				uid, err = strconv.ParseInt(string(uidObj.Value), 10, 64)
-				if err != nil {
-					o.logger.Error().Err(err).Interface("user", u).Msg("could not extract uid for user")
-				}
-			}
-		}
-		if gidObj, ok := u.Opaque.Map["gid"]; ok {
-			if gidObj.Decoder == "plain" {
-				gid, err = strconv.ParseInt(string(gidObj.Value), 10, 64)
-				if err != nil {
-					o.logger.Error().Err(err).Interface("user", u).Msg("could not extract gid for user")
-				}
-			}
-		}
-	}
-	return uid, gid
 }

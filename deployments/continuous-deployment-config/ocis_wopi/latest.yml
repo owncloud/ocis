@@ -1,0 +1,54 @@
+---
+- name: continuous-deployment-ocis-wopi-latest
+  server:
+    server_type: cx21
+    image: ubuntu-20.04
+    location: nbg1
+    initial_ssh_key_names:
+      - owncloud-ocis@drone.owncloud.com
+    labels:
+      owner: wkloucek
+      for: oCIS-continuous-deployment-examples
+    rebuild: $REBUILD
+    rebuild_carry_paths:
+      - /var/lib/docker/volumes/ocis_certs
+
+  domains:
+    - "*.ocis-wopi.latest.owncloud.works"
+
+  vars:
+    ssh_authorized_keys:
+      - https://github.com/butonic.keys
+      - https://github.com/C0rby.keys
+      - https://github.com/fschade.keys
+      - https://github.com/kulmann.keys
+      - https://github.com/micbar.keys
+      - https://github.com/pascalwengerter.keys
+      - https://github.com/paulcod3.keys
+      - https://github.com/refs.keys
+      - https://github.com/wkloucek.keys
+    docker_compose_projects:
+      - name: ocis
+        git_url: https://github.com/owncloud/ocis.git
+        ref: master
+        docker_compose_path: deployments/examples/ocis_wopi
+        env:
+          INSECURE: "false"
+          TRAEFIK_ACME_MAIL: wkloucek@owncloud.com
+          OCIS_DOCKER_TAG: latest
+          OCIS_DOMAIN: ocis.ocis-wopi.latest.owncloud.works
+          WOPISERVER_DOMAIN: wopiserver.ocis-wopi.latest.owncloud.works
+          COLLABORA_DOMAIN: collabora.ocis-wopi.latest.owncloud.works
+          ONLYOFFICE_DOMAIN: onlyoffice.ocis-wopi.latest.owncloud.works
+          CODIMD_DOMAIN: codimd.ocis-wopi.latest.owncloud.works
+          COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
+      - name: monitoring
+        git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git
+        ref: master
+        env:
+          NETWORK_NAME: ocis-net
+          TELEMETRY_SERVE_DOMAIN: telemetry.ocis-wopi.latest.owncloud.works
+          JAEGER_COLLECTOR: jaeger-collector.infra.owncloud.works:443
+          TELEGRAF_SPECIFIC_CONFIG: ocis_single_container
+          OCIS_URL: ocis.ocis-wopi.latest.owncloud.works
+          OCIS_DEPLOYMENT_ID: continuous-deployment-ocis-wopi-latest

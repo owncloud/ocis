@@ -5,18 +5,18 @@ import (
 	"strings"
 
 	glauthcfg "github.com/glauth/glauth/pkg/config"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/glauth/pkg/config"
-	"github.com/owncloud/ocis/glauth/pkg/crypto"
 	"github.com/owncloud/ocis/glauth/pkg/flagset"
 	"github.com/owncloud/ocis/glauth/pkg/metrics"
 	"github.com/owncloud/ocis/glauth/pkg/server/debug"
 	"github.com/owncloud/ocis/glauth/pkg/server/glauth"
 	"github.com/owncloud/ocis/glauth/pkg/tracing"
+	pkgcrypto "github.com/owncloud/ocis/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/urfave/cli/v2"
 )
 
 // Server is the entrypoint for the server command.
@@ -30,18 +30,24 @@ func Server(cfg *config.Config) *cli.Command {
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
-			cfg.Backend.Servers = ctx.StringSlice("backend-server")
-			cfg.Fallback.Servers = ctx.StringSlice("fallback-server")
+			// StringSliceFlag doesn't support Destination
+			// UPDATE Destination on string flags supported. Wait for https://github.com/urfave/cli/pull/1078 to get to micro/cli
+			if len(ctx.StringSlice("backend-server")) > 0 {
+				cfg.Backend.Servers = ctx.StringSlice("backend-server")
+			}
+			if len(ctx.StringSlice("fallback-server")) > 0 {
+				cfg.Fallback.Servers = ctx.StringSlice("fallback-server")
+			}
 			if !cfg.Supervised {
 				return ParseConfig(ctx, cfg)
 			}
-			logger.Debug().Str("service", "glauth").Msg("ignoring config file parsing when running supervised")
+			logger.Debug().Strs("backend-server", ctx.StringSlice("backend-server")).Str("service", "glauth").Msg("ignoring config file parsing when running supervised")
 			return nil
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
-			if err := tracing.Configure(cfg, logger); err != nil {
+			if err := tracing.Configure(cfg); err != nil {
 				return err
 			}
 
@@ -62,11 +68,11 @@ func Server(cfg *config.Config) *cli.Command {
 
 				lcfg := glauthcfg.LDAP{
 					Enabled: cfg.Ldap.Enabled,
-					Listen:  cfg.Ldap.Address,
+					Listen:  cfg.Ldap.Addr,
 				}
 				lscfg := glauthcfg.LDAPS{
 					Enabled: cfg.Ldaps.Enabled,
-					Listen:  cfg.Ldaps.Address,
+					Listen:  cfg.Ldaps.Addr,
 					Cert:    cfg.Ldaps.Cert,
 					Key:     cfg.Ldaps.Key,
 				}
@@ -100,7 +106,7 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 
 				if lscfg.Enabled {
-					if err := crypto.GenCert(cfg.Ldaps.Cert, cfg.Ldaps.Key, logger); err != nil {
+					if err := pkgcrypto.GenCert(cfg.Ldaps.Cert, cfg.Ldaps.Key, logger); err != nil {
 						logger.Fatal().Err(err).Msgf("Could not generate test-certificate")
 					}
 				}

@@ -1,9 +1,9 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/ocs/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // HealthWithConfig applies cfg to the root flagset
@@ -11,7 +11,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9114"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9114"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"OCS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -57,28 +57,28 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "tracing-enabled",
 			Value:       flags.OverrideDefaultBool(cfg.Tracing.Enabled, false),
 			Usage:       "Enable sending traces",
-			EnvVars:     []string{"OCS_TRACING_ENABLED"},
+			EnvVars:     []string{"OCS_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-type",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Type, "jaeger"),
 			Usage:       "Tracing backend type",
-			EnvVars:     []string{"OCS_TRACING_TYPE"},
+			EnvVars:     []string{"OCS_TRACING_TYPE", "OCIS_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-endpoint",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Endpoint, ""),
 			Usage:       "Endpoint for the agent",
-			EnvVars:     []string{"OCS_TRACING_ENDPOINT"},
+			EnvVars:     []string{"OCS_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		&cli.StringFlag{
 			Name:        "tracing-collector",
 			Value:       flags.OverrideDefaultString(cfg.Tracing.Collector, ""),
 			Usage:       "Endpoint for the collector",
-			EnvVars:     []string{"OCS_TRACING_COLLECTOR"},
+			EnvVars:     []string{"OCS_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		&cli.StringFlag{
@@ -90,7 +90,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9114"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9114"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"OCS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -116,7 +116,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9110"),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "127.0.0.1:9110"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"OCS_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
@@ -161,9 +161,16 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "reva-gateway-addr",
 			Value:       flags.OverrideDefaultString(cfg.RevaAddress, "127.0.0.1:9142"),
-			Usage:       "REVA Gateway Endpoint",
-			EnvVars:     []string{"OCS_REVA_GATEWAY_ADDR"},
+			Usage:       "Address of REVA gateway endpoint",
+			EnvVars:     []string{"REVA_GATEWAY"},
 			Destination: &cfg.RevaAddress,
+		},
+		&cli.StringFlag{
+			Name:        "machine-auth-api-key",
+			Value:       flags.OverrideDefaultString(cfg.MachineAuthAPIKey, "change-me-please"),
+			Usage:       "the API key to be used for the machine auth driver in reva",
+			EnvVars:     []string{"OCS_MACHINE_AUTH_API_KEY", "OCIS_MACHINE_AUTH_API_KEY"},
+			Destination: &cfg.MachineAuthAPIKey,
 		},
 		&cli.StringFlag{
 			Name:        "idm-address",
@@ -178,6 +185,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "storage driver for users mount: eg. local, eos, owncloud, ocis or s3",
 			EnvVars:     []string{"OCS_STORAGE_USERS_DRIVER", "STORAGE_USERS_DRIVER"},
 			Destination: &cfg.StorageUsersDriver,
+		},
+		&cli.StringFlag{
+			Name:  "extensions",
+			Usage: "Run specific extensions during supervised mode",
 		},
 	}
 }

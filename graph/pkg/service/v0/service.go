@@ -3,8 +3,10 @@ package svc
 import (
 	"net/http"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/owncloud/ocis/ocis-pkg/account"
+	opkgm "github.com/owncloud/ocis/ocis-pkg/middleware"
 )
 
 // Service defines the extension handlers.
@@ -33,6 +35,7 @@ func NewService(opts ...Option) Service {
 		r.Route("/v1.0", func(r chi.Router) {
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/", svc.GetMe)
+				r.Get("/drives", svc.GetDrives)
 				r.Get("/drive/root/children", svc.GetRootDriveChildren)
 			})
 			r.Route("/users", func(r chi.Router) {
@@ -47,6 +50,18 @@ func NewService(opts ...Option) Service {
 				r.Route("/{groupID}", func(r chi.Router) {
 					r.Use(svc.GroupCtx)
 					r.Get("/", svc.GetGroup)
+				})
+			})
+			r.Group(func(r chi.Router) {
+				r.Use(opkgm.ExtractAccountUUID(
+					account.Logger(options.Logger),
+					account.JWTSecret(options.Config.TokenManager.JWTSecret)),
+				)
+				r.Route("/drives", func(r chi.Router) {
+					r.Post("/", svc.CreateDrive)
+				})
+				r.Route("/Drive({firstSegmentIdentifier})", func(r chi.Router) {
+					r.Patch("/*", svc.UpdateDrive)
 				})
 			})
 		})

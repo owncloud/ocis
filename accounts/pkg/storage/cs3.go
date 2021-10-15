@@ -9,13 +9,14 @@ import (
 	"net/http"
 	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
+
+	"github.com/cs3org/reva/pkg/auth/scope"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
@@ -67,7 +68,7 @@ func (r CS3Repo) WriteAccount(ctx context.Context, a *proto.Account) (err error)
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	if err := r.makeRootDirIfNotExist(ctx, accountsFolder); err != nil {
 		return err
 	}
@@ -104,10 +105,10 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err err
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", accountsFolder)},
+			Path: path.Join("/meta", accountsFolder),
 		},
 	})
 	if err != nil {
@@ -154,11 +155,11 @@ func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", accountsFolder, id)},
+			Path: path.Join("/meta", accountsFolder, id),
 		},
 	})
 
@@ -181,7 +182,7 @@ func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	if err := r.makeRootDirIfNotExist(ctx, groupsFolder); err != nil {
 		return err
 	}
@@ -218,10 +219,10 @@ func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) 
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", groupsFolder)},
+			Path: path.Join("/meta", groupsFolder),
 		},
 	})
 	if err != nil {
@@ -268,11 +269,11 @@ func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, token.TokenHeader, t)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Spec: &provider.Reference_Path{Path: path.Join("/meta", groupsFolder, id)},
+			Path: path.Join("/meta", groupsFolder, id),
 		},
 	})
 
@@ -298,21 +299,15 @@ func AuthenticateCS3(ctx context.Context, su config.ServiceUser, tm token.Manage
 		Id: &user.UserId{
 			OpaqueId: su.UUID,
 		},
-		Groups: []string{},
-		Opaque: &types.Opaque{
-			Map: map[string]*types.OpaqueEntry{
-				"uid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.FormatInt(su.UID, 10)),
-				},
-				"gid": {
-					Decoder: "plain",
-					Value:   []byte(strconv.FormatInt(su.GID, 10)),
-				},
-			},
-		},
+		Groups:    []string{},
+		UidNumber: su.UID,
+		GidNumber: su.GID,
 	}
-	return tm.MintToken(ctx, u)
+	s, err := scope.AddOwnerScope(nil)
+	if err != nil {
+		return
+	}
+	return tm.MintToken(ctx, u, s)
 }
 
 func (r CS3Repo) accountURL(id string) string {
@@ -330,7 +325,7 @@ func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error
 // MakeDirIfNotExist will create a root node in the metadata storage. Requires an authenticated context.
 func MakeDirIfNotExist(ctx context.Context, sp provider.ProviderAPIClient, folder string) error {
 	var rootPathRef = &provider.Reference{
-		Spec: &provider.Reference_Path{Path: path.Join("/meta", folder)},
+		Path: path.Join("/meta", folder),
 	}
 
 	resp, err := sp.Stat(ctx, &provider.StatRequest{
@@ -377,7 +372,7 @@ func (d dataProviderClient) put(url string, body io.Reader, token string) (*http
 		return nil, err
 	}
 
-	req.Header.Add("x-access-token", token)
+	req.Header.Add(revactx.TokenHeader, token)
 	return d.client.Do(req)
 }
 
@@ -387,6 +382,6 @@ func (d dataProviderClient) get(url string, token string) (*http.Response, error
 		return nil, err
 	}
 
-	req.Header.Add("x-access-token", token)
+	req.Header.Add(revactx.TokenHeader, token)
 	return d.client.Do(req)
 }

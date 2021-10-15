@@ -2,7 +2,7 @@ package imgsource
 
 import (
 	"context"
-	"image"
+	"io"
 )
 
 type key int
@@ -13,7 +13,7 @@ const (
 
 // Source defines the interface for image sources
 type Source interface {
-	Get(ctx context.Context, path string) (image.Image, error)
+	Get(ctx context.Context, path string) (io.ReadCloser, error)
 }
 
 // ContextSetAuthorization puts the authorization in the context.

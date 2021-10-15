@@ -37,6 +37,11 @@
           "backend": "http://localhost:9140"
         },
         {
+          "type": "query",
+          "endpoint": "/remote.php/?preview=1",
+          "backend": "http://localhost:9115"
+        },
+        {
           "endpoint": "/remote.php/",
           "backend": "http://localhost:9140"
         },
@@ -61,20 +66,20 @@
           "backend": "http://localhost:9140"
         },
         {
+          "endpoint": "/graph/",
+          "backend": "http://localhost:9120"
+        },
+        {
+          "endpoint": "/graph-explorer/",
+          "backend": "http://localhost:9135"
+        },
+        {
           "endpoint": "/api/v0/settings",
           "backend": "http://localhost:9190"
         },
         {
           "endpoint": "/settings.js",
           "backend": "http://localhost:9190"
-        },
-        {
-          "endpoint": "/api/v0/greet",
-          "backend": "http://localhost:9105"
-        },
-        {
-          "endpoint": "/hello.js",
-          "backend": "http://localhost:9105"
         }
       ]
     }

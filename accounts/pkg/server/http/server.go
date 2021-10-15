@@ -2,13 +2,14 @@ package http
 
 import (
 	"github.com/asim/go-micro/v3"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/accounts/pkg/assets"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
-	"github.com/owncloud/ocis/accounts/pkg/version"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 )
 
 // Server initializes the http service and server.
@@ -28,8 +29,9 @@ func Server(opts ...Option) http.Service {
 
 	mux := chi.NewMux()
 
-	mux.Use(middleware.RealIP)
-	mux.Use(middleware.RequestID)
+	mux.Use(chimiddleware.RealIP)
+	mux.Use(chimiddleware.RequestID)
+	mux.Use(middleware.TraceContext)
 	mux.Use(middleware.NoCache)
 	mux.Use(middleware.Cors)
 	mux.Use(middleware.Secure)
@@ -66,6 +68,5 @@ func Server(opts ...Option) http.Service {
 		options.Logger.Fatal().Err(err).Msg("failed to register the handler")
 	}
 
-	service.Init()
 	return service
 }
