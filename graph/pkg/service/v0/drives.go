@@ -452,8 +452,25 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 		Total:     &total,
 		Used:      &used,
 	}
+	state := calculateQuotaState(total, used)
+	qta.State = &state
 
 	return qta, nil
+}
+
+func calculateQuotaState(total int64, used int64) (state string) {
+	percent := (float64(used) / float64(total)) * 100
+
+	switch {
+	case percent <= float64(75):
+		return "normal"
+	case percent <= float64(90):
+		return "nearing"
+	case percent <= float64(99):
+		return "critical"
+	default:
+		return "exceeded"
+	}
 }
 
 func getQuota(quota *msgraph.Quota, defaultQuota string) *provider.Quota {
@@ -471,5 +488,4 @@ func getQuota(quota *msgraph.Quota, defaultQuota string) *provider.Quota {
 	default:
 		return nil
 	}
-
 }
