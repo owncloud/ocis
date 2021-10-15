@@ -124,6 +124,13 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_AUTH_BEARER_ENDPOINT"},
 			Destination: &cfg.Reva.AuthBearer.Endpoint,
 		},
+		&cli.StringFlag{
+			Name:        "auth-machine-endpoint",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AuthMachine.Endpoint, "localhost:9166"),
+			Usage:       "endpoint to use for the machine auth provider",
+			EnvVars:     []string{"STORAGE_AUTH_MACHINE_ENDPOINT"},
+			Destination: &cfg.Reva.AuthMachine.Endpoint,
+		},
 
 		// storage registry
 
