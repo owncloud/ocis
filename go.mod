@@ -20,7 +20,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.1.0
 	github.com/coreos/go-oidc/v3 v3.0.0
 	github.com/cs3org/go-cs3apis v0.0.0-20211007101428-6d142794ec11
-	github.com/cs3org/reva v1.14.1-0.20211014164014-5866f5e0f31b
+	github.com/cs3org/reva v1.14.1-0.20211015081146-2e9bc0c7714a
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth v1.1.3-0.20210729125545-b9aecdfcac31
 	github.com/go-chi/chi/v5 v5.0.4
