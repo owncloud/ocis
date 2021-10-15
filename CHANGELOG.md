@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Security - Don't expose services by default: [#2612](https://github.com/owncloud/ocis/issues/2612)
 * Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
+* Enhancement - Report quota states: [#2628](https://github.com/owncloud/ocis/pull/2628)
 
 ## Details
 
@@ -26,6 +27,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/2621
    https://jira.owncloud.com/browse/OCIS-2070
+
+* Enhancement - Report quota states: [#2628](https://github.com/owncloud/ocis/pull/2628)
+
+   When listing the available spaces via the GraphAPI we now return quota states to make it easier
+   for the clients to add visual indicators.
+
+   https://github.com/owncloud/ocis/pull/2628
 # Changelog for [1.13.0] (2021-10-13)
 
 The following sections list the changes for 1.13.0.
