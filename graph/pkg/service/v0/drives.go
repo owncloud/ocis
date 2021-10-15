@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -12,6 +13,7 @@ import (
 	"time"
 
 	"github.com/CiscoM31/godata"
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -64,8 +66,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	files, err := formatDrives(wdu, res.StorageSpaces)
+	files, err := g.formatDrives(ctx, wdu, res.StorageSpaces)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error encoding response as json")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -398,17 +399,61 @@ func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpac
 	return drive, nil
 }
 
-func formatDrives(baseURL *url.URL, mds []*storageprovider.StorageSpace) ([]*msgraph.Drive, error) {
+func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storageprovider.StorageSpace) ([]*msgraph.Drive, error) {
 	responses := make([]*msgraph.Drive, 0, len(mds))
 	for i := range mds {
 		res, err := cs3StorageSpaceToDrive(baseURL, mds[i])
 		if err != nil {
 			return nil, err
 		}
+		qta, err := g.getDriveQuota(ctx, mds[i])
+		if err != nil {
+			return nil, err
+		}
+		res.Quota = &qta
 		responses = append(responses, res)
 	}
 
 	return responses, nil
+}
+
+func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (msgraph.Quota, error) {
+	client, err := g.GetClient()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error creating grpc client")
+		return msgraph.Quota{}, err
+	}
+
+	req := &gateway.GetQuotaRequest{
+		Ref: &provider.Reference{
+			ResourceId: &provider.ResourceId{
+				StorageId: space.Root.StorageId,
+				OpaqueId:  space.Root.OpaqueId,
+			},
+			Path: ".",
+		},
+	}
+	res, err := client.GetQuota(ctx, req)
+	switch {
+	case err != nil:
+		g.logger.Error().Err(err).Msg("error sending get quota grpc request")
+		return msgraph.Quota{}, err
+	case res.Status.Code != cs3rpc.Code_CODE_OK:
+		g.logger.Error().Err(err).Msg("error sending sending get quota grpc request")
+		return msgraph.Quota{}, err
+	}
+
+	total := int64(res.TotalBytes)
+
+	used := int64(res.UsedBytes)
+	remaining := total - used
+	qta := msgraph.Quota{
+		Remaining: &remaining,
+		Total:     &total,
+		Used:      &used,
+	}
+
+	return qta, nil
 }
 
 func getQuota(quota *msgraph.Quota, defaultQuota string) *provider.Quota {
