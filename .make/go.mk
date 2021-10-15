@@ -78,6 +78,7 @@ ci-golangci-lint: $(GOLANGCI_LINT)
 
 .PHONY: test
 test:
+	@make -C ../ generate
 	@go test -v -coverprofile coverage.out ./...
 
 .PHONY: go-coverage
