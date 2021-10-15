@@ -27,6 +27,7 @@ ci-go-generate: # CI runs ci-node-generate automatically before this target
 
 .PHONY: ci-node-generate
 ci-node-generate: yarn-build
+	@make -C ../accounts generate
 
 .PHONY: yarn-build
 yarn-build: node_modules
