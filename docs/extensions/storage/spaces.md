@@ -50,7 +50,7 @@ Having introduced the above, one can refer to a Drive with the following URL for
 'https://localhost:9200/graph/v1.0/Drive(1284d238-aa92-42ce-bdc4-0b0000009157!07c26b3a-9944-4f2b-ab33-b0b326fc7570")
 ```
 
-Udating an entity attribute:
+Updating an entity attribute:
 
 ```console
 curl -X PATCH 'https://localhost:9200/graph/v1.0/Drive("1284d238-aa92-42ce-bdc4-0b0000009157!07c26b3a-9944-4f2b-ab33-b0b326fc7570)' -d '{"name":"42"}' -v
@@ -75,3 +75,100 @@ Add a description to your spaces
 ```
 
 This feature makes use of the internal storage layout and is completely abstracted from the end user.
+
+### Quotas
+
+Spaces capacity (quota) is independent of where the Storage quota. As a Space admin you can set the quota for all users of a space, and as such, there are no limitations and is up to the admin to make a correct use of this.
+
+It is possible to have a space quota greater than the storage quota. A Space may also have "infinite" quota, meaning a single space without quota can occupy the entirety of a disk.
+
+#### Quota Enforcement
+
+Creating a Space with a quota of 10 bytes:
+
+`curl -k -X POST 'https://localhost:9200/graph/v1.0/drives' -u admin:admin -d '{"name":"marketing", "quota": {"total": 10}}' -v`
+
+```console
+/var/tmp/ocis/storage/users
+├── blobs
+├── nodes
+│   ├── 627981c2-2a71-4adf-b680-177e245afdda
+│   ├── 9541e7c3-8fda-4b49-b697-e7e51457cf5a
+│   ├── b5692345-108d-4b80-9747-3a7e9739ad57
+│   └── root
+│       ├── 118351d7-67a4-4cdf-b495-6093d1e572ed -> ../627981c2-2a71-4adf-b680-177e245afdda
+│       └── ddc2004c-0977-11eb-9d3f-a793888cd0f8 -> ../b5692345-108d-4b80-9747-3a7e9739ad57
+├── spaces
+│   ├── personal
+│   │   └── b5692345-108d-4b80-9747-3a7e9739ad57 -> ../../nodes/b5692345-108d-4b80-9747-3a7e9739ad57
+│   ├── project
+│   │   └── 627981c2-2a71-4adf-b680-177e245afdda -> ../../nodes/627981c2-2a71-4adf-b680-177e245afdda
+│   └── share
+├── trash
+└── uploads
+```
+
+Verify the new space has 10 bytes, and none of it is used:
+
+```json
+{
+    "driveType": "project",
+    "id": "1284d238-aa92-42ce-bdc4-0b0000009157!627981c2-2a71-4adf-b680-177e245afdda",
+    "lastModifiedDateTime": "2021-10-15T11:16:26.029188+02:00",
+    "name": "marketing",
+    "owner": {
+        "user": {
+            "id": "ddc2004c-0977-11eb-9d3f-a793888cd0f8"
+        }
+    },
+    "quota": {
+        "remaining": 10,
+        "total": 10,
+        "used": 0
+    },
+    "root": {
+        "id": "1284d238-aa92-42ce-bdc4-0b0000009157!627981c2-2a71-4adf-b680-177e245afdda",
+        "webDavUrl": "https://localhost:9200/dav/spaces/1284d238-aa92-42ce-bdc4-0b0000009157!627981c2-2a71-4adf-b680-177e245afdda"
+    }
+}
+```
+
+Upload a 6 bytes file:
+
+`curl -k -X PUT https://localhost:9200/dav/spaces/1284d238-aa92-42ce-bdc4-0b0000009157\!627981c2-2a71-4adf-b680-177e245afdda/6bytes.txt -d "012345" -u admin:admin -v`
+
+Query the quota again:
+
+```json
+...
+"quota": {
+    "remaining": 4,
+    "total": 10,
+    "used": 6
+},
+...
+```
+
+Now attempt to upload 5 bytes to the space:
+
+`curl -k -X PUT https://localhost:9200/dav/spaces/1284d238-aa92-42ce-bdc4-0b0000009157\!627981c2-2a71-4adf-b680-177e245afdda/5bytes.txt -d "01234" -u admin:admin -v`
+
+The request will fail with `507 Insufficient Storage`:
+
+```
+ HTTP/1.1 507 Insufficient Storage
+< Access-Control-Allow-Origin: *
+< Content-Length: 0
+< Content-Security-Policy: default-src 'none';
+< Date: Fri, 15 Oct 2021 09:24:46 GMT
+< Vary: Origin
+< X-Content-Type-Options: nosniff
+< X-Download-Options: noopen
+< X-Frame-Options: SAMEORIGIN
+< X-Permitted-Cross-Domain-Policies: none
+< X-Robots-Tag: none
+< X-Xss-Protection: 1; mode=block
+<
+* Connection #0 to host localhost left intact
+* Closing connection 0
+```
