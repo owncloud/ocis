@@ -172,3 +172,7 @@ The request will fail with `507 Insufficient Storage`:
 * Connection #0 to host localhost left intact
 * Closing connection 0
 ```
+
+##### Considerations
+
+- If a Space quota is updated to unlimited, the upper limit is the entire available space on disk
