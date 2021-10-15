@@ -150,7 +150,7 @@ protobuf:
 
 .PHONY: bingo-update
 bingo-update: $(BINGO)
-	$(BINGO) get -u
+	$(BINGO) get -l -u
 
 CHANGELOG_VERSION =
 

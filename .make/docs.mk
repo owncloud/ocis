@@ -4,4 +4,4 @@ config-docs-generate: $(FLAEX)
 	@$(FLAEX) >| ../docs/extensions/$(NAME)/configuration.md
 
 .PHONY: grpc-docs-generate
-grpc-docs-generate: ../docs/extensions/${NAME}/grpc.md
+grpc-docs-generate: buf-generate
