@@ -2,11 +2,12 @@ package svc
 
 import (
 	"encoding/xml"
-	merrors "github.com/asim/go-micro/v3/errors"
-	"github.com/go-chi/render"
 	"net/http"
 	"path"
 	"strings"
+
+	"github.com/go-chi/render"
+	merrors "go-micro.dev/v4/errors"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"

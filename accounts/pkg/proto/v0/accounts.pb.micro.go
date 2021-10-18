@@ -5,20 +5,20 @@ package proto
 
 import (
 	fmt "fmt"
-	empty "github.com/golang/protobuf/ptypes/empty"
-	_ "github.com/golang/protobuf/ptypes/timestamp"
 	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
-	_ "google.golang.org/genproto/protobuf/field_mask"
 	proto "google.golang.org/protobuf/proto"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	_ "google.golang.org/protobuf/types/known/fieldmaskpb"
+	_ "google.golang.org/protobuf/types/known/timestamppb"
 	math "math"
 )
 
 import (
 	context "context"
-	api "github.com/asim/go-micro/v3/api"
-	client "github.com/asim/go-micro/v3/client"
-	server "github.com/asim/go-micro/v3/server"
+	api "go-micro.dev/v4/api"
+	client "go-micro.dev/v4/client"
+	server "go-micro.dev/v4/server"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -86,7 +86,7 @@ type AccountsService interface {
 	// Updates an account
 	UpdateAccount(ctx context.Context, in *UpdateAccountRequest, opts ...client.CallOption) (*Account, error)
 	// Deletes an account
-	DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...client.CallOption) (*empty.Empty, error)
+	DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...client.CallOption) (*emptypb.Empty, error)
 }
 
 type accountsService struct {
@@ -141,9 +141,9 @@ func (c *accountsService) UpdateAccount(ctx context.Context, in *UpdateAccountRe
 	return out, nil
 }
 
-func (c *accountsService) DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...client.CallOption) (*empty.Empty, error) {
+func (c *accountsService) DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...client.CallOption) (*emptypb.Empty, error) {
 	req := c.c.NewRequest(c.name, "AccountsService.DeleteAccount", in)
-	out := new(empty.Empty)
+	out := new(emptypb.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -163,7 +163,7 @@ type AccountsServiceHandler interface {
 	// Updates an account
 	UpdateAccount(context.Context, *UpdateAccountRequest, *Account) error
 	// Deletes an account
-	DeleteAccount(context.Context, *DeleteAccountRequest, *empty.Empty) error
+	DeleteAccount(context.Context, *DeleteAccountRequest, *emptypb.Empty) error
 }
 
 func RegisterAccountsServiceHandler(s server.Server, hdlr AccountsServiceHandler, opts ...server.HandlerOption) error {
@@ -172,7 +172,7 @@ func RegisterAccountsServiceHandler(s server.Server, hdlr AccountsServiceHandler
 		GetAccount(ctx context.Context, in *GetAccountRequest, out *Account) error
 		CreateAccount(ctx context.Context, in *CreateAccountRequest, out *Account) error
 		UpdateAccount(ctx context.Context, in *UpdateAccountRequest, out *Account) error
-		DeleteAccount(ctx context.Context, in *DeleteAccountRequest, out *empty.Empty) error
+		DeleteAccount(ctx context.Context, in *DeleteAccountRequest, out *emptypb.Empty) error
 	}
 	type AccountsService struct {
 		accountsService
@@ -236,7 +236,7 @@ func (h *accountsServiceHandler) UpdateAccount(ctx context.Context, in *UpdateAc
 	return h.AccountsServiceHandler.UpdateAccount(ctx, in, out)
 }
 
-func (h *accountsServiceHandler) DeleteAccount(ctx context.Context, in *DeleteAccountRequest, out *empty.Empty) error {
+func (h *accountsServiceHandler) DeleteAccount(ctx context.Context, in *DeleteAccountRequest, out *emptypb.Empty) error {
 	return h.AccountsServiceHandler.DeleteAccount(ctx, in, out)
 }
 
@@ -315,7 +315,7 @@ type GroupsService interface {
 	// Updates a group
 	UpdateGroup(ctx context.Context, in *UpdateGroupRequest, opts ...client.CallOption) (*Group, error)
 	// Deletes a group
-	DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...client.CallOption) (*empty.Empty, error)
+	DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...client.CallOption) (*emptypb.Empty, error)
 	// group:addmember https://docs.microsoft.com/en-us/graph/api/group-post-members?view=graph-rest-1.0&tabs=http
 	AddMember(ctx context.Context, in *AddMemberRequest, opts ...client.CallOption) (*Group, error)
 	// group:removemember https://docs.microsoft.com/en-us/graph/api/group-delete-members?view=graph-rest-1.0
@@ -376,9 +376,9 @@ func (c *groupsService) UpdateGroup(ctx context.Context, in *UpdateGroupRequest,
 	return out, nil
 }
 
-func (c *groupsService) DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...client.CallOption) (*empty.Empty, error) {
+func (c *groupsService) DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...client.CallOption) (*emptypb.Empty, error) {
 	req := c.c.NewRequest(c.name, "GroupsService.DeleteGroup", in)
-	out := new(empty.Empty)
+	out := new(emptypb.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -428,7 +428,7 @@ type GroupsServiceHandler interface {
 	// Updates a group
 	UpdateGroup(context.Context, *UpdateGroupRequest, *Group) error
 	// Deletes a group
-	DeleteGroup(context.Context, *DeleteGroupRequest, *empty.Empty) error
+	DeleteGroup(context.Context, *DeleteGroupRequest, *emptypb.Empty) error
 	// group:addmember https://docs.microsoft.com/en-us/graph/api/group-post-members?view=graph-rest-1.0&tabs=http
 	AddMember(context.Context, *AddMemberRequest, *Group) error
 	// group:removemember https://docs.microsoft.com/en-us/graph/api/group-delete-members?view=graph-rest-1.0
@@ -443,7 +443,7 @@ func RegisterGroupsServiceHandler(s server.Server, hdlr GroupsServiceHandler, op
 		GetGroup(ctx context.Context, in *GetGroupRequest, out *Group) error
 		CreateGroup(ctx context.Context, in *CreateGroupRequest, out *Group) error
 		UpdateGroup(ctx context.Context, in *UpdateGroupRequest, out *Group) error
-		DeleteGroup(ctx context.Context, in *DeleteGroupRequest, out *empty.Empty) error
+		DeleteGroup(ctx context.Context, in *DeleteGroupRequest, out *emptypb.Empty) error
 		AddMember(ctx context.Context, in *AddMemberRequest, out *Group) error
 		RemoveMember(ctx context.Context, in *RemoveMemberRequest, out *Group) error
 		ListMembers(ctx context.Context, in *ListMembersRequest, out *ListMembersResponse) error
@@ -531,7 +531,7 @@ func (h *groupsServiceHandler) UpdateGroup(ctx context.Context, in *UpdateGroupR
 	return h.GroupsServiceHandler.UpdateGroup(ctx, in, out)
 }
 
-func (h *groupsServiceHandler) DeleteGroup(ctx context.Context, in *DeleteGroupRequest, out *empty.Empty) error {
+func (h *groupsServiceHandler) DeleteGroup(ctx context.Context, in *DeleteGroupRequest, out *emptypb.Empty) error {
 	return h.GroupsServiceHandler.DeleteGroup(ctx, in, out)
 }
 

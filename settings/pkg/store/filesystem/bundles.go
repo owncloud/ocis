@@ -9,6 +9,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/owncloud/ocis/settings/pkg/proto/v0"
+	"github.com/owncloud/ocis/settings/pkg/store/errortypes"
 )
 
 var m = &sync.RWMutex{}
@@ -110,7 +111,12 @@ func (s Store) WriteBundle(record *proto.Bundle) (*proto.Bundle, error) {
 func (s Store) AddSettingToBundle(bundleID string, setting *proto.Setting) (*proto.Setting, error) {
 	bundle, err := s.ReadBundle(bundleID)
 	if err != nil {
-		return nil, err
+		if _, notFound := err.(errortypes.BundleNotFound); !notFound {
+			return nil, err
+		}
+		bundle = new(proto.Bundle)
+		bundle.Id = bundleID
+		bundle.Type = proto.Bundle_TYPE_DEFAULT
 	}
 	if setting.Id == "" {
 		setting.Id = uuid.Must(uuid.NewV4()).String()

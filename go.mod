@@ -5,22 +5,21 @@ go 1.17
 require (
 	github.com/CiscoM31/godata v1.0.4
 	github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e
-	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20210812172626-c7195aae9817
-	github.com/asim/go-micro/plugins/logger/zerolog/v3 v3.0.0-20210812172626-c7195aae9817
-	github.com/asim/go-micro/plugins/registry/etcd/v3 v3.0.0-20210812172626-c7195aae9817
-	github.com/asim/go-micro/plugins/registry/kubernetes/v3 v3.0.0-20210812172626-c7195aae9817
-	github.com/asim/go-micro/plugins/registry/mdns/v3 v3.0.0-20210812172626-c7195aae9817
-	github.com/asim/go-micro/plugins/registry/nats/v3 v3.0.0-20210812172626-c7195aae9817
-	github.com/asim/go-micro/plugins/server/grpc/v3 v3.0.0-20210812172626-c7195aae9817
-	github.com/asim/go-micro/plugins/server/http/v3 v3.0.0-20210812172626-c7195aae9817
-	github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v3 v3.0.0-20210812172626-c7195aae9817
-	github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v3 v3.0.0-20210812172626-c7195aae9817
-	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3 v3.0.0-20210812172626-c7195aae9817
-	github.com/asim/go-micro/v3 v3.6.1-0.20210924081004-8c39b1e1204d
+	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20211012122208-f63e46a7d1e9
+	github.com/asim/go-micro/plugins/logger/zerolog/v3 v3.0.0-20211012122208-f63e46a7d1e9
+	github.com/asim/go-micro/plugins/registry/etcd/v3 v3.0.0-20211012122208-f63e46a7d1e9
+	github.com/asim/go-micro/plugins/registry/kubernetes/v3 v3.0.0-20211012122208-f63e46a7d1e9
+	github.com/asim/go-micro/plugins/registry/mdns/v3 v3.0.0-20211012122208-f63e46a7d1e9
+	github.com/asim/go-micro/plugins/registry/nats/v3 v3.0.0-20211012122208-f63e46a7d1e9
+	github.com/asim/go-micro/plugins/server/grpc/v3 v3.0.0-20211012122208-f63e46a7d1e9
+	github.com/asim/go-micro/plugins/server/http/v3 v3.0.0-20211012122208-f63e46a7d1e9
+	github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v3 v3.0.0-20211012122208-f63e46a7d1e9
+	github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v3 v3.0.0-20211012122208-f63e46a7d1e9
+	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3 v3.0.0-20211012122208-f63e46a7d1e9
 	github.com/blevesearch/bleve/v2 v2.1.0
 	github.com/coreos/go-oidc/v3 v3.0.0
 	github.com/cs3org/go-cs3apis v0.0.0-20211007101428-6d142794ec11
-	github.com/cs3org/reva v1.14.1-0.20211014164014-5866f5e0f31b
+	github.com/cs3org/reva v1.14.1-0.20211015144112-cddbdd4c560f
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth v1.1.3-0.20210729125545-b9aecdfcac31
 	github.com/go-chi/chi/v5 v5.0.4
@@ -57,6 +56,7 @@ require (
 	github.com/thejerf/suture/v4 v4.0.1
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/yaegashi/msgraph.go v0.1.4
+	go-micro.dev/v4 v4.1.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.25.0
 	go.opentelemetry.io/otel v1.0.1
@@ -69,7 +69,6 @@ require (
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
 	google.golang.org/genproto v0.0.0-20210624195500-8bfb893ecb84
 	google.golang.org/grpc v1.41.0
-	google.golang.org/grpc/examples v0.0.0-20210802225658-edb9b3bc2266 // indirect
 	google.golang.org/protobuf v1.27.1
 	gotest.tools/v3 v3.0.3
 	stash.kopano.io/kgol/rndm v1.1.1
@@ -87,6 +86,7 @@ require (
 	github.com/RoaringBitmap/roaring v0.7.3 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
+	github.com/asim/go-micro/v3 v3.6.1-0.20210924081004-8c39b1e1204d // indirect
 	github.com/aws/aws-sdk-go v1.40.46 // indirect
 	github.com/beevik/etree v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect

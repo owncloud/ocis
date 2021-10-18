@@ -9,7 +9,6 @@ import (
 	"regexp"
 	"strconv"
 
-	merrors "github.com/asim/go-micro/v3/errors"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -17,6 +16,7 @@ import (
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
 	ocstracing "github.com/owncloud/ocis/ocs/pkg/tracing"
+	merrors "go-micro.dev/v4/errors"
 	"go.opentelemetry.io/otel/attribute"
 )
 

@@ -7,7 +7,6 @@ import (
 	"path"
 	"strings"
 
-	merrors "github.com/asim/go-micro/v3/errors"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -18,6 +17,7 @@ import (
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"
 	"github.com/pkg/errors"
+	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/grpc/metadata"
 )
 

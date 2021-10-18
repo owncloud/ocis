@@ -8,6 +8,10 @@ The following sections list the changes for unreleased.
 
 * Security - Don't expose services by default: [#2612](https://github.com/owncloud/ocis/issues/2612)
 * Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
+* Enhancement - Upgrade to go-micro v4.1.0: [#2616](https://github.com/owncloud/ocis/pull/2616)
+* Enhancement - Add a middleware to authenticate public share requests: [#2536](https://github.com/owncloud/ocis/pull/2536)
+* Enhancement - Report quota states: [#2628](https://github.com/owncloud/ocis/pull/2628)
+* Enhancement - Update reva to v1.14.1-0.20211015144112-cddbdd4c560f: [#2536](https://github.com/owncloud/ocis/pull/2536)
 
 ## Details
 
@@ -26,6 +30,41 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/2621
    https://jira.owncloud.com/browse/OCIS-2070
+
+* Enhancement - Upgrade to go-micro v4.1.0: [#2616](https://github.com/owncloud/ocis/pull/2616)
+
+   We've upgraded to go-micro v4.1.0
+
+   https://github.com/owncloud/ocis/pull/2616
+
+* Enhancement - Add a middleware to authenticate public share requests: [#2536](https://github.com/owncloud/ocis/pull/2536)
+
+   Added a new middleware to authenticate public share requests. This makes it possible to use
+   APIs which require an authenticated context with public shares.
+
+   https://github.com/owncloud/ocis/issues/2479
+   https://github.com/owncloud/ocis/pull/2536
+
+* Enhancement - Report quota states: [#2628](https://github.com/owncloud/ocis/pull/2628)
+
+   When listing the available spaces via the GraphAPI we now return quota states to make it easier
+   for the clients to add visual indicators.
+
+   https://github.com/owncloud/ocis/pull/2628
+
+* Enhancement - Update reva to v1.14.1-0.20211015144112-cddbdd4c560f: [#2536](https://github.com/owncloud/ocis/pull/2536)
+
+   Updated reva to v1.14.1-0.20211015144112-cddbdd4c560f This update includes: *
+   Enhancement [cs3org/reva#2170](https://github.com/cs3org/reva/pull/2170): Handle
+   propfind requests for existing files * Enhancement
+   [cs3org/reva#2166](https://github.com/cs3org/reva/pull/2166): Allow nil quota in
+   decomposedfs * Enhancement
+   [cs3org/reva#2152](https://github.com/cs3org/reva/pull/2152): Report quota per
+   storage space * Enhancement
+   [cs3org/reva#2143](https://github.com/cs3org/reva/pull/2143): Enabling apps to work
+   in public shares
+
+   https://github.com/owncloud/ocis/pull/2536
 # Changelog for [1.13.0] (2021-10-13)
 
 The following sections list the changes for 1.13.0.

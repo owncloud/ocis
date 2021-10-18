@@ -7,10 +7,10 @@ import (
 
 	"github.com/cs3org/reva/pkg/auth/scope"
 
-	"github.com/asim/go-micro/v3/metadata"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/ocis-pkg/account"
+	"go-micro.dev/v4/metadata"
 )
 
 // newAccountOptions initializes the available default options.
@@ -60,7 +60,7 @@ func ExtractAccountUUID(opts ...account.Option) func(http.Handler) http.Handler 
 				opt.Logger.Error().Err(err)
 				return
 			}
-			if ok, err := scope.VerifyScope(tokenScope, r); err != nil || !ok {
+			if ok, err := scope.VerifyScope(r.Context(), tokenScope, r); err != nil || !ok {
 				opt.Logger.Error().Err(err).Msg("verifying scope failed")
 				return
 			}

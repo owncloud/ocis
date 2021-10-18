@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/asim/go-micro/v3/metadata"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/stretchr/testify/assert"
+	"go-micro.dev/v4/metadata"
 )
 
 var (

@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v3"
-	merrors "github.com/asim/go-micro/v3/errors"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -27,6 +26,7 @@ import (
 	ocstracing "github.com/owncloud/ocis/ocs/pkg/tracing"
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
 	"github.com/pkg/errors"
+	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"

@@ -9,7 +9,7 @@ import (
 	mdnsr "github.com/asim/go-micro/plugins/registry/mdns/v3"
 	natsr "github.com/asim/go-micro/plugins/registry/nats/v3"
 
-	"github.com/asim/go-micro/v3/registry"
+	"go-micro.dev/v4/registry"
 )
 
 var (

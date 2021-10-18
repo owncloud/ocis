@@ -9,8 +9,6 @@ import (
 	"os"
 	"testing"
 
-	merrors "github.com/asim/go-micro/v3/errors"
-	"github.com/asim/go-micro/v3/metadata"
 	ocislog "github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
@@ -19,6 +17,8 @@ import (
 	svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	store "github.com/owncloud/ocis/settings/pkg/store/filesystem"
 	"github.com/stretchr/testify/assert"
+	merrors "go-micro.dev/v4/errors"
+	"go-micro.dev/v4/metadata"
 )
 
 var (
