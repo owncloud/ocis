@@ -8,7 +8,7 @@ Feature: List and create spaces
 
   Scenario: list own spaces
     Given user "Alice" has been created with default attributes and without skeleton files
-    And user "Alice" lists all available spaces via the GraphApi
+    When user "Alice" lists all available spaces via the GraphApi
     Then the HTTP status code should be "200"
     And the webDavUrl of the personal space has been found
     And user "Alice" lists the content of the personal space root using the WebDav Api
