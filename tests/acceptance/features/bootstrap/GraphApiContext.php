@@ -88,7 +88,7 @@ class GraphApiContext implements Context {
         }
         $fullUrl .= "graph/v1.0/me/drives/" . $arguments;
 
-        return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, 'GET', $user, $password, $headers, $body);
+        return HttpRequestHelper::get($fullUrl, $xRequestId, $user, $password, $headers, $body);
     }
 
     /**
