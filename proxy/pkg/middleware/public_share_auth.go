@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -20,8 +21,12 @@ func PublicShareAuth(opts ...Option) func(next http.Handler) http.Handler {
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Currently we only want to authenticate app open request coming from public shares.
 			shareToken := r.Header.Get(headerShareToken)
+			if shareToken == "" {
+				shareToken = r.URL.Query().Get(headerShareToken)
+			}
+
+			// Currently we only want to authenticate app open request coming from public shares.
 			if shareToken == "" {
 				// Don't authenticate
 				next.ServeHTTP(w, r)
@@ -48,6 +53,8 @@ func PublicShareAuth(opts ...Option) func(next http.Handler) http.Handler {
 				next.ServeHTTP(w, r)
 				return
 			}
+
+			fmt.Println("########################################################", authResp.Token)
 
 			r.Header.Add(headerRevaAccessToken, authResp.Token)
 			next.ServeHTTP(w, r)
