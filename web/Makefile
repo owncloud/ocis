@@ -26,11 +26,8 @@ ci-go-generate: pull-assets # CI runs ci-node-generate automatically before this
 	@go generate ./...
 
 .PHONY: ci-node-generate
-ci-node-generate: yarn-build
-
-.PHONY: yarn-build
-yarn-build:
-	yarn lint
+ci-node-generate:
+	yarn install --frozen-lockfile
 
 WEB_ASSETS_VERSION = v4.3.0
 
