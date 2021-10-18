@@ -132,6 +132,7 @@ go-mod-tidy:
 .PHONY: test
 test:
 	@for mod in $(OCIS_MODULES); do \
+        $(MAKE) --no-print-directory -C $$mod ci-node-generate; \
         $(MAKE) --no-print-directory -C $$mod test; \
     done
 
