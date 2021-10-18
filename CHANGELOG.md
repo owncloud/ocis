@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Security - Don't expose services by default: [#2612](https://github.com/owncloud/ocis/issues/2612)
 * Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
+* Enhancement - Upgrade to go-micro v4.1.0: [#2616](https://github.com/owncloud/ocis/pull/2616)
 * Enhancement - Report quota states: [#2628](https://github.com/owncloud/ocis/pull/2628)
 
 ## Details
@@ -27,6 +28,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/2621
    https://jira.owncloud.com/browse/OCIS-2070
+
+* Enhancement - Upgrade to go-micro v4.1.0: [#2616](https://github.com/owncloud/ocis/pull/2616)
+
+   We've upgraded to go-micro v4.1.0
+
+   https://github.com/owncloud/ocis/pull/2616
 
 * Enhancement - Report quota states: [#2628](https://github.com/owncloud/ocis/pull/2628)
 
