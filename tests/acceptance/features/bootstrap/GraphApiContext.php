@@ -161,7 +161,7 @@ class GraphApiContext implements Context {
     }
 
     /**
-     * @Then the webDavUrl of the personal space has been found
+     * Get the webDavUrl of the personal space has been found
      *
      * @return void
      */
@@ -194,8 +194,10 @@ class GraphApiContext implements Context {
      *
      * @return void
      */
-    public function theUserListsTheContentOfASpaceRootUsingTheWebDAvApi($user): void
+    public function theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi($user): void
     {
+        $this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
+        $this->theWebDavUrlOfThePersonalSpaceHasBeenFound();
         $this->featureContext->setResponse(
             $this->sendPropfindRequestToUrl(
                 $this->getPersonalDriveWebDavUrl(),

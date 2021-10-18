@@ -6,7 +6,6 @@ default:
     apiAccountsHashDifficulty:
       paths:
         - '%paths.base%/../features/apiAccountsHashDifficulty'
-        - '%paths.base%/../features/apiSpaces'
       context: &common_ldap_suite_context
         parameters:
           ldapAdminPassword: admin
@@ -14,10 +13,28 @@ default:
           ldapGroupsOU: TestGroups
           ldapInitialUserFilePath: /../../config/ldap-users.ldif
       contexts:
-        - GraphApiContext:
         - OccContext:
         - FeatureContext: &common_feature_context_params
             baseUrl:  http://localhost:8080
+            adminUsername: admin
+            adminPassword: admin
+            regularUserPassword: 123456
+            ocPath: apps/testing/api/v1/occ
+        - CapabilitiesContext:
+        - ChecksumContext:
+        - FavoritesContext:
+        - FilesVersionsContext:
+        - PublicWebDavContext:
+        - TrashbinContext:
+        - WebDavPropertiesContext:
+    apiSpaces:
+      paths:
+        - '%paths.base%/../features/apiSpaces'
+      contexts:
+        - GraphApiContext:
+        - OccContext:
+        - FeatureContext: &common_feature_context_params
+            baseUrl: http://localhost:8080
             adminUsername: admin
             adminPassword: admin
             regularUserPassword: 123456
