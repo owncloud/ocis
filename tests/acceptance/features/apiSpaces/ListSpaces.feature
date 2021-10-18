@@ -11,5 +11,5 @@ Feature: List and create spaces
     When user "Alice" lists all available spaces via the GraphApi
     Then the HTTP status code should be "200"
     And the webDavUrl of the personal space has been found
-    And user "Alice" lists the content of the personal space root using the WebDav Api
+    When user "Alice" lists the content of the personal space root using the WebDav Api
     And the HTTP status code should be "207"
