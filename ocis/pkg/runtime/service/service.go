@@ -14,7 +14,6 @@ import (
 	"time"
 
 	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v3"
-	"github.com/asim/go-micro/v3/logger"
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
 	accounts "github.com/owncloud/ocis/accounts/pkg/command"
@@ -35,6 +34,7 @@ import (
 	webdav "github.com/owncloud/ocis/webdav/pkg/command"
 	"github.com/rs/zerolog"
 	"github.com/thejerf/suture/v4"
+	"go-micro.dev/v4/logger"
 )
 
 var (
@@ -105,6 +105,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["storage-groupprovider"] = storage.NewGroupProvider
 	s.ServicesRegistry["storage-authbasic"] = storage.NewAuthBasic
 	s.ServicesRegistry["storage-authbearer"] = storage.NewAuthBearer
+	s.ServicesRegistry["storage-authmachine"] = storage.NewAuthMachine
 	s.ServicesRegistry["storage-home"] = storage.NewStorageHome
 	s.ServicesRegistry["storage-users"] = storage.NewStorageUsers
 	s.ServicesRegistry["storage-public-link"] = storage.NewStoragePublicLink

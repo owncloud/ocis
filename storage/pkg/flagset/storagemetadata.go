@@ -1,9 +1,10 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/owncloud/ocis/storage/pkg/flagset/metadatadrivers"
+	"github.com/urfave/cli/v2"
 )
 
 // StorageMetadata applies cfg to the root flagset
@@ -11,7 +12,7 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 	f := []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StorageMetadata.DebugAddr, "0.0.0.0:9217"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageMetadata.DebugAddr, "127.0.0.1:9217"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_METADATA_DEBUG_ADDR"},
 			Destination: &cfg.Reva.StorageMetadata.DebugAddr,
@@ -25,7 +26,7 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "grpc-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StorageMetadata.GRPCAddr, "0.0.0.0:9215"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageMetadata.GRPCAddr, "127.0.0.1:9215"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_METADATA_GRPC_PROVIDER_ADDR"},
 			Destination: &cfg.Reva.StorageMetadata.GRPCAddr,
@@ -46,7 +47,7 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StorageMetadata.HTTPAddr, "0.0.0.0:9216"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageMetadata.HTTPAddr, "127.0.0.1:9216"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_METADATA_HTTP_ADDR"},
 			Destination: &cfg.Reva.StorageMetadata.HTTPAddr,
@@ -71,10 +72,10 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 		// Gateway
 
 		&cli.StringFlag{
-			Name:        "gateway-endpoint",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142"),
-			Usage:       "endpoint to use for the gateway service",
-			EnvVars:     []string{"STORAGE_GATEWAY_ENDPOINT"},
+			Name:        "reva-gateway-addr",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "127.0.0.1:9142"),
+			Usage:       "Address of REVA gateway endpoint",
+			EnvVars:     []string{"REVA_GATEWAY"},
 			Destination: &cfg.Reva.Gateway.Endpoint,
 		},
 
@@ -89,23 +90,14 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 		},
 	}
 
-	f = append(f,
-		&cli.StringFlag{
-			Name:        "storage-root",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Storages.Common.Root, "/var/tmp/ocis/storage/metadata"),
-			Usage:       "the path to the metadata storage root",
-			EnvVars:     []string{"STORAGE_METADATA_ROOT"},
-			Destination: &cfg.Reva.Storages.Common.Root,
-		},
-	)
 	f = append(f, TracingWithConfig(cfg)...)
 	f = append(f, DebugWithConfig(cfg)...)
 	f = append(f, SecretWithConfig(cfg)...)
-	f = append(f, DriverEOSWithConfig(cfg)...)
-	f = append(f, DriverLocalWithConfig(cfg)...)
-	f = append(f, DriverOwnCloudWithConfig(cfg)...)
-	f = append(f, DriverOCISWithConfig(cfg)...)
-	f = append(f, DriverS3NGWithConfig(cfg)...)
+	f = append(f, metadatadrivers.DriverEOSWithConfig(cfg)...)
+	f = append(f, metadatadrivers.DriverLocalWithConfig(cfg)...)
+	f = append(f, metadatadrivers.DriverOCISWithConfig(cfg)...)
+	f = append(f, metadatadrivers.DriverS3NGWithConfig(cfg)...)
+	f = append(f, metadatadrivers.DriverS3WithConfig(cfg)...)
 
 	return f
 

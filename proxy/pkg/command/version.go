@@ -6,10 +6,10 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/registry"
 
-	"github.com/micro/cli/v2"
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/flagset"
+	"github.com/urfave/cli/v2"
 )
 
 // PrintVersion prints the service versions of all running instances.

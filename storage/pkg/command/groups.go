@@ -9,7 +9,6 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
@@ -18,6 +17,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // Groups is the entrypoint for the sharing command.
@@ -102,7 +102,9 @@ func groupsConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inter
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret": cfg.Reva.JWTSecret,
+			"jwt_secret":                cfg.Reva.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
+			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.Groups.GRPCNetwork,
@@ -156,26 +158,27 @@ func groupsConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inter
 	}
 }
 
-// GroupProvider allows for the storage-groupprovider command to be embedded and supervised by a suture supervisor tree.
-type GroupProvider struct {
+// GroupSutureService allows for the storage-groupprovider command to be embedded and supervised by a suture supervisor tree.
+type GroupSutureService struct {
 	cfg *config.Config
 }
 
-// NewGroupProvider creates a new storage.GroupProvider
+// NewGroupProviderSutureService creates a new storage.GroupProvider
 func NewGroupProvider(cfg *ociscfg.Config) suture.Service {
 	if cfg.Mode == 0 {
 		cfg.Storage.Reva.Groups.Supervised = true
 	}
-	return GroupProvider{
+	return GroupSutureService{
 		cfg: cfg.Storage,
 	}
 }
 
-func (s GroupProvider) Serve(ctx context.Context) error {
+func (s GroupSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.Groups.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range Groups(s.cfg).Flags {
-		if err := Groups(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := Groups(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

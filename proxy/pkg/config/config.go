@@ -45,11 +45,6 @@ type Tracing struct {
 	Service   string
 }
 
-// Asset defines the available asset configuration.
-type Asset struct {
-	Path string
-}
-
 // Policy enables us to use multiple directors.
 type Policy struct {
 	Name   string
@@ -70,7 +65,7 @@ type RouteType string
 const (
 	// PrefixRoute are routes matched by a prefix
 	PrefixRoute RouteType = "prefix"
-	// QueryRoute are routes machted by a prefix and query parameters
+	// QueryRoute are routes matched by a prefix and query parameters
 	QueryRoute RouteType = "query"
 	// RegexRoute are routes matched by a pattern
 	RegexRoute RouteType = "regex"
@@ -113,7 +108,6 @@ type Config struct {
 	HTTP                  HTTP
 	Service               Service
 	Tracing               Tracing
-	Asset                 Asset
 	Policies              []Policy
 	OIDC                  OIDC
 	TokenManager          TokenManager
@@ -121,8 +115,9 @@ type Config struct {
 	Reva                  Reva
 	PreSignedURL          PreSignedURL
 	AccountBackend        string
-	UserOIDCClaim             string
-	UserCS3Claim         string
+	UserOIDCClaim         string
+	UserCS3Claim          string
+	MachineAuthAPIKey     string
 	AutoprovisionAccounts bool
 	EnableBasicAuth       bool
 	InsecureBackends      bool

@@ -73,6 +73,24 @@ Credentials:
 - oCIS: [ocis.ocis-keycloak.released.owncloud.works](https://ocis.ocis-keycloak.released.owncloud.works)
 - Keycloak: [keycloak.ocis-keycloak.released.owncloud.works](https://keycloak.ocis-keycloak.released.owncloud.works)
 
+# Parallel deployment of oC10 and oCIS
+
+Credentials:
+
+- oC10 / oCIS: see [default demo users]({{< ref "../getting-started#login-to-owncloud-web" >}})
+- Keycloak:
+  - username: admin
+  - password: admin
+- LDAP management:
+  - username: cn=admin,dc=owncloud,dc=com
+  - password: admin
+
+## Latest
+
+- oC10 / oCIS: [cloud.oc10-ocis-parallel.latest.owncloud.works](https://cloud.oc10-ocis-parallel.latest.owncloud.works)
+- LDAP management: [ldap.oc10-ocis-parallel.latest.owncloud.works](https://ldap.oc10-ocis-parallel.latest.owncloud.works)
+- Keycloak: [keycloak.oc10-ocis-parallel.latest.owncloud.works](https://keycloak.oc10-ocis-parallel.latest.owncloud.works)
+
 # oCIS with Hello extension
 
 Credentials:

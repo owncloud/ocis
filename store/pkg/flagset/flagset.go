@@ -1,9 +1,9 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/store/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // RootWithConfig applies cfg to the root flagset
@@ -42,7 +42,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9460"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9464"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"STORE_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -95,7 +95,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9460"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9464"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORE_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -125,6 +125,13 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "Set the base namespace for the grpc namespace",
 			EnvVars:     []string{"STORE_GRPC_NAMESPACE"},
 			Destination: &cfg.Service.Namespace,
+		},
+		&cli.StringFlag{
+			Name:        "grpc-addr",
+			Value:       flags.OverrideDefaultString(cfg.GRPC.Addr, "127.0.0.1:9460"),
+			Usage:       "Address to bind grpc server",
+			EnvVars:     []string{"STORE_GRPC_ADDR"},
+			Destination: &cfg.GRPC.Addr,
 		},
 		&cli.StringFlag{
 			Name:        "name",

@@ -14,42 +14,43 @@ import (
 )
 
 type cs3backend struct {
-	userProvider        cs3.UserAPIClient
 	settingsRoleService settings.RoleService
 	authProvider        RevaAuthenticator
+	machineAuthAPIKey   string
 	logger              log.Logger
 }
 
 // NewCS3UserBackend creates a user-provider which fetches users from a CS3 UserBackend
-func NewCS3UserBackend(up cs3.UserAPIClient, rs settings.RoleService, ap RevaAuthenticator, logger log.Logger) UserBackend {
+func NewCS3UserBackend(rs settings.RoleService, ap RevaAuthenticator, machineAuthAPIKey string, logger log.Logger) UserBackend {
 	return &cs3backend{
-		userProvider:        up,
 		settingsRoleService: rs,
 		authProvider:        ap,
+		machineAuthAPIKey:   machineAuthAPIKey,
 		logger:              logger,
 	}
 }
 
-func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, withRoles bool) (*cs3.User, error) {
-	res, err := c.userProvider.GetUserByClaim(ctx, &cs3.GetUserByClaimRequest{
-		Claim: claim,
-		Value: value,
+func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, withRoles bool) (*cs3.User, string, error) {
+	res, err := c.authProvider.Authenticate(ctx, &gateway.AuthenticateRequest{
+		Type:         "machine",
+		ClientId:     claim + ":" + value,
+		ClientSecret: c.machineAuthAPIKey,
 	})
 
 	switch {
 	case err != nil:
-		return nil, fmt.Errorf("could not get user by claim %v with value %v: %w", claim, value, err)
+		return nil, "", fmt.Errorf("could not get user by claim %v with value %v: %w", claim, value, err)
 	case res.Status.Code != rpcv1beta1.Code_CODE_OK:
 		if res.Status.Code == rpcv1beta1.Code_CODE_NOT_FOUND {
-			return nil, ErrAccountNotFound
+			return nil, "", ErrAccountNotFound
 		}
-		return nil, fmt.Errorf("could not get user by claim %v with value %v : %w ", claim, value, err)
+		return nil, "", fmt.Errorf("could not get user by claim %v with value %v : %w ", claim, value, err)
 	}
 
 	user := res.User
 
 	if !withRoles {
-		return user, nil
+		return user, res.Token, nil
 	}
 
 	var roleIDs []string
@@ -82,10 +83,10 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 		user.Opaque.Map["roles"] = enc
 	}
 
-	return res.User, nil
+	return user, res.Token, nil
 }
 
-func (c *cs3backend) Authenticate(ctx context.Context, username string, password string) (*cs3.User, error) {
+func (c *cs3backend) Authenticate(ctx context.Context, username string, password string) (*cs3.User, string, error) {
 	res, err := c.authProvider.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         "basic",
 		ClientId:     username,
@@ -94,12 +95,12 @@ func (c *cs3backend) Authenticate(ctx context.Context, username string, password
 
 	switch {
 	case err != nil:
-		return nil, fmt.Errorf("could not authenticate with username and password user: %s, %w", username, err)
+		return nil, "", fmt.Errorf("could not authenticate with username and password user: %s, %w", username, err)
 	case res.Status.Code != rpcv1beta1.Code_CODE_OK:
-		return nil, fmt.Errorf("could not authenticate with username and password user: %s, got code: %d", username, res.Status.Code)
+		return nil, "", fmt.Errorf("could not authenticate with username and password user: %s, got code: %d", username, res.Status.Code)
 	}
 
-	return res.User, nil
+	return res.User, res.Token, nil
 }
 
 func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string]interface{}) (*cs3.User, error) {

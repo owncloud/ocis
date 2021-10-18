@@ -3,8 +3,8 @@ package proto
 import (
 	"context"
 
-	"github.com/asim/go-micro/v3/client"
-	"github.com/golang/protobuf/ptypes/empty"
+	"go-micro.dev/v4/client"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // MockBundleService can be used to write tests against the bundle service.
@@ -40,7 +40,7 @@ type MockBundleService struct {
 	GetBundleFunc               func(ctx context.Context, req *GetBundleRequest, opts ...client.CallOption) (*GetBundleResponse, error)
 	SaveBundleFunc              func(ctx context.Context, req *SaveBundleRequest, opts ...client.CallOption) (*SaveBundleResponse, error)
 	AddSettingToBundleFunc      func(ctx context.Context, req *AddSettingToBundleRequest, opts ...client.CallOption) (*AddSettingToBundleResponse, error)
-	RemoveSettingFromBundleFunc func(ctx context.Context, req *RemoveSettingFromBundleRequest, opts ...client.CallOption) (*empty.Empty, error)
+	RemoveSettingFromBundleFunc func(ctx context.Context, req *RemoveSettingFromBundleRequest, opts ...client.CallOption) (*emptypb.Empty, error)
 }
 
 // ListBundles will panic if the function has been called, but not mocked
@@ -76,7 +76,7 @@ func (m MockBundleService) AddSettingToBundle(ctx context.Context, req *AddSetti
 }
 
 // RemoveSettingFromBundle will panic if the function has been called, but not mocked
-func (m MockBundleService) RemoveSettingFromBundle(ctx context.Context, req *RemoveSettingFromBundleRequest, opts ...client.CallOption) (*empty.Empty, error) {
+func (m MockBundleService) RemoveSettingFromBundle(ctx context.Context, req *RemoveSettingFromBundleRequest, opts ...client.CallOption) (*emptypb.Empty, error) {
 	if m.RemoveSettingFromBundleFunc != nil {
 		return m.RemoveSettingFromBundleFunc(ctx, req, opts...)
 	}
@@ -128,7 +128,7 @@ type MockRoleService struct {
 	ListRolesFunc           func(ctx context.Context, req *ListBundlesRequest, opts ...client.CallOption) (*ListBundlesResponse, error)
 	ListRoleAssignmentsFunc func(ctx context.Context, req *ListRoleAssignmentsRequest, opts ...client.CallOption) (*ListRoleAssignmentsResponse, error)
 	AssignRoleToUserFunc    func(ctx context.Context, req *AssignRoleToUserRequest, opts ...client.CallOption) (*AssignRoleToUserResponse, error)
-	RemoveRoleFromUserFunc  func(ctx context.Context, req *RemoveRoleFromUserRequest, opts ...client.CallOption) (*empty.Empty, error)
+	RemoveRoleFromUserFunc  func(ctx context.Context, req *RemoveRoleFromUserRequest, opts ...client.CallOption) (*emptypb.Empty, error)
 }
 
 // ListRoles will panic if the function has been called, but not mocked
@@ -156,7 +156,7 @@ func (m MockRoleService) AssignRoleToUser(ctx context.Context, req *AssignRoleTo
 }
 
 // RemoveRoleFromUser will panic if the function has been called, but not mocked
-func (m MockRoleService) RemoveRoleFromUser(ctx context.Context, req *RemoveRoleFromUserRequest, opts ...client.CallOption) (*empty.Empty, error) {
+func (m MockRoleService) RemoveRoleFromUser(ctx context.Context, req *RemoveRoleFromUserRequest, opts ...client.CallOption) (*emptypb.Empty, error) {
 	if m.RemoveRoleFromUserFunc != nil {
 		return m.RemoveRoleFromUserFunc(ctx, req, opts...)
 	}

@@ -39,12 +39,20 @@ type StorageRegistry struct {
 	JSON         string
 }
 
+// AppRegistry defines the available app registry configuration
+type AppRegistry struct {
+	Driver        string
+	MimetypesJSON string
+}
+
 // AppProvider defines the available app provider configuration
 type AppProvider struct {
 	Port
 	ExternalAddr string
 	Driver       string
 	WopiDriver   WopiDriver
+	AppsURL      string
+	OpenURL      string
 }
 
 type WopiDriver struct {
@@ -119,6 +127,11 @@ type Users struct {
 	UserGroupsCacheExpiration int
 }
 
+// AuthMachineConfig defines the available configuration for the machine auth driver.
+type AuthMachineConfig struct {
+	MachineAuthAPIKey string
+}
+
 // Groups defines the available groups configuration.
 type Groups struct {
 	Port
@@ -132,7 +145,9 @@ type FrontendPort struct {
 	Port
 
 	AppProviderPrefix       string
+	ArchiverPrefix          string
 	DatagatewayPrefix       string
+	Favorites               bool
 	OCDavPrefix             string
 	OCSPrefix               string
 	OCSSharePrefix          string
@@ -185,14 +200,12 @@ type PublicStorage struct {
 
 // StorageConfig combines all available storage driver configuration parts.
 type StorageConfig struct {
-	Home        DriverCommon
 	EOS         DriverEOS
 	Local       DriverCommon
 	OwnCloud    DriverOwnCloud
 	OwnCloudSQL DriverOwnCloudSQL
 	S3          DriverS3
 	S3NG        DriverS3NG
-	Common      DriverCommon
 	OCIS        DriverOCIS
 	// TODO checksums ... figure out what that is supposed to do
 }
@@ -273,6 +286,8 @@ type DriverEOS struct {
 
 // DriverOCIS defines the available oCIS storage driver configuration.
 type DriverOCIS struct {
+	DriverCommon
+
 	ServiceUserUUID string
 }
 
@@ -403,28 +418,41 @@ type OCDav struct {
 	DavFilesNamespace string
 }
 
+// Archiver defines the available archiver configuration.
+type Archiver struct {
+	MaxNumFiles int64
+	MaxSize     int64
+	ArchiverURL string
+}
+
 // Reva defines the available reva configuration.
 type Reva struct {
 	// JWTSecret used to sign jwt tokens between services
-	JWTSecret       string
-	TransferSecret  string
-	TransferExpires int
-	OIDC            OIDC
-	LDAP            LDAP
-	UserGroupRest   UserGroupRest
-	UserOwnCloudSQL UserOwnCloudSQL
-	OCDav           OCDav
-	Storages        StorageConfig
+	JWTSecret             string
+	SkipUserGroupsInToken bool
+	TransferSecret        string
+	TransferExpires       int
+	OIDC                  OIDC
+	LDAP                  LDAP
+	UserGroupRest         UserGroupRest
+	UserOwnCloudSQL       UserOwnCloudSQL
+	OCDav                 OCDav
+	Archiver              Archiver
+	UserStorage           StorageConfig
+	MetadataStorage       StorageConfig
 	// Ports are used to configure which services to start on which port
 	Frontend          FrontendPort
 	DataGateway       DataGatewayPort
 	Gateway           Gateway
 	StorageRegistry   StorageRegistry
+	AppRegistry       AppRegistry
 	Users             Users
 	Groups            Groups
 	AuthProvider      Users
 	AuthBasic         Port
 	AuthBearer        Port
+	AuthMachine       Port
+	AuthMachineConfig AuthMachineConfig
 	Sharing           Sharing
 	StorageHome       StoragePort
 	StorageUsers      StoragePort

@@ -1,9 +1,9 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/web/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // RootWithConfig applies cfg to the root flagset
@@ -35,7 +35,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9104"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9104"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"WEB_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -95,7 +95,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9104"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9104"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"WEB_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -121,7 +121,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9100"),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "127.0.0.1:9100"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"WEB_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
@@ -164,16 +164,23 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "web-config-server",
 			Value:       flags.OverrideDefaultString(cfg.Web.Config.Server, "https://localhost:9200"),
-			Usage:       "Server URL",
+			Usage:       "Configuration server URL",
 			EnvVars:     []string{"WEB_UI_CONFIG_SERVER", "OCIS_URL"}, // WEB_UI_CONFIG_SERVER takes precedence over OCIS_URL
 			Destination: &cfg.Web.Config.Server,
 		},
 		&cli.StringFlag{
+			Name:        "web-theme-server",
+			Value:       flags.OverrideDefaultString(cfg.Web.ThemeServer, "https://localhost:9200"),
+			Usage:       "Theme server URL",
+			EnvVars:     []string{"WEB_UI_THEME_SERVER", "OCIS_URL"}, // WEB_UI_THEME_SERVER takes precedence over OCIS_URL
+			Destination: &cfg.Web.ThemeServer,
+		},
+		&cli.StringFlag{
 			Name:        "web-config-theme",
-			Value:       flags.OverrideDefaultString(cfg.Web.Config.Theme, "owncloud"),
-			Usage:       "Theme",
-			EnvVars:     []string{"WEB_UI_CONFIG_THEME"},
-			Destination: &cfg.Web.Config.Theme,
+			Value:       flags.OverrideDefaultString(cfg.Web.ThemePath, "/themes/owncloud/theme.json"),
+			Usage:       "Theme path on the theme server",
+			EnvVars:     []string{"WEB_UI_THEME_PATH"},
+			Destination: &cfg.Web.ThemePath,
 		},
 		&cli.StringFlag{
 			Name:        "web-config-version",
@@ -184,7 +191,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringSliceFlag{
 			Name:    "web-config-app",
-			Value:   cli.NewStringSlice("files", "search", "media-viewer"),
+			Value:   cli.NewStringSlice("files", "search", "media-viewer", "external"),
 			Usage:   `--web-config-app files [--web-config-app draw-io]`,
 			EnvVars: []string{"WEB_UI_CONFIG_APPS"},
 		},

@@ -27,7 +27,7 @@
           </template>
           <div class="oc-mt" v-else>
             <oc-loader :aria-label="$gettext('Loading personal settings')" />
-            <oc-alert :aria-hidden="true" varition="primary" no-close>
+            <oc-alert :aria-hidden="true" variation="primary" no-close>
               <p v-translate>Loading personal settings...</p>
             </oc-alert>
           </div>

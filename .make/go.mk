@@ -1,4 +1,5 @@
-IMPORT := github.com/owncloud/ocis/$(NAME)
+OCIS_REPO := github.com/owncloud/ocis
+IMPORT := ($OCIS_REPO)/$(NAME)
 BIN := bin
 DIST := dist
 
@@ -40,8 +41,8 @@ ifndef DATE
 	DATE := $(shell date -u '+%Y%m%d')
 endif
 
-LDFLAGS += -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn -s -w -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
-DEBUG_LDFLAGS += -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn -X "$(IMPORT)/pkg/version.String=$(VERSION)" -X "$(IMPORT)/pkg/version.Date=$(DATE)"
+LDFLAGS += -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn -s -w -X "$(OCIS_REPO)/ocis-pkg/version.String=$(VERSION)" -X "$(OCIS_REPO)/ocis-pkg/version.Date=$(DATE)"
+DEBUG_LDFLAGS += -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn -X "$(OCIS_REPO)/ocis-pkg/version.String=$(VERSION)" -X "$(OCIS_REPO)/ocis-pkg/version.Date=$(DATE)"
 
 GCFLAGS += all=-N -l
 
@@ -69,11 +70,11 @@ fmt:
 
 .PHONY: golangci-lint
 golangci-lint: $(GOLANGCI_LINT)
-	$(GOLANGCI_LINT) run -E gosec -E bodyclose -E dogsled -E durationcheck -E golint -E ifshort -E makezero -E prealloc -E predeclared --path-prefix $(NAME)
+	$(GOLANGCI_LINT) run -E gosec -E bodyclose -E dogsled -E durationcheck -E revive -E ifshort -E makezero -E prealloc -E predeclared --path-prefix $(NAME)
 
 .PHONY: ci-golangci-lint
 ci-golangci-lint: $(GOLANGCI_LINT)
-	$(GOLANGCI_LINT) run -E gosec -E bodyclose -E dogsled -E durationcheck -E golint -E ifshort -E makezero -E prealloc -E predeclared --path-prefix $(NAME) --timeout 10m0s --issues-exit-code 0 --out-format checkstyle > checkstyle.xml
+	$(GOLANGCI_LINT) run -E gosec -E bodyclose -E dogsled -E durationcheck -E revive -E ifshort -E makezero -E prealloc -E predeclared --path-prefix $(NAME) --timeout 10m0s --issues-exit-code 0 --out-format checkstyle > checkstyle.xml
 
 .PHONY: test
 test:

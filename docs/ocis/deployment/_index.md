@@ -20,6 +20,7 @@ oCIS deployments are super simple, yet there are many configurations possible fo
 - [oCIS setup with Traefik for SSL termination]({{< ref "ocis_traefik" >}})
 - [oCIS setup with Keycloak as identity provider]({{< ref "ocis_keycloak" >}})
 - [oCIS setup with WOPI server to open office documents in your browser]({{< ref "ocis_wopi" >}})
+- [Parallel deployment of oC10 and oCIS]({{< ref "oc10_ocis_parallel" >}})
 - [oCIS with S3 storage backend (MinIO)]({{< ref "ocis_s3" >}})
 - [oCIS with the Hello extension example]({{< ref "ocis_hello" >}})
 
@@ -40,6 +41,9 @@ You can change it by setting the `OCIS_JWT_SECRET` environment variable for oCIS
 
 Another is used secret for singing JWT tokens for uploads and downloads, which also needs to be changed by the user.
 You can change it by setting the `STORAGE_TRANSFER_SECRET` environment variable for oCIS to a random string.
+
+One more secret is used for machine auth, so that external applications can authenticate with an API key.
+You can change it by setting the `OCIS_MACHINE_AUTH_API_KEY` environment variable for oCIS to a random string.
 
 ### Delete demo users
 

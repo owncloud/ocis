@@ -9,7 +9,6 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
@@ -18,6 +17,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // AuthBasic is the entrypoint for the auth-basic command.
@@ -49,6 +49,10 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
 			rcfg := authBasicConfigFromStruct(c, cfg)
+			logger.Debug().
+				Str("server", "authbasic").
+				Interface("reva-config", rcfg).
+				Msg("config")
 
 			gr.Add(func() error {
 				runtime.RunWithOptions(rcfg, pidFile, runtime.WithLogger(&logger.Logger))
@@ -98,7 +102,9 @@ func authBasicConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret": cfg.Reva.JWTSecret,
+			"jwt_secret":                cfg.Reva.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
+			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.AuthBasic.GRPCNetwork,
@@ -156,8 +162,9 @@ func NewAuthBasic(cfg *ociscfg.Config) suture.Service {
 func (s AuthBasicSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.AuthBasic.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range AuthBasic(s.cfg).Flags {
-		if err := AuthBasic(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := AuthBasic(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

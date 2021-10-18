@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
@@ -20,6 +20,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // Frontend is the entrypoint for the frontend command.
@@ -30,7 +31,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 		Flags: flagset.FrontendWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Frontend.Services = c.StringSlice("service")
-			cfg.Reva.ChecksumSupportedTypes = c.StringSlice("checksum-suppored-type")
+			cfg.Reva.ChecksumSupportedTypes = c.StringSlice("checksum-supported-type")
 			return loadUserAgent(c, cfg)
 		},
 		Action: func(c *cli.Context) error {
@@ -54,12 +55,35 @@ func Frontend(cfg *config.Config) *cli.Command {
 				desktopRedirectURIs[port] = fmt.Sprintf("http://localhost:%d", (port + 1024))
 			}
 
+			archivers := []map[string]interface{}{
+				{
+					"enabled":       true,
+					"version":       "2.0.0",
+					"formats":       []string{"tar", "zip"},
+					"archiver_url":  cfg.Reva.Archiver.ArchiverURL,
+					"max_num_files": strconv.FormatInt(cfg.Reva.Archiver.MaxNumFiles, 10),
+					"max_size":      strconv.FormatInt(cfg.Reva.Archiver.MaxSize, 10),
+				},
+			}
+
+			appProviders := []map[string]interface{}{
+				{
+					"enabled":  true,
+					"version":  "1.0.0",
+					"apps_url": cfg.Reva.AppProvider.AppsURL,
+					"open_url": cfg.Reva.AppProvider.OpenURL,
+				},
+			}
+
 			filesCfg := map[string]interface{}{
 				"private_links":     false,
 				"bigfilechunking":   false,
 				"blacklisted_files": []string{},
 				"undelete":          true,
 				"versioning":        true,
+				"archivers":         archivers,
+				"app_providers":     appProviders,
+				"favorites":         cfg.Reva.Frontend.Favorites,
 			}
 
 			if cfg.Reva.DefaultUploadProtocol == "tus" {
@@ -125,8 +149,9 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret": cfg.Reva.JWTSecret,
-			"gatewaysvc": cfg.Reva.Gateway.Endpoint, // Todo or address?
+			"jwt_secret":                cfg.Reva.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Gateway.Endpoint, // Todo or address?
+			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"http": map[string]interface{}{
 			"network": cfg.Reva.Frontend.HTTPNetwork,
@@ -146,6 +171,13 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 					"transfer_shared_secret": cfg.Reva.TransferSecret,
 					"timeout":                86400,
 					"insecure":               true,
+				},
+				"archiver": map[string]interface{}{
+					"prefix":        cfg.Reva.Frontend.ArchiverPrefix,
+					"timeout":       86400,
+					"insecure":      true,
+					"max_num_files": cfg.Reva.Archiver.MaxNumFiles,
+					"max_size":      cfg.Reva.Archiver.MaxSize,
 				},
 				"datagateway": map[string]interface{}{
 					"prefix":                 cfg.Reva.Frontend.DatagatewayPrefix,
@@ -174,7 +206,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 							"db_host":     cfg.Reva.Sharing.UserSQLHost,
 							"db_port":     cfg.Reva.Sharing.UserSQLPort,
 							"db_name":     cfg.Reva.Sharing.UserSQLName,
-							"namespace":   cfg.Reva.Storages.EOS.Root,
+							"namespace":   cfg.Reva.UserStorage.EOS.Root,
 							"gatewaysvc":  cfg.Reva.Gateway.Endpoint,
 						},
 					},
@@ -308,8 +340,9 @@ func NewFrontend(cfg *ociscfg.Config) suture.Service {
 func (s FrontendSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.Frontend.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range Frontend(s.cfg).Flags {
-		if err := Frontend(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := Frontend(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

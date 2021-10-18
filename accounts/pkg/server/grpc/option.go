@@ -3,11 +3,11 @@ package grpc
 import (
 	"context"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/metrics"
 	svc "github.com/owncloud/ocis/accounts/pkg/service/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/urfave/cli/v2"
 )
 
 // Option defines a single option function.

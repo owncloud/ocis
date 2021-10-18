@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
@@ -31,6 +31,7 @@ import (
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
+	"github.com/urfave/cli/v2"
 	"golang.org/x/oauth2"
 )
 
@@ -45,7 +46,11 @@ func Server(cfg *config.Config) *cli.Command {
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
-			cfg.PreSignedURL.AllowedHTTPMethods = ctx.StringSlice("presignedurl-allow-method")
+			// StringSliceFlag doesn't support Destination
+			// UPDATE Destination on string flags supported. Wait for https://github.com/urfave/cli/pull/1078 to get to micro/cli
+			if len(ctx.StringSlice("presignedurl-allow-method")) > 0 {
+				cfg.PreSignedURL.AllowedHTTPMethods = ctx.StringSlice("presignedurl-allow-method")
+			}
 
 			if err := loadUserAgent(ctx, cfg); err != nil {
 				return err
@@ -142,27 +147,36 @@ func Server(cfg *config.Config) *cli.Command {
 	}
 }
 
-func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alice.Chain {
+func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config) alice.Chain {
 	rolesClient := settings.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
 	revaClient, err := cs3.GetGatewayServiceClient(cfg.Reva.Address)
 	var userProvider backend.UserBackend
 	switch cfg.AccountBackend {
 	case "accounts":
+		tokenManager, err := jwt.New(map[string]interface{}{
+			"secret":  cfg.TokenManager.JWTSecret,
+			"expires": int64(24 * 60 * 60),
+		})
+		if err != nil {
+			logger.Error().Err(err).
+				Msg("Failed to create token manager")
+		}
 		userProvider = backend.NewAccountsServiceUserBackend(
 			acc.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient),
 			rolesClient,
 			cfg.OIDC.Issuer,
-			l,
+			tokenManager,
+			logger,
 		)
 	case "cs3":
-		userProvider = backend.NewCS3UserBackend(revaClient, rolesClient, revaClient, l)
+		userProvider = backend.NewCS3UserBackend(rolesClient, revaClient, cfg.MachineAuthAPIKey, logger)
 	default:
-		l.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)
+		logger.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)
 	}
 
 	storeClient := storepb.NewStoreService("com.owncloud.api.store", grpc.DefaultClient)
 	if err != nil {
-		l.Error().Err(err).
+		logger.Error().Err(err).
 			Str("gateway", cfg.Reva.Address).
 			Msg("Failed to create reva gateway service client")
 	}
@@ -182,7 +196,7 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 		pkgmiddleware.TraceContext,
 		chimiddleware.RealIP,
 		chimiddleware.RequestID,
-		middleware.AccessLog(l),
+		middleware.AccessLog(logger),
 		middleware.HTTPSRedirect,
 
 		// now that we established the basics, on with authentication middleware
@@ -202,20 +216,20 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 			middleware.TokenCacheTTL(time.Second*time.Duration(cfg.OIDC.UserinfoCache.TTL)),
 
 			// basic Options
-			middleware.Logger(l),
+			middleware.Logger(logger),
 			middleware.EnableBasicAuth(cfg.EnableBasicAuth),
 			middleware.UserProvider(userProvider),
 			middleware.OIDCIss(cfg.OIDC.Issuer),
 			middleware.CredentialsByUserAgent(cfg.Reva.Middleware.Auth.CredentialsByUserAgent),
 		),
 		middleware.SignedURLAuth(
-			middleware.Logger(l),
+			middleware.Logger(logger),
 			middleware.PreSignedURLConfig(cfg.PreSignedURL),
 			middleware.UserProvider(userProvider),
 			middleware.Store(storeClient),
 		),
 		middleware.AccountResolver(
-			middleware.Logger(l),
+			middleware.Logger(logger),
 			middleware.UserProvider(userProvider),
 			middleware.TokenManagerConfig(cfg.TokenManager),
 			middleware.UserOIDCClaim(cfg.UserOIDCClaim),
@@ -224,15 +238,19 @@ func loadMiddlewares(ctx context.Context, l log.Logger, cfg *config.Config) alic
 		),
 
 		middleware.SelectorCookie(
-			middleware.Logger(l),
+			middleware.Logger(logger),
 			middleware.UserProvider(userProvider),
 			middleware.PolicySelectorConfig(*cfg.PolicySelector),
 		),
 
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
-			middleware.Logger(l),
+			middleware.Logger(logger),
 			middleware.TokenManagerConfig(cfg.TokenManager),
+			middleware.RevaGatewayClient(revaClient),
+		),
+		middleware.PublicShareAuth(
+			middleware.Logger(logger),
 			middleware.RevaGatewayClient(revaClient),
 		),
 	)

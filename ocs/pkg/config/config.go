@@ -64,6 +64,7 @@ type Config struct {
 	AccountBackend     string
 	RevaAddress        string
 	StorageUsersDriver string
+	MachineAuthAPIKey  string
 	IdentityManagement IdentityManagement
 
 	Context    context.Context

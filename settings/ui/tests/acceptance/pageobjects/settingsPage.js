@@ -34,7 +34,7 @@ module.exports = {
           let elemfound = true
 
           // Language value is set to empty at beginning
-          // In that case jsut return false
+          // In that case just return false
           await this.api.element('@languageValue', result => {
             if (result.status < 0) {
               elemfound = false

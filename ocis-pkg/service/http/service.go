@@ -8,8 +8,8 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/registry"
 
 	mhttps "github.com/asim/go-micro/plugins/server/http/v3"
-	"github.com/asim/go-micro/v3"
-	"github.com/asim/go-micro/v3/server"
+	"go-micro.dev/v4"
+	"go-micro.dev/v4/server"
 )
 
 // Service simply wraps the go-micro web service.

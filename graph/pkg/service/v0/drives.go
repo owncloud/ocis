@@ -1,21 +1,25 @@
 package svc
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"math"
 	"net/http"
 	"net/url"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/CiscoM31/godata"
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/pkg/ctx"
-	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
@@ -53,6 +57,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		}
 		g.logger.Error().Err(err).Msg("error sending list storage spaces grpc request")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		return
 	}
 
 	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
@@ -61,8 +66,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	files, err := formatDrives(wdu, res.StorageSpaces)
+	files, err := g.formatDrives(ctx, wdu, res.StorageSpaces)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error encoding response as json")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -145,11 +149,6 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := r.ParseForm(); err != nil {
-		errorcode.GeneralException.Render(w, r, http.StatusUnauthorized, err.Error())
-		return
-	}
-
 	s := sproto.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
 
 	_, err := s.GetPermissionByID(r.Context(), &sproto.GetPermissionByIDRequest{
@@ -166,31 +165,34 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	spaceName := chi.URLParam(r, "drive-name")
+	drive := msgraph.Drive{}
+	if err := json.NewDecoder(r.Body).Decode(&drive); err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "invalid schema definition")
+		return
+	}
+	spaceName := *drive.Name
 	if spaceName == "" {
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Errorf("invalid name").Error())
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "invalid name")
 		return
 	}
 
-	quota, _ := strconv.ParseUint(r.Form.Get("quota"), 10, 64)
-	if quota == 0 {
-		quota = 65536 // set default quota if no form value was sent.
+	var driveType string
+	if drive.DriveType != nil {
+		driveType = *drive.DriveType
 	}
-
-	quotaMaxFiles, _ := strconv.ParseUint(r.Form.Get("quotaMaxFiles"), 10, 64)
-	if quotaMaxFiles == 0 {
-		quotaMaxFiles = 20 // set default quotaMaxFiles if no form value was sent.
+	switch driveType {
+	case "", "project":
+		driveType = "project"
+	default:
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("drives of type %s cannot be created via this api", driveType))
+		return
 	}
 
 	csr := provider.CreateStorageSpaceRequest{
 		Owner: us,
-		Type:  "share",
+		Type:  driveType,
 		Name:  spaceName,
-		Quota: &provider.Quota{
-			QuotaMaxBytes: quota,
-			QuotaMaxFiles: quotaMaxFiles,
-		},
+		Quota: getQuota(drive.Quota, g.config.Spaces.DefaultQuota),
 	}
 
 	resp, err := client.CreateStorageSpace(r.Context(), &csr)
@@ -200,8 +202,98 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Errorf("").Error())
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "")
+		return
 	}
+
+	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error parsing url")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	newDrive, err := cs3StorageSpaceToDrive(wdu, resp.StorageSpace)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error parsing url")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+	render.Status(r, http.StatusCreated)
+	render.JSON(w, r, newDrive)
+}
+
+func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
+	// wildcards however addressed here is not yet supported. We want to address drives by their unique
+	// identifiers. Any open queries need to be implemented. Same applies for sub-entities.
+	// For further reading: http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#sec_AddressingaSubsetofaCollection
+
+	// strip "/graph/v1.0/" out and parse the rest. This is how godata input is expected.
+	//https://github.com/CiscoM31/godata/blob/d70e191d2908191623be84401fecc40d6af4afde/url_parser_test.go#L10
+	sanitized := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+
+	req, err := godata.ParseRequest(sanitized, r.URL.Query(), true)
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if req.FirstSegment.Identifier.Get() == "" {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "identifier cannot be empty")
+		return
+	}
+
+	drive := msgraph.Drive{}
+	if err = json.NewDecoder(r.Body).Decode(&drive); err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %v", r.Body))
+		return
+	}
+
+	identifierParts := strings.Split(req.FirstSegment.Identifier.Get(), "!")
+	if len(identifierParts) != 2 {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid resource id: %v", req.FirstSegment.Identifier.Get()))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	storageID, opaqueID := identifierParts[0], identifierParts[1]
+
+	client, err := g.GetClient()
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	updateSpaceRequest := &provider.UpdateStorageSpaceRequest{
+		// Prepare the object to apply the diff from. The properties on StorageSpace will overwrite
+		// the original storage space.
+		StorageSpace: &provider.StorageSpace{
+			Root: &provider.ResourceId{
+				StorageId: storageID,
+				OpaqueId:  opaqueID,
+			},
+			Name: *drive.Name,
+		},
+	}
+
+	if drive.Quota.HasTotal() {
+		updateSpaceRequest.StorageSpace.Quota = &storageprovider.Quota{
+			QuotaMaxBytes: uint64(*drive.Quota.Total),
+		}
+	}
+
+	resp, err := client.UpdateStorageSpace(r.Context(), updateSpaceRequest)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "")
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func cs3TimestampToTime(t *types.Timestamp) time.Time {
@@ -307,15 +399,93 @@ func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpac
 	return drive, nil
 }
 
-func formatDrives(baseURL *url.URL, mds []*storageprovider.StorageSpace) ([]*msgraph.Drive, error) {
+func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storageprovider.StorageSpace) ([]*msgraph.Drive, error) {
 	responses := make([]*msgraph.Drive, 0, len(mds))
 	for i := range mds {
 		res, err := cs3StorageSpaceToDrive(baseURL, mds[i])
 		if err != nil {
 			return nil, err
 		}
+		qta, err := g.getDriveQuota(ctx, mds[i])
+		if err != nil {
+			return nil, err
+		}
+		res.Quota = &qta
 		responses = append(responses, res)
 	}
 
 	return responses, nil
+}
+
+func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (msgraph.Quota, error) {
+	client, err := g.GetClient()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error creating grpc client")
+		return msgraph.Quota{}, err
+	}
+
+	req := &gateway.GetQuotaRequest{
+		Ref: &provider.Reference{
+			ResourceId: &provider.ResourceId{
+				StorageId: space.Root.StorageId,
+				OpaqueId:  space.Root.OpaqueId,
+			},
+			Path: ".",
+		},
+	}
+	res, err := client.GetQuota(ctx, req)
+	switch {
+	case err != nil:
+		g.logger.Error().Err(err).Msg("error sending get quota grpc request")
+		return msgraph.Quota{}, err
+	case res.Status.Code != cs3rpc.Code_CODE_OK:
+		g.logger.Error().Err(err).Msg("error sending sending get quota grpc request")
+		return msgraph.Quota{}, err
+	}
+
+	total := int64(res.TotalBytes)
+
+	used := int64(res.UsedBytes)
+	remaining := total - used
+	qta := msgraph.Quota{
+		Remaining: &remaining,
+		Total:     &total,
+		Used:      &used,
+	}
+	state := calculateQuotaState(total, used)
+	qta.State = &state
+
+	return qta, nil
+}
+
+func calculateQuotaState(total int64, used int64) (state string) {
+	percent := (float64(used) / float64(total)) * 100
+
+	switch {
+	case percent <= float64(75):
+		return "normal"
+	case percent <= float64(90):
+		return "nearing"
+	case percent <= float64(99):
+		return "critical"
+	default:
+		return "exceeded"
+	}
+}
+
+func getQuota(quota *msgraph.Quota, defaultQuota string) *provider.Quota {
+	switch {
+	case quota != nil && quota.Total != nil:
+		if q := *quota.Total; q >= 0 {
+			return &provider.Quota{QuotaMaxBytes: uint64(q)}
+		}
+		fallthrough
+	case defaultQuota != "":
+		if q, err := strconv.ParseInt(defaultQuota, 10, 64); err == nil && q >= 0 {
+			return &provider.Quota{QuotaMaxBytes: uint64(q)}
+		}
+		fallthrough
+	default:
+		return nil
+	}
 }

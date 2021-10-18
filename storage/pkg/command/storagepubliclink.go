@@ -8,7 +8,6 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
@@ -17,6 +16,7 @@ import (
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // StoragePublicLink is the entrypoint for the reva-storage-public-link command.
@@ -88,8 +88,9 @@ func storagePublicLinkConfigFromStruct(c *cli.Context, cfg *config.Config) map[s
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret": cfg.Reva.JWTSecret,
-			"gatewaysvc": cfg.Reva.Gateway.Endpoint,
+			"jwt_secret":                cfg.Reva.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
+			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.StoragePublicLink.GRPCNetwork,
@@ -134,8 +135,9 @@ func NewStoragePublicLink(cfg *ociscfg.Config) suture.Service {
 func (s StoragePublicLinkSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.StoragePublicLink.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range StoragePublicLink(s.cfg).Flags {
-		if err := StoragePublicLink(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := StoragePublicLink(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

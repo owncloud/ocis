@@ -1,9 +1,10 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/owncloud/ocis/storage/pkg/flagset/userdrivers"
+	"github.com/urfave/cli/v2"
 )
 
 // FrontendWithConfig applies cfg to the root flagset
@@ -13,7 +14,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 		// debug ports are the odd ports
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.DebugAddr, "0.0.0.0:9141"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.DebugAddr, "127.0.0.1:9141"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"STORAGE_FRONTEND_DEBUG_ADDR"},
 			Destination: &cfg.Reva.Frontend.DebugAddr,
@@ -57,6 +58,23 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.OCDav.DavFilesNamespace,
 		},
 
+		// Archiver
+
+		&cli.Int64Flag{
+			Name:        "archiver-max-num-files",
+			Value:       flags.OverrideDefaultInt64(cfg.Reva.Archiver.MaxNumFiles, 10000),
+			Usage:       "Maximum number of files to be included in the archiver",
+			EnvVars:     []string{"STORAGE_ARCHIVER_MAX_NUM_FILES"},
+			Destination: &cfg.Reva.Archiver.MaxNumFiles,
+		},
+		&cli.Int64Flag{
+			Name:        "archiver-max-size",
+			Value:       flags.OverrideDefaultInt64(cfg.Reva.Archiver.MaxSize, 1073741824), // 1GB
+			Usage:       "Maximum size for the sum of the sizes of all the files included in the archive",
+			EnvVars:     []string{"STORAGE_ARCHIVER_MAX_SIZE"},
+			Destination: &cfg.Reva.Archiver.MaxSize,
+		},
+
 		// Services
 
 		// Frontend
@@ -70,7 +88,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "addr",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.HTTPAddr, "0.0.0.0:9140"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.HTTPAddr, "127.0.0.1:9140"),
 			Usage:       "Address to bind storage service",
 			EnvVars:     []string{"STORAGE_FRONTEND_HTTP_ADDR"},
 			Destination: &cfg.Reva.Frontend.HTTPAddr,
@@ -99,11 +117,25 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.Frontend.AppProviderPrefix,
 		},
 		&cli.StringFlag{
+			Name:        "archiver-prefix",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.ArchiverPrefix, "archiver"),
+			Usage:       "archiver prefix",
+			EnvVars:     []string{"STORAGE_FRONTEND_ARCHIVER_PREFIX"},
+			Destination: &cfg.Reva.Frontend.ArchiverPrefix,
+		},
+		&cli.StringFlag{
 			Name:        "datagateway-prefix",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.DatagatewayPrefix, "data"),
 			Usage:       "datagateway prefix",
 			EnvVars:     []string{"STORAGE_FRONTEND_DATAGATEWAY_PREFIX"},
 			Destination: &cfg.Reva.Frontend.DatagatewayPrefix,
+		},
+		&cli.BoolFlag{
+			Name:        "favorites",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.Frontend.Favorites, false),
+			Usage:       "announces favorites support to clients",
+			EnvVars:     []string{"STORAGE_FRONTEND_FAVORITES"},
+			Destination: &cfg.Reva.Frontend.Favorites,
 		},
 		&cli.StringFlag{
 			Name:        "ocdav-prefix",
@@ -150,10 +182,10 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 		// Gateway
 
 		&cli.StringFlag{
-			Name:        "gateway-url",
-			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "localhost:9142"),
-			Usage:       "URL to use for the storage gateway service",
-			EnvVars:     []string{"STORAGE_GATEWAY_ENDPOINT"},
+			Name:        "reva-gateway-addr",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Gateway.Endpoint, "127.0.0.1:9142"),
+			Usage:       "Address of REVA gateway endpoint",
+			EnvVars:     []string{"REVA_GATEWAY"},
 			Destination: &cfg.Reva.Gateway.Endpoint,
 		},
 
@@ -180,9 +212,9 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.UploadHTTPMethodOverride,
 		},
 		&cli.StringSliceFlag{
-			Name:    "checksum-suppored-type",
+			Name:    "checksum-supported-type",
 			Value:   cli.NewStringSlice("sha1", "md5", "adler32"),
-			Usage:   "--checksum-suppored-type sha1 [--checksum-suppored-type adler32]",
+			Usage:   "--checksum-supported-type sha1 [--checksum-supported-type adler32]",
 			EnvVars: []string{"STORAGE_FRONTEND_CHECKSUM_SUPPORTED_TYPES"},
 		},
 		&cli.StringFlag{
@@ -191,6 +223,31 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "Specify the preferred checksum algorithm used for uploads",
 			EnvVars:     []string{"STORAGE_FRONTEND_CHECKSUM_PREFERRED_UPLOAD_TYPE"},
 			Destination: &cfg.Reva.ChecksumPreferredUploadType,
+		},
+
+		// Archiver
+		&cli.StringFlag{
+			Name:        "archiver-url",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Archiver.ArchiverURL, "/archiver"),
+			Usage:       "URL where the archiver is reachable",
+			EnvVars:     []string{"STORAGE_FRONTEND_ARCHIVER_URL"},
+			Destination: &cfg.Reva.Archiver.ArchiverURL,
+		},
+
+		// App Provider
+		&cli.StringFlag{
+			Name:        "appprovider-apps-url",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.AppsURL, "/app/list"),
+			Usage:       "URL where the app listing of the app provider is reachable",
+			EnvVars:     []string{"STORAGE_FRONTEND_APP_PROVIDER_APPS_URL"},
+			Destination: &cfg.Reva.AppProvider.AppsURL,
+		},
+		&cli.StringFlag{
+			Name:        "appprovider-open-url",
+			Value:       flags.OverrideDefaultString(cfg.Reva.AppProvider.OpenURL, "/app/open"),
+			Usage:       "URL where files can be handed over to an application from the app provider",
+			EnvVars:     []string{"STORAGE_FRONTEND_APP_PROVIDER_OPEN_URL"},
+			Destination: &cfg.Reva.AppProvider.OpenURL,
 		},
 
 		// Reva Middlewares Config
@@ -205,7 +262,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 	flags = append(flags, DebugWithConfig(cfg)...)
 	flags = append(flags, SecretWithConfig(cfg)...)
 	flags = append(flags, SharingSQLWithConfig(cfg)...)
-	flags = append(flags, DriverEOSWithConfig(cfg)...)
+	flags = append(flags, userdrivers.DriverEOSWithConfig(cfg)...)
 
 	return flags
 }

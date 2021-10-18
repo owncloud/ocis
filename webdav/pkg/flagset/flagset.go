@@ -1,9 +1,9 @@
 package flagset
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/webdav/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // HealthWithConfig applies cfg to the root flagset
@@ -11,7 +11,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9119"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9119"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"WEBDAV_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -89,7 +89,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9119"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9119"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"WEBDAV_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -115,7 +115,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9115"),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "127.0.0.1:9115"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"WEBDAV_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,

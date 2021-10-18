@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/web/pkg/config"
@@ -15,6 +14,7 @@ import (
 	"github.com/owncloud/ocis/web/pkg/server/debug"
 	"github.com/owncloud/ocis/web/pkg/server/http"
 	"github.com/owncloud/ocis/web/pkg/tracing"
+	"github.com/urfave/cli/v2"
 )
 
 // Server is the entrypoint for the server command.
@@ -29,7 +29,11 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.HTTP.Root = strings.TrimRight(cfg.HTTP.Root, "/")
 			}
 
-			cfg.Web.Config.Apps = ctx.StringSlice("web-config-app")
+			// StringSliceFlag doesn't support Destination
+			// UPDATE Destination on string flags supported. Wait for https://github.com/urfave/cli/pull/1078 to get to micro/cli
+			if len(ctx.StringSlice("web-config-app")) > 0 {
+				cfg.Web.Config.Apps = ctx.StringSlice("web-config-app")
+			}
 
 			if !cfg.Supervised {
 				if err := ParseConfig(ctx, cfg); err != nil {

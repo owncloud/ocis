@@ -26,7 +26,7 @@ The dashed lines in the diagram indicate requests that are made to authenticate 
 2. The gateway will verify the JWT signature of the `x-access-token` or try to authenticate the request itself, e.g. using a public link token.
 
 {{< hint warning >}}
-The bottom part is lighter because we will deprecate it in favor of using only the CS3 user and group providers after moving some account functionality into reva and glauth. The metadata storage is not registered in the reva gateway to seperate metadata necessary for running the service from data that is being served directly.
+The bottom part is lighter because we will deprecate it in favor of using only the CS3 user and group providers after moving some account functionality into reva and glauth. The metadata storage is not registered in the reva gateway to separate metadata necessary for running the service from data that is being served directly.
 {{< /hint >}}
 
 ## Endpoints and references

@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v3"
-	merrors "github.com/asim/go-micro/v3/errors"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -27,7 +26,7 @@ import (
 	ocstracing "github.com/owncloud/ocis/ocs/pkg/tracing"
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
 	"github.com/pkg/errors"
-	"go.opentelemetry.io/otel/attribute"
+	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
@@ -149,8 +148,6 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 		Tracer("ocs").
 		Start(r.Context(), "GetUser")
 	defer span.End()
-
-	span.SetAttributes(attribute.Any("user", d))
 
 	mustNotFail(render.Render(w, r, response.DataRender(d)))
 }
@@ -486,7 +483,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 func (o Ocs) mintTokenForUser(ctx context.Context, account *accounts.Account) (string, error) {
 	tm, _ := jwt.New(map[string]interface{}{
 		"secret":  o.config.TokenManager.JWTSecret,
-		"expires": int64(60),
+		"expires": int64(24 * 60 * 60),
 	})
 
 	u := &revauser.User{
@@ -736,7 +733,7 @@ func (o Ocs) fetchAccountByUsername(ctx context.Context, name string) (*accounts
 
 func (o Ocs) fetchAccountFromCS3Backend(ctx context.Context, name string) (*accounts.Account, error) {
 	backend := o.getCS3Backend()
-	u, err := backend.GetUserByClaims(ctx, "username", name, false)
+	u, _, err := backend.GetUserByClaims(ctx, "username", name, false)
 	if err != nil {
 		return nil, err
 	}

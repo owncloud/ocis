@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -67,6 +68,13 @@ func (p Web) getPayload() (payload []byte, err error) {
 		if p.config.Web.Config.Options == nil {
 			p.config.Web.Config.Options = make(map[string]interface{})
 			p.config.Web.Config.Options["hideSearchBar"] = true
+		}
+
+		// build theme url
+		if themeServer, err := url.Parse(p.config.Web.ThemeServer); err == nil {
+			p.config.Web.Config.Theme = themeServer.String() + p.config.Web.ThemePath
+		} else {
+			p.config.Web.Config.Theme = p.config.Web.ThemePath
 		}
 
 		if p.config.Web.Config.ExternalApps == nil {

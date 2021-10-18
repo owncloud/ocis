@@ -3,10 +3,10 @@ package flagset
 import (
 	"path"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/glauth/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
+	"github.com/urfave/cli/v2"
 )
 
 // RootWithConfig applies cfg to the root flagset
@@ -38,7 +38,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9129"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9129"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"GLAUTH_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -98,7 +98,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9129"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9129"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"GLAUTH_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -132,10 +132,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "ldap-addr",
-			Value:       flags.OverrideDefaultString(cfg.Ldap.Address, "0.0.0.0:9125"),
+			Value:       flags.OverrideDefaultString(cfg.Ldap.Addr, "127.0.0.1:9125"),
 			Usage:       "Address to bind ldap server",
 			EnvVars:     []string{"GLAUTH_LDAP_ADDR"},
-			Destination: &cfg.Ldap.Address,
+			Destination: &cfg.Ldap.Addr,
 		},
 		&cli.BoolFlag{
 			Name:        "ldap-enabled",
@@ -147,10 +147,10 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "ldaps-addr",
-			Value:       flags.OverrideDefaultString(cfg.Ldaps.Address, "0.0.0.0:9126"),
+			Value:       flags.OverrideDefaultString(cfg.Ldaps.Addr, "127.0.0.1:9126"),
 			Usage:       "Address to bind ldap server",
 			EnvVars:     []string{"GLAUTH_LDAPS_ADDR"},
-			Destination: &cfg.Ldaps.Address,
+			Destination: &cfg.Ldaps.Addr,
 		},
 		&cli.BoolFlag{
 			Name:        "ldaps-enabled",
@@ -178,7 +178,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "backend-basedn",
-			Value:       flags.OverrideDefaultString(cfg.Backend.BaseDN, "dc=example,dc=org"),
+			Value:       flags.OverrideDefaultString(cfg.Backend.BaseDN, "dc=ocis,dc=test"),
 			Usage:       "base distinguished name to expose",
 			EnvVars:     []string{"GLAUTH_BACKEND_BASEDN"},
 			Destination: &cfg.Backend.BaseDN,
@@ -221,8 +221,8 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringSliceFlag{
 			Name:    "backend-server",
-			Value:   cli.NewStringSlice("https://demo.owncloud.com/apps/graphapi/v1.0"),
-			Usage:   `--backend-server http://internal1.example.com [--backend-server http://internal2.example.com]`,
+			Value:   cli.NewStringSlice(),
+			Usage:   `--backend-server https://demo.owncloud.com/apps/graphapi/v1.0 [--backend-server "https://demo2.owncloud.com/apps/graphapi/v1.0"]`,
 			EnvVars: []string{"GLAUTH_BACKEND_SERVERS"},
 		},
 		&cli.BoolFlag{
@@ -237,7 +237,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "fallback-basedn",
-			Value:       flags.OverrideDefaultString(cfg.Fallback.BaseDN, "dc=example,dc=org"),
+			Value:       flags.OverrideDefaultString(cfg.Fallback.BaseDN, "dc=ocis,dc=test"),
 			Usage:       "base distinguished name to expose",
 			EnvVars:     []string{"GLAUTH_FALLBACK_BASEDN"},
 			Destination: &cfg.Fallback.BaseDN,

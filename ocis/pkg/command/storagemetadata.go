@@ -1,12 +1,12 @@
 package command
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/storage/pkg/command"
 	svcconfig "github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset"
+	"github.com/urfave/cli/v2"
 )
 
 // StorageMetadataCommand is the entrypoint for the storage-metadata command.

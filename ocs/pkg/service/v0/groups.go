@@ -9,7 +9,6 @@ import (
 	"regexp"
 	"strconv"
 
-	merrors "github.com/asim/go-micro/v3/errors"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -17,6 +16,7 @@ import (
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
 	ocstracing "github.com/owncloud/ocis/ocs/pkg/tracing"
+	merrors "go-micro.dev/v4/errors"
 	"go.opentelemetry.io/otel/attribute"
 )
 
@@ -38,7 +38,7 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 				Start(r.Context(), "ListUserGroups")
 			defer span.End()
 
-			span.SetAttributes(attribute.Any("groups", u.Groups))
+			span.SetAttributes(attribute.StringSlice("groups", u.Groups))
 
 			if len(u.Groups) > 0 {
 				mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: u.Groups})))
@@ -96,7 +96,7 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 		Start(r.Context(), "ListUserGroups")
 	defer span.End()
 
-	span.SetAttributes(attribute.Any("groups", groups))
+	span.SetAttributes(attribute.StringSlice("groups", groups))
 
 	mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: groups})))
 }
@@ -266,7 +266,7 @@ func (o Ocs) ListGroups(w http.ResponseWriter, r *http.Request) {
 		Start(r.Context(), "ListGroups")
 	defer span.End()
 
-	span.SetAttributes(attribute.Any("groups", groups))
+	span.SetAttributes(attribute.StringSlice("groups", groups))
 
 	mustNotFail(render.Render(w, r, response.DataRender(&data.Groups{Groups: groups})))
 }

@@ -3,10 +3,10 @@ package flagset
 import (
 	"path"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/idp/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
+	"github.com/urfave/cli/v2"
 )
 
 // RootWithConfig applies cfg to the root flagset
@@ -38,7 +38,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9134"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9134"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"IDP_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -98,7 +98,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9134"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9134"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"IDP_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -124,7 +124,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "http-addr",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "0.0.0.0:9130"),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.Addr, "127.0.0.1:9130"),
 			Usage:       "Address to bind http server",
 			EnvVars:     []string{"IDP_HTTP_ADDR"},
 			Destination: &cfg.HTTP.Addr,
@@ -166,7 +166,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldap-bind-dn",
-			Value:       flags.OverrideDefaultString(cfg.Ldap.BindDN, "cn=idp,ou=sysusers,dc=example,dc=org"),
+			Value:       flags.OverrideDefaultString(cfg.Ldap.BindDN, "cn=idp,ou=sysusers,dc=ocis,dc=test"),
 			Usage:       "Bind DN for the LDAP server (glauth)",
 			EnvVars:     []string{"IDP_LDAP_BIND_DN"},
 			Destination: &cfg.Ldap.BindDN,
@@ -180,7 +180,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "ldap-base-dn",
-			Value:       flags.OverrideDefaultString(cfg.Ldap.BaseDN, "ou=users,dc=example,dc=org"),
+			Value:       flags.OverrideDefaultString(cfg.Ldap.BaseDN, "ou=users,dc=ocis,dc=test"),
 			Usage:       "LDAP base DN of the oCIS users",
 			EnvVars:     []string{"IDP_LDAP_BASE_DN"},
 			Destination: &cfg.Ldap.BaseDN,
@@ -270,7 +270,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "validation-keys-path",
-			Usage:       "Full path to a folder containg PEM encoded private or public key files used for token validaton (file name without extension is used as kid)",
+			Usage:       "Full path to a folder containing PEM encoded private or public key files used for token validation (file name without extension is used as kid)",
 			EnvVars:     []string{"IDP_VALIDATION_KEYS_PATH"},
 			Value:       flags.OverrideDefaultString(cfg.IDP.ValidationKeysPath, ""),
 			Destination: &cfg.IDP.ValidationKeysPath,

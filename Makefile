@@ -32,7 +32,7 @@ OCIS_MODULES = \
 	web \
 	webdav
 
-ifneq (, $(shell which go 2> /dev/null)) # supress `command not found warnings` for non go targets in CI
+ifneq (, $(shell which go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include .bingo/Variables.mk
 endif
 
@@ -150,7 +150,7 @@ protobuf:
 
 .PHONY: bingo-update
 bingo-update: $(BINGO)
-	$(BINGO) get -u
+	$(BINGO) get -l -u
 
 CHANGELOG_VERSION =
 

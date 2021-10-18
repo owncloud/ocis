@@ -149,7 +149,7 @@ def main(ctx):
     elif (ctx.build.event == "pull_request" and "[docs-only]" in ctx.build.title) or \
          (ctx.build.event != "pull_request" and "[docs-only]" in (ctx.build.title + ctx.build.message)):
         # [docs-only] is not taken from PR messages, but from commit messages
-        pipelines = [docs(ctx)]
+        pipelines = [docs(ctx), changelog(ctx)]
 
     else:
         test_pipelines.append(
@@ -260,7 +260,7 @@ def testOcisModule(ctx, module):
     steps = makeGenerate(module) + [
         {
             "name": "golangci-lint",
-            "image": "owncloudci/golang:1.16",
+            "image": "owncloudci/golang:1.17",
             "pull": "always",
             "commands": [
                 "mkdir -p cache/checkstyle",
@@ -271,7 +271,7 @@ def testOcisModule(ctx, module):
         },
         {
             "name": "test",
-            "image": "owncloudci/golang:1.16",
+            "image": "owncloudci/golang:1.17",
             "pull": "always",
             "commands": [
                 "mkdir -p cache/coverage",
@@ -282,7 +282,7 @@ def testOcisModule(ctx, module):
         },
         {
             "name": "scan-result-cache",
-            "image": "plugins/s3:1",
+            "image": "plugins/s3:latest",
             "settings": {
                 "endpoint": {
                     "from_secret": "cache_s3_endpoint",
@@ -432,7 +432,7 @@ def uploadScanResults(ctx):
 def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
     earlyFail = config["localApiTests"]["earlyFail"] if "earlyFail" in config["localApiTests"] else False
 
-    if ("full-ci" in ctx.build.title.lower()):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
         earlyFail = False
 
     return {
@@ -484,7 +484,7 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
     earlyFail = config["apiTests"]["earlyFail"] if "earlyFail" in config["apiTests"] else False
 
-    if ("full-ci" in ctx.build.title.lower()):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
         earlyFail = False
 
     return {
@@ -549,7 +549,7 @@ def uiTests(ctx):
         "filterTags": "",
         "skip": False,
         "earlyFail": False,
-        # only used if 'full-ci' is in build title
+        # only used if 'full-ci' is in build title or if run by cron
         "numberOfParts": 20,
         "skipExceptParts": [],
     }
@@ -562,10 +562,10 @@ def uiTests(ctx):
     filterTags = params["filterTags"]
     earlyFail = params["earlyFail"]
 
-    if ("full-ci" in ctx.build.title.lower()):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
         earlyFail = False
 
-    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "tag"):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "tag" or ctx.build.event == "cron"):
         numberOfParts = params["numberOfParts"]
         skipExceptParts = params["skipExceptParts"]
         debugPartsEnabled = (len(skipExceptParts) != 0)
@@ -667,7 +667,7 @@ def uiTestPipeline(ctx, filterTags, earlyFail, runPart = 1, numberOfParts = 1, s
 def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
     earlyFail = config["accountsUITests"]["earlyFail"] if "earlyFail" in config["accountsUITests"] else False
 
-    if ("full-ci" in ctx.build.title.lower()):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
         earlyFail = False
 
     return {
@@ -736,7 +736,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
 def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
     earlyFail = config["settingsUITests"]["earlyFail"] if "earlyFail" in config["settingsUITests"] else False
 
-    if ("full-ci" in ctx.build.title.lower()):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
         earlyFail = False
 
     return {
@@ -915,7 +915,7 @@ def dockerRelease(ctx, arch):
         "steps": makeGenerate("") + [
             {
                 "name": "build",
-                "image": "owncloudci/golang:1.16",
+                "image": "owncloudci/golang:1.17",
                 "pull": "always",
                 "commands": [
                     "make -C ocis release-linux-docker",
@@ -988,15 +988,22 @@ def dockerEos(ctx):
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": makeGenerate("ocis") +
-                 build() + [
+        "steps": makeGenerate("") + [
+            {
+                "name": "build",
+                "image": "owncloudci/golang:1.17",
+                "pull": "always",
+                "commands": [
+                    "make -C ocis release-linux-docker",
+                ],
+            },
             {
                 "name": "dryrun-eos-ocis",
                 "image": "plugins/docker:latest",
                 "pull": "always",
                 "settings": {
                     "dry_run": True,
-                    "context": "ocis/docker/eos-ocis",
+                    "context": "ocis",
                     "tags": "linux-eos-ocis",
                     "dockerfile": "ocis/docker/eos-ocis/Dockerfile",
                     "repo": "owncloud/eos-ocis",
@@ -1021,7 +1028,7 @@ def dockerEos(ctx):
                         "from_secret": "docker_password",
                     },
                     "auto_tag": True,
-                    "context": "ocis/docker/eos-ocis",
+                    "context": "ocis",
                     "dockerfile": "ocis/docker/eos-ocis/Dockerfile",
                     "repo": "owncloud/eos-ocis",
                 },
@@ -1089,7 +1096,7 @@ def binaryRelease(ctx, name):
         "steps": makeGenerate("") + [
             {
                 "name": "build",
-                "image": "owncloudci/golang:1.16",
+                "image": "owncloudci/golang:1.17",
                 "pull": "always",
                 "commands": [
                     "make -C ocis release-%s" % (name),
@@ -1097,7 +1104,7 @@ def binaryRelease(ctx, name):
             },
             {
                 "name": "finish",
-                "image": "owncloudci/golang:1.16",
+                "image": "owncloudci/golang:1.17",
                 "pull": "always",
                 "commands": [
                     "make -C ocis release-finish",
@@ -1111,7 +1118,7 @@ def binaryRelease(ctx, name):
             },
             {
                 "name": "upload",
-                "image": "plugins/s3:1",
+                "image": "plugins/s3:latest",
                 "pull": "always",
                 "settings": settings,
                 "when": {
@@ -1123,7 +1130,7 @@ def binaryRelease(ctx, name):
             },
             {
                 "name": "changelog",
-                "image": "owncloudci/golang:1.16",
+                "image": "owncloudci/golang:1.17",
                 "pull": "always",
                 "commands": [
                     "make changelog CHANGELOG_VERSION=%s" % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
@@ -1259,7 +1266,7 @@ def changelog(ctx):
         "steps": [
             {
                 "name": "generate",
-                "image": "owncloudci/golang:1.16",
+                "image": "owncloudci/golang:1.17",
                 "pull": "always",
                 "commands": [
                     "make -C ocis changelog",
@@ -1366,19 +1373,19 @@ def docs(ctx):
         "steps": [
             {
                 "name": "docs-generate",
-                "image": "owncloudci/golang:1.16",
+                "image": "owncloudci/golang:1.17",
                 "commands": ["make -C %s docs-generate" % (module) for module in config["modules"]],
             },
             {
                 "name": "prepare",
-                "image": "owncloudci/golang:1.16",
+                "image": "owncloudci/golang:1.17",
                 "commands": [
                     "make -C docs docs-copy",
                 ],
             },
             {
                 "name": "test",
-                "image": "owncloudci/golang:1.16",
+                "image": "owncloudci/golang:1.17",
                 "commands": [
                     "make -C docs test",
                 ],
@@ -1459,7 +1466,7 @@ def makeGenerate(module):
         },
         {
             "name": "generate go",
-            "image": "owncloudci/golang:1.16",
+            "image": "owncloudci/golang:1.17",
             "pull": "always",
             "commands": [
                 "%s ci-go-generate" % (make),
@@ -1504,18 +1511,14 @@ def notify(ctx):
 
 def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
     environment = {
-        #'OCIS_LOG_LEVEL': 'debug',
         "OCIS_URL": "https://ocis-server:9200",
         "GRAPH_SPACES_WEBDAV_BASE": "https://ocis-server:9200/dav/spaces/",
         "STORAGE_HOME_DRIVER": "%s" % (storage),
         "STORAGE_USERS_DRIVER": "%s" % (storage),
-        "STORAGE_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/users",
-        "STORAGE_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
-        "STORAGE_METADATA_ROOT": "/srv/app/tmp/ocis/metadata",
-        "STORAGE_DRIVER_OWNCLOUD_DATADIR": "/srv/app/tmp/ocis/owncloud/data",
-        "STORAGE_DRIVER_OWNCLOUD_REDIS_ADDR": "redis:6379" if storage == "owncloud" else "",
-        "STORAGE_HOME_DATA_SERVER_URL": "http://ocis-server:9155/data",
-        "STORAGE_USERS_DATA_SERVER_URL": "http://ocis-server:9158/data",
+        "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
+        "STORAGE_USERS_DRIVER_OWNCLOUD_DATADIR": "/srv/app/tmp/ocis/owncloud/data",
+        "STORAGE_USERS_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/users",
+        "STORAGE_METADATA_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/metadata",
         "STORAGE_SHARING_USER_JSON_FILE": "/srv/app/tmp/ocis/shares.json",
         "PROXY_ENABLE_BASIC_AUTH": True,
         "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
@@ -1603,7 +1606,7 @@ def build():
     return [
         {
             "name": "build",
-            "image": "owncloudci/golang:1.16",
+            "image": "owncloudci/golang:1.17",
             "pull": "always",
             "commands": [
                 "make -C ocis build",
@@ -1620,6 +1623,7 @@ def example_deploys(ctx):
         "ocis_wopi/latest.yml",
         "ocis_hello/latest.yml",
         "ocis_s3/latest.yml",
+        "oc10_ocis_parallel/latest.yml",
     ]
     released_configs = [
         "cs3_users_ocis/released.yml",

@@ -3,8 +3,8 @@ package flagset
 import (
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // HealthWithConfig applies cfg to the root flagset
@@ -12,7 +12,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9189"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9189"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"THUMBNAILS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -90,7 +90,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9189"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9189"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"THUMBNAILS_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -123,7 +123,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "grpc-addr",
-			Value:       flags.OverrideDefaultString(cfg.Server.Address, "0.0.0.0:9185"),
+			Value:       flags.OverrideDefaultString(cfg.Server.Address, "127.0.0.1:9185"),
 			Usage:       "Address to bind grpc server",
 			EnvVars:     []string{"THUMBNAILS_GRPC_ADDR"},
 			Destination: &cfg.Server.Address,
@@ -145,8 +145,8 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "reva-gateway-addr",
 			Value:       flags.OverrideDefaultString(cfg.Thumbnail.RevaGateway, "127.0.0.1:9142"),
-			Usage:       "Reva gateway address",
-			EnvVars:     []string{"THUMBNAILS_REVA_GATEWAY", "PROXY_REVA_GATEWAY_ADDR"},
+			Usage:       "Address of REVA gateway endpoint",
+			EnvVars:     []string{"REVA_GATEWAY"},
 			Destination: &cfg.Thumbnail.RevaGateway,
 		},
 		&cli.BoolFlag{

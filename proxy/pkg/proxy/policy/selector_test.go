@@ -7,12 +7,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/asim/go-micro/v3/client"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
+	"go-micro.dev/v4/client"
 )
 
 func TestLoadSelector(t *testing.T) {
@@ -141,7 +141,7 @@ func TestClaimsSelector(t *testing.T) {
 	})
 
 	var tests = []testCase{
-		{"unatuhenticated", context.Background(), nil, "unauthenticated"},
+		{"unauthenticated", context.Background(), nil, "unauthenticated"},
 		{"default", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: ""}), nil, "default"},
 		{"claim-value", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: "ocis.routing.policy-value"}), nil, "ocis.routing.policy-value"},
 		{"cookie-only", context.Background(), &http.Cookie{Name: SelectorCookieName, Value: "cookie"}, "cookie"},

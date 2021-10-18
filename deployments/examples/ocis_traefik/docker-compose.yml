@@ -14,7 +14,7 @@ services:
       - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@example.org}"
       - "--certificatesResolvers.http.acme.storage=/certs/acme.json"
       - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
-      # enable dasbhoard
+      # enable dashboard
       - "--api.dashboard=true"
       # define entrypoints
       - "--entryPoints.http.address=:80"
@@ -58,7 +58,8 @@ services:
       IDP_LDAP_BIND_PASSWORD: ${IDP_LDAP_BIND_PASSWORD:-idp}
       STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      OCIS_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
+      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
+      OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-data:/var/tmp/ocis

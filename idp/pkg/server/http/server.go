@@ -4,12 +4,12 @@ import (
 	"crypto/tls"
 	"os"
 
-	"github.com/asim/go-micro/v3"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	svc "github.com/owncloud/ocis/idp/pkg/service/v0"
 	pkgcrypto "github.com/owncloud/ocis/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
+	"go-micro.dev/v4"
 )
 
 // Server initializes the http service and server.

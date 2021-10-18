@@ -3,10 +3,10 @@ package flagset
 import (
 	"path"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
 	"github.com/owncloud/ocis/proxy/pkg/config"
+	"github.com/urfave/cli/v2"
 )
 
 // RootWithConfig applies cfg to the root flagset
@@ -42,7 +42,7 @@ func HealthWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9109"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9109"),
 			Usage:       "Address to debug endpoint",
 			EnvVars:     []string{"PROXY_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -102,7 +102,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "debug-addr",
-			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "0.0.0.0:9205"),
+			Value:       flags.OverrideDefaultString(cfg.Debug.Addr, "127.0.0.1:9205"),
 			Usage:       "Address to bind debug server",
 			EnvVars:     []string{"PROXY_DEBUG_ADDR"},
 			Destination: &cfg.Debug.Addr,
@@ -139,13 +139,6 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "Root path of http server",
 			EnvVars:     []string{"PROXY_HTTP_ROOT"},
 			Destination: &cfg.HTTP.Root,
-		},
-		&cli.StringFlag{
-			Name:        "asset-path",
-			Value:       flags.OverrideDefaultString(cfg.Asset.Path, ""),
-			Usage:       "Path to custom assets",
-			EnvVars:     []string{"PROXY_ASSET_PATH"},
-			Destination: &cfg.Asset.Path,
 		},
 		&cli.StringFlag{
 			Name:        "service-namespace",
@@ -192,8 +185,8 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "reva-gateway-addr",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Address, "127.0.0.1:9142"),
-			Usage:       "REVA Gateway Endpoint",
-			EnvVars:     []string{"PROXY_REVA_GATEWAY_ADDR"},
+			Usage:       "Address of REVA gateway endpoint",
+			EnvVars:     []string{"REVA_GATEWAY"},
 			Destination: &cfg.Reva.Address,
 		},
 		&cli.BoolFlag{
@@ -289,6 +282,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "account-backend-type",
 			EnvVars:     []string{"PROXY_ACCOUNT_BACKEND_TYPE"},
 			Destination: &cfg.AccountBackend,
+		},
+
+		&cli.StringFlag{
+			Name:        "machine-auth-api-key",
+			Value:       flags.OverrideDefaultString(cfg.MachineAuthAPIKey, "change-me-please"),
+			Usage:       "the API key to be used for the machine auth driver in reva",
+			EnvVars:     []string{"PROXY_MACHINE_AUTH_API_KEY", "OCIS_MACHINE_AUTH_API_KEY"},
+			Destination: &cfg.MachineAuthAPIKey,
 		},
 
 		// Reva Middlewares Config
