@@ -28,6 +28,25 @@ default:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
+    apiSpaces:
+      paths:
+        - '%paths.base%/../features/apiSpaces'
+      contexts:
+        - GraphApiContext:
+        - OccContext:
+        - FeatureContext: &common_feature_context_params
+            baseUrl: http://localhost:8080
+            adminUsername: admin
+            adminPassword: admin
+            regularUserPassword: 123456
+            ocPath: apps/testing/api/v1/occ
+        - CapabilitiesContext:
+        - ChecksumContext:
+        - FavoritesContext:
+        - FilesVersionsContext:
+        - PublicWebDavContext:
+        - TrashbinContext:
+        - WebDavPropertiesContext:
 
   extensions:
     jarnaiz\JUnitFormatter\JUnitFormatterExtension:

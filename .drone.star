@@ -240,6 +240,7 @@ def testPipelines(ctx):
     if "skip" not in config["localApiTests"] or not config["localApiTests"]["skip"]:
         pipelines = [
             localApiTests(ctx, "ocis", "apiAccountsHashDifficulty", "default"),
+            localApiTests(ctx, "ocis", "apiSpaces", "default"),
         ]
 
     if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
@@ -1512,6 +1513,7 @@ def notify(ctx):
 def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
     environment = {
         "OCIS_URL": "https://ocis-server:9200",
+        "GRAPH_SPACES_WEBDAV_BASE": "https://ocis-server:9200/dav/spaces/",
         "STORAGE_HOME_DRIVER": "%s" % (storage),
         "STORAGE_USERS_DRIVER": "%s" % (storage),
         "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
