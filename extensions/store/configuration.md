@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-18T08:02:58+0000"
+date: "2021-10-18T08:57:21+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/store/templates
@@ -34,6 +34,40 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Command-line flags
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### store version
+
+Print the versions of the running instances
+
+Usage: `store version [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-grpc-namespace |  $STORE_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
+
+-name |  $STORE_NAME
+: Service name. Default: `"store"`.
 
 ### store health
 
@@ -178,38 +212,4 @@ Usage: `store server [command options] [arguments...]`
 : Run specific extensions during supervised mode. This flag is set by the runtime.
 
 
-
-### store version
-
-Print the versions of the running instances
-
-Usage: `store version [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--grpc-namespace |  $STORE_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
-
-
--name |  $STORE_NAME
-: Service name. Default: `"store"`.
 
