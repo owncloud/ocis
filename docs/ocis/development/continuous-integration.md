@@ -35,10 +35,6 @@ You may add flags to your commit message or PR title in order to speed up pipeli
 
 - `[full-ci]`: deactivates the fail early mechanism and runs all available test (as default only smoke tests are run)
 
-- `[docs-only]`: please add this flag, if you only changed documentation. This will only trigger documentation related CI steps.
-
-- `[tests-only]`: please add this flag, if you only changed tests or test-related tooling. You do not need to add a changelog for tests-only changes.
-
 ### Knowledge base
 
 - My pipeline fails because some CI related files or commands are missing.
