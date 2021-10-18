@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Upgrade to go-micro v4.1.0: [#2616](https://github.com/owncloud/ocis/pull/2616)
 * Enhancement - Add a middleware to authenticate public share requests: [#2536](https://github.com/owncloud/ocis/pull/2536)
 * Enhancement - Report quota states: [#2628](https://github.com/owncloud/ocis/pull/2628)
+* Enhancement - Start up a new machine auth provider in the storage service: [#2528](https://github.com/owncloud/ocis/pull/2528)
 * Enhancement - Update reva to v1.14.1-0.20211015144112-cddbdd4c560f: [#2536](https://github.com/owncloud/ocis/pull/2536)
 
 ## Details
@@ -60,6 +61,13 @@ The following sections list the changes for unreleased.
    for the clients to add visual indicators.
 
    https://github.com/owncloud/ocis/pull/2628
+
+* Enhancement - Start up a new machine auth provider in the storage service: [#2528](https://github.com/owncloud/ocis/pull/2528)
+
+   This PR also adds the config to skip encoding user groups in reva tokens
+
+   https://github.com/owncloud/ocis/pull/2528
+   https://github.com/owncloud/ocis/pull/2529
 
 * Enhancement - Update reva to v1.14.1-0.20211015144112-cddbdd4c560f: [#2536](https://github.com/owncloud/ocis/pull/2536)
 
