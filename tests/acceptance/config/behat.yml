@@ -13,6 +13,7 @@ default:
           ldapGroupsOU: TestGroups
           ldapInitialUserFilePath: /../../config/ldap-users.ldif
       contexts:
+        - RevaContext:
         - OccContext:
         - FeatureContext: &common_feature_context_params
             baseUrl:  http://localhost:8080
