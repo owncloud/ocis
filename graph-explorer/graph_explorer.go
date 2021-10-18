@@ -1,4 +1,4 @@
-package graph_explorer
+package graphexplorer
 
 import (
 	"embed"

@@ -1,10 +1,11 @@
 package assets
 
 import (
-	"github.com/owncloud/ocis/settings"
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/owncloud/ocis/settings"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/settings/pkg/config"
