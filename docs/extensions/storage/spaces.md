@@ -78,7 +78,7 @@ This feature makes use of the internal storage layout and is completely abstract
 
 ### Quotas
 
-Spaces capacity (quota) is independent of where the Storage quota. As a Space admin you can set the quota for all users of a space, and as such, there are no limitations and is up to the admin to make a correct use of this.
+Spaces capacity (quota) is independent of the Storage quota. As a Space admin you can set the quota for all users of a space, and as such, there are no limitations and is up to the admin to make a correct use of this.
 
 It is possible to have a space quota greater than the storage quota. A Space may also have "infinite" quota, meaning a single space without quota can occupy the entirety of a disk.
 
