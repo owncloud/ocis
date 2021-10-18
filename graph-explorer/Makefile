@@ -30,9 +30,7 @@ ci-node-generate: yarn-build
 
 .PHONY: yarn-build
 yarn-build:
-	yarn lint
-	yarn test
-	yarn build
+	yarn install --frozen-lockfile
 
 .PHONY: pull-assets
 pull-assets:

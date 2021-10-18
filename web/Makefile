@@ -31,8 +31,6 @@ ci-node-generate: yarn-build
 .PHONY: yarn-build
 yarn-build:
 	yarn lint
-	yarn test
-	yarn build
 
 WEB_ASSETS_VERSION = v4.3.0
 
