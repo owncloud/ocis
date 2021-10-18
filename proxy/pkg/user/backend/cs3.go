@@ -31,14 +31,9 @@ func NewCS3UserBackend(rs settings.RoleService, ap RevaAuthenticator, machineAut
 }
 
 func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, withRoles bool) (*cs3.User, string, error) {
-	// We only support authentication via username for now
-	if claim != "username" {
-		return nil, "", fmt.Errorf("claim: %s not supported", claim)
-	}
-
 	res, err := c.authProvider.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         "machine",
-		ClientId:     value,
+		ClientId:     claim + ":" + value,
 		ClientSecret: c.machineAuthAPIKey,
 	})
 

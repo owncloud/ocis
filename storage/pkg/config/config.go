@@ -127,10 +127,8 @@ type Users struct {
 	UserGroupsCacheExpiration int
 }
 
-// AuthBearerConfig defines the available configuration for the bearer auth drivers.
-type AuthBearerConfig struct {
-	Port
-	Driver            string
+// AuthMachineConfig defines the available configuration for the machine auth driver.
+type AuthMachineConfig struct {
 	MachineAuthAPIKey string
 }
 
@@ -430,17 +428,18 @@ type Archiver struct {
 // Reva defines the available reva configuration.
 type Reva struct {
 	// JWTSecret used to sign jwt tokens between services
-	JWTSecret       string
-	TransferSecret  string
-	TransferExpires int
-	OIDC            OIDC
-	LDAP            LDAP
-	UserGroupRest   UserGroupRest
-	UserOwnCloudSQL UserOwnCloudSQL
-	OCDav           OCDav
-	Archiver        Archiver
-	UserStorage     StorageConfig
-	MetadataStorage StorageConfig
+	JWTSecret             string
+	SkipUserGroupsInToken bool
+	TransferSecret        string
+	TransferExpires       int
+	OIDC                  OIDC
+	LDAP                  LDAP
+	UserGroupRest         UserGroupRest
+	UserOwnCloudSQL       UserOwnCloudSQL
+	OCDav                 OCDav
+	Archiver              Archiver
+	UserStorage           StorageConfig
+	MetadataStorage       StorageConfig
 	// Ports are used to configure which services to start on which port
 	Frontend          FrontendPort
 	DataGateway       DataGatewayPort
@@ -450,9 +449,10 @@ type Reva struct {
 	Users             Users
 	Groups            Groups
 	AuthProvider      Users
-	AuthBearerConfig  AuthBearerConfig
 	AuthBasic         Port
 	AuthBearer        Port
+	AuthMachine       Port
+	AuthMachineConfig AuthMachineConfig
 	Sharing           Sharing
 	StorageHome       StoragePort
 	StorageUsers      StoragePort
