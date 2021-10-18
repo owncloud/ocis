@@ -1,7 +1,8 @@
 FROM owncloudci/golang:1.17 as build
 
 RUN apk update && \
-        apk add --update npm
+        apk add --update npm && \
+        apk add --update go
 
 COPY ./ /ocis/
 
