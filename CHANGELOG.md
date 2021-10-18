@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Security - Don't expose services by default: [#2612](https://github.com/owncloud/ocis/issues/2612)
+* Bugfix - Enhancement: [#2630](https://github.com/owncloud/ocis/pull/2630)
 * Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
 * Enhancement - Upgrade to go-micro v4.1.0: [#2616](https://github.com/owncloud/ocis/pull/2616)
 * Enhancement - Add a middleware to authenticate public share requests: [#2536](https://github.com/owncloud/ocis/pull/2536)
@@ -22,6 +23,14 @@ The following sections list the changes for unreleased.
    except the proxy which is listening on 0.0.0.0:9200.
 
    https://github.com/owncloud/ocis/issues/2612
+
+* Bugfix - Enhancement: [#2630](https://github.com/owncloud/ocis/pull/2630)
+
+   We've switched the usage of bufbuild/Buf from a protoc replacement only to also using it to
+   configuring the outputs and pinning dependencies.
+
+   https://github.com/owncloud/ocis/pull/2630
+   https://github.com/owncloud/ocis/pull/2616
 
 * Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
 
