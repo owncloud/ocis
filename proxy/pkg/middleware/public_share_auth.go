@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -53,8 +52,6 @@ func PublicShareAuth(opts ...Option) func(next http.Handler) http.Handler {
 				next.ServeHTTP(w, r)
 				return
 			}
-
-			fmt.Println("########################################################", authResp.Token)
 
 			r.Header.Add(headerRevaAccessToken, authResp.Token)
 			next.ServeHTTP(w, r)
