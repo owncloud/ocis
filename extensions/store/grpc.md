@@ -9,7 +9,7 @@ geekdocFilePath: grpc.md
 
 {{< toc >}}
 
-## store.proto
+## proto/v0/store.proto
 
 ### DatabasesRequest
 

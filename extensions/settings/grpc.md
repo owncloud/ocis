@@ -9,7 +9,7 @@ geekdocFilePath: grpc.md
 
 {{< toc >}}
 
-## settings.proto
+## proto/v0/settings.proto
 
 ### AddSettingToBundleRequest
 
