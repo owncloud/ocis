@@ -20,8 +20,12 @@ func PublicShareAuth(opts ...Option) func(next http.Handler) http.Handler {
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Currently we only want to authenticate app open request coming from public shares.
 			shareToken := r.Header.Get(headerShareToken)
+			if shareToken == "" {
+				shareToken = r.URL.Query().Get(headerShareToken)
+			}
+
+			// Currently we only want to authenticate app open request coming from public shares.
 			if shareToken == "" {
 				// Don't authenticate
 				next.ServeHTTP(w, r)
