@@ -7,13 +7,13 @@
 package proto
 
 import (
-	empty "github.com/golang/protobuf/ptypes/empty"
-	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
-	field_mask "google.golang.org/genproto/protobuf/field_mask"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	fieldmaskpb "google.golang.org/protobuf/types/known/fieldmaskpb"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -113,7 +113,7 @@ type ListAccountsRequest struct {
 	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// Optional. Used to specify a subset of fields that should be
 	// returned by a get operation or modified by an update operation.
-	FieldMask *field_mask.FieldMask `protobuf:"bytes,3,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
+	FieldMask *fieldmaskpb.FieldMask `protobuf:"bytes,3,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 	// Optional. Search criteria used to select the accounts to return.
 	// If no search criteria is specified then all accounts will be
 	// returned
@@ -183,7 +183,7 @@ func (x *ListAccountsRequest) GetPageToken() string {
 	return ""
 }
 
-func (x *ListAccountsRequest) GetFieldMask() *field_mask.FieldMask {
+func (x *ListAccountsRequest) GetFieldMask() *fieldmaskpb.FieldMask {
 	if x != nil {
 		return x.FieldMask
 	}
@@ -361,7 +361,7 @@ type UpdateAccountRequest struct {
 	Account *Account `protobuf:"bytes,1,opt,name=account,proto3" json:"account,omitempty"`
 	// The update mask applies to the resource. For the `FieldMask` definition,
 	// see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
-	UpdateMask *field_mask.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
+	UpdateMask *fieldmaskpb.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
 }
 
 func (x *UpdateAccountRequest) Reset() {
@@ -403,7 +403,7 @@ func (x *UpdateAccountRequest) GetAccount() *Account {
 	return nil
 }
 
-func (x *UpdateAccountRequest) GetUpdateMask() *field_mask.FieldMask {
+func (x *UpdateAccountRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 	if x != nil {
 		return x.UpdateMask
 	}
@@ -516,9 +516,9 @@ type Account struct {
 	// should we only respond with repeated strings of ids? no clients should a proper filter mask!
 	MemberOf []*Group `protobuf:"bytes,13,rep,name=memberOf,proto3" json:"memberOf,omitempty"`
 	// The created date of the account object.
-	CreatedDateTime *timestamp.Timestamp `protobuf:"bytes,16,opt,name=created_date_time,json=createdDateTime,proto3" json:"created_date_time,omitempty"`
+	CreatedDateTime *timestamppb.Timestamp `protobuf:"bytes,16,opt,name=created_date_time,json=createdDateTime,proto3" json:"created_date_time,omitempty"`
 	// The date and time the user was deleted. Returned only on $select.
-	DeletedDateTime *timestamp.Timestamp `protobuf:"bytes,17,opt,name=deleted_date_time,json=deletedDateTime,proto3" json:"deleted_date_time,omitempty"`
+	DeletedDateTime *timestamppb.Timestamp `protobuf:"bytes,17,opt,name=deleted_date_time,json=deletedDateTime,proto3" json:"deleted_date_time,omitempty"`
 	// *true* if this object is synced from an on-premises directory;
 	// *false* if this object was originally synced from an on-premises directory but is no longer synced;
 	// null if this object has never been synced from an on-premises directory (default). Read-only
@@ -542,7 +542,7 @@ type Account struct {
 	// The property is only populated for customers who are synchronizing their on-premises directory to ocis-accounts. Read-only.
 	OnPremisesUserPrincipalName string `protobuf:"bytes,26,opt,name=on_premises_user_principal_name,json=onPremisesUserPrincipalName,proto3" json:"on_premises_user_principal_name,omitempty"`
 	// Indicates the last time at which the object was synced with the on-premises directory; Read-only.
-	OnPremisesLastSyncDateTime *timestamp.Timestamp `protobuf:"bytes,28,opt,name=on_premises_last_sync_date_time,json=onPremisesLastSyncDateTime,proto3" json:"on_premises_last_sync_date_time,omitempty"`
+	OnPremisesLastSyncDateTime *timestamppb.Timestamp `protobuf:"bytes,28,opt,name=on_premises_last_sync_date_time,json=onPremisesLastSyncDateTime,proto3" json:"on_premises_last_sync_date_time,omitempty"`
 	// Errors when using synchronization during provisioning.
 	OnPremisesProvisioningErrors []*OnPremisesProvisioningError `protobuf:"bytes,29,rep,name=on_premises_provisioning_errors,json=onPremisesProvisioningErrors,proto3" json:"on_premises_provisioning_errors,omitempty"`
 	// For an external user invited to the tenant using the invitation API, this property represents the invited user's invitation status.
@@ -550,17 +550,17 @@ type Account struct {
 	// Returned only on $select. Supports $filter with the supported values. For example: $filter=externalUserState eq 'PendingAcceptance'.
 	ExternalUserState string `protobuf:"bytes,40,opt,name=external_user_state,json=externalUserState,proto3" json:"external_user_state,omitempty"`
 	// Shows the timestamp for the latest change to the externalUserState property. Returned only on $select.
-	ExternalUserStateChangeDateTime *timestamp.Timestamp `protobuf:"bytes,41,opt,name=external_user_state_change_date_time,json=externalUserStateChangeDateTime,proto3" json:"external_user_state_change_date_time,omitempty"`
+	ExternalUserStateChangeDateTime *timestamppb.Timestamp `protobuf:"bytes,41,opt,name=external_user_state_change_date_time,json=externalUserStateChangeDateTime,proto3" json:"external_user_state_change_date_time,omitempty"`
 	// Any refresh tokens or sessions tokens (session cookies) issued before this time are invalid, and applications will get
 	// an error when using an invalid refresh or sessions token to acquire a delegated access token (to access APIs such as Microsoft Graph).
 	// If this happens, the application will need to acquire a new refresh token by making a request to the authorize endpoint.
 	// Returned only on $select. Read-only. Use invalidateAllRefreshTokens to reset.
-	RefreshTokensValidFromDateTime *timestamp.Timestamp `protobuf:"bytes,60,opt,name=refresh_tokens_valid_from_date_time,json=refreshTokensValidFromDateTime,proto3" json:"refresh_tokens_valid_from_date_time,omitempty"`
+	RefreshTokensValidFromDateTime *timestamppb.Timestamp `protobuf:"bytes,60,opt,name=refresh_tokens_valid_from_date_time,json=refreshTokensValidFromDateTime,proto3" json:"refresh_tokens_valid_from_date_time,omitempty"`
 	// Any refresh tokens or sessions tokens (session cookies) issued before this time are invalid, and applications will get
 	// an error when using an invalid refresh or sessions token to acquire a delegated access token (to access APIs such as Microsoft Graph).
 	// If this happens, the application will need to acquire a new refresh token by making a request to the authorize endpoint.
 	// Read-only. Use revokeSignInSessions to reset.
-	SignInSessionsValidFromDateTime *timestamp.Timestamp `protobuf:"bytes,61,opt,name=sign_in_sessions_valid_from_date_time,json=signInSessionsValidFromDateTime,proto3" json:"sign_in_sessions_valid_from_date_time,omitempty"`
+	SignInSessionsValidFromDateTime *timestamppb.Timestamp `protobuf:"bytes,61,opt,name=sign_in_sessions_valid_from_date_time,json=signInSessionsValidFromDateTime,proto3" json:"sign_in_sessions_valid_from_date_time,omitempty"`
 }
 
 func (x *Account) Reset() {
@@ -686,14 +686,14 @@ func (x *Account) GetMemberOf() []*Group {
 	return nil
 }
 
-func (x *Account) GetCreatedDateTime() *timestamp.Timestamp {
+func (x *Account) GetCreatedDateTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.CreatedDateTime
 	}
 	return nil
 }
 
-func (x *Account) GetDeletedDateTime() *timestamp.Timestamp {
+func (x *Account) GetDeletedDateTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.DeletedDateTime
 	}
@@ -749,7 +749,7 @@ func (x *Account) GetOnPremisesUserPrincipalName() string {
 	return ""
 }
 
-func (x *Account) GetOnPremisesLastSyncDateTime() *timestamp.Timestamp {
+func (x *Account) GetOnPremisesLastSyncDateTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.OnPremisesLastSyncDateTime
 	}
@@ -770,21 +770,21 @@ func (x *Account) GetExternalUserState() string {
 	return ""
 }
 
-func (x *Account) GetExternalUserStateChangeDateTime() *timestamp.Timestamp {
+func (x *Account) GetExternalUserStateChangeDateTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.ExternalUserStateChangeDateTime
 	}
 	return nil
 }
 
-func (x *Account) GetRefreshTokensValidFromDateTime() *timestamp.Timestamp {
+func (x *Account) GetRefreshTokensValidFromDateTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.RefreshTokensValidFromDateTime
 	}
 	return nil
 }
 
-func (x *Account) GetSignInSessionsValidFromDateTime() *timestamp.Timestamp {
+func (x *Account) GetSignInSessionsValidFromDateTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.SignInSessionsValidFromDateTime
 	}
@@ -883,7 +883,7 @@ type PasswordProfile struct {
 	// The password must satisfy minimum requirements as specified by the user’s passwordPolicies property. By default, a strong password is required.
 	Password string `protobuf:"bytes,1,opt,name=password,proto3" json:"password,omitempty"`
 	// The time when this account last changed their password.
-	LastPasswordChangeDateTime *timestamp.Timestamp `protobuf:"bytes,2,opt,name=last_password_change_date_time,json=lastPasswordChangeDateTime,proto3" json:"last_password_change_date_time,omitempty"`
+	LastPasswordChangeDateTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=last_password_change_date_time,json=lastPasswordChangeDateTime,proto3" json:"last_password_change_date_time,omitempty"`
 	// Specifies password policies for the user.
 	//This value is an enumeration with one possible value being “DisableStrongPassword”, which allows weaker passwords than the default policy to be specified.
 	// “DisablePasswordExpiration” can also be specified.
@@ -933,7 +933,7 @@ func (x *PasswordProfile) GetPassword() string {
 	return ""
 }
 
-func (x *PasswordProfile) GetLastPasswordChangeDateTime() *timestamp.Timestamp {
+func (x *PasswordProfile) GetLastPasswordChangeDateTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.LastPasswordChangeDateTime
 	}
@@ -973,7 +973,7 @@ type ListGroupsRequest struct {
 	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// Optional. Used to specify a subset of fields that should be
 	// returned by a get operation or modified by an update operation.
-	FieldMask *field_mask.FieldMask `protobuf:"bytes,3,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
+	FieldMask *fieldmaskpb.FieldMask `protobuf:"bytes,3,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 	// Optional. Search criteria used to select the groups to return.
 	// If no search criteria is specified then all groups will be
 	// returned
@@ -1041,7 +1041,7 @@ func (x *ListGroupsRequest) GetPageToken() string {
 	return ""
 }
 
-func (x *ListGroupsRequest) GetFieldMask() *field_mask.FieldMask {
+func (x *ListGroupsRequest) GetFieldMask() *fieldmaskpb.FieldMask {
 	if x != nil {
 		return x.FieldMask
 	}
@@ -1219,7 +1219,7 @@ type UpdateGroupRequest struct {
 	Group *Group `protobuf:"bytes,1,opt,name=group,proto3" json:"group,omitempty"`
 	// The update mask applies to the resource. For the `FieldMask` definition,
 	// see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
-	UpdateMask *field_mask.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
+	UpdateMask *fieldmaskpb.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
 }
 
 func (x *UpdateGroupRequest) Reset() {
@@ -1261,7 +1261,7 @@ func (x *UpdateGroupRequest) GetGroup() *Group {
 	return nil
 }
 
-func (x *UpdateGroupRequest) GetUpdateMask() *field_mask.FieldMask {
+func (x *UpdateGroupRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 	if x != nil {
 		return x.UpdateMask
 	}
@@ -1440,7 +1440,7 @@ type ListMembersRequest struct {
 	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// Optional. Used to specify a subset of fields that should be
 	// returned by a get operation or modified by an update operation.
-	FieldMask *field_mask.FieldMask `protobuf:"bytes,3,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
+	FieldMask *fieldmaskpb.FieldMask `protobuf:"bytes,3,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 	// Optional. Search criteria used to select the groups to return.
 	// If no search criteria is specified then all groups will be
 	// returned
@@ -1510,7 +1510,7 @@ func (x *ListMembersRequest) GetPageToken() string {
 	return ""
 }
 
-func (x *ListMembersRequest) GetFieldMask() *field_mask.FieldMask {
+func (x *ListMembersRequest) GetFieldMask() *fieldmaskpb.FieldMask {
 	if x != nil {
 		return x.FieldMask
 	}
@@ -1619,13 +1619,13 @@ type Group struct {
 	GidNumber int64 `protobuf:"varint,6,opt,name=gid_number,json=gidNumber,proto3" json:"gid_number,omitempty"`
 	// Timestamp of when the group was created. The value cannot be modified and is automatically populated when the group is created
 	// Returned by default. Read-only.
-	CreatedDateTime *timestamp.Timestamp `protobuf:"bytes,7,opt,name=created_date_time,json=createdDateTime,proto3" json:"created_date_time,omitempty"`
+	CreatedDateTime *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_date_time,json=createdDateTime,proto3" json:"created_date_time,omitempty"`
 	// For some Azure Active Directory objects (user, group, application), if the object is deleted, it is first logically deleted, and this property is updated with the date and time when the object was deleted. Otherwise this property is null. If the object is restored, this property is updated to null.
 	// Returned by default. Read-only.
-	DeletedDateTime *timestamp.Timestamp `protobuf:"bytes,8,opt,name=deleted_date_time,json=deletedDateTime,proto3" json:"deleted_date_time,omitempty"`
+	DeletedDateTime *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=deleted_date_time,json=deletedDateTime,proto3" json:"deleted_date_time,omitempty"`
 	// Timestamp of when the group is set to expire. The value cannot be modified and is automatically populated when the group is created.
 	// Returned by default. Read-only.
-	ExpirationDateTime *timestamp.Timestamp `protobuf:"bytes,9,opt,name=expiration_date_time,json=expirationDateTime,proto3" json:"expiration_date_time,omitempty"`
+	ExpirationDateTime *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=expiration_date_time,json=expirationDateTime,proto3" json:"expiration_date_time,omitempty"`
 	// True if the group is not displayed in certain parts of the Outlook user interface:
 	// in the Address Book, in address lists for selecting message recipients, and in the Browse Groups dialog for searching groups; false otherwise. Default value is false.
 	// Returned only on $select.
@@ -1738,21 +1738,21 @@ func (x *Group) GetGidNumber() int64 {
 	return 0
 }
 
-func (x *Group) GetCreatedDateTime() *timestamp.Timestamp {
+func (x *Group) GetCreatedDateTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.CreatedDateTime
 	}
 	return nil
 }
 
-func (x *Group) GetDeletedDateTime() *timestamp.Timestamp {
+func (x *Group) GetDeletedDateTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.DeletedDateTime
 	}
 	return nil
 }
 
-func (x *Group) GetExpirationDateTime() *timestamp.Timestamp {
+func (x *Group) GetExpirationDateTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.ExpirationDateTime
 	}
@@ -1844,7 +1844,7 @@ type OnPremisesProvisioningError struct {
 	// Category of the provisioning error. Note: Currently, there is only one possible value. Possible value: PropertyConflict - indicates a property value is not unique. Other objects contain the same value for the property.
 	Category string `protobuf:"bytes,1,opt,name=category,proto3" json:"category,omitempty"`
 	// The date and time at which the error occurred.
-	OccurredDateTime *timestamp.Timestamp `protobuf:"bytes,2,opt,name=occurred_date_time,json=occurredDateTime,proto3" json:"occurred_date_time,omitempty"`
+	OccurredDateTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=occurred_date_time,json=occurredDateTime,proto3" json:"occurred_date_time,omitempty"`
 	// Name of the directory property causing the error. Current possible values: UserPrincipalName or ProxyAddress
 	PropertyCausingError string `protobuf:"bytes,3,opt,name=property_causing_error,json=propertyCausingError,proto3" json:"property_causing_error,omitempty"`
 	// Value of the property causing the error.
@@ -1890,7 +1890,7 @@ func (x *OnPremisesProvisioningError) GetCategory() string {
 	return ""
 }
 
-func (x *OnPremisesProvisioningError) GetOccurredDateTime() *timestamp.Timestamp {
+func (x *OnPremisesProvisioningError) GetOccurredDateTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.OccurredDateTime
 	}
@@ -2467,9 +2467,9 @@ var file_accounts_proto_goTypes = []interface{}{
 	(*ListMembersResponse)(nil),         // 20: com.owncloud.ocis.accounts.v0.ListMembersResponse
 	(*Group)(nil),                       // 21: com.owncloud.ocis.accounts.v0.Group
 	(*OnPremisesProvisioningError)(nil), // 22: com.owncloud.ocis.accounts.v0.OnPremisesProvisioningError
-	(*field_mask.FieldMask)(nil),        // 23: google.protobuf.FieldMask
-	(*timestamp.Timestamp)(nil),         // 24: google.protobuf.Timestamp
-	(*empty.Empty)(nil),                 // 25: google.protobuf.Empty
+	(*fieldmaskpb.FieldMask)(nil),       // 23: google.protobuf.FieldMask
+	(*timestamppb.Timestamp)(nil),       // 24: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),               // 25: google.protobuf.Empty
 }
 var file_accounts_proto_depIdxs = []int32{
 	23, // 0: com.owncloud.ocis.accounts.v0.ListAccountsRequest.field_mask:type_name -> google.protobuf.FieldMask

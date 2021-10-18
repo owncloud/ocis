@@ -9,9 +9,9 @@ import (
 	mbreaker "github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v3"
 	"github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v3"
 	"github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3"
-	"github.com/asim/go-micro/v3"
-	"github.com/asim/go-micro/v3/client"
 	"github.com/owncloud/ocis/ocis-pkg/registry"
+	"go-micro.dev/v4"
+	"go-micro.dev/v4/client"
 )
 
 // DefaultClient is a custom oCIS grpc configured client.

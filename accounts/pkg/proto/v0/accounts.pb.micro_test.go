@@ -11,10 +11,8 @@ import (
 	"testing"
 
 	mgrpcc "github.com/asim/go-micro/plugins/client/grpc/v3"
+	empty "github.com/golang/protobuf/ptypes/empty"
 
-	"github.com/asim/go-micro/v3/client"
-	merrors "github.com/asim/go-micro/v3/errors"
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/owncloud/ocis/accounts/pkg/command"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
@@ -22,6 +20,8 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	"github.com/stretchr/testify/assert"
+	"go-micro.dev/v4/client"
+	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -544,7 +544,7 @@ func TestUpdateAccount(t *testing.T) {
 			resp, err := updateAccount(t, tt.userAccount, updateMask)
 			if tt.expectedErrOnUpdate != nil {
 				assert.Error(t, err)
-				assert.Equal(t, tt.expectedErrOnUpdate, err)
+				assert.Equal(t, tt.expectedErrOnUpdate.Error(), err.Error())
 			} else {
 				assert.NoError(t, err)
 				assert.IsType(t, &proto.Account{}, resp)

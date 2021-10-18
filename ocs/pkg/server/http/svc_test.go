@@ -14,7 +14,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/asim/go-micro/v3/client"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/pkg/auth/scope"
@@ -32,6 +31,7 @@ import (
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	ssvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"github.com/stretchr/testify/assert"
+	"go-micro.dev/v4/client"
 )
 
 const (

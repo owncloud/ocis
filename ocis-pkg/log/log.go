@@ -6,11 +6,11 @@ import (
 	"strings"
 	"time"
 
-	mdlog "github.com/asim/go-micro/v3/debug/log"
-	mlog "github.com/asim/go-micro/v3/util/log"
-	"github.com/asim/go-micro/v3/util/ring"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	mdlog "go-micro.dev/v4/debug/log"
+	mlog "go-micro.dev/v4/util/log"
+	"go-micro.dev/v4/util/ring"
 )
 
 // Logger simply wraps the zerolog logger.

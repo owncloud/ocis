@@ -7,10 +7,10 @@ import (
 
 	"github.com/cs3org/reva/pkg/auth/scope"
 
-	"github.com/asim/go-micro/v3/metadata"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/ocis-pkg/account"
+	"go-micro.dev/v4/metadata"
 )
 
 // newAccountOptions initializes the available default options.
