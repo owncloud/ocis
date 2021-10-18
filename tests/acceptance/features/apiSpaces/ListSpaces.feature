@@ -12,4 +12,4 @@ Feature: List and create spaces
     Then the HTTP status code should be "200"
     And the webDavUrl of the personal space has been found
     When user "Alice" lists the content of the personal space root using the WebDav Api
-    And the HTTP status code should be "207"
+    Then the HTTP status code should be "207"
