@@ -27,6 +27,7 @@ ci-go-generate: pull-assets # CI runs ci-node-generate automatically before this
 
 .PHONY: ci-node-generate
 ci-node-generate:
+	npm install --global yarn
 	yarn install --frozen-lockfile
 
 .PHONY: pull-assets
