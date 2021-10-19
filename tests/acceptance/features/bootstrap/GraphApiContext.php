@@ -97,7 +97,7 @@ class GraphApiContext implements Context {
      * @param $baseUrl
      * @param $user
      * @param $password
-     * @param string $spaceName
+     * @param string $body
      * @param string $xRequestId
      * @param array $headers
      * @return ResponseInterface
@@ -106,7 +106,7 @@ class GraphApiContext implements Context {
         $baseUrl,
         $user,
         $password,
-        string $spaceName,
+        string $body,
         string $xRequestId = '',
         array $headers = []
     ): ResponseInterface
@@ -115,9 +115,9 @@ class GraphApiContext implements Context {
         if (!str_ends_with($fullUrl, '/')) {
             $fullUrl .= '/';
         }
-        $fullUrl .= "drives/" . $spaceName;
+        $fullUrl .= "graph/v1.0/drives/";
 
-        return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, 'POST', $user, $password, $headers);
+        return HttpRequestHelper::post($fullUrl, $xRequestId, $user, $password, $headers, $body);
     }
 
     /**
@@ -161,7 +161,100 @@ class GraphApiContext implements Context {
     }
 
     /**
-     * Get the webDavUrl of the personal space has been found
+     * @When /^user "([^"]*)" creates a space "([^"]*)" of type "([^"]*)" with the default quota using the GraphApi$/
+     *
+     * @param $user string
+     * @param $spaceName string
+     * @param $spaceType string
+     *
+     * @return void
+     */
+    public function theUserCreatesASpaceUsingTheGraphApi($user, $spaceName, $spaceType): void
+    {
+        $space = ["Name" => $spaceName, "driveType" => $spaceType];
+        $body = json_encode($space);
+        $this->featureContext->setResponse(
+            $this->sendCreateSpaceRequest(
+                $this->featureContext->getBaseUrl(),
+                $user,
+                $this->featureContext->getPasswordForUser($user),
+                $body,
+                ""
+            )
+        );
+    }
+
+    /**
+     * @When /^the administrator gives "([^"]*)" the role "([^"]*)" using the settings api$/
+     *
+     * @param $user string
+     * @param $role string
+     *
+     * @return void
+     */
+    public function theAdministratorGivesUserTheRole($user, $role): void
+    {
+        $admin = $this->featureContext->getAdminUsername();
+        $password = $this->featureContext->getAdminPassword();
+        $headers = [];
+
+        $baseUrl = $this->featureContext->getBaseUrl();
+        if (!str_ends_with($baseUrl, '/')) {
+            $baseUrl .= '/';
+        }
+        // get the roles list first
+        $fullUrl = $baseUrl . "api/v0/settings/roles-list";
+        $this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, "{}"));
+        $rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
+        $bundles = [];
+        if (isset(\json_decode($rawBody,  true)["bundles"])) {
+            $bundles = \json_decode($rawBody, true)["bundles"];
+        }
+        $roleToAssign = "";
+        foreach($bundles as $bundle => $value) {
+            // find the selected role
+            if ($value["displayName"] === $role) {
+                $roleToAssign = $value;
+            }
+        }
+        Assert::assertNotEmpty($roleToAssign, "The selected role $role could not be found");
+
+        // get the accounts list first
+        $fullUrl = $baseUrl . "api/v0/accounts/accounts-list";
+        $this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, "{}"));
+        $rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
+        $accounts = [];
+        if (isset(\json_decode($rawBody,  true)["accounts"])) {
+            $accounts = \json_decode($rawBody, true)["accounts"];
+        }
+        $accountToChange = "";
+        foreach($accounts as $account) {
+            // find the selected user
+            if ($account["preferredName"] === $user) {
+                $accountToChange = $account;
+            }
+        }
+        Assert::assertNotEmpty($accountToChange, "The seleted account $user does not exist");
+
+        // set the new role
+        $fullUrl = $baseUrl . "api/v0/settings/assignments-add";
+        $body = json_encode(["account_uuid" => $accountToChange["id"], "role_id" => $roleToAssign["id"]]);
+
+        $this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, $body));
+        $rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
+
+        $assignment = [];
+        if (isset(\json_decode($rawBody,  true)["assignment"])) {
+            $assignment = \json_decode($rawBody, true)["assignment"];
+        }
+
+        Assert::assertEquals($accountToChange["id"], $assignment["accountUuid"]);
+        Assert::assertEquals($roleToAssign["id"], $assignment["roleId"]);
+    }
+
+
+    /**
+     * Get the webDavUrl of the personal space
      *
      * @return void
      */
