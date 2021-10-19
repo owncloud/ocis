@@ -144,18 +144,19 @@ type Groups struct {
 type FrontendPort struct {
 	Port
 
-	AppProviderPrefix       string
-	ArchiverPrefix          string
-	DatagatewayPrefix       string
-	Favorites               bool
-	OCDavPrefix             string
-	OCSPrefix               string
-	OCSSharePrefix          string
-	OCSHomeNamespace        string
-	PublicURL               string
-	OCSCacheWarmupDriver    string
-	OCSResourceInfoCacheTTL int
-	Middleware              Middleware
+	AppProviderPrefix          string
+	ArchiverPrefix             string
+	DatagatewayPrefix          string
+	Favorites                  bool
+	OCDavPrefix                string
+	OCSPrefix                  string
+	OCSSharePrefix             string
+	OCSHomeNamespace           string
+	PublicURL                  string
+	OCSCacheWarmupDriver       string
+	OCSAdditionalInfoAttribute string
+	OCSResourceInfoCacheTTL    int
+	Middleware                 Middleware
 }
 
 // Middleware configures reva middlewares.
