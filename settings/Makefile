@@ -32,8 +32,8 @@ docs-generate: config-docs-generate \
 include ../.make/generate.mk
 
 .PHONY: ci-go-generate
-ci-go-generate: protobuf # CI runs ci-node-generate automatically before this target
-	@go generate ./...
+ci-go-generate: #protobuf # CI runs ci-node-generate automatically before this target
+	#@go generate ./...
 
 .PHONY: ci-node-generate
 ci-node-generate: yarn-build
@@ -46,8 +46,6 @@ yarn-build: node_modules
 
 .PHONY: node_modules
 node_modules:
-	apk add npm
-	npm install --global yarn
 	yarn install --frozen-lockfile
 
 ############ protobuf ############

@@ -23,13 +23,10 @@ include ../.make/generate.mk
 
 .PHONY: ci-go-generate
 ci-go-generate: pull-assets # CI runs ci-node-generate automatically before this target
-	@go generate ./...
+	# @go generate ./...
 
 .PHONY: ci-node-generate
 ci-node-generate:
-	apk add npm
-	npm install --global yarn
-	yarn install --frozen-lockfile
 
 WEB_ASSETS_VERSION = v4.3.0
 

@@ -1,8 +1,5 @@
 FROM owncloudci/golang:1.17 as build
 
-RUN apk update && \
-        apk add --update npm
-
 COPY ./ /ocis/
 
 WORKDIR /ocis/ocis
@@ -14,7 +11,6 @@ FROM alpine:3.13
 RUN apk update && \
 	apk upgrade && \
 	apk add ca-certificates mailcap && \
-        apk add --update npm && \
 	rm -rf /var/cache/apk/* && \
 	echo 'hosts: files dns' >| /etc/nsswitch.conf
 
