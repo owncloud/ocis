@@ -3,6 +3,8 @@ FROM owncloudci/golang:1.17 as build
 RUN apk update && \
         apk add --update npm
 
+RUN npm install --global yarn
+
 COPY ./ /ocis/
 
 WORKDIR /ocis/ocis
@@ -14,8 +16,11 @@ FROM alpine:3.13
 RUN apk update && \
 	apk upgrade && \
 	apk add ca-certificates mailcap && \
+        apk add --update npm && \
 	rm -rf /var/cache/apk/* && \
 	echo 'hosts: files dns' >| /etc/nsswitch.conf
+
+RUN npm install --global yarn
 
 LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
   org.label-schema.name="ownCloud Infinite Scale" \

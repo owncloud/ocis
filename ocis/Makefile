@@ -32,7 +32,6 @@ ci-go-generate: # CI runs ci-node-generate automatically before this target
 
 .PHONY: ci-node-generate
 ci-node-generate:
-	@npm install --global yarn
 	@make -C ../accounts ci-node-generate
 	@make -C ../graph-explorer ci-node-generate
 	@make -C ../settings ci-node-generate
