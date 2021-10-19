@@ -64,6 +64,7 @@ services:
       PROXY_ACCOUNT_BACKEND_TYPE: cs3
       STORAGE_LDAP_HOSTNAME: ldap-server
       STORAGE_LDAP_PORT: 636
+      STORAGE_LDAP_INSECURE: "true"
       STORAGE_LDAP_BASE_DN: "dc=owncloud,dc=com"
       STORAGE_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
       STORAGE_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
