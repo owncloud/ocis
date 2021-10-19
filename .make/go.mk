@@ -77,7 +77,7 @@ ci-golangci-lint: $(GOLANGCI_LINT)
 	$(GOLANGCI_LINT) run -E gosec -E bodyclose -E dogsled -E durationcheck -E revive -E ifshort -E makezero -E prealloc -E predeclared --path-prefix $(NAME) --timeout 10m0s --issues-exit-code 0 --out-format checkstyle > checkstyle.xml
 
 .PHONY: test
-test:
+test: ci-node-generate
 	@go test -v -coverprofile coverage.out ./...
 
 .PHONY: go-coverage
