@@ -33,6 +33,6 @@ ci-go-generate: # CI runs ci-node-generate automatically before this target
 .PHONY: ci-node-generate
 ci-node-generate:
 	@make -C ../accounts ci-node-generate
-	@make -C ../graph-explorer ci-node-generate
+	@make -C ../graph-explorer generate
 	@make -C ../settings ci-node-generate
-	@make -C ../web ci-node-generate
+	@make -C ../web generate
