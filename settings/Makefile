@@ -46,6 +46,8 @@ yarn-build: node_modules
 
 .PHONY: node_modules
 node_modules:
+	apk add npm
+	npm install --global yarn
 	yarn install --frozen-lockfile
 
 ############ protobuf ############
