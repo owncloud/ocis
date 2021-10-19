@@ -23,7 +23,6 @@ include ../.make/generate.mk
 
 .PHONY: ci-go-generate
 ci-go-generate: pull-assets # CI runs ci-node-generate automatically before this target
-	# @go generate ./...
 
 .PHONY: ci-node-generate
 ci-node-generate:

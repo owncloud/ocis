@@ -61,10 +61,5 @@ func read(assetPath string, fileName string) (http.File, error) {
 		return nil, err
 	}
 
-	f, err := os.Open(p)
-	if err != nil {
-		return nil, err
-	}
-
-	return f, nil
+	return os.Open(p)
 }
