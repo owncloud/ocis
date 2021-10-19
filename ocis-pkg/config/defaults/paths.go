@@ -10,9 +10,9 @@ const ()
 
 var (
 	// switch between modes
-	BaseDataPathType string = "homedir"
+	BaseDataPathType = "homedir"
 	// don't read from this, only write
-	BaseDataPathValue string = "/var/lib/ocis"
+	BaseDataPathValue = "/var/lib/ocis"
 )
 
 func BaseDataPath() string {
