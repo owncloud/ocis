@@ -11,11 +11,7 @@ else
 	UNAME := $(shell uname -s)
 endif
 
-ifeq ($(UNAME), Darwin)
-	GOBUILD ?= go build -i
-else
-	GOBUILD ?= go build
-endif
+GOBUILD ?= go build
 
 SOURCES ?= $(shell find . -name "*.go" -type f -not -path "./node_modules/*")
 
