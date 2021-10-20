@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-19T14:32:09+0000"
+date: "2021-10-20T07:08:13+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/store/templates
@@ -171,7 +171,7 @@ Usage: `store server [command options] [arguments...]`
 
 
 -data-path |  $STORE_DATA_PATH
-: location of the store data path. Default: `"/var/tmp/ocis/store"`.
+: location of the store data path. Default: `flags.OverrideDefaultString(cfg.Datapath, path.Join(defaults.BaseDataPath(), "store"))`.
 
 
 -extensions | 

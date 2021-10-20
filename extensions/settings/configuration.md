@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-19T14:32:04+0000"
+date: "2021-10-20T07:08:06+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -197,7 +197,7 @@ Usage: `settings server [command options] [arguments...]`
 
 
 -data-path |  $SETTINGS_DATA_PATH
-: Mount path for the storage. Default: `"/var/tmp/ocis/settings"`.
+: Mount path for the storage. Default: `flags.OverrideDefaultString(cfg.Service.DataPath, path.Join(defaults.BaseDataPath(), "settings"))`.
 
 
 -jwt-secret |  $SETTINGS_JWT_SECRET , $OCIS_JWT_SECRET

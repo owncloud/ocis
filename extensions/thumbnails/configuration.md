@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-19T14:32:16+0000"
+date: "2021-10-20T07:08:18+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -179,7 +179,7 @@ Usage: `thumbnails server [command options] [arguments...]`
 
 
 -filesystemstorage-root |  $THUMBNAILS_FILESYSTEMSTORAGE_ROOT
-: Root path of the filesystem storage directory. Default: `/var/tmp/ocis/thumbnails`.
+: Root path of the filesystem storage directory. Default: `flags.OverrideDefaultString(cfg.Thumbnail.FileSystemStorage.RootDirectory, path.Join(defaults.BaseDataPath(), "thumbnails"))`.
 
 
 -reva-gateway-addr |  $REVA_GATEWAY

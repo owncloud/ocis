@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-19T14:32:04+0000"
+date: "2021-10-20T07:08:06+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -229,11 +229,11 @@ Usage: `proxy server [command options] [arguments...]`
 
 
 -transport-tls-cert |  $PROXY_TRANSPORT_TLS_CERT
-: Certificate file for transport encryption. Default: `flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(pkgos.MustUserConfigDir("ocis", "proxy"), "server.crt"))`.
+: Certificate file for transport encryption. Default: `flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(defaults.BaseDataPath(), "proxy", "server.crt"))`.
 
 
 -transport-tls-key |  $PROXY_TRANSPORT_TLS_KEY
-: Secret file for transport encryption. Default: `flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(pkgos.MustUserConfigDir("ocis", "proxy"), "server.key"))`.
+: Secret file for transport encryption. Default: `flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(defaults.BaseDataPath(), "proxy", "server.key"))`.
 
 
 -tls |  $PROXY_TLS

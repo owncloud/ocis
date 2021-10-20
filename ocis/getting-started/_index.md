@@ -46,7 +46,7 @@ chmod +x ocis
 ./ocis server
 ```
 
-The default primary storage location is `/var/tmp/ocis`. You can change that value by configuration.
+The default primary storage location is `~/.ocis` or `/var/lib/ocis` depending on the packaging format and your operating system user. You can change that value by configuration.
 
 {{< hint warning >}}
 oCIS by default relies on Multicast DNS (mDNS), usually via avahi-daemon. If your system has a firewall, make sure mDNS is allowed in your active zone.

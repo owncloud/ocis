@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-19T14:32:04+0000"
+date: "2021-10-20T07:08:06+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/idp/templates
@@ -34,82 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Command-line flags
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### idp ocis-idp
-
-Serve IDP API for oCIS
-
-Usage: `idp ocis-idp [command options] [arguments...]`
-
-
--log-level |  $IDP_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
-
--log-pretty |  $IDP_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
-
--log-color |  $IDP_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### idp server
 
@@ -231,11 +155,11 @@ Usage: `idp server [command options] [arguments...]`
 
 
 -transport-tls-cert |  $IDP_TRANSPORT_TLS_CERT
-: Certificate file for transport encryption. Default: `flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(pkgos.MustUserConfigDir("ocis", "idp"), "server.crt"))`.
+: Certificate file for transport encryption. Default: `flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(defaults.BaseDataPath(), "idp", "server.crt"))`.
 
 
 -transport-tls-key |  $IDP_TRANSPORT_TLS_KEY
-: Secret file for transport encryption. Default: `flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(pkgos.MustUserConfigDir("ocis", "idp"), "server.key"))`.
+: Secret file for transport encryption. Default: `flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(defaults.BaseDataPath(), "idp", "server.key"))`.
 
 
 -iss |  $IDP_ISS , $OCIS_URL
@@ -287,11 +211,11 @@ Usage: `idp server [command options] [arguments...]`
 
 
 -identifier-client-path |  $IDP_IDENTIFIER_CLIENT_PATH
-: Path to the identifier web client base folder. Default: `"/var/tmp/ocis/idp"`.
+: Path to the identifier web client base folder. Default: `flags.OverrideDefaultString(cfg.IDP.IdentifierClientPath, path.Join(defaults.BaseDataPath(), "idp"))`.
 
 
 -identifier-registration-conf |  $IDP_IDENTIFIER_REGISTRATION_CONF
-: Path to a identifier-registration.yaml configuration file. Default: `"./config/identifier-registration.yaml"`.
+: Path to a identifier-registration.yaml configuration file. Default: `flags.OverrideDefaultString(cfg.IDP.IdentifierRegistrationConf, path.Join(defaults.BaseDataPath(), "idp", "identifier-registration.yaml"))`.
 
 
 -identifier-scopes-conf |  $IDP_IDENTIFIER_SCOPES_CONF
@@ -428,6 +352,82 @@ Usage: `idp health [command options] [arguments...]`
 
 -debug-addr |  $IDP_DEBUG_ADDR
 : Address to debug endpoint. Default: `"127.0.0.1:9134"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### idp ocis-idp
+
+Serve IDP API for oCIS
+
+Usage: `idp ocis-idp [command options] [arguments...]`
+
+
+-log-level |  $IDP_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+
+-log-pretty |  $IDP_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+
+-log-color |  $IDP_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
 
 
 
