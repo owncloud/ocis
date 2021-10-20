@@ -26,4 +26,5 @@ ci-go-generate: # CI runs ci-node-generate automatically before this target
 	@go generate ./...
 
 .PHONY: ci-node-generate
-ci-node-generate:
+ci-node-generate: 
+	@make -C ../accounts ci-node-generate

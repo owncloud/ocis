@@ -31,4 +31,8 @@ ci-go-generate: # CI runs ci-node-generate automatically before this target
 	@go generate ./...
 
 .PHONY: ci-node-generate
-ci-node-generate:
+ci-node-generate: # no need to recreate go code, just add assets
+	@make -C ../accounts ci-node-generate
+	@make -C ../graph-explorer ci-node-generate
+	@make -C ../settings ci-node-generate
+	@make -C ../web ci-node-generate

@@ -1,9 +1,19 @@
 package assets
 
 import (
+	"net/http"
+
+	graphexplorer "github.com/owncloud/ocis/graph-explorer"
 	"github.com/owncloud/ocis/graph-explorer/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/assetsfs"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
+
+// New returns a new http filesystem to serve assets.
+func New(opts ...Option) http.FileSystem {
+	options := newOptions(opts...)
+	return assetsfs.New(graphexplorer.Assets, "", options.Logger)
+}
 
 // Option defines a single option function.
 type Option func(o *Options)
