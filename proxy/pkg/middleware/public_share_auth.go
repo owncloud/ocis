@@ -9,7 +9,7 @@ import (
 const (
 	headerRevaAccessToken   = "x-access-token"
 	headerShareToken        = "public-token"
-	basicAuthPasswordPrefix = "basic|"
+	basicAuthPasswordPrefix = "password|"
 	authenticationType      = "publicshares"
 )
 
