@@ -83,6 +83,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/2479
    https://github.com/owncloud/ocis/pull/2536
+   https://github.com/owncloud/ocis/pull/2652
 
 * Enhancement - Report quota states: [#2628](https://github.com/owncloud/ocis/pull/2628)
 
