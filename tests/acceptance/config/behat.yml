@@ -32,7 +32,7 @@ default:
       paths:
         - '%paths.base%/../features/apiSpaces'
       contexts:
-        - GraphApiContext:
+        - SpacesContext:
         - OccContext:
         - FeatureContext: &common_feature_context_params
             baseUrl: http://localhost:8080
