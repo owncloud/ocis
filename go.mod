@@ -18,13 +18,13 @@ require (
 	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3 v3.0.0-20211012122208-f63e46a7d1e9
 	github.com/blevesearch/bleve/v2 v2.2.1
 	github.com/coreos/go-oidc/v3 v3.1.0
-	github.com/cs3org/go-cs3apis v0.0.0-20211018122138-391b29bd7803
+	github.com/cs3org/go-cs3apis v0.0.0-20211007101428-6d142794ec11
 	github.com/cs3org/reva v1.14.1-0.20211018074606-00d075577d05
 	github.com/disintegration/imaging v1.6.2
-	github.com/glauth/glauth v1.1.2
+	github.com/glauth/glauth v1.1.3-0.20210729125545-b9aecdfcac31
 	github.com/go-chi/chi/v5 v5.0.4
 	github.com/go-chi/render v1.0.1
-	github.com/go-logr/logr v1.1.0
+	github.com/go-logr/logr v0.4.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/gofrs/uuid v4.1.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.1.0
@@ -34,7 +34,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.6.0
 	github.com/iancoleman/strcase v0.2.0
 	github.com/justinas/alice v1.2.0
-	github.com/libregraph/lico v0.51.1
+	github.com/libregraph/lico v0.34.1-0.20210803054646-b584e0372224
 	github.com/mennanov/fieldmask-utils v0.5.0
 	github.com/mitchellh/mapstructure v1.4.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
@@ -120,9 +120,9 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
+	github.com/eternnoir/gncp v0.0.0-20170707042257-c70df2d0cd68 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.0 // indirect
 	github.com/gdexlab/go-render v1.0.1 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.3 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
@@ -157,9 +157,7 @@ require (
 	github.com/kevinburke/ssh_config v1.1.0 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
-	github.com/kr/pretty v0.3.0 // indirect
-	github.com/kr/text v0.2.0 // indirect
-	github.com/longsleep/go-metrics v1.0.0 // indirect
+	github.com/longsleep/go-metrics v0.0.0-20191013204616-cddea569b0ea // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mattermost/xml-roundtrip-validator v0.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.11 // indirect
@@ -186,7 +184,6 @@ require (
 	github.com/nats-io/nkeys v0.3.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
-	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7 // indirect
 	github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
@@ -202,11 +199,11 @@ require (
 	github.com/rickb777/date v1.16.1 // indirect
 	github.com/rickb777/plural v1.4.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/rs/cors v1.8.0 // indirect
 	github.com/rs/xid v1.3.0 // indirect
 	github.com/russellhaering/goxmldsig v1.1.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sciencemesh/meshdirectory-web v1.0.4 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/sethvargo/go-password v0.2.0 // indirect
@@ -232,6 +229,7 @@ require (
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20211020064051-0ec99a608a1b // indirect
 	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
 	golang.org/x/tools v0.1.7 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/ini.v1 v1.63.2 // indirect
@@ -240,7 +238,8 @@ require (
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
-	stash.kopano.io/kgol/oidc-go v0.3.2 // indirect
+	stash.kopano.io/kgol/kcc-go/v5 v5.0.1 // indirect
+	stash.kopano.io/kgol/oidc-go v0.3.1 // indirect
 )
 
 // this is a transitive replace. See https://github.com/libregraph/lico/blob/master/go.mod#L38
