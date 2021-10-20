@@ -215,7 +215,7 @@ require (
 	github.com/steveyen/gtreap v0.1.0 // indirect
 	github.com/studio-b12/gowebdav v0.0.0-20210917133250-a3a86976a1df // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
-	github.com/tus/tusd v1.7.3 // indirect
+	github.com/tus/tusd v1.6.0 // indirect
 	github.com/wk8/go-ordered-map v0.2.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
