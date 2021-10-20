@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-20T10:54:59+0000"
+date: "2021-10-20T13:05:43+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -35,157 +35,103 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### accounts server
+### accounts update
 
-Start ocis accounts service
+Make changes to an existing account
 
-Usage: `accounts server [command options] [arguments...]`
-
-
+Usage: `accounts update [command options] [arguments...]`
 
 
 
 
--log-file |  $ACCOUNTS_LOG_FILE , $OCIS_LOG_FILE
-: Enable log to file.
 
 
--tracing-enabled |  $ACCOUNTS_TRACING_ENABLED , $OCIS_TRACING_ENABLED
-: Enable sending traces.
 
 
--tracing-type |  $ACCOUNTS_TRACING_TYPE , $OCIS_TRACING_TYPE
-: Tracing backend type. Default: `"jaeger"`.
 
 
--tracing-endpoint |  $ACCOUNTS_TRACING_ENDPOINT , $OCIS_TRACING_ENDPOINT
-: Endpoint for the agent. Default: `""`.
 
 
--tracing-collector |  $ACCOUNTS_TRACING_COLLECTOR , $OCIS_TRACING_COLLECTOR
-: Endpoint for the collector. Default: `""`.
 
 
--tracing-service |  $ACCOUNTS_TRACING_SERVICE
-: Service name for tracing. Default: `"accounts"`.
 
 
--http-namespace |  $ACCOUNTS_HTTP_NAMESPACE
-: Set the base namespace for the http namespace. Default: `"com.owncloud.web"`.
 
 
--http-addr |  $ACCOUNTS_HTTP_ADDR
-: Address to bind http server. Default: `"127.0.0.1:9181"`.
 
 
--http-root |  $ACCOUNTS_HTTP_ROOT
-: Root path of http server. Default: `"/"`.
 
 
--http-cache-ttl |  $ACCOUNTS_CACHE_TTL
-: Set the static assets caching duration in seconds. Default: `604800`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 -grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
 
 
--grpc-addr |  $ACCOUNTS_GRPC_ADDR
-: Address to bind grpc server. Default: `"127.0.0.1:9180"`.
-
-
 -name |  $ACCOUNTS_NAME
 : service name. Default: `"accounts"`.
 
 
--accounts-hash-difficulty |  $ACCOUNTS_HASH_DIFFICULTY
-: accounts password hash difficulty. Default: `11`.
+-enabled | 
+: Enable the account.
 
 
--demo-users-and-groups |  $ACCOUNTS_DEMO_USERS_AND_GROUPS
-: Enable demo users and groups. Default: `true`.
+-displayname | 
+: Set the displayname for the account.
 
 
--asset-path |  $ACCOUNTS_ASSET_PATH
-: Path to custom assets. Default: `""`.
+-preferred-name | 
+: Set the preferred-name for the account.
 
 
--jwt-secret |  $ACCOUNTS_JWT_SECRET , $OCIS_JWT_SECRET
-: Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `"Pive-Fumkiu4"`.
+-on-premises-sam-account-name | 
+: Set the on-premises-sam-account-name.
 
 
--storage-backend |  $ACCOUNTS_STORAGE_BACKEND
-: Which backend to use to store accounts data (CS3 or disk). Default: `"CS3"`.
+-uidnumber | 
+: Set the uidnumber for the account.
 
 
--storage-disk-path |  $ACCOUNTS_STORAGE_DISK_PATH
-: Path on the local disk to store accounts data when backend is set to disk. Default: `flags.OverrideDefaultString(cfg.Repo.Disk.Path, path.Join(defaults.BaseDataPath(), "accounts"))`.
+-gidnumber | 
+: Set the gidnumber for the account.
 
 
--storage-cs3-provider-addr |  $ACCOUNTS_STORAGE_CS3_PROVIDER_ADDR
-: bind address for the metadata storage provider. Default: `"localhost:9215"`.
+-mail | 
+: Set the mail for the account.
 
 
--storage-cs3-data-url |  $ACCOUNTS_STORAGE_CS3_DATA_URL
-: http endpoint of the metadata storage. Default: `"http://localhost:9216"`.
+-description | 
+: Set the description for the account.
 
 
--storage-cs3-data-prefix |  $ACCOUNTS_STORAGE_CS3_DATA_PREFIX
-: path prefix for the http endpoint of the metadata storage, without leading slash. Default: `"data"`.
+-password | 
+: Set the password for the account.
 
 
--storage-cs3-jwt-secret |  $ACCOUNTS_STORAGE_CS3_JWT_SECRET , $OCIS_JWT_SECRET
-: Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `"Pive-Fumkiu4"`.
+-password-policies | 
+: Possible policies: DisableStrongPassword, DisablePasswordExpiration.
 
 
--service-user-uuid |  $ACCOUNTS_SERVICE_USER_UUID
-: uuid of the internal service user (required on EOS). Default: `"95cb8724-03b2-11eb-a0a6-c33ef8ef53ad"`.
+-force-password-change | 
+: Force password change on next sign-in.
 
 
--service-user-username |  $ACCOUNTS_SERVICE_USER_USERNAME
-: username of the internal service user (required on EOS). Default: `""`.
-
-
--service-user-uid |  $ACCOUNTS_SERVICE_USER_UID
-: uid of the internal service user (required on EOS). Default: `0`.
-
-
--service-user-gid |  $ACCOUNTS_SERVICE_USER_GID
-: gid of the internal service user (required on EOS). Default: `0`.
-
-
--uid-index-lower-bound |  $ACCOUNTS_UID_INDEX_LOWER_BOUND
-: define a starting point for the account UID. Default: `0`.
-
-
--gid-index-lower-bound |  $ACCOUNTS_GID_INDEX_LOWER_BOUND
-: define a starting point for the account GID. Default: `1000`.
-
-
--uid-index-upper-bound |  $ACCOUNTS_UID_INDEX_UPPER_BOUND
-: define an ending point for the account UID. Default: `0`.
-
-
--gid-index-upper-bound |  $ACCOUNTS_GID_INDEX_UPPER_BOUND
-: define an ending point for the account GID. Default: `1000`.
-
-
--extensions | 
-: Run specific extensions during supervised mode.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+-force-password-change-mfa | 
+: Force password change on next sign-in with mfa.
 
 
 
@@ -291,11 +237,11 @@ Usage: `accounts inspect [command options] [arguments...]`
 -name |  $ACCOUNTS_NAME
 : service name. Default: `"accounts"`.
 
-### accounts rebuildIndex
+### accounts list
 
-Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
+List existing accounts
 
-Usage: `accounts rebuildIndex [command options] [arguments...]`
+Usage: `accounts list [command options] [arguments...]`
 
 
 
@@ -363,6 +309,12 @@ Usage: `accounts rebuildIndex [command options] [arguments...]`
 
 
 
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `"accounts"`.
 
 
 
@@ -540,103 +492,157 @@ Usage: `accounts ocis-accounts [command options] [arguments...]`
 
 
 
-### accounts update
+### accounts server
 
-Make changes to an existing account
+Start ocis accounts service
 
-Usage: `accounts update [command options] [arguments...]`
-
-
+Usage: `accounts server [command options] [arguments...]`
 
 
 
 
 
 
+-log-file |  $ACCOUNTS_LOG_FILE , $OCIS_LOG_FILE
+: Enable log to file.
 
 
+-tracing-enabled |  $ACCOUNTS_TRACING_ENABLED , $OCIS_TRACING_ENABLED
+: Enable sending traces.
 
 
+-tracing-type |  $ACCOUNTS_TRACING_TYPE , $OCIS_TRACING_TYPE
+: Tracing backend type. Default: `"jaeger"`.
 
 
+-tracing-endpoint |  $ACCOUNTS_TRACING_ENDPOINT , $OCIS_TRACING_ENDPOINT
+: Endpoint for the agent. Default: `""`.
 
 
+-tracing-collector |  $ACCOUNTS_TRACING_COLLECTOR , $OCIS_TRACING_COLLECTOR
+: Endpoint for the collector. Default: `""`.
 
 
+-tracing-service |  $ACCOUNTS_TRACING_SERVICE
+: Service name for tracing. Default: `"accounts"`.
 
 
+-http-namespace |  $ACCOUNTS_HTTP_NAMESPACE
+: Set the base namespace for the http namespace. Default: `"com.owncloud.web"`.
 
 
+-http-addr |  $ACCOUNTS_HTTP_ADDR
+: Address to bind http server. Default: `"127.0.0.1:9181"`.
 
 
+-http-root |  $ACCOUNTS_HTTP_ROOT
+: Root path of http server. Default: `"/"`.
 
 
-
-
-
-
-
-
-
-
-
-
+-http-cache-ttl |  $ACCOUNTS_CACHE_TTL
+: Set the static assets caching duration in seconds. Default: `604800`.
 
 
 -grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
 
 
+-grpc-addr |  $ACCOUNTS_GRPC_ADDR
+: Address to bind grpc server. Default: `"127.0.0.1:9180"`.
+
+
 -name |  $ACCOUNTS_NAME
 : service name. Default: `"accounts"`.
 
 
--enabled | 
-: Enable the account.
+-accounts-hash-difficulty |  $ACCOUNTS_HASH_DIFFICULTY
+: accounts password hash difficulty. Default: `11`.
 
 
--displayname | 
-: Set the displayname for the account.
+-demo-users-and-groups |  $ACCOUNTS_DEMO_USERS_AND_GROUPS
+: Enable demo users and groups. Default: `true`.
 
 
--preferred-name | 
-: Set the preferred-name for the account.
+-asset-path |  $ACCOUNTS_ASSET_PATH
+: Path to custom assets. Default: `""`.
 
 
--on-premises-sam-account-name | 
-: Set the on-premises-sam-account-name.
+-jwt-secret |  $ACCOUNTS_JWT_SECRET , $OCIS_JWT_SECRET
+: Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `"Pive-Fumkiu4"`.
 
 
--uidnumber | 
-: Set the uidnumber for the account.
+-storage-backend |  $ACCOUNTS_STORAGE_BACKEND
+: Which backend to use to store accounts data (CS3 or disk). Default: `"CS3"`.
 
 
--gidnumber | 
-: Set the gidnumber for the account.
+-storage-disk-path |  $ACCOUNTS_STORAGE_DISK_PATH
+: Path on the local disk to store accounts data when backend is set to disk. Default: `flags.OverrideDefaultString(cfg.Repo.Disk.Path, path.Join(defaults.BaseDataPath(), "accounts"))`.
 
 
--mail | 
-: Set the mail for the account.
+-storage-cs3-provider-addr |  $ACCOUNTS_STORAGE_CS3_PROVIDER_ADDR
+: bind address for the metadata storage provider. Default: `"localhost:9215"`.
 
 
--description | 
-: Set the description for the account.
+-storage-cs3-data-url |  $ACCOUNTS_STORAGE_CS3_DATA_URL
+: http endpoint of the metadata storage. Default: `"http://localhost:9216"`.
 
 
--password | 
-: Set the password for the account.
+-storage-cs3-data-prefix |  $ACCOUNTS_STORAGE_CS3_DATA_PREFIX
+: path prefix for the http endpoint of the metadata storage, without leading slash. Default: `"data"`.
 
 
--password-policies | 
-: Possible policies: DisableStrongPassword, DisablePasswordExpiration.
+-storage-cs3-jwt-secret |  $ACCOUNTS_STORAGE_CS3_JWT_SECRET , $OCIS_JWT_SECRET
+: Used to create JWT to talk to reva, should equal reva's jwt-secret. Default: `"Pive-Fumkiu4"`.
 
 
--force-password-change | 
-: Force password change on next sign-in.
+-service-user-uuid |  $ACCOUNTS_SERVICE_USER_UUID
+: uuid of the internal service user (required on EOS). Default: `"95cb8724-03b2-11eb-a0a6-c33ef8ef53ad"`.
 
 
--force-password-change-mfa | 
-: Force password change on next sign-in with mfa.
+-service-user-username |  $ACCOUNTS_SERVICE_USER_USERNAME
+: username of the internal service user (required on EOS). Default: `""`.
+
+
+-service-user-uid |  $ACCOUNTS_SERVICE_USER_UID
+: uid of the internal service user (required on EOS). Default: `0`.
+
+
+-service-user-gid |  $ACCOUNTS_SERVICE_USER_GID
+: gid of the internal service user (required on EOS). Default: `0`.
+
+
+-uid-index-lower-bound |  $ACCOUNTS_UID_INDEX_LOWER_BOUND
+: define a starting point for the account UID. Default: `0`.
+
+
+-gid-index-lower-bound |  $ACCOUNTS_GID_INDEX_LOWER_BOUND
+: define a starting point for the account GID. Default: `1000`.
+
+
+-uid-index-upper-bound |  $ACCOUNTS_UID_INDEX_UPPER_BOUND
+: define an ending point for the account UID. Default: `0`.
+
+
+-gid-index-upper-bound |  $ACCOUNTS_GID_INDEX_UPPER_BOUND
+: define an ending point for the account GID. Default: `1000`.
+
+
+-extensions | 
+: Run specific extensions during supervised mode.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -864,11 +870,11 @@ Usage: `accounts add [command options] [arguments...]`
 
 
 
-### accounts list
+### accounts rebuildIndex
 
-List existing accounts
+Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
 
-Usage: `accounts list [command options] [arguments...]`
+Usage: `accounts rebuildIndex [command options] [arguments...]`
 
 
 
@@ -936,12 +942,6 @@ Usage: `accounts list [command options] [arguments...]`
 
 
 
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
-
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `"accounts"`.
 
 
 
