@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Enhancement: [#2630](https://github.com/owncloud/ocis/pull/2630)
 * Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
 * Change - New default data paths and easier configuration of the data path: [#2590](https://github.com/owncloud/ocis/pull/2590)
+* Enhancement - Use go-embed insted of fileb0x: [#1199](https://github.com/owncloud/ocis/issues/1199)
 * Enhancement - Upgrade to go-micro v4.1.0: [#2616](https://github.com/owncloud/ocis/pull/2616)
 * Enhancement - Add a middleware to authenticate public share requests: [#2536](https://github.com/owncloud/ocis/pull/2536)
 * Enhancement - Report quota states: [#2628](https://github.com/owncloud/ocis/pull/2628)
@@ -60,6 +61,14 @@ The following sections list the changes for unreleased.
    to your go build step.
 
    https://github.com/owncloud/ocis/pull/2590
+
+* Enhancement - Use go-embed insted of fileb0x: [#1199](https://github.com/owncloud/ocis/issues/1199)
+
+   Go-embed delivers already the funtionality we need but with less code. We decided to use it
+   instead of 3rd party fileb0x
+
+   https://github.com/owncloud/ocis/issues/1199
+   https://github.com/owncloud/ocis/pull/2631
 
 * Enhancement - Upgrade to go-micro v4.1.0: [#2616](https://github.com/owncloud/ocis/pull/2616)
 
