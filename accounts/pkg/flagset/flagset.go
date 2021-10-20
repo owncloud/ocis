@@ -1,8 +1,11 @@
 package flagset
 
 import (
+	"path"
+
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/urfave/cli/v2"
 )
@@ -156,9 +159,16 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.TokenManager.JWTSecret,
 		},
 		&cli.StringFlag{
+			Name:        "storage-backend",
+			Value:       flags.OverrideDefaultString(cfg.Repo.Disk.Path, "CS3"),
+			Usage:       "Which backend to use to store accounts data (CS3 or disk)",
+			EnvVars:     []string{"ACCOUNTS_STORAGE_BACKEND"},
+			Destination: &cfg.Repo.Backend,
+		},
+		&cli.StringFlag{
 			Name:        "storage-disk-path",
-			Value:       flags.OverrideDefaultString(cfg.Repo.Disk.Path, ""),
-			Usage:       "Path on the local disk, e.g. /var/tmp/ocis/accounts",
+			Value:       flags.OverrideDefaultString(cfg.Repo.Disk.Path, path.Join(defaults.BaseDataPath(), "accounts")),
+			Usage:       "Path on the local disk to store accounts data when backend is set to disk",
 			EnvVars:     []string{"ACCOUNTS_STORAGE_DISK_PATH"},
 			Destination: &cfg.Repo.Disk.Path,
 		},

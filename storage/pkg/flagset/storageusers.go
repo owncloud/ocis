@@ -1,6 +1,9 @@
 package flagset
 
 import (
+	"path"
+
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset/userdrivers"
@@ -119,7 +122,7 @@ func StorageUsersWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "tmp-folder",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StorageUsers.TempFolder, "/var/tmp/ocis/tmp/users"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageUsers.TempFolder, path.Join(defaults.BaseDataPath(), "tmp", "users")),
 			Usage:       "path to tmp folder",
 			EnvVars:     []string{"STORAGE_USERS_TMP_FOLDER"},
 			Destination: &cfg.Reva.StorageUsers.TempFolder,

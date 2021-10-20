@@ -1,6 +1,9 @@
 package userdrivers
 
 import (
+	"path"
+
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/urfave/cli/v2"
@@ -11,14 +14,14 @@ func DriverOwnCloudWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "storage-owncloud-datadir",
-			Value:       flags.OverrideDefaultString(cfg.Reva.UserStorage.OwnCloud.Root, "/var/tmp/ocis/storage/owncloud"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.UserStorage.OwnCloud.Root, path.Join(defaults.BaseDataPath(), "storage", "owncloud")),
 			Usage:       "the path to the owncloud data directory",
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_DATADIR"},
 			Destination: &cfg.Reva.UserStorage.OwnCloud.Root,
 		},
 		&cli.StringFlag{
 			Name:        "storage-owncloud-uploadinfo-dir",
-			Value:       flags.OverrideDefaultString(cfg.Reva.UserStorage.OwnCloud.UploadInfoDir, "/var/tmp/ocis/storage/uploadinfo"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.UserStorage.OwnCloud.UploadInfoDir, path.Join(defaults.BaseDataPath(), "storage", "uploadinfo")),
 			Usage:       "the path to the tus upload info directory",
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_UPLOADINFO_DIR"},
 			Destination: &cfg.Reva.UserStorage.OwnCloud.UploadInfoDir,

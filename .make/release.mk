@@ -13,8 +13,10 @@ release-dirs:
 release-linux: $(GOX) release-dirs
 	$(GOX) -tags 'netgo $(TAGS)' -ldflags '-extldflags "-static" $(LDFLAGS)' -os 'linux' -arch 'amd64 386 arm64 arm' -output '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
 
+# docker specific packaging flags
+DOCKER_LDFLAGS += -X "$(OCIS_REPO)/ocis-pkg/config/defaults.BaseDataPathType=path" -X "$(OCIS_REPO)/ocis-pkg/config/defaults.BaseDataPathValue=/var/lib/ocis"
 release-linux-docker: $(GOX) release-dirs
-	$(GOX) -tags 'netgo $(TAGS)' -ldflags '-extldflags "-static" $(LDFLAGS)' -os 'linux' -arch 'amd64 386 arm64 arm' -output '$(DIST)/binaries/$(EXECUTABLE)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
+	$(GOX) -tags 'netgo $(TAGS)' -ldflags '-extldflags "-static" $(LDFLAGS) $(DOCKER_LDFLAGS)' -os 'linux' -arch 'amd64 386 arm64 arm' -output '$(DIST)/binaries/$(EXECUTABLE)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
 
 .PHONY: release-windows
 release-windows: $(GOX) release-dirs

@@ -1,6 +1,9 @@
 package flagset
 
 import (
+	"path"
+
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
@@ -137,7 +140,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "filesystemstorage-root",
-			Value:       "/var/tmp/ocis/thumbnails",
+			Value:       flags.OverrideDefaultString(cfg.Thumbnail.FileSystemStorage.RootDirectory, path.Join(defaults.BaseDataPath(), "thumbnails")),
 			Usage:       "Root path of the filesystem storage directory",
 			EnvVars:     []string{"THUMBNAILS_FILESYSTEMSTORAGE_ROOT"},
 			Destination: &cfg.Thumbnail.FileSystemStorage.RootDirectory,

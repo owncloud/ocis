@@ -1,6 +1,9 @@
 package metadatadrivers
 
 import (
+	"path"
+
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/urfave/cli/v2"
@@ -11,7 +14,7 @@ func DriverS3NGWithConfig(cfg *config.Config) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:        "storage-s3ng-root",
-			Value:       flags.OverrideDefaultString(cfg.Reva.MetadataStorage.S3NG.Root, "/var/tmp/ocis/storage/metadata"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.MetadataStorage.S3NG.Root, path.Join(defaults.BaseDataPath(), "storage", "metadata")),
 			Usage:       "the path to the local storage root",
 			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3NG_ROOT"},
 			Destination: &cfg.Reva.MetadataStorage.S3NG.Root,

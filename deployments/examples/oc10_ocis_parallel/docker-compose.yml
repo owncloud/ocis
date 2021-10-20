@@ -120,7 +120,7 @@ services:
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/ocis/proxy-config.dist.json:/config/proxy-config.dist.json
-      - ocis-data:/var/tmp/ocis
+      - ocis-data:/var/lib/ocis
       # shared volume with oC10
       - oc10-data:/mnt/data
     labels:

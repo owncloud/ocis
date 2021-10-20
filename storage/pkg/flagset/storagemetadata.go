@@ -1,6 +1,9 @@
 package flagset
 
 import (
+	"path"
+
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/flagset/metadatadrivers"
@@ -54,7 +57,7 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "tmp-folder",
-			Value:       flags.OverrideDefaultString(cfg.Reva.StorageMetadata.TempFolder, "/var/tmp/ocis/tmp/metadata"),
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageMetadata.TempFolder, path.Join(defaults.BaseDataPath(), "tmp", "metadata")),
 			Usage:       "path to tmp folder",
 			EnvVars:     []string{"STORAGE_METADATA_TMP_FOLDER"},
 			Destination: &cfg.Reva.StorageMetadata.TempFolder,

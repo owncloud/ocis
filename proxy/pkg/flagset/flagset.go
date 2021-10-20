@@ -3,8 +3,8 @@ package flagset
 import (
 	"path"
 
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
-	pkgos "github.com/owncloud/ocis/ocis-pkg/os"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/urfave/cli/v2"
 )
@@ -156,14 +156,14 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-cert",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(pkgos.MustUserConfigDir("ocis", "proxy"), "server.crt")),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSCert, path.Join(defaults.BaseDataPath(), "proxy", "server.crt")),
 			Usage:       "Certificate file for transport encryption",
 			EnvVars:     []string{"PROXY_TRANSPORT_TLS_CERT"},
 			Destination: &cfg.HTTP.TLSCert,
 		},
 		&cli.StringFlag{
 			Name:        "transport-tls-key",
-			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(pkgos.MustUserConfigDir("ocis", "proxy"), "server.key")),
+			Value:       flags.OverrideDefaultString(cfg.HTTP.TLSKey, path.Join(defaults.BaseDataPath(), "proxy", "server.key")),
 			Usage:       "Secret file for transport encryption",
 			EnvVars:     []string{"PROXY_TRANSPORT_TLS_KEY"},
 			Destination: &cfg.HTTP.TLSKey,

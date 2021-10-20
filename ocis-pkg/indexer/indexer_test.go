@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-//const cs3RootFolder = "/var/tmp/ocis/storage/users/data"
+//const cs3RootFolder = "/tmp/ocis/storage/users/data"
 //
 //func TestIndexer_CS3_AddWithUniqueIndex(t *testing.T) {
 //	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)

@@ -1,6 +1,9 @@
 package flagset
 
 import (
+	"path"
+
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/owncloud/ocis/settings/pkg/config"
 	"github.com/urfave/cli/v2"
@@ -171,7 +174,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "data-path",
-			Value:       flags.OverrideDefaultString(cfg.Service.DataPath, "/var/tmp/ocis/settings"),
+			Value:       flags.OverrideDefaultString(cfg.Service.DataPath, path.Join(defaults.BaseDataPath(), "settings")),
 			Usage:       "Mount path for the storage",
 			EnvVars:     []string{"SETTINGS_DATA_PATH"},
 			Destination: &cfg.Service.DataPath,
