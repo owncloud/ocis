@@ -202,7 +202,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.IntFlag{
 			Name:        "upload-max-chunk-size",
-			Value:       flags.OverrideDefaultInt(cfg.Reva.UploadMaxChunkSize, 0),
+			Value:       flags.OverrideDefaultInt(cfg.Reva.UploadMaxChunkSize, 1e+8), // 0.1 GB
 			Usage:       "Max chunk size in bytes to advertise to clients through capabilities, or 0 for unlimited",
 			EnvVars:     []string{"STORAGE_FRONTEND_UPLOAD_MAX_CHUNK_SIZE"},
 			Destination: &cfg.Reva.UploadMaxChunkSize,
