@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Change - New default data paths and easier configuration of the data path: [#2590](https://github.com/owncloud/ocis/pull/2590)
 * Enhancement - Use go-embed insted of fileb0x: [#1199](https://github.com/owncloud/ocis/issues/1199)
 * Enhancement - Upgrade to go-micro v4.1.0: [#2616](https://github.com/owncloud/ocis/pull/2616)
+* Enhancement - Lower TUS max chunk size: [#2584](https://github.com/owncloud/ocis/pull/2584)
 * Enhancement - Add a middleware to authenticate public share requests: [#2536](https://github.com/owncloud/ocis/pull/2536)
 * Enhancement - Report quota states: [#2628](https://github.com/owncloud/ocis/pull/2628)
 * Enhancement - Start up a new machine auth provider in the storage service: [#2528](https://github.com/owncloud/ocis/pull/2528)
@@ -75,6 +76,13 @@ The following sections list the changes for unreleased.
    We've upgraded to go-micro v4.1.0
 
    https://github.com/owncloud/ocis/pull/2616
+
+* Enhancement - Lower TUS max chunk size: [#2584](https://github.com/owncloud/ocis/pull/2584)
+
+   We've lowered the TUS max chunk size from infinite to 0.1GB so that chunking actually happens.
+
+   https://github.com/owncloud/ocis/pull/2584
+   https://github.com/cs3org/reva/pull/2136
 
 * Enhancement - Add a middleware to authenticate public share requests: [#2536](https://github.com/owncloud/ocis/pull/2536)
 
