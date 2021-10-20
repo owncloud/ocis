@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-20T10:42:15+0000"
+date: "2021-10-20T10:54:59+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -34,336 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Command-line flags
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### accounts update
-
-Make changes to an existing account
-
-Usage: `accounts update [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
-
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `"accounts"`.
-
-
--enabled | 
-: Enable the account.
-
-
--displayname | 
-: Set the displayname for the account.
-
-
--preferred-name | 
-: Set the preferred-name for the account.
-
-
--on-premises-sam-account-name | 
-: Set the on-premises-sam-account-name.
-
-
--uidnumber | 
-: Set the uidnumber for the account.
-
-
--gidnumber | 
-: Set the gidnumber for the account.
-
-
--mail | 
-: Set the mail for the account.
-
-
--description | 
-: Set the description for the account.
-
-
--password | 
-: Set the password for the account.
-
-
--password-policies | 
-: Possible policies: DisableStrongPassword, DisablePasswordExpiration.
-
-
--force-password-change | 
-: Force password change on next sign-in.
-
-
--force-password-change-mfa | 
-: Force password change on next sign-in with mfa.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### accounts add
-
-Create a new account
-
-Usage: `accounts add [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
-
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `"accounts"`.
-
-
--enabled | 
-: Enable the account.
-
-
--displayname | 
-: Set the displayname for the account.
-
-
--username | 
-: Username will be written to preferred-name and on_premises_sam_account_name.
-
-
--preferred-name | 
-: Set the preferred-name for the account.
-
-
--on-premises-sam-account-name | 
-: Set the on-premises-sam-account-name.
-
-
--uidnumber | 
-: Set the uidnumber for the account.
-
-
--gidnumber | 
-: Set the gidnumber for the account.
-
-
--mail | 
-: Set the mail for the account.
-
-
--description | 
-: Set the description for the account.
-
-
--password | 
-: Set the password for the account.
-
-
--password-policies | 
-: Possible policies: DisableStrongPassword, DisablePasswordExpiration.
-
-
--force-password-change | 
-: Force password change on next sign-in.
-
-
--force-password-change-mfa | 
-: Force password change on next sign-in with mfa.
-
-
-
-
-
-
-
-### accounts ocis-accounts
-
-Provide accounts and groups for oCIS
-
-Usage: `accounts ocis-accounts [command options] [arguments...]`
-
-
--log-level |  $ACCOUNTS_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
-
--log-pretty |  $ACCOUNTS_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
-
--log-color |  $ACCOUNTS_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
-
-
--extensions | 
-: Run specific extensions during supervised mode.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### accounts server
 
@@ -538,6 +208,166 @@ Usage: `accounts server [command options] [arguments...]`
 
 
 
+### accounts inspect
+
+Show detailed data on an existing account
+
+Usage: `accounts inspect [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `"accounts"`.
+
+### accounts rebuildIndex
+
+Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
+
+Usage: `accounts rebuildIndex [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### accounts remove
 
 Removes an existing account
@@ -618,6 +448,214 @@ Usage: `accounts remove [command options] [arguments...]`
 
 -name |  $ACCOUNTS_NAME
 : service name. Default: `"accounts"`.
+
+
+
+### accounts ocis-accounts
+
+Provide accounts and groups for oCIS
+
+Usage: `accounts ocis-accounts [command options] [arguments...]`
+
+
+-log-level |  $ACCOUNTS_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+
+-log-pretty |  $ACCOUNTS_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+
+-log-color |  $ACCOUNTS_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
+
+-extensions | 
+: Run specific extensions during supervised mode.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### accounts update
+
+Make changes to an existing account
+
+Usage: `accounts update [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `"accounts"`.
+
+
+-enabled | 
+: Enable the account.
+
+
+-displayname | 
+: Set the displayname for the account.
+
+
+-preferred-name | 
+: Set the preferred-name for the account.
+
+
+-on-premises-sam-account-name | 
+: Set the on-premises-sam-account-name.
+
+
+-uidnumber | 
+: Set the uidnumber for the account.
+
+
+-gidnumber | 
+: Set the gidnumber for the account.
+
+
+-mail | 
+: Set the mail for the account.
+
+
+-description | 
+: Set the description for the account.
+
+
+-password | 
+: Set the password for the account.
+
+
+-password-policies | 
+: Possible policies: DisableStrongPassword, DisablePasswordExpiration.
+
+
+-force-password-change | 
+: Force password change on next sign-in.
+
+
+-force-password-change-mfa | 
+: Force password change on next sign-in with mfa.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -704,30 +742,11 @@ Usage: `accounts version [command options] [arguments...]`
 
 
 
-### accounts inspect
+### accounts add
 
-Show detailed data on an existing account
+Create a new account
 
-Usage: `accounts inspect [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Usage: `accounts add [command options] [arguments...]`
 
 
 
@@ -786,6 +805,64 @@ Usage: `accounts inspect [command options] [arguments...]`
 
 -name |  $ACCOUNTS_NAME
 : service name. Default: `"accounts"`.
+
+
+-enabled | 
+: Enable the account.
+
+
+-displayname | 
+: Set the displayname for the account.
+
+
+-username | 
+: Username will be written to preferred-name and on_premises_sam_account_name.
+
+
+-preferred-name | 
+: Set the preferred-name for the account.
+
+
+-on-premises-sam-account-name | 
+: Set the on-premises-sam-account-name.
+
+
+-uidnumber | 
+: Set the uidnumber for the account.
+
+
+-gidnumber | 
+: Set the gidnumber for the account.
+
+
+-mail | 
+: Set the mail for the account.
+
+
+-description | 
+: Set the description for the account.
+
+
+-password | 
+: Set the password for the account.
+
+
+-password-policies | 
+: Possible policies: DisableStrongPassword, DisablePasswordExpiration.
+
+
+-force-password-change | 
+: Force password change on next sign-in.
+
+
+-force-password-change-mfa | 
+: Force password change on next sign-in with mfa.
+
+
+
+
+
+
 
 ### accounts list
 
@@ -865,83 +942,6 @@ Usage: `accounts list [command options] [arguments...]`
 
 -name |  $ACCOUNTS_NAME
 : service name. Default: `"accounts"`.
-
-
-
-
-
-### accounts rebuildIndex
-
-Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
-
-Usage: `accounts rebuildIndex [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
