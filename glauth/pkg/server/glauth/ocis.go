@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/glauth/glauth/pkg/config"
-	"github.com/glauth/glauth/pkg/handler"
-	"github.com/glauth/glauth/pkg/stats"
+	"github.com/glauth/glauth/v2/pkg/config"
+	"github.com/glauth/glauth/v2/pkg/handler"
+	"github.com/glauth/glauth/v2/pkg/stats"
 	ber "github.com/nmcclain/asn1-ber"
 	"github.com/nmcclain/ldap"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
@@ -527,8 +527,13 @@ func (h ocisHandler) Delete(boundDN string, deleteDN string, conn net.Conn) (res
 }
 
 // FindUser with the given username
-func (h ocisHandler) FindUser(userName string) (found bool, user config.User, err error) {
+func (h ocisHandler) FindUser(userName string, searchByUPN bool) (found bool, user config.User, err error) {
 	return false, config.User{}, nil
+}
+
+// FindGroup with the given groupname
+func (h ocisHandler) FindGroup(groupName string) (found bool, user config.Group, err error) {
+	return false, config.Group{}, nil
 }
 
 // NewOCISHandler implements a glauth backend with ocis-accounts as the datasource
