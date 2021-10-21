@@ -912,13 +912,6 @@ special character username not valid
 -   [apiTrashbin/trashbinFilesFolders.feature:252](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L252)
 -   [apiTrashbin/trashbinFilesFolders.feature:253](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L253)
 
-#### [Creating an already existing user works](https://github.com/owncloud/ocis-accounts/issues/80)
--   [apiProvisioning-v2/addUser.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L40)
--   [apiProvisioning-v2/addUser.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L47)
-
-#### [Username is case sensitive](https://github.com/owncloud/ocis-accounts/issues/128)
--   [apiProvisioning-v2/addUser.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L116)
-
 #### [Client token generation not implemented](https://github.com/owncloud/ocis/issues/197)
 -   [apiProvisioning-v1/apiProvisioningUsingAppPassword.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/apiProvisioningUsingAppPassword.feature#L39)
 -   [apiProvisioning-v1/apiProvisioningUsingAppPassword.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/apiProvisioningUsingAppPassword.feature#L67)
