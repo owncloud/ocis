@@ -52,6 +52,7 @@ type TokenManager struct {
 
 type Spaces struct {
 	WebDavBase   string
+	WebDavPath   string
 	DefaultQuota string
 }
 

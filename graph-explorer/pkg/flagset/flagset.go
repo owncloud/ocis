@@ -148,11 +148,18 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.GraphExplorer.ClientID,
 		},
 		&cli.StringFlag{
-			Name:        "graph-url",
-			Value:       flags.OverrideDefaultString(cfg.GraphExplorer.GraphURL, "https://localhost:9200/graph"),
-			Usage:       "Set the url to the graph api service",
-			EnvVars:     []string{"GRAPH_EXPLORER_GRAPH_URL"},
-			Destination: &cfg.GraphExplorer.GraphURL,
+			Name:        "graph-url-base",
+			Value:       flags.OverrideDefaultString(cfg.GraphExplorer.GraphURLBase, "https://localhost:9200"),
+			Usage:       "Set the base url to the graph api service",
+			EnvVars:     []string{"GRAPH_EXPLORER_GRAPH_URL_BASE", "OCIS_URL"},
+			Destination: &cfg.GraphExplorer.GraphURLBase,
+		},
+		&cli.StringFlag{
+			Name:        "graph-url-path",
+			Value:       flags.OverrideDefaultString(cfg.GraphExplorer.GraphURLPath, "/graph"),
+			Usage:       "Set the url path to the graph api service",
+			EnvVars:     []string{"GRAPH_EXPLORER_GRAPH_URL_PATH"},
+			Destination: &cfg.GraphExplorer.GraphURLPath,
 		},
 		&cli.StringFlag{
 			Name:  "extensions",

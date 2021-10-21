@@ -341,7 +341,7 @@ func defaultPolicies() []config.Policy {
 					Backend:  "http://localhost:9120",
 				},
 				{
-					Endpoint: "/graph-explorer/",
+					Endpoint: "/graph-explorer",
 					Backend:  "http://localhost:9135",
 				},
 				// if we were using the go micro api gateway we could look up the endpoint in the registry dynamically
