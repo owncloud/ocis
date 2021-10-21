@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Security - Don't expose services by default: [#2612](https://github.com/owncloud/ocis/issues/2612)
 * Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
 * Change - New default data paths and easier configuration of the data path: [#2590](https://github.com/owncloud/ocis/pull/2590)
+* Change - Split spaces webdav url and graph url in base and path: [#2660](https://github.com/owncloud/ocis/pull/2660)
 * Enhancement - Add user setting capability: [#2655](https://github.com/owncloud/ocis/pull/2655)
 * Enhancement - Broaden bufbuild/Buf usage: [#2630](https://github.com/owncloud/ocis/pull/2630)
 * Enhancement - Replace fileb0x with go-embed: [#1199](https://github.com/owncloud/ocis/issues/1199)
@@ -55,6 +56,15 @@ The following sections list the changes for unreleased.
    to your go build step.
 
    https://github.com/owncloud/ocis/pull/2590
+
+* Change - Split spaces webdav url and graph url in base and path: [#2660](https://github.com/owncloud/ocis/pull/2660)
+
+   We've fixed the behavior for the spaces webdav url and graph explorer graph url settings, so
+   that they respect the environment variable `OCIS_URL`. Previously oCIS admins needed to set
+   these URLs manually to make spaces and the graph explorer work.
+
+   https://github.com/owncloud/ocis/issues/2659
+   https://github.com/owncloud/ocis/pull/2660
 
 * Enhancement - Add user setting capability: [#2655](https://github.com/owncloud/ocis/pull/2655)
 
