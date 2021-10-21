@@ -13,11 +13,13 @@ oCIS is all about files. But most of the time you want to do something with file
 
 The app registry is the single point where all apps register itself and their supported mime types.
 
-### Mime type configuration / allow list
+### Mime type configuration / creation allow list
 
-Administrators need to add supported mime types to the mime type configuration, which works like an allow list. Only mime types on this list will be offered by the app registry even if app providers register additional mime types.
+The apps will register their supported mime types automatically, so that users can open supported files with them.
 
-In order to modify the mime type config you need to set STORAGE_APP_REGISTRY_MIMETYPES_JSON=.../mimetypes.json to a valid JSON file with a content like this:
+Administrators can set default applications on a per mimetype basis and also allow the creation of new files for certain mime types. This per mime type configuration also features a description, file extension option and an icon.
+
+In order to modify the mime type config you need to set `STORAGE_APP_REGISTRY_MIMETYPES_JSON=.../mimetypes.json` to a valid JSON file with a content like this:
 
 ```json
 [
@@ -27,7 +29,8 @@ In order to modify the mime type config you need to set STORAGE_APP_REGISTRY_MIM
     "name": "OpenDocument",
     "description": "OpenDocument text document",
     "icon": "",
-    "default_app": "Collabora"
+    "default_app": "Collabora",
+    "allow_creation": true
   },
   {
     "mime_type": "application/vnd.oasis.opendocument.spreadsheet",
@@ -35,12 +38,20 @@ In order to modify the mime type config you need to set STORAGE_APP_REGISTRY_MIM
     "name": "OpenSpreadsheet",
     "description": "OpenDocument spreadsheet document",
     "icon": "",
-    "default_app": "Collabora"
+    "default_app": "Collabora",
+    "allow_creation": false
   }
 ]
 ```
+Fields:
+  - `mime_type` is the mime type you want to configure
+  - `extension` is the file extension to be used for new files
+  - `name` is the name of the file / mime type
+  - `description` is a human readable description of the file / mime type
+  - `icon` URL to an icon which should be used for that mime type
+  - `default_app` name of the default app which opens this mime type when the user doesn't specify one
+  - `allow_creation` is wether a user should be able to create new file from that mime type (`true` or `false`)
 
-Please add all mime types you would like use with apps. You also can configure, which application should be treated as a default app for a certain mime type by setting the app provider name in default_app.
 
 ### Listing available mime types / apps
 
@@ -162,7 +173,9 @@ curl 'https://ocis.test/app/open?file_id=ZmlsZTppZAo=&app_name=Collabora&view_mo
 
 Response:
 
-Result:
+Apps are expected to be opened in Iframes and the response will give some parameters for that action.
+
+Some apps expect to be opened in the Iframe with a form post. The response will look like this:
 
 ``` json
 {
@@ -176,6 +189,9 @@ Result:
 }
 ```
 
+
+Some apps expect to be opened in the Iframe with a GET request and need additional headers to be set:
+
 ``` json
 {
   "app_url": "https://...",
@@ -186,9 +202,10 @@ Result:
     "arbitrary_header": "lorem-ipsum",
   }
 }
+
 ```
 
-Errors:
+If opening an app fails, you may encounter one of the following errors:
 
 - wrong `view_mode`
 ``` json
