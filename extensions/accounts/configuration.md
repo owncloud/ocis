@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-21T07:45:36+0000"
+date: "2021-10-21T08:58:03+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -35,11 +35,11 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### accounts rebuildIndex
+### accounts list
 
-Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
+List existing accounts
 
-Usage: `accounts rebuildIndex [command options] [arguments...]`
+Usage: `accounts list [command options] [arguments...]`
 
 
 
@@ -69,143 +69,6 @@ Usage: `accounts rebuildIndex [command options] [arguments...]`
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### accounts ocis-accounts
-
-Provide accounts and groups for oCIS
-
-Usage: `accounts ocis-accounts [command options] [arguments...]`
-
-
--log-level |  $ACCOUNTS_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
-
--log-pretty |  $ACCOUNTS_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
-
--log-color |  $ACCOUNTS_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
-
-
--extensions | 
-: Run specific extensions during supervised mode.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### accounts update
-
-Make changes to an existing account
-
-Usage: `accounts update [command options] [arguments...]`
 
 
 
@@ -252,52 +115,14 @@ Usage: `accounts update [command options] [arguments...]`
 : service name. Default: `"accounts"`.
 
 
--enabled | 
-: Enable the account.
 
 
--displayname | 
-: Set the displayname for the account.
 
+### accounts version
 
--preferred-name | 
-: Set the preferred-name for the account.
+Print the versions of the running instances
 
-
--on-premises-sam-account-name | 
-: Set the on-premises-sam-account-name.
-
-
--uidnumber | 
-: Set the uidnumber for the account.
-
-
--gidnumber | 
-: Set the gidnumber for the account.
-
-
--mail | 
-: Set the mail for the account.
-
-
--description | 
-: Set the description for the account.
-
-
--password | 
-: Set the password for the account.
-
-
--password-policies | 
-: Possible policies: DisableStrongPassword, DisablePasswordExpiration.
-
-
--force-password-change | 
-: Force password change on next sign-in.
-
-
--force-password-change-mfa | 
-: Force password change on next sign-in with mfa.
+Usage: `accounts version [command options] [arguments...]`
 
 
 
@@ -315,6 +140,62 @@ Usage: `accounts update [command options] [arguments...]`
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `"accounts"`.
 
 
 
@@ -442,11 +323,90 @@ Usage: `accounts add [command options] [arguments...]`
 
 
 
-### accounts list
+### accounts rebuildIndex
 
-List existing accounts
+Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
 
-Usage: `accounts list [command options] [arguments...]`
+Usage: `accounts rebuildIndex [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### accounts remove
+
+Removes an existing account
+
+Usage: `accounts remove [command options] [arguments...]`
+
+
 
 
 
@@ -520,6 +480,93 @@ Usage: `accounts list [command options] [arguments...]`
 
 -name |  $ACCOUNTS_NAME
 : service name. Default: `"accounts"`.
+
+
+
+### accounts ocis-accounts
+
+Provide accounts and groups for oCIS
+
+Usage: `accounts ocis-accounts [command options] [arguments...]`
+
+
+-log-level |  $ACCOUNTS_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+
+-log-pretty |  $ACCOUNTS_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+
+-log-color |  $ACCOUNTS_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
+
+-extensions | 
+: Run specific extensions during supervised mode.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -698,40 +745,11 @@ Usage: `accounts server [command options] [arguments...]`
 
 
 
-### accounts version
+### accounts update
 
-Print the versions of the running instances
+Make changes to an existing account
 
-Usage: `accounts version [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Usage: `accounts update [command options] [arguments...]`
 
 
 
@@ -776,6 +794,71 @@ Usage: `accounts version [command options] [arguments...]`
 
 -name |  $ACCOUNTS_NAME
 : service name. Default: `"accounts"`.
+
+
+-enabled | 
+: Enable the account.
+
+
+-displayname | 
+: Set the displayname for the account.
+
+
+-preferred-name | 
+: Set the preferred-name for the account.
+
+
+-on-premises-sam-account-name | 
+: Set the on-premises-sam-account-name.
+
+
+-uidnumber | 
+: Set the uidnumber for the account.
+
+
+-gidnumber | 
+: Set the gidnumber for the account.
+
+
+-mail | 
+: Set the mail for the account.
+
+
+-description | 
+: Set the description for the account.
+
+
+-password | 
+: Set the password for the account.
+
+
+-password-policies | 
+: Possible policies: DisableStrongPassword, DisablePasswordExpiration.
+
+
+-force-password-change | 
+: Force password change on next sign-in.
+
+
+-force-password-change-mfa | 
+: Force password change on next sign-in with mfa.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -863,87 +946,4 @@ Usage: `accounts inspect [command options] [arguments...]`
 
 -name |  $ACCOUNTS_NAME
 : service name. Default: `"accounts"`.
-
-### accounts remove
-
-Removes an existing account
-
-Usage: `accounts remove [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
-
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `"accounts"`.
-
-
 
