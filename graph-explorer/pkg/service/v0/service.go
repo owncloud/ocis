@@ -61,7 +61,7 @@ func (p GraphExplorer) ConfigJs(w http.ResponseWriter, r *http.Request) {
 	if _, err := io.WriteString(w, fmt.Sprintf("window.Iss = \"%v\";", p.config.GraphExplorer.Issuer)); err != nil {
 		p.logger.Error().Err(err).Msg("Could not write to response writer")
 	}
-	if _, err := io.WriteString(w, fmt.Sprintf("window.GraphUrl = \"%v\";", p.config.GraphExplorer.GraphURL)); err != nil {
+	if _, err := io.WriteString(w, fmt.Sprintf("window.GraphUrl = \"%v\";", p.config.GraphExplorer.GraphURLBase+p.config.GraphExplorer.GraphURLPath)); err != nil {
 		p.logger.Error().Err(err).Msg("Could not write to response writer")
 	}
 }

@@ -60,7 +60,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
+	wdu, err := url.Parse(g.config.Spaces.WebDavBase + g.config.Spaces.WebDavPath)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error parsing url")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -206,7 +206,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
+	wdu, err := url.Parse(g.config.Spaces.WebDavBase + g.config.Spaces.WebDavPath)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error parsing url")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
