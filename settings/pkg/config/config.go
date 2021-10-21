@@ -18,12 +18,21 @@ type Debug struct {
 	Zpages bool
 }
 
+// CORS defines the available cors configuration.
+type CORS struct {
+	AllowedOrigins   []string
+	AllowedMethods   []string
+	AllowedHeaders   []string
+	AllowCredentials bool
+}
+
 // HTTP defines the available http configuration.
 type HTTP struct {
 	Addr      string
 	Namespace string
 	Root      string
 	CacheTTL  int
+	CORS      CORS
 }
 
 // GRPC defines the available grpc configuration.

@@ -109,6 +109,30 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"ACCOUNTS_CACHE_TTL"},
 			Destination: &cfg.HTTP.CacheTTL,
 		},
+		&cli.StringSliceFlag{
+			Name:    "cors-allowed-origins",
+			Value:   cli.NewStringSlice("*"),
+			Usage:   "Set the allowed CORS origins",
+			EnvVars: []string{"ACCOUNTS_CORS_ALLOW_ORIGINS", "OCIS_CORS_ALLOW_ORIGINS"},
+		},
+		&cli.StringSliceFlag{
+			Name:    "cors-allowed-methods",
+			Value:   cli.NewStringSlice("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"),
+			Usage:   "Set the allowed CORS origins",
+			EnvVars: []string{"ACCOUNTS_CORS_ALLOW_METHODS", "OCIS_CORS_ALLOW_METHODS"},
+		},
+		&cli.StringSliceFlag{
+			Name:    "cors-allowed-headers",
+			Value:   cli.NewStringSlice("Authorization", "Origin", "Content-Type", "Accept", "X-Requested-With"),
+			Usage:   "Set the allowed CORS origins",
+			EnvVars: []string{"ACCOUNTS_CORS_ALLOW_HEADERS", "OCIS_CORS_ALLOW_HEADERS"},
+		},
+		&cli.BoolFlag{
+			Name:    "cors-allow-credentials",
+			Value:   flags.OverrideDefaultBool(cfg.HTTP.CORS.AllowCredentials, true),
+			Usage:   "Allow credentials for CORS",
+			EnvVars: []string{"ACCOUNTS_CORS_ALLOW_CREDENTIALS", "OCIS_CORS_ALLOW_CREDENTIALS"},
+		},
 		&cli.StringFlag{
 			Name:        "grpc-namespace",
 			Value:       flags.OverrideDefaultString(cfg.GRPC.Namespace, "com.owncloud.api"),

@@ -18,10 +18,19 @@ type Debug struct {
 	Zpages bool
 }
 
+// CORS defines the available cors configuration.
+type CORS struct {
+	AllowedOrigins   []string
+	AllowedMethods   []string
+	AllowedHeaders   []string
+	AllowCredentials bool
+}
+
 // HTTP defines the available http configuration.
 type HTTP struct {
 	Addr string
 	Root string
+	CORS CORS
 }
 
 // Service defines the available service configuration.

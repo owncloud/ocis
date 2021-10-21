@@ -2,6 +2,7 @@ package http
 
 import (
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/owncloud/ocis/ocis-pkg/cors"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
 	svc "github.com/owncloud/ocis/webdav/pkg/service/v0"
@@ -29,7 +30,13 @@ func Server(opts ...Option) (http.Service, error) {
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,
 			middleware.NoCache,
-			middleware.Cors,
+			middleware.Cors(
+				cors.Logger(options.Logger),
+				cors.AllowedOrigins(options.Config.HTTP.CORS.AllowedOrigins),
+				cors.AllowedMethods(options.Config.HTTP.CORS.AllowedMethods),
+				cors.AllowedHeaders(options.Config.HTTP.CORS.AllowedHeaders),
+				cors.AllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
+			),
 			middleware.Secure,
 			middleware.Version(
 				options.Config.Service.Name,

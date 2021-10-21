@@ -11,15 +11,19 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger  log.Logger
-	Name    string
-	Version string
-	Address string
-	Token   string
-	Pprof   bool
-	Zpages  bool
-	Health  func(http.ResponseWriter, *http.Request)
-	Ready   func(http.ResponseWriter, *http.Request)
+	Logger               log.Logger
+	Name                 string
+	Version              string
+	Address              string
+	Token                string
+	Pprof                bool
+	Zpages               bool
+	Health               func(http.ResponseWriter, *http.Request)
+	Ready                func(http.ResponseWriter, *http.Request)
+	CorsAllowedOrigins   []string
+	CorsAllowedMethods   []string
+	CorsAllowedHeaders   []string
+	CorsAllowCredentials bool
 }
 
 // newOptions initializes the available default options.
@@ -93,5 +97,33 @@ func Health(h func(http.ResponseWriter, *http.Request)) Option {
 func Ready(r func(http.ResponseWriter, *http.Request)) Option {
 	return func(o *Options) {
 		o.Ready = r
+	}
+}
+
+// CorsAllowedOrigins provides a function to set the CorsAllowedOrigin option.
+func CorsAllowedOrigins(origins []string) Option {
+	return func(o *Options) {
+		o.CorsAllowedOrigins = origins
+	}
+}
+
+// CorsAllowedMethods provides a function to set the CorsAllowedMethods option.
+func CorsAllowedMethods(methods []string) Option {
+	return func(o *Options) {
+		o.CorsAllowedMethods = methods
+	}
+}
+
+// CorsAllowedHeaders provides a function to set the CorsAllowedHeaders option.
+func CorsAllowedHeaders(headers []string) Option {
+	return func(o *Options) {
+		o.CorsAllowedHeaders = headers
+	}
+}
+
+// CorsAllowCredentials provides a function to set the CorsAllowAllowCredential option.
+func CorsAllowCredentials(allow bool) Option {
+	return func(o *Options) {
+		o.CorsAllowCredentials = allow
 	}
 }
