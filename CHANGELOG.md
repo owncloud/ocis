@@ -7,10 +7,11 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Security - Don't expose services by default: [#2612](https://github.com/owncloud/ocis/issues/2612)
-* Bugfix - Enhancement: [#2630](https://github.com/owncloud/ocis/pull/2630)
 * Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
 * Change - New default data paths and easier configuration of the data path: [#2590](https://github.com/owncloud/ocis/pull/2590)
-* Enhancement - Use go-embed insted of fileb0x: [#1199](https://github.com/owncloud/ocis/issues/1199)
+* Enhancement - Add user setting capability: [#2655](https://github.com/owncloud/ocis/pull/2655)
+* Enhancement - Broaden bufbuild/Buf usage: [#2630](https://github.com/owncloud/ocis/pull/2630)
+* Enhancement - Replace fileb0x with go-embed: [#1199](https://github.com/owncloud/ocis/issues/1199)
 * Enhancement - Upgrade to go-micro v4.1.0: [#2616](https://github.com/owncloud/ocis/pull/2616)
 * Enhancement - Lower TUS max chunk size: [#2584](https://github.com/owncloud/ocis/pull/2584)
 * Enhancement - Add a middleware to authenticate public share requests: [#2536](https://github.com/owncloud/ocis/pull/2536)
@@ -28,18 +29,10 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/2612
 
-* Bugfix - Enhancement: [#2630](https://github.com/owncloud/ocis/pull/2630)
-
-   We've switched the usage of bufbuild/Buf from a protoc replacement only to also using it to
-   configuring the outputs and pinning dependencies.
-
-   https://github.com/owncloud/ocis/pull/2630
-   https://github.com/owncloud/ocis/pull/2616
-
 * Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
 
    When creating a new space a (configurable) default quota will be used (instead the hardcoded
-   one) One can set the EnvVar `GRAPH_SPACES_DEFAULT_QUOTA` to configure it
+   one). One can set the EnvVar `GRAPH_SPACES_DEFAULT_QUOTA` to configure it
 
    https://github.com/owncloud/ocis/issues/2621
    https://jira.owncloud.com/browse/OCIS-2070
@@ -63,13 +56,29 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/2590
 
-* Enhancement - Use go-embed insted of fileb0x: [#1199](https://github.com/owncloud/ocis/issues/1199)
+* Enhancement - Add user setting capability: [#2655](https://github.com/owncloud/ocis/pull/2655)
 
-   Go-embed delivers already the funtionality we need but with less code. We decided to use it
+   We've added a capability to communicate the existance of a user settings service to clients.
+
+   https://github.com/owncloud/web/issues/5926
+   https://github.com/owncloud/ocis/pull/2655
+
+* Enhancement - Broaden bufbuild/Buf usage: [#2630](https://github.com/owncloud/ocis/pull/2630)
+
+   We've switched the usage of bufbuild/Buf from a protoc replacement only to also using it to
+   confige the outputs and pinning dependencies.
+
+   https://github.com/owncloud/ocis/pull/2630
+   https://github.com/owncloud/ocis/pull/2616
+
+* Enhancement - Replace fileb0x with go-embed: [#1199](https://github.com/owncloud/ocis/issues/1199)
+
+   Go-embed already brings the functionality we need but with less code. We decided to use it
    instead of 3rd party fileb0x
 
    https://github.com/owncloud/ocis/issues/1199
    https://github.com/owncloud/ocis/pull/2631
+   https://github.com/owncloud/ocis/pull/2649
 
 * Enhancement - Upgrade to go-micro v4.1.0: [#2616](https://github.com/owncloud/ocis/pull/2616)
 
