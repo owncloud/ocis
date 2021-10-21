@@ -2,7 +2,12 @@ package middleware
 
 import (
 	"net/http"
+	"strings"
 	"time"
+
+	"github.com/owncloud/ocis/ocis-pkg/cors"
+
+	chicors "github.com/go-chi/cors"
 )
 
 // NoCache writes required cache headers to all requests.
@@ -17,18 +22,20 @@ func NoCache(next http.Handler) http.Handler {
 }
 
 // Cors writes required cors headers to all requests.
-func Cors(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "OPTIONS" {
-			next.ServeHTTP(w, r)
-		} else {
-			w.Header().Set("Access-Control-Allow-Origin", "*")
-			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
-			w.Header().Set("Access-Control-Allow-Headers", "authorization, origin, content-type, accept, x-requested-with")
-			w.Header().Set("Allow", "HEAD, GET, POST, PUT, PATCH, DELETE, OPTIONS")
-
-			w.WriteHeader(http.StatusOK)
-		}
+func Cors(opts ...cors.Option) func(http.Handler) http.Handler {
+	options := cors.NewOptions(opts...)
+	logger := options.Logger
+	logger.Debug().
+		Str("allowed_origins", strings.Join(options.AllowedOrigins, ", ")).
+		Str("allowed_methods", strings.Join(options.AllowedMethods, ", ")).
+		Str("allowed_headers", strings.Join(options.AllowedHeaders, ", ")).
+		Bool("allow_credentials", options.AllowCredentials).
+		Msg("setup cors middleware")
+	return chicors.Handler(chicors.Options{
+		AllowedOrigins:   options.AllowedOrigins,
+		AllowedMethods:   options.AllowedMethods,
+		AllowedHeaders:   options.AllowedHeaders,
+		AllowCredentials: options.AllowCredentials,
 	})
 }
 

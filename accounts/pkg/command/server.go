@@ -35,6 +35,15 @@ func Server(cfg *config.Config) *cli.Command {
 			if !cfg.Supervised {
 				return ParseConfig(ctx, cfg)
 			}
+			if origins := ctx.StringSlice("cors-allowed-origins"); len(origins) != 0 {
+				cfg.HTTP.CORS.AllowedOrigins = origins
+			}
+			if methods := ctx.StringSlice("cors-allowed-methods"); len(methods) != 0 {
+				cfg.HTTP.CORS.AllowedMethods = methods
+			}
+			if headers := ctx.StringSlice("cors-allowed-headers"); len(headers) != 0 {
+				cfg.HTTP.CORS.AllowedOrigins = headers
+			}
 			logger.Debug().Str("service", "accounts").Msg("ignoring config file parsing when running supervised")
 			return nil
 		},
