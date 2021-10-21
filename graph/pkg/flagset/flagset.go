@@ -143,10 +143,17 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 
 		&cli.StringFlag{
 			Name:        "spaces-webdav-base",
-			Value:       flags.OverrideDefaultString(cfg.Spaces.WebDavBase, "https://localhost:9200/dav/spaces/"),
+			Value:       flags.OverrideDefaultString(cfg.Spaces.WebDavBase, "https://localhost:9200"),
 			Usage:       "spaces webdav base URL to use when rendering drive WabDAV URLs",
-			EnvVars:     []string{"GRAPH_SPACES_WEBDAV_BASE"},
+			EnvVars:     []string{"GRAPH_SPACES_WEBDAV_BASE", "OCIS_URL"},
 			Destination: &cfg.Spaces.WebDavBase,
+		},
+		&cli.StringFlag{
+			Name:        "spaces-webdav-path",
+			Value:       flags.OverrideDefaultString(cfg.Spaces.WebDavPath, "/dav/spaces/"),
+			Usage:       "spaces webdav path to use when rendering drive WabDAV URLs",
+			EnvVars:     []string{"GRAPH_SPACES_WEBDAV_PATH"},
+			Destination: &cfg.Spaces.WebDavPath,
 		},
 
 		&cli.StringFlag{

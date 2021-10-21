@@ -42,9 +42,10 @@ type Tracing struct {
 
 // GraphExplorer defines the available graph-explorer configuration.
 type GraphExplorer struct {
-	ClientID string
-	Issuer   string
-	GraphURL string
+	ClientID     string
+	Issuer       string
+	GraphURLBase string
+	GraphURLPath string
 }
 
 // Config combines all available configuration parts.
