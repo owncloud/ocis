@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-21T13:32:28+0000"
+date: "2021-10-21T16:07:47+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/graph-explorer/templates
@@ -71,6 +71,7 @@ Usage: `graph-explorer [global options] command [command options] [arguments...]
 
 
 
+
 ## Sub Commands
 
 ### graph-explorer health
@@ -85,6 +86,7 @@ Usage: `graph-explorer health [command options] [arguments...]`
 
 -debug-addr |  $GRAPH_EXPLORER_DEBUG_ADDR
 : Address to debug endpoint. Default: `"127.0.0.1:9136"`.
+
 
 
 
@@ -174,8 +176,12 @@ Usage: `graph-explorer server [command options] [arguments...]`
 : Set the OpenID Client ID to send to the issuer. Default: `"ocis-explorer.js"`.
 
 
--graph-url |  $GRAPH_EXPLORER_GRAPH_URL
-: Set the url to the graph api service. Default: `"https://localhost:9200/graph"`.
+-graph-url-base |  $GRAPH_EXPLORER_GRAPH_URL_BASE , $OCIS_URL
+: Set the base url to the graph api service. Default: `"https://localhost:9200"`.
+
+
+-graph-url-path |  $GRAPH_EXPLORER_GRAPH_URL_PATH
+: Set the url path to the graph api service. Default: `"/graph"`.
 
 
 -extensions | 

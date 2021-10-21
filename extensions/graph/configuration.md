@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-21T13:32:28+0000"
+date: "2021-10-21T16:07:47+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/graph/templates
@@ -35,38 +35,6 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### graph health
-
-Check health status
-
-Usage: `graph health [command options] [arguments...]`
-
-
-
-
-
-
--debug-addr |  $GRAPH_DEBUG_ADDR
-: Address to debug endpoint. Default: `"127.0.0.1:9124"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### graph ocis-graph
 
 Serve Graph API for oCIS
@@ -88,6 +56,7 @@ Usage: `graph ocis-graph [command options] [arguments...]`
 
 -log-color |  $GRAPH_LOG_COLOR , $OCIS_LOG_COLOR
 : Enable colored logging.
+
 
 
 
@@ -172,8 +141,12 @@ Usage: `graph server [command options] [arguments...]`
 : Set the base namespace for the http service for service discovery. Default: `"com.owncloud.web"`.
 
 
--spaces-webdav-base |  $GRAPH_SPACES_WEBDAV_BASE
-: spaces webdav base URL to use when rendering drive WabDAV URLs. Default: `"https://localhost:9200/dav/spaces/"`.
+-spaces-webdav-base |  $GRAPH_SPACES_WEBDAV_BASE , $OCIS_URL
+: spaces webdav base URL to use when rendering drive WabDAV URLs. Default: `"https://localhost:9200"`.
+
+
+-spaces-webdav-path |  $GRAPH_SPACES_WEBDAV_PATH
+: spaces webdav path to use when rendering drive WabDAV URLs. Default: `"/dav/spaces/"`.
 
 
 -default-space-quota |  $GRAPH_SPACES_DEFAULT_QUOTA
@@ -190,4 +163,37 @@ Usage: `graph server [command options] [arguments...]`
 
 -extensions | 
 : Run specific extensions during supervised mode. This flag is set by the runtime.
+
+### graph health
+
+Check health status
+
+Usage: `graph health [command options] [arguments...]`
+
+
+
+
+
+
+-debug-addr |  $GRAPH_DEBUG_ADDR
+: Address to debug endpoint. Default: `"127.0.0.1:9124"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
