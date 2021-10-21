@@ -66,6 +66,7 @@ type Thumbnail struct {
 	CS3AllowInsecure    bool              `ocisConfig:"cs3_allow_insecure"`
 	RevaGateway         string            `ocisConfig:"reva_gateway"`
 	WebdavNamespace     string            `ocisConfig:"webdav_namespace"`
+	FontMapFile         string            `ocisConfig:"font_map_file"`
 }
 
 // New initializes a new configuration with or without defaults.

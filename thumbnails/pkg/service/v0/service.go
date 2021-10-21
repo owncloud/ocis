@@ -41,6 +41,9 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 		cs3Source:    options.CS3Source,
 		logger:       logger,
 		cs3Client:    options.CS3Client,
+		preprocessorOpts: PreprocessorOpts{
+			TxtFontFileMap: options.Config.Thumbnail.FontMapFile,
+		},
 	}
 
 	return svc
@@ -48,13 +51,18 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 
 // Thumbnail implements the GRPC handler.
 type Thumbnail struct {
-	serviceID       string
-	webdavNamespace string
-	manager         thumbnail.Manager
-	webdavSource    imgsource.Source
-	cs3Source       imgsource.Source
-	logger          log.Logger
-	cs3Client       gateway.GatewayAPIClient
+	serviceID        string
+	webdavNamespace  string
+	manager          thumbnail.Manager
+	webdavSource     imgsource.Source
+	cs3Source        imgsource.Source
+	logger           log.Logger
+	cs3Client        gateway.GatewayAPIClient
+	preprocessorOpts PreprocessorOpts
+}
+
+type PreprocessorOpts struct {
+	TxtFontFileMap string
 }
 
 // GetThumbnail retrieves a thumbnail for an image
@@ -114,7 +122,10 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *v0proto.GetThumbnai
 		return nil, merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
 	defer r.Close() // nolint:errcheck
-	pp := preprocessor.ForType(sRes.GetInfo().GetMimeType())
+	ppOpts := map[string]interface{}{
+		"fontFileMap": g.preprocessorOpts.TxtFontFileMap,
+	}
+	pp := preprocessor.ForType(sRes.GetInfo().GetMimeType(), ppOpts)
 	img, err := pp.Convert(r)
 	if img == nil || err != nil {
 		return nil, merrors.InternalServerError(g.serviceID, "could not get image")
@@ -188,7 +199,10 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *v0proto.GetThumb
 		return nil, merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
 	defer r.Close() // nolint:errcheck
-	pp := preprocessor.ForType(sRes.GetInfo().GetMimeType())
+	ppOpts := map[string]interface{}{
+		"fontFileMap": g.preprocessorOpts.TxtFontFileMap,
+	}
+	pp := preprocessor.ForType(sRes.GetInfo().GetMimeType(), ppOpts)
 	img, err := pp.Convert(r)
 	if img == nil || err != nil {
 		return nil, merrors.InternalServerError(g.serviceID, "could not get image")

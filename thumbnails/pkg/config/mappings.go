@@ -92,6 +92,10 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Server.Namespace,
 		},
 		{
+			EnvVars:     []string{"THUMBNAILS_TXT_FONTMAP_FILE"},
+			Destination: &cfg.Thumbnail.FontMapFile,
+		},
+		{
 			EnvVars:     []string{"THUMBNAILS_FILESYSTEMSTORAGE_ROOT"},
 			Destination: &cfg.Thumbnail.FileSystemStorage.RootDirectory,
 		},
