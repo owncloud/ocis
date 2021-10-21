@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v3"
-	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -438,7 +437,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		req := &gateway.PurgeRecycleRequest{
+		req := &provider.PurgeRecycleRequest{
 			Ref: &provider.Reference{
 				Path: homeResp.Path,
 			},
