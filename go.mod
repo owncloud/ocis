@@ -21,7 +21,7 @@ require (
 	github.com/cs3org/go-cs3apis v0.0.0-20211007101428-6d142794ec11
 	github.com/cs3org/reva v1.14.1-0.20211018074606-00d075577d05
 	github.com/disintegration/imaging v1.6.2
-	github.com/glauth/glauth v1.1.3-0.20210729125545-b9aecdfcac31
+	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.4
 	github.com/go-chi/render v1.0.1
 	github.com/go-logr/logr v0.4.0

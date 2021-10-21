@@ -3,7 +3,7 @@ package glauth
 import (
 	"context"
 
-	"github.com/glauth/glauth/pkg/config"
+	"github.com/glauth/glauth/v2/pkg/config"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )

@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	glauthcfg "github.com/glauth/glauth/pkg/config"
+	glauthcfg "github.com/glauth/glauth/v2/pkg/config"
 	"github.com/oklog/run"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/glauth/pkg/config"

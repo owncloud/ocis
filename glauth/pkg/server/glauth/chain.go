@@ -3,8 +3,8 @@ package glauth
 import (
 	"net"
 
-	"github.com/glauth/glauth/pkg/config"
-	"github.com/glauth/glauth/pkg/handler"
+	"github.com/glauth/glauth/v2/pkg/config"
+	"github.com/glauth/glauth/v2/pkg/handler"
 	"github.com/nmcclain/ldap"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
@@ -102,8 +102,13 @@ func (h chainHandler) Delete(boundDN string, deleteDN string, conn net.Conn) (re
 }
 
 // FindUser with the given username. Called by the ldap backend to authenticate the bind. Optional
-func (h chainHandler) FindUser(userName string) (bool, config.User, error) {
+func (h chainHandler) FindUser(userName string, searchByUPN bool) (bool, config.User, error) {
 	return false, config.User{}, nil
+}
+
+// FindGroup is not yet supported for the chain backend
+func (h chainHandler) FindGroup(groupName string) (bool, config.Group, error) {
+	return false, config.Group{}, nil
 }
 
 // NewChainHandler implements a chain backend with two backends
