@@ -18,8 +18,8 @@ require (
 	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3 v3.0.0-20211012122208-f63e46a7d1e9
 	github.com/blevesearch/bleve/v2 v2.2.1
 	github.com/coreos/go-oidc/v3 v3.1.0
-	github.com/cs3org/go-cs3apis v0.0.0-20211007101428-6d142794ec11
-	github.com/cs3org/reva v1.14.1-0.20211018074606-00d075577d05
+	github.com/cs3org/go-cs3apis v0.0.0-20211018122138-391b29bd7803
+	github.com/cs3org/reva v1.14.1-0.20211021070229-852282ce34f5
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth v1.1.3-0.20210729125545-b9aecdfcac31
 	github.com/go-chi/chi/v5 v5.0.4
