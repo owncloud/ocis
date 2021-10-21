@@ -916,9 +916,6 @@ special character username not valid
 -   [apiProvisioning-v2/addUser.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L40)
 -   [apiProvisioning-v2/addUser.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L47)
 
-#### [Password can be set to empty](https://github.com/owncloud/product/issues/197)
--   [apiProvisioning-v2/addUser.feature:83](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L83)
-
 #### [Username is case sensitive](https://github.com/owncloud/ocis-accounts/issues/128)
 -   [apiProvisioning-v2/addUser.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L116)
 
