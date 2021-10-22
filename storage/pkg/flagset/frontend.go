@@ -182,6 +182,13 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_FRONTEND_OCS_CACHE_WARMUP_DRIVER"},
 			Destination: &cfg.Reva.Frontend.OCSCacheWarmupDriver,
 		},
+		&cli.StringFlag{
+			Name:        "ocs-additional-info-attribute",
+			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.OCSAdditionalInfoAttribute, "{{.Mail}}"),
+			Usage:       "the additional info to be returned when searching for users",
+			EnvVars:     []string{"STORAGE_FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE"},
+			Destination: &cfg.Reva.Frontend.OCSAdditionalInfoAttribute,
+		},
 		// Gateway
 
 		&cli.StringFlag{
