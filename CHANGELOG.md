@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Security - Don't expose services by default: [#2612](https://github.com/owncloud/ocis/issues/2612)
+* Bugfix - Create parent directories for idp configuration: [#2667](https://github.com/owncloud/ocis/issues/2667)
 * Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
 * Change - New default data paths and easier configuration of the data path: [#2590](https://github.com/owncloud/ocis/pull/2590)
 * Change - Split spaces webdav url and graph url in base and path: [#2660](https://github.com/owncloud/ocis/pull/2660)
@@ -32,6 +33,13 @@ The following sections list the changes for unreleased.
    except the proxy which is listening on 0.0.0.0:9200.
 
    https://github.com/owncloud/ocis/issues/2612
+
+* Bugfix - Create parent directories for idp configuration: [#2667](https://github.com/owncloud/ocis/issues/2667)
+
+   The parent directories of the identifier-registration.yaml config file might not exist when
+   starting idp. Create them, when that is the case.
+
+   https://github.com/owncloud/ocis/issues/2667
 
 * Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
 
