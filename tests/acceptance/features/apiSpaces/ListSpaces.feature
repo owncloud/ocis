@@ -17,7 +17,7 @@ Feature: List and create spaces
       | driveType | personal     |
       | name      | Alice Hansen |
 
-  Scenario: Alice requests her space via webDav api, she expects a 207 code 
+  Scenario: Alice requests her space via webDav api, she expects a 207 code
     When user "Alice" lists all available spaces via the GraphApi
     And user "Alice" lists the content of the space with the name "Alice Hansen" using the WebDav Api
     Then the HTTP status code should be "207"
@@ -34,7 +34,7 @@ Feature: List and create spaces
       | key       | value        |
       | driveType | project      |
       | name      | Project Mars |
-      | total     | 1000000000   | 
+      | total     | 1000000000   |
     When user "Alice" lists all available spaces via the GraphApi
     And user "Alice" lists the content of the space with the name "Project Mars" using the WebDav Api
     Then the propfind result of the space should contain these entries:
@@ -48,15 +48,14 @@ Feature: List and create spaces
       | key        | value         |
       | driveType  | project       |
       | name       | Project Venus |
-      | total      | 2000          | 
-    
+      | total      | 2000          |
+
   Scenario: Alice creates folder via Graph api in space, she expects a 201 code and she checks that folder exists
     Given the administrator gives "Alice" the role "Admin" using the settings api
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
     And user "Alice" lists all available spaces via the GraphApi
-    And user "Alice" creates a folder "mainFolder" in space "Project Venus" using the WebDav Api 
+    And user "Alice" creates a folder "mainFolder" in space "Project Venus" using the WebDav Api
     Then the HTTP status code should be "201"
     When user "Alice" lists the content of the space with the name "Project Venus" using the WebDav Api
     Then the propfind result of the space should contain these entries:
       | mainFolder/        |
-    

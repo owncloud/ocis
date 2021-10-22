@@ -384,6 +384,35 @@ class SpacesContext implements Context {
     }
 
     /**
+     * @Then /^the quota (total|used|remaining|state) of space "([^"]*)" should be set$/
+     *
+     * @param $type string
+     * @param $space string
+     * @return void
+     */
+    public function theQuotaOfSpaceShouldBeSet($type, $space): void
+    {
+        $space = $this->getAvailableSpaces()[$space];
+        Assert::assertTrue(isset($space["quota"][$type]),"quota $type is not set on the space.");
+        Assert::assertNotEmpty($space["quota"][$type], "quota $type has no value set on the space.");
+    }
+
+    /**
+     * @Then /^the quota (total|used|remaining|state) of space "([^"]*)" should be "([^"]*)"$/
+     *
+     * @param $type string
+     * @param $space string
+     * @param $value string
+     * @return void
+     */
+    public function theQuotaOfSpaceShouldBe($type, $space, $value): void
+    {
+        $space = $this->getAvailableSpaces()[$space];
+        Assert::assertTrue(isset($space["quota"][$type]), "quota $type is not set on the space.");
+        Assert::assertEquals($value, $space["quota"][$type]);
+    }
+
+    /**
      * @Then /^the (?:propfind|search) result of the space should (not|)\s?contain these (?:files|entries):$/
      *
      * @param string $user
@@ -420,10 +449,10 @@ class SpacesContext implements Context {
             }
         }
     }
-    
+
     /**
      * Method search for a match $key->$value
-     * 
+     *
      * @param array $array
      * @param string $key
      * @param string $value
@@ -564,9 +593,9 @@ class SpacesContext implements Context {
     /**
      * @When /^user "([^"]*)" creates a folder "([^"]*)" in space "([^"]*)" using the WebDav Api$/
      *
-     * @param string $user 
-     * @param string $folder 
-     * @param string $spaceName 
+     * @param string $user
+     * @param string $folder
+     * @param string $spaceName
      *
      * @return void
      * @throws JsonException
@@ -608,7 +637,7 @@ class SpacesContext implements Context {
         $folder,
         $spaceName,
         array $headers = []
-        
+
     ): ResponseInterface
     {
         $spaceId = $this->getAvailableSpaces()[$spaceName]["id"];
