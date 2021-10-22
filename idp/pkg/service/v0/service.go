@@ -73,7 +73,7 @@ func createConfigsIfNotExist(assets http.FileSystem, filePath, ocisURL string) e
 
 	folder := path.Dir(filePath)
 	if _, err := os.Stat(folder); os.IsNotExist(err) {
-		if err := os.Mkdir(folder, 0700); err != nil {
+		if err := os.MkdirAll(folder, 0700); err != nil {
 			return err
 		}
 	}
