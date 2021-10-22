@@ -20,7 +20,8 @@ The following sections list the changes for unreleased.
 * Enhancement - Add a middleware to authenticate public share requests: [#2536](https://github.com/owncloud/ocis/pull/2536)
 * Enhancement - Report quota states: [#2628](https://github.com/owncloud/ocis/pull/2628)
 * Enhancement - Start up a new machine auth provider in the storage service: [#2528](https://github.com/owncloud/ocis/pull/2528)
-* Enhancement - Update reva to v1.14.1-0.20211021070229-852282ce34f5: [#2658](https://github.com/owncloud/ocis/pull/2658)
+* Enhancement - Enforce permission on update space quota: [#2650](https://github.com/owncloud/ocis/pull/2650)
+* Enhancement - Update reva to v1.14.1-0.20211022092730-84a5191f1c5a: [#2658](https://github.com/owncloud/ocis/pull/2658)
 
 ## Details
 
@@ -138,9 +139,16 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/2528
    https://github.com/owncloud/ocis/pull/2529
 
-* Enhancement - Update reva to v1.14.1-0.20211021070229-852282ce34f5: [#2658](https://github.com/owncloud/ocis/pull/2658)
+* Enhancement - Enforce permission on update space quota: [#2650](https://github.com/owncloud/ocis/pull/2650)
 
-   Updated reva to v1.14.1-0.20211021070229-852282ce34f5 This update includes: * Fix
+   Added a check that only users with the `set-space-quota` permission can update the space
+   quota.
+
+   https://github.com/owncloud/ocis/pull/2650
+
+* Enhancement - Update reva to v1.14.1-0.20211022092730-84a5191f1c5a: [#2658](https://github.com/owncloud/ocis/pull/2658)
+
+   Updated reva to v1.14.1-0.20211022092730-84a5191f1c5a This update includes: * Fix
    [cs3org/reva#2168](https://github.com/cs3org/reva/pull/2168): Override provider if
    was previously registered * Fix
    [cs3org/reva#2173](https://github.com/cs3org/reva/pull/2173): Fix archiver max size
@@ -164,10 +172,14 @@ The following sections list the changes for unreleased.
    [cs3org/reva#2170](https://github.com/cs3org/reva/pull/2170): Handle propfind
    requests for existing files * Enh
    [cs3org/reva#2165](https://github.com/cs3org/reva/pull/2165): Allow access to
-   recycle bin for arbitrary paths outside homes
+   recycle bin for arbitrary paths outside homes * Enh
+   [cs3org/reva#2189](https://github.com/cs3org/reva/pull/2189): Add user settings
+   capability * Enh [cs3org/reva#2162](https://github.com/cs3org/reva/pull/2162):
+   Implement the UpdateStorageSpace method
 
    https://github.com/owncloud/ocis/pull/2658
    https://github.com/owncloud/ocis/pull/2536
+   https://github.com/owncloud/ocis/pull/2650
 # Changelog for [1.13.0] (2021-10-13)
 
 The following sections list the changes for 1.13.0.
