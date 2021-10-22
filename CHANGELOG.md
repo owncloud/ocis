@@ -14,6 +14,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Broaden bufbuild/Buf usage: [#2630](https://github.com/owncloud/ocis/pull/2630)
 * Enhancement - Replace fileb0x with go-embed: [#1199](https://github.com/owncloud/ocis/issues/1199)
 * Enhancement - Upgrade to go-micro v4.1.0: [#2616](https://github.com/owncloud/ocis/pull/2616)
+* Enhancement - Review and correct http header: [#2666](https://github.com/owncloud/ocis/pull/2666)
 * Enhancement - Lower TUS max chunk size: [#2584](https://github.com/owncloud/ocis/pull/2584)
 * Enhancement - Add sharees additional info paramater config to ocs: [#2637](https://github.com/owncloud/ocis/pull/2637)
 * Enhancement - Add a middleware to authenticate public share requests: [#2536](https://github.com/owncloud/ocis/pull/2536)
@@ -96,6 +97,12 @@ The following sections list the changes for unreleased.
    We've upgraded to go-micro v4.1.0
 
    https://github.com/owncloud/ocis/pull/2616
+
+* Enhancement - Review and correct http header: [#2666](https://github.com/owncloud/ocis/pull/2666)
+
+   Reviewed and corrected the necessary http headers. Made CORS configurable.
+
+   https://github.com/owncloud/ocis/pull/2666
 
 * Enhancement - Lower TUS max chunk size: [#2584](https://github.com/owncloud/ocis/pull/2584)
 
