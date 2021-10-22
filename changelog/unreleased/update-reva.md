@@ -1,6 +1,6 @@
-Enhancement: Update reva to v1.14.1-0.20211021070229-852282ce34f5
+Enhancement: Update reva to v1.14.1-0.20211022092730-84a5191f1c5a
 
-Updated reva to v1.14.1-0.20211021070229-852282ce34f5
+Updated reva to v1.14.1-0.20211022092730-84a5191f1c5a
 This update includes:
  * Fix [cs3org/reva#2168](https://github.com/cs3org/reva/pull/2168): Override provider if was previously registered
  * Fix [cs3org/reva#2173](https://github.com/cs3org/reva/pull/2173): Fix archiver max size reached error
@@ -15,6 +15,9 @@ This update includes:
  * Enh [cs3org/reva#2180](https://github.com/cs3org/reva/pull/2180): Remove OCDAV options namespace parameter
  * Enh [cs3org/reva#2170](https://github.com/cs3org/reva/pull/2170): Handle propfind requests for existing files
  * Enh [cs3org/reva#2165](https://github.com/cs3org/reva/pull/2165): Allow access to recycle bin for arbitrary paths outside homes
+ * Enh [cs3org/reva#2189](https://github.com/cs3org/reva/pull/2189): Add user settings capability
+ * Enh [cs3org/reva#2162](https://github.com/cs3org/reva/pull/2162): Implement the UpdateStorageSpace method
 
 https://github.com/owncloud/ocis/pull/2658
 https://github.com/owncloud/ocis/pull/2536
+https://github.com/owncloud/ocis/pull/2650
