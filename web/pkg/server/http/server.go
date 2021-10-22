@@ -31,7 +31,6 @@ func Server(opts ...Option) (http.Service, error) {
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,
 			middleware.NoCache,
-			middleware.Cors,
 			middleware.Secure,
 			webmid.SilentRefresh,
 			middleware.Version(
