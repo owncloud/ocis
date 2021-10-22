@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-22T06:58:28+0000"
+date: "2021-10-22T12:36:50+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocs/templates
@@ -72,11 +72,19 @@ Usage: `ocs health [command options] [arguments...]`
 
 
 
+
+
+
+
 ### ocs ocis-ocs
 
 Serve OCS API for oCIS
 
 Usage: `ocs ocis-ocs [command options] [arguments...]`
+
+
+
+
 
 
 
@@ -178,6 +186,22 @@ Usage: `ocs server [command options] [arguments...]`
 : Set the base namespace for the http namespace. Default: `"com.owncloud.web"`.
 
 
+-cors-allowed-origins |  $OCS_CORS_ALLOW_ORIGINS , $OCIS_CORS_ALLOW_ORIGINS
+: Set the allowed CORS origins. Default: `cli.NewStringSlice("*")`.
+
+
+-cors-allowed-methods |  $OCS_CORS_ALLOW_METHODS , $OCIS_CORS_ALLOW_METHODS
+: Set the allowed CORS origins. Default: `cli.NewStringSlice("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")`.
+
+
+-cors-allowed-headers |  $OCS_CORS_ALLOW_HEADERS , $OCIS_CORS_ALLOW_HEADERS
+: Set the allowed CORS origins. Default: `cli.NewStringSlice("Authorization", "Origin", "Content-Type", "Accept", "X-Requested-With")`.
+
+
+-cors-allow-credentials |  $OCS_CORS_ALLOW_CREDENTIALS , $OCIS_CORS_ALLOW_CREDENTIALS
+: Allow credentials for CORS. Default: `true`.
+
+
 -name |  $OCS_NAME
 : Service name. Default: `"ocs"`.
 
@@ -220,6 +244,10 @@ Usage: `ocs server [command options] [arguments...]`
 Print the versions of the running instances
 
 Usage: `ocs version [command options] [arguments...]`
+
+
+
+
 
 
 

@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-22T06:58:28+0000"
+date: "2021-10-22T12:36:50+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -52,6 +52,10 @@ Usage: `settings ocis-settings [command options] [arguments...]`
 
 -log-color |  $SETTINGS_LOG_COLOR , $OCIS_LOG_COLOR
 : Enable colored logging.
+
+
+
+
 
 
 
@@ -144,6 +148,22 @@ Usage: `settings server [command options] [arguments...]`
 : Set the static assets caching duration in seconds. Default: `604800`.
 
 
+-cors-allowed-origins |  $SETTINGS_CORS_ALLOW_ORIGINS , $OCIS_CORS_ALLOW_ORIGINS
+: Set the allowed CORS origins. Default: `cli.NewStringSlice("*")`.
+
+
+-cors-allowed-methods |  $SETTINGS_CORS_ALLOW_METHODS , $OCIS_CORS_ALLOW_METHODS
+: Set the allowed CORS origins. Default: `cli.NewStringSlice("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")`.
+
+
+-cors-allowed-headers |  $SETTINGS_CORS_ALLOW_HEADERS , $OCIS_CORS_ALLOW_HEADERS
+: Set the allowed CORS origins. Default: `cli.NewStringSlice("Authorization", "Origin", "Content-Type", "Accept", "X-Requested-With")`.
+
+
+-cors-allow-credentials |  $SETTINGS_CORS_ALLOW_CREDENTIALS , $OCIS_CORS_ALLOW_CREDENTIALS
+: Allow credentials for CORS. Default: `true`.
+
+
 -grpc-addr |  $SETTINGS_GRPC_ADDR
 : Address to bind grpc server. Default: `"127.0.0.1:9191"`.
 
@@ -205,6 +225,10 @@ Usage: `settings version [command options] [arguments...]`
 
 
 
+
+
+
+
 -grpc-namespace |  $SETTINGS_GRPC_NAMESPACE
 : Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
 
@@ -224,6 +248,10 @@ Usage: `settings health [command options] [arguments...]`
 
 -debug-addr |  $SETTINGS_DEBUG_ADDR
 : Address to debug endpoint. Default: `"127.0.0.1:9194"`.
+
+
+
+
 
 
 

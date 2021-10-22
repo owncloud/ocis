@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-22T06:58:40+0000"
+date: "2021-10-22T12:37:01+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/webdav/templates
@@ -65,40 +65,11 @@ Usage: `webdav [global options] command [command options] [arguments...]`
 
 
 
+
+
+
+
 ## Sub Commands
-
-### webdav health
-
-Check health status
-
-Usage: `webdav health [command options] [arguments...]`
-
-
--debug-addr |  $WEBDAV_DEBUG_ADDR
-: Address to debug endpoint. Default: `"127.0.0.1:9119"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### webdav server
 
@@ -172,6 +143,22 @@ Usage: `webdav server [command options] [arguments...]`
 : Set the base namespace for service discovery. Default: `"com.owncloud.web"`.
 
 
+-cors-allowed-origins |  $WEBDAV_CORS_ALLOW_ORIGINS , $OCIS_CORS_ALLOW_ORIGINS
+: Set the allowed CORS origins. Default: `cli.NewStringSlice("*")`.
+
+
+-cors-allowed-methods |  $WEBDAV_CORS_ALLOW_METHODS , $OCIS_CORS_ALLOW_METHODS
+: Set the allowed CORS origins. Default: `cli.NewStringSlice("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")`.
+
+
+-cors-allowed-headers |  $WEBDAV_CORS_ALLOW_HEADERS , $OCIS_CORS_ALLOW_HEADERS
+: Set the allowed CORS origins. Default: `cli.NewStringSlice("Authorization", "Origin", "Content-Type", "Accept", "X-Requested-With")`.
+
+
+-cors-allow-credentials |  $WEBDAV_CORS_ALLOW_CREDENTIALS , $OCIS_CORS_ALLOW_CREDENTIALS
+: Allow credentials for CORS. Default: `true`.
+
+
 -service-name |  $WEBDAV_SERVICE_NAME
 : Service name. Default: `"webdav"`.
 
@@ -222,10 +209,51 @@ Usage: `webdav version [command options] [arguments...]`
 
 
 
+
+
+
+
 -http-namespace |  $WEBDAV_HTTP_NAMESPACE
 : Set the base namespace for service discovery. Default: `"com.owncloud.web"`.
 
 
 -service-name |  $WEBDAV_SERVICE_NAME
 : Service name. Default: `"webdav"`.
+
+### webdav health
+
+Check health status
+
+Usage: `webdav health [command options] [arguments...]`
+
+
+-debug-addr |  $WEBDAV_DEBUG_ADDR
+: Address to debug endpoint. Default: `"127.0.0.1:9119"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
