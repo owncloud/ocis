@@ -14,6 +14,7 @@ import (
 
 	"github.com/CiscoM31/godata"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -26,6 +27,8 @@ import (
 	sproto "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	settingsSvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	msgraph "github.com/owncloud/open-graph-api-go"
+
+	merrors "go-micro.dev/v4/errors"
 )
 
 // GetDrives implements the Service interface.
@@ -60,7 +63,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
+	wdu, err := url.Parse(g.config.Spaces.WebDavBase + g.config.Spaces.WebDavPath)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error parsing url")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -206,7 +209,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	wdu, err := url.Parse(g.config.Spaces.WebDavBase)
+	wdu, err := url.Parse(g.config.Spaces.WebDavBase + g.config.Spaces.WebDavPath)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error parsing url")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -268,15 +271,31 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		// Prepare the object to apply the diff from. The properties on StorageSpace will overwrite
 		// the original storage space.
 		StorageSpace: &provider.StorageSpace{
+			Id: &storageprovider.StorageSpaceId{
+				OpaqueId: req.FirstSegment.Identifier.Get(),
+			},
 			Root: &provider.ResourceId{
 				StorageId: storageID,
 				OpaqueId:  opaqueID,
 			},
-			Name: *drive.Name,
 		},
 	}
 
+	if drive.Name != nil {
+		updateSpaceRequest.StorageSpace.Name = *drive.Name
+	}
+
 	if drive.Quota.HasTotal() {
+		user := ctxpkg.ContextMustGetUser(r.Context())
+		canSetSpaceQuota, err := canSetSpaceQuota(r.Context(), user)
+		if err != nil {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+			return
+		}
+		if !canSetSpaceQuota {
+			errorcode.GeneralException.Render(w, r, http.StatusUnauthorized, "user is not allowed to set the space quota")
+			return
+		}
 		updateSpaceRequest.StorageSpace.Quota = &storageprovider.Quota{
 			QuotaMaxBytes: uint64(*drive.Quota.Total),
 		}
@@ -488,4 +507,17 @@ func getQuota(quota *msgraph.Quota, defaultQuota string) *provider.Quota {
 	default:
 		return nil
 	}
+}
+
+func canSetSpaceQuota(ctx context.Context, user *userv1beta1.User) (bool, error) {
+	settingsService := sproto.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
+	_, err := settingsService.GetPermissionByID(ctx, &sproto.GetPermissionByIDRequest{PermissionId: settingsSvc.SetSpaceQuotaPermissionID})
+	if err != nil {
+		merror := merrors.FromError(err)
+		if merror.Status == http.StatusText(http.StatusNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }

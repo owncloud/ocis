@@ -194,11 +194,12 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 					"public_url":       cfg.Reva.Frontend.PublicURL,
 				},
 				"ocs": map[string]interface{}{
-					"share_prefix":            cfg.Reva.Frontend.OCSSharePrefix,
-					"home_namespace":          cfg.Reva.Frontend.OCSHomeNamespace,
-					"resource_info_cache_ttl": cfg.Reva.Frontend.OCSResourceInfoCacheTTL,
-					"prefix":                  cfg.Reva.Frontend.OCSPrefix,
-					"cache_warmup_driver":     cfg.Reva.Frontend.OCSCacheWarmupDriver,
+					"share_prefix":              cfg.Reva.Frontend.OCSSharePrefix,
+					"home_namespace":            cfg.Reva.Frontend.OCSHomeNamespace,
+					"resource_info_cache_ttl":   cfg.Reva.Frontend.OCSResourceInfoCacheTTL,
+					"prefix":                    cfg.Reva.Frontend.OCSPrefix,
+					"additional_info_attribute": cfg.Reva.Frontend.OCSAdditionalInfoAttribute,
+					"cache_warmup_driver":       cfg.Reva.Frontend.OCSCacheWarmupDriver,
 					"cache_warmup_drivers": map[string]interface{}{
 						"cbox": map[string]interface{}{
 							"db_username": cfg.Reva.Sharing.UserSQLUsername,
@@ -272,6 +273,12 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 								"user": map[string]interface{}{
 									"send_mail":       true,
 									"profile_picture": false,
+									"settings": []map[string]interface{}{
+										{
+											"enabled": true,
+											"version": "1.0.0",
+										},
+									},
 								},
 								"user_enumeration": map[string]interface{}{
 									"enabled":            true,

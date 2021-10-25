@@ -7,16 +7,22 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Security - Don't expose services by default: [#2612](https://github.com/owncloud/ocis/issues/2612)
-* Bugfix - Enhancement: [#2630](https://github.com/owncloud/ocis/pull/2630)
+* Bugfix - Create parent directories for idp configuration: [#2667](https://github.com/owncloud/ocis/issues/2667)
 * Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
 * Change - New default data paths and easier configuration of the data path: [#2590](https://github.com/owncloud/ocis/pull/2590)
-* Enhancement - Use go-embed insted of fileb0x: [#1199](https://github.com/owncloud/ocis/issues/1199)
+* Change - Split spaces webdav url and graph url in base and path: [#2660](https://github.com/owncloud/ocis/pull/2660)
+* Enhancement - Add user setting capability: [#2655](https://github.com/owncloud/ocis/pull/2655)
+* Enhancement - Broaden bufbuild/Buf usage: [#2630](https://github.com/owncloud/ocis/pull/2630)
+* Enhancement - Replace fileb0x with go-embed: [#1199](https://github.com/owncloud/ocis/issues/1199)
 * Enhancement - Upgrade to go-micro v4.1.0: [#2616](https://github.com/owncloud/ocis/pull/2616)
+* Enhancement - Review and correct http header: [#2666](https://github.com/owncloud/ocis/pull/2666)
 * Enhancement - Lower TUS max chunk size: [#2584](https://github.com/owncloud/ocis/pull/2584)
+* Enhancement - Add sharees additional info paramater config to ocs: [#2637](https://github.com/owncloud/ocis/pull/2637)
 * Enhancement - Add a middleware to authenticate public share requests: [#2536](https://github.com/owncloud/ocis/pull/2536)
 * Enhancement - Report quota states: [#2628](https://github.com/owncloud/ocis/pull/2628)
 * Enhancement - Start up a new machine auth provider in the storage service: [#2528](https://github.com/owncloud/ocis/pull/2528)
-* Enhancement - Update reva to v1.14.1-0.20211021070229-852282ce34f5: [#2658](https://github.com/owncloud/ocis/pull/2658)
+* Enhancement - Enforce permission on update space quota: [#2650](https://github.com/owncloud/ocis/pull/2650)
+* Enhancement - Update reva to v1.14.1-0.20211022092730-84a5191f1c5a: [#2658](https://github.com/owncloud/ocis/pull/2658)
 
 ## Details
 
@@ -28,18 +34,17 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/2612
 
-* Bugfix - Enhancement: [#2630](https://github.com/owncloud/ocis/pull/2630)
+* Bugfix - Create parent directories for idp configuration: [#2667](https://github.com/owncloud/ocis/issues/2667)
 
-   We've switched the usage of bufbuild/Buf from a protoc replacement only to also using it to
-   configuring the outputs and pinning dependencies.
+   The parent directories of the identifier-registration.yaml config file might not exist when
+   starting idp. Create them, when that is the case.
 
-   https://github.com/owncloud/ocis/pull/2630
-   https://github.com/owncloud/ocis/pull/2616
+   https://github.com/owncloud/ocis/issues/2667
 
 * Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
 
    When creating a new space a (configurable) default quota will be used (instead the hardcoded
-   one) One can set the EnvVar `GRAPH_SPACES_DEFAULT_QUOTA` to configure it
+   one). One can set the EnvVar `GRAPH_SPACES_DEFAULT_QUOTA` to configure it
 
    https://github.com/owncloud/ocis/issues/2621
    https://jira.owncloud.com/browse/OCIS-2070
@@ -63,13 +68,38 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/2590
 
-* Enhancement - Use go-embed insted of fileb0x: [#1199](https://github.com/owncloud/ocis/issues/1199)
+* Change - Split spaces webdav url and graph url in base and path: [#2660](https://github.com/owncloud/ocis/pull/2660)
 
-   Go-embed delivers already the funtionality we need but with less code. We decided to use it
+   We've fixed the behavior for the spaces webdav url and graph explorer graph url settings, so
+   that they respect the environment variable `OCIS_URL`. Previously oCIS admins needed to set
+   these URLs manually to make spaces and the graph explorer work.
+
+   https://github.com/owncloud/ocis/issues/2659
+   https://github.com/owncloud/ocis/pull/2660
+
+* Enhancement - Add user setting capability: [#2655](https://github.com/owncloud/ocis/pull/2655)
+
+   We've added a capability to communicate the existance of a user settings service to clients.
+
+   https://github.com/owncloud/web/issues/5926
+   https://github.com/owncloud/ocis/pull/2655
+
+* Enhancement - Broaden bufbuild/Buf usage: [#2630](https://github.com/owncloud/ocis/pull/2630)
+
+   We've switched the usage of bufbuild/Buf from a protoc replacement only to also using it to
+   confige the outputs and pinning dependencies.
+
+   https://github.com/owncloud/ocis/pull/2630
+   https://github.com/owncloud/ocis/pull/2616
+
+* Enhancement - Replace fileb0x with go-embed: [#1199](https://github.com/owncloud/ocis/issues/1199)
+
+   Go-embed already brings the functionality we need but with less code. We decided to use it
    instead of 3rd party fileb0x
 
    https://github.com/owncloud/ocis/issues/1199
    https://github.com/owncloud/ocis/pull/2631
+   https://github.com/owncloud/ocis/pull/2649
 
 * Enhancement - Upgrade to go-micro v4.1.0: [#2616](https://github.com/owncloud/ocis/pull/2616)
 
@@ -77,12 +107,22 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/2616
 
+* Enhancement - Review and correct http header: [#2666](https://github.com/owncloud/ocis/pull/2666)
+
+   Reviewed and corrected the necessary http headers. Made CORS configurable.
+
+   https://github.com/owncloud/ocis/pull/2666
+
 * Enhancement - Lower TUS max chunk size: [#2584](https://github.com/owncloud/ocis/pull/2584)
 
    We've lowered the TUS max chunk size from infinite to 0.1GB so that chunking actually happens.
 
    https://github.com/owncloud/ocis/pull/2584
    https://github.com/cs3org/reva/pull/2136
+
+* Enhancement - Add sharees additional info paramater config to ocs: [#2637](https://github.com/owncloud/ocis/pull/2637)
+
+   https://github.com/owncloud/ocis/pull/2637
 
 * Enhancement - Add a middleware to authenticate public share requests: [#2536](https://github.com/owncloud/ocis/pull/2536)
 
@@ -107,9 +147,16 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/2528
    https://github.com/owncloud/ocis/pull/2529
 
-* Enhancement - Update reva to v1.14.1-0.20211021070229-852282ce34f5: [#2658](https://github.com/owncloud/ocis/pull/2658)
+* Enhancement - Enforce permission on update space quota: [#2650](https://github.com/owncloud/ocis/pull/2650)
 
-   Updated reva to v1.14.1-0.20211021070229-852282ce34f5 This update includes: * Fix
+   Added a check that only users with the `set-space-quota` permission can update the space
+   quota.
+
+   https://github.com/owncloud/ocis/pull/2650
+
+* Enhancement - Update reva to v1.14.1-0.20211022092730-84a5191f1c5a: [#2658](https://github.com/owncloud/ocis/pull/2658)
+
+   Updated reva to v1.14.1-0.20211022092730-84a5191f1c5a This update includes: * Fix
    [cs3org/reva#2168](https://github.com/cs3org/reva/pull/2168): Override provider if
    was previously registered * Fix
    [cs3org/reva#2173](https://github.com/cs3org/reva/pull/2173): Fix archiver max size
@@ -133,10 +180,14 @@ The following sections list the changes for unreleased.
    [cs3org/reva#2170](https://github.com/cs3org/reva/pull/2170): Handle propfind
    requests for existing files * Enh
    [cs3org/reva#2165](https://github.com/cs3org/reva/pull/2165): Allow access to
-   recycle bin for arbitrary paths outside homes
+   recycle bin for arbitrary paths outside homes * Enh
+   [cs3org/reva#2189](https://github.com/cs3org/reva/pull/2189): Add user settings
+   capability * Enh [cs3org/reva#2162](https://github.com/cs3org/reva/pull/2162):
+   Implement the UpdateStorageSpace method
 
    https://github.com/owncloud/ocis/pull/2658
    https://github.com/owncloud/ocis/pull/2536
+   https://github.com/owncloud/ocis/pull/2650
 # Changelog for [1.13.0] (2021-10-13)
 
 The following sections list the changes for 1.13.0.

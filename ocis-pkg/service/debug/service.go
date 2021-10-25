@@ -6,6 +6,7 @@ import (
 
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
+	"github.com/owncloud/ocis/ocis-pkg/cors"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opencensus.io/zpages"
@@ -51,7 +52,12 @@ func NewService(opts ...Option) *http.Server {
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,
 			middleware.NoCache,
-			middleware.Cors,
+			middleware.Cors(
+				cors.AllowedOrigins(dopts.CorsAllowedOrigins),
+				cors.AllowedMethods(dopts.CorsAllowedMethods),
+				cors.AllowedHeaders(dopts.CorsAllowedHeaders),
+				cors.AllowCredentials(dopts.CorsAllowCredentials),
+			),
 			middleware.Secure,
 			middleware.Version(
 				dopts.Name,
