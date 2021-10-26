@@ -10,14 +10,11 @@ geekdocFilePath: releasing.md
 
 ## Requirements
 
-You need a working installation of [the Go programming language](https://golang.org/) installed to build the assets for a working release.
+You need a working installation of [the Go programming language](https://golang.org/), [the Node runtime](https://nodejs.org/) and [the Yarn package manager](https://yarnpkg.com/) installed to build the assets for a working release.
 
 ## Releasing
 
-After adding changes to the settings package within oCIS and testing them locally, you want to update the compiled assets to the oCIS binary. 
-
-To achieve this, you have to run a Go command and add the results to your PR. The preferred way to do this is to run `make generate` in the root 
-of the repository and then commit the resulting changes to your branch/PR.
+The settings service doesn't have a dedicated release process. Simply commit your changes, make sure linting and unit tests pass locally and open a pull request.
 
 ### Package Hierarchy
 
