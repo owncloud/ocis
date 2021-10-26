@@ -7,7 +7,7 @@ geekdocEditPath: edit/master/docs/extensions/storage
 geekdocFilePath: apps.md
 ---
 
-oCIS is all about files. But most of the time you want to do something with files. Therefore oCIS has an concept about apps, that can handle specific file types, so called mime types.
+oCIS is all about files. But most of the time you want to do something with files that beyond the basic upload, download and share behavior. Therefore, oCIS has a concept for apps, that can handle specific file types, so called mime types.
 
 ## App provider capability
 
@@ -38,7 +38,7 @@ Please note that there might be two or more app providers with different version
 
 ## App registry
 
-The app registry is the single point where all apps register itself and their supported mime types.
+The app registry is the single point where all apps register themselves and their respective supported mime types.
 
 ### Mime type configuration / creation allow list
 
