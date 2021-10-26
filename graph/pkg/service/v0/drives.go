@@ -43,7 +43,29 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	permissions := make(map[string]struct{}, 1)
+	s := sproto.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
+
+	_, err = s.GetPermissionByID(ctx, &sproto.GetPermissionByIDRequest{
+		PermissionId: settingsSvc.ListAllSpacesPermissionID,
+	})
+
+	// No error means the user has the permission
+	if err == nil {
+		permissions[settingsSvc.ListAllSpacesPermissionName] = struct{}{}
+	}
+	value, err := json.Marshal(permissions)
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
 	res, err := client.ListStorageSpaces(ctx, &storageprovider.ListStorageSpacesRequest{
+		Opaque: &types.Opaque{Map: map[string]*types.OpaqueEntry{
+			"permissions": {
+				Decoder: "json",
+				Value:   value,
+			},
+		}},
 		// TODO add filters?
 	})
 	switch {

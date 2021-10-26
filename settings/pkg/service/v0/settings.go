@@ -29,6 +29,11 @@ const (
 	// SetSpaceQuotaPermissionName is the hardcoded setting name for the set space quota permission
 	SetSpaceQuotaPermissionName string = "set-space-quota"
 
+	// ListAllSpacesPermissionID is the hardcoded setting UUID for the list all spaces permission
+	ListAllSpacesPermissionID string = "016f6ddd-9501-4a0a-8ebe-64a20ee8ec82"
+	// ListAllSpacesPermissionName is the hardcoded setting name for the list all spaces permission
+	ListAllSpacesPermissionName string = "list-all-spaces"
+
 	// CreateSpacePermissionID is the hardcoded setting UUID for the create space permission
 	CreateSpacePermissionID string = "79e13b30-3e22-11eb-bc51-0b9f0bad9a58"
 	// CreateSpacePermissionName is the hardcoded setting name for the create space permission
@@ -373,6 +378,24 @@ func generatePermissionRequests() []*settings.AddSettingToBundleRequest {
 				Value: &settings.Setting_PermissionValue{
 					PermissionValue: &settings.Permission{
 						Operation:  settings.Permission_OPERATION_READWRITE,
+						Constraint: settings.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+		},
+		{
+			BundleId: BundleUUIDRoleAdmin,
+			Setting: &settings.Setting{
+				Id:          ListAllSpacesPermissionID,
+				Name:        ListAllSpacesPermissionName,
+				DisplayName: "List All Spaces",
+				Description: "This permission allows list all spaces.",
+				Resource: &settings.Resource{
+					Type: settings.Resource_TYPE_SYSTEM,
+				},
+				Value: &settings.Setting_PermissionValue{
+					PermissionValue: &settings.Permission{
+						Operation:  settings.Permission_OPERATION_READ,
 						Constraint: settings.Permission_CONSTRAINT_ALL,
 					},
 				},
