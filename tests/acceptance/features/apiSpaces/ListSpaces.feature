@@ -17,18 +17,16 @@ Feature: List and create spaces
       | driveType | personal     |
       | name      | Alice Hansen |
 
-  Scenario: Alice requests her space via webDav api, she expects a 207 code and the correct data in the xml response 
+  Scenario: Alice requests her space via webDav api, she expects a 207 code 
     When user "Alice" lists all available spaces via the GraphApi
     And user "Alice" lists the content of the space with the name "Alice Hansen" using the WebDav Api
     Then the HTTP status code should be "207"
-    And the propfind result of the space should contain these entries:
-      | .space/        |
 
   Scenario: Alice tryes to create Space via Graph api without right, she expects a response of 401
     When user "Alice" creates a space "Project Mars" of type "project" with the default quota using the GraphApi
     Then the HTTP status code should be "401"
 
-  Scenario: Alice creates Space via Graph api with defaul quota, she expects a 201 code and the correct data in the response
+  Scenario: Alice creates Space via Graph api with defaul quota, she expects a 201 code the correct data and that space exists
     Given the administrator gives "Alice" the role "Admin" using the settings api
     When user "Alice" creates a space "Project Mars" of type "project" with the default quota using the GraphApi
     Then the HTTP status code should be "201"
@@ -37,8 +35,12 @@ Feature: List and create spaces
       | driveType | project      |
       | name      | Project Mars |
       | total     | 1000000000   | 
+    When user "Alice" lists all available spaces via the GraphApi
+    And user "Alice" lists the content of the space with the name "Project Mars" using the WebDav Api
+    Then the propfind result of the space should contain these entries:
+      | .space/ |
 
-  Scenario: Alice creates Space via Graph api, she expects a 201 code and the correct data in the response
+  Scenario: Alice creates Space via Graph api with certain quota, she expects a 201 code and the correct data in the response
     Given the administrator gives "Alice" the role "Admin" using the settings api
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
     Then the HTTP status code should be "201"
@@ -48,10 +50,13 @@ Feature: List and create spaces
       | name       | Project Venus |
       | total      | 2000          | 
     
-  Scenario: Alice creates folder via Graph api, she expects a 201 code and the correct data in the response
+  Scenario: Alice creates folder via Graph api in space, she expects a 201 code and she checks that folder exists
     Given the administrator gives "Alice" the role "Admin" using the settings api
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
     And user "Alice" lists all available spaces via the GraphApi
-    When user "Alice" creates a folder "mainFolder" in space "Project Venus" using the WebDav Api 
+    And user "Alice" creates a folder "mainFolder" in space "Project Venus" using the WebDav Api 
     Then the HTTP status code should be "201"
+    When user "Alice" lists the content of the space with the name "Project Venus" using the WebDav Api
+    Then the propfind result of the space should contain these entries:
+      | mainFolder/        |
     
