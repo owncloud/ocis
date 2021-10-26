@@ -216,7 +216,6 @@ def stopRecentBuilds(ctx):
     return [{
         "name": "stop-recent-builds",
         "image": "drone/cli:alpine",
-        "pull": "always",
         "environment": {
             "DRONE_SERVER": "https://drone.owncloud.com",
             "DRONE_TOKEN": {
@@ -262,7 +261,6 @@ def testOcisModule(ctx, module):
         {
             "name": "golangci-lint",
             "image": "owncloudci/golang:1.17",
-            "pull": "always",
             "commands": [
                 "mkdir -p cache/checkstyle",
                 "make -C %s ci-golangci-lint" % (module),
@@ -273,7 +271,6 @@ def testOcisModule(ctx, module):
         {
             "name": "test",
             "image": "owncloudci/golang:1.17",
-            "pull": "always",
             "commands": [
                 "mkdir -p cache/coverage",
                 "make -C %s test" % (module),
@@ -395,7 +392,6 @@ def uploadScanResults(ctx):
             {
                 "name": "codacy",
                 "image": "plugins/codacy:1",
-                "pull": "always",
                 "settings": {
                     "token": {
                         "from_secret": "codacy_token",
@@ -405,7 +401,6 @@ def uploadScanResults(ctx):
             {
                 "name": "sonarcloud",
                 "image": "sonarsource/sonar-scanner-cli:latest",
-                "pull": "always",
                 "environment": sonar_env,
             },
             {
@@ -450,7 +445,6 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
             {
                 "name": "localApiTests-%s-%s" % (suite, storage),
                 "image": "owncloudci/php:7.4",
-                "pull": "always",
                 "environment": {
                     "TEST_SERVER_URL": "https://ocis-server:9200",
                     "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
@@ -502,7 +496,6 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
             {
                 "name": "oC10ApiTests-%s-storage-%s" % (storage, part_number),
                 "image": "owncloudci/php:7.4",
-                "pull": "always",
                 "environment": {
                     "TEST_SERVER_URL": "https://ocis-server:9200",
                     "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
@@ -616,7 +609,6 @@ def uiTestPipeline(ctx, filterTags, earlyFail, runPart = 1, numberOfParts = 1, s
             {
                 "name": "webUITests",
                 "image": "owncloudci/nodejs:14",
-                "pull": "always",
                 "environment": {
                     "SERVER_HOST": "https://ocis-server:9200",
                     "BACKEND_HOST": "https://ocis-server:9200",
@@ -684,7 +676,6 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
             {
                 "name": "WebUIAcceptanceTests",
                 "image": "owncloudci/nodejs:14",
-                "pull": "always",
                 "environment": {
                     "SERVER_HOST": "https://ocis-server:9200",
                     "BACKEND_HOST": "https://ocis-server:9200",
@@ -753,7 +744,6 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
             {
                 "name": "WebUIAcceptanceTests",
                 "image": "owncloudci/nodejs:14",
-                "pull": "always",
                 "environment": {
                     "SERVER_HOST": "https://ocis-server:9200",
                     "BACKEND_HOST": "https://ocis-server:9200",
@@ -789,7 +779,6 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
             {
                 "name": "redis",
                 "image": "redis:6-alpine",
-                "pull": "always",
             },
         ] + selenium(),
         "volumes": [stepVolumeOC10Tests] +
@@ -812,7 +801,6 @@ def stopBuild(earlyFail):
         return [{
             "name": "stop-build",
             "image": "drone/cli:alpine",
-            "pull": "always",
             "environment": {
                 "DRONE_SERVER": "https://drone.owncloud.com",
                 "DRONE_TOKEN": {
@@ -839,8 +827,7 @@ def buildGithubCommentForBuildStopped(alternateSuiteName, earlyFail):
     if (earlyFail):
         return [{
             "name": "build-github-comment-buildStop",
-            "image": "owncloud/ubuntu:16.04",
-            "pull": "always",
+            "image": "owncloud/ubuntu:20.04",
             "commands": [
                 'echo "<details><summary>:boom: Acceptance tests <strong>%s</strong> failed. The build is cancelled...</summary>\\n\\n" >> /drone/src/comments.file' % alternateSuiteName,
             ],
@@ -862,7 +849,6 @@ def githubComment(earlyFail):
         return [{
             "name": "github-comment",
             "image": "jmccann/drone-github-comment:1",
-            "pull": "if-not-exists",
             "settings": {
                 "message_file": "/drone/src/comments.file",
             },
@@ -917,7 +903,6 @@ def dockerRelease(ctx, arch):
             {
                 "name": "build",
                 "image": "owncloudci/golang:1.17",
-                "pull": "always",
                 "commands": [
                     "make -C ocis release-linux-docker",
                 ],
@@ -925,7 +910,6 @@ def dockerRelease(ctx, arch):
             {
                 "name": "dryrun",
                 "image": "plugins/docker:latest",
-                "pull": "always",
                 "settings": {
                     "dry_run": True,
                     "context": "ocis",
@@ -945,7 +929,6 @@ def dockerRelease(ctx, arch):
             {
                 "name": "docker",
                 "image": "plugins/docker:latest",
-                "pull": "always",
                 "settings": {
                     "username": {
                         "from_secret": "docker_username",
@@ -993,7 +976,6 @@ def dockerEos(ctx):
             {
                 "name": "build",
                 "image": "owncloudci/golang:1.17",
-                "pull": "always",
                 "commands": [
                     "make -C ocis release-linux-docker",
                 ],
@@ -1001,7 +983,6 @@ def dockerEos(ctx):
             {
                 "name": "dryrun-eos-ocis",
                 "image": "plugins/docker:latest",
-                "pull": "always",
                 "settings": {
                     "dry_run": True,
                     "context": "ocis",
@@ -1020,7 +1001,6 @@ def dockerEos(ctx):
             {
                 "name": "docker-eos-ocis",
                 "image": "plugins/docker:latest",
-                "pull": "always",
                 "settings": {
                     "username": {
                         "from_secret": "docker_username",
@@ -1098,7 +1078,6 @@ def binaryRelease(ctx, name):
             {
                 "name": "build",
                 "image": "owncloudci/golang:1.17",
-                "pull": "always",
                 "commands": [
                     "make -C ocis release-%s" % (name),
                 ],
@@ -1106,7 +1085,6 @@ def binaryRelease(ctx, name):
             {
                 "name": "finish",
                 "image": "owncloudci/golang:1.17",
-                "pull": "always",
                 "commands": [
                     "make -C ocis release-finish",
                 ],
@@ -1120,7 +1098,6 @@ def binaryRelease(ctx, name):
             {
                 "name": "upload",
                 "image": "plugins/s3:latest",
-                "pull": "always",
                 "settings": settings,
                 "when": {
                     "ref": [
@@ -1132,7 +1109,6 @@ def binaryRelease(ctx, name):
             {
                 "name": "changelog",
                 "image": "owncloudci/golang:1.17",
-                "pull": "always",
                 "commands": [
                     "make changelog CHANGELOG_VERSION=%s" % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
                 ],
@@ -1145,7 +1121,6 @@ def binaryRelease(ctx, name):
             {
                 "name": "release",
                 "image": "plugins/github-release:1",
-                "pull": "always",
                 "settings": {
                     "api_key": {
                         "from_secret": "github_token",
@@ -1193,7 +1168,6 @@ def releaseSubmodule(ctx):
             {
                 "name": "release-submodule",
                 "image": "plugins/github-release:1",
-                "pull": "always",
                 "settings": {
                     "api_key": {
                         "from_secret": "github_token",
@@ -1233,7 +1207,6 @@ def releaseDockerManifest(ctx):
             {
                 "name": "execute",
                 "image": "plugins/manifest:1",
-                "pull": "always",
                 "settings": {
                     "username": {
                         "from_secret": "docker_username",
@@ -1268,7 +1241,6 @@ def changelog(ctx):
             {
                 "name": "generate",
                 "image": "owncloudci/golang:1.17",
-                "pull": "always",
                 "commands": [
                     "make -C ocis changelog",
                 ],
@@ -1276,7 +1248,6 @@ def changelog(ctx):
             {
                 "name": "diff",
                 "image": "owncloudci/alpine:latest",
-                "pull": "always",
                 "commands": [
                     "git diff",
                 ],
@@ -1284,7 +1255,6 @@ def changelog(ctx):
             {
                 "name": "output",
                 "image": "owncloudci/alpine:latest",
-                "pull": "always",
                 "commands": [
                     "cat CHANGELOG.md",
                 ],
@@ -1292,7 +1262,6 @@ def changelog(ctx):
             {
                 "name": "publish",
                 "image": "plugins/git-action:1",
-                "pull": "always",
                 "settings": {
                     "actions": [
                         "commit",
@@ -1340,7 +1309,6 @@ def releaseDockerReadme(ctx):
             {
                 "name": "execute",
                 "image": "chko/docker-pushrm:1",
-                "pull": "always",
                 "environment": {
                     "DOCKER_USER": {
                         "from_secret": "docker_username",
@@ -1394,7 +1362,6 @@ def docs(ctx):
             {
                 "name": "publish",
                 "image": "plugins/gh-pages:1",
-                "pull": "always",
                 "settings": {
                     "username": {
                         "from_secret": "github_username",
@@ -1459,7 +1426,6 @@ def makeGenerate(module):
         {
             "name": "generate nodejs",
             "image": "owncloudci/nodejs:14",
-            "pull": "always",
             "commands": [
                 "%s ci-node-generate" % (make),
             ],
@@ -1468,7 +1434,6 @@ def makeGenerate(module):
         {
             "name": "generate go",
             "image": "owncloudci/golang:1.17",
-            "pull": "always",
             "commands": [
                 "%s ci-go-generate" % (make),
             ],
@@ -1488,7 +1453,6 @@ def notify(ctx):
             {
                 "name": "notify-rocketchat",
                 "image": "plugins/slack:1",
-                "pull": "always",
                 "settings": {
                     "webhook": {
                         "from_secret": config["rocketchat"]["from_secret"],
@@ -1538,7 +1502,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
         {
             "name": "ocis-server",
             "image": "owncloudci/alpine:latest",
-            "pull": "always",
             "detach": True,
             "environment": environment,
             "commands": [
@@ -1550,7 +1513,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
         {
             "name": "wait-for-ocis-server",
             "image": "owncloudci/wait-for:latest",
-            "pull": "always",
             "commands": [
                 "wait-for -it ocis-server:9200 -t 300",
             ],
@@ -1562,7 +1524,6 @@ def cloneCoreRepos():
         {
             "name": "clone-core-repos",
             "image": "owncloudci/alpine:latest",
-            "pull": "always",
             "commands": [
                 "source /drone/src/.drone.env",
                 "git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing",
@@ -1579,7 +1540,6 @@ def redis():
         {
             "name": "redis",
             "image": "redis:6-alpine",
-            "pull": "always",
         },
     ]
 
@@ -1594,7 +1554,6 @@ def selenium():
         {
             "name": "selenium",
             "image": "selenium/standalone-chrome-debug:3.141.59",
-            "pull": "always",
             "volumes": [{
                 "name": "uploads",
                 "path": "/uploads",
@@ -1607,7 +1566,6 @@ def build():
         {
             "name": "build",
             "image": "owncloudci/golang:1.17",
-            "pull": "always",
             "commands": [
                 "make -C ocis build",
             ],
@@ -1710,7 +1668,6 @@ def checkStarlark():
             {
                 "name": "format-check-starlark",
                 "image": "owncloudci/bazel-buildifier",
-                "pull": "always",
                 "commands": [
                     "buildifier --mode=check .drone.star",
                 ],
@@ -1718,7 +1675,6 @@ def checkStarlark():
             {
                 "name": "show-diff",
                 "image": "owncloudci/bazel-buildifier",
-                "pull": "always",
                 "commands": [
                     "buildifier --mode=fix .drone.star",
                     "git diff",
@@ -1751,7 +1707,6 @@ def genericCache(name, action, mounts, cache_key):
     step = {
         "name": "%s_%s" % (action, name),
         "image": "meltwater/drone-cache:v1",
-        "pull": "always",
         "environment": {
             "AWS_ACCESS_KEY_ID": {
                 "from_secret": "cache_s3_access_key",
