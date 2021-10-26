@@ -404,7 +404,7 @@ class SpacesContext implements Context {
     }
 
     /**
-     * @Then the json responded should contain these key and value pairs
+     * @Then /the json responded should contain these key and value pairs/
      *
      * @param TableNode $table
      *
@@ -413,10 +413,36 @@ class SpacesContext implements Context {
     public function jsonRespondedShouldContain(TableNode $table) {
         $this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
         $responseJson = json_decode($this->featureContext->getResponse()->getBody(), true);
+
         foreach ($table->getHash() as $row) {
-            $expected = [$row["key"] => $row["value"]];
-            Assert::assertEquals($row["value"], $responseJson[$row["key"]]);
+            if (empty($this->searchKeyValueInArray($responseJson, $row["key"], $row["value"]))){
+                Assert::assertFalse($row["value"], ($row["value"] . ' not found'));
+            }
         }
+    }
+    
+    /**
+     * Method search for a match $key->$value
+     * 
+     * @param array $array
+     * @param string $key
+     * @param string $value
+     * @return array $results
+     */
+    public function searchKeyValueInArray($array, $key, $value)
+    {
+        $results = array();
+
+        if (is_array($array)) {
+            if (isset($array[$key]) && $array[$key] == $value) {
+                $results[] = $array;
+            }
+
+            foreach ($array as $subarray) {
+                $results = array_merge($results, $this->searchKeyValueInArray($subarray, $key, $value));
+            }
+        }
+        return $results;
     }
 
     /**
@@ -452,6 +478,7 @@ class SpacesContext implements Context {
             }
         }
     }
+
     /**
      * Verify that the tableNode contains expected number of columns
      *
@@ -532,5 +559,65 @@ class SpacesContext implements Context {
             return $results;
         }
         return false;
+    }
+
+    /**
+     * @When /^user "([^"]*)" creates a folder "([^"]*)" in space "([^"]*)" using the WebDav Api$/
+     *
+     * @param string $user 
+     * @param string $folder 
+     * @param string $spaceName 
+     *
+     * @return void
+     * @throws JsonException
+     */
+    public function theUserCreatesAFolderUsingTheGraphApi($user, $folder, $spaceName): void
+    {
+        $this->featureContext->setResponse(
+            $this->sendCreateFolderRequest(
+                $this->featureContext->getBaseUrl(),
+                "",
+                "MKCOL",
+                $user,
+                $this->featureContext->getPasswordForUser($user),
+                $folder,
+                $spaceName
+            )
+        );
+    }
+
+    /**
+     * Send Graph Create Space Request
+     *
+     * @param $baseUrl
+     * @param $user
+     * @param $password
+     * @param string $method
+     * @param string $xRequestId
+     * @param array $headers
+     * @param string $folder
+     * @param string $spaceName
+     * @return ResponseInterface
+     */
+    public function sendCreateFolderRequest(
+        $baseUrl,
+        string $xRequestId = '',
+        string $method,
+        $user,
+        $password,
+        $folder,
+        $spaceName,
+        array $headers = []
+        
+    ): ResponseInterface
+    {
+        $spaceId = $this->getAvailableSpaces()[$spaceName]["id"];
+        $fullUrl = $baseUrl;
+        if (!str_ends_with($fullUrl, '/')) {
+            $fullUrl .= '/';
+        }
+        $fullUrl .= "dav/spaces/" .  $spaceId . '/' . $folder;
+
+        return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers);
     }
 }
