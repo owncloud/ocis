@@ -31,9 +31,7 @@ and take note of its release tag name.
 1. Create a branch `update-web-$version` in the [ocis repository](https://github.com/owncloud/ocis)
 2. Change into web package folder via `cd web`
 3. Inside `web/`, update the `Makefile` so that the WEB_ASSETS_VERSION variable references the currently released version of https://github.com/owncloud/web
-4. Inside `web/`, replace the current assets with newly released ones by running `make pull-assets`
-5. Inside `web/`, run `make generate`. The output should look something like this: `web: embed.go - YYY/MM/DD ... to write [./embed.go] from config file ...`
-6. Move to the changelog (`cd ../changelog/`) and add a changelog file to the `unreleased/` folder (You can copy an old web release changelog item as a template)
-7. Move to the repo root (`cd ..`)and update the WEB_COMMITID in the `/.drone.env` file to the commit id from the released version (unless the existing commit id is already newer)
-8. **Optional:** Test the changes locally by running `cd ocis && go run cmd/ocis/main.go server`, visiting [https://localhost:9200](https://localhost:9200) and confirming everything renders correctly
-9. Commit your changes, push them and [create a PR](https://github.com/owncloud/ocis/pulls)
+4. Move to the changelog (`cd ../changelog/`) and add a changelog file to the `unreleased/` folder (You can copy an old web release changelog item as a template)
+5. Move to the repo root (`cd ..`)and update the WEB_COMMITID in the `/.drone.env` file to the commit id from the released version (unless the existing commit id is already newer)
+6. **Optional:** Test the changes locally by running `cd ocis && go run cmd/ocis/main.go server`, visiting [https://localhost:9200](https://localhost:9200) and confirming everything renders correctly
+7. Commit your changes, push them and [create a PR](https://github.com/owncloud/ocis/pulls)
