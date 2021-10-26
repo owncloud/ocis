@@ -22,6 +22,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Report quota states: [#2628](https://github.com/owncloud/ocis/pull/2628)
 * Enhancement - Start up a new machine auth provider in the storage service: [#2528](https://github.com/owncloud/ocis/pull/2528)
 * Enhancement - Enforce permission on update space quota: [#2650](https://github.com/owncloud/ocis/pull/2650)
+* Enhancement - Update lico to v0.51.1: [#2654](https://github.com/owncloud/ocis/pull/2654)
 * Enhancement - Update reva to v1.14.1-0.20211022092730-84a5191f1c5a: [#2658](https://github.com/owncloud/ocis/pull/2658)
 
 ## Details
@@ -153,6 +154,13 @@ The following sections list the changes for unreleased.
    quota.
 
    https://github.com/owncloud/ocis/pull/2650
+
+* Enhancement - Update lico to v0.51.1: [#2654](https://github.com/owncloud/ocis/pull/2654)
+
+   Updated lico to v0.51.1 This update includes: * Apply LibreGraph naming treewide * move to
+   go1.17 * Update 3rd party Go dependencies
+
+   https://github.com/owncloud/ocis/pull/2654
 
 * Enhancement - Update reva to v1.14.1-0.20211022092730-84a5191f1c5a: [#2658](https://github.com/owncloud/ocis/pull/2658)
 
