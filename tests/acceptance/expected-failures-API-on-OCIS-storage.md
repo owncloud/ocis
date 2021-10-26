@@ -897,7 +897,6 @@ special character username not valid
 -   [apiProvisioning-v1/getUser.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L35)
 -   [apiProvisioning-v2/addUser.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L20)
 -   [apiProvisioning-v2/addUser.feature:123](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L123)
--   [apiProvisioning-v2/addUser.feature:202](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L202)
 -   [apiProvisioning-v2/deleteUser.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/deleteUser.feature#L19)
 -   [apiProvisioning-v2/disableUser.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L19)
 -   [apiProvisioning-v2/editUser.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L29)
@@ -912,15 +911,8 @@ special character username not valid
 -   [apiTrashbin/trashbinFilesFolders.feature:252](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L252)
 -   [apiTrashbin/trashbinFilesFolders.feature:253](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L253)
 
-#### [Creating an already existing user works](https://github.com/owncloud/ocis-accounts/issues/80)
--   [apiProvisioning-v2/addUser.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L40)
--   [apiProvisioning-v2/addUser.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L47)
-
 #### [Password can be set to empty](https://github.com/owncloud/product/issues/197)
 -   [apiProvisioning-v2/addUser.feature:83](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L83)
-
-#### [Username is case sensitive](https://github.com/owncloud/ocis-accounts/issues/128)
--   [apiProvisioning-v2/addUser.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L116)
 
 #### [Client token generation not implemented](https://github.com/owncloud/ocis/issues/197)
 -   [apiProvisioning-v1/apiProvisioningUsingAppPassword.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/apiProvisioningUsingAppPassword.feature#L39)
@@ -1478,3 +1470,7 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 -   [apiShareManagementToShares/acceptShares.feature:577](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L577)
 -   [apiShareOperationsToShares2/shareAccessByID.feature:124](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L124)
 -   [apiShareOperationsToShares2/shareAccessByID.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L125)
+
+### [Content-type is not multipart/byteranges when downloading file with Range Header](https://github.com/owncloud/ocis/issues/2677)
+-   [apiWebdavOperations/downloadFile.feature:169](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L169)
+-   [apiWebdavOperations/downloadFile.feature:170](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L170)
