@@ -13,6 +13,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/mux"
 	"github.com/libregraph/lico/bootstrap"
+	dummyBackendSupport "github.com/libregraph/lico/bootstrap/backends/dummy"
+	guestBackendSupport "github.com/libregraph/lico/bootstrap/backends/guest"
+	kcBackendSupport "github.com/libregraph/lico/bootstrap/backends/kc"
+	ldapBackendSupport "github.com/libregraph/lico/bootstrap/backends/ldap"
 	licoconfig "github.com/libregraph/lico/config"
 	"github.com/libregraph/lico/server"
 	"github.com/owncloud/ocis/idp/pkg/assets"
@@ -45,6 +49,11 @@ func NewService(opts ...Option) Service {
 	if err := createConfigsIfNotExist(assetVFS, options.Config.IDP.IdentifierRegistrationConf, options.Config.IDP.Iss); err != nil {
 		logger.Fatal().Err(err).Msg("could not create default config")
 	}
+
+	guestBackendSupport.MustRegister()
+	ldapBackendSupport.MustRegister()
+	dummyBackendSupport.MustRegister()
+	kcBackendSupport.MustRegister()
 
 	bs, err := bootstrap.Boot(ctx, &options.Config.IDP, &licoconfig.Config{
 		Logger: logw.Wrap(logger),
