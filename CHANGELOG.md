@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
 * Change - New default data paths and easier configuration of the data path: [#2590](https://github.com/owncloud/ocis/pull/2590)
 * Change - Split spaces webdav url and graph url in base and path: [#2660](https://github.com/owncloud/ocis/pull/2660)
+* Change - Update ownCloud Web to v4.4.0: [#2681](https://github.com/owncloud/ocis/pull/2681)
 * Enhancement - Add user setting capability: [#2655](https://github.com/owncloud/ocis/pull/2655)
 * Enhancement - Broaden bufbuild/Buf usage: [#2630](https://github.com/owncloud/ocis/pull/2630)
 * Enhancement - Replace fileb0x with go-embed: [#1199](https://github.com/owncloud/ocis/issues/1199)
@@ -77,6 +78,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/2659
    https://github.com/owncloud/ocis/pull/2660
+
+* Change - Update ownCloud Web to v4.4.0: [#2681](https://github.com/owncloud/ocis/pull/2681)
+
+   Tags: web
+
+   We updated ownCloud Web to v4.4.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2681
+   https://github.com/owncloud/web/releases/tag/v4.4.0
 
 * Enhancement - Add user setting capability: [#2655](https://github.com/owncloud/ocis/pull/2655)
 
