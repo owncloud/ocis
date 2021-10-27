@@ -88,6 +88,47 @@ class SpacesContext implements Context {
     }
 
     /**
+     * Get SpaceId by Name
+     *
+     * @param $name string
+     * @return string
+     */
+    public function getSpaceIdByName(string $name): string
+    {
+        $response = json_decode($this->featureContext->getResponse()->getBody(), true);
+        if (isset($response['name']) && $response['name'] === $name) {
+            return $response["id"];
+        }
+        foreach ($response["value"] as $spaceCandidate) {
+            if ($spaceCandidate['name'] === $name) {
+                return $spaceCandidate["id"];
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get Space Array by name
+     *
+     * @param string $name
+     * @return array
+     */
+    public function getSpaceByName(string $name): array
+    {
+        $response = json_decode($this->featureContext->getResponse()->getBody(), true);
+        $spaceAsArray = $response;
+        if (isset($response['name']) && $response['name'] === $name) {
+            return $response;
+        }
+        foreach ($spaceAsArray["value"] as $spaceCandidate) {
+            if ($spaceCandidate['name'] === $name) {
+                return $spaceCandidate;
+            }
+        }
+        return [];
+    }
+
+    /**
      * @BeforeScenario
      *
      * @param BeforeScenarioScope $scope
@@ -404,41 +445,45 @@ class SpacesContext implements Context {
     }
 
     /**
-     * @Then /the json responded should contain these key and value pairs/
+     * @Then /^the json responded should contain a space "([^"]*)" with these key and value pairs:$/
      *
+     * @param string $spaceName
      * @param TableNode $table
      *
      * @return void
      */
-    public function jsonRespondedShouldContain(TableNode $table) {
+    public function jsonRespondedShouldContain($spaceName, TableNode $table) {
         $this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
+        Assert::assertIsArray($spaceAsArray = $this->getSpaceByName($spaceName), "No space with name $spaceName found");
         foreach ($table->getHash() as $row) {
-            $responseJson = json_decode($this->featureContext->getResponse()->getBody(), true);
+            // remember the original Space Array
+            $original = $spaceAsArray;
+            $row['value'] = $this->featureContext->substituteInLineCodes(
+                $row['value'],
+                $this->featureContext->getCurrentUser(),
+                [],
+                [
+                    [
+                        "code" => "%space_id%",
+                        "function" =>
+                            [$this, "getSpaceIdByName"],
+                        "parameter" => ["$spaceName"]
+                    ]
+                ]
+            );
             $segments = explode("@@@", $row["key"]);
+            // traverse down in the array
             foreach ($segments as $segment) {
-                $arrayKeyExists = array_key_exists($segment, $responseJson);
+                $arrayKeyExists = array_key_exists($segment, $spaceAsArray);
+                $key = $row["key"];
+                Assert::assertTrue($arrayKeyExists, "The key $key does not exist on the response");
                 if ($arrayKeyExists) {
-                    $responseJson = $responseJson[$segment];
-                }
-                else {
-                    foreach($responseJson as $firstLevelArray) {
-                        if (array_key_exists($segment, $firstLevelArray)){
-                            $responseJson = $firstLevelArray[$segment];
-                        } else {
-                            foreach($firstLevelArray as $secondLevelArray) {
-                                if (array_key_exists($segment, $secondLevelArray)){
-                                    $responseJson = $secondLevelArray[$segment];
-                                }
-                                else {
-                                    $key = $row["key"];
-                                    Assert::assertTrue(array_key_exists($segment, $secondLevelArray), "The key $key does not exist on the response");
-                                }
-                            }
-                        } 
-                    }
+                    $spaceAsArray = $spaceAsArray[$segment];
                 }
             }
-            Assert::assertEquals($row["value"], $responseJson);
+            Assert::assertEquals($row["value"], $spaceAsArray);
+            // set the spaceArray to the point before traversing
+            $spaceAsArray = $original;
         }
     }
 
@@ -561,14 +606,14 @@ class SpacesContext implements Context {
     /**
      * @When /^user "([^"]*)" creates a folder "([^"]*)" in space "([^"]*)" using the WebDav Api$/
      *
-     * @param string $user 
-     * @param string $folder 
-     * @param string $spaceName 
+     * @param string $user
+     * @param string $folder
+     * @param string $spaceName
      *
      * @return void
      * @throws JsonException
      */
-    public function theUserCreatesAFolderUsingTheWebDavApi($user, $folder, $spaceName): void
+    public function theUserCreatesAFolderUsingTheGraphApi($user, $folder, $spaceName): void
     {
         $this->featureContext->setResponse(
             $this->sendCreateFolderRequest(
@@ -584,7 +629,7 @@ class SpacesContext implements Context {
     }
 
     /**
-     * Send Webdav Create Folder Request
+     * Send Graph Create Space Request
      *
      * @param $baseUrl
      * @param $user
@@ -605,7 +650,7 @@ class SpacesContext implements Context {
         $folder,
         $spaceName,
         array $headers = []
-        
+
     ): ResponseInterface
     {
         $spaceId = $this->getAvailableSpaces()[$spaceName]["id"];
