@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Change - Configurable default quota: [#2621](https://github.com/owncloud/ocis/issues/2621)
 * Change - New default data paths and easier configuration of the data path: [#2590](https://github.com/owncloud/ocis/pull/2590)
 * Change - Split spaces webdav url and graph url in base and path: [#2660](https://github.com/owncloud/ocis/pull/2660)
+* Change - Update ownCloud Web to v4.4.0: [#2681](https://github.com/owncloud/ocis/pull/2681)
 * Enhancement - Add user setting capability: [#2655](https://github.com/owncloud/ocis/pull/2655)
 * Enhancement - Broaden bufbuild/Buf usage: [#2630](https://github.com/owncloud/ocis/pull/2630)
 * Enhancement - Replace fileb0x with go-embed: [#1199](https://github.com/owncloud/ocis/issues/1199)
@@ -22,7 +23,8 @@ The following sections list the changes for unreleased.
 * Enhancement - Report quota states: [#2628](https://github.com/owncloud/ocis/pull/2628)
 * Enhancement - Start up a new machine auth provider in the storage service: [#2528](https://github.com/owncloud/ocis/pull/2528)
 * Enhancement - Enforce permission on update space quota: [#2650](https://github.com/owncloud/ocis/pull/2650)
-* Enhancement - Update reva to v1.14.1-0.20211022092730-84a5191f1c5a: [#2658](https://github.com/owncloud/ocis/pull/2658)
+* Enhancement - Update lico to v0.51.1: [#2654](https://github.com/owncloud/ocis/pull/2654)
+* Enhancement - Update reva to v1.15: [#2658](https://github.com/owncloud/ocis/pull/2658)
 
 ## Details
 
@@ -76,6 +78,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/2659
    https://github.com/owncloud/ocis/pull/2660
+
+* Change - Update ownCloud Web to v4.4.0: [#2681](https://github.com/owncloud/ocis/pull/2681)
+
+   Tags: web
+
+   We updated ownCloud Web to v4.4.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2681
+   https://github.com/owncloud/web/releases/tag/v4.4.0
 
 * Enhancement - Add user setting capability: [#2655](https://github.com/owncloud/ocis/pull/2655)
 
@@ -154,9 +166,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/2650
 
-* Enhancement - Update reva to v1.14.1-0.20211022092730-84a5191f1c5a: [#2658](https://github.com/owncloud/ocis/pull/2658)
+* Enhancement - Update lico to v0.51.1: [#2654](https://github.com/owncloud/ocis/pull/2654)
 
-   Updated reva to v1.14.1-0.20211022092730-84a5191f1c5a This update includes: * Fix
+   Updated lico to v0.51.1 This update includes: * Apply LibreGraph naming treewide * move to
+   go1.17 * Update 3rd party Go dependencies
+
+   https://github.com/owncloud/ocis/pull/2654
+
+* Enhancement - Update reva to v1.15: [#2658](https://github.com/owncloud/ocis/pull/2658)
+
+   Updated reva to v1.15 This update includes: * Fix
    [cs3org/reva#2168](https://github.com/cs3org/reva/pull/2168): Override provider if
    was previously registered * Fix
    [cs3org/reva#2173](https://github.com/cs3org/reva/pull/2173): Fix archiver max size
@@ -183,11 +202,14 @@ The following sections list the changes for unreleased.
    recycle bin for arbitrary paths outside homes * Enh
    [cs3org/reva#2189](https://github.com/cs3org/reva/pull/2189): Add user settings
    capability * Enh [cs3org/reva#2162](https://github.com/cs3org/reva/pull/2162):
-   Implement the UpdateStorageSpace method
+   Implement the UpdateStorageSpace method * Enh
+   [cs3org/reva#2117](https://github.com/cs3org/reva/pull/2117): Add ocs cache warmup
+   strategy for first request from the user
 
    https://github.com/owncloud/ocis/pull/2658
    https://github.com/owncloud/ocis/pull/2536
    https://github.com/owncloud/ocis/pull/2650
+   https://github.com/owncloud/ocis/pull/2680
 # Changelog for [1.13.0] (2021-10-13)
 
 The following sections list the changes for 1.13.0.

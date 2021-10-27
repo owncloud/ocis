@@ -75,7 +75,7 @@ type Config struct {
 	HTTP    HTTP
 	Tracing Tracing
 	Asset   Asset
-	IDP     bootstrap.Config
+	IDP     bootstrap.Settings
 	Ldap    Ldap
 	Service Service
 
