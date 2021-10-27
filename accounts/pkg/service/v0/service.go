@@ -64,7 +64,7 @@ func New(opts ...Option) (s *Service, err error) {
 	}
 
 	r := oreg.GetRegistry()
-	if strings.ToLower(cfg.Repo.Backend) == "cs3" {
+	if cfg.Repo.Backend == "cs3" {
 		if _, err := r.GetService("com.owncloud.storage.metadata"); err != nil {
 			logger.Error().Err(err).Msg("index: storage-metadata service not present")
 			return nil, err
@@ -119,17 +119,17 @@ func configFromSvc(cfg *config.Config) (*idxcfg.Config, error) {
 		}
 	}(cfg)
 
-	switch backend := strings.ToLower(cfg.Repo.Backend); backend {
+	switch cfg.Repo.Backend {
 	case "disk":
 		c.Repo = idxcfg.Repo{
-			Backend: backend,
+			Backend: cfg.Repo.Backend,
 			Disk: idxcfg.Disk{
 				Path: cfg.Repo.Disk.Path,
 			},
 		}
 	case "cs3":
 		c.Repo = idxcfg.Repo{
-			Backend: backend,
+			Backend: cfg.Repo.Backend,
 			CS3: idxcfg.CS3{
 				ProviderAddr: cfg.Repo.CS3.ProviderAddr,
 				DataURL:      cfg.Repo.CS3.DataURL,
@@ -425,7 +425,7 @@ func (s Service) createDefaultGroups(withDemoGroups bool) (err error) {
 }
 
 func createMetadataStorage(cfg *config.Config, logger log.Logger) (storage.Repo, error) {
-	switch strings.ToLower(cfg.Repo.Backend) {
+	switch cfg.Repo.Backend {
 	case "disk":
 		return storage.NewDiskRepo(cfg, logger), nil
 	case "cs3":
