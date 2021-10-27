@@ -244,7 +244,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 							"dav":   map[string]interface{}{},
 							"files_sharing": map[string]interface{}{
 								"api_enabled":                       true,
-								"resharing":                         true,
+								"resharing":                         false,
 								"group_sharing":                     true,
 								"auto_accept_share":                 true,
 								"share_with_group_members_only":     true,
