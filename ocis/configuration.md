@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-26T18:26:49+0000"
+date: "2021-10-27T05:26:24+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -112,13 +112,11 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
-### ocis kill
+### ocis health
 
-Kill an extension by name
+Check health status
 
-Usage: `ocis kill [command options] [arguments...]`
-
-
+Usage: `ocis health [command options] [arguments...]`
 
 
 
@@ -132,6 +130,11 @@ Usage: `ocis kill [command options] [arguments...]`
 
 
 
+
+
+
+-debug-addr |  $OCIS_DEBUG_ADDR
+: Address to debug endpoint. Default: `127.0.0.1:9010`.
 
 
 
@@ -175,6 +178,35 @@ Usage: `ocis list [command options] [arguments...]`
 Runs an extension
 
 Usage: `ocis run [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### ocis kill
+
+Kill an extension by name
+
+Usage: `ocis kill [command options] [arguments...]`
 
 
 
@@ -252,131 +284,99 @@ Usage: `ocis server [command options] [arguments...]`
 -extensions |  $OCIS_RUN_EXTENSIONS
 : Run specific extensions during supervised mode.
 
-### ocis health
-
-Check health status
-
-Usage: `ocis health [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $OCIS_DEBUG_ADDR
-: Address to debug endpoint. Default: `127.0.0.1:9010`.
-
-
-
-
-
-
-
-
-
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
-
-#### ocis thumbnails
-
-Start thumbnails server
-
-#### ocis version
-
-Lists running services with version
-
-#### ocis webdav
-
-Start webdav server
-
-#### ocis glauth
-
-Start glauth server
-
-#### ocis idp
-
-Start idp server
-
-#### ocis storage-public-link
-
-Start storage public link storage
-
-#### ocis accounts
-
-Start accounts server
-
-#### ocis storage-home
-
-Start storage and data provider for /home mount
-
-#### ocis storage-userprovider
-
-Start storage userprovider service
-
-#### ocis storage-users
-
-Start storage and data provider for /users mount
 
 #### ocis store
 
 Start a go-micro store
 
-#### ocis proxy
+#### ocis storage-app-provider
 
-Start proxy server
-
-#### ocis storage-auth-bearer
-
-Start storage auth-bearer service
+Start storage app-provider service
 
 #### ocis storage-groupprovider
 
 Start storage groupprovider service
 
-#### ocis storage-sharing
+#### ocis storage-userprovider
 
-Start storage sharing service
+Start storage userprovider service
 
-#### ocis storage-app-provider
+#### ocis version
 
-Start storage app-provider service
+Lists running services with version
 
-#### ocis storage-frontend
+#### ocis proxy
 
-Start storage frontend
+Start proxy server
+
+#### ocis storage-metadata
+
+Start storage and data service for metadata
 
 #### ocis storage-gateway
 
 Start storage gateway
 
+#### ocis thumbnails
+
+Start thumbnails server
+
+#### ocis idp
+
+Start idp server
+
+#### ocis glauth
+
+Start glauth server
+
 #### ocis ocs
 
 Start ocs server
-
-#### ocis settings
-
-Start settings server
-
-#### ocis web
-
-Start web server
 
 #### ocis storage-auth-basic
 
 Start storage auth-basic service
 
-#### ocis storage-metadata
+#### ocis storage-home
 
-Start storage and data service for metadata
+Start storage and data provider for /home mount
+
+#### ocis storage-users
+
+Start storage and data provider for /users mount
+
+#### ocis web
+
+Start web server
+
+#### ocis webdav
+
+Start webdav server
+
+#### ocis accounts
+
+Start accounts server
+
+#### ocis settings
+
+Start settings server
+
+#### ocis storage-auth-bearer
+
+Start storage auth-bearer service
+
+#### ocis storage-frontend
+
+Start storage frontend
+
+#### ocis storage-public-link
+
+Start storage public link storage
+
+#### ocis storage-sharing
+
+Start storage sharing service
 
