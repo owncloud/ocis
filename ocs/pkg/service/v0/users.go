@@ -181,7 +181,7 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	}
 	if strings.TrimSpace(password) == "" {
 		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "empty password not allowed")))
-		o.logger.Error().Err(err).Str("userid", userid).Msg("empty password not allowed")
+		o.logger.Error().Str("userid", userid).Msg("empty password not allowed")
 		return
 	}
 
