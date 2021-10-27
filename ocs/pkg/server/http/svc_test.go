@@ -542,6 +542,7 @@ func init() {
 			DemoUsersAndGroups: true,
 		},
 		Repo: accountsCfg.Repo{
+			Backend: "disk",
 			Disk: accountsCfg.Disk{
 				Path: dataPath,
 			},

@@ -184,7 +184,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "storage-backend",
-			Value:       flags.OverrideDefaultString(cfg.Repo.Disk.Path, "CS3"),
+			Value:       flags.OverrideDefaultString(cfg.Repo.Backend, "CS3"),
 			Usage:       "Which backend to use to store accounts data (CS3 or disk)",
 			EnvVars:     []string{"ACCOUNTS_STORAGE_BACKEND"},
 			Destination: &cfg.Repo.Backend,
