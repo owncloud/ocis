@@ -412,37 +412,34 @@ class SpacesContext implements Context {
      */
     public function jsonRespondedShouldContain(TableNode $table) {
         $this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
-        $responseJson = json_decode($this->featureContext->getResponse()->getBody(), true);
-
         foreach ($table->getHash() as $row) {
-            if (empty($this->searchKeyValueInArray($responseJson, $row["key"], $row["value"]))){
-                Assert::assertFalse($row["value"], ($row["value"] . ' not found'));
+            $responseJson = json_decode($this->featureContext->getResponse()->getBody(), true);
+            $segments = explode("@@@", $row["key"]);
+            foreach ($segments as $segment) {
+                $arrayKeyExists = array_key_exists($segment, $responseJson);
+                if ($arrayKeyExists) {
+                    $responseJson = $responseJson[$segment];
+                }
+                else {
+                    foreach($responseJson as $firstLevelArray) {
+                        if (array_key_exists($segment, $firstLevelArray)){
+                            $responseJson = $firstLevelArray[$segment];
+                        } else {
+                            foreach($firstLevelArray as $secondLevelArray) {
+                                if (array_key_exists($segment, $secondLevelArray)){
+                                    $responseJson = $secondLevelArray[$segment];
+                                }
+                                else {
+                                    $key = $row["key"];
+                                    Assert::assertTrue(array_key_exists($segment, $secondLevelArray), "The key $key does not exist on the response");
+                                }
+                            }
+                        } 
+                    }
+                }
             }
+            Assert::assertEquals($row["value"], $responseJson);
         }
-    }
-    
-    /**
-     * Method search for a match $key->$value
-     * 
-     * @param array $array
-     * @param string $key
-     * @param string $value
-     * @return array $results
-     */
-    public function searchKeyValueInArray($array, $key, $value)
-    {
-        $results = array();
-
-        if (is_array($array)) {
-            if (isset($array[$key]) && $array[$key] == $value) {
-                $results[] = $array;
-            }
-
-            foreach ($array as $subarray) {
-                $results = array_merge($results, $this->searchKeyValueInArray($subarray, $key, $value));
-            }
-        }
-        return $results;
     }
 
     /**
@@ -571,7 +568,7 @@ class SpacesContext implements Context {
      * @return void
      * @throws JsonException
      */
-    public function theUserCreatesAFolderUsingTheGraphApi($user, $folder, $spaceName): void
+    public function theUserCreatesAFolderUsingTheWebDavApi($user, $folder, $spaceName): void
     {
         $this->featureContext->setResponse(
             $this->sendCreateFolderRequest(
@@ -587,7 +584,7 @@ class SpacesContext implements Context {
     }
 
     /**
-     * Send Graph Create Space Request
+     * Send Webdav Create Folder Request
      *
      * @param $baseUrl
      * @param $user
