@@ -340,6 +340,14 @@ File and sync features in a shared scenario
 - [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L47)
 - [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L48)
 
+#### [Shares received in different ways are not merged](https://github.com/owncloud/ocis/issues/2711)
+- [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:553](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L553)
+- [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:554](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L554)
+- [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:598](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L598)
+- [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:599](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L599)
+- [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:621](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L621)
+- [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:622](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L622)
+
 #### [file_target of a auto-renamed file is not correct directly after sharing](https://github.com/owncloud/core/issues/32322)
 -   [apiShareManagementBasicToShares/deleteShareFromShares.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L59)
 -   [apiShareManagementToShares/mergeShare.feature:89](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/mergeShare.feature#L89)
