@@ -7,8 +7,9 @@ import (
 
 // Repo defines which storage implementation is to be used.
 type Repo struct {
-	Disk Disk
-	CS3  CS3
+	Backend string
+	Disk    Disk
+	CS3     CS3
 }
 
 // Disk is the local disk implementation of the storage.

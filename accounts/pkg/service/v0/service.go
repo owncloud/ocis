@@ -2,12 +2,13 @@ package service
 
 import (
 	"context"
-	"errors"
 	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 
@@ -48,17 +49,22 @@ func New(opts ...Option) (s *Service, err error) {
 		roleManager = &m
 	}
 
+	storage, err := createMetadataStorage(cfg, logger)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not create metadata storage")
+	}
+
 	s = &Service{
 		id:          cfg.GRPC.Namespace + "." + cfg.Server.Name,
 		log:         logger,
 		Config:      cfg,
 		RoleService: roleService,
 		RoleManager: roleManager,
-		repo:        createMetadataStorage(cfg, logger),
+		repo:        storage,
 	}
 
 	r := oreg.GetRegistry()
-	if strings.ToLower(cfg.Repo.Backend) != "disk" {
+	if strings.ToLower(cfg.Repo.Backend) == "cs3" {
 		if _, err := r.GetService("com.owncloud.storage.metadata"); err != nil {
 			logger.Error().Err(err).Msg("index: storage-metadata service not present")
 			return nil, err
@@ -113,40 +119,41 @@ func configFromSvc(cfg *config.Config) (*idxcfg.Config, error) {
 		}
 	}(cfg)
 
-	if (config.Repo{}) != cfg.Repo {
-		if (config.Disk{}) != cfg.Repo.Disk {
-			c.Repo = idxcfg.Repo{
-				Disk: idxcfg.Disk{
-					Path: cfg.Repo.Disk.Path,
-				},
-			}
+	switch backend := strings.ToLower(cfg.Repo.Backend); backend {
+	case "disk":
+		c.Repo = idxcfg.Repo{
+			Backend: backend,
+			Disk: idxcfg.Disk{
+				Path: cfg.Repo.Disk.Path,
+			},
 		}
+	case "cs3":
+		c.Repo = idxcfg.Repo{
+			Backend: backend,
+			CS3: idxcfg.CS3{
+				ProviderAddr: cfg.Repo.CS3.ProviderAddr,
+				DataURL:      cfg.Repo.CS3.DataURL,
+				DataPrefix:   cfg.Repo.CS3.DataPrefix,
+				JWTSecret:    cfg.Repo.CS3.JWTSecret,
+			},
+		}
+	default:
+		return nil, errors.New("index backend " + cfg.Repo.Backend + " is not supported")
+	}
 
-		if (config.CS3{}) != cfg.Repo.CS3 {
-			c.Repo = idxcfg.Repo{
-				CS3: idxcfg.CS3{
-					ProviderAddr: cfg.Repo.CS3.ProviderAddr,
-					DataURL:      cfg.Repo.CS3.DataURL,
-					DataPrefix:   cfg.Repo.CS3.DataPrefix,
-					JWTSecret:    cfg.Repo.CS3.JWTSecret,
-				},
-			}
+	if (config.Index{}) != cfg.Index {
+		c.Index = idxcfg.Index{
+			UID: idxcfg.Bound{
+				Lower: cfg.Index.UID.Lower,
+			},
+			GID: idxcfg.Bound{
+				Lower: cfg.Index.GID.Lower,
+			},
 		}
+	}
 
-		if (config.Index{}) != cfg.Index {
-			c.Index = idxcfg.Index{
-				UID: idxcfg.Bound{
-					Lower: cfg.Index.UID.Lower,
-				},
-				GID: idxcfg.Bound{
-					Lower: cfg.Index.GID.Lower,
-				},
-			}
-		}
-
-		if (config.ServiceUser{}) != cfg.ServiceUser {
-			c.ServiceUser = cfg.ServiceUser
-		}
+	if (config.ServiceUser{}) != cfg.ServiceUser {
+		c.ServiceUser = cfg.ServiceUser
 	}
 
 	return c, nil
@@ -417,17 +424,19 @@ func (s Service) createDefaultGroups(withDemoGroups bool) (err error) {
 	return nil
 }
 
-func createMetadataStorage(cfg *config.Config, logger log.Logger) storage.Repo {
-	// for now we detect the used storage implementation based on which storage is configured
-	// the config with defaults needs to be checked last
-	if cfg.Repo.Disk.Path != "" {
-		return storage.NewDiskRepo(cfg, logger)
+func createMetadataStorage(cfg *config.Config, logger log.Logger) (storage.Repo, error) {
+	switch strings.ToLower(cfg.Repo.Backend) {
+	case "disk":
+		return storage.NewDiskRepo(cfg, logger), nil
+	case "cs3":
+		repo, err := storage.NewCS3Repo(cfg)
+		if err != nil {
+			return nil, errors.Wrap(err, "cs3 backend was configured but failed to start")
+		}
+		return repo, nil
+	default:
+		return nil, errors.New("backend type " + cfg.Repo.Backend + " is not supported")
 	}
-	repo, err := storage.NewCS3Repo(cfg)
-	if err != nil {
-		logger.Fatal().Err(err).Msg("cs3 storage was configured but failed to start")
-	}
-	return repo
 }
 
 // Service implements the AccountsServiceHandler interface
