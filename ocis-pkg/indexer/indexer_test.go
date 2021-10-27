@@ -300,6 +300,7 @@ func TestQueryDiskImpl(t *testing.T) {
 func createDiskIndexer(dataDir string) *Indexer {
 	return CreateIndexer(&config.Config{
 		Repo: config.Repo{
+			Backend: "disk",
 			Disk: config.Disk{
 				Path: dataDir,
 			},

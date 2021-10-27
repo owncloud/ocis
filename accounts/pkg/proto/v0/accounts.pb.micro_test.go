@@ -80,6 +80,7 @@ func init() {
 	)
 
 	cfg := config.New()
+	cfg.Repo.Backend = "disk"
 	cfg.Repo.Disk.Path = dataPath
 	cfg.Server.DemoUsersAndGroups = true
 	var hdlr *svc.Service

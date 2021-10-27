@@ -33,6 +33,7 @@ var (
 func init() {
 	cfg := config.New()
 	cfg.Server.Name = "accounts"
+	cfg.Repo.Backend = "disk"
 	cfg.Repo.Disk.Path = dataPath
 	logger := olog.NewLogger(olog.Color(true), olog.Pretty(true))
 	roleServiceMock = buildRoleServiceMock()

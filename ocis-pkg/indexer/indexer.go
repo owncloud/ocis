@@ -3,9 +3,10 @@ package indexer
 
 import (
 	"fmt"
-	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"path"
 	"strings"
+
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"github.com/CiscoM31/godata"
 	"github.com/iancoleman/strcase"
@@ -39,14 +40,6 @@ func CreateIndexer(cfg *config.Config) *Indexer {
 	}
 }
 
-func getRegistryStrategy(cfg *config.Config) string {
-	if cfg.Repo.Disk.Path != "" {
-		return "disk"
-	}
-
-	return "cs3"
-}
-
 // Reset takes care of deleting all indices from storage and from the internal map of indices
 func (i *Indexer) Reset() error {
 	for j := range i.indices {
@@ -66,11 +59,10 @@ func (i *Indexer) Reset() error {
 
 // AddIndex adds a new index to the indexer receiver.
 func (i *Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexType string, bound *option.Bound, caseInsensitive bool) error {
-	strategy := getRegistryStrategy(i.config)
-	f := registry.IndexConstructorRegistry[strategy][indexType]
+	f := registry.IndexConstructorRegistry[i.config.Repo.Backend][indexType]
 	var idx index.Index
 
-	if strategy == "cs3" {
+	if i.config.Repo.Backend == "cs3" {
 		idx = f(
 			option.CaseInsensitive(caseInsensitive),
 			option.WithEntity(t),
