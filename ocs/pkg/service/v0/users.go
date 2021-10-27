@@ -179,6 +179,11 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	if strings.TrimSpace(password) == "" {
+		mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "empty password not allowed")))
+		o.logger.Error().Str("userid", userid).Msg("empty password not allowed")
+		return
+	}
 
 	// fallbacks
 	/* TODO decide if we want to make these fallbacks. Keep in mind:

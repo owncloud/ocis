@@ -911,9 +911,6 @@ special character username not valid
 -   [apiTrashbin/trashbinFilesFolders.feature:252](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L252)
 -   [apiTrashbin/trashbinFilesFolders.feature:253](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L253)
 
-#### [Password can be set to empty](https://github.com/owncloud/product/issues/197)
--   [apiProvisioning-v2/addUser.feature:83](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L83)
-
 #### [Client token generation not implemented](https://github.com/owncloud/ocis/issues/197)
 -   [apiProvisioning-v1/apiProvisioningUsingAppPassword.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/apiProvisioningUsingAppPassword.feature#L39)
 -   [apiProvisioning-v1/apiProvisioningUsingAppPassword.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/apiProvisioningUsingAppPassword.feature#L67)

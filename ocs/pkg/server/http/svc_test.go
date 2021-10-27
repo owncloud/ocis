@@ -169,6 +169,8 @@ var formats = []string{"json", "xml"}
 
 var dataPath = createTmpDir()
 
+var defaultPassword = "Testing123"
+
 var defaultUsers = []string{
 	userEinstein,
 	userIDP,
@@ -709,6 +711,10 @@ func getService() svc.Service {
 }
 
 func createUser(u User) error {
+	// add default password if not set differently
+	if u.Password == "" {
+		u.Password = defaultPassword
+	}
 	_, err := sendRequest(
 		"POST",
 		userProvisioningEndPoint,
@@ -765,17 +771,6 @@ func TestCreateUser(t *testing.T) {
 				UIDNumber:   20027,
 				GIDNumber:   30000,
 				Password:    "newPassword",
-			},
-			nil,
-		},
-		// https://github.com/owncloud/ocis-ocs/issues/50
-		{
-			"User without password",
-			User{
-				Enabled:     "true",
-				ID:          "john",
-				Email:       "john@example.com",
-				Displayname: "John Dalton",
 			},
 			nil,
 		},
