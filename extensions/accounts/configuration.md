@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-27T14:59:25+0000"
+date: "2021-10-27T15:06:28+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -35,15 +35,11 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### accounts inspect
+### accounts list
 
-Show detailed data on an existing account
+List existing accounts
 
-Usage: `accounts inspect [command options] [arguments...]`
-
-
-
-
+Usage: `accounts list [command options] [arguments...]`
 
 
 
@@ -121,6 +117,10 @@ Usage: `accounts inspect [command options] [arguments...]`
 
 -name |  $ACCOUNTS_NAME
 : service name. Default: `"accounts"`.
+
+
+
+
 
 ### accounts remove
 
@@ -206,99 +206,6 @@ Usage: `accounts remove [command options] [arguments...]`
 
 -name |  $ACCOUNTS_NAME
 : service name. Default: `"accounts"`.
-
-
-
-### accounts ocis-accounts
-
-Provide accounts and groups for oCIS
-
-Usage: `accounts ocis-accounts [command options] [arguments...]`
-
-
--log-level |  $ACCOUNTS_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
-
--log-pretty |  $ACCOUNTS_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
-
--log-color |  $ACCOUNTS_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
-
-
--extensions | 
-: Run specific extensions during supervised mode.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -701,6 +608,267 @@ Usage: `accounts version [command options] [arguments...]`
 
 
 
+### accounts inspect
+
+Show detailed data on an existing account
+
+Usage: `accounts inspect [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `"accounts"`.
+
+### accounts rebuildIndex
+
+Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
+
+Usage: `accounts rebuildIndex [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### accounts ocis-accounts
+
+Provide accounts and groups for oCIS
+
+Usage: `accounts ocis-accounts [command options] [arguments...]`
+
+
+-log-level |  $ACCOUNTS_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+
+-log-pretty |  $ACCOUNTS_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+
+-log-color |  $ACCOUNTS_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
+
+-extensions | 
+: Run specific extensions during supervised mode.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### accounts add
 
 Create a new account
@@ -820,174 +988,6 @@ Usage: `accounts add [command options] [arguments...]`
 
 -force-password-change-mfa | 
 : Force password change on next sign-in with mfa.
-
-
-
-
-
-
-
-### accounts list
-
-List existing accounts
-
-Usage: `accounts list [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
-
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `"accounts"`.
-
-
-
-
-
-### accounts rebuildIndex
-
-Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
-
-Usage: `accounts rebuildIndex [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
