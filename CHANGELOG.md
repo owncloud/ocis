@@ -1,3 +1,20 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.14.0...master
+
+## Summary
+
+* Bugfix - Don't allow empty password: [#197](https://github.com/owncloud/product/issues/197)
+
+## Details
+
+* Bugfix - Don't allow empty password: [#197](https://github.com/owncloud/product/issues/197)
+
+   It was allowed to create users with empty or spaces-only password. This is fixed
+
+   https://github.com/owncloud/product/issues/197
 # Changelog for [1.14.0] (2021-10-27)
 
 The following sections list the changes for 1.14.0.
