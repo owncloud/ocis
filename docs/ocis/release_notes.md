@@ -28,7 +28,7 @@ You can also read the full [ownCloud Infinite Scale changelog](https://github.co
 
 ### Breaking changes
 {{< hint warning >}}
-We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref"./release_roadmap" >}})
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref"./release_roadmap">}})
 {{< /hint >}}
 
 ## ownCloud Infinite Scale 1.13.0 Technology Preview
