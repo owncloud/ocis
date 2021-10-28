@@ -3,6 +3,7 @@
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
+use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\SetupHelper;
@@ -96,7 +97,7 @@ class SpacesContext implements Context {
      */
     public function getSpaceIdByName(string $name): string
     {
-        $response = json_decode($this->featureContext->getResponse()->getBody(), true);
+        $response = json_decode($this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
         if (isset($response['name']) && $response['name'] === $name) {
             return $response["id"];
         }
@@ -113,10 +114,11 @@ class SpacesContext implements Context {
      *
      * @param string $name
      * @return array
+     * @throws Exception
      */
     public function getSpaceByName(string $name): array
     {
-        $response = json_decode($this->featureContext->getResponse()->getBody(), true);
+        $response = json_decode($this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $spaceAsArray = $response;
         if (isset($response['name']) && $response['name'] === $name) {
             return $response;
@@ -162,6 +164,7 @@ class SpacesContext implements Context {
      * @param array $body
      * @param array $headers
      * @return ResponseInterface
+     * @throws GuzzleException
      */
     public function listSpacesRequest(
         string $baseUrl,
@@ -191,6 +194,7 @@ class SpacesContext implements Context {
      * @param string $xRequestId
      * @param array $headers
      * @return ResponseInterface
+     * @throws GuzzleException
      */
     public function sendCreateSpaceRequest(
         string $baseUrl,
@@ -219,6 +223,7 @@ class SpacesContext implements Context {
      * @param string $xRequestId
      * @param array $headers
      * @return ResponseInterface
+     * @throws GuzzleException
      */
     public function sendPropfindRequestToUrl(
         string $fullUrl,
@@ -234,8 +239,9 @@ class SpacesContext implements Context {
     /**
      * @When /^user "([^"]*)" lists all available spaces via the GraphApi$/
      *
-     * @param $user
+     * @param string $user
      * @return void
+     * @throws GuzzleException
      */
     public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user): void
     {
@@ -259,6 +265,8 @@ class SpacesContext implements Context {
      * @param string $spaceType
      *
      * @return void
+     * @throws GuzzleException
+     * @throws Exception
      */
     public function theUserCreatesASpaceUsingTheGraphApi(
         string $user,
@@ -266,7 +274,7 @@ class SpacesContext implements Context {
         string $spaceType): void
     {
         $space = ["Name" => $spaceName, "driveType" => $spaceType];
-        $body = json_encode($space);
+        $body = json_encode($space, JSON_THROW_ON_ERROR);
         $this->featureContext->setResponse(
             $this->sendCreateSpaceRequest(
                 $this->featureContext->getBaseUrl(),
@@ -287,6 +295,8 @@ class SpacesContext implements Context {
      * @param int $quota
      *
      * @return void
+     * @throws GuzzleException
+     * @throws Exception
      */
     public function theUserCreatesASpaceWithQuotaUsingTheGraphApi(
         string $user,
@@ -314,6 +324,8 @@ class SpacesContext implements Context {
      * @param string $role
      *
      * @return void
+     * @throws GuzzleException
+     * @throws Exception
      */
     public function theAdministratorGivesUserTheRole(string $user, string $role): void
     {
@@ -333,8 +345,8 @@ class SpacesContext implements Context {
         $this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, "{}"));
         if ($this->featureContext->getResponse()) {
             $rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
-            if (isset(\json_decode($rawBody,  true)["bundles"])) {
-                $bundles = \json_decode($rawBody, true)["bundles"];
+            if (isset(\json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["bundles"])) {
+                $bundles = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["bundles"];
             }
         }
         $roleToAssign = "";
@@ -351,8 +363,8 @@ class SpacesContext implements Context {
         $this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, "{}"));
         if ($this->featureContext->getResponse()) {
             $rawBody = $this->featureContext->getResponse()->getBody()->getContents();
-            if (isset(\json_decode($rawBody,  true)["accounts"])) {
-                $accounts = \json_decode($rawBody, true)["accounts"];
+            if (isset(\json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["accounts"])) {
+                $accounts = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["accounts"];
             }
         }
         $accountToChange = "";
@@ -366,13 +378,13 @@ class SpacesContext implements Context {
 
         // set the new role
         $fullUrl = $baseUrl . "api/v0/settings/assignments-add";
-        $body = json_encode(["account_uuid" => $accountToChange["id"], "role_id" => $roleToAssign["id"]]);
+        $body = json_encode(["account_uuid" => $accountToChange["id"], "role_id" => $roleToAssign["id"]], JSON_THROW_ON_ERROR);
 
         $this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, $body));
         if ($this->featureContext->getResponse()) {
             $rawBody = $this->featureContext->getResponse()->getBody()->getContents();
-            if (isset(\json_decode($rawBody,  true)["assignment"])) {
-                $assignment = \json_decode($rawBody, true)["assignment"];
+            if (isset(\json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["assignment"])) {
+                $assignment = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["assignment"];
             }
         }
 
@@ -385,11 +397,13 @@ class SpacesContext implements Context {
      * Remember the available Spaces
      *
      * @return void
+     *
+     * @throws Exception
      */
     public function rememberTheAvailableSpaces(): void
     {
         $rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
-        $drives = json_decode($rawBody,  true);
+        $drives = json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
         if (isset($drives["value"])) {
             $drives = $drives["value"];
         }
@@ -409,6 +423,7 @@ class SpacesContext implements Context {
      * @param string $user
      * @param string $name
      * @return void
+     * @throws GuzzleException
      */
     public function theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
         string $user,
@@ -457,6 +472,7 @@ class SpacesContext implements Context {
      * @param TableNode $table
      *
      * @return void
+     * @throws Exception
      */
     public function jsonRespondedShouldContain(
         string $spaceName,
@@ -476,7 +492,7 @@ class SpacesContext implements Context {
                         "code" => "%space_id%",
                         "function" =>
                             [$this, "getSpaceIdByName"],
-                        "parameter" => ["$spaceName"]
+                        "parameter" => [$spaceName]
                     ]
                 ]
             );
@@ -556,14 +572,14 @@ class SpacesContext implements Context {
      * and returns found search results if found else returns false
      *
      * @param string|null $entryNameToSearch
-     * @return string|array|boolean
+     * @return array
      * string if $entryNameToSearch is given and is found
      * array if $entryNameToSearch is not given
      * boolean false if $entryNameToSearch is given and is not found
      */
     public function findEntryFromPropfindResponse(
         string $entryNameToSearch = null
-    ) {
+    ): array {
         $spaceId = $this->getResponseSpaceId();
         //if we are using that step the second time in a scenario e.g. 'But ... should not'
         //then don't parse the result again, because the result in a ResponseInterface
@@ -608,7 +624,7 @@ class SpacesContext implements Context {
         if ($entryNameToSearch === null) {
             return $results;
         }
-        return false;
+        return [];
     }
 
     /**
@@ -619,6 +635,7 @@ class SpacesContext implements Context {
      * @param string $spaceName
      *
      * @return void
+     * @throws GuzzleException
      */
     public function theUserCreatesAFolderUsingTheGraphApi(
         string $user,
@@ -650,6 +667,7 @@ class SpacesContext implements Context {
      * @param string $xRequestId
      * @param array $headers
      * @return ResponseInterface
+     * @throws GuzzleException
      */
     public function sendCreateFolderRequest(
         string $baseUrl,
