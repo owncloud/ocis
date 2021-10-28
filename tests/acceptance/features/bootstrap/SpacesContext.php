@@ -2,11 +2,11 @@
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\TableNode;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\SetupHelper;
 use PHPUnit\Framework\Assert;
-use \Behat\Gherkin\Node\TableNode;
 
 require_once 'bootstrap.php';
 
@@ -69,7 +69,7 @@ class SpacesContext implements Context {
      *
      * @var string
      */
-    private $responseSpaceId;
+    private string $responseSpaceId;
 
     /**
      * @param string $responseSpaceId
@@ -92,6 +92,7 @@ class SpacesContext implements Context {
      *
      * @param $name string
      * @return string
+     * @throws Exception
      */
     public function getSpaceIdByName(string $name): string
     {
@@ -104,7 +105,7 @@ class SpacesContext implements Context {
                 return $spaceCandidate["id"];
             }
         }
-        return false;
+        throw new Exception(__METHOD__ . " space with name $name not found");
     }
 
     /**
@@ -153,29 +154,29 @@ class SpacesContext implements Context {
     /**
      * Send Graph List Spaces Request
      *
-     * @param $baseUrl
-     * @param $user
-     * @param $password
-     * @param $arguments
+     * @param string $baseUrl
+     * @param string $user
+     * @param string $password
+     * @param string $urlArguments
      * @param string $xRequestId
      * @param array $body
      * @param array $headers
      * @return ResponseInterface
      */
     public function listSpacesRequest(
-        $baseUrl,
-        $user,
-        $password,
-        $arguments,
+        string $baseUrl,
+        string $user,
+        string $password,
+        string $urlArguments,
         string $xRequestId = '',
-        array $body = [],
-        array $headers = []
-    ) {
+        array  $body = [],
+        array  $headers = []
+    ): ResponseInterface {
         $fullUrl = $baseUrl;
         if (!str_ends_with($fullUrl, '/')) {
             $fullUrl .= '/';
         }
-        $fullUrl .= "graph/v1.0/me/drives/" . $arguments;
+        $fullUrl .= "graph/v1.0/me/drives/" . $urlArguments;
 
         return HttpRequestHelper::get($fullUrl, $xRequestId, $user, $password, $headers, $body);
     }
@@ -183,18 +184,18 @@ class SpacesContext implements Context {
     /**
      * Send Graph Create Space Request
      *
-     * @param $baseUrl
-     * @param $user
-     * @param $password
+     * @param string $baseUrl
+     * @param string $user
+     * @param string $password
      * @param string $body
      * @param string $xRequestId
      * @param array $headers
      * @return ResponseInterface
      */
     public function sendCreateSpaceRequest(
-        $baseUrl,
-        $user,
-        $password,
+        string $baseUrl,
+        string $user,
+        string $password,
         string $body,
         string $xRequestId = '',
         array $headers = []
@@ -212,17 +213,17 @@ class SpacesContext implements Context {
     /**
      * Send Propfind Request to Url
      *
-     * @param $fullUrl
-     * @param $user
-     * @param $password
+     * @param string $fullUrl
+     * @param string $user
+     * @param string $password
      * @param string $xRequestId
      * @param array $headers
      * @return ResponseInterface
      */
     public function sendPropfindRequestToUrl(
-        $fullUrl,
-        $user,
-        $password,
+        string $fullUrl,
+        string $user,
+        string $password,
         string $xRequestId = '',
         array $headers = []
     ): ResponseInterface
@@ -236,7 +237,7 @@ class SpacesContext implements Context {
      * @param $user
      * @return void
      */
-    public function theUserListsAllHisAvailableSpacesUsingTheGraphApi($user): void
+    public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user): void
     {
         $this->featureContext->setResponse(
             $this->listSpacesRequest(
@@ -253,13 +254,16 @@ class SpacesContext implements Context {
     /**
      * @When /^user "([^"]*)" creates a space "([^"]*)" of type "([^"]*)" with the default quota using the GraphApi$/
      *
-     * @param $user string
-     * @param $spaceName string
-     * @param $spaceType string
+     * @param string $user
+     * @param string $spaceName
+     * @param string $spaceType
      *
      * @return void
      */
-    public function theUserCreatesASpaceUsingTheGraphApi($user, $spaceName, $spaceType): void
+    public function theUserCreatesASpaceUsingTheGraphApi(
+        string $user,
+        string $spaceName,
+        string $spaceType): void
     {
         $space = ["Name" => $spaceName, "driveType" => $spaceType];
         $body = json_encode($space);
@@ -277,17 +281,20 @@ class SpacesContext implements Context {
     /**
      * @When /^user "([^"]*)" creates a space "([^"]*)" of type "([^"]*)" with quota "([^"]*)" using the GraphApi$/
      *
-     * @param $user string
-     * @param $spaceName string
-     * @param $spaceType string
-     * @param $quota int
+     * @param string $user
+     * @param string $spaceName
+     * @param string $spaceType
+     * @param int $quota
      *
      * @return void
-     * @throws JsonException
      */
-    public function theUserCreatesASpaceWithQuotaUsingTheGraphApi($user, $spaceName, $spaceType, $quota): void
+    public function theUserCreatesASpaceWithQuotaUsingTheGraphApi(
+        string $user,
+        string $spaceName,
+        string $spaceType,
+        int $quota): void
     {
-        $space = ["Name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => (int) $quota]];
+        $space = ["Name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
         $body = json_encode($space);
         $this->featureContext->setResponse(
             $this->sendCreateSpaceRequest(
@@ -303,8 +310,8 @@ class SpacesContext implements Context {
     /**
      * @When /^the administrator gives "([^"]*)" the role "([^"]*)" using the settings api$/
      *
-     * @param $user string
-     * @param $role string
+     * @param string $user
+     * @param string $role
      *
      * @return void
      */
@@ -313,6 +320,9 @@ class SpacesContext implements Context {
         $admin = $this->featureContext->getAdminUsername();
         $password = $this->featureContext->getAdminPassword();
         $headers = [];
+        $bundles = [];
+        $accounts = [];
+        $assignment = [];
 
         $baseUrl = $this->featureContext->getBaseUrl();
         if (!str_ends_with($baseUrl, '/')) {
@@ -323,13 +333,12 @@ class SpacesContext implements Context {
         $this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, "{}"));
         if ($this->featureContext->getResponse()) {
             $rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
-        }
-        $bundles = [];
-        if (isset(\json_decode($rawBody,  true)["bundles"])) {
-            $bundles = \json_decode($rawBody, true)["bundles"];
+            if (isset(\json_decode($rawBody,  true)["bundles"])) {
+                $bundles = \json_decode($rawBody, true)["bundles"];
+            }
         }
         $roleToAssign = "";
-        foreach($bundles as $bundle => $value) {
+        foreach($bundles as $value) {
             // find the selected role
             if ($value["displayName"] === $role) {
                 $roleToAssign = $value;
@@ -342,10 +351,9 @@ class SpacesContext implements Context {
         $this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, "{}"));
         if ($this->featureContext->getResponse()) {
             $rawBody = $this->featureContext->getResponse()->getBody()->getContents();
-        }
-        $accounts = [];
-        if (isset(\json_decode($rawBody,  true)["accounts"])) {
-            $accounts = \json_decode($rawBody, true)["accounts"];
+            if (isset(\json_decode($rawBody,  true)["accounts"])) {
+                $accounts = \json_decode($rawBody, true)["accounts"];
+            }
         }
         $accountToChange = "";
         foreach($accounts as $account) {
@@ -354,7 +362,7 @@ class SpacesContext implements Context {
                 $accountToChange = $account;
             }
         }
-        Assert::assertNotEmpty($accountToChange, "The seleted account $user does not exist");
+        Assert::assertNotEmpty($accountToChange, "The selected account $user does not exist");
 
         // set the new role
         $fullUrl = $baseUrl . "api/v0/settings/assignments-add";
@@ -363,11 +371,9 @@ class SpacesContext implements Context {
         $this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, $body));
         if ($this->featureContext->getResponse()) {
             $rawBody = $this->featureContext->getResponse()->getBody()->getContents();
-        }
-
-        $assignment = [];
-        if (isset(\json_decode($rawBody,  true)["assignment"])) {
-            $assignment = \json_decode($rawBody, true)["assignment"];
+            if (isset(\json_decode($rawBody,  true)["assignment"])) {
+                $assignment = \json_decode($rawBody, true)["assignment"];
+            }
         }
 
         Assert::assertEquals($accountToChange["id"], $assignment["accountUuid"]);
@@ -400,11 +406,14 @@ class SpacesContext implements Context {
     /**
      * @When /^user "([^"]*)" lists the content of the space with the name "([^"]*)" using the WebDav Api$/
      *
-     * @param $user
-     * @param $name
+     * @param string $user
+     * @param string $name
      * @return void
      */
-    public function theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi($user, $name): void
+    public function theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
+        string $user,
+        string $name
+    ): void
     {
         $spaceId = $this->getAvailableSpaces()[$name]["id"];
         $spaceWebDavUrl = $this->getAvailableSpaces()[$name]["root"]["webDavUrl"];
@@ -415,8 +424,6 @@ class SpacesContext implements Context {
                 $this->featureContext->getPasswordForUser($user),
                 "",
                 [],
-                [],
-                []
             )
         );
         $this->setResponseSpaceId($spaceId);
@@ -427,7 +434,6 @@ class SpacesContext implements Context {
     /**
      * @Then /^the (?:propfind|search) result of the space should (not|)\s?contain these (?:files|entries):$/
      *
-     * @param string $user
      * @param string $shouldOrNot (not|)
      * @param TableNode $expectedFiles
      *
@@ -435,9 +441,9 @@ class SpacesContext implements Context {
      * @throws Exception
      */
     public function thePropfindResultShouldContainEntries(
-        $shouldOrNot,
+        string $shouldOrNot,
         TableNode $expectedFiles
-    ) {
+    ):void {
         $this->propfindResultShouldContainEntries(
             $shouldOrNot,
             $expectedFiles,
@@ -452,7 +458,10 @@ class SpacesContext implements Context {
      *
      * @return void
      */
-    public function jsonRespondedShouldContain($spaceName, TableNode $table) {
+    public function jsonRespondedShouldContain(
+        string $spaceName,
+        TableNode $table
+    ): void {
         $this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
         Assert::assertIsArray($spaceAsArray = $this->getSpaceByName($spaceName), "No space with name $spaceName found");
         foreach ($table->getHash() as $row) {
@@ -490,15 +499,14 @@ class SpacesContext implements Context {
     /**
      * @param string $shouldOrNot (not|)
      * @param TableNode $expectedFiles
-     * @param string|null $user
      *
      * @return void
      * @throws Exception
      */
     public function propfindResultShouldContainEntries(
-        $shouldOrNot,
+        string $shouldOrNot,
         TableNode $expectedFiles
-    ) {
+    ): void {
         $this->verifyTableNodeColumnsCount($expectedFiles, 1);
         $elementRows = $expectedFiles->getRows();
         $should = ($shouldOrNot !== "not");
@@ -530,10 +538,10 @@ class SpacesContext implements Context {
      * @return void
      * @throws Exception
      */
-    public function verifyTableNodeColumnsCount($table, $count) {
-        if (!($table instanceof TableNode)) {
-            throw new Exception("TableNode expected but got " . \gettype($table));
-        }
+    public function verifyTableNodeColumnsCount(
+        TableNode $table,
+        int $count
+    ): void {
         if (\count($table->getRows()) < 1) {
             throw new Exception("Table should have at least one row.");
         }
@@ -611,14 +619,16 @@ class SpacesContext implements Context {
      * @param string $spaceName
      *
      * @return void
-     * @throws JsonException
      */
-    public function theUserCreatesAFolderUsingTheGraphApi($user, $folder, $spaceName): void
+    public function theUserCreatesAFolderUsingTheGraphApi(
+        string $user,
+        string $folder,
+        string $spaceName
+    ): void
     {
         $this->featureContext->setResponse(
             $this->sendCreateFolderRequest(
                 $this->featureContext->getBaseUrl(),
-                "",
                 "MKCOL",
                 $user,
                 $this->featureContext->getPasswordForUser($user),
@@ -631,26 +641,25 @@ class SpacesContext implements Context {
     /**
      * Send Graph Create Space Request
      *
-     * @param $baseUrl
-     * @param $user
-     * @param $password
+     * @param string $baseUrl
      * @param string $method
-     * @param string $xRequestId
-     * @param array $headers
+     * @param string $user
+     * @param string $password
      * @param string $folder
      * @param string $spaceName
+     * @param string $xRequestId
+     * @param array $headers
      * @return ResponseInterface
      */
     public function sendCreateFolderRequest(
-        $baseUrl,
-        string $xRequestId = '',
+        string $baseUrl,
         string $method,
-        $user,
-        $password,
-        $folder,
-        $spaceName,
+        string $user,
+        string $password,
+        string $folder,
+        string $spaceName,
+        string $xRequestId = '',
         array $headers = []
-
     ): ResponseInterface
     {
         $spaceId = $this->getAvailableSpaces()[$spaceName]["id"];

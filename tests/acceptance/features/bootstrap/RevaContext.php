@@ -25,7 +25,7 @@ class RevaContext implements Context {
      * @return void
      * @throws Exception
      */
-    public function setUpScenario(BeforeScenarioScope $scope) {
+    public function setUpScenario(BeforeScenarioScope $scope): void {
         // Get the environment
         $environment = $scope->getEnvironment();
         // Get all the contexts you need in this context
