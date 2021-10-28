@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-10-28T11:16:20+0000"
+date: "2021-10-28T12:57:43+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/graph/templates
@@ -34,6 +34,39 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Command-line flags
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### graph health
+
+Check health status
+
+Usage: `graph health [command options] [arguments...]`
+
+
+
+
+
+
+-debug-addr |  $GRAPH_DEBUG_ADDR
+: Address to debug endpoint. Default: `"127.0.0.1:9124"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### graph ocis-graph
 
@@ -163,37 +196,4 @@ Usage: `graph server [command options] [arguments...]`
 
 -extensions | 
 : Run specific extensions during supervised mode. This flag is set by the runtime.
-
-### graph health
-
-Check health status
-
-Usage: `graph health [command options] [arguments...]`
-
-
-
-
-
-
--debug-addr |  $GRAPH_DEBUG_ADDR
-: Address to debug endpoint. Default: `"127.0.0.1:9124"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
