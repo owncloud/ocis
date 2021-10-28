@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Don't allow empty password: [#197](https://github.com/owncloud/product/issues/197)
 * Bugfix - Don't announce resharing via capabilities: [#2690](https://github.com/owncloud/ocis/pull/2690)
+* Enhancement - Add API to list all spaces: [#2692](https://github.com/owncloud/ocis/pull/2692)
 
 ## Details
 
@@ -23,6 +24,13 @@ The following sections list the changes for unreleased.
    that clients have a chance to react accordingly.
 
    https://github.com/owncloud/ocis/pull/2690
+
+* Enhancement - Add API to list all spaces: [#2692](https://github.com/owncloud/ocis/pull/2692)
+
+   Added a graph endpoint to enable users with the `list-all-spaces` permission to list all
+   spaces.
+
+   https://github.com/owncloud/ocis/pull/2692
 # Changelog for [1.14.0] (2021-10-27)
 
 The following sections list the changes for 1.14.0.
