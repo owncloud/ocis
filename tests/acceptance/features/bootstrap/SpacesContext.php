@@ -88,6 +88,47 @@ class SpacesContext implements Context {
     }
 
     /**
+     * Get SpaceId by Name
+     *
+     * @param $name string
+     * @return string
+     */
+    public function getSpaceIdByName(string $name): string
+    {
+        $response = json_decode($this->featureContext->getResponse()->getBody(), true);
+        if (isset($response['name']) && $response['name'] === $name) {
+            return $response["id"];
+        }
+        foreach ($response["value"] as $spaceCandidate) {
+            if ($spaceCandidate['name'] === $name) {
+                return $spaceCandidate["id"];
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get Space Array by name
+     *
+     * @param string $name
+     * @return array
+     */
+    public function getSpaceByName(string $name): array
+    {
+        $response = json_decode($this->featureContext->getResponse()->getBody(), true);
+        $spaceAsArray = $response;
+        if (isset($response['name']) && $response['name'] === $name) {
+            return $response;
+        }
+        foreach ($spaceAsArray["value"] as $spaceCandidate) {
+            if ($spaceCandidate['name'] === $name) {
+                return $spaceCandidate;
+            }
+        }
+        return [];
+    }
+
+    /**
      * @BeforeScenario
      *
      * @param BeforeScenarioScope $scope
@@ -404,18 +445,45 @@ class SpacesContext implements Context {
     }
 
     /**
-     * @Then the json responded should contain these key and value pairs
+     * @Then /^the json responded should contain a space "([^"]*)" with these key and value pairs:$/
      *
+     * @param string $spaceName
      * @param TableNode $table
      *
      * @return void
      */
-    public function jsonRespondedShouldContain(TableNode $table) {
+    public function jsonRespondedShouldContain($spaceName, TableNode $table) {
         $this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
-        $responseJson = json_decode($this->featureContext->getResponse()->getBody(), true);
+        Assert::assertIsArray($spaceAsArray = $this->getSpaceByName($spaceName), "No space with name $spaceName found");
         foreach ($table->getHash() as $row) {
-            $expected = [$row["key"] => $row["value"]];
-            Assert::assertEquals($row["value"], $responseJson[$row["key"]]);
+            // remember the original Space Array
+            $original = $spaceAsArray;
+            $row['value'] = $this->featureContext->substituteInLineCodes(
+                $row['value'],
+                $this->featureContext->getCurrentUser(),
+                [],
+                [
+                    [
+                        "code" => "%space_id%",
+                        "function" =>
+                            [$this, "getSpaceIdByName"],
+                        "parameter" => ["$spaceName"]
+                    ]
+                ]
+            );
+            $segments = explode("@@@", $row["key"]);
+            // traverse down in the array
+            foreach ($segments as $segment) {
+                $arrayKeyExists = array_key_exists($segment, $spaceAsArray);
+                $key = $row["key"];
+                Assert::assertTrue($arrayKeyExists, "The key $key does not exist on the response");
+                if ($arrayKeyExists) {
+                    $spaceAsArray = $spaceAsArray[$segment];
+                }
+            }
+            Assert::assertEquals($row["value"], $spaceAsArray);
+            // set the spaceArray to the point before traversing
+            $spaceAsArray = $original;
         }
     }
 
@@ -452,6 +520,7 @@ class SpacesContext implements Context {
             }
         }
     }
+
     /**
      * Verify that the tableNode contains expected number of columns
      *
@@ -532,5 +601,65 @@ class SpacesContext implements Context {
             return $results;
         }
         return false;
+    }
+
+    /**
+     * @When /^user "([^"]*)" creates a folder "([^"]*)" in space "([^"]*)" using the WebDav Api$/
+     *
+     * @param string $user
+     * @param string $folder
+     * @param string $spaceName
+     *
+     * @return void
+     * @throws JsonException
+     */
+    public function theUserCreatesAFolderUsingTheGraphApi($user, $folder, $spaceName): void
+    {
+        $this->featureContext->setResponse(
+            $this->sendCreateFolderRequest(
+                $this->featureContext->getBaseUrl(),
+                "",
+                "MKCOL",
+                $user,
+                $this->featureContext->getPasswordForUser($user),
+                $folder,
+                $spaceName
+            )
+        );
+    }
+
+    /**
+     * Send Graph Create Space Request
+     *
+     * @param $baseUrl
+     * @param $user
+     * @param $password
+     * @param string $method
+     * @param string $xRequestId
+     * @param array $headers
+     * @param string $folder
+     * @param string $spaceName
+     * @return ResponseInterface
+     */
+    public function sendCreateFolderRequest(
+        $baseUrl,
+        string $xRequestId = '',
+        string $method,
+        $user,
+        $password,
+        $folder,
+        $spaceName,
+        array $headers = []
+
+    ): ResponseInterface
+    {
+        $spaceId = $this->getAvailableSpaces()[$spaceName]["id"];
+        $fullUrl = $baseUrl;
+        if (!str_ends_with($fullUrl, '/')) {
+            $fullUrl .= '/';
+        }
+        $fullUrl .= "dav/spaces/" .  $spaceId . '/' . $folder;
+
+        return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers);
     }
 }
