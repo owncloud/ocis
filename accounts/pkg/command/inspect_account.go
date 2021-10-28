@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/asim/go-micro/plugins/client/grpc/v3"
+	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/flagset"

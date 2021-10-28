@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"sort"
 
-	"github.com/asim/go-micro/plugins/client/grpc/v3"
+	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
