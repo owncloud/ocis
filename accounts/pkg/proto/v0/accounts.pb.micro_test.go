@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	mgrpcc "github.com/asim/go-micro/plugins/client/grpc/v3"
+	mgrpcc "github.com/asim/go-micro/plugins/client/grpc/v4"
 	empty "github.com/golang/protobuf/ptypes/empty"
 
 	"github.com/owncloud/ocis/accounts/pkg/command"

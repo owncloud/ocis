@@ -13,7 +13,7 @@ import (
 	"syscall"
 	"time"
 
-	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v3"
+	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v4"
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
 	accounts "github.com/owncloud/ocis/accounts/pkg/command"

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/asim/go-micro/plugins/client/grpc/v3"
+	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/flagset"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"

@@ -5,17 +5,17 @@ go 1.17
 require (
 	github.com/CiscoM31/godata v1.0.4
 	github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e
-	github.com/asim/go-micro/plugins/client/grpc/v3 v3.0.0-20211012122208-f63e46a7d1e9
-	github.com/asim/go-micro/plugins/logger/zerolog/v3 v3.0.0-20211012122208-f63e46a7d1e9
-	github.com/asim/go-micro/plugins/registry/etcd/v3 v3.0.0-20211012122208-f63e46a7d1e9
-	github.com/asim/go-micro/plugins/registry/kubernetes/v3 v3.0.0-20211012122208-f63e46a7d1e9
-	github.com/asim/go-micro/plugins/registry/mdns/v3 v3.0.0-20211012122208-f63e46a7d1e9
-	github.com/asim/go-micro/plugins/registry/nats/v3 v3.0.0-20211012122208-f63e46a7d1e9
-	github.com/asim/go-micro/plugins/server/grpc/v3 v3.0.0-20211012122208-f63e46a7d1e9
-	github.com/asim/go-micro/plugins/server/http/v3 v3.0.0-20211012122208-f63e46a7d1e9
-	github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v3 v3.0.0-20211012122208-f63e46a7d1e9
-	github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v3 v3.0.0-20211012122208-f63e46a7d1e9
-	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3 v3.0.0-20211012122208-f63e46a7d1e9
+	github.com/asim/go-micro/plugins/client/grpc/v4 v4.0.0-20211028090348-ed690ed838cc
+	github.com/asim/go-micro/plugins/logger/zerolog/v4 v4.0.0-20211028090348-ed690ed838cc
+	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20211028090348-ed690ed838cc
+	github.com/asim/go-micro/plugins/registry/kubernetes/v4 v4.0.0-20211028090348-ed690ed838cc
+	github.com/asim/go-micro/plugins/registry/mdns/v4 v4.0.0-20211028090348-ed690ed838cc
+	github.com/asim/go-micro/plugins/registry/nats/v4 v4.0.0-20211028090348-ed690ed838cc
+	github.com/asim/go-micro/plugins/server/grpc/v4 v4.0.0-20211028090348-ed690ed838cc
+	github.com/asim/go-micro/plugins/server/http/v4 v4.0.0-20211028090348-ed690ed838cc
+	github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v4 v4.0.0-20211028090348-ed690ed838cc
+	github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v4 v4.0.0-20211028090348-ed690ed838cc
+	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v4 v4.0.0-20211028090348-ed690ed838cc
 	github.com/blevesearch/bleve/v2 v2.2.1
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20211018122138-391b29bd7803
@@ -66,7 +66,7 @@ require (
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d
 	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
-	google.golang.org/genproto v0.0.0-20211019152133-63b7e35f4404
+	google.golang.org/genproto v0.0.0-20211020151524-b7c3a969101a
 	google.golang.org/grpc v1.41.0
 	google.golang.org/protobuf v1.27.1
 	gotest.tools/v3 v3.0.3
