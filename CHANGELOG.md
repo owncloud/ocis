@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Don't allow empty password: [#197](https://github.com/owncloud/product/issues/197)
+* Bugfix - Don't announce resharing via capabilities: [#2690](https://github.com/owncloud/ocis/pull/2690)
 
 ## Details
 
@@ -15,6 +16,13 @@ The following sections list the changes for unreleased.
    It was allowed to create users with empty or spaces-only password. This is fixed
 
    https://github.com/owncloud/product/issues/197
+
+* Bugfix - Don't announce resharing via capabilities: [#2690](https://github.com/owncloud/ocis/pull/2690)
+
+   OCIS / Reva is not capable of resharing, yet. We've set the resharing capability to false, so
+   that clients have a chance to react accordingly.
+
+   https://github.com/owncloud/ocis/pull/2690
 # Changelog for [1.14.0] (2021-10-27)
 
 The following sections list the changes for 1.14.0.
