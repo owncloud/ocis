@@ -97,17 +97,18 @@ This ADR is limited to the scope of "how will a web client deal with the browser
 
 ## Decision Outcome
 
-Chosen option: "[option 1]", because [justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force force | … | comes out best (see below)].
+Chosen option: "Mixed global URLs", because it meets the reuirement to contain a path and a stable identifier.
 
 ### Positive Consequences <!-- optional -->
 
-* [e.g., improvement of quality attribute satisfaction, follow-up decisions required, …]
-* …
+* The path makes it "human readable"
+* The URL can be bookmarked
+* The bookmarked URLs remain stable even if the path changes
+* All urls can be shortened to hide any metadata like path, resource name and query parameters
 
 ### Negative Consequences <!-- optional -->
 
-* [e.g., compromising quality attribute, follow-up decisions required, …]
-* …
+* the web UI needs to look up the space alias in a registry to build an API request for the `/dav/space` endpoint
 
 ## Pros and Cons of the Options
 
