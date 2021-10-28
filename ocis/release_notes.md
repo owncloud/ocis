@@ -7,6 +7,30 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.14.0 Technology Preview
+
+Version 1.14.0 brings more progress on the backend for the 'Spaces' and 'Quota' features. ownCloud Web 4.4.0 has received performance and usability improvements.
+
+The most prominent changes in ownCloud Infinite Scale 1.14.0 and ownCloud Web 4.4.0 comprise:
+
+- The media viewer in ownCloud Web is now accessible and themeable. [web#5900](https://github.com/owncloud/web/pull/5900)
+- The share expiration date setting has been moved to a dropdown menu to better fit the interface. [web#5806](https://github.com/owncloud/web/pull/5806)
+- The performance of ownCloud Web has been improved by removing unnecessary requests and redirects. [web#5910](https://github.com/owncloud/web/pull/5910) [web#5893](https://github.com/owncloud/web/pull/5893) [web#5917](https://github.com/owncloud/web/pull/5917) 
+- It is now possible for the sysadmin to set a default quota for new Spaces. This way, users with the respective permission can create new Spaces but administrators still keep a leverage on storage usage. [ocis#2619](https://github.com/owncloud/ocis/pull/2619)
+- The permission to change Space quota is now enforced. [ocis#2650](https://github.com/owncloud/ocis/pull/2650)
+- The maximum chunk size for upload file chunking has been set to 100 MB which will make chunking apply more frequently resulting in more stable uploads. [ocis#2584](https://github.com/owncloud/ocis/pull/2584)
+- It is now possible to set a default storage path for Infinite Scale. [ocis#2590](https://github.com/owncloud/ocis/pull/2590)
+- Infinite Scale services now by default only listen on localhost to prevent accidental exposure. [ocis#2612](https://github.com/owncloud/ocis/pull/2612)
+- A capability for the user settings endpoint has been added to improve request handling in Web between when used with ownCloud Classic and Infinite Scale, respectively. [ocis#2655](https://github.com/owncloud/ocis/pull/2655)
+- Requests in public links are now authenticated properly paving the way for Office capabilities in public links. [ocis#2536](https://github.com/owncloud/ocis/pull/2536)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.14.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v4.4.0) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.13.0 Technology Preview
 
 Version 1.13.0 brings progress on the backend for the 'Spaces' feature. ownCloud Web and Infinite Scale now provide ZIP/TAR download for multiple files/folders and can integrate external file viewer/editor applications (e.g., Collabora Online, ONLYOFFICE, CodiMD, Microsoft Office Online). 
