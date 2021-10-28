@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Don't allow empty password: [#197](https://github.com/owncloud/product/issues/197)
+* Bugfix - Fix oCIS startup ony systems with IPv6: [#2698](https://github.com/owncloud/ocis/pull/2698)
 * Bugfix - Don't announce resharing via capabilities: [#2690](https://github.com/owncloud/ocis/pull/2690)
 * Enhancement - Add API to list all spaces: [#2692](https://github.com/owncloud/ocis/pull/2692)
 
@@ -17,6 +18,13 @@ The following sections list the changes for unreleased.
    It was allowed to create users with empty or spaces-only password. This is fixed
 
    https://github.com/owncloud/product/issues/197
+
+* Bugfix - Fix oCIS startup ony systems with IPv6: [#2698](https://github.com/owncloud/ocis/pull/2698)
+
+   We've fixed failing startup of oCIS on systems with IPv6 addresses.
+
+   https://github.com/owncloud/ocis/issues/2300
+   https://github.com/owncloud/ocis/pull/2698
 
 * Bugfix - Don't announce resharing via capabilities: [#2690](https://github.com/owncloud/ocis/pull/2690)
 
