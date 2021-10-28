@@ -3,7 +3,7 @@ title: "Efficient Stat Polling"
 date: 2020-03-03T10:31:00+01:00
 weight: 30
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs
+geekdocEditPath: edit/master/docs/architecture
 geekdocFilePath: efficient-stat-polling.md
 ---
 
