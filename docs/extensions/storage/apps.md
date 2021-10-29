@@ -271,6 +271,60 @@ There are apps, which need to be opened in the iframe with a GET request. The GE
   }
   ```
 
+### Creating a file with the app provider
+
+**Endpoint**: specified in the capabilities in `new_file_url`, currently `/app/new`
+
+**Method**: HTTP POST
+
+**Authentication** (one of them):
+
+- `Authorization` header with OIDC Bearer token for authenticated users or basic auth credentials (if enabled in oCIS)
+- `Public-Token` header with public link token for public links
+- `X-Access-Token` header with a REVA token for authenticated users
+
+**Query parameters**:
+
+- `filename` (mandatory): path / name of the new file
+- `template` (optional): not yet implemented
+
+**Request examples**:
+
+```bash
+curl -X POST 'https://ocis.test/app/new?filename=/home/test.odt'
+```
+
+**Response example**:
+
+You will receive a file id of the freshly created file, which you can use to open the file in an editor.
+
+```json
+{
+  "file_id": "ZmlsZTppZAo="
+}
+```
+
+**Example responses (error case)**:
+
+- #TODO: file already exists, currently existing files will be overwritten
+
+  ```json
+  {
+    "code": "ERROR",
+    "message": "file already exists"
+  }
+  ```
+
+- unauthorized / failed to create the file
+
+  ```json
+  {
+    "code": "SERVER_ERROR",
+    "message": "error creating resource"
+  }
+  ```
+
+
 ## App drivers
 
 App drivers represent apps, if the app is not able to register itself. Currently there is only the CS3org WOPI server app driver.
