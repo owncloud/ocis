@@ -69,11 +69,14 @@ We remove or disable the file based locking of the CS3org WOPI server.
 **No locking is bad**, because:
 
 - merging changes from different versions is a pain, since there is no way to calculate differences for most of the files (eg. docx or xlsx files)
+- no locking breaks the WOPI specs, as the CS3 WOPI server won't be capable to honor the WOPI Lock related operations
 
 ### CS3 API locking
 
 - Add CS3 API for resource (files, directories) locking, unlocking and checking locks
   - locking always with timeout
+  - lock creation is a "create-if-not-exists" operation
+  - locks need to have arbitrary metadata (eg. the CS3 WOPI server is stateless by storing information on / in the locks)
 - Implement WebDAV locking using the CS3 API
 - Implement Locking in storage drivers
 - Change CS3 WOPI server to use CS3 API locking mechanism
@@ -83,6 +86,8 @@ We remove or disable the file based locking of the CS3org WOPI server.
 
 - you can lock files on the actual storage (if the storage supports that -> storage driver dependent)
 - you can lock files in ownCloud 10 when using the ownCloudSQL storage driver in the migration deployment (but oC10 Collabora / OnlyOffice also need to implement locking, to fully leverage that)
+- clients can get the lock information via the api without ignoring / hiding lock file changes
+- clients can use the lock information to lock the file in their context (eg. via some file explorer integration)
 
 **CS3 API locking is bad**, because:
 
