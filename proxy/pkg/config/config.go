@@ -25,11 +25,11 @@ type Debug struct {
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr    string
-	Root    string
-	TLSCert string
-	TLSKey  string
-	TLS     bool
+	Addr    string `mapstructure:"addr"`
+	Root    string `mapstructure:"http_root"`
+	TLSCert string `mapstructure:"http_tls_cert"`
+	TLSKey  string `mapstructure:"http_tls_key"`
+	TLS     bool   `mapstructure:"http_tls"`
 }
 
 // Service defines the available service configuration.
@@ -105,25 +105,25 @@ type Cache struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File                  string
-	Log                   Log
-	Debug                 Debug
-	HTTP                  HTTP
-	Service               Service
-	Tracing               Tracing
-	Policies              []Policy
-	OIDC                  OIDC
-	TokenManager          TokenManager
+	File                  string          `mapstructure:"file"`
+	Log                   Log             `mapstructure:"log"`
+	Debug                 Debug           `mapstructure:"debug"`
+	HTTP                  HTTP            `mapstructure:"http"`
+	Service               Service         `mapstructure:"service"`
+	Tracing               Tracing         `mapstructure:"tracing"`
+	Policies              []Policy        `mapstructure:"policies"`
+	OIDC                  OIDC            `mapstructure:"oidc"`
+	TokenManager          TokenManager    `mapstructure:"token_manager"`
 	PolicySelector        *PolicySelector `mapstructure:"policy_selector"`
-	Reva                  Reva
-	PreSignedURL          PreSignedURL
-	AccountBackend        string
-	UserOIDCClaim         string
-	UserCS3Claim          string
-	MachineAuthAPIKey     string
-	AutoprovisionAccounts bool
-	EnableBasicAuth       bool
-	InsecureBackends      bool
+	Reva                  Reva            `mapstructure:"reva"`
+	PreSignedURL          PreSignedURL    `mapstructure:"pre_signed_url"`
+	AccountBackend        string          `mapstructure:"account_backend"`
+	UserOIDCClaim         string          `mapstructure:"user_oidc_claim"`
+	UserCS3Claim          string          `mapstructure:"user_cs3_claim"`
+	MachineAuthAPIKey     string          `mapstructure:"machine_auth_api_key"`
+	AutoprovisionAccounts bool            `mapstructure:"auto_provision_accounts"`
+	EnableBasicAuth       bool            `mapstructure:"enable_basic_auth"`
+	InsecureBackends      bool            `mapstructure:"insecure_backends"`
 
 	Context    context.Context
 	Supervised bool
@@ -132,9 +132,9 @@ type Config struct {
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
 // with the configured oidc-provider
 type OIDC struct {
-	Issuer        string
-	Insecure      bool
-	UserinfoCache Cache
+	Issuer        string `mapstructure:"issuer"`
+	Insecure      bool   `mapstructure:"insecure"`
+	UserinfoCache Cache  `mapstructure:"user_info_cache"`
 }
 
 // PolicySelector is the toplevel-configuration for different selectors
@@ -147,18 +147,18 @@ type PolicySelector struct {
 
 // StaticSelectorConf is the config for the static-policy-selector
 type StaticSelectorConf struct {
-	Policy string
+	Policy string `mapstructure:"policy"`
 }
 
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
-	JWTSecret string
+	JWTSecret string `mapstructure:"jwt_secret"`
 }
 
 // PreSignedURL is the config for the presigned url middleware
 type PreSignedURL struct {
-	AllowedHTTPMethods []string
-	Enabled            bool
+	AllowedHTTPMethods []string `mapstructure:"allowed_http_methods"`
+	Enabled            bool     `mapstructure:"enabled"`
 }
 
 // MigrationSelectorConf is the config for the migration-selector

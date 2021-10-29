@@ -55,9 +55,12 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			if !cfg.Supervised {
-				return ParseConfig(ctx, cfg)
+			if err := ParseConfig(ctx, cfg); err != nil {
+				panic(err)
 			}
+			//if !cfg.Supervised {
+			//	return ParseConfig(ctx, cfg)
+			//}
 			logger.Debug().Str("service", "ocs").Msg("ignoring config file parsing when running supervised")
 			return nil
 		},

@@ -3,15 +3,13 @@ package command
 import (
 	"context"
 	"os"
-	"strings"
 
-	"github.com/owncloud/ocis/ocis-pkg/sync"
-
+	gofig "github.com/gookit/config/v2"
+	gooyaml "github.com/gookit/config/v2/yaml"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/proxy/pkg/config"
-	"github.com/spf13/viper"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
 )
@@ -71,45 +69,23 @@ func NewLogger(cfg *config.Config) log.Logger {
 
 // ParseConfig loads proxy configuration from Viper known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	sync.ParsingViperConfig.Lock()
-	defer sync.ParsingViperConfig.Unlock()
-	logger := NewLogger(cfg)
+	// create a new config and load files and env values onto it since this needs to be thread-safe.
+	cnf := gofig.NewWithOptions("proxy", gofig.ParseEnv)
 
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.SetEnvPrefix("PROXY")
-	viper.AutomaticEnv()
+	// TODO(refs) add ENV + toml + json
+	cnf.AddDriver(gooyaml.Driver)
 
-	if c.IsSet("config-file") {
-		viper.SetConfigFile(c.String("config-file"))
-	} else {
-		viper.SetConfigName("proxy")
-
-		viper.AddConfigPath("/etc/ocis")
-		viper.AddConfigPath("$HOME/.ocis")
-		viper.AddConfigPath("./config")
+	// TODO(refs) load from expected locations with the expected name
+	err := cnf.LoadFiles("/Users/aunger/code/owncloud/ocis/proxy/pkg/command/proxy_example_config.yaml")
+	if err != nil {
+		panic(err)
 	}
 
-	if err := viper.ReadInConfig(); err != nil {
-		switch err.(type) {
-		case viper.ConfigFileNotFoundError:
-			logger.Debug().
-				Msg("no config found on preconfigured location")
-		case viper.UnsupportedConfigError:
-			logger.Fatal().
-				Err(err).
-				Msg("unsupported config type")
-		default:
-			logger.Fatal().
-				Err(err).
-				Msg("failed to read config")
-		}
-	}
+	// bind all keys to cfg, as we expect an entire proxy.[yaml, toml...] to define all keys and not only sub values.
+	err = cnf.BindStruct("", cfg)
 
-	if err := viper.Unmarshal(&cfg); err != nil {
-		logger.Fatal().
-			Err(err).
-			Msg("Failed to parse config")
-	}
+	// step 2: overwrite the config values with those from ENV variables. Sadly the library only parses config files and does
+	// not support tags for env variables.
 
 	return nil
 }
