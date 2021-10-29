@@ -21,7 +21,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/cs3"
-	"github.com/owncloud/ocis/proxy/pkg/flagset"
 	"github.com/owncloud/ocis/proxy/pkg/metrics"
 	"github.com/owncloud/ocis/proxy/pkg/middleware"
 	"github.com/owncloud/ocis/proxy/pkg/proxy"
@@ -40,7 +39,7 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: append(flagset.ServerWithConfig(cfg), flagset.RootWithConfig(cfg)...),
+		//Flags: append(flagset.ServerWithConfig(cfg), flagset.RootWithConfig(cfg)...),
 		Before: func(ctx *cli.Context) error {
 			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {

@@ -11,7 +11,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/proxy/pkg/config"
-	"github.com/owncloud/ocis/proxy/pkg/flagset"
 	"github.com/spf13/viper"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
@@ -32,7 +31,7 @@ func Execute(cfg *config.Config) error {
 			},
 		},
 
-		Flags: flagset.RootWithConfig(cfg),
+		//Flags: flagset.RootWithConfig(cfg),
 
 		Before: func(c *cli.Context) error {
 			cfg.Service.Version = version.String

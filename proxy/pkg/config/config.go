@@ -2,6 +2,9 @@ package config
 
 import (
 	"context"
+	"path"
+
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 )
 
 // Log defines the available logging configuration.
@@ -190,5 +193,62 @@ type RegexRuleConf struct {
 func New() *Config {
 	return &Config{
 		HTTP: HTTP{},
+	}
+}
+
+// DefaultConfig are values stored in the flag set, but moved to a struct.
+func DefaultConfig() *Config {
+	return &Config{
+		File: "",
+		Log:  Log{}, // logging config is inherited.
+		Debug: Debug{
+			Addr:  "0.0.0.0:9205",
+			Token: "",
+		},
+		HTTP: HTTP{
+			Addr:    "0.0.0.0:9200",
+			Root:    "/",
+			TLSCert: path.Join(defaults.BaseDataPath(), "proxy", "server.crt"),
+			TLSKey:  path.Join(defaults.BaseDataPath(), "proxy", "server.key"),
+			TLS:     true,
+		},
+		Service: Service{
+			Name:      "proxy",
+			Namespace: "com.owncloud.web",
+		},
+		Tracing: Tracing{
+			Type:      "jaeger",
+			Endpoint:  "",
+			Collector: "",
+			Service:   "proxy",
+		},
+		OIDC: OIDC{
+			Issuer:   "https://localhost:9200",
+			Insecure: true,
+			//Insecure: true,
+			UserinfoCache: Cache{
+				Size: 1024,
+				TTL:  10,
+			},
+		},
+		TokenManager: TokenManager{
+			JWTSecret: "Pive-Fumkiu4",
+		},
+		PolicySelector: nil,
+		Reva: Reva{
+			Address: "127.0.0.1:9142",
+		},
+		PreSignedURL: PreSignedURL{
+			AllowedHTTPMethods: []string{"GET"},
+			Enabled:            true,
+		},
+		AccountBackend:    "accounts",
+		UserOIDCClaim:     "email",
+		UserCS3Claim:      "mail",
+		MachineAuthAPIKey: "change-me-please",
+		//AutoprovisionAccounts: false,
+		//EnableBasicAuth:       false,
+		//InsecureBackends:      false,
+		Context: nil,
 	}
 }

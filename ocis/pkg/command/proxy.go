@@ -9,7 +9,6 @@ import (
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/proxy/pkg/command"
 	svcconfig "github.com/owncloud/ocis/proxy/pkg/config"
-	"github.com/owncloud/ocis/proxy/pkg/flagset"
 	"github.com/urfave/cli/v2"
 )
 
@@ -19,7 +18,7 @@ func ProxyCommand(cfg *config.Config) *cli.Command {
 		Name:     "proxy",
 		Usage:    "Start proxy server",
 		Category: "Extensions",
-		Flags:    flagset.ServerWithConfig(cfg.Proxy),
+		//Flags:    flagset.ServerWithConfig(cfg.Proxy),
 		Subcommands: []*cli.Command{
 			command.PrintVersion(cfg.Proxy),
 		},

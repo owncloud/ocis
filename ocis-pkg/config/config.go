@@ -116,7 +116,7 @@ func New() *Config {
 		IDP:           idp.New(),
 		OCS:           ocs.New(),
 		Web:           web.New(),
-		Proxy:         proxy.New(),
+		Proxy:         proxy.DefaultConfig(),
 		Settings:      settings.New(),
 		Storage:       storage.New(),
 		Store:         store.New(),
