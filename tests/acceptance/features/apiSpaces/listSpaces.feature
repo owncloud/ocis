@@ -55,7 +55,7 @@ Feature: List and create spaces
       | quota@@@total    | 2000          |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
 
-  Scenario: Alice creates folder via Graph api in space, she expects a 201 code and she checks that folder exists
+  Scenario: Alice creates a folder via the Graph api in space, she expects a 201 code and she checks that folder exists
     Given the administrator gives "Alice" the role "Admin" using the settings api
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
     And user "Alice" lists all available spaces via the GraphApi
