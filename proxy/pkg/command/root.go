@@ -78,14 +78,11 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	// TODO(refs) load from expected locations with the expected name
 	err := cnf.LoadFiles("/Users/aunger/code/owncloud/ocis/proxy/pkg/command/proxy_example_config.yaml")
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// bind all keys to cfg, as we expect an entire proxy.[yaml, toml...] to define all keys and not only sub values.
 	err = cnf.BindStruct("", cfg)
-
-	// step 2: overwrite the config values with those from ENV variables. Sadly the library only parses config files and does
-	// not support tags for env variables.
 
 	return nil
 }
@@ -97,10 +94,10 @@ type SutureService struct {
 
 // NewSutureService creates a new proxy.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
+	inheritLogging(cfg)
 	if cfg.Mode == 0 {
 		cfg.Proxy.Supervised = true
 	}
-	cfg.Proxy.Log.File = cfg.Log.File
 	return SutureService{
 		cfg: cfg.Proxy,
 	}
@@ -113,4 +110,14 @@ func (s SutureService) Serve(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// inheritLogging is a poor man's global logging state tip-toeing around circular dependencies. It sets the logging
+// of the service to whatever is in the higher config (in this case coming from ocis.yaml) and sets them as defaults,
+// being overwritten when the extension parses its config file / env variables.
+func inheritLogging(cfg *ociscfg.Config) {
+	cfg.Proxy.Log.File = cfg.Log.File
+	cfg.Proxy.Log.Color = cfg.Log.Color
+	cfg.Proxy.Log.Pretty = cfg.Log.Pretty
+	cfg.Proxy.Log.Level = cfg.Log.Level
 }

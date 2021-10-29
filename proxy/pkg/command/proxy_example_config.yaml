@@ -1,6 +1,6 @@
-log:
-  level: info
-  color: true
-  pretty: true
+#log:
+#  level: debug
+#  color: false
+#  pretty: false
 http:
   addr: "${PROXY_HTTP_ADDR|localhost:2222}"
