@@ -22,7 +22,7 @@ require (
 	github.com/cs3org/reva v1.15.1-0.20211027114107-4879bf6be97a
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
-	github.com/go-chi/chi/v5 v5.0.4
+	github.com/go-chi/chi/v5 v5.0.5
 	github.com/go-chi/cors v1.2.0
 	github.com/go-chi/render v1.0.1
 	github.com/go-logr/logr v0.4.0
