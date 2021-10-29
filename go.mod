@@ -155,6 +155,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
+	github.com/juliangruber/go-intersect v1.0.0 // indirect
 	github.com/kevinburke/ssh_config v1.1.0 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
@@ -248,3 +249,5 @@ require (
 
 // this is a transitive replace. See https://github.com/libregraph/lico/blob/master/go.mod#L38
 replace github.com/crewjam/saml => github.com/crewjam/saml v0.4.5
+
+replace github.com/cs3org/reva => github.com/c0rby/reva v0.0.2-0.20211029143116-7f4080441139
