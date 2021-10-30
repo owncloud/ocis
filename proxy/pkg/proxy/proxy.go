@@ -93,19 +93,14 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 	for _, pol := range options.Config.Policies {
 		for _, route := range pol.Routes {
 			rp.logger.Debug().Str("fwd: ", route.Endpoint)
-			uri, err := url.Parse(route.Backend)
-			if err != nil {
+			uri, err2 := url.Parse(route.Backend)
+			if err2 != nil {
 				rp.logger.
 					Fatal(). // fail early on misconfiguration
-					Err(err).
+					Err(err2).
 					Str("backend", route.Backend).
 					Msg("malformed url")
 			}
-
-			rp.logger.
-				Debug().
-				Interface("route", route).
-				Msg("adding route")
 
 			rp.AddHost(pol.Name, uri, route)
 		}
