@@ -7,7 +7,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/spf13/viper"
 	"github.com/urfave/cli/v2"
 )
@@ -27,7 +26,7 @@ func Execute(cfg *config.Config) error {
 			},
 		},
 
-		Flags: flagset.RootWithConfig(cfg),
+		//Flags: flagset.RootWithConfig(cfg),
 
 		Before: func(c *cli.Context) error {
 			logger := NewLogger(cfg)

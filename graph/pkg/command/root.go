@@ -9,7 +9,6 @@ import (
 	"github.com/thejerf/suture/v4"
 
 	"github.com/owncloud/ocis/graph/pkg/config"
-	"github.com/owncloud/ocis/graph/pkg/flagset"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/version"
@@ -32,7 +31,7 @@ func Execute(cfg *config.Config) error {
 			},
 		},
 
-		Flags: flagset.RootWithConfig(cfg),
+		//Flags: flagset.RootWithConfig(cfg),
 
 		Before: func(c *cli.Context) error {
 			cfg.Server.Version = version.String
@@ -92,8 +91,8 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	if err := viper.ReadInConfig(); err != nil {
 		switch err.(type) {
 		case viper.ConfigFileNotFoundError:
-			logger.Info().
-				Msg("Continue without config")
+			//logger.Info().
+			//	Msg("Continue without config")
 		case viper.UnsupportedConfigError:
 			logger.Fatal().
 				Err(err).

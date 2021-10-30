@@ -67,7 +67,7 @@ func NewLogger(cfg *config.Config) log.Logger {
 	)
 }
 
-// ParseConfig loads proxy configuration from Viper known paths.
+// ParseConfig loads proxy configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	// create a new config and load files and env values onto it since this needs to be thread-safe.
 	cnf := gofig.NewWithOptions("proxy", gofig.ParseEnv)

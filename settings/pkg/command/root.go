@@ -11,7 +11,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/settings/pkg/config"
-	"github.com/owncloud/ocis/settings/pkg/flagset"
 	"github.com/spf13/viper"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
@@ -32,7 +31,7 @@ func Execute(cfg *config.Config) error {
 			},
 		},
 
-		Flags: flagset.RootWithConfig(cfg),
+		//Flags: flagset.RootWithConfig(cfg),
 
 		Before: func(c *cli.Context) error {
 			cfg.Service.Version = version.String
@@ -122,6 +121,7 @@ type SutureService struct {
 
 // NewSutureService creates a new settings.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
+	inheritLogging(cfg)
 	if cfg.Mode == 0 {
 		cfg.Settings.Supervised = true
 	}
@@ -138,4 +138,14 @@ func (s SutureService) Serve(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// inheritLogging is a poor man's global logging state tip-toeing around circular dependencies. It sets the logging
+// of the service to whatever is in the higher config (in this case coming from ocis.yaml) and sets them as defaults,
+// being overwritten when the extension parses its config file / env variables.
+func inheritLogging(cfg *ociscfg.Config) {
+	cfg.Settings.Log.File = cfg.Log.File
+	cfg.Settings.Log.Color = cfg.Log.Color
+	cfg.Settings.Log.Pretty = cfg.Log.Pretty
+	cfg.Settings.Log.Level = cfg.Log.Level
 }

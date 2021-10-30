@@ -18,43 +18,43 @@ import (
 
 // Log defines the available logging configuration.
 type Log struct {
-	Level  string
-	Pretty bool
-	Color  bool
-	File   string
+	Level  string `mapstructure:"level"`
+	Pretty bool   `mapstructure:"pretty"`
+	Color  bool   `mapstructure:"color"`
+	File   string `mapstructure:"file"`
 }
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string
-	Token  string
-	Pprof  bool
-	Zpages bool
+	Addr   string `mapstructure:"addr"`
+	Token  string `mapstructure:"token"`
+	Pprof  bool   `mapstructure:"pprof"`
+	Zpages bool   `mapstructure:"zpages"`
 }
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr string
-	Root string
+	Addr string `mapstructure:"addr"`
+	Root string `mapstructure:"root"`
 }
 
 // GRPC defines the available grpc configuration.
 type GRPC struct {
-	Addr string
+	Addr string `mapstructure:"addr"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool
-	Type      string
-	Endpoint  string
-	Collector string
-	Service   string
+	Enabled   bool   `mapstructure:"enabled"`
+	Type      string `mapstructure:"type"`
+	Endpoint  string `mapstructure:"endpoint"`
+	Collector string `mapstructure:"collector"`
+	Service   string `mapstructure:"service"`
 }
 
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
-	JWTSecret string
+	JWTSecret string `mapstructure:"jwt_secret"`
 }
 
 const (
@@ -69,41 +69,41 @@ type Mode int
 
 // Runtime configures the oCIS runtime when running in supervised mode.
 type Runtime struct {
-	Port       string
-	Host       string
-	Extensions string
+	Port       string `mapstructure:"port"`
+	Host       string `mapstructure:"host"`
+	Extensions string `mapstructure:"extensions"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
-	// Mode is mostly used whenever we need to run an extension. The technical debt this introduces is in regards of
+	// Mode is mostly used whenever we need to run an extension. The technical debt this introduces is in regard of
 	// what it does. Supervised (0) loads configuration from a unified config file because of known limitations of Viper; whereas
 	// Unsupervised (1) MUST parse config from all known sources.
 	Mode Mode
 	File string
 
-	Registry     string
-	Log          Log
-	Debug        Debug
-	HTTP         HTTP
-	GRPC         GRPC
-	Tracing      Tracing
-	TokenManager TokenManager
-	Runtime      Runtime
+	Registry     string       `mapstructure:"registry"`
+	Log          Log          `mapstructure:"log"`
+	Debug        Debug        `mapstructure:"debug"`
+	HTTP         HTTP         `mapstructure:"http"`
+	GRPC         GRPC         `mapstructure:"grpc"`
+	Tracing      Tracing      `mapstructure:"tracing"`
+	TokenManager TokenManager `mapstructure:"token_manager"`
+	Runtime      Runtime      `mapstructure:"runtime"`
 
-	Accounts      *accounts.Config
-	GLAuth        *glauth.Config
-	Graph         *graph.Config
-	GraphExplorer *graphExplorer.Config
-	IDP           *idp.Config
-	OCS           *ocs.Config
-	Web           *web.Config
-	Proxy         *proxy.Config
-	Settings      *settings.Config
-	Storage       *storage.Config
-	Store         *store.Config
-	Thumbnails    *thumbnails.Config
-	WebDAV        *webdav.Config
+	Accounts      *accounts.Config      `mapstructure:"accounts"`
+	GLAuth        *glauth.Config        `mapstructure:"glauth"`
+	Graph         *graph.Config         `mapstructure:"graph"`
+	GraphExplorer *graphExplorer.Config `mapstructure:"graph_explorer"`
+	IDP           *idp.Config           `mapstructure:"idp"`
+	OCS           *ocs.Config           `mapstructure:"ocs"`
+	Web           *web.Config           `mapstructure:"web"`
+	Proxy         *proxy.Config         `mapstructure:"proxy"`
+	Settings      *settings.Config      `mapstructure:"settings"`
+	Storage       *storage.Config       `mapstructure:"storage"`
+	Store         *store.Config         `mapstructure:"store"`
+	Thumbnails    *thumbnails.Config    `mapstructure:"thumbnails"`
+	WebDAV        *webdav.Config        `mapstructure:"webdav"`
 }
 
 // New initializes a new configuration with or without defaults.

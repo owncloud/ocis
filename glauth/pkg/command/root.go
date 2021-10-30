@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/owncloud/ocis/glauth/pkg/config"
-	"github.com/owncloud/ocis/glauth/pkg/flagset"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
@@ -31,7 +30,7 @@ func Execute(cfg *config.Config) error {
 			},
 		},
 
-		Flags: flagset.RootWithConfig(cfg),
+		//Flags: flagset.RootWithConfig(cfg),
 
 		Before: func(c *cli.Context) error {
 			cfg.Version = version.String
@@ -120,6 +119,7 @@ type SutureService struct {
 
 // NewSutureService creates a new glauth.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
+	inheritLogging(cfg)
 	if cfg.Mode == 0 {
 		cfg.GLAuth.Supervised = true
 	}
@@ -136,4 +136,14 @@ func (s SutureService) Serve(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// inheritLogging is a poor man's global logging state tip-toeing around circular dependencies. It sets the logging
+// of the service to whatever is in the higher config (in this case coming from ocis.yaml) and sets them as defaults,
+// being overwritten when the extension parses its config file / env variables.
+func inheritLogging(cfg *ociscfg.Config) {
+	cfg.GLAuth.Log.File = cfg.Log.File
+	cfg.GLAuth.Log.Color = cfg.Log.Color
+	cfg.GLAuth.Log.Pretty = cfg.Log.Pretty
+	cfg.GLAuth.Log.Level = cfg.Log.Level
 }

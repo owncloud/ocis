@@ -32,11 +32,6 @@ type Service struct {
 func NewService(opts ...Option) Service {
 	sopts := newOptions(opts...)
 
-	sopts.Logger.Info().
-		Str("transport", "grpc").
-		Str("addr", sopts.Address).
-		Msg("starting server")
-
 	mopts := []micro.Option{
 		// first add a server because it will reset any options
 		micro.Server(mgrpcs.NewServer()),

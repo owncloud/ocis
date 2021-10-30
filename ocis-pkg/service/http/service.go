@@ -20,11 +20,6 @@ type Service struct {
 // NewService initializes a new http service.
 func NewService(opts ...Option) Service {
 	sopts := newOptions(opts...)
-	sopts.Logger.Info().
-		Str("transport", transport(sopts.TLSConfig)).
-		Str("addr", sopts.Address).
-		Msg("starting server")
-
 	wopts := []micro.Option{
 		micro.Server(mhttps.NewServer(server.TLSConfig(sopts.TLSConfig))),
 		micro.Address(sopts.Address),
