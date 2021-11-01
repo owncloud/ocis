@@ -17,7 +17,8 @@ geekdocFilePath: ocis_keycloak.md
 
 [Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_keycloak)
 
-The docker stack consists 4 containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
+The docker stack consists 4 containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network. It
+is also responsible for redirecting requests on the OIDC discovery endpoints (e.g. `.well-known/openid-configuration`) to the correct destination in Keycloak.
 
 Keycloak add two containers: Keycloak itself and a PostgreSQL as database. Keycloak will be configured as oCIS' IDP instead of the internal IDP [LibreGraph Connect]({{< ref "../../extensions/idp" >}})
 
