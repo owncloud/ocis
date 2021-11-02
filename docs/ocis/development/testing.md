@@ -48,7 +48,7 @@ For example `make -C tests/acceptance/docker Core-API-Tests-owncloud-storage-3`r
 The single feature tests can also be run against the different storage backends. Therefore multiple make targets with the schema test-<test source>-feature-<storage backend> exists. For selecting a single feature test you have to add an additional `BEHAT_FEATURE=...` parameter when invoking the make command:
 
 ```
-make -C tests/acceptance/docker test-ocis-feature-ocis BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature'
+make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature'
 ```
 
 This must be pointing to a valid feature definition.
