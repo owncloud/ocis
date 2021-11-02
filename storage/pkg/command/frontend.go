@@ -162,6 +162,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 				},
 				"auth": map[string]interface{}{
 					"credentials_by_user_agent": cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent,
+					"credential_chain":          []string{"bearer"},
 				},
 			},
 			// TODO build services dynamically
