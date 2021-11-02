@@ -16,13 +16,13 @@ require (
 	github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v4 v4.0.0-20211028090348-ed690ed838cc
 	github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v4 v4.0.0-20211028090348-ed690ed838cc
 	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v4 v4.0.0-20211028090348-ed690ed838cc
-	github.com/blevesearch/bleve/v2 v2.2.1
+	github.com/blevesearch/bleve/v2 v2.2.2
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20211018122138-391b29bd7803
 	github.com/cs3org/reva v1.15.1-0.20211027114107-4879bf6be97a
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
-	github.com/go-chi/chi/v5 v5.0.4
+	github.com/go-chi/chi/v5 v5.0.5
 	github.com/go-chi/cors v1.2.0
 	github.com/go-chi/render v1.0.1
 	github.com/go-logr/logr v0.4.0
@@ -49,7 +49,7 @@ require (
 	github.com/owncloud/open-graph-api-go v0.0.0-20211018134924-bea0e2a6ec3e
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
-	github.com/rs/zerolog v1.25.0
+	github.com/rs/zerolog v1.26.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.9.0
@@ -59,7 +59,7 @@ require (
 	github.com/yaegashi/msgraph.go v0.1.4
 	go-micro.dev/v4 v4.2.1
 	go.opencensus.io v0.23.0
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.25.0
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.26.0
 	go.opentelemetry.io/otel v1.1.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.1.0
 	go.opentelemetry.io/otel/sdk v1.1.0
