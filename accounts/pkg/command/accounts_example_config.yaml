@@ -1,0 +1,4 @@
+log:
+  level: info
+  color: true
+  pretty: true

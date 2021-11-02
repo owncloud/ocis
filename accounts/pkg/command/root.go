@@ -3,14 +3,14 @@ package command
 import (
 	"context"
 	"os"
-	"strings"
+
+	gofig "github.com/gookit/config/v2"
+	gooyaml "github.com/gookit/config/v2/yaml"
 
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/ocis-pkg/version"
-	"github.com/spf13/viper"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
 )
@@ -78,47 +78,23 @@ func NewLogger(cfg *config.Config) log.Logger {
 	)
 }
 
-// ParseConfig loads accounts configuration from Viper known paths.
+// ParseConfig loads accounts configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	sync.ParsingViperConfig.Lock()
-	defer sync.ParsingViperConfig.Unlock()
-	logger := NewLogger(cfg)
+	// create a new config and load files and env values onto it since this needs to be thread-safe.
+	cnf := gofig.NewWithOptions("accounts", gofig.ParseEnv)
 
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.SetEnvPrefix("ACCOUNTS")
-	viper.AutomaticEnv()
+	// TODO(refs) add ENV + toml + json
+	cnf.AddDriver(gooyaml.Driver)
 
-	if c.IsSet("config-file") {
-		viper.SetConfigFile(c.String("config-file"))
-	} else {
-		viper.SetConfigName(defaultFilename)
-
-		for _, v := range defaultConfigPaths {
-			viper.AddConfigPath(v)
-		}
+	// TODO(refs) load from expected locations with the expected name
+	err := cnf.LoadFiles("/Users/aunger/code/owncloud/ocis/accounts/pkg/command/accounts_example_config.yaml")
+	if err != nil {
+		// we have to swallow the error, since it is not mission critical a
+		// config file is missing and default values are loaded instead.
+		//return err
 	}
 
-	if err := viper.ReadInConfig(); err != nil {
-		switch err.(type) {
-		case viper.ConfigFileNotFoundError:
-			logger.Debug().
-				Msg("no config found on preconfigured location")
-		case viper.UnsupportedConfigError:
-			logger.Fatal().
-				Err(err).
-				Msg("Unsupported config type")
-		default:
-			logger.Fatal().
-				Err(err).
-				Msg("Failed to read config")
-		}
-	}
-
-	if err := viper.Unmarshal(&cfg); err != nil {
-		logger.Fatal().
-			Err(err).
-			Msg("Failed to parse config")
-	}
+	err = cnf.BindStruct("", cfg)
 
 	return nil
 }
