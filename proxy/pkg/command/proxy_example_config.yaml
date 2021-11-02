@@ -1,6 +1,0 @@
-log:
-  level: info
-  color: true
-  pretty: true
-http:
-  addr: "${PROXY_HTTP_ADDR|localhost:2222}"

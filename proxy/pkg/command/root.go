@@ -4,8 +4,6 @@ import (
 	"context"
 	"os"
 
-	gofig "github.com/gookit/config/v2"
-	gooyaml "github.com/gookit/config/v2/yaml"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/version"
@@ -69,22 +67,7 @@ func NewLogger(cfg *config.Config) log.Logger {
 
 // ParseConfig loads proxy configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	// create a new config and load files and env values onto it since this needs to be thread-safe.
-	cnf := gofig.NewWithOptions("proxy", gofig.ParseEnv)
-
-	// TODO(refs) add ENV + toml + json
-	cnf.AddDriver(gooyaml.Driver)
-
-	// TODO(refs) load from expected locations with the expected name
-	err := cnf.LoadFiles("/Users/aunger/code/owncloud/ocis/proxy/pkg/command/proxy_example_config.yaml")
-	if err != nil {
-		return err
-	}
-
-	// bind all keys to cfg, as we expect an entire proxy.[yaml, toml...] to define all keys and not only sub values.
-	err = cnf.BindStruct("", cfg)
-
-	return nil
+	return ociscfg.BindSourcesToStructs("proxy", cfg)
 }
 
 // SutureService allows for the proxy command to be embedded and supervised by a suture supervisor tree.

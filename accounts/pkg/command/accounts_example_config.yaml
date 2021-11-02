@@ -1,7 +1,0 @@
-log:
-  level: info
-  color: true
-  pretty: true
-repo:
-  cs3:
-    provider_addr: "localhost:9214"

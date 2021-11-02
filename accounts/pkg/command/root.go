@@ -4,9 +4,6 @@ import (
 	"context"
 	"os"
 
-	gofig "github.com/gookit/config/v2"
-	gooyaml "github.com/gookit/config/v2/yaml"
-
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -76,23 +73,7 @@ func NewLogger(cfg *config.Config) log.Logger {
 
 // ParseConfig loads accounts configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	// create a new config and load files and env values onto it since this needs to be thread-safe.
-	cnf := gofig.NewWithOptions("accounts", gofig.ParseEnv)
-
-	// TODO(refs) add ENV + toml + json
-	cnf.AddDriver(gooyaml.Driver)
-
-	// TODO(refs) load from expected locations with the expected name
-	err := cnf.LoadFiles("/Users/aunger/code/owncloud/ocis/accounts/pkg/command/accounts_example_config.yaml")
-	if err != nil {
-		// we have to swallow the error, since it is not mission critical a
-		// config file is missing and default values are loaded instead.
-		//return err
-	}
-
-	err = cnf.BindStruct("", cfg)
-
-	return nil
+	return ociscfg.BindSourcesToStructs("accounts", cfg)
 }
 
 // SutureService allows for the accounts command to be embedded and supervised by a suture supervisor tree.
