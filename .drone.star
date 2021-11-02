@@ -1,3 +1,14 @@
+"""oCIS CI defintion
+"""
+
+# images
+OC_CI_ALPINE = "owncloudci/alpine:latest"
+OC_CI_GOLANG = "owncloudci/golang:1.17"
+OC_CI_NODEJS = "owncloudci/nodejs:14"
+OC_CI_PHP = "owncloudci/php:7.4"
+MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
+
+# configuration
 config = {
     "modules": [
         # if you add a module here please also add it to the root level Makefile
@@ -260,7 +271,7 @@ def testOcisModule(ctx, module):
     steps = makeGenerate(module) + [
         {
             "name": "golangci-lint",
-            "image": "owncloudci/golang:1.17",
+            "image": OC_CI_GOLANG,
             "commands": [
                 "mkdir -p cache/checkstyle",
                 "make -C %s ci-golangci-lint" % (module),
@@ -270,7 +281,7 @@ def testOcisModule(ctx, module):
         },
         {
             "name": "test",
-            "image": "owncloudci/golang:1.17",
+            "image": OC_CI_GOLANG,
             "commands": [
                 "mkdir -p cache/coverage",
                 "make -C %s test" % (module),
@@ -378,7 +389,7 @@ def uploadScanResults(ctx):
             },
             {
                 "name": "sync-from-cache",
-                "image": "minio/mc:RELEASE.2021-03-23T05-46-11Z",
+                "image": MINIO_MC,
                 "environment": {
                     "MC_HOST_cachebucket": {
                         "from_secret": "cache_s3_connection_url",
@@ -405,7 +416,7 @@ def uploadScanResults(ctx):
             },
             {
                 "name": "purge-cache",
-                "image": "minio/mc:RELEASE.2021-03-23T05-46-11Z",
+                "image": MINIO_MC,
                 "environment": {
                     "MC_HOST_cachebucket": {
                         "from_secret": "cache_s3_connection_url",
@@ -426,10 +437,7 @@ def uploadScanResults(ctx):
     }
 
 def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
-    earlyFail = config["localApiTests"]["earlyFail"] if "earlyFail" in config["localApiTests"] else False
-
-    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
-        earlyFail = False
+    early_fail = config["localApiTests"]["earlyFail"] if "earlyFail" in config["localApiTests"] else False
 
     return {
         "kind": "pipeline",
@@ -444,7 +452,7 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
                  cloneCoreRepos() + [
             {
                 "name": "localApiTests-%s-%s" % (suite, storage),
-                "image": "owncloudci/php:7.4",
+                "image": OC_CI_PHP,
                 "environment": {
                     "TEST_SERVER_URL": "https://ocis-server:9200",
                     "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
@@ -463,7 +471,7 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
                 ],
                 "volumes": [stepVolumeOC10Tests],
             },
-        ] + buildGithubCommentForBuildStopped("localApiTests-%s-%s" % (suite, storage), earlyFail) + githubComment(earlyFail) + stopBuild(earlyFail),
+        ] + failEarly(ctx, early_fail),
         "services": redisForOCStorage(storage),
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
@@ -477,10 +485,7 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
     }
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
-    earlyFail = config["apiTests"]["earlyFail"] if "earlyFail" in config["apiTests"] else False
-
-    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
-        earlyFail = False
+    early_fail = config["apiTests"]["earlyFail"] if "earlyFail" in config["apiTests"] else False
 
     return {
         "kind": "pipeline",
@@ -495,7 +500,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                  cloneCoreRepos() + [
             {
                 "name": "oC10ApiTests-%s-storage-%s" % (storage, part_number),
-                "image": "owncloudci/php:7.4",
+                "image": OC_CI_PHP,
                 "environment": {
                     "TEST_SERVER_URL": "https://ocis-server:9200",
                     "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
@@ -515,7 +520,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                 ],
                 "volumes": [stepVolumeOC10Tests],
             },
-        ] + buildGithubCommentForBuildStopped("Core-API-Tests-%s-storage-%s" % (storage, part_number), earlyFail) + githubComment(earlyFail) + stopBuild(earlyFail),
+        ] + failEarly(ctx, early_fail),
         "services": redisForOCStorage(storage),
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
@@ -556,9 +561,6 @@ def uiTests(ctx):
     filterTags = params["filterTags"]
     earlyFail = params["earlyFail"]
 
-    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
-        earlyFail = False
-
     if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "tag" or ctx.build.event == "cron"):
         numberOfParts = params["numberOfParts"]
         skipExceptParts = params["skipExceptParts"]
@@ -576,7 +578,7 @@ def uiTests(ctx):
 
     return pipelines
 
-def uiTestPipeline(ctx, filterTags, earlyFail, runPart = 1, numberOfParts = 1, storage = "ocis", uniqueName = "", accounts_hash_difficulty = 4):
+def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, storage = "ocis", uniqueName = "", accounts_hash_difficulty = 4):
     standardFilterTags = "not @skipOnOCIS and not @skip and not @notToImplementOnOCIS and not @federated-server-needed"
     if filterTags == "":
         finalFilterTags = standardFilterTags
@@ -608,7 +610,7 @@ def uiTestPipeline(ctx, filterTags, earlyFail, runPart = 1, numberOfParts = 1, s
                  ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
             {
                 "name": "webUITests",
-                "image": "owncloudci/nodejs:14",
+                "image": OC_CI_NODEJS,
                 "environment": {
                     "SERVER_HOST": "https://ocis-server:9200",
                     "BACKEND_HOST": "https://ocis-server:9200",
@@ -640,7 +642,7 @@ def uiTestPipeline(ctx, filterTags, earlyFail, runPart = 1, numberOfParts = 1, s
                                "path": "/uploads",
                            }],
             },
-        ] + buildGithubCommentForBuildStopped("Web-Tests-ocis-%s-storage-%s" % (storage, runPart), earlyFail) + githubComment(earlyFail) + stopBuild(earlyFail),
+        ] + failEarly(ctx, early_fail),
         "services": selenium(),
         "volumes": [pipelineVolumeOC10Tests] +
                    [{
@@ -658,10 +660,7 @@ def uiTestPipeline(ctx, filterTags, earlyFail, runPart = 1, numberOfParts = 1, s
     }
 
 def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
-    earlyFail = config["accountsUITests"]["earlyFail"] if "earlyFail" in config["accountsUITests"] else False
-
-    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
-        earlyFail = False
+    early_fail = config["accountsUITests"]["earlyFail"] if "earlyFail" in config["accountsUITests"] else False
 
     return {
         "kind": "pipeline",
@@ -675,7 +674,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                  ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
             {
                 "name": "WebUIAcceptanceTests",
-                "image": "owncloudci/nodejs:14",
+                "image": OC_CI_NODEJS,
                 "environment": {
                     "SERVER_HOST": "https://ocis-server:9200",
                     "BACKEND_HOST": "https://ocis-server:9200",
@@ -708,7 +707,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                                "path": "/uploads",
                            }],
             },
-        ] + buildGithubCommentForBuildStopped("accountsUITests", earlyFail) + githubComment(earlyFail) + stopBuild(earlyFail),
+        ] + failEarly(ctx, early_fail),
         "services": selenium(),
         "volumes": [stepVolumeOC10Tests] +
                    [{
@@ -726,10 +725,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
     }
 
 def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
-    earlyFail = config["settingsUITests"]["earlyFail"] if "earlyFail" in config["settingsUITests"] else False
-
-    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
-        earlyFail = False
+    early_fail = config["settingsUITests"]["earlyFail"] if "earlyFail" in config["settingsUITests"] else False
 
     return {
         "kind": "pipeline",
@@ -743,7 +739,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                  ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
             {
                 "name": "WebUIAcceptanceTests",
-                "image": "owncloudci/nodejs:14",
+                "image": OC_CI_NODEJS,
                 "environment": {
                     "SERVER_HOST": "https://ocis-server:9200",
                     "BACKEND_HOST": "https://ocis-server:9200",
@@ -774,7 +770,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                                "path": "/uploads",
                            }],
             },
-        ] + buildGithubCommentForBuildStopped("settingsUITests", earlyFail) + githubComment(earlyFail) + stopBuild(earlyFail),
+        ] + failEarly(ctx, early_fail),
         "services": [
             {
                 "name": "redis",
@@ -796,79 +792,68 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
         },
     }
 
-def stopBuild(earlyFail):
-    if (earlyFail):
-        return [{
-            "name": "stop-build",
-            "image": "drone/cli:alpine",
-            "environment": {
-                "DRONE_SERVER": "https://drone.owncloud.com",
-                "DRONE_TOKEN": {
-                    "from_secret": "drone_token",
+def failEarly(ctx, early_fail):
+    """failEarly sends posts a comment about the failed pipeline to the github pr and then kills all pipelines of the current build
+
+    Args:
+        ctx: drone passes a context with information which the pipeline can be adapted to
+        early_fail: boolean if an early fail should happen or not
+
+    Returns:
+        pipeline steps
+    """
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
+        return []
+
+    if (early_fail):
+        return [
+            {
+                "name": "github-comment",
+                "image": "thegeeklab/drone-github-comment:1",
+                "settings": {
+                    "message": ":boom: Acceptance test [<strong>${DRONE_STAGE_NAME}</strong>](${DRONE_BUILD_LINK}/${DRONE_STAGE_NUMBER}/1) failed. Further test are cancelled...",
+                    "key": "pr-${DRONE_PULL_REQUEST}",  #TODO: we could delete the comment after a successfull CI run
+                    "update": "true",
+                    "api_key": {
+                        "from_secret": "github_token",
+                    },
+                },
+                "when": {
+                    "status": [
+                        "failure",
+                    ],
+                    "event": [
+                        "pull_request",
+                    ],
                 },
             },
-            "commands": [
-                "drone build stop owncloud/ocis ${DRONE_BUILD_NUMBER}",
-            ],
-            "when": {
-                "status": [
-                    "failure",
+            {
+                "name": "stop-build",
+                "image": "drone/cli:alpine",
+                # # https://github.com/drone/runner-go/blob/0bd0f8fc31c489817572060d17c6e24aaa487470/pipeline/runtime/const.go#L95-L102
+                # "failure": "fail-fast",
+                # would be an alternative, but is currently broken
+                "environment": {
+                    "DRONE_SERVER": "https://drone.owncloud.com",
+                    "DRONE_TOKEN": {
+                        "from_secret": "drone_token",
+                    },
+                },
+                "commands": [
+                    "drone build stop owncloud/ocis ${DRONE_BUILD_NUMBER}",
                 ],
-                "event": [
-                    "pull_request",
-                ],
-            },
-        }]
-
-    else:
-        return []
-
-def buildGithubCommentForBuildStopped(alternateSuiteName, earlyFail):
-    if (earlyFail):
-        return [{
-            "name": "build-github-comment-buildStop",
-            "image": "owncloud/ubuntu:20.04",
-            "commands": [
-                'echo "<details><summary>:boom: Acceptance tests <strong>%s</strong> failed. The build is cancelled...</summary>\\n\\n" >> /drone/src/comments.file' % alternateSuiteName,
-            ],
-            "when": {
-                "status": [
-                    "failure",
-                ],
-                "event": [
-                    "pull_request",
-                ],
-            },
-        }]
-
-    else:
-        return []
-
-def githubComment(earlyFail):
-    if (earlyFail):
-        return [{
-            "name": "github-comment",
-            "image": "jmccann/drone-github-comment:1",
-            "settings": {
-                "message_file": "/drone/src/comments.file",
-            },
-            "environment": {
-                "GITHUB_TOKEN": {
-                    "from_secret": "github_token",
+                "when": {
+                    "status": [
+                        "failure",
+                    ],
+                    "event": [
+                        "pull_request",
+                    ],
                 },
             },
-            "when": {
-                "status": [
-                    "failure",
-                ],
-                "event": [
-                    "pull_request",
-                ],
-            },
-        }]
+        ]
 
-    else:
-        return []
+    return []
 
 def dockerReleases(ctx):
     pipelines = []
@@ -902,7 +887,7 @@ def dockerRelease(ctx, arch):
         "steps": makeGenerate("") + [
             {
                 "name": "build",
-                "image": "owncloudci/golang:1.17",
+                "image": OC_CI_GOLANG,
                 "commands": [
                     "make -C ocis release-linux-docker",
                 ],
@@ -975,7 +960,7 @@ def dockerEos(ctx):
         "steps": makeGenerate("") + [
             {
                 "name": "build",
-                "image": "owncloudci/golang:1.17",
+                "image": OC_CI_GOLANG,
                 "commands": [
                     "make -C ocis release-linux-docker",
                 ],
@@ -1077,14 +1062,14 @@ def binaryRelease(ctx, name):
         "steps": makeGenerate("") + [
             {
                 "name": "build",
-                "image": "owncloudci/golang:1.17",
+                "image": OC_CI_GOLANG,
                 "commands": [
                     "make -C ocis release-%s" % (name),
                 ],
             },
             {
                 "name": "finish",
-                "image": "owncloudci/golang:1.17",
+                "image": OC_CI_GOLANG,
                 "commands": [
                     "make -C ocis release-finish",
                 ],
@@ -1108,7 +1093,7 @@ def binaryRelease(ctx, name):
             },
             {
                 "name": "changelog",
-                "image": "owncloudci/golang:1.17",
+                "image": OC_CI_GOLANG,
                 "commands": [
                     "make changelog CHANGELOG_VERSION=%s" % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
                 ],
@@ -1240,21 +1225,21 @@ def changelog(ctx):
         "steps": [
             {
                 "name": "generate",
-                "image": "owncloudci/golang:1.17",
+                "image": OC_CI_GOLANG,
                 "commands": [
                     "make -C ocis changelog",
                 ],
             },
             {
                 "name": "diff",
-                "image": "owncloudci/alpine:latest",
+                "image": OC_CI_ALPINE,
                 "commands": [
                     "git diff",
                 ],
             },
             {
                 "name": "output",
-                "image": "owncloudci/alpine:latest",
+                "image": OC_CI_ALPINE,
                 "commands": [
                     "cat CHANGELOG.md",
                 ],
@@ -1342,19 +1327,19 @@ def docs(ctx):
         "steps": [
             {
                 "name": "docs-generate",
-                "image": "owncloudci/golang:1.17",
+                "image": OC_CI_GOLANG,
                 "commands": ["make -C %s docs-generate" % (module) for module in config["modules"]],
             },
             {
                 "name": "prepare",
-                "image": "owncloudci/golang:1.17",
+                "image": OC_CI_GOLANG,
                 "commands": [
                     "make -C docs docs-copy",
                 ],
             },
             {
                 "name": "test",
-                "image": "owncloudci/golang:1.17",
+                "image": OC_CI_GOLANG,
                 "commands": [
                     "make -C docs test",
                 ],
@@ -1382,7 +1367,7 @@ def docs(ctx):
             },
             {
                 "name": "list and remove temporary files",
-                "image": "owncloudci/alpine:latest",
+                "image": OC_CI_ALPINE,
                 "commands": [
                     "tree docs/hugo/public",
                     "rm -rf docs/hugo",
@@ -1425,7 +1410,7 @@ def makeGenerate(module):
     return [
         {
             "name": "generate nodejs",
-            "image": "owncloudci/nodejs:14",
+            "image": OC_CI_NODEJS,
             "commands": [
                 "%s ci-node-generate" % (make),
             ],
@@ -1433,7 +1418,7 @@ def makeGenerate(module):
         },
         {
             "name": "generate go",
-            "image": "owncloudci/golang:1.17",
+            "image": OC_CI_GOLANG,
             "commands": [
                 "%s ci-go-generate" % (make),
             ],
@@ -1501,7 +1486,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
     return [
         {
             "name": "ocis-server",
-            "image": "owncloudci/alpine:latest",
+            "image": OC_CI_ALPINE,
             "detach": True,
             "environment": environment,
             "commands": [
@@ -1523,7 +1508,7 @@ def cloneCoreRepos():
     return [
         {
             "name": "clone-core-repos",
-            "image": "owncloudci/alpine:latest",
+            "image": OC_CI_ALPINE,
             "commands": [
                 "source /drone/src/.drone.env",
                 "git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing",
@@ -1565,7 +1550,7 @@ def build():
     return [
         {
             "name": "build",
-            "image": "owncloudci/golang:1.17",
+            "image": OC_CI_GOLANG,
             "commands": [
                 "make -C ocis build",
             ],
@@ -1667,14 +1652,14 @@ def checkStarlark():
         "steps": [
             {
                 "name": "format-check-starlark",
-                "image": "owncloudci/bazel-buildifier",
+                "image": "owncloudci/bazel-buildifier:latest",
                 "commands": [
                     "buildifier --mode=check .drone.star",
                 ],
             },
             {
                 "name": "show-diff",
-                "image": "owncloudci/bazel-buildifier",
+                "image": "owncloudci/bazel-buildifier:latest",
                 "commands": [
                     "buildifier --mode=fix .drone.star",
                     "git diff",
@@ -1742,7 +1727,7 @@ def genericCachePurge(ctx, name, cache_key):
         "steps": [
             {
                 "name": "purge-cache",
-                "image": "minio/mc:RELEASE.2021-03-23T05-46-11Z",
+                "image": MINIO_MC,
                 "failure": "ignore",
                 "environment": {
                     "MC_HOST_cache": {
