@@ -33,9 +33,9 @@ func DefaultConfigSources(filename string, drivers []string) []string {
 	var sources []string
 
 	for i := range defaultLocations {
-		_fs := os.DirFS(defaultLocations[i])
+		dirFS := os.DirFS(defaultLocations[i])
 		pattern := filename + ".*"
-		matched, _ := fs.Glob(_fs, pattern)
+		matched, _ := fs.Glob(dirFS, pattern)
 		if len(matched) > 0 {
 			// prepend path to results
 			for j := 0; j < len(matched); j++ {
