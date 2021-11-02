@@ -109,7 +109,7 @@ type Config struct {
 // New initializes a new configuration with or without defaults.
 func New() *Config {
 	return &Config{
-		Accounts:      accounts.New(),
+		Accounts:      accounts.DefaultConfig(),
 		GLAuth:        glauth.New(),
 		Graph:         graph.New(),
 		GraphExplorer: graphExplorer.New(),
