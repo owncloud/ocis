@@ -48,7 +48,7 @@ require (
 	github.com/owncloud/open-graph-api-go v0.0.0-20211018134924-bea0e2a6ec3e
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
-	github.com/rs/zerolog v1.25.0
+	github.com/rs/zerolog v1.26.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.9.0
