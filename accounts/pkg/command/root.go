@@ -12,11 +12,6 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var (
-	defaultConfigPaths = []string{"/etc/ocis", "$HOME/.ocis", "./config"}
-	defaultFilename    = "accounts"
-)
-
 // Execute is the entry point for the ocis-accounts command.
 func Execute(cfg *config.Config) error {
 	app := &cli.App{

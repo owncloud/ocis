@@ -75,6 +75,9 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	}
 
 	err = cnf.BindStruct("", cfg)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

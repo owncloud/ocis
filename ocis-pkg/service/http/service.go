@@ -1,7 +1,6 @@
 package http
 
 import (
-	"crypto/tls"
 	"strings"
 	"time"
 
@@ -33,12 +32,4 @@ func NewService(opts ...Option) Service {
 	}
 
 	return Service{micro.NewService(wopts...)}
-}
-
-func transport(secure *tls.Config) string {
-	if secure != nil {
-		return "https"
-	}
-
-	return "http"
 }
