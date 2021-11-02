@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Don't allow empty password: [#197](https://github.com/owncloud/product/issues/197)
+* Bugfix - Fix basic auth config: [#2719](https://github.com/owncloud/ocis/pull/2719)
 * Bugfix - Fix oCIS startup ony systems with IPv6: [#2698](https://github.com/owncloud/ocis/pull/2698)
 * Bugfix - Fix error logging when there is no thumbnail for a file: [#2702](https://github.com/owncloud/ocis/pull/2702)
 * Bugfix - Don't announce resharing via capabilities: [#2690](https://github.com/owncloud/ocis/pull/2690)
@@ -19,6 +20,14 @@ The following sections list the changes for unreleased.
    It was allowed to create users with empty or spaces-only password. This is fixed
 
    https://github.com/owncloud/product/issues/197
+
+* Bugfix - Fix basic auth config: [#2719](https://github.com/owncloud/ocis/pull/2719)
+
+   Users could authenticate using basic auth even though `PROXY_ENABLE_BASIC_AUTH` was set to
+   false.
+
+   https://github.com/owncloud/ocis/issues/2466
+   https://github.com/owncloud/ocis/pull/2719
 
 * Bugfix - Fix oCIS startup ony systems with IPv6: [#2698](https://github.com/owncloud/ocis/pull/2698)
 
