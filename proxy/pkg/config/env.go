@@ -8,7 +8,7 @@ import (
 
 type mapping struct {
 	goType      string      // expected type, used for decoding. It is the field dynamic type.
-	env         string      // name of the env var.
+	env         []string    // name of the env var.
 	destination interface{} // memory address of the original config value to modify.
 }
 
@@ -17,7 +17,7 @@ type mapping struct {
 func GetEnv() []string {
 	var r = make([]string, len(structMappings(&Config{})))
 	for i := range structMappings(&Config{}) {
-		r = append(r, structMappings(&Config{})[i].env)
+		r = append(r, structMappings(&Config{})[i].env...)
 	}
 
 	return r
@@ -27,26 +27,28 @@ func GetEnv() []string {
 func (c *Config) UnmapEnv(gooconf *gofig.Config) error {
 	vals := structMappings(c)
 	for i := range vals {
-		// we need to guard against v != "" because this is the condition that checks that the value is set from the environment.
-		// the `ok` guard is not enough, apparently.
-		if v, ok := gooconf.GetValue(vals[i].env); ok && v != "" {
-			switch vals[i].goType {
-			case "bool":
-				r := gooconf.Bool(vals[i].env)
-				*vals[i].destination.(*bool) = r
-			case "string":
-				r := gooconf.String(vals[i].env)
-				*vals[i].destination.(*string) = r
-			case "int":
-				r := gooconf.Int(vals[i].env)
-				*vals[i].destination.(*int) = r
-			case "float":
-				// defaults to float64
-				r := gooconf.Float(vals[i].env)
-				*vals[i].destination.(*float64) = r
-			default:
-				// it is unlikely we will ever get here. Let this serve more as a runtime check for when debugging.
-				return fmt.Errorf("invalid type for env var: `%v`", vals[i].env)
+		for j := range vals[i].env {
+			// we need to guard against v != "" because this is the condition that checks that the value is set from the environment.
+			// the `ok` guard is not enough, apparently.
+			if v, ok := gooconf.GetValue(vals[i].env[j]); ok && v != "" {
+				switch vals[i].goType {
+				case "bool":
+					r := gooconf.Bool(vals[i].env[j])
+					*vals[i].destination.(*bool) = r
+				case "string":
+					r := gooconf.String(vals[i].env[j])
+					*vals[i].destination.(*string) = r
+				case "int":
+					r := gooconf.Int(vals[i].env[j])
+					*vals[i].destination.(*int) = r
+				case "float":
+					// defaults to float64
+					r := gooconf.Float(vals[i].env[j])
+					*vals[i].destination.(*float64) = r
+				default:
+					// it is unlikely we will ever get here. Let this serve more as a runtime check for when debugging.
+					return fmt.Errorf("invalid type for env var: `%v`", vals[i].env[j])
+				}
 			}
 		}
 	}

@@ -5,22 +5,22 @@ func structMappings(cfg *Config) []mapping {
 	return []mapping{
 		{
 			goType:      "bool",
-			env:         "PROXY_ENABLE_BASIC_AUTH",
+			env:         []string{"PROXY_ENABLE_BASIC_AUTH"},
 			destination: &cfg.EnableBasicAuth,
 		},
 		{
 			goType:      "string",
-			env:         "PROXY_LOG_LEVEL",
+			env:         []string{"PROXY_LOG_LEVEL", "OCIS_LOG_LEVEL"},
 			destination: &cfg.Log.Level,
 		},
 		{
 			goType:      "bool",
-			env:         "PROXY_LOG_COLOR",
+			env:         []string{"PROXY_LOG_COLOR", "OCIS_LOG_COLOR"},
 			destination: &cfg.Log.Color,
 		},
 		{
 			goType:      "bool",
-			env:         "PROXY_LOG_PRETTY",
+			env:         []string{"PROXY_LOG_PRETTY", "OCIS_LOG_PRETTY"},
 			destination: &cfg.Log.Pretty,
 		},
 	}
