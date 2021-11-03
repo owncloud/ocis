@@ -17,6 +17,7 @@
       "guzzlehttp/guzzle": "^7.4",
       "phpunit/phpunit": "^9.5",
       "laminas/laminas-ldap": "^2.10",
-      "ankitpokhrel/tus-php": "^2.1"
+      "ankitpokhrel/tus-php": "^2.1",
+      "wapmorgan/unified-archive": "^1.1.3"
     }
   }
