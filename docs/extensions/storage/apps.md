@@ -34,7 +34,9 @@ The capabilities endpoint (eg. `https://localhost:9200/ocs/v1.php/cloud/capabili
 }
 ```
 
+{{< hint info >}}
 Please note that there might be two or more app providers with different versions. This is not be expected to happen on a regular basis. It was designed for a possible migration period for clients when the app provider needs a breaking change.
+{{< /hint >}}
 
 ## App registry
 
