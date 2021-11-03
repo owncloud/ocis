@@ -5,197 +5,168 @@ func structMappings(cfg *Config) []mapping {
 	return []mapping{
 		// Logging
 		{
-			env:         []string{"PROXY_LOG_LEVEL", "OCIS_LOG_LEVEL"},
-			destination: &cfg.Log.Level,
+			EnvVars:     []string{"PROXY_LOG_LEVEL", "OCIS_LOG_LEVEL"},
+			Destination: &cfg.Log.Level,
 		},
 		{
-			env:         []string{"PROXY_LOG_COLOR", "OCIS_LOG_COLOR"},
-			destination: &cfg.Log.Color,
+			EnvVars:     []string{"PROXY_LOG_COLOR", "OCIS_LOG_COLOR"},
+			Destination: &cfg.Log.Color,
 		},
 		{
-			env:         []string{"PROXY_LOG_PRETTY", "OCIS_LOG_PRETTY"},
-			destination: &cfg.Log.Pretty,
+			EnvVars:     []string{"PROXY_LOG_PRETTY", "OCIS_LOG_PRETTY"},
+			Destination: &cfg.Log.Pretty,
 		},
 		{
-			env:         []string{"PROXY_LOG_FILE", "OCIS_LOG_FILE"},
-			destination: &cfg.Log.File,
+			EnvVars:     []string{"PROXY_LOG_FILE", "OCIS_LOG_FILE"},
+			Destination: &cfg.Log.File,
 		},
 
 		// Basic auth
 		{
-			env:         []string{"PROXY_ENABLE_BASIC_AUTH"},
-			destination: &cfg.EnableBasicAuth,
+			EnvVars:     []string{"PROXY_ENABLE_BASIC_AUTH"},
+			Destination: &cfg.EnableBasicAuth,
 		},
 
 		// Debug (health)
 		{
-			env:         []string{"PROXY_DEBUG_ADDR"},
-			destination: &cfg.Debug.Addr,
+			EnvVars:     []string{"PROXY_DEBUG_ADDR"},
+			Destination: &cfg.Debug.Addr,
 		},
 
 		{
-			env:         []string{"PROXY_CONFIG_FILE"},
-			destination: &cfg.File,
+			EnvVars:     []string{"PROXY_CONFIG_FILE"},
+			Destination: &cfg.File,
 		},
 
 		// Tracing
 		{
-			env:         []string{"PROXY_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
-			destination: &cfg.Tracing.Enabled,
+			EnvVars:     []string{"PROXY_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
+			Destination: &cfg.Tracing.Enabled,
 		},
 		{
-			env:         []string{"PROXY_TRACING_TYPE", "OCIS_TRACING_TYPE"},
-			destination: &cfg.Tracing.Type,
+			EnvVars:     []string{"PROXY_TRACING_TYPE", "OCIS_TRACING_TYPE"},
+			Destination: &cfg.Tracing.Type,
 		},
 		{
-			env:         []string{"PROXY_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
-			destination: &cfg.Tracing.Endpoint,
+			EnvVars:     []string{"PROXY_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
+			Destination: &cfg.Tracing.Endpoint,
 		},
 		{
-			env:         []string{"PROXY_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
-			destination: &cfg.Tracing.Collector,
+			EnvVars:     []string{"PROXY_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
+			Destination: &cfg.Tracing.Collector,
 		},
 		{
-			env:         []string{"PROXY_TRACING_SERVICE"},
-			destination: &cfg.Tracing.Service,
+			EnvVars:     []string{"PROXY_TRACING_SERVICE"},
+			Destination: &cfg.Tracing.Service,
 		},
 
 		// Debug
 		{
-			env:         []string{"PROXY_DEBUG_ADDR"},
-			destination: &cfg.Debug.Addr,
+			EnvVars:     []string{"PROXY_DEBUG_ADDR"},
+			Destination: &cfg.Debug.Addr,
 		},
 		{
-			env:         []string{"PROXY_DEBUG_TOKEN"},
-			destination: &cfg.Debug.Token,
+			EnvVars:     []string{"PROXY_DEBUG_TOKEN"},
+			Destination: &cfg.Debug.Token,
 		},
 		{
-			env:         []string{"PROXY_DEBUG_PPROF"},
-			destination: &cfg.Debug.Pprof,
+			EnvVars:     []string{"PROXY_DEBUG_PPROF"},
+			Destination: &cfg.Debug.Pprof,
 		},
 		{
-			env:         []string{"PROXY_DEBUG_ZPAGES"},
-			destination: &cfg.Debug.Zpages,
+			EnvVars:     []string{"PROXY_DEBUG_ZPAGES"},
+			Destination: &cfg.Debug.Zpages,
 		},
 
 		// HTTP
 		{
-			env:         []string{"PROXY_HTTP_ADDR"},
-			destination: &cfg.HTTP.Addr,
+			EnvVars:     []string{"PROXY_HTTP_ADDR"},
+			Destination: &cfg.HTTP.Addr,
 		},
 		{
-			env:         []string{"PROXY_HTTP_ROOT"},
-			destination: &cfg.HTTP.Root,
+			EnvVars:     []string{"PROXY_HTTP_ROOT"},
+			Destination: &cfg.HTTP.Root,
 		},
 
 		// Service
 		{
-			env:         []string{"PROXY_SERVICE_NAMESPACE"},
-			destination: &cfg.Service.Name,
+			EnvVars:     []string{"PROXY_SERVICE_NAMESPACE"},
+			Destination: &cfg.Service.Namespace,
 		},
 		{
-			env:         []string{"PROXY_SERVICE_NAME"},
-			destination: &cfg.Service.Namespace,
+			EnvVars:     []string{"PROXY_SERVICE_NAME"},
+			Destination: &cfg.Service.Name,
 		},
 		{
-			env:         nil,
-			destination: nil,
+			EnvVars:     []string{"PROXY_TRANSPORT_TLS_CERT"},
+			Destination: &cfg.HTTP.TLSCert,
 		},
 		{
-			env:         nil,
-			destination: nil,
+			EnvVars:     []string{"PROXY_TRANSPORT_TLS_KEY"},
+			Destination: &cfg.HTTP.TLSKey,
 		},
 		{
-			env:         nil,
-			destination: nil,
+			EnvVars:     []string{"PROXY_TLS"},
+			Destination: &cfg.HTTP.TLS,
 		},
 		{
-			env:         nil,
-			destination: nil,
+			EnvVars:     []string{"PROXY_JWT_SECRET", "OCIS_JWT_SECRET"},
+			Destination: &cfg.TokenManager.JWTSecret,
+		},
+
+		{
+			EnvVars:     []string{"REVA_GATEWAY"},
+			Destination: &cfg.Reva.Address,
 		},
 		{
-			env:         nil,
-			destination: nil,
+			EnvVars:     []string{"PROXY_INSECURE_BACKENDS"},
+			Destination: &cfg.InsecureBackends,
 		},
 		{
-			env:         nil,
-			destination: nil,
+			EnvVars:     []string{"PROXY_OIDC_ISSUER", "OCIS_URL"}, // PROXY_OIDC_ISSUER takes precedence over OCIS_URL
+			Destination: &cfg.OIDC.Issuer,
 		},
 		{
-			env:         nil,
-			destination: nil,
+			EnvVars:     []string{"PROXY_OIDC_INSECURE"},
+			Destination: &cfg.OIDC.Insecure,
 		},
 		{
-			env:         nil,
-			destination: nil,
+			EnvVars:     []string{"PROXY_OIDC_USERINFO_CACHE_TTL"},
+			Destination: &cfg.OIDC.UserinfoCache.TTL,
 		},
 		{
-			env:         nil,
-			destination: nil,
+			EnvVars:     []string{"PROXY_OIDC_USERINFO_CACHE_SIZE"},
+			Destination: &cfg.OIDC.UserinfoCache.Size,
 		},
 		{
-			env:         nil,
-			destination: nil,
+			EnvVars:     []string{"PROXY_AUTOPROVISION_ACCOUNTS"},
+			Destination: &cfg.AutoprovisionAccounts,
 		},
 		{
-			env:         nil,
-			destination: nil,
+			EnvVars:     []string{"PROXY_USER_OIDC_CLAIM"},
+			Destination: &cfg.UserOIDCClaim,
 		},
 		{
-			env:         nil,
-			destination: nil,
+			EnvVars:     []string{"PROXY_USER_CS3_CLAIM"},
+			Destination: &cfg.UserCS3Claim,
 		},
 		{
-			env:         nil,
-			destination: nil,
+			EnvVars:     []string{"PROXY_ENABLE_PRESIGNEDURLS"},
+			Destination: &cfg.PreSignedURL.Enabled,
 		},
 		{
-			env:         nil,
-			destination: nil,
+			EnvVars:     []string{"PROXY_ACCOUNT_BACKEND_TYPE"},
+			Destination: &cfg.AccountBackend,
 		},
 		{
-			env:         nil,
-			destination: nil,
+			EnvVars:     []string{"PROXY_MACHINE_AUTH_API_KEY", "OCIS_MACHINE_AUTH_API_KEY"},
+			Destination: &cfg.MachineAuthAPIKey,
 		},
-		{
-			env:         nil,
-			destination: nil,
-		},
-		{
-			env:         nil,
-			destination: nil,
-		},
-		{
-			env:         nil,
-			destination: nil,
-		},
-		{
-			env:         nil,
-			destination: nil,
-		},
-		{
-			env:         nil,
-			destination: nil,
-		},
-		{
-			env:         nil,
-			destination: nil,
-		},
-		{
-			env:         nil,
-			destination: nil,
-		},
-		{
-			env:         nil,
-			destination: nil,
-		},
-		{
-			env:         nil,
-			destination: nil,
-		},
-		{
-			env:         nil,
-			destination: nil,
-		},
+		// there are 2 missing bindings:
+		// EnvVars: []string{"PROXY_MIDDLEWARE_AUTH_CREDENTIALS_BY_USER_AGENT"},
+		// EnvVars: []string{"PRESIGNEDURL_ALLOWED_METHODS"},
+		// since they both have no destination
+		// see https://github.com/owncloud/ocis/blob/52e5effa4fa05a1626d46f7d4cb574dde3a54593/proxy/pkg/flagset/flagset.go#L256-L261
+		// and https://github.com/owncloud/ocis/blob/52e5effa4fa05a1626d46f7d4cb574dde3a54593/proxy/pkg/flagset/flagset.go#L295-L300
 	}
 }
