@@ -7,7 +7,7 @@ geekdocEditPath: edit/master/docs/extensions/storage
 geekdocFilePath: apps.md
 ---
 
-oCIS is all about files. But most of the time you want to do something with files that beyond the basic upload, download and share behavior. Therefore, oCIS has a concept for apps, that can handle specific file types, so called mime types.
+oCIS is all about files. But most of the time you want to do something with files that is beyond the basic upload, download and share behavior. Therefore, oCIS has a concept for apps, that can handle specific file types, so called mime types.
 
 ## App provider capability
 
@@ -44,9 +44,9 @@ The app registry is the single point where all apps register themselves and thei
 
 The apps will register their supported mime types automatically, so that users can open supported files with them.
 
-Administrators can set default applications on a per mimetype basis and also allow the creation of new files for certain mime types. This per mime type configuration also features a description, file extension option and an icon.
+Administrators can set default applications on a per mime type basis and also allow the creation of new files for certain mime types. This per mime type configuration also features a description, file extension option and an icon.
 
-In order to modify the mime type config you need to set `STORAGE_APP_REGISTRY_MIMETYPES_JSON=.../mimetypes.json` to a valid JSON file with a content like this:
+In order to modify the mime type config you need to set `STORAGE_APP_REGISTRY_MIMETYPES_JSON=.../mimetypes.json` to a valid JSON file with content like this:
 
 ```json
 [
