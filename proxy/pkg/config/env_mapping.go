@@ -8,6 +8,23 @@ import (
 	gofig "github.com/gookit/config/v2"
 )
 
+// mappings holds a record of how to get an env variable's value onto a config.Config value. Field selectors are made via
+// the `tagName` field. For instance having the following value:
+//	type example struct {
+//	  enable `mapstructure:"enable"`
+//	}
+//
+//  e := example{enable: false}
+//
+// we can link the field `e.enable` with the environment variable EXTENSION_ENABLE by adding an entry in this mappings:
+//	{
+//		gType:   "bool",
+//		envName: "EXTENSION_ENABLE",
+//		tagName: "enable",
+//	}
+//
+// so when a config is parsed the value is read from the environment, parsed and loaded onto whatever destination
+// has the tagName.
 var mappings = []struct {
 	gType   string // expected type, used for decoding. It is the type expected from gookit.
 	envName string // name of the env var
