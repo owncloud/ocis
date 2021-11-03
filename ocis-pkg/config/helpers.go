@@ -65,7 +65,7 @@ func sanitizeExtensions(set []string, ext []string, f func(a, b string) bool) []
 
 // BindSourcesToStructs assigns any config value from a config file / env variable to struct `dst`. Its only purpose
 // is to solely modify `dst`, not dealing with the config structs; and do so in a thread safe manner.
-func BindSourcesToStructs(extension string, dst interface{}) error {
+func BindSourcesToStructs(extension string, dst interface{}) (*gofig.Config, error) {
 	sources := DefaultConfigSources(extension, supportedExtensions)
 	cnf := gofig.NewWithOptions("proxy", gofig.ParseEnv)
 	cnf.AddDriver(gooyaml.Driver)
@@ -73,8 +73,8 @@ func BindSourcesToStructs(extension string, dst interface{}) error {
 
 	err := cnf.BindStruct("", &dst)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return cnf, nil
 }

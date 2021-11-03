@@ -67,7 +67,19 @@ func NewLogger(cfg *config.Config) log.Logger {
 
 // ParseConfig loads proxy configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	return ociscfg.BindSourcesToStructs("proxy", cfg)
+	conf, err := ociscfg.BindSourcesToStructs("proxy", cfg)
+	if err != nil {
+		return err
+	}
+
+	// load all env variables relevant to the config in the current context.
+	conf.LoadOSEnv(config.GetEnv(), false)
+
+	if err = config.UnmapEnv(conf, cfg); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // SutureService allows for the proxy command to be embedded and supervised by a suture supervisor tree.

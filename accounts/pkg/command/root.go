@@ -68,7 +68,12 @@ func NewLogger(cfg *config.Config) log.Logger {
 
 // ParseConfig loads accounts configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	return ociscfg.BindSourcesToStructs("accounts", cfg)
+	_, err := ociscfg.BindSourcesToStructs("accounts", cfg)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // SutureService allows for the accounts command to be embedded and supervised by a suture supervisor tree.
