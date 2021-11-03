@@ -1556,7 +1556,6 @@ def skipIfUnchanged(ctx, type):
     base = [
         "^docs/.*",
         "^changelog/.*",
-        "^.drone.star$",  #TODO: remove
     ]
     unit = [
         ".*_test.go$",
