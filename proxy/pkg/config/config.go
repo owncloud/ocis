@@ -9,23 +9,23 @@ import (
 
 // Log defines the available logging configuration.
 type Log struct {
-	Level  string
-	Pretty bool
-	Color  bool
-	File   string
+	Level  string `mapstructure:"log_level"`
+	Pretty bool   `mapstructure:"log_pretty"`
+	Color  bool   `mapstructure:"log_color"`
+	File   string `mapstructure:"log_file"`
 }
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string
-	Token  string
-	Pprof  bool
-	Zpages bool
+	Addr   string `mapstructure:"debug_addr"`
+	Token  string `mapstructure:"debug_token"`
+	Pprof  bool   `mapstructure:"debug_pprof"`
+	Zpages bool   `mapstructure:"debug_zpages"`
 }
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr    string `mapstructure:"addr"`
+	Addr    string `mapstructure:"http_addr"`
 	Root    string `mapstructure:"http_root"`
 	TLSCert string `mapstructure:"http_tls_cert"`
 	TLSKey  string `mapstructure:"http_tls_key"`
@@ -34,32 +34,32 @@ type HTTP struct {
 
 // Service defines the available service configuration.
 type Service struct {
-	Name      string
-	Namespace string
-	Version   string
+	Name      string `mapstructure:"service_name"`
+	Namespace string `mapstructure:"service_namespace"`
+	Version   string `mapstructure:"service_version"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool
-	Type      string
-	Endpoint  string
-	Collector string
-	Service   string
+	Enabled   bool   `mapstructure:"tracing_enabled"`
+	Type      string `mapstructure:"tracing_type"`
+	Endpoint  string `mapstructure:"tracing_endpoint"`
+	Collector string `mapstructure:"tracing_collector"`
+	Service   string `mapstructure:"tracing_service"`
 }
 
 // Policy enables us to use multiple directors.
 type Policy struct {
-	Name   string
-	Routes []Route
+	Name   string  `mapstructure:"policy_name"`
+	Routes []Route `mapstructure:"policy_routes"`
 }
 
 // Route define forwarding routes
 type Route struct {
-	Type        RouteType
-	Endpoint    string
-	Backend     string
-	ApacheVHost bool `mapstructure:"apache-vhost"`
+	Type        RouteType `mapstructure:"route_type"`
+	Endpoint    string    `mapstructure:"route_endpoint"`
+	Backend     string    `mapstructure:"route_backend"`
+	ApacheVHost bool      `mapstructure:"apache-vhost"`
 }
 
 // RouteType defines the type of a route
@@ -83,24 +83,24 @@ var (
 
 // Reva defines all available REVA configuration.
 type Reva struct {
-	Address    string
-	Middleware Middleware
+	Address    string     `mapstructure:"reva_address"`
+	Middleware Middleware `mapstructure:"reva_middleware"`
 }
 
 // Middleware configures proxy middlewares.
 type Middleware struct {
-	Auth Auth
+	Auth Auth `mapstructure:""`
 }
 
 // Auth configures proxy http auth middleware.
 type Auth struct {
-	CredentialsByUserAgent map[string]string
+	CredentialsByUserAgent map[string]string `mapstructure:""`
 }
 
 // Cache is a TTL cache configuration.
 type Cache struct {
-	Size int
-	TTL  int
+	Size int `mapstructure:"cache_size"`
+	TTL  int `mapstructure:"cache_ttl"`
 }
 
 // Config combines all available configuration parts.
@@ -132,9 +132,9 @@ type Config struct {
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
 // with the configured oidc-provider
 type OIDC struct {
-	Issuer        string `mapstructure:"issuer"`
-	Insecure      bool   `mapstructure:"insecure"`
-	UserinfoCache Cache  `mapstructure:"user_info_cache"`
+	Issuer        string `mapstructure:"oidc_issuer"`
+	Insecure      bool   `mapstructure:"oidc_insecure"`
+	UserinfoCache Cache  `mapstructure:"oidc_user_info_cache"`
 }
 
 // PolicySelector is the toplevel-configuration for different selectors
@@ -147,7 +147,7 @@ type PolicySelector struct {
 
 // StaticSelectorConf is the config for the static-policy-selector
 type StaticSelectorConf struct {
-	Policy string `mapstructure:"policy"`
+	Policy string `mapstructure:"static_selector_policy"`
 }
 
 // TokenManager is the config for using the reva token manager
@@ -182,6 +182,7 @@ type RegexSelectorConf struct {
 	UnauthenticatedPolicy string          `mapstructure:"unauthenticated_policy"`
 	SelectorCookieName    string          `mapstructure:"selector_cookie_name"`
 }
+
 type RegexRuleConf struct {
 	Priority int    `mapstructure:"priority"`
 	Property string `mapstructure:"property"`
