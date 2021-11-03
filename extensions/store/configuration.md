@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-11-02T15:03:41+0000"
+date: "2021-11-03T07:19:12+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/store/templates
@@ -34,79 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Command-line flags
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### store server
-
-Start integrated server
-
-Usage: `store server [command options] [arguments...]`
-
-
-
-
-
-
-
--log-file |  $STORE_LOG_FILE , $OCIS_LOG_FILE
-: Enable log to file.
-
-
--tracing-enabled |  $STORE_TRACING_ENABLED , $OCIS_TRACING_ENABLED
-: Enable sending traces.
-
-
--tracing-type |  $STORE_TRACING_TYPE , $OCIS_TRACING_TYPE
-: Tracing backend type. Default: `"jaeger"`.
-
-
--tracing-endpoint |  $STORE_TRACING_ENDPOINT , $OCIS_TRACING_ENDPOINT
-: Endpoint for the agent. Default: `""`.
-
-
--tracing-collector |  $STORE_TRACING_COLLECTOR , $OCIS_TRACING_COLLECTOR
-: Endpoint for the collector. Default: `""`.
-
-
--tracing-service |  $STORE_TRACING_SERVICE
-: Service name for tracing. Default: `"store"`.
-
-
--debug-addr |  $STORE_DEBUG_ADDR
-: Address to bind debug server. Default: `"127.0.0.1:9464"`.
-
-
--debug-token |  $STORE_DEBUG_TOKEN
-: Token to grant metrics access. Default: `""`.
-
-
--debug-pprof |  $STORE_DEBUG_PPROF
-: Enable pprof debugging.
-
-
--debug-zpages |  $STORE_DEBUG_ZPAGES
-: Enable zpages debugging.
-
-
--grpc-namespace |  $STORE_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
-
-
--grpc-addr |  $STORE_GRPC_ADDR
-: Address to bind grpc server. Default: `"127.0.0.1:9460"`.
-
-
--name |  $STORE_NAME
-: Service name. Default: `"store"`.
-
-
--data-path |  $STORE_DATA_PATH
-: location of the store data path. Default: `flags.OverrideDefaultString(cfg.Datapath, path.Join(defaults.BaseDataPath(), "store"))`.
-
-
--extensions | 
-: Run specific extensions during supervised mode. This flag is set by the runtime.
-
-
 
 ### store version
 
@@ -210,6 +137,79 @@ Usage: `store ocis-store [command options] [arguments...]`
 
 
 
+
+
+
+### store server
+
+Start integrated server
+
+Usage: `store server [command options] [arguments...]`
+
+
+
+
+
+
+
+-log-file |  $STORE_LOG_FILE , $OCIS_LOG_FILE
+: Enable log to file.
+
+
+-tracing-enabled |  $STORE_TRACING_ENABLED , $OCIS_TRACING_ENABLED
+: Enable sending traces.
+
+
+-tracing-type |  $STORE_TRACING_TYPE , $OCIS_TRACING_TYPE
+: Tracing backend type. Default: `"jaeger"`.
+
+
+-tracing-endpoint |  $STORE_TRACING_ENDPOINT , $OCIS_TRACING_ENDPOINT
+: Endpoint for the agent. Default: `""`.
+
+
+-tracing-collector |  $STORE_TRACING_COLLECTOR , $OCIS_TRACING_COLLECTOR
+: Endpoint for the collector. Default: `""`.
+
+
+-tracing-service |  $STORE_TRACING_SERVICE
+: Service name for tracing. Default: `"store"`.
+
+
+-debug-addr |  $STORE_DEBUG_ADDR
+: Address to bind debug server. Default: `"127.0.0.1:9464"`.
+
+
+-debug-token |  $STORE_DEBUG_TOKEN
+: Token to grant metrics access. Default: `""`.
+
+
+-debug-pprof |  $STORE_DEBUG_PPROF
+: Enable pprof debugging.
+
+
+-debug-zpages |  $STORE_DEBUG_ZPAGES
+: Enable zpages debugging.
+
+
+-grpc-namespace |  $STORE_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
+
+-grpc-addr |  $STORE_GRPC_ADDR
+: Address to bind grpc server. Default: `"127.0.0.1:9460"`.
+
+
+-name |  $STORE_NAME
+: Service name. Default: `"store"`.
+
+
+-data-path |  $STORE_DATA_PATH
+: location of the store data path. Default: `flags.OverrideDefaultString(cfg.Datapath, path.Join(defaults.BaseDataPath(), "store"))`.
+
+
+-extensions | 
+: Run specific extensions during supervised mode. This flag is set by the runtime.
 
 
 
