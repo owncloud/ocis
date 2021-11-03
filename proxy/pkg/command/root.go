@@ -75,7 +75,7 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	// load all env variables relevant to the config in the current context.
 	conf.LoadOSEnv(config.GetEnv(), false)
 
-	if err = config.UnmapEnv(conf, cfg); err != nil {
+	if err = cfg.UnmapEnv(conf); err != nil {
 		return err
 	}
 
