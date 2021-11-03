@@ -67,7 +67,7 @@ require (
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d
 	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
 	google.golang.org/genproto v0.0.0-20211020151524-b7c3a969101a
-	google.golang.org/grpc v1.41.0
+	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.27.1
 	gotest.tools/v3 v3.0.3
 	stash.kopano.io/kgol/rndm v1.1.1
