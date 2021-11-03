@@ -1550,7 +1550,7 @@ def build():
     ]
 
 def skipIfUnchanged(ctx, type):
-    if "full-ci" in ctx.build.title.lower():
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "tag" or ctx.build.event == "cron"):
         return []
 
     base = [
