@@ -132,7 +132,8 @@ curl 'https://ocis.test/app/list'
       "name": "OpenDocument",
       "icon": "https://some-website.test/opendocument-text-icon.png",
       "description": "OpenDocument text document",
-      "allow_creation": true
+      "allow_creation": true,
+      "default_application": "Collabora"
     },
     {
       "mime_type": "text/markdown",
@@ -145,7 +146,8 @@ curl 'https://ocis.test/app/list'
       ],
       "name": "Markdown file",
       "description": "Markdown file",
-      "allow_creation": true
+      "allow_creation": true,
+      "default_application": "CodiMD"
     },
     {
       "mime_type": "application/vnd.ms-word.document.macroenabled.12",
