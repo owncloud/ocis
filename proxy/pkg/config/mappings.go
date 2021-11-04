@@ -123,7 +123,7 @@ func structMappings(cfg *Config) []mapping {
 			Destination: &cfg.InsecureBackends,
 		},
 		{
-			EnvVars:     []string{"PROXY_OIDC_ISSUER", "OCIS_URL"}, // PROXY_OIDC_ISSUER takes precedence over OCIS_URL
+			EnvVars:     []string{"PROXY_OIDC_ISSUER"},
 			Destination: &cfg.OIDC.Issuer,
 		},
 		{

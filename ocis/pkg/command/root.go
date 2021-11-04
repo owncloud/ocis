@@ -21,7 +21,7 @@ func Execute() error {
 		Usage:    "ownCloud Infinite Scale Stack",
 		Compiled: version.Compiled(),
 		Before: func(c *cli.Context) error {
-			return ParseConfig(cfg)
+			return ParseConfig(c, cfg)
 		},
 		Authors: []*cli.Author{
 			{
@@ -63,7 +63,7 @@ func NewLogger(cfg *config.Config) log.Logger {
 }
 
 // ParseConfig loads ocis configuration from known paths.
-func ParseConfig(cfg *config.Config) error {
+func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	conf, err := ociscfg.BindSourcesToStructs("ocis", cfg)
 	if err != nil {
 		return err

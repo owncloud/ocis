@@ -18,7 +18,6 @@ func ProxyCommand(cfg *config.Config) *cli.Command {
 		Name:     "proxy",
 		Usage:    "Start proxy server",
 		Category: "Extensions",
-		//Flags:    flagset.ServerWithConfig(cfg.Proxy),
 		Subcommands: []*cli.Command{
 			command.PrintVersion(cfg.Proxy),
 		},
@@ -33,6 +32,7 @@ func ProxyCommand(cfg *config.Config) *cli.Command {
 }
 
 func configureProxy(cfg *config.Config) *svcconfig.Config {
+	cfg.Proxy.OcisURL = cfg.OcisURL
 	cfg.Proxy.Log.Level = cfg.Log.Level
 	cfg.Proxy.Log.Pretty = cfg.Log.Pretty
 	cfg.Proxy.Log.Color = cfg.Log.Color

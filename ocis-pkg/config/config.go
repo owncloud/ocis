@@ -83,8 +83,9 @@ type Config struct {
 	// Mode is mostly used whenever we need to run an extension. The technical debt this introduces is in regard of
 	// what it does. Supervised (0) loads configuration from a unified config file because of known limitations of Viper; whereas
 	// Unsupervised (1) MUST parse config from all known sources.
-	Mode Mode
-	File string
+	Mode    Mode
+	File    string
+	OcisURL string `mapstructure:"ocis_url"`
 
 	Registry     string       `mapstructure:"registry"`
 	Log          Log          `mapstructure:"log"`

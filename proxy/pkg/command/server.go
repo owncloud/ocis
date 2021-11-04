@@ -52,6 +52,14 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.PreSignedURL.AllowedHTTPMethods = ctx.StringSlice("presignedurl-allow-method")
 			}
 
+			// we need a starting point to compare the default config values to determine if the outcome of ParseConfig
+			// modified a value that should be shared just because it is present in the ocis.yaml file.
+			defaultConfig := config.DefaultConfig()
+
+			if cfg.OcisURL != "" && cfg.OIDC.Issuer == defaultConfig.OIDC.Issuer {
+				cfg.OIDC.Issuer = cfg.OcisURL
+			}
+
 			if err := loadUserAgent(ctx, cfg); err != nil {
 				return err
 			}

@@ -105,6 +105,8 @@ type Cache struct {
 
 // Config combines all available configuration parts.
 type Config struct {
+	OcisURL string
+
 	File                  string          `mapstructure:"file"`
 	Log                   Log             `mapstructure:"log"`
 	Debug                 Debug           `mapstructure:"debug"`
