@@ -285,13 +285,14 @@ There are apps, which need to be opened in the iframe with a GET request. The GE
 
 **Query parameters**:
 
-- `filename` (mandatory): path / name of the new file
+- `parent_container_id` (mandatory): ID of the folder in which the file will be created
+- `filename` (mandatory): name of the new file
 - `template` (optional): not yet implemented
 
 **Request examples**:
 
 ```bash
-curl -X POST 'https://ocis.test/app/new?filename=/home/test.odt'
+curl -X POST 'https://ocis.test/app/new?parent_container_id=c2lkOmNpZAo=&filename=test.odt'
 ```
 
 **Response example**:
@@ -306,21 +307,37 @@ You will receive a file id of the freshly created file, which you can use to ope
 
 **Example responses (error case)**:
 
-- #TODO: file already exists, currently existing files will be overwritten
-
+- missing parent folder ID
   ```json
   {
-    "code": "ERROR",
-    "message": "file already exists"
+    "code": "INVALID_PARAMETER",
+    "message": "Missing parent container ID"
   }
   ```
 
-- unauthorized / failed to create the file
+- missing file name
+  ```json
+  {
+    "code": "INVALID_PARAMETER",
+    "message": "Missing filename"
+  }
+  ```
+
+- file already exists
 
   ```json
   {
     "code": "SERVER_ERROR",
-    "message": "error creating resource"
+    "message": "The file already exists"
+  }
+  ```
+
+- unauthorized / failed to find the parent folder
+
+  ```json
+  {
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "The parent container is not accessible or does not exist"
   }
   ```
 
