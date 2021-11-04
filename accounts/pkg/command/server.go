@@ -8,7 +8,6 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/accounts/pkg/config"
-	"github.com/owncloud/ocis/accounts/pkg/flagset"
 	"github.com/owncloud/ocis/accounts/pkg/metrics"
 	"github.com/owncloud/ocis/accounts/pkg/server/grpc"
 	"github.com/owncloud/ocis/accounts/pkg/server/http"
@@ -23,7 +22,6 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:        "server",
 		Usage:       "Start ocis accounts service",
 		Description: "uses an LDAP server as the storage backend",
-		Flags:       flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
 			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {

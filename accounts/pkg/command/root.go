@@ -66,10 +66,17 @@ func NewLogger(cfg *config.Config) log.Logger {
 	)
 }
 
-// ParseConfig loads accounts configuration from known paths.
+// ParseConfig loads proxy configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	_, err := ociscfg.BindSourcesToStructs("accounts", cfg)
+	conf, err := ociscfg.BindSourcesToStructs("accounts", cfg)
 	if err != nil {
+		return err
+	}
+
+	// load all env variables relevant to the config in the current context.
+	conf.LoadOSEnv(config.GetEnv(), false)
+
+	if err = cfg.UnmapEnv(conf); err != nil {
 		return err
 	}
 
