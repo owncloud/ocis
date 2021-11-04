@@ -67,7 +67,7 @@ func sanitizeExtensions(set []string, ext []string, f func(a, b string) bool) []
 // is to solely modify `dst`, not dealing with the config structs; and do so in a thread safe manner.
 func BindSourcesToStructs(extension string, dst interface{}) (*gofig.Config, error) {
 	sources := DefaultConfigSources(extension, supportedExtensions)
-	cnf := gofig.NewWithOptions("proxy", gofig.ParseEnv)
+	cnf := gofig.NewWithOptions(extension, gofig.ParseEnv)
 	cnf.AddDriver(gooyaml.Driver)
 	_ = cnf.LoadFiles(sources...)
 

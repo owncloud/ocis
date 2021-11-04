@@ -3,15 +3,12 @@ package command
 import (
 	"os"
 
-	gofig "github.com/gookit/config/v2"
-	gooyaml "github.com/gookit/config/v2/yaml"
-
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/urfave/cli/v2"
-
 	"github.com/owncloud/ocis/ocis-pkg/config"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/ocis/pkg/register"
+	"github.com/urfave/cli/v2"
 )
 
 // Execute is the entry point for the ocis command.
@@ -24,7 +21,7 @@ func Execute() error {
 		Usage:    "ownCloud Infinite Scale Stack",
 		Compiled: version.Compiled(),
 		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg)
+			return ParseConfig(cfg)
 		},
 		Authors: []*cli.Author{
 			{
@@ -66,16 +63,15 @@ func NewLogger(cfg *config.Config) log.Logger {
 }
 
 // ParseConfig loads ocis configuration from known paths.
-func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	cnf := gofig.NewWithOptions("ocis", gofig.ParseEnv)
-	cnf.AddDriver(gooyaml.Driver)
-	err := cnf.LoadFiles("/Users/aunger/code/owncloud/ocis/ocis/pkg/command/ocis_example_config.yaml")
+func ParseConfig(cfg *config.Config) error {
+	conf, err := ociscfg.BindSourcesToStructs("ocis", cfg)
 	if err != nil {
 		return err
 	}
 
-	err = cnf.BindStruct("", cfg)
-	if err != nil {
+	conf.LoadOSEnv(config.GetEnv(), false)
+
+	if err = cfg.UnmapEnv(conf); err != nil {
 		return err
 	}
 

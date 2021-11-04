@@ -27,8 +27,6 @@ func Execute(cfg *config.Config) error {
 			},
 		},
 
-		//Flags: flagset.RootWithConfig(cfg),
-
 		Before: func(c *cli.Context) error {
 			cfg.Service.Version = version.String
 			return nil
