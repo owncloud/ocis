@@ -7,9 +7,9 @@ geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0013-locking.md
 ---
 
-- Status: proposed
-- Deciders: @pmaier1, @dragotin, @butonic, @micbar, @wkloucek
-- Date: 2021-10-28
+- Status: accepted
+- Deciders: @hodyroff, @pmaier1, @jojowein, @dragotin, @micbar, @tbsbdr, @wkloucek
+- Date: 2021-11-03
 
 ## Context and Problem Statement
 
@@ -28,7 +28,9 @@ At the time of this writing no locking mechanisms exists in oCIS / REVA for both
 
 ## Decision Outcome
 
-// TODO, but recommendation against file based locking. Because file based locking does not work on file-only shares
+For the GA we chose option 2. Therefore we need to remove or disable the file based locking functionality of the CS3org WOPI server. The decision was taken because the current file based locking does not work on file-only shares. The current locking also does not guarantee exclusive access to a file since other parts of oCIS like the WebDAV API or other REVA services don't respect the locks.
+
+After the GA we need to implement option 3.
 
 ## Pros and Cons of the Options
 
