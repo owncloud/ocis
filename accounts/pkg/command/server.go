@@ -23,7 +23,6 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage:       "Start ocis accounts service",
 		Description: "uses an LDAP server as the storage backend",
 		Before: func(ctx *cli.Context) error {
-			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
@@ -32,17 +31,20 @@ func Server(cfg *config.Config) *cli.Command {
 
 			// When running on single binary mode the before hook from the root command won't get called. We manually
 			// call this before hook from ocis command, so the configuration can be loaded.
-			return ParseConfig(ctx, cfg)
-			if origins := ctx.StringSlice("cors-allowed-origins"); len(origins) != 0 {
-				cfg.HTTP.CORS.AllowedOrigins = origins
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
 			}
-			if methods := ctx.StringSlice("cors-allowed-methods"); len(methods) != 0 {
-				cfg.HTTP.CORS.AllowedMethods = methods
-			}
-			if headers := ctx.StringSlice("cors-allowed-headers"); len(headers) != 0 {
-				cfg.HTTP.CORS.AllowedOrigins = headers
-			}
-			logger.Debug().Str("service", "accounts").Msg("ignoring config file parsing when running supervised")
+
+			// TODO(this is not in the cli context anymore)
+			//if origins := ctx.StringSlice("cors-allowed-origins"); len(origins) != 0 {
+			//	cfg.HTTP.CORS.AllowedOrigins = origins
+			//}
+			//if methods := ctx.StringSlice("cors-allowed-methods"); len(methods) != 0 {
+			//	cfg.HTTP.CORS.AllowedMethods = methods
+			//}
+			//if headers := ctx.StringSlice("cors-allowed-headers"); len(headers) != 0 {
+			//	cfg.HTTP.CORS.AllowedOrigins = headers
+			//}
 			return nil
 		},
 		Action: func(c *cli.Context) error {
