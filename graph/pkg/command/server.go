@@ -6,7 +6,6 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/graph/pkg/config"
-	"github.com/owncloud/ocis/graph/pkg/flagset"
 	"github.com/owncloud/ocis/graph/pkg/metrics"
 	"github.com/owncloud/ocis/graph/pkg/server/debug"
 	"github.com/owncloud/ocis/graph/pkg/server/http"
@@ -20,7 +19,6 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")

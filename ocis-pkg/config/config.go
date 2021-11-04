@@ -115,8 +115,8 @@ type Config struct {
 func New() *Config {
 	return &Config{
 		Accounts:      accounts.DefaultConfig(),
-		GLAuth:        glauth.New(),
-		Graph:         graph.New(),
+		GLAuth:        glauth.DefaultConfig(),
+		Graph:         graph.DefaultConfig(),
 		GraphExplorer: graphExplorer.New(),
 		IDP:           idp.New(),
 		OCS:           ocs.New(),
