@@ -29,9 +29,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			// When running on single binary mode the before hook from the root command won't get called. We manually
 			// call this before hook from ocis command, so the configuration can be loaded.
-			if !cfg.Supervised {
-				return ParseConfig(ctx, cfg)
-			}
+			return ParseConfig(ctx, cfg)
 			logger.Debug().Str("service", "graph").Msg("ignoring config file parsing when running supervised")
 			return nil
 		},
