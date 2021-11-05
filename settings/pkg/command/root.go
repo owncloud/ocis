@@ -3,15 +3,11 @@ package command
 import (
 	"context"
 	"os"
-	"strings"
-
-	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/settings/pkg/config"
-	"github.com/spf13/viper"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
 )
@@ -30,8 +26,6 @@ func Execute(cfg *config.Config) error {
 				Email: "support@owncloud.com",
 			},
 		},
-
-		//Flags: flagset.RootWithConfig(cfg),
 
 		Before: func(c *cli.Context) error {
 			cfg.Service.Version = version.String
@@ -69,46 +63,18 @@ func NewLogger(cfg *config.Config) log.Logger {
 	)
 }
 
-// ParseConfig loads settings configuration from Viper known paths.
+// ParseConfig loads idp configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	sync.ParsingViperConfig.Lock()
-	defer sync.ParsingViperConfig.Unlock()
-	logger := NewLogger(cfg)
-
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.SetEnvPrefix("SETTINGS")
-	viper.AutomaticEnv()
-
-	if c.IsSet("config-file") {
-		viper.SetConfigFile(c.String("config-file"))
-	} else {
-		viper.SetConfigName("settings")
-
-		viper.AddConfigPath("/etc/ocis")
-		viper.AddConfigPath("$HOME/.ocis")
-		viper.AddConfigPath("./config")
+	conf, err := ociscfg.BindSourcesToStructs("settings", cfg)
+	if err != nil {
+		return err
 	}
 
-	if err := viper.ReadInConfig(); err != nil {
-		switch err.(type) {
-		case viper.ConfigFileNotFoundError:
-			logger.Debug().
-				Msg("no config found on preconfigured location")
-		case viper.UnsupportedConfigError:
-			logger.Fatal().
-				Err(err).
-				Msg("unsupported config type")
-		default:
-			logger.Fatal().
-				Err(err).
-				Msg("failed to read config")
-		}
-	}
+	// load all env variables relevant to the config in the current context.
+	conf.LoadOSEnv(config.GetEnv(), false)
 
-	if err := viper.Unmarshal(&cfg); err != nil {
-		logger.Fatal().
-			Err(err).
-			Msg("failed to parse config")
+	if err = cfg.UnmapEnv(conf); err != nil {
+		return err
 	}
 
 	return nil

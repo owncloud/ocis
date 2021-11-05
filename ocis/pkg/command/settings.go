@@ -9,7 +9,6 @@ import (
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/settings/pkg/command"
 	svcconfig "github.com/owncloud/ocis/settings/pkg/config"
-	"github.com/owncloud/ocis/settings/pkg/flagset"
 	"github.com/urfave/cli/v2"
 )
 
@@ -19,7 +18,6 @@ func SettingsCommand(cfg *config.Config) *cli.Command {
 		Name:     "settings",
 		Usage:    "Start settings server",
 		Category: "Extensions",
-		Flags:    flagset.ServerWithConfig(cfg.Settings),
 		Subcommands: []*cli.Command{
 			command.PrintVersion(cfg.Settings),
 		},
