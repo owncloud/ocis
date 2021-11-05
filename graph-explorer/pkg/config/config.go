@@ -10,59 +10,59 @@ import (
 
 // Log defines the available logging configuration.
 type Log struct {
-	Level  string
-	Pretty bool
-	Color  bool
-	File   string
+	Level  string `mapstructure:"level"`
+	Pretty bool   `mapstructure:"pretty"`
+	Color  bool   `mapstructure:"color"`
+	File   string `mapstructure:"file"`
 }
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string
-	Token  string
-	Pprof  bool
-	Zpages bool
+	Addr   string `mapstructure:"addr"`
+	Token  string `mapstructure:"token"`
+	Pprof  bool   `mapstructure:"pprof"`
+	Zpages bool   `mapstructure:"zpages"`
 }
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string
-	Root      string
-	Namespace string
+	Addr      string `mapstructure:"addr"`
+	Root      string `mapstructure:"root"`
+	Namespace string `mapstructure:"namespace"`
 }
 
 // Server configures a server.
 type Server struct {
-	Version string
-	Name    string
+	Version string `mapstructure:"version"`
+	Name    string `mapstructure:"name"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool
-	Type      string
-	Endpoint  string
-	Collector string
-	Service   string
+	Enabled   bool   `mapstructure:"enabled"`
+	Type      string `mapstructure:"type"`
+	Endpoint  string `mapstructure:"endpoint"`
+	Collector string `mapstructure:"collector"`
+	Service   string `mapstructure:"service"`
 }
 
 // GraphExplorer defines the available graph-explorer configuration.
 type GraphExplorer struct {
-	ClientID     string
-	Issuer       string
-	GraphURLBase string
-	GraphURLPath string
+	ClientID     string `mapstructure:"client_id"`
+	Issuer       string `mapstructure:"issuer"`
+	GraphURLBase string `mapstructure:"graph_url_base"`
+	GraphURLPath string `mapstructure:"graph_url_path"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
-	File          string
-	Log           Log
-	Debug         Debug
-	HTTP          HTTP
-	Server        Server
-	Tracing       Tracing
-	GraphExplorer GraphExplorer
+	File          string        `mapstructure:"file"`
+	Log           Log           `mapstructure:"log"`
+	Debug         Debug         `mapstructure:"debug"`
+	HTTP          HTTP          `mapstructure:"http"`
+	Server        Server        `mapstructure:"server"`
+	Tracing       Tracing       `mapstructure:"tracing"`
+	GraphExplorer GraphExplorer `mapstructure:"graph_explorer"`
 
 	Context    context.Context
 	Supervised bool

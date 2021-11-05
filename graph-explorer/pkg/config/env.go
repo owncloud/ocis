@@ -9,6 +9,18 @@ type mapping struct {
 func structMappings(cfg *Config) []mapping {
 	return []mapping{
 		{
+			EnvVars:     []string{"GRAPH_EXPLORER_LOG_LEVEL", "OCIS_LOG_LEVEL"},
+			Destination: &cfg.Log.Level,
+		},
+		{
+			EnvVars:     []string{"GRAPH_EXPLORER_LOG_PRETTY", "OCIS_LOG_PRETTY"},
+			Destination: &cfg.Log.Pretty,
+		},
+		{
+			EnvVars:     []string{"GRAPH_EXPLORER_LOG_COLOR", "OCIS_LOG_COLOR"},
+			Destination: &cfg.Log.Color,
+		},
+		{
 			EnvVars:     []string{"GRAPH_EXPLORER_LOG_FILE", "OCIS_LOG_FILE"},
 			Destination: &cfg.Log.File,
 		},
