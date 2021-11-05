@@ -10,7 +10,6 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/ocs/pkg/config"
-	"github.com/owncloud/ocis/ocs/pkg/flagset"
 	"github.com/owncloud/ocis/ocs/pkg/metrics"
 	"github.com/owncloud/ocis/ocs/pkg/server/debug"
 	"github.com/owncloud/ocis/ocs/pkg/server/http"
@@ -22,26 +21,15 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
-			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			if !cfg.Supervised {
-				return ParseConfig(ctx, cfg)
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
 			}
-			if origins := ctx.StringSlice("cors-allowed-origins"); len(origins) != 0 {
-				cfg.HTTP.CORS.AllowedOrigins = origins
-			}
-			if methods := ctx.StringSlice("cors-allowed-methods"); len(methods) != 0 {
-				cfg.HTTP.CORS.AllowedMethods = methods
-			}
-			if headers := ctx.StringSlice("cors-allowed-headers"); len(headers) != 0 {
-				cfg.HTTP.CORS.AllowedOrigins = headers
-			}
-			logger.Debug().Str("service", "ocs").Msg("ignoring config file parsing when running supervised")
+
 			return nil
 		},
 		Action: func(c *cli.Context) error {

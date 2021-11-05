@@ -9,7 +9,6 @@ import (
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/ocs/pkg/command"
 	svcconfig "github.com/owncloud/ocis/ocs/pkg/config"
-	"github.com/owncloud/ocis/ocs/pkg/flagset"
 	"github.com/urfave/cli/v2"
 )
 
@@ -19,7 +18,6 @@ func OCSCommand(cfg *config.Config) *cli.Command {
 		Name:     "ocs",
 		Usage:    "Start ocs server",
 		Category: "Extensions",
-		Flags:    flagset.ServerWithConfig(cfg.OCS),
 		Subcommands: []*cli.Command{
 			command.PrintVersion(cfg.OCS),
 		},

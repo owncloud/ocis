@@ -120,7 +120,7 @@ func New() *Config {
 		IDP:           idp.DefaultConfig(),
 		Proxy:         proxy.DefaultConfig(),
 		GraphExplorer: graphExplorer.DefaultConfig(),
-		OCS:           ocs.New(),
+		OCS:           ocs.DefaultConfig(),
 		Web:           web.New(),
 		Settings:      settings.New(),
 		Storage:       storage.New(),
