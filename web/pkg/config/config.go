@@ -8,6 +8,8 @@ import (
 	gofig "github.com/gookit/config/v2"
 )
 
+const defaultIngressURL = "https://localhost:9200"
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string `mapstructure:"level"`
@@ -50,9 +52,9 @@ type Asset struct {
 type WebConfig struct {
 	Server        string                 `json:"server,omitempty" mapstructure:"server"`
 	Theme         string                 `json:"theme,omitempty" mapstructure:"theme"`
-	Version       string                 `json:"version,omitempty" mapstructure:"version"` // TODO what is version used for?
+	Version       string                 `json:"version,omitempty" mapstructure:"version"`
 	OpenIDConnect OIDC                   `json:"openIdConnect,omitempty" mapstructure:"oids"`
-	Apps          []string               `json:"apps" mapstructure:"apps"` // TODO add nil as empty when https://go-review.googlesource.com/c/go/+/205897/ is released
+	Apps          []string               `json:"apps" mapstructure:"apps"`
 	ExternalApps  []ExternalApp          `json:"external_apps,omitempty" mapstructure:"external_apps"`
 	Options       map[string]interface{} `json:"options,omitempty" mapstructure:"options"`
 }
@@ -140,15 +142,15 @@ func DefaultConfig() *Config {
 		},
 		Web: Web{
 			Path:        "",
-			ThemeServer: "https://localhost:9200",
+			ThemeServer: defaultIngressURL,
 			ThemePath:   "/themes/owncloud/theme.json",
 			Config: WebConfig{
-				Server:  "https://localhost:9200",
+				Server:  defaultIngressURL,
 				Theme:   "",
 				Version: "0.1.0",
 				OpenIDConnect: OIDC{
 					MetadataURL:  "",
-					Authority:    "https://localhost:9200",
+					Authority:    defaultIngressURL,
 					ClientID:     "web",
 					ResponseType: "code",
 					Scope:        "openid profile email",

@@ -130,7 +130,6 @@ func New() *Config {
 	}
 }
 
-// TODO(refs) refactoir refactor this outside
 type mapping struct {
 	EnvVars     []string    // name of the EnvVars var.
 	Destination interface{} // memory address of the original config value to modify.
@@ -148,7 +147,6 @@ func GetEnv() []string {
 }
 
 // UnmapEnv loads values from the gooconf.Config argument and sets them in the expected destination.
-// TODO(refs) can we avoid repetition here?
 func (c *Config) UnmapEnv(gooconf *gofig.Config) error {
 	vals := structMappings(c)
 	for i := range vals {

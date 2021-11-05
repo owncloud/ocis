@@ -35,16 +35,6 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			// TODO(this is not in the cli context anymore)
-			//if origins := ctx.StringSlice("cors-allowed-origins"); len(origins) != 0 {
-			//	cfg.HTTP.CORS.AllowedOrigins = origins
-			//}
-			//if methods := ctx.StringSlice("cors-allowed-methods"); len(methods) != 0 {
-			//	cfg.HTTP.CORS.AllowedMethods = methods
-			//}
-			//if headers := ctx.StringSlice("cors-allowed-headers"); len(headers) != 0 {
-			//	cfg.HTTP.CORS.AllowedOrigins = headers
-			//}
 			return nil
 		},
 		Action: func(c *cli.Context) error {
