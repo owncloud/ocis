@@ -48,22 +48,22 @@ type Asset struct {
 
 // WebConfig defines the available web configuration for a dynamically rendered config.json.
 type WebConfig struct {
-	Server        string                 `json:"server,omitempty",mapstructure:"server"`
-	Theme         string                 `json:"theme,omitempty",mapstructure:"theme"`
-	Version       string                 `json:"version,omitempty",mapstructure:"version"` // TODO what is version used for?
-	OpenIDConnect OIDC                   `json:"openIdConnect,omitempty",mapstructure:"oids"`
-	Apps          []string               `json:"apps",mapstructure:"apps"` // TODO add nil as empty when https://go-review.googlesource.com/c/go/+/205897/ is released
-	ExternalApps  []ExternalApp          `json:"external_apps,omitempty",mapstructure:"external_apps"`
-	Options       map[string]interface{} `json:"options,omitempty",mapstructure:"options"`
+	Server        string                 `json:"server,omitempty" mapstructure:"server"`
+	Theme         string                 `json:"theme,omitempty" mapstructure:"theme"`
+	Version       string                 `json:"version,omitempty" mapstructure:"version"` // TODO what is version used for?
+	OpenIDConnect OIDC                   `json:"openIdConnect,omitempty" mapstructure:"oids"`
+	Apps          []string               `json:"apps" mapstructure:"apps"` // TODO add nil as empty when https://go-review.googlesource.com/c/go/+/205897/ is released
+	ExternalApps  []ExternalApp          `json:"external_apps,omitempty" mapstructure:"external_apps"`
+	Options       map[string]interface{} `json:"options,omitempty" mapstructure:"options"`
 }
 
 // OIDC defines the available oidc configuration
 type OIDC struct {
-	MetadataURL  string `json:"metadata_url,omitempty",mapstructure:"metadata_url"`
-	Authority    string `json:"authority,omitempty",mapstructure:"authority"`
-	ClientID     string `json:"client_id,omitempty",mapstructure:"client_id"`
-	ResponseType string `json:"response_type,omitempty",mapstructure:"response_type"`
-	Scope        string `json:"scope,omitempty",mapstructure:"scope"`
+	MetadataURL  string `json:"metadata_url,omitempty" mapstructure:"metadata_url"`
+	Authority    string `json:"authority,omitempty" mapstructure:"authority"`
+	ClientID     string `json:"client_id,omitempty" mapstructure:"client_id"`
+	ResponseType string `json:"response_type,omitempty" mapstructure:"response_type"`
+	Scope        string `json:"scope,omitempty" mapstructure:"scope"`
 }
 
 // ExternalApp defines an external web app.
@@ -75,15 +75,15 @@ type OIDC struct {
 //	  }
 //  }
 type ExternalApp struct {
-	ID   string `json:"id,omitempty",mapstructure:"id"`
-	Path string `json:"path,omitempty",mapstructure:"path"`
+	ID   string `json:"id,omitempty" mapstructure:"id"`
+	Path string `json:"path,omitempty" mapstructure:"path"`
 	// Config is completely dynamic, because it depends on the extension
-	Config map[string]interface{} `json:"config,omitempty",mapstructure:"config"`
+	Config map[string]interface{} `json:"config,omitempty" mapstructure:"config"`
 }
 
 // ExternalAppConfig defines an external web app configuration.
 type ExternalAppConfig struct {
-	URL string `json:"url,omitempty",mapstructure:"url"`
+	URL string `json:"url,omitempty" mapstructure:"url"`
 }
 
 // Web defines the available web configuration.
