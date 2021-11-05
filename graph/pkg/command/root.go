@@ -63,7 +63,7 @@ func NewLogger(cfg *config.Config) log.Logger {
 	)
 }
 
-// ParseConfig loads proxy configuration from known paths.
+// ParseConfig loads graph configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	conf, err := ociscfg.BindSourcesToStructs("graph", cfg)
 	if err != nil {

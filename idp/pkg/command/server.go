@@ -6,7 +6,6 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/idp/pkg/config"
-	"github.com/owncloud/ocis/idp/pkg/flagset"
 	"github.com/owncloud/ocis/idp/pkg/metrics"
 	"github.com/owncloud/ocis/idp/pkg/server/debug"
 	"github.com/owncloud/ocis/idp/pkg/server/http"
@@ -20,9 +19,7 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
-			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
@@ -41,10 +38,9 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.IDP.SigningPrivateKeyFiles = ctx.StringSlice("signing-private-key")
 			}
 
-			if !cfg.Supervised {
-				return ParseConfig(ctx, cfg)
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
 			}
-			logger.Debug().Str("service", "idp").Msg("ignoring config file parsing when running supervised")
 			return nil
 		},
 		Action: func(c *cli.Context) error {

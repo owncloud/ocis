@@ -3,7 +3,6 @@ package command
 import (
 	"github.com/owncloud/ocis/idp/pkg/command"
 	svcconfig "github.com/owncloud/ocis/idp/pkg/config"
-	"github.com/owncloud/ocis/idp/pkg/flagset"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/ocis/pkg/register"
@@ -16,7 +15,6 @@ func IDPCommand(cfg *config.Config) *cli.Command {
 		Name:     "idp",
 		Usage:    "Start idp server",
 		Category: "Extensions",
-		Flags:    flagset.ServerWithConfig(cfg.IDP),
 		Subcommands: []*cli.Command{
 			command.PrintVersion(cfg.IDP),
 		},

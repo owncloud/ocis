@@ -18,7 +18,6 @@ func AccountsCommand(cfg *config.Config) *cli.Command {
 		Name:     "accounts",
 		Usage:    "Start accounts server",
 		Category: "Extensions",
-		//Flags:    flagset.ServerWithConfig(cfg.Accounts),
 		Subcommands: []*cli.Command{
 			command.ListAccounts(cfg.Accounts),
 			command.AddAccount(cfg.Accounts),
