@@ -10,77 +10,77 @@ import (
 
 // Log defines the available logging configuration.
 type Log struct {
-	Level  string
-	Pretty bool
-	Color  bool
-	File   string
+	Level  string `mapstructure:"level"`
+	Pretty bool   `mapstructure:"pretty"`
+	Color  bool   `mapstructure:"color"`
+	File   string `mapstructure:"file"`
 }
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string
-	Token  string
-	Pprof  bool
-	Zpages bool
+	Addr   string `mapstructure:"addr"`
+	Token  string `mapstructure:"token"`
+	Pprof  bool   `mapstructure:"pprof"`
+	Zpages bool   `mapstructure:"zpages"`
 }
 
 // CORS defines the available cors configuration.
 type CORS struct {
-	AllowedOrigins   []string
-	AllowedMethods   []string
-	AllowedHeaders   []string
-	AllowCredentials bool
+	AllowedOrigins   []string `mapstructure:"allowed_origins"`
+	AllowedMethods   []string `mapstructure:"allowed_methods"`
+	AllowedHeaders   []string `mapstructure:"allowed_headers"`
+	AllowCredentials bool     `mapstructure:"allow_credentials"`
 }
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr string
-	Root string
-	CORS CORS
+	Addr string `mapstructure:"addr"`
+	Root string `mapstructure:"root"`
+	CORS CORS   `mapstructure:"cors"`
 }
 
 // Service defines the available service configuration.
 type Service struct {
-	Name      string
-	Namespace string
-	Version   string
+	Name      string `mapstructure:"name"`
+	Namespace string `mapstructure:"namespace"`
+	Version   string `mapstructure:"version"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool
-	Type      string
-	Endpoint  string
-	Collector string
-	Service   string
+	Enabled   bool   `mapstructure:"enabled"`
+	Type      string `mapstructure:"type"`
+	Endpoint  string `mapstructure:"endpoint"`
+	Collector string `mapstructure:"collector"`
+	Service   string `mapstructure:"service"`
 }
 
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
-	JWTSecret string
+	JWTSecret string `mapstructure:"jwt_secret"`
 }
 
 // IdentityManagement keeps track of the OIDC address. This is because Reva requisite of uniqueness for users
 // is based in the combination of IDP hostname + UserID. For more information see:
 // https://github.com/cs3org/reva/blob/4fd0229f13fae5bc9684556a82dbbd0eced65ef9/pkg/storage/utils/decomposedfs/node/node.go#L856-L865
 type IdentityManagement struct {
-	Address string
+	Address string `mapstructure:"address"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
-	File               string
-	Log                Log
-	Debug              Debug
-	HTTP               HTTP
-	Tracing            Tracing
-	TokenManager       TokenManager
-	Service            Service
-	AccountBackend     string
-	RevaAddress        string
-	StorageUsersDriver string
-	MachineAuthAPIKey  string
-	IdentityManagement IdentityManagement
+	File               string             `mapstructure:"file"`
+	Log                Log                `mapstructure:"log"`
+	Debug              Debug              `mapstructure:"debug"`
+	HTTP               HTTP               `mapstructure:"http"`
+	Tracing            Tracing            `mapstructure:"tracing"`
+	TokenManager       TokenManager       `mapstructure:"token_manager"`
+	Service            Service            `mapstructure:"service"`
+	AccountBackend     string             `mapstructure:"account_backend"`
+	RevaAddress        string             `mapstructure:"reva_address"`
+	StorageUsersDriver string             `mapstructure:"storage_users_driver"`
+	MachineAuthAPIKey  string             `mapstructure:"machine_auth_api_key"`
+	IdentityManagement IdentityManagement `mapstructure:"identity_management"`
 
 	Context    context.Context
 	Supervised bool
