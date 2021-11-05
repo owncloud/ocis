@@ -10,60 +10,60 @@ import (
 
 // Log defines the available logging configuration.
 type Log struct {
-	Level  string
-	Pretty bool
-	Color  bool
-	File   string
+	Level  string `mapstructure:"level"`
+	Pretty bool   `mapstructure:"pretty"`
+	Color  bool   `mapstructure:"color"`
+	File   string `mapstructure:"file"`
 }
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string
-	Token  string
-	Pprof  bool
-	Zpages bool
+	Addr   string `mapstructure:"addr"`
+	Token  string `mapstructure:"token"`
+	Pprof  bool   `mapstructure:"pprof"`
+	Zpages bool   `mapstructure:"zpages"`
 }
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string
-	Root      string
-	Namespace string
-	CacheTTL  int
+	Addr      string `mapstructure:"addr"`
+	Root      string `mapstructure:"root"`
+	Namespace string `mapstructure:"namespace"`
+	CacheTTL  int    `mapstructure:"cache_ttl"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool
-	Type      string
-	Endpoint  string
-	Collector string
-	Service   string
+	Enabled   bool   `mapstructure:"enabled"`
+	Type      string `mapstructure:"type"`
+	Endpoint  string `mapstructure:"endpoint"`
+	Collector string `mapstructure:"collector"`
+	Service   string `mapstructure:"service"`
 }
 
 // Asset defines the available asset configuration.
 type Asset struct {
-	Path string
+	Path string `mapstructure:"path"`
 }
 
 // WebConfig defines the available web configuration for a dynamically rendered config.json.
 type WebConfig struct {
-	Server        string                 `json:"server,omitempty"`
-	Theme         string                 `json:"theme,omitempty"`
-	Version       string                 `json:"version,omitempty"` // TODO what is version used for?
-	OpenIDConnect OIDC                   `json:"openIdConnect,omitempty"`
-	Apps          []string               `json:"apps"` // TODO add nilasempty when https://go-review.googlesource.com/c/go/+/205897/ is released
-	ExternalApps  []ExternalApp          `json:"external_apps,omitempty"`
-	Options       map[string]interface{} `json:"options,omitempty"`
+	Server        string                 `json:"server,omitempty",mapstructure:"server"`
+	Theme         string                 `json:"theme,omitempty",mapstructure:"theme"`
+	Version       string                 `json:"version,omitempty",mapstructure:"version"` // TODO what is version used for?
+	OpenIDConnect OIDC                   `json:"openIdConnect,omitempty",mapstructure:"oids"`
+	Apps          []string               `json:"apps",mapstructure:"apps"` // TODO add nil as empty when https://go-review.googlesource.com/c/go/+/205897/ is released
+	ExternalApps  []ExternalApp          `json:"external_apps,omitempty",mapstructure:"external_apps"`
+	Options       map[string]interface{} `json:"options,omitempty",mapstructure:"options"`
 }
 
 // OIDC defines the available oidc configuration
 type OIDC struct {
-	MetadataURL  string `json:"metadata_url,omitempty"`
-	Authority    string `json:"authority,omitempty"`
-	ClientID     string `json:"client_id,omitempty"`
-	ResponseType string `json:"response_type,omitempty"`
-	Scope        string `json:"scope,omitempty"`
+	MetadataURL  string `json:"metadata_url,omitempty",mapstructure:"metadata_url"`
+	Authority    string `json:"authority,omitempty",mapstructure:"authority"`
+	ClientID     string `json:"client_id,omitempty",mapstructure:"client_id"`
+	ResponseType string `json:"response_type,omitempty",mapstructure:"response_type"`
+	Scope        string `json:"scope,omitempty",mapstructure:"scope"`
 }
 
 // ExternalApp defines an external web app.
@@ -75,34 +75,34 @@ type OIDC struct {
 //	  }
 //  }
 type ExternalApp struct {
-	ID   string `json:"id,omitempty"`
-	Path string `json:"path,omitempty"`
+	ID   string `json:"id,omitempty",mapstructure:"id"`
+	Path string `json:"path,omitempty",mapstructure:"path"`
 	// Config is completely dynamic, because it depends on the extension
-	Config map[string]interface{} `json:"config,omitempty"`
+	Config map[string]interface{} `json:"config,omitempty",mapstructure:"config"`
 }
 
 // ExternalAppConfig defines an external web app configuration.
 type ExternalAppConfig struct {
-	URL string `json:"url,omitempty"`
+	URL string `json:"url,omitempty",mapstructure:"url"`
 }
 
 // Web defines the available web configuration.
 type Web struct {
-	Path        string
-	ThemeServer string // used to build Theme in WebConfig
-	ThemePath   string // used to build Theme in WebConfig
-	Config      WebConfig
+	Path        string    `mapstructure:"path"`
+	ThemeServer string    `mapstructure:"theme_server"` // used to build Theme in WebConfig
+	ThemePath   string    `mapstructure:"theme_path"`   // used to build Theme in WebConfig
+	Config      WebConfig `mapstructure:"config"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
-	File    string
-	Log     Log
-	Debug   Debug
-	HTTP    HTTP
-	Tracing Tracing
-	Asset   Asset
-	Web     Web
+	File    string  `mapstructure:"file"`
+	Log     Log     `mapstructure:"log"`
+	Debug   Debug   `mapstructure:"debug"`
+	HTTP    HTTP    `mapstructure:"http"`
+	Tracing Tracing `mapstructure:"tracing"`
+	Asset   Asset   `mapstructure:"asset"`
+	Web     Web     `mapstructure:"web"`
 
 	Context    context.Context
 	Supervised bool

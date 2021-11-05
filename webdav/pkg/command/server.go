@@ -22,23 +22,15 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage: "Start integrated server",
 		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
-			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			if !cfg.Supervised {
-				return ParseConfig(ctx, cfg)
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
 			}
-			if origins := ctx.StringSlice("cors-allowed-origins"); len(origins) != 0 {
-				cfg.HTTP.CORS.AllowedOrigins = origins
-			}
-			if methods := ctx.StringSlice("cors-allowed-methods"); len(methods) != 0 {
-				cfg.HTTP.CORS.AllowedMethods = methods
-			}
-			if headers := ctx.StringSlice("cors-allowed-headers"); len(headers) != 0 {
-				cfg.HTTP.CORS.AllowedOrigins = headers
-			}
+
+			logger := NewLogger(cfg)
 			logger.Debug().Str("service", "webdav").Msg("ignoring config file parsing when running supervised")
 			return nil
 		},

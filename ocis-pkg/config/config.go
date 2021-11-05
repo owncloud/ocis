@@ -126,7 +126,7 @@ func New() *Config {
 		Storage:       storage.New(),
 		Store:         store.New(),
 		Thumbnails:    thumbnails.DefaultConfig(),
-		WebDAV:        webdav.New(),
+		WebDAV:        webdav.DefaultConfig(),
 	}
 }
 
