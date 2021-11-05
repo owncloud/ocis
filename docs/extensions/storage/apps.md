@@ -101,6 +101,8 @@ curl 'https://ocis.test/app/list'
 
 **Response example**:
 
+HTTP status code: 200
+
 ```json
 {
   "mime-types": [
@@ -218,6 +220,8 @@ All apps are expected to be opened in an iframe and the response will give some 
 
 There are apps, which need to be opened in the iframe with a form post. The form post must include all form parameters included in the response. For these apps the response will look like this:
 
+HTTP status code: 200
+
 ```json
 {
   "app_url": "https://.....",
@@ -231,6 +235,8 @@ There are apps, which need to be opened in the iframe with a form post. The form
 ```
 
 There are apps, which need to be opened in the iframe with a GET request. The GET request must have set all headers included in the response. For these apps the response will look like this:
+
+HTTP status code: 200
 
 ```json
 {
@@ -246,30 +252,69 @@ There are apps, which need to be opened in the iframe with a GET request. The GE
 
 **Example responses (error case)**:
 
-- wrong `view_mode`
+- missing `file_id`
+
+  HTTP status code: 400
 
   ```json
   {
-    "code": "SERVER_ERROR",
-    "message": "Missing or invalid viewmode argument"
+    "code": "INVALID_PARAMETER",
+    "message": "missing file ID"
+  }
+  ```
+
+- wrong `view_mode`
+
+  HTTP status code: 400
+
+  ```json
+  {
+    "code": "INVALID_PARAMETER",
+    "message": "invalid view mode"
   }
   ```
 
 - unknown `app_name`
 
+  HTTP status code: 404
+
   ```json
   {
-    "code": "SERVER_ERROR",
-    "message": "error searching for app provider"
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "error: not found: app 'Collabor' not found"
   }
   ```
 
-- wrong / invalid file id / unauthorized to open the file
+- wrong / invalid file id
+
+  HTTP status code: 400
 
   ```json
   {
-    "code": "SERVER_ERROR",
-    "message": "error statting file"
+    "code": "INVALID_PARAMETER",
+    "message": "invalid file ID"
+  }
+  ```
+
+- file id does not point to a file
+
+  HTTP status code: 400
+
+  ```json
+  {
+    "code": "INVALID_PARAMETER",
+    "message": "the given file id does not point to a file"
+  }
+  ```
+
+- file does not exist / unauthorized to open the file
+
+  HTTP status code: 404
+
+  ```json
+  {
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "file does not exist"
   }
   ```
 
@@ -309,37 +354,69 @@ You will receive a file id of the freshly created file, which you can use to ope
 
 **Example responses (error case)**:
 
-- missing parent folder ID
+- missing `parent_container_id`
+
+  HTTP status code: 400
+
   ```json
   {
     "code": "INVALID_PARAMETER",
-    "message": "Missing parent container ID"
+    "message": "missing parent container ID"
   }
   ```
 
-- missing file name
+- missing `filename`
+
+  HTTP status code: 400
+
   ```json
   {
     "code": "INVALID_PARAMETER",
-    "message": "Missing filename"
+    "message": "missing filename"
+  }
+  ```
+
+- parent container not found
+
+  HTTP status code: 404
+
+  ```json
+  {
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "the parent container is not accessible or does not exist"
+  }
+  ```
+
+- `parent_container_id` does not point to a container
+
+  HTTP status code: 400
+
+  ```json
+  {
+    "code": "INVALID_PARAMETER",
+    "message": "the parent container id does not point to a container"
+  }
+  ```
+
+- `filename` is invalid (eg. includes a path segment)
+
+  HTTP status code: 400
+
+  ```json
+  {
+    "code": "INVALID_PARAMETER",
+    "message": "the filename must not contain a path segment"
   }
   ```
 
 - file already exists
 
-  ```json
-  {
-    "code": "SERVER_ERROR",
-    "message": "The file already exists"
-  }
-  ```
-
-- unauthorized / failed to find the parent folder
+  HTTP status code: 403
 
   ```json
   {
-    "code": "RESOURCE_NOT_FOUND",
-    "message": "The parent container is not accessible or does not exist"
+    "code": "RESOURCE_ALREADY_EXISTS",
+    "message": "the file already exists"
   }
   ```
 
