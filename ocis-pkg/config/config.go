@@ -123,10 +123,10 @@ func New() *Config {
 		OCS:           ocs.DefaultConfig(),
 		Settings:      settings.DefaultConfig(),
 		Web:           web.DefaultConfig(),
-		Storage:       storage.New(),
-		Store:         store.New(),
+		Store:         store.DefaultConfig(),
 		Thumbnails:    thumbnails.DefaultConfig(),
 		WebDAV:        webdav.DefaultConfig(),
+		Storage:       storage.New(),
 	}
 }
 
