@@ -115,7 +115,7 @@ func DefaultConfig() *Config {
 			Addr:      "127.0.0.1:9190",
 			Namespace: "com.owncloud.web",
 			Root:      "/",
-			CacheTTL:  604800, // 10 days
+			CacheTTL:  604800, // 7 days
 			CORS: CORS{
 				AllowedOrigins:   []string{"*"},
 				AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},

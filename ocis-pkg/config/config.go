@@ -122,7 +122,7 @@ func New() *Config {
 		GraphExplorer: graphExplorer.DefaultConfig(),
 		OCS:           ocs.DefaultConfig(),
 		Settings:      settings.DefaultConfig(),
-		Web:           web.New(),
+		Web:           web.DefaultConfig(),
 		Storage:       storage.New(),
 		Store:         store.New(),
 		Thumbnails:    thumbnails.DefaultConfig(),

@@ -9,7 +9,6 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/web/pkg/config"
-	"github.com/owncloud/ocis/web/pkg/flagset"
 	"github.com/owncloud/ocis/web/pkg/metrics"
 	"github.com/owncloud/ocis/web/pkg/server/debug"
 	"github.com/owncloud/ocis/web/pkg/server/http"
@@ -22,24 +21,16 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
-			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimRight(cfg.HTTP.Root, "/")
 			}
 
-			// StringSliceFlag doesn't support Destination
-			// UPDATE Destination on string flags supported. Wait for https://github.com/urfave/cli/pull/1078 to get to micro/cli
-			if len(ctx.StringSlice("web-config-app")) > 0 {
-				cfg.Web.Config.Apps = ctx.StringSlice("web-config-app")
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
 			}
 
-			if !cfg.Supervised {
-				if err := ParseConfig(ctx, cfg); err != nil {
-					return err
-				}
-			}
+			logger := NewLogger(cfg)
 			logger.Debug().Str("service", "web").Msg("ignoring config file parsing when running supervised")
 
 			// build well known openid-configuration endpoint if it is not set

@@ -5,7 +5,6 @@ import (
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/web/pkg/command"
 	svcconfig "github.com/owncloud/ocis/web/pkg/config"
-	"github.com/owncloud/ocis/web/pkg/flagset"
 	"github.com/urfave/cli/v2"
 )
 
@@ -15,7 +14,6 @@ func WebCommand(cfg *config.Config) *cli.Command {
 		Name:     "web",
 		Usage:    "Start web server",
 		Category: "Extensions",
-		Flags:    flagset.ServerWithConfig(cfg.Web),
 		Before: func(ctx *cli.Context) error {
 			return ParseConfig(ctx, cfg)
 		},
