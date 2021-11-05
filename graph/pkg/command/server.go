@@ -24,8 +24,6 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			// When running on single binary mode the before hook from the root command won't get called. We manually
-			// call this before hook from ocis command, so the configuration can be loaded.
 			if err := ParseConfig(ctx, cfg); err != nil {
 				return err
 			}
