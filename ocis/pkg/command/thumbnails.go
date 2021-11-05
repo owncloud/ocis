@@ -8,7 +8,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/thumbnails/pkg/command"
-	"github.com/owncloud/ocis/thumbnails/pkg/flagset"
 	"github.com/urfave/cli/v2"
 
 	svcconfig "github.com/owncloud/ocis/thumbnails/pkg/config"
@@ -20,7 +19,6 @@ func ThumbnailsCommand(cfg *config.Config) *cli.Command {
 		Name:     "thumbnails",
 		Usage:    "Start thumbnails server",
 		Category: "Extensions",
-		Flags:    flagset.ServerWithConfig(cfg.Thumbnails),
 		Subcommands: []*cli.Command{
 			command.PrintVersion(cfg.Thumbnails),
 		},

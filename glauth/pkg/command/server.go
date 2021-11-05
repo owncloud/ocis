@@ -32,14 +32,6 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			// TODO(refs) there is no cli flags anymore...
-			//if len(ctx.StringSlice("backend-server")) > 0 {
-			//	cfg.Backend.Servers = ctx.StringSlice("backend-server")
-			//}
-			//if len(ctx.StringSlice("fallback-server")) > 0 {
-			//	cfg.Fallback.Servers = ctx.StringSlice("fallback-server")
-			//}
-
 			return nil
 		},
 		Action: func(c *cli.Context) error {
