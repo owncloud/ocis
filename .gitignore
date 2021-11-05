@@ -29,6 +29,9 @@ vendor
 vendor-bin/**/vendor
 vendor-bin/**/composer.lock
 
+# API acceptance tests - auto-generated files
+.php-cs-fixer.cache
+
 # drone CI is in .drone.star, do not let someone accidentally commit a local .drone.yml
 .drone.yml
 

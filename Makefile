@@ -32,6 +32,12 @@ OCIS_MODULES = \
 	web \
 	webdav
 
+# bin file definitions
+PHP_CS_FIXER=php -d zend.enable_gc=0 vendor-bin/owncloud-codestyle/vendor/bin/php-cs-fixer
+PHP_CODESNIFFER=vendor-bin/php_codesniffer/vendor/bin/phpcs
+PHAN=php -d zend.enable_gc=0 vendor-bin/phan/vendor/bin/phan
+PHPSTAN=php -d zend.enable_gc=0 vendor-bin/phpstan/vendor/bin/phpstan
+
 ifneq (, $(shell which go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include .bingo/Variables.mk
 endif
@@ -63,6 +69,10 @@ help:
 	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/testing/#testing-with-test-suite-in-docker${RESET}\n"
 	@echo -e "\tsee ./tests/acceptance/docker/Makefile"
 	@echo -e "\tor run ${YELLOW}make -C tests/acceptance/docker help${RESET}"
+	@echo
+	@echo -e "${GREEN}Tools for developing tests:\n${RESET}"
+	@echo -e "\tmake test-php-style\t\t${BLUE}run PHP code style checks${RESET}"
+	@echo -e "\tmake test-php-style-fix\t\t${BLUE}run PHP code style checks and fix any issues found${RESET}"
 	@echo
 
 .PHONY: clean-tests
@@ -194,3 +204,25 @@ l10n-write:
 .PHONY: ci-format
 ci-format: $(BUILDIFIER)
 	$(BUILDIFIER) --mode=fix .drone.star
+
+.PHONY: test-php-style
+test-php-style: vendor-bin/owncloud-codestyle/vendor vendor-bin/php_codesniffer/vendor
+	$(PHP_CS_FIXER) fix -v --diff --allow-risky yes --dry-run
+	$(PHP_CODESNIFFER) --cache --runtime-set ignore_warnings_on_exit --standard=phpcs.xml tests/acceptance
+
+.PHONY: test-php-style-fix
+test-php-style-fix: vendor-bin/owncloud-codestyle/vendor
+	$(PHP_CS_FIXER) fix -v --diff --allow-risky yes
+
+
+vendor-bin/owncloud-codestyle/vendor: vendor/bamarni/composer-bin-plugin vendor-bin/owncloud-codestyle/composer.lock
+	composer bin owncloud-codestyle install --no-progress
+
+vendor-bin/owncloud-codestyle/composer.lock: vendor-bin/owncloud-codestyle/composer.json
+	@echo owncloud-codestyle composer.lock is not up to date.
+
+vendor-bin/php_codesniffer/vendor: vendor/bamarni/composer-bin-plugin vendor-bin/php_codesniffer/composer.lock
+	composer bin php_codesniffer install --no-progress
+
+vendor-bin/php_codesniffer/composer.lock: vendor-bin/php_codesniffer/composer.json
+	@echo php_codesniffer composer.lock is not up to date.
