@@ -3,6 +3,8 @@ package command
 import (
 	"os"
 
+	"github.com/owncloud/ocis/ocis/pkg/flagset"
+
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -20,6 +22,7 @@ func Execute() error {
 		Version:  version.String,
 		Usage:    "ownCloud Infinite Scale Stack",
 		Compiled: version.Compiled(),
+		Flags:    flagset.RootWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg)
 		},
