@@ -7,7 +7,6 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/webdav/pkg/config"
-	"github.com/owncloud/ocis/webdav/pkg/flagset"
 	"github.com/owncloud/ocis/webdav/pkg/metrics"
 	"github.com/owncloud/ocis/webdav/pkg/server/debug"
 	"github.com/owncloud/ocis/webdav/pkg/server/http"
@@ -20,7 +19,6 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")

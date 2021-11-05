@@ -9,7 +9,6 @@ import (
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/webdav/pkg/command"
 	svcconfig "github.com/owncloud/ocis/webdav/pkg/config"
-	"github.com/owncloud/ocis/webdav/pkg/flagset"
 	"github.com/urfave/cli/v2"
 )
 
@@ -19,7 +18,6 @@ func WebDAVCommand(cfg *config.Config) *cli.Command {
 		Name:     "webdav",
 		Usage:    "Start webdav server",
 		Category: "Extensions",
-		Flags:    flagset.ServerWithConfig(cfg.WebDAV),
 		Subcommands: []*cli.Command{
 			command.PrintVersion(cfg.WebDAV),
 		},

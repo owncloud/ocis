@@ -123,7 +123,7 @@ func structMappings(cfg *Config) []mapping {
 			Destination: &cfg.InsecureBackends,
 		},
 		{
-			EnvVars:     []string{"PROXY_OIDC_ISSUER"},
+			EnvVars:     []string{"PROXY_OIDC_ISSUER", "OCIS_URL"},
 			Destination: &cfg.OIDC.Issuer,
 		},
 		{

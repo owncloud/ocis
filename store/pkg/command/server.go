@@ -9,7 +9,6 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/store/pkg/config"
-	"github.com/owncloud/ocis/store/pkg/flagset"
 	"github.com/owncloud/ocis/store/pkg/metrics"
 	"github.com/owncloud/ocis/store/pkg/server/debug"
 	"github.com/owncloud/ocis/store/pkg/server/grpc"
@@ -21,7 +20,6 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
 
 			if err := ParseConfig(ctx, cfg); err != nil {
