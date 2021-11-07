@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+
 	gofig "github.com/gookit/config/v2"
 	accounts "github.com/owncloud/ocis/accounts/pkg/config"
 	glauth "github.com/owncloud/ocis/glauth/pkg/config"
@@ -130,11 +132,6 @@ func New() *Config {
 	}
 }
 
-type mapping struct {
-	EnvVars     []string    // name of the EnvVars var.
-	Destination interface{} // memory address of the original config value to modify.
-}
-
 // GetEnv fetches a list of known env variables for this extension. It is to be used by gookit, as it provides a list
 // with all the environment variables an extension supports.
 func GetEnv() []string {
@@ -182,8 +179,8 @@ func (c *Config) UnmapEnv(gooconf *gofig.Config) error {
 }
 
 // structMappings binds a set of environment variables to a destination on cfg.
-func structMappings(cfg *Config) []mapping {
-	return []mapping{
+func structMappings(cfg *Config) []shared.EnvBinding {
+	return []shared.EnvBinding{
 		{
 			EnvVars:     []string{"OCIS_LOG_FILE"},
 			Destination: &cfg.Log.Level,

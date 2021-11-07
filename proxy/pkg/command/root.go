@@ -72,12 +72,8 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 
 	// load all env variables relevant to the config in the current context.
 	conf.LoadOSEnv(config.GetEnv(), false)
-
-	if err = cfg.UnmapEnv(conf); err != nil {
-		return err
-	}
-
-	return nil
+	bindings := config.StructMappings(cfg)
+	return ociscfg.UnbindEnv(conf, bindings)
 }
 
 // SutureService allows for the proxy command to be embedded and supervised by a suture supervisor tree.

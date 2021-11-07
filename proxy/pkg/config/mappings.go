@@ -1,8 +1,14 @@
 package config
 
-// structMappings binds a set of environment variables to a destination on cfg.
-func structMappings(cfg *Config) []mapping {
-	return []mapping{
+import "github.com/owncloud/ocis/ocis-pkg/shared"
+
+// StructMappings binds a set of environment variables to a destination on cfg.
+func StructMappings(cfg *Config) []shared.EnvBinding {
+	return structMappings(cfg)
+}
+
+func structMappings(cfg *Config) []shared.EnvBinding {
+	return []shared.EnvBinding{
 		// Logging
 		{
 			EnvVars:     []string{"PROXY_LOG_LEVEL", "OCIS_LOG_LEVEL"},
