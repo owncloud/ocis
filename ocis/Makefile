@@ -16,15 +16,12 @@ include ../.make/go.mk
 include ../.make/release.mk
 
 ############ docs generate ############
+CONFIG_DOCS_BASE_PATH := ../docs
+
 include ../.make/docs.mk
 
 .PHONY: docs-generate
 docs-generate: config-docs-generate
-
-.PHONY: config-docs-generate
-config-docs-generate: $(FLAEX)
-	@echo "$(NAME): generating config docs"
-	@$(FLAEX) >| ../docs/$(NAME)/configuration.md
 
 ############ dev-docker ############
 .PHONY: dev-docker
