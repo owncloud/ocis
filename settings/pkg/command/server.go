@@ -25,11 +25,7 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			if err := ParseConfig(ctx, cfg); err != nil {
-				return err
-			}
-
-			return nil
+			return ParseConfig(ctx, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
