@@ -30,9 +30,6 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			logger := NewLogger(cfg)
-			logger.Debug().Str("service", "web").Msg("ignoring config file parsing when running supervised")
-
 			// build well known openid-configuration endpoint if it is not set
 			if cfg.Web.Config.OpenIDConnect.MetadataURL == "" {
 				cfg.Web.Config.OpenIDConnect.MetadataURL = strings.TrimRight(cfg.Web.Config.OpenIDConnect.Authority, "/") + "/.well-known/openid-configuration"
