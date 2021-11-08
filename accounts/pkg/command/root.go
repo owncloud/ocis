@@ -90,11 +90,7 @@ type SutureService struct {
 
 // NewSutureService creates a new accounts.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	inheritLogging(cfg)
-	if cfg.Mode == 0 {
-		cfg.Accounts.Supervised = true
-	}
-	cfg.Accounts.Log.File = cfg.Log.File
+	cfg.Accounts.Log = cfg.Log
 	return SutureService{
 		cfg: cfg.Accounts,
 	}
@@ -107,14 +103,4 @@ func (s SutureService) Serve(ctx context.Context) error {
 	}
 
 	return nil
-}
-
-// inheritLogging is a poor man's global logging state tip-toeing around circular dependencies. It sets the logging
-// of the service to whatever is in the higher config (in this case coming from ocis.yaml) and sets them as defaults,
-// being overwritten when the extension parses its config file / env variables.
-func inheritLogging(cfg *ociscfg.Config) {
-	cfg.Accounts.Log.File = cfg.Log.File
-	cfg.Accounts.Log.Color = cfg.Log.Color
-	cfg.Accounts.Log.Pretty = cfg.Log.Pretty
-	cfg.Accounts.Log.Level = cfg.Log.Level
 }

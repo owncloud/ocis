@@ -7,6 +7,8 @@ import (
 	"path"
 	"reflect"
 
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+
 	gofig "github.com/gookit/config/v2"
 
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
@@ -76,14 +78,6 @@ type TokenManager struct {
 	JWTSecret string `mapstructure:"jwt_secret"`
 }
 
-// Log defines the available logging configuration.
-type Log struct {
-	Level  string `mapstructure:"level"`
-	Pretty bool   `mapstructure:"pretty"`
-	Color  bool   `mapstructure:"color"`
-	File   string `mapstructure:"file"`
-}
-
 // Repo defines which storage implementation is to be used.
 type Repo struct {
 	Backend string `mapstructure:"backend"`
@@ -140,7 +134,7 @@ type Config struct {
 	GRPC         GRPC         `mapstructure:"grpc"`
 	Server       Server       `mapstructure:"server"`
 	Asset        Asset        `mapstructure:"asset"`
-	Log          Log          `mapstructure:"log"`
+	Log          shared.Log   `mapstructure:"log"`
 	TokenManager TokenManager `mapstructure:"token_manager"`
 	Repo         Repo         `mapstructure:"repo"`
 	Index        Index        `mapstructure:"index"`
@@ -181,7 +175,7 @@ func DefaultConfig() *Config {
 			DemoUsersAndGroups: true,
 		},
 		Asset: Asset{},
-		Log:   Log{},
+		Log:   shared.Log{},
 		TokenManager: TokenManager{
 			JWTSecret: "Pive-Fumkiu4",
 		},
