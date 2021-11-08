@@ -8,6 +8,11 @@ import (
 	"strings"
 	"time"
 
+	gofig "github.com/gookit/config/v2"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
@@ -40,8 +45,24 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:  "server",
 		Usage: "Start integrated server",
 		Before: func(ctx *cli.Context) error {
+			// remember shared logging info to prevent empty overwrites
+			inLog := cfg.Log
+
 			if err := ParseConfig(ctx, cfg); err != nil {
 				return err
+			}
+
+			if (cfg.Log == shared.Log{}) && (inLog != shared.Log{}) {
+				// set the default to the parent config
+				cfg.Log = inLog
+
+				// and parse the environment
+				conf := &gofig.Config{}
+				conf.LoadOSEnv(config.GetEnv(), false)
+				bindings := config.StructMappings(cfg)
+				if err := ociscfg.BindEnv(conf, bindings); err != nil {
+					return err
+				}
 			}
 
 			if cfg.HTTP.Root != "/" {

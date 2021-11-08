@@ -62,7 +62,7 @@ func NewLogger(cfg *config.Config) log.Logger {
 	)
 }
 
-// ParseConfig loads ocis configuration from known paths.
+// ParseConfig loads ocis configuration.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	conf, err := ociscfg.BindSourcesToStructs("ocis", cfg)
 	if err != nil {
@@ -71,9 +71,6 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 
 	conf.LoadOSEnv(config.GetEnv(), false)
 
-	if err = cfg.UnmapEnv(conf); err != nil {
-		return err
-	}
-
-	return nil
+	bindings := config.StructMappings(cfg)
+	return ociscfg.BindEnv(conf, bindings)
 }

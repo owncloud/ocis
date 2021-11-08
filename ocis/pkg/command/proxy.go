@@ -5,10 +5,13 @@ package command
 
 import (
 	"github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/proxy/pkg/command"
 	"github.com/urfave/cli/v2"
 )
+
+var globalLog shared.Log
 
 // ProxyCommand is the entry point for the proxy command.
 func ProxyCommand(cfg *config.Config) *cli.Command {
@@ -20,10 +23,20 @@ func ProxyCommand(cfg *config.Config) *cli.Command {
 			command.PrintVersion(cfg.Proxy),
 		},
 		Before: func(ctx *cli.Context) error {
-			return ParseConfig(ctx, cfg)
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
+			}
+
+			globalLog = cfg.Log
+
+			return nil
 		},
 		Action: func(c *cli.Context) error {
-			cfg.Proxy.Log = cfg.Log
+			// if proxy logging is empty in ocis.yaml
+			if (cfg.Proxy.Log == shared.Log{}) && (globalLog != shared.Log{}) {
+				// we can safely inherit the global logging values.
+				cfg.Proxy.Log = globalLog
+			}
 			origCmd := command.Server(cfg.Proxy)
 			return handleOriginalAction(c, origCmd)
 		},
