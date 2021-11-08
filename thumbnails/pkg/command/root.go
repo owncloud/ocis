@@ -70,15 +70,9 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	if err != nil {
 		return err
 	}
-
-	// load all env variables relevant to the config in the current context.
 	conf.LoadOSEnv(config.GetEnv(), false)
-
-	if err = cfg.UnmapEnv(conf); err != nil {
-		return err
-	}
-
-	return nil
+	bindings := config.StructMappings(cfg)
+	return ociscfg.BindEnv(conf, bindings)
 }
 
 // SutureService allows for the thumbnails command to be embedded and supervised by a suture supervisor tree.
@@ -88,11 +82,7 @@ type SutureService struct {
 
 // NewSutureService creates a new thumbnails.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	inheritLogging(cfg)
-	if cfg.Mode == 0 {
-		cfg.Thumbnails.Supervised = true
-	}
-	cfg.Thumbnails.Log.File = cfg.Log.File
+	cfg.Thumbnails.Log = cfg.Log
 	return SutureService{
 		cfg: cfg.Thumbnails,
 	}
@@ -105,14 +95,4 @@ func (s SutureService) Serve(ctx context.Context) error {
 	}
 
 	return nil
-}
-
-// inheritLogging is a poor man's global logging state tip-toeing around circular dependencies. It sets the logging
-// of the service to whatever is in the higher config (in this case coming from ocis.yaml) and sets them as defaults,
-// being overwritten when the extension parses its config file / env variables.
-func inheritLogging(cfg *ociscfg.Config) {
-	cfg.Thumbnails.Log.File = cfg.Log.File
-	cfg.Thumbnails.Log.Color = cfg.Log.Color
-	cfg.Thumbnails.Log.Pretty = cfg.Log.Pretty
-	cfg.Thumbnails.Log.Level = cfg.Log.Level
 }
