@@ -3,8 +3,6 @@ package command
 import (
 	"os"
 
-	"github.com/owncloud/ocis/ocis/pkg/flagset"
-
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -15,14 +13,13 @@ import (
 
 // Execute is the entry point for the ocis command.
 func Execute() error {
-	cfg := config.New()
+	cfg := config.DefaultConfig()
 
 	app := &cli.App{
 		Name:     "ocis",
 		Version:  version.String,
 		Usage:    "ownCloud Infinite Scale Stack",
 		Compiled: version.Compiled(),
-		Flags:    flagset.RootWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg)
 		},

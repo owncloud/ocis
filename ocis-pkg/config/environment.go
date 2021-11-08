@@ -4,17 +4,16 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/owncloud/ocis/ocis-pkg/shared"
-
 	gofig "github.com/gookit/config/v2"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
-// UnbindEnv takes a config `c` and a EnvBinding
-func UnbindEnv(c *gofig.Config, bindings []shared.EnvBinding) error {
-	return unbindEnv(c, bindings)
+// BindEnv takes a config `c` and a EnvBinding and binds the values from the environment to the address location in cfg.
+func BindEnv(c *gofig.Config, bindings []shared.EnvBinding) error {
+	return bindEnv(c, bindings)
 }
 
-func unbindEnv(c *gofig.Config, bindings []shared.EnvBinding) error {
+func bindEnv(c *gofig.Config, bindings []shared.EnvBinding) error {
 	for i := range bindings {
 		for j := range bindings[i].EnvVars {
 			// we need to guard against v != "" because this is the condition that checks that the value is set from the environment.

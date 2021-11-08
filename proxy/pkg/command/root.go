@@ -63,17 +63,22 @@ func NewLogger(cfg *config.Config) log.Logger {
 	)
 }
 
-// ParseConfig loads proxy configuration from known paths.
+// ParseConfig loads proxy configuration. Loading will first attempt to parse config files in the expected locations
+// and then parses environment variables. In the context of oCIS env variables will always overwrite values set
+// in a config file.
+// If this extension is run as a subcommand (i.e: ocis proxy) then there are 2 levels of config parsing:
+// 1. ocis.yaml (if any)
+// 2. proxy.yaml (if any)
+// 3. environment variables.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	conf, err := ociscfg.BindSourcesToStructs("proxy", cfg)
 	if err != nil {
 		return err
 	}
 
-	// load all env variables relevant to the config in the current context.
 	conf.LoadOSEnv(config.GetEnv(), false)
 	bindings := config.StructMappings(cfg)
-	return ociscfg.UnbindEnv(conf, bindings)
+	return ociscfg.BindEnv(conf, bindings)
 }
 
 // SutureService allows for the proxy command to be embedded and supervised by a suture supervisor tree.
@@ -83,10 +88,6 @@ type SutureService struct {
 
 // NewSutureService creates a new proxy.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	inheritLogging(cfg)
-	if cfg.Mode == 0 {
-		cfg.Proxy.Supervised = true
-	}
 	return SutureService{
 		cfg: cfg.Proxy,
 	}
@@ -99,14 +100,4 @@ func (s SutureService) Serve(ctx context.Context) error {
 	}
 
 	return nil
-}
-
-// inheritLogging is a poor man's global logging state tip-toeing around circular dependencies. It sets the logging
-// of the service to whatever is in the higher config (in this case coming from ocis.yaml) and sets them as defaults,
-// being overwritten when the extension parses its config file / env variables.
-func inheritLogging(cfg *ociscfg.Config) {
-	cfg.Proxy.Log.File = cfg.Log.File
-	cfg.Proxy.Log.Color = cfg.Log.Color
-	cfg.Proxy.Log.Pretty = cfg.Log.Pretty
-	cfg.Proxy.Log.Level = cfg.Log.Level
 }

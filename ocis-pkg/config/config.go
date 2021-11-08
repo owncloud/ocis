@@ -82,10 +82,7 @@ type Runtime struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	// Mode is mostly used whenever we need to run an extension. The technical debt this introduces is in regard of
-	// what it does. Supervised (0) loads configuration from a unified config file because of known limitations of Viper; whereas
-	// Unsupervised (1) MUST parse config from all known sources.
-	Mode    Mode
+	Mode    Mode // DEPRECATED
 	File    string
 	OcisURL string `mapstructure:"ocis_url"`
 
@@ -116,6 +113,54 @@ type Config struct {
 // New initializes a new configuration with or without defaults.
 func New() *Config {
 	return &Config{
+		Accounts:      accounts.DefaultConfig(),
+		GLAuth:        glauth.DefaultConfig(),
+		Graph:         graph.DefaultConfig(),
+		IDP:           idp.DefaultConfig(),
+		Proxy:         proxy.DefaultConfig(),
+		GraphExplorer: graphExplorer.DefaultConfig(),
+		OCS:           ocs.DefaultConfig(),
+		Settings:      settings.DefaultConfig(),
+		Web:           web.DefaultConfig(),
+		Store:         store.DefaultConfig(),
+		Thumbnails:    thumbnails.DefaultConfig(),
+		WebDAV:        webdav.DefaultConfig(),
+		Storage:       storage.New(),
+	}
+}
+
+func DefaultConfig() *Config {
+	return &Config{
+		Log: Log{
+			Level: "info",
+		},
+		Debug: Debug{
+			Addr:   "127.0.0.1:9010",
+			Token:  "",
+			Pprof:  false,
+			Zpages: false,
+		},
+		HTTP: HTTP{
+			Addr: "127.0.0.1:9000",
+			Root: "/",
+		},
+		GRPC: GRPC{
+			Addr: "127.0.0.1:9001",
+		},
+		Tracing: Tracing{
+			Enabled:   false,
+			Type:      "jaeger",
+			Endpoint:  "",
+			Collector: "",
+			Service:   "ocis",
+		},
+		TokenManager: TokenManager{
+			JWTSecret: "Pive-Fumkiu4",
+		},
+		Runtime: Runtime{
+			Port: "9250",
+			Host: "localhost",
+		},
 		Accounts:      accounts.DefaultConfig(),
 		GLAuth:        glauth.DefaultConfig(),
 		Graph:         graph.DefaultConfig(),
@@ -178,13 +223,8 @@ func (c *Config) UnmapEnv(gooconf *gofig.Config) error {
 	return nil
 }
 
-// structMappings binds a set of environment variables to a destination on cfg.
 func structMappings(cfg *Config) []shared.EnvBinding {
 	return []shared.EnvBinding{
-		{
-			EnvVars:     []string{"OCIS_LOG_FILE"},
-			Destination: &cfg.Log.Level,
-		},
 		{
 			EnvVars:     []string{"OCIS_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,
@@ -196,6 +236,74 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"OCIS_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
+		},
+		{
+			EnvVars:     []string{"OCIS_LOG_FILE"},
+			Destination: &cfg.Log.File,
+		},
+		{
+			EnvVars:     []string{"OCIS_TRACING_ENABLED"},
+			Destination: &cfg.Tracing.Enabled,
+		},
+		{
+			EnvVars:     []string{"OCIS_TRACING_TYPE"},
+			Destination: &cfg.Tracing.Type,
+		},
+		{
+			EnvVars:     []string{"OCIS_TRACING_ENDPOINT"},
+			Destination: &cfg.Tracing.Endpoint,
+		},
+		{
+			EnvVars:     []string{"OCIS_TRACING_COLLECTOR"},
+			Destination: &cfg.Tracing.Collector,
+		},
+		{
+			EnvVars:     []string{"OCIS_TRACING_SERVICE"},
+			Destination: &cfg.Tracing.Service,
+		},
+		{
+			EnvVars:     []string{"OCIS_JWT_SECRET"},
+			Destination: &cfg.TokenManager.JWTSecret,
+		},
+		{
+			EnvVars:     []string{"OCIS_RUNTIME_PORT"},
+			Destination: &cfg.Runtime.Port,
+		},
+		{
+			EnvVars:     []string{"OCIS_RUNTIME_HOST"},
+			Destination: &cfg.Runtime.Host,
+		},
+		{
+			EnvVars:     []string{"OCIS_DEBUG_ADDR"},
+			Destination: &cfg.Debug.Addr,
+		},
+		{
+			EnvVars:     []string{"OCIS_DEBUG_TOKEN"},
+			Destination: &cfg.Debug.Token,
+		},
+		{
+			EnvVars:     []string{"OCIS_DEBUG_PPROF"},
+			Destination: &cfg.Debug.Pprof,
+		},
+		{
+			EnvVars:     []string{"OCIS_DEBUG_ZPAGES"},
+			Destination: &cfg.Debug.Zpages,
+		},
+		{
+			EnvVars:     []string{"OCIS_HTTP_ADDR"},
+			Destination: &cfg.HTTP.Addr,
+		},
+		{
+			EnvVars:     []string{"OCIS_HTTP_ROOT"},
+			Destination: &cfg.HTTP.Root,
+		},
+		{
+			EnvVars:     []string{"OCIS_GRPC_ADDR"},
+			Destination: &cfg.GRPC.Addr,
+		},
+		{
+			EnvVars:     []string{"OCIS_RUN_EXTENSIONS"},
+			Destination: &cfg.Runtime.Extensions,
 		},
 	}
 }

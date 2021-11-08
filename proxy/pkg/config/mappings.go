@@ -2,7 +2,20 @@ package config
 
 import "github.com/owncloud/ocis/ocis-pkg/shared"
 
-// StructMappings binds a set of environment variables to a destination on cfg.
+// GetEnv fetches a list of known env variables for this extension. It is to be used by gookit, as it provides a list
+// with all the environment variables an extension supports.
+func GetEnv() []string {
+	var r = make([]string, len(structMappings(&Config{})))
+	for i := range structMappings(&Config{}) {
+		r = append(r, structMappings(&Config{})[i].EnvVars...)
+	}
+
+	return r
+}
+
+// StructMappings binds a set of environment variables to a destination on cfg. Iterating over this set and editing the
+// Destination value of a binding will alter the original value, as it is a pointer to its memory address. This lets
+// us propagate changes easier.
 func StructMappings(cfg *Config) []shared.EnvBinding {
 	return structMappings(cfg)
 }

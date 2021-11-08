@@ -141,10 +141,10 @@ type OIDC struct {
 
 // PolicySelector is the toplevel-configuration for different selectors
 type PolicySelector struct {
-	Static    *StaticSelectorConf
-	Migration *MigrationSelectorConf
-	Claims    *ClaimsSelectorConf
-	Regex     *RegexSelectorConf
+	Static    *StaticSelectorConf    `mapstructure:"static"`
+	Migration *MigrationSelectorConf `mapstructure:"migration"`
+	Claims    *ClaimsSelectorConf    `mapstructure:"claims"`
+	Regex     *RegexSelectorConf     `mapstructure:"regex"`
 }
 
 // StaticSelectorConf is the config for the static-policy-selector
