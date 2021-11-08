@@ -24,24 +24,19 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			// StringSliceFlag doesn't support Destination
-			// UPDATE Destination on string flags supported. Wait for https://github.com/urfave/cli/pull/1078 to get to micro/cli
-			if len(ctx.StringSlice("trusted-proxy")) > 0 {
-				cfg.IDP.TrustedProxy = ctx.StringSlice("trusted-proxy")
-			}
+			//if len(ctx.StringSlice("trusted-proxy")) > 0 {
+			//	cfg.IDP.TrustedProxy = ctx.StringSlice("trusted-proxy")
+			//}
+			//
+			//if len(ctx.StringSlice("allow-scope")) > 0 {
+			//	cfg.IDP.AllowScope = ctx.StringSlice("allow-scope")
+			//}
+			//
+			//if len(ctx.StringSlice("signing-private-key")) > 0 {
+			//	cfg.IDP.SigningPrivateKeyFiles = ctx.StringSlice("signing-private-key")
+			//}
 
-			if len(ctx.StringSlice("allow-scope")) > 0 {
-				cfg.IDP.AllowScope = ctx.StringSlice("allow-scope")
-			}
-
-			if len(ctx.StringSlice("signing-private-key")) > 0 {
-				cfg.IDP.SigningPrivateKeyFiles = ctx.StringSlice("signing-private-key")
-			}
-
-			if err := ParseConfig(ctx, cfg); err != nil {
-				return err
-			}
-			return nil
+			return ParseConfig(ctx, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)

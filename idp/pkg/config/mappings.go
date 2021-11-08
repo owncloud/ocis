@@ -1,13 +1,17 @@
 package config
 
-type mapping struct {
-	EnvVars     []string    // name of the EnvVars var.
-	Destination interface{} // memory address of the original config value to modify.
+import "github.com/owncloud/ocis/ocis-pkg/shared"
+
+// StructMappings binds a set of environment variables to a destination on cfg. Iterating over this set and editing the
+// Destination value of a binding will alter the original value, as it is a pointer to its memory address. This lets
+// us propagate changes easier.
+func StructMappings(cfg *Config) []shared.EnvBinding {
+	return structMappings(cfg)
 }
 
 // structMappings binds a set of environment variables to a destination on cfg.
-func structMappings(cfg *Config) []mapping {
-	return []mapping{
+func structMappings(cfg *Config) []shared.EnvBinding {
+	return []shared.EnvBinding{
 		{
 			EnvVars:     []string{"IDP_LOG_LEVEL", "OCIS_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,
