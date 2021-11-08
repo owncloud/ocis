@@ -4,6 +4,8 @@ import (
 	"context"
 	"os"
 
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+
 	"github.com/owncloud/ocis/glauth/pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -79,7 +81,9 @@ type SutureService struct {
 
 // NewSutureService creates a new glauth.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	cfg.GLAuth.Log = cfg.Log
+	if (cfg.GLAuth.Log == shared.Log{}) {
+		cfg.GLAuth.Log = cfg.Log
+	}
 	return SutureService{
 		cfg: cfg.GLAuth,
 	}

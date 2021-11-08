@@ -26,9 +26,7 @@ func ProxyCommand(cfg *config.Config) *cli.Command {
 			if err := ParseConfig(ctx, cfg); err != nil {
 				return err
 			}
-
 			globalLog = cfg.Log
-
 			return nil
 		},
 		Action: func(c *cli.Context) error {
