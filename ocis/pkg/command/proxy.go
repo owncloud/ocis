@@ -11,10 +11,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var globalLog shared.Log
-
 // ProxyCommand is the entry point for the proxy command.
 func ProxyCommand(cfg *config.Config) *cli.Command {
+	var globalLog shared.Log
+
 	return &cli.Command{
 		Name:     "proxy",
 		Usage:    "Start proxy server",
