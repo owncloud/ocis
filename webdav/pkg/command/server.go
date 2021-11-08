@@ -24,13 +24,7 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			if err := ParseConfig(ctx, cfg); err != nil {
-				return err
-			}
-
-			logger := NewLogger(cfg)
-			logger.Debug().Str("service", "webdav").Msg("ignoring config file parsing when running supervised")
-			return nil
+			return ParseConfig(ctx, cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
