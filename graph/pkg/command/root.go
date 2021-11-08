@@ -78,8 +78,8 @@ type SutureService struct {
 
 // NewSutureService creates a new graph.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	if (cfg.Accounts.Log == shared.Log{}) {
-		cfg.Accounts.Log = cfg.Log
+	if (cfg.Graph.Log == shared.Log{}) {
+		cfg.Graph.Log = cfg.Log
 	}
 	return SutureService{
 		cfg: cfg.Graph,

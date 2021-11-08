@@ -84,8 +84,8 @@ type SutureService struct {
 
 // NewSutureService creates a new idp.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	if (cfg.Accounts.Log == shared.Log{}) {
-		cfg.Accounts.Log = cfg.Log
+	if (cfg.IDP.Log == shared.Log{}) {
+		cfg.IDP.Log = cfg.Log
 	}
 	return SutureService{
 		cfg: cfg.IDP,
