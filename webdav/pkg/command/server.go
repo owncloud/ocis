@@ -4,6 +4,10 @@ import (
 	"context"
 	"strings"
 
+	gofig "github.com/gookit/config/v2"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/webdav/pkg/config"
@@ -20,11 +24,31 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:  "server",
 		Usage: "Start integrated server",
 		Before: func(ctx *cli.Context) error {
+			// remember shared logging info to prevent empty overwrites
+			inLog := cfg.Log
+
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			return ParseConfig(ctx, cfg)
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
+			}
+
+			if (cfg.Log == shared.Log{}) && (inLog != shared.Log{}) {
+				// set the default to the parent config
+				cfg.Log = inLog
+
+				// and parse the environment
+				conf := &gofig.Config{}
+				conf.LoadOSEnv(config.GetEnv(), false)
+				bindings := config.StructMappings(cfg)
+				if err := ociscfg.BindEnv(conf, bindings); err != nil {
+					return err
+				}
+			}
+
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
