@@ -4,6 +4,8 @@ import (
 	"context"
 	"strings"
 
+	"github.com/owncloud/ocis/ocis-pkg/log"
+
 	gofig "github.com/gookit/config/v2"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/shared"
@@ -55,7 +57,7 @@ func Server(cfg *config.Config) *cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
+			logger := log.LoggerFromConfig("accounts", cfg.Log)
 			err := tracing.Configure(cfg)
 			if err != nil {
 				return err
