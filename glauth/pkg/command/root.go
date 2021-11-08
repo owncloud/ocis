@@ -19,21 +19,16 @@ func Execute(cfg *config.Config) error {
 		Version:  version.String,
 		Usage:    "Serve GLAuth API for oCIS",
 		Compiled: version.Compiled(),
-
 		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
 				Email: "support@owncloud.com",
 			},
 		},
-
-		//Flags: flagset.RootWithConfig(cfg),
-
 		Before: func(c *cli.Context) error {
 			cfg.Version = version.String
 			return nil
 		},
-
 		Commands: []*cli.Command{
 			Server(cfg),
 			Health(cfg),
@@ -73,12 +68,8 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 
 	// load all env variables relevant to the config in the current context.
 	conf.LoadOSEnv(config.GetEnv(), false)
-
-	if err = cfg.UnmapEnv(conf); err != nil {
-		return err
-	}
-
-	return nil
+	bindings := config.StructMappings(cfg)
+	return ociscfg.BindEnv(conf, bindings)
 }
 
 // SutureService allows for the glauth command to be embedded and supervised by a suture supervisor tree.
@@ -88,11 +79,7 @@ type SutureService struct {
 
 // NewSutureService creates a new glauth.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	inheritLogging(cfg)
-	if cfg.Mode == 0 {
-		cfg.GLAuth.Supervised = true
-	}
-	cfg.GLAuth.Log.File = cfg.Log.File
+	cfg.GLAuth.Log = cfg.Log
 	return SutureService{
 		cfg: cfg.GLAuth,
 	}
@@ -105,14 +92,4 @@ func (s SutureService) Serve(ctx context.Context) error {
 	}
 
 	return nil
-}
-
-// inheritLogging is a poor man's global logging state tip-toeing around circular dependencies. It sets the logging
-// of the service to whatever is in the higher config (in this case coming from ocis.yaml) and sets them as defaults,
-// being overwritten when the extension parses its config file / env variables.
-func inheritLogging(cfg *ociscfg.Config) {
-	cfg.GLAuth.Log.File = cfg.Log.File
-	cfg.GLAuth.Log.Color = cfg.Log.Color
-	cfg.GLAuth.Log.Pretty = cfg.Log.Pretty
-	cfg.GLAuth.Log.Level = cfg.Log.Level
 }

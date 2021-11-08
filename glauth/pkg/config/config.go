@@ -6,17 +6,11 @@ import (
 	"path"
 	"reflect"
 
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+
 	gofig "github.com/gookit/config/v2"
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 )
-
-// Log defines the available logging configuration.
-type Log struct {
-	Level  string `mapstructure:"level"`
-	Pretty bool   `mapstructure:"pretty"`
-	Color  bool   `mapstructure:"color"`
-	File   string `mapstructure:"file"`
-}
 
 // Debug defines the available debug configuration.
 type Debug struct {
@@ -70,17 +64,17 @@ type Backend struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File           string  `mapstructure:"file"`
-	Log            Log     `mapstructure:"log"`
-	Debug          Debug   `mapstructure:"debug"`
-	HTTP           HTTP    `mapstructure:"http"`
-	Tracing        Tracing `mapstructure:"tracing"`
-	Ldap           Ldap    `mapstructure:"ldap"`
-	Ldaps          Ldaps   `mapstructure:"ldaps"`
-	Backend        Backend `mapstructure:"backend"`
-	Fallback       Backend `mapstructure:"fallback"`
-	Version        string  `mapstructure:"version"`
-	RoleBundleUUID string  `mapstructure:"role_bundle_uuid"`
+	File           string     `mapstructure:"file"`
+	Log            shared.Log `mapstructure:"log"`
+	Debug          Debug      `mapstructure:"debug"`
+	HTTP           HTTP       `mapstructure:"http"`
+	Tracing        Tracing    `mapstructure:"tracing"`
+	Ldap           Ldap       `mapstructure:"ldap"`
+	Ldaps          Ldaps      `mapstructure:"ldaps"`
+	Backend        Backend    `mapstructure:"backend"`
+	Fallback       Backend    `mapstructure:"fallback"`
+	Version        string     `mapstructure:"version"`
+	RoleBundleUUID string     `mapstructure:"role_bundle_uuid"`
 
 	Context    context.Context
 	Supervised bool
@@ -93,7 +87,7 @@ func New() *Config {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Log: Log{},
+		Log: shared.Log{},
 		Debug: Debug{
 			Addr: "127.0.0.1:9129",
 		},

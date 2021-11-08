@@ -19,19 +19,16 @@ func Execute(cfg *config.Config) error {
 		Version:  version.String,
 		Usage:    "proxy for oCIS",
 		Compiled: version.Compiled(),
-
 		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
 				Email: "support@owncloud.com",
 			},
 		},
-
 		Before: func(c *cli.Context) error {
 			cfg.Service.Version = version.String
 			return nil
 		},
-
 		Commands: []*cli.Command{
 			Server(cfg),
 			Health(cfg),
