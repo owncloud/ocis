@@ -64,14 +64,9 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	if err != nil {
 		return err
 	}
-
-	// load all env variables relevant to the config in the current context.
 	conf.LoadOSEnv(config.GetEnv(), false)
-
 	bindings := config.StructMappings(cfg)
 	return ociscfg.BindEnv(conf, bindings)
-
-	return nil
 }
 
 // SutureService allows for the graph command to be embedded and supervised by a suture supervisor tree.

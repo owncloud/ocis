@@ -19,7 +19,6 @@ func Execute(cfg *config.Config) error {
 		Version:  version.String,
 		Usage:    "Serve Graph-Explorer for oCIS",
 		Compiled: version.Compiled(),
-
 		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
@@ -30,18 +29,15 @@ func Execute(cfg *config.Config) error {
 			cfg.Server.Version = version.String
 			return ParseConfig(c, cfg)
 		},
-
 		Commands: []*cli.Command{
 			Server(cfg),
 			Health(cfg),
 		},
 	}
-
 	cli.HelpFlag = &cli.BoolFlag{
 		Name:  "help,h",
 		Usage: "Show the help",
 	}
-
 	cli.VersionFlag = &cli.BoolFlag{
 		Name:  "version,v",
 		Usage: "Print the version",
@@ -68,14 +64,9 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 		return err
 	}
 
-	// load all env variables relevant to the config in the current context.
 	conf.LoadOSEnv(config.GetEnv(), false)
-
-	if err = cfg.UnmapEnv(conf); err != nil {
-		return err
-	}
-
-	return nil
+	bindings := config.StructMappings(cfg)
+	return ociscfg.BindEnv(conf, bindings)
 }
 
 // SutureService allows for the graph-explorer command to be embedded and supervised by a suture supervisor tree.
@@ -85,11 +76,7 @@ type SutureService struct {
 
 // NewSutureService creates a new graph-explorer.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	inheritLogging(cfg)
-	if cfg.Mode == 0 {
-		cfg.GraphExplorer.Supervised = true
-	}
-	cfg.GraphExplorer.Log.File = cfg.Log.File
+	cfg.GraphExplorer.Log = cfg.Log
 	return SutureService{
 		cfg: cfg.GraphExplorer,
 	}
@@ -102,14 +89,4 @@ func (s SutureService) Serve(ctx context.Context) error {
 	}
 
 	return nil
-}
-
-// inheritLogging is a poor man's global logging state tip-toeing around circular dependencies. It sets the logging
-// of the service to whatever is in the higher config (in this case coming from ocis.yaml) and sets them as defaults,
-// being overwritten when the extension parses its config file / env variables.
-func inheritLogging(cfg *ociscfg.Config) {
-	cfg.GraphExplorer.Log.File = cfg.Log.File
-	cfg.GraphExplorer.Log.Color = cfg.Log.Color
-	cfg.GraphExplorer.Log.Pretty = cfg.Log.Pretty
-	cfg.GraphExplorer.Log.Level = cfg.Log.Level
 }

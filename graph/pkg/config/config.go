@@ -9,14 +9,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
-// Log defines the available logging configuration.
-type Log struct {
-	Level  string `mapstructure:"level"`
-	Pretty bool   `mapstructure:"pretty"`
-	Color  bool   `mapstructure:"color"`
-	File   string `mapstructure:"file"`
-}
-
 // Debug defines the available debug configuration.
 type Debug struct {
 	Addr   string `mapstructure:"addr"`

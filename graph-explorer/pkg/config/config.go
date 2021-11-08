@@ -6,15 +6,8 @@ import (
 	"reflect"
 
 	gofig "github.com/gookit/config/v2"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
-
-// Log defines the available logging configuration.
-type Log struct {
-	Level  string `mapstructure:"level"`
-	Pretty bool   `mapstructure:"pretty"`
-	Color  bool   `mapstructure:"color"`
-	File   string `mapstructure:"file"`
-}
 
 // Debug defines the available debug configuration.
 type Debug struct {
@@ -57,7 +50,7 @@ type GraphExplorer struct {
 // Config combines all available configuration parts.
 type Config struct {
 	File          string        `mapstructure:"file"`
-	Log           Log           `mapstructure:"log"`
+	Log           shared.Log    `mapstructure:"log"`
 	Debug         Debug         `mapstructure:"debug"`
 	HTTP          HTTP          `mapstructure:"http"`
 	Server        Server        `mapstructure:"server"`
@@ -76,7 +69,7 @@ func New() *Config {
 // DefaultConfig provides with a working version of a config.
 func DefaultConfig() *Config {
 	return &Config{
-		Log: Log{},
+		Log: shared.Log{},
 		Debug: Debug{
 			Addr:   "127.0.0.1:9136",
 			Token:  "",
