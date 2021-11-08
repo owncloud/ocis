@@ -88,6 +88,7 @@ type SutureService struct {
 
 // NewSutureService creates a new proxy.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
+	cfg.Proxy.Log = cfg.Log
 	return SutureService{
 		cfg: cfg.Proxy,
 	}

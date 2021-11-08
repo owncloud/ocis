@@ -23,6 +23,7 @@ func ProxyCommand(cfg *config.Config) *cli.Command {
 			return ParseConfig(ctx, cfg)
 		},
 		Action: func(c *cli.Context) error {
+			cfg.Proxy.Log = cfg.Log
 			origCmd := command.Server(cfg.Proxy)
 			return handleOriginalAction(c, origCmd)
 		},

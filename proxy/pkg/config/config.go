@@ -5,6 +5,7 @@ import (
 	"path"
 
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
 // Log defines the available logging configuration.
@@ -108,7 +109,7 @@ type Config struct {
 	OcisURL string
 
 	File                  string          `mapstructure:"file"`
-	Log                   Log             `mapstructure:"log"`
+	Log                   shared.Log      `mapstructure:"log"`
 	Debug                 Debug           `mapstructure:"debug"`
 	HTTP                  HTTP            `mapstructure:"http"`
 	Service               Service         `mapstructure:"service"`
@@ -203,7 +204,7 @@ func New() *Config {
 func DefaultConfig() *Config {
 	return &Config{
 		File: "",
-		Log:  Log{}, // logging config is inherited.
+		Log:  shared.Log{}, // logging config is inherited.
 		Debug: Debug{
 			Addr:  "0.0.0.0:9205",
 			Token: "",

@@ -7,3 +7,11 @@ type EnvBinding struct {
 	EnvVars     []string    // name of the environment var.
 	Destination interface{} // pointer to the original config value to modify.
 }
+
+// Log defines the available logging configuration.
+type Log struct {
+	Level  string `mapstructure:"level"`
+	Pretty bool   `mapstructure:"pretty"`
+	Color  bool   `mapstructure:"color"`
+	File   string `mapstructure:"file"`
+}

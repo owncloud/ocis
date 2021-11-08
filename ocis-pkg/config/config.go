@@ -22,14 +22,6 @@ import (
 	webdav "github.com/owncloud/ocis/webdav/pkg/config"
 )
 
-// Log defines the available logging configuration.
-type Log struct {
-	Level  string `mapstructure:"level"`
-	Pretty bool   `mapstructure:"pretty"`
-	Color  bool   `mapstructure:"color"`
-	File   string `mapstructure:"file"`
-}
-
 // Debug defines the available debug configuration.
 type Debug struct {
 	Addr   string `mapstructure:"addr"`
@@ -87,7 +79,7 @@ type Config struct {
 	OcisURL string `mapstructure:"ocis_url"`
 
 	Registry     string       `mapstructure:"registry"`
-	Log          Log          `mapstructure:"log"`
+	Log          shared.Log   `mapstructure:"log"`
 	Debug        Debug        `mapstructure:"debug"`
 	HTTP         HTTP         `mapstructure:"http"`
 	GRPC         GRPC         `mapstructure:"grpc"`
@@ -131,7 +123,7 @@ func New() *Config {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Log: Log{
+		Log: shared.Log{
 			Level: "info",
 		},
 		Debug: Debug{
