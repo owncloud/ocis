@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	gofig "github.com/gookit/config/v2"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
 // Log defines the available logging configuration.
@@ -65,7 +66,7 @@ type Spaces struct {
 // Config combines all available configuration parts.
 type Config struct {
 	File         string       `mapstructure:"file"`
-	Log          Log          `mapstructure:"log"`
+	Log          shared.Log   `mapstructure:"log"`
 	Debug        Debug        `mapstructure:"debug"`
 	HTTP         HTTP         `mapstructure:"http"`
 	Server       Server       `mapstructure:"server"`
@@ -85,7 +86,7 @@ func New() *Config {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Log: Log{},
+		Log: shared.Log{},
 		Debug: Debug{
 			Addr:  "127.0.0.1:9124",
 			Token: "",

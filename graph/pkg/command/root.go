@@ -20,30 +20,25 @@ func Execute(cfg *config.Config) error {
 		Version:  version.String,
 		Usage:    "Serve Graph API for oCIS",
 		Compiled: version.Compiled(),
-
 		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
 				Email: "support@owncloud.com",
 			},
 		},
-
 		Before: func(c *cli.Context) error {
 			cfg.Server.Version = version.String
 			return ParseConfig(c, cfg)
 		},
-
 		Commands: []*cli.Command{
 			Server(cfg),
 			Health(cfg),
 		},
 	}
-
 	cli.HelpFlag = &cli.BoolFlag{
 		Name:  "help,h",
 		Usage: "Show the help",
 	}
-
 	cli.VersionFlag = &cli.BoolFlag{
 		Name:  "version,v",
 		Usage: "Print the version",
@@ -73,9 +68,8 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	// load all env variables relevant to the config in the current context.
 	conf.LoadOSEnv(config.GetEnv(), false)
 
-	if err = cfg.UnmapEnv(conf); err != nil {
-		return err
-	}
+	bindings := config.StructMappings(cfg)
+	return ociscfg.BindEnv(conf, bindings)
 
 	return nil
 }
@@ -87,10 +81,7 @@ type SutureService struct {
 
 // NewSutureService creates a new graph.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Graph.Supervised = true
-	}
-	cfg.Graph.Log.File = cfg.Log.File
+	cfg.Graph.Log = cfg.Log
 	return SutureService{
 		cfg: cfg.Graph,
 	}

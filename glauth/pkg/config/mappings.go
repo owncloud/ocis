@@ -2,11 +2,6 @@ package config
 
 import "github.com/owncloud/ocis/ocis-pkg/shared"
 
-type mapping struct {
-	EnvVars     []string    // name of the EnvVars var.
-	Destination interface{} // memory address of the original config value to modify.
-}
-
 // StructMappings binds a set of environment variables to a destination on cfg. Iterating over this set and editing the
 // Destination value of a binding will alter the original value, as it is a pointer to its memory address. This lets
 // us propagate changes easier.
