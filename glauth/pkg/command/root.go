@@ -4,11 +4,11 @@ import (
 	"context"
 	"os"
 
-	"github.com/owncloud/ocis/ocis-pkg/shared"
-
 	"github.com/owncloud/ocis/glauth/pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	oclog "github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
@@ -52,13 +52,7 @@ func Execute(cfg *config.Config) error {
 
 // NewLogger initializes a service-specific logger instance.
 func NewLogger(cfg *config.Config) log.Logger {
-	return log.NewLogger(
-		log.Name("glauth"),
-		log.Level(cfg.Log.Level),
-		log.Pretty(cfg.Log.Pretty),
-		log.Color(cfg.Log.Color),
-		log.File(cfg.Log.File),
-	)
+	return oclog.LoggerFromConfig("glauth", cfg.Log)
 }
 
 // ParseConfig loads glauth configuration from known paths.
