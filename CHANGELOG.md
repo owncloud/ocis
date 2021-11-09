@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix error logging when there is no thumbnail for a file: [#2702](https://github.com/owncloud/ocis/pull/2702)
 * Bugfix - Don't announce resharing via capabilities: [#2690](https://github.com/owncloud/ocis/pull/2690)
 * Enhancement - Add API to list all spaces: [#2692](https://github.com/owncloud/ocis/pull/2692)
+* Enhancement - Update reva to v1.16: [#2737](https://github.com/owncloud/ocis/pull/2737)
 
 ## Details
 
@@ -57,6 +58,12 @@ The following sections list the changes for unreleased.
    spaces.
 
    https://github.com/owncloud/ocis/pull/2692
+
+* Enhancement - Update reva to v1.16: [#2737](https://github.com/owncloud/ocis/pull/2737)
+
+   Updated reva to v1.16 This update includes: * TODO before oCIS release
+
+   https://github.com/owncloud/ocis/pull/2737
 # Changelog for [1.14.0] (2021-10-27)
 
 The following sections list the changes for 1.14.0.
