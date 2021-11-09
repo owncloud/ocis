@@ -21,7 +21,7 @@ In order to simplify deployments and development the configuration model from oC
 
 Since we include a set of predefined extensions within the single binary, configuring an extension can be done in a variety of ways. Since we work with complex types, having as many cli per config value scales poorly, so we limited the options to config files and environment variables, leaving cli flags for shared values, such as config file sources (`--config-file`) or logging (`--log-level`, `--log-pretty`, `--log-file` or `--log-color`).
 
-The hierarchy is clear enough, leaving us with a clear:
+The hierarchy is clear enough, leaving us with:
 
 _(each element above overwrites its precedent)_
 
@@ -29,7 +29,7 @@ _(each element above overwrites its precedent)_
 2. extension config
 3. ocis config
 
-This is manifested in the previous diagram. We can then speak about "configuration file arithmetics", where resulting config transformations happen through a series of steps with the sources mentioned previously. An administrator must be aware of this sources, since mis-managing them can be a source of confusion, having undesired transformations on config files believed not to be applied.
+This is manifested in the previous diagram. We can then speak about "configuration file arithmetics", where resulting config transformations happen through a series of steps. An administrator must be aware of these sources, since mis-managing them can be a source of confusion, having undesired transformations on config files believed not to be applied.
 
 ## Flows
 
@@ -115,11 +115,11 @@ Since one can run an extension using the runtime (supervised) or not (unsupervis
 
 #### Supervised
 
-You are using the supervised mode whenever you issue the `ocis server` command. We start the runtime on port `9250` (by default) that listens for commands regarding the lifecycle of the supervised extensions. When an extension runs supervised and is killed, the only way to provide / overwrite configuration values will be through an extension config file. This is due to the parent process has already started, and it already has its own environment. This is a living design document, and if the need arise where we want to stick to the loading defaults, we could.
+You are using the supervised mode whenever you issue the `ocis server` command. We start the runtime on port `9250` (by default) that listens for commands regarding the lifecycle of the supervised extensions. When an extension runs supervised and is killed, the only way to provide / overwrite configuration values will be through an extension config file. This is due to the parent process has already started, and it already has its own environment.
 
 #### Unsupervised
 
-All the points from the priority section hold true. An unsupervised extension can be started with the format: `ocis [extension]` i.e: `ocis proxy`. First, `ocis.yaml` are parsed, the `proxy.yaml` and finally any environment variables.
+All the points from the priority section hold true. An unsupervised extension can be started with the format: `ocis [extension]` i.e: `ocis proxy`. First, `ocis.yaml` is parsed, then `proxy.yaml` followed by environment variables.
 
 ## Shared Values
 
