@@ -133,10 +133,10 @@ def main(ctx):
     pipelines = []
 
     test_pipelines = \
+        checkForRecentBuilds(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
         testOcisModules(ctx) + \
-        testPipelines(ctx) + \
-        checkForRecentBuilds(ctx)
+        testPipelines(ctx)
 
     build_release_pipelines = \
         dockerReleases(ctx) + \
@@ -149,35 +149,21 @@ def main(ctx):
         docs(ctx),
     ]
 
-    if ctx.build.event == "cron":
-        pipelines = test_pipelines + [
-            pipelineDependsOn(
-                purgeBuildArtifactCache(ctx, "ocis-binary-amd64"),
-                testPipelines(ctx),
-            ),
-        ] + example_deploys(ctx)
+    test_pipelines.append(
+        pipelineDependsOn(
+            purgeBuildArtifactCache(ctx, "ocis-binary-amd64"),
+            testPipelines(ctx),
+        ),
+    )
 
-    elif (ctx.build.event == "pull_request" and "[docs-only]" in ctx.build.title) or \
-         (ctx.build.event != "pull_request" and "[docs-only]" in (ctx.build.title + ctx.build.message)):
-        # [docs-only] is not taken from PR messages, but from commit messages
-        pipelines = [docs(ctx), changelog(ctx)]
+    pipelines = test_pipelines + build_release_pipelines + build_release_helpers
 
-    else:
-        test_pipelines.append(
-            pipelineDependsOn(
-                purgeBuildArtifactCache(ctx, "ocis-binary-amd64"),
-                testPipelines(ctx),
-            ),
+    pipelines = \
+        pipelines + \
+        pipelinesDependsOn(
+            example_deploys(ctx),
+            pipelines,
         )
-
-        pipelines = test_pipelines + build_release_pipelines + build_release_helpers
-
-        pipelines = \
-            pipelines + \
-            pipelinesDependsOn(
-                example_deploys(ctx),
-                pipelines,
-            )
 
     # always append notification step
     pipelines.append(
@@ -268,7 +254,7 @@ def testPipelines(ctx):
     return pipelines
 
 def testOcisModule(ctx, module):
-    steps = makeGenerate(module) + [
+    steps = skipIfUnchanged(ctx, "unit-tests") + makeGenerate(module) + [
         {
             "name": "golangci-lint",
             "image": OC_CI_GOLANG,
@@ -339,7 +325,8 @@ def buildOcisBinaryForTesting(ctx):
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": makeGenerate("") +
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") +
+                 makeGenerate("") +
                  build() +
                  rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis"),
         "trigger": {
@@ -387,6 +374,7 @@ def uploadScanResults(ctx):
                     "git checkout $DRONE_COMMIT",
                 ],
             },
+        ] + skipIfUnchanged(ctx, "unit-tests") + [
             {
                 "name": "sync-from-cache",
                 "image": MINIO_MC,
@@ -447,7 +435,7 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
                  ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) +
                  cloneCoreRepos() + [
             {
@@ -495,7 +483,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
                  ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) +
                  cloneCoreRepos() + [
             {
@@ -606,7 +594,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
                  ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
             {
                 "name": "webUITests",
@@ -670,7 +658,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
                  ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
             {
                 "name": "WebUIAcceptanceTests",
@@ -735,7 +723,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
                  ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
             {
                 "name": "WebUIAcceptanceTests",
@@ -802,7 +790,7 @@ def failEarly(ctx, early_fail):
     Returns:
         pipeline steps
     """
-    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "tag" or ctx.build.event == "cron"):
         return []
 
     if (early_fail):
@@ -884,7 +872,8 @@ def dockerRelease(ctx, arch):
             "os": "linux",
             "arch": arch,
         },
-        "steps": makeGenerate("") + [
+        "steps": skipIfUnchanged(ctx, "build-docker") +
+                 makeGenerate("") + [
             {
                 "name": "build",
                 "image": OC_CI_GOLANG,
@@ -957,7 +946,8 @@ def dockerEos(ctx):
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": makeGenerate("") + [
+        "steps": skipIfUnchanged(ctx, "build-docker") +
+                 makeGenerate("") + [
             {
                 "name": "build",
                 "image": OC_CI_GOLANG,
@@ -1059,7 +1049,8 @@ def binaryRelease(ctx, name):
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": makeGenerate("") + [
+        "steps": skipIfUnchanged(ctx, "build-binary") +
+                 makeGenerate("") + [
             {
                 "name": "build",
                 "image": OC_CI_GOLANG,
@@ -1557,6 +1548,49 @@ def build():
             "volumes": [stepVolumeGo],
         },
     ]
+
+def skipIfUnchanged(ctx, type):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "tag" or ctx.build.event == "cron"):
+        return []
+
+    base = [
+        "^.github/.*",
+        "^.vscode/.*",
+        "^changelog/.*",
+        "^docs/.*",
+        "^deployments/.*",
+    ]
+    unit = [
+        ".*_test.go$",
+    ]
+    acceptance = [
+        "^tests/acceptance/.*",
+    ]
+
+    skip = []
+    if type == "acceptance-tests":
+        skip = base + unit
+    if type == "unit-tests":
+        skip = base + acceptance
+    if type == "build-binary" or type == "build-docker":
+        skip = base + unit + acceptance
+
+    if len(skip) == 0:
+        return []
+
+    return [{
+        "name": "skip-if-unchanged",
+        "image": "owncloudci/drone-skip-pipeline",
+        "pull": "always",
+        "settings": {
+            "ALLOW_SKIP_CHANGED": skip,
+        },
+        "when": {
+            "event": [
+                "pull_request",
+            ],
+        },
+    }]
 
 def example_deploys(ctx):
     latest_configs = [
