@@ -595,7 +595,7 @@ class SpacesContext implements Context {
                     "response does not contain the entry '$expectedFile[0]'"
                 );
             } else {
-                Assert::assertFalse(
+                Assert::assertEmpty(
                     $fileFound,
                     "response does contain the entry '$expectedFile[0]' but should not"
                 );
@@ -748,7 +748,6 @@ class SpacesContext implements Context {
                 $content
             )
         );
-        $this->featureContext->theHTTPStatusCodeShouldBe([201, 204]);
     }
 
     /**
