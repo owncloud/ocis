@@ -121,6 +121,45 @@ You are using the supervised mode whenever you issue the `ocis server` command. 
 
 All the points from the priority section hold true. An unsupervised extension can be started with the format: `ocis [extension]` i.e: `ocis proxy`. First, `ocis.yaml` are parsed, the `proxy.yaml` and finally any environment variables.
 
+## Shared Values
+
+When running in supervised mode (`ocis server`) it is beneficial to have common values for logging, so that the log output is correctly formatted, or everything is piped to the same file without duplicating config keys and values all over the place. This is possible using the global `log` config key:
+
+_ocis.yaml_
+```yaml
+log:
+  level: error
+  color: true
+  pretty: true
+  file: /var/tmp/ocis_output.log
+```
+
+There is, however, the option for extensions to overwrite this global values by declaring their own logging directives:
+
+_ocis.yaml_
+```yaml
+log:
+  level: info
+  color: false
+  pretty: false
+```
+
+One can go as far as to make the case of an extension overwriting its shared logging config that received from the main `ocis.yaml` file. Because things can get out of hands pretty fast we recommend not mixing logging configuration values and either use the same global logging values for all extensions.
+
+{{< hint warning >}}
+When overwriting a globally shared logging values, one *MUST* specify all values.
+{{< /hint >}}
+
+### Log config keys
+
+```yaml
+log:
+  level: [ error | warning | info | debug ]
+  color: [ true | false ]
+  pretty: [ true | false ]
+  file: [ path/to/log/file ] # MUST not be used with pretty = true
+```
+
 ## Default config values (in yaml)
 
 TBD. Needs to be generated and merged with the env mappings.
