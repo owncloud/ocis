@@ -17,11 +17,11 @@ var (
 		".config/",
 	}
 
-	// supportedExtensions is determined by gookit/config. For the purposes of the PR MVP we will focus on yaml, looking
-	// into extending it to all supported drivers.
+	// supportedExtensions is determined by gookit/config.
 	supportedExtensions = []string{
 		"yaml",
 		"yml",
+		"json",
 	}
 )
 
