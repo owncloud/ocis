@@ -181,7 +181,11 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 					"drivers": map[string]interface{}{
 						"static": map[string]interface{}{
 							"home_provider": cfg.Reva.StorageRegistry.HomeProvider,
-							"rules":         rules(cfg, logger),
+							"rules":         simpleRules(cfg, logger),
+						},
+						"spaces": map[string]interface{}{
+							"home_provider": cfg.Reva.StorageRegistry.HomeProvider,
+							"rules":         spacesRules(cfg, logger),
 						},
 					},
 				},
@@ -191,7 +195,7 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 	return rcfg
 }
 
-func rules(cfg *config.Config, logger log.Logger) map[string]map[string]interface{} {
+func simpleRules(cfg *config.Config, logger log.Logger) map[string]map[string]interface{} {
 
 	// if a list of rules is given it overrides the generated rules from below
 	if len(cfg.Reva.StorageRegistry.Rules) > 0 {
@@ -231,6 +235,44 @@ func rules(cfg *config.Config, logger log.Logger) map[string]map[string]interfac
 	}
 
 	return ret
+}
+
+func spacesRules(cfg *config.Config, logger log.Logger) map[string]map[string]interface{} {
+
+	// if a list of rules is given it overrides the generated rules from below
+	if len(cfg.Reva.StorageRegistry.Rules) > 0 {
+		rules := map[string]map[string]interface{}{}
+		for i := range cfg.Reva.StorageRegistry.Rules {
+			parts := strings.SplitN(cfg.Reva.StorageRegistry.Rules[i], "=", 2)
+			rules[parts[0]] = map[string]interface{}{"address": parts[1]}
+		}
+		return rules
+	}
+
+	// check if the rules have to be read from a json file
+	if cfg.Reva.StorageRegistry.JSON != "" {
+		data, err := ioutil.ReadFile(cfg.Reva.StorageRegistry.JSON)
+		if err != nil {
+			logger.Error().Err(err).Msg("Failed to read storage registry rules from JSON file: " + cfg.Reva.StorageRegistry.JSON)
+			return nil
+		}
+		var rules map[string]map[string]interface{}
+		if err = json.Unmarshal(data, &rules); err != nil {
+			logger.Error().Err(err).Msg("Failed to unmarshal storage registry rules")
+			return nil
+		}
+		return rules
+	}
+
+	// generate rules based on default config
+	return map[string]map[string]interface{}{
+		"/personal": {"address": cfg.Reva.StorageUsers.Endpoint},
+		// public link storage returns the mount id of the actual storage
+		"/public": {"address": cfg.Reva.StoragePublicLink.Endpoint},
+		// TODO shares
+		//"/shares":   {"address": cfg.Reva.StoragePublicLink.Endpoint},
+		// medatada storage not part of the global namespace
+	}
 }
 
 func mimetypes(cfg *config.Config, logger log.Logger) []map[string]interface{} {

@@ -132,7 +132,6 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 			},
 			"services": map[string]interface{}{
 				"storageprovider": map[string]interface{}{
-					"mount_path":      "/meta",
 					"driver":          cfg.Reva.StorageMetadata.Driver,
 					"drivers":         storagedrivers.MetadataDrivers(cfg),
 					"data_server_url": cfg.Reva.StorageMetadata.DataServerURL,

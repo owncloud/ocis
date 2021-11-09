@@ -106,7 +106,6 @@ func storageHomeConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 				"storageprovider": map[string]interface{}{
 					"driver":             cfg.Reva.StorageHome.Driver,
 					"drivers":            storagedrivers.HomeDrivers(cfg),
-					"mount_path":         cfg.Reva.StorageHome.MountPath,
 					"mount_id":           cfg.Reva.StorageHome.MountID,
 					"expose_data_server": cfg.Reva.StorageHome.ExposeDataServer,
 					"data_server_url":    cfg.Reva.StorageHome.DataServerURL,
