@@ -108,7 +108,6 @@ services:
       OCIS_STORAGE_READ_ONLY: "false" # TODO: conflict with OWNCLOUDSQL -> https://github.com/owncloud/ocis/issues/2303
       # General oCIS config
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
-      PROXY_LOG_LEVEL: ${PROXY_LOG_LEVEL:-error}
       OCIS_URL: https://${CLOUD_DOMAIN:-cloud.owncloud.test}
       PROXY_OIDC_INSECURE: "${INSECURE:-false}" # needed if Traefik is using self generated certificates
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
@@ -119,7 +118,7 @@ services:
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
-      - ./config/ocis/proxy-config.dist.json:/config/proxy-config.dist.json
+      - ./config/ocis/proxy.json:/etc/ocis/proxy.json
       - ocis-data:/var/lib/ocis
       # shared volume with oC10
       - oc10-data:/mnt/data

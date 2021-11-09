@@ -1,7 +1,4 @@
 {
-  "log": {
-    "level": "PROXY_LOG_LEVEL"
-  },
   "policy_selector": {
     "claims": {
       "default_policy": "oc10",
@@ -52,6 +49,10 @@
         },
         {
           "endpoint": "/index.php/",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/app/",
           "backend": "http://localhost:9140"
         },
         {
