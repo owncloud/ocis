@@ -32,7 +32,7 @@ func TestPrefixRouteMatcher(t *testing.T) {
 }
 
 func TestQueryRouteMatcher(t *testing.T) {
-	cfg := config.New()
+	cfg := config.DefaultConfig()
 	p := NewMultiHostReverseProxy(Config(cfg))
 
 	table := []matchertest{
@@ -59,7 +59,7 @@ func TestQueryRouteMatcher(t *testing.T) {
 }
 
 func TestRegexRouteMatcher(t *testing.T) {
-	cfg := config.New()
+	cfg := config.DefaultConfig()
 	p := NewMultiHostReverseProxy(Config(cfg))
 
 	table := []matchertest{
