@@ -67,9 +67,13 @@
           "backend": "http://localhost:9140"
         },
         {
-					"endpoint": "/app/",
-					"backend":  "http://localhost:9140"
-				},
+          "endpoint": "/app/",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/archiver",
+          "backend": "http://localhost:9140"
+        },
         {
           "endpoint": "/graph/",
           "backend": "http://localhost:9120"

@@ -81,6 +81,10 @@
           "backend": "http://localhost:9140"
         },
         {
+          "endpoint": "/archiver",
+          "backend": "http://localhost:9140"
+        },
+        {
           "endpoint": "/graph-explorer/",
           "backend": "http://localhost:9135"
         },
