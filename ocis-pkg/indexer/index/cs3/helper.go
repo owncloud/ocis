@@ -12,7 +12,7 @@ import (
 func deleteIndexRoot(ctx context.Context, storageProvider provider.ProviderAPIClient, indexRootDir string) error {
 	res, err := storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Path: path.Join("/meta", indexRootDir),
+			Path: path.Join("/", indexRootDir),
 		},
 	})
 	if err != nil {

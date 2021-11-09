@@ -32,7 +32,7 @@ package cs3
 //	sut := NewNonUniqueIndexWithOptions(
 //		option.WithTypeName(GetTypeFQN(User{})),
 //		option.WithIndexBy("UserName"),
-//		option.WithFilesDir(path.Join(cfg.Repo.Disk.Path, "/meta")),
+//		option.WithFilesDir(path.Join(cfg.Repo.Disk.Path, "/")),
 //		option.WithDataDir(cfg.Repo.Disk.Path),
 //		option.WithDataURL(cfg.Repo.CS3.DataURL),
 //		option.WithDataPrefix(cfg.Repo.CS3.DataPrefix),
