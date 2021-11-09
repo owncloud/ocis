@@ -102,11 +102,6 @@ class ArchiverContext implements Context {
 		\file_put_contents($tempFile, $this->featureContext->getResponse()->getBody()->getContents());
 		$archive = UnifiedArchive::open($tempFile);
 		foreach ($expectedFiles->getHash() as $expectedFile) {
-			Assert::assertTrue(
-				$archive->hasFile($expectedFile['name']),
-				__METHOD__ .
-				" archive does not contain '" . $expectedFile['name'] . "'"
-			);
 			Assert::assertEquals(
 				$expectedFile['content'],
 				$archive->getFileContent($expectedFile['name']),
