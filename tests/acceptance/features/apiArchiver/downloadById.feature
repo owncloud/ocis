@@ -18,3 +18,14 @@ Feature: download multiple resources bundled into an archive
     And the downloaded archive should contain these files:
       | name          | content   |
       | textfile0.txt | some data |
+
+  Scenario: download a single folder
+    Given user "Alice" has created folder "my_data"
+    And user "Alice" has uploaded file with content "some data" to "/my_data/textfile0.txt"
+    And user "Alice" has uploaded file with content "more data" to "/my_data/an_other_file.txt"
+    When user "Alice" downloads the archive of "/my_data" using the resource id
+    Then the HTTP status code should be "200"
+    And the downloaded archive should contain these files:
+      | name                      | content   |
+      | my_data/textfile0.txt     | some data |
+      | my_data/an_other_file.txt | more data |
