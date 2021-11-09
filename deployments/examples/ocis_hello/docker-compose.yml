@@ -52,7 +52,8 @@ services:
     environment:
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
-      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
+      #OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
+      PROXY_LOG_LEVEL: debug
       PROXY_OIDC_INSECURE: "${INSECURE:-false}" # needed if Traefik is using self generated certificates
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       # change default secrets
@@ -63,14 +64,12 @@ services:
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       # web ui
       WEB_UI_CONFIG: "/var/tmp/ocis/.config/web-config.json"
-      # proxy
-      PROXY_CONFIG_FILE: "/var/tmp/ocis/.config/proxy-config.json"
       # make settings service available to oCIS Hello
       SETTINGS_GRPC_ADDR: 0.0.0.0:9191
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/ocis/web-config.dist.json:/config/web-config.dist.json
-      - ./config/ocis/proxy-config.json:/config/proxy-config.json
+      - ./config/ocis/proxy.json:/etc/ocis/proxy.json
       - ocis-data:/var/lib/ocis
     labels:
       - "traefik.enable=true"

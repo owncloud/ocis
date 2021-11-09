@@ -108,7 +108,6 @@ type Cache struct {
 type Config struct {
 	OcisURL string
 
-	File                  string          `mapstructure:"file"`
 	Log                   shared.Log      `mapstructure:"log"`
 	Debug                 Debug           `mapstructure:"debug"`
 	HTTP                  HTTP            `mapstructure:"http"`
@@ -203,8 +202,7 @@ func New() *Config {
 // DefaultConfig are values stored in the flag set, but moved to a struct.
 func DefaultConfig() *Config {
 	return &Config{
-		File: "",
-		Log:  shared.Log{}, // logging config is inherited.
+		Log: shared.Log{}, // logging config is inherited.
 		Debug: Debug{
 			Addr:  "0.0.0.0:9205",
 			Token: "",
@@ -253,6 +251,165 @@ func DefaultConfig() *Config {
 		//AutoprovisionAccounts: false,
 		//EnableBasicAuth:       false,
 		//InsecureBackends:      false,
-		Context: nil,
+		Context:  nil,
+		Policies: defaultPolicies(),
+	}
+}
+
+func defaultPolicies() []Policy {
+	return []Policy{
+		{
+			Name: "ocis",
+			Routes: []Route{
+				{
+					Endpoint: "/",
+					Backend:  "http://localhost:9100",
+				},
+				{
+					Endpoint: "/.well-known/",
+					Backend:  "http://localhost:9130",
+				},
+				{
+					Endpoint: "/konnect/",
+					Backend:  "http://localhost:9130",
+				},
+				{
+					Endpoint: "/signin/",
+					Backend:  "http://localhost:9130",
+				},
+				{
+					Endpoint: "/archiver",
+					Backend:  "http://localhost:9140",
+				},
+				{
+					Type:     RegexRoute,
+					Endpoint: "/ocs/v[12].php/cloud/(users?|groups)", // we have `user`, `users` and `groups` in ocis-ocs
+					Backend:  "http://localhost:9110",
+				},
+				{
+					Endpoint: "/ocs/",
+					Backend:  "http://localhost:9140",
+				},
+				{
+					Type:     QueryRoute,
+					Endpoint: "/remote.php/?preview=1",
+					Backend:  "http://localhost:9115",
+				},
+				{
+					Endpoint: "/remote.php/",
+					Backend:  "http://localhost:9140",
+				},
+				{
+					Endpoint: "/dav/",
+					Backend:  "http://localhost:9140",
+				},
+				{
+					Endpoint: "/webdav/",
+					Backend:  "http://localhost:9140",
+				},
+				{
+					Endpoint: "/status.php",
+					Backend:  "http://localhost:9140",
+				},
+				{
+					Endpoint: "/index.php/",
+					Backend:  "http://localhost:9140",
+				},
+				{
+					Endpoint: "/data",
+					Backend:  "http://localhost:9140",
+				},
+				{
+					Endpoint: "/app/",
+					Backend:  "http://localhost:9140",
+				},
+				{
+					Endpoint: "/graph/",
+					Backend:  "http://localhost:9120",
+				},
+				{
+					Endpoint: "/graph-explorer",
+					Backend:  "http://localhost:9135",
+				},
+				// if we were using the go micro api gateway we could look up the endpoint in the registry dynamically
+				{
+					Endpoint: "/api/v0/accounts",
+					Backend:  "http://localhost:9181",
+				},
+				// TODO the lookup needs a better mechanism
+				{
+					Endpoint: "/accounts.js",
+					Backend:  "http://localhost:9181",
+				},
+				{
+					Endpoint: "/api/v0/settings",
+					Backend:  "http://localhost:9190",
+				},
+				{
+					Endpoint: "/settings.js",
+					Backend:  "http://localhost:9190",
+				},
+			},
+		},
+		{
+			Name: "oc10",
+			Routes: []Route{
+				{
+					Endpoint: "/",
+					Backend:  "http://localhost:9100",
+				},
+				{
+					Endpoint: "/.well-known/",
+					Backend:  "http://localhost:9130",
+				},
+				{
+					Endpoint: "/konnect/",
+					Backend:  "http://localhost:9130",
+				},
+				{
+					Endpoint: "/signin/",
+					Backend:  "http://localhost:9130",
+				},
+				{
+					Endpoint: "/archiver",
+					Backend:  "http://localhost:9140",
+				},
+				{
+					Endpoint:    "/ocs/",
+					Backend:     "https://demo.owncloud.com",
+					ApacheVHost: true,
+				},
+				{
+					Endpoint:    "/remote.php/",
+					Backend:     "https://demo.owncloud.com",
+					ApacheVHost: true,
+				},
+				{
+					Endpoint:    "/dav/",
+					Backend:     "https://demo.owncloud.com",
+					ApacheVHost: true,
+				},
+				{
+					Endpoint:    "/webdav/",
+					Backend:     "https://demo.owncloud.com",
+					ApacheVHost: true,
+				},
+				{
+					Endpoint:    "/status.php",
+					Backend:     "https://demo.owncloud.com",
+					ApacheVHost: true,
+				},
+				{
+					Endpoint:    "/index.php/",
+					Backend:     "https://demo.owncloud.com",
+					ApacheVHost: true,
+				},
+				{
+					Endpoint:    "/data",
+					Backend:     "https://demo.owncloud.com",
+					ApacheVHost: true,
+				},
+			},
+		},
 	}
 }

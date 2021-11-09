@@ -13,7 +13,7 @@ type matchertest struct {
 }
 
 func TestPrefixRouteMatcher(t *testing.T) {
-	cfg := config.New()
+	cfg := config.DefaultConfig()
 	p := NewMultiHostReverseProxy(Config(cfg))
 
 	table := []matchertest{

@@ -12,8 +12,8 @@ import (
 
 var (
 	defaultLocations = []string{
-		filepath.Join(os.Getenv("HOME"), "/.ocis/config"),
-		"/etc/ocis",
+		filepath.Join(os.Getenv("HOME"), "/.ocis/config/"),
+		"/etc/ocis/",
 		".config/",
 	}
 

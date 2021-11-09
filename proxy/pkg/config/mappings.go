@@ -52,11 +52,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Debug.Addr,
 		},
 
-		{
-			EnvVars:     []string{"PROXY_CONFIG_FILE"},
-			Destination: &cfg.File,
-		},
-
 		// Tracing
 		{
 			EnvVars:     []string{"PROXY_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
