@@ -1554,8 +1554,11 @@ def skipIfUnchanged(ctx, type):
         return []
 
     base = [
-        "^docs/.*",
+        "^.github/.*",
+        "^.vscode/.*",
         "^changelog/.*",
+        "^docs/.*",
+        "^deployments/.*",
     ]
     unit = [
         ".*_test.go$",
