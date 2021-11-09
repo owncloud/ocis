@@ -237,6 +237,7 @@ def testPipelines(ctx):
         pipelines = [
             localApiTests(ctx, "ocis", "apiAccountsHashDifficulty", "default"),
             localApiTests(ctx, "ocis", "apiSpaces", "default"),
+            localApiTests(ctx, "ocis", "apiArchiver", "default"),
         ]
 
     if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
