@@ -13,19 +13,19 @@ func StructMappings(cfg *Config) []shared.EnvBinding {
 func structMappings(cfg *Config) []shared.EnvBinding {
 	return []shared.EnvBinding{
 		{
-			EnvVars:     []string{"OCS_LOG_FILE", "OCIS_LOG_FILE"},
+			EnvVars:     []string{"OCIS_LOG_FILE", "OCS_LOG_FILE"},
 			Destination: &cfg.Log.File,
 		},
 		{
-			EnvVars:     []string{"OCS_LOG_LEVEL", "OCIS_LOG_LEVEL"},
+			EnvVars:     []string{"OCIS_LOG_LEVEL", "OCS_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,
 		},
 		{
-			EnvVars:     []string{"OCS_LOG_PRETTY", "OCIS_LOG_PRETTY"},
+			EnvVars:     []string{"OCIS_LOG_PRETTY", "OCS_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
 		{
-			EnvVars:     []string{"OCS_LOG_COLOR", "OCIS_LOG_COLOR"},
+			EnvVars:     []string{"OCIS_LOG_COLOR", "OCS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
 		{
@@ -33,19 +33,19 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.File,
 		},
 		{
-			EnvVars:     []string{"OCS_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
+			EnvVars:     []string{"OCIS_TRACING_ENABLED", "OCS_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		{
-			EnvVars:     []string{"OCS_TRACING_TYPE", "OCIS_TRACING_TYPE"},
+			EnvVars:     []string{"OCIS_TRACING_TYPE", "OCS_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		{
-			EnvVars:     []string{"OCS_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
+			EnvVars:     []string{"OCIS_TRACING_ENDPOINT", "OCS_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		{
-			EnvVars:     []string{"OCS_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
+			EnvVars:     []string{"OCIS_TRACING_COLLECTOR", "OCS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		{
@@ -85,7 +85,7 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.HTTP.Root,
 		},
 		{
-			EnvVars:     []string{"OCS_JWT_SECRET", "OCIS_JWT_SECRET"},
+			EnvVars:     []string{"OCIS_JWT_SECRET", "OCS_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
 		},
 		{
@@ -97,15 +97,15 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.RevaAddress,
 		},
 		{
-			EnvVars:     []string{"OCS_MACHINE_AUTH_API_KEY", "OCIS_MACHINE_AUTH_API_KEY"},
+			EnvVars:     []string{"OCIS_MACHINE_AUTH_API_KEY", "OCS_MACHINE_AUTH_API_KEY"},
 			Destination: &cfg.MachineAuthAPIKey,
 		},
 		{
-			EnvVars:     []string{"OCS_IDM_ADDRESS", "OCIS_URL"},
+			EnvVars:     []string{"OCIS_URL", "OCS_IDM_ADDRESS"},
 			Destination: &cfg.IdentityManagement.Address,
 		},
 		{
-			EnvVars:     []string{"OCS_STORAGE_USERS_DRIVER", "STORAGE_USERS_DRIVER"},
+			EnvVars:     []string{"STORAGE_USERS_DRIVER", "OCS_STORAGE_USERS_DRIVER"},
 			Destination: &cfg.StorageUsersDriver,
 		},
 	}

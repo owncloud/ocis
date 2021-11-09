@@ -14,6 +14,6 @@
                 "OCIS_LOG_COLOR": "true",
                 "PROXY_ENABLE_BASIC_AUTH": "true"
             }
-        },
+        }
     ]
 }

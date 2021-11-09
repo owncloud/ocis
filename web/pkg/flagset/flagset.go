@@ -12,19 +12,19 @@ func RootWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.StringFlag{
 			Name:        "log-level",
 			Usage:       "Set logging level",
-			EnvVars:     []string{"WEB_LOG_LEVEL", "OCIS_LOG_LEVEL"},
+			EnvVars:     []string{"OCIS_LOG_LEVEL", "WEB_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,
 		},
 		&cli.BoolFlag{
 			Name:        "log-pretty",
 			Usage:       "Enable pretty logging",
-			EnvVars:     []string{"WEB_LOG_PRETTY", "OCIS_LOG_PRETTY"},
+			EnvVars:     []string{"OCIS_LOG_PRETTY", "WEB_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
 		&cli.BoolFlag{
 			Name:        "log-color",
 			Usage:       "Enable colored logging",
-			EnvVars:     []string{"WEB_LOG_COLOR", "OCIS_LOG_COLOR"},
+			EnvVars:     []string{"OCIS_LOG_COLOR", "WEB_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
 	}

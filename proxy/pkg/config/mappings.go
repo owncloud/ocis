@@ -24,19 +24,19 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 	return []shared.EnvBinding{
 		// Logging
 		{
-			EnvVars:     []string{"PROXY_LOG_LEVEL", "OCIS_LOG_LEVEL"},
+			EnvVars:     []string{"OCIS_LOG_LEVEL", "PROXY_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,
 		},
 		{
-			EnvVars:     []string{"PROXY_LOG_COLOR", "OCIS_LOG_COLOR"},
+			EnvVars:     []string{"OCIS_LOG_COLOR", "PROXY_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
 		{
-			EnvVars:     []string{"PROXY_LOG_PRETTY", "OCIS_LOG_PRETTY"},
+			EnvVars:     []string{"OCIS_LOG_PRETTY", "PROXY_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
 		{
-			EnvVars:     []string{"PROXY_LOG_FILE", "OCIS_LOG_FILE"},
+			EnvVars:     []string{"OCIS_LOG_FILE", "PROXY_LOG_FILE"},
 			Destination: &cfg.Log.File,
 		},
 
@@ -54,19 +54,19 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 
 		// Tracing
 		{
-			EnvVars:     []string{"PROXY_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
+			EnvVars:     []string{"OCIS_TRACING_ENABLED", "PROXY_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		{
-			EnvVars:     []string{"PROXY_TRACING_TYPE", "OCIS_TRACING_TYPE"},
+			EnvVars:     []string{"OCIS_TRACING_TYPE", "PROXY_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		{
-			EnvVars:     []string{"PROXY_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
+			EnvVars:     []string{"OCIS_TRACING_ENDPOINT", "PROXY_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		{
-			EnvVars:     []string{"PROXY_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
+			EnvVars:     []string{"OCIS_TRACING_COLLECTOR", "PROXY_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		{
@@ -124,7 +124,7 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.HTTP.TLS,
 		},
 		{
-			EnvVars:     []string{"PROXY_JWT_SECRET", "OCIS_JWT_SECRET"},
+			EnvVars:     []string{"OCIS_JWT_SECRET", "PROXY_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
 		},
 
@@ -137,7 +137,7 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.InsecureBackends,
 		},
 		{
-			EnvVars:     []string{"PROXY_OIDC_ISSUER", "OCIS_URL"},
+			EnvVars:     []string{"OCIS_URL", "PROXY_OIDC_ISSUER"},
 			Destination: &cfg.OIDC.Issuer,
 		},
 		{
@@ -173,7 +173,7 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.AccountBackend,
 		},
 		{
-			EnvVars:     []string{"PROXY_MACHINE_AUTH_API_KEY", "OCIS_MACHINE_AUTH_API_KEY"},
+			EnvVars:     []string{"OCIS_MACHINE_AUTH_API_KEY", "PROXY_MACHINE_AUTH_API_KEY"},
 			Destination: &cfg.MachineAuthAPIKey,
 		},
 		// there are 2 missing bindings:

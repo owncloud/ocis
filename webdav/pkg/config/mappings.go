@@ -13,19 +13,19 @@ func StructMappings(cfg *Config) []shared.EnvBinding {
 func structMappings(cfg *Config) []shared.EnvBinding {
 	return []shared.EnvBinding{
 		{
-			EnvVars:     []string{"WEBDAV_LOG_FILE", "OCIS_LOG_FILE"},
+			EnvVars:     []string{"OCIS_LOG_FILE", "WEBDAV_LOG_FILE"},
 			Destination: &cfg.Log.File,
 		},
 		{
-			EnvVars:     []string{"WEBDAV_LOG_LEVEL", "OCIS_LOG_LEVEL"},
+			EnvVars:     []string{"OCIS_LOG_LEVEL", "WEBDAV_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,
 		},
 		{
-			EnvVars:     []string{"WEBDAV_LOG_PRETTY", "OCIS_LOG_PRETTY"},
+			EnvVars:     []string{"OCIS_LOG_PRETTY", "WEBDAV_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
 		{
-			EnvVars:     []string{"WEBDAV_LOG_COLOR", "OCIS_LOG_COLOR"},
+			EnvVars:     []string{"OCIS_LOG_COLOR", "WEBDAV_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
 		{
@@ -33,19 +33,19 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.File,
 		},
 		{
-			EnvVars:     []string{"WEBDAV_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
+			EnvVars:     []string{"OCIS_TRACING_ENABLED", "WEBDAV_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		{
-			EnvVars:     []string{"WEBDAV_TRACING_TYPE", "OCIS_TRACING_TYPE"},
+			EnvVars:     []string{"OCIS_TRACING_TYPE", "WEBDAV_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		{
-			EnvVars:     []string{"WEBDAV_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
+			EnvVars:     []string{"OCIS_TRACING_ENDPOINT", "WEBDAV_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		{
-			EnvVars:     []string{"WEBDAV_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
+			EnvVars:     []string{"OCIS_TRACING_COLLECTOR", "WEBDAV_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		{
@@ -85,7 +85,7 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.HTTP.Root,
 		},
 		{
-			EnvVars:     []string{"OCIS_PUBLIC_URL", "OCIS_URL"},
+			EnvVars:     []string{"OCIS_URL", "OCIS_PUBLIC_URL"},
 			Destination: &cfg.OcisPublicURL,
 		},
 		{

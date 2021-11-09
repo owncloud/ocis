@@ -186,7 +186,7 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "public-url",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.PublicURL, "https://localhost:9200"),
 			Usage:       "URL to use for the storage service",
-			EnvVars:     []string{"STORAGE_FRONTEND_PUBLIC_URL", "OCIS_URL"}, // STORAGE_FRONTEND_PUBLIC_URL takes precedence over OCIS_URL
+			EnvVars:     []string{"OCIS_URL", "STORAGE_FRONTEND_PUBLIC_URL"}, // STORAGE_FRONTEND_PUBLIC_URL takes precedence over OCIS_URL
 			Destination: &cfg.Reva.Frontend.PublicURL,
 		},
 		&cli.StringFlag{

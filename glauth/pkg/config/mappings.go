@@ -13,19 +13,19 @@ func StructMappings(cfg *Config) []shared.EnvBinding {
 func structMappings(cfg *Config) []shared.EnvBinding {
 	return []shared.EnvBinding{
 		{
-			EnvVars:     []string{"GLAUTH_LOG_LEVEL", "OCIS_LOG_LEVEL"},
+			EnvVars:     []string{"OCIS_LOG_LEVEL", "GLAUTH_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,
 		},
 		{
-			EnvVars:     []string{"GLAUTH_LOG_PRETTY", "OCIS_LOG_PRETTY"},
+			EnvVars:     []string{"OCIS_LOG_PRETTY", "GLAUTH_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
 		{
-			EnvVars:     []string{"GLAUTH_LOG_COLOR", "OCIS_LOG_COLOR"},
+			EnvVars:     []string{"OCIS_LOG_COLOR", "GLAUTH_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
 		{
-			EnvVars:     []string{"GLAUTH_LOG_FILE", "OCIS_LOG_FILE"},
+			EnvVars:     []string{"OCIS_LOG_FILE", "GLAUTH_LOG_FILE"},
 			Destination: &cfg.Log.File,
 		},
 		{
@@ -33,19 +33,19 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.File,
 		},
 		{
-			EnvVars:     []string{"GLAUTH_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
+			EnvVars:     []string{"OCIS_TRACING_ENABLED", "GLAUTH_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		{
-			EnvVars:     []string{"GLAUTH_TRACING_TYPE", "OCIS_TRACING_TYPE"},
+			EnvVars:     []string{"OCIS_TRACING_TYPE", "GLAUTH_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		{
-			EnvVars:     []string{"GLAUTH_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
+			EnvVars:     []string{"OCIS_TRACING_ENDPOINT", "GLAUTH_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		{
-			EnvVars:     []string{"GLAUTH_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
+			EnvVars:     []string{"OCIS_TRACING_COLLECTOR", "GLAUTH_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		{

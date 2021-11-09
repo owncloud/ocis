@@ -17,35 +17,35 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.File,
 		},
 		{
-			EnvVars:     []string{"GRAPH_LOG_LEVEL", "OCIS_LOG_LEVEL"},
+			EnvVars:     []string{"OCIS_LOG_LEVEL", "GRAPH_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,
 		},
 		{
-			EnvVars:     []string{"GRAPH_LOG_PRETTY", "OCIS_LOG_PRETTY"},
+			EnvVars:     []string{"OCIS_LOG_PRETTY", "GRAPH_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
 		{
-			EnvVars:     []string{"GRAPH_LOG_COLOR", "OCIS_LOG_COLOR"},
+			EnvVars:     []string{"OCIS_LOG_COLOR", "GRAPH_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
 		{
-			EnvVars:     []string{"GRAPH_LOG_FILE", "OCIS_LOG_FILE"},
+			EnvVars:     []string{"OCIS_LOG_FILE", "GRAPH_LOG_FILE"},
 			Destination: &cfg.Log.File,
 		},
 		{
-			EnvVars:     []string{"GRAPH_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
+			EnvVars:     []string{"OCIS_TRACING_ENABLED", "GRAPH_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		{
-			EnvVars:     []string{"GRAPH_TRACING_TYPE", "OCIS_TRACING_TYPE"},
+			EnvVars:     []string{"OCIS_TRACING_TYPE", "GRAPH_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		{
-			EnvVars:     []string{"GRAPH_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
+			EnvVars:     []string{"OCIS_TRACING_ENDPOINT", "GRAPH_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		{
-			EnvVars:     []string{"GRAPH_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
+			EnvVars:     []string{"OCIS_TRACING_COLLECTOR", "GRAPH_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		{
@@ -81,7 +81,7 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.HTTP.Namespace,
 		},
 		{
-			EnvVars:     []string{"GRAPH_SPACES_WEBDAV_BASE", "OCIS_URL"},
+			EnvVars:     []string{"OCIS_URL", "GRAPH_SPACES_WEBDAV_BASE"},
 			Destination: &cfg.Spaces.WebDavBase,
 		},
 		{
@@ -93,7 +93,7 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Spaces.DefaultQuota,
 		},
 		{
-			EnvVars:     []string{"GRAPH_JWT_SECRET", "OCIS_JWT_SECRET"},
+			EnvVars:     []string{"OCIS_JWT_SECRET", "GRAPH_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,
 		},
 		{

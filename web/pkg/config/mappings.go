@@ -13,19 +13,19 @@ func StructMappings(cfg *Config) []shared.EnvBinding {
 func structMappings(cfg *Config) []shared.EnvBinding {
 	return []shared.EnvBinding{
 		{
-			EnvVars:     []string{"WEB_LOG_LEVEL", "OCIS_LOG_LEVEL"},
+			EnvVars:     []string{"OCIS_LOG_LEVEL", "WEB_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,
 		},
 		{
-			EnvVars:     []string{"WEB_LOG_PRETTY", "OCIS_LOG_PRETTY"},
+			EnvVars:     []string{"OCIS_LOG_PRETTY", "WEB_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
 		{
-			EnvVars:     []string{"WEB_LOG_COLOR", "OCIS_LOG_COLOR"},
+			EnvVars:     []string{"OCIS_LOG_COLOR", "WEB_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
 		{
-			EnvVars:     []string{"WEB_LOG_FILE", "OCIS_LOG_FILE"},
+			EnvVars:     []string{"OCIS_LOG_FILE", "WEB_LOG_FILE"},
 			Destination: &cfg.Log.File,
 		},
 		{
@@ -33,19 +33,19 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.File,
 		},
 		{
-			EnvVars:     []string{"WEB_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
+			EnvVars:     []string{"OCIS_TRACING_ENABLED", "WEB_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		{
-			EnvVars:     []string{"WEB_TRACING_TYPE", "OCIS_TRACING_TYPE"},
+			EnvVars:     []string{"OCIS_TRACING_TYPE", "WEB_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		{
-			EnvVars:     []string{"WEB_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
+			EnvVars:     []string{"OCIS_TRACING_ENDPOINT", "WEB_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		{
-			EnvVars:     []string{"WEB_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
+			EnvVars:     []string{"OCIS_TRACING_COLLECTOR", "WEB_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		{
@@ -93,11 +93,11 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Web.Path,
 		},
 		{
-			EnvVars:     []string{"WEB_UI_CONFIG_SERVER", "OCIS_URL"}, // WEB_UI_CONFIG_SERVER takes precedence over OCIS_URL
+			EnvVars:     []string{"OCIS_URL", "WEB_UI_CONFIG_SERVER"}, // WEB_UI_CONFIG_SERVER takes precedence over OCIS_URL
 			Destination: &cfg.Web.Config.Server,
 		},
 		{
-			EnvVars:     []string{"WEB_UI_THEME_SERVER", "OCIS_URL"}, // WEB_UI_THEME_SERVER takes precedence over OCIS_URL
+			EnvVars:     []string{"OCIS_URL", "WEB_UI_THEME_SERVER"}, // WEB_UI_THEME_SERVER takes precedence over OCIS_URL
 			Destination: &cfg.Web.ThemeServer,
 		},
 		{
@@ -113,7 +113,7 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Web.Config.OpenIDConnect.MetadataURL,
 		},
 		{
-			EnvVars:     []string{"WEB_OIDC_AUTHORITY", "OCIS_URL"}, // WEB_OIDC_AUTHORITY takes precedence over OCIS_URL
+			EnvVars:     []string{"OCIS_URL", "WEB_OIDC_AUTHORITY"}, // WEB_OIDC_AUTHORITY takes precedence over OCIS_URL
 			Destination: &cfg.Web.Config.OpenIDConnect.Authority,
 		},
 		{

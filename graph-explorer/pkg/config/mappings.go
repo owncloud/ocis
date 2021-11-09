@@ -13,35 +13,35 @@ func StructMappings(cfg *Config) []shared.EnvBinding {
 func structMappings(cfg *Config) []shared.EnvBinding {
 	return []shared.EnvBinding{
 		{
-			EnvVars:     []string{"GRAPH_EXPLORER_LOG_LEVEL", "OCIS_LOG_LEVEL"},
+			EnvVars:     []string{"OCIS_LOG_LEVEL", "GRAPH_EXPLORER_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,
 		},
 		{
-			EnvVars:     []string{"GRAPH_EXPLORER_LOG_PRETTY", "OCIS_LOG_PRETTY"},
+			EnvVars:     []string{"OCIS_LOG_PRETTY", "GRAPH_EXPLORER_LOG_PRETTY"},
 			Destination: &cfg.Log.Pretty,
 		},
 		{
-			EnvVars:     []string{"GRAPH_EXPLORER_LOG_COLOR", "OCIS_LOG_COLOR"},
+			EnvVars:     []string{"OCIS_LOG_COLOR", "GRAPH_EXPLORER_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
 		{
-			EnvVars:     []string{"GRAPH_EXPLORER_LOG_FILE", "OCIS_LOG_FILE"},
+			EnvVars:     []string{"OCIS_LOG_FILE", "GRAPH_EXPLORER_LOG_FILE"},
 			Destination: &cfg.Log.File,
 		},
 		{
-			EnvVars:     []string{"GRAPH_EXPLORER_TRACING_ENABLED", "OCIS_TRACING_ENABLED"},
+			EnvVars:     []string{"OCIS_TRACING_ENABLED", "GRAPH_EXPLORER_TRACING_ENABLED"},
 			Destination: &cfg.Tracing.Enabled,
 		},
 		{
-			EnvVars:     []string{"GRAPH_EXPLORER_TRACING_TYPE", "OCIS_TRACING_TYPE"},
+			EnvVars:     []string{"OCIS_TRACING_TYPE", "GRAPH_EXPLORER_TRACING_TYPE"},
 			Destination: &cfg.Tracing.Type,
 		},
 		{
-			EnvVars:     []string{"GRAPH_EXPLORER_TRACING_ENDPOINT", "OCIS_TRACING_ENDPOINT"},
+			EnvVars:     []string{"OCIS_TRACING_ENDPOINT", "GRAPH_EXPLORER_TRACING_ENDPOINT"},
 			Destination: &cfg.Tracing.Endpoint,
 		},
 		{
-			EnvVars:     []string{"GRAPH_EXPLORER_TRACING_COLLECTOR", "OCIS_TRACING_COLLECTOR"},
+			EnvVars:     []string{"OCIS_TRACING_COLLECTOR", "GRAPH_EXPLORER_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
 		},
 		{
@@ -77,7 +77,7 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.HTTP.Namespace,
 		},
 		{
-			EnvVars:     []string{"GRAPH_EXPLORER_ISSUER", "OCIS_URL"},
+			EnvVars:     []string{"OCIS_URL", "GRAPH_EXPLORER_ISSUER"},
 			Destination: &cfg.GraphExplorer.Issuer,
 		},
 		{
@@ -85,7 +85,7 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.GraphExplorer.ClientID,
 		},
 		{
-			EnvVars:     []string{"GRAPH_EXPLORER_GRAPH_URL_BASE", "OCIS_URL"},
+			EnvVars:     []string{"OCIS_URL", "GRAPH_EXPLORER_GRAPH_URL_BASE"},
 			Destination: &cfg.GraphExplorer.GraphURLBase,
 		},
 		{
