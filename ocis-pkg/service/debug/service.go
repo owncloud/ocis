@@ -28,6 +28,10 @@ func NewService(opts ...Option) *http.Server {
 	mux.HandleFunc("/healthz", dopts.Health)
 	mux.HandleFunc("/readyz", dopts.Ready)
 
+	if dopts.ConfigDump != nil {
+		mux.HandleFunc("/config", dopts.ConfigDump)
+	}
+
 	if dopts.Pprof {
 		mux.HandleFunc("/debug/pprof/", pprof.Index)
 		mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
