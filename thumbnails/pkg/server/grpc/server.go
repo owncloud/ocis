@@ -25,7 +25,7 @@ func NewService(opts ...Option) grpc.Service {
 		grpc.Version(options.Config.Server.Version),
 	)
 	tconf := options.Config.Thumbnail
-	gc, err := pool.GetGatewayServiceClient(tconf.RevaGateway) //TODO: insecure defaults to true, https://github.com/cs3org/reva/issues/2216
+	gc, err := pool.GetGatewayServiceClient(tconf.RevaGateway)
 	if err != nil {
 		options.Logger.Error().Err(err).Msg("could not get gateway client")
 		return grpc.Service{}

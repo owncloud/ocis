@@ -149,7 +149,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config) alice.Chain {
 	rolesClient := settings.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
-	revaClient, err := cs3.GetGatewayServiceClient(cfg.Reva.Address, cfg.Reva.Insecure) //TODO: insecure defaults to true, https://github.com/cs3org/reva/issues/2216
+	revaClient, err := cs3.GetGatewayServiceClient(cfg.Reva.Address)
 	var userProvider backend.UserBackend
 	switch cfg.AccountBackend {
 	case "accounts":

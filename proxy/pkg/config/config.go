@@ -81,7 +81,6 @@ var (
 // Reva defines all available REVA configuration.
 type Reva struct {
 	Address    string
-	Insecure   bool
 	Middleware Middleware
 }
 

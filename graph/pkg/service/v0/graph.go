@@ -24,7 +24,7 @@ func (g Graph) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GetClient returns a gateway client to talk to reva
 func (g Graph) GetClient() (gateway.GatewayAPIClient, error) {
-	return pool.GetGatewayServiceClient(g.config.Reva.Address) //TODO: insecure defaults to true, https://github.com/cs3org/reva/issues/2216
+	return pool.GetGatewayServiceClient(g.config.Reva.Address)
 }
 
 // The key type is unexported to prevent collisions with context keys defined in

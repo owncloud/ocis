@@ -1477,7 +1477,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
         "PROXY_OIDC_INSECURE": "true",
         "THUMBNAILS_WEBDAVSOURCE_INSECURE": "true",
         "THUMBNAILS_CS3SOURCE_INSECURE": "true",
-        "REVA_GATEWAY_INSECURE": "true",
         "STORAGE_OIDC_INSECURE": "true",
         "STORAGE_HOME_DATAPROVIDER_INSECURE": "true",
         "STORAGE_METADATA_DATAPROVIDER_INSECURE": "true",

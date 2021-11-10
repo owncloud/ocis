@@ -384,7 +384,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 		ctx := metadata.AppendToOutgoingContext(r.Context(), revactx.TokenHeader, t)
 
-		gwc, err := pool.GetGatewayServiceClient(o.config.Reva.Address) //TODO: insecure defaults to true, https://github.com/cs3org/reva/issues/2216
+		gwc, err := pool.GetGatewayServiceClient(o.config.Reva.Address)
 		if err != nil {
 			o.logger.Error().Err(err).Msg("error securing a connection to Reva gateway")
 		}

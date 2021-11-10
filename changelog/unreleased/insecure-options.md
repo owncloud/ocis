@@ -4,7 +4,6 @@ We had several hard-coded 'insecure' flags. These options are now configurable a
 
 ```
 PROXY_OIDC_INSECURE=true
-REVA_GATEWAY_INSECURE=true
 STORAGE_FRONTEND_APPPROVIDER_INSECURE=true
 STORAGE_FRONTEND_ARCHIVER_INSECURE=true
 STORAGE_FRONTEND_OCDAV_INSECURE=true

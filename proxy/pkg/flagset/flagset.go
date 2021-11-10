@@ -190,13 +190,6 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.Address,
 		},
 		&cli.BoolFlag{
-			Name:        "reva-gateway-insecure",
-			Value:       flags.OverrideDefaultBool(cfg.Reva.Insecure, false),
-			Usage:       "allow insecure communication to REVA gateway endpoint",
-			EnvVars:     []string{"REVA_GATEWAY_INSECURE"},
-			Destination: &cfg.Reva.Insecure,
-		},
-		&cli.BoolFlag{
 			Name:        "insecure",
 			Value:       flags.OverrideDefaultBool(cfg.InsecureBackends, false),
 			Usage:       "allow insecure communication to upstream servers",

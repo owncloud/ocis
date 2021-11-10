@@ -161,7 +161,7 @@ func (o Ocs) getAccountService() accounts.AccountsService {
 }
 
 func (o Ocs) getCS3Backend() backend.UserBackend {
-	revaClient, err := pool.GetGatewayServiceClient(o.config.Reva.Address) //TODO: insecure defaults to true, https://github.com/cs3org/reva/issues/2216
+	revaClient, err := pool.GetGatewayServiceClient(o.config.Reva.Address)
 	if err != nil {
 		o.logger.Fatal().Msgf("could not get reva client at address %s", o.config.Reva.Address)
 	}
