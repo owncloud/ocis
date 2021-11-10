@@ -7,17 +7,24 @@ import (
 	"google.golang.org/grpc"
 )
 
-func newConn(endpoint string) (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(
-		endpoint,
-		grpc.WithInsecure(),
-		grpc.WithUnaryInterceptor(
-			otelgrpc.UnaryClientInterceptor(
-				otelgrpc.WithTracerProvider(
-					proxytracing.TraceProvider,
-				),
+func newConn(endpoint string, insecure bool) (*grpc.ClientConn, error) {
+	opts := []grpc.DialOption{}
+
+	opts = append(opts, grpc.WithUnaryInterceptor(
+		otelgrpc.UnaryClientInterceptor(
+			otelgrpc.WithTracerProvider(
+				proxytracing.TraceProvider,
 			),
 		),
+	))
+
+	if insecure {
+		opts = append(opts, grpc.WithInsecure())
+	}
+
+	conn, err := grpc.Dial(
+		endpoint,
+		opts...,
 	)
 	if err != nil {
 		return nil, err
@@ -27,8 +34,8 @@ func newConn(endpoint string) (*grpc.ClientConn, error) {
 }
 
 // GetGatewayServiceClient returns a new cs3 gateway client
-func GetGatewayServiceClient(endpoint string) (gateway.GatewayAPIClient, error) {
-	conn, err := newConn(endpoint)
+func GetGatewayServiceClient(endpoint string, insecure bool) (gateway.GatewayAPIClient, error) {
+	conn, err := newConn(endpoint, insecure)
 	if err != nil {
 		return nil, err
 	}

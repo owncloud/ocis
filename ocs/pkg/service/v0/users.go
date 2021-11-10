@@ -375,7 +375,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if o.config.RevaAddress != "" && o.config.StorageUsersDriver != "owncloud" {
+	if o.config.Reva.Address != "" && o.config.StorageUsersDriver != "owncloud" {
 		t, err := o.mintTokenForUser(r.Context(), account)
 		if err != nil {
 			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "error minting token").Error())))
@@ -384,7 +384,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 		ctx := metadata.AppendToOutgoingContext(r.Context(), revactx.TokenHeader, t)
 
-		gwc, err := pool.GetGatewayServiceClient(o.config.RevaAddress)
+		gwc, err := pool.GetGatewayServiceClient(o.config.Reva.Address) //TODO: insecure defaults to true, https://github.com/cs3org/reva/issues/2216
 		if err != nil {
 			o.logger.Error().Err(err).Msg("error securing a connection to Reva gateway")
 		}

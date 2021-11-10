@@ -25,7 +25,7 @@ func NewService(opts ...Option) grpc.Service {
 		grpc.Version(options.Config.Server.Version),
 	)
 	tconf := options.Config.Thumbnail
-	gc, err := pool.GetGatewayServiceClient(tconf.RevaGateway)
+	gc, err := pool.GetGatewayServiceClient(tconf.RevaGateway) //TODO: insecure defaults to true, https://github.com/cs3org/reva/issues/2216
 	if err != nil {
 		options.Logger.Error().Err(err).Msg("could not get gateway client")
 		return grpc.Service{}
@@ -42,7 +42,7 @@ func NewService(opts ...Option) grpc.Service {
 					options.Logger,
 				),
 			),
-			svc.CS3Source(imgsource.NewCS3Source(gc)),
+			svc.CS3Source(imgsource.NewCS3Source(tconf, gc)),
 			svc.CS3Client(gc),
 		)
 		thumbnail = svc.NewInstrument(thumbnail, options.Metrics)

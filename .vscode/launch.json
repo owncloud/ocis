@@ -7,14 +7,25 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/ocis/cmd/ocis",
-            "args": ["server"],
+            "args": [
+                "server"
+            ],
             "env": {
+                // log settings for human developers
                 "OCIS_LOG_LEVEL": "debug",
                 "OCIS_LOG_PRETTY": "true",
                 "OCIS_LOG_COLOR": "true",
+                // enable basic auth for dev setup so that we can use curl for testing
                 "PROXY_ENABLE_BASIC_AUTH": "true",
+                // set insecure options because we don't have valid certificates in dev environments
+                "PROXY_OIDC_INSECURE": "true",
+                "THUMBNAILS_WEBDAVSOURCE_INSECURE": "true",
+                "THUMBNAILS_CS3SOURCE_INSECURE": "true",
+                "REVA_GATEWAY_INSECURE": "true",
+                "STORAGE_OIDC_INSECURE": "true",
                 "STORAGE_HOME_DATAPROVIDER_INSECURE": "true",
                 "STORAGE_METADATA_DATAPROVIDER_INSECURE": "true",
+                "STORAGE_USERS_DATAPROVIDER_INSECURE": "true",
                 "STORAGE_FRONTEND_OCDAV_INSECURE": "true",
                 "STORAGE_FRONTEND_ARCHIVER_INSECURE": "true",
                 "STORAGE_FRONTEND_APPPROVIDER_INSECURE": "true",

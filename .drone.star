@@ -1474,11 +1474,17 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
         "IDP_IDENTIFIER_REGISTRATION_CONF": "/drone/src/tests/config/drone/identifier-registration.yml",
         "OCIS_LOG_LEVEL": "error",
         "SETTINGS_DATA_PATH": "/srv/app/tmp/ocis/settings",
-        "STORAGE_HOME_DATAPROVIDER_INSECURE": True,
-        "STORAGE_METADATA_DATAPROVIDER_INSECURE": True,
-        "STORAGE_FRONTEND_OCDAV_INSECURE": True,
-        "STORAGE_FRONTEND_ARCHIVER_INSECURE": True,
-        "STORAGE_FRONTEND_APPPROVIDER_INSECURE": True,
+        "PROXY_OIDC_INSECURE": "true",
+        "THUMBNAILS_WEBDAVSOURCE_INSECURE": "true",
+        "THUMBNAILS_CS3SOURCE_INSECURE": "true",
+        "REVA_GATEWAY_INSECURE": "true",
+        "STORAGE_OIDC_INSECURE": "true",
+        "STORAGE_HOME_DATAPROVIDER_INSECURE": "true",
+        "STORAGE_METADATA_DATAPROVIDER_INSECURE": "true",
+        "STORAGE_USERS_DATAPROVIDER_INSECURE": "true",
+        "STORAGE_FRONTEND_OCDAV_INSECURE": "true",
+        "STORAGE_FRONTEND_ARCHIVER_INSECURE": "true",
+        "STORAGE_FRONTEND_APPPROVIDER_INSECURE": "true",
     }
 
     # Pass in "default" accounts_hash_difficulty to not set this environment variable.

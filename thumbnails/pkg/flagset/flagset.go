@@ -154,10 +154,17 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:        "webdavsource-insecure",
-			Value:       flags.OverrideDefaultBool(cfg.Thumbnail.WebdavAllowInsecure, true),
+			Value:       flags.OverrideDefaultBool(cfg.Thumbnail.WebdavAllowInsecure, false),
 			Usage:       "Whether to skip certificate checks",
 			EnvVars:     []string{"THUMBNAILS_WEBDAVSOURCE_INSECURE"},
 			Destination: &cfg.Thumbnail.WebdavAllowInsecure,
+		},
+		&cli.BoolFlag{
+			Name:        "cs3source-insecure",
+			Value:       flags.OverrideDefaultBool(cfg.Thumbnail.CS3AllowInsecure, false),
+			Usage:       "Whether to skip certificate checks",
+			EnvVars:     []string{"THUMBNAILS_CS3SOURCE_INSECURE"},
+			Destination: &cfg.Thumbnail.CS3AllowInsecure,
 		},
 		&cli.StringSliceFlag{
 			Name:    "thumbnail-resolution",
