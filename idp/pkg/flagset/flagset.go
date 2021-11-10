@@ -355,6 +355,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 		&cli.BoolFlag{
 			Name:        "insecure",
 			Usage:       "Disable TLS certificate and hostname validation",
+			Value:       flags.OverrideDefaultBool(cfg.IDP.Insecure, false),
 			EnvVars:     []string{"IDP_INSECURE"},
 			Destination: &cfg.IDP.Insecure,
 		},

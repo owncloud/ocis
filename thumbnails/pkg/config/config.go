@@ -63,6 +63,7 @@ type Thumbnail struct {
 	Resolutions         []string
 	FileSystemStorage   FileSystemStorage
 	WebdavAllowInsecure bool
+	CS3AllowInsecure    bool
 	RevaGateway         string
 	WebdavNamespace     string
 }

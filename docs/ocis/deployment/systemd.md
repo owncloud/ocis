@@ -45,6 +45,7 @@ In order to create the file we need first to create the folder `/etc/ocis/` and 
 ```
 OCIS_URL=https://some-hostname-or-ip:9200
 PROXY_HTTP_ADDR=0.0.0.0:9200
+OCIS_INSECURE=false
 
 OCIS_LOG_LEVEL=error
 
@@ -56,7 +57,7 @@ PROXY_TRANSPORT_TLS_CERT=/etc/ocis/proxy/server.crt
 PROXY_TRANSPORT_TLS_KEY=/etc/ocis/proxy/server.key
 ```
 
-Please change your `OCIS_URL` in order to reflect your actual deployment.
+Please change your `OCIS_URL` in order to reflect your actual deployment. If you are using self signed certificates you need to set `OCIS_INSECURE=true` in `/etc/ocis/ocis.env`.
 
 
 ## Starting the oCIS service

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 
 	"github.com/go-chi/chi/v5"
@@ -19,7 +20,6 @@ import (
 	ocsm "github.com/owncloud/ocis/ocs/pkg/middleware"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
-	"github.com/owncloud/ocis/proxy/pkg/cs3"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
@@ -161,9 +161,9 @@ func (o Ocs) getAccountService() accounts.AccountsService {
 }
 
 func (o Ocs) getCS3Backend() backend.UserBackend {
-	revaClient, err := cs3.GetGatewayServiceClient(o.config.RevaAddress)
+	revaClient, err := pool.GetGatewayServiceClient(o.config.Reva.Address)
 	if err != nil {
-		o.logger.Fatal().Msgf("could not get reva client at address %s", o.config.RevaAddress)
+		o.logger.Fatal().Msgf("could not get reva client at address %s", o.config.Reva.Address)
 	}
 	return backend.NewCS3UserBackend(nil, revaClient, o.config.MachineAuthAPIKey, o.logger)
 }

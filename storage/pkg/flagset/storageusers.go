@@ -79,6 +79,13 @@ func StorageUsersWithConfig(cfg *config.Config) []cli.Flag {
 			Destination: &cfg.Reva.StorageUsers.Driver,
 		},
 		&cli.BoolFlag{
+			Name:        "dataprovider-insecure",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.StorageUsers.DataProvider.Insecure, false),
+			Usage:       "dataprovider insecure",
+			EnvVars:     []string{"STORAGE_USERS_DATAPROVIDER_INSECURE", "OCIS_INSECURE"},
+			Destination: &cfg.Reva.StorageUsers.DataProvider.Insecure,
+		},
+		&cli.BoolFlag{
 			Name:        "read-only",
 			Value:       flags.OverrideDefaultBool(cfg.Reva.StorageUsers.ReadOnly, false),
 			Usage:       "use storage driver in read-only mode",

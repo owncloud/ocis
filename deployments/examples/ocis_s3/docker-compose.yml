@@ -52,7 +52,6 @@ services:
     environment:
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
-      PROXY_OIDC_INSECURE: "${INSECURE:-false}" # needed if Traefik is using self generated certificates
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       # change default secrets
       IDP_LDAP_BIND_PASSWORD: ${IDP_LDAP_BIND_PASSWORD:-idp}
@@ -70,6 +69,8 @@ services:
       STORAGE_USERS_DRIVER_S3NG_ACCESS_KEY: ${MINIO_ACCESS_KEY:-ocis}
       STORAGE_USERS_DRIVER_S3NG_SECRET_KEY: ${MINIO_SECRET_KEY:-ocis-secret-key}
       STORAGE_USERS_DRIVER_S3NG_BUCKET: ${MINIO_BUCKET:-ocis-bucket}
+      # INSECURE: needed if oCIS / Traefik is using self generated certificates
+      OCIS_INSECURE: "${INSECURE:-false}"
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-data:/var/lib/ocis

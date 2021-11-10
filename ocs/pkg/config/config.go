@@ -49,6 +49,11 @@ type Tracing struct {
 	Service   string
 }
 
+// Reva defines all available REVA configuration.
+type Reva struct {
+	Address string
+}
+
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
 	JWTSecret string
@@ -71,7 +76,7 @@ type Config struct {
 	TokenManager       TokenManager
 	Service            Service
 	AccountBackend     string
-	RevaAddress        string
+	Reva               Reva
 	StorageUsersDriver string
 	MachineAuthAPIKey  string
 	IdentityManagement IdentityManagement
