@@ -18,16 +18,7 @@
                 // enable basic auth for dev setup so that we can use curl for testing
                 "PROXY_ENABLE_BASIC_AUTH": "true",
                 // set insecure options because we don't have valid certificates in dev environments
-                "PROXY_OIDC_INSECURE": "true",
-                "THUMBNAILS_WEBDAVSOURCE_INSECURE": "true",
-                "THUMBNAILS_CS3SOURCE_INSECURE": "true",
-                "STORAGE_OIDC_INSECURE": "true",
-                "STORAGE_HOME_DATAPROVIDER_INSECURE": "true",
-                "STORAGE_METADATA_DATAPROVIDER_INSECURE": "true",
-                "STORAGE_USERS_DATAPROVIDER_INSECURE": "true",
-                "STORAGE_FRONTEND_OCDAV_INSECURE": "true",
-                "STORAGE_FRONTEND_ARCHIVER_INSECURE": "true",
-                "STORAGE_FRONTEND_APPPROVIDER_INSECURE": "true",
+                "OCIS_INSECURE": "true",
             }
         },
     ]

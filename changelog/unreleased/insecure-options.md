@@ -1,4 +1,4 @@
-Enhancement: Make insecure options configurable
+Change: Make insecure options configurable
 
 We had several hard-coded 'insecure' flags. These options are now configurable and default to false. Also we changed all other 'insecure' flags with a previous default of true to false. In development environments using self signed certs (the default) you need to set these flags:
 
@@ -13,6 +13,12 @@ STORAGE_OIDC_INSECURE=true
 STORAGE_USERS_DATAPROVIDER_INSECURE=true
 THUMBNAILS_CS3SOURCE_INSECURE=true
 THUMBNAILS_WEBDAVSOURCE_INSECURE=true
+```
+
+As an alternative you also can set a single flag, which configures all options together:
+
+```
+OCIS_INSECURE=true
 ```
 
 https://github.com/owncloud/ocis/issues/2700

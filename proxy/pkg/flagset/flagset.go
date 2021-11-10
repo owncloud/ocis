@@ -210,7 +210,7 @@ func ServerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "oidc-insecure",
 			Value:       flags.OverrideDefaultBool(cfg.OIDC.Insecure, false),
 			Usage:       "OIDC allow insecure communication",
-			EnvVars:     []string{"PROXY_OIDC_INSECURE"},
+			EnvVars:     []string{"PROXY_OIDC_INSECURE", "OCIS_INSECURE"},
 			Destination: &cfg.OIDC.Insecure,
 		},
 		&cli.IntFlag{

@@ -134,7 +134,7 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "dataprovider-insecure",
 			Value:       flags.OverrideDefaultBool(cfg.Reva.StorageHome.DataProvider.Insecure, false),
 			Usage:       "dataprovider insecure",
-			EnvVars:     []string{"STORAGE_HOME_DATAPROVIDER_INSECURE"},
+			EnvVars:     []string{"STORAGE_HOME_DATAPROVIDER_INSECURE", "OCIS_INSECURE"},
 			Destination: &cfg.Reva.StorageHome.DataProvider.Insecure,
 		},
 

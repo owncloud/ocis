@@ -32,7 +32,7 @@ func AuthBearerWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "oidc-insecure",
 			Value:       flags.OverrideDefaultBool(cfg.Reva.OIDC.Insecure, false),
 			Usage:       "OIDC allow insecure communication",
-			EnvVars:     []string{"STORAGE_OIDC_INSECURE"},
+			EnvVars:     []string{"STORAGE_OIDC_INSECURE", "OCIS_INSECURE"},
 			Destination: &cfg.Reva.OIDC.Insecure,
 		},
 		&cli.StringFlag{

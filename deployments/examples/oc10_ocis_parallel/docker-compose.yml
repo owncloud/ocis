@@ -117,16 +117,7 @@ services:
       STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
-      PROXY_OIDC_INSECURE: "${INSECURE:-false}"
-      THUMBNAILS_WEBDAVSOURCE_INSECURE: "${INSECURE:-false}"
-      THUMBNAILS_CS3SOURCE_INSECURE: "${INSECURE:-false}"
-      STORAGE_OIDC_INSECURE: "${INSECURE:-false}"
-      STORAGE_HOME_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
-      STORAGE_METADATA_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
-      STORAGE_USERS_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
-      STORAGE_FRONTEND_OCDAV_INSECURE: "${INSECURE:-false}"
-      STORAGE_FRONTEND_ARCHIVER_INSECURE: "${INSECURE:-false}"
-      STORAGE_FRONTEND_APPPROVIDER_INSECURE: "${INSECURE:-false}"
+      OCIS_INSECURE: "${INSECURE:-false}"
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/ocis/proxy-config.dist.json:/config/proxy-config.dist.json

@@ -123,7 +123,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "approvider-insecure",
 			Value:       flags.OverrideDefaultBool(cfg.Reva.Frontend.AppProviderInsecure, false),
 			Usage:       "approvider insecure",
-			EnvVars:     []string{"STORAGE_FRONTEND_APPPROVIDER_INSECURE"},
+			EnvVars:     []string{"STORAGE_FRONTEND_APPPROVIDER_INSECURE", "OCIS_INSECURE"},
 			Destination: &cfg.Reva.Frontend.AppProviderInsecure,
 		},
 		&cli.StringFlag{
@@ -137,7 +137,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "archiver-insecure",
 			Value:       flags.OverrideDefaultBool(cfg.Reva.Frontend.ArchiverInsecure, false),
 			Usage:       "archiver insecure",
-			EnvVars:     []string{"STORAGE_FRONTEND_ARCHIVER_INSECURE"},
+			EnvVars:     []string{"STORAGE_FRONTEND_ARCHIVER_INSECURE", "OCIS_INSECURE"},
 			Destination: &cfg.Reva.Frontend.ArchiverInsecure,
 		},
 		&cli.StringFlag{
@@ -165,7 +165,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Name:        "ocdav-insecure",
 			Value:       flags.OverrideDefaultBool(cfg.Reva.Frontend.OCDavInsecure, false),
 			Usage:       "owncloud webdav insecure",
-			EnvVars:     []string{"STORAGE_FRONTEND_OCDAV_INSECURE"},
+			EnvVars:     []string{"STORAGE_FRONTEND_OCDAV_INSECURE", "OCIS_INSECURE"},
 			Destination: &cfg.Reva.Frontend.OCDavInsecure,
 		},
 		&cli.StringFlag{

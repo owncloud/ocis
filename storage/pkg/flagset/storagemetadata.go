@@ -73,7 +73,7 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 			Name:        "dataprovider-insecure",
 			Value:       flags.OverrideDefaultBool(cfg.Reva.StorageMetadata.DataProvider.Insecure, false),
 			Usage:       "dataprovider insecure",
-			EnvVars:     []string{"STORAGE_METADATA_DATAPROVIDER_INSECURE"},
+			EnvVars:     []string{"STORAGE_METADATA_DATAPROVIDER_INSECURE", "OCIS_INSECURE"},
 			Destination: &cfg.Reva.StorageMetadata.DataProvider.Insecure,
 		},
 
