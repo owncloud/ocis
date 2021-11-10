@@ -55,6 +55,14 @@
           "backend": "http://localhost:9140"
         },
         {
+          "endpoint": "/index.php/login",
+          "backend": "http://localhost:9100"
+        },
+        {
+          "endpoint": "/login",
+          "backend": "http://localhost:9100"
+        },
+        {
           "endpoint": "/data",
           "backend": "http://localhost:9140"
         },
