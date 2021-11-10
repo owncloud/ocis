@@ -66,10 +66,15 @@ func ParseThumbnailRequest(r *http.Request) (*ThumbnailRequest, error) {
 // So using the URLParam function is not possible.
 func extractFilePath(r *http.Request) (string, error) {
 	user := chi.URLParam(r, "user")
+	user, err := url.QueryUnescape(user)
+	if err != nil {
+		return "", errors.New("could not unescape user")
+	}
 	if user != "" {
 		parts := strings.SplitN(r.URL.Path, user, 2)
 		return parts[1], nil
 	}
+
 	token := chi.URLParam(r, "token")
 	if token != "" {
 		parts := strings.SplitN(r.URL.Path, token, 2)

@@ -9,9 +9,11 @@ The following sections list the changes for unreleased.
 * Bugfix - Don't allow empty password: [#197](https://github.com/owncloud/product/issues/197)
 * Bugfix - Fix basic auth config: [#2719](https://github.com/owncloud/ocis/pull/2719)
 * Bugfix - Fix oCIS startup ony systems with IPv6: [#2698](https://github.com/owncloud/ocis/pull/2698)
+* Bugfix - Fix opening images in media viewer for some usernames: [#2738](https://github.com/owncloud/ocis/pull/2738)
 * Bugfix - Fix error logging when there is no thumbnail for a file: [#2702](https://github.com/owncloud/ocis/pull/2702)
 * Bugfix - Don't announce resharing via capabilities: [#2690](https://github.com/owncloud/ocis/pull/2690)
 * Enhancement - Add API to list all spaces: [#2692](https://github.com/owncloud/ocis/pull/2692)
+* Enhancement - Update reva to v1.16: [#2737](https://github.com/owncloud/ocis/pull/2737)
 
 ## Details
 
@@ -36,6 +38,15 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/2300
    https://github.com/owncloud/ocis/pull/2698
 
+* Bugfix - Fix opening images in media viewer for some usernames: [#2738](https://github.com/owncloud/ocis/pull/2738)
+
+   We've fixed the opening of images in the media viewer for user names containing special
+   characters (eg. `@`) which will be URL-escaped. Before this fix users could not see the image in
+   the media viewer. Now the user name is correctly escaped and the user can view the image in the
+   media viewer.
+
+   https://github.com/owncloud/ocis/pull/2738
+
 * Bugfix - Fix error logging when there is no thumbnail for a file: [#2702](https://github.com/owncloud/ocis/pull/2702)
 
    We've fixed the behavior of the logging when there is no thumbnail for a file (because the
@@ -57,6 +68,12 @@ The following sections list the changes for unreleased.
    spaces.
 
    https://github.com/owncloud/ocis/pull/2692
+
+* Enhancement - Update reva to v1.16: [#2737](https://github.com/owncloud/ocis/pull/2737)
+
+   Updated reva to v1.16 This update includes: * TODO before oCIS release
+
+   https://github.com/owncloud/ocis/pull/2737
 # Changelog for [1.14.0] (2021-10-27)
 
 The following sections list the changes for 1.14.0.

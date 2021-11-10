@@ -1,4 +1,7 @@
 {
+  "log": {
+    "level": "PROXY_LOG_LEVEL"
+  },
   "policy_selector": {
     "claims": {
       "default_policy": "oc10",
@@ -52,8 +55,12 @@
           "backend": "http://localhost:9140"
         },
         {
-          "endpoint": "/app/",
-          "backend": "http://localhost:9140"
+          "endpoint": "/index.php/login",
+          "backend": "http://localhost:9100"
+        },
+        {
+          "endpoint": "/login",
+          "backend": "http://localhost:9100"
         },
         {
           "endpoint": "/data",
@@ -62,6 +69,14 @@
         {
           "endpoint": "/graph/",
           "backend": "http://localhost:9120"
+        },
+        {
+          "endpoint": "/app/",
+          "backend": "http://localhost:9140"
+        },
+        {
+          "endpoint": "/archiver",
+          "backend": "http://localhost:9140"
         },
         {
           "endpoint": "/graph-explorer/",
