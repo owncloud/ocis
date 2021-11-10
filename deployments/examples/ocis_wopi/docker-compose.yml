@@ -58,7 +58,6 @@ services:
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
-      PROXY_OIDC_INSECURE: "${INSECURE:-false}" # needed if Traefik is using self generated certificates
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       # change default secrets
       IDP_LDAP_BIND_PASSWORD: ${IDP_LDAP_BIND_PASSWORD:-idp}
@@ -69,6 +68,17 @@ services:
       # app registry
       STORAGE_GATEWAY_GRPC_ADDR: 0.0.0.0:9142 # make the REVA gateway accessible to the app drivers
       STORAGE_APP_REGISTRY_MIMETYPES_JSON: /var/tmp/ocis/app-config/mimetypes.json
+      # INSECURE: needed if oCIS / Traefik is using self generated certificates
+      PROXY_OIDC_INSECURE: "${INSECURE:-false}"
+      THUMBNAILS_WEBDAVSOURCE_INSECURE: "${INSECURE:-false}"
+      THUMBNAILS_CS3SOURCE_INSECURE: "${INSECURE:-false}"
+      STORAGE_OIDC_INSECURE: "${INSECURE:-false}"
+      STORAGE_HOME_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
+      STORAGE_METADATA_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
+      STORAGE_USERS_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
+      STORAGE_FRONTEND_OCDAV_INSECURE: "${INSECURE:-false}"
+      STORAGE_FRONTEND_ARCHIVER_INSECURE: "${INSECURE:-false}"
+      STORAGE_FRONTEND_APPPROVIDER_INSECURE: "${INSECURE:-false}"
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/ocis/mimetypes.json:/var/tmp/ocis/app-config/mimetypes.json
