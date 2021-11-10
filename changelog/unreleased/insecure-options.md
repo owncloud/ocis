@@ -1,6 +1,8 @@
-Change: Make insecure options configurable
+Change: Make all insecure options configurable and change the default to false
 
-We had several hard-coded 'insecure' flags. These options are now configurable and default to false. Also we changed all other 'insecure' flags with a previous default of true to false. In development environments using self signed certs (the default) you need to set these flags:
+We had several hard-coded 'insecure' flags. These options are now configurable and default to false. Also we changed all other 'insecure' flags with a previous default of true to false.
+
+In development environments using self signed certs (the default) you now need to set these flags:
 
 ```
 PROXY_OIDC_INSECURE=true
