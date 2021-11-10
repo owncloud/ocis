@@ -143,6 +143,9 @@ func (ta *TextAnalyzer) AnalyzeString(word string, opts AnalysisOpts) TextAnalys
 						if expFinal, finalOk := expCurrent[script]; finalOk {
 							lastRange.TargetScript = expFinal
 							if isWhiteSpace {
+								// TODO: Check if this is dead code.
+								// whitespace should be part of the "Common" script, and the Common
+								// script shouldn't be part of a mergeMap
 								lastRange.Spaces = append(lastRange.Spaces, wordIndex)
 							}
 							runeCount++
@@ -216,6 +219,7 @@ func (tr *TextAnalysis) MergeCommon(mergeMap MergeMap) {
 			if previousRange.TargetScript == sRange.TargetScript {
 				previousRange.High = sRange.High
 				previousRange.Spaces = append(previousRange.Spaces, sRange.Spaces...)
+				previousRange.RuneCount += sRange.RuneCount
 			} else if sRange.TargetScript == "Common" || sRange.TargetScript == "Inherited" {
 				// new range will be absorbed into the previous one
 				previousRange.High = sRange.High
@@ -229,6 +233,7 @@ func (tr *TextAnalysis) MergeCommon(mergeMap MergeMap) {
 				previousRange.Spaces = append(previousRange.Spaces, sRange.Spaces...)
 				tr.RuneCount[sRange.TargetScript] += previousRange.RuneCount
 				tr.RuneCount[previousRange.TargetScript] -= previousRange.RuneCount
+				previousRange.RuneCount += sRange.RuneCount
 				previousRange.TargetScript = sRange.TargetScript
 			} else {
 				if expCurrent, currentOk := mergeMap[previousRange.TargetScript]; currentOk {
@@ -236,11 +241,12 @@ func (tr *TextAnalysis) MergeCommon(mergeMap MergeMap) {
 						if sRange.TargetScript == expFinal {
 							// the previous range has changed the target script
 							tr.RuneCount[previousRange.TargetScript] -= previousRange.RuneCount
+							tr.RuneCount[sRange.TargetScript] += previousRange.RuneCount
 						} else {
 							// new range has been absorbed
 							tr.RuneCount[sRange.TargetScript] -= sRange.RuneCount
+							tr.RuneCount[previousRange.TargetScript] += sRange.RuneCount
 						}
-						tr.RuneCount[expFinal] += sRange.RuneCount
 						previousRange.TargetScript = expFinal
 						previousRange.High = sRange.High
 						previousRange.Spaces = append(previousRange.Spaces, sRange.Spaces...)
