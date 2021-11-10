@@ -130,6 +130,13 @@ func StorageHomeWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_HOME_TMP_FOLDER"},
 			Destination: &cfg.Reva.StorageHome.TempFolder,
 		},
+		&cli.BoolFlag{
+			Name:        "dataprovider-insecure",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.StorageHome.DataProvider.Insecure, false),
+			Usage:       "dataprovider insecure",
+			EnvVars:     []string{"STORAGE_HOME_DATAPROVIDER_INSECURE"},
+			Destination: &cfg.Reva.StorageHome.DataProvider.Insecure,
+		},
 
 		// some drivers need to look up users at the gateway
 

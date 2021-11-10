@@ -170,12 +170,12 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 					"prefix":                 cfg.Reva.Frontend.AppProviderPrefix,
 					"transfer_shared_secret": cfg.Reva.TransferSecret,
 					"timeout":                86400,
-					"insecure":               true,
+					"insecure":               cfg.Reva.Frontend.AppProviderInsecure,
 				},
 				"archiver": map[string]interface{}{
 					"prefix":        cfg.Reva.Frontend.ArchiverPrefix,
 					"timeout":       86400,
-					"insecure":      true,
+					"insecure":      cfg.Reva.Frontend.ArchiverInsecure,
 					"max_num_files": cfg.Reva.Archiver.MaxNumFiles,
 					"max_size":      cfg.Reva.Archiver.MaxSize,
 				},
@@ -190,7 +190,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 					"files_namespace":  cfg.Reva.OCDav.DavFilesNamespace,
 					"webdav_namespace": cfg.Reva.OCDav.WebdavNamespace,
 					"timeout":          86400,
-					"insecure":         true,
+					"insecure":         cfg.Reva.Frontend.OCDavInsecure,
 					"public_url":       cfg.Reva.Frontend.PublicURL,
 				},
 				"ocs": map[string]interface{}{

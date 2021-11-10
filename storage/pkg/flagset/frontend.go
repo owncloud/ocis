@@ -119,12 +119,26 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_FRONTEND_APPPROVIDER_PREFIX"},
 			Destination: &cfg.Reva.Frontend.AppProviderPrefix,
 		},
+		&cli.BoolFlag{
+			Name:        "approvider-insecure",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.Frontend.AppProviderInsecure, false),
+			Usage:       "approvider insecure",
+			EnvVars:     []string{"STORAGE_FRONTEND_APPPROVIDER_INSECURE"},
+			Destination: &cfg.Reva.Frontend.AppProviderInsecure,
+		},
 		&cli.StringFlag{
 			Name:        "archiver-prefix",
 			Value:       flags.OverrideDefaultString(cfg.Reva.Frontend.ArchiverPrefix, "archiver"),
 			Usage:       "archiver prefix",
 			EnvVars:     []string{"STORAGE_FRONTEND_ARCHIVER_PREFIX"},
 			Destination: &cfg.Reva.Frontend.ArchiverPrefix,
+		},
+		&cli.BoolFlag{
+			Name:        "archiver-insecure",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.Frontend.ArchiverInsecure, false),
+			Usage:       "archiver insecure",
+			EnvVars:     []string{"STORAGE_FRONTEND_ARCHIVER_INSECURE"},
+			Destination: &cfg.Reva.Frontend.ArchiverInsecure,
 		},
 		&cli.StringFlag{
 			Name:        "datagateway-prefix",
@@ -146,6 +160,13 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			Usage:       "owncloud webdav endpoint prefix",
 			EnvVars:     []string{"STORAGE_FRONTEND_OCDAV_PREFIX"},
 			Destination: &cfg.Reva.Frontend.OCDavPrefix,
+		},
+		&cli.BoolFlag{
+			Name:        "ocdav-insecure",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.Frontend.OCDavInsecure, false),
+			Usage:       "owncloud webdav insecure",
+			EnvVars:     []string{"STORAGE_FRONTEND_OCDAV_INSECURE"},
+			Destination: &cfg.Reva.Frontend.OCDavInsecure,
 		},
 		&cli.StringFlag{
 			Name:        "ocs-prefix",

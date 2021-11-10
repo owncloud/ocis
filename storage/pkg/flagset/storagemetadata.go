@@ -69,6 +69,13 @@ func StorageMetadata(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_METADATA_DRIVER"},
 			Destination: &cfg.Reva.StorageMetadata.Driver,
 		},
+		&cli.BoolFlag{
+			Name:        "dataprovider-insecure",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.StorageMetadata.DataProvider.Insecure, false),
+			Usage:       "dataprovider insecure",
+			EnvVars:     []string{"STORAGE_METADATA_DATAPROVIDER_INSECURE"},
+			Destination: &cfg.Reva.StorageMetadata.DataProvider.Insecure,
+		},
 
 		// some drivers need to look up users at the gateway
 

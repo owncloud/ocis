@@ -12,7 +12,12 @@
                 "OCIS_LOG_LEVEL": "debug",
                 "OCIS_LOG_PRETTY": "true",
                 "OCIS_LOG_COLOR": "true",
-                "PROXY_ENABLE_BASIC_AUTH": "true"
+                "PROXY_ENABLE_BASIC_AUTH": "true",
+                "STORAGE_HOME_DATAPROVIDER_INSECURE": "true",
+                "STORAGE_METADATA_DATAPROVIDER_INSECURE": "true",
+                "STORAGE_FRONTEND_OCDAV_INSECURE": "true",
+                "STORAGE_FRONTEND_ARCHIVER_INSECURE": "true",
+                "STORAGE_FRONTEND_APPPROVIDER_INSECURE": "true",
             }
         },
     ]
