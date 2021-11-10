@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix opening images in media viewer for some usernames: [#2738](https://github.com/owncloud/ocis/pull/2738)
 * Bugfix - Fix error logging when there is no thumbnail for a file: [#2702](https://github.com/owncloud/ocis/pull/2702)
 * Bugfix - Don't announce resharing via capabilities: [#2690](https://github.com/owncloud/ocis/pull/2690)
+* Change - Make all insecure options configurable and change the default to false: [#2700](https://github.com/owncloud/ocis/issues/2700)
 * Enhancement - Add API to list all spaces: [#2692](https://github.com/owncloud/ocis/pull/2692)
 * Enhancement - Update reva to v1.16: [#2737](https://github.com/owncloud/ocis/pull/2737)
 
@@ -61,6 +62,28 @@ The following sections list the changes for unreleased.
    that clients have a chance to react accordingly.
 
    https://github.com/owncloud/ocis/pull/2690
+
+* Change - Make all insecure options configurable and change the default to false: [#2700](https://github.com/owncloud/ocis/issues/2700)
+
+   We had several hard-coded 'insecure' flags. These options are now configurable and default to
+   false. Also we changed all other 'insecure' flags with a previous default of true to false.
+
+   In development environments using self signed certs (the default) you now need to set these
+   flags:
+
+   ``` PROXY_OIDC_INSECURE=true STORAGE_FRONTEND_APPPROVIDER_INSECURE=true
+   STORAGE_FRONTEND_ARCHIVER_INSECURE=true STORAGE_FRONTEND_OCDAV_INSECURE=true
+   STORAGE_HOME_DATAPROVIDER_INSECURE=true
+   STORAGE_METADATA_DATAPROVIDER_INSECURE=true STORAGE_OIDC_INSECURE=true
+   STORAGE_USERS_DATAPROVIDER_INSECURE=true THUMBNAILS_CS3SOURCE_INSECURE=true
+   THUMBNAILS_WEBDAVSOURCE_INSECURE=true ```
+
+   As an alternative you also can set a single flag, which configures all options together:
+
+   ``` OCIS_INSECURE=true ```
+
+   https://github.com/owncloud/ocis/issues/2700
+   https://github.com/owncloud/ocis/pull/2745
 
 * Enhancement - Add API to list all spaces: [#2692](https://github.com/owncloud/ocis/pull/2692)
 
