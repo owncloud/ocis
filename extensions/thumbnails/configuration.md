@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-11-10T12:26:25+0000"
+date: "2021-11-10T16:54:35+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/thumbnails/templates
@@ -70,11 +70,13 @@ Usage: `thumbnails health [command options] [arguments...]`
 
 
 
+
 ### thumbnails ocis-thumbnails
 
 Example usage
 
 Usage: `thumbnails ocis-thumbnails [command options] [arguments...]`
+
 
 
 
@@ -186,8 +188,12 @@ Usage: `thumbnails server [command options] [arguments...]`
 : Address of REVA gateway endpoint. Default: `"127.0.0.1:9142"`.
 
 
--webdavsource-insecure |  $THUMBNAILS_WEBDAVSOURCE_INSECURE
-: Whether to skip certificate checks. Default: `true`.
+-webdavsource-insecure |  $THUMBNAILS_WEBDAVSOURCE_INSECURE , $OCIS_INSECURE
+: Whether to skip certificate checks. Default: `false`.
+
+
+-cs3source-insecure |  $THUMBNAILS_CS3SOURCE_INSECURE , $OCIS_INSECURE
+: Whether to skip certificate checks. Default: `false`.
 
 
 -thumbnail-resolution |  $THUMBNAILS_RESOLUTIONS
@@ -208,6 +214,7 @@ Usage: `thumbnails server [command options] [arguments...]`
 Print the versions of the running instances
 
 Usage: `thumbnails version [command options] [arguments...]`
+
 
 
 

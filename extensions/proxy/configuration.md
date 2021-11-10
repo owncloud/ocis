@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-11-10T12:26:07+0000"
+date: "2021-11-10T16:54:28+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/proxy/templates
@@ -147,8 +147,8 @@ Usage: `proxy server [command options] [arguments...]`
 : OIDC issuer. Default: `"https://localhost:9200"`.
 
 
--oidc-insecure |  $PROXY_OIDC_INSECURE
-: OIDC allow insecure communication. Default: `true`.
+-oidc-insecure |  $PROXY_OIDC_INSECURE , $OCIS_INSECURE
+: OIDC allow insecure communication. Default: `false`.
 
 
 -oidc-userinfo-cache-tll |  $PROXY_OIDC_USERINFO_CACHE_TTL
