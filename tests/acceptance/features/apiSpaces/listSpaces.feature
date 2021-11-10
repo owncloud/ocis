@@ -54,13 +54,3 @@ Feature: List and create spaces
       | name             | Project Venus |
       | quota@@@total    | 2000          |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
-
-  Scenario: Alice creates folder via Graph api in space, she expects a 201 code and she checks that folder exists
-    Given the administrator gives "Alice" the role "Admin" using the settings api
-    When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
-    And user "Alice" lists all available spaces via the GraphApi
-    And user "Alice" creates a folder "mainFolder" in space "Project Venus" using the WebDav Api
-    Then the HTTP status code should be "201"
-    When user "Alice" lists the content of the space with the name "Project Venus" using the WebDav Api
-    Then the propfind result of the space should contain these entries:
-      | mainFolder/        |
