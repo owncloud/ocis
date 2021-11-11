@@ -85,6 +85,7 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 				// fake oidc claims
 				claims := map[string]interface{}{
 					oidc.OwncloudUUID:      user.Id.OpaqueId,
+					options.UserOIDCClaim:  user.Id.OpaqueId,
 					oidc.Iss:               user.Id.Idp,
 					oidc.PreferredUsername: user.Username,
 					oidc.Email:             user.Mail,
