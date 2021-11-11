@@ -35,6 +35,7 @@ OCIS_MODULES = \
 # bin file definitions
 PHP_CS_FIXER=php -d zend.enable_gc=0 vendor-bin/owncloud-codestyle/vendor/bin/php-cs-fixer
 PHP_CODESNIFFER=vendor-bin/php_codesniffer/vendor/bin/phpcs
+PHP_CODEBEAUTIFIER=vendor-bin/php_codesniffer/vendor/bin/phpcbf
 PHAN=php -d zend.enable_gc=0 vendor-bin/phan/vendor/bin/phan
 PHPSTAN=php -d zend.enable_gc=0 vendor-bin/phpstan/vendor/bin/phpstan
 
@@ -213,7 +214,7 @@ test-php-style: vendor-bin/owncloud-codestyle/vendor vendor-bin/php_codesniffer/
 .PHONY: test-php-style-fix
 test-php-style-fix: vendor-bin/owncloud-codestyle/vendor
 	$(PHP_CS_FIXER) fix -v --diff --allow-risky yes
-
+	$(PHP_CODEBEAUTIFIER) --cache --runtime-set ignore_warnings_on_exit --standard=phpcs.xml tests/acceptance
 
 vendor-bin/owncloud-codestyle/vendor: vendor/bamarni/composer-bin-plugin vendor-bin/owncloud-codestyle/composer.lock
 	composer bin owncloud-codestyle install --no-progress
