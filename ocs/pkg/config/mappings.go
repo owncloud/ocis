@@ -94,7 +94,7 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		},
 		{
 			EnvVars:     []string{"REVA_GATEWAY"},
-			Destination: &cfg.RevaAddress,
+			Destination: &cfg.Reva.Address,
 		},
 		{
 			EnvVars:     []string{"OCIS_MACHINE_AUTH_API_KEY", "OCS_MACHINE_AUTH_API_KEY"},
