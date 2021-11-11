@@ -52,7 +52,7 @@ func Execute(cfg *config.Config) error {
 
 // NewLogger initializes a service-specific logger instance.
 func NewLogger(cfg *config.Config) log.Logger {
-	return oclog.LoggerFromConfig("glauth", cfg.Log)
+	return oclog.LoggerFromConfig("glauth", *cfg.Log)
 }
 
 // ParseConfig loads glauth configuration from known paths.
@@ -62,8 +62,20 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 		return err
 	}
 
+	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &shared.Log{
+			Level:  cfg.Commons.Log.Level,
+			Pretty: cfg.Commons.Log.Pretty,
+			Color:  cfg.Commons.Log.Color,
+			File:   cfg.Commons.Log.File,
+		}
+	} else if cfg.Log == nil && cfg.Commons == nil {
+		cfg.Log = &shared.Log{}
+	}
+
 	// load all env variables relevant to the config in the current context.
-	conf.LoadOSEnv(config.GetEnv(), false)
+	conf.LoadOSEnv(config.GetEnv(cfg), false)
 	bindings := config.StructMappings(cfg)
 	return ociscfg.BindEnv(conf, bindings)
 }
@@ -75,9 +87,7 @@ type SutureService struct {
 
 // NewSutureService creates a new glauth.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	if (cfg.GLAuth.Log == shared.Log{}) {
-		cfg.GLAuth.Log = cfg.Log
-	}
+	cfg.GLAuth.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.GLAuth,
 	}

@@ -88,7 +88,6 @@ type SutureService struct {
 
 // NewSutureService creates a new proxy.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	// inherit common configuration from ocis config parsing.
 	cfg.Proxy.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.Proxy,
