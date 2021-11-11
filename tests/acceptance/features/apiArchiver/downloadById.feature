@@ -41,3 +41,23 @@ Feature: download multiple resources bundled into an archive
       | user-agent | archive-type |
       | Linux      | tar          |
       | Windows NT | zip          |
+
+  Scenario: download multiple files and folders
+    Given user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
+    And user "Alice" has uploaded file with content "other data" to "/textfile1.txt"
+    And user "Alice" has created folder "my_data"
+    And user "Alice" has uploaded file with content "some data" to "/my_data/textfile2.txt"
+    And user "Alice" has created folder "more_data"
+    And user "Alice" has uploaded file with content "more data" to "/more_data/an_other_file.txt"
+    When user "Alice" downloads the archive of these items using the resource ids
+      | textfile0.txt |
+      | textfile1.txt |
+      | my_data       |
+      | more_data     |
+    Then the HTTP status code should be "200"
+    And the downloaded tar archive should contain these files:
+      | name                        | content    |
+      | textfile0.txt               | some data  |
+      | textfile1.txt               | other data |
+      | my_data/textfile2.txt       | some data  |
+      | more_data/an_other_file.txt | more data  |
