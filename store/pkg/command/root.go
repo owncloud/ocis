@@ -4,8 +4,6 @@ import (
 	"context"
 	"os"
 
-	"github.com/owncloud/ocis/ocis-pkg/shared"
-
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/version"
@@ -86,9 +84,6 @@ type SutureService struct {
 
 // NewSutureService creates a new store.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	if (cfg.Accounts.Log == shared.Log{}) {
-		cfg.Accounts.Log = cfg.Log
-	}
 	return SutureService{
 		cfg: cfg.Store,
 	}
