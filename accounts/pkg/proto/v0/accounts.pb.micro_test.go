@@ -85,7 +85,7 @@ func init() {
 	var hdlr *svc.Service
 	var err error
 
-	if hdlr, err = svc.New(svc.Logger(oclog.LoggerFromConfig("accounts", cfg.Log)), svc.Config(cfg), svc.RoleService(buildRoleServiceMock())); err != nil {
+	if hdlr, err = svc.New(svc.Logger(oclog.LoggerFromConfig("accounts", *cfg.Log)), svc.Config(cfg), svc.RoleService(buildRoleServiceMock())); err != nil {
 		log.Fatalf("Could not create new service")
 	}
 

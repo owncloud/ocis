@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+
 	"github.com/pkg/errors"
 
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
@@ -108,6 +110,10 @@ func (s Service) buildIndex() (*indexer.Indexer, error) {
 // because the index config was mapped after the service config.
 func configFromSvc(cfg *config.Config) (*idxcfg.Config, error) {
 	c := idxcfg.New()
+
+	if cfg.Log == nil {
+		cfg.Log = &shared.Log{}
+	}
 
 	defer func(cfg *config.Config) {
 		l := log.NewLogger(log.Color(cfg.Log.Color), log.Pretty(cfg.Log.Pretty), log.Level(cfg.Log.Level))

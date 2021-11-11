@@ -145,7 +145,9 @@ type Config struct {
 
 // New returns a new config.
 func New() *Config {
-	return &Config{}
+	return &Config{
+		Log: &shared.Log{},
+	}
 }
 
 func DefaultConfig() *Config {
