@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-11-11T06:49:07+0000"
+date: "2021-11-11T07:11:33+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/settings/templates
@@ -34,6 +34,89 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Command-line flags
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
+
+### settings version
+
+Print the versions of the running instances
+
+Usage: `settings version [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-grpc-namespace |  $SETTINGS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
+
+-name |  $SETTINGS_NAME
+: service name. Default: `"settings"`.
+
+### settings health
+
+Check health status
+
+Usage: `settings health [command options] [arguments...]`
+
+
+
+
+
+-debug-addr |  $SETTINGS_DEBUG_ADDR
+: Address to debug endpoint. Default: `"127.0.0.1:9194"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### settings ocis-settings
 
@@ -190,89 +273,6 @@ Usage: `settings server [command options] [arguments...]`
 
 -extensions | 
 : Run specific extensions during supervised mode. This flag is set by the runtime.
-
-
-
-### settings version
-
-Print the versions of the running instances
-
-Usage: `settings version [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--grpc-namespace |  $SETTINGS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
-
-
--name |  $SETTINGS_NAME
-: service name. Default: `"settings"`.
-
-### settings health
-
-Check health status
-
-Usage: `settings health [command options] [arguments...]`
-
-
-
-
-
--debug-addr |  $SETTINGS_DEBUG_ADDR
-: Address to debug endpoint. Default: `"127.0.0.1:9194"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
