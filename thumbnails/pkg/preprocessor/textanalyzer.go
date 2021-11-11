@@ -112,18 +112,7 @@ func (ta *TextAnalyzer) AnalyzeString(word string, opts AnalysisOpts) TextAnalys
 
 	runeCount := 0
 	for wordIndex, char := range word {
-		script := "_unknown"
-		for scriptIndex, scriptFound := range ta.scriptListCache {
-			// if we can't match with a known script, do nothing and jump to the next char
-			if unicode.Is(ta.scripts[scriptFound], char) {
-				if scriptIndex > 3 {
-					// we might expect more chars with the same script
-					// so move the script first to match it faster next time
-					ta.reorderScriptList(scriptFound)
-				}
-				script = scriptFound
-			}
-		}
+		script := ta.chooseScriptFor(char)
 
 		isWhiteSpace := unicode.Is(unicode.White_Space, char)
 		if lastRange == nil {
@@ -135,23 +124,16 @@ func (ta *TextAnalyzer) AnalyzeString(word string, opts AnalysisOpts) TextAnalys
 			}
 		} else {
 			if script != lastRange.TargetScript {
-				if opts.UseMergeMap {
-					// This option mainly target japanese chars; multiple scripts can be used
-					// in the same piece of text (Han, Hiragana and Katakana)
-					// Instead of starting a new range, adjust the target script of the last range
-					if expCurrent, currentOk := opts.MergeMap[lastRange.TargetScript]; currentOk {
-						if expFinal, finalOk := expCurrent[script]; finalOk {
-							lastRange.TargetScript = expFinal
-							if isWhiteSpace {
-								// TODO: Check if this is dead code.
-								// whitespace should be part of the "Common" script, and the Common
-								// script shouldn't be part of a mergeMap
-								lastRange.Spaces = append(lastRange.Spaces, wordIndex)
-							}
-							runeCount++
-							continue
-						}
+				if mapScript, isOk := ta.getMergeMapValue(opts, lastRange.TargetScript, script); isOk {
+					lastRange.TargetScript = mapScript
+					if isWhiteSpace {
+						// TODO: Check if this is dead code.
+						// whitespace should be part of the "Common" script, and the Common
+						// script shouldn't be part of a mergeMap
+						lastRange.Spaces = append(lastRange.Spaces, wordIndex)
 					}
+					runeCount++
+					continue
 				}
 
 				lastRange.High = wordIndex - 1
@@ -166,10 +148,9 @@ func (ta *TextAnalyzer) AnalyzeString(word string, opts AnalysisOpts) TextAnalys
 					Spaces:       make([]int, 0),
 					TargetScript: script,
 				}
-				runeCount = 1
-			} else {
-				runeCount++
+				runeCount = 0
 			}
+			runeCount++
 		}
 		if isWhiteSpace {
 			lastRange.Spaces = append(lastRange.Spaces, wordIndex)
@@ -184,6 +165,22 @@ func (ta *TextAnalyzer) AnalyzeString(word string, opts AnalysisOpts) TextAnalys
 		analysis.ScriptRanges = append(analysis.ScriptRanges, *lastRange)
 	}
 	return analysis
+}
+
+func (ta *TextAnalyzer) chooseScriptFor(char rune) string {
+	script := "_unknown"
+	for scriptIndex, scriptFound := range ta.scriptListCache {
+		// if we can't match with a known script, do nothing and jump to the next char
+		if unicode.Is(ta.scripts[scriptFound], char) {
+			if scriptIndex > 3 {
+				// we might expect more chars with the same script
+				// so move the script first to match it faster next time
+				ta.reorderScriptList(scriptFound)
+			}
+			return scriptFound
+		}
+	}
+	return script
 }
 
 // Reorder the scriptListCache in the TextAnalyzer in order to speed up
@@ -203,6 +200,23 @@ func (ta *TextAnalyzer) reorderScriptList(matchedScript string) {
 	}
 }
 
+// Get the value from the merge map based on the previous and current scripts.
+// The information about using the merge map and the actual merge map will be
+// gotten from the AnalysisOpts passed as parameter
+func (ta *TextAnalyzer) getMergeMapValue(opts AnalysisOpts, previous, current string) (string, bool) {
+	if opts.UseMergeMap {
+		// This option mainly target japanese chars; multiple scripts can be used
+		// in the same piece of text (Han, Hiragana and Katakana)
+		// Instead of starting a new range, adjust the target script of the last range
+		if expCurrent, currentOk := opts.MergeMap[previous]; currentOk {
+			if expFinal, finalOk := expCurrent[current]; finalOk {
+				return expFinal, finalOk
+			}
+		}
+	}
+	return "", false
+}
+
 // Change the "Common" script to the one used in the previous script range.
 // The ranges will be readjusted and merged if they're adjacent.
 // This naive approach should be good enough for normal use cases
@@ -213,52 +227,52 @@ func (ta *TextAnalyzer) reorderScriptList(matchedScript string) {
 // If the MergeMap isn't needed, use an empty one
 func (tr *TextAnalysis) MergeCommon(mergeMap MergeMap) {
 	var finalRanges []ScriptRange
-	var previousRange *ScriptRange
-	for _, sRange := range tr.ScriptRanges {
-		if previousRange != nil {
-			if previousRange.TargetScript == sRange.TargetScript {
-				previousRange.High = sRange.High
-				previousRange.Spaces = append(previousRange.Spaces, sRange.Spaces...)
-				previousRange.RuneCount += sRange.RuneCount
-			} else if sRange.TargetScript == "Common" || sRange.TargetScript == "Inherited" {
-				// new range will be absorbed into the previous one
-				previousRange.High = sRange.High
-				previousRange.Spaces = append(previousRange.Spaces, sRange.Spaces...)
-				previousRange.RuneCount += sRange.RuneCount
-				tr.RuneCount[previousRange.TargetScript] += sRange.RuneCount
-				tr.RuneCount[sRange.TargetScript] -= sRange.RuneCount
-			} else if previousRange.TargetScript == "Common" || previousRange.TargetScript == "Inherited" {
-				// might happen if the text starts with a Common script
-				previousRange.High = sRange.High
-				previousRange.Spaces = append(previousRange.Spaces, sRange.Spaces...)
-				tr.RuneCount[sRange.TargetScript] += previousRange.RuneCount
-				tr.RuneCount[previousRange.TargetScript] -= previousRange.RuneCount
-				previousRange.RuneCount += sRange.RuneCount
-				previousRange.TargetScript = sRange.TargetScript
-			} else {
-				if expCurrent, currentOk := mergeMap[previousRange.TargetScript]; currentOk {
-					if expFinal, finalOk := expCurrent[sRange.TargetScript]; finalOk {
-						if sRange.TargetScript == expFinal {
-							// the previous range has changed the target script
-							tr.RuneCount[previousRange.TargetScript] -= previousRange.RuneCount
-							tr.RuneCount[sRange.TargetScript] += previousRange.RuneCount
-						} else {
-							// new range has been absorbed
-							tr.RuneCount[sRange.TargetScript] -= sRange.RuneCount
-							tr.RuneCount[previousRange.TargetScript] += sRange.RuneCount
-						}
-						previousRange.TargetScript = expFinal
-						previousRange.High = sRange.High
-						previousRange.Spaces = append(previousRange.Spaces, sRange.Spaces...)
-						previousRange.RuneCount += sRange.RuneCount
-						continue
-					}
-				}
-				finalRanges = append(finalRanges, *previousRange)
-				*previousRange = sRange
-			}
+	var previousRange *ScriptRange = &ScriptRange{}
+
+	if len(tr.ScriptRanges) < 1 {
+		// no ranges -> nothing to do
+		return
+	}
+
+	*previousRange = tr.ScriptRanges[0]
+	for _, sRange := range tr.ScriptRanges[1:] {
+		if previousRange.TargetScript == sRange.TargetScript {
+			previousRange.High = sRange.High
+			previousRange.Spaces = append(previousRange.Spaces, sRange.Spaces...)
+			previousRange.RuneCount += sRange.RuneCount
+		} else if sRange.TargetScript == "Common" || sRange.TargetScript == "Inherited" {
+			// new range will be absorbed into the previous one
+			previousRange.High = sRange.High
+			previousRange.Spaces = append(previousRange.Spaces, sRange.Spaces...)
+			previousRange.RuneCount += sRange.RuneCount
+			tr.RuneCount[previousRange.TargetScript] += sRange.RuneCount
+			tr.RuneCount[sRange.TargetScript] -= sRange.RuneCount
+		} else if previousRange.TargetScript == "Common" || previousRange.TargetScript == "Inherited" {
+			// might happen if the text starts with a Common script
+			previousRange.High = sRange.High
+			previousRange.Spaces = append(previousRange.Spaces, sRange.Spaces...)
+			tr.RuneCount[sRange.TargetScript] += previousRange.RuneCount
+			tr.RuneCount[previousRange.TargetScript] -= previousRange.RuneCount
+			previousRange.RuneCount += sRange.RuneCount
+			previousRange.TargetScript = sRange.TargetScript
 		} else {
-			previousRange = &ScriptRange{}
+			if mapScript, isOk := tr.getMergeMapValue(mergeMap, previousRange.TargetScript, sRange.TargetScript); isOk {
+				if sRange.TargetScript == mapScript {
+					// the previous range has changed the target script
+					tr.RuneCount[previousRange.TargetScript] -= previousRange.RuneCount
+					tr.RuneCount[sRange.TargetScript] += previousRange.RuneCount
+				} else {
+					// new range has been absorbed
+					tr.RuneCount[sRange.TargetScript] -= sRange.RuneCount
+					tr.RuneCount[previousRange.TargetScript] += sRange.RuneCount
+				}
+				previousRange.TargetScript = mapScript
+				previousRange.High = sRange.High
+				previousRange.Spaces = append(previousRange.Spaces, sRange.Spaces...)
+				previousRange.RuneCount += sRange.RuneCount
+				continue
+			}
+			finalRanges = append(finalRanges, *previousRange)
 			*previousRange = sRange
 		}
 	}
@@ -272,4 +286,16 @@ func (tr *TextAnalysis) MergeCommon(mergeMap MergeMap) {
 			delete(tr.RuneCount, index)
 		}
 	}
+}
+
+func (tr *TextAnalysis) getMergeMapValue(mMap MergeMap, previous, current string) (string, bool) {
+	// This option mainly target japanese chars; multiple scripts can be used
+	// in the same piece of text (Han, Hiragana and Katakana)
+	// Instead of starting a new range, adjust the target script of the last range
+	if expCurrent, currentOk := mMap[previous]; currentOk {
+		if expFinal, finalOk := expCurrent[current]; finalOk {
+			return expFinal, finalOk
+		}
+	}
+	return "", false
 }

@@ -7,6 +7,28 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var (
+	inputs = [16]string{
+		"basic latin",
+		"trailing tab	",
+		"Small text. \"$\", \"£\" and \"¥\" are currencies.",
+		"latin with 🖖",
+		"기본 한국어",
+		"基本的な日本語",
+		"ウーロン茶",
+		"私はエンジニアです",
+		"ティー私はエンジニアです",
+		"私はエンジニアです ティー",
+		"आधारभूत देवनागरी",
+		"mixed 언어 传入 🚀!",
+		"/k͜p/",
+		// ä and a + ¨
+		"ä ä",
+		"базовый русский", // cyrillic script isn't part of our default
+		"latin русский",   // latin + cyrillic (cyrillic not supported)
+	}
+)
+
 func TestAnalyzeString(t *testing.T) {
 	defaultOpts := AnalysisOpts{
 		UseMergeMap: true,
@@ -19,7 +41,7 @@ func TestAnalyzeString(t *testing.T) {
 		eOut  TextAnalysis
 	}{
 		{
-			input: "basic latin",
+			input: inputs[0],
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
@@ -28,12 +50,12 @@ func TestAnalyzeString(t *testing.T) {
 				RuneCount: map[string]int{
 					"Latin": 11,
 				},
-				Text: "basic latin",
+				Text: inputs[0],
 			},
 		},
 		{
-			input: "trailing tab	",
-			opts: defaultOpts,
+			input: inputs[1],
+			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
 					ScriptRange{Low: 0, High: 12, Spaces: []int{8, 12}, TargetScript: "Latin", RuneCount: 13},
@@ -41,11 +63,11 @@ func TestAnalyzeString(t *testing.T) {
 				RuneCount: map[string]int{
 					"Latin": 13,
 				},
-				Text: "trailing tab	",
+				Text: inputs[1],
 			},
 		},
 		{
-			input: "Small text. \"$\", \"£\" and \"¥\" are currencies.",
+			input: inputs[2],
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
@@ -54,11 +76,11 @@ func TestAnalyzeString(t *testing.T) {
 				RuneCount: map[string]int{
 					"Latin": 44,
 				},
-				Text: "Small text. \"$\", \"£\" and \"¥\" are currencies.",
+				Text: inputs[2],
 			},
 		},
 		{
-			input: "latin with 🖖",
+			input: inputs[3],
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
@@ -67,11 +89,11 @@ func TestAnalyzeString(t *testing.T) {
 				RuneCount: map[string]int{
 					"Latin": 12,
 				},
-				Text: "latin with 🖖",
+				Text: inputs[3],
 			},
 		},
 		{
-			input: "기본 한국어",
+			input: inputs[4],
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
@@ -80,11 +102,11 @@ func TestAnalyzeString(t *testing.T) {
 				RuneCount: map[string]int{
 					"Hangul": 6,
 				},
-				Text: "기본 한국어",
+				Text: inputs[4],
 			},
 		},
 		{
-			input: "基本的な日本語",
+			input: inputs[5],
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
@@ -93,11 +115,11 @@ func TestAnalyzeString(t *testing.T) {
 				RuneCount: map[string]int{
 					"Hiragana": 7,
 				},
-				Text: "基本的な日本語",
+				Text: inputs[5],
 			},
 		},
 		{
-			input: "ウーロン茶",
+			input: inputs[6],
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
@@ -106,11 +128,11 @@ func TestAnalyzeString(t *testing.T) {
 				RuneCount: map[string]int{
 					"Katakana": 5,
 				},
-				Text: "ウーロン茶",
+				Text: inputs[6],
 			},
 		},
 		{
-			input: "私はエンジニアです",
+			input: inputs[7],
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
@@ -119,11 +141,11 @@ func TestAnalyzeString(t *testing.T) {
 				RuneCount: map[string]int{
 					"Hiragana": 9,
 				},
-				Text: "私はエンジニアです",
+				Text: inputs[7],
 			},
 		},
 		{
-			input: "ティー私はエンジニアです",
+			input: inputs[8],
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
@@ -132,11 +154,11 @@ func TestAnalyzeString(t *testing.T) {
 				RuneCount: map[string]int{
 					"Hiragana": 12,
 				},
-				Text: "ティー私はエンジニアです",
+				Text: inputs[8],
 			},
 		},
 		{
-			input: "私はエンジニアです ティー",
+			input: inputs[9],
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
@@ -145,11 +167,11 @@ func TestAnalyzeString(t *testing.T) {
 				RuneCount: map[string]int{
 					"Hiragana": 13,
 				},
-				Text: "私はエンジニアです ティー",
+				Text: inputs[9],
 			},
 		},
 		{
-			input: "आधारभूत देवनागरी",
+			input: inputs[10],
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
@@ -158,11 +180,11 @@ func TestAnalyzeString(t *testing.T) {
 				RuneCount: map[string]int{
 					"Devanagari": 16,
 				},
-				Text: "आधारभूत देवनागरी",
+				Text: inputs[10],
 			},
 		},
 		{
-			input: "mixed 언어 传入 🚀!",
+			input: inputs[11],
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
@@ -175,11 +197,11 @@ func TestAnalyzeString(t *testing.T) {
 					"Hangul": 3,
 					"Han":    5,
 				},
-				Text: "mixed 언어 传入 🚀!",
+				Text: inputs[11],
 			},
 		},
 		{
-			input: "/k͜p/",
+			input: inputs[12],
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
@@ -188,11 +210,11 @@ func TestAnalyzeString(t *testing.T) {
 				RuneCount: map[string]int{
 					"Latin": 5,
 				},
-				Text: "/k͜p/",
+				Text: inputs[12],
 			},
 		},
 		{
-			input: "ä ä", // ä and a + ¨
+			input: inputs[13], // ä and a + ¨
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
@@ -201,11 +223,11 @@ func TestAnalyzeString(t *testing.T) {
 				RuneCount: map[string]int{
 					"Latin": 4,
 				},
-				Text: "ä ä",
+				Text: inputs[13],
 			},
 		},
 		{
-			input: "базовый русский", // cyrillic script isn't part of our default
+			input: inputs[14], // cyrillic script isn't part of our default
 			opts:  defaultOpts,
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
@@ -214,7 +236,22 @@ func TestAnalyzeString(t *testing.T) {
 				RuneCount: map[string]int{
 					"_unknown": 15,
 				},
-				Text: "базовый русский",
+				Text: inputs[14],
+			},
+		},
+		{
+			input: inputs[15], // latin + cyrillic (cyrillic script isn't part of our default)
+			opts:  defaultOpts,
+			eOut: TextAnalysis{
+				ScriptRanges: []ScriptRange{
+					ScriptRange{Low: 0, High: 5, Spaces: []int{5}, TargetScript: "Latin", RuneCount: 6},
+					ScriptRange{Low: 6, High: 19, Spaces: []int{}, TargetScript: "_unknown", RuneCount: 7},
+				},
+				RuneCount: map[string]int{
+					"Latin":    6,
+					"_unknown": 7,
+				},
+				Text: inputs[15],
 			},
 		},
 	}
@@ -240,7 +277,7 @@ func TestAnalyzeStringRaw(t *testing.T) {
 		eOut  TextAnalysis
 	}{
 		{
-			input: "basic latin",
+			input: inputs[0],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
 					ScriptRange{Low: 0, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
@@ -251,11 +288,11 @@ func TestAnalyzeStringRaw(t *testing.T) {
 					"Latin":  10,
 					"Common": 1,
 				},
-				Text: "basic latin",
+				Text: inputs[0],
 			},
 		},
 		{
-			input: "trailing tab	",
+			input: inputs[1],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
 					ScriptRange{Low: 0, High: 7, Spaces: []int{}, TargetScript: "Latin", RuneCount: 8},
@@ -267,11 +304,11 @@ func TestAnalyzeStringRaw(t *testing.T) {
 					"Latin":  11,
 					"Common": 2,
 				},
-				Text: "trailing tab	",
+				Text: inputs[1],
 			},
 		},
 		{
-			input: "Small text. \"$\", \"£\" and \"¥\" are currencies.",
+			input: inputs[2],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
 					ScriptRange{Low: 0, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
@@ -289,11 +326,11 @@ func TestAnalyzeStringRaw(t *testing.T) {
 					"Latin":  25,
 					"Common": 19,
 				},
-				Text: "Small text. \"$\", \"£\" and \"¥\" are currencies.",
+				Text: inputs[2],
 			},
 		},
 		{
-			input: "latin with 🖖",
+			input: inputs[3],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
 					ScriptRange{Low: 0, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
@@ -305,11 +342,11 @@ func TestAnalyzeStringRaw(t *testing.T) {
 					"Latin":  9,
 					"Common": 3,
 				},
-				Text: "latin with 🖖",
+				Text: inputs[3],
 			},
 		},
 		{
-			input: "기본 한국어",
+			input: inputs[4],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
 					ScriptRange{Low: 0, High: 5, Spaces: []int{}, TargetScript: "Hangul", RuneCount: 2},
@@ -320,11 +357,11 @@ func TestAnalyzeStringRaw(t *testing.T) {
 					"Hangul": 5,
 					"Common": 1,
 				},
-				Text: "기본 한국어",
+				Text: inputs[4],
 			},
 		},
 		{
-			input: "基本的な日本語",
+			input: inputs[5],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
 					ScriptRange{Low: 0, High: 8, Spaces: []int{}, TargetScript: "Han", RuneCount: 3},
@@ -335,11 +372,11 @@ func TestAnalyzeStringRaw(t *testing.T) {
 					"Hiragana": 1,
 					"Han":      6,
 				},
-				Text: "基本的な日本語",
+				Text: inputs[5],
 			},
 		},
 		{
-			input: "ウーロン茶",
+			input: inputs[6],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
 					ScriptRange{Low: 0, High: 2, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 1},
@@ -352,11 +389,11 @@ func TestAnalyzeStringRaw(t *testing.T) {
 					"Common":   1,
 					"Han":      1,
 				},
-				Text: "ウーロン茶",
+				Text: inputs[6],
 			},
 		},
 		{
-			input: "私はエンジニアです",
+			input: inputs[7],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
 					ScriptRange{Low: 0, High: 2, Spaces: []int{}, TargetScript: "Han", RuneCount: 1},
@@ -369,11 +406,11 @@ func TestAnalyzeStringRaw(t *testing.T) {
 					"Hiragana": 3,
 					"Katakana": 5,
 				},
-				Text: "私はエンジニアです",
+				Text: inputs[7],
 			},
 		},
 		{
-			input: "ティー私はエンジニアです",
+			input: inputs[8],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
 					ScriptRange{Low: 0, High: 5, Spaces: []int{}, TargetScript: "Katakana", RuneCount: 2},
@@ -389,11 +426,11 @@ func TestAnalyzeStringRaw(t *testing.T) {
 					"Katakana": 7,
 					"Common":   1,
 				},
-				Text: "ティー私はエンジニアです",
+				Text: inputs[8],
 			},
 		},
 		{
-			input: "私はエンジニアです ティー",
+			input: inputs[9],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
 					ScriptRange{Low: 0, High: 2, Spaces: []int{}, TargetScript: "Han", RuneCount: 1},
@@ -410,11 +447,11 @@ func TestAnalyzeStringRaw(t *testing.T) {
 					"Katakana": 7,
 					"Common":   2,
 				},
-				Text: "私はエンジニアです ティー",
+				Text: inputs[9],
 			},
 		},
 		{
-			input: "आधारभूत देवनागरी",
+			input: inputs[10],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
 					ScriptRange{Low: 0, High: 20, Spaces: []int{}, TargetScript: "Devanagari", RuneCount: 7},
@@ -425,11 +462,11 @@ func TestAnalyzeStringRaw(t *testing.T) {
 					"Devanagari": 15,
 					"Common":     1,
 				},
-				Text: "आधारभूत देवनागरी",
+				Text: inputs[10],
 			},
 		},
 		{
-			input: "mixed 언어 传入 🚀!",
+			input: inputs[11],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
 					ScriptRange{Low: 0, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
@@ -445,11 +482,11 @@ func TestAnalyzeStringRaw(t *testing.T) {
 					"Han":    2,
 					"Common": 5,
 				},
-				Text: "mixed 언어 传入 🚀!",
+				Text: inputs[11],
 			},
 		},
 		{
-			input: "/k͜p/",
+			input: inputs[12],
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
 					ScriptRange{Low: 0, High: 0, Spaces: []int{}, TargetScript: "Common", RuneCount: 1},
@@ -463,11 +500,11 @@ func TestAnalyzeStringRaw(t *testing.T) {
 					"Common":    2,
 					"Inherited": 1,
 				},
-				Text: "/k͜p/",
+				Text: inputs[12],
 			},
 		},
 		{
-			input: "ä ä", // ä and a + ¨
+			input: inputs[13], // ä and a + ¨
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
 					ScriptRange{Low: 0, High: 1, Spaces: []int{}, TargetScript: "Latin", RuneCount: 1},
@@ -480,11 +517,11 @@ func TestAnalyzeStringRaw(t *testing.T) {
 					"Common":    1,
 					"Inherited": 1,
 				},
-				Text: "ä ä",
+				Text: inputs[13],
 			},
 		},
 		{
-			input: "базовый русский", // cyrillic script isn't part of our default
+			input: inputs[14], // cyrillic script isn't part of our default
 			eOut: TextAnalysis{
 				ScriptRanges: []ScriptRange{
 					ScriptRange{Low: 0, High: 13, Spaces: []int{}, TargetScript: "_unknown", RuneCount: 7},
@@ -495,7 +532,7 @@ func TestAnalyzeStringRaw(t *testing.T) {
 					"_unknown": 14,
 					"Common":   1,
 				},
-				Text: "базовый русский",
+				Text: inputs[14],
 			},
 		},
 	}
