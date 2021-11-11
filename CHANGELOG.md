@@ -97,6 +97,7 @@ The following sections list the changes for unreleased.
    Updated reva to v1.16 This update includes: * TODO before oCIS release
 
    https://github.com/owncloud/ocis/pull/2737
+   https://github.com/owncloud/ocis/pull/2726
 # Changelog for [1.14.0] (2021-10-27)
 
 The following sections list the changes for 1.14.0.
