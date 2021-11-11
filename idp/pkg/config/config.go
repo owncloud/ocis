@@ -98,15 +98,17 @@ type Settings struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File    string     `mapstructure:"file"`
-	Log     shared.Log `mapstructure:"log"`
-	Debug   Debug      `mapstructure:"debug"`
-	HTTP    HTTP       `mapstructure:"http"`
-	Tracing Tracing    `mapstructure:"tracing"`
-	Asset   Asset      `mapstructure:"asset"`
-	IDP     Settings   `mapstructure:"idp"`
-	Ldap    Ldap       `mapstructure:"ldap"`
-	Service Service    `mapstructure:"service"`
+	*shared.Commons
+
+	File    string      `mapstructure:"file"`
+	Log     *shared.Log `mapstructure:"log"`
+	Debug   Debug       `mapstructure:"debug"`
+	HTTP    HTTP        `mapstructure:"http"`
+	Tracing Tracing     `mapstructure:"tracing"`
+	Asset   Asset       `mapstructure:"asset"`
+	IDP     Settings    `mapstructure:"idp"`
+	Ldap    Ldap        `mapstructure:"ldap"`
+	Service Service     `mapstructure:"service"`
 
 	Context    context.Context
 	Supervised bool
@@ -119,7 +121,6 @@ func New() *Config {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Log: shared.Log{},
 		Debug: Debug{
 			Addr: "127.0.0.1:9134",
 		},
@@ -188,15 +189,4 @@ func DefaultConfig() *Config {
 			Namespace: "com.owncloud.web",
 		},
 	}
-}
-
-// GetEnv fetches a list of known env variables for this extension. It is to be used by gookit, as it provides a list
-// with all the environment variables an extension supports.
-func GetEnv() []string {
-	var r = make([]string, len(structMappings(DefaultConfig())))
-	for i := range structMappings(DefaultConfig()) {
-		r = append(r, structMappings(DefaultConfig())[i].EnvVars...)
-	}
-
-	return r
 }

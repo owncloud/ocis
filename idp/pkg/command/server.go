@@ -4,15 +4,12 @@ import (
 	"context"
 	"strings"
 
-	gofig "github.com/gookit/config/v2"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/idp/pkg/config"
 	"github.com/owncloud/ocis/idp/pkg/metrics"
 	"github.com/owncloud/ocis/idp/pkg/server/debug"
 	"github.com/owncloud/ocis/idp/pkg/server/http"
 	"github.com/owncloud/ocis/idp/pkg/tracing"
-	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/urfave/cli/v2"
 )
@@ -23,9 +20,6 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:  "server",
 		Usage: "Start integrated server",
 		Before: func(ctx *cli.Context) error {
-			// remember shared logging info to prevent empty overwrites
-			inLog := cfg.Log
-
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
@@ -44,19 +38,6 @@ func Server(cfg *config.Config) *cli.Command {
 
 			if err := ParseConfig(ctx, cfg); err != nil {
 				return err
-			}
-
-			if (cfg.Log == shared.Log{}) && (inLog != shared.Log{}) {
-				// set the default to the parent config
-				cfg.Log = inLog
-
-				// and parse the environment
-				conf := &gofig.Config{}
-				conf.LoadOSEnv(config.GetEnv(), false)
-				bindings := config.StructMappings(cfg)
-				if err := ociscfg.BindEnv(conf, bindings); err != nil {
-					return err
-				}
 			}
 
 			return nil
