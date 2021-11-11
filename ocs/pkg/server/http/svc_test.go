@@ -551,7 +551,7 @@ func init() {
 				Path: dataPath,
 			},
 		},
-		Log: shared.Log{
+		Log: &shared.Log{
 			Level:  "info",
 			Pretty: true,
 			Color:  true,
@@ -562,7 +562,7 @@ func init() {
 	var err error
 
 	if hdlr, err = accountsSvc.New(
-		accountsSvc.Logger(oclog.LoggerFromConfig("accounts", c.Log)),
+		accountsSvc.Logger(oclog.LoggerFromConfig("accounts", *c.Log)),
 		accountsSvc.Config(c),
 		accountsSvc.RoleService(buildRoleServiceMock()),
 	); err != nil {
