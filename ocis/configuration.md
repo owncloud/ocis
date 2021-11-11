@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-11-11T08:17:03+0000"
+date: "2021-11-11T10:08:05+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -112,6 +112,64 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
+### ocis run
+
+Runs an extension
+
+Usage: `ocis run [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### ocis kill
+
+Kill an extension by name
+
+Usage: `ocis kill [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### ocis health
 
 Check health status
@@ -135,35 +193,6 @@ Usage: `ocis health [command options] [arguments...]`
 
 -debug-addr |  $OCIS_DEBUG_ADDR
 : Address to debug endpoint. Default: `127.0.0.1:9010`.
-
-
-
-
-
-
-
-
-
-### ocis run
-
-Runs an extension
-
-Usage: `ocis run [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -255,35 +284,6 @@ Usage: `ocis list [command options] [arguments...]`
 
 
 
-### ocis kill
-
-Kill an extension by name
-
-Usage: `ocis kill [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
@@ -292,9 +292,37 @@ There are more subcommands to start the individual extensions. Please check the 
 
 Start proxy server
 
+#### ocis settings
+
+Start settings server
+
 #### ocis storage-frontend
 
 Start storage frontend
+
+#### ocis storage-metadata
+
+Start storage and data service for metadata
+
+#### ocis storage-sharing
+
+Start storage sharing service
+
+#### ocis webdav
+
+Start webdav server
+
+#### ocis storage-gateway
+
+Start storage gateway
+
+#### ocis storage-userprovider
+
+Start storage userprovider service
+
+#### ocis store
+
+Start a go-micro store
 
 #### ocis storage-users
 
@@ -308,75 +336,47 @@ Start accounts server
 
 Start storage auth-basic service
 
-#### ocis glauth
+#### ocis storage-public-link
 
-Start glauth server
-
-#### ocis storage-app-provider
-
-Start storage app-provider service
-
-#### ocis storage-home
-
-Start storage and data provider for /home mount
-
-#### ocis storage-metadata
-
-Start storage and data service for metadata
-
-#### ocis ocs
-
-Start ocs server
+Start storage public link storage
 
 #### ocis storage-auth-bearer
 
 Start storage auth-bearer service
 
-#### ocis version
+#### ocis ocs
 
-Lists running services with version
-
-#### ocis storage-userprovider
-
-Start storage userprovider service
-
-#### ocis store
-
-Start a go-micro store
-
-#### ocis thumbnails
-
-Start thumbnails server
-
-#### ocis webdav
-
-Start webdav server
+Start ocs server
 
 #### ocis storage-groupprovider
 
 Start storage groupprovider service
 
-#### ocis storage-sharing
+#### ocis thumbnails
 
-Start storage sharing service
-
-#### ocis storage-gateway
-
-Start storage gateway
-
-#### ocis storage-public-link
-
-Start storage public link storage
+Start thumbnails server
 
 #### ocis web
 
 Start web server
 
+#### ocis storage-app-provider
+
+Start storage app-provider service
+
+#### ocis glauth
+
+Start glauth server
+
 #### ocis idp
 
 Start idp server
 
-#### ocis settings
+#### ocis storage-home
 
-Start settings server
+Start storage and data provider for /home mount
+
+#### ocis version
+
+Lists running services with version
 
