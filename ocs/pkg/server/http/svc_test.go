@@ -698,7 +698,7 @@ func getService() svc.Service {
 		TokenManager: config.TokenManager{
 			JWTSecret: jwtSecret,
 		},
-		Log: shared.Log{
+		Log: &shared.Log{
 			Level: "debug",
 		},
 	}
