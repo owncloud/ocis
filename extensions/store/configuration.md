@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-11-10T16:54:32+0000"
+date: "2021-11-11T00:54:21+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/store/templates
@@ -34,46 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Command-line flags
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### store ocis-store
-
-Service to store values for ocis extensions
-
-Usage: `store ocis-store [command options] [arguments...]`
-
-
--config-file |  $STORE_CONFIG_FILE
-: Path to config file.
-
-
--log-level |  $STORE_LOG_LEVEL , $OCIS_LOG_LEVEL
-: Set logging level.
-
-
--log-pretty |  $STORE_LOG_PRETTY , $OCIS_LOG_PRETTY
-: Enable pretty logging.
-
-
--log-color |  $STORE_LOG_COLOR , $OCIS_LOG_COLOR
-: Enable colored logging.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### store server
 
@@ -195,6 +155,46 @@ Usage: `store health [command options] [arguments...]`
 
 -debug-addr |  $STORE_DEBUG_ADDR
 : Address to debug endpoint. Default: `"127.0.0.1:9464"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### store ocis-store
+
+Service to store values for ocis extensions
+
+Usage: `store ocis-store [command options] [arguments...]`
+
+
+-config-file |  $STORE_CONFIG_FILE
+: Path to config file.
+
+
+-log-level |  $STORE_LOG_LEVEL , $OCIS_LOG_LEVEL
+: Set logging level.
+
+
+-log-pretty |  $STORE_LOG_PRETTY , $OCIS_LOG_PRETTY
+: Enable pretty logging.
+
+
+-log-color |  $STORE_LOG_COLOR , $OCIS_LOG_COLOR
+: Enable colored logging.
+
 
 
 
