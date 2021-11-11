@@ -61,3 +61,10 @@ Feature: download multiple resources bundled into an archive
       | textfile1.txt               | other data |
       | my_data/textfile2.txt       | some data  |
       | more_data/an_other_file.txt | more data  |
+
+  Scenario: download a single file as different user
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
+    When user "Brian" downloads the archive of "/textfile0.txt" of user "Alice" using the resource id
+    Then the HTTP status code should be "400"
+

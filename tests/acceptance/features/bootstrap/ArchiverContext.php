@@ -100,6 +100,34 @@ class ArchiverContext implements Context {
 	}
 
 	/**
+	 * @When user :downloader downloads the archive of :item of user :owner using the resource id
+	 *
+	 * @param string $downloader Who sends the request
+	 * @param string $resource
+	 * @param string $owner Who is the real owner of the file
+	 *
+	 * @return void
+	 *
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userDownloadsTheArchiveOfItemOfUserUsingTheResourceId(
+		string $downloader,
+		string $resource,
+		string $owner
+	): void {
+		$resourceId = $this->featureContext->getFileIdForPath($owner, $resource);
+		$downloader = $this->featureContext->getActualUsername($downloader);
+		$this->featureContext->setResponse(
+			HttpRequestHelper::get(
+				$this->featureContext->getBaseUrl() . '/archiver?id=' . $resourceId,
+				'',
+				$downloader,
+				$this->featureContext->getPasswordForUser($downloader),
+			)
+		);
+	}
+
+	/**
 	 * @When user :arg1 downloads the archive of these items using the resource ids
 	 *
 	 * @param string $user
