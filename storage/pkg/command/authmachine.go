@@ -123,9 +123,7 @@ type AuthMachineSutureService struct {
 
 // NewAuthMachineSutureService creates a new gateway.AuthMachineSutureService
 func NewAuthMachine(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.AuthMachine.Supervised = true
-	}
+	cfg.Storage.Log = cfg.Commons.Log
 	return AuthMachineSutureService{
 		cfg: cfg.Storage,
 	}

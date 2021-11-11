@@ -335,11 +335,9 @@ type FrontendSutureService struct {
 	cfg *config.Config
 }
 
-// NewFrontendSutureService creates a new frontend.FrontendSutureService
+// NewFrontend creates a new frontend.FrontendSutureService
 func NewFrontend(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.Frontend.Supervised = true
-	}
+	cfg.Storage.Log = cfg.Commons.Log
 	return FrontendSutureService{
 		cfg: cfg.Storage,
 	}

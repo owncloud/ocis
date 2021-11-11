@@ -186,9 +186,7 @@ type UserProviderSutureService struct {
 
 // NewUserProviderSutureService creates a new storage.UserProvider
 func NewUserProvider(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.Users.Supervised = true
-	}
+	cfg.Storage.Log = cfg.Commons.Log
 	return UserProviderSutureService{
 		cfg: cfg.Storage,
 	}

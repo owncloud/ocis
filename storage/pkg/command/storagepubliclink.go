@@ -124,9 +124,7 @@ type StoragePublicLinkSutureService struct {
 
 // NewStoragePublicLinkSutureService creates a new storage.StoragePublicLinkSutureService
 func NewStoragePublicLink(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.StoragePublicLink.Supervised = true
-	}
+	cfg.Storage.Log = cfg.Commons.Log
 	return StoragePublicLinkSutureService{
 		cfg: cfg.Storage,
 	}

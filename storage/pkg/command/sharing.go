@@ -191,9 +191,7 @@ type SharingSutureService struct {
 
 // NewSharingSutureService creates a new store.SharingSutureService
 func NewSharing(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.Sharing.Supervised = true
-	}
+	cfg.Storage.Log = cfg.Commons.Log
 	return SharingSutureService{
 		cfg: cfg.Storage,
 	}

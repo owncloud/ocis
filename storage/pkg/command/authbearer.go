@@ -127,9 +127,7 @@ type AuthBearerSutureService struct {
 
 // NewAuthBearerSutureService creates a new gateway.AuthBearerSutureService
 func NewAuthBearer(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.AuthBearer.Supervised = true
-	}
+	cfg.Storage.Log = cfg.Commons.Log
 	return AuthBearerSutureService{
 		cfg: cfg.Storage,
 	}

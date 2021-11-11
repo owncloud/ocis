@@ -1,6 +1,10 @@
 package config
 
-import "context"
+import (
+	"context"
+
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+)
 
 // Log defines the available logging configuration.
 type Log struct {
@@ -497,7 +501,7 @@ type Asset struct {
 // Config combines all available configuration parts.
 type Config struct {
 	File    string
-	Log     Log
+	Log     *shared.Log
 	Debug   Debug
 	Reva    Reva
 	Tracing Tracing
@@ -506,5 +510,7 @@ type Config struct {
 
 // New initializes a new configuration with or without defaults.
 func New() *Config {
-	return &Config{}
+	return &Config{
+		Log: &shared.Log{},
+	}
 }

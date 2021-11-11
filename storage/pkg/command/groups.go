@@ -165,9 +165,7 @@ type GroupSutureService struct {
 
 // NewGroupProviderSutureService creates a new storage.GroupProvider
 func NewGroupProvider(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.Groups.Supervised = true
-	}
+	cfg.Storage.Log = cfg.Commons.Log
 	return GroupSutureService{
 		cfg: cfg.Storage,
 	}

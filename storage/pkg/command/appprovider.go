@@ -132,9 +132,7 @@ type AppProviderSutureService struct {
 
 // NewAppProvider creates a new store.AppProviderSutureService
 func NewAppProvider(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.AppProvider.Supervised = true
-	}
+	cfg.Storage.Log = cfg.Commons.Log
 	return AppProviderSutureService{
 		cfg: cfg.Storage,
 	}

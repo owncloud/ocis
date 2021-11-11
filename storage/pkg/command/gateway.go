@@ -351,9 +351,7 @@ type GatewaySutureService struct {
 
 // NewGatewaySutureService creates a new gateway.GatewaySutureService
 func NewGateway(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.Gateway.Supervised = true
-	}
+	cfg.Storage.Log = cfg.Commons.Log
 	return GatewaySutureService{
 		cfg: cfg.Storage,
 	}

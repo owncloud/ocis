@@ -151,9 +151,7 @@ type AuthBasicSutureService struct {
 
 // NewAuthBasicSutureService creates a new store.AuthBasicSutureService
 func NewAuthBasic(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.AuthBasic.Supervised = true
-	}
+	cfg.Storage.Log = cfg.Commons.Log
 	return AuthBasicSutureService{
 		cfg: cfg.Storage,
 	}

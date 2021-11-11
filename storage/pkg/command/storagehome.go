@@ -150,9 +150,7 @@ type StorageHomeSutureService struct {
 
 // NewStorageHomeSutureService creates a new storage.StorageHomeSutureService
 func NewStorageHome(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.StorageHome.Supervised = true
-	}
+	cfg.Storage.Log = cfg.Commons.Log
 	return StorageHomeSutureService{
 		cfg: cfg.Storage,
 	}
