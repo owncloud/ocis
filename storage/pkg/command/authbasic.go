@@ -151,7 +151,7 @@ type AuthBasicSutureService struct {
 
 // NewAuthBasicSutureService creates a new store.AuthBasicSutureService
 func NewAuthBasic(cfg *ociscfg.Config) suture.Service {
-	cfg.Storage.Log = cfg.Commons.Log
+	cfg.Storage.Commons = cfg.Commons
 	return AuthBasicSutureService{
 		cfg: cfg.Storage,
 	}

@@ -150,7 +150,7 @@ type StorageHomeSutureService struct {
 
 // NewStorageHomeSutureService creates a new storage.StorageHomeSutureService
 func NewStorageHome(cfg *ociscfg.Config) suture.Service {
-	cfg.Storage.Log = cfg.Commons.Log
+	cfg.Storage.Commons = cfg.Commons
 	return StorageHomeSutureService{
 		cfg: cfg.Storage,
 	}

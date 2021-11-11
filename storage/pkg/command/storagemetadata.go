@@ -166,7 +166,7 @@ type MetadataSutureService struct {
 
 // NewSutureService creates a new storagemetadata.SutureService
 func NewStorageMetadata(cfg *ociscfg.Config) suture.Service {
-	cfg.Storage.Log = cfg.Commons.Log
+	cfg.Storage.Commons = cfg.Commons
 	return MetadataSutureService{
 		cfg: cfg.Storage,
 	}

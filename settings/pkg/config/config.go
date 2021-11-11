@@ -68,9 +68,11 @@ type TokenManager struct {
 
 // Config combines all available configuration parts.
 type Config struct {
+	*shared.Commons
+
 	File         string
 	Service      Service
-	Log          shared.Log
+	Log          *shared.Log
 	Debug        Debug
 	HTTP         HTTP
 	GRPC         GRPC
@@ -90,7 +92,6 @@ func New() *Config {
 // DefaultConfig provides sane bootstrapping defaults.
 func DefaultConfig() *Config {
 	return &Config{
-		Log: shared.Log{},
 		Service: Service{
 			Name:     "settings",
 			DataPath: path.Join(defaults.BaseDataPath(), "settings"),
@@ -131,15 +132,4 @@ func DefaultConfig() *Config {
 			JWTSecret: "Pive-Fumkiu4",
 		},
 	}
-}
-
-// GetEnv fetches a list of known env variables for this extension. It is to be used by gookit, as it provides a list
-// with all the environment variables an extension supports.
-func GetEnv() []string {
-	var r = make([]string, len(structMappings(&Config{})))
-	for i := range structMappings(&Config{}) {
-		r = append(r, structMappings(&Config{})[i].EnvVars...)
-	}
-
-	return r
 }

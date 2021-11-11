@@ -159,6 +159,11 @@ func Start(o ...Option) error {
 		FailureBackoff:   3 * time.Second,
 	})
 
+	s.cfg.Storage.Log.Color = s.cfg.Log.Color
+	s.cfg.Storage.Log.Level = s.cfg.Log.Level
+	s.cfg.Storage.Log.Pretty = s.cfg.Log.Pretty
+	s.cfg.Storage.Log.File = s.cfg.Log.File
+
 	if err = rpc.Register(s); err != nil {
 		if s != nil {
 			s.Log.Fatal().Err(err)

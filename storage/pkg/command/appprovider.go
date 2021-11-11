@@ -132,7 +132,7 @@ type AppProviderSutureService struct {
 
 // NewAppProvider creates a new store.AppProviderSutureService
 func NewAppProvider(cfg *ociscfg.Config) suture.Service {
-	cfg.Storage.Log = cfg.Commons.Log
+	cfg.Storage.Commons = cfg.Commons
 	return AppProviderSutureService{
 		cfg: cfg.Storage,
 	}

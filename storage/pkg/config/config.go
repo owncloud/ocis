@@ -500,6 +500,8 @@ type Asset struct {
 
 // Config combines all available configuration parts.
 type Config struct {
+	*shared.Commons
+
 	File    string
 	Log     *shared.Log
 	Debug   Debug
