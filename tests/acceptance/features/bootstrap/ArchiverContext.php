@@ -63,16 +63,29 @@ class ArchiverContext implements Context {
 	}
 
 	/**
-	 * @When user :user downloads the archive of :resourceId using the resource id
+	 * @When user :user downloads the archive of :resourceId using the resource id and setting these headers
 	 *
 	 * @param string $user
 	 * @param string $resource
+	 * @param TableNode $headersTable
 	 *
 	 * @return void
 	 *
 	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
-	public function userDownloadsTheArchiveOfUsingTheResourceId(string $user, string $resource): void {
+	public function userDownloadsTheArchiveOfUsingTheResourceId(
+		string $user,
+		string $resource,
+		TableNode $headersTable
+	): void {
+		$this->featureContext->verifyTableNodeColumns(
+			$headersTable,
+			['header', 'value']
+		);
+		$headers = [];
+		foreach ($headersTable as $row) {
+			$headers[$row['header']] = $row ['value'];
+		}
 		$resourceId = $this->featureContext->getFileIdForPath($user, $resource);
 		$user = $this->featureContext->getActualUsername($user);
 		$this->featureContext->setResponse(
@@ -80,25 +93,27 @@ class ArchiverContext implements Context {
 				$this->featureContext->getBaseUrl() . '/archiver?id=' . $resourceId,
 				'',
 				$user,
-				$this->featureContext->getPasswordForUser($user)
+				$this->featureContext->getPasswordForUser($user),
+				$headers
 			)
 		);
 	}
 
 	/**
-	 * @Then the downloaded archive should contain these files:
+	 * @Then the downloaded :type archive should contain these files:
 	 *
+	 * @param string $type
 	 * @param TableNode $expectedFiles
 	 *
 	 * @return void
 	 *
 	 * @throws Exception
 	 */
-	public function theDownloadedArchiveShouldContainTheseFiles(TableNode $expectedFiles) {
+	public function theDownloadedArchiveShouldContainTheseFiles(string $type, TableNode $expectedFiles) {
 		$this->featureContext->verifyTableNodeColumns($expectedFiles, ['name', 'content']);
 		$tempFile = \tempnam(\sys_get_temp_dir(), 'OcAcceptanceTests_');
 		\unlink($tempFile); // we only need the name
-		$tempFile = $tempFile . '.tar'; // it needs the extension
+		$tempFile = $tempFile . '.' . $type; // it needs the extension
 		\file_put_contents($tempFile, $this->featureContext->getResponse()->getBody()->getContents());
 		$archive = UnifiedArchive::open($tempFile);
 		foreach ($expectedFiles->getHash() as $expectedFile) {
