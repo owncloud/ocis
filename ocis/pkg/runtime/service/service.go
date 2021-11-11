@@ -167,6 +167,10 @@ func Start(o ...Option) error {
 		}
 	}
 
+	if s.cfg.Storage.Log == nil {
+		s.cfg.Storage.Log = &shared.Log{}
+	}
+
 	s.cfg.Storage.Log.Color = s.cfg.Commons.Color
 	s.cfg.Storage.Log.Level = s.cfg.Commons.Level
 	s.cfg.Storage.Log.Pretty = s.cfg.Commons.Pretty

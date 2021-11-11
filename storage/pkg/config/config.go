@@ -512,7 +512,5 @@ type Config struct {
 
 // New initializes a new configuration with or without defaults.
 func New() *Config {
-	return &Config{
-		Log: &shared.Log{},
-	}
+	return &Config{}
 }

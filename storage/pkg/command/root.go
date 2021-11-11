@@ -4,6 +4,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/storage/pkg/config"
@@ -25,10 +27,11 @@ func Execute(cfg *config.Config) error {
 				Email: "support@owncloud.com",
 			},
 		},
-
-		//Flags: flagset.RootWithConfig(cfg),
-
 		Before: func(c *cli.Context) error {
+			if cfg.Log == nil {
+				cfg.Log = &shared.Log{}
+			}
+
 			logger := NewLogger(cfg)
 
 			viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
