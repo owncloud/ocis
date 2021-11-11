@@ -47,7 +47,7 @@ type Tracing struct {
 
 // Reva defines all available REVA configuration.
 type Reva struct {
-	Address string `address`
+	Address string `mapstructure:"address"`
 }
 
 // TokenManager is the config for using the reva token manager
@@ -72,7 +72,7 @@ type Config struct {
 	TokenManager       TokenManager       `mapstructure:"token_manager"`
 	Service            Service            `mapstructure:"service"`
 	AccountBackend     string             `mapstructure:"account_backend"`
-	Reva        Reva             `mapstructure:"reva"`
+	Reva               Reva               `mapstructure:"reva"`
 	StorageUsersDriver string             `mapstructure:"storage_users_driver"`
 	MachineAuthAPIKey  string             `mapstructure:"machine_auth_api_key"`
 	IdentityManagement IdentityManagement `mapstructure:"identity_management"`
@@ -121,7 +121,7 @@ func DefaultConfig() *Config {
 			Namespace: "com.owncloud.web",
 		},
 		AccountBackend:     "accounts",
-		Reva:        Reva{Address: "127.0.0.1:9142"},
+		Reva:               Reva{Address: "127.0.0.1:9142"},
 		StorageUsersDriver: "ocis",
 		MachineAuthAPIKey:  "change-me-please",
 		IdentityManagement: IdentityManagement{
