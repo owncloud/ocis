@@ -100,6 +100,37 @@ class ArchiverContext implements Context {
 	}
 
 	/**
+	 * @When user :arg1 downloads the archive of these items using the resource ids
+	 *
+	 * @param string $user
+	 * @param TableNode $items
+	 *
+	 * @return void
+	 *
+	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 */
+	public function userDownloadsTheArchiveOfTheseItemsUsingTheResourceIds(
+		string $user,
+		TableNode $items
+	): void {
+		$user = $this->featureContext->getActualUsername($user);
+		$resourceIdsString = '';
+		foreach ($items->getRows() as $item) {
+			$fileId = $this->featureContext->getFileIdForPath($user, $item[0]);
+			$resourceIdsString .= 'id=' . $fileId . '&';
+		}
+		$resourceIdsString = \rtrim($resourceIdsString, '&');
+		$this->featureContext->setResponse(
+			HttpRequestHelper::get(
+				$this->featureContext->getBaseUrl() . '/archiver?' . $resourceIdsString,
+				'',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+			)
+		);
+	}
+
+	/**
 	 * @Then the downloaded :type archive should contain these files:
 	 *
 	 * @param string $type
