@@ -92,6 +92,41 @@ pipelineVolumeOC10Tests = \
         "temp": {},
     }
 
+# trigger for pipelines which run on master, version tags and pull requests
+PIPELINE_TRIGGER_ALL = \
+    {
+        "ref": [
+            "refs/heads/master",
+            "refs/tags/v*",
+            "refs/pull/**",
+        ],
+    }
+
+# trigger for piplines only to run on pull requests
+PIPELINE_TRIGGER_PULL_ONLY = \
+    {
+        "ref": [
+            "refs/pull/**",
+        ],
+    }
+
+# trigger for submodule release pipelines
+PIPELINE_TRIGGER_SUBMODULE_RELEASE = \
+    {
+        "ref": [
+            "refs/tags/*/v*",
+        ],
+    }
+
+# trigger for release pipelines
+PIPELINE_TRIGGER_RELEASE = \
+    {
+        "ref": [
+            "refs/heads/master",
+            "refs/tags/v*",
+        ],
+    }
+
 def pipelineDependsOn(pipeline, dependant_pipelines):
     if "depends_on" in pipeline.keys():
         pipeline["depends_on"] = pipeline["depends_on"] + getPipelineNames(dependant_pipelines)
@@ -188,47 +223,26 @@ def testOcisModules(ctx):
     return pipelines + [scan_result_upload]
 
 def checkForRecentBuilds(ctx):
-    pipelines = []
-
-    result = {
+    return [{
         "kind": "pipeline",
         "type": "docker",
         "name": "stop-recent-builds",
-        "steps": stopRecentBuilds(ctx),
-        "depends_on": [],
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/**",
-                "refs/pull/**",
-            ],
-        },
-    }
-
-    pipelines.append(result)
-
-    return pipelines
-
-def stopRecentBuilds(ctx):
-    return [{
-        "name": "stop-recent-builds",
-        "image": "drone/cli:alpine",
-        "environment": {
-            "DRONE_SERVER": "https://drone.owncloud.com",
-            "DRONE_TOKEN": {
-                "from_secret": "drone_token",
+        "steps": [{
+            "name": "stop-recent-builds",
+            "image": "drone/cli:alpine",
+            "environment": {
+                "DRONE_SERVER": "https://drone.owncloud.com",
+                "DRONE_TOKEN": {
+                    "from_secret": "drone_token",
+                },
             },
-        },
-        "commands": [
-            "drone build ls %s --status running > /drone/src/recentBuilds.txt" % ctx.repo.slug,
-            "drone build info %s ${DRONE_BUILD_NUMBER} > /drone/src/thisBuildInfo.txt" % ctx.repo.slug,
-            "cd /drone/src && ./tests/acceptance/cancelBuilds.sh",
-        ],
-        "when": {
-            "event": [
-                "pull_request",
+            "commands": [
+                "drone build ls %s --status running > /drone/src/recentBuilds.txt" % ctx.repo.slug,
+                "drone build info %s ${DRONE_BUILD_NUMBER} > /drone/src/thisBuildInfo.txt" % ctx.repo.slug,
+                "cd /drone/src && ./tests/acceptance/cancelBuilds.sh",
             ],
-        },
+        }],
+        "trigger": PIPELINE_TRIGGER_PULL_ONLY,
     }]
 
 def testPipelines(ctx):
@@ -306,14 +320,11 @@ def testOcisModule(ctx, module):
             "arch": "amd64",
         },
         "steps": steps,
-        "trigger": {
+        "trigger": dictMerge(PIPELINE_TRIGGER_ALL, {
             "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
                 "refs/tags/%s/v*" % (module),
-                "refs/pull/**",
             ],
-        },
+        }),
         "volumes": [pipelineVolumeGo],
     }
 
@@ -330,13 +341,7 @@ def buildOcisBinaryForTesting(ctx):
                  makeGenerate("") +
                  build() +
                  rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis"),
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-                "refs/pull/**",
-            ],
-        },
+        "trigger": PIPELINE_TRIGGER_ALL,
         "volumes": [pipelineVolumeGo],
     }
 
@@ -416,13 +421,7 @@ def uploadScanResults(ctx):
                 ],
             },
         ],
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-                "refs/pull/**",
-            ],
-        },
+        "trigger": PIPELINE_TRIGGER_ALL,
     }
 
 def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
@@ -463,13 +462,7 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
         ] + failEarly(ctx, early_fail),
         "services": redisForOCStorage(storage),
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-                "refs/pull/**",
-            ],
-        },
+        "trigger": PIPELINE_TRIGGER_ALL,
         "volumes": [pipelineVolumeOC10Tests],
     }
 
@@ -512,13 +505,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
         ] + failEarly(ctx, early_fail),
         "services": redisForOCStorage(storage),
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-                "refs/pull/**",
-            ],
-        },
+        "trigger": PIPELINE_TRIGGER_ALL,
         "volumes": [pipelineVolumeOC10Tests],
     }
 
@@ -639,13 +626,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                        "temp": {},
                    }],
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-                "refs/pull/**",
-            ],
-        },
+        "trigger": PIPELINE_TRIGGER_ALL,
     }
 
 def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
@@ -704,13 +685,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                        "temp": {},
                    }],
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-                "refs/pull/**",
-            ],
-        },
+        "trigger": PIPELINE_TRIGGER_ALL,
     }
 
 def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
@@ -772,13 +747,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                        "temp": {},
                    }],
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-                "refs/pull/**",
-            ],
-        },
+        "trigger": PIPELINE_TRIGGER_ALL,
     }
 
 def failEarly(ctx, early_fail):
@@ -928,13 +897,7 @@ def dockerRelease(ctx, arch):
             },
         ],
         "depends_on": getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-                "refs/pull/**",
-            ],
-        },
+        "trigger": PIPELINE_TRIGGER_ALL,
         "volumes": [pipelineVolumeGo],
     }
 
@@ -999,13 +962,7 @@ def dockerEos(ctx):
             },
         ],
         "depends_on": getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-                "refs/pull/**",
-            ],
-        },
+        "trigger": PIPELINE_TRIGGER_ALL,
         "volumes": [pipelineVolumeGo],
     }
 
@@ -1118,13 +1075,7 @@ def binaryRelease(ctx, name):
             },
         ],
         "depends_on": getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-                "refs/pull/**",
-            ],
-        },
+        "trigger": PIPELINE_TRIGGER_ALL,
         "volumes": [pipelineVolumeGo],
     }
 
@@ -1164,11 +1115,7 @@ def releaseSubmodule(ctx):
             },
         ],
         "depends_on": depends,
-        "trigger": {
-            "ref": [
-                "refs/tags/*/v*",
-            ],
-        },
+        "trigger": PIPELINE_TRIGGER_SUBMODULE_RELEASE,
     }
 
 def releaseDockerManifest(ctx):
@@ -1197,12 +1144,7 @@ def releaseDockerManifest(ctx):
                 },
             },
         ],
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-            ],
-        },
+        "trigger": PIPELINE_TRIGGER_RELEASE,
     }
 
 def changelog(ctx):
@@ -1299,12 +1241,7 @@ def releaseDockerReadme(ctx):
                 },
             },
         ],
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-            ],
-        },
+        "trigger": PIPELINE_TRIGGER_RELEASE,
     }
 
 def docs(ctx):
@@ -1439,16 +1376,14 @@ def notify(ctx):
             },
         ],
         "depends_on": [],
-        "trigger": {
+        "trigger": dictMerge(PIPELINE_TRIGGER_RELEASE, {
             "ref": [
-                "refs/heads/master",
                 "refs/heads/release*",
-                "refs/tags/**",
             ],
             "status": [
                 "failure",
             ],
-        },
+        }),
     }
 
 def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
@@ -1671,12 +1606,7 @@ def deploy(ctx, config, rebuild):
                 },
             },
         ],
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-            ],
-        },
+        "trigger": PIPELINE_TRIGGER_RELEASE,
     }
 
 def checkStarlark():
@@ -1707,12 +1637,14 @@ def checkStarlark():
             },
         ],
         "depends_on": [],
-        "trigger": {
-            "ref": [
-                "refs/pull/**",
-            ],
-        },
+        "trigger": PIPELINE_TRIGGER_PULL_ONLY,
     }]
+
+def dictMerge(dictA, dictB):
+    res = {}
+    res.update(dictA)
+    res.update(dictB)
+    return res
 
 def genericCache(name, action, mounts, cache_key):
     rebuild = "false"
@@ -1774,17 +1706,12 @@ def genericCachePurge(ctx, name, cache_key):
                 ],
             },
         ],
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-                "refs/pull/**",
-            ],
+        "trigger": dictMerge(PIPELINE_TRIGGER_ALL, {
             "status": [
                 "success",
                 "failure",
             ],
-        },
+        }),
     }
 
 def genericBuildArtifactCache(ctx, name, action, path):
