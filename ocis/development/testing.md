@@ -98,7 +98,7 @@ git clone https://github.com/owncloud/core.git
 To start ocis:
 
 ```
-PROXY_ENABLE_BASIC_AUTH=true bin/ocis server
+OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true bin/ocis server
 ```
 
 `PROXY_ENABLE_BASIC_AUTH` will allow the acceptance tests to make requests against the provisioning api (and other endpoints) using basic auth.

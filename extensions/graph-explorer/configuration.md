@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-11-11T04:32:12+0000"
+date: "2021-11-11T06:48:49+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/graph-explorer/templates
@@ -73,37 +73,6 @@ Usage: `graph-explorer [global options] command [command options] [arguments...]
 
 
 ## Sub Commands
-
-### graph-explorer health
-
-Check health status
-
-Usage: `graph-explorer health [command options] [arguments...]`
-
-
-
-
-
--debug-addr |  $GRAPH_EXPLORER_DEBUG_ADDR
-: Address to debug endpoint. Default: `"127.0.0.1:9136"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### graph-explorer server
 
@@ -186,4 +155,35 @@ Usage: `graph-explorer server [command options] [arguments...]`
 
 -extensions | 
 : Run specific extensions during supervised mode. This flag is set by the runtime.
+
+### graph-explorer health
+
+Check health status
+
+Usage: `graph-explorer health [command options] [arguments...]`
+
+
+
+
+
+-debug-addr |  $GRAPH_EXPLORER_DEBUG_ADDR
+: Address to debug endpoint. Default: `"127.0.0.1:9136"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
