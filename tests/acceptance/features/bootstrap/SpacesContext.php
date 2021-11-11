@@ -20,7 +20,6 @@
  *
  */
 use Behat\Behat\Context\Context;
-use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
@@ -40,6 +39,34 @@ class SpacesContext implements Context {
 	 * @var FeatureContext
 	 */
 	private FeatureContext $featureContext;
+
+	/**
+	 * @var array key is space name and value is the username that created the space
+	 */
+	private array $createdSpaces;
+
+	/**
+	 * @param string $spaceName
+	 *
+	 * @return string name of the user that created the space
+	 * @throws Exception
+	 */
+	public function getSpaceCreator(string $spaceName): string {
+		if (!\array_key_exists($spaceName, $this->createdSpaces)) {
+			throw new Exception(__METHOD__ . " space '$spaceName' has not been created in this scenario");
+		}
+		return $this->createdSpaces[$spaceName];
+	}
+
+	/**
+	 * @param string $spaceName
+	 * @param string $spaceCreator
+	 *
+	 * @return void
+	 */
+	public function setSpaceCreator(string $spaceName, string $spaceCreator): void {
+		$this->createdSpaces[$spaceName] = $spaceCreator;
+	}
 
 	/**
 	 * @var array
@@ -344,6 +371,7 @@ class SpacesContext implements Context {
 				""
 			)
 		);
+		$this->setSpaceCreator($spaceName, $user);
 	}
 
 	/**
@@ -376,6 +404,7 @@ class SpacesContext implements Context {
 				""
 			)
 		);
+		$this->setSpaceCreator($spaceName, $user);
 	}
 
 	/**
@@ -480,7 +509,7 @@ class SpacesContext implements Context {
 	 * @When /^user "([^"]*)" lists the content of the space with the name "([^"]*)" using the WebDav Api$/
 	 *
 	 * @param string $user
-	 * @param string $name
+	 * @param string $spaceName
 	 *
 	 * @return void
 	 *
@@ -488,9 +517,9 @@ class SpacesContext implements Context {
 	 */
 	public function theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
 		string $user,
-		string $name
+		string $spaceName
 	): void {
-		$space = $this->getSpaceByName($name);
+		$space = $this->getSpaceByName($spaceName);
 		Assert::assertIsArray($space);
 		Assert::assertNotEmpty($spaceId = $space["id"]);
 		Assert::assertNotEmpty($spaceWebDavUrl = $space["root"]["webDavUrl"]);
@@ -523,6 +552,32 @@ class SpacesContext implements Context {
 		string $shouldOrNot,
 		TableNode $expectedFiles
 	):void {
+		$this->propfindResultShouldContainEntries(
+			$shouldOrNot,
+			$expectedFiles,
+		);
+	}
+
+	/**
+	 * @Then /^the space "([^"]*)" should (not|)\s?contain these (?:files|entries):$/
+	 *
+	 * @param string    $spaceName
+	 * @param string    $shouldOrNot   (not|)
+	 * @param TableNode $expectedFiles
+	 *
+	 * @return void
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function theSpaceShouldContainEntries(
+		string $spaceName,
+		string $shouldOrNot,
+		TableNode $expectedFiles
+	):void {
+		$this->theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
+			$this->getSpaceCreator($spaceName),
+			$spaceName
+		);
 		$this->propfindResultShouldContainEntries(
 			$shouldOrNot,
 			$expectedFiles,
