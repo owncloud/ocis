@@ -128,7 +128,7 @@ func storageUsersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string
 					"driver":      cfg.Reva.StorageUsers.Driver,
 					"drivers":     storagedrivers.UserDrivers(cfg),
 					"timeout":     86400,
-					"insecure":    true,
+					"insecure":    cfg.Reva.StorageUsers.DataProvider.Insecure,
 					"disable_tus": false,
 				},
 			},

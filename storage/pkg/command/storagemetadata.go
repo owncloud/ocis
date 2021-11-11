@@ -150,7 +150,7 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 					"driver":      cfg.Reva.StorageMetadata.Driver,
 					"drivers":     storagedrivers.MetadataDrivers(cfg),
 					"timeout":     86400,
-					"insecure":    true,
+					"insecure":    cfg.Reva.StorageMetadata.DataProvider.Insecure,
 					"disable_tus": true,
 				},
 			},

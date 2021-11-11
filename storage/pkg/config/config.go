@@ -144,10 +144,13 @@ type Groups struct {
 type FrontendPort struct {
 	Port
 
+	AppProviderInsecure        bool
 	AppProviderPrefix          string
+	ArchiverInsecure           bool
 	ArchiverPrefix             string
 	DatagatewayPrefix          string
 	Favorites                  bool
+	OCDavInsecure              bool
 	OCDavPrefix                string
 	OCSPrefix                  string
 	OCSSharePrefix             string
@@ -175,6 +178,10 @@ type DataGatewayPort struct {
 	PublicURL string
 }
 
+type DataProvider struct {
+	Insecure bool
+}
+
 // StoragePort defines the available storage configuration.
 type StoragePort struct {
 	Port
@@ -186,9 +193,10 @@ type StoragePort struct {
 	DataServerURL string
 
 	// for HTTP ports with only one http service
-	HTTPPrefix string
-	TempFolder string
-	ReadOnly   bool
+	HTTPPrefix   string
+	TempFolder   string
+	ReadOnly     bool
+	DataProvider DataProvider
 }
 
 // PublicStorage configures a public storage provider

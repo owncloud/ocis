@@ -453,6 +453,7 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
                     "BEHAT_SUITE": suite,
                     "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
                     "PATH_TO_CORE": "/srv/app/testrunner",
+                    "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (storage.upper()),
                     "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                 },
                 "commands": [
@@ -1466,6 +1467,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
         "IDP_IDENTIFIER_REGISTRATION_CONF": "/drone/src/tests/config/drone/identifier-registration.yml",
         "OCIS_LOG_LEVEL": "error",
         "SETTINGS_DATA_PATH": "/srv/app/tmp/ocis/settings",
+        "OCIS_INSECURE": "true",
     }
 
     # Pass in "default" accounts_hash_difficulty to not set this environment variable.

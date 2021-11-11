@@ -7,12 +7,18 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/ocis/cmd/ocis",
-            "args": ["server"],
+            "args": [
+                "server"
+            ],
             "env": {
+                // log settings for human developers
                 "OCIS_LOG_LEVEL": "debug",
                 "OCIS_LOG_PRETTY": "true",
                 "OCIS_LOG_COLOR": "true",
-                "PROXY_ENABLE_BASIC_AUTH": "true"
+                // enable basic auth for dev setup so that we can use curl for testing
+                "PROXY_ENABLE_BASIC_AUTH": "true",
+                // set insecure options because we don't have valid certificates in dev environments
+                "OCIS_INSECURE": "true",
             }
         }
     ]

@@ -42,7 +42,7 @@ func NewService(opts ...Option) grpc.Service {
 					options.Logger,
 				),
 			),
-			svc.CS3Source(imgsource.NewCS3Source(gc)),
+			svc.CS3Source(imgsource.NewCS3Source(tconf, gc)),
 			svc.CS3Client(gc),
 		)
 		thumbnail = svc.NewInstrument(thumbnail, options.Metrics)

@@ -61,6 +61,7 @@ type Thumbnail struct {
 	Resolutions         []string          `mapstructure:"resolutions"`
 	FileSystemStorage   FileSystemStorage `mapstructure:"filesystem_storage"`
 	WebdavAllowInsecure bool              `mapstructure:"webdav_allow_insecure"`
+	CS3AllowInsecure    bool `mapstructure:"cs3_allow_insecure"`
 	RevaGateway         string            `mapstructure:"reva_gateway"`
 	WebdavNamespace     string            `mapstructure:"webdav_namespace"`
 }
@@ -99,6 +100,7 @@ func DefaultConfig() *Config {
 			WebdavAllowInsecure: true,
 			RevaGateway:         "127.0.0.1:9142",
 			WebdavNamespace:     "/home",
+			CS3AllowInsecure: false,
 		},
 	}
 }

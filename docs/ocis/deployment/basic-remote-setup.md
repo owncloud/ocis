@@ -29,9 +29,10 @@ For the following examples you need to have the oCIS binary in your current work
 
 ### Using automatically generated certificates
 
-In order to run oCIS with automatically generated and self signed certificates please execute following command. You need to replace `your-host` with an IP or hostname.
+In order to run oCIS with automatically generated and self signed certificates please execute following command. You need to replace `your-host` with an IP or hostname. Since you have only self signed certificates you need to have `OCIS_INSECURE` set to `true`.
 
 ```bash
+OCIS_INSECURE=true \
 PROXY_HTTP_ADDR=0.0.0.0:9200 \
 OCIS_URL=https://your-host:9200 \
 ./ocis server
@@ -42,12 +43,15 @@ OCIS_URL=https://your-host:9200 \
 If you have your own certificates already in place, you may want to make oCIS use them:
 
 ```bash
+OCIS_INSECURE=false \
 PROXY_HTTP_ADDR=0.0.0.0:9200 \
 OCIS_URL=https://your-host:9200 \
 PROXY_TRANSPORT_TLS_KEY=./certs/your-host.key \
 PROXY_TRANSPORT_TLS_CERT=./certs/your-host.crt \
 ./ocis server
 ```
+
+If you generated these certificates on your own, you might need to set `OCIS_INSECURE` to `true`.
 
 For more configuration options check the configuration section in [oCIS]({{< ref "../configuration" >}}) and the oCIS extensions.
 

@@ -14,6 +14,7 @@ services:
       WEB_UI_CONFIG: /drone/src/tests/config/drone/ocis-config.json
       IDP_IDENTIFIER_REGISTRATION_CONF: /drone/src/tests/config/drone/identifier-registration.yml
       ACCOUNTS_HASH_DIFFICULTY: 4
+      OCIS_INSECURE: "true"
       # s3ng specific settings
       STORAGE_USERS_DRIVER_S3NG_ENDPOINT: http://ceph:8080
       STORAGE_USERS_DRIVER_S3NG_REGION: default
