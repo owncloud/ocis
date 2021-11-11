@@ -35,12 +35,14 @@ type Tracing struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File      string     `mapstructure:"file"`
-	Log       shared.Log `mapstructure:"log"`
-	Debug     Debug      `mapstructure:"debug"`
-	Server    Server     `mapstructure:"server"`
-	Tracing   Tracing    `mapstructure:"tracing"`
-	Thumbnail Thumbnail  `mapstructure:"thumbnail"`
+	*shared.Commons
+
+	File      string      `mapstructure:"file"`
+	Log       *shared.Log `mapstructure:"log"`
+	Debug     Debug       `mapstructure:"debug"`
+	Server    Server      `mapstructure:"server"`
+	Tracing   Tracing     `mapstructure:"tracing"`
+	Thumbnail Thumbnail   `mapstructure:"thumbnail"`
 
 	Context    context.Context
 	Supervised bool
@@ -73,7 +75,6 @@ func New() *Config {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Log: shared.Log{},
 		Debug: Debug{
 			Addr:   "127.0.0.1:9189",
 			Token:  "",
@@ -103,15 +104,4 @@ func DefaultConfig() *Config {
 			CS3AllowInsecure:    false,
 		},
 	}
-}
-
-// GetEnv fetches a list of known env variables for this extension. It is to be used by gookit, as it provides a list
-// with all the environment variables an extension supports.
-func GetEnv() []string {
-	var r = make([]string, len(structMappings(&Config{})))
-	for i := range structMappings(&Config{}) {
-		r = append(r, structMappings(&Config{})[i].EnvVars...)
-	}
-
-	return r
 }
