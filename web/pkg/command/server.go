@@ -6,10 +6,6 @@ import (
 	"io/ioutil"
 	"strings"
 
-	gofig "github.com/gookit/config/v2"
-	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
-
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/web/pkg/config"
@@ -26,9 +22,6 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:  "server",
 		Usage: "Start integrated server",
 		Before: func(ctx *cli.Context) error {
-			// remember shared logging info to prevent empty overwrites
-			inLog := cfg.Log
-
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimRight(cfg.HTTP.Root, "/")
 			}
@@ -40,19 +33,6 @@ func Server(cfg *config.Config) *cli.Command {
 			// build well known openid-configuration endpoint if it is not set
 			if cfg.Web.Config.OpenIDConnect.MetadataURL == "" {
 				cfg.Web.Config.OpenIDConnect.MetadataURL = strings.TrimRight(cfg.Web.Config.OpenIDConnect.Authority, "/") + "/.well-known/openid-configuration"
-			}
-
-			if (cfg.Log == shared.Log{}) && (inLog != shared.Log{}) {
-				// set the default to the parent config
-				cfg.Log = inLog
-
-				// and parse the environment
-				conf := &gofig.Config{}
-				conf.LoadOSEnv(config.GetEnv(), false)
-				bindings := config.StructMappings(cfg)
-				if err := ociscfg.BindEnv(conf, bindings); err != nil {
-					return err
-				}
 			}
 
 			return nil
@@ -71,7 +51,7 @@ func Server(cfg *config.Config) *cli.Command {
 					logger.Err(err).Msg("error opening config file")
 					return err
 				}
-				if err := json.Unmarshal(contents, &cfg.Web.Config); err != nil {
+				if err = json.Unmarshal(contents, &cfg.Web.Config); err != nil {
 					logger.Fatal().Err(err).Msg("error unmarshalling config file")
 					return err
 				}
