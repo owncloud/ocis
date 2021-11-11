@@ -70,7 +70,7 @@ func New() *Config {
 func DefaultConfig() *Config {
 	return &Config{
 		Debug: Debug{
-			Addr:   "",
+			Addr:   "127.0.0.1:9119",
 			Token:  "",
 			Pprof:  false,
 			Zpages: false,

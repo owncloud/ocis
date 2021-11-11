@@ -300,8 +300,6 @@ github.com/crewjam/saml v0.4.5/go.mod h1:qCJQpUtZte9R1ZjUBcW8qtCNlinbO363ooNl02S
 github.com/cs3org/cato v0.0.0-20200828125504-e418fc54dd5e/go.mod h1:XJEZ3/EQuI3BXTp/6DUzFr850vlxq11I6satRtz0YQ4=
 github.com/cs3org/go-cs3apis v0.0.0-20211104090126-8e972dca8304 h1:e/nIPR518vyvrulo9goAZTtYD6gFfu/2/9MDe6mTGcw=
 github.com/cs3org/go-cs3apis v0.0.0-20211104090126-8e972dca8304/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
-github.com/cs3org/reva v1.15.1-0.20211110104228-63cd96849ff2 h1:Cka+iK9qhpdqIulCXZ9yhZQCLR1vHG2NfQRJOPPYgxY=
-github.com/cs3org/reva v1.15.1-0.20211110104228-63cd96849ff2/go.mod h1:DzqOq0OpB4P5j66RVsTw2e9JK2XECH4AATIdTTqifb8=
 github.com/cs3org/reva v1.15.1-0.20211110160042-a6eb9d5a7cd2 h1:+aPM9Pa8J+Ab4veJ7103tUN6RtHuruwxUfqN1htFkZU=
 github.com/cs3org/reva v1.15.1-0.20211110160042-a6eb9d5a7cd2/go.mod h1:DzqOq0OpB4P5j66RVsTw2e9JK2XECH4AATIdTTqifb8=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=

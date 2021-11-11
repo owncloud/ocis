@@ -71,7 +71,8 @@ func Server(cfg *config.Config) *cli.Command {
 
 				gr.Add(func() error {
 					return server.Run()
-				}, func(_ error) {
+				}, func(err error) {
+					logger.Error().Err(err).Msg("error ")
 					logger.Info().
 						Str("transport", "http").
 						Msg("Shutting down server")
@@ -92,7 +93,8 @@ func Server(cfg *config.Config) *cli.Command {
 					return err
 				}
 
-				gr.Add(server.ListenAndServe, func(_ error) {
+				gr.Add(server.ListenAndServe, func(err error) {
+					logger.Error().Err(err)
 					_ = server.Shutdown(ctx)
 					cancel()
 				})
