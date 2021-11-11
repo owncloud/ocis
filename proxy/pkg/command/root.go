@@ -4,10 +4,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/owncloud/ocis/ocis-pkg/shared"
-
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/thejerf/suture/v4"
@@ -51,17 +50,6 @@ func Execute(cfg *config.Config) error {
 	return app.Run(os.Args)
 }
 
-// NewLogger initializes a service-specific logger instance.
-func NewLogger(cfg *config.Config) log.Logger {
-	return log.NewLogger(
-		log.Name("proxy"),
-		log.Level(cfg.Log.Level),
-		log.Pretty(cfg.Log.Pretty),
-		log.Color(cfg.Log.Color),
-		log.File(cfg.Log.File),
-	)
-}
-
 // ParseConfig loads proxy configuration. Loading will first attempt to parse config files in the expected locations
 // and then parses environment variables. In the context of oCIS env variables will always overwrite values set
 // in a config file.
@@ -75,7 +63,20 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 		return err
 	}
 
-	conf.LoadOSEnv(config.GetEnv(), false)
+	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &shared.Log{
+			Level:  cfg.Commons.Log.Level,
+			Pretty: cfg.Commons.Log.Pretty,
+			Color:  cfg.Commons.Log.Color,
+			File:   cfg.Commons.Log.File,
+		}
+	} else if cfg.Log == nil && cfg.Commons == nil {
+		cfg.Log = &shared.Log{}
+	}
+
+	conf.LoadOSEnv(config.GetEnv(cfg), false)
+
 	bindings := config.StructMappings(cfg)
 	return ociscfg.BindEnv(conf, bindings)
 }
@@ -87,9 +88,8 @@ type SutureService struct {
 
 // NewSutureService creates a new proxy.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	if (cfg.Proxy.Log == shared.Log{}) {
-		cfg.Proxy.Log = cfg.Log
-	}
+	// inherit common configuration from ocis config parsing.
+	cfg.Proxy.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.Proxy,
 	}
@@ -102,4 +102,15 @@ func (s SutureService) Serve(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// NewLogger initializes a service-specific logger instance.
+func NewLogger(cfg *config.Config) log.Logger {
+	return log.NewLogger(
+		log.Name("proxy"),
+		log.Level(cfg.Log.Level),
+		log.Pretty(cfg.Log.Pretty),
+		log.Color(cfg.Log.Color),
+		log.File(cfg.Log.File),
+	)
 }

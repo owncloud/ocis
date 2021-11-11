@@ -125,12 +125,14 @@ type Tracing struct {
 
 // Config merges all Account config parameters.
 type Config struct {
+	*shared.Commons
+
 	LDAP         LDAP         `mapstructure:"ldap"`
 	HTTP         HTTP         `mapstructure:"http"`
 	GRPC         GRPC         `mapstructure:"grpc"`
 	Server       Server       `mapstructure:"server"`
 	Asset        Asset        `mapstructure:"asset"`
-	Log          shared.Log   `mapstructure:"log"`
+	Log          *shared.Log  `mapstructure:"log"`
 	TokenManager TokenManager `mapstructure:"token_manager"`
 	Repo         Repo         `mapstructure:"repo"`
 	Index        Index        `mapstructure:"index"`
@@ -171,7 +173,6 @@ func DefaultConfig() *Config {
 			DemoUsersAndGroups: true,
 		},
 		Asset: Asset{},
-		Log:   shared.Log{},
 		TokenManager: TokenManager{
 			JWTSecret: "Pive-Fumkiu4",
 		},
@@ -212,10 +213,10 @@ func DefaultConfig() *Config {
 
 // GetEnv fetches a list of known env variables for this extension. It is to be used by gookit, as it provides a list
 // with all the environment variables an extension supports.
-func GetEnv() []string {
-	var r = make([]string, len(structMappings(&Config{})))
-	for i := range structMappings(&Config{}) {
-		r = append(r, structMappings(&Config{})[i].EnvVars...)
+func GetEnv(cfg *Config) []string {
+	var r = make([]string, len(structMappings(cfg)))
+	for i := range structMappings(cfg) {
+		r = append(r, structMappings(cfg)[i].EnvVars...)
 	}
 
 	return r

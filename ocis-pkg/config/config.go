@@ -70,6 +70,8 @@ type Runtime struct {
 
 // Config combines all available configuration parts.
 type Config struct {
+	*shared.Commons `mapstructure:"shared"`
+
 	Mode    Mode // DEPRECATED
 	File    string
 	OcisURL string `mapstructure:"ocis_url"`
@@ -119,9 +121,6 @@ func New() *Config {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Log: shared.Log{
-			Level: "info",
-		},
 		Debug: Debug{
 			Addr:   "127.0.0.1:9010",
 			Token:  "",

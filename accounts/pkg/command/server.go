@@ -6,10 +6,6 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
 
-	gofig "github.com/gookit/config/v2"
-	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
-
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"github.com/oklog/run"
@@ -29,8 +25,6 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage:       "Start ocis accounts service",
 		Description: "uses an LDAP server as the storage backend",
 		Before: func(ctx *cli.Context) error {
-			// remember shared logging info to prevent empty overwrites
-			inLog := cfg.Log
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
@@ -41,23 +35,10 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			if (cfg.Log == shared.Log{}) && (inLog != shared.Log{}) {
-				// set the default to the parent config
-				cfg.Log = inLog
-
-				// and parse the environment
-				conf := &gofig.Config{}
-				conf.LoadOSEnv(config.GetEnv(), false)
-				bindings := config.StructMappings(cfg)
-				if err := ociscfg.BindEnv(conf, bindings); err != nil {
-					return err
-				}
-			}
-
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			logger := log.LoggerFromConfig("accounts", cfg.Log)
+			logger := log.LoggerFromConfig("accounts", *cfg.Log)
 			err := tracing.Configure(cfg)
 			if err != nil {
 				return err

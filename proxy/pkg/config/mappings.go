@@ -4,10 +4,10 @@ import "github.com/owncloud/ocis/ocis-pkg/shared"
 
 // GetEnv fetches a list of known env variables for this extension. It is to be used by gookit, as it provides a list
 // with all the environment variables an extension supports.
-func GetEnv() []string {
-	var r = make([]string, len(structMappings(&Config{})))
-	for i := range structMappings(&Config{}) {
-		r = append(r, structMappings(&Config{})[i].EnvVars...)
+func GetEnv(cfg *Config) []string {
+	var r = make([]string, len(structMappings(cfg)))
+	for i := range structMappings(cfg) {
+		r = append(r, structMappings(cfg)[i].EnvVars...)
 	}
 
 	return r

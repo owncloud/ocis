@@ -15,3 +15,10 @@ type Log struct {
 	Color  bool   `mapstructure:"color"`
 	File   string `mapstructure:"file"`
 }
+
+// Commons holds configuration that are common to all extensions. Each extension can then decide whether
+// to overwrite its values.
+type Commons struct {
+	*Log    `mapstructure:"log"`
+	OcisURL string `mapstructure:"ocis_url"`
+}

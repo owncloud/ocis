@@ -106,9 +106,9 @@ type Cache struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	OcisURL string
+	*shared.Commons
 
-	Log                   shared.Log      `mapstructure:"log"`
+	Log                   *shared.Log     `mapstructure:"log"`
 	Debug                 Debug           `mapstructure:"debug"`
 	HTTP                  HTTP            `mapstructure:"http"`
 	Service               Service         `mapstructure:"service"`
@@ -199,10 +199,9 @@ func New() *Config {
 	}
 }
 
-// DefaultConfig are values stored in the flag set, but moved to a struct.
+// DefaultConfig provides with a working local configuration for a proxy service.
 func DefaultConfig() *Config {
 	return &Config{
-		Log: shared.Log{}, // logging config is inherited.
 		Debug: Debug{
 			Addr:  "0.0.0.0:9205",
 			Token: "",
