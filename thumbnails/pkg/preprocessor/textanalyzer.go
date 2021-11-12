@@ -2,6 +2,7 @@ package preprocessor
 
 import (
 	"unicode"
+	"unicode/utf8"
 )
 
 // Default list of scripts to be analyzed within the string.
@@ -105,65 +106,72 @@ func NewTextAnalyzer(scriptList []string) TextAnalyzer {
 // A TextAnalysis will be returned with the result of the analysis.
 func (ta *TextAnalyzer) AnalyzeString(word string, opts AnalysisOpts) TextAnalysis {
 	analysis := TextAnalysis{
-		RuneCount: make(map[string]int),
-		Text:      word,
+		ScriptRanges: []ScriptRange{},
+		RuneCount:    make(map[string]int),
+		Text:         word,
 	}
-	var lastRange *ScriptRange
 
-	runeCount := 0
-	for wordIndex, char := range word {
+	if len(word) < 1 {
+		return analysis
+	}
+
+	firstRune, runeLen := utf8.DecodeRuneInString(word)
+
+	lastRange := &ScriptRange{
+		Low:          0,
+		Spaces:       make([]int, 0),
+		TargetScript: ta.chooseScriptFor(firstRune),
+	}
+	firstRuneIsWhiteSpace := unicode.Is(unicode.White_Space, firstRune)
+	if firstRuneIsWhiteSpace {
+		lastRange.Spaces = append(lastRange.Spaces, 0)
+	}
+
+	runeCount := 1
+	for wordIndex, char := range word[runeLen:] {
+		wordIndex += runeLen // shifted from the original string
 		script := ta.chooseScriptFor(char)
 
 		isWhiteSpace := unicode.Is(unicode.White_Space, char)
-		if lastRange == nil {
-			runeCount = 1
+		if script != lastRange.TargetScript {
+			if mapScript, isOk := ta.getMergeMapValue(opts, lastRange.TargetScript, script); isOk {
+				lastRange.TargetScript = mapScript
+				if isWhiteSpace {
+					// TODO: Check if this is dead code.
+					// whitespace should be part of the "Common" script, and the Common
+					// script shouldn't be part of a mergeMap
+					lastRange.Spaces = append(lastRange.Spaces, wordIndex)
+				}
+				runeCount++
+				continue
+			}
+
+			lastRange.High = wordIndex - 1
+			lastRange.RuneCount = runeCount
+			analysis.ScriptRanges = append(analysis.ScriptRanges, *lastRange)
+			if _, exists := analysis.RuneCount[lastRange.TargetScript]; !exists {
+				analysis.RuneCount[lastRange.TargetScript] = 0
+			}
+			analysis.RuneCount[lastRange.TargetScript] += runeCount
 			lastRange = &ScriptRange{
 				Low:          wordIndex,
 				Spaces:       make([]int, 0),
 				TargetScript: script,
 			}
-		} else {
-			if script != lastRange.TargetScript {
-				if mapScript, isOk := ta.getMergeMapValue(opts, lastRange.TargetScript, script); isOk {
-					lastRange.TargetScript = mapScript
-					if isWhiteSpace {
-						// TODO: Check if this is dead code.
-						// whitespace should be part of the "Common" script, and the Common
-						// script shouldn't be part of a mergeMap
-						lastRange.Spaces = append(lastRange.Spaces, wordIndex)
-					}
-					runeCount++
-					continue
-				}
-
-				lastRange.High = wordIndex - 1
-				lastRange.RuneCount = runeCount
-				analysis.ScriptRanges = append(analysis.ScriptRanges, *lastRange)
-				if _, exists := analysis.RuneCount[lastRange.TargetScript]; !exists {
-					analysis.RuneCount[lastRange.TargetScript] = 0
-				}
-				analysis.RuneCount[lastRange.TargetScript] += runeCount
-				lastRange = &ScriptRange{
-					Low:          wordIndex,
-					Spaces:       make([]int, 0),
-					TargetScript: script,
-				}
-				runeCount = 0
-			}
-			runeCount++
+			runeCount = 0
 		}
+		runeCount++
 		if isWhiteSpace {
 			lastRange.Spaces = append(lastRange.Spaces, wordIndex)
 		}
 	}
 
-	if lastRange != nil {
-		// close the last range
-		lastRange.High = len(word) - 1
-		lastRange.RuneCount = runeCount
-		analysis.RuneCount[lastRange.TargetScript] += runeCount
-		analysis.ScriptRanges = append(analysis.ScriptRanges, *lastRange)
-	}
+	// close the last range
+	lastRange.High = len(word) - 1
+	lastRange.RuneCount = runeCount
+	analysis.RuneCount[lastRange.TargetScript] += runeCount
+	analysis.ScriptRanges = append(analysis.ScriptRanges, *lastRange)
+
 	return analysis
 }
 
@@ -227,13 +235,13 @@ func (ta *TextAnalyzer) getMergeMapValue(opts AnalysisOpts, previous, current st
 // If the MergeMap isn't needed, use an empty one
 func (tr *TextAnalysis) MergeCommon(mergeMap MergeMap) {
 	var finalRanges []ScriptRange
-	var previousRange *ScriptRange = &ScriptRange{}
 
 	if len(tr.ScriptRanges) < 1 {
 		// no ranges -> nothing to do
 		return
 	}
 
+	previousRange := &ScriptRange{}
 	*previousRange = tr.ScriptRanges[0]
 	for _, sRange := range tr.ScriptRanges[1:] {
 		if previousRange.TargetScript == sRange.TargetScript {

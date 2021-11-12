@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	inputs = [16]string{
+	inputs = [18]string{
 		"basic latin",
 		"trailing tab	",
 		"Small text. \"$\", \"£\" and \"¥\" are currencies.",
@@ -26,6 +26,8 @@ var (
 		"ä ä",
 		"базовый русский", // cyrillic script isn't part of our default
 		"latin русский",   // latin + cyrillic (cyrillic not supported)
+		" space justified ",
+		"",
 	}
 )
 
@@ -252,6 +254,28 @@ func TestAnalyzeString(t *testing.T) {
 					"_unknown": 7,
 				},
 				Text: inputs[15],
+			},
+		},
+		{
+			input: inputs[16], // latin + cyrillic (cyrillic script isn't part of our default)
+			opts:  defaultOpts,
+			eOut: TextAnalysis{
+				ScriptRanges: []ScriptRange{
+					ScriptRange{Low: 0, High: 16, Spaces: []int{0, 6, 16}, TargetScript: "Latin", RuneCount: 17},
+				},
+				RuneCount: map[string]int{
+					"Latin": 17,
+				},
+				Text: inputs[16],
+			},
+		},
+		{
+			input: inputs[17], // latin + cyrillic (cyrillic script isn't part of our default)
+			opts:  defaultOpts,
+			eOut: TextAnalysis{
+				ScriptRanges: []ScriptRange{},
+				RuneCount:    map[string]int{},
+				Text:         inputs[17],
 			},
 		},
 	}
@@ -533,6 +557,47 @@ func TestAnalyzeStringRaw(t *testing.T) {
 					"Common":   1,
 				},
 				Text: inputs[14],
+			},
+		},
+		{
+			input: inputs[15], // latin + cyrillic (cyrillic script isn't part of our default)
+			eOut: TextAnalysis{
+				ScriptRanges: []ScriptRange{
+					ScriptRange{Low: 0, High: 4, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
+					ScriptRange{Low: 5, High: 5, Spaces: []int{5}, TargetScript: "Common", RuneCount: 1},
+					ScriptRange{Low: 6, High: 19, Spaces: []int{}, TargetScript: "_unknown", RuneCount: 7},
+				},
+				RuneCount: map[string]int{
+					"Latin":    5,
+					"Common":   1,
+					"_unknown": 7,
+				},
+				Text: inputs[15],
+			},
+		},
+		{
+			input: inputs[16],
+			eOut: TextAnalysis{
+				ScriptRanges: []ScriptRange{
+					ScriptRange{Low: 0, High: 0, Spaces: []int{0}, TargetScript: "Common", RuneCount: 1},
+					ScriptRange{Low: 1, High: 5, Spaces: []int{}, TargetScript: "Latin", RuneCount: 5},
+					ScriptRange{Low: 6, High: 6, Spaces: []int{6}, TargetScript: "Common", RuneCount: 1},
+					ScriptRange{Low: 7, High: 15, Spaces: []int{}, TargetScript: "Latin", RuneCount: 9},
+					ScriptRange{Low: 16, High: 16, Spaces: []int{16}, TargetScript: "Common", RuneCount: 1},
+				},
+				RuneCount: map[string]int{
+					"Latin":  14,
+					"Common": 3,
+				},
+				Text: inputs[16],
+			},
+		},
+		{
+			input: inputs[17], // empty string
+			eOut: TextAnalysis{
+				ScriptRanges: []ScriptRange{},
+				RuneCount:    map[string]int{},
+				Text:         inputs[17],
 			},
 		},
 	}
