@@ -100,8 +100,12 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Thumbnail.RevaGateway,
 		},
 		{
-			EnvVars:     []string{"THUMBNAILS_WEBDAVSOURCE_INSECURE"},
+			EnvVars:     []string{"OCIS_INSECURE", "THUMBNAILS_WEBDAVSOURCE_INSECURE"},
 			Destination: &cfg.Thumbnail.WebdavAllowInsecure,
+		},
+		{
+			EnvVars:     []string{"OCIS_INSECURE", "THUMBNAILS_CS3SOURCE_INSECURE"},
+			Destination: &cfg.Thumbnail.CS3AllowInsecure,
 		},
 		{
 			EnvVars:     []string{"STORAGE_WEBDAV_NAMESPACE"},
