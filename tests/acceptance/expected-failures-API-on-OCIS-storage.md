@@ -1496,3 +1496,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 ### [Content-type is not multipart/byteranges when downloading file with Range Header](https://github.com/owncloud/ocis/issues/2677)
 -   [apiWebdavOperations/downloadFile.feature:169](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L169)
 -   [apiWebdavOperations/downloadFile.feature:170](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L170)
+
+### [send PUT requests to another user's webDav endpoints as normal user](https://github.com/owncloud/ocis/issues/2759)
+-   [apiAuthWebDav/webDavPUTAuth.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavPUTAuth.feature#L40)
