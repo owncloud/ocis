@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-11-13T00:08:31+0000"
+date: "2021-11-14T00:04:49+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/accounts/templates
@@ -35,11 +35,13 @@ If multiple variables are listed for one option, they are in order of precedence
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
 
-### accounts list
+### accounts remove
 
-List existing accounts
+Removes an existing account
 
-Usage: `accounts list [command options] [arguments...]`
+Usage: `accounts remove [command options] [arguments...]`
+
+
 
 
 
@@ -117,8 +119,6 @@ Usage: `accounts list [command options] [arguments...]`
 
 -name |  $ACCOUNTS_NAME
 : service name. Default: `"accounts"`.
-
-
 
 
 
@@ -215,40 +215,11 @@ Usage: `accounts ocis-accounts [command options] [arguments...]`
 
 
 
-### accounts version
+### accounts update
 
-Print the versions of the running instances
+Make changes to an existing account
 
-Usage: `accounts version [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Usage: `accounts update [command options] [arguments...]`
 
 
 
@@ -297,6 +268,71 @@ Usage: `accounts version [command options] [arguments...]`
 
 -name |  $ACCOUNTS_NAME
 : service name. Default: `"accounts"`.
+
+
+-enabled | 
+: Enable the account.
+
+
+-displayname | 
+: Set the displayname for the account.
+
+
+-preferred-name | 
+: Set the preferred-name for the account.
+
+
+-on-premises-sam-account-name | 
+: Set the on-premises-sam-account-name.
+
+
+-uidnumber | 
+: Set the uidnumber for the account.
+
+
+-gidnumber | 
+: Set the gidnumber for the account.
+
+
+-mail | 
+: Set the mail for the account.
+
+
+-description | 
+: Set the description for the account.
+
+
+-password | 
+: Set the password for the account.
+
+
+-password-policies | 
+: Possible policies: DisableStrongPassword, DisablePasswordExpiration.
+
+
+-force-password-change | 
+: Force password change on next sign-in.
+
+
+-force-password-change-mfa | 
+: Force password change on next sign-in with mfa.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -421,6 +457,174 @@ Usage: `accounts add [command options] [arguments...]`
 
 -force-password-change-mfa | 
 : Force password change on next sign-in with mfa.
+
+
+
+
+
+
+
+### accounts list
+
+List existing accounts
+
+Usage: `accounts list [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
+: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
+
+
+-name |  $ACCOUNTS_NAME
+: service name. Default: `"accounts"`.
+
+
+
+
+
+### accounts rebuildIndex
+
+Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
+
+Usage: `accounts rebuildIndex [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -704,217 +908,11 @@ Usage: `accounts server [command options] [arguments...]`
 
 
 
-### accounts update
+### accounts version
 
-Make changes to an existing account
+Print the versions of the running instances
 
-Usage: `accounts update [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--grpc-namespace |  $ACCOUNTS_GRPC_NAMESPACE
-: Set the base namespace for the grpc namespace. Default: `"com.owncloud.api"`.
-
-
--name |  $ACCOUNTS_NAME
-: service name. Default: `"accounts"`.
-
-
--enabled | 
-: Enable the account.
-
-
--displayname | 
-: Set the displayname for the account.
-
-
--preferred-name | 
-: Set the preferred-name for the account.
-
-
--on-premises-sam-account-name | 
-: Set the on-premises-sam-account-name.
-
-
--uidnumber | 
-: Set the uidnumber for the account.
-
-
--gidnumber | 
-: Set the gidnumber for the account.
-
-
--mail | 
-: Set the mail for the account.
-
-
--description | 
-: Set the description for the account.
-
-
--password | 
-: Set the password for the account.
-
-
--password-policies | 
-: Possible policies: DisableStrongPassword, DisablePasswordExpiration.
-
-
--force-password-change | 
-: Force password change on next sign-in.
-
-
--force-password-change-mfa | 
-: Force password change on next sign-in with mfa.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### accounts rebuildIndex
-
-Rebuilds the service's index, i.e. deleting and then re-adding all existing documents
-
-Usage: `accounts rebuildIndex [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### accounts remove
-
-Removes an existing account
-
-Usage: `accounts remove [command options] [arguments...]`
-
-
+Usage: `accounts version [command options] [arguments...]`
 
 
 
@@ -992,6 +990,8 @@ Usage: `accounts remove [command options] [arguments...]`
 
 -name |  $ACCOUNTS_NAME
 : service name. Default: `"accounts"`.
+
+
 
 
 
