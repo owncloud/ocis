@@ -221,6 +221,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			middleware.UserProvider(userProvider),
 			middleware.OIDCIss(cfg.OIDC.Issuer),
 			middleware.UserOIDCClaim(cfg.UserOIDCClaim),
+			middleware.UserCS3Claim(cfg.UserCS3Claim),
 			middleware.CredentialsByUserAgent(cfg.Reva.Middleware.Auth.CredentialsByUserAgent),
 		),
 		middleware.SignedURLAuth(
