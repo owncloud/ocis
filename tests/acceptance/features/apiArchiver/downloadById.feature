@@ -124,11 +124,11 @@ Feature: download multiple resources bundled into an archive
       | User-Agent | <user-agent> |
     Then the HTTP status code should be "200"
     And the downloaded <archive-type> archive should contain these files:
-      | name                             | content    |
-      | Shares/textfile0.txt             | some data  |
-      | Shares/textfile1.txt             | other data |
-      | Shares/my_data/textfile0.txt     | some data  |
-      | Shares/my_data/an_other_file.txt | more data  |
+      | name                               | content    |
+      | Shares/textfile0.txt               | some data  |
+      | Shares/textfile1.txt               | other data |
+      | Shares/my_data/textfile2.txt       | some data  |
+      | Shares/more_data/an_other_file.txt | more data  |
     Examples:
       | user-agent | archive-type |
       | Linux      | tar          |
