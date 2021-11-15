@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-11-15T13:05:24+0000"
+date: "2021-11-15T16:10:02+0000"
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocs/templates
@@ -34,91 +34,6 @@ If multiple variables are listed for one option, they are in order of precedence
 ### Command-line flags
 
 If you prefer to configure the service with command-line flags you can see the available variables below. Command line flags are only working when calling the subcommand directly.
-
-### ocs version
-
-Print the versions of the running instances
-
-Usage: `ocs version [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--http-namespace |  $OCS_NAMESPACE
-: Set the base namespace for the http namespace. Default: `"com.owncloud.web"`.
-
-
--name |  $OCS_NAME
-: Service name. Default: `"ocs"`.
-
-### ocs health
-
-Check health status
-
-Usage: `ocs health [command options] [arguments...]`
-
-
--debug-addr |  $OCS_DEBUG_ADDR
-: Address to debug endpoint. Default: `"127.0.0.1:9114"`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### ocs ocis-ocs
 
@@ -280,6 +195,91 @@ Usage: `ocs server [command options] [arguments...]`
 
 -extensions | 
 : Run specific extensions during supervised mode.
+
+
+
+### ocs version
+
+Print the versions of the running instances
+
+Usage: `ocs version [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-http-namespace |  $OCS_NAMESPACE
+: Set the base namespace for the http namespace. Default: `"com.owncloud.web"`.
+
+
+-name |  $OCS_NAME
+: Service name. Default: `"ocs"`.
+
+### ocs health
+
+Check health status
+
+Usage: `ocs health [command options] [arguments...]`
+
+
+-debug-addr |  $OCS_DEBUG_ADDR
+: Address to debug endpoint. Default: `"127.0.0.1:9114"`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
