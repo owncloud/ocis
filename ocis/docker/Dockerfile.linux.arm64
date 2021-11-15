@@ -5,7 +5,7 @@ ARG REVISION=""
 
 RUN apk update && \
 	apk upgrade && \
-	apk add ca-certificates mailcap && \
+	apk add ca-certificates mailcap tree attr && \
 	rm -rf /var/cache/apk/* && \
 	echo 'hosts: files dns' >| /etc/nsswitch.conf
 
