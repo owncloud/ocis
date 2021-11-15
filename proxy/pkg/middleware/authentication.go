@@ -126,6 +126,8 @@ func newBasicAuth(options Options) func(http.Handler) http.Handler {
 		EnableBasicAuth(options.EnableBasicAuth),
 		AccountsClient(options.AccountsClient),
 		OIDCIss(options.OIDCIss),
+		UserOIDCClaim(options.UserOIDCClaim),
+		UserCS3Claim(options.UserCS3Claim),
 		CredentialsByUserAgent(options.CredentialsByUserAgent),
 	)
 }
