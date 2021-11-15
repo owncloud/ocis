@@ -220,6 +220,7 @@ type StorageConfig struct {
 	S3          DriverS3
 	S3NG        DriverS3NG
 	OCIS        DriverOCIS
+	// TODO checksums ... figure out what that is supposed to do
 }
 
 // DriverCommon defines common driver configuration options.
