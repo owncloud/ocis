@@ -84,10 +84,17 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 
 				// fake oidc claims
 				claims := map[string]interface{}{
-					oidc.OwncloudUUID:      user.Id.OpaqueId,
 					oidc.Iss:               user.Id.Idp,
 					oidc.PreferredUsername: user.Username,
 					oidc.Email:             user.Mail,
+					oidc.OwncloudUUID:      user.Id.OpaqueId,
+				}
+
+				if options.UserCS3Claim == "userid" {
+					// set the custom user claim only if users will be looked up by the userid on the CS3api
+					// OpaqueId contains the userid configured in STORAGE_LDAP_USER_SCHEMA_UID
+					claims[options.UserOIDCClaim] = user.Id.OpaqueId
+
 				}
 
 				next.ServeHTTP(w, req.WithContext(oidc.NewContext(req.Context(), claims)))

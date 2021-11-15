@@ -63,19 +63,52 @@ class ArchiverContext implements Context {
 	}
 
 	/**
-	 * @When user :user downloads the archive of :resourceId using the resource id and setting these headers
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $addressType id|ids|path|paths
+	 *
+	 * @return string
+	 *
+	 * @throws Exception
+	 */
+	private function getArchiverQueryString(
+		string $user,
+		string $resource,
+		string $addressType
+	): string {
+		switch ($addressType) {
+			case 'id':
+			case 'ids':
+				return 'id=' . $this->featureContext->getFileIdForPath($user, $resource);
+				break;
+			case 'path':
+			case 'paths':
+				return 'path=' . $resource;
+			default:
+				throw new Exception(
+					'"' . $addressType .
+					'" is not a legal value for $addressType, must be id|ids|path|paths'
+				);
+		}
+	}
+
+	/**
+	 * @When user :user downloads the archive of :resource using the resource :addressType and setting these headers
 	 *
 	 * @param string $user
 	 * @param string $resource
+	 * @param string $addressType id|path
 	 * @param TableNode $headersTable
 	 *
 	 * @return void
 	 *
 	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws Exception
 	 */
-	public function userDownloadsTheArchiveOfUsingTheResourceId(
+	public function userDownloadsTheArchive(
 		string $user,
 		string $resource,
+		string $addressType,
 		TableNode $headersTable
 	): void {
 		$this->featureContext->verifyTableNodeColumns(
@@ -86,11 +119,12 @@ class ArchiverContext implements Context {
 		foreach ($headersTable as $row) {
 			$headers[$row['header']] = $row ['value'];
 		}
-		$resourceId = $this->featureContext->getFileIdForPath($user, $resource);
+
 		$user = $this->featureContext->getActualUsername($user);
+		$queryString = $this->getArchiverQueryString($user, $resource, $addressType);
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
-				$this->featureContext->getBaseUrl() . '/archiver?id=' . $resourceId,
+				$this->featureContext->getBaseUrl() . '/archiver?' . $queryString,
 				'',
 				$user,
 				$this->featureContext->getPasswordForUser($user),
@@ -100,26 +134,29 @@ class ArchiverContext implements Context {
 	}
 
 	/**
-	 * @When user :downloader downloads the archive of :item of user :owner using the resource id
+	 * @When user :downloader downloads the archive of :item of user :owner using the resource :addressType
 	 *
 	 * @param string $downloader Who sends the request
 	 * @param string $resource
 	 * @param string $owner Who is the real owner of the file
+	 * @param string $addressType id|path
 	 *
 	 * @return void
 	 *
 	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws Exception
 	 */
-	public function userDownloadsTheArchiveOfItemOfUserUsingTheResourceId(
+	public function userDownloadsTheArchiveOfItemOfUser(
 		string $downloader,
 		string $resource,
-		string $owner
+		string $owner,
+		string $addressType
 	): void {
-		$resourceId = $this->featureContext->getFileIdForPath($owner, $resource);
 		$downloader = $this->featureContext->getActualUsername($downloader);
+		$queryString = $this->getArchiverQueryString($owner, $resource, $addressType);
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
-				$this->featureContext->getBaseUrl() . '/archiver?id=' . $resourceId,
+				$this->featureContext->getBaseUrl() . '/archiver?' . $queryString,
 				'',
 				$downloader,
 				$this->featureContext->getPasswordForUser($downloader),
@@ -128,29 +165,31 @@ class ArchiverContext implements Context {
 	}
 
 	/**
-	 * @When user :arg1 downloads the archive of these items using the resource ids
+	 * @When user :user downloads the archive of these items using the resource :addressType
 	 *
 	 * @param string $user
 	 * @param TableNode $items
+	 * @param string $addressType ids|paths
 	 *
 	 * @return void
 	 *
 	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
-	public function userDownloadsTheArchiveOfTheseItemsUsingTheResourceIds(
+	public function userDownloadsTheArchiveOfTheseItems(
 		string $user,
-		TableNode $items
+		TableNode $items,
+		string $addressType
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
-		$resourceIdsString = '';
+		$queryString = '';
 		foreach ($items->getRows() as $item) {
-			$fileId = $this->featureContext->getFileIdForPath($user, $item[0]);
-			$resourceIdsString .= 'id=' . $fileId . '&';
+			$queryString .= $this->getArchiverQueryString($user, $item[0], $addressType) . '&';
 		}
-		$resourceIdsString = \rtrim($resourceIdsString, '&');
+
+		$queryString = \rtrim($queryString, '&');
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
-				$this->featureContext->getBaseUrl() . '/archiver?' . $resourceIdsString,
+				$this->featureContext->getBaseUrl() . '/archiver?' . $queryString,
 				'',
 				$user,
 				$this->featureContext->getPasswordForUser($user),

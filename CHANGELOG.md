@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Don't allow empty password: [#197](https://github.com/owncloud/product/issues/197)
 * Bugfix - Fix basic auth config: [#2719](https://github.com/owncloud/ocis/pull/2719)
+* Bugfix - Fix basic auth with custom user claim: [#2755](https://github.com/owncloud/ocis/pull/2755)
 * Bugfix - Fix oCIS startup ony systems with IPv6: [#2698](https://github.com/owncloud/ocis/pull/2698)
 * Bugfix - Fix opening images in media viewer for some usernames: [#2738](https://github.com/owncloud/ocis/pull/2738)
 * Bugfix - Fix error logging when there is no thumbnail for a file: [#2702](https://github.com/owncloud/ocis/pull/2702)
@@ -31,6 +32,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/2466
    https://github.com/owncloud/ocis/pull/2719
+
+* Bugfix - Fix basic auth with custom user claim: [#2755](https://github.com/owncloud/ocis/pull/2755)
+
+   We've fixed authentication with basic if oCIS is configured to use a non-standard claim as user
+   claim (`PROXY_USER_OIDC_CLAIM`). Prior to this bugfix the authentication always failed and
+   is now working.
+
+   https://github.com/owncloud/ocis/pull/2755
 
 * Bugfix - Fix oCIS startup ony systems with IPv6: [#2698](https://github.com/owncloud/ocis/pull/2698)
 

@@ -5,8 +5,8 @@ Feature: download multiple resources bundled into an archive
   So that I don't have to execute repetitive tasks
 
   As a developer
-  I want to be able to use the resource ID to download multiple items at once
-  So that I don't have to know the full path of the resource
+  I want to be able to use the full path of the resource to download multiple items at once
+  So that I don't have to know the ID of the resource
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
@@ -14,7 +14,7 @@ Feature: download multiple resources bundled into an archive
 
   Scenario Outline: download a single file
     Given user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
-    When user "Alice" downloads the archive of "/textfile0.txt" using the resource id and setting these headers
+    When user "Alice" downloads the archive of "/home/textfile0.txt" using the resource path and setting these headers
       | header     | value        |
       | User-Agent | <user-agent> |
     Then the HTTP status code should be "200"
@@ -31,7 +31,7 @@ Feature: download multiple resources bundled into an archive
     Given user "Alice" has created folder "my_data"
     And user "Alice" has uploaded file with content "some data" to "/my_data/textfile0.txt"
     And user "Alice" has uploaded file with content "more data" to "/my_data/an_other_file.txt"
-    When user "Alice" downloads the archive of "/my_data" using the resource id and setting these headers
+    When user "Alice" downloads the archive of "/home/my_data" using the resource path and setting these headers
       | header     | value        |
       | User-Agent | <user-agent> |
     Then the HTTP status code should be "200"
@@ -52,11 +52,11 @@ Feature: download multiple resources bundled into an archive
     And user "Alice" has uploaded file with content "some data" to "/my_data/textfile2.txt"
     And user "Alice" has created folder "more_data"
     And user "Alice" has uploaded file with content "more data" to "/more_data/an_other_file.txt"
-    When user "Alice" downloads the archive of these items using the resource ids
-      | textfile0.txt |
-      | textfile1.txt |
-      | my_data       |
-      | more_data     |
+    When user "Alice" downloads the archive of these items using the resource paths
+      | /home/textfile0.txt |
+      | /home/textfile1.txt |
+      | /home/my_data       |
+      | /home/more_data     |
     Then the HTTP status code should be "200"
     And the downloaded tar archive should contain these files:
       | name                        | content    |
@@ -66,10 +66,8 @@ Feature: download multiple resources bundled into an archive
       | more_data/an_other_file.txt | more data  |
 
 
-  Scenario: download a single file as different user
-    Given user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
-    When user "Brian" downloads the archive of "/textfile0.txt" of user "Alice" using the resource id
+  Scenario: download a not existing single file
+    When user "Alice" downloads the archive of "/doesnotexist.txt" of user "Alice" using the resource path
     Then the HTTP status code should be "400"
 
 
@@ -89,11 +87,11 @@ Feature: download multiple resources bundled into an archive
     And user "Brian" has accepted share "/textfile1.txt" offered by user "Alice"
     And user "Brian" has accepted share "/my_data" offered by user "Alice"
     And user "Brian" has accepted share "/more_data" offered by user "Alice"
-    When user "Brian" downloads the archive of these items using the resource ids
-      | /Shares/textfile0.txt |
-      | /Shares/textfile1.txt |
-      | /Shares/my_data       |
-      | /Shares/more_data     |
+    When user "Brian" downloads the archive of these items using the resource path
+      | /home/Shares/textfile0.txt |
+      | /home/Shares/textfile1.txt |
+      | /home/Shares/my_data       |
+      | /home/Shares/more_data     |
     Then the HTTP status code should be "200"
     And the downloaded tar archive should contain these files:
       | name                        | content    |
@@ -119,7 +117,7 @@ Feature: download multiple resources bundled into an archive
     And user "Brian" has accepted share "/textfile1.txt" offered by user "Alice"
     And user "Brian" has accepted share "/my_data" offered by user "Alice"
     And user "Brian" has accepted share "/more_data" offered by user "Alice"
-    When user "Brian" downloads the archive of "/Shares" using the resource id and setting these headers
+    When user "Brian" downloads the archive of "/home/Shares" using the resource path and setting these headers
       | header     | value        |
       | User-Agent | <user-agent> |
     Then the HTTP status code should be "200"
