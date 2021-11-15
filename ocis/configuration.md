@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-11-15T07:39:53+0000"
+date: "2021-11-15T11:35:46+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -112,6 +112,88 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
+### ocis server
+
+Start fullstack server
+
+Usage: `ocis server [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $OCIS_DEBUG_ADDR
+: Address to bind debug server. Default: `127.0.0.1:9010`.
+
+
+-debug-token |  $OCIS_DEBUG_TOKEN
+: Token to grant metrics access.
+
+
+-debug-pprof |  $OCIS_DEBUG_PPROF
+: Enable pprof debugging.
+
+
+-debug-zpages |  $OCIS_DEBUG_ZPAGES
+: Enable zpages debugging.
+
+
+-http-addr |  $OCIS_HTTP_ADDR
+: Address to bind http server. Default: `127.0.0.1:9000`.
+
+
+-http-root |  $OCIS_HTTP_ROOT
+: Root path of http server. Default: `/`.
+
+
+-grpc-addr |  $OCIS_GRPC_ADDR
+: Address to bind grpc server. Default: `127.0.0.1:9001`.
+
+
+-extensions |  $OCIS_RUN_EXTENSIONS
+: Run specific extensions during supervised mode.
+
+### ocis list
+
+Lists running ocis extensions
+
+Usage: `ocis list [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### ocis health
 
 Check health status
@@ -202,143 +284,53 @@ Usage: `ocis run [command options] [arguments...]`
 
 
 
-### ocis server
-
-Start fullstack server
-
-Usage: `ocis server [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $OCIS_DEBUG_ADDR
-: Address to bind debug server. Default: `127.0.0.1:9010`.
-
-
--debug-token |  $OCIS_DEBUG_TOKEN
-: Token to grant metrics access.
-
-
--debug-pprof |  $OCIS_DEBUG_PPROF
-: Enable pprof debugging.
-
-
--debug-zpages |  $OCIS_DEBUG_ZPAGES
-: Enable zpages debugging.
-
-
--http-addr |  $OCIS_HTTP_ADDR
-: Address to bind http server. Default: `127.0.0.1:9000`.
-
-
--http-root |  $OCIS_HTTP_ROOT
-: Root path of http server. Default: `/`.
-
-
--grpc-addr |  $OCIS_GRPC_ADDR
-: Address to bind grpc server. Default: `127.0.0.1:9001`.
-
-
--extensions |  $OCIS_RUN_EXTENSIONS
-: Run specific extensions during supervised mode.
-
-### ocis list
-
-Lists running ocis extensions
-
-Usage: `ocis list [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
-
-#### ocis storage-users
-
-Start storage and data provider for /users mount
 
 #### ocis version
 
 Lists running services with version
 
-#### ocis web
-
-Start web server
-
-#### ocis storage-public-link
-
-Start storage public link storage
-
-#### ocis store
-
-Start a go-micro store
-
 #### ocis webdav
 
 Start webdav server
 
-#### ocis settings
+#### ocis storage-userprovider
 
-Start settings server
-
-#### ocis storage-auth-bearer
-
-Start storage auth-bearer service
-
-#### ocis storage-home
-
-Start storage and data provider for /home mount
-
-#### ocis storage-metadata
-
-Start storage and data service for metadata
-
-#### ocis glauth
-
-Start glauth server
+Start storage userprovider service
 
 #### ocis idp
 
 Start idp server
 
+#### ocis storage-app-provider
+
+Start storage app-provider service
+
+#### ocis storage-public-link
+
+Start storage public link storage
+
+#### ocis glauth
+
+Start glauth server
+
 #### ocis accounts
 
 Start accounts server
+
+#### ocis storage-metadata
+
+Start storage and data service for metadata
+
+#### ocis storage-auth-basic
+
+Start storage auth-basic service
+
+#### ocis storage-auth-bearer
+
+Start storage auth-bearer service
 
 #### ocis storage-gateway
 
@@ -348,35 +340,43 @@ Start storage gateway
 
 Start ocs server
 
-#### ocis proxy
+#### ocis settings
 
-Start proxy server
-
-#### ocis storage-frontend
-
-Start storage frontend
-
-#### ocis storage-groupprovider
-
-Start storage groupprovider service
-
-#### ocis storage-app-provider
-
-Start storage app-provider service
-
-#### ocis storage-auth-basic
-
-Start storage auth-basic service
-
-#### ocis storage-sharing
-
-Start storage sharing service
+Start settings server
 
 #### ocis thumbnails
 
 Start thumbnails server
 
-#### ocis storage-userprovider
+#### ocis storage-home
 
-Start storage userprovider service
+Start storage and data provider for /home mount
+
+#### ocis storage-groupprovider
+
+Start storage groupprovider service
+
+#### ocis store
+
+Start a go-micro store
+
+#### ocis proxy
+
+Start proxy server
+
+#### ocis storage-sharing
+
+Start storage sharing service
+
+#### ocis storage-users
+
+Start storage and data provider for /users mount
+
+#### ocis web
+
+Start web server
+
+#### ocis storage-frontend
+
+Start storage frontend
 
