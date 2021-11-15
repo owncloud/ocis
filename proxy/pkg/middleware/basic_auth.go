@@ -91,7 +91,7 @@ func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 				}
 
 				if options.UserCS3Claim == "userid" {
-					// set the custom user claim only if users will be looked up by the the userid on the CS3api
+					// set the custom user claim only if users will be looked up by the userid on the CS3api
 					// OpaqueId contains the userid configured in STORAGE_LDAP_USER_SCHEMA_UID
 					claims[options.UserOIDCClaim] = user.Id.OpaqueId
 
