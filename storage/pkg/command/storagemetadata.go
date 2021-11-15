@@ -15,7 +15,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/storage/pkg/command/storagedrivers"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/service/external"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
@@ -31,7 +30,10 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 		Name:  "storage-metadata",
 		Usage: "Start storage-metadata service",
 		// TODO(refs) at this point it might make sense delegate log flags to each individual storage command.
-		Flags:    flagset.StorageMetadata(cfg),
+		//Flags:    flagset.StorageMetadata(cfg),
+		Before: func(c *cli.Context) error {
+			return ParseConfig(c, cfg, "storage-metadata")
+		},
 		Category: "Extensions",
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)

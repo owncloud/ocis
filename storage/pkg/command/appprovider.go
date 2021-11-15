@@ -12,7 +12,6 @@ import (
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
@@ -24,11 +23,11 @@ func AppProvider(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "app-provider",
 		Usage: "Start appprovider for providing apps",
-		Flags: flagset.AppProviderWithConfig(cfg),
+		//Flags: flagset.AppProviderWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.AppProvider.Services = c.StringSlice("service")
 
-			return nil
+			return ParseConfig(c, cfg, "storage-app-provider")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)

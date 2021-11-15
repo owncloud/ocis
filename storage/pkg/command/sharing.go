@@ -16,7 +16,6 @@ import (
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
@@ -27,11 +26,11 @@ func Sharing(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "sharing",
 		Usage: "Start sharing service",
-		Flags: flagset.SharingWithConfig(cfg),
+		//Flags: flagset.SharingWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Sharing.Services = c.StringSlice("service")
 
-			return nil
+			return ParseConfig(c, cfg, "storage-sharing")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)

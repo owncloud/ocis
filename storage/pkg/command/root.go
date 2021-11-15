@@ -2,14 +2,10 @@ package command
 
 import (
 	"os"
-	"strings"
-
-	"github.com/owncloud/ocis/ocis-pkg/shared"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/spf13/viper"
 	"github.com/urfave/cli/v2"
 )
 
@@ -28,49 +24,7 @@ func Execute(cfg *config.Config) error {
 			},
 		},
 		Before: func(c *cli.Context) error {
-			if cfg.Log == nil {
-				cfg.Log = &shared.Log{}
-			}
-
-			logger := NewLogger(cfg)
-
-			viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-			viper.SetEnvPrefix("STORAGE")
-			viper.AutomaticEnv()
-
-			if c.IsSet("config-file") {
-				viper.SetConfigFile(c.String("config-file"))
-			} else {
-				viper.SetConfigName("storage")
-
-				viper.AddConfigPath("/etc/ocis")
-				viper.AddConfigPath("$HOME/.ocis")
-				viper.AddConfigPath("./config")
-			}
-
-			if err := viper.ReadInConfig(); err != nil {
-				switch err.(type) {
-				case viper.ConfigFileNotFoundError:
-					logger.Debug().
-						Msg("no config found on preconfigured location")
-				case viper.UnsupportedConfigError:
-					logger.Fatal().
-						Err(err).
-						Msg("unsupported config type")
-				default:
-					logger.Fatal().
-						Err(err).
-						Msg("failed to read config")
-				}
-			}
-
-			if err := viper.Unmarshal(&cfg); err != nil {
-				logger.Fatal().
-					Err(err).
-					Msg("failed to parse config")
-			}
-
-			return nil
+			return ParseConfig(c, cfg, "storage")
 		},
 
 		Commands: []*cli.Command{

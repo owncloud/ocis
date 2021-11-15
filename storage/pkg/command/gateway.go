@@ -9,21 +9,19 @@ import (
 	"path"
 	"strings"
 
-	"github.com/mitchellh/mapstructure"
-	"github.com/owncloud/ocis/storage/pkg/tracing"
-
-	"github.com/owncloud/ocis/ocis-pkg/sync"
-	"github.com/owncloud/ocis/ocis-pkg/version"
-
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
+	"github.com/mitchellh/mapstructure"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/service/external"
+	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
 )
@@ -33,7 +31,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "gateway",
 		Usage: "Start gateway",
-		Flags: flagset.GatewayWithConfig(cfg),
+		//Flags: flagset.GatewayWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.Gateway.Services = c.StringSlice("service")
 			cfg.Reva.StorageRegistry.Rules = c.StringSlice("storage-registry-rule")
@@ -42,7 +40,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 				cfg.Reva.DataGateway.PublicURL = strings.TrimRight(cfg.Reva.Frontend.PublicURL, "/") + "/data"
 			}
 
-			return nil
+			return ParseConfig(c, cfg, "storage-gatway")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -222,11 +220,12 @@ func rules(cfg *config.Config, logger log.Logger) map[string]map[string]interfac
 
 	// generate rules based on default config
 	return map[string]map[string]interface{}{
-		cfg.Reva.StorageHome.MountPath:       {"address": cfg.Reva.StorageHome.Endpoint},
-		cfg.Reva.StorageHome.MountID:         {"address": cfg.Reva.StorageHome.Endpoint},
-		cfg.Reva.StorageUsers.MountPath:      {"address": cfg.Reva.StorageUsers.Endpoint},
-		cfg.Reva.StorageUsers.MountID + ".*": {"address": cfg.Reva.StorageUsers.Endpoint},
-		cfg.Reva.StoragePublicLink.MountPath: {"address": cfg.Reva.StoragePublicLink.Endpoint},
+		cfg.Reva.StorageHome.MountPath: {"address": cfg.Reva.StorageHome.Endpoint},
+		// this is an ugly hack. Why is it here in the first place?
+		"1284d238-aa92-42ce-bdc4-0b0000009154": {"address": cfg.Reva.StorageHome.Endpoint},
+		cfg.Reva.StorageUsers.MountPath:        {"address": cfg.Reva.StorageUsers.Endpoint},
+		cfg.Reva.StorageUsers.MountID + ".*":   {"address": cfg.Reva.StorageUsers.Endpoint},
+		cfg.Reva.StoragePublicLink.MountPath:   {"address": cfg.Reva.StoragePublicLink.Endpoint},
 		// public link storage returns the mount id of the actual storage
 		// medatada storage not part of the global namespace
 	}
@@ -377,4 +376,30 @@ func (s GatewaySutureService) Serve(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// ParseConfig loads accounts configuration from known paths.
+func ParseConfig(c *cli.Context, cfg *config.Config, storageExtension string) error {
+	conf, err := ociscfg.BindSourcesToStructs(storageExtension, cfg)
+	if err != nil {
+		return err
+	}
+
+	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &shared.Log{
+			Level:  cfg.Commons.Log.Level,
+			Pretty: cfg.Commons.Log.Pretty,
+			Color:  cfg.Commons.Log.Color,
+			File:   cfg.Commons.Log.File,
+		}
+	} else if cfg.Log == nil && cfg.Commons == nil {
+		cfg.Log = &shared.Log{}
+	}
+
+	// load all env variables relevant to the config in the current context.
+	conf.LoadOSEnv(config.GetEnv(cfg), false)
+
+	bindings := config.StructMappings(cfg)
+	return ociscfg.BindEnv(conf, bindings)
 }

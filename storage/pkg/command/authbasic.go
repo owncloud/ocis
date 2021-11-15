@@ -13,7 +13,6 @@ import (
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
@@ -25,11 +24,11 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-basic",
 		Usage: "Start authprovider for basic auth",
-		Flags: flagset.AuthBasicWithConfig(cfg),
+		//Flags: flagset.AuthBasicWithConfig(cfg),
 		Before: func(c *cli.Context) error {
 			cfg.Reva.AuthBasic.Services = c.StringSlice("service")
 
-			return nil
+			return ParseConfig(c, cfg, "storage-auth-basic")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)

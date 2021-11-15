@@ -115,7 +115,7 @@ func New() *Config {
 		Store:         store.DefaultConfig(),
 		Thumbnails:    thumbnails.DefaultConfig(),
 		WebDAV:        webdav.DefaultConfig(),
-		Storage:       storage.New(),
+		Storage:       storage.DefaultConfig(),
 	}
 }
 
@@ -160,7 +160,7 @@ func DefaultConfig() *Config {
 		Store:         store.DefaultConfig(),
 		Thumbnails:    thumbnails.DefaultConfig(),
 		WebDAV:        webdav.DefaultConfig(),
-		Storage:       storage.New(),
+		Storage:       storage.DefaultConfig(),
 	}
 }
 
