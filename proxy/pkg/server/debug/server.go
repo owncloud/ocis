@@ -27,10 +27,12 @@ func Server(opts ...Option) (*http.Server, error) {
 	), nil
 }
 
+const contentTypeHeader = "Content-Type"
+
 // health implements the health check.
 func health(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/plain")
+		w.Header().Set(contentTypeHeader, "text/plain")
 		w.WriteHeader(http.StatusOK)
 
 		// TODO(tboerger): check if services are up and running
@@ -44,7 +46,7 @@ func health(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 // ready implements the ready check.
 func ready(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/plain")
+		w.Header().Set(contentTypeHeader, "text/plain")
 		w.WriteHeader(http.StatusOK)
 
 		// TODO(tboerger): check if services are up and running
@@ -58,7 +60,7 @@ func ready(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 // configDump implements the config dump
 func configDump(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set(contentTypeHeader, "application/json")
 
 		b, err := json.Marshal(cfg)
 		if err != nil {
