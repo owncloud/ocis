@@ -133,7 +133,7 @@ def main(ctx):
     pipelines = []
 
     test_pipelines = \
-        checkForRecentBuilds(ctx) + \
+        cancelPreviousBuilds() + \
         [buildOcisBinaryForTesting(ctx)] + \
         testOcisModules(ctx) + \
         testPipelines(ctx)
@@ -187,46 +187,26 @@ def testOcisModules(ctx):
 
     return pipelines + [scan_result_upload]
 
-def checkForRecentBuilds(ctx):
-    pipelines = []
-
-    result = {
+def cancelPreviousBuilds():
+    return [{
         "kind": "pipeline",
         "type": "docker",
-        "name": "stop-recent-builds",
-        "steps": stopRecentBuilds(ctx),
-        "depends_on": [],
+        "name": "cancel-previous-builds",
+        "clone": {
+            "disable": True,
+        },
+        "steps": [{
+            "name": "cancel-previous-builds",
+            "image": "owncloudci/drone-cancel-previous-builds",
+            "settings": {
+                "DRONE_TOKEN": {
+                    "from_secret": "drone_token",
+                },
+            },
+        }],
         "trigger": {
             "ref": [
-                "refs/heads/master",
-                "refs/tags/**",
                 "refs/pull/**",
-            ],
-        },
-    }
-
-    pipelines.append(result)
-
-    return pipelines
-
-def stopRecentBuilds(ctx):
-    return [{
-        "name": "stop-recent-builds",
-        "image": "drone/cli:alpine",
-        "environment": {
-            "DRONE_SERVER": "https://drone.owncloud.com",
-            "DRONE_TOKEN": {
-                "from_secret": "drone_token",
-            },
-        },
-        "commands": [
-            "drone build ls %s --status running > /drone/src/recentBuilds.txt" % ctx.repo.slug,
-            "drone build info %s ${DRONE_BUILD_NUMBER} > /drone/src/thisBuildInfo.txt" % ctx.repo.slug,
-            "cd /drone/src && ./tests/acceptance/cancelBuilds.sh",
-        ],
-        "when": {
-            "event": [
-                "pull_request",
             ],
         },
     }]
