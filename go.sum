@@ -1273,8 +1273,8 @@ github.com/yuin/goldmark v1.4.0/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1
 github.com/zenazn/goji v0.9.1-0.20160507202103-64eb34159fe5/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 go-micro.dev/v4 v4.1.0/go.mod h1:XTEJj5ILOBW+2ndGDG56r8fBXZ8hmsVaIaS1K5zwj+s=
 go-micro.dev/v4 v4.2.1/go.mod h1:XTEJj5ILOBW+2ndGDG56r8fBXZ8hmsVaIaS1K5zwj+s=
-go-micro.dev/v4 v4.3.0 h1:sXVOWux4M2JBSaFYXZ0HhDFMt2m6EqY0IbfrR+R4Wn0=
-go-micro.dev/v4 v4.3.0/go.mod h1:tw47Xfg2YywfPUnglZgXQsSf7p0ST6mQL3v0JooGmSY=
+go-micro.dev/v4 v4.4.0 h1:DN/WlUwtG0yXs65oevUknlrQXfcBOaeW+WV2tzawZY4=
+go-micro.dev/v4 v4.4.0/go.mod h1:hSBUne6gtYTfYmnNxGQmaNmRQ6z8LqGrAVNmL/ae0lY=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/bbolt v1.3.5/go.mod h1:G5EMThwa9y8QZGBClrRx5EY+Yw9kAhnjy3bSjsnlVTQ=
 go.etcd.io/bbolt v1.3.6 h1:/ecaJf0sk1l4l6V4awd65v2C3ILy7MSj+s/x1ADCIMU=
