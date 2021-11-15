@@ -921,7 +921,7 @@ func DefaultConfig() *Config {
 			Configs:                     nil,
 			UploadMaxChunkSize:          1e+8,
 			UploadHTTPMethodOverride:    "",
-			ChecksumSupportedTypes:      nil,
+			ChecksumSupportedTypes:      []string{"sha1", "md5", "adler32"},
 			ChecksumPreferredUploadType: "",
 			DefaultUploadProtocol:       "tus",
 		},
