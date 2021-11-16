@@ -57,4 +57,4 @@ yarn-build: node_modules
 
 .PHONY: node_modules
 node_modules:
-	yarn install --frozen-lockfile
+	yarn install --immutable
