@@ -814,18 +814,21 @@ func DefaultConfig() *Config {
 				GRPCAddr:    "127.0.0.1:9146",
 				DebugAddr:   "127.0.0.1:9147",
 				Services:    []string{"authprovider"},
+				Endpoint:    "localhost:9146",
 			},
 			AuthBearer: Port{
 				GRPCNetwork: "tcp",
 				GRPCAddr:    "127.0.0.1:9148",
 				DebugAddr:   "127.0.0.1:9149",
 				Services:    []string{"authprovider"},
+				Endpoint:    "localhost:9148",
 			},
 			AuthMachine: Port{
 				GRPCNetwork: "tcp",
 				GRPCAddr:    "127.0.0.1:9166",
 				DebugAddr:   "127.0.0.1:9167",
 				Services:    []string{"authprovider"},
+				Endpoint:    "localhost:9166",
 			},
 			AuthMachineConfig: AuthMachineConfig{
 				MachineAuthAPIKey: "change-me-please",
