@@ -1,5 +1,7 @@
 services:
   ocis-server:
+    image: owncloud/ocis:$OCIS_IMAGE_TAG
+    user: root
     environment:
       OCIS_URL: "https://ocis-server:9200"
       STORAGE_HOME_DRIVER: $STORAGE_DRIVER
