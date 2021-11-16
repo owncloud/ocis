@@ -27,10 +27,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "frontend",
 		Usage: "Start frontend service",
-		//Flags: flagset.FrontendWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.Frontend.Services = c.StringSlice("service")
-			cfg.Reva.ChecksumSupportedTypes = c.StringSlice("checksum-supported-type")
 			if err := loadUserAgent(c, cfg); err != nil {
 				return err
 			}

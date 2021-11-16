@@ -33,8 +33,8 @@ func Gateway(cfg *config.Config) *cli.Command {
 		Usage: "Start gateway",
 		//Flags: flagset.GatewayWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.Gateway.Services = c.StringSlice("service")
-			cfg.Reva.StorageRegistry.Rules = c.StringSlice("storage-registry-rule")
+			//cfg.Reva.Gateway.Services = c.StringSlice("service")
+			//cfg.Reva.StorageRegistry.Rules = c.StringSlice("storage-registry-rule")
 
 			if cfg.Reva.DataGateway.PublicURL == "" {
 				cfg.Reva.DataGateway.PublicURL = strings.TrimRight(cfg.Reva.Frontend.PublicURL, "/") + "/data"

@@ -7,7 +7,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/storage/pkg/command"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/urfave/cli/v2"
 )
 
@@ -17,7 +16,7 @@ func StorageHomeCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-home",
 		Usage:    "Start storage and data provider for /home mount",
 		Category: "Extensions",
-		Flags:    flagset.StorageHomeWithConfig(cfg.Storage),
+		//Flags:    flagset.StorageHomeWithConfig(cfg.Storage),
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)
 		},

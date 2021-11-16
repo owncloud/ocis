@@ -52,7 +52,7 @@ func SharingWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringSliceFlag{
 			Name:    "service",
-			Value:   cli.NewStringSlice("usershareprovider", "publicshareprovider"), // TODO osmshareprovider
+			Value:   cli.NewStringSlice("usershareprovider", "publicshareprovider"), // accounted for
 			Usage:   "--service usershareprovider [--service publicshareprovider]",
 			EnvVars: []string{"STORAGE_SHARING_SERVICES"},
 		},

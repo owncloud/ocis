@@ -23,10 +23,7 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-bearer",
 		Usage: "Start authprovider for bearer auth",
-		//Flags: flagset.AuthBearerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.AuthBearer.Services = c.StringSlice("service")
-
 			return ParseConfig(c, cfg, "storage-auth-bearer")
 		},
 		Action: func(c *cli.Context) error {

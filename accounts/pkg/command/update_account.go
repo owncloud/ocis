@@ -6,7 +6,6 @@ import (
 
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	"github.com/owncloud/ocis/accounts/pkg/config"
-	"github.com/owncloud/ocis/accounts/pkg/flagset"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/urfave/cli/v2"
 	"google.golang.org/genproto/protobuf/field_mask"
@@ -21,7 +20,7 @@ func UpdateAccount(cfg *config.Config) *cli.Command {
 		Name:      "update",
 		Usage:     "Make changes to an existing account",
 		ArgsUsage: "id",
-		Flags:     flagset.UpdateAccountWithConfig(cfg, a),
+		//Flags:     flagset.UpdateAccountWithConfig(cfg, a),
 		Before: func(c *cli.Context) error {
 			if len(c.StringSlice("password_policies")) > 0 {
 				// StringSliceFlag doesn't support Destination

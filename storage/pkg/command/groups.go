@@ -24,10 +24,7 @@ func Groups(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "groups",
 		Usage: "Start groups service",
-		//Flags: flagset.GroupsWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.Groups.Services = c.StringSlice("service")
-
 			return ParseConfig(c, cfg, "storage-groups")
 		},
 		Action: func(c *cli.Context) error {

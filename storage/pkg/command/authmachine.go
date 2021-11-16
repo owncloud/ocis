@@ -23,10 +23,7 @@ func AuthMachine(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-machine",
 		Usage: "Start authprovider for machine auth",
-		//Flags: flagset.AuthMachineWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.AuthMachine.Services = c.StringSlice("service")
-
 			return ParseConfig(c, cfg, "storage-auth-machine")
 		},
 		Action: func(c *cli.Context) error {

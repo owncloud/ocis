@@ -25,7 +25,7 @@ func AppProvider(cfg *config.Config) *cli.Command {
 		Usage: "Start appprovider for providing apps",
 		//Flags: flagset.AppProviderWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.AppProvider.Services = c.StringSlice("service")
+			//cfg.Reva.AppProvider.Services = c.StringSlice("service")
 
 			return ParseConfig(c, cfg, "storage-app-provider")
 		},

@@ -7,7 +7,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/storage/pkg/command"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/urfave/cli/v2"
 )
 
@@ -17,7 +16,7 @@ func StorageGatewayCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-gateway",
 		Usage:    "Start storage gateway",
 		Category: "Extensions",
-		Flags:    flagset.GatewayWithConfig(cfg.Storage),
+		//Flags:    flagset.GatewayWithConfig(cfg.Storage),
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)
 		},

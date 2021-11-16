@@ -7,7 +7,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/storage/pkg/command"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/urfave/cli/v2"
 )
 
@@ -17,7 +16,7 @@ func StoragePublicLinkCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-public-link",
 		Usage:    "Start storage public link storage",
 		Category: "Extensions",
-		Flags:    flagset.StoragePublicLink(cfg.Storage),
+		//Flags:    flagset.StoragePublicLink(cfg.Storage),
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)
 		},
