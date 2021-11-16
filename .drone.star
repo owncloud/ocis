@@ -255,7 +255,7 @@ def testPipelines(ctx):
     return pipelines
 
 def testOcisModule(ctx, module):
-    steps = skipIfUnchanged(ctx, "unit-tests") + makeGenerate(module) + [
+    steps = skipIfUnchanged(ctx, "unit-tests") + makeGoGenerate(module) + [
         {
             "name": "golangci-lint",
             "image": OC_CI_GOLANG,
@@ -327,7 +327,8 @@ def buildOcisBinaryForTesting(ctx):
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                 makeGenerate("") +
+                 makeNodeGenerate("") +
+                 makeGoGenerate("") +
                  build() +
                  rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis"),
         "trigger": {
@@ -622,7 +623,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                     "cd /srv/app/web",
                     "git checkout $WEB_COMMITID",
                     "cp -r tests/acceptance/filesForUpload/* /uploads",
-                    "yarn install --frozen-lockfile",
+                    "yarn install --immutable",
                     "yarn build",
                     "./tests/acceptance/run.sh",
                 ],
@@ -685,10 +686,10 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "cd /srv/app/web",
                     "git checkout $WEB_COMMITID",
                     "cp -r tests/acceptance/filesForUpload/* /uploads",
-                    "yarn install --frozen-lockfile",
+                    "yarn install --immutable",
                     "yarn build",
                     "cd /drone/src/accounts",
-                    "yarn install --frozen-lockfile",
+                    "yarn install --immutable",
                     "make test-acceptance-webui",
                 ],
                 "volumes": [stepVolumeOC10Tests] +
@@ -749,9 +750,9 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "cp -r /srv/app/web/tests/acceptance/filesForUpload/* /uploads",
                     "cd /srv/app/web",
                     "git checkout $WEB_COMMITID",
-                    "yarn install --frozen-lockfile",
+                    "yarn install --immutable",
                     "cd /drone/src/settings",
-                    "yarn install --frozen-lockfile",
+                    "yarn install --immutable",
                     "make test-acceptance-webui",
                 ],
                 "volumes": [stepVolumeOC10Tests] +
@@ -875,12 +876,13 @@ def dockerRelease(ctx, arch):
             "arch": arch,
         },
         "steps": skipIfUnchanged(ctx, "build-docker") +
-                 makeGenerate("") + [
+                 makeNodeGenerate("") +
+                 makeGoGenerate("") + [
             {
                 "name": "build",
                 "image": OC_CI_GOLANG,
                 "commands": [
-                    "make -C ocis release-linux-docker",
+                    "make -C ocis release-linux-docker-%s" % (arch),
                 ],
             },
             {
@@ -949,12 +951,13 @@ def dockerEos(ctx):
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "build-docker") +
-                 makeGenerate("") + [
+                 makeNodeGenerate("") +
+                 makeGoGenerate("") + [
             {
                 "name": "build",
                 "image": OC_CI_GOLANG,
                 "commands": [
-                    "make -C ocis release-linux-docker",
+                    "make -C ocis release-linux-docker-amd64",
                 ],
             },
             {
@@ -1052,7 +1055,8 @@ def binaryRelease(ctx, name):
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "build-binary") +
-                 makeGenerate("") + [
+                 makeNodeGenerate("") +
+                 makeGoGenerate("") + [
             {
                 "name": "build",
                 "image": OC_CI_GOLANG,
@@ -1395,7 +1399,7 @@ def docs(ctx):
         },
     }
 
-def makeGenerate(module):
+def makeNodeGenerate(module):
     if module == "":
         make = "make"
     else:
@@ -1409,6 +1413,14 @@ def makeGenerate(module):
             ],
             "volumes": [stepVolumeGo],
         },
+    ]
+
+def makeGoGenerate(module):
+    if module == "":
+        make = "make"
+    else:
+        make = "make -C %s" % (module)
+    return [
         {
             "name": "generate go",
             "image": OC_CI_GOLANG,

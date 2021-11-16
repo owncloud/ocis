@@ -150,5 +150,6 @@
     "webpack-manifest-plugin": "3.1.0",
     "workbox-webpack-plugin": "4.3.1",
     "yarn-deduplicate": "^3.1.0"
-  }
+  },
+  "packageManager": "yarn@3.1.0"
 }

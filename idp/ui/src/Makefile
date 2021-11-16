@@ -2,7 +2,7 @@ all: images
 
 .PHONY: images
 images:
-	@$(MAKE) -C images
+	@$(MAKE) --no-print-directory -C images
 
 clean:
-	@$(MAKE) -C images clean
+	@$(MAKE) --no-print-directory -C images clean

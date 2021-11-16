@@ -1,5 +1,0 @@
-services:
-  ocis-server:
-    build:
-      context: ./../../../../.
-      dockerfile: Dockerfile

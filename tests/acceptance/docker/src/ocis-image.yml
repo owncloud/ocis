@@ -1,4 +1,0 @@
-services:
-  ocis-server:
-    image: owncloud/ocis:$OCIS_IMAGE_TAG
-    user: root
