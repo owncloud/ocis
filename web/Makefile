@@ -1,6 +1,8 @@
 SHELL := bash
 NAME := web
 
+include ../.make/recursion.mk
+
 ############ tooling ############
 ifneq (, $(shell which go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../.bingo/Variables.mk
@@ -31,4 +33,5 @@ WEB_ASSETS_VERSION = v4.4.0
 
 .PHONY: pull-assets
 pull-assets:
-	@rm -Rf assets && mkdir assets/ && curl -slL -o- https://github.com/owncloud/web/releases/download/$(WEB_ASSETS_VERSION)/web.tar.gz | tar xzf - -C assets/
+	@git clean -xfd assets
+	@curl -slL -o- https://github.com/owncloud/web/releases/download/$(WEB_ASSETS_VERSION)/web.tar.gz | tar xzf - -C assets/

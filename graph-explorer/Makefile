@@ -1,6 +1,8 @@
 SHELL := bash
 NAME := graph-explorer
 
+include ../.make/recursion.mk
+
 ############ tooling ############
 ifneq (, $(shell which go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../.bingo/Variables.mk
@@ -29,5 +31,5 @@ ci-node-generate: pull-assets
 
 .PHONY: pull-assets
 pull-assets:
-	@rm -Rf assets && mkdir assets/ && curl -slL -o- https://github.com/owncloud/graph-explorer/releases/download/v1.7.10.3/release.tar.gz | tar xvzf - -C assets/
-
+	@git clean -xfd assets
+	@curl -slL -o- https://github.com/owncloud/graph-explorer/releases/download/v1.7.10.3/release.tar.gz | tar xvzf - -C assets/

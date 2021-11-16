@@ -1,0 +1,17 @@
+# yarn2 with Zero-Installs: https://yarnpkg.com/features/zero-installs
+#.yarn/*
+#!.yarn/cache
+#!.yarn/patches
+#!.yarn/plugins
+#!.yarn/releases
+#!.yarn/sdks
+#!.yarn/versions
+
+# yarn2 not using Zero-Installs: https://yarnpkg.com/features/zero-installs
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*

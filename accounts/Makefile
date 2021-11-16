@@ -1,6 +1,8 @@
 SHELL := bash
 NAME := accounts
 
+include ../.make/recursion.mk
+
 .PHONY: test-acceptance-webui
 test-acceptance-webui:
 	./ui/tests/run-acceptance-test.sh $(FEATURE_PATH)
@@ -44,7 +46,7 @@ yarn-build: node_modules
 
 .PHONY: node_modules
 node_modules:
-	yarn install --frozen-lockfile
+	yarn install --immutable
 
 ############ protobuf ############
 PROTO_VERSION := v0

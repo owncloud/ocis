@@ -43,6 +43,8 @@ ifneq (, $(shell which go 2> /dev/null)) # suppress `command not found warnings`
 include .bingo/Variables.mk
 endif
 
+include .make/recursion.mk
+
 .PHONY: help
 help:
 	@echo "Please use 'make <target>' where <target> is one of the following:"
@@ -130,9 +132,10 @@ ci-go-generate:
 
 .PHONY: ci-node-generate
 ci-node-generate:
-	@for mod in $(OCIS_MODULES); do \
+	@if [ $(MAKE_DEPTH) -le 1 ]; then \
+	for mod in $(OCIS_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod ci-node-generate; \
-    done
+    done; fi;
 
 .PHONY: go-mod-tidy
 go-mod-tidy:
@@ -175,31 +178,31 @@ endif
 .PHONY: l10n-push
 l10n-push:
 	@for extension in $(L10N_MODULES); do \
-    	make -C $$extension l10n-push; \
+		$(MAKE) -C $$extension l10n-push; \
 	done
 
 .PHONY: l10n-pull
 l10n-pull:
 	@for extension in $(L10N_MODULES); do \
-    	make -C $$extension l10n-pull; \
+		$(MAKE) -C $$extension l10n-pull; \
 	done
 
 .PHONY: l10n-clean
 l10n-clean:
 	@for extension in $(L10N_MODULES); do \
-		make -C $$extension l10n-clean; \
+		$(MAKE) -C $$extension l10n-clean; \
 	done
 
 .PHONY: l10n-read
 l10n-read:
 	@for extension in $(L10N_MODULES); do \
-    	make -C $$extension l10n-read; \
+		$(MAKE) -C $$extension l10n-read; \
     done
 
 .PHONY: l10n-write
 l10n-write:
 	@for extension in $(L10N_MODULES); do \
-    	make -C $$extension l10n-write; \
+		$(MAKE) -C $$extension l10n-write; \
     done
 
 .PHONY: ci-format
