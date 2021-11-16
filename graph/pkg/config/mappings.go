@@ -111,5 +111,9 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			EnvVars:     []string{"REVA_GATEWAY"},
 			Destination: &cfg.Reva.Address,
 		},
+		{
+			EnvVars:     []string{"GRAPH_IDENTITY_BACKEND"},
+			Destination: &cfg.Identity.Backend,
+		},
 	}
 }

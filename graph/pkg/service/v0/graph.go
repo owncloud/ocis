@@ -7,14 +7,16 @@ import (
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/graph/pkg/config"
+	"github.com/owncloud/ocis/graph/pkg/identity"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
 // Graph defines implements the business logic for Service.
 type Graph struct {
-	config *config.Config
-	mux    *chi.Mux
-	logger *log.Logger
+	config      *config.Config
+	mux         *chi.Mux
+	logger      *log.Logger
+	userBackend identity.Users
 }
 
 // ServeHTTP implements the Service interface.

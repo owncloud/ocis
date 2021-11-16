@@ -52,6 +52,10 @@ type Spaces struct {
 	DefaultQuota string `ocisConfig:"default_quota"`
 }
 
+type Identity struct {
+	Backend string `ocisConfig:"backend"`
+}
+
 // Config combines all available configuration parts.
 type Config struct {
 	*shared.Commons
@@ -65,6 +69,7 @@ type Config struct {
 	Reva         Reva         `ocisConfig:"reva"`
 	TokenManager TokenManager `ocisConfig:"token_manager"`
 	Spaces       Spaces       `ocisConfig:"spaces"`
+	Identity     Identity     `ocisConfig:"identity"`
 
 	Context    context.Context
 	Supervised bool
@@ -102,6 +107,9 @@ func DefaultConfig() *Config {
 			WebDavBase:   "https://localhost:9200",
 			WebDavPath:   "/dav/spaces/",
 			DefaultQuota: "1000000000",
+		},
+		Identity: Identity{
+			Backend: "cs3",
 		},
 	}
 }
