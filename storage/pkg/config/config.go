@@ -1003,5 +1003,33 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			EnvVars:     []string{"OCIS_INSECURE", "STORAGE_USERS_DATAPROVIDER_INSECURE"},
 			Destination: &cfg.Reva.StorageUsers.DataProvider.Insecure,
 		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_LOCAL_ROOT"},
+			Destination: &cfg.Reva.UserStorage.Local.Root,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER"},
+			Destination: &cfg.Reva.StorageUsers.Driver,
+		},
+		{
+			EnvVars:     []string{"STORAGE_HOME_DRIVER"},
+			Destination: &cfg.Reva.StorageHome.Driver,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_DATADIR"},
+			Destination: &cfg.Reva.UserStorage.OwnCloud.Root,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OCIS_ROOT"},
+			Destination: &cfg.Reva.UserStorage.OCIS.Root,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_OCIS_ROOT"},
+			Destination: &cfg.Reva.MetadataStorage.OCIS.Root,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_USER_JSON_FILE"},
+			Destination: &cfg.Reva.Sharing.UserJSONFile,
+		},
 	}
 }
