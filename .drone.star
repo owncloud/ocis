@@ -255,7 +255,7 @@ def testPipelines(ctx):
     return pipelines
 
 def testOcisModule(ctx, module):
-    steps = skipIfUnchanged(ctx, "unit-tests") + makeGenerate(module) + [
+    steps = skipIfUnchanged(ctx, "unit-tests") + makeGoGenerate(module) + [
         {
             "name": "golangci-lint",
             "image": OC_CI_GOLANG,
@@ -327,7 +327,8 @@ def buildOcisBinaryForTesting(ctx):
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                 makeGenerate("") +
+                 makeNodeGenerate("") +
+                 makeGoGenerate("") +
                  build() +
                  rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis"),
         "trigger": {
@@ -875,7 +876,8 @@ def dockerRelease(ctx, arch):
             "arch": arch,
         },
         "steps": skipIfUnchanged(ctx, "build-docker") +
-                 makeGenerate("") + [
+                 makeNodeGenerate("") +
+                 makeGoGenerate("") + [
             {
                 "name": "build",
                 "image": OC_CI_GOLANG,
@@ -949,7 +951,8 @@ def dockerEos(ctx):
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "build-docker") +
-                 makeGenerate("") + [
+                 makeNodeGenerate("") +
+                 makeGoGenerate("") + [
             {
                 "name": "build",
                 "image": OC_CI_GOLANG,
@@ -1052,7 +1055,8 @@ def binaryRelease(ctx, name):
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "build-binary") +
-                 makeGenerate("") + [
+                 makeNodeGenerate("") +
+                 makeGoGenerate("") + [
             {
                 "name": "build",
                 "image": OC_CI_GOLANG,
@@ -1395,7 +1399,7 @@ def docs(ctx):
         },
     }
 
-def makeGenerate(module):
+def makeNodeGenerate(module):
     if module == "":
         make = "make"
     else:
@@ -1409,6 +1413,14 @@ def makeGenerate(module):
             ],
             "volumes": [stepVolumeGo],
         },
+    ]
+
+def makeGoGenerate(module):
+    if module == "":
+        make = "make"
+    else:
+        make = "make -C %s" % (module)
+    return [
         {
             "name": "generate go",
             "image": OC_CI_GOLANG,
