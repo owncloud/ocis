@@ -36,7 +36,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.6.0
 	github.com/iancoleman/strcase v0.2.0
 	github.com/justinas/alice v1.2.0
-	github.com/libregraph/lico v0.51.1
+	github.com/libregraph/lico v0.52.0
 	github.com/mennanov/fieldmask-utils v0.5.0
 	github.com/mitchellh/mapstructure v1.4.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
@@ -59,12 +59,12 @@ require (
 	github.com/yaegashi/msgraph.go v0.1.4
 	go-micro.dev/v4 v4.4.0
 	go.opencensus.io v0.23.0
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.26.1
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.27.0
 	go.opentelemetry.io/otel v1.2.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.1.0
-	go.opentelemetry.io/otel/sdk v1.1.0
+	go.opentelemetry.io/otel/sdk v1.2.0
 	go.opentelemetry.io/otel/trace v1.2.0
-	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
+	golang.org/x/crypto v0.0.0-20211108221036-ceb1ce70b4fa
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d
 	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
 	google.golang.org/genproto v0.0.0-20211020151524-b7c3a969101a
@@ -199,7 +199,7 @@ require (
 	github.com/pquerna/otp v1.3.0 // indirect
 	github.com/prometheus/alertmanager v0.23.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
-	github.com/prometheus/common v0.32.0 // indirect
+	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/prometheus/statsd_exporter v0.22.2 // indirect
 	github.com/rickb777/date v1.16.1 // indirect
@@ -233,9 +233,9 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.19.1 // indirect
-	golang.org/x/net v0.0.0-20211020060615-d418f374d309 // indirect
+	golang.org/x/net v0.0.0-20211111083644-e5c967477495 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20211020064051-0ec99a608a1b // indirect
+	golang.org/x/sys v0.0.0-20211110154304-99a53858aa08 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	golang.org/x/tools v0.1.7 // indirect
@@ -248,6 +248,3 @@ require (
 	stash.kopano.io/kgol/kcc-go/v5 v5.0.1 // indirect
 	stash.kopano.io/kgol/oidc-go v0.3.2 // indirect
 )
-
-// this is a transitive replace. See https://github.com/libregraph/lico/blob/master/go.mod#L38
-replace github.com/crewjam/saml => github.com/crewjam/saml v0.4.5
