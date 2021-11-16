@@ -246,6 +246,3 @@ require (
 	stash.kopano.io/kgol/kcc-go/v5 v5.0.1 // indirect
 	stash.kopano.io/kgol/oidc-go v0.3.2 // indirect
 )
-
-// this is a transitive replace. See https://github.com/libregraph/lico/blob/master/go.mod#L38
-replace github.com/crewjam/saml => github.com/crewjam/saml v0.4.5
