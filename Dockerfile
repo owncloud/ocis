@@ -1,3 +1,13 @@
+# Please consider to not use this Dockerfile.
+# If you want to build an image from source,
+# you might want to run following command instead:
+# `make -C ocis dev-docker`
+# It will build a `owncloud/ocis:dev` image for you.
+
+# If you still want to build oCIS using this Dockerfile
+# you can do it by running following command:
+# `docker build -t owncloud/ocis:custom .`
+
 FROM owncloudci/nodejs:14 as generate
 
 COPY ./ /ocis/
@@ -11,7 +21,6 @@ COPY --from=generate /ocis /ocis
 
 WORKDIR /ocis/ocis
 RUN make ci-go-generate build
-
 
 FROM alpine:3.13
 
