@@ -32,11 +32,15 @@ func Gateway(cfg *config.Config) *cli.Command {
 		Name:  "gateway",
 		Usage: "Start gateway",
 		Before: func(c *cli.Context) error {
+			if err := ParseConfig(c, cfg, "storage-gateway"); err != nil {
+				return err
+			}
+
 			if cfg.Reva.DataGateway.PublicURL == "" {
 				cfg.Reva.DataGateway.PublicURL = strings.TrimRight(cfg.Reva.Frontend.PublicURL, "/") + "/data"
 			}
 
-			return ParseConfig(c, cfg, "storage-gateway")
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
