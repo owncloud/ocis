@@ -963,6 +963,7 @@ func GetEnv(cfg *Config) []string {
 
 func structMappings(cfg *Config) []shared.EnvBinding {
 	return []shared.EnvBinding{
+		// Shared
 		{
 			EnvVars:     []string{"OCIS_LOG_LEVEL", "STORAGE_FRONTEND_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,
@@ -1046,6 +1047,1207 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"OCIS_URL", "STORAGE_USERPROVIDER_OWNCLOUDSQL_IDP"},
 			Destination: &cfg.Reva.UserOwnCloudSQL.Idp,
+		},
+		{
+			EnvVars:     []string{"STORAGE_DEBUG_ADDR"},
+			Destination: &cfg.Debug.Addr,
+		},
+
+		// debug
+
+		{
+			EnvVars:     []string{"STORAGE_DEBUG_TOKEN"},
+			Destination: &cfg.Debug.Token,
+		},
+		{
+			EnvVars:     []string{"STORAGE_DEBUG_PPROF"},
+			Destination: &cfg.Debug.Pprof,
+		},
+		{
+			EnvVars:     []string{"STORAGE_DEBUG_ZPAGES"},
+			Destination: &cfg.Debug.Zpages,
+		},
+
+		// app provider
+
+		{
+			EnvVars:     []string{"APP_PROVIDER_BASIC_DEBUG_ADDR"},
+			Destination: &cfg.Reva.AppProvider.DebugAddr,
+		},
+		{
+			EnvVars:     []string{"APP_PROVIDER_BASIC_GRPC_NETWORK"},
+			Destination: &cfg.Reva.AppProvider.GRPCNetwork,
+		},
+		{
+			EnvVars:     []string{"APP_PROVIDER_BASIC_GRPC_ADDR"},
+			Destination: &cfg.Reva.AppProvider.GRPCAddr,
+		},
+		{
+			EnvVars:     []string{"APP_PROVIDER_BASIC_EXTERNAL_ADDR"},
+			Destination: &cfg.Reva.AppProvider.ExternalAddr,
+		},
+		{
+			EnvVars:     []string{"APP_PROVIDER_DRIVER"},
+			Destination: &cfg.Reva.AppProvider.Driver,
+		},
+		{
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_APP_API_KEY"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.AppAPIKey,
+		},
+		{
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_APP_DESKTOP_ONLY"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.AppDesktopOnly,
+		},
+		{
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_APP_ICON_URI"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.AppIconURI,
+		},
+		{
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_APP_INTERNAL_URL"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.AppInternalURL,
+		},
+		{
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_APP_NAME"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.AppName,
+		},
+		{
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_APP_URL"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.AppURL,
+		},
+		{
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_INSECURE"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.Insecure,
+		},
+		{
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_IOP_SECRET"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.IopSecret,
+		},
+		{
+			EnvVars:     []string{"APP_PROVIDER_WOPI_DRIVER_WOPI_URL"},
+			Destination: &cfg.Reva.AppProvider.WopiDriver.WopiURL,
+		},
+
+		// authbasic
+		{
+			EnvVars:     []string{"STORAGE_AUTH_BASIC_DEBUG_ADDR"},
+			Destination: &cfg.Reva.AuthBasic.DebugAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_AUTH_DRIVER"},
+			Destination: &cfg.Reva.AuthProvider.Driver,
+		},
+		{
+			EnvVars:     []string{"STORAGE_AUTH_JSON"},
+			Destination: &cfg.Reva.AuthProvider.JSON,
+		},
+		{
+			EnvVars:     []string{"STORAGE_AUTH_BASIC_GRPC_NETWORK"},
+			Destination: &cfg.Reva.AuthBasic.GRPCNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_AUTH_BASIC_GRPC_ADDR"},
+			Destination: &cfg.Reva.AuthBasic.GRPCAddr,
+		},
+		{
+			EnvVars:     []string{"REVA_GATEWAY"},
+			Destination: &cfg.Reva.Gateway.Endpoint,
+		},
+
+		// authbearer
+		{
+			EnvVars:     []string{"STORAGE_AUTH_BEARER_DEBUG_ADDR"},
+			Destination: &cfg.Reva.AuthBearer.DebugAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_OIDC_ID_CLAIM"},
+			Destination: &cfg.Reva.OIDC.IDClaim,
+		},
+		{
+			EnvVars:     []string{"STORAGE_OIDC_UID_CLAIM"},
+			Destination: &cfg.Reva.OIDC.UIDClaim,
+		},
+		{
+			EnvVars:     []string{"STORAGE_OIDC_GID_CLAIM"},
+			Destination: &cfg.Reva.OIDC.GIDClaim,
+		},
+		{
+			EnvVars:     []string{"STORAGE_AUTH_BEARER_GRPC_NETWORK"},
+			Destination: &cfg.Reva.AuthBearer.GRPCNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_AUTH_BEARER_GRPC_ADDR"},
+			Destination: &cfg.Reva.AuthBearer.GRPCAddr,
+		},
+
+		// auth-machine
+		{
+			EnvVars:     []string{"STORAGE_AUTH_MACHINE_DEBUG_ADDR"},
+			Destination: &cfg.Reva.AuthMachine.DebugAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_AUTH_MACHINE_AUTH_API_KEY", "OCIS_MACHINE_AUTH_API_KEY"},
+			Destination: &cfg.Reva.AuthMachineConfig.MachineAuthAPIKey,
+		},
+		{
+			EnvVars:     []string{"STORAGE_AUTH_MACHINE_GRPC_NETWORK"},
+			Destination: &cfg.Reva.AuthMachine.GRPCNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_AUTH_MACHINE_GRPC_ADDR"},
+			Destination: &cfg.Reva.AuthMachine.GRPCAddr,
+		},
+
+		// frontend
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_DEBUG_ADDR"},
+			Destination: &cfg.Reva.Frontend.DebugAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_TRANSFER_SECRET"},
+			Destination: &cfg.Reva.TransferSecret,
+		},
+		{
+			EnvVars:     []string{"STORAGE_CHUNK_FOLDER"},
+			Destination: &cfg.Reva.OCDav.WebdavNamespace,
+		},
+		{
+			EnvVars:     []string{"STORAGE_WEBDAV_NAMESPACE"},
+			Destination: &cfg.Reva.OCDav.WebdavNamespace,
+		},
+		{
+			EnvVars:     []string{"STORAGE_DAV_FILES_NAMESPACE"},
+			Destination: &cfg.Reva.OCDav.DavFilesNamespace,
+		},
+		{
+			EnvVars:     []string{"STORAGE_ARCHIVER_MAX_NUM_FILES"},
+			Destination: &cfg.Reva.Archiver.MaxNumFiles,
+		},
+		{
+			EnvVars:     []string{"STORAGE_ARCHIVER_MAX_SIZE"},
+			Destination: &cfg.Reva.Archiver.MaxSize,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_HTTP_NETWORK"},
+			Destination: &cfg.Reva.Frontend.HTTPNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_HTTP_ADDR"},
+			Destination: &cfg.Reva.Frontend.HTTPAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_APPPROVIDER_PREFIX"},
+			Destination: &cfg.Reva.Frontend.AppProviderPrefix,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_ARCHIVER_PREFIX"},
+			Destination: &cfg.Reva.Frontend.ArchiverPrefix,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_DATAGATEWAY_PREFIX"},
+			Destination: &cfg.Reva.Frontend.DatagatewayPrefix,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_FAVORITES"},
+			Destination: &cfg.Reva.Frontend.Favorites,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_OCDAV_PREFIX"},
+			Destination: &cfg.Reva.Frontend.OCDavPrefix,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_OCS_PREFIX"},
+			Destination: &cfg.Reva.Frontend.OCSPrefix,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_OCS_SHARE_PREFIX"},
+			Destination: &cfg.Reva.Frontend.OCSSharePrefix,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_OCS_HOME_NAMESPACE"},
+			Destination: &cfg.Reva.Frontend.OCSHomeNamespace,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL"},
+			Destination: &cfg.Reva.Frontend.OCSResourceInfoCacheTTL,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_OCS_CACHE_WARMUP_DRIVER"},
+			Destination: &cfg.Reva.Frontend.OCSCacheWarmupDriver,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE"},
+			Destination: &cfg.Reva.Frontend.OCSAdditionalInfoAttribute,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_DEFAULT_UPLOAD_PROTOCOL"},
+			Destination: &cfg.Reva.DefaultUploadProtocol,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_UPLOAD_MAX_CHUNK_SIZE"},
+			Destination: &cfg.Reva.UploadMaxChunkSize,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE"},
+			Destination: &cfg.Reva.UploadHTTPMethodOverride,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_CHECKSUM_PREFERRED_UPLOAD_TYPE"},
+			Destination: &cfg.Reva.ChecksumPreferredUploadType,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_ARCHIVER_URL"},
+			Destination: &cfg.Reva.Archiver.ArchiverURL,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_APP_PROVIDER_APPS_URL"},
+			Destination: &cfg.Reva.AppProvider.AppsURL,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_APP_PROVIDER_OPEN_URL"},
+			Destination: &cfg.Reva.AppProvider.OpenURL,
+		},
+
+		// gateway
+		{
+			EnvVars:     []string{"STORAGE_GATEWAY_DEBUG_ADDR"},
+			Destination: &cfg.Reva.Gateway.DebugAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_TRANSFER_EXPIRES"},
+			Destination: &cfg.Reva.TransferExpires,
+		},
+		{
+			EnvVars:     []string{"STORAGE_GATEWAY_GRPC_NETWORK"},
+			Destination: &cfg.Reva.Gateway.GRPCNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_GATEWAY_GRPC_ADDR"},
+			Destination: &cfg.Reva.Gateway.GRPCAddr,
+		},
+
+		{
+			EnvVars:     []string{"STORAGE_GATEWAY_COMMIT_SHARE_TO_STORAGE_GRANT"},
+			Destination: &cfg.Reva.Gateway.CommitShareToStorageGrant,
+		},
+		{
+			EnvVars:     []string{"STORAGE_GATEWAY_COMMIT_SHARE_TO_STORAGE_REF"},
+			Destination: &cfg.Reva.Gateway.CommitShareToStorageRef,
+		},
+		{
+			EnvVars:     []string{"STORAGE_GATEWAY_SHARE_FOLDER"},
+			Destination: &cfg.Reva.Gateway.ShareFolder,
+		},
+		{
+			EnvVars:     []string{"STORAGE_GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN"},
+			Destination: &cfg.Reva.Gateway.DisableHomeCreationOnLogin,
+		},
+		{
+			EnvVars:     []string{"STORAGE_GATEWAY_HOME_MAPPING"},
+			Destination: &cfg.Reva.Gateway.HomeMapping,
+		},
+		{
+			EnvVars:     []string{"STORAGE_GATEWAY_ETAG_CACHE_TTL"},
+			Destination: &cfg.Reva.Gateway.EtagCacheTTL,
+		},
+		{
+			EnvVars:     []string{"STORAGE_AUTH_BASIC_ENDPOINT"},
+			Destination: &cfg.Reva.AuthBasic.Endpoint,
+		},
+		{
+			EnvVars:     []string{"STORAGE_AUTH_BEARER_ENDPOINT"},
+			Destination: &cfg.Reva.AuthBearer.Endpoint,
+		},
+		{
+			EnvVars:     []string{"STORAGE_AUTH_MACHINE_ENDPOINT"},
+			Destination: &cfg.Reva.AuthMachine.Endpoint,
+		},
+		{
+			EnvVars:     []string{"STORAGE_STORAGE_REGISTRY_DRIVER"},
+			Destination: &cfg.Reva.StorageRegistry.Driver,
+		},
+		{
+			EnvVars:     []string{"STORAGE_STORAGE_REGISTRY_HOME_PROVIDER"},
+			Destination: &cfg.Reva.StorageRegistry.HomeProvider,
+		},
+		{
+			EnvVars:     []string{"STORAGE_STORAGE_REGISTRY_JSON"},
+			Destination: &cfg.Reva.StorageRegistry.JSON,
+		},
+		{
+			EnvVars:     []string{"STORAGE_APP_REGISTRY_DRIVER"},
+			Destination: &cfg.Reva.AppRegistry.Driver,
+		},
+		{
+			EnvVars:     []string{"STORAGE_APP_REGISTRY_MIMETYPES_JSON"},
+			Destination: &cfg.Reva.AppRegistry.MimetypesJSON,
+		},
+		{
+			EnvVars:     []string{"STORAGE_DATAGATEWAY_PUBLIC_URL"},
+			Destination: &cfg.Reva.DataGateway.PublicURL,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERPROVIDER_ENDPOINT"},
+			Destination: &cfg.Reva.Users.Endpoint,
+		},
+		{
+			EnvVars:     []string{"STORAGE_GROUPPROVIDER_ENDPOINT"},
+			Destination: &cfg.Reva.Groups.Endpoint,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_ENDPOINT"},
+			Destination: &cfg.Reva.Sharing.Endpoint,
+		},
+		{
+			EnvVars:     []string{"STORAGE_APPPROVIDER_ENDPOINT"},
+			Destination: &cfg.Reva.AppProvider.Endpoint,
+		},
+		{
+			EnvVars:     []string{"STORAGE_HOME_ENDPOINT"},
+			Destination: &cfg.Reva.StorageHome.Endpoint,
+		},
+		{
+			EnvVars:     []string{"STORAGE_HOME_MOUNT_PATH"},
+			Destination: &cfg.Reva.StorageHome.MountPath,
+		},
+		{
+			EnvVars:     []string{"STORAGE_HOME_MOUNT_ID"},
+			Destination: &cfg.Reva.StorageHome.MountID,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_ENDPOINT"},
+			Destination: &cfg.Reva.StorageUsers.Endpoint,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_MOUNT_PATH"},
+			Destination: &cfg.Reva.StorageUsers.MountPath,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_MOUNT_ID"},
+			Destination: &cfg.Reva.StorageUsers.MountID,
+		},
+		{
+			EnvVars:     []string{"STORAGE_PUBLIC_LINK_ENDPOINT"},
+			Destination: &cfg.Reva.StoragePublicLink.Endpoint,
+		},
+		{
+			EnvVars:     []string{"STORAGE_PUBLIC_LINK_MOUNT_PATH"},
+			Destination: &cfg.Reva.StoragePublicLink.MountPath,
+		},
+
+		// groups
+		{
+			EnvVars:     []string{"STORAGE_GROUPPROVIDER_DEBUG_ADDR"},
+			Destination: &cfg.Reva.Groups.DebugAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_GROUPPROVIDER_NETWORK"},
+			Destination: &cfg.Reva.Groups.GRPCNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_GROUPPROVIDER_ADDR"},
+			Destination: &cfg.Reva.Groups.GRPCAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_GROUPPROVIDER_DRIVER"},
+			Destination: &cfg.Reva.Groups.Driver,
+		},
+		{
+			EnvVars:     []string{"STORAGE_GROUPPROVIDER_JSON"},
+			Destination: &cfg.Reva.Groups.JSON,
+		},
+		{
+			EnvVars:     []string{"STORAGE_GROUP_CACHE_EXPIRATION"},
+			Destination: &cfg.Reva.Groups.GroupMembersCacheExpiration,
+		},
+
+		// ldap
+		{
+			EnvVars:     []string{"STORAGE_LDAP_HOSTNAME"},
+			Destination: &cfg.Reva.LDAP.Hostname,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_PORT"},
+			Destination: &cfg.Reva.LDAP.Port,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_CACERT"},
+			Destination: &cfg.Reva.LDAP.CACert,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_INSECURE"},
+			Destination: &cfg.Reva.LDAP.Insecure,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_BASE_DN"},
+			Destination: &cfg.Reva.LDAP.BaseDN,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_LOGINFILTER"},
+			Destination: &cfg.Reva.LDAP.LoginFilter,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_USERFILTER"},
+			Destination: &cfg.Reva.LDAP.UserFilter,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_USERATTRIBUTEFILTER"},
+			Destination: &cfg.Reva.LDAP.UserAttributeFilter,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_USERFINDFILTER"},
+			Destination: &cfg.Reva.LDAP.UserFindFilter,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_USERGROUPFILTER"},
+			Destination: &cfg.Reva.LDAP.UserGroupFilter,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_GROUPFILTER"},
+			Destination: &cfg.Reva.LDAP.GroupFilter,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_GROUPATTRIBUTEFILTER"},
+			Destination: &cfg.Reva.LDAP.GroupAttributeFilter,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_GROUPFINDFILTER"},
+			Destination: &cfg.Reva.LDAP.GroupFindFilter,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_GROUPMEMBERFILTER"},
+			Destination: &cfg.Reva.LDAP.GroupMemberFilter,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_BIND_DN"},
+			Destination: &cfg.Reva.LDAP.BindDN,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_BIND_PASSWORD"},
+			Destination: &cfg.Reva.LDAP.BindPassword,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_USER_SCHEMA_UID"},
+			Destination: &cfg.Reva.LDAP.UserSchema.UID,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_USER_SCHEMA_MAIL"},
+			Destination: &cfg.Reva.LDAP.UserSchema.Mail,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_USER_SCHEMA_DISPLAYNAME"},
+			Destination: &cfg.Reva.LDAP.UserSchema.DisplayName,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_USER_SCHEMA_CN"},
+			Destination: &cfg.Reva.LDAP.UserSchema.CN,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_USER_SCHEMA_UID_NUMBER"},
+			Destination: &cfg.Reva.LDAP.UserSchema.UIDNumber,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_USER_SCHEMA_GID_NUMBER"},
+			Destination: &cfg.Reva.LDAP.UserSchema.GIDNumber,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_GROUP_SCHEMA_GID"},
+			Destination: &cfg.Reva.LDAP.GroupSchema.GID,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_GROUP_SCHEMA_MAIL"},
+			Destination: &cfg.Reva.LDAP.GroupSchema.Mail,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_GROUP_SCHEMA_DISPLAYNAME"},
+			Destination: &cfg.Reva.LDAP.GroupSchema.DisplayName,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_GROUP_SCHEMA_CN"},
+			Destination: &cfg.Reva.LDAP.GroupSchema.CN,
+		},
+		{
+			EnvVars:     []string{"STORAGE_LDAP_GROUP_SCHEMA_GID_NUMBER"},
+			Destination: &cfg.Reva.LDAP.GroupSchema.GIDNumber,
+		},
+
+		// rest
+		{
+			EnvVars:     []string{"STORAGE_REST_CLIENT_ID"},
+			Destination: &cfg.Reva.UserGroupRest.ClientID,
+		},
+		{
+			EnvVars:     []string{"STORAGE_REST_CLIENT_SECRET"},
+			Destination: &cfg.Reva.UserGroupRest.ClientSecret,
+		},
+		{
+			EnvVars:     []string{"STORAGE_REST_REDIS_ADDRESS"},
+			Destination: &cfg.Reva.UserGroupRest.RedisAddress,
+		},
+		{
+			EnvVars:     []string{"STORAGE_REST_REDIS_USERNAME"},
+			Destination: &cfg.Reva.UserGroupRest.RedisUsername,
+		},
+		{
+			EnvVars:     []string{"STORAGE_REST_REDIS_PASSWORD"},
+			Destination: &cfg.Reva.UserGroupRest.RedisPassword,
+		},
+		{
+			EnvVars:     []string{"STORAGE_REST_ID_PROVIDER"},
+			Destination: &cfg.Reva.UserGroupRest.IDProvider,
+		},
+		{
+			EnvVars:     []string{"STORAGE_REST_API_BASE_URL"},
+			Destination: &cfg.Reva.UserGroupRest.APIBaseURL,
+		},
+		{
+			EnvVars:     []string{"STORAGE_REST_OIDC_TOKEN_ENDPOINT"},
+			Destination: &cfg.Reva.UserGroupRest.OIDCTokenEndpoint,
+		},
+		{
+			EnvVars:     []string{"STORAGE_REST_TARGET_API"},
+			Destination: &cfg.Reva.UserGroupRest.TargetAPI,
+		},
+
+		// secret
+		{
+			EnvVars:     []string{"STORAGE_JWT_SECRET", "OCIS_JWT_SECRET"},
+			Destination: &cfg.Reva.JWTSecret,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SKIP_USER_GROUPS_IN_TOKEN"},
+			Destination: &cfg.Reva.SkipUserGroupsInToken,
+		},
+
+		// sharing
+		{
+			EnvVars:     []string{"STORAGE_SHARING_DEBUG_ADDR"},
+			Destination: &cfg.Reva.Sharing.DebugAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_GRPC_NETWORK"},
+			Destination: &cfg.Reva.Sharing.GRPCNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_GRPC_ADDR"},
+			Destination: &cfg.Reva.Sharing.GRPCAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_USER_DRIVER"},
+			Destination: &cfg.Reva.Sharing.UserDriver,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_PUBLIC_DRIVER"},
+			Destination: &cfg.Reva.Sharing.PublicDriver,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_PUBLIC_JSON_FILE"},
+			Destination: &cfg.Reva.Sharing.PublicJSONFile,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_PUBLIC_PASSWORD_HASH_COST"},
+			Destination: &cfg.Reva.Sharing.PublicPasswordHashCost,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_PUBLIC_ENABLE_EXPIRED_SHARES_CLEANUP"},
+			Destination: &cfg.Reva.Sharing.PublicEnableExpiredSharesCleanup,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_PUBLIC_JANITOR_RUN_INTERVAL"},
+			Destination: &cfg.Reva.Sharing.PublicJanitorRunInterval,
+		},
+
+		// shqringsql
+		{
+			EnvVars:     []string{"STORAGE_SHARING_USER_SQL_USERNAME"},
+			Destination: &cfg.Reva.Sharing.UserSQLUsername,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_USER_SQL_PASSWORD"},
+			Destination: &cfg.Reva.Sharing.UserSQLPassword,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_USER_SQL_HOST"},
+			Destination: &cfg.Reva.Sharing.UserSQLHost,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_USER_SQL_PORT"},
+			Destination: &cfg.Reva.Sharing.UserSQLPort,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_USER_SQL_NAME"},
+			Destination: &cfg.Reva.Sharing.UserSQLName,
+		},
+
+		// storage home
+		{
+			EnvVars:     []string{"STORAGE_HOME_DEBUG_ADDR"},
+			Destination: &cfg.Reva.StorageHome.DebugAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_HOME_GRPC_NETWORK"},
+			Destination: &cfg.Reva.StorageHome.GRPCNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_HOME_GRPC_ADDR"},
+			Destination: &cfg.Reva.StorageHome.GRPCAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_HOME_HTTP_NETWORK"},
+			Destination: &cfg.Reva.StorageHome.HTTPNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_HOME_HTTP_ADDR"},
+			Destination: &cfg.Reva.StorageHome.HTTPAddr,
+		},
+		{
+			EnvVars:     []string{"OCIS_STORAGE_READ_ONLY", "STORAGE_HOME_READ_ONLY"},
+			Destination: &cfg.Reva.StorageHome.ReadOnly,
+		},
+		{
+			EnvVars:     []string{"STORAGE_HOME_EXPOSE_DATA_SERVER"},
+			Destination: &cfg.Reva.StorageHome.ExposeDataServer,
+		},
+		{
+			EnvVars:     []string{"STORAGE_HOME_DATA_SERVER_URL"},
+			Destination: &cfg.Reva.StorageHome.DataServerURL,
+		},
+		{
+			EnvVars:     []string{"STORAGE_HOME_HTTP_PREFIX"},
+			Destination: &cfg.Reva.StorageHome.HTTPPrefix,
+		},
+		{
+			EnvVars:     []string{"STORAGE_HOME_TMP_FOLDER"},
+			Destination: &cfg.Reva.StorageHome.TempFolder,
+		},
+
+		// storage metadata
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DEBUG_ADDR"},
+			Destination: &cfg.Reva.StorageMetadata.DebugAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_GRPC_NETWORK"},
+			Destination: &cfg.Reva.StorageMetadata.GRPCNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_GRPC_PROVIDER_ADDR"},
+			Destination: &cfg.Reva.StorageMetadata.GRPCAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DATA_SERVER_URL"},
+			Destination: &cfg.Reva.StorageMetadata.DataServerURL,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_HTTP_NETWORK"},
+			Destination: &cfg.Reva.StorageMetadata.HTTPNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_HTTP_ADDR"},
+			Destination: &cfg.Reva.StorageMetadata.HTTPAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_TMP_FOLDER"},
+			Destination: &cfg.Reva.StorageMetadata.TempFolder,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER"},
+			Destination: &cfg.Reva.StorageMetadata.Driver,
+		},
+
+		// storage public link
+		{
+			EnvVars:     []string{"STORAGE_PUBLIC_LINK_DEBUG_ADDR"},
+			Destination: &cfg.Reva.StoragePublicLink.DebugAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_PUBLIC_LINK_GRPC_NETWORK"},
+			Destination: &cfg.Reva.StoragePublicLink.GRPCNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_PUBLIC_LINK_GRPC_ADDR"},
+			Destination: &cfg.Reva.StoragePublicLink.GRPCAddr,
+		},
+
+		// storage users
+		{
+			EnvVars:     []string{"STORAGE_USERS_DEBUG_ADDR"},
+			Destination: &cfg.Reva.StorageUsers.DebugAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_GRPC_NETWORK"},
+			Destination: &cfg.Reva.StorageUsers.GRPCNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_GRPC_ADDR"},
+			Destination: &cfg.Reva.StorageUsers.GRPCAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_HTTP_NETWORK"},
+			Destination: &cfg.Reva.StorageUsers.HTTPNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_HTTP_ADDR"},
+			Destination: &cfg.Reva.StorageUsers.HTTPAddr,
+		},
+		{
+			EnvVars:     []string{"OCIS_STORAGE_READ_ONLY", "STORAGE_USERS_READ_ONLY"},
+			Destination: &cfg.Reva.StorageUsers.ReadOnly,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_EXPOSE_DATA_SERVER"},
+			Destination: &cfg.Reva.StorageUsers.ExposeDataServer,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DATA_SERVER_URL"},
+			Destination: &cfg.Reva.StorageUsers.DataServerURL,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_HTTP_PREFIX"},
+			Destination: &cfg.Reva.StorageUsers.HTTPPrefix,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_TMP_FOLDER"},
+			Destination: &cfg.Reva.StorageUsers.TempFolder,
+		},
+
+		// tracing
+		{
+			EnvVars:     []string{"OCIS_TRACING_ENABLED", "STORAGE_TRACING_ENABLED"},
+			Destination: &cfg.Tracing.Enabled,
+		},
+		{
+			EnvVars:     []string{"OCIS_TRACING_TYPE", "STORAGE_TRACING_TYPE"},
+			Destination: &cfg.Tracing.Type,
+		},
+		{
+			EnvVars:     []string{"OCIS_TRACING_ENDPOINT", "STORAGE_TRACING_ENDPOINT"},
+			Destination: &cfg.Tracing.Endpoint,
+		},
+		{
+			EnvVars:     []string{"OCIS_TRACING_COLLECTOR", "STORAGE_TRACING_COLLECTOR"},
+			Destination: &cfg.Tracing.Collector,
+		},
+		{
+			EnvVars:     []string{"STORAGE_TRACING_SERVICE"},
+			Destination: &cfg.Tracing.Service,
+		},
+
+		// users
+		{
+			EnvVars:     []string{"STORAGE_USERPROVIDER_DEBUG_ADDR"},
+			Destination: &cfg.Reva.Users.DebugAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERPROVIDER_NETWORK"},
+			Destination: &cfg.Reva.Users.GRPCNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERPROVIDER_ADDR"},
+			Destination: &cfg.Reva.Users.GRPCAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERPROVIDER_DRIVER"},
+			Destination: &cfg.Reva.Users.Driver,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERPROVIDER_JSON"},
+			Destination: &cfg.Reva.Users.JSON,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USER_CACHE_EXPIRATION"},
+			Destination: &cfg.Reva.Users.UserGroupsCacheExpiration,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERPROVIDER_OWNCLOUDSQL_DBHOST"},
+			Destination: &cfg.Reva.UserOwnCloudSQL.DBHost,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERPROVIDER_OWNCLOUDSQL_DBPORT"},
+			Destination: &cfg.Reva.UserOwnCloudSQL.DBPort,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERPROVIDER_OWNCLOUDSQL_DBNAME"},
+			Destination: &cfg.Reva.UserOwnCloudSQL.DBName,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERPROVIDER_OWNCLOUDSQL_DBUSER"},
+			Destination: &cfg.Reva.UserOwnCloudSQL.DBUsername,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERPROVIDER_OWNCLOUDSQL_DBPASS"},
+			Destination: &cfg.Reva.UserOwnCloudSQL.DBPassword,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERPROVIDER_OWNCLOUDSQL_NOBODY"},
+			Destination: &cfg.Reva.UserOwnCloudSQL.Nobody,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERPROVIDER_OWNCLOUDSQL_JOIN_USERNAME"},
+			Destination: &cfg.Reva.UserOwnCloudSQL.JoinUsername,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERPROVIDER_OWNCLOUDSQL_JOIN_OWNCLOUDUUID"},
+			Destination: &cfg.Reva.UserOwnCloudSQL.JoinOwnCloudUUID,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERPROVIDER_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH"},
+			Destination: &cfg.Reva.UserOwnCloudSQL.EnableMedialSearch,
+		},
+
+		// driver eos
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_NAMESPACE"},
+			Destination: &cfg.Reva.UserStorage.EOS.Root,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_SHADOW_NAMESPACE"},
+			Destination: &cfg.Reva.UserStorage.EOS.ShadowNamespace,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_UPLOADS_NAMESPACE"},
+			Destination: &cfg.Reva.UserStorage.EOS.UploadsNamespace,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_SHARE_FOLDER"},
+			Destination: &cfg.Reva.UserStorage.EOS.ShareFolder,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_BINARY"},
+			Destination: &cfg.Reva.UserStorage.EOS.EosBinary,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_XRDCOPY_BINARY"},
+			Destination: &cfg.Reva.UserStorage.EOS.XrdcopyBinary,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_MASTER_URL"},
+			Destination: &cfg.Reva.UserStorage.EOS.MasterURL,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_SLAVE_URL"},
+			Destination: &cfg.Reva.UserStorage.EOS.SlaveURL,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_CACHE_DIRECTORY"},
+			Destination: &cfg.Reva.UserStorage.EOS.CacheDirectory,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_ENABLE_LOGGING"},
+			Destination: &cfg.Reva.UserStorage.EOS.EnableLogging,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_SHOW_HIDDEN_SYSFILES"},
+			Destination: &cfg.Reva.UserStorage.EOS.ShowHiddenSysFiles,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_FORCE_SINGLEUSER_MODE"},
+			Destination: &cfg.Reva.UserStorage.EOS.ForceSingleUserMode,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_USE_KEYTAB"},
+			Destination: &cfg.Reva.UserStorage.EOS.UseKeytab,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_SEC_PROTOCOL"},
+			Destination: &cfg.Reva.UserStorage.EOS.SecProtocol,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_KEYTAB"},
+			Destination: &cfg.Reva.UserStorage.EOS.Keytab,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_SINGLE_USERNAME"},
+			Destination: &cfg.Reva.UserStorage.EOS.SingleUsername,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_EOS_LAYOUT"},
+			Destination: &cfg.Reva.UserStorage.EOS.UserLayout,
+		},
+		{
+			EnvVars:     []string{"REVA_GATEWAY"},
+			Destination: &cfg.Reva.UserStorage.EOS.GatewaySVC,
+		},
+
+		// driver local
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_LOCAL_SHARE_FOLDER"},
+			Destination: &cfg.Reva.UserStorage.Local.ShareFolder,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_LOCAL_USER_LAYOUT"},
+			Destination: &cfg.Reva.UserStorage.Local.UserLayout,
+		},
+
+		// driver ocis
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OCIS_LAYOUT"},
+			Destination: &cfg.Reva.UserStorage.OCIS.UserLayout,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OCIS_SHARE_FOLDER"},
+			Destination: &cfg.Reva.UserStorage.OCIS.ShareFolder,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OCIS_SERVICE_USER_UUID"},
+			Destination: &cfg.Reva.UserStorage.OCIS.ServiceUserUUID,
+		},
+
+		// driver owncloud
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_UPLOADINFO_DIR"},
+			Destination: &cfg.Reva.UserStorage.OwnCloud.UploadInfoDir,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_SHARE_FOLDER"},
+			Destination: &cfg.Reva.UserStorage.OwnCloud.ShareFolder,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_SCAN"},
+			Destination: &cfg.Reva.UserStorage.OwnCloud.Scan,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_REDIS_ADDR"},
+			Destination: &cfg.Reva.UserStorage.OwnCloud.Redis,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_LAYOUT"},
+			Destination: &cfg.Reva.UserStorage.OwnCloud.UserLayout,
+		},
+
+		// driver owncloud sql
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DATADIR"},
+			Destination: &cfg.Reva.UserStorage.OwnCloudSQL.Root,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUDSQL_UPLOADINFO_DIR"},
+			Destination: &cfg.Reva.UserStorage.OwnCloudSQL.UploadInfoDir,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUDSQL_SHARE_FOLDER"},
+			Destination: &cfg.Reva.UserStorage.OwnCloudSQL.ShareFolder,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUDSQL_LAYOUT"},
+			Destination: &cfg.Reva.UserStorage.OwnCloudSQL.UserLayout,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBUSERNAME"},
+			Destination: &cfg.Reva.UserStorage.OwnCloudSQL.DBUsername,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBPASSWORD"},
+			Destination: &cfg.Reva.UserStorage.OwnCloudSQL.DBPassword,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBHOST"},
+			Destination: &cfg.Reva.UserStorage.OwnCloudSQL.DBHost,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBPORT"},
+			Destination: &cfg.Reva.UserStorage.OwnCloudSQL.DBPort,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBNAME"},
+			Destination: &cfg.Reva.UserStorage.OwnCloudSQL.DBName,
+		},
+
+		// driver s3
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3_REGION"},
+			Destination: &cfg.Reva.UserStorage.S3.Region,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3_ACCESS_KEY"},
+			Destination: &cfg.Reva.UserStorage.S3.AccessKey,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3_SECRET_KEY"},
+			Destination: &cfg.Reva.UserStorage.S3.SecretKey,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3_ENDPOINT"},
+			Destination: &cfg.Reva.UserStorage.S3.Endpoint,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3_BUCKET"},
+			Destination: &cfg.Reva.UserStorage.S3.Bucket,
+		},
+
+		// driver s3ng
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_ROOT"},
+			Destination: &cfg.Reva.UserStorage.S3NG.Root,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_LAYOUT"},
+			Destination: &cfg.Reva.UserStorage.S3NG.UserLayout,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_SHARE_FOLDER"},
+			Destination: &cfg.Reva.UserStorage.S3NG.ShareFolder,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_REGION"},
+			Destination: &cfg.Reva.UserStorage.S3NG.Region,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_ACCESS_KEY"},
+			Destination: &cfg.Reva.UserStorage.S3NG.AccessKey,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_SECRET_KEY"},
+			Destination: &cfg.Reva.UserStorage.S3NG.SecretKey,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_ENDPOINT"},
+			Destination: &cfg.Reva.UserStorage.S3NG.Endpoint,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_BUCKET"},
+			Destination: &cfg.Reva.UserStorage.S3NG.Bucket,
+		},
+
+		// metadata driver eos
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_NAMESPACE"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.Root,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_SHADOW_NAMESPACE"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.ShadowNamespace,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_UPLOADS_NAMESPACE"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.UploadsNamespace,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_SHARE_FOLDER"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.ShareFolder,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_BINARY"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.EosBinary,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_XRDCOPY_BINARY"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.XrdcopyBinary,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_MASTER_URL"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.MasterURL,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_SLAVE_URL"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.SlaveURL,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_CACHE_DIRECTORY"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.CacheDirectory,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_ENABLE_LOGGING"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.EnableLogging,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_SHOW_HIDDEN_SYSFILES"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.ShowHiddenSysFiles,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_FORCE_SINGLEUSER_MODE"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.ForceSingleUserMode,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_USE_KEYTAB"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.UseKeytab,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_SEC_PROTOCOL"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.SecProtocol,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_KEYTAB"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.Keytab,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_SINGLE_USERNAME"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.SingleUsername,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_EOS_LAYOUT"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.UserLayout,
+		},
+		{
+			EnvVars:     []string{"REVA_GATEWAY"},
+			Destination: &cfg.Reva.MetadataStorage.EOS.GatewaySVC,
+		},
+
+		// metadata local driver
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_LOCAL_ROOT"},
+			Destination: &cfg.Reva.MetadataStorage.Local.Root,
+		},
+
+		// metadata ocis driver
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_OCIS_LAYOUT"},
+			Destination: &cfg.Reva.MetadataStorage.OCIS.UserLayout,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_OCIS_SERVICE_USER_UUID"},
+			Destination: &cfg.Reva.MetadataStorage.OCIS.ServiceUserUUID,
+		},
+
+		// metadata driver s3
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3_REGION"},
+			Destination: &cfg.Reva.MetadataStorage.S3.Region,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3_ACCESS_KEY"},
+			Destination: &cfg.Reva.MetadataStorage.S3.AccessKey,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3_SECRET_KEY"},
+			Destination: &cfg.Reva.MetadataStorage.S3.SecretKey,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3_ENDPOINT"},
+			Destination: &cfg.Reva.MetadataStorage.S3.Endpoint,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3_BUCKET"},
+			Destination: &cfg.Reva.MetadataStorage.S3.Bucket,
+		},
+
+		// driver s3ng
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3NG_ROOT"},
+			Destination: &cfg.Reva.MetadataStorage.S3NG.Root,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3NG_LAYOUT"},
+			Destination: &cfg.Reva.MetadataStorage.S3NG.UserLayout,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3NG_REGION"},
+			Destination: &cfg.Reva.MetadataStorage.S3NG.Region,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3NG_ACCESS_KEY"},
+			Destination: &cfg.Reva.MetadataStorage.S3NG.AccessKey,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3NG_SECRET_KEY"},
+			Destination: &cfg.Reva.MetadataStorage.S3NG.SecretKey,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3NG_ENDPOINT"},
+			Destination: &cfg.Reva.MetadataStorage.S3NG.Endpoint,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3NG_BUCKET"},
+			Destination: &cfg.Reva.MetadataStorage.S3NG.Bucket,
 		},
 	}
 }
