@@ -648,7 +648,7 @@ Scenario Outline: Moving a file into a shared folder as the sharee and as the sh
 -   [apiWebdavMove2/moveFile.feature:290](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L290)
 -   [apiWebdavMove2/moveFile.feature:291](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L291)
 
-#### [OCIS-storage overwriting a file as share receiver, does not create a new file version for the sharer](https://github.com/owncloud/ocis/issues/766)
+#### [User loses accepted share if owner changes the contents of the file](https://github.com/owncloud/ocis/issues/2706)
 -   [apiVersions/fileVersionsSharingToShares.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L32)
 
 #### [restoring an older version of a shared file deletes the share](https://github.com/owncloud/ocis/issues/765)
