@@ -220,20 +220,15 @@ func spacesRules(cfg *config.Config, logger log.Logger) map[string]map[string]in
 
 	// generate rules based on default config
 	return map[string]map[string]interface{}{
-		"/home": {
-			"address":          cfg.Reva.StorageUsers.Endpoint,
-			"space_type":       "personal",
-			"space_owner_self": true,
-		},
-		"/home/Shares": {
-			"address":       cfg.Reva.StorageShares.Endpoint,
-			"space_type":    "share",
-			"path_template": "/home/Shares/{{.Name}}",
-		},
 		"/users": {
 			"address":       cfg.Reva.StorageUsers.Endpoint,
 			"space_type":    "personal",
-			"path_template": "/users/{{.Owner.Id.OpaqueId}}",
+			"path_template": "/users/{{.Space.Owner.Id.OpaqueId}}",
+		},
+		"/users/{{.CurrentUser.Id.OpaqueId}}/Shares/{{.Space.Name}}": {
+			"address":       cfg.Reva.StorageShares.Endpoint,
+			"space_type":    "share",
+			"path_template": "/users/{{.CurrentUser.Id.OpaqueId}}/Shares/{{.Space.Name}}",
 		},
 		// public link storage returns the mount id of the actual storage
 		"/public": {
