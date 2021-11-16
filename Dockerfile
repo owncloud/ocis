@@ -1,12 +1,18 @@
-# Please consider to not use this Dockerfile.
-# If you want to build an image from source,
-# you might want to run following command instead:
-# `make -C ocis dev-docker`
-# It will build a `owncloud/ocis:dev` image for you.
+# Please use this Dockerfile only if
+# you want to build an image from source without
+# Yarn and Go installed on your dev machine.
 
-# If you still want to build oCIS using this Dockerfile
-# you can do it by running following command:
+# You can build oCIS using this Dockerfile
+# by running following command:
 # `docker build -t owncloud/ocis:custom .`
+
+# In most other cases you might want to run the
+# following command instead:
+# `make -C ocis dev-docker`
+# It will build a `owncloud/ocis:dev` image for you
+# and use your local Yarn and Go caches and therefore
+# is a lot faster than the below build steps.
+
 
 FROM owncloudci/nodejs:14 as generate
 
