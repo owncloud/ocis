@@ -23,7 +23,6 @@ func StoragePublicLink(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-public-link",
 		Usage: "Start storage-public-link service",
-		//Flags:    flagset.StoragePublicLink(cfg),
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg, "storage-public-link")
 		},

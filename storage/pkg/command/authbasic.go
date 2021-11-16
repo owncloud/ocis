@@ -24,10 +24,7 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-basic",
 		Usage: "Start authprovider for basic auth",
-		//Flags: flagset.AuthBasicWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			//cfg.Reva.AuthBasic.Services = c.StringSlice("service")
-
 			return ParseConfig(c, cfg, "storage-auth-basic")
 		},
 		Action: func(c *cli.Context) error {

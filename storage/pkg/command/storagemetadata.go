@@ -29,8 +29,6 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-metadata",
 		Usage: "Start storage-metadata service",
-		// TODO(refs) at this point it might make sense delegate log flags to each individual storage command.
-		//Flags:    flagset.StorageMetadata(cfg),
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg, "storage-metadata")
 		},

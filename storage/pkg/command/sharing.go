@@ -26,10 +26,7 @@ func Sharing(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "sharing",
 		Usage: "Start sharing service",
-		//Flags: flagset.SharingWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			//cfg.Reva.Sharing.Services = c.StringSlice("service")
-
 			return ParseConfig(c, cfg, "storage-sharing")
 		},
 		Action: func(c *cli.Context) error {
