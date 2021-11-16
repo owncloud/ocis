@@ -1031,5 +1031,21 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			EnvVars:     []string{"STORAGE_SHARING_USER_JSON_FILE"},
 			Destination: &cfg.Reva.Sharing.UserJSONFile,
 		},
+		{
+			EnvVars:     []string{"OCIS_URL", "STORAGE_FRONTEND_PUBLIC_URL"},
+			Destination: &cfg.Reva.Frontend.PublicURL,
+		},
+		{
+			EnvVars:     []string{"OCIS_URL", "STORAGE_OIDC_ISSUER"},
+			Destination: &cfg.Reva.OIDC.Issuer,
+		},
+		{
+			EnvVars:     []string{"OCIS_URL", "STORAGE_LDAP_IDP"},
+			Destination: &cfg.Reva.LDAP.IDP,
+		},
+		{
+			EnvVars:     []string{"OCIS_URL", "STORAGE_USERPROVIDER_OWNCLOUDSQL_IDP"},
+			Destination: &cfg.Reva.UserOwnCloudSQL.Idp,
+		},
 	}
 }
