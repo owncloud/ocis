@@ -138,7 +138,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingAutocompletion/shareAutocompletion.feature:128](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L128)
 -   [webUISharingAutocompletion/shareAutocompletion.feature:141](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L141)
 
-### [No occ command in ocis](https://github.com/owncloud/ocis/issues/1317)
 ### [First request with a recreated user returns a 401 error](https://github.com/owncloud/ocis/issues/1675)
 -   [webUISharingAutocompletion/shareAutocompletion.feature:76](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L76)
 -   [webUISharingAutocompletion/shareAutocompletion.feature:115](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L115)
@@ -222,7 +221,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderAdvancedPermissionsGroups/shareAdvancePermissionsGroup.feature#L71)
 
 ### [Share Permissions](https://github.com/owncloud/ocis/issues/1277)
-### [Deletion of a selected user/group as a collaborator has unusual behavior in UI](https://github.com/owncloud/web/issues/5857)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L62)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:63](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L63)
 -   [webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:63](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature#L63)
@@ -235,7 +233,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingFolderPermissionMultipleUsers/shareFolderWithMultipleUsers.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFolderPermissionMultipleUsers/shareFolderWithMultipleUsers.feature#L62)
 
 ### [Advanced Permissions role is not displayed](https://github.com/owncloud/ocis/issues/1922)
-### [Deletion of a selected user/group as a collaborator has unusual behavior in UI](https://github.com/owncloud/web/issues/5857)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:64](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L64)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:65](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L65)
 -   [webUISharingFilePermissionsGroups/sharePermissionsGroup.feature:66](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionsGroups/sharePermissionsGroup.feature#L66)
