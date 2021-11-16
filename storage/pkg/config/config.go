@@ -194,7 +194,6 @@ type DataProvider struct {
 type StoragePort struct {
 	Port
 	Driver           string `ocisConfig:"driver"`
-	MountPath        string `ocisConfig:"mount_path"`
 	MountID          string `ocisConfig:"mount_id"`
 	AlternativeID    string `ocisConfig:"alternative_id"`
 	ExposeDataServer bool   `ocisConfig:"expose_data_server"`
@@ -472,7 +471,7 @@ type Reva struct {
 	AuthMachine       Port              `ocisConfig:"auth_machine"`
 	AuthMachineConfig AuthMachineConfig `ocisConfig:"auth_machine_config"`
 	Sharing           Sharing           `ocisConfig:"sharing"`
-	StorageHome       StoragePort       `ocisConfig:"storage_home"`
+	StorageShares     StoragePort       `ocisConfig:"storage_shares"`
 	StorageUsers      StoragePort       `ocisConfig:"storage_users"`
 	StoragePublicLink PublicStorage     `ocisConfig:"storage_public_link"`
 	StorageMetadata   StoragePort       `ocisConfig:"storage_metadata"`
@@ -864,7 +863,7 @@ func DefaultConfig() *Config {
 				PublicJanitorRunInterval:         60,
 				UserStorageMountID:               "",
 			},
-			StorageHome: StoragePort{
+			StorageShares: StoragePort{
 				Port: Port{
 					Endpoint:    "localhost:9154",
 					DebugAddr:   "127.0.0.1:9156",
@@ -873,14 +872,9 @@ func DefaultConfig() *Config {
 					HTTPNetwork: "tcp",
 					HTTPAddr:    "127.0.0.1:9155",
 				},
-				Driver:        "ocis",
 				ReadOnly:      false,
-				MountPath:     "/home",
 				AlternativeID: "1284d238-aa92-42ce-bdc4-0b0000009154",
 				MountID:       "1284d238-aa92-42ce-bdc4-0b0000009157",
-				DataServerURL: "http://localhost:9155/data",
-				HTTPPrefix:    "data",
-				TempFolder:    path.Join(defaults.BaseDataPath(), "tmp", "home"),
 			},
 			StorageUsers: StoragePort{
 				Port: Port{
@@ -891,7 +885,6 @@ func DefaultConfig() *Config {
 					HTTPNetwork: "tcp",
 					HTTPAddr:    "127.0.0.1:9158",
 				},
-				MountPath:     "/users",
 				MountID:       "1284d238-aa92-42ce-bdc4-0b0000009157",
 				Driver:        "ocis",
 				DataServerURL: "http://localhost:9158/data",
@@ -906,8 +899,7 @@ func DefaultConfig() *Config {
 						GRPCNetwork: "tcp",
 						GRPCAddr:    "127.0.0.1:9178",
 					},
-					MountPath: "/public",
-					MountID:   "e1a73ede-549b-4226-abdf-40e69ca8230d",
+					MountID: "7993447f-687f-490d-875c-ac95e89a62a4",
 				},
 				PublicShareProviderAddr: "",
 				UserProviderAddr:        "",
@@ -992,10 +984,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Reva.StorageMetadata.DataProvider.Insecure,
 		},
 		{
-			EnvVars:     []string{"OCIS_INSECURE", "STORAGE_HOME_DATAPROVIDER_INSECURE"},
-			Destination: &cfg.Reva.StorageHome.DataProvider.Insecure,
-		},
-		{
 			EnvVars:     []string{"OCIS_INSECURE", "STORAGE_FRONTEND_APPPROVIDER_INSECURE"},
 			Destination: &cfg.Reva.Frontend.AppProviderInsecure,
 		},
@@ -1022,10 +1010,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"STORAGE_USERS_DRIVER"},
 			Destination: &cfg.Reva.StorageUsers.Driver,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_DRIVER"},
-			Destination: &cfg.Reva.StorageHome.Driver,
 		},
 		{
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_DATADIR"},
@@ -1413,36 +1397,20 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Reva.AppProvider.Endpoint,
 		},
 		{
-			EnvVars:     []string{"STORAGE_HOME_ENDPOINT"},
-			Destination: &cfg.Reva.StorageHome.Endpoint,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_MOUNT_PATH"},
-			Destination: &cfg.Reva.StorageHome.MountPath,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_MOUNT_ID"},
-			Destination: &cfg.Reva.StorageHome.MountID,
-		},
-		{
 			EnvVars:     []string{"STORAGE_USERS_ENDPOINT"},
 			Destination: &cfg.Reva.StorageUsers.Endpoint,
-		},
-		{
-			EnvVars:     []string{"STORAGE_USERS_MOUNT_PATH"},
-			Destination: &cfg.Reva.StorageUsers.MountPath,
 		},
 		{
 			EnvVars:     []string{"STORAGE_USERS_MOUNT_ID"},
 			Destination: &cfg.Reva.StorageUsers.MountID,
 		},
 		{
-			EnvVars:     []string{"STORAGE_PUBLIC_LINK_ENDPOINT"},
-			Destination: &cfg.Reva.StoragePublicLink.Endpoint,
+			EnvVars:     []string{"STORAGE_SHARES_ENDPOINT"},
+			Destination: &cfg.Reva.StorageShares.Endpoint,
 		},
 		{
-			EnvVars:     []string{"STORAGE_PUBLIC_LINK_MOUNT_PATH"},
-			Destination: &cfg.Reva.StoragePublicLink.MountPath,
+			EnvVars:     []string{"STORAGE_PUBLIC_LINK_ENDPOINT"},
+			Destination: &cfg.Reva.StoragePublicLink.Endpoint,
 		},
 
 		// groups
@@ -1689,48 +1657,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Reva.Sharing.UserSQLName,
 		},
 
-		// storage home
-		{
-			EnvVars:     []string{"STORAGE_HOME_DEBUG_ADDR"},
-			Destination: &cfg.Reva.StorageHome.DebugAddr,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_GRPC_NETWORK"},
-			Destination: &cfg.Reva.StorageHome.GRPCNetwork,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_GRPC_ADDR"},
-			Destination: &cfg.Reva.StorageHome.GRPCAddr,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_HTTP_NETWORK"},
-			Destination: &cfg.Reva.StorageHome.HTTPNetwork,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_HTTP_ADDR"},
-			Destination: &cfg.Reva.StorageHome.HTTPAddr,
-		},
-		{
-			EnvVars:     []string{"OCIS_STORAGE_READ_ONLY", "STORAGE_HOME_READ_ONLY"},
-			Destination: &cfg.Reva.StorageHome.ReadOnly,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_EXPOSE_DATA_SERVER"},
-			Destination: &cfg.Reva.StorageHome.ExposeDataServer,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_DATA_SERVER_URL"},
-			Destination: &cfg.Reva.StorageHome.DataServerURL,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_HTTP_PREFIX"},
-			Destination: &cfg.Reva.StorageHome.HTTPPrefix,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_TMP_FOLDER"},
-			Destination: &cfg.Reva.StorageHome.TempFolder,
-		},
-
 		// storage metadata
 		{
 			EnvVars:     []string{"STORAGE_METADATA_DEBUG_ADDR"},
@@ -1819,6 +1745,32 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"STORAGE_USERS_TMP_FOLDER"},
 			Destination: &cfg.Reva.StorageUsers.TempFolder,
+		},
+
+		// storage shares
+		{
+			EnvVars:     []string{"STORAGE_SHARES_DEBUG_ADDR"},
+			Destination: &cfg.Reva.StorageShares.DebugAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARES_GRPC_NETWORK"},
+			Destination: &cfg.Reva.StorageShares.GRPCNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARES_GRPC_ADDR"},
+			Destination: &cfg.Reva.StorageShares.GRPCAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARES_HTTP_NETWORK"},
+			Destination: &cfg.Reva.StorageShares.HTTPNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARES_HTTP_ADDR"},
+			Destination: &cfg.Reva.StorageShares.HTTPAddr,
+		},
+		{
+			EnvVars:     []string{"OCIS_STORAGE_READ_ONLY", "STORAGE_SHARES_READ_ONLY"},
+			Destination: &cfg.Reva.StorageShares.ReadOnly,
 		},
 
 		// tracing

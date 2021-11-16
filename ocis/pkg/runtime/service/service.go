@@ -108,8 +108,8 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["storage-authbasic"] = storage.NewAuthBasic
 	s.ServicesRegistry["storage-authbearer"] = storage.NewAuthBearer
 	s.ServicesRegistry["storage-authmachine"] = storage.NewAuthMachine
-	s.ServicesRegistry["storage-home"] = storage.NewStorageHome
 	s.ServicesRegistry["storage-users"] = storage.NewStorageUsers
+	s.ServicesRegistry["storage-shares"] = storage.NewStorageShares
 	s.ServicesRegistry["storage-public-link"] = storage.NewStoragePublicLink
 	s.ServicesRegistry["storage-appprovider"] = storage.NewAppProvider
 

@@ -12,7 +12,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/command/storagedrivers"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
@@ -20,13 +19,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// StorageHome is the entrypoint for the storage-home command.
-func StorageHome(cfg *config.Config) *cli.Command {
+// StorageShares is the entrypoint for the storage-shares command.
+func StorageShares(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "storage-home",
-		Usage: "Start storage-home service",
+		Name:  "storage-shares",
+		Usage: "Start storage-shares service",
 		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg, "storage-home")
+			return ParseConfig(c, cfg, "storage-shares")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -40,7 +39,7 @@ func StorageHome(cfg *config.Config) *cli.Command {
 			uuid := uuid.Must(uuid.NewV4())
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
-			rcfg := storageHomeConfigFromStruct(c, cfg)
+			rcfg := storageSharesConfigFromStruct(c, cfg)
 
 			gr.Add(func() error {
 				runtime.RunWithOptions(
@@ -59,7 +58,7 @@ func StorageHome(cfg *config.Config) *cli.Command {
 
 			debugServer, err := debug.Server(
 				debug.Name(c.Command.Name+"-debug"),
-				debug.Addr(cfg.Reva.StorageHome.DebugAddr),
+				debug.Addr(cfg.Reva.StorageShares.DebugAddr),
 				debug.Logger(logger),
 				debug.Context(ctx),
 				debug.Config(cfg),
@@ -74,7 +73,7 @@ func StorageHome(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageHome.Supervised {
+			if !cfg.Reva.StorageShares.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
@@ -83,11 +82,11 @@ func StorageHome(cfg *config.Config) *cli.Command {
 	}
 }
 
-// storageHomeConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
-func storageHomeConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
+// storageSharesConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+func storageSharesConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
 	rcfg := map[string]interface{}{
 		"core": map[string]interface{}{
-			"max_cpus":             cfg.Reva.StorageHome.MaxCPUs,
+			"max_cpus":             cfg.Reva.StorageShares.MaxCPUs,
 			"tracing_enabled":      cfg.Tracing.Enabled,
 			"tracing_endpoint":     cfg.Tracing.Endpoint,
 			"tracing_collector":    cfg.Tracing.Collector,
@@ -99,37 +98,17 @@ func storageHomeConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
-			"network": cfg.Reva.StorageHome.GRPCNetwork,
-			"address": cfg.Reva.StorageHome.GRPCAddr,
-			// TODO build services dynamically
+			"network": cfg.Reva.StorageShares.GRPCNetwork,
+			"address": cfg.Reva.StorageShares.GRPCAddr,
 			"services": map[string]interface{}{
-				"storageprovider": map[string]interface{}{
-					"driver":             cfg.Reva.StorageHome.Driver,
-					"drivers":            storagedrivers.HomeDrivers(cfg),
-					"mount_id":           cfg.Reva.StorageHome.MountID,
-					"expose_data_server": cfg.Reva.StorageHome.ExposeDataServer,
-					"data_server_url":    cfg.Reva.StorageHome.DataServerURL,
-					"tmp_folder":         cfg.Reva.StorageHome.TempFolder,
-				},
-			},
-		},
-		"http": map[string]interface{}{
-			"network": cfg.Reva.StorageHome.HTTPNetwork,
-			"address": cfg.Reva.StorageHome.HTTPAddr,
-			// TODO build services dynamically
-			"services": map[string]interface{}{
-				"dataprovider": map[string]interface{}{
-					"prefix":      cfg.Reva.StorageHome.HTTPPrefix,
-					"driver":      cfg.Reva.StorageHome.Driver,
-					"drivers":     storagedrivers.HomeDrivers(cfg),
-					"timeout":     86400,
-					"insecure":    cfg.Reva.StorageHome.DataProvider.Insecure,
-					"disable_tus": false,
+				"sharesstorageprovider": map[string]interface{}{
+					"usershareprovidersvc": cfg.Reva.Sharing.Endpoint,
+					"gateway_addr":         cfg.Reva.Gateway.Endpoint,
 				},
 			},
 		},
 	}
-	if cfg.Reva.StorageHome.ReadOnly {
+	if cfg.Reva.StorageShares.ReadOnly {
 		gcfg := rcfg["grpc"].(map[string]interface{})
 		gcfg["interceptors"] = map[string]interface{}{
 			"readonly": map[string]interface{}{},
@@ -138,35 +117,35 @@ func storageHomeConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 	return rcfg
 }
 
-// StorageHomeSutureService allows for the storage-home command to be embedded and supervised by a suture supervisor tree.
-type StorageHomeSutureService struct {
+// StorageSharesSutureService allows for the storage-home command to be embedded and supervised by a suture supervisor tree.
+type StorageSharesSutureService struct {
 	cfg *config.Config
 }
 
-// NewStorageHomeSutureService creates a new storage.StorageHomeSutureService
-func NewStorageHome(cfg *ociscfg.Config) suture.Service {
+// NewStorageShares creates a new storage.StorageSharesSutureService
+func NewStorageShares(cfg *ociscfg.Config) suture.Service {
 	cfg.Storage.Commons = cfg.Commons
-	return StorageHomeSutureService{
+	return StorageSharesSutureService{
 		cfg: cfg.Storage,
 	}
 }
 
-func (s StorageHomeSutureService) Serve(ctx context.Context) error {
-	s.cfg.Reva.StorageHome.Context = ctx
+func (s StorageSharesSutureService) Serve(ctx context.Context) error {
+	s.cfg.Reva.StorageShares.Context = ctx
 	f := &flag.FlagSet{}
-	cmdFlags := StorageHome(s.cfg).Flags
+	cmdFlags := StorageShares(s.cfg).Flags
 	for k := range cmdFlags {
 		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}
 	cliCtx := cli.NewContext(nil, f, nil)
-	if StorageHome(s.cfg).Before != nil {
-		if err := StorageHome(s.cfg).Before(cliCtx); err != nil {
+	if StorageShares(s.cfg).Before != nil {
+		if err := StorageShares(s.cfg).Before(cliCtx); err != nil {
 			return err
 		}
 	}
-	if err := StorageHome(s.cfg).Action(cliCtx); err != nil {
+	if err := StorageShares(s.cfg).Action(cliCtx); err != nil {
 		return err
 	}
 

@@ -101,6 +101,7 @@ func storagePublicLinkConfigFromStruct(c *cli.Context, cfg *config.Config) map[s
 			},
 			"services": map[string]interface{}{
 				"publicstorageprovider": map[string]interface{}{
+					"mount_id":     cfg.Reva.StoragePublicLink.MountID,
 					"gateway_addr": cfg.Reva.Gateway.Endpoint,
 				},
 				"authprovider": map[string]interface{}{

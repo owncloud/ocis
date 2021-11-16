@@ -179,10 +179,6 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 				"storageregistry": map[string]interface{}{
 					"driver": cfg.Reva.StorageRegistry.Driver,
 					"drivers": map[string]interface{}{
-						"static": map[string]interface{}{
-							"home_provider": cfg.Reva.StorageRegistry.HomeProvider,
-							"rules":         simpleRules(cfg, logger),
-						},
 						"spaces": map[string]interface{}{
 							"home_provider": cfg.Reva.StorageRegistry.HomeProvider,
 							"rules":         spacesRules(cfg, logger),
@@ -193,48 +189,6 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 		},
 	}
 	return rcfg
-}
-
-func simpleRules(cfg *config.Config, logger log.Logger) map[string]map[string]interface{} {
-
-	// if a list of rules is given it overrides the generated rules from below
-	if len(cfg.Reva.StorageRegistry.Rules) > 0 {
-		rules := map[string]map[string]interface{}{}
-		for i := range cfg.Reva.StorageRegistry.Rules {
-			parts := strings.SplitN(cfg.Reva.StorageRegistry.Rules[i], "=", 2)
-			rules[parts[0]] = map[string]interface{}{"address": parts[1]}
-		}
-		return rules
-	}
-
-	// check if the rules have to be read from a json file
-	if cfg.Reva.StorageRegistry.JSON != "" {
-		data, err := ioutil.ReadFile(cfg.Reva.StorageRegistry.JSON)
-		if err != nil {
-			logger.Error().Err(err).Msg("Failed to read storage registry rules from JSON file: " + cfg.Reva.StorageRegistry.JSON)
-			return nil
-		}
-		var rules map[string]map[string]interface{}
-		if err = json.Unmarshal(data, &rules); err != nil {
-			logger.Error().Err(err).Msg("Failed to unmarshal storage registry rules")
-			return nil
-		}
-		return rules
-	}
-
-	// generate rules based on default config
-	ret := map[string]map[string]interface{}{
-		cfg.Reva.StorageHome.MountPath:       {"address": cfg.Reva.StorageHome.Endpoint},
-		cfg.Reva.StorageHome.AlternativeID:   {"address": cfg.Reva.StorageHome.Endpoint},
-		cfg.Reva.StorageUsers.MountPath:      {"address": cfg.Reva.StorageUsers.Endpoint},
-		cfg.Reva.StorageUsers.MountID + ".*": {"address": cfg.Reva.StorageUsers.Endpoint},
-		cfg.Reva.StoragePublicLink.MountPath: {"address": cfg.Reva.StoragePublicLink.Endpoint},
-		cfg.Reva.StoragePublicLink.MountID:   {"address": cfg.Reva.StoragePublicLink.Endpoint},
-		// public link storage returns the mount id of the actual storage
-		// medatada storage not part of the global namespace
-	}
-
-	return ret
 }
 
 func spacesRules(cfg *config.Config, logger log.Logger) map[string]map[string]interface{} {
@@ -266,11 +220,27 @@ func spacesRules(cfg *config.Config, logger log.Logger) map[string]map[string]in
 
 	// generate rules based on default config
 	return map[string]map[string]interface{}{
-		"/personal": {"address": cfg.Reva.StorageUsers.Endpoint},
+		"/home": {
+			"address":          cfg.Reva.StorageUsers.Endpoint,
+			"space_type":       "personal",
+			"space_owner_self": true,
+		},
+		"/home/Shares": {
+			"address":       cfg.Reva.StorageShares.Endpoint,
+			"space_type":    "share",
+			"path_template": "/home/Shares/{{.Name}}",
+		},
+		"/users": {
+			"address":       cfg.Reva.StorageUsers.Endpoint,
+			"space_type":    "personal",
+			"path_template": "/users/{{.Owner.Id.OpaqueId}}",
+		},
 		// public link storage returns the mount id of the actual storage
-		"/public": {"address": cfg.Reva.StoragePublicLink.Endpoint},
-		// TODO shares
-		//"/shares":   {"address": cfg.Reva.StoragePublicLink.Endpoint},
+		"/public": {
+			"address":       cfg.Reva.StoragePublicLink.Endpoint,
+			"space_type":    "public",
+			"path_template": "/public",
+		},
 		// medatada storage not part of the global namespace
 	}
 }

@@ -58,7 +58,7 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	}
 	var ep, tk string
 	for _, p := range rsp.Protocols {
-		if p.Protocol == "simple" {
+		if p.Protocol == "spaces" {
 			ep, tk = p.DownloadEndpoint, p.Token
 		}
 	}
