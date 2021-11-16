@@ -141,7 +141,7 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.OIDC.Issuer,
 		},
 		{
-			EnvVars:     []string{"PROXY_OIDC_INSECURE"},
+			EnvVars:     []string{"OCIS_INSECURE", "PROXY_OIDC_INSECURE"},
 			Destination: &cfg.OIDC.Insecure,
 		},
 		{
