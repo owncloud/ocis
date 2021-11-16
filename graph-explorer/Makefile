@@ -31,5 +31,5 @@ ci-node-generate: pull-assets
 
 .PHONY: pull-assets
 pull-assets:
-	@rm -Rf assets && mkdir assets/ && curl -slL -o- https://github.com/owncloud/graph-explorer/releases/download/v1.7.10.3/release.tar.gz | tar xvzf - -C assets/
-
+	@git clean -xfd assets
+	@curl -slL -o- https://github.com/owncloud/graph-explorer/releases/download/v1.7.10.3/release.tar.gz | tar xvzf - -C assets/
