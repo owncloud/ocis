@@ -1,6 +1,8 @@
 SHELL := bash
 NAME := thumbnails
 
+include ../.make/recursion.mk
+
 ############ tooling ############
 ifneq (, $(shell which go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../.bingo/Variables.mk

@@ -1,6 +1,8 @@
 SHELL := bash
 NAME := accounts
 
+include ../.make/recursion.mk
+
 .PHONY: test-acceptance-webui
 test-acceptance-webui:
 	./ui/tests/run-acceptance-test.sh $(FEATURE_PATH)
