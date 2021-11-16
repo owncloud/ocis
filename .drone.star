@@ -880,7 +880,7 @@ def dockerRelease(ctx, arch):
                 "name": "build",
                 "image": OC_CI_GOLANG,
                 "commands": [
-                    "make -C ocis release-linux-docker",
+                    "make -C ocis release-linux-docker-%s" % (arch),
                 ],
             },
             {
@@ -954,7 +954,7 @@ def dockerEos(ctx):
                 "name": "build",
                 "image": OC_CI_GOLANG,
                 "commands": [
-                    "make -C ocis release-linux-docker",
+                    "make -C ocis release-linux-docker-amd64",
                 ],
             },
             {
