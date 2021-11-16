@@ -178,31 +178,31 @@ endif
 .PHONY: l10n-push
 l10n-push:
 	@for extension in $(L10N_MODULES); do \
-    	make -C $$extension l10n-push; \
+		$(MAKE) -C $$extension l10n-push; \
 	done
 
 .PHONY: l10n-pull
 l10n-pull:
 	@for extension in $(L10N_MODULES); do \
-    	make -C $$extension l10n-pull; \
+		$(MAKE) -C $$extension l10n-pull; \
 	done
 
 .PHONY: l10n-clean
 l10n-clean:
 	@for extension in $(L10N_MODULES); do \
-		make -C $$extension l10n-clean; \
+		$(MAKE) -C $$extension l10n-clean; \
 	done
 
 .PHONY: l10n-read
 l10n-read:
 	@for extension in $(L10N_MODULES); do \
-    	make -C $$extension l10n-read; \
+		$(MAKE) -C $$extension l10n-read; \
     done
 
 .PHONY: l10n-write
 l10n-write:
 	@for extension in $(L10N_MODULES); do \
-    	make -C $$extension l10n-write; \
+		$(MAKE) -C $$extension l10n-write; \
     done
 
 .PHONY: ci-format
