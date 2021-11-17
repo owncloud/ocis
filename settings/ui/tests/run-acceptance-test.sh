@@ -25,7 +25,7 @@ then
 	cleanup=true
 	testFolder=$(mktemp -d -p .)
 	printf "creating folder $testFolder for Test infrastructure setup\n\n"
-	export TEST_INFRA_DIRECTORY=$testFolder/tests
+	export TEST_INFRA_DIRECTORY=$(realpath $testFolder)
 fi
 
 clean_up() {
@@ -40,7 +40,7 @@ clean_up() {
 
 trap clean_up SIGHUP SIGINT SIGTERM EXIT
 
-cp -r "$WEB_PATH"/tests "$testFolder"
+cp -r $(ls -d "$WEB_PATH"/tests/acceptance/* | grep -v 'node_modules') "$testFolder"
 
 export SERVER_HOST=${SERVER_HOST:-https://localhost:9200}
 export BACKEND_HOST=${BACKEND_HOST:-https://localhost:9200}
