@@ -38,6 +38,25 @@ func (s Store) ReadPermissionByID(permissionID string, roleIDs []string) (*proto
 	return nil, nil
 }
 
+// ReadPermissionByName finds the permission in the roles, specified by the provided roleIDs
+func (s Store) ReadPermissionByName(name string, roleIDs []string) (*proto.Permission, error) {
+	for _, roleID := range roleIDs {
+		role, err := s.ReadBundle(roleID)
+		if err != nil {
+			s.Logger.Debug().Str("roleID", roleID).Msg("role not found, skipping")
+			continue
+		}
+		for _, permission := range role.Settings {
+			if permission.Name == name {
+				if value, ok := permission.Value.(*proto.Setting_PermissionValue); ok {
+					return value.PermissionValue, nil
+				}
+			}
+		}
+	}
+	return nil, nil
+}
+
 // extractPermissionsByResource collects all permissions from the provided role that match the requested resource
 func extractPermissionsByResource(resource *proto.Resource, role *proto.Bundle) []*proto.Permission {
 	permissions := make([]*proto.Permission, 0)

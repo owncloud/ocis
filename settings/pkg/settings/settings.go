@@ -50,4 +50,5 @@ type RoleAssignmentManager interface {
 type PermissionManager interface {
 	ListPermissionsByResource(resource *proto.Resource, roleIDs []string) ([]*proto.Permission, error)
 	ReadPermissionByID(permissionID string, roleIDs []string) (*proto.Permission, error)
+	ReadPermissionByName(name string, roleIDs []string) (*proto.Permission, error)
 }

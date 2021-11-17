@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
+	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	"github.com/cs3org/reva/pkg/rgrpc/status"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
@@ -34,6 +37,49 @@ func NewService(cfg *config.Config, logger log.Logger) Service {
 	}
 	service.RegisterDefaultRoles()
 	return service
+}
+
+func (g Service) CheckPermission(ctx context.Context, req *permissions.CheckPermissionRequest) (*permissions.CheckPermissionResponse, error) {
+	spec := req.SubjectRef.Spec
+
+	var accountID string
+	switch ref := spec.(type) {
+	case *permissions.SubjectReference_UserId:
+		accountID = ref.UserId.OpaqueId
+	case *permissions.SubjectReference_GroupId:
+		accountID = ref.GroupId.OpaqueId
+	}
+
+	assignments, err := g.manager.ListRoleAssignments(accountID)
+	if err != nil {
+		return &permissions.CheckPermissionResponse{
+			Status: status.NewInternal(ctx, err, err.Error()),
+		}, nil
+	}
+
+	roleIDs := make([]string, 0, len(assignments))
+	for _, a := range assignments {
+		roleIDs = append(roleIDs, a.RoleId)
+	}
+
+	permission, err := g.manager.ReadPermissionByName(req.Permission, roleIDs)
+	if err != nil {
+		return &permissions.CheckPermissionResponse{
+			Status: status.NewInternal(ctx, err, err.Error()),
+		}, nil
+	}
+
+	if permission == nil {
+		return &permissions.CheckPermissionResponse{
+			Status: &rpcv1beta1.Status{
+				Code: rpcv1beta1.Code_CODE_PERMISSION_DENIED,
+			},
+		}, nil
+	}
+
+	return &permissions.CheckPermissionResponse{
+		Status: status.NewOK(ctx),
+	}, nil
 }
 
 // RegisterDefaultRoles composes default roles and saves them. Skipped if the roles already exist.

@@ -199,10 +199,11 @@ type StoragePort struct {
 	DataServerURL string `ocisConfig:"data_server_url"`
 
 	// for HTTP ports with only one http service
-	HTTPPrefix   string       `ocisConfig:"http_prefix"`
-	TempFolder   string       `ocisConfig:"temp_folder"`
-	ReadOnly     bool         `ocisConfig:"read_only"`
-	DataProvider DataProvider `ocisConfig:"data_provider"`
+	HTTPPrefix      string       `ocisConfig:"http_prefix"`
+	TempFolder      string       `ocisConfig:"temp_folder"`
+	ReadOnly        bool         `ocisConfig:"read_only"`
+	DataProvider    DataProvider `ocisConfig:"data_provider"`
+	GatewayEndpoint string       `ocisConfig:"gateway_endpoint"`
 }
 
 // PublicStorage configures a public storage provider
@@ -474,6 +475,7 @@ type Reva struct {
 	StoragePublicLink PublicStorage     `ocisConfig:"storage_public_link"`
 	StorageMetadata   StoragePort       `ocisConfig:"storage_metadata"`
 	AppProvider       AppProvider       `ocisConfig:"app_provider"`
+	Permissions       Port              `ocisConfig:"permissions"`
 	// Configs can be used to configure the reva instance.
 	// Services and Ports will be ignored if this is used
 	Configs map[string]interface{} `ocisConfig:"configs"`
