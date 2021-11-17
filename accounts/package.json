@@ -27,7 +27,7 @@
     "axios": "^0.21.4",
     "core-js": "^3.17.3",
     "debounce": "^1.2.1",
-    "validator": "^13.1.1",
+    "validator": "^13.7.0",
     "vuex": "^3.5.1"
   },
   "devDependencies": {
