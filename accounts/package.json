@@ -12,7 +12,7 @@
   "license": "Apache-2.0",
   "author": "ownCloud GmbH <devops@owncloud.com>",
   "scripts": {
-    "acceptance-tests": "cucumber-js --retry 1 --require-module @babel/register --require-module @babel/polyfill --require ${TEST_INFRA_DIRECTORY}/acceptance/setup.js --require ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/acceptance/stepDefinitions --format @cucumber/pretty-formatter -t \"${TEST_TAGS:-not @skip and not @skipOnOC10}\"",
+    "acceptance-tests": "cucumber-js --retry 1 --require-module @babel/register --require-module @babel/polyfill --require ${TEST_INFRA_DIRECTORY}/setup.js --require ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/stepDefinitions --format @cucumber/pretty-formatter -t \"${TEST_TAGS:-not @skip and not @skipOnOC10}\"",
     "build": "rollup -c",
     "generate-api": "node node_modules/swagger-vue-generator/bin/generate-api.js --package-version v0 --source pkg/proto/v0/accounts.swagger.json --moduleName accounts --destination ui/client/accounts/index.js",
     "lint": "eslint ui/**/*.vue ui/**/*.js --color --global requirejs --global require",
@@ -47,6 +47,7 @@
     "@rollup/plugin-json": "^4.0.1",
     "@rollup/plugin-replace": "^2.3.0",
     "archiver": "^5.3.0",
+    "chromedriver": "^93.0.1",
     "cross-env": "^7.0.3",
     "easygettext": "^2.17.0",
     "eslint": "7.24.0",
