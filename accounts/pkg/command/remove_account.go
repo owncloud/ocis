@@ -6,7 +6,6 @@ import (
 
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	"github.com/owncloud/ocis/accounts/pkg/config"
-	"github.com/owncloud/ocis/accounts/pkg/flagset"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/urfave/cli/v2"
 )
@@ -18,7 +17,9 @@ func RemoveAccount(cfg *config.Config) *cli.Command {
 		Usage:     "Removes an existing account",
 		ArgsUsage: "id",
 		Aliases:   []string{"rm"},
-		Flags:     flagset.RemoveAccountWithConfig(cfg),
+		Before: func(c *cli.Context) error {
+			return ParseConfig(c, cfg)
+		},
 		Action: func(c *cli.Context) error {
 			accServiceID := cfg.GRPC.Namespace + "." + cfg.Server.Name
 			if c.NArg() != 1 {

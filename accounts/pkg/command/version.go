@@ -8,7 +8,6 @@ import (
 
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/accounts/pkg/config"
-	"github.com/owncloud/ocis/accounts/pkg/flagset"
 	"github.com/urfave/cli/v2"
 )
 
@@ -17,7 +16,9 @@ func PrintVersion(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "version",
 		Usage: "Print the versions of the running instances",
-		Flags: flagset.ListAccountsWithConfig(cfg),
+		Before: func(c *cli.Context) error {
+			return ParseConfig(c, cfg)
+		},
 		Action: func(c *cli.Context) error {
 			reg := registry.GetRegistry()
 			services, err := reg.GetService(cfg.GRPC.Namespace + "." + cfg.Server.Name)
