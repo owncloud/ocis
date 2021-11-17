@@ -19,10 +19,7 @@ func RemoveAccount(cfg *config.Config) *cli.Command {
 		Usage:     "Removes an existing account",
 		ArgsUsage: "id",
 		Aliases:   []string{"rm"},
-		Flags:     flagset.Root(cfg),
-		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg)
-		},
+		Flags:     flagset.RemoveAccountWithConfig(cfg),
 		Action: func(c *cli.Context) error {
 			accServiceID := cfg.GRPC.Namespace + "." + cfg.Server.Name
 			if c.NArg() != 1 {

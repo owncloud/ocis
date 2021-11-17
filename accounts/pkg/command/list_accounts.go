@@ -20,7 +20,7 @@ func ListAccounts(cfg *config.Config) *cli.Command {
 		Name:    "list",
 		Usage:   "List existing accounts",
 		Aliases: []string{"ls"},
-		Flags:   flagset.Root(cfg),
+		Flags:   flagset.ListAccountsWithConfig(cfg),
 		Action: func(c *cli.Context) error {
 			accSvcID := cfg.GRPC.Namespace + "." + cfg.Server.Name
 			accSvc := accounts.NewAccountsService(accSvcID, grpc.NewClient())

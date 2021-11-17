@@ -16,9 +16,6 @@ func PrintVersion(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "version",
 		Usage: "Print the versions of the running instances",
-		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg)
-		},
 		Action: func(c *cli.Context) error {
 			reg := registry.GetRegistry()
 			services, err := reg.GetService(cfg.GRPC.Namespace + "." + cfg.Server.Name)

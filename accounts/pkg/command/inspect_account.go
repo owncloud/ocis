@@ -20,7 +20,7 @@ func InspectAccount(cfg *config.Config) *cli.Command {
 		Name:      "inspect",
 		Usage:     "Show detailed data on an existing account",
 		ArgsUsage: "id",
-		Flags:     flagset.Root(cfg),
+		Flags:     flagset.InspectAccountWithConfig(cfg),
 		Action: func(c *cli.Context) error {
 			accServiceID := cfg.GRPC.Namespace + "." + cfg.Server.Name
 			if c.NArg() != 1 {
