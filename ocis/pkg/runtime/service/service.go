@@ -124,6 +124,10 @@ func NewService(options ...Option) (*Service, error) {
 // Start an rpc service. By default the package scope Start will run all default extensions to provide with a working
 // oCIS instance.
 func Start(o ...Option) error {
+	// Start the runtime. Most likely this was called ONLY by the `ocis server` subcommand, but since we cannot protect
+	// from the caller, the previous statement holds truth.
+
+	// prepare a new rpc Service struct.
 	s, err := NewService(o...)
 	if err != nil {
 		return err
@@ -167,7 +171,10 @@ func Start(o ...Option) error {
 		s.cfg.Storage.Log = &shared.Log{}
 	}
 
-	propagateLoggingCommonsToStorages(s)
+	s.cfg.Storage.Log.Color = s.cfg.Commons.Color
+	s.cfg.Storage.Log.Level = s.cfg.Commons.Level
+	s.cfg.Storage.Log.Pretty = s.cfg.Commons.Pretty
+	s.cfg.Storage.Log.File = s.cfg.Commons.File
 
 	if err = rpc.Register(s); err != nil {
 		if s != nil {
@@ -181,7 +188,16 @@ func Start(o ...Option) error {
 		s.Log.Fatal().Err(err)
 	}
 
-	defer gracefulRecovery(s)
+	defer func() {
+		if r := recover(); r != nil {
+			reason := strings.Builder{}
+			if _, err := net.Dial("tcp", net.JoinHostPort(s.cfg.Runtime.Host, s.cfg.Runtime.Port)); err != nil {
+				reason.WriteString("runtime address already in use")
+			}
+
+			fmt.Println(reason.String())
+		}
+	}()
 
 	// prepare the set of services to run
 	s.generateRunSet(s.cfg)
@@ -204,26 +220,6 @@ func Start(o ...Option) error {
 	scheduleServiceTokens(s, s.Delayed)
 
 	return http.Serve(l, nil)
-}
-
-func propagateLoggingCommonsToStorages(s *Service) {
-	s.cfg.Storage.Log.Color = s.cfg.Commons.Color
-	s.cfg.Storage.Log.Level = s.cfg.Commons.Level
-	s.cfg.Storage.Log.Pretty = s.cfg.Commons.Pretty
-	s.cfg.Storage.Log.File = s.cfg.Commons.File
-}
-
-func gracefulRecovery(s *Service) {
-	func() {
-		if r := recover(); r != nil {
-			reason := strings.Builder{}
-			if _, err := net.Dial("tcp", net.JoinHostPort(s.cfg.Runtime.Host, s.cfg.Runtime.Port)); err != nil {
-				reason.WriteString("runtime address already in use")
-			}
-
-			fmt.Println(reason.String())
-		}
-	}()
 }
 
 // scheduleServiceTokens adds service tokens to the service supervisor.

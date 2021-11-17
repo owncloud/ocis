@@ -72,7 +72,7 @@ type Runtime struct {
 type Config struct {
 	*shared.Commons `mapstructure:"shared"`
 
-	Mode    Mode
+	Mode    Mode // DEPRECATED
 	File    string
 	OcisURL string `mapstructure:"ocis_url"`
 
