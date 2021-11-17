@@ -36,17 +36,19 @@ func NewMetadataStorage(providerAddr string) (s MetadataStorage, err error) {
 type MetadataStorage struct {
 	storageProvider   provider.ProviderAPIClient
 	dataGatewayClient *http.Client
+	SpaceRoot         *provider.ResourceId
 }
 
-func (r MetadataStorage) SimpleUpload(ctx context.Context, uploadpath string, content []byte) error {
+func (ms MetadataStorage) SimpleUpload(ctx context.Context, uploadpath string, content []byte) error {
 
 	ref := provider.InitiateFileUploadRequest{
 		Ref: &provider.Reference{
-			Path: path.Join(storageMountPath, uploadpath),
+			ResourceId: ms.SpaceRoot,
+			Path:       path.Join(storageMountPath, uploadpath),
 		},
 	}
 
-	res, err := r.storageProvider.InitiateFileUpload(ctx, &ref)
+	res, err := ms.storageProvider.InitiateFileUpload(ctx, &ref)
 	if err != nil {
 		return err
 	}
@@ -70,7 +72,7 @@ func (r MetadataStorage) SimpleUpload(ctx context.Context, uploadpath string, co
 
 	md, _ := metadata.FromOutgoingContext(ctx)
 	req.Header.Add(revactx.TokenHeader, md.Get(revactx.TokenHeader)[0])
-	resp, err := r.dataGatewayClient.Do(req)
+	resp, err := ms.dataGatewayClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -80,14 +82,15 @@ func (r MetadataStorage) SimpleUpload(ctx context.Context, uploadpath string, co
 	return nil
 }
 
-func (r MetadataStorage) SimpleDownload(ctx context.Context, downloadpath string) (content []byte, err error) {
+func (ms MetadataStorage) SimpleDownload(ctx context.Context, downloadpath string) (content []byte, err error) {
 	ref := provider.InitiateFileDownloadRequest{
 		Ref: &provider.Reference{
-			Path: path.Join(storageMountPath, downloadpath),
+			ResourceId: ms.SpaceRoot,
+			Path:       path.Join(storageMountPath, downloadpath),
 		},
 	}
 
-	res, err := r.storageProvider.InitiateFileDownload(ctx, &ref)
+	res, err := ms.storageProvider.InitiateFileDownload(ctx, &ref)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -111,7 +114,7 @@ func (r MetadataStorage) SimpleDownload(ctx context.Context, downloadpath string
 
 	md, _ := metadata.FromOutgoingContext(ctx)
 	req.Header.Add(revactx.TokenHeader, md.Get(revactx.TokenHeader)[0])
-	resp, err := r.dataGatewayClient.Do(req)
+	resp, err := ms.dataGatewayClient.Do(req)
 	if err != nil {
 		return []byte{}, err
 	}

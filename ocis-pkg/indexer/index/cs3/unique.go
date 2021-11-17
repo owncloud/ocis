@@ -15,6 +15,7 @@ import (
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
+	"github.com/cs3org/reva/pkg/utils"
 	idxerrs "github.com/owncloud/ocis/ocis-pkg/indexer/errors"
 	"github.com/owncloud/ocis/ocis-pkg/indexer/index"
 	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
@@ -162,15 +163,14 @@ func (idx *Unique) Remove(id string, v string) error {
 		return err
 	}
 
-<<<<<<< HEAD
-	deletePath := path.Join("/meta", idx.indexRootDir, v)
-=======
 	deletePath := path.Join("/", idx.indexRootDir, v)
-	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
->>>>>>> 7a5fb4c2e (drop /meta mount prefix)
 	resp, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Path: deletePath,
+			ResourceId: &provider.ResourceId{
+				StorageId: idx.cs3conf.ServiceUser.UUID,
+				OpaqueId:  idx.cs3conf.ServiceUser.UUID,
+			},
+			Path: utils.MakeRelativePath(deletePath),
 		},
 	})
 
@@ -217,7 +217,11 @@ func (idx *Unique) Search(pattern string) ([]string, error) {
 
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Path: path.Join("/", idx.indexRootDir),
+			ResourceId: &provider.ResourceId{
+				StorageId: idx.cs3conf.ServiceUser.UUID,
+				OpaqueId:  idx.cs3conf.ServiceUser.UUID,
+			},
+			Path: utils.MakeRelativePath(idx.indexRootDir),
 		},
 	})
 
@@ -304,7 +308,10 @@ func (idx *Unique) makeDirIfNotExists(folder string) error {
 	if err != nil {
 		return err
 	}
-	return storage.MakeDirIfNotExist(ctx, idx.storageProvider, folder)
+	return storage.MakeDirIfNotExist(ctx, idx.storageProvider, &provider.ResourceId{
+		StorageId: idx.cs3conf.ServiceUser.UUID,
+		OpaqueId:  idx.cs3conf.ServiceUser.UUID,
+	}, folder)
 }
 
 func (idx *Unique) getAuthenticatedContext(ctx context.Context) (context.Context, error) {
@@ -323,5 +330,5 @@ func (idx *Unique) Delete() error {
 		return err
 	}
 
-	return deleteIndexRoot(ctx, idx.storageProvider, idx.indexRootDir)
+	return deleteIndexRoot(ctx, idx.storageProvider, idx.cs3conf.ServiceUser.UUID, idx.indexRootDir)
 }
