@@ -1185,7 +1185,7 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Reva.AuthMachine.DebugAddr,
 		},
 		{
-			EnvVars:     []string{"STORAGE_AUTH_MACHINE_AUTH_API_KEY", "OCIS_MACHINE_AUTH_API_KEY"},
+			EnvVars:     []string{"OCIS_MACHINE_AUTH_API_KEY", "STORAGE_AUTH_MACHINE_AUTH_API_KEY"},
 			Destination: &cfg.Reva.AuthMachineConfig.MachineAuthAPIKey,
 		},
 		{
@@ -1610,7 +1610,7 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 
 		// secret
 		{
-			EnvVars:     []string{"STORAGE_JWT_SECRET", "OCIS_JWT_SECRET"},
+			EnvVars:     []string{"OCIS_JWT_SECRET", "STORAGE_JWT_SECRET"},
 			Destination: &cfg.Reva.JWTSecret,
 		},
 		{
