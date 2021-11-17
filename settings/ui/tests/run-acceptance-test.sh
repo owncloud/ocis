@@ -18,14 +18,14 @@ then
 	exit 1
 fi
 
-trap clean_up SIGHUP SIGINT SIGTERM
+#trap clean_up SIGHUP SIGINT SIGTERM
 
 if [ -z "$TEST_INFRA_DIRECTORY" ]
 then
 	cleanup=true
 	testFolder=$(mktemp -d -p .)
 	printf "creating folder $testFolder for Test infrastructure setup\n\n"
-	export TEST_INFRA_DIRECTORY=$testFolder/tests
+	export TEST_INFRA_DIRECTORY=$(realpath $testFolder)
 fi
 
 clean_up() {
@@ -40,8 +40,10 @@ clean_up() {
 
 trap clean_up SIGHUP SIGINT SIGTERM EXIT
 
-cp -r "$WEB_PATH"/tests/acceptance/stepDefinitions "$testFolder"
-cp "$WEB_PATH"/tests/acceptance/setup.js "$testFolder"
+cp -r "$WEB_PATH"/tests/acceptance/* "$testFolder"
+rm -r $testFolder/node_modules
+
+yarn install --immutable
 
 export SERVER_HOST=${SERVER_HOST:-https://localhost:9200}
 export BACKEND_HOST=${BACKEND_HOST:-https://localhost:9200}
