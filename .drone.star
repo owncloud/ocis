@@ -673,7 +673,6 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "BACKEND_HOST": "https://ocis-server:9200",
                     "RUN_ON_OCIS": "true",
                     "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/owncloud/data",
-                    "OCIS_SKELETON_DIR": "/srv/app/testing/data/webUISkeleton",
                     "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
                     "TEST_TAGS": "not @skipOnOCIS and not @skip",
                     "LOCAL_UPLOAD_DIR": "/uploads",
@@ -683,12 +682,12 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                 },
                 "commands": [
                     ". /drone/src/.drone.env",
-                    "git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing",
+                    # we need to have Web around for some general step definitions (eg. how to log in)
                     "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
                     "cd /srv/app/web",
                     "git checkout $WEB_COMMITID",
-                    "cp -r tests/acceptance/filesForUpload/* /uploads",
-                    "cd tests/acceptance/",
+                    # TODO: settings/package.json has all the acceptance test dependencies
+                    # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
                     "cd /drone/src/accounts",
                     "yarn install --immutable",
                     "make test-acceptance-webui",
@@ -746,12 +745,12 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                 },
                 "commands": [
                     ". /drone/src/.drone.env",
-                    "git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing",
+                    # we need to have Web around for some general step definitions (eg. how to log in)
                     "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
-                    "cp -r /srv/app/web/tests/acceptance/filesForUpload/* /uploads",
                     "cd /srv/app/web",
                     "git checkout $WEB_COMMITID",
-                    "cd tests/acceptance/",
+                    # TODO: settings/package.json has all the acceptance test dependencies
+                    # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
                     "cd /drone/src/settings",
                     "yarn install --immutable",
                     "make test-acceptance-webui",
