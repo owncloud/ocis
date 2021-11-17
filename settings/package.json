@@ -12,7 +12,7 @@
   "license": "Apache-2.0",
   "author": "ownCloud GmbH <devops@owncloud.com>",
   "scripts": {
-    "acceptance-tests": "echo ${TEST_INFRA_DIRECTORY}/stepDefinitions; cucumber-js --retry 1 --require-module @babel/register --require-module @babel/polyfill --require ${TEST_INFRA_DIRECTORY}/setup.js --require ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/stepDefinitions --format @cucumber/pretty-formatter -t \"${TEST_TAGS:-not @skip and not @skipOnOC10}\"",
+    "acceptance-tests": "cucumber-js --retry 1 --require-module @babel/register --require-module @babel/polyfill --require ${TEST_INFRA_DIRECTORY}/setup.js --require ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/stepDefinitions --format @cucumber/pretty-formatter -t \"${TEST_TAGS:-not @skip and not @skipOnOC10}\"",
     "build": "rollup -c",
     "generate-api": "node node_modules/swagger-vue-generator/bin/generate-api.js --package-version v0 --source pkg/proto/v0/settings.swagger.json --moduleName settings --destination ui/client/settings/index.js",
     "lint": "eslint ui/**/*.vue ui/**/*.js --color --global requirejs --global require",

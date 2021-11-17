@@ -18,7 +18,7 @@ then
 	exit 1
 fi
 
-#trap clean_up SIGHUP SIGINT SIGTERM
+trap clean_up SIGHUP SIGINT SIGTERM
 
 if [ -z "$TEST_INFRA_DIRECTORY" ]
 then
@@ -40,10 +40,7 @@ clean_up() {
 
 trap clean_up SIGHUP SIGINT SIGTERM EXIT
 
-cp -r "$WEB_PATH"/tests/acceptance/* "$testFolder"
-rm -r $testFolder/node_modules
-
-yarn install --immutable
+cp -r $(ls -d "$WEB_PATH"/tests/acceptance/* | grep -v 'node_modules') "$testFolder"
 
 export SERVER_HOST=${SERVER_HOST:-https://localhost:9200}
 export BACKEND_HOST=${BACKEND_HOST:-https://localhost:9200}

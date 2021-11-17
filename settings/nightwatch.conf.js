@@ -1,5 +1,4 @@
 const path = require('path')
-const WEB_PATH = process.env.WEB_PATH
 const TEST_INFRA_DIRECTORY = process.env.TEST_INFRA_DIRECTORY
 
 const config = require(path.join(TEST_INFRA_DIRECTORY, 'nightwatch.conf.js'))
