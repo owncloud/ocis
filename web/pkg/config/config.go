@@ -6,6 +6,8 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
+const defaultIngressURL = "https://localhost:9200"
+
 // Debug defines the available debug configuration.
 type Debug struct {
 	Addr   string `mapstructure:"addr"`
@@ -106,6 +108,7 @@ func New() *Config {
 }
 
 func DefaultConfig() *Config {
+
 	return &Config{
 		Debug: Debug{
 			Addr:   "127.0.0.1:9104",
@@ -131,15 +134,15 @@ func DefaultConfig() *Config {
 		},
 		Web: Web{
 			Path:        "",
-			ThemeServer: "https://localhost:9200",
+			ThemeServer: defaultIngressURL,
 			ThemePath:   "/themes/owncloud/theme.json",
 			Config: WebConfig{
-				Server:  "https://localhost:9200",
+				Server:  defaultIngressURL,
 				Theme:   "",
 				Version: "0.1.0",
 				OpenIDConnect: OIDC{
 					MetadataURL:  "",
-					Authority:    "https://localhost:9200",
+					Authority:    defaultIngressURL,
 					ClientID:     "web",
 					ResponseType: "code",
 					Scope:        "openid profile email",

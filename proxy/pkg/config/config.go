@@ -256,6 +256,10 @@ func DefaultConfig() *Config {
 }
 
 func defaultPolicies() []Policy {
+	const idpBackend = "http://localhost:9130"
+	const revaBackend = "http://localhost:9140"
+	const ingressBackendURL = "https://demo.owncloud.com"
+
 	return []Policy{
 		{
 			Name: "ocis",
@@ -266,19 +270,19 @@ func defaultPolicies() []Policy {
 				},
 				{
 					Endpoint: "/.well-known/",
-					Backend:  "http://localhost:9130",
+					Backend:  idpBackend,
 				},
 				{
 					Endpoint: "/konnect/",
-					Backend:  "http://localhost:9130",
+					Backend:  idpBackend,
 				},
 				{
 					Endpoint: "/signin/",
-					Backend:  "http://localhost:9130",
+					Backend:  idpBackend,
 				},
 				{
 					Endpoint: "/archiver",
-					Backend:  "http://localhost:9140",
+					Backend:  revaBackend,
 				},
 				{
 					Type:     RegexRoute,
@@ -287,7 +291,7 @@ func defaultPolicies() []Policy {
 				},
 				{
 					Endpoint: "/ocs/",
-					Backend:  "http://localhost:9140",
+					Backend:  revaBackend,
 				},
 				{
 					Type:     QueryRoute,
@@ -296,31 +300,31 @@ func defaultPolicies() []Policy {
 				},
 				{
 					Endpoint: "/remote.php/",
-					Backend:  "http://localhost:9140",
+					Backend:  revaBackend,
 				},
 				{
 					Endpoint: "/dav/",
-					Backend:  "http://localhost:9140",
+					Backend:  revaBackend,
 				},
 				{
 					Endpoint: "/webdav/",
-					Backend:  "http://localhost:9140",
+					Backend:  revaBackend,
 				},
 				{
 					Endpoint: "/status.php",
-					Backend:  "http://localhost:9140",
+					Backend:  revaBackend,
 				},
 				{
 					Endpoint: "/index.php/",
-					Backend:  "http://localhost:9140",
+					Backend:  revaBackend,
 				},
 				{
 					Endpoint: "/data",
-					Backend:  "http://localhost:9140",
+					Backend:  revaBackend,
 				},
 				{
 					Endpoint: "/app/",
-					Backend:  "http://localhost:9140",
+					Backend:  revaBackend,
 				},
 				{
 					Endpoint: "/graph/",
@@ -335,7 +339,6 @@ func defaultPolicies() []Policy {
 					Endpoint: "/api/v0/accounts",
 					Backend:  "http://localhost:9181",
 				},
-				// TODO the lookup needs a better mechanism
 				{
 					Endpoint: "/accounts.js",
 					Backend:  "http://localhost:9181",
@@ -359,53 +362,53 @@ func defaultPolicies() []Policy {
 				},
 				{
 					Endpoint: "/.well-known/",
-					Backend:  "http://localhost:9130",
+					Backend:  idpBackend,
 				},
 				{
 					Endpoint: "/konnect/",
-					Backend:  "http://localhost:9130",
+					Backend:  idpBackend,
 				},
 				{
 					Endpoint: "/signin/",
-					Backend:  "http://localhost:9130",
+					Backend:  revaBackend,
 				},
 				{
 					Endpoint: "/archiver",
-					Backend:  "http://localhost:9140",
+					Backend:  revaBackend,
 				},
 				{
 					Endpoint:    "/ocs/",
-					Backend:     "https://demo.owncloud.com",
+					Backend:     ingressBackendURL,
 					ApacheVHost: true,
 				},
 				{
 					Endpoint:    "/remote.php/",
-					Backend:     "https://demo.owncloud.com",
+					Backend:     ingressBackendURL,
 					ApacheVHost: true,
 				},
 				{
 					Endpoint:    "/dav/",
-					Backend:     "https://demo.owncloud.com",
+					Backend:     ingressBackendURL,
 					ApacheVHost: true,
 				},
 				{
 					Endpoint:    "/webdav/",
-					Backend:     "https://demo.owncloud.com",
+					Backend:     ingressBackendURL,
 					ApacheVHost: true,
 				},
 				{
 					Endpoint:    "/status.php",
-					Backend:     "https://demo.owncloud.com",
+					Backend:     ingressBackendURL,
 					ApacheVHost: true,
 				},
 				{
 					Endpoint:    "/index.php/",
-					Backend:     "https://demo.owncloud.com",
+					Backend:     ingressBackendURL,
 					ApacheVHost: true,
 				},
 				{
 					Endpoint:    "/data",
-					Backend:     "https://demo.owncloud.com",
+					Backend:     ingressBackendURL,
 					ApacheVHost: true,
 				},
 			},
