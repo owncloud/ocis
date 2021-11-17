@@ -146,7 +146,7 @@ def main(ctx):
 
     build_release_helpers = [
         changelog(ctx),
-        docs(ctx),
+        # docs(ctx),
     ]
 
     test_pipelines.append(
