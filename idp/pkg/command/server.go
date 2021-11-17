@@ -20,24 +20,12 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:  "server",
 		Usage: "Start integrated server",
 		Before: func(ctx *cli.Context) error {
-			if cfg.HTTP.Root != "/" {
-				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
-			}
-
-			//if len(ctx.StringSlice("trusted-proxy")) > 0 {
-			//	cfg.IDP.TrustedProxy = ctx.StringSlice("trusted-proxy")
-			//}
-			//
-			//if len(ctx.StringSlice("allow-scope")) > 0 {
-			//	cfg.IDP.AllowScope = ctx.StringSlice("allow-scope")
-			//}
-			//
-			//if len(ctx.StringSlice("signing-private-key")) > 0 {
-			//	cfg.IDP.SigningPrivateKeyFiles = ctx.StringSlice("signing-private-key")
-			//}
-
 			if err := ParseConfig(ctx, cfg); err != nil {
 				return err
+			}
+
+			if cfg.HTTP.Root != "/" {
+				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
 			return nil
