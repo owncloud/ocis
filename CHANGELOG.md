@@ -14,6 +14,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix error logging when there is no thumbnail for a file: [#2702](https://github.com/owncloud/ocis/pull/2702)
 * Bugfix - Don't announce resharing via capabilities: [#2690](https://github.com/owncloud/ocis/pull/2690)
 * Change - Make all insecure options configurable and change the default to false: [#2700](https://github.com/owncloud/ocis/issues/2700)
+* Change - Update ownCloud Web to v4.5.0: [#2780](https://github.com/owncloud/ocis/pull/2780)
 * Enhancement - Add API to list all spaces: [#2692](https://github.com/owncloud/ocis/pull/2692)
 * Enhancement - Update reva to v1.16: [#2737](https://github.com/owncloud/ocis/pull/2737)
 
@@ -93,6 +94,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/2700
    https://github.com/owncloud/ocis/pull/2745
+
+* Change - Update ownCloud Web to v4.5.0: [#2780](https://github.com/owncloud/ocis/pull/2780)
+
+   Tags: web
+
+   We updated ownCloud Web to v4.5.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2780
+   https://github.com/owncloud/web/releases/tag/v4.5.0
 
 * Enhancement - Add API to list all spaces: [#2692](https://github.com/owncloud/ocis/pull/2692)
 
