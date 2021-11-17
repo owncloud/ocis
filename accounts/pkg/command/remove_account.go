@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/owncloud/ocis/accounts/pkg/flagset"
+
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
@@ -17,6 +19,7 @@ func RemoveAccount(cfg *config.Config) *cli.Command {
 		Usage:     "Removes an existing account",
 		ArgsUsage: "id",
 		Aliases:   []string{"rm"},
+		Flags:     flagset.Root(cfg),
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg)
 		},

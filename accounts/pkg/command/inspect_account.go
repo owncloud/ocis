@@ -5,6 +5,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/owncloud/ocis/accounts/pkg/flagset"
+
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/accounts/pkg/config"
@@ -18,9 +20,7 @@ func InspectAccount(cfg *config.Config) *cli.Command {
 		Name:      "inspect",
 		Usage:     "Show detailed data on an existing account",
 		ArgsUsage: "id",
-		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg)
-		},
+		Flags:     flagset.Root(cfg),
 		Action: func(c *cli.Context) error {
 			accServiceID := cfg.GRPC.Namespace + "." + cfg.Server.Name
 			if c.NArg() != 1 {

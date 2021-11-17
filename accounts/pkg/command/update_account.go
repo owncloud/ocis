@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/owncloud/ocis/accounts/pkg/flagset"
+
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
@@ -20,10 +22,9 @@ func UpdateAccount(cfg *config.Config) *cli.Command {
 		Name:      "update",
 		Usage:     "Make changes to an existing account",
 		ArgsUsage: "id",
-		//Flags:     flagset.UpdateAccountWithConfig(cfg, a),
+		Flags:     flagset.UpdateAccountWithConfig(cfg, a),
 		Before: func(c *cli.Context) error {
 			if len(c.StringSlice("password_policies")) > 0 {
-				// StringSliceFlag doesn't support Destination
 				a.PasswordProfile.PasswordPolicies = c.StringSlice("password_policies")
 			}
 

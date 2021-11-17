@@ -5,6 +5,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/owncloud/ocis/accounts/pkg/flagset"
+
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/accounts/pkg/config"
@@ -18,9 +20,7 @@ func ListAccounts(cfg *config.Config) *cli.Command {
 		Name:    "list",
 		Usage:   "List existing accounts",
 		Aliases: []string{"ls"},
-		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg)
-		},
+		Flags:   flagset.Root(cfg),
 		Action: func(c *cli.Context) error {
 			accSvcID := cfg.GRPC.Namespace + "." + cfg.Server.Name
 			accSvc := accounts.NewAccountsService(accSvcID, grpc.NewClient())
