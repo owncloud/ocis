@@ -46,7 +46,8 @@ clean_up() {
 
 trap clean_up SIGHUP SIGINT SIGTERM EXIT
 
-cp -r "$WEB_PATH"/tests "$testFolder"
+cp -r "$WEB_PATH"/tests/acceptance/stepDefinitions "$testFolder"
+cp "$WEB_PATH"/tests/acceptance/setup.js "$testFolder"
 
 export SERVER_HOST=${SERVER_HOST:-https://localhost:9200}
 export BACKEND_HOST=${BACKEND_HOST:-https://localhost:9200}
