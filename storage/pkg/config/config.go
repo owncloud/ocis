@@ -518,17 +518,9 @@ func New() *Config {
 	return &Config{}
 }
 
-const (
-	defaultLocalIngressURL = "https://localhost:9200"
-	defaultSharesFolder    = "/Shares"
-	defaultEOSMasterURL    = "root://eos-mgm1.eoscluster.cern.ch:1094"
-	defaultGatewaySVCAddr  = "127.0.0.1:9142"
-	defaultUserLayout      = "{{.Id.OpaqueId}}"
-)
-
 func DefaultConfig() *Config {
-
 	return &Config{
+		// log is inherited
 		Debug: Debug{
 			Addr: "127.0.0.1:9109",
 		},
@@ -538,7 +530,7 @@ func DefaultConfig() *Config {
 			TransferSecret:        "replace-me-with-a-transfer-secret",
 			TransferExpires:       24 * 60 * 60,
 			OIDC: OIDC{
-				Issuer:   defaultLocalIngressURL,
+				Issuer:   "https://localhost:9200",
 				Insecure: false,
 				IDClaim:  "preferred_username",
 			},
@@ -559,7 +551,7 @@ func DefaultConfig() *Config {
 				GroupMemberFilter:    "(&(objectclass=posixAccount)(ownclouduuid={{.OpaqueId}}*))",
 				BindDN:               "cn=reva,ou=sysusers,dc=ocis,dc=test",
 				BindPassword:         "reva",
-				IDP:                  defaultLocalIngressURL,
+				IDP:                  "https://localhost:9200",
 				UserSchema: LDAPUserSchema{
 					UID:         "ownclouduuid",
 					Mail:        "mail",
@@ -585,7 +577,7 @@ func DefaultConfig() *Config {
 				DBHost:             "mysql",
 				DBPort:             3306,
 				DBName:             "owncloud",
-				Idp:                defaultLocalIngressURL,
+				Idp:                "https://localhost:9200",
 				Nobody:             90,
 				JoinUsername:       false,
 				JoinOwnCloudUUID:   false,
@@ -604,29 +596,29 @@ func DefaultConfig() *Config {
 				EOS: DriverEOS{
 					DriverCommon: DriverCommon{
 						Root:        "/eos/dockertest/reva",
-						ShareFolder: defaultSharesFolder,
+						ShareFolder: "/Shares",
 						UserLayout:  "{{substr 0 1 .Username}}/{{.Username}}",
 					},
 					ShadowNamespace:  "", // Defaults to path.Join(c.Namespace, ".shadow")
 					UploadsNamespace: "", // Defaults to path.Join(c.Namespace, ".uploads")
 					EosBinary:        "/usr/bin/eos",
 					XrdcopyBinary:    "/usr/bin/xrdcopy",
-					MasterURL:        defaultEOSMasterURL,
-					SlaveURL:         defaultEOSMasterURL,
+					MasterURL:        "root://eos-mgm1.eoscluster.cern.ch:1094",
+					SlaveURL:         "root://eos-mgm1.eoscluster.cern.ch:1094",
 					CacheDirectory:   os.TempDir(),
-					GatewaySVC:       defaultGatewaySVCAddr,
+					GatewaySVC:       "127.0.0.1:9142",
 				},
 				Local: DriverCommon{
 					Root:        path.Join(defaults.BaseDataPath(), "storage", "local", "users"),
-					ShareFolder: defaultSharesFolder,
+					ShareFolder: "/Shares",
 					UserLayout:  "{{.Username}}",
 					EnableHome:  false,
 				},
 				OwnCloud: DriverOwnCloud{
 					DriverCommon: DriverCommon{
 						Root:        path.Join(defaults.BaseDataPath(), "storage", "owncloud"),
-						ShareFolder: defaultSharesFolder,
-						UserLayout:  defaultUserLayout,
+						ShareFolder: "/Shares",
+						UserLayout:  "{{.Id.OpaqueId}}",
 						EnableHome:  false,
 					},
 					UploadInfoDir: path.Join(defaults.BaseDataPath(), "storage", "uploadinfo"),
@@ -636,7 +628,7 @@ func DefaultConfig() *Config {
 				OwnCloudSQL: DriverOwnCloudSQL{
 					DriverCommon: DriverCommon{
 						Root:        path.Join(defaults.BaseDataPath(), "storage", "owncloud"),
-						ShareFolder: defaultSharesFolder,
+						ShareFolder: "/Shares",
 						UserLayout:  "{{.Username}}",
 						EnableHome:  false,
 					},
@@ -658,8 +650,8 @@ func DefaultConfig() *Config {
 				S3NG: DriverS3NG{
 					DriverCommon: DriverCommon{
 						Root:        path.Join(defaults.BaseDataPath(), "storage", "users"),
-						ShareFolder: defaultSharesFolder,
-						UserLayout:  defaultUserLayout,
+						ShareFolder: "/Shares",
+						UserLayout:  "{{.Id.OpaqueId}}",
 						EnableHome:  false,
 					},
 					Region:    "default",
@@ -671,8 +663,8 @@ func DefaultConfig() *Config {
 				OCIS: DriverOCIS{
 					DriverCommon: DriverCommon{
 						Root:        path.Join(defaults.BaseDataPath(), "storage", "users"),
-						ShareFolder: defaultSharesFolder,
-						UserLayout:  defaultUserLayout,
+						ShareFolder: "/Shares",
+						UserLayout:  "{{.Id.OpaqueId}}",
 					},
 					ServiceUserUUID: "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
 				},
@@ -681,7 +673,7 @@ func DefaultConfig() *Config {
 				EOS: DriverEOS{
 					DriverCommon: DriverCommon{
 						Root:        "/eos/dockertest/reva",
-						ShareFolder: defaultSharesFolder,
+						ShareFolder: "/Shares",
 						UserLayout:  "{{substr 0 1 .Username}}/{{.Username}}",
 						EnableHome:  false,
 					},
@@ -689,9 +681,9 @@ func DefaultConfig() *Config {
 					UploadsNamespace:    "",
 					EosBinary:           "/usr/bin/eos",
 					XrdcopyBinary:       "/usr/bin/xrdcopy",
-					MasterURL:           defaultEOSMasterURL,
+					MasterURL:           "root://eos-mgm1.eoscluster.cern.ch:1094",
 					GrpcURI:             "",
-					SlaveURL:            defaultEOSMasterURL,
+					SlaveURL:            "root://eos-mgm1.eoscluster.cern.ch:1094",
 					CacheDirectory:      os.TempDir(),
 					EnableLogging:       false,
 					ShowHiddenSysFiles:  false,
@@ -700,7 +692,7 @@ func DefaultConfig() *Config {
 					SecProtocol:         "",
 					Keytab:              "",
 					SingleUsername:      "",
-					GatewaySVC:          defaultGatewaySVCAddr,
+					GatewaySVC:          "127.0.0.1:9142",
 				},
 				Local: DriverCommon{
 					Root: path.Join(defaults.BaseDataPath(), "storage", "local", "metadata"),
@@ -715,7 +707,7 @@ func DefaultConfig() *Config {
 					DriverCommon: DriverCommon{
 						Root:        path.Join(defaults.BaseDataPath(), "storage", "metadata"),
 						ShareFolder: "",
-						UserLayout:  defaultUserLayout,
+						UserLayout:  "{{.Id.OpaqueId}}",
 						EnableHome:  false,
 					},
 					Region: "default",
@@ -724,7 +716,7 @@ func DefaultConfig() *Config {
 					DriverCommon: DriverCommon{
 						Root:        path.Join(defaults.BaseDataPath(), "storage", "metadata"),
 						ShareFolder: "",
-						UserLayout:  defaultUserLayout,
+						UserLayout:  "{{.Id.OpaqueId}}",
 						EnableHome:  false,
 					},
 					ServiceUserUUID: "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
@@ -755,9 +747,9 @@ func DefaultConfig() *Config {
 				OCDavInsecure:              false,
 				OCDavPrefix:                "",
 				OCSPrefix:                  "ocs",
-				OCSSharePrefix:             defaultSharesFolder,
+				OCSSharePrefix:             "/Shares",
 				OCSHomeNamespace:           "/home",
-				PublicURL:                  defaultLocalIngressURL,
+				PublicURL:                  "https://localhost:9200",
 				OCSCacheWarmupDriver:       "",
 				OCSAdditionalInfoAttribute: "{{.Mail}}",
 				OCSResourceInfoCacheTTL:    0,
@@ -769,10 +761,10 @@ func DefaultConfig() *Config {
 			},
 			Gateway: Gateway{
 				Port: Port{
-					Endpoint:    defaultGatewaySVCAddr,
+					Endpoint:    "127.0.0.1:9142",
 					DebugAddr:   "127.0.0.1:9143",
 					GRPCNetwork: "tcp",
-					GRPCAddr:    defaultGatewaySVCAddr,
+					GRPCAddr:    "127.0.0.1:9142",
 				},
 				CommitShareToStorageGrant:  true,
 				CommitShareToStorageRef:    true,
