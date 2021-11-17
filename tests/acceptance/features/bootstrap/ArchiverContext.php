@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * ownCloud
  *
@@ -207,7 +207,7 @@ class ArchiverContext implements Context {
 	 *
 	 * @throws Exception
 	 */
-	public function theDownloadedArchiveShouldContainTheseFiles(string $type, TableNode $expectedFiles) {
+	public function theDownloadedArchiveShouldContainTheseFiles(string $type, TableNode $expectedFiles):void {
 		$this->featureContext->verifyTableNodeColumns($expectedFiles, ['name', 'content']);
 		$tempFile = \tempnam(\sys_get_temp_dir(), 'OcAcceptanceTests_');
 		\unlink($tempFile); // we only need the name
