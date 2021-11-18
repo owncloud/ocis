@@ -250,12 +250,12 @@ func DefaultConfig() *Config {
 		//AutoprovisionAccounts: false,
 		//EnableBasicAuth:       false,
 		//InsecureBackends:      false,
-		Context:  nil,
-		Policies: defaultPolicies(),
+		Context: nil,
+		//Policies: defaultPolicies(),
 	}
 }
 
-func defaultPolicies() []Policy {
+func DefaultPolicies() []Policy {
 	return []Policy{
 		{
 			Name: "ocis",

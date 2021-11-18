@@ -44,6 +44,10 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
+			if cfg.Policies == nil {
+				cfg.Policies = config.DefaultPolicies()
+			}
+
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
