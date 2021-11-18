@@ -25,24 +25,24 @@ func NewService(opts ...Option) Service {
 	m := chi.NewMux()
 	m.Use(options.Middleware...)
 
-	var userBackend identity.Users
+	var backend identity.Backend
 	switch options.Config.Identity.Backend {
 	case "cs3":
-		userBackend = &identity.CS3{
+		backend = &identity.CS3{
 			Config: &options.Config.Reva,
 			Logger: &options.Logger,
 		}
 	case "ldap":
-		userBackend = identity.NewLDAPBackend(options.Config.Identity.LDAP, &options.Logger)
+		backend = identity.NewLDAPBackend(options.Config.Identity.LDAP, &options.Logger)
 	default:
 		options.Logger.Error().Msgf("Unknown Identity Backend: '%s'", options.Config.Identity.Backend)
 	}
 
 	svc := Graph{
-		config:      options.Config,
-		mux:         m,
-		logger:      &options.Logger,
-		userBackend: userBackend,
+		config:          options.Config,
+		mux:             m,
+		logger:          &options.Logger,
+		identityBackend: backend,
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {

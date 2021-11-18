@@ -33,7 +33,7 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 // GetUsers implements the Service interface.
 // TODO use cs3 api to look up user
 func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
-	users, err := g.userBackend.GetUsers(r.Context(), r.URL.Query())
+	users, err := g.identityBackend.GetUsers(r.Context(), r.URL.Query())
 	if err != nil {
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
@@ -54,7 +54,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := g.userBackend.GetUser(r.Context(), userID)
+	user, err := g.identityBackend.GetUser(r.Context(), userID)
 
 	if err != nil {
 		var errcode errorcode.Error

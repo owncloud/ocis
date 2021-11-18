@@ -13,10 +13,10 @@ import (
 
 // Graph defines implements the business logic for Service.
 type Graph struct {
-	config      *config.Config
-	mux         *chi.Mux
-	logger      *log.Logger
-	userBackend identity.Users
+	config          *config.Config
+	mux             *chi.Mux
+	logger          *log.Logger
+	identityBackend identity.Backend
 }
 
 // ServeHTTP implements the Service interface.

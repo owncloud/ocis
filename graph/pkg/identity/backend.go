@@ -8,7 +8,7 @@ import (
 	msgraph "github.com/yaegashi/msgraph.go/beta"
 )
 
-type Users interface {
+type Backend interface {
 	GetUser(ctx context.Context, nameOrId string) (*msgraph.User, error)
 	GetUsers(ctx context.Context, queryParam url.Values) ([]*msgraph.User, error)
 }
