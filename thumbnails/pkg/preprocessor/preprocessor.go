@@ -63,37 +63,37 @@ Scan: // Label for the scanner loop, so we can break it easily
 	for scanner.Scan() {
 		txt := scanner.Text()
 		height := fixed.I(fontSizeAsInt) // reset to default height
-		if txt != "" {
-			textResult := textAnalyzer.AnalyzeString(txt, taOpts)
-			textResult.MergeCommon(DefaultMergeMap)
 
-			for _, sRange := range textResult.ScriptRanges {
-				targetFontFace, _ := t.fontLoader.LoadFaceForScript(sRange.TargetScript)
-				// if the target script is "_unknown" it's expected that the loaded face
-				// uses the default font
-				faceHeight := targetFontFace.Face.Metrics().Height
-				if faceHeight > height {
-					height = faceHeight
-				}
+		textResult := textAnalyzer.AnalyzeString(txt, taOpts)
+		textResult.MergeCommon(DefaultMergeMap)
 
-				canvas.Face = targetFontFace.Face
-				initialByte := sRange.Low
-				for _, sRangeSpace := range sRange.Spaces {
-					if canvas.Dot.Y > maxY {
-						break Scan
-					}
-					drawWord(canvas, textResult.Text[initialByte:sRangeSpace], minX, maxX, height, maxY, true)
-					initialByte = sRangeSpace
+		for _, sRange := range textResult.ScriptRanges {
+			targetFontFace, _ := t.fontLoader.LoadFaceForScript(sRange.TargetScript)
+			// if the target script is "_unknown" it's expected that the loaded face
+			// uses the default font
+			faceHeight := targetFontFace.Face.Metrics().Height
+			if faceHeight > height {
+				height = faceHeight
+			}
+
+			canvas.Face = targetFontFace.Face
+			initialByte := sRange.Low
+			for _, sRangeSpace := range sRange.Spaces {
+				if canvas.Dot.Y > maxY {
+					break Scan
 				}
-				if initialByte <= sRange.High {
-					// some bytes left to be written
-					if canvas.Dot.Y > maxY {
-						break Scan
-					}
-					drawWord(canvas, textResult.Text[initialByte:sRange.High+1], minX, maxX, height, maxY, len(sRange.Spaces) > 0)
+				drawWord(canvas, textResult.Text[initialByte:sRangeSpace], minX, maxX, height, maxY, true)
+				initialByte = sRangeSpace
+			}
+			if initialByte <= sRange.High {
+				// some bytes left to be written
+				if canvas.Dot.Y > maxY {
+					break Scan
 				}
+				drawWord(canvas, textResult.Text[initialByte:sRange.High+1], minX, maxX, height, maxY, len(sRange.Spaces) > 0)
 			}
 		}
+
 		canvas.Dot.X = minX
 		canvas.Dot.Y += height.Mul(fixed.Int26_6(1<<6 + 1<<5)) // height * 1.5
 
