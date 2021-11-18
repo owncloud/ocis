@@ -115,5 +115,45 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			EnvVars:     []string{"GRAPH_IDENTITY_BACKEND"},
 			Destination: &cfg.Identity.Backend,
 		},
+		{
+			EnvVars:     []string{"GRAPH_LDAP_URI"},
+			Destination: &cfg.Identity.LDAP.URI,
+		},
+		{
+			EnvVars:     []string{"GRAPH_LDAP_BIND_DN"},
+			Destination: &cfg.Identity.LDAP.BindDN,
+		},
+		{
+			EnvVars:     []string{"GRAPH_LDAP_BIND_PASSWORD"},
+			Destination: &cfg.Identity.LDAP.BindPassword,
+		},
+		{
+			EnvVars:     []string{"GRAPH_LDAP_USER_BASE_DN"},
+			Destination: &cfg.Identity.LDAP.UserBaseDN,
+		},
+		{
+			EnvVars:     []string{"GRAPH_LDAP_USER_EMAIL_ATTRIBUTE"},
+			Destination: &cfg.Identity.LDAP.UserEmailAttribute,
+		},
+		{
+			EnvVars:     []string{"GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE"},
+			Destination: &cfg.Identity.LDAP.UserDisplayNameAttribute,
+		},
+		{
+			EnvVars:     []string{"GRAPH_LDAP_USER_NAME_ATTRIBUTE"},
+			Destination: &cfg.Identity.LDAP.UserNameAttribute,
+		},
+		{
+			EnvVars:     []string{"GRAPH_LDAP_USER_UID_ATTRIBUTE"},
+			Destination: &cfg.Identity.LDAP.UserIDAttribute,
+		},
+		{
+			EnvVars:     []string{"GRAPH_LDAP_USER_FILTER"},
+			Destination: &cfg.Identity.LDAP.UserFilter,
+		},
+		{
+			EnvVars:     []string{"GRAPH_LDAP_USER_SCOPE"},
+			Destination: &cfg.Identity.LDAP.UserSearchScope,
+		},
 	}
 }

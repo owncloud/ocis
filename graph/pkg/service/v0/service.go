@@ -32,6 +32,8 @@ func NewService(opts ...Option) Service {
 			Config: &options.Config.Reva,
 			Logger: &options.Logger,
 		}
+	case "ldap":
+		userBackend = identity.NewLDAPBackend(options.Config.Identity.LDAP, &options.Logger)
 	default:
 		options.Logger.Error().Msgf("Unknown Identity Backend: '%s'", options.Config.Identity.Backend)
 	}

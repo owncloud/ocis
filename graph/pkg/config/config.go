@@ -52,8 +52,22 @@ type Spaces struct {
 	DefaultQuota string `ocisConfig:"default_quota"`
 }
 
+type LDAP struct {
+	URI                      string `ocisConfig:"uri"`
+	BindDN                   string `ocisConfig:"bind_dn"`
+	BindPassword             string `ocisConfig:"bind_password"`
+	UserBaseDN               string `ocisConfig:"user_base_dn"`
+	UserEmailAttribute       string `ocisConfig:"user_mail_attribute"`
+	UserDisplayNameAttribute string `ocisConfig:"user_displayname_attribute"`
+	UserNameAttribute        string `ocisConfig:"user_name_attribute"`
+	UserIDAttribute          string `ocisConfig:"user_id_attribute"`
+	UserFilter               string `ocisConfig:"user_filter"`
+	UserSearchScope          string `ocisConfig:"user_search_scope"`
+}
+
 type Identity struct {
 	Backend string `ocisConfig:"backend"`
+	LDAP    LDAP   `ocisConfig:"ldap"`
 }
 
 // Config combines all available configuration parts.
@@ -110,6 +124,20 @@ func DefaultConfig() *Config {
 		},
 		Identity: Identity{
 			Backend: "cs3",
+			LDAP: LDAP{
+				URI:                      "ldap://localhost:9125",
+				BindDN:                   "",
+				BindPassword:             "",
+				UserBaseDN:               "ou=users,dc=ocis,dc=test",
+				UserEmailAttribute:       "mail",
+				UserDisplayNameAttribute: "displayName",
+				UserNameAttribute:        "uid",
+				// FIXME: switch this to some more widely available attribute by default
+				//        ideally this needs to	be constant for the lifetime of a users
+				UserIDAttribute: "ownclouduuid",
+				UserFilter:      "(objectClass=posixaccount)",
+				UserSearchScope: "sub",
+			},
 		},
 	}
 }
