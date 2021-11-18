@@ -686,8 +686,8 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
                     "cd /srv/app/web",
                     "git checkout $WEB_COMMITID",
-                    # TODO: settings/package.json has all the acceptance test dependencies
-                    # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
+                    "cd tests/acceptance/",
+                    "yarn install --immutable",
                     "cd /drone/src/accounts",
                     "yarn install --immutable",
                     "make test-acceptance-webui",
@@ -749,8 +749,8 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
                     "cd /srv/app/web",
                     "git checkout $WEB_COMMITID",
-                    # TODO: settings/package.json has all the acceptance test dependencies
-                    # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
+                    "cd tests/acceptance/",
+                    "yarn install --immutable",
                     "cd /drone/src/settings",
                     "yarn install --immutable",
                     "make test-acceptance-webui",
