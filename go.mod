@@ -3,7 +3,7 @@ module github.com/owncloud/ocis
 go 1.17
 
 require (
-	github.com/CiscoM31/godata v1.0.4
+	github.com/CiscoM31/godata v1.0.5
 	github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e
 	github.com/asim/go-micro/plugins/client/grpc/v4 v4.0.0-20211028090348-ed690ed838cc
 	github.com/asim/go-micro/plugins/logger/zerolog/v4 v4.0.0-20211028090348-ed690ed838cc

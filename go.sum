@@ -72,8 +72,8 @@ github.com/Azure/go-ntlmssp v0.0.0-20200615164410-66371956d46c/go.mod h1:chxPXzS
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/toml v0.4.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/CiscoM31/godata v1.0.4 h1:PFGyWG3lunFVnYodKaTPxgTfenDxeCci4Td1F13fOQc=
-github.com/CiscoM31/godata v1.0.4/go.mod h1:Mgl+jHnqFqMT3pPD0pcahMMqI392Z8qInjrwvsbJAb4=
+github.com/CiscoM31/godata v1.0.5 h1:AITXpa/5ybXEq59A0nqUGiS7ZXVJnQtFw5o09tyN/UA=
+github.com/CiscoM31/godata v1.0.5/go.mod h1:wcmFm66GMdOE316TgwFO1wo5ainCvTK26omd93oZf2M=
 github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e h1:Bqtt5C+uVk+vH/t5dmB47uDCTwxw16EYHqvJnmY2aQc=
 github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e/go.mod h1:njRCDrl+1RQ/A/+KVU8Ho2EWAxUSkohOWczdW3dzDG0=
 github.com/HdrHistogram/hdrhistogram-go v1.1.2/go.mod h1:yDgFjdqOqDEKOvasDdhWNXYg9BVp4O+o5f6V/ehm6Oo=
