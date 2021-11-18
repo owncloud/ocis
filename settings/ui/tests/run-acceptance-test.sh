@@ -46,7 +46,15 @@ export SERVER_HOST=${SERVER_HOST:-https://localhost:9200}
 export BACKEND_HOST=${BACKEND_HOST:-https://localhost:9200}
 export TEST_TAGS=${TEST_TAGS:-"not @skip"}
 
-yarn run acceptance-tests "$1"
+cucumber-js --retry 1 \
+						--require-module @babel/register \ 
+						--require-module @babel/polyfill \
+						--require ${TEST_INFRA_DIRECTORY}/setup.js \
+						--require ui/tests/acceptance/stepDefinitions \
+						--require ${TEST_INFRA_DIRECTORY}/stepDefinitions \
+						--format @cucumber/pretty-formatter \
+						-t ${TEST_TAGS:-not @skip and not @skipOnOC10} \
+						"$1"
 
 status=$?
 exit $status
