@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-date: "2021-11-17T16:26:50+0000"
+date: "2021-11-18T00:07:31+0000"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/ocis/templates
@@ -112,11 +112,101 @@ Usage: `ocis [global options] command [command options] [arguments...]`
 
 ## Sub Commands
 
+### ocis health
+
+Check health status
+
+Usage: `ocis health [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-debug-addr |  $OCIS_DEBUG_ADDR
+: Address to debug endpoint. Default: `127.0.0.1:9010`.
+
+
+
+
+
+
+
+
+
 ### ocis run
 
 Runs an extension
 
 Usage: `ocis run [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### ocis kill
+
+Kill an extension by name
+
+Usage: `ocis kill [command options] [arguments...]`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### ocis list
+
+Lists running ocis extensions
+
+Usage: `ocis list [command options] [arguments...]`
 
 
 
@@ -194,143 +284,13 @@ Usage: `ocis server [command options] [arguments...]`
 -extensions |  $OCIS_RUN_EXTENSIONS
 : Run specific extensions during supervised mode.
 
-### ocis kill
-
-Kill an extension by name
-
-Usage: `ocis kill [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### ocis list
-
-Lists running ocis extensions
-
-Usage: `ocis list [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### ocis health
-
-Check health status
-
-Usage: `ocis health [command options] [arguments...]`
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--debug-addr |  $OCIS_DEBUG_ADDR
-: Address to debug endpoint. Default: `127.0.0.1:9010`.
-
-
-
-
-
-
-
-
-
 ### List of available Extension subcommands
 
 There are more subcommands to start the individual extensions. Please check the documentation about their usage and options in the dedicated section of the documentation.
 
-#### ocis webdav
-
-Start webdav server
-
-#### ocis storage-sharing
-
-Start storage sharing service
-
-#### ocis storage-public-link
-
-Start storage public link storage
-
 #### ocis storage-userprovider
 
 Start storage userprovider service
-
-#### ocis thumbnails
-
-Start thumbnails server
-
-#### ocis web
-
-Start web server
-
-#### ocis storage-home
-
-Start storage and data provider for /home mount
-
-#### ocis proxy
-
-Start proxy server
-
-#### ocis storage-auth-bearer
-
-Start storage auth-bearer service
-
-#### ocis storage-auth-basic
-
-Start storage auth-basic service
-
-#### ocis store
-
-Start a go-micro store
 
 #### ocis glauth
 
@@ -340,43 +300,83 @@ Start glauth server
 
 Start storage app-provider service
 
-#### ocis storage-gateway
-
-Start storage gateway
-
-#### ocis storage-frontend
-
-Start storage frontend
-
-#### ocis storage-groupprovider
-
-Start storage groupprovider service
-
-#### ocis storage-metadata
-
-Start storage and data service for metadata
-
 #### ocis storage-users
 
 Start storage and data provider for /users mount
 
-#### ocis version
+#### ocis accounts
 
-Lists running services with version
-
-#### ocis ocs
-
-Start ocs server
-
-#### ocis settings
-
-Start settings server
+Start accounts server
 
 #### ocis idp
 
 Start idp server
 
-#### ocis accounts
+#### ocis ocs
 
-Start accounts server
+Start ocs server
+
+#### ocis storage-auth-basic
+
+Start storage auth-basic service
+
+#### ocis storage-public-link
+
+Start storage public link storage
+
+#### ocis storage-sharing
+
+Start storage sharing service
+
+#### ocis version
+
+Lists running services with version
+
+#### ocis web
+
+Start web server
+
+#### ocis webdav
+
+Start webdav server
+
+#### ocis storage-groupprovider
+
+Start storage groupprovider service
+
+#### ocis store
+
+Start a go-micro store
+
+#### ocis thumbnails
+
+Start thumbnails server
+
+#### ocis proxy
+
+Start proxy server
+
+#### ocis settings
+
+Start settings server
+
+#### ocis storage-frontend
+
+Start storage frontend
+
+#### ocis storage-gateway
+
+Start storage gateway
+
+#### ocis storage-metadata
+
+Start storage and data service for metadata
+
+#### ocis storage-auth-bearer
+
+Start storage auth-bearer service
+
+#### ocis storage-home
+
+Start storage and data provider for /home mount
 
