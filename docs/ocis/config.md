@@ -19,7 +19,7 @@ In order to simplify deployments and development the configuration model from oC
 
 ## In-depth configuration
 
-Since we include a set of predefined extensions within the single binary, configuring an extension can be done in a variety of ways. Since we work with complex types, having as many cli per config value scales poorly, so we limited the options to config files and environment variables, leaving cli flags for shared values, such as config file sources (`--config-file`) or logging (`--log-level`, `--log-pretty`, `--log-file` or `--log-color`).
+Since we include a set of predefined extensions within the single binary, configuring an extension can be done in a variety of ways. Since we work with complex types, having as many cli per config value scales poorly, so we limited the options to config files and environment variables, leaving cli flags for common values, such as logging (`--log-level`, `--log-pretty`, `--log-file` or `--log-color`).
 
 The hierarchy is clear enough, leaving us with:
 
@@ -38,6 +38,14 @@ Let's explore the various flows with examples and workflows.
 ### Examples
 
 Let's explore with examples this approach.
+
+#### Expected loading locations:
+
+- `$HOME/.ocis/config/`
+- `/etc/ocis/`
+- `.config/`
+
+followed by the extension name. When configuring the proxy, a valid full path that will get loaded is `$HOME/.ocis/config/proxy.yaml`.
 
 ####  Only config files
 
