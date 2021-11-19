@@ -916,7 +916,6 @@ special character username not valid
 -   [apiProvisioning-v1/disableUser.feature:185](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L185)
 -   [apiProvisioning-v1/disableUser.feature:239](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L239)
 -   [apiProvisioning-v1/disableUser.feature:256](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L256)
--   [apiProvisioning-v1/disableUser.feature:257](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L257)
 -   [apiProvisioning-v2/disableUser.feature:82](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L82)
 -   [apiProvisioning-v2/disableUser.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L102)
 -   [apiProvisioning-v2/disableUser.feature:111](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L111)
@@ -925,7 +924,6 @@ special character username not valid
 -   [apiProvisioning-v2/disableUser.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L182)
 -   [apiProvisioning-v2/disableUser.feature:236](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L236)
 -   [apiProvisioning-v2/disableUser.feature:253](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L253)
--   [apiProvisioning-v2/disableUser.feature:254](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L254)
 
 #### [Update displayname to empty value is successful](https://github.com/owncloud/ocis/issues/2167)
 -   [apiProvisioning-v1/editUser.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L48)
