@@ -12,113 +12,113 @@ import (
 
 // Log defines the available logging configuration.
 type Log struct {
-	Level  string `mapstructure:"level"`
-	Pretty bool   `mapstructure:"pretty"`
-	Color  bool   `mapstructure:"color"`
-	File   string `mapstructure:"file"`
+	Level  string `ocisConfig:"level"`
+	Pretty bool   `ocisConfig:"pretty"`
+	Color  bool   `ocisConfig:"color"`
+	File   string `ocisConfig:"file"`
 }
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string `mapstructure:"addr"`
-	Token  string `mapstructure:"token"`
-	Pprof  bool   `mapstructure:"pprof"`
-	Zpages bool   `mapstructure:"zpages"`
+	Addr   string `ocisConfig:"addr"`
+	Token  string `ocisConfig:"token"`
+	Pprof  bool   `ocisConfig:"pprof"`
+	Zpages bool   `ocisConfig:"zpages"`
 }
 
 // Gateway defines the available gateway configuration.
 type Gateway struct {
 	Port
-	CommitShareToStorageGrant  bool   `mapstructure:"commit_share_to_storage_grant"`
-	CommitShareToStorageRef    bool   `mapstructure:"commit_share_to_storage_ref"`
-	DisableHomeCreationOnLogin bool   `mapstructure:"disable_home_creation_on_login"`
-	ShareFolder                string `mapstructure:"share_folder"`
-	LinkGrants                 string `mapstructure:"link_grants"`
-	HomeMapping                string `mapstructure:"home_mapping"`
-	EtagCacheTTL               int    `mapstructure:"etag_cache_ttl"`
+	CommitShareToStorageGrant  bool   `ocisConfig:"commit_share_to_storage_grant"`
+	CommitShareToStorageRef    bool   `ocisConfig:"commit_share_to_storage_ref"`
+	DisableHomeCreationOnLogin bool   `ocisConfig:"disable_home_creation_on_login"`
+	ShareFolder                string `ocisConfig:"share_folder"`
+	LinkGrants                 string `ocisConfig:"link_grants"`
+	HomeMapping                string `ocisConfig:"home_mapping"`
+	EtagCacheTTL               int    `ocisConfig:"etag_cache_ttl"`
 }
 
 // StorageRegistry defines the available storage registry configuration
 type StorageRegistry struct {
-	Driver string `mapstructure:"driver"`
+	Driver string `ocisConfig:"driver"`
 	// HomeProvider is the path in the global namespace that the static storage registry uses to determine the home storage
-	HomeProvider string   `mapstructure:"home_provider"`
-	Rules        []string `mapstructure:"rules"`
-	JSON         string   `mapstructure:"json"`
+	HomeProvider string   `ocisConfig:"home_provider"`
+	Rules        []string `ocisConfig:"rules"`
+	JSON         string   `ocisConfig:"json"`
 }
 
 // AppRegistry defines the available app registry configuration
 type AppRegistry struct {
-	Driver        string `mapstructure:"driver"`
-	MimetypesJSON string `mapstructure:"mime_types_json"`
+	Driver        string `ocisConfig:"driver"`
+	MimetypesJSON string `ocisConfig:"mime_types_json"`
 }
 
 // AppProvider defines the available app provider configuration
 type AppProvider struct {
 	Port
-	ExternalAddr string     `mapstructure:"external_addr"`
-	Driver       string     `mapstructure:"driver"`
-	WopiDriver   WopiDriver `mapstructure:"wopi_driver"`
-	AppsURL      string     `mapstructure:"apps_url"`
-	OpenURL      string     `mapstructure:"open_url"`
+	ExternalAddr string     `ocisConfig:"external_addr"`
+	Driver       string     `ocisConfig:"driver"`
+	WopiDriver   WopiDriver `ocisConfig:"wopi_driver"`
+	AppsURL      string     `ocisConfig:"apps_url"`
+	OpenURL      string     `ocisConfig:"open_url"`
 }
 
 type WopiDriver struct {
-	AppAPIKey      string `mapstructure:"app_api_key"`
-	AppDesktopOnly bool   `mapstructure:"app_desktop_only"`
-	AppIconURI     string `mapstructure:"app_icon_uri"`
-	AppInternalURL string `mapstructure:"app_internal_url"`
-	AppName        string `mapstructure:"app_name"`
-	AppURL         string `mapstructure:"app_url"`
-	Insecure       bool   `mapstructure:"insecure"`
-	IopSecret      string `mapstructure:"ipo_secret"`
-	JWTSecret      string `mapstructure:"jwt_secret"`
-	WopiURL        string `mapstructure:"wopi_url"`
+	AppAPIKey      string `ocisConfig:"app_api_key"`
+	AppDesktopOnly bool   `ocisConfig:"app_desktop_only"`
+	AppIconURI     string `ocisConfig:"app_icon_uri"`
+	AppInternalURL string `ocisConfig:"app_internal_url"`
+	AppName        string `ocisConfig:"app_name"`
+	AppURL         string `ocisConfig:"app_url"`
+	Insecure       bool   `ocisConfig:"insecure"`
+	IopSecret      string `ocisConfig:"ipo_secret"`
+	JWTSecret      string `ocisConfig:"jwt_secret"`
+	WopiURL        string `ocisConfig:"wopi_url"`
 }
 
 // Sharing defines the available sharing configuration.
 type Sharing struct {
 	Port
-	UserDriver                       string `mapstructure:"user_driver"`
-	UserJSONFile                     string `mapstructure:"user_json_file"`
-	UserSQLUsername                  string `mapstructure:"user_sql_username"`
-	UserSQLPassword                  string `mapstructure:"user_sql_password"`
-	UserSQLHost                      string `mapstructure:"user_sql_host"`
-	UserSQLPort                      int    `mapstructure:"user_sql_port"`
-	UserSQLName                      string `mapstructure:"user_sql_name"`
-	PublicDriver                     string `mapstructure:"public_driver"`
-	PublicJSONFile                   string `mapstructure:"public_json_file"`
-	PublicPasswordHashCost           int    `mapstructure:"public_password_hash_cost"`
-	PublicEnableExpiredSharesCleanup bool   `mapstructure:"public_enable_expired_shares_cleanup"`
-	PublicJanitorRunInterval         int    `mapstructure:"public_janitor_run_interval"`
-	UserStorageMountID               string `mapstructure:"user_storage_mount_id"`
+	UserDriver                       string `ocisConfig:"user_driver"`
+	UserJSONFile                     string `ocisConfig:"user_json_file"`
+	UserSQLUsername                  string `ocisConfig:"user_sql_username"`
+	UserSQLPassword                  string `ocisConfig:"user_sql_password"`
+	UserSQLHost                      string `ocisConfig:"user_sql_host"`
+	UserSQLPort                      int    `ocisConfig:"user_sql_port"`
+	UserSQLName                      string `ocisConfig:"user_sql_name"`
+	PublicDriver                     string `ocisConfig:"public_driver"`
+	PublicJSONFile                   string `ocisConfig:"public_json_file"`
+	PublicPasswordHashCost           int    `ocisConfig:"public_password_hash_cost"`
+	PublicEnableExpiredSharesCleanup bool   `ocisConfig:"public_enable_expired_shares_cleanup"`
+	PublicJanitorRunInterval         int    `ocisConfig:"public_janitor_run_interval"`
+	UserStorageMountID               string `ocisConfig:"user_storage_mount_id"`
 }
 
 // Port defines the available port configuration.
 type Port struct {
 	// MaxCPUs can be a number or a percentage
-	MaxCPUs  string `mapstructure:"max_cpus"`
-	LogLevel string `mapstructure:"log_level"`
+	MaxCPUs  string `ocisConfig:"max_cpus"`
+	LogLevel string `ocisConfig:"log_level"`
 	// GRPCNetwork can be tcp, udp or unix
-	GRPCNetwork string `mapstructure:"grpc_network"`
+	GRPCNetwork string `ocisConfig:"grpc_network"`
 	// GRPCAddr to listen on, hostname:port (0.0.0.0:9999 for all interfaces) or socket (/var/run/reva/sock)
-	GRPCAddr string `mapstructure:"grpc_addr"`
+	GRPCAddr string `ocisConfig:"grpc_addr"`
 	// Protocol can be grpc or http
 	// HTTPNetwork can be tcp, udp or unix
-	HTTPNetwork string `mapstructure:"http_network"`
+	HTTPNetwork string `ocisConfig:"http_network"`
 	// HTTPAddr to listen on, hostname:port (0.0.0.0:9100 for all interfaces) or socket (/var/run/reva/sock)
-	HTTPAddr string `mapstructure:"http_addr"`
+	HTTPAddr string `ocisConfig:"http_addr"`
 	// Protocol can be grpc or http
-	Protocol string `mapstructure:"protocol"`
+	Protocol string `ocisConfig:"protocol"`
 	// Endpoint is used by the gateway and registries (eg localhost:9100 or cloud.example.com)
-	Endpoint string `mapstructure:"endpoint"`
+	Endpoint string `ocisConfig:"endpoint"`
 	// DebugAddr for the debug endpoint to bind to
-	DebugAddr string `mapstructure:"debug_addr"`
+	DebugAddr string `ocisConfig:"debug_addr"`
 	// Services can be used to give a list of services that should be started on this port
-	Services []string `mapstructure:"services"`
+	Services []string `ocisConfig:"services"`
 	// Config can be used to configure the reva instance.
 	// Services and Protocol will be ignored if this is used
-	Config map[string]interface{} `mapstructure:"config"`
+	Config map[string]interface{} `ocisConfig:"config"`
 
 	// Context allows for context cancellation and propagation
 	Context context.Context
@@ -130,113 +130,113 @@ type Port struct {
 // Users defines the available users configuration.
 type Users struct {
 	Port
-	Driver                    string `mapstucture:"driver"`
-	JSON                      string `mapstucture:"json"`
-	UserGroupsCacheExpiration int    `mapstucture:"user_groups_cache_expiration"`
+	Driver                    string `ocisConfig:"driver"`
+	JSON                      string `ocisConfig:"json"`
+	UserGroupsCacheExpiration int    `ocisConfig:"user_groups_cache_expiration"`
 }
 
 // AuthMachineConfig defines the available configuration for the machine auth driver.
 type AuthMachineConfig struct {
-	MachineAuthAPIKey string `mapstucture:"machine_auth_api_key"`
+	MachineAuthAPIKey string `ocisConfig:"machine_auth_api_key"`
 }
 
 // Groups defines the available groups configuration.
 type Groups struct {
 	Port
-	Driver                      string `mapstucture:"driver"`
-	JSON                        string `mapstucture:"json"`
-	GroupMembersCacheExpiration int    `mapstucture:"group_members_cache_expiration"`
+	Driver                      string `ocisConfig:"driver"`
+	JSON                        string `ocisConfig:"json"`
+	GroupMembersCacheExpiration int    `ocisConfig:"group_members_cache_expiration"`
 }
 
 // FrontendPort defines the available frontend configuration.
 type FrontendPort struct {
 	Port
 
-	AppProviderInsecure        bool       `mapstucture:"app_provider_insecure"`
-	AppProviderPrefix          string     `mapstucture:"app_provider_prefix"`
-	ArchiverInsecure           bool       `mapstucture:"archiver_insecure"`
-	ArchiverPrefix             string     `mapstucture:"archiver_prefix"`
-	DatagatewayPrefix          string     `mapstucture:"data_gateway_prefix"`
-	Favorites                  bool       `mapstucture:"favorites"`
-	OCDavInsecure              bool       `mapstucture:"ocdav_insecure"`
-	OCDavPrefix                string     `mapstucture:"ocdav_prefix"`
-	OCSPrefix                  string     `mapstucture:"ocs_prefix"`
-	OCSSharePrefix             string     `mapstucture:"ocs_share_prefix"`
-	OCSHomeNamespace           string     `mapstucture:"ocs_home_namespace"`
-	PublicURL                  string     `mapstucture:"public_url"`
-	OCSCacheWarmupDriver       string     `mapstucture:"ocs_cache_warmup_driver"`
-	OCSAdditionalInfoAttribute string     `mapstucture:"ocs_additional_info_attribute"`
-	OCSResourceInfoCacheTTL    int        `mapstucture:"ocs_resource_info_cache_ttl"`
-	Middleware                 Middleware `mapstucture:"middleware"`
+	AppProviderInsecure        bool       `ocisConfig:"app_provider_insecure"`
+	AppProviderPrefix          string     `ocisConfig:"app_provider_prefix"`
+	ArchiverInsecure           bool       `ocisConfig:"archiver_insecure"`
+	ArchiverPrefix             string     `ocisConfig:"archiver_prefix"`
+	DatagatewayPrefix          string     `ocisConfig:"data_gateway_prefix"`
+	Favorites                  bool       `ocisConfig:"favorites"`
+	OCDavInsecure              bool       `ocisConfig:"ocdav_insecure"`
+	OCDavPrefix                string     `ocisConfig:"ocdav_prefix"`
+	OCSPrefix                  string     `ocisConfig:"ocs_prefix"`
+	OCSSharePrefix             string     `ocisConfig:"ocs_share_prefix"`
+	OCSHomeNamespace           string     `ocisConfig:"ocs_home_namespace"`
+	PublicURL                  string     `ocisConfig:"public_url"`
+	OCSCacheWarmupDriver       string     `ocisConfig:"ocs_cache_warmup_driver"`
+	OCSAdditionalInfoAttribute string     `ocisConfig:"ocs_additional_info_attribute"`
+	OCSResourceInfoCacheTTL    int        `ocisConfig:"ocs_resource_info_cache_ttl"`
+	Middleware                 Middleware `ocisConfig:"middleware"`
 }
 
 // Middleware configures reva middlewares.
 type Middleware struct {
-	Auth Auth `mapstructure:"auth"`
+	Auth Auth `ocisConfig:"auth"`
 }
 
 // Auth configures reva http auth middleware.
 type Auth struct {
-	CredentialsByUserAgent map[string]string `mapstructure:"credentials_by_user_agenr"`
+	CredentialsByUserAgent map[string]string `ocisConfig:"credentials_by_user_agenr"`
 }
 
 // DataGatewayPort has a public url
 type DataGatewayPort struct {
 	Port
-	PublicURL string `mapstructure:""`
+	PublicURL string `ocisConfig:""`
 }
 
 type DataProvider struct {
-	Insecure bool `mapstructure:"insecure"`
+	Insecure bool `ocisConfig:"insecure"`
 }
 
 // StoragePort defines the available storage configuration.
 type StoragePort struct {
 	Port
-	Driver           string `mapstructure:"driver"`
-	MountPath        string `mapstructure:"mount_path"`
-	MountID          string `mapstructure:"mount_id"`
-	ExposeDataServer bool   `mapstructure:"expose_data_server"`
+	Driver           string `ocisConfig:"driver"`
+	MountPath        string `ocisConfig:"mount_path"`
+	MountID          string `ocisConfig:"mount_id"`
+	ExposeDataServer bool   `ocisConfig:"expose_data_server"`
 	// url the data gateway will use to route requests
-	DataServerURL string `mapstructure:"data_server_url"`
+	DataServerURL string `ocisConfig:"data_server_url"`
 
 	// for HTTP ports with only one http service
-	HTTPPrefix   string       `mapstructure:"http_prefix"`
-	TempFolder   string       `mapstructure:"temp_folder"`
-	ReadOnly     bool         `mapstructure:"read_only"`
-	DataProvider DataProvider `mapstructure:"data_provider"`
+	HTTPPrefix   string       `ocisConfig:"http_prefix"`
+	TempFolder   string       `ocisConfig:"temp_folder"`
+	ReadOnly     bool         `ocisConfig:"read_only"`
+	DataProvider DataProvider `ocisConfig:"data_provider"`
 }
 
 // PublicStorage configures a public storage provider
 type PublicStorage struct {
 	StoragePort
 
-	PublicShareProviderAddr string `mapstructure:"public_share_provider_addr"`
-	UserProviderAddr        string `mapstructure:"user_provider_addr"`
+	PublicShareProviderAddr string `ocisConfig:"public_share_provider_addr"`
+	UserProviderAddr        string `ocisConfig:"user_provider_addr"`
 }
 
 // StorageConfig combines all available storage driver configuration parts.
 type StorageConfig struct {
-	EOS         DriverEOS         `mapstructure:"eos"`
-	Local       DriverCommon      `mapstructure:"local"`
-	OwnCloud    DriverOwnCloud    `mapstructure:"owncloud"`
-	OwnCloudSQL DriverOwnCloudSQL `mapstructure:"owncloud_sql"`
-	S3          DriverS3          `mapstructure:"s3"`
-	S3NG        DriverS3NG        `mapstructure:"s3ng"`
-	OCIS        DriverOCIS        `mapstructure:"ocis"`
+	EOS         DriverEOS         `ocisConfig:"eos"`
+	Local       DriverCommon      `ocisConfig:"local"`
+	OwnCloud    DriverOwnCloud    `ocisConfig:"owncloud"`
+	OwnCloudSQL DriverOwnCloudSQL `ocisConfig:"owncloud_sql"`
+	S3          DriverS3          `ocisConfig:"s3"`
+	S3NG        DriverS3NG        `ocisConfig:"s3ng"`
+	OCIS        DriverOCIS        `ocisConfig:"ocis"`
 }
 
 // DriverCommon defines common driver configuration options.
 type DriverCommon struct {
 	// Root is the absolute path to the location of the data
-	Root string `mapstructure:"root"`
+	Root string `ocisConfig:"root"`
 	//ShareFolder defines the name of the folder jailing all shares
-	ShareFolder string `mapstructure:"share_folder"`
+	ShareFolder string `ocisConfig:"share_folder"`
 	// UserLayout contains the template used to construct
 	// the internal path, eg: `{{substr 0 1 .Username}}/{{.Username}}`
-	UserLayout string `mapstructure:"user_layout"`
+	UserLayout string `ocisConfig:"user_layout"`
 	// EnableHome enables the creation of home directories.
-	EnableHome bool `mapstructure:"enable_home"`
+	EnableHome bool `ocisConfig:"enable_home"`
 }
 
 // DriverEOS defines the available EOS driver configuration.
@@ -244,273 +244,273 @@ type DriverEOS struct {
 	DriverCommon
 
 	// ShadowNamespace for storing shadow data
-	ShadowNamespace string `mapstructure:"shadow_namespace"`
+	ShadowNamespace string `ocisConfig:"shadow_namespace"`
 
 	// UploadsNamespace for storing upload data
-	UploadsNamespace string `mapstructure:"uploads_namespace"`
+	UploadsNamespace string `ocisConfig:"uploads_namespace"`
 
 	// Location of the eos binary.
 	// Default is /usr/bin/eos.
-	EosBinary string `mapstructure:"eos_binary"`
+	EosBinary string `ocisConfig:"eos_binary"`
 
 	// Location of the xrdcopy binary.
 	// Default is /usr/bin/xrdcopy.
-	XrdcopyBinary string `mapstructure:"xrd_copy_binary"`
+	XrdcopyBinary string `ocisConfig:"xrd_copy_binary"`
 
 	// URL of the Master EOS MGM.
 	// Default is root://eos-example.org
-	MasterURL string `mapstructure:"master_url"`
+	MasterURL string `ocisConfig:"master_url"`
 
 	// URI of the EOS MGM grpc server
 	// Default is empty
-	GrpcURI string `mapstructure:"grpc_uri"`
+	GrpcURI string `ocisConfig:"grpc_uri"`
 
 	// URL of the Slave EOS MGM.
 	// Default is root://eos-example.org
-	SlaveURL string `mapstructure:"slave_url"`
+	SlaveURL string `ocisConfig:"slave_url"`
 
 	// Location on the local fs where to store reads.
 	// Defaults to os.TempDir()
-	CacheDirectory string `mapstructure:"cache_directory"`
+	CacheDirectory string `ocisConfig:"cache_directory"`
 
 	// Enables logging of the commands executed
 	// Defaults to false
-	EnableLogging bool `mapstructure:"enable_logging"`
+	EnableLogging bool `ocisConfig:"enable_logging"`
 
 	// ShowHiddenSysFiles shows internal EOS files like
 	// .sys.v# and .sys.a# files.
-	ShowHiddenSysFiles bool `mapstructure:"shadow_hidden_files"`
+	ShowHiddenSysFiles bool `ocisConfig:"shadow_hidden_files"`
 
 	// ForceSingleUserMode will force connections to EOS to use SingleUsername
-	ForceSingleUserMode bool `mapstructure:"force_single_user_mode"`
+	ForceSingleUserMode bool `ocisConfig:"force_single_user_mode"`
 
 	// UseKeyTabAuth changes will authenticate requests by using an EOS keytab.
-	UseKeytab bool `mapstructure:"user_keytab"`
+	UseKeytab bool `ocisConfig:"user_keytab"`
 
 	// SecProtocol specifies the xrootd security protocol to use between the server and EOS.
-	SecProtocol string `mapstructure:"sec_protocol"`
+	SecProtocol string `ocisConfig:"sec_protocol"`
 
 	// Keytab specifies the location of the keytab to use to authenticate to EOS.
-	Keytab string `mapstructure:"keytab"`
+	Keytab string `ocisConfig:"keytab"`
 
 	// SingleUsername is the username to use when SingleUserMode is enabled
-	SingleUsername string `mapstructure:"single_username"`
+	SingleUsername string `ocisConfig:"single_username"`
 
 	// gateway service to use for uid lookups
-	GatewaySVC string `mapstructure:"gateway_svc"`
+	GatewaySVC string `ocisConfig:"gateway_svc"`
 }
 
 // DriverOCIS defines the available oCIS storage driver configuration.
 type DriverOCIS struct {
 	DriverCommon
 
-	ServiceUserUUID string `mapstructure:"service_user_uuid"`
+	ServiceUserUUID string `ocisConfig:"service_user_uuid"`
 }
 
 // DriverOwnCloud defines the available ownCloud storage driver configuration.
 type DriverOwnCloud struct {
 	DriverCommon
 
-	UploadInfoDir string `mapstructure:"upload_info_dir"`
-	Redis         string `mapstructure:"redis"`
-	Scan          bool   `mapstructure:"scan"`
+	UploadInfoDir string `ocisConfig:"upload_info_dir"`
+	Redis         string `ocisConfig:"redis"`
+	Scan          bool   `ocisConfig:"scan"`
 }
 
 // DriverOwnCloudSQL defines the available ownCloudSQL storage driver configuration.
 type DriverOwnCloudSQL struct {
 	DriverCommon
 
-	UploadInfoDir string `mapstructure:"upload_info_dir"`
-	DBUsername    string `mapstructure:"db_username"`
-	DBPassword    string `mapstructure:"db_password"`
-	DBHost        string `mapstructure:"db_host"`
-	DBPort        int    `mapstructure:"db_port"`
-	DBName        string `mapstructure:"db_name"`
+	UploadInfoDir string `ocisConfig:"upload_info_dir"`
+	DBUsername    string `ocisConfig:"db_username"`
+	DBPassword    string `ocisConfig:"db_password"`
+	DBHost        string `ocisConfig:"db_host"`
+	DBPort        int    `ocisConfig:"db_port"`
+	DBName        string `ocisConfig:"db_name"`
 }
 
 // DriverS3 defines the available S3 storage driver configuration.
 type DriverS3 struct {
 	DriverCommon
 
-	Region    string `mapstructure:"region"`
-	AccessKey string `mapstructure:"access_key"`
-	SecretKey string `mapstructure:"secret_key"`
-	Endpoint  string `mapstructure:"endpoint"`
-	Bucket    string `mapstructure:"bucket"`
+	Region    string `ocisConfig:"region"`
+	AccessKey string `ocisConfig:"access_key"`
+	SecretKey string `ocisConfig:"secret_key"`
+	Endpoint  string `ocisConfig:"endpoint"`
+	Bucket    string `ocisConfig:"bucket"`
 }
 
 // DriverS3NG defines the available s3ng storage driver configuration.
 type DriverS3NG struct {
 	DriverCommon
 
-	Region    string `mapstructure:"region"`
-	AccessKey string `mapstructure:"access_key"`
-	SecretKey string `mapstructure:"secret_key"`
-	Endpoint  string `mapstructure:"endpoint"`
-	Bucket    string `mapstructure:"bucket"`
+	Region    string `ocisConfig:"region"`
+	AccessKey string `ocisConfig:"access_key"`
+	SecretKey string `ocisConfig:"secret_key"`
+	Endpoint  string `ocisConfig:"endpoint"`
+	Bucket    string `ocisConfig:"bucket"`
 }
 
 // OIDC defines the available OpenID Connect configuration.
 type OIDC struct {
-	Issuer   string `mapstructure:"issuer"`
-	Insecure bool   `mapstructure:"insecure"`
-	IDClaim  string `mapstructure:"id_claim"`
-	UIDClaim string `mapstructure:"uid_claim"`
-	GIDClaim string `mapstructure:"gid_claim"`
+	Issuer   string `ocisConfig:"issuer"`
+	Insecure bool   `ocisConfig:"insecure"`
+	IDClaim  string `ocisConfig:"id_claim"`
+	UIDClaim string `ocisConfig:"uid_claim"`
+	GIDClaim string `ocisConfig:"gid_claim"`
 }
 
 // LDAP defines the available ldap configuration.
 type LDAP struct {
-	Hostname             string          `mapstructure:"hostname"`
-	Port                 int             `mapstructure:"port"`
-	CACert               string          `mapstructure:"ca_cert"`
-	Insecure             bool            `mapstructure:"insecure"`
-	BaseDN               string          `mapstructure:"base_dn"`
-	LoginFilter          string          `mapstructure:"login_filter"`
-	UserFilter           string          `mapstructure:"user_filter"`
-	UserAttributeFilter  string          `mapstructure:"user_attribute_filter"`
-	UserFindFilter       string          `mapstructure:"user_find_filter"`
-	UserGroupFilter      string          `mapstructure:"user_group_filter"`
-	GroupFilter          string          `mapstructure:"group_filter"`
-	GroupAttributeFilter string          `mapstructure:"group_attribute_filter"`
-	GroupFindFilter      string          `mapstructure:"group_finder_filter"`
-	GroupMemberFilter    string          `mapstructure:"group_member_filter"`
-	BindDN               string          `mapstructure:"bind_dn"`
-	BindPassword         string          `mapstructure:"bind_password"`
-	IDP                  string          `mapstructure:"idp"`
-	UserSchema           LDAPUserSchema  `mapstructure:"user_schema"`
-	GroupSchema          LDAPGroupSchema `mapstructure:"group_schema"`
+	Hostname             string          `ocisConfig:"hostname"`
+	Port                 int             `ocisConfig:"port"`
+	CACert               string          `ocisConfig:"ca_cert"`
+	Insecure             bool            `ocisConfig:"insecure"`
+	BaseDN               string          `ocisConfig:"base_dn"`
+	LoginFilter          string          `ocisConfig:"login_filter"`
+	UserFilter           string          `ocisConfig:"user_filter"`
+	UserAttributeFilter  string          `ocisConfig:"user_attribute_filter"`
+	UserFindFilter       string          `ocisConfig:"user_find_filter"`
+	UserGroupFilter      string          `ocisConfig:"user_group_filter"`
+	GroupFilter          string          `ocisConfig:"group_filter"`
+	GroupAttributeFilter string          `ocisConfig:"group_attribute_filter"`
+	GroupFindFilter      string          `ocisConfig:"group_finder_filter"`
+	GroupMemberFilter    string          `ocisConfig:"group_member_filter"`
+	BindDN               string          `ocisConfig:"bind_dn"`
+	BindPassword         string          `ocisConfig:"bind_password"`
+	IDP                  string          `ocisConfig:"idp"`
+	UserSchema           LDAPUserSchema  `ocisConfig:"user_schema"`
+	GroupSchema          LDAPGroupSchema `ocisConfig:"group_schema"`
 }
 
 // UserGroupRest defines the REST driver specification for user and group resolution.
 type UserGroupRest struct {
-	ClientID          string `mapstructure:"client_id"`
-	ClientSecret      string `mapstructure:"client_secret"`
-	RedisAddress      string `mapstructure:"redis_address"`
-	RedisUsername     string `mapstructure:"redis_username"`
-	RedisPassword     string `mapstructure:"redis_password"`
-	IDProvider        string `mapstructure:"idp_provider"`
-	APIBaseURL        string `mapstructure:"api_base_url"`
-	OIDCTokenEndpoint string `mapstructure:"oidc_token_endpoint"`
-	TargetAPI         string `mapstructure:"target_api"`
+	ClientID          string `ocisConfig:"client_id"`
+	ClientSecret      string `ocisConfig:"client_secret"`
+	RedisAddress      string `ocisConfig:"redis_address"`
+	RedisUsername     string `ocisConfig:"redis_username"`
+	RedisPassword     string `ocisConfig:"redis_password"`
+	IDProvider        string `ocisConfig:"idp_provider"`
+	APIBaseURL        string `ocisConfig:"api_base_url"`
+	OIDCTokenEndpoint string `ocisConfig:"oidc_token_endpoint"`
+	TargetAPI         string `ocisConfig:"target_api"`
 }
 
 // UserOwnCloudSQL defines the available ownCloudSQL user provider configuration.
 type UserOwnCloudSQL struct {
-	DBUsername         string `mapstructure:"db_username"`
-	DBPassword         string `mapstructure:"db_password"`
-	DBHost             string `mapstructure:"db_host"`
-	DBPort             int    `mapstructure:"db_port"`
-	DBName             string `mapstructure:"db_name"`
-	Idp                string `mapstructure:"idp"`
-	Nobody             int64  `mapstructure:"nobody"`
-	JoinUsername       bool   `mapstructure:"join_username"`
-	JoinOwnCloudUUID   bool   `mapstructure:"join_owncloud_uuid"`
-	EnableMedialSearch bool   `mapstructure:"enable_medial_search"`
+	DBUsername         string `ocisConfig:"db_username"`
+	DBPassword         string `ocisConfig:"db_password"`
+	DBHost             string `ocisConfig:"db_host"`
+	DBPort             int    `ocisConfig:"db_port"`
+	DBName             string `ocisConfig:"db_name"`
+	Idp                string `ocisConfig:"idp"`
+	Nobody             int64  `ocisConfig:"nobody"`
+	JoinUsername       bool   `ocisConfig:"join_username"`
+	JoinOwnCloudUUID   bool   `ocisConfig:"join_owncloud_uuid"`
+	EnableMedialSearch bool   `ocisConfig:"enable_medial_search"`
 }
 
 // LDAPUserSchema defines the available ldap user schema configuration.
 type LDAPUserSchema struct {
-	UID         string `mapstructure:"uid"`
-	Mail        string `mapstructure:"mail"`
-	DisplayName string `mapstructure:"display_name"`
-	CN          string `mapstructure:"cn"`
-	UIDNumber   string `mapstructure:"uid_number"`
-	GIDNumber   string `mapstructure:"gid_number"`
+	UID         string `ocisConfig:"uid"`
+	Mail        string `ocisConfig:"mail"`
+	DisplayName string `ocisConfig:"display_name"`
+	CN          string `ocisConfig:"cn"`
+	UIDNumber   string `ocisConfig:"uid_number"`
+	GIDNumber   string `ocisConfig:"gid_number"`
 }
 
 // LDAPGroupSchema defines the available ldap group schema configuration.
 type LDAPGroupSchema struct {
-	GID         string `mapstructure:"gid"`
-	Mail        string `mapstructure:"mail"`
-	DisplayName string `mapstructure:"display_name"`
-	CN          string `mapstructure:"cn"`
-	GIDNumber   string `mapstructure:"gid_number"`
+	GID         string `ocisConfig:"gid"`
+	Mail        string `ocisConfig:"mail"`
+	DisplayName string `ocisConfig:"display_name"`
+	CN          string `ocisConfig:"cn"`
+	GIDNumber   string `ocisConfig:"gid_number"`
 }
 
 // OCDav defines the available ocdav configuration.
 type OCDav struct {
-	WebdavNamespace   string `mapstructure:"webdav_namespace"`
-	DavFilesNamespace string `mapstructure:"dav_files_namespace"`
+	WebdavNamespace   string `ocisConfig:"webdav_namespace"`
+	DavFilesNamespace string `ocisConfig:"dav_files_namespace"`
 }
 
 // Archiver defines the available archiver configuration.
 type Archiver struct {
-	MaxNumFiles int64  `mapstructure:"max_num_files"`
-	MaxSize     int64  `mapstructure:"max_size"`
-	ArchiverURL string `mapstructure:"archiver_url"`
+	MaxNumFiles int64  `ocisConfig:"max_num_files"`
+	MaxSize     int64  `ocisConfig:"max_size"`
+	ArchiverURL string `ocisConfig:"archiver_url"`
 }
 
 // Reva defines the available reva configuration.
 type Reva struct {
 	// JWTSecret used to sign jwt tokens between services
-	JWTSecret             string          `mapstructure:"jwt_secret"`
-	SkipUserGroupsInToken bool            `mapstructure:"skip_user_grooups_in_token"`
-	TransferSecret        string          `mapstructure:"transfer_secret"`
-	TransferExpires       int             `mapstructure:"transfer_expires"`
-	OIDC                  OIDC            `mapstructure:"oidc"`
-	LDAP                  LDAP            `mapstructure:"ldap"`
-	UserGroupRest         UserGroupRest   `mapstructure:"user_group_rest"`
-	UserOwnCloudSQL       UserOwnCloudSQL `mapstructure:"user_owncloud_sql"`
-	OCDav                 OCDav           `mapstructure:"ocdav"`
-	Archiver              Archiver        `mapstructure:"archiver"`
-	UserStorage           StorageConfig   `mapstructure:"user_storage"`
-	MetadataStorage       StorageConfig   `mapstructure:"metadata_storage"`
+	JWTSecret             string          `ocisConfig:"jwt_secret"`
+	SkipUserGroupsInToken bool            `ocisConfig:"skip_user_grooups_in_token"`
+	TransferSecret        string          `ocisConfig:"transfer_secret"`
+	TransferExpires       int             `ocisConfig:"transfer_expires"`
+	OIDC                  OIDC            `ocisConfig:"oidc"`
+	LDAP                  LDAP            `ocisConfig:"ldap"`
+	UserGroupRest         UserGroupRest   `ocisConfig:"user_group_rest"`
+	UserOwnCloudSQL       UserOwnCloudSQL `ocisConfig:"user_owncloud_sql"`
+	OCDav                 OCDav           `ocisConfig:"ocdav"`
+	Archiver              Archiver        `ocisConfig:"archiver"`
+	UserStorage           StorageConfig   `ocisConfig:"user_storage"`
+	MetadataStorage       StorageConfig   `ocisConfig:"metadata_storage"`
 	// Ports are used to configure which services to start on which port
-	Frontend          FrontendPort      `mapstructure:"frontend"`
-	DataGateway       DataGatewayPort   `mapstructure:"data_gateway"`
-	Gateway           Gateway           `mapstructure:"gateway"`
-	StorageRegistry   StorageRegistry   `mapstructure:"storage_registry"`
-	AppRegistry       AppRegistry       `mapstructure:"app_registry"`
-	Users             Users             `mapstructure:"users"`
-	Groups            Groups            `mapstructure:"groups"`
-	AuthProvider      Users             `mapstructure:"auth_provider"`
-	AuthBasic         Port              `mapstructure:"auth_basic"`
-	AuthBearer        Port              `mapstructure:"auth_bearer"`
-	AuthMachine       Port              `mapstructure:"auth_machine"`
-	AuthMachineConfig AuthMachineConfig `mapstructure:"auth_machine_config"`
-	Sharing           Sharing           `mapstructure:"sharing"`
-	StorageHome       StoragePort       `mapstructure:"storage_home"`
-	StorageUsers      StoragePort       `mapstructure:"storage_users"`
-	StoragePublicLink PublicStorage     `mapstructure:"storage_public_link"`
-	StorageMetadata   StoragePort       `mapstructure:"storage_metadata"`
-	AppProvider       AppProvider       `mapstructure:"app_provider"`
+	Frontend          FrontendPort      `ocisConfig:"frontend"`
+	DataGateway       DataGatewayPort   `ocisConfig:"data_gateway"`
+	Gateway           Gateway           `ocisConfig:"gateway"`
+	StorageRegistry   StorageRegistry   `ocisConfig:"storage_registry"`
+	AppRegistry       AppRegistry       `ocisConfig:"app_registry"`
+	Users             Users             `ocisConfig:"users"`
+	Groups            Groups            `ocisConfig:"groups"`
+	AuthProvider      Users             `ocisConfig:"auth_provider"`
+	AuthBasic         Port              `ocisConfig:"auth_basic"`
+	AuthBearer        Port              `ocisConfig:"auth_bearer"`
+	AuthMachine       Port              `ocisConfig:"auth_machine"`
+	AuthMachineConfig AuthMachineConfig `ocisConfig:"auth_machine_config"`
+	Sharing           Sharing           `ocisConfig:"sharing"`
+	StorageHome       StoragePort       `ocisConfig:"storage_home"`
+	StorageUsers      StoragePort       `ocisConfig:"storage_users"`
+	StoragePublicLink PublicStorage     `ocisConfig:"storage_public_link"`
+	StorageMetadata   StoragePort       `ocisConfig:"storage_metadata"`
+	AppProvider       AppProvider       `ocisConfig:"app_provider"`
 	// Configs can be used to configure the reva instance.
 	// Services and Ports will be ignored if this is used
-	Configs map[string]interface{} `mapstructure:"configs"`
+	Configs map[string]interface{} `ocisConfig:"configs"`
 	// chunking and resumable upload config (TUS)
-	UploadMaxChunkSize       int    `mapstructure:"uppload_max_chunk_size"`
-	UploadHTTPMethodOverride string `mapstructure:"upload_http_method_override"`
+	UploadMaxChunkSize       int    `ocisConfig:"uppload_max_chunk_size"`
+	UploadHTTPMethodOverride string `ocisConfig:"upload_http_method_override"`
 	// checksumming capabilities
-	ChecksumSupportedTypes      []string `mapstructure:"checksum_supported_types"`
-	ChecksumPreferredUploadType string   `mapstructure:"checksum_preferred_upload_type"`
-	DefaultUploadProtocol       string   `mapstructure:"default_upload_protocol"`
+	ChecksumSupportedTypes      []string `ocisConfig:"checksum_supported_types"`
+	ChecksumPreferredUploadType string   `ocisConfig:"checksum_preferred_upload_type"`
+	DefaultUploadProtocol       string   `ocisConfig:"default_upload_protocol"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `mapstructure:"enabled"`
-	Type      string `mapstructure:"type"`
-	Endpoint  string `mapstructure:"endpoint"`
-	Collector string `mapstructure:"collector"`
-	Service   string `mapstructure:"service"`
+	Enabled   bool   `ocisConfig:"enabled"`
+	Type      string `ocisConfig:"type"`
+	Endpoint  string `ocisConfig:"endpoint"`
+	Collector string `ocisConfig:"collector"`
+	Service   string `ocisConfig:"service"`
 }
 
 // Asset defines the available asset configuration.
 type Asset struct {
-	Path string `mapstructure:"path"`
+	Path string `ocisConfig:"path"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
 	*shared.Commons
 
-	File    string      `mapstructure:"file"`
-	Log     *shared.Log `mapstructure:"log"`
-	Debug   Debug       `mapstructure:"debug"`
-	Reva    Reva        `mapstructure:"reva"`
-	Tracing Tracing     `mapstructure:"tracing"`
-	Asset   Asset       `mapstructure:"asset"`
+	File    string      `ocisConfig:"file"`
+	Log     *shared.Log `ocisConfig:"log"`
+	Debug   Debug       `ocisConfig:"debug"`
+	Reva    Reva        `ocisConfig:"reva"`
+	Tracing Tracing     `ocisConfig:"tracing"`
+	Asset   Asset       `ocisConfig:"asset"`
 }
 
 // New initializes a new configuration with or without defaults.

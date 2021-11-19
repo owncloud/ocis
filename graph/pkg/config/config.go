@@ -8,63 +8,63 @@ import (
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string `mapstructure:"addr"`
-	Token  string `mapstructure:"token"`
-	Pprof  bool   `mapstructure:"pprof"`
-	Zpages bool   `mapstructure:"zpages"`
+	Addr   string `ocisConfig:"addr"`
+	Token  string `ocisConfig:"token"`
+	Pprof  bool   `ocisConfig:"pprof"`
+	Zpages bool   `ocisConfig:"zpages"`
 }
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string `mapstructure:"addr"`
-	Namespace string `mapstructure:"namespace"`
-	Root      string `mapstructure:"root"`
+	Addr      string `ocisConfig:"addr"`
+	Namespace string `ocisConfig:"namespace"`
+	Root      string `ocisConfig:"root"`
 }
 
 // Server configures a server.
 type Server struct {
-	Version string `mapstructure:"version"`
-	Name    string `mapstructure:"name"`
+	Version string `ocisConfig:"version"`
+	Name    string `ocisConfig:"name"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `mapstructure:"enabled"`
-	Type      string `mapstructure:"type"`
-	Endpoint  string `mapstructure:"endpoint"`
-	Collector string `mapstructure:"collector"`
-	Service   string `mapstructure:"service"`
+	Enabled   bool   `ocisConfig:"enabled"`
+	Type      string `ocisConfig:"type"`
+	Endpoint  string `ocisConfig:"endpoint"`
+	Collector string `ocisConfig:"collector"`
+	Service   string `ocisConfig:"service"`
 }
 
 // Reva defines all available REVA configuration.
 type Reva struct {
-	Address string `mapstructure:"address"`
+	Address string `ocisConfig:"address"`
 }
 
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
-	JWTSecret string `mapstructure:"jwt_secret"`
+	JWTSecret string `ocisConfig:"jwt_secret"`
 }
 
 type Spaces struct {
-	WebDavBase   string `mapstructure:"webdav_base"`
-	WebDavPath   string `mapstructure:"webdav_path"`
-	DefaultQuota string `mapstructure:"default_quota"`
+	WebDavBase   string `ocisConfig:"webdav_base"`
+	WebDavPath   string `ocisConfig:"webdav_path"`
+	DefaultQuota string `ocisConfig:"default_quota"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
 	*shared.Commons
 
-	File         string       `mapstructure:"file"`
-	Log          *shared.Log  `mapstructure:"log"`
-	Debug        Debug        `mapstructure:"debug"`
-	HTTP         HTTP         `mapstructure:"http"`
-	Server       Server       `mapstructure:"server"`
-	Tracing      Tracing      `mapstructure:"tracing"`
-	Reva         Reva         `mapstructure:"reva"`
-	TokenManager TokenManager `mapstructure:"token_manager"`
-	Spaces       Spaces       `mapstructure:"spaces"`
+	File         string       `ocisConfig:"file"`
+	Log          *shared.Log  `ocisConfig:"log"`
+	Debug        Debug        `ocisConfig:"debug"`
+	HTTP         HTTP         `ocisConfig:"http"`
+	Server       Server       `ocisConfig:"server"`
+	Tracing      Tracing      `ocisConfig:"tracing"`
+	Reva         Reva         `ocisConfig:"reva"`
+	TokenManager TokenManager `ocisConfig:"token_manager"`
+	Spaces       Spaces       `ocisConfig:"spaces"`
 
 	Context    context.Context
 	Supervised bool

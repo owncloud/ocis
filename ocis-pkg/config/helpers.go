@@ -69,6 +69,9 @@ func sanitizeExtensions(set []string, ext []string, f func(a, b string) bool) []
 func BindSourcesToStructs(extension string, dst interface{}) (*gofig.Config, error) {
 	sources := DefaultConfigSources(extension, supportedExtensions)
 	cnf := gofig.NewWithOptions(extension, gofig.ParseEnv)
+	cnf.WithOptions(func(options *gofig.Options) {
+		options.DecoderConfig.TagName = "ocisConfig"
+	})
 	cnf.AddDriver(gooyaml.Driver)
 	cnf.AddDriver(goojson.Driver)
 	_ = cnf.LoadFiles(sources...)

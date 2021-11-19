@@ -10,57 +10,57 @@ import (
 
 // Log defines the available logging configuration.
 type Log struct {
-	Level  string `mapstructure:"level"`
-	Pretty bool   `mapstructure:"pretty"`
-	Color  bool   `mapstructure:"color"`
-	File   string `mapstructure:"file"`
+	Level  string `ocisConfig:"level"`
+	Pretty bool   `ocisConfig:"pretty"`
+	Color  bool   `ocisConfig:"color"`
+	File   string `ocisConfig:"file"`
 }
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string `mapstructure:"addr"`
-	Token  string `mapstructure:"token"`
-	Pprof  bool   `mapstructure:"pprof"`
-	Zpages bool   `mapstructure:"zpages"`
+	Addr   string `ocisConfig:"addr"`
+	Token  string `ocisConfig:"token"`
+	Pprof  bool   `ocisConfig:"pprof"`
+	Zpages bool   `ocisConfig:"zpages"`
 }
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr    string `mapstructure:"addr"`
-	Root    string `mapstructure:"root"`
-	TLSCert string `mapstructure:"tls_cert"`
-	TLSKey  string `mapstructure:"tls_key"`
-	TLS     bool   `mapstructure:"tls"`
+	Addr    string `ocisConfig:"addr"`
+	Root    string `ocisConfig:"root"`
+	TLSCert string `ocisConfig:"tls_cert"`
+	TLSKey  string `ocisConfig:"tls_key"`
+	TLS     bool   `ocisConfig:"tls"`
 }
 
 // Service defines the available service configuration.
 type Service struct {
-	Name      string `mapstructure:"name"`
-	Namespace string `mapstructure:"namespace"`
-	Version   string `mapstructure:"version"`
+	Name      string `ocisConfig:"name"`
+	Namespace string `ocisConfig:"namespace"`
+	Version   string `ocisConfig:"version"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `mapstructure:"enabled"`
-	Type      string `mapstructure:"type"`
-	Endpoint  string `mapstructure:"endpoint"`
-	Collector string `mapstructure:"collector"`
-	Service   string `mapstructure:"service"`
+	Enabled   bool   `ocisConfig:"enabled"`
+	Type      string `ocisConfig:"type"`
+	Endpoint  string `ocisConfig:"endpoint"`
+	Collector string `ocisConfig:"collector"`
+	Service   string `ocisConfig:"service"`
 }
 
 // Policy enables us to use multiple directors.
 type Policy struct {
-	Name   string  `mapstructure:"name"`
-	Routes []Route `mapstructure:"routes"`
+	Name   string  `ocisConfig:"name"`
+	Routes []Route `ocisConfig:"routes"`
 }
 
 // Route define forwarding routes
 type Route struct {
-	Type        RouteType `mapstructure:"type"`
-	Endpoint    string    `mapstructure:"endpoint"`
-	Backend     string    `mapstructure:"backend"`
-	ApacheVHost bool      `mapstructure:"apache-vhost"`
+	Type        RouteType `ocisConfig:"type"`
+	Endpoint    string    `ocisConfig:"endpoint"`
+	Backend     string    `ocisConfig:"backend"`
+	ApacheVHost bool      `ocisConfig:"apache-vhost"`
 }
 
 // RouteType defines the type of a route
@@ -84,48 +84,48 @@ var (
 
 // Reva defines all available REVA configuration.
 type Reva struct {
-	Address    string     `mapstructure:"address"`
-	Middleware Middleware `mapstructure:"middleware"`
+	Address    string     `ocisConfig:"address"`
+	Middleware Middleware `ocisConfig:"middleware"`
 }
 
 // Middleware configures proxy middlewares.
 type Middleware struct {
-	Auth Auth `mapstructure:"middleware"`
+	Auth Auth `ocisConfig:"middleware"`
 }
 
 // Auth configures proxy http auth middleware.
 type Auth struct {
-	CredentialsByUserAgent map[string]string `mapstructure:""`
+	CredentialsByUserAgent map[string]string `ocisConfig:""`
 }
 
 // Cache is a TTL cache configuration.
 type Cache struct {
-	Size int `mapstructure:"size"`
-	TTL  int `mapstructure:"ttl"`
+	Size int `ocisConfig:"size"`
+	TTL  int `ocisConfig:"ttl"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
 	*shared.Commons
 
-	Log                   *shared.Log     `mapstructure:"log"`
-	Debug                 Debug           `mapstructure:"debug"`
-	HTTP                  HTTP            `mapstructure:"http"`
-	Service               Service         `mapstructure:"service"`
-	Tracing               Tracing         `mapstructure:"tracing"`
-	Policies              []Policy        `mapstructure:"policies"`
-	OIDC                  OIDC            `mapstructure:"oidc"`
-	TokenManager          TokenManager    `mapstructure:"token_manager"`
-	PolicySelector        *PolicySelector `mapstructure:"policy_selector"`
-	Reva                  Reva            `mapstructure:"reva"`
-	PreSignedURL          PreSignedURL    `mapstructure:"pre_signed_url"`
-	AccountBackend        string          `mapstructure:"account_backend"`
-	UserOIDCClaim         string          `mapstructure:"user_oidc_claim"`
-	UserCS3Claim          string          `mapstructure:"user_cs3_claim"`
-	MachineAuthAPIKey     string          `mapstructure:"machine_auth_api_key"`
-	AutoprovisionAccounts bool            `mapstructure:"auto_provision_accounts"`
-	EnableBasicAuth       bool            `mapstructure:"enable_basic_auth"`
-	InsecureBackends      bool            `mapstructure:"insecure_backends"`
+	Log                   *shared.Log     `ocisConfig:"log"`
+	Debug                 Debug           `ocisConfig:"debug"`
+	HTTP                  HTTP            `ocisConfig:"http"`
+	Service               Service         `ocisConfig:"service"`
+	Tracing               Tracing         `ocisConfig:"tracing"`
+	Policies              []Policy        `ocisConfig:"policies"`
+	OIDC                  OIDC            `ocisConfig:"oidc"`
+	TokenManager          TokenManager    `ocisConfig:"token_manager"`
+	PolicySelector        *PolicySelector `ocisConfig:"policy_selector"`
+	Reva                  Reva            `ocisConfig:"reva"`
+	PreSignedURL          PreSignedURL    `ocisConfig:"pre_signed_url"`
+	AccountBackend        string          `ocisConfig:"account_backend"`
+	UserOIDCClaim         string          `ocisConfig:"user_oidc_claim"`
+	UserCS3Claim          string          `ocisConfig:"user_cs3_claim"`
+	MachineAuthAPIKey     string          `ocisConfig:"machine_auth_api_key"`
+	AutoprovisionAccounts bool            `ocisConfig:"auto_provision_accounts"`
+	EnableBasicAuth       bool            `ocisConfig:"enable_basic_auth"`
+	InsecureBackends      bool            `ocisConfig:"insecure_backends"`
 
 	Context    context.Context
 	Supervised bool
@@ -134,62 +134,62 @@ type Config struct {
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
 // with the configured oidc-provider
 type OIDC struct {
-	Issuer        string `mapstructure:"issuer"`
-	Insecure      bool   `mapstructure:"insecure"`
-	UserinfoCache Cache  `mapstructure:"user_info_cache"`
+	Issuer        string `ocisConfig:"issuer"`
+	Insecure      bool   `ocisConfig:"insecure"`
+	UserinfoCache Cache  `ocisConfig:"user_info_cache"`
 }
 
 // PolicySelector is the toplevel-configuration for different selectors
 type PolicySelector struct {
-	Static    *StaticSelectorConf    `mapstructure:"static"`
-	Migration *MigrationSelectorConf `mapstructure:"migration"`
-	Claims    *ClaimsSelectorConf    `mapstructure:"claims"`
-	Regex     *RegexSelectorConf     `mapstructure:"regex"`
+	Static    *StaticSelectorConf    `ocisConfig:"static"`
+	Migration *MigrationSelectorConf `ocisConfig:"migration"`
+	Claims    *ClaimsSelectorConf    `ocisConfig:"claims"`
+	Regex     *RegexSelectorConf     `ocisConfig:"regex"`
 }
 
 // StaticSelectorConf is the config for the static-policy-selector
 type StaticSelectorConf struct {
-	Policy string `mapstructure:"policy"`
+	Policy string `ocisConfig:"policy"`
 }
 
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
-	JWTSecret string `mapstructure:"jwt_secret"`
+	JWTSecret string `ocisConfig:"jwt_secret"`
 }
 
 // PreSignedURL is the config for the presigned url middleware
 type PreSignedURL struct {
-	AllowedHTTPMethods []string `mapstructure:"allowed_http_methods"`
-	Enabled            bool     `mapstructure:"enabled"`
+	AllowedHTTPMethods []string `ocisConfig:"allowed_http_methods"`
+	Enabled            bool     `ocisConfig:"enabled"`
 }
 
 // MigrationSelectorConf is the config for the migration-selector
 type MigrationSelectorConf struct {
-	AccFoundPolicy        string `mapstructure:"acc_found_policy"`
-	AccNotFoundPolicy     string `mapstructure:"acc_not_found_policy"`
-	UnauthenticatedPolicy string `mapstructure:"unauthenticated_policy"`
+	AccFoundPolicy        string `ocisConfig:"acc_found_policy"`
+	AccNotFoundPolicy     string `ocisConfig:"acc_not_found_policy"`
+	UnauthenticatedPolicy string `ocisConfig:"unauthenticated_policy"`
 }
 
 // ClaimsSelectorConf is the config for the claims-selector
 type ClaimsSelectorConf struct {
-	DefaultPolicy         string `mapstructure:"default_policy"`
-	UnauthenticatedPolicy string `mapstructure:"unauthenticated_policy"`
-	SelectorCookieName    string `mapstructure:"selector_cookie_name"`
+	DefaultPolicy         string `ocisConfig:"default_policy"`
+	UnauthenticatedPolicy string `ocisConfig:"unauthenticated_policy"`
+	SelectorCookieName    string `ocisConfig:"selector_cookie_name"`
 }
 
 // RegexSelectorConf is the config for the regex-selector
 type RegexSelectorConf struct {
-	DefaultPolicy         string          `mapstructure:"default_policy"`
-	MatchesPolicies       []RegexRuleConf `mapstructure:"matches_policies"`
-	UnauthenticatedPolicy string          `mapstructure:"unauthenticated_policy"`
-	SelectorCookieName    string          `mapstructure:"selector_cookie_name"`
+	DefaultPolicy         string          `ocisConfig:"default_policy"`
+	MatchesPolicies       []RegexRuleConf `ocisConfig:"matches_policies"`
+	UnauthenticatedPolicy string          `ocisConfig:"unauthenticated_policy"`
+	SelectorCookieName    string          `ocisConfig:"selector_cookie_name"`
 }
 
 type RegexRuleConf struct {
-	Priority int    `mapstructure:"priority"`
-	Property string `mapstructure:"property"`
-	Match    string `mapstructure:"match"`
-	Policy   string `mapstructure:"policy"`
+	Priority int    `ocisConfig:"priority"`
+	Property string `ocisConfig:"property"`
+	Match    string `ocisConfig:"match"`
+	Policy   string `ocisConfig:"policy"`
 }
 
 // New initializes a new configuration

@@ -20,35 +20,35 @@ import (
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string `mapstructure:"addr"`
-	Token  string `mapstructure:"token"`
-	Pprof  bool   `mapstructure:"pprof"`
-	Zpages bool   `mapstructure:"zpages"`
+	Addr   string `ocisConfig:"addr"`
+	Token  string `ocisConfig:"token"`
+	Pprof  bool   `ocisConfig:"pprof"`
+	Zpages bool   `ocisConfig:"zpages"`
 }
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr string `mapstructure:"addr"`
-	Root string `mapstructure:"root"`
+	Addr string `ocisConfig:"addr"`
+	Root string `ocisConfig:"root"`
 }
 
 // GRPC defines the available grpc configuration.
 type GRPC struct {
-	Addr string `mapstructure:"addr"`
+	Addr string `ocisConfig:"addr"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `mapstructure:"enabled"`
-	Type      string `mapstructure:"type"`
-	Endpoint  string `mapstructure:"endpoint"`
-	Collector string `mapstructure:"collector"`
-	Service   string `mapstructure:"service"`
+	Enabled   bool   `ocisConfig:"enabled"`
+	Type      string `ocisConfig:"type"`
+	Endpoint  string `ocisConfig:"endpoint"`
+	Collector string `ocisConfig:"collector"`
+	Service   string `ocisConfig:"service"`
 }
 
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
-	JWTSecret string `mapstructure:"jwt_secret"`
+	JWTSecret string `ocisConfig:"jwt_secret"`
 }
 
 const (
@@ -63,41 +63,41 @@ type Mode int
 
 // Runtime configures the oCIS runtime when running in supervised mode.
 type Runtime struct {
-	Port       string `mapstructure:"port"`
-	Host       string `mapstructure:"host"`
-	Extensions string `mapstructure:"extensions"`
+	Port       string `ocisConfig:"port"`
+	Host       string `ocisConfig:"host"`
+	Extensions string `ocisConfig:"extensions"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons `mapstructure:"shared"`
+	*shared.Commons `ocisConfig:"shared"`
 
 	Mode    Mode // DEPRECATED
 	File    string
-	OcisURL string `mapstructure:"ocis_url"`
+	OcisURL string `ocisConfig:"ocis_url"`
 
-	Registry     string       `mapstructure:"registry"`
-	Log          shared.Log   `mapstructure:"log"`
-	Debug        Debug        `mapstructure:"debug"`
-	HTTP         HTTP         `mapstructure:"http"`
-	GRPC         GRPC         `mapstructure:"grpc"`
-	Tracing      Tracing      `mapstructure:"tracing"`
-	TokenManager TokenManager `mapstructure:"token_manager"`
-	Runtime      Runtime      `mapstructure:"runtime"`
+	Registry     string       `ocisConfig:"registry"`
+	Log          shared.Log   `ocisConfig:"log"`
+	Debug        Debug        `ocisConfig:"debug"`
+	HTTP         HTTP         `ocisConfig:"http"`
+	GRPC         GRPC         `ocisConfig:"grpc"`
+	Tracing      Tracing      `ocisConfig:"tracing"`
+	TokenManager TokenManager `ocisConfig:"token_manager"`
+	Runtime      Runtime      `ocisConfig:"runtime"`
 
-	Accounts      *accounts.Config      `mapstructure:"accounts"`
-	GLAuth        *glauth.Config        `mapstructure:"glauth"`
-	Graph         *graph.Config         `mapstructure:"graph"`
-	GraphExplorer *graphExplorer.Config `mapstructure:"graph_explorer"`
-	IDP           *idp.Config           `mapstructure:"idp"`
-	OCS           *ocs.Config           `mapstructure:"ocs"`
-	Web           *web.Config           `mapstructure:"web"`
-	Proxy         *proxy.Config         `mapstructure:"proxy"`
-	Settings      *settings.Config      `mapstructure:"settings"`
-	Storage       *storage.Config       `mapstructure:"storage"`
-	Store         *store.Config         `mapstructure:"store"`
-	Thumbnails    *thumbnails.Config    `mapstructure:"thumbnails"`
-	WebDAV        *webdav.Config        `mapstructure:"webdav"`
+	Accounts      *accounts.Config      `ocisConfig:"accounts"`
+	GLAuth        *glauth.Config        `ocisConfig:"glauth"`
+	Graph         *graph.Config         `ocisConfig:"graph"`
+	GraphExplorer *graphExplorer.Config `ocisConfig:"graph_explorer"`
+	IDP           *idp.Config           `ocisConfig:"idp"`
+	OCS           *ocs.Config           `ocisConfig:"ocs"`
+	Web           *web.Config           `ocisConfig:"web"`
+	Proxy         *proxy.Config         `ocisConfig:"proxy"`
+	Settings      *settings.Config      `ocisConfig:"settings"`
+	Storage       *storage.Config       `ocisConfig:"storage"`
+	Store         *store.Config         `ocisConfig:"store"`
+	Thumbnails    *thumbnails.Config    `ocisConfig:"thumbnails"`
+	WebDAV        *webdav.Config        `ocisConfig:"webdav"`
 }
 
 // New initializes a new configuration with or without defaults.

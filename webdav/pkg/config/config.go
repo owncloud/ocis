@@ -8,55 +8,55 @@ import (
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string `mapstructure:"addr"`
-	Token  string `mapstructure:"token"`
-	Pprof  bool   `mapstructure:"pprof"`
-	Zpages bool   `mapstructure:"zpages"`
+	Addr   string `ocisConfig:"addr"`
+	Token  string `ocisConfig:"token"`
+	Pprof  bool   `ocisConfig:"pprof"`
+	Zpages bool   `ocisConfig:"zpages"`
 }
 
 // CORS defines the available cors configuration.
 type CORS struct {
-	AllowedOrigins   []string `mapstructure:"allowed_origins"`
-	AllowedMethods   []string `mapstructure:"allowed_methods"`
-	AllowedHeaders   []string `mapstructure:"allowed_headers"`
-	AllowCredentials bool     `mapstructure:"allow_credentials"`
+	AllowedOrigins   []string `ocisConfig:"allowed_origins"`
+	AllowedMethods   []string `ocisConfig:"allowed_methods"`
+	AllowedHeaders   []string `ocisConfig:"allowed_headers"`
+	AllowCredentials bool     `ocisConfig:"allow_credentials"`
 }
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr string `mapstructure:"addr"`
-	Root string `mapstructure:"root"`
-	CORS CORS   `mapstructure:"cors"`
+	Addr string `ocisConfig:"addr"`
+	Root string `ocisConfig:"root"`
+	CORS CORS   `ocisConfig:"cors"`
 }
 
 // Service defines the available service configuration.
 type Service struct {
-	Name      string `mapstructure:"name"`
-	Namespace string `mapstructure:"namespace"`
-	Version   string `mapstructure:"version"`
+	Name      string `ocisConfig:"name"`
+	Namespace string `ocisConfig:"namespace"`
+	Version   string `ocisConfig:"version"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `mapstructure:"enabled"`
-	Type      string `mapstructure:"type"`
-	Endpoint  string `mapstructure:"endpoint"`
-	Collector string `mapstructure:"collector"`
-	Service   string `mapstructure:"service"`
+	Enabled   bool   `ocisConfig:"enabled"`
+	Type      string `ocisConfig:"type"`
+	Endpoint  string `ocisConfig:"endpoint"`
+	Collector string `ocisConfig:"collector"`
+	Service   string `ocisConfig:"service"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
 	*shared.Commons
 
-	File            string      `mapstructure:"file"`
-	Log             *shared.Log `mapstructure:"log"`
-	Debug           Debug       `mapstructure:"debug"`
-	HTTP            HTTP        `mapstructure:"http"`
-	Tracing         Tracing     `mapstructure:"tracing"`
-	Service         Service     `mapstructure:"service"`
-	OcisPublicURL   string      `mapstructure:"ocis_public_url"`
-	WebdavNamespace string      `mapstructure:"webdav_namespace"`
+	File            string      `ocisConfig:"file"`
+	Log             *shared.Log `ocisConfig:"log"`
+	Debug           Debug       `ocisConfig:"debug"`
+	HTTP            HTTP        `ocisConfig:"http"`
+	Tracing         Tracing     `ocisConfig:"tracing"`
+	Service         Service     `ocisConfig:"service"`
+	OcisPublicURL   string      `ocisConfig:"ocis_public_url"`
+	WebdavNamespace string      `ocisConfig:"webdav_namespace"`
 
 	Context    context.Context
 	Supervised bool

@@ -10,39 +10,39 @@ import (
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string `mapstructure:"addr"`
-	Token  string `mapstructure:"token"`
-	Pprof  bool   `mapstructure:"pprof"`
-	Zpages bool   `mapstructure:"zpages"`
+	Addr   string `ocisConfig:"addr"`
+	Token  string `ocisConfig:"token"`
+	Pprof  bool   `ocisConfig:"pprof"`
+	Zpages bool   `ocisConfig:"zpages"`
 }
 
 // Server defines the available server configuration.
 type Server struct {
-	Name      string `mapstructure:"name"`
-	Namespace string `mapstructure:"namespace"`
-	Address   string `mapstructure:"address"`
-	Version   string `mapstructure:"version"`
+	Name      string `ocisConfig:"name"`
+	Namespace string `ocisConfig:"namespace"`
+	Address   string `ocisConfig:"address"`
+	Version   string `ocisConfig:"version"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `mapstructure:"enabled"`
-	Type      string `mapstructure:"type"`
-	Endpoint  string `mapstructure:"endpoint"`
-	Collector string `mapstructure:"collector"`
-	Service   string `mapstructure:"service"`
+	Enabled   bool   `ocisConfig:"enabled"`
+	Type      string `ocisConfig:"type"`
+	Endpoint  string `ocisConfig:"endpoint"`
+	Collector string `ocisConfig:"collector"`
+	Service   string `ocisConfig:"service"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
 	*shared.Commons
 
-	File      string      `mapstructure:"file"`
-	Log       *shared.Log `mapstructure:"log"`
-	Debug     Debug       `mapstructure:"debug"`
-	Server    Server      `mapstructure:"server"`
-	Tracing   Tracing     `mapstructure:"tracing"`
-	Thumbnail Thumbnail   `mapstructure:"thumbnail"`
+	File      string      `ocisConfig:"file"`
+	Log       *shared.Log `ocisConfig:"log"`
+	Debug     Debug       `ocisConfig:"debug"`
+	Server    Server      `ocisConfig:"server"`
+	Tracing   Tracing     `ocisConfig:"tracing"`
+	Thumbnail Thumbnail   `ocisConfig:"thumbnail"`
 
 	Context    context.Context
 	Supervised bool
@@ -50,22 +50,22 @@ type Config struct {
 
 // FileSystemStorage defines the available filesystem storage configuration.
 type FileSystemStorage struct {
-	RootDirectory string `mapstructure:"root_directory"`
+	RootDirectory string `ocisConfig:"root_directory"`
 }
 
 // FileSystemSource defines the available filesystem source configuration.
 type FileSystemSource struct {
-	BasePath string `mapstructure:"base_path"`
+	BasePath string `ocisConfig:"base_path"`
 }
 
 // Thumbnail defines the available thumbnail related configuration.
 type Thumbnail struct {
-	Resolutions         []string          `mapstructure:"resolutions"`
-	FileSystemStorage   FileSystemStorage `mapstructure:"filesystem_storage"`
-	WebdavAllowInsecure bool              `mapstructure:"webdav_allow_insecure"`
-	CS3AllowInsecure    bool              `mapstructure:"cs3_allow_insecure"`
-	RevaGateway         string            `mapstructure:"reva_gateway"`
-	WebdavNamespace     string            `mapstructure:"webdav_namespace"`
+	Resolutions         []string          `ocisConfig:"resolutions"`
+	FileSystemStorage   FileSystemStorage `ocisConfig:"filesystem_storage"`
+	WebdavAllowInsecure bool              `ocisConfig:"webdav_allow_insecure"`
+	CS3AllowInsecure    bool              `ocisConfig:"cs3_allow_insecure"`
+	RevaGateway         string            `ocisConfig:"reva_gateway"`
+	WebdavNamespace     string            `ocisConfig:"webdav_namespace"`
 }
 
 // New initializes a new configuration with or without defaults.

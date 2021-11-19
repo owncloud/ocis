@@ -10,43 +10,43 @@ import (
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string
-	Token  string
-	Pprof  bool
-	Zpages bool
+	Addr   string `ocisConfig:"addr"`
+	Token  string `ocisConfig:"token"`
+	Pprof  bool   `ocisConfig:"pprof"`
+	Zpages bool   `ocisConfig:"zpages"`
 }
 
 // GRPC defines the available grpc configuration.
 type GRPC struct {
-	Addr string
-	Root string
+	Addr string `ocisConfig:"addr"`
+	Root string `ocisConfig:"root"`
 }
 
 // Service defines the available service configuration.
 type Service struct {
-	Name      string
-	Namespace string
-	Version   string
+	Name      string `ocisConfig:"name"`
+	Namespace string `ocisConfig:"namespace"`
+	Version   string `ocisConfig:"version"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool
-	Type      string
-	Endpoint  string
-	Collector string
-	Service   string
+	Enabled   bool   `ocisConfig:"enabled"`
+	Type      string `ocisConfig:"type"`
+	Endpoint  string `ocisConfig:"endpoint"`
+	Collector string `ocisConfig:"collector"`
+	Service   string `ocisConfig:"service"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
-	File     string
-	Log      shared.Log
-	Debug    Debug
-	GRPC     GRPC
-	Tracing  Tracing
-	Datapath string
-	Service  Service
+	File     string     `ocisConfig:"file"`
+	Log      shared.Log `ocisConfig:"log"`
+	Debug    Debug      `ocisConfig:"debug"`
+	GRPC     GRPC       `ocisConfig:"grpc"`
+	Tracing  Tracing    `ocisConfig:"tracing"`
+	Datapath string     `ocisConfig:"data_path"`
+	Service  Service    `ocisConfig:"service"`
 
 	Context    context.Context
 	Supervised bool

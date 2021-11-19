@@ -11,69 +11,69 @@ import (
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string `mapstructure:"addr"`
-	Token  string `mapstructure:"token"`
-	Pprof  bool   `mapstructure:"pprof"`
-	Zpages bool   `mapstructure:"zpages"`
+	Addr   string `ocisConfig:"addr"`
+	Token  string `ocisConfig:"token"`
+	Pprof  bool   `ocisConfig:"pprof"`
+	Zpages bool   `ocisConfig:"zpages"`
 }
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string `mapstructure:"addr"`
-	Namespace string `mapstructure:"namespace"`
-	Root      string `mapstructure:"root"`
+	Addr      string `ocisConfig:"addr"`
+	Namespace string `ocisConfig:"namespace"`
+	Root      string `ocisConfig:"root"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `mapstructure:"enabled"`
-	Type      string `mapstructure:"type"`
-	Endpoint  string `mapstructure:"endpoint"`
-	Collector string `mapstructure:"collector"`
-	Service   string `mapstructure:"service"`
+	Enabled   bool   `ocisConfig:"enabled"`
+	Type      string `ocisConfig:"type"`
+	Endpoint  string `ocisConfig:"endpoint"`
+	Collector string `ocisConfig:"collector"`
+	Service   string `ocisConfig:"service"`
 }
 
 // Ldap defined the available LDAP configuration.
 type Ldap struct {
-	Enabled bool   `mapstructure:"enabled"`
-	Addr    string `mapstructure:"addr"`
+	Enabled bool   `ocisConfig:"enabled"`
+	Addr    string `ocisConfig:"addr"`
 }
 
 // Ldaps defined the available LDAPS configuration.
 type Ldaps struct {
-	Addr    string `mapstructure:"addr"`
-	Enabled bool   `mapstructure:"enabled"`
-	Cert    string `mapstructure:"cert"`
-	Key     string `mapstructure:"key"`
+	Addr    string `ocisConfig:"addr"`
+	Enabled bool   `ocisConfig:"enabled"`
+	Cert    string `ocisConfig:"cert"`
+	Key     string `ocisConfig:"key"`
 }
 
 // Backend defined the available backend configuration.
 type Backend struct {
-	Datastore   string   `mapstructure:"datastore"`
-	BaseDN      string   `mapstructure:"base_dn"`
-	Insecure    bool     `mapstructure:"insecure"`
-	NameFormat  string   `mapstructure:"name_format"`
-	GroupFormat string   `mapstructure:"group_format"`
-	Servers     []string `mapstructure:"servers"`
-	SSHKeyAttr  string   `mapstructure:"ssh_key_attr"`
-	UseGraphAPI bool     `mapstructure:"use_graph_api"`
+	Datastore   string   `ocisConfig:"datastore"`
+	BaseDN      string   `ocisConfig:"base_dn"`
+	Insecure    bool     `ocisConfig:"insecure"`
+	NameFormat  string   `ocisConfig:"name_format"`
+	GroupFormat string   `ocisConfig:"group_format"`
+	Servers     []string `ocisConfig:"servers"`
+	SSHKeyAttr  string   `ocisConfig:"ssh_key_attr"`
+	UseGraphAPI bool     `ocisConfig:"use_graph_api"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
 	*shared.Commons
 
-	File           string      `mapstructure:"file"`
-	Log            *shared.Log `mapstructure:"log"`
-	Debug          Debug       `mapstructure:"debug"`
-	HTTP           HTTP        `mapstructure:"http"`
-	Tracing        Tracing     `mapstructure:"tracing"`
-	Ldap           Ldap        `mapstructure:"ldap"`
-	Ldaps          Ldaps       `mapstructure:"ldaps"`
-	Backend        Backend     `mapstructure:"backend"`
-	Fallback       Backend     `mapstructure:"fallback"`
-	Version        string      `mapstructure:"version"`
-	RoleBundleUUID string      `mapstructure:"role_bundle_uuid"`
+	File           string      `ocisConfig:"file"`
+	Log            *shared.Log `ocisConfig:"log"`
+	Debug          Debug       `ocisConfig:"debug"`
+	HTTP           HTTP        `ocisConfig:"http"`
+	Tracing        Tracing     `ocisConfig:"tracing"`
+	Ldap           Ldap        `ocisConfig:"ldap"`
+	Ldaps          Ldaps       `ocisConfig:"ldaps"`
+	Backend        Backend     `ocisConfig:"backend"`
+	Fallback       Backend     `ocisConfig:"fallback"`
+	Version        string      `ocisConfig:"version"`
+	RoleBundleUUID string      `ocisConfig:"role_bundle_uuid"`
 
 	Context    context.Context
 	Supervised bool

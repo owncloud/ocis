@@ -8,52 +8,52 @@ import (
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string `mapstructure:"addr"`
-	Token  string `mapstructure:"token"`
-	Pprof  bool   `mapstructure:"pprof"`
-	Zpages bool   `mapstructure:"zpages"`
+	Addr   string `ocisConfig:"addr"`
+	Token  string `ocisConfig:"token"`
+	Pprof  bool   `ocisConfig:"pprof"`
+	Zpages bool   `ocisConfig:"zpages"`
 }
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string `mapstructure:"addr"`
-	Root      string `mapstructure:"root"`
-	Namespace string `mapstructure:"namespace"`
-	CacheTTL  int    `mapstructure:"cache_ttl"`
+	Addr      string `ocisConfig:"addr"`
+	Root      string `ocisConfig:"root"`
+	Namespace string `ocisConfig:"namespace"`
+	CacheTTL  int    `ocisConfig:"cache_ttl"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `mapstructure:"enabled"`
-	Type      string `mapstructure:"type"`
-	Endpoint  string `mapstructure:"endpoint"`
-	Collector string `mapstructure:"collector"`
-	Service   string `mapstructure:"service"`
+	Enabled   bool   `ocisConfig:"enabled"`
+	Type      string `ocisConfig:"type"`
+	Endpoint  string `ocisConfig:"endpoint"`
+	Collector string `ocisConfig:"collector"`
+	Service   string `ocisConfig:"service"`
 }
 
 // Asset defines the available asset configuration.
 type Asset struct {
-	Path string `mapstructure:"path"`
+	Path string `ocisConfig:"path"`
 }
 
 // WebConfig defines the available web configuration for a dynamically rendered config.json.
 type WebConfig struct {
-	Server        string                 `json:"server,omitempty" mapstructure:"server"`
-	Theme         string                 `json:"theme,omitempty" mapstructure:"theme"`
-	Version       string                 `json:"version,omitempty" mapstructure:"version"`
-	OpenIDConnect OIDC                   `json:"openIdConnect,omitempty" mapstructure:"oids"`
-	Apps          []string               `json:"apps" mapstructure:"apps"`
-	ExternalApps  []ExternalApp          `json:"external_apps,omitempty" mapstructure:"external_apps"`
-	Options       map[string]interface{} `json:"options,omitempty" mapstructure:"options"`
+	Server        string                 `json:"server,omitempty" ocisConfig:"server"`
+	Theme         string                 `json:"theme,omitempty" ocisConfig:"theme"`
+	Version       string                 `json:"version,omitempty" ocisConfig:"version"`
+	OpenIDConnect OIDC                   `json:"openIdConnect,omitempty" ocisConfig:"oids"`
+	Apps          []string               `json:"apps" ocisConfig:"apps"`
+	ExternalApps  []ExternalApp          `json:"external_apps,omitempty" ocisConfig:"external_apps"`
+	Options       map[string]interface{} `json:"options,omitempty" ocisConfig:"options"`
 }
 
 // OIDC defines the available oidc configuration
 type OIDC struct {
-	MetadataURL  string `json:"metadata_url,omitempty" mapstructure:"metadata_url"`
-	Authority    string `json:"authority,omitempty" mapstructure:"authority"`
-	ClientID     string `json:"client_id,omitempty" mapstructure:"client_id"`
-	ResponseType string `json:"response_type,omitempty" mapstructure:"response_type"`
-	Scope        string `json:"scope,omitempty" mapstructure:"scope"`
+	MetadataURL  string `json:"metadata_url,omitempty" ocisConfig:"metadata_url"`
+	Authority    string `json:"authority,omitempty" ocisConfig:"authority"`
+	ClientID     string `json:"client_id,omitempty" ocisConfig:"client_id"`
+	ResponseType string `json:"response_type,omitempty" ocisConfig:"response_type"`
+	Scope        string `json:"scope,omitempty" ocisConfig:"scope"`
 }
 
 // ExternalApp defines an external web app.
@@ -65,36 +65,36 @@ type OIDC struct {
 //	  }
 //  }
 type ExternalApp struct {
-	ID   string `json:"id,omitempty" mapstructure:"id"`
-	Path string `json:"path,omitempty" mapstructure:"path"`
+	ID   string `json:"id,omitempty" ocisConfig:"id"`
+	Path string `json:"path,omitempty" ocisConfig:"path"`
 	// Config is completely dynamic, because it depends on the extension
-	Config map[string]interface{} `json:"config,omitempty" mapstructure:"config"`
+	Config map[string]interface{} `json:"config,omitempty" ocisConfig:"config"`
 }
 
 // ExternalAppConfig defines an external web app configuration.
 type ExternalAppConfig struct {
-	URL string `json:"url,omitempty" mapstructure:"url"`
+	URL string `json:"url,omitempty" ocisConfig:"url"`
 }
 
 // Web defines the available web configuration.
 type Web struct {
-	Path        string    `mapstructure:"path"`
-	ThemeServer string    `mapstructure:"theme_server"` // used to build Theme in WebConfig
-	ThemePath   string    `mapstructure:"theme_path"`   // used to build Theme in WebConfig
-	Config      WebConfig `mapstructure:"config"`
+	Path        string    `ocisConfig:"path"`
+	ThemeServer string    `ocisConfig:"theme_server"` // used to build Theme in WebConfig
+	ThemePath   string    `ocisConfig:"theme_path"`   // used to build Theme in WebConfig
+	Config      WebConfig `ocisConfig:"config"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
 	*shared.Commons
 
-	File    string      `mapstructure:"file"`
-	Log     *shared.Log `mapstructure:"log"`
-	Debug   Debug       `mapstructure:"debug"`
-	HTTP    HTTP        `mapstructure:"http"`
-	Tracing Tracing     `mapstructure:"tracing"`
-	Asset   Asset       `mapstructure:"asset"`
-	Web     Web         `mapstructure:"web"`
+	File    string      `ocisConfig:"file"`
+	Log     *shared.Log `ocisConfig:"log"`
+	Debug   Debug       `ocisConfig:"debug"`
+	HTTP    HTTP        `ocisConfig:"http"`
+	Tracing Tracing     `ocisConfig:"tracing"`
+	Asset   Asset       `ocisConfig:"asset"`
+	Web     Web         `ocisConfig:"web"`
 
 	Context    context.Context
 	Supervised bool

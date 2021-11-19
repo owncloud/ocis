@@ -11,104 +11,104 @@ import (
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string `mapstructure:"addr"`
-	Token  string `mapstructure:"token"`
-	Pprof  bool   `mapstructure:"pprof"`
-	Zpages bool   `mapstructure:"zpages"`
+	Addr   string `ocisConfig:"addr"`
+	Token  string `ocisConfig:"token"`
+	Pprof  bool   `ocisConfig:"pprof"`
+	Zpages bool   `ocisConfig:"zpages"`
 }
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr    string `mapstructure:"addr"`
-	Root    string `mapstructure:"root"`
-	TLSCert string `mapstructure:"tls_cert"`
-	TLSKey  string `mapstructure:"tls_key"`
-	TLS     bool   `mapstructure:"tls"`
+	Addr    string `ocisConfig:"addr"`
+	Root    string `ocisConfig:"root"`
+	TLSCert string `ocisConfig:"tls_cert"`
+	TLSKey  string `ocisConfig:"tls_key"`
+	TLS     bool   `ocisConfig:"tls"`
 }
 
 // Ldap defines the available LDAP configuration.
 type Ldap struct {
-	URI               string `mapstructure:"uri"`
-	BindDN            string `mapstructure:"bind_dn"`
-	BindPassword      string `mapstructure:"bind_password"`
-	BaseDN            string `mapstructure:"base_dn"`
-	Scope             string `mapstructure:"scope"`
-	LoginAttribute    string `mapstructure:"login_attribute"`
-	EmailAttribute    string `mapstructure:"email_attribute"`
-	NameAttribute     string `mapstructure:"name_attribute"`
-	UUIDAttribute     string `mapstructure:"uuid_attribute"`
-	UUIDAttributeType string `mapstructure:"uuid_attribute_type"`
-	Filter            string `mapstructure:"filter"`
+	URI               string `ocisConfig:"uri"`
+	BindDN            string `ocisConfig:"bind_dn"`
+	BindPassword      string `ocisConfig:"bind_password"`
+	BaseDN            string `ocisConfig:"base_dn"`
+	Scope             string `ocisConfig:"scope"`
+	LoginAttribute    string `ocisConfig:"login_attribute"`
+	EmailAttribute    string `ocisConfig:"email_attribute"`
+	NameAttribute     string `ocisConfig:"name_attribute"`
+	UUIDAttribute     string `ocisConfig:"uuid_attribute"`
+	UUIDAttributeType string `ocisConfig:"uuid_attribute_type"`
+	Filter            string `ocisConfig:"filter"`
 }
 
 // Service defines the available service configuration.
 type Service struct {
-	Name      string `mapstructure:"name"`
-	Namespace string `mapstructure:"namespace"`
-	Version   string `mapstructure:"version"`
+	Name      string `ocisConfig:"name"`
+	Namespace string `ocisConfig:"namespace"`
+	Version   string `ocisConfig:"version"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `mapstructure:"enabled"`
-	Type      string `mapstructure:"type"`
-	Endpoint  string `mapstructure:"endpoint"`
-	Collector string `mapstructure:"collector"`
-	Service   string `mapstructure:"service"`
+	Enabled   bool   `ocisConfig:"enabled"`
+	Type      string `ocisConfig:"type"`
+	Endpoint  string `ocisConfig:"endpoint"`
+	Collector string `ocisConfig:"collector"`
+	Service   string `ocisConfig:"service"`
 }
 
 // Asset defines the available asset configuration.
 type Asset struct {
-	Path string `mapstructure:"asset"`
+	Path string `ocisConfig:"asset"`
 }
 
 type Settings struct {
-	Iss                               string   `mapstructure:"iss"`
-	IdentityManager                   string   `mapstructure:"identity_manager"`
-	URIBasePath                       string   `mapstructure:"uri_base_path"`
-	SignInURI                         string   `mapstructure:"sign_in_uri"`
-	SignedOutURI                      string   `mapstructure:"signed_out_uri"`
-	AuthorizationEndpointURI          string   `mapstructure:"authorization_endpoint_uri"`
-	EndsessionEndpointURI             string   `mapstructure:"end_session_endpoint_uri"`
-	Insecure                          bool     `mapstructure:"insecure"`
-	TrustedProxy                      []string `mapstructure:"trusted_proxy"`
-	AllowScope                        []string `mapstructure:"allow_scope"`
-	AllowClientGuests                 bool     `mapstructure:"allow_client_guests"`
-	AllowDynamicClientRegistration    bool     `mapstructure:"allow_dynamic_client_registration"`
-	EncryptionSecretFile              string   `mapstructure:"encrypt_secret_file"`
-	Listen                            string   `mapstructure:"listen"`
-	IdentifierClientDisabled          bool     `mapstructure:"identifier_client_disabled"`
-	IdentifierClientPath              string   `mapstructure:"identifier_client_path"`
-	IdentifierRegistrationConf        string   `mapstructure:"identifier_registration_conf"`
-	IdentifierScopesConf              string   `mapstructure:"identifier_scopes_conf"`
-	IdentifierDefaultBannerLogo       string   `mapstructure:"identifier_default_banner_logo"`
-	IdentifierDefaultSignInPageText   string   `mapstructure:"identifier_default_sign_in_page_text"`
-	IdentifierDefaultUsernameHintText string   `mapstructure:"identifier_default_username_hint_text"`
-	SigningKid                        string   `mapstructure:"sign_in_kid"`
-	SigningMethod                     string   `mapstructure:"sign_in_method"`
-	SigningPrivateKeyFiles            []string `mapstructure:"sign_in_private_key_files"`
-	ValidationKeysPath                string   `mapstructure:"validation_keys_path"`
-	CookieBackendURI                  string   `mapstructure:"cookie_backend_uri"`
-	CookieNames                       []string `mapstructure:"cookie_names"`
-	AccessTokenDurationSeconds        uint64   `mapstructure:"access_token_duration_seconds"`
-	IDTokenDurationSeconds            uint64   `mapstructure:"id_token_duration_seconds"`
-	RefreshTokenDurationSeconds       uint64   `mapstructure:"refresh_token_duration_seconds"`
-	DyamicClientSecretDurationSeconds uint64   `mapstructure:"dynamic_client_secret_duration_seconds"`
+	Iss                               string   `ocisConfig:"iss"`
+	IdentityManager                   string   `ocisConfig:"identity_manager"`
+	URIBasePath                       string   `ocisConfig:"uri_base_path"`
+	SignInURI                         string   `ocisConfig:"sign_in_uri"`
+	SignedOutURI                      string   `ocisConfig:"signed_out_uri"`
+	AuthorizationEndpointURI          string   `ocisConfig:"authorization_endpoint_uri"`
+	EndsessionEndpointURI             string   `ocisConfig:"end_session_endpoint_uri"`
+	Insecure                          bool     `ocisConfig:"insecure"`
+	TrustedProxy                      []string `ocisConfig:"trusted_proxy"`
+	AllowScope                        []string `ocisConfig:"allow_scope"`
+	AllowClientGuests                 bool     `ocisConfig:"allow_client_guests"`
+	AllowDynamicClientRegistration    bool     `ocisConfig:"allow_dynamic_client_registration"`
+	EncryptionSecretFile              string   `ocisConfig:"encrypt_secret_file"`
+	Listen                            string   `ocisConfig:"listen"`
+	IdentifierClientDisabled          bool     `ocisConfig:"identifier_client_disabled"`
+	IdentifierClientPath              string   `ocisConfig:"identifier_client_path"`
+	IdentifierRegistrationConf        string   `ocisConfig:"identifier_registration_conf"`
+	IdentifierScopesConf              string   `ocisConfig:"identifier_scopes_conf"`
+	IdentifierDefaultBannerLogo       string   `ocisConfig:"identifier_default_banner_logo"`
+	IdentifierDefaultSignInPageText   string   `ocisConfig:"identifier_default_sign_in_page_text"`
+	IdentifierDefaultUsernameHintText string   `ocisConfig:"identifier_default_username_hint_text"`
+	SigningKid                        string   `ocisConfig:"sign_in_kid"`
+	SigningMethod                     string   `ocisConfig:"sign_in_method"`
+	SigningPrivateKeyFiles            []string `ocisConfig:"sign_in_private_key_files"`
+	ValidationKeysPath                string   `ocisConfig:"validation_keys_path"`
+	CookieBackendURI                  string   `ocisConfig:"cookie_backend_uri"`
+	CookieNames                       []string `ocisConfig:"cookie_names"`
+	AccessTokenDurationSeconds        uint64   `ocisConfig:"access_token_duration_seconds"`
+	IDTokenDurationSeconds            uint64   `ocisConfig:"id_token_duration_seconds"`
+	RefreshTokenDurationSeconds       uint64   `ocisConfig:"refresh_token_duration_seconds"`
+	DyamicClientSecretDurationSeconds uint64   `ocisConfig:"dynamic_client_secret_duration_seconds"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
 	*shared.Commons
 
-	File    string      `mapstructure:"file"`
-	Log     *shared.Log `mapstructure:"log"`
-	Debug   Debug       `mapstructure:"debug"`
-	HTTP    HTTP        `mapstructure:"http"`
-	Tracing Tracing     `mapstructure:"tracing"`
-	Asset   Asset       `mapstructure:"asset"`
-	IDP     Settings    `mapstructure:"idp"`
-	Ldap    Ldap        `mapstructure:"ldap"`
-	Service Service     `mapstructure:"service"`
+	File    string      `ocisConfig:"file"`
+	Log     *shared.Log `ocisConfig:"log"`
+	Debug   Debug       `ocisConfig:"debug"`
+	HTTP    HTTP        `ocisConfig:"http"`
+	Tracing Tracing     `ocisConfig:"tracing"`
+	Asset   Asset       `ocisConfig:"asset"`
+	IDP     Settings    `ocisConfig:"idp"`
+	Ldap    Ldap        `ocisConfig:"ldap"`
+	Service Service     `ocisConfig:"service"`
 
 	Context    context.Context
 	Supervised bool

@@ -12,132 +12,132 @@ import (
 
 // LDAP defines the available ldap configuration.
 type LDAP struct {
-	Hostname     string     `mapstructure:"hostname"`
-	Port         int        `mapstructure:"port"`
-	BaseDN       string     `mapstructure:"base_dn"`
-	UserFilter   string     `mapstructure:"user_filter"`
-	GroupFilter  string     `mapstructure:"group_filter"`
-	BindDN       string     `mapstructure:"bind_dn"`
-	BindPassword string     `mapstructure:"bind_password"`
-	IDP          string     `mapstructure:"idp"`
-	Schema       LDAPSchema `mapstructure:"schema"`
+	Hostname     string     `ocisConfig:"hostname"`
+	Port         int        `ocisConfig:"port"`
+	BaseDN       string     `ocisConfig:"base_dn"`
+	UserFilter   string     `ocisConfig:"user_filter"`
+	GroupFilter  string     `ocisConfig:"group_filter"`
+	BindDN       string     `ocisConfig:"bind_dn"`
+	BindPassword string     `ocisConfig:"bind_password"`
+	IDP          string     `ocisConfig:"idp"`
+	Schema       LDAPSchema `ocisConfig:"schema"`
 }
 
 // LDAPSchema defines the available ldap schema configuration.
 type LDAPSchema struct {
-	AccountID   string `mapstructure:"account_id"`
-	Identities  string `mapstructure:"identities"`
-	Username    string `mapstructure:"username"`
-	DisplayName string `mapstructure:"display_name"`
-	Mail        string `mapstructure:"mail"`
-	Groups      string `mapstructure:"groups"`
+	AccountID   string `ocisConfig:"account_id"`
+	Identities  string `ocisConfig:"identities"`
+	Username    string `ocisConfig:"username"`
+	DisplayName string `ocisConfig:"display_name"`
+	Mail        string `ocisConfig:"mail"`
+	Groups      string `ocisConfig:"groups"`
 }
 
 // CORS defines the available cors configuration.
 type CORS struct {
-	AllowedOrigins   []string `mapstructure:"allowed_origins"`
-	AllowedMethods   []string `mapstructure:"allowed_methods"`
-	AllowedHeaders   []string `mapstructure:"allowed_headers"`
-	AllowCredentials bool     `mapstructure:"allowed_credentials"`
+	AllowedOrigins   []string `ocisConfig:"allowed_origins"`
+	AllowedMethods   []string `ocisConfig:"allowed_methods"`
+	AllowedHeaders   []string `ocisConfig:"allowed_headers"`
+	AllowCredentials bool     `ocisConfig:"allowed_credentials"`
 }
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string `mapstructure:"addr"`
-	Namespace string `mapstructure:"namespace"`
-	Root      string `mapstructure:"root"`
-	CacheTTL  int    `mapstructure:"cache_ttl"`
-	CORS      CORS   `mapstructure:"cors"`
+	Addr      string `ocisConfig:"addr"`
+	Namespace string `ocisConfig:"namespace"`
+	Root      string `ocisConfig:"root"`
+	CacheTTL  int    `ocisConfig:"cache_ttl"`
+	CORS      CORS   `ocisConfig:"cors"`
 }
 
 // GRPC defines the available grpc configuration.
 type GRPC struct {
-	Addr      string `mapstructure:"addr"`
-	Namespace string `mapstructure:"namespace"`
+	Addr      string `ocisConfig:"addr"`
+	Namespace string `ocisConfig:"namespace"`
 }
 
 // Server configures a server.
 type Server struct {
-	Version            string `mapstructure:"version"`
-	Name               string `mapstructure:"name"`
-	HashDifficulty     int    `mapstructure:"hash_difficulty"`
-	DemoUsersAndGroups bool   `mapstructure:"demo_users_and_groups"`
+	Version            string `ocisConfig:"version"`
+	Name               string `ocisConfig:"name"`
+	HashDifficulty     int    `ocisConfig:"hash_difficulty"`
+	DemoUsersAndGroups bool   `ocisConfig:"demo_users_and_groups"`
 }
 
 // Asset defines the available asset configuration.
 type Asset struct {
-	Path string `mapstructure:"path"`
+	Path string `ocisConfig:"path"`
 }
 
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
-	JWTSecret string `mapstructure:"jwt_secret"`
+	JWTSecret string `ocisConfig:"jwt_secret"`
 }
 
 // Repo defines which storage implementation is to be used.
 type Repo struct {
-	Backend string `mapstructure:"backend"`
-	Disk    Disk   `mapstructure:"disk"`
-	CS3     CS3    `mapstructure:"cs3"`
+	Backend string `ocisConfig:"backend"`
+	Disk    Disk   `ocisConfig:"disk"`
+	CS3     CS3    `ocisConfig:"cs3"`
 }
 
 // Disk is the local disk implementation of the storage.
 type Disk struct {
-	Path string `mapstructure:"path"`
+	Path string `ocisConfig:"path"`
 }
 
 // CS3 is the cs3 implementation of the storage.
 type CS3 struct {
-	ProviderAddr string `mapstructure:"provider_addr"`
-	DataURL      string `mapstructure:"data_url"`
-	DataPrefix   string `mapstructure:"data_prefix"`
-	JWTSecret    string `mapstructure:"jwt_secret"`
+	ProviderAddr string `ocisConfig:"provider_addr"`
+	DataURL      string `ocisConfig:"data_url"`
+	DataPrefix   string `ocisConfig:"data_prefix"`
+	JWTSecret    string `ocisConfig:"jwt_secret"`
 }
 
 // ServiceUser defines the user required for EOS.
 type ServiceUser struct {
-	UUID     string `mapstructure:"uuid"`
-	Username string `mapstructure:"username"`
-	UID      int64  `mapstructure:"uid"`
-	GID      int64  `mapstructure:"gid"`
+	UUID     string `ocisConfig:"uuid"`
+	Username string `ocisConfig:"username"`
+	UID      int64  `ocisConfig:"uid"`
+	GID      int64  `ocisConfig:"gid"`
 }
 
 // Index defines config for indexes.
 type Index struct {
-	UID Bound `mapstructure:"uid"`
-	GID Bound `mapstructure:"gid"`
+	UID Bound `ocisConfig:"uid"`
+	GID Bound `ocisConfig:"gid"`
 }
 
 // Bound defines a lower and upper bound.
 type Bound struct {
-	Lower int64 `mapstructure:"lower"`
-	Upper int64 `mapstructure:"upper"`
+	Lower int64 `ocisConfig:"lower"`
+	Upper int64 `ocisConfig:"upper"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `mapstructure:"enabled"`
-	Type      string `mapstructure:"type"`
-	Endpoint  string `mapstructure:"endpoint"`
-	Collector string `mapstructure:"collector"`
-	Service   string `mapstructure:"service"`
+	Enabled   bool   `ocisConfig:"enabled"`
+	Type      string `ocisConfig:"type"`
+	Endpoint  string `ocisConfig:"endpoint"`
+	Collector string `ocisConfig:"collector"`
+	Service   string `ocisConfig:"service"`
 }
 
 // Config merges all Account config parameters.
 type Config struct {
 	*shared.Commons
 
-	LDAP         LDAP         `mapstructure:"ldap"`
-	HTTP         HTTP         `mapstructure:"http"`
-	GRPC         GRPC         `mapstructure:"grpc"`
-	Server       Server       `mapstructure:"server"`
-	Asset        Asset        `mapstructure:"asset"`
-	Log          *shared.Log  `mapstructure:"log"`
-	TokenManager TokenManager `mapstructure:"token_manager"`
-	Repo         Repo         `mapstructure:"repo"`
-	Index        Index        `mapstructure:"index"`
-	ServiceUser  ServiceUser  `mapstructure:"service_user"`
-	Tracing      Tracing      `mapstructure:"tracing"`
+	LDAP         LDAP         `ocisConfig:"ldap"`
+	HTTP         HTTP         `ocisConfig:"http"`
+	GRPC         GRPC         `ocisConfig:"grpc"`
+	Server       Server       `ocisConfig:"server"`
+	Asset        Asset        `ocisConfig:"asset"`
+	Log          *shared.Log  `ocisConfig:"log"`
+	TokenManager TokenManager `ocisConfig:"token_manager"`
+	Repo         Repo         `ocisConfig:"repo"`
+	Index        Index        `ocisConfig:"index"`
+	ServiceUser  ServiceUser  `ocisConfig:"service_user"`
+	Tracing      Tracing      `ocisConfig:"tracing"`
 
 	Context    context.Context
 	Supervised bool
