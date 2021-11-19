@@ -257,7 +257,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	//https://github.com/CiscoM31/godata/blob/d70e191d2908191623be84401fecc40d6af4afde/url_parser_test.go#L10
 	sanitized := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
 
-	req, err := godata.ParseRequest(sanitized, r.URL.Query(), true)
+	req, err := godata.ParseRequest(r.Context(), sanitized, r.URL.Query())
 	if err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())
 		return

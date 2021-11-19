@@ -276,7 +276,7 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 }
 
 func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]string, error) {
-	return s.index.Query(&proto.Account{}, query)
+	return s.index.Query(ctx, &proto.Account{}, query)
 }
 
 // GetAccount implements the AccountsServiceHandler interface

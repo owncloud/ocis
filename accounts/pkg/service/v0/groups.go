@@ -88,7 +88,7 @@ func (s Service) ListGroups(ctx context.Context, in *proto.ListGroupsRequest, ou
 	return
 }
 func (s Service) findGroupsByQuery(ctx context.Context, query string) ([]string, error) {
-	return s.index.Query(&proto.Group{}, query)
+	return s.index.Query(ctx, &proto.Group{}, query)
 }
 
 // GetGroup implements the GroupsServiceHandler interface

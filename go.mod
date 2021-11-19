@@ -3,7 +3,7 @@ module github.com/owncloud/ocis
 go 1.17
 
 require (
-	github.com/CiscoM31/godata v1.0.4
+	github.com/CiscoM31/godata v1.0.5
 	github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e
 	github.com/asim/go-micro/plugins/client/grpc/v4 v4.0.0-20211028090348-ed690ed838cc
 	github.com/asim/go-micro/plugins/logger/zerolog/v4 v4.0.0-20211028090348-ed690ed838cc
@@ -19,10 +19,10 @@ require (
 	github.com/blevesearch/bleve/v2 v2.2.2
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20211104090126-8e972dca8304
-	github.com/cs3org/reva v1.15.1-0.20211119095816-7cfc6d3cc8c2
+	github.com/cs3org/reva v1.16.0
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
-	github.com/go-chi/chi/v5 v5.0.6
+	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/cors v1.2.0
 	github.com/go-chi/render v1.0.1
 	github.com/go-logr/logr v0.4.0
