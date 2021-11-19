@@ -289,7 +289,13 @@ func GatewayWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_PUBLIC_LINK_MOUNT_PATH"},
 			Destination: &cfg.Reva.StoragePublicLink.MountPath,
 		},
-		// public-link has no mount id
+		&cli.StringFlag{
+			Name:        "storage-public-link-mount-id",
+			Value:       flags.OverrideDefaultString(cfg.Reva.StoragePublicLink.MountID, "e1a73ede-549b-4226-abdf-40e69ca8230d"),
+			Usage:       "mount id",
+			EnvVars:     []string{"STORAGE_PUBLIC_LINK_MOUNT_ID"},
+			Destination: &cfg.Reva.StoragePublicLink.MountID,
+		},
 	}
 
 	flags = append(flags, TracingWithConfig(cfg)...)
