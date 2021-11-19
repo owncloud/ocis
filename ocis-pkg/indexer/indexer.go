@@ -2,6 +2,7 @@
 package indexer
 
 import (
+	"context"
 	"fmt"
 	"path"
 	"strings"
@@ -255,8 +256,8 @@ func (i *Indexer) Update(from, to interface{}) error {
 }
 
 // Query parses an OData query into something our indexer.Index understands and resolves it.
-func (i *Indexer) Query(t interface{}, q string) ([]string, error) {
-	query, err := godata.ParseFilterString(q)
+func (i *Indexer) Query(ctx context.Context, t interface{}, q string) ([]string, error) {
+	query, err := godata.ParseFilterString(ctx, q)
 	if err != nil {
 		return nil, err
 	}
@@ -353,7 +354,7 @@ func sanitizeInput(operands []string) (*indexerTuple, error) {
 // is to transform godata operators and functions into supported operations on our index. At the time of this writing
 // we only support `FindBy` and `FindByPartial` queries as these are the only implemented filters on indexer.Index(es).
 func buildTreeFromOdataQuery(root *godata.ParseNode, tree *queryTree) error {
-	if root.Token.Type == godata.FilterTokenFunc { // i.e "startswith", "contains"
+	if root.Token.Type == godata.ExpressionTokenFunc { // i.e "startswith", "contains"
 		switch root.Token.Value {
 		case "startswith":
 			token := token{
@@ -372,7 +373,7 @@ func buildTreeFromOdataQuery(root *godata.ParseNode, tree *queryTree) error {
 		}
 	}
 
-	if root.Token.Type == godata.FilterTokenLogical {
+	if root.Token.Type == godata.ExpressionTokenLogical {
 		switch root.Token.Value {
 		case "or":
 			tree.insert(&token{operator: root.Token.Value})
