@@ -1,0 +1,96 @@
+dn: ou=groups,dc=owncloud,dc=com
+objectClass: organizationalUnit
+ou: groups
+
+dn: cn=users,ou=groups,dc=owncloud,dc=com
+objectClass: groupOfUniqueNames
+objectClass: posixGroup
+objectClass: ownCloud
+objectClass: top
+cn: users
+description: Users
+gidNumber: 30000
+ownCloudUUID:: NTA5YTlkY2QtYmIzNy00ZjRmLWEwMWEtMTlkY2EyN2Q5Y2Zh
+uniqueMember: uid=einstein,ou=users,dc=owncloud,dc=com
+uniqueMember: uid=marie,ou=users,dc=owncloud,dc=com
+uniqueMember: uid=richard,ou=users,dc=owncloud,dc=com
+uniqueMember: uid=moss,ou=users,dc=owncloud,dc=com
+
+dn: cn=sailing-lovers,ou=groups,dc=owncloud,dc=com
+objectClass: groupOfUniqueNames
+objectClass: posixGroup
+objectClass: ownCloud
+objectClass: top
+cn: sailing-lovers
+description: Sailing lovers
+gidNumber: 30001
+ownCloudUUID:: NjA0MGFhMTctOWM2NC00ZmVmLTliZDAtNzcyMzRkNzFiYWQw
+uniqueMember: uid=einstein,ou=users,dc=owncloud,dc=com
+
+dn: cn=violin-haters,ou=groups,dc=owncloud,dc=com
+objectClass: groupOfUniqueNames
+objectClass: posixGroup
+objectClass: ownCloud
+objectClass: top
+cn: violin-haters
+description: Violin haters
+gidNumber: 30002
+ownCloudUUID:: ZGQ1OGU1ZWMtODQyZS00OThiLTg4MDAtNjFmMmVjNmY5MTFm
+uniqueMember: uid=einstein,ou=users,dc=owncloud,dc=com
+
+dn: cn=radium-lovers,ou=groups,dc=owncloud,dc=com
+objectClass: groupOfUniqueNames
+objectClass: posixGroup
+objectClass: ownCloud
+objectClass: top
+cn: radium-lovers
+description: Radium lovers
+gidNumber: 30003
+ownCloudUUID:: N2I4N2ZkNDktMjg2ZS00YTVmLWJhZmQtYzUzNWQ1ZGQ5OTdh
+uniqueMember: uid=marie,ou=users,dc=owncloud,dc=com
+
+dn: cn=polonium-lovers,ou=groups,dc=owncloud,dc=com
+objectClass: groupOfUniqueNames
+objectClass: posixGroup
+objectClass: ownCloud
+objectClass: top
+cn: polonium-lovers
+description: Polonium lovers
+gidNumber: 30004
+ownCloudUUID:: Y2VkYzIxYWEtNDA3Mi00NjE0LTg2NzYtZmE5MTY1ZjU5OGZm
+uniqueMember: uid=marie,ou=users,dc=owncloud,dc=com
+
+dn: cn=quantum-lovers,ou=groups,dc=owncloud,dc=com
+objectClass: groupOfUniqueNames
+objectClass: posixGroup
+objectClass: ownCloud
+objectClass: top
+cn: quantum-lovers
+description: Quantum lovers
+gidNumber: 30005
+ownCloudUUID:: YTE3MjYxMDgtMDFmOC00YzMwLTg4ZGYtMmIxYTlkMWNiYTFh
+uniqueMember: uid=richard,ou=users,dc=owncloud,dc=com
+
+dn: cn=philosophy-haters,ou=groups,dc=owncloud,dc=com
+objectClass: groupOfUniqueNames
+objectClass: posixGroup
+objectClass: ownCloud
+objectClass: top
+cn: philosophy-haters
+description: Philosophy haters
+gidNumber: 30006
+ownCloudUUID:: MTY3Y2JlZTItMDUxOC00NTVhLWJmYjItMDMxZmUwNjIxZTVk
+uniqueMember: uid=richard,ou=users,dc=owncloud,dc=com
+
+dn: cn=physics-lovers,ou=groups,dc=owncloud,dc=com
+objectClass: groupOfUniqueNames
+objectClass: posixGroup
+objectClass: ownCloud
+objectClass: top
+cn: physics-lovers
+description: Physics lovers
+gidNumber: 30007
+ownCloudUUID:: MjYyOTgyYzEtMjM2Mi00YWZhLWJmZGYtOGNiZmVmNjRhMDZl
+uniqueMember: uid=einstein,ou=users,dc=owncloud,dc=com
+uniqueMember: uid=marie,ou=users,dc=owncloud,dc=com
+uniqueMember: uid=richard,ou=users,dc=owncloud,dc=com

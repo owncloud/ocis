@@ -1,0 +1,4 @@
+!config
+output
+log*
+parallel-compose/*
