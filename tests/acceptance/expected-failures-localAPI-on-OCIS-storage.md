@@ -6,3 +6,6 @@
 
 #### [downloading an archive with invalid path returns HTTP/500](https://github.com/owncloud/ocis/issues/2768)
 -   [apiArchiver/downloadByPath.feature:69](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/apiArchiver/downloadByPath.feature#L69)
+
+#### [downloading an archive with non existing / accessible id returns HTTP/500](https://github.com/owncloud/ocis/issues/2795)
+- [apiArchiver/downloadById.feature:69](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadByPath.feature#L69)
