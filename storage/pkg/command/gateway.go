@@ -227,6 +227,7 @@ func rules(cfg *config.Config, logger log.Logger) map[string]map[string]interfac
 		cfg.Reva.StorageUsers.MountPath:      {"address": cfg.Reva.StorageUsers.Endpoint},
 		cfg.Reva.StorageUsers.MountID + ".*": {"address": cfg.Reva.StorageUsers.Endpoint},
 		cfg.Reva.StoragePublicLink.MountPath: {"address": cfg.Reva.StoragePublicLink.Endpoint},
+		cfg.Reva.StoragePublicLink.MountID:   {"address": cfg.Reva.StoragePublicLink.Endpoint},
 		// public link storage returns the mount id of the actual storage
 		// medatada storage not part of the global namespace
 	}
