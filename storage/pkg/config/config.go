@@ -196,6 +196,7 @@ type StoragePort struct {
 	Driver           string `ocisConfig:"driver"`
 	MountPath        string `ocisConfig:"mount_path"`
 	MountID          string `ocisConfig:"mount_id"`
+	AlternativeID    string `ocisConfig:"alternative_id"`
 	ExposeDataServer bool   `ocisConfig:"expose_data_server"`
 	// url the data gateway will use to route requests
 	DataServerURL string `ocisConfig:"data_server_url"`
@@ -867,6 +868,7 @@ func DefaultConfig() *Config {
 				Driver:        "ocis",
 				ReadOnly:      false,
 				MountPath:     "/home",
+				AlternativeID: "1284d238-aa92-42ce-bdc4-0b0000009154",
 				MountID:       "1284d238-aa92-42ce-bdc4-0b0000009157",
 				DataServerURL: "http://localhost:9155/data",
 				HTTPPrefix:    "data",
@@ -897,6 +899,7 @@ func DefaultConfig() *Config {
 						GRPCAddr:    "127.0.0.1:9178",
 					},
 					MountPath: "/public",
+					MountID:   "e1a73ede-549b-4226-abdf-40e69ca8230d",
 				},
 				PublicShareProviderAddr: "",
 				UserProviderAddr:        "",
