@@ -585,6 +585,34 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Then /^for user "([^"]*)" the space "([^"]*)" should (not|)\s?contain these (?:files|entries):$/
+	 *
+	 * @param string    $user
+	 * @param string    $spaceName
+	 * @param string    $shouldOrNot   (not|)
+	 * @param TableNode $expectedFiles
+	 *
+	 * @return void
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function usertheSpaceShouldContainEntries(
+		string $user,
+		string $spaceName,
+		string $shouldOrNot,
+		TableNode $expectedFiles
+	):void {
+		$this->theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
+			$user,
+			$spaceName
+		);
+		$this->propfindResultShouldContainEntries(
+			$shouldOrNot,
+			$expectedFiles,
+		);
+	}
+
+	/**
 	 * @Then /^the json responded should contain a space "([^"]*)" with these key and value pairs:$/
 	 *
 	 * @param string $spaceName

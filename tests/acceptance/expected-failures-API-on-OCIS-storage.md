@@ -1261,6 +1261,7 @@ Scenario Outline: Unauthenticated call
 -   [apiCapabilities/capabilities.feature:737](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L737)
 -   [apiCapabilities/capabilities.feature:766](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L766)
 -   [apiCapabilities/capabilities.feature:795](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L795)
+-   [apiCapabilities/capabilities.feature:827](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L827)
 -   [apiShareCreateSpecialToShares1/createShareWhenExcludedFromSharing.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareWhenExcludedFromSharing.feature#L25)
 -   [apiShareCreateSpecialToShares1/createShareWhenExcludedFromSharing.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareWhenExcludedFromSharing.feature#L26)
 -   [apiShareCreateSpecialToShares1/createShareWhenExcludedFromSharing.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareWhenExcludedFromSharing.feature#L44)

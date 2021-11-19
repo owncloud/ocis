@@ -16,7 +16,7 @@ Feature: Upload files into a space
     And user "Alice" lists all available spaces via the GraphApi
     And user "Alice" creates a folder "mainFolder" in space "Project Venus" using the WebDav Api
     Then the HTTP status code should be "201"
-    And the space "Project Venus" should contain these entries:
+    And for user "Alice" the space "Project Venus" should contain these entries:
       | mainFolder        |
 
   Scenario: Bob creates a folder via the Graph api in a space, he expects a 404 code and Alice checks that this folder does not exist
@@ -25,7 +25,7 @@ Feature: Upload files into a space
     And user "Alice" lists all available spaces via the GraphApi
     And user "Bob" creates a folder "forAlice" in space "Project Merkur" using the WebDav Api
     Then the HTTP status code should be "404"
-    And the space "Project Merkur" should not contain these entries:
+    And for user "Alice" the space "Project Merkur" should not contain these entries:
       | forAlice        |
 
   Scenario: Alice creates a folder via Graph api and uploads a file
@@ -36,7 +36,7 @@ Feature: Upload files into a space
     Then the HTTP status code should be "201"
     And user "Alice" uploads a file inside space "Project Moon" with content "Test" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "201"
-    And the space "Project Moon" should contain these entries:
+    And for user "Alice" the space "Project Moon" should contain these entries:
       | NewFolder        |
       | test.txt         |
 
@@ -46,7 +46,7 @@ Feature: Upload files into a space
     And user "Alice" lists all available spaces via the GraphApi
     And user "Bob" uploads a file inside space "Project Pluto" with content "Test" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "404"
-    And the space "Project Pluto" should not contain these entries:
+    And for user "Alice" the space "Project Pluto" should not contain these entries:
       | test.txt        |
 
   Scenario: Alice creates uploads a file and checks her quota
@@ -61,8 +61,7 @@ Feature: Upload files into a space
     And user "Alice" lists all available spaces via the GraphApi
     And user "Alice" uploads a file inside space "Project Saturn" with content "Test" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "201"
-    When user "Alice" lists the content of the space with the name "Project Saturn" using the WebDav Api
-    Then the propfind result of the space should contain these entries:
+    And for user "Alice" the space "Project Saturn" should contain these entries:
       | test.txt         |
     And user "Alice" lists all available spaces via the GraphApi
     And the json responded should contain a space "Project Saturn" with these key and value pairs:

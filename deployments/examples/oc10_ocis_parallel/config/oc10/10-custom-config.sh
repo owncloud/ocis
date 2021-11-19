@@ -6,7 +6,8 @@ gomplate \
   -f /etc/templates/oidc.config.php \
   -o ${OWNCLOUD_VOLUME_CONFIG}/oidc.config.php
 
-occ market:upgrade --major openidconnect # we need a release including https://github.com/owncloud/openidconnect/pull/180
+# we need at least version 2.1.0 of the oenidconnect app
+occ market:upgrade --major openidconnect
 occ app:enable openidconnect
 
 # user LDAP
