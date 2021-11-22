@@ -136,6 +136,14 @@ func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*msgraph.
 	return users, nil
 }
 
+func (i *LDAP) GetGroup(ctx context.Context, groupID string) (*msgraph.Group, error) {
+	return nil, nil
+}
+
+func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*msgraph.Group, error) {
+	return nil, nil
+}
+
 func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *msgraph.User {
 	return &msgraph.User{
 		DisplayName:              pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName)),

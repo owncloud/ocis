@@ -11,6 +11,9 @@ import (
 type Backend interface {
 	GetUser(ctx context.Context, nameOrId string) (*msgraph.User, error)
 	GetUsers(ctx context.Context, queryParam url.Values) ([]*msgraph.User, error)
+
+	GetGroup(ctx context.Context, nameOrId string) (*msgraph.Group, error)
+	GetGroups(ctx context.Context, queryParam url.Values) ([]*msgraph.Group, error)
 }
 
 func CreateUserModelFromCS3(u *cs3.User) *msgraph.User {
