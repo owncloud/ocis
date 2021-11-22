@@ -7,6 +7,32 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.15.0 Technology Preview
+
+Version 1.15.0 brings improvements for the app provider (external application integrations) and more progress on the 'Spaces' feature. Public links now support multi-file and folder downloads as well as all other external application integrations. ownCloud Web 4.5.0 furthermore comes with improvements for use with the ownCloud Classic backend. 
+
+The most prominent changes in ownCloud Infinite Scale 1.15.0 and ownCloud Web 4.5.0 comprise:
+
+- Multi-file and folder downloads as well as other external application (Collabora Online, ONLYOFFICE, CodiMD, etc.) integrations now work in public links. [web#5924](https://github.com/owncloud/web/pull/5924)
+- New files (created/uploaded and file versions) will now be highlighted in ownCloud Web. [web#6020](https://github.com/owncloud/web/pull/6020)
+- When using ownCloud Web with the ownCloud Classic backend, Web will now automatically display app entries in the app switcher based on the entries in the app switcher of the Classic UI (e.g., Activity, Market) so that users can easily find and use the apps. [web#5996](https://github.com/owncloud/web/pull/5996)
+- The width of the right sidebar in the Files app of ownCloud Web has been reduced to make it better usable on medium-sized screens. [web#5983](https://github.com/owncloud/web/pull/5983)
+- ownCloud Web has received performance and other improvements for external application integrations. [web#5952](https://github.com/owncloud/web/pull/5952)
+- Spaces: A new API endpoint has been introduced that allows to list all Spaces in an installation. [ocis#2692](https://github.com/owncloud/ocis/pull/2692)
+- Spaces: A permission has been added to control which users can list all Spaces. [cs3org/reva#2207](https://github.com/cs3org/reva/pull/2207)
+- The app provider (for external application integrations) has received improvements for announcing and prioritizing applications as well as for error handling. [cs3org/reva#2230](https://github.com/cs3org/reva/pull/2230) [cs3org/reva#2263](https://github.com/cs3org/reva/pull/2263) [cs3org/reva#2258](https://github.com/cs3org/reva/pull/2258)
+- The configuration defaults have been revisited and improved towards better security. [ocis#2700](https://github.com/owncloud/ocis/issues/2700)
+- IPv6 support for Infinite Scale has been added. [ocis#2698](https://github.com/owncloud/ocis/pull/2698)
+- A capability for the 'Resharing' feature will now be correctly announced. [ocis#2690](https://github.com/owncloud/ocis/pull/2690)
+- Restoring a file version now works properly. [cs3org/reva#2270](https://github.com/cs3org/reva/pull/2270)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.15.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v4.5.0) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.14.0 Technology Preview
 
 Version 1.14.0 brings more progress on the backend for the 'Spaces' and 'Quota' features. ownCloud Web 4.4.0 has received performance and usability improvements.
