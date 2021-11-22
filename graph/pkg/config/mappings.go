@@ -155,5 +155,25 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			EnvVars:     []string{"GRAPH_LDAP_USER_SCOPE"},
 			Destination: &cfg.Identity.LDAP.UserSearchScope,
 		},
+		{
+			EnvVars:     []string{"GRAPH_LDAP_GROUP_BASE_DN"},
+			Destination: &cfg.Identity.LDAP.GroupBaseDN,
+		},
+		{
+			EnvVars:     []string{"GRAPH_LDAP_GROUP_SEARCH_SCOPE"},
+			Destination: &cfg.Identity.LDAP.GroupSearchScope,
+		},
+		{
+			EnvVars:     []string{"GRAPH_LDAP_GROUP_FILTER"},
+			Destination: &cfg.Identity.LDAP.GroupFilter,
+		},
+		{
+			EnvVars:     []string{"GRAPH_LDAP_GROUP_NAME_ATTRIBUTE"},
+			Destination: &cfg.Identity.LDAP.GroupNameAttribute,
+		},
+		{
+			EnvVars:     []string{"GRAPH_LDAP_GROUP_ID_ATTRIBUTE"},
+			Destination: &cfg.Identity.LDAP.GroupIDAttribute,
+		},
 	}
 }

@@ -19,8 +19,14 @@ type LDAP struct {
 	userFilter       string
 	userScope        int
 	userAttributeMap userAttributeMap
-	logger           *log.Logger
-	conn             *ldaputil.ConnWithReconnect
+
+	groupBaseDN       string
+	groupFilter       string
+	groupScope        int
+	groupAttributeMap groupAttributeMap
+
+	logger *log.Logger
+	conn   *ldaputil.ConnWithReconnect
 }
 
 type userAttributeMap struct {
@@ -30,7 +36,12 @@ type userAttributeMap struct {
 	userName    string
 }
 
-func NewLDAPBackend(config config.LDAP, logger *log.Logger) *LDAP {
+type groupAttributeMap struct {
+	name string
+	id   string
+}
+
+func NewLDAPBackend(config config.LDAP, logger *log.Logger) (*LDAP, error) {
 	conn := ldaputil.NewLDAPWithReconnect(logger, config.URI, config.BindDN, config.BindPassword)
 	uam := userAttributeMap{
 		displayName: config.UserDisplayNameAttribute,
@@ -38,25 +49,33 @@ func NewLDAPBackend(config config.LDAP, logger *log.Logger) *LDAP {
 		mail:        config.UserEmailAttribute,
 		userName:    config.UserNameAttribute,
 	}
+	gam := groupAttributeMap{
+		name: config.GroupNameAttribute,
+		id:   config.GroupIDAttribute,
+	}
 
-	var userScope int
-	switch config.UserSearchScope {
-	case "sub":
-		userScope = ldap.ScopeWholeSubtree
-	case "one":
-		userScope = ldap.ScopeSingleLevel
-	case "base":
-		userScope = ldap.ScopeBaseObject
+	var userScope, groupScope int
+	var err error
+	if userScope, err = stringToScope(config.UserSearchScope); err != nil {
+		return nil, fmt.Errorf("Error configuring user scope: %w", err)
+	}
+
+	if groupScope, err = stringToScope(config.GroupSearchScope); err != nil {
+		return nil, fmt.Errorf("Error configuring group scope: %w", err)
 	}
 
 	return &LDAP{
-		userBaseDN:       config.UserBaseDN,
-		userFilter:       config.UserFilter,
-		userScope:        userScope,
-		userAttributeMap: uam,
-		logger:           logger,
-		conn:             &conn,
-	}
+		userBaseDN:        config.UserBaseDN,
+		userFilter:        config.UserFilter,
+		userScope:         userScope,
+		userAttributeMap:  uam,
+		groupBaseDN:       config.GroupBaseDN,
+		groupFilter:       config.GroupFilter,
+		groupScope:        groupScope,
+		groupAttributeMap: gam,
+		logger:            logger,
+		conn:              &conn,
+	}, nil
 }
 
 func (i *LDAP) GetUser(ctx context.Context, userID string) (*msgraph.User, error) {
@@ -137,11 +156,75 @@ func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*msgraph.
 }
 
 func (i *LDAP) GetGroup(ctx context.Context, groupID string) (*msgraph.Group, error) {
-	return nil, nil
+	i.logger.Debug().Str("backend", "ldap").Msg("GetGroup")
+	groupID = ldap.EscapeFilter(groupID)
+	searchRequest := ldap.NewSearchRequest(
+		i.groupBaseDN, i.groupScope, ldap.NeverDerefAliases, 1, 0, false,
+		fmt.Sprintf("(&%s(|(%s=%s)(%s=%s)))", i.groupFilter, i.groupAttributeMap.name, groupID, i.groupAttributeMap.id, groupID),
+		[]string{
+			i.groupAttributeMap.name,
+			i.groupAttributeMap.id,
+		},
+		nil,
+	)
+	i.logger.Debug().Str("backend", "ldap").Msgf("Search %s", i.groupBaseDN)
+	res, err := i.conn.Search(searchRequest)
+
+	if err != nil {
+		var errmsg string
+		if lerr, ok := err.(*ldap.Error); ok {
+			if lerr.ResultCode == ldap.LDAPResultSizeLimitExceeded {
+				errmsg = fmt.Sprintf("too many results searching for group '%s'", groupID)
+				i.logger.Debug().Str("backend", "ldap").Err(lerr).Msg(errmsg)
+			}
+		}
+		return nil, errorcode.New(errorcode.ItemNotFound, errmsg)
+	}
+	if len(res.Entries) == 0 {
+		return nil, errorcode.New(errorcode.ItemNotFound, "not found")
+	}
+
+	return i.createGroupModelFromLDAP(res.Entries[0]), nil
 }
 
 func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*msgraph.Group, error) {
-	return nil, nil
+	i.logger.Debug().Str("backend", "ldap").Msg("GetGroups")
+
+	search := queryParam.Get("search")
+	if search == "" {
+		search = queryParam.Get("$search")
+	}
+	groupFilter := i.groupFilter
+	if search != "" {
+		search = ldap.EscapeFilter(search)
+		groupFilter = fmt.Sprintf(
+			"(&(%s)(|(%s=%s*)(%s=%s*)))",
+			groupFilter,
+			i.groupAttributeMap.name, search,
+			i.groupAttributeMap.id, search,
+		)
+	}
+	searchRequest := ldap.NewSearchRequest(
+		i.groupBaseDN, i.groupScope, ldap.NeverDerefAliases, 0, 0, false,
+		groupFilter,
+		[]string{
+			i.groupAttributeMap.name,
+			i.groupAttributeMap.id,
+		},
+		nil,
+	)
+	i.logger.Debug().Str("backend", "ldap").Str("Base", i.groupBaseDN).Str("filter", groupFilter).Msg("ldap search")
+	res, err := i.conn.Search(searchRequest)
+	if err != nil {
+		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
+	}
+
+	groups := make([]*msgraph.Group, 0, len(res.Entries))
+
+	for _, e := range res.Entries {
+		groups = append(groups, i.createGroupModelFromLDAP(e))
+	}
+	return groups, nil
 }
 
 func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *msgraph.User {
@@ -157,9 +240,35 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *msgraph.User {
 	}
 }
 
+func (i *LDAP) createGroupModelFromLDAP(e *ldap.Entry) *msgraph.Group {
+	return &msgraph.Group{
+		DisplayName:              pointerOrNil(e.GetEqualFoldAttributeValue(i.groupAttributeMap.name)),
+		OnPremisesSamAccountName: pointerOrNil(e.GetEqualFoldAttributeValue(i.groupAttributeMap.name)),
+		DirectoryObject: msgraph.DirectoryObject{
+			Entity: msgraph.Entity{
+				ID: pointerOrNil(e.GetEqualFoldAttributeValue(i.groupAttributeMap.id)),
+			},
+		},
+	}
+}
 func pointerOrNil(val string) *string {
 	if val == "" {
 		return nil
 	}
 	return &val
+}
+
+func stringToScope(scope string) (int, error) {
+	var s int
+	switch scope {
+	case "sub":
+		s = ldap.ScopeWholeSubtree
+	case "one":
+		s = ldap.ScopeSingleLevel
+	case "base":
+		s = ldap.ScopeBaseObject
+	default:
+		return 0, fmt.Errorf("Invalid Scope '%s'", scope)
+	}
+	return s, nil
 }

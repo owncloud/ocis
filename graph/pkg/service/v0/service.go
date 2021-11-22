@@ -33,9 +33,14 @@ func NewService(opts ...Option) Service {
 			Logger: &options.Logger,
 		}
 	case "ldap":
-		backend = identity.NewLDAPBackend(options.Config.Identity.LDAP, &options.Logger)
+		var err error
+		if backend, err = identity.NewLDAPBackend(options.Config.Identity.LDAP, &options.Logger); err != nil {
+			options.Logger.Error().Msgf("Error initializing LDAP Backend: '%s'", err)
+			return nil
+		}
 	default:
 		options.Logger.Error().Msgf("Unknown Identity Backend: '%s'", options.Config.Identity.Backend)
+		return nil
 	}
 
 	svc := Graph{
