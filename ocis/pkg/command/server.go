@@ -25,7 +25,7 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			return ParseConfig(c, cfg)
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 

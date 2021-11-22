@@ -20,10 +20,6 @@ func SettingsCommand(cfg *config.Config) *cli.Command {
 			command.PrintVersion(cfg.Settings),
 		},
 		Before: func(ctx *cli.Context) error {
-			if err := ParseConfig(ctx, cfg); err != nil {
-				return err
-			}
-
 			if cfg.Commons != nil {
 				cfg.Settings.Commons = cfg.Commons
 			}
