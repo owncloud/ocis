@@ -20,6 +20,10 @@ func ThumbnailsCommand(cfg *config.Config) *cli.Command {
 			command.PrintVersion(cfg.Thumbnails),
 		},
 		Before: func(ctx *cli.Context) error {
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
+			}
+
 			if cfg.Commons != nil {
 				cfg.Thumbnails.Commons = cfg.Commons
 			}

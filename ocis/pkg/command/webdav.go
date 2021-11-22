@@ -21,6 +21,10 @@ func WebDAVCommand(cfg *config.Config) *cli.Command {
 			command.PrintVersion(cfg.WebDAV),
 		},
 		Before: func(ctx *cli.Context) error {
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
+			}
+
 			if cfg.Commons != nil {
 				cfg.WebDAV.Commons = cfg.Commons
 			}

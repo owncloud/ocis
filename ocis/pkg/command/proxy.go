@@ -20,6 +20,10 @@ func ProxyCommand(cfg *config.Config) *cli.Command {
 			command.PrintVersion(cfg.Proxy),
 		},
 		Before: func(ctx *cli.Context) error {
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
+			}
+
 			if cfg.Commons != nil {
 				cfg.Proxy.Commons = cfg.Commons
 			}

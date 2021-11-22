@@ -14,6 +14,10 @@ func GLAuthCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start glauth server",
 		Category: "Extensions",
 		Before: func(ctx *cli.Context) error {
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
+			}
+
 			if cfg.Commons != nil {
 				cfg.GLAuth.Commons = cfg.Commons
 			}
