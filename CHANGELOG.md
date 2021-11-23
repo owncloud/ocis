@@ -1,3 +1,23 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.15.0...master
+
+## Summary
+
+* Change - Restructure Configuration Parsing: [#2708](https://github.com/owncloud/ocis/pull/2708)
+
+## Details
+
+* Change - Restructure Configuration Parsing: [#2708](https://github.com/owncloud/ocis/pull/2708)
+
+   Tags: ocis
+
+   CLI flags are no longer needed for subcommands, as we rely solely on env variables and config
+   files. This greatly simplifies configuration and deployment.
+
+   https://github.com/owncloud/ocis/pull/2708
 # Changelog for [1.15.0] (2021-11-19)
 
 The following sections list the changes for 1.15.0.
