@@ -2,6 +2,7 @@ Enhancement: Update REVA to v1.16.0
 
 Updated REVA to v1.16.0
 This update includes:
+
  * Fix [cs3org/reva#2245](https://github.com/cs3org/reva/pull/2245): Don't announce search-files capability
  * Fix [cs3org/reva#2247](https://github.com/cs3org/reva/pull/2247): Merge user ACLs from EOS to sys ACLs
  * Fix [cs3org/reva#2279](https://github.com/cs3org/reva/pull/2279): Return the inode of the version folder for files when listing in EOS
