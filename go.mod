@@ -33,7 +33,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/gookit/config/v2 v2.0.27
 	github.com/gorilla/mux v1.8.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.6.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.0
 	github.com/iancoleman/strcase v0.2.0
 	github.com/justinas/alice v1.2.0
 	github.com/libregraph/lico v0.52.0
@@ -65,8 +65,8 @@ require (
 	go.opentelemetry.io/otel/trace v1.2.0
 	golang.org/x/crypto v0.0.0-20211108221036-ceb1ce70b4fa
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d
-	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
-	google.golang.org/genproto v0.0.0-20211020151524-b7c3a969101a
+	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
+	google.golang.org/genproto v0.0.0-20211118181313-81c1377c94b1
 	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/yaml.v2 v2.4.0
