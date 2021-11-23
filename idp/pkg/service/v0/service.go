@@ -55,7 +55,10 @@ func NewService(opts ...Option) Service {
 	dummyBackendSupport.MustRegister()
 	kcBackendSupport.MustRegister()
 
-	bs, err := bootstrap.Boot(ctx, &options.Config.IDP, &licoconfig.Config{
+	// https://play.golang.org/p/Mh8AVJCd593
+	idpSettings := bootstrap.Settings(options.Config.IDP)
+
+	bs, err := bootstrap.Boot(ctx, &idpSettings, &licoconfig.Config{
 		Logger: logw.Wrap(logger),
 	})
 

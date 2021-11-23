@@ -12,7 +12,6 @@ import (
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
@@ -24,11 +23,8 @@ func AuthMachine(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-machine",
 		Usage: "Start authprovider for machine auth",
-		Flags: flagset.AuthMachineWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.AuthMachine.Services = c.StringSlice("service")
-
-			return nil
+			return ParseConfig(c, cfg, "storage-auth-machine")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -123,9 +119,7 @@ type AuthMachineSutureService struct {
 
 // NewAuthMachineSutureService creates a new gateway.AuthMachineSutureService
 func NewAuthMachine(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.AuthMachine.Supervised = true
-	}
+	cfg.Storage.Commons = cfg.Commons
 	return AuthMachineSutureService{
 		cfg: cfg.Storage,
 	}

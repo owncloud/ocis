@@ -20,6 +20,6 @@
                 // set insecure options because we don't have valid certificates in dev environments
                 "OCIS_INSECURE": "true",
             }
-        },
+        }
     ]
 }

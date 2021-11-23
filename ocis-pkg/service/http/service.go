@@ -1,7 +1,6 @@
 package http
 
 import (
-	"crypto/tls"
 	"strings"
 	"time"
 
@@ -20,11 +19,6 @@ type Service struct {
 // NewService initializes a new http service.
 func NewService(opts ...Option) Service {
 	sopts := newOptions(opts...)
-	sopts.Logger.Info().
-		Str("transport", transport(sopts.TLSConfig)).
-		Str("addr", sopts.Address).
-		Msg("starting server")
-
 	wopts := []micro.Option{
 		micro.Server(mhttps.NewServer(server.TLSConfig(sopts.TLSConfig))),
 		micro.Address(sopts.Address),
@@ -38,12 +32,4 @@ func NewService(opts ...Option) Service {
 	}
 
 	return Service{micro.NewService(wopts...)}
-}
-
-func transport(secure *tls.Config) string {
-	if secure != nil {
-		return "https"
-	}
-
-	return "http"
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/webdav/pkg/config"
-	"github.com/owncloud/ocis/webdav/pkg/flagset"
 	"github.com/owncloud/ocis/webdav/pkg/metrics"
 	"github.com/owncloud/ocis/webdav/pkg/server/debug"
 	"github.com/owncloud/ocis/webdav/pkg/server/http"
@@ -20,26 +19,15 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
-			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			if !cfg.Supervised {
-				return ParseConfig(ctx, cfg)
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
 			}
-			if origins := ctx.StringSlice("cors-allowed-origins"); len(origins) != 0 {
-				cfg.HTTP.CORS.AllowedOrigins = origins
-			}
-			if methods := ctx.StringSlice("cors-allowed-methods"); len(methods) != 0 {
-				cfg.HTTP.CORS.AllowedMethods = methods
-			}
-			if headers := ctx.StringSlice("cors-allowed-headers"); len(headers) != 0 {
-				cfg.HTTP.CORS.AllowedOrigins = headers
-			}
-			logger.Debug().Str("service", "webdav").Msg("ignoring config file parsing when running supervised")
+
 			return nil
 		},
 		Action: func(c *cli.Context) error {
@@ -83,7 +71,8 @@ func Server(cfg *config.Config) *cli.Command {
 
 				gr.Add(func() error {
 					return server.Run()
-				}, func(_ error) {
+				}, func(err error) {
+					logger.Error().Err(err).Msg("error ")
 					logger.Info().
 						Str("transport", "http").
 						Msg("Shutting down server")
@@ -104,7 +93,8 @@ func Server(cfg *config.Config) *cli.Command {
 					return err
 				}
 
-				gr.Add(server.ListenAndServe, func(_ error) {
+				gr.Add(server.ListenAndServe, func(err error) {
+					logger.Error().Err(err)
 					_ = server.Shutdown(ctx)
 					cancel()
 				})

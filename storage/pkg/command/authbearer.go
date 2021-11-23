@@ -12,7 +12,6 @@ import (
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
@@ -24,11 +23,8 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-bearer",
 		Usage: "Start authprovider for bearer auth",
-		Flags: flagset.AuthBearerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.AuthBearer.Services = c.StringSlice("service")
-
-			return nil
+			return ParseConfig(c, cfg, "storage-auth-bearer")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -127,9 +123,7 @@ type AuthBearerSutureService struct {
 
 // NewAuthBearerSutureService creates a new gateway.AuthBearerSutureService
 func NewAuthBearer(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.AuthBearer.Supervised = true
-	}
+	cfg.Storage.Commons = cfg.Commons
 	return AuthBearerSutureService{
 		cfg: cfg.Storage,
 	}

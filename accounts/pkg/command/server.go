@@ -4,11 +4,12 @@ import (
 	"context"
 	"strings"
 
+	"github.com/owncloud/ocis/ocis-pkg/log"
+
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/accounts/pkg/config"
-	"github.com/owncloud/ocis/accounts/pkg/flagset"
 	"github.com/owncloud/ocis/accounts/pkg/metrics"
 	"github.com/owncloud/ocis/accounts/pkg/server/grpc"
 	"github.com/owncloud/ocis/accounts/pkg/server/http"
@@ -23,34 +24,21 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:        "server",
 		Usage:       "Start ocis accounts service",
 		Description: "uses an LDAP server as the storage backend",
-		Flags:       flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
-			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
 			cfg.Repo.Backend = strings.ToLower(cfg.Repo.Backend)
 
-			// When running on single binary mode the before hook from the root command won't get called. We manually
-			// call this before hook from ocis command, so the configuration can be loaded.
-			if !cfg.Supervised {
-				return ParseConfig(ctx, cfg)
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
 			}
-			if origins := ctx.StringSlice("cors-allowed-origins"); len(origins) != 0 {
-				cfg.HTTP.CORS.AllowedOrigins = origins
-			}
-			if methods := ctx.StringSlice("cors-allowed-methods"); len(methods) != 0 {
-				cfg.HTTP.CORS.AllowedMethods = methods
-			}
-			if headers := ctx.StringSlice("cors-allowed-headers"); len(headers) != 0 {
-				cfg.HTTP.CORS.AllowedOrigins = headers
-			}
-			logger.Debug().Str("service", "accounts").Msg("ignoring config file parsing when running supervised")
+
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
+			logger := log.LoggerFromConfig("accounts", *cfg.Log)
 			err := tracing.Configure(cfg)
 			if err != nil {
 				return err

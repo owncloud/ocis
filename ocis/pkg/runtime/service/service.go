@@ -13,6 +13,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+
 	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v4"
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
@@ -159,13 +161,22 @@ func Start(o ...Option) error {
 		FailureBackoff:   3 * time.Second,
 	})
 
-	// reva storages have their own logging. For consistency sake the top level logging will cascade to reva.
-	s.cfg.Storage.Log.Color = s.cfg.Log.Color
-	s.cfg.Storage.Log.Level = s.cfg.Log.Level
-	s.cfg.Storage.Log.Pretty = s.cfg.Log.Pretty
-	s.cfg.Storage.Log.File = s.cfg.Log.File
+	if s.cfg.Commons == nil {
+		s.cfg.Commons = &shared.Commons{
+			Log: &shared.Log{},
+		}
+	}
 
-	if err := rpc.Register(s); err != nil {
+	if s.cfg.Storage.Log == nil {
+		s.cfg.Storage.Log = &shared.Log{}
+	}
+
+	s.cfg.Storage.Log.Color = s.cfg.Commons.Color
+	s.cfg.Storage.Log.Level = s.cfg.Commons.Level
+	s.cfg.Storage.Log.Pretty = s.cfg.Commons.Pretty
+	s.cfg.Storage.Log.File = s.cfg.Commons.File
+
+	if err = rpc.Register(s); err != nil {
 		if s != nil {
 			s.Log.Fatal().Err(err)
 		}

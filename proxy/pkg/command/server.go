@@ -21,7 +21,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/cs3"
-	"github.com/owncloud/ocis/proxy/pkg/flagset"
 	"github.com/owncloud/ocis/proxy/pkg/metrics"
 	"github.com/owncloud/ocis/proxy/pkg/middleware"
 	"github.com/owncloud/ocis/proxy/pkg/proxy"
@@ -40,14 +39,19 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: append(flagset.ServerWithConfig(cfg), flagset.RootWithConfig(cfg)...),
 		Before: func(ctx *cli.Context) error {
-			logger := NewLogger(cfg)
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
+			}
+
+			if cfg.Policies == nil {
+				cfg.Policies = config.DefaultPolicies()
+			}
+
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
-			// StringSliceFlag doesn't support Destination
-			// UPDATE Destination on string flags supported. Wait for https://github.com/urfave/cli/pull/1078 to get to micro/cli
+
 			if len(ctx.StringSlice("presignedurl-allow-method")) > 0 {
 				cfg.PreSignedURL.AllowedHTTPMethods = ctx.StringSlice("presignedurl-allow-method")
 			}
@@ -56,10 +60,6 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			if !cfg.Supervised {
-				return ParseConfig(ctx, cfg)
-			}
-			logger.Debug().Str("service", "ocs").Msg("ignoring config file parsing when running supervised")
 			return nil
 		},
 		Action: func(c *cli.Context) error {

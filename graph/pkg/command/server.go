@@ -6,7 +6,6 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/graph/pkg/config"
-	"github.com/owncloud/ocis/graph/pkg/flagset"
 	"github.com/owncloud/ocis/graph/pkg/metrics"
 	"github.com/owncloud/ocis/graph/pkg/server/debug"
 	"github.com/owncloud/ocis/graph/pkg/server/http"
@@ -20,19 +19,15 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
-			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			// When running on single binary mode the before hook from the root command won't get called. We manually
-			// call this before hook from ocis command, so the configuration can be loaded.
-			if !cfg.Supervised {
-				return ParseConfig(ctx, cfg)
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
 			}
-			logger.Debug().Str("service", "graph").Msg("ignoring config file parsing when running supervised")
+
 			return nil
 		},
 		Action: func(c *cli.Context) error {

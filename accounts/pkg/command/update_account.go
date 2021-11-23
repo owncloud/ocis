@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/owncloud/ocis/accounts/pkg/flagset"
+
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	"github.com/owncloud/ocis/accounts/pkg/config"
-	"github.com/owncloud/ocis/accounts/pkg/flagset"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/urfave/cli/v2"
 	"google.golang.org/genproto/protobuf/field_mask"
@@ -24,7 +25,6 @@ func UpdateAccount(cfg *config.Config) *cli.Command {
 		Flags:     flagset.UpdateAccountWithConfig(cfg, a),
 		Before: func(c *cli.Context) error {
 			if len(c.StringSlice("password_policies")) > 0 {
-				// StringSliceFlag doesn't support Destination
 				a.PasswordProfile.PasswordPolicies = c.StringSlice("password_policies")
 			}
 

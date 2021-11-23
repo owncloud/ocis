@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/urfave/cli/v2"
 )
 
@@ -14,7 +13,9 @@ func Health(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "health",
 		Usage: "Check health status",
-		Flags: flagset.HealthWithConfig(cfg),
+		Before: func(c *cli.Context) error {
+			return ParseConfig(c, cfg, "storage")
+		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 

@@ -16,7 +16,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
@@ -28,11 +27,11 @@ func Frontend(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "frontend",
 		Usage: "Start frontend service",
-		Flags: flagset.FrontendWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.Frontend.Services = c.StringSlice("service")
-			cfg.Reva.ChecksumSupportedTypes = c.StringSlice("checksum-supported-type")
-			return loadUserAgent(c, cfg)
+			if err := loadUserAgent(c, cfg); err != nil {
+				return err
+			}
+			return ParseConfig(c, cfg, "storage-frontend")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -335,11 +334,9 @@ type FrontendSutureService struct {
 	cfg *config.Config
 }
 
-// NewFrontendSutureService creates a new frontend.FrontendSutureService
+// NewFrontend creates a new frontend.FrontendSutureService
 func NewFrontend(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.Frontend.Supervised = true
-	}
+	cfg.Storage.Commons = cfg.Commons
 	return FrontendSutureService{
 		cfg: cfg.Storage,
 	}

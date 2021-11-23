@@ -20,6 +20,7 @@ type Options struct {
 	Zpages               bool
 	Health               func(http.ResponseWriter, *http.Request)
 	Ready                func(http.ResponseWriter, *http.Request)
+	ConfigDump           func(http.ResponseWriter, *http.Request)
 	CorsAllowedOrigins   []string
 	CorsAllowedMethods   []string
 	CorsAllowedHeaders   []string
@@ -97,6 +98,13 @@ func Health(h func(http.ResponseWriter, *http.Request)) Option {
 func Ready(r func(http.ResponseWriter, *http.Request)) Option {
 	return func(o *Options) {
 		o.Ready = r
+	}
+}
+
+// ConfigDump to be documented.
+func ConfigDump(r func(http.ResponseWriter, *http.Request)) Option {
+	return func(o *Options) {
+		o.ConfigDump = r
 	}
 }
 

@@ -3,15 +3,13 @@ package command
 import (
 	"context"
 	"os"
-	"strings"
 
-	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
-	"github.com/spf13/viper"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
 )
@@ -68,48 +66,28 @@ func NewLogger(cfg *config.Config) log.Logger {
 }
 
 // ParseConfig loads configuration from Viper known paths.
+// ParseConfig loads glauth configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	sync.ParsingViperConfig.Lock()
-	defer sync.ParsingViperConfig.Unlock()
-	logger := NewLogger(cfg)
-
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.SetEnvPrefix("THUMBNAILS")
-	viper.AutomaticEnv()
-
-	if c.IsSet("config-file") {
-		viper.SetConfigFile(c.String("config-file"))
-	} else {
-		viper.SetConfigName("thumbnails")
-
-		viper.AddConfigPath("/etc/ocis")
-		viper.AddConfigPath("$HOME/.ocis")
-		viper.AddConfigPath("./config")
+	conf, err := ociscfg.BindSourcesToStructs("thumbnails", cfg)
+	if err != nil {
+		return err
 	}
 
-	if err := viper.ReadInConfig(); err != nil {
-		switch err.(type) {
-		case viper.ConfigFileNotFoundError:
-			logger.Debug().
-				Msg("no config found on preconfigured location")
-		case viper.UnsupportedConfigError:
-			logger.Fatal().
-				Err(err).
-				Msg("unsupported config type")
-		default:
-			logger.Fatal().
-				Err(err).
-				Msg("failed to read config")
+	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &shared.Log{
+			Level:  cfg.Commons.Log.Level,
+			Pretty: cfg.Commons.Log.Pretty,
+			Color:  cfg.Commons.Log.Color,
+			File:   cfg.Commons.Log.File,
 		}
+	} else if cfg.Log == nil && cfg.Commons == nil {
+		cfg.Log = &shared.Log{}
 	}
 
-	if err := viper.Unmarshal(&cfg); err != nil {
-		logger.Fatal().
-			Err(err).
-			Msg("failed to parse config")
-	}
-
-	return nil
+	conf.LoadOSEnv(config.GetEnv(cfg), false)
+	bindings := config.StructMappings(cfg)
+	return ociscfg.BindEnv(conf, bindings)
 }
 
 // SutureService allows for the thumbnails command to be embedded and supervised by a suture supervisor tree.
@@ -119,10 +97,7 @@ type SutureService struct {
 
 // NewSutureService creates a new thumbnails.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Thumbnails.Supervised = true
-	}
-	cfg.Thumbnails.Log.File = cfg.Log.File
+	cfg.Thumbnails.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.Thumbnails,
 	}

@@ -13,7 +13,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/command/storagedrivers"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
@@ -25,11 +24,8 @@ func StorageUsers(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-users",
 		Usage: "Start storage-users service",
-		Flags: flagset.StorageUsersWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.StorageHome.Services = c.StringSlice("service")
-
-			return nil
+			return ParseConfig(c, cfg, "storage-userprovider")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -150,9 +146,7 @@ type StorageUsersSutureService struct {
 
 // NewStorageUsersSutureService creates a new storage.StorageUsersSutureService
 func NewStorageUsers(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.StorageUsers.Supervised = true
-	}
+	cfg.Storage.Commons = cfg.Commons
 	return StorageUsersSutureService{
 		cfg: cfg.Storage,
 	}

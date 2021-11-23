@@ -62,8 +62,6 @@ services:
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       # web ui
       WEB_UI_CONFIG: "/var/tmp/ocis/.config/web-config.json"
-      # proxy
-      PROXY_CONFIG_FILE: "/var/tmp/ocis/.config/proxy-config.json"
       # make settings service available to oCIS Hello
       SETTINGS_GRPC_ADDR: 0.0.0.0:9191
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
@@ -71,7 +69,7 @@ services:
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/ocis/web-config.dist.json:/config/web-config.dist.json
-      - ./config/ocis/proxy-config.json:/config/proxy-config.json
+      - ./config/ocis/proxy.json:/etc/ocis/proxy.json
       - ocis-data:/var/lib/ocis
     labels:
       - "traefik.enable=true"

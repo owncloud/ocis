@@ -1,6 +1,7 @@
 package debug
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 
@@ -22,6 +23,7 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.Zpages(options.Config.Debug.Zpages),
 		debug.Health(health(options.Config)),
 		debug.Ready(ready(options.Config)),
+		debug.ConfigDump(configDump(options.Config)),
 	), nil
 }
 
@@ -50,5 +52,19 @@ func ready(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 		if _, err := io.WriteString(w, http.StatusText(http.StatusOK)); err != nil {
 			panic(err)
 		}
+	}
+}
+
+// configDump implements the config dump
+func configDump(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		b, err := json.Marshal(cfg)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+
+		_, _ = w.Write(b)
 	}
 }

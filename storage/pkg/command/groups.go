@@ -13,7 +13,6 @@ import (
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
@@ -25,11 +24,8 @@ func Groups(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "groups",
 		Usage: "Start groups service",
-		Flags: flagset.GroupsWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.Groups.Services = c.StringSlice("service")
-
-			return nil
+			return ParseConfig(c, cfg, "storage-groups")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -165,9 +161,7 @@ type GroupSutureService struct {
 
 // NewGroupProviderSutureService creates a new storage.GroupProvider
 func NewGroupProvider(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.Groups.Supervised = true
-	}
+	cfg.Storage.Commons = cfg.Commons
 	return GroupSutureService{
 		cfg: cfg.Storage,
 	}

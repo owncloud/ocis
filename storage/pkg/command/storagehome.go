@@ -14,7 +14,6 @@ import (
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/command/storagedrivers"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
@@ -26,11 +25,8 @@ func StorageHome(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-home",
 		Usage: "Start storage-home service",
-		Flags: flagset.StorageHomeWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.StorageHome.Services = c.StringSlice("service")
-
-			return nil
+			return ParseConfig(c, cfg, "storage-home")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -150,9 +146,7 @@ type StorageHomeSutureService struct {
 
 // NewStorageHomeSutureService creates a new storage.StorageHomeSutureService
 func NewStorageHome(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.StorageHome.Supervised = true
-	}
+	cfg.Storage.Commons = cfg.Commons
 	return StorageHomeSutureService{
 		cfg: cfg.Storage,
 	}

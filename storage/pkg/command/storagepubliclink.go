@@ -12,7 +12,6 @@ import (
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
@@ -22,9 +21,11 @@ import (
 // StoragePublicLink is the entrypoint for the reva-storage-public-link command.
 func StoragePublicLink(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "storage-public-link",
-		Usage:    "Start storage-public-link service",
-		Flags:    flagset.StoragePublicLink(cfg),
+		Name:  "storage-public-link",
+		Usage: "Start storage-public-link service",
+		Before: func(c *cli.Context) error {
+			return ParseConfig(c, cfg, "storage-public-link")
+		},
 		Category: "Extensions",
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -125,9 +126,7 @@ type StoragePublicLinkSutureService struct {
 
 // NewStoragePublicLinkSutureService creates a new storage.StoragePublicLinkSutureService
 func NewStoragePublicLink(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.StoragePublicLink.Supervised = true
-	}
+	cfg.Storage.Commons = cfg.Commons
 	return StoragePublicLinkSutureService{
 		cfg: cfg.Storage,
 	}

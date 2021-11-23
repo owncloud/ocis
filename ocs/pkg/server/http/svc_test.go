@@ -14,17 +14,19 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/pkg/auth/scope"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/golang/protobuf/ptypes/empty"
-	accountsCmd "github.com/owncloud/ocis/accounts/pkg/command"
 	accountsCfg "github.com/owncloud/ocis/accounts/pkg/config"
 	accountsProto "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	accountsSvc "github.com/owncloud/ocis/accounts/pkg/service/v0"
 	ocisLog "github.com/owncloud/ocis/ocis-pkg/log"
+	oclog "github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocs/pkg/config"
 	svc "github.com/owncloud/ocis/ocs/pkg/service/v0"
@@ -549,7 +551,7 @@ func init() {
 				Path: dataPath,
 			},
 		},
-		Log: accountsCfg.Log{
+		Log: &shared.Log{
 			Level:  "info",
 			Pretty: true,
 			Color:  true,
@@ -560,7 +562,7 @@ func init() {
 	var err error
 
 	if hdlr, err = accountsSvc.New(
-		accountsSvc.Logger(accountsCmd.NewLogger(c)),
+		accountsSvc.Logger(oclog.LoggerFromConfig("accounts", *c.Log)),
 		accountsSvc.Config(c),
 		accountsSvc.RoleService(buildRoleServiceMock()),
 	); err != nil {
@@ -696,7 +698,7 @@ func getService() svc.Service {
 		TokenManager: config.TokenManager{
 			JWTSecret: jwtSecret,
 		},
-		Log: config.Log{
+		Log: &shared.Log{
 			Level: "debug",
 		},
 	}

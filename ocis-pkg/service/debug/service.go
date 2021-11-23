@@ -15,12 +15,6 @@ import (
 // NewService initializes a new debug service.
 func NewService(opts ...Option) *http.Server {
 	dopts := newOptions(opts...)
-
-	dopts.Logger.Info().
-		Str("transport", "debug").
-		Str("addr", dopts.Address).
-		Msg("starting server")
-
 	mux := http.NewServeMux()
 
 	mux.Handle("/metrics", alice.New(
@@ -33,6 +27,10 @@ func NewService(opts ...Option) *http.Server {
 
 	mux.HandleFunc("/healthz", dopts.Health)
 	mux.HandleFunc("/readyz", dopts.Ready)
+
+	if dopts.ConfigDump != nil {
+		mux.HandleFunc("/config", dopts.ConfigDump)
+	}
 
 	if dopts.Pprof {
 		mux.HandleFunc("/debug/pprof/", pprof.Index)

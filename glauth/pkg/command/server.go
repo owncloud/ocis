@@ -8,7 +8,6 @@ import (
 	"github.com/oklog/run"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/glauth/pkg/config"
-	"github.com/owncloud/ocis/glauth/pkg/flagset"
 	"github.com/owncloud/ocis/glauth/pkg/metrics"
 	"github.com/owncloud/ocis/glauth/pkg/server/debug"
 	"github.com/owncloud/ocis/glauth/pkg/server/glauth"
@@ -24,24 +23,15 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
-			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
-			// StringSliceFlag doesn't support Destination
-			// UPDATE Destination on string flags supported. Wait for https://github.com/urfave/cli/pull/1078 to get to micro/cli
-			if len(ctx.StringSlice("backend-server")) > 0 {
-				cfg.Backend.Servers = ctx.StringSlice("backend-server")
+
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
 			}
-			if len(ctx.StringSlice("fallback-server")) > 0 {
-				cfg.Fallback.Servers = ctx.StringSlice("fallback-server")
-			}
-			if !cfg.Supervised {
-				return ParseConfig(ctx, cfg)
-			}
-			logger.Debug().Strs("backend-server", ctx.StringSlice("backend-server")).Str("service", "glauth").Msg("ignoring config file parsing when running supervised")
+
 			return nil
 		},
 		Action: func(c *cli.Context) error {
