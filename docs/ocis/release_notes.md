@@ -18,7 +18,7 @@ The most prominent changes in ownCloud Infinite Scale 1.15.0 and ownCloud Web 4.
 - When using ownCloud Web with the ownCloud Classic backend, Web will now automatically display app entries in the app switcher based on the entries in the app switcher of the Classic UI (e.g., Activity, Market) so that users can easily find and use the apps. [web#5996](https://github.com/owncloud/web/pull/5996)
 - The width of the right sidebar in the Files app of ownCloud Web has been reduced to make it better usable on medium-sized screens. [web#5983](https://github.com/owncloud/web/pull/5983)
 - ownCloud Web has received performance and other improvements for external application integrations. [web#5952](https://github.com/owncloud/web/pull/5952)
-- Spaces: A new API endpoint has been introduced that allows to list all Spaces in an installation. [ocis#2692](https://github.com/owncloud/ocis/pull/2692)
+- Spaces: A new API endpoint has been introduced that allows listing all Spaces in an installation. [ocis#2692](https://github.com/owncloud/ocis/pull/2692)
 - Spaces: A permission has been added to control which users can list all Spaces. [cs3org/reva#2207](https://github.com/cs3org/reva/pull/2207)
 - The app provider (for external application integrations) has received improvements for announcing and prioritizing applications as well as for error handling. [cs3org/reva#2230](https://github.com/cs3org/reva/pull/2230) [cs3org/reva#2263](https://github.com/cs3org/reva/pull/2263) [cs3org/reva#2258](https://github.com/cs3org/reva/pull/2258)
 - The configuration defaults have been revisited and improved towards better security. [ocis#2700](https://github.com/owncloud/ocis/issues/2700)
