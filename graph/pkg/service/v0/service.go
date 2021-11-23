@@ -5,7 +5,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+
 	"github.com/owncloud/ocis/graph/pkg/identity"
+	"github.com/owncloud/ocis/graph/pkg/identity/ldap"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	opkgm "github.com/owncloud/ocis/ocis-pkg/middleware"
 )
@@ -34,7 +36,12 @@ func NewService(opts ...Option) Service {
 		}
 	case "ldap":
 		var err error
-		if backend, err = identity.NewLDAPBackend(options.Config.Identity.LDAP, &options.Logger); err != nil {
+		conn := ldap.NewLDAPWithReconnect(&options.Logger,
+			options.Config.Identity.LDAP.URI,
+			options.Config.Identity.LDAP.BindDN,
+			options.Config.Identity.LDAP.BindPassword,
+		)
+		if backend, err = identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger); err != nil {
 			options.Logger.Error().Msgf("Error initializing LDAP Backend: '%s'", err)
 			return nil
 		}

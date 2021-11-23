@@ -9,7 +9,6 @@ import (
 	msgraph "github.com/yaegashi/msgraph.go/beta"
 
 	"github.com/owncloud/ocis/graph/pkg/config"
-	ldaputil "github.com/owncloud/ocis/graph/pkg/identity/ldap"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
@@ -26,7 +25,7 @@ type LDAP struct {
 	groupAttributeMap groupAttributeMap
 
 	logger *log.Logger
-	conn   *ldaputil.ConnWithReconnect
+	conn   ldap.Client
 }
 
 type userAttributeMap struct {
@@ -41,13 +40,20 @@ type groupAttributeMap struct {
 	id   string
 }
 
-func NewLDAPBackend(config config.LDAP, logger *log.Logger) (*LDAP, error) {
-	conn := ldaputil.NewLDAPWithReconnect(logger, config.URI, config.BindDN, config.BindPassword)
+func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LDAP, error) {
+	if config.UserDisplayNameAttribute == "" || config.UserIDAttribute == "" ||
+		config.UserEmailAttribute == "" || config.UserNameAttribute == "" {
+		return nil, fmt.Errorf("Invalid user attribute mappings")
+	}
 	uam := userAttributeMap{
 		displayName: config.UserDisplayNameAttribute,
 		id:          config.UserIDAttribute,
 		mail:        config.UserEmailAttribute,
 		userName:    config.UserNameAttribute,
+	}
+
+	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
+		return nil, fmt.Errorf("Invalid group attribute mappings")
 	}
 	gam := groupAttributeMap{
 		name: config.GroupNameAttribute,
@@ -74,7 +80,7 @@ func NewLDAPBackend(config config.LDAP, logger *log.Logger) (*LDAP, error) {
 		groupScope:        groupScope,
 		groupAttributeMap: gam,
 		logger:            logger,
-		conn:              &conn,
+		conn:              lc,
 	}, nil
 }
 
@@ -228,6 +234,9 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*msgraph
 }
 
 func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *msgraph.User {
+	if e == nil {
+		return nil
+	}
 	return &msgraph.User{
 		DisplayName:              pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName)),
 		Mail:                     pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.mail)),

@@ -4,7 +4,10 @@ package ldap
 // https://gist.github.com/emsearcy/cba3295d1a06d4c432ab4f6173b65e4f#file-ldap_snippet-go
 
 import (
+	"crypto/tls"
 	"errors"
+	"fmt"
+	"time"
 
 	"github.com/go-ldap/ldap/v3"
 
@@ -16,6 +19,7 @@ type ldapConnection struct {
 	Error error
 }
 
+// Implements the ldap.CLient interface
 type ConnWithReconnect struct {
 	conn    chan ldapConnection
 	reset   chan *ldap.Conn
@@ -124,4 +128,68 @@ func (c ConnWithReconnect) reconnect(resetConn *ldap.Conn) (*ldap.Conn, error) {
 	c.logger.Debug().Msg("Waiting for new connection")
 	result := <-c.conn
 	return result.Conn, result.Error
+}
+
+// Remaining methods to fulfill ldap.Client interface
+
+func (c ConnWithReconnect) Start() {}
+
+func (c ConnWithReconnect) StartTLS(*tls.Config) error {
+	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}
+
+func (c ConnWithReconnect) Close() {}
+
+func (c ConnWithReconnect) IsClosing() bool {
+	return false
+}
+
+func (c ConnWithReconnect) SetTimeout(time.Duration) {}
+
+func (c ConnWithReconnect) Bind(username, password string) error {
+	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}
+
+func (c ConnWithReconnect) UnauthenticatedBind(username string) error {
+	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}
+
+func (c ConnWithReconnect) SimpleBind(*ldap.SimpleBindRequest) (*ldap.SimpleBindResult, error) {
+	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}
+
+func (c ConnWithReconnect) ExternalBind() error {
+	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}
+
+func (c ConnWithReconnect) Add(*ldap.AddRequest) error {
+	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}
+
+func (c ConnWithReconnect) Del(*ldap.DelRequest) error {
+	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}
+
+func (c ConnWithReconnect) Modify(*ldap.ModifyRequest) error {
+	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}
+
+func (c ConnWithReconnect) ModifyDN(*ldap.ModifyDNRequest) error {
+	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}
+
+func (c ConnWithReconnect) ModifyWithResult(*ldap.ModifyRequest) (*ldap.ModifyResult, error) {
+	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}
+
+func (c ConnWithReconnect) Compare(dn, attribute, value string) (bool, error) {
+	return false, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}
+
+func (c ConnWithReconnect) PasswordModify(*ldap.PasswordModifyRequest) (*ldap.PasswordModifyResult, error) {
+	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}
+
+func (c ConnWithReconnect) SearchWithPaging(searchRequest *ldap.SearchRequest, pagingSize uint32) (*ldap.SearchResult, error) {
+	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
