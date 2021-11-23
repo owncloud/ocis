@@ -344,11 +344,12 @@ type DriverS3 struct {
 type DriverS3NG struct {
 	DriverCommon
 
-	Region    string `ocisConfig:"region"`
-	AccessKey string `ocisConfig:"access_key"`
-	SecretKey string `ocisConfig:"secret_key"`
-	Endpoint  string `ocisConfig:"endpoint"`
-	Bucket    string `ocisConfig:"bucket"`
+	ServiceUserUUID string `ocisConfig:"service_user_uuid"`
+	Region          string `ocisConfig:"region"`
+	AccessKey       string `ocisConfig:"access_key"`
+	SecretKey       string `ocisConfig:"secret_key"`
+	Endpoint        string `ocisConfig:"endpoint"`
+	Bucket          string `ocisConfig:"bucket"`
 }
 
 // OIDC defines the available OpenID Connect configuration.
@@ -655,11 +656,12 @@ func DefaultConfig() *Config {
 						UserLayout:  "{{.Id.OpaqueId}}",
 						EnableHome:  false,
 					},
-					Region:    "default",
-					AccessKey: "",
-					SecretKey: "",
-					Endpoint:  "",
-					Bucket:    "",
+					ServiceUserUUID: "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
+					Region:          "default",
+					AccessKey:       "",
+					SecretKey:       "",
+					Endpoint:        "",
+					Bucket:          "",
 				},
 				OCIS: DriverOCIS{
 					DriverCommon: DriverCommon{
@@ -2231,6 +2233,10 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3NG_LAYOUT"},
 			Destination: &cfg.Reva.MetadataStorage.S3NG.UserLayout,
+		},
+		{
+			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3NG_SERVICE_USER_UUID"},
+			Destination: &cfg.Reva.MetadataStorage.S3NG.ServiceUserUUID,
 		},
 		{
 			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3NG_REGION"},
