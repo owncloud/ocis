@@ -874,4 +874,104 @@ class SpacesContext implements Context {
 
 		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers);
 	}
+
+	/**
+	 * @When /^user "([^"]*)" changes the name of the "([^"]*)" space to "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $newName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function updateSpaceName(
+		string $user,
+		string $spaceName,
+		string $newName
+	): void {
+		$space = $this->getSpaceByName($spaceName);
+		$spaceId = $space["id"];
+
+		$bodyData = ["Name" => $newName];
+		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
+
+		$this->featureContext->setResponse(
+			$this->sendUpdateSpaceRequest(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$body,
+				$spaceId
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" changes the quota of the "([^"]*)" space to "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param int $newQuota
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function updateSpaceQuota(
+		string $user,
+		string $spaceName,
+		int $newQuota
+	): void {
+		$space = $this->getSpaceByName($spaceName);
+		$spaceId = $space["id"];
+
+		$bodyData = ["quota" => ["total" => $newQuota]];
+		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
+
+		$this->featureContext->setResponse(
+			$this->sendUpdateSpaceRequest(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$body,
+				$spaceId
+			)
+		);
+	}
+
+	/**
+	 * Send Graph Update Space Request
+	 *
+	 * @param  string $baseUrl
+	 * @param  string $user
+	 * @param  string $password
+	 * @param  mixed $body
+	 * @param  string $spaceId
+	 * @param  string $xRequestId
+	 * @param  array  $headers
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 */
+	public function sendUpdateSpaceRequest(
+		string $baseUrl,
+		string $user,
+		string $password,
+		$body,
+		string $spaceId,
+		string $xRequestId = '',
+		array $headers = []
+	): ResponseInterface {
+		$fullUrl = $baseUrl;
+		if (!str_ends_with($fullUrl, '/')) {
+			$fullUrl .= '/';
+		}
+		$fullUrl .= "graph/v1.0/Drive($spaceId)";
+		$method = 'PATCH';
+
+		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers, $body);
+	}
 }
