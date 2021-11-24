@@ -64,14 +64,17 @@ func MetadataDrivers(cfg *config.Config) map[string]interface{} {
 			"bucket":     cfg.Reva.MetadataStorage.S3.Bucket,
 		},
 		"s3ng": map[string]interface{}{
-			"root":          cfg.Reva.MetadataStorage.S3NG.Root,
-			"enable_home":   false,
-			"user_layout":   cfg.Reva.MetadataStorage.S3NG.UserLayout,
-			"s3.region":     cfg.Reva.MetadataStorage.S3NG.Region,
-			"s3.access_key": cfg.Reva.MetadataStorage.S3NG.AccessKey,
-			"s3.secret_key": cfg.Reva.MetadataStorage.S3NG.SecretKey,
-			"s3.endpoint":   cfg.Reva.MetadataStorage.S3NG.Endpoint,
-			"s3.bucket":     cfg.Reva.MetadataStorage.S3NG.Bucket,
+			"root":                cfg.Reva.MetadataStorage.S3NG.Root,
+			"enable_home":         false,
+			"user_layout":         cfg.Reva.MetadataStorage.S3NG.UserLayout,
+			"treetime_accounting": false,
+			"treesize_accounting": false,
+			"owner":               cfg.Reva.MetadataStorage.S3NG.ServiceUserUUID, // the accounts service system account uuid
+			"s3.region":           cfg.Reva.MetadataStorage.S3NG.Region,
+			"s3.access_key":       cfg.Reva.MetadataStorage.S3NG.AccessKey,
+			"s3.secret_key":       cfg.Reva.MetadataStorage.S3NG.SecretKey,
+			"s3.endpoint":         cfg.Reva.MetadataStorage.S3NG.Endpoint,
+			"s3.bucket":           cfg.Reva.MetadataStorage.S3NG.Bucket,
 		},
 	}
 }
