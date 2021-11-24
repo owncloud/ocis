@@ -713,7 +713,12 @@ func DefaultConfig() *Config {
 						UserLayout:  "{{.Id.OpaqueId}}",
 						EnableHome:  false,
 					},
-					Region: "default",
+					ServiceUserUUID: "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
+					Region:          "default",
+					AccessKey:       "",
+					SecretKey:       "",
+					Endpoint:        "",
+					Bucket:          "",
 				},
 				OCIS: DriverOCIS{
 					DriverCommon: DriverCommon{
