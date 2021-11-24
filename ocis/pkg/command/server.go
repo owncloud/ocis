@@ -4,8 +4,6 @@
 package command
 
 import (
-	"strings"
-
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 
 	"github.com/owncloud/ocis/ocis-pkg/config"
@@ -21,10 +19,6 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage:    "Start fullstack server",
 		Category: "Fullstack",
 		Before: func(c *cli.Context) error {
-			if cfg.HTTP.Root != "/" {
-				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
-			}
-
 			return ParseConfig(c, cfg)
 		},
 		Action: func(c *cli.Context) error {

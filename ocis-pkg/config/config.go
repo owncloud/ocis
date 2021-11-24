@@ -18,25 +18,6 @@ import (
 	webdav "github.com/owncloud/ocis/webdav/pkg/config"
 )
 
-// Debug defines the available debug configuration.
-type Debug struct {
-	Addr   string `ocisConfig:"addr"`
-	Token  string `ocisConfig:"token"`
-	Pprof  bool   `ocisConfig:"pprof"`
-	Zpages bool   `ocisConfig:"zpages"`
-}
-
-// HTTP defines the available http configuration.
-type HTTP struct {
-	Addr string `ocisConfig:"addr"`
-	Root string `ocisConfig:"root"`
-}
-
-// GRPC defines the available grpc configuration.
-type GRPC struct {
-	Addr string `ocisConfig:"addr"`
-}
-
 // Tracing defines the available tracing configuration.
 type Tracing struct {
 	Enabled   bool   `ocisConfig:"enabled"`
@@ -78,9 +59,6 @@ type Config struct {
 
 	Registry     string       `ocisConfig:"registry"`
 	Log          shared.Log   `ocisConfig:"log"`
-	Debug        Debug        `ocisConfig:"debug"`
-	HTTP         HTTP         `ocisConfig:"http"`
-	GRPC         GRPC         `ocisConfig:"grpc"`
 	Tracing      Tracing      `ocisConfig:"tracing"`
 	TokenManager TokenManager `ocisConfig:"token_manager"`
 	Runtime      Runtime      `ocisConfig:"runtime"`
@@ -121,19 +99,6 @@ func New() *Config {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Debug: Debug{
-			Addr:   "127.0.0.1:9010",
-			Token:  "",
-			Pprof:  false,
-			Zpages: false,
-		},
-		HTTP: HTTP{
-			Addr: "127.0.0.1:9000",
-			Root: "/",
-		},
-		GRPC: GRPC{
-			Addr: "127.0.0.1:9001",
-		},
 		Tracing: Tracing{
 			Enabled:   false,
 			Type:      "jaeger",
@@ -231,34 +196,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"OCIS_RUNTIME_HOST"},
 			Destination: &cfg.Runtime.Host,
-		},
-		{
-			EnvVars:     []string{"OCIS_DEBUG_ADDR"},
-			Destination: &cfg.Debug.Addr,
-		},
-		{
-			EnvVars:     []string{"OCIS_DEBUG_TOKEN"},
-			Destination: &cfg.Debug.Token,
-		},
-		{
-			EnvVars:     []string{"OCIS_DEBUG_PPROF"},
-			Destination: &cfg.Debug.Pprof,
-		},
-		{
-			EnvVars:     []string{"OCIS_DEBUG_ZPAGES"},
-			Destination: &cfg.Debug.Zpages,
-		},
-		{
-			EnvVars:     []string{"OCIS_HTTP_ADDR"},
-			Destination: &cfg.HTTP.Addr,
-		},
-		{
-			EnvVars:     []string{"OCIS_HTTP_ROOT"},
-			Destination: &cfg.HTTP.Root,
-		},
-		{
-			EnvVars:     []string{"OCIS_GRPC_ADDR"},
-			Destination: &cfg.GRPC.Addr,
 		},
 		{
 			EnvVars:     []string{"OCIS_RUN_EXTENSIONS"},
