@@ -2094,6 +2094,10 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Reva.UserStorage.S3NG.UserLayout,
 		},
 		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_SERVICE_USER_UUID"},
+			Destination: &cfg.Reva.UserStorage.S3NG.ServiceUserUUID,
+		},
+		{
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_SHARE_FOLDER"},
 			Destination: &cfg.Reva.UserStorage.S3NG.ShareFolder,
 		},

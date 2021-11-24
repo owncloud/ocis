@@ -115,15 +115,18 @@ func HomeDrivers(cfg *config.Config) map[string]interface{} {
 			"bucket":     cfg.Reva.UserStorage.S3.Bucket,
 		},
 		"s3ng": map[string]interface{}{
-			"root":          cfg.Reva.UserStorage.S3NG.Root,
-			"enable_home":   true,
-			"user_layout":   cfg.Reva.UserStorage.S3NG.UserLayout,
-			"share_folder":  cfg.Reva.UserStorage.S3NG.ShareFolder,
-			"s3.region":     cfg.Reva.UserStorage.S3NG.Region,
-			"s3.access_key": cfg.Reva.UserStorage.S3NG.AccessKey,
-			"s3.secret_key": cfg.Reva.UserStorage.S3NG.SecretKey,
-			"s3.endpoint":   cfg.Reva.UserStorage.S3NG.Endpoint,
-			"s3.bucket":     cfg.Reva.UserStorage.S3NG.Bucket,
+			"root":                cfg.Reva.UserStorage.S3NG.Root,
+			"enable_home":         true,
+			"user_layout":         cfg.Reva.UserStorage.S3NG.UserLayout,
+			"treetime_accounting": true,
+			"treesize_accounting": true,
+			"owner":               cfg.Reva.UserStorage.S3NG.ServiceUserUUID, // the accounts service system account uuid
+			"share_folder":        cfg.Reva.UserStorage.S3NG.ShareFolder,
+			"s3.region":           cfg.Reva.UserStorage.S3NG.Region,
+			"s3.access_key":       cfg.Reva.UserStorage.S3NG.AccessKey,
+			"s3.secret_key":       cfg.Reva.UserStorage.S3NG.SecretKey,
+			"s3.endpoint":         cfg.Reva.UserStorage.S3NG.Endpoint,
+			"s3.bucket":           cfg.Reva.UserStorage.S3NG.Bucket,
 		},
 	}
 }
