@@ -89,10 +89,10 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		},
 		{
 			EnvVars:     []string{"IDP_HTTP_NAMESPACE"},
-			Destination: &cfg.Service.Namespace,
+			Destination: &cfg.HTTP.Namespace,
 		},
 		{
-			EnvVars:     []string{"IDP_NAME"},
+			EnvVars:     []string{"IDP_SERVICE_NAME"},
 			Destination: &cfg.Service.Name,
 		},
 		{

@@ -56,12 +56,10 @@ type GRPC struct {
 	Namespace string `ocisConfig:"namespace"`
 }
 
-// Server configures a server.
-type Server struct {
-	Version            string `ocisConfig:"version"`
-	Name               string `ocisConfig:"name"`
-	HashDifficulty     int    `ocisConfig:"hash_difficulty"`
-	DemoUsersAndGroups bool   `ocisConfig:"demo_users_and_groups"`
+// Service defines the available service configuration.
+type Service struct {
+	Name    string `ocisConfig:"name"`
+	Version string `ocisConfig:"version"`
 }
 
 // Asset defines the available asset configuration.
@@ -125,17 +123,19 @@ type Tracing struct {
 type Config struct {
 	*shared.Commons
 
-	LDAP         LDAP         `ocisConfig:"ldap"`
-	HTTP         HTTP         `ocisConfig:"http"`
-	GRPC         GRPC         `ocisConfig:"grpc"`
-	Server       Server       `ocisConfig:"server"`
-	Asset        Asset        `ocisConfig:"asset"`
-	Log          *shared.Log  `ocisConfig:"log"`
-	TokenManager TokenManager `ocisConfig:"token_manager"`
-	Repo         Repo         `ocisConfig:"repo"`
-	Index        Index        `ocisConfig:"index"`
-	ServiceUser  ServiceUser  `ocisConfig:"service_user"`
-	Tracing      Tracing      `ocisConfig:"tracing"`
+	LDAP               LDAP         `ocisConfig:"ldap"`
+	HTTP               HTTP         `ocisConfig:"http"`
+	GRPC               GRPC         `ocisConfig:"grpc"`
+	Service            Service      `ocisConfig:"service"`
+	Asset              Asset        `ocisConfig:"asset"`
+	Log                *shared.Log  `ocisConfig:"log"`
+	TokenManager       TokenManager `ocisConfig:"token_manager"`
+	Repo               Repo         `ocisConfig:"repo"`
+	Index              Index        `ocisConfig:"index"`
+	ServiceUser        ServiceUser  `ocisConfig:"service_user"`
+	HashDifficulty     int          `ocisConfig:"hash_difficulty"`
+	DemoUsersAndGroups bool         `ocisConfig:"demo_users_and_groups"`
+	Tracing            Tracing      `ocisConfig:"tracing"`
 
 	Context    context.Context
 	Supervised bool
@@ -167,15 +167,15 @@ func DefaultConfig() *Config {
 			Addr:      "127.0.0.1:9180",
 			Namespace: "com.owncloud.api",
 		},
-		Server: Server{
-			Name:               "accounts",
-			HashDifficulty:     11,
-			DemoUsersAndGroups: true,
+		Service: Service{
+			Name: "accounts",
 		},
 		Asset: Asset{},
 		TokenManager: TokenManager{
 			JWTSecret: "Pive-Fumkiu4",
 		},
+		HashDifficulty:     11,
+		DemoUsersAndGroups: true,
 		Repo: Repo{
 			Backend: "CS3",
 			Disk: Disk{

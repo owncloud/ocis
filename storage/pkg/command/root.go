@@ -35,6 +35,7 @@ func Execute(cfg *config.Config) error {
 			AppProvider(cfg),
 			AuthBasic(cfg),
 			AuthBearer(cfg),
+			AuthMachine(cfg),
 			Sharing(cfg),
 			StorageUsers(cfg),
 			StorageShares(cfg),

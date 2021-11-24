@@ -16,12 +16,16 @@ type Debug struct {
 	Zpages bool   `ocisConfig:"zpages"`
 }
 
-// Server defines the available server configuration.
-type Server struct {
-	Name      string `ocisConfig:"name"`
+// GRPC defines the available grpc configuration.
+type GRPC struct {
+	Addr      string `ocisConfig:"addr"`
 	Namespace string `ocisConfig:"namespace"`
-	Address   string `ocisConfig:"address"`
-	Version   string `ocisConfig:"version"`
+}
+
+// Service provides configuration options for the service
+type Service struct {
+	Name    string `ocisConfig:"name"`
+	Version string `ocisConfig:"version"`
 }
 
 // Tracing defines the available tracing configuration.
@@ -40,7 +44,8 @@ type Config struct {
 	File      string      `ocisConfig:"file"`
 	Log       *shared.Log `ocisConfig:"log"`
 	Debug     Debug       `ocisConfig:"debug"`
-	Server    Server      `ocisConfig:"server"`
+	GRPC      GRPC        `ocisConfig:"grpc"`
+	Service   Service     `ocisConfig:"service"`
 	Tracing   Tracing     `ocisConfig:"tracing"`
 	Thumbnail Thumbnail   `ocisConfig:"thumbnail"`
 
@@ -81,10 +86,12 @@ func DefaultConfig() *Config {
 			Pprof:  false,
 			Zpages: false,
 		},
-		Server: Server{
-			Name:      "thumbnails",
+		GRPC: GRPC{
+			Addr:      "127.0.0.1:9185",
 			Namespace: "com.owncloud.api",
-			Address:   "127.0.0.1:9185",
+		},
+		Service: Service{
+			Name: "thumbnails",
 		},
 		Tracing: Tracing{
 			Enabled:   false,

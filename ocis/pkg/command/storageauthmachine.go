@@ -16,7 +16,7 @@ func StorageAuthMachineCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-auth-machine",
 		Usage:    "Start storage auth-machine service",
 		Category: "Extensions",
-		//Flags:    flagset.AuthBearerWithConfig(cfg.Storage),
+		//Flags:    flagset.AuthMachineWithConfig(cfg.Storage),
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)
 		},

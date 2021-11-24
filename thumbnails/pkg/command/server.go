@@ -43,15 +43,15 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			metrics.BuildInfo.WithLabelValues(cfg.Server.Version).Set(1)
+			metrics.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
 
 			service := grpc.NewService(
 				grpc.Logger(logger),
 				grpc.Context(ctx),
 				grpc.Config(cfg),
-				grpc.Name(cfg.Server.Name),
-				grpc.Namespace(cfg.Server.Namespace),
-				grpc.Address(cfg.Server.Address),
+				grpc.Name(cfg.Service.Name),
+				grpc.Namespace(cfg.GRPC.Namespace),
+				grpc.Address(cfg.GRPC.Addr),
 				grpc.Metrics(metrics),
 			)
 

@@ -57,7 +57,7 @@ func New(opts ...Option) (s *Service, err error) {
 	}
 
 	s = &Service{
-		id:          cfg.GRPC.Namespace + "." + cfg.Server.Name,
+		id:          cfg.GRPC.Namespace + "." + cfg.Service.Name,
 		log:         logger,
 		Config:      cfg,
 		RoleService: roleService,
@@ -81,11 +81,11 @@ func New(opts ...Option) (s *Service, err error) {
 		return nil, err
 	}
 
-	if err = s.createDefaultAccounts(cfg.Server.DemoUsersAndGroups); err != nil {
+	if err = s.createDefaultAccounts(cfg.DemoUsersAndGroups); err != nil {
 		return nil, err
 	}
 
-	if err = s.createDefaultGroups(cfg.Server.DemoUsersAndGroups); err != nil {
+	if err = s.createDefaultGroups(cfg.DemoUsersAndGroups); err != nil {
 		return nil, err
 	}
 	return

@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"strings"
 
 	glauthcfg "github.com/glauth/glauth/v2/pkg/config"
 	"github.com/oklog/run"
@@ -23,9 +22,6 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:  "server",
 		Usage: "Start integrated server",
 		Before: func(ctx *cli.Context) error {
-			if cfg.HTTP.Root != "/" {
-				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
-			}
 
 			if err := ParseConfig(ctx, cfg); err != nil {
 				return err

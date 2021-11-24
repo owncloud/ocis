@@ -22,6 +22,12 @@ type HTTP struct {
 	CacheTTL  int    `ocisConfig:"cache_ttl"`
 }
 
+// Service defines the available service configuration.
+type Service struct {
+	Name    string `ocisConfig:"name"`
+	Version string `ocisConfig:"version"`
+}
+
 // Tracing defines the available tracing configuration.
 type Tracing struct {
 	Enabled   bool   `ocisConfig:"enabled"`
@@ -92,6 +98,7 @@ type Config struct {
 	Log     *shared.Log `ocisConfig:"log"`
 	Debug   Debug       `ocisConfig:"debug"`
 	HTTP    HTTP        `ocisConfig:"http"`
+	Service Service     `ocisConfig:"service"`
 	Tracing Tracing     `ocisConfig:"tracing"`
 	Asset   Asset       `ocisConfig:"asset"`
 	Web     Web         `ocisConfig:"web"`
@@ -118,6 +125,9 @@ func DefaultConfig() *Config {
 			Root:      "/",
 			Namespace: "com.owncloud.web",
 			CacheTTL:  604800, // 7 days
+		},
+		Service: Service{
+			Name: "web",
 		},
 		Tracing: Tracing{
 			Enabled:   false,

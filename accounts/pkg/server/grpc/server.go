@@ -11,13 +11,13 @@ func Server(opts ...Option) grpc.Service {
 	handler := options.Handler
 
 	service := grpc.NewService(
-		grpc.Name(options.Config.Server.Name),
+		grpc.Name(options.Config.Service.Name),
 		grpc.Context(options.Context),
 		grpc.Address(options.Config.GRPC.Addr),
 		grpc.Namespace(options.Config.GRPC.Namespace),
 		grpc.Logger(options.Logger),
 		grpc.Flags(options.Flags...),
-		grpc.Version(options.Config.Server.Version),
+		grpc.Version(options.Config.Service.Version),
 	)
 
 	if err := proto.RegisterAccountsServiceHandler(service.Server(), handler); err != nil {

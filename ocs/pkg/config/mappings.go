@@ -84,11 +84,11 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.HTTP.Addr,
 		},
 		{
-			EnvVars:     []string{"OCS_NAMESPACE"},
-			Destination: &cfg.Service.Namespace,
+			EnvVars:     []string{"OCS_HTTP_NAMESPACE"},
+			Destination: &cfg.HTTP.Namespace,
 		},
 		{
-			EnvVars:     []string{"OCS_NAME"},
+			EnvVars:     []string{"OCS_SERVICE_NAME"},
 			Destination: &cfg.Service.Name,
 		},
 		{

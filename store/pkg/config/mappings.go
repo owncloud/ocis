@@ -66,14 +66,14 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		},
 		{
 			EnvVars:     []string{"STORE_GRPC_NAMESPACE"},
-			Destination: &cfg.Service.Namespace,
+			Destination: &cfg.GRPC.Namespace,
 		},
 		{
 			EnvVars:     []string{"STORE_GRPC_ADDR"},
 			Destination: &cfg.GRPC.Addr,
 		},
 		{
-			EnvVars:     []string{"STORE_NAME"},
+			EnvVars:     []string{"STORE_SERVICE_NAME"},
 			Destination: &cfg.Service.Name,
 		},
 		{

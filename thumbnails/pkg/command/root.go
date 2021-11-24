@@ -30,7 +30,7 @@ func Execute(cfg *config.Config) error {
 		},
 
 		Before: func(c *cli.Context) error {
-			cfg.Server.Version = version.String
+			cfg.Service.Version = version.String
 			return nil
 		},
 

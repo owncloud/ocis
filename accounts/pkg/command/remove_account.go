@@ -21,7 +21,7 @@ func RemoveAccount(cfg *config.Config) *cli.Command {
 		Aliases:   []string{"rm"},
 		Flags:     flagset.RemoveAccountWithConfig(cfg),
 		Action: func(c *cli.Context) error {
-			accServiceID := cfg.GRPC.Namespace + "." + cfg.Server.Name
+			accServiceID := cfg.GRPC.Namespace + "." + cfg.Service.Name
 			if c.NArg() != 1 {
 				fmt.Println("Please provide a user-id")
 				os.Exit(1)

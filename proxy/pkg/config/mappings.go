@@ -101,15 +101,9 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			EnvVars:     []string{"PROXY_HTTP_ROOT"},
 			Destination: &cfg.HTTP.Root,
 		},
-
-		// Service
 		{
-			EnvVars:     []string{"PROXY_SERVICE_NAMESPACE"},
-			Destination: &cfg.Service.Namespace,
-		},
-		{
-			EnvVars:     []string{"PROXY_SERVICE_NAME"},
-			Destination: &cfg.Service.Name,
+			EnvVars:     []string{"PROXY_HTTP_NAMESPACE"},
+			Destination: &cfg.HTTP.Namespace,
 		},
 		{
 			EnvVars:     []string{"PROXY_TRANSPORT_TLS_CERT"},
@@ -123,6 +117,14 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			EnvVars:     []string{"PROXY_TLS"},
 			Destination: &cfg.HTTP.TLS,
 		},
+
+		// Service
+		{
+			EnvVars:     []string{"PROXY_SERVICE_NAME"},
+			Destination: &cfg.Service.Name,
+		},
+
+		// Other
 		{
 			EnvVars:     []string{"OCIS_JWT_SECRET", "PROXY_JWT_SECRET"},
 			Destination: &cfg.TokenManager.JWTSecret,

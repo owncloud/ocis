@@ -18,7 +18,7 @@ func PrintVersion(cfg *config.Config) *cli.Command {
 		Usage: "Print the versions of the running instances",
 		Action: func(c *cli.Context) error {
 			reg := registry.GetRegistry()
-			services, err := reg.GetService(cfg.GRPC.Namespace + "." + cfg.Server.Name)
+			services, err := reg.GetService(cfg.GRPC.Namespace + "." + cfg.Service.Name)
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not get accounts services from the registry: %v", err))
 				return err

@@ -23,10 +23,10 @@ func UpdateAccountWithConfig(cfg *config.Config, a *accounts.Account) []cli.Flag
 		},
 		&cli.StringFlag{
 			Name:        "name",
-			Value:       flags.OverrideDefaultString(cfg.Server.Name, "accounts"),
+			Value:       flags.OverrideDefaultString(cfg.Service.Name, "accounts"),
 			Usage:       "service name",
 			EnvVars:     []string{"ACCOUNTS_NAME"},
-			Destination: &cfg.Server.Name,
+			Destination: &cfg.Service.Name,
 		},
 		&cli.BoolFlag{
 			Name:        "enabled",
@@ -107,10 +107,10 @@ func AddAccountWithConfig(cfg *config.Config, a *accounts.Account) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "name",
-			Value:       flags.OverrideDefaultString(cfg.Server.Name, "accounts"),
+			Value:       flags.OverrideDefaultString(cfg.Service.Name, "accounts"),
 			Usage:       "service name",
 			EnvVars:     []string{"ACCOUNTS_NAME"},
-			Destination: &cfg.Server.Name,
+			Destination: &cfg.Service.Name,
 		},
 		&cli.BoolFlag{
 			Name:        "enabled",
@@ -191,10 +191,10 @@ func ListAccountsWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "name",
-			Value:       flags.OverrideDefaultString(cfg.Server.Name, "accounts"),
+			Value:       flags.OverrideDefaultString(cfg.Service.Name, "accounts"),
 			Usage:       "service name",
 			EnvVars:     []string{"ACCOUNTS_NAME"},
-			Destination: &cfg.Server.Name,
+			Destination: &cfg.Service.Name,
 		},
 	}
 }
@@ -211,10 +211,10 @@ func RemoveAccountWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "name",
-			Value:       flags.OverrideDefaultString(cfg.Server.Name, "accounts"),
+			Value:       flags.OverrideDefaultString(cfg.Service.Name, "accounts"),
 			Usage:       "service name",
 			EnvVars:     []string{"ACCOUNTS_NAME"},
-			Destination: &cfg.Server.Name,
+			Destination: &cfg.Service.Name,
 		},
 	}
 }
@@ -231,10 +231,10 @@ func InspectAccountWithConfig(cfg *config.Config) []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "name",
-			Value:       flags.OverrideDefaultString(cfg.Server.Name, "accounts"),
+			Value:       flags.OverrideDefaultString(cfg.Service.Name, "accounts"),
 			Usage:       "service name",
 			EnvVars:     []string{"ACCOUNTS_NAME"},
-			Destination: &cfg.Server.Name,
+			Destination: &cfg.Service.Name,
 		},
 	}
 }

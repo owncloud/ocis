@@ -7,7 +7,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/registry"
 
 	tw "github.com/olekukonko/tablewriter"
-	"github.com/owncloud/ocis/idp/pkg/config"
+	"github.com/owncloud/ocis/web/pkg/config"
 	"github.com/urfave/cli/v2"
 )
 
@@ -23,12 +23,12 @@ func PrintVersion(cfg *config.Config) *cli.Command {
 			reg := registry.GetRegistry()
 			services, err := reg.GetService(cfg.HTTP.Namespace + "." + cfg.Service.Name)
 			if err != nil {
-				fmt.Println(fmt.Errorf("could not get idp services from the registry: %v", err))
+				fmt.Println(fmt.Errorf("could not get web services from the registry: %v", err))
 				return err
 			}
 
 			if len(services) == 0 {
-				fmt.Println("No running idp service found.")
+				fmt.Println("No running web service found.")
 				return nil
 			}
 

@@ -36,7 +36,7 @@ type HTTP struct {
 
 // GRPC defines the available grpc configuration.
 type GRPC struct {
-	Addr      string `ocisConfig:"grpc"`
+	Addr      string `ocisConfig:"addr"`
 	Namespace string `ocisConfig:"namespace"`
 }
 

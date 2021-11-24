@@ -85,7 +85,7 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		},
 		{
 			EnvVars:     []string{"WEBDAV_HTTP_NAMESPACE"},
-			Destination: &cfg.Service.Namespace,
+			Destination: &cfg.HTTP.Namespace,
 		},
 		{
 			EnvVars:     []string{"WEBDAV_SERVICE_NAME"},

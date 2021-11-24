@@ -21,10 +21,10 @@ type HTTP struct {
 	Namespace string `ocisConfig:"namespace"`
 }
 
-// Server configures a server.
-type Server struct {
-	Version string `ocisConfig:"version"`
+// Service defines the available service configuration.
+type Service struct {
 	Name    string `ocisConfig:"name"`
+	Version string `ocisConfig:"version"`
 }
 
 // Tracing defines the available tracing configuration.
@@ -50,7 +50,7 @@ type Config struct {
 	Log           shared.Log    `ocisConfig:"log"`
 	Debug         Debug         `ocisConfig:"debug"`
 	HTTP          HTTP          `ocisConfig:"http"`
-	Server        Server        `ocisConfig:"server"`
+	Service       Service       `ocisConfig:"service"`
 	Tracing       Tracing       `ocisConfig:"tracing"`
 	GraphExplorer GraphExplorer `ocisConfig:"graph_explorer"`
 
@@ -78,7 +78,9 @@ func DefaultConfig() *Config {
 			Root:      "/graph-explorer",
 			Namespace: "com.owncloud.web",
 		},
-		Server: Server{},
+		Service: Service{
+			Name: "graph",
+		},
 		Tracing: Tracing{
 			Type:      "jaeger",
 			Endpoint:  "",
