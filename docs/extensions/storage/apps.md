@@ -295,7 +295,8 @@ services:
     command: storage-app-provider server # start only the app driver
     environment:
       STORAGE_GATEWAY_ENDPOINT: ocis:9142 # oCIS gateway endpoint
-      APP_PROVIDER_BASIC_EXTERNAL_ADDR: ocis-appdriver-collabora:9164 # how oCIS can reach this app driver
+      APP_PROVIDER_GRPC_ADDR: 0.0.0.0:9164
+      APP_PROVIDER_EXTERNAL_ADDR: ocis-appdriver-collabora:9164 # how oCIS can reach this app driver
       OCIS_JWT_SECRET: ocis-jwt-secret
       APP_PROVIDER_DRIVER: wopi
       APP_PROVIDER_WOPI_DRIVER_APP_NAME: Collabora # will be used as name for this app

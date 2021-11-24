@@ -794,6 +794,7 @@ func DefaultConfig() *Config {
 			Users: Users{
 				Port: Port{
 					Endpoint:    "localhost:9144",
+					DebugAddr:   "127.0.0.1:9145",
 					GRPCNetwork: "tcp",
 					GRPCAddr:    "127.0.0.1:9144",
 					Services:    []string{"userprovider"},
@@ -1081,19 +1082,19 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		// app provider
 
 		{
-			EnvVars:     []string{"APP_PROVIDER_BASIC_DEBUG_ADDR"},
+			EnvVars:     []string{"APP_PROVIDER_DEBUG_ADDR"},
 			Destination: &cfg.Reva.AppProvider.DebugAddr,
 		},
 		{
-			EnvVars:     []string{"APP_PROVIDER_BASIC_GRPC_NETWORK"},
+			EnvVars:     []string{"APP_PROVIDER_GRPC_NETWORK"},
 			Destination: &cfg.Reva.AppProvider.GRPCNetwork,
 		},
 		{
-			EnvVars:     []string{"APP_PROVIDER_BASIC_GRPC_ADDR"},
+			EnvVars:     []string{"APP_PROVIDER_GRPC_ADDR"},
 			Destination: &cfg.Reva.AppProvider.GRPCAddr,
 		},
 		{
-			EnvVars:     []string{"APP_PROVIDER_BASIC_EXTERNAL_ADDR"},
+			EnvVars:     []string{"APP_PROVIDER_EXTERNAL_ADDR"},
 			Destination: &cfg.Reva.AppProvider.ExternalAddr,
 		},
 		{
