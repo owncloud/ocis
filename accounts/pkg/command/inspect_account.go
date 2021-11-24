@@ -22,7 +22,7 @@ func InspectAccount(cfg *config.Config) *cli.Command {
 		ArgsUsage: "id",
 		Flags:     flagset.InspectAccountWithConfig(cfg),
 		Action: func(c *cli.Context) error {
-			accServiceID := cfg.GRPC.Namespace + "." + cfg.Server.Name
+			accServiceID := cfg.GRPC.Namespace + "." + cfg.Service.Name
 			if c.NArg() != 1 {
 				fmt.Println("Please provide a user-id")
 				os.Exit(1)

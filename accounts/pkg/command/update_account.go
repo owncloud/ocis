@@ -40,7 +40,7 @@ func UpdateAccount(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			a.Id = c.Args().First()
-			accSvcID := cfg.GRPC.Namespace + "." + cfg.Server.Name
+			accSvcID := cfg.GRPC.Namespace + "." + cfg.Service.Name
 			accSvc := accounts.NewAccountsService(accSvcID, grpc.NewClient())
 			_, err := accSvc.UpdateAccount(c.Context, &accounts.UpdateAccountRequest{
 				Account:    a,

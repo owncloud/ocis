@@ -24,16 +24,16 @@ type CORS struct {
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr string `ocisConfig:"addr"`
-	Root string `ocisConfig:"root"`
-	CORS CORS   `ocisConfig:"cors"`
+	Addr      string `ocisConfig:"addr"`
+	Root      string `ocisConfig:"root"`
+	Namespace string `ocisConfig:"namespace"`
+	CORS      CORS   `ocisConfig:"cors"`
 }
 
 // Service defines the available service configuration.
 type Service struct {
-	Name      string `ocisConfig:"name"`
-	Namespace string `ocisConfig:"namespace"`
-	Version   string `ocisConfig:"version"`
+	Name    string `ocisConfig:"name"`
+	Version string `ocisConfig:"version"`
 }
 
 // Tracing defines the available tracing configuration.
@@ -76,8 +76,9 @@ func DefaultConfig() *Config {
 			Zpages: false,
 		},
 		HTTP: HTTP{
-			Addr: "127.0.0.1:9115",
-			Root: "/",
+			Addr:      "127.0.0.1:9115",
+			Root:      "/",
+			Namespace: "com.owncloud.web",
 			CORS: CORS{
 				AllowedOrigins:   []string{"*"},
 				AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
@@ -85,16 +86,15 @@ func DefaultConfig() *Config {
 				AllowCredentials: true,
 			},
 		},
+		Service: Service{
+			Name: "webdav",
+		},
 		Tracing: Tracing{
 			Enabled:   false,
 			Type:      "jaeger",
 			Endpoint:  "",
 			Collector: "",
 			Service:   "webdav",
-		},
-		Service: Service{
-			Name:      "webdav",
-			Namespace: "com.owncloud.web",
 		},
 		OcisPublicURL:   "https://127.0.0.1:9200",
 		WebdavNamespace: "/home",

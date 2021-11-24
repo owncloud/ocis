@@ -30,7 +30,7 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 		logger.Fatal().Err(err).Msg("resolutions not configured correctly")
 	}
 	svc := Thumbnail{
-		serviceID:       options.Config.Server.Namespace + "." + options.Config.Server.Name,
+		serviceID:       options.Config.GRPC.Namespace + "." + options.Config.Service.Name,
 		webdavNamespace: options.Config.Thumbnail.WebdavNamespace,
 		manager: thumbnail.NewSimpleManager(
 			resolutions,

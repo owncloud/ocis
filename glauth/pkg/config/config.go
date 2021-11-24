@@ -17,11 +17,10 @@ type Debug struct {
 	Zpages bool   `ocisConfig:"zpages"`
 }
 
-// HTTP defines the available http configuration.
-type HTTP struct {
-	Addr      string `ocisConfig:"addr"`
-	Namespace string `ocisConfig:"namespace"`
-	Root      string `ocisConfig:"root"`
+// Service defines the available service configuration.
+type Service struct {
+	Name    string `ocisConfig:"name"`
+	Version string `ocisConfig:"version"`
 }
 
 // Tracing defines the available tracing configuration.
@@ -35,16 +34,18 @@ type Tracing struct {
 
 // Ldap defined the available LDAP configuration.
 type Ldap struct {
-	Enabled bool   `ocisConfig:"enabled"`
-	Addr    string `ocisConfig:"addr"`
+	Enabled   bool   `ocisConfig:"enabled"`
+	Addr      string `ocisConfig:"addr"`
+	Namespace string `ocisConfig:"namespace"`
 }
 
 // Ldaps defined the available LDAPS configuration.
 type Ldaps struct {
-	Addr    string `ocisConfig:"addr"`
-	Enabled bool   `ocisConfig:"enabled"`
-	Cert    string `ocisConfig:"cert"`
-	Key     string `ocisConfig:"key"`
+	Enabled   bool   `ocisConfig:"enabled"`
+	Addr      string `ocisConfig:"addr"`
+	Namespace string `ocisConfig:"namespace"`
+	Cert      string `ocisConfig:"cert"`
+	Key       string `ocisConfig:"key"`
 }
 
 // Backend defined the available backend configuration.
@@ -66,7 +67,7 @@ type Config struct {
 	File           string      `ocisConfig:"file"`
 	Log            *shared.Log `ocisConfig:"log"`
 	Debug          Debug       `ocisConfig:"debug"`
-	HTTP           HTTP        `ocisConfig:"http"`
+	Service        Service     `ocisConfig:"service"`
 	Tracing        Tracing     `ocisConfig:"tracing"`
 	Ldap           Ldap        `ocisConfig:"ldap"`
 	Ldaps          Ldaps       `ocisConfig:"ldaps"`
@@ -89,20 +90,24 @@ func DefaultConfig() *Config {
 		Debug: Debug{
 			Addr: "127.0.0.1:9129",
 		},
-		HTTP: HTTP{},
 		Tracing: Tracing{
 			Type:    "jaeger",
 			Service: "glauth",
 		},
+		Service: Service{
+			Name: "glauth",
+		},
 		Ldap: Ldap{
-			Enabled: true,
-			Addr:    "127.0.0.1:9125",
+			Enabled:   true,
+			Addr:      "127.0.0.1:9125",
+			Namespace: "com.owncloud.ldap",
 		},
 		Ldaps: Ldaps{
-			Addr:    "127.0.0.1:9126",
-			Enabled: true,
-			Cert:    path.Join(defaults.BaseDataPath(), "ldap", "ldap.crt"),
-			Key:     path.Join(defaults.BaseDataPath(), "ldap", "ldap.key"),
+			Enabled:   true,
+			Addr:      "127.0.0.1:9126",
+			Namespace: "com.owncloud.ldaps",
+			Cert:      path.Join(defaults.BaseDataPath(), "ldap", "ldap.crt"),
+			Key:       path.Join(defaults.BaseDataPath(), "ldap", "ldap.key"),
 		},
 		Backend: Backend{
 			Datastore:   "accounts",

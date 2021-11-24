@@ -28,7 +28,7 @@ func Execute(cfg *config.Config) error {
 			},
 		},
 		Before: func(c *cli.Context) error {
-			cfg.Version = version.String
+			cfg.Service.Version = version.String
 			return nil
 		},
 		Commands: []*cli.Command{

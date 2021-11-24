@@ -24,16 +24,16 @@ type CORS struct {
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr string `ocisConfig:"addr"`
-	Root string `ocisConfig:"root"`
-	CORS CORS   `ocisConfig:"cors"`
+	Addr      string `ocisConfig:"addr"`
+	Root      string `ocisConfig:"root"`
+	Namespace string `ocisConfig:"namespace"`
+	CORS      CORS   `ocisConfig:"cors"`
 }
 
 // Service defines the available service configuration.
 type Service struct {
-	Name      string `ocisConfig:"name"`
-	Namespace string `ocisConfig:"namespace"`
-	Version   string `ocisConfig:"version"`
+	Name    string `ocisConfig:"name"`
+	Version string `ocisConfig:"version"`
 }
 
 // Tracing defines the available tracing configuration.
@@ -98,14 +98,18 @@ func DefaultConfig() *Config {
 			Zpages: false,
 		},
 		HTTP: HTTP{
-			Addr: "127.0.0.1:9110",
-			Root: "/ocs",
+			Addr:      "127.0.0.1:9110",
+			Root:      "/ocs",
+			Namespace: "com.owncloud.web",
 			CORS: CORS{
 				AllowedOrigins:   []string{"*"},
 				AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 				AllowedHeaders:   []string{"Authorization", "Origin", "Content-Type", "Accept", "X-Requested-With"},
 				AllowCredentials: true,
 			},
+		},
+		Service: Service{
+			Name: "ocs",
 		},
 		Tracing: Tracing{
 			Enabled:   false,
@@ -116,10 +120,6 @@ func DefaultConfig() *Config {
 		},
 		TokenManager: TokenManager{
 			JWTSecret: "Pive-Fumkiu4",
-		},
-		Service: Service{
-			Name:      "ocs",
-			Namespace: "com.owncloud.web",
 		},
 		AccountBackend:     "accounts",
 		Reva:               Reva{Address: "127.0.0.1:9142"},

@@ -11,7 +11,7 @@ func Server(opts ...Option) grpc.Service {
 	options := newOptions(opts...)
 
 	service := grpc.NewService(
-		grpc.Namespace(options.Config.Service.Namespace),
+		grpc.Namespace(options.Config.GRPC.Namespace),
 		grpc.Name(options.Config.Service.Name),
 		grpc.Version(options.Config.Service.Version),
 		grpc.Context(options.Context),

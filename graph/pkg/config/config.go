@@ -21,10 +21,10 @@ type HTTP struct {
 	Root      string `ocisConfig:"root"`
 }
 
-// Server configures a server.
-type Server struct {
-	Version string `ocisConfig:"version"`
+// Service defines the available service configuration.
+type Service struct {
 	Name    string `ocisConfig:"name"`
+	Version string `ocisConfig:"version"`
 }
 
 // Tracing defines the available tracing configuration.
@@ -85,7 +85,7 @@ type Config struct {
 	Log          *shared.Log  `ocisConfig:"log"`
 	Debug        Debug        `ocisConfig:"debug"`
 	HTTP         HTTP         `ocisConfig:"http"`
-	Server       Server       `ocisConfig:"server"`
+	Service      Service      `ocisConfig:"service"`
 	Tracing      Tracing      `ocisConfig:"tracing"`
 	Reva         Reva         `ocisConfig:"reva"`
 	TokenManager TokenManager `ocisConfig:"token_manager"`
@@ -109,10 +109,12 @@ func DefaultConfig() *Config {
 		},
 		HTTP: HTTP{
 			Addr:      "127.0.0.1:9120",
-			Namespace: "com.owncloud.web",
+			Namespace: "com.owncloud.graph",
 			Root:      "/graph",
 		},
-		Server: Server{},
+		Service: Service{
+			Name: "graph",
+		},
 		Tracing: Tracing{
 			Enabled: false,
 			Type:    "jaeger",

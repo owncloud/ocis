@@ -18,7 +18,7 @@ func Server(opts ...Option) (http.Service, error) {
 		http.Logger(options.Logger),
 		http.Name(options.Config.Service.Name),
 		http.Version(options.Config.Service.Version),
-		http.Namespace(options.Config.Service.Namespace),
+		http.Namespace(options.Config.HTTP.Namespace),
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
 		http.Flags(options.Flags...),

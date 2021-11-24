@@ -18,15 +18,15 @@ type Debug struct {
 
 // GRPC defines the available grpc configuration.
 type GRPC struct {
-	Addr string `ocisConfig:"addr"`
-	Root string `ocisConfig:"root"`
+	Addr      string `ocisConfig:"addr"`
+	Root      string `ocisConfig:"root"`
+	Namespace string `ocisConfig:"namespace"`
 }
 
 // Service defines the available service configuration.
 type Service struct {
-	Name      string `ocisConfig:"name"`
-	Namespace string `ocisConfig:"namespace"`
-	Version   string `ocisConfig:"version"`
+	Name    string `ocisConfig:"name"`
+	Version string `ocisConfig:"version"`
 }
 
 // Tracing defines the available tracing configuration.
@@ -67,7 +67,11 @@ func DefaultConfig() *Config {
 			Zpages: false,
 		},
 		GRPC: GRPC{
-			Addr: "127.0.0.1:9460",
+			Addr:      "127.0.0.1:9460",
+			Namespace: "com.owncloud.api",
+		},
+		Service: Service{
+			Name: "store",
 		},
 		Tracing: Tracing{
 			Enabled:   false,
@@ -77,10 +81,6 @@ func DefaultConfig() *Config {
 			Service:   "store",
 		},
 		Datapath: path.Join(defaults.BaseDataPath(), "store"),
-		Service: Service{
-			Name:      "store",
-			Namespace: "com.owncloud.api",
-		},
 	}
 }
 

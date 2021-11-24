@@ -21,7 +21,7 @@ func PrintVersion(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			reg := registry.GetRegistry()
-			services, err := reg.GetService(cfg.Service.Namespace + "." + cfg.Service.Name)
+			services, err := reg.GetService(cfg.GRPC.Namespace + "." + cfg.Service.Name)
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not get store services from the registry: %v", err))
 				return err

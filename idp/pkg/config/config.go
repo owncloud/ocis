@@ -19,11 +19,18 @@ type Debug struct {
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr    string `ocisConfig:"addr"`
-	Root    string `ocisConfig:"root"`
-	TLSCert string `ocisConfig:"tls_cert"`
-	TLSKey  string `ocisConfig:"tls_key"`
-	TLS     bool   `ocisConfig:"tls"`
+	Addr      string `ocisConfig:"addr"`
+	Root      string `ocisConfig:"root"`
+	Namespace string `ocisConfig:"namespace"`
+	TLSCert   string `ocisConfig:"tls_cert"`
+	TLSKey    string `ocisConfig:"tls_key"`
+	TLS       bool   `ocisConfig:"tls"`
+}
+
+// Service defines the available service configuration.
+type Service struct {
+	Name    string `ocisConfig:"name"`
+	Version string `ocisConfig:"version"`
 }
 
 // Ldap defines the available LDAP configuration.
@@ -39,13 +46,6 @@ type Ldap struct {
 	UUIDAttribute     string `ocisConfig:"uuid_attribute"`
 	UUIDAttributeType string `ocisConfig:"uuid_attribute_type"`
 	Filter            string `ocisConfig:"filter"`
-}
-
-// Service defines the available service configuration.
-type Service struct {
-	Name      string `ocisConfig:"name"`
-	Namespace string `ocisConfig:"namespace"`
-	Version   string `ocisConfig:"version"`
 }
 
 // Tracing defines the available tracing configuration.
@@ -125,11 +125,15 @@ func DefaultConfig() *Config {
 			Addr: "127.0.0.1:9134",
 		},
 		HTTP: HTTP{
-			Addr:    "127.0.0.1:9130",
-			Root:    "/",
-			TLSCert: path.Join(defaults.BaseDataPath(), "idp", "server.crt"),
-			TLSKey:  path.Join(defaults.BaseDataPath(), "idp", "server.key"),
-			TLS:     false,
+			Addr:      "127.0.0.1:9130",
+			Root:      "/",
+			Namespace: "com.owncloud.web",
+			TLSCert:   path.Join(defaults.BaseDataPath(), "idp", "server.crt"),
+			TLSKey:    path.Join(defaults.BaseDataPath(), "idp", "server.key"),
+			TLS:       false,
+		},
+		Service: Service{
+			Name: "idp",
 		},
 		Tracing: Tracing{
 			Type:      "jaeger",
@@ -183,10 +187,6 @@ func DefaultConfig() *Config {
 			UUIDAttribute:     "uid",
 			UUIDAttributeType: "text",
 			Filter:            "(objectClass=posixaccount)",
-		},
-		Service: Service{
-			Name:      "idp",
-			Namespace: "com.owncloud.web",
 		},
 	}
 }
