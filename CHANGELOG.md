@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Change - Restructure Configuration Parsing: [#2708](https://github.com/owncloud/ocis/pull/2708)
+* Enhancement - Cleanup ocis-pkg config: [#2813](https://github.com/owncloud/ocis/pull/2813)
 
 ## Details
 
@@ -18,6 +19,12 @@ The following sections list the changes for unreleased.
    files. This greatly simplifies configuration and deployment.
 
    https://github.com/owncloud/ocis/pull/2708
+
+* Enhancement - Cleanup ocis-pkg config: [#2813](https://github.com/owncloud/ocis/pull/2813)
+
+   Certain values were of no use when configuring the ocis runtime.
+
+   https://github.com/owncloud/ocis/pull/2813
 # Changelog for [1.15.0] (2021-11-19)
 
 The following sections list the changes for 1.15.0.
