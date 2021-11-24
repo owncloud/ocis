@@ -14,6 +14,8 @@ ownCloudUUID:: NTA5YTlkY2QtYmIzNy00ZjRmLWEwMWEtMTlkY2EyN2Q5Y2Zh
 uniqueMember: uid=einstein,ou=users,dc=owncloud,dc=com
 uniqueMember: uid=marie,ou=users,dc=owncloud,dc=com
 uniqueMember: uid=richard,ou=users,dc=owncloud,dc=com
+uniqueMember: uid=moss,ou=users,dc=owncloud,dc=com
+uniqueMember: uid=admin,ou=users,dc=owncloud,dc=com
 
 dn: cn=sailing-lovers,ou=groups,dc=owncloud,dc=com
 objectClass: groupOfUniqueNames

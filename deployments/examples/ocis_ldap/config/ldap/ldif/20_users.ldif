@@ -62,3 +62,43 @@ gidNumber: 30000
 homeDirectory: /home/richard
 ownCloudUUID:: OTMyYjQ1NDAtOGQxNi00ODFlLThlZjQtNTg4ZTRiNmIxNTFj
 userPassword:: e1NTSEF9Z05LZTRreHdmOGRUREY5eHlhSmpySTZ3MGxSVUM1d1RGcWROTVE9PQ==
+
+dn: uid=moss,ou=users,dc=owncloud,dc=com
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: ownCloud
+objectClass: person
+objectClass: posixAccount
+objectClass: top
+uid: moss
+givenName: Maurice
+sn: Moss
+cn: moss
+displayName: Maurice Moss
+description: A worker in the IT Department of Reynholm Industries. Of all the working staff in the IT Department, he is the most hard-working, the most experienced, and the most capable of doing his job well. He puts a lot of effort into his work, however he does not get the credit he deserves.
+mail: moss@example.org
+uidNumber: 20003
+gidNumber: 30000
+homeDirectory: /home/moss
+ownCloudUUID:: MDU4YmZmOTUtNjcwOC00ZmU1LTkxZTQtOWVhM2QzNzc1ODhi
+userPassword:: e1NTSEF9N0hEdTRoMkFDVExFWWt4U0RtSDZVQjhmUlpKRExDZDc=
+
+dn: uid=admin,ou=users,dc=owncloud,dc=com
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: ownCloud
+objectClass: person
+objectClass: posixAccount
+objectClass: top
+uid: admin
+givenName: Admin
+sn: Admin
+cn: admin
+displayName: Admin
+description: An admin for this oCIS instance.
+mail: admin@example.org
+uidNumber: 20004
+gidNumber: 30000
+homeDirectory: /home/admin
+ownCloudUUID:: ZGRjMjAwNGMtMDk3Ny0xMWViLTlkM2YtYTc5Mzg4OGNkMGY4
+userPassword:: e1NTSEF9UWhmaFB3dERydTUydURoWFFObDRMbzVIckI3TkI5Nmo=
