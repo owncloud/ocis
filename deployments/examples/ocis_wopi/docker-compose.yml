@@ -92,8 +92,8 @@ services:
     command: storage-app-provider server
     environment:
       REVA_GATEWAY: ${REVA_GATEWAY:-ocis:9142}
-      APP_PROVIDER_BASIC_GRPC_ADDR: 0.0.0.0:9164
-      APP_PROVIDER_BASIC_EXTERNAL_ADDR: ocis-appdriver-collabora:9164
+      APP_PROVIDER_GRPC_ADDR: 0.0.0.0:9164
+      APP_PROVIDER_EXTERNAL_ADDR: ocis-appdriver-collabora:9164
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       APP_PROVIDER_DRIVER: wopi
@@ -118,8 +118,8 @@ services:
     #command: storage-app-provider server
     environment:
       REVA_GATEWAY: ${REVA_GATEWAY:-ocis:9142}
-      APP_PROVIDER_BASIC_GRPC_ADDR: 0.0.0.0:9164
-      APP_PROVIDER_BASIC_EXTERNAL_ADDR: ocis-appdriver-onlyoffice:9164
+      APP_PROVIDER_GRPC_ADDR: 0.0.0.0:9164
+      APP_PROVIDER_EXTERNAL_ADDR: ocis-appdriver-onlyoffice:9164
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       APP_PROVIDER_DRIVER: wopi
@@ -146,8 +146,8 @@ services:
     #command: storage-app-provider server
     environment:
       REVA_GATEWAY: ${REVA_GATEWAY:-ocis:9142}
-      APP_PROVIDER_BASIC_GRPC_ADDR: 0.0.0.0:9164
-      APP_PROVIDER_BASIC_EXTERNAL_ADDR: ocis-appdriver-codimd:9164
+      APP_PROVIDER_GRPC_ADDR: 0.0.0.0:9164
+      APP_PROVIDER_EXTERNAL_ADDR: ocis-appdriver-codimd:9164
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       APP_PROVIDER_DRIVER: wopi
