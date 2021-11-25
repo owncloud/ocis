@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix using s3ng as the metadata storage backend: [#2807](https://github.com/owncloud/ocis/pull/2807)
+* Change - Rename `APP_PROVIDER_BASIC_*` environment variables: [#2812](https://github.com/owncloud/ocis/pull/2812)
 * Change - Restructure Configuration Parsing: [#2708](https://github.com/owncloud/ocis/pull/2708)
 * Enhancement - Cleanup ocis-pkg config: [#2813](https://github.com/owncloud/ocis/pull/2813)
 
@@ -18,6 +19,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/2668
    https://github.com/owncloud/ocis/pull/2807
+
+* Change - Rename `APP_PROVIDER_BASIC_*` environment variables: [#2812](https://github.com/owncloud/ocis/pull/2812)
+
+   We've renamed the `APP_PROVIDER_BASIC_*` to `APP_PROVIDER_*` since the `_BASIC_` part is a
+   copy and paste error. Now all app provider environment variables are consistently starting
+   with `APP_PROVIDER_*`.
+
+   https://github.com/owncloud/ocis/pull/2812
+   https://github.com/owncloud/ocis/pull/2811
 
 * Change - Restructure Configuration Parsing: [#2708](https://github.com/owncloud/ocis/pull/2708)
 
