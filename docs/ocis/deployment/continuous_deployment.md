@@ -115,7 +115,7 @@ Credentials:
 - oCIS: [ocis.ocis-s3.latest.owncloud.works](https://ocis.ocis-s3.latest.owncloud.works)
 - MinIO: [minio.ocis-s3.latest.owncloud.works](https://minio.ocis-s3.latest.owncloud.works)
 
-# oCIS with CS3 users
+# oCIS with LDAP for users and groups
 
 Credentials:
 
@@ -126,10 +126,10 @@ Credentials:
 
 ## Latest
 
-- oCIS: [ocis.ocis-cs3-users.latest.owncloud.works](https://ocis.ocis-cs3-users.latest.owncloud.works)
-- LDAP admin: [ldap.ocis-cs3-users.latest.owncloud.works](https://ldap.ocis-cs3-users.latest.owncloud.works)
+- oCIS: [ocis.ocis-ldap.latest.owncloud.works](https://ocis.ocis-ldap.latest.owncloud.works)
+- LDAP admin: [ldap.ocis-ldap.latest.owncloud.works](https://ldap.ocis-ldap.latest.owncloud.works)
 
 ## Released
 
-- oCIS: [ocis.ocis-cs3-users.released.owncloud.works](https://ocis.ocis-cs3-users.released.owncloud.works)
-- LDAP admin: [ldap.ocis-cs3-users.released.owncloud.works](https://ldap.ocis-cs3-users.released.owncloud.works)
+- oCIS: [ocis.ocis-ldap.released.owncloud.works](https://ocis.ocis-ldap.released.owncloud.works)
+- LDAP admin: [ldap.ocis-ldap.released.owncloud.works](https://ldap.ocis-ldap.released.owncloud.works)

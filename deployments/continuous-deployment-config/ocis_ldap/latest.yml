@@ -1,5 +1,5 @@
 ---
-- name: continuous-deployment-ocis-cs3-users-released
+- name: continuous-deployment-ocis-ldap-latest
   server:
     server_type: cx21
     image: ubuntu-20.04
@@ -14,7 +14,7 @@
       - /var/lib/docker/volumes/ocis_certs
 
   domains:
-    - "*.ocis-cs3-users.released.owncloud.works"
+    - "*.ocis-ldap.latest.owncloud.works"
 
   vars:
     ssh_authorized_keys:
@@ -31,21 +31,21 @@
       - name: ocis
         git_url: https://github.com/owncloud/ocis.git
         ref: master
-        docker_compose_path: deployments/examples/cs3_users_ocis
+        docker_compose_path: deployments/examples/ocis_ldap
         env:
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: wkloucek@owncloud.com
-          OCIS_DOCKER_TAG: 1
-          OCIS_DOMAIN: ocis.ocis-cs3-users.released.owncloud.works
-          LDAP_MANAGER_DOMAIN: ldap.ocis-cs3-users.released.owncloud.works
+          OCIS_DOCKER_TAG: latest
+          OCIS_DOMAIN: ocis.ocis-ldap.latest.owncloud.works
+          LDAP_MANAGER_DOMAIN: ldap.ocis-ldap.latest.owncloud.works
           COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
       - name: monitoring
         git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git
         ref: master
         env:
           NETWORK_NAME: ocis-net
-          TELEMETRY_SERVE_DOMAIN: telemetry.ocis-cs3-users.released.owncloud.works
+          TELEMETRY_SERVE_DOMAIN: telemetry.ocis-ldap.latest.owncloud.works
           JAEGER_COLLECTOR: jaeger-collector.infra.owncloud.works:443
           TELEGRAF_SPECIFIC_CONFIG: ocis_single_container
-          OCIS_URL: ocis.ocis-cs3-users.released.owncloud.works
-          OCIS_DEPLOYMENT_ID: continuous-deployment-ocis-cs3-users-released
+          OCIS_URL: ocis.ocis-ldap.latest.owncloud.works
+          OCIS_DEPLOYMENT_ID: continuous-deployment-ocis-ldap-latest
