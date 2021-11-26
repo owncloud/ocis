@@ -426,6 +426,8 @@ cannot share a folder with create permission
 -   [apiSharePublicLink1/createPublicLinkShare.feature:320](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L320)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:347](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L347)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:348](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L348)
+-   [apiSharePublicLink1/createPublicLinkShare.feature:377](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L377)
+-   [apiSharePublicLink1/createPublicLinkShare.feature:378](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L378)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:411](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L411)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:412](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L412)
 -   [apiSharePublicLink1/createPublicLinkShare.feature:413](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L413)
