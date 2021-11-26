@@ -283,7 +283,7 @@ func (o Ocs) AddGroup(w http.ResponseWriter, r *http.Request) {
 		if response.APIVersion(r.Context()) == "2" {
 			code = data.MetaBadRequest.StatusCode
 		}
-		mustNotFail(render.Render(w, r, response.ErrRender(code, "No groupid or display name provided")))
+		render.Render(w, r, response.ErrRender(code, "No groupid or display name provided"))
 		return
 	}
 
