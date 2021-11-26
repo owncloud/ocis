@@ -272,10 +272,26 @@ func (o Ocs) ListGroups(w http.ResponseWriter, r *http.Request) {
 }
 
 // AddGroup adds a group
+// oC10 implementation: https://github.com/owncloud/core/blob/762780a23c9eadda4fb5fa8db99eba66a5100b6e/apps/provisioning_api/lib/Groups.php#L126-L154
 func (o Ocs) AddGroup(w http.ResponseWriter, r *http.Request) {
 	groupid := r.PostFormValue("groupid")
 	displayname := r.PostFormValue("displayname")
 	gid := r.PostFormValue("gidnumber")
+
+	if displayname == "" && groupid == "" {
+		code := data.MetaFailure.StatusCode // v1
+		if response.APIVersion(r.Context()) == "2" {
+			code = data.MetaBadRequest.StatusCode
+		}
+		mustNotFail(render.Render(w, r, response.ErrRender(code, "No groupid or display name provided")))
+		return
+	}
+
+	if displayname == "" {
+		// oC10 OCS does not know about a group displayname
+		// therefore we fall back to the oC10 parameter groupid (which is the groupname in the oC10 world)
+		displayname = groupid
+	}
 
 	var gidNumber int64
 	var err error
@@ -287,10 +303,6 @@ func (o Ocs) AddGroup(w http.ResponseWriter, r *http.Request) {
 			o.logger.Error().Err(err).Str("gid", gid).Str("groupid", groupid).Msg("Cannot use the gidnumber provided")
 			return
 		}
-	}
-
-	if displayname == "" {
-		displayname = groupid
 	}
 
 	newGroup := &accounts.Group{
