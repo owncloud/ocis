@@ -80,7 +80,7 @@ func VersionCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		version := chi.URLParam(r, "version")
 		if version == "" {
-			mustNotFail(render.Render(w, r, ErrRender(data.MetaBadRequest.StatusCode, "unknown ocs api version")))
+			_ = render.Render(w, r, ErrRender(data.MetaBadRequest.StatusCode, "unknown ocs api version"))
 			return
 		}
 		w.Header().Set("Ocs-Api-Version", version)
@@ -89,10 +89,4 @@ func VersionCtx(next http.Handler) http.Handler {
 		ctx := context.WithValue(r.Context(), apiVersionKey, version)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
-}
-
-func mustNotFail(err error) {
-	if err != nil {
-		panic(err)
-	}
 }

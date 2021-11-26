@@ -63,7 +63,9 @@ func NewService(opts ...Option) Service {
 		svc.config.AccountBackend = "accounts"
 	}
 
-	requireUser := ocsm.RequireUser()
+	requireUser := ocsm.RequireUser(
+		ocsm.Logger(options.Logger),
+	)
 
 	requireAdmin := ocsm.RequireAdmin(
 		ocsm.RoleManager(roleManager),
@@ -153,7 +155,7 @@ func (o Ocs) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // NotFound uses ErrRender to always return a proper OCS payload
 func (o Ocs) NotFound(w http.ResponseWriter, r *http.Request) {
-	mustNotFail(render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "not found")))
+	o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "not found"))
 }
 
 func (o Ocs) getAccountService() accounts.AccountsService {
@@ -174,5 +176,11 @@ func (o Ocs) getGroupsService() accounts.GroupsService {
 
 // NotImplementedStub returns a not implemented error
 func (o Ocs) NotImplementedStub(w http.ResponseWriter, r *http.Request) {
-	mustNotFail(render.Render(w, r, response.ErrRender(data.MetaUnknownError.StatusCode, "Not implemented")))
+	o.mustRender(w, r, response.ErrRender(data.MetaUnknownError.StatusCode, "Not implemented"))
+}
+
+func (o Ocs) mustRender(w http.ResponseWriter, r *http.Request, renderer render.Renderer) {
+	if err := render.Render(w, r, renderer); err != nil {
+		o.logger.Err(err).Msgf("failed to write response for ocs request %s on %s", r.Method, r.URL)
+	}
 }
