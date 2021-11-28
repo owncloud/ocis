@@ -6,12 +6,23 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Disallow creation of a group with empty name via the OCS api: [#2825](https://github.com/owncloud/ocis/pull/2825)
 * Bugfix - Fix using s3ng as the metadata storage backend: [#2807](https://github.com/owncloud/ocis/pull/2807)
 * Change - Rename `APP_PROVIDER_BASIC_*` environment variables: [#2812](https://github.com/owncloud/ocis/pull/2812)
 * Change - Restructure Configuration Parsing: [#2708](https://github.com/owncloud/ocis/pull/2708)
 * Enhancement - Cleanup ocis-pkg config: [#2813](https://github.com/owncloud/ocis/pull/2813)
 
 ## Details
+
+* Bugfix - Disallow creation of a group with empty name via the OCS api: [#2825](https://github.com/owncloud/ocis/pull/2825)
+
+   We've fixed the behavior for group creation on the OCS api, where it was possible to create a
+   group with an empty name. This was is not possible on oC10 and is therefore also forbidden on oCIS
+   to keep compatibility. This PR forbids the creation and also ensures the correct status code
+   for both OCS v1 and OCS v2 apis.
+
+   https://github.com/owncloud/ocis/issues/2823
+   https://github.com/owncloud/ocis/pull/2825
 
 * Bugfix - Fix using s3ng as the metadata storage backend: [#2807](https://github.com/owncloud/ocis/pull/2807)
 
