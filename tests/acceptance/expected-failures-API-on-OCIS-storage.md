@@ -983,10 +983,6 @@ _ocs: api compatibility, return correct status code_
 -   [apiProvisioningGroups-v1/addGroup.feature:134](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addGroup.feature#L134)
 -   [apiProvisioningGroups-v2/addGroup.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addGroup.feature#L129)
 
-#### [creating a group with empty name doesn't give an error](https://github.com/owncloud/ocis/issues/2823)
--   [apiProvisioningGroups-v1/addGroup.feature:181](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addGroup.feature#L181)
--   [apiProvisioningGroups-v2/addGroup.feature:177](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addGroup.feature#L177)
-
 #### [cannot create group with '/'](https://github.com/owncloud/product/issues/285)
 -   [apiProvisioningGroups-v1/addToGroup.feature:82](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L82)
 -   [apiProvisioningGroups-v1/deleteGroup.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/deleteGroup.feature#L85)

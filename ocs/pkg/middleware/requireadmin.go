@@ -14,13 +14,19 @@ import (
 func RequireAdmin(opts ...Option) func(next http.Handler) http.Handler {
 	opt := newOptions(opts...)
 
+	mustRender := func(w http.ResponseWriter, r *http.Request, renderer render.Renderer) {
+		if err := render.Render(w, r, renderer); err != nil {
+			opt.Logger.Err(err).Msgf("failed to write response for ocs request %s on %s", r.Method, r.URL)
+		}
+	}
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 			// get roles from context
 			roleIDs, ok := roles.ReadRoleIDsFromContext(r.Context())
 			if !ok {
-				mustNotFail(render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized")))
+				mustRender(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized"))
 				return
 			}
 
@@ -30,13 +36,7 @@ func RequireAdmin(opts ...Option) func(next http.Handler) http.Handler {
 				return
 			}
 
-			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized")))
+			mustRender(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized"))
 		})
-	}
-}
-
-func mustNotFail(err error) {
-	if err != nil {
-		panic(err)
 	}
 }
