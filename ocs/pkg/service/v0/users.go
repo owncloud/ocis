@@ -102,7 +102,7 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, data.MessageUserNotFound))
 		} else {
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -288,7 +288,7 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, data.MessageUserNotFound))
 		} else {
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -366,7 +366,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, data.MessageUserNotFound))
 		} else {
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -470,7 +470,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, data.MessageUserNotFound))
 		} else {
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -523,7 +523,7 @@ func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, data.MessageUserNotFound))
 		} else {
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -574,7 +574,7 @@ func (o Ocs) DisableUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, data.MessageUserNotFound))
 		} else {
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -731,7 +731,7 @@ func (o Ocs) fetchAccountByUsername(ctx context.Context, name string) (*accounts
 	if res != nil && len(res.Accounts) == 1 {
 		return res.Accounts[0], nil
 	}
-	return nil, merrors.NotFound("", "The requested user could not be found")
+	return nil, merrors.NotFound("", data.MessageUserNotFound)
 }
 
 func (o Ocs) fetchAccountFromCS3Backend(ctx context.Context, name string) (*accounts.Account, error) {

@@ -56,7 +56,7 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			merr := merrors.FromError(err)
 			if merr.Code == http.StatusNotFound {
-				o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+				o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, data.MessageUserNotFound))
 			} else {
 				o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 			}
@@ -119,7 +119,7 @@ func (o Ocs) AddToGroup(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested user could not be found"))
+			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, data.MessageUserNotFound))
 		} else {
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -131,7 +131,7 @@ func (o Ocs) AddToGroup(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested group could not be found"))
+			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, data.MessageGroupNotFound))
 		} else {
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -146,7 +146,7 @@ func (o Ocs) AddToGroup(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested group could not be found"))
+			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, data.MessageGroupNotFound))
 		} else {
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -201,7 +201,7 @@ func (o Ocs) RemoveFromGroup(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			merr := merrors.FromError(err)
 			if merr.Code == http.StatusNotFound {
-				o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, "The requested user could not be found"))
+				o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, data.MessageUserNotFound))
 			} else {
 				o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 			}
@@ -215,7 +215,7 @@ func (o Ocs) RemoveFromGroup(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested group could not be found"))
+			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, data.MessageGroupNotFound))
 		} else {
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -230,7 +230,7 @@ func (o Ocs) RemoveFromGroup(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested group could not be found"))
+			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, data.MessageGroupNotFound))
 		} else {
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -352,7 +352,7 @@ func (o Ocs) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested group could not be found"))
+			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, data.MessageGroupNotFound))
 		} else {
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -366,7 +366,7 @@ func (o Ocs) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested group could not be found"))
+			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, data.MessageGroupNotFound))
 		} else {
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -388,7 +388,7 @@ func (o Ocs) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested group could not be found"))
+			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, data.MessageGroupNotFound))
 		} else {
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -400,7 +400,7 @@ func (o Ocs) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		merr := merrors.FromError(err)
 		if merr.Code == http.StatusNotFound {
-			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "The requested group could not be found"))
+			o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, data.MessageGroupNotFound))
 		} else {
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 		}
@@ -433,5 +433,5 @@ func (o Ocs) fetchGroupByName(ctx context.Context, name string) (*accounts.Group
 	if res != nil && len(res.Groups) == 1 {
 		return res.Groups[0], nil
 	}
-	return nil, merrors.NotFound("", "The requested group could not be found")
+	return nil, merrors.NotFound("", data.MessageGroupNotFound)
 }

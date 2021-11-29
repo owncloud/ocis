@@ -35,3 +35,9 @@ var MetaNotFound = Meta{Status: "error", StatusCode: 998, Message: "Not Found"}
 
 // MetaUnknownError is used for unknown errors
 var MetaUnknownError = Meta{Status: "error", StatusCode: 999, Message: "Unknown Error"}
+
+// MessageUserNotFound is  used when a user can not be found
+var MessageUserNotFound = "The requested user could not be found"
+
+// MessageGroupNotFound is used when a group can not be found
+var MessageGroupNotFound = "The requested group could not be found"
