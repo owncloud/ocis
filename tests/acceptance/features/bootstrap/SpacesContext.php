@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * ownCloud
  *
@@ -163,7 +163,7 @@ class SpacesContext implements Context {
 	 * @throws Exception
 	 */
 	public function getSpaceByNameFromResponse(string $name): array {
-		$response = json_decode($this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
+		$response = json_decode((string)$this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
 		$spaceAsArray = $response;
 		if (isset($response['name']) && $response['name'] === $name) {
 			return $response;
