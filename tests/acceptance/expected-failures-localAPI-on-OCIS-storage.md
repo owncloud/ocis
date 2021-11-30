@@ -9,3 +9,6 @@
 
 #### [downloading an archive with non existing / accessible id returns HTTP/500](https://github.com/owncloud/ocis/issues/2795)
 - [apiArchiver/downloadById.feature:69](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadByPath.feature#L69)
+
+#### [Overwriting a file in the space within the allowed quota does not work](https://github.com/owncloud/ocis/issues/2829)
+- [apiSpaces/quota.feature:59](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/quota.feature#L59)
