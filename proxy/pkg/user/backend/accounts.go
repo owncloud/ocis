@@ -123,8 +123,12 @@ func (a accountsServiceBackend) CreateUserFromClaims(ctx context.Context, claims
 		}
 	}
 	if req.Account.PreferredName, ok = claims[oidc.PreferredUsername].(string); !ok {
-		a.logger.Warn().Msg("Missing preferred_username claim")
-	} else {
+		a.logger.Warn().Msg("Missing preferred_username claim, falling back to email")
+		if req.Account.PreferredName, ok = claims[oidc.Email].(string); !ok {
+			a.logger.Debug().Msg("Missing email claim as well")
+		}
+	}
+	if req.Account.PreferredName != "" {
 		// also use as on premises samaccount name
 		req.Account.OnPremisesSamAccountName = req.Account.PreferredName
 	}
