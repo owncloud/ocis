@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Change - Rename `APP_PROVIDER_BASIC_*` environment variables: [#2812](https://github.com/owncloud/ocis/pull/2812)
 * Change - Restructure Configuration Parsing: [#2708](https://github.com/owncloud/ocis/pull/2708)
 * Enhancement - Cleanup ocis-pkg config: [#2813](https://github.com/owncloud/ocis/pull/2813)
+* Enhancement - Update REVA to v1.17.0: [#2835](https://github.com/owncloud/ocis/pull/2835)
 
 ## Details
 
@@ -54,6 +55,14 @@ The following sections list the changes for unreleased.
    Certain values were of no use when configuring the ocis runtime.
 
    https://github.com/owncloud/ocis/pull/2813
+
+* Enhancement - Update REVA to v1.17.0: [#2835](https://github.com/owncloud/ocis/pull/2835)
+
+   Updated REVA to v1.17.0 This update includes:
+
+  * #TODO: update this changelog before the next oCIS release
+
+   https://github.com/owncloud/ocis/pull/2835
 # Changelog for [1.15.0] (2021-11-19)
 
 The following sections list the changes for 1.15.0.
