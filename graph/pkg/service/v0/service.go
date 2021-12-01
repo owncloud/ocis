@@ -5,6 +5,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+
+	"github.com/owncloud/ocis/graph/pkg/identity"
+	"github.com/owncloud/ocis/graph/pkg/identity/ldap"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	opkgm "github.com/owncloud/ocis/ocis-pkg/middleware"
 )
@@ -24,10 +27,34 @@ func NewService(opts ...Option) Service {
 	m := chi.NewMux()
 	m.Use(options.Middleware...)
 
+	var backend identity.Backend
+	switch options.Config.Identity.Backend {
+	case "cs3":
+		backend = &identity.CS3{
+			Config: &options.Config.Reva,
+			Logger: &options.Logger,
+		}
+	case "ldap":
+		var err error
+		conn := ldap.NewLDAPWithReconnect(&options.Logger,
+			options.Config.Identity.LDAP.URI,
+			options.Config.Identity.LDAP.BindDN,
+			options.Config.Identity.LDAP.BindPassword,
+		)
+		if backend, err = identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger); err != nil {
+			options.Logger.Error().Msgf("Error initializing LDAP Backend: '%s'", err)
+			return nil
+		}
+	default:
+		options.Logger.Error().Msgf("Unknown Identity Backend: '%s'", options.Config.Identity.Backend)
+		return nil
+	}
+
 	svc := Graph{
-		config: options.Config,
-		mux:    m,
-		logger: &options.Logger,
+		config:          options.Config,
+		mux:             m,
+		logger:          &options.Logger,
+		identityBackend: backend,
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
@@ -41,14 +68,12 @@ func NewService(opts ...Option) Service {
 			r.Route("/users", func(r chi.Router) {
 				r.Get("/", svc.GetUsers)
 				r.Route("/{userID}", func(r chi.Router) {
-					r.Use(svc.UserCtx)
 					r.Get("/", svc.GetUser)
 				})
 			})
 			r.Route("/groups", func(r chi.Router) {
 				r.Get("/", svc.GetGroups)
 				r.Route("/{groupID}", func(r chi.Router) {
-					r.Use(svc.GroupCtx)
 					r.Get("/", svc.GetGroup)
 				})
 			})

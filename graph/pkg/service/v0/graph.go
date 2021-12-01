@@ -7,14 +7,16 @@ import (
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/graph/pkg/config"
+	"github.com/owncloud/ocis/graph/pkg/identity"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
 // Graph defines implements the business logic for Service.
 type Graph struct {
-	config *config.Config
-	mux    *chi.Mux
-	logger *log.Logger
+	config          *config.Config
+	mux             *chi.Mux
+	logger          *log.Logger
+	identityBackend identity.Backend
 }
 
 // ServeHTTP implements the Service interface.
@@ -26,15 +28,6 @@ func (g Graph) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (g Graph) GetClient() (gateway.GatewayAPIClient, error) {
 	return pool.GetGatewayServiceClient(g.config.Reva.Address)
 }
-
-// The key type is unexported to prevent collisions with context keys defined in
-// other packages.
-type key int
-
-const (
-	userKey key = iota
-	groupKey
-)
 
 type listResponse struct {
 	Value interface{} `json:"value,omitempty"`

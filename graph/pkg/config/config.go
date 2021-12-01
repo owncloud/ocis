@@ -52,6 +52,31 @@ type Spaces struct {
 	DefaultQuota string `ocisConfig:"default_quota"`
 }
 
+type LDAP struct {
+	URI          string `ocisConfig:"uri"`
+	BindDN       string `ocisConfig:"bind_dn"`
+	BindPassword string `ocisConfig:"bind_password"`
+
+	UserBaseDN               string `ocisConfig:"user_base_dn"`
+	UserSearchScope          string `ocisConfig:"user_search_scope"`
+	UserFilter               string `ocisConfig:"user_filter"`
+	UserEmailAttribute       string `ocisConfig:"user_mail_attribute"`
+	UserDisplayNameAttribute string `ocisConfig:"user_displayname_attribute"`
+	UserNameAttribute        string `ocisConfig:"user_name_attribute"`
+	UserIDAttribute          string `ocisConfig:"user_id_attribute"`
+
+	GroupBaseDN        string `ocisConfig:"group_base_dn"`
+	GroupSearchScope   string `ocisConfig:"group_search_scope"`
+	GroupFilter        string `ocisConfig:"group_filter"`
+	GroupNameAttribute string `ocisConfig:"group_name_attribute"`
+	GroupIDAttribute   string `ocisConfig:"group_id_attribute"`
+}
+
+type Identity struct {
+	Backend string `ocisConfig:"backend"`
+	LDAP    LDAP   `ocisConfig:"ldap"`
+}
+
 // Config combines all available configuration parts.
 type Config struct {
 	*shared.Commons
@@ -65,6 +90,7 @@ type Config struct {
 	Reva         Reva         `ocisConfig:"reva"`
 	TokenManager TokenManager `ocisConfig:"token_manager"`
 	Spaces       Spaces       `ocisConfig:"spaces"`
+	Identity     Identity     `ocisConfig:"identity"`
 
 	Context    context.Context
 	Supervised bool
@@ -102,6 +128,28 @@ func DefaultConfig() *Config {
 			WebDavBase:   "https://localhost:9200",
 			WebDavPath:   "/dav/spaces/",
 			DefaultQuota: "1000000000",
+		},
+		Identity: Identity{
+			Backend: "cs3",
+			LDAP: LDAP{
+				URI:                      "ldap://localhost:9125",
+				BindDN:                   "",
+				BindPassword:             "",
+				UserBaseDN:               "ou=users,dc=ocis,dc=test",
+				UserSearchScope:          "sub",
+				UserFilter:               "(objectClass=posixaccount)",
+				UserEmailAttribute:       "mail",
+				UserDisplayNameAttribute: "displayName",
+				UserNameAttribute:        "uid",
+				// FIXME: switch this to some more widely available attribute by default
+				//        ideally this needs to	be constant for the lifetime of a users
+				UserIDAttribute:    "ownclouduuid",
+				GroupBaseDN:        "ou=groups,dc=ocis,dc=test",
+				GroupSearchScope:   "sub",
+				GroupFilter:        "(objectclass=groupOfNames)",
+				GroupNameAttribute: "cn",
+				GroupIDAttribute:   "cn",
+			},
 		},
 	}
 }
