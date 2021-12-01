@@ -22,6 +22,7 @@
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Testwork\Environment\Environment;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
@@ -177,13 +178,20 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @param string $name
+	 * The method finds available spaces to the user and returns the space by spaceName
+	 * 
+	 * @param string $user
+	 * @param string $spaceName
 	 *
 	 * @return array
 	 */
-	public function getSpaceByName(string $name): array {
+	public function getSpaceByName(string $user, string $name): array {
+		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
+		
 		$spaces = $this->getAvailableSpaces();
-		Assert::assertIsArray($spaces[$name]);
+		Assert::assertIsArray($spaces[$name], "Space with name $name for user $user not found");
+		Assert::assertNotEmpty($spaces[$name]["root"]["webDavUrl"], "WebDavUrl for space with name $name for user $user not found");
+		
 		return $spaces[$name];
 	}
 
@@ -408,7 +416,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^the administrator gives "([^"]*)" the role "([^"]*)" using the settings api$/
+	 * @When /^the administrator has given "([^"]*)" the role "([^"]*)" using the settings api$/
 	 *
 	 * @param string $user
 	 * @param string $role
@@ -519,7 +527,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName
 	): void {
-		$space = $this->getSpaceByName($spaceName);
+		$space = $this->getSpaceByName($user, $spaceName);
 		Assert::assertIsArray($space);
 		Assert::assertNotEmpty($spaceId = $space["id"]);
 		Assert::assertNotEmpty($spaceWebDavUrl = $space["root"]["webDavUrl"]);
@@ -793,14 +801,56 @@ class SpacesContext implements Context {
 		string $folder,
 		string $spaceName
 	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+	
+		$baseUrl = $this->featureContext->getBaseUrl();
+		if (!str_ends_with($baseUrl, '/')) {
+			$baseUrl .= '/';
+		}
+		$fullUrl = $baseUrl . "dav/spaces/" . $space['id'] . '/' . $folder;
+
 		$this->featureContext->setResponse(
 			$this->sendCreateFolderRequest(
-				$this->featureContext->getBaseUrl(),
+				$fullUrl,
 				"MKCOL",
 				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$folder,
-				$spaceName
+				$this->featureContext->getPasswordForUser($user)
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" creates a folder "([^"]*)" in space "([^"]*)" owned by the user "([^"]*)" using the WebDav Api$/
+	 *
+	 * @param string $user
+	 * @param string $folder
+	 * @param string $spaceName
+	 * @param string $ownerUser
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 */
+	public function theUserCreatesAFolderToAnotherOwnerSpaceUsingTheGraphApi(
+		string $user,
+		string $folder,
+		string $spaceName,
+		string $ownerUser
+	): void {
+		$space = $this->getSpaceByName($ownerUser, $spaceName);
+	
+		$baseUrl = $this->featureContext->getBaseUrl();
+		if (!str_ends_with($baseUrl, '/')) {
+			$baseUrl .= '/';
+		}
+		$fullUrl = $baseUrl . "dav/spaces/" . $space['id'] . '/' . $folder;
+
+		$this->featureContext->setResponse(
+			$this->sendCreateFolderRequest(
+				$fullUrl,
+				"MKCOL",
+				$user,
+				$this->featureContext->getPasswordForUser($user)
 			)
 		);
 	}
@@ -823,7 +873,43 @@ class SpacesContext implements Context {
 		string $content,
 		string $destination
 	): void {
-		$space = $this->getSpaceByName($spaceName);
+		$space = $this->getSpaceByName($user, $spaceName);
+		Assert::assertIsArray($space, "Space with name $spaceName not found");
+		Assert::assertNotEmpty($space["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName not found");
+
+		$this->featureContext->setResponse(
+			$this->sendPutRequestToUrl(
+				$space["root"]["webDavUrl"] . "/" . $destination,
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				"",
+				[],
+				$content
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" uploads a file inside space "([^"]*)" owned by the user "([^"]*)" with content "([^"]*)" to "([^"]*)" using the WebDAV API$/ 
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $ownerUser
+	 * @param string $content
+	 * @param string $destination
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserUploadsAFileToAnotherOwnerSpace(
+		string $user,
+		string $spaceName,
+		string $ownerUser,
+		string $content,
+		string $destination
+	): void {
+		$space = $this->getSpaceByName($ownerUser, $spaceName);
 		Assert::assertIsArray($space, "Space with name $spaceName not found");
 		Assert::assertNotEmpty($space["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName not found");
 
@@ -842,12 +928,10 @@ class SpacesContext implements Context {
 	/**
 	 * Send Graph Create Folder Request
 	 *
-	 * @param  string $baseUrl
+	 * @param  string $fullUrl
 	 * @param  string $method
 	 * @param  string $user
 	 * @param  string $password
-	 * @param  string $folder
-	 * @param  string $spaceName
 	 * @param  string $xRequestId
 	 * @param  array  $headers
 	 *
@@ -856,22 +940,13 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function sendCreateFolderRequest(
-		string $baseUrl,
+		string $fullUrl,
 		string $method,
 		string $user,
 		string $password,
-		string $folder,
-		string $spaceName,
 		string $xRequestId = '',
 		array $headers = []
 	): ResponseInterface {
-		$spaceId = $this->getAvailableSpaces()[$spaceName]["id"];
-		$fullUrl = $baseUrl;
-		if (!str_ends_with($fullUrl, '/')) {
-			$fullUrl .= '/';
-		}
-		$fullUrl .= "dav/spaces/" . $spaceId . '/' . $folder;
-
 		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers);
 	}
 
@@ -891,7 +966,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $newName
 	): void {
-		$space = $this->getSpaceByName($spaceName);
+		$space = $this->getSpaceByName($user, $spaceName);
 		$spaceId = $space["id"];
 
 		$bodyData = ["Name" => $newName];
@@ -924,7 +999,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		int $newQuota
 	): void {
-		$space = $this->getSpaceByName($spaceName);
+		$space = $this->getSpaceByName($user, $spaceName);
 		$spaceId = $space["id"];
 
 		$bodyData = ["quota" => ["total" => $newQuota]];
@@ -973,5 +1048,64 @@ class SpacesContext implements Context {
 		$method = 'PATCH';
 
 		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers, $body);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has created a space "([^"]*)" of type "([^"]*)" with quota "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $spaceType
+	 * @param int $quota
+	 *
+	 * @return void
+	 */
+	public function userHasCreatedSpace(string $user, string $spaceName, string $spaceType, int $quota):void {
+		$space = ["Name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
+		$body = json_encode($space);
+		$this->featureContext->setResponse(
+			$this->sendCreateSpaceRequest(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$body,
+				""
+			)
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201, 
+			"Expected response status code should be 201 (Created)"
+		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has uploaded a file inside space "([^"]*)" with content "([^"]*)" to "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $fileContent
+	 * @param string $destination
+	 *
+	 * @return void
+	 */
+	public function userHasUploadedFile(string $user, string $spaceName, string $fileContent, string $destination):void {
+		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
+		
+		$space = $this->getSpaceByName($user, $spaceName);
+		Assert::assertIsArray($space, "Space with name $spaceName not found");
+		Assert::assertNotEmpty($space["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName not found");
+
+		$this->featureContext->setResponse(
+			$this->sendPutRequestToUrl(
+				$space["root"]["webDavUrl"] . "/" . $destination,
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				"",
+				[],
+				$fileContent
+			)
+		);
+
+		$this->featureContext->theHTTPStatusCodeShouldBeOr(201, 204);
 	}
 }

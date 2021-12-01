@@ -6,21 +6,19 @@ Feature: State of the quota
   | 0 - 75%  | normal   |
   | 76 - 90% | nearing  |
   | 91 - 99% | critical |
-  | 100 %    | exceded  |
+  | 100 %    | exceeded |
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
-    And the administrator gives "Alice" the role "Admin" using the settings api
+    And the administrator has given "Alice" the role "Admin" using the settings api
     
 
   Scenario Outline: check the quota display 
-    When user "Alice" creates a space "<spaceName>" of type "project" with quota "<total>" using the GraphApi
-    And user "Alice" lists all available spaces via the GraphApi
-    And user "Alice" uploads a file inside space "<spaceName>" with content "<fileContent>" to "test.txt" using the WebDAV API
-    Then the HTTP status code should be "201"
+    Given user "Alice" has created a space "<spaceName>" of type "project" with quota "<total>" 
+    And user "Alice" has uploaded a file inside space "<spaceName>" with content "<fileContent>" to "test.txt" 
     When user "Alice" lists all available spaces via the GraphApi
     Then the json responded should contain a space "<spaceName>" with these key and value pairs:
       | key              | value       |
@@ -41,35 +39,30 @@ Feature: State of the quota
 
   
   Scenario: uploading a file with an insufficient quota
-    When user "Alice" creates a space "Project Alfa" of type "project" with quota "10" using the GraphApi
-    And user "Alice" lists all available spaces via the GraphApi
-    And user "Alice" uploads a file inside space "Project Alfa" with content "More than 10 bytes" to "test.txt" using the WebDAV API
+    Given user "Alice" has created a space "Project Alfa" of type "project" with quota "10" 
+    When user "Alice" uploads a file inside space "Project Alfa" with content "More than 10 bytes" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "507"
 
 
   Scenario: creating a folder with an insufficient quota
-    When user "Alice" creates a space "Project Beta" of type "project" with quota "7" using the GraphApi
-    And user "Alice" lists all available spaces via the GraphApi
-    And user "Alice" uploads a file inside space "Project Alfa" with content "7 bytes" to "test.txt" using the WebDAV API
-    Then the HTTP status code should be "201"
+    Given user "Alice" has created a space "Project Beta" of type "project" with quota "7"
+    And user "Alice" has uploaded a file inside space "Project Beta" with content "7 bytes" to "test.txt"
     When user "Alice" creates a folder "NewFolder" in space "Project Beta" using the WebDav Api
     Then the HTTP status code should be "201" 
+    And for user "Alice" the space "Project Beta" should contain these entries:
+      | NewFolder |
 
 
   Scenario: overwriting a file with an enough quota
-    When user "Alice" creates a space "Project Gamma" of type "project" with quota "10" using the GraphApi
-    And user "Alice" lists all available spaces via the GraphApi
-    And user "Alice" uploads a file inside space "Project Gamma" with content "7 bytes" to "test.txt" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And user "Alice" uploads a file inside space "Project Gamma" with content "0010 bytes" to "test.txt" using the WebDAV API
+    Given user "Alice" has created a space "Project Gamma" of type "project" with quota "10" 
+    And user "Alice" has uploaded a file inside space "Project Gamma" with content "7 bytes" to "test.txt" 
+    When user "Alice" uploads a file inside space "Project Gamma" with content "0010 bytes" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "204"
 
 
   Scenario: overwriting a file with an insufficient quota
-    When user "Alice" creates a space "Project Delta" of type "project" with quota "10" using the GraphApi
-    And user "Alice" lists all available spaces via the GraphApi
-    And user "Alice" uploads a file inside space "Project Delta" with content "7 bytes" to "test.txt" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And user "Alice" uploads a file inside space "Project Delta" with content "00011 bytes" to "test.txt" using the WebDAV API
+    When user "Alice" has created a space "Project Delta" of type "project" with quota "10" 
+    And user "Alice" has uploaded a file inside space "Project Delta" with content "7 bytes" to "test.txt" 
+    When user "Alice" uploads a file inside space "Project Delta" with content "00011 bytes" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "507"
   
