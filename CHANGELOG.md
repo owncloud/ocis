@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix using s3ng as the metadata storage backend: [#2807](https://github.com/owncloud/ocis/pull/2807)
 * Change - Rename `APP_PROVIDER_BASIC_*` environment variables: [#2812](https://github.com/owncloud/ocis/pull/2812)
 * Change - Restructure Configuration Parsing: [#2708](https://github.com/owncloud/ocis/pull/2708)
+* Change - OIDC: fallback if IDP doesn't provide "preferred_username" claim: [#2644](https://github.com/owncloud/ocis/issues/2644)
 * Enhancement - Cleanup ocis-pkg config: [#2813](https://github.com/owncloud/ocis/pull/2813)
 * Enhancement - Update REVA to v1.17.0: [#2835](https://github.com/owncloud/ocis/pull/2835)
 
@@ -49,6 +50,12 @@ The following sections list the changes for unreleased.
    files. This greatly simplifies configuration and deployment.
 
    https://github.com/owncloud/ocis/pull/2708
+
+* Change - OIDC: fallback if IDP doesn't provide "preferred_username" claim: [#2644](https://github.com/owncloud/ocis/issues/2644)
+
+   Some IDPs don't add the "preferred_username" claim. Fallback to the "email" claim in that case
+
+   https://github.com/owncloud/ocis/issues/2644
 
 * Enhancement - Cleanup ocis-pkg config: [#2813](https://github.com/owncloud/ocis/pull/2813)
 
