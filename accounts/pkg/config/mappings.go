@@ -101,14 +101,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Repo.CS3.ProviderAddr,
 		},
 		{
-			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_DATA_URL"},
-			Destination: &cfg.Repo.CS3.DataURL,
-		},
-		{
-			EnvVars:     []string{"ACCOUNTS_STORAGE_CS3_DATA_PREFIX"},
-			Destination: &cfg.Repo.CS3.DataPrefix,
-		},
-		{
 			EnvVars:     []string{"OCIS_JWT_SECRET", "ACCOUNTS_STORAGE_CS3_JWT_SECRET"},
 			Destination: &cfg.Repo.CS3.JWTSecret,
 		},

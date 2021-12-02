@@ -2,8 +2,6 @@ package cs3
 
 import (
 	"context"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -16,7 +14,6 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	idxerrs "github.com/owncloud/ocis/ocis-pkg/indexer/errors"
 	"github.com/owncloud/ocis/ocis-pkg/indexer/index"
@@ -38,9 +35,7 @@ type NonUnique struct {
 	indexBaseDir    string
 	indexRootDir    string
 
-	tokenManager    token.Manager
-	storageProvider provider.ProviderAPIClient
-	dataProvider    dataProviderClient // Used to create and download data via http, bypassing reva upload protocol
+	metadataStorage *metadataStorage
 
 	cs3conf *Config
 }
@@ -69,16 +64,8 @@ func NewNonUniqueIndexWithOptions(o ...option.Option) index.Index {
 		indexRootDir:    path.Join(path.Join(opts.DataDir, "index.cs3"), strings.Join([]string{"non_unique", opts.TypeName, opts.IndexBy}, ".")),
 		cs3conf: &Config{
 			ProviderAddr: opts.ProviderAddr,
-			DataURL:      opts.DataURL,
-			DataPrefix:   opts.DataPrefix,
 			JWTSecret:    opts.JWTSecret,
 			ServiceUser:  opts.ServiceUser,
-		},
-		dataProvider: dataProviderClient{
-			baseURL: singleJoiningSlash(opts.DataURL, opts.DataPrefix),
-			client: http.Client{
-				Transport: http.DefaultTransport,
-			},
 		},
 	}
 }
@@ -93,27 +80,22 @@ func (idx *NonUnique) Init() error {
 		return err
 	}
 
-	idx.tokenManager = tokenManager
-
 	client, err := pool.GetStorageProviderServiceClient(idx.cs3conf.ProviderAddr)
 	if err != nil {
 		return err
 	}
 
-	idx.storageProvider = client
-
-	ctx := context.Background()
-	tk, err := idx.authenticate(ctx)
-	if err != nil {
-		return err
+	idx.metadataStorage = &metadataStorage{
+		tokenManager:      tokenManager,
+		storageProvider:   client,
+		dataGatewayClient: http.DefaultClient,
 	}
-	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, tk)
 
-	if err := idx.makeDirIfNotExists(ctx, idx.indexBaseDir); err != nil {
+	if err := idx.makeDirIfNotExists(idx.indexBaseDir); err != nil {
 		return err
 	}
 
-	if err := idx.makeDirIfNotExists(ctx, idx.indexRootDir); err != nil {
+	if err := idx.makeDirIfNotExists(idx.indexRootDir); err != nil {
 		return err
 	}
 
@@ -131,7 +113,7 @@ func (idx *NonUnique) Lookup(v string) ([]string, error) {
 		return nil, err
 	}
 
-	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
+	res, err := idx.metadataStorage.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
 			Path: path.Join("/meta", idx.indexRootDir, v),
 		},
@@ -156,13 +138,9 @@ func (idx *NonUnique) Add(id, v string) (string, error) {
 	if idx.caseInsensitive {
 		v = strings.ToLower(v)
 	}
-	ctx, err := idx.getAuthenticatedContext(context.Background())
-	if err != nil {
-		return "", err
-	}
 
 	newName := path.Join(idx.indexRootDir, v)
-	if err := idx.makeDirIfNotExists(ctx, newName); err != nil {
+	if err := idx.makeDirIfNotExists(newName); err != nil {
 		return "", err
 	}
 
@@ -191,7 +169,7 @@ func (idx *NonUnique) Remove(id string, v string) error {
 	}
 
 	deletePath := path.Join("/meta", idx.indexRootDir, v, id)
-	resp, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
+	resp, err := idx.metadataStorage.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
 			Path: deletePath,
 		},
@@ -206,7 +184,7 @@ func (idx *NonUnique) Remove(id string, v string) error {
 	}
 
 	toStat := path.Join("/meta", idx.indexRootDir, v)
-	lcResp, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
+	lcResp, err := idx.metadataStorage.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
 			Path: toStat,
 		},
@@ -217,7 +195,7 @@ func (idx *NonUnique) Remove(id string, v string) error {
 
 	if len(lcResp.Infos) == 0 {
 		deletePath = path.Join("/meta", idx.indexRootDir, v)
-		_, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
+		_, err := idx.metadataStorage.storageProvider.Delete(ctx, &provider.DeleteRequest{
 			Ref: &provider.Reference{
 				Path: deletePath,
 			},
@@ -261,7 +239,7 @@ func (idx *NonUnique) Search(pattern string) ([]string, error) {
 
 	foldersMatched := make([]string, 0)
 	matches := make([]string, 0)
-	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
+	res, err := idx.metadataStorage.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
 			Path: path.Join("/meta", idx.indexRootDir),
 		},
@@ -282,7 +260,7 @@ func (idx *NonUnique) Search(pattern string) ([]string, error) {
 	}
 
 	for i := range foldersMatched {
-		res, _ := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
+		res, _ := idx.metadataStorage.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 			Ref: &provider.Reference{
 				Path: foldersMatched[i],
 			},
@@ -316,12 +294,16 @@ func (idx *NonUnique) FilesDir() string {
 	return idx.filesDir
 }
 
-func (idx *NonUnique) makeDirIfNotExists(ctx context.Context, folder string) error {
-	return storage.MakeDirIfNotExist(ctx, idx.storageProvider, folder)
+func (idx *NonUnique) makeDirIfNotExists(folder string) error {
+	ctx, err := idx.getAuthenticatedContext(context.Background())
+	if err != nil {
+		return err
+	}
+	return storage.MakeDirIfNotExist(ctx, idx.metadataStorage.storageProvider, folder)
 }
 
 func (idx *NonUnique) createSymlink(oldname, newname string) error {
-	t, err := idx.authenticate(context.TODO())
+	ctx, err := idx.getAuthenticatedContext(context.Background())
 	if err != nil {
 		return err
 	}
@@ -330,43 +312,24 @@ func (idx *NonUnique) createSymlink(oldname, newname string) error {
 		return os.ErrExist
 	}
 
-	resp, err := idx.dataProvider.put(newname, strings.NewReader(oldname), t)
+	err = idx.metadataStorage.uploadHelper(ctx, newname, []byte(oldname))
 	if err != nil {
 		return err
 	}
-	if err = resp.Body.Close(); err != nil {
-		return err
-	}
-
 	return nil
 }
 
 func (idx *NonUnique) resolveSymlink(name string) (string, error) {
-	t, err := idx.authenticate(context.TODO())
+	ctx, err := idx.getAuthenticatedContext(context.Background())
 	if err != nil {
 		return "", err
 	}
 
-	resp, err := idx.dataProvider.get(name, t)
+	b, err := idx.metadataStorage.downloadHelper(ctx, name)
 	if err != nil {
 		return "", err
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		if resp.StatusCode == http.StatusNotFound {
-			return "", os.ErrNotExist
-		}
-
-		return "", fmt.Errorf("could not resolve symlink %s, got status %v", name, resp.StatusCode)
-	}
-
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-	if err = resp.Body.Close(); err != nil {
-		return "", err
-	}
 	return string(b), err
 }
 
@@ -386,9 +349,9 @@ func (idx *NonUnique) Delete() error {
 		return err
 	}
 
-	return deleteIndexRoot(ctx, idx.storageProvider, idx.indexRootDir)
+	return deleteIndexRoot(ctx, idx.metadataStorage.storageProvider, idx.indexRootDir)
 }
 
 func (idx *NonUnique) authenticate(ctx context.Context) (token string, err error) {
-	return storage.AuthenticateCS3(ctx, idx.cs3conf.ServiceUser, idx.tokenManager)
+	return storage.AuthenticateCS3(ctx, idx.cs3conf.ServiceUser, idx.metadataStorage.tokenManager)
 }

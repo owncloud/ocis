@@ -4,12 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"path"
 	"path/filepath"
-	"strings"
 
 	"github.com/cs3org/reva/pkg/auth/scope"
 
@@ -28,10 +27,10 @@ import (
 
 // CS3Repo provides a cs3 implementation of the Repo interface
 type CS3Repo struct {
-	cfg             *config.Config
-	tm              token.Manager
-	storageProvider provider.ProviderAPIClient
-	dataProvider    dataProviderClient // Used to create and download data via http, bypassing reva upload protocol
+	cfg               *config.Config
+	tm                token.Manager
+	storageProvider   provider.ProviderAPIClient
+	dataGatewayClient *http.Client
 }
 
 // NewCS3Repo creates a new cs3 repo
@@ -50,14 +49,10 @@ func NewCS3Repo(cfg *config.Config) (Repo, error) {
 	}
 
 	return CS3Repo{
-		cfg:             cfg,
-		tm:              tokenManager,
-		storageProvider: client,
-		dataProvider: dataProviderClient{
-			client: http.Client{
-				Transport: http.DefaultTransport,
-			},
-		},
+		cfg:               cfg,
+		tm:                tokenManager,
+		storageProvider:   client,
+		dataGatewayClient: http.DefaultClient,
 	}, nil
 }
 
@@ -78,14 +73,9 @@ func (r CS3Repo) WriteAccount(ctx context.Context, a *proto.Account) (err error)
 		return err
 	}
 
-	resp, err := r.dataProvider.put(r.accountURL(a.Id), bytes.NewReader(by), t)
-	if err != nil {
-		return err
-	}
-	if err = resp.Body.Close(); err != nil {
-		return err
-	}
-	return nil
+	err = r.uploadHelper(ctx, r.accountURL(a.Id), by)
+	return err
+
 }
 
 // LoadAccount loads an account via cs3 by id and writes it to the provided account
@@ -94,8 +84,9 @@ func (r CS3Repo) LoadAccount(ctx context.Context, id string, a *proto.Account) (
 	if err != nil {
 		return err
 	}
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
-	return r.loadAccount(id, t, a)
+	return r.loadAccount(ctx, id, a)
 }
 
 // LoadAccounts loads all the accounts from the cs3 api
@@ -118,7 +109,7 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err err
 	log := olog.NewLogger(olog.Pretty(r.cfg.Log.Pretty), olog.Color(r.cfg.Log.Color), olog.Level(r.cfg.Log.Level))
 	for i := range res.Infos {
 		acc := &proto.Account{}
-		err := r.loadAccount(filepath.Base(res.Infos[i].Path), t, acc)
+		err := r.loadAccount(ctx, filepath.Base(res.Infos[i].Path), acc)
 		if err != nil {
 			log.Err(err).Msg("could not load account")
 			continue
@@ -128,24 +119,16 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err err
 	return nil
 }
 
-func (r CS3Repo) loadAccount(id string, t string, a *proto.Account) error {
-	resp, err := r.dataProvider.get(r.accountURL(id), t)
+func (r CS3Repo) loadAccount(ctx context.Context, id string, a *proto.Account) error {
+	account, err := r.downloadHelper(ctx, r.accountURL(id))
 	if err != nil {
+		switch err.(type) {
+		case notFoundErr:
+			return notFoundErr{"account", id}
+		}
 		return err
 	}
-
-	if resp.StatusCode != http.StatusOK {
-		return &notFoundErr{"account", id}
-	}
-
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	if err = resp.Body.Close(); err != nil {
-		return err
-	}
-	return json.Unmarshal(b, &a)
+	return json.Unmarshal(account, &a)
 }
 
 // DeleteAccount deletes an account via cs3 by id
@@ -192,14 +175,8 @@ func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 		return err
 	}
 
-	resp, err := r.dataProvider.put(r.groupURL(g.Id), bytes.NewReader(by), t)
-	if err != nil {
-		return err
-	}
-	if err = resp.Body.Close(); err != nil {
-		return err
-	}
-	return nil
+	err = r.uploadHelper(ctx, r.groupURL(g.Id), by)
+	return err
 }
 
 // LoadGroup loads a group via cs3 by id and writes it to the provided group
@@ -208,8 +185,9 @@ func (r CS3Repo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err 
 	if err != nil {
 		return err
 	}
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
-	return r.loadGroup(id, t, g)
+	return r.loadGroup(ctx, id, g)
 }
 
 // LoadGroups loads all the groups from the cs3 api
@@ -232,7 +210,7 @@ func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) 
 	log := olog.NewLogger(olog.Pretty(r.cfg.Log.Pretty), olog.Color(r.cfg.Log.Color), olog.Level(r.cfg.Log.Level))
 	for i := range res.Infos {
 		grp := &proto.Group{}
-		err := r.loadGroup(filepath.Base(res.Infos[i].Path), t, grp)
+		err := r.loadGroup(ctx, filepath.Base(res.Infos[i].Path), grp)
 		if err != nil {
 			log.Err(err).Msg("could not load account")
 			continue
@@ -242,24 +220,16 @@ func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) 
 	return nil
 }
 
-func (r CS3Repo) loadGroup(id string, t string, g *proto.Group) error {
-	resp, err := r.dataProvider.get(r.groupURL(id), t)
+func (r CS3Repo) loadGroup(ctx context.Context, id string, g *proto.Group) error {
+	group, err := r.downloadHelper(ctx, r.groupURL(id))
 	if err != nil {
+		switch err.(type) {
+		case notFoundErr:
+			return notFoundErr{"group", id}
+		}
 		return err
 	}
-
-	if resp.StatusCode == http.StatusNotFound {
-		return &notFoundErr{"group", id}
-	}
-
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	if err = resp.Body.Close(); err != nil {
-		return err
-	}
-	return json.Unmarshal(b, &g)
+	return json.Unmarshal(group, &g)
 }
 
 // DeleteGroup deletes a group via cs3 by id
@@ -311,11 +281,11 @@ func AuthenticateCS3(ctx context.Context, su config.ServiceUser, tm token.Manage
 }
 
 func (r CS3Repo) accountURL(id string) string {
-	return singleJoiningSlash(r.cfg.Repo.CS3.DataURL, path.Join(r.cfg.Repo.CS3.DataPrefix, accountsFolder, id))
+	return path.Join(accountsFolder, id)
 }
 
 func (r CS3Repo) groupURL(id string) string {
-	return singleJoiningSlash(r.cfg.Repo.CS3.DataURL, path.Join(r.cfg.Repo.CS3.DataPrefix, groupsFolder, id))
+	return path.Join(groupsFolder, id)
 }
 
 func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error {
@@ -349,39 +319,91 @@ func MakeDirIfNotExist(ctx context.Context, sp provider.ProviderAPIClient, folde
 	return nil
 }
 
-// TODO: this is copied from proxy. Find a better solution or move it to ocis-pkg
-func singleJoiningSlash(a, b string) string {
-	aslash := strings.HasSuffix(a, "/")
-	bslash := strings.HasPrefix(b, "/")
-	switch {
-	case aslash && bslash:
-		return a + b[1:]
-	case !aslash && !bslash:
-		return a + "/" + b
+func (r CS3Repo) uploadHelper(ctx context.Context, path string, content []byte) error {
+
+	ref := provider.InitiateFileUploadRequest{
+		Ref: &provider.Reference{
+			Path: path,
+		},
 	}
-	return a + b
-}
 
-type dataProviderClient struct {
-	client http.Client
-}
-
-func (d dataProviderClient) put(url string, body io.Reader, token string) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodPut, url, body)
+	res, err := r.storageProvider.InitiateFileUpload(ctx, &ref)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	req.Header.Add(revactx.TokenHeader, token)
-	return d.client.Do(req)
+	var endpoint string
+
+	for _, proto := range res.GetProtocols() {
+		if proto.Protocol == "simple" {
+			endpoint = proto.GetUploadEndpoint()
+			break
+		}
+	}
+	if endpoint == "" {
+		return errors.New("metadata storage doesn't support the simple upload protocol")
+	}
+
+	req, err := http.NewRequest(http.MethodPut, endpoint, bytes.NewReader(content))
+	if err != nil {
+		return err
+	}
+	resp, err := r.dataGatewayClient.Do(req)
+	if err != nil {
+		return err
+	}
+	if err = resp.Body.Close(); err != nil {
+		return err
+	}
+	return nil
 }
 
-func (d dataProviderClient) get(url string, token string) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
+func (r CS3Repo) downloadHelper(ctx context.Context, path string) (content []byte, err error) {
+
+	ref := provider.InitiateFileDownloadRequest{
+		Ref: &provider.Reference{
+			Path: path,
+		},
 	}
 
-	req.Header.Add(revactx.TokenHeader, token)
-	return d.client.Do(req)
+	res, err := r.storageProvider.InitiateFileDownload(ctx, &ref)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	var endpoint string
+
+	for _, proto := range res.GetProtocols() {
+		if proto.Protocol == "simple" {
+			endpoint = proto.GetDownloadEndpoint()
+			break
+		}
+	}
+	if endpoint == "" {
+		return []byte{}, errors.New("metadata storage doesn't support the simple download protocol")
+	}
+
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return []byte{}, err
+	}
+	resp, err := r.dataGatewayClient.Do(req)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return []byte{}, &notFoundErr{}
+	}
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	if err = resp.Body.Close(); err != nil {
+		return []byte{}, err
+	}
+
+	return b, nil
 }

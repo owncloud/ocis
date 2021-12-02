@@ -89,8 +89,6 @@ type Disk struct {
 // CS3 is the cs3 implementation of the storage.
 type CS3 struct {
 	ProviderAddr string `ocisConfig:"provider_addr"`
-	DataURL      string `ocisConfig:"data_url"`
-	DataPrefix   string `ocisConfig:"data_prefix"`
 	JWTSecret    string `ocisConfig:"jwt_secret"`
 }
 
@@ -185,8 +183,6 @@ func DefaultConfig() *Config {
 			},
 			CS3: CS3{
 				ProviderAddr: "localhost:9215",
-				DataURL:      "http://localhost:9216",
-				DataPrefix:   "data",
 				JWTSecret:    "Pive-Fumkiu4",
 			},
 		},
