@@ -12,10 +12,10 @@ Feature: Upload files into a space
     And the administrator has given "Alice" the role "Admin" using the settings api
 
   Scenario: Alice creates a folder via the Graph api in space, she expects a 201 code and she checks that folder exists
-    Given user "Alice" has created a space "Project Venus" of type "project" with quota "2000" 
-    When user "Alice" creates a folder "mainFolder" in space "Project Venus" using the WebDav Api
+    Given user "Alice" has created a space "Project Ceres" of type "project" with quota "2000" 
+    When user "Alice" creates a folder "mainFolder" in space "Project Ceres" using the WebDav Api
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Project Venus" should contain these entries:
+    And for user "Alice" the space "Project Ceres" should contain these entries:
       | mainFolder        |
 
   Scenario: Bob creates a folder via the Graph api in a space, he expects a 404 code and Alice checks that this folder does not exist

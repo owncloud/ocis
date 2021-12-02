@@ -179,7 +179,7 @@ class SpacesContext implements Context {
 
 	/**
 	 * The method finds available spaces to the user and returns the space by spaceName
-	 * 
+	 *
 	 * @param string $user
 	 * @param string $spaceName
 	 *
@@ -890,7 +890,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" uploads a file inside space "([^"]*)" owned by the user "([^"]*)" with content "([^"]*)" to "([^"]*)" using the WebDAV API$/ 
+	 * @When /^user "([^"]*)" uploads a file inside space "([^"]*)" owned by the user "([^"]*)" with content "([^"]*)" to "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
@@ -1073,7 +1073,7 @@ class SpacesContext implements Context {
 			)
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
-			201, 
+			201,
 			"Expected response status code should be 201 (Created)"
 		);
 	}
