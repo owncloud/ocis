@@ -180,8 +180,8 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 					"driver": cfg.Reva.StorageRegistry.Driver,
 					"drivers": map[string]interface{}{
 						"spaces": map[string]interface{}{
-							"home_provider": cfg.Reva.StorageRegistry.HomeProvider,
-							"rules":         spacesRules(cfg, logger),
+							"home_template": cfg.Reva.StorageRegistry.HomeProvider,
+							"providers":     spacesProviders(cfg, logger),
 						},
 					},
 				},
@@ -191,7 +191,7 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 	return rcfg
 }
 
-func spacesRules(cfg *config.Config, logger log.Logger) map[string]map[string]interface{} {
+func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[string]interface{} {
 
 	// if a list of rules is given it overrides the generated rules from below
 	if len(cfg.Reva.StorageRegistry.Rules) > 0 {
@@ -220,21 +220,24 @@ func spacesRules(cfg *config.Config, logger log.Logger) map[string]map[string]in
 
 	// generate rules based on default config
 	return map[string]map[string]interface{}{
-		"/users": {
-			"address":       cfg.Reva.StorageUsers.Endpoint,
+		cfg.Reva.StorageUsers.Endpoint: {
+			"mount_path":    "/users",
 			"space_type":    "personal",
 			"path_template": "/users/{{.Space.Owner.Id.OpaqueId}}",
+			"description":   "Personal Spaces",
 		},
-		"/users/{{.CurrentUser.Id.OpaqueId}}/Shares/{{.Space.Name}}": {
-			"address":       cfg.Reva.StorageShares.Endpoint,
+		cfg.Reva.StorageShares.Endpoint: {
+			"mount_path":    "/users/{{.CurrentUser.Id.OpaqueId}}/Shares",
 			"space_type":    "share",
 			"path_template": "/users/{{.CurrentUser.Id.OpaqueId}}/Shares/{{.Space.Name}}",
+			"description":   "Shares",
 		},
 		// public link storage returns the mount id of the actual storage
-		"/public": {
-			"address":       cfg.Reva.StoragePublicLink.Endpoint,
+		cfg.Reva.StoragePublicLink.Endpoint: {
+			"mount_path":    "/public",
 			"space_type":    "public",
 			"path_template": "/public",
+			"description":   "Public Links",
 		},
 		// medatada storage not part of the global namespace
 	}
