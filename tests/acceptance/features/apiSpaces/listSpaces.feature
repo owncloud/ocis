@@ -30,7 +30,7 @@ Feature: List and create spaces
     Then the HTTP status code should be "401"
 
   Scenario: Alice creates Space via Graph api with default quota, she expects a 201 code the correct data and that space exists
-    Given the administrator gives "Alice" the role "Admin" using the settings api
+    Given the administrator has given "Alice" the role "Admin" using the settings api
     When user "Alice" creates a space "Project Mars" of type "project" with the default quota using the GraphApi
     Then the HTTP status code should be "201"
     And the json responded should contain a space "Project Mars" with these key and value pairs:
@@ -45,7 +45,7 @@ Feature: List and create spaces
       | .space/ |
 
   Scenario: Alice creates Space via Graph api with certain quota, she expects a 201 code and the correct data in the response
-    Given the administrator gives "Alice" the role "Admin" using the settings api
+    Given the administrator has given "Alice" the role "Admin" using the settings api
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
     Then the HTTP status code should be "201"
     And the json responded should contain a space "Project Venus" with these key and value pairs:
