@@ -585,8 +585,8 @@ func DefaultConfig() *Config {
 				EnableMedialSearch: false,
 			},
 			OCDav: OCDav{
-				WebdavNamespace:   "/home/",
-				DavFilesNamespace: "/users/",
+				WebdavNamespace:   "/users/{{.Id.OpaqueId}}",
+				DavFilesNamespace: "/users",
 			},
 			Archiver: Archiver{
 				MaxNumFiles: 10000,
@@ -751,7 +751,7 @@ func DefaultConfig() *Config {
 				ArchiverPrefix:             "archiver",
 				DatagatewayPrefix:          "data",
 				Favorites:                  false,
-				OCDavInsecure:              false,
+				OCDavInsecure:              true,
 				OCDavPrefix:                "",
 				OCSPrefix:                  "ocs",
 				OCSSharePrefix:             "/Shares",
@@ -782,7 +782,7 @@ func DefaultConfig() *Config {
 				EtagCacheTTL:               0,
 			},
 			StorageRegistry: StorageRegistry{
-				Driver:       "static",
+				Driver:       "spaces",
 				HomeProvider: "/home",
 				JSON:         "",
 			},

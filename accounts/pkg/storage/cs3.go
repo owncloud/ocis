@@ -35,7 +35,6 @@ type CS3Repo struct {
 	tm              token.Manager
 	storageProvider provider.ProviderAPIClient
 	metadataStorage metadatastorage.MetadataStorage
-	space           *provider.StorageSpace
 }
 
 // NewCS3Repo creates a new cs3 repo
@@ -104,13 +103,13 @@ func (r *CS3Repo) Init() (err error) {
 	case err != nil:
 		return err
 	case cssr.Status.Code == v1beta11.Code_CODE_OK:
-		// continue
-	case cssr.Status.Code != v1beta11.Code_CODE_ALREADY_EXISTS:
-		// continue
+		r.metadataStorage.SpaceRoot = cssr.StorageSpace.Root
+	case cssr.Status.Code == v1beta11.Code_CODE_ALREADY_EXISTS:
+		// TODO make CreateStorageSpace return existing space?
+		r.metadataStorage.SpaceRoot = &provider.ResourceId{StorageId: r.cfg.ServiceUser.UUID, OpaqueId: r.cfg.ServiceUser.UUID}
 	default:
 		return errtypes.NewErrtypeFromStatus(cssr.Status)
 	}
-	r.metadataStorage.SpaceRoot = cssr.StorageSpace.Root
 	return nil
 }
 
@@ -154,7 +153,7 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err err
 
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			ResourceId: r.space.Root,
+			ResourceId: r.metadataStorage.SpaceRoot,
 			Path:       utils.MakeRelativePath(accountsFolder),
 		},
 	})
@@ -195,7 +194,7 @@ func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			ResourceId: r.space.Root,
+			ResourceId: r.metadataStorage.SpaceRoot,
 			Path:       utils.MakeRelativePath(filepath.Join("/", accountsFolder, id)),
 		},
 	})
@@ -251,7 +250,7 @@ func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) 
 
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			ResourceId: r.space.Root,
+			ResourceId: r.metadataStorage.SpaceRoot,
 			Path:       utils.MakeRelativePath(groupsFolder),
 		},
 	})
@@ -292,7 +291,7 @@ func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			ResourceId: r.space.Root,
+			ResourceId: r.metadataStorage.SpaceRoot,
 			Path:       utils.MakeRelativePath(filepath.Join(groupsFolder, id)),
 		},
 	})
@@ -345,7 +344,7 @@ func (r CS3Repo) groupURL(id string) string {
 }
 
 func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error {
-	return MakeDirIfNotExist(ctx, r.storageProvider, r.space.Root, folder)
+	return MakeDirIfNotExist(ctx, r.storageProvider, r.metadataStorage.SpaceRoot, folder)
 }
 
 // MakeDirIfNotExist will create a root node in the metadata storage. Requires an authenticated context.
