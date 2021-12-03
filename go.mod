@@ -215,7 +215,6 @@ require (
 	github.com/sony/gobreaker v0.4.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/steveyen/gtreap v0.1.0 // indirect
-	github.com/studio-b12/gowebdav v0.0.0-20210917133250-a3a86976a1df // indirect
 	github.com/tus/tusd v1.6.0 // indirect
 	github.com/wk8/go-ordered-map v0.2.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
@@ -241,3 +240,7 @@ require (
 	stash.kopano.io/kgol/kcc-go/v5 v5.0.1 // indirect
 	stash.kopano.io/kgol/oidc-go v0.3.2 // indirect
 )
+
+replace github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20211202110423-9a39aa29c2ea
+
+//replace github.com/cs3org/reva => ../reva
