@@ -4,11 +4,19 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"path"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/token"
+	"google.golang.org/grpc/metadata"
+)
+
+const (
+	storageMountPath = "/meta"
 )
 
 type metadataStorage struct {
@@ -17,11 +25,11 @@ type metadataStorage struct {
 	dataGatewayClient *http.Client
 }
 
-func (r metadataStorage) uploadHelper(ctx context.Context, path string, content []byte) error {
+func (r metadataStorage) uploadHelper(ctx context.Context, uploadpath string, content []byte) error {
 
 	ref := provider.InitiateFileUploadRequest{
 		Ref: &provider.Reference{
-			Path: path,
+			Path: path.Join(storageMountPath, uploadpath),
 		},
 	}
 
@@ -46,6 +54,9 @@ func (r metadataStorage) uploadHelper(ctx context.Context, path string, content 
 	if err != nil {
 		return err
 	}
+
+	md, _ := metadata.FromOutgoingContext(ctx)
+	req.Header.Add(revactx.TokenHeader, md.Get(revactx.TokenHeader)[0])
 	resp, err := r.dataGatewayClient.Do(req)
 	if err != nil {
 		return err
@@ -56,11 +67,10 @@ func (r metadataStorage) uploadHelper(ctx context.Context, path string, content 
 	return nil
 }
 
-func (r metadataStorage) downloadHelper(ctx context.Context, path string) (content []byte, err error) {
-
+func (r metadataStorage) downloadHelper(ctx context.Context, downloadpath string) (content []byte, err error) {
 	ref := provider.InitiateFileDownloadRequest{
 		Ref: &provider.Reference{
-			Path: path,
+			Path: path.Join(storageMountPath, downloadpath),
 		},
 	}
 
@@ -85,14 +95,17 @@ func (r metadataStorage) downloadHelper(ctx context.Context, path string) (conte
 	if err != nil {
 		return []byte{}, err
 	}
+
+	md, _ := metadata.FromOutgoingContext(ctx)
+	req.Header.Add(revactx.TokenHeader, md.Get(revactx.TokenHeader)[0])
 	resp, err := r.dataGatewayClient.Do(req)
 	if err != nil {
 		return []byte{}, err
 	}
 
-	//if resp.StatusCode != http.StatusOK {
-	//	return []byte{}, &notFoundErr{}
-	//}
+	if resp.StatusCode != http.StatusOK {
+		return []byte{}, &notFoundErr{}
+	}
 
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -104,4 +117,18 @@ func (r metadataStorage) downloadHelper(ctx context.Context, path string) (conte
 	}
 
 	return b, nil
+}
+
+type notFoundErr struct {
+	typ, id string
+}
+
+func (e notFoundErr) Error() string {
+	return fmt.Sprintf("%s with id %s not found", e.typ, e.id)
+}
+
+// IsNotFoundErr can be returned by repo Load and Delete operations
+func IsNotFoundErr(e error) bool {
+	_, ok := e.(*notFoundErr)
+	return ok
 }

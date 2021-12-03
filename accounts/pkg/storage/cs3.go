@@ -25,6 +25,10 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+const (
+	storageMountPath = "/meta"
+)
+
 // CS3Repo provides a cs3 implementation of the Repo interface
 type CS3Repo struct {
 	cfg               *config.Config
@@ -99,7 +103,7 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err err
 	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Path: path.Join("/meta", accountsFolder),
+			Path: path.Join(storageMountPath, accountsFolder),
 		},
 	})
 	if err != nil {
@@ -142,7 +146,7 @@ func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Path: path.Join("/meta", accountsFolder, id),
+			Path: path.Join(storageMountPath, accountsFolder, id),
 		},
 	})
 
@@ -200,7 +204,7 @@ func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) 
 	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Path: path.Join("/meta", groupsFolder),
+			Path: path.Join(storageMountPath, groupsFolder),
 		},
 	})
 	if err != nil {
@@ -243,7 +247,7 @@ func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Path: path.Join("/meta", groupsFolder, id),
+			Path: path.Join(storageMountPath, groupsFolder, id),
 		},
 	})
 
@@ -268,6 +272,7 @@ func AuthenticateCS3(ctx context.Context, su config.ServiceUser, tm token.Manage
 	u := &user.User{
 		Id: &user.UserId{
 			OpaqueId: su.UUID,
+			Type:     user.UserType_USER_TYPE_APPLICATION,
 		},
 		Groups:    []string{},
 		UidNumber: su.UID,
@@ -295,7 +300,7 @@ func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error
 // MakeDirIfNotExist will create a root node in the metadata storage. Requires an authenticated context.
 func MakeDirIfNotExist(ctx context.Context, sp provider.ProviderAPIClient, folder string) error {
 	var rootPathRef = &provider.Reference{
-		Path: path.Join("/meta", folder),
+		Path: path.Join(storageMountPath, folder),
 	}
 
 	resp, err := sp.Stat(ctx, &provider.StatRequest{
@@ -319,11 +324,11 @@ func MakeDirIfNotExist(ctx context.Context, sp provider.ProviderAPIClient, folde
 	return nil
 }
 
-func (r CS3Repo) uploadHelper(ctx context.Context, path string, content []byte) error {
+func (r CS3Repo) uploadHelper(ctx context.Context, uploadpath string, content []byte) error {
 
 	ref := provider.InitiateFileUploadRequest{
 		Ref: &provider.Reference{
-			Path: path,
+			Path: path.Join(storageMountPath, uploadpath),
 		},
 	}
 
@@ -348,6 +353,8 @@ func (r CS3Repo) uploadHelper(ctx context.Context, path string, content []byte) 
 	if err != nil {
 		return err
 	}
+	md, _ := metadata.FromOutgoingContext(ctx)
+	req.Header.Add(revactx.TokenHeader, md.Get(revactx.TokenHeader)[0])
 	resp, err := r.dataGatewayClient.Do(req)
 	if err != nil {
 		return err
@@ -358,11 +365,11 @@ func (r CS3Repo) uploadHelper(ctx context.Context, path string, content []byte) 
 	return nil
 }
 
-func (r CS3Repo) downloadHelper(ctx context.Context, path string) (content []byte, err error) {
+func (r CS3Repo) downloadHelper(ctx context.Context, downloadpath string) (content []byte, err error) {
 
 	ref := provider.InitiateFileDownloadRequest{
 		Ref: &provider.Reference{
-			Path: path,
+			Path: path.Join(storageMountPath, downloadpath),
 		},
 	}
 
@@ -387,6 +394,8 @@ func (r CS3Repo) downloadHelper(ctx context.Context, path string) (content []byt
 	if err != nil {
 		return []byte{}, err
 	}
+	md, _ := metadata.FromOutgoingContext(ctx)
+	req.Header.Add(revactx.TokenHeader, md.Get(revactx.TokenHeader)[0])
 	resp, err := r.dataGatewayClient.Do(req)
 	if err != nil {
 		return []byte{}, err

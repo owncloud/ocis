@@ -922,7 +922,7 @@ func DefaultConfig() *Config {
 				},
 				Driver:           "ocis",
 				ExposeDataServer: false,
-				DataServerURL:    "http://localhost:9216",
+				DataServerURL:    "http://localhost:9216/data",
 				TempFolder:       path.Join(defaults.BaseDataPath(), "tmp", "metadata"),
 				DataProvider:     DataProvider{},
 			},
