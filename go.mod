@@ -241,3 +241,5 @@ require (
 	stash.kopano.io/kgol/kcc-go/v5 v5.0.1 // indirect
 	stash.kopano.io/kgol/oidc-go v0.3.2 // indirect
 )
+
+replace github.com/cs3org/reva => github.com/fschade/reva v1.4.1-0.20211203011658-519e54bfdee8
