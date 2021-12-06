@@ -203,7 +203,7 @@ func New() *Config {
 func DefaultConfig() *Config {
 	return &Config{
 		Debug: Debug{
-			Addr:  "0.0.0.0:9205",
+			Addr:  "127.0.0.1:9205",
 			Token: "",
 		},
 		HTTP: HTTP{
