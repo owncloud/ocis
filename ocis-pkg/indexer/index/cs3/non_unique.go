@@ -337,7 +337,7 @@ func (idx *NonUnique) resolveSymlink(name string) (string, error) {
 }
 
 func (idx *NonUnique) getAuthenticatedContext(ctx context.Context) (context.Context, error) {
-	t, err := idx.authenticate(ctx)
+	t, err := storage.AuthenticateCS3(ctx, idx.cs3conf.ServiceUser, idx.metadataStorage.tokenManager)
 	if err != nil {
 		return nil, err
 	}
@@ -353,8 +353,4 @@ func (idx *NonUnique) Delete() error {
 	}
 
 	return deleteIndexRoot(ctx, idx.metadataStorage.storageProvider, idx.indexRootDir)
-}
-
-func (idx *NonUnique) authenticate(ctx context.Context) (token string, err error) {
-	return storage.AuthenticateCS3(ctx, idx.cs3conf.ServiceUser, idx.metadataStorage.tokenManager)
 }

@@ -297,12 +297,8 @@ func (idx *Unique) makeDirIfNotExists(folder string) error {
 	return storage.MakeDirIfNotExist(ctx, idx.metadataStorage.storageProvider, folder)
 }
 
-func (idx *Unique) authenticate(ctx context.Context) (token string, err error) {
-	return storage.AuthenticateCS3(ctx, idx.cs3conf.ServiceUser, idx.metadataStorage.tokenManager)
-}
-
 func (idx *Unique) getAuthenticatedContext(ctx context.Context) (context.Context, error) {
-	t, err := idx.authenticate(ctx)
+	t, err := storage.AuthenticateCS3(ctx, idx.cs3conf.ServiceUser, idx.metadataStorage.tokenManager)
 	if err != nil {
 		return nil, err
 	}

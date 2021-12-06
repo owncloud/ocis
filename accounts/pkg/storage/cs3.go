@@ -62,12 +62,11 @@ func NewCS3Repo(cfg *config.Config) (Repo, error) {
 
 // WriteAccount writes an account via cs3 and modifies the provided account (e.g. with a generated id).
 func (r CS3Repo) WriteAccount(ctx context.Context, a *proto.Account) (err error) {
-	t, err := r.authenticate(ctx)
+	ctx, err = r.getAuthenticatedContext(ctx)
 	if err != nil {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	if err := r.makeRootDirIfNotExist(ctx, accountsFolder); err != nil {
 		return err
 	}
@@ -84,23 +83,21 @@ func (r CS3Repo) WriteAccount(ctx context.Context, a *proto.Account) (err error)
 
 // LoadAccount loads an account via cs3 by id and writes it to the provided account
 func (r CS3Repo) LoadAccount(ctx context.Context, id string, a *proto.Account) (err error) {
-	t, err := r.authenticate(ctx)
+	ctx, err = r.getAuthenticatedContext(ctx)
 	if err != nil {
 		return err
 	}
-	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
 	return r.loadAccount(ctx, id, a)
 }
 
 // LoadAccounts loads all the accounts from the cs3 api
 func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err error) {
-	t, err := r.authenticate(ctx)
+	ctx, err = r.getAuthenticatedContext(ctx)
 	if err != nil {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
 			Path: path.Join(storageMountPath, accountsFolder),
@@ -136,12 +133,10 @@ func (r CS3Repo) loadAccount(ctx context.Context, id string, a *proto.Account) e
 
 // DeleteAccount deletes an account via cs3 by id
 func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
-	t, err := r.authenticate(ctx)
+	ctx, err = r.getAuthenticatedContext(ctx)
 	if err != nil {
 		return err
 	}
-
-	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
@@ -163,12 +158,11 @@ func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
 
 // WriteGroup writes a group via cs3 and modifies the provided group (e.g. with a generated id).
 func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
-	t, err := r.authenticate(ctx)
+	ctx, err = r.getAuthenticatedContext(ctx)
 	if err != nil {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	if err := r.makeRootDirIfNotExist(ctx, groupsFolder); err != nil {
 		return err
 	}
@@ -184,23 +178,21 @@ func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 
 // LoadGroup loads a group via cs3 by id and writes it to the provided group
 func (r CS3Repo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err error) {
-	t, err := r.authenticate(ctx)
+	ctx, err = r.getAuthenticatedContext(ctx)
 	if err != nil {
 		return err
 	}
-	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
 	return r.loadGroup(ctx, id, g)
 }
 
 // LoadGroups loads all the groups from the cs3 api
 func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) {
-	t, err := r.authenticate(ctx)
+	ctx, err = r.getAuthenticatedContext(ctx)
 	if err != nil {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
 			Path: path.Join(storageMountPath, groupsFolder),
@@ -236,12 +228,10 @@ func (r CS3Repo) loadGroup(ctx context.Context, id string, g *proto.Group) error
 
 // DeleteGroup deletes a group via cs3 by id
 func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
-	t, err := r.authenticate(ctx)
+	ctx, err = r.getAuthenticatedContext(ctx)
 	if err != nil {
 		return err
 	}
-
-	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
@@ -261,8 +251,13 @@ func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 	return err
 }
 
-func (r CS3Repo) authenticate(ctx context.Context) (token string, err error) {
-	return AuthenticateCS3(ctx, r.cfg.ServiceUser, r.tm)
+func (r CS3Repo) getAuthenticatedContext(ctx context.Context) (context.Context, error) {
+	t, err := AuthenticateCS3(ctx, r.cfg.ServiceUser, r.tm)
+	if err != nil {
+		return nil, err
+	}
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
+	return ctx, nil
 }
 
 // AuthenticateCS3 mints an auth token for communicating with cs3 storage based on a service user from config
