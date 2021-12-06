@@ -102,14 +102,8 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 
 // AddToGroup adds a user to a group
 func (o Ocs) AddToGroup(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		o.mustRender(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "Could not parse form from request"))
-		return
-	}
-
+	groupid := r.PostFormValue("groupid")
 	userid := chi.URLParam(r, "userid")
-	groupid := r.PostForm.Get("groupid")
 
 	if groupid == "" {
 		o.mustRender(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "empty group assignment: unspecified group"))
