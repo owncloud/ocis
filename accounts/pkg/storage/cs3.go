@@ -126,9 +126,8 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err err
 func (r CS3Repo) loadAccount(ctx context.Context, id string, a *proto.Account) error {
 	account, err := r.downloadHelper(ctx, r.accountURL(id))
 	if err != nil {
-		switch err.(type) {
-		case notFoundErr:
-			return notFoundErr{"account", id}
+		if IsNotFoundErr(err) {
+			return &notFoundErr{"account", id}
 		}
 		return err
 	}
@@ -227,9 +226,8 @@ func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) 
 func (r CS3Repo) loadGroup(ctx context.Context, id string, g *proto.Group) error {
 	group, err := r.downloadHelper(ctx, r.groupURL(id))
 	if err != nil {
-		switch err.(type) {
-		case notFoundErr:
-			return notFoundErr{"group", id}
+		if IsNotFoundErr(err) {
+			return &notFoundErr{"group", id}
 		}
 		return err
 	}
