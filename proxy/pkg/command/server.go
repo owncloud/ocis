@@ -18,7 +18,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
-	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/cs3"
 	"github.com/owncloud/ocis/proxy/pkg/metrics"
@@ -136,10 +135,6 @@ func Server(cfg *config.Config) *cli.Command {
 					_ = server.Shutdown(ctx)
 					cancel()
 				})
-			}
-
-			if !cfg.Supervised {
-				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()

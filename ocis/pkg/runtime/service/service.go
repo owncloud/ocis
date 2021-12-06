@@ -137,9 +137,6 @@ func Start(o ...Option) error {
 	halt := make(chan os.Signal, 1)
 	signal.Notify(halt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 
-	// notify goroutines that they are running on supervised mode
-	s.cfg.Mode = ociscfg.SUPERVISED
-
 	setMicroLogger()
 
 	// tolerance controls backoff cycles from the supervisor.
@@ -191,7 +188,7 @@ func Start(o ...Option) error {
 	defer func() {
 		if r := recover(); r != nil {
 			reason := strings.Builder{}
-			if _, err := net.Dial("tcp", net.JoinHostPort(s.cfg.Runtime.Host, s.cfg.Runtime.Port)); err != nil {
+			if _, err = net.Dial("tcp", net.JoinHostPort(s.cfg.Runtime.Host, s.cfg.Runtime.Port)); err != nil {
 				reason.WriteString("runtime address already in use")
 			}
 
@@ -256,11 +253,6 @@ func (s *Service) generateRunSet(cfg *config.Config) {
 
 // Start indicates the Service Controller to start a new supervised service as an OS thread.
 func (s *Service) Start(name string, reply *int) error {
-	// RPC calls to a Service object will allow for parsing config. Mind that since the runtime is running on a different
-	// machine, the configuration needs to be present in the given machine. RPC does not yet allow providing a config
-	// during transport.
-	s.cfg.Mode = ociscfg.UNSUPERVISED
-
 	swap := deepcopy.Copy(s.cfg)
 	if _, ok := s.ServicesRegistry[name]; ok {
 		*reply = 0
@@ -306,7 +298,7 @@ func (s *Service) List(args struct{}, reply *string) error {
 func (s *Service) Kill(name string, reply *int) error {
 	if len(s.serviceToken[name]) > 0 {
 		for i := range s.serviceToken[name] {
-			if err := s.Supervisor.Remove(s.serviceToken[name][i]); err != nil {
+			if err := s.Supervisor.RemoveAndWait(s.serviceToken[name][i], 5000*time.Millisecond); err != nil {
 				return err
 			}
 		}

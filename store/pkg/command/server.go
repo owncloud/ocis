@@ -9,8 +9,6 @@ import (
 
 	"github.com/owncloud/ocis/store/pkg/tracing"
 
-	"github.com/owncloud/ocis/ocis-pkg/sync"
-
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/store/pkg/config"
 	"github.com/owncloud/ocis/store/pkg/metrics"
@@ -101,10 +99,6 @@ func Server(cfg *config.Config) *cli.Command {
 					_ = server.Shutdown(ctx)
 					cancel()
 				})
-			}
-
-			if !cfg.Supervised {
-				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()

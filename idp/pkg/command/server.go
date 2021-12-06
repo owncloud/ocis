@@ -10,7 +10,6 @@ import (
 	"github.com/owncloud/ocis/idp/pkg/server/debug"
 	"github.com/owncloud/ocis/idp/pkg/server/http"
 	"github.com/owncloud/ocis/idp/pkg/tracing"
-	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/urfave/cli/v2"
 )
 
@@ -94,10 +93,6 @@ func Server(cfg *config.Config) *cli.Command {
 					_ = server.Shutdown(ctx)
 					cancel()
 				})
-			}
-
-			if !cfg.Supervised {
-				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()

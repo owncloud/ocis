@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/settings/pkg/config"
 	"github.com/owncloud/ocis/settings/pkg/metrics"
 	"github.com/owncloud/ocis/settings/pkg/server/debug"
@@ -82,10 +81,6 @@ func Server(cfg *config.Config) *cli.Command {
 				_ = debugServer.Shutdown(ctx)
 				cancel()
 			})
-
-			if !cfg.Supervised {
-				sync.Trap(&servers, cancel)
-			}
 
 			return servers.Run()
 		},

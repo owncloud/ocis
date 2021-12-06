@@ -13,7 +13,6 @@ func StorageMetadataCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-metadata",
 		Usage:    "Start storage and data service for metadata",
 		Category: "Extensions",
-		//Flags:    flagset.StorageMetadata(cfg.Storage),
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)
 		},
