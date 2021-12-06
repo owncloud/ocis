@@ -36,9 +36,9 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.1
 	github.com/iancoleman/strcase v0.2.0
 	github.com/justinas/alice v1.2.0
-	github.com/libregraph/lico v0.52.0
+	github.com/libregraph/lico v0.53.0
 	github.com/mennanov/fieldmask-utils v0.5.0
-	github.com/mitchellh/mapstructure v1.4.2
+	github.com/mitchellh/mapstructure v1.4.3
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nmcclain/asn1-ber v0.0.0-20170104154839-2661553a0484
 	github.com/nmcclain/ldap v0.0.0-20210720162743-7f8d1e44eeba
