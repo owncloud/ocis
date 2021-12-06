@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix claim selector based routing for basic auth: [#2779](https://github.com/owncloud/ocis/pull/2779)
 * Bugfix - Disallow creation of a group with empty name via the OCS api: [#2825](https://github.com/owncloud/ocis/pull/2825)
 * Bugfix - Fix using s3ng as the metadata storage backend: [#2807](https://github.com/owncloud/ocis/pull/2807)
 * Change - Rename `APP_PROVIDER_BASIC_*` environment variables: [#2812](https://github.com/owncloud/ocis/pull/2812)
@@ -15,6 +16,17 @@ The following sections list the changes for unreleased.
 * Enhancement - Update REVA to v1.17.0: [#2835](https://github.com/owncloud/ocis/pull/2835)
 
 ## Details
+
+* Bugfix - Fix claim selector based routing for basic auth: [#2779](https://github.com/owncloud/ocis/pull/2779)
+
+   We've fixed the claim selector based routing for requests using basic auth. Previously
+   requests using basic auth have always been routed to the DefaultPolicy when using the claim
+   selector despite the set cookie because the basic auth middleware fakes some OIDC claims.
+
+   Now the cookie is checked before routing to the DefaultPolicy and therefore set cookie will
+   also be respected for requests using basic auth.
+
+   https://github.com/owncloud/ocis/pull/2779
 
 * Bugfix - Disallow creation of a group with empty name via the OCS api: [#2825](https://github.com/owncloud/ocis/pull/2825)
 
