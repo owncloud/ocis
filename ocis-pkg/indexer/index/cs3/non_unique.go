@@ -327,6 +327,10 @@ func (idx *NonUnique) resolveSymlink(name string) (string, error) {
 
 	b, err := idx.metadataStorage.downloadHelper(ctx, name)
 	if err != nil {
+		switch err.(type) {
+		case notFoundErr:
+			return "", os.ErrNotExist
+		}
 		return "", err
 	}
 
