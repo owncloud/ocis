@@ -1,17 +1,16 @@
-package cs3
+package metadataStorage
 
 import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"path"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/pkg/ctx"
-	"github.com/cs3org/reva/pkg/token"
+	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -19,13 +18,27 @@ const (
 	storageMountPath = "/meta"
 )
 
-type metadataStorage struct {
-	tokenManager      token.Manager
+func NewMetadataStorage(providerAddr string) (s MetadataStorage, err error) {
+
+	p, err := pool.GetStorageProviderServiceClient(providerAddr)
+	if err != nil {
+		return MetadataStorage{}, err
+	}
+
+	c := http.DefaultClient
+
+	return MetadataStorage{
+		storageProvider:   p,
+		dataGatewayClient: c,
+	}, nil
+}
+
+type MetadataStorage struct {
 	storageProvider   provider.ProviderAPIClient
 	dataGatewayClient *http.Client
 }
 
-func (r metadataStorage) uploadHelper(ctx context.Context, uploadpath string, content []byte) error {
+func (r MetadataStorage) SimpleUpload(ctx context.Context, uploadpath string, content []byte) error {
 
 	ref := provider.InitiateFileUploadRequest{
 		Ref: &provider.Reference{
@@ -67,7 +80,7 @@ func (r metadataStorage) uploadHelper(ctx context.Context, uploadpath string, co
 	return nil
 }
 
-func (r metadataStorage) downloadHelper(ctx context.Context, downloadpath string) (content []byte, err error) {
+func (r MetadataStorage) SimpleDownload(ctx context.Context, downloadpath string) (content []byte, err error) {
 	ref := provider.InitiateFileDownloadRequest{
 		Ref: &provider.Reference{
 			Path: path.Join(storageMountPath, downloadpath),
@@ -117,18 +130,4 @@ func (r metadataStorage) downloadHelper(ctx context.Context, downloadpath string
 	}
 
 	return b, nil
-}
-
-type notFoundErr struct {
-	typ, id string
-}
-
-func (e notFoundErr) Error() string {
-	return fmt.Sprintf("%s with id %s not found", e.typ, e.id)
-}
-
-// IsNotFoundErr can be returned by repo Load and Delete operations
-func IsNotFoundErr(e error) bool {
-	_, ok := e.(*notFoundErr)
-	return ok
 }

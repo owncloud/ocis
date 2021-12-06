@@ -2,7 +2,6 @@ package cs3
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -18,12 +17,14 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/ocis/ocis-pkg/indexer/index"
 	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
 	"github.com/owncloud/ocis/ocis-pkg/indexer/registry"
+	metadatastorage "github.com/owncloud/ocis/ocis-pkg/metadata_storage"
 )
 
 // Autoincrement are fields for an index of type autoincrement.
@@ -34,7 +35,9 @@ type Autoincrement struct {
 	indexBaseDir string
 	indexRootDir string
 
-	metadataStorage *metadataStorage
+	tokenManager    token.Manager
+	storageProvider provider.ProviderAPIClient
+	metadataStorage *metadatastorage.MetadataStorage
 
 	cs3conf *Config
 	bound   *option.Bound
@@ -73,21 +76,22 @@ func (idx *Autoincrement) Init() error {
 	tokenManager, err := jwt.New(map[string]interface{}{
 		"secret": idx.cs3conf.JWTSecret,
 	})
-
 	if err != nil {
 		return err
 	}
+	idx.tokenManager = tokenManager
 
 	client, err := pool.GetStorageProviderServiceClient(idx.cs3conf.ProviderAddr)
 	if err != nil {
 		return err
 	}
+	idx.storageProvider = client
 
-	idx.metadataStorage = &metadataStorage{
-		tokenManager:      tokenManager,
-		storageProvider:   client,
-		dataGatewayClient: http.DefaultClient,
+	m, err := metadatastorage.NewMetadataStorage(idx.cs3conf.ProviderAddr)
+	if err != nil {
+		return err
 	}
+	idx.metadataStorage = &m
 
 	if err := idx.makeDirIfNotExists(idx.indexBaseDir); err != nil {
 		return err
@@ -159,7 +163,7 @@ func (idx *Autoincrement) Remove(id string, v string) error {
 	}
 
 	deletePath := path.Join("/meta", idx.indexRootDir, v)
-	resp, err := idx.metadataStorage.storageProvider.Delete(ctx, &provider.DeleteRequest{
+	resp, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
 			Path: deletePath,
 		},
@@ -197,7 +201,7 @@ func (idx *Autoincrement) Search(pattern string) ([]string, error) {
 		return nil, err
 	}
 
-	res, err := idx.metadataStorage.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
+	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
 			Path: path.Join("/meta", idx.indexRootDir),
 		},
@@ -256,7 +260,7 @@ func (idx *Autoincrement) createSymlink(oldname, newname string) error {
 		return os.ErrExist
 	}
 
-	err = idx.metadataStorage.uploadHelper(ctx, newname, []byte(oldname))
+	err = idx.metadataStorage.SimpleUpload(ctx, newname, []byte(oldname))
 	if err != nil {
 		return err
 	}
@@ -269,9 +273,9 @@ func (idx *Autoincrement) resolveSymlink(name string) (string, error) {
 		return "", err
 	}
 
-	b, err := idx.metadataStorage.downloadHelper(ctx, name)
+	b, err := idx.metadataStorage.SimpleDownload(ctx, name)
 	if err != nil {
-		if IsNotFoundErr(err) {
+		if metadatastorage.IsNotFoundErr(err) {
 			return "", os.ErrNotExist
 		}
 		return "", err
@@ -286,7 +290,7 @@ func (idx *Autoincrement) makeDirIfNotExists(folder string) error {
 		return err
 	}
 
-	return storage.MakeDirIfNotExist(ctx, idx.metadataStorage.storageProvider, folder)
+	return storage.MakeDirIfNotExist(ctx, idx.storageProvider, folder)
 }
 
 func (idx *Autoincrement) next() (int, error) {
@@ -295,9 +299,9 @@ func (idx *Autoincrement) next() (int, error) {
 		return -1, err
 	}
 
-	res, err := idx.metadataStorage.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
+	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Path: path.Join("/meta", idx.indexRootDir),
+			Path: path.Join("/meta", idx.indexRootDir), //TODO:
 		},
 	})
 
@@ -329,7 +333,7 @@ func (idx *Autoincrement) next() (int, error) {
 }
 
 func (idx *Autoincrement) getAuthenticatedContext(ctx context.Context) (context.Context, error) {
-	t, err := storage.AuthenticateCS3(ctx, idx.cs3conf.ServiceUser, idx.metadataStorage.tokenManager)
+	t, err := storage.AuthenticateCS3(ctx, idx.cs3conf.ServiceUser, idx.tokenManager)
 	if err != nil {
 		return nil, err
 	}
@@ -344,5 +348,5 @@ func (idx *Autoincrement) Delete() error {
 		return err
 	}
 
-	return deleteIndexRoot(ctx, idx.metadataStorage.storageProvider, idx.indexRootDir)
+	return deleteIndexRoot(ctx, idx.storageProvider, idx.indexRootDir)
 }

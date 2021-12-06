@@ -1,12 +1,8 @@
 package storage
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
-	"io/ioutil"
-	"net/http"
 	"path"
 	"path/filepath"
 
@@ -22,6 +18,7 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
+	metadatastorage "github.com/owncloud/ocis/ocis-pkg/metadata_storage"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -31,10 +28,10 @@ const (
 
 // CS3Repo provides a cs3 implementation of the Repo interface
 type CS3Repo struct {
-	cfg               *config.Config
-	tm                token.Manager
-	storageProvider   provider.ProviderAPIClient
-	dataGatewayClient *http.Client
+	cfg             *config.Config
+	tm              token.Manager
+	storageProvider provider.ProviderAPIClient
+	metadataStorage metadatastorage.MetadataStorage
 }
 
 // NewCS3Repo creates a new cs3 repo
@@ -52,11 +49,16 @@ func NewCS3Repo(cfg *config.Config) (Repo, error) {
 		return nil, err
 	}
 
+	ms, err := metadatastorage.NewMetadataStorage(cfg.Repo.CS3.ProviderAddr)
+	if err != nil {
+		return nil, err
+	}
+
 	return CS3Repo{
-		cfg:               cfg,
-		tm:                tokenManager,
-		storageProvider:   client,
-		dataGatewayClient: http.DefaultClient,
+		cfg:             cfg,
+		tm:              tokenManager,
+		storageProvider: client,
+		metadataStorage: ms,
 	}, nil
 }
 
@@ -76,7 +78,7 @@ func (r CS3Repo) WriteAccount(ctx context.Context, a *proto.Account) (err error)
 		return err
 	}
 
-	err = r.uploadHelper(ctx, r.accountURL(a.Id), by)
+	err = r.metadataStorage.SimpleUpload(ctx, r.accountURL(a.Id), by)
 	return err
 
 }
@@ -121,9 +123,9 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err err
 }
 
 func (r CS3Repo) loadAccount(ctx context.Context, id string, a *proto.Account) error {
-	account, err := r.downloadHelper(ctx, r.accountURL(id))
+	account, err := r.metadataStorage.SimpleDownload(ctx, r.accountURL(id))
 	if err != nil {
-		if IsNotFoundErr(err) {
+		if metadatastorage.IsNotFoundErr(err) {
 			return &notFoundErr{"account", id}
 		}
 		return err
@@ -172,7 +174,7 @@ func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 		return err
 	}
 
-	err = r.uploadHelper(ctx, r.groupURL(g.Id), by)
+	err = r.metadataStorage.SimpleUpload(ctx, r.groupURL(g.Id), by)
 	return err
 }
 
@@ -216,9 +218,9 @@ func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) 
 }
 
 func (r CS3Repo) loadGroup(ctx context.Context, id string, g *proto.Group) error {
-	group, err := r.downloadHelper(ctx, r.groupURL(id))
+	group, err := r.metadataStorage.SimpleDownload(ctx, r.groupURL(id))
 	if err != nil {
-		if IsNotFoundErr(err) {
+		if metadatastorage.IsNotFoundErr(err) {
 			return &notFoundErr{"group", id}
 		}
 		return err
@@ -315,97 +317,4 @@ func MakeDirIfNotExist(ctx context.Context, sp provider.ProviderAPIClient, folde
 	}
 
 	return nil
-}
-
-func (r CS3Repo) uploadHelper(ctx context.Context, uploadpath string, content []byte) error {
-
-	ref := provider.InitiateFileUploadRequest{
-		Ref: &provider.Reference{
-			Path: path.Join(storageMountPath, uploadpath),
-		},
-	}
-
-	res, err := r.storageProvider.InitiateFileUpload(ctx, &ref)
-	if err != nil {
-		return err
-	}
-
-	var endpoint string
-
-	for _, proto := range res.GetProtocols() {
-		if proto.Protocol == "simple" {
-			endpoint = proto.GetUploadEndpoint()
-			break
-		}
-	}
-	if endpoint == "" {
-		return errors.New("metadata storage doesn't support the simple upload protocol")
-	}
-
-	req, err := http.NewRequest(http.MethodPut, endpoint, bytes.NewReader(content))
-	if err != nil {
-		return err
-	}
-	md, _ := metadata.FromOutgoingContext(ctx)
-	req.Header.Add(revactx.TokenHeader, md.Get(revactx.TokenHeader)[0])
-	resp, err := r.dataGatewayClient.Do(req)
-	if err != nil {
-		return err
-	}
-	if err = resp.Body.Close(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r CS3Repo) downloadHelper(ctx context.Context, downloadpath string) (content []byte, err error) {
-
-	ref := provider.InitiateFileDownloadRequest{
-		Ref: &provider.Reference{
-			Path: path.Join(storageMountPath, downloadpath),
-		},
-	}
-
-	res, err := r.storageProvider.InitiateFileDownload(ctx, &ref)
-	if err != nil {
-		return []byte{}, err
-	}
-
-	var endpoint string
-
-	for _, proto := range res.GetProtocols() {
-		if proto.Protocol == "simple" {
-			endpoint = proto.GetDownloadEndpoint()
-			break
-		}
-	}
-	if endpoint == "" {
-		return []byte{}, errors.New("metadata storage doesn't support the simple download protocol")
-	}
-
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
-	if err != nil {
-		return []byte{}, err
-	}
-	md, _ := metadata.FromOutgoingContext(ctx)
-	req.Header.Add(revactx.TokenHeader, md.Get(revactx.TokenHeader)[0])
-	resp, err := r.dataGatewayClient.Do(req)
-	if err != nil {
-		return []byte{}, err
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return []byte{}, &notFoundErr{}
-	}
-
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return []byte{}, err
-	}
-
-	if err = resp.Body.Close(); err != nil {
-		return []byte{}, err
-	}
-
-	return b, nil
 }
