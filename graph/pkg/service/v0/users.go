@@ -3,6 +3,7 @@ package svc
 import (
 	"errors"
 	"net/http"
+	"net/url"
 
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/go-chi/chi/v5"
@@ -49,6 +50,11 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 // GetUser implements the Service interface.
 func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")
+	userID, err := url.PathUnescape(userID)
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
+	}
+
 	if userID == "" {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
 		return

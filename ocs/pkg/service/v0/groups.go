@@ -22,8 +22,11 @@ import (
 // ListUserGroups lists a users groups
 func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
+	userid, err := url.PathUnescape(userid)
+	if err != nil {
+		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+	}
 	var account *accounts.Account
-	var err error
 
 	// short circuit if there is a user already in the context
 	if u, ok := revactx.ContextGetUser(r.Context()); ok {
@@ -104,6 +107,10 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 func (o Ocs) AddToGroup(w http.ResponseWriter, r *http.Request) {
 	groupid := r.PostFormValue("groupid")
 	userid := chi.URLParam(r, "userid")
+	userid, err := url.PathUnescape(userid)
+	if err != nil {
+		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+	}
 
 	if groupid == "" {
 		o.mustRender(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "empty group assignment: unspecified group"))
@@ -155,8 +162,10 @@ func (o Ocs) AddToGroup(w http.ResponseWriter, r *http.Request) {
 // RemoveFromGroup removes a user from a group
 func (o Ocs) RemoveFromGroup(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
-
-	var err error
+	userid, err := url.PathUnescape(userid)
+	if err != nil {
+		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+	}
 
 	// Really? a DELETE with form encoded body?!?
 	// but it is not encoded as mime, so we cannot just call r.ParseForm()
@@ -340,6 +349,10 @@ func (o Ocs) AddGroup(w http.ResponseWriter, r *http.Request) {
 // DeleteGroup deletes a group
 func (o Ocs) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	groupid := chi.URLParam(r, "groupid")
+	groupid, err := url.PathUnescape(groupid)
+	if err != nil {
+		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+	}
 
 	// ocs only knows about names so we have to look up the internal id
 	group, err := o.fetchGroupByName(r.Context(), groupid)
@@ -376,6 +389,10 @@ func (o Ocs) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 func (o Ocs) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 
 	groupid := chi.URLParam(r, "groupid")
+	groupid, err := url.PathUnescape(groupid)
+	if err != nil {
+		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+	}
 
 	// ocs only knows about names so we have to look up the internal id
 	group, err := o.fetchGroupByName(r.Context(), groupid)

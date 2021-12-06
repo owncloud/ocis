@@ -3,6 +3,7 @@ package svc
 import (
 	"errors"
 	"net/http"
+	"net/url"
 
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 
@@ -30,6 +31,11 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 // GetGroup implements the Service interface.
 func (g Graph) GetGroup(w http.ResponseWriter, r *http.Request) {
 	groupID := chi.URLParam(r, "groupID")
+	groupID, err := url.PathUnescape(groupID)
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping group id failed")
+	}
+
 	if groupID == "" {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing group id")
 		return
