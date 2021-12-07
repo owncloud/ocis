@@ -14,7 +14,6 @@ import (
 	"github.com/owncloud/ocis/glauth/pkg/tracing"
 	pkgcrypto "github.com/owncloud/ocis/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
-	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/urfave/cli/v2"
 )
 
@@ -176,10 +175,6 @@ func Server(cfg *config.Config) *cli.Command {
 					_ = server.Shutdown(ctx)
 					cancel()
 				})
-			}
-
-			if !cfg.Supervised {
-				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()

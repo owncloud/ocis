@@ -6,8 +6,6 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
 
-	"github.com/owncloud/ocis/ocis-pkg/sync"
-
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/metrics"
@@ -84,10 +82,6 @@ func Server(cfg *config.Config) *cli.Command {
 				logger.Info().Str("server", "grpc").Msg("shutting down server")
 				cancel()
 			})
-
-			if !cfg.Supervised {
-				sync.Trap(&gr, cancel)
-			}
 
 			return gr.Run()
 		},
