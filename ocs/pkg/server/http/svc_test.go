@@ -482,6 +482,22 @@ func assertUsersSame(t *testing.T, expected, actual User, quotaAvailable bool) {
 	}
 }
 
+func findAccount(t *testing.T, username string) (*accountsProto.Account, error) {
+	cl := accountsProto.NewAccountsService("com.owncloud.api.accounts", service.Client())
+
+	req := &accountsProto.ListAccountsRequest{
+		Query: "preferred_name eq '" + username + "'",
+	}
+	res, err := cl.ListAccounts(context.Background(), req)
+	if err != nil {
+		return nil, err
+	}
+	if len(res.Accounts) == 0 {
+		return nil, fmt.Errorf("username %s not found", username)
+	}
+	return res.Accounts[0], err
+}
+
 func deleteAccount(t *testing.T, id string) (*empty.Empty, error) {
 	cl := accountsProto.NewAccountsService("com.owncloud.api.accounts", service.Client())
 
@@ -1435,12 +1451,17 @@ func TestGetSingleUser(t *testing.T) {
 				t.Fatal(err)
 			}
 
+			a, err := findAccount(t, user.ID)
+			if err != nil {
+				t.Fatal(err)
+			}
+
 			formatpart := getFormatString(format)
 			res, err := sendRequest(
 				"GET",
 				fmt.Sprintf("/%v/cloud/user%v", ocsVersion, formatpart),
 				"",
-				&User{ID: user.ID},
+				&User{ID: a.Id},
 				[]string{ssvc.BundleUUIDRoleUser},
 			)
 
