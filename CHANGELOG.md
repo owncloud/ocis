@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix claim selector based routing for basic auth: [#2779](https://github.com/owncloud/ocis/pull/2779)
 * Bugfix - Disallow creation of a group with empty name via the OCS api: [#2825](https://github.com/owncloud/ocis/pull/2825)
 * Bugfix - Fix using s3ng as the metadata storage backend: [#2807](https://github.com/owncloud/ocis/pull/2807)
+* Bugfix - Use the CS3api up- and download workflow for the accounts service: [#2837](https://github.com/owncloud/ocis/pull/2837)
 * Change - Rename `APP_PROVIDER_BASIC_*` environment variables: [#2812](https://github.com/owncloud/ocis/pull/2812)
 * Change - Restructure Configuration Parsing: [#2708](https://github.com/owncloud/ocis/pull/2708)
 * Change - OIDC: fallback if IDP doesn't provide "preferred_username" claim: [#2644](https://github.com/owncloud/ocis/issues/2644)
@@ -45,6 +46,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/2668
    https://github.com/owncloud/ocis/pull/2807
+
+* Bugfix - Use the CS3api up- and download workflow for the accounts service: [#2837](https://github.com/owncloud/ocis/pull/2837)
+
+   We've fixed the interaction of the accounts service with the metadata storage after bypassing
+   the InitiateUpload and InitiateDownload have been removed from various storage drivers. The
+   accounts service now uses the proper CS3apis workflow for up- and downloads.
+
+   https://github.com/owncloud/ocis/pull/2837
+   https://github.com/cs3org/reva/pull/2309
 
 * Change - Rename `APP_PROVIDER_BASIC_*` environment variables: [#2812](https://github.com/owncloud/ocis/pull/2812)
 
@@ -89,6 +99,7 @@ The following sections list the changes for unreleased.
   * #TODO: update this changelog before the next oCIS release
 
    https://github.com/owncloud/ocis/pull/2835
+   https://github.com/owncloud/ocis/pull/2837
 # Changelog for [1.15.0] (2021-11-19)
 
 The following sections list the changes for 1.15.0.
