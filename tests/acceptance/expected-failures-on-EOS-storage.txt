@@ -1,0 +1,1263 @@
+# this file contains the scenarios from ownCloud10 core API tests that are currently expected to fail
+# when run with EOS storage
+#
+# ToDo: enable testing with EOS in CI and adjust this list to match what actually fails
+#
+# test scenarios that fail with OC storage (that were tagged skipOnOcis-OC-Storage in core)
+#
+#
+# https://github.com/owncloud/ocis-reva/issues/196 Checksum feature
+apiMain/checksums.feature:24
+apiMain/checksums.feature:25
+apiMain/checksums.feature:35
+apiMain/checksums.feature:36
+apiMain/checksums.feature:46
+apiMain/checksums.feature:47
+apiMain/checksums.feature:50
+apiMain/checksums.feature:58
+apiMain/checksums.feature:67
+apiMain/checksums.feature:99
+apiMain/checksums.feature:100
+apiMain/checksums.feature:103
+apiMain/checksums.feature:110
+apiMain/checksums.feature:119
+apiMain/checksums.feature:129
+apiMain/checksums.feature:138
+apiMain/checksums.feature:147
+apiMain/checksums.feature:158
+apiMain/checksums.feature:174
+apiMain/checksums.feature:192
+apiMain/checksums.feature:217
+apiMain/checksums.feature:218
+apiMain/checksums.feature:239
+apiMain/checksums.feature:240
+apiMain/checksums.feature:258
+apiMain/checksums.feature:279
+apiMain/checksums.feature:280
+apiMain/checksums.feature:295
+apiMain/checksums.feature:296
+apiMain/checksums.feature:308
+apiMain/checksums.feature:309
+apiMain/checksums.feature:312
+apiMain/checksums.feature:324
+
+# https://github.com/owncloud/ocis-reva/issues/214
+apiMain/checksums.feature:346
+apiMain/checksums.feature:347
+#
+# https://github.com/owncloud/ocis-reva/issues/100 no robots.txt available
+apiMain/main.feature:5
+#
+# https://github.com/owncloud/ocis-reva/issues/101 quota query
+apiMain/quota.feature:9
+apiMain/quota.feature:16
+apiMain/quota.feature:23
+apiMain/quota.feature:30
+apiMain/quota.feature:41
+apiMain/quota.feature:54
+apiMain/quota.feature:68
+apiMain/quota.feature:82
+apiMain/quota.feature:99
+apiMain/quota.feature:112
+#
+# https://github.com/owncloud/ocis-reva/issues/65 There is no such thing like a "super-user"
+# https://github.com/owncloud/ocis-reva/issues/97 no command equivalent to occ
+apiMain/status.feature:5
+#
+# https://github.com/owncloud/ocis-reva/issues/29 ocs config endpoint only accessible by authorized users
+# https://github.com/owncloud/ocis-reva/issues/30 HTTP 401 Unauthorized responses don't contain a body
+apiAuthOcs/ocsDELETEAuth.feature:9
+apiAuthOcs/ocsGETAuth.feature:10
+apiAuthOcs/ocsGETAuth.feature:33
+apiAuthOcs/ocsGETAuth.feature:53
+apiAuthOcs/ocsGETAuth.feature:88
+apiAuthOcs/ocsGETAuth.feature:121
+apiAuthOcs/ocsGETAuth.feature:139
+apiAuthOcs/ocsPOSTAuth.feature:10
+apiAuthOcs/ocsPUTAuth.feature:10
+#
+# https://github.com/owncloud/ocis-reva/issues/9 users can access each-others data using the new webdav API
+apiAuthWebDav/webDavLOCKAuth.feature:38
+apiAuthWebDav/webDavMKCOLAuth.feature:37
+#
+# https://github.com/owncloud/ocis-reva/issues/14 renaming a resource does not work
+apiAuthWebDav/webDavMOVEAuth.feature:37
+#
+# https://github.com/owncloud/ocis-reva/issues/179 send POST requests to another user's webDav endpoints as normal user
+apiAuthWebDav/webDavPOSTAuth.feature:38
+#
+# https://github.com/owncloud/ocis-reva/issues/9 users can access each-others data using the new webdav API
+apiAuthWebDav/webDavPUTAuth.feature:38
+#
+# https://github.com/owncloud/ocis-reva/issues/175 Default capabilities for normal user not same as in oC-core
+# https://github.com/owncloud/ocis-reva/issues/176 Difference in response content of status.php and default capabilities
+apiCapabilities/capabilitiesWithNormalUser.feature:11
+#
+# https://github.com/owncloud/ocis-reva/issues/276 elements cannot be favorited
+apiFavorites/favorites.feature:28
+apiFavorites/favorites.feature:29
+apiFavorites/favorites.feature:44
+apiFavorites/favorites.feature:45
+apiFavorites/favorites.feature:59
+apiFavorites/favorites.feature:60
+apiFavorites/favorites.feature:75
+apiFavorites/favorites.feature:76
+
+# https://github.com/owncloud/ocis-reva/issues/39 REPORT request not implemented
+apiFavorites/favorites.feature:228
+apiFavorites/favorites.feature:229
+#
+# OCS Provisioning API scenarios that fail - to be investigated and issues raised or comments added here
+apiProvisioning-v1/addUser.feature:29
+apiProvisioning-v1/addUser.feature:30
+apiProvisioning-v1/addUser.feature:32
+apiProvisioning-v1/addUser.feature:39
+apiProvisioning-v1/addUser.feature:69
+apiProvisioning-v1/addUser.feature:96
+apiProvisioning-v1/addUser.feature:97
+apiProvisioning-v1/addUser.feature:98
+apiProvisioning-v1/addUser.feature:99
+apiProvisioning-v1/addUser.feature:100
+apiProvisioning-v1/addUser.feature:102
+apiProvisioning-v1/addUser.feature:118
+apiProvisioning-v1/addUser.feature:121
+apiProvisioning-v1/addUser.feature:122
+apiProvisioning-v1/addUser.feature:123
+apiProvisioning-v1/apiProvisioningUsingAppPassword.feature:39
+apiProvisioning-v1/apiProvisioningUsingAppPassword.feature:67
+apiProvisioning-v1/deleteUser.feature:29
+apiProvisioning-v1/deleteUser.feature:30
+apiProvisioning-v1/deleteUser.feature:32
+apiProvisioning-v1/deleteUser.feature:53
+apiProvisioning-v1/disableUser.feature:11
+apiProvisioning-v1/disableUser.feature:29
+apiProvisioning-v1/disableUser.feature:30
+apiProvisioning-v1/disableUser.feature:79
+apiProvisioning-v1/disableUser.feature:99
+apiProvisioning-v1/disableUser.feature:107
+apiProvisioning-v1/disableUser.feature:129
+apiProvisioning-v1/editUser.feature:29
+apiProvisioning-v1/editUser.feature:30
+apiProvisioning-v1/editUser.feature:47
+apiProvisioning-v1/editUser.feature:56
+apiProvisioning-v1/editUser.feature:122
+apiProvisioning-v1/enableUser.feature:11
+apiProvisioning-v1/enableUser.feature:31
+apiProvisioning-v1/enableUser.feature:32
+apiProvisioning-v1/enableUser.feature:34
+apiProvisioning-v1/enableUser.feature:56
+apiProvisioning-v1/enableUser.feature:63
+apiProvisioning-v1/enableUser.feature:86
+apiProvisioning-v1/getUser.feature:34
+apiProvisioning-v1/getUser.feature:35
+apiProvisioning-v1/getUser.feature:37
+apiProvisioning-v1/getUser.feature:81
+apiProvisioning-v1/getUsers.feature:11
+apiProvisioning-v1/getUsers.feature:35
+apiProvisioning-v1/resetUserPassword.feature:21
+apiProvisioning-v1/resetUserPassword.feature:55
+apiProvisioning-v2/addUser.feature:29
+apiProvisioning-v2/addUser.feature:30
+apiProvisioning-v2/addUser.feature:32
+apiProvisioning-v2/addUser.feature:39
+apiProvisioning-v2/addUser.feature:69
+apiProvisioning-v2/addUser.feature:96
+apiProvisioning-v2/addUser.feature:97
+apiProvisioning-v2/addUser.feature:98
+apiProvisioning-v2/addUser.feature:99
+apiProvisioning-v2/addUser.feature:100
+apiProvisioning-v2/addUser.feature:102
+apiProvisioning-v2/apiProvisioningUsingAppPassword.feature:39
+apiProvisioning-v2/apiProvisioningUsingAppPassword.feature:67
+apiProvisioning-v2/deleteUser.feature:29
+apiProvisioning-v2/deleteUser.feature:30
+apiProvisioning-v2/deleteUser.feature:32
+apiProvisioning-v2/deleteUser.feature:54
+apiProvisioning-v2/disableUser.feature:11
+apiProvisioning-v2/disableUser.feature:29
+apiProvisioning-v2/disableUser.feature:30
+apiProvisioning-v2/disableUser.feature:81
+apiProvisioning-v2/disableUser.feature:101
+apiProvisioning-v2/disableUser.feature:110
+apiProvisioning-v2/disableUser.feature:133
+apiProvisioning-v2/editUser.feature:29
+apiProvisioning-v2/editUser.feature:30
+apiProvisioning-v2/editUser.feature:47
+apiProvisioning-v2/editUser.feature:56
+apiProvisioning-v2/editUser.feature:122
+apiProvisioning-v2/enableUser.feature:11
+apiProvisioning-v2/enableUser.feature:31
+apiProvisioning-v2/enableUser.feature:32
+apiProvisioning-v2/enableUser.feature:34
+apiProvisioning-v2/enableUser.feature:56
+apiProvisioning-v2/enableUser.feature:64
+apiProvisioning-v2/enableUser.feature:88
+apiProvisioning-v2/getUser.feature:34
+apiProvisioning-v2/getUser.feature:35
+apiProvisioning-v2/getUser.feature:37
+apiProvisioning-v2/getUser.feature:47
+apiProvisioning-v2/getUser.feature:82
+apiProvisioning-v2/getUsers.feature:11
+apiProvisioning-v2/getUsers.feature:36
+apiProvisioning-v2/resetUserPassword.feature:21
+apiProvisioning-v2/resetUserPassword.feature:55
+#
+# https://github.com/owncloud/product/issues/271 Cannot set mtime on upload
+#
+apiSharePublicLink1/createPublicLinkShare.feature:776
+apiSharePublicLink1/createPublicLinkShare.feature:789
+apiSharePublicLink1/createPublicLinkShare.feature:790
+#
+# https://github.com/owncloud/ocis-reva/issues/34 groups endpoint does not exist
+apiSharees/sharees.feature:32
+apiSharees/sharees.feature:33
+apiSharees/sharees.feature:53
+apiSharees/sharees.feature:54
+apiSharees/sharees.feature:74
+apiSharees/sharees.feature:75
+apiSharees/sharees.feature:98
+apiSharees/sharees.feature:99
+apiSharees/sharees.feature:118
+apiSharees/sharees.feature:119
+apiSharees/sharees.feature:137
+apiSharees/sharees.feature:138
+apiSharees/sharees.feature:157
+apiSharees/sharees.feature:158
+apiSharees/sharees.feature:177
+apiSharees/sharees.feature:178
+apiSharees/sharees.feature:198
+apiSharees/sharees.feature:199
+apiSharees/sharees.feature:217
+apiSharees/sharees.feature:218
+apiSharees/sharees.feature:237
+apiSharees/sharees.feature:238
+apiSharees/sharees.feature:257
+apiSharees/sharees.feature:258
+apiSharees/sharees.feature:277
+apiSharees/sharees.feature:278
+apiSharees/sharees.feature:297
+apiSharees/sharees.feature:298
+apiSharees/sharees.feature:317
+apiSharees/sharees.feature:318
+apiSharees/sharees.feature:336
+apiSharees/sharees.feature:337
+apiSharees/sharees.feature:355
+apiSharees/sharees.feature:356
+apiSharees/sharees.feature:374
+apiSharees/sharees.feature:375
+apiSharees/sharees.feature:393
+apiSharees/sharees.feature:394
+apiSharees/sharees.feature:412
+apiSharees/sharees.feature:413
+apiSharees/sharees.feature:430
+apiSharees/sharees.feature:431
+apiSharees/sharees.feature:450
+apiSharees/sharees.feature:451
+apiSharees/sharees.feature:475
+apiSharees/sharees.feature:476
+apiSharees/sharees.feature:495
+apiSharees/sharees.feature:496
+apiSharees/sharees.feature:515
+apiSharees/sharees.feature:516
+apiSharees/sharees.feature:537
+apiSharees/sharees.feature:538
+#
+# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set (shareapi_auto_accept_share)
+apiShareManagement/acceptShares.feature:155
+apiShareManagement/acceptShares.feature:313
+apiShareManagement/acceptShares.feature:333
+apiShareManagement/acceptShares.feature:415
+apiShareManagement/acceptShares.feature:416
+apiShareManagement/acceptShares.feature:417
+apiShareManagement/acceptShares.feature:418
+apiShareManagement/acceptShares.feature:419
+apiShareManagement/acceptShares.feature:421
+apiShareManagement/acceptShares.feature:436
+apiShareManagement/acceptShares.feature:458
+apiShareManagement/acceptShares.feature:477
+apiShareManagement/acceptShares.feature:511
+apiShareManagement/acceptShares.feature:542
+apiShareManagement/acceptShares.feature:561
+apiShareManagement/acceptShares.feature:582
+apiShareManagement/acceptShares.feature:652
+apiShareManagement/acceptShares.feature:696
+#
+# Accepting a share returns empty response
+apiShareManagement/acceptSharesToSharesFolder.feature:15
+apiShareManagement/acceptSharesToSharesFolder.feature:22
+apiShareManagement/acceptSharesToSharesFolder.feature:30
+apiShareManagement/acceptSharesToSharesFolder.feature:52
+
+# https://github.com/owncloud/product/issues/208 After accepting a share data in the received file cannot be downloaded
+apiShareManagement/acceptSharesToSharesFolder.feature:15
+#
+# https://github.com/owncloud/product/issues/207 Response is empty when accepting a share
+apiShareManagement/acceptSharesToSharesFolder.feature:30
+apiShareManagement/acceptSharesToSharesFolder.feature:52
+#
+# https://github.com/owncloud/ocis-reva/issues/34  groups endpoint does not exist
+# https://github.com/owncloud/ocis-reva/issues/243 Sharing seems to work but does not work
+# https://github.com/owncloud/ocis-reva/issues/372 Listing shares via ocs API does not show path for parent folders
+# https://github.com/owncloud/ocis-reva/issues/356 Fields missing in delete share OCS response
+# https://github.com/owncloud/product/issues/203 file_target in share response
+# https://github.com/owncloud/ocis-reva/issues/357 Shares not deleted when user is deleted
+# https://github.com/owncloud/ocis-reva/issues/301 [EOS] no displayname owner when creating share
+# https://github.com/owncloud/ocis-reva/issues/302 [EOS] mime-type is not set correctly when sharing
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:36
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:37
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:66
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:67
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:91
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:92
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:94
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:95
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:97
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:98
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:100
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:101
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:115
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:116
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:130
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:131
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:155
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:156
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:179
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:180
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:204
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:205
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:234
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:235
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:254
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:255
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:284
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:285
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:299
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:300
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:316
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:317
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:332
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:333
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:350
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:351
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:355
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:380
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:445
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:446
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:481
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:482
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:485
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:513
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:531
+apiShareToSharesManagementBasic/createShareToSharesFolder.feature:549
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:28
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:29
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:43
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:44
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:46
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:58
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:72
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:89
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:107
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:118
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:130
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:163
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:164
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:165
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:166
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:181
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:182
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:183
+apiShareToSharesManagementBasic/deleteShareFromShares.feature:184
+apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:42
+apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:43
+apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:69
+apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:70
+apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:97
+apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:98
+apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:135
+apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:136
+#
+# These currently pass in owncloud/ocis-reva and should start passing here in ocis soon
+apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:115
+apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:116
+apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:153
+apiShareToSharesManagementBasic/excludeGroupFromReceivingSharesToSharesFolder.feature:154
+#
+# https://github.com/owncloud/ocis-reva/issues/260 Sharee retrieves the information about a share -but gets response containing all the shares
+apiShareOperations/accessToShare.feature:48
+apiShareOperations/accessToShare.feature:49
+#
+# https://github.com/owncloud/ocis-reva/issues/262 Shares are not deleted when user is deleted
+apiShareOperations/gettingShares.feature:21
+apiShareOperations/gettingShares.feature:22
+#
+# https://github.com/owncloud/ocis-reva/issues/65 There is no such thing like a "super-user"
+apiShareOperations/gettingShares.feature:34
+apiShareOperations/gettingShares.feature:35
+#
+# https://github.com/owncloud/ocis-reva/issues/357 Delete shares from user when user is deleted
+# https://github.com/owncloud/ocis-reva/issues/301 no displayname_owner shown when creating a share
+# https://github.com/owncloud/ocis-reva/issues/302 when sharing a file mime-type field is set to application/octet-stream
+apiShareOperations/gettingShares.feature:124
+apiShareOperations/gettingShares.feature:125
+#
+# https://github.com/owncloud/ocis-reva/issues/374 OCS error message for attempting to access share via share id as an unauthorized user is not informative
+apiShareOperations/gettingShares.feature:168
+apiShareOperations/gettingShares.feature:169
+#
+# https://github.com/owncloud/ocis-reva/issues/372 Listing shares via ocs API does not show path for parent folders
+apiShareOperations/gettingShares.feature:204
+apiShareOperations/gettingShares.feature:205
+#
+# https://github.com/owncloud/ocis-reva/issues/47 cannot get ocs:share-permissions via WebDAV
+apiShareOperations/getWebDAVSharePermissions.feature:21
+apiShareOperations/getWebDAVSharePermissions.feature:22
+apiShareOperations/getWebDAVSharePermissions.feature:134
+apiShareOperations/getWebDAVSharePermissions.feature:135
+#
+# https://github.com/owncloud/ocis-reva/issues/282 Split old public API webdav tests from new public webdav tests
+# https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
+apiSharePublicLink1/accessToPublicLinkShare.feature:10
+apiSharePublicLink1/accessToPublicLinkShare.feature:20
+apiSharePublicLink1/accessToPublicLinkShare.feature:30
+apiSharePublicLink1/accessToPublicLinkShare.feature:43
+apiSharePublicLink1/changingPublicLinkShare.feature:22
+apiSharePublicLink1/changingPublicLinkShare.feature:23
+apiSharePublicLink1/changingPublicLinkShare.feature:37
+apiSharePublicLink1/changingPublicLinkShare.feature:41
+apiSharePublicLink1/changingPublicLinkShare.feature:52
+apiSharePublicLink1/changingPublicLinkShare.feature:63
+apiSharePublicLink1/changingPublicLinkShare.feature:85
+apiSharePublicLink1/changingPublicLinkShare.feature:96
+apiSharePublicLink1/changingPublicLinkShare.feature:107
+apiSharePublicLink1/changingPublicLinkShare.feature:128
+apiSharePublicLink1/changingPublicLinkShare.feature:151
+apiSharePublicLink1/changingPublicLinkShare.feature:174
+apiSharePublicLink1/changingPublicLinkShare.feature:197
+apiSharePublicLink1/changingPublicLinkShare.feature:221
+apiSharePublicLink1/changingPublicLinkShare.feature:244
+apiSharePublicLink1/changingPublicLinkShare.feature:267
+apiSharePublicLink1/changingPublicLinkShare.feature:278
+apiSharePublicLink1/changingPublicLinkShare.feature:289
+apiSharePublicLink1/changingPublicLinkShare.feature:300
+apiSharePublicLink1/createPublicLinkShare.feature:34
+apiSharePublicLink1/createPublicLinkShare.feature:35
+#
+# https://github.com/owncloud/ocis-reva/issues/12 Range Header is not obeyed when downloading a file
+apiSharePublicLink1/createPublicLinkShare.feature:63
+apiSharePublicLink1/createPublicLinkShare.feature:64
+#
+apiSharePublicLink1/createPublicLinkShare.feature:95
+apiSharePublicLink1/createPublicLinkShare.feature:96
+#
+# https://github.com/owncloud/ocis-reva/issues/199 Ability to return error messages in Webdav response bodies
+apiSharePublicLink1/createPublicLinkShare.feature:127
+apiSharePublicLink1/createPublicLinkShare.feature:128
+#
+apiSharePublicLink1/createPublicLinkShare.feature:155
+apiSharePublicLink1/createPublicLinkShare.feature:156
+#
+# https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
+apiSharePublicLink1/createPublicLinkShare.feature:183
+apiSharePublicLink1/createPublicLinkShare.feature:184
+#
+apiSharePublicLink1/createPublicLinkShare.feature:214
+apiSharePublicLink1/createPublicLinkShare.feature:215
+#
+# https://github.com/owncloud/ocis-reva/issues/12  Range Header is not obeyed when downloading a file
+apiSharePublicLink1/createPublicLinkShare.feature:245
+apiSharePublicLink1/createPublicLinkShare.feature:246
+#
+apiSharePublicLink1/createPublicLinkShare.feature:276
+apiSharePublicLink1/createPublicLinkShare.feature:277
+#
+# https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
+apiSharePublicLink1/createPublicLinkShare.feature:307
+apiSharePublicLink1/createPublicLinkShare.feature:308
+#
+apiSharePublicLink1/createPublicLinkShare.feature:370
+apiSharePublicLink1/createPublicLinkShare.feature:371
+#
+# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
+apiSharePublicLink1/createPublicLinkShare.feature:389
+apiSharePublicLink1/createPublicLinkShare.feature:390
+#
+# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
+apiSharePublicLink1/createPublicLinkShare.feature:411
+apiSharePublicLink1/createPublicLinkShare.feature:413
+#
+# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
+apiSharePublicLink1/createPublicLinkShare.feature:435
+apiSharePublicLink1/createPublicLinkShare.feature:437
+#
+# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
+apiSharePublicLink1/createPublicLinkShare.feature:461
+apiSharePublicLink1/createPublicLinkShare.feature:463
+#
+# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
+apiSharePublicLink1/createPublicLinkShare.feature:487
+apiSharePublicLink1/createPublicLinkShare.feature:489
+apiSharePublicLink1/createPublicLinkShare.feature:491
+apiSharePublicLink1/createPublicLinkShare.feature:493
+apiSharePublicLink1/createPublicLinkShare.feature:495
+apiSharePublicLink1/createPublicLinkShare.feature:497
+#
+# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
+apiSharePublicLink1/createPublicLinkShare.feature:518
+apiSharePublicLink1/createPublicLinkShare.feature:519
+#
+# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
+apiSharePublicLink1/createPublicLinkShare.feature:534
+apiSharePublicLink1/createPublicLinkShare.feature:535
+#
+apiSharePublicLink1/createPublicLinkShare.feature:553
+apiSharePublicLink1/createPublicLinkShare.feature:554
+#
+apiSharePublicLink1/createPublicLinkShare.feature:590
+apiSharePublicLink1/createPublicLinkShare.feature:591
+#
+# https://github.com/owncloud/ocis-reva/issues/283 Prevent creating public share for the home root folder
+apiSharePublicLink1/createPublicLinkShare.feature:620
+apiSharePublicLink1/createPublicLinkShare.feature:621
+#
+apiSharePublicLink1/createPublicLinkShare.feature:634
+apiSharePublicLink1/createPublicLinkShare.feature:635
+#
+apiSharePublicLink1/createPublicLinkShare.feature:663
+apiSharePublicLink1/createPublicLinkShare.feature:664
+#
+# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
+apiSharePublicLink1/createPublicLinkShare.feature:714
+apiSharePublicLink1/createPublicLinkShare.feature:715
+#
+# https://github.com/owncloud/ocis-reva/issues/199 Ability to return error messages in Webdav response bodies
+apiSharePublicLink1/createPublicLinkShare.feature:718
+#
+# https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
+apiSharePublicLink1/createPublicLinkShare.feature:727
+#
+# https://github.com/owncloud/ocis-reva/issues/468 Cannot set Mtime on upload
+apiSharePublicLink1/createPublicLinkShare.feature:760
+apiSharePublicLink1/createPublicLinkShare.feature:761
+apiSharePublicLink1/createPublicLinkShare.feature:774
+apiSharePublicLink1/createPublicLinkShare.feature:775
+#
+# https://github.com/owncloud/ocis-reva/issues/373 copying a folder within a public link folder to folder with same name as an already existing file overwrites the parent file
+apiSharePublicLink2/copyFromPublicLink.feature:60
+#
+# https://github.com/owncloud/ocis-reva/issues/373
+apiSharePublicLink2/copyFromPublicLink.feature:86
+#
+# https://github.com/owncloud/ocis-reva/issues/368 copying a file from within a public link folder to "/" overwrites the parent folder
+apiSharePublicLink2/copyFromPublicLink.feature:167
+apiSharePublicLink2/copyFromPublicLink.feature:168
+#
+# https://github.com/owncloud/ocis-reva/issues/368 copying a file from within a public link folder to "/" overwrites the parent folder
+apiSharePublicLink2/copyFromPublicLink.feature:183
+apiSharePublicLink2/copyFromPublicLink.feature:184
+#
+# https://github.com/owncloud/ocis-reva/issues/476 overwriting a file removes it's public links
+apiSharePublicLink2/multilinkSharing.feature:160
+#
+apiSharePublicLink2/updatePublicLinkShare.feature:94
+apiSharePublicLink2/updatePublicLinkShare.feature:95
+#
+apiSharePublicLink2/updatePublicLinkShare.feature:285
+apiSharePublicLink2/updatePublicLinkShare.feature:286
+#
+# https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
+apiSharePublicLink2/updatePublicLinkShare.feature:304
+apiSharePublicLink2/updatePublicLinkShare.feature:305
+#
+apiSharePublicLink2/updatePublicLinkShare.feature:323
+apiSharePublicLink2/updatePublicLinkShare.feature:324
+#
+# https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
+apiSharePublicLink2/updatePublicLinkShare.feature:342
+apiSharePublicLink2/updatePublicLinkShare.feature:343
+#
+apiSharePublicLink2/updatePublicLinkShare.feature:361
+apiSharePublicLink2/updatePublicLinkShare.feature:362
+#
+# https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
+apiSharePublicLink2/updatePublicLinkShare.feature:380
+apiSharePublicLink2/updatePublicLinkShare.feature:381
+#
+apiSharePublicLink2/updatePublicLinkShare.feature:399
+apiSharePublicLink2/updatePublicLinkShare.feature:400
+#
+# https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
+apiSharePublicLink2/updatePublicLinkShare.feature:418
+apiSharePublicLink2/updatePublicLinkShare.feature:419
+#
+apiSharePublicLink2/updatePublicLinkShare.feature:440
+apiSharePublicLink2/updatePublicLinkShare.feature:441
+#
+# https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
+apiSharePublicLink2/updatePublicLinkShare.feature:462
+apiSharePublicLink2/updatePublicLinkShare.feature:463
+#
+apiSharePublicLink2/updatePublicLinkShare.feature:487
+apiSharePublicLink2/updatePublicLinkShare.feature:488
+#
+apiSharePublicLink2/uploadToPublicLinkShare.feature:9
+#
+# https://github.com/owncloud/ocis-reva/issues/286 Upload-only shares must not overwrite but create a separate file
+apiSharePublicLink2/uploadToPublicLinkShare.feature:23
+#
+# https://github.com/owncloud/ocis-reva/issues/290 Accessing non-existing public link should return 404, not 500
+apiSharePublicLink2/uploadToPublicLinkShare.feature:62
+apiSharePublicLink2/uploadToPublicLinkShare.feature:63
+#
+# https://github.com/owncloud/ocis-reva/issues/290 Accessing non-existing public link should return 404, not 500
+apiSharePublicLink2/uploadToPublicLinkShare.feature:66
+#
+# https://github.com/owncloud/ocis-reva/issues/292 Public link enforce permissions
+apiSharePublicLink2/uploadToPublicLinkShare.feature:74
+#
+apiSharePublicLink2/uploadToPublicLinkShare.feature:83
+#
+apiSharePublicLink2/uploadToPublicLinkShare.feature:103
+#
+apiSharePublicLink2/uploadToPublicLinkShare.feature:121
+#
+apiSharePublicLink2/uploadToPublicLinkShare.feature:139
+#
+# https://github.com/owncloud/ocis-reva/issues/195 Set quota over settings
+apiSharePublicLink2/uploadToPublicLinkShare.feature:148
+#
+apiSharePublicLink2/uploadToPublicLinkShare.feature:158
+#
+# https://github.com/owncloud/ocis-reva/issues/195 Set quota over settings
+apiSharePublicLink2/uploadToPublicLinkShare.feature:167
+#
+apiSharePublicLink2/uploadToPublicLinkShare.feature:177
+#
+# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
+apiSharePublicLink2/uploadToPublicLinkShare.feature:186
+#
+apiSharePublicLink2/uploadToPublicLinkShare.feature:196
+#
+# https://github.com/owncloud/ocis-reva/issues/41 various sharing settings cannot be set
+apiSharePublicLink2/uploadToPublicLinkShare.feature:206
+#
+apiSharePublicLink2/uploadToPublicLinkShare.feature:217
+#
+apiSharePublicLink2/uploadToPublicLinkShare.feature:238
+#
+apiSharePublicLink2/uploadToPublicLinkShare.feature:255
+#
+# https://github.com/owncloud/ocis-reva/issues/286 Upload-only shares must not overwrite but create a separate file
+apiSharePublicLink2/uploadToPublicLinkShare.feature:273
+#
+# https://github.com/owncloud/product/issues/179 Propfind to trashbin endpoint requires UUID
+# https://github.com/owncloud/product/issues/178 File deletion using dav gives unique string in filename in the trashbin
+apiTrashbin/trashbinDelete.feature:31
+apiTrashbin/trashbinDelete.feature:32
+apiTrashbin/trashbinDelete.feature:33
+apiTrashbin/trashbinDelete.feature:34
+apiTrashbin/trashbinDelete.feature:37
+apiTrashbin/trashbinDelete.feature:50
+apiTrashbin/trashbinDelete.feature:67
+#
+# https://github.com/owncloud/product/issues/179 Propfind to trashbin endpoint requires UUID
+# https://github.com/owncloud/product/issues/178 File deletion using dav gives unique string in filename in the trashbin
+apiTrashbin/trashbinFilesFolders.feature:44
+apiTrashbin/trashbinFilesFolders.feature:45
+apiTrashbin/trashbinFilesFolders.feature:60
+apiTrashbin/trashbinFilesFolders.feature:61
+apiTrashbin/trashbinFilesFolders.feature:89
+apiTrashbin/trashbinFilesFolders.feature:90
+apiTrashbin/trashbinFilesFolders.feature:104
+apiTrashbin/trashbinFilesFolders.feature:105
+apiTrashbin/trashbinFilesFolders.feature:217
+apiTrashbin/trashbinFilesFolders.feature:218
+apiTrashbin/trashbinFilesFolders.feature:235
+apiTrashbin/trashbinFilesFolders.feature:236
+apiTrashbin/trashbinFilesFolders.feature:259
+apiTrashbin/trashbinFilesFolders.feature:260
+apiTrashbin/trashbinFilesFolders.feature:273
+apiTrashbin/trashbinFilesFolders.feature:274
+apiTrashbin/trashbinFilesFolders.feature:287
+apiTrashbin/trashbinFilesFolders.feature:288
+apiTrashbin/trashbinFilesFolders.feature:302
+apiTrashbin/trashbinFilesFolders.feature:303
+apiTrashbin/trashbinFilesFolders.feature:304
+apiTrashbin/trashbinFilesFolders.feature:308
+apiTrashbin/trashbinFilesFolders.feature:309
+apiTrashbin/trashbinFilesFolders.feature:310
+#
+# https://github.com/owncloud/product/issues/179 Propfind to trashbin endpoint requires UUID
+# https://github.com/owncloud/product/issues/178 File deletion using dav gives unique string in filename in the trashbin
+apiTrashbin/trashbinRestore.feature:31
+apiTrashbin/trashbinRestore.feature:32
+apiTrashbin/trashbinRestore.feature:62
+apiTrashbin/trashbinRestore.feature:63
+apiTrashbin/trashbinRestore.feature:76
+apiTrashbin/trashbinRestore.feature:77
+apiTrashbin/trashbinRestore.feature:92
+apiTrashbin/trashbinRestore.feature:93
+apiTrashbin/trashbinRestore.feature:112
+apiTrashbin/trashbinRestore.feature:113
+apiTrashbin/trashbinRestore.feature:114
+apiTrashbin/trashbinRestore.feature:115
+apiTrashbin/trashbinRestore.feature:116
+apiTrashbin/trashbinRestore.feature:117
+apiTrashbin/trashbinRestore.feature:141
+apiTrashbin/trashbinRestore.feature:142
+apiTrashbin/trashbinRestore.feature:143
+apiTrashbin/trashbinRestore.feature:144
+apiTrashbin/trashbinRestore.feature:165
+apiTrashbin/trashbinRestore.feature:166
+apiTrashbin/trashbinRestore.feature:188
+apiTrashbin/trashbinRestore.feature:189
+apiTrashbin/trashbinRestore.feature:206
+apiTrashbin/trashbinRestore.feature:207
+apiTrashbin/trashbinRestore.feature:279
+apiTrashbin/trashbinRestore.feature:280
+apiTrashbin/trashbinRestore.feature:323
+apiTrashbin/trashbinRestore.feature:324
+apiTrashbin/trashbinRestore.feature:325
+apiTrashbin/trashbinRestore.feature:326
+apiTrashbin/trashbinRestore.feature:327
+apiTrashbin/trashbinRestore.feature:328
+apiTrashbin/trashbinRestore.feature:343
+apiTrashbin/trashbinRestore.feature:344
+#
+# https://github.com/owncloud/ocis-reva/issues/17  uploading with old-chunking does not work
+# https://github.com/owncloud/ocis-reva/issues/56  remote.php/dav/uploads endpoint does not exist
+apiVersions/fileVersions.feature:15
+apiVersions/fileVersions.feature:23
+apiVersions/fileVersions.feature:36
+apiVersions/fileVersions.feature:45
+apiVersions/fileVersions.feature:88
+apiVersions/fileVersions.feature:89
+apiVersions/fileVersions.feature:93
+apiVersions/fileVersions.feature:104
+apiVersions/fileVersions.feature:288
+apiVersions/fileVersions.feature:362
+apiVersions/fileVersions.feature:373
+#
+# https://github.com/owncloud/ocis-reva/issues/275 file id changes on every uploaded
+apiVersions/fileVersions.feature:29
+apiVersions/fileVersions.feature:52
+apiVersions/fileVersions.feature:61
+apiVersions/fileVersions.feature:69
+apiVersions/fileVersions.feature:130
+#
+# https://github.com/owncloud/ocis-reva/issues/14  renaming a resource does not work
+apiWebdavMove1/moveFileAsync.feature:26
+apiWebdavMove1/moveFileAsync.feature:27
+apiWebdavMove1/moveFileAsync.feature:28
+apiWebdavMove1/moveFileAsync.feature:29
+apiWebdavMove1/moveFileAsync.feature:30
+apiWebdavMove1/moveFileAsync.feature:31
+apiWebdavMove1/moveFileAsync.feature:33
+apiWebdavMove1/moveFileAsync.feature:46
+apiWebdavMove1/moveFileAsync.feature:59
+apiWebdavMove1/moveFileAsync.feature:73
+apiWebdavMove1/moveFileAsync.feature:88
+apiWebdavMove1/moveFileAsync.feature:107
+apiWebdavMove1/moveFileAsync.feature:125
+apiWebdavMove1/moveFileAsync.feature:135
+apiWebdavMove1/moveFileAsync.feature:141
+apiWebdavMove1/moveFileAsync.feature:156
+apiWebdavMove1/moveFileAsync.feature:173
+apiWebdavMove1/moveFileAsync.feature:174
+apiWebdavMove1/moveFileAsync.feature:184
+apiWebdavMove1/moveFileAsync.feature:185
+apiWebdavMove1/moveFileAsync.feature:204
+apiWebdavMove1/moveFileAsync.feature:205
+apiWebdavMove1/moveFileAsync.feature:224
+apiWebdavMove1/moveFileAsync.feature:225
+apiWebdavMove1/moveFileAsync.feature:234
+apiWebdavMove1/moveFileAsync.feature:235
+apiWebdavMove1/moveFileAsync.feature:240
+#
+# https://github.com/owncloud/ocis-reva/issues/14  renaming a resource does not work
+apiWebdavMove1/moveFileToBlacklistedNameAsync.feature:12
+apiWebdavMove1/moveFileToBlacklistedNameAsync.feature:18
+apiWebdavMove1/moveFileToBlacklistedNameAsync.feature:26
+#
+# https://github.com/owncloud/ocis-reva/issues/14  renaming a resource does not work
+apiWebdavMove1/moveFileToExcludedDirectoryAsync.feature:12
+apiWebdavMove1/moveFileToExcludedDirectoryAsync.feature:19
+apiWebdavMove1/moveFileToExcludedDirectoryAsync.feature:27
+#
+# https://github.com/owncloud/ocis-reva/issues/14  renaming a resource does not work
+apiWebdavMove1/moveFolder.feature:21
+apiWebdavMove1/moveFolder.feature:22
+apiWebdavMove1/moveFolder.feature:34
+apiWebdavMove1/moveFolder.feature:35
+apiWebdavMove1/moveFolder.feature:47
+apiWebdavMove1/moveFolder.feature:48
+#
+# https://github.com/owncloud/ocis-reva/issues/14  renaming a resource does not work
+apiWebdavMove1/moveFolderToBlacklistedName.feature:21
+apiWebdavMove1/moveFolderToBlacklistedName.feature:22
+apiWebdavMove1/moveFolderToBlacklistedName.feature:35
+apiWebdavMove1/moveFolderToBlacklistedName.feature:36
+apiWebdavMove1/moveFolderToBlacklistedName.feature:70
+apiWebdavMove1/moveFolderToBlacklistedName.feature:71
+#
+# https://github.com/owncloud/ocis-reva/issues/14  renaming a resource does not work
+apiWebdavMove1/moveFolderToExcludedDirectory.feature:21
+apiWebdavMove1/moveFolderToExcludedDirectory.feature:22
+apiWebdavMove1/moveFolderToExcludedDirectory.feature:34
+apiWebdavMove1/moveFolderToExcludedDirectory.feature:35
+apiWebdavMove1/moveFolderToExcludedDirectory.feature:70
+apiWebdavMove1/moveFolderToExcludedDirectory.feature:71
+#
+# https://github.com/owncloud/ocis-reva/issues/14  renaming a resource does not work
+apiWebdavMove2/moveFile.feature:89
+apiWebdavMove2/moveFile.feature:90
+apiWebdavMove2/moveFile.feature:91
+apiWebdavMove2/moveFile.feature:92
+apiWebdavMove2/moveFile.feature:112
+apiWebdavMove2/moveFile.feature:113
+apiWebdavMove2/moveFile.feature:136
+apiWebdavMove2/moveFile.feature:137
+apiWebdavMove2/moveFile.feature:138
+apiWebdavMove2/moveFile.feature:139
+apiWebdavMove2/moveFile.feature:160
+apiWebdavMove2/moveFile.feature:161
+apiWebdavMove2/moveFile.feature:181
+apiWebdavMove2/moveFile.feature:182
+apiWebdavMove2/moveFile.feature:200
+apiWebdavMove2/moveFile.feature:201
+apiWebdavMove2/moveFile.feature:219
+apiWebdavMove2/moveFile.feature:220
+apiWebdavMove2/moveFile.feature:255
+apiWebdavMove2/moveFile.feature:256
+apiWebdavMove2/moveFile.feature:272
+apiWebdavMove2/moveFile.feature:273
+#
+#
+# https://github.com/owncloud/ocis-reva/issues/265 file cannot contain ? character
+apiWebdavMove2/moveFile.feature:292
+#
+# https://github.com/owncloud/ocis-reva/issues/14  renaming a resource does not work
+apiWebdavMove2/moveFileToBlacklistedName.feature:18
+apiWebdavMove2/moveFileToBlacklistedName.feature:19
+apiWebdavMove2/moveFileToBlacklistedName.feature:29
+apiWebdavMove2/moveFileToBlacklistedName.feature:30
+apiWebdavMove2/moveFileToBlacklistedName.feature:62
+apiWebdavMove2/moveFileToBlacklistedName.feature:63
+#
+# https://github.com/owncloud/ocis-reva/issues/14  renaming a resource does not work
+apiWebdavMove2/moveFileToExcludedDirectory.feature:18
+apiWebdavMove2/moveFileToExcludedDirectory.feature:19
+apiWebdavMove2/moveFileToExcludedDirectory.feature:28
+apiWebdavMove2/moveFileToExcludedDirectory.feature:29
+apiWebdavMove2/moveFileToExcludedDirectory.feature:63
+apiWebdavMove2/moveFileToExcludedDirectory.feature:64
+#
+# https://github.com/owncloud/ocis-reva/issues/11  listing received shares does not work
+apiWebdavOperations/deleteFolder.feature:67
+apiWebdavOperations/deleteFolder.feature:68
+apiWebdavOperations/deleteFolder.feature:69
+apiWebdavOperations/deleteFolder.feature:70
+apiWebdavOperations/deleteFolder.feature:91
+apiWebdavOperations/deleteFolder.feature:92
+#
+# https://github.com/owncloud/ocis-reva/issues/12  Range Header is not obeyed when downloading a file
+apiWebdavOperations/downloadFile.feature:29
+apiWebdavOperations/downloadFile.feature:30
+#
+apiWebdavOperations/downloadFile.feature:72
+apiWebdavOperations/downloadFile.feature:73
+#
+apiWebdavOperations/downloadFile.feature:84
+apiWebdavOperations/downloadFile.feature:85
+#
+apiWebdavOperations/refuseAccess.feature:21
+apiWebdavOperations/refuseAccess.feature:22
+#
+apiWebdavOperations/refuseAccess.feature:33
+apiWebdavOperations/refuseAccess.feature:34
+#
+# https://github.com/owncloud/ocis-reva/issues/39  REPORT request not implemented
+apiWebdavOperations/search.feature:42
+apiWebdavOperations/search.feature:43
+apiWebdavOperations/search.feature:57
+apiWebdavOperations/search.feature:58
+apiWebdavOperations/search.feature:74
+apiWebdavOperations/search.feature:75
+apiWebdavOperations/search.feature:83
+apiWebdavOperations/search.feature:84
+apiWebdavOperations/search.feature:101
+apiWebdavOperations/search.feature:102
+apiWebdavOperations/search.feature:119
+apiWebdavOperations/search.feature:120
+apiWebdavOperations/search.feature:138
+apiWebdavOperations/search.feature:139
+apiWebdavOperations/search.feature:165
+apiWebdavOperations/search.feature:166
+apiWebdavOperations/search.feature:191
+apiWebdavOperations/search.feature:192
+apiWebdavOperations/search.feature:210
+apiWebdavOperations/search.feature:211
+apiWebdavOperations/search.feature:213
+apiWebdavOperations/search.feature:229
+#
+# https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
+apiWebdavProperties1/copyFile.feature:65
+apiWebdavProperties1/copyFile.feature:66
+#
+# https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
+apiWebdavProperties1/copyFile.feature:85
+apiWebdavProperties1/copyFile.feature:86
+#
+# https://github.com/owncloud/ocis-reva/issues/15 blacklisted filenames like .htaccess & file.parts can be uploaded
+apiWebdavProperties1/copyFile.feature:102
+apiWebdavProperties1/copyFile.feature:103
+#
+# https://github.com/owncloud/ocis-reva/issues/387 Getting information about a folder overwritten by a file gives 500 error instead of 404
+apiWebdavProperties1/copyFile.feature:116
+apiWebdavProperties1/copyFile.feature:117
+#
+# https://github.com/owncloud/ocis-reva/issues/387 Getting information about a folder overwritten by a file gives 500 error instead of 404
+apiWebdavProperties1/copyFile.feature:129
+apiWebdavProperties1/copyFile.feature:130
+#
+# https://github.com/owncloud/ocis-reva/issues/387 Getting information about a folder overwritten by a file gives 500 error instead of 404
+apiWebdavProperties1/copyFile.feature:165
+apiWebdavProperties1/copyFile.feature:166
+#
+# https://github.com/owncloud/ocis-reva/issues/387 Getting information about a folder overwritten by a file gives 500 error instead of 404
+apiWebdavProperties1/copyFile.feature:202
+apiWebdavProperties1/copyFile.feature:203
+#
+# https://github.com/owncloud/ocis-reva/issues/387 Getting information about a folder overwritten by a file gives 500 error instead of 404
+apiWebdavProperties1/copyFile.feature:350
+apiWebdavProperties1/copyFile.feature:351
+#
+# https://github.com/owncloud/ocis-reva/issues/387 Getting information about a folder overwritten by a file gives 500 error instead of 404
+apiWebdavProperties1/copyFile.feature:370
+apiWebdavProperties1/copyFile.feature:371
+#
+# https://github.com/owncloud/ocis-reva/issues/387 Getting information about a folder overwritten by a file gives 500 error instead of 404
+apiWebdavProperties1/copyFile.feature:395
+apiWebdavProperties1/copyFile.feature:396
+#
+# https://github.com/owncloud/ocis-reva/issues/387 Getting information about a folder overwritten by a file gives 500 error instead of 404
+apiWebdavProperties1/copyFile.feature:422
+apiWebdavProperties1/copyFile.feature:423
+#
+# https://github.com/owncloud/ocis-reva/issues/387 Getting information about a folder overwritten by a file gives 500 error instead of 404
+apiWebdavProperties1/copyFile.feature:448
+apiWebdavProperties1/copyFile.feature:449
+#
+# https://github.com/owncloud/ocis-reva/issues/387 Getting information about a folder overwritten by a file gives 500 error instead of 404
+apiWebdavProperties1/copyFile.feature:474
+apiWebdavProperties1/copyFile.feature:475
+#
+# https://github.com/owncloud/ocis-reva/issues/15 blacklisted filenames like .htaccess & file.parts can be uploaded
+apiWebdavProperties1/createFolder.feature:71
+apiWebdavProperties1/createFolder.feature:72
+#
+# https://github.com/owncloud/ocis-reva/issues/168 creating a folder that already exists returns an empty body
+apiWebdavProperties1/createFolder.feature:85
+apiWebdavProperties1/createFolder.feature:86
+#
+# https://github.com/owncloud/ocis-reva/issues/168 creating a folder that already exists returns an empty body
+apiWebdavProperties1/createFolder.feature:99
+apiWebdavProperties1/createFolder.feature:100
+#
+# https://github.com/owncloud/ocis-reva/issues/101 quota query
+apiWebdavProperties1/getQuota.feature:17
+apiWebdavProperties1/getQuota.feature:18
+apiWebdavProperties1/getQuota.feature:27
+apiWebdavProperties1/getQuota.feature:28
+apiWebdavProperties1/getQuota.feature:48
+apiWebdavProperties1/getQuota.feature:49
+apiWebdavProperties1/getQuota.feature:61
+apiWebdavProperties1/getQuota.feature:62
+apiWebdavProperties1/getQuota.feature:77
+apiWebdavProperties1/getQuota.feature:78
+#
+# https://github.com/owncloud/ocis-reva/issues/276 elements cannot be favorited
+apiWebdavProperties1/setFileProperties.feature:20
+apiWebdavProperties1/setFileProperties.feature:21
+apiWebdavProperties1/setFileProperties.feature:45
+apiWebdavProperties1/setFileProperties.feature:46
+apiWebdavProperties1/setFileProperties.feature:76
+apiWebdavProperties1/setFileProperties.feature:77
+apiWebdavProperties1/setFileProperties.feature:80
+#
+# https://github.com/owncloud/ocis-reva/issues/265 elements cannot be favorited
+apiWebdavProperties2/getFileProperties.feature:102
+apiWebdavProperties2/getFileProperties.feature:103
+#
+# https://github.com/owncloud/ocis-reva/issues/217 Some failing tests with Webdav custom properties
+apiWebdavProperties1/setFileProperties.feature:32
+apiWebdavProperties1/setFileProperties.feature:33
+apiWebdavProperties1/setFileProperties.feature:63
+apiWebdavProperties1/setFileProperties.feature:64
+#
+# https://github.com/owncloud/ocis-reva/issues/214 XML properties in webdav response not properly encoded
+apiWebdavProperties2/getFileProperties.feature:37
+apiWebdavProperties2/getFileProperties.feature:39
+apiWebdavProperties2/getFileProperties.feature:40
+apiWebdavProperties2/getFileProperties.feature:41
+apiWebdavProperties2/getFileProperties.feature:43
+apiWebdavProperties2/getFileProperties.feature:44
+#
+# https://github.com/owncloud/ocis-reva/issues/214 XML properties in webdav response not properly encoded
+apiWebdavProperties2/getFileProperties.feature:59
+apiWebdavProperties2/getFileProperties.feature:60
+apiWebdavProperties2/getFileProperties.feature:61
+apiWebdavProperties2/getFileProperties.feature:63
+apiWebdavProperties2/getFileProperties.feature:64
+apiWebdavProperties2/getFileProperties.feature:66
+apiWebdavProperties2/getFileProperties.feature:67
+apiWebdavProperties2/getFileProperties.feature:68
+apiWebdavProperties2/getFileProperties.feature:70
+apiWebdavProperties2/getFileProperties.feature:71
+#
+# https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
+apiWebdavProperties2/getFileProperties.feature:135
+apiWebdavProperties2/getFileProperties.feature:136
+#
+# https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
+apiWebdavProperties2/getFileProperties.feature:156
+apiWebdavProperties2/getFileProperties.feature:157
+#
+# https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
+apiWebdavProperties2/getFileProperties.feature:174
+apiWebdavProperties2/getFileProperties.feature:175
+#
+# https://github.com/owncloud/ocis-reva/issues/11 listing received shares does not work
+apiWebdavProperties2/getFileProperties.feature:206
+apiWebdavProperties2/getFileProperties.feature:207
+#
+apiWebdavProperties2/getFileProperties.feature:218
+apiWebdavProperties2/getFileProperties.feature:219
+#
+# https://github.com/owncloud/ocis-reva/issues/216 Private link support
+apiWebdavProperties2/getFileProperties.feature:232
+apiWebdavProperties2/getFileProperties.feature:233
+#
+# https://github.com/owncloud/ocis-reva/issues/163 trying to access a non-existing resource returns an empty body
+apiWebdavProperties2/getFileProperties.feature:242
+apiWebdavProperties2/getFileProperties.feature:243
+#
+# https://github.com/owncloud/ocis-reva/issues/217 Some failing tests with Webdav custom properties
+apiWebdavProperties2/getFileProperties.feature:246
+#
+# https://github.com/owncloud/ocis-reva/issues/217 Some failing tests with Webdav custom properties
+apiWebdavProperties2/getFileProperties.feature:266
+#
+# https://github.com/owncloud/ocis-reva/issues/217 Some failing tests with Webdav custom properties
+apiWebdavProperties2/getFileProperties.feature:301
+apiWebdavProperties2/getFileProperties.feature:302
+#
+# https://github.com/owncloud/ocis-reva/issues/217 Some failing tests with Webdav custom properties
+apiWebdavProperties2/getFileProperties.feature:314
+apiWebdavProperties2/getFileProperties.feature:315
+#
+# https://github.com/owncloud/ocis-reva/issues/217 Some failing tests with Webdav custom properties
+apiWebdavProperties2/getFileProperties.feature:327
+apiWebdavProperties2/getFileProperties.feature:328
+#
+# https://github.com/owncloud/ocis-reva/issues/217 Some failing tests with Webdav custom properties
+apiWebdavProperties2/getFileProperties.feature:389
+apiWebdavProperties2/getFileProperties.feature:390
+#
+# https://github.com/owncloud/ocis-reva/issues/217 Some failing tests with Webdav custom properties
+apiWebdavProperties2/getFileProperties.feature:402
+apiWebdavProperties2/getFileProperties.feature:403
+#
+# https://github.com/owncloud/ocis-reva/issues/217 Some failing tests with Webdav custom properties
+apiWebdavProperties2/getFileProperties.feature:415
+apiWebdavProperties2/getFileProperties.feature:416
+#
+# https://github.com/owncloud/ocis-reva/issues/217 Some failing tests with Webdav custom properties
+apiWebdavProperties2/getFileProperties.feature:428
+apiWebdavProperties2/getFileProperties.feature:429
+#
+# https://github.com/owncloud/ocis-reva/issues/217 Some failing tests with Webdav custom properties
+apiWebdavProperties2/getFileProperties.feature:441
+apiWebdavProperties2/getFileProperties.feature:442
+#
+# https://github.com/owncloud/ocis-reva/issues/217 Some failing tests with Webdav custom properties
+apiWebdavProperties2/getFileProperties.feature:454
+apiWebdavProperties2/getFileProperties.feature:455
+#
+# https://github.com/owncloud/ocis-reva/issues/265 filename cannot contain ?
+apiWebdavUpload1/uploadFile.feature:48
+apiWebdavUpload1/uploadFile.feature:49
+apiWebdavUpload1/uploadFile.feature:50
+apiWebdavUpload1/uploadFile.feature:51
+apiWebdavUpload1/uploadFile.feature:52
+apiWebdavUpload1/uploadFile.feature:53
+apiWebdavUpload1/uploadFile.feature:95
+apiWebdavUpload1/uploadFile.feature:96
+apiWebdavUpload1/uploadFile.feature:97
+apiWebdavUpload1/uploadFile.feature:98
+#
+# https://github.com/owncloud/ocis-reva/issues/468 Cannot set Mtime on upload
+apiWebdavUpload1/uploadFile.feature:144
+apiWebdavUpload1/uploadFile.feature:145
+apiWebdavUpload1/uploadFile.feature:157
+apiWebdavUpload1/uploadFile.feature:158
+apiWebdavUpload1/uploadFile.feature:171
+apiWebdavUpload1/uploadFile.feature:172
+apiWebdavUpload1/uploadFile.feature:184
+apiWebdavUpload1/uploadFile.feature:185
+#
+# https://github.com/owncloud/ocis-reva/issues/15 blacklisted filenames like .htaccess & file.parts can be uploaded
+apiWebdavUpload1/uploadFile.feature:112
+apiWebdavUpload1/uploadFile.feature:113
+#
+# https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
+apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:14
+apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:31
+apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:48
+apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:65
+apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:83
+apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:92
+apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:106
+apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:143
+apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:144
+apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:146
+apiWebdavUpload1/uploadFileAsyncUsingNewChunking.feature:159
+#
+# https://github.com/owncloud/ocis-reva/issues/15 blacklisted filenames like .htaccess & file.parts can be uploaded
+apiWebdavUpload1/uploadFileToBlacklistedName.feature:19
+apiWebdavUpload1/uploadFileToBlacklistedName.feature:20
+#
+# https://github.com/owncloud/ocis-reva/issues/54 system configuration options missing
+apiWebdavUpload1/uploadFileToBlacklistedName.feature:31
+apiWebdavUpload1/uploadFileToBlacklistedName.feature:32
+#
+# https://github.com/owncloud/ocis-reva/issues/54 system configuration options missing
+apiWebdavUpload1/uploadFileToBlacklistedName.feature:65
+apiWebdavUpload1/uploadFileToBlacklistedName.feature:66
+#
+# https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
+apiWebdavUpload1/uploadFileToBlacklistedNameAsyncUsingNewChunking.feature:14
+apiWebdavUpload1/uploadFileToBlacklistedNameAsyncUsingNewChunking.feature:23
+apiWebdavUpload1/uploadFileToBlacklistedNameAsyncUsingNewChunking.feature:47
+apiWebdavUpload1/uploadFileToBlacklistedNameAsyncUsingNewChunking.feature:48
+apiWebdavUpload1/uploadFileToBlacklistedNameAsyncUsingNewChunking.feature:49
+apiWebdavUpload1/uploadFileToBlacklistedNameAsyncUsingNewChunking.feature:52
+#
+# https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
+apiWebdavUpload1/uploadFileToExcludedDirectory.feature:20
+apiWebdavUpload1/uploadFileToExcludedDirectory.feature:21
+apiWebdavUpload1/uploadFileToExcludedDirectory.feature:33
+apiWebdavUpload1/uploadFileToExcludedDirectory.feature:34
+apiWebdavUpload1/uploadFileToExcludedDirectory.feature:69
+apiWebdavUpload1/uploadFileToExcludedDirectory.feature:70
+#
+# https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
+apiWebdavUpload1/uploadFileToExcludedDirectoryAsyncUsingNewChunking.feature:14
+apiWebdavUpload1/uploadFileToExcludedDirectoryAsyncUsingNewChunking.feature:24
+apiWebdavUpload1/uploadFileToExcludedDirectoryAsyncUsingNewChunking.feature:49
+apiWebdavUpload1/uploadFileToExcludedDirectoryAsyncUsingNewChunking.feature:50
+apiWebdavUpload1/uploadFileToExcludedDirectoryAsyncUsingNewChunking.feature:51
+apiWebdavUpload1/uploadFileToExcludedDirectoryAsyncUsingNewChunking.feature:54
+#
+# https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature:12
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature:21
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature:45
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature:46
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature:47
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingNewChunking.feature:50
+#
+# https://github.com/owncloud/ocis-reva/issues/15 blacklisted filenames like .htaccess & file.parts can be uploaded
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:13
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:20
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:37
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:38
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:39
+apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:42
+#
+# https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:12
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:22
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:47
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:48
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:49
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingNewChunking.feature:52
+#
+# https://github.com/owncloud/ocis-reva/issues/15 blacklisted filenames like .htaccess & file.parts can be uploaded
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:13
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:21
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:39
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:40
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:41
+apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:44
+#
+# https://github.com/owncloud/ocis-reva/issues/56 remote.php/dav/uploads endpoint does not exist
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:12
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:29
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:43
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:57
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:74
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:79
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:85
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:94
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:98
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:106
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:135
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:136
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:137
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:157
+apiWebdavUpload2/uploadFileUsingNewChunking.feature:158
+#
+# https://github.com/owncloud/ocis-reva/issues/17  uploading with old-chunking does not work
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:13
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:26
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:35
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:44
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:76
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:77
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:97
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:98
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:99
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:100
+apiWebdavUpload2/uploadFileUsingOldChunking.feature:101
+#
+# https://github.com/owncloud/ocis/issues/187 Previews via webDAV API tests fail on OCIS
+apiWebdavPreviews/previews.feature:15
+apiWebdavPreviews/previews.feature:16
+apiWebdavPreviews/previews.feature:17
+apiWebdavPreviews/previews.feature:18
+apiWebdavPreviews/previews.feature:19
+apiWebdavPreviews/previews.feature:29
+apiWebdavPreviews/previews.feature:30
+apiWebdavPreviews/previews.feature:31
+apiWebdavPreviews/previews.feature:32
+apiWebdavPreviews/previews.feature:33
+apiWebdavPreviews/previews.feature:34
+apiWebdavPreviews/previews.feature:35
+apiWebdavPreviews/previews.feature:46
+apiWebdavPreviews/previews.feature:47
+apiWebdavPreviews/previews.feature:48
+apiWebdavPreviews/previews.feature:49
+apiWebdavPreviews/previews.feature:50
+apiWebdavPreviews/previews.feature:51
+apiWebdavPreviews/previews.feature:52Add webUI tests for preview of jpeg and png file with media viewer
+apiWebdavPreviews/previews.feature:103
+apiWebdavPreviews/previews.feature:112
+apiWebdavPreviews/previews.feature:119
+apiWebdavPreviews/previews.feature:126
+apiWebdavPreviews/previews.feature:134
+apiWebdavPreviews/previews.feature:143
+apiWebdavPreviews/previews.feature:162
+apiWebdavPreviews/previews.feature:163
+apiWebdavPreviews/previews.feature:164
+apiWebdavPreviews/previews.feature:165
+apiWebdavPreviews/previews.feature:177
+apiWebdavPreviews/previews.feature:178
+#
+# https://github.com/owncloud/ocis-ocs/issues/35 group support is not yet implemented
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:83
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:84
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:102
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:103
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:104
+apiShareCreateSpecial2/createShareWithInvalidPermissions.feature:105
