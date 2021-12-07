@@ -6,20 +6,20 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
-	"path"
 
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	revactx "github.com/cs3org/reva/pkg/ctx"
+	"github.com/cs3org/reva/pkg/errtypes"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/pkg/utils"
+	"github.com/owncloud/ocis/accounts/pkg/config"
 	"google.golang.org/grpc/metadata"
 )
 
-const (
-	storageMountPath = "/meta"
-)
-
 func NewMetadataStorage(providerAddr string) (s MetadataStorage, err error) {
-
 	p, err := pool.GetStorageProviderServiceClient(providerAddr)
 	if err != nil {
 		return MetadataStorage{}, err
@@ -39,12 +39,49 @@ type MetadataStorage struct {
 	SpaceRoot         *provider.ResourceId
 }
 
+// init creates the metadata space
+func (ms *MetadataStorage) Init(ctx context.Context, serviceUser config.ServiceUser) (err error) {
+	// FIXME change CS3 api to allow sending a space id
+	cssr, err := ms.storageProvider.CreateStorageSpace(ctx, &provider.CreateStorageSpaceRequest{
+		Opaque: &typesv1beta1.Opaque{
+			Map: map[string]*typesv1beta1.OpaqueEntry{
+				"spaceid": {
+					Decoder: "plain",
+					Value:   []byte(serviceUser.UUID),
+				},
+			},
+		},
+		Owner: &user.User{
+			Id: &user.UserId{
+				OpaqueId: serviceUser.UUID,
+			},
+			Groups:    []string{},
+			UidNumber: serviceUser.UID,
+			GidNumber: serviceUser.GID,
+		},
+		Name: "Metadata",
+		Type: "metadata",
+	})
+	switch {
+	case err != nil:
+		return err
+	case cssr.Status.Code == v1beta11.Code_CODE_OK:
+		ms.SpaceRoot = cssr.StorageSpace.Root
+	case cssr.Status.Code == v1beta11.Code_CODE_ALREADY_EXISTS:
+		// TODO make CreateStorageSpace return existing space?
+		ms.SpaceRoot = &provider.ResourceId{StorageId: serviceUser.UUID, OpaqueId: serviceUser.UUID}
+	default:
+		return errtypes.NewErrtypeFromStatus(cssr.Status)
+	}
+	return nil
+}
+
 func (ms MetadataStorage) SimpleUpload(ctx context.Context, uploadpath string, content []byte) error {
 
 	ref := provider.InitiateFileUploadRequest{
 		Ref: &provider.Reference{
 			ResourceId: ms.SpaceRoot,
-			Path:       path.Join(storageMountPath, uploadpath),
+			Path:       utils.MakeRelativePath(uploadpath),
 		},
 	}
 
@@ -86,7 +123,7 @@ func (ms MetadataStorage) SimpleDownload(ctx context.Context, downloadpath strin
 	ref := provider.InitiateFileDownloadRequest{
 		Ref: &provider.Reference{
 			ResourceId: ms.SpaceRoot,
-			Path:       path.Join(storageMountPath, downloadpath),
+			Path:       utils.MakeRelativePath(downloadpath),
 		},
 	}
 
@@ -98,13 +135,13 @@ func (ms MetadataStorage) SimpleDownload(ctx context.Context, downloadpath strin
 	var endpoint string
 
 	for _, proto := range res.GetProtocols() {
-		if proto.Protocol == "simple" {
+		if proto.Protocol == "spaces" {
 			endpoint = proto.GetDownloadEndpoint()
 			break
 		}
 	}
 	if endpoint == "" {
-		return []byte{}, errors.New("metadata storage doesn't support the simple download protocol")
+		return []byte{}, errors.New("metadata storage doesn't support the spaces download protocol")
 	}
 
 	req, err := http.NewRequest(http.MethodGet, endpoint, nil)

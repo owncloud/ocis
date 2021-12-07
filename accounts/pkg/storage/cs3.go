@@ -6,18 +6,15 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/cs3org/reva/pkg/auth/scope"
-	"github.com/cs3org/reva/pkg/errtypes"
-	"github.com/cs3org/reva/pkg/utils"
-
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/pkg/auth/scope"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
+	"github.com/cs3org/reva/pkg/utils"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
@@ -25,16 +22,12 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-const (
-	storageMountPath = "/meta"
-)
-
 // CS3Repo provides a cs3 implementation of the Repo interface
 type CS3Repo struct {
 	cfg             *config.Config
 	tm              token.Manager
 	storageProvider provider.ProviderAPIClient
-	metadataStorage metadatastorage.MetadataStorage
+	metadataStorage *metadatastorage.MetadataStorage
 }
 
 // NewCS3Repo creates a new cs3 repo
@@ -57,60 +50,22 @@ func NewCS3Repo(cfg *config.Config) (Repo, error) {
 		return nil, err
 	}
 
-	repo := CS3Repo{
+	r := CS3Repo{
 		cfg:             cfg,
 		tm:              tokenManager,
 		storageProvider: client,
-		metadataStorage: ms,
+		metadataStorage: &ms,
 	}
 
-	if err := repo.Init(); err != nil {
+	ctx, err := r.getAuthenticatedContext(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	if err := ms.Init(ctx, cfg.ServiceUser); err != nil {
 		return nil, err
 	}
 
-	return &repo, nil
-}
-
-// init creates the metadata space
-func (r *CS3Repo) Init() (err error) {
-	ctx := context.Background()
-	ctx, err = r.getAuthenticatedContext(ctx)
-	if err != nil {
-		return err
-	}
-	// FIXME change CS3 api to allow sending a space id
-	cssr, err := r.storageProvider.CreateStorageSpace(ctx, &provider.CreateStorageSpaceRequest{
-		Opaque: &typesv1beta1.Opaque{
-			Map: map[string]*typesv1beta1.OpaqueEntry{
-				"spaceid": {
-					Decoder: "plain",
-					Value:   []byte(r.cfg.ServiceUser.UUID),
-				},
-			},
-		},
-		Owner: &user.User{
-			Id: &user.UserId{
-				OpaqueId: r.cfg.ServiceUser.UUID,
-			},
-			Groups:    []string{},
-			UidNumber: r.cfg.ServiceUser.UID,
-			GidNumber: r.cfg.ServiceUser.GID,
-		},
-		Name: "Metadata",
-		Type: "metadata",
-	})
-	switch {
-	case err != nil:
-		return err
-	case cssr.Status.Code == v1beta11.Code_CODE_OK:
-		r.metadataStorage.SpaceRoot = cssr.StorageSpace.Root
-	case cssr.Status.Code == v1beta11.Code_CODE_ALREADY_EXISTS:
-		// TODO make CreateStorageSpace return existing space?
-		r.metadataStorage.SpaceRoot = &provider.ResourceId{StorageId: r.cfg.ServiceUser.UUID, OpaqueId: r.cfg.ServiceUser.UUID}
-	default:
-		return errtypes.NewErrtypeFromStatus(cssr.Status)
-	}
-	return nil
+	return r, nil
 }
 
 // WriteAccount writes an account via cs3 and modifies the provided account (e.g. with a generated id).

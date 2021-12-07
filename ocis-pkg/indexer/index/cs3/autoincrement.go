@@ -94,6 +94,14 @@ func (idx *Autoincrement) Init() error {
 	}
 	idx.metadataStorage = &m
 
+	ctx, err := idx.getAuthenticatedContext(context.Background())
+	if err != nil {
+		return err
+	}
+	if err := idx.metadataStorage.Init(ctx, idx.cs3conf.ServiceUser); err != nil {
+		return err
+	}
+
 	if err := idx.makeDirIfNotExists(idx.indexBaseDir); err != nil {
 		return err
 	}
@@ -298,7 +306,10 @@ func (idx *Autoincrement) makeDirIfNotExists(folder string) error {
 	if err != nil {
 		return err
 	}
-	return storage.MakeDirIfNotExist(ctx, idx.storageProvider, folder)
+	return storage.MakeDirIfNotExist(ctx, idx.storageProvider, &provider.ResourceId{
+		StorageId: idx.cs3conf.ServiceUser.UUID,
+		OpaqueId:  idx.cs3conf.ServiceUser.UUID,
+	}, folder)
 }
 
 func (idx *Autoincrement) next() (int, error) {

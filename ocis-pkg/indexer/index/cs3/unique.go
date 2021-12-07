@@ -91,6 +91,14 @@ func (idx *Unique) Init() error {
 	}
 	idx.metadataStorage = &m
 
+	ctx, err := idx.getAuthenticatedContext(context.Background())
+	if err != nil {
+		return err
+	}
+	if err := idx.metadataStorage.Init(ctx, idx.cs3conf.ServiceUser); err != nil {
+		return err
+	}
+
 	if err := idx.makeDirIfNotExists(idx.indexBaseDir); err != nil {
 		return err
 	}
