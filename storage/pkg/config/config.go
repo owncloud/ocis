@@ -545,7 +545,7 @@ func DefaultConfig() *Config {
 				UserFilter:           "(&(objectclass=posixAccount)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))",
 				UserAttributeFilter:  "(&(objectclass=posixAccount)({{attr}}={{value}}))",
 				UserFindFilter:       "(&(objectclass=posixAccount)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
-				UserGroupFilter:      "(&(objectclass=posixGroup)(ownclouduuid={{.OpaqueId}}*))",
+				UserGroupFilter:      "(&(objectclass=posixGroup)(cn={{.}}*))", // FIXME (&(objectclass=posixGroup)(ownclouduuid={{.OpaqueId}}*)) in reva the template is executed with a string. IIRC rhaferkamp mentioned this
 				GroupFilter:          "(&(objectclass=posixGroup)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))",
 				GroupAttributeFilter: "(&(objectclass=posixGroup)({{attr}}={{value}}))",
 				GroupFindFilter:      "(&(objectclass=posixGroup)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
@@ -755,7 +755,7 @@ func DefaultConfig() *Config {
 				OCDavPrefix:                "",
 				OCSPrefix:                  "ocs",
 				OCSSharePrefix:             "/Shares",
-				OCSHomeNamespace:           "/home",
+				OCSHomeNamespace:           "/users/{{.Id.OpaqueId}}",
 				PublicURL:                  "https://localhost:9200",
 				OCSCacheWarmupDriver:       "",
 				OCSAdditionalInfoAttribute: "{{.Mail}}",
