@@ -1,8 +1,6 @@
-package storage
+package metadataStorage
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type notFoundErr struct {
 	typ, id string

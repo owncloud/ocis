@@ -8,6 +8,13 @@ Level-3 headings should be used for the references to the relevant issues. Inclu
 
 Other free text and markdown formatting can be used elsewhere in the document if needed. But if you want to explain something about the issue, then please post that in the issue itself.
 
+### [unexpected behavior when renaming files](https://github.com/owncloud/web/issues/4893)
+- [webUIFilesCopy/copy.feature:36](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copy.feature#L36)
+- [webUIFilesCopy/copy.feature:68](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copy.feature#L68)
+- [webUIFilesCopy/copy.feature:69](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copy.feature#L69)
+- [webUIFilesCopy/copy.feature:70](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copy.feature#L70)
+- [webUIFilesCopy/copy.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copy.feature#L71)
+
 ### [Media Viewer does not support mp3 files](https://github.com/owncloud/ocis/issues/1106)
 -   [webUIPreview/imageMediaViewer.feature:84](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L84)
 -   [webUIPreview/imageMediaViewer.feature:91](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPreview/imageMediaViewer.feature#L91)

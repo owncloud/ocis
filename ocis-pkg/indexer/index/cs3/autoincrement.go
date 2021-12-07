@@ -2,9 +2,6 @@ package cs3
 
 import (
 	"context"
-	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -27,6 +24,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/indexer/index"
 	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
 	"github.com/owncloud/ocis/ocis-pkg/indexer/registry"
+	metadatastorage "github.com/owncloud/ocis/ocis-pkg/metadata_storage"
 )
 
 // Autoincrement are fields for an index of type autoincrement.
@@ -39,7 +37,7 @@ type Autoincrement struct {
 
 	tokenManager    token.Manager
 	storageProvider provider.ProviderAPIClient
-	dataProvider    dataProviderClient // Used to create and download data via http, bypassing reva upload protocol
+	metadataStorage *metadatastorage.MetadataStorage
 
 	cs3conf *Config
 	bound   *option.Bound
@@ -65,16 +63,8 @@ func NewAutoincrementIndex(o ...option.Option) index.Index {
 		indexRootDir: path.Join(path.Join(opts.DataDir, "index.cs3"), strings.Join([]string{"autoincrement", opts.TypeName, opts.IndexBy}, ".")),
 		cs3conf: &Config{
 			ProviderAddr: opts.ProviderAddr,
-			DataURL:      opts.DataURL,
-			DataPrefix:   opts.DataPrefix,
 			JWTSecret:    opts.JWTSecret,
 			ServiceUser:  opts.ServiceUser,
-		},
-		dataProvider: dataProviderClient{
-			baseURL: singleJoiningSlash(opts.DataURL, opts.DataPrefix),
-			client: http.Client{
-				Transport: http.DefaultTransport,
-			},
 		},
 	}
 
@@ -86,30 +76,28 @@ func (idx *Autoincrement) Init() error {
 	tokenManager, err := jwt.New(map[string]interface{}{
 		"secret": idx.cs3conf.JWTSecret,
 	})
-
 	if err != nil {
 		return err
 	}
-
 	idx.tokenManager = tokenManager
 
 	client, err := pool.GetStorageProviderServiceClient(idx.cs3conf.ProviderAddr)
 	if err != nil {
 		return err
 	}
-
 	idx.storageProvider = client
 
-	ctx, err := idx.getAuthenticatedContext(context.Background())
+	m, err := metadatastorage.NewMetadataStorage(idx.cs3conf.ProviderAddr)
 	if err != nil {
 		return err
 	}
+	idx.metadataStorage = &m
 
-	if err := idx.makeDirIfNotExists(ctx, idx.indexBaseDir); err != nil {
+	if err := idx.makeDirIfNotExists(idx.indexBaseDir); err != nil {
 		return err
 	}
 
-	if err := idx.makeDirIfNotExists(ctx, idx.indexRootDir); err != nil {
+	if err := idx.makeDirIfNotExists(idx.indexRootDir); err != nil {
 		return err
 	}
 
@@ -263,7 +251,7 @@ func (idx *Autoincrement) FilesDir() string {
 }
 
 func (idx *Autoincrement) createSymlink(oldname, newname string) error {
-	t, err := idx.authenticate(context.TODO())
+	ctx, err := idx.getAuthenticatedContext(context.Background())
 	if err != nil {
 		return err
 	}
@@ -272,52 +260,37 @@ func (idx *Autoincrement) createSymlink(oldname, newname string) error {
 		return os.ErrExist
 	}
 
-	resp, err := idx.dataProvider.put(newname, strings.NewReader(oldname), t)
+	err = idx.metadataStorage.SimpleUpload(ctx, newname, []byte(oldname))
 	if err != nil {
 		return err
 	}
-	if err = resp.Body.Close(); err != nil {
-		return err
-	}
-
 	return nil
 }
 
 func (idx *Autoincrement) resolveSymlink(name string) (string, error) {
-	t, err := idx.authenticate(context.TODO())
+	ctx, err := idx.getAuthenticatedContext(context.Background())
 	if err != nil {
 		return "", err
 	}
 
-	resp, err := idx.dataProvider.get(name, t)
+	b, err := idx.metadataStorage.SimpleDownload(ctx, name)
 	if err != nil {
-		return "", err
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		if resp.StatusCode == http.StatusNotFound {
+		if metadatastorage.IsNotFoundErr(err) {
 			return "", os.ErrNotExist
 		}
-
-		return "", fmt.Errorf("could not resolve symlink %s, got status %v", name, resp.StatusCode)
-	}
-
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
 		return "", err
 	}
-	if err = resp.Body.Close(); err != nil {
-		return "", err
-	}
+
 	return string(b), err
 }
 
-func (idx *Autoincrement) makeDirIfNotExists(ctx context.Context, folder string) error {
-	return storage.MakeDirIfNotExist(ctx, idx.storageProvider, folder)
-}
+func (idx *Autoincrement) makeDirIfNotExists(folder string) error {
+	ctx, err := idx.getAuthenticatedContext(context.Background())
+	if err != nil {
+		return err
+	}
 
-func (idx *Autoincrement) authenticate(ctx context.Context) (token string, err error) {
-	return storage.AuthenticateCS3(ctx, idx.cs3conf.ServiceUser, idx.tokenManager)
+	return storage.MakeDirIfNotExist(ctx, idx.storageProvider, folder)
 }
 
 func (idx *Autoincrement) next() (int, error) {
@@ -328,7 +301,7 @@ func (idx *Autoincrement) next() (int, error) {
 
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Path: path.Join("/meta", idx.indexRootDir),
+			Path: path.Join("/meta", idx.indexRootDir), //TODO:
 		},
 	})
 
@@ -360,7 +333,7 @@ func (idx *Autoincrement) next() (int, error) {
 }
 
 func (idx *Autoincrement) getAuthenticatedContext(ctx context.Context) (context.Context, error) {
-	t, err := idx.authenticate(ctx)
+	t, err := storage.AuthenticateCS3(ctx, idx.cs3conf.ServiceUser, idx.tokenManager)
 	if err != nil {
 		return nil, err
 	}

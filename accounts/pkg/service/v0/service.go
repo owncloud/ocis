@@ -138,8 +138,6 @@ func configFromSvc(cfg *config.Config) (*idxcfg.Config, error) {
 			Backend: cfg.Repo.Backend,
 			CS3: idxcfg.CS3{
 				ProviderAddr: cfg.Repo.CS3.ProviderAddr,
-				DataURL:      cfg.Repo.CS3.DataURL,
-				DataPrefix:   cfg.Repo.CS3.DataPrefix,
 				JWTSecret:    cfg.Repo.CS3.JWTSecret,
 			},
 		}

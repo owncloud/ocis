@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -85,8 +86,11 @@ func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 // GetUser returns the user with the given userid
 func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
+	userid, err := url.PathUnescape(userid)
+	if err != nil {
+		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+	}
 	var account *accounts.Account
-	var err error
 
 	switch {
 	case userid == "":
@@ -273,9 +277,12 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 // EditUser creates a new user account
 func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
+	userid, err := url.PathUnescape(userid)
+	if err != nil {
+		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+	}
 
 	var account *accounts.Account
-	var err error
 	switch o.config.AccountBackend {
 	case "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
@@ -351,9 +358,12 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 // DeleteUser deletes a user
 func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
+	userid, err := url.PathUnescape(userid)
+	if err != nil {
+		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+	}
 
 	var account *accounts.Account
-	var err error
 	switch o.config.AccountBackend {
 	case "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
@@ -508,9 +518,12 @@ func (o Ocs) mintTokenForUser(ctx context.Context, account *accounts.Account) (s
 // EnableUser enables a user
 func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
+	userid, err := url.PathUnescape(userid)
+	if err != nil {
+		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+	}
 
 	var account *accounts.Account
-	var err error
 	switch o.config.AccountBackend {
 	case "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
@@ -559,9 +572,12 @@ func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
 // DisableUser disables a user
 func (o Ocs) DisableUser(w http.ResponseWriter, r *http.Request) {
 	userid := chi.URLParam(r, "userid")
+	userid, err := url.PathUnescape(userid)
+	if err != nil {
+		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
+	}
 
 	var account *accounts.Account
-	var err error
 	switch o.config.AccountBackend {
 	case "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)

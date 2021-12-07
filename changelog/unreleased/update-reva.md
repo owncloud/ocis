@@ -7,3 +7,4 @@ This update includes:
 
 
 https://github.com/owncloud/ocis/pull/2835
+https://github.com/owncloud/ocis/pull/2837
