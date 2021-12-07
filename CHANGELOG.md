@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Change - Restructure Configuration Parsing: [#2708](https://github.com/owncloud/ocis/pull/2708)
 * Change - OIDC: fallback if IDP doesn't provide "preferred_username" claim: [#2644](https://github.com/owncloud/ocis/issues/2644)
 * Enhancement - Cleanup ocis-pkg config: [#2813](https://github.com/owncloud/ocis/pull/2813)
+* Enhancement - Correct shutdown of services under runtime: [#2843](https://github.com/owncloud/ocis/pull/2843)
 * Enhancement - Update REVA to v1.17.0: [#2835](https://github.com/owncloud/ocis/pull/2835)
 
 ## Details
@@ -74,6 +75,12 @@ The following sections list the changes for unreleased.
    Certain values were of no use when configuring the ocis runtime.
 
    https://github.com/owncloud/ocis/pull/2813
+
+* Enhancement - Correct shutdown of services under runtime: [#2843](https://github.com/owncloud/ocis/pull/2843)
+
+   Supervised goroutines now shut themselves down on context cancellation propagation.
+
+   https://github.com/owncloud/ocis/pull/2843
 
 * Enhancement - Update REVA to v1.17.0: [#2835](https://github.com/owncloud/ocis/pull/2835)
 
