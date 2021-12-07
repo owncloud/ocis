@@ -19,6 +19,7 @@ import (
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
@@ -197,7 +198,7 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	newAccount := &accounts.Account{
-		Id:                       userid,
+		Id:                       uuid.New().String(),
 		DisplayName:              displayname,
 		PreferredName:            userid,
 		OnPremisesSamAccountName: userid,
@@ -463,7 +464,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if purgeRecycleResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
+		if purgeRecycleResponse.Status.Code != rpcv1beta1.Code_CODE_OK && purgeRecycleResponse.Status.Code != rpcv1beta1.Code_CODE_NOT_FOUND {
 			o.logger.Error().
 				Str("stat_status_code", statResp.Status.Code.String()).
 				Str("stat_message", statResp.Status.Message).
