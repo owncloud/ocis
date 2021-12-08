@@ -221,23 +221,32 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 	// generate rules based on default config
 	return map[string]map[string]interface{}{
 		cfg.Reva.StorageUsers.Endpoint: {
-			"mount_path":    "/users",
-			"space_type":    "personal",
-			"path_template": "/users/{{.Space.Owner.Id.OpaqueId}}",
-			"description":   "Personal Spaces",
+			"spaces": map[string]interface{}{
+				"personal": map[string]interface{}{
+					"mount_point":   "/users",
+					"path_template": "/users/{{.Space.Owner.Id.OpaqueId}}",
+				},
+				"project": map[string]interface{}{
+					"mount_point":   "/projects",
+					"path_template": "/projects/{{.Space.Name}}",
+				},
+			},
 		},
 		cfg.Reva.StorageShares.Endpoint: {
-			"mount_path":    "/users/{{.CurrentUser.Id.OpaqueId}}/Shares",
-			"space_type":    "share",
-			"path_template": "/users/{{.CurrentUser.Id.OpaqueId}}/Shares/{{.Space.Name}}",
-			"description":   "Shares",
+			"spaces": map[string]interface{}{
+				"share": map[string]interface{}{
+					"mount_point":   "/users/{{.CurrentUser.Id.OpaqueId}}/Shares",
+					"path_template": "/users/{{.CurrentUser.Id.OpaqueId}}/Shares/{{.Space.Name}}",
+				},
+			},
 		},
 		// public link storage returns the mount id of the actual storage
 		cfg.Reva.StoragePublicLink.Endpoint: {
-			"mount_path":    "/public",
-			"space_type":    "public",
-			"path_template": "/public",
-			"description":   "Public Links",
+			"spaces": map[string]interface{}{
+				"public": map[string]interface{}{
+					"mount_point": "/public",
+				},
+			},
 		},
 		// medatada storage not part of the global namespace
 	}

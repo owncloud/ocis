@@ -31,6 +31,7 @@ require (
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.1.0
 	github.com/golang/protobuf v1.5.2
+	github.com/google/uuid v1.3.0
 	github.com/gookit/config/v2 v2.0.27
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.1
@@ -143,7 +144,6 @@ require (
 	github.com/gomodule/redigo v1.8.5 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/gookit/goutil v0.3.15 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
@@ -241,4 +241,4 @@ require (
 	stash.kopano.io/kgol/oidc-go v0.3.2 // indirect
 )
 
-replace github.com/cs3org/reva => github.com/cs3org/reva v1.16.1-0.20211207113801-1fa1ac1d3349
+replace github.com/cs3org/reva => github.com/cs3org/reva v1.16.1-0.20211208164450-3abd76eecf8b
