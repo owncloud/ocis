@@ -594,6 +594,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                     "RUN_PART": runPart,
                     "DIVIDE_INTO_NUM_PARTS": numberOfParts,
                     "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-webUI-on-%s-storage%s.md" % (storage.upper(), expectedFailuresFileFilterTags),
+                    "MIDDLEWARE_HOST": "http://middleware:3000",
                 },
                 "commands": [
                     ". /drone/src/.drone.env",
@@ -615,7 +616,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                            }],
             },
         ] + failEarly(ctx, early_fail),
-        "services": selenium(),
+        "services": selenium() + middlewareService(),
         "volumes": [pipelineVolumeOC10Tests] +
                    [{
                        "name": "uploads",
@@ -1416,6 +1417,29 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
             ],
         },
     ]
+
+def middlewareService():
+    return [{
+        "name": "middleware",
+        "image": "owncloud/owncloud-test-middleware",
+        "pull": "always",
+        "environment": {
+            "BACKEND_HOST": "https://ocis-server:9200",
+            "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/storage/owncloud/",
+            "RUN_ON_OCIS": "true",
+            "HOST": "middleware",
+            "REMOTE_UPLOAD_DIR": "/uploads",
+            "NODE_TLS_REJECT_UNAUTHORIZED": "0",
+            "MIDDLEWARE_HOST": "middleware",
+        },
+        "volumes": [{
+            "name": "uploads",
+            "path": "/uploads",
+        }, {
+            "name": "gopath",
+            "path": "/srv/app",
+        }],
+    }]
 
 def cloneCoreRepos():
     return [
