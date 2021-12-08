@@ -40,7 +40,7 @@ clean_up() {
 
 trap clean_up SIGHUP SIGINT SIGTERM EXIT
 
-#cp -r $(ls -d "$WEB_PATH"/tests/acceptance/* | grep -v 'node_modules') "$testFolder"
+cp -r $(ls -d "$WEB_PATH"/tests/acceptance/* | grep -v 'node_modules') "$testFolder"
 
 set -evax
 
@@ -48,7 +48,7 @@ export SERVER_HOST=${SERVER_HOST:-https://localhost:9200}
 export BACKEND_HOST=${BACKEND_HOST:-https://localhost:9200}
 export TEST_TAGS=${TEST_TAGS:-"not @skip"}
 
-export CUCUMBER_OPTS="--retry 1 --require-module @babel/register --require-module @babel/polyfill --require ${TEST_INFRA_DIRECTORY}/setup.js --require ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/stepDefinitions --format @cucumber/pretty-formatter -t ""'""${TEST_TAGS}""'"
+export CUCUMBER_OPTS="--retry 1 --require-module @babel/register --require-module @babel/polyfill --require ${TEST_INFRA_DIRECTORY}/setup.js --require ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/stepDefinitions --format @cucumber/pretty-formatter"
 
 cd /srv/app/web/tests/acceptance/
 yarn test:acceptance:external
