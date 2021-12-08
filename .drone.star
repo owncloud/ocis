@@ -621,18 +621,17 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                 },
                 "commands": [
                     ". /drone/src/.drone.env",
-                    # clone web
-                    "git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing",
+                    # clone web and and check out the right commit
                     "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
                     "cd /srv/app/web",
                     "git checkout $WEB_COMMITID",
                     # provide files for upload
-                    "cp -r tests/acceptance/filesForUpload/* /uploads",
-                    #"yarn install --immutable",
-                    #"yarn build",
-                    # install and run acceptance tests
-                    "cd tests/acceptance/",
+                    "cp -r /srv/app/web/tests/acceptance/filesForUpload/* /uploads",
+                    "git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing",
+                    # install acceptance test deps
+                    "cd /srv/app/web/tests/acceptance/",
                     "yarn install --immutable",
+                    # start acceptance tests
                     "./run.sh",
                 ],
                 "volumes": [stepVolumeOC10Tests] +
@@ -697,7 +696,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "cd /srv/app/web/tests/acceptance/",
                     "yarn install --immutable",
                     # start acceptance tests
-                    "sh /drone/src/accounts/ui/tests/run-acceptance-test.sh",
+                    "make -C /drone/src/accounts test-acceptance-webui",
                 ],
                 "volumes": [stepVolumeOC10Tests] +
                            [{
@@ -761,7 +760,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "cd /srv/app/web/tests/acceptance/",
                     "yarn install --immutable",
                     # start acceptance tests
-                    "sh /drone/src/settings/ui/tests/run-acceptance-test.sh",
+                    "make -C /drone/src/settings test-acceptance-webui",
                 ],
                 "volumes": [stepVolumeOC10Tests] +
                            [{

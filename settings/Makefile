@@ -3,6 +3,11 @@ NAME := settings
 
 include ../.make/recursion.mk
 
+.PHONY: test-acceptance-webui
+test-acceptance-webui:
+	./ui/tests/run-acceptance-test.sh $(FEATURE_PATH)
+
+
 ############ tooling ############
 ifneq (, $(shell which go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../.bingo/Variables.mk
