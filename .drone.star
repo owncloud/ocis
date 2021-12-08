@@ -621,13 +621,16 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                 },
                 "commands": [
                     ". /drone/src/.drone.env",
+                    # clone web
                     "git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing",
                     "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
                     "cd /srv/app/web",
                     "git checkout $WEB_COMMITID",
+                    # provide files for upload
                     "cp -r tests/acceptance/filesForUpload/* /uploads",
-                    "yarn install --immutable",
-                    "yarn build",
+                    #"yarn install --immutable",
+                    #"yarn build",
+                    # install and run acceptance tests
                     "cd tests/acceptance/",
                     "yarn install --immutable",
                     "./run.sh",
@@ -686,15 +689,15 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                 },
                 "commands": [
                     ". /drone/src/.drone.env",
-                    # we need to have Web around for some general step definitions (eg. how to log in)
+                    # clone web and and check out the right commit
                     "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
                     "cd /srv/app/web",
                     "git checkout $WEB_COMMITID",
-                    "cd tests/acceptance/",
+                    # install acceptance test deps
+                    "cd /srv/app/web/tests/acceptance/",
                     "yarn install --immutable",
-                    "cd /drone/src/accounts",
-                    "yarn install --immutable",
-                    "make test-acceptance-webui",
+                    # start acceptance tests
+                    "sh /drone/src/accounts/ui/tests/run-acceptance-test.sh",
                 ],
                 "volumes": [stepVolumeOC10Tests] +
                            [{
@@ -750,15 +753,15 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                 },
                 "commands": [
                     ". /drone/src/.drone.env",
-                    # we need to have Web around for some general step definitions (eg. how to log in)
+                    # clone web and and check out the right commit
                     "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
                     "cd /srv/app/web",
                     "git checkout $WEB_COMMITID",
-                    "cd tests/acceptance/",
+                    # install acceptance test deps
+                    "cd /srv/app/web/tests/acceptance/",
                     "yarn install --immutable",
-                    "cd /drone/src/settings",
-                    "yarn install --immutable",
-                    "make test-acceptance-webui",
+                    # start acceptance tests
+                    "sh /drone/src/settings/ui/tests/run-acceptance-test.sh",
                 ],
                 "volumes": [stepVolumeOC10Tests] +
                            [{
