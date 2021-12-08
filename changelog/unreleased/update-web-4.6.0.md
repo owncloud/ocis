@@ -1,4 +1,4 @@
-Change: Update ownCloud Web to v4.6.0
+Enhancement: Update ownCloud Web to v4.6.0
 
 Tags: web
 

@@ -659,6 +659,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
                     "WEB_PATH": "/srv/app/web",
                     "FEATURE_PATH": "/drone/src/accounts/ui/tests/acceptance/features",
+                    "MIDDLEWARE_HOST": "http://middleware:3000",
                 },
                 "commands": [
                     ". /drone/src/.drone.env",
@@ -679,7 +680,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                            }],
             },
         ] + failEarly(ctx, early_fail),
-        "services": selenium(),
+        "services": selenium() + middlewareService(),
         "volumes": [stepVolumeOC10Tests] +
                    [{
                        "name": "uploads",
@@ -722,6 +723,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
                     "WEB_PATH": "/srv/app/web",
                     "FEATURE_PATH": "/drone/src/settings/ui/tests/acceptance/features",
+                    "MIDDLEWARE_HOST": "http://middleware:3000",
                 },
                 "commands": [
                     ". /drone/src/.drone.env",
@@ -747,7 +749,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                 "name": "redis",
                 "image": "redis:6-alpine",
             },
-        ] + selenium(),
+        ] + selenium() + middlewareService(),
         "volumes": [stepVolumeOC10Tests] +
                    [{
                        "name": "uploads",
