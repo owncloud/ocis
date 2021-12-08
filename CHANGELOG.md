@@ -16,6 +16,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Cleanup ocis-pkg config: [#2813](https://github.com/owncloud/ocis/pull/2813)
 * Enhancement - Correct shutdown of services under runtime: [#2843](https://github.com/owncloud/ocis/pull/2843)
 * Enhancement - Update REVA to v1.17.0: [#2835](https://github.com/owncloud/ocis/pull/2835)
+* Enhancement - Update ownCloud Web to v4.6.0: [#2846](https://github.com/owncloud/ocis/pull/2846)
 
 ## Details
 
@@ -100,6 +101,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/2835
    https://github.com/owncloud/ocis/pull/2837
+
+* Enhancement - Update ownCloud Web to v4.6.0: [#2846](https://github.com/owncloud/ocis/pull/2846)
+
+   Tags: web
+
+   We updated ownCloud Web to v4.6.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2846
+   https://github.com/owncloud/web/releases/tag/v4.6.0
 # Changelog for [1.15.0] (2021-11-19)
 
 The following sections list the changes for 1.15.0.
