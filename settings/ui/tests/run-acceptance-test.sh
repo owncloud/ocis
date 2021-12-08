@@ -40,7 +40,9 @@ clean_up() {
 
 trap clean_up SIGHUP SIGINT SIGTERM EXIT
 
-cp -r $(ls -d "$WEB_PATH"/tests/acceptance/* | grep -v 'node_modules') "$testFolder"
+#cp -r $(ls -d "$WEB_PATH"/tests/acceptance/* | grep -v 'node_modules') "$testFolder"
+
+set -evax
 
 export SERVER_HOST=${SERVER_HOST:-https://localhost:9200}
 export BACKEND_HOST=${BACKEND_HOST:-https://localhost:9200}
