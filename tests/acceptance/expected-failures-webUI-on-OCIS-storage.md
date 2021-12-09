@@ -114,8 +114,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 ### [share indicator in files are not shown until sharing sidebar is opened](https://github.com/owncloud/web/issues/4167)
 -   [webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:100](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersSharingIndicator/shareWithUsers.feature#L100)
 -   [webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:121](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersSharingIndicator/shareWithUsers.feature#L121)
--   [webUISharingPublicManagement/publicLinkIndicator.feature:12](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkIndicator.feature#L12)
--   [webUISharingPublicManagement/publicLinkIndicator.feature:47](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkIndicator.feature#L47)
 -   [webUISharingPublicManagement/publicLinkIndicator.feature:64](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkIndicator.feature#L64)
 -   [webUISharingPublicManagement/publicLinkIndicator.feature:81](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkIndicator.feature#L81)
 -   [webUISharingPublicManagement/publicLinkIndicator.feature:98](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkIndicator.feature#L98)
