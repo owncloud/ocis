@@ -16,13 +16,13 @@ fi
 
 if cd $PATH_TO_CORE > /dev/null 2>&1
 then
-    git checkout -c advice.detachedHead=false $CORE_BRANCH
+    git -c advice.detachedHead=false checkout $CORE_BRANCH
     git pull
-    git checkout -c advice.detachedHead=false $CORE_COMMITID
+    git -c advice.detachedHead=false checkout $CORE_COMMITID
 else
     git clone -b $CORE_BRANCH --single-branch --no-tags https://github.com/owncloud/core.git $PATH_TO_CORE
     cd $PATH_TO_CORE
-    git checkout -c advice.detachedHead=false $CORE_COMMITID
+    git -c advice.detachedHead=false checkout $CORE_COMMITID
 fi
 
 ## CONFIGURE TEST
