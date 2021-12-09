@@ -4,7 +4,7 @@ NAME := settings
 include ../.make/recursion.mk
 
 .PHONY: test-acceptance-webui
-test-acceptance-webui:
+test-acceptance-webui: node_modules
 	./ui/tests/run-acceptance-test.sh $(FEATURE_PATH)
 
 

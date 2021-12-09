@@ -1,7 +1,8 @@
-const assert = require('assert')
-const { client } = require('nightwatch-api')
-const { Given, When, Then } = require('@cucumber/cucumber')
-const languageHelper = require('../helpers/language')
+const importCwd = require('import-cwd')
+const assert = importCwd('assert')
+const { client } = importCwd('nightwatch-api')
+const { Given, When, Then } = importCwd('@cucumber/cucumber')
+const languageHelper = importCwd('../helpers/language')
 
 Given('the user browses to the settings page', function () {
   return client.page.settingsPage().navigateAndWaitTillLoaded()
