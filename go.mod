@@ -19,7 +19,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.2.2
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20211104090126-8e972dca8304
-	github.com/cs3org/reva v1.16.1-0.20211203225713-939768a1af06
+	github.com/cs3org/reva v1.17.0
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.7
@@ -38,7 +38,7 @@ require (
 	github.com/justinas/alice v1.2.0
 	github.com/libregraph/lico v0.53.0
 	github.com/mennanov/fieldmask-utils v0.5.0
-	github.com/mitchellh/mapstructure v1.4.2
+	github.com/mitchellh/mapstructure v1.4.3
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nmcclain/asn1-ber v0.0.0-20170104154839-2661553a0484
 	github.com/nmcclain/ldap v0.0.0-20210720162743-7f8d1e44eeba
@@ -87,7 +87,7 @@ require (
 	github.com/RoaringBitmap/roaring v0.9.4 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
-	github.com/aws/aws-sdk-go v1.42.9 // indirect
+	github.com/aws/aws-sdk-go v1.42.19 // indirect
 	github.com/beevik/etree v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
@@ -140,7 +140,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/gomodule/redigo v1.8.5 // indirect
+	github.com/gomodule/redigo v1.8.6 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
