@@ -23,9 +23,10 @@ set -evax
 export SERVER_HOST=${SERVER_HOST:-https://localhost:9200}
 export BACKEND_HOST=${BACKEND_HOST:-https://localhost:9200}
 export TEST_TAGS=${TEST_TAGS:-"not @skip"}
+export EXTERNAL_STEP_DEFINITIONS="/drone/src/accounts/ui/tests/acceptance/stepDefinitions"
 
 cd ${WEB_PATH}/tests/acceptance/
-yarn test:acceptance:external -- --require /drone/src/accounts/ui/tests/acceptance/stepDefinitions/*.js ${1}
+yarn test:acceptance:external -- ${1}
 
 status=$?
 exit $status
