@@ -375,7 +375,7 @@ def uploadScanResults(ctx):
                 "image": "alpine/git:latest",
                 "commands": [
                     "git clone https://github.com/%s.git ." % (repo_slug),
-                    "git checkout $DRONE_COMMIT",
+                    "git -c advice.detachedHead=false checkout $DRONE_COMMIT",
                 ],
             },
         ] + skipIfUnchanged(ctx, "unit-tests") + [
@@ -624,7 +624,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                     # clone web and and check out the right commit
                     "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
                     "cd /srv/app/web",
-                    "git checkout $WEB_COMMITID",
+                    "git checkout -c advice.detachedHead=false $WEB_COMMITID",
                     # provide files for upload
                     "cp -r /srv/app/web/tests/acceptance/filesForUpload/* /uploads",
                     "git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing",
@@ -691,7 +691,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     # clone web and and check out the right commit
                     "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
                     "cd /srv/app/web",
-                    "git checkout $WEB_COMMITID",
+                    "git checkout -c advice.detachedHead=false $WEB_COMMITID",
                     # install acceptance test deps
                     "cd /srv/app/web/tests/acceptance/",
                     "yarn install --immutable",
@@ -755,7 +755,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     # clone web and and check out the right commit
                     "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
                     "cd /srv/app/web",
-                    "git checkout $WEB_COMMITID",
+                    "git checkout -c advice.detachedHead=false $WEB_COMMITID",
                     # install acceptance test deps
                     "cd /srv/app/web/tests/acceptance/",
                     "yarn install --immutable",
@@ -1487,7 +1487,7 @@ def cloneCoreRepos():
                 "git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing",
                 "git clone -b $CORE_BRANCH --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner",
                 "cd /srv/app/testrunner",
-                "git checkout $CORE_COMMITID",
+                "git checkout -c advice.detachedHead=false $CORE_COMMITID",
             ],
             "volumes": [stepVolumeOC10Tests],
         },
