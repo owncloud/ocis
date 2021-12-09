@@ -2,16 +2,17 @@ package svc
 
 import (
 	"encoding/xml"
-	merrors "github.com/asim/go-micro/v3/errors"
-	"github.com/go-chi/render"
 	"net/http"
 	"path"
 	"strings"
 
+	"github.com/go-chi/render"
+	merrors "go-micro.dev/v4/errors"
+
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis/webdav/pkg/config"
 	"github.com/owncloud/ocis/webdav/pkg/dav/requests"
@@ -44,9 +45,9 @@ func NewService(opts ...Option) Service {
 	m.Use(options.Middleware...)
 
 	svc := Webdav{
-		config: options.Config,
-		log:    options.Logger,
-		mux:    m,
+		config:           options.Config,
+		log:              options.Logger,
+		mux:              m,
 		thumbnailsClient: thumbnails.NewThumbnailService("com.owncloud.api.thumbnails", grpc.DefaultClient),
 	}
 
@@ -61,9 +62,9 @@ func NewService(opts ...Option) Service {
 
 // Webdav defines implements the business logic for Service.
 type Webdav struct {
-	config *config.Config
-	log    log.Logger
-	mux    *chi.Mux
+	config           *config.Config
+	log              log.Logger
+	mux              *chi.Mux
 	thumbnailsClient thumbnails.ThumbnailService
 }
 
@@ -95,16 +96,18 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		},
 	})
 	if err != nil {
-		g.log.Error().Err(err).Msg("could not get thumbnail")
 		e := merrors.Parse(err.Error())
 		switch e.Code {
 		case http.StatusNotFound:
+			// StatusNotFound is expected for unsupported files
 			renderError(w, r, errNotFound(notFoundMsg(tr.Filename)))
+			return
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(err.Error()))
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
+		g.log.Error().Err(err).Msg("could not get thumbnail")
 		return
 	}
 
@@ -138,16 +141,18 @@ func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
 		},
 	})
 	if err != nil {
-		g.log.Error().Err(err).Msg("could not get thumbnail")
 		e := merrors.Parse(err.Error())
 		switch e.Code {
 		case http.StatusNotFound:
+			// StatusNotFound is expected for unsupported files
 			renderError(w, r, errNotFound(notFoundMsg(tr.Filename)))
+			return
 		case http.StatusBadRequest:
 			renderError(w, r, errBadRequest(err.Error()))
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
+		g.log.Error().Err(err).Msg("could not get thumbnail")
 		return
 	}
 
@@ -184,14 +189,15 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 		e := merrors.Parse(err.Error())
 		switch e.Code {
 		case http.StatusNotFound:
+			// StatusNotFound is expected for unsupported files
 			renderError(w, r, errNotFound(notFoundMsg(tr.Filename)))
+			return
 		case http.StatusBadRequest:
-			g.log.Error().Err(err).Msg("could not get thumbnail")
 			renderError(w, r, errBadRequest(err.Error()))
 		default:
-			g.log.Error().Err(err).Msg("could not get thumbnail")
 			renderError(w, r, errInternalError(err.Error()))
 		}
+		g.log.Error().Err(err).Msg("could not get thumbnail")
 		return
 	}
 

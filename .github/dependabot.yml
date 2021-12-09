@@ -19,12 +19,6 @@ updates:
     open-pull-requests-limit: 2
 
   - package-ecosystem: "npm"
-    directory: "/onlyoffice"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 2
-
-  - package-ecosystem: "npm"
     directory: "/idp"
     schedule:
       interval: "weekly"

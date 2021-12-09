@@ -9,15 +9,14 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // AuthBasic is the entrypoint for the auth-basic command.
@@ -25,11 +24,8 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-basic",
 		Usage: "Start authprovider for basic auth",
-		Flags: flagset.AuthBasicWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.AuthBasic.Services = c.StringSlice("service")
-
-			return nil
+			return ParseConfig(c, cfg, "storage-auth-basic")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -49,6 +45,10 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
 			rcfg := authBasicConfigFromStruct(c, cfg)
+			logger.Debug().
+				Str("server", "authbasic").
+				Interface("reva-config", rcfg).
+				Msg("config")
 
 			gr.Add(func() error {
 				runtime.RunWithOptions(rcfg, pidFile, runtime.WithLogger(&logger.Logger))
@@ -98,7 +98,9 @@ func authBasicConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret": cfg.Reva.JWTSecret,
+			"jwt_secret":                cfg.Reva.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
+			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.AuthBasic.GRPCNetwork,
@@ -114,6 +116,8 @@ func authBasicConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 						"ldap": map[string]interface{}{
 							"hostname":      cfg.Reva.LDAP.Hostname,
 							"port":          cfg.Reva.LDAP.Port,
+							"cacert":        cfg.Reva.LDAP.CACert,
+							"insecure":      cfg.Reva.LDAP.Insecure,
 							"base_dn":       cfg.Reva.LDAP.BaseDN,
 							"loginfilter":   cfg.Reva.LDAP.LoginFilter,
 							"bind_username": cfg.Reva.LDAP.BindDN,
@@ -143,9 +147,7 @@ type AuthBasicSutureService struct {
 
 // NewAuthBasicSutureService creates a new store.AuthBasicSutureService
 func NewAuthBasic(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.AuthBasic.Supervised = true
-	}
+	cfg.Storage.Commons = cfg.Commons
 	return AuthBasicSutureService{
 		cfg: cfg.Storage,
 	}
@@ -154,8 +156,9 @@ func NewAuthBasic(cfg *ociscfg.Config) suture.Service {
 func (s AuthBasicSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.AuthBasic.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range AuthBasic(s.cfg).Flags {
-		if err := AuthBasic(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := AuthBasic(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

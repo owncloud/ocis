@@ -9,9 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/asim/go-micro/v3/client"
-	merrors "github.com/asim/go-micro/v3/errors"
-	"github.com/asim/go-micro/v3/metadata"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
@@ -21,9 +18,12 @@ import (
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	ssvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"github.com/stretchr/testify/assert"
+	"go-micro.dev/v4/client"
+	merrors "go-micro.dev/v4/errors"
+	"go-micro.dev/v4/metadata"
 )
 
-const dataPath = "/var/tmp/ocis-accounts-tests"
+const dataPath = "/tmp/ocis-accounts-tests"
 
 var (
 	roleServiceMock settings.RoleService
@@ -33,6 +33,7 @@ var (
 func init() {
 	cfg := config.New()
 	cfg.Server.Name = "accounts"
+	cfg.Repo.Backend = "disk"
 	cfg.Repo.Disk.Path = dataPath
 	logger := olog.NewLogger(olog.Color(true), olog.Pretty(true))
 	roleServiceMock = buildRoleServiceMock()

@@ -6,20 +6,20 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // Frontend is the entrypoint for the frontend command.
@@ -27,11 +27,11 @@ func Frontend(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "frontend",
 		Usage: "Start frontend service",
-		Flags: flagset.FrontendWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.Frontend.Services = c.StringSlice("service")
-			cfg.Reva.ChecksumSupportedTypes = c.StringSlice("checksum-suppored-type")
-			return loadUserAgent(c, cfg)
+			if err := loadUserAgent(c, cfg); err != nil {
+				return err
+			}
+			return ParseConfig(c, cfg, "storage-frontend")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -54,12 +54,35 @@ func Frontend(cfg *config.Config) *cli.Command {
 				desktopRedirectURIs[port] = fmt.Sprintf("http://localhost:%d", (port + 1024))
 			}
 
+			archivers := []map[string]interface{}{
+				{
+					"enabled":       true,
+					"version":       "2.0.0",
+					"formats":       []string{"tar", "zip"},
+					"archiver_url":  cfg.Reva.Archiver.ArchiverURL,
+					"max_num_files": strconv.FormatInt(cfg.Reva.Archiver.MaxNumFiles, 10),
+					"max_size":      strconv.FormatInt(cfg.Reva.Archiver.MaxSize, 10),
+				},
+			}
+
+			appProviders := []map[string]interface{}{
+				{
+					"enabled":  true,
+					"version":  "1.0.0",
+					"apps_url": cfg.Reva.AppProvider.AppsURL,
+					"open_url": cfg.Reva.AppProvider.OpenURL,
+				},
+			}
+
 			filesCfg := map[string]interface{}{
 				"private_links":     false,
 				"bigfilechunking":   false,
 				"blacklisted_files": []string{},
 				"undelete":          true,
 				"versioning":        true,
+				"archivers":         archivers,
+				"app_providers":     appProviders,
+				"favorites":         cfg.Reva.Frontend.Favorites,
 			}
 
 			if cfg.Reva.DefaultUploadProtocol == "tus" {
@@ -125,8 +148,9 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret": cfg.Reva.JWTSecret,
-			"gatewaysvc": cfg.Reva.Gateway.Endpoint, // Todo or address?
+			"jwt_secret":                cfg.Reva.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Gateway.Endpoint, // Todo or address?
+			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"http": map[string]interface{}{
 			"network": cfg.Reva.Frontend.HTTPNetwork,
@@ -137,10 +161,24 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 				},
 				"auth": map[string]interface{}{
 					"credentials_by_user_agent": cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent,
+					"credential_chain":          []string{"bearer"},
 				},
 			},
 			// TODO build services dynamically
 			"services": map[string]interface{}{
+				"appprovider": map[string]interface{}{
+					"prefix":                 cfg.Reva.Frontend.AppProviderPrefix,
+					"transfer_shared_secret": cfg.Reva.TransferSecret,
+					"timeout":                86400,
+					"insecure":               cfg.Reva.Frontend.AppProviderInsecure,
+				},
+				"archiver": map[string]interface{}{
+					"prefix":        cfg.Reva.Frontend.ArchiverPrefix,
+					"timeout":       86400,
+					"insecure":      cfg.Reva.Frontend.ArchiverInsecure,
+					"max_num_files": cfg.Reva.Archiver.MaxNumFiles,
+					"max_size":      cfg.Reva.Archiver.MaxSize,
+				},
 				"datagateway": map[string]interface{}{
 					"prefix":                 cfg.Reva.Frontend.DatagatewayPrefix,
 					"transfer_shared_secret": cfg.Reva.TransferSecret,
@@ -152,15 +190,16 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 					"files_namespace":  cfg.Reva.OCDav.DavFilesNamespace,
 					"webdav_namespace": cfg.Reva.OCDav.WebdavNamespace,
 					"timeout":          86400,
-					"insecure":         true,
+					"insecure":         cfg.Reva.Frontend.OCDavInsecure,
 					"public_url":       cfg.Reva.Frontend.PublicURL,
 				},
 				"ocs": map[string]interface{}{
-					"share_prefix":            cfg.Reva.Frontend.OCSSharePrefix,
-					"home_namespace":          cfg.Reva.Frontend.OCSHomeNamespace,
-					"resource_info_cache_ttl": cfg.Reva.Frontend.OCSResourceInfoCacheTTL,
-					"prefix":                  cfg.Reva.Frontend.OCSPrefix,
-					"cache_warmup_driver":     cfg.Reva.Frontend.OCSCacheWarmupDriver,
+					"share_prefix":              cfg.Reva.Frontend.OCSSharePrefix,
+					"home_namespace":            cfg.Reva.Frontend.OCSHomeNamespace,
+					"resource_info_cache_ttl":   cfg.Reva.Frontend.OCSResourceInfoCacheTTL,
+					"prefix":                    cfg.Reva.Frontend.OCSPrefix,
+					"additional_info_attribute": cfg.Reva.Frontend.OCSAdditionalInfoAttribute,
+					"cache_warmup_driver":       cfg.Reva.Frontend.OCSCacheWarmupDriver,
 					"cache_warmup_drivers": map[string]interface{}{
 						"cbox": map[string]interface{}{
 							"db_username": cfg.Reva.Sharing.UserSQLUsername,
@@ -168,7 +207,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 							"db_host":     cfg.Reva.Sharing.UserSQLHost,
 							"db_port":     cfg.Reva.Sharing.UserSQLPort,
 							"db_name":     cfg.Reva.Sharing.UserSQLName,
-							"namespace":   cfg.Reva.Storages.EOS.Root,
+							"namespace":   cfg.Reva.UserStorage.EOS.Root,
 							"gatewaysvc":  cfg.Reva.Gateway.Endpoint,
 						},
 					},
@@ -205,7 +244,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 							"dav":   map[string]interface{}{},
 							"files_sharing": map[string]interface{}{
 								"api_enabled":                       true,
-								"resharing":                         true,
+								"resharing":                         false,
 								"group_sharing":                     true,
 								"auto_accept_share":                 true,
 								"share_with_group_members_only":     true,
@@ -234,6 +273,12 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 								"user": map[string]interface{}{
 									"send_mail":       true,
 									"profile_picture": false,
+									"settings": []map[string]interface{}{
+										{
+											"enabled": true,
+											"version": "1.0.0",
+										},
+									},
 								},
 								"user_enumeration": map[string]interface{}{
 									"enabled":            true,
@@ -243,9 +288,6 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 									"outgoing": true,
 									"incoming": true,
 								},
-							},
-							"notifications": map[string]interface{}{
-								"endpoints": []string{"disable"},
 							},
 						},
 						"version": map[string]interface{}{
@@ -292,11 +334,9 @@ type FrontendSutureService struct {
 	cfg *config.Config
 }
 
-// NewFrontendSutureService creates a new frontend.FrontendSutureService
+// NewFrontend creates a new frontend.FrontendSutureService
 func NewFrontend(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.Frontend.Supervised = true
-	}
+	cfg.Storage.Commons = cfg.Commons
 	return FrontendSutureService{
 		cfg: cfg.Storage,
 	}
@@ -305,8 +345,9 @@ func NewFrontend(cfg *ociscfg.Config) suture.Service {
 func (s FrontendSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.Frontend.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range Frontend(s.cfg).Flags {
-		if err := Frontend(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := Frontend(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

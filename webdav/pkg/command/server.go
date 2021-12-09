@@ -4,15 +4,13 @@ import (
 	"context"
 	"strings"
 
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/webdav/pkg/config"
-	"github.com/owncloud/ocis/webdav/pkg/flagset"
 	"github.com/owncloud/ocis/webdav/pkg/metrics"
 	"github.com/owncloud/ocis/webdav/pkg/server/debug"
 	"github.com/owncloud/ocis/webdav/pkg/server/http"
 	"github.com/owncloud/ocis/webdav/pkg/tracing"
+	"github.com/urfave/cli/v2"
 )
 
 // Server is the entrypoint for the server command.
@@ -20,17 +18,15 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
-			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			if !cfg.Supervised {
-				return ParseConfig(ctx, cfg)
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
 			}
-			logger.Debug().Str("service", "webdav").Msg("ignoring config file parsing when running supervised")
+
 			return nil
 		},
 		Action: func(c *cli.Context) error {
@@ -74,7 +70,8 @@ func Server(cfg *config.Config) *cli.Command {
 
 				gr.Add(func() error {
 					return server.Run()
-				}, func(_ error) {
+				}, func(err error) {
+					logger.Error().Err(err).Msg("error ")
 					logger.Info().
 						Str("transport", "http").
 						Msg("Shutting down server")
@@ -95,14 +92,11 @@ func Server(cfg *config.Config) *cli.Command {
 					return err
 				}
 
-				gr.Add(server.ListenAndServe, func(_ error) {
+				gr.Add(server.ListenAndServe, func(err error) {
+					logger.Error().Err(err)
 					_ = server.Shutdown(ctx)
 					cancel()
 				})
-			}
-
-			if !cfg.Supervised {
-				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()

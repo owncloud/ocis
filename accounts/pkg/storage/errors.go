@@ -8,7 +8,7 @@ type notFoundErr struct {
 	typ, id string
 }
 
-func (e *notFoundErr) Error() string {
+func (e notFoundErr) Error() string {
 	return fmt.Sprintf("%s with id %s not found", e.typ, e.id)
 }
 

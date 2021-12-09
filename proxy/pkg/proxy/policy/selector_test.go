@@ -3,15 +3,16 @@ package policy
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/asim/go-micro/v3/client"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
+	"go-micro.dev/v4/client"
 )
 
 func TestLoadSelector(t *testing.T) {
@@ -129,6 +130,7 @@ func mockAccSvc(retErr bool) proto.AccountsService {
 type testCase struct {
 	Name     string
 	Context  context.Context
+	Cookie   *http.Cookie
 	Expected string
 }
 
@@ -139,12 +141,17 @@ func TestClaimsSelector(t *testing.T) {
 	})
 
 	var tests = []testCase{
-		{"unatuhenticated", context.Background(), "unauthenticated"},
-		{"default", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: ""}), "default"},
-		{"claim-value", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: "ocis.routing.policy-value"}), "ocis.routing.policy-value"},
+		{"unauthenticated", context.Background(), nil, "unauthenticated"},
+		{"default", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: ""}), nil, "default"},
+		{"claim-value", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: "ocis.routing.policy-value"}), nil, "ocis.routing.policy-value"},
+		{"cookie-only", context.Background(), &http.Cookie{Name: SelectorCookieName, Value: "cookie"}, "cookie"},
+		{"claim-can-override-cookie", oidc.NewContext(context.Background(), map[string]interface{}{oidc.OcisRoutingPolicy: "ocis.routing.policy-value"}), &http.Cookie{Name: SelectorCookieName, Value: "cookie"}, "ocis.routing.policy-value"},
 	}
 	for _, tc := range tests {
 		r := httptest.NewRequest("GET", "https://example.com", nil)
+		if tc.Cookie != nil {
+			r.AddCookie(tc.Cookie)
+		}
 		nr := r.WithContext(tc.Context)
 		got, err := sel(nr)
 		if err != nil {
@@ -172,16 +179,16 @@ func TestRegexSelector(t *testing.T) {
 	})
 
 	var tests = []testCase{
-		{"unauthenticated", context.Background(), "unauthenticated"},
-		{"default", revactx.ContextSetUser(context.Background(), &userv1beta1.User{}), "default"},
-		{"mail-ocis", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Mail: "marie@example.org"}), "ocis"},
-		{"mail-oc10", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Mail: "einstein@example.org"}), "oc10"},
-		{"username-einstein", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Username: "einstein"}), "ocis"},
-		{"username-feynman", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Username: "feynman"}), "ocis"},
-		{"username-marie", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Username: "marie"}), "oc10"},
-		{"id-nil", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Id: &userv1beta1.UserId{}}), "default"},
-		{"id-1", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: "4c510ada-c86b-4815-8820-42cdf82c3d51"}}), "ocis"},
-		{"id-2", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"}}), "oc10"},
+		{"unauthenticated", context.Background(), nil, "unauthenticated"},
+		{"default", revactx.ContextSetUser(context.Background(), &userv1beta1.User{}), nil, "default"},
+		{"mail-ocis", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Mail: "marie@example.org"}), nil, "ocis"},
+		{"mail-oc10", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Mail: "einstein@example.org"}), nil, "oc10"},
+		{"username-einstein", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Username: "einstein"}), nil, "ocis"},
+		{"username-feynman", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Username: "feynman"}), nil, "ocis"},
+		{"username-marie", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Username: "marie"}), nil, "oc10"},
+		{"id-nil", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Id: &userv1beta1.UserId{}}), nil, "default"},
+		{"id-1", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: "4c510ada-c86b-4815-8820-42cdf82c3d51"}}), nil, "ocis"},
+		{"id-2", revactx.ContextSetUser(context.Background(), &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"}}), nil, "oc10"},
 	}
 
 	for _, tc := range tests {

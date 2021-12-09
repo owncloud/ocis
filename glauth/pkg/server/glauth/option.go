@@ -3,7 +3,7 @@ package glauth
 import (
 	"context"
 
-	"github.com/glauth/glauth/pkg/config"
+	"github.com/glauth/glauth/v2/pkg/config"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
@@ -73,28 +73,28 @@ func Backend(val *config.Config) Option {
 	}
 }
 
-// Fallback provides a strring to set the fallback option.
+// Fallback provides a string to set the fallback option.
 func Fallback(val *config.Config) Option {
 	return func(o *Options) {
 		o.Fallback = val
 	}
 }
 
-// BaseDN provides a strring to set the BaseDN option.
+// BaseDN provides a string to set the BaseDN option.
 func BaseDN(val string) Option {
 	return func(o *Options) {
 		o.BaseDN = val
 	}
 }
 
-// NameFormat provides a strring to set the NameFormat option.
+// NameFormat provides a string to set the NameFormat option.
 func NameFormat(val string) Option {
 	return func(o *Options) {
 		o.NameFormat = val
 	}
 }
 
-// GroupFormat provides a strring to set the GroupFormat option.
+// GroupFormat provides a string to set the GroupFormat option.
 func GroupFormat(val string) Option {
 	return func(o *Options) {
 		o.GroupFormat = val

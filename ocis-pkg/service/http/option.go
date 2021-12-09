@@ -5,8 +5,8 @@ import (
 	"crypto/tls"
 	"net/http"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/urfave/cli/v2"
 )
 
 // Option defines a single option function.

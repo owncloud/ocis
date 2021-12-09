@@ -103,6 +103,7 @@ func getUniqueIdxSut(t *testing.T, indexBy string, entityType interface{}) (inde
 	dataPath, _ := WriteIndexTestData(Data, "ID", "")
 	cfg := config.Config{
 		Repo: config.Repo{
+			Backend: "disk",
 			Disk: config.Disk{
 				Path: dataPath,
 			},

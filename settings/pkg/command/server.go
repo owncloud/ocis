@@ -4,16 +4,14 @@ import (
 	"context"
 	"strings"
 
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/settings/pkg/config"
-	"github.com/owncloud/ocis/settings/pkg/flagset"
 	"github.com/owncloud/ocis/settings/pkg/metrics"
 	"github.com/owncloud/ocis/settings/pkg/server/debug"
 	"github.com/owncloud/ocis/settings/pkg/server/grpc"
 	"github.com/owncloud/ocis/settings/pkg/server/http"
 	"github.com/owncloud/ocis/settings/pkg/tracing"
+	"github.com/urfave/cli/v2"
 )
 
 // Server is the entrypoint for the server command.
@@ -21,19 +19,15 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
-			logger := NewLogger(cfg)
 			if cfg.HTTP.Root != "/" {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			// When running on single binary mode the before hook from the root command won't get called. We manually
-			// call this before hook from ocis command, so the configuration can be loaded.
-			if !cfg.Supervised {
-				return ParseConfig(ctx, cfg)
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
 			}
-			logger.Debug().Str("service", "settings").Msg("ignoring config file parsing when running supervised")
+
 			return nil
 		},
 		Action: func(c *cli.Context) error {
@@ -87,10 +81,6 @@ func Server(cfg *config.Config) *cli.Command {
 				_ = debugServer.Shutdown(ctx)
 				cancel()
 			})
-
-			if !cfg.Supervised {
-				sync.Trap(&servers, cancel)
-			}
 
 			return servers.Run()
 		},

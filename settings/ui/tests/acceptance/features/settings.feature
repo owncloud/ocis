@@ -13,7 +13,7 @@ Feature: Set user specific settings
 	Scenario: Check the default settings
 		Given user "user1" has logged in using the webUI
 		And the user browses to the settings page
-		Then the setting "Language" should not have any value
+		Then the setting "Language" should have value "English"
 		When the user browses to the files page
 		Then the files menu should be listed in language "English"
 

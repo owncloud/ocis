@@ -3,18 +3,16 @@ package command
 import (
 	"context"
 	"os"
-	"strings"
 
-	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+
 	"github.com/thejerf/suture/v4"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/graph/pkg/config"
-	"github.com/owncloud/ocis/graph/pkg/flagset"
-	"github.com/owncloud/ocis/graph/pkg/version"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/spf13/viper"
+	"github.com/owncloud/ocis/ocis-pkg/version"
+	"github.com/urfave/cli/v2"
 )
 
 // Execute is the entry point for the ocis-graph command.
@@ -24,32 +22,25 @@ func Execute(cfg *config.Config) error {
 		Version:  version.String,
 		Usage:    "Serve Graph API for oCIS",
 		Compiled: version.Compiled(),
-
 		Authors: []*cli.Author{
 			{
 				Name:  "ownCloud GmbH",
 				Email: "support@owncloud.com",
 			},
 		},
-
-		Flags: flagset.RootWithConfig(cfg),
-
 		Before: func(c *cli.Context) error {
 			cfg.Server.Version = version.String
 			return ParseConfig(c, cfg)
 		},
-
 		Commands: []*cli.Command{
 			Server(cfg),
 			Health(cfg),
 		},
 	}
-
 	cli.HelpFlag = &cli.BoolFlag{
 		Name:  "help,h",
 		Usage: "Show the help",
 	}
-
 	cli.VersionFlag = &cli.BoolFlag{
 		Name:  "version,v",
 		Usage: "Print the version",
@@ -69,49 +60,28 @@ func NewLogger(cfg *config.Config) log.Logger {
 	)
 }
 
-// ParseConfig reads graph configuration from fs.
+// ParseConfig loads graph configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	sync.ParsingViperConfig.Lock()
-	defer sync.ParsingViperConfig.Unlock()
-	logger := NewLogger(cfg)
-
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.SetEnvPrefix("GRAPH")
-	viper.AutomaticEnv()
-
-	if c.IsSet("config-file") {
-		viper.SetConfigFile(c.String("config-file"))
-	} else {
-		viper.SetConfigName("graph")
-
-		viper.AddConfigPath("/etc/ocis")
-		viper.AddConfigPath("$HOME/.ocis")
-		viper.AddConfigPath("./config")
+	conf, err := ociscfg.BindSourcesToStructs("graph", cfg)
+	if err != nil {
+		return err
 	}
 
-	if err := viper.ReadInConfig(); err != nil {
-		switch err.(type) {
-		case viper.ConfigFileNotFoundError:
-			logger.Info().
-				Msg("Continue without config")
-		case viper.UnsupportedConfigError:
-			logger.Fatal().
-				Err(err).
-				Msg("Unsupported config type")
-		default:
-			logger.Fatal().
-				Err(err).
-				Msg("Failed to read config")
+	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &shared.Log{
+			Level:  cfg.Commons.Log.Level,
+			Pretty: cfg.Commons.Log.Pretty,
+			Color:  cfg.Commons.Log.Color,
+			File:   cfg.Commons.Log.File,
 		}
+	} else if cfg.Log == nil && cfg.Commons == nil {
+		cfg.Log = &shared.Log{}
 	}
 
-	if err := viper.Unmarshal(&cfg); err != nil {
-		logger.Fatal().
-			Err(err).
-			Msg("Failed to parse config")
-	}
-
-	return nil
+	conf.LoadOSEnv(config.GetEnv(cfg), false)
+	bindings := config.StructMappings(cfg)
+	return ociscfg.BindEnv(conf, bindings)
 }
 
 // SutureService allows for the graph command to be embedded and supervised by a suture supervisor tree.
@@ -121,10 +91,7 @@ type SutureService struct {
 
 // NewSutureService creates a new graph.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Graph.Supervised = true
-	}
-	cfg.Graph.Log.File = cfg.Log.File
+	cfg.Graph.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.Graph,
 	}

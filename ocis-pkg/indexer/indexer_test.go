@@ -1,6 +1,7 @@
 package indexer
 
 import (
+	"context"
 	"os"
 	"path"
 	"testing"
@@ -14,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-//const cs3RootFolder = "/var/tmp/ocis/storage/users/data"
+//const cs3RootFolder = "/tmp/ocis/storage/users/data"
 //
 //func TestIndexer_CS3_AddWithUniqueIndex(t *testing.T) {
 //	dataDir, err := WriteIndexTestData(Data, "ID", cs3RootFolder)
@@ -255,6 +256,7 @@ func TestQueryDiskImpl(t *testing.T) {
 	dataDir, err := WriteIndexTestData(Data, "ID", "")
 	assert.NoError(t, err)
 	indexer := createDiskIndexer(dataDir)
+	ctx := context.Background()
 
 	err = indexer.AddIndex(&Account{}, "OnPremisesSamAccountName", "ID", "accounts", "non_unique", nil, false)
 	assert.NoError(t, err)
@@ -274,23 +276,23 @@ func TestQueryDiskImpl(t *testing.T) {
 	_, err = indexer.Add(acc)
 	assert.NoError(t, err)
 
-	r, err := indexer.Query(&Account{}, "on_premises_sam_account_name eq 'MrDootDoot'") // this query will match both pets.
+	r, err := indexer.Query(ctx, &Account{}, "on_premises_sam_account_name eq 'MrDootDoot'") // this query will match both pets.
 	assert.NoError(t, err)
 	assert.Equal(t, []string{"ba5b6e54-e29d-4b2b-8cc4-0a0b958140d2"}, r)
 
-	r, err = indexer.Query(&Account{}, "mail eq 'spooky@skeletons.org'") // this query will match both pets.
+	r, err = indexer.Query(ctx, &Account{}, "mail eq 'spooky@skeletons.org'") // this query will match both pets.
 	assert.NoError(t, err)
 	assert.Equal(t, []string{"ba5b6e54-e29d-4b2b-8cc4-0a0b958140d2"}, r)
 
-	r, err = indexer.Query(&Account{}, "on_premises_sam_account_name eq 'MrDootDoot' or mail eq 'spooky@skeletons.org'") // this query will match both pets.
+	r, err = indexer.Query(ctx, &Account{}, "on_premises_sam_account_name eq 'MrDootDoot' or mail eq 'spooky@skeletons.org'") // this query will match both pets.
 	assert.NoError(t, err)
 	assert.Equal(t, []string{"ba5b6e54-e29d-4b2b-8cc4-0a0b958140d2"}, r)
 
-	r, err = indexer.Query(&Account{}, "startswith(on_premises_sam_account_name,'MrDoo')") // this query will match both pets.
+	r, err = indexer.Query(ctx, &Account{}, "startswith(on_premises_sam_account_name,'MrDoo')") // this query will match both pets.
 	assert.NoError(t, err)
 	assert.Equal(t, []string{"ba5b6e54-e29d-4b2b-8cc4-0a0b958140d2"}, r)
 
-	r, err = indexer.Query(&Account{}, "id eq 'ba5b6e54-e29d-4b2b-8cc4-0a0b958140d2' or on_premises_sam_account_name eq 'MrDootDoot'") // this query will match both pets.
+	r, err = indexer.Query(ctx, &Account{}, "id eq 'ba5b6e54-e29d-4b2b-8cc4-0a0b958140d2' or on_premises_sam_account_name eq 'MrDootDoot'") // this query will match both pets.
 	assert.NoError(t, err)
 	assert.Equal(t, []string{"ba5b6e54-e29d-4b2b-8cc4-0a0b958140d2"}, r)
 
@@ -300,6 +302,7 @@ func TestQueryDiskImpl(t *testing.T) {
 func createDiskIndexer(dataDir string) *Indexer {
 	return CreateIndexer(&config.Config{
 		Repo: config.Repo{
+			Backend: "disk",
 			Disk: config.Disk{
 				Path: dataDir,
 			},

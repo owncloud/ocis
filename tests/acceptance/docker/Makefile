@@ -18,12 +18,13 @@ COMPOSE_FILE ?= src/redis.yml:src/ocis-base.yml:src/acceptance.yml
 ## user input
 BEHAT_FEATURE ?=
 
+
 ifdef OCIS_IMAGE_TAG
-	COMPOSE_FILE := $(COMPOSE_FILE):src/ocis-image.yml
+	BUILD_DEV_IMAGE := 0
 else
-	COMPOSE_FILE := $(COMPOSE_FILE):src/ocis-build.yml
+	BUILD_DEV_IMAGE := 1
 endif
-OCIS_IMAGE_TAG ?= latest
+OCIS_IMAGE_TAG ?= dev
 
 # static
 DIVIDE_INTO_NUM_PARTS := 10
@@ -191,7 +192,7 @@ $(targets):
 	$(MAKE) --no-print-directory testSuite
 
 .PHONY: testSuite
-testSuite: clean-docker-container
+testSuite: build-dev-image clean-docker-container
 	@if [ -n "${START_CEPH}" ]; then \
 		COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
 		COMPOSE_FILE=src/ceph.yml \
@@ -212,7 +213,18 @@ testSuite: clean-docker-container
 show-test-logs: ## show logs of test
 	@COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
 	COMPOSE_FILE=$(COMPOSE_FILE) \
-	docker logs -f ocis-acceptance-tests_acceptance-tests_1 | less
+	docker-compose logs --no-log-prefix -f acceptance-tests | less
+
+.PHONY: build-dev-image
+build-dev-image:
+	@rm -rf ../../../vendor
+	@if [ $(BUILD_DEV_IMAGE) -eq 1 ]; then \
+		$(MAKE) --no-print-directory -C ../../../ocis dev-docker \
+	; fi;
+
+.PHONY: clean-dev-docker-image
+clean-dev-docker-image: ## clean docker image built during acceptance tests
+	@docker image rm owncloud/ocis:dev || true
 
 .PHONY: clean-docker-container
 clean-docker-container: ## clean docker containers created during acceptance tests
@@ -242,4 +254,4 @@ clean-docker-volumes: ## clean docker volumes created during acceptance tests
 	@$(MAKE) --no-print-directory -C ../. clean-tests
 
 .PHONY: clean
-clean: clean-docker-container clean-docker-volumes clean-files ## clean all
+clean: clean-docker-container clean-docker-volumes clean-dev-docker-image clean-files ## clean all

@@ -7,7 +7,9 @@ import (
 	"testing"
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	"github.com/cs3org/reva/pkg/auth/scope"
 	revactx "github.com/cs3org/reva/pkg/ctx"
+	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
@@ -106,9 +108,20 @@ func TestInternalServerErrorOnMissingMailAndUsername(t *testing.T) {
 }
 
 func newMockAccountResolver(userBackendResult *userv1beta1.User, userBackendErr error, oidcclaim, cs3claim string) http.Handler {
+	tokenManager, _ := jwt.New(map[string]interface{}{
+		"secret":  "change-me",
+		"expires": int64(60),
+	})
+
+	token := ""
+	if userBackendResult != nil {
+		s, _ := scope.AddOwnerScope(nil)
+		token, _ = tokenManager.MintToken(context.Background(), userBackendResult, s)
+	}
+
 	mock := &test.UserBackendMock{
-		GetUserByClaimsFunc: func(ctx context.Context, claim string, value string, withRoles bool) (*userv1beta1.User, error) {
-			return userBackendResult, userBackendErr
+		GetUserByClaimsFunc: func(ctx context.Context, claim string, value string, withRoles bool) (*userv1beta1.User, string, error) {
+			return userBackendResult, token, userBackendErr
 		},
 	}
 

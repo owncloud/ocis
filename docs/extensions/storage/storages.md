@@ -120,7 +120,7 @@ To provide the other storage aspects we plan to implement a FUSE overlay filesys
 This is the current default storage driver. While it implements the file tree (using redis, including id based lookup), ETag propagation, trash, versions and sharing (including expiry) using the data directory layout of ownCloud 10 it has [known limitations](https://github.com/owncloud/core/issues/28095) that cannot be fixed without changing the actual layout on disk.
 
 To setup it up properly in a distributed fashion, the storage-home and the storage-oc need to share the same underlying FS. Their "data" counterparts also need access to the same shared FS.
-For a simple docker-compose setup, you can create a volume which will be used by the "storage-storage-home", "storage-storage-home-data", "storage-storage-oc" and "storage-storage-oc-data" containers. Using the `owncloud/ocis` docker image, the volume would need to be hooked in the `/var/tmp/ocis` folder inside the containers.
+For a simple docker-compose setup, you can create a volume which will be used by the "storage-storage-home", "storage-storage-home-data", "storage-storage-oc" and "storage-storage-oc-data" containers. Using the `owncloud/ocis` docker image, the volume would need to be hooked in the `/var/lib/ocis` folder inside the containers.
 
 - tree provided by a POSIX filesystem
   - file layout is mapped to the old ownCloud 10 layout

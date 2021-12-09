@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/GeertJohan/yubigo"
-	"github.com/glauth/glauth/pkg/config"
-	"github.com/glauth/glauth/pkg/handler"
+	"github.com/glauth/glauth/v2/pkg/config"
+	"github.com/glauth/glauth/v2/pkg/handler"
 	"github.com/go-logr/logr"
 	"github.com/nmcclain/ldap"
 	"github.com/owncloud/ocis/glauth/pkg/mlogr"

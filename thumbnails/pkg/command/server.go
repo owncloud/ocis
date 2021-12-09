@@ -4,15 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
-	"github.com/owncloud/ocis/thumbnails/pkg/flagset"
 	"github.com/owncloud/ocis/thumbnails/pkg/metrics"
 	"github.com/owncloud/ocis/thumbnails/pkg/server/debug"
 	"github.com/owncloud/ocis/thumbnails/pkg/server/grpc"
 	"github.com/owncloud/ocis/thumbnails/pkg/tracing"
+	"github.com/urfave/cli/v2"
 )
 
 // Server is the entrypoint for the server command.
@@ -20,15 +18,10 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
-			logger := NewLogger(cfg)
-			cfg.Thumbnail.Resolutions = ctx.StringSlice("thumbnail-resolution")
-
-			if !cfg.Supervised {
-				return ParseConfig(ctx, cfg)
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
 			}
-			logger.Debug().Str("service", "thumbnails").Msg("ignoring config file parsing when running supervised")
 			return nil
 		},
 		Action: func(c *cli.Context) error {
@@ -83,10 +76,6 @@ func Server(cfg *config.Config) *cli.Command {
 				_ = server.Shutdown(ctx)
 				cancel()
 			})
-
-			if !cfg.Supervised {
-				sync.Trap(&gr, cancel)
-			}
 
 			return gr.Run()
 		},

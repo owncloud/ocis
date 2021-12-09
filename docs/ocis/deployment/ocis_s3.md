@@ -76,7 +76,9 @@ See also [example server setup]({{< ref "preparing_server" >}})
       # JWT secret which is used for the storage provider. Must be changed in order to have a secure oCIS. Defaults to "Pive-Fumkiu4"
       OCIS_JWT_SECRET=
       # JWT secret which is used for uploads to create transfer tokens. Must be changed in order to have a secure oCIS. Defaults to "replace-me-with-a-transfer-secret"
-      OCIS_TRANSFER_SECRET=
+      STORAGE_TRANSFER_SECRET=
+      # Machine auth api key secret. Must be changed in order to have a secure oCIS. Defaults to "change-me-please"
+      OCIS_MACHINE_AUTH_API_KEY=
 
       ### MINIO / S3 settings ###
       # Domain of MinIO where the Web UI is accessible. Defaults to "minio.owncloud.test".
@@ -116,7 +118,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   `docker-compose up -d`
 
-* You now can visit oCIS and are able to use it just normally. If you log into the web UI of MinIO, you will see blobs of files you uploaded.
+* You now can visit oCIS and are able to use it just normally. If you log into the web UI of MinIO, you will see blobs of files you uploaded. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
 
 ## Local setup
 For a more simple local ocis setup see [Getting started]({{< ref "../getting-started" >}})
@@ -134,4 +136,4 @@ After that you're ready to start the application stack:
 
 `docker-compose up -d`
 
- Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You now can use oCIS normally and should now upload a file. Open https://minio.owncloud.test in your browser and accept the invalid certificate warning, after that you will see blobs of files you have uploaded to oCIS.
+ Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You now can use oCIS normally and should now upload a file. Open https://minio.owncloud.test in your browser and accept the invalid certificate warning, after that you will see blobs of files you have uploaded to oCIS. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.

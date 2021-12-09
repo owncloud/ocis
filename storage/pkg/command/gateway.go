@@ -9,21 +9,21 @@ import (
 	"path"
 	"strings"
 
-	"github.com/owncloud/ocis/storage/pkg/tracing"
-
-	"github.com/owncloud/ocis/ocis-pkg/sync"
-
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
+	"github.com/mitchellh/mapstructure"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/service/external"
+	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // Gateway is the entrypoint for the gateway command.
@@ -31,10 +31,10 @@ func Gateway(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "gateway",
 		Usage: "Start gateway",
-		Flags: flagset.GatewayWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.Gateway.Services = c.StringSlice("service")
-			cfg.Reva.StorageRegistry.Rules = c.StringSlice("storage-registry-rule")
+			if err := ParseConfig(c, cfg, "storage-gateway"); err != nil {
+				return err
+			}
 
 			if cfg.Reva.DataGateway.PublicURL == "" {
 				cfg.Reva.DataGateway.PublicURL = strings.TrimRight(cfg.Reva.Frontend.PublicURL, "/") + "/data"
@@ -50,6 +50,11 @@ func Gateway(cfg *config.Config) *cli.Command {
 			uuid := uuid.Must(uuid.NewV4())
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 			rcfg := gatewayConfigFromStruct(c, cfg, logger)
+			logger.Debug().
+				Str("server", "gateway").
+				Interface("reva-config", rcfg).
+				Msg("config")
+
 			defer cancel()
 
 			gr.Add(func() error {
@@ -58,6 +63,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 					"com.owncloud.storage",
 					uuid.String(),
 					cfg.Reva.Gateway.GRPCAddr,
+					version.String,
 					logger,
 				)
 
@@ -116,8 +122,9 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret": cfg.Reva.JWTSecret,
-			"gatewaysvc": cfg.Reva.Gateway.Endpoint,
+			"jwt_secret":                cfg.Reva.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
+			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.Gateway.GRPCNetwork,
@@ -155,8 +162,17 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 							"rules": map[string]interface{}{
 								"basic":        cfg.Reva.AuthBasic.Endpoint,
 								"bearer":       cfg.Reva.AuthBearer.Endpoint,
+								"machine":      cfg.Reva.AuthMachine.Endpoint,
 								"publicshares": cfg.Reva.StoragePublicLink.Endpoint,
 							},
+						},
+					},
+				},
+				"appregistry": map[string]interface{}{
+					"driver": "static",
+					"drivers": map[string]interface{}{
+						"static": map[string]interface{}{
+							"mime_types": mimetypes(cfg, logger),
 						},
 					},
 				},
@@ -203,15 +219,130 @@ func rules(cfg *config.Config, logger log.Logger) map[string]map[string]interfac
 	}
 
 	// generate rules based on default config
-	return map[string]map[string]interface{}{
+	ret := map[string]map[string]interface{}{
 		cfg.Reva.StorageHome.MountPath:       {"address": cfg.Reva.StorageHome.Endpoint},
-		cfg.Reva.StorageHome.MountID:         {"address": cfg.Reva.StorageHome.Endpoint},
+		cfg.Reva.StorageHome.AlternativeID:   {"address": cfg.Reva.StorageHome.Endpoint},
 		cfg.Reva.StorageUsers.MountPath:      {"address": cfg.Reva.StorageUsers.Endpoint},
 		cfg.Reva.StorageUsers.MountID + ".*": {"address": cfg.Reva.StorageUsers.Endpoint},
 		cfg.Reva.StoragePublicLink.MountPath: {"address": cfg.Reva.StoragePublicLink.Endpoint},
+		cfg.Reva.StoragePublicLink.MountID:   {"address": cfg.Reva.StoragePublicLink.Endpoint},
 		// public link storage returns the mount id of the actual storage
 		// medatada storage not part of the global namespace
 	}
+
+	return ret
+}
+
+func mimetypes(cfg *config.Config, logger log.Logger) []map[string]interface{} {
+
+	type mimeTypeConfig struct {
+		MimeType      string `json:"mime_type" mapstructure:"mime_type"`
+		Extension     string `json:"extension" mapstructure:"extension"`
+		Name          string `json:"name" mapstructure:"name"`
+		Description   string `json:"description" mapstructure:"description"`
+		Icon          string `json:"icon" mapstructure:"icon"`
+		DefaultApp    string `json:"default_app" mapstructure:"default_app"`
+		AllowCreation bool   `json:"allow_creation" mapstructure:"allow_creation"`
+	}
+	var mimetypes []mimeTypeConfig
+	var m []map[string]interface{}
+
+	// load default app mimetypes from a json file
+	if cfg.Reva.AppRegistry.MimetypesJSON != "" {
+		data, err := ioutil.ReadFile(cfg.Reva.AppRegistry.MimetypesJSON)
+		if err != nil {
+			logger.Error().Err(err).Msg("Failed to read app registry mimetypes from JSON file: " + cfg.Reva.AppRegistry.MimetypesJSON)
+			return nil
+		}
+		if err = json.Unmarshal(data, &mimetypes); err != nil {
+			logger.Error().Err(err).Msg("Failed to unmarshal storage registry rules")
+			return nil
+		}
+		if err := mapstructure.Decode(mimetypes, &m); err != nil {
+			logger.Error().Err(err).Msg("Failed to decode defaultapp registry mimetypes to mapstructure")
+			return nil
+		}
+		return m
+	}
+
+	logger.Info().Msg("No app registry mimetypes JSON file provided, loading default configuration")
+
+	mimetypes = []mimeTypeConfig{
+		{
+			MimeType:    "application/pdf",
+			Extension:   "pdf",
+			Name:        "PDF",
+			Description: "PDF document",
+		},
+		{
+			MimeType:      "application/vnd.oasis.opendocument.text",
+			Extension:     "odt",
+			Name:          "OpenDocument",
+			Description:   "OpenDocument text document",
+			AllowCreation: true,
+		},
+		{
+			MimeType:      "application/vnd.oasis.opendocument.spreadsheet",
+			Extension:     "ods",
+			Name:          "OpenSpreadsheet",
+			Description:   "OpenDocument spreadsheet document",
+			AllowCreation: true,
+		},
+		{
+			MimeType:      "application/vnd.oasis.opendocument.presentation",
+			Extension:     "odp",
+			Name:          "OpenPresentation",
+			Description:   "OpenDocument presentation document",
+			AllowCreation: true,
+		},
+		{
+			MimeType:      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+			Extension:     "docx",
+			Name:          "Microsoft Word",
+			Description:   "Microsoft Word document",
+			AllowCreation: true,
+		},
+		{
+			MimeType:      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			Extension:     "xlsx",
+			Name:          "Microsoft Excel",
+			Description:   "Microsoft Excel document",
+			AllowCreation: true,
+		},
+		{
+			MimeType:      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+			Extension:     "pptx",
+			Name:          "Microsoft PowerPoint",
+			Description:   "Microsoft PowerPoint document",
+			AllowCreation: true,
+		},
+		{
+			MimeType:    "application/vnd.jupyter",
+			Extension:   "ipynb",
+			Name:        "Jupyter Notebook",
+			Description: "Jupyter Notebook",
+		},
+		{
+			MimeType:      "text/markdown",
+			Extension:     "md",
+			Name:          "Markdown file",
+			Description:   "Markdown file",
+			AllowCreation: true,
+		},
+		{
+			MimeType:    "application/compressed-markdown",
+			Extension:   "zmd",
+			Name:        "Compressed markdown file",
+			Description: "Compressed markdown file",
+		},
+	}
+
+	if err := mapstructure.Decode(mimetypes, &m); err != nil {
+		logger.Error().Err(err).Msg("Failed to decode defaultapp registry mimetypes to mapstructure")
+		return nil
+	}
+	return m
+
 }
 
 // GatewaySutureService allows for the storage-gateway command to be embedded and supervised by a suture supervisor tree.
@@ -221,9 +352,7 @@ type GatewaySutureService struct {
 
 // NewGatewaySutureService creates a new gateway.GatewaySutureService
 func NewGateway(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.Gateway.Supervised = true
-	}
+	cfg.Storage.Commons = cfg.Commons
 	return GatewaySutureService{
 		cfg: cfg.Storage,
 	}
@@ -232,8 +361,9 @@ func NewGateway(cfg *ociscfg.Config) suture.Service {
 func (s GatewaySutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.Gateway.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range Gateway(s.cfg).Flags {
-		if err := Gateway(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := Gateway(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}
@@ -248,4 +378,30 @@ func (s GatewaySutureService) Serve(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// ParseConfig loads accounts configuration from known paths.
+func ParseConfig(c *cli.Context, cfg *config.Config, storageExtension string) error {
+	conf, err := ociscfg.BindSourcesToStructs(storageExtension, cfg)
+	if err != nil {
+		return err
+	}
+
+	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &shared.Log{
+			Level:  cfg.Commons.Log.Level,
+			Pretty: cfg.Commons.Log.Pretty,
+			Color:  cfg.Commons.Log.Color,
+			File:   cfg.Commons.Log.File,
+		}
+	} else if cfg.Log == nil && cfg.Commons == nil {
+		cfg.Log = &shared.Log{}
+	}
+
+	// load all env variables relevant to the config in the current context.
+	conf.LoadOSEnv(config.GetEnv(cfg), false)
+
+	bindings := config.StructMappings(cfg)
+	return ociscfg.BindEnv(conf, bindings)
 }

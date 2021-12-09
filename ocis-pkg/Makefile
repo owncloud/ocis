@@ -1,8 +1,10 @@
 SHELL := bash
 NAME := ocis-pkg
 
+include ../.make/recursion.mk
+
 ############ tooling ############
-ifneq (, $(shell which go 2> /dev/null)) # supress `command not found warnings` for non go targets in CI
+ifneq (, $(shell which go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../.bingo/Variables.mk
 endif
 
@@ -13,21 +15,18 @@ include ../.make/go.mk
 include ../.make/release.mk
 
 ############ docs generate ############
+SKIP_CONFIG_DOCS_GENERATE = 1
+
 include ../.make/docs.mk
 
 .PHONY: docs-generate
 docs-generate:
-
-.PHONY: config-docs-generate
-config-docs-generate:
-	@echo "ocis-pkg: nothing to do"
 
 ############ generate ############
 include ../.make/generate.mk
 
 .PHONY: ci-go-generate
 ci-go-generate: # CI runs ci-node-generate automatically before this target
-	@go generate $(GENERATE)
 
 .PHONY: ci-node-generate
 ci-node-generate:

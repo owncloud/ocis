@@ -9,8 +9,6 @@ import (
 	"os"
 	"testing"
 
-	merrors "github.com/asim/go-micro/v3/errors"
-	"github.com/asim/go-micro/v3/metadata"
 	ocislog "github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
@@ -19,6 +17,8 @@ import (
 	svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	store "github.com/owncloud/ocis/settings/pkg/store/filesystem"
 	"github.com/stretchr/testify/assert"
+	merrors "go-micro.dev/v4/errors"
+	"go-micro.dev/v4/metadata"
 )
 
 var (
@@ -167,7 +167,7 @@ var (
 	}
 )
 
-const dataPath = "/var/tmp/grpc-tests-ocis-settings"
+const dataPath = "/tmp/grpc-tests-ocis-settings"
 
 func init() {
 	service = grpc.NewService(
@@ -808,7 +808,7 @@ func TestCreateRoleAndAssign(t *testing.T) {
 }
 
 // // TODO this tests are non-deterministic at least on my machine. Find a way to make them deterministic.
-// func TestListBudlesOnAuthorizedUser(t *testing.T) {
+// func TestListBundlesOnAuthorizedUser(t *testing.T) {
 // 	client := service.Client()
 // 	client2 := service.Client()
 // 	cl := proto.NewBundleService("com.owncloud.api.settings", client)

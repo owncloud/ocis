@@ -2,10 +2,12 @@
 package indexer
 
 import (
+	"context"
 	"fmt"
-	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"path"
 	"strings"
+
+	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"github.com/CiscoM31/godata"
 	"github.com/iancoleman/strcase"
@@ -39,14 +41,6 @@ func CreateIndexer(cfg *config.Config) *Indexer {
 	}
 }
 
-func getRegistryStrategy(cfg *config.Config) string {
-	if cfg.Repo.Disk.Path != "" {
-		return "disk"
-	}
-
-	return "cs3"
-}
-
 // Reset takes care of deleting all indices from storage and from the internal map of indices
 func (i *Indexer) Reset() error {
 	for j := range i.indices {
@@ -66,11 +60,10 @@ func (i *Indexer) Reset() error {
 
 // AddIndex adds a new index to the indexer receiver.
 func (i *Indexer) AddIndex(t interface{}, indexBy, pkName, entityDirName, indexType string, bound *option.Bound, caseInsensitive bool) error {
-	strategy := getRegistryStrategy(i.config)
-	f := registry.IndexConstructorRegistry[strategy][indexType]
+	f := registry.IndexConstructorRegistry[i.config.Repo.Backend][indexType]
 	var idx index.Index
 
-	if strategy == "cs3" {
+	if i.config.Repo.Backend == "cs3" {
 		idx = f(
 			option.CaseInsensitive(caseInsensitive),
 			option.WithEntity(t),
@@ -263,8 +256,8 @@ func (i *Indexer) Update(from, to interface{}) error {
 }
 
 // Query parses an OData query into something our indexer.Index understands and resolves it.
-func (i *Indexer) Query(t interface{}, q string) ([]string, error) {
-	query, err := godata.ParseFilterString(q)
+func (i *Indexer) Query(ctx context.Context, t interface{}, q string) ([]string, error) {
+	query, err := godata.ParseFilterString(ctx, q)
 	if err != nil {
 		return nil, err
 	}
@@ -361,7 +354,7 @@ func sanitizeInput(operands []string) (*indexerTuple, error) {
 // is to transform godata operators and functions into supported operations on our index. At the time of this writing
 // we only support `FindBy` and `FindByPartial` queries as these are the only implemented filters on indexer.Index(es).
 func buildTreeFromOdataQuery(root *godata.ParseNode, tree *queryTree) error {
-	if root.Token.Type == godata.FilterTokenFunc { // i.e "startswith", "contains"
+	if root.Token.Type == godata.ExpressionTokenFunc { // i.e "startswith", "contains"
 		switch root.Token.Value {
 		case "startswith":
 			token := token{
@@ -380,7 +373,7 @@ func buildTreeFromOdataQuery(root *godata.ParseNode, tree *queryTree) error {
 		}
 	}
 
-	if root.Token.Type == godata.FilterTokenLogical {
+	if root.Token.Type == godata.ExpressionTokenLogical {
 		switch root.Token.Value {
 		case "or":
 			tree.insert(&token{operator: root.Token.Value})

@@ -20,11 +20,11 @@ build: vendor | src i18n ; $(info building identifier Webapp ...)	@
 
 .PHONY: src
 src:
-	@$(MAKE) -C src
+	@$(MAKE) --no-print-directory -C src
 
 .PHONY: i18n
 i18n: vendor
-	@$(MAKE) -C i18n
+	@$(MAKE) --no-print-directory -C i18n
 
 .PHONY: lint
 lint: vendor ; $(info running eslint ...)	@
@@ -40,7 +40,7 @@ lint-checkstyle: vendor ; $(info running eslint checkstyle ...)	@
 .PHONY: vendor
 vendor: .yarninstall
 
-.yarninstall: package.json ; $(info getting depdencies with yarn ...)   @
+.yarninstall: package.json ; $(info getting dependencies with yarn ...)   @
 	@$(YARN) install --silent
 	@touch $@
 
@@ -58,7 +58,7 @@ clean:
 	@rm -rf node_modules
 	@rm -f .yarninstall
 
-	@$(MAKE) -C src clean
+	@$(MAKE) --no-print-directory -C src clean
 
 .PHONY: version
 version:

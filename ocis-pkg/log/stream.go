@@ -1,7 +1,7 @@
 package log
 
 import (
-	mdlog "github.com/asim/go-micro/v3/debug/log"
+	mdlog "go-micro.dev/v4/debug/log"
 )
 
 type logStream struct {

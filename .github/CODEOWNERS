@@ -1,5 +1,4 @@
-/accounts/ @kulmann @pascalwengerter 
-/onlyoffice/ @kulmann @pascalwengerter 
-/settings/ @kulmann @pascalwengerter 
-/web/ @kulmann @pascalwengerter 
+accounts/ @kulmann @pascalwengerter @paulcod3
+settings/ @kulmann @pascalwengerter @paulcod3
+web/ @kulmann @pascalwengerter 
 .drone.star @wkloucek @micbar @phil-davis @individual-it

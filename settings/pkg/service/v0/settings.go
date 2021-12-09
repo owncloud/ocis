@@ -24,6 +24,21 @@ const (
 	// SettingsManagementPermissionName is the hardcoded setting name for the settings management permission
 	SettingsManagementPermissionName string = "settings-management"
 
+	// SetSpaceQuotaPermissionID is the hardcoded setting UUID for the set space quota permission
+	SetSpaceQuotaPermissionID string = "4e6f9709-f9e7-44f1-95d4-b762d27b7896"
+	// SetSpaceQuotaPermissionName is the hardcoded setting name for the set space quota permission
+	SetSpaceQuotaPermissionName string = "set-space-quota"
+
+	// ListAllSpacesPermissionID is the hardcoded setting UUID for the list all spaces permission
+	ListAllSpacesPermissionID string = "016f6ddd-9501-4a0a-8ebe-64a20ee8ec82"
+	// ListAllSpacesPermissionName is the hardcoded setting name for the list all spaces permission
+	ListAllSpacesPermissionName string = "list-all-spaces"
+
+	// CreateSpacePermissionID is the hardcoded setting UUID for the create space permission
+	CreateSpacePermissionID string = "79e13b30-3e22-11eb-bc51-0b9f0bad9a58"
+	// CreateSpacePermissionName is the hardcoded setting name for the create space permission
+	CreateSpacePermissionName string = "create-space"
+
 	settingUUIDProfileLanguage = "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f"
 
 	// AccountManagementPermissionID is the hardcoded setting UUID for the account management permission
@@ -118,6 +133,7 @@ var languageSetting = settings.Setting_SingleChoiceValue{
 					},
 				},
 				DisplayValue: "English",
+				Default:      true,
 			},
 			{
 				Value: &settings.ListOptionValue{
@@ -327,6 +343,60 @@ func generatePermissionRequests() []*settings.AddSettingToBundleRequest {
 					PermissionValue: &settings.Permission{
 						Operation:  settings.Permission_OPERATION_READWRITE,
 						Constraint: settings.Permission_CONSTRAINT_OWN,
+					},
+				},
+			},
+		},
+		{
+			BundleId: BundleUUIDRoleAdmin,
+			Setting: &settings.Setting{
+				Id:          SetSpaceQuotaPermissionID,
+				Name:        SetSpaceQuotaPermissionName,
+				DisplayName: "Set Space Quota",
+				Description: "This permission allows to manage space quotas.",
+				Resource: &settings.Resource{
+					Type: settings.Resource_TYPE_SYSTEM,
+				},
+				Value: &settings.Setting_PermissionValue{
+					PermissionValue: &settings.Permission{
+						Operation:  settings.Permission_OPERATION_READWRITE,
+						Constraint: settings.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+		},
+		{
+			BundleId: BundleUUIDRoleAdmin,
+			Setting: &settings.Setting{
+				Id:          CreateSpacePermissionID,
+				Name:        CreateSpacePermissionName,
+				DisplayName: "Create Space",
+				Description: "This permission allows to create new spaces.",
+				Resource: &settings.Resource{
+					Type: settings.Resource_TYPE_SYSTEM,
+				},
+				Value: &settings.Setting_PermissionValue{
+					PermissionValue: &settings.Permission{
+						Operation:  settings.Permission_OPERATION_READWRITE,
+						Constraint: settings.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+		},
+		{
+			BundleId: BundleUUIDRoleAdmin,
+			Setting: &settings.Setting{
+				Id:          ListAllSpacesPermissionID,
+				Name:        ListAllSpacesPermissionName,
+				DisplayName: "List All Spaces",
+				Description: "This permission allows list all spaces.",
+				Resource: &settings.Resource{
+					Type: settings.Resource_TYPE_SYSTEM,
+				},
+				Value: &settings.Setting_PermissionValue{
+					PermissionValue: &settings.Permission{
+						Operation:  settings.Permission_OPERATION_READ,
+						Constraint: settings.Permission_CONSTRAINT_ALL,
 					},
 				},
 			},

@@ -8,8 +8,6 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rgrpc/status"
-	"github.com/cs3org/reva/pkg/token"
-	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"google.golang.org/grpc/metadata"
 )
@@ -20,17 +18,9 @@ func CreateHome(optionSetters ...Option) func(next http.Handler) http.Handler {
 	logger := options.Logger
 
 	return func(next http.Handler) http.Handler {
-		tokenManager, err := jwt.New(map[string]interface{}{
-			"secret": options.TokenManagerConfig.JWTSecret,
-		})
-		if err != nil {
-			logger.Fatal().Err(err).Msgf("Could not initialize token-manager")
-		}
-
 		return &createHome{
 			next:              next,
 			logger:            logger,
-			tokenManager:      tokenManager,
 			revaGatewayClient: options.RevaGatewayClient,
 		}
 	}
@@ -39,7 +29,6 @@ func CreateHome(optionSetters ...Option) func(next http.Handler) http.Handler {
 type createHome struct {
 	next              http.Handler
 	logger            log.Logger
-	tokenManager      token.Manager
 	revaGatewayClient gateway.GatewayAPIClient
 }
 

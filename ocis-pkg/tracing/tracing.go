@@ -2,6 +2,8 @@ package tracing
 
 import (
 	"fmt"
+	"net/url"
+	"strings"
 
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/propagation"
@@ -17,18 +19,36 @@ var Propagator = propagation.NewCompositeTextMapPropagator(
 )
 
 // GetTraceProvider returns a configured open-telemetry trace provider.
-func GetTraceProvider(collectorEndpoint, traceType, serviceName string) (*sdktrace.TracerProvider, error) {
+func GetTraceProvider(agentEndpoint, collectorEndpoint, serviceName, traceType string) (*sdktrace.TracerProvider, error) {
 	switch t := traceType; t {
 	case "jaeger":
-		if collectorEndpoint == "" {
-			return sdktrace.NewTracerProvider(), nil
-		}
-
-		exp, err := jaeger.New(
-			jaeger.WithCollectorEndpoint(
-				jaeger.WithEndpoint(collectorEndpoint),
-			),
+		var (
+			exp *jaeger.Exporter
+			err error
 		)
+
+		if agentEndpoint != "" {
+			var agentHost string
+			var agentPort string
+
+			agentHost, agentPort, err = parseAgentConfig(agentEndpoint)
+			if err != nil {
+				return nil, err
+			}
+
+			exp, err = jaeger.New(
+				jaeger.WithAgentEndpoint(
+					jaeger.WithAgentHost(agentHost),
+					jaeger.WithAgentPort(agentPort),
+				),
+			)
+		} else if collectorEndpoint != "" {
+			exp, err = jaeger.New(
+				jaeger.WithCollectorEndpoint(
+					jaeger.WithEndpoint(collectorEndpoint),
+				),
+			)
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -48,4 +68,28 @@ func GetTraceProvider(collectorEndpoint, traceType, serviceName string) (*sdktra
 	default:
 		return nil, fmt.Errorf("invalid trace configuration")
 	}
+}
+
+func parseAgentConfig(ae string) (string, string, error) {
+	u, err := url.Parse(ae)
+	// as per url.go:
+	// [...] Trying to parse a hostname and path
+	// without a scheme is invalid but may not necessarily return an
+	// error, due to parsing ambiguities.
+	if err == nil && u.Hostname() != "" && u.Port() != "" {
+		return u.Hostname(), u.Port(), nil
+	}
+
+	p := strings.Split(ae, ":")
+	if len(p) != 2 {
+		return "", "", fmt.Errorf(fmt.Sprintf("invalid agent endpoint `%s`. expected format: `hostname:port`", ae))
+	}
+
+	switch {
+	case p[0] == "" && p[1] == "": // case ae = ":"
+		return "", "", fmt.Errorf(fmt.Sprintf("invalid agent endpoint `%s`. expected format: `hostname:port`", ae))
+	case p[0] == "":
+		return "", "", fmt.Errorf(fmt.Sprintf("invalid agent endpoint `%s`. expected format: `hostname:port`", ae))
+	}
+	return p[0], p[1], nil
 }

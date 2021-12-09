@@ -1,6 +1,6 @@
 ---
 debug:
-  addr: 0.0.0.0:9104
+  addr: 0.0.0.0:9136
   token:
   pprof: false
   zpages: false

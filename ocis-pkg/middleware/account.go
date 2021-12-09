@@ -1,16 +1,15 @@
 package middleware
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 
 	"github.com/cs3org/reva/pkg/auth/scope"
 
-	"github.com/asim/go-micro/v3/metadata"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/ocis-pkg/account"
+	"go-micro.dev/v4/metadata"
 )
 
 // newAccountOptions initializes the available default options.
@@ -30,17 +29,13 @@ const AccountID string = "Account-Id"
 // RoleIDs serves as key for the roles in the context
 const RoleIDs string = "Role-Ids"
 
-// UUIDKey serves as key for the account uuid in the context
-// Deprecated: UUIDKey exists for compatibility reasons. Use AccountID instead.
-var UUIDKey struct{}
-
 // ExtractAccountUUID provides a middleware to extract the account uuid from the x-access-token header value
 // and write it to the context. If there is no x-access-token the middleware is omitted.
 func ExtractAccountUUID(opts ...account.Option) func(http.Handler) http.Handler {
 	opt := newAccountOptions(opts...)
 	tokenManager, err := jwt.New(map[string]interface{}{
 		"secret":  opt.JWTSecret,
-		"expires": int64(60),
+		"expires": int64(24 * 60 * 60),
 	})
 	if err != nil {
 		opt.Logger.Fatal().Err(err).Msgf("Could not initialize token-manager")
@@ -60,7 +55,7 @@ func ExtractAccountUUID(opts ...account.Option) func(http.Handler) http.Handler 
 				opt.Logger.Error().Err(err)
 				return
 			}
-			if ok, err := scope.VerifyScope(tokenScope, r); err != nil || !ok {
+			if ok, err := scope.VerifyScope(r.Context(), tokenScope, r); err != nil || !ok {
 				opt.Logger.Error().Err(err).Msg("verifying scope failed")
 				return
 			}
@@ -70,7 +65,6 @@ func ExtractAccountUUID(opts ...account.Option) func(http.Handler) http.Handler 
 
 			// Important: user.Id.OpaqueId is the AccountUUID. Set this way in the account uuid middleware in ocis-proxy.
 			// https://github.com/owncloud/ocis-proxy/blob/ea254d6036592cf9469d757d1295e0c4309d1e63/pkg/middleware/account_uuid.go#L109
-			ctx = context.WithValue(ctx, UUIDKey, u.Id.OpaqueId)
 			// TODO: implement token manager in cs3org/reva that uses generic metadata instead of access token from header.
 			ctx = metadata.Set(ctx, AccountID, u.Id.OpaqueId)
 			if u.Opaque != nil {

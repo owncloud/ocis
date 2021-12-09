@@ -73,6 +73,24 @@ Credentials:
 - oCIS: [ocis.ocis-keycloak.released.owncloud.works](https://ocis.ocis-keycloak.released.owncloud.works)
 - Keycloak: [keycloak.ocis-keycloak.released.owncloud.works](https://keycloak.ocis-keycloak.released.owncloud.works)
 
+# Parallel deployment of oC10 and oCIS
+
+Credentials:
+
+- oC10 / oCIS: see [default demo users]({{< ref "../getting-started#login-to-owncloud-web" >}})
+- Keycloak:
+  - username: admin
+  - password: admin
+- LDAP management:
+  - username: cn=admin,dc=owncloud,dc=com
+  - password: admin
+
+## Latest
+
+- oC10 / oCIS: [cloud.oc10-ocis-parallel.latest.owncloud.works](https://cloud.oc10-ocis-parallel.latest.owncloud.works)
+- LDAP management: [ldap.oc10-ocis-parallel.latest.owncloud.works](https://ldap.oc10-ocis-parallel.latest.owncloud.works)
+- Keycloak: [keycloak.oc10-ocis-parallel.latest.owncloud.works](https://keycloak.oc10-ocis-parallel.latest.owncloud.works)
+
 # oCIS with Hello extension
 
 Credentials:
@@ -97,7 +115,7 @@ Credentials:
 - oCIS: [ocis.ocis-s3.latest.owncloud.works](https://ocis.ocis-s3.latest.owncloud.works)
 - MinIO: [minio.ocis-s3.latest.owncloud.works](https://minio.ocis-s3.latest.owncloud.works)
 
-# oCIS with CS3 users
+# oCIS with LDAP for users and groups
 
 Credentials:
 
@@ -108,10 +126,10 @@ Credentials:
 
 ## Latest
 
-- oCIS: [ocis.ocis-cs3-users.latest.owncloud.works](https://ocis.ocis-cs3-users.latest.owncloud.works)
-- LDAP admin: [ldap.ocis-cs3-users.latest.owncloud.works](https://ldap.ocis-cs3-users.latest.owncloud.works)
+- oCIS: [ocis.ocis-ldap.latest.owncloud.works](https://ocis.ocis-ldap.latest.owncloud.works)
+- LDAP admin: [ldap.ocis-ldap.latest.owncloud.works](https://ldap.ocis-ldap.latest.owncloud.works)
 
 ## Released
 
-- oCIS: [ocis.ocis-cs3-users.released.owncloud.works](https://ocis.ocis-cs3-users.released.owncloud.works)
-- LDAP admin: [ldap.ocis-cs3-users.released.owncloud.works](https://ldap.ocis-cs3-users.released.owncloud.works)
+- oCIS: [ocis.ocis-ldap.released.owncloud.works](https://ocis.ocis-ldap.released.owncloud.works)
+- LDAP admin: [ldap.ocis-ldap.released.owncloud.works](https://ldap.ocis-ldap.released.owncloud.works)

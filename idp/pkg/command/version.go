@@ -6,10 +6,9 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/registry"
 
-	"github.com/micro/cli/v2"
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/idp/pkg/config"
-	"github.com/owncloud/ocis/idp/pkg/flagset"
+	"github.com/urfave/cli/v2"
 )
 
 // PrintVersion prints the service versions of all running instances.
@@ -17,7 +16,9 @@ func PrintVersion(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "version",
 		Usage: "Print the versions of the running instances",
-		Flags: flagset.ListIDPWithConfig(cfg),
+		Before: func(c *cli.Context) error {
+			return ParseConfig(c, cfg)
+		},
 		Action: func(c *cli.Context) error {
 			reg := registry.GetRegistry()
 			services, err := reg.GetService(cfg.Service.Namespace + "." + cfg.Service.Name)

@@ -17,6 +17,16 @@
     - "*.ocis-wopi.latest.owncloud.works"
 
   vars:
+    ssh_authorized_keys:
+      - https://github.com/butonic.keys
+      - https://github.com/C0rby.keys
+      - https://github.com/fschade.keys
+      - https://github.com/kulmann.keys
+      - https://github.com/micbar.keys
+      - https://github.com/pascalwengerter.keys
+      - https://github.com/paulcod3.keys
+      - https://github.com/refs.keys
+      - https://github.com/wkloucek.keys
     docker_compose_projects:
       - name: ocis
         git_url: https://github.com/owncloud/ocis.git
@@ -27,10 +37,10 @@
           TRAEFIK_ACME_MAIL: wkloucek@owncloud.com
           OCIS_DOCKER_TAG: latest
           OCIS_DOMAIN: ocis.ocis-wopi.latest.owncloud.works
-          OCIS_WOPISERVER_DOCKER_TAG: latest
-          CS3ORG_WOPISERVER_DOCKER_TAG: latest
           WOPISERVER_DOMAIN: wopiserver.ocis-wopi.latest.owncloud.works
           COLLABORA_DOMAIN: collabora.ocis-wopi.latest.owncloud.works
+          ONLYOFFICE_DOMAIN: onlyoffice.ocis-wopi.latest.owncloud.works
+          CODIMD_DOMAIN: codimd.ocis-wopi.latest.owncloud.works
           COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
       - name: monitoring
         git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git

@@ -16,7 +16,7 @@ So we are trying to reflect this in the tooling. It should be kept simple and qu
 
 Besides standard development tools like git and a text editor, you need the following software for development:
 
-- Go >= v1.16 ([install instructions](https://golang.org/doc/install))
+- Go >= v1.17 ([install instructions](https://golang.org/doc/install))
 - Yarn ([install instructions](https://classic.yarnpkg.com/en/docs/install))
 - docker ([install instructions](https://docs.docker.com/get-docker/))
 - docker-compose ([install instructions](https://docs.docker.com/compose/install/))
@@ -27,7 +27,7 @@ If you find tools needed besides the mentioned above, please feel free to open a
 
 oCIS consists of multiple micro services, also called extensions. We started by having standalone repositories for each of them, but quickly noticed that this adds a time consuming overhead for developers. So we ended up with a monorepo housing all the extensions in one repository.
 
-Each extension lives in a subfolder (eg. `accounts` or `settings`) within this respository as an independent Go module, following the [golang-standard project-layout](https://github.com/golang-standards/project-layout). They have common Makefile targets and can be used to change, build and run individual extensions. This allows us to version and release each extension independently.
+Each extension lives in a subfolder (eg. `accounts` or `settings`) within this repository as an independent Go module, following the [golang-standard project-layout](https://github.com/golang-standards/project-layout). They have common Makefile targets and can be used to change, build and run individual extensions. This allows us to version and release each extension independently.
 
 The `ocis` folder contains our [go-micro](https://github.com/asim/go-micro/) and [suture](https://github.com/thejerf/suture) based runtime. It is used to import all extensions and implements commands to manage them, similar to a small orchestrator. With the resulting oCIS binary you can start single extensions or even all extensions at the same time.
 

@@ -33,11 +33,11 @@ You can find the latest official release of oCIS at [our download mirror](https:
 The latest build from the master branch can be found at [our download mirrors testing section](https://download.owncloud.com/ocis/ocis/testing/).
 
 To run oCIS as binary you need to download it first and then run the following commands.
-For this example, assuming version 1.10.0 of oCIS running on a Linux AMD64 host:
+For this example, assuming version 1.13.0 of oCIS running on a Linux AMD64 host:
 
 ```console
 # download
-curl https://download.owncloud.com/ocis/ocis/1.10.0/ocis-1.10.0-linux-amd64 --output ocis
+curl https://download.owncloud.com/ocis/ocis/1.13.0/ocis-1.13.0-linux-amd64 --output ocis
 
 # make binary executable
 chmod +x ocis
@@ -46,7 +46,7 @@ chmod +x ocis
 ./ocis server
 ```
 
-The default primary storage location is `/var/tmp/ocis`. You can change that value by configuration.
+The default primary storage location is `~/.ocis` or `/var/lib/ocis` depending on the packaging format and your operating system user. You can change that value by configuration.
 
 {{< hint warning >}}
 oCIS by default relies on Multicast DNS (mDNS), usually via avahi-daemon. If your system has a firewall, make sure mDNS is allowed in your active zone.
@@ -71,7 +71,7 @@ Open [https://localhost:9200](https://localhost:9200) and [login using one of th
 
 ### Basic Management Commands
 
-The oCIS single binary contains multiple extensions and the `ocis` command helps you to manage them. You already used `ocis server` to run all available extensions in the [Run oCIS]({{< ref "#run-ocis" >}}) section. We now will show you some more management commands, which you may also explore by typing `ocis --help` or going to the [docs]({{< ref "../configuration" >}}).
+The oCIS single binary contains multiple extensions and the `ocis` command helps you to manage them. You already used `ocis server` to run all available extensions in the [Run oCIS]({{< ref "#run-ocis" >}}) section. We now will show you some more management commands, which you may also explore by typing `ocis --help` or going to the [docs]({{< ref "../config" >}}).
 
 To start oCIS server:
 

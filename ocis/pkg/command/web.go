@@ -1,12 +1,10 @@
 package command
 
 import (
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/web/pkg/command"
-	svcconfig "github.com/owncloud/ocis/web/pkg/config"
-	"github.com/owncloud/ocis/web/pkg/flagset"
+	"github.com/urfave/cli/v2"
 )
 
 // WebCommand is the entrypoint for the web command.
@@ -15,30 +13,22 @@ func WebCommand(cfg *config.Config) *cli.Command {
 		Name:     "web",
 		Usage:    "Start web server",
 		Category: "Extensions",
-		Flags:    flagset.ServerWithConfig(cfg.Web),
 		Before: func(ctx *cli.Context) error {
-			return ParseConfig(ctx, cfg)
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
+			}
+
+			if cfg.Commons != nil {
+				cfg.Web.Commons = cfg.Commons
+			}
+
+			return nil
 		},
 		Action: func(c *cli.Context) error {
-			origCmd := command.Server(configureWeb(cfg))
+			origCmd := command.Server(cfg.Web)
 			return handleOriginalAction(c, origCmd)
 		},
 	}
-}
-
-func configureWeb(cfg *config.Config) *svcconfig.Config {
-	cfg.Web.Log.Level = cfg.Log.Level
-	cfg.Web.Log.Pretty = cfg.Log.Pretty
-	cfg.Web.Log.Color = cfg.Log.Color
-
-	if cfg.Tracing.Enabled {
-		cfg.Web.Tracing.Enabled = cfg.Tracing.Enabled
-		cfg.Web.Tracing.Type = cfg.Tracing.Type
-		cfg.Web.Tracing.Endpoint = cfg.Tracing.Endpoint
-		cfg.Web.Tracing.Collector = cfg.Tracing.Collector
-	}
-
-	return cfg.Web
 }
 
 func init() {

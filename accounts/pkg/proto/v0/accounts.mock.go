@@ -3,13 +3,13 @@ package proto
 import (
 	context "context"
 
-	client "github.com/asim/go-micro/v3/client"
-	empty "github.com/golang/protobuf/ptypes/empty"
+	client "go-micro.dev/v4/client"
+	empty "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // MockAccountsService can be used to write tests
 /*
-To creata a mock overwrite the functions of an instance like this:
+To create a mock overwrite the functions of an instance like this:
 
 ```go
 func mockAccSvc(retErr bool) proto.AccountsService {

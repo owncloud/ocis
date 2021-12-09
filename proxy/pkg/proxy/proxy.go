@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	chimiddleware "github.com/go-chi/chi/middleware"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 
 	"go.opentelemetry.io/otel/attribute"
 
@@ -62,13 +62,6 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 		},
 	}
 
-	if options.Config.Policies == nil {
-		rp.logger.Info().Str("source", "runtime").Msg("Policies")
-		options.Config.Policies = defaultPolicies()
-	} else {
-		rp.logger.Info().Str("source", "file").Str("src", options.Config.File).Msg("policies")
-	}
-
 	if options.Config.PolicySelector == nil {
 		firstPolicy := options.Config.Policies[0].Name
 		rp.logger.Warn().Str("policy", firstPolicy).Msg("policy-selector not configured. Will always use first policy")
@@ -93,19 +86,14 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 	for _, pol := range options.Config.Policies {
 		for _, route := range pol.Routes {
 			rp.logger.Debug().Str("fwd: ", route.Endpoint)
-			uri, err := url.Parse(route.Backend)
-			if err != nil {
+			uri, err2 := url.Parse(route.Backend)
+			if err2 != nil {
 				rp.logger.
 					Fatal(). // fail early on misconfiguration
-					Err(err).
+					Err(err2).
 					Str("backend", route.Backend).
 					Msg("malformed url")
 			}
-
-			rp.logger.
-				Debug().
-				Interface("route", route).
-				Msg("adding route")
 
 			rp.AddHost(pol.Name, uri, route)
 		}
@@ -267,158 +255,4 @@ func (p *MultiHostReverseProxy) regexRouteMatcher(pattern string, target url.URL
 
 func (p *MultiHostReverseProxy) prefixRouteMatcher(prefix string, target url.URL) bool {
 	return strings.HasPrefix(target.Path, prefix) && prefix != "/"
-}
-
-func defaultPolicies() []config.Policy {
-	return []config.Policy{
-		{
-			Name: "ocis",
-			Routes: []config.Route{
-				{
-					Endpoint: "/",
-					Backend:  "http://localhost:9100",
-				},
-				{
-					Endpoint: "/.well-known/",
-					Backend:  "http://localhost:9130",
-				},
-				{
-					Endpoint: "/konnect/",
-					Backend:  "http://localhost:9130",
-				},
-				{
-					Endpoint: "/signin/",
-					Backend:  "http://localhost:9130",
-				},
-				{
-					Type:     config.RegexRoute,
-					Endpoint: "/ocs/v[12].php/cloud/(users?|groups)", // we have `user`, `users` and `groups` in ocis-ocs
-					Backend:  "http://localhost:9110",
-				},
-				{
-					Endpoint: "/ocs/",
-					Backend:  "http://localhost:9140",
-				},
-				{
-					Endpoint: "/ocs/v[12].php/cloud/users/signing-key",
-					Backend:  "http://localhost:9110",
-				},
-				{
-					Type:     config.QueryRoute,
-					Endpoint: "/remote.php/?preview=1",
-					Backend:  "http://localhost:9115",
-				},
-				{
-					Endpoint: "/remote.php/",
-					Backend:  "http://localhost:9140",
-				},
-				{
-					Endpoint: "/dav/",
-					Backend:  "http://localhost:9140",
-				},
-				{
-					Endpoint: "/webdav/",
-					Backend:  "http://localhost:9140",
-				},
-				{
-					Endpoint: "/status.php",
-					Backend:  "http://localhost:9140",
-				},
-				{
-					Endpoint: "/index.php/",
-					Backend:  "http://localhost:9140",
-				},
-				{
-					Endpoint: "/data",
-					Backend:  "http://localhost:9140",
-				},
-				{
-					Endpoint: "/graph/",
-					Backend:  "http://localhost:9120",
-				},
-				{
-					Endpoint: "/graph-explorer/",
-					Backend:  "http://localhost:9135",
-				},
-				// if we were using the go micro api gateway we could look up the endpoint in the registry dynamically
-				{
-					Endpoint: "/api/v0/accounts",
-					Backend:  "http://localhost:9181",
-				},
-				// TODO the lookup needs a better mechanism
-				{
-					Endpoint: "/accounts.js",
-					Backend:  "http://localhost:9181",
-				},
-				{
-					Endpoint: "/api/v0/settings",
-					Backend:  "http://localhost:9190",
-				},
-				{
-					Endpoint: "/settings.js",
-					Backend:  "http://localhost:9190",
-				},
-				{
-					Endpoint: "/onlyoffice.js",
-					Backend:  "http://localhost:9220",
-				},
-			},
-		},
-		{
-			Name: "oc10",
-			Routes: []config.Route{
-				{
-					Endpoint: "/",
-					Backend:  "http://localhost:9100",
-				},
-				{
-					Endpoint: "/.well-known/",
-					Backend:  "http://localhost:9130",
-				},
-				{
-					Endpoint: "/konnect/",
-					Backend:  "http://localhost:9130",
-				},
-				{
-					Endpoint: "/signin/",
-					Backend:  "http://localhost:9130",
-				},
-				{
-					Endpoint:    "/ocs/",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/remote.php/",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/dav/",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/webdav/",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/status.php",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/index.php/",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/data",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-			},
-		},
-	}
 }

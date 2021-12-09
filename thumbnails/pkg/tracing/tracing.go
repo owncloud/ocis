@@ -13,8 +13,10 @@ var (
 
 func Configure(cfg *config.Config) error {
 	var err error
-	if TraceProvider, err = pkgtrace.GetTraceProvider(cfg.Tracing.Collector, cfg.Tracing.Type, "thumbnails"); err != nil {
-		return err
+	if cfg.Tracing.Enabled {
+		if TraceProvider, err = pkgtrace.GetTraceProvider(cfg.Tracing.Endpoint, cfg.Tracing.Collector, "thumbnails", cfg.Tracing.Type); err != nil {
+			return err
+		}
 	}
 
 	return nil

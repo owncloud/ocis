@@ -4,8 +4,9 @@ import (
 	"net/http"
 	"net/http/pprof"
 
-	chimiddleware "github.com/go-chi/chi/middleware"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
+	"github.com/owncloud/ocis/ocis-pkg/cors"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opencensus.io/zpages"
@@ -14,12 +15,6 @@ import (
 // NewService initializes a new debug service.
 func NewService(opts ...Option) *http.Server {
 	dopts := newOptions(opts...)
-
-	dopts.Logger.Info().
-		Str("transport", "debug").
-		Str("addr", dopts.Address).
-		Msg("starting server")
-
 	mux := http.NewServeMux()
 
 	mux.Handle("/metrics", alice.New(
@@ -32,6 +27,10 @@ func NewService(opts ...Option) *http.Server {
 
 	mux.HandleFunc("/healthz", dopts.Health)
 	mux.HandleFunc("/readyz", dopts.Ready)
+
+	if dopts.ConfigDump != nil {
+		mux.HandleFunc("/config", dopts.ConfigDump)
+	}
 
 	if dopts.Pprof {
 		mux.HandleFunc("/debug/pprof/", pprof.Index)
@@ -51,7 +50,12 @@ func NewService(opts ...Option) *http.Server {
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,
 			middleware.NoCache,
-			middleware.Cors,
+			middleware.Cors(
+				cors.AllowedOrigins(dopts.CorsAllowedOrigins),
+				cors.AllowedMethods(dopts.CorsAllowedMethods),
+				cors.AllowedHeaders(dopts.CorsAllowedHeaders),
+				cors.AllowCredentials(dopts.CorsAllowCredentials),
+			),
 			middleware.Secure,
 			middleware.Version(
 				dopts.Name,

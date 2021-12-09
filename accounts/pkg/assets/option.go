@@ -1,9 +1,19 @@
 package assets
 
 import (
+	"net/http"
+
+	"github.com/owncloud/ocis/accounts"
 	"github.com/owncloud/ocis/accounts/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/assetsfs"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
+
+// New returns a new http filesystem to serve assets.
+func New(opts ...Option) http.FileSystem {
+	options := newOptions(opts...)
+	return assetsfs.New(accounts.Assets, options.Config.Asset.Path, options.Logger)
+}
 
 // Option defines a single option function.
 type Option func(o *Options)

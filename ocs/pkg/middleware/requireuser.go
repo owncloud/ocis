@@ -10,18 +10,25 @@ import (
 )
 
 // RequireUser middleware is used to require a user in context
-func RequireUser() func(next http.Handler) http.Handler {
+func RequireUser(opts ...Option) func(next http.Handler) http.Handler {
+	opt := newOptions(opts...)
+
+	mustRender := func(w http.ResponseWriter, r *http.Request, renderer render.Renderer) {
+		if err := render.Render(w, r, renderer); err != nil {
+			opt.Logger.Err(err).Msgf("failed to write response for ocs request %s on %s", r.Method, r.URL)
+		}
+	}
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 			u, ok := revactx.ContextGetUser(r.Context())
 			if !ok {
-				mustNotFail(render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized")))
+				mustRender(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized"))
 				return
 			}
 			if u.Id == nil || u.Id.OpaqueId == "" {
-				mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id")))
+				mustRender(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id"))
 				return
 			}
 

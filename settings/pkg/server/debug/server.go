@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/owncloud/ocis/ocis-pkg/service/debug"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/settings/pkg/config"
-	"github.com/owncloud/ocis/settings/pkg/version"
 )
 
 // Server initializes the debug service and server.
@@ -23,6 +23,10 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.Zpages(options.Config.Debug.Zpages),
 		debug.Health(health(options.Config)),
 		debug.Ready(ready(options.Config)),
+		debug.CorsAllowedOrigins(options.Config.HTTP.CORS.AllowedOrigins),
+		debug.CorsAllowedMethods(options.Config.HTTP.CORS.AllowedMethods),
+		debug.CorsAllowedHeaders(options.Config.HTTP.CORS.AllowedHeaders),
+		debug.CorsAllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
 	), nil
 }
 

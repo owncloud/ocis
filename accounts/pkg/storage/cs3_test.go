@@ -17,8 +17,6 @@ package storage
 //	Repo: config.Repo{
 //		CS3:  config.CS3{
 //			ProviderAddr: "0.0.0.0:9215",
-//			DataURL:    "http://localhost:9216",
-//			DataPrefix:   "data",
 //		},
 //	},
 //}

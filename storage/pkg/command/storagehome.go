@@ -10,14 +10,14 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/storage/pkg/command/storagedrivers"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // StorageHome is the entrypoint for the storage-home command.
@@ -25,11 +25,8 @@ func StorageHome(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-home",
 		Usage: "Start storage-home service",
-		Flags: flagset.StorageHomeWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.StorageHome.Services = c.StringSlice("service")
-
-			return nil
+			return ParseConfig(c, cfg, "storage-home")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -43,16 +40,6 @@ func StorageHome(cfg *config.Config) *cli.Command {
 			uuid := uuid.Must(uuid.NewV4())
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
-			// override driver enable home option with home config
-			if cfg.Reva.Storages.Home.EnableHome {
-				cfg.Reva.Storages.Common.EnableHome = true
-				cfg.Reva.Storages.EOS.EnableHome = true
-				cfg.Reva.Storages.Local.EnableHome = true
-				cfg.Reva.Storages.OwnCloud.EnableHome = true
-				cfg.Reva.Storages.OwnCloudSQL.EnableHome = true
-				cfg.Reva.Storages.S3.EnableHome = true
-				cfg.Reva.Storages.S3NG.EnableHome = true
-			}
 			rcfg := storageHomeConfigFromStruct(c, cfg)
 
 			gr.Add(func() error {
@@ -107,8 +94,9 @@ func storageHomeConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret": cfg.Reva.JWTSecret,
-			"gatewaysvc": cfg.Reva.Gateway.Endpoint,
+			"jwt_secret":                cfg.Reva.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
+			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.StorageHome.GRPCNetwork,
@@ -117,7 +105,7 @@ func storageHomeConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 			"services": map[string]interface{}{
 				"storageprovider": map[string]interface{}{
 					"driver":             cfg.Reva.StorageHome.Driver,
-					"drivers":            drivers(cfg),
+					"drivers":            storagedrivers.HomeDrivers(cfg),
 					"mount_path":         cfg.Reva.StorageHome.MountPath,
 					"mount_id":           cfg.Reva.StorageHome.MountID,
 					"expose_data_server": cfg.Reva.StorageHome.ExposeDataServer,
@@ -134,9 +122,9 @@ func storageHomeConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 				"dataprovider": map[string]interface{}{
 					"prefix":      cfg.Reva.StorageHome.HTTPPrefix,
 					"driver":      cfg.Reva.StorageHome.Driver,
-					"drivers":     drivers(cfg),
+					"drivers":     storagedrivers.HomeDrivers(cfg),
 					"timeout":     86400,
-					"insecure":    true,
+					"insecure":    cfg.Reva.StorageHome.DataProvider.Insecure,
 					"disable_tus": false,
 				},
 			},
@@ -158,9 +146,7 @@ type StorageHomeSutureService struct {
 
 // NewStorageHomeSutureService creates a new storage.StorageHomeSutureService
 func NewStorageHome(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.StorageHome.Supervised = true
-	}
+	cfg.Storage.Commons = cfg.Commons
 	return StorageHomeSutureService{
 		cfg: cfg.Storage,
 	}
@@ -169,8 +155,9 @@ func NewStorageHome(cfg *ociscfg.Config) suture.Service {
 func (s StorageHomeSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.StorageHome.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range StorageHome(s.cfg).Flags {
-		if err := StorageHome(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := StorageHome(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

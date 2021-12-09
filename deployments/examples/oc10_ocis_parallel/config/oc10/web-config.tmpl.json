@@ -1,0 +1,35 @@
+{
+  "server": "https://{{ .Env.CLOUD_DOMAIN }}",
+  "theme": "owncloud",
+  "openIdConnect": {
+    "metadata_url": "{{ .Env.IDP_OIDC_ISSUER }}/.well-known/openid-configuration",
+    "authority": "{{ .Env.IDP_OIDC_ISSUER }}",
+    "client_id": "oc10-web",
+    "response_type": "code",
+    "scope": "openid profile email"
+  },
+  "apps": ["files", "media-viewer", "search"],
+  "applications": [
+    {
+      "icon": "switch_ui",
+      "target": "_self",
+      "title": {
+        "en": "Classic Design",
+        "de": "Dateien",
+        "fr": "Fichiers",
+        "zh_CN": "文件"
+      },
+      "url": "https://{{ .Env.CLOUD_DOMAIN }}/index.php/apps/files"
+    },
+    {
+      "icon": "application",
+      "menu": "user",
+      "target": "_self",
+      "title": {
+        "de": "Einstellungen",
+        "en": "Settings"
+      },
+      "url": "https://{{ .Env.CLOUD_DOMAIN }}/index.php/settings/personal"
+    }
+  ]
+}

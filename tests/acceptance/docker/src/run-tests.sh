@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#mkdir -p /drone/src/vendor-bin/behat
+#cp /tmp/vendor-bin/behat/composer.json /drone/src/vendor-bin/behat/composer.json
+
 git config --global advice.detachedHead false
 
 ## GET DEPENDENCIES
