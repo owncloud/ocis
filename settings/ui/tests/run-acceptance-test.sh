@@ -25,7 +25,7 @@ export BACKEND_HOST=${BACKEND_HOST:-https://localhost:9200}
 export TEST_TAGS=${TEST_TAGS:-"not @skip"}
 
 cd ${WEB_PATH}/tests/acceptance/
-yarn test:acceptance:external -- --require /drone/src/settings/ui/tests/acceptance/stepDefinitions
+yarn test:acceptance:external -- --require /drone/src/settings/ui/tests/acceptance/stepDefinitions ${1}
 
 status=$?
 exit $status
