@@ -14,19 +14,19 @@ geekdocFilePath: profiling.md
 - Go development kit of a [supported version](https://golang.org/doc/devel/release.html#policy).
   Follow [these instructions](http://golang.org/doc/code.html) to install the
   go tool and set up GOPATH.
-
-- Graphviz: http://www.graphviz.org/
-  Optional, used to generate graphic visualizations of profiles
+- Graphviz: http://www.graphviz.org/. Used to generate graphic visualizations of profiles, which this example setup does.
 
 The only way to enable the profiler currently is to explicitly select which areas to collect samples for. In order to do this, the following steps have to be followed.
 
 ## 1. Clone Reva
 
+Reva is the reference implementation of the CS3 APIs that we use for our daily business between oCIS and its storages. It is in charge of accessing the storage, as well as managing shares. Because of this fact, the examples will modify code in this dependency. You can think of Reva as the framework we use in order to interface with different storage providers.
+
 `git clone github.com/cs3org/reva`
 
 ## 2. Patch reva with the area that you want sampled.
 
-For the purposes of this docs let's use the WebDAV `PROPFIND` path.
+For the purposes of these docs let's use the WebDAV `PROPFIND` path. This patch is needed in order to have the WebDAV process reporting profiling traces to the `pprof`.
 
 ```diff
 diff --git a/internal/http/services/owncloud/ocdav/propfind.go b/internal/http/services/owncloud/ocdav/propfind.go
@@ -60,11 +60,13 @@ index 0e9c99be..f271572f 100644
 The previous patch will:
 
 1. import `net/http/pprof`, which will register debug handlers in `DefaultServeMux`.
-2. define a `init()` function that starts an http server with the previously registered handlers.
+2. define a `init()` function that starts an HTTP server with the previously registered handlers.
 
 With everything running one should have access to http://localhost:1234/debug/pprof/
 
 ## 3. Replace reva in oCIS go.mod with local version and build a new binary
+
+In Go, the `go.mod` file controls the dependencies of your module. Because we patched an external library, Go provides with a mechanism to overwrite an existing dependency with one on your local machine, which we previously installed.
 
 ```diff
 diff --git a/go.mod b/go.mod
@@ -85,6 +87,8 @@ Make sure to replace `github.com/cs3org/reva => path/to/your/reva` with the corr
 
 ## 4. Build a new ocis binary
 
+Using the new dependency with the pprof patch.
+
 From owncloud/ocis root:
 
 ```console
@@ -97,10 +101,12 @@ $ make clean build
 From owncloud/ocis root:
 
 ```console
-$ OCIS_LOG_PRETTY=true OCIS_LOG_COLOR=true ocis/bin/ocis server
+$ ocis/bin/ocis server
 ```
 
 ## 6. Run `pprof`
+
+[Pprof](https://github.com/google/pprof) is a tool developed at Google. It is a tool for visualization and analysis of profiling data. It will take the reported profiled data from our server, and represent it in a meaningful manner.
 
 ### Install pprof
 
@@ -123,6 +129,10 @@ Once the collection is done a browser tab will open with the result `svg`, looki
 ![img](https://i.imgur.com/vo0EbcX.jpg)
 
 For references on how to interpret this graph, [continue reading here](https://github.com/google/pprof/blob/master/doc/README.md#interpreting-the-callgraph).
+
+## Room for improvement
+
+Because these docs are intended to be read by developers they are quite technical in content. Requiring the user to alter the code. This is done so that we do not include, or assume, third party dependencies such as Graphviz in our binary, making it heavier. Having said this, the profiler is only meant to be used in development
 
 ## References
 
