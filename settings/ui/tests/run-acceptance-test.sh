@@ -23,10 +23,9 @@ set -evax
 export SERVER_HOST=${SERVER_HOST:-https://localhost:9200}
 export BACKEND_HOST=${BACKEND_HOST:-https://localhost:9200}
 export TEST_TAGS=${TEST_TAGS:-"not @skip"}
-export CUCUMBER_OPTS="--require ${WEB_PATH}/tests/acceptance/setup.js --require /drone/src/settings/ui/tests/acceptance/stepDefinitions --require ${WEB_PATH}/tests/acceptance/stepDefinitions"
 
-cd /srv/app/web/tests/acceptance/
-yarn test:acceptance:external -- ${CUCUMBER_OPTS}
+cd ${WEB_PATH}/tests/acceptance/
+yarn test:acceptance:external -- --require /drone/src/settings/ui/tests/acceptance/stepDefinitions
 
 status=$?
 exit $status
