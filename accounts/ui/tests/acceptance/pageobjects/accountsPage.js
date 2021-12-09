@@ -1,4 +1,5 @@
-const util = require('util')
+const importCwd = require('import-cwd')
+const util = importCwd('util')
 
 module.exports = {
   url: function () {

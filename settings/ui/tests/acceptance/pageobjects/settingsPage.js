@@ -1,5 +1,6 @@
-const { client } = require('nightwatch-api')
-const util = require('util')
+const importCwd = require('import-cwd')
+const { client } = importCwd('nightwatch-api')
+const util = importCwd('util')
 
 module.exports = {
   url: function () {
