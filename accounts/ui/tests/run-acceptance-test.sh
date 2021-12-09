@@ -24,6 +24,7 @@ export SERVER_HOST=${SERVER_HOST:-https://localhost:9200}
 export BACKEND_HOST=${BACKEND_HOST:-https://localhost:9200}
 export TEST_TAGS=${TEST_TAGS:-"not @skip"}
 export EXTERNAL_STEP_DEFINITIONS="/drone/src/accounts/ui/tests/acceptance/stepDefinitions"
+export EXTERNAL_PAGE_OBJECTS="/drone/src/accounts/ui/tests/acceptance/pageobjects"
 
 cd ${WEB_PATH}/tests/acceptance/
 yarn test:acceptance:external -- ${1}
