@@ -51,7 +51,7 @@ export TEST_TAGS=${TEST_TAGS:-"not @skip"}
 export CUCUMBER_OPTS="--require ${TEST_INFRA_DIRECTORY}/setup.js --require /drone/src/settings/ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/stepDefinitions"
 
 cd /srv/app/web/tests/acceptance/
-yarn test:acceptance:external -- -t \"${TEST_TAGS:-not @skip}\" ${CUCUMBER_OPTS}
+yarn test:acceptance:external -- ${CUCUMBER_OPTS}
 
 status=$?
 exit $status
