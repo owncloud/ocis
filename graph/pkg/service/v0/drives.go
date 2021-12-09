@@ -274,14 +274,19 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	root := &provider.ResourceId{}
+
 	identifierParts := strings.Split(req.FirstSegment.Identifier.Get(), "!")
-	if len(identifierParts) != 2 {
+	switch len(identifierParts) {
+	case 1:
+		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[0]
+	case 2:
+		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[1]
+	default:
 		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid resource id: %v", req.FirstSegment.Identifier.Get()))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	storageID, opaqueID := identifierParts[0], identifierParts[1]
 
 	client, err := g.GetClient()
 	if err != nil {
@@ -294,12 +299,9 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		// the original storage space.
 		StorageSpace: &provider.StorageSpace{
 			Id: &storageprovider.StorageSpaceId{
-				OpaqueId: req.FirstSegment.Identifier.Get(),
+				OpaqueId: root.StorageId + "!" + root.OpaqueId,
 			},
-			Root: &provider.ResourceId{
-				StorageId: storageID,
-				OpaqueId:  opaqueID,
-			},
+			Root: root,
 		},
 	}
 
@@ -386,20 +388,19 @@ func formatDriveItems(mds []*storageprovider.ResourceInfo) ([]*msgraph.DriveItem
 
 func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpace) (*msgraph.Drive, error) {
 	rootID := space.Root.StorageId + "!" + space.Root.OpaqueId
+	if space.Root.StorageId == space.Root.OpaqueId {
+		// omit opaqueid
+		rootID = space.Root.StorageId
+	}
+
 	drive := &msgraph.Drive{
 		BaseItem: msgraph.BaseItem{
 			Entity: msgraph.Entity{
-				Id: &space.Id.OpaqueId,
+				Id: &rootID,
 			},
 			Name: &space.Name,
 			//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
 			//"description": "string", // TODO read from StorageSpace ... needs Opaque for now
-		},
-		Owner: &msgraph.IdentitySet{
-			User: &msgraph.Identity{
-				Id: &space.Owner.Id.OpaqueId,
-				// DisplayName: , TODO read and cache from users provider
-			},
 		},
 
 		DriveType: &space.SpaceType,
@@ -420,6 +421,15 @@ func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpac
 		drive.Root.WebDavUrl = &webDavURL
 	}
 
+	// TODO The public space has no owner ... should we even show it?
+	if space.Owner != nil && space.Owner.Id != nil {
+		drive.Owner = &msgraph.IdentitySet{
+			User: &msgraph.Identity{
+				Id: &space.Owner.Id.OpaqueId,
+				// DisplayName: , TODO read and cache from users provider
+			},
+		}
+	}
 	if space.Mtime != nil {
 		lastModified := cs3TimestampToTime(space.Mtime)
 		drive.BaseItem.LastModifiedDateTime = &lastModified
@@ -447,22 +457,21 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storag
 		if err != nil {
 			return nil, err
 		}
-		qta, err := g.getDriveQuota(ctx, mds[i])
+		res.Quota, err = g.getDriveQuota(ctx, mds[i])
 		if err != nil {
 			return nil, err
 		}
-		res.Quota = &qta
 		responses = append(responses, res)
 	}
 
 	return responses, nil
 }
 
-func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (msgraph.Quota, error) {
+func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (*msgraph.Quota, error) {
 	client, err := g.GetClient()
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error creating grpc client")
-		return msgraph.Quota{}, err
+		return nil, nil
 	}
 
 	req := &gateway.GetQuotaRequest{
@@ -478,17 +487,20 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 	switch {
 	case err != nil:
 		g.logger.Error().Err(err).Msg("error sending get quota grpc request")
-		return msgraph.Quota{}, err
+		return nil, nil
+	case res.Status.Code == cs3rpc.Code_CODE_UNIMPLEMENTED:
+		// TODO well duh
+		return nil, nil
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
 		g.logger.Error().Err(err).Msg("error sending sending get quota grpc request")
-		return msgraph.Quota{}, err
+		return nil, err
 	}
 
 	total := int64(res.TotalBytes)
 
 	used := int64(res.UsedBytes)
 	remaining := total - used
-	qta := msgraph.Quota{
+	qta := &msgraph.Quota{
 		Remaining: &remaining,
 		Total:     &total,
 		Used:      &used,
