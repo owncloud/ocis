@@ -14,6 +14,7 @@ The following sections list the changes for unreleased.
 * Change - Restructure Configuration Parsing: [#2708](https://github.com/owncloud/ocis/pull/2708)
 * Change - OIDC: fallback if IDP doesn't provide "preferred_username" claim: [#2644](https://github.com/owncloud/ocis/issues/2644)
 * Enhancement - Cleanup ocis-pkg config: [#2813](https://github.com/owncloud/ocis/pull/2813)
+* Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
 * Enhancement - Correct shutdown of services under runtime: [#2843](https://github.com/owncloud/ocis/pull/2843)
 * Enhancement - Update REVA to v1.17.0: [#2849](https://github.com/owncloud/ocis/pull/2849)
 * Enhancement - Update ownCloud Web to v4.6.0: [#2846](https://github.com/owncloud/ocis/pull/2846)
@@ -86,6 +87,12 @@ The following sections list the changes for unreleased.
    Certain values were of no use when configuring the ocis runtime.
 
    https://github.com/owncloud/ocis/pull/2813
+
+* Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
+
+   Enabled public share requests to be authenticated using the public share signature.
+
+   https://github.com/owncloud/ocis/pull/2831
 
 * Enhancement - Correct shutdown of services under runtime: [#2843](https://github.com/owncloud/ocis/pull/2843)
 
