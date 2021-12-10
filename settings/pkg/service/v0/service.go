@@ -4,9 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	merrors "github.com/asim/go-micro/v3/errors"
-	"github.com/asim/go-micro/v3/metadata"
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
@@ -14,6 +11,9 @@ import (
 	"github.com/owncloud/ocis/settings/pkg/proto/v0"
 	"github.com/owncloud/ocis/settings/pkg/settings"
 	store "github.com/owncloud/ocis/settings/pkg/store/filesystem"
+	merrors "go-micro.dev/v4/errors"
+	"go-micro.dev/v4/metadata"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // Service represents a service.
@@ -190,7 +190,7 @@ func (g Service) AddSettingToBundle(ctx context.Context, req *proto.AddSettingTo
 }
 
 // RemoveSettingFromBundle implements the BundleServiceHandler interface
-func (g Service) RemoveSettingFromBundle(ctx context.Context, req *proto.RemoveSettingFromBundleRequest, _ *empty.Empty) error {
+func (g Service) RemoveSettingFromBundle(ctx context.Context, req *proto.RemoveSettingFromBundleRequest, _ *emptypb.Empty) error {
 	if err := g.checkStaticPermissionsByBundleID(ctx, req.BundleId); err != nil {
 		return err
 	}
@@ -332,7 +332,7 @@ func (g Service) AssignRoleToUser(ctx context.Context, req *proto.AssignRoleToUs
 }
 
 // RemoveRoleFromUser implements the RoleServiceHandler interface
-func (g Service) RemoveRoleFromUser(ctx context.Context, req *proto.RemoveRoleFromUserRequest, _ *empty.Empty) error {
+func (g Service) RemoveRoleFromUser(ctx context.Context, req *proto.RemoveRoleFromUserRequest, _ *emptypb.Empty) error {
 	if err := g.checkStaticPermissionsByBundleType(ctx, proto.Bundle_TYPE_ROLE); err != nil {
 		return err
 	}

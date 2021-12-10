@@ -83,6 +83,7 @@ func getNonUniqueIdxSut(t *testing.T, entity interface{}, indexBy string) (index
 	dataPath, _ := WriteIndexTestData(Data, "ID", "")
 	cfg := config.Config{
 		Repo: config.Repo{
+			Backend: "disk",
 			Disk: config.Disk{
 				Path: dataPath,
 			},

@@ -8,15 +8,14 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // AuthBearer is the entrypoint for the auth-bearer command.
@@ -24,11 +23,8 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-bearer",
 		Usage: "Start authprovider for bearer auth",
-		Flags: flagset.AuthBearerWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.AuthBearer.Services = c.StringSlice("service")
-
-			return nil
+			return ParseConfig(c, cfg, "storage-auth-bearer")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -93,7 +89,9 @@ func authBearerConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]i
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret": cfg.Reva.JWTSecret,
+			"jwt_secret":                cfg.Reva.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
+			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.AuthBearer.GRPCNetwork,
@@ -125,9 +123,7 @@ type AuthBearerSutureService struct {
 
 // NewAuthBearerSutureService creates a new gateway.AuthBearerSutureService
 func NewAuthBearer(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.AuthBearer.Supervised = true
-	}
+	cfg.Storage.Commons = cfg.Commons
 	return AuthBearerSutureService{
 		cfg: cfg.Storage,
 	}
@@ -136,8 +132,9 @@ func NewAuthBearer(cfg *ociscfg.Config) suture.Service {
 func (s AuthBearerSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.AuthBearer.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range AuthBearer(s.cfg).Flags {
-		if err := AuthBearer(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := AuthBearer(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

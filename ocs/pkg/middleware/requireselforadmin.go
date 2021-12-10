@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"net/url"
 
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/go-chi/chi/v5"
@@ -16,22 +17,28 @@ import (
 func RequireSelfOrAdmin(opts ...Option) func(next http.Handler) http.Handler {
 	opt := newOptions(opts...)
 
+	mustRender := func(w http.ResponseWriter, r *http.Request, renderer render.Renderer) {
+		if err := render.Render(w, r, renderer); err != nil {
+			opt.Logger.Err(err).Msgf("failed to write response for ocs request %s on %s", r.Method, r.URL)
+		}
+	}
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 			u, ok := revactx.ContextGetUser(r.Context())
 			if !ok {
-				mustNotFail(render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized")))
+				mustRender(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized"))
 				return
 			}
 			if u.Id == nil || u.Id.OpaqueId == "" {
-				mustNotFail(render.Render(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id")))
+				mustRender(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "user is missing an id"))
 				return
 			}
 			// get roles from context
 			roleIDs, ok := roles.ReadRoleIDsFromContext(r.Context())
 			if !ok {
-				mustNotFail(render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized")))
+				mustRender(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized"))
 				return
 			}
 
@@ -44,13 +51,18 @@ func RequireSelfOrAdmin(opts ...Option) func(next http.Handler) http.Handler {
 			// check if self management permission is present in roles of the authenticated account
 			if opt.RoleManager.FindPermissionByID(r.Context(), roleIDs, accounts.SelfManagementPermissionID) != nil {
 				userid := chi.URLParam(r, "userid")
+				var err error
+				if userid, err = url.PathUnescape(userid); err != nil {
+					mustRender(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "malformed username"))
+				}
+
 				if userid == "" || userid == u.Id.OpaqueId || userid == u.Username {
 					next.ServeHTTP(w, r)
 					return
 				}
 			}
 
-			mustNotFail(render.Render(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized")))
+			mustRender(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized"))
 
 		})
 	}

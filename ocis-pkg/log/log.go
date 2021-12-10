@@ -6,16 +6,29 @@ import (
 	"strings"
 	"time"
 
-	mdlog "github.com/asim/go-micro/v3/debug/log"
-	mlog "github.com/asim/go-micro/v3/util/log"
-	"github.com/asim/go-micro/v3/util/ring"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	mdlog "go-micro.dev/v4/debug/log"
+	mlog "go-micro.dev/v4/util/log"
+	"go-micro.dev/v4/util/ring"
 )
 
 // Logger simply wraps the zerolog logger.
 type Logger struct {
 	zerolog.Logger
+}
+
+// LoggerFromConfig initializes a service-specific logger instance.
+func LoggerFromConfig(name string, cfg shared.Log) Logger {
+	return NewLogger(
+		Name(name),
+		Level(cfg.Level),
+		Pretty(cfg.Pretty),
+		Color(cfg.Color),
+		File(cfg.File),
+	)
 }
 
 // NewLogger initializes a new logger instance.

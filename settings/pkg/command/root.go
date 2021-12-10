@@ -3,18 +3,15 @@ package command
 import (
 	"context"
 	"os"
-	"strings"
 
-	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 
-	"github.com/micro/cli/v2"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/settings/pkg/config"
-	"github.com/owncloud/ocis/settings/pkg/flagset"
-	"github.com/owncloud/ocis/settings/pkg/version"
-	"github.com/spf13/viper"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // Execute is the entry point for the ocis-settings command.
@@ -31,8 +28,6 @@ func Execute(cfg *config.Config) error {
 				Email: "support@owncloud.com",
 			},
 		},
-
-		Flags: flagset.RootWithConfig(cfg),
 
 		Before: func(c *cli.Context) error {
 			cfg.Service.Version = version.String
@@ -70,49 +65,28 @@ func NewLogger(cfg *config.Config) log.Logger {
 	)
 }
 
-// ParseConfig loads settings configuration from Viper known paths.
+// ParseConfig loads idp configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	sync.ParsingViperConfig.Lock()
-	defer sync.ParsingViperConfig.Unlock()
-	logger := NewLogger(cfg)
-
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.SetEnvPrefix("SETTINGS")
-	viper.AutomaticEnv()
-
-	if c.IsSet("config-file") {
-		viper.SetConfigFile(c.String("config-file"))
-	} else {
-		viper.SetConfigName("settings")
-
-		viper.AddConfigPath("/etc/ocis")
-		viper.AddConfigPath("$HOME/.ocis")
-		viper.AddConfigPath("./config")
+	conf, err := ociscfg.BindSourcesToStructs("settings", cfg)
+	if err != nil {
+		return err
 	}
 
-	if err := viper.ReadInConfig(); err != nil {
-		switch err.(type) {
-		case viper.ConfigFileNotFoundError:
-			logger.Debug().
-				Msg("no config found on preconfigured location")
-		case viper.UnsupportedConfigError:
-			logger.Fatal().
-				Err(err).
-				Msg("unsupported config type")
-		default:
-			logger.Fatal().
-				Err(err).
-				Msg("failed to read config")
+	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &shared.Log{
+			Level:  cfg.Commons.Log.Level,
+			Pretty: cfg.Commons.Log.Pretty,
+			Color:  cfg.Commons.Log.Color,
+			File:   cfg.Commons.Log.File,
 		}
+	} else if cfg.Log == nil && cfg.Commons == nil {
+		cfg.Log = &shared.Log{}
 	}
 
-	if err := viper.Unmarshal(&cfg); err != nil {
-		logger.Fatal().
-			Err(err).
-			Msg("failed to parse config")
-	}
-
-	return nil
+	conf.LoadOSEnv(config.GetEnv(cfg), false)
+	bindings := config.StructMappings(cfg)
+	return ociscfg.BindEnv(conf, bindings)
 }
 
 // SutureService allows for the settings command to be embedded and supervised by a suture supervisor tree.
@@ -122,10 +96,7 @@ type SutureService struct {
 
 // NewSutureService creates a new settings.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Settings.Supervised = true
-	}
-	cfg.Settings.Log.File = cfg.Log.File
+	cfg.Settings.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.Settings,
 	}

@@ -5,11 +5,11 @@ import (
 	"path"
 	"strconv"
 
-	merrors "github.com/asim/go-micro/v3/errors"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
+	merrors "go-micro.dev/v4/errors"
 	p "google.golang.org/protobuf/proto"
 )
 
@@ -88,7 +88,7 @@ func (s Service) ListGroups(ctx context.Context, in *proto.ListGroupsRequest, ou
 	return
 }
 func (s Service) findGroupsByQuery(ctx context.Context, query string) ([]string, error) {
-	return s.index.Query(&proto.Group{}, query)
+	return s.index.Query(ctx, &proto.Group{}, query)
 }
 
 // GetGroup implements the GroupsServiceHandler interface
@@ -270,7 +270,7 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 			break
 		}
 	}
-	// only store the reference to prevent recurision when marshaling json
+	// only store the reference to prevent recursion when marshaling json
 	gref := &proto.Group{
 		Id: g.Id,
 	}

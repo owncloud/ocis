@@ -9,6 +9,11 @@ geekdocFilePath: demo-users.md
 
 As long as oCIS is released as [technology preview]({{< ref "../release_roadmap#release_roadmap" >}}) it will come with default demo users. These enable you to do quick testing and developing.
 
+{{< hint info >}}
+To skip the generation of demo users, run the inital setup step with an additional environment variable.
+`ACCOUNTS_DEMO_USERS_AND_GROUPS=false ./bin/ocis server` generates only the admin, and one user for IDP and Reva respectively.
+{{< /hint >}}
+
 Following users are available in the demo set:
 
 | username | password      | email                | role  | groups                                                                  |

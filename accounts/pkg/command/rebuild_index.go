@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/asim/go-micro/plugins/client/grpc/v3"
-	merrors "github.com/asim/go-micro/v3/errors"
-	"github.com/micro/cli/v2"
+	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	index "github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	"github.com/urfave/cli/v2"
+	merrors "go-micro.dev/v4/errors"
 )
 
 // RebuildIndex rebuilds the entire configured index.

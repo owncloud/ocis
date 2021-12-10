@@ -33,18 +33,19 @@ Einstein copies the URL in the browser (or an email with the same URL is sent au
 
 When Marie enters that URL she will be presented with a login form on the `https://cloud.zurich.test` instance, because the share was created on that domain. If `https://cloud.zurich.test` trusts her OpenID Connect identity provider `https://idp.paris.test` she can log in. This time, the *storage space registry* discovery will come up with `https://cloud.paris.test` though. Since that registry is different than the registry tied to `https://cloud.zurich.test` oCIS web can look up the *storage space* `716199a6-00c0-4fec-93d2-7e00150b1c84` and register the WebDAV URL `https://cloud.zurich.test/dav/spaces/716199a6-00c0-4fec-93d2-7e00150b1c84/a/rel/path` in Maries *storage space registry* at `https://cloud.paris.test`. When she accepts that share her clients will be able to sync the new *storage space* at `https://cloud.zurich.test`.
 
-Or in other words: _total world federation!_
-
 ### oCIS microservice runtime
+
 The oCIS runtime allows us to dynamically manage services running in a single process. We use [suture](https://github.com/thejerf/suture) to create a supervisor tree that starts each service in a dedicated goroutine. By default oCIS will start all built-in oCIS extensions in a single process. Individual services can be moved to other nodes to scale-out and meet specific performance requirements. A [go-micro](https://github.com/asim/go-micro/blob/master/registry/registry.go) based registry allows services in multiple nodes to form a distributed microservice architecture.
 
 ### oCIS extensions
+
 Every oCIS extension uses [ocis-pkg](https://github.com/owncloud/ocis/tree/master/ocis-pkg), which implements the [go-micro](https://go-micro.dev/) interfaces for [servers](https://github.com/asim/go-micro/blob/v3.5.0/server/server.go#L17-L37) to register and [clients](https://github.com/asim/go-micro/blob/v3.5.0/client/client.go#L11-L23) to lookup nodes with a service [registry](https://github.com/asim/go-micro/blob/v3.5.0/registry/registry.go).
-We are following the [12 Factor](https://12factor.net/) methodology with oCIS. The uniformity of services also allows us to use the same command, logging and configuration mechanism. Configurations are forwarded from the 
+We are following the [12 Factor](https://12factor.net/) methodology with oCIS. The uniformity of services also allows us to use the same command, logging and configuration mechanism. Configurations are forwarded from the
 oCIS runtime to the individual extensions.
 
 
 ### go-micro
+
 While the [go-micro](https://go-micro.dev/) framework provides abstractions as well as implementations for the different components in a microservice architecture, it uses a more developer focused runtime philosophy: It is used to download services from a repo, compile them on the fly and start them as individual processes. For oCIS we decided to use a more admin friendly runtime: You can download a single binary and start the contained oCIS extensions with a single `bin/ocis server`. This also makes packaging easier.
 
 We use [ocis-pkg](https://github.com/owncloud/ocis/tree/master/ocis-pkg) to configure the default implementations for the go-micro [grpc server](https://github.com/asim/go-micro/tree/v3.5.0/plugins/server/grpc), [client](https://github.com/asim/go-micro/tree/v3.5.0/plugins/client/grpc) and [mdns registry](https://github.com/asim/go-micro/blob/v3.5.0/registry/mdns_registry.go), swapping them out as needed, eg. to use the [kubernetes registry plugin](https://github.com/asim/go-micro/tree/v3.5.0/plugins/registry/kubernetes).
@@ -59,6 +60,7 @@ Interacting with oCIS involves a multitude af APIs. The server and all clients r
 We run a huge [test suite](https://github.com/owncloud/core/tree/master/tests), which originated in ownCloud 10 and continues to grow. A detailed description can be found in the developer docs for [testing]({{< ref "development/testing" >}}).
 
 ### Architecture Overview
+
 Running `bin/ocis server` will start the below services, all of which can be scaled and deployed on a single node or in a cloud native environment, as needed.
 
 {{< svg src="ocis/static/architecture-overview.drawio.svg" >}}

@@ -10,18 +10,17 @@ import (
 	"path/filepath"
 	"testing"
 
-	mgrpcc "github.com/asim/go-micro/plugins/client/grpc/v3"
-
-	"github.com/asim/go-micro/v3/client"
-	merrors "github.com/asim/go-micro/v3/errors"
-	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/owncloud/ocis/accounts/pkg/command"
+	mgrpcc "github.com/asim/go-micro/plugins/client/grpc/v4"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	svc "github.com/owncloud/ocis/accounts/pkg/service/v0"
+	oclog "github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	"github.com/stretchr/testify/assert"
+	"go-micro.dev/v4/client"
+	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -80,11 +79,13 @@ func init() {
 	)
 
 	cfg := config.New()
+	cfg.Repo.Backend = "disk"
 	cfg.Repo.Disk.Path = dataPath
+	cfg.Server.DemoUsersAndGroups = true
 	var hdlr *svc.Service
 	var err error
 
-	if hdlr, err = svc.New(svc.Logger(command.NewLogger(cfg)), svc.Config(cfg), svc.RoleService(buildRoleServiceMock())); err != nil {
+	if hdlr, err = svc.New(svc.Logger(oclog.LoggerFromConfig("accounts", *cfg.Log)), svc.Config(cfg), svc.RoleService(buildRoleServiceMock())); err != nil {
 		log.Fatalf("Could not create new service")
 	}
 
@@ -391,7 +392,7 @@ func deleteGroup(t *testing.T, id string) (*empty.Empty, error) {
 
 // createTmpDir creates a temporary dir for tests data.
 func createTmpDir() string {
-	name, err := ioutil.TempDir("/var/tmp", "ocis-accounts-store-")
+	name, err := ioutil.TempDir("/tmp", "ocis-accounts-store-")
 	if err != nil {
 		panic(err)
 	}
@@ -543,7 +544,7 @@ func TestUpdateAccount(t *testing.T) {
 			resp, err := updateAccount(t, tt.userAccount, updateMask)
 			if tt.expectedErrOnUpdate != nil {
 				assert.Error(t, err)
-				assert.Equal(t, tt.expectedErrOnUpdate, err)
+				assert.Equal(t, tt.expectedErrOnUpdate.Error(), err.Error())
 			} else {
 				assert.NoError(t, err)
 				assert.IsType(t, &proto.Account{}, resp)
@@ -616,7 +617,7 @@ func TestUpdateNonUpdatableFieldsInAccount(t *testing.T) {
 				errMsg := fmt.Sprintf("can not update field %s, either unknown or readonly", tt.updateMask[0])
 				assert.Equal(t, errMsg, e.Detail)
 			} else {
-				t.Fatal("Expected merror errors but found something else.")
+				t.Fatal("Expected merrors errors but found something else.")
 			}
 		})
 	}

@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/asim/go-micro/plugins/client/grpc/v3"
-	"github.com/micro/cli/v2"
-	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/flagset"
+
+	"github.com/asim/go-micro/plugins/client/grpc/v4"
+	"github.com/owncloud/ocis/accounts/pkg/config"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	"github.com/urfave/cli/v2"
 )
 
 // RemoveAccount command deletes an existing account.

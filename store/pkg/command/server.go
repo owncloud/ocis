@@ -3,17 +3,18 @@ package command
 import (
 	"context"
 
+	gofig "github.com/gookit/config/v2"
+	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+
 	"github.com/owncloud/ocis/store/pkg/tracing"
 
-	"github.com/owncloud/ocis/ocis-pkg/sync"
-
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/store/pkg/config"
-	"github.com/owncloud/ocis/store/pkg/flagset"
 	"github.com/owncloud/ocis/store/pkg/metrics"
 	"github.com/owncloud/ocis/store/pkg/server/debug"
 	"github.com/owncloud/ocis/store/pkg/server/grpc"
+	"github.com/urfave/cli/v2"
 )
 
 // Server is the entrypoint for the server command.
@@ -21,15 +22,26 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Flags: flagset.ServerWithConfig(cfg),
 		Before: func(ctx *cli.Context) error {
-			logger := NewLogger(cfg)
-			// When running on single binary mode the before hook from the root command won't get called. We manually
-			// call this before hook from ocis command, so the configuration can be loaded.
-			if !cfg.Supervised {
-				return ParseConfig(ctx, cfg)
+			// remember shared logging info to prevent empty overwrites
+			inLog := cfg.Log
+			if err := ParseConfig(ctx, cfg); err != nil {
+				return err
 			}
-			logger.Debug().Str("service", "store").Msg("ignoring config file parsing when running supervised")
+
+			if (cfg.Log == shared.Log{}) && (inLog != shared.Log{}) {
+				// set the default to the parent config
+				cfg.Log = inLog
+
+				// and parse the environment
+				conf := &gofig.Config{}
+				conf.LoadOSEnv(config.GetEnv(), false)
+				bindings := config.StructMappings(cfg)
+				if err := ociscfg.BindEnv(conf, bindings); err != nil {
+					return err
+				}
+			}
+
 			return nil
 		},
 		Action: func(c *cli.Context) error {
@@ -87,10 +99,6 @@ func Server(cfg *config.Config) *cli.Command {
 					_ = server.Shutdown(ctx)
 					cancel()
 				})
-			}
-
-			if !cfg.Supervised {
-				sync.Trap(&gr, cancel)
 			}
 
 			return gr.Run()

@@ -8,23 +8,24 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // StoragePublicLink is the entrypoint for the reva-storage-public-link command.
 func StoragePublicLink(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "storage-public-link",
-		Usage:    "Start storage-public-link service",
-		Flags:    flagset.StoragePublicLink(cfg),
+		Name:  "storage-public-link",
+		Usage: "Start storage-public-link service",
+		Before: func(c *cli.Context) error {
+			return ParseConfig(c, cfg, "storage-public-link")
+		},
 		Category: "Extensions",
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -88,8 +89,9 @@ func storagePublicLinkConfigFromStruct(c *cli.Context, cfg *config.Config) map[s
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret": cfg.Reva.JWTSecret,
-			"gatewaysvc": cfg.Reva.Gateway.Endpoint,
+			"jwt_secret":                cfg.Reva.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
+			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.StoragePublicLink.GRPCNetwork,
@@ -100,6 +102,7 @@ func storagePublicLinkConfigFromStruct(c *cli.Context, cfg *config.Config) map[s
 			"services": map[string]interface{}{
 				"publicstorageprovider": map[string]interface{}{
 					"mount_path":   cfg.Reva.StoragePublicLink.MountPath,
+					"mount_id":     cfg.Reva.StoragePublicLink.MountID,
 					"gateway_addr": cfg.Reva.Gateway.Endpoint,
 				},
 				"authprovider": map[string]interface{}{
@@ -123,9 +126,7 @@ type StoragePublicLinkSutureService struct {
 
 // NewStoragePublicLinkSutureService creates a new storage.StoragePublicLinkSutureService
 func NewStoragePublicLink(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.StoragePublicLink.Supervised = true
-	}
+	cfg.Storage.Commons = cfg.Commons
 	return StoragePublicLinkSutureService{
 		cfg: cfg.Storage,
 	}
@@ -134,8 +135,9 @@ func NewStoragePublicLink(cfg *ociscfg.Config) suture.Service {
 func (s StoragePublicLinkSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.StoragePublicLink.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range StoragePublicLink(s.cfg).Flags {
-		if err := StoragePublicLink(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := StoragePublicLink(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

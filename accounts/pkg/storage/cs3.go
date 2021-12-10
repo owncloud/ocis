@@ -1,15 +1,10 @@
 package storage
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"io"
-	"io/ioutil"
-	"net/http"
 	"path"
 	"path/filepath"
-	"strings"
 
 	"github.com/cs3org/reva/pkg/auth/scope"
 
@@ -23,7 +18,12 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
+	metadatastorage "github.com/owncloud/ocis/ocis-pkg/metadata_storage"
 	"google.golang.org/grpc/metadata"
+)
+
+const (
+	storageMountPath = "/meta"
 )
 
 // CS3Repo provides a cs3 implementation of the Repo interface
@@ -31,7 +31,7 @@ type CS3Repo struct {
 	cfg             *config.Config
 	tm              token.Manager
 	storageProvider provider.ProviderAPIClient
-	dataProvider    dataProviderClient // Used to create and download data via http, bypassing reva upload protocol
+	metadataStorage metadatastorage.MetadataStorage
 }
 
 // NewCS3Repo creates a new cs3 repo
@@ -49,26 +49,26 @@ func NewCS3Repo(cfg *config.Config) (Repo, error) {
 		return nil, err
 	}
 
+	ms, err := metadatastorage.NewMetadataStorage(cfg.Repo.CS3.ProviderAddr)
+	if err != nil {
+		return nil, err
+	}
+
 	return CS3Repo{
 		cfg:             cfg,
 		tm:              tokenManager,
 		storageProvider: client,
-		dataProvider: dataProviderClient{
-			client: http.Client{
-				Transport: http.DefaultTransport,
-			},
-		},
+		metadataStorage: ms,
 	}, nil
 }
 
 // WriteAccount writes an account via cs3 and modifies the provided account (e.g. with a generated id).
 func (r CS3Repo) WriteAccount(ctx context.Context, a *proto.Account) (err error) {
-	t, err := r.authenticate(ctx)
+	ctx, err = r.getAuthenticatedContext(ctx)
 	if err != nil {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	if err := r.makeRootDirIfNotExist(ctx, accountsFolder); err != nil {
 		return err
 	}
@@ -78,37 +78,31 @@ func (r CS3Repo) WriteAccount(ctx context.Context, a *proto.Account) (err error)
 		return err
 	}
 
-	resp, err := r.dataProvider.put(r.accountURL(a.Id), bytes.NewReader(by), t)
-	if err != nil {
-		return err
-	}
-	if err = resp.Body.Close(); err != nil {
-		return err
-	}
-	return nil
+	err = r.metadataStorage.SimpleUpload(ctx, r.accountURL(a.Id), by)
+	return err
+
 }
 
 // LoadAccount loads an account via cs3 by id and writes it to the provided account
 func (r CS3Repo) LoadAccount(ctx context.Context, id string, a *proto.Account) (err error) {
-	t, err := r.authenticate(ctx)
+	ctx, err = r.getAuthenticatedContext(ctx)
 	if err != nil {
 		return err
 	}
 
-	return r.loadAccount(id, t, a)
+	return r.loadAccount(ctx, id, a)
 }
 
 // LoadAccounts loads all the accounts from the cs3 api
 func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err error) {
-	t, err := r.authenticate(ctx)
+	ctx, err = r.getAuthenticatedContext(ctx)
 	if err != nil {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Path: path.Join("/meta", accountsFolder),
+			Path: path.Join(storageMountPath, accountsFolder),
 		},
 	})
 	if err != nil {
@@ -118,7 +112,7 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err err
 	log := olog.NewLogger(olog.Pretty(r.cfg.Log.Pretty), olog.Color(r.cfg.Log.Color), olog.Level(r.cfg.Log.Level))
 	for i := range res.Infos {
 		acc := &proto.Account{}
-		err := r.loadAccount(filepath.Base(res.Infos[i].Path), t, acc)
+		err := r.loadAccount(ctx, filepath.Base(res.Infos[i].Path), acc)
 		if err != nil {
 			log.Err(err).Msg("could not load account")
 			continue
@@ -128,38 +122,27 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err err
 	return nil
 }
 
-func (r CS3Repo) loadAccount(id string, t string, a *proto.Account) error {
-	resp, err := r.dataProvider.get(r.accountURL(id), t)
+func (r CS3Repo) loadAccount(ctx context.Context, id string, a *proto.Account) error {
+	account, err := r.metadataStorage.SimpleDownload(ctx, r.accountURL(id))
 	if err != nil {
+		if metadatastorage.IsNotFoundErr(err) {
+			return &notFoundErr{"account", id}
+		}
 		return err
 	}
-
-	if resp.StatusCode != http.StatusOK {
-		return &notFoundErr{"account", id}
-	}
-
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	if err = resp.Body.Close(); err != nil {
-		return err
-	}
-	return json.Unmarshal(b, &a)
+	return json.Unmarshal(account, &a)
 }
 
 // DeleteAccount deletes an account via cs3 by id
 func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
-	t, err := r.authenticate(ctx)
+	ctx, err = r.getAuthenticatedContext(ctx)
 	if err != nil {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
-
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Path: path.Join("/meta", accountsFolder, id),
+			Path: path.Join(storageMountPath, accountsFolder, id),
 		},
 	})
 
@@ -177,12 +160,11 @@ func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
 
 // WriteGroup writes a group via cs3 and modifies the provided group (e.g. with a generated id).
 func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
-	t, err := r.authenticate(ctx)
+	ctx, err = r.getAuthenticatedContext(ctx)
 	if err != nil {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	if err := r.makeRootDirIfNotExist(ctx, groupsFolder); err != nil {
 		return err
 	}
@@ -192,37 +174,30 @@ func (r CS3Repo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 		return err
 	}
 
-	resp, err := r.dataProvider.put(r.groupURL(g.Id), bytes.NewReader(by), t)
-	if err != nil {
-		return err
-	}
-	if err = resp.Body.Close(); err != nil {
-		return err
-	}
-	return nil
+	err = r.metadataStorage.SimpleUpload(ctx, r.groupURL(g.Id), by)
+	return err
 }
 
 // LoadGroup loads a group via cs3 by id and writes it to the provided group
 func (r CS3Repo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err error) {
-	t, err := r.authenticate(ctx)
+	ctx, err = r.getAuthenticatedContext(ctx)
 	if err != nil {
 		return err
 	}
 
-	return r.loadGroup(id, t, g)
+	return r.loadGroup(ctx, id, g)
 }
 
 // LoadGroups loads all the groups from the cs3 api
 func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) {
-	t, err := r.authenticate(ctx)
+	ctx, err = r.getAuthenticatedContext(ctx)
 	if err != nil {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Path: path.Join("/meta", groupsFolder),
+			Path: path.Join(storageMountPath, groupsFolder),
 		},
 	})
 	if err != nil {
@@ -232,7 +207,7 @@ func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) 
 	log := olog.NewLogger(olog.Pretty(r.cfg.Log.Pretty), olog.Color(r.cfg.Log.Color), olog.Level(r.cfg.Log.Level))
 	for i := range res.Infos {
 		grp := &proto.Group{}
-		err := r.loadGroup(filepath.Base(res.Infos[i].Path), t, grp)
+		err := r.loadGroup(ctx, filepath.Base(res.Infos[i].Path), grp)
 		if err != nil {
 			log.Err(err).Msg("could not load account")
 			continue
@@ -242,38 +217,27 @@ func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) 
 	return nil
 }
 
-func (r CS3Repo) loadGroup(id string, t string, g *proto.Group) error {
-	resp, err := r.dataProvider.get(r.groupURL(id), t)
+func (r CS3Repo) loadGroup(ctx context.Context, id string, g *proto.Group) error {
+	group, err := r.metadataStorage.SimpleDownload(ctx, r.groupURL(id))
 	if err != nil {
+		if metadatastorage.IsNotFoundErr(err) {
+			return &notFoundErr{"group", id}
+		}
 		return err
 	}
-
-	if resp.StatusCode == http.StatusNotFound {
-		return &notFoundErr{"group", id}
-	}
-
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	if err = resp.Body.Close(); err != nil {
-		return err
-	}
-	return json.Unmarshal(b, &g)
+	return json.Unmarshal(group, &g)
 }
 
 // DeleteGroup deletes a group via cs3 by id
 func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
-	t, err := r.authenticate(ctx)
+	ctx, err = r.getAuthenticatedContext(ctx)
 	if err != nil {
 		return err
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
-
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Path: path.Join("/meta", groupsFolder, id),
+			Path: path.Join(storageMountPath, groupsFolder, id),
 		},
 	})
 
@@ -289,8 +253,13 @@ func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 	return err
 }
 
-func (r CS3Repo) authenticate(ctx context.Context) (token string, err error) {
-	return AuthenticateCS3(ctx, r.cfg.ServiceUser, r.tm)
+func (r CS3Repo) getAuthenticatedContext(ctx context.Context) (context.Context, error) {
+	t, err := AuthenticateCS3(ctx, r.cfg.ServiceUser, r.tm)
+	if err != nil {
+		return nil, err
+	}
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
+	return ctx, nil
 }
 
 // AuthenticateCS3 mints an auth token for communicating with cs3 storage based on a service user from config
@@ -298,6 +267,7 @@ func AuthenticateCS3(ctx context.Context, su config.ServiceUser, tm token.Manage
 	u := &user.User{
 		Id: &user.UserId{
 			OpaqueId: su.UUID,
+			Type:     user.UserType_USER_TYPE_APPLICATION,
 		},
 		Groups:    []string{},
 		UidNumber: su.UID,
@@ -311,11 +281,11 @@ func AuthenticateCS3(ctx context.Context, su config.ServiceUser, tm token.Manage
 }
 
 func (r CS3Repo) accountURL(id string) string {
-	return singleJoiningSlash(r.cfg.Repo.CS3.DataURL, path.Join(r.cfg.Repo.CS3.DataPrefix, accountsFolder, id))
+	return path.Join(accountsFolder, id)
 }
 
 func (r CS3Repo) groupURL(id string) string {
-	return singleJoiningSlash(r.cfg.Repo.CS3.DataURL, path.Join(r.cfg.Repo.CS3.DataPrefix, groupsFolder, id))
+	return path.Join(groupsFolder, id)
 }
 
 func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error {
@@ -325,7 +295,7 @@ func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error
 // MakeDirIfNotExist will create a root node in the metadata storage. Requires an authenticated context.
 func MakeDirIfNotExist(ctx context.Context, sp provider.ProviderAPIClient, folder string) error {
 	var rootPathRef = &provider.Reference{
-		Path: path.Join("/meta", folder),
+		Path: path.Join(storageMountPath, folder),
 	}
 
 	resp, err := sp.Stat(ctx, &provider.StatRequest{
@@ -347,41 +317,4 @@ func MakeDirIfNotExist(ctx context.Context, sp provider.ProviderAPIClient, folde
 	}
 
 	return nil
-}
-
-// TODO: this is copied from proxy. Find a better solution or move it to ocis-pkg
-func singleJoiningSlash(a, b string) string {
-	aslash := strings.HasSuffix(a, "/")
-	bslash := strings.HasPrefix(b, "/")
-	switch {
-	case aslash && bslash:
-		return a + b[1:]
-	case !aslash && !bslash:
-		return a + "/" + b
-	}
-	return a + b
-}
-
-type dataProviderClient struct {
-	client http.Client
-}
-
-func (d dataProviderClient) put(url string, body io.Reader, token string) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodPut, url, body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add(revactx.TokenHeader, token)
-	return d.client.Do(req)
-}
-
-func (d dataProviderClient) get(url string, token string) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add(revactx.TokenHeader, token)
-	return d.client.Do(req)
 }

@@ -17,9 +17,10 @@ geekdocFilePath: ocis_keycloak.md
 
 [Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_keycloak)
 
-The docker stack consists 4 containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
+The docker stack consists 4 containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network. It
+is also responsible for redirecting requests on the OIDC discovery endpoints (e.g. `.well-known/openid-configuration`) to the correct destination in Keycloak.
 
-Keykloak add two containers: Keycloak itself and a PostgreSQL as database. Keycloak will be configured as oCIS' IDP instead of the internal IDP [LibreGraph Connect]({{< ref "../../extensions/idp" >}})
+Keycloak add two containers: Keycloak itself and a PostgreSQL as database. Keycloak will be configured as oCIS' IDP instead of the internal IDP [LibreGraph Connect]({{< ref "../../extensions/idp" >}})
 
 The other container is oCIS itself running all extensions in one container. In this example oCIS uses the [oCIS storage driver]({{< ref "../../extensions/storage/storagedrivers" >}})
 
@@ -77,7 +78,9 @@ See also [example server setup]({{< ref "preparing_server" >}})
   # JWT secret which is used for the storage provider. Must be changed in order to have a secure oCIS. Defaults to "Pive-Fumkiu4"
   OCIS_JWT_SECRET=
   # JWT secret which is used for uploads to create transfer tokens. Must be changed in order to have a secure oCIS. Defaults to "replace-me-with-a-transfer-secret"
-  OCIS_TRANSFER_SECRET=
+  STORAGE_TRANSFER_SECRET=
+  # Machine auth api key secret. Must be changed in order to have a secure oCIS. Defaults to "change-me-please"
+  OCIS_MACHINE_AUTH_API_KEY=
 
   ### Keycloak ###
   # Domain of Keycloak, where you can find the management and authentication frontend. Defaults to "keycloak.owncloud.test"

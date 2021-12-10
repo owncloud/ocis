@@ -16,8 +16,6 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 
-	merrors "github.com/asim/go-micro/v3/errors"
-	"github.com/asim/go-micro/v3/metadata"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
 	fieldmask_utils "github.com/mennanov/fieldmask-utils"
@@ -31,6 +29,8 @@ import (
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	settings_svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"github.com/rs/zerolog"
+	merrors "go-micro.dev/v4/errors"
+	"go-micro.dev/v4/metadata"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/genproto/protobuf/field_mask"
 	p "google.golang.org/protobuf/proto"
@@ -276,7 +276,7 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 }
 
 func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]string, error) {
-	return s.index.Query(&proto.Account{}, query)
+	return s.index.Query(ctx, &proto.Account{}, query)
 }
 
 // GetAccount implements the AccountsServiceHandler interface
@@ -625,7 +625,7 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 	return
 }
 
-// whitelist of all paths/fields which can be updated by users themself
+// whitelist of all paths/fields which can be updated by users themselves
 var selfUpdatableAccountPaths = map[string]struct{}{
 	"DisplayName":              {},
 	"Description":              {},
@@ -741,7 +741,7 @@ func validateAccountEmail(serviceID string, a *proto.Account) error {
 	return nil
 }
 
-// We want to allow email addresses as usernames so they show up when using them in ACLs on storages that allow intergration with our glauth LDAP service
+// We want to allow email addresses as usernames so they show up when using them in ACLs on storages that allow integration with our glauth LDAP service
 // so we are adding a few restrictions from https://stackoverflow.com/questions/6949667/what-are-the-real-rules-for-linux-usernames-on-centos-6-and-rhel-6
 // names should not start with numbers
 var usernameRegex = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]*(@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)*$")

@@ -7,11 +7,16 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/mux"
 	"github.com/libregraph/lico/bootstrap"
+	dummyBackendSupport "github.com/libregraph/lico/bootstrap/backends/dummy"
+	guestBackendSupport "github.com/libregraph/lico/bootstrap/backends/guest"
+	kcBackendSupport "github.com/libregraph/lico/bootstrap/backends/kc"
+	ldapBackendSupport "github.com/libregraph/lico/bootstrap/backends/ldap"
 	licoconfig "github.com/libregraph/lico/config"
 	"github.com/libregraph/lico/server"
 	"github.com/owncloud/ocis/idp/pkg/assets"
@@ -41,11 +46,19 @@ func NewService(opts ...Option) Service {
 		logger.Fatal().Err(err).Msg("could not initialize env vars")
 	}
 
-	if err := createConfigsIfNotExist(assetVFS, options.Config.IDP.Iss); err != nil {
+	if err := createConfigsIfNotExist(assetVFS, options.Config.IDP.IdentifierRegistrationConf, options.Config.IDP.Iss); err != nil {
 		logger.Fatal().Err(err).Msg("could not create default config")
 	}
 
-	bs, err := bootstrap.Boot(ctx, &options.Config.IDP, &licoconfig.Config{
+	guestBackendSupport.MustRegister()
+	ldapBackendSupport.MustRegister()
+	dummyBackendSupport.MustRegister()
+	kcBackendSupport.MustRegister()
+
+	// https://play.golang.org/p/Mh8AVJCd593
+	idpSettings := bootstrap.Settings(options.Config.IDP)
+
+	bs, err := bootstrap.Boot(ctx, &idpSettings, &licoconfig.Config{
 		Logger: logw.Wrap(logger),
 	})
 
@@ -68,14 +81,16 @@ func NewService(opts ...Option) Service {
 	return svc
 }
 
-func createConfigsIfNotExist(assets http.FileSystem, ocisURL string) error {
-	if _, err := os.Stat("./config"); os.IsNotExist(err) {
-		if err := os.Mkdir("./config", 0700); err != nil {
+func createConfigsIfNotExist(assets http.FileSystem, filePath, ocisURL string) error {
+
+	folder := path.Dir(filePath)
+	if _, err := os.Stat(folder); os.IsNotExist(err) {
+		if err := os.MkdirAll(folder, 0700); err != nil {
 			return err
 		}
 	}
 
-	if _, err := os.Stat("./config/identifier-registration.yaml"); os.IsNotExist(err) {
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		defaultConf, err := assets.Open("/identifier-registration.yaml")
 		if err != nil {
 			return err
@@ -83,7 +98,7 @@ func createConfigsIfNotExist(assets http.FileSystem, ocisURL string) error {
 
 		defer defaultConf.Close()
 
-		confOnDisk, err := os.Create("./config/identifier-registration.yaml")
+		confOnDisk, err := os.Create(filePath)
 		if err != nil {
 			return err
 		}
@@ -98,7 +113,7 @@ func createConfigsIfNotExist(assets http.FileSystem, ocisURL string) error {
 		// replace placeholder {{OCIS_URL}} with https://localhost:9200 / correct host
 		conf = []byte(strings.ReplaceAll(string(conf), "{{OCIS_URL}}", strings.TrimRight(ocisURL, "/")))
 
-		err = ioutil.WriteFile("./config/identifier-registration.yaml", conf, 0600)
+		err = ioutil.WriteFile(filePath, conf, 0600)
 		if err != nil {
 			return err
 		}

@@ -1,0 +1,53 @@
+---
+- name: continuous-deployment-oc10-ocis-parallel
+  server:
+    server_type: cx21
+    image: ubuntu-20.04
+    location: nbg1
+    initial_ssh_key_names:
+      - owncloud-ocis@drone.owncloud.com
+    labels:
+      owner: wkloucek
+      for: oCIS-continuous-deployment-examples
+    rebuild: $REBUILD
+    rebuild_carry_paths:
+      - /var/lib/docker/volumes/ocis_certs
+
+  domains:
+    - "*.oc10-ocis-parallel.latest.owncloud.works"
+
+  vars:
+    os_env_umask: 022 # https://github.com/dev-sec/ansible-collection-hardening/blob/master/roles/os_hardening/README.md#variables
+    ssh_authorized_keys:
+      - https://github.com/butonic.keys
+      - https://github.com/C0rby.keys
+      - https://github.com/fschade.keys
+      - https://github.com/kulmann.keys
+      - https://github.com/micbar.keys
+      - https://github.com/pascalwengerter.keys
+      - https://github.com/paulcod3.keys
+      - https://github.com/refs.keys
+      - https://github.com/wkloucek.keys
+    docker_compose_projects:
+      - name: ocis
+        git_url: https://github.com/owncloud/ocis.git
+        ref: master
+        docker_compose_path: deployments/examples/oc10_ocis_parallel
+        env:
+          INSECURE: "false"
+          TRAEFIK_ACME_MAIL: wkloucek@owncloud.com
+          OCIS_DOCKER_TAG: latest
+          CLOUD_DOMAIN: cloud.oc10-ocis-parallel.latest.owncloud.works
+          KEYCLOAK_DOMAIN: keycloak.oc10-ocis-parallel.latest.owncloud.works
+          LDAP_MANAGER_DOMAIN: ldap.oc10-ocis-parallel.latest.owncloud.works
+          COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
+      - name: monitoring
+        git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git
+        ref: master
+        env:
+          NETWORK_NAME: ocis-net
+          TELEMETRY_SERVE_DOMAIN: telemetry.oc10-ocis-parallel.latest.owncloud.works
+          JAEGER_COLLECTOR: jaeger-collector.infra.owncloud.works:443
+          TELEGRAF_SPECIFIC_CONFIG: ocis_single_container
+          OCIS_URL: cloud.oc10-ocis-parallel.latest.owncloud.works
+          OCIS_DEPLOYMENT_ID: continuous-deployment-oc10-ocis-parallel-latest

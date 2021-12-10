@@ -11,12 +11,12 @@ import (
 )
 
 const (
-	_resolutionSeperator = "x"
+	_resolutionSeparator = "x"
 )
 
 // ParseResolution returns an image.Rectangle representing the resolution given as a string
 func ParseResolution(s string) (image.Rectangle, error) {
-	parts := strings.Split(s, _resolutionSeperator)
+	parts := strings.Split(s, _resolutionSeparator)
 	if len(parts) != 2 {
 		return image.Rectangle{}, fmt.Errorf("failed to parse resolution: %s. Expected format <width>x<height>", s)
 	}
@@ -78,7 +78,7 @@ func (rs Resolutions) ClosestMatch(requested image.Rectangle, sourceSize image.R
 		}
 
 		// Convert diff to positive value
-		// Multiplying by -1 is safe since we aren't getting postive numbers here
+		// Multiplying by -1 is safe since we aren't getting positive numbers here
 		// because of the check above
 		absDiff := diff * -1
 		if absDiff < minDiff {

@@ -7,7 +7,7 @@ import (
 	"net/rpc"
 	"os"
 
-	cli "github.com/micro/cli/v2"
+	cli "github.com/urfave/cli/v2"
 
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"

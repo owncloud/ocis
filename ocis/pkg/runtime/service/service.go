@@ -13,8 +13,9 @@ import (
 	"syscall"
 	"time"
 
-	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v3"
-	"github.com/asim/go-micro/v3/logger"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+
+	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v4"
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
 	accounts "github.com/owncloud/ocis/accounts/pkg/command"
@@ -35,6 +36,7 @@ import (
 	webdav "github.com/owncloud/ocis/webdav/pkg/command"
 	"github.com/rs/zerolog"
 	"github.com/thejerf/suture/v4"
+	"go-micro.dev/v4/logger"
 )
 
 var (
@@ -105,6 +107,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["storage-groupprovider"] = storage.NewGroupProvider
 	s.ServicesRegistry["storage-authbasic"] = storage.NewAuthBasic
 	s.ServicesRegistry["storage-authbearer"] = storage.NewAuthBearer
+	s.ServicesRegistry["storage-authmachine"] = storage.NewAuthMachine
 	s.ServicesRegistry["storage-home"] = storage.NewStorageHome
 	s.ServicesRegistry["storage-users"] = storage.NewStorageUsers
 	s.ServicesRegistry["storage-public-link"] = storage.NewStoragePublicLink
@@ -134,9 +137,6 @@ func Start(o ...Option) error {
 	halt := make(chan os.Signal, 1)
 	signal.Notify(halt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 
-	// notify goroutines that they are running on supervised mode
-	s.cfg.Mode = ociscfg.SUPERVISED
-
 	setMicroLogger()
 
 	// tolerance controls backoff cycles from the supervisor.
@@ -158,13 +158,22 @@ func Start(o ...Option) error {
 		FailureBackoff:   3 * time.Second,
 	})
 
-	// reva storages have their own logging. For consistency sake the top level logging will cascade to reva.
-	s.cfg.Storage.Log.Color = s.cfg.Log.Color
-	s.cfg.Storage.Log.Level = s.cfg.Log.Level
-	s.cfg.Storage.Log.Pretty = s.cfg.Log.Pretty
-	s.cfg.Storage.Log.File = s.cfg.Log.File
+	if s.cfg.Commons == nil {
+		s.cfg.Commons = &shared.Commons{
+			Log: &shared.Log{},
+		}
+	}
 
-	if err := rpc.Register(s); err != nil {
+	if s.cfg.Storage.Log == nil {
+		s.cfg.Storage.Log = &shared.Log{}
+	}
+
+	s.cfg.Storage.Log.Color = s.cfg.Commons.Color
+	s.cfg.Storage.Log.Level = s.cfg.Commons.Level
+	s.cfg.Storage.Log.Pretty = s.cfg.Commons.Pretty
+	s.cfg.Storage.Log.File = s.cfg.Commons.File
+
+	if err = rpc.Register(s); err != nil {
 		if s != nil {
 			s.Log.Fatal().Err(err)
 		}
@@ -179,7 +188,7 @@ func Start(o ...Option) error {
 	defer func() {
 		if r := recover(); r != nil {
 			reason := strings.Builder{}
-			if _, err := net.Dial("tcp", net.JoinHostPort(s.cfg.Runtime.Host, s.cfg.Runtime.Port)); err != nil {
+			if _, err = net.Dial("tcp", net.JoinHostPort(s.cfg.Runtime.Host, s.cfg.Runtime.Port)); err != nil {
 				reason.WriteString("runtime address already in use")
 			}
 
@@ -244,11 +253,6 @@ func (s *Service) generateRunSet(cfg *config.Config) {
 
 // Start indicates the Service Controller to start a new supervised service as an OS thread.
 func (s *Service) Start(name string, reply *int) error {
-	// RPC calls to a Service object will allow for parsing config. Mind that since the runtime is running on a different
-	// machine, the configuration needs to be present in the given machine. RPC does not yet allow providing a config
-	// during transport.
-	s.cfg.Mode = ociscfg.UNSUPERVISED
-
 	swap := deepcopy.Copy(s.cfg)
 	if _, ok := s.ServicesRegistry[name]; ok {
 		*reply = 0
@@ -294,7 +298,7 @@ func (s *Service) List(args struct{}, reply *string) error {
 func (s *Service) Kill(name string, reply *int) error {
 	if len(s.serviceToken[name]) > 0 {
 		for i := range s.serviceToken[name] {
-			if err := s.Supervisor.Remove(s.serviceToken[name][i]); err != nil {
+			if err := s.Supervisor.RemoveAndWait(s.serviceToken[name][i], 5000*time.Millisecond); err != nil {
 				return err
 			}
 		}

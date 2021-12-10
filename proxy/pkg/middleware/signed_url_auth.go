@@ -48,7 +48,7 @@ func (m signedURLAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user, err := m.userProvider.GetUserByClaims(req.Context(), "username", req.URL.Query().Get("OC-Credential"), true)
+	user, _, err := m.userProvider.GetUserByClaims(req.Context(), "username", req.URL.Query().Get("OC-Credential"), true)
 	if err != nil {
 		m.logger.Error().Err(err).Msg("Could not get user by claim")
 		w.WriteHeader(http.StatusInternalServerError)

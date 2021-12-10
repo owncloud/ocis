@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/store/pkg/config"
-	"github.com/owncloud/ocis/store/pkg/flagset"
+	"github.com/urfave/cli/v2"
 )
 
 // Health is the entrypoint for the health command.
@@ -14,7 +13,9 @@ func Health(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "health",
 		Usage: "Check health status",
-		Flags: flagset.HealthWithConfig(cfg),
+		Before: func(c *cli.Context) error {
+			return ParseConfig(c, cfg)
+		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 

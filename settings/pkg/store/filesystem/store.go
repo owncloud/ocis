@@ -24,17 +24,17 @@ type Store struct {
 // New creates a new store
 func New(cfg *config.Config) settings.Manager {
 	s := Store{
-		Logger: olog.NewLogger(
-			olog.Color(cfg.Log.Color),
-			olog.Pretty(cfg.Log.Pretty),
-			olog.Level(cfg.Log.Level),
-			olog.File(cfg.Log.File),
-		),
+		//Logger: olog.NewLogger(
+		//	olog.Color(cfg.Log.Color),
+		//	olog.Pretty(cfg.Log.Pretty),
+		//	olog.Level(cfg.Log.Level),
+		//	olog.File(cfg.Log.File),
+		//),
 	}
 
 	if _, err := os.Stat(cfg.Service.DataPath); err != nil {
 		s.Logger.Info().Msgf("creating container on %v", cfg.Service.DataPath)
-		err := os.MkdirAll(cfg.Service.DataPath, 0700)
+		err = os.MkdirAll(cfg.Service.DataPath, 0700)
 
 		if err != nil {
 			s.Logger.Err(err).Msgf("providing container on %v", cfg.Service.DataPath)

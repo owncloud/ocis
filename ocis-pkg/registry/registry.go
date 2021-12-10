@@ -4,12 +4,12 @@ import (
 	"os"
 	"strings"
 
-	etcdr "github.com/asim/go-micro/plugins/registry/etcd/v3"
-	kubernetesr "github.com/asim/go-micro/plugins/registry/kubernetes/v3"
-	mdnsr "github.com/asim/go-micro/plugins/registry/mdns/v3"
-	natsr "github.com/asim/go-micro/plugins/registry/nats/v3"
+	etcdr "github.com/asim/go-micro/plugins/registry/etcd/v4"
+	kubernetesr "github.com/asim/go-micro/plugins/registry/kubernetes/v4"
+	mdnsr "github.com/asim/go-micro/plugins/registry/mdns/v4"
+	natsr "github.com/asim/go-micro/plugins/registry/nats/v4"
 
-	"github.com/asim/go-micro/v3/registry"
+	"go-micro.dev/v4/registry"
 )
 
 var (

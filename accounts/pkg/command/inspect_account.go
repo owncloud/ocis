@@ -5,12 +5,13 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/asim/go-micro/plugins/client/grpc/v3"
-	"github.com/micro/cli/v2"
+	"github.com/owncloud/ocis/accounts/pkg/flagset"
+
+	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/accounts/pkg/config"
-	"github.com/owncloud/ocis/accounts/pkg/flagset"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	"github.com/urfave/cli/v2"
 )
 
 // InspectAccount command shows detailed information about a specific account.

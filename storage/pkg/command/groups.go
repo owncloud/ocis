@@ -9,15 +9,14 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // Groups is the entrypoint for the sharing command.
@@ -25,11 +24,8 @@ func Groups(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "groups",
 		Usage: "Start groups service",
-		Flags: flagset.GroupsWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.Groups.Services = c.StringSlice("service")
-
-			return nil
+			return ParseConfig(c, cfg, "storage-groups")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -102,7 +98,9 @@ func groupsConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inter
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret": cfg.Reva.JWTSecret,
+			"jwt_secret":                cfg.Reva.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
+			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.Groups.GRPCNetwork,
@@ -118,6 +116,8 @@ func groupsConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inter
 						"ldap": map[string]interface{}{
 							"hostname":        cfg.Reva.LDAP.Hostname,
 							"port":            cfg.Reva.LDAP.Port,
+							"cacert":          cfg.Reva.LDAP.CACert,
+							"insecure":        cfg.Reva.LDAP.Insecure,
 							"base_dn":         cfg.Reva.LDAP.BaseDN,
 							"groupfilter":     cfg.Reva.LDAP.GroupFilter,
 							"attributefilter": cfg.Reva.LDAP.GroupAttributeFilter,
@@ -154,26 +154,25 @@ func groupsConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inter
 	}
 }
 
-// GroupProvider allows for the storage-groupprovider command to be embedded and supervised by a suture supervisor tree.
-type GroupProvider struct {
+// GroupSutureService allows for the storage-groupprovider command to be embedded and supervised by a suture supervisor tree.
+type GroupSutureService struct {
 	cfg *config.Config
 }
 
-// NewGroupProvider creates a new storage.GroupProvider
+// NewGroupProviderSutureService creates a new storage.GroupProvider
 func NewGroupProvider(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.Groups.Supervised = true
-	}
-	return GroupProvider{
+	cfg.Storage.Commons = cfg.Commons
+	return GroupSutureService{
 		cfg: cfg.Storage,
 	}
 }
 
-func (s GroupProvider) Serve(ctx context.Context) error {
+func (s GroupSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.Groups.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range Groups(s.cfg).Flags {
-		if err := Groups(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := Groups(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

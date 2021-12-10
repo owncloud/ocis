@@ -22,15 +22,15 @@ const (
 // ThumbnailRequest combines all parameters provided when requesting a thumbnail
 type ThumbnailRequest struct {
 	// The file path of the source file
-	Filepath        string
+	Filepath string
 	// The file name of the source file including the extension
-	Filename        string
+	Filename string
 	// The file extension
-	Extension       string
+	Extension string
 	// The requested width of the thumbnail
-	Width           int32
+	Width int32
 	// The requested height of the thumbnail
-	Height          int32
+	Height int32
 	// In case of a public share the public link token.
 	PublicLinkToken string
 }
@@ -66,10 +66,15 @@ func ParseThumbnailRequest(r *http.Request) (*ThumbnailRequest, error) {
 // So using the URLParam function is not possible.
 func extractFilePath(r *http.Request) (string, error) {
 	user := chi.URLParam(r, "user")
+	user, err := url.QueryUnescape(user)
+	if err != nil {
+		return "", errors.New("could not unescape user")
+	}
 	if user != "" {
 		parts := strings.SplitN(r.URL.Path, user, 2)
 		return parts[1], nil
 	}
+
 	token := chi.URLParam(r, "token")
 	if token != "" {
 		parts := strings.SplitN(r.URL.Path, token, 2)
@@ -97,7 +102,7 @@ func parseDimension(d, name string, defaultValue int64) (int64, error) {
 	result, err := strconv.ParseInt(d, 10, 32)
 	if err != nil || result < 1 {
 		// The error message doesn't fit but for OC10 API compatibility reasons we have to set this.
-		return 0, fmt.Errorf("Cannot set %s of 0 or smaller!", name) //nolint:golint
+		return 0, fmt.Errorf("Cannot set %s of 0 or smaller!", name)
 	}
 	return result, nil
 }

@@ -1,8 +1,10 @@
 SHELL := bash
 NAME := thumbnails
 
+include ../.make/recursion.mk
+
 ############ tooling ############
-ifneq (, $(shell which go 2> /dev/null)) # supress `command not found warnings` for non go targets in CI
+ifneq (, $(shell which go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../.bingo/Variables.mk
 endif
 
@@ -24,7 +26,6 @@ include ../.make/generate.mk
 
 .PHONY: ci-go-generate
 ci-go-generate: protobuf # CI runs ci-node-generate automatically before this target
-	@go generate ./...
 
 .PHONY: ci-node-generate
 ci-node-generate:
@@ -36,8 +37,4 @@ PROTO_SRC := pkg/proto/$(PROTO_VERSION)
 include ../.make/protobuf.mk
 
 .PHONY: protobuf
-protobuf: $(PROTO_SRC)/${NAME}.pb.go \
-		  $(PROTO_SRC)/${NAME}.pb.micro.go \
-		  $(PROTO_SRC)/${NAME}.swagger.json \
-		  ../docs/extensions/${NAME}/grpc.md
-		  #$(PROTO_SRC)/${NAME}.pb.web.go \ # not needed for thumbnails
+protobuf: buf-generate

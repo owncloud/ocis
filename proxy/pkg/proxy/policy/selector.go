@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"sort"
 
-	"github.com/asim/go-micro/plugins/client/grpc/v3"
+	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
@@ -164,19 +164,34 @@ func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.Account
 // This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OCIS and
 func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
 	return func(r *http.Request) (s string, err error) {
-		// use cookie first if provided
-		selectorCookie, err := r.Cookie(cfg.SelectorCookieName)
-		if err == nil {
-			return selectorCookie.Value, nil
+
+		selectorCookie := func(r *http.Request) string {
+			selectorCookie, err := r.Cookie(cfg.SelectorCookieName)
+			if err == nil {
+				// TODO check we know the routing policy?
+				return selectorCookie.Value
+			}
+			return ""
 		}
 
-		// if no cookie is present, try to route by selector
+		// first, try to route by selector
 		if claims := oidc.FromContext(r.Context()); claims != nil {
 			if p, ok := claims[oidc.OcisRoutingPolicy].(string); ok && p != "" {
 				// TODO check we know the routing policy?
 				return p, nil
 			}
+
+			// basic auth requests don't have a routing claim, so check for the cookie
+			if s := selectorCookie(r); s != "" {
+				return s, nil
+			}
+
 			return cfg.DefaultPolicy, nil
+		}
+
+		// use cookie if provided
+		if s := selectorCookie(r); s != "" {
+			return s, nil
 		}
 
 		return cfg.UnauthenticatedPolicy, nil

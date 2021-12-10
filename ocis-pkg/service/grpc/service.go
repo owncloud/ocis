@@ -4,14 +4,14 @@ import (
 	"strings"
 	"time"
 
-	mgrpcc "github.com/asim/go-micro/plugins/client/grpc/v3"
-	mgrpcs "github.com/asim/go-micro/plugins/server/grpc/v3"
-	mbreaker "github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v3"
-	"github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v3"
-	"github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v3"
-	"github.com/asim/go-micro/v3"
-	"github.com/asim/go-micro/v3/client"
+	mgrpcc "github.com/asim/go-micro/plugins/client/grpc/v4"
+	mgrpcs "github.com/asim/go-micro/plugins/server/grpc/v4"
+	mbreaker "github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v4"
+	"github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v4"
+	"github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v4"
 	"github.com/owncloud/ocis/ocis-pkg/registry"
+	"go-micro.dev/v4"
+	"go-micro.dev/v4/client"
 )
 
 // DefaultClient is a custom oCIS grpc configured client.
@@ -31,11 +31,6 @@ type Service struct {
 // NewService initializes a new grpc service.
 func NewService(opts ...Option) Service {
 	sopts := newOptions(opts...)
-
-	sopts.Logger.Info().
-		Str("transport", "grpc").
-		Str("addr", sopts.Address).
-		Msg("starting server")
 
 	mopts := []micro.Option{
 		// first add a server because it will reset any options

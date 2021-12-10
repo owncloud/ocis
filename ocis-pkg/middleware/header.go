@@ -2,7 +2,12 @@ package middleware
 
 import (
 	"net/http"
+	"strings"
 	"time"
+
+	"github.com/owncloud/ocis/ocis-pkg/cors"
+
+	chicors "github.com/go-chi/cors"
 )
 
 // NoCache writes required cache headers to all requests.
@@ -17,30 +22,35 @@ func NoCache(next http.Handler) http.Handler {
 }
 
 // Cors writes required cors headers to all requests.
-func Cors(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "OPTIONS" {
-			next.ServeHTTP(w, r)
-		} else {
-			w.Header().Set("Access-Control-Allow-Origin", "*")
-			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
-			w.Header().Set("Access-Control-Allow-Headers", "authorization, origin, content-type, accept, x-requested-with")
-			w.Header().Set("Allow", "HEAD, GET, POST, PUT, PATCH, DELETE, OPTIONS")
-
-			w.WriteHeader(http.StatusOK)
-		}
+func Cors(opts ...cors.Option) func(http.Handler) http.Handler {
+	options := cors.NewOptions(opts...)
+	logger := options.Logger
+	logger.Debug().
+		Str("allowed_origins", strings.Join(options.AllowedOrigins, ", ")).
+		Str("allowed_methods", strings.Join(options.AllowedMethods, ", ")).
+		Str("allowed_headers", strings.Join(options.AllowedHeaders, ", ")).
+		Bool("allow_credentials", options.AllowCredentials).
+		Msg("setup cors middleware")
+	return chicors.Handler(chicors.Options{
+		AllowedOrigins:   options.AllowedOrigins,
+		AllowedMethods:   options.AllowedMethods,
+		AllowedHeaders:   options.AllowedHeaders,
+		AllowCredentials: options.AllowCredentials,
 	})
 }
 
 // Secure writes required access headers to all requests.
 func Secure(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		// Indicates whether the browser is allowed to render this page in a <frame>, <iframe>, <embed> or <object>.
 		w.Header().Set("X-Frame-Options", "DENY")
+		// Does basically the same as X-Frame-Options.
+		w.Header().Set("Content-Security-Policy", "frame-ancestors 'none'")
+		// This header inidicates that MIME types advertised in the Content-Type headers should not be changed and be followed.
 		w.Header().Set("X-Content-Type-Options", "nosniff")
-		w.Header().Set("X-XSS-Protection", "1; mode=block")
 
 		if r.TLS != nil {
+			// Tell browsers that the website should only be accessed  using HTTPS.
 			w.Header().Set("Strict-Transport-Security", "max-age=31536000")
 		}
 

@@ -12,7 +12,7 @@ OUTPUT_DIR = ./l10n
 TEMPLATE_FILE = ./l10n/template.pot
 
 # Name of the generated .po files for each available locale.
-LOCALE_FILES = $(shell find l10n/locale -name '*.po')
+LOCALE_FILES = $(shell find l10n/locale -name '*.po' 2> /dev/null)
 
 .PHONY: l10n-push
 l10n-push:

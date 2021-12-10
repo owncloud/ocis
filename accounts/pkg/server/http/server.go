@@ -1,15 +1,16 @@
 package http
 
 import (
-	"github.com/asim/go-micro/v3"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/accounts/pkg/assets"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
-	"github.com/owncloud/ocis/accounts/pkg/version"
 	"github.com/owncloud/ocis/ocis-pkg/account"
+	"github.com/owncloud/ocis/ocis-pkg/cors"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
+	"github.com/owncloud/ocis/ocis-pkg/version"
+	"go-micro.dev/v4"
 )
 
 // Server initializes the http service and server.
@@ -33,7 +34,13 @@ func Server(opts ...Option) http.Service {
 	mux.Use(chimiddleware.RequestID)
 	mux.Use(middleware.TraceContext)
 	mux.Use(middleware.NoCache)
-	mux.Use(middleware.Cors)
+	mux.Use(middleware.Cors(
+		cors.Logger(options.Logger),
+		cors.AllowedOrigins(options.Config.HTTP.CORS.AllowedOrigins),
+		cors.AllowedMethods(options.Config.HTTP.CORS.AllowedMethods),
+		cors.AllowedHeaders(options.Config.HTTP.CORS.AllowedHeaders),
+		cors.AllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
+	))
 	mux.Use(middleware.Secure)
 	mux.Use(middleware.ExtractAccountUUID(
 		account.Logger(options.Logger),

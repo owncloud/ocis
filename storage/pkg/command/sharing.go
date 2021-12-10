@@ -13,13 +13,12 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // Sharing is the entrypoint for the sharing command.
@@ -27,11 +26,8 @@ func Sharing(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "sharing",
 		Usage: "Start sharing service",
-		Flags: flagset.SharingWithConfig(cfg),
 		Before: func(c *cli.Context) error {
-			cfg.Reva.Sharing.Services = c.StringSlice("service")
-
-			return nil
+			return ParseConfig(c, cfg, "storage-sharing")
 		},
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
@@ -112,8 +108,9 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret": cfg.Reva.JWTSecret,
-			"gatewaysvc": cfg.Reva.Gateway.Endpoint,
+			"jwt_secret":                cfg.Reva.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
+			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.Sharing.GRPCNetwork,
@@ -190,9 +187,7 @@ type SharingSutureService struct {
 
 // NewSharingSutureService creates a new store.SharingSutureService
 func NewSharing(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.Sharing.Supervised = true
-	}
+	cfg.Storage.Commons = cfg.Commons
 	return SharingSutureService{
 		cfg: cfg.Storage,
 	}
@@ -201,8 +196,9 @@ func NewSharing(cfg *ociscfg.Config) suture.Service {
 func (s SharingSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.Sharing.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range Sharing(s.cfg).Flags {
-		if err := Sharing(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := Sharing(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

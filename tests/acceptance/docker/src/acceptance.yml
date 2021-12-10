@@ -23,6 +23,9 @@ services:
       - ./run-tests.sh:/test/run-tests.sh
       - oCISownCloud10testsuite:/srv
       - ../../../../:/drone/src
+      - ../../../../vendor-bin/behat/composer.json:/tmp/vendor-bin/behat/composer.json
+      - oCISownCloud10testsuite-vendor:/drone/src/vendor
 
 volumes:
   oCISownCloud10testsuite:
+  oCISownCloud10testsuite-vendor:

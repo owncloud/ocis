@@ -10,15 +10,16 @@ import (
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
-	"github.com/micro/cli/v2"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/version"
+	"github.com/owncloud/ocis/storage/pkg/command/storagedrivers"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/flagset"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/service/external"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
+	"github.com/urfave/cli/v2"
 )
 
 // StorageMetadata the entrypoint for the storage-storage-metadata command.
@@ -28,20 +29,10 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-metadata",
 		Usage: "Start storage-metadata service",
-		// TODO(refs) at this point it might make sense delegate log flags to each individual storage command.
-		Flags:    append(flagset.StorageMetadata(cfg), flagset.RootWithConfig(cfg)...),
-		Category: "Extensions",
 		Before: func(c *cli.Context) error {
-			storageRoot := c.String("storage-root")
-
-			cfg.Reva.Storages.OwnCloud.Root = storageRoot
-			cfg.Reva.Storages.EOS.Root = storageRoot
-			cfg.Reva.Storages.Local.Root = storageRoot
-			cfg.Reva.Storages.S3.Root = storageRoot
-			cfg.Reva.Storages.Home.Root = storageRoot
-
-			return nil
+			return ParseConfig(c, cfg, "storage-metadata")
 		},
+		Category: "Extensions",
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 			tracing.Configure(cfg, logger)
@@ -57,23 +48,6 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
-
-			// Disable home because the metadata is stored independently
-			// of the user. This also means that a valid-token without any user-id
-			// is allowed to write to the metadata-storage.
-			cfg.Reva.Storages.Common.EnableHome = false
-			cfg.Reva.Storages.EOS.EnableHome = false
-			cfg.Reva.Storages.Local.EnableHome = false
-			cfg.Reva.Storages.OwnCloud.EnableHome = false
-			cfg.Reva.Storages.S3.EnableHome = false
-
-			// We need this hack because the metadata storage can define STORAGE_METADATA_ROOT which has the same destination as
-			// STORAGE_DRIVER_OCIS_ROOT. When both variables are set one storage will always be out of sync. Ensure the
-			// metadata storage root is never overridden. This is the kind of stateful code that make you want to cry blood.
-			if os.Getenv("STORAGE_METADATA_ROOT") != "" && os.Getenv("STORAGE_DRIVER_OCIS_ROOT") != "" {
-				cfg.Reva.Storages.Common.Root = os.Getenv("STORAGE_METADATA_ROOT")
-			}
-
 			rcfg := storageMetadataFromStruct(c, cfg)
 
 			gr.Add(func() error {
@@ -124,6 +98,7 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 				"com.owncloud.storage.metadata",
 				uuid.Must(uuid.NewV4()).String(),
 				cfg.Reva.StorageMetadata.GRPCAddr,
+				version.String,
 				logger,
 			); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the grpc endpoint")
@@ -145,8 +120,9 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret": cfg.Reva.JWTSecret,
-			"gatewaysvc": cfg.Reva.Gateway.Endpoint,
+			"jwt_secret":                cfg.Reva.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
+			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.Reva.StorageMetadata.GRPCNetwork,
@@ -158,7 +134,7 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 				"storageprovider": map[string]interface{}{
 					"mount_path":      "/meta",
 					"driver":          cfg.Reva.StorageMetadata.Driver,
-					"drivers":         drivers(cfg),
+					"drivers":         storagedrivers.MetadataDrivers(cfg),
 					"data_server_url": cfg.Reva.StorageMetadata.DataServerURL,
 					"tmp_folder":      cfg.Reva.StorageMetadata.TempFolder,
 				},
@@ -172,9 +148,9 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 				"dataprovider": map[string]interface{}{
 					"prefix":      "data",
 					"driver":      cfg.Reva.StorageMetadata.Driver,
-					"drivers":     drivers(cfg),
+					"drivers":     storagedrivers.MetadataDrivers(cfg),
 					"timeout":     86400,
-					"insecure":    true,
+					"insecure":    cfg.Reva.StorageMetadata.DataProvider.Insecure,
 					"disable_tus": true,
 				},
 			},
@@ -184,25 +160,24 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 }
 
 // SutureService allows for the storage-metadata command to be embedded and supervised by a suture supervisor tree.
-type SutureService struct {
+type MetadataSutureService struct {
 	cfg *config.Config
 }
 
 // NewSutureService creates a new storagemetadata.SutureService
 func NewStorageMetadata(cfg *ociscfg.Config) suture.Service {
-	if cfg.Mode == 0 {
-		cfg.Storage.Reva.StorageMetadata.Supervised = true
-	}
-	return SutureService{
+	cfg.Storage.Commons = cfg.Commons
+	return MetadataSutureService{
 		cfg: cfg.Storage,
 	}
 }
 
-func (s SutureService) Serve(ctx context.Context) error {
+func (s MetadataSutureService) Serve(ctx context.Context) error {
 	s.cfg.Reva.StorageMetadata.Context = ctx
 	f := &flag.FlagSet{}
-	for k := range StorageMetadata(s.cfg).Flags {
-		if err := StorageMetadata(s.cfg).Flags[k].Apply(f); err != nil {
+	cmdFlags := StorageMetadata(s.cfg).Flags
+	for k := range cmdFlags {
+		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}

@@ -13,7 +13,8 @@ type matchertest struct {
 }
 
 func TestPrefixRouteMatcher(t *testing.T) {
-	cfg := config.New()
+	cfg := config.DefaultConfig()
+	cfg.Policies = config.DefaultPolicies()
 	p := NewMultiHostReverseProxy(Config(cfg))
 
 	table := []matchertest{
@@ -32,7 +33,8 @@ func TestPrefixRouteMatcher(t *testing.T) {
 }
 
 func TestQueryRouteMatcher(t *testing.T) {
-	cfg := config.New()
+	cfg := config.DefaultConfig()
+	cfg.Policies = config.DefaultPolicies()
 	p := NewMultiHostReverseProxy(Config(cfg))
 
 	table := []matchertest{
@@ -59,7 +61,8 @@ func TestQueryRouteMatcher(t *testing.T) {
 }
 
 func TestRegexRouteMatcher(t *testing.T) {
-	cfg := config.New()
+	cfg := config.DefaultConfig()
+	cfg.Policies = config.DefaultPolicies()
 	p := NewMultiHostReverseProxy(Config(cfg))
 
 	table := []matchertest{

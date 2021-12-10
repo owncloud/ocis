@@ -6,9 +6,9 @@ import (
 	"net"
 	"net/rpc"
 
-	"github.com/micro/cli/v2"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
+	"github.com/urfave/cli/v2"
 )
 
 // ListCommand is the entrypoint for the list command.

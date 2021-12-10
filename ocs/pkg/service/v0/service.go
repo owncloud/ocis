@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 
 	"github.com/go-chi/chi/v5"
@@ -19,7 +20,6 @@ import (
 	ocsm "github.com/owncloud/ocis/ocs/pkg/middleware"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
-	"github.com/owncloud/ocis/proxy/pkg/cs3"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
@@ -63,7 +63,9 @@ func NewService(opts ...Option) Service {
 		svc.config.AccountBackend = "accounts"
 	}
 
-	requireUser := ocsm.RequireUser()
+	requireUser := ocsm.RequireUser(
+		ocsm.Logger(options.Logger),
+	)
 
 	requireAdmin := ocsm.RequireAdmin(
 		ocsm.RoleManager(roleManager),
@@ -153,7 +155,7 @@ func (o Ocs) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // NotFound uses ErrRender to always return a proper OCS payload
 func (o Ocs) NotFound(w http.ResponseWriter, r *http.Request) {
-	mustNotFail(render.Render(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "not found")))
+	o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "not found"))
 }
 
 func (o Ocs) getAccountService() accounts.AccountsService {
@@ -161,11 +163,11 @@ func (o Ocs) getAccountService() accounts.AccountsService {
 }
 
 func (o Ocs) getCS3Backend() backend.UserBackend {
-	revaClient, err := cs3.GetGatewayServiceClient(o.config.RevaAddress)
+	revaClient, err := pool.GetGatewayServiceClient(o.config.Reva.Address)
 	if err != nil {
-		o.logger.Fatal().Msgf("could not get reva client at address %s", o.config.RevaAddress)
+		o.logger.Fatal().Msgf("could not get reva client at address %s", o.config.Reva.Address)
 	}
-	return backend.NewCS3UserBackend(revaClient, nil, revaClient, o.logger)
+	return backend.NewCS3UserBackend(nil, revaClient, o.config.MachineAuthAPIKey, o.logger)
 }
 
 func (o Ocs) getGroupsService() accounts.GroupsService {
@@ -174,5 +176,11 @@ func (o Ocs) getGroupsService() accounts.GroupsService {
 
 // NotImplementedStub returns a not implemented error
 func (o Ocs) NotImplementedStub(w http.ResponseWriter, r *http.Request) {
-	mustNotFail(render.Render(w, r, response.ErrRender(data.MetaUnknownError.StatusCode, "Not implemented")))
+	o.mustRender(w, r, response.ErrRender(data.MetaUnknownError.StatusCode, "Not implemented"))
+}
+
+func (o Ocs) mustRender(w http.ResponseWriter, r *http.Request, renderer render.Renderer) {
+	if err := render.Render(w, r, renderer); err != nil {
+		o.logger.Err(err).Msgf("failed to write response for ocs request %s on %s", r.Method, r.URL)
+	}
 }

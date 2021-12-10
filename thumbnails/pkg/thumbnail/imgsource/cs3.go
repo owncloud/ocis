@@ -12,6 +12,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rhttp"
+	"github.com/owncloud/ocis/thumbnails/pkg/config"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/metadata"
 )
@@ -23,12 +24,14 @@ const (
 )
 
 type CS3 struct {
-	client gateway.GatewayAPIClient
+	client   gateway.GatewayAPIClient
+	insecure bool
 }
 
-func NewCS3Source(c gateway.GatewayAPIClient) CS3 {
+func NewCS3Source(cfg config.Thumbnail, c gateway.GatewayAPIClient) CS3 {
 	return CS3{
-		client: c,
+		client:   c,
+		insecure: cfg.CS3AllowInsecure,
 	}
 }
 
@@ -67,7 +70,9 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	httpReq.Header.Set(revactx.TokenHeader, auth)
 	httpReq.Header.Set(TokenTransportHeader, tk)
 
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{
+		InsecureSkipVerify: s.insecure, //nolint:gosec
+	}
 	client := &http.Client{}
 
 	resp, err := client.Do(httpReq) // nolint:bodyclose

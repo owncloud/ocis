@@ -22,7 +22,8 @@ func Run(cfg *config.Config) *cobra.Command {
 				log.Fatal("dialing:", err)
 			}
 			var res int
-			if err := client.Call("Service.Start", &args[0], &res); err != nil {
+
+			if err = client.Call("Service.Start", &args[0], &res); err != nil {
 				log.Fatal(err)
 			}
 

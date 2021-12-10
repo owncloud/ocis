@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -67,6 +68,13 @@ func (p Web) getPayload() (payload []byte, err error) {
 		if p.config.Web.Config.Options == nil {
 			p.config.Web.Config.Options = make(map[string]interface{})
 			p.config.Web.Config.Options["hideSearchBar"] = true
+		}
+
+		// build theme url
+		if themeServer, err := url.Parse(p.config.Web.ThemeServer); err == nil {
+			p.config.Web.Config.Theme = themeServer.String() + p.config.Web.ThemePath
+		} else {
+			p.config.Web.Config.Theme = p.config.Web.ThemePath
 		}
 
 		if p.config.Web.Config.ExternalApps == nil {
@@ -133,14 +141,21 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 	if !strings.HasSuffix(rootWithSlash, "/") {
 		rootWithSlash = rootWithSlash + "/"
 	}
+	assets := assets.New(
+		assets.Logger(p.logger),
+		assets.Config(p.config),
+	)
+
+	notFoundFunc := func(w http.ResponseWriter, r *http.Request) {
+		// TODO: replace the redirect with a not found page containing a link to the Web UI
+		http.Redirect(w, r, rootWithSlash, http.StatusTemporaryRedirect)
+	}
 
 	static := http.StripPrefix(
 		rootWithSlash,
-		http.FileServer(
-			assets.New(
-				assets.Logger(p.logger),
-				assets.Config(p.config),
-			),
+		interceptNotFound(
+			http.FileServer(assets),
+			notFoundFunc,
 		),
 	)
 
@@ -157,16 +172,11 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 				rootWithSlash,
 				http.StatusMovedPermanently,
 			)
-
 			return
 		}
 
 		if r.URL.Path != rootWithSlash && strings.HasSuffix(r.URL.Path, "/") {
-			http.NotFound(
-				w,
-				r,
-			)
-
+			notFoundFunc(w, r)
 			return
 		}
 
@@ -181,4 +191,33 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 
 		static.ServeHTTP(w, r)
 	}
+}
+
+func interceptNotFound(h http.Handler, notFoundFunc func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		notFoundInterceptor := &NotFoundInterceptor{ResponseWriter: w}
+		h.ServeHTTP(notFoundInterceptor, r)
+		if notFoundInterceptor.status == http.StatusNotFound {
+			notFoundFunc(w, r)
+		}
+	}
+}
+
+type NotFoundInterceptor struct {
+	http.ResponseWriter
+	status int
+}
+
+func (w *NotFoundInterceptor) WriteHeader(status int) {
+	w.status = status
+	if status != http.StatusNotFound {
+		w.ResponseWriter.WriteHeader(status)
+	}
+}
+
+func (w *NotFoundInterceptor) Write(p []byte) (int, error) {
+	if w.status != http.StatusNotFound {
+		return w.ResponseWriter.Write(p)
+	}
+	return len(p), nil
 }

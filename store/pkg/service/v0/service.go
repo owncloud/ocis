@@ -7,12 +7,12 @@ import (
 	"os"
 	"path/filepath"
 
-	merrors "github.com/asim/go-micro/v3/errors"
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/keyword"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/store/pkg/config"
 	"github.com/owncloud/ocis/store/pkg/proto/v0"
+	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
@@ -242,7 +242,7 @@ func (s *Service) Tables(ctx context.Context, in *proto.TablesRequest, out *prot
 }
 
 // TODO sanitize key. As it may contain invalid characters, such as slashes.
-// file: /var/tmp/ocis/store/databases/{database}/{table}/{record.key}.
+// file: /tmp/ocis-store/databases/{database}/{table}/{record.key}.
 func getID(database string, table string, key string) string {
 	// TODO sanitize input.
 	return filepath.Join(database, table, key)

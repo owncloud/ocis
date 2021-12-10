@@ -7,22 +7,30 @@ release: release-dirs release-linux release-windows release-darwin release-copy 
 
 .PHONY: release-dirs
 release-dirs:
-	mkdir -p $(DIST)/binaries $(DIST)/release
+	@mkdir -p $(DIST)/binaries $(DIST)/release
+
+# docker specific packaging flags
+DOCKER_LDFLAGS += -X "$(OCIS_REPO)/ocis-pkg/config/defaults.BaseDataPathType=path" -X "$(OCIS_REPO)/ocis-pkg/config/defaults.BaseDataPathValue=/var/lib/ocis"
+release-linux-docker-amd64: $(GOX) release-dirs
+	@$(GOX) -tags 'netgo $(TAGS)' -ldflags '-extldflags "-static" $(LDFLAGS) $(DOCKER_LDFLAGS)' -os 'linux' -arch 'amd64' -output '$(DIST)/binaries/$(EXECUTABLE)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
+
+release-linux-docker-arm: $(GOX) release-dirs
+	@$(GOX) -tags 'netgo $(TAGS)' -ldflags '-extldflags "-static" $(LDFLAGS) $(DOCKER_LDFLAGS)' -os 'linux' -arch 'arm' -output '$(DIST)/binaries/$(EXECUTABLE)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
+
+release-linux-docker-arm64: $(GOX) release-dirs
+	@$(GOX) -tags 'netgo $(TAGS)' -ldflags '-extldflags "-static" $(LDFLAGS) $(DOCKER_LDFLAGS)' -os 'linux' -arch 'arm64' -output '$(DIST)/binaries/$(EXECUTABLE)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
 
 .PHONY: release-linux
 release-linux: $(GOX) release-dirs
-	$(GOX) -tags 'netgo $(TAGS)' -ldflags '-extldflags "-static" $(LDFLAGS)' -os 'linux' -arch 'amd64 386 arm64 arm' -output '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
-
-release-linux-docker: $(GOX) release-dirs
-	$(GOX) -tags 'netgo $(TAGS)' -ldflags '-extldflags "-static" $(LDFLAGS)' -os 'linux' -arch 'amd64 386 arm64 arm' -output '$(DIST)/binaries/$(EXECUTABLE)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
+	@$(GOX) -tags 'netgo $(TAGS)' -ldflags '-extldflags "-static" $(LDFLAGS)' -os 'linux' -arch 'amd64 386 arm64 arm' -output '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
 
 .PHONY: release-windows
 release-windows: $(GOX) release-dirs
-	$(GOX) -tags 'netgo $(TAGS)' -ldflags '-extldflags "-static" $(LDFLAGS)' -os 'windows' -arch 'amd64' -output '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
+	@$(GOX) -tags 'netgo $(TAGS)' -ldflags '-extldflags "-static" $(LDFLAGS)' -os 'windows' -arch 'amd64' -output '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
 
 .PHONY: release-darwin
 release-darwin: $(GOX) release-dirs
-	$(GOX) -tags 'netgo $(TAGS)' -ldflags '$(LDFLAGS)' -os 'darwin' -arch 'amd64' -output '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
+	@$(GOX) -tags 'netgo $(TAGS)' -ldflags '$(LDFLAGS)' -os 'darwin' -arch 'amd64 arm64' -output '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-{{.OS}}-{{.Arch}}' ./cmd/$(NAME)
 
 .PHONY: release-copy
 release-copy:

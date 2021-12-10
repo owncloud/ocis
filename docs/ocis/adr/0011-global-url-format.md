@@ -97,17 +97,18 @@ This ADR is limited to the scope of "how will a web client deal with the browser
 
 ## Decision Outcome
 
-Chosen option: "[option 1]", because [justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force force | … | comes out best (see below)].
+Chosen option: "Mixed global URLs", because it meets the requirement to contain a path and a stable identifier.
 
 ### Positive Consequences <!-- optional -->
 
-* [e.g., improvement of quality attribute satisfaction, follow-up decisions required, …]
-* …
+* The path makes it "human readable"
+* The URL can be bookmarked
+* The bookmarked URLs remain stable even if the path changes
+* All URLs can be shortened to hide any metadata like path, resource name and query parameters
 
 ### Negative Consequences <!-- optional -->
 
-* [e.g., compromising quality attribute, follow-up decisions required, …]
-* …
+* the web UI needs to look up the space alias in a registry to build an API request for the `/dav/space` endpoint
 
 ## Pros and Cons of the Options
 
@@ -177,7 +178,7 @@ There is a customized ownCloud instance that uses path only based URLs:
 {{< hint >}}
 * `/#` is used by the current vue router.
 * `/s` denotes that this is a space url.
-* `<space_id>` and `<resource_id>` both consist of `<storage_id>:<node_id>`, but the `space_id` can be replaced with a shorter id or an alias. See furthor down below.
+* `<space_id>` and `<resource_id>` both consist of `<storage_id>:<node_id>`, but the `space_id` can be replaced with a shorter id or an alias. See further down below.
 * `<relative/path>` takes precedence over the `<resource_id>`, both are optional
 {{< /hint >}}
 
@@ -245,11 +246,11 @@ When every space has a namespaced alias and a relative path we can build a globa
 | `https://demo.owncloud.com/files/personal/einstein/relative/path/to/resource?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | sub folder `/relative/path/to/resource` |
 | `https://demo.owncloud.com/files/shares/einstein/somesharename?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | shared URL for `/relative/path/to/resource` |
 | `https://demo.owncloud.com/files/personal/einstein/marie is stupid/and richard as well/resource?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | sub folder `marie is stupid/and richard as well/resource` ... something einstein might not want to reveal |
-| `https://demo.owncloud.com/files/shares/einstein/resource (2)?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | named link URL for `/marie is stupid/and richard as well/resource`, does not disclose the actual hierarchy, has an appended counter to avaid a collision |
+| `https://demo.owncloud.com/files/shares/einstein/resource (2)?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | named link URL for `/marie is stupid/and richard as well/resource`, does not disclose the actual hierarchy, has an appended counter to avoid a collision |
 | `https://demo.owncloud.com/files/shares/einstein/mybestfriends?id=b78c2044-5b51-446f-82f6-907a664d089c:194b4a97-597c-4461-ab56-afd4f5a21608` | named link URL for `/marie is stupid/and richard as well/resource`, does not disclose the actual hierarchy, has a custom alias for the share |
 | `https://demo.owncloud.com/files/public/kcZVYaXr7oZ66bg/relative/path/to/resource` | sub folder `/relative/path/to/resource` in public link with token `kcZVYaXr7oZ66bg` |
 | `https://demo.owncloud.com/files/public/kcZVYaXr7oZ66bg/relative/path/to/resource` | sub folder `/relative/path/to/resource` in public link with token `kcZVYaXr7oZ66bg` |
-| `https://demo.owncloud.com/s/kcZVYaXr7oZ66bg/` | shortened link to a resource. This is needed to be able to copy a link to a resource whithout leaking any metadata. |
+| `https://demo.owncloud.com/s/kcZVYaXr7oZ66bg/` | shortened link to a resource. This is needed to be able to copy a link to a resource without leaking any metadata. |
 
 
 `</namespaced/alias></relative/path/to/resource>` is the global path in the CS3 api. The CS3 Storage Registry is responsible by managing the mount points.

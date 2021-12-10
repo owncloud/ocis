@@ -90,7 +90,7 @@ func DataRender(d interface{}) render.Renderer {
 	}
 }
 
-// ErrRender creates an Error Paylod with the given OCS error code and message
+// ErrRender creates an Error Payload with the given OCS error code and message
 // The httpcode will be determined using the API version stored in the context
 func ErrRender(c int, m string) render.Renderer {
 	return &Response{

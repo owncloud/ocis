@@ -8,15 +8,15 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/asim/go-micro/v3/metadata"
-	"github.com/glauth/glauth/pkg/config"
-	"github.com/glauth/glauth/pkg/handler"
-	"github.com/glauth/glauth/pkg/stats"
+	"github.com/glauth/glauth/v2/pkg/config"
+	"github.com/glauth/glauth/v2/pkg/handler"
+	"github.com/glauth/glauth/v2/pkg/stats"
 	ber "github.com/nmcclain/asn1-ber"
 	"github.com/nmcclain/ldap"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
+	"go-micro.dev/v4/metadata"
 )
 
 type queryType string
@@ -88,8 +88,8 @@ func (h ocisHandler) Bind(bindDN, bindSimplePw string, conn net.Conn) (ldap.LDAP
 	// check password
 	res, err := h.as.ListAccounts(ctx, &accounts.ListAccountsRequest{
 		//Query: fmt.Sprintf("username eq '%s'", username),
-		// TODO this allows lookung up users when you know the username using basic auth
-		// adding the password to the query is an option but sending the sover the wira a la scim seems ugly
+		// TODO this allows looking up users when you know the username using basic auth
+		// adding the password to the query is an option but sending this over the wire a la scim seems ugly
 		// but to set passwords our accounts need it anyway
 		Query: fmt.Sprintf("login eq '%s' and password eq '%s'", userName, bindSimplePw),
 	})
@@ -527,8 +527,13 @@ func (h ocisHandler) Delete(boundDN string, deleteDN string, conn net.Conn) (res
 }
 
 // FindUser with the given username
-func (h ocisHandler) FindUser(userName string) (found bool, user config.User, err error) {
+func (h ocisHandler) FindUser(userName string, searchByUPN bool) (found bool, user config.User, err error) {
 	return false, config.User{}, nil
+}
+
+// FindGroup with the given groupname
+func (h ocisHandler) FindGroup(groupName string) (found bool, user config.Group, err error) {
+	return false, config.Group{}, nil
 }
 
 // NewOCISHandler implements a glauth backend with ocis-accounts as the datasource
