@@ -130,6 +130,7 @@ curl -k 'https://localhost:9200/graph/v1.0/me/drives' -u einstein:relativity -v 
     }
   }
 ]
+```
 
 As we can see the response already contains a space-aware dav endpoint, which we can use to upload files to the space:
 
