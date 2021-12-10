@@ -140,13 +140,13 @@ Upload a 6 bytes file:
 Query the quota again:
 
 ```json
-...
-"quota": {
+{
+  "quota": {
     "remaining": 4,
     "total": 10,
     "used": 6
-},
-...
+  }
+}
 ```
 
 Now attempt to upload 5 bytes to the space:

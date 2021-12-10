@@ -36,48 +36,6 @@ A *reference* is a logical concept that identifies a [*resource*]({{< ref "#reso
 The `/` is important because currently the static [*storage registry*]({{< ref "#storage-space-registries" >}}) uses a map to look up which [*storage provider*]({{< ref "#storage-providers" >}}) is responsible for the resource. Paths must be prefixed with `/` so there can be no collisions between paths and storage provider ids in the same map.
 {{< /hint >}}
 
-
-{{< hint warning >}}
-### Alternative: reference triple ####
-A *reference* is a logical concept. It identifies a [*resource*]({{< ref "#resources" >}}) and consists of
-a `storage_space`, a `<root_id>` and a `<path>`
-```
-<storage_space>!<root_id>:<path>
-```
-While all components are optional, only three cases are used:
-| format | example | description |
-|-|-|-|
-| `!:<absolute_path>` | `!:/absolute/path/to/file.ext` | absolute path |
-| `<storage_space>!:<relative_path>` | `ee1687e5-ac7f-426d-a6c0-03fed91d5f62!:path/to/file.ext` | path relative to the root of the storage space |
-| `<storage_space>!<root>:<relative_path>` | `ee1687e5-ac7f-426d-a6c0-03fed91d5f62!c3cf23bb-8f47-4719-a150-1d25a1f6fb56:to/file.ext` | path relative to the specified node in the storage space, used to reference resources without disclosing parent paths |
-
-`<storage_space>` should be a UUID to prevent references from breaking when a *user* or [*storage space*]({{< ref "#storage-spaces" >}}) gets renamed. But it can also be derived from a migration of an oc10 instance by concatenating an instance identifier and the numeric storage id from oc10, e.g. `oc10-instance-a$1234`.
-
-A reference will often start as an absolute/global path, e.g. `!:/home/Projects/Foo`. The gateway will look up the storage provider that is responsible for the path
-
-| Name | Description | Who resolves it? |
-|------|-------------|-|
-| `!:/home/Projects/Foo` | the absolute path a client like davfs will use. | The gateway uses the storage registry to look up the responsible storage provider |
-| `ee1687e5-ac7f-426d-a6c0-03fed91d5f62!:/Projects/Foo` | the `storage_space` is the same as the `root`, the path becomes relative to the root | the storage provider can use this reference to identify this resource |
-
-Now, the same file is accessed as a share
-| Name | Description |
-|------|-------------|
-| `!:/users/Einstein/Projects/Foo` | `Foo` is the shared folder |
-| `ee1687e5-ac7f-426d-a6c0-03fed91d5f62!56f7ceca-e7f8-4530-9a7a-fe4b7ec8089a:` | `56f7ceca-e7f8-4530-9a7a-fe4b7ec8089a` is the id of `Foo`, the path is empty |
-
-
-The `:`, `!` and `$` are chosen from the set of [RFC3986 sub delimiters](https://tools.ietf.org/html/rfc3986#section-2.2) on purpose. They can be used in URLs without having to be encoded. In some cases, a delimiter can be left out if a component is not set:
-| reference | interpretation |
-|-|-|
-| `/absolute/path/to/file.ext` | absolute path, all delimiters omitted |
-| `ee1687e5-ac7f-426d-a6c0-03fed91d5f62!path/to/file.ext` | relative path in the given storage space, root delimiter `:` omitted |
-| `56f7ceca-e7f8-4530-9a7a-fe4b7ec8089a:to/file.ext` | relative path in the given root node, storage space delimiter `!` omitted |
-| `ee1687e5-ac7f-426d-a6c0-03fed91d5f62!56f7ceca-e7f8-4530-9a7a-fe4b7ec8089a:` | node id in the given storage space, `:` must be present |
-| `ee1687e5-ac7f-426d-a6c0-03fed91d5f62` | root of the storage space, all delimiters omitted, can be distinguished by the `/` |
-
-{{< /hint >}}
-
 ## Storage Drivers
 
 A *storage driver* implements access to a [*storage system*]({{< ref "#storage-systems" >}}):
@@ -108,15 +66,10 @@ Technically, this means that every storage driver needs to have a map of a `uuid
 ### Storage Systems
 {{< svg src="extensions/storage/static/storageprovider.drawio.svg" >}}
 
-{{< hint warning >}}
-**Proposed Change**
 A *storage provider* manages multiple [*storage spaces*]({{< ref "#storage-space" >}})
 by accessing a [*storage system*]({{< ref "#storage-systems" >}}) with a [*storage driver*]({{< ref "#storage-drivers" >}}).
 
 {{< svg src="extensions/storage/static/storageprovider-spaces.drawio.svg" >}}
-
-By making [*storage providers*]({{< ref "#storage-providers" >}}) aware of [*storage spaces*]({{< ref "#storage-spaces" >}}) we can get rid of the current `enablehome` flag / hack in reva, which lead to the [spawn of `*home` drivers](https://github.com/cs3org/reva/tree/master/pkg/storage/fs). Furthermore, provisioning a new [*storage space*]({{< ref "#storage-space" >}}) becomes a generic operation, regardless of the need of provisioning a new user home or a new project space.
-{{< /hint >}}
 
 ## Storage Space Registries
 
