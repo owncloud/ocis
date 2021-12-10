@@ -7,6 +7,29 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.16.0 Technology Preview
+
+Version 1.16.0 brings bug fixes, new features and progress for ongoing feature implementations like 'Spaces' and application integrations. ownCloud Web comes with a couple of usability improvements (e.g., breadcrumb context menu, right-click menu for multi-select). Infinite Scale has got a revamped config handling that makes deployments easier and more flexible. Additionally, it enables easy and fast collaboration via public links.
+
+The most prominent changes in ownCloud Infinite Scale 1.16.0 and ownCloud Web 4.6.0 comprise:
+
+- ownCloud Web now provides a context menu in the navigation breadcrumb that allows users to conduct actions for the parent folder (e.g., sharing). [web#6044](https://github.com/owncloud/web/pull/6044)
+- It is now possible to edit files with integrated applications in public links. [cs3org/reva#2310](https://github.com/cs3org/reva/pull/2310)
+- Infinite Scale now provides the API endpoints to manage Spaces (e.g., add/remove users, manage their roles). [ocis#2740](https://github.com/owncloud/ocis/issues/2740) [cs3org/reva#2250](https://github.com/cs3org/reva/pull/2250)
+- The config handling in Infinite Scale has received a huge rework to better enable different deployment and configuration models (environment variables, single config file, service-specific config files). More information can be found in the [documentation](https://owncloud.dev/ocis/config/). [#2708](https://github.com/owncloud/ocis/pull/2708)
+- The right-click context menu in ownCloud Web now works when multiple files have been selected. [web#5973](https://github.com/owncloud/web/pull/5973)
+- ownCloud Web now shows accessibility-optimized tooltips with absolute dates on relative dates. [web#6037](https://github.com/owncloud/web/pull/6037)
+- Pagination in folders with many files now works properly again. [#6056](https://github.com/owncloud/web/pull/6056)
+- The s3ng metadata storage backend works again. [#2807](https://github.com/owncloud/ocis/pull/2807)
+- Improvements have been added to support more identity providers (e.g., Authelia). [cs3org/reva#2314](https://github.com/cs3org/reva/pull/2314)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.16.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v4.6.0) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.15.0 Technology Preview
 
 Version 1.15.0 brings improvements for the app provider (external application integrations) and more progress on the 'Spaces' feature. Public links now support multi-file and folder downloads as well as all other external application integrations. ownCloud Web 4.5.0 furthermore comes with improvements for use with the ownCloud Classic backend. 
