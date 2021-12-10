@@ -10,18 +10,16 @@ geekdocFilePath: _index.md
 {{< figure class="floatright" src="/media/is.png" width="70%" height="auto" >}}
 
 ## ownCloud Infinite Scale
-
 Welcome to oCIS, the modern file-sync and share platform, which is based on our knowledge and experience with the PHP based [ownCloud server](https://owncloud.com/#server).
 
 ### The idea of federated storage
+To creata a truly federated storage architecture oCIS breaks down the old ownCloud 10 user specific namespace, which is assembled on the server side, and makes the individual parts accessible to clients as storage spaces and storage space registries.
 
-To create a truly federated storage architecture oCIS breaks down the old ownCloud 10 user specific namespace, which is assembled on the server side, and makes the individual parts accessible to clients as storage spaces and storage space registries.
-
-The below diagram shows the core concepts that are the foundation for the new architecture:
+The below diagram shows the core conceps that are the foundation for the new architecture:
 - End user devices can fetch the list of *storage spaces* a user has access to, by querying one or multiple *storage space registries*. The list contains a unique endpoint for every *storage space*.
 - [*Storage space registries*]({{< ref "../extensions/storage/terminology#storage-space-registries" >}}) manage the list of storage spaces a user has access to. They may subscribe to *storage spaces* in order to receive notifications about changes on behalf of an end users mobile or desktop client.
-- [*Storage spaces*]({{< ref "../extensions/storage/terminology#storage-spaces" >}}) represent a collection of files and folders. A users personal files are a *storage space*, a group or project drive is a *storage space*, and even incoming shares are treated and implemented as *storage spaces*. Each with properties like owners, permissions, quota and type.
-- [*Storage providers*]({{< ref "../extensions/storage/terminology#storage-providers" >}}) can hold multiple *storage spaces*. At an oCIS instance, there might be a dedicated *storage provider* responsible for users personal storage spaces. There might be multiple, sharing the load or there might be just one, hosting all types of *storage spaces*.
+- [*Storage spaces*]({{< ref "../extensions/storage/terminology#storage-spaces" >}}) represent a collection of files and folders. A users personal files are contained in a *storage space*, a group or project drive is a *storage space*, and even incoming shares are treated and implemented as *storage spaces*. Each with properties like owners, permissions, quota and type.
+- [*Storage providers*]({{< ref "../extensions/storage/terminology#storage-providers" >}}) can hold multiple *storage spaces*. At an oCIS instance, there might be a dedicated *storage provider* responsible for users personal storage spaces. There might be multiple, either to shard the load, provide different levels of redundancy or support custom workflows. Or there might be just one, hosting all types of *storage spaces*.
 
 {{< svg src="ocis/static/idea.drawio.svg" >}}
 
@@ -42,7 +40,7 @@ The oCIS runtime allows us to dynamically manage services running in a single pr
 ### oCIS extensions
 
 Every oCIS extension uses [ocis-pkg](https://github.com/owncloud/ocis/tree/master/ocis-pkg), which implements the [go-micro](https://go-micro.dev/) interfaces for [servers](https://github.com/asim/go-micro/blob/v3.5.0/server/server.go#L17-L37) to register and [clients](https://github.com/asim/go-micro/blob/v3.5.0/client/client.go#L11-L23) to lookup nodes with a service [registry](https://github.com/asim/go-micro/blob/v3.5.0/registry/registry.go).
-We are following the [12 Factor](https://12factor.net/) methodology with oCIS. The uniformity of services also allows us to use the same command, logging and configuration mechanism. Configurations are forwarded from the 
+We are following the [12 Factor](https://12factor.net/) methodology with oCIS. The uniformity of services also allows us to use the same command, logging and configuration mechanism. Configurations are forwarded from the
 oCIS runtime to the individual extensions.
 
 
