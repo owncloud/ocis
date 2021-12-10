@@ -73,24 +73,7 @@ by accessing a [*storage system*]({{< ref "#storage-systems" >}}) with a [*stora
 
 ## Storage Space Registries
 
-A *storage registry* manages the [*CS3 global namespace*]({{< ref "./namespaces.md#cs3-global-namespaces" >}}):
-It is used by the *gateway*
-to look up `address` and `port` of the [*storage provider*]({{< ref "#storage-providers" >}})
-that should handle a [*reference*]({{< ref "#references" >}}).
-
-{{< svg src="extensions/storage/static/storageregistry.drawio.svg" >}}
-
-{{< hint warning >}}
-**Proposed Change**
-A *storage space registry* manages the [*namespace*]({{< ref "./namespaces.md" >}}) for a *user*:
-It is used by the *gateway*
-to look up `address` and `port` of the [*storage provider*]({{< ref "#storage-providers" >}})
-that is currently serving a [*storage space*]({{< ref "#storage-space" >}}).
-
-{{< svg src="extensions/storage/static/storageregistry-spaces.drawio.svg" >}}
-
-By making *storage registries* aware of [*storage spaces*]({{< ref "#storage-spaces" >}}) we can query them for a listing of all [*storage spaces*]({{< ref "#storage-spaces" >}}) a user has access to. Including his home, received shares, project folders or group drives. See [a WIP PR for spaces in the oCIS repo (#1827)](https://github.com/owncloud/ocis/pull/1827) for more info.
-{{< /hint >}}
+A [*storage spaces registry*]({{< ref "./spacesregistry.md" >}}) manages the [*namespace*]({{< ref "./namespaces.md" >}}) for a *user*
 
 ## Storage Spaces
 A *storage space* is a logical concept:
@@ -105,7 +88,7 @@ Examples would be every user's home storage space, project storage spaces or gro
 Finally, a logical `storage space id` is not tied to a specific [*storage provider*]({{< ref "#storage-providers" >}}). If the [*storage driver*]({{< ref "#storage-drivers" >}}) supports it, we can import existing files including their `file id`, which makes it possible to move [*storage spaces*]({{< ref "#storage-spaces" >}}) between [*storage providers*]({{< ref "#storage-providers" >}}) to implement storage classes, e.g. with or without archival, workflows, on SSDs or HDDs.
 
 ## Shares
-*To be clarified: we are aware that [*storage spaces*]({{< ref "#storage-spaces" >}}) may be too 'heavyweight' for ad hoc sharing with groups. That being said, there is no technical reason why group shares should not be treated like [*storage spaces*]({{< ref "#storage-spaces" >}}) that users can provision themselves. They would share the quota with the users home [*storage space*]({{< ref "#storage-spaces" >}}) and the share initiator would be the sole owner. Technically, the mechanism of treating a share like a new [*storage space*]({{< ref "#storage-spaces" >}}) would be the same. This obviously also extends to user shares and even file individual shares that would be wrapped in a virtual collection. It would also become possible to share collections of arbitrary files in a single storage space, e.g. the ten best pictures from a large album.*
+*To be clarified: we are aware that [*storage spaces*]({{< ref "#storage-spaces" >}}) may be too 'heavyweight' for ad hoc sharEsing with groups. That being said, there is no technical reason why group shares should not be treated like [*storage spaces*]({{< ref "#storage-spaces" >}}) that users can provision themselves. They would share the quota with the users home [*storage space*]({{< ref "#storage-spaces" >}}) and the share initiator would be the sole owner. Technically, the mechanism of treating a share like a new [*storage space*]({{< ref "#storage-spaces" >}}) would be the same. This obviously also extends to user shares and even file individual shares that would be wrapped in a virtual collection. It would also become possible to share collections of arbitrary files in a single storage space, e.g. the ten best pictures from a large album.*
 
 
 ## Storage Systems
