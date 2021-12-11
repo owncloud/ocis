@@ -240,7 +240,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 
 	newDrive, err := cs3StorageSpaceToDrive(wdu, resp.StorageSpace)
 	if err != nil {
-		g.logger.Error().Err(err).Msg("error parsing url")
+		g.logger.Error().Err(err).Msg("error parsing space")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -322,11 +322,32 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, resp.GetStatus().GetMessage())
+		switch resp.Status.GetCode() {
+		case v1beta11.Code_CODE_NOT_FOUND:
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, resp.GetStatus().GetMessage())
+			return
+		default:
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, resp.GetStatus().GetMessage())
+			return
+		}
+	}
+
+	wdu, err := url.Parse(g.config.Spaces.WebDavBase + g.config.Spaces.WebDavPath)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error parsing url")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	updatedDrive, err := cs3StorageSpaceToDrive(wdu, resp.StorageSpace)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error parsing space")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, updatedDrive)
 }
 
 func cs3TimestampToTime(t *types.Timestamp) time.Time {
