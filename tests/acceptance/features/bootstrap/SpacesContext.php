@@ -187,11 +187,11 @@ class SpacesContext implements Context {
 	 */
 	public function getSpaceByName(string $user, string $name): array {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
-		
+
 		$spaces = $this->getAvailableSpaces();
 		Assert::assertIsArray($spaces[$name], "Space with name $name for user $user not found");
 		Assert::assertNotEmpty($spaces[$name]["root"]["webDavUrl"], "WebDavUrl for space with name $name for user $user not found");
-		
+
 		return $spaces[$name];
 	}
 
@@ -802,7 +802,7 @@ class SpacesContext implements Context {
 		string $spaceName
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-	
+
 		$baseUrl = $this->featureContext->getBaseUrl();
 		if (!str_ends_with($baseUrl, '/')) {
 			$baseUrl .= '/';
@@ -838,7 +838,7 @@ class SpacesContext implements Context {
 		string $ownerUser
 	): void {
 		$space = $this->getSpaceByName($ownerUser, $spaceName);
-	
+
 		$baseUrl = $this->featureContext->getBaseUrl();
 		if (!str_ends_with($baseUrl, '/')) {
 			$baseUrl .= '/';
@@ -1044,7 +1044,7 @@ class SpacesContext implements Context {
 		if (!str_ends_with($fullUrl, '/')) {
 			$fullUrl .= '/';
 		}
-		$fullUrl .= "graph/v1.0/Drive($spaceId)";
+		$fullUrl .= "graph/v1.0/drives/$spaceId";
 		$method = 'PATCH';
 
 		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers, $body);
@@ -1090,7 +1090,7 @@ class SpacesContext implements Context {
 	 */
 	public function userHasUploadedFile(string $user, string $spaceName, string $fileContent, string $destination):void {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
-		
+
 		$space = $this->getSpaceByName($user, $spaceName);
 		Assert::assertIsArray($space, "Space with name $spaceName not found");
 		Assert::assertNotEmpty($space["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName not found");
