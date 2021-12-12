@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Use the CS3api up- and download workflow for the accounts service: [#2837](https://github.com/owncloud/ocis/pull/2837)
 * Change - Rename `APP_PROVIDER_BASIC_*` environment variables: [#2812](https://github.com/owncloud/ocis/pull/2812)
 * Change - Restructure Configuration Parsing: [#2708](https://github.com/owncloud/ocis/pull/2708)
+* Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
 * Change - OIDC: fallback if IDP doesn't provide "preferred_username" claim: [#2644](https://github.com/owncloud/ocis/issues/2644)
 * Enhancement - Cleanup ocis-pkg config: [#2813](https://github.com/owncloud/ocis/pull/2813)
 * Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
@@ -75,6 +76,12 @@ The following sections list the changes for unreleased.
    files. This greatly simplifies configuration and deployment.
 
    https://github.com/owncloud/ocis/pull/2708
+
+* Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
+
+   This updates the libre-graph-api to use the latest spec and types.
+
+   https://github.com/owncloud/ocis/pull/2858
 
 * Change - OIDC: fallback if IDP doesn't provide "preferred_username" claim: [#2644](https://github.com/owncloud/ocis/issues/2644)
 
