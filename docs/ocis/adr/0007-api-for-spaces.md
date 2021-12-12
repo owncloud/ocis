@@ -45,7 +45,7 @@ This the DRAFT for the API.
 
 ownCloud servers provide an API to query for available spaces of an user.
 
-See the openAPI Specification for the [open Graph API](https://owncloud.dev/open-graph-api/).
+See the openAPI Specification for the [Libre Graph API](https://owncloud.dev/libre-graph-api/).
 
 Most important, the API returns the WebDAV endpoint for each space. With that, clients do not have to make assumptions about WebDAV routes any more.
 
@@ -80,8 +80,7 @@ The reply to both calls is either one or a list of [Drive representation objects
   "owner": { "@odata.type": "microsoft.graph.identitySet" },
   "quota": { "@odata.type": "microsoft.graph.quota" },
   "root":  { "@odata.type": "microsoft.graph.driveItem" },
-  "webUrl": "url",
-  "ocCoOwner": [ { "@odata.type": "microsoft.graph.identitySet" } ]
+  "webUrl": "url"
 }
 ```
 
@@ -93,7 +92,6 @@ The meaning of the objects in Open Graph API context are:
 4. **quota** - quota information about this space
 5. **root**  - the root driveItem object.
 6. **webUrl** - The URL to make this space visible in the browser.
-7. **ocCoOwner** - optional array owner objects of the co-owners of a space (*)
 
 The following *driveType* values are available in the first step, but might be enhanced later:
 
