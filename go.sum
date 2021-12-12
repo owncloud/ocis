@@ -993,7 +993,6 @@ github.com/onsi/ginkgo v1.16.5/go.mod h1:+E8gABHa3K6zRBolWtd+ROzc/U5bkGt0FwiG042
 github.com/onsi/gomega v1.4.3/go.mod h1:ex+gbHU/CVuBBDIJjb2X0qEXbFg53c61hWP/1CpauHY=
 github.com/onsi/gomega v1.7.1/go.mod h1:XdKZgCCFLUoM/7CFJVPcG8C1xQ1AJ0vpAezJrB7JYyY=
 github.com/onsi/gomega v1.10.1/go.mod h1:iN09h71vgCQne3DLsj+A5owkum+a2tYe+TOCB1ybHNo=
-github.com/onsi/gomega v1.10.5/go.mod h1:gza4q3jKQJijlu05nKWRCW/GavJumGt8aNRxWg7mt48=
 github.com/onsi/gomega v1.17.0 h1:9Luw4uT5HTjHTN8+aNcSThgH1vdXnmdJ8xIfZ4wyTRE=
 github.com/onsi/gomega v1.17.0/go.mod h1:HnhC7FXeEQY45zxNK3PPoIUhzk/80Xly9PcubAlGdZY=
 github.com/op/go-logging v0.0.0-20160315200505-970db520ece7/go.mod h1:HzydrMdWErDVzsI23lYNej1Htcns9BCg93Dk0bBINWk=
@@ -1010,8 +1009,8 @@ github.com/oracle/oci-go-sdk v24.3.0+incompatible/go.mod h1:VQb79nF8Z2cwLkLS35uk
 github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc h1:Ak86L+yDSOzKFa7WM5bf5itSOo1e3Xh8bm5YCMUXIjQ=
 github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CFcDWnWD9XkenwhI=
 github.com/ovh/go-ovh v1.1.0/go.mod h1:AxitLZ5HBRPyUd+Zl60Ajaag+rNTdVXWIkzfrVuTXWA=
-github.com/owncloud/open-graph-api-go v0.0.0-20211018134924-bea0e2a6ec3e h1:Aww53qP8t9WmFq88NZk5BIcVz6zH4z4QqE98JEpsLRs=
-github.com/owncloud/open-graph-api-go v0.0.0-20211018134924-bea0e2a6ec3e/go.mod h1:1Z3JQaJg9KjZ9dW5fxA0hfqdgL9Ma/9wmU3Uk+7rIx4=
+github.com/owncloud/libre-graph-api-go v0.3.0 h1:CjSWuL6Gd+HgIlZfBLjYTloH1F/8naxaL5xZZz4N+ms=
+github.com/owncloud/libre-graph-api-go v0.3.0/go.mod h1:dOt7+kXldpyUGBFdfFBs6PbWElqqa2/Q5+pMF9izL3w=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
@@ -1092,13 +1091,10 @@ github.com/prometheus/tsdb v0.7.1/go.mod h1:qhTCs0VvXwvX/y3TZrWD7rabWM+ijKTux40T
 github.com/rainycape/memcache v0.0.0-20150622160815-1031fa0ce2f2/go.mod h1:7tZKcyumwBO6qip7RNQ5r77yrssm9bfCowcLEBcU5IA=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
+github.com/rickb777/date v1.12.4 h1:+6IzcCCS/1t17DrmnEvrznyq7nM8vPwir6/UhlyohKw=
 github.com/rickb777/date v1.12.4/go.mod h1:xP0eo/I5qmUt97yRGClHZfyLZ3ikMw6v6SU5MOGZTE0=
-github.com/rickb777/date v1.16.1 h1:nUx7FrnRLxwj4QpbuHOz7RRcnEyFOiXnZxdC2lx0f8c=
-github.com/rickb777/date v1.16.1/go.mod h1:QwU+l0bIHSFsMQH12voxZbC531J+lM3A/ZFq5gku8F8=
+github.com/rickb777/plural v1.2.0 h1:5tvEc7UBCZ7l8h/2UeybSkt/uu1DQsZFOFdNevmUhlE=
 github.com/rickb777/plural v1.2.0/go.mod h1:UdpyWFCGbo3mvK3f/PfZOAOrkjzJlYN/sD46XNWJ+Es=
-github.com/rickb777/plural v1.3.0/go.mod h1:xyHbelv4YvJE51gjMnHvk+U2e9zIysg6lTnSQK8XUYA=
-github.com/rickb777/plural v1.4.1 h1:5MMLcbIaapLFmvDGRT5iPk8877hpTPt8Y9cdSKRw9sU=
-github.com/rickb777/plural v1.4.1/go.mod h1:kdmXUpmKBJTS0FtG/TFumd//VBWsNTD7zOw7x4umxNw=
 github.com/rivo/uniseg v0.2.0 h1:S1pD9weZBuJdFmowNwbpi7BJ8TNftyUImj/0WQi72jY=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rogpeppe/fastuuid v0.0.0-20150106093220-6724a57986af/go.mod h1:XWv6SoW27p1b0cqNHllgS5HIMJraePCO15w5zCzIWYg=

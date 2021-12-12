@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
-	msgraph "github.com/owncloud/open-graph-api-go"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
 // ErrorCode defines code as used in MS Graph - see https://docs.microsoft.com/en-us/graph/errors?context=graph%2Fapi%2F1.0&view=graph-rest-1.0
@@ -86,8 +86,8 @@ func (e ErrorCode) Render(w http.ResponseWriter, r *http.Request, status int, ms
 	}
 
 	innererror["request-id"] = middleware.GetReqID(r.Context())
-	resp := &msgraph.OdataError{
-		Error: msgraph.OdataErrorMain{
+	resp := &libregraph.OdataError{
+		Error: libregraph.OdataErrorMain{
 			Code:       e.String(),
 			Message:    msg,
 			Innererror: &innererror,
