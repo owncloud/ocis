@@ -249,10 +249,10 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
-	driveID := chi.URLParam(r, "driveID")
-	driveID, err := url.PathUnescape(driveID)
+	driveID, err := url.PathUnescape(chi.URLParam(r, "driveID"))
 	if err != nil {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping drive id failed")
+		return
 	}
 
 	if driveID == "" {

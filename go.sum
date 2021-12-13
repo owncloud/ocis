@@ -299,6 +299,8 @@ github.com/crewjam/saml v0.4.5/go.mod h1:qCJQpUtZte9R1ZjUBcW8qtCNlinbO363ooNl02S
 github.com/cs3org/cato v0.0.0-20200828125504-e418fc54dd5e/go.mod h1:XJEZ3/EQuI3BXTp/6DUzFr850vlxq11I6satRtz0YQ4=
 github.com/cs3org/go-cs3apis v0.0.0-20211104090126-8e972dca8304 h1:e/nIPR518vyvrulo9goAZTtYD6gFfu/2/9MDe6mTGcw=
 github.com/cs3org/go-cs3apis v0.0.0-20211104090126-8e972dca8304/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
+github.com/cs3org/reva v1.17.1-0.20211212151213-778de37266ff h1:IUj5GfxDa8WgNzeH+5MnJREzjoneejygmnMgU2hAWCg=
+github.com/cs3org/reva v1.17.1-0.20211212151213-778de37266ff/go.mod h1:gtsVzMfDrUiUjH6qlHx+QqiRKsSYjVO6wEcCzANiqUg=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8/go.mod h1:4abs/jPXcmJzYoYGF91JF9Uq9s/KL5n1jvFDix8KcqY=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
@@ -882,8 +884,6 @@ github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103 h1:Z/i1e+gTZrmcGeZy
 github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103/go.mod h1:o9YPB5aGP8ob35Vy6+vyq3P3bWe7NQWzf+JLiXCiMaE=
 github.com/mennanov/fieldmask-utils v0.5.0 h1:8em4akN0NM3hmmrg8VbvOPfdS4SSBdbFd53m9VtfOg0=
 github.com/mennanov/fieldmask-utils v0.5.0/go.mod h1:lah2lHczE2ff+7SqnNKpB+YzaO7M3h5iNO4LgPTJheM=
-github.com/micbar/reva v1.9.1-0.20211211204557-ace6314aca5d h1:YjTtmls7nPPIa/kAdzlebZlk8bf/E3gA13RophdAFbs=
-github.com/micbar/reva v1.9.1-0.20211211204557-ace6314aca5d/go.mod h1:gtsVzMfDrUiUjH6qlHx+QqiRKsSYjVO6wEcCzANiqUg=
 github.com/miekg/dns v1.0.14/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
 github.com/miekg/dns v1.1.26/go.mod h1:bPDLeHnStXmXAq1m/Ch/hvfNHr14JKNPMBo3VZKjuso=
 github.com/miekg/dns v1.1.40/go.mod h1:KNUDUusw/aVsxyTYZM1oqvCicbwhgbNgztCETuNZ7xM=
