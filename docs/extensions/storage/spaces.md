@@ -47,16 +47,16 @@ This is an extract of an element of the list spaces response. An entire object h
 Having introduced the above, one can refer to a Drive with the following URL format:
 
 ```console
-'https://localhost:9200/graph/v1.0/Drive(1284d238-aa92-42ce-bdc4-0b0000009157!07c26b3a-9944-4f2b-ab33-b0b326fc7570")
+'https://localhost:9200/graph/v1.0/drives/1284d238-aa92-42ce-bdc4-0b0000009157!07c26b3a-9944-4f2b-ab33-b0b326fc7570
 ```
 
 Updating an entity attribute:
 
 ```console
-curl -X PATCH 'https://localhost:9200/graph/v1.0/Drive("1284d238-aa92-42ce-bdc4-0b0000009157!07c26b3a-9944-4f2b-ab33-b0b326fc7570)' -d '{"name":"42"}' -v
+curl -X PATCH 'https://localhost:9200/graph/v1.0/drives/1284d238-aa92-42ce-bdc4-0b0000009157!07c26b3a-9944-4f2b-ab33-b0b326fc7570' -d '{"name":"42"}' -v
 ```
 
-The previous URL resource path segment (`Drive(1284d238-aa92-42ce-bdc4-0b0000009157!07c26b3a-9944-4f2b-ab33-b0b326fc7570)`) is parsed and handed over to the storage registry in order to apply the patch changes in the body, in this case update the space name attribute to `42`. Since space names are not unique we only support addressing them by their unique identifiers, any other query would render too ambiguous and explode in complexity.
+The previous URL resource path segment (`1284d238-aa92-42ce-bdc4-0b0000009157!07c26b3a-9944-4f2b-ab33-b0b326fc7570`) is parsed and handed over to the storage registry in order to apply the patch changes in the body, in this case update the space name attribute to `42`. Since space names are not unique we only support addressing them by their unique identifiers, any other query would render too ambiguous and explode in complexity.
 
 
 ### Updating a space description
