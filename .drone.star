@@ -20,6 +20,82 @@ OC10_URL = "http://oc10:8080"
 
 DRONE_CONFIG_PATH = "/drone/src/tests/parallelDeployAcceptance/drone"
 
+# step volumes
+stepOC10TemplatesVol = \
+    {
+        "name": "config-templates",
+        "path": "/etc/templates",
+    }
+stepOC10PreServerVol = \
+    {
+        "name": "preserver-config",
+        "path": "/etc/pre_server.d",
+    }
+stepOC10AppsVol = \
+    {
+        "name": "core-apps",
+        "path": "/var/www/owncloud/apps",
+    }
+stepOC10CronsVol = \
+    {
+        "name": "crons",
+        "path": "/tmp",
+    }
+stepOC10OCISSharedVol = \
+    {
+        "name": "data",
+        "path": "/mnt/data",
+    }
+stepOCISConfigVol = \
+    {
+        "name": "proxy-config",
+        "path": "/etc/ocis",
+    }
+
+# pipeline volumes
+pipeOC10TemplatesVol = \
+    {
+        "name": "config-templates",
+        "temp": {},
+    }
+pipeOC10PreServerVol = \
+    {
+        "name": "preserver-config",
+        "temp": {},
+    }
+pipeOC10AppsVol = \
+    {
+        "name": "core-apps",
+        "temp": {},
+    }
+pipeOC10CronsVol = \
+    {
+        "name": "crons",
+        "temp": {},
+    }
+pipeOC10OCISSharedVol = \
+    {
+        "name": "data",
+        "temp": {},
+    }
+pipeOCISConfigVol = \
+    {
+        "name": "proxy-config",
+        "temp": {},
+    }       
+
+def appendVolumes(volumeArr = []):
+    volumes = []
+    for volume in volumeArr:
+        volumeType = type(volume)
+        if 'dict' in volumeType:
+            volumes.append(volume)
+        else:
+            print("ERROR: The following volume is of type '%s'. Expected type 'dict'" % (volumeType))
+            print(volume)
+    print(volumes)
+    return volumes
+
 def main(ctx):
     pipelines = []
     pipelines = acceptancePipeline()
@@ -37,9 +113,6 @@ def acceptancePipeline():
         "steps":
             composerInstall() +
             copyConfigs() +
-            # makeNodeGenerate() +
-            # makeGoGenerate() +
-            # buildOCIS() + 
             waitForServices() + 
             oC10Service() + 
             waitForOC10() +
@@ -47,50 +120,28 @@ def acceptancePipeline():
             fixPermissions() +
             ocisServer() + 
             waitForOCIS() + 
-            apiTests(),
+            parallelDeploymentApiTests(),
         "services": keycloakDbService() +
                     oc10DbService() +
                     ldapService() +
                     redisService() +
                     keycloakService(),
-        "volumes": [
-            {
-                "name": "config-templates",
-                "temp": {},
-            },
-            {
-                "name": "preserver-config",
-                "temp": {},
-            },
-            {
-                "name": "crons",
-                "temp": {},
-            },
-            {
-                "name": "data",
-                "temp": {},
-            },
-            {
-                "name": "core-apps",
-                "temp": {},
-            },
-            {
-                "name": "proxy-config",
-                "temp": {},
-            },
-            {
-                "name": "gopath",
-                "temp": {},
-            },
-        ],
+        "volumes": appendVolumes([
+            pipeOC10TemplatesVol, 
+            pipeOC10PreServerVol,
+            pipeOC10AppsVol,
+            pipeOC10CronsVol,
+            pipeOC10OCISSharedVol,
+            pipeOCISConfigVol,
+        ]),
         "trigger": {
             "ref": [
                 "refs/pull/**",
-            ]
-        }
+            ],
+        },
     }
 
-def apiTests():
+def parallelDeploymentApiTests():
     return [{
         "name": "API Tests",
         "image": OC_CI_PHP,
@@ -110,59 +161,7 @@ def apiTests():
             "make -C ./tests/parallelDeployAcceptance test-paralleldeployment-api",
         ],
         "depends_on": ["composer-install", "wait-for-oc10", "wait-for-ocis"],
-        "volumes": [
-            {
-                "name": "core-apps",
-                "path": "/var/www/owncloud/apps",
-            },
-        ]
-    }]
-
-def makeNodeGenerate():
-    return [{
-        "name": "generate-nodejs",
-        "image": OC_CI_NODEJS,
-        "commands": [
-            "make ci-node-generate",
-        ],
-        "volumes": [
-            {
-                "name": "gopath",
-                "path": "/go",
-            },
-        ],
-    }]
-
-def makeGoGenerate():
-    return [{
-        "name": "generate-go",
-        "image": OC_CI_GOLANG,
-        "commands": [
-            "whoami",
-            "make ci-go-generate",
-        ],
-        "volumes": [
-            {
-                "name": "gopath",
-                "path": "/go",
-            },
-        ],
-    }]
-
-def buildOCIS():
-    return [{
-        "name": "build-ocis",
-        "image": OC_CI_GOLANG,
-        "commands": [
-            "make -C ocis build",
-        ],
-        "volumes": [
-            {
-                "name": "gopath",
-                "path": "/go",
-            },
-        ],
-        "depends_on": ["generate-nodejs", "generate-go"]
+        "volumes": appendVolumes([stepOC10AppsVol]),
     }]
 
 def ocisServer():
@@ -241,25 +240,9 @@ def ocisServer():
         "environment": environment,
         "detach": True,
         "commands": [
-            "whoami",
-            "cd /mnt/data",
-            "ls -al",
             "%s/ocis/server.sh" % (DRONE_CONFIG_PATH),
         ],
-        "volumes": [
-            {
-                "name": "data",
-                "path": "/mnt/data",
-            },
-            {
-                "name": "proxy-config",
-                "path": "/etc/ocis",
-            },
-            {
-                "name": "gopath",
-                "path": "/go",
-            },
-        ],
+        "volumes": appendVolumes([stepOC10OCISSharedVol, stepOCISConfigVol]),
         "user": "33:33",
         "depends_on": ["fix-permissions"],
     }]
@@ -316,28 +299,13 @@ def oC10Service():
             "OWNCLOUD_LOG_FILE": "/mnt/data/owncloud.log",
             
         },
-        "volumes": [
-            {
-                "name": "data",
-                "path": "/mnt/data",
-            },
-            {
-                "name": "core-apps",
-                "path": "/var/www/owncloud/apps",
-            },
-            {
-                "name": "config-templates",
-                "path": "/etc/templates",
-            },
-            {
-                "name": "preserver-config",
-                "path": "/etc/pre_server.d",
-            },
-            {
-                "name": "crons",
-                "path": "/tmp",
-            },
-        ],
+        "volumes": appendVolumes([
+            stepOC10OCISSharedVol,
+            stepOC10AppsVol,
+            stepOC10TemplatesVol,
+            stepOC10PreServerVol,
+            stepOC10CronsVol,
+        ]),
         "depends_on": ["wait-for-services", "copy-configs"],
     }]
 
@@ -393,7 +361,7 @@ def keycloakDbService():
             "POSTGRES_DB": "keycloak",
             "POSTGRES_USER": "keycloak",
             "POSTGRES_PASSWORD": "keycloak",
-        }
+        },
     }]
 
 def oc10DbService():
@@ -412,7 +380,7 @@ def oc10DbService():
                 "--max-allowed-packet=128M",
                 "--innodb-log-file-size=64M",
                 "--innodb-read-only-compressed=OFF",
-            ]
+            ],
         },
         
     ]
@@ -424,7 +392,7 @@ def redisService():
         "pull": "always",
         "command": [
             "--databases",
-            "1"
+            "1",
         ],
     }]
 
@@ -457,24 +425,12 @@ def copyConfigs():
             "cp %s/oc10/ldap-sync-cron /tmp/ldap-sync-cron" % (DRONE_CONFIG_PATH),
             "cp %s/oc10/10-custom-config.sh /etc/pre_server.d/10-custom-config.sh" % (DRONE_CONFIG_PATH),
         ],
-        "volumes": [
-            {
-                "name": "proxy-config",
-                "path": "/etc/ocis",
-            },
-            {
-                "name": "config-templates",
-                "path": "/etc/templates",
-            },
-            {
-                "name": "preserver-config",
-                "path": "/etc/pre_server.d",
-            },
-            {
-                "name": "crons",
-                "path": "/tmp",
-            },
-        ]
+        "volumes": appendVolumes([
+            stepOCISConfigVol,
+            stepOC10TemplatesVol,
+            stepOC10PreServerVol,
+            stepOC10CronsVol,
+        ]),
     }]
 
 def owncloudLog():
@@ -486,13 +442,8 @@ def owncloudLog():
         "commands": [
             "tail -f /mnt/data/owncloud.log",
         ],
-        "volumes": [
-            {
-                "name": "data",
-                "path": "/mnt/data",
-            }
-        ],
-        "depends_on": ["wait-for-oc10"]
+        "volumes": appendVolumes([stepOC10OCISSharedVol]),
+        "depends_on": ["wait-for-oc10"],
     }]
 
 def fixPermissions():
@@ -504,19 +455,8 @@ def fixPermissions():
             "chown -R www-data:www-data /var/www/owncloud/apps",
             "chmod -R 777 /var/www/owncloud/apps",
             "chmod -R 777 /mnt/data/",
-            "cd /mnt/data",
-            "ls -al",
         ],
-        "volumes": [
-            {
-                "name": "core-apps",
-                "path": "/var/www/owncloud/apps",
-            },
-            {
-                "name": "data",
-                "path": "/mnt/data",
-            }
-        ],
+        "volumes": appendVolumes([stepOC10AppsVol, stepOC10OCISSharedVol]),
         "depends_on": ["wait-for-oc10"],
     }]
 
@@ -537,7 +477,7 @@ def waitForOC10():
         "commands": [
             "wait-for -it oc10:8080 -t 300",
         ],
-        "depends_on": ["wait-for-services"]
+        "depends_on": ["wait-for-services"],
     }]
 
 def waitForOCIS():
