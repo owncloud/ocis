@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
+* Change - Return not found when updating non existent space: [#2869](https://github.com/cs3org/reva/pull/2869)
 * Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
 
 ## Details
@@ -16,6 +17,12 @@ The following sections list the changes for unreleased.
    This updates the libre-graph-api to use the latest spec and types.
 
    https://github.com/owncloud/ocis/pull/2858
+
+* Change - Return not found when updating non existent space: [#2869](https://github.com/cs3org/reva/pull/2869)
+
+   If a spaceid of a space which is updated doesn't exist, handle it as a not found error.
+
+   https://github.com/cs3org/reva/pull/2869
 
 * Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
 
