@@ -2,7 +2,31 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.15.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.16.0...master
+
+## Summary
+
+* Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
+* Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
+
+## Details
+
+* Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
+
+   This updates the libre-graph-api to use the latest spec and types.
+
+   https://github.com/owncloud/ocis/pull/2858
+
+* Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
+
+   Enabled public share requests to be authenticated using the public share signature.
+
+   https://github.com/owncloud/ocis/pull/2831
+# Changelog for [1.16.0] (2021-12-10)
+
+The following sections list the changes for 1.16.0.
+
+[1.16.0]: https://github.com/owncloud/ocis/compare/v1.15.0...v1.16.0
 
 ## Summary
 
@@ -12,13 +36,11 @@ The following sections list the changes for unreleased.
 * Bugfix - Use the CS3api up- and download workflow for the accounts service: [#2837](https://github.com/owncloud/ocis/pull/2837)
 * Change - Rename `APP_PROVIDER_BASIC_*` environment variables: [#2812](https://github.com/owncloud/ocis/pull/2812)
 * Change - Restructure Configuration Parsing: [#2708](https://github.com/owncloud/ocis/pull/2708)
-* Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
 * Change - OIDC: fallback if IDP doesn't provide "preferred_username" claim: [#2644](https://github.com/owncloud/ocis/issues/2644)
 * Enhancement - Cleanup ocis-pkg config: [#2813](https://github.com/owncloud/ocis/pull/2813)
-* Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
 * Enhancement - Correct shutdown of services under runtime: [#2843](https://github.com/owncloud/ocis/pull/2843)
 * Enhancement - Update REVA to v1.17.0: [#2849](https://github.com/owncloud/ocis/pull/2849)
-* Enhancement - Update ownCloud Web to v4.6.0: [#2846](https://github.com/owncloud/ocis/pull/2846)
+* Enhancement - Update ownCloud Web to v4.6.1: [#2846](https://github.com/owncloud/ocis/pull/2846)
 
 ## Details
 
@@ -77,12 +99,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/2708
 
-* Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
-
-   This updates the libre-graph-api to use the latest spec and types.
-
-   https://github.com/owncloud/ocis/pull/2858
-
 * Change - OIDC: fallback if IDP doesn't provide "preferred_username" claim: [#2644](https://github.com/owncloud/ocis/issues/2644)
 
    Some IDPs don't add the "preferred_username" claim. Fallback to the "email" claim in that case
@@ -94,12 +110,6 @@ The following sections list the changes for unreleased.
    Certain values were of no use when configuring the ocis runtime.
 
    https://github.com/owncloud/ocis/pull/2813
-
-* Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
-
-   Enabled public share requests to be authenticated using the public share signature.
-
-   https://github.com/owncloud/ocis/pull/2831
 
 * Enhancement - Correct shutdown of services under runtime: [#2843](https://github.com/owncloud/ocis/pull/2843)
 
@@ -114,7 +124,7 @@ The following sections list the changes for unreleased.
   * Fix [cs3org/reva#2305](https://github.com/cs3org/reva/pull/2305): Make sure /app/new takes `target` as absolute path
   * Fix [cs3org/reva#2303](https://github.com/cs3org/reva/pull/2303): Fix content disposition header for public links files
   * Fix [cs3org/reva#2316](https://github.com/cs3org/reva/pull/2316): Fix the share types in propfinds
-  * Fix [cs3org/reva#2803](https://github.com/cs3org/reva/pull/2803): Fix app provider for editor public links
+  * Fix [cs3org/reva#2803](https://github.com/cs3org/reva/pull/2310): Fix app provider for editor public links
   * Fix [cs3org/reva#2298](https://github.com/cs3org/reva/pull/2298): Remove share refs from trashbin
   * Fix [cs3org/reva#2309](https://github.com/cs3org/reva/pull/2309): Remove early finish for zero byte file uploads
   * Fix [cs3org/reva#1941](https://github.com/cs3org/reva/pull/1941): Fix TUS uploads with transfer token only
@@ -122,7 +132,7 @@ The following sections list the changes for unreleased.
   * Enh [cs3org/reva#2217](https://github.com/cs3org/reva/pull/2217): OIDC auth driver for ESCAPE IAM
   * Enh [cs3org/reva#2256](https://github.com/cs3org/reva/pull/2256): Return user type in the response of the ocs GET user call
   * Enh [cs3org/reva#2315](https://github.com/cs3org/reva/pull/2315): Add new attributes to public link propfinds
-  * Enh [cs3org/reva#2740](https://github.com/cs3org/reva/pull/2740): Implement space membership endpoints
+  * Enh [cs3org/reva#2740](https://github.com/cs3org/reva/pull/2250): Implement space membership endpoints
   * Enh [cs3org/reva#2252](https://github.com/cs3org/reva/pull/2252): Add the xattr sys.acl to SysACL (eosgrpc)
   * Enh [cs3org/reva#2314](https://github.com/cs3org/reva/pull/2314): OIDC: fallback if IDP doesn't provide "preferred_username" claim
 
@@ -130,15 +140,15 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/2835
    https://github.com/owncloud/ocis/pull/2837
 
-* Enhancement - Update ownCloud Web to v4.6.0: [#2846](https://github.com/owncloud/ocis/pull/2846)
+* Enhancement - Update ownCloud Web to v4.6.1: [#2846](https://github.com/owncloud/ocis/pull/2846)
 
    Tags: web
 
-   We updated ownCloud Web to v4.6.0. Please refer to the changelog (linked) for details on the web
+   We updated ownCloud Web to v4.6.1. Please refer to the changelog (linked) for details on the web
    release.
 
    https://github.com/owncloud/ocis/pull/2846
-   https://github.com/owncloud/web/releases/tag/v4.6.0
+   https://github.com/owncloud/web/releases/tag/v4.6.1
 # Changelog for [1.15.0] (2021-11-19)
 
 The following sections list the changes for 1.15.0.
