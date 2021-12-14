@@ -6,7 +6,7 @@ default:
     apiAccountsHashDifficulty:
       paths:
         - '%paths.base%/../features/apiAccountsHashDifficulty'
-      context: &common_ldap_suite_context
+      context:
         parameters:
           ldapAdminPassword: admin
           ldapUsersOU: TestUsers
@@ -34,12 +34,7 @@ default:
       contexts:
         - SpacesContext:
         - OccContext:
-        - FeatureContext: &common_feature_context_params
-            baseUrl: http://localhost:8080
-            adminUsername: admin
-            adminPassword: admin
-            regularUserPassword: 123456
-            ocPath: apps/testing/api/v1/occ
+        - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
         - ChecksumContext:
         - FavoritesContext:
@@ -54,12 +49,7 @@ default:
       contexts:
         - ArchiverContext:
         - OccContext:
-        - FeatureContext: &common_feature_context_params
-            baseUrl: http://localhost:8080
-            adminUsername: admin
-            adminPassword: admin
-            regularUserPassword: 123456
-            ocPath: apps/testing/api/v1/occ
+        - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
         - ChecksumContext:
         - FilesVersionsContext:

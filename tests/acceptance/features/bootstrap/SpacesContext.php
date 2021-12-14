@@ -185,14 +185,14 @@ class SpacesContext implements Context {
 	 *
 	 * @return array
 	 */
-	public function getSpaceByName(string $user, string $name): array {
+	public function getSpaceByName(string $user, string $spaceName): array {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
 
 		$spaces = $this->getAvailableSpaces();
-		Assert::assertIsArray($spaces[$name], "Space with name $name for user $user not found");
-		Assert::assertNotEmpty($spaces[$name]["root"]["webDavUrl"], "WebDavUrl for space with name $name for user $user not found");
+		Assert::assertIsArray($spaces[$spaceName], "Space with name $spaceName for user $user not found");
+		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName for user $user not found");
 
-		return $spaces[$name];
+		return $spaces[$spaceName];
 	}
 
 	/**
@@ -604,7 +604,7 @@ class SpacesContext implements Context {
 	 *
 	 * @throws Exception|GuzzleException
 	 */
-	public function usertheSpaceShouldContainEntries(
+	public function userTheSpaceShouldContainEntries(
 		string $user,
 		string $spaceName,
 		string $shouldOrNot,
