@@ -19,7 +19,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.2.2
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20211104090126-8e972dca8304
-	github.com/cs3org/reva v1.17.1-0.20211212151213-778de37266ff
+	github.com/cs3org/reva v1.17.1-0.20211215132908-5cde0187454b
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.7
@@ -82,7 +82,7 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
 	github.com/Microsoft/go-winio v0.5.1 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20210920160938-87db9fbc61c7 // indirect
-	github.com/ReneKroon/ttlcache/v2 v2.9.0 // indirect
+	github.com/ReneKroon/ttlcache/v2 v2.10.0 // indirect
 	github.com/RoaringBitmap/roaring v0.9.4 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
@@ -171,7 +171,7 @@ require (
 	github.com/miekg/dns v1.1.43 // indirect
 	github.com/mileusna/useragent v1.0.2 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.16 // indirect
+	github.com/minio/minio-go/v7 v7.0.18 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
