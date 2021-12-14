@@ -34,7 +34,7 @@ class RevaContext implements Context {
 	/**
 	 * @var FeatureContext
 	 */
-	private $featureContext;
+	private FeatureContext $featureContext;
 
 	/**
 	 * @BeforeScenario

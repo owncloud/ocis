@@ -38,7 +38,7 @@ class ArchiverContext implements Context {
 	/**
 	 * @var FeatureContext
 	 */
-	private $featureContext;
+	private FeatureContext $featureContext;
 
 	/**
 	 * @BeforeScenario
@@ -80,7 +80,6 @@ class ArchiverContext implements Context {
 			case 'id':
 			case 'ids':
 				return 'id=' . $this->featureContext->getFileIdForPath($user, $resource);
-				break;
 			case 'path':
 			case 'paths':
 				return 'path=' . $resource;
