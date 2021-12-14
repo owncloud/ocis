@@ -60,8 +60,8 @@ require (
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.27.0
 	go.opentelemetry.io/otel v1.3.0
-	go.opentelemetry.io/otel/exporters/jaeger v1.2.0
-	go.opentelemetry.io/otel/sdk v1.2.0
+	go.opentelemetry.io/otel/exporters/jaeger v1.3.0
+	go.opentelemetry.io/otel/sdk v1.3.0
 	go.opentelemetry.io/otel/trace v1.3.0
 	golang.org/x/crypto v0.0.0-20211108221036-ceb1ce70b4fa
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d
