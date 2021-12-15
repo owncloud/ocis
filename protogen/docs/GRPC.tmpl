@@ -1,0 +1,95 @@
+---
+title: "GRPC API"
+date: 2018-05-02T00:00:00+00:00
+weight: 50
+geekdocRepo: https://github.com/owncloud/ocis-thumbnails
+geekdocEditPath: edit/master/docs
+geekdocFilePath: grpc.md
+---
+
+{{`{{< toc >}}`}}
+
+{{ range .Files -}}
+{{ $filename := .Name }}
+{{ $filenameParts := splitList "/" $filename }}
+## {{ .Name }}
+
+{{ .Description }}
+{{- range .Messages -}}
+{{- /* remove newline */}}### {{ .LongName }}
+
+{{ .Description }}
+
+{{ if .HasFields -}}
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+{{ range .Fields -}}
+{{- $loca := printf "#%s" (.LongType | lower | replace "." "") -}}
+{{- if and (hasPrefix "ocis." .LongType) (ge (len $filenameParts) 3) -}}
+	{{- $rep := regexReplaceAll "[^/]+" (slice $filenameParts 1 (sub (len $filenameParts) 1) | join "/") ".." -}}
+	{{- $fieldDir := dir (.LongType | lower | replace "." "/") -}}
+	{{- $loca = printf "%s/%s/grpc.md#%s" $rep (substr 5 (len $fieldDir) $fieldDir) (.Type | lower | replace "." "") -}}
+{{- end -}}
+| {{.Name}} | [{{.LongType}}]({{ $loca }}) | {{.Label}} | {{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end }} |
+{{ end -}}
+{{ end }}
+{{ if .HasExtensions -}}
+| Extension | Type | Base | Number | Description |
+| --------- | ---- | ---- | ------ | ----------- |
+{{ range .Extensions -}}
+| {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}} |
+{{ end -}}
+{{ end -}}
+{{ end -}}
+{{- range .Enums -}}
+### {{ .LongName }}
+
+{{ .Description }}
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+{{range .Values -}}
+| {{.Name}} | {{.Number}} | {{nobr .Description}} |
+{{ end -}}
+{{ end -}}
+
+{{ if .HasExtensions }}
+
+### File-level Extensions
+| Extension | Type | Base | Number | Description |
+| --------- | ---- | ---- | ------ | ----------- |
+{{ range .Extensions -}}
+| {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{nobr .Description}}{{if .DefaultValue}} Default: `{{.DefaultValue}}`{{end}} |
+{{ end -}}
+{{ end -}} 
+{{- range .Services }}
+### {{ .Name }}
+
+{{ .Description }}
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+{{ range .Methods -}}
+{{- $reqLoca := printf "#%s" (.RequestLongType | lower | replace "." "") -}}
+{{- $respLoca := printf "#%s" (.ResponseLongType | lower | replace "." "") -}}
+{{- if and (hasPrefix ".ocis." .RequestLongType) (ge (len $filenameParts) 3) }}
+	{{- $rep := regexReplaceAll "[^/]+" (slice $filenameParts 1 (sub (len $filenameParts) 1) | join "/") ".." -}}
+	{{- $reqDir := dir (.RequestLongType | lower | replace "." "/") -}}
+	{{- $reqLoca = printf "%s/%s/grpc.md#%s" $rep (substr 6 (len $reqDir) $reqDir) (.RequestType | lower | replace "." "") -}}
+{{- end -}}
+{{- if and (hasPrefix ".ocis." .ResponseLongType) (ge (len $filenameParts) 3) }}
+	{{- $rep := regexReplaceAll "[^/]+" (slice $filenameParts 1 (sub (len $filenameParts) 1) | join "/") ".." -}}
+	{{- $respDir := dir (.ResponseLongType | lower | replace "." "/") -}}
+	{{- $respLoca = printf "%s/%s/grpc.md#%s" $rep (substr 6 (len $respDir) $respDir) (.ResponseType | lower | replace "." "") -}}
+{{- end -}}
+| {{.Name}} | [{{.RequestLongType}}]({{ $reqLoca }}){{if .RequestStreaming}} stream{{end}} | [{{.ResponseLongType}}]({{ $respLoca }}){{if .ResponseStreaming}} stream{{end}} | {{nobr .Description}} |
+{{ end -}}
+{{ end -}}
+{{ end }}
+## Scalar Value Types
+
+| .proto Type | Notes | C++ | Java |
+| ----------- | ----- | --- | ---- |
+{{ range .Scalars -}}
+| {{`{{< div id="`}}{{.ProtoType}}{{`" content="`}}{{.ProtoType}}{{`" >}}`}} | {{.Notes}} | {{.CppType}} | {{.JavaType}} |
+{{ end }}

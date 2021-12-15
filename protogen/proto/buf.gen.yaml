@@ -1,0 +1,29 @@
+version: v1
+plugins:
+  - name: go
+    path: ../../.bingo/protoc-gen-go
+    out: ../gen/
+    opt:
+      - paths=source_relative
+
+  - name: micro
+    path: ../../.bingo/protoc-gen-micro
+    out: ../gen/
+    opt:
+      - paths=source_relative
+
+  - name: microweb
+    path: ../../.bingo/protoc-gen-microweb
+    out: ../gen/
+    opt:
+      - paths=source_relative
+
+  - name: openapiv2
+    path: ../../.bingo/protoc-gen-openapiv2
+    out: ../gen/
+
+  - name: doc
+    path: ../../.bingo/protoc-gen-doc
+    out: ../docs/extensions
+    opt:
+      - ../docs/GRPC.tmpl,grpc.md,source_relative
