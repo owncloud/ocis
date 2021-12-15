@@ -958,6 +958,14 @@ _ocs: api compatibility, return correct status code_
 -   [apiProvisioningGroups-v1/addGroup.feature:134](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addGroup.feature#L134)
 -   [apiProvisioningGroups-v2/addGroup.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addGroup.feature#L129)
 
+#### [group names with space at the start or end should not be allowed](https://github.com/owncloud/ocis/issues/2876)
+-   [apiProvisioningGroups-v1/addGroup.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addGroup.feature#L158)
+-   [apiProvisioningGroups-v1/addGroup.feature:166](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addGroup.feature#L166)
+-   [apiProvisioningGroups-v1/addGroup.feature:174](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addGroup.feature#L174)
+-   [apiProvisioningGroups-v2/addGroup.feature:154](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addGroup.feature#L154)
+-   [apiProvisioningGroups-v2/addGroup.feature:162](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addGroup.feature#L162)
+-   [apiProvisioningGroups-v2/addGroup.feature:170](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addGroup.feature#L170)
+
 #### [cannot create group with '/'](https://github.com/owncloud/product/issues/285)
 -   [apiProvisioningGroups-v1/addToGroup.feature:82](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L82)
 -   [apiProvisioningGroups-v1/deleteGroup.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/deleteGroup.feature#L85)
@@ -1433,6 +1441,3 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 ### [Content-type is not multipart/byteranges when downloading file with Range Header](https://github.com/owncloud/ocis/issues/2677)
 -   [apiWebdavOperations/downloadFile.feature:169](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L169)
 -   [apiWebdavOperations/downloadFile.feature:170](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L170)
-
-### [send PUT requests to another user's webDav endpoints as normal user](https://github.com/owncloud/ocis/issues/2759)
--   [apiAuthWebDav/webDavPUTAuth.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavPUTAuth.feature#L40)

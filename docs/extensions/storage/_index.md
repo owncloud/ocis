@@ -8,16 +8,13 @@ geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---
 
-## Abstract
+## Overview
 
-This service provides an oCIS extension that wraps [reva](https://github.com/cs3org/reva/) and adds an opinionated configuration to it.
+The storage extension wraps [reva](https://github.com/cs3org/reva/) and adds an opinionated configuration to provide two core services for the oCIS platform:
+1. A [*Spaces Registry*]({{< ref "./spacesregistry.md" >}}) that acts as a dictionary for storage *Spaces* and their metadata
+2. A [*Spaces Provider*]({{< ref "./spacesprovider.md" >}}) that organizes *Resources* in storage *Spaces* and persists them in an underlying *Storage System*
 
-## Architecture Overview
-
-The below diagram shows the oCIS services and the contained reva services within as dashed boxes. In general:
-1. A request comes in at the proxy and is authenticated using OIDC.
-2. It is forwarded to the oCIS frontend which handles ocs and ocdav requests by talking to the reva gateway using the CS3 API.
-3. The gateway acts as a facade to the actual CS3 services: storage providers, user providers, group providers and sharing providers.
+*Clients* will use the *Spaces Registry* to poll or get notified about changes in all *Spaces* a user has access to. Every *Space* has a dedicated `/dav/spaces/<spaceid>` WebDAV endpoint that is served by a *Spaces Provider* which uses a specific reva storage driver to wrap an underlying *Storage System*.
 
 {{< svg src="extensions/storage/static/overview.drawio.svg" >}}
 
@@ -34,3 +31,4 @@ The bottom part is lighter because we will deprecate it in favor of using only t
 In order to reason about the request flow, two aspects in the architecture need to be understood well:
 1. What kind of [*namespaces*]({{< ref "./namespaces.md" >}}) are presented at the different WebDAV and CS3 endpoints?
 2. What kind of [*resource*]({{< ref "./terminology.md#resources" >}}) [*references*]({{< ref "./terminology.md#references" >}}) are exposed or required: path or id based?
+{{< svg src="extensions/storage/static/storage.drawio.svg" >}}

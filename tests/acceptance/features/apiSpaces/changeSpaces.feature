@@ -11,9 +11,9 @@ Feature: Change data of space
     And the administrator has given "Alice" the role "Admin" using the settings api
 
   Scenario: Alice changes a name of the space via the Graph api, she expects a 204 code and checks that the space name has changed
-    Given user "Alice" has created a space "Project Jupiter" of type "project" with quota "20" 
+    Given user "Alice" has created a space "Project Jupiter" of type "project" with quota "20"
     When user "Alice" changes the name of the "Project Jupiter" space to "Project Death Star"
-    Then the HTTP status code should be "204"
+    Then the HTTP status code should be "200"
     When user "Alice" lists all available spaces via the GraphApi
     Then the json responded should contain a space "Project Death Star" with these key and value pairs:
       | key              | value                            |
@@ -23,12 +23,11 @@ Feature: Change data of space
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
 
   Scenario: Alice increases quota of the space via the Graph api, she expects a 204 code and checks that the quota has changed
-    Given user "Alice" has created a space "Project Earth" of type "project" with quota "20" 
+    Given user "Alice" has created a space "Project Earth" of type "project" with quota "20"
     When user "Alice" changes the quota of the "Project Earth" space to "100"
-    Then the HTTP status code should be "204"
+    Then the HTTP status code should be "200"
     When user "Alice" lists all available spaces via the GraphApi
     Then the json responded should contain a space "Project Earth" with these key and value pairs:
       | key              | value         |
       | name             | Project Earth |
       | quota@@@total    | 100           |
-      

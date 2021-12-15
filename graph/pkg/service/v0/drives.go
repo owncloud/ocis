@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/CiscoM31/godata"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -21,12 +20,14 @@ import (
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/pkg/ctx"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	sproto "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	settingsSvc "github.com/owncloud/ocis/settings/pkg/service/v0"
-	msgraph "github.com/owncloud/open-graph-api-go"
+	msgraph "github.com/yaegashi/msgraph.go/beta"
 
 	merrors "go-micro.dev/v4/errors"
 )
@@ -190,7 +191,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-	drive := msgraph.Drive{}
+	drive := libregraph.Drive{}
 	if err := json.NewDecoder(r.Body).Decode(&drive); err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "invalid schema definition")
 		return
@@ -240,7 +241,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 
 	newDrive, err := cs3StorageSpaceToDrive(wdu, resp.StorageSpace)
 	if err != nil {
-		g.logger.Error().Err(err).Msg("error parsing url")
+		g.logger.Error().Err(err).Msg("error parsing space")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -249,26 +250,18 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
-	// wildcards however addressed here is not yet supported. We want to address drives by their unique
-	// identifiers. Any open queries need to be implemented. Same applies for sub-entities.
-	// For further reading: http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#sec_AddressingaSubsetofaCollection
-
-	// strip "/graph/v1.0/" out and parse the rest. This is how godata input is expected.
-	//https://github.com/CiscoM31/godata/blob/d70e191d2908191623be84401fecc40d6af4afde/url_parser_test.go#L10
-	sanitized := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
-
-	req, err := godata.ParseRequest(r.Context(), sanitized, r.URL.Query())
+	driveID, err := url.PathUnescape(chi.URLParam(r, "driveID"))
 	if err != nil {
-		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping drive id failed")
 		return
 	}
 
-	if req.FirstSegment.Identifier.Get() == "" {
-		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "identifier cannot be empty")
+	if driveID == "" {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing drive id")
 		return
 	}
 
-	drive := msgraph.Drive{}
+	drive := libregraph.Drive{}
 	if err = json.NewDecoder(r.Body).Decode(&drive); err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %v", r.Body))
 		return
@@ -332,49 +325,66 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "")
+		switch resp.Status.GetCode() {
+		case v1beta11.Code_CODE_NOT_FOUND:
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, resp.GetStatus().GetMessage())
+			return
+		default:
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, resp.GetStatus().GetMessage())
+			return
+		}
+	}
+
+	wdu, err := url.Parse(g.config.Spaces.WebDavBase + g.config.Spaces.WebDavPath)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error parsing url")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	updatedDrive, err := cs3StorageSpaceToDrive(wdu, resp.StorageSpace)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error parsing space")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, updatedDrive)
 }
 
 func cs3TimestampToTime(t *types.Timestamp) time.Time {
 	return time.Unix(int64(t.Seconds), int64(t.Nanos))
 }
 
-func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*msgraph.DriveItem, error) {
+func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*libregraph.DriveItem, error) {
 	size := new(int64)
 	*size = int64(res.Size) // uint64 -> int :boom:
 	name := path.Base(res.Path)
 
-	driveItem := &msgraph.DriveItem{
-		BaseItem: msgraph.BaseItem{
-			Entity: msgraph.Entity{
-				Id: &res.Id.OpaqueId,
-			},
-			Name: &name,
-			ETag: &res.Etag,
-		},
+	driveItem := &libregraph.DriveItem{
+		Id:   &res.Id.OpaqueId,
+		Name: &name,
+		ETag: &res.Etag,
 		Size: size,
 	}
 	if res.Mtime != nil {
 		lastModified := cs3TimestampToTime(res.Mtime)
-		driveItem.BaseItem.LastModifiedDateTime = &lastModified
+		driveItem.LastModifiedDateTime = &lastModified
 	}
 	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_FILE {
-		driveItem.File = &msgraph.OpenGraphFile{ // FIXME We cannot use msgraph.File here because the openapi codegenerator autodetects 'File' as a go type ...
+		driveItem.File = &libregraph.OpenGraphFile{ // FIXME We cannot use libregraph.File here because the openapi codegenerator autodetects 'File' as a go type ...
 			MimeType: &res.MimeType,
 		}
 	}
 	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER {
-		driveItem.Folder = &msgraph.Folder{}
+		driveItem.Folder = &libregraph.Folder{}
 	}
 	return driveItem, nil
 }
 
-func formatDriveItems(mds []*storageprovider.ResourceInfo) ([]*msgraph.DriveItem, error) {
-	responses := make([]*msgraph.DriveItem, 0, len(mds))
+func formatDriveItems(mds []*storageprovider.ResourceInfo) ([]*libregraph.DriveItem, error) {
+	responses := make([]*libregraph.DriveItem, 0, len(mds))
 	for i := range mds {
 		res, err := cs3ResourceToDriveItem(mds[i])
 		if err != nil {
@@ -386,30 +396,27 @@ func formatDriveItems(mds []*storageprovider.ResourceInfo) ([]*msgraph.DriveItem
 	return responses, nil
 }
 
-func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpace) (*msgraph.Drive, error) {
+func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpace) (*libregraph.Drive, error) {
 	rootID := space.Root.StorageId + "!" + space.Root.OpaqueId
 	if space.Root.StorageId == space.Root.OpaqueId {
 		// omit opaqueid
 		rootID = space.Root.StorageId
 	}
 
-	drive := &msgraph.Drive{
-		BaseItem: msgraph.BaseItem{
-			Entity: msgraph.Entity{
-				Id: &rootID,
+	drive := &libregraph.Drive{
+		Id:   &rootID,
+		Name: &space.Name,
+		//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
+		//"description": "string", // TODO read from StorageSpace ... needs Opaque for now
+		Owner: &libregraph.IdentitySet{
+			User: &libregraph.Identity{
+				Id: &space.Owner.Id.OpaqueId,
+				// DisplayName: , TODO read and cache from users provider
 			},
-			Name: &space.Name,
-			//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
-			//"description": "string", // TODO read from StorageSpace ... needs Opaque for now
 		},
-
 		DriveType: &space.SpaceType,
-		Root: &msgraph.DriveItem{
-			BaseItem: msgraph.BaseItem{
-				Entity: msgraph.Entity{
-					Id: &rootID,
-				},
-			},
+		Root: &libregraph.DriveItem{
+			Id: &rootID,
 		},
 	}
 
@@ -432,7 +439,7 @@ func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpac
 	}
 	if space.Mtime != nil {
 		lastModified := cs3TimestampToTime(space.Mtime)
-		drive.BaseItem.LastModifiedDateTime = &lastModified
+		drive.LastModifiedDateTime = &lastModified
 	}
 	if space.Quota != nil {
 		var t int64
@@ -441,7 +448,7 @@ func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpac
 		} else {
 			t = int64(space.Quota.QuotaMaxBytes)
 		}
-		drive.Quota = &msgraph.Quota{
+		drive.Quota = &libregraph.Quota{
 			Total: &t,
 		}
 	}
@@ -450,8 +457,8 @@ func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpac
 	return drive, nil
 }
 
-func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storageprovider.StorageSpace) ([]*msgraph.Drive, error) {
-	responses := make([]*msgraph.Drive, 0, len(mds))
+func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storageprovider.StorageSpace) ([]*libregraph.Drive, error) {
+	responses := make([]*libregraph.Drive, 0, len(mds))
 	for i := range mds {
 		res, err := cs3StorageSpaceToDrive(baseURL, mds[i])
 		if err != nil {
@@ -467,11 +474,11 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storag
 	return responses, nil
 }
 
-func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (*msgraph.Quota, error) {
+func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (libregraph.Quota, error) {
 	client, err := g.GetClient()
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error creating grpc client")
-		return nil, nil
+		return libregraph.Quota{}, err
 	}
 
 	req := &gateway.GetQuotaRequest{
@@ -487,20 +494,20 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 	switch {
 	case err != nil:
 		g.logger.Error().Err(err).Msg("error sending get quota grpc request")
-		return nil, nil
+		return libregraph.Quota{}, nil
 	case res.Status.Code == cs3rpc.Code_CODE_UNIMPLEMENTED:
 		// TODO well duh
-		return nil, nil
+		return libregraph.Quota{}, nil
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
 		g.logger.Error().Err(err).Msg("error sending sending get quota grpc request")
-		return nil, err
+		return libregraph.Quota{}, err
 	}
 
 	total := int64(res.TotalBytes)
 
 	used := int64(res.UsedBytes)
 	remaining := total - used
-	qta := &msgraph.Quota{
+	qta := libregraph.Quota{
 		Remaining: &remaining,
 		Total:     &total,
 		Used:      &used,
@@ -526,7 +533,7 @@ func calculateQuotaState(total int64, used int64) (state string) {
 	}
 }
 
-func getQuota(quota *msgraph.Quota, defaultQuota string) *provider.Quota {
+func getQuota(quota *libregraph.Quota, defaultQuota string) *provider.Quota {
 	switch {
 	case quota != nil && quota.Total != nil:
 		if q := *quota.Total; q >= 0 {

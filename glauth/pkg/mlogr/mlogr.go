@@ -14,23 +14,28 @@ const traceVerbosity = 8
 
 // New returns a logr.Logger which is implemented by the log.
 func New(l *plog.Logger) logr.Logger {
-	return logger{
+	sink := logSink{
 		l:         l,
 		verbosity: 0,
 		prefix:    "glauth",
 		values:    nil,
 	}
+
+	return logr.New(sink)
 }
 
-// logger is a logr.Logger that uses the ocis-pkg log.
-type logger struct {
+func (l logSink) Init(info logr.RuntimeInfo) {
+}
+
+// logSink is a logr.LogSink that uses the ocis-pkg log.
+type logSink struct {
 	l         *plog.Logger
 	verbosity int
 	prefix    string
 	values    []interface{}
 }
 
-func (l logger) clone() logger {
+func (l logSink) clone() logSink {
 	out := l
 	out.values = copySlice(l.values)
 	return out
@@ -71,8 +76,8 @@ func add(e *zerolog.Event, keysAndVals []interface{}) {
 	}
 }
 
-func (l logger) Info(msg string, keysAndVals ...interface{}) {
-	if l.Enabled() {
+func (l logSink) Info(level int, msg string, kvList ...interface{}) {
+	if l.Enabled(level) {
 		var e *zerolog.Event
 		if l.verbosity < debugVerbosity {
 			e = l.l.Info()
@@ -86,16 +91,16 @@ func (l logger) Info(msg string, keysAndVals ...interface{}) {
 			e.Str("name", l.prefix)
 		}
 		add(e, l.values)
-		add(e, keysAndVals)
+		add(e, kvList)
 		e.Msg(msg)
 	}
 }
 
-func (l logger) Enabled() bool {
+func (l logSink) Enabled(level int) bool {
 	return true
 }
 
-func (l logger) Error(err error, msg string, keysAndVals ...interface{}) {
+func (l logSink) Error(err error, msg string, keysAndVals ...interface{}) {
 	e := l.l.Error().Err(err)
 	if l.prefix != "" {
 		e.Str("name", l.prefix)
@@ -105,18 +110,10 @@ func (l logger) Error(err error, msg string, keysAndVals ...interface{}) {
 	e.Msg(msg)
 }
 
-func (l logger) V(verbosity int) logr.InfoLogger {
-	//new := l.clone()
-	//new.level = level
-	//return new
-	l.verbosity = verbosity
-	return l
-}
-
-// WithName returns a new logr.Logger with the specified name appended. zerologr
+// WithName returns a new logr.LogSink with the specified name appended. zerologr
 // uses '/' characters to separate name elements.  Callers should not pass '/'
 // in the provided name string, but this library does not actually enforce that.
-func (l logger) WithName(name string) logr.Logger {
+func (l logSink) WithName(name string) logr.LogSink {
 	nl := l.clone()
 	if len(l.prefix) > 0 {
 		nl.prefix = l.prefix + "/"
@@ -124,11 +121,10 @@ func (l logger) WithName(name string) logr.Logger {
 	nl.prefix += name
 	return nl
 }
-func (l logger) WithValues(kvList ...interface{}) logr.Logger {
+func (l logSink) WithValues(kvList ...interface{}) logr.LogSink {
 	nl := l.clone()
 	nl.values = append(nl.values, kvList...)
 	return nl
 }
 
-var _ logr.Logger = logger{}
-var _ logr.InfoLogger = logger{}
+var _ logr.LogSink = logSink{}

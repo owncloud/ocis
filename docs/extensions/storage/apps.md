@@ -24,7 +24,8 @@ The capabilities endpoint (eg. `https://localhost:9200/ocs/v1.php/cloud/capabili
               "enabled": true,
               "version": "1.0.0",
               "apps_url": "/app/list",
-              "open_url": "/app/open"
+              "open_url": "/app/open",
+              "new_url": "/app/new"
             }
           ]
         }
@@ -101,6 +102,8 @@ curl 'https://ocis.test/app/list'
 
 **Response example**:
 
+HTTP status code: 200
+
 ```json
 {
   "mime-types": [
@@ -132,7 +135,8 @@ curl 'https://ocis.test/app/list'
       "name": "OpenDocument",
       "icon": "https://some-website.test/opendocument-text-icon.png",
       "description": "OpenDocument text document",
-      "allow_creation": true
+      "allow_creation": true,
+      "default_application": "Collabora"
     },
     {
       "mime_type": "text/markdown",
@@ -145,7 +149,8 @@ curl 'https://ocis.test/app/list'
       ],
       "name": "Markdown file",
       "description": "Markdown file",
-      "allow_creation": true
+      "allow_creation": true,
+      "default_application": "CodiMD"
     },
     {
       "mime_type": "application/vnd.ms-word.document.macroenabled.12",
@@ -216,6 +221,8 @@ All apps are expected to be opened in an iframe and the response will give some 
 
 There are apps, which need to be opened in the iframe with a form post. The form post must include all form parameters included in the response. For these apps the response will look like this:
 
+HTTP status code: 200
+
 ```json
 {
   "app_url": "https://.....",
@@ -229,6 +236,8 @@ There are apps, which need to be opened in the iframe with a form post. The form
 ```
 
 There are apps, which need to be opened in the iframe with a GET request. The GET request must have set all headers included in the response. For these apps the response will look like this:
+
+HTTP status code: 200
 
 ```json
 {
@@ -244,32 +253,174 @@ There are apps, which need to be opened in the iframe with a GET request. The GE
 
 **Example responses (error case)**:
 
-- wrong `view_mode`
+- missing `file_id`
+
+  HTTP status code: 400
 
   ```json
   {
-    "code": "SERVER_ERROR",
-    "message": "Missing or invalid viewmode argument"
+    "code": "INVALID_PARAMETER",
+    "message": "missing file ID"
+  }
+  ```
+
+- wrong `view_mode`
+
+  HTTP status code: 400
+
+  ```json
+  {
+    "code": "INVALID_PARAMETER",
+    "message": "invalid view mode"
   }
   ```
 
 - unknown `app_name`
 
-  ```json
-  {
-    "code": "SERVER_ERROR",
-    "message": "error searching for app provider"
-  }
-  ```
-
-- wrong / invalid file id / unauthorized to open the file
+  HTTP status code: 404
 
   ```json
   {
-    "code": "SERVER_ERROR",
-    "message": "error statting file"
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "error: not found: app 'Collabor' not found"
   }
   ```
+
+- wrong / invalid file id
+
+  HTTP status code: 400
+
+  ```json
+  {
+    "code": "INVALID_PARAMETER",
+    "message": "invalid file ID"
+  }
+  ```
+
+- file id does not point to a file
+
+  HTTP status code: 400
+
+  ```json
+  {
+    "code": "INVALID_PARAMETER",
+    "message": "the given file id does not point to a file"
+  }
+  ```
+
+- file does not exist / unauthorized to open the file
+
+  HTTP status code: 404
+
+  ```json
+  {
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "file does not exist"
+  }
+  ```
+
+### Creating a file with the app provider
+
+**Endpoint**: specified in the capabilities in `new_file_url`, currently `/app/new`
+
+**Method**: HTTP POST
+
+**Authentication** (one of them):
+
+- `Authorization` header with OIDC Bearer token for authenticated users or basic auth credentials (if enabled in oCIS)
+- `Public-Token` header with public link token for public links
+- `X-Access-Token` header with a REVA token for authenticated users
+
+**Query parameters**:
+
+- `parent_container_id` (mandatory): ID of the folder in which the file will be created
+- `filename` (mandatory): name of the new file
+- `template` (optional): not yet implemented
+
+**Request examples**:
+
+```bash
+curl -X POST 'https://ocis.test/app/new?parent_container_id=c2lkOmNpZAo=&filename=test.odt'
+```
+
+**Response example**:
+
+You will receive a file id of the freshly created file, which you can use to open the file in an editor.
+
+```json
+{
+  "file_id": "ZmlsZTppZAo="
+}
+```
+
+**Example responses (error case)**:
+
+- missing `parent_container_id`
+
+  HTTP status code: 400
+
+  ```json
+  {
+    "code": "INVALID_PARAMETER",
+    "message": "missing parent container ID"
+  }
+  ```
+
+- missing `filename`
+
+  HTTP status code: 400
+
+  ```json
+  {
+    "code": "INVALID_PARAMETER",
+    "message": "missing filename"
+  }
+  ```
+
+- parent container not found
+
+  HTTP status code: 404
+
+  ```json
+  {
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "the parent container is not accessible or does not exist"
+  }
+  ```
+
+- `parent_container_id` does not point to a container
+
+  HTTP status code: 400
+
+  ```json
+  {
+    "code": "INVALID_PARAMETER",
+    "message": "the parent container id does not point to a container"
+  }
+  ```
+
+- `filename` is invalid (eg. includes a path segment)
+
+  HTTP status code: 400
+
+  ```json
+  {
+    "code": "INVALID_PARAMETER",
+    "message": "the filename must not contain a path segment"
+  }
+  ```
+
+- file already exists
+
+  HTTP status code: 403
+
+  ```json
+  {
+    "code": "RESOURCE_ALREADY_EXISTS",
+    "message": "the file already exists"
+  }
+  ```
+
 
 ## App drivers
 

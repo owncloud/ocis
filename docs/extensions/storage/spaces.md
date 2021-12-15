@@ -47,16 +47,16 @@ This is an extract of an element of the list spaces response. An entire object h
 Having introduced the above, one can refer to a Drive with the following URL format:
 
 ```console
-'https://localhost:9200/graph/v1.0/Drive(1284d238-aa92-42ce-bdc4-0b0000009157!07c26b3a-9944-4f2b-ab33-b0b326fc7570")
+'https://localhost:9200/graph/v1.0/drives/1284d238-aa92-42ce-bdc4-0b0000009157!07c26b3a-9944-4f2b-ab33-b0b326fc7570
 ```
 
 Updating an entity attribute:
 
 ```console
-curl -X PATCH 'https://localhost:9200/graph/v1.0/Drive("1284d238-aa92-42ce-bdc4-0b0000009157!07c26b3a-9944-4f2b-ab33-b0b326fc7570)' -d '{"name":"42"}' -v
+curl -X PATCH 'https://localhost:9200/graph/v1.0/drives/1284d238-aa92-42ce-bdc4-0b0000009157!07c26b3a-9944-4f2b-ab33-b0b326fc7570' -d '{"name":"42"}' -v
 ```
 
-The previous URL resource path segment (`Drive(1284d238-aa92-42ce-bdc4-0b0000009157!07c26b3a-9944-4f2b-ab33-b0b326fc7570)`) is parsed and handed over to the storage registry in order to apply the patch changes in the body, in this case update the space name attribute to `42`. Since space names are not unique we only support addressing them by their unique identifiers, any other query would render too ambiguous and explode in complexity.
+The previous URL resource path segment (`1284d238-aa92-42ce-bdc4-0b0000009157!07c26b3a-9944-4f2b-ab33-b0b326fc7570`) is parsed and handed over to the storage registry in order to apply the patch changes in the body, in this case update the space name attribute to `42`. Since space names are not unique we only support addressing them by their unique identifiers, any other query would render too ambiguous and explode in complexity.
 
 
 ### Updating a space description
@@ -140,13 +140,13 @@ Upload a 6 bytes file:
 Query the quota again:
 
 ```json
-...
-"quota": {
+{
+  "quota": {
     "remaining": 4,
     "total": 10,
     "used": 6
-},
-...
+  }
+}
 ```
 
 Now attempt to upload 5 bytes to the space:
@@ -176,3 +176,33 @@ The request will fail with `507 Insufficient Storage`:
 ##### Considerations
 
 - If a Space quota is updated to unlimited, the upper limit is the entire available space on disk
+{{< hint warning >}}
+
+The current implementation in oCIS might not yet fully reflect this concept. Feel free to add links to ADRs, PRs and Issues in short warning boxes like this.
+
+{{< /hint >}}
+
+## Storage Spaces
+A storage *space* is a logical concept. It organizes a set of [*resources*]({{< ref "#resources" >}}) in a hierarchical tree. It has a single *owner* (*user* or *group*),
+a *quota*, *permissions* and is identified by a `storage space id`.
+
+{{< svg src="extensions/storage/static/storagespace.drawio.svg" >}}
+
+Examples would be every user's personal storage *space*, project storage *spaces* or group storage *spaces*. While they all serve different purposes and may or may not have workflows like anti virus scanning enabled, we need a way to identify and manage these subtrees in a generic way. By creating a dedicated concept for them this becomes easier and literally makes the codebase cleaner. A storage [*Spaces Registry*]({{< ref "./spacesregistry.md" >}}) then allows listing the capabilities of storage *spaces*, e.g. free space, quota, owner, syncable, root etag, upload workflow steps, ...
+
+Finally, a logical `storage space id` is not tied to a specific [*spaces provider*]({{< ref "./spacesprovider.md" >}}). If the [*storage driver*]({{< ref "./storagedrivers.md" >}}) supports it, we can import existing files including their `file id`, which makes it possible to move storage *spaces* between [*spaces providers*]({{< ref "./spacesprovider.md" >}}) to implement storage classes, e.g. with or without archival, workflows, on SSDs or HDDs.
+
+## Shares
+*To be clarified: we are aware that [*storage spaces*]({{< ref "#storage-spaces" >}}) may be too 'heavywheight' for ad hoc sharing with groups. That being said, there is no technical reason why group shares should not be treated like storage [*spaces*]({{< ref "#storage-spaces" >}}) that users can provision themselves. They would share the quota with the users home or personal storage [*space*]({{< ref "#storage-spaces" >}}) and the share initiator would be the sole owner. Technically, the mechanism of treating a share like a new storage [*space*]({{< ref "#storage-spaces" >}}) would be the same. This obviously also extends to user shares and even file individual shares that would be wrapped in a virtual collection. It would also become possible to share collections of arbitrary files in a single storage space, e.g. the ten best pictures from a large album.*
+
+## Notes
+
+We can implement [ListStorageSpaces](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.ListStorageSpacesRequest) by either
+- iterating over the root of the storage and treating every folder following the `<user_layout>` as a `home` *storage space*,
+- iterating over the root of the storage and treating every folder following a new `<project_layout>` as a `project` *storage space*, or
+- iterating over the root of the storage and treating every folder following a generic `<layout>` as a *storage space* for a configurable space type, or
+- we allow configuring a map of `space type` to `layout` (based on the [CreateStorageSpaceRequest](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.CreateStorageSpaceRequest)) which would allow things like
+```
+home=/var/lib/ocis/storage/home/{{substr 0 1 .Owner.Username}}/{{.Owner.Username}}
+spaces=/spaces/var/lib/ocis/storage/projects/{{.Name}}
+```

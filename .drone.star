@@ -1,4 +1,4 @@
-"""oCIS CI defintion
+"""oCIS CI definition
 """
 
 # images
@@ -6,6 +6,7 @@ OC_CI_ALPINE = "owncloudci/alpine:latest"
 OC_CI_GOLANG = "owncloudci/golang:1.17"
 OC_CI_NODEJS = "owncloudci/nodejs:14"
 OC_CI_PHP = "owncloudci/php:7.4"
+OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
 
 # configuration
@@ -577,7 +578,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
+                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() + [
             {
                 "name": "webUITests",
                 "image": OC_CI_NODEJS,
@@ -594,6 +595,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                     "RUN_PART": runPart,
                     "DIVIDE_INTO_NUM_PARTS": numberOfParts,
                     "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-webUI-on-%s-storage%s.md" % (storage.upper(), expectedFailuresFileFilterTags),
+                    "MIDDLEWARE_HOST": "http://middleware:3000",
                 },
                 "commands": [
                     ". /drone/src/.drone.env",
@@ -615,7 +617,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                            }],
             },
         ] + failEarly(ctx, early_fail),
-        "services": selenium(),
+        "services": selenium() + middlewareService(),
         "volumes": [pipelineVolumeOC10Tests] +
                    [{
                        "name": "uploads",
@@ -643,7 +645,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
+                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() + [
             {
                 "name": "WebUIAcceptanceTests",
                 "image": OC_CI_NODEJS,
@@ -658,6 +660,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
                     "WEB_PATH": "/srv/app/web",
                     "FEATURE_PATH": "/drone/src/accounts/ui/tests/acceptance/features",
+                    "MIDDLEWARE_HOST": "http://middleware:3000",
                 },
                 "commands": [
                     ". /drone/src/.drone.env",
@@ -678,7 +681,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                            }],
             },
         ] + failEarly(ctx, early_fail),
-        "services": selenium(),
+        "services": selenium() + middlewareService(),
         "volumes": [stepVolumeOC10Tests] +
                    [{
                        "name": "uploads",
@@ -706,7 +709,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + [
+                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() + [
             {
                 "name": "WebUIAcceptanceTests",
                 "image": OC_CI_NODEJS,
@@ -721,6 +724,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
                     "WEB_PATH": "/srv/app/web",
                     "FEATURE_PATH": "/drone/src/settings/ui/tests/acceptance/features",
+                    "MIDDLEWARE_HOST": "http://middleware:3000",
                 },
                 "commands": [
                     ". /drone/src/.drone.env",
@@ -746,7 +750,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                 "name": "redis",
                 "image": "redis:6-alpine",
             },
-        ] + selenium(),
+        ] + selenium() + middlewareService(),
         "volumes": [stepVolumeOC10Tests] +
                    [{
                        "name": "uploads",
@@ -782,7 +786,7 @@ def failEarly(ctx, early_fail):
                 "image": "thegeeklab/drone-github-comment:1",
                 "settings": {
                     "message": ":boom: Acceptance test [<strong>${DRONE_STAGE_NAME}</strong>](${DRONE_BUILD_LINK}/${DRONE_STAGE_NUMBER}/1) failed. Further test are cancelled...",
-                    "key": "pr-${DRONE_PULL_REQUEST}",  #TODO: we could delete the comment after a successfull CI run
+                    "key": "pr-${DRONE_PULL_REQUEST}",  #TODO: we could delete the comment after a successful CI run
                     "update": "true",
                     "api_key": {
                         "from_secret": "github_token",
@@ -1417,6 +1421,38 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
         },
     ]
 
+def middlewareService():
+    return [{
+        "name": "middleware",
+        "image": "owncloud/owncloud-test-middleware",
+        "pull": "always",
+        "environment": {
+            "BACKEND_HOST": "https://ocis-server:9200",
+            "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/storage/owncloud/",
+            "RUN_ON_OCIS": "true",
+            "HOST": "middleware",
+            "REMOTE_UPLOAD_DIR": "/uploads",
+            "NODE_TLS_REJECT_UNAUTHORIZED": "0",
+            "MIDDLEWARE_HOST": "middleware",
+        },
+        "volumes": [{
+            "name": "uploads",
+            "path": "/uploads",
+        }, {
+            "name": "gopath",
+            "path": "/srv/app",
+        }],
+    }]
+
+def waitForMiddlewareService():
+    return [{
+        "name": "wait-for-middleware-service",
+        "image": OC_CI_WAIT_FOR,
+        "commands": [
+            "wait-for -it middleware:3000 -t 300",
+        ],
+    }]
+
 def cloneCoreRepos():
     return [
         {
@@ -1458,6 +1494,15 @@ def selenium():
             }],
         },
     ]
+
+def waitForSeleniumService():
+    return [{
+        "name": "wait-for-selenium-service",
+        "image": OC_CI_WAIT_FOR,
+        "commands": [
+            "wait-for -it selenium:4444 -t 300",
+        ],
+    }]
 
 def build():
     return [

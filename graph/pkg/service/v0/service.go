@@ -85,9 +85,9 @@ func NewService(opts ...Option) Service {
 				r.Route("/drives", func(r chi.Router) {
 					r.Get("/", svc.GetDrives)
 					r.Post("/", svc.CreateDrive)
-				})
-				r.Route("/Drive({firstSegmentIdentifier})", func(r chi.Router) {
-					r.Patch("/*", svc.UpdateDrive)
+					r.Route("/{driveID}", func(r chi.Router) {
+						r.Patch("/", svc.UpdateDrive)
+					})
 				})
 			})
 		})

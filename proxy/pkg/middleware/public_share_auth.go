@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 )
@@ -32,12 +33,23 @@ func PublicShareAuth(opts ...Option) func(next http.Handler) http.Handler {
 				return
 			}
 
-			// We can ignore the username since it is always set to "public" in public shares.
-			_, password, ok := r.BasicAuth()
+			var sharePassword string
+			if signature := r.URL.Query().Get("signature"); signature != "" {
+				expiration := r.URL.Query().Get("expiration")
+				if expiration == "" {
+					logger.Warn().Str("signature", signature).Msg("cannot do signature auth without the expiration")
+					next.ServeHTTP(w, r)
+					return
+				}
+				sharePassword = strings.Join([]string{"signature", signature, expiration}, "|")
+			} else {
+				// We can ignore the username since it is always set to "public" in public shares.
+				_, password, ok := r.BasicAuth()
 
-			sharePassword := basicAuthPasswordPrefix
-			if ok {
-				sharePassword += password
+				sharePassword = basicAuthPasswordPrefix
+				if ok {
+					sharePassword += password
+				}
 			}
 
 			authResp, err := options.RevaGatewayClient.Authenticate(r.Context(), &gateway.AuthenticateRequest{

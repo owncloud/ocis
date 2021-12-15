@@ -1,10 +1,8 @@
-Enhancement: Update REVA to v1.17.0
+Enhancement: Update REVA to xxx
 
-Updated REVA to v1.17.0
+Updated REVA to xxx
 This update includes:
 
- * #TODO: update this changelog before the next oCIS release
+ * TODO: update changelog before oCIS release
 
-
-https://github.com/owncloud/ocis/pull/2835
-https://github.com/owncloud/ocis/pull/2837
+https://github.com/owncloud/ocis/pull/2878
