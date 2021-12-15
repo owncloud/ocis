@@ -61,6 +61,7 @@ type AppProvider struct {
 	WopiDriver   WopiDriver `ocisConfig:"wopi_driver"`
 	AppsURL      string     `ocisConfig:"apps_url"`
 	OpenURL      string     `ocisConfig:"open_url"`
+	NewURL       string     `ocisConfig:"new_url"`
 }
 
 type WopiDriver struct {
@@ -938,6 +939,7 @@ func DefaultConfig() *Config {
 				WopiDriver:   WopiDriver{},
 				AppsURL:      "/app/list",
 				OpenURL:      "/app/open",
+				NewURL:       "/app/new",
 			},
 			Configs:                     nil,
 			UploadMaxChunkSize:          1e+8,
@@ -1316,6 +1318,10 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"STORAGE_FRONTEND_APP_PROVIDER_OPEN_URL"},
 			Destination: &cfg.Reva.AppProvider.OpenURL,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_APP_PROVIDER_NEW_URL"},
+			Destination: &cfg.Reva.AppProvider.NewURL,
 		},
 
 		// gateway
