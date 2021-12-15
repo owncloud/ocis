@@ -234,7 +234,7 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 		},
 		cfg.Reva.StorageShares.Endpoint: {
 			"spaces": map[string]interface{}{
-				"share": map[string]interface{}{
+				"reference": map[string]interface{}{
 					"mount_point":   "/users/{{.CurrentUser.Id.OpaqueId}}/Shares",
 					"path_template": "/users/{{.CurrentUser.Id.OpaqueId}}/Shares/{{.Space.Name}}",
 				},
