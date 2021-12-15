@@ -5,36 +5,25 @@ import (
 	"net/url"
 
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	msgraph "github.com/yaegashi/msgraph.go/beta"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
 type Backend interface {
-	GetUser(ctx context.Context, nameOrId string) (*msgraph.User, error)
-	GetUsers(ctx context.Context, queryParam url.Values) ([]*msgraph.User, error)
+	GetUser(ctx context.Context, nameOrId string) (*libregraph.User, error)
+	GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error)
 
-	GetGroup(ctx context.Context, nameOrId string) (*msgraph.Group, error)
-	GetGroups(ctx context.Context, queryParam url.Values) ([]*msgraph.Group, error)
+	GetGroup(ctx context.Context, nameOrId string) (*libregraph.Group, error)
+	GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error)
 }
 
-func CreateUserModelFromCS3(u *cs3.User) *msgraph.User {
+func CreateUserModelFromCS3(u *cs3.User) *libregraph.User {
 	if u.Id == nil {
 		u.Id = &cs3.UserId{}
 	}
-	return &msgraph.User{
-		DisplayName: &u.DisplayName,
-		Mail:        &u.Mail,
-		// TODO u.Groups are those ids or group names?
+	return &libregraph.User{
+		DisplayName:              &u.DisplayName,
+		Mail:                     &u.Mail,
 		OnPremisesSamAccountName: &u.Username,
-		DirectoryObject: msgraph.DirectoryObject{
-			Entity: msgraph.Entity{
-				ID: &u.Id.OpaqueId,
-				Object: msgraph.Object{
-					AdditionalData: map[string]interface{}{
-						"uidnumber": u.UidNumber,
-						"gidnumber": u.GidNumber,
-					},
-				},
-			},
-		},
+		Id:                       &u.Id.OpaqueId,
 	}
 }

@@ -8,7 +8,7 @@ import (
 	cs3user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
-	msgraph "github.com/yaegashi/msgraph.go/beta"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/owncloud/ocis/graph/pkg/config"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
@@ -20,7 +20,7 @@ type CS3 struct {
 	Logger *log.Logger
 }
 
-func (i *CS3) GetUser(ctx context.Context, userID string) (*msgraph.User, error) {
+func (i *CS3) GetUser(ctx context.Context, userID string) (*libregraph.User, error) {
 	client, err := pool.GetGatewayServiceClient(i.Config.Address)
 	if err != nil {
 		i.Logger.Error().Err(err).Msg("could not get client")
@@ -46,7 +46,7 @@ func (i *CS3) GetUser(ctx context.Context, userID string) (*msgraph.User, error)
 	return CreateUserModelFromCS3(res.User), nil
 }
 
-func (i *CS3) GetUsers(ctx context.Context, queryParam url.Values) ([]*msgraph.User, error) {
+func (i *CS3) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error) {
 	client, err := pool.GetGatewayServiceClient(i.Config.Address)
 	if err != nil {
 		i.Logger.Error().Err(err).Msg("could not get client")
@@ -75,7 +75,7 @@ func (i *CS3) GetUsers(ctx context.Context, queryParam url.Values) ([]*msgraph.U
 		return nil, errorcode.New(errorcode.GeneralException, res.Status.Message)
 	}
 
-	users := make([]*msgraph.User, 0, len(res.Users))
+	users := make([]*libregraph.User, 0, len(res.Users))
 
 	for _, user := range res.Users {
 		users = append(users, CreateUserModelFromCS3(user))
@@ -84,7 +84,7 @@ func (i *CS3) GetUsers(ctx context.Context, queryParam url.Values) ([]*msgraph.U
 	return users, nil
 }
 
-func (i *CS3) GetGroups(ctx context.Context, queryParam url.Values) ([]*msgraph.Group, error) {
+func (i *CS3) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error) {
 	client, err := pool.GetGatewayServiceClient(i.Config.Address)
 	if err != nil {
 		i.Logger.Error().Err(err).Msg("could not get client")
@@ -114,7 +114,7 @@ func (i *CS3) GetGroups(ctx context.Context, queryParam url.Values) ([]*msgraph.
 		return nil, errorcode.New(errorcode.GeneralException, res.Status.Message)
 	}
 
-	groups := make([]*msgraph.Group, 0, len(res.Groups))
+	groups := make([]*libregraph.Group, 0, len(res.Groups))
 
 	for _, group := range res.Groups {
 		groups = append(groups, createGroupModelFromCS3(group))
@@ -123,7 +123,7 @@ func (i *CS3) GetGroups(ctx context.Context, queryParam url.Values) ([]*msgraph.
 	return groups, nil
 }
 
-func (i *CS3) GetGroup(ctx context.Context, groupID string) (*msgraph.Group, error) {
+func (i *CS3) GetGroup(ctx context.Context, groupID string) (*libregraph.Group, error) {
 	client, err := pool.GetGatewayServiceClient(i.Config.Address)
 	if err != nil {
 		i.Logger.Error().Err(err).Msg("could not get client")
@@ -150,16 +150,12 @@ func (i *CS3) GetGroup(ctx context.Context, groupID string) (*msgraph.Group, err
 	return createGroupModelFromCS3(res.Group), nil
 }
 
-func createGroupModelFromCS3(g *cs3group.Group) *msgraph.Group {
+func createGroupModelFromCS3(g *cs3group.Group) *libregraph.Group {
 	if g.Id == nil {
 		g.Id = &cs3group.GroupId{}
 	}
-	return &msgraph.Group{
-		DirectoryObject: msgraph.DirectoryObject{
-			Entity: msgraph.Entity{
-				ID: &g.Id.OpaqueId,
-			},
-		},
+	return &libregraph.Group{
+		Id:                       &g.Id.OpaqueId,
 		OnPremisesDomainName:     &g.Id.Idp,
 		OnPremisesSamAccountName: &g.GroupName,
 		DisplayName:              &g.DisplayName,
