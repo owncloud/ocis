@@ -405,12 +405,6 @@ func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpac
 		Name: &space.Name,
 		//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
 		//"description": "string", // TODO read from StorageSpace ... needs Opaque for now
-		Owner: &libregraph.IdentitySet{
-			User: &libregraph.Identity{
-				Id: &space.Owner.Id.OpaqueId,
-				// DisplayName: , TODO read and cache from users provider
-			},
-		},
 		DriveType: &space.SpaceType,
 		Root: &libregraph.DriveItem{
 			Id: &rootID,
