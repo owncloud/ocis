@@ -15,8 +15,6 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/pkg/ctx"
@@ -27,7 +25,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	sproto "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	settingsSvc "github.com/owncloud/ocis/settings/pkg/service/v0"
-	msgraph "github.com/yaegashi/msgraph.go/beta"
 
 	merrors "go-micro.dev/v4/errors"
 )
@@ -214,7 +211,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	csr := provider.CreateStorageSpaceRequest{
+	csr := storageprovider.CreateStorageSpaceRequest{
 		Owner: us,
 		Type:  driveType,
 		Name:  spaceName,
@@ -227,7 +224,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
+	if resp.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "")
 		return
 	}
@@ -267,16 +264,16 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	root := &provider.ResourceId{}
+	root := &storageprovider.ResourceId{}
 
-	identifierParts := strings.Split(req.FirstSegment.Identifier.Get(), "!")
+	identifierParts := strings.Split(driveID, "!")
 	switch len(identifierParts) {
 	case 1:
 		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[0]
 	case 2:
 		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[1]
 	default:
-		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid resource id: %v", req.FirstSegment.Identifier.Get()))
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid resource id: %v", driveID))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -287,10 +284,10 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updateSpaceRequest := &provider.UpdateStorageSpaceRequest{
+	updateSpaceRequest := &storageprovider.UpdateStorageSpaceRequest{
 		// Prepare the object to apply the diff from. The properties on StorageSpace will overwrite
 		// the original storage space.
-		StorageSpace: &provider.StorageSpace{
+		StorageSpace: &storageprovider.StorageSpace{
 			Id: &storageprovider.StorageSpaceId{
 				OpaqueId: root.StorageId + "!" + root.OpaqueId,
 			},
@@ -324,9 +321,9 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if resp.GetStatus().GetCode() != v1beta11.Code_CODE_OK {
+	if resp.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
 		switch resp.Status.GetCode() {
-		case v1beta11.Code_CODE_NOT_FOUND:
+		case cs3rpc.Code_CODE_NOT_FOUND:
 			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, resp.GetStatus().GetMessage())
 			return
 		default:
@@ -430,8 +427,8 @@ func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpac
 
 	// TODO The public space has no owner ... should we even show it?
 	if space.Owner != nil && space.Owner.Id != nil {
-		drive.Owner = &msgraph.IdentitySet{
-			User: &msgraph.Identity{
+		drive.Owner = &libregraph.IdentitySet{
+			User: &libregraph.Identity{
 				Id: &space.Owner.Id.OpaqueId,
 				// DisplayName: , TODO read and cache from users provider
 			},
@@ -474,16 +471,16 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storag
 	return responses, nil
 }
 
-func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (libregraph.Quota, error) {
+func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (*libregraph.Quota, error) {
 	client, err := g.GetClient()
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error creating grpc client")
-		return libregraph.Quota{}, err
+		return nil, err
 	}
 
 	req := &gateway.GetQuotaRequest{
-		Ref: &provider.Reference{
-			ResourceId: &provider.ResourceId{
+		Ref: &storageprovider.Reference{
+			ResourceId: &storageprovider.ResourceId{
 				StorageId: space.Root.StorageId,
 				OpaqueId:  space.Root.OpaqueId,
 			},
@@ -494,13 +491,13 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 	switch {
 	case err != nil:
 		g.logger.Error().Err(err).Msg("error sending get quota grpc request")
-		return libregraph.Quota{}, nil
+		return nil, nil
 	case res.Status.Code == cs3rpc.Code_CODE_UNIMPLEMENTED:
 		// TODO well duh
-		return libregraph.Quota{}, nil
+		return nil, nil
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
 		g.logger.Error().Err(err).Msg("error sending sending get quota grpc request")
-		return libregraph.Quota{}, err
+		return nil, err
 	}
 
 	total := int64(res.TotalBytes)
@@ -515,7 +512,7 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 	state := calculateQuotaState(total, used)
 	qta.State = &state
 
-	return qta, nil
+	return &qta, nil
 }
 
 func calculateQuotaState(total int64, used int64) (state string) {
@@ -533,16 +530,16 @@ func calculateQuotaState(total int64, used int64) (state string) {
 	}
 }
 
-func getQuota(quota *libregraph.Quota, defaultQuota string) *provider.Quota {
+func getQuota(quota *libregraph.Quota, defaultQuota string) *storageprovider.Quota {
 	switch {
 	case quota != nil && quota.Total != nil:
 		if q := *quota.Total; q >= 0 {
-			return &provider.Quota{QuotaMaxBytes: uint64(q)}
+			return &storageprovider.Quota{QuotaMaxBytes: uint64(q)}
 		}
 		fallthrough
 	case defaultQuota != "":
 		if q, err := strconv.ParseInt(defaultQuota, 10, 64); err == nil && q >= 0 {
-			return &provider.Quota{QuotaMaxBytes: uint64(q)}
+			return &storageprovider.Quota{QuotaMaxBytes: uint64(q)}
 		}
 		fallthrough
 	default:
