@@ -24,7 +24,8 @@ The capabilities endpoint (eg. `https://localhost:9200/ocs/v1.php/cloud/capabili
               "enabled": true,
               "version": "1.0.0",
               "apps_url": "/app/list",
-              "open_url": "/app/open"
+              "open_url": "/app/open",
+              "new_url": "/app/new"
             }
           ]
         }
