@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Change - Return not found when updating non existent space: [#2869](https://github.com/cs3org/reva/pull/2869)
 * Enhancement - Add new file url of the app provider to the ocs capabilities: [#2884](https://github.com/owncloud/ocis/pull/2884)
 * Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
+* Enhancement - Update REVA to xxx: [#2878](https://github.com/owncloud/ocis/pull/2878)
 
 ## Details
 
@@ -39,6 +40,14 @@ The following sections list the changes for unreleased.
    Enabled public share requests to be authenticated using the public share signature.
 
    https://github.com/owncloud/ocis/pull/2831
+
+* Enhancement - Update REVA to xxx: [#2878](https://github.com/owncloud/ocis/pull/2878)
+
+   Updated REVA to xxx This update includes:
+
+  * TODO: update changelog before oCIS release
+
+   https://github.com/owncloud/ocis/pull/2878
 # Changelog for [1.16.0] (2021-12-10)
 
 The following sections list the changes for 1.16.0.
