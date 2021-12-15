@@ -5,22 +5,24 @@ import (
 	"path"
 	"strconv"
 
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
 	merrors "go-micro.dev/v4/errors"
 	p "google.golang.org/protobuf/proto"
 )
 
-func (s Service) expandMembers(g *proto.Group) {
+func (s Service) expandMembers(g *accountsmsg.Group) {
 	if g == nil {
 		return
 	}
-	expanded := []*proto.Account{}
+	expanded := []*accountsmsg.Account{}
 	for i := range g.Members {
 		// TODO resolve by name, when a create or update is issued they may not have an id? fall back to searching the group id in the index?
-		a := &proto.Account{}
+		a := &accountsmsg.Account{}
 		if err := s.repo.LoadAccount(context.Background(), g.Members[i].Id, a); err == nil {
 			expanded = append(expanded, a)
 		} else {
@@ -32,14 +34,14 @@ func (s Service) expandMembers(g *proto.Group) {
 }
 
 // deflateMembers replaces the users of a group with an instance that only contains the id
-func (s Service) deflateMembers(g *proto.Group) {
+func (s Service) deflateMembers(g *accountsmsg.Group) {
 	if g == nil {
 		return
 	}
-	deflated := []*proto.Account{}
+	deflated := []*accountsmsg.Account{}
 	for i := range g.Members {
 		if g.Members[i].Id != "" {
-			deflated = append(deflated, &proto.Account{Id: g.Members[i].Id})
+			deflated = append(deflated, &accountsmsg.Account{Id: g.Members[i].Id})
 		} else {
 			// TODO fetch and use an id when group only has a name but no id
 			s.log.Error().Str("id", g.Id).Interface("account", g.Members[i]).Msg("resolving members by name is not implemented yet")
@@ -49,7 +51,7 @@ func (s Service) deflateMembers(g *proto.Group) {
 }
 
 // ListGroups implements the GroupsServiceHandler interface
-func (s Service) ListGroups(ctx context.Context, in *proto.ListGroupsRequest, out *proto.ListGroupsResponse) (err error) {
+func (s Service) ListGroups(ctx context.Context, in *accountssvc.ListGroupsRequest, out *accountssvc.ListGroupsResponse) (err error) {
 	if in.Query == "" {
 		err = s.repo.LoadGroups(ctx, &out.Groups)
 		if err != nil {
@@ -68,10 +70,10 @@ func (s Service) ListGroups(ctx context.Context, in *proto.ListGroupsRequest, ou
 	}
 
 	searchResults, err := s.findGroupsByQuery(ctx, in.Query)
-	out.Groups = make([]*proto.Group, 0, len(searchResults))
+	out.Groups = make([]*accountsmsg.Group, 0, len(searchResults))
 
 	for _, hit := range searchResults {
-		g := &proto.Group{}
+		g := &accountsmsg.Group{}
 		if err = s.repo.LoadGroup(ctx, hit, g); err != nil {
 			s.log.Error().Err(err).Str("group", hit).Msg("could not load group, skipping")
 			continue
@@ -88,11 +90,11 @@ func (s Service) ListGroups(ctx context.Context, in *proto.ListGroupsRequest, ou
 	return
 }
 func (s Service) findGroupsByQuery(ctx context.Context, query string) ([]string, error) {
-	return s.index.Query(ctx, &proto.Group{}, query)
+	return s.index.Query(ctx, &accountsmsg.Group{}, query)
 }
 
 // GetGroup implements the GroupsServiceHandler interface
-func (s Service) GetGroup(c context.Context, in *proto.GetGroupRequest, out *proto.Group) (err error) {
+func (s Service) GetGroup(c context.Context, in *accountssvc.GetGroupRequest, out *accountsmsg.Group) (err error) {
 	var id string
 	if id, err = cleanupID(in.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up group id: %v", err.Error())
@@ -116,7 +118,7 @@ func (s Service) GetGroup(c context.Context, in *proto.GetGroupRequest, out *pro
 }
 
 // CreateGroup implements the GroupsServiceHandler interface
-func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, out *proto.Group) (err error) {
+func (s Service) CreateGroup(c context.Context, in *accountssvc.CreateGroupRequest, out *accountsmsg.Group) (err error) {
 	if in.Group == nil {
 		return merrors.InternalServerError(s.id, "invalid group: empty")
 	}
@@ -159,7 +161,7 @@ func (s Service) CreateGroup(c context.Context, in *proto.CreateGroupRequest, ou
 }
 
 // rollbackCreateGroup tries to rollback changes made by `CreateGroup` if parts of it failed.
-func (s Service) rollbackCreateGroup(ctx context.Context, group *proto.Group) {
+func (s Service) rollbackCreateGroup(ctx context.Context, group *accountsmsg.Group) {
 	err := s.index.Delete(group)
 	if err != nil {
 		s.log.Err(err).Msg("failed to rollback group from indices")
@@ -171,18 +173,18 @@ func (s Service) rollbackCreateGroup(ctx context.Context, group *proto.Group) {
 }
 
 // UpdateGroup implements the GroupsServiceHandler interface
-func (s Service) UpdateGroup(c context.Context, in *proto.UpdateGroupRequest, out *proto.Group) (err error) {
+func (s Service) UpdateGroup(c context.Context, in *accountssvc.UpdateGroupRequest, out *accountsmsg.Group) (err error) {
 	return merrors.InternalServerError(s.id, "not implemented")
 }
 
 // DeleteGroup implements the GroupsServiceHandler interface
-func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, out *empty.Empty) (err error) {
+func (s Service) DeleteGroup(c context.Context, in *accountssvc.DeleteGroupRequest, out *empty.Empty) (err error) {
 	var id string
 	if id, err = cleanupID(in.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up group id: %v", err.Error())
 	}
 
-	g := &proto.Group{}
+	g := &accountsmsg.Group{}
 	if err = s.repo.LoadGroup(c, id, g); err != nil {
 		if storage.IsNotFoundErr(err) {
 			return merrors.NotFound(s.id, "group not found: %v", err.Error())
@@ -192,7 +194,7 @@ func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, ou
 
 	// delete memberof relationship in users
 	for i := range g.Members {
-		err = s.RemoveMember(c, &proto.RemoveMemberRequest{
+		err = s.RemoveMember(c, &accountssvc.RemoveMemberRequest{
 			AccountId: g.Members[i].Id,
 			GroupId:   id,
 		}, g)
@@ -219,7 +221,7 @@ func (s Service) DeleteGroup(c context.Context, in *proto.DeleteGroupRequest, ou
 }
 
 // AddMember implements the GroupsServiceHandler interface
-func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *proto.Group) (err error) {
+func (s Service) AddMember(c context.Context, in *accountssvc.AddMemberRequest, out *accountsmsg.Group) (err error) {
 	// cleanup ids
 	var groupID string
 	if groupID, err = cleanupID(in.GroupId); err != nil {
@@ -232,7 +234,7 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 	}
 
 	// load structs
-	a := &proto.Account{}
+	a := &accountsmsg.Account{}
 	if err = s.repo.LoadAccount(c, accountID, a); err != nil {
 		if storage.IsNotFoundErr(err) {
 			return merrors.NotFound(s.id, "group not found: %v", err.Error())
@@ -240,7 +242,7 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 		return merrors.InternalServerError(s.id, "could not load group: %v", err.Error())
 	}
 
-	g := &proto.Group{}
+	g := &accountsmsg.Group{}
 	if err = s.repo.LoadGroup(c, groupID, g); err != nil {
 		if storage.IsNotFoundErr(err) {
 			return merrors.NotFound(s.id, "could not load group: %v", err.Error())
@@ -255,7 +257,7 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 			alreadyRelated = true
 		}
 	}
-	aref := &proto.Account{
+	aref := &accountsmsg.Account{
 		Id: a.Id,
 	}
 	if !alreadyRelated {
@@ -271,7 +273,7 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 		}
 	}
 	// only store the reference to prevent recursion when marshaling json
-	gref := &proto.Group{
+	gref := &accountsmsg.Group{
 		Id: g.Id,
 	}
 	if !alreadyRelated {
@@ -292,7 +294,7 @@ func (s Service) AddMember(c context.Context, in *proto.AddMemberRequest, out *p
 }
 
 // RemoveMember implements the GroupsServiceHandler interface
-func (s Service) RemoveMember(c context.Context, in *proto.RemoveMemberRequest, out *proto.Group) (err error) {
+func (s Service) RemoveMember(c context.Context, in *accountssvc.RemoveMemberRequest, out *accountsmsg.Group) (err error) {
 
 	// cleanup ids
 	var groupID string
@@ -306,7 +308,7 @@ func (s Service) RemoveMember(c context.Context, in *proto.RemoveMemberRequest, 
 	}
 
 	// load structs
-	a := &proto.Account{}
+	a := &accountsmsg.Account{}
 	if err = s.repo.LoadAccount(c, accountID, a); err != nil {
 		if storage.IsNotFoundErr(err) {
 			return merrors.NotFound(s.id, "could not load account: %v", err.Error())
@@ -315,7 +317,7 @@ func (s Service) RemoveMember(c context.Context, in *proto.RemoveMemberRequest, 
 		return merrors.InternalServerError(s.id, "could not load account: %v", err.Error())
 	}
 
-	g := &proto.Group{}
+	g := &accountsmsg.Group{}
 	if err = s.repo.LoadGroup(c, groupID, g); err != nil {
 		if storage.IsNotFoundErr(err) {
 			return merrors.NotFound(s.id, "could not load group: %v", err.Error())
@@ -325,7 +327,7 @@ func (s Service) RemoveMember(c context.Context, in *proto.RemoveMemberRequest, 
 	}
 
 	//remove the account from the group if it exists
-	newMembers := []*proto.Account{}
+	newMembers := []*accountsmsg.Account{}
 	for i := range g.Members {
 		if g.Members[i].Id != a.Id {
 			newMembers = append(newMembers, g.Members[i])
@@ -334,7 +336,7 @@ func (s Service) RemoveMember(c context.Context, in *proto.RemoveMemberRequest, 
 	g.Members = newMembers
 
 	// remove the group from the account if it exists
-	newGroups := []*proto.Group{}
+	newGroups := []*accountsmsg.Group{}
 	for i := range a.MemberOf {
 		if a.MemberOf[i].Id != g.Id {
 			newGroups = append(newGroups, a.MemberOf[i])
@@ -358,14 +360,14 @@ func (s Service) RemoveMember(c context.Context, in *proto.RemoveMemberRequest, 
 }
 
 // ListMembers implements the GroupsServiceHandler interface
-func (s Service) ListMembers(c context.Context, in *proto.ListMembersRequest, out *proto.ListMembersResponse) (err error) {
+func (s Service) ListMembers(c context.Context, in *accountssvc.ListMembersRequest, out *accountssvc.ListMembersResponse) (err error) {
 	// cleanup ids
 	var groupID string
 	if groupID, err = cleanupID(in.Id); err != nil {
 		return merrors.InternalServerError(s.id, "could not clean up group id: %v", err.Error())
 	}
 
-	g := &proto.Group{}
+	g := &accountsmsg.Group{}
 	if err = s.repo.LoadGroup(c, groupID, g); err != nil {
 		if storage.IsNotFoundErr(err) {
 			return merrors.NotFound(s.id, "group not found: %v", err.Error())

@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+
 	glauthcfg "github.com/glauth/glauth/v2/pkg/config"
 	"github.com/oklog/run"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/glauth/pkg/config"
 	"github.com/owncloud/ocis/glauth/pkg/config/parser"
 	"github.com/owncloud/ocis/glauth/pkg/logging"
@@ -179,7 +180,7 @@ func Server(cfg *config.Config) *cli.Command {
 }
 
 // getAccountsServices returns an ocis-accounts service
-func getAccountsServices() (accounts.AccountsService, accounts.GroupsService) {
-	return accounts.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient),
-		accounts.NewGroupsService("com.owncloud.api.accounts", grpc.DefaultClient)
+func getAccountsServices() (accountssvc.AccountsService, accountssvc.GroupsService) {
+	return accountssvc.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient),
+		accountssvc.NewGroupsService("com.owncloud.api.accounts", grpc.DefaultClient)
 }

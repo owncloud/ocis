@@ -5,12 +5,14 @@ import (
 	"os"
 	"strconv"
 
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+
 	"github.com/owncloud/ocis/accounts/pkg/flagset"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/accounts/pkg/config"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/urfave/cli/v2"
 )
 
@@ -30,8 +32,8 @@ func InspectAccount(cfg *config.Config) *cli.Command {
 			}
 
 			uid := c.Args().First()
-			accSvc := accounts.NewAccountsService(accServiceID, grpc.NewClient())
-			acc, err := accSvc.GetAccount(c.Context, &accounts.GetAccountRequest{
+			accSvc := accountssvc.NewAccountsService(accServiceID, grpc.NewClient())
+			acc, err := accSvc.GetAccount(c.Context, &accountssvc.GetAccountRequest{
 				Id: uid,
 			})
 
@@ -45,7 +47,7 @@ func InspectAccount(cfg *config.Config) *cli.Command {
 		}}
 }
 
-func buildAccountInspectTable(acc *accounts.Account) *tw.Table {
+func buildAccountInspectTable(acc *accountsmsg.Account) *tw.Table {
 	table := tw.NewWriter(os.Stdout)
 	table.SetAutoMergeCells(true)
 	table.AppendBulk([][]string{

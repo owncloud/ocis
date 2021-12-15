@@ -8,8 +8,9 @@ import (
 
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
@@ -29,7 +30,7 @@ type Options struct {
 	// HTTPClient to use for communication with the oidcAuth provider
 	HTTPClient *http.Client
 	// AccountsClient for resolving accounts
-	AccountsClient acc.AccountsService
+	AccountsClient accountssvc.AccountsService
 	// UP
 	UserProvider backend.UserBackend
 	// SettingsRoleService for the roles API in settings
@@ -100,7 +101,7 @@ func HTTPClient(c *http.Client) Option {
 }
 
 // AccountsClient provides a function to set the accounts client config option.
-func AccountsClient(ac acc.AccountsService) Option {
+func AccountsClient(ac accountssvc.AccountsService) Option {
 	return func(o *Options) {
 		o.AccountsClient = ac
 	}

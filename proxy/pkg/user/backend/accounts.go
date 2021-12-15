@@ -6,18 +6,20 @@ import (
 	"net/http"
 	"strings"
 
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/pkg/auth/scope"
 	"github.com/cs3org/reva/pkg/token"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
 // NewAccountsServiceUserBackend creates a user-provider which fetches users from the ocis accounts-service
-func NewAccountsServiceUserBackend(ac accounts.AccountsService, rs settings.RoleService, oidcISS string, tokenManager token.Manager, logger log.Logger) UserBackend {
+func NewAccountsServiceUserBackend(ac accountssvc.AccountsService, rs settings.RoleService, oidcISS string, tokenManager token.Manager, logger log.Logger) UserBackend {
 	return &accountsServiceBackend{
 		accountsClient:      ac,
 		settingsRoleService: rs,
@@ -28,7 +30,7 @@ func NewAccountsServiceUserBackend(ac accounts.AccountsService, rs settings.Role
 }
 
 type accountsServiceBackend struct {
-	accountsClient      accounts.AccountsService
+	accountsClient      accountssvc.AccountsService
 	settingsRoleService settings.RoleService
 	OIDCIss             string
 	logger              log.Logger
@@ -36,7 +38,7 @@ type accountsServiceBackend struct {
 }
 
 func (a accountsServiceBackend) GetUserByClaims(ctx context.Context, claim, value string, withRoles bool) (*cs3.User, string, error) {
-	var account *accounts.Account
+	var account *accountsmsg.Account
 	var status int
 	var query string
 
@@ -109,8 +111,8 @@ func (a *accountsServiceBackend) Authenticate(ctx context.Context, username stri
 }
 
 func (a accountsServiceBackend) CreateUserFromClaims(ctx context.Context, claims map[string]interface{}) (*cs3.User, error) {
-	req := &accounts.CreateAccountRequest{
-		Account: &accounts.Account{
+	req := &accountssvc.CreateAccountRequest{
+		Account: &accountsmsg.Account{
 			CreationType:   "LocalAccount",
 			AccountEnabled: true,
 		},
@@ -155,7 +157,7 @@ func (a accountsServiceBackend) GetUserGroups(ctx context.Context, userID string
 
 // accountToUser converts an owncloud account struct to a reva user struct. In the proxy
 // we work with the reva struct as a token can be minted from it.
-func (a *accountsServiceBackend) accountToUser(account *accounts.Account) *cs3.User {
+func (a *accountsServiceBackend) accountToUser(account *accountsmsg.Account) *cs3.User {
 	user := &cs3.User{
 		Id: &cs3.UserId{
 			OpaqueId: account.Id,
@@ -173,8 +175,8 @@ func (a *accountsServiceBackend) accountToUser(account *accounts.Account) *cs3.U
 	return user
 }
 
-func (a *accountsServiceBackend) getAccount(ctx context.Context, query string) (account *accounts.Account, status int) {
-	resp, err := a.accountsClient.ListAccounts(ctx, &accounts.ListAccountsRequest{
+func (a *accountsServiceBackend) getAccount(ctx context.Context, query string) (account *accountsmsg.Account, status int) {
+	resp, err := a.accountsClient.ListAccounts(ctx, &accountssvc.ListAccountsRequest{
 		Query:    query,
 		PageSize: 2,
 	})
@@ -216,7 +218,7 @@ func (a *accountsServiceBackend) generateToken(ctx context.Context, u *cs3.User)
 	return token, nil
 }
 
-func expandGroups(account *accounts.Account) []string {
+func expandGroups(account *accountsmsg.Account) []string {
 	groups := make([]string, len(account.MemberOf))
 	for i := range account.MemberOf {
 		// reva needs the unix group name

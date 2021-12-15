@@ -4,8 +4,8 @@ package storage
 
 //import (
 //	"context"
+//	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
 //	"github.com/owncloud/ocis/accounts/pkg/config"
-//	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 //	"github.com/stretchr/testify/assert"
 //	"testing"
 //)
@@ -25,7 +25,7 @@ package storage
 //	r, err := NewCS3Repo("hello", cfg)
 //	assert.NoError(t, err)
 //
-//	err = r.WriteAccount(context.Background(), &proto.Account{
+//	err = r.WriteAccount(context.Background(), &accountsmsg.Account{
 //		Id:             "fefef-egegweg-gegeg",
 //		AccountEnabled: true,
 //		DisplayName:    "Mike Jones",
@@ -39,14 +39,14 @@ package storage
 //	r, err := NewCS3Repo("hello", cfg)
 //	assert.NoError(t, err)
 //
-//	err = r.WriteAccount(context.Background(), &proto.Account{
+//	err = r.WriteAccount(context.Background(), &accountsmsg.Account{
 //		Id:             "fefef-egegweg-gegeg",
 //		AccountEnabled: true,
 //		DisplayName:    "Mike Jones",
 //		Mail:           "mike@example.com",
 //	})
 //
-//	acc := &proto.Account{}
+//	acc := &accountsmsg.Account{}
 //	err = r.LoadAccount(context.Background(), "fefef-egegweg-gegeg", acc)
 //
 //	assert.NoError(t, err)
@@ -59,7 +59,7 @@ package storage
 //	r, err := NewCS3Repo("hello", cfg)
 //	assert.NoError(t, err)
 //
-//	err = r.WriteAccount(context.Background(), &proto.Account{
+//	err = r.WriteAccount(context.Background(), &accountsmsg.Account{
 //		Id:             "delete-me-id",
 //		AccountEnabled: true,
 //		DisplayName:    "Mike Jones",

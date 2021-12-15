@@ -1,16 +1,17 @@
 package flagset
 
 import (
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
+
 	"github.com/owncloud/ocis/accounts/pkg/config"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/flags"
 	"github.com/urfave/cli/v2"
 )
 
 // UpdateAccountWithConfig applies update command flags to cfg
-func UpdateAccountWithConfig(cfg *config.Config, a *accounts.Account) []cli.Flag {
+func UpdateAccountWithConfig(cfg *config.Config, a *accountsmsg.Account) []cli.Flag {
 	if a.PasswordProfile == nil {
-		a.PasswordProfile = &accounts.PasswordProfile{}
+		a.PasswordProfile = &accountsmsg.PasswordProfile{}
 	}
 
 	return []cli.Flag{
@@ -92,9 +93,9 @@ func UpdateAccountWithConfig(cfg *config.Config, a *accounts.Account) []cli.Flag
 }
 
 // AddAccountWithConfig applies create command flags to cfg
-func AddAccountWithConfig(cfg *config.Config, a *accounts.Account) []cli.Flag {
+func AddAccountWithConfig(cfg *config.Config, a *accountsmsg.Account) []cli.Flag {
 	if a.PasswordProfile == nil {
-		a.PasswordProfile = &accounts.PasswordProfile{}
+		a.PasswordProfile = &accountsmsg.PasswordProfile{}
 	}
 
 	return []cli.Flag{

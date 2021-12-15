@@ -7,12 +7,13 @@ import (
 	"net/http"
 	"time"
 
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
 	"github.com/oklog/run"
-	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
@@ -139,7 +140,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 				Msg("Failed to create token manager")
 		}
 		userProvider = backend.NewAccountsServiceUserBackend(
-			acc.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient),
+			accountssvc.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient),
 			rolesClient,
 			cfg.OIDC.Issuer,
 			tokenManager,

@@ -8,8 +8,9 @@ import (
 	"path/filepath"
 	"sync"
 
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
+
 	"github.com/owncloud/ocis/accounts/pkg/config"
-	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
 )
 
@@ -43,7 +44,7 @@ func NewDiskRepo(cfg *config.Config, log olog.Logger) DiskRepo {
 }
 
 // WriteAccount to the local filesystem
-func (r DiskRepo) WriteAccount(ctx context.Context, a *proto.Account) (err error) {
+func (r DiskRepo) WriteAccount(ctx context.Context, a *accountsmsg.Account) (err error) {
 	// leave only the group id
 	r.deflateMemberOf(a)
 
@@ -57,7 +58,7 @@ func (r DiskRepo) WriteAccount(ctx context.Context, a *proto.Account) (err error
 }
 
 // LoadAccount from the local filesystem
-func (r DiskRepo) LoadAccount(ctx context.Context, id string, a *proto.Account) (err error) {
+func (r DiskRepo) LoadAccount(ctx context.Context, id string, a *accountsmsg.Account) (err error) {
 	path := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder, id)
 	var data []byte
 	if data, err = ioutil.ReadFile(path); err != nil {
@@ -71,14 +72,14 @@ func (r DiskRepo) LoadAccount(ctx context.Context, id string, a *proto.Account) 
 }
 
 // LoadAccounts loads all the accounts from the local filesystem
-func (r DiskRepo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err error) {
+func (r DiskRepo) LoadAccounts(ctx context.Context, a *[]*accountsmsg.Account) (err error) {
 	root := filepath.Join(r.cfg.Repo.Disk.Path, accountsFolder)
 	infos, err := ioutil.ReadDir(root)
 	if err != nil {
 		return err
 	}
 	for i := range infos {
-		acc := &proto.Account{}
+		acc := &accountsmsg.Account{}
 		if e := r.LoadAccount(ctx, infos[i].Name(), acc); e != nil {
 			r.log.Err(e).Msg("could not load account")
 			continue
@@ -101,7 +102,7 @@ func (r DiskRepo) DeleteAccount(ctx context.Context, id string) (err error) {
 }
 
 // WriteGroup to the local filesystem
-func (r DiskRepo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
+func (r DiskRepo) WriteGroup(ctx context.Context, g *accountsmsg.Group) (err error) {
 	// leave only the member id
 	r.deflateMembers(g)
 
@@ -119,7 +120,7 @@ func (r DiskRepo) WriteGroup(ctx context.Context, g *proto.Group) (err error) {
 }
 
 // LoadGroup from the local filesystem
-func (r DiskRepo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err error) {
+func (r DiskRepo) LoadGroup(ctx context.Context, id string, g *accountsmsg.Group) (err error) {
 	path := filepath.Join(r.cfg.Repo.Disk.Path, groupsFolder, id)
 
 	groupLock.Lock()
@@ -137,14 +138,14 @@ func (r DiskRepo) LoadGroup(ctx context.Context, id string, g *proto.Group) (err
 }
 
 // LoadGroups loads all the groups from the local filesystem
-func (r DiskRepo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) {
+func (r DiskRepo) LoadGroups(ctx context.Context, g *[]*accountsmsg.Group) (err error) {
 	root := filepath.Join(r.cfg.Repo.Disk.Path, groupsFolder)
 	infos, err := ioutil.ReadDir(root)
 	if err != nil {
 		return err
 	}
 	for i := range infos {
-		grp := &proto.Group{}
+		grp := &accountsmsg.Group{}
 		if e := r.LoadGroup(ctx, infos[i].Name(), grp); e != nil {
 			r.log.Err(e).Msg("could not load group")
 			continue
@@ -167,14 +168,14 @@ func (r DiskRepo) DeleteGroup(ctx context.Context, id string) (err error) {
 }
 
 // deflateMemberOf replaces the groups of a user with an instance that only contains the id
-func (r DiskRepo) deflateMemberOf(a *proto.Account) {
+func (r DiskRepo) deflateMemberOf(a *accountsmsg.Account) {
 	if a == nil {
 		return
 	}
-	var deflated []*proto.Group
+	var deflated []*accountsmsg.Group
 	for i := range a.MemberOf {
 		if a.MemberOf[i].Id != "" {
-			deflated = append(deflated, &proto.Group{Id: a.MemberOf[i].Id})
+			deflated = append(deflated, &accountsmsg.Group{Id: a.MemberOf[i].Id})
 		} else {
 			// TODO fetch and use an id when group only has a name but no id
 			r.log.Error().Str("id", a.Id).Interface("group", a.MemberOf[i]).Msg("resolving groups by name is not implemented yet")
@@ -184,14 +185,14 @@ func (r DiskRepo) deflateMemberOf(a *proto.Account) {
 }
 
 // deflateMembers replaces the users of a group with an instance that only contains the id
-func (r DiskRepo) deflateMembers(g *proto.Group) {
+func (r DiskRepo) deflateMembers(g *accountsmsg.Group) {
 	if g == nil {
 		return
 	}
-	var deflated []*proto.Account
+	var deflated []*accountsmsg.Account
 	for i := range g.Members {
 		if g.Members[i].Id != "" {
-			deflated = append(deflated, &proto.Account{Id: g.Members[i].Id})
+			deflated = append(deflated, &accountsmsg.Account{Id: g.Members[i].Id})
 		} else {
 			// TODO fetch and use an id when group only has a name but no id
 			r.log.Error().Str("id", g.Id).Interface("account", g.Members[i]).Msg("resolving members by name is not implemented yet")

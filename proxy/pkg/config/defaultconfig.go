@@ -132,7 +132,7 @@ func DefaultPolicies() []Policy {
 				},
 				// if we were using the go micro api gateway we could look up the endpoint in the registry dynamically
 				{
-					Endpoint: "/api/v0/accounts",
+					Endpoint: "/api/v1/accounts",
 					Backend:  "http://localhost:9181",
 				},
 				// TODO the lookup needs a better mechanism

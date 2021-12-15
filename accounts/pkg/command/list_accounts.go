@@ -5,12 +5,14 @@ import (
 	"os"
 	"strconv"
 
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+
 	"github.com/owncloud/ocis/accounts/pkg/flagset"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/accounts/pkg/config"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/urfave/cli/v2"
 )
 
@@ -24,8 +26,8 @@ func ListAccounts(cfg *config.Config) *cli.Command {
 		Flags:    flagset.ListAccountsWithConfig(cfg),
 		Action: func(c *cli.Context) error {
 			accSvcID := cfg.GRPC.Namespace + "." + cfg.Service.Name
-			accSvc := accounts.NewAccountsService(accSvcID, grpc.NewClient())
-			resp, err := accSvc.ListAccounts(c.Context, &accounts.ListAccountsRequest{})
+			accSvc := accountssvc.NewAccountsService(accSvcID, grpc.NewClient())
+			resp, err := accSvc.ListAccounts(c.Context, &accountssvc.ListAccountsRequest{})
 
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not list accounts %w", err))
@@ -38,7 +40,7 @@ func ListAccounts(cfg *config.Config) *cli.Command {
 }
 
 // buildAccountsListTable creates an ascii table for printing on the cli
-func buildAccountsListTable(accs []*accounts.Account) *tw.Table {
+func buildAccountsListTable(accs []*accountsmsg.Account) *tw.Table {
 	table := tw.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Id", "DisplayName", "Mail", "AccountEnabled"})
 	table.SetAutoFormatHeaders(false)

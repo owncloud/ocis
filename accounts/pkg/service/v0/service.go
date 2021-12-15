@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
 	"github.com/pkg/errors"
 
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
@@ -18,7 +19,6 @@ import (
 	idxerrs "github.com/owncloud/ocis/ocis-pkg/indexer/errors"
 
 	"github.com/owncloud/ocis/accounts/pkg/config"
-	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	oreg "github.com/owncloud/ocis/ocis-pkg/registry"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
@@ -162,7 +162,7 @@ func configFromSvc(cfg *config.Config) (*idxcfg.Config, error) {
 }
 
 func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
-	accounts := []proto.Account{
+	accounts := []accountsmsg.Account{
 		{
 			Id:                       "4c510ada-c86b-4815-8820-42cdf82c3d51",
 			PreferredName:            "einstein",
@@ -171,11 +171,11 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 			DisplayName:              "Albert Einstein",
 			UidNumber:                20000,
 			GidNumber:                30000,
-			PasswordProfile: &proto.PasswordProfile{
+			PasswordProfile: &accountsmsg.PasswordProfile{
 				Password: "$2a$11$4WNffzgU/WrIRiDnwu8OnOwgOIIUqR/2Ptvp7WJAQCTSgSrylyuvC",
 			},
 			AccountEnabled: true,
-			MemberOf: []*proto.Group{
+			MemberOf: []*accountsmsg.Group{
 				{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
 				{Id: "6040aa17-9c64-4fef-9bd0-77234d71bad0"}, // sailing-lovers
 				{Id: "dd58e5ec-842e-498b-8800-61f2ec6f911f"}, // violin-haters
@@ -190,11 +190,11 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 			DisplayName:              "Marie Curie",
 			UidNumber:                20001,
 			GidNumber:                30000,
-			PasswordProfile: &proto.PasswordProfile{
+			PasswordProfile: &accountsmsg.PasswordProfile{
 				Password: "$2a$11$Wu2XcDnE6G2No8C88FVWluNHyXuQQi0cHzSe82Vni8AdwIO12fphC",
 			},
 			AccountEnabled: true,
-			MemberOf: []*proto.Group{
+			MemberOf: []*accountsmsg.Group{
 				{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
 				{Id: "7b87fd49-286e-4a5f-bafd-c535d5dd997a"}, // radium-lovers
 				{Id: "cedc21aa-4072-4614-8676-fa9165f598ff"}, // polonium-lovers
@@ -209,11 +209,11 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 			DisplayName:              "Richard Feynman",
 			UidNumber:                20002,
 			GidNumber:                30000,
-			PasswordProfile: &proto.PasswordProfile{
+			PasswordProfile: &accountsmsg.PasswordProfile{
 				Password: "$2a$11$6Lak4zh1xUkpObg2rrOotOTdQYGj2Uu/sowcVLhub.8qYIr.CxzEW",
 			},
 			AccountEnabled: true,
-			MemberOf: []*proto.Group{
+			MemberOf: []*accountsmsg.Group{
 				{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
 				{Id: "a1726108-01f8-4c30-88df-2b1a9d1cba1a"}, // quantum-lovers
 				{Id: "167cbee2-0518-455a-bfb2-031fe0621e5d"}, // philosophy-haters
@@ -229,11 +229,11 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 			DisplayName:              "Maurice Moss",
 			UidNumber:                20003,
 			GidNumber:                30000,
-			PasswordProfile: &proto.PasswordProfile{
+			PasswordProfile: &accountsmsg.PasswordProfile{
 				Password: "$2a$11$jvI6PHuvrimpcCHzL2Q2WOqfm1FGdYAuSYZBDahr/B48fpiFxyDy2",
 			},
 			AccountEnabled: true,
-			MemberOf: []*proto.Group{
+			MemberOf: []*accountsmsg.Group{
 				{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
 			},
 		},
@@ -245,11 +245,11 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 			DisplayName:              "Admin",
 			UidNumber:                20004,
 			GidNumber:                30000,
-			PasswordProfile: &proto.PasswordProfile{
+			PasswordProfile: &accountsmsg.PasswordProfile{
 				Password: "$2a$11$En9VIUtqOdDyUl.LuUq2KeuBb5A2n8zE0lkJ2v6IDRSaOamhNq6Uu",
 			},
 			AccountEnabled: true,
-			MemberOf: []*proto.Group{
+			MemberOf: []*accountsmsg.Group{
 				{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
 			},
 		},
@@ -262,11 +262,11 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 			DisplayName:              "Kopano IDP",
 			UidNumber:                10000,
 			GidNumber:                15000,
-			PasswordProfile: &proto.PasswordProfile{
+			PasswordProfile: &accountsmsg.PasswordProfile{
 				Password: "$2y$12$ywfGLDPsSlBTVZU0g.2GZOPO8Wap3rVOpm8e3192VlytNdGWH7x72",
 			},
 			AccountEnabled: true,
-			MemberOf: []*proto.Group{
+			MemberOf: []*accountsmsg.Group{
 				{Id: "34f38767-c937-4eb6-b847-1c175829a2a0"}, // sysusers
 			},
 		},
@@ -278,11 +278,11 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 			DisplayName:              "Reva Inter Operability Platform",
 			UidNumber:                10001,
 			GidNumber:                15000,
-			PasswordProfile: &proto.PasswordProfile{
+			PasswordProfile: &accountsmsg.PasswordProfile{
 				Password: "$2a$11$40xzy3rO8Tq4j2VkFbKz8Ow19BRaqaixEjAR0IbvQXxtOvMtkjwzy",
 			},
 			AccountEnabled: true,
-			MemberOf: []*proto.Group{
+			MemberOf: []*accountsmsg.Group{
 				{Id: "34f38767-c937-4eb6-b847-1c175829a2a0"}, // sysusers
 			},
 		},
@@ -300,7 +300,7 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 			continue
 		}
 
-		a := &proto.Account{}
+		a := &accountsmsg.Account{}
 		err := s.repo.LoadAccount(context.Background(), accounts[i].Id, a)
 		if !storage.IsNotFoundErr(err) {
 			continue // account already exists -> do not overwrite
@@ -344,35 +344,35 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 }
 
 func (s Service) createDefaultGroups(withDemoGroups bool) (err error) {
-	groups := []proto.Group{
-		{Id: "34f38767-c937-4eb6-b847-1c175829a2a0", GidNumber: 15000, OnPremisesSamAccountName: "sysusers", DisplayName: "Technical users", Description: "A group for technical users. They should not show up in sharing dialogs.", Members: []*proto.Account{
+	groups := []accountsmsg.Group{
+		{Id: "34f38767-c937-4eb6-b847-1c175829a2a0", GidNumber: 15000, OnPremisesSamAccountName: "sysusers", DisplayName: "Technical users", Description: "A group for technical users. They should not show up in sharing dialogs.", Members: []*accountsmsg.Account{
 			{Id: "820ba2a1-3f54-4538-80a4-2d73007e30bf"}, // idp
 			{Id: "bc596f3c-c955-4328-80a0-60d018b4ad57"}, // reva
 		}},
-		{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa", GidNumber: 30000, OnPremisesSamAccountName: "users", DisplayName: "Users", Description: "A group every normal user belongs to.", Members: []*proto.Account{
+		{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa", GidNumber: 30000, OnPremisesSamAccountName: "users", DisplayName: "Users", Description: "A group every normal user belongs to.", Members: []*accountsmsg.Account{
 			{Id: "4c510ada-c86b-4815-8820-42cdf82c3d51"}, // einstein
 			{Id: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"}, // marie
 			{Id: "932b4540-8d16-481e-8ef4-588e4b6b151c"}, // feynman
 		}},
-		{Id: "6040aa17-9c64-4fef-9bd0-77234d71bad0", GidNumber: 30001, OnPremisesSamAccountName: "sailing-lovers", DisplayName: "Sailing lovers", Members: []*proto.Account{
+		{Id: "6040aa17-9c64-4fef-9bd0-77234d71bad0", GidNumber: 30001, OnPremisesSamAccountName: "sailing-lovers", DisplayName: "Sailing lovers", Members: []*accountsmsg.Account{
 			{Id: "4c510ada-c86b-4815-8820-42cdf82c3d51"}, // einstein
 		}},
-		{Id: "dd58e5ec-842e-498b-8800-61f2ec6f911f", GidNumber: 30002, OnPremisesSamAccountName: "violin-haters", DisplayName: "Violin haters", Members: []*proto.Account{
+		{Id: "dd58e5ec-842e-498b-8800-61f2ec6f911f", GidNumber: 30002, OnPremisesSamAccountName: "violin-haters", DisplayName: "Violin haters", Members: []*accountsmsg.Account{
 			{Id: "4c510ada-c86b-4815-8820-42cdf82c3d51"}, // einstein
 		}},
-		{Id: "7b87fd49-286e-4a5f-bafd-c535d5dd997a", GidNumber: 30003, OnPremisesSamAccountName: "radium-lovers", DisplayName: "Radium lovers", Members: []*proto.Account{
+		{Id: "7b87fd49-286e-4a5f-bafd-c535d5dd997a", GidNumber: 30003, OnPremisesSamAccountName: "radium-lovers", DisplayName: "Radium lovers", Members: []*accountsmsg.Account{
 			{Id: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"}, // marie
 		}},
-		{Id: "cedc21aa-4072-4614-8676-fa9165f598ff", GidNumber: 30004, OnPremisesSamAccountName: "polonium-lovers", DisplayName: "Polonium lovers", Members: []*proto.Account{
+		{Id: "cedc21aa-4072-4614-8676-fa9165f598ff", GidNumber: 30004, OnPremisesSamAccountName: "polonium-lovers", DisplayName: "Polonium lovers", Members: []*accountsmsg.Account{
 			{Id: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"}, // marie
 		}},
-		{Id: "a1726108-01f8-4c30-88df-2b1a9d1cba1a", GidNumber: 30005, OnPremisesSamAccountName: "quantum-lovers", DisplayName: "Quantum lovers", Members: []*proto.Account{
+		{Id: "a1726108-01f8-4c30-88df-2b1a9d1cba1a", GidNumber: 30005, OnPremisesSamAccountName: "quantum-lovers", DisplayName: "Quantum lovers", Members: []*accountsmsg.Account{
 			{Id: "932b4540-8d16-481e-8ef4-588e4b6b151c"}, // feynman
 		}},
-		{Id: "167cbee2-0518-455a-bfb2-031fe0621e5d", GidNumber: 30006, OnPremisesSamAccountName: "philosophy-haters", DisplayName: "Philosophy haters", Members: []*proto.Account{
+		{Id: "167cbee2-0518-455a-bfb2-031fe0621e5d", GidNumber: 30006, OnPremisesSamAccountName: "philosophy-haters", DisplayName: "Philosophy haters", Members: []*accountsmsg.Account{
 			{Id: "932b4540-8d16-481e-8ef4-588e4b6b151c"}, // feynman
 		}},
-		{Id: "262982c1-2362-4afa-bfdf-8cbfef64a06e", GidNumber: 30007, OnPremisesSamAccountName: "physics-lovers", DisplayName: "Physics lovers", Members: []*proto.Account{
+		{Id: "262982c1-2362-4afa-bfdf-8cbfef64a06e", GidNumber: 30007, OnPremisesSamAccountName: "physics-lovers", DisplayName: "Physics lovers", Members: []*accountsmsg.Account{
 			{Id: "4c510ada-c86b-4815-8820-42cdf82c3d51"}, // einstein
 			{Id: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"}, // marie
 			{Id: "932b4540-8d16-481e-8ef4-588e4b6b151c"}, // feynman
@@ -389,7 +389,7 @@ func (s Service) createDefaultGroups(withDemoGroups bool) (err error) {
 			continue
 		}
 
-		g := &proto.Group{}
+		g := &accountsmsg.Group{}
 		err := s.repo.LoadGroup(context.Background(), groups[i].Id, g)
 		if !storage.IsNotFoundErr(err) {
 			continue // group already exists -> do not overwrite
