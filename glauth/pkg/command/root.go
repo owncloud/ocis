@@ -51,7 +51,7 @@ func Execute(cfg *config.Config) error {
 
 // ParseConfig loads glauth configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	_, err := ociscfg.BindSourcesToStructs("accounts", cfg)
+	_, err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg)
 	if err != nil {
 		return err
 	}
