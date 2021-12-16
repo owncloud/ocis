@@ -5,33 +5,8 @@ import (
 	"context"
 	"path"
 
-	"github.com/owncloud/ocis/ocis-pkg/shared"
-
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 )
-
-// LDAP defines the available ldap configuration.
-type LDAP struct {
-	Hostname     string     `ocisConfig:"hostname"`
-	Port         int        `ocisConfig:"port"`
-	BaseDN       string     `ocisConfig:"base_dn"`
-	UserFilter   string     `ocisConfig:"user_filter"`
-	GroupFilter  string     `ocisConfig:"group_filter"`
-	BindDN       string     `ocisConfig:"bind_dn"`
-	BindPassword string     `ocisConfig:"bind_password"`
-	IDP          string     `ocisConfig:"idp"`
-	Schema       LDAPSchema `ocisConfig:"schema"`
-}
-
-// LDAPSchema defines the available ldap schema configuration.
-type LDAPSchema struct {
-	AccountID   string `ocisConfig:"account_id"`
-	Identities  string `ocisConfig:"identities"`
-	Username    string `ocisConfig:"username"`
-	DisplayName string `ocisConfig:"display_name"`
-	Mail        string `ocisConfig:"mail"`
-	Groups      string `ocisConfig:"groups"`
-}
 
 // CORS defines the available cors configuration.
 type CORS struct {
@@ -43,98 +18,111 @@ type CORS struct {
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string `ocisConfig:"addr"`
-	Namespace string `ocisConfig:"namespace"`
-	Root      string `ocisConfig:"root"`
-	CacheTTL  int    `ocisConfig:"cache_ttl"`
+	Addr      string `ocisConfig:"addr" env:"ACCOUNTS_HTTP_ADDR"`
+	Namespace string
+	Root      string `ocisConfig:"root" env:"ACCOUNTS_HTTP_ROOT"`
+	CacheTTL  int    `ocisConfig:"cache_ttl" env:"ACCOUNTS_CACHE_TTL"`
 	CORS      CORS   `ocisConfig:"cors"`
 }
 
 // GRPC defines the available grpc configuration.
 type GRPC struct {
-	Addr      string `ocisConfig:"addr"`
-	Namespace string `ocisConfig:"namespace"`
+	Addr      string `ocisConfig:"addr" env:"ACCOUNTS_GRPC_ADDR"`
+	Namespace string
 }
 
 // Service defines the available service configuration.
 type Service struct {
-	Name    string `ocisConfig:"name"`
-	Version string `ocisConfig:"version"`
+	Name    string
+	Version string
 }
 
 // Asset defines the available asset configuration.
 type Asset struct {
-	Path string `ocisConfig:"path"`
+	Path string `ocisConfig:"path" env:"ACCOUNTS_ASSET_PATH"`
 }
 
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
-	JWTSecret string `ocisConfig:"jwt_secret"`
+	JWTSecret string `ocisConfig:"jwt_secret" env:"OCIS_JWT_SECRET;ACCOUNTS_JWT_SECRET"`
 }
 
 // Repo defines which storage implementation is to be used.
 type Repo struct {
-	Backend string `ocisConfig:"backend"`
+	Backend string `ocisConfig:"backend"  env:"ACCOUNTS_STORAGE_BACKEND"`
 	Disk    Disk   `ocisConfig:"disk"`
 	CS3     CS3    `ocisConfig:"cs3"`
 }
 
 // Disk is the local disk implementation of the storage.
 type Disk struct {
-	Path string `ocisConfig:"path"`
+	Path string `ocisConfig:"path" env:"ACCOUNTS_STORAGE_DISK_PATH"`
 }
 
 // CS3 is the cs3 implementation of the storage.
 type CS3 struct {
-	ProviderAddr string `ocisConfig:"provider_addr"`
-	JWTSecret    string `ocisConfig:"jwt_secret"`
+	ProviderAddr string `ocisConfig:"provider_addr" env:"ACCOUNTS_STORAGE_CS3_PROVIDER_ADDR"`
+	JWTSecret    string `ocisConfig:"jwt_secret" env:"ACCOUNTS_STORAGE_CS3_JWT_SECRET"`
 }
 
 // ServiceUser defines the user required for EOS.
 type ServiceUser struct {
-	UUID     string `ocisConfig:"uuid"`
-	Username string `ocisConfig:"username"`
-	UID      int64  `ocisConfig:"uid"`
-	GID      int64  `ocisConfig:"gid"`
+	UUID     string `ocisConfig:"uuid" env:"ACCOUNTS_SERVICE_USER_UUID"`
+	Username string `ocisConfig:"username" env:"ACCOUNTS_SERVICE_USER_USERNAME"`
+	UID      int64  `ocisConfig:"uid" env:"ACCOUNTS_SERVICE_USER_UID"`
+	GID      int64  `ocisConfig:"gid" env:"ACCOUNTS_SERVICE_USER_GID"`
 }
 
 // Index defines config for indexes.
 type Index struct {
-	UID Bound `ocisConfig:"uid"`
-	GID Bound `ocisConfig:"gid"`
+	UID UIDBound `ocisConfig:"uid"`
+	GID GIDBound `ocisConfig:"gid"`
 }
 
-// Bound defines a lower and upper bound.
-type Bound struct {
-	Lower int64 `ocisConfig:"lower"`
-	Upper int64 `ocisConfig:"upper"`
+// GIDBound defines a lower and upper bound.
+type GIDBound struct {
+	Lower int64 `ocisConfig:"lower" env:"ACCOUNTS_GID_INDEX_LOWER_BOUND"`
+	Upper int64 `ocisConfig:"upper" env:"ACCOUNTS_GID_INDEX_UPPER_BOUND"`
+}
+
+// UIDBound defines a lower and upper bound.
+type UIDBound struct {
+	Lower int64 `ocisConfig:"lower" env:"ACCOUNTS_UID_INDEX_LOWER_BOUND"`
+	Upper int64 `ocisConfig:"upper" env:"ACCOUNTS_UID_INDEX_UPPER_BOUND"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `ocisConfig:"enabled"`
-	Type      string `ocisConfig:"type"`
-	Endpoint  string `ocisConfig:"endpoint"`
-	Collector string `ocisConfig:"collector"`
-	Service   string `ocisConfig:"service"`
+	Enabled   bool   `ocisConfig:"enabled" env:"OCIS_TRACING_ENABLED;ACCOUNTS_TRACING_ENABLED"`
+	Type      string `ocisConfig:"type" env:"OCIS_TRACING_TYPE;ACCOUNTS_TRACING_TYPE"`
+	Endpoint  string `ocisConfig:"endpoint" env:"OCIS_TRACING_ENDPOINT;ACCOUNTS_TRACING_ENDPOINT"`
+	Collector string `ocisConfig:"collector" env:"OCIS_TRACING_COLLECTOR;ACCOUNTS_TRACING_COLLECTOR"`
+	Service   string `ocisConfig:"service" env:"ACCOUNTS_TRACING_SERVICE"` //TODO: should this be an ID? or the same as Service.Name?
+}
+
+// Log defines the available log configuration.
+type Log struct {
+	Level  string `mapstructure:"level" env:"OCIS_LOG_LEVEL;ACCOUNTS_LOG_LEVEL"`
+	Pretty bool   `mapstructure:"pretty" env:"OCIS_LOG_PRETTY;ACCOUNTS_LOG_PRETTY"`
+	Color  bool   `mapstructure:"color" env:"OCIS_LOG_COLOR;ACCOUNTS_LOG_COLOR"`
+	File   string `mapstructure:"file" env:"OCIS_LOG_FILE;ACCOUNTS_LOG_FILE"`
 }
 
 // Config merges all Account config parameters.
 type Config struct {
-	*shared.Commons
+	//*shared.Commons
 
-	LDAP               LDAP         `ocisConfig:"ldap"`
 	HTTP               HTTP         `ocisConfig:"http"`
 	GRPC               GRPC         `ocisConfig:"grpc"`
 	Service            Service      `ocisConfig:"service"`
 	Asset              Asset        `ocisConfig:"asset"`
-	Log                *shared.Log  `ocisConfig:"log"`
+	Log                Log          `ocisConfig:"log"`
 	TokenManager       TokenManager `ocisConfig:"token_manager"`
 	Repo               Repo         `ocisConfig:"repo"`
 	Index              Index        `ocisConfig:"index"`
 	ServiceUser        ServiceUser  `ocisConfig:"service_user"`
-	HashDifficulty     int          `ocisConfig:"hash_difficulty"`
-	DemoUsersAndGroups bool         `ocisConfig:"demo_users_and_groups"`
+	HashDifficulty     int          `ocisConfig:"hash_difficulty" env:"ACCOUNTS_HASH_DIFFICULTY"`
+	DemoUsersAndGroups bool         `ocisConfig:"demo_users_and_groups" env:"ACCOUNTS_DEMO_USERS_AND_GROUPS"`
 	Tracing            Tracing      `ocisConfig:"tracing"`
 
 	Context    context.Context
@@ -143,14 +131,12 @@ type Config struct {
 
 // New returns a new config.
 func New() *Config {
-	return &Config{
-		Log: &shared.Log{},
-	}
+	return &Config{}
 }
 
 func DefaultConfig() *Config {
 	return &Config{
-		LDAP: LDAP{},
+
 		HTTP: HTTP{
 			Addr:      "127.0.0.1:9181",
 			Namespace: "com.owncloud.web",
@@ -187,11 +173,11 @@ func DefaultConfig() *Config {
 			},
 		},
 		Index: Index{
-			UID: Bound{
+			UID: UIDBound{
 				Lower: 0,
 				Upper: 1000,
 			},
-			GID: Bound{
+			GID: GIDBound{
 				Lower: 0,
 				Upper: 1000,
 			},
@@ -207,15 +193,4 @@ func DefaultConfig() *Config {
 			Service: "accounts",
 		},
 	}
-}
-
-// GetEnv fetches a list of known env variables for this extension. It is to be used by gookit, as it provides a list
-// with all the environment variables an extension supports.
-func GetEnv(cfg *Config) []string {
-	var r = make([]string, len(structMappings(cfg)))
-	for i := range structMappings(cfg) {
-		r = append(r, structMappings(cfg)[i].EnvVars...)
-	}
-
-	return r
 }
