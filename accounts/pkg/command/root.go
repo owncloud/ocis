@@ -82,7 +82,7 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	}
 
 	// merge environment variable config on top of the current config
-	if err := mergo.Merge(cfg, envCfg, mergo.WithOverride); err != nil {
+	if err := mergo.Merge(cfg, envCfg, mergo.WithOverride); err != nil && err.Error() != "none of the target fields were set from environment variables" {
 		return err
 	}
 

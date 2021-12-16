@@ -12,11 +12,12 @@ import (
 
 	mgrpcc "github.com/asim/go-micro/plugins/client/grpc/v4"
 	empty "github.com/golang/protobuf/ptypes/empty"
-	"github.com/owncloud/ocis/accounts/pkg/command"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	svc "github.com/owncloud/ocis/accounts/pkg/service/v0"
+	oclog "github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	"github.com/stretchr/testify/assert"
 	"go-micro.dev/v4/client"
@@ -85,7 +86,7 @@ func init() {
 	var hdlr *svc.Service
 	var err error
 
-	if hdlr, err = svc.New(svc.Logger(command.LoggerFromConfig("accounts", cfg.Log)), svc.Config(cfg), svc.RoleService(buildRoleServiceMock())); err != nil {
+	if hdlr, err = svc.New(svc.Logger(oclog.LoggerFromConfig("accounts", shared.Log(cfg.Log))), svc.Config(cfg), svc.RoleService(buildRoleServiceMock())); err != nil {
 		log.Fatalf("Could not create new service")
 	}
 

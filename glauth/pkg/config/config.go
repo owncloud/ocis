@@ -64,7 +64,6 @@ type Backend struct {
 type Config struct {
 	*shared.Commons
 
-	File           string      `ocisConfig:"file"`
 	Log            *shared.Log `ocisConfig:"log"`
 	Debug          Debug       `ocisConfig:"debug"`
 	Service        Service     `ocisConfig:"service"`
