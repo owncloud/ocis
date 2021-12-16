@@ -26,8 +26,8 @@ type CORS struct {
 type HTTP struct {
 	Addr      string `ocisConfig:"addr"`
 	Root      string `ocisConfig:"root"`
-	Namespace string `ocisConfig:"namespace"`
-	CORS      CORS   `ocisConfig:"cors"`
+	Namespace string
+	CORS      CORS `ocisConfig:"cors"`
 }
 
 // Service defines the available service configuration.

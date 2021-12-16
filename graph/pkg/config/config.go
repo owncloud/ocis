@@ -17,7 +17,7 @@ type Debug struct {
 // HTTP defines the available http configuration.
 type HTTP struct {
 	Addr      string `ocisConfig:"addr"`
-	Namespace string `ocisConfig:"namespace"`
+	Namespace string
 	Root      string `ocisConfig:"root"`
 }
 

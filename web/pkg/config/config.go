@@ -18,8 +18,8 @@ type Debug struct {
 type HTTP struct {
 	Addr      string `ocisConfig:"addr"`
 	Root      string `ocisConfig:"root"`
-	Namespace string `ocisConfig:"namespace"`
-	CacheTTL  int    `ocisConfig:"cache_ttl"`
+	Namespace string
+	CacheTTL  int `ocisConfig:"cache_ttl"`
 }
 
 // Service defines the available service configuration.
