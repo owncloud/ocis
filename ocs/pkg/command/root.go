@@ -67,7 +67,7 @@ func NewLogger(cfg *config.Config) log.Logger {
 
 // ParseConfig loads idp configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	_, err := ociscfg.BindSourcesToStructs("ocs", cfg)
+	_, err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg)
 	if err != nil {
 		return err
 	}
