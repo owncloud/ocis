@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 * Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
 * Change - Return not found when updating non existent space: [#2869](https://github.com/cs3org/reva/pull/2869)
 * Enhancement - Add new file url of the app provider to the ocs capabilities: [#2884](https://github.com/owncloud/ocis/pull/2884)
@@ -13,6 +14,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Update REVA to xxx: [#2878](https://github.com/owncloud/ocis/pull/2878)
 
 ## Details
+
+* Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
+
+   GraphApi has been updated to version 0.4.1 and the existing dependency was removed
+
+   https://github.com/owncloud/ocis/pull/2885
 
 * Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
 
