@@ -16,6 +16,18 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// TODO: don't redeclare from ocis-pkg/log/log.go
+// LoggerFromConfig initializes a service-specific logger instance.
+func LoggerFromConfig(name string, cfg config.Log) log.Logger {
+	return log.NewLogger(
+		log.Name(name),
+		log.Level(cfg.Level),
+		log.Pretty(cfg.Pretty),
+		log.Color(cfg.Color),
+		log.File(cfg.File),
+	)
+}
+
 // Server is the entry point for the server command.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
@@ -36,7 +48,7 @@ func Server(cfg *config.Config) *cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			logger := log.LoggerFromConfig("accounts", *cfg.Log)
+			logger := LoggerFromConfig("accounts", cfg.Log)
 			err := tracing.Configure(cfg)
 			if err != nil {
 				return err
