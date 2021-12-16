@@ -73,10 +73,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.GRPC.Addr,
 		},
 		{
-			EnvVars:     []string{"ACCOUNTS_SERVICE_NAME"},
-			Destination: &cfg.Service.Name,
-		},
-		{
 			EnvVars:     []string{"ACCOUNTS_HASH_DIFFICULTY"},
 			Destination: &cfg.HashDifficulty,
 		},

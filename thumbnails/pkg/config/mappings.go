@@ -80,10 +80,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Debug.Zpages,
 		},
 		{
-			EnvVars:     []string{"THUMBNAILS_SERVICE_NAME"},
-			Destination: &cfg.Service.Name,
-		},
-		{
 			EnvVars:     []string{"THUMBNAILS_GRPC_ADDR"},
 			Destination: &cfg.GRPC.Addr,
 		},

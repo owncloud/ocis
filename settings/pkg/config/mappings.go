@@ -104,10 +104,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.GRPC.Namespace,
 		},
 		{
-			EnvVars:     []string{"SETTINGS_SERVICE_NAME"},
-			Destination: &cfg.Service.Name,
-		},
-		{
 			EnvVars:     []string{"SETTINGS_DATA_PATH"},
 			Destination: &cfg.Service.DataPath,
 		},
