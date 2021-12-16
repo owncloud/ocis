@@ -17,6 +17,10 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Log.File,
 		},
 		{
+			EnvVars:     []string{"OCIS_LOG_LEVEL", "ACCOUNTS_LOG_LEVEL"},
+			Destination: &cfg.Log.Level,
+		},
+		{
 			EnvVars:     []string{"OCIS_LOG_COLOR", "ACCOUNTS_LOG_COLOR"},
 			Destination: &cfg.Log.Color,
 		},
