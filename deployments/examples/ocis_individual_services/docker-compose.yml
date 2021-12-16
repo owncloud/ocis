@@ -62,7 +62,7 @@ services:
 
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
 
-      PROXY_ENABLE_BASIC_AUTH: "true" #TODO: only for testing purposes
+      PROXY_ENABLE_BASIC_AUTH: "${OCIS_BASIC_AUTH:-false}"
 
       REVA_GATEWAY: storage-gateway:9142
 
@@ -70,7 +70,7 @@ services:
       PROXY_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       PROXY_INSECURE_BACKENDS: false
 
-      PROXY_OIDC_INSECURE: "true" #TODO: insecure
+      PROXY_OIDC_INSECURE: "${INSECURE:-false}"
       PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
 
       PROXY_AUTOPROVISION_ACCOUNTS: "true"
@@ -135,7 +135,7 @@ services:
       GLAUTH_LDAP_ADDR: 0.0.0.0:9125
       GLAUTH_LDAPS_ADDR: 0.0.0.0:9126
 
-      GLAUTH_BACKEND_INSECURE: "true" #TODO: insecure
+      GLAUTH_BACKEND_INSECURE: "true" # TODO: is there a way around it?
     logging:
       driver: "local"
     restart: always
@@ -162,7 +162,7 @@ services:
       #IDP_LDAP_BIND_PASSWORD:
 
       IDP_ISS: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      IDP_INSECURE: true #TODO: insecure
+      IDP_INSECURE: "${INSECURE:-false}"
     logging:
       driver: "local"
     restart: always
@@ -260,7 +260,7 @@ services:
 
       THUMBNAILS_GRPC_ADDR: 0.0.0.0:9185
 
-      THUMBNAILS_CS3SOURCE_INSECURE: "true" #TODO: insecure
+      THUMBNAILS_CS3SOURCE_INSECURE: "true" #TODO: is there a way around it?
       REVA_GATEWAY: storage-gateway:9142
 
     # optional shared thumbnail cache between services
@@ -360,7 +360,7 @@ services:
       OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      STORAGE_HOME_DATAPROVIDER_INSECURE: "true" #TODO: insecure
+      STORAGE_HOME_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
 
       STORAGE_METADATA_GRPC_PROVIDER_ADDR: 0.0.0.0:9215
       STORAGE_METADATA_HTTP_ADDR: 0.0.0.0:9216
@@ -469,7 +469,7 @@ services:
       OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      STORAGE_HOME_DATAPROVIDER_INSECURE: "true" #TODO: insecure
+      STORAGE_HOME_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
 
       STORAGE_HOME_DRIVER: ocis #TODO use s3?
 
@@ -504,7 +504,7 @@ services:
       OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      STORAGE_USERS_DATAPROVIDER_INSECURE: "true" #TODO: insecure
+      STORAGE_USERS_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
 
       STORAGE_USERS_DRIVER: ocis #TODO use s3?
 
@@ -539,7 +539,7 @@ services:
       OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       STORAGE_PUBLIC_LINK_ENDPOINT: storage-publiclink:9178
-      STORAGE_PUBLIC_GRPC_ADDR: 0.0.0.0:9178
+      STORAGE_PUBLIC_LINK_GRPC_ADDR: 0.0.0.0:9178
 
       STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       REVA_GATEWAY: storage-gateway:9142
@@ -600,7 +600,7 @@ services:
       STORAGE_USERPROVIDER_DRIVER: ldap
       STORAGE_LDAP_HOSTNAME: glauth
       STORAGE_LDAP_PORT: 9126
-      STORAGE_LDAP_INSECURE: "true" #TODO: insecure
+      STORAGE_LDAP_INSECURE: "true" #TODO trust the certificate of the ldap server
       #STORAGE_LDAP_BIND_DN:
       #STORAGE_LDAP_BIND_PASSWORD:
       STORAGE_LDAP_IDP: https://${OCIS_DOMAIN:-ocis.owncloud.test}
@@ -632,7 +632,7 @@ services:
       STORAGE_GROUPPROVIDER_DRIVER: ldap
       STORAGE_LDAP_HOSTNAME: glauth
       STORAGE_LDAP_PORT: 9126
-      STORAGE_LDAP_INSECURE: "true" #TODO: insecure
+      STORAGE_LDAP_INSECURE: "true" #TODO trust the certificate of the ldap server
       #STORAGE_LDAP_BIND_DN:
       #STORAGE_LDAP_BIND_PASSWORD:
       STORAGE_LDAP_IDP: https://${OCIS_DOMAIN:-ocis.owncloud.test}
@@ -705,7 +705,8 @@ services:
 
       STORAGE_HOME_ENDPOINT: storage-home:9154
       STORAGE_USERS_ENDPOINT: storage-users:9157
-      STORAGE_PUBLIC_LINK_ENDPOINT: storage-publiclink:9178
+
+      STORAGE_PUBLIC_LINK_ENDPOINT: storage-publiclink:9178 #TODO: this serves a auth and storage provider!?
 
       STORAGE_AUTH_BASIC_ENDPOINT: storage-authbasic:9146
       STORAGE_AUTH_BEARER_ENDPOINT: storage-authbearer:9166
@@ -733,4 +734,5 @@ volumes:
   ocis-storage-sharing: null
 
 networks:
-  ocis-net: null
+  ocis-net:
+    external: true
