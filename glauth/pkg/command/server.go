@@ -7,6 +7,7 @@ import (
 	"github.com/oklog/run"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/glauth/pkg/config"
+	"github.com/owncloud/ocis/glauth/pkg/logging"
 	"github.com/owncloud/ocis/glauth/pkg/metrics"
 	"github.com/owncloud/ocis/glauth/pkg/server/debug"
 	"github.com/owncloud/ocis/glauth/pkg/server/glauth"
@@ -30,9 +31,9 @@ func Server(cfg *config.Config) *cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-
-			if err := tracing.Configure(cfg); err != nil {
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			err := tracing.Configure(cfg)
+			if err != nil {
 				return err
 			}
 
@@ -47,7 +48,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			metrics.BuildInfo.WithLabelValues(cfg.Version).Set(1)
+			metrics.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
 
 			{
 

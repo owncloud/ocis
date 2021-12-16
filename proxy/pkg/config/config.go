@@ -28,7 +28,7 @@ type Debug struct {
 type HTTP struct {
 	Addr      string `ocisConfig:"addr"`
 	Root      string `ocisConfig:"root"`
-	Namespace string `ocisConfig:"namespace"`
+	Namespace string
 	TLSCert   string `ocisConfig:"tls_cert"`
 	TLSKey    string `ocisConfig:"tls_key"`
 	TLS       bool   `ocisConfig:"tls"`

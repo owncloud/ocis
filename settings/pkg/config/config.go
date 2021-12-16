@@ -28,7 +28,7 @@ type CORS struct {
 // HTTP defines the available http configuration.
 type HTTP struct {
 	Addr      string `ocisConfig:"addr"`
-	Namespace string `ocisConfig:"namespace"`
+	Namespace string
 	Root      string `ocisConfig:"root"`
 	CacheTTL  int    `ocisConfig:"cache_ttl"`
 	CORS      CORS   `ocisConfig:"cors"`
@@ -37,7 +37,7 @@ type HTTP struct {
 // GRPC defines the available grpc configuration.
 type GRPC struct {
 	Addr      string `ocisConfig:"addr"`
-	Namespace string `ocisConfig:"namespace"`
+	Namespace string
 }
 
 // Service provides configuration options for the service

@@ -19,7 +19,7 @@ type Debug struct {
 // GRPC defines the available grpc configuration.
 type GRPC struct {
 	Addr      string `ocisConfig:"addr"`
-	Namespace string `ocisConfig:"namespace"`
+	Namespace string
 }
 
 // Service provides configuration options for the service
