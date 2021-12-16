@@ -49,7 +49,7 @@ require (
 	github.com/owncloud/libre-graph-api-go v0.3.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
-	github.com/rs/zerolog v1.26.0
+	github.com/rs/zerolog v1.26.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.3.0
 	github.com/stretchr/testify v1.7.0
@@ -63,7 +63,7 @@ require (
 	go.opentelemetry.io/otel/exporters/jaeger v1.3.0
 	go.opentelemetry.io/otel/sdk v1.3.0
 	go.opentelemetry.io/otel/trace v1.3.0
-	golang.org/x/crypto v0.0.0-20211108221036-ceb1ce70b4fa
+	golang.org/x/crypto v0.0.0-20211215165025-cf75a172585e
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa
