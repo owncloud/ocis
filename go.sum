@@ -312,8 +312,6 @@ github.com/crewjam/saml v0.4.5/go.mod h1:qCJQpUtZte9R1ZjUBcW8qtCNlinbO363ooNl02S
 github.com/cs3org/cato v0.0.0-20200828125504-e418fc54dd5e/go.mod h1:XJEZ3/EQuI3BXTp/6DUzFr850vlxq11I6satRtz0YQ4=
 github.com/cs3org/go-cs3apis v0.0.0-20211104090126-8e972dca8304 h1:e/nIPR518vyvrulo9goAZTtYD6gFfu/2/9MDe6mTGcw=
 github.com/cs3org/go-cs3apis v0.0.0-20211104090126-8e972dca8304/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
-github.com/cs3org/reva v1.17.1-0.20211215074511-8236ffa3f824 h1:eVNZAbZehrPQLtYCkqoGCU64V7xA4po4U7/Pa0twH9Q=
-github.com/cs3org/reva v1.17.1-0.20211215074511-8236ffa3f824/go.mod h1:iXr05MZR63XQXX657oEtylokVz0SmmJU88uTju7+6uo=
 github.com/cs3org/reva v1.17.1-0.20211215132908-5cde0187454b h1:pXH63+1AWhp61MzLQZgndp0GcpR8boci7D1VnR2hINA=
 github.com/cs3org/reva v1.17.1-0.20211215132908-5cde0187454b/go.mod h1:iXr05MZR63XQXX657oEtylokVz0SmmJU88uTju7+6uo=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
@@ -709,8 +707,8 @@ github.com/grpc-ecosystem/grpc-gateway v1.8.5/go.mod h1:vNeuVxBJEsws4ogUvrchl83t
 github.com/grpc-ecosystem/grpc-gateway v1.9.0/go.mod h1:vNeuVxBJEsws4ogUvrchl83t/GYV9WGTSLVdBhOQFDY=
 github.com/grpc-ecosystem/grpc-gateway v1.16.0 h1:gmcG1KaJ57LophUzW0Hy8NmPhnMZb4M0+kPpLofRdBo=
 github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFbcEtjT1g+wF4CSlocrBnw=
-github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.1 h1:p5m7GOEGXyoq6QWl4/RRMsQ6tWbTpbQmAnkxXgWSprY=
-github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.1/go.mod h1:8ZeZajTed/blCOHBbj8Fss8bPHiFKcmJJzuIbUtFCAo=
+github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.2 h1:I/pwhnUln5wbMnTyRbzswA0/JxpK8sZj0aUfI3TV1So=
+github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.2/go.mod h1:lsuH8kb4GlMdSlI4alNIBBSAt5CHJtg3i+0WuN9J5YM=
 github.com/h2non/parth v0.0.0-20190131123155-b4df798d6542/go.mod h1:Ow0tF8D4Kplbc8s8sSb3V2oUCygFHVp8gC3Dn6U4MNI=
 github.com/hashicorp/consul/api v1.1.0/go.mod h1:VmuI/Lkw1nC05EYQWNKwWGbkg+FbDBtguAZLlVdkD9Q=
 github.com/hashicorp/consul/api v1.11.0/go.mod h1:XjsvQN+RJGWI2TWy1/kqaE16HrR2J/FWgkYjdZQsX9M=
@@ -1054,8 +1052,8 @@ github.com/oracle/oci-go-sdk v24.3.0+incompatible/go.mod h1:VQb79nF8Z2cwLkLS35uk
 github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc h1:Ak86L+yDSOzKFa7WM5bf5itSOo1e3Xh8bm5YCMUXIjQ=
 github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CFcDWnWD9XkenwhI=
 github.com/ovh/go-ovh v1.1.0/go.mod h1:AxitLZ5HBRPyUd+Zl60Ajaag+rNTdVXWIkzfrVuTXWA=
-github.com/owncloud/libre-graph-api-go v0.3.0 h1:CjSWuL6Gd+HgIlZfBLjYTloH1F/8naxaL5xZZz4N+ms=
-github.com/owncloud/libre-graph-api-go v0.3.0/go.mod h1:dOt7+kXldpyUGBFdfFBs6PbWElqqa2/Q5+pMF9izL3w=
+github.com/owncloud/libre-graph-api-go v0.4.1 h1:B0y57Em+MEge1EQMCbvOtQS0WxqlaY3qzWPZ8roBNd8=
+github.com/owncloud/libre-graph-api-go v0.4.1/go.mod h1:dOt7+kXldpyUGBFdfFBs6PbWElqqa2/Q5+pMF9izL3w=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=

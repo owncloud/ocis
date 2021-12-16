@@ -33,7 +33,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/gookit/config/v2 v2.0.27
 	github.com/gorilla/mux v1.8.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.1
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.2
 	github.com/iancoleman/strcase v0.2.0
 	github.com/justinas/alice v1.2.0
 	github.com/libregraph/lico v0.53.0
@@ -46,7 +46,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.17.0
-	github.com/owncloud/libre-graph-api-go v0.3.0
+	github.com/owncloud/libre-graph-api-go v0.4.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/rs/zerolog v1.26.0
