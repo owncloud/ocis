@@ -11,7 +11,8 @@ services:
     command:
       - "--log.level=${TRAEFIK_LOG_LEVEL:-ERROR}"
       # letsencrypt configuration
-      - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@example.org}"
+      - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@e\
+        xample.org}"
       - "--certificatesResolvers.http.acme.storage=/certs/acme.json"
       - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
       # enable dashboard
@@ -32,9 +33,11 @@ services:
       - "traefik-certs:/certs"
     labels:
       - "traefik.enable=${TRAEFIK_DASHBOARD:-false}"
-      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS:-admin:$$apr1$$4vqie50r$$YQAmQdtmz5n9rEALhxJ4l.}" # defaults to admin:admin
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_\
+        AUTH_USERS:-admin:$$apr1$$4vqie50r$$YQAmQdtmz5n9rEALhxJ4l.}" # defaults to admin:admin
       - "traefik.http.routers.traefik.entrypoints=https"
-      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN:-traefik.owncloud.test}`)"
+      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN:-traefik.ownc\
+        loud.test}`)"
       - "traefik.http.routers.traefik.middlewares=traefik-auth"
       - "traefik.http.routers.traefik.tls.certresolver=http"
       - "traefik.http.routers.traefik.service=api@internal"
@@ -78,7 +81,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=https"
-      - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`)"
+      - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test\
+        }`)"
       - "traefik.http.routers.ocis.tls.certresolver=http"
       - "traefik.http.routers.ocis.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
@@ -261,7 +265,7 @@ services:
 
     # optional shared thumbnail cache between services
     volumes:
-       - "ocis-settings:/var/lib/ocis" #TODO /thumbnails"
+      - "ocis-settings:/var/lib/ocis" #TODO /thumbnails"
     logging:
       driver: "local"
     restart: always
@@ -289,7 +293,6 @@ services:
     logging:
       driver: "local"
     restart: always
-
 
   # TODO: this webdav service handles only thumbnails
   webdav:
