@@ -40,7 +40,6 @@ type Tracing struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File     string     `ocisConfig:"file"`
 	Log      shared.Log `ocisConfig:"log"`
 	Debug    Debug      `ocisConfig:"debug"`
 	GRPC     GRPC       `ocisConfig:"grpc"`

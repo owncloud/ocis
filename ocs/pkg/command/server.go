@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/owncloud/ocis/ocs/pkg/logging"
 	"github.com/owncloud/ocis/ocs/pkg/tracing"
 
 	"github.com/oklog/run"
@@ -31,9 +32,9 @@ func Server(cfg *config.Config) *cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-
-			if err := tracing.Configure(cfg); err != nil {
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			err := tracing.Configure(cfg)
+			if err != nil {
 				return err
 			}
 

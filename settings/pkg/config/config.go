@@ -70,7 +70,6 @@ type TokenManager struct {
 type Config struct {
 	*shared.Commons
 
-	File         string       `ocisConfig:"file"`
 	Service      Service      `ocisConfig:"service"`
 	Log          *shared.Log  `ocisConfig:"log"`
 	Debug        Debug        `ocisConfig:"debug"`

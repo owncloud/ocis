@@ -46,7 +46,6 @@ type GraphExplorer struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	File          string        `ocisConfig:"file"`
 	Log           shared.Log    `ocisConfig:"log"`
 	Debug         Debug         `ocisConfig:"debug"`
 	HTTP          HTTP          `ocisConfig:"http"`

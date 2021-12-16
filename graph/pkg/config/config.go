@@ -81,7 +81,6 @@ type Identity struct {
 type Config struct {
 	*shared.Commons
 
-	File         string       `ocisConfig:"file"`
 	Log          *shared.Log  `ocisConfig:"log"`
 	Debug        Debug        `ocisConfig:"debug"`
 	HTTP         HTTP         `ocisConfig:"http"`
