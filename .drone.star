@@ -37,7 +37,7 @@ config = {
         "numberOfParts": 10,
         "skip": False,
         "skipExceptParts": [],
-        "earlyFail": True,
+        "earlyFail": False,
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
