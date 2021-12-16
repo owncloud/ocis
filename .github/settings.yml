@@ -58,7 +58,8 @@ branches:
       enforce_admins: null
       restrictions:
         apps: []
-        users: []
+        users:
+          - dependabot
         teams:
           - ci
           - employees
