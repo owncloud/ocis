@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix configuration for space membership endpoint: [#2893](https://github.com/owncloud/ocis/pull/2893)
 * Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 * Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
 * Change - Return not found when updating non existent space: [#2869](https://github.com/cs3org/reva/pull/2869)
@@ -14,6 +15,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Update REVA to xxx: [#2878](https://github.com/owncloud/ocis/pull/2878)
 
 ## Details
+
+* Bugfix - Fix configuration for space membership endpoint: [#2893](https://github.com/owncloud/ocis/pull/2893)
+
+   Added a missing config value to the ocs config related to the space membership endpoint.
+
+   https://github.com/owncloud/ocis/pull/2893
 
 * Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 
