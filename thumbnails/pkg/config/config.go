@@ -36,11 +36,11 @@ type FileSystemSource struct {
 
 // Thumbnail defines the available thumbnail related configuration.
 type Thumbnail struct {
-	Resolutions         []string          `ocisConfig:"resolutions"` // TODO: how to configure
+	Resolutions         []string          `ocisConfig:"resolutions"`
 	FileSystemStorage   FileSystemStorage `ocisConfig:"filesystem_storage"`
 	WebdavAllowInsecure bool              `ocisConfig:"webdav_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_WEBDAVSOURCE_INSECURE"`
 	CS3AllowInsecure    bool              `ocisConfig:"cs3_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_CS3SOURCE_INSECURE"`
-	RevaGateway         string            `ocisConfig:"reva_gateway" env:"REVA_GATEWAY"` //TODO: use REVA config
+	RevaGateway         string            `ocisConfig:"reva_gateway" env:"REVA_GATEWAY"`
 	WebdavNamespace     string            `ocisConfig:"webdav_namespace" env:"STORAGE_WEBDAV_NAMESPACE"`
 	FontMapFile         string            `ocisConfig:"font_map_file" env:"THUMBNAILS_TXT_FONTMAP_FILE"`
 }
