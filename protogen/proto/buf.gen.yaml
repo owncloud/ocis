@@ -13,10 +13,14 @@ plugins:
       - paths=source_relative
 
   - name: microweb
-    path: ../../.bingo/protoc-gen-microweb
+    #path: ../../.bingo/protoc-gen-microweb
+    path: ../../../protoc-gen-microweb/protoc-gen-microweb
     out: ../gen/
     opt:
       - paths=source_relative
+      - "ignore_packages=\
+         ocis.services.thumbnails.v1;\
+         ocis.messages.thumbnails.v1"
 
   - name: openapiv2
     path: ../../.bingo/protoc-gen-openapiv2

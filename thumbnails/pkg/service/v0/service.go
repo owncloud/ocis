@@ -12,8 +12,8 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v1"
 	"github.com/owncloud/ocis/thumbnails/pkg/preprocessor"
-	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"
 	"github.com/pkg/errors"
@@ -22,7 +22,7 @@ import (
 )
 
 // NewService returns a service implementation for Service.
-func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
+func NewService(opts ...Option) thumbnailssvc.ThumbnailServiceHandler {
 	options := newOptions(opts...)
 	logger := options.Logger
 	resolutions, err := thumbnail.ParseResolutions(options.Config.Thumbnail.Resolutions)
@@ -64,8 +64,8 @@ type PreprocessorOpts struct {
 }
 
 // GetThumbnail retrieves a thumbnail for an image
-func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetThumbnailRequest, rsp *v0proto.GetThumbnailResponse) error {
-	_, ok := v0proto.GetThumbnailRequest_ThumbnailType_value[req.ThumbnailType.String()]
+func (g Thumbnail) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest, rsp *thumbnailssvc.GetThumbnailResponse) error {
+	_, ok := thumbnailssvc.GetThumbnailRequest_ThumbnailType_value[req.ThumbnailType.String()]
 	if !ok {
 		g.logger.Debug().Str("thumbnail_type", req.ThumbnailType.String()).Msg("unsupported thumbnail type")
 		return nil
@@ -96,7 +96,7 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetThumbnailRe
 	return nil
 }
 
-func (g Thumbnail) handleCS3Source(ctx context.Context, req *v0proto.GetThumbnailRequest, encoder thumbnail.Encoder) ([]byte, error) {
+func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest, encoder thumbnail.Encoder) ([]byte, error) {
 	src := req.GetCs3Source()
 	sRes, err := g.stat(src.Path, src.Authorization)
 	if err != nil {
@@ -135,7 +135,7 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *v0proto.GetThumbnai
 	return thumb, nil
 }
 
-func (g Thumbnail) handleWebdavSource(ctx context.Context, req *v0proto.GetThumbnailRequest, encoder thumbnail.Encoder) ([]byte, error) {
+func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest, encoder thumbnail.Encoder) ([]byte, error) {
 	src := req.GetWebdavSource()
 	imgURL, err := url.Parse(src.Url)
 	if err != nil {

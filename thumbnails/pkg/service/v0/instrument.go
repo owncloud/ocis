@@ -3,13 +3,13 @@ package svc
 import (
 	"context"
 
+	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v1"
 	"github.com/owncloud/ocis/thumbnails/pkg/metrics"
-	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 // NewInstrument returns a service that instruments metrics.
-func NewInstrument(next v0proto.ThumbnailServiceHandler, metrics *metrics.Metrics) v0proto.ThumbnailServiceHandler {
+func NewInstrument(next thumbnailssvc.ThumbnailServiceHandler, metrics *metrics.Metrics) thumbnailssvc.ThumbnailServiceHandler {
 	return instrument{
 		next:    next,
 		metrics: metrics,
@@ -17,12 +17,12 @@ func NewInstrument(next v0proto.ThumbnailServiceHandler, metrics *metrics.Metric
 }
 
 type instrument struct {
-	next    v0proto.ThumbnailServiceHandler
+	next    thumbnailssvc.ThumbnailServiceHandler
 	metrics *metrics.Metrics
 }
 
 // GetThumbnail implements the ThumbnailServiceHandler interface.
-func (i instrument) GetThumbnail(ctx context.Context, req *v0proto.GetThumbnailRequest, rsp *v0proto.GetThumbnailResponse) error {
+func (i instrument) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest, rsp *thumbnailssvc.GetThumbnailResponse) error {
 	timer := prometheus.NewTimer(prometheus.ObserverFunc(func(v float64) {
 		us := v * 1000_000
 		i.metrics.Latency.WithLabelValues().Observe(us)
