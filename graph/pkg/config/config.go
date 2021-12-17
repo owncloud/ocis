@@ -29,7 +29,7 @@ type Config struct {
 }
 
 type Spaces struct {
-	WebDavBase   string `ocisConfig:"webdav_base" env:"GRAPH_SPACES_WEBDAV_BASE"`
+	WebDavBase   string `ocisConfig:"webdav_base" env:"OCIS_URL;GRAPH_SPACES_WEBDAV_BASE"`
 	WebDavPath   string `ocisConfig:"webdav_path" env:"GRAPH_SPACES_WEBDAV_PATH"`
 	DefaultQuota string `ocisConfig:"default_quota" env:"GRAPH_SPACES_DEFAULT_QUOTA"`
 }
