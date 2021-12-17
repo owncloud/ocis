@@ -183,7 +183,7 @@ type UserProviderSutureService struct {
 
 // NewUserProviderSutureService creates a new storage.UserProvider
 func NewUserProvider(cfg *ociscfg.Config) suture.Service {
-	cfg.Storage.Commons = cfg.Commons
+	//cfg.Storage.Commons = cfg.Commons
 	return UserProviderSutureService{
 		cfg: cfg.Storage,
 	}

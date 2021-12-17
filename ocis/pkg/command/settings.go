@@ -21,9 +21,9 @@ func SettingsCommand(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			if cfg.Commons != nil {
-				cfg.Settings.Commons = cfg.Commons
-			}
+			//if cfg.Commons != nil {
+			//	cfg.Settings.Commons = cfg.Commons
+			//}
 
 			return nil
 		},
