@@ -7,7 +7,6 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/owncloud/ocis/storage/pkg/logging"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 
 	"github.com/owncloud/ocis/ocis-pkg/sync"
@@ -31,7 +30,7 @@ func Sharing(cfg *config.Config) *cli.Command {
 			return ParseConfig(c, cfg, "storage-sharing")
 		},
 		Action: func(c *cli.Context) error {
-			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			logger := NewLogger(cfg)
 
 			tracing.Configure(cfg, logger)
 
@@ -188,7 +187,7 @@ type SharingSutureService struct {
 
 // NewSharingSutureService creates a new store.SharingSutureService
 func NewSharing(cfg *ociscfg.Config) suture.Service {
-	//cfg.Storage.Commons = cfg.Commons
+	cfg.Storage.Commons = cfg.Commons
 	return SharingSutureService{
 		cfg: cfg.Storage,
 	}

@@ -21,7 +21,7 @@ type Logger struct {
 }
 
 // LoggerFromConfig initializes a service-specific logger instance.
-func LoggerFromConfig(name string, cfg shared.Log) Logger {
+func LoggerFromConfig(name string, cfg *shared.Log) Logger {
 	return NewLogger(
 		Name(name),
 		Level(cfg.Level),

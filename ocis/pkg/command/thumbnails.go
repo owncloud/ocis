@@ -21,9 +21,9 @@ func ThumbnailsCommand(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			//if cfg.Commons != nil {
-			//	cfg.Thumbnails.Commons = cfg.Commons
-			//}
+			if cfg.Commons != nil {
+				cfg.Thumbnails.Commons = cfg.Commons
+			}
 
 			return nil
 		},

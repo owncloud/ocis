@@ -6,7 +6,7 @@ import (
 )
 
 // LoggerFromConfig initializes a service-specific logger instance.
-func Configure(name string, cfg config.Log) log.Logger {
+func Configure(name string, cfg *config.Log) log.Logger {
 	return log.NewLogger(
 		log.Name(name),
 		log.Level(cfg.Level),

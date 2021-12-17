@@ -109,9 +109,9 @@ func (s Service) buildIndex() (*indexer.Indexer, error) {
 func configFromSvc(cfg *config.Config) (*idxcfg.Config, error) {
 	c := idxcfg.New()
 
-	//if cfg.Log == nil {
-	//	cfg.Log = &shared.Log{}
-	//}
+	if cfg.Log == nil {
+		cfg.Log = &config.Log{}
+	}
 
 	defer func(cfg *config.Config) {
 		l := log.NewLogger(log.Color(cfg.Log.Color), log.Pretty(cfg.Log.Pretty), log.Level(cfg.Log.Level))

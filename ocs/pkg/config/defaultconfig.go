@@ -27,7 +27,6 @@ func DefaultConfig() *Config {
 			Type:      "jaeger",
 			Endpoint:  "",
 			Collector: "",
-			Service:   "ocs",
 		},
 		TokenManager: TokenManager{
 			JWTSecret: "Pive-Fumkiu4",

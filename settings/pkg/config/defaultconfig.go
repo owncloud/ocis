@@ -38,7 +38,6 @@ func DefaultConfig() *Config {
 			Type:      "jaeger",
 			Endpoint:  "",
 			Collector: "",
-			Service:   "settings",
 		},
 		DataPath: path.Join(defaults.BaseDataPath(), "settings"),
 		Asset: Asset{

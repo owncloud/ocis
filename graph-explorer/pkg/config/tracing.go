@@ -6,5 +6,4 @@ type Tracing struct {
 	Type      string `ocisConfig:"type" env:"OCIS_TRACING_TYPE;GRAPH_EXPLORER_TRACING_TYPE"`
 	Endpoint  string `ocisConfig:"endpoint" env:"OCIS_TRACING_ENDPOINT;GRAPH_EXPLORER_TRACING_ENDPOINT"`
 	Collector string `ocisConfig:"collector" env:"OCIS_TRACING_COLLECTOR;GRAPH_EXPLORER_TRACING_COLLECTOR"`
-	Service   string `ocisConfig:"service" env:"GRAPH_EXPLORER_TRACING_SERVICE"` //TODO: should this be an ID? or the same as Service.Name?
 }

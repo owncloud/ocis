@@ -18,9 +18,9 @@ func GraphExplorerCommand(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			//if cfg.Commons != nil {
-			//	cfg.Graph.Commons = cfg.Commons
-			//}
+			if cfg.Commons != nil {
+				cfg.Graph.Commons = cfg.Commons
+			}
 
 			return nil
 		},

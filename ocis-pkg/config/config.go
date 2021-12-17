@@ -24,7 +24,6 @@ type Tracing struct {
 	Type      string `ocisConfig:"type"`
 	Endpoint  string `ocisConfig:"endpoint"`
 	Collector string `ocisConfig:"collector"`
-	Service   string `ocisConfig:"service"`
 }
 
 // TokenManager is the config for using the reva token manager
@@ -42,28 +41,6 @@ const (
 
 type Mode int
 
-// Service defines the available service configuration.
-type Service struct {
-	Name    string
-	Version string
-}
-
-// Debug defines the available debug configuration.
-type Debug struct {
-	Addr   string `ocisConfig:"addr" env:"ACCOUNTS_DEBUG_ADDR"`
-	Token  string `ocisConfig:"token" env:"ACCOUNTS_DEBUG_TOKEN"`
-	Pprof  bool   `ocisConfig:"pprof" env:"ACCOUNTS_DEBUG_PPROF"`
-	Zpages bool   `ocisConfig:"zpages" env:"ACCOUNTS_DEBUG_ZPAGES"`
-}
-
-// Log defines the available log configuration.
-type Log struct {
-	Level  string `mapstructure:"level" env:"OCIS_LOG_LEVEL"`
-	Pretty bool   `mapstructure:"pretty" env:"OCIS_LOG_PRETTY"`
-	Color  bool   `mapstructure:"color" env:"OCIS_LOG_COLOR"`
-	File   string `mapstructure:"file" env:"OCIS_LOG_FILE"`
-}
-
 // Runtime configures the oCIS runtime when running in supervised mode.
 type Runtime struct {
 	Port       string `ocisConfig:"port"`
@@ -75,11 +52,8 @@ type Runtime struct {
 type Config struct {
 	*shared.Commons `ocisConfig:"shared"`
 
-	Service Service `ocisConfig:"service"`
-
-	Tracing Tracing `ocisConfig:"tracing"`
-	Log     Log     `ocisConfig:"log"`
-	Debug   Debug   `ocisConfig:"debug"`
+	Tracing shared.Tracing `ocisConfig:"tracing"`
+	Log     shared.Log     `ocisConfig:"log"`
 
 	Mode    Mode // DEPRECATED
 	File    string
@@ -106,13 +80,6 @@ type Config struct {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Tracing: Tracing{
-			Enabled:   false,
-			Type:      "jaeger",
-			Endpoint:  "",
-			Collector: "",
-			Service:   "ocis",
-		},
 		TokenManager: TokenManager{
 			JWTSecret: "Pive-Fumkiu4",
 		},
@@ -188,10 +155,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"OCIS_TRACING_COLLECTOR"},
 			Destination: &cfg.Tracing.Collector,
-		},
-		{
-			EnvVars:     []string{"OCIS_TRACING_SERVICE"},
-			Destination: &cfg.Tracing.Service,
 		},
 		{
 			EnvVars:     []string{"OCIS_JWT_SECRET"},

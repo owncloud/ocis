@@ -18,9 +18,9 @@ func GLAuthCommand(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			//if cfg.Commons != nil {
-			//	cfg.GLAuth.Commons = cfg.Commons
-			//}
+			if cfg.Commons != nil {
+				cfg.GLAuth.Commons = cfg.Commons
+			}
 
 			return nil
 		},

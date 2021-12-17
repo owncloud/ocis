@@ -27,7 +27,6 @@ func DefaultConfig() *Config {
 			Type:      "jaeger",
 			Endpoint:  "",
 			Collector: "",
-			Service:   "webdav",
 		},
 		OcisPublicURL:   "https://127.0.0.1:9200",
 		WebdavNamespace: "/home",

@@ -21,9 +21,9 @@ func ProxyCommand(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			//if cfg.Commons != nil {
-			//	cfg.Proxy.Commons = cfg.Commons
-			//}
+			if cfg.Commons != nil {
+				cfg.Proxy.Commons = cfg.Commons
+			}
 
 			return nil
 		},

@@ -22,7 +22,6 @@ func DefaultConfig() *Config {
 			Type:      "jaeger",
 			Endpoint:  "",
 			Collector: "",
-			Service:   "web",
 		},
 		Asset: Asset{
 			Path: "",

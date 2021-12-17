@@ -23,10 +23,10 @@ func DefaultConfig() *Config {
 			Name: "idp",
 		},
 		Tracing: Tracing{
+			Enabled:   false,
 			Type:      "jaeger",
 			Endpoint:  "",
 			Collector: "",
-			Service:   "idp",
 		},
 		Asset: Asset{},
 		IDP: Settings{

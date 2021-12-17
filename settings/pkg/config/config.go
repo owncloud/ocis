@@ -2,14 +2,18 @@ package config
 
 import (
 	"context"
+
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
 // Config combines all available configuration parts.
 type Config struct {
+	*shared.Commons
+
 	Service Service
 
 	Tracing Tracing `ocisConfig:"tracing"`
-	Log     Log     `ocisConfig:"log"`
+	Log     *Log    `ocisConfig:"log"`
 	Debug   Debug   `ocisConfig:"debug"`
 
 	HTTP HTTP `ocisConfig:"http"`
@@ -27,4 +31,3 @@ type Config struct {
 type Asset struct {
 	Path string `ocisConfig:"path" env:"SETTINGS_ASSET_PATH"`
 }
-

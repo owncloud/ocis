@@ -12,8 +12,10 @@ func DefaultConfig() *Config {
 			Addr: "127.0.0.1:9129",
 		},
 		Tracing: Tracing{
-			Type:    "jaeger",
-			Service: "glauth",
+			Enabled:   false,
+			Type:      "jaeger",
+			Endpoint:  "",
+			Collector: "",
 		},
 		Service: Service{
 			Name: "glauth",
