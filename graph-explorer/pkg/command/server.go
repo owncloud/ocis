@@ -6,6 +6,7 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/graph-explorer/pkg/config"
+	"github.com/owncloud/ocis/graph-explorer/pkg/logging"
 	"github.com/owncloud/ocis/graph-explorer/pkg/metrics"
 	"github.com/owncloud/ocis/graph-explorer/pkg/server/debug"
 	"github.com/owncloud/ocis/graph-explorer/pkg/server/http"
@@ -26,9 +27,11 @@ func Server(cfg *config.Config) *cli.Command {
 			return ParseConfig(ctx, cfg)
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-			tracing.Configure(cfg)
-
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			err := tracing.Configure(cfg)
+			if err != nil {
+				return err
+			}
 			var (
 				gr          = run.Group{}
 				ctx, cancel = func() (context.Context, context.CancelFunc) {

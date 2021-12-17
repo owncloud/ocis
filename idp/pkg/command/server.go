@@ -6,6 +6,7 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/idp/pkg/config"
+	"github.com/owncloud/ocis/idp/pkg/logging"
 	"github.com/owncloud/ocis/idp/pkg/metrics"
 	"github.com/owncloud/ocis/idp/pkg/server/debug"
 	"github.com/owncloud/ocis/idp/pkg/server/http"
@@ -30,10 +31,11 @@ func Server(cfg *config.Config) *cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-
-			tracing.Configure(cfg)
-
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			err := tracing.Configure(cfg)
+			if err != nil {
+				return err
+			}
 			var (
 				gr          = run.Group{}
 				ctx, cancel = func() (context.Context, context.CancelFunc) {

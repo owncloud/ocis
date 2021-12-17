@@ -8,45 +8,45 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
-// Log defines the available logging configuration.
+// Log defines the available log configuration.
 type Log struct {
-	Level  string `ocisConfig:"level"`
-	Pretty bool   `ocisConfig:"pretty"`
-	Color  bool   `ocisConfig:"color"`
-	File   string `ocisConfig:"file"`
+	Level  string `mapstructure:"level" env:"OCIS_LOG_LEVEL;PROXY_LOG_LEVEL"`
+	Pretty bool   `mapstructure:"pretty" env:"OCIS_LOG_PRETTY;PROXY_LOG_PRETTY"`
+	Color  bool   `mapstructure:"color" env:"OCIS_LOG_COLOR;PROXY_LOG_COLOR"`
+	File   string `mapstructure:"file" env:"OCIS_LOG_FILE;PROXY_LOG_FILE"`
 }
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string `ocisConfig:"addr"`
-	Token  string `ocisConfig:"token"`
-	Pprof  bool   `ocisConfig:"pprof"`
-	Zpages bool   `ocisConfig:"zpages"`
+	Addr   string `ocisConfig:"addr" env:"PROXY_DEBUG_ADDR"`
+	Token  string `ocisConfig:"token" env:"PROXY_DEBUG_TOKEN"`
+	Pprof  bool   `ocisConfig:"pprof" env:"PROXY_DEBUG_PPROF"`
+	Zpages bool   `ocisConfig:"zpages" env:"PROXY_DEBUG_ZPAGES"`
 }
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string `ocisConfig:"addr"`
-	Root      string `ocisConfig:"root"`
+	Addr      string `ocisConfig:"addr" env:"PROXY_HTTP_ADDR"`
+	Root      string `ocisConfig:"root" env:"PROXY_HTTP_ROOT"`
 	Namespace string
-	TLSCert   string `ocisConfig:"tls_cert"`
-	TLSKey    string `ocisConfig:"tls_key"`
-	TLS       bool   `ocisConfig:"tls"`
+	TLSCert   string `ocisConfig:"tls_cert" env:"PROXY_TRANSPORT_TLS_CERT"`
+	TLSKey    string `ocisConfig:"tls_key" env:"PROXY_TRANSPORT_TLS_KEY"`
+	TLS       bool   `ocisConfig:"tls" env:"PROXY_TLS"`
 }
 
 // Service defines the available service configuration.
 type Service struct {
-	Name    string `ocisConfig:"name"`
-	Version string `ocisConfig:"version"`
+	Name    string
+	Version string
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `ocisConfig:"enabled"`
-	Type      string `ocisConfig:"type"`
-	Endpoint  string `ocisConfig:"endpoint"`
-	Collector string `ocisConfig:"collector"`
-	Service   string `ocisConfig:"service"`
+	Enabled   bool   `ocisConfig:"enabled" env:"OCIS_TRACING_ENABLED;PROXY_TRACING_ENABLED"`
+	Type      string `ocisConfig:"type" env:"OCIS_TRACING_TYPE;PROXY_TRACING_TYPE"`
+	Endpoint  string `ocisConfig:"endpoint" env:"OCIS_TRACING_ENDPOINT;PROXY_TRACING_ENDPOINT"`
+	Collector string `ocisConfig:"collector" env:"OCIS_TRACING_COLLECTOR;PROXY_TRACING_COLLECTOR"`
+	Service   string `ocisConfig:"service" env:"PROXY_TRACING_SERVICE"` //TODO: should this be an ID? or the same as Service.Name?
 }
 
 // Policy enables us to use multiple directors.
@@ -84,7 +84,7 @@ var (
 
 // Reva defines all available REVA configuration.
 type Reva struct {
-	Address    string     `ocisConfig:"address"`
+	Address    string     `ocisConfig:"address" env:"REVA_GATEWAY"`
 	Middleware Middleware `ocisConfig:"middleware"`
 }
 
@@ -98,34 +98,31 @@ type Auth struct {
 	CredentialsByUserAgent map[string]string `ocisConfig:""`
 }
 
-// Cache is a TTL cache configuration.
-type Cache struct {
-	Size int `ocisConfig:"size"`
-	TTL  int `ocisConfig:"ttl"`
-}
-
 // Config combines all available configuration parts.
 type Config struct {
 	*shared.Commons
 
-	Log                   *shared.Log     `ocisConfig:"log"`
-	Debug                 Debug           `ocisConfig:"debug"`
-	HTTP                  HTTP            `ocisConfig:"http"`
-	Service               Service         `ocisConfig:"service"`
-	Tracing               Tracing         `ocisConfig:"tracing"`
+	Service Service `ocisConfig:"service"`
+
+	Tracing Tracing `ocisConfig:"tracing"`
+	Log     Log     `ocisConfig:"log"`
+	Debug   Debug   `ocisConfig:"debug"`
+
+	HTTP HTTP `ocisConfig:"http"`
+
 	Policies              []Policy        `ocisConfig:"policies"`
 	OIDC                  OIDC            `ocisConfig:"oidc"`
 	TokenManager          TokenManager    `ocisConfig:"token_manager"`
 	PolicySelector        *PolicySelector `ocisConfig:"policy_selector"`
 	Reva                  Reva            `ocisConfig:"reva"`
 	PreSignedURL          PreSignedURL    `ocisConfig:"pre_signed_url"`
-	AccountBackend        string          `ocisConfig:"account_backend"`
-	UserOIDCClaim         string          `ocisConfig:"user_oidc_claim"`
-	UserCS3Claim          string          `ocisConfig:"user_cs3_claim"`
-	MachineAuthAPIKey     string          `ocisConfig:"machine_auth_api_key"`
-	AutoprovisionAccounts bool            `ocisConfig:"auto_provision_accounts"`
-	EnableBasicAuth       bool            `ocisConfig:"enable_basic_auth"`
-	InsecureBackends      bool            `ocisConfig:"insecure_backends"`
+	AccountBackend        string          `ocisConfig:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE"`
+	UserOIDCClaim         string          `ocisConfig:"user_oidc_claim" env:"PROXY_USER_OIDC_CLAIM"`
+	UserCS3Claim          string          `ocisConfig:"user_cs3_claim" env:"PROXY_USER_CS3_CLAIM"`
+	MachineAuthAPIKey     string          `ocisConfig:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY"`
+	AutoprovisionAccounts bool            `ocisConfig:"auto_provision_accounts" env:"PROXY_AUTOPROVISION_ACCOUNTS"`
+	EnableBasicAuth       bool            `ocisConfig:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH"`
+	InsecureBackends      bool            `ocisConfig:"insecure_backends" env:"PROXY_INSECURE_BACKENDS"`
 
 	Context    context.Context
 	Supervised bool
@@ -134,9 +131,15 @@ type Config struct {
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
 // with the configured oidc-provider
 type OIDC struct {
-	Issuer        string `ocisConfig:"issuer"`
-	Insecure      bool   `ocisConfig:"insecure"`
-	UserinfoCache Cache  `ocisConfig:"user_info_cache"`
+	Issuer        string        `ocisConfig:"issuer" env:"OCIS_URL;PROXY_OIDC_ISSUER"`
+	Insecure      bool          `ocisConfig:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE"`
+	UserinfoCache UserinfoCache `ocisConfig:"user_info_cache"`
+}
+
+// UserinfoCache is a TTL cache configuration.
+type UserinfoCache struct {
+	Size int `ocisConfig:"size" env:"PROXY_OIDC_USERINFO_CACHE_SIZE"`
+	TTL  int `ocisConfig:"ttl" env:"PROXY_OIDC_USERINFO_CACHE_TTL"`
 }
 
 // PolicySelector is the toplevel-configuration for different selectors
@@ -154,13 +157,13 @@ type StaticSelectorConf struct {
 
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
-	JWTSecret string `ocisConfig:"jwt_secret"`
+	JWTSecret string `ocisConfig:"jwt_secret" env:"OCIS_JWT_SECRET;PROXY_JWT_SECRET"`
 }
 
 // PreSignedURL is the config for the presigned url middleware
 type PreSignedURL struct {
 	AllowedHTTPMethods []string `ocisConfig:"allowed_http_methods"`
-	Enabled            bool     `ocisConfig:"enabled"`
+	Enabled            bool     `ocisConfig:"enabled" env:"PROXY_ENABLE_PRESIGNEDURLS"`
 }
 
 // MigrationSelectorConf is the config for the migration-selector
@@ -192,13 +195,6 @@ type RegexRuleConf struct {
 	Policy   string `ocisConfig:"policy"`
 }
 
-// New initializes a new configuration
-func New() *Config {
-	return &Config{
-		HTTP: HTTP{},
-	}
-}
-
 // DefaultConfig provides with a working local configuration for a proxy service.
 func DefaultConfig() *Config {
 	return &Config{
@@ -227,7 +223,7 @@ func DefaultConfig() *Config {
 			Issuer:   "https://localhost:9200",
 			Insecure: true,
 			//Insecure: true,
-			UserinfoCache: Cache{
+			UserinfoCache: UserinfoCache{
 				Size: 1024,
 				TTL:  10,
 			},
@@ -243,14 +239,14 @@ func DefaultConfig() *Config {
 			AllowedHTTPMethods: []string{"GET"},
 			Enabled:            true,
 		},
-		AccountBackend:    "accounts",
-		UserOIDCClaim:     "email",
-		UserCS3Claim:      "mail",
-		MachineAuthAPIKey: "change-me-please",
-		//AutoprovisionAccounts: false,
-		//EnableBasicAuth:       false,
-		//InsecureBackends:      false,
-		Context: nil,
+		AccountBackend:        "accounts",
+		UserOIDCClaim:         "email",
+		UserCS3Claim:          "mail",
+		MachineAuthAPIKey:     "change-me-please",
+		AutoprovisionAccounts: false,
+		EnableBasicAuth:       false,
+		InsecureBackends:      false,
+		// TODO: enable
 		//Policies: defaultPolicies(),
 	}
 }

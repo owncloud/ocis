@@ -5,60 +5,63 @@ import (
 	"path"
 
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string `ocisConfig:"addr"`
-	Token  string `ocisConfig:"token"`
-	Pprof  bool   `ocisConfig:"pprof"`
-	Zpages bool   `ocisConfig:"zpages"`
+	Addr   string `ocisConfig:"addr" env:"STORE_DEBUG_ADDR"`
+	Token  string `ocisConfig:"token" env:"STORE_DEBUG_TOKEN"`
+	Pprof  bool   `ocisConfig:"pprof" env:"STORE_DEBUG_PPROF"`
+	Zpages bool   `ocisConfig:"zpages" env:"STORE_DEBUG_ZPAGES"`
 }
 
 // GRPC defines the available grpc configuration.
 type GRPC struct {
-	Addr      string `ocisConfig:"addr"`
-	Root      string `ocisConfig:"root"`
+	Addr      string `ocisConfig:"addr" env:"STORE_GRPC_ADDR"`
 	Namespace string
 }
 
 // Service defines the available service configuration.
 type Service struct {
-	Name    string `ocisConfig:"name"`
-	Version string `ocisConfig:"version"`
+	Name    string
+	Version string
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `ocisConfig:"enabled"`
-	Type      string `ocisConfig:"type"`
-	Endpoint  string `ocisConfig:"endpoint"`
-	Collector string `ocisConfig:"collector"`
-	Service   string `ocisConfig:"service"`
+	Enabled   bool   `ocisConfig:"enabled" env:"OCIS_TRACING_ENABLED;STORE_TRACING_ENABLED"`
+	Type      string `ocisConfig:"type" env:"OCIS_TRACING_TYPE;STORE_TRACING_TYPE"`
+	Endpoint  string `ocisConfig:"endpoint" env:"OCIS_TRACING_ENDPOINT;STORE_TRACING_ENDPOINT"`
+	Collector string `ocisConfig:"collector" env:"OCIS_TRACING_COLLECTOR;STORE_TRACING_COLLECTOR"`
+	Service   string `ocisConfig:"service" env:"STORE_TRACING_SERVICE"` //TODO: should this be an ID? or the same as Service.Name?
+}
+
+// Log defines the available log configuration.
+type Log struct {
+	Level  string `mapstructure:"level" env:"OCIS_LOG_LEVEL;STORE_LOG_LEVEL"`
+	Pretty bool   `mapstructure:"pretty" env:"OCIS_LOG_PRETTY;STORE_LOG_PRETTY"`
+	Color  bool   `mapstructure:"color" env:"OCIS_LOG_COLOR;STORE_LOG_COLOR"`
+	File   string `mapstructure:"file" env:"OCIS_LOG_FILE;STORE_LOG_FILE"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
-	Log      shared.Log `ocisConfig:"log"`
-	Debug    Debug      `ocisConfig:"debug"`
-	GRPC     GRPC       `ocisConfig:"grpc"`
-	Tracing  Tracing    `ocisConfig:"tracing"`
-	Datapath string     `ocisConfig:"data_path"`
-	Service  Service    `ocisConfig:"service"`
+	Service Service `ocisConfig:"service"`
+
+	Tracing Tracing `ocisConfig:"tracing"`
+	Log     Log     `ocisConfig:"log"`
+	Debug   Debug   `ocisConfig:"debug"`
+
+	GRPC GRPC `ocisConfig:"grpc"`
+
+	Datapath string `ocisConfig:"data_path" env:"STORE_DATA_PATH"`
 
 	Context    context.Context
 	Supervised bool
 }
 
-// New initializes a new configuration with or without defaults.
-func New() *Config {
-	return &Config{}
-}
-
 func DefaultConfig() *Config {
 	return &Config{
-		Log: shared.Log{},
 		Debug: Debug{
 			Addr:   "127.0.0.1:9464",
 			Token:  "",
@@ -81,15 +84,4 @@ func DefaultConfig() *Config {
 		},
 		Datapath: path.Join(defaults.BaseDataPath(), "store"),
 	}
-}
-
-// GetEnv fetches a list of known env variables for this extension. It is to be used by gookit, as it provides a list
-// with all the environment variables an extension supports.
-func GetEnv() []string {
-	var r = make([]string, len(structMappings(&Config{})))
-	for i := range structMappings(&Config{}) {
-		r = append(r, structMappings(&Config{})[i].EnvVars...)
-	}
-
-	return r
 }

@@ -26,7 +26,7 @@ func init() {
 		grpc.Address("localhost:9992"),
 	)
 
-	cfg := config.New()
+	cfg := config.DefaultConfig()
 	cfg.Thumbnail.Resolutions = []string{"16x16", "32x32", "64x64", "128x128"}
 
 	wd, _ := os.Getwd()
@@ -44,17 +44,17 @@ func init() {
 	if err != nil {
 		log.Fatalf("could not register ThumbnailHandler: %v", err)
 	}
-	 if err := service.Server().Start(); err != nil {
-	 	log.Fatalf("could not start server: %v", err)
-	 }
+	if err := service.Server().Start(); err != nil {
+		log.Fatalf("could not start server: %v", err)
+	}
 }
 
 func TestGetThumbnailInvalidImage(t *testing.T) {
 	req := proto.GetThumbnailRequest{
-		Filepath: "invalid.png",
+		Filepath:      "invalid.png",
 		ThumbnailType: proto.GetThumbnailRequest_PNG,
-		Height:   32,
-		Width:    32,
+		Height:        32,
+		Width:         32,
 	}
 	client := service.Client()
 	cl := proto.NewThumbnailService("com.owncloud.api.thumbnails", client)

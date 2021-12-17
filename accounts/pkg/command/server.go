@@ -26,11 +26,11 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
-			cfg.Repo.Backend = strings.ToLower(cfg.Repo.Backend)
-
 			if err := ParseConfig(ctx, cfg); err != nil {
 				return err
 			}
+
+			cfg.Repo.Backend = strings.ToLower(cfg.Repo.Backend)
 
 			return nil
 		},

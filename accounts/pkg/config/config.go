@@ -8,6 +8,15 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 )
 
+//TODO: use debug config
+// Debug defines the available debug configuration.
+type Debug struct {
+	Addr   string `ocisConfig:"addr" env:"ACCOUNTS_DEBUG_ADDR"`
+	Token  string `ocisConfig:"token" env:"ACCOUNTS_DEBUG_TOKEN"`
+	Pprof  bool   `ocisConfig:"pprof" env:"ACCOUNTS_DEBUG_PPROF"`
+	Zpages bool   `ocisConfig:"zpages" env:"ACCOUNTS_DEBUG_ZPAGES"`
+}
+
 // CORS defines the available cors configuration.
 type CORS struct {
 	AllowedOrigins   []string `ocisConfig:"allowed_origins"`
@@ -112,26 +121,26 @@ type Log struct {
 type Config struct {
 	//*shared.Commons
 
-	HTTP               HTTP         `ocisConfig:"http"`
-	GRPC               GRPC         `ocisConfig:"grpc"`
-	Service            Service      `ocisConfig:"service"`
-	Asset              Asset        `ocisConfig:"asset"`
-	Log                Log          `ocisConfig:"log"`
-	TokenManager       TokenManager `ocisConfig:"token_manager"`
-	Repo               Repo         `ocisConfig:"repo"`
-	Index              Index        `ocisConfig:"index"`
-	ServiceUser        ServiceUser  `ocisConfig:"service_user"`
-	HashDifficulty     int          `ocisConfig:"hash_difficulty" env:"ACCOUNTS_HASH_DIFFICULTY"`
-	DemoUsersAndGroups bool         `ocisConfig:"demo_users_and_groups" env:"ACCOUNTS_DEMO_USERS_AND_GROUPS"`
-	Tracing            Tracing      `ocisConfig:"tracing"`
+	Service Service `ocisConfig:"service"`
+
+	Tracing Tracing `ocisConfig:"tracing"`
+	Log     Log     `ocisConfig:"log"`
+	Debug   Debug   `ocisConfig:"debug"`
+
+	HTTP HTTP `ocisConfig:"http"`
+	GRPC GRPC `ocisConfig:"grpc"`
+
+	TokenManager TokenManager `ocisConfig:"token_manager"`
+
+	Asset              Asset       `ocisConfig:"asset"`
+	Repo               Repo        `ocisConfig:"repo"`
+	Index              Index       `ocisConfig:"index"`
+	ServiceUser        ServiceUser `ocisConfig:"service_user"`
+	HashDifficulty     int         `ocisConfig:"hash_difficulty" env:"ACCOUNTS_HASH_DIFFICULTY"`
+	DemoUsersAndGroups bool        `ocisConfig:"demo_users_and_groups" env:"ACCOUNTS_DEMO_USERS_AND_GROUPS"`
 
 	Context    context.Context
 	Supervised bool
-}
-
-// New returns a new config.
-func New() *Config {
-	return &Config{}
 }
 
 func DefaultConfig() *Config {

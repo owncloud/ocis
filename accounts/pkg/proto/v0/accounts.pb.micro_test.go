@@ -79,7 +79,7 @@ func init() {
 		grpc.Address("localhost:9180"),
 	)
 
-	cfg := config.New()
+	cfg := config.DefaultConfig()
 	cfg.Repo.Backend = "disk"
 	cfg.Repo.Disk.Path = dataPath
 	cfg.DemoUsersAndGroups = true

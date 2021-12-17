@@ -21,7 +21,7 @@ import (
 	"github.com/libregraph/lico/server"
 	"github.com/owncloud/ocis/idp/pkg/assets"
 	"github.com/owncloud/ocis/idp/pkg/config"
-	logw "github.com/owncloud/ocis/idp/pkg/log"
+	"github.com/owncloud/ocis/idp/pkg/logging"
 	"github.com/owncloud/ocis/idp/pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"stash.kopano.io/kgol/rndm"
@@ -59,7 +59,7 @@ func NewService(opts ...Option) Service {
 	idpSettings := bootstrap.Settings(options.Config.IDP)
 
 	bs, err := bootstrap.Boot(ctx, &idpSettings, &licoconfig.Config{
-		Logger: logw.Wrap(logger),
+		Logger: logging.Wrap(logger),
 	})
 
 	if err != nil {

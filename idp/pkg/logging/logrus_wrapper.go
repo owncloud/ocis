@@ -1,9 +1,10 @@
-package log
+package logging
 
 import (
+	"io/ioutil"
+
 	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
-	"io/ioutil"
 )
 
 type levelMap map[logrus.Level]zerolog.Level

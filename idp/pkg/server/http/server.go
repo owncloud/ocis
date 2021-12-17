@@ -70,7 +70,7 @@ func Server(opts ...Option) (http.Service, error) {
 
 	{
 		handle = svc.NewInstrument(handle, options.Metrics)
-		handle = svc.NewLogging(handle, options.Logger)
+		handle = svc.NewLoggingHandler(handle, options.Logger)
 	}
 
 	if err := micro.RegisterHandler(service.Server(), handle); err != nil {
