@@ -2,56 +2,26 @@ package config
 
 import (
 	"context"
-
-	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
-// Debug defines the available debug configuration.
-type Debug struct {
-	Addr   string `ocisConfig:"addr" env:"GRAPH_DEBUG_ADDR"`
-	Token  string `ocisConfig:"token" env:"GRAPH_DEBUG_TOKEN"`
-	Pprof  bool   `ocisConfig:"pprof" env:"GRAPH_DEBUG_PPROF"`
-	Zpages bool   `ocisConfig:"zpages" env:"GRAPH_DEBUG_ZPAGES"`
-}
+// Config combines all available configuration parts.
+type Config struct {
+	Service Service
 
-// HTTP defines the available http configuration.
-type HTTP struct {
-	Addr      string `ocisConfig:"addr" env:"GRAPH_HTTP_ADDR"`
-	Namespace string
-	Root      string `ocisConfig:"root" env:"GRAPH_HTTP_ROOT"`
-}
+	Tracing Tracing `ocisConfig:"tracing"`
+	Log     Log     `ocisConfig:"log"`
+	Debug   Debug   `ocisConfig:"debug"`
 
-// Service defines the available service configuration.
-type Service struct {
-	Name    string
-	Version string
-}
+	HTTP HTTP `ocisConfig:"http"`
 
-// Tracing defines the available tracing configuration.
-type Tracing struct {
-	Enabled   bool   `ocisConfig:"enabled" env:"OCIS_TRACING_ENABLED;GRAPH_TRACING_ENABLED"`
-	Type      string `ocisConfig:"type" env:"OCIS_TRACING_TYPE;GRAPH_TRACING_TYPE"`
-	Endpoint  string `ocisConfig:"endpoint" env:"OCIS_TRACING_ENDPOINT;GRAPH_TRACING_ENDPOINT"`
-	Collector string `ocisConfig:"collector" env:"OCIS_TRACING_COLLECTOR;GRAPH_TRACING_COLLECTOR"`
-	Service   string `ocisConfig:"service" env:"GRAPH_TRACING_SERVICE"` //TODO: should this be an ID? or the same as Service.Name?
-}
+	Reva         Reva         `ocisConfig:"reva"`
+	TokenManager TokenManager `ocisConfig:"token_manager"`
 
-// Log defines the available log configuration.
-type Log struct {
-	Level  string `mapstructure:"level" env:"OCIS_LOG_LEVEL;GRAPH_LOG_LEVEL"`
-	Pretty bool   `mapstructure:"pretty" env:"OCIS_LOG_PRETTY;GRAPH_LOG_PRETTY"`
-	Color  bool   `mapstructure:"color" env:"OCIS_LOG_COLOR;GRAPH_LOG_COLOR"`
-	File   string `mapstructure:"file" env:"OCIS_LOG_FILE;GRAPH_LOG_FILE"`
-}
+	Spaces   Spaces   `ocisConfig:"spaces"`
+	Identity Identity `ocisConfig:"identity"`
 
-// Reva defines all available REVA configuration.
-type Reva struct {
-	Address string `ocisConfig:"address" env:"REVA_GATEWAY"`
-}
-
-// TokenManager is the config for using the reva token manager
-type TokenManager struct {
-	JWTSecret string `ocisConfig:"jwt_secret" env:"OCIS_JWT_SECRET;GRAPH_JWT_SECRET"`
+	Context    context.Context
+	Supervised bool
 }
 
 type Spaces struct {
@@ -84,81 +54,4 @@ type LDAP struct {
 type Identity struct {
 	Backend string `ocisConfig:"backend" env:"GRAPH_IDENTITY_BACKEND"`
 	LDAP    LDAP   `ocisConfig:"ldap"`
-}
-
-// Config combines all available configuration parts.
-type Config struct {
-	*shared.Commons
-
-	Service Service `ocisConfig:"service"`
-
-	Tracing Tracing `ocisConfig:"tracing"`
-	Log     Log     `ocisConfig:"log"`
-	Debug   Debug   `ocisConfig:"debug"`
-
-	HTTP HTTP `ocisConfig:"http"`
-
-	Reva         Reva         `ocisConfig:"reva"`
-	TokenManager TokenManager `ocisConfig:"token_manager"`
-
-	Spaces   Spaces   `ocisConfig:"spaces"`
-	Identity Identity `ocisConfig:"identity"`
-
-	Context    context.Context
-	Supervised bool
-}
-
-func DefaultConfig() *Config {
-	return &Config{
-		Debug: Debug{
-			Addr:  "127.0.0.1:9124",
-			Token: "",
-		},
-		HTTP: HTTP{
-			Addr:      "127.0.0.1:9120",
-			Namespace: "com.owncloud.graph",
-			Root:      "/graph",
-		},
-		Service: Service{
-			Name: "graph",
-		},
-		Tracing: Tracing{
-			Enabled: false,
-			Type:    "jaeger",
-			Service: "graph",
-		},
-		Reva: Reva{
-			Address: "127.0.0.1:9142",
-		},
-		TokenManager: TokenManager{
-			JWTSecret: "Pive-Fumkiu4",
-		},
-		Spaces: Spaces{
-			WebDavBase:   "https://localhost:9200",
-			WebDavPath:   "/dav/spaces/",
-			DefaultQuota: "1000000000",
-		},
-		Identity: Identity{
-			Backend: "cs3",
-			LDAP: LDAP{
-				URI:                      "ldap://localhost:9125",
-				BindDN:                   "",
-				BindPassword:             "",
-				UserBaseDN:               "ou=users,dc=ocis,dc=test",
-				UserSearchScope:          "sub",
-				UserFilter:               "(objectClass=posixaccount)",
-				UserEmailAttribute:       "mail",
-				UserDisplayNameAttribute: "displayName",
-				UserNameAttribute:        "uid",
-				// FIXME: switch this to some more widely available attribute by default
-				//        ideally this needs to	be constant for the lifetime of a users
-				UserIDAttribute:    "ownclouduuid",
-				GroupBaseDN:        "ou=groups,dc=ocis,dc=test",
-				GroupSearchScope:   "sub",
-				GroupFilter:        "(objectclass=groupOfNames)",
-				GroupNameAttribute: "cn",
-				GroupIDAttribute:   "cn",
-			},
-		},
-	}
 }

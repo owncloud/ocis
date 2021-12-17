@@ -120,7 +120,7 @@ type AuthMachineSutureService struct {
 
 // NewAuthMachineSutureService creates a new gateway.AuthMachineSutureService
 func NewAuthMachine(cfg *ociscfg.Config) suture.Service {
-	cfg.Storage.Commons = cfg.Commons
+	//cfg.Storage.Commons = cfg.Commons
 	return AuthMachineSutureService{
 		cfg: cfg.Storage,
 	}

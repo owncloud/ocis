@@ -22,9 +22,9 @@ func WebDAVCommand(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			if cfg.Commons != nil {
-				cfg.WebDAV.Commons = cfg.Commons
-			}
+			//if cfg.Commons != nil {
+			//	cfg.WebDAV.Commons = cfg.Commons
+			//}
 
 			return nil
 		},

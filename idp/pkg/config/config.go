@@ -2,35 +2,24 @@ package config
 
 import (
 	"context"
-	"path"
-
-	"github.com/owncloud/ocis/ocis-pkg/shared"
-
-	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 )
 
-// Debug defines the available debug configuration.
-type Debug struct {
-	Addr   string `ocisConfig:"addr" env:"IDP_DEBUG_ADDR"`
-	Token  string `ocisConfig:"token" env:"IDP_DEBUG_TOKEN"`
-	Pprof  bool   `ocisConfig:"pprof" env:"IDP_DEBUG_PPROF"`
-	Zpages bool   `ocisConfig:"zpages" env:"IDP_DEBUG_ZPAGES"`
-}
+// Config combines all available configuration parts.
+type Config struct {
+	Service Service
 
-// HTTP defines the available http configuration.
-type HTTP struct {
-	Addr      string `ocisConfig:"addr" env:"IDP_HTTP_ADDR"`
-	Root      string `ocisConfig:"root" env:"IDP_HTTP_ROOT"`
-	Namespace string
-	TLSCert   string `ocisConfig:"tls_cert" env:"IDP_TRANSPORT_TLS_CERT"`
-	TLSKey    string `ocisConfig:"tls_key" env:"IDP_TRANSPORT_TLS_KEY"`
-	TLS       bool   `ocisConfig:"tls" env:"IDP_TLS"`
-}
+	Tracing Tracing `ocisConfig:"tracing"`
+	Log     Log     `ocisConfig:"log"`
+	Debug   Debug   `ocisConfig:"debug"`
 
-// Service defines the available service configuration.
-type Service struct {
-	Name    string
-	Version string
+	HTTP HTTP `ocisConfig:"http"`
+
+	Asset Asset    `ocisConfig:"asset"`
+	IDP   Settings `ocisConfig:"idp"`
+	Ldap  Ldap     `ocisConfig:"ldap"`
+
+	Context    context.Context
+	Supervised bool
 }
 
 // Ldap defines the available LDAP configuration.
@@ -50,23 +39,6 @@ type Ldap struct {
 	UUIDAttributeType string `ocisConfig:"uuid_attribute_type" env:"IDP_LDAP_UUID_ATTRIBUTE_TYPE"`
 
 	Filter string `ocisConfig:"filter" env:"IDP_LDAP_FILTER"`
-}
-
-// Tracing defines the available tracing configuration.
-type Tracing struct {
-	Enabled   bool   `ocisConfig:"enabled" env:"OCIS_TRACING_ENABLED;IDP_TRACING_ENABLED"`
-	Type      string `ocisConfig:"type" env:"OCIS_TRACING_TYPE;IDP_TRACING_TYPE"`
-	Endpoint  string `ocisConfig:"endpoint" env:"OCIS_TRACING_ENDPOINT;IDP_TRACING_ENDPOINT"`
-	Collector string `ocisConfig:"collector" env:"OCIS_TRACING_COLLECTOR;IDP_TRACING_COLLECTOR"`
-	Service   string `ocisConfig:"service" env:"IDP_TRACING_SERVICE"` //TODO: should this be an ID? or the same as Service.Name?
-}
-
-// Log defines the available log configuration.
-type Log struct {
-	Level  string `mapstructure:"level" env:"OCIS_LOG_LEVEL;IDP_LOG_LEVEL"`
-	Pretty bool   `mapstructure:"pretty" env:"OCIS_LOG_PRETTY;IDP_LOG_PRETTY"`
-	Color  bool   `mapstructure:"color" env:"OCIS_LOG_COLOR;IDP_LOG_COLOR"`
-	File   string `mapstructure:"file" env:"OCIS_LOG_FILE;IDP_LOG_FILE"`
 }
 
 // Asset defines the available asset configuration.
@@ -122,96 +94,4 @@ type Settings struct {
 	IDTokenDurationSeconds            uint64 `ocisConfig:"id_token_duration_seconds" env:"IDP_ID_TOKEN_EXPIRATION"`
 	RefreshTokenDurationSeconds       uint64 `ocisConfig:"refresh_token_duration_seconds" env:"IDP_REFRESH_TOKEN_EXPIRATION"`
 	DyamicClientSecretDurationSeconds uint64 `ocisConfig:"dynamic_client_secret_duration_seconds" env:""`
-}
-
-// Config combines all available configuration parts.
-type Config struct {
-	*shared.Commons
-
-	Service Service `ocisConfig:"service"`
-
-	Tracing Tracing `ocisConfig:"tracing"`
-	Log     Log     `ocisConfig:"log"`
-	Debug   Debug   `ocisConfig:"debug"`
-
-	HTTP HTTP `ocisConfig:"http"`
-
-	Asset Asset    `ocisConfig:"asset"`
-	IDP   Settings `ocisConfig:"idp"`
-	Ldap  Ldap     `ocisConfig:"ldap"`
-
-	Context    context.Context
-	Supervised bool
-}
-
-func DefaultConfig() *Config {
-	return &Config{
-		Debug: Debug{
-			Addr: "127.0.0.1:9134",
-		},
-		HTTP: HTTP{
-			Addr:      "127.0.0.1:9130",
-			Root:      "/",
-			Namespace: "com.owncloud.web",
-			TLSCert:   path.Join(defaults.BaseDataPath(), "idp", "server.crt"),
-			TLSKey:    path.Join(defaults.BaseDataPath(), "idp", "server.key"),
-			TLS:       false,
-		},
-		Service: Service{
-			Name: "idp",
-		},
-		Tracing: Tracing{
-			Type:      "jaeger",
-			Endpoint:  "",
-			Collector: "",
-			Service:   "idp",
-		},
-		Asset: Asset{},
-		IDP: Settings{
-			Iss:                               "https://localhost:9200",
-			IdentityManager:                   "ldap",
-			URIBasePath:                       "",
-			SignInURI:                         "",
-			SignedOutURI:                      "",
-			AuthorizationEndpointURI:          "",
-			EndsessionEndpointURI:             "",
-			Insecure:                          false,
-			TrustedProxy:                      nil,
-			AllowScope:                        nil,
-			AllowClientGuests:                 false,
-			AllowDynamicClientRegistration:    false,
-			EncryptionSecretFile:              "",
-			Listen:                            "",
-			IdentifierClientDisabled:          true,
-			IdentifierClientPath:              path.Join(defaults.BaseDataPath(), "idp"),
-			IdentifierRegistrationConf:        path.Join(defaults.BaseDataPath(), "idp", "identifier-registration.yaml"),
-			IdentifierScopesConf:              "",
-			IdentifierDefaultBannerLogo:       "",
-			IdentifierDefaultSignInPageText:   "",
-			IdentifierDefaultUsernameHintText: "",
-			SigningKid:                        "",
-			SigningMethod:                     "PS256",
-			SigningPrivateKeyFiles:            nil,
-			ValidationKeysPath:                "",
-			CookieBackendURI:                  "",
-			CookieNames:                       nil,
-			AccessTokenDurationSeconds:        60 * 10,                // 10 minutes
-			IDTokenDurationSeconds:            60 * 60,                // 1 hour
-			RefreshTokenDurationSeconds:       60 * 60 * 24 * 365 * 3, // 1 year
-			DyamicClientSecretDurationSeconds: 0,
-		},
-		Ldap: Ldap{
-			URI:               "ldap://localhost:9125",
-			BindDN:            "cn=idp,ou=sysusers,dc=ocis,dc=test",
-			BindPassword:      "idp",
-			BaseDN:            "ou=users,dc=ocis,dc=test",
-			Scope:             "sub",
-			LoginAttribute:    "cn",
-			EmailAttribute:    "mail",
-			NameAttribute:     "sn",
-			UUIDAttribute:     "uid",
-			UUIDAttributeType: "text",
-			Filter:            "(objectClass=posixaccount)",
-		},
-	}
 }

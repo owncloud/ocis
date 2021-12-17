@@ -1,49 +1,31 @@
-// Package config should be moved to internal
 package config
 
 import (
 	"context"
-	"path"
-
-	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 )
 
-//TODO: use debug config
-// Debug defines the available debug configuration.
-type Debug struct {
-	Addr   string `ocisConfig:"addr" env:"ACCOUNTS_DEBUG_ADDR"`
-	Token  string `ocisConfig:"token" env:"ACCOUNTS_DEBUG_TOKEN"`
-	Pprof  bool   `ocisConfig:"pprof" env:"ACCOUNTS_DEBUG_PPROF"`
-	Zpages bool   `ocisConfig:"zpages" env:"ACCOUNTS_DEBUG_ZPAGES"`
-}
+// Config combines all available configuration parts.
+type Config struct {
+	Service Service
 
-// CORS defines the available cors configuration.
-type CORS struct {
-	AllowedOrigins   []string `ocisConfig:"allowed_origins"`
-	AllowedMethods   []string `ocisConfig:"allowed_methods"`
-	AllowedHeaders   []string `ocisConfig:"allowed_headers"`
-	AllowCredentials bool     `ocisConfig:"allowed_credentials"`
-}
+	Tracing Tracing `ocisConfig:"tracing"`
+	Log     Log     `ocisConfig:"log"`
+	Debug   Debug   `ocisConfig:"debug"`
 
-// HTTP defines the available http configuration.
-type HTTP struct {
-	Addr      string `ocisConfig:"addr" env:"ACCOUNTS_HTTP_ADDR"`
-	Namespace string
-	Root      string `ocisConfig:"root" env:"ACCOUNTS_HTTP_ROOT"`
-	CacheTTL  int    `ocisConfig:"cache_ttl" env:"ACCOUNTS_CACHE_TTL"`
-	CORS      CORS   `ocisConfig:"cors"`
-}
+	HTTP HTTP `ocisConfig:"http"`
+	GRPC GRPC `ocisConfig:"grpc"`
 
-// GRPC defines the available grpc configuration.
-type GRPC struct {
-	Addr      string `ocisConfig:"addr" env:"ACCOUNTS_GRPC_ADDR"`
-	Namespace string
-}
+	TokenManager TokenManager `ocisConfig:"token_manager"`
 
-// Service defines the available service configuration.
-type Service struct {
-	Name    string
-	Version string
+	Asset              Asset       `ocisConfig:"asset"`
+	Repo               Repo        `ocisConfig:"repo"`
+	Index              Index       `ocisConfig:"index"`
+	ServiceUser        ServiceUser `ocisConfig:"service_user"`
+	HashDifficulty     int         `ocisConfig:"hash_difficulty" env:"ACCOUNTS_HASH_DIFFICULTY"`
+	DemoUsersAndGroups bool        `ocisConfig:"demo_users_and_groups" env:"ACCOUNTS_DEMO_USERS_AND_GROUPS"`
+
+	Context    context.Context
+	Supervised bool
 }
 
 // Asset defines the available asset configuration.
@@ -98,108 +80,4 @@ type GIDBound struct {
 type UIDBound struct {
 	Lower int64 `ocisConfig:"lower" env:"ACCOUNTS_UID_INDEX_LOWER_BOUND"`
 	Upper int64 `ocisConfig:"upper" env:"ACCOUNTS_UID_INDEX_UPPER_BOUND"`
-}
-
-// Tracing defines the available tracing configuration.
-type Tracing struct {
-	Enabled   bool   `ocisConfig:"enabled" env:"OCIS_TRACING_ENABLED;ACCOUNTS_TRACING_ENABLED"`
-	Type      string `ocisConfig:"type" env:"OCIS_TRACING_TYPE;ACCOUNTS_TRACING_TYPE"`
-	Endpoint  string `ocisConfig:"endpoint" env:"OCIS_TRACING_ENDPOINT;ACCOUNTS_TRACING_ENDPOINT"`
-	Collector string `ocisConfig:"collector" env:"OCIS_TRACING_COLLECTOR;ACCOUNTS_TRACING_COLLECTOR"`
-	Service   string `ocisConfig:"service" env:"ACCOUNTS_TRACING_SERVICE"` //TODO: should this be an ID? or the same as Service.Name?
-}
-
-// Log defines the available log configuration.
-type Log struct {
-	Level  string `mapstructure:"level" env:"OCIS_LOG_LEVEL;ACCOUNTS_LOG_LEVEL"`
-	Pretty bool   `mapstructure:"pretty" env:"OCIS_LOG_PRETTY;ACCOUNTS_LOG_PRETTY"`
-	Color  bool   `mapstructure:"color" env:"OCIS_LOG_COLOR;ACCOUNTS_LOG_COLOR"`
-	File   string `mapstructure:"file" env:"OCIS_LOG_FILE;ACCOUNTS_LOG_FILE"`
-}
-
-// Config merges all Account config parameters.
-type Config struct {
-	//*shared.Commons
-
-	Service Service `ocisConfig:"service"`
-
-	Tracing Tracing `ocisConfig:"tracing"`
-	Log     Log     `ocisConfig:"log"`
-	Debug   Debug   `ocisConfig:"debug"`
-
-	HTTP HTTP `ocisConfig:"http"`
-	GRPC GRPC `ocisConfig:"grpc"`
-
-	TokenManager TokenManager `ocisConfig:"token_manager"`
-
-	Asset              Asset       `ocisConfig:"asset"`
-	Repo               Repo        `ocisConfig:"repo"`
-	Index              Index       `ocisConfig:"index"`
-	ServiceUser        ServiceUser `ocisConfig:"service_user"`
-	HashDifficulty     int         `ocisConfig:"hash_difficulty" env:"ACCOUNTS_HASH_DIFFICULTY"`
-	DemoUsersAndGroups bool        `ocisConfig:"demo_users_and_groups" env:"ACCOUNTS_DEMO_USERS_AND_GROUPS"`
-
-	Context    context.Context
-	Supervised bool
-}
-
-func DefaultConfig() *Config {
-	return &Config{
-
-		HTTP: HTTP{
-			Addr:      "127.0.0.1:9181",
-			Namespace: "com.owncloud.web",
-			Root:      "/",
-			CacheTTL:  604800, // 7 days
-			CORS: CORS{
-				AllowedOrigins:   []string{"*"},
-				AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-				AllowedHeaders:   []string{"Authorization", "Origin", "Content-Type", "Accept", "X-Requested-With"},
-				AllowCredentials: true,
-			},
-		},
-		GRPC: GRPC{
-			Addr:      "127.0.0.1:9180",
-			Namespace: "com.owncloud.api",
-		},
-		Service: Service{
-			Name: "accounts",
-		},
-		Asset: Asset{},
-		TokenManager: TokenManager{
-			JWTSecret: "Pive-Fumkiu4",
-		},
-		HashDifficulty:     11,
-		DemoUsersAndGroups: true,
-		Repo: Repo{
-			Backend: "CS3",
-			Disk: Disk{
-				Path: path.Join(defaults.BaseDataPath(), "accounts"),
-			},
-			CS3: CS3{
-				ProviderAddr: "localhost:9215",
-				JWTSecret:    "Pive-Fumkiu4",
-			},
-		},
-		Index: Index{
-			UID: UIDBound{
-				Lower: 0,
-				Upper: 1000,
-			},
-			GID: GIDBound{
-				Lower: 0,
-				Upper: 1000,
-			},
-		},
-		ServiceUser: ServiceUser{
-			UUID:     "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-			Username: "",
-			UID:      0,
-			GID:      0,
-		},
-		Tracing: Tracing{
-			Type:    "jaeger",
-			Service: "accounts",
-		},
-	}
 }

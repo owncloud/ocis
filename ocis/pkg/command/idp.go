@@ -21,9 +21,9 @@ func IDPCommand(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			if cfg.Commons != nil {
-				cfg.IDP.Commons = cfg.Commons
-			}
+			//if cfg.Commons != nil {
+			//	cfg.IDP.Commons = cfg.Commons
+			//}
 
 			return nil
 		},
