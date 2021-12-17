@@ -39,8 +39,10 @@ func Execute(cfg *config.Config) error {
 			ListAccounts(cfg),
 			InspectAccount(cfg),
 			RemoveAccount(cfg),
-			PrintVersion(cfg),
 			RebuildIndex(cfg),
+
+			Health(cfg),
+			PrintVersion(cfg),
 		},
 	}
 
