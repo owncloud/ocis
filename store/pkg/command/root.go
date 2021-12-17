@@ -4,7 +4,6 @@ import (
 	"context"
 	"os"
 
-	"github.com/imdario/mergo"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/store/pkg/config"
@@ -60,7 +59,7 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 		return err
 	}
 
-		// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
+	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
 	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
 		cfg.Log = &config.Log{
 			Level:  cfg.Commons.Log.Level,
@@ -73,13 +72,7 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	}
 
 	// load all env variables relevant to the config in the current context.
-	envCfg := config.Config{}
-	if err := envdecode.Decode(&envCfg); err != nil && err.Error() != "none of the target fields were set from environment variables" {
-		return err
-	}
-
-	// merge environment variable config on top of the current config
-	if err := mergo.Merge(cfg, envCfg, mergo.WithOverride); err != nil {
+	if err := envdecode.Decode(cfg); err != nil && err.Error() != "none of the target fields were set from environment variables" {
 		return err
 	}
 
