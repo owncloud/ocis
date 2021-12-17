@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"os"
+	"strings"
 
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
@@ -81,6 +82,12 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	if err := envdecode.Decode(cfg); err != nil && err.Error() != "none of the target fields were set from environment variables" {
 		return err
 	}
+
+	// sanitize config
+	if cfg.HTTP.Root != "/" {
+		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
+	}
+	cfg.Repo.Backend = strings.ToLower(cfg.Repo.Backend)
 
 	return nil
 }
