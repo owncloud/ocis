@@ -26,6 +26,7 @@ func Execute(cfg *config.Config) error {
 				Email: "support@owncloud.com",
 			},
 		},
+
 		Before: func(c *cli.Context) error {
 			cfg.Service.Version = version.String
 			return ParseConfig(c, cfg)

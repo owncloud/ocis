@@ -84,23 +84,22 @@ type FallbackBackend struct {
 type Config struct {
 	*shared.Commons
 
-	Log            Log             `ocisConfig:"log"`
-	Debug          Debug           `ocisConfig:"debug"`
-	Service        Service         `ocisConfig:"service"`
-	Tracing        Tracing         `ocisConfig:"tracing"`
-	Ldap           Ldap            `ocisConfig:"ldap"`
-	Ldaps          Ldaps           `ocisConfig:"ldaps"`
-	Backend        Backend         `ocisConfig:"backend"`
-	Fallback       FallbackBackend `ocisConfig:"fallback"`
-	RoleBundleUUID string          `ocisConfig:"role_bundle_uuid" env:"GLAUTH_ROLE_BUNDLE_ID"`
+	Service Service `ocisConfig:"service"`
+
+	Tracing Tracing `ocisConfig:"tracing"`
+	Log     Log     `ocisConfig:"log"`
+	Debug   Debug   `ocisConfig:"debug"`
+
+	Ldap  Ldap  `ocisConfig:"ldap"`
+	Ldaps Ldaps `ocisConfig:"ldaps"`
+
+	Backend  Backend         `ocisConfig:"backend"`
+	Fallback FallbackBackend `ocisConfig:"fallback"`
+
+	RoleBundleUUID string `ocisConfig:"role_bundle_uuid" env:"GLAUTH_ROLE_BUNDLE_ID"`
 
 	Context    context.Context
 	Supervised bool
-}
-
-// New initializes a new configuration with or without defaults.
-func New() *Config {
-	return &Config{}
 }
 
 func DefaultConfig() *Config {

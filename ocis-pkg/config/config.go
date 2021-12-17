@@ -42,6 +42,28 @@ const (
 
 type Mode int
 
+// Service defines the available service configuration.
+type Service struct {
+	Name    string
+	Version string
+}
+
+// Debug defines the available debug configuration.
+type Debug struct {
+	Addr   string `ocisConfig:"addr" env:"ACCOUNTS_DEBUG_ADDR"`
+	Token  string `ocisConfig:"token" env:"ACCOUNTS_DEBUG_TOKEN"`
+	Pprof  bool   `ocisConfig:"pprof" env:"ACCOUNTS_DEBUG_PPROF"`
+	Zpages bool   `ocisConfig:"zpages" env:"ACCOUNTS_DEBUG_ZPAGES"`
+}
+
+// Log defines the available log configuration.
+type Log struct {
+	Level  string `mapstructure:"level" env:"OCIS_LOG_LEVEL"`
+	Pretty bool   `mapstructure:"pretty" env:"OCIS_LOG_PRETTY"`
+	Color  bool   `mapstructure:"color" env:"OCIS_LOG_COLOR"`
+	File   string `mapstructure:"file" env:"OCIS_LOG_FILE"`
+}
+
 // Runtime configures the oCIS runtime when running in supervised mode.
 type Runtime struct {
 	Port       string `ocisConfig:"port"`
@@ -53,13 +75,17 @@ type Runtime struct {
 type Config struct {
 	*shared.Commons `ocisConfig:"shared"`
 
+	Service Service `ocisConfig:"service"`
+
+	Tracing Tracing `ocisConfig:"tracing"`
+	Log     Log     `ocisConfig:"log"`
+	Debug   Debug   `ocisConfig:"debug"`
+
 	Mode    Mode // DEPRECATED
 	File    string
 	OcisURL string `ocisConfig:"ocis_url"`
 
 	Registry     string       `ocisConfig:"registry"`
-	Log          shared.Log   `ocisConfig:"log"`
-	Tracing      Tracing      `ocisConfig:"tracing"`
 	TokenManager TokenManager `ocisConfig:"token_manager"`
 	Runtime      Runtime      `ocisConfig:"runtime"`
 
@@ -76,25 +102,6 @@ type Config struct {
 	Store         *store.Config         `ocisConfig:"store"`
 	Thumbnails    *thumbnails.Config    `ocisConfig:"thumbnails"`
 	WebDAV        *webdav.Config        `ocisConfig:"webdav"`
-}
-
-// New initializes a new configuration with or without defaults.
-func New() *Config {
-	return &Config{
-		Accounts:      accounts.DefaultConfig(),
-		GLAuth:        glauth.DefaultConfig(),
-		Graph:         graph.DefaultConfig(),
-		IDP:           idp.DefaultConfig(),
-		Proxy:         proxy.DefaultConfig(),
-		GraphExplorer: graphExplorer.DefaultConfig(),
-		OCS:           ocs.DefaultConfig(),
-		Settings:      settings.DefaultConfig(),
-		Web:           web.DefaultConfig(),
-		Store:         store.DefaultConfig(),
-		Thumbnails:    thumbnails.DefaultConfig(),
-		WebDAV:        webdav.DefaultConfig(),
-		Storage:       storage.DefaultConfig(),
-	}
 }
 
 func DefaultConfig() *Config {
@@ -149,6 +156,7 @@ func StructMappings(cfg *Config) []shared.EnvBinding {
 
 func structMappings(cfg *Config) []shared.EnvBinding {
 	return []shared.EnvBinding{
+		// TODO: transform this too
 		{
 			EnvVars:     []string{"OCIS_LOG_LEVEL"},
 			Destination: &cfg.Log.Level,

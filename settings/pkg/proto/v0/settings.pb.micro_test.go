@@ -176,8 +176,8 @@ func init() {
 		grpc.Address("localhost:9992"),
 	)
 
-	cfg := config.New()
-	cfg.Service.DataPath = dataPath
+	cfg := config.DefaultConfig()
+	cfg.DataPath = dataPath
 	handler = svc.NewService(cfg, ocislog.NewLogger(ocislog.Color(true), ocislog.Pretty(true)))
 	err := proto.RegisterBundleServiceHandler(service.Server(), handler)
 	if err != nil {

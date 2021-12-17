@@ -90,23 +90,22 @@ type Identity struct {
 type Config struct {
 	*shared.Commons
 
-	Log          Log          `ocisConfig:"log"`
-	Debug        Debug        `ocisConfig:"debug"`
-	HTTP         HTTP         `ocisConfig:"http"`
-	Service      Service      `ocisConfig:"service"`
-	Tracing      Tracing      `ocisConfig:"tracing"`
+	Service Service `ocisConfig:"service"`
+
+	Tracing Tracing `ocisConfig:"tracing"`
+	Log     Log     `ocisConfig:"log"`
+	Debug   Debug   `ocisConfig:"debug"`
+
+	HTTP HTTP `ocisConfig:"http"`
+
 	Reva         Reva         `ocisConfig:"reva"`
 	TokenManager TokenManager `ocisConfig:"token_manager"`
-	Spaces       Spaces       `ocisConfig:"spaces"`
-	Identity     Identity     `ocisConfig:"identity"`
+
+	Spaces   Spaces   `ocisConfig:"spaces"`
+	Identity Identity `ocisConfig:"identity"`
 
 	Context    context.Context
 	Supervised bool
-}
-
-// New initializes a new configuration with or without defaults.
-func New() *Config {
-	return &Config{}
 }
 
 func DefaultConfig() *Config {

@@ -74,25 +74,25 @@ type IdentityManagement struct {
 type Config struct {
 	*shared.Commons
 
-	Log                Log                `ocisConfig:"log"`
-	Debug              Debug              `ocisConfig:"debug"`
-	HTTP               HTTP               `ocisConfig:"http"`
-	Tracing            Tracing            `ocisConfig:"tracing"`
-	TokenManager       TokenManager       `ocisConfig:"token_manager"`
-	Service            Service            `ocisConfig:"service"`
-	Reva               Reva               `ocisConfig:"reva"`
+	Service Service `ocisConfig:"service"`
+
+	Tracing Tracing `ocisConfig:"tracing"`
+	Log     Log     `ocisConfig:"log"`
+	Debug   Debug   `ocisConfig:"debug"`
+
+	HTTP HTTP `ocisConfig:"http"`
+
+	TokenManager TokenManager `ocisConfig:"token_manager"`
+	Reva         Reva         `ocisConfig:"reva"`
+
 	IdentityManagement IdentityManagement `ocisConfig:"identity_management"`
-	AccountBackend     string             `ocisConfig:"account_backend" env:"OCS_ACCOUNT_BACKEND_TYPE"`
-	StorageUsersDriver string             `ocisConfig:"storage_users_driver" env:"STORAGE_USERS_DRIVER;OCS_STORAGE_USERS_DRIVER"`
-	MachineAuthAPIKey  string             `ocisConfig:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;OCS_MACHINE_AUTH_API_KEY"`
+
+	AccountBackend     string `ocisConfig:"account_backend" env:"OCS_ACCOUNT_BACKEND_TYPE"`
+	StorageUsersDriver string `ocisConfig:"storage_users_driver" env:"STORAGE_USERS_DRIVER;OCS_STORAGE_USERS_DRIVER"`
+	MachineAuthAPIKey  string `ocisConfig:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;OCS_MACHINE_AUTH_API_KEY"`
 
 	Context    context.Context
 	Supervised bool
-}
-
-// New initializes a new configuration with or without defaults.
-func New() *Config {
-	return &Config{}
 }
 
 // DefaultConfig provides default values for a config struct.

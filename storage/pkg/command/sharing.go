@@ -7,6 +7,7 @@ import (
 	"path"
 	"path/filepath"
 
+	"github.com/owncloud/ocis/storage/pkg/logging"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 
 	"github.com/owncloud/ocis/ocis-pkg/sync"
@@ -30,7 +31,7 @@ func Sharing(cfg *config.Config) *cli.Command {
 			return ParseConfig(c, cfg, "storage-sharing")
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 
 			tracing.Configure(cfg, logger)
 

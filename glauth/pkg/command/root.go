@@ -26,10 +26,12 @@ func Execute(cfg *config.Config) error {
 				Email: "support@owncloud.com",
 			},
 		},
+
 		Before: func(c *cli.Context) error {
 			cfg.Service.Version = version.String
-			return nil
+			return ParseConfig(c, cfg)
 		},
+
 		Commands: []*cli.Command{
 			Server(cfg),
 			Health(cfg),
@@ -89,7 +91,7 @@ type SutureService struct {
 
 // NewSutureService creates a new glauth.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	cfg.GLAuth.Commons = cfg.Commons
+	//cfg.GLAuth.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.GLAuth,
 	}

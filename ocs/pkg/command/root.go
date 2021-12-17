@@ -6,7 +6,6 @@ import (
 
 	"github.com/imdario/mergo"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/ocs/pkg/config"
 	"github.com/thejerf/suture/v4"
@@ -31,7 +30,7 @@ func Execute(cfg *config.Config) error {
 
 		Before: func(c *cli.Context) error {
 			cfg.Service.Version = version.String
-			return nil
+			return ParseConfig(c, cfg)
 		},
 
 		Commands: []*cli.Command{
@@ -52,17 +51,6 @@ func Execute(cfg *config.Config) error {
 	}
 
 	return app.Run(os.Args)
-}
-
-// NewLogger initializes a service-specific logger instance.
-func NewLogger(cfg *config.Config) log.Logger {
-	return log.NewLogger(
-		log.Name("ocs"),
-		log.Level(cfg.Log.Level),
-		log.Pretty(cfg.Log.Pretty),
-		log.Color(cfg.Log.Color),
-		log.File(cfg.Log.File),
-	)
 }
 
 // ParseConfig loads idp configuration from known paths.
@@ -105,7 +93,7 @@ type SutureService struct {
 
 // NewSutureService creates a new ocs.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	cfg.OCS.Commons = cfg.Commons
+	//cfg.OCS.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.OCS,
 	}

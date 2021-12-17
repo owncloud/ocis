@@ -10,6 +10,12 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
+// Service defines the available service configuration.
+type Service struct {
+	Name    string
+	Version string
+}
+
 // Log defines the available logging configuration.
 type Log struct {
 	Level  string `ocisConfig:"level"`
@@ -507,16 +513,15 @@ type Asset struct {
 type Config struct {
 	*shared.Commons
 
-	Log     *shared.Log `ocisConfig:"log"`
-	Debug   Debug       `ocisConfig:"debug"`
-	Reva    Reva        `ocisConfig:"reva"`
-	Tracing Tracing     `ocisConfig:"tracing"`
-	Asset   Asset       `ocisConfig:"asset"`
-}
+	Service Service `ocisConfig:"service"`
 
-// New initializes a new configuration with or without defaults.
-func New() *Config {
-	return &Config{}
+	Tracing Tracing `ocisConfig:"tracing"`
+	Log     Log     `ocisConfig:"log"`
+	Debug   Debug   `ocisConfig:"debug"`
+
+	Reva Reva `ocisConfig:"reva"`
+
+	Asset Asset `ocisConfig:"asset"`
 }
 
 func DefaultConfig() *Config {

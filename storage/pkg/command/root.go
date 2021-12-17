@@ -3,7 +3,6 @@ package command
 import (
 	"os"
 
-	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/urfave/cli/v2"
@@ -23,8 +22,10 @@ func Execute(cfg *config.Config) error {
 				Email: "support@owncloud.com",
 			},
 		},
+
 		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg, "storage")
+			cfg.Service.Version = version.String
+			return ParseConfig(c, cfg, "_")
 		},
 
 		Commands: []*cli.Command{
@@ -56,15 +57,4 @@ func Execute(cfg *config.Config) error {
 	}
 
 	return app.Run(os.Args)
-}
-
-// NewLogger initializes a service-specific logger instance.
-func NewLogger(cfg *config.Config) log.Logger {
-	return log.NewLogger(
-		log.Name("storage"),
-		log.Level(cfg.Log.Level),
-		log.Pretty(cfg.Log.Pretty),
-		log.Color(cfg.Log.Color),
-		log.File(cfg.Log.File),
-	)
 }

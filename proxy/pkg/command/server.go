@@ -20,6 +20,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/cs3"
+	"github.com/owncloud/ocis/proxy/pkg/logging"
 	"github.com/owncloud/ocis/proxy/pkg/metrics"
 	"github.com/owncloud/ocis/proxy/pkg/middleware"
 	"github.com/owncloud/ocis/proxy/pkg/proxy"
@@ -62,9 +63,9 @@ func Server(cfg *config.Config) *cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-
-			if err := tracing.Configure(cfg); err != nil {
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			err := tracing.Configure(cfg)
+			if err != nil {
 				return err
 			}
 

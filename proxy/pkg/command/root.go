@@ -4,13 +4,13 @@ import (
 	"context"
 	"os"
 
+	"github.com/imdario/mergo"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
+	"github.com/wkloucek/envdecode"
 )
 
 // Execute is the entry point for the ocis-proxy command.
@@ -26,10 +26,12 @@ func Execute(cfg *config.Config) error {
 				Email: "support@owncloud.com",
 			},
 		},
+
 		Before: func(c *cli.Context) error {
 			cfg.Service.Version = version.String
-			return nil
+			return ParseConfig(c, cfg)
 		},
+
 		Commands: []*cli.Command{
 			Server(cfg),
 			Health(cfg),
@@ -50,35 +52,37 @@ func Execute(cfg *config.Config) error {
 	return app.Run(os.Args)
 }
 
-// ParseConfig loads proxy configuration. Loading will first attempt to parse config files in the expected locations
-// and then parses environment variables. In the context of oCIS env variables will always overwrite values set
-// in a config file.
-// If this extension is run as a subcommand (i.e: ocis proxy) then there are 2 levels of config parsing:
-// 1. ocis.yaml (if any)
-// 2. proxy.yaml (if any)
-// 3. environment variables.
+// ParseConfig loads accounts configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	conf, err := ociscfg.BindSourcesToStructs("proxy", cfg)
+	_, err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg)
 	if err != nil {
 		return err
 	}
 
 	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
-	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
-		cfg.Log = &shared.Log{
-			Level:  cfg.Commons.Log.Level,
-			Pretty: cfg.Commons.Log.Pretty,
-			Color:  cfg.Commons.Log.Color,
-			File:   cfg.Commons.Log.File,
-		}
-	} else if cfg.Log == nil && cfg.Commons == nil {
-		cfg.Log = &shared.Log{}
+	//if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+	//	cfg.Log = &shared.Log{
+	//		Level:  cfg.Commons.Log.Level,
+	//		Pretty: cfg.Commons.Log.Pretty,
+	//		Color:  cfg.Commons.Log.Color,
+	//		File:   cfg.Commons.Log.File,
+	//	}
+	//} else if cfg.Log == nil && cfg.Commons == nil {
+	//	cfg.Log = &shared.Log{}
+	//}
+
+	// load all env variables relevant to the config in the current context.
+	envCfg := config.Config{}
+	if err := envdecode.Decode(&envCfg); err != nil && err.Error() != "none of the target fields were set from environment variables" {
+		return err
 	}
 
-	conf.LoadOSEnv(config.GetEnv(cfg), false)
+	// merge environment variable config on top of the current config
+	if err := mergo.Merge(cfg, envCfg, mergo.WithOverride); err != nil {
+		return err
+	}
 
-	bindings := config.StructMappings(cfg)
-	return ociscfg.BindEnv(conf, bindings)
+	return nil
 }
 
 // SutureService allows for the proxy command to be embedded and supervised by a suture supervisor tree.
@@ -88,7 +92,7 @@ type SutureService struct {
 
 // NewSutureService creates a new proxy.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	cfg.Proxy.Commons = cfg.Commons
+	//cfg.Proxy.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.Proxy,
 	}
@@ -101,15 +105,4 @@ func (s SutureService) Serve(ctx context.Context) error {
 	}
 
 	return nil
-}
-
-// NewLogger initializes a service-specific logger instance.
-func NewLogger(cfg *config.Config) log.Logger {
-	return log.NewLogger(
-		log.Name("proxy"),
-		log.Level(cfg.Log.Level),
-		log.Pretty(cfg.Log.Pretty),
-		log.Color(cfg.Log.Color),
-		log.File(cfg.Log.File),
-	)
 }

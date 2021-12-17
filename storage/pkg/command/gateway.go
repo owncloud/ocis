@@ -15,10 +15,10 @@ import (
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/storage/pkg/config"
+	"github.com/owncloud/ocis/storage/pkg/logging"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/service/external"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
@@ -43,7 +43,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 			tracing.Configure(cfg, logger)
 			gr := run.Group{}
 			ctx, cancel := context.WithCancel(context.Background())
@@ -425,16 +425,16 @@ func ParseConfig(c *cli.Context, cfg *config.Config, storageExtension string) er
 	}
 
 	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
-	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
-		cfg.Log = &shared.Log{
-			Level:  cfg.Commons.Log.Level,
-			Pretty: cfg.Commons.Log.Pretty,
-			Color:  cfg.Commons.Log.Color,
-			File:   cfg.Commons.Log.File,
-		}
-	} else if cfg.Log == nil && cfg.Commons == nil {
-		cfg.Log = &shared.Log{}
-	}
+	//if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+	//	cfg.Log = &shared.Log{
+	//		Level:  cfg.Commons.Log.Level,
+	//		Pretty: cfg.Commons.Log.Pretty,
+	//		Color:  cfg.Commons.Log.Color,
+	//		File:   cfg.Commons.Log.File,
+	//	}
+	//} else if cfg.Log == nil && cfg.Commons == nil {
+	//	cfg.Log = &shared.Log{}
+	//}
 
 	// load all env variables relevant to the config in the current context.
 	conf.LoadOSEnv(config.GetEnv(cfg), false)

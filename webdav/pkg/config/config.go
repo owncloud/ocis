@@ -8,10 +8,10 @@ import (
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string `ocisConfig:"addr"`
-	Token  string `ocisConfig:"token"`
-	Pprof  bool   `ocisConfig:"pprof"`
-	Zpages bool   `ocisConfig:"zpages"`
+	Addr   string `ocisConfig:"addr" env:"WEBDAV_DEBUG_ADDR"`
+	Token  string `ocisConfig:"token" env:"WEBDAV_DEBUG_TOKEN"`
+	Pprof  bool   `ocisConfig:"pprof" env:"WEBDAV_DEBUG_PPROF"`
+	Zpages bool   `ocisConfig:"zpages" env:"WEBDAV_DEBUG_ZPAGES"`
 }
 
 // CORS defines the available cors configuration.
@@ -24,48 +24,53 @@ type CORS struct {
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string `ocisConfig:"addr"`
-	Root      string `ocisConfig:"root"`
+	Addr      string `ocisConfig:"addr" env:"WEBDAV_HTTP_ADDR"`
 	Namespace string
-	CORS      CORS `ocisConfig:"cors"`
+	Root      string `ocisConfig:"root" env:"WEBDAV_HTTP_ROOT"`
+	CORS      CORS   `ocisConfig:"cors"`
 }
 
 // Service defines the available service configuration.
 type Service struct {
-	Name    string `ocisConfig:"name"`
-	Version string `ocisConfig:"version"`
+	Name    string
+	Version string
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `ocisConfig:"enabled"`
-	Type      string `ocisConfig:"type"`
-	Endpoint  string `ocisConfig:"endpoint"`
-	Collector string `ocisConfig:"collector"`
-	Service   string `ocisConfig:"service"`
+	Enabled   bool   `ocisConfig:"enabled" env:"OCIS_TRACING_ENABLED;WEBDAV_TRACING_ENABLED"`
+	Type      string `ocisConfig:"type" env:"OCIS_TRACING_TYPE;WEBDAV_TRACING_TYPE"`
+	Endpoint  string `ocisConfig:"endpoint" env:"OCIS_TRACING_ENDPOINT;WEBDAV_TRACING_ENDPOINT"`
+	Collector string `ocisConfig:"collector" env:"OCIS_TRACING_COLLECTOR;WEBDAV_TRACING_COLLECTOR"`
+	Service   string `ocisConfig:"service" env:"WEBDAV_TRACING_SERVICE"` //TODO: should this be an ID? or the same as Service.Name?
+}
+
+// Log defines the available log configuration.
+type Log struct {
+	Level  string `mapstructure:"level" env:"OCIS_LOG_LEVEL;WEBDAV_LOG_LEVEL"`
+	Pretty bool   `mapstructure:"pretty" env:"OCIS_LOG_PRETTY;WEBDAV_LOG_PRETTY"`
+	Color  bool   `mapstructure:"color" env:"OCIS_LOG_COLOR;WEBDAV_LOG_COLOR"`
+	File   string `mapstructure:"file" env:"OCIS_LOG_FILE;WEBDAV_LOG_FILE"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
 	*shared.Commons
 
-	File            string      `ocisConfig:"file"`
-	Log             *shared.Log `ocisConfig:"log"`
-	Debug           Debug       `ocisConfig:"debug"`
-	HTTP            HTTP        `ocisConfig:"http"`
-	Tracing         Tracing     `ocisConfig:"tracing"`
-	Service         Service     `ocisConfig:"service"`
-	OcisPublicURL   string      `ocisConfig:"ocis_public_url"`
-	WebdavNamespace string      `ocisConfig:"webdav_namespace"`
-	RevaGateway     string      `ocisConfig:"reva_gateway"`
+	Service Service `ocisConfig:"service"`
+
+	Tracing Tracing `ocisConfig:"tracing"`
+	Log     Log     `ocisConfig:"log"`
+	Debug   Debug   `ocisConfig:"debug"`
+
+	HTTP HTTP `ocisConfig:"http"`
+
+	OcisPublicURL   string `ocisConfig:"ocis_public_url" env:"OCIS_URL;OCIS_PUBLIC_URL"`
+	WebdavNamespace string `ocisConfig:"webdav_namespace" env:"STORAGE_WEBDAV_NAMESPACE"` //TODO: prevent this cross config
+	RevaGateway     string `ocisConfig:"reva_gateway" env:"REVA_GATEWAY"`
 
 	Context    context.Context
 	Supervised bool
-}
-
-// New initializes a new configuration with or without defaults.
-func New() *Config {
-	return &Config{}
 }
 
 func DefaultConfig() *Config {

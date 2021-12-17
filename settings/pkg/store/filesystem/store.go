@@ -32,16 +32,16 @@ func New(cfg *config.Config) settings.Manager {
 		//),
 	}
 
-	if _, err := os.Stat(cfg.Service.DataPath); err != nil {
-		s.Logger.Info().Msgf("creating container on %v", cfg.Service.DataPath)
-		err = os.MkdirAll(cfg.Service.DataPath, 0700)
+	if _, err := os.Stat(cfg.DataPath); err != nil {
+		s.Logger.Info().Msgf("creating container on %v", cfg.DataPath)
+		err = os.MkdirAll(cfg.DataPath, 0700)
 
 		if err != nil {
-			s.Logger.Err(err).Msgf("providing container on %v", cfg.Service.DataPath)
+			s.Logger.Err(err).Msgf("providing container on %v", cfg.DataPath)
 		}
 	}
 
-	s.dataPath = cfg.Service.DataPath
+	s.dataPath = cfg.DataPath
 	return &s
 }
 
