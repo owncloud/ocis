@@ -13,11 +13,10 @@ import (
 	mgrpcc "github.com/asim/go-micro/plugins/client/grpc/v4"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/owncloud/ocis/accounts/pkg/config"
+	"github.com/owncloud/ocis/accounts/pkg/logging"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	svc "github.com/owncloud/ocis/accounts/pkg/service/v0"
-	oclog "github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
 	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	"github.com/stretchr/testify/assert"
 	"go-micro.dev/v4/client"
@@ -83,10 +82,17 @@ func init() {
 	cfg.Repo.Backend = "disk"
 	cfg.Repo.Disk.Path = dataPath
 	cfg.DemoUsersAndGroups = true
+	cfg.Log = &config.Log{}
 	var hdlr *svc.Service
 	var err error
 
-	if hdlr, err = svc.New(svc.Logger(oclog.LoggerFromConfig("accounts", shared.Log(cfg.Log))), svc.Config(cfg), svc.RoleService(buildRoleServiceMock())); err != nil {
+	hdlr, err = svc.New(
+		svc.Logger(logging.Configure(cfg.Service.Name, cfg.Log)),
+		svc.Config(cfg),
+		svc.RoleService(buildRoleServiceMock()),
+	)
+
+	if err != nil {
 		log.Fatalf("Could not create new service")
 	}
 
@@ -494,7 +500,7 @@ func TestUpdateAccount(t *testing.T) {
 				GidNumber:                30001,
 				Mail:                     "एलिस@उदाहरण.com",
 			},
-			merrors.BadRequest(".", "preferred_name 'अद्भुत-एलिस' must be at least the local part of an email"),
+			merrors.BadRequest("com.owncloud.api.accounts", "preferred_name 'अद्भुत-एलिस' must be at least the local part of an email"),
 		},
 		{
 			"Update user with empty data values",
@@ -506,7 +512,7 @@ func TestUpdateAccount(t *testing.T) {
 				GidNumber:                0,
 				Mail:                     "",
 			},
-			merrors.BadRequest(".", "preferred_name '' must be at least the local part of an email"),
+			merrors.BadRequest("com.owncloud.api.accounts", "preferred_name '' must be at least the local part of an email"),
 		},
 		{
 			"Update user with strange data",
@@ -518,7 +524,7 @@ func TestUpdateAccount(t *testing.T) {
 				GidNumber:                1000,
 				Mail:                     "1.2@3.c_@",
 			},
-			merrors.BadRequest(".", "mail '1.2@3.c_@' must be a valid email"),
+			merrors.BadRequest("com.owncloud.api.accounts", "mail '1.2@3.c_@' must be a valid email"),
 		},
 	}
 

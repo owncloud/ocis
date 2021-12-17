@@ -563,7 +563,7 @@ func init() {
 				Path: dataPath,
 			},
 		},
-		Log: accountsCfg.Log{
+		Log: &accountsCfg.Log{
 			Level:  "info",
 			Pretty: true,
 			Color:  true,
@@ -710,7 +710,7 @@ func getService() svc.Service {
 		TokenManager: config.TokenManager{
 			JWTSecret: jwtSecret,
 		},
-		Log: config.Log{
+		Log: &config.Log{
 			Level: "debug",
 		},
 	}

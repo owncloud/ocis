@@ -16,7 +16,7 @@ var _ = Describe("Crypto", func() {
 	var (
 		userConfigDir string
 		err           error
-		config        = cfg.New()
+		config        = cfg.DefaultConfig()
 	)
 
 	BeforeEach(func() {
