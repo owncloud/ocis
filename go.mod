@@ -36,7 +36,6 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.2
 	github.com/iancoleman/strcase v0.2.0
-	github.com/imdario/mergo v0.3.12
 	github.com/justinas/alice v1.2.0
 	github.com/libregraph/lico v0.53.1
 	github.com/mennanov/fieldmask-utils v0.5.0
@@ -152,6 +151,7 @@ require (
 	github.com/hashicorp/go-plugin v1.4.3 // indirect
 	github.com/hashicorp/yamux v0.0.0-20211028200310-0bc27b27de87 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
+	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
