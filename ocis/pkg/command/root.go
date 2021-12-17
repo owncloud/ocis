@@ -8,6 +8,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
+	"github.com/wkloucek/envdecode"
 )
 
 // Execute is the entry point for the ocis command.
@@ -55,15 +56,15 @@ func Execute() error {
 
 // ParseConfig loads ocis configuration.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	conf, err := ociscfg.BindSourcesToStructs("ocis", cfg)
+	_, err := ociscfg.BindSourcesToStructs("ocis", cfg)
 	if err != nil {
 		return err
 	}
 
-	// TODO: use envconfig here too
+	// load all env variables relevant to the config in the current context.
+	if err := envdecode.Decode(cfg); err != nil && err.Error() != "none of the target fields were set from environment variables" {
+		return err
+	}
 
-	conf.LoadOSEnv(config.GetEnv(), false)
-
-	bindings := config.StructMappings(cfg)
-	return ociscfg.BindEnv(conf, bindings)
+	return nil
 }
