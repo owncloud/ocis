@@ -202,9 +202,9 @@ https://cloud.google.com/apis/design/naming_convention?hl=de
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | ListAccounts | [ListAccountsRequest](#listaccountsrequest) | [ListAccountsResponse](#listaccountsresponse) | Lists accounts |
-| GetAccount | [GetAccountRequest](#getaccountrequest) | [.ocis.messages.accounts.v1.Account](../../../messages/accounts/v1/grpc.md#account) | Gets an account rpc GetAccount(GetAccountRequest) returns (Account) { |
-| CreateAccount | [CreateAccountRequest](#createaccountrequest) | [.ocis.messages.accounts.v1.Account](../../../messages/accounts/v1/grpc.md#account) | Creates an account rpc CreateAccount(CreateAccountRequest) returns (Account) { |
-| UpdateAccount | [UpdateAccountRequest](#updateaccountrequest) | [.ocis.messages.accounts.v1.Account](../../../messages/accounts/v1/grpc.md#account) | Updates an account rpc UpdateAccount(UpdateAccountRequest) returns (Account) { |
+| GetAccount | [GetAccountRequest](#getaccountrequest) | [.ocis.messages.accounts.v1.Account](../../../messages/accounts/v1/grpc.md#account) | Gets an account |
+| CreateAccount | [CreateAccountRequest](#createaccountrequest) | [.ocis.messages.accounts.v1.Account](../../../messages/accounts/v1/grpc.md#account) | Creates an account |
+| UpdateAccount | [UpdateAccountRequest](#updateaccountrequest) | [.ocis.messages.accounts.v1.Account](../../../messages/accounts/v1/grpc.md#account) | Updates an account |
 | DeleteAccount | [DeleteAccountRequest](#deleteaccountrequest) | [.google.protobuf.Empty](#googleprotobufempty) | Deletes an account |
 
 ### GroupsService

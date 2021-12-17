@@ -5,6 +5,7 @@ package v1
 
 import (
 	fmt "fmt"
+	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
 	v1 "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	proto "google.golang.org/protobuf/proto"
@@ -79,13 +80,10 @@ type AccountsService interface {
 	// Lists accounts
 	ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...client.CallOption) (*ListAccountsResponse, error)
 	// Gets an account
-	//rpc GetAccount(GetAccountRequest) returns (Account) {
 	GetAccount(ctx context.Context, in *GetAccountRequest, opts ...client.CallOption) (*v1.Account, error)
 	// Creates an account
-	//rpc CreateAccount(CreateAccountRequest) returns (Account) {
 	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...client.CallOption) (*v1.Account, error)
 	// Updates an account
-	//rpc UpdateAccount(UpdateAccountRequest) returns (Account) {
 	UpdateAccount(ctx context.Context, in *UpdateAccountRequest, opts ...client.CallOption) (*v1.Account, error)
 	// Deletes an account
 	DeleteAccount(ctx context.Context, in *DeleteAccountRequest, opts ...client.CallOption) (*emptypb.Empty, error)
@@ -159,13 +157,10 @@ type AccountsServiceHandler interface {
 	// Lists accounts
 	ListAccounts(context.Context, *ListAccountsRequest, *ListAccountsResponse) error
 	// Gets an account
-	//rpc GetAccount(GetAccountRequest) returns (Account) {
 	GetAccount(context.Context, *GetAccountRequest, *v1.Account) error
 	// Creates an account
-	//rpc CreateAccount(CreateAccountRequest) returns (Account) {
 	CreateAccount(context.Context, *CreateAccountRequest, *v1.Account) error
 	// Updates an account
-	//rpc UpdateAccount(UpdateAccountRequest) returns (Account) {
 	UpdateAccount(context.Context, *UpdateAccountRequest, *v1.Account) error
 	// Deletes an account
 	DeleteAccount(context.Context, *DeleteAccountRequest, *emptypb.Empty) error

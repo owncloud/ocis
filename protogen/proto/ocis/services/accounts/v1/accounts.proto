@@ -9,6 +9,32 @@ import "google/api/field_behavior.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "ownCloud Infinite Scale accounts";
+    version: "1.0.0";
+    contact: {
+      name: "ownCloud GmbH";
+      url: "https://github.com/owncloud/ocis";
+      email: "support@owncloud.com";
+    };
+    license: {
+      name: "Apache-2.0";
+      url: "https://github.com/owncloud/ocis/blob/master/LICENSE";
+    };
+  };
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+  external_docs: {
+    description: "Developer Manual";
+    url: "https://owncloud.dev/extensions/accounts/";
+  };
+};
+
 // Follow recommended Methods for rpc APIs https://cloud.google.com/apis/design/resources?hl=de#methods
 // https://cloud.google.com/apis/design/standard_methods?hl=de#list
 // https://cloud.google.com/apis/design/naming_convention?hl=de
@@ -22,7 +48,6 @@ service AccountsService {
         };
     }
     // Gets an account
-    //rpc GetAccount(GetAccountRequest) returns (Account) {
     rpc GetAccount(GetAccountRequest) returns (ocis.messages.accounts.v1.Account) {
         option (google.api.http) = {
             post: "/api/v1/accounts/accounts-get",
@@ -30,7 +55,6 @@ service AccountsService {
         };
     }
     // Creates an account
-    //rpc CreateAccount(CreateAccountRequest) returns (Account) {
     rpc CreateAccount(CreateAccountRequest) returns (ocis.messages.accounts.v1.Account) {
         // Create maps to HTTP POST. URL path as the collection name.
         // HTTP request body contains the resource
@@ -40,7 +64,6 @@ service AccountsService {
         };
     }
     // Updates an account
-    //rpc UpdateAccount(UpdateAccountRequest) returns (Account) {
     rpc UpdateAccount(UpdateAccountRequest) returns (ocis.messages.accounts.v1.Account) {
         // Update maps to HTTP PATCH. Resource name is mapped to a URL path.
         // Resource is contained in the HTTP request body

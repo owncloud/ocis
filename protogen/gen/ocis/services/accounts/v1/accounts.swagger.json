@@ -1,8 +1,17 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "ocis/services/accounts/v1/accounts.proto",
-    "version": "version not set"
+    "title": "ownCloud Infinite Scale accounts",
+    "version": "1.0.0",
+    "contact": {
+      "name": "ownCloud GmbH",
+      "url": "https://github.com/owncloud/ocis",
+      "email": "support@owncloud.com"
+    },
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://github.com/owncloud/ocis/blob/master/LICENSE"
+    }
   },
   "tags": [
     {
@@ -15,6 +24,10 @@
       "name": "IndexService"
     }
   ],
+  "schemes": [
+    "http",
+    "https"
+  ],
   "consumes": [
     "application/json"
   ],
@@ -24,7 +37,7 @@
   "paths": {
     "/api/v1/accounts/accounts-create": {
       "post": {
-        "summary": "Creates an account\nrpc CreateAccount(CreateAccountRequest) returns (Account) {",
+        "summary": "Creates an account",
         "operationId": "AccountsService_CreateAccount",
         "responses": {
           "200": {
@@ -90,7 +103,7 @@
     },
     "/api/v1/accounts/accounts-get": {
       "post": {
-        "summary": "Gets an account\nrpc GetAccount(GetAccountRequest) returns (Account) {",
+        "summary": "Gets an account",
         "operationId": "AccountsService_GetAccount",
         "responses": {
           "200": {
@@ -156,7 +169,7 @@
     },
     "/api/v1/accounts/accounts-update": {
       "post": {
-        "summary": "Updates an account\nrpc UpdateAccount(UpdateAccountRequest) returns (Account) {",
+        "summary": "Updates an account",
         "operationId": "AccountsService_UpdateAccount",
         "responses": {
           "200": {
@@ -1043,5 +1056,9 @@
         }
       }
     }
+  },
+  "externalDocs": {
+    "description": "Developer Manual",
+    "url": "https://owncloud.dev/extensions/accounts/"
   }
 }
