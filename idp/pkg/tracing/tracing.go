@@ -14,7 +14,7 @@ var (
 func Configure(cfg *config.Config) error {
 	var err error
 	if cfg.Tracing.Enabled {
-		if TraceProvider, err = pkgtrace.GetTraceProvider(cfg.Tracing.Endpoint, cfg.Tracing.Collector, "idp", cfg.Tracing.Type); err != nil {
+		if TraceProvider, err = pkgtrace.GetTraceProvider(cfg.Tracing.Endpoint, cfg.Tracing.Collector, cfg.Service.Name, cfg.Tracing.Type); err != nil {
 			return err
 		}
 	}

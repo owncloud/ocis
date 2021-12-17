@@ -24,10 +24,10 @@ func DefaultConfig() *Config {
 			Name: "proxy",
 		},
 		Tracing: Tracing{
+			Enabled:   false,
 			Type:      "jaeger",
 			Endpoint:  "",
 			Collector: "",
-			Service:   "proxy",
 		},
 		OIDC: OIDC{
 			Issuer:   "https://localhost:9200",

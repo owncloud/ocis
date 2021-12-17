@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/logging"
 	"github.com/urfave/cli/v2"
 )
 
@@ -18,7 +17,7 @@ func Health(cfg *config.Config) *cli.Command {
 			return ParseConfig(c, cfg, "storage")
 		},
 		Action: func(c *cli.Context) error {
-			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			logger := NewLogger(cfg)
 
 			resp, err := http.Get(
 				fmt.Sprintf(

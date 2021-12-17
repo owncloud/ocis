@@ -8,7 +8,6 @@ import (
 
 func DefaultConfig() *Config {
 	return &Config{
-
 		HTTP: HTTP{
 			Addr:      "127.0.0.1:9181",
 			Namespace: "com.owncloud.web",
@@ -59,10 +58,6 @@ func DefaultConfig() *Config {
 			Username: "",
 			UID:      0,
 			GID:      0,
-		},
-		Tracing: Tracing{
-			Type:    "jaeger",
-			Service: "accounts",
 		},
 	}
 }

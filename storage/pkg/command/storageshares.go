@@ -7,7 +7,6 @@ import (
 	"path"
 
 	"github.com/owncloud/ocis/ocis-pkg/sync"
-	"github.com/owncloud/ocis/storage/pkg/logging"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
@@ -29,7 +28,7 @@ func StorageShares(cfg *config.Config) *cli.Command {
 			return ParseConfig(c, cfg, "storage-shares")
 		},
 		Action: func(c *cli.Context) error {
-			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			logger := NewLogger(cfg)
 
 			tracing.Configure(cfg, logger)
 
@@ -125,7 +124,7 @@ type StorageSharesSutureService struct {
 
 // NewStorageShares creates a new storage.StorageSharesSutureService
 func NewStorageShares(cfg *ociscfg.Config) suture.Service {
-	//cfg.Storage.Commons = cfg.Commons
+	cfg.Storage.Commons = cfg.Commons
 	return StorageSharesSutureService{
 		cfg: cfg.Storage,
 	}

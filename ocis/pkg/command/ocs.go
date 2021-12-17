@@ -18,9 +18,9 @@ func OCSCommand(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			//if cfg.Commons != nil {
-			//	cfg.OCS.Commons = cfg.Commons
-			//}
+			if cfg.Commons != nil {
+				cfg.OCS.Commons = cfg.Commons
+			}
 
 			return nil
 		},

@@ -12,7 +12,6 @@ import (
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/logging"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
@@ -29,7 +28,7 @@ func StoragePublicLink(cfg *config.Config) *cli.Command {
 		},
 		Category: "Extensions",
 		Action: func(c *cli.Context) error {
-			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			logger := NewLogger(cfg)
 			tracing.Configure(cfg, logger)
 			gr := run.Group{}
 			ctx, cancel := context.WithCancel(context.Background())
@@ -126,7 +125,7 @@ type StoragePublicLinkSutureService struct {
 
 // NewStoragePublicLinkSutureService creates a new storage.StoragePublicLinkSutureService
 func NewStoragePublicLink(cfg *ociscfg.Config) suture.Service {
-	//cfg.Storage.Commons = cfg.Commons
+	cfg.Storage.Commons = cfg.Commons
 	return StoragePublicLinkSutureService{
 		cfg: cfg.Storage,
 	}

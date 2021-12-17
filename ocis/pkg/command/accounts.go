@@ -26,9 +26,9 @@ func AccountsCommand(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			//if cfg.Commons != nil {
-			//	cfg.Accounts.Commons = cfg.Commons
-			//}
+			if cfg.Commons != nil {
+				cfg.Accounts.Commons = cfg.Commons
+			}
 
 			return nil
 		},

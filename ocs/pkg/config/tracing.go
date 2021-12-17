@@ -6,5 +6,4 @@ type Tracing struct {
 	Type      string `ocisConfig:"type" env:"OCIS_TRACING_TYPE;OCS_TRACING_TYPE"`
 	Endpoint  string `ocisConfig:"endpoint" env:"OCIS_TRACING_ENDPOINT;OCS_TRACING_ENDPOINT"`
 	Collector string `ocisConfig:"collector" env:"OCIS_TRACING_COLLECTOR;OCS_TRACING_COLLECTOR"`
-	Service   string `ocisConfig:"service" env:"OCS_TRACING_SERVICE"`
 }

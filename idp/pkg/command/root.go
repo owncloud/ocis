@@ -60,16 +60,16 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	}
 
 	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
-	//if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
-	//	cfg.Log = &shared.Log{
-	//		Level:  cfg.Commons.Log.Level,
-	//		Pretty: cfg.Commons.Log.Pretty,
-	//		Color:  cfg.Commons.Log.Color,
-	//		File:   cfg.Commons.Log.File,
-	//	}
-	//} else if cfg.Log == nil && cfg.Commons == nil {
-	//	cfg.Log = &shared.Log{}
-	//}
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &config.Log{
+			Level:  cfg.Commons.Log.Level,
+			Pretty: cfg.Commons.Log.Pretty,
+			Color:  cfg.Commons.Log.Color,
+			File:   cfg.Commons.Log.File,
+		}
+	} else if cfg.Log == nil && cfg.Commons == nil {
+		cfg.Log = &config.Log{}
+	}
 
 	// load all env variables relevant to the config in the current context.
 	envCfg := config.Config{}
@@ -92,7 +92,7 @@ type SutureService struct {
 
 // NewSutureService creates a new idp.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	//cfg.IDP.Commons = cfg.Commons
+	cfg.IDP.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.IDP,
 	}

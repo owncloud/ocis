@@ -16,9 +16,18 @@ type Log struct {
 	File   string `mapstructure:"file"`
 }
 
+// Tracing defines the available tracing configuration.
+type Tracing struct {
+	Enabled   bool   `ocisConfig:"enabled"`
+	Type      string `ocisConfig:"type"`
+	Endpoint  string `ocisConfig:"endpoint"`
+	Collector string `ocisConfig:"collector"`
+}
+
 // Commons holds configuration that are common to all extensions. Each extension can then decide whether
 // to overwrite its values.
 type Commons struct {
 	*Log    `mapstructure:"log"`
+	Tracing `mapstrucuture:"log"`
 	OcisURL string `mapstructure:"ocis_url"`
 }

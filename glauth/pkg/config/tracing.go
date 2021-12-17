@@ -6,5 +6,4 @@ type Tracing struct {
 	Type      string `ocisConfig:"type" env:"OCIS_TRACING_TYPE;GLAUTH_TRACING_TYPE"`
 	Endpoint  string `ocisConfig:"endpoint" env:"OCIS_TRACING_ENDPOINT;GLAUTH_TRACING_ENDPOINT"`
 	Collector string `ocisConfig:"collector" env:"OCIS_TRACING_COLLECTOR;GLAUTH_TRACING_COLLECTOR"`
-	Service   string `ocisConfig:"service" env:"GLAUTH_TRACING_SERVICE"` // TODO:
 }

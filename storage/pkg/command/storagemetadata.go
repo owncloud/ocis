@@ -7,7 +7,6 @@ import (
 	"path"
 
 	"github.com/owncloud/ocis/ocis-pkg/sync"
-	"github.com/owncloud/ocis/storage/pkg/logging"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
@@ -35,7 +34,7 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 		},
 		Category: "Extensions",
 		Action: func(c *cli.Context) error {
-			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			logger := NewLogger(cfg)
 			tracing.Configure(cfg, logger)
 
 			gr := run.Group{}
@@ -166,7 +165,7 @@ type MetadataSutureService struct {
 
 // NewSutureService creates a new storagemetadata.SutureService
 func NewStorageMetadata(cfg *ociscfg.Config) suture.Service {
-	//cfg.Storage.Commons = cfg.Commons
+	cfg.Storage.Commons = cfg.Commons
 	return MetadataSutureService{
 		cfg: cfg.Storage,
 	}

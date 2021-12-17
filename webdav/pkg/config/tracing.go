@@ -6,5 +6,4 @@ type Tracing struct {
 	Type      string `ocisConfig:"type" env:"OCIS_TRACING_TYPE;WEBDAV_TRACING_TYPE"`
 	Endpoint  string `ocisConfig:"endpoint" env:"OCIS_TRACING_ENDPOINT;WEBDAV_TRACING_ENDPOINT"`
 	Collector string `ocisConfig:"collector" env:"OCIS_TRACING_COLLECTOR;WEBDAV_TRACING_COLLECTOR"`
-	Service   string `ocisConfig:"service" env:"WEBDAV_TRACING_SERVICE"` //TODO: should this be an ID? or the same as Service.Name?
 }
