@@ -99,7 +99,7 @@ services:
     entrypoint:
       - ocis
       - accounts
-      - server #TODO: change bind users' passwords
+      - servqer #TODO: change bind users' passwords
     environment:
       ACCOUNTS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
       ACCOUNTS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
@@ -108,10 +108,14 @@ services:
       ACCOUNTS_HTTP_ADDR: 0.0.0.0:9181
       ACCOUNTS_GRPC_ADDR: 0.0.0.0:9180
 
+      #TODO: make resolving of settings service use DNS instead of mDNS
+      # com.owncloud.api.settings
+      # https://github.com/asim/go-micro/tree/master/plugins/selector/static
+
+      ACCOUNTS_JWT_SECRET: ${OCIS_METADATA_JWT_SECRET:-Pive-Fumkiu4}
+
       ACCOUNTS_STORAGE_BACKEND: cs3
       ACCOUNTS_STORAGE_CS3_PROVIDER_ADDR: storage-metadata:9215
-      # TODO: remove one of those two jwt secrets
-      ACCOUNTS_JWT_SECRET: ${OCIS_METADATA_JWT_SECRET:-Pive-Fumkiu4}
       ACCOUNTS_STORAGE_CS3_JWT_SECRET: ${OCIS_METADATA_JWT_SECRET:-Pive-Fumkiu4}
     logging:
       driver: "local"
@@ -215,6 +219,7 @@ services:
       SETTINGS_GRPC_ADDR: 0.0.0.0:9191
 
       SETTINGS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+    #TODO: settings should use the store!?
     volumes:
       - "ocis-settings:/var/lib/ocis" #TODO: /settings"
     logging:
@@ -237,6 +242,7 @@ services:
       STORE_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       STORE_GRPC_ADDR: 0.0.0.0:9460
+    # TODO: what is the store used for?
     volumes:
       - "ocis-settings:/var/lib/ocis" #TODO: /store"
     logging:
