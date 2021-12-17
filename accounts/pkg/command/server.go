@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"strings"
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/accounts/pkg/config"
@@ -22,15 +21,9 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage:       "Start ocis accounts service",
 		Description: "uses an LDAP server as the storage backend",
 		Before: func(ctx *cli.Context) error {
-			if cfg.HTTP.Root != "/" {
-				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
-			}
-
 			if err := ParseConfig(ctx, cfg); err != nil {
 				return err
 			}
-
-			cfg.Repo.Backend = strings.ToLower(cfg.Repo.Backend)
 
 			return nil
 		},
