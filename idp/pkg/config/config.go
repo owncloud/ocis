@@ -76,23 +76,23 @@ type Settings struct {
 
 	EncryptionSecretFile string `ocisConfig:"encrypt_secret_file" env:"IDP_ENCRYPTION_SECRET"`
 
-	Listen string `ocisConfig:"listen"` //TODO: is this even needed?
+	Listen string
 
 	IdentifierClientDisabled          bool   `ocisConfig:"identifier_client_disabled" env:"IDP_DISABLE_IDENTIFIER_WEBAPP"`
 	IdentifierClientPath              string `ocisConfig:"identifier_client_path" env:"IDP_IDENTIFIER_CLIENT_PATH"`
 	IdentifierRegistrationConf        string `ocisConfig:"identifier_registration_conf" env:"IDP_IDENTIFIER_REGISTRATION_CONF"`
 	IdentifierScopesConf              string `ocisConfig:"identifier_scopes_conf" env:"IDP_IDENTIFIER_SCOPES_CONF"`
-	IdentifierDefaultBannerLogo       string `ocisConfig:"identifier_default_banner_logo"`        // TODO: is this even needed?
-	IdentifierDefaultSignInPageText   string `ocisConfig:"identifier_default_sign_in_page_text"`  // TODO: is this even needed?
-	IdentifierDefaultUsernameHintText string `ocisConfig:"identifier_default_username_hint_text"` // TODO: is this even needed?
+	IdentifierDefaultBannerLogo       string
+	IdentifierDefaultSignInPageText   string
+	IdentifierDefaultUsernameHintText string
 
-	SigningKid             string   `ocisConfig:"sign_in_kid" env:"IDP_SIGNING_KID"`
-	SigningMethod          string   `ocisConfig:"sign_in_method" env:"IDP_SIGNING_METHOD"`
-	SigningPrivateKeyFiles []string `ocisConfig:"sign_in_private_key_files"` // TODO: is this even needed?
+	SigningKid             string   `ocisConfig:"signing_kid" env:"IDP_SIGNING_KID"`
+	SigningMethod          string   `ocisConfig:"signing_method" env:"IDP_SIGNING_METHOD"`
+	SigningPrivateKeyFiles []string `ocisConfig:"signing_private_key_files"` // TODO: is this even needed?
 	ValidationKeysPath     string   `ocisConfig:"validation_keys_path" env:"IDP_VALIDATION_KEYS_PATH"`
 
-	CookieBackendURI string   `ocisConfig:"cookie_backend_uri"` // TODO: is this even needed?
-	CookieNames      []string `ocisConfig:"cookie_names"`       // TODO: is this even needed?
+	CookieBackendURI string
+	CookieNames      []string
 
 	AccessTokenDurationSeconds        uint64 `ocisConfig:"access_token_duration_seconds" env:"IDP_ACCESS_TOKEN_EXPIRATION"`
 	IDTokenDurationSeconds            uint64 `ocisConfig:"id_token_duration_seconds" env:"IDP_ID_TOKEN_EXPIRATION"`

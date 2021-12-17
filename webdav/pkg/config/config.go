@@ -19,7 +19,7 @@ type Config struct {
 	HTTP HTTP `ocisConfig:"http"`
 
 	OcisPublicURL   string `ocisConfig:"ocis_public_url" env:"OCIS_URL;OCIS_PUBLIC_URL"`
-	WebdavNamespace string `ocisConfig:"webdav_namespace" env:"STORAGE_WEBDAV_NAMESPACE"` //TODO: prevent this cross config
+	WebdavNamespace string `ocisConfig:"webdav_namespace" env:"STORAGE_WEBDAV_NAMESPACE"`
 
 	Context    context.Context
 	Supervised bool
