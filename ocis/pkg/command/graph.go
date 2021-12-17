@@ -1,3 +1,6 @@
+//go:build !simple
+// +build !simple
+
 package command
 
 import (
