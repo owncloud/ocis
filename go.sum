@@ -1052,8 +1052,6 @@ github.com/oracle/oci-go-sdk v24.3.0+incompatible/go.mod h1:VQb79nF8Z2cwLkLS35uk
 github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc h1:Ak86L+yDSOzKFa7WM5bf5itSOo1e3Xh8bm5YCMUXIjQ=
 github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CFcDWnWD9XkenwhI=
 github.com/ovh/go-ovh v1.1.0/go.mod h1:AxitLZ5HBRPyUd+Zl60Ajaag+rNTdVXWIkzfrVuTXWA=
-github.com/owncloud/libre-graph-api-go v0.4.1 h1:B0y57Em+MEge1EQMCbvOtQS0WxqlaY3qzWPZ8roBNd8=
-github.com/owncloud/libre-graph-api-go v0.4.1/go.mod h1:dOt7+kXldpyUGBFdfFBs6PbWElqqa2/Q5+pMF9izL3w=
 github.com/owncloud/libre-graph-api-go v0.5.0 h1:Dgj3W/Ywhi7BluuWNH37ft26eZLBS3jj08x+wAyFW5g=
 github.com/owncloud/libre-graph-api-go v0.5.0/go.mod h1:dOt7+kXldpyUGBFdfFBs6PbWElqqa2/Q5+pMF9izL3w=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
@@ -1330,8 +1328,8 @@ github.com/zclconf/go-cty-debug v0.0.0-20191215020915-b22d67c1ba0b/go.mod h1:ZRK
 github.com/zenazn/goji v0.9.1-0.20160507202103-64eb34159fe5/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 go-micro.dev/v4 v4.1.0/go.mod h1:XTEJj5ILOBW+2ndGDG56r8fBXZ8hmsVaIaS1K5zwj+s=
 go-micro.dev/v4 v4.2.1/go.mod h1:XTEJj5ILOBW+2ndGDG56r8fBXZ8hmsVaIaS1K5zwj+s=
-go-micro.dev/v4 v4.4.0 h1:DN/WlUwtG0yXs65oevUknlrQXfcBOaeW+WV2tzawZY4=
-go-micro.dev/v4 v4.4.0/go.mod h1:hSBUne6gtYTfYmnNxGQmaNmRQ6z8LqGrAVNmL/ae0lY=
+go-micro.dev/v4 v4.5.0 h1:0MQxFupE1pxhiamf8FvOyGL0N+ezxM73czZbBy3S/Kg=
+go-micro.dev/v4 v4.5.0/go.mod h1:hSBUne6gtYTfYmnNxGQmaNmRQ6z8LqGrAVNmL/ae0lY=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/bbolt v1.3.5/go.mod h1:G5EMThwa9y8QZGBClrRx5EY+Yw9kAhnjy3bSjsnlVTQ=
 go.etcd.io/bbolt v1.3.6 h1:/ecaJf0sk1l4l6V4awd65v2C3ILy7MSj+s/x1ADCIMU=
