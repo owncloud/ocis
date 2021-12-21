@@ -62,6 +62,7 @@ The following sections list the changes for unreleased.
   * TODO: update changelog before oCIS release
 
    https://github.com/owncloud/ocis/pull/2878
+   https://github.com/owncloud/ocis/pull/2901
 # Changelog for [1.16.0] (2021-12-10)
 
 The following sections list the changes for 1.16.0.
