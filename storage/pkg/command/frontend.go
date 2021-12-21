@@ -71,6 +71,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 					"version":  "1.0.0",
 					"apps_url": cfg.Reva.AppProvider.AppsURL,
 					"open_url": cfg.Reva.AppProvider.OpenURL,
+					"new_url":  cfg.Reva.AppProvider.NewURL,
 				},
 			}
 
