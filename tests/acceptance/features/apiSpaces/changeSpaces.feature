@@ -10,7 +10,7 @@ Feature: Change data of space
     Given user "Alice" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "Admin" using the settings api
 
-  Scenario: Alice changes a name of the space via the Graph api, she expects a 204 code and checks that the space name has changed
+  Scenario: Alice changes a name of the space via the Graph api, she expects a 200 code and checks that the space name has changed
     Given user "Alice" has created a space "Project Jupiter" of type "project" with quota "20"
     When user "Alice" changes the name of the "Project Jupiter" space to "Project Death Star"
     Then the HTTP status code should be "200"
@@ -22,7 +22,7 @@ Feature: Change data of space
       | quota@@@total    | 20                               |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
 
-  Scenario: Alice increases quota of the space via the Graph api, she expects a 204 code and checks that the quota has changed
+  Scenario: Alice increases quota of the space via the Graph api, she expects a 200 code and checks that the quota has changed
     Given user "Alice" has created a space "Project Earth" of type "project" with quota "20"
     When user "Alice" changes the quota of the "Project Earth" space to "100"
     Then the HTTP status code should be "200"

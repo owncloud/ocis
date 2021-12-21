@@ -668,6 +668,20 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Then /^the json responded should not contain a space "([^"]*)"$/
+	 *
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function jsonRespondedShouldNotContain(
+		string $spaceName
+	): void {
+		Assert::assertEmpty($this->getSpaceByNameFromResponse($spaceName), "space $spaceName should not be available for a user");
+	}
+
+	/**
 	 * @param string    $shouldOrNot   (not|)
 	 * @param TableNode $expectedFiles
 	 *
@@ -816,6 +830,44 @@ class SpacesContext implements Context {
 				$user,
 				$this->featureContext->getPasswordForUser($user)
 			)
+		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has created a folder "([^"]*)" in space "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $folder
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 */
+	public function theUserHasCreateAFolderUsingTheGraphApi(
+		string $user,
+		string $folder,
+		string $spaceName
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+
+		$baseUrl = $this->featureContext->getBaseUrl();
+		if (!str_ends_with($baseUrl, '/')) {
+			$baseUrl .= '/';
+		}
+		$fullUrl = $baseUrl . "dav/spaces/" . $space['id'] . '/' . $folder;
+
+		$this->featureContext->setResponse(
+			$this->sendCreateFolderRequest(
+				$fullUrl,
+				"MKCOL",
+				$user,
+				$this->featureContext->getPasswordForUser($user)
+			)
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			"Expected response status code should be 201"
 		);
 	}
 
@@ -1107,5 +1159,87 @@ class SpacesContext implements Context {
 		);
 
 		$this->featureContext->theHTTPStatusCodeShouldBeOr(201, 204);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" shares a space "([^"]*)" to user "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param  string $userRecipient
+	 *
+	 * @throws GuzzleException
+	 */
+	public function sendShareSpaceRequest(
+		string $user,
+		string $spaceName,
+		string $userRecipient
+	): ResponseInterface {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$body = ["space_ref" => $space['id'], "shareType" => 7, "shareWith" => $userRecipient];
+
+		$baseUrl = $this->featureContext->getBaseUrl();
+		if (!str_ends_with($baseUrl, '/')) {
+			$baseUrl .= '/';
+		}
+		$fullUrl = $baseUrl . "ocs/v2.php/apps/files_sharing/api/v1/shares";
+
+		return HttpRequestHelper::post($fullUrl, "", $user, $this->featureContext->getPasswordForUser($user), [], $body);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has shared a space "([^"]*)" to user "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param  string $userRecipient
+	 *
+	 * @throws GuzzleException
+	 */
+	public function userHasSharedSpace(
+		string $user,
+		string $spaceName,
+		string $userRecipient
+	): ResponseInterface {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$body = ["space_ref" => $space['id'], "shareType" => 7, "shareWith" => $userRecipient];
+
+		$baseUrl = $this->featureContext->getBaseUrl();
+		if (!str_ends_with($baseUrl, '/')) {
+			$baseUrl .= '/';
+		}
+		$fullUrl = $baseUrl . "ocs/v2.php/apps/files_sharing/api/v1/shares";
+
+		return HttpRequestHelper::post($fullUrl, "", $user, $this->featureContext->getPasswordForUser($user), [], $body);
+
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+		$this->OCSContext->theOCSStatusCodeShouldBe(400, "Expected OCS response status code should be 200");
+	}
+
+	/**
+	 * @When /^user "([^"]*)" unshares a space "([^"]*)" to user "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param  string $userRecipient
+	 *
+	 * @throws GuzzleException
+	 */
+	public function sendUnshareSpaceRequest(
+		string $user,
+		string $spaceName,
+		string $userRecipient
+	): ResponseInterface {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$baseUrl = $this->featureContext->getBaseUrl();
+		if (!str_ends_with($baseUrl, '/')) {
+			$baseUrl .= '/';
+		}
+		$fullUrl = $baseUrl . "ocs/v2.php/apps/files_sharing/api/v1/shares/" . $space['id'] . "?shareWith=" . $userRecipient;
+
+		return HttpRequestHelper::delete($fullUrl, "", $user, $this->featureContext->getPasswordForUser($user));
 	}
 }
