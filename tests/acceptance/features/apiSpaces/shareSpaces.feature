@@ -1,6 +1,6 @@
 @api @skipOnOcV10
 Feature: Share spaces
-  As a owner a space 
+  As the owner of a space 
   I want to be able to add members to a space, and to remove access for them
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
@@ -12,17 +12,17 @@ Feature: Share spaces
     And the administrator has given "Alice" the role "Admin" using the settings api
     
   
-  Scenario: Alice shares space to Brian, she expects a 200 responce code
+  Scenario: Alice shares space to Brian, she expects a 200 response code
     Given user "Alice" has created a space "Space to share" of type "project" with quota "10" 
     When user "Alice" shares a space "Space to share" to user "Brian"
     Then the HTTP status code should be "200"
     
   
-  Scenario: Brian check that shared space is available
+  Scenario: Brian checks that a shared space is available
     Given user "Alice" has created a space "Share space to Brian" of type "project" with quota "10" 
     And user "Alice" has shared a space "Share space to Brian" to user "Brian"
     When user "Brian" lists all available spaces via the GraphApi
-    And the json responded should contain a space "Share space to Brian" with these key and value pairs:
+    Then the json responded should contain a space "Share space to Brian" with these key and value pairs:
       | key              | value                            |
       | driveType        | share                            |
       | id               | %space_id%                       |
@@ -51,7 +51,7 @@ Feature: Share spaces
     Given user "Alice" has created a space "Unshare space" of type "project" with quota "10" 
     And user "Alice" has shared a space "Unshare space" to user "Brian"
     When user "Brian" lists all available spaces via the GraphApi
-    And the json responded should contain a space "Unshare space" with these key and value pairs:
+    Then the json responded should contain a space "Unshare space" with these key and value pairs:
       | key       | value         |
       | driveType | share         |
       | id        | %space_id%    |
