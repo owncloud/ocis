@@ -860,8 +860,8 @@ github.com/labstack/echo/v4 v4.1.11/go.mod h1:i541M3Fj6f76NZtHSj7TXnyM8n2gaodfvf
 github.com/labstack/gommon v0.3.0/go.mod h1:MULnywXg0yavhxWKc+lOruYdAhDwPK9wf0OL7NoOu+k=
 github.com/leodido/go-urn v1.1.0/go.mod h1:+cyI34gQWZcE1eQU7NVgKkkzdXDQHr1dBMtdAPozLkw=
 github.com/lib/pq v1.10.0/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
-github.com/libregraph/lico v0.53.0 h1:5xsbZle5jeh8F12Hi0OHZ8eV301wiToqeMS0TdH7dN0=
-github.com/libregraph/lico v0.53.0/go.mod h1:EXf6Y9s9TygW6unSXosBpVXWUURoN2sPX0053o4zVfQ=
+github.com/libregraph/lico v0.53.1 h1:c5JYFg0mrIgk6Ktj77rNJ2K8X01hs28JJ9Vw1N1iMAk=
+github.com/libregraph/lico v0.53.1/go.mod h1:EXf6Y9s9TygW6unSXosBpVXWUURoN2sPX0053o4zVfQ=
 github.com/linode/linodego v0.25.3/go.mod h1:GSBKPpjoQfxEfryoCRcgkuUOCuVtGHWhzI8OMdycNTE=
 github.com/liquidweb/go-lwApi v0.0.0-20190605172801-52a4864d2738/go.mod h1:0sYF9rMXb0vlG+4SzdiGMXHheCZxjguMq+Zb4S2BfBs=
 github.com/liquidweb/go-lwApi v0.0.5/go.mod h1:0sYF9rMXb0vlG+4SzdiGMXHheCZxjguMq+Zb4S2BfBs=
