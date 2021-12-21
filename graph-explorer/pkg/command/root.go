@@ -6,10 +6,10 @@ import (
 
 	"github.com/owncloud/ocis/graph-explorer/pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
-	"github.com/wkloucek/envdecode"
 )
 
 // Execute is the entry point for the graph-explorer command.

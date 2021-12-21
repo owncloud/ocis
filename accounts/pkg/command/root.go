@@ -7,10 +7,10 @@ import (
 
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
-	"github.com/wkloucek/envdecode"
 )
 
 // Execute is the entry point for the ocis-accounts command.
