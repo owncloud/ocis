@@ -1,0 +1,40 @@
+default:
+  autoload:
+    "": "%paths.base%/../features/bootstrap"
+
+  suites:
+    apiShareManagement:
+      paths:
+        - "%paths.base%/../features/apiShareManagement"
+      context: &common_ldap_suite_context
+        parameters:
+          ldapAdminPassword: admin
+          ldapUsersOU: TestUsers
+          ldapGroupsOU: TestGroups
+          ldapInitialUserFilePath: /ldap_users_groups.ldif
+      contexts:
+        - ParallelContext:
+        - FeatureContext: &common_feature_context_params
+            baseUrl: https://ocis:9200
+            adminUsername: admin
+            adminPassword: admin
+            regularUserPassword: 1234
+            ocPath: apps/testing/api/v1/occ
+        - OccContext:
+
+    apiWebdavOperations:
+      paths:
+        - "%paths.base%/../features/apiWebdavOperations"
+      context: *common_ldap_suite_context
+      contexts:
+        - ParallelContext:
+        - FeatureContext: *common_feature_context_params
+
+  extensions:
+    jarnaiz\JUnitFormatter\JUnitFormatterExtension:
+      filename: report.xml
+      outputDir: "%paths.base%/../output/"
+
+    rdx\behatvars\BehatVariablesExtension: ~
+
+    Cjm\Behat\StepThroughExtension: ~

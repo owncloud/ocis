@@ -1,0 +1,7 @@
+dn: ou=TestUsers,dc=owncloud,dc=com
+objectClass: organizationalUnit
+ou: TestUsers
+
+dn: ou=TestGroups,dc=owncloud,dc=com
+objectClass: organizationalUnit
+ou: TestGroups
