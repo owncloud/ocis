@@ -16,6 +16,8 @@ Feature: Share spaces
     Given user "Alice" has created a space "Space to share" of type "project" with quota "10"
     When user "Alice" shares a space "Space to share" to user "Brian"
     Then the HTTP status code should be "200"
+    And the OCS status code should be "200"
+    And the OCS status message should be "OK"
 
 
   Scenario: A user can see that a received shared space is available

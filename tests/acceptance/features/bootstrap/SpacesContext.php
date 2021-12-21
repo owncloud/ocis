@@ -1178,7 +1178,16 @@ class SpacesContext implements Context {
 		}
 		$fullUrl = $baseUrl . "ocs/v2.php/apps/files_sharing/api/v1/shares";
 
-		HttpRequestHelper::post($fullUrl, "", $user, $this->featureContext->getPasswordForUser($user), [], $body);
+		$this->featureContext->setResponse(
+			HttpRequestHelper::post(
+				$fullUrl,
+				"",
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				$body
+			)
+		);
 	}
 
 	/**
