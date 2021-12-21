@@ -33,20 +33,24 @@ You can find the latest official release of oCIS at [our download mirror](https:
 The latest build from the master branch can be found at [our download mirrors testing section](https://download.owncloud.com/ocis/ocis/testing/).
 
 To run oCIS as binary you need to download it first and then run the following commands.
-For this example, assuming version 1.13.0 of oCIS running on a Linux AMD64 host:
+For this example, assuming version 1.16.0 of oCIS running on a Linux AMD64 host:
 
 ```console
 # download
-curl https://download.owncloud.com/ocis/ocis/1.13.0/ocis-1.13.0-linux-amd64 --output ocis
+curl https://download.owncloud.com/ocis/ocis/1.16.0/ocis-1.16.0-linux-amd64 --output ocis
 
 # make binary executable
 chmod +x ocis
 
 # run
-./ocis server
+OCIS_INSECURE=true ./ocis server
 ```
 
 The default primary storage location is `~/.ocis` or `/var/lib/ocis` depending on the packaging format and your operating system user. You can change that value by configuration.
+
+{{< hint info >}}
+When you're using oCIS with self-signed certificates, you need to set the environment variable `OCIS_INSECURE=true`, in order to make oCIS work.
+{{< /hint >}}
 
 {{< hint warning >}}
 oCIS by default relies on Multicast DNS (mDNS), usually via avahi-daemon. If your system has a firewall, make sure mDNS is allowed in your active zone.
@@ -60,8 +64,17 @@ The `latest` tag always reflects the current master branch.
 
 ```console
 docker pull owncloud/ocis
-docker run --rm -ti -p 9200:9200 owncloud/ocis
+docker run --rm -ti -p 9200:9200 -e OCIS_INSECURE=true owncloud/ocis
 ```
+
+{{< hint info >}}
+When you're using oCIS with self-signed certificates, you need to set the environment variable `OCIS_INSECURE=true`, in order to make oCIS work.
+{{< /hint >}}
+
+{{< hint warning >}}
+In order to persist your data, you need to mount a docker volume or create a host bind-mount at `/var/lib/ocis`, for example with: `-v /some/host/dir:/var/lib/ocis`
+
+{{< /hint >}}
 
 ## Usage
 
