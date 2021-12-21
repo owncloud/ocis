@@ -4,8 +4,8 @@ import (
 	"context"
 	"os"
 
+	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
 	"github.com/thejerf/suture/v4"
-	"github.com/wkloucek/envdecode"
 
 	"github.com/owncloud/ocis/graph/pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"

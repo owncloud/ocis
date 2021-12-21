@@ -56,7 +56,6 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/thejerf/suture/v4 v4.0.1
 	github.com/urfave/cli/v2 v2.3.0
-	github.com/wkloucek/envdecode v0.0.0-20211216135343-360f0d3c2679
 	go-micro.dev/v4 v4.5.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.28.0
