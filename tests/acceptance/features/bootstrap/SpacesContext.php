@@ -42,6 +42,11 @@ class SpacesContext implements Context {
 	private FeatureContext $featureContext;
 
 	/**
+	 * @var OCSContext
+	 */
+	private OCSContext $ocsContext;
+
+	/**
 	 * @var array key is space name and value is the username that created the space
 	 */
 	private array $createdSpaces;
@@ -209,6 +214,9 @@ class SpacesContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
 		$this->featureContext = $environment->getContext('FeatureContext');
+		$this->ocsContext = $environment->getContext('OCSContext');
+		// Run the BeforeScenario function in OCSContext to set it up correctly
+		$this->ocsContext->before($scope);
 		SetupHelper::init(
 			$this->featureContext->getAdminUsername(),
 			$this->featureContext->getAdminPassword(),
@@ -559,7 +567,7 @@ class SpacesContext implements Context {
 	public function thePropfindResultShouldContainEntries(
 		string $shouldOrNot,
 		TableNode $expectedFiles
-	):void {
+	): void {
 		$this->propfindResultShouldContainEntries(
 			$shouldOrNot,
 			$expectedFiles,
@@ -581,7 +589,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $shouldOrNot,
 		TableNode $expectedFiles
-	):void {
+	): void {
 		$this->theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
 			$this->getSpaceCreator($spaceName),
 			$spaceName
@@ -609,7 +617,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $shouldOrNot,
 		TableNode $expectedFiles
-	):void {
+	): void {
 		$this->theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
 			$user,
 			$spaceName
@@ -815,22 +823,7 @@ class SpacesContext implements Context {
 		string $folder,
 		string $spaceName
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
-
-		$baseUrl = $this->featureContext->getBaseUrl();
-		if (!str_ends_with($baseUrl, '/')) {
-			$baseUrl .= '/';
-		}
-		$fullUrl = $baseUrl . "dav/spaces/" . $space['id'] . '/' . $folder;
-
-		$this->featureContext->setResponse(
-			$this->sendCreateFolderRequest(
-				$fullUrl,
-				"MKCOL",
-				$user,
-				$this->featureContext->getPasswordForUser($user)
-			)
-		);
+        $this->theUserCreatesAFolderToAnotherOwnerSpaceUsingTheGraphApi($user, $folder, $spaceName);
 	}
 
 	/**
@@ -849,22 +842,8 @@ class SpacesContext implements Context {
 		string $folder,
 		string $spaceName
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
+		$this->theUserCreatesAFolderUsingTheGraphApi($user, $folder, $spaceName);
 
-		$baseUrl = $this->featureContext->getBaseUrl();
-		if (!str_ends_with($baseUrl, '/')) {
-			$baseUrl .= '/';
-		}
-		$fullUrl = $baseUrl . "dav/spaces/" . $space['id'] . '/' . $folder;
-
-		$this->featureContext->setResponse(
-			$this->sendCreateFolderRequest(
-				$fullUrl,
-				"MKCOL",
-				$user,
-				$this->featureContext->getPasswordForUser($user)
-			)
-		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201"
@@ -887,8 +866,12 @@ class SpacesContext implements Context {
 		string $user,
 		string $folder,
 		string $spaceName,
-		string $ownerUser
+		string $ownerUser = ''
 	): void {
+		if ($ownerUser === '') {
+			$ownerUser = $user;
+		}
+
 		$space = $this->getSpaceByName($ownerUser, $spaceName);
 
 		$baseUrl = $this->featureContext->getBaseUrl();
@@ -1112,7 +1095,12 @@ class SpacesContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userHasCreatedSpace(string $user, string $spaceName, string $spaceType, int $quota):void {
+	public function userHasCreatedSpace(
+		string $user,
+		string $spaceName,
+		string $spaceType,
+		int $quota
+	): void {
 		$space = ["Name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
 		$body = json_encode($space);
 		$this->featureContext->setResponse(
@@ -1140,7 +1128,12 @@ class SpacesContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userHasUploadedFile(string $user, string $spaceName, string $fileContent, string $destination):void {
+	public function userHasUploadedFile(
+		string $user,
+		string $spaceName,
+		string $fileContent,
+		string $destination
+	): void {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
 
 		$space = $this->getSpaceByName($user, $spaceName);
@@ -1168,13 +1161,14 @@ class SpacesContext implements Context {
 	 * @param  string $spaceName
 	 * @param  string $userRecipient
 	 *
+	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function sendShareSpaceRequest(
 		string $user,
 		string $spaceName,
 		string $userRecipient
-	): ResponseInterface {
+	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$body = ["space_ref" => $space['id'], "shareType" => 7, "shareWith" => $userRecipient];
 
@@ -1184,7 +1178,7 @@ class SpacesContext implements Context {
 		}
 		$fullUrl = $baseUrl . "ocs/v2.php/apps/files_sharing/api/v1/shares";
 
-		return HttpRequestHelper::post($fullUrl, "", $user, $this->featureContext->getPasswordForUser($user), [], $body);
+		HttpRequestHelper::post($fullUrl, "", $user, $this->featureContext->getPasswordForUser($user), [], $body);
 	}
 
 	/**
@@ -1194,13 +1188,14 @@ class SpacesContext implements Context {
 	 * @param  string $spaceName
 	 * @param  string $userRecipient
 	 *
+	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function userHasSharedSpace(
 		string $user,
 		string $spaceName,
 		string $userRecipient
-	): ResponseInterface {
+	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$body = ["space_ref" => $space['id'], "shareType" => 7, "shareWith" => $userRecipient];
 
@@ -1210,13 +1205,24 @@ class SpacesContext implements Context {
 		}
 		$fullUrl = $baseUrl . "ocs/v2.php/apps/files_sharing/api/v1/shares";
 
-		return HttpRequestHelper::post($fullUrl, "", $user, $this->featureContext->getPasswordForUser($user), [], $body);
-
-		$this->featureContext->theHTTPStatusCodeShouldBe(
-			200,
-			"Expected response status code should be 200"
+		$this->featureContext->setResponse(
+			HttpRequestHelper::post(
+				$fullUrl,
+				"",
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				$body
+			)
 		);
-		$this->OCSContext->theOCSStatusCodeShouldBe(400, "Expected OCS response status code should be 200");
+
+        $expectedHTTPStatus = "200";
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+            $expectedHTTPStatus,
+			"Expected response status code should be $expectedHTTPStatus"
+		);
+        $expectedOCSStatus = "200";
+		$this->ocsContext->theOCSStatusCodeShouldBe($expectedOCSStatus, "Expected OCS response status code $expectedOCSStatus");
 	}
 
 	/**
@@ -1226,13 +1232,14 @@ class SpacesContext implements Context {
 	 * @param  string $spaceName
 	 * @param  string $userRecipient
 	 *
+	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function sendUnshareSpaceRequest(
 		string $user,
 		string $spaceName,
 		string $userRecipient
-	): ResponseInterface {
+	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		if (!str_ends_with($baseUrl, '/')) {
@@ -1240,6 +1247,6 @@ class SpacesContext implements Context {
 		}
 		$fullUrl = $baseUrl . "ocs/v2.php/apps/files_sharing/api/v1/shares/" . $space['id'] . "?shareWith=" . $userRecipient;
 
-		return HttpRequestHelper::delete($fullUrl, "", $user, $this->featureContext->getPasswordForUser($user));
+		HttpRequestHelper::delete($fullUrl, "", $user, $this->featureContext->getPasswordForUser($user));
 	}
 }
