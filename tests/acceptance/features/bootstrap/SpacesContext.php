@@ -244,7 +244,7 @@ class SpacesContext implements Context {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $urlArguments,
+		string $urlArguments = '',
 		string $xRequestId = '',
 		array  $body = [],
 		array  $headers = []
@@ -351,9 +351,7 @@ class SpacesContext implements Context {
 			$this->listSpacesRequest(
 				$this->featureContext->getBaseUrl(),
 				$user,
-				$this->featureContext->getPasswordForUser($user),
-				"",
-				""
+				$this->featureContext->getPasswordForUser($user)
 			)
 		);
 		$this->rememberTheAvailableSpaces();
@@ -383,8 +381,7 @@ class SpacesContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$body,
-				""
+				$body
 			)
 		);
 		$this->setSpaceCreator($spaceName, $user);
@@ -416,8 +413,7 @@ class SpacesContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$body,
-				""
+				$body
 			)
 		);
 		$this->setSpaceCreator($spaceName, $user);
@@ -1108,8 +1104,7 @@ class SpacesContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$body,
-				""
+				$body
 			)
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
@@ -1205,27 +1200,9 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $userRecipient
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		$body = ["space_ref" => $space['id'], "shareType" => 7, "shareWith" => $userRecipient];
+		$this->sendShareSpaceRequest($user, $spaceName, $userRecipient);
 
-		$baseUrl = $this->featureContext->getBaseUrl();
-		if (!str_ends_with($baseUrl, '/')) {
-			$baseUrl .= '/';
-		}
-		$fullUrl = $baseUrl . "ocs/v2.php/apps/files_sharing/api/v1/shares";
-
-		$this->featureContext->setResponse(
-			HttpRequestHelper::post(
-				$fullUrl,
-				"",
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				[],
-				$body
-			)
-		);
-
-        $expectedHTTPStatus = "200";
+		$expectedHTTPStatus = "200";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
             $expectedHTTPStatus,
 			"Expected response status code should be $expectedHTTPStatus"
