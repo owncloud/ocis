@@ -234,7 +234,25 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 		},
 		cfg.Reva.StorageShares.Endpoint: {
 			"spaces": map[string]interface{}{
-				"reference": map[string]interface{}{
+				/*
+					"share": map[string]interface{}{
+						// The jail needs to be filled with mount points
+						// .Space.Name is a path relative to the mount point
+						"mount_point":   "/users/{{.CurrentUser.Id.OpaqueId}}/Shares",
+						"path_template": "/users/{{.CurrentUser.Id.OpaqueId}}/Shares/{{.Space.Name}}",
+					},
+				*/
+				"virtual": map[string]interface{}{
+					// The root of the share jail is mounted here
+					"mount_point": "/users/{{.CurrentUser.Id.OpaqueId}}/Shares",
+				},
+				"grant": map[string]interface{}{
+					// Grants are relative to a space root that the gateway will determine with a stat
+					"mount_point": ".",
+				},
+				"mountpoint": map[string]interface{}{
+					// The jail needs to be filled with mount points
+					// .Space.Name is a path relative to the mount point
 					"mount_point":   "/users/{{.CurrentUser.Id.OpaqueId}}/Shares",
 					"path_template": "/users/{{.CurrentUser.Id.OpaqueId}}/Shares/{{.Space.Name}}",
 				},
