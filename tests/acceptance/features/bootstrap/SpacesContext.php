@@ -47,6 +47,11 @@ class SpacesContext implements Context {
 	private OCSContext $ocsContext;
 
 	/**
+	 * @var string
+	 */
+	private string $baseUrl;
+
+	/**
 	 * @var array key is space name and value is the username that created the space
 	 */
 	private array $createdSpaces;
@@ -217,10 +222,11 @@ class SpacesContext implements Context {
 		$this->ocsContext = $environment->getContext('OCSContext');
 		// Run the BeforeScenario function in OCSContext to set it up correctly
 		$this->ocsContext->before($scope);
+		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");
 		SetupHelper::init(
 			$this->featureContext->getAdminUsername(),
 			$this->featureContext->getAdminPassword(),
-			$this->featureContext->getBaseUrl(),
+			$this->baseUrl,
 			$this->featureContext->getOcPath()
 		);
 	}
@@ -249,11 +255,7 @@ class SpacesContext implements Context {
 		array  $body = [],
 		array  $headers = []
 	): ResponseInterface {
-		$fullUrl = $baseUrl;
-		if (!str_ends_with($fullUrl, '/')) {
-			$fullUrl .= '/';
-		}
-		$fullUrl .= "graph/v1.0/me/drives/" . $urlArguments;
+		$fullUrl = $baseUrl . "/graph/v1.0/me/drives/" . $urlArguments;
 
 		return HttpRequestHelper::get($fullUrl, $xRequestId, $user, $password, $headers, $body);
 	}
@@ -280,11 +282,7 @@ class SpacesContext implements Context {
 		string $xRequestId = '',
 		array $headers = []
 	): ResponseInterface {
-		$fullUrl = $baseUrl;
-		if (!str_ends_with($fullUrl, '/')) {
-			$fullUrl .= '/';
-		}
-		$fullUrl .= "graph/v1.0/drives/";
+		$fullUrl = $baseUrl . "/graph/v1.0/drives/";
 
 		return HttpRequestHelper::post($fullUrl, $xRequestId, $user, $password, $headers, $body);
 	}
@@ -349,7 +347,7 @@ class SpacesContext implements Context {
 	public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user): void {
 		$this->featureContext->setResponse(
 			$this->listSpacesRequest(
-				$this->featureContext->getBaseUrl(),
+				$this->baseUrl,
 				$user,
 				$this->featureContext->getPasswordForUser($user)
 			)
@@ -378,7 +376,7 @@ class SpacesContext implements Context {
 		$body = json_encode($space, JSON_THROW_ON_ERROR);
 		$this->featureContext->setResponse(
 			$this->sendCreateSpaceRequest(
-				$this->featureContext->getBaseUrl(),
+				$this->baseUrl,
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$body
@@ -410,7 +408,7 @@ class SpacesContext implements Context {
 		$body = json_encode($space);
 		$this->featureContext->setResponse(
 			$this->sendCreateSpaceRequest(
-				$this->featureContext->getBaseUrl(),
+				$this->baseUrl,
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$body
@@ -438,12 +436,8 @@ class SpacesContext implements Context {
 		$accounts = [];
 		$assignment = [];
 
-		$baseUrl = $this->featureContext->getBaseUrl();
-		if (!str_ends_with($baseUrl, '/')) {
-			$baseUrl .= '/';
-		}
 		// get the roles list first
-		$fullUrl = $baseUrl . "api/v0/settings/roles-list";
+		$fullUrl = $this->baseUrl . "/api/v0/settings/roles-list";
 		$this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, "{}"));
 		if ($this->featureContext->getResponse()) {
 			$rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
@@ -461,7 +455,7 @@ class SpacesContext implements Context {
 		Assert::assertNotEmpty($roleToAssign, "The selected role $role could not be found");
 
 		// get the accounts list first
-		$fullUrl = $baseUrl . "api/v0/accounts/accounts-list";
+		$fullUrl = $this->baseUrl . "/api/v0/accounts/accounts-list";
 		$this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, "{}"));
 		if ($this->featureContext->getResponse()) {
 			$rawBody = $this->featureContext->getResponse()->getBody()->getContents();
@@ -479,7 +473,7 @@ class SpacesContext implements Context {
 		Assert::assertNotEmpty($accountToChange, "The selected account $user does not exist");
 
 		// set the new role
-		$fullUrl = $baseUrl . "api/v0/settings/assignments-add";
+		$fullUrl = $this->baseUrl . "/api/v0/settings/assignments-add";
 		$body = json_encode(["account_uuid" => $accountToChange["id"], "role_id" => $roleToAssign["id"]], JSON_THROW_ON_ERROR);
 
 		$this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, $body));
@@ -870,11 +864,7 @@ class SpacesContext implements Context {
 
 		$space = $this->getSpaceByName($ownerUser, $spaceName);
 
-		$baseUrl = $this->featureContext->getBaseUrl();
-		if (!str_ends_with($baseUrl, '/')) {
-			$baseUrl .= '/';
-		}
-		$fullUrl = $baseUrl . "dav/spaces/" . $space['id'] . '/' . $folder;
+		$fullUrl = $this->baseUrl . "/dav/spaces/" . $space['id'] . '/' . $folder;
 
 		$this->featureContext->setResponse(
 			$this->sendCreateFolderRequest(
@@ -1005,7 +995,7 @@ class SpacesContext implements Context {
 
 		$this->featureContext->setResponse(
 			$this->sendUpdateSpaceRequest(
-				$this->featureContext->getBaseUrl(),
+				$this->baseUrl,
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$body,
@@ -1038,7 +1028,7 @@ class SpacesContext implements Context {
 
 		$this->featureContext->setResponse(
 			$this->sendUpdateSpaceRequest(
-				$this->featureContext->getBaseUrl(),
+				$this->baseUrl,
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$body,
@@ -1071,11 +1061,7 @@ class SpacesContext implements Context {
 		string $xRequestId = '',
 		array $headers = []
 	): ResponseInterface {
-		$fullUrl = $baseUrl;
-		if (!str_ends_with($fullUrl, '/')) {
-			$fullUrl .= '/';
-		}
-		$fullUrl .= "graph/v1.0/drives/$spaceId";
+		$fullUrl = $baseUrl . "/graph/v1.0/drives/$spaceId";
 		$method = 'PATCH';
 
 		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers, $body);
@@ -1101,7 +1087,7 @@ class SpacesContext implements Context {
 		$body = json_encode($space);
 		$this->featureContext->setResponse(
 			$this->sendCreateSpaceRequest(
-				$this->featureContext->getBaseUrl(),
+				$this->baseUrl,
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$body
@@ -1167,11 +1153,7 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$body = ["space_ref" => $space['id'], "shareType" => 7, "shareWith" => $userRecipient];
 
-		$baseUrl = $this->featureContext->getBaseUrl();
-		if (!str_ends_with($baseUrl, '/')) {
-			$baseUrl .= '/';
-		}
-		$fullUrl = $baseUrl . "ocs/v2.php/apps/files_sharing/api/v1/shares";
+		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares";
 
 		$this->featureContext->setResponse(
 			HttpRequestHelper::post(
@@ -1227,11 +1209,7 @@ class SpacesContext implements Context {
 		string $userRecipient
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$baseUrl = $this->featureContext->getBaseUrl();
-		if (!str_ends_with($baseUrl, '/')) {
-			$baseUrl .= '/';
-		}
-		$fullUrl = $baseUrl . "ocs/v2.php/apps/files_sharing/api/v1/shares/" . $space['id'] . "?shareWith=" . $userRecipient;
+		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares/" . $space['id'] . "?shareWith=" . $userRecipient;
 
 		HttpRequestHelper::delete($fullUrl, "", $user, $this->featureContext->getPasswordForUser($user));
 	}
