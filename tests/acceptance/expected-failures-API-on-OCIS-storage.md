@@ -26,6 +26,9 @@ _ocdav: double check the webdav property parsing when custom namespaces are used
 -    [apiVersions/fileVersions.feature:455](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L455)
 -    [apiVersions/fileVersionsSharingToShares.feature:305](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L305)
 
+#### [file versions do not report the version author](https://github.com/owncloud/ocis/issues/2914)
+-    [apiVersions/fileVersions.feature:474](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L474)
+
 ### Sync
 Synchronization features like etag propagation, setting mtime and locking files
 
@@ -882,8 +885,8 @@ special character username not valid
 -   [apiProvisioning-v1/editUser.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L29)
 -   [apiProvisioning-v1/editUser.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L30)
 -   [apiProvisioning-v1/enableUser.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/enableUser.feature#L20)
--   [apiProvisioning-v1/getUser.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L36)
--   [apiProvisioning-v1/getUser.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L37)
+-   [apiProvisioning-v1/getUser.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L38)
+-   [apiProvisioning-v1/getUser.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L39)
 -   [apiProvisioning-v2/addUser.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L20)
 -   [apiProvisioning-v2/addUser.feature:123](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L123)
 -   [apiProvisioning-v2/deleteUser.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/deleteUser.feature#L19)
@@ -891,8 +894,8 @@ special character username not valid
 -   [apiProvisioning-v2/editUser.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L29)
 -   [apiProvisioning-v2/editUser.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L30)
 -   [apiProvisioning-v2/enableUser.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L20)
--   [apiProvisioning-v2/getUser.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L36)
--   [apiProvisioning-v2/getUser.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L37)
+-   [apiProvisioning-v2/getUser.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L38)
+-   [apiProvisioning-v2/getUser.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L39)
 -   [apiTrashbin/trashbinFilesFolders.feature:245](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L245)
 -   [apiTrashbin/trashbinFilesFolders.feature:246](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L246)
 -   [apiTrashbin/trashbinFilesFolders.feature:247](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L247)
@@ -940,30 +943,30 @@ special character username not valid
 
 #### [user can get info of other users/ cloud/users endpoints not authenticated](https://github.com/owncloud/product/issues/248)
 -   [apiProvisioning-v2/deleteUser.feature:57](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/deleteUser.feature#L57)
--   [apiProvisioning-v1/getUser.feature:88](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L88)
--   [apiProvisioning-v2/getUser.feature:88](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L88)
+-   [apiProvisioning-v2/getUser.feature:92](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L92)
 -   [apiProvisioning-v2/getUsers.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUsers.feature#L44)
 
 #### [incorrect ocs(v2) status value when getting info of user that does not exist should be 404, gives 998](https://github.com/owncloud/product/issues/250)
 _ocs: api compatibility, return correct status code_
--   [apiProvisioning-v2/getUser.feature:52](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L52)
+-   [apiProvisioning-v2/getUser.feature:55](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L55)
 
 #### [Provisioning API does not provide last_login in response](https://github.com/owncloud/ocis/issues/2729)
 -   [apiProvisioning-v1/getUser.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L11)
--   [apiProvisioning-v1/getUser.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L40)
--   [apiProvisioning-v1/getUser.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L99)
--   [apiProvisioning-v1/getUser.feature:111](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L111)
--   [apiProvisioning-v1/getUser.feature:123](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L123)
--   [apiProvisioning-v1/getUser.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L135)
--   [apiProvisioning-v1/getUser.feature:147](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L147)
--   [apiProvisioning-v1/getUser.feature:159](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L159)
+-   [apiProvisioning-v1/getUser.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L42)
+-   [apiProvisioning-v1/getUser.feature:92](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L92)
+-   [apiProvisioning-v1/getUser.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L103)
+-   [apiProvisioning-v1/getUser.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L116)
+-   [apiProvisioning-v1/getUser.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L129)
+-   [apiProvisioning-v1/getUser.feature:142](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L142)
+-   [apiProvisioning-v1/getUser.feature:155](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L155)
+-   [apiProvisioning-v1/getUser.feature:168](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L168)
 -   [apiProvisioning-v2/getUser.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L11)
--   [apiProvisioning-v2/getUser.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L40)
--   [apiProvisioning-v2/getUser.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L99)
--   [apiProvisioning-v2/getUser.feature:111](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L111)
--   [apiProvisioning-v2/getUser.feature:123](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L123)
--   [apiProvisioning-v2/getUser.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L135)
--   [apiProvisioning-v2/getUser.feature:147](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L147)
+-   [apiProvisioning-v2/getUser.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L42)
+-   [apiProvisioning-v2/getUser.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L103)
+-   [apiProvisioning-v2/getUser.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L116)
+-   [apiProvisioning-v2/getUser.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L129)
+-   [apiProvisioning-v2/getUser.feature:142](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L142)
+-   [apiProvisioning-v2/getUser.feature:155](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L155)
 
 #### [incorrect ocs(v2) status value when getting info of share that does not exist should be 404, gives 998](https://github.com/owncloud/product/issues/250)
 _ocs: api compatibility, return correct status code_
