@@ -389,7 +389,8 @@
             "description": "The id of the group to add a member to",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "[^/]+"
           },
           {
             "name": "body",
@@ -435,7 +436,8 @@
             "description": "The id of the group to remove a member from",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "[^/]+"
           },
           {
             "name": "accountId",
@@ -482,7 +484,8 @@
             "description": "The id of the group to list members from",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "pattern": "[^/]+"
           },
           {
             "name": "body",
