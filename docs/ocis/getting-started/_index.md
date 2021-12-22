@@ -74,6 +74,7 @@ When you're using oCIS with self-signed certificates, you need to set the enviro
 {{< hint warning >}}
 In order to persist your data, you need to mount a docker volume or create a host bind-mount at `/var/lib/ocis`, for example with: `-v /some/host/dir:/var/lib/ocis`
 
+You cannot use bind mounts on MacOS, since extended attributes are not supported ([owncloud/ocis#182](https://github.com/owncloud/ocis/issues/182), [moby/moby#1070](https://github.com/moby/moby/issues/1070)).
 {{< /hint >}}
 
 ## Usage
