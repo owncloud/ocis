@@ -234,7 +234,6 @@ class SpacesContext implements Context {
 	/**
 	 * Send Graph List Spaces Request
 	 *
-	 * @param  string $baseUrl
 	 * @param  string $user
 	 * @param  string $password
 	 * @param  string $urlArguments
@@ -247,7 +246,6 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function listSpacesRequest(
-		string $baseUrl,
 		string $user,
 		string $password,
 		string $urlArguments = '',
@@ -255,7 +253,7 @@ class SpacesContext implements Context {
 		array  $body = [],
 		array  $headers = []
 	): ResponseInterface {
-		$fullUrl = $baseUrl . "/graph/v1.0/me/drives/" . $urlArguments;
+		$fullUrl = $this->baseUrl . "/graph/v1.0/me/drives/" . $urlArguments;
 
 		return HttpRequestHelper::get($fullUrl, $xRequestId, $user, $password, $headers, $body);
 	}
@@ -263,7 +261,6 @@ class SpacesContext implements Context {
 	/**
 	 * Send Graph Create Space Request
 	 *
-	 * @param  string $baseUrl
 	 * @param  string $user
 	 * @param  string $password
 	 * @param  string $body
@@ -275,14 +272,13 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function sendCreateSpaceRequest(
-		string $baseUrl,
 		string $user,
 		string $password,
 		string $body,
 		string $xRequestId = '',
 		array $headers = []
 	): ResponseInterface {
-		$fullUrl = $baseUrl . "/graph/v1.0/drives/";
+		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/";
 
 		return HttpRequestHelper::post($fullUrl, $xRequestId, $user, $password, $headers, $body);
 	}
@@ -347,7 +343,6 @@ class SpacesContext implements Context {
 	public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user): void {
 		$this->featureContext->setResponse(
 			$this->listSpacesRequest(
-				$this->baseUrl,
 				$user,
 				$this->featureContext->getPasswordForUser($user)
 			)
@@ -376,7 +371,6 @@ class SpacesContext implements Context {
 		$body = json_encode($space, JSON_THROW_ON_ERROR);
 		$this->featureContext->setResponse(
 			$this->sendCreateSpaceRequest(
-				$this->baseUrl,
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$body
@@ -408,7 +402,6 @@ class SpacesContext implements Context {
 		$body = json_encode($space);
 		$this->featureContext->setResponse(
 			$this->sendCreateSpaceRequest(
-				$this->baseUrl,
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$body
@@ -995,7 +988,6 @@ class SpacesContext implements Context {
 
 		$this->featureContext->setResponse(
 			$this->sendUpdateSpaceRequest(
-				$this->baseUrl,
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$body,
@@ -1028,7 +1020,6 @@ class SpacesContext implements Context {
 
 		$this->featureContext->setResponse(
 			$this->sendUpdateSpaceRequest(
-				$this->baseUrl,
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$body,
@@ -1040,7 +1031,6 @@ class SpacesContext implements Context {
 	/**
 	 * Send Graph Update Space Request
 	 *
-	 * @param  string $baseUrl
 	 * @param  string $user
 	 * @param  string $password
 	 * @param  mixed $body
@@ -1053,7 +1043,6 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function sendUpdateSpaceRequest(
-		string $baseUrl,
 		string $user,
 		string $password,
 		$body,
@@ -1061,7 +1050,7 @@ class SpacesContext implements Context {
 		string $xRequestId = '',
 		array $headers = []
 	): ResponseInterface {
-		$fullUrl = $baseUrl . "/graph/v1.0/drives/$spaceId";
+		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/$spaceId";
 		$method = 'PATCH';
 
 		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers, $body);
@@ -1087,7 +1076,6 @@ class SpacesContext implements Context {
 		$body = json_encode($space);
 		$this->featureContext->setResponse(
 			$this->sendCreateSpaceRequest(
-				$this->baseUrl,
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$body
