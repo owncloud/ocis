@@ -62,7 +62,7 @@ const filesListHeaderMenu = {
   Deutsch: [
     'Name',
     'Größe',
-    'Geändert',
+    'Bearbeitet',
     'Aktionen'
   ],
   Español: [
