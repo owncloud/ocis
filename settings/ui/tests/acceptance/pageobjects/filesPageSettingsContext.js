@@ -60,8 +60,7 @@ module.exports = {
       selector: '.oc-sidebar-nav-item'
     },
     openNavigationBtn: {
-      selector: '//button[@aria-label="Open navigation menu"]',
-      locateStrategy: 'xpath'
+      selector: '.oc-app-navigation-toggle'
     },
     userMenuBtn: {
       selector: '#_userMenuButton'

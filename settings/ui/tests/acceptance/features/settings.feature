@@ -3,12 +3,12 @@ Feature: Set user specific settings
 	I want to set user specific settings
 	So that I can customize my OCIS experience to my liking
 
-  Background:
-    Given these users have been created with default attributes and without skeleton files:
-      | username |
-      | user1    |
-      | user2    |
-	And user "user1" has created folder "simple-folder"
+	Background:
+		Given these users have been created with default attributes and without skeleton files in the server:
+			| username |
+			| user1    |
+			| user2    |
+		And user "user1" has created folder "simple-folder"
 
 	Scenario: Check the default settings
 		Given user "user1" has logged in using the webUI
