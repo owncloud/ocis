@@ -52,6 +52,7 @@ type SutureService struct {
 
 // NewSutureService creates a new store.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
+	cfg.Store.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.Store,
 	}
