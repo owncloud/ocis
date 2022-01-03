@@ -52,7 +52,7 @@ type SutureService struct {
 
 // NewSutureService creates a new graph-explorer.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	//cfg.GraphExplorer.Log = cfg.Log
+	cfg.GraphExplorer.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.GraphExplorer,
 	}
