@@ -15,15 +15,7 @@ func GraphExplorerCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start graph-explorer server",
 		Category: "Extensions",
 		Before: func(ctx *cli.Context) error {
-			if err := parser.ParseConfig(cfg); err != nil {
-				return err
-			}
-
-			if cfg.Commons != nil {
-				cfg.GraphExplorer.Commons = cfg.Commons
-			}
-
-			return nil
+			return parser.ParseConfig(cfg)
 		},
 		Subcommands: command.GetCommands(cfg.GraphExplorer),
 	}

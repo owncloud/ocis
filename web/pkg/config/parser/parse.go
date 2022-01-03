@@ -2,6 +2,7 @@ package parser
 
 import (
 	"errors"
+	"strings"
 
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/web/pkg/config"
@@ -37,6 +38,13 @@ func ParseConfig(cfg *config.Config) error {
 	}
 
 	// sanitize config
+	if cfg.HTTP.Root != "/" {
+		cfg.HTTP.Root = strings.TrimRight(cfg.HTTP.Root, "/")
+	}
+	// build well known openid-configuration endpoint if it is not set
+	if cfg.Web.Config.OpenIDConnect.MetadataURL == "" {
+		cfg.Web.Config.OpenIDConnect.MetadataURL = strings.TrimRight(cfg.Web.Config.OpenIDConnect.Authority, "/") + "/.well-known/openid-configuration"
+	}
 
 	return nil
 }
