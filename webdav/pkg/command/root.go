@@ -7,7 +7,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/clihelper"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/webdav/pkg/config"
-	"github.com/owncloud/ocis/webdav/pkg/config/parser"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
 )
@@ -29,11 +28,8 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the ocis-webdav command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:  "webdav",
-		Usage: "Serve WebDAV API for oCIS",
-		Before: func(c *cli.Context) error {
-			return parser.ParseConfig(cfg)
-		},
+		Name:     "webdav",
+		Usage:    "Serve WebDAV API for oCIS",
 		Commands: GetCommands(cfg),
 	})
 

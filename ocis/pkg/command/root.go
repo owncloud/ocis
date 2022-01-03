@@ -5,7 +5,6 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/clihelper"
 	"github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/config/parser"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
 )
@@ -17,9 +16,6 @@ func Execute() error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:  "ocis",
 		Usage: "ownCloud Infinite Scale Stack",
-		Before: func(c *cli.Context) error {
-			return parser.ParseConfig(cfg)
-		},
 	})
 
 	for _, fn := range register.Commands {

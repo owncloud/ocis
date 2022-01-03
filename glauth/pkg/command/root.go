@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/owncloud/ocis/glauth/pkg/config"
-	"github.com/owncloud/ocis/glauth/pkg/config/parser"
 	"github.com/owncloud/ocis/ocis-pkg/clihelper"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/thejerf/suture/v4"
@@ -29,11 +28,8 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the ocis-glauth command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:  "ocis-glauth",
-		Usage: "Serve GLAuth API for oCIS",
-		Before: func(c *cli.Context) error {
-			return parser.ParseConfig(cfg)
-		},
+		Name:     "ocis-glauth",
+		Usage:    "Serve GLAuth API for oCIS",
 		Commands: GetCommands(cfg),
 	})
 

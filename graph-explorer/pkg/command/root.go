@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/owncloud/ocis/graph-explorer/pkg/config"
-	"github.com/owncloud/ocis/graph-explorer/pkg/config/parser"
 	"github.com/owncloud/ocis/ocis-pkg/clihelper"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/thejerf/suture/v4"
@@ -29,11 +28,8 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the graph-explorer command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:  "graph-explorer",
-		Usage: "Serve Graph-Explorer for oCIS",
-		Before: func(c *cli.Context) error {
-			return parser.ParseConfig(cfg)
-		},
+		Name:     "graph-explorer",
+		Usage:    "Serve Graph-Explorer for oCIS",
 		Commands: GetCommands(cfg),
 	})
 

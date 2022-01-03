@@ -16,15 +16,7 @@ func StoreCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start a go-micro store",
 		Category: "Extensions",
 		Before: func(ctx *cli.Context) error {
-			if err := parser.ParseConfig(cfg); err != nil {
-				return err
-			}
-
-			if cfg.Commons != nil {
-				cfg.Store.Commons = cfg.Commons
-			}
-
-			return nil
+			return parser.ParseConfig(cfg)
 		},
 		Subcommands: command.GetCommands(cfg.Store),
 	}

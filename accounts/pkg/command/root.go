@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/owncloud/ocis/accounts/pkg/config"
-	"github.com/owncloud/ocis/accounts/pkg/config/parser"
 	"github.com/owncloud/ocis/ocis-pkg/clihelper"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/thejerf/suture/v4"
@@ -35,11 +34,8 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the ocis-accounts command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:  "ocis-accounts",
-		Usage: "Provide accounts and groups for oCIS",
-		Before: func(c *cli.Context) error {
-			return parser.ParseConfig(cfg)
-		},
+		Name:     "ocis-accounts",
+		Usage:    "Provide accounts and groups for oCIS",
 		Commands: GetCommands(cfg),
 	})
 

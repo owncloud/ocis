@@ -15,15 +15,7 @@ func WebCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start web server",
 		Category: "Extensions",
 		Before: func(ctx *cli.Context) error {
-			if err := parser.ParseConfig(cfg); err != nil {
-				return err
-			}
-
-			if cfg.Commons != nil {
-				cfg.Web.Commons = cfg.Commons
-			}
-
-			return nil
+			return parser.ParseConfig(cfg)
 		},
 		Subcommands: command.GetCommands(cfg.Web),
 	}

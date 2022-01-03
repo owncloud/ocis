@@ -15,15 +15,7 @@ func ThumbnailsCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start thumbnails server",
 		Category: "Extensions",
 		Before: func(ctx *cli.Context) error {
-			if err := parser.ParseConfig(cfg); err != nil {
-				return err
-			}
-
-			if cfg.Commons != nil {
-				cfg.Thumbnails.Commons = cfg.Commons
-			}
-
-			return nil
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
 			origCmd := command.Server(cfg.Thumbnails)

@@ -7,7 +7,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/clihelper"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/store/pkg/config"
-	"github.com/owncloud/ocis/store/pkg/config/parser"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
 )
@@ -29,11 +28,8 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the ocis-store command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:  "ocis-store",
-		Usage: "Service to store values for ocis extensions",
-		Before: func(c *cli.Context) error {
-			return parser.ParseConfig(cfg)
-		},
+		Name:     "ocis-store",
+		Usage:    "Service to store values for ocis extensions",
 		Commands: GetCommands(cfg),
 	})
 

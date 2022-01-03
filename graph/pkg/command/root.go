@@ -4,7 +4,6 @@ import (
 	"context"
 	"os"
 
-	"github.com/owncloud/ocis/graph/pkg/config/parser"
 	"github.com/owncloud/ocis/ocis-pkg/clihelper"
 	"github.com/thejerf/suture/v4"
 
@@ -30,11 +29,8 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the ocis-graph command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:  "ocis-graph",
-		Usage: "Serve Graph API for oCIS",
-		Before: func(c *cli.Context) error {
-			return parser.ParseConfig(cfg)
-		},
+		Name:     "ocis-graph",
+		Usage:    "Serve Graph API for oCIS",
 		Commands: GetCommands(cfg),
 	})
 	cli.HelpFlag = &cli.BoolFlag{

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/owncloud/ocis/proxy/pkg/config"
+	"github.com/owncloud/ocis/proxy/pkg/config/parser"
 	"github.com/owncloud/ocis/proxy/pkg/logging"
 	"github.com/urfave/cli/v2"
 )
@@ -14,7 +15,9 @@ func Health(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "health",
 		Usage: "Check health status",
-		//Flags: flagset.HealthWithConfig(cfg),
+		Before: func(c *cli.Context) error {
+			return parser.ParseConfig(cfg)
+		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 

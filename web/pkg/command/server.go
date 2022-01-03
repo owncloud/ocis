@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"io/ioutil"
-	"strings"
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/web/pkg/config"
@@ -22,21 +21,8 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Before: func(ctx *cli.Context) error {
-			if cfg.HTTP.Root != "/" {
-				cfg.HTTP.Root = strings.TrimRight(cfg.HTTP.Root, "/")
-			}
-
-			if err := parser.ParseConfig(cfg); err != nil {
-				return err
-			}
-
-			// build well known openid-configuration endpoint if it is not set
-			if cfg.Web.Config.OpenIDConnect.MetadataURL == "" {
-				cfg.Web.Config.OpenIDConnect.MetadataURL = strings.TrimRight(cfg.Web.Config.OpenIDConnect.Authority, "/") + "/.well-known/openid-configuration"
-			}
-
-			return nil
+		Before: func(c *cli.Context) error {
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)

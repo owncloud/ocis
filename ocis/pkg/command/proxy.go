@@ -15,15 +15,7 @@ func ProxyCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start proxy server",
 		Category: "Extensions",
 		Before: func(ctx *cli.Context) error {
-			if err := parser.ParseConfig(cfg); err != nil {
-				return err
-			}
-
-			if cfg.Commons != nil {
-				cfg.Proxy.Commons = cfg.Commons
-			}
-
-			return nil
+			return parser.ParseConfig(cfg)
 		},
 		Subcommands: command.GetCommands(cfg.Proxy),
 	}

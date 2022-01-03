@@ -21,11 +21,8 @@ func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "server",
 		Usage: "Start integrated server",
-		Before: func(ctx *cli.Context) error {
-			if err := parser.ParseConfig(cfg); err != nil {
-				return err
-			}
-			return nil
+		Before: func(c *cli.Context) error {
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
