@@ -60,7 +60,7 @@
     "fs-extra": "^9.0.1",
     "join-path": "^1.1.1",
     "ldapjs": "^2.2.3",
-    "nightwatch": "1.7.11",
+    "nightwatch": "1.7.13",
     "nightwatch-api": "3.0.2",
     "nightwatch-vrt": "^0.2.10",
     "node-fetch": "^2.6.1",
