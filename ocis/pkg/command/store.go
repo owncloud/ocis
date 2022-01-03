@@ -23,11 +23,13 @@ func StoreCommand(cfg *config.Config) *cli.Command {
 				return err
 			}
 
+			// TODO: what to do
 			//globalLog = cfg.Log
 
 			return nil
 		},
 		Action: func(c *cli.Context) error {
+			// TODO: what to do
 			// if accounts logging is empty in ocis.yaml
 			//if (cfg.Store.Log == shared.Log{}) && (globalLog != shared.Log{}) {
 			//	// we can safely inherit the global logging values.

@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/owncloud/ocis/ocis-pkg/config"
-	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
@@ -57,9 +57,21 @@ func Execute() error {
 
 // ParseConfig loads ocis configuration.
 func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	_, err := ociscfg.BindSourcesToStructs("ocis", cfg)
+	_, err := config.BindSourcesToStructs("ocis", cfg)
 	if err != nil {
 		return err
+	}
+
+	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &shared.Log{
+			Level:  cfg.Commons.Log.Level,
+			Pretty: cfg.Commons.Log.Pretty,
+			Color:  cfg.Commons.Log.Color,
+			File:   cfg.Commons.Log.File,
+		}
+	} else if cfg.Log == nil && cfg.Commons == nil {
+		cfg.Log = &shared.Log{}
 	}
 
 	// load all env variables relevant to the config in the current context.

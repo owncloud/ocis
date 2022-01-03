@@ -25,21 +25,33 @@ func Server(opts ...Option) (*http.Server, error) {
 	), nil
 }
 
+// health implements the health check.
 func health(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusOK)
-		if _, err := io.WriteString(w, http.StatusText(http.StatusOK)); err != nil {
+
+		// TODO: check if services are up and running
+
+		_, err := io.WriteString(w, http.StatusText(http.StatusOK))
+		// io.WriteString should not fail but if it does we want to know.
+		if err != nil {
 			panic(err)
 		}
 	}
 }
 
+// ready implements the ready check.
 func ready(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusOK)
-		if _, err := io.WriteString(w, http.StatusText(http.StatusOK)); err != nil {
+
+		// TODO: check if services are up and running
+
+		_, err := io.WriteString(w, http.StatusText(http.StatusOK))
+		// io.WriteString should not fail but if it does we want to know.
+		if err != nil {
 			panic(err)
 		}
 	}

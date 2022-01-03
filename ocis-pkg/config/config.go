@@ -45,7 +45,7 @@ type Config struct {
 	*shared.Commons `ocisConfig:"shared"`
 
 	Tracing shared.Tracing `ocisConfig:"tracing"`
-	Log     shared.Log     `ocisConfig:"log"`
+	Log     *shared.Log    `ocisConfig:"log"`
 
 	Mode    Mode // DEPRECATED
 	File    string

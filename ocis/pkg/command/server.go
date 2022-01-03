@@ -18,6 +18,7 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 
+			// what to do
 			//cfg.Commons = &shared.Commons{
 			//	Log: &cfg.Log,
 			//}

@@ -1,6 +1,5 @@
 package config
 
-//TODO: use debug config
 // Debug defines the available debug configuration.
 type Debug struct {
 	Addr   string `ocisConfig:"addr" env:"ACCOUNTS_DEBUG_ADDR"`

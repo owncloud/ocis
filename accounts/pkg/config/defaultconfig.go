@@ -8,6 +8,12 @@ import (
 
 func DefaultConfig() *Config {
 	return &Config{
+		Debug: Debug{
+			Addr:   "127.0.0.1:9182",
+			Token:  "",
+			Pprof:  false,
+			Zpages: false,
+		},
 		HTTP: HTTP{
 			Addr:      "127.0.0.1:9181",
 			Namespace: "com.owncloud.web",
