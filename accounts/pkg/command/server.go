@@ -7,6 +7,7 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/logging"
 	"github.com/owncloud/ocis/accounts/pkg/metrics"
+	"github.com/owncloud/ocis/accounts/pkg/server/debug"
 	"github.com/owncloud/ocis/accounts/pkg/server/grpc"
 	"github.com/owncloud/ocis/accounts/pkg/server/http"
 	svc "github.com/owncloud/ocis/accounts/pkg/service/v0"
@@ -72,6 +73,18 @@ func Server(cfg *config.Config) *cli.Command {
 
 			gr.Add(grpcServer.Run, func(_ error) {
 				logger.Info().Str("server", "grpc").Msg("shutting down server")
+				cancel()
+			})
+
+			// prepare a debug server and add it to the group run.
+			debugServer, err := debug.Server(debug.Logger(logger), debug.Context(ctx), debug.Config(cfg))
+			if err != nil {
+				logger.Error().Err(err).Str("server", "debug").Msg("Failed to initialize server")
+				return err
+			}
+
+			gr.Add(debugServer.ListenAndServe, func(_ error) {
+				_ = debugServer.Shutdown(ctx)
 				cancel()
 			})
 
