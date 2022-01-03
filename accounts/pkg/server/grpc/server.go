@@ -3,6 +3,7 @@ package grpc
 import (
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 )
 
 // Server initializes a new go-micro service ready to run
@@ -17,7 +18,7 @@ func Server(opts ...Option) grpc.Service {
 		grpc.Namespace(options.Config.GRPC.Namespace),
 		grpc.Logger(options.Logger),
 		grpc.Flags(options.Flags...),
-		grpc.Version(options.Config.Service.Version),
+		grpc.Version(version.String),
 	)
 
 	if err := proto.RegisterAccountsServiceHandler(service.Server(), handler); err != nil {

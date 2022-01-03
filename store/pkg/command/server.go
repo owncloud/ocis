@@ -5,6 +5,7 @@ import (
 
 	"github.com/oklog/run"
 
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/store/pkg/config"
 	"github.com/owncloud/ocis/store/pkg/config/parser"
 	"github.com/owncloud/ocis/store/pkg/logging"
@@ -47,7 +48,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			metrics.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
+			metrics.BuildInfo.WithLabelValues(version.String).Set(1)
 
 			{
 				server := grpc.Server(

@@ -1,7 +1,5 @@
 package config
 
-import "github.com/owncloud/ocis/ocis-pkg/version"
-
 func DefaultConfig() *Config {
 	return &Config{
 		Debug: Debug{
@@ -17,8 +15,7 @@ func DefaultConfig() *Config {
 			CacheTTL:  604800, // 7 days
 		},
 		Service: Service{
-			Name:    "web",
-			Version: version.String, // TODO: ensure everywhere or remove
+			Name: "web",
 		},
 		Tracing: Tracing{
 			Enabled:   false,
