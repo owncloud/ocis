@@ -19,18 +19,12 @@ func GraphExplorerCommand(cfg *config.Config) *cli.Command {
 			}
 
 			if cfg.Commons != nil {
-				cfg.Graph.Commons = cfg.Commons
+				cfg.GraphExplorer.Commons = cfg.Commons
 			}
 
 			return nil
 		},
-		Action: func(c *cli.Context) error {
-			origCmd := command.Server(cfg.GraphExplorer)
-			return handleOriginalAction(c, origCmd)
-		},
-		Subcommands: []*cli.Command{
-			command.PrintVersion(cfg.GraphExplorer),
-		},
+		Subcommands: command.GetCommands(cfg.GraphExplorer),
 	}
 }
 

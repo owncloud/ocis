@@ -24,10 +24,7 @@ func WebCommand(cfg *config.Config) *cli.Command {
 
 			return nil
 		},
-		Action: func(c *cli.Context) error {
-			origCmd := command.Server(cfg.Web)
-			return handleOriginalAction(c, origCmd)
-		},
+		Subcommands: command.GetCommands(cfg.Web),
 	}
 }
 

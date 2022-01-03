@@ -33,7 +33,6 @@ type Spaces struct {
 	DefaultQuota string `ocisConfig:"default_quota" env:"GRAPH_SPACES_DEFAULT_QUOTA"`
 }
 
-// TODO: do we really need a ldap backend if CS3 also does LDAP!?
 type LDAP struct {
 	URI          string `ocisConfig:"uri" env:"GRAPH_LDAP_URI"`
 	BindDN       string `ocisConfig:"bind_dn" env:"GRAPH_LDAP_BIND_DN"`

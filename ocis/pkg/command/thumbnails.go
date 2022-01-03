@@ -13,9 +13,6 @@ func ThumbnailsCommand(cfg *config.Config) *cli.Command {
 		Name:     "thumbnails",
 		Usage:    "Start thumbnails server",
 		Category: "Extensions",
-		Subcommands: []*cli.Command{
-			command.PrintVersion(cfg.Thumbnails),
-		},
 		Before: func(ctx *cli.Context) error {
 			if err := ParseConfig(ctx, cfg); err != nil {
 				return err
@@ -31,6 +28,7 @@ func ThumbnailsCommand(cfg *config.Config) *cli.Command {
 			origCmd := command.Server(cfg.Thumbnails)
 			return handleOriginalAction(c, origCmd)
 		},
+		Subcommands: command.GetCommands(cfg.Thumbnails),
 	}
 }
 

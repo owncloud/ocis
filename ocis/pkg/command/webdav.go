@@ -14,9 +14,6 @@ func WebDAVCommand(cfg *config.Config) *cli.Command {
 		Name:     "webdav",
 		Usage:    "Start webdav server",
 		Category: "Extensions",
-		Subcommands: []*cli.Command{
-			command.PrintVersion(cfg.WebDAV),
-		},
 		Before: func(ctx *cli.Context) error {
 			if err := ParseConfig(ctx, cfg); err != nil {
 				return err
@@ -28,10 +25,7 @@ func WebDAVCommand(cfg *config.Config) *cli.Command {
 
 			return nil
 		},
-		Action: func(c *cli.Context) error {
-			origCmd := command.Server(cfg.WebDAV)
-			return handleOriginalAction(c, origCmd)
-		},
+		Subcommands: command.GetCommands(cfg.WebDAV),
 	}
 }
 
