@@ -18,7 +18,7 @@ import (
 
 // ErrInvalidTarget indicates that the target value passed to
 // Decode is invalid.  Target must be a non-nil pointer to a struct.
-var ErrInvalidTarget = errors.New("target must be non-nil pointer to struct that has at least one exported field with a valid env tag.")
+var ErrInvalidTarget = errors.New("target must be non-nil pointer to struct that has at least one exported field with a valid env tag")
 var ErrNoTargetFieldsAreSet = errors.New("none of the target fields were set from environment variables")
 
 // FailureFunc is called when an error is encountered during a MustDecode
@@ -199,7 +199,9 @@ func decode(target interface{}, strict bool) (int, error) {
 				return 0, err
 			}
 		} else if f.Kind() == reflect.Slice {
-			decodeSlice(&f, env)
+			if err := decodeSlice(&f, env); err != nil {
+				return 0, err
+			}
 		} else {
 			if err := decodePrimitiveType(&f, env); err != nil && strict {
 				return 0, err
@@ -210,7 +212,7 @@ func decode(target interface{}, strict bool) (int, error) {
 	return setFieldCount, nil
 }
 
-func decodeSlice(f *reflect.Value, env string) {
+func decodeSlice(f *reflect.Value, env string) error {
 	parts := strings.Split(env, ";")
 
 	values := parts[:0]
@@ -225,11 +227,15 @@ func decodeSlice(f *reflect.Value, env string) {
 	if valuesCount > 0 {
 		for i := 0; i < valuesCount; i++ {
 			e := slice.Index(i)
-			decodePrimitiveType(&e, values[i])
+			err := decodePrimitiveType(&e, values[i])
+			if err != nil {
+				return err
+			}
 		}
 	}
 
 	f.Set(slice)
+	return nil
 }
 
 func decodePrimitiveType(f *reflect.Value, env string) error {
@@ -290,8 +296,7 @@ func decodePrimitiveType(f *reflect.Value, env string) error {
 // MustDecode calls Decode and terminates the process if any errors
 // are encountered.
 func MustDecode(target interface{}) {
-	err := Decode(target)
-	if err != nil {
+	if err := Decode(target); err != nil {
 		FailureFunc(err)
 	}
 }
@@ -299,8 +304,7 @@ func MustDecode(target interface{}) {
 // MustStrictDecode calls StrictDecode and terminates the process if any errors
 // are encountered.
 func MustStrictDecode(target interface{}) {
-	err := StrictDecode(target)
-	if err != nil {
+	if err := StrictDecode(target); err != nil {
 		FailureFunc(err)
 	}
 }
