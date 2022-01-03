@@ -24,13 +24,7 @@ func OCSCommand(cfg *config.Config) *cli.Command {
 
 			return nil
 		},
-		Action: func(c *cli.Context) error {
-			origCmd := command.Server(cfg.OCS)
-			return handleOriginalAction(c, origCmd)
-		},
-		Subcommands: []*cli.Command{
-			command.PrintVersion(cfg.OCS),
-		},
+		Subcommands: command.GetCommands(cfg.OCS),
 	}
 }
 

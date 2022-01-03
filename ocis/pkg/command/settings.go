@@ -13,9 +13,6 @@ func SettingsCommand(cfg *config.Config) *cli.Command {
 		Name:     "settings",
 		Usage:    "Start settings server",
 		Category: "Extensions",
-		Subcommands: []*cli.Command{
-			command.PrintVersion(cfg.Settings),
-		},
 		Before: func(ctx *cli.Context) error {
 			if err := ParseConfig(ctx, cfg); err != nil {
 				return err
@@ -27,10 +24,7 @@ func SettingsCommand(cfg *config.Config) *cli.Command {
 
 			return nil
 		},
-		Action: func(c *cli.Context) error {
-			origCmd := command.Server(cfg.Settings)
-			return handleOriginalAction(c, origCmd)
-		},
+		Subcommands: command.GetCommands(cfg.Settings),
 	}
 }
 

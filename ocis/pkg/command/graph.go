@@ -19,18 +19,12 @@ func GraphCommand(cfg *config.Config) *cli.Command {
 			}
 
 			if cfg.Commons != nil {
-				cfg.Graph.Commons = cfg.Commons
+				cfg.Accounts.Commons = cfg.Commons
 			}
 
 			return nil
 		},
-		Action: func(c *cli.Context) error {
-			origCmd := command.Server(cfg.Graph)
-			return handleOriginalAction(c, origCmd)
-		},
-		Subcommands: []*cli.Command{
-			command.PrintVersion(cfg.Graph),
-		},
+		Subcommands: command.GetCommands(cfg.Graph),
 	}
 }
 

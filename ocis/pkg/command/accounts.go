@@ -13,14 +13,6 @@ func AccountsCommand(cfg *config.Config) *cli.Command {
 		Name:     "accounts",
 		Usage:    "Start accounts server",
 		Category: "Extensions",
-		Subcommands: []*cli.Command{
-			command.ListAccounts(cfg.Accounts),
-			command.AddAccount(cfg.Accounts),
-			command.UpdateAccount(cfg.Accounts),
-			command.RemoveAccount(cfg.Accounts),
-			command.InspectAccount(cfg.Accounts),
-			command.PrintVersion(cfg.Accounts),
-		},
 		Before: func(ctx *cli.Context) error {
 			if err := ParseConfig(ctx, cfg); err != nil {
 				return err
@@ -32,10 +24,7 @@ func AccountsCommand(cfg *config.Config) *cli.Command {
 
 			return nil
 		},
-		Action: func(c *cli.Context) error {
-			origCmd := command.Server(cfg.Accounts)
-			return handleOriginalAction(c, origCmd)
-		},
+		Subcommands: command.GetCommands(cfg.Accounts),
 	}
 }
 

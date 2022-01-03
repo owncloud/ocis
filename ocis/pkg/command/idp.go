@@ -13,9 +13,6 @@ func IDPCommand(cfg *config.Config) *cli.Command {
 		Name:     "idp",
 		Usage:    "Start idp server",
 		Category: "Extensions",
-		Subcommands: []*cli.Command{
-			command.PrintVersion(cfg.IDP),
-		},
 		Before: func(ctx *cli.Context) error {
 			if err := ParseConfig(ctx, cfg); err != nil {
 				return err
@@ -27,14 +24,7 @@ func IDPCommand(cfg *config.Config) *cli.Command {
 
 			return nil
 		},
-		Action: func(c *cli.Context) error {
-			idpCommand := command.Server(cfg.IDP)
-			if err := idpCommand.Before(c); err != nil {
-				return err
-			}
-
-			return cli.HandleAction(idpCommand.Action, c)
-		},
+		Subcommands: command.GetCommands(cfg.IDP),
 	}
 }
 

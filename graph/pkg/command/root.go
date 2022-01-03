@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 
+	"github.com/owncloud/ocis/ocis-pkg/clihelper"
 	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
 	"github.com/thejerf/suture/v4"
 
@@ -14,37 +15,36 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// GetCommands provides all commands for this service
+func GetCommands(cfg *config.Config) cli.Commands {
+	return []*cli.Command{
+		// start this service
+		Server(cfg),
+
+		// interaction with this service
+
+		// infos about this service
+		Health(cfg),
+		Version(cfg),
+	}
+}
+
 // Execute is the entry point for the ocis-graph command.
 func Execute(cfg *config.Config) error {
-	app := &cli.App{
-		Name:     "ocis-graph",
-		Version:  version.String,
-		Usage:    "Serve Graph API for oCIS",
-		Compiled: version.Compiled(),
-		Authors: []*cli.Author{
-			{
-				Name:  "ownCloud GmbH",
-				Email: "support@owncloud.com",
-			},
-		},
+	app := clihelper.DefaultApp(&cli.App{
+		Name:  "ocis-graph",
+		Usage: "Serve Graph API for oCIS",
 
 		Before: func(c *cli.Context) error {
 			cfg.Service.Version = version.String
 			return ParseConfig(c, cfg)
 		},
 
-		Commands: []*cli.Command{
-			Server(cfg),
-			Health(cfg),
-		},
-	}
+		Commands: GetCommands(cfg),
+	})
 	cli.HelpFlag = &cli.BoolFlag{
 		Name:  "help,h",
 		Usage: "Show the help",
-	}
-	cli.VersionFlag = &cli.BoolFlag{
-		Name:  "version,v",
-		Usage: "Print the version",
 	}
 
 	return app.Run(os.Args)

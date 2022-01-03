@@ -4,10 +4,10 @@ import (
 	"errors"
 	"os"
 
+	"github.com/owncloud/ocis/ocis-pkg/clihelper"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
 	"github.com/owncloud/ocis/ocis-pkg/shared"
-	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
 )
@@ -16,24 +16,16 @@ import (
 func Execute() error {
 	cfg := config.DefaultConfig()
 
-	app := &cli.App{
-		Name:     "ocis",
-		Version:  version.String,
-		Usage:    "ownCloud Infinite Scale Stack",
-		Compiled: version.Compiled(),
+	app := clihelper.DefaultApp(&cli.App{
+		Name:  "ocis",
+		Usage: "ownCloud Infinite Scale Stack",
 
 		Before: func(c *cli.Context) error {
+			// TODO: what do do?
 			//cfg.Service.Version = version.String
 			return ParseConfig(c, cfg)
 		},
-
-		Authors: []*cli.Author{
-			{
-				Name:  "ownCloud GmbH",
-				Email: "support@owncloud.com",
-			},
-		},
-	}
+	})
 
 	for _, fn := range register.Commands {
 		app.Commands = append(
@@ -45,11 +37,6 @@ func Execute() error {
 	cli.HelpFlag = &cli.BoolFlag{
 		Name:  "help,h",
 		Usage: "Show the help",
-	}
-
-	cli.VersionFlag = &cli.BoolFlag{
-		Name:  "version,v",
-		Usage: "Print the version",
 	}
 
 	return app.Run(os.Args)
