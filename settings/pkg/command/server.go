@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/oklog/run"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/settings/pkg/config"
 	"github.com/owncloud/ocis/settings/pkg/config/parser"
 	"github.com/owncloud/ocis/settings/pkg/logging"
@@ -44,7 +45,7 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			mtrcs := metrics.New()
-			mtrcs.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
+			mtrcs.BuildInfo.WithLabelValues(version.String).Set(1)
 
 			// prepare an HTTP server and add it to the group run.
 			httpServer := http.Server(

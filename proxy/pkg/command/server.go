@@ -15,6 +15,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/config/parser"
 	"github.com/owncloud/ocis/proxy/pkg/cs3"
@@ -64,7 +65,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			m.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
+			m.BuildInfo.WithLabelValues(version.String).Set(1)
 
 			rp := proxy.NewMultiHostReverseProxy(
 				proxy.Logger(logger),

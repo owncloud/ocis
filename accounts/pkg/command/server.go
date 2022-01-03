@@ -13,6 +13,7 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/server/http"
 	svc "github.com/owncloud/ocis/accounts/pkg/service/v0"
 	"github.com/owncloud/ocis/accounts/pkg/tracing"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/urfave/cli/v2"
 )
 
@@ -41,7 +42,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			mtrcs.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
+			mtrcs.BuildInfo.WithLabelValues(version.String).Set(1)
 
 			handler, err := svc.New(svc.Logger(logger), svc.Config(cfg))
 			if err != nil {

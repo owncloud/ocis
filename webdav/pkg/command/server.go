@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/oklog/run"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/webdav/pkg/config"
 	"github.com/owncloud/ocis/webdav/pkg/config/parser"
 	"github.com/owncloud/ocis/webdav/pkg/logging"
@@ -47,7 +48,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			metrics.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
+			metrics.BuildInfo.WithLabelValues(version.String).Set(1)
 
 			{
 				server, err := http.Server(

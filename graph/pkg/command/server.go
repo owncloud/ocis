@@ -11,6 +11,7 @@ import (
 	"github.com/owncloud/ocis/graph/pkg/server/debug"
 	"github.com/owncloud/ocis/graph/pkg/server/http"
 	"github.com/owncloud/ocis/graph/pkg/tracing"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/urfave/cli/v2"
 )
 
@@ -45,7 +46,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			mtrcs.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
+			mtrcs.BuildInfo.WithLabelValues(version.String).Set(1)
 
 			{
 				server, err := http.Server(
