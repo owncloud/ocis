@@ -411,7 +411,7 @@ func TestDecodeErrors(t *testing.T) {
 
 	var tcrd testConfigRequiredDefault
 	defer func() {
-		recover()
+		_ = recover()
 	}()
 	_ = Decode(&tcrd)
 	t.Fatal("This should not have been reached. A panic should have occured.")

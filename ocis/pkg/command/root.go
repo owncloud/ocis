@@ -1,6 +1,7 @@
 package command
 
 import (
+	"errors"
 	"os"
 
 	"github.com/owncloud/ocis/ocis-pkg/config"
@@ -62,8 +63,11 @@ func ParseConfig(c *cli.Context, cfg *config.Config) error {
 	}
 
 	// load all env variables relevant to the config in the current context.
-	if err := envdecode.Decode(cfg); err != nil && err.Error() != "none of the target fields were set from environment variables" {
-		return err
+	if err := envdecode.Decode(cfg); err != nil {
+		// no environment variable set for this config is an expected "error"
+		if !errors.Is(err, envdecode.ErrNoTargetFieldsAreSet) {
+			return err
+		}
 	}
 
 	return nil
