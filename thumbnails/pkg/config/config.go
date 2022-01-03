@@ -20,8 +20,7 @@ type Config struct {
 
 	Thumbnail Thumbnail `ocisConfig:"thumbnail"`
 
-	Context    context.Context
-	Supervised bool
+	Context context.Context
 }
 
 // FileSystemStorage defines the available filesystem storage configuration.

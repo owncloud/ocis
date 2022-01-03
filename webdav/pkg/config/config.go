@@ -22,6 +22,5 @@ type Config struct {
 	WebdavNamespace string `ocisConfig:"webdav_namespace" env:"STORAGE_WEBDAV_NAMESPACE"` //TODO: prevent this cross config
 	RevaGateway     string `ocisConfig:"reva_gateway" env:"REVA_GATEWAY"`
 
-	Context    context.Context
-	Supervised bool
+	Context context.Context
 }

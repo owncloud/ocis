@@ -23,8 +23,7 @@ type Config struct {
 	Asset        Asset        `ocisConfig:"asset"`
 	TokenManager TokenManager `ocisConfig:"token_manager"`
 
-	Context    context.Context
-	Supervised bool
+	Context context.Context
 }
 
 // Asset defines the available asset configuration.

@@ -125,7 +125,7 @@ type Port struct {
 	Context context.Context
 
 	// Supervised is used when running under an oCIS runtime supervision tree
-	Supervised bool // deprecated
+	Supervised bool // deprecated // TODO: delete me
 }
 
 // Users defines the available users configuration.

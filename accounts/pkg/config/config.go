@@ -28,8 +28,7 @@ type Config struct {
 	HashDifficulty     int         `ocisConfig:"hash_difficulty" env:"ACCOUNTS_HASH_DIFFICULTY"`
 	DemoUsersAndGroups bool        `ocisConfig:"demo_users_and_groups" env:"ACCOUNTS_DEMO_USERS_AND_GROUPS"`
 
-	Context    context.Context
-	Supervised bool
+	Context context.Context
 }
 
 // Asset defines the available asset configuration.
