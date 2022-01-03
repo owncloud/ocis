@@ -2,6 +2,8 @@ package command
 
 import (
 	"github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config/parser"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/ocis/pkg/runtime"
 	"github.com/urfave/cli/v2"
@@ -14,14 +16,13 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage:    "Start fullstack server",
 		Category: "Fullstack",
 		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg)
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
 
-			// what to do
-			//cfg.Commons = &shared.Commons{
-			//	Log: &cfg.Log,
-			//}
+			cfg.Commons = &shared.Commons{
+				Log: cfg.Log,
+			}
 
 			r := runtime.New(cfg)
 			return r.Start()

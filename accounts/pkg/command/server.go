@@ -5,6 +5,7 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/accounts/pkg/config"
+	"github.com/owncloud/ocis/accounts/pkg/config/parser"
 	"github.com/owncloud/ocis/accounts/pkg/logging"
 	"github.com/owncloud/ocis/accounts/pkg/metrics"
 	"github.com/owncloud/ocis/accounts/pkg/server/debug"
@@ -22,7 +23,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage:       "Start ocis accounts service",
 		Description: "uses an LDAP server as the storage backend",
 		Before: func(ctx *cli.Context) error {
-			if err := ParseConfig(ctx, cfg); err != nil {
+			if err := parser.ParseConfig(cfg); err != nil {
 				return err
 			}
 

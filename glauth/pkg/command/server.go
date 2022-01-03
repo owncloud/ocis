@@ -7,6 +7,7 @@ import (
 	"github.com/oklog/run"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/glauth/pkg/config"
+	"github.com/owncloud/ocis/glauth/pkg/config/parser"
 	"github.com/owncloud/ocis/glauth/pkg/logging"
 	"github.com/owncloud/ocis/glauth/pkg/metrics"
 	"github.com/owncloud/ocis/glauth/pkg/server/debug"
@@ -24,7 +25,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage: "Start integrated server",
 		Before: func(ctx *cli.Context) error {
 
-			if err := ParseConfig(ctx, cfg); err != nil {
+			if err := parser.ParseConfig(cfg); err != nil {
 				return err
 			}
 

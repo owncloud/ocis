@@ -2,10 +2,10 @@ package command
 
 import (
 	"context"
-	"strings"
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/idp/pkg/config"
+	"github.com/owncloud/ocis/idp/pkg/config/parser"
 	"github.com/owncloud/ocis/idp/pkg/logging"
 	"github.com/owncloud/ocis/idp/pkg/metrics"
 	"github.com/owncloud/ocis/idp/pkg/server/debug"
@@ -20,12 +20,8 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:  "server",
 		Usage: "Start integrated server",
 		Before: func(ctx *cli.Context) error {
-			if err := ParseConfig(ctx, cfg); err != nil {
+			if err := parser.ParseConfig(cfg); err != nil {
 				return err
-			}
-
-			if cfg.HTTP.Root != "/" {
-				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 			}
 
 			return nil

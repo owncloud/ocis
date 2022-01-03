@@ -6,6 +6,7 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
+	"github.com/owncloud/ocis/thumbnails/pkg/config/parser"
 	"github.com/owncloud/ocis/thumbnails/pkg/logging"
 	"github.com/owncloud/ocis/thumbnails/pkg/metrics"
 	"github.com/owncloud/ocis/thumbnails/pkg/server/debug"
@@ -20,7 +21,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:  "server",
 		Usage: "Start integrated server",
 		Before: func(ctx *cli.Context) error {
-			if err := ParseConfig(ctx, cfg); err != nil {
+			if err := parser.ParseConfig(cfg); err != nil {
 				return err
 			}
 			return nil

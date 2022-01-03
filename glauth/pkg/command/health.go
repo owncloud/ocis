@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/owncloud/ocis/glauth/pkg/config"
+	"github.com/owncloud/ocis/glauth/pkg/config/parser"
 	"github.com/owncloud/ocis/glauth/pkg/logging"
 	"github.com/urfave/cli/v2"
 )
@@ -15,7 +16,7 @@ func Health(cfg *config.Config) *cli.Command {
 		Name:  "health",
 		Usage: "Check health status",
 		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg)
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)

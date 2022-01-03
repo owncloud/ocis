@@ -3,14 +3,15 @@ package command
 import (
 	"context"
 
-	"github.com/owncloud/ocis/store/pkg/logging"
-	"github.com/owncloud/ocis/store/pkg/tracing"
-
 	"github.com/oklog/run"
+
 	"github.com/owncloud/ocis/store/pkg/config"
+	"github.com/owncloud/ocis/store/pkg/config/parser"
+	"github.com/owncloud/ocis/store/pkg/logging"
 	"github.com/owncloud/ocis/store/pkg/metrics"
 	"github.com/owncloud/ocis/store/pkg/server/debug"
 	"github.com/owncloud/ocis/store/pkg/server/grpc"
+	"github.com/owncloud/ocis/store/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 
@@ -20,7 +21,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:  "server",
 		Usage: "Start integrated server",
 		Before: func(ctx *cli.Context) error {
-			if err := ParseConfig(ctx, cfg); err != nil {
+			if err := parser.ParseConfig(cfg); err != nil {
 				return err
 			}
 
