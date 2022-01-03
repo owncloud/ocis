@@ -22,8 +22,7 @@ type Config struct {
 	IDP   Settings `ocisConfig:"idp"`
 	Ldap  Ldap     `ocisConfig:"ldap"`
 
-	Context    context.Context
-	Supervised bool
+	Context context.Context
 }
 
 // Ldap defines the available LDAP configuration.

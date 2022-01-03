@@ -32,8 +32,7 @@ type Config struct {
 	EnableBasicAuth       bool            `ocisConfig:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH"`
 	InsecureBackends      bool            `ocisConfig:"insecure_backends" env:"PROXY_INSECURE_BACKENDS"`
 
-	Context    context.Context
-	Supervised bool
+	Context context.Context
 }
 
 // Policy enables us to use multiple directors.

@@ -22,8 +22,7 @@ type Config struct {
 	File  string `ocisConfig:"file" env:"WEB_UI_CONFIG"` // TODO: rename this to a more self explaining string
 	Web   Web    `ocisConfig:"web"`
 
-	Context    context.Context
-	Supervised bool
+	Context context.Context
 }
 
 // Asset defines the available asset configuration.

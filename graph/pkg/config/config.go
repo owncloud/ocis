@@ -24,8 +24,7 @@ type Config struct {
 	Spaces   Spaces   `ocisConfig:"spaces"`
 	Identity Identity `ocisConfig:"identity"`
 
-	Context    context.Context
-	Supervised bool
+	Context context.Context
 }
 
 type Spaces struct {

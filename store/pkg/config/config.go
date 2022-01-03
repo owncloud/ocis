@@ -20,6 +20,5 @@ type Config struct {
 
 	Datapath string `ocisConfig:"data_path" env:"STORE_DATA_PATH"`
 
-	Context    context.Context
-	Supervised bool
+	Context context.Context
 }

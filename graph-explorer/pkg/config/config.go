@@ -20,8 +20,7 @@ type Config struct {
 
 	GraphExplorer GraphExplorer `ocisConfig:"graph_explorer"`
 
-	Context    context.Context
-	Supervised bool
+	Context context.Context
 }
 
 // GraphExplorer defines the available graph-explorer configuration.

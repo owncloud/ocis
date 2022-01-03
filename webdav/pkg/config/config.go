@@ -21,6 +21,5 @@ type Config struct {
 	OcisPublicURL   string `ocisConfig:"ocis_public_url" env:"OCIS_URL;OCIS_PUBLIC_URL"`
 	WebdavNamespace string `ocisConfig:"webdav_namespace" env:"STORAGE_WEBDAV_NAMESPACE"`
 
-	Context    context.Context
-	Supervised bool
+	Context context.Context
 }

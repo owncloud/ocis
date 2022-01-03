@@ -24,8 +24,7 @@ type Config struct {
 
 	RoleBundleUUID string `ocisConfig:"role_bundle_uuid" env:"GLAUTH_ROLE_BUNDLE_ID"`
 
-	Context    context.Context
-	Supervised bool
+	Context context.Context
 }
 
 // Backend defined the available backend configuration.
