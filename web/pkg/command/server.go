@@ -8,6 +8,7 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/web/pkg/config"
+	"github.com/owncloud/ocis/web/pkg/config/parser"
 	"github.com/owncloud/ocis/web/pkg/logging"
 	"github.com/owncloud/ocis/web/pkg/metrics"
 	"github.com/owncloud/ocis/web/pkg/server/debug"
@@ -26,7 +27,7 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.HTTP.Root = strings.TrimRight(cfg.HTTP.Root, "/")
 			}
 
-			if err := ParseConfig(ctx, cfg); err != nil {
+			if err := parser.ParseConfig(cfg); err != nil {
 				return err
 			}
 

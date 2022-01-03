@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config/parser"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/settings/pkg/command"
 	"github.com/urfave/cli/v2"
@@ -14,7 +15,7 @@ func SettingsCommand(cfg *config.Config) *cli.Command {
 		Usage:    "Start settings server",
 		Category: "Extensions",
 		Before: func(ctx *cli.Context) error {
-			if err := ParseConfig(ctx, cfg); err != nil {
+			if err := parser.ParseConfig(cfg); err != nil {
 				return err
 			}
 

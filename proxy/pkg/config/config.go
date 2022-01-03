@@ -18,11 +18,12 @@ type Config struct {
 
 	HTTP HTTP `ocisConfig:"http"`
 
+	Reva Reva `ocisConfig:"reva"`
+
 	Policies              []Policy        `ocisConfig:"policies"`
 	OIDC                  OIDC            `ocisConfig:"oidc"`
 	TokenManager          TokenManager    `ocisConfig:"token_manager"`
 	PolicySelector        *PolicySelector `ocisConfig:"policy_selector"`
-	Reva                  Reva            `ocisConfig:"reva"`
 	PreSignedURL          PreSignedURL    `ocisConfig:"pre_signed_url"`
 	AccountBackend        string          `ocisConfig:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE"`
 	UserOIDCClaim         string          `ocisConfig:"user_oidc_claim" env:"PROXY_USER_OIDC_CLAIM"`
@@ -31,6 +32,7 @@ type Config struct {
 	AutoprovisionAccounts bool            `ocisConfig:"auto_provision_accounts" env:"PROXY_AUTOPROVISION_ACCOUNTS"`
 	EnableBasicAuth       bool            `ocisConfig:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH"`
 	InsecureBackends      bool            `ocisConfig:"insecure_backends" env:"PROXY_INSECURE_BACKENDS"`
+	AuthMiddleware        AuthMiddleware  `ocisConfig:"auth_middleware"`
 
 	Context context.Context
 }
@@ -68,21 +70,9 @@ var (
 	RouteTypes = []RouteType{QueryRoute, RegexRoute, PrefixRoute}
 )
 
-// TODO: use reva config here
-// Reva defines all available REVA configuration.
-type Reva struct {
-	Address    string     `ocisConfig:"address" env:"REVA_GATEWAY"`
-	Middleware Middleware `ocisConfig:"middleware"`
-}
-
-// Middleware configures proxy middlewares.
-type Middleware struct {
-	Auth Auth `ocisConfig:"middleware"`
-}
-
-// Auth configures proxy http auth middleware.
-type Auth struct {
-	CredentialsByUserAgent map[string]string `ocisConfig:""`
+// AuthMiddleware configures the proxy http auth middleware.
+type AuthMiddleware struct {
+	CredentialsByUserAgent map[string]string `ocisConfig:"credentials_by_user_agent"`
 }
 
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
