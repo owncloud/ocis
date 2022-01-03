@@ -9,7 +9,6 @@ import (
 	"reflect"
 	"sort"
 	"strconv"
-	"sync"
 	"testing"
 	"time"
 )
@@ -62,8 +61,6 @@ type testConfig struct {
 	DefaultSliceInt []int         `env:"TEST_UNSET,asdf=asdf,default=1;2;3"`
 	DefaultDuration time.Duration `env:"TEST_UNSET,asdf=asdf,default=24h"`
 	DefaultURL      *url.URL      `env:"TEST_UNSET,default=http://example.com"`
-
-	cantInterfaceField sync.Mutex
 }
 
 type testConfigNoSet struct {
@@ -83,11 +80,12 @@ type testConfigOverride struct {
 }
 
 type testNoExportedFields struct {
-	aString  string  `env:"TEST_STRING"`
-	anInt64  int64   `env:"TEST_INT64"`
-	aUint16  uint16  `env:"TEST_UINT16"`
-	aFloat64 float64 `env:"TEST_FLOAT64"`
-	aBool    bool    `env:"TEST_BOOL"`
+	// folowing unexported fields are used for tests
+	aString  string  `env:"TEST_STRING"`  //nolint:structcheck,unused
+	anInt64  int64   `env:"TEST_INT64"`   //nolint:structcheck,unused
+	aUint16  uint16  `env:"TEST_UINT16"`  //nolint:structcheck,unused
+	aFloat64 float64 `env:"TEST_FLOAT64"` //nolint:structcheck,unused
+	aBool    bool    `env:"TEST_BOOL"`    //nolint:structcheck,unused
 }
 
 type testNoTags struct {
@@ -223,9 +221,9 @@ func TestDecode(t *testing.T) {
 	}
 
 	urlVal, _ := url.Parse("https://example.com")
-	expectedUrlSlice := []*url.URL{urlVal}
-	if !reflect.DeepEqual(tc.URLSlice, expectedUrlSlice) {
-		t.Fatalf("Expected %s, got %s", expectedUrlSlice, tc.URLSlice)
+	expectedURLSlice := []*url.URL{urlVal}
+	if !reflect.DeepEqual(tc.URLSlice, expectedURLSlice) {
+		t.Fatalf("Expected %s, got %s", expectedURLSlice, tc.URLSlice)
 	}
 
 	if tc.UnsetString != "" {
@@ -366,7 +364,7 @@ func TestDecodeErrors(t *testing.T) {
 	}
 
 	var tc testConfig
-	err = Decode(tc)
+	err = Decode(tc) //nolint:govet
 	if err != ErrInvalidTarget {
 		t.Fatal("Should have gotten an error decoding into a non-pointer")
 	}
@@ -413,10 +411,9 @@ func TestDecodeErrors(t *testing.T) {
 
 	var tcrd testConfigRequiredDefault
 	defer func() {
-		if r := recover(); r != nil {
-		}
+		recover()
 	}()
-	err = Decode(&tcrd)
+	_ = Decode(&tcrd)
 	t.Fatal("This should not have been reached. A panic should have occured.")
 }
 
@@ -464,8 +461,7 @@ func ExampleDecode() {
 	os.Setenv("EXAMPLE_STRING", "an example!")
 
 	var e Example
-	err := Decode(&e)
-	if err != nil {
+	if err := Decode(&e); err != nil {
 		panic(err)
 	}
 
@@ -500,7 +496,7 @@ type testConfigExport struct {
 	UnsetURL      *url.URL      `env:"TEST_UNSET_URL"`
 
 	UnusedField     string
-	unexportedField string
+	unexportedField string //nolint:structcheck,unused
 
 	IgnoredPtr *bool `env:"TEST_IGNORED_POINTER"`
 
@@ -619,8 +615,7 @@ func TestExport(t *testing.T) {
 	tc.NestedPtr = &nestedConfigExportPointer{}
 	tc.NoConfigPtrSet = &noConfig{}
 
-	err := Decode(&tc)
-	if err != nil {
+	if err := Decode(&tc); err != nil {
 		t.Fatal(err)
 	}
 

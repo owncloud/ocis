@@ -215,12 +215,11 @@ func (i *Indexer) FindByPartial(t interface{}, field string, pattern string) ([]
 // Update updates all indexes on a value <from> to a value <to>.
 func (i *Indexer) Update(from, to interface{}) error {
 	typeNameFrom := getTypeFQN(from)
-	typeNameTo := getTypeFQN(to)
 
 	i.mu.Lock(typeNameFrom)
 	defer i.mu.Unlock(typeNameFrom)
 
-	if typeNameFrom != typeNameTo {
+	if typeNameTo := getTypeFQN(to); typeNameFrom != typeNameTo {
 		return fmt.Errorf("update types do not match: from %v to %v", typeNameFrom, typeNameTo)
 	}
 
