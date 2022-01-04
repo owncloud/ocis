@@ -291,6 +291,10 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 									"incoming": true,
 								},
 							},
+							"spaces": map[string]interface{}{
+								"version": "0.0.1",
+								"enabled": true,
+							},
 						},
 						"version": map[string]interface{}{
 							"edition": "reva",
