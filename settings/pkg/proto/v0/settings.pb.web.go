@@ -12,7 +12,7 @@ import (
 	"github.com/go-chi/render"
 	"github.com/golang/protobuf/jsonpb"
 
-	"github.com/golang/protobuf/ptypes/empty"
+	ptypesempty "github.com/golang/protobuf/ptypes/empty"
 )
 
 type webBundleServiceHandler struct {
@@ -25,9 +25,7 @@ func (h *webBundleServiceHandler) ServeHTTP(w http.ResponseWriter, r *http.Reque
 }
 
 func (h *webBundleServiceHandler) SaveBundle(w http.ResponseWriter, r *http.Request) {
-
 	req := &SaveBundleRequest{}
-
 	resp := &SaveBundleResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -49,9 +47,7 @@ func (h *webBundleServiceHandler) SaveBundle(w http.ResponseWriter, r *http.Requ
 }
 
 func (h *webBundleServiceHandler) GetBundle(w http.ResponseWriter, r *http.Request) {
-
 	req := &GetBundleRequest{}
-
 	resp := &GetBundleResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -73,9 +69,7 @@ func (h *webBundleServiceHandler) GetBundle(w http.ResponseWriter, r *http.Reque
 }
 
 func (h *webBundleServiceHandler) ListBundles(w http.ResponseWriter, r *http.Request) {
-
 	req := &ListBundlesRequest{}
-
 	resp := &ListBundlesResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -97,9 +91,7 @@ func (h *webBundleServiceHandler) ListBundles(w http.ResponseWriter, r *http.Req
 }
 
 func (h *webBundleServiceHandler) AddSettingToBundle(w http.ResponseWriter, r *http.Request) {
-
 	req := &AddSettingToBundleRequest{}
-
 	resp := &AddSettingToBundleResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -121,9 +113,8 @@ func (h *webBundleServiceHandler) AddSettingToBundle(w http.ResponseWriter, r *h
 }
 
 func (h *webBundleServiceHandler) RemoveSettingFromBundle(w http.ResponseWriter, r *http.Request) {
-
 	req := &RemoveSettingFromBundleRequest{}
-	resp := &empty.Empty{}
+	resp := &ptypesempty.Empty{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusPreconditionFailed)
@@ -166,9 +157,7 @@ func (h *webValueServiceHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *webValueServiceHandler) SaveValue(w http.ResponseWriter, r *http.Request) {
-
 	req := &SaveValueRequest{}
-
 	resp := &SaveValueResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -190,9 +179,7 @@ func (h *webValueServiceHandler) SaveValue(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *webValueServiceHandler) GetValue(w http.ResponseWriter, r *http.Request) {
-
 	req := &GetValueRequest{}
-
 	resp := &GetValueResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -214,9 +201,7 @@ func (h *webValueServiceHandler) GetValue(w http.ResponseWriter, r *http.Request
 }
 
 func (h *webValueServiceHandler) ListValues(w http.ResponseWriter, r *http.Request) {
-
 	req := &ListValuesRequest{}
-
 	resp := &ListValuesResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -238,9 +223,7 @@ func (h *webValueServiceHandler) ListValues(w http.ResponseWriter, r *http.Reque
 }
 
 func (h *webValueServiceHandler) GetValueByUniqueIdentifiers(w http.ResponseWriter, r *http.Request) {
-
 	req := &GetValueByUniqueIdentifiersRequest{}
-
 	resp := &GetValueResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -283,9 +266,7 @@ func (h *webRoleServiceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 }
 
 func (h *webRoleServiceHandler) ListRoles(w http.ResponseWriter, r *http.Request) {
-
 	req := &ListBundlesRequest{}
-
 	resp := &ListBundlesResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -307,9 +288,7 @@ func (h *webRoleServiceHandler) ListRoles(w http.ResponseWriter, r *http.Request
 }
 
 func (h *webRoleServiceHandler) ListRoleAssignments(w http.ResponseWriter, r *http.Request) {
-
 	req := &ListRoleAssignmentsRequest{}
-
 	resp := &ListRoleAssignmentsResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -331,9 +310,7 @@ func (h *webRoleServiceHandler) ListRoleAssignments(w http.ResponseWriter, r *ht
 }
 
 func (h *webRoleServiceHandler) AssignRoleToUser(w http.ResponseWriter, r *http.Request) {
-
 	req := &AssignRoleToUserRequest{}
-
 	resp := &AssignRoleToUserResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -355,9 +332,8 @@ func (h *webRoleServiceHandler) AssignRoleToUser(w http.ResponseWriter, r *http.
 }
 
 func (h *webRoleServiceHandler) RemoveRoleFromUser(w http.ResponseWriter, r *http.Request) {
-
 	req := &RemoveRoleFromUserRequest{}
-	resp := &empty.Empty{}
+	resp := &ptypesempty.Empty{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusPreconditionFailed)
@@ -399,9 +375,7 @@ func (h *webPermissionServiceHandler) ServeHTTP(w http.ResponseWriter, r *http.R
 }
 
 func (h *webPermissionServiceHandler) ListPermissionsByResource(w http.ResponseWriter, r *http.Request) {
-
 	req := &ListPermissionsByResourceRequest{}
-
 	resp := &ListPermissionsByResourceResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -423,9 +397,7 @@ func (h *webPermissionServiceHandler) ListPermissionsByResource(w http.ResponseW
 }
 
 func (h *webPermissionServiceHandler) GetPermissionByID(w http.ResponseWriter, r *http.Request) {
-
 	req := &GetPermissionByIDRequest{}
-
 	resp := &GetPermissionByIDResponse{}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {

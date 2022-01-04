@@ -71,6 +71,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 					"version":  "1.0.0",
 					"apps_url": cfg.Reva.AppProvider.AppsURL,
 					"open_url": cfg.Reva.AppProvider.OpenURL,
+					"new_url":  cfg.Reva.AppProvider.NewURL,
 				},
 			}
 
@@ -194,6 +195,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 					"public_url":       cfg.Reva.Frontend.PublicURL,
 				},
 				"ocs": map[string]interface{}{
+					"storage_registry_svc":      cfg.Reva.Gateway.Endpoint,
 					"share_prefix":              cfg.Reva.Frontend.OCSSharePrefix,
 					"home_namespace":            cfg.Reva.Frontend.OCSHomeNamespace,
 					"resource_info_cache_ttl":   cfg.Reva.Frontend.OCSResourceInfoCacheTTL,
@@ -289,6 +291,10 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 									"outgoing": true,
 									"incoming": true,
 								},
+							},
+							"spaces": map[string]interface{}{
+								"version": "0.0.1",
+								"enabled": true,
 							},
 						},
 						"version": map[string]interface{}{

@@ -105,7 +105,7 @@ func TestCreateUserModelFromLDAP(t *testing.T) {
 		t.Error("Converting a valid LDAP Entry should succeed")
 	} else {
 		if *user.OnPremisesSamAccountName != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.userName) {
-			t.Errorf("Error creating msGraph User from LDAP Entry: %s != %s", *user.OnPremisesSamAccountName, userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.userName))
+			t.Errorf("Error creating msGraph User from LDAP Entry: %v != %v", user.OnPremisesSamAccountName, pointerOrNil(userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.userName)))
 		}
 		if *user.Mail != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.mail) {
 			t.Errorf("Error creating msGraph User from LDAP Entry: %s != %s", *user.Mail, userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.mail))
@@ -113,8 +113,8 @@ func TestCreateUserModelFromLDAP(t *testing.T) {
 		if *user.DisplayName != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.displayName) {
 			t.Errorf("Error creating msGraph User from LDAP Entry: %s != %s", *user.DisplayName, userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.displayName))
 		}
-		if *user.ID != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id) {
-			t.Errorf("Error creating msGraph User from LDAP Entry: %s != %s", *user.ID, userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id))
+		if *user.Id != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id) {
+			t.Errorf("Error creating msGraph User from LDAP Entry: %s != %s", *user.Id, userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id))
 		}
 	}
 }
@@ -150,7 +150,7 @@ func TestGetUser(t *testing.T) {
 	u, err := b.GetUser(context.Background(), "user")
 	if err != nil {
 		t.Errorf("Expected GetUser to succeed. Got %s", err.Error())
-	} else if *u.ID != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id) {
+	} else if *u.Id != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id) {
 		t.Errorf("Expected GetUser to return a valid user")
 	}
 }
@@ -208,7 +208,7 @@ func TestGetGroup(t *testing.T) {
 	g, err := b.GetGroup(context.Background(), "group")
 	if err != nil {
 		t.Errorf("Expected GetGroup to succeed. Got %s", err.Error())
-	} else if *g.ID != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id) {
+	} else if *g.Id != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id) {
 		t.Errorf("Expected GetGroup to return a valid group")
 	}
 }

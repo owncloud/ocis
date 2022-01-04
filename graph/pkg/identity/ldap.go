@@ -6,7 +6,7 @@ import (
 	"net/url"
 
 	"github.com/go-ldap/ldap/v3"
-	msgraph "github.com/yaegashi/msgraph.go/beta"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/owncloud/ocis/graph/pkg/config"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
@@ -84,7 +84,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 	}, nil
 }
 
-func (i *LDAP) GetUser(ctx context.Context, userID string) (*msgraph.User, error) {
+func (i *LDAP) GetUser(ctx context.Context, userID string) (*libregraph.User, error) {
 	i.logger.Debug().Str("backend", "ldap").Msg("GetUser")
 	userID = ldap.EscapeFilter(userID)
 	searchRequest := ldap.NewSearchRequest(
@@ -118,7 +118,7 @@ func (i *LDAP) GetUser(ctx context.Context, userID string) (*msgraph.User, error
 	return i.createUserModelFromLDAP(res.Entries[0]), nil
 }
 
-func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*msgraph.User, error) {
+func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error) {
 	i.logger.Debug().Str("backend", "ldap").Msg("GetUsers")
 
 	search := queryParam.Get("search")
@@ -153,7 +153,7 @@ func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*msgraph.
 		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
 	}
 
-	users := make([]*msgraph.User, 0, len(res.Entries))
+	users := make([]*libregraph.User, 0, len(res.Entries))
 
 	for _, e := range res.Entries {
 		users = append(users, i.createUserModelFromLDAP(e))
@@ -161,7 +161,7 @@ func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*msgraph.
 	return users, nil
 }
 
-func (i *LDAP) GetGroup(ctx context.Context, groupID string) (*msgraph.Group, error) {
+func (i *LDAP) GetGroup(ctx context.Context, groupID string) (*libregraph.Group, error) {
 	i.logger.Debug().Str("backend", "ldap").Msg("GetGroup")
 	groupID = ldap.EscapeFilter(groupID)
 	searchRequest := ldap.NewSearchRequest(
@@ -193,7 +193,7 @@ func (i *LDAP) GetGroup(ctx context.Context, groupID string) (*msgraph.Group, er
 	return i.createGroupModelFromLDAP(res.Entries[0]), nil
 }
 
-func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*msgraph.Group, error) {
+func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error) {
 	i.logger.Debug().Str("backend", "ldap").Msg("GetGroups")
 
 	search := queryParam.Get("search")
@@ -225,7 +225,7 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*msgraph
 		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
 	}
 
-	groups := make([]*msgraph.Group, 0, len(res.Entries))
+	groups := make([]*libregraph.Group, 0, len(res.Entries))
 
 	for _, e := range res.Entries {
 		groups = append(groups, i.createGroupModelFromLDAP(e))
@@ -233,31 +233,23 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*msgraph
 	return groups, nil
 }
 
-func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *msgraph.User {
+func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 	if e == nil {
 		return nil
 	}
-	return &msgraph.User{
+	return &libregraph.User{
 		DisplayName:              pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName)),
 		Mail:                     pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.mail)),
 		OnPremisesSamAccountName: pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.userName)),
-		DirectoryObject: msgraph.DirectoryObject{
-			Entity: msgraph.Entity{
-				ID: pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.id)),
-			},
-		},
+		Id:                       pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.id)),
 	}
 }
 
-func (i *LDAP) createGroupModelFromLDAP(e *ldap.Entry) *msgraph.Group {
-	return &msgraph.Group{
+func (i *LDAP) createGroupModelFromLDAP(e *ldap.Entry) *libregraph.Group {
+	return &libregraph.Group{
 		DisplayName:              pointerOrNil(e.GetEqualFoldAttributeValue(i.groupAttributeMap.name)),
 		OnPremisesSamAccountName: pointerOrNil(e.GetEqualFoldAttributeValue(i.groupAttributeMap.name)),
-		DirectoryObject: msgraph.DirectoryObject{
-			Entity: msgraph.Entity{
-				ID: pointerOrNil(e.GetEqualFoldAttributeValue(i.groupAttributeMap.id)),
-			},
-		},
+		Id:                       pointerOrNil(e.GetEqualFoldAttributeValue(i.groupAttributeMap.id)),
 	}
 }
 func pointerOrNil(val string) *string {

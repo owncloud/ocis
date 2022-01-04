@@ -1,0 +1,10 @@
+# This LDIF files describes the ownCloud schema and can be used to
+# add two optional attributes: ownCloudQuota and ownCloudUUID
+# The ownCloudUUID is used to store a unique, non-reassignable, persistent identifier for users and groups
+dn: cn=owncloud,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: owncloud
+olcAttributeTypes: ( 1.3.6.1.4.1.39430.1.1.1 NAME 'ownCloudQuota' DESC 'User Quota (e.g. 2 GB)' EQUALITY caseExactMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.39430.1.1.2 NAME 'ownCloudUUID' DESC 'A non-reassignable and persistent account ID)' EQUALITY uuidMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.1.16.1 SINGLE-VALUE )
+olcAttributeTypes: ( 1.3.6.1.4.1.39430.1.1.3 NAME 'ownCloudSelector' DESC 'A selector attribute for a route in the ownCloud Infinte Scale proxy)' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcObjectClasses: ( 1.3.6.1.4.1.39430.1.2.1 NAME 'ownCloud' DESC 'ownCloud LDAP Schema' AUXILIARY MAY ( ownCloudQuota $ ownCloudUUID $ ownCloudSelector ) )

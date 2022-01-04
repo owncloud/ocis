@@ -39,6 +39,7 @@ default:
         - ChecksumContext:
         - FavoritesContext:
         - FilesVersionsContext:
+        - OCSContext:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:

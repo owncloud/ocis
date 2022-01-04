@@ -42,6 +42,16 @@ class SpacesContext implements Context {
 	private FeatureContext $featureContext;
 
 	/**
+	 * @var OCSContext
+	 */
+	private OCSContext $ocsContext;
+
+	/**
+	 * @var string
+	 */
+	private string $baseUrl;
+
+	/**
 	 * @var array key is space name and value is the username that created the space
 	 */
 	private array $createdSpaces;
@@ -209,10 +219,14 @@ class SpacesContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
 		$this->featureContext = $environment->getContext('FeatureContext');
+		$this->ocsContext = $environment->getContext('OCSContext');
+		// Run the BeforeScenario function in OCSContext to set it up correctly
+		$this->ocsContext->before($scope);
+		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");
 		SetupHelper::init(
 			$this->featureContext->getAdminUsername(),
 			$this->featureContext->getAdminPassword(),
-			$this->featureContext->getBaseUrl(),
+			$this->baseUrl,
 			$this->featureContext->getOcPath()
 		);
 	}
@@ -220,7 +234,6 @@ class SpacesContext implements Context {
 	/**
 	 * Send Graph List Spaces Request
 	 *
-	 * @param  string $baseUrl
 	 * @param  string $user
 	 * @param  string $password
 	 * @param  string $urlArguments
@@ -233,19 +246,14 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function listSpacesRequest(
-		string $baseUrl,
 		string $user,
 		string $password,
-		string $urlArguments,
+		string $urlArguments = '',
 		string $xRequestId = '',
 		array  $body = [],
 		array  $headers = []
 	): ResponseInterface {
-		$fullUrl = $baseUrl;
-		if (!str_ends_with($fullUrl, '/')) {
-			$fullUrl .= '/';
-		}
-		$fullUrl .= "graph/v1.0/me/drives/" . $urlArguments;
+		$fullUrl = $this->baseUrl . "/graph/v1.0/me/drives/" . $urlArguments;
 
 		return HttpRequestHelper::get($fullUrl, $xRequestId, $user, $password, $headers, $body);
 	}
@@ -253,7 +261,6 @@ class SpacesContext implements Context {
 	/**
 	 * Send Graph Create Space Request
 	 *
-	 * @param  string $baseUrl
 	 * @param  string $user
 	 * @param  string $password
 	 * @param  string $body
@@ -265,18 +272,13 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function sendCreateSpaceRequest(
-		string $baseUrl,
 		string $user,
 		string $password,
 		string $body,
 		string $xRequestId = '',
 		array $headers = []
 	): ResponseInterface {
-		$fullUrl = $baseUrl;
-		if (!str_ends_with($fullUrl, '/')) {
-			$fullUrl .= '/';
-		}
-		$fullUrl .= "graph/v1.0/drives/";
+		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/";
 
 		return HttpRequestHelper::post($fullUrl, $xRequestId, $user, $password, $headers, $body);
 	}
@@ -341,11 +343,8 @@ class SpacesContext implements Context {
 	public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user): void {
 		$this->featureContext->setResponse(
 			$this->listSpacesRequest(
-				$this->featureContext->getBaseUrl(),
 				$user,
-				$this->featureContext->getPasswordForUser($user),
-				"",
-				""
+				$this->featureContext->getPasswordForUser($user)
 			)
 		);
 		$this->rememberTheAvailableSpaces();
@@ -372,11 +371,9 @@ class SpacesContext implements Context {
 		$body = json_encode($space, JSON_THROW_ON_ERROR);
 		$this->featureContext->setResponse(
 			$this->sendCreateSpaceRequest(
-				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$body,
-				""
+				$body
 			)
 		);
 		$this->setSpaceCreator($spaceName, $user);
@@ -405,11 +402,9 @@ class SpacesContext implements Context {
 		$body = json_encode($space);
 		$this->featureContext->setResponse(
 			$this->sendCreateSpaceRequest(
-				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$body,
-				""
+				$body
 			)
 		);
 		$this->setSpaceCreator($spaceName, $user);
@@ -434,12 +429,8 @@ class SpacesContext implements Context {
 		$accounts = [];
 		$assignment = [];
 
-		$baseUrl = $this->featureContext->getBaseUrl();
-		if (!str_ends_with($baseUrl, '/')) {
-			$baseUrl .= '/';
-		}
 		// get the roles list first
-		$fullUrl = $baseUrl . "api/v0/settings/roles-list";
+		$fullUrl = $this->baseUrl . "/api/v0/settings/roles-list";
 		$this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, "{}"));
 		if ($this->featureContext->getResponse()) {
 			$rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
@@ -457,7 +448,7 @@ class SpacesContext implements Context {
 		Assert::assertNotEmpty($roleToAssign, "The selected role $role could not be found");
 
 		// get the accounts list first
-		$fullUrl = $baseUrl . "api/v0/accounts/accounts-list";
+		$fullUrl = $this->baseUrl . "/api/v0/accounts/accounts-list";
 		$this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, "{}"));
 		if ($this->featureContext->getResponse()) {
 			$rawBody = $this->featureContext->getResponse()->getBody()->getContents();
@@ -475,7 +466,7 @@ class SpacesContext implements Context {
 		Assert::assertNotEmpty($accountToChange, "The selected account $user does not exist");
 
 		// set the new role
-		$fullUrl = $baseUrl . "api/v0/settings/assignments-add";
+		$fullUrl = $this->baseUrl . "/api/v0/settings/assignments-add";
 		$body = json_encode(["account_uuid" => $accountToChange["id"], "role_id" => $roleToAssign["id"]], JSON_THROW_ON_ERROR);
 
 		$this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, $body));
@@ -559,7 +550,7 @@ class SpacesContext implements Context {
 	public function thePropfindResultShouldContainEntries(
 		string $shouldOrNot,
 		TableNode $expectedFiles
-	):void {
+	): void {
 		$this->propfindResultShouldContainEntries(
 			$shouldOrNot,
 			$expectedFiles,
@@ -581,7 +572,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $shouldOrNot,
 		TableNode $expectedFiles
-	):void {
+	): void {
 		$this->theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
 			$this->getSpaceCreator($spaceName),
 			$spaceName
@@ -609,7 +600,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $shouldOrNot,
 		TableNode $expectedFiles
-	):void {
+	): void {
 		$this->theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
 			$user,
 			$spaceName
@@ -665,6 +656,20 @@ class SpacesContext implements Context {
 			// set the spaceArray to the point before traversing
 			$spaceAsArray = $original;
 		}
+	}
+
+	/**
+	 * @Then /^the json responded should not contain a space "([^"]*)"$/
+	 *
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function jsonRespondedShouldNotContain(
+		string $spaceName
+	): void {
+		Assert::assertEmpty($this->getSpaceByNameFromResponse($spaceName), "space $spaceName should not be available for a user");
 	}
 
 	/**
@@ -801,21 +806,30 @@ class SpacesContext implements Context {
 		string $folder,
 		string $spaceName
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
+        $this->theUserCreatesAFolderToAnotherOwnerSpaceUsingTheGraphApi($user, $folder, $spaceName);
+	}
 
-		$baseUrl = $this->featureContext->getBaseUrl();
-		if (!str_ends_with($baseUrl, '/')) {
-			$baseUrl .= '/';
-		}
-		$fullUrl = $baseUrl . "dav/spaces/" . $space['id'] . '/' . $folder;
+	/**
+	 * @Given /^user "([^"]*)" has created a folder "([^"]*)" in space "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $folder
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 */
+	public function theUserHasCreateAFolderUsingTheGraphApi(
+		string $user,
+		string $folder,
+		string $spaceName
+	): void {
+		$this->theUserCreatesAFolderUsingTheGraphApi($user, $folder, $spaceName);
 
-		$this->featureContext->setResponse(
-			$this->sendCreateFolderRequest(
-				$fullUrl,
-				"MKCOL",
-				$user,
-				$this->featureContext->getPasswordForUser($user)
-			)
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			"Expected response status code should be 201"
 		);
 	}
 
@@ -835,15 +849,15 @@ class SpacesContext implements Context {
 		string $user,
 		string $folder,
 		string $spaceName,
-		string $ownerUser
+		string $ownerUser = ''
 	): void {
+		if ($ownerUser === '') {
+			$ownerUser = $user;
+		}
+
 		$space = $this->getSpaceByName($ownerUser, $spaceName);
 
-		$baseUrl = $this->featureContext->getBaseUrl();
-		if (!str_ends_with($baseUrl, '/')) {
-			$baseUrl .= '/';
-		}
-		$fullUrl = $baseUrl . "dav/spaces/" . $space['id'] . '/' . $folder;
+		$fullUrl = $this->baseUrl . "/dav/spaces/" . $space['id'] . '/' . $folder;
 
 		$this->featureContext->setResponse(
 			$this->sendCreateFolderRequest(
@@ -974,7 +988,6 @@ class SpacesContext implements Context {
 
 		$this->featureContext->setResponse(
 			$this->sendUpdateSpaceRequest(
-				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$body,
@@ -1007,7 +1020,6 @@ class SpacesContext implements Context {
 
 		$this->featureContext->setResponse(
 			$this->sendUpdateSpaceRequest(
-				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$body,
@@ -1019,7 +1031,6 @@ class SpacesContext implements Context {
 	/**
 	 * Send Graph Update Space Request
 	 *
-	 * @param  string $baseUrl
 	 * @param  string $user
 	 * @param  string $password
 	 * @param  mixed $body
@@ -1032,7 +1043,6 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function sendUpdateSpaceRequest(
-		string $baseUrl,
 		string $user,
 		string $password,
 		$body,
@@ -1040,11 +1050,7 @@ class SpacesContext implements Context {
 		string $xRequestId = '',
 		array $headers = []
 	): ResponseInterface {
-		$fullUrl = $baseUrl;
-		if (!str_ends_with($fullUrl, '/')) {
-			$fullUrl .= '/';
-		}
-		$fullUrl .= "graph/v1.0/drives/$spaceId";
+		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/$spaceId";
 		$method = 'PATCH';
 
 		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers, $body);
@@ -1060,16 +1066,19 @@ class SpacesContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userHasCreatedSpace(string $user, string $spaceName, string $spaceType, int $quota):void {
+	public function userHasCreatedSpace(
+		string $user,
+		string $spaceName,
+		string $spaceType,
+		int $quota
+	): void {
 		$space = ["Name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
 		$body = json_encode($space);
 		$this->featureContext->setResponse(
 			$this->sendCreateSpaceRequest(
-				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$body,
-				""
+				$body
 			)
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
@@ -1088,7 +1097,12 @@ class SpacesContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userHasUploadedFile(string $user, string $spaceName, string $fileContent, string $destination):void {
+	public function userHasUploadedFile(
+		string $user,
+		string $spaceName,
+		string $fileContent,
+		string $destination
+	): void {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
 
 		$space = $this->getSpaceByName($user, $spaceName);
@@ -1107,5 +1121,84 @@ class SpacesContext implements Context {
 		);
 
 		$this->featureContext->theHTTPStatusCodeShouldBeOr(201, 204);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" shares a space "([^"]*)" to user "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param  string $userRecipient
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function sendShareSpaceRequest(
+		string $user,
+		string $spaceName,
+		string $userRecipient
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$body = ["space_ref" => $space['id'], "shareType" => 7, "shareWith" => $userRecipient];
+
+		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares";
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::post(
+				$fullUrl,
+				"",
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				$body
+			)
+		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has shared a space "([^"]*)" to user "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param  string $userRecipient
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasSharedSpace(
+		string $user,
+		string $spaceName,
+		string $userRecipient
+	): void {
+		$this->sendShareSpaceRequest($user, $spaceName, $userRecipient);
+
+		$expectedHTTPStatus = "200";
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+            $expectedHTTPStatus,
+			"Expected response status code should be $expectedHTTPStatus"
+		);
+        $expectedOCSStatus = "200";
+		$this->ocsContext->theOCSStatusCodeShouldBe($expectedOCSStatus, "Expected OCS response status code $expectedOCSStatus");
+	}
+
+	/**
+	 * @When /^user "([^"]*)" unshares a space "([^"]*)" to user "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param  string $userRecipient
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function sendUnshareSpaceRequest(
+		string $user,
+		string $spaceName,
+		string $userRecipient
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares/" . $space['id'] . "?shareWith=" . $userRecipient;
+
+		HttpRequestHelper::delete($fullUrl, "", $user, $this->featureContext->getPasswordForUser($user));
 	}
 }

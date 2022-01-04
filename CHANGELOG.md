@@ -6,13 +6,36 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Add `ocis storage-auth-machine` subcommand: [#2910](https://github.com/owncloud/ocis/pull/2910)
+* Bugfix - Fix configuration for space membership endpoint: [#2893](https://github.com/owncloud/ocis/pull/2893)
+* Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 * Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
 * Change - Return not found when updating non existent space: [#2869](https://github.com/cs3org/reva/pull/2869)
 * Enhancement - Add new file url of the app provider to the ocs capabilities: [#2884](https://github.com/owncloud/ocis/pull/2884)
+* Enhancement - Add spaces capability: [#2931](https://github.com/owncloud/ocis/pull/2931)
 * Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
 * Enhancement - Update REVA to xxx: [#2878](https://github.com/owncloud/ocis/pull/2878)
+* Enhancement - Update ownCloud Web to v4.8.0: [#2895](https://github.com/owncloud/ocis/pull/2895)
 
 ## Details
+
+* Bugfix - Add `ocis storage-auth-machine` subcommand: [#2910](https://github.com/owncloud/ocis/pull/2910)
+
+   We added the ocis subcommand to start the machine auth provider.
+
+   https://github.com/owncloud/ocis/pull/2910
+
+* Bugfix - Fix configuration for space membership endpoint: [#2893](https://github.com/owncloud/ocis/pull/2893)
+
+   Added a missing config value to the ocs config related to the space membership endpoint.
+
+   https://github.com/owncloud/ocis/pull/2893
+
+* Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
+
+   GraphApi has been updated to version 0.4.1 and the existing dependency was removed
+
+   https://github.com/owncloud/ocis/pull/2885
 
 * Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
 
@@ -32,8 +55,16 @@ The following sections list the changes for unreleased.
    can discover this url analogous to the app list and file open urls.
 
    https://github.com/owncloud/ocis/pull/2884
+   https://github.com/owncloud/ocis/pull/2907
    https://github.com/cs3org/reva/pull/2379
    https://github.com/owncloud/web/pull/5890#issuecomment-993905242
+
+* Enhancement - Add spaces capability: [#2931](https://github.com/owncloud/ocis/pull/2931)
+
+   We've added the spaces capability with version 0.0.1 and enabled set to true.
+
+   https://github.com/owncloud/ocis/pull/2931
+   https://github.com/cs3org/reva/pull/2015
 
 * Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
 
@@ -48,6 +79,17 @@ The following sections list the changes for unreleased.
   * TODO: update changelog before oCIS release
 
    https://github.com/owncloud/ocis/pull/2878
+   https://github.com/owncloud/ocis/pull/2901
+
+* Enhancement - Update ownCloud Web to v4.8.0: [#2895](https://github.com/owncloud/ocis/pull/2895)
+
+   Tags: web
+
+   We updated ownCloud Web to v4.8.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/2895
+   https://github.com/owncloud/web/releases/tag/v4.8.0
 # Changelog for [1.16.0] (2021-12-10)
 
 The following sections list the changes for 1.16.0.
