@@ -21,7 +21,7 @@
       <oc-button :id="`accounts-roles-select-trigger-${account.id}`" class="accounts-roles-select-trigger" appearance="outline">
         <span class="uk-flex uk-flex-middle accounts-roles-current-role">
           {{ currentRole ? currentRole.displayName : $gettext('Select role') }}
-          <oc-icon name="expand_more" aria-hidden="true" />
+          <oc-icon name="arrow-down-s" aria-hidden="true" />
         </span>
       </oc-button>
       <oc-drop
@@ -48,14 +48,14 @@
       <oc-icon
         v-if="account.accountEnabled"
         key="account-icon-enabled"
-        name="ready"
+        name="user-follow"
         variation="success"
         :aria-label="$gettext('Account is activated')"
         class="accounts-status-indicator-enabled"
       />
       <oc-icon
         v-else
-        name="deprecated"
+        name="user-unfollow"
         key="account-icon-disabled"
         variation="danger"
         :aria-label="$gettext('Account is blocked')"

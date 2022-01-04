@@ -80,6 +80,6 @@
     "xml-js": "^1.6.11"
   },
   "peerDependencies": {
-    "owncloud-design-system": "^11.0.0"
+    "owncloud-design-system": "12.0.0-alpha7"
   }
 }

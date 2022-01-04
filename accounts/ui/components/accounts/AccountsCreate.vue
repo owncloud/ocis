@@ -65,7 +65,7 @@
           gap-size="small"
           @click="setFormInProgress(true)"
         >
-          <oc-icon name="add" />
+          <oc-icon name="user-add" />
           <translate>Create new account</translate>
         </oc-button>
       </div>

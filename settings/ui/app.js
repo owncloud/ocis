@@ -11,7 +11,7 @@ function $gettext (msg) {
 const appInfo = {
   name: $gettext('Settings'),
   id: 'settings',
-  icon: 'application',
+  icon: 'settings-4',
   isFileEditor: false,
   extensions: []
 }
