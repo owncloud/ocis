@@ -18,7 +18,7 @@ require (
 	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v4 v4.0.0-20211028090348-ed690ed838cc
 	github.com/blevesearch/bleve/v2 v2.2.2
 	github.com/coreos/go-oidc/v3 v3.1.0
-	github.com/cs3org/go-cs3apis v0.0.0-20211104090126-8e972dca8304
+	github.com/cs3org/go-cs3apis v0.0.0-20211213090556-12c0d565f51d
 	github.com/cs3org/reva v1.17.1-0.20211215132908-5cde0187454b
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
@@ -78,6 +78,7 @@ require (
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.4.0 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20200615164410-66371956d46c // indirect
+	github.com/BurntSushi/toml v0.4.1 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
@@ -242,4 +243,5 @@ require (
 
 //replace github.com/cs3org/reva => github.com/cs3org/reva v1.16.1-0.20211208164450-3abd76eecf8b
 //replace github.com/cs3org/reva => ../reva
-replace github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20211215162350-743e7a39805b
+
+replace github.com/cs3org/reva => github.com/butonic/reva v0.0.0-20220104162327-7cb3906d2729
