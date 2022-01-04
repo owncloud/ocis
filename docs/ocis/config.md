@@ -19,7 +19,7 @@ In order to simplify deployments and development the configuration model from oC
 
 ## In-depth configuration
 
-Since we include a set of predefined extensions within the single binary, configuring an extension can be done in a variety of ways. Since we work with complex types, having as many cli per config value scales poorly, so we limited the options to config files and environment variables, leaving cli flags for common values, such as logging (`--log-level`, `--log-pretty`, `--log-file` or `--log-color`).
+Since we include a set of predefined extensions within the single binary, configuring an extension can be done in a variety of ways. Since we work with complex types, having as many cli per config value scales poorly, so we limited the options to config files and environment variables.
 
 The hierarchy is clear enough, leaving us with:
 
