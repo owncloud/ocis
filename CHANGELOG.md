@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
 * Change - Return not found when updating non existent space: [#2869](https://github.com/cs3org/reva/pull/2869)
 * Enhancement - Add new file url of the app provider to the ocs capabilities: [#2884](https://github.com/owncloud/ocis/pull/2884)
+* Enhancement - Add spaces capability: [#2931](https://github.com/owncloud/ocis/pull/2931)
 * Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
 * Enhancement - Update REVA to xxx: [#2878](https://github.com/owncloud/ocis/pull/2878)
 * Enhancement - Update ownCloud Web to v4.8.0: [#2895](https://github.com/owncloud/ocis/pull/2895)
@@ -57,6 +58,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/2907
    https://github.com/cs3org/reva/pull/2379
    https://github.com/owncloud/web/pull/5890#issuecomment-993905242
+
+* Enhancement - Add spaces capability: [#2931](https://github.com/owncloud/ocis/pull/2931)
+
+   We've added the spaces capability with version 0.0.1 and enabled set to true.
+
+   https://github.com/owncloud/ocis/pull/2931
+   https://github.com/cs3org/reva/pull/2015
 
 * Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
 
