@@ -162,8 +162,13 @@ func (c ConnWithReconnect) ExternalBind() error {
 	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
 
-func (c ConnWithReconnect) Add(*ldap.AddRequest) error {
-	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+func (c ConnWithReconnect) Add(a *ldap.AddRequest) error {
+	conn, err := c.GetConnection()
+	if err != nil {
+		return err
+	}
+
+	return conn.Add(a)
 }
 
 func (c ConnWithReconnect) Del(*ldap.DelRequest) error {

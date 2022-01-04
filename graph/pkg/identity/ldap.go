@@ -84,6 +84,95 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 	}, nil
 }
 
+// CreateUser implements the Backend Interface. It converts the libregraph.User into an
+// LDAP User Entry (using the inetOrgPerson LDAP Objectclass) add adds that to the
+// configured LDAP server
+func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregraph.User, error) {
+
+	ar := ldap.AddRequest{
+		DN: fmt.Sprintf("uid=%s,%s", *user.OnPremisesSamAccountName, i.userBaseDN),
+		Attributes: []ldap.Attribute{
+			{
+				Type: "objectClass",
+				Vals: []string{"inetOrgPerson", "organizationalPerson", "person", "top"},
+			},
+			// inetOrgPerson requires "cn"
+			{
+				Type: "cn",
+				Vals: []string{*user.OnPremisesSamAccountName},
+			},
+			{
+				Type: i.userAttributeMap.mail,
+				Vals: []string{*user.Mail},
+			},
+			{
+				Type: i.userAttributeMap.userName,
+				Vals: []string{*user.OnPremisesSamAccountName},
+			},
+			{
+				Type: i.userAttributeMap.displayName,
+				Vals: []string{*user.DisplayName},
+			},
+		},
+	}
+
+	if user.PasswordProfile != nil && user.PasswordProfile.Password != nil {
+		// TODO? This relies to the LDAP server to properly hash the password.
+		// We might want to add support for the Password Modify LDAP Extended
+		// Operation for servers that implement it. (Or implement client-side
+		// hashing here.
+		ar.Attribute("userPassword", []string{*user.PasswordProfile.Password})
+	}
+
+	// inetOrgPerson requires "sn" to be set. Set it to the Username if
+	// Surname is not set in the Request
+	var sn string
+	if user.Surname != nil && *user.Surname != "" {
+		sn = *user.Surname
+	} else {
+		sn = *user.OnPremisesSamAccountName
+	}
+	ar.Attribute("sn", []string{sn})
+
+	if err := i.conn.Add(&ar); err != nil {
+		return nil, err
+	}
+
+	// Read	back user from LDAP to get the generated UUID
+	e, err := i.getUserByDN(ar.DN)
+	if err != nil {
+		return nil, err
+	}
+	return i.createUserModelFromLDAP(e), nil
+}
+
+func (i *LDAP) getUserByDN(dn string) (*ldap.Entry, error) {
+	searchRequest := ldap.NewSearchRequest(
+		dn, ldap.ScopeBaseObject, ldap.NeverDerefAliases, 1, 0, false,
+		"(objectclass=*)",
+		[]string{
+			i.userAttributeMap.displayName,
+			i.userAttributeMap.id,
+			i.userAttributeMap.mail,
+			i.userAttributeMap.userName,
+		},
+		nil,
+	)
+
+	i.logger.Debug().Str("backend", "ldap").Str("dn", dn).Msg("Search user by DN")
+	res, err := i.conn.Search(searchRequest)
+
+	if err != nil {
+		i.logger.Error().Err(err).Str("backend", "ldap").Str("dn", dn).Msg("Search user by DN failed")
+		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
+	}
+	if len(res.Entries) == 0 {
+		return nil, errorcode.New(errorcode.ItemNotFound, "not found")
+	}
+
+	return res.Entries[0], nil
+}
+
 func (i *LDAP) GetUser(ctx context.Context, userID string) (*libregraph.User, error) {
 	i.logger.Debug().Str("backend", "ldap").Msg("GetUser")
 	userID = ldap.EscapeFilter(userID)
@@ -106,7 +195,8 @@ func (i *LDAP) GetUser(ctx context.Context, userID string) (*libregraph.User, er
 		if lerr, ok := err.(*ldap.Error); ok {
 			if lerr.ResultCode == ldap.LDAPResultSizeLimitExceeded {
 				errmsg = fmt.Sprintf("too many results searching for user '%s'", userID)
-				i.logger.Debug().Str("backend", "ldap").Err(lerr).Msg(errmsg)
+				i.logger.Debug().Str("backend", "ldap").Err(lerr).
+					Str("user", userID).Msg("too many results searching for user")
 			}
 		}
 		return nil, errorcode.New(errorcode.ItemNotFound, errmsg)

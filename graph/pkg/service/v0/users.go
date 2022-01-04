@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/url"
@@ -8,9 +9,9 @@ import (
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/graph/pkg/identity"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
-	//msgraph "github.com/owncloud/open-graph-api-go" // FIXME needs OnPremisesSamAccountName, OnPremisesDomainName and AdditionalData
 )
 
 // GetMe implements the Service interface.
@@ -32,7 +33,6 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetUsers implements the Service interface.
-// TODO use cs3 api to look up user
 func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := g.identityBackend.GetUsers(r.Context(), r.URL.Query())
 	if err != nil {
@@ -45,6 +45,28 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &listResponse{Value: users})
+}
+
+func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
+	u := libregraph.NewUser()
+	err := json.NewDecoder(r.Body).Decode(u)
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if isNilOrEmpty(u.DisplayName) || isNilOrEmpty(u.OnPremisesSamAccountName) || isNilOrEmpty(u.Mail) {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Missing Required Attribute")
+		return
+	}
+
+	if u, err = g.identityBackend.CreateUser(r.Context(), *u); err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, u)
 }
 
 // GetUser implements the Service interface.
@@ -73,4 +95,8 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, user)
+}
+
+func isNilOrEmpty(s *string) bool {
+	return s == nil || *s == ""
 }

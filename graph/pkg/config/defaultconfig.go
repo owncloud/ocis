@@ -33,13 +33,13 @@ func DefaultConfig() *Config {
 				BindPassword:             "",
 				UserBaseDN:               "ou=users,dc=ocis,dc=test",
 				UserSearchScope:          "sub",
-				UserFilter:               "(objectClass=posixaccount)",
+				UserFilter:               "(objectClass=inetOrgPerson)",
 				UserEmailAttribute:       "mail",
 				UserDisplayNameAttribute: "displayName",
 				UserNameAttribute:        "uid",
 				// FIXME: switch this to some more widely available attribute by default
 				//        ideally this needs to	be constant for the lifetime of a users
-				UserIDAttribute:    "ownclouduuid",
+				UserIDAttribute:    "entryUUID",
 				GroupBaseDN:        "ou=groups,dc=ocis,dc=test",
 				GroupSearchScope:   "sub",
 				GroupFilter:        "(objectclass=groupOfNames)",

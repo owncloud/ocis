@@ -67,6 +67,7 @@ func NewService(opts ...Option) Service {
 			})
 			r.Route("/users", func(r chi.Router) {
 				r.Get("/", svc.GetUsers)
+				r.Post("/", svc.PostUser)
 				r.Route("/{userID}", func(r chi.Router) {
 					r.Get("/", svc.GetUser)
 				})
