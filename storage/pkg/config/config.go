@@ -587,7 +587,7 @@ func DefaultConfig() *Config {
 			},
 			OCDav: OCDav{
 				WebdavNamespace:   "/users/{{.Id.OpaqueId}}",
-				DavFilesNamespace: "/users",
+				DavFilesNamespace: "/users/{{.Id.OpaqueId}}",
 			},
 			Archiver: Archiver{
 				MaxNumFiles: 10000,
