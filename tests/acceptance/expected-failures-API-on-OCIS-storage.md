@@ -27,7 +27,13 @@ _ocdav: double check the webdav property parsing when custom namespaces are used
 -    [apiVersions/fileVersionsSharingToShares.feature:305](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L305)
 
 #### [file versions do not report the version author](https://github.com/owncloud/ocis/issues/2914)
--    [apiVersions/fileVersions.feature:474](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L474)
+-    [apiVersions/fileVersionAuthor.feature:14](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature:#L14)
+-    [apiVersions/fileVersionAuthor.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature:#L36)
+-    [apiVersions/fileVersionAuthor.feature:56](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature:#L56)
+-    [apiVersions/fileVersionAuthor.feature:75](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature:#L75)
+-    [apiVersions/fileVersionAuthor.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature:#L101)
+-    [apiVersions/fileVersionAuthor.feature:128](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature:#L128)
+-    [apiVersions/fileVersionAuthor.feature:155](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature:#L155)
 
 ### Sync
 Synchronization features like etag propagation, setting mtime and locking files
