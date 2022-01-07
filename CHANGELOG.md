@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Add `ocis storage-auth-machine` subcommand: [#2910](https://github.com/owncloud/ocis/pull/2910)
 * Bugfix - Fix configuration for space membership endpoint: [#2893](https://github.com/owncloud/ocis/pull/2893)
+* Change - Unify configuration and commands: [#2818](https://github.com/owncloud/ocis/pull/2818)
 * Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 * Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
 * Change - Return not found when updating non existent space: [#2869](https://github.com/cs3org/reva/pull/2869)
@@ -30,6 +31,14 @@ The following sections list the changes for unreleased.
    Added a missing config value to the ocs config related to the space membership endpoint.
 
    https://github.com/owncloud/ocis/pull/2893
+
+* Change - Unify configuration and commands: [#2818](https://github.com/owncloud/ocis/pull/2818)
+
+   We've unified the configuration and commands of all non storage services. This also includes
+   the change, that environment variables are now defined on the config struct as tags instead in a
+   separate mapping.
+
+   https://github.com/owncloud/ocis/pull/2818
 
 * Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 
