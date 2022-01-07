@@ -3,11 +3,17 @@ package svc
 import (
 	"encoding/xml"
 	"net/http"
-	"path"
+	"path/filepath"
 	"strings"
 
+	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/pkg/storage/utils/templates"
 	"github.com/go-chi/render"
 	merrors "go-micro.dev/v4/errors"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
@@ -38,17 +44,24 @@ type Service interface {
 }
 
 // NewService returns a service implementation for Service.
-func NewService(opts ...Option) Service {
+func NewService(opts ...Option) (Service, error) {
 	options := newOptions(opts...)
+	conf := options.Config
 
 	m := chi.NewMux()
 	m.Use(options.Middleware...)
 
+	gwc, err := pool.GetGatewayServiceClient(conf.RevaGateway)
+	if err != nil {
+		return nil, err
+	}
+
 	svc := Webdav{
-		config:           options.Config,
+		config:           conf,
 		log:              options.Logger,
 		mux:              m,
 		thumbnailsClient: thumbnails.NewThumbnailService("com.owncloud.api.thumbnails", grpc.DefaultClient),
+		revaClient:       gwc,
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
@@ -57,7 +70,7 @@ func NewService(opts ...Option) Service {
 		r.Head("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnailHead)
 	})
 
-	return svc
+	return svc, nil
 }
 
 // Webdav defines implements the business logic for Service.
@@ -66,6 +79,7 @@ type Webdav struct {
 	log              log.Logger
 	mux              *chi.Mux
 	thumbnailsClient thumbnails.ThumbnailService
+	revaClient       gatewayv1beta1.GatewayAPIClient
 }
 
 // ServeHTTP implements the Service interface.
@@ -83,6 +97,18 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	t := r.Header.Get(TokenHeader)
+	ctx := metadata.AppendToOutgoingContext(r.Context(), TokenHeader, t)
+	userRes, err := g.revaClient.GetUserByClaim(ctx, &userv1beta1.GetUserByClaimRequest{
+		Claim: "username",
+		Value: tr.Username,
+	})
+	if err != nil || userRes.Status.Code != rpcv1beta1.Code_CODE_OK {
+		g.log.Error().Err(err).Msg("could not get user")
+		renderError(w, r, errInternalError("could not get user"))
+		return
+	}
+
+	fullPath := filepath.Join(templates.WithUser(userRes.User, g.config.WebdavNamespace), tr.Filepath)
 	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnails.GetThumbnailRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
 		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),
@@ -90,7 +116,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		Height:        tr.Height,
 		Source: &thumbnails.GetThumbnailRequest_Cs3Source{
 			Cs3Source: &thumbnails.CS3Source{
-				Path:          path.Join(g.config.WebdavNamespace, tr.Filepath),
+				Path:          fullPath,
 				Authorization: t,
 			},
 		},

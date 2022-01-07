@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/pkg/ctx"
@@ -30,8 +31,7 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 		logger.Fatal().Err(err).Msg("resolutions not configured correctly")
 	}
 	svc := Thumbnail{
-		serviceID:       options.Config.Server.Namespace + "." + options.Config.Server.Name,
-		webdavNamespace: options.Config.Thumbnail.WebdavNamespace,
+		serviceID: options.Config.Server.Namespace + "." + options.Config.Server.Name,
 		manager: thumbnail.NewSimpleManager(
 			resolutions,
 			options.ThumbnailStorage,
@@ -52,7 +52,6 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 // Thumbnail implements the GRPC handler.
 type Thumbnail struct {
 	serviceID        string
-	webdavNamespace  string
 	manager          thumbnail.Manager
 	webdavSource     imgsource.Source
 	cs3Source        imgsource.Source
@@ -100,7 +99,7 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetThumbnailRe
 
 func (g Thumbnail) handleCS3Source(ctx context.Context, req *v0proto.GetThumbnailRequest, encoder thumbnail.Encoder) ([]byte, error) {
 	src := req.GetCs3Source()
-	sRes, err := g.stat(src.Path, src.Authorization)
+	sRes, err := g.stat(src.Path, src.Authorization, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +143,11 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *v0proto.GetThumb
 		return nil, errors.Wrap(err, "source url is invalid")
 	}
 
-	var auth, statPath string
+	var (
+		auth, statPath string
+		user           *userv1beta1.User
+	)
+
 	if src.IsPublicLink {
 		q := imgURL.Query()
 		var rsp *gateway.AuthenticateResponse
@@ -171,12 +174,14 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *v0proto.GetThumb
 			return nil, merrors.InternalServerError(g.serviceID, "could not authenticate: %s", err.Error())
 		}
 		auth = rsp.Token
+		user = rsp.User
 		statPath = path.Join("/public", src.PublicLinkToken, req.Filepath)
 	} else {
 		auth = src.RevaAuthorization
-		statPath = path.Join(g.webdavNamespace, req.Filepath)
+		statPath = req.Filepath
+		user = revactx.ContextMustGetUser(ctx)
 	}
-	sRes, err := g.stat(statPath, auth)
+	sRes, err := g.stat(statPath, auth, user)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +219,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *v0proto.GetThumb
 	return thumb, nil
 }
 
-func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
+func (g Thumbnail) stat(path, auth string, user *userv1beta1.User) (*provider.StatResponse, error) {
 	ctx := metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
 
 	req := &provider.StatRequest{

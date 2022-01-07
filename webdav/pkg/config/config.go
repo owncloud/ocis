@@ -57,6 +57,7 @@ type Config struct {
 	Service         Service     `ocisConfig:"service"`
 	OcisPublicURL   string      `ocisConfig:"ocis_public_url"`
 	WebdavNamespace string      `ocisConfig:"webdav_namespace"`
+	RevaGateway     string      `ocisConfig:"reva_gateway"`
 
 	Context    context.Context
 	Supervised bool
@@ -97,6 +98,7 @@ func DefaultConfig() *Config {
 			Namespace: "com.owncloud.web",
 		},
 		OcisPublicURL:   "https://127.0.0.1:9200",
-		WebdavNamespace: "/home",
+		WebdavNamespace: "/users/{{.Id.OpaqueId}}",
+		RevaGateway:     "127.0.0.1:9142",
 	}
 }

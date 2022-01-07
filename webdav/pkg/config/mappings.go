@@ -103,5 +103,9 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			EnvVars:     []string{"STORAGE_WEBDAV_NAMESPACE"},
 			Destination: &cfg.WebdavNamespace,
 		},
+		{
+			EnvVars:     []string{"REVA_GATEWAY"},
+			Destination: &cfg.RevaGateway,
+		},
 	}
 }

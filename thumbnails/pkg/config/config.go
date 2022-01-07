@@ -65,7 +65,6 @@ type Thumbnail struct {
 	WebdavAllowInsecure bool              `ocisConfig:"webdav_allow_insecure"`
 	CS3AllowInsecure    bool              `ocisConfig:"cs3_allow_insecure"`
 	RevaGateway         string            `ocisConfig:"reva_gateway"`
-	WebdavNamespace     string            `ocisConfig:"webdav_namespace"`
 	FontMapFile         string            `ocisConfig:"font_map_file"`
 }
 
@@ -101,7 +100,6 @@ func DefaultConfig() *Config {
 			},
 			WebdavAllowInsecure: true,
 			RevaGateway:         "127.0.0.1:9142",
-			WebdavNamespace:     "/home",
 			CS3AllowInsecure:    false,
 		},
 	}

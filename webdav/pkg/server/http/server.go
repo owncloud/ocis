@@ -23,7 +23,7 @@ func Server(opts ...Option) (http.Service, error) {
 		http.Flags(options.Flags...),
 	)
 
-	handle := svc.NewService(
+	handle, err := svc.NewService(
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
@@ -47,6 +47,9 @@ func Server(opts ...Option) (http.Service, error) {
 			),
 		),
 	)
+	if err != nil {
+		return http.Service{}, err
+	}
 
 	{
 		handle = svc.NewInstrument(handle, options.Metrics)
