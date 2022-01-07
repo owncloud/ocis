@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/pkg/ctx"
@@ -99,7 +98,7 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *v0proto.GetThumbnailRe
 
 func (g Thumbnail) handleCS3Source(ctx context.Context, req *v0proto.GetThumbnailRequest, encoder thumbnail.Encoder) ([]byte, error) {
 	src := req.GetCs3Source()
-	sRes, err := g.stat(src.Path, src.Authorization, nil)
+	sRes, err := g.stat(src.Path, src.Authorization)
 	if err != nil {
 		return nil, err
 	}
@@ -143,10 +142,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *v0proto.GetThumb
 		return nil, errors.Wrap(err, "source url is invalid")
 	}
 
-	var (
-		auth, statPath string
-		user           *userv1beta1.User
-	)
+	var auth, statPath string
 
 	if src.IsPublicLink {
 		q := imgURL.Query()
@@ -174,14 +170,12 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *v0proto.GetThumb
 			return nil, merrors.InternalServerError(g.serviceID, "could not authenticate: %s", err.Error())
 		}
 		auth = rsp.Token
-		user = rsp.User
 		statPath = path.Join("/public", src.PublicLinkToken, req.Filepath)
 	} else {
 		auth = src.RevaAuthorization
 		statPath = req.Filepath
-		user = revactx.ContextMustGetUser(ctx)
 	}
-	sRes, err := g.stat(statPath, auth, user)
+	sRes, err := g.stat(statPath, auth)
 	if err != nil {
 		return nil, err
 	}
@@ -219,7 +213,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *v0proto.GetThumb
 	return thumb, nil
 }
 
-func (g Thumbnail) stat(path, auth string, user *userv1beta1.User) (*provider.StatResponse, error) {
+func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 	ctx := metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
 
 	req := &provider.StatRequest{
