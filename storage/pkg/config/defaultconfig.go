@@ -33,7 +33,7 @@ func DefaultConfig() *Config {
 				UserFilter:           "(&(objectclass=posixAccount)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))",
 				UserAttributeFilter:  "(&(objectclass=posixAccount)({{attr}}={{value}}))",
 				UserFindFilter:       "(&(objectclass=posixAccount)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
-				UserGroupFilter:      "(&(objectclass=posixGroup)(ownclouduuid={{.OpaqueId}}*))",
+				UserGroupFilter:      "(&(objectclass=posixGroup)(cn={{.}}*))", // FIXME (&(objectclass=posixGroup)(ownclouduuid={{.OpaqueId}}*)) in reva the template is executed with a string. IIRC rhaferkamp mentioned this
 				GroupFilter:          "(&(objectclass=posixGroup)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))",
 				GroupAttributeFilter: "(&(objectclass=posixGroup)({{attr}}={{value}}))",
 				GroupFindFilter:      "(&(objectclass=posixGroup)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
@@ -239,7 +239,7 @@ func DefaultConfig() *Config {
 				ArchiverPrefix:             "archiver",
 				DatagatewayPrefix:          "data",
 				Favorites:                  false,
-				OCDavInsecure:              false,
+				OCDavInsecure:              false, // true?
 				OCDavPrefix:                "",
 				OCSPrefix:                  "ocs",
 				OCSSharePrefix:             "/Shares",
@@ -271,7 +271,7 @@ func DefaultConfig() *Config {
 			},
 			StorageRegistry: StorageRegistry{
 				Driver:       "spaces",
-				HomeProvider: "/home",
+				HomeProvider: "/home", // unused for spaces, static currently not supported
 				JSON:         "",
 			},
 			AppRegistry: AppRegistry{
@@ -387,7 +387,7 @@ func DefaultConfig() *Config {
 						GRPCNetwork: "tcp",
 						GRPCAddr:    "127.0.0.1:9178",
 					},
-					MountID: "e1a73ede-549b-4226-abdf-40e69ca8230d",
+					MountID: "7993447f-687f-490d-875c-ac95e89a62a4",
 				},
 				PublicShareProviderAddr: "",
 				UserProviderAddr:        "",

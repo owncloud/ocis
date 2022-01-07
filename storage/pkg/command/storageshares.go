@@ -117,7 +117,7 @@ func storageSharesConfigFromStruct(c *cli.Context, cfg *config.Config) map[strin
 	return rcfg
 }
 
-// StorageSharesSutureService allows for the storage-home command to be embedded and supervised by a suture supervisor tree.
+// StorageSharesSutureService allows for the storage-shares command to be embedded and supervised by a suture supervisor tree.
 type StorageSharesSutureService struct {
 	cfg *config.Config
 }

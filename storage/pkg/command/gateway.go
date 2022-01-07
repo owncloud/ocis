@@ -180,8 +180,7 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 					"driver": cfg.Reva.StorageRegistry.Driver,
 					"drivers": map[string]interface{}{
 						"spaces": map[string]interface{}{
-							"home_template": cfg.Reva.StorageRegistry.HomeProvider,
-							"providers":     spacesProviders(cfg, logger),
+							"providers": spacesProviders(cfg, logger),
 						},
 					},
 				},
@@ -234,14 +233,6 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 		},
 		cfg.Reva.StorageShares.Endpoint: {
 			"spaces": map[string]interface{}{
-				/*
-					"share": map[string]interface{}{
-						// The jail needs to be filled with mount points
-						// .Space.Name is a path relative to the mount point
-						"mount_point":   "/users/{{.CurrentUser.Id.OpaqueId}}/Shares",
-						"path_template": "/users/{{.CurrentUser.Id.OpaqueId}}/Shares/{{.Space.Name}}",
-					},
-				*/
 				"virtual": map[string]interface{}{
 					// The root of the share jail is mounted here
 					"mount_point": "/users/{{.CurrentUser.Id.OpaqueId}}/Shares",
