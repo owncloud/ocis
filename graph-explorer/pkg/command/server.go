@@ -2,33 +2,35 @@ package command
 
 import (
 	"context"
-	"strings"
+	"fmt"
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/graph-explorer/pkg/config"
+	"github.com/owncloud/ocis/graph-explorer/pkg/config/parser"
+	"github.com/owncloud/ocis/graph-explorer/pkg/logging"
 	"github.com/owncloud/ocis/graph-explorer/pkg/metrics"
 	"github.com/owncloud/ocis/graph-explorer/pkg/server/debug"
 	"github.com/owncloud/ocis/graph-explorer/pkg/server/http"
 	"github.com/owncloud/ocis/graph-explorer/pkg/tracing"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/urfave/cli/v2"
 )
 
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "server",
-		Usage: "Start integrated server",
+		Name:     "server",
+		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
+		Category: "server",
 		Before: func(ctx *cli.Context) error {
-			if cfg.HTTP.Root != "/" {
-				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
-			}
-
-			return ParseConfig(ctx, cfg)
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-			tracing.Configure(cfg)
-
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			err := tracing.Configure(cfg)
+			if err != nil {
+				return err
+			}
 			var (
 				gr          = run.Group{}
 				ctx, cancel = func() (context.Context, context.CancelFunc) {
@@ -42,7 +44,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			mtrcs.BuildInfo.WithLabelValues(cfg.Server.Version).Set(1)
+			mtrcs.BuildInfo.WithLabelValues(version.String).Set(1)
 
 			{
 				server, err := http.Server(

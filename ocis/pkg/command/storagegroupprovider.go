@@ -1,6 +1,3 @@
-//go:build !simple
-// +build !simple
-
 package command
 
 import (
@@ -14,8 +11,8 @@ import (
 func StorageGroupProviderCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "storage-groupprovider",
-		Usage:    "Start storage groupprovider service",
-		Category: "Extensions",
+		Usage:    "start storage groupprovider service",
+		Category: "extensions",
 		//Flags:    flagset.GroupsWithConfig(cfg.Storage),
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)

@@ -2,41 +2,33 @@ package command
 
 import (
 	"context"
-	"strings"
-
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"fmt"
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/accounts/pkg/config"
+	"github.com/owncloud/ocis/accounts/pkg/config/parser"
+	"github.com/owncloud/ocis/accounts/pkg/logging"
 	"github.com/owncloud/ocis/accounts/pkg/metrics"
+	"github.com/owncloud/ocis/accounts/pkg/server/debug"
 	"github.com/owncloud/ocis/accounts/pkg/server/grpc"
 	"github.com/owncloud/ocis/accounts/pkg/server/http"
 	svc "github.com/owncloud/ocis/accounts/pkg/service/v0"
 	"github.com/owncloud/ocis/accounts/pkg/tracing"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/urfave/cli/v2"
 )
 
 // Server is the entry point for the server command.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:        "server",
-		Usage:       "Start ocis accounts service",
-		Description: "uses an LDAP server as the storage backend",
-		Before: func(ctx *cli.Context) error {
-			if cfg.HTTP.Root != "/" {
-				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
-			}
-
-			cfg.Repo.Backend = strings.ToLower(cfg.Repo.Backend)
-
-			if err := ParseConfig(ctx, cfg); err != nil {
-				return err
-			}
-
-			return nil
+		Name:     "server",
+		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
+		Category: "server",
+		Before: func(c *cli.Context) error {
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
-			logger := log.LoggerFromConfig("accounts", *cfg.Log)
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 			err := tracing.Configure(cfg)
 			if err != nil {
 				return err
@@ -47,7 +39,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			mtrcs.BuildInfo.WithLabelValues(cfg.Server.Version).Set(1)
+			mtrcs.BuildInfo.WithLabelValues(version.String).Set(1)
 
 			handler, err := svc.New(svc.Logger(logger), svc.Config(cfg))
 			if err != nil {
@@ -58,7 +50,7 @@ func Server(cfg *config.Config) *cli.Command {
 			httpServer := http.Server(
 				http.Config(cfg),
 				http.Logger(logger),
-				http.Name(cfg.Server.Name),
+				http.Name(cfg.Service.Name),
 				http.Context(ctx),
 				http.Metrics(mtrcs),
 				http.Handler(handler),
@@ -72,7 +64,7 @@ func Server(cfg *config.Config) *cli.Command {
 			grpcServer := grpc.Server(
 				grpc.Config(cfg),
 				grpc.Logger(logger),
-				grpc.Name(cfg.Server.Name),
+				grpc.Name(cfg.Service.Name),
 				grpc.Context(ctx),
 				grpc.Metrics(mtrcs),
 				grpc.Handler(handler),
@@ -80,6 +72,18 @@ func Server(cfg *config.Config) *cli.Command {
 
 			gr.Add(grpcServer.Run, func(_ error) {
 				logger.Info().Str("server", "grpc").Msg("shutting down server")
+				cancel()
+			})
+
+			// prepare a debug server and add it to the group run.
+			debugServer, err := debug.Server(debug.Logger(logger), debug.Context(ctx), debug.Config(cfg))
+			if err != nil {
+				logger.Error().Err(err).Str("server", "debug").Msg("Failed to initialize server")
+				return err
+			}
+
+			gr.Add(debugServer.ListenAndServe, func(_ error) {
+				_ = debugServer.Shutdown(ctx)
 				cancel()
 			})
 

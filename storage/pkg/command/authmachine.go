@@ -22,7 +22,7 @@ import (
 func AuthMachine(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-machine",
-		Usage: "Start authprovider for machine auth",
+		Usage: "start authprovider for machine auth",
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg, "storage-auth-machine")
 		},

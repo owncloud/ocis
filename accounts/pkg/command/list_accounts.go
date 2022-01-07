@@ -17,12 +17,13 @@ import (
 // ListAccounts command lists all accounts
 func ListAccounts(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:    "list",
-		Usage:   "List existing accounts",
-		Aliases: []string{"ls"},
-		Flags:   flagset.ListAccountsWithConfig(cfg),
+		Name:     "list",
+		Usage:    "list existing accounts",
+		Category: "account management",
+		Aliases:  []string{"ls"},
+		Flags:    flagset.ListAccountsWithConfig(cfg),
 		Action: func(c *cli.Context) error {
-			accSvcID := cfg.GRPC.Namespace + "." + cfg.Server.Name
+			accSvcID := cfg.GRPC.Namespace + "." + cfg.Service.Name
 			accSvc := accounts.NewAccountsService(accSvcID, grpc.NewClient())
 			resp, err := accSvc.ListAccounts(c.Context, &accounts.ListAccountsRequest{})
 

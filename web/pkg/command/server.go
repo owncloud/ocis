@@ -3,11 +3,13 @@ package command
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
-	"strings"
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/web/pkg/config"
+	"github.com/owncloud/ocis/web/pkg/config/parser"
+	"github.com/owncloud/ocis/web/pkg/logging"
 	"github.com/owncloud/ocis/web/pkg/metrics"
 	"github.com/owncloud/ocis/web/pkg/server/debug"
 	"github.com/owncloud/ocis/web/pkg/server/http"
@@ -18,28 +20,16 @@ import (
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "server",
-		Usage: "Start integrated server",
-		Before: func(ctx *cli.Context) error {
-			if cfg.HTTP.Root != "/" {
-				cfg.HTTP.Root = strings.TrimRight(cfg.HTTP.Root, "/")
-			}
-
-			if err := ParseConfig(ctx, cfg); err != nil {
-				return err
-			}
-
-			// build well known openid-configuration endpoint if it is not set
-			if cfg.Web.Config.OpenIDConnect.MetadataURL == "" {
-				cfg.Web.Config.OpenIDConnect.MetadataURL = strings.TrimRight(cfg.Web.Config.OpenIDConnect.Authority, "/") + "/.well-known/openid-configuration"
-			}
-
-			return nil
+		Name:     "server",
+		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
+		Category: "server",
+		Before: func(c *cli.Context) error {
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-
-			if err := tracing.Configure(cfg); err != nil {
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			err := tracing.Configure(cfg)
+			if err != nil {
 				return err
 			}
 

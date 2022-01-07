@@ -1,6 +1,3 @@
-//go:build !simple
-// +build !simple
-
 package command
 
 import (
@@ -14,8 +11,8 @@ import (
 func StorageAuthBasicCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "storage-auth-basic",
-		Usage:    "Start storage auth-basic service",
-		Category: "Extensions",
+		Usage:    "start storage auth-basic service",
+		Category: "extensions",
 		//Flags:    flagset.AuthBasicWithConfig(cfg.Storage),
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)

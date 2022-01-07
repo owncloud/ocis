@@ -3,10 +3,8 @@ package command
 import (
 	"os"
 
+	"github.com/owncloud/ocis/ocis-pkg/clihelper"
 	"github.com/owncloud/ocis/ocis-pkg/config"
-	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
 )
@@ -15,21 +13,10 @@ import (
 func Execute() error {
 	cfg := config.DefaultConfig()
 
-	app := &cli.App{
-		Name:     "ocis",
-		Version:  version.String,
-		Usage:    "ownCloud Infinite Scale Stack",
-		Compiled: version.Compiled(),
-		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg)
-		},
-		Authors: []*cli.Author{
-			{
-				Name:  "ownCloud GmbH",
-				Email: "support@owncloud.com",
-			},
-		},
-	}
+	app := clihelper.DefaultApp(&cli.App{
+		Name:  "ocis",
+		Usage: "ownCloud Infinite Scale Stack",
+	})
 
 	for _, fn := range register.Commands {
 		app.Commands = append(
@@ -43,34 +30,5 @@ func Execute() error {
 		Usage: "Show the help",
 	}
 
-	cli.VersionFlag = &cli.BoolFlag{
-		Name:  "version,v",
-		Usage: "Print the version",
-	}
-
 	return app.Run(os.Args)
-}
-
-// NewLogger initializes a service-specific logger instance
-func NewLogger(cfg *config.Config) log.Logger {
-	return log.NewLogger(
-		log.Name("ocis"),
-		log.Level(cfg.Log.Level),
-		log.Pretty(cfg.Log.Pretty),
-		log.Color(cfg.Log.Color),
-		log.File(cfg.Log.File),
-	)
-}
-
-// ParseConfig loads ocis configuration.
-func ParseConfig(c *cli.Context, cfg *config.Config) error {
-	conf, err := ociscfg.BindSourcesToStructs("ocis", cfg)
-	if err != nil {
-		return err
-	}
-
-	conf.LoadOSEnv(config.GetEnv(), false)
-
-	bindings := config.StructMappings(cfg)
-	return ociscfg.BindEnv(conf, bindings)
 }

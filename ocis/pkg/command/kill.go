@@ -16,8 +16,8 @@ import (
 func KillCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "kill",
-		Usage:    "Kill an extension by name",
-		Category: "Runtime",
+		Usage:    "kill an extension by name in the runtime (supervised mode)",
+		Category: "runtime",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "hostname",

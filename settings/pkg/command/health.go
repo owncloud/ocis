@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/owncloud/ocis/settings/pkg/config"
+	"github.com/owncloud/ocis/settings/pkg/config/parser"
+	"github.com/owncloud/ocis/settings/pkg/logging"
 	"github.com/urfave/cli/v2"
 )
 
@@ -14,10 +16,10 @@ func Health(cfg *config.Config) *cli.Command {
 		Name:  "health",
 		Usage: "Check health status",
 		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg)
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 
 			resp, err := http.Get(
 				fmt.Sprintf(
@@ -34,7 +36,7 @@ func Health(cfg *config.Config) *cli.Command {
 
 			defer resp.Body.Close()
 
-			if resp.StatusCode != 200 {
+			if resp.StatusCode != http.StatusOK {
 				logger.Fatal().
 					Int("code", resp.StatusCode).
 					Msg("Health seems to be in bad state")

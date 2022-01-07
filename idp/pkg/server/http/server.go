@@ -9,6 +9,7 @@ import (
 	pkgcrypto "github.com/owncloud/ocis/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"go-micro.dev/v4"
 )
 
@@ -40,9 +41,9 @@ func Server(opts ...Option) (http.Service, error) {
 
 	service := http.NewService(
 		http.Logger(options.Logger),
-		http.Namespace(options.Config.Service.Namespace),
+		http.Namespace(options.Config.HTTP.Namespace),
 		http.Name(options.Config.Service.Name),
-		http.Version(options.Config.Service.Version),
+		http.Version(version.String),
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
 		http.Flags(options.Flags...),
@@ -60,7 +61,7 @@ func Server(opts ...Option) (http.Service, error) {
 			middleware.Secure,
 			middleware.Version(
 				options.Config.Service.Name,
-				options.Config.Service.Version,
+				version.String,
 			),
 			middleware.Logger(
 				options.Logger,
@@ -70,7 +71,7 @@ func Server(opts ...Option) (http.Service, error) {
 
 	{
 		handle = svc.NewInstrument(handle, options.Metrics)
-		handle = svc.NewLogging(handle, options.Logger)
+		handle = svc.NewLoggingHandler(handle, options.Logger)
 	}
 
 	if err := micro.RegisterHandler(service.Server(), handle); err != nil {

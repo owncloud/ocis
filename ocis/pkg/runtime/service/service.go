@@ -168,10 +168,10 @@ func Start(o ...Option) error {
 		s.cfg.Storage.Log = &shared.Log{}
 	}
 
-	s.cfg.Storage.Log.Color = s.cfg.Commons.Color
-	s.cfg.Storage.Log.Level = s.cfg.Commons.Level
-	s.cfg.Storage.Log.Pretty = s.cfg.Commons.Pretty
-	s.cfg.Storage.Log.File = s.cfg.Commons.File
+	s.cfg.Storage.Log.Color = s.cfg.Commons.Log.Color
+	s.cfg.Storage.Log.Level = s.cfg.Commons.Log.Level
+	s.cfg.Storage.Log.Pretty = s.cfg.Commons.Log.Pretty
+	s.cfg.Storage.Log.File = s.cfg.Commons.Log.File
 
 	if err = rpc.Register(s); err != nil {
 		if s != nil {

@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/settings/pkg/proto/v0"
 	svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
@@ -13,7 +14,7 @@ func Server(opts ...Option) grpc.Service {
 	service := grpc.NewService(
 		grpc.Logger(options.Logger),
 		grpc.Name(options.Name),
-		grpc.Version(options.Config.Service.Version),
+		grpc.Version(version.String),
 		grpc.Address(options.Config.GRPC.Addr),
 		grpc.Namespace(options.Config.GRPC.Namespace),
 		grpc.Context(options.Context),

@@ -1,6 +1,3 @@
-//go:build !simple
-// +build !simple
-
 package command
 
 import (
@@ -14,8 +11,8 @@ import (
 func StoragePublicLinkCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "storage-public-link",
-		Usage:    "Start storage public link storage",
-		Category: "Extensions",
+		Usage:    "start storage public link storage",
+		Category: "extensions",
 		//Flags:    flagset.StoragePublicLink(cfg.Storage),
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)

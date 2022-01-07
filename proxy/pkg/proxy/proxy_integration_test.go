@@ -10,8 +10,6 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/owncloud/ocis/ocis-pkg/shared"
-
 	"github.com/owncloud/ocis/proxy/pkg/config"
 )
 
@@ -215,7 +213,7 @@ func (tc *testCase) expectProxyTo(strURL string) testCase {
 
 func testConfig(policy []config.Policy) *config.Config {
 	return &config.Config{
-		Log:            &shared.Log{},
+		Log:            &config.Log{},
 		Debug:          config.Debug{},
 		HTTP:           config.HTTP{},
 		Tracing:        config.Tracing{},

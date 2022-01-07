@@ -26,7 +26,7 @@ import (
 func Frontend(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "frontend",
-		Usage: "Start frontend service",
+		Usage: "start frontend service",
 		Before: func(c *cli.Context) error {
 			if err := loadUserAgent(c, cfg); err != nil {
 				return err

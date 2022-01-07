@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	if err := command.Execute(config.New()); err != nil {
+	if err := command.Execute(config.DefaultConfig()); err != nil {
 		os.Exit(1)
 	}
 }

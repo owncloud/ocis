@@ -11,8 +11,9 @@ import (
 // Health is the entrypoint for the health command.
 func Health(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "health",
-		Usage: "Check health status",
+		Name:     "health",
+		Usage:    "check health status",
+		Category: "info",
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg, "storage")
 		},
@@ -34,7 +35,7 @@ func Health(cfg *config.Config) *cli.Command {
 
 			defer resp.Body.Close()
 
-			if resp.StatusCode != 200 {
+			if resp.StatusCode != http.StatusOK {
 				logger.Fatal().
 					Int("code", resp.StatusCode).
 					Msg("Health seems to be in bad state")

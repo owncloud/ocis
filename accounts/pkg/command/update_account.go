@@ -21,6 +21,7 @@ func UpdateAccount(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:      "update",
 		Usage:     "Make changes to an existing account",
+		Category:  "account management",
 		ArgsUsage: "id",
 		Flags:     flagset.UpdateAccountWithConfig(cfg, a),
 		Before: func(c *cli.Context) error {
@@ -40,7 +41,7 @@ func UpdateAccount(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			a.Id = c.Args().First()
-			accSvcID := cfg.GRPC.Namespace + "." + cfg.Server.Name
+			accSvcID := cfg.GRPC.Namespace + "." + cfg.Service.Name
 			accSvc := accounts.NewAccountsService(accSvcID, grpc.NewClient())
 			_, err := accSvc.UpdateAccount(c.Context, &accounts.UpdateAccountRequest{
 				Account:    a,

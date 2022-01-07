@@ -3,6 +3,7 @@ package command
 import (
 	"github.com/owncloud/ocis/idp/pkg/command"
 	"github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config/parser"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
 )
@@ -10,31 +11,13 @@ import (
 // IDPCommand is the entrypoint for the idp command.
 func IDPCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "idp",
-		Usage:    "Start idp server",
-		Category: "Extensions",
-		Subcommands: []*cli.Command{
-			command.PrintVersion(cfg.IDP),
-		},
+		Name:     cfg.IDP.Service.Name,
+		Usage:    subcommandDescription(cfg.IDP.Service.Name),
+		Category: "extensions",
 		Before: func(ctx *cli.Context) error {
-			if err := ParseConfig(ctx, cfg); err != nil {
-				return err
-			}
-
-			if cfg.Commons != nil {
-				cfg.IDP.Commons = cfg.Commons
-			}
-
-			return nil
+			return parser.ParseConfig(cfg)
 		},
-		Action: func(c *cli.Context) error {
-			idpCommand := command.Server(cfg.IDP)
-			if err := idpCommand.Before(c); err != nil {
-				return err
-			}
-
-			return cli.HandleAction(idpCommand.Action, c)
-		},
+		Subcommands: command.GetCommands(cfg.IDP),
 	}
 }
 

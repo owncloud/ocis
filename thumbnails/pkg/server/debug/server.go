@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/owncloud/ocis/ocis-pkg/service/debug"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
 )
 
@@ -14,8 +15,8 @@ func Server(opts ...Option) (*http.Server, error) {
 
 	return debug.NewService(
 		debug.Logger(options.Logger),
-		debug.Name(options.Config.Server.Name),
-		debug.Version(options.Config.Server.Version),
+		debug.Name(options.Config.Service.Name),
+		debug.Version(version.String),
 		debug.Address(options.Config.Debug.Addr),
 		debug.Token(options.Config.Debug.Token),
 		debug.Pprof(options.Config.Debug.Pprof),
@@ -25,21 +26,33 @@ func Server(opts ...Option) (*http.Server, error) {
 	), nil
 }
 
+// health implements the health check.
 func health(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusOK)
-		if _, err := io.WriteString(w, http.StatusText(http.StatusOK)); err != nil {
+
+		// TODO: check if services are up and running
+
+		_, err := io.WriteString(w, http.StatusText(http.StatusOK))
+		// io.WriteString should not fail but if it does we want to know.
+		if err != nil {
 			panic(err)
 		}
 	}
 }
 
+// ready implements the ready check.
 func ready(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusOK)
-		if _, err := io.WriteString(w, http.StatusText(http.StatusOK)); err != nil {
+
+		// TODO: check if services are up and running
+
+		_, err := io.WriteString(w, http.StatusText(http.StatusOK))
+		// io.WriteString should not fail but if it does we want to know.
+		if err != nil {
 			panic(err)
 		}
 	}

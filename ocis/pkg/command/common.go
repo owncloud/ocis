@@ -1,6 +1,10 @@
 package command
 
-import "github.com/urfave/cli/v2"
+import (
+	"fmt"
+
+	"github.com/urfave/cli/v2"
+)
 
 func handleOriginalAction(c *cli.Context, cmd *cli.Command) error {
 
@@ -11,4 +15,8 @@ func handleOriginalAction(c *cli.Context, cmd *cli.Command) error {
 	}
 
 	return cli.HandleAction(cmd.Action, c)
+}
+
+func subcommandDescription(serviceName string) string {
+	return fmt.Sprintf("%s extension commands", serviceName)
 }

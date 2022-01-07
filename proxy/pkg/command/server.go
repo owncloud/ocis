@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -14,12 +13,14 @@ import (
 	"github.com/justinas/alice"
 	"github.com/oklog/run"
 	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
-	"github.com/owncloud/ocis/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/proxy/pkg/config"
+	"github.com/owncloud/ocis/proxy/pkg/config/parser"
 	"github.com/owncloud/ocis/proxy/pkg/cs3"
+	"github.com/owncloud/ocis/proxy/pkg/logging"
 	"github.com/owncloud/ocis/proxy/pkg/metrics"
 	"github.com/owncloud/ocis/proxy/pkg/middleware"
 	"github.com/owncloud/ocis/proxy/pkg/proxy"
@@ -36,35 +37,16 @@ import (
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "server",
-		Usage: "Start integrated server",
-		Before: func(ctx *cli.Context) error {
-			if err := ParseConfig(ctx, cfg); err != nil {
-				return err
-			}
-
-			if cfg.Policies == nil {
-				cfg.Policies = config.DefaultPolicies()
-			}
-
-			if cfg.HTTP.Root != "/" {
-				cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
-			}
-
-			if len(ctx.StringSlice("presignedurl-allow-method")) > 0 {
-				cfg.PreSignedURL.AllowedHTTPMethods = ctx.StringSlice("presignedurl-allow-method")
-			}
-
-			if err := loadUserAgent(ctx, cfg); err != nil {
-				return err
-			}
-
-			return nil
+		Name:     "server",
+		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
+		Category: "server",
+		Before: func(c *cli.Context) error {
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-
-			if err := tracing.Configure(cfg); err != nil {
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			err := tracing.Configure(cfg)
+			if err != nil {
 				return err
 			}
 
@@ -82,7 +64,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			m.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
+			m.BuildInfo.WithLabelValues(version.String).Set(1)
 
 			rp := proxy.NewMultiHostReverseProxy(
 				proxy.Logger(logger),
@@ -217,7 +199,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			middleware.OIDCIss(cfg.OIDC.Issuer),
 			middleware.UserOIDCClaim(cfg.UserOIDCClaim),
 			middleware.UserCS3Claim(cfg.UserCS3Claim),
-			middleware.CredentialsByUserAgent(cfg.Reva.Middleware.Auth.CredentialsByUserAgent),
+			middleware.CredentialsByUserAgent(cfg.AuthMiddleware.CredentialsByUserAgent),
 		),
 		middleware.SignedURLAuth(
 			middleware.Logger(logger),
@@ -251,29 +233,4 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			middleware.RevaGatewayClient(revaClient),
 		),
 	)
-}
-
-// loadUserAgent reads the proxy-user-agent-lock-in, since it is a string flag, and attempts to construct a map of
-// "user-agent":"challenge" locks in for Reva.
-// Modifies cfg. Spaces don't need to be trimmed as urfavecli takes care of it. User agents with spaces are valid. i.e:
-// Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:83.0) Gecko/20100101 Firefox/83.0
-// This function works by relying in our format of specifying [user-agent:challenge] and the fact that the user agent
-// might contain ":" (colon), so the original string is reversed, split in two parts, by the time it is split we
-// have the indexes reversed and the tuple is in the format of [challenge:user-agent], then the same process is applied
-// in reverse for each individual part
-func loadUserAgent(c *cli.Context, cfg *config.Config) error {
-	cfg.Reva.Middleware.Auth.CredentialsByUserAgent = make(map[string]string)
-	locks := c.StringSlice("proxy-user-agent-lock-in")
-
-	for _, v := range locks {
-		vv := conversions.Reverse(v)
-		parts := strings.SplitN(vv, ":", 2)
-		if len(parts) != 2 {
-			return fmt.Errorf("unexpected config value for user-agent lock-in: %v, expected format is user-agent:challenge", v)
-		}
-
-		cfg.Reva.Middleware.Auth.CredentialsByUserAgent[conversions.Reverse(parts[1])] = conversions.Reverse(parts[0])
-	}
-
-	return nil
 }

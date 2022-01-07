@@ -8,8 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/owncloud/ocis/ocis-pkg/shared"
-
 	"github.com/pkg/errors"
 
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
@@ -57,7 +55,7 @@ func New(opts ...Option) (s *Service, err error) {
 	}
 
 	s = &Service{
-		id:          cfg.GRPC.Namespace + "." + cfg.Server.Name,
+		id:          cfg.GRPC.Namespace + "." + cfg.Service.Name,
 		log:         logger,
 		Config:      cfg,
 		RoleService: roleService,
@@ -81,11 +79,11 @@ func New(opts ...Option) (s *Service, err error) {
 		return nil, err
 	}
 
-	if err = s.createDefaultAccounts(cfg.Server.DemoUsersAndGroups); err != nil {
+	if err = s.createDefaultAccounts(cfg.DemoUsersAndGroups); err != nil {
 		return nil, err
 	}
 
-	if err = s.createDefaultGroups(cfg.Server.DemoUsersAndGroups); err != nil {
+	if err = s.createDefaultGroups(cfg.DemoUsersAndGroups); err != nil {
 		return nil, err
 	}
 	return
@@ -112,7 +110,7 @@ func configFromSvc(cfg *config.Config) (*idxcfg.Config, error) {
 	c := idxcfg.New()
 
 	if cfg.Log == nil {
-		cfg.Log = &shared.Log{}
+		cfg.Log = &config.Log{}
 	}
 
 	defer func(cfg *config.Config) {

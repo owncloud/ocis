@@ -5,6 +5,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/cors"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	ocsmw "github.com/owncloud/ocis/ocs/pkg/middleware"
 	svc "github.com/owncloud/ocis/ocs/pkg/service/v0"
 	"go-micro.dev/v4"
@@ -17,8 +18,8 @@ func Server(opts ...Option) (http.Service, error) {
 	service := http.NewService(
 		http.Logger(options.Logger),
 		http.Name(options.Config.Service.Name),
-		http.Version(options.Config.Service.Version),
-		http.Namespace(options.Config.Service.Namespace),
+		http.Version(version.String),
+		http.Namespace(options.Config.HTTP.Namespace),
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
 		http.Flags(options.Flags...),
@@ -39,7 +40,10 @@ func Server(opts ...Option) (http.Service, error) {
 				cors.AllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
 			),
 			middleware.Secure,
-			middleware.Version(options.Config.Service.Name, options.Config.Service.Version),
+			middleware.Version(
+				options.Config.Service.Name,
+				version.String,
+			),
 			middleware.Logger(options.Logger),
 			ocsmw.LogTrace,
 		),

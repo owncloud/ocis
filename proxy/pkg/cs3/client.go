@@ -5,12 +5,13 @@ import (
 	proxytracing "github.com/owncloud/ocis/proxy/pkg/tracing"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func newConn(endpoint string) (*grpc.ClientConn, error) {
 	conn, err := grpc.Dial(
 		endpoint,
-		grpc.WithInsecure(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithUnaryInterceptor(
 			otelgrpc.UnaryClientInterceptor(
 				otelgrpc.WithTracerProvider(
@@ -28,6 +29,7 @@ func newConn(endpoint string) (*grpc.ClientConn, error) {
 
 // GetGatewayServiceClient returns a new cs3 gateway client
 func GetGatewayServiceClient(endpoint string) (gateway.GatewayAPIClient, error) {
+	// TODO: check connection pooling
 	conn, err := newConn(endpoint)
 	if err != nil {
 		return nil, err

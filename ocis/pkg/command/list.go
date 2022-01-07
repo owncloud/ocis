@@ -15,8 +15,8 @@ import (
 func ListCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "list",
-		Usage:    "Lists running ocis extensions",
-		Category: "Runtime",
+		Usage:    "list oCIS extensions running in the runtime (supervised mode)",
+		Category: "runtime",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "hostname",

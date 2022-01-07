@@ -2,52 +2,34 @@ package command
 
 import (
 	"context"
-
-	gofig "github.com/gookit/config/v2"
-	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
-
-	"github.com/owncloud/ocis/store/pkg/tracing"
+	"fmt"
 
 	"github.com/oklog/run"
+
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/store/pkg/config"
+	"github.com/owncloud/ocis/store/pkg/config/parser"
+	"github.com/owncloud/ocis/store/pkg/logging"
 	"github.com/owncloud/ocis/store/pkg/metrics"
 	"github.com/owncloud/ocis/store/pkg/server/debug"
 	"github.com/owncloud/ocis/store/pkg/server/grpc"
+	"github.com/owncloud/ocis/store/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "server",
-		Usage: "Start integrated server",
-		Before: func(ctx *cli.Context) error {
-			// remember shared logging info to prevent empty overwrites
-			inLog := cfg.Log
-			if err := ParseConfig(ctx, cfg); err != nil {
-				return err
-			}
-
-			if (cfg.Log == shared.Log{}) && (inLog != shared.Log{}) {
-				// set the default to the parent config
-				cfg.Log = inLog
-
-				// and parse the environment
-				conf := &gofig.Config{}
-				conf.LoadOSEnv(config.GetEnv(), false)
-				bindings := config.StructMappings(cfg)
-				if err := ociscfg.BindEnv(conf, bindings); err != nil {
-					return err
-				}
-			}
-
-			return nil
+		Name:     "server",
+		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
+		Category: "server",
+		Before: func(c *cli.Context) error {
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-
-			if err := tracing.Configure(cfg); err != nil {
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			err := tracing.Configure(cfg)
+			if err != nil {
 				return err
 			}
 
@@ -64,7 +46,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			metrics.BuildInfo.WithLabelValues(cfg.Service.Version).Set(1)
+			metrics.BuildInfo.WithLabelValues(version.String).Set(1)
 
 			{
 				server := grpc.Server(

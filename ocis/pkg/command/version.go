@@ -7,6 +7,7 @@ import (
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/registry"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
 	mreg "go-micro.dev/v4/registry"
@@ -16,9 +17,13 @@ import (
 func VersionCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "version",
-		Usage:    "Lists running services with version",
-		Category: "Runtime",
+		Usage:    "print the version of this binary and all running extension instances",
+		Category: "info",
 		Action: func(c *cli.Context) error {
+			fmt.Println("Version: " + version.String)
+			fmt.Printf("Compiled: %s\n", version.Compiled())
+			fmt.Println("")
+
 			reg := registry.GetRegistry()
 			serviceList, err := reg.ListServices()
 			if err != nil {

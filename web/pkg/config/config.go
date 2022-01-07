@@ -6,41 +6,35 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
-// Debug defines the available debug configuration.
-type Debug struct {
-	Addr   string `ocisConfig:"addr"`
-	Token  string `ocisConfig:"token"`
-	Pprof  bool   `ocisConfig:"pprof"`
-	Zpages bool   `ocisConfig:"zpages"`
-}
+// Config combines all available configuration parts.
+type Config struct {
+	*shared.Commons
 
-// HTTP defines the available http configuration.
-type HTTP struct {
-	Addr      string `ocisConfig:"addr"`
-	Root      string `ocisConfig:"root"`
-	Namespace string `ocisConfig:"namespace"`
-	CacheTTL  int    `ocisConfig:"cache_ttl"`
-}
+	Service Service
 
-// Tracing defines the available tracing configuration.
-type Tracing struct {
-	Enabled   bool   `ocisConfig:"enabled"`
-	Type      string `ocisConfig:"type"`
-	Endpoint  string `ocisConfig:"endpoint"`
-	Collector string `ocisConfig:"collector"`
-	Service   string `ocisConfig:"service"`
+	Tracing Tracing `ocisConfig:"tracing"`
+	Log     *Log    `ocisConfig:"log"`
+	Debug   Debug   `ocisConfig:"debug"`
+
+	HTTP HTTP `ocisConfig:"http"`
+
+	Asset Asset  `ocisConfig:"asset"`
+	File  string `ocisConfig:"file" env:"WEB_UI_CONFIG"` // TODO: rename this to a more self explaining string
+	Web   Web    `ocisConfig:"web"`
+
+	Context context.Context
 }
 
 // Asset defines the available asset configuration.
 type Asset struct {
-	Path string `ocisConfig:"path"`
+	Path string `ocisConfig:"path" env:"WEB_ASSET_PATH"`
 }
 
 // WebConfig defines the available web configuration for a dynamically rendered config.json.
 type WebConfig struct {
-	Server        string                 `json:"server,omitempty" ocisConfig:"server"`
-	Theme         string                 `json:"theme,omitempty" ocisConfig:"theme"`
-	Version       string                 `json:"version,omitempty" ocisConfig:"version"`
+	Server        string                 `json:"server,omitempty" ocisConfig:"server" env:"OCIS_URL;WEB_UI_CONFIG_SERVER"`
+	Theme         string                 `json:"theme,omitempty" ocisConfig:"theme" env:""`
+	Version       string                 `json:"version,omitempty" ocisConfig:"version" env:"WEB_UI_CONFIG_VERSION"`
 	OpenIDConnect OIDC                   `json:"openIdConnect,omitempty" ocisConfig:"oids"`
 	Apps          []string               `json:"apps" ocisConfig:"apps"`
 	ExternalApps  []ExternalApp          `json:"external_apps,omitempty" ocisConfig:"external_apps"`
@@ -49,11 +43,11 @@ type WebConfig struct {
 
 // OIDC defines the available oidc configuration
 type OIDC struct {
-	MetadataURL  string `json:"metadata_url,omitempty" ocisConfig:"metadata_url"`
-	Authority    string `json:"authority,omitempty" ocisConfig:"authority"`
-	ClientID     string `json:"client_id,omitempty" ocisConfig:"client_id"`
-	ResponseType string `json:"response_type,omitempty" ocisConfig:"response_type"`
-	Scope        string `json:"scope,omitempty" ocisConfig:"scope"`
+	MetadataURL  string `json:"metadata_url,omitempty" ocisConfig:"metadata_url" env:"WEB_OIDC_METADATA_URL"`
+	Authority    string `json:"authority,omitempty" ocisConfig:"authority" env:"OCIS_URL;WEB_OIDC_AUTHORITY"`
+	ClientID     string `json:"client_id,omitempty" ocisConfig:"client_id" env:"WEB_OIDC_CLIENT_ID"`
+	ResponseType string `json:"response_type,omitempty" ocisConfig:"response_type" env:"WEB_OIDC_RESPONSE_TYPE"`
+	Scope        string `json:"scope,omitempty" ocisConfig:"scope" env:"WEB_OIDC_SCOPE"`
 }
 
 // ExternalApp defines an external web app.
@@ -73,79 +67,13 @@ type ExternalApp struct {
 
 // ExternalAppConfig defines an external web app configuration.
 type ExternalAppConfig struct {
-	URL string `json:"url,omitempty" ocisConfig:"url"`
+	URL string `json:"url,omitempty" ocisConfig:"url" env:""`
 }
 
 // Web defines the available web configuration.
 type Web struct {
-	Path        string    `ocisConfig:"path"`
-	ThemeServer string    `ocisConfig:"theme_server"` // used to build Theme in WebConfig
-	ThemePath   string    `ocisConfig:"theme_path"`   // used to build Theme in WebConfig
+	Path        string    `ocisConfig:"path" env:"WEB_UI_PATH"`
+	ThemeServer string    `ocisConfig:"theme_server" env:"OCIS_URL;WEB_UI_THEME_SERVER"` // used to build Theme in WebConfig
+	ThemePath   string    `ocisConfig:"theme_path" env:"WEB_UI_THEME_PATH"`              // used to build Theme in WebConfig
 	Config      WebConfig `ocisConfig:"config"`
-}
-
-// Config combines all available configuration parts.
-type Config struct {
-	*shared.Commons
-
-	File    string      `ocisConfig:"file"`
-	Log     *shared.Log `ocisConfig:"log"`
-	Debug   Debug       `ocisConfig:"debug"`
-	HTTP    HTTP        `ocisConfig:"http"`
-	Tracing Tracing     `ocisConfig:"tracing"`
-	Asset   Asset       `ocisConfig:"asset"`
-	Web     Web         `ocisConfig:"web"`
-
-	Context    context.Context
-	Supervised bool
-}
-
-// New initializes a new configuration with or without defaults.
-func New() *Config {
-	return &Config{}
-}
-
-func DefaultConfig() *Config {
-	return &Config{
-		Debug: Debug{
-			Addr:   "127.0.0.1:9104",
-			Token:  "",
-			Pprof:  false,
-			Zpages: false,
-		},
-		HTTP: HTTP{
-			Addr:      "127.0.0.1:9100",
-			Root:      "/",
-			Namespace: "com.owncloud.web",
-			CacheTTL:  604800, // 7 days
-		},
-		Tracing: Tracing{
-			Enabled:   false,
-			Type:      "jaeger",
-			Endpoint:  "",
-			Collector: "",
-			Service:   "web",
-		},
-		Asset: Asset{
-			Path: "",
-		},
-		Web: Web{
-			Path:        "",
-			ThemeServer: "https://localhost:9200",
-			ThemePath:   "/themes/owncloud/theme.json",
-			Config: WebConfig{
-				Server:  "https://localhost:9200",
-				Theme:   "",
-				Version: "0.1.0",
-				OpenIDConnect: OIDC{
-					MetadataURL:  "",
-					Authority:    "https://localhost:9200",
-					ClientID:     "web",
-					ResponseType: "code",
-					Scope:        "openid profile email",
-				},
-				Apps: []string{"files", "search", "media-viewer", "external"},
-			},
-		},
-	}
 }

@@ -5,7 +5,10 @@ import (
 	"fmt"
 
 	"github.com/oklog/run"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
+	"github.com/owncloud/ocis/thumbnails/pkg/config/parser"
+	"github.com/owncloud/ocis/thumbnails/pkg/logging"
 	"github.com/owncloud/ocis/thumbnails/pkg/metrics"
 	"github.com/owncloud/ocis/thumbnails/pkg/server/debug"
 	"github.com/owncloud/ocis/thumbnails/pkg/server/grpc"
@@ -16,17 +19,16 @@ import (
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "server",
-		Usage: "Start integrated server",
-		Before: func(ctx *cli.Context) error {
-			if err := ParseConfig(ctx, cfg); err != nil {
-				return err
-			}
-			return nil
+		Name:     "server",
+		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
+		Category: "server",
+		Before: func(c *cli.Context) error {
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-			if err := tracing.Configure(cfg); err != nil {
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			err := tracing.Configure(cfg)
+			if err != nil {
 				return err
 			}
 
@@ -43,15 +45,15 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			metrics.BuildInfo.WithLabelValues(cfg.Server.Version).Set(1)
+			metrics.BuildInfo.WithLabelValues(version.String).Set(1)
 
 			service := grpc.NewService(
 				grpc.Logger(logger),
 				grpc.Context(ctx),
 				grpc.Config(cfg),
-				grpc.Name(cfg.Server.Name),
-				grpc.Namespace(cfg.Server.Namespace),
-				grpc.Address(cfg.Server.Address),
+				grpc.Name(cfg.Service.Name),
+				grpc.Namespace(cfg.GRPC.Namespace),
+				grpc.Address(cfg.GRPC.Addr),
 				grpc.Metrics(metrics),
 			)
 

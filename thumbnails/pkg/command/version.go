@@ -5,30 +5,33 @@ import (
 	"os"
 
 	"github.com/owncloud/ocis/ocis-pkg/registry"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/thumbnails/pkg/config"
 	"github.com/urfave/cli/v2"
 )
 
-// PrintVersion prints the service versions of all running instances.
-func PrintVersion(cfg *config.Config) *cli.Command {
+// Version prints the service versions of all running instances.
+func Version(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "version",
-		Usage: "Print the versions of the running instances",
-		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg)
-		},
+		Name:     "version",
+		Usage:    "print the version of this binary and the running extension instances",
+		Category: "info",
 		Action: func(c *cli.Context) error {
+			fmt.Println("Version: " + version.String)
+			fmt.Printf("Compiled: %s\n", version.Compiled())
+			fmt.Println("")
+
 			reg := registry.GetRegistry()
-			services, err := reg.GetService(cfg.Server.Namespace + "." + cfg.Server.Name)
+			services, err := reg.GetService(cfg.GRPC.Namespace + "." + cfg.Service.Name)
 			if err != nil {
-				fmt.Println(fmt.Errorf("could not get thumbnails services from the registry: %v", err))
+				fmt.Println(fmt.Errorf("could not get %s services from the registry: %v", cfg.Service.Name, err))
 				return err
 			}
 
 			if len(services) == 0 {
-				fmt.Println("No running thumbnails service found.")
+				fmt.Println("No running " + cfg.Service.Name + " service found.")
 				return nil
 			}
 

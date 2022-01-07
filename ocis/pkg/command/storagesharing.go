@@ -1,6 +1,3 @@
-//go:build !simple
-// +build !simple
-
 package command
 
 import (
@@ -14,8 +11,8 @@ import (
 func StorageSharingCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "storage-sharing",
-		Usage:    "Start storage sharing service",
-		Category: "Extensions",
+		Usage:    "start storage sharing service",
+		Category: "extensions",
 		//Flags:    flagset.SharingWithConfig(cfg.Storage),
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)

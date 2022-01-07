@@ -16,10 +16,11 @@ func AddAccount(cfg *config.Config) *cli.Command {
 		PasswordProfile: &accounts.PasswordProfile{},
 	}
 	return &cli.Command{
-		Name:    "add",
-		Usage:   "Create a new account",
-		Aliases: []string{"create", "a"},
-		Flags:   flagset.AddAccountWithConfig(cfg, a),
+		Name:     "add",
+		Usage:    "create a new account",
+		Category: "account management",
+		Aliases:  []string{"create", "a"},
+		Flags:    flagset.AddAccountWithConfig(cfg, a),
 		Before: func(c *cli.Context) error {
 			// Write value of username to the flags beneath, as preferred name
 			// and on-premises-sam-account-name is probably confusing for users.
@@ -41,7 +42,7 @@ func AddAccount(cfg *config.Config) *cli.Command {
 
 		},
 		Action: func(c *cli.Context) error {
-			accSvcID := cfg.GRPC.Namespace + "." + cfg.Server.Name
+			accSvcID := cfg.GRPC.Namespace + "." + cfg.Service.Name
 			accSvc := accounts.NewAccountsService(accSvcID, grpc.NewClient())
 			_, err := accSvc.CreateAccount(c.Context, &accounts.CreateAccountRequest{
 				Account: a,

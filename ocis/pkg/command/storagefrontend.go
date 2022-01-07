@@ -1,6 +1,3 @@
-//go:build !simple
-// +build !simple
-
 package command
 
 import (
@@ -14,8 +11,8 @@ import (
 func StorageFrontendCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "storage-frontend",
-		Usage:    "Start storage frontend",
-		Category: "Extensions",
+		Usage:    "start storage frontend",
+		Category: "extensions",
 		//Flags:    flagset.FrontendWithConfig(cfg.Storage),
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)

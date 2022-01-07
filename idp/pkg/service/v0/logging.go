@@ -7,19 +7,19 @@ import (
 )
 
 // NewLogging returns a service that logs messages.
-func NewLogging(next Service, logger log.Logger) Service {
-	return logging{
+func NewLoggingHandler(next Service, logger log.Logger) Service {
+	return loggingHandler{
 		next:   next,
 		logger: logger,
 	}
 }
 
-type logging struct {
+type loggingHandler struct {
 	next   Service
 	logger log.Logger
 }
 
 // ServeHTTP implements the Service interface.
-func (l logging) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (l loggingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	l.next.ServeHTTP(w, r)
 }

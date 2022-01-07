@@ -6,6 +6,7 @@ import (
 
 	pkgcrypto "github.com/owncloud/ocis/ocis-pkg/crypto"
 	svc "github.com/owncloud/ocis/ocis-pkg/service/http"
+	"github.com/owncloud/ocis/ocis-pkg/version"
 	"go-micro.dev/v4"
 )
 
@@ -43,11 +44,11 @@ func Server(opts ...Option) (svc.Service, error) {
 
 	service := svc.NewService(
 		svc.Name(options.Config.Service.Name),
+		svc.Version(version.String),
 		svc.TLSConfig(tlsConfig),
 		svc.Logger(options.Logger),
-		svc.Namespace(options.Config.Service.Namespace),
-		svc.Version(options.Config.Service.Version),
 		svc.Address(options.Config.HTTP.Addr),
+		svc.Namespace(options.Config.HTTP.Namespace),
 		svc.Context(options.Context),
 		svc.Flags(options.Flags...),
 	)

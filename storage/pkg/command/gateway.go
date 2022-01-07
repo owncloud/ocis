@@ -30,7 +30,7 @@ import (
 func Gateway(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "gateway",
-		Usage: "Start gateway",
+		Usage: "start gateway",
 		Before: func(c *cli.Context) error {
 			if err := ParseConfig(c, cfg, "storage-gateway"); err != nil {
 				return err

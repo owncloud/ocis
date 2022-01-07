@@ -1,6 +1,3 @@
-//go:build !simple
-// +build !simple
-
 package command
 
 import (
@@ -15,7 +12,7 @@ func StorageAuthBearerCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "storage-auth-bearer",
 		Usage:    "Start storage auth-bearer service",
-		Category: "Extensions",
+		Category: "extensions",
 		//Flags:    flagset.AuthBearerWithConfig(cfg.Storage),
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)

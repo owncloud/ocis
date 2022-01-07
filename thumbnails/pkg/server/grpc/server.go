@@ -22,7 +22,7 @@ func NewService(opts ...Option) grpc.Service {
 		grpc.Address(options.Address),
 		grpc.Context(options.Context),
 		grpc.Flags(options.Flags...),
-		grpc.Version(options.Config.Server.Version),
+		grpc.Version(version.String),
 	)
 	tconf := options.Config.Thumbnail
 	gc, err := pool.GetGatewayServiceClient(tconf.RevaGateway)

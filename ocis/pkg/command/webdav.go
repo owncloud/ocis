@@ -1,10 +1,8 @@
-//go:build !simple
-// +build !simple
-
 package command
 
 import (
 	"github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config/parser"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/webdav/pkg/command"
 	"github.com/urfave/cli/v2"
@@ -14,27 +12,13 @@ import (
 func WebDAVCommand(cfg *config.Config) *cli.Command {
 
 	return &cli.Command{
-		Name:     "webdav",
-		Usage:    "Start webdav server",
-		Category: "Extensions",
-		Subcommands: []*cli.Command{
-			command.PrintVersion(cfg.WebDAV),
-		},
+		Name:     cfg.WebDAV.Service.Name,
+		Usage:    subcommandDescription(cfg.WebDAV.Service.Name),
+		Category: "extensions",
 		Before: func(ctx *cli.Context) error {
-			if err := ParseConfig(ctx, cfg); err != nil {
-				return err
-			}
-
-			if cfg.Commons != nil {
-				cfg.WebDAV.Commons = cfg.Commons
-			}
-
-			return nil
+			return parser.ParseConfig(cfg)
 		},
-		Action: func(c *cli.Context) error {
-			origCmd := command.Server(cfg.WebDAV)
-			return handleOriginalAction(c, origCmd)
-		},
+		Subcommands: command.GetCommands(cfg.WebDAV),
 	}
 }
 
