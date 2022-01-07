@@ -26,7 +26,7 @@ Feature: Share spaces
     When user "Brian" lists all available spaces via the GraphApi
     Then the json responded should contain a space "Share space to Brian" with these key and value pairs:
       | key              | value                            |
-      | driveType        | share                            |
+      | driveType        | project                          |
       | id               | %space_id%                       |
       | name             | Share space to Brian             |
       | quota@@@state    | normal                           |
@@ -55,7 +55,7 @@ Feature: Share spaces
     When user "Brian" lists all available spaces via the GraphApi
     Then the json responded should contain a space "Unshare space" with these key and value pairs:
       | key       | value         |
-      | driveType | share         |
+      | driveType | project       |
       | id        | %space_id%    |
       | name      | Unshare space |
     When user "Alice" unshares a space "Unshare space" to user "Brian"
