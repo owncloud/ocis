@@ -581,11 +581,6 @@ _getting and setting quota_
 -   [apiWebdavProperties1/getQuota.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L27)
 -   [apiWebdavProperties1/getQuota.feature:28](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L28)
 
-
-#### [cannot get share-types webdav property](https://github.com/owncloud/ocis/issues/567)
--   [apiWebdavProperties2/getFileProperties.feature:174](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L174)
--   [apiWebdavProperties2/getFileProperties.feature:175](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L175)
-
 #### [Private link support](https://github.com/owncloud/product/issues/201)
 #### [oc:privatelink property not returned in webdav responses](https://github.com/owncloud/product/issues/262)
 -   [apiWebdavProperties2/getFileProperties.feature:232](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L232)
@@ -1428,7 +1423,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 -   [apiSharePublicLink2/allowGroupToCreatePublicLinks.feature:91](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/allowGroupToCreatePublicLinks.feature#L91)
 
 ### [Cannot download preview of shared received file after the shareowner has changed the file content](https://github.com/owncloud/ocis/issues/2538)
-- [apiWebdavPreviews/previews.feature:196](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L196)
 - [apiWebdavPreviews/previews.feature:217](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L217)
 - [apiWebdavPreviews/previews.feature:233](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L233)
 
