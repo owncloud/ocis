@@ -16,7 +16,8 @@ import (
 func RemoveAccount(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:      "remove",
-		Usage:     "Removes an existing account",
+		Usage:     "removes an existing account",
+		Category:  "account management",
 		ArgsUsage: "id",
 		Aliases:   []string{"rm"},
 		Flags:     flagset.RemoveAccountWithConfig(cfg),

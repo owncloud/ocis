@@ -15,8 +15,9 @@ import (
 // Version prints the service versions of all running instances.
 func Version(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "version",
-		Usage: "Print the versions of the running instances",
+		Name:     "version",
+		Usage:    "Print the version of this binary and the running extension instances",
+		Category: "Version",
 		Action: func(c *cli.Context) error {
 			fmt.Println("Version: " + version.String)
 			fmt.Printf("Compiled: %s\n", version.Compiled())

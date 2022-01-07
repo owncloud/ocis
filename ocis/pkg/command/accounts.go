@@ -11,9 +11,9 @@ import (
 // AccountsCommand is the entrypoint for the accounts command.
 func AccountsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "accounts",
-		Usage:    "Start accounts server",
-		Category: "Extensions",
+		Name:     cfg.Accounts.Service.Name,
+		Usage:    subcommandDescription(cfg.Accounts.Service.Name),
+		Category: "extensions",
 		Before: func(ctx *cli.Context) error {
 			return parser.ParseConfig(cfg)
 		},

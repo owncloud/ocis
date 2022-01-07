@@ -22,11 +22,11 @@ import (
 func StoragePublicLink(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-public-link",
-		Usage: "Start storage-public-link service",
+		Usage: "start storage-public-link service",
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg, "storage-public-link")
 		},
-		Category: "Extensions",
+		Category: "extensions",
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 			tracing.Configure(cfg, logger)

@@ -11,9 +11,9 @@ import (
 // IDPCommand is the entrypoint for the idp command.
 func IDPCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "idp",
-		Usage:    "Start idp server",
-		Category: "Extensions",
+		Name:     cfg.IDP.Service.Name,
+		Usage:    subcommandDescription(cfg.IDP.Service.Name),
+		Category: "extensions",
 		Before: func(ctx *cli.Context) error {
 			return parser.ParseConfig(cfg)
 		},

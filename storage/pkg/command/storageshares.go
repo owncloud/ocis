@@ -23,7 +23,7 @@ import (
 func StorageShares(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-shares",
-		Usage: "Start storage-shares service",
+		Usage: "start storage-shares service",
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg, "storage-shares")
 		},

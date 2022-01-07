@@ -13,10 +13,11 @@ import (
 // Health is the entrypoint for the health command.
 func Health(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "health",
-		Usage: "Check health status",
+		Name:     "health",
+		Usage:    "check health status",
+		Category: "info",
 		Before: func(c *cli.Context) error {
-			return parser.ParseConfig( cfg)
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)

@@ -23,7 +23,7 @@ import (
 func AuthBasic(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-basic",
-		Usage: "Start authprovider for basic auth",
+		Usage: "start authprovider for basic auth",
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg, "storage-auth-basic")
 		},

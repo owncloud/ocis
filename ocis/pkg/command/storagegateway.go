@@ -11,8 +11,8 @@ import (
 func StorageGatewayCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "storage-gateway",
-		Usage:    "Start storage gateway",
-		Category: "Extensions",
+		Usage:    "start storage gateway",
+		Category: "extensions",
 		//Flags:    flagset.GatewayWithConfig(cfg.Storage),
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)

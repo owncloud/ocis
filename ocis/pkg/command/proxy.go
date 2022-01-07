@@ -11,9 +11,9 @@ import (
 // ProxyCommand is the entry point for the proxy command.
 func ProxyCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "proxy",
-		Usage:    "Start proxy server",
-		Category: "Extensions",
+		Name:     cfg.Proxy.Service.Name,
+		Usage:    subcommandDescription(cfg.Proxy.Service.Name),
+		Category: "extensions",
 		Before: func(ctx *cli.Context) error {
 			return parser.ParseConfig(cfg)
 		},

@@ -17,8 +17,8 @@ import (
 func RunCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "run",
-		Usage:    "Runs an extension",
-		Category: "Runtime",
+		Usage:    "run an extension by name in the runtime (supervised mode)",
+		Category: "runtime",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "hostname",

@@ -22,7 +22,7 @@ import (
 func AppProvider(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "app-provider",
-		Usage: "Start appprovider for providing apps",
+		Usage: "start appprovider for providing apps",
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg, "storage-app-provider")
 		},

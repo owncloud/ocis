@@ -11,9 +11,9 @@ import (
 // OCSCommand is the entrypoint for the ocs command.
 func OCSCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "ocs",
-		Usage:    "Start ocs server",
-		Category: "Extensions",
+		Name:     cfg.OCS.Service.Name,
+		Usage:    subcommandDescription(cfg.OCS.Service.Name),
+		Category: "extensions",
 		Before: func(ctx *cli.Context) error {
 			return parser.ParseConfig(cfg)
 		},

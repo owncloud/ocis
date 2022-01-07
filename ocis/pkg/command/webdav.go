@@ -12,9 +12,9 @@ import (
 func WebDAVCommand(cfg *config.Config) *cli.Command {
 
 	return &cli.Command{
-		Name:     "webdav",
-		Usage:    "Start webdav server",
-		Category: "Extensions",
+		Name:     cfg.WebDAV.Service.Name,
+		Usage:    subcommandDescription(cfg.WebDAV.Service.Name),
+		Category: "extensions",
 		Before: func(ctx *cli.Context) error {
 			return parser.ParseConfig(cfg)
 		},

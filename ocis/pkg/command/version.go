@@ -17,8 +17,8 @@ import (
 func VersionCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "version",
-		Usage:    "Lists running services with version",
-		Category: "Runtime",
+		Usage:    "print the version of this binary and all running extension instances",
+		Category: "info",
 		Action: func(c *cli.Context) error {
 			fmt.Println("Version: " + version.String)
 			fmt.Printf("Compiled: %s\n", version.Compiled())

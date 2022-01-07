@@ -11,9 +11,9 @@ import (
 // GLAuthCommand is the entrypoint for the glauth command.
 func GLAuthCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "glauth",
-		Usage:    "Start glauth server",
-		Category: "Extensions",
+		Name:     cfg.GLAuth.Service.Name,
+		Usage:    subcommandDescription(cfg.GLAuth.Service.Name),
+		Category: "extensions",
 		Before: func(ctx *cli.Context) error {
 			return parser.ParseConfig(cfg)
 		},

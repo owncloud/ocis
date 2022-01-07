@@ -12,9 +12,9 @@ import (
 func StoreCommand(cfg *config.Config) *cli.Command {
 
 	return &cli.Command{
-		Name:     "store",
-		Usage:    "Start a go-micro store",
-		Category: "Extensions",
+		Name:     cfg.Store.Service.Name,
+		Usage:    subcommandDescription(cfg.Store.Service.Name),
+		Category: "extensions",
 		Before: func(ctx *cli.Context) error {
 			return parser.ParseConfig(cfg)
 		},

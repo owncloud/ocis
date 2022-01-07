@@ -13,8 +13,8 @@ import (
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "server",
-		Usage:    "Start fullstack server",
-		Category: "Fullstack",
+		Usage:    "start a fullstack server (runtime and all extensions in supervised mode)",
+		Category: "fullstack",
 		Before: func(c *cli.Context) error {
 			return parser.ParseConfig(cfg)
 		},

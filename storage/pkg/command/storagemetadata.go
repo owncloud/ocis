@@ -28,11 +28,11 @@ import (
 func StorageMetadata(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-metadata",
-		Usage: "Start storage-metadata service",
+		Usage: "start storage-metadata service",
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg, "storage-metadata")
 		},
-		Category: "Extensions",
+		Category: "extensions",
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 			tracing.Configure(cfg, logger)

@@ -21,6 +21,7 @@ func UpdateAccount(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:      "update",
 		Usage:     "Make changes to an existing account",
+		Category:  "account management",
 		ArgsUsage: "id",
 		Flags:     flagset.UpdateAccountWithConfig(cfg, a),
 		Before: func(c *cli.Context) error {

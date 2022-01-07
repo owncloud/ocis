@@ -23,7 +23,7 @@ import (
 func Groups(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "groups",
-		Usage: "Start groups service",
+		Usage: "start groups service",
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg, "storage-groups")
 		},

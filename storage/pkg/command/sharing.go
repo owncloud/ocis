@@ -25,7 +25,7 @@ import (
 func Sharing(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "sharing",
-		Usage: "Start sharing service",
+		Usage: "start sharing service",
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg, "storage-sharing")
 		},

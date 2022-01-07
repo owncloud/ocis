@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/graph-explorer/pkg/config"
@@ -18,8 +19,9 @@ import (
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "server",
-		Usage: "Start integrated server",
+		Name:     "server",
+		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
+		Category: "server",
 		Before: func(ctx *cli.Context) error {
 			return parser.ParseConfig(cfg)
 		},

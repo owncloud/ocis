@@ -11,8 +11,8 @@ import (
 func StorageUsersCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "storage-users",
-		Usage:    "Start storage and data provider for /users mount",
-		Category: "Extensions",
+		Usage:    "start storage and data provider for /users mount",
+		Category: "extensions",
 		//Flags:    flagset.StorageUsersWithConfig(cfg.Storage),
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)

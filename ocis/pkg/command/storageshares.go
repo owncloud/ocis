@@ -11,8 +11,8 @@ import (
 func StorageSharesCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "storage-shares",
-		Usage:    "Start storage and data provider for /home/Shares mount",
-		Category: "Extensions",
+		Usage:    "start storage and data provider for shares jail",
+		Category: "extensions",
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)
 		},
