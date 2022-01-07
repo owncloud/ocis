@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -36,8 +37,9 @@ import (
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "server",
-		Usage: "Start integrated server",
+		Name:     "server",
+		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
+		Category: "server",
 		Before: func(c *cli.Context) error {
 			return parser.ParseConfig(cfg)
 		},

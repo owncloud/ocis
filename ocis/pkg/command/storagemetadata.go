@@ -11,8 +11,8 @@ import (
 func StorageMetadataCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "storage-metadata",
-		Usage:    "Start storage and data service for metadata",
-		Category: "Extensions",
+		Usage:    "start storage and data service for metadata",
+		Category: "extensions",
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)
 		},

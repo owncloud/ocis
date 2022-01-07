@@ -11,9 +11,9 @@ import (
 // GraphExplorerCommand is the entrypoint for the graph-explorer command.
 func GraphExplorerCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "graph-explorer",
-		Usage:    "Start graph-explorer server",
-		Category: "Extensions",
+		Name:     cfg.GraphExplorer.Service.Name,
+		Usage:    subcommandDescription(cfg.GraphExplorer.Service.Name),
+		Category: "extensions",
 		Before: func(ctx *cli.Context) error {
 			return parser.ParseConfig(cfg)
 		},

@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/accounts/pkg/config"
@@ -20,9 +21,9 @@ import (
 // Server is the entry point for the server command.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:        "server",
-		Usage:       "Start ocis accounts service",
-		Description: "uses an LDAP server as the storage backend",
+		Name:     "server",
+		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
+		Category: "server",
 		Before: func(c *cli.Context) error {
 			return parser.ParseConfig(cfg)
 		},

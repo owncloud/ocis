@@ -24,7 +24,7 @@ import (
 func StorageHome(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-home",
-		Usage: "Start storage-home service",
+		Usage: "start storage-home service",
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg, "storage-home")
 		},

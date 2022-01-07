@@ -11,9 +11,9 @@ import (
 // SettingsCommand is the entry point for the settings command.
 func SettingsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "settings",
-		Usage:    "Start settings server",
-		Category: "Extensions",
+		Name:     cfg.Settings.Service.Name,
+		Usage:    subcommandDescription(cfg.Settings.Service.Name),
+		Category: "extensions",
 		Before: func(ctx *cli.Context) error {
 			return parser.ParseConfig(cfg)
 		},

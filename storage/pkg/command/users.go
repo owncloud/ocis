@@ -23,7 +23,7 @@ import (
 func Users(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "users",
-		Usage: "Start users service",
+		Usage: "start users service",
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg, "storage-users")
 		},

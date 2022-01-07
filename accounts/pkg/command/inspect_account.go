@@ -18,7 +18,8 @@ import (
 func InspectAccount(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:      "inspect",
-		Usage:     "Show detailed data on an existing account",
+		Usage:     "show detailed data on an existing account",
+		Category:  "account management",
 		ArgsUsage: "id",
 		Flags:     flagset.InspectAccountWithConfig(cfg),
 		Action: func(c *cli.Context) error {

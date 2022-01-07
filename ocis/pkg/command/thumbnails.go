@@ -11,15 +11,11 @@ import (
 // ThumbnailsCommand is the entrypoint for the thumbnails command.
 func ThumbnailsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "thumbnails",
-		Usage:    "Start thumbnails server",
-		Category: "Extensions",
+		Name:     cfg.Thumbnails.Service.Name,
+		Usage:    subcommandDescription(cfg.Thumbnails.Service.Name),
+		Category: "extensions",
 		Before: func(ctx *cli.Context) error {
 			return parser.ParseConfig(cfg)
-		},
-		Action: func(c *cli.Context) error {
-			origCmd := command.Server(cfg.Thumbnails)
-			return handleOriginalAction(c, origCmd)
 		},
 		Subcommands: command.GetCommands(cfg.Thumbnails),
 	}

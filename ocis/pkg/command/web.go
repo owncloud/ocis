@@ -11,9 +11,9 @@ import (
 // WebCommand is the entrypoint for the web command.
 func WebCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "web",
-		Usage:    "Start web server",
-		Category: "Extensions",
+		Name:     cfg.Web.Service.Name,
+		Usage:    subcommandDescription(cfg.Web.Service.Name),
+		Category: "extensions",
 		Before: func(ctx *cli.Context) error {
 			return parser.ParseConfig(cfg)
 		},

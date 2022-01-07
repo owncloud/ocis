@@ -22,7 +22,7 @@ import (
 func AuthBearer(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-bearer",
-		Usage: "Start authprovider for bearer auth",
+		Usage: "start authprovider for bearer auth",
 		Before: func(c *cli.Context) error {
 			return ParseConfig(c, cfg, "storage-auth-bearer")
 		},
