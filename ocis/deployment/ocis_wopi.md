@@ -176,3 +176,22 @@ After that you're ready to start the application stack:
 Open https://collabora.owncloud.test, https://onlyoffice.owncloud.test, https://codimd.owncloud.test and https://wopiserver.owncloud.test  in your browser and accept the invalid certificate warning.
 
 Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You are now able to open an office document in your browser. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
+
+## Local setup for web development
+
+In case you want to run ownCloud Web from a development branch together with this deployment example (e.g. for feature development for the app provider frontend) you can use this deployment example with the local setup and some additional steps as described below.
+
+1. Clone the [ownCloud Web repository](https://github.com/owncloud/web) on your development machine.
+2. Run `yarn && yarn build:w` for `web`, so that it creates and continuously updates the `dist` folder for web.
+3. Add the dist folder as read only volume to `volumes` section of the `ocis` service in the `docker-compose.yml` file:
+   ```yaml
+   - /your/local/path/to/web/dist/:/web/dist:ro
+   ```
+   Make sure to point to the `dist` folder inside your local copy of the web repository.
+4. Set the oCIS environment variable `WEB_ASSET_PATH` in the `environment` section of the `ocis` service, so that it uses your mounted dist folder for the web assets, instead of the assets that are embedded into oCIS.
+   ```yaml
+   WEB_ASSET_PATH: "/web/dist"
+   ```
+5. Start the deployment example as described above in the `Local setup` section.
+
+For app provider frontend development in `web` you can find the source code in `web/packages/web-app-external`. Some parts of the integration live in `web/packages/web-app-files`.
