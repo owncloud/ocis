@@ -4,6 +4,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 
 	accounts "github.com/owncloud/ocis/accounts/pkg/config"
+	gateway "github.com/owncloud/ocis/gateway/pkg/config"
 	glauth "github.com/owncloud/ocis/glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/graph/pkg/config"
@@ -56,16 +57,17 @@ type Config struct {
 	Runtime      Runtime      `ocisConfig:"runtime"`
 
 	Accounts      *accounts.Config      `ocisConfig:"accounts"`
+	Gateway       *gateway.Config       `ocisConfig:"gateway"`
 	GLAuth        *glauth.Config        `ocisConfig:"glauth"`
 	Graph         *graph.Config         `ocisConfig:"graph"`
 	GraphExplorer *graphExplorer.Config `ocisConfig:"graph_explorer"`
 	IDP           *idp.Config           `ocisConfig:"idp"`
 	OCS           *ocs.Config           `ocisConfig:"ocs"`
-	Web           *web.Config           `ocisConfig:"web"`
 	Proxy         *proxy.Config         `ocisConfig:"proxy"`
 	Settings      *settings.Config      `ocisConfig:"settings"`
 	Storage       *storage.Config       `ocisConfig:"storage"`
 	Store         *store.Config         `ocisConfig:"store"`
 	Thumbnails    *thumbnails.Config    `ocisConfig:"thumbnails"`
+	Web           *web.Config           `ocisConfig:"web"`
 	WebDAV        *webdav.Config        `ocisConfig:"webdav"`
 }

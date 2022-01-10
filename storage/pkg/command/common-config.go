@@ -1,115 +1,17 @@
 package command
 
 import (
-	"context"
 	"encoding/json"
-	"flag"
 	"io/ioutil"
-	"os"
-	"path"
 	"strings"
 
-	"github.com/cs3org/reva/cmd/revad/runtime"
-	"github.com/gofrs/uuid"
 	"github.com/mitchellh/mapstructure"
-	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/shared"
-	"github.com/owncloud/ocis/ocis-pkg/sync"
-	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/storage/pkg/config"
-	"github.com/owncloud/ocis/storage/pkg/server/debug"
-	"github.com/owncloud/ocis/storage/pkg/service/external"
-	"github.com/owncloud/ocis/storage/pkg/tracing"
-	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
 )
-
-// Gateway is the entrypoint for the gateway command.
-func Gateway(cfg *config.Config) *cli.Command {
-	return &cli.Command{
-		Name:  "gateway",
-		Usage: "start gateway",
-		Before: func(c *cli.Context) error {
-			if err := ParseConfig(c, cfg, "storage-gateway"); err != nil {
-				return err
-			}
-
-			if cfg.Reva.DataGateway.PublicURL == "" {
-				cfg.Reva.DataGateway.PublicURL = strings.TrimRight(cfg.Reva.Frontend.PublicURL, "/") + "/data"
-			}
-
-			return nil
-		},
-		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-			tracing.Configure(cfg, logger)
-			gr := run.Group{}
-			ctx, cancel := context.WithCancel(context.Background())
-			uuid := uuid.Must(uuid.NewV4())
-			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
-			rcfg := gatewayConfigFromStruct(c, cfg, logger)
-			logger.Debug().
-				Str("server", "gateway").
-				Interface("reva-config", rcfg).
-				Msg("config")
-
-			defer cancel()
-
-			gr.Add(func() error {
-				err := external.RegisterGRPCEndpoint(
-					ctx,
-					"com.owncloud.storage",
-					uuid.String(),
-					cfg.Reva.Gateway.GRPCAddr,
-					version.String,
-					logger,
-				)
-
-				if err != nil {
-					return err
-				}
-
-				runtime.RunWithOptions(
-					rcfg,
-					pidFile,
-					runtime.WithLogger(&logger.Logger),
-				)
-				return nil
-			}, func(_ error) {
-				logger.Info().
-					Str("server", c.Command.Name).
-					Msg("Shutting down server")
-
-				cancel()
-			})
-
-			debugServer, err := debug.Server(
-				debug.Name(c.Command.Name+"-debug"),
-				debug.Addr(cfg.Reva.Gateway.DebugAddr),
-				debug.Logger(logger),
-				debug.Context(ctx),
-				debug.Config(cfg),
-			)
-
-			if err != nil {
-				logger.Info().Err(err).Str("server", "debug").Msg("Failed to initialize server")
-				return err
-			}
-
-			gr.Add(debugServer.ListenAndServe, func(_ error) {
-				cancel()
-			})
-
-			if !cfg.Reva.Gateway.Supervised {
-				sync.Trap(&gr, cancel)
-			}
-
-			return gr.Run()
-		},
-	}
-}
 
 // gatewayConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
 func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logger) map[string]interface{} {
@@ -343,41 +245,6 @@ func mimetypes(cfg *config.Config, logger log.Logger) []map[string]interface{} {
 	}
 	return m
 
-}
-
-// GatewaySutureService allows for the storage-gateway command to be embedded and supervised by a suture supervisor tree.
-type GatewaySutureService struct {
-	cfg *config.Config
-}
-
-// NewGatewaySutureService creates a new gateway.GatewaySutureService
-func NewGateway(cfg *ociscfg.Config) suture.Service {
-	cfg.Storage.Commons = cfg.Commons
-	return GatewaySutureService{
-		cfg: cfg.Storage,
-	}
-}
-
-func (s GatewaySutureService) Serve(ctx context.Context) error {
-	s.cfg.Reva.Gateway.Context = ctx
-	f := &flag.FlagSet{}
-	cmdFlags := Gateway(s.cfg).Flags
-	for k := range cmdFlags {
-		if err := cmdFlags[k].Apply(f); err != nil {
-			return err
-		}
-	}
-	cliCtx := cli.NewContext(nil, f, nil)
-	if Gateway(s.cfg).Before != nil {
-		if err := Gateway(s.cfg).Before(cliCtx); err != nil {
-			return err
-		}
-	}
-	if err := Gateway(s.cfg).Action(cliCtx); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // ParseConfig loads accounts configuration from known paths.
