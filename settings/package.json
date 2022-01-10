@@ -45,7 +45,7 @@
     "@rollup/plugin-commonjs": "^17.1.0",
     "@rollup/plugin-json": "^4.0.1",
     "@rollup/plugin-replace": "^2.4.2",
-    "chromedriver": "^93.0.1",
+    "chromedriver": "^97.0.0",
     "archiver": "^5.3.0",
     "cross-env": "^7.0.3",
     "easygettext": "^2.7.0",
