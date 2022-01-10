@@ -14,6 +14,9 @@
 -   [apiArchiver/downloadByPath.feature:132](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/apiArchiver/downloadByPath.feature#L132)
 -   [apiArchiver/downloadByPath.feature:133](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/apiArchiver/downloadByPath.feature#L133)
 
+####  Another users space literally does not exist because it is not listed as a space for him, 404 seems correct, expects 403
+-   [apiAuthWebDav/webDavPUTAuth.feature:40]
+
 
 #### [Overwriting a file in the space within the allowed quota does not work](https://github.com/owncloud/ocis/issues/2829)
 - [apiSpaces/quota.feature:56](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/quota.feature#L56)
