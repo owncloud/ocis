@@ -246,4 +246,4 @@ require (
 //replace github.com/cs3org/reva => github.com/cs3org/reva v1.16.1-0.20211208164450-3abd76eecf8b
 //replace github.com/cs3org/reva => ../reva
 
-replace github.com/cs3org/reva => github.com/cs3org/reva v1.16.1-0.20220107152324-c05e07489406
+replace github.com/cs3org/reva => github.com/cs3org/reva v1.16.1-0.20220110143148-0b50ca9ddb6e
