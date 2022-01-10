@@ -31,7 +31,7 @@ func APIVersion(ctx context.Context) string {
 }
 
 // OcsV1StatusCodes returns the http status codes for the OCS API v1.
-func OcsV1StatusCodes(meta data.Meta) int {
+func OcsV1StatusCodes(meta *data.Meta) int {
 	if meta.StatusCode == data.MetaUnauthorized.StatusCode {
 		return http.StatusUnauthorized
 	}
@@ -43,10 +43,12 @@ func OcsV1StatusCodes(meta data.Meta) int {
 // also HTTP status codes for apps are the same as OCS codes
 // see https://github.com/owncloud/core/blob/b9ff4c93e051c94adfb301545098ae627e52ef76/lib/public/AppFramework/OCSController.php#L142-L150
 // I think this is a bug in the ocs v2 api, but since we are going to mimic bugs in ocis ... here goes
-func OcsV2StatusCodes(meta data.Meta) int {
+// dangerzone: the value is passed in as pointer, because the actual ocs response code has to be changed as well
+func OcsV2StatusCodes(meta *data.Meta) int {
 	sc := meta.StatusCode
 	switch sc {
 	case data.MetaNotFound.StatusCode:
+		meta.StatusCode = http.StatusNotFound
 		return http.StatusNotFound
 	case data.MetaUnknownError.StatusCode:
 		fallthrough
@@ -55,7 +57,6 @@ func OcsV2StatusCodes(meta data.Meta) int {
 	case data.MetaUnauthorized.StatusCode:
 		return http.StatusUnauthorized
 	case data.MetaOK.StatusCode:
-		// TODO mustn't data.Meta be a pointer so this assignment has an effect
 		meta.StatusCode = http.StatusOK
 		return http.StatusOK
 	}

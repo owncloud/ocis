@@ -72,11 +72,8 @@ func (rsp Response) MarshalXML(e *xml.Encoder, start xml.StartElement) (err erro
 func (rsp *Response) Render(w http.ResponseWriter, r *http.Request) error {
 	version := APIVersion(r.Context())
 	m := statusCodeMapper(version)
-	statusCode := m(rsp.OCS.Meta)
+	statusCode := m(&rsp.OCS.Meta)
 	render.Status(r, statusCode)
-	if version == ocsVersion2 && statusCode == http.StatusOK {
-		rsp.OCS.Meta.StatusCode = statusCode
-	}
 	return nil
 }
 
@@ -100,8 +97,8 @@ func ErrRender(c int, m string) render.Renderer {
 	}
 }
 
-func statusCodeMapper(version string) func(data.Meta) int {
-	var mapper func(data.Meta) int
+func statusCodeMapper(version string) func(*data.Meta) int {
+	var mapper func(*data.Meta) int
 	switch version {
 	case ocsVersion1:
 		mapper = OcsV1StatusCodes
