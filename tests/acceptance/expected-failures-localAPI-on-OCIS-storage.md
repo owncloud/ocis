@@ -14,6 +14,10 @@
 -   [apiArchiver/downloadByPath.feature:132](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadByPath.feature#L132)
 -   [apiArchiver/downloadByPath.feature:133](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadByPath.feature#L133)
 
+### Tries to download /Shares/ folder but it cannot be downloaded any more directly
+- [apiArchiver/downloadById.feature:134](https://github.com/owncloud/web/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L134)
+- [apiArchiver/downloadById.feature:135](https://github.com/owncloud/web/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L135)
+
 #### [Overwriting a file in the space within the allowed quota does not work](https://github.com/owncloud/ocis/issues/2829)
 - [apiSpaces/quota.feature:56](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/quota.feature#L56)
 
