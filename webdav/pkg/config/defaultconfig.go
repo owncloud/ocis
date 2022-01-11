@@ -29,6 +29,7 @@ func DefaultConfig() *Config {
 			Collector: "",
 		},
 		OcisPublicURL:   "https://127.0.0.1:9200",
-		WebdavNamespace: "/home",
+		WebdavNamespace: "/users/{{.Id.OpaqueId}}",
+		RevaGateway:     "127.0.0.1:9142",
 	}
 }

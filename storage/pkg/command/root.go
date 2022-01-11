@@ -21,9 +21,9 @@ func GetCommands(cfg *config.Config) cli.Commands {
 		AuthBearer(cfg),
 		AuthMachine(cfg),
 		Sharing(cfg),
-		StorageHome(cfg),
-		StorageUsers(cfg),
 		StoragePublicLink(cfg),
+		StorageShares(cfg),
+		StorageUsers(cfg),
 		StorageMetadata(cfg),
 		Health(cfg),
 	}

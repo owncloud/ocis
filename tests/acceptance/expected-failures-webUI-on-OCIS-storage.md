@@ -122,8 +122,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUIRestrictSharing/restrictSharing.feature:56](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictSharing.feature#L56)
 
 ### [First request with a recreated user returns a 401 error](https://github.com/owncloud/ocis/issues/1675)
--   [webUISharingAutocompletion/shareAutocompletion.feature:56](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L56)
--   [webUISharingAutocompletion/shareAutocompletion.feature:66](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L66)
 -   [webUISharingAutocompletion/shareAutocompletion.feature:128](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L128)
 -   [webUISharingAutocompletion/shareAutocompletion.feature:141](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L141)
 
@@ -510,3 +508,13 @@ Other free text and markdown formatting can be used elsewhere in the document if
 
 ### [shares are not listed with full paths](https://github.com/owncloud/ocis/issues/2462)
 -   [webUISharingPublicBasic/publicLinkCreate.feature:88](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicBasic/publicLinkCreate.feature#L88)
+
+### Shares folder cannot be deleted and is always visible
+-  [webUIDeleteFilesFolders/deleteFilesFolders.feature:77](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L77)
+-  [webUIDeleteFilesFolders/deleteFilesFolders.feature:89](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L89)
+-  [webUISharingAcceptShares/acceptShares.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L72)
+-  [webUIOperationsWithFolderShares/accessToSharesFolder.feature:14](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIOperationsWithFolderShares/accessToSharesFolder.feature#L14)
+
+### [web config update is not properly reflected after the ocis start](https://github.com/owncloud/ocis/issues/2944)
+-   [webUIFiles/breadcrumb.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/breadcrumb.feature#L50)
+

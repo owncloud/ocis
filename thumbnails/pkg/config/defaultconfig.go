@@ -34,7 +34,6 @@ func DefaultConfig() *Config {
 			},
 			WebdavAllowInsecure: true,
 			RevaGateway:         "127.0.0.1:9142",
-			WebdavNamespace:     "/home",
 			CS3AllowInsecure:    false,
 		},
 	}

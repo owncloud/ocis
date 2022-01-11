@@ -6,15 +6,15 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/cs3org/reva/pkg/auth/scope"
-
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/pkg/auth/scope"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
+	"github.com/cs3org/reva/pkg/utils"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
@@ -22,16 +22,12 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-const (
-	storageMountPath = "/meta"
-)
-
 // CS3Repo provides a cs3 implementation of the Repo interface
 type CS3Repo struct {
 	cfg             *config.Config
 	tm              token.Manager
 	storageProvider provider.ProviderAPIClient
-	metadataStorage metadatastorage.MetadataStorage
+	metadataStorage *metadatastorage.MetadataStorage
 }
 
 // NewCS3Repo creates a new cs3 repo
@@ -54,12 +50,22 @@ func NewCS3Repo(cfg *config.Config) (Repo, error) {
 		return nil, err
 	}
 
-	return CS3Repo{
+	r := CS3Repo{
 		cfg:             cfg,
 		tm:              tokenManager,
 		storageProvider: client,
-		metadataStorage: ms,
-	}, nil
+		metadataStorage: &ms,
+	}
+
+	ctx, err := r.getAuthenticatedContext(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	if err := ms.Init(ctx, cfg.ServiceUser); err != nil {
+		return nil, err
+	}
+
+	return r, nil
 }
 
 // WriteAccount writes an account via cs3 and modifies the provided account (e.g. with a generated id).
@@ -102,7 +108,8 @@ func (r CS3Repo) LoadAccounts(ctx context.Context, a *[]*proto.Account) (err err
 
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Path: path.Join(storageMountPath, accountsFolder),
+			ResourceId: r.metadataStorage.SpaceRoot,
+			Path:       utils.MakeRelativePath(accountsFolder),
 		},
 	})
 	if err != nil {
@@ -142,7 +149,8 @@ func (r CS3Repo) DeleteAccount(ctx context.Context, id string) (err error) {
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Path: path.Join(storageMountPath, accountsFolder, id),
+			ResourceId: r.metadataStorage.SpaceRoot,
+			Path:       utils.MakeRelativePath(filepath.Join("/", accountsFolder, id)),
 		},
 	})
 
@@ -197,7 +205,8 @@ func (r CS3Repo) LoadGroups(ctx context.Context, g *[]*proto.Group) (err error) 
 
 	res, err := r.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Path: path.Join(storageMountPath, groupsFolder),
+			ResourceId: r.metadataStorage.SpaceRoot,
+			Path:       utils.MakeRelativePath(groupsFolder),
 		},
 	})
 	if err != nil {
@@ -237,7 +246,8 @@ func (r CS3Repo) DeleteGroup(ctx context.Context, id string) (err error) {
 
 	resp, err := r.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Path: path.Join(storageMountPath, groupsFolder, id),
+			ResourceId: r.metadataStorage.SpaceRoot,
+			Path:       utils.MakeRelativePath(filepath.Join(groupsFolder, id)),
 		},
 	})
 
@@ -289,13 +299,14 @@ func (r CS3Repo) groupURL(id string) string {
 }
 
 func (r CS3Repo) makeRootDirIfNotExist(ctx context.Context, folder string) error {
-	return MakeDirIfNotExist(ctx, r.storageProvider, folder)
+	return MakeDirIfNotExist(ctx, r.storageProvider, r.metadataStorage.SpaceRoot, folder)
 }
 
 // MakeDirIfNotExist will create a root node in the metadata storage. Requires an authenticated context.
-func MakeDirIfNotExist(ctx context.Context, sp provider.ProviderAPIClient, folder string) error {
+func MakeDirIfNotExist(ctx context.Context, sp provider.ProviderAPIClient, root *provider.ResourceId, folder string) error {
 	var rootPathRef = &provider.Reference{
-		Path: path.Join(storageMountPath, folder),
+		ResourceId: root,
+		Path:       utils.MakeRelativePath(folder),
 	}
 
 	resp, err := sp.Stat(ctx, &provider.StatRequest{

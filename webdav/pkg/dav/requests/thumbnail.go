@@ -33,11 +33,13 @@ type ThumbnailRequest struct {
 	Height int32
 	// In case of a public share the public link token.
 	PublicLinkToken string
+	// The username from the requested URL
+	Username string
 }
 
 // ParseThumbnailRequest extracts all required parameters from a http request.
 func ParseThumbnailRequest(r *http.Request) (*ThumbnailRequest, error) {
-	fp, err := extractFilePath(r)
+	fp, username, err := extractFilePath(r)
 	if err != nil {
 		return nil, err
 	}
@@ -55,6 +57,7 @@ func ParseThumbnailRequest(r *http.Request) (*ThumbnailRequest, error) {
 		Width:           int32(width),
 		Height:          int32(height),
 		PublicLinkToken: chi.URLParam(r, "token"),
+		Username:        username,
 	}, nil
 }
 
@@ -64,23 +67,23 @@ func ParseThumbnailRequest(r *http.Request) (*ThumbnailRequest, error) {
 //
 // User and filepath are dynamic and filepath can contain slashes
 // So using the URLParam function is not possible.
-func extractFilePath(r *http.Request) (string, error) {
+func extractFilePath(r *http.Request) (string, string, error) {
 	user := chi.URLParam(r, "user")
 	user, err := url.QueryUnescape(user)
 	if err != nil {
-		return "", errors.New("could not unescape user")
+		return "", "", errors.New("could not unescape user")
 	}
 	if user != "" {
 		parts := strings.SplitN(r.URL.Path, user, 2)
-		return parts[1], nil
+		return parts[1], user, nil
 	}
 
 	token := chi.URLParam(r, "token")
 	if token != "" {
 		parts := strings.SplitN(r.URL.Path, token, 2)
-		return parts[1], nil
+		return parts[1], "", nil
 	}
-	return "", errors.New("could not extract file path")
+	return "", "", errors.New("could not extract file path")
 }
 
 func parseDimensions(q url.Values) (int64, int64, error) {

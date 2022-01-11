@@ -30,8 +30,7 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 		logger.Fatal().Err(err).Msg("resolutions not configured correctly")
 	}
 	svc := Thumbnail{
-		serviceID:       options.Config.GRPC.Namespace + "." + options.Config.Service.Name,
-		webdavNamespace: options.Config.Thumbnail.WebdavNamespace,
+		serviceID: options.Config.GRPC.Namespace + "." + options.Config.Service.Name,
 		manager: thumbnail.NewSimpleManager(
 			resolutions,
 			options.ThumbnailStorage,
@@ -52,7 +51,6 @@ func NewService(opts ...Option) v0proto.ThumbnailServiceHandler {
 // Thumbnail implements the GRPC handler.
 type Thumbnail struct {
 	serviceID        string
-	webdavNamespace  string
 	manager          thumbnail.Manager
 	webdavSource     imgsource.Source
 	cs3Source        imgsource.Source
@@ -145,6 +143,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *v0proto.GetThumb
 	}
 
 	var auth, statPath string
+
 	if src.IsPublicLink {
 		q := imgURL.Query()
 		var rsp *gateway.AuthenticateResponse
@@ -174,7 +173,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *v0proto.GetThumb
 		statPath = path.Join("/public", src.PublicLinkToken, req.Filepath)
 	} else {
 		auth = src.RevaAuthorization
-		statPath = path.Join(g.webdavNamespace, req.Filepath)
+		statPath = req.Filepath
 	}
 	sRes, err := g.stat(statPath, auth)
 	if err != nil {

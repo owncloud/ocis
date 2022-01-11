@@ -201,6 +201,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 					"resource_info_cache_ttl":   cfg.Reva.Frontend.OCSResourceInfoCacheTTL,
 					"prefix":                    cfg.Reva.Frontend.OCSPrefix,
 					"additional_info_attribute": cfg.Reva.Frontend.OCSAdditionalInfoAttribute,
+					"machine_auth_apikey":       cfg.Reva.AuthMachineConfig.MachineAuthAPIKey,
 					"cache_warmup_driver":       cfg.Reva.Frontend.OCSCacheWarmupDriver,
 					"cache_warmup_drivers": map[string]interface{}{
 						"cbox": map[string]interface{}{
