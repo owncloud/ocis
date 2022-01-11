@@ -70,6 +70,7 @@ func NewService(opts ...Option) Service {
 				r.Post("/", svc.PostUser)
 				r.Route("/{userID}", func(r chi.Router) {
 					r.Get("/", svc.GetUser)
+					r.Delete("/", svc.DeleteUser)
 				})
 			})
 			r.Route("/groups", func(r chi.Router) {

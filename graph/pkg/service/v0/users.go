@@ -97,6 +97,32 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, user)
 }
 
+func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "userID")
+	userID, err := url.PathUnescape(userID)
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
+	}
+
+	if userID == "" {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
+		return
+	}
+
+	err = g.identityBackend.DeleteUser(r.Context(), userID)
+
+	if err != nil {
+		var errcode errorcode.Error
+		if errors.As(err, &errcode) {
+			errcode.Render(w, r)
+		} else {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		}
+	}
+	render.Status(r, http.StatusNoContent)
+	render.NoContent(w, r)
+}
+
 func isNilOrEmpty(s *string) bool {
 	return s == nil || *s == ""
 }

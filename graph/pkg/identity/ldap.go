@@ -146,6 +146,20 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 	return i.createUserModelFromLDAP(e), nil
 }
 
+// DeleteUser implements the Backend Interface. It permanently deletes a User identified
+// by name or id from the LDAP server
+func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
+	e, err := i.getLDAPUserByNameOrID(nameOrID)
+	if err != nil {
+		return err
+	}
+	dr := ldap.DelRequest{DN: e.DN}
+	if err = i.conn.Del(&dr); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (i *LDAP) getUserByDN(dn string) (*ldap.Entry, error) {
 	searchRequest := ldap.NewSearchRequest(
 		dn, ldap.ScopeBaseObject, ldap.NeverDerefAliases, 1, 0, false,
@@ -173,12 +187,11 @@ func (i *LDAP) getUserByDN(dn string) (*ldap.Entry, error) {
 	return res.Entries[0], nil
 }
 
-func (i *LDAP) GetUser(ctx context.Context, userID string) (*libregraph.User, error) {
-	i.logger.Debug().Str("backend", "ldap").Msg("GetUser")
-	userID = ldap.EscapeFilter(userID)
+func (i *LDAP) getLDAPUserByNameOrID(nameOrID string) (*ldap.Entry, error) {
+	nameOrID = ldap.EscapeFilter(nameOrID)
 	searchRequest := ldap.NewSearchRequest(
 		i.userBaseDN, i.userScope, ldap.NeverDerefAliases, 1, 0, false,
-		fmt.Sprintf("(&%s(|(%s=%s)(%s=%s)))", i.userFilter, i.userAttributeMap.userName, userID, i.userAttributeMap.id, userID),
+		fmt.Sprintf("(&%s(|(%s=%s)(%s=%s)))", i.userFilter, i.userAttributeMap.userName, nameOrID, i.userAttributeMap.id, nameOrID),
 		[]string{
 			i.userAttributeMap.displayName,
 			i.userAttributeMap.id,
@@ -194,9 +207,9 @@ func (i *LDAP) GetUser(ctx context.Context, userID string) (*libregraph.User, er
 		var errmsg string
 		if lerr, ok := err.(*ldap.Error); ok {
 			if lerr.ResultCode == ldap.LDAPResultSizeLimitExceeded {
-				errmsg = fmt.Sprintf("too many results searching for user '%s'", userID)
+				errmsg = fmt.Sprintf("too many results searching for user '%s'", nameOrID)
 				i.logger.Debug().Str("backend", "ldap").Err(lerr).
-					Str("user", userID).Msg("too many results searching for user")
+					Str("user", nameOrID).Msg("too many results searching for user")
 			}
 		}
 		return nil, errorcode.New(errorcode.ItemNotFound, errmsg)
@@ -205,7 +218,16 @@ func (i *LDAP) GetUser(ctx context.Context, userID string) (*libregraph.User, er
 		return nil, errorcode.New(errorcode.ItemNotFound, "not found")
 	}
 
-	return i.createUserModelFromLDAP(res.Entries[0]), nil
+	return res.Entries[0], nil
+}
+
+func (i *LDAP) GetUser(ctx context.Context, nameOrID string) (*libregraph.User, error) {
+	i.logger.Debug().Str("backend", "ldap").Msg("GetUser")
+	e, err := i.getLDAPUserByNameOrID(nameOrID)
+	if err != nil {
+		return nil, err
+	}
+	return i.createUserModelFromLDAP(e), nil
 }
 
 func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error) {

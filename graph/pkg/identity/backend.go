@@ -12,6 +12,9 @@ type Backend interface {
 	// CreateUser creates a given user in the identity backend.
 	CreateUser(ctx context.Context, user libregraph.User) (*libregraph.User, error)
 
+	// DeleteUser deletes a given user, identified by username or id, from the backend
+	DeleteUser(ctx context.Context, nameOrId string) error
+
 	GetUser(ctx context.Context, nameOrId string) (*libregraph.User, error)
 	GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error)
 

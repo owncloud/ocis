@@ -171,8 +171,13 @@ func (c ConnWithReconnect) Add(a *ldap.AddRequest) error {
 	return conn.Add(a)
 }
 
-func (c ConnWithReconnect) Del(*ldap.DelRequest) error {
-	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+func (c ConnWithReconnect) Del(d *ldap.DelRequest) error {
+	conn, err := c.GetConnection()
+	if err != nil {
+		return err
+	}
+
+	return conn.Del(d)
 }
 
 func (c ConnWithReconnect) Modify(*ldap.ModifyRequest) error {
