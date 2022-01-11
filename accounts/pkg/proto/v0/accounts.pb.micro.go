@@ -38,9 +38,8 @@ func NewAccountsServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
 		{
 			Name:    "AccountsService.ListAccounts",
-			Path:    []string{"/api/v0/accounts/accounts-list"},
-			Method:  []string{"POST"},
-			Body:    "*",
+			Path:    []string{"/graph/v1.0/users"},
+			Method:  []string{"GET"},
 			Handler: "rpc",
 		},
 		{
@@ -180,9 +179,8 @@ func RegisterAccountsServiceHandler(s server.Server, hdlr AccountsServiceHandler
 	h := &accountsServiceHandler{hdlr}
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "AccountsService.ListAccounts",
-		Path:    []string{"/api/v0/accounts/accounts-list"},
-		Method:  []string{"POST"},
-		Body:    "*",
+		Path:    []string{"/graph/v1.0/users"},
+		Method:  []string{"GET"},
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{

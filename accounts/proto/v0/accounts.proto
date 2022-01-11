@@ -44,8 +44,7 @@ service AccountsService {
     rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse) {
         // List method maps to HTTP GET
         option (google.api.http) = {
-            post: "/api/v0/accounts/accounts-list",
-            body: "*"
+            get: "/graph/v1.0/users",
         };
     }
     // Gets an account

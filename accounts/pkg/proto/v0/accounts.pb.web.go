@@ -42,7 +42,7 @@ func (h *webAccountsServiceHandler) ListAccounts(w http.ResponseWriter, r *http.
 		return
 	}
 
-	render.Status(r, http.StatusCreated)
+	render.Status(r, http.StatusOK)
 	render.JSON(w, r, resp)
 }
 
@@ -140,7 +140,7 @@ func RegisterAccountsServiceWeb(r chi.Router, i AccountsServiceHandler, middlewa
 		h: i,
 	}
 
-	r.MethodFunc("POST", "/api/v0/accounts/accounts-list", handler.ListAccounts)
+	r.MethodFunc("GET", "/graph/v1.0/users", handler.ListAccounts)
 	r.MethodFunc("POST", "/api/v0/accounts/accounts-get", handler.GetAccount)
 	r.MethodFunc("POST", "/api/v0/accounts/accounts-create", handler.CreateAccount)
 	r.MethodFunc("POST", "/api/v0/accounts/accounts-update", handler.UpdateAccount)
