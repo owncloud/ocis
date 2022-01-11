@@ -1049,6 +1049,9 @@ _ocdav: api compatibility, return correct status code_
 _ocdav: api compatibility, return correct status code_
 -   [apiAuthWebDav/webDavPOSTAuth.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavPOSTAuth.feature#L40)  Scenario: send POST requests to another user's webDav endpoints as normal user
 
+#### Another users space literally does not exist because it is not listed as a space for him, 404 seems correct, expects 403
+-   [apiAuthWebDav/webDavPUTAuth.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavPUTAuth.feature#L40)
+
 #### [Using double slash in URL to access a folder gives 501 and other status codes](https://github.com/owncloud/ocis/issues/1667)
 -   [apiAuthWebDav/webDavSpecialURLs.feature:13](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavSpecialURLs.feature#L13)
 -   [apiAuthWebDav/webDavSpecialURLs.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavSpecialURLs.feature#L24)
@@ -1418,18 +1421,18 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 -   [apiWebdavUpload1/uploadFileToBlacklistedName.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToBlacklistedName.feature#L66)
 -   [apiWebdavUpload1/uploadFileToBlacklistedName.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToBlacklistedName.feature#L67)
 
-### [Allow public link sharing only for certain groups feature not implemented]
+#### [Allow public link sharing only for certain groups feature not implemented]
 -   [apiSharePublicLink2/allowGroupToCreatePublicLinks.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/allowGroupToCreatePublicLinks.feature#L35)
 -   [apiSharePublicLink2/allowGroupToCreatePublicLinks.feature:91](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/allowGroupToCreatePublicLinks.feature#L91)
 
-### [Cannot download preview of shared received file after the shareowner has changed the file content](https://github.com/owncloud/ocis/issues/2538)
+#### [Cannot download preview of shared received file after the shareowner has changed the file content](https://github.com/owncloud/ocis/issues/2538)
 - [apiWebdavPreviews/previews.feature:217](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L217)
 - [apiWebdavPreviews/previews.feature:233](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L233)
 
-### [Preview of text file with UTF content does not render correctly](https://github.com/owncloud/ocis/issues/2570)
+#### [Preview of text file with UTF content does not render correctly](https://github.com/owncloud/ocis/issues/2570)
 -   [apiWebdavPreviews/previews.feature:208](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L208)
 
-### [Share path in the response is different between share states](https://github.com/owncloud/ocis/issues/2540)
+#### [Share path in the response is different between share states](https://github.com/owncloud/ocis/issues/2540)
 -   [apiShareManagementToShares/acceptShares.feature:65](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L65)
 -   [apiShareManagementToShares/acceptShares.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L93)
 -   [apiShareManagementToShares/acceptShares.feature:228](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L228)
@@ -1441,6 +1444,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 -   [apiShareOperationsToShares2/shareAccessByID.feature:124](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L124)
 -   [apiShareOperationsToShares2/shareAccessByID.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L125)
 
-### [Content-type is not multipart/byteranges when downloading file with Range Header](https://github.com/owncloud/ocis/issues/2677)
+#### [Content-type is not multipart/byteranges when downloading file with Range Header](https://github.com/owncloud/ocis/issues/2677)
 -   [apiWebdavOperations/downloadFile.feature:169](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L169)
 -   [apiWebdavOperations/downloadFile.feature:170](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L170)
