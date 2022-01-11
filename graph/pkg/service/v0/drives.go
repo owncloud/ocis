@@ -32,11 +32,11 @@ import (
 
 // GetDrives implements the Service interface.
 func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
-	sanitized := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
 	// Parse the request with odata parser
-	odataReq, err := godata.ParseRequest(r.Context(), sanitized, r.URL.Query())
+	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
 	if err != nil {
-		g.logger.Err(err).Msg("unable to parse odata request")
+		g.logger.Err(err).Interface("query", r.URL.Query()).Msg("query error")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -66,6 +66,12 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
+	filters, err := generateCs3Filters(odataReq)
+	if err != nil {
+		g.logger.Err(err).Interface("query", r.URL.Query()).Msg("query error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
 	res, err := client.ListStorageSpaces(ctx, &storageprovider.ListStorageSpacesRequest{
 		Opaque: &types.Opaque{Map: map[string]*types.OpaqueEntry{
 			"permissions": {
@@ -73,7 +79,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 				Value:   value,
 			},
 		}},
-		Filters: generateCs3Filters(odataReq),
+		Filters: filters,
 	})
 	switch {
 	case err != nil:
@@ -563,7 +569,7 @@ func canSetSpaceQuota(ctx context.Context, user *userv1beta1.User) (bool, error)
 	return true, nil
 }
 
-func generateCs3Filters(request *godata.GoDataRequest) []*storageprovider.ListStorageSpacesRequest_Filter {
+func generateCs3Filters(request *godata.GoDataRequest) ([]*storageprovider.ListStorageSpacesRequest_Filter, error) {
 	var filters []*storageprovider.ListStorageSpacesRequest_Filter
 	if request.Query.Filter != nil && request.Query.Filter.Tree.Token.Value == "eq" {
 		switch request.Query.Filter.Tree.Children[0].Token.Value {
@@ -586,6 +592,9 @@ func generateCs3Filters(request *godata.GoDataRequest) []*storageprovider.ListSt
 			}
 			filters = append(filters, filter2)
 		}
+	} else {
+		err := fmt.Errorf("unsupported filter operand: %s", request.Query.Filter.Tree.Token.Value)
+		return nil, err
 	}
-	return filters
+	return filters, nil
 }
