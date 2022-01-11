@@ -42,16 +42,16 @@ config = {
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "accountsUITests": {
-        "skip": True,
+        "skip": False,
         "earlyFail": True,
     },
     "settingsUITests": {
-        "skip": True,
+        "skip": False,
         "earlyFail": True,
     },
     "parallelApiTests": {
@@ -59,7 +59,7 @@ config = {
             "suites": [
                 "apiShareManagement",
             ],
-            "skip": True,
+            "skip": False,
             "earlyFail": True,
             "cron": "nightly",
         },
@@ -67,7 +67,7 @@ config = {
             "suites": [
                 "apiWebdavOperations",
             ],
-            "skip": True,
+            "skip": False,
             "earlyFail": True,
             "cron": "nightly",
         },
