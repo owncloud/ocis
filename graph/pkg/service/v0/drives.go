@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/CiscoM31/godata"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -31,6 +32,14 @@ import (
 
 // GetDrives implements the Service interface.
 func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
+	sanitized := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+	// Parse the request with odata parser
+	odataReq, err := godata.ParseRequest(r.Context(), sanitized, r.URL.Query())
+	if err != nil {
+		g.logger.Err(err).Msg("unable to parse odata request")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
 	g.logger.Info().Msg("Calling GetDrives")
 	ctx := r.Context()
 
@@ -64,7 +73,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 				Value:   value,
 			},
 		}},
-		// TODO add filters?
+		Filters: generateCs3Filters(odataReq),
 	})
 	switch {
 	case err != nil:
@@ -552,4 +561,31 @@ func canSetSpaceQuota(ctx context.Context, user *userv1beta1.User) (bool, error)
 		return false, err
 	}
 	return true, nil
+}
+
+func generateCs3Filters(request *godata.GoDataRequest) []*storageprovider.ListStorageSpacesRequest_Filter {
+	var filters []*storageprovider.ListStorageSpacesRequest_Filter
+	if request.Query.Filter != nil && request.Query.Filter.Tree.Token.Value == "eq" {
+		switch request.Query.Filter.Tree.Children[0].Token.Value {
+		case "driveType":
+			filter1 := &storageprovider.ListStorageSpacesRequest_Filter{
+				Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
+				Term: &storageprovider.ListStorageSpacesRequest_Filter_SpaceType{
+					SpaceType: strings.Trim(request.Query.Filter.Tree.Children[1].Token.Value, "'"),
+				},
+			}
+			filters = append(filters, filter1)
+		case "id":
+			filter2 := &storageprovider.ListStorageSpacesRequest_Filter{
+				Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,
+				Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
+					Id: &storageprovider.StorageSpaceId{
+						OpaqueId: strings.Trim(request.Query.Filter.Tree.Children[1].Token.Value, "'"),
+					},
+				},
+			}
+			filters = append(filters, filter2)
+		}
+	}
+	return filters
 }
