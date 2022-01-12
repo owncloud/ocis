@@ -21,8 +21,8 @@ import (
 	ocsm "github.com/owncloud/ocis/ocs/pkg/middleware"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
 // Service defines the extension handlers.
@@ -40,7 +40,7 @@ func NewService(opts ...Option) Service {
 
 	roleService := options.RoleService
 	if roleService == nil {
-		roleService = settings.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
+		roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
 	}
 	roleManager := options.RoleManager
 	if roleManager == nil {
@@ -144,7 +144,7 @@ func NewService(opts ...Option) Service {
 type Ocs struct {
 	config      *config.Config
 	logger      log.Logger
-	RoleService settings.RoleService
+	RoleService settingssvc.RoleService
 	RoleManager *roles.Manager
 	mux         *chi.Mux
 }

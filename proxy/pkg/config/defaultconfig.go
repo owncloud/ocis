@@ -141,7 +141,7 @@ func DefaultPolicies() []Policy {
 					Backend:  "http://localhost:9181",
 				},
 				{
-					Endpoint: "/api/v0/settings",
+					Endpoint: "/api/v1/settings",
 					Backend:  "http://localhost:9190",
 				},
 				{

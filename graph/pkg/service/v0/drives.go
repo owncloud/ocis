@@ -26,8 +26,8 @@ import (
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/net"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
-	sproto "github.com/owncloud/ocis/settings/pkg/proto/v0"
-	settingsSvc "github.com/owncloud/ocis/settings/pkg/service/v0"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
+	settingsServiceExt "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"gopkg.in/yaml.v2"
 
 	merrors "go-micro.dev/v4/errors"
@@ -155,10 +155,10 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s := sproto.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
+	s := settingssvc.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
 
-	_, err := s.GetPermissionByID(r.Context(), &sproto.GetPermissionByIDRequest{
-		PermissionId: settingsSvc.CreateSpacePermissionID,
+	_, err := s.GetPermissionByID(r.Context(), &settingssvc.GetPermissionByIDRequest{
+		PermissionId: settingsServiceExt.CreateSpacePermissionID,
 	})
 	if err != nil {
 		// if the permission is not existing for the user in context we can assume we don't have it. Return 401.
@@ -379,15 +379,15 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 	client := g.GetGatewayClient()
 
 	permissions := make(map[string]struct{}, 1)
-	s := sproto.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
+	s := settingssvc.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
 
-	_, err := s.GetPermissionByID(ctx, &sproto.GetPermissionByIDRequest{
-		PermissionId: settingsSvc.ListAllSpacesPermissionID,
+	_, err := s.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{
+		PermissionId: settingsServiceExt.ListAllSpacesPermissionID,
 	})
 
 	// No error means the user has the permission
 	if err == nil {
-		permissions[settingsSvc.ListAllSpacesPermissionName] = struct{}{}
+		permissions[settingsServiceExt.ListAllSpacesPermissionName] = struct{}{}
 	}
 	value, err := json.Marshal(permissions)
 	if err != nil {
@@ -683,8 +683,8 @@ func getQuota(quota *libregraph.Quota, defaultQuota string) *storageprovider.Quo
 }
 
 func canSetSpaceQuota(ctx context.Context, user *userv1beta1.User) (bool, error) {
-	settingsService := sproto.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
-	_, err := settingsService.GetPermissionByID(ctx, &sproto.GetPermissionByIDRequest{PermissionId: settingsSvc.SetSpaceQuotaPermissionID})
+	settingsService := settingssvc.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
+	_, err := settingsService.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{PermissionId: settingsServiceExt.SetSpaceQuotaPermissionID})
 	if err != nil {
 		merror := merrors.FromError(err)
 		if merror.Status == http.StatusText(http.StatusNotFound) {

@@ -28,7 +28,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
 	settings_svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"github.com/rs/zerolog"
 	merrors "go-micro.dev/v4/errors"
@@ -455,7 +455,7 @@ func (s Service) CreateAccount(ctx context.Context, in *accountssvc.CreateAccoun
 	if s.RoleService == nil {
 		return merrors.InternalServerError(s.id, "could not assign role to account: roleService not configured")
 	}
-	if _, err = s.RoleService.AssignRoleToUser(ctx, &settings.AssignRoleToUserRequest{
+	if _, err = s.RoleService.AssignRoleToUser(ctx, &settingssvc.AssignRoleToUserRequest{
 		AccountUuid: out.Id,
 		RoleId:      settings_svc.BundleUUIDRoleUser,
 	}); err != nil {

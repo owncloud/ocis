@@ -8,8 +8,8 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/ocis-pkg/version"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
 	"github.com/owncloud/ocis/settings/pkg/assets"
-	"github.com/owncloud/ocis/settings/pkg/proto/v0"
 	svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"go-micro.dev/v4"
 )
@@ -73,10 +73,10 @@ func Server(opts ...Option) http.Service {
 	))
 
 	mux.Route(options.Config.HTTP.Root, func(r chi.Router) {
-		proto.RegisterBundleServiceWeb(r, handle)
-		proto.RegisterValueServiceWeb(r, handle)
-		proto.RegisterRoleServiceWeb(r, handle)
-		proto.RegisterPermissionServiceWeb(r, handle)
+		settingssvc.RegisterBundleServiceWeb(r, handle)
+		settingssvc.RegisterValueServiceWeb(r, handle)
+		settingssvc.RegisterRoleServiceWeb(r, handle)
+		settingssvc.RegisterPermissionServiceWeb(r, handle)
 	})
 
 	micro.RegisterHandler(service.Server(), mux)

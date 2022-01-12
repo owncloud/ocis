@@ -6,7 +6,8 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v1"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
 	ssvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
 
@@ -27,7 +28,7 @@ const (
 
 // RegisterPermissions registers permissions for account management and group management with the settings service.
 func RegisterPermissions(l *olog.Logger) {
-	service := settings.NewBundleService("com.owncloud.api.settings", grpc.DefaultClient)
+	service := settingssvc.NewBundleService("com.owncloud.api.settings", grpc.DefaultClient)
 
 	permissionRequests := generateAccountManagementPermissionsRequests()
 	for i := range permissionRequests {
@@ -41,61 +42,61 @@ func RegisterPermissions(l *olog.Logger) {
 	}
 }
 
-func generateAccountManagementPermissionsRequests() []settings.AddSettingToBundleRequest {
-	return []settings.AddSettingToBundleRequest{
+func generateAccountManagementPermissionsRequests() []settingssvc.AddSettingToBundleRequest {
+	return []settingssvc.AddSettingToBundleRequest{
 		{
 			BundleId: ssvc.BundleUUIDRoleAdmin,
-			Setting: &settings.Setting{
+			Setting: &settingsmsg.Setting{
 				Id:          AccountManagementPermissionID,
 				Name:        AccountManagementPermissionName,
 				DisplayName: "Account Management",
 				Description: "This permission gives full access to everything that is related to account management.",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_USER,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
 					Id:   "all",
 				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READWRITE,
-						Constraint: settings.Permission_CONSTRAINT_ALL,
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 					},
 				},
 			},
 		},
 		{
 			BundleId: ssvc.BundleUUIDRoleAdmin,
-			Setting: &settings.Setting{
+			Setting: &settingsmsg.Setting{
 				Id:          GroupManagementPermissionID,
 				Name:        GroupManagementPermissionName,
 				DisplayName: "Group Management",
 				Description: "This permission gives full access to everything that is related to group management.",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_GROUP,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_GROUP,
 					Id:   "all",
 				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READWRITE,
-						Constraint: settings.Permission_CONSTRAINT_ALL,
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 					},
 				},
 			},
 		},
 		{
 			BundleId: ssvc.BundleUUIDRoleUser,
-			Setting: &settings.Setting{
+			Setting: &settingsmsg.Setting{
 				Id:          SelfManagementPermissionID,
 				Name:        SelfManagementPermissionName,
 				DisplayName: "Self Management",
 				Description: "This permission gives access to self management.",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_USER,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
 					Id:   "me",
 				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READWRITE,
-						Constraint: settings.Permission_CONSTRAINT_OWN,
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
 					},
 				},
 			},

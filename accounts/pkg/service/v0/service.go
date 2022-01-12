@@ -22,7 +22,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	oreg "github.com/owncloud/ocis/ocis-pkg/registry"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
 )
 
 // userDefaultGID is the default integer representing the "users" group.
@@ -36,7 +36,7 @@ func New(opts ...Option) (s *Service, err error) {
 
 	roleService := options.RoleService
 	if roleService == nil {
-		roleService = settings.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
+		roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
 	}
 	roleManager := options.RoleManager
 	if roleManager == nil {
@@ -447,7 +447,7 @@ type Service struct {
 	log         log.Logger
 	Config      *config.Config
 	index       *indexer.Indexer
-	RoleService settings.RoleService
+	RoleService settingssvc.RoleService
 	RoleManager *roles.Manager
 	repo        storage.Repo
 }

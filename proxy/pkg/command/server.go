@@ -18,6 +18,7 @@ import (
 	pkgmiddleware "github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/version"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/config/parser"
 	"github.com/owncloud/ocis/proxy/pkg/cs3"
@@ -29,7 +30,6 @@ import (
 	proxyHTTP "github.com/owncloud/ocis/proxy/pkg/server/http"
 	"github.com/owncloud/ocis/proxy/pkg/tracing"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/oauth2"
@@ -126,7 +126,7 @@ func Server(cfg *config.Config) *cli.Command {
 }
 
 func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config) alice.Chain {
-	rolesClient := settings.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
+	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
 	revaClient, err := cs3.GetGatewayServiceClient(cfg.Reva.Address)
 	var userProvider backend.UserBackend
 	switch cfg.AccountBackend {

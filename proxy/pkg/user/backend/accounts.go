@@ -15,11 +15,11 @@ import (
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
 )
 
 // NewAccountsServiceUserBackend creates a user-provider which fetches users from the ocis accounts-service
-func NewAccountsServiceUserBackend(ac accountssvc.AccountsService, rs settings.RoleService, oidcISS string, tokenManager token.Manager, logger log.Logger) UserBackend {
+func NewAccountsServiceUserBackend(ac accountssvc.AccountsService, rs settingssvc.RoleService, oidcISS string, tokenManager token.Manager, logger log.Logger) UserBackend {
 	return &accountsServiceBackend{
 		accountsClient:      ac,
 		settingsRoleService: rs,
@@ -31,7 +31,7 @@ func NewAccountsServiceUserBackend(ac accountssvc.AccountsService, rs settings.R
 
 type accountsServiceBackend struct {
 	accountsClient      accountssvc.AccountsService
-	settingsRoleService settings.RoleService
+	settingsRoleService settingssvc.RoleService
 	OIDCIss             string
 	logger              log.Logger
 	tokenManager        token.Manager
@@ -228,7 +228,7 @@ func expandGroups(account *accountsmsg.Account) []string {
 }
 
 // injectRoles adds roles from the roles-service to the user-struct by mutating an existing struct
-func injectRoles(ctx context.Context, u *cs3.User, ss settings.RoleService) error {
+func injectRoles(ctx context.Context, u *cs3.User, ss settingssvc.RoleService) error {
 	roleIDs, err := loadRolesIDs(ctx, u.Id.OpaqueId, ss)
 	if err != nil {
 		return err

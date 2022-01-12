@@ -9,7 +9,8 @@ import (
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v1"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"go-micro.dev/v4/client"
@@ -32,7 +33,7 @@ var mockAccResp = []*accounts.Account{
 	},
 }
 
-var expectedRoles = []*settings.UserRoleAssignment{
+var expectedRoles = []*settingsmsg.UserRoleAssignment{
 	{Id: "abc", AccountUuid: "1234", RoleId: "a"},
 	{Id: "def", AccountUuid: "1234", RoleId: "b"},
 }
@@ -150,7 +151,7 @@ func assertUserMatchesAccount(t *testing.T, exp *accounts.Account, act *userv1be
 	assert.Equal(t, int64(2), act.GidNumber)
 }
 
-func newAccountsBackend(mockAccounts []*accounts.Account, mockRoles []*settings.UserRoleAssignment) UserBackend {
+func newAccountsBackend(mockAccounts []*accounts.Account, mockRoles []*settingsmsg.UserRoleAssignment) UserBackend {
 	accSvc, roleSvc := getAccountService(mockAccounts, nil), getRoleService(mockRoles, nil)
 	tokenManager, _ := jwt.New(map[string]interface{}{
 		"secret":  "change-me",
@@ -174,10 +175,10 @@ func getAccountService(expectedResponse []*accounts.Account, err error) *account
 	}
 }
 
-func getRoleService(expectedResponse []*settings.UserRoleAssignment, err error) *settings.MockRoleService {
-	return &settings.MockRoleService{
-		ListRoleAssignmentsFunc: func(ctx context.Context, req *settings.ListRoleAssignmentsRequest, opts ...client.CallOption) (*settings.ListRoleAssignmentsResponse, error) {
-			return &settings.ListRoleAssignmentsResponse{Assignments: expectedResponse}, err
+func getRoleService(expectedResponse []*settingsmsg.UserRoleAssignment, err error) *settingssvc.MockRoleService {
+	return &settingssvc.MockRoleService{
+		ListRoleAssignmentsFunc: func(ctx context.Context, req *settingssvc.ListRoleAssignmentsRequest, opts ...client.CallOption) (*settingssvc.ListRoleAssignmentsResponse, error) {
+			return &settingssvc.ListRoleAssignmentsResponse{Assignments: expectedResponse}, err
 		},
 	}
 

@@ -3,8 +3,8 @@ package settings
 import (
 	"errors"
 
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v1"
 	"github.com/owncloud/ocis/settings/pkg/config"
-	"github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
 
 var (
@@ -28,32 +28,32 @@ type Manager interface {
 
 // BundleManager is a bundle service interface for abstraction of storage implementations
 type BundleManager interface {
-	ListBundles(bundleType proto.Bundle_Type, bundleIDs []string) ([]*proto.Bundle, error)
-	ReadBundle(bundleID string) (*proto.Bundle, error)
-	WriteBundle(bundle *proto.Bundle) (*proto.Bundle, error)
-	ReadSetting(settingID string) (*proto.Setting, error)
-	AddSettingToBundle(bundleID string, setting *proto.Setting) (*proto.Setting, error)
+	ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []string) ([]*settingsmsg.Bundle, error)
+	ReadBundle(bundleID string) (*settingsmsg.Bundle, error)
+	WriteBundle(bundle *settingsmsg.Bundle) (*settingsmsg.Bundle, error)
+	ReadSetting(settingID string) (*settingsmsg.Setting, error)
+	AddSettingToBundle(bundleID string, setting *settingsmsg.Setting) (*settingsmsg.Setting, error)
 	RemoveSettingFromBundle(bundleID, settingID string) error
 }
 
 // ValueManager is a value service interface for abstraction of storage implementations
 type ValueManager interface {
-	ListValues(bundleID, accountUUID string) ([]*proto.Value, error)
-	ReadValue(valueID string) (*proto.Value, error)
-	ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*proto.Value, error)
-	WriteValue(value *proto.Value) (*proto.Value, error)
+	ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, error)
+	ReadValue(valueID string) (*settingsmsg.Value, error)
+	ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*settingsmsg.Value, error)
+	WriteValue(value *settingsmsg.Value) (*settingsmsg.Value, error)
 }
 
 // RoleAssignmentManager is a role assignment service interface for abstraction of storage implementations
 type RoleAssignmentManager interface {
-	ListRoleAssignments(accountUUID string) ([]*proto.UserRoleAssignment, error)
-	WriteRoleAssignment(accountUUID, roleID string) (*proto.UserRoleAssignment, error)
+	ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRoleAssignment, error)
+	WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.UserRoleAssignment, error)
 	RemoveRoleAssignment(assignmentID string) error
 }
 
 // PermissionManager is a permissions service interface for abstraction of storage implementations
 type PermissionManager interface {
-	ListPermissionsByResource(resource *proto.Resource, roleIDs []string) ([]*proto.Permission, error)
-	ReadPermissionByID(permissionID string, roleIDs []string) (*proto.Permission, error)
-	ReadPermissionByName(name string, roleIDs []string) (*proto.Permission, error)
+	ListPermissionsByResource(resource *settingsmsg.Resource, roleIDs []string) ([]*settingsmsg.Permission, error)
+	ReadPermissionByID(permissionID string, roleIDs []string) (*settingsmsg.Permission, error)
+	ReadPermissionByName(name string, roleIDs []string) (*settingsmsg.Permission, error)
 }

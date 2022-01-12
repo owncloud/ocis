@@ -8,7 +8,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
 	"google.golang.org/grpc"
 )
 
@@ -35,8 +35,8 @@ type RevaAuthenticator interface {
 }
 
 // loadRolesIDs returns the role-ids assigned to an user
-func loadRolesIDs(ctx context.Context, opaqueUserID string, rs settings.RoleService) ([]string, error) {
-	req := &settings.ListRoleAssignmentsRequest{AccountUuid: opaqueUserID}
+func loadRolesIDs(ctx context.Context, opaqueUserID string, rs settingssvc.RoleService) ([]string, error) {
+	req := &settingssvc.ListRoleAssignmentsRequest{AccountUuid: opaqueUserID}
 	assignmentResponse, err := rs.ListRoleAssignments(ctx, req)
 
 	if err != nil {

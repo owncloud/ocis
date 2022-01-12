@@ -1,12 +1,13 @@
 package roles
 
 import (
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
-	"github.com/stretchr/testify/assert"
 	"strconv"
 	"sync"
 	"testing"
 	"time"
+
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v1"
+	"github.com/stretchr/testify/assert"
 )
 
 func cacheRunner(size int, ttl time.Duration) (*cache, func(f func(v string))) {
@@ -29,10 +30,10 @@ func cacheRunner(size int, ttl time.Duration) (*cache, func(f func(v string))) {
 func BenchmarkCache(b *testing.B) {
 	b.ReportAllocs()
 	size := 1024
-	c, cr := cacheRunner(size, 100 * time.Millisecond)
+	c, cr := cacheRunner(size, 100*time.Millisecond)
 
-	cr(func(v string) { c.set(v, &settings.Bundle{})})
-	cr(func(v string) { c.get(v)})
+	cr(func(v string) { c.set(v, &settingsmsg.Bundle{}) })
+	cr(func(v string) { c.get(v) })
 }
 
 func TestCache(t *testing.T) {
@@ -41,7 +42,7 @@ func TestCache(t *testing.T) {
 	c, cr := cacheRunner(size, ttl)
 
 	cr(func(v string) {
-		c.set(v, &settings.Bundle{Id: v})
+		c.set(v, &settingsmsg.Bundle{Id: v})
 	})
 
 	assert.Equal(t, "50", c.get("50").Id, "it returns the right bundle")

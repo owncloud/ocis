@@ -28,7 +28,8 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocs/pkg/config"
 	svc "github.com/owncloud/ocis/ocs/pkg/service/v0"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v1"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
 	ssvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"github.com/stretchr/testify/assert"
 	"go-micro.dev/v4/client"
@@ -512,23 +513,23 @@ func deleteGroup(t *testing.T, id string) (*empty.Empty, error) {
 	return res, err
 }
 
-func buildRoleServiceMock() settings.RoleService {
-	return settings.MockRoleService{
-		AssignRoleToUserFunc: func(ctx context.Context, req *settings.AssignRoleToUserRequest, opts ...client.CallOption) (res *settings.AssignRoleToUserResponse, err error) {
+func buildRoleServiceMock() settingssvc.RoleService {
+	return settingssvc.MockRoleService{
+		AssignRoleToUserFunc: func(ctx context.Context, req *settingssvc.AssignRoleToUserRequest, opts ...client.CallOption) (res *settingssvc.AssignRoleToUserResponse, err error) {
 			mockedRoleAssignment[req.AccountUuid] = req.RoleId
-			return &settings.AssignRoleToUserResponse{
-				Assignment: &settings.UserRoleAssignment{
+			return &settingssvc.AssignRoleToUserResponse{
+				Assignment: &settingssvc.UserRoleAssignment{
 					AccountUuid: req.AccountUuid,
 					RoleId:      req.RoleId,
 				},
 			}, nil
 		},
-		ListRolesFunc: func(ctx context.Context, req *settings.ListBundlesRequest, opts ...client.CallOption) (*settings.ListBundlesResponse, error) {
-			return &settings.ListBundlesResponse{
-				Bundles: []*settings.Bundle{
+		ListRolesFunc: func(ctx context.Context, req *settingssvc.ListBundlesRequest, opts ...client.CallOption) (*settingssvc.ListBundlesResponse, error) {
+			return &settingssvc.ListBundlesResponse{
+				Bundles: []*settingsmsg.Bundle{
 					{
 						Id: ssvc.BundleUUIDRoleAdmin,
-						Settings: []*settings.Setting{
+						Settings: []*settingsmsg.Setting{
 							{
 								Id: accountsSvc.AccountManagementPermissionID,
 							},
@@ -536,7 +537,7 @@ func buildRoleServiceMock() settings.RoleService {
 					},
 					{
 						Id: ssvc.BundleUUIDRoleUser,
-						Settings: []*settings.Setting{
+						Settings: []*settingsmsg.Setting{
 							{
 								Id: accountsSvc.SelfManagementPermissionID,
 							},

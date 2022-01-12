@@ -6,7 +6,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	"github.com/owncloud/ocis/ocs/pkg/config"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
 )
 
 // Option defines a single option function.
@@ -17,7 +17,7 @@ type Options struct {
 	Logger      log.Logger
 	Config      *config.Config
 	Middleware  []func(http.Handler) http.Handler
-	RoleService settings.RoleService
+	RoleService settingssvc.RoleService
 	RoleManager *roles.Manager
 }
 
@@ -54,7 +54,7 @@ func Middleware(val ...func(http.Handler) http.Handler) Option {
 }
 
 // RoleService provides a function to set the RoleService option.
-func RoleService(val settings.RoleService) Option {
+func RoleService(val settingssvc.RoleService) Option {
 	return func(o *Options) {
 		o.RoleService = val
 	}

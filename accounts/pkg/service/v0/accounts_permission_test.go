@@ -17,7 +17,8 @@ import (
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v1"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
 	ssvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"github.com/stretchr/testify/assert"
 	"go-micro.dev/v4/client"
@@ -28,7 +29,7 @@ import (
 const dataPath = "/tmp/ocis-accounts-tests"
 
 var (
-	roleServiceMock settings.RoleService
+	roleServiceMock settingssvc.RoleService
 	s               *Service
 )
 
@@ -315,15 +316,15 @@ func buildTestCtx(t *testing.T, roleIDs []string) context.Context {
 	return ctx
 }
 
-func buildRoleServiceMock() settings.RoleService {
-	defaultRoles := map[string]*settings.Bundle{
+func buildRoleServiceMock() settingssvc.RoleService {
+	defaultRoles := map[string]*settingsmsg.Bundle{
 		ssvc.BundleUUIDRoleAdmin: {
 			Id:   ssvc.BundleUUIDRoleAdmin,
-			Type: settings.Bundle_TYPE_ROLE,
-			Resource: &settings.Resource{
-				Type: settings.Resource_TYPE_SYSTEM,
+			Type: settingsmsg.Bundle_TYPE_ROLE,
+			Resource: &settingsmsg.Resource{
+				Type: settingsmsg.Resource_TYPE_SYSTEM,
 			},
-			Settings: []*settings.Setting{
+			Settings: []*settingsmsg.Setting{
 				{
 					Id: AccountManagementPermissionID,
 				},
@@ -331,37 +332,37 @@ func buildRoleServiceMock() settings.RoleService {
 		},
 		ssvc.BundleUUIDRoleUser: {
 			Id:   ssvc.BundleUUIDRoleUser,
-			Type: settings.Bundle_TYPE_ROLE,
-			Resource: &settings.Resource{
-				Type: settings.Resource_TYPE_SYSTEM,
+			Type: settingsmsg.Bundle_TYPE_ROLE,
+			Resource: &settingsmsg.Resource{
+				Type: settingsmsg.Resource_TYPE_SYSTEM,
 			},
-			Settings: []*settings.Setting{},
+			Settings: []*settingsmsg.Setting{},
 		},
 		ssvc.BundleUUIDRoleGuest: {
 			Id:   ssvc.BundleUUIDRoleGuest,
-			Type: settings.Bundle_TYPE_ROLE,
-			Resource: &settings.Resource{
-				Type: settings.Resource_TYPE_SYSTEM,
+			Type: settingsmsg.Bundle_TYPE_ROLE,
+			Resource: &settingsmsg.Resource{
+				Type: settingsmsg.Resource_TYPE_SYSTEM,
 			},
-			Settings: []*settings.Setting{},
+			Settings: []*settingsmsg.Setting{},
 		},
 	}
-	return settings.MockRoleService{
-		ListRolesFunc: func(ctx context.Context, req *settings.ListBundlesRequest, opts ...client.CallOption) (res *settings.ListBundlesResponse, err error) {
-			payload := make([]*settings.Bundle, 0)
+	return settingssvc.MockRoleService{
+		ListRolesFunc: func(ctx context.Context, req *settingssvc.ListBundlesRequest, opts ...client.CallOption) (res *settingssvc.ListBundlesResponse, err error) {
+			payload := make([]*settingsmsg.Bundle, 0)
 			for _, roleID := range req.BundleIds {
 				if defaultRoles[roleID] != nil {
 					payload = append(payload, defaultRoles[roleID])
 				}
 			}
-			return &settings.ListBundlesResponse{
+			return &settingssvc.ListBundlesResponse{
 				Bundles: payload,
 			}, nil
 		},
-		AssignRoleToUserFunc: func(ctx context.Context, req *settings.AssignRoleToUserRequest, opts ...client.CallOption) (res *settings.AssignRoleToUserResponse, err error) {
+		AssignRoleToUserFunc: func(ctx context.Context, req *settingssvc.AssignRoleToUserRequest, opts ...client.CallOption) (res *settingssvc.AssignRoleToUserResponse, err error) {
 			// mock can be empty. function is called during service start. actual role assignments not needed for the tests.
-			return &settings.AssignRoleToUserResponse{
-				Assignment: &settings.UserRoleAssignment{},
+			return &settingssvc.AssignRoleToUserResponse{
+				Assignment: &settingsmsg.UserRoleAssignment{},
 			}, nil
 		},
 	}

@@ -4,14 +4,15 @@ import (
 	"context"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v1"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
 )
 
 // Manager manages a cache of roles by fetching unknown roles from the settings.RoleService.
 type Manager struct {
 	logger      log.Logger
 	cache       cache
-	roleService settings.RoleService
+	roleService settingssvc.RoleService
 }
 
 // NewManager returns a new instance of Manager.
@@ -25,9 +26,9 @@ func NewManager(o ...Option) Manager {
 }
 
 // List returns all roles that match the given roleIDs.
-func (m *Manager) List(ctx context.Context, roleIDs []string) []*settings.Bundle {
+func (m *Manager) List(ctx context.Context, roleIDs []string) []*settingsmsg.Bundle {
 	// get from cache
-	result := make([]*settings.Bundle, 0)
+	result := make([]*settingsmsg.Bundle, 0)
 	lookup := make([]string, 0)
 	for _, roleID := range roleIDs {
 		if hit := m.cache.get(roleID); hit == nil {
@@ -39,7 +40,7 @@ func (m *Manager) List(ctx context.Context, roleIDs []string) []*settings.Bundle
 
 	// if there are roles missing, fetch them from the RoleService
 	if len(lookup) > 0 {
-		request := &settings.ListBundlesRequest{
+		request := &settingssvc.ListBundlesRequest{
 			BundleIds: lookup,
 		}
 		res, err := m.roleService.ListRoles(ctx, request)
@@ -56,7 +57,7 @@ func (m *Manager) List(ctx context.Context, roleIDs []string) []*settings.Bundle
 }
 
 // FindPermissionByID searches for a permission-setting by the permissionID, but limited to the given roleIDs
-func (m *Manager) FindPermissionByID(ctx context.Context, roleIDs []string, permissionID string) *settings.Setting {
+func (m *Manager) FindPermissionByID(ctx context.Context, roleIDs []string, permissionID string) *settingsmsg.Setting {
 	for _, role := range m.List(ctx, roleIDs) {
 		for _, setting := range role.Settings {
 			if setting.Id == permissionID {
@@ -66,4 +67,3 @@ func (m *Manager) FindPermissionByID(ctx context.Context, roleIDs []string, perm
 	}
 	return nil
 }
-

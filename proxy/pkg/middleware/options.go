@@ -6,9 +6,8 @@ import (
 
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
-
 	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -34,7 +33,7 @@ type Options struct {
 	// UP
 	UserProvider backend.UserBackend
 	// SettingsRoleService for the roles API in settings
-	SettingsRoleService settings.RoleService
+	SettingsRoleService settingssvc.RoleService
 	// OIDCProviderFunc to lazily initialize an oidc provider, must be set for the oidc_auth middleware
 	OIDCProviderFunc func() (OIDCProvider, error)
 	// OIDCIss is the oidcAuth-issuer
@@ -108,7 +107,7 @@ func AccountsClient(ac accountssvc.AccountsService) Option {
 }
 
 // SettingsRoleService provides a function to set the role service option.
-func SettingsRoleService(rc settings.RoleService) Option {
+func SettingsRoleService(rc settingssvc.RoleService) Option {
 	return func(o *Options) {
 		o.SettingsRoleService = rc
 	}

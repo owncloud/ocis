@@ -4,36 +4,36 @@ import (
 	"testing"
 
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v1"
 	"github.com/stretchr/testify/assert"
 )
 
 var bundleScenarios = []struct {
 	name   string
-	bundle *proto.Bundle
+	bundle *settingsmsg.Bundle
 }{
 	{
 		name: "generic-test-file-resource",
-		bundle: &proto.Bundle{
+		bundle: &settingsmsg.Bundle{
 			Id:          bundle1,
-			Type:        proto.Bundle_TYPE_DEFAULT,
+			Type:        settingsmsg.Bundle_TYPE_DEFAULT,
 			Extension:   extension1,
 			DisplayName: "test1",
-			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_FILE,
+			Resource: &settingsmsg.Resource{
+				Type: settingsmsg.Resource_TYPE_FILE,
 				Id:   "beep",
 			},
-			Settings: []*proto.Setting{
+			Settings: []*settingsmsg.Setting{
 				{
 					Id:          setting1,
 					Description: "test-desc-1",
 					DisplayName: "test-displayname-1",
-					Resource: &proto.Resource{
-						Type: proto.Resource_TYPE_FILE,
+					Resource: &settingsmsg.Resource{
+						Type: settingsmsg.Resource_TYPE_FILE,
 						Id:   "bleep",
 					},
-					Value: &proto.Setting_IntValue{
-						IntValue: &proto.Int{
+					Value: &settingsmsg.Setting_IntValue{
+						IntValue: &settingsmsg.Int{
 							Min: 0,
 							Max: 42,
 						},
@@ -44,24 +44,24 @@ var bundleScenarios = []struct {
 	},
 	{
 		name: "generic-test-system-resource",
-		bundle: &proto.Bundle{
+		bundle: &settingsmsg.Bundle{
 			Id:          bundle2,
-			Type:        proto.Bundle_TYPE_DEFAULT,
+			Type:        settingsmsg.Bundle_TYPE_DEFAULT,
 			Extension:   extension2,
 			DisplayName: "test1",
-			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_SYSTEM,
+			Resource: &settingsmsg.Resource{
+				Type: settingsmsg.Resource_TYPE_SYSTEM,
 			},
-			Settings: []*proto.Setting{
+			Settings: []*settingsmsg.Setting{
 				{
 					Id:          setting2,
 					Description: "test-desc-2",
 					DisplayName: "test-displayname-2",
-					Resource: &proto.Resource{
-						Type: proto.Resource_TYPE_SYSTEM,
+					Resource: &settingsmsg.Resource{
+						Type: settingsmsg.Resource_TYPE_SYSTEM,
 					},
-					Value: &proto.Setting_IntValue{
-						IntValue: &proto.Int{
+					Value: &settingsmsg.Setting_IntValue{
+						IntValue: &settingsmsg.Int{
 							Min: 0,
 							Max: 42,
 						},
@@ -72,27 +72,27 @@ var bundleScenarios = []struct {
 	},
 	{
 		name: "generic-test-role-bundle",
-		bundle: &proto.Bundle{
+		bundle: &settingsmsg.Bundle{
 			Id:          bundle3,
-			Type:        proto.Bundle_TYPE_ROLE,
+			Type:        settingsmsg.Bundle_TYPE_ROLE,
 			Extension:   extension1,
 			DisplayName: "Role1",
-			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_SYSTEM,
+			Resource: &settingsmsg.Resource{
+				Type: settingsmsg.Resource_TYPE_SYSTEM,
 			},
-			Settings: []*proto.Setting{
+			Settings: []*settingsmsg.Setting{
 				{
 					Id:          setting3,
 					Description: "test-desc-3",
 					DisplayName: "test-displayname-3",
-					Resource: &proto.Resource{
-						Type: proto.Resource_TYPE_SETTING,
+					Resource: &settingsmsg.Resource{
+						Type: settingsmsg.Resource_TYPE_SETTING,
 						Id:   setting1,
 					},
-					Value: &proto.Setting_PermissionValue{
-						PermissionValue: &proto.Permission{
-							Operation:  proto.Permission_OPERATION_READ,
-							Constraint: proto.Permission_CONSTRAINT_OWN,
+					Value: &settingsmsg.Setting_PermissionValue{
+						PermissionValue: &settingsmsg.Permission{
+							Operation:  settingsmsg.Permission_OPERATION_READ,
+							Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
 						},
 					},
 				},
@@ -124,16 +124,16 @@ func TestBundles(t *testing.T) {
 	}
 
 	// check that ListBundles only returns bundles with type DEFAULT
-	bundles, err := s.ListBundles(proto.Bundle_TYPE_DEFAULT, []string{})
+	bundles, err := s.ListBundles(settingsmsg.Bundle_TYPE_DEFAULT, []string{})
 	if err != nil {
 		t.Error(err)
 	}
 	for i := range bundles {
-		assert.Equal(t, proto.Bundle_TYPE_DEFAULT, bundles[i].Type)
+		assert.Equal(t, settingsmsg.Bundle_TYPE_DEFAULT, bundles[i].Type)
 	}
 
 	// check that ListBundles filtered by an id only returns that bundle
-	filteredBundles, err := s.ListBundles(proto.Bundle_TYPE_DEFAULT, []string{bundle2})
+	filteredBundles, err := s.ListBundles(settingsmsg.Bundle_TYPE_DEFAULT, []string{bundle2})
 	if err != nil {
 		t.Error(err)
 	}
@@ -143,12 +143,12 @@ func TestBundles(t *testing.T) {
 	}
 
 	// check that ListRoles only returns bundles with type ROLE
-	roles, err := s.ListBundles(proto.Bundle_TYPE_ROLE, []string{})
+	roles, err := s.ListBundles(settingsmsg.Bundle_TYPE_ROLE, []string{})
 	if err != nil {
 		t.Error(err)
 	}
 	for i := range roles {
-		assert.Equal(t, proto.Bundle_TYPE_ROLE, roles[i].Type)
+		assert.Equal(t, settingsmsg.Bundle_TYPE_ROLE, roles[i].Type)
 	}
 
 	burnRoot()
