@@ -1990,6 +1990,7 @@ def parallelDeployAcceptancePipeline(ctx):
                     pipeOCISConfigVol,
                     pipelineVolumeOC10Tests,
                 ],
+                "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
                 "trigger": {},
             }
 
@@ -2119,14 +2120,13 @@ def parallelDeploymentOcisServer():
             "environment": environment,
             "detach": True,
             "commands": [
-                "apk add mailcap",  # install /etc/mime.types
                 "ocis/bin/ocis server",
             ],
             "volumes": [
                 stepVolumeOC10OCISData,
                 stepVolumeOCISConfig,
             ],
-            "user": "33:33",
+            "user": "33:33",  # same user as oC10
             "depends_on": ["fix-permissions"],
         },
         {
