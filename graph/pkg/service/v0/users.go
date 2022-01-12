@@ -123,6 +123,41 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	render.NoContent(w, r)
 }
 
+// PatchUser implements the Service Interface. Updates the specified attributes of an
+// ExistingUser
+func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
+	nameOrID := chi.URLParam(r, "userID")
+	nameOrID, err := url.PathUnescape(nameOrID)
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
+	}
+
+	if nameOrID == "" {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
+		return
+	}
+	changes := libregraph.NewUser()
+	err = json.NewDecoder(r.Body).Decode(changes)
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	u, err := g.identityBackend.UpdateUser(r.Context(), nameOrID, *changes)
+	if err != nil {
+		var errcode errorcode.Error
+		if errors.As(err, &errcode) {
+			errcode.Render(w, r)
+		} else {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		}
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, u)
+
+}
+
 func isNilOrEmpty(s *string) bool {
 	return s == nil || *s == ""
 }

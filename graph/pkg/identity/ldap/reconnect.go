@@ -180,16 +180,31 @@ func (c ConnWithReconnect) Del(d *ldap.DelRequest) error {
 	return conn.Del(d)
 }
 
-func (c ConnWithReconnect) Modify(*ldap.ModifyRequest) error {
-	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+func (c ConnWithReconnect) Modify(m *ldap.ModifyRequest) error {
+	conn, err := c.GetConnection()
+	if err != nil {
+		return err
+	}
+
+	return conn.Modify(m)
 }
 
-func (c ConnWithReconnect) ModifyDN(*ldap.ModifyDNRequest) error {
-	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+func (c ConnWithReconnect) ModifyDN(m *ldap.ModifyDNRequest) error {
+	conn, err := c.GetConnection()
+	if err != nil {
+		return err
+	}
+
+	return conn.ModifyDN(m)
 }
 
-func (c ConnWithReconnect) ModifyWithResult(*ldap.ModifyRequest) (*ldap.ModifyResult, error) {
-	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+func (c ConnWithReconnect) ModifyWithResult(m *ldap.ModifyRequest) (*ldap.ModifyResult, error) {
+	conn, err := c.GetConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	return conn.ModifyWithResult(m)
 }
 
 func (c ConnWithReconnect) Compare(dn, attribute, value string) (bool, error) {

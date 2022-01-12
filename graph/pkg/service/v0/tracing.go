@@ -44,3 +44,8 @@ func (t tracing) PostUser(w http.ResponseWriter, r *http.Request) {
 func (t tracing) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	t.next.DeleteUser(w, r)
 }
+
+// PatchUser implements the Service interface.
+func (t tracing) PatchUser(w http.ResponseWriter, r *http.Request) {
+	t.next.PatchUser(w, r)
+}

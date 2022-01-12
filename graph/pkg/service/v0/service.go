@@ -20,6 +20,7 @@ type Service interface {
 	GetUser(http.ResponseWriter, *http.Request)
 	PostUser(http.ResponseWriter, *http.Request)
 	DeleteUser(http.ResponseWriter, *http.Request)
+	PatchUser(http.ResponseWriter, *http.Request)
 }
 
 // NewService returns a service implementation for Service.
@@ -73,6 +74,7 @@ func NewService(opts ...Option) Service {
 				r.Route("/{userID}", func(r chi.Router) {
 					r.Get("/", svc.GetUser)
 					r.Delete("/", svc.DeleteUser)
+					r.Patch("/", svc.PatchUser)
 				})
 			})
 			r.Route("/groups", func(r chi.Router) {

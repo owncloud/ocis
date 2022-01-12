@@ -15,6 +15,9 @@ type Backend interface {
 	// DeleteUser deletes a given user, identified by username or id, from the backend
 	DeleteUser(ctx context.Context, nameOrId string) error
 
+	// UpdateUser applies changes to given user, identified by username or id
+	UpdateUser(ctx context.Context, nameOrId string, user libregraph.User) (*libregraph.User, error)
+
 	GetUser(ctx context.Context, nameOrId string) (*libregraph.User, error)
 	GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error)
 

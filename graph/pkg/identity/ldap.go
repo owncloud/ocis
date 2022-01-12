@@ -160,6 +160,57 @@ func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
 	return nil
 }
 
+// UpdateUser implements the Backend Interface. It's currently not suported for the CS3 backedn
+func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.User) (*libregraph.User, error) {
+	e, err := i.getLDAPUserByNameOrID(nameOrID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Don't allow updates of the ID
+	if user.Id != nil && *user.Id != "" {
+		if e.GetEqualFoldAttributeValue(i.userAttributeMap.id) != *user.Id {
+			return nil, errorcode.New(errorcode.NotAllowed, "changing the UserId is not allowed")
+		}
+	}
+	// TODO: In order to allow updating the user name we'd need to issue a ModRDN operation
+	// As we currently using uid as the naming Attribute for the user entries. (Do we even
+	// want to allow changing the user name?). For now just disallow it.
+	if user.OnPremisesSamAccountName != nil && *user.OnPremisesSamAccountName != "" {
+		if e.GetEqualFoldAttributeValue(i.userAttributeMap.userName) != *user.OnPremisesSamAccountName {
+			return nil, errorcode.New(errorcode.NotSupported, "changing the user name is currently not supported")
+		}
+	}
+
+	mr := ldap.ModifyRequest{DN: e.DN}
+	if user.DisplayName != nil && *user.DisplayName != "" {
+		if e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName) != *user.DisplayName {
+			mr.Replace(i.userAttributeMap.displayName, []string{*user.DisplayName})
+		}
+	}
+	if user.Mail != nil && *user.Mail != "" {
+		if e.GetEqualFoldAttributeValue(i.userAttributeMap.mail) != *user.Mail {
+			mr.Replace(i.userAttributeMap.mail, []string{*user.Mail})
+		}
+	}
+	if user.PasswordProfile != nil && user.PasswordProfile.Password != nil && *user.PasswordProfile.Password != "" {
+		// password are hashed server side there is no need to check if the new password
+		// is actually different from the old one.
+		mr.Replace("userPassword", []string{*user.PasswordProfile.Password})
+	}
+
+	if err := i.conn.Modify(&mr); err != nil {
+		return nil, err
+	}
+
+	// Read	back user from LDAP to get the generated UUID
+	e, err = i.getUserByDN(e.DN)
+	if err != nil {
+		return nil, err
+	}
+	return i.createUserModelFromLDAP(e), nil
+}
+
 func (i *LDAP) getUserByDN(dn string) (*ldap.Entry, error) {
 	searchRequest := ldap.NewSearchRequest(
 		dn, ldap.ScopeBaseObject, ldap.NeverDerefAliases, 1, 0, false,

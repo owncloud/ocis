@@ -48,3 +48,8 @@ func (l logging) PostUser(w http.ResponseWriter, r *http.Request) {
 func (l logging) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	l.next.DeleteUser(w, r)
 }
+
+// PatchUser implements the Service interface.
+func (l logging) PatchUser(w http.ResponseWriter, r *http.Request) {
+	l.next.PatchUser(w, r)
+}

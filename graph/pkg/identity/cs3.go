@@ -30,6 +30,11 @@ func (i *CS3) DeleteUser(ctx context.Context, nameOrID string) error {
 	return errorcode.New(errorcode.NotSupported, "not implemented")
 }
 
+// UpdateUser implements the Backend Interface. It's currently not suported for the CS3 backend
+func (i *CS3) UpdateUser(ctx context.Context, nameOrID string, user libregraph.User) (*libregraph.User, error) {
+	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
+}
+
 func (i *CS3) GetUser(ctx context.Context, userID string) (*libregraph.User, error) {
 	client, err := pool.GetGatewayServiceClient(i.Config.Address)
 	if err != nil {
