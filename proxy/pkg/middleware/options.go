@@ -8,11 +8,11 @@ import (
 
 	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
 	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
+	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v1"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/proxy/pkg/config"
-	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
 )
 
 // Option defines a single option function.
@@ -41,7 +41,7 @@ type Options struct {
 	// RevaGatewayClient to send requests to the reva gateway
 	RevaGatewayClient gateway.GatewayAPIClient
 	// Store for persisting data
-	Store storepb.StoreService
+	Store storesvc.StoreService
 	// PreSignedURLConfig to configure the middleware
 	PreSignedURLConfig config.PreSignedURL
 	// UserOIDCClaim to read from the oidc claims
@@ -142,7 +142,7 @@ func RevaGatewayClient(gc gateway.GatewayAPIClient) Option {
 }
 
 // Store provides a function to set the store option.
-func Store(sc storepb.StoreService) Option {
+func Store(sc storesvc.StoreService) Option {
 	return func(o *Options) {
 		o.Store = sc
 	}

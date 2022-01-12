@@ -13,6 +13,9 @@ import (
 	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
 	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
 
+	storemsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/store/v1"
+	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v1"
+
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -27,7 +30,6 @@ import (
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
 	ocstracing "github.com/owncloud/ocis/ocs/pkg/tracing"
-	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
 	"github.com/pkg/errors"
 	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/genproto/protobuf/field_mask"
@@ -653,9 +655,9 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	// use the user's UUID
 	userID := u.Id.OpaqueId
 
-	c := storepb.NewStoreService("com.owncloud.api.store", grpc.NewClient())
-	res, err := c.Read(r.Context(), &storepb.ReadRequest{
-		Options: &storepb.ReadOptions{
+	c := storesvc.NewStoreService("com.owncloud.api.store", grpc.NewClient())
+	res, err := c.Read(r.Context(), &storesvc.ReadRequest{
+		Options: &storemsg.ReadOptions{
 			Database: "proxy",
 			Table:    "signing-keys",
 		},
@@ -687,12 +689,12 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	}
 	signingKey := hex.EncodeToString(key)
 
-	_, err = c.Write(r.Context(), &storepb.WriteRequest{
-		Options: &storepb.WriteOptions{
+	_, err = c.Write(r.Context(), &storesvc.WriteRequest{
+		Options: &storemsg.WriteOptions{
 			Database: "proxy",
 			Table:    "signing-keys",
 		},
-		Record: &storepb.Record{
+		Record: &storemsg.Record{
 			Key:   userID,
 			Value: []byte(signingKey),
 			// TODO Expiry?

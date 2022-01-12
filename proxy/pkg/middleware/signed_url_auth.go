@@ -13,9 +13,10 @@ import (
 
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	storemsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/store/v1"
+	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v1"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
-	store "github.com/owncloud/ocis/store/pkg/proto/v0"
 	"golang.org/x/crypto/pbkdf2"
 )
 
@@ -39,7 +40,7 @@ type signedURLAuth struct {
 	logger             log.Logger
 	preSignedURLConfig config.PreSignedURL
 	userProvider       backend.UserBackend
-	store              store.StoreService
+	store              storesvc.StoreService
 }
 
 func (m signedURLAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -197,8 +198,8 @@ func (m signedURLAuth) createSignature(url string, signingKey []byte) string {
 }
 
 func (m signedURLAuth) getSigningKey(ctx context.Context, ocisID string) ([]byte, error) {
-	res, err := m.store.Read(ctx, &store.ReadRequest{
-		Options: &store.ReadOptions{
+	res, err := m.store.Read(ctx, &storesvc.ReadRequest{
+		Options: &storemsg.ReadOptions{
 			Database: "proxy",
 			Table:    "signing-keys",
 		},
