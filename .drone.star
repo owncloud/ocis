@@ -7,6 +7,7 @@ OC_CI_GOLANG = "owncloudci/golang:1.17"
 OC_CI_NODEJS = "owncloudci/nodejs:14"
 OC_CI_PHP = "owncloudci/php:7.4"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
+OC_TESTING_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.0.0"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
 REDIS = "redis:6-alpine"
 
@@ -1448,8 +1449,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
 def middlewareService():
     return [{
         "name": "middleware",
-        "image": "owncloud/owncloud-test-middleware",
-        "pull": "always",
+        "image": OC_TESTING_MIDDLEWARE,
         "environment": {
             "BACKEND_HOST": "https://ocis-server:9200",
             "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/storage/owncloud/",
@@ -1572,7 +1572,6 @@ def skipIfUnchanged(ctx, type):
     return [{
         "name": "skip-if-unchanged",
         "image": "owncloudci/drone-skip-pipeline",
-        "pull": "always",
         "settings": {
             "ALLOW_SKIP_CHANGED": skip,
         },
@@ -2144,7 +2143,6 @@ def oC10Server():
         {
             "name": "oc10",
             "image": OC_OC10,
-            "pull": "always",
             "detach": True,
             "environment": {
                 # can be switched to "web"
@@ -2213,7 +2211,6 @@ def ldapService():
     return [{
         "name": "openldap",
         "image": OSIXIA_OPENLDAP,
-        "pull": "always",
         "environment": {
             "LDAP_TLS_VERIFY_CLIENT": "never",
             "LDAP_DOMAIN": "owncloud.com",
@@ -2235,7 +2232,6 @@ def oc10DbService():
         {
             "name": "oc10-db",
             "image": MARIADB,
-            "pull": "always",
             "environment": {
                 "MYSQL_ROOT_PASSWORD": "owncloud",
                 "MYSQL_USER": "owncloud",
@@ -2254,7 +2250,6 @@ def copyConfigs():
     return [{
         "name": "copy-configs",
         "image": OC_OC10,
-        "pull": "always",
         "commands": [
             # ocis proxy config
             "mkdir -p /etc/ocis",
@@ -2277,7 +2272,6 @@ def owncloudLog():
     return [{
         "name": "owncloud-log",
         "image": OC_UBUNTU,
-        "pull": "always",
         "detach": True,
         "commands": [
             "tail -f /mnt/data/owncloud.log",
@@ -2292,7 +2286,6 @@ def fixSharedDataPermissions():
     return [{
         "name": "fix-permissions",
         "image": OC_CI_PHP,
-        "pull": "always",
         "commands": [
             "chown -R www-data:www-data /var/www/owncloud/apps",
             "chmod -R 777 /var/www/owncloud/apps",
