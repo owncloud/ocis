@@ -423,7 +423,7 @@ func ParseConfig(c *cli.Context, cfg *config.Config, storageExtension string) er
 			Color:  cfg.Commons.Log.Color,
 			File:   cfg.Commons.Log.File,
 		}
-	} else if cfg.Log == nil && cfg.Commons == nil {
+	} else if cfg.Log == nil {
 		cfg.Log = &shared.Log{}
 	}
 

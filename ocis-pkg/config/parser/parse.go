@@ -23,7 +23,7 @@ func ParseConfig(cfg *config.Config) error {
 			Color:  cfg.Commons.Log.Color,
 			File:   cfg.Commons.Log.File,
 		}
-	} else if cfg.Log == nil && cfg.Commons == nil {
+	} else if cfg.Log == nil {
 		cfg.Log = &shared.Log{}
 	}
 
