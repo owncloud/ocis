@@ -2116,6 +2116,14 @@ def parallelDeploymentOcisServer():
 
     return [
         {
+            "name": "ocis-data-dir-permissions",
+            "image": OC_CI_ALPINE,
+            "commands": [
+                "mkdir ./ocis-data",
+                "chmod 777 ./ocis-data",  # make writable for 33:33
+            ],
+        },
+        {
             "name": "ocis",
             "image": OC_CI_ALPINE,
             "environment": environment,
