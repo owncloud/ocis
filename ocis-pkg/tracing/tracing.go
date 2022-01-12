@@ -21,7 +21,7 @@ var Propagator = propagation.NewCompositeTextMapPropagator(
 // GetTraceProvider returns a configured open-telemetry trace provider.
 func GetTraceProvider(agentEndpoint, collectorEndpoint, serviceName, traceType string) (*sdktrace.TracerProvider, error) {
 	switch t := traceType; t {
-	case "jaeger":
+	case "", "jaeger":
 		var (
 			exp *jaeger.Exporter
 			err error
@@ -66,7 +66,7 @@ func GetTraceProvider(agentEndpoint, collectorEndpoint, serviceName, traceType s
 	case "zipkin":
 		fallthrough
 	default:
-		return nil, fmt.Errorf("invalid trace configuration")
+		return nil, fmt.Errorf("unknown trace type %s", traceType)
 	}
 }
 
