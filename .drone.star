@@ -1969,13 +1969,14 @@ def parallelDeployAcceptancePipeline(ctx):
                     "os": "linux",
                     "arch": "amd64",
                 },
-                "steps": cloneCoreRepos() +
+                "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+                         cloneCoreRepos() +
                          copyConfigs() +
                          waitForServices() +
-                         oC10Server() +
+                         parallelDeploymentOC10Server() +
                          owncloudLog() +
                          fixSharedDataPermissions() +
-                         latestOcisServer() +
+                         parallelDeploymentOcisServer() +
                          parallelAcceptance(environment) +
                          failEarly(ctx, early_fail),
                 "services": oc10DbService() +
@@ -2041,7 +2042,7 @@ def parallelAcceptance(env):
         ],
     }]
 
-def latestOcisServer():
+def parallelDeploymentOcisServer():
     environment = {
         # Keycloak IDP specific configuration
         "PROXY_OIDC_ISSUER": "https://keycloak/auth/realmsowncloud",
@@ -2114,11 +2115,12 @@ def latestOcisServer():
     return [
         {
             "name": "ocis",
-            "image": OC_OCIS,
+            "image": OC_CI_ALPINE,
             "environment": environment,
             "detach": True,
             "commands": [
-                "ocis server",
+                "apk add mailcap",  # install /etc/mime.types
+                "ocis/bin/ocis server",
             ],
             "volumes": [
                 stepVolumeOC10OCISData,
@@ -2137,7 +2139,7 @@ def latestOcisServer():
         },
     ]
 
-def oC10Server():
+def parallelDeploymentOC10Server():
     return [
         {
             "name": "oc10",
