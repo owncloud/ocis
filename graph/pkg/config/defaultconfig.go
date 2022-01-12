@@ -14,12 +14,6 @@ func DefaultConfig() *Config {
 		Service: Service{
 			Name: "graph",
 		},
-		Tracing: Tracing{
-			Enabled:   false,
-			Type:      "jaeger",
-			Endpoint:  "",
-			Collector: "",
-		},
 		Reva: Reva{
 			Address: "127.0.0.1:9142",
 		},

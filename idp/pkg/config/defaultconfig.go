@@ -22,12 +22,6 @@ func DefaultConfig() *Config {
 		Service: Service{
 			Name: "idp",
 		},
-		Tracing: Tracing{
-			Enabled:   false,
-			Type:      "jaeger",
-			Endpoint:  "",
-			Collector: "",
-		},
 		Asset: Asset{},
 		IDP: Settings{
 			Iss:                               "https://localhost:9200",
