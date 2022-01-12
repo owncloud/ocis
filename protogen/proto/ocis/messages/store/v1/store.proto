@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package ocis.messages.store.v1;
+
+option go_package = "github.com/owncloud/ocis/protogen/gen/ocis/messages/store/v1";
+
+message Field {
+	// type of value e.g string, int, int64, bool, float64
+	string type = 1;
+	// the actual value
+	string value = 2;
+}
+
+message Record {
+	// key of the recorda
+	string key = 1;
+	// value in the record
+	bytes value = 2;
+	// time.Duration (signed int64 nanoseconds)
+	int64 expiry = 3;
+	// the associated metadata
+	map<string,Field> metadata = 4;
+}
+
+message ReadOptions {
+	string database = 1;
+	string table = 2;
+	bool prefix   = 3;
+	bool suffix   = 4;
+	uint64 limit  = 5;
+	uint64 offset = 6;
+	map<string,Field> where = 7;
+}
+
+message WriteOptions {
+	string database = 1;
+	string table = 2;
+	// time.Time
+	int64 expiry = 3;
+	// time.Duration
+	int64 ttl = 4;
+}
+
+message DeleteOptions {
+	string database = 1;
+	string table = 2;
+}
+
+message ListOptions {
+	string database = 1;
+	string table = 2;
+	string prefix   = 3;
+	string suffix   = 4;
+	uint64 limit  = 5;
+	uint64 offset = 6;
+}

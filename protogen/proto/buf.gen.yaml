@@ -20,7 +20,9 @@ plugins:
       - paths=source_relative
       - "ignore_packages=\
          ocis.services.thumbnails.v1;\
-         ocis.messages.thumbnails.v1"
+         ocis.messages.thumbnails.v1;\
+         ocis.services.store.v1;\
+         ocis.messages.store.v1"
 
   - name: openapiv2
     path: ../../.bingo/protoc-gen-openapiv2
