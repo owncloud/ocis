@@ -3,7 +3,8 @@
   "config" : {
     "platform": {
       "php": "7.2"
-    }
+    },
+    "vendor-dir": "./vendor-php"
   },
   "require": {
   },
