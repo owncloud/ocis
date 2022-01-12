@@ -571,30 +571,32 @@ func canSetSpaceQuota(ctx context.Context, user *userv1beta1.User) (bool, error)
 
 func generateCs3Filters(request *godata.GoDataRequest) ([]*storageprovider.ListStorageSpacesRequest_Filter, error) {
 	var filters []*storageprovider.ListStorageSpacesRequest_Filter
-	if request.Query.Filter != nil && request.Query.Filter.Tree.Token.Value == "eq" {
-		switch request.Query.Filter.Tree.Children[0].Token.Value {
-		case "driveType":
-			filter1 := &storageprovider.ListStorageSpacesRequest_Filter{
-				Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
-				Term: &storageprovider.ListStorageSpacesRequest_Filter_SpaceType{
-					SpaceType: strings.Trim(request.Query.Filter.Tree.Children[1].Token.Value, "'"),
-				},
-			}
-			filters = append(filters, filter1)
-		case "id":
-			filter2 := &storageprovider.ListStorageSpacesRequest_Filter{
-				Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,
-				Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
-					Id: &storageprovider.StorageSpaceId{
-						OpaqueId: strings.Trim(request.Query.Filter.Tree.Children[1].Token.Value, "'"),
+	if request.Query.Filter != nil {
+		if request.Query.Filter.Tree.Token.Value == "eq" {
+			switch request.Query.Filter.Tree.Children[0].Token.Value {
+			case "driveType":
+				filter1 := &storageprovider.ListStorageSpacesRequest_Filter{
+					Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
+					Term: &storageprovider.ListStorageSpacesRequest_Filter_SpaceType{
+						SpaceType: strings.Trim(request.Query.Filter.Tree.Children[1].Token.Value, "'"),
 					},
-				},
+				}
+				filters = append(filters, filter1)
+			case "id":
+				filter2 := &storageprovider.ListStorageSpacesRequest_Filter{
+					Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,
+					Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
+						Id: &storageprovider.StorageSpaceId{
+							OpaqueId: strings.Trim(request.Query.Filter.Tree.Children[1].Token.Value, "'"),
+						},
+					},
+				}
+				filters = append(filters, filter2)
 			}
-			filters = append(filters, filter2)
+		} else {
+			err := fmt.Errorf("unsupported filter operand: %s", request.Query.Filter.Tree.Token.Value)
+			return nil, err
 		}
-	} else {
-		err := fmt.Errorf("unsupported filter operand: %s", request.Query.Filter.Tree.Token.Value)
-		return nil, err
 	}
 	return filters, nil
 }
