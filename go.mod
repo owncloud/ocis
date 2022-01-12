@@ -19,7 +19,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.0
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20211214102047-7ce3134d7bf8
-	github.com/cs3org/reva v1.17.1-0.20220105095955-fa1d1fc01d85
+	github.com/cs3org/reva v1.16.1-0.20220112085026-07451f6cd806
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.7
@@ -243,7 +243,4 @@ require (
 	stash.kopano.io/kgol/oidc-go v0.3.2 // indirect
 )
 
-//replace github.com/cs3org/reva => github.com/cs3org/reva v1.16.1-0.20211208164450-3abd76eecf8b
 //replace github.com/cs3org/reva => ../reva
-
-replace github.com/cs3org/reva => github.com/cs3org/reva v1.16.1-0.20220111150347-1b21aefbf8db
