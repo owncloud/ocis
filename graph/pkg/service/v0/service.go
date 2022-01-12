@@ -18,6 +18,8 @@ type Service interface {
 	GetMe(http.ResponseWriter, *http.Request)
 	GetUsers(http.ResponseWriter, *http.Request)
 	GetUser(http.ResponseWriter, *http.Request)
+	PostUser(http.ResponseWriter, *http.Request)
+	DeleteUser(http.ResponseWriter, *http.Request)
 }
 
 // NewService returns a service implementation for Service.

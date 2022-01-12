@@ -38,3 +38,13 @@ func (l logging) GetUsers(w http.ResponseWriter, r *http.Request) {
 func (l logging) GetUser(w http.ResponseWriter, r *http.Request) {
 	l.next.GetUser(w, r)
 }
+
+// PostUser implements the Service interface.
+func (l logging) PostUser(w http.ResponseWriter, r *http.Request) {
+	l.next.PostUser(w, r)
+}
+
+// DeleteUser implements the Service interface.
+func (l logging) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	l.next.DeleteUser(w, r)
+}

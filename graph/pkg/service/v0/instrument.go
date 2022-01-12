@@ -34,7 +34,17 @@ func (i instrument) GetUsers(w http.ResponseWriter, r *http.Request) {
 	i.next.GetUsers(w, r)
 }
 
-// GetUsers implements the Service interface.
+// GetUser implements the Service interface.
 func (i instrument) GetUser(w http.ResponseWriter, r *http.Request) {
 	i.next.GetUser(w, r)
+}
+
+// PostUser implements the Service interface.
+func (i instrument) PostUser(w http.ResponseWriter, r *http.Request) {
+	i.next.PostUser(w, r)
+}
+
+// DeleteUser implements the Service interface.
+func (i instrument) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	i.next.DeleteUser(w, r)
 }
