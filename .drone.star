@@ -2105,6 +2105,7 @@ def parallelDeploymentOcisServer():
         "OCIS_LOG_LEVEL": "error",
         "OCIS_URL": OCIS_URL,
         "PROXY_TLS": "true",
+        "OCIS_BASE_DATA_PATH": "./ocis-data",  # this is only needed since we use a binary not intended to be run in a rootless docker container
         # change default secrets
         "OCIS_JWT_SECRET": "Pive-Fumkiu4",
         "STORAGE_TRANSFER_SECRET": "replace-me-with-a-transfer-secret",
