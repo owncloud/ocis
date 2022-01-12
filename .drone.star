@@ -155,17 +155,18 @@ def main(ctx):
     test_pipelines = \
         cancelPreviousBuilds() + \
         [buildOcisBinaryForTesting(ctx)] + \
+        testOcisModules(ctx) + \
         testPipelines(ctx)
 
-    # build_release_pipelines = \
-    #     dockerReleases(ctx) + \
-    #     binaryReleases(ctx) + \
-    #     [releaseSubmodule(ctx)]
+    build_release_pipelines = \
+        dockerReleases(ctx) + \
+        binaryReleases(ctx) + \
+        [releaseSubmodule(ctx)]
 
-    # build_release_helpers = [
-    #     changelog(ctx),
-    #     docs(ctx),
-    # ]
+    build_release_helpers = [
+        changelog(ctx),
+        docs(ctx),
+    ]
 
     test_pipelines.append(
         pipelineDependsOn(
@@ -174,7 +175,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines  # + build_release_pipelines + build_release_helpers
+    pipelines = test_pipelines + build_release_pipelines + build_release_helpers
 
     pipelines = \
         pipelines + \
@@ -234,21 +235,21 @@ def testPipelines(ctx):
     if "skip" not in config["localApiTests"] or not config["localApiTests"]["skip"]:
         pipelines = [
             localApiTests(ctx, "ocis", "apiAccountsHashDifficulty", "default"),
-            # localApiTests(ctx, "ocis", "apiSpaces", "default"),
-            # localApiTests(ctx, "ocis", "apiArchiver", "default"),
+            localApiTests(ctx, "ocis", "apiSpaces", "default"),
+            localApiTests(ctx, "ocis", "apiArchiver", "default"),
         ]
 
-    # if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
-    #     pipelines += apiTests(ctx)
+    if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
+        pipelines += apiTests(ctx)
 
-    # if "skip" not in config["uiTests"] or not config["uiTests"]["skip"]:
-    #     pipelines += uiTests(ctx)
+    if "skip" not in config["uiTests"] or not config["uiTests"]["skip"]:
+        pipelines += uiTests(ctx)
 
-    # if "skip" not in config["accountsUITests"] or not config["accountsUITests"]["skip"]:
-    #     pipelines.append(accountsUITests(ctx))
+    if "skip" not in config["accountsUITests"] or not config["accountsUITests"]["skip"]:
+        pipelines.append(accountsUITests(ctx))
 
-    # if "skip" not in config["settingsUITests"] or not config["settingsUITests"]["skip"]:
-    #     pipelines.append(settingsUITests(ctx))
+    if "skip" not in config["settingsUITests"] or not config["settingsUITests"]["skip"]:
+        pipelines.append(settingsUITests(ctx))
 
     if "parallelApiTests" in config:
         pipelines += parallelDeployAcceptancePipeline(ctx)
@@ -1501,7 +1502,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
                 "apk add mailcap",  # install /etc/mime.types
                 "ocis/bin/ocis server",
             ],
-            "user": "33:33",
             "volumes": volumes,
             "depends_on": depends_on,
         },
@@ -1511,6 +1511,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "commands": [
                 "wait-for -it ocis-server:9200 -t 300",
             ],
+            "depends_on": depends_on,
         },
     ]
 
@@ -2040,10 +2041,11 @@ def parallelDeployAcceptancePipeline(ctx):
                     "os": "linux",
                     "arch": "amd64",
                 },
-                "steps": cloneCoreRepos() +
+                "steps": skipIfUnchanged(ctx, "acceptance-tests") +
+                         restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+                         cloneCoreRepos() +
                          copyConfigs() +
-                         waitForServices() +
-                         oC10Server() +
+                         parallelDeploymentOC10Server() +
                          owncloudLog() +
                          fixSharedDataPermissions() +
                          ocisServer(
@@ -2066,6 +2068,7 @@ def parallelDeployAcceptancePipeline(ctx):
                     pipeOCISConfigVol,
                     pipelineVolumeOC10Tests,
                 ],
+                "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
                 "trigger": {},
             }
 
@@ -2110,7 +2113,7 @@ def parallelAcceptance(env):
         "commands": [
             "make test-paralleldeployment-api",
         ],
-        "depends_on": ["clone-core-repos", "wait-for-oc10", "wait-for-ocis"],
+        "depends_on": ["clone-core-repos", "wait-for-oc10", "wait-for-ocis-server"],
         "volumes": [
             stepVolumeOC10Apps,
             stepVolumeOC10Tests,
@@ -2118,7 +2121,7 @@ def parallelAcceptance(env):
         ],
     }]
 
-def latestOcisServer():
+def parallelDeploymentOcisServer():
     environment = {
         # Keycloak IDP specific configuration
         "PROXY_OIDC_ISSUER": "https://keycloak/auth/realmsowncloud",
@@ -2214,7 +2217,7 @@ def latestOcisServer():
         },
     ]
 
-def oC10Server():
+def parallelDeploymentOC10Server():
     return [
         {
             "name": "oc10",
@@ -2272,7 +2275,7 @@ def oC10Server():
                 stepVolumeOC10Templates,
                 stepVolumeOC10PreServer,
             ],
-            "depends_on": ["wait-for-services", "copy-configs"],
+            "depends_on": ["copy-configs"],
         },
         {
             "name": "wait-for-oc10",
@@ -2280,7 +2283,7 @@ def oC10Server():
             "commands": [
                 "wait-for -it oc10:8080 -t 300",
             ],
-            "depends_on": ["wait-for-services"],
+            "depends_on": ["copy-configs"],
         },
     ]
 
@@ -2378,14 +2381,4 @@ def fixSharedDataPermissions():
             stepVolumeOC10OCISData,
         ],
         "depends_on": ["wait-for-oc10"],
-    }]
-
-def waitForServices():
-    return [{
-        "name": "wait-for-services",
-        "image": OC_CI_WAIT_FOR,
-        "commands": [
-            "wait-for -it oc10-db:3306 -t 300",
-            "wait-for -it openldap:636 -t 300",
-        ],
     }]
