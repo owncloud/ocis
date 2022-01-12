@@ -38,7 +38,7 @@ export const request = (method, url, body, queryParameters, form, config) => {
 export const RoleService_AssignRoleToUser = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/settings/assignments-add'
+  let path = '/api/v0/settings/assignments-add'
   let body
   let queryParameters = {}
   let form = {}
@@ -56,7 +56,7 @@ export const RoleService_AssignRoleToUser = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const RoleService_AssignRoleToUser_RAW_URL = function() {
-  return '/api/v1/settings/assignments-add'
+  return '/api/v0/settings/assignments-add'
 }
 export const RoleService_AssignRoleToUser_TYPE = function() {
   return 'post'
@@ -64,7 +64,7 @@ export const RoleService_AssignRoleToUser_TYPE = function() {
 export const RoleService_AssignRoleToUserURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/settings/assignments-add'
+  let path = '/api/v0/settings/assignments-add'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -84,7 +84,7 @@ export const RoleService_AssignRoleToUserURL = function(parameters = {}) {
 export const RoleService_ListRoleAssignments = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/settings/assignments-list'
+  let path = '/api/v0/settings/assignments-list'
   let body
   let queryParameters = {}
   let form = {}
@@ -102,7 +102,7 @@ export const RoleService_ListRoleAssignments = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const RoleService_ListRoleAssignments_RAW_URL = function() {
-  return '/api/v1/settings/assignments-list'
+  return '/api/v0/settings/assignments-list'
 }
 export const RoleService_ListRoleAssignments_TYPE = function() {
   return 'post'
@@ -110,7 +110,7 @@ export const RoleService_ListRoleAssignments_TYPE = function() {
 export const RoleService_ListRoleAssignmentsURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/settings/assignments-list'
+  let path = '/api/v0/settings/assignments-list'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -130,7 +130,7 @@ export const RoleService_ListRoleAssignmentsURL = function(parameters = {}) {
 export const RoleService_RemoveRoleFromUser = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/settings/assignments-remove'
+  let path = '/api/v0/settings/assignments-remove'
   let body
   let queryParameters = {}
   let form = {}
@@ -148,7 +148,7 @@ export const RoleService_RemoveRoleFromUser = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const RoleService_RemoveRoleFromUser_RAW_URL = function() {
-  return '/api/v1/settings/assignments-remove'
+  return '/api/v0/settings/assignments-remove'
 }
 export const RoleService_RemoveRoleFromUser_TYPE = function() {
   return 'post'
@@ -156,7 +156,7 @@ export const RoleService_RemoveRoleFromUser_TYPE = function() {
 export const RoleService_RemoveRoleFromUserURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/settings/assignments-remove'
+  let path = '/api/v0/settings/assignments-remove'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -176,7 +176,7 @@ export const RoleService_RemoveRoleFromUserURL = function(parameters = {}) {
 export const BundleService_GetBundle = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/settings/bundle-get'
+  let path = '/api/v0/settings/bundle-get'
   let body
   let queryParameters = {}
   let form = {}
@@ -194,7 +194,7 @@ export const BundleService_GetBundle = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const BundleService_GetBundle_RAW_URL = function() {
-  return '/api/v1/settings/bundle-get'
+  return '/api/v0/settings/bundle-get'
 }
 export const BundleService_GetBundle_TYPE = function() {
   return 'post'
@@ -202,7 +202,7 @@ export const BundleService_GetBundle_TYPE = function() {
 export const BundleService_GetBundleURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/settings/bundle-get'
+  let path = '/api/v0/settings/bundle-get'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -222,7 +222,7 @@ export const BundleService_GetBundleURL = function(parameters = {}) {
 export const BundleService_SaveBundle = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/settings/bundle-save'
+  let path = '/api/v0/settings/bundle-save'
   let body
   let queryParameters = {}
   let form = {}
@@ -240,7 +240,7 @@ export const BundleService_SaveBundle = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const BundleService_SaveBundle_RAW_URL = function() {
-  return '/api/v1/settings/bundle-save'
+  return '/api/v0/settings/bundle-save'
 }
 export const BundleService_SaveBundle_TYPE = function() {
   return 'post'
@@ -248,7 +248,7 @@ export const BundleService_SaveBundle_TYPE = function() {
 export const BundleService_SaveBundleURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/settings/bundle-save'
+  let path = '/api/v0/settings/bundle-save'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -268,7 +268,7 @@ export const BundleService_SaveBundleURL = function(parameters = {}) {
 export const BundleService_AddSettingToBundle = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/settings/bundles-add-setting'
+  let path = '/api/v0/settings/bundles-add-setting'
   let body
   let queryParameters = {}
   let form = {}
@@ -286,7 +286,7 @@ export const BundleService_AddSettingToBundle = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const BundleService_AddSettingToBundle_RAW_URL = function() {
-  return '/api/v1/settings/bundles-add-setting'
+  return '/api/v0/settings/bundles-add-setting'
 }
 export const BundleService_AddSettingToBundle_TYPE = function() {
   return 'post'
@@ -294,7 +294,7 @@ export const BundleService_AddSettingToBundle_TYPE = function() {
 export const BundleService_AddSettingToBundleURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/settings/bundles-add-setting'
+  let path = '/api/v0/settings/bundles-add-setting'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -314,7 +314,7 @@ export const BundleService_AddSettingToBundleURL = function(parameters = {}) {
 export const BundleService_ListBundles = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/settings/bundles-list'
+  let path = '/api/v0/settings/bundles-list'
   let body
   let queryParameters = {}
   let form = {}
@@ -332,7 +332,7 @@ export const BundleService_ListBundles = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const BundleService_ListBundles_RAW_URL = function() {
-  return '/api/v1/settings/bundles-list'
+  return '/api/v0/settings/bundles-list'
 }
 export const BundleService_ListBundles_TYPE = function() {
   return 'post'
@@ -340,7 +340,7 @@ export const BundleService_ListBundles_TYPE = function() {
 export const BundleService_ListBundlesURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/settings/bundles-list'
+  let path = '/api/v0/settings/bundles-list'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -360,7 +360,7 @@ export const BundleService_ListBundlesURL = function(parameters = {}) {
 export const BundleService_RemoveSettingFromBundle = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/settings/bundles-remove-setting'
+  let path = '/api/v0/settings/bundles-remove-setting'
   let body
   let queryParameters = {}
   let form = {}
@@ -378,7 +378,7 @@ export const BundleService_RemoveSettingFromBundle = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const BundleService_RemoveSettingFromBundle_RAW_URL = function() {
-  return '/api/v1/settings/bundles-remove-setting'
+  return '/api/v0/settings/bundles-remove-setting'
 }
 export const BundleService_RemoveSettingFromBundle_TYPE = function() {
   return 'post'
@@ -386,7 +386,7 @@ export const BundleService_RemoveSettingFromBundle_TYPE = function() {
 export const BundleService_RemoveSettingFromBundleURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/settings/bundles-remove-setting'
+  let path = '/api/v0/settings/bundles-remove-setting'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -406,7 +406,7 @@ export const BundleService_RemoveSettingFromBundleURL = function(parameters = {}
 export const PermissionService_GetPermissionByID = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/settings/permissions-get-by-id'
+  let path = '/api/v0/settings/permissions-get-by-id'
   let body
   let queryParameters = {}
   let form = {}
@@ -424,7 +424,7 @@ export const PermissionService_GetPermissionByID = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const PermissionService_GetPermissionByID_RAW_URL = function() {
-  return '/api/v1/settings/permissions-get-by-id'
+  return '/api/v0/settings/permissions-get-by-id'
 }
 export const PermissionService_GetPermissionByID_TYPE = function() {
   return 'post'
@@ -432,7 +432,7 @@ export const PermissionService_GetPermissionByID_TYPE = function() {
 export const PermissionService_GetPermissionByIDURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/settings/permissions-get-by-id'
+  let path = '/api/v0/settings/permissions-get-by-id'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -452,7 +452,7 @@ export const PermissionService_GetPermissionByIDURL = function(parameters = {}) 
 export const PermissionService_ListPermissionsByResource = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/settings/permissions-list-by-resource'
+  let path = '/api/v0/settings/permissions-list-by-resource'
   let body
   let queryParameters = {}
   let form = {}
@@ -470,7 +470,7 @@ export const PermissionService_ListPermissionsByResource = function(parameters =
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const PermissionService_ListPermissionsByResource_RAW_URL = function() {
-  return '/api/v1/settings/permissions-list-by-resource'
+  return '/api/v0/settings/permissions-list-by-resource'
 }
 export const PermissionService_ListPermissionsByResource_TYPE = function() {
   return 'post'
@@ -478,7 +478,7 @@ export const PermissionService_ListPermissionsByResource_TYPE = function() {
 export const PermissionService_ListPermissionsByResourceURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/settings/permissions-list-by-resource'
+  let path = '/api/v0/settings/permissions-list-by-resource'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -498,7 +498,7 @@ export const PermissionService_ListPermissionsByResourceURL = function(parameter
 export const RoleService_ListRoles = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/settings/roles-list'
+  let path = '/api/v0/settings/roles-list'
   let body
   let queryParameters = {}
   let form = {}
@@ -516,7 +516,7 @@ export const RoleService_ListRoles = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const RoleService_ListRoles_RAW_URL = function() {
-  return '/api/v1/settings/roles-list'
+  return '/api/v0/settings/roles-list'
 }
 export const RoleService_ListRoles_TYPE = function() {
   return 'post'
@@ -524,7 +524,7 @@ export const RoleService_ListRoles_TYPE = function() {
 export const RoleService_ListRolesURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/settings/roles-list'
+  let path = '/api/v0/settings/roles-list'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -544,7 +544,7 @@ export const RoleService_ListRolesURL = function(parameters = {}) {
 export const ValueService_GetValue = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/settings/values-get'
+  let path = '/api/v0/settings/values-get'
   let body
   let queryParameters = {}
   let form = {}
@@ -562,7 +562,7 @@ export const ValueService_GetValue = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const ValueService_GetValue_RAW_URL = function() {
-  return '/api/v1/settings/values-get'
+  return '/api/v0/settings/values-get'
 }
 export const ValueService_GetValue_TYPE = function() {
   return 'post'
@@ -570,7 +570,7 @@ export const ValueService_GetValue_TYPE = function() {
 export const ValueService_GetValueURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/settings/values-get'
+  let path = '/api/v0/settings/values-get'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -590,7 +590,7 @@ export const ValueService_GetValueURL = function(parameters = {}) {
 export const ValueService_GetValueByUniqueIdentifiers = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/settings/values-get-by-unique-identifiers'
+  let path = '/api/v0/settings/values-get-by-unique-identifiers'
   let body
   let queryParameters = {}
   let form = {}
@@ -608,7 +608,7 @@ export const ValueService_GetValueByUniqueIdentifiers = function(parameters = {}
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const ValueService_GetValueByUniqueIdentifiers_RAW_URL = function() {
-  return '/api/v1/settings/values-get-by-unique-identifiers'
+  return '/api/v0/settings/values-get-by-unique-identifiers'
 }
 export const ValueService_GetValueByUniqueIdentifiers_TYPE = function() {
   return 'post'
@@ -616,7 +616,7 @@ export const ValueService_GetValueByUniqueIdentifiers_TYPE = function() {
 export const ValueService_GetValueByUniqueIdentifiersURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/settings/values-get-by-unique-identifiers'
+  let path = '/api/v0/settings/values-get-by-unique-identifiers'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -636,7 +636,7 @@ export const ValueService_GetValueByUniqueIdentifiersURL = function(parameters =
 export const ValueService_ListValues = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/settings/values-list'
+  let path = '/api/v0/settings/values-list'
   let body
   let queryParameters = {}
   let form = {}
@@ -654,7 +654,7 @@ export const ValueService_ListValues = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const ValueService_ListValues_RAW_URL = function() {
-  return '/api/v1/settings/values-list'
+  return '/api/v0/settings/values-list'
 }
 export const ValueService_ListValues_TYPE = function() {
   return 'post'
@@ -662,7 +662,7 @@ export const ValueService_ListValues_TYPE = function() {
 export const ValueService_ListValuesURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/settings/values-list'
+  let path = '/api/v0/settings/values-list'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -682,7 +682,7 @@ export const ValueService_ListValuesURL = function(parameters = {}) {
 export const ValueService_SaveValue = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/settings/values-save'
+  let path = '/api/v0/settings/values-save'
   let body
   let queryParameters = {}
   let form = {}
@@ -700,7 +700,7 @@ export const ValueService_SaveValue = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const ValueService_SaveValue_RAW_URL = function() {
-  return '/api/v1/settings/values-save'
+  return '/api/v0/settings/values-save'
 }
 export const ValueService_SaveValue_TYPE = function() {
   return 'post'
@@ -708,7 +708,7 @@ export const ValueService_SaveValue_TYPE = function() {
 export const ValueService_SaveValueURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/settings/values-save'
+  let path = '/api/v0/settings/values-save'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]

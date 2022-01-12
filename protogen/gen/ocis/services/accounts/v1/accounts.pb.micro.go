@@ -38,35 +38,35 @@ func NewAccountsServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
 		{
 			Name:    "AccountsService.ListAccounts",
-			Path:    []string{"/api/v1/accounts/accounts-list"},
+			Path:    []string{"/api/v0/accounts/accounts-list"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "AccountsService.GetAccount",
-			Path:    []string{"/api/v1/accounts/accounts-get"},
+			Path:    []string{"/api/v0/accounts/accounts-get"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "AccountsService.CreateAccount",
-			Path:    []string{"/api/v1/accounts/accounts-create"},
+			Path:    []string{"/api/v0/accounts/accounts-create"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "AccountsService.UpdateAccount",
-			Path:    []string{"/api/v1/accounts/accounts-update"},
+			Path:    []string{"/api/v0/accounts/accounts-update"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "AccountsService.DeleteAccount",
-			Path:    []string{"/api/v1/accounts/accounts-delete"},
+			Path:    []string{"/api/v0/accounts/accounts-delete"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
@@ -180,35 +180,35 @@ func RegisterAccountsServiceHandler(s server.Server, hdlr AccountsServiceHandler
 	h := &accountsServiceHandler{hdlr}
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "AccountsService.ListAccounts",
-		Path:    []string{"/api/v1/accounts/accounts-list"},
+		Path:    []string{"/api/v0/accounts/accounts-list"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "AccountsService.GetAccount",
-		Path:    []string{"/api/v1/accounts/accounts-get"},
+		Path:    []string{"/api/v0/accounts/accounts-get"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "AccountsService.CreateAccount",
-		Path:    []string{"/api/v1/accounts/accounts-create"},
+		Path:    []string{"/api/v0/accounts/accounts-create"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "AccountsService.UpdateAccount",
-		Path:    []string{"/api/v1/accounts/accounts-update"},
+		Path:    []string{"/api/v0/accounts/accounts-update"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "AccountsService.DeleteAccount",
-		Path:    []string{"/api/v1/accounts/accounts-delete"},
+		Path:    []string{"/api/v0/accounts/accounts-delete"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
@@ -246,56 +246,56 @@ func NewGroupsServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
 		{
 			Name:    "GroupsService.ListGroups",
-			Path:    []string{"/api/v1/accounts/groups-list"},
+			Path:    []string{"/api/v0/accounts/groups-list"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "GroupsService.GetGroup",
-			Path:    []string{"/api/v1/accounts/groups-get"},
+			Path:    []string{"/api/v0/accounts/groups-get"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "GroupsService.CreateGroup",
-			Path:    []string{"/api/v1/accounts/groups-create"},
+			Path:    []string{"/api/v0/accounts/groups-create"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "GroupsService.UpdateGroup",
-			Path:    []string{"/api/v1/accounts/groups-update"},
+			Path:    []string{"/api/v0/accounts/groups-update"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "GroupsService.DeleteGroup",
-			Path:    []string{"/api/v1/accounts/groups-delete"},
+			Path:    []string{"/api/v0/accounts/groups-delete"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "GroupsService.AddMember",
-			Path:    []string{"/api/v1/groups/{group_id=*}/members/$ref"},
+			Path:    []string{"/api/v0/groups/{group_id=*}/members/$ref"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "GroupsService.RemoveMember",
-			Path:    []string{"/api/v1/groups/{group_id=*}/members/{account_id}/$ref"},
+			Path:    []string{"/api/v0/groups/{group_id=*}/members/{account_id}/$ref"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "GroupsService.ListMembers",
-			Path:    []string{"/api/v1/groups/{id=*}/members/$ref"},
+			Path:    []string{"/api/v0/groups/{id=*}/members/$ref"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
@@ -454,56 +454,56 @@ func RegisterGroupsServiceHandler(s server.Server, hdlr GroupsServiceHandler, op
 	h := &groupsServiceHandler{hdlr}
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.ListGroups",
-		Path:    []string{"/api/v1/accounts/groups-list"},
+		Path:    []string{"/api/v0/accounts/groups-list"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.GetGroup",
-		Path:    []string{"/api/v1/accounts/groups-get"},
+		Path:    []string{"/api/v0/accounts/groups-get"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.CreateGroup",
-		Path:    []string{"/api/v1/accounts/groups-create"},
+		Path:    []string{"/api/v0/accounts/groups-create"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.UpdateGroup",
-		Path:    []string{"/api/v1/accounts/groups-update"},
+		Path:    []string{"/api/v0/accounts/groups-update"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.DeleteGroup",
-		Path:    []string{"/api/v1/accounts/groups-delete"},
+		Path:    []string{"/api/v0/accounts/groups-delete"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.AddMember",
-		Path:    []string{"/api/v1/groups/{group_id=*}/members/$ref"},
+		Path:    []string{"/api/v0/groups/{group_id=*}/members/$ref"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.RemoveMember",
-		Path:    []string{"/api/v1/groups/{group_id=*}/members/{account_id}/$ref"},
+		Path:    []string{"/api/v0/groups/{group_id=*}/members/{account_id}/$ref"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "GroupsService.ListMembers",
-		Path:    []string{"/api/v1/groups/{id=*}/members/$ref"},
+		Path:    []string{"/api/v0/groups/{id=*}/members/$ref"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
@@ -553,7 +553,7 @@ func NewIndexServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
 		{
 			Name:    "IndexService.RebuildIndex",
-			Path:    []string{"/api/v1/index/rebuild"},
+			Path:    []string{"/api/v0/index/rebuild"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
@@ -605,7 +605,7 @@ func RegisterIndexServiceHandler(s server.Server, hdlr IndexServiceHandler, opts
 	h := &indexServiceHandler{hdlr}
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "IndexService.RebuildIndex",
-		Path:    []string{"/api/v1/index/rebuild"},
+		Path:    []string{"/api/v0/index/rebuild"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",

@@ -140,11 +140,11 @@ func RegisterBundleServiceWeb(r chi.Router, i BundleServiceHandler, middlewares 
 		h: i,
 	}
 
-	r.MethodFunc("POST", "/api/v1/settings/bundle-save", handler.SaveBundle)
-	r.MethodFunc("POST", "/api/v1/settings/bundle-get", handler.GetBundle)
-	r.MethodFunc("POST", "/api/v1/settings/bundles-list", handler.ListBundles)
-	r.MethodFunc("POST", "/api/v1/settings/bundles-add-setting", handler.AddSettingToBundle)
-	r.MethodFunc("POST", "/api/v1/settings/bundles-remove-setting", handler.RemoveSettingFromBundle)
+	r.MethodFunc("POST", "/api/v0/settings/bundle-save", handler.SaveBundle)
+	r.MethodFunc("POST", "/api/v0/settings/bundle-get", handler.GetBundle)
+	r.MethodFunc("POST", "/api/v0/settings/bundles-list", handler.ListBundles)
+	r.MethodFunc("POST", "/api/v0/settings/bundles-add-setting", handler.AddSettingToBundle)
+	r.MethodFunc("POST", "/api/v0/settings/bundles-remove-setting", handler.RemoveSettingFromBundle)
 }
 
 type webValueServiceHandler struct {
@@ -250,10 +250,10 @@ func RegisterValueServiceWeb(r chi.Router, i ValueServiceHandler, middlewares ..
 		h: i,
 	}
 
-	r.MethodFunc("POST", "/api/v1/settings/values-save", handler.SaveValue)
-	r.MethodFunc("POST", "/api/v1/settings/values-get", handler.GetValue)
-	r.MethodFunc("POST", "/api/v1/settings/values-list", handler.ListValues)
-	r.MethodFunc("POST", "/api/v1/settings/values-get-by-unique-identifiers", handler.GetValueByUniqueIdentifiers)
+	r.MethodFunc("POST", "/api/v0/settings/values-save", handler.SaveValue)
+	r.MethodFunc("POST", "/api/v0/settings/values-get", handler.GetValue)
+	r.MethodFunc("POST", "/api/v0/settings/values-list", handler.ListValues)
+	r.MethodFunc("POST", "/api/v0/settings/values-get-by-unique-identifiers", handler.GetValueByUniqueIdentifiers)
 }
 
 type webRoleServiceHandler struct {
@@ -359,10 +359,10 @@ func RegisterRoleServiceWeb(r chi.Router, i RoleServiceHandler, middlewares ...f
 		h: i,
 	}
 
-	r.MethodFunc("POST", "/api/v1/settings/roles-list", handler.ListRoles)
-	r.MethodFunc("POST", "/api/v1/settings/assignments-list", handler.ListRoleAssignments)
-	r.MethodFunc("POST", "/api/v1/settings/assignments-add", handler.AssignRoleToUser)
-	r.MethodFunc("POST", "/api/v1/settings/assignments-remove", handler.RemoveRoleFromUser)
+	r.MethodFunc("POST", "/api/v0/settings/roles-list", handler.ListRoles)
+	r.MethodFunc("POST", "/api/v0/settings/assignments-list", handler.ListRoleAssignments)
+	r.MethodFunc("POST", "/api/v0/settings/assignments-add", handler.AssignRoleToUser)
+	r.MethodFunc("POST", "/api/v0/settings/assignments-remove", handler.RemoveRoleFromUser)
 }
 
 type webPermissionServiceHandler struct {
@@ -424,8 +424,8 @@ func RegisterPermissionServiceWeb(r chi.Router, i PermissionServiceHandler, midd
 		h: i,
 	}
 
-	r.MethodFunc("POST", "/api/v1/settings/permissions-list-by-resource", handler.ListPermissionsByResource)
-	r.MethodFunc("POST", "/api/v1/settings/permissions-get-by-id", handler.GetPermissionByID)
+	r.MethodFunc("POST", "/api/v0/settings/permissions-list-by-resource", handler.ListPermissionsByResource)
+	r.MethodFunc("POST", "/api/v0/settings/permissions-get-by-id", handler.GetPermissionByID)
 }
 
 // SaveBundleRequestJSONMarshaler describes the default jsonpb.Marshaler used by all

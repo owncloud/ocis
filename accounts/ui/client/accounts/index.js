@@ -38,7 +38,7 @@ export const request = (method, url, body, queryParameters, form, config) => {
 export const AccountsService_CreateAccount = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/accounts/accounts-create'
+  let path = '/api/v0/accounts/accounts-create'
   let body
   let queryParameters = {}
   let form = {}
@@ -56,7 +56,7 @@ export const AccountsService_CreateAccount = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const AccountsService_CreateAccount_RAW_URL = function() {
-  return '/api/v1/accounts/accounts-create'
+  return '/api/v0/accounts/accounts-create'
 }
 export const AccountsService_CreateAccount_TYPE = function() {
   return 'post'
@@ -64,7 +64,7 @@ export const AccountsService_CreateAccount_TYPE = function() {
 export const AccountsService_CreateAccountURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/accounts/accounts-create'
+  let path = '/api/v0/accounts/accounts-create'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -84,7 +84,7 @@ export const AccountsService_CreateAccountURL = function(parameters = {}) {
 export const AccountsService_DeleteAccount = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/accounts/accounts-delete'
+  let path = '/api/v0/accounts/accounts-delete'
   let body
   let queryParameters = {}
   let form = {}
@@ -102,7 +102,7 @@ export const AccountsService_DeleteAccount = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const AccountsService_DeleteAccount_RAW_URL = function() {
-  return '/api/v1/accounts/accounts-delete'
+  return '/api/v0/accounts/accounts-delete'
 }
 export const AccountsService_DeleteAccount_TYPE = function() {
   return 'post'
@@ -110,7 +110,7 @@ export const AccountsService_DeleteAccount_TYPE = function() {
 export const AccountsService_DeleteAccountURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/accounts/accounts-delete'
+  let path = '/api/v0/accounts/accounts-delete'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -130,7 +130,7 @@ export const AccountsService_DeleteAccountURL = function(parameters = {}) {
 export const AccountsService_GetAccount = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/accounts/accounts-get'
+  let path = '/api/v0/accounts/accounts-get'
   let body
   let queryParameters = {}
   let form = {}
@@ -148,7 +148,7 @@ export const AccountsService_GetAccount = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const AccountsService_GetAccount_RAW_URL = function() {
-  return '/api/v1/accounts/accounts-get'
+  return '/api/v0/accounts/accounts-get'
 }
 export const AccountsService_GetAccount_TYPE = function() {
   return 'post'
@@ -156,7 +156,7 @@ export const AccountsService_GetAccount_TYPE = function() {
 export const AccountsService_GetAccountURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/accounts/accounts-get'
+  let path = '/api/v0/accounts/accounts-get'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -176,7 +176,7 @@ export const AccountsService_GetAccountURL = function(parameters = {}) {
 export const AccountsService_ListAccounts = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/accounts/accounts-list'
+  let path = '/api/v0/accounts/accounts-list'
   let body
   let queryParameters = {}
   let form = {}
@@ -194,7 +194,7 @@ export const AccountsService_ListAccounts = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const AccountsService_ListAccounts_RAW_URL = function() {
-  return '/api/v1/accounts/accounts-list'
+  return '/api/v0/accounts/accounts-list'
 }
 export const AccountsService_ListAccounts_TYPE = function() {
   return 'post'
@@ -202,7 +202,7 @@ export const AccountsService_ListAccounts_TYPE = function() {
 export const AccountsService_ListAccountsURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/accounts/accounts-list'
+  let path = '/api/v0/accounts/accounts-list'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -222,7 +222,7 @@ export const AccountsService_ListAccountsURL = function(parameters = {}) {
 export const AccountsService_UpdateAccount = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/api/v1/accounts/accounts-update'
+  let path = '/api/v0/accounts/accounts-update'
   let body
   let queryParameters = {}
   let form = {}
@@ -240,7 +240,7 @@ export const AccountsService_UpdateAccount = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const AccountsService_UpdateAccount_RAW_URL = function() {
-  return '/api/v1/accounts/accounts-update'
+  return '/api/v0/accounts/accounts-update'
 }
 export const AccountsService_UpdateAccount_TYPE = function() {
   return 'post'
@@ -248,7 +248,7 @@ export const AccountsService_UpdateAccount_TYPE = function() {
 export const AccountsService_UpdateAccountURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/api/v1/accounts/accounts-update'
+  let path = '/api/v0/accounts/accounts-update'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]

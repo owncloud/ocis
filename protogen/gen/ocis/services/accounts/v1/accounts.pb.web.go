@@ -141,11 +141,11 @@ func RegisterAccountsServiceWeb(r chi.Router, i AccountsServiceHandler, middlewa
 		h: i,
 	}
 
-	r.MethodFunc("POST", "/api/v1/accounts/accounts-list", handler.ListAccounts)
-	r.MethodFunc("POST", "/api/v1/accounts/accounts-get", handler.GetAccount)
-	r.MethodFunc("POST", "/api/v1/accounts/accounts-create", handler.CreateAccount)
-	r.MethodFunc("POST", "/api/v1/accounts/accounts-update", handler.UpdateAccount)
-	r.MethodFunc("POST", "/api/v1/accounts/accounts-delete", handler.DeleteAccount)
+	r.MethodFunc("POST", "/api/v0/accounts/accounts-list", handler.ListAccounts)
+	r.MethodFunc("POST", "/api/v0/accounts/accounts-get", handler.GetAccount)
+	r.MethodFunc("POST", "/api/v0/accounts/accounts-create", handler.CreateAccount)
+	r.MethodFunc("POST", "/api/v0/accounts/accounts-update", handler.UpdateAccount)
+	r.MethodFunc("POST", "/api/v0/accounts/accounts-delete", handler.DeleteAccount)
 }
 
 type webGroupsServiceHandler struct {
@@ -339,14 +339,14 @@ func RegisterGroupsServiceWeb(r chi.Router, i GroupsServiceHandler, middlewares 
 		h: i,
 	}
 
-	r.MethodFunc("POST", "/api/v1/accounts/groups-list", handler.ListGroups)
-	r.MethodFunc("POST", "/api/v1/accounts/groups-get", handler.GetGroup)
-	r.MethodFunc("POST", "/api/v1/accounts/groups-create", handler.CreateGroup)
-	r.MethodFunc("POST", "/api/v1/accounts/groups-update", handler.UpdateGroup)
-	r.MethodFunc("POST", "/api/v1/accounts/groups-delete", handler.DeleteGroup)
-	r.MethodFunc("POST", "/api/v1/groups/{group_id=*}/members/$ref", handler.AddMember)
-	r.MethodFunc("POST", "/api/v1/groups/{group_id=*}/members/{account_id}/$ref", handler.RemoveMember)
-	r.MethodFunc("POST", "/api/v1/groups/{id=*}/members/$ref", handler.ListMembers)
+	r.MethodFunc("POST", "/api/v0/accounts/groups-list", handler.ListGroups)
+	r.MethodFunc("POST", "/api/v0/accounts/groups-get", handler.GetGroup)
+	r.MethodFunc("POST", "/api/v0/accounts/groups-create", handler.CreateGroup)
+	r.MethodFunc("POST", "/api/v0/accounts/groups-update", handler.UpdateGroup)
+	r.MethodFunc("POST", "/api/v0/accounts/groups-delete", handler.DeleteGroup)
+	r.MethodFunc("POST", "/api/v0/groups/{group_id=*}/members/$ref", handler.AddMember)
+	r.MethodFunc("POST", "/api/v0/groups/{group_id=*}/members/{account_id}/$ref", handler.RemoveMember)
+	r.MethodFunc("POST", "/api/v0/groups/{id=*}/members/$ref", handler.ListMembers)
 }
 
 type webIndexServiceHandler struct {
@@ -386,7 +386,7 @@ func RegisterIndexServiceWeb(r chi.Router, i IndexServiceHandler, middlewares ..
 		h: i,
 	}
 
-	r.MethodFunc("POST", "/api/v1/index/rebuild", handler.RebuildIndex)
+	r.MethodFunc("POST", "/api/v0/index/rebuild", handler.RebuildIndex)
 }
 
 // RebuildIndexRequestJSONMarshaler describes the default jsonpb.Marshaler used by all

@@ -43,14 +43,14 @@ service AccountsService {
     rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse) {
         // List method maps to HTTP GET
         option (google.api.http) = {
-            post: "/api/v1/accounts/accounts-list",
+            post: "/api/v0/accounts/accounts-list",
             body: "*"
         };
     }
     // Gets an account
     rpc GetAccount(GetAccountRequest) returns (ocis.messages.accounts.v1.Account) {
         option (google.api.http) = {
-            post: "/api/v1/accounts/accounts-get",
+            post: "/api/v0/accounts/accounts-get",
             body: "*"
         };
     }
@@ -59,7 +59,7 @@ service AccountsService {
         // Create maps to HTTP POST. URL path as the collection name.
         // HTTP request body contains the resource
         option (google.api.http) = {
-            post: "/api/v1/accounts/accounts-create"
+            post: "/api/v0/accounts/accounts-create"
             body: "*"
         };
     }
@@ -68,7 +68,7 @@ service AccountsService {
         // Update maps to HTTP PATCH. Resource name is mapped to a URL path.
         // Resource is contained in the HTTP request body
         option (google.api.http) = {
-            post: "/api/v1/accounts/accounts-update"
+            post: "/api/v0/accounts/accounts-update"
             body: "*"
         };
     };
@@ -77,7 +77,7 @@ service AccountsService {
         // Delete maps to HTTP DELETE. Resource name maps to the URL path.
         // There is no request body
         option (google.api.http) = {
-            post: "/api/v1/accounts/accounts-delete",
+            post: "/api/v0/accounts/accounts-delete",
             body: "*"
         };
     }
@@ -88,14 +88,14 @@ service GroupsService {
     rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse) {
         // List method maps to HTTP GET
         option (google.api.http) = {
-            post: "/api/v1/accounts/groups-list",
+            post: "/api/v0/accounts/groups-list",
             body: "*"
         };
     }
     // Gets an groups
     rpc GetGroup(GetGroupRequest) returns (ocis.messages.accounts.v1.Group) {
         option (google.api.http) = {
-            post: "/api/v1/accounts/groups-get",
+            post: "/api/v0/accounts/groups-get",
             body: "*"
         };
     }
@@ -104,7 +104,7 @@ service GroupsService {
         // Create maps to HTTP POST. URL path as the collection name.
         // HTTP request body contains the resource
         option (google.api.http) = {
-            post: "/api/v1/accounts/groups-create"
+            post: "/api/v0/accounts/groups-create"
             body: "*"
         };
     }
@@ -113,7 +113,7 @@ service GroupsService {
         // Update maps to HTTP PATCH. Resource name is mapped to a URL path.
         // Resource is contained in the HTTP request body
         option (google.api.http) = {
-            post: "/api/v1/accounts/groups-update"
+            post: "/api/v0/accounts/groups-update"
             body: "*"
         };
     };
@@ -122,7 +122,7 @@ service GroupsService {
         // Delete maps to HTTP DELETE. Resource name maps to the URL path.
         // There is no request body
         option (google.api.http) = {
-            post: "/api/v1/accounts/groups-delete",
+            post: "/api/v0/accounts/groups-delete",
             body: "*"
         };
     }
@@ -136,7 +136,7 @@ service GroupsService {
     rpc AddMember(AddMemberRequest) returns (ocis.messages.accounts.v1.Group) {
         //  All request parameters go into body.
         option (google.api.http) = {
-            post: "/api/v1/groups/{group_id=*}/members/$ref"
+            post: "/api/v0/groups/{group_id=*}/members/$ref"
             body: "*"
         };
     }
@@ -145,7 +145,7 @@ service GroupsService {
         //  All request parameters go into body.
         option (google.api.http) = {
             // URLs are broken
-            post: "/api/v1/groups/{group_id=*}/members/{account_id}/$ref"
+            post: "/api/v0/groups/{group_id=*}/members/{account_id}/$ref"
             body: "*"
         };
     }
@@ -154,7 +154,7 @@ service GroupsService {
         //  All request parameters go into body.
         option (google.api.http) = {
             // URLs are broken
-            post: "/api/v1/groups/{id=*}/members/$ref"
+            post: "/api/v0/groups/{id=*}/members/$ref"
             body: "*"
         };
     }
@@ -166,7 +166,7 @@ service IndexService {
         //  All request parameters go into body.
         option (google.api.http) = {
             // URLs are broken
-            post: "/api/v1/index/rebuild"
+            post: "/api/v0/index/rebuild"
             body: "*"
         };
     }

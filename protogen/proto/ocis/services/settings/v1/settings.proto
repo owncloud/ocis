@@ -36,31 +36,31 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 service BundleService {
   rpc SaveBundle(SaveBundleRequest) returns (SaveBundleResponse) {
     option (google.api.http) = {
-      post: "/api/v1/settings/bundle-save",
+      post: "/api/v0/settings/bundle-save",
       body: "*"
     };
   }
   rpc GetBundle(GetBundleRequest) returns (GetBundleResponse) {
     option (google.api.http) = {
-      post: "/api/v1/settings/bundle-get",
+      post: "/api/v0/settings/bundle-get",
       body: "*"
     };
   }
   rpc ListBundles(ListBundlesRequest) returns (ListBundlesResponse) {
     option (google.api.http) = {
-      post: "/api/v1/settings/bundles-list",
+      post: "/api/v0/settings/bundles-list",
       body: "*"
     };
   }
   rpc AddSettingToBundle(AddSettingToBundleRequest) returns (AddSettingToBundleResponse) {
     option (google.api.http) = {
-      post: "/api/v1/settings/bundles-add-setting",
+      post: "/api/v0/settings/bundles-add-setting",
       body: "*"
     };
   }
   rpc RemoveSettingFromBundle(RemoveSettingFromBundleRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/v1/settings/bundles-remove-setting",
+      post: "/api/v0/settings/bundles-remove-setting",
       body: "*"
     };
   }
@@ -69,25 +69,25 @@ service BundleService {
 service ValueService {
   rpc SaveValue(SaveValueRequest) returns (SaveValueResponse) {
     option (google.api.http) = {
-      post: "/api/v1/settings/values-save",
+      post: "/api/v0/settings/values-save",
       body: "*"
     };
   }
   rpc GetValue(GetValueRequest) returns (GetValueResponse) {
     option (google.api.http) = {
-      post: "/api/v1/settings/values-get",
+      post: "/api/v0/settings/values-get",
       body: "*"
     };
   }
   rpc ListValues(ListValuesRequest) returns (ListValuesResponse) {
     option (google.api.http) = {
-      post: "/api/v1/settings/values-list",
+      post: "/api/v0/settings/values-list",
       body: "*"
     };
   }
   rpc GetValueByUniqueIdentifiers(GetValueByUniqueIdentifiersRequest) returns (GetValueResponse) {
     option (google.api.http) = {
-      post: "/api/v1/settings/values-get-by-unique-identifiers",
+      post: "/api/v0/settings/values-get-by-unique-identifiers",
       body: "*"
     };
   }
@@ -96,25 +96,25 @@ service ValueService {
 service RoleService {
   rpc ListRoles(ListBundlesRequest) returns (ListBundlesResponse) {
     option (google.api.http) = {
-      post: "/api/v1/settings/roles-list",
+      post: "/api/v0/settings/roles-list",
       body: "*"
     };
   }
   rpc ListRoleAssignments(ListRoleAssignmentsRequest) returns (ListRoleAssignmentsResponse) {
     option (google.api.http) = {
-      post: "/api/v1/settings/assignments-list",
+      post: "/api/v0/settings/assignments-list",
       body: "*"
     };
   }
   rpc AssignRoleToUser(AssignRoleToUserRequest) returns (AssignRoleToUserResponse) {
     option (google.api.http) = {
-      post: "/api/v1/settings/assignments-add",
+      post: "/api/v0/settings/assignments-add",
       body: "*"
     };
   }
   rpc RemoveRoleFromUser(RemoveRoleFromUserRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/v1/settings/assignments-remove",
+      post: "/api/v0/settings/assignments-remove",
       body: "*"
     };
   }
@@ -123,13 +123,13 @@ service RoleService {
 service PermissionService {
   rpc ListPermissionsByResource(ListPermissionsByResourceRequest) returns (ListPermissionsByResourceResponse) {
     option (google.api.http) = {
-      post: "/api/v1/settings/permissions-list-by-resource",
+      post: "/api/v0/settings/permissions-list-by-resource",
       body: "*"
     };
   }
   rpc GetPermissionByID(GetPermissionByIDRequest) returns (GetPermissionByIDResponse) {
     option (google.api.http) = {
-      post: "/api/v1/settings/permissions-get-by-id",
+      post: "/api/v0/settings/permissions-get-by-id",
       body: "*"
     };
   }

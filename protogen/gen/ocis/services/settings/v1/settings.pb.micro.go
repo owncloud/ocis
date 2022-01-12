@@ -37,35 +37,35 @@ func NewBundleServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
 		{
 			Name:    "BundleService.SaveBundle",
-			Path:    []string{"/api/v1/settings/bundle-save"},
+			Path:    []string{"/api/v0/settings/bundle-save"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "BundleService.GetBundle",
-			Path:    []string{"/api/v1/settings/bundle-get"},
+			Path:    []string{"/api/v0/settings/bundle-get"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "BundleService.ListBundles",
-			Path:    []string{"/api/v1/settings/bundles-list"},
+			Path:    []string{"/api/v0/settings/bundles-list"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "BundleService.AddSettingToBundle",
-			Path:    []string{"/api/v1/settings/bundles-add-setting"},
+			Path:    []string{"/api/v0/settings/bundles-add-setting"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "BundleService.RemoveSettingFromBundle",
-			Path:    []string{"/api/v1/settings/bundles-remove-setting"},
+			Path:    []string{"/api/v0/settings/bundles-remove-setting"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
@@ -169,35 +169,35 @@ func RegisterBundleServiceHandler(s server.Server, hdlr BundleServiceHandler, op
 	h := &bundleServiceHandler{hdlr}
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "BundleService.SaveBundle",
-		Path:    []string{"/api/v1/settings/bundle-save"},
+		Path:    []string{"/api/v0/settings/bundle-save"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "BundleService.GetBundle",
-		Path:    []string{"/api/v1/settings/bundle-get"},
+		Path:    []string{"/api/v0/settings/bundle-get"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "BundleService.ListBundles",
-		Path:    []string{"/api/v1/settings/bundles-list"},
+		Path:    []string{"/api/v0/settings/bundles-list"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "BundleService.AddSettingToBundle",
-		Path:    []string{"/api/v1/settings/bundles-add-setting"},
+		Path:    []string{"/api/v0/settings/bundles-add-setting"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "BundleService.RemoveSettingFromBundle",
-		Path:    []string{"/api/v1/settings/bundles-remove-setting"},
+		Path:    []string{"/api/v0/settings/bundles-remove-setting"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
@@ -235,28 +235,28 @@ func NewValueServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
 		{
 			Name:    "ValueService.SaveValue",
-			Path:    []string{"/api/v1/settings/values-save"},
+			Path:    []string{"/api/v0/settings/values-save"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "ValueService.GetValue",
-			Path:    []string{"/api/v1/settings/values-get"},
+			Path:    []string{"/api/v0/settings/values-get"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "ValueService.ListValues",
-			Path:    []string{"/api/v1/settings/values-list"},
+			Path:    []string{"/api/v0/settings/values-list"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "ValueService.GetValueByUniqueIdentifiers",
-			Path:    []string{"/api/v1/settings/values-get-by-unique-identifiers"},
+			Path:    []string{"/api/v0/settings/values-get-by-unique-identifiers"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
@@ -347,28 +347,28 @@ func RegisterValueServiceHandler(s server.Server, hdlr ValueServiceHandler, opts
 	h := &valueServiceHandler{hdlr}
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "ValueService.SaveValue",
-		Path:    []string{"/api/v1/settings/values-save"},
+		Path:    []string{"/api/v0/settings/values-save"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "ValueService.GetValue",
-		Path:    []string{"/api/v1/settings/values-get"},
+		Path:    []string{"/api/v0/settings/values-get"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "ValueService.ListValues",
-		Path:    []string{"/api/v1/settings/values-list"},
+		Path:    []string{"/api/v0/settings/values-list"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "ValueService.GetValueByUniqueIdentifiers",
-		Path:    []string{"/api/v1/settings/values-get-by-unique-identifiers"},
+		Path:    []string{"/api/v0/settings/values-get-by-unique-identifiers"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
@@ -402,28 +402,28 @@ func NewRoleServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
 		{
 			Name:    "RoleService.ListRoles",
-			Path:    []string{"/api/v1/settings/roles-list"},
+			Path:    []string{"/api/v0/settings/roles-list"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "RoleService.ListRoleAssignments",
-			Path:    []string{"/api/v1/settings/assignments-list"},
+			Path:    []string{"/api/v0/settings/assignments-list"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "RoleService.AssignRoleToUser",
-			Path:    []string{"/api/v1/settings/assignments-add"},
+			Path:    []string{"/api/v0/settings/assignments-add"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "RoleService.RemoveRoleFromUser",
-			Path:    []string{"/api/v1/settings/assignments-remove"},
+			Path:    []string{"/api/v0/settings/assignments-remove"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
@@ -514,28 +514,28 @@ func RegisterRoleServiceHandler(s server.Server, hdlr RoleServiceHandler, opts .
 	h := &roleServiceHandler{hdlr}
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "RoleService.ListRoles",
-		Path:    []string{"/api/v1/settings/roles-list"},
+		Path:    []string{"/api/v0/settings/roles-list"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "RoleService.ListRoleAssignments",
-		Path:    []string{"/api/v1/settings/assignments-list"},
+		Path:    []string{"/api/v0/settings/assignments-list"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "RoleService.AssignRoleToUser",
-		Path:    []string{"/api/v1/settings/assignments-add"},
+		Path:    []string{"/api/v0/settings/assignments-add"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "RoleService.RemoveRoleFromUser",
-		Path:    []string{"/api/v1/settings/assignments-remove"},
+		Path:    []string{"/api/v0/settings/assignments-remove"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
@@ -569,14 +569,14 @@ func NewPermissionServiceEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{
 		{
 			Name:    "PermissionService.ListPermissionsByResource",
-			Path:    []string{"/api/v1/settings/permissions-list-by-resource"},
+			Path:    []string{"/api/v0/settings/permissions-list-by-resource"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "PermissionService.GetPermissionByID",
-			Path:    []string{"/api/v1/settings/permissions-get-by-id"},
+			Path:    []string{"/api/v0/settings/permissions-get-by-id"},
 			Method:  []string{"POST"},
 			Body:    "*",
 			Handler: "rpc",
@@ -641,14 +641,14 @@ func RegisterPermissionServiceHandler(s server.Server, hdlr PermissionServiceHan
 	h := &permissionServiceHandler{hdlr}
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "PermissionService.ListPermissionsByResource",
-		Path:    []string{"/api/v1/settings/permissions-list-by-resource"},
+		Path:    []string{"/api/v0/settings/permissions-list-by-resource"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "PermissionService.GetPermissionByID",
-		Path:    []string{"/api/v1/settings/permissions-get-by-id"},
+		Path:    []string{"/api/v0/settings/permissions-get-by-id"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",

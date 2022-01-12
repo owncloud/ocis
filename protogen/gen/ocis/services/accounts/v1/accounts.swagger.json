@@ -35,7 +35,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/v1/accounts/accounts-create": {
+    "/api/v0/accounts/accounts-create": {
       "post": {
         "summary": "Creates an account",
         "operationId": "AccountsService_CreateAccount",
@@ -68,7 +68,7 @@
         ]
       }
     },
-    "/api/v1/accounts/accounts-delete": {
+    "/api/v0/accounts/accounts-delete": {
       "post": {
         "summary": "Deletes an account",
         "operationId": "AccountsService_DeleteAccount",
@@ -101,7 +101,7 @@
         ]
       }
     },
-    "/api/v1/accounts/accounts-get": {
+    "/api/v0/accounts/accounts-get": {
       "post": {
         "summary": "Gets an account",
         "operationId": "AccountsService_GetAccount",
@@ -134,7 +134,7 @@
         ]
       }
     },
-    "/api/v1/accounts/accounts-list": {
+    "/api/v0/accounts/accounts-list": {
       "post": {
         "summary": "Lists accounts",
         "operationId": "AccountsService_ListAccounts",
@@ -167,7 +167,7 @@
         ]
       }
     },
-    "/api/v1/accounts/accounts-update": {
+    "/api/v0/accounts/accounts-update": {
       "post": {
         "summary": "Updates an account",
         "operationId": "AccountsService_UpdateAccount",
@@ -200,7 +200,7 @@
         ]
       }
     },
-    "/api/v1/accounts/groups-create": {
+    "/api/v0/accounts/groups-create": {
       "post": {
         "summary": "Creates a group",
         "operationId": "GroupsService_CreateGroup",
@@ -233,7 +233,7 @@
         ]
       }
     },
-    "/api/v1/accounts/groups-delete": {
+    "/api/v0/accounts/groups-delete": {
       "post": {
         "summary": "Deletes a group",
         "operationId": "GroupsService_DeleteGroup",
@@ -266,7 +266,7 @@
         ]
       }
     },
-    "/api/v1/accounts/groups-get": {
+    "/api/v0/accounts/groups-get": {
       "post": {
         "summary": "Gets an groups",
         "operationId": "GroupsService_GetGroup",
@@ -299,7 +299,7 @@
         ]
       }
     },
-    "/api/v1/accounts/groups-list": {
+    "/api/v0/accounts/groups-list": {
       "post": {
         "summary": "Lists groups",
         "operationId": "GroupsService_ListGroups",
@@ -332,7 +332,7 @@
         ]
       }
     },
-    "/api/v1/accounts/groups-update": {
+    "/api/v0/accounts/groups-update": {
       "post": {
         "summary": "Updates a group",
         "operationId": "GroupsService_UpdateGroup",
@@ -365,7 +365,7 @@
         ]
       }
     },
-    "/api/v1/groups/{groupId}/members/$ref": {
+    "/api/v0/groups/{groupId}/members/$ref": {
       "post": {
         "summary": "group:addmember https://docs.microsoft.com/en-us/graph/api/group-post-members?view=graph-rest-1.0\u0026tabs=http",
         "operationId": "GroupsService_AddMember",
@@ -411,7 +411,7 @@
         ]
       }
     },
-    "/api/v1/groups/{groupId}/members/{accountId}/$ref": {
+    "/api/v0/groups/{groupId}/members/{accountId}/$ref": {
       "post": {
         "summary": "group:removemember https://docs.microsoft.com/en-us/graph/api/group-delete-members?view=graph-rest-1.0",
         "operationId": "GroupsService_RemoveMember",
@@ -458,7 +458,7 @@
         ]
       }
     },
-    "/api/v1/groups/{id}/members/$ref": {
+    "/api/v0/groups/{id}/members/$ref": {
       "post": {
         "summary": "group:listmembers https://docs.microsoft.com/en-us/graph/api/group-list-members?view=graph-rest-1.0",
         "operationId": "GroupsService_ListMembers",
@@ -517,7 +517,7 @@
         ]
       }
     },
-    "/api/v1/index/rebuild": {
+    "/api/v0/index/rebuild": {
       "post": {
         "operationId": "IndexService_RebuildIndex",
         "responses": {

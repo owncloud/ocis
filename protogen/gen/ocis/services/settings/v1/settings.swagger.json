@@ -38,7 +38,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/v1/settings/assignments-add": {
+    "/api/v0/settings/assignments-add": {
       "post": {
         "operationId": "RoleService_AssignRoleToUser",
         "responses": {
@@ -70,7 +70,7 @@
         ]
       }
     },
-    "/api/v1/settings/assignments-list": {
+    "/api/v0/settings/assignments-list": {
       "post": {
         "operationId": "RoleService_ListRoleAssignments",
         "responses": {
@@ -102,7 +102,7 @@
         ]
       }
     },
-    "/api/v1/settings/assignments-remove": {
+    "/api/v0/settings/assignments-remove": {
       "post": {
         "operationId": "RoleService_RemoveRoleFromUser",
         "responses": {
@@ -134,7 +134,7 @@
         ]
       }
     },
-    "/api/v1/settings/bundle-get": {
+    "/api/v0/settings/bundle-get": {
       "post": {
         "operationId": "BundleService_GetBundle",
         "responses": {
@@ -166,7 +166,7 @@
         ]
       }
     },
-    "/api/v1/settings/bundle-save": {
+    "/api/v0/settings/bundle-save": {
       "post": {
         "operationId": "BundleService_SaveBundle",
         "responses": {
@@ -198,7 +198,7 @@
         ]
       }
     },
-    "/api/v1/settings/bundles-add-setting": {
+    "/api/v0/settings/bundles-add-setting": {
       "post": {
         "operationId": "BundleService_AddSettingToBundle",
         "responses": {
@@ -230,7 +230,7 @@
         ]
       }
     },
-    "/api/v1/settings/bundles-list": {
+    "/api/v0/settings/bundles-list": {
       "post": {
         "operationId": "BundleService_ListBundles",
         "responses": {
@@ -262,7 +262,7 @@
         ]
       }
     },
-    "/api/v1/settings/bundles-remove-setting": {
+    "/api/v0/settings/bundles-remove-setting": {
       "post": {
         "operationId": "BundleService_RemoveSettingFromBundle",
         "responses": {
@@ -294,7 +294,7 @@
         ]
       }
     },
-    "/api/v1/settings/permissions-get-by-id": {
+    "/api/v0/settings/permissions-get-by-id": {
       "post": {
         "operationId": "PermissionService_GetPermissionByID",
         "responses": {
@@ -326,7 +326,7 @@
         ]
       }
     },
-    "/api/v1/settings/permissions-list-by-resource": {
+    "/api/v0/settings/permissions-list-by-resource": {
       "post": {
         "operationId": "PermissionService_ListPermissionsByResource",
         "responses": {
@@ -358,7 +358,7 @@
         ]
       }
     },
-    "/api/v1/settings/roles-list": {
+    "/api/v0/settings/roles-list": {
       "post": {
         "operationId": "RoleService_ListRoles",
         "responses": {
@@ -390,7 +390,7 @@
         ]
       }
     },
-    "/api/v1/settings/values-get": {
+    "/api/v0/settings/values-get": {
       "post": {
         "operationId": "ValueService_GetValue",
         "responses": {
@@ -422,7 +422,7 @@
         ]
       }
     },
-    "/api/v1/settings/values-get-by-unique-identifiers": {
+    "/api/v0/settings/values-get-by-unique-identifiers": {
       "post": {
         "operationId": "ValueService_GetValueByUniqueIdentifiers",
         "responses": {
@@ -454,7 +454,7 @@
         ]
       }
     },
-    "/api/v1/settings/values-list": {
+    "/api/v0/settings/values-list": {
       "post": {
         "operationId": "ValueService_ListValues",
         "responses": {
@@ -486,7 +486,7 @@
         ]
       }
     },
-    "/api/v1/settings/values-save": {
+    "/api/v0/settings/values-save": {
       "post": {
         "operationId": "ValueService_SaveValue",
         "responses": {

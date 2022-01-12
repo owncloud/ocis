@@ -132,7 +132,7 @@ func DefaultPolicies() []Policy {
 				},
 				// if we were using the go micro api gateway we could look up the endpoint in the registry dynamically
 				{
-					Endpoint: "/api/v1/accounts",
+					Endpoint: "/api/v0/accounts",
 					Backend:  "http://localhost:9181",
 				},
 				// TODO the lookup needs a better mechanism
@@ -141,7 +141,7 @@ func DefaultPolicies() []Policy {
 					Backend:  "http://localhost:9181",
 				},
 				{
-					Endpoint: "/api/v1/settings",
+					Endpoint: "/api/v0/settings",
 					Backend:  "http://localhost:9190",
 				},
 				{
