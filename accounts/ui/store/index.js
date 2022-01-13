@@ -102,8 +102,8 @@ const actions = {
         $domain: getters.getServerForJsClient,
         body: {}
       })
-      if (response.status === 201) {
-        const accounts = response.data.accounts
+      if (response.status >= 200 && response.status < 300) {
+        const accounts = response.data.value
         commit('SET_ACCOUNTS', accounts || [])
         return
       }
