@@ -19,6 +19,7 @@ import (
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
@@ -197,7 +198,7 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	newAccount := &accounts.Account{
-		Id:                       userid,
+		Id:                       uuid.New().String(),
 		DisplayName:              displayname,
 		PreferredName:            userid,
 		OnPremisesSamAccountName: userid,
@@ -398,77 +399,51 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			o.logger.Error().Err(err).Msg("error securing a connection to Reva gateway")
 		}
 
-		homeResp, err := gwc.GetHome(ctx, &provider.GetHomeRequest{})
-		if err != nil {
-			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not get home").Error()))
-			return
-		}
-
-		if homeResp.Status.Code != rpcv1beta1.Code_CODE_OK {
-			o.logger.Error().
-				Str("stat_status_code", homeResp.Status.Code.String()).
-				Str("stat_message", homeResp.Status.Message).
-				Msg("DeleteUser: could not get user home: get failed")
-			return
-		}
-
-		statResp, err := gwc.Stat(ctx, &provider.StatRequest{
-			Ref: &provider.Reference{
-				Path: homeResp.Path,
+		lsRes, err := gwc.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
+			Filters: []*provider.ListStorageSpacesRequest_Filter{
+				{
+					Type: provider.ListStorageSpacesRequest_Filter_TYPE_OWNER,
+					Term: &provider.ListStorageSpacesRequest_Filter_Owner{
+						Owner: &revauser.UserId{
+							Idp:      o.config.IdentityManagement.Address,
+							OpaqueId: account.Id,
+						},
+					},
+				},
+				{
+					Type: provider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
+					Term: &provider.ListStorageSpacesRequest_Filter_SpaceType{
+						SpaceType: "personal",
+					},
+				},
 			},
 		})
-
 		if err != nil {
-			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not stat home").Error()))
+			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not list owned personal spaces").Error()))
 			return
 		}
 
-		if statResp.Status.Code != rpcv1beta1.Code_CODE_OK {
+		if lsRes.Status.Code != rpcv1beta1.Code_CODE_OK {
 			o.logger.Error().
-				Str("stat_status_code", statResp.Status.Code.String()).
-				Str("stat_message", statResp.Status.Message).
-				Msg("DeleteUser: could not delete user home: stat failed")
+				Interface("status", lsRes.Status).
+				Msg("DeleteUser: could not list personal spaces")
 			return
 		}
 
-		delReq := &provider.DeleteRequest{
-			Ref: &provider.Reference{
-				ResourceId: statResp.Info.Id,
-			},
-		}
-
-		delResp, err := gwc.Delete(ctx, delReq)
-		if err != nil {
-			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not delete home").Error()))
-			return
-		}
-
-		if delResp.Status.Code != rpcv1beta1.Code_CODE_OK {
-			o.logger.Error().
-				Str("stat_status_code", statResp.Status.Code.String()).
-				Str("stat_message", statResp.Status.Message).
-				Msg("DeleteUser: could not delete user home: delete failed")
-			return
-		}
-
-		req := &provider.PurgeRecycleRequest{
-			Ref: &provider.Reference{
-				Path: homeResp.Path,
-			},
-		}
-
-		purgeRecycleResponse, err := gwc.PurgeRecycle(ctx, req)
-		if err != nil {
-			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not delete trash").Error()))
-			return
-		}
-
-		if purgeRecycleResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
-			o.logger.Error().
-				Str("stat_status_code", statResp.Status.Code.String()).
-				Str("stat_message", statResp.Status.Message).
-				Msg("DeleteUser: could not delete user trash: delete failed")
-			return
+		for _, space := range lsRes.StorageSpaces {
+			dsRes, err := gwc.DeleteStorageSpace(ctx, &provider.DeleteStorageSpaceRequest{
+				Id: space.Id,
+			})
+			if err != nil {
+				o.logger.Error().Err(err).Msg("DeleteUser: could not make delete space request")
+				continue
+			}
+			if dsRes.Status.Code != rpcv1beta1.Code_CODE_OK && dsRes.Status.Code != rpcv1beta1.Code_CODE_NOT_FOUND {
+				o.logger.Error().
+					Interface("status", dsRes.Status).
+					Msg("DeleteUser: could not delete space")
+				continue
+			}
 		}
 	}
 

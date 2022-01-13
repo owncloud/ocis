@@ -21,12 +21,6 @@ func DefaultConfig() *Config {
 		Service: Service{
 			Name: "thumbnails",
 		},
-		Tracing: Tracing{
-			Enabled:   false,
-			Type:      "jaeger",
-			Endpoint:  "",
-			Collector: "",
-		},
 		Thumbnail: Thumbnail{
 			Resolutions: []string{"16x16", "32x32", "64x64", "128x128", "1920x1080", "3840x2160", "7680x4320"},
 			FileSystemStorage: FileSystemStorage{
@@ -34,7 +28,6 @@ func DefaultConfig() *Config {
 			},
 			WebdavAllowInsecure: true,
 			RevaGateway:         "127.0.0.1:9142",
-			WebdavNamespace:     "/home",
 			CS3AllowInsecure:    false,
 		},
 	}

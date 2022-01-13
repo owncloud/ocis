@@ -59,7 +59,7 @@ config = {
             "suites": [
                 "apiShareManagement",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
             "cron": "nightly",
         },
@@ -67,7 +67,7 @@ config = {
             "suites": [
                 "apiWebdavOperations",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
             "cron": "nightly",
         },
@@ -251,7 +251,7 @@ def testPipelines(ctx):
     if "skip" not in config["settingsUITests"] or not config["settingsUITests"]["skip"]:
         pipelines.append(settingsUITests(ctx))
 
-    if "parallelApiTests" in config:
+    if "skip" not in config["parallelApiTests"] or not config["parallelApiTests"]["skip"]:
         pipelines += parallelDeployAcceptancePipeline(ctx)
 
     return pipelines

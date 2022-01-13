@@ -12,9 +12,9 @@ type Config struct {
 
 	Service Service
 
-	Tracing Tracing `ocisConfig:"tracing"`
-	Log     *Log    `ocisConfig:"log"`
-	Debug   Debug   `ocisConfig:"debug"`
+	Tracing *Tracing `ocisConfig:"tracing"`
+	Log     *Log     `ocisConfig:"log"`
+	Debug   Debug    `ocisConfig:"debug"`
 
 	GRPC GRPC `ocisConfig:"grpc"`
 

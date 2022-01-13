@@ -106,7 +106,6 @@ func storageUsersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string
 				"storageprovider": map[string]interface{}{
 					"driver":             cfg.Reva.StorageUsers.Driver,
 					"drivers":            storagedrivers.UserDrivers(cfg),
-					"mount_path":         cfg.Reva.StorageUsers.MountPath,
 					"mount_id":           cfg.Reva.StorageUsers.MountID,
 					"expose_data_server": cfg.Reva.StorageUsers.ExposeDataServer,
 					"data_server_url":    cfg.Reva.StorageUsers.DataServerURL,

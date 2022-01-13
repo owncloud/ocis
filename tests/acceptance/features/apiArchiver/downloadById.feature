@@ -70,7 +70,7 @@ Feature: download multiple resources bundled into an archive
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     When user "Brian" downloads the archive of "/textfile0.txt" of user "Alice" using the resource id
-    Then the HTTP status code should be "400"
+    Then the HTTP status code should be "404"
 
 
   Scenario: download multiple shared items as share receiver

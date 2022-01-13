@@ -15,6 +15,7 @@ import (
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/token"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
+	"github.com/cs3org/reva/pkg/utils"
 	idxerrs "github.com/owncloud/ocis/ocis-pkg/indexer/errors"
 	"github.com/owncloud/ocis/ocis-pkg/indexer/index"
 	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
@@ -95,6 +96,14 @@ func (idx *NonUnique) Init() error {
 	}
 	idx.metadataStorage = &m
 
+	ctx, err := idx.getAuthenticatedContext(context.Background())
+	if err != nil {
+		return err
+	}
+	if err := idx.metadataStorage.Init(ctx, idx.cs3conf.ServiceUser); err != nil {
+		return err
+	}
+
 	if err := idx.makeDirIfNotExists(idx.indexBaseDir); err != nil {
 		return err
 	}
@@ -119,7 +128,11 @@ func (idx *NonUnique) Lookup(v string) ([]string, error) {
 
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Path: path.Join("/meta", idx.indexRootDir, v),
+			ResourceId: &provider.ResourceId{
+				StorageId: idx.cs3conf.ServiceUser.UUID,
+				OpaqueId:  idx.cs3conf.ServiceUser.UUID,
+			},
+			Path: utils.MakeRelativePath(path.Join("/", idx.indexRootDir, v)),
 		},
 	})
 
@@ -172,10 +185,14 @@ func (idx *NonUnique) Remove(id string, v string) error {
 		return err
 	}
 
-	deletePath := path.Join("/meta", idx.indexRootDir, v, id)
+	deletePath := path.Join("/", idx.indexRootDir, v, id)
 	resp, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
 		Ref: &provider.Reference{
-			Path: deletePath,
+			ResourceId: &provider.ResourceId{
+				StorageId: idx.cs3conf.ServiceUser.UUID,
+				OpaqueId:  idx.cs3conf.ServiceUser.UUID,
+			},
+			Path: utils.MakeRelativePath(deletePath),
 		},
 	})
 
@@ -187,10 +204,14 @@ func (idx *NonUnique) Remove(id string, v string) error {
 		return &idxerrs.NotFoundErr{TypeName: idx.typeName, Key: idx.indexBy, Value: v}
 	}
 
-	toStat := path.Join("/meta", idx.indexRootDir, v)
+	toStat := path.Join("/", idx.indexRootDir, v)
 	lcResp, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Path: toStat,
+			ResourceId: &provider.ResourceId{
+				StorageId: idx.cs3conf.ServiceUser.UUID,
+				OpaqueId:  idx.cs3conf.ServiceUser.UUID,
+			},
+			Path: utils.MakeRelativePath(toStat),
 		},
 	})
 	if err != nil {
@@ -198,10 +219,14 @@ func (idx *NonUnique) Remove(id string, v string) error {
 	}
 
 	if len(lcResp.Infos) == 0 {
-		deletePath = path.Join("/meta", idx.indexRootDir, v)
+		deletePath = path.Join("/", idx.indexRootDir, v)
 		_, err := idx.storageProvider.Delete(ctx, &provider.DeleteRequest{
 			Ref: &provider.Reference{
-				Path: deletePath,
+				ResourceId: &provider.ResourceId{
+					StorageId: idx.cs3conf.ServiceUser.UUID,
+					OpaqueId:  idx.cs3conf.ServiceUser.UUID,
+				},
+				Path: utils.MakeRelativePath(deletePath),
 			},
 		})
 		if err != nil {
@@ -245,7 +270,11 @@ func (idx *NonUnique) Search(pattern string) ([]string, error) {
 	matches := make([]string, 0)
 	res, err := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 		Ref: &provider.Reference{
-			Path: path.Join("/meta", idx.indexRootDir),
+			ResourceId: &provider.ResourceId{
+				StorageId: idx.cs3conf.ServiceUser.UUID,
+				OpaqueId:  idx.cs3conf.ServiceUser.UUID,
+			},
+			Path: utils.MakeRelativePath(idx.indexRootDir),
 		},
 	})
 
@@ -266,7 +295,11 @@ func (idx *NonUnique) Search(pattern string) ([]string, error) {
 	for i := range foldersMatched {
 		res, _ := idx.storageProvider.ListContainer(ctx, &provider.ListContainerRequest{
 			Ref: &provider.Reference{
-				Path: foldersMatched[i],
+				ResourceId: &provider.ResourceId{
+					StorageId: idx.cs3conf.ServiceUser.UUID,
+					OpaqueId:  idx.cs3conf.ServiceUser.UUID,
+				},
+				Path: utils.MakeRelativePath(foldersMatched[i]),
 			},
 		})
 
@@ -303,7 +336,10 @@ func (idx *NonUnique) makeDirIfNotExists(folder string) error {
 	if err != nil {
 		return err
 	}
-	return storage.MakeDirIfNotExist(ctx, idx.storageProvider, folder)
+	return storage.MakeDirIfNotExist(ctx, idx.storageProvider, &provider.ResourceId{
+		StorageId: idx.cs3conf.ServiceUser.UUID,
+		OpaqueId:  idx.cs3conf.ServiceUser.UUID,
+	}, folder)
 }
 
 func (idx *NonUnique) createSymlink(oldname, newname string) error {
@@ -356,5 +392,5 @@ func (idx *NonUnique) Delete() error {
 		return err
 	}
 
-	return deleteIndexRoot(ctx, idx.storageProvider, idx.indexRootDir)
+	return deleteIndexRoot(ctx, idx.storageProvider, idx.cs3conf.ServiceUser.UUID, idx.indexRootDir)
 }

@@ -2,10 +2,6 @@ package config
 
 import (
 	"context"
-	"os"
-	"path"
-
-	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
@@ -195,7 +191,6 @@ type DataProvider struct {
 type StoragePort struct {
 	Port
 	Driver           string `ocisConfig:"driver"`
-	MountPath        string `ocisConfig:"mount_path"`
 	MountID          string `ocisConfig:"mount_id"`
 	AlternativeID    string `ocisConfig:"alternative_id"`
 	ExposeDataServer bool   `ocisConfig:"expose_data_server"`
@@ -473,7 +468,7 @@ type Reva struct {
 	AuthMachine       Port              `ocisConfig:"auth_machine"`
 	AuthMachineConfig AuthMachineConfig `ocisConfig:"auth_machine_config"`
 	Sharing           Sharing           `ocisConfig:"sharing"`
-	StorageHome       StoragePort       `ocisConfig:"storage_home"`
+	StorageShares     StoragePort       `ocisConfig:"storage_shares"`
 	StorageUsers      StoragePort       `ocisConfig:"storage_users"`
 	StoragePublicLink PublicStorage     `ocisConfig:"storage_public_link"`
 	StorageMetadata   StoragePort       `ocisConfig:"storage_metadata"`
@@ -521,441 +516,6 @@ func New() *Config {
 	return &Config{}
 }
 
-func DefaultConfig() *Config {
-	return &Config{
-		// log is inherited
-		Debug: Debug{
-			Addr: "127.0.0.1:9109",
-		},
-		Reva: Reva{
-			JWTSecret:             "Pive-Fumkiu4",
-			SkipUserGroupsInToken: false,
-			TransferSecret:        "replace-me-with-a-transfer-secret",
-			TransferExpires:       24 * 60 * 60,
-			OIDC: OIDC{
-				Issuer:   "https://localhost:9200",
-				Insecure: false,
-				IDClaim:  "preferred_username",
-			},
-			LDAP: LDAP{
-				Hostname:             "localhost",
-				Port:                 9126,
-				CACert:               path.Join(defaults.BaseDataPath(), "ldap", "ldap.crt"),
-				Insecure:             false,
-				BaseDN:               "dc=ocis,dc=test",
-				LoginFilter:          "(&(objectclass=posixAccount)(|(cn={{login}})(mail={{login}})))",
-				UserFilter:           "(&(objectclass=posixAccount)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))",
-				UserAttributeFilter:  "(&(objectclass=posixAccount)({{attr}}={{value}}))",
-				UserFindFilter:       "(&(objectclass=posixAccount)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
-				UserGroupFilter:      "(&(objectclass=posixGroup)(ownclouduuid={{.OpaqueId}}*))",
-				GroupFilter:          "(&(objectclass=posixGroup)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))",
-				GroupAttributeFilter: "(&(objectclass=posixGroup)({{attr}}={{value}}))",
-				GroupFindFilter:      "(&(objectclass=posixGroup)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
-				GroupMemberFilter:    "(&(objectclass=posixAccount)(ownclouduuid={{.OpaqueId}}*))",
-				BindDN:               "cn=reva,ou=sysusers,dc=ocis,dc=test",
-				BindPassword:         "reva",
-				IDP:                  "https://localhost:9200",
-				UserSchema: LDAPUserSchema{
-					UID:         "ownclouduuid",
-					Mail:        "mail",
-					DisplayName: "displayname",
-					CN:          "cn",
-					UIDNumber:   "uidnumber",
-					GIDNumber:   "gidnumber",
-				},
-				GroupSchema: LDAPGroupSchema{
-					GID:         "cn",
-					Mail:        "mail",
-					DisplayName: "cn",
-					CN:          "cn",
-					GIDNumber:   "gidnumber",
-				},
-			},
-			UserGroupRest: UserGroupRest{
-				RedisAddress: "localhost:6379",
-			},
-			UserOwnCloudSQL: UserOwnCloudSQL{
-				DBUsername:         "owncloud",
-				DBPassword:         "secret",
-				DBHost:             "mysql",
-				DBPort:             3306,
-				DBName:             "owncloud",
-				Idp:                "https://localhost:9200",
-				Nobody:             90,
-				JoinUsername:       false,
-				JoinOwnCloudUUID:   false,
-				EnableMedialSearch: false,
-			},
-			OCDav: OCDav{
-				WebdavNamespace:   "/home/",
-				DavFilesNamespace: "/users/",
-			},
-			Archiver: Archiver{
-				MaxNumFiles: 10000,
-				MaxSize:     1073741824,
-				ArchiverURL: "/archiver",
-			},
-			UserStorage: StorageConfig{
-				EOS: DriverEOS{
-					DriverCommon: DriverCommon{
-						Root:        "/eos/dockertest/reva",
-						ShareFolder: "/Shares",
-						UserLayout:  "{{substr 0 1 .Username}}/{{.Username}}",
-					},
-					ShadowNamespace:  "", // Defaults to path.Join(c.Namespace, ".shadow")
-					UploadsNamespace: "", // Defaults to path.Join(c.Namespace, ".uploads")
-					EosBinary:        "/usr/bin/eos",
-					XrdcopyBinary:    "/usr/bin/xrdcopy",
-					MasterURL:        "root://eos-mgm1.eoscluster.cern.ch:1094",
-					SlaveURL:         "root://eos-mgm1.eoscluster.cern.ch:1094",
-					CacheDirectory:   os.TempDir(),
-					GatewaySVC:       "127.0.0.1:9142",
-				},
-				Local: DriverCommon{
-					Root:        path.Join(defaults.BaseDataPath(), "storage", "local", "users"),
-					ShareFolder: "/Shares",
-					UserLayout:  "{{.Username}}",
-					EnableHome:  false,
-				},
-				OwnCloud: DriverOwnCloud{
-					DriverCommon: DriverCommon{
-						Root:        path.Join(defaults.BaseDataPath(), "storage", "owncloud"),
-						ShareFolder: "/Shares",
-						UserLayout:  "{{.Id.OpaqueId}}",
-						EnableHome:  false,
-					},
-					UploadInfoDir: path.Join(defaults.BaseDataPath(), "storage", "uploadinfo"),
-					Redis:         ":6379",
-					Scan:          true,
-				},
-				OwnCloudSQL: DriverOwnCloudSQL{
-					DriverCommon: DriverCommon{
-						Root:        path.Join(defaults.BaseDataPath(), "storage", "owncloud"),
-						ShareFolder: "/Shares",
-						UserLayout:  "{{.Username}}",
-						EnableHome:  false,
-					},
-					UploadInfoDir: path.Join(defaults.BaseDataPath(), "storage", "uploadinfo"),
-					DBUsername:    "owncloud",
-					DBPassword:    "owncloud",
-					DBHost:        "",
-					DBPort:        3306,
-					DBName:        "owncloud",
-				},
-				S3: DriverS3{
-					DriverCommon: DriverCommon{},
-					Region:       "default",
-					AccessKey:    "",
-					SecretKey:    "",
-					Endpoint:     "",
-					Bucket:       "",
-				},
-				S3NG: DriverS3NG{
-					DriverCommon: DriverCommon{
-						Root:        path.Join(defaults.BaseDataPath(), "storage", "users"),
-						ShareFolder: "/Shares",
-						UserLayout:  "{{.Id.OpaqueId}}",
-						EnableHome:  false,
-					},
-					ServiceUserUUID: "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-					Region:          "default",
-					AccessKey:       "",
-					SecretKey:       "",
-					Endpoint:        "",
-					Bucket:          "",
-				},
-				OCIS: DriverOCIS{
-					DriverCommon: DriverCommon{
-						Root:        path.Join(defaults.BaseDataPath(), "storage", "users"),
-						ShareFolder: "/Shares",
-						UserLayout:  "{{.Id.OpaqueId}}",
-					},
-					ServiceUserUUID: "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-				},
-			},
-			MetadataStorage: StorageConfig{
-				EOS: DriverEOS{
-					DriverCommon: DriverCommon{
-						Root:        "/eos/dockertest/reva",
-						ShareFolder: "/Shares",
-						UserLayout:  "{{substr 0 1 .Username}}/{{.Username}}",
-						EnableHome:  false,
-					},
-					ShadowNamespace:     "",
-					UploadsNamespace:    "",
-					EosBinary:           "/usr/bin/eos",
-					XrdcopyBinary:       "/usr/bin/xrdcopy",
-					MasterURL:           "root://eos-mgm1.eoscluster.cern.ch:1094",
-					GrpcURI:             "",
-					SlaveURL:            "root://eos-mgm1.eoscluster.cern.ch:1094",
-					CacheDirectory:      os.TempDir(),
-					EnableLogging:       false,
-					ShowHiddenSysFiles:  false,
-					ForceSingleUserMode: false,
-					UseKeytab:           false,
-					SecProtocol:         "",
-					Keytab:              "",
-					SingleUsername:      "",
-					GatewaySVC:          "127.0.0.1:9142",
-				},
-				Local: DriverCommon{
-					Root: path.Join(defaults.BaseDataPath(), "storage", "local", "metadata"),
-				},
-				OwnCloud:    DriverOwnCloud{},
-				OwnCloudSQL: DriverOwnCloudSQL{},
-				S3: DriverS3{
-					DriverCommon: DriverCommon{},
-					Region:       "default",
-				},
-				S3NG: DriverS3NG{
-					DriverCommon: DriverCommon{
-						Root:        path.Join(defaults.BaseDataPath(), "storage", "metadata"),
-						ShareFolder: "",
-						UserLayout:  "{{.Id.OpaqueId}}",
-						EnableHome:  false,
-					},
-					ServiceUserUUID: "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-					Region:          "default",
-					AccessKey:       "",
-					SecretKey:       "",
-					Endpoint:        "",
-					Bucket:          "",
-				},
-				OCIS: DriverOCIS{
-					DriverCommon: DriverCommon{
-						Root:        path.Join(defaults.BaseDataPath(), "storage", "metadata"),
-						ShareFolder: "",
-						UserLayout:  "{{.Id.OpaqueId}}",
-						EnableHome:  false,
-					},
-					ServiceUserUUID: "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-				},
-			},
-			Frontend: FrontendPort{
-				Port: Port{
-					MaxCPUs:     "",
-					LogLevel:    "",
-					GRPCNetwork: "",
-					GRPCAddr:    "",
-					HTTPNetwork: "tcp",
-					HTTPAddr:    "127.0.0.1:9140",
-					Protocol:    "",
-					Endpoint:    "",
-					DebugAddr:   "127.0.0.1:9141",
-					Services:    []string{"datagateway", "ocdav", "ocs", "appprovider"},
-					Config:      nil,
-					Context:     nil,
-					Supervised:  false,
-				},
-				AppProviderInsecure:        false,
-				AppProviderPrefix:          "",
-				ArchiverInsecure:           false,
-				ArchiverPrefix:             "archiver",
-				DatagatewayPrefix:          "data",
-				Favorites:                  false,
-				OCDavInsecure:              false,
-				OCDavPrefix:                "",
-				OCSPrefix:                  "ocs",
-				OCSSharePrefix:             "/Shares",
-				OCSHomeNamespace:           "/home",
-				PublicURL:                  "https://localhost:9200",
-				OCSCacheWarmupDriver:       "",
-				OCSAdditionalInfoAttribute: "{{.Mail}}",
-				OCSResourceInfoCacheTTL:    0,
-				Middleware:                 Middleware{},
-			},
-			DataGateway: DataGatewayPort{
-				Port:      Port{},
-				PublicURL: "",
-			},
-			Gateway: Gateway{
-				Port: Port{
-					Endpoint:    "127.0.0.1:9142",
-					DebugAddr:   "127.0.0.1:9143",
-					GRPCNetwork: "tcp",
-					GRPCAddr:    "127.0.0.1:9142",
-				},
-				CommitShareToStorageGrant:  true,
-				CommitShareToStorageRef:    true,
-				DisableHomeCreationOnLogin: false,
-				ShareFolder:                "Shares",
-				LinkGrants:                 "",
-				HomeMapping:                "",
-				EtagCacheTTL:               0,
-			},
-			StorageRegistry: StorageRegistry{
-				Driver:       "static",
-				HomeProvider: "/home",
-				JSON:         "",
-			},
-			AppRegistry: AppRegistry{
-				Driver:        "static",
-				MimetypesJSON: "",
-			},
-			Users: Users{
-				Port: Port{
-					Endpoint:    "localhost:9144",
-					DebugAddr:   "127.0.0.1:9145",
-					GRPCNetwork: "tcp",
-					GRPCAddr:    "127.0.0.1:9144",
-					Services:    []string{"userprovider"},
-				},
-				Driver:                    "ldap",
-				UserGroupsCacheExpiration: 5,
-			},
-			Groups: Groups{
-				Port: Port{
-					Endpoint:    "localhost:9160",
-					DebugAddr:   "127.0.0.1:9161",
-					GRPCNetwork: "tcp",
-					GRPCAddr:    "127.0.0.1:9160",
-					Services:    []string{"groupprovider"},
-				},
-				Driver:                      "ldap",
-				GroupMembersCacheExpiration: 5,
-			},
-			AuthProvider: Users{
-				Port:                      Port{},
-				Driver:                    "ldap",
-				UserGroupsCacheExpiration: 0,
-			},
-			AuthBasic: Port{
-				GRPCNetwork: "tcp",
-				GRPCAddr:    "127.0.0.1:9146",
-				DebugAddr:   "127.0.0.1:9147",
-				Services:    []string{"authprovider"},
-				Endpoint:    "localhost:9146",
-			},
-			AuthBearer: Port{
-				GRPCNetwork: "tcp",
-				GRPCAddr:    "127.0.0.1:9148",
-				DebugAddr:   "127.0.0.1:9149",
-				Services:    []string{"authprovider"},
-				Endpoint:    "localhost:9148",
-			},
-			AuthMachine: Port{
-				GRPCNetwork: "tcp",
-				GRPCAddr:    "127.0.0.1:9166",
-				DebugAddr:   "127.0.0.1:9167",
-				Services:    []string{"authprovider"},
-				Endpoint:    "localhost:9166",
-			},
-			AuthMachineConfig: AuthMachineConfig{
-				MachineAuthAPIKey: "change-me-please",
-			},
-			Sharing: Sharing{
-				Port: Port{
-					Endpoint:    "localhost:9150",
-					DebugAddr:   "127.0.0.1:9151",
-					GRPCNetwork: "tcp",
-					GRPCAddr:    "127.0.0.1:9150",
-					Services:    []string{"usershareprovider", "publicshareprovider"},
-				},
-				UserDriver:                       "json",
-				UserJSONFile:                     path.Join(defaults.BaseDataPath(), "storage", "shares.json"),
-				UserSQLUsername:                  "",
-				UserSQLPassword:                  "",
-				UserSQLHost:                      "",
-				UserSQLPort:                      1433,
-				UserSQLName:                      "",
-				PublicDriver:                     "json",
-				PublicJSONFile:                   path.Join(defaults.BaseDataPath(), "storage", "publicshares.json"),
-				PublicPasswordHashCost:           11,
-				PublicEnableExpiredSharesCleanup: true,
-				PublicJanitorRunInterval:         60,
-				UserStorageMountID:               "",
-			},
-			StorageHome: StoragePort{
-				Port: Port{
-					Endpoint:    "localhost:9154",
-					DebugAddr:   "127.0.0.1:9156",
-					GRPCNetwork: "tcp",
-					GRPCAddr:    "127.0.0.1:9154",
-					HTTPNetwork: "tcp",
-					HTTPAddr:    "127.0.0.1:9155",
-				},
-				Driver:        "ocis",
-				ReadOnly:      false,
-				MountPath:     "/home",
-				AlternativeID: "1284d238-aa92-42ce-bdc4-0b0000009154",
-				MountID:       "1284d238-aa92-42ce-bdc4-0b0000009157",
-				DataServerURL: "http://localhost:9155/data",
-				HTTPPrefix:    "data",
-				TempFolder:    path.Join(defaults.BaseDataPath(), "tmp", "home"),
-			},
-			StorageUsers: StoragePort{
-				Port: Port{
-					Endpoint:    "localhost:9157",
-					DebugAddr:   "127.0.0.1:9159",
-					GRPCNetwork: "tcp",
-					GRPCAddr:    "127.0.0.1:9157",
-					HTTPNetwork: "tcp",
-					HTTPAddr:    "127.0.0.1:9158",
-				},
-				MountPath:     "/users",
-				MountID:       "1284d238-aa92-42ce-bdc4-0b0000009157",
-				Driver:        "ocis",
-				DataServerURL: "http://localhost:9158/data",
-				HTTPPrefix:    "data",
-				TempFolder:    path.Join(defaults.BaseDataPath(), "tmp", "users"),
-			},
-			StoragePublicLink: PublicStorage{
-				StoragePort: StoragePort{
-					Port: Port{
-						Endpoint:    "localhost:9178",
-						DebugAddr:   "127.0.0.1:9179",
-						GRPCNetwork: "tcp",
-						GRPCAddr:    "127.0.0.1:9178",
-					},
-					MountPath: "/public",
-					MountID:   "e1a73ede-549b-4226-abdf-40e69ca8230d",
-				},
-				PublicShareProviderAddr: "",
-				UserProviderAddr:        "",
-			},
-			StorageMetadata: StoragePort{
-				Port: Port{
-					GRPCNetwork: "tcp",
-					GRPCAddr:    "127.0.0.1:9215",
-					HTTPNetwork: "tcp",
-					HTTPAddr:    "127.0.0.1:9216",
-					DebugAddr:   "127.0.0.1:9217",
-				},
-				Driver:           "ocis",
-				ExposeDataServer: false,
-				DataServerURL:    "http://localhost:9216/data",
-				TempFolder:       path.Join(defaults.BaseDataPath(), "tmp", "metadata"),
-				DataProvider:     DataProvider{},
-			},
-			AppProvider: AppProvider{
-				Port: Port{
-					GRPCNetwork: "tcp",
-					GRPCAddr:    "127.0.0.1:9164",
-					DebugAddr:   "127.0.0.1:9165",
-					Endpoint:    "localhost:9164",
-					Services:    []string{"appprovider"},
-				},
-				ExternalAddr: "127.0.0.1:9164",
-				WopiDriver:   WopiDriver{},
-				AppsURL:      "/app/list",
-				OpenURL:      "/app/open",
-				NewURL:       "/app/new",
-			},
-			Configs:                     nil,
-			UploadMaxChunkSize:          1e+8,
-			UploadHTTPMethodOverride:    "",
-			ChecksumSupportedTypes:      []string{"sha1", "md5", "adler32"},
-			ChecksumPreferredUploadType: "",
-			DefaultUploadProtocol:       "tus",
-		},
-		Tracing: Tracing{
-			Service: "storage",
-			Type:    "jaeger",
-		},
-		Asset: Asset{},
-	}
-}
-
 // StructMappings binds a set of environment variables to a destination on cfg. Iterating over this set and editing the
 // Destination value of a binding will alter the original value, as it is a pointer to its memory address. This lets
 // us propagate changes easier.
@@ -994,10 +554,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Reva.StorageMetadata.DataProvider.Insecure,
 		},
 		{
-			EnvVars:     []string{"OCIS_INSECURE", "STORAGE_HOME_DATAPROVIDER_INSECURE"},
-			Destination: &cfg.Reva.StorageHome.DataProvider.Insecure,
-		},
-		{
 			EnvVars:     []string{"OCIS_INSECURE", "STORAGE_FRONTEND_APPPROVIDER_INSECURE"},
 			Destination: &cfg.Reva.Frontend.AppProviderInsecure,
 		},
@@ -1024,10 +580,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"STORAGE_USERS_DRIVER"},
 			Destination: &cfg.Reva.StorageUsers.Driver,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_DRIVER"},
-			Destination: &cfg.Reva.StorageHome.Driver,
 		},
 		{
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_DATADIR"},
@@ -1419,36 +971,20 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Reva.AppProvider.Endpoint,
 		},
 		{
-			EnvVars:     []string{"STORAGE_HOME_ENDPOINT"},
-			Destination: &cfg.Reva.StorageHome.Endpoint,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_MOUNT_PATH"},
-			Destination: &cfg.Reva.StorageHome.MountPath,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_MOUNT_ID"},
-			Destination: &cfg.Reva.StorageHome.MountID,
-		},
-		{
 			EnvVars:     []string{"STORAGE_USERS_ENDPOINT"},
 			Destination: &cfg.Reva.StorageUsers.Endpoint,
-		},
-		{
-			EnvVars:     []string{"STORAGE_USERS_MOUNT_PATH"},
-			Destination: &cfg.Reva.StorageUsers.MountPath,
 		},
 		{
 			EnvVars:     []string{"STORAGE_USERS_MOUNT_ID"},
 			Destination: &cfg.Reva.StorageUsers.MountID,
 		},
 		{
-			EnvVars:     []string{"STORAGE_PUBLIC_LINK_ENDPOINT"},
-			Destination: &cfg.Reva.StoragePublicLink.Endpoint,
+			EnvVars:     []string{"STORAGE_SHARES_ENDPOINT"},
+			Destination: &cfg.Reva.StorageShares.Endpoint,
 		},
 		{
-			EnvVars:     []string{"STORAGE_PUBLIC_LINK_MOUNT_PATH"},
-			Destination: &cfg.Reva.StoragePublicLink.MountPath,
+			EnvVars:     []string{"STORAGE_PUBLIC_LINK_ENDPOINT"},
+			Destination: &cfg.Reva.StoragePublicLink.Endpoint,
 		},
 
 		// groups
@@ -1695,48 +1231,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Reva.Sharing.UserSQLName,
 		},
 
-		// storage home
-		{
-			EnvVars:     []string{"STORAGE_HOME_DEBUG_ADDR"},
-			Destination: &cfg.Reva.StorageHome.DebugAddr,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_GRPC_NETWORK"},
-			Destination: &cfg.Reva.StorageHome.GRPCNetwork,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_GRPC_ADDR"},
-			Destination: &cfg.Reva.StorageHome.GRPCAddr,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_HTTP_NETWORK"},
-			Destination: &cfg.Reva.StorageHome.HTTPNetwork,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_HTTP_ADDR"},
-			Destination: &cfg.Reva.StorageHome.HTTPAddr,
-		},
-		{
-			EnvVars:     []string{"OCIS_STORAGE_READ_ONLY", "STORAGE_HOME_READ_ONLY"},
-			Destination: &cfg.Reva.StorageHome.ReadOnly,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_EXPOSE_DATA_SERVER"},
-			Destination: &cfg.Reva.StorageHome.ExposeDataServer,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_DATA_SERVER_URL"},
-			Destination: &cfg.Reva.StorageHome.DataServerURL,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_HTTP_PREFIX"},
-			Destination: &cfg.Reva.StorageHome.HTTPPrefix,
-		},
-		{
-			EnvVars:     []string{"STORAGE_HOME_TMP_FOLDER"},
-			Destination: &cfg.Reva.StorageHome.TempFolder,
-		},
-
 		// storage metadata
 		{
 			EnvVars:     []string{"STORAGE_METADATA_DEBUG_ADDR"},
@@ -1825,6 +1319,32 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"STORAGE_USERS_TMP_FOLDER"},
 			Destination: &cfg.Reva.StorageUsers.TempFolder,
+		},
+
+		// storage shares
+		{
+			EnvVars:     []string{"STORAGE_SHARES_DEBUG_ADDR"},
+			Destination: &cfg.Reva.StorageShares.DebugAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARES_GRPC_NETWORK"},
+			Destination: &cfg.Reva.StorageShares.GRPCNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARES_GRPC_ADDR"},
+			Destination: &cfg.Reva.StorageShares.GRPCAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARES_HTTP_NETWORK"},
+			Destination: &cfg.Reva.StorageShares.HTTPNetwork,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARES_HTTP_ADDR"},
+			Destination: &cfg.Reva.StorageShares.HTTPAddr,
+		},
+		{
+			EnvVars:     []string{"OCIS_STORAGE_READ_ONLY", "STORAGE_SHARES_READ_ONLY"},
+			Destination: &cfg.Reva.StorageShares.ReadOnly,
 		},
 
 		// tracing

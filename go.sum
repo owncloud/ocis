@@ -84,6 +84,7 @@ github.com/Azure/go-ntlmssp v0.0.0-20200615164410-66371956d46c/go.mod h1:chxPXzS
 github.com/Azure/go-ntlmssp v0.0.0-20211209120228-48547f28849e h1:ZU22z/2YRFLyf/P4ZwUYSdNCWsMEI0VeyrFoI2rAhJQ=
 github.com/Azure/go-ntlmssp v0.0.0-20211209120228-48547f28849e/go.mod h1:chxPXzSsl7ZWRAuOIE23GDNzjWuZquvFlgA8xmpunjU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
+github.com/BurntSushi/toml v0.4.1 h1:GaI7EiDXDRfa8VshkTj7Fym7ha+y8/XxIgD2okUIjLw=
 github.com/BurntSushi/toml v0.4.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/CiscoM31/godata v1.0.5 h1:AITXpa/5ybXEq59A0nqUGiS7ZXVJnQtFw5o09tyN/UA=
@@ -323,8 +324,8 @@ github.com/crewjam/saml v0.4.5/go.mod h1:qCJQpUtZte9R1ZjUBcW8qtCNlinbO363ooNl02S
 github.com/cs3org/cato v0.0.0-20200828125504-e418fc54dd5e/go.mod h1:XJEZ3/EQuI3BXTp/6DUzFr850vlxq11I6satRtz0YQ4=
 github.com/cs3org/go-cs3apis v0.0.0-20211214102047-7ce3134d7bf8 h1:PqOprF37OvwCbAN5W23znknGk6N/LMayqLAeP904FHE=
 github.com/cs3org/go-cs3apis v0.0.0-20211214102047-7ce3134d7bf8/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
-github.com/cs3org/reva v1.17.1-0.20220105095955-fa1d1fc01d85 h1:4MjQ95MeeffQA9dCraON4YXBwkxVmJpxSNMKnn0ryZA=
-github.com/cs3org/reva v1.17.1-0.20220105095955-fa1d1fc01d85/go.mod h1:WqO2/NkAmx1qes09G92lGPxxyroQgnZetJrCPItCcDo=
+github.com/cs3org/reva v1.16.1-0.20220111150347-1b21aefbf8db h1:YCzbz8N0OHkO6AcA2SfXHCc02Y/DqSkO+hm8Pj+eDZ4=
+github.com/cs3org/reva v1.16.1-0.20220111150347-1b21aefbf8db/go.mod h1:WqO2/NkAmx1qes09G92lGPxxyroQgnZetJrCPItCcDo=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8/go.mod h1:4abs/jPXcmJzYoYGF91JF9Uq9s/KL5n1jvFDix8KcqY=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
@@ -1070,8 +1071,8 @@ github.com/oracle/oci-go-sdk v24.3.0+incompatible/go.mod h1:VQb79nF8Z2cwLkLS35uk
 github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc h1:Ak86L+yDSOzKFa7WM5bf5itSOo1e3Xh8bm5YCMUXIjQ=
 github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CFcDWnWD9XkenwhI=
 github.com/ovh/go-ovh v1.1.0/go.mod h1:AxitLZ5HBRPyUd+Zl60Ajaag+rNTdVXWIkzfrVuTXWA=
-github.com/owncloud/libre-graph-api-go v0.5.0 h1:Dgj3W/Ywhi7BluuWNH37ft26eZLBS3jj08x+wAyFW5g=
-github.com/owncloud/libre-graph-api-go v0.5.0/go.mod h1:dOt7+kXldpyUGBFdfFBs6PbWElqqa2/Q5+pMF9izL3w=
+github.com/owncloud/libre-graph-api-go v0.7.0 h1:TBvTsh+F77T3QV2j19G6Y5yDsu03JYrw6ZP8dv3Y4Dw=
+github.com/owncloud/libre-graph-api-go v0.7.0/go.mod h1:dOt7+kXldpyUGBFdfFBs6PbWElqqa2/Q5+pMF9izL3w=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
@@ -1277,8 +1278,6 @@ github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/studio-b12/gowebdav v0.0.0-20210917133250-a3a86976a1df/go.mod h1:gCcfDlA1Y7GqOaeEKw5l9dOGx1VLdc/HuQSlQAaZ30s=
-github.com/studio-b12/gowebdav v0.0.0-20211109083228-3f8721cd4b6f h1:L2NE7BXnSlSLoNYZ0lCwZDjdnYjCNYC71k9ClZUTFTs=
-github.com/studio-b12/gowebdav v0.0.0-20211109083228-3f8721cd4b6f/go.mod h1:bHA7t77X/QFExdeAnDzK6vKM34kEZAcE1OX4MfiwjkE=
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
 github.com/syndtr/goleveldb v1.0.0/go.mod h1:ZVVdQEZoIme9iO1Ch2Jdy24qqXrMMOU6lpPAyBWyWuQ=
 github.com/thanhpk/randstr v1.0.4 h1:IN78qu/bR+My+gHCvMEXhR/i5oriVHcTB/BJJIRTsNo=

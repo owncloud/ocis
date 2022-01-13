@@ -31,6 +31,7 @@ require (
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.2.0
 	github.com/golang/protobuf v1.5.2
+	github.com/google/uuid v1.3.0
 	github.com/gookit/config/v2 v2.0.27
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.2
@@ -46,7 +47,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.17.0
-	github.com/owncloud/libre-graph-api-go v0.5.0
+	github.com/owncloud/libre-graph-api-go v0.7.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/rs/zerolog v1.26.1
@@ -76,6 +77,7 @@ require (
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.4.0 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20211209120228-48547f28849e // indirect
+	github.com/BurntSushi/toml v0.4.1 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
@@ -141,7 +143,6 @@ require (
 	github.com/gomodule/redigo v1.8.6 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/gookit/goutil v0.4.0 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
@@ -213,7 +214,6 @@ require (
 	github.com/sony/gobreaker v0.5.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/steveyen/gtreap v0.1.0 // indirect
-	github.com/studio-b12/gowebdav v0.0.0-20211109083228-3f8721cd4b6f // indirect
 	github.com/tus/tusd v1.8.0 // indirect
 	github.com/wk8/go-ordered-map v0.2.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
@@ -242,3 +242,8 @@ require (
 	stash.kopano.io/kgol/kcc-go/v5 v5.0.1 // indirect
 	stash.kopano.io/kgol/oidc-go v0.3.2 // indirect
 )
+
+//replace github.com/cs3org/reva => github.com/cs3org/reva v1.16.1-0.20211208164450-3abd76eecf8b
+//replace github.com/cs3org/reva => ../reva
+
+replace github.com/cs3org/reva => github.com/cs3org/reva v1.16.1-0.20220111150347-1b21aefbf8db

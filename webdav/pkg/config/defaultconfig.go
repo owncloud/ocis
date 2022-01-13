@@ -22,13 +22,8 @@ func DefaultConfig() *Config {
 		Service: Service{
 			Name: "webdav",
 		},
-		Tracing: Tracing{
-			Enabled:   false,
-			Type:      "jaeger",
-			Endpoint:  "",
-			Collector: "",
-		},
 		OcisPublicURL:   "https://127.0.0.1:9200",
-		WebdavNamespace: "/home",
+		WebdavNamespace: "/users/{{.Id.OpaqueId}}",
+		RevaGateway:     "127.0.0.1:9142",
 	}
 }

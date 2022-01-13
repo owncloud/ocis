@@ -179,9 +179,8 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 				"storageregistry": map[string]interface{}{
 					"driver": cfg.Reva.StorageRegistry.Driver,
 					"drivers": map[string]interface{}{
-						"static": map[string]interface{}{
-							"home_provider": cfg.Reva.StorageRegistry.HomeProvider,
-							"rules":         rules(cfg, logger),
+						"spaces": map[string]interface{}{
+							"providers": spacesProviders(cfg, logger),
 						},
 					},
 				},
@@ -191,7 +190,7 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 	return rcfg
 }
 
-func rules(cfg *config.Config, logger log.Logger) map[string]map[string]interface{} {
+func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[string]interface{} {
 
 	// if a list of rules is given it overrides the generated rules from below
 	if len(cfg.Reva.StorageRegistry.Rules) > 0 {
@@ -219,18 +218,47 @@ func rules(cfg *config.Config, logger log.Logger) map[string]map[string]interfac
 	}
 
 	// generate rules based on default config
-	ret := map[string]map[string]interface{}{
-		cfg.Reva.StorageHome.MountPath:       {"address": cfg.Reva.StorageHome.Endpoint},
-		cfg.Reva.StorageHome.AlternativeID:   {"address": cfg.Reva.StorageHome.Endpoint},
-		cfg.Reva.StorageUsers.MountPath:      {"address": cfg.Reva.StorageUsers.Endpoint},
-		cfg.Reva.StorageUsers.MountID + ".*": {"address": cfg.Reva.StorageUsers.Endpoint},
-		cfg.Reva.StoragePublicLink.MountPath: {"address": cfg.Reva.StoragePublicLink.Endpoint},
-		cfg.Reva.StoragePublicLink.MountID:   {"address": cfg.Reva.StoragePublicLink.Endpoint},
+	return map[string]map[string]interface{}{
+		cfg.Reva.StorageUsers.Endpoint: {
+			"spaces": map[string]interface{}{
+				"personal": map[string]interface{}{
+					"mount_point":   "/users",
+					"path_template": "/users/{{.Space.Owner.Id.OpaqueId}}",
+				},
+				"project": map[string]interface{}{
+					"mount_point":   "/projects",
+					"path_template": "/projects/{{.Space.Name}}",
+				},
+			},
+		},
+		cfg.Reva.StorageShares.Endpoint: {
+			"spaces": map[string]interface{}{
+				"virtual": map[string]interface{}{
+					// The root of the share jail is mounted here
+					"mount_point": "/users/{{.CurrentUser.Id.OpaqueId}}/Shares",
+				},
+				"grant": map[string]interface{}{
+					// Grants are relative to a space root that the gateway will determine with a stat
+					"mount_point": ".",
+				},
+				"mountpoint": map[string]interface{}{
+					// The jail needs to be filled with mount points
+					// .Space.Name is a path relative to the mount point
+					"mount_point":   "/users/{{.CurrentUser.Id.OpaqueId}}/Shares",
+					"path_template": "/users/{{.CurrentUser.Id.OpaqueId}}/Shares/{{.Space.Name}}",
+				},
+			},
+		},
 		// public link storage returns the mount id of the actual storage
+		cfg.Reva.StoragePublicLink.Endpoint: {
+			"spaces": map[string]interface{}{
+				"public": map[string]interface{}{
+					"mount_point": "/public",
+				},
+			},
+		},
 		// medatada storage not part of the global namespace
 	}
-
-	return ret
 }
 
 func mimetypes(cfg *config.Config, logger log.Logger) []map[string]interface{} {
@@ -395,7 +423,7 @@ func ParseConfig(c *cli.Context, cfg *config.Config, storageExtension string) er
 			Color:  cfg.Commons.Log.Color,
 			File:   cfg.Commons.Log.File,
 		}
-	} else if cfg.Log == nil && cfg.Commons == nil {
+	} else if cfg.Log == nil {
 		cfg.Log = &shared.Log{}
 	}
 
