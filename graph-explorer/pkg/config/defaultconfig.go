@@ -16,12 +16,6 @@ func DefaultConfig() *Config {
 		Service: Service{
 			Name: "graph-explorer",
 		},
-		Tracing: Tracing{
-			Enabled:   false,
-			Type:      "jaeger",
-			Endpoint:  "",
-			Collector: "",
-		},
 		GraphExplorer: GraphExplorer{
 			ClientID:     "ocis-explorer.js",
 			Issuer:       "https://localhost:9200",

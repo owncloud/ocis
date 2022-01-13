@@ -33,12 +33,6 @@ func DefaultConfig() *Config {
 			Addr:      "127.0.0.1:9191",
 			Namespace: "com.owncloud.api",
 		},
-		Tracing: Tracing{
-			Enabled:   false,
-			Type:      "jaeger",
-			Endpoint:  "",
-			Collector: "",
-		},
 		DataPath: path.Join(defaults.BaseDataPath(), "settings"),
 		Asset: Asset{
 			Path: "",

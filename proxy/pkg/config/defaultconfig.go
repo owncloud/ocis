@@ -23,12 +23,6 @@ func DefaultConfig() *Config {
 		Service: Service{
 			Name: "proxy",
 		},
-		Tracing: Tracing{
-			Enabled:   false,
-			Type:      "jaeger",
-			Endpoint:  "",
-			Collector: "",
-		},
 		OIDC: OIDC{
 			Issuer:   "https://localhost:9200",
 			Insecure: true,

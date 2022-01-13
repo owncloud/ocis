@@ -22,12 +22,7 @@ func DefaultConfig() *Config {
 		Service: Service{
 			Name: "ocs",
 		},
-		Tracing: Tracing{
-			Enabled:   false,
-			Type:      "jaeger",
-			Endpoint:  "",
-			Collector: "",
-		},
+
 		TokenManager: TokenManager{
 			JWTSecret: "Pive-Fumkiu4",
 		},

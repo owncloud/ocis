@@ -17,12 +17,6 @@ func DefaultConfig() *Config {
 		Service: Service{
 			Name: "web",
 		},
-		Tracing: Tracing{
-			Enabled:   false,
-			Type:      "jaeger",
-			Endpoint:  "",
-			Collector: "",
-		},
 		Asset: Asset{
 			Path: "",
 		},

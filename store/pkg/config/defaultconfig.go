@@ -21,12 +21,6 @@ func DefaultConfig() *Config {
 		Service: Service{
 			Name: "store",
 		},
-		Tracing: Tracing{
-			Enabled:   false,
-			Type:      "jaeger",
-			Endpoint:  "",
-			Collector: "",
-		},
 		Datapath: path.Join(defaults.BaseDataPath(), "store"),
 	}
 }
