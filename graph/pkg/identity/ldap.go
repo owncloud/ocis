@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/go-ldap/ldap/v3"
+	"github.com/gofrs/uuid"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/owncloud/ocis/graph/pkg/config"
@@ -14,6 +15,8 @@ import (
 )
 
 type LDAP struct {
+	useServerUUID bool
+
 	userBaseDN       string
 	userFilter       string
 	userScope        int
@@ -71,6 +74,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 	}
 
 	return &LDAP{
+		useServerUUID:     config.UseServerUUID,
 		userBaseDN:        config.UserBaseDN,
 		userFilter:        config.UserFilter,
 		userScope:         userScope,
@@ -88,14 +92,9 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 // LDAP User Entry (using the inetOrgPerson LDAP Objectclass) add adds that to the
 // configured LDAP server
 func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregraph.User, error) {
-
 	ar := ldap.AddRequest{
 		DN: fmt.Sprintf("uid=%s,%s", *user.OnPremisesSamAccountName, i.userBaseDN),
 		Attributes: []ldap.Attribute{
-			{
-				Type: "objectClass",
-				Vals: []string{"inetOrgPerson", "organizationalPerson", "person", "top"},
-			},
 			// inetOrgPerson requires "cn"
 			{
 				Type: "cn",
@@ -116,6 +115,8 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 		},
 	}
 
+	objectClasses := []string{"inetOrgPerson", "organizationalPerson", "person", "top"}
+
 	if user.PasswordProfile != nil && user.PasswordProfile.Password != nil {
 		// TODO? This relies to the LDAP server to properly hash the password.
 		// We might want to add support for the Password Modify LDAP Extended
@@ -123,6 +124,11 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 		// hashing here.
 		ar.Attribute("userPassword", []string{*user.PasswordProfile.Password})
 	}
+	if !i.useServerUUID {
+		ar.Attribute("owncloudUUID", []string{uuid.Must(uuid.NewV4()).String()})
+		objectClasses = append(objectClasses, "owncloud")
+	}
+	ar.Attribute("objectClass", objectClasses)
 
 	// inetOrgPerson requires "sn" to be set. Set it to the Username if
 	// Surname is not set in the Request

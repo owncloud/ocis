@@ -31,6 +31,7 @@ func DefaultConfig() *Config {
 				URI:                      "ldap://localhost:9125",
 				BindDN:                   "",
 				BindPassword:             "",
+				UseServerUUID:            false,
 				UserBaseDN:               "ou=users,dc=ocis,dc=test",
 				UserSearchScope:          "sub",
 				UserFilter:               "(objectClass=inetOrgPerson)",
@@ -39,12 +40,12 @@ func DefaultConfig() *Config {
 				UserNameAttribute:        "uid",
 				// FIXME: switch this to some more widely available attribute by default
 				//        ideally this needs to	be constant for the lifetime of a users
-				UserIDAttribute:    "entryUUID",
+				UserIDAttribute:    "owncloudUUID",
 				GroupBaseDN:        "ou=groups,dc=ocis,dc=test",
 				GroupSearchScope:   "sub",
 				GroupFilter:        "(objectclass=groupOfNames)",
 				GroupNameAttribute: "cn",
-				GroupIDAttribute:   "cn",
+				GroupIDAttribute:   "owncloudUUID",
 			},
 		},
 	}

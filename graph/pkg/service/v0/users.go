@@ -60,6 +60,14 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Disallow user-supplied IDs. It's supposed to be readonly. We're either
+	// generating them in the backend ourselves or rely on the Backend's
+	// storage (e.g. LDAP) to provide a unique ID.
+	if !isNilOrEmpty(u.Id) {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user id is a read-only attribute")
+		return
+	}
+
 	if u, err = g.identityBackend.CreateUser(r.Context(), *u); err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return

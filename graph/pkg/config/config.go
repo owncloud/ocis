@@ -34,9 +34,10 @@ type Spaces struct {
 }
 
 type LDAP struct {
-	URI          string `ocisConfig:"uri" env:"GRAPH_LDAP_URI"`
-	BindDN       string `ocisConfig:"bind_dn" env:"GRAPH_LDAP_BIND_DN"`
-	BindPassword string `ocisConfig:"bind_password" env:"GRAPH_LDAP_BIND_PASSWORD"`
+	URI           string `ocisConfig:"uri" env:"GRAPH_LDAP_URI"`
+	BindDN        string `ocisConfig:"bind_dn" env:"GRAPH_LDAP_BIND_DN"`
+	BindPassword  string `ocisConfig:"bind_password" env:"GRAPH_LDAP_BIND_PASSWORD"`
+	UseServerUUID bool   `ocisConfig:"use_server_uuid" env:"GRAPH_LDAP_SERVER_UUID"`
 
 	UserBaseDN               string `ocisConfig:"user_base_dn" env:"GRAPH_LDAP_USER_BASE_DN"`
 	UserSearchScope          string `ocisConfig:"user_search_scope" env:"GRAPH_LDAP_USER_SCOPE"`
