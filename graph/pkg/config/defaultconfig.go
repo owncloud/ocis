@@ -32,6 +32,7 @@ func DefaultConfig() *Config {
 				BindDN:                   "",
 				BindPassword:             "",
 				UseServerUUID:            false,
+				WriteEnabled:             false,
 				UserBaseDN:               "ou=users,dc=ocis,dc=test",
 				UserSearchScope:          "sub",
 				UserFilter:               "(objectClass=inetOrgPerson)",

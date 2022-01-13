@@ -16,6 +16,7 @@ import (
 
 type LDAP struct {
 	useServerUUID bool
+	writeEnabled  bool
 
 	userBaseDN       string
 	userFilter       string
@@ -85,6 +86,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		groupAttributeMap: gam,
 		logger:            logger,
 		conn:              lc,
+		writeEnabled:      config.WriteEnabled,
 	}, nil
 }
 
@@ -92,6 +94,9 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 // LDAP User Entry (using the inetOrgPerson LDAP Objectclass) add adds that to the
 // configured LDAP server
 func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregraph.User, error) {
+	if !i.writeEnabled {
+		return nil, errorcode.New(errorcode.NotAllowed, "server is configured read-only")
+	}
 	ar := ldap.AddRequest{
 		DN: fmt.Sprintf("uid=%s,%s", *user.OnPremisesSamAccountName, i.userBaseDN),
 		Attributes: []ldap.Attribute{
@@ -155,6 +160,9 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 // DeleteUser implements the Backend Interface. It permanently deletes a User identified
 // by name or id from the LDAP server
 func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
+	if !i.writeEnabled {
+		return errorcode.New(errorcode.NotAllowed, "server is configured read-only")
+	}
 	e, err := i.getLDAPUserByNameOrID(nameOrID)
 	if err != nil {
 		return err
@@ -168,6 +176,9 @@ func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
 
 // UpdateUser implements the Backend Interface. It's currently not suported for the CS3 backedn
 func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.User) (*libregraph.User, error) {
+	if !i.writeEnabled {
+		return nil, errorcode.New(errorcode.NotAllowed, "server is configured read-only")
+	}
 	e, err := i.getLDAPUserByNameOrID(nameOrID)
 	if err != nil {
 		return nil, err
