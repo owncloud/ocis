@@ -26,17 +26,17 @@ func DefaultConfig() *Config {
 			DefaultQuota: "1000000000",
 		},
 		Identity: Identity{
-			Backend: "cs3",
+			Backend: "ldap",
 			LDAP: LDAP{
 				URI:                      "ldap://localhost:9125",
-				BindDN:                   "",
-				BindPassword:             "",
-				UserBaseDN:               "ou=users,dc=ocis,dc=test",
+				BindDN:                   "cn=admin,dc=ocis,dc=test",
+				BindPassword:             "admin",
+				UserBaseDN:               "dc=ocis,dc=test",
 				UserSearchScope:          "sub",
 				UserFilter:               "(objectClass=posixaccount)",
 				UserEmailAttribute:       "mail",
 				UserDisplayNameAttribute: "displayName",
-				UserNameAttribute:        "uid",
+				UserNameAttribute:        "cn",
 				// FIXME: switch this to some more widely available attribute by default
 				//        ideally this needs to	be constant for the lifetime of a users
 				UserIDAttribute:    "ownclouduuid",

@@ -107,13 +107,11 @@ const actions = {
       // accounts backend:  status = 201
       // A better approach is to introduce a config to enable switching between backends and move this logic to its
       // specific location.
-
       if (response.status >= 200 && response.status < 300) {
         const accounts = response.data.value === undefined ? response.data.accounts : response.data.value
         commit('SET_ACCOUNTS', accounts || [])
         return
       }
-
     } catch (e) {
     }
     commit('SET_FAILED', true)
