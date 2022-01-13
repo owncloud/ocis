@@ -3,6 +3,7 @@ package svc
 import (
 	"net/http"
 
+	"github.com/ReneKroon/ttlcache/v2"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/go-chi/chi/v5"
@@ -17,6 +18,7 @@ type Graph struct {
 	mux             *chi.Mux
 	logger          *log.Logger
 	identityBackend identity.Backend
+	spaceYamlCache  *ttlcache.Cache
 }
 
 // ServeHTTP implements the Service interface.

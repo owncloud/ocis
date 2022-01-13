@@ -3,6 +3,7 @@ package svc
 import (
 	"net/http"
 
+	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
@@ -55,6 +56,7 @@ func NewService(opts ...Option) Service {
 		mux:             m,
 		logger:          &options.Logger,
 		identityBackend: backend,
+		spaceYamlCache:  ttlcache.NewCache(),
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {

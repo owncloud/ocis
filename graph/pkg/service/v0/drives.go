@@ -2,15 +2,15 @@ package svc
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math"
 	"net/http"
 	"net/url"
-	"path"
 	"strconv"
 	"strings"
-	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -18,6 +18,7 @@ import (
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/pkg/ctx"
+	"github.com/cs3org/reva/pkg/rhttp"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -25,8 +26,15 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	sproto "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	settingsSvc "github.com/owncloud/ocis/settings/pkg/service/v0"
+	"gopkg.in/yaml.v2"
 
 	merrors "go-micro.dev/v4/errors"
+)
+
+const (
+	// "github.com/cs3org/reva/internal/http/services/datagateway" is internal so we redeclare it here
+	// TokenTransportHeader holds the header key for the reva transfer token
+	TokenTransportHeader = "X-Reva-Transfer"
 )
 
 // GetDrives implements the Service interface.
@@ -90,70 +98,6 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	files, err := g.formatDrives(ctx, wdu, res.StorageSpaces)
-	if err != nil {
-		g.logger.Error().Err(err).Msg("error encoding response as json")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &listResponse{Value: files})
-}
-
-// GetRootDriveChildren implements the Service interface.
-func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
-	g.logger.Info().Msg("Calling GetRootDriveChildren")
-	ctx := r.Context()
-
-	client, err := g.GetClient()
-	if err != nil {
-		g.logger.Error().Err(err).Msg("could not get client")
-		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	res, err := client.GetHome(ctx, &storageprovider.GetHomeRequest{})
-	switch {
-	case err != nil:
-		g.logger.Error().Err(err).Msg("error sending get home grpc request")
-		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
-		return
-	case res.Status.Code != cs3rpc.Code_CODE_OK:
-		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
-			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
-			return
-		}
-		g.logger.Error().Err(err).Msg("error sending get home grpc request")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
-		return
-	}
-
-	lRes, err := client.ListContainer(ctx, &storageprovider.ListContainerRequest{
-		Ref: &storageprovider.Reference{
-			Path: res.Path,
-		},
-	})
-	switch {
-	case err != nil:
-		g.logger.Error().Err(err).Msg("error sending list container grpc request")
-		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
-		return
-	case res.Status.Code != cs3rpc.Code_CODE_OK:
-		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
-			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, res.Status.Message)
-			return
-		}
-		if res.Status.Code == cs3rpc.Code_CODE_PERMISSION_DENIED {
-			// TODO check if we should return 404 to not disclose existing items
-			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, res.Status.Message)
-			return
-		}
-		g.logger.Error().Err(err).Msg("error sending list container grpc request")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
-		return
-	}
-
-	files, err := formatDriveItems(lRes.Infos)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error encoding response as json")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -350,40 +294,38 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, updatedDrive)
 }
 
-func cs3TimestampToTime(t *types.Timestamp) time.Time {
-	return time.Unix(int64(t.Seconds), int64(t.Nanos))
-}
-
-func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*libregraph.DriveItem, error) {
-	size := new(int64)
-	*size = int64(res.Size) // uint64 -> int :boom:
-	name := path.Base(res.Path)
-
-	driveItem := &libregraph.DriveItem{
-		Id:   &res.Id.OpaqueId,
-		Name: &name,
-		ETag: &res.Etag,
-		Size: size,
-	}
-	if res.Mtime != nil {
-		lastModified := cs3TimestampToTime(res.Mtime)
-		driveItem.LastModifiedDateTime = &lastModified
-	}
-	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_FILE {
-		driveItem.File = &libregraph.OpenGraphFile{ // FIXME We cannot use libregraph.File here because the openapi codegenerator autodetects 'File' as a go type ...
-			MimeType: &res.MimeType,
+func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storageprovider.StorageSpace) ([]*libregraph.Drive, error) {
+	responses := make([]*libregraph.Drive, 0, len(mds))
+	for _, space := range mds {
+		res, err := cs3StorageSpaceToDrive(baseURL, space)
+		if err != nil {
+			return nil, err
 		}
-	}
-	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER {
-		driveItem.Folder = &libregraph.Folder{}
-	}
-	return driveItem, nil
-}
-
-func formatDriveItems(mds []*storageprovider.ResourceInfo) ([]*libregraph.DriveItem, error) {
-	responses := make([]*libregraph.DriveItem, 0, len(mds))
-	for i := range mds {
-		res, err := cs3ResourceToDriveItem(mds[i])
+		spaceYaml, err := g.getSpaceYaml(ctx, space)
+		if err == nil {
+			if spaceYaml.Description != "" {
+				res.Description = &spaceYaml.Description
+			}
+			if len(spaceYaml.Special) > 0 {
+				s := make([]libregraph.DriveItem, 0, len(spaceYaml.Special))
+				for name, relativePath := range spaceYaml.Special {
+					sdi, err := g.getDriveItem(ctx, space.Root, relativePath)
+					if err != nil {
+						// TODO log
+						continue
+					}
+					n := name // copy the name to a dedicated variable
+					sdi.SpecialFolder = &libregraph.SpecialFolder{
+						Name: &n,
+					}
+					// TODO cache until ./.config/ocis/space.yaml file changes
+					s = append(s, *sdi)
+				}
+				res.Special = &s
+			}
+		}
+		// TODO this overwrites the quota that might already have been mapped in cs3StorageSpaceToDrive above ... move this into the cs3StorageSpaceToDrive method?
+		res.Quota, err = g.getDriveQuota(ctx, space)
 		if err != nil {
 			return nil, err
 		}
@@ -444,25 +386,10 @@ func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpac
 		}
 	}
 	// FIXME use coowner from https://github.com/owncloud/open-graph-api
+	// TODO read .space.yaml and parse it for description and thumbnail?
+	//
 
 	return drive, nil
-}
-
-func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storageprovider.StorageSpace) ([]*libregraph.Drive, error) {
-	responses := make([]*libregraph.Drive, 0, len(mds))
-	for i := range mds {
-		res, err := cs3StorageSpaceToDrive(baseURL, mds[i])
-		if err != nil {
-			return nil, err
-		}
-		res.Quota, err = g.getDriveQuota(ctx, mds[i])
-		if err != nil {
-			return nil, err
-		}
-		responses = append(responses, res)
-	}
-
-	return responses, nil
 }
 
 func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (*libregraph.Quota, error) {
@@ -484,13 +411,13 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 	res, err := client.GetQuota(ctx, req)
 	switch {
 	case err != nil:
-		g.logger.Error().Err(err).Msg("error sending get quota grpc request")
+		g.logger.Error().Err(err).Msg("could not call GetQuota")
 		return nil, nil
 	case res.Status.Code == cs3rpc.Code_CODE_UNIMPLEMENTED:
 		// TODO well duh
 		return nil, nil
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
-		g.logger.Error().Err(err).Msg("error sending sending get quota grpc request")
+		g.logger.Error().Err(err).Msg("error sending get quota grpc request")
 		return nil, err
 	}
 
@@ -507,6 +434,110 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 	qta.State = &state
 
 	return &qta, nil
+}
+
+type SpaceYaml struct {
+	Version     string `yaml:"version"`
+	Description string `yaml:"description"`
+	// map of {name} -> {relative path to resource}, eg:
+	// readme -> readme.md
+	// image -> .config/ocis/space.png
+	Special map[string]string `yaml:"special"`
+}
+
+// generates a space root stat cache key used to detect changes in a space
+func spaceRootStatKey(id *storageprovider.ResourceId) string {
+	if id == nil || id.StorageId == "" || id.OpaqueId == "" {
+		return ""
+	}
+	return "sid:" + id.StorageId + "!oid:" + id.OpaqueId
+}
+
+type spaceYamlEntry struct {
+	spaceYaml      SpaceYaml
+	spaceYamlMtime *types.Timestamp
+	rootMtime      *types.Timestamp
+}
+
+func (g Graph) getSpaceYaml(ctx context.Context, space *storageprovider.StorageSpace) (*SpaceYaml, error) {
+
+	/*}
+	if syc, err := g.spaceYamlCache.Get(spaceRootStatKey(space.Root)); err == nil {
+		if spaceYamlEntry, ok := spaceYamlEntry(syc) {
+			if spaceYamlEntry.rootMtime != nil && space.Mtime != nil {
+
+
+			}
+		}
+	}
+	*/
+	// TODO try reading from cache, invalidate when space mtime changes
+	client, err := g.GetClient()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error creating grpc client")
+		return nil, err
+	}
+	dlReq := &storageprovider.InitiateFileDownloadRequest{
+		Ref: &storageprovider.Reference{
+			ResourceId: &storageprovider.ResourceId{
+				StorageId: space.Root.StorageId,
+				OpaqueId:  space.Root.OpaqueId,
+			},
+			Path: "./.config/ocis/space.yaml",
+		},
+	}
+	// ctx := metadata.AppendToOutgoingContext(ctx, "If-Modified-Since", TODO send cached mtime of space yaml )
+	// TODO initiate file download only if the etag does not match
+	rsp, err := client.InitiateFileDownload(ctx, dlReq)
+	if err != nil {
+		return nil, err
+	}
+	if rsp.Status.Code != cs3rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("could not initiate download of %s: %s", dlReq.Ref.Path, rsp.Status.Message)
+	}
+	var ep, tk string
+	for _, p := range rsp.Protocols {
+		if p.Protocol == "spaces" {
+			ep, tk = p.DownloadEndpoint, p.Token
+		}
+	}
+	if ep == "" {
+		return nil, fmt.Errorf("space does not support the spaces download protocol")
+	}
+
+	httpReq, err := rhttp.NewRequest(ctx, "GET", ep, nil)
+	if err != nil {
+		return nil, err
+	}
+	//	httpReq.Header.Set(ctxpkg.TokenHeader, auth)
+	httpReq.Header.Set(TokenTransportHeader, tk)
+
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{
+		InsecureSkipVerify: true, //nolint:gosec
+	}
+	httpClient := &http.Client{}
+
+	resp, err := httpClient.Do(httpReq) // nolint:bodyclose
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("could not get the .space.yaml. Request returned with statuscode %d ", resp.StatusCode)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	spaceYaml := &SpaceYaml{}
+	//if err := yaml.NewDecoder(resp.Body).Decode(spaceYaml); err != nil {
+	if err := yaml.Unmarshal(body, spaceYaml); err != nil {
+		return nil, err
+	}
+
+	return spaceYaml, nil
 }
 
 func calculateQuotaState(total int64, used int64) (state string) {
