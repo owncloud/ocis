@@ -29,12 +29,3 @@ ci-go-generate: protobuf # CI runs ci-node-generate automatically before this ta
 
 .PHONY: ci-node-generate
 ci-node-generate:
-
-############ protobuf ############
-PROTO_VERSION := v0
-PROTO_SRC := pkg/proto/$(PROTO_VERSION)
-
-include ../.make/protobuf.mk
-
-.PHONY: protobuf
-protobuf: buf-generate
