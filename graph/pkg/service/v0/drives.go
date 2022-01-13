@@ -69,7 +69,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 	filters, err := generateCs3Filters(odataReq)
 	if err != nil {
 		g.logger.Err(err).Interface("query", r.URL.Query()).Msg("query error")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		errorcode.NotSupported.Render(w, r, http.StatusNotImplemented, err.Error())
 		return
 	}
 	res, err := client.ListStorageSpaces(ctx, &storageprovider.ListStorageSpacesRequest{
