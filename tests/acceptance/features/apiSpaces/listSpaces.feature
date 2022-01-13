@@ -37,11 +37,7 @@ Feature: List and create spaces
       | quota@@@state    | normal       |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
     And the json responded should not contain a space with name "Shares Jail"
-    And the json responded should contain spaces of type "personal"
     And the json responded should only contain spaces of type "personal"
-    And the json responded should not contain spaces of type "project"
-    And the json responded should not contain spaces of type "virtual"
-    And the json responded should not contain spaces of type "public"
 
   Scenario: An ordinary user will not see any space when using a filter for project
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'project'"
