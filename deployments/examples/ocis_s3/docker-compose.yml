@@ -60,7 +60,6 @@ services:
       STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       # activate s3ng storage driver
-      STORAGE_HOME_DRIVER: s3ng
       STORAGE_USERS_DRIVER: s3ng
       STORAGE_METADATA_DRIVER: ocis # keep metadata on ocis storage since this are only small files atm
       # s3ng specific settings
