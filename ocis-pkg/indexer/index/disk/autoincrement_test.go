@@ -8,7 +8,7 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
 	//. "github.com/owncloud/ocis/ocis-pkg/indexer/test"
-	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -236,7 +236,7 @@ func TestAdd(t *testing.T) {
 		}),
 		option.WithDataDir(tmpDir),
 		option.WithFilesDir(filepath.Join(tmpDir, "data")),
-		option.WithEntity(&proto.Account{}),
+		option.WithEntity(&accountsmsg.Account{}),
 		option.WithTypeName("owncloud.Account"),
 		option.WithIndexBy("UidNumber"),
 	)

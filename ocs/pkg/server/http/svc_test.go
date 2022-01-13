@@ -22,13 +22,14 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	accountsCfg "github.com/owncloud/ocis/accounts/pkg/config"
 	accountsLogging "github.com/owncloud/ocis/accounts/pkg/logging"
-	accountsProto "github.com/owncloud/ocis/accounts/pkg/proto/v0"
-	accountsSvc "github.com/owncloud/ocis/accounts/pkg/service/v0"
+	accountsServiceExt "github.com/owncloud/ocis/accounts/pkg/service/v0"
 	ocisLog "github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocs/pkg/config"
 	svc "github.com/owncloud/ocis/ocs/pkg/service/v0"
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v1"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
 	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
 	ssvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"github.com/stretchr/testify/assert"
@@ -481,10 +482,10 @@ func assertUsersSame(t *testing.T, expected, actual User, quotaAvailable bool) {
 	}
 }
 
-func findAccount(t *testing.T, username string) (*accountsProto.Account, error) {
-	cl := accountsProto.NewAccountsService("com.owncloud.api.accounts", service.Client())
+func findAccount(t *testing.T, username string) (*accountsmsg.Account, error) {
+	cl := accountssvc.NewAccountsService("com.owncloud.api.accounts", service.Client())
 
-	req := &accountsProto.ListAccountsRequest{
+	req := &accountssvc.ListAccountsRequest{
 		Query: "preferred_name eq '" + username + "'",
 	}
 	res, err := cl.ListAccounts(context.Background(), req)
@@ -498,17 +499,17 @@ func findAccount(t *testing.T, username string) (*accountsProto.Account, error) 
 }
 
 func deleteAccount(t *testing.T, id string) (*empty.Empty, error) {
-	cl := accountsProto.NewAccountsService("com.owncloud.api.accounts", service.Client())
+	cl := accountssvc.NewAccountsService("com.owncloud.api.accounts", service.Client())
 
-	req := &accountsProto.DeleteAccountRequest{Id: id}
+	req := &accountssvc.DeleteAccountRequest{Id: id}
 	res, err := cl.DeleteAccount(context.Background(), req)
 	return res, err
 }
 
 func deleteGroup(t *testing.T, id string) (*empty.Empty, error) {
-	cl := accountsProto.NewGroupsService("com.owncloud.api.accounts", service.Client())
+	cl := accountssvc.NewGroupsService("com.owncloud.api.accounts", service.Client())
 
-	req := &accountsProto.DeleteGroupRequest{Id: id}
+	req := &accountssvc.DeleteGroupRequest{Id: id}
 	res, err := cl.DeleteGroup(context.Background(), req)
 	return res, err
 }
@@ -518,7 +519,7 @@ func buildRoleServiceMock() settingssvc.RoleService {
 		AssignRoleToUserFunc: func(ctx context.Context, req *settingssvc.AssignRoleToUserRequest, opts ...client.CallOption) (res *settingssvc.AssignRoleToUserResponse, err error) {
 			mockedRoleAssignment[req.AccountUuid] = req.RoleId
 			return &settingssvc.AssignRoleToUserResponse{
-				Assignment: &settingssvc.UserRoleAssignment{
+				Assignment: &settingsmsg.UserRoleAssignment{
 					AccountUuid: req.AccountUuid,
 					RoleId:      req.RoleId,
 				},
@@ -531,7 +532,7 @@ func buildRoleServiceMock() settingssvc.RoleService {
 						Id: ssvc.BundleUUIDRoleAdmin,
 						Settings: []*settingsmsg.Setting{
 							{
-								Id: accountsSvc.AccountManagementPermissionID,
+								Id: accountsServiceExt.AccountManagementPermissionID,
 							},
 						},
 					},
@@ -539,7 +540,7 @@ func buildRoleServiceMock() settingssvc.RoleService {
 						Id: ssvc.BundleUUIDRoleUser,
 						Settings: []*settingsmsg.Setting{
 							{
-								Id: accountsSvc.SelfManagementPermissionID,
+								Id: accountsServiceExt.SelfManagementPermissionID,
 							},
 						},
 					},
@@ -571,22 +572,22 @@ func init() {
 		},
 	}
 
-	var hdlr *accountsSvc.Service
+	var hdlr *accountsServiceExt.Service
 	var err error
 
-	if hdlr, err = accountsSvc.New(
-		accountsSvc.Logger(accountsLogging.Configure("accounts", c.Log)),
-		accountsSvc.Config(c),
-		accountsSvc.RoleService(buildRoleServiceMock()),
+	if hdlr, err = accountsServiceExt.New(
+		accountsServiceExt.Logger(accountsLogging.Configure("accounts", c.Log)),
+		accountsServiceExt.Config(c),
+		accountsServiceExt.RoleService(buildRoleServiceMock()),
 	); err != nil {
 		log.Fatalf("Could not create new service")
 	}
 
-	err = accountsProto.RegisterAccountsServiceHandler(service.Server(), hdlr)
+	err = accountssvc.RegisterAccountsServiceHandler(service.Server(), hdlr)
 	if err != nil {
 		log.Fatal("could not register the Accounts handler")
 	}
-	err = accountsProto.RegisterGroupsServiceHandler(service.Server(), hdlr)
+	err = accountssvc.RegisterGroupsServiceHandler(service.Server(), hdlr)
 	if err != nil {
 		log.Fatal("could not register the Groups handler")
 	}

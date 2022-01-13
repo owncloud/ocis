@@ -9,8 +9,9 @@ import (
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	revactx "github.com/cs3org/reva/pkg/ctx"
-	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"go-micro.dev/v4/client"
 )
@@ -110,18 +111,18 @@ func TestMigrationSelector(t *testing.T) {
 	}
 }
 
-func mockAccSvc(retErr bool) proto.AccountsService {
+func mockAccSvc(retErr bool) accountssvc.AccountsService {
 	if retErr {
-		return &proto.MockAccountsService{
-			GetFunc: func(ctx context.Context, in *proto.GetAccountRequest, opts ...client.CallOption) (record *proto.Account, err error) {
+		return &accountssvc.MockAccountsService{
+			GetFunc: func(ctx context.Context, in *accountssvc.GetAccountRequest, opts ...client.CallOption) (record *accountsmsg.Account, err error) {
 				return nil, fmt.Errorf("error returned by mockAccountsService GET")
 			},
 		}
 	}
 
-	return &proto.MockAccountsService{
-		GetFunc: func(ctx context.Context, in *proto.GetAccountRequest, opts ...client.CallOption) (record *proto.Account, err error) {
-			return &proto.Account{}, nil
+	return &accountssvc.MockAccountsService{
+		GetFunc: func(ctx context.Context, in *accountssvc.GetAccountRequest, opts ...client.CallOption) (record *accountsmsg.Account, err error) {
+			return &accountsmsg.Account{}, nil
 		},
 	}
 

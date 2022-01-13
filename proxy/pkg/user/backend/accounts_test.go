@@ -6,17 +6,18 @@ import (
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v1"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
 	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"go-micro.dev/v4/client"
 )
 
-var mockAccResp = []*accounts.Account{
+var mockAccResp = []*accountsmsg.Account{
 	{
 		Id:                       "1234",
 		AccountEnabled:           true,
@@ -26,7 +27,7 @@ var mockAccResp = []*accounts.Account{
 		GidNumber:                2,
 		Mail:                     "foo@example.org",
 		OnPremisesSamAccountName: "samaccount",
-		MemberOf: []*accounts.Group{
+		MemberOf: []*accountsmsg.Group{
 			{OnPremisesSamAccountName: "g1"},
 			{OnPremisesSamAccountName: "g2"},
 		},
@@ -64,7 +65,7 @@ func TestGetUserByClaimsFound(t *testing.T) {
 }
 
 func TestGetUserByClaimsNotFound(t *testing.T) {
-	accBackend := newAccountsBackend([]*accounts.Account{}, expectedRoles)
+	accBackend := newAccountsBackend([]*accountsmsg.Account{}, expectedRoles)
 
 	u, _, err := accBackend.GetUserByClaims(context.Background(), "mail", "foo@example.com", true)
 
@@ -74,7 +75,7 @@ func TestGetUserByClaimsNotFound(t *testing.T) {
 }
 
 func TestGetUserByClaimsInvalidClaim(t *testing.T) {
-	accBackend := newAccountsBackend([]*accounts.Account{}, expectedRoles)
+	accBackend := newAccountsBackend([]*accountsmsg.Account{}, expectedRoles)
 	u, _, err := accBackend.GetUserByClaims(context.Background(), "invalidClaimName", "efwfwfwfe", true)
 
 	assert.Nil(t, u)
@@ -82,7 +83,7 @@ func TestGetUserByClaimsInvalidClaim(t *testing.T) {
 }
 
 func TestGetUserByClaimsDisabledAccount(t *testing.T) {
-	accBackend := newAccountsBackend([]*accounts.Account{{AccountEnabled: false}}, expectedRoles)
+	accBackend := newAccountsBackend([]*accountsmsg.Account{{AccountEnabled: false}}, expectedRoles)
 	u, _, err := accBackend.GetUserByClaims(context.Background(), "mail", "foo@example.com", true)
 
 	assert.Nil(t, u)
@@ -100,7 +101,7 @@ func TestAuthenticate(t *testing.T) {
 }
 
 func TestAuthenticateFailed(t *testing.T) {
-	accBackend := newAccountsBackend([]*accounts.Account{}, expectedRoles)
+	accBackend := newAccountsBackend([]*accountsmsg.Account{}, expectedRoles)
 	u, _, err := accBackend.Authenticate(context.Background(), "foo", "secret")
 
 	assert.Nil(t, u)
@@ -109,7 +110,7 @@ func TestAuthenticateFailed(t *testing.T) {
 
 func TestCreateUserFromClaims(t *testing.T) {
 	exp := mockAccResp[0]
-	accBackend := newAccountsBackend([]*accounts.Account{}, expectedRoles)
+	accBackend := newAccountsBackend([]*accountsmsg.Account{}, expectedRoles)
 	act, _ := accBackend.CreateUserFromClaims(context.Background(), map[string]interface{}{
 		oidc.Name:              mockAccResp[0].DisplayName,
 		oidc.PreferredUsername: mockAccResp[0].OnPremisesSamAccountName,
@@ -127,11 +128,11 @@ func TestCreateUserFromClaims(t *testing.T) {
 }
 
 func TestGetUserGroupsUnimplemented(t *testing.T) {
-	accBackend := newAccountsBackend([]*accounts.Account{}, expectedRoles)
+	accBackend := newAccountsBackend([]*accountsmsg.Account{}, expectedRoles)
 	assert.Panics(t, func() { accBackend.GetUserGroups(context.Background(), "foo") })
 }
 
-func assertUserMatchesAccount(t *testing.T, exp *accounts.Account, act *userv1beta1.User) {
+func assertUserMatchesAccount(t *testing.T, exp *accountsmsg.Account, act *userv1beta1.User) {
 	// User
 	assert.NotNil(t, act.Id)
 	assert.Equal(t, exp.Id, act.Id.OpaqueId)
@@ -151,7 +152,7 @@ func assertUserMatchesAccount(t *testing.T, exp *accounts.Account, act *userv1be
 	assert.Equal(t, int64(2), act.GidNumber)
 }
 
-func newAccountsBackend(mockAccounts []*accounts.Account, mockRoles []*settingsmsg.UserRoleAssignment) UserBackend {
+func newAccountsBackend(mockAccounts []*accountsmsg.Account, mockRoles []*settingsmsg.UserRoleAssignment) UserBackend {
 	accSvc, roleSvc := getAccountService(mockAccounts, nil), getRoleService(mockRoles, nil)
 	tokenManager, _ := jwt.New(map[string]interface{}{
 		"secret":  "change-me",
@@ -162,12 +163,12 @@ func newAccountsBackend(mockAccounts []*accounts.Account, mockRoles []*settingsm
 	return accBackend
 }
 
-func getAccountService(expectedResponse []*accounts.Account, err error) *accounts.MockAccountsService {
-	return &accounts.MockAccountsService{
-		ListFunc: func(ctx context.Context, in *accounts.ListAccountsRequest, opts ...client.CallOption) (*accounts.ListAccountsResponse, error) {
-			return &accounts.ListAccountsResponse{Accounts: expectedResponse}, err
+func getAccountService(expectedResponse []*accountsmsg.Account, err error) *accountssvc.MockAccountsService {
+	return &accountssvc.MockAccountsService{
+		ListFunc: func(ctx context.Context, in *accountssvc.ListAccountsRequest, opts ...client.CallOption) (*accountssvc.ListAccountsResponse, error) {
+			return &accountssvc.ListAccountsResponse{Accounts: expectedResponse}, err
 		},
-		CreateFunc: func(ctx context.Context, in *accounts.CreateAccountRequest, opts ...client.CallOption) (*accounts.Account, error) {
+		CreateFunc: func(ctx context.Context, in *accountssvc.CreateAccountRequest, opts ...client.CallOption) (*accountsmsg.Account, error) {
 			a := in.Account
 			a.Id = "1234"
 			return a, nil
