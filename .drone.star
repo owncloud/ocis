@@ -1969,14 +1969,13 @@ def parallelDeployAcceptancePipeline(ctx):
                     "os": "linux",
                     "arch": "amd64",
                 },
-                "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                         cloneCoreRepos() +
+                "steps": cloneCoreRepos() +
                          copyConfigs() +
                          waitForServices() +
-                         parallelDeploymentOC10Server() +
+                         oC10Server() +
                          owncloudLog() +
                          fixSharedDataPermissions() +
-                         parallelDeploymentOcisServer() +
+                         latestOcisServer() +
                          parallelAcceptance(environment) +
                          failEarly(ctx, early_fail),
                 "services": oc10DbService() +
@@ -1990,7 +1989,6 @@ def parallelDeployAcceptancePipeline(ctx):
                     pipeOCISConfigVol,
                     pipelineVolumeOC10Tests,
                 ],
-                "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
                 "trigger": {},
             }
 
@@ -2043,7 +2041,7 @@ def parallelAcceptance(env):
         ],
     }]
 
-def parallelDeploymentOcisServer():
+def latestOcisServer():
     environment = {
         # Keycloak IDP specific configuration
         "PROXY_OIDC_ISSUER": "https://keycloak/auth/realmsowncloud",
@@ -2105,7 +2103,6 @@ def parallelDeploymentOcisServer():
         "OCIS_LOG_LEVEL": "error",
         "OCIS_URL": OCIS_URL,
         "PROXY_TLS": "true",
-        "OCIS_BASE_DATA_PATH": "./ocis-data",  # this is only needed since we use a binary not intended to be run in a rootless docker container
         # change default secrets
         "OCIS_JWT_SECRET": "Pive-Fumkiu4",
         "STORAGE_TRANSFER_SECRET": "replace-me-with-a-transfer-secret",
@@ -2116,26 +2113,18 @@ def parallelDeploymentOcisServer():
 
     return [
         {
-            "name": "ocis-data-dir-permissions",
-            "image": OC_CI_ALPINE,
-            "commands": [
-                "mkdir ./ocis-data",
-                "chmod 777 ./ocis-data",  # make writable for 33:33
-            ],
-        },
-        {
             "name": "ocis",
-            "image": OC_CI_ALPINE,
+            "image": OC_OCIS,
             "environment": environment,
             "detach": True,
             "commands": [
-                "ocis/bin/ocis server",
+                "ocis server",
             ],
             "volumes": [
                 stepVolumeOC10OCISData,
                 stepVolumeOCISConfig,
             ],
-            "user": "33:33",  # same user as oC10
+            "user": "33:33",
             "depends_on": ["fix-permissions"],
         },
         {
@@ -2148,7 +2137,7 @@ def parallelDeploymentOcisServer():
         },
     ]
 
-def parallelDeploymentOC10Server():
+def oC10Server():
     return [
         {
             "name": "oc10",
