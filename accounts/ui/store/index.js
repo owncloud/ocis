@@ -102,11 +102,18 @@ const actions = {
         $domain: getters.getServerForJsClient,
         body: {}
       })
+      // this is flawed. The responses from the accounts and ldap carry a different key:
+      // ldap backend:      status = 200
+      // accounts backend:  status = 201
+      // A better approach is to introduce a config to enable switching between backends and move this logic to its
+      // specific location.
+
       if (response.status >= 200 && response.status < 300) {
-        const accounts = response.data.value
+        const accounts = response.data.value === undefined ? response.data.accounts : response.data.value
         commit('SET_ACCOUNTS', accounts || [])
         return
       }
+
     } catch (e) {
     }
     commit('SET_FAILED', true)
