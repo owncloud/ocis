@@ -155,6 +155,7 @@ type FrontendPort struct {
 	ArchiverPrefix             string     `ocisConfig:"archiver_prefix"`
 	DatagatewayPrefix          string     `ocisConfig:"data_gateway_prefix"`
 	Favorites                  bool       `ocisConfig:"favorites"`
+	ProjectSpaces              bool       `ocisConfig:"project_spaces"`
 	OCDavInsecure              bool       `ocisConfig:"ocdav_insecure"`
 	OCDavPrefix                string     `ocisConfig:"ocdav_prefix"`
 	OCSPrefix                  string     `ocisConfig:"ocs_prefix"`
@@ -814,6 +815,10 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"STORAGE_FRONTEND_FAVORITES"},
 			Destination: &cfg.Reva.Frontend.Favorites,
+		},
+		{
+			EnvVars:     []string{"STORAGE_FRONTEND_PROJECT_SPACES"},
+			Destination: &cfg.Reva.Frontend.ProjectSpaces,
 		},
 		{
 			EnvVars:     []string{"STORAGE_FRONTEND_OCDAV_PREFIX"},

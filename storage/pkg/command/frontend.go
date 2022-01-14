@@ -294,7 +294,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 							},
 							"spaces": map[string]interface{}{
 								"version": "0.0.1",
-								"enabled": true,
+								"enabled": cfg.Reva.Frontend.ProjectSpaces,
 							},
 						},
 						"version": map[string]interface{}{
