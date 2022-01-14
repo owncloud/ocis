@@ -9,6 +9,7 @@ import (
 	"math"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -19,6 +20,7 @@ import (
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rhttp"
+	"github.com/cs3org/reva/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -318,6 +320,9 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storag
 					sdi.SpecialFolder = &libregraph.SpecialFolder{
 						Name: &n,
 					}
+					webdavURL := baseURL.String() + filepath.Join(space.Id.OpaqueId, relativePath)
+					sdi.WebDavUrl = &webdavURL
+
 					// TODO cache until ./.config/ocis/space.yaml file changes
 					s = append(s, *sdi)
 				}
@@ -459,18 +464,28 @@ type spaceYamlEntry struct {
 	rootMtime      *types.Timestamp
 }
 
+/*
+parent reference could be used to indicate the parent
+
+    "parentReference": {
+        "driveId": "c12644a14b0a7750",
+        "driveType": "personal",
+        "id": "C12644A14B0A7750!1383",
+        "name": "Screenshots",
+        "path": "/drive/root:/Bilder/Screenshots"
+    },
+
+*/
 func (g Graph) getSpaceYaml(ctx context.Context, space *storageprovider.StorageSpace) (*SpaceYaml, error) {
 
-	/*}
+	// if the root mtime
 	if syc, err := g.spaceYamlCache.Get(spaceRootStatKey(space.Root)); err == nil {
-		if spaceYamlEntry, ok := spaceYamlEntry(syc) {
+		if spaceYamlEntry, ok := syc.(spaceYamlEntry); ok {
 			if spaceYamlEntry.rootMtime != nil && space.Mtime != nil {
-
-
+				utils.LaterTS(spaceYamlEntry.rootMtime, space.Mtime)
 			}
 		}
 	}
-	*/
 	// TODO try reading from cache, invalidate when space mtime changes
 	client, err := g.GetClient()
 	if err != nil {
@@ -484,9 +499,17 @@ func (g Graph) getSpaceYaml(ctx context.Context, space *storageprovider.StorageS
 				OpaqueId:  space.Root.OpaqueId,
 			},
 			Path: "./.config/ocis/space.yaml",
+			// TODO what if a public share should have a readme and an image?
+			// should we just default to a ./Readme.md and ./folder.png/jpg?
+			// what existing conventions could we use? .desktop file? .env file?
+			// how should users set a README fo public link file shares? They only point to a file, not a folder that could contain a readme and image
+			// should weo reuse the readme and image of the space that contains the file shared via link?
 		},
 	}
-	// ctx := metadata.AppendToOutgoingContext(ctx, "If-Modified-Since", TODO send cached mtime of space yaml )
+	//ctx = metadata.AppendToOutgoingContext(ctx, headers.IfModifiedSince, "TODO grpc has no official cache headers")
+	// FIXME how can clients retrieve a file just by id?
+	// The drive Item does currently not have a relative path ...
+	// so clients would have to make a request by id ... but webdav cannot do that ...
 	// TODO initiate file download only if the etag does not match
 	rsp, err := client.InitiateFileDownload(ctx, dlReq)
 	if err != nil {
