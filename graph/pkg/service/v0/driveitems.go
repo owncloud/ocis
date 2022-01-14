@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"path"
 	"path/filepath"
@@ -93,8 +94,11 @@ func (g Graph) getDriveItem(ctx context.Context, root *storageprovider.ResourceI
 		Path: filepath.Join("./", relativePath),
 	}
 	res, err := client.Stat(ctx, &storageprovider.StatRequest{Ref: ref})
-	if res.Status.Code != cs3rpc.Code_CODE_OK {
+	if err != nil {
 		return nil, err
+	}
+	if res.Status.Code != cs3rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("could not stat %s: %s", ref, res.Status.Message)
 	}
 
 	return cs3ResourceToDriveItem(res.Info)

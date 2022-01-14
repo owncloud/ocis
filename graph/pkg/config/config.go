@@ -28,9 +28,11 @@ type Config struct {
 }
 
 type Spaces struct {
-	WebDavBase   string `ocisConfig:"webdav_base" env:"OCIS_URL;GRAPH_SPACES_WEBDAV_BASE"`
-	WebDavPath   string `ocisConfig:"webdav_path" env:"GRAPH_SPACES_WEBDAV_PATH"`
-	DefaultQuota string `ocisConfig:"default_quota" env:"GRAPH_SPACES_DEFAULT_QUOTA"`
+	WebDavBase                      string `ocisConfig:"webdav_base" env:"OCIS_URL;GRAPH_SPACES_WEBDAV_BASE"`
+	WebDavPath                      string `ocisConfig:"webdav_path" env:"GRAPH_SPACES_WEBDAV_PATH"`
+	DefaultQuota                    string `ocisConfig:"default_quota" env:"GRAPH_SPACES_DEFAULT_QUOTA"`
+	Insecure                        bool   `ocisConfig:"insecure" env:"OCIS_INSECURE;GRAPH_SPACES_INSECURE"`
+	ExtendedSpacePropertiesCacheTTL int    `ocisConfig:"extended_space_properties_cache_ttl" env:"GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL"`
 }
 
 type LDAP struct {

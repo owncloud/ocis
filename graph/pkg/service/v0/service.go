@@ -52,11 +52,11 @@ func NewService(opts ...Option) Service {
 	}
 
 	svc := Graph{
-		config:          options.Config,
-		mux:             m,
-		logger:          &options.Logger,
-		identityBackend: backend,
-		spaceYamlCache:  ttlcache.NewCache(),
+		config:               options.Config,
+		mux:                  m,
+		logger:               &options.Logger,
+		identityBackend:      backend,
+		spacePropertiesCache: ttlcache.NewCache(),
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {

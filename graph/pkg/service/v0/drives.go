@@ -5,13 +5,13 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"net/http"
 	"net/url"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -20,7 +20,6 @@ import (
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rhttp"
-	"github.com/cs3org/reva/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -298,17 +297,22 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storag
 		if err != nil {
 			return nil, err
 		}
-		spaceYaml, err := g.getSpaceYaml(ctx, space)
+		spaceProperties, err := g.getExtendedSpaceProperties(ctx, space)
+		if err != nil {
+			g.logger.Error().Err(err).Interface("space", space).Msg("error reading extendedSpaceProperties")
+			continue
+		}
 		if err == nil {
-			if spaceYaml.Description != "" {
-				res.Description = &spaceYaml.Description
+			if spaceProperties.Description != "" {
+				res.Description = &spaceProperties.Description
 			}
-			if len(spaceYaml.Special) > 0 {
-				s := make([]libregraph.DriveItem, 0, len(spaceYaml.Special))
-				for name, relativePath := range spaceYaml.Special {
+			if len(spaceProperties.Special) > 0 {
+				s := make([]libregraph.DriveItem, 0, len(spaceProperties.Special))
+				for name, relativePath := range spaceProperties.Special {
 					sdi, err := g.getDriveItem(ctx, space.Root, relativePath)
 					if err != nil {
-						// TODO log
+						// TODO cach not found response
+						g.logger.Debug().Err(err).Interface("space", space).Interface("path", relativePath).Msg("error fetching drive item")
 						continue
 					}
 					n := name // copy the name to a dedicated variable
@@ -386,8 +390,6 @@ func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpac
 		}
 	}
 	// FIXME use coowner from https://github.com/owncloud/open-graph-api
-	// TODO read .space.yaml and parse it for description and thumbnail?
-	//
 
 	return drive, nil
 }
@@ -436,13 +438,14 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 	return &qta, nil
 }
 
-type SpaceYaml struct {
-	Version     string `yaml:"version"`
-	Description string `yaml:"description"`
+// ExtendedSpaceProperties are stored in a file
+type ExtendedSpaceProperties struct {
+	Version     string `yaml:"version" json:"version"`
+	Description string `yaml:"description" json:"description"`
 	// map of {name} -> {relative path to resource}, eg:
 	// readme -> readme.md
 	// image -> .config/ocis/space.png
-	Special map[string]string `yaml:"special"`
+	Special map[string]string `yaml:"special" json:"special"`
 }
 
 // generates a space root stat cache key used to detect changes in a space
@@ -453,26 +456,26 @@ func spaceRootStatKey(id *storageprovider.ResourceId) string {
 	return "sid:" + id.StorageId + "!oid:" + id.OpaqueId
 }
 
-type spaceYamlEntry struct {
-	spaceYaml      SpaceYaml
-	spaceYamlMtime *types.Timestamp
-	rootMtime      *types.Timestamp
+type spacePropertiesEntry struct {
+	spaceProperties ExtendedSpaceProperties
+	rootMtime       *types.Timestamp
 }
 
-func (g Graph) getSpaceYaml(ctx context.Context, space *storageprovider.StorageSpace) (*SpaceYaml, error) {
+func (g Graph) getExtendedSpaceProperties(ctx context.Context, space *storageprovider.StorageSpace) (*ExtendedSpaceProperties, error) {
 
-	// if the root mtime
-	if syc, err := g.spaceYamlCache.Get(spaceRootStatKey(space.Root)); err == nil {
-		if spaceYamlEntry, ok := syc.(spaceYamlEntry); ok {
-			if spaceYamlEntry.rootMtime != nil && space.Mtime != nil {
-				utils.LaterTS(spaceYamlEntry.rootMtime, space.Mtime)
+	// if the root is older or equal to our cache we can reuse the cached extended spaces properties
+	if syc, err := g.spacePropertiesCache.Get(spaceRootStatKey(space.Root)); err == nil {
+		if spe, ok := syc.(spacePropertiesEntry); ok {
+			if spe.rootMtime != nil && space.Mtime != nil {
+				if spe.rootMtime.Seconds > space.Mtime.Seconds { // second precision is good enough
+					return &spe.spaceProperties, nil
+				}
 			}
 		}
 	}
-	// TODO try reading from cache, invalidate when space mtime changes
+
 	client, err := g.GetClient()
 	if err != nil {
-		g.logger.Error().Err(err).Msg("error creating grpc client")
 		return nil, err
 	}
 	dlReq := &storageprovider.InitiateFileDownloadRequest{
@@ -498,9 +501,22 @@ func (g Graph) getSpaceYaml(ctx context.Context, space *storageprovider.StorageS
 	if err != nil {
 		return nil, err
 	}
-	if rsp.Status.Code != cs3rpc.Code_CODE_OK {
+	switch rsp.Status.Code {
+	case cs3rpc.Code_CODE_OK:
+		// continue
+	case cs3rpc.Code_CODE_NOT_FOUND:
+		// cache an empty instance
+		spacePropertiesEntry := spacePropertiesEntry{
+			spaceProperties: ExtendedSpaceProperties{},
+			rootMtime:       space.Mtime,
+		}
+		g.spacePropertiesCache.SetWithTTL(spaceRootStatKey(space.Root), spacePropertiesEntry, time.Second*time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL))
+
+		return &spacePropertiesEntry.spaceProperties, nil
+	default:
 		return nil, fmt.Errorf("could not initiate download of %s: %s", dlReq.Ref.Path, rsp.Status.Message)
 	}
+
 	var ep, tk string
 	for _, p := range rsp.Protocols {
 		if p.Protocol == "spaces" {
@@ -515,11 +531,10 @@ func (g Graph) getSpaceYaml(ctx context.Context, space *storageprovider.StorageS
 	if err != nil {
 		return nil, err
 	}
-	//	httpReq.Header.Set(ctxpkg.TokenHeader, auth)
 	httpReq.Header.Set(headers.TokenTransportHeader, tk)
 
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{
-		InsecureSkipVerify: true, //nolint:gosec
+		InsecureSkipVerify: g.config.Spaces.Insecure, //nolint:gosec
 	}
 	httpClient := &http.Client{}
 
@@ -528,22 +543,35 @@ func (g Graph) getSpaceYaml(ctx context.Context, space *storageprovider.StorageS
 		return nil, err
 	}
 
-	if resp.StatusCode != http.StatusOK {
+	switch resp.StatusCode {
+	case http.StatusOK:
+		// continue
+	case http.StatusNotFound:
+		// cache an empty instance
+		spacePropertiesEntry := spacePropertiesEntry{
+			spaceProperties: ExtendedSpaceProperties{},
+			rootMtime:       space.Mtime,
+		}
+		g.spacePropertiesCache.SetWithTTL(spaceRootStatKey(space.Root), spacePropertiesEntry, time.Second*time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL))
+
+		return &spacePropertiesEntry.spaceProperties, nil
+	default:
 		return nil, fmt.Errorf("could not get the .space.yaml. Request returned with statuscode %d ", resp.StatusCode)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
+	spaceProperties := ExtendedSpaceProperties{}
+	if err := yaml.NewDecoder(resp.Body).Decode(&spaceProperties); err != nil {
 		return nil, err
 	}
 
-	spaceYaml := &SpaceYaml{}
-	//if err := yaml.NewDecoder(resp.Body).Decode(spaceYaml); err != nil {
-	if err := yaml.Unmarshal(body, spaceYaml); err != nil {
-		return nil, err
+	// cache properties
+	spacePropertiesEntry := spacePropertiesEntry{
+		spaceProperties: spaceProperties,
+		rootMtime:       space.Mtime,
 	}
+	g.spacePropertiesCache.SetWithTTL(spaceRootStatKey(space.Root), spacePropertiesEntry, time.Second*time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL))
 
-	return spaceYaml, nil
+	return &spaceProperties, nil
 }
 
 func calculateQuotaState(total int64, used int64) (state string) {
