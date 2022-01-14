@@ -448,12 +448,12 @@ class SpacesContext implements Context {
 		Assert::assertNotEmpty($roleToAssign, "The selected role $role could not be found");
 
 		// get the accounts list first
-		$fullUrl = $this->baseUrl . "/api/v0/accounts/accounts-list";
+		$fullUrl = $this->baseUrl . "/graph/v1.0/users";
 		$this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, "{}"));
 		if ($this->featureContext->getResponse()) {
 			$rawBody = $this->featureContext->getResponse()->getBody()->getContents();
-			if (isset(\json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["accounts"])) {
-				$accounts = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["accounts"];
+			if (isset(\json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["value"])) {
+				$accounts = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["value"];
 			}
 		}
 		$accountToChange = "";
