@@ -239,6 +239,7 @@ func DefaultConfig() *Config {
 				ArchiverPrefix:             "archiver",
 				DatagatewayPrefix:          "data",
 				Favorites:                  false,
+				ProjectSpaces:              true,
 				OCDavInsecure:              false, // true?
 				OCDavPrefix:                "",
 				OCSPrefix:                  "ocs",

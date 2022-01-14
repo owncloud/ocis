@@ -91,7 +91,6 @@ services:
       STORAGE_LDAP_USERFILTER: "(&(objectclass=posixAccount)(objectclass=owncloud)(|(ownclouduuid={{.OpaqueId}})(uid={{.OpaqueId}})))"
       STORAGE_LDAP_USERFINDFILTER: "(&(objectclass=posixAccount)(objectclass=owncloud)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))"
       # ownCloud storage driver
-      STORAGE_HOME_DRIVER: owncloudsql
       STORAGE_USERS_DRIVER: owncloudsql
       STORAGE_METADATA_DRIVER: ocis # keep metadata on ocis storage since this are only small files atm
       STORAGE_USERS_DRIVER_OWNCLOUDSQL_DATADIR: /mnt/data/files
