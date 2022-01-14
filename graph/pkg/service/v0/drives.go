@@ -25,18 +25,13 @@ import (
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
+	"github.com/owncloud/ocis/graph/pkg/service/v0/net/headers"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	sproto "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	settingsSvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"gopkg.in/yaml.v2"
 
 	merrors "go-micro.dev/v4/errors"
-)
-
-const (
-	// "github.com/cs3org/reva/internal/http/services/datagateway" is internal so we redeclare it here
-	// TokenTransportHeader holds the header key for the reva transfer token
-	TokenTransportHeader = "X-Reva-Transfer"
 )
 
 // GetDrives implements the Service interface.
@@ -464,18 +459,6 @@ type spaceYamlEntry struct {
 	rootMtime      *types.Timestamp
 }
 
-/*
-parent reference could be used to indicate the parent
-
-    "parentReference": {
-        "driveId": "c12644a14b0a7750",
-        "driveType": "personal",
-        "id": "C12644A14B0A7750!1383",
-        "name": "Screenshots",
-        "path": "/drive/root:/Bilder/Screenshots"
-    },
-
-*/
 func (g Graph) getSpaceYaml(ctx context.Context, space *storageprovider.StorageSpace) (*SpaceYaml, error) {
 
 	// if the root mtime
@@ -533,7 +516,7 @@ func (g Graph) getSpaceYaml(ctx context.Context, space *storageprovider.StorageS
 		return nil, err
 	}
 	//	httpReq.Header.Set(ctxpkg.TokenHeader, auth)
-	httpReq.Header.Set(TokenTransportHeader, tk)
+	httpReq.Header.Set(headers.TokenTransportHeader, tk)
 
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{
 		InsecureSkipVerify: true, //nolint:gosec
