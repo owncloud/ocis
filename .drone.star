@@ -1400,7 +1400,6 @@ def notify(ctx):
 def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
     environment = {
         "OCIS_URL": "https://ocis-server:9200",
-        "STORAGE_HOME_DRIVER": "%s" % (storage),
         "STORAGE_USERS_DRIVER": "%s" % (storage),
         "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
         "STORAGE_USERS_DRIVER_OWNCLOUD_DATADIR": "/srv/app/tmp/ocis/owncloud/data",
@@ -2082,7 +2081,6 @@ def latestOcisServer():
         "STORAGE_LDAP_USERFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(|(ownclouduuid={{.OpaqueId}})(uid={{.OpaqueId}})))",
         "STORAGE_LDAP_USERFINDFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
         # ownCloud storage driver
-        "STORAGE_HOME_DRIVER": "owncloudsql",
         "STORAGE_USERS_DRIVER": "owncloudsql",
         "STORAGE_METADATA_DRIVER": "ocis",
         "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DATADIR": "/mnt/data/files",
