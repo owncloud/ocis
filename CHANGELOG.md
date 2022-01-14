@@ -16,6 +16,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add new file url of the app provider to the ocs capabilities: [#2884](https://github.com/owncloud/ocis/pull/2884)
 * Enhancement - Add spaces capability: [#2931](https://github.com/owncloud/ocis/pull/2931)
 * Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
+* Enhancement - Update REVA to v1.16.1-0.20220112085026-07451f6cd806: [#2953](https://github.com/owncloud/ocis/pull/2953)
 * Enhancement - Update REVA to xxx: [#2878](https://github.com/owncloud/ocis/pull/2878)
 * Enhancement - Update ownCloud Web to v4.8.0: [#2895](https://github.com/owncloud/ocis/pull/2895)
 
@@ -90,6 +91,12 @@ The following sections list the changes for unreleased.
    Enabled public share requests to be authenticated using the public share signature.
 
    https://github.com/owncloud/ocis/pull/2831
+
+* Enhancement - Update REVA to v1.16.1-0.20220112085026-07451f6cd806: [#2953](https://github.com/owncloud/ocis/pull/2953)
+
+   Update REVA to v1.16.1-0.20220112085026-07451f6cd806
+
+   https://github.com/owncloud/ocis/pull/2953
 
 * Enhancement - Update REVA to xxx: [#2878](https://github.com/owncloud/ocis/pull/2878)
 
