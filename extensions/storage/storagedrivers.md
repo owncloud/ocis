@@ -168,7 +168,6 @@ For a simple docker-compose setup, you can create a volume which will be used by
 The CERN eos storage has evolved with ownCloud and natively supports id based lookup, ETag propagation, subtree size accounting, sharing, trash and versions. To use it you need to change the default configuration of the `storage storage-home` command (or have a look at the Makefile ̀ eos-start` target):
 
 ```
-export STORAGE_HOME_DRIVER=eos
 export STORAGE_DRIVER_EOS_NAMESPACE=/eos
 export STORAGE_DRIVER_EOS_MASTER_URL="root://eos-mgm1.eoscluster.cern.ch:1094"
 export STORAGE_DRIVER_EOS_ENABLE_HOME=true
