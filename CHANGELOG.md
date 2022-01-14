@@ -79,10 +79,11 @@ The following sections list the changes for unreleased.
 
 * Enhancement - Add spaces capability: [#2931](https://github.com/owncloud/ocis/pull/2931)
 
-   We've added the spaces capability with version 0.0.1 and enabled set to true.
+   We've added the spaces capability with version 0.0.1 and enabled defaulting to true.
 
    https://github.com/owncloud/ocis/pull/2931
    https://github.com/cs3org/reva/pull/2015
+   https://github.com/owncloud/ocis/pull/2965
 
 * Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
 
