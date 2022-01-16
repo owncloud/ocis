@@ -19,6 +19,31 @@ Feature: List and create spaces
       | name             | Alice Hansen |
       | quota@@@state    | normal       |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+    And the json responded should contain a space "Shares Jail" with these key and value pairs:
+      | key              | value        |
+      | driveType        | virtual     |
+      | id               | %space_id%   |
+      | name             | Shares Jail |
+      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+
+  Scenario: An ordinary user can request information about their Space via the Graph API using a filter
+    When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'personal'"
+    Then the HTTP status code should be "200"
+    And the json responded should contain a space "Alice Hansen" with these key and value pairs:
+      | key              | value        |
+      | driveType        | personal     |
+      | id               | %space_id%   |
+      | name             | Alice Hansen |
+      | quota@@@state    | normal       |
+      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+    And the json responded should not contain a space with name "Shares Jail"
+    And the json responded should only contain spaces of type "personal"
+
+  Scenario: An ordinary user will not see any space when using a filter for project
+    When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'project'"
+    Then the HTTP status code should be "200"
+    And the json responded should not contain a space with name "Alice Hansen"
+    And the json responded should not contain spaces of type "personal"
 
   Scenario: An ordinary user can access their Space via the webDav API
     When user "Alice" lists all available spaces via the GraphApi

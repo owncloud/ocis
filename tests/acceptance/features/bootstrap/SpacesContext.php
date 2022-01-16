@@ -351,6 +351,26 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" lists all available spaces via the GraphApi with query "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $query
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 */
+	public function theUserListsAllHisAvailableSpacesUsingTheGraphApiWithFilter(string $user, string $query): void {
+		$this->featureContext->setResponse(
+			$this->listSpacesRequest(
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				"?". $query
+			)
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" creates a space "([^"]*)" of type "([^"]*)" with the default quota using the GraphApi$/
 	 *
 	 * @param string $user
@@ -659,7 +679,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^the json responded should not contain a space "([^"]*)"$/
+	 * @Then /^the json responded should not contain a space with name "([^"]*)"$/
 	 *
 	 * @param string $spaceName
 	 *
@@ -670,6 +690,45 @@ class SpacesContext implements Context {
 		string $spaceName
 	): void {
 		Assert::assertEmpty($this->getSpaceByNameFromResponse($spaceName), "space $spaceName should not be available for a user");
+	}
+
+	/**
+	 * @Then /^the json responded should (not|only|)\s?contain spaces of type "([^"]*)"$/
+	 *
+	 * @param string $shoulOrNot (not|only|)
+	 * @param string $type
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function jsonRespondedShouldNotContainSpaceType(
+		string $onlyOrNot,
+		string $type
+	): void {
+		Assert::assertNotEmpty(
+			$spaces = json_decode(
+				(string)$this->featureContext
+					->getResponse()->getBody(),
+				true,
+				512,
+				JSON_THROW_ON_ERROR
+			)
+		);
+		$matches = [];
+		foreach($spaces["value"] as $space) {
+			if($onlyOrNot === "not") {
+				Assert::assertNotEquals($space["driveType"], $type);
+			}
+			if($onlyOrNot === "only") {
+				Assert::assertEquals($space["driveType"], $type);
+			}
+			if($onlyOrNot === "" && $space["driveType"] === $type) {
+				$matches[] = $space;
+			}
+		}
+		if($onlyOrNot === "") {
+			Assert::assertNotEmpty($matches);
+		}
 	}
 
 	/**
