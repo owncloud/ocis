@@ -88,7 +88,16 @@ The oCIS storage driver is the default storage driver. It decomposes the metadat
 
 The S3NG storage driver uses the same metadata layout on a POSIX storage as the oCIS driver, but it uses S3 as the blob storage.
 
-TODO add list of capabilities / tradeoffs 
+TODO add list of capabilities / tradeoffs
+
+#### Related Kernel limits 
+The decomposedfs currently stores CS3 grants in extended attributes. When listing extended attributes the result is currently limited to 64kB. Assuming a 20 byte uuid a grant has ~40 bytes. Which would limit the number of extended attributes to ~1630 entries or ~1600 shares. This can be extended by moving the grants from extended attributes into a dedicated file.
+
+From [Wikipedia on Extended file attributes](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux):
+> The Linux kernel allows extended attribute to have names of up to 255 bytes and values of up to 64 KiB,[14] as do XFS and ReiserFS, but ext2/3/4 and btrfs impose much smaller limits, requiring all the attributes (names and values) of one file to fit in one "filesystem block" (usually 4 KiB). Per POSIX.1e,[citation needed] the names are required to start with one of security, system, trusted, and user plus a period. This defines the four namespaces of extended attributes.[15]
+
+And from the [man page on listxattr](https://www.man7.org/linux/man-pages/man2/listxattr.2.html):
+> As noted in xattr(7), the VFS imposes a limit of 64 kB on the size of the extended attribute name list returned by listxattr(7).  If the total size of attribute names attached to a file exceeds this limit, it is no longer possible to retrieve the list of attribute names.
 
 ### Local Storage Driver
 
@@ -126,6 +135,11 @@ The *minimal* storage driver for a POSIX based filesystem. It literally supports
 To provide the other storage aspects we plan to implement a FUSE overlay filesystem which will add the different aspects on top of local filesystems like ext4, btrfs or xfs. It should work on NFSv45 as well, although NFSv4 supports RichACLs and we will explore how to leverage them to implement sharing at a future date. The idea is to use the storages native capabilities to deliver the best user experience. But again: that means making the right tradeoffs.
 
 ### OwnCloud Storage Driver
+
+{{< hint info >}}
+**Deprecated**
+The owncloud storage driver was used for testing purposes early on. For a parallel deployment focus has shifted to the owncloudsql.
+{{< /hint >}}
 
 This is the current default storage driver. While it implements the file tree (using redis, including id based lookup), ETag propagation, trash, versions and sharing (including expiry) using the data directory layout of ownCloud 10 it has [known limitations](https://github.com/owncloud/core/issues/28095) that cannot be fixed without changing the actual layout on disk.
 
