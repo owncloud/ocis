@@ -525,7 +525,9 @@ func (g Graph) getExtendedSpaceProperties(ctx context.Context, space *storagepro
 			spaceProperties: ExtendedSpaceProperties{},
 			rootMtime:       space.Mtime,
 		}
-		g.spacePropertiesCache.SetWithTTL(spaceRootStatKey(space.Root), spacePropertiesEntry, time.Second*time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL))
+		if err := g.spacePropertiesCache.SetWithTTL(spaceRootStatKey(space.Root), spacePropertiesEntry, time.Second*time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL)); err != nil {
+			g.logger.Error().Err(err).Msg("could not cache extended space properties")
+		}
 
 		return &spacePropertiesEntry.spaceProperties, nil
 	default:
@@ -567,7 +569,9 @@ func (g Graph) getExtendedSpaceProperties(ctx context.Context, space *storagepro
 			spaceProperties: ExtendedSpaceProperties{},
 			rootMtime:       space.Mtime,
 		}
-		g.spacePropertiesCache.SetWithTTL(spaceRootStatKey(space.Root), spacePropertiesEntry, time.Second*time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL))
+		if err := g.spacePropertiesCache.SetWithTTL(spaceRootStatKey(space.Root), spacePropertiesEntry, time.Second*time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL)); err != nil {
+			g.logger.Error().Err(err).Msg("could not cache extended space properties")
+		}
 
 		return &spacePropertiesEntry.spaceProperties, nil
 	default:
@@ -584,7 +588,9 @@ func (g Graph) getExtendedSpaceProperties(ctx context.Context, space *storagepro
 		spaceProperties: spaceProperties,
 		rootMtime:       space.Mtime,
 	}
-	g.spacePropertiesCache.SetWithTTL(spaceRootStatKey(space.Root), spacePropertiesEntry, time.Second*time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL))
+	if err := g.spacePropertiesCache.SetWithTTL(spaceRootStatKey(space.Root), spacePropertiesEntry, time.Second*time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL)); err != nil {
+		g.logger.Error().Err(err).Msg("could not cache extended space properties")
+	}
 
 	return &spaceProperties, nil
 }

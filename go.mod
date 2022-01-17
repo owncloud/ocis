@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/CiscoM31/godata v1.0.5
 	github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e
+	github.com/ReneKroon/ttlcache/v2 v2.11.0
 	github.com/asim/go-micro/plugins/client/grpc/v4 v4.0.0-20211220083148-8e52761edb49
 	github.com/asim/go-micro/plugins/logger/zerolog/v4 v4.0.0-20211220083148-8e52761edb49
 	github.com/asim/go-micro/plugins/registry/etcd/v4 v4.0.0-20211220083148-8e52761edb49
@@ -83,7 +84,6 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
 	github.com/Microsoft/go-winio v0.5.1 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20211112122917-428f8eabeeb3 // indirect
-	github.com/ReneKroon/ttlcache/v2 v2.11.0 // indirect
 	github.com/RoaringBitmap/roaring v0.9.4 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
