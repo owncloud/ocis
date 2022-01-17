@@ -4,7 +4,6 @@ services:
     user: root
     environment:
       OCIS_URL: "https://ocis-server:9200"
-      STORAGE_HOME_DRIVER: $STORAGE_DRIVER
       STORAGE_USERS_DRIVER: $STORAGE_DRIVER
       STORAGE_USERS_DRIVER_LOCAL_ROOT: /srv/app/tmp/ocis/local/root
       STORAGE_USERS_DRIVER_OWNCLOUD_DATADIR: /srv/app/tmp/ocis/owncloud/data

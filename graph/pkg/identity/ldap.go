@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/go-ldap/ldap/v3"
+	"github.com/gofrs/uuid"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/owncloud/ocis/graph/pkg/config"
@@ -14,6 +15,9 @@ import (
 )
 
 type LDAP struct {
+	useServerUUID bool
+	writeEnabled  bool
+
 	userBaseDN       string
 	userFilter       string
 	userScope        int
@@ -71,6 +75,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 	}
 
 	return &LDAP{
+		useServerUUID:     config.UseServerUUID,
 		userBaseDN:        config.UserBaseDN,
 		userFilter:        config.UserFilter,
 		userScope:         userScope,
@@ -81,15 +86,180 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		groupAttributeMap: gam,
 		logger:            logger,
 		conn:              lc,
+		writeEnabled:      config.WriteEnabled,
 	}, nil
 }
 
-func (i *LDAP) GetUser(ctx context.Context, userID string) (*libregraph.User, error) {
-	i.logger.Debug().Str("backend", "ldap").Msg("GetUser")
-	userID = ldap.EscapeFilter(userID)
+// CreateUser implements the Backend Interface. It converts the libregraph.User into an
+// LDAP User Entry (using the inetOrgPerson LDAP Objectclass) add adds that to the
+// configured LDAP server
+func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregraph.User, error) {
+	if !i.writeEnabled {
+		return nil, errorcode.New(errorcode.NotAllowed, "server is configured read-only")
+	}
+	ar := ldap.AddRequest{
+		DN: fmt.Sprintf("uid=%s,%s", *user.OnPremisesSamAccountName, i.userBaseDN),
+		Attributes: []ldap.Attribute{
+			// inetOrgPerson requires "cn"
+			{
+				Type: "cn",
+				Vals: []string{*user.OnPremisesSamAccountName},
+			},
+			{
+				Type: i.userAttributeMap.mail,
+				Vals: []string{*user.Mail},
+			},
+			{
+				Type: i.userAttributeMap.userName,
+				Vals: []string{*user.OnPremisesSamAccountName},
+			},
+			{
+				Type: i.userAttributeMap.displayName,
+				Vals: []string{*user.DisplayName},
+			},
+		},
+	}
+
+	objectClasses := []string{"inetOrgPerson", "organizationalPerson", "person", "top"}
+
+	if user.PasswordProfile != nil && user.PasswordProfile.Password != nil {
+		// TODO? This relies to the LDAP server to properly hash the password.
+		// We might want to add support for the Password Modify LDAP Extended
+		// Operation for servers that implement it. (Or implement client-side
+		// hashing here.
+		ar.Attribute("userPassword", []string{*user.PasswordProfile.Password})
+	}
+	if !i.useServerUUID {
+		ar.Attribute("owncloudUUID", []string{uuid.Must(uuid.NewV4()).String()})
+		objectClasses = append(objectClasses, "owncloud")
+	}
+	ar.Attribute("objectClass", objectClasses)
+
+	// inetOrgPerson requires "sn" to be set. Set it to the Username if
+	// Surname is not set in the Request
+	var sn string
+	if user.Surname != nil && *user.Surname != "" {
+		sn = *user.Surname
+	} else {
+		sn = *user.OnPremisesSamAccountName
+	}
+	ar.Attribute("sn", []string{sn})
+
+	if err := i.conn.Add(&ar); err != nil {
+		return nil, err
+	}
+
+	// Read	back user from LDAP to get the generated UUID
+	e, err := i.getUserByDN(ar.DN)
+	if err != nil {
+		return nil, err
+	}
+	return i.createUserModelFromLDAP(e), nil
+}
+
+// DeleteUser implements the Backend Interface. It permanently deletes a User identified
+// by name or id from the LDAP server
+func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
+	if !i.writeEnabled {
+		return errorcode.New(errorcode.NotAllowed, "server is configured read-only")
+	}
+	e, err := i.getLDAPUserByNameOrID(nameOrID)
+	if err != nil {
+		return err
+	}
+	dr := ldap.DelRequest{DN: e.DN}
+	if err = i.conn.Del(&dr); err != nil {
+		return err
+	}
+	return nil
+}
+
+// UpdateUser implements the Backend Interface. It's currently not suported for the CS3 backedn
+func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.User) (*libregraph.User, error) {
+	if !i.writeEnabled {
+		return nil, errorcode.New(errorcode.NotAllowed, "server is configured read-only")
+	}
+	e, err := i.getLDAPUserByNameOrID(nameOrID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Don't allow updates of the ID
+	if user.Id != nil && *user.Id != "" {
+		if e.GetEqualFoldAttributeValue(i.userAttributeMap.id) != *user.Id {
+			return nil, errorcode.New(errorcode.NotAllowed, "changing the UserId is not allowed")
+		}
+	}
+	// TODO: In order to allow updating the user name we'd need to issue a ModRDN operation
+	// As we currently using uid as the naming Attribute for the user entries. (Do we even
+	// want to allow changing the user name?). For now just disallow it.
+	if user.OnPremisesSamAccountName != nil && *user.OnPremisesSamAccountName != "" {
+		if e.GetEqualFoldAttributeValue(i.userAttributeMap.userName) != *user.OnPremisesSamAccountName {
+			return nil, errorcode.New(errorcode.NotSupported, "changing the user name is currently not supported")
+		}
+	}
+
+	mr := ldap.ModifyRequest{DN: e.DN}
+	if user.DisplayName != nil && *user.DisplayName != "" {
+		if e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName) != *user.DisplayName {
+			mr.Replace(i.userAttributeMap.displayName, []string{*user.DisplayName})
+		}
+	}
+	if user.Mail != nil && *user.Mail != "" {
+		if e.GetEqualFoldAttributeValue(i.userAttributeMap.mail) != *user.Mail {
+			mr.Replace(i.userAttributeMap.mail, []string{*user.Mail})
+		}
+	}
+	if user.PasswordProfile != nil && user.PasswordProfile.Password != nil && *user.PasswordProfile.Password != "" {
+		// password are hashed server side there is no need to check if the new password
+		// is actually different from the old one.
+		mr.Replace("userPassword", []string{*user.PasswordProfile.Password})
+	}
+
+	if err := i.conn.Modify(&mr); err != nil {
+		return nil, err
+	}
+
+	// Read	back user from LDAP to get the generated UUID
+	e, err = i.getUserByDN(e.DN)
+	if err != nil {
+		return nil, err
+	}
+	return i.createUserModelFromLDAP(e), nil
+}
+
+func (i *LDAP) getUserByDN(dn string) (*ldap.Entry, error) {
+	searchRequest := ldap.NewSearchRequest(
+		dn, ldap.ScopeBaseObject, ldap.NeverDerefAliases, 1, 0, false,
+		"(objectclass=*)",
+		[]string{
+			i.userAttributeMap.displayName,
+			i.userAttributeMap.id,
+			i.userAttributeMap.mail,
+			i.userAttributeMap.userName,
+		},
+		nil,
+	)
+
+	i.logger.Debug().Str("backend", "ldap").Str("dn", dn).Msg("Search user by DN")
+	res, err := i.conn.Search(searchRequest)
+
+	if err != nil {
+		i.logger.Error().Err(err).Str("backend", "ldap").Str("dn", dn).Msg("Search user by DN failed")
+		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
+	}
+	if len(res.Entries) == 0 {
+		return nil, errorcode.New(errorcode.ItemNotFound, "not found")
+	}
+
+	return res.Entries[0], nil
+}
+
+func (i *LDAP) getLDAPUserByNameOrID(nameOrID string) (*ldap.Entry, error) {
+	nameOrID = ldap.EscapeFilter(nameOrID)
 	searchRequest := ldap.NewSearchRequest(
 		i.userBaseDN, i.userScope, ldap.NeverDerefAliases, 1, 0, false,
-		fmt.Sprintf("(&%s(|(%s=%s)(%s=%s)))", i.userFilter, i.userAttributeMap.userName, userID, i.userAttributeMap.id, userID),
+		fmt.Sprintf("(&%s(|(%s=%s)(%s=%s)))", i.userFilter, i.userAttributeMap.userName, nameOrID, i.userAttributeMap.id, nameOrID),
 		[]string{
 			i.userAttributeMap.displayName,
 			i.userAttributeMap.id,
@@ -105,8 +275,9 @@ func (i *LDAP) GetUser(ctx context.Context, userID string) (*libregraph.User, er
 		var errmsg string
 		if lerr, ok := err.(*ldap.Error); ok {
 			if lerr.ResultCode == ldap.LDAPResultSizeLimitExceeded {
-				errmsg = fmt.Sprintf("too many results searching for user '%s'", userID)
-				i.logger.Debug().Str("backend", "ldap").Err(lerr).Msg(errmsg)
+				errmsg = fmt.Sprintf("too many results searching for user '%s'", nameOrID)
+				i.logger.Debug().Str("backend", "ldap").Err(lerr).
+					Str("user", nameOrID).Msg("too many results searching for user")
 			}
 		}
 		return nil, errorcode.New(errorcode.ItemNotFound, errmsg)
@@ -115,7 +286,16 @@ func (i *LDAP) GetUser(ctx context.Context, userID string) (*libregraph.User, er
 		return nil, errorcode.New(errorcode.ItemNotFound, "not found")
 	}
 
-	return i.createUserModelFromLDAP(res.Entries[0]), nil
+	return res.Entries[0], nil
+}
+
+func (i *LDAP) GetUser(ctx context.Context, nameOrID string) (*libregraph.User, error) {
+	i.logger.Debug().Str("backend", "ldap").Msg("GetUser")
+	e, err := i.getLDAPUserByNameOrID(nameOrID)
+	if err != nil {
+		return nil, err
+	}
+	return i.createUserModelFromLDAP(e), nil
 }
 
 func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error) {
