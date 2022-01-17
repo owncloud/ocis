@@ -735,3 +735,55 @@ func generateCs3Filters(request *godata.GoDataRequest) ([]*storageprovider.ListS
 	}
 	return filters, nil
 }
+
+func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
+	driveID, err := url.PathUnescape(chi.URLParam(r, "driveID"))
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping drive id failed")
+		return
+	}
+
+	if driveID == "" {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing drive id")
+		return
+	}
+
+	root := &storageprovider.ResourceId{}
+
+	identifierParts := strings.Split(driveID, "!")
+	switch len(identifierParts) {
+	case 1:
+		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[0]
+	case 2:
+		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[1]
+	default:
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid resource id: %v", driveID))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	purge := parsePurgeHeader(r.Header)
+
+	var opaque *types.Opaque
+	if purge {
+		opaque = &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				"purge": {},
+			},
+		}
+	}
+
+	dRes, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+		Opaque: opaque,
+		Id: &storageprovider.StorageSpaceId{
+			OpaqueId: root.StorageId,
+		},
+	})
+	if err != nil || dRes.Status.Code != cs3rpc.Code_CODE_OK {
+		g.logger.Error().Err(err).Msg("error deleting storage space")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

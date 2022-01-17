@@ -51,7 +51,9 @@ func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		m.logger.Err(err).Msg("error calling CreateHome")
 	} else if createHomeRes.Status.Code != rpc.Code_CODE_OK {
 		err := status.NewErrorFromCode(createHomeRes.Status.Code, "gateway")
-		m.logger.Err(err).Msg("error when calling Createhome")
+		if createHomeRes.Status.Code != rpc.Code_CODE_ALREADY_EXISTS {
+			m.logger.Err(err).Msg("error when calling Createhome")
+		}
 	}
 
 	m.next.ServeHTTP(w, req)
