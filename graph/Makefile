@@ -26,6 +26,7 @@ include ../.make/generate.mk
 .PHONY: ci-go-generate
 ci-go-generate: $(MOCKERY) # CI runs ci-node-generate automatically before this target
 	$(MOCKERY) --dir pkg/service/v0 --case underscore --name GatewayClient
+	$(MOCKERY) --dir pkg/service/v0 --case underscore --name HTTPClient
 
 .PHONY: ci-node-generate
 ci-node-generate:

@@ -2,7 +2,6 @@ package svc
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -47,7 +46,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Msg("Calling GetDrives")
 	ctx := r.Context()
 
-	client := g.GetClient()
+	client := g.GetGatewayClient()
 
 	permissions := make(map[string]struct{}, 1)
 	s := sproto.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
@@ -133,7 +132,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := g.GetClient()
+	client := g.GetGatewayClient()
 	drive := libregraph.Drive{}
 	if err := json.NewDecoder(r.Body).Decode(&drive); err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "invalid schema definition")
@@ -224,7 +223,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := g.GetClient()
+	client := g.GetGatewayClient()
 
 	updateSpaceRequest := &storageprovider.UpdateStorageSpaceRequest{
 		// Prepare the object to apply the diff from. The properties on StorageSpace will overwrite
@@ -397,7 +396,7 @@ func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpac
 }
 
 func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (*libregraph.Quota, error) {
-	client := g.GetClient()
+	client := g.GetGatewayClient()
 
 	req := &gateway.GetQuotaRequest{
 		Ref: &storageprovider.Reference{
@@ -472,7 +471,7 @@ func (g Graph) getExtendedSpaceProperties(ctx context.Context, space *storagepro
 		}
 	}
 
-	client := g.GetClient()
+	client := g.GetGatewayClient()
 
 	dlReq := &storageprovider.InitiateFileDownloadRequest{
 		Ref: &storageprovider.Reference{
@@ -531,10 +530,7 @@ func (g Graph) getExtendedSpaceProperties(ctx context.Context, space *storagepro
 	}
 	httpReq.Header.Set(headers.TokenTransportHeader, tk)
 
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{
-		InsecureSkipVerify: g.config.Spaces.Insecure, //nolint:gosec
-	}
-	httpClient := &http.Client{}
+	httpClient := g.GetHTTPClient()
 
 	resp, err := httpClient.Do(httpReq) // nolint:bodyclose
 	if err != nil {
@@ -561,7 +557,19 @@ func (g Graph) getExtendedSpaceProperties(ctx context.Context, space *storagepro
 
 	spaceProperties := ExtendedSpaceProperties{}
 	if err := yaml.NewDecoder(resp.Body).Decode(&spaceProperties); err != nil {
-		return nil, err
+		g.logger.Debug().Err(err).Msg("invalid space yaml, ignoring")
+
+		// cache an empty instance
+		// TODO insert an 'invalid yaml' item? how can we return an error to the user?
+		spacePropertiesEntry := spacePropertiesEntry{
+			spaceProperties: ExtendedSpaceProperties{},
+			rootMtime:       space.Mtime,
+		}
+		if err := g.spacePropertiesCache.SetWithTTL(spaceRootStatKey(space.Root), spacePropertiesEntry, time.Second*time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL)); err != nil {
+			g.logger.Error().Err(err).Msg("could not cache extended space properties")
+		}
+
+		return &spacePropertiesEntry.spaceProperties, nil
 	}
 
 	// cache properties

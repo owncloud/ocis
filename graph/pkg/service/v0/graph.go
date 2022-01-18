@@ -16,7 +16,7 @@ import (
 
 //go:generate make generate
 
-// GatewayClient is the subset of the gateway.GatewayAPIClient that's being uses to interact with the gateway
+// GatewayClient is the subset of the gateway.GatewayAPIClient that is being used to interact with the gateway
 type GatewayClient interface {
 	//gateway.GatewayAPIClient
 
@@ -48,6 +48,11 @@ type GatewayClient interface {
 	GetQuota(ctx context.Context, in *gateway.GetQuotaRequest, opts ...grpc.CallOption) (*provider.GetQuotaResponse, error)
 }
 
+// HTTPClient is the subset of the http.Client that is being used to interact with the download gateway
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 // GetGatewayServiceClientFunc is a callback used to pass in a mock during testing
 type GetGatewayServiceClientFunc func() (GatewayClient, error)
 
@@ -57,7 +62,8 @@ type Graph struct {
 	mux                  *chi.Mux
 	logger               *log.Logger
 	identityBackend      identity.Backend
-	client               GatewayClient
+	gatewayClient        GatewayClient
+	httpClient           HTTPClient
 	spacePropertiesCache *ttlcache.Cache
 }
 
@@ -67,8 +73,13 @@ func (g Graph) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetClient returns a gateway client to talk to reva
-func (g Graph) GetClient() GatewayClient {
-	return g.client
+func (g Graph) GetGatewayClient() GatewayClient {
+	return g.gatewayClient
+}
+
+// GetClient returns a gateway client to talk to reva
+func (g Graph) GetHTTPClient() HTTPClient {
+	return g.httpClient
 }
 
 type listResponse struct {

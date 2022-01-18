@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"net/http"
 	"path"
-	"path/filepath"
 	"time"
 
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/pkg/utils"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
@@ -21,7 +21,7 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Msg("Calling GetRootDriveChildren")
 	ctx := r.Context()
 
-	client := g.GetClient()
+	client := g.GetGatewayClient()
 
 	res, err := client.GetHome(ctx, &storageprovider.GetHomeRequest{})
 	switch {
@@ -77,12 +77,12 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 
 func (g Graph) getDriveItem(ctx context.Context, root *storageprovider.ResourceId, relativePath string) (*libregraph.DriveItem, error) {
 
-	client := g.GetClient()
+	client := g.GetGatewayClient()
 
 	ref := &storageprovider.Reference{
 		ResourceId: root,
 		// the path is always relative to the root of the drive, not the location of the .config/ocis/space.yaml file
-		Path: filepath.Join("./", relativePath),
+		Path: utils.MakeRelativePath(relativePath),
 	}
 	res, err := client.Stat(ctx, &storageprovider.StatRequest{Ref: ref})
 	if err != nil {
@@ -119,15 +119,19 @@ func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*libregraph.Driv
 
 	driveItem := &libregraph.DriveItem{
 		Id:   &res.Id.OpaqueId,
-		Name: &name,
-		ETag: &res.Etag,
 		Size: size,
+	}
+	if name != "" {
+		driveItem.Name = &name
+	}
+	if res.Etag != "" {
+		driveItem.ETag = &res.Etag
 	}
 	if res.Mtime != nil {
 		lastModified := cs3TimestampToTime(res.Mtime)
 		driveItem.LastModifiedDateTime = &lastModified
 	}
-	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_FILE {
+	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_FILE && res.MimeType != "" {
 		driveItem.File = &libregraph.OpenGraphFile{ // FIXME We cannot use libregraph.File here because the openapi codegenerator autodetects 'File' as a go type ...
 			MimeType: &res.MimeType,
 		}

@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"crypto/tls"
 	"net/http"
 
 	"github.com/ReneKroon/ttlcache/v2"
@@ -64,15 +65,23 @@ func NewService(opts ...Option) Service {
 		identityBackend:      backend,
 		spacePropertiesCache: ttlcache.NewCache(),
 	}
-	if options.GatewayServiceClient == nil {
+	if options.GatewayClient == nil {
 		var err error
-		svc.client, err = pool.GetGatewayServiceClient(options.Config.Reva.Address)
+		svc.gatewayClient, err = pool.GetGatewayServiceClient(options.Config.Reva.Address)
 		if err != nil {
 			options.Logger.Error().Err(err).Msg("Could not get gateway client")
 			return nil
 		}
 	} else {
-		svc.client = options.GatewayServiceClient
+		svc.gatewayClient = options.GatewayClient
+	}
+	if options.HTTPClient == nil {
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{
+			InsecureSkipVerify: options.Config.Spaces.Insecure, //nolint:gosec
+		}
+		svc.httpClient = &http.Client{}
+	} else {
+		svc.httpClient = options.HTTPClient
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
