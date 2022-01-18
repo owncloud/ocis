@@ -117,6 +117,7 @@ func NewService(opts ...Option) Service {
 					r.Post("/", svc.CreateDrive)
 					r.Route("/{driveID}", func(r chi.Router) {
 						r.Patch("/", svc.UpdateDrive)
+						r.Get("/", svc.GetSingleDrive)
 					})
 				})
 			})
