@@ -21,12 +21,7 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Msg("Calling GetRootDriveChildren")
 	ctx := r.Context()
 
-	client, err := g.GetClient()
-	if err != nil {
-		g.logger.Error().Err(err).Msg("could not get client")
-		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
-		return
-	}
+	client := g.GetClient()
 
 	res, err := client.GetHome(ctx, &storageprovider.GetHomeRequest{})
 	switch {
@@ -82,11 +77,7 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 
 func (g Graph) getDriveItem(ctx context.Context, root *storageprovider.ResourceId, relativePath string) (*libregraph.DriveItem, error) {
 
-	client, err := g.GetClient()
-	if err != nil {
-		g.logger.Error().Err(err).Msg("error creating grpc client")
-		return nil, err
-	}
+	client := g.GetClient()
 
 	ref := &storageprovider.Reference{
 		ResourceId: root,

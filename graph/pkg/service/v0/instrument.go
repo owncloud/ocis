@@ -53,3 +53,8 @@ func (i instrument) DeleteUser(w http.ResponseWriter, r *http.Request) {
 func (i instrument) PatchUser(w http.ResponseWriter, r *http.Request) {
 	i.next.PatchUser(w, r)
 }
+
+// GetDrives implements the Service interface.
+func (i instrument) GetDrives(w http.ResponseWriter, r *http.Request) {
+	i.next.GetDrives(w, r)
+}

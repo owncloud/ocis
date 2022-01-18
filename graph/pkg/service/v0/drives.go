@@ -47,12 +47,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Msg("Calling GetDrives")
 	ctx := r.Context()
 
-	client, err := g.GetClient()
-	if err != nil {
-		g.logger.Err(err).Msg("error getting grpc client")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		return
-	}
+	client := g.GetClient()
 
 	permissions := make(map[string]struct{}, 1)
 	s := sproto.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
@@ -138,11 +133,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client, err := g.GetClient()
-	if err != nil {
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		return
-	}
+	client := g.GetClient()
 	drive := libregraph.Drive{}
 	if err := json.NewDecoder(r.Body).Decode(&drive); err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "invalid schema definition")
@@ -233,11 +224,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client, err := g.GetClient()
-	if err != nil {
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		return
-	}
+	client := g.GetClient()
 
 	updateSpaceRequest := &storageprovider.UpdateStorageSpaceRequest{
 		// Prepare the object to apply the diff from. The properties on StorageSpace will overwrite
@@ -410,11 +397,7 @@ func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpac
 }
 
 func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (*libregraph.Quota, error) {
-	client, err := g.GetClient()
-	if err != nil {
-		g.logger.Error().Err(err).Msg("error creating grpc client")
-		return nil, err
-	}
+	client := g.GetClient()
 
 	req := &gateway.GetQuotaRequest{
 		Ref: &storageprovider.Reference{
@@ -489,10 +472,8 @@ func (g Graph) getExtendedSpaceProperties(ctx context.Context, space *storagepro
 		}
 	}
 
-	client, err := g.GetClient()
-	if err != nil {
-		return nil, err
-	}
+	client := g.GetClient()
+
 	dlReq := &storageprovider.InitiateFileDownloadRequest{
 		Ref: &storageprovider.Reference{
 			ResourceId: &storageprovider.ResourceId{

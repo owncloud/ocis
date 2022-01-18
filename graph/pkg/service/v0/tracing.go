@@ -49,3 +49,8 @@ func (t tracing) DeleteUser(w http.ResponseWriter, r *http.Request) {
 func (t tracing) PatchUser(w http.ResponseWriter, r *http.Request) {
 	t.next.PatchUser(w, r)
 }
+
+// GetDrives implements the Service interface.
+func (t tracing) GetDrives(w http.ResponseWriter, r *http.Request) {
+	t.next.GetDrives(w, r)
+}
