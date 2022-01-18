@@ -43,7 +43,12 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Msg("Calling GetDrives")
 	ctx := r.Context()
 
-	client := g.GetClient()
+	client, err := g.GetClient()
+	if err != nil {
+		g.logger.Err(err).Msg("error getting grpc client")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	permissions := make(map[string]struct{}, 1)
 	s := sproto.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
@@ -115,7 +120,12 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Msg("Calling GetRootDriveChildren")
 	ctx := r.Context()
 
-	client := g.GetClient()
+	client, err := g.GetClient()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("could not get client")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	res, err := client.GetHome(ctx, &storageprovider.GetHomeRequest{})
 	switch {
@@ -188,7 +198,11 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := g.GetClient()
+	client, err := g.GetClient()
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
 	drive := libregraph.Drive{}
 	if err := json.NewDecoder(r.Body).Decode(&drive); err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "invalid schema definition")
@@ -279,7 +293,11 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := g.GetClient()
+	client, err := g.GetClient()
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	updateSpaceRequest := &storageprovider.UpdateStorageSpaceRequest{
 		// Prepare the object to apply the diff from. The properties on StorageSpace will overwrite
@@ -463,7 +481,11 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storag
 }
 
 func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (*libregraph.Quota, error) {
-	client := g.GetClient()
+	client, err := g.GetClient()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error creating grpc client")
+		return nil, err
+	}
 
 	req := &gateway.GetQuotaRequest{
 		Ref: &storageprovider.Reference{

@@ -3,7 +3,6 @@ package svc
 import (
 	"net/http"
 
-	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
@@ -22,8 +21,6 @@ type Service interface {
 	PostUser(http.ResponseWriter, *http.Request)
 	DeleteUser(http.ResponseWriter, *http.Request)
 	PatchUser(http.ResponseWriter, *http.Request)
-
-	GetDrives(w http.ResponseWriter, r *http.Request)
 }
 
 // NewService returns a service implementation for Service.
@@ -61,16 +58,6 @@ func NewService(opts ...Option) Service {
 		mux:             m,
 		logger:          &options.Logger,
 		identityBackend: backend,
-	}
-	if options.GatewayServiceClient == nil {
-		var err error
-		svc.client, err = pool.GetGatewayServiceClient(options.Config.Reva.Address)
-		if err != nil {
-			options.Logger.Error().Err(err).Msg("Could not get gateway client")
-			return nil
-		}
-	} else {
-		svc.client = options.GatewayServiceClient
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
