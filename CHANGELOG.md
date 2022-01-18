@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Add `ocis storage-auth-machine` subcommand: [#2910](https://github.com/owncloud/ocis/pull/2910)
+* Bugfix - Fix retry handling for LDAP connections: [#2974](https://github.com/owncloud/ocis/issues/2974)
 * Bugfix - Fix the default tracing provider: [#2952](https://github.com/owncloud/ocis/pull/2952)
 * Bugfix - Fix configuration for space membership endpoint: [#2893](https://github.com/owncloud/ocis/pull/2893)
 * Change - Unify configuration and commands: [#2818](https://github.com/owncloud/ocis/pull/2818)
@@ -28,6 +29,13 @@ The following sections list the changes for unreleased.
    We added the ocis subcommand to start the machine auth provider.
 
    https://github.com/owncloud/ocis/pull/2910
+
+* Bugfix - Fix retry handling for LDAP connections: [#2974](https://github.com/owncloud/ocis/issues/2974)
+
+   We've fixed the handling of network issues (e.g. connection loss) during LDAP Write
+   Operations to correcty retry the request.
+
+   https://github.com/owncloud/ocis/issues/2974
 
 * Bugfix - Fix the default tracing provider: [#2952](https://github.com/owncloud/ocis/pull/2952)
 
