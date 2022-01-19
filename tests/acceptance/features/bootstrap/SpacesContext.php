@@ -232,7 +232,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * Send Graph List Spaces Request
+	 * Send Graph List My Spaces Request
 	 *
 	 * @param  string $user
 	 * @param  string $password
@@ -245,7 +245,7 @@ class SpacesContext implements Context {
 	 *
 	 * @throws GuzzleException
 	 */
-	public function listSpacesRequest(
+	public function listMySpacesRequest(
 		string $user,
 		string $password,
 		string $urlArguments = '',
@@ -254,6 +254,34 @@ class SpacesContext implements Context {
 		array  $headers = []
 	): ResponseInterface {
 		$fullUrl = $this->baseUrl . "/graph/v1.0/me/drives/" . $urlArguments;
+
+		return HttpRequestHelper::get($fullUrl, $xRequestId, $user, $password, $headers, $body);
+	}
+
+	/**
+	 * Send Graph List Single Space Request
+	 *
+	 * @param  string $user
+	 * @param  string $password
+	 * @param  string $urlArguments
+	 * @param  string $xRequestId
+	 * @param  array  $body
+	 * @param  array  $headers
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 */
+	public function listSingleSpaceRequest(
+		string $user,
+		string $password,
+		string $spaceId,
+		string $urlArguments = '',
+		string $xRequestId = '',
+		array  $body = [],
+		array  $headers = []
+	): ResponseInterface {
+		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/" . $spaceId . "/" . $urlArguments;
 
 		return HttpRequestHelper::get($fullUrl, $xRequestId, $user, $password, $headers, $body);
 	}
@@ -342,7 +370,7 @@ class SpacesContext implements Context {
 	 */
 	public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user): void {
 		$this->featureContext->setResponse(
-			$this->listSpacesRequest(
+			$this->listMySpacesRequest(
 				$user,
 				$this->featureContext->getPasswordForUser($user)
 			)
@@ -362,10 +390,34 @@ class SpacesContext implements Context {
 	 */
 	public function theUserListsAllHisAvailableSpacesUsingTheGraphApiWithFilter(string $user, string $query): void {
 		$this->featureContext->setResponse(
-			$this->listSpacesRequest(
+			$this->listMySpacesRequest(
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				"?". $query
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" looks up the single space "([^"]*)" via the GraphApi by using its id$/
+	 *
+	 * @param string $user
+	 * @param string $query
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 */
+	public function theUserLooksUpTheSingleSpaceUsingTheGraphApiByUsingItsId(string $user, string $spaceName): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		Assert::assertIsArray($space);
+		Assert::assertNotEmpty($spaceId = $space["id"]);
+		Assert::assertNotEmpty($spaceWebDavUrl = $space["root"]["webDavUrl"]);
+		$this->featureContext->setResponse(
+			$this->listSingleSpaceRequest(
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$spaceId
 			)
 		);
 	}

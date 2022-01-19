@@ -79,3 +79,35 @@ Feature: List and create spaces
       | name             | Project Venus |
       | quota@@@total    | 2000          |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+
+  Scenario: A user can list his personal space via multiple endpoints
+    When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'personal'"
+    Then the json responded should contain a space "Alice Hansen" with these key and value pairs:
+      | key              | value         |
+      | driveType        | personal      |
+      | name             | Alice Hansen  |
+      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+    When user "Alice" looks up the single space "Alice Hansen" via the GraphApi by using its id
+    Then the json responded should contain a space "Alice Hansen" with these key and value pairs:
+      | key              | value         |
+      | driveType        | personal      |
+      | name             | Alice Hansen  |
+      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+
+  Scenario: A user can list his created spaces via multiple endpoints
+    Given the administrator has given "Alice" the role "Admin" using the settings api
+    When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
+    Then the HTTP status code should be "201"
+    And the json responded should contain a space "Project Venus" with these key and value pairs:
+      | key              | value         |
+      | driveType        | project       |
+      | name             | Project Venus |
+      | quota@@@total    | 2000          |
+      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+    When user "Alice" looks up the single space "Project Venus" via the GraphApi by using its id
+    Then the json responded should contain a space "Project Venus" with these key and value pairs:
+      | key              | value         |
+      | driveType        | project       |
+      | name             | Project Venus |
+      | quota@@@total    | 2000          |
+      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
