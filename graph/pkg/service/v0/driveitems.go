@@ -115,13 +115,13 @@ func cs3TimestampToTime(t *types.Timestamp) time.Time {
 func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*libregraph.DriveItem, error) {
 	size := new(int64)
 	*size = int64(res.Size) // uint64 -> int :boom:
-	name := path.Base(res.Path)
 
 	driveItem := &libregraph.DriveItem{
 		Id:   &res.Id.OpaqueId,
 		Size: size,
 	}
-	if name != "" {
+
+	if name := path.Base(res.Path); name != "" {
 		driveItem.Name = &name
 	}
 	if res.Etag != "" {
