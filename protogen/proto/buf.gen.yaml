@@ -13,8 +13,7 @@ plugins:
       - paths=source_relative
 
   - name: microweb
-    #path: ../../.bingo/protoc-gen-microweb
-    path: ../../../protoc-gen-microweb/protoc-gen-microweb
+    path: ../../.bingo/protoc-gen-microweb
     out: ../gen/
     opt:
       - paths=source_relative
@@ -30,6 +29,6 @@ plugins:
 
   - name: doc
     path: ../../.bingo/protoc-gen-doc
-    out: ../docs/extensions
+    out: ../../docs/grpc_apis
     opt:
       - ../docs/GRPC.tmpl,grpc.md,source_relative

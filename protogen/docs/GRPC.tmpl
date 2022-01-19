@@ -1,9 +1,11 @@
 ---
-title: "GRPC API"
-date: 2018-05-02T00:00:00+00:00
+{{- $package := (index .Files 0).Package }}
+title: "{{ $package }}"
+url: /grpc_apis/{{ $package }}
+date: {{ now | date "2006-01-02T15:04:05Z07:00" }}
 weight: 50
-geekdocRepo: https://github.com/owncloud/ocis-thumbnails
-geekdocEditPath: edit/master/docs
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/grpc_apis/{{ $package | replace "." "/" }}
 geekdocFilePath: grpc.md
 ---
 
@@ -26,9 +28,9 @@ geekdocFilePath: grpc.md
 {{ range .Fields -}}
 {{- $loca := printf "#%s" (.LongType | lower | replace "." "") -}}
 {{- if and (hasPrefix "ocis." .LongType) (ge (len $filenameParts) 3) -}}
-	{{- $rep := regexReplaceAll "[^/]+" (slice $filenameParts 1 (sub (len $filenameParts) 1) | join "/") ".." -}}
-	{{- $fieldDir := dir (.LongType | lower | replace "." "/") -}}
-	{{- $loca = printf "%s/%s/grpc.md#%s" $rep (substr 5 (len $fieldDir) $fieldDir) (.Type | lower | replace "." "") -}}
+	{{- $ltypeSpl := .LongType | splitList "." -}}
+	{{- $ltypePkg := slice $ltypeSpl 0 (sub (len $ltypeSpl) 1) | join "." -}}
+	{{- $loca = printf "/grpc_apis/%s/#%s" $ltypePkg (.Type | lower) -}}
 {{- end -}}
 | {{.Name}} | [{{.LongType}}]({{ $loca }}) | {{.Label}} | {{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end }} |
 {{ end -}}
