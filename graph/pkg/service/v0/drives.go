@@ -24,7 +24,7 @@ import (
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
-	"github.com/owncloud/ocis/graph/pkg/service/v0/net/headers"
+	"github.com/owncloud/ocis/graph/pkg/service/v0/net"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	sproto "github.com/owncloud/ocis/settings/pkg/proto/v0"
 	settingsSvc "github.com/owncloud/ocis/settings/pkg/service/v0"
@@ -524,11 +524,11 @@ func (g Graph) getExtendedSpaceProperties(ctx context.Context, space *storagepro
 		return nil, fmt.Errorf("space does not support the spaces download protocol")
 	}
 
-	httpReq, err := rhttp.NewRequest(ctx, "GET", ep, nil)
+	httpReq, err := rhttp.NewRequest(ctx, http.MethodGet, ep, nil)
 	if err != nil {
 		return nil, err
 	}
-	httpReq.Header.Set(headers.TokenTransportHeader, tk)
+	httpReq.Header.Set(net.HeaderTokenTransport, tk)
 
 	httpClient := g.GetHTTPClient()
 

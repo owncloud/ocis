@@ -114,7 +114,7 @@ func cs3TimestampToTime(t *types.Timestamp) time.Time {
 
 func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*libregraph.DriveItem, error) {
 	size := new(int64)
-	*size = int64(res.Size) // uint64 -> int :boom:
+	*size = int64(res.Size) // TODO lurking overflow: make size of libregraph drive item use uint64
 
 	driveItem := &libregraph.DriveItem{
 		Id:   &res.Id.OpaqueId,
@@ -132,7 +132,8 @@ func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*libregraph.Driv
 		driveItem.LastModifiedDateTime = &lastModified
 	}
 	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_FILE && res.MimeType != "" {
-		driveItem.File = &libregraph.OpenGraphFile{ // FIXME We cannot use libregraph.File here because the openapi codegenerator autodetects 'File' as a go type ...
+		// We cannot use a libregraph.File here because the openapi codegenerator autodetects 'File' as a go type ...
+		driveItem.File = &libregraph.OpenGraphFile{
 			MimeType: &res.MimeType,
 		}
 	}
