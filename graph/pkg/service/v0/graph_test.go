@@ -2,6 +2,7 @@ package svc_test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -19,6 +20,14 @@ import (
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
 )
+
+var spaceYaml = strings.NewReader(`---
+version: "1.0"
+description: read from yaml
+special:
+  readme: readme2.md
+  image: .img/space.png
+`)
 
 var _ = Describe("Graph", func() {
 	var (
@@ -131,13 +140,7 @@ var _ = Describe("Graph", func() {
 			// mock space.yaml
 			httpClient.On("Do", mock.Anything, mock.Anything).Return(&http.Response{
 				StatusCode: http.StatusOK,
-				Body: io.NopCloser(strings.NewReader(`---
-version: "1.0"
-description: read from yaml
-special:
-  readme: readme2.md
-  image: .img/space.png
-`)),
+				Body:       io.NopCloser(spaceYaml),
 			}, nil)
 			gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
 				Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
@@ -191,43 +194,63 @@ special:
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
-			body, _ := io.ReadAll(rr.Body)
-			Expect(body).To(MatchJSON(`
-			{
-				"value":[
-					{
-						"driveType":"aspacetype",
-						"id":"aspaceid!anopaqueid",
-						"name":"aspacename",
-						"description":"read from yaml",
-						"root":{
-							"id":"aspaceid!anopaqueid",
-							"webDavUrl":"https://localhost:9200/dav/spaces/aspaceid!anopaqueid"
-						},
-						"special": [
-						  {
-							"id": "readmeid",
-							"name": "readme2.md",
-							"size": 10,
-							"specialFolder": {
-							  "name": "readme"
-							},
-							"webDavUrl": "https://localhost:9200/dav/spaces/aspaceid/readme2.md"
-						  },
-						  {
-							"id": "imageid",
-							"name": "space.png",
-							"size": 20,
-							"specialFolder": {
-							  "name": "image"
-							},
-							"webDavUrl": "https://localhost:9200/dav/spaces/aspaceid/.img/space.png"
-						  }
-						]
+			type expectedJSON struct {
+				Value []struct {
+					DriveType   string `json:"driveType"`
+					ID          string
+					Name        string
+					Description string
+					Root        struct {
+						ID        string
+						WebDavURL string
 					}
-				]
-			}		
-			`))
+					Special []struct {
+						ID            string
+						Name          string
+						Size          int
+						SpecialFolder struct {
+							Name string
+						}
+						WebDavURL string
+					}
+				}
+			}
+			body, _ := io.ReadAll(rr.Body)
+			e := expectedJSON{}
+			err := json.Unmarshal(body, &e)
+			Expect(err).To(BeNil())
+
+			Expect(len(e.Value)).To(Equal(1))
+
+			v := e.Value[0]
+			eq := func(actual string, expected string) {
+				Expect(actual).To(Equal(expected))
+			}
+			eq(v.DriveType, "aspacetype")
+			eq(v.ID, "aspaceid!anopaqueid")
+			eq(v.Name, "aspacename")
+			eq(v.Description, "read from yaml")
+			eq(v.Root.ID, "aspaceid!anopaqueid")
+			eq(v.Root.WebDavURL, "https://localhost:9200/dav/spaces/aspaceid!anopaqueid")
+
+			Expect(len(v.Special)).To(Equal(2))
+			for _, s := range v.Special {
+				switch s.ID {
+				default:
+					Fail("unexpected id" + s.ID)
+				case "readmeid":
+					eq(s.Name, "readme2.md")
+					Expect(s.Size).To(Equal(10))
+					eq(s.SpecialFolder.Name, "readme")
+					eq(s.WebDavURL, "https://localhost:9200/dav/spaces/aspaceid/readme2.md")
+				case "imageid":
+					eq(s.Name, "space.png")
+					Expect(s.Size).To(Equal(20))
+					eq(s.SpecialFolder.Name, "image")
+					eq(s.WebDavURL, "https://localhost:9200/dav/spaces/aspaceid/.img/space.png")
+
+				}
+			}
 		})
 	})
 })
