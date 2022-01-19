@@ -174,6 +174,11 @@ func (i *CS3) GetGroup(ctx context.Context, groupID string) (*libregraph.Group, 
 	return createGroupModelFromCS3(res.Group), nil
 }
 
+// GetGroupMembers implements the Backend Interface. It's currently not supported for the CS3 backend
+func (i *CS3) GetGroupMembers(ctx context.Context, groupID string) ([]*libregraph.User, error) {
+	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
+}
+
 func createGroupModelFromCS3(g *cs3group.Group) *libregraph.Group {
 	if g.Id == nil {
 		g.Id = &cs3group.GroupId{}

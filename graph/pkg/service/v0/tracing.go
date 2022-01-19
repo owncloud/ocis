@@ -65,6 +65,11 @@ func (t tracing) PostGroup(w http.ResponseWriter, r *http.Request) {
 	t.next.PostGroup(w, r)
 }
 
+// GetGroupMembers implements the Service interface.
+func (t tracing) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
+	t.next.GetGroupMembers(w, r)
+}
+
 // GetDrives implements the Service interface.
 func (t tracing) GetDrives(w http.ResponseWriter, r *http.Request) {
 	t.next.GetDrives(w, r)

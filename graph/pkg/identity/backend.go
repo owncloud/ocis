@@ -25,6 +25,7 @@ type Backend interface {
 	CreateGroup(ctx context.Context, group libregraph.Group) (*libregraph.Group, error)
 	GetGroup(ctx context.Context, nameOrID string) (*libregraph.Group, error)
 	GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error)
+	GetGroupMembers(ctx context.Context, id string) ([]*libregraph.User, error)
 }
 
 func CreateUserModelFromCS3(u *cs3.User) *libregraph.User {
