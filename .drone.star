@@ -7,6 +7,7 @@ OC_CI_GOLANG = "owncloudci/golang:1.17"
 OC_CI_NODEJS = "owncloudci/nodejs:14"
 OC_CI_PHP = "owncloudci/php:7.4"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
+OC_TESTING_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.2.0"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
 REDIS = "redis:6-alpine"
 
@@ -1443,8 +1444,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
 def middlewareService():
     return [{
         "name": "middleware",
-        "image": "owncloud/owncloud-test-middleware",
-        "pull": "always",
+        "image": OC_TESTING_MIDDLEWARE,
         "environment": {
             "BACKEND_HOST": "https://ocis-server:9200",
             "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/storage/owncloud/",
