@@ -1,8 +1,11 @@
 package svc
 
 import (
+	"crypto/tls"
 	"net/http"
 
+	"github.com/ReneKroon/ttlcache/v2"
+	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
@@ -21,6 +24,8 @@ type Service interface {
 	PostUser(http.ResponseWriter, *http.Request)
 	DeleteUser(http.ResponseWriter, *http.Request)
 	PatchUser(http.ResponseWriter, *http.Request)
+
+	GetDrives(w http.ResponseWriter, r *http.Request)
 }
 
 // NewService returns a service implementation for Service.
@@ -54,10 +59,29 @@ func NewService(opts ...Option) Service {
 	}
 
 	svc := Graph{
-		config:          options.Config,
-		mux:             m,
-		logger:          &options.Logger,
-		identityBackend: backend,
+		config:               options.Config,
+		mux:                  m,
+		logger:               &options.Logger,
+		identityBackend:      backend,
+		spacePropertiesCache: ttlcache.NewCache(),
+	}
+	if options.GatewayClient == nil {
+		var err error
+		svc.gatewayClient, err = pool.GetGatewayServiceClient(options.Config.Reva.Address)
+		if err != nil {
+			options.Logger.Error().Err(err).Msg("Could not get gateway client")
+			return nil
+		}
+	} else {
+		svc.gatewayClient = options.GatewayClient
+	}
+	if options.HTTPClient == nil {
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{
+			InsecureSkipVerify: options.Config.Spaces.Insecure, //nolint:gosec
+		}
+		svc.httpClient = &http.Client{}
+	} else {
+		svc.httpClient = options.HTTPClient
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {

@@ -24,6 +24,7 @@ func DefaultConfig() *Config {
 			WebDavBase:   "https://localhost:9200",
 			WebDavPath:   "/dav/spaces/",
 			DefaultQuota: "1000000000",
+			Insecure:     false,
 		},
 		Identity: Identity{
 			Backend: "cs3",

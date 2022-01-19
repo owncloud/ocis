@@ -12,9 +12,11 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger     log.Logger
-	Config     *config.Config
-	Middleware []func(http.Handler) http.Handler
+	Logger        log.Logger
+	Config        *config.Config
+	Middleware    []func(http.Handler) http.Handler
+	GatewayClient GatewayClient
+	HTTPClient    HTTPClient
 }
 
 // newOptions initializes the available default options.
@@ -46,5 +48,19 @@ func Config(val *config.Config) Option {
 func Middleware(val ...func(http.Handler) http.Handler) Option {
 	return func(o *Options) {
 		o.Middleware = val
+	}
+}
+
+// WithGatewayClient provides a function to set the gateway client option.
+func WithGatewayClient(val GatewayClient) Option {
+	return func(o *Options) {
+		o.GatewayClient = val
+	}
+}
+
+// WithHTTPClient provides a function to set the http client option.
+func WithHTTPClient(val HTTPClient) Option {
+	return func(o *Options) {
+		o.HTTPClient = val
 	}
 }

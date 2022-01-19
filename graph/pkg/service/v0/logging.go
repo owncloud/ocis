@@ -53,3 +53,8 @@ func (l logging) DeleteUser(w http.ResponseWriter, r *http.Request) {
 func (l logging) PatchUser(w http.ResponseWriter, r *http.Request) {
 	l.next.PatchUser(w, r)
 }
+
+// GetDrives implements the Service interface.
+func (l logging) GetDrives(w http.ResponseWriter, r *http.Request) {
+	l.next.GetDrives(w, r)
+}

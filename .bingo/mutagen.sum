@@ -10,6 +10,7 @@ github.com/mattn/go-colorable v0.1.8 h1:c1ghPdyEDarC70ftn0y+A/Ee++9zz8ljHG1b13eJ
 github.com/mattn/go-isatty v0.0.13 h1:qdl+GuBjcsKKDco5BsxPJlId98mSWNKqYA+Co0SC1yA=
 github.com/mutagen-io/apimachinery v0.21.3-mutagen1 h1:7bnH35Ayna8ERRINDJ+J+bRd/85vv7ySFzFYpkmX62o=
 github.com/mutagen-io/extstat v0.0.0-20210224131814-32fa3f057fa8 h1:NEBqH/oVnWBunxdrdy1vlyGior8smhC6jZjxlWSG2BU=
+github.com/mutagen-io/fsevents v0.0.0-20180903111129-10556809b434 h1:PYeqqury0vVzjjUVO6dwtfA2HXOaPYgDclSgKX8u0gs=
 github.com/mutagen-io/gopass v0.0.0-20170602182606-9a121bec1ae7 h1:0PaUmAw6e54jseSG0ob2U9P1p6p+Sppw3sanphmM4LY=
 github.com/mutagen-io/mutagen v0.12.0 h1:RtTezK5ewMhsLnHwXY4g/E5xaq63GWZrl1Ocr7W5e9w=
 github.com/mutagen-io/mutagen v0.12.0/go.mod h1:Ms9m9qVNIHVR6W4ceY/OFv31V2nN1hH1atxfUP1W4F0=
