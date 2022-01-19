@@ -54,6 +54,21 @@ func (l logging) PatchUser(w http.ResponseWriter, r *http.Request) {
 	l.next.PatchUser(w, r)
 }
 
+// GetGroups implements the Service interface.
+func (l logging) GetGroups(w http.ResponseWriter, r *http.Request) {
+	l.next.GetGroups(w, r)
+}
+
+// GetGroup implements the Service interface.
+func (l logging) GetGroup(w http.ResponseWriter, r *http.Request) {
+	l.next.GetGroup(w, r)
+}
+
+// PostGroup implements the Service interface.
+func (l logging) PostGroup(w http.ResponseWriter, r *http.Request) {
+	l.next.PostGroup(w, r)
+}
+
 // GetDrives implements the Service interface.
 func (l logging) GetDrives(w http.ResponseWriter, r *http.Request) {
 	l.next.GetDrives(w, r)

@@ -46,8 +46,10 @@ type userAttributeMap struct {
 }
 
 type groupAttributeMap struct {
-	name string
-	id   string
+	name         string
+	id           string
+	member       string
+	memberSyntax string
 }
 
 func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LDAP, error) {
@@ -66,8 +68,10 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		return nil, errors.New("invalid group attribute mappings")
 	}
 	gam := groupAttributeMap{
-		name: config.GroupNameAttribute,
-		id:   config.GroupIDAttribute,
+		name:         config.GroupNameAttribute,
+		id:           config.GroupIDAttribute,
+		member:       "member",
+		memberSyntax: "dn",
 	}
 
 	var userScope, groupScope int
@@ -180,7 +184,7 @@ func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
 	return nil
 }
 
-// UpdateUser implements the Backend Interface. It's currently not suported for the CS3 backedn
+// UpdateUser implements the Backend Interface for the LDAP Backend
 func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.User) (*libregraph.User, error) {
 	if !i.writeEnabled {
 		return nil, errReadOnly
@@ -235,15 +239,28 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 }
 
 func (i *LDAP) getUserByDN(dn string) (*ldap.Entry, error) {
+	attrs := []string{
+		i.userAttributeMap.displayName,
+		i.userAttributeMap.id,
+		i.userAttributeMap.mail,
+		i.userAttributeMap.userName,
+	}
+	return i.getEntryByDN(dn, attrs)
+}
+
+func (i *LDAP) getGroupByDN(dn string) (*ldap.Entry, error) {
+	attrs := []string{
+		i.groupAttributeMap.id,
+		i.groupAttributeMap.name,
+	}
+	return i.getEntryByDN(dn, attrs)
+}
+
+func (i *LDAP) getEntryByDN(dn string, attrs []string) (*ldap.Entry, error) {
 	searchRequest := ldap.NewSearchRequest(
 		dn, ldap.ScopeBaseObject, ldap.NeverDerefAliases, 1, 0, false,
 		"(objectclass=*)",
-		[]string{
-			i.userAttributeMap.displayName,
-			i.userAttributeMap.id,
-			i.userAttributeMap.mail,
-			i.userAttributeMap.userName,
-		},
+		attrs,
 		nil,
 	)
 
@@ -419,6 +436,56 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 	return groups, nil
 }
 
+// CreateGroup implements the Backend Interface for the LDAP Backend
+// It is currently restricted to managing groups based on the "groupOfNames" ObjectClass.
+// As "groupOfNames" requires a "member" Attribute to be present. Empty Groups (groups
+// without a member) a represented by adding an empty DN as the single member.
+func (i *LDAP) CreateGroup(ctx context.Context, group libregraph.Group) (*libregraph.Group, error) {
+	if !i.writeEnabled {
+		return nil, errorcode.New(errorcode.NotAllowed, "server is configured read-only")
+	}
+	ar := ldap.AddRequest{
+		DN: fmt.Sprintf("cn=%s,%s", *group.DisplayName, i.groupBaseDN),
+		Attributes: []ldap.Attribute{
+			{
+				Type: i.groupAttributeMap.name,
+				Vals: []string{*group.DisplayName},
+			},
+			// This is a crutch to allow groups without members for LDAP Server's which
+			// that apply strict Schema checking. The RFCs define "member/uniqueMember"
+			// as required attribute for groupOfNames/groupOfUniqueNames. So we
+			// add an empty string (which is a valid DN) as the initial member.
+			// It will be replace once real members are added.
+			// We might wanna use the newer, but not so broadly used "groupOfMembers"
+			// objectclass (RFC2307bis-02) where "member" is optional.
+			{
+				Type: i.groupAttributeMap.member,
+				Vals: []string{""},
+			},
+		},
+	}
+
+	// TODO make group objectclass configurable to support e.g. posixGroup, groupOfUniqueNames, groupOfMembers?}
+	objectClasses := []string{"groupOfNames", "top"}
+
+	if !i.useServerUUID {
+		ar.Attribute("owncloudUUID", []string{uuid.Must(uuid.NewV4()).String()})
+		objectClasses = append(objectClasses, "owncloud")
+	}
+	ar.Attribute("objectClass", objectClasses)
+
+	if err := i.conn.Add(&ar); err != nil {
+		return nil, err
+	}
+
+	// Read	back group from LDAP to get the generated UUID
+	e, err := i.getGroupByDN(ar.DN)
+	if err != nil {
+		return nil, err
+	}
+	return i.createGroupModelFromLDAP(e), nil
+}
+
 func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 	if e == nil {
 		return nil
@@ -433,9 +500,8 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 
 func (i *LDAP) createGroupModelFromLDAP(e *ldap.Entry) *libregraph.Group {
 	return &libregraph.Group{
-		DisplayName:              pointerOrNil(e.GetEqualFoldAttributeValue(i.groupAttributeMap.name)),
-		OnPremisesSamAccountName: pointerOrNil(e.GetEqualFoldAttributeValue(i.groupAttributeMap.name)),
-		Id:                       pointerOrNil(e.GetEqualFoldAttributeValue(i.groupAttributeMap.id)),
+		DisplayName: pointerOrNil(e.GetEqualFoldAttributeValue(i.groupAttributeMap.name)),
+		Id:          pointerOrNil(e.GetEqualFoldAttributeValue(i.groupAttributeMap.id)),
 	}
 }
 func pointerOrNil(val string) *string {

@@ -50,6 +50,21 @@ func (t tracing) PatchUser(w http.ResponseWriter, r *http.Request) {
 	t.next.PatchUser(w, r)
 }
 
+// GetGroups implements the Service interface.
+func (t tracing) GetGroups(w http.ResponseWriter, r *http.Request) {
+	t.next.GetGroups(w, r)
+}
+
+// GetGroup implements the Service interface.
+func (t tracing) GetGroup(w http.ResponseWriter, r *http.Request) {
+	t.next.GetGroup(w, r)
+}
+
+// PostGroup implements the Service interface.
+func (t tracing) PostGroup(w http.ResponseWriter, r *http.Request) {
+	t.next.PostGroup(w, r)
+}
+
 // GetDrives implements the Service interface.
 func (t tracing) GetDrives(w http.ResponseWriter, r *http.Request) {
 	t.next.GetDrives(w, r)

@@ -142,6 +142,11 @@ func (i *CS3) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregra
 	return groups, nil
 }
 
+// CreateGroup implements the Backend Interface. It's currently not supported for the CS3 backend
+func (i *CS3) CreateGroup(ctx context.Context, group libregraph.Group) (*libregraph.Group, error) {
+	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
+}
+
 func (i *CS3) GetGroup(ctx context.Context, groupID string) (*libregraph.Group, error) {
 	client, err := pool.GetGatewayServiceClient(i.Config.Address)
 	if err != nil {

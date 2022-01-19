@@ -21,6 +21,8 @@ type Backend interface {
 	GetUser(ctx context.Context, nameOrID string) (*libregraph.User, error)
 	GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error)
 
+	// Create Group creates the supplied group in the identity backend.
+	CreateGroup(ctx context.Context, group libregraph.Group) (*libregraph.Group, error)
 	GetGroup(ctx context.Context, nameOrID string) (*libregraph.Group, error)
 	GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error)
 }
