@@ -90,7 +90,6 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 
 // GetSingleDrive does a lookup of a single space by spaceId
 func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
-	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
 	driveId := chi.URLParam(r, "driveID")
 	if driveId == "" {
 		err := fmt.Errorf("no valid space id retrieved")
@@ -98,27 +97,20 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-	// Add the driveId filter to the request query
-	spaceFilterValue := fmt.Sprintf("id eq %s", driveId)
-	query := r.URL.Query()
-	query.Add("$filter", spaceFilterValue)
-	// Parse the request with odata parser
-	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, query)
-	if err != nil {
-		g.logger.Err(err).Interface("query", r.URL.Query()).Msg("query error")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
-		return
-	}
 
 	g.logger.Info().Str("driveID", driveId).Msg("Calling GetSingleDrive")
 	ctx := r.Context()
 
-	filters, err := generateCs3Filters(odataReq)
-	if err != nil {
-		g.logger.Err(err).Interface("query", r.URL.Query()).Msg("query error")
-		errorcode.NotSupported.Render(w, r, http.StatusNotImplemented, err.Error())
-		return
+	var filters []*storageprovider.ListStorageSpacesRequest_Filter
+	filterDriveId := &storageprovider.ListStorageSpacesRequest_Filter{
+		Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,
+		Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
+			Id: &storageprovider.StorageSpaceId{
+				OpaqueId: driveId,
+			},
+		},
 	}
+	filters = append(filters, filterDriveId)
 	res, err := g.ListStorageSpacesWithFilters(ctx, filters)
 	switch {
 	case err != nil:
@@ -127,6 +119,8 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
 		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
+			// the client is doing a lookup for a specific space, therefore we need to return
+			// not found to the caller
 			g.logger.Error().Str("driveId", driveId).Msg(fmt.Sprintf("space with id `%s` not found", driveId))
 			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, fmt.Sprintf("space with id `%s` not found", driveId))
 			return
@@ -151,14 +145,14 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 	switch num := len(spaces); {
 	case num == 0:
 		g.logger.Error().Str("driveId", driveId).Msg("no space found")
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, fmt.Sprintf("no space found with id %s", driveId))
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, fmt.Sprintf("space with id `%s` not found", driveId))
 		return
 	case num == 1:
 		render.Status(r, http.StatusOK)
 		render.JSON(w, r, spaces[0])
 	default:
-		g.logger.Error().Int("number", num).Msg("an unexpected number of spaces was found")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "an unexpected number of spaces was found")
+		g.logger.Error().Int("number", num).Msg("expected to find a single space but found more")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "expected to find a single space but found more")
 		return
 	}
 }
