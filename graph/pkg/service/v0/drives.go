@@ -127,8 +127,8 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
 		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
-			g.logger.Error().Str("driveId", driveId).Msg("no space found")
-			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, fmt.Sprintf("no space found with id %s", driveId))
+			g.logger.Error().Str("driveId", driveId).Msg(fmt.Sprintf("space with id `%s` not found", driveId))
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, fmt.Sprintf("space with id `%s` not found", driveId))
 			return
 		}
 		g.logger.Error().Err(err).Msg("error sending list storage spaces grpc request")
