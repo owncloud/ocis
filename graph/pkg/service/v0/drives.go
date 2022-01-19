@@ -100,16 +100,16 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Str("driveID", driveID).Msg("Calling GetSingleDrive")
 	ctx := r.Context()
 
-	var filters []*storageprovider.ListStorageSpacesRequest_Filter
-	filterDriveID := &storageprovider.ListStorageSpacesRequest_Filter{
-		Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,
-		Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
-			Id: &storageprovider.StorageSpaceId{
-				OpaqueId: driveID,
+	filters := []*storageprovider.ListStorageSpacesRequest_Filter{
+		{
+			Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,
+			Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
+				Id: &storageprovider.StorageSpaceId{
+					OpaqueId: driveID,
+				},
 			},
 		},
 	}
-	filters = append(filters, filterDriveID)
 	res, err := g.ListStorageSpacesWithFilters(ctx, filters)
 	switch {
 	case err != nil:
