@@ -84,6 +84,7 @@ The following sections list the changes for unreleased.
    Added a new graph endpoint to delete and purge spaces.
 
    https://github.com/owncloud/ocis/pull/2979
+   https://github.com/owncloud/ocis/pull/3000
 
 * Enhancement - Add new file url of the app provider to the ocs capabilities: [#2884](https://github.com/owncloud/ocis/pull/2884)
 
