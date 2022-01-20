@@ -779,7 +779,12 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 			OpaqueId: root.StorageId,
 		},
 	})
-	if err != nil || dRes.Status.Code != cs3rpc.Code_CODE_OK {
+	switch {
+	case dRes.Status.Code == cs3rpc.Code_CODE_INVALID_ARGUMENT:
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, dRes.Status.Message)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	case err != nil || dRes.Status.Code != cs3rpc.Code_CODE_OK:
 		g.logger.Error().Err(err).Msg("error deleting storage space")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
