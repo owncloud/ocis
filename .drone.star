@@ -361,7 +361,7 @@ def uploadScanResults(ctx):
     if ctx.build.source_repo:
         fork_handling = [
             "git remote add fork https://github.com/%s.git" % (ctx.build.source_repo),
-            "git pull fork",
+            "git fetch fork",
         ]
 
     return {
