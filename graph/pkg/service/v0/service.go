@@ -35,6 +35,7 @@ type Service interface {
 	GetGroup(http.ResponseWriter, *http.Request)
 	PostGroup(http.ResponseWriter, *http.Request)
 	GetGroupMembers(http.ResponseWriter, *http.Request)
+	PostGroupMember(http.ResponseWriter, *http.Request)
 
 	GetDrives(w http.ResponseWriter, r *http.Request)
 }
@@ -117,7 +118,10 @@ func NewService(opts ...Option) Service {
 				r.Post("/", svc.PostGroup)
 				r.Route("/{groupID}", func(r chi.Router) {
 					r.Get("/", svc.GetGroup)
-					r.Get("/members", svc.GetGroupMembers)
+					r.Route("/members", func(r chi.Router) {
+						r.Get("/", svc.GetGroupMembers)
+						r.Post("/$ref", svc.PostGroupMember)
+					})
 				})
 			})
 			r.Group(func(r chi.Router) {

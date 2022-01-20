@@ -74,6 +74,11 @@ func (i instrument) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 	i.next.GetGroupMembers(w, r)
 }
 
+// PostGroupMember implements the Service interface.
+func (i instrument) PostGroupMember(w http.ResponseWriter, r *http.Request) {
+	i.next.PostGroupMember(w, r)
+}
+
 // GetDrives implements the Service interface.
 func (i instrument) GetDrives(w http.ResponseWriter, r *http.Request) {
 	i.next.GetDrives(w, r)

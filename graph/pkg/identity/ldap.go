@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-ldap/ldap/v3"
 	"github.com/gofrs/uuid"
+	ldapdn "github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/owncloud/ocis/graph/pkg/config"
@@ -551,6 +552,53 @@ func (i *LDAP) CreateGroup(ctx context.Context, group libregraph.Group) (*libreg
 	return i.createGroupModelFromLDAP(e), nil
 }
 
+// AddMemberToGroup implements the Backend Interface for the LDAP backend.
+// Currently it is limited to adding Users as Group members. Adding other groups
+// as members is not yet implemented
+func (i *LDAP) AddMemberToGroup(ctx context.Context, groupID string, memberID string) error {
+	ge, err := i.getLDAPGroupByID(groupID, true)
+	if err != nil {
+		return err
+	}
+	me, err := i.getLDAPUserByID(memberID)
+	if err != nil {
+		return err
+	}
+	i.logger.Debug().Str("backend", "ldap").Str("groupdn", ge.DN).Str("member", me.DN).Msg("Add Member")
+
+	mr := ldap.ModifyRequest{DN: ge.DN}
+	// Handle empty groups (using the empty member attribute)
+	current := ge.GetEqualFoldAttributeValues(i.groupAttributeMap.member)
+	if len(current) == 1 && current[0] == "" {
+		mr.Delete(i.groupAttributeMap.member, []string{""})
+	}
+	nUserDN, err := ldapdn.ParseNormalize(me.DN)
+	for _, member := range current {
+		if member == "" {
+			continue
+		}
+		if nMember, err := ldapdn.ParseNormalize(member); err != nil {
+			// We couldn't parse the member value as a DN. Let's keep it
+			// as it is but log a warning
+			i.logger.Warn().Str("memberDN", member).Err(err).Msg("Couldn't parse DN")
+			continue
+		} else {
+			if nMember == nUserDN {
+				i.logger.Info().Str("memberDN", member).Msg("User already present. Nothing to do")
+				return nil
+			}
+		}
+
+	}
+
+	mr.Add(i.groupAttributeMap.member, []string{me.DN})
+
+	if err := i.conn.Modify(&mr); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 	if e == nil {
 		return nil
@@ -569,6 +617,7 @@ func (i *LDAP) createGroupModelFromLDAP(e *ldap.Entry) *libregraph.Group {
 		Id:          pointerOrNil(e.GetEqualFoldAttributeValue(i.groupAttributeMap.id)),
 	}
 }
+
 func pointerOrNil(val string) *string {
 	if val == "" {
 		return nil

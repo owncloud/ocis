@@ -26,6 +26,8 @@ type Backend interface {
 	GetGroup(ctx context.Context, nameOrID string) (*libregraph.Group, error)
 	GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error)
 	GetGroupMembers(ctx context.Context, id string) ([]*libregraph.User, error)
+	// AddMemberToGroup adds a new member (reference by ID) to supplied group in the identity backend.
+	AddMemberToGroup(ctx context.Context, groupID string, memberID string) error
 }
 
 func CreateUserModelFromCS3(u *cs3.User) *libregraph.User {
