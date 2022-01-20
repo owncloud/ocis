@@ -12,9 +12,17 @@ Feature: Share spaces
     And the administrator has given "Alice" the role "Admin" using the settings api
 
 
-  Scenario: A user can share a space to another user
+  Scenario: A user can share a space to another user with role viewer
     Given user "Alice" has created a space "Space to share" of type "project" with quota "10"
-    When user "Alice" shares a space "Space to share" to user "Brian"
+    When user "Alice" shares a space "Space to share" to user "Brian" with role "viewer"
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "200"
+    And the OCS status message should be "OK"
+
+  
+  Scenario: A user can share a space to another user with role editor
+    Given user "Alice" has created a space "Space to share with role editor" of type "project" with quota "10"
+    When user "Alice" shares a space "Space to share" to user "Brian" with role "editor"
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
@@ -22,7 +30,7 @@ Feature: Share spaces
 
   Scenario: A user can see that a received shared space is available
     Given user "Alice" has created a space "Share space to Brian" of type "project" with quota "10"
-    And user "Alice" has shared a space "Share space to Brian" to user "Brian"
+    And user "Alice" has shared a space "Share space to Brian" to user "Brian" with role "viewer"
     When user "Brian" lists all available spaces via the GraphApi
     Then the json responded should contain a space "Share space to Brian" with these key and value pairs:
       | key              | value                            |
@@ -36,7 +44,7 @@ Feature: Share spaces
   Scenario: A user can see a file in a received shared space
     Given user "Alice" has created a space "Share space with file" of type "project" with quota "10"
     And user "Alice" has uploaded a file inside space "Share space with file" with content "Test" to "test.txt"
-    When user "Alice" has shared a space "Share space with file" to user "Brian"
+    When user "Alice" has shared a space "Share space with file" to user "Brian" with role "viewer"
     Then for user "Brian" the space "Share space with file" should contain these entries:
       | test.txt |
 
@@ -44,14 +52,14 @@ Feature: Share spaces
   Scenario: A user can see a folder in received shared space
     Given user "Alice" has created a space "Share space with folder" of type "project" with quota "10"
     And user "Alice" has created a folder "Folder Main" in space "Share space with folder"
-    When user "Alice" has shared a space "Share space with folder" to user "Brian"
+    When user "Alice" has shared a space "Share space with folder" to user "Brian" with role "viewer"
     Then for user "Brian" the space "Share space with folder" should contain these entries:
       | Folder Main |
 
 
   Scenario: When a user unshares a space, the space becomes unavailable to the receiver
     Given user "Alice" has created a space "Unshare space" of type "project" with quota "10"
-    And user "Alice" has shared a space "Unshare space" to user "Brian"
+    And user "Alice" has shared a space "Unshare space" to user "Brian" with role "viewer"
     When user "Brian" lists all available spaces via the GraphApi
     Then the json responded should contain a space "Unshare space" with these key and value pairs:
       | key       | value         |
@@ -61,4 +69,4 @@ Feature: Share spaces
     When user "Alice" unshares a space "Unshare space" to user "Brian"
     Then the HTTP status code should be "200"
     And user "Brian" lists all available spaces via the GraphApi
-    And the json responded should not contain a space "Unshare space"
+    And the json responded should not contain a space with name "Unshare space"

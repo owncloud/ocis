@@ -1183,11 +1183,12 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" shares a space "([^"]*)" to user "([^"]*)"$/
+	 * @When /^user "([^"]*)" shares a space "([^"]*)" to user "([^"]*)" with role "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
 	 * @param  string $userRecipient
+	 * @param  string $role
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -1195,10 +1196,22 @@ class SpacesContext implements Context {
 	public function sendShareSpaceRequest(
 		string $user,
 		string $spaceName,
-		string $userRecipient
+		string $userRecipient,
+		string $role
 	): void {
+		switch ($role) {
+			case "viewer":
+				$role = 1;
+				break;
+			case "editor":
+				$role = 15;
+				break;
+			default:
+				$role = 1;
+		}
+
 		$space = $this->getSpaceByName($user, $spaceName);
-		$body = ["space_ref" => $space['id'], "shareType" => 7, "shareWith" => $userRecipient];
+		$body = ["space_ref" => $space['id'], "shareType" => 7, "shareWith" => $userRecipient, "permissions" => $role];
 
 		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares";
 
@@ -1215,11 +1228,12 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has shared a space "([^"]*)" to user "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has shared a space "([^"]*)" to user "([^"]*)" with role "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
 	 * @param  string $userRecipient
+	 * @param  string $role
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -1227,9 +1241,10 @@ class SpacesContext implements Context {
 	public function userHasSharedSpace(
 		string $user,
 		string $spaceName,
-		string $userRecipient
+		string $userRecipient,
+		string $role
 	): void {
-		$this->sendShareSpaceRequest($user, $spaceName, $userRecipient);
+		$this->sendShareSpaceRequest($user, $spaceName, $userRecipient, $role);
 
 		$expectedHTTPStatus = "200";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
