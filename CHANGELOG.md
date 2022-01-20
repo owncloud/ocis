@@ -18,6 +18,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add spaces capability: [#2931](https://github.com/owncloud/ocis/pull/2931)
 * Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
 * Enhancement - Update REVA to v1.16.1-0.20220112085026-07451f6cd806: [#2953](https://github.com/owncloud/ocis/pull/2953)
+* Enhancement - Add endpoint to retrieve a single space: [#2978](https://github.com/owncloud/ocis/pull/2978)
 * Enhancement - Add filter by driveType and id to /me/drives: [#2946](https://github.com/owncloud/ocis/pull/2946)
 * Enhancement - Update REVA to xxx: [#2878](https://github.com/owncloud/ocis/pull/2878)
 * Enhancement - Update ownCloud Web to v4.8.0: [#2895](https://github.com/owncloud/ocis/pull/2895)
@@ -106,6 +107,12 @@ The following sections list the changes for unreleased.
    Update REVA to v1.16.1-0.20220112085026-07451f6cd806
 
    https://github.com/owncloud/ocis/pull/2953
+
+* Enhancement - Add endpoint to retrieve a single space: [#2978](https://github.com/owncloud/ocis/pull/2978)
+
+   We added the endpoint ``/drives/{driveID}`` to get a single space by id from the server.
+
+   https://github.com/owncloud/ocis/pull/2978
 
 * Enhancement - Add filter by driveType and id to /me/drives: [#2946](https://github.com/owncloud/ocis/pull/2946)
 

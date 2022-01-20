@@ -7,6 +7,7 @@ OC_CI_GOLANG = "owncloudci/golang:1.17"
 OC_CI_NODEJS = "owncloudci/nodejs:14"
 OC_CI_PHP = "owncloudci/php:7.4"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
+OC_TESTING_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.2.0"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
 REDIS = "redis:6-alpine"
 
@@ -356,7 +357,12 @@ def uploadScanResults(ctx):
             "SONAR_PULL_REQUEST_KEY": "%s" % (ctx.build.ref.replace("refs/pull/", "").split("/")[0]),
         })
 
-    repo_slug = ctx.build.source_repo if ctx.build.source_repo else ctx.repo.slug
+    fork_handling = []
+    if ctx.build.source_repo != "" and ctx.build.source_repo != ctx.repo.slug:
+        fork_handling = [
+            "git remote add fork https://github.com/%s.git" % (ctx.build.source_repo),
+            "git fetch fork",
+        ]
 
     return {
         "kind": "pipeline",
@@ -374,9 +380,13 @@ def uploadScanResults(ctx):
                 "name": "clone",
                 "image": "alpine/git:latest",
                 "commands": [
-                    "git clone https://github.com/%s.git ." % (repo_slug),
-                    "git checkout $DRONE_COMMIT",
-                ],
+                                # Always use the owncloud/ocis repository as base to have an up to date default branch.
+                                # This is needed for the skipIfUnchanged step, since it references a commit on master (which could be absent on a fork)
+                                "git clone https://github.com/%s.git ." % (ctx.repo.slug),
+                            ] + fork_handling +
+                            [
+                                "git checkout $DRONE_COMMIT",
+                            ],
             },
         ] + skipIfUnchanged(ctx, "unit-tests") + [
             {
@@ -1443,8 +1453,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
 def middlewareService():
     return [{
         "name": "middleware",
-        "image": "owncloud/owncloud-test-middleware",
-        "pull": "always",
+        "image": OC_TESTING_MIDDLEWARE,
         "environment": {
             "BACKEND_HOST": "https://ocis-server:9200",
             "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/storage/owncloud/",

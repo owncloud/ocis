@@ -63,7 +63,7 @@ services:
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
-      ACCOUNTS_DEMO_USERS_AND_GROUPS: false # don't generate demo users
+      ACCOUNTS_DEMO_USERS_AND_GROUPS: "false" # don't generate demo users
       # change default secrets
       IDP_LDAP_BIND_PASSWORD: ${IDP_LDAP_BIND_PASSWORD:-idp}
       STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}

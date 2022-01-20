@@ -85,3 +85,9 @@ func (g Graph) GetHTTPClient() HTTPClient {
 type listResponse struct {
 	Value interface{} `json:"value,omitempty"`
 }
+
+const (
+	NoSpaceFoundMessage           = "space with id `%s` not found"
+	ListStorageSpacesTransportErr = "transport error sending list storage spaces grpc request"
+	ListStorageSpacesReturnsErr   = "list storage spaces grpc request returns an errorcode in the response"
+)
