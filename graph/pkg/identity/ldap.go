@@ -278,11 +278,22 @@ func (i *LDAP) getEntryByDN(dn string, attrs []string) (*ldap.Entry, error) {
 	return res.Entries[0], nil
 }
 
+func (i *LDAP) getLDAPUserByID(id string) (*ldap.Entry, error) {
+	id = ldap.EscapeFilter(id)
+	filter := fmt.Sprintf("(%s=%s)", i.userAttributeMap.id, id)
+	return i.getLDAPUserByFilter(filter)
+}
+
 func (i *LDAP) getLDAPUserByNameOrID(nameOrID string) (*ldap.Entry, error) {
 	nameOrID = ldap.EscapeFilter(nameOrID)
+	filter := fmt.Sprintf("(|(%s=%s)(%s=%s))", i.userAttributeMap.userName, nameOrID, i.userAttributeMap.id, nameOrID)
+	return i.getLDAPUserByFilter(filter)
+}
+
+func (i *LDAP) getLDAPUserByFilter(filter string) (*ldap.Entry, error) {
 	searchRequest := ldap.NewSearchRequest(
 		i.userBaseDN, i.userScope, ldap.NeverDerefAliases, 1, 0, false,
-		fmt.Sprintf("(&%s(|(%s=%s)(%s=%s)))", i.userFilter, i.userAttributeMap.userName, nameOrID, i.userAttributeMap.id, nameOrID),
+		fmt.Sprintf("(&%s%s)", i.userFilter, filter),
 		[]string{
 			i.userAttributeMap.displayName,
 			i.userAttributeMap.id,
@@ -298,9 +309,9 @@ func (i *LDAP) getLDAPUserByNameOrID(nameOrID string) (*ldap.Entry, error) {
 		var errmsg string
 		if lerr, ok := err.(*ldap.Error); ok {
 			if lerr.ResultCode == ldap.LDAPResultSizeLimitExceeded {
-				errmsg = fmt.Sprintf("too many results searching for user '%s'", nameOrID)
+				errmsg = fmt.Sprintf("too many results searching for user '%s'", filter)
 				i.logger.Debug().Str("backend", "ldap").Err(lerr).
-					Str("user", nameOrID).Msg("too many results searching for user")
+					Str("userfilter", filter).Msg("too many results searching for user")
 			}
 		}
 		return nil, errorcode.New(errorcode.ItemNotFound, errmsg)
@@ -373,8 +384,22 @@ func (i *LDAP) GetGroup(ctx context.Context, nameOrID string) (*libregraph.Group
 	return i.createGroupModelFromLDAP(e), nil
 }
 
+func (i *LDAP) getLDAPGroupByID(id string, requestMembers bool) (*ldap.Entry, error) {
+	id = ldap.EscapeFilter(id)
+	filter := fmt.Sprintf("(%s=%s)", i.groupAttributeMap.id, id)
+	return i.getLDAPGroupByFilter(filter, requestMembers)
+}
+
 func (i *LDAP) getLDAPGroupByNameOrID(nameOrID string, requestMembers bool) (*ldap.Entry, error) {
 	nameOrID = ldap.EscapeFilter(nameOrID)
+	filter := fmt.Sprintf("(|(%s=%s)(%s=%s))", i.groupAttributeMap.name, nameOrID, i.groupAttributeMap.id, nameOrID)
+	return i.getLDAPGroupByFilter(filter, requestMembers)
+}
+
+// Search for LDAP Groups matching the specified filter, if requestMembers is true the groupMemberShip
+// attribute will be part of the result attributes. The LDAP filter is combined with the configured groupFilter
+// resulting in a filter like "(&(LDAP.groupFilter)(<filter_from_args>))"
+func (i *LDAP) getLDAPGroupByFilter(filter string, requestMembers bool) (*ldap.Entry, error) {
 	attrs := []string{
 		i.groupAttributeMap.name,
 		i.groupAttributeMap.id,
@@ -386,7 +411,7 @@ func (i *LDAP) getLDAPGroupByNameOrID(nameOrID string, requestMembers bool) (*ld
 
 	searchRequest := ldap.NewSearchRequest(
 		i.groupBaseDN, i.groupScope, ldap.NeverDerefAliases, 1, 0, false,
-		fmt.Sprintf("(&%s(|(%s=%s)(%s=%s)))", i.groupFilter, i.groupAttributeMap.name, nameOrID, i.groupAttributeMap.id, nameOrID),
+		fmt.Sprintf("(&%s%s)", i.groupFilter, filter),
 		attrs,
 		nil,
 	)
@@ -397,7 +422,7 @@ func (i *LDAP) getLDAPGroupByNameOrID(nameOrID string, requestMembers bool) (*ld
 		var errmsg string
 		if lerr, ok := err.(*ldap.Error); ok {
 			if lerr.ResultCode == ldap.LDAPResultSizeLimitExceeded {
-				errmsg = fmt.Sprintf("too many results searching for group '%s'", nameOrID)
+				errmsg = fmt.Sprintf("too many results searching for group '%s'", filter)
 				i.logger.Debug().Str("backend", "ldap").Err(lerr).Msg(errmsg)
 			}
 		}
