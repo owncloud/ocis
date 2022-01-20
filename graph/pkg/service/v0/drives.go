@@ -43,46 +43,20 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
-	g.logger.Info().Msg("Calling GetDrives")
+	g.logger.Info().Interface("query", r.URL.Query()).Msg("Calling GetDrives")
 	ctx := r.Context()
 
-	client := g.GetGatewayClient()
-
-	permissions := make(map[string]struct{}, 1)
-	s := sproto.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
-
-	_, err = s.GetPermissionByID(ctx, &sproto.GetPermissionByIDRequest{
-		PermissionId: settingsSvc.ListAllSpacesPermissionID,
-	})
-
-	// No error means the user has the permission
-	if err == nil {
-		permissions[settingsSvc.ListAllSpacesPermissionName] = struct{}{}
-	}
-	value, err := json.Marshal(permissions)
-	if err != nil {
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		return
-	}
 	filters, err := generateCs3Filters(odataReq)
 	if err != nil {
 		g.logger.Err(err).Interface("query", r.URL.Query()).Msg("query error")
 		errorcode.NotSupported.Render(w, r, http.StatusNotImplemented, err.Error())
 		return
 	}
-	res, err := client.ListStorageSpaces(ctx, &storageprovider.ListStorageSpacesRequest{
-		Opaque: &types.Opaque{Map: map[string]*types.OpaqueEntry{
-			"permissions": {
-				Decoder: "json",
-				Value:   value,
-			},
-		}},
-		Filters: filters,
-	})
+	res, err := g.ListStorageSpacesWithFilters(ctx, filters)
 	switch {
 	case err != nil:
-		g.logger.Error().Err(err).Msg("error sending list storage spaces grpc request")
-		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
+		g.logger.Error().Err(err).Msg(ListStorageSpacesTransportErr)
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
 		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
@@ -91,7 +65,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 			render.JSON(w, r, &listResponse{})
 			return
 		}
-		g.logger.Error().Err(err).Msg("error sending list storage spaces grpc request")
+		g.logger.Error().Err(err).Msg(ListStorageSpacesReturnsErr)
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
 		return
 	}
@@ -111,6 +85,75 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &listResponse{Value: files})
+}
+
+// GetSingleDrive does a lookup of a single space by spaceId
+func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
+	driveID := chi.URLParam(r, "driveID")
+	if driveID == "" {
+		err := fmt.Errorf("no valid space id retrieved")
+		g.logger.Err(err)
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	g.logger.Info().Str("driveID", driveID).Msg("Calling GetSingleDrive")
+	ctx := r.Context()
+
+	filters := []*storageprovider.ListStorageSpacesRequest_Filter{
+		{
+			Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,
+			Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
+				Id: &storageprovider.StorageSpaceId{
+					OpaqueId: driveID,
+				},
+			},
+		},
+	}
+	res, err := g.ListStorageSpacesWithFilters(ctx, filters)
+	switch {
+	case err != nil:
+		g.logger.Error().Err(err).Msg(ListStorageSpacesTransportErr)
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	case res.Status.Code != cs3rpc.Code_CODE_OK:
+		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
+			// the client is doing a lookup for a specific space, therefore we need to return
+			// not found to the caller
+			g.logger.Error().Str("driveID", driveID).Msg(fmt.Sprintf(NoSpaceFoundMessage, driveID))
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, fmt.Sprintf(NoSpaceFoundMessage, driveID))
+			return
+		}
+		g.logger.Error().Err(err).Msg(ListStorageSpacesReturnsErr)
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		return
+	}
+
+	wdu, err := url.Parse(g.config.Spaces.WebDavBase + g.config.Spaces.WebDavPath)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error parsing url")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+	spaces, err := g.formatDrives(ctx, wdu, res.StorageSpaces)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error encoding response")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+	switch num := len(spaces); {
+	case num == 0:
+		g.logger.Error().Str("driveID", driveID).Msg("no space found")
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, fmt.Sprintf(NoSpaceFoundMessage, driveID))
+		return
+	case num == 1:
+		render.Status(r, http.StatusOK)
+		render.JSON(w, r, spaces[0])
+	default:
+		g.logger.Error().Int("number", num).Msg("expected to find a single space but found more")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "expected to find a single space but found more")
+		return
+	}
 }
 
 // CreateDrive creates a storage drive (space).
@@ -338,6 +381,38 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storag
 	}
 
 	return responses, nil
+}
+
+// ListStorageSpacesWithFilters List Storage Spaces using filters
+func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*storageprovider.ListStorageSpacesRequest_Filter) (*storageprovider.ListStorageSpacesResponse, error) {
+	client := g.GetGatewayClient()
+
+	permissions := make(map[string]struct{}, 1)
+	s := sproto.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
+
+	_, err := s.GetPermissionByID(ctx, &sproto.GetPermissionByIDRequest{
+		PermissionId: settingsSvc.ListAllSpacesPermissionID,
+	})
+
+	// No error means the user has the permission
+	if err == nil {
+		permissions[settingsSvc.ListAllSpacesPermissionName] = struct{}{}
+	}
+	value, err := json.Marshal(permissions)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := client.ListStorageSpaces(ctx, &storageprovider.ListStorageSpacesRequest{
+		Opaque: &types.Opaque{Map: map[string]*types.OpaqueEntry{
+			"permissions": {
+				Decoder: "json",
+				Value:   value,
+			},
+		}},
+		Filters: filters,
+	})
+	return res, err
 }
 
 func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpace) (*libregraph.Drive, error) {
