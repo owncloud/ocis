@@ -32,14 +32,14 @@ geekdocFilePath: grpc.md
 	{{- $ltypePkg := slice $ltypeSpl 0 (sub (len $ltypeSpl) 1) | join "." -}}
 	{{- $loca = printf "/grpc_apis/%s/#%s" $ltypePkg (.Type | lower) -}}
 {{- end -}}
-| {{.Name}} | [{{.LongType}}]({{ $loca }}) | {{.Label}} | {{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end }} |
+| {{.Name}} | [{{.LongType}}]({{ $loca }}) | {{.Label}} | {{ .Description | replace "\n" "<br>" }}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end }} |
 {{ end -}}
 {{ end }}
 {{ if .HasExtensions -}}
 | Extension | Type | Base | Number | Description |
 | --------- | ---- | ---- | ------ | ----------- |
 {{ range .Extensions -}}
-| {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}} |
+| {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{ .Description | replace "\n" "<br>" }}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}} |
 {{ end -}}
 {{ end -}}
 {{ end -}}
@@ -51,7 +51,7 @@ geekdocFilePath: grpc.md
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 {{range .Values -}}
-| {{.Name}} | {{.Number}} | {{nobr .Description}} |
+| {{.Name}} | {{.Number}} | {{ .Description | replace "\n" "<br>" }} |
 {{ end -}}
 {{ end -}}
 
@@ -61,7 +61,7 @@ geekdocFilePath: grpc.md
 | Extension | Type | Base | Number | Description |
 | --------- | ---- | ---- | ------ | ----------- |
 {{ range .Extensions -}}
-| {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{nobr .Description}}{{if .DefaultValue}} Default: `{{.DefaultValue}}`{{end}} |
+| {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{ .Description | replace "\n" "<br>" }}{{if .DefaultValue}} Default: `{{.DefaultValue}}`{{end}} |
 {{ end -}}
 {{ end -}} 
 {{- range .Services }}
@@ -75,16 +75,16 @@ geekdocFilePath: grpc.md
 {{- $reqLoca := printf "#%s" (.RequestLongType | lower | replace "." "") -}}
 {{- $respLoca := printf "#%s" (.ResponseLongType | lower | replace "." "") -}}
 {{- if and (hasPrefix ".ocis." .RequestLongType) (ge (len $filenameParts) 3) }}
-	{{- $rep := regexReplaceAll "[^/]+" (slice $filenameParts 1 (sub (len $filenameParts) 1) | join "/") ".." -}}
-	{{- $reqDir := dir (.RequestLongType | lower | replace "." "/") -}}
-	{{- $reqLoca = printf "%s/%s/grpc.md#%s" $rep (substr 6 (len $reqDir) $reqDir) (.RequestType | lower | replace "." "") -}}
+	{{- $ltypeSpl := .RequestLongType | substr 1 -1 | splitList "." -}}
+	{{- $ltypePkg := slice $ltypeSpl 0 (sub (len $ltypeSpl) 1) | join "." -}}
+	{{- $reqLoca = printf "/grpc_apis/%s/#%s" $ltypePkg (.RequestType | lower) -}}
 {{- end -}}
 {{- if and (hasPrefix ".ocis." .ResponseLongType) (ge (len $filenameParts) 3) }}
-	{{- $rep := regexReplaceAll "[^/]+" (slice $filenameParts 1 (sub (len $filenameParts) 1) | join "/") ".." -}}
-	{{- $respDir := dir (.ResponseLongType | lower | replace "." "/") -}}
-	{{- $respLoca = printf "%s/%s/grpc.md#%s" $rep (substr 6 (len $respDir) $respDir) (.ResponseType | lower | replace "." "") -}}
+	{{- $ltypeSpl := .ResponseLongType | substr 1 -1 | splitList "." -}}
+	{{- $ltypePkg := slice $ltypeSpl 0 (sub (len $ltypeSpl) 1) | join "." -}}
+	{{- $respLoca = printf "/grpc_apis/%s/#%s" $ltypePkg (.ResponseType | lower) -}}
 {{- end -}}
-| {{.Name}} | [{{.RequestLongType}}]({{ $reqLoca }}){{if .RequestStreaming}} stream{{end}} | [{{.ResponseLongType}}]({{ $respLoca }}){{if .ResponseStreaming}} stream{{end}} | {{nobr .Description}} |
+| {{.Name}} | [{{.RequestLongType}}]({{ $reqLoca }}){{if .RequestStreaming}} stream{{end}} | [{{.ResponseLongType}}]({{ $respLoca }}){{if .ResponseStreaming}} stream{{end}} | {{ .Description | replace "\n" "<br>" }} |
 {{ end -}}
 {{ end -}}
 {{ end }}

@@ -30,13 +30,13 @@ type Account struct {
 
 	// The unique identifier for the user. Key. Not nullable. Non reassignable. Read-only.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// *true* if the account is enabled; otherwise, *false*. This property is required when a user is created. Supports $filter.
+	// `true` if the account is enabled; otherwise, `false`. This property is required when a user is created. Supports $filter.
 	AccountEnabled bool `protobuf:"varint,2,opt,name=account_enabled,json=accountEnabled,proto3" json:"account_enabled,omitempty"`
 	// A resource account is also known as a /disabled user object/ in Azure AD, and can be used to represent resources in general.
 	// In Exchange it might be used to represent conference rooms, for example, and allow them to have a phone number.
 	// You could give printers or machines with a sync client resource accounts as well.
 	// A resource account can be homed in Microsoft 365 or on premises using Skype for Business Server 2019.
-	// *true* if the user is a resource account; otherwise, *false*. Null value should be considered false.
+	// `true` if the user is a resource account; otherwise, `false`. Null value should be considered false.
 	IsResourceAccount bool `protobuf:"varint,3,opt,name=is_resource_account,json=isResourceAccount,proto3" json:"is_resource_account,omitempty"`
 	// Indicates whether the account was created as
 	// - a regular school or work account ("" / emptystring),
@@ -57,7 +57,6 @@ type Account struct {
 	// The username
 	// posixaccount MUST uid
 	PreferredName string `protobuf:"bytes,7,opt,name=preferred_name,json=preferredName,proto3" json:"preferred_name,omitempty"`
-	// TODO rename to on_premise_? or move to extension? see https://docs.microsoft.com/en-us/graph/extensibility-open-users
 	// used for exposing the user using ldap
 	// posixaccount MUST uidnumber
 	UidNumber int64 `protobuf:"varint,8,opt,name=uid_number,json=uidNumber,proto3" json:"uid_number,omitempty"`
@@ -83,8 +82,8 @@ type Account struct {
 	CreatedDateTime *timestamppb.Timestamp `protobuf:"bytes,16,opt,name=created_date_time,json=createdDateTime,proto3" json:"created_date_time,omitempty"`
 	// The date and time the user was deleted. Returned only on $select.
 	DeletedDateTime *timestamppb.Timestamp `protobuf:"bytes,17,opt,name=deleted_date_time,json=deletedDateTime,proto3" json:"deleted_date_time,omitempty"`
-	// *true* if this object is synced from an on-premises directory;
-	// *false* if this object was originally synced from an on-premises directory but is no longer synced;
+	// `true` if this object is synced from an on-premises directory;
+	// `false` if this object was originally synced from an on-premises directory but is no longer synced;
 	// null if this object has never been synced from an on-premises directory (default). Read-only
 	OnPremisesSyncEnabled bool `protobuf:"varint,20,opt,name=on_premises_sync_enabled,json=onPremisesSyncEnabled,proto3" json:"on_premises_sync_enabled,omitempty"`
 	// This property is used to associate an on-premises LDAP user to the oCIS account object.
@@ -378,7 +377,7 @@ type Identities struct {
 	Issuer string `protobuf:"bytes,2,opt,name=issuer,proto3" json:"issuer,omitempty"`
 	// Specifies the unique identifier assigned to the user by the issuer. The combination of *issuer* and *issuerAssignedId* must be unique within the organization. Represents the sign-in name for the user, when signInType is set to emailAddress or userName (also known as local accounts).
 	// When *signInType* is set to:
-	// * `emailAddress`, (or starts with `emailAddress` like `emailAddress1`) *issuerAssignedId* must be a valid email address
+	// * `emailAddress`, (or starts with `emailAddress` like `emailAddress1`) `issuerAssignedId` must be a valid email address
 	// * `userName`, issuer_assigned_id must be a valid local part of an email address
 	// Supports $filter. 512 character limit.
 	IssuerAssignedId string `protobuf:"bytes,3,opt,name=issuer_assigned_id,json=issuerAssignedId,proto3" json:"issuer_assigned_id,omitempty"`
@@ -452,9 +451,9 @@ type PasswordProfile struct {
 	//This value is an enumeration with one possible value being “DisableStrongPassword”, which allows weaker passwords than the default policy to be specified.
 	// “DisablePasswordExpiration” can also be specified.
 	PasswordPolicies []string `protobuf:"bytes,3,rep,name=password_policies,json=passwordPolicies,proto3" json:"password_policies,omitempty"`
-	// *true* if the user must change her password on the next login; otherwise false.
+	// `true` if the user must change her password on the next login; otherwise false.
 	ForceChangePasswordNextSignIn bool `protobuf:"varint,4,opt,name=force_change_password_next_sign_in,json=forceChangePasswordNextSignIn,proto3" json:"force_change_password_next_sign_in,omitempty"`
-	// If *true*, at next sign-in, the user must perform a multi-factor authentication (MFA) before being forced to change their password. The behavior is identical to forceChangePasswordNextSignIn except that the user is required to first perform a multi-factor authentication before password change. After a password change, this property will be automatically reset to false. If not set, default is false.
+	// If `true`, at next sign-in, the user must perform a multi-factor authentication (MFA) before being forced to change their password. The behavior is identical to forceChangePasswordNextSignIn except that the user is required to first perform a multi-factor authentication before password change. After a password change, this property will be automatically reset to false. If not set, default is false.
 	ForceChangePasswordNextSignInWithMfa bool `protobuf:"varint,5,opt,name=force_change_password_next_sign_in_with_mfa,json=forceChangePasswordNextSignInWithMfa,proto3" json:"force_change_password_next_sign_in_with_mfa,omitempty"`
 }
 
@@ -538,7 +537,6 @@ type Group struct {
 	// groupofnames MUST cn
 	DisplayName string `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"` // groupofnames MUST/MAY member
 	// Users, contacts, and groups that are members of this group. HTTP Methods: GET (supported for all groups), POST (supported for security groups and mail-enabled security groups), DELETE (supported only for security groups) Read-only. Nullable.
-	// TODO accounts (users) only for now, we can add groups with the dedicated message using oneof construct later
 	Members []*Account `protobuf:"bytes,3,rep,name=members,proto3" json:"members,omitempty"`
 	// groupofnames MAY businessCategory
 	// groupofnames MAY o
@@ -568,8 +566,8 @@ type Group struct {
 	// Visibility can be set only when a group is created; it is not editable.
 	// Returned by default.
 	Visibility string `protobuf:"bytes,11,opt,name=visibility,proto3" json:"visibility,omitempty"`
-	// *true* if this group is synced from an on-premises directory;
-	// *false* if this group was originally synced from an on-premises directory but is no longer synced;
+	// `true` if this group is synced from an on-premises directory;
+	// `false` if this group was originally synced from an on-premises directory but is no longer synced;
 	// null if this object has never been synced from an on-premises directory (default).
 	// Returned by default. Read-only. Supports $filter.
 	OnPremisesSyncEnabled bool `protobuf:"varint,20,opt,name=on_premises_sync_enabled,json=onPremisesSyncEnabled,proto3" json:"on_premises_sync_enabled,omitempty"`

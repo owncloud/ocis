@@ -14,14 +14,14 @@ message Account {
     // The unique identifier for the user. Key. Not nullable. Non reassignable. Read-only.
     string id = 1;
 
-    // *true* if the account is enabled; otherwise, *false*. This property is required when a user is created. Supports $filter.
+    // `true` if the account is enabled; otherwise, `false`. This property is required when a user is created. Supports $filter.
     bool account_enabled = 2;
 
     // A resource account is also known as a /disabled user object/ in Azure AD, and can be used to represent resources in general.
     // In Exchange it might be used to represent conference rooms, for example, and allow them to have a phone number.
     // You could give printers or machines with a sync client resource accounts as well.
     // A resource account can be homed in Microsoft 365 or on premises using Skype for Business Server 2019.
-    // *true* if the user is a resource account; otherwise, *false*. Null value should be considered false.
+    // `true` if the user is a resource account; otherwise, `false`. Null value should be considered false.
     bool is_resource_account = 3;
 
     // Indicates whether the account was created as
@@ -50,6 +50,7 @@ message Account {
     string preferred_name = 7;
 
     // TODO rename to on_premise_? or move to extension? see https://docs.microsoft.com/en-us/graph/extensibility-open-users
+
     // used for exposing the user using ldap
     // posixaccount MUST uidnumber
     int64 uid_number = 8;
@@ -100,8 +101,8 @@ message Account {
 
     // properties for sync
 
-    // *true* if this object is synced from an on-premises directory;
-    // *false* if this object was originally synced from an on-premises directory but is no longer synced;
+    // `true` if this object is synced from an on-premises directory;
+    // `false` if this object was originally synced from an on-premises directory but is no longer synced;
     // null if this object has never been synced from an on-premises directory (default). Read-only
     bool on_premises_sync_enabled = 20;
 
@@ -186,7 +187,7 @@ message Identities {
 
     // Specifies the unique identifier assigned to the user by the issuer. The combination of *issuer* and *issuerAssignedId* must be unique within the organization. Represents the sign-in name for the user, when signInType is set to emailAddress or userName (also known as local accounts).
     // When *signInType* is set to:
-    // * `emailAddress`, (or starts with `emailAddress` like `emailAddress1`) *issuerAssignedId* must be a valid email address
+    // * `emailAddress`, (or starts with `emailAddress` like `emailAddress1`) `issuerAssignedId` must be a valid email address
     // * `userName`, issuer_assigned_id must be a valid local part of an email address
     // Supports $filter. 512 character limit.
     string issuer_assigned_id = 3;
@@ -205,10 +206,10 @@ message PasswordProfile {
     // “DisablePasswordExpiration” can also be specified.
     repeated string password_policies = 3;
 
-    // *true* if the user must change her password on the next login; otherwise false.
+    // `true` if the user must change her password on the next login; otherwise false.
     bool force_change_password_next_sign_in = 4;
 
-    // If *true*, at next sign-in, the user must perform a multi-factor authentication (MFA) before being forced to change their password. The behavior is identical to forceChangePasswordNextSignIn except that the user is required to first perform a multi-factor authentication before password change. After a password change, this property will be automatically reset to false. If not set, default is false.
+    // If `true`, at next sign-in, the user must perform a multi-factor authentication (MFA) before being forced to change their password. The behavior is identical to forceChangePasswordNextSignIn except that the user is required to first perform a multi-factor authentication before password change. After a password change, this property will be automatically reset to false. If not set, default is false.
     bool force_change_password_next_sign_in_with_mfa = 5;
 }
 
@@ -226,8 +227,9 @@ message Group {
     string display_name = 2;
     // groupofnames MUST/MAY member
 
-    // Users, contacts, and groups that are members of this group. HTTP Methods: GET (supported for all groups), POST (supported for security groups and mail-enabled security groups), DELETE (supported only for security groups) Read-only. Nullable.
     // TODO accounts (users) only for now, we can add groups with the dedicated message using oneof construct later
+
+    // Users, contacts, and groups that are members of this group. HTTP Methods: GET (supported for all groups), POST (supported for security groups and mail-enabled security groups), DELETE (supported only for security groups) Read-only. Nullable.
     repeated Account members = 3;
 
     // groupofnames MAY businessCategory
@@ -279,8 +281,8 @@ message Group {
 
     // properties for sync
 
-    // *true* if this group is synced from an on-premises directory;
-    // *false* if this group was originally synced from an on-premises directory but is no longer synced;
+    // `true` if this group is synced from an on-premises directory;
+    // `false` if this group was originally synced from an on-premises directory but is no longer synced;
     // null if this object has never been synced from an on-premises directory (default).
     // Returned by default. Read-only. Supports $filter.
     bool on_premises_sync_enabled = 20;

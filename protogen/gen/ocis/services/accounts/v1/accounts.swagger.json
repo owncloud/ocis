@@ -590,11 +590,11 @@
         },
         "accountEnabled": {
           "type": "boolean",
-          "description": "*true* if the account is enabled; otherwise, *false*. This property is required when a user is created. Supports $filter."
+          "description": "`true` if the account is enabled; otherwise, `false`. This property is required when a user is created. Supports $filter."
         },
         "isResourceAccount": {
           "type": "boolean",
-          "description": "A resource account is also known as a /disabled user object/ in Azure AD, and can be used to represent resources in general.\nIn Exchange it might be used to represent conference rooms, for example, and allow them to have a phone number.\nYou could give printers or machines with a sync client resource accounts as well.\nA resource account can be homed in Microsoft 365 or on premises using Skype for Business Server 2019.\n*true* if the user is a resource account; otherwise, *false*. Null value should be considered false."
+          "description": "A resource account is also known as a /disabled user object/ in Azure AD, and can be used to represent resources in general.\nIn Exchange it might be used to represent conference rooms, for example, and allow them to have a phone number.\nYou could give printers or machines with a sync client resource accounts as well.\nA resource account can be homed in Microsoft 365 or on premises using Skype for Business Server 2019.\n`true` if the user is a resource account; otherwise, `false`. Null value should be considered false."
         },
         "creationType": {
           "type": "string",
@@ -618,7 +618,7 @@
         "uidNumber": {
           "type": "string",
           "format": "int64",
-          "title": "TODO rename to on_premise_? or move to extension? see https://docs.microsoft.com/en-us/graph/extensibility-open-users\nused for exposing the user using ldap\nposixaccount MUST uidnumber"
+          "title": "used for exposing the user using ldap\nposixaccount MUST uidnumber"
         },
         "gidNumber": {
           "type": "string",
@@ -656,7 +656,7 @@
         },
         "onPremisesSyncEnabled": {
           "type": "boolean",
-          "title": "*true* if this object is synced from an on-premises directory;\n*false* if this object was originally synced from an on-premises directory but is no longer synced;\nnull if this object has never been synced from an on-premises directory (default). Read-only"
+          "title": "`true` if this object is synced from an on-premises directory;\n`false` if this object was originally synced from an on-premises directory but is no longer synced;\nnull if this object has never been synced from an on-premises directory (default). Read-only"
         },
         "onPremisesImmutableId": {
           "type": "string",
@@ -782,7 +782,7 @@
           "items": {
             "$ref": "#/definitions/v1Account"
           },
-          "title": "Users, contacts, and groups that are members of this group. HTTP Methods: GET (supported for all groups), POST (supported for security groups and mail-enabled security groups), DELETE (supported only for security groups) Read-only. Nullable.\nTODO accounts (users) only for now, we can add groups with the dedicated message using oneof construct later"
+          "description": "Users, contacts, and groups that are members of this group. HTTP Methods: GET (supported for all groups), POST (supported for security groups and mail-enabled security groups), DELETE (supported only for security groups) Read-only. Nullable."
         },
         "owners": {
           "type": "array",
@@ -825,7 +825,7 @@
         },
         "onPremisesSyncEnabled": {
           "type": "boolean",
-          "description": "*true* if this group is synced from an on-premises directory;\n*false* if this group was originally synced from an on-premises directory but is no longer synced;\nnull if this object has never been synced from an on-premises directory (default).\nReturned by default. Read-only. Supports $filter."
+          "description": "`true` if this group is synced from an on-premises directory;\n`false` if this group was originally synced from an on-premises directory but is no longer synced;\nnull if this object has never been synced from an on-premises directory (default).\nReturned by default. Read-only. Supports $filter."
         },
         "onPremisesImmutableId": {
           "type": "string",
@@ -877,7 +877,7 @@
         },
         "issuerAssignedId": {
           "type": "string",
-          "description": "Specifies the unique identifier assigned to the user by the issuer. The combination of *issuer* and *issuerAssignedId* must be unique within the organization. Represents the sign-in name for the user, when signInType is set to emailAddress or userName (also known as local accounts).\nWhen *signInType* is set to:\n* `emailAddress`, (or starts with `emailAddress` like `emailAddress1`) *issuerAssignedId* must be a valid email address\n* `userName`, issuer_assigned_id must be a valid local part of an email address\nSupports $filter. 512 character limit."
+          "description": "Specifies the unique identifier assigned to the user by the issuer. The combination of *issuer* and *issuerAssignedId* must be unique within the organization. Represents the sign-in name for the user, when signInType is set to emailAddress or userName (also known as local accounts).\nWhen *signInType* is set to:\n* `emailAddress`, (or starts with `emailAddress` like `emailAddress1`) `issuerAssignedId` must be a valid email address\n* `userName`, issuer_assigned_id must be a valid local part of an email address\nSupports $filter. 512 character limit."
         }
       },
       "description": "Identities Represents an identity used to sign in to a user account.\nAn identity can be provided by oCIS, by organizations, or by social identity providers such as Facebook, Google, or Microsoft, that are tied to a user account.\nThis enables the user to sign in to the user account with any of those associated identities.\nThey are also used to keep a history of old usernames."
@@ -1019,11 +1019,11 @@
         },
         "forceChangePasswordNextSignIn": {
           "type": "boolean",
-          "description": "*true* if the user must change her password on the next login; otherwise false."
+          "description": "`true` if the user must change her password on the next login; otherwise false."
         },
         "forceChangePasswordNextSignInWithMfa": {
           "type": "boolean",
-          "description": "If *true*, at next sign-in, the user must perform a multi-factor authentication (MFA) before being forced to change their password. The behavior is identical to forceChangePasswordNextSignIn except that the user is required to first perform a multi-factor authentication before password change. After a password change, this property will be automatically reset to false. If not set, default is false."
+          "description": "If `true`, at next sign-in, the user must perform a multi-factor authentication (MFA) before being forced to change their password. The behavior is identical to forceChangePasswordNextSignIn except that the user is required to first perform a multi-factor authentication before password change. After a password change, this property will be automatically reset to false. If not set, default is false."
         }
       }
     },
