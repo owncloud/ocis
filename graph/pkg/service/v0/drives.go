@@ -100,16 +100,7 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Str("driveID", driveID).Msg("Calling GetSingleDrive")
 	ctx := r.Context()
 
-	filters := []*storageprovider.ListStorageSpacesRequest_Filter{
-		{
-			Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,
-			Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
-				Id: &storageprovider.StorageSpaceId{
-					OpaqueId: driveID,
-				},
-			},
-		},
-	}
+	filters := []*storageprovider.ListStorageSpacesRequest_Filter{listStorageSpacesIDFilter(driveID)}
 	res, err := g.ListStorageSpacesWithFilters(ctx, filters)
 	switch {
 	case err != nil:
@@ -710,23 +701,9 @@ func generateCs3Filters(request *godata.GoDataRequest) ([]*storageprovider.ListS
 		if request.Query.Filter.Tree.Token.Value == "eq" {
 			switch request.Query.Filter.Tree.Children[0].Token.Value {
 			case "driveType":
-				filter1 := &storageprovider.ListStorageSpacesRequest_Filter{
-					Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
-					Term: &storageprovider.ListStorageSpacesRequest_Filter_SpaceType{
-						SpaceType: strings.Trim(request.Query.Filter.Tree.Children[1].Token.Value, "'"),
-					},
-				}
-				filters = append(filters, filter1)
+				filters = append(filters, listStorageSpacesTypeFilter(strings.Trim(request.Query.Filter.Tree.Children[1].Token.Value, "'")))
 			case "id":
-				filter2 := &storageprovider.ListStorageSpacesRequest_Filter{
-					Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,
-					Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
-						Id: &storageprovider.StorageSpaceId{
-							OpaqueId: strings.Trim(request.Query.Filter.Tree.Children[1].Token.Value, "'"),
-						},
-					},
-				}
-				filters = append(filters, filter2)
+				filters = append(filters, listStorageSpacesIDFilter(strings.Trim(request.Query.Filter.Tree.Children[1].Token.Value, "'")))
 			}
 		} else {
 			err := fmt.Errorf("unsupported filter operand: %s", request.Query.Filter.Tree.Token.Value)
@@ -734,6 +711,26 @@ func generateCs3Filters(request *godata.GoDataRequest) ([]*storageprovider.ListS
 		}
 	}
 	return filters, nil
+}
+
+func listStorageSpacesIDFilter(id string) *storageprovider.ListStorageSpacesRequest_Filter {
+	return &storageprovider.ListStorageSpacesRequest_Filter{
+		Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,
+		Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
+			Id: &storageprovider.StorageSpaceId{
+				OpaqueId: id,
+			},
+		},
+	}
+}
+
+func listStorageSpacesTypeFilter(spaceType string) *storageprovider.ListStorageSpacesRequest_Filter {
+	return &storageprovider.ListStorageSpacesRequest_Filter{
+		Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
+		Term: &storageprovider.ListStorageSpacesRequest_Filter_SpaceType{
+			SpaceType: spaceType,
+		},
+	}
 }
 
 func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
