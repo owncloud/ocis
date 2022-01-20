@@ -3,6 +3,7 @@ package svc
 import (
 	"crypto/tls"
 	"net/http"
+	"strconv"
 
 	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
@@ -13,6 +14,11 @@ import (
 	"github.com/owncloud/ocis/graph/pkg/identity/ldap"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	opkgm "github.com/owncloud/ocis/ocis-pkg/middleware"
+)
+
+const (
+	// HeaderPurge defines the header name for the purge header.
+	HeaderPurge = "Purge"
 )
 
 // Service defines the extension handlers.
@@ -118,6 +124,7 @@ func NewService(opts ...Option) Service {
 					r.Route("/{driveID}", func(r chi.Router) {
 						r.Patch("/", svc.UpdateDrive)
 						r.Get("/", svc.GetSingleDrive)
+						r.Delete("/", svc.DeleteDrive)
 					})
 				})
 			})
@@ -125,4 +132,16 @@ func NewService(opts ...Option) Service {
 	})
 
 	return svc
+}
+
+// parseHeaderPurge parses the 'Purge' header.
+// '1', 't', 'T', 'TRUE', 'true', 'True' are parsed as true
+// all other values are false.
+func parsePurgeHeader(h http.Header) bool {
+	val := h.Get(HeaderPurge)
+
+	if b, err := strconv.ParseBool(val); err == nil {
+		return b
+	}
+	return false
 }
