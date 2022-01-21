@@ -37,7 +37,7 @@ If that is still too abstract, [here is an ELI5 writeup](https://dev.to/miguelmo
 
 ### How does oCIS fit in the Kubernetes model
 
-oCIS was designed with running on Kubernetes in mind. We set up to adopt the [Twelve-Factor App](https://12factor.net/) principles regarding configuration, with almost every aspect of oCIS being modifiable via environment variables. This comes in handy when you especially have a look at how a helm chart's (we will introduce this concept shortly) [list of values](https://github.com/refs/ocis-charts/blob/d8735e3222d2050504303851d3461909c86fcc89/ocis/values.yaml) looks like.
+oCIS was designed with running on Kubernetes in mind. We set up to adopt the [Twelve-Factor App](https://12factor.net/) principles regarding configuration, with almost every aspect of oCIS being modifiable via environment variables. This comes in handy when you especially have a look at how a helm chart's (we will introduce this concept shortly) [list of values](https://github.com/owncloud/ocis-charts/blob/d8735e3222d2050504303851d3461909c86fcc89/ocis/values.yaml) looks like.
 
 ## What is Minikube
 
@@ -64,7 +64,7 @@ For a guide on how to set minikube up follow the [official minikube start guide]
 First off, verify your installation is correct:
 
 ```console
-~/code/refs/ocis-charts
+~/code/owncloud/ocis-charts
 ❯ minikube status
 minikube
 type: Control Plane
@@ -77,7 +77,7 @@ kubeconfig: Stopped
 After that, start the cluster:
 
 ```console
-~/code/refs/ocis-charts
+~/code/owncloud/ocis-charts
 ❯ minikube start
 😄  minikube v1.23.0 on Darwin 11.4
 ✨  Using the docker driver based on existing profile
@@ -95,7 +95,7 @@ _On these docs, we are using the Docker driver on Mac._
 
 ## Run a chart
 
-The easiest way to run the entire package is by using the available charts on https://github.com/refs/ocis-charts. It is not the purpose of this guide to explain the inner working of Kubernetes or its resources, as Helm builds an abstraction oon top of it, letting you interact with a refined interface that roughly translates as "helm install" and "helm uninstall".
+The easiest way to run the entire package is by using the available charts on https://github.com/owncloud/ocis-charts. It is not the purpose of this guide to explain the inner working of Kubernetes or its resources, as Helm builds an abstraction oon top of it, letting you interact with a refined interface that roughly translates as "helm install" and "helm uninstall".
 
 In order to host charts one can create a [charts repository](https://helm.sh/docs/topics/chart_repository/), but this is outside the scope of this documentation. Having said that, we will assume you have access to a cli and git.
 
@@ -108,7 +108,7 @@ In order to host charts one can create a [charts repository](https://helm.sh/doc
 
 ### Setup
 
-1. clone the charts: `git clone https://github.com/refs/ocis-charts.git /var/tmp/ocis-charts`
+1. clone the charts: `git clone https://github.com/owncloud/ocis-charts.git /var/tmp/ocis-charts`
 2. cd into the charts root: `cd /var/tmp/ocis-charts/ocis`
 3. install the package: `helm install ocis .`
 4. verify the application is running in the cluster: `kubectl get pods`
@@ -129,7 +129,7 @@ webdav-f8d4dd7c6-vv4n7        1/1     Running   3 (10m ago)      3h33m
 5. expose the proxy as a service to the host
 
 ```console
-~/code/refs/ocis-charts
+~/code/owncloud/ocis-charts
 ❯ minikube service proxy-service --url
 🏃  Starting tunnel for service proxy-service.
 |-----------|---------------|-------------|------------------------|
