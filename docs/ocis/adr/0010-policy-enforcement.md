@@ -13,12 +13,17 @@ geekdocFilePath: 0010-policy-enforcement.md
 
 ## Context and Problem Statement
 
-There should be a way to impose certain limitations in areas of the code that require licensing. This document researches an approach to achieve it.
+There should be a way to impose certain limitations in areas of the code that require licensing. This document researches an approach to achieve this goal, while limiting the scope to the enforcement side of it. The architecture for a policy system must be composed of 2 parts:
+
+1. License creation and validation
+2. Enforcement
+
+It is desirable to keep both systems isolated, since the implementation of the latter has to be done within the constraints of the codebase. The alternative is running an enforcement service and have each and every single request evaluating whether the request is valid or not.
 
 ## Decision Drivers
 
-- as a team, we want to have the licensing code concentrated in a central module
-- we don't want to stop/start the extension whenever a policy is updated (hot reload)
+- As a team, we want to have the licensing code concentrated in a central module
+- We don't want to stop/start the extension whenever a policy is updated (hot reload). It must happen during runtime.
 
 ## Considered Options
 
@@ -32,15 +37,15 @@ Chosen option: option 2; Use third party libraries such as Open Policy Agent (a 
 ### Positive Consequences
 
 - OPA is production battle tested.
-- built around performance - policies evaluations are no longer than 1ms per request.
-- middleware friendly: we use gRPC clients all over our ecosystem; wrappers (or middlewares) is a viable way to solve this problem instead of a dedicated service or its own package.
-- community support.
-- kubernetes friendly.
-- supports envoy, kong, terraform, traefik, php, node and many more.
+- Built around performance - policies evaluations are no longer than 1ms per request.
+- Middleware friendly: we use gRPC clients all over our ecosystem; wrappers (or middlewares) is a viable way to solve this problem instead of a dedicated service or its own package.
+- Community support.
+- Kubernetes friendly.
+- Supports envoy, kong, terraform, traefik, php, node and many more.
 
 ### Negative Consequences
 
-- more vendor code inside the binary (larger attack surface, larger footprint [to be quantified] )
+- More vendor code inside the binary (larger attack surface, larger footprint [to be quantified] )
 
 ## Chosen option approach
 
@@ -50,10 +55,10 @@ Make use of [overloading Open Policy Agent's input](https://www.openpolicyagent.
 
 New terms are defined to refer to new mental models:
 
-- policy: self-imposed limitation of a piece of software. i.e: "after 20 users limit the use of thumbnails".
-- checkers: in the context of a middleware, a checker is in charge of defining logical conditions that prevent requests (users) from doing an action.
-- policy file: a [rego file](https://www.openpolicyagent.org/docs/latest/policy-language/).
-- policy evaluation: the act of piecing together input (from a request), data (from an external storage) and policies in order to make a decision.
+- Policy: self-imposed limitation of a piece of software. i.e: "after 20 users limit the use of thumbnails".
+- Checkers: in the context of a middleware, a checker is in charge of defining logical conditions that prevent requests (users) from doing an action.
+- Policy file: a [rego file](https://www.openpolicyagent.org/docs/latest/policy-language/).
+- Policy evaluation: the act of piecing together input (from a request), data (from an external storage) and policies in order to make a decision.
 
 #### Temporary new Interfaces part of the PoC
 
