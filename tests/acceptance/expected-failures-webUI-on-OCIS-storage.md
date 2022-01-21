@@ -513,7 +513,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -  [webUIDeleteFilesFolders/deleteFilesFolders.feature:77](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L77)
 -  [webUIDeleteFilesFolders/deleteFilesFolders.feature:89](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L89)
 -  [webUISharingAcceptShares/acceptShares.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L72)
--  [webUIOperationsWithFolderShares/accessToSharesFolder.feature:14](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIOperationsWithFolderShares/accessToSharesFolder.feature#L14)
+
 
 ### [web config update is not properly reflected after the ocis start](https://github.com/owncloud/ocis/issues/2944)
 -   [webUIFiles/breadcrumb.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/breadcrumb.feature#L50)
