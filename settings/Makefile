@@ -48,3 +48,9 @@ yarn-build: node_modules
 .PHONY: node_modules
 node_modules:
 	yarn install --immutable
+
+############ protobuf ############
+include ../.make/protobuf.mk
+
+.PHONY: protobuf
+protobuf: buf-generate
