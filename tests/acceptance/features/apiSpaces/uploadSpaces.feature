@@ -64,3 +64,52 @@ Feature: Upload files into a space
       | quota@@@total    | 2000          |
       | quota@@@remaining| 1996          |
       | quota@@@used     | 4             |
+
+  Scenario: A user with role editor can create a folder in shared Space via the Graph API
+    Given user "Alice" has created a space "Editor can create folder" of type "project" with quota "2000"
+    And user "Alice" has shared a space "Editor can create folder" to user "Bob" with role "editor"
+    When user "Bob" creates a folder "mainFolder" in space "Editor can create folder" using the WebDav Api
+    Then the HTTP status code should be "201"
+    And for user "Bob" the space "Editor can create folder" should contain these entries:
+      | mainFolder        |
+    And for user "Alice" the space "Editor can create folder" should contain these entries:
+      | mainFolder        |
+
+
+  Scenario: A user with role viewer cannot create a folder in shared Space via the Graph API
+    Given user "Alice" has created a space "Viewer cannot create folder" of type "project" with quota "2000"
+    And user "Alice" has shared a space "Viewer cannot create folder" to user "Bob" with role "viewer"
+    When user "Bob" creates a folder "mainFolder" in space "Viewer cannot create folder" using the WebDav Api
+    Then the HTTP status code should be "403"
+    And for user "Bob" the space "Viewer cannot create folder" should not contain these entries:
+      | mainFolder        |
+    And for user "Alice" the space "Viewer cannot create folder" should not contain these entries:
+      | mainFolder        |
+
+
+  Scenario: A user with role editor can upload a file in shared Space via the Graph API
+    Given user "Alice" has created a space "Editor can upload file" of type "project" with quota "20"
+    And user "Alice" has shared a space "Editor can upload file" to user "Bob" with role "editor"
+    When user "Bob" uploads a file inside space "Editor can upload file" with content "Test" to "test.txt" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Bob" the space "Editor can upload file" should contain these entries:
+      | test.txt         |
+    And for user "Alice" the space "Editor can upload file" should contain these entries:
+      | test.txt         |
+    When user "Bob" lists all available spaces via the GraphApi
+    Then the json responded should contain a space "Editor can upload file" with these key and value pairs:
+      | key              | value                 |
+      | name             | Editor can upload file |
+      | quota@@@used     | 4                     |
+
+
+  Scenario: A user with role viewer cannot upload a file in shared Space via the Graph API
+    Given user "Alice" has created a space "Viewer cannot upload file" of type "project" with quota "20"
+    And user "Alice" has shared a space "Viewer cannot upload file" to user "Bob" with role "viewer"
+    When user "Bob" uploads a file inside space "Viewer cannot upload file" with content "Test" to "test.txt" using the WebDAV API
+    Then the HTTP status code should be "403"
+    And for user "Bob" the space "Viewer cannot upload file" should not contain these entries:
+      | test.txt         |
+    And for user "Alice" the space "Viewer cannot upload file" should not contain these entries:
+      | test.txt         |
+      
