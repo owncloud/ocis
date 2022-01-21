@@ -64,6 +64,14 @@ New terms are defined to refer to new mental models:
 
 - IStorage: provides means of extracting data from an external source (in case of the POC an etcd storage cluster).
 
+### External data storages
+
+However, for this to be usable it needs state. The Rego engine works with input and data, where data is essentially a database the input is tried against, in order to expand this poc to include functionality such as counters (i.e: give access to the thumbnails only to 50 users) we need an external storage, and consequentially, Rego needs to have an option to load data from an external storage. There is an entire chapter in the documentation regarding external data: https://www.openpolicyagent.org/docs/latest/external-data/. The most "natural" option (option 5) states:
+
+> OPA includes functionality for reaching out to external servers during evaluation. This functionality handles those cases where there is too much data to synchronize into OPA, JWTs are ineffective, or policy requires information that must be as up to date as possible.
+
+This is a natural option because it requires service-to-service communication, and by definition using microservices it should come "natural to us". Another approach is using JWT (which we already use) to encode the necessary data into the JWT and handing it over to rego as "data". The issue with this approach is that depending on the features of the licenses the JWT might grow and be filled with noise and redundancy (this is, unless a new token is issued for licensing purposes).
+
 ### Future ideas
 
 [This proof of concept](https://github.com/owncloud/ocis/pull/2236) is very rigid in the sense that the `IStorage` interface only has one implementation that ties it to etcd, meaning running an oCIS cluster without an etcd service will result in a crash. This is by far ideal and less coupled implementations should be done. There is the case of using the storage metadata as a source to store data necessary to the policies, or even using the go-micro store as a kv store to achieve the exact same, since it already runs as its own service. The implementation of this is trivial and left out of the POC since it requires more time than the allotted for this task.
