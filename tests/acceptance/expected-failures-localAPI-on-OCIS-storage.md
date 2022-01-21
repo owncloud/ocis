@@ -21,6 +21,3 @@
 #### [Overwriting a file in the space within the allowed quota does not work](https://github.com/owncloud/ocis/issues/2829)
 - [apiSpaces/quota.feature:56](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/quota.feature#L56)
 
-#### [Uploading a file to a shared space does not work](https://github.com/owncloud/ocis/issues/3002)
-- [apiSpaces/uploadSpaces.feature:90](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/uploadSpaces.feature#L90)
-- [apiSpaces/uploadSpaces.feature:106](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/uploadSpaces.feature#L106)
