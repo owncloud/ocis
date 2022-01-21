@@ -324,8 +324,8 @@ github.com/crewjam/saml v0.4.5/go.mod h1:qCJQpUtZte9R1ZjUBcW8qtCNlinbO363ooNl02S
 github.com/cs3org/cato v0.0.0-20200828125504-e418fc54dd5e/go.mod h1:XJEZ3/EQuI3BXTp/6DUzFr850vlxq11I6satRtz0YQ4=
 github.com/cs3org/go-cs3apis v0.0.0-20211214102047-7ce3134d7bf8 h1:PqOprF37OvwCbAN5W23znknGk6N/LMayqLAeP904FHE=
 github.com/cs3org/go-cs3apis v0.0.0-20211214102047-7ce3134d7bf8/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
-github.com/cs3org/reva v1.16.1-0.20220120120348-3d065e97841a h1:uh0+qsh83/nB1jpbp+mNW/Q38yktRr7l52HqQQbP+WI=
-github.com/cs3org/reva v1.16.1-0.20220120120348-3d065e97841a/go.mod h1:86uvpL6IYmqoyAWT0DDCooo9Bh4tp5A33SLOLapc7V0=
+github.com/cs3org/reva v1.16.1-0.20220121134812-59d1aa30eb60 h1:XaraDDlNXPv5GREzwkP7+8IEMDXbzzeHsekfUQABJzc=
+github.com/cs3org/reva v1.16.1-0.20220121134812-59d1aa30eb60/go.mod h1:/BofcMJgfqTIHNiCp1uXr9ABcgylp27U2W4fjYUR6Fg=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8/go.mod h1:4abs/jPXcmJzYoYGF91JF9Uq9s/KL5n1jvFDix8KcqY=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
@@ -934,6 +934,7 @@ github.com/mattn/go-runewidth v0.0.9/go.mod h1:H031xJmbD/WCDINGzjvQ9THkh0rPKHF+m
 github.com/mattn/go-runewidth v0.0.13 h1:lTGmDsbAYt5DmK6OnoV7EuIF1wEIFAcxld6ypU4OSgU=
 github.com/mattn/go-runewidth v0.0.13/go.mod h1:Jdepj2loyihRzMpdS35Xk/zdY8IAYHsh153qUoGf23w=
 github.com/mattn/go-sqlite3 v1.14.6/go.mod h1:NyWgC/yNuGj7Q9rpYnZvas74GogHl5/Z4A/KQRfk6bU=
+github.com/mattn/go-sqlite3 v1.14.10/go.mod h1:NyWgC/yNuGj7Q9rpYnZvas74GogHl5/Z4A/KQRfk6bU=
 github.com/mattn/go-sqlite3 v2.0.3+incompatible h1:gXHsfypPkaMZrKbD5209QV9jbUTJKjyR5WD3HYQSd+U=
 github.com/mattn/go-sqlite3 v2.0.3+incompatible/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsOqkbpncsNc=
 github.com/mattn/go-tty v0.0.0-20180219170247-931426f7535a/go.mod h1:XPvLUNfbS4fJH25nqRHfWLMa1ONC8Amw+mIA639KxkE=
