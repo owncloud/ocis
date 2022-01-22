@@ -10,7 +10,6 @@ import { RoleService_ListRoles } from '../client/settings'
 import { injectAuthToken } from '../helpers/auth'
 
 const state = {
-  config: null,
   initialized: false,
   failed: false,
   accounts: {},
@@ -19,7 +18,6 @@ const state = {
 }
 
 const getters = {
-  config: state => state.config,
   isInitialized: state => state.initialized,
   hasFailed: state => state.failed,
   getAccountsSorted: state => {
@@ -36,9 +34,6 @@ const getters = {
 }
 
 const mutations = {
-  LOAD_CONFIG (state, config) {
-    state.config = config
-  },
   SET_INITIALIZED (state, value) {
     state.initialized = value
   },
@@ -81,10 +76,6 @@ const mutations = {
 }
 
 const actions = {
-  loadConfig ({ commit }, config) {
-    commit('LOAD_CONFIG', config)
-  },
-
   async initialize ({ commit, dispatch, getters }) {
     await Promise.all([
       dispatch('fetchAccounts'),

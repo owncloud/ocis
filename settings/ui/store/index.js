@@ -8,13 +8,11 @@ import axios from 'axios'
 import keyBy from 'lodash-es/keyBy'
 
 const state = {
-  config: null,
   initialized: false,
   bundles: {}
 }
 
 const getters = {
-  config: state => state.config,
   initialized: state => state.initialized,
   extensions: state => {
     return [...new Set(Object.values(state.bundles).map(bundle => bundle.extension))].sort()
@@ -36,17 +34,9 @@ const mutations = {
   SET_BUNDLES (state, bundles) {
     state.bundles = keyBy(bundles, 'id')
   },
-  LOAD_CONFIG (state, config) {
-    state.config = config
-  }
 }
 
 const actions = {
-  // Used by ocis-web.
-  loadConfig ({ commit }, config) {
-    commit('LOAD_CONFIG', config)
-  },
-
   async initialize ({ commit, dispatch }) {
     await dispatch('fetchBundles')
     commit('SET_INITIALIZED', true)
