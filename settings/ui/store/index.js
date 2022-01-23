@@ -33,7 +33,7 @@ const mutations = {
   },
   SET_BUNDLES (state, bundles) {
     state.bundles = keyBy(bundles, 'id')
-  },
+  }
 }
 
 const actions = {
