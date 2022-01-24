@@ -99,7 +99,7 @@ services:
     entrypoint:
       - ocis
       - accounts
-      - servqer #TODO: change bind users' passwords
+      - server #TODO: change bind users' passwords
     environment:
       ACCOUNTS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
       ACCOUNTS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
@@ -366,6 +366,7 @@ services:
       OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
+      #TODO: what's that?
       STORAGE_HOME_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
 
       STORAGE_METADATA_GRPC_PROVIDER_ADDR: 0.0.0.0:9215
@@ -460,7 +461,7 @@ services:
       driver: "local"
     restart: always
 
-  storage-home:
+  storage-shares:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
       replicas: 1
@@ -468,29 +469,24 @@ services:
       ocis-net: null
     entrypoint:
       - ocis
-      - storage-home
+      - storage-shares
       - server
     environment:
       OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
       OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      STORAGE_HOME_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
+      STORAGE_SHARES_ENDPOINT: storage-shares:9154
+      STORAGE_SHARES_GRPC_ADDR: 0.0.0.0:9154
 
-      STORAGE_HOME_DRIVER: ocis #TODO use s3?
-
-      STORAGE_HOME_ENDPOINT: storage-home:9154
-      STORAGE_HOME_GRPC_ADDR: 0.0.0.0:9154
-
-      STORAGE_HOME_HTTP_ADDR: 0.0.0.0:9155
-      STORAGE_HOME_DATA_SERVER_URL: http://storage-home:9155/data
+      # TODO: is this even needed?
+      #STORAGE_SHARES_HTTP_ADDR: 0.0.0.0:9155
 
       STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
       STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       REVA_GATEWAY: storage-gateway:9142
-    volumes:
-      # TODO: this is a shared volume with storage-users
-      - "ocis-storage-users:/var/lib/ocis" #TODO /storage/users"
+    #volumes:
+      # TODO: volume needed?
     logging:
       driver: "local"
     restart: always
@@ -709,7 +705,6 @@ services:
 
       # TODO: check connection pool in REVA
 
-      STORAGE_HOME_ENDPOINT: storage-home:9154
       STORAGE_USERS_ENDPOINT: storage-users:9157
 
       STORAGE_PUBLIC_LINK_ENDPOINT: storage-publiclink:9178 #TODO: this serves a auth and storage provider!?
@@ -718,6 +713,7 @@ services:
       STORAGE_AUTH_BEARER_ENDPOINT: storage-authbearer:9166
       STORAGE_AUTH_MACHINE_ENDPOINT: storage-authmachine:9148
 
+      STORAGE_SHARES_ENDPOINT: storage-shares:9154
       STORAGE_SHARING_ENDPOINT: storage-sharing:9150
 
       STORAGE_GROUPPROVIDER_ENDPOINT: storage-groupprovider:9160
