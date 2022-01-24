@@ -33,7 +33,7 @@ func DefaultConfig() *Config {
 				UserFilter:           "(&(objectclass=posixAccount)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))",
 				UserAttributeFilter:  "(&(objectclass=posixAccount)({{attr}}={{value}}))",
 				UserFindFilter:       "(&(objectclass=posixAccount)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
-				UserGroupFilter:      "(&(objectclass=posixGroup)(cn={{.}}*))", // FIXME (&(objectclass=posixGroup)(ownclouduuid={{.OpaqueId}}*)) in reva the template is executed with a string. IIRC rhaferkamp mentioned this
+				UserGroupFilter:      "(&(objectclass=posixGroup)(cn={{query}}*))",
 				GroupFilter:          "(&(objectclass=posixGroup)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))",
 				GroupAttributeFilter: "(&(objectclass=posixGroup)({{attr}}={{value}}))",
 				GroupFindFilter:      "(&(objectclass=posixGroup)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
