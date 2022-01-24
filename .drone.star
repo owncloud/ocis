@@ -512,7 +512,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                     "TEST_OCIS": "true",
                     "SEND_SCENARIO_LINE_REFERENCES": "true",
                     "STORAGE_DRIVER": storage,
-                    "BEHAT_FILTER_TAGS": "~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
+                    "BEHAT_FILTER_TAGS": "~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage&&~@issue-ocis-3023" % ("OC" if storage == "owncloud" else "OCIS"),
                     "DIVIDE_INTO_NUM_PARTS": number_of_parts,
                     "RUN_PART": part_number,
                     "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-API-on-%s-storage.md" % (storage.upper()),
