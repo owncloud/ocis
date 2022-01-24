@@ -41,7 +41,8 @@ _ocdav: double check the webdav property parsing when custom namespaces are used
 Synchronization features like etag propagation, setting mtime and locking files
 
 #### [Uploading an old method chunked file with checksum should fail using new DAV path](https://github.com/owncloud/ocis/issues/2323)
--   [apiMain/checksums.feature:263](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L263)
+-   [apiMain/checksums.feature:369](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L369)
+-   [apiMain/checksums.feature:374](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L374)
 
 #### [Webdav LOCK operations](https://github.com/owncloud/ocis/issues/1284)
 -   [apiWebdavLocks/exclusiveLocks.feature:18](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/exclusiveLocks.feature#L18)
@@ -1122,6 +1123,7 @@ And other missing implementation of favorites
 -   [apiFavorites/favoritesSharingToShares.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favoritesSharingToShares.feature#L64)
 -   [apiFavorites/favoritesSharingToShares.feature:83](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favoritesSharingToShares.feature#L83)
 -   [apiFavorites/favoritesSharingToShares.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favoritesSharingToShares.feature#L102)
+-   [apiMain/checksums.feature:203](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L203)
 
 #### [WWW-Authenticate header for unauthenticated requests is not clear](https://github.com/owncloud/ocis/issues/2285)
 Scenario Outline: Unauthenticated call
