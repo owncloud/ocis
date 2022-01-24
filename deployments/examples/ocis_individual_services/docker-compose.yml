@@ -68,7 +68,7 @@ services:
 
       PROXY_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       PROXY_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
-      PROXY_INSECURE_BACKENDS: false
+      PROXY_INSECURE_BACKENDS: "false"
 
       PROXY_OIDC_INSECURE: "${INSECURE:-false}"
       PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
@@ -319,6 +319,7 @@ services:
       WEBDAV_HTTP_ADDR: 0.0.0.0:9115
 
       OCIS_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      REVA_GATEWAY: storage-gateway:9142
     logging:
       driver: "local"
     restart: always
@@ -464,7 +465,7 @@ services:
   storage-shares:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
-      replicas: 1
+      replicas: ${OCIS_SCALE:-1}
     networks:
       ocis-net: null
     entrypoint:
@@ -479,14 +480,11 @@ services:
       STORAGE_SHARES_ENDPOINT: storage-shares:9154
       STORAGE_SHARES_GRPC_ADDR: 0.0.0.0:9154
 
-      # TODO: is this even needed?
-      #STORAGE_SHARES_HTTP_ADDR: 0.0.0.0:9155
+      STORAGE_SHARING_ENDPOINT: storage-sharing:9150
 
       STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
       STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       REVA_GATEWAY: storage-gateway:9142
-    #volumes:
-      # TODO: volume needed?
     logging:
       driver: "local"
     restart: always
