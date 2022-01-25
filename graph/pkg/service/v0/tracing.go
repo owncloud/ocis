@@ -80,6 +80,11 @@ func (t tracing) PostGroupMember(w http.ResponseWriter, r *http.Request) {
 	t.next.PostGroupMember(w, r)
 }
 
+// DeleteGroupMember implements the Service interface.
+func (t tracing) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
+	t.next.DeleteGroupMember(w, r)
+}
+
 // GetDrives implements the Service interface.
 func (t tracing) GetDrives(w http.ResponseWriter, r *http.Request) {
 	t.next.GetDrives(w, r)

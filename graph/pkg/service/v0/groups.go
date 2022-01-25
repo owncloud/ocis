@@ -205,3 +205,46 @@ func (g Graph) PostGroupMember(w http.ResponseWriter, r *http.Request) {
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
 }
+
+// DeleteGroupMember implements the Service interface.
+func (g Graph) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
+	g.logger.Info().Msg("Calling DeleteGroupMember")
+
+	groupID := chi.URLParam(r, "groupID")
+	groupID, err := url.PathUnescape(groupID)
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping group id failed")
+		return
+	}
+
+	if groupID == "" {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing group id")
+		return
+	}
+
+	memberID := chi.URLParam(r, "memberID")
+	memberID, err = url.PathUnescape(memberID)
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping group id failed")
+		return
+	}
+
+	if memberID == "" {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing group id")
+		return
+	}
+	g.logger.Debug().Str("groupID", groupID).Str("memberID", memberID).Msg("DeleteGroupMember")
+	err = g.identityBackend.RemoveMemberFromGroup(r.Context(), groupID, memberID)
+
+	if err != nil {
+		var errcode errorcode.Error
+		if errors.As(err, &errcode) {
+			errcode.Render(w, r)
+		} else {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+	render.Status(r, http.StatusNoContent)
+	render.NoContent(w, r)
+}

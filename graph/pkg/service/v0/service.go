@@ -37,6 +37,7 @@ type Service interface {
 	DeleteGroup(http.ResponseWriter, *http.Request)
 	GetGroupMembers(http.ResponseWriter, *http.Request)
 	PostGroupMember(http.ResponseWriter, *http.Request)
+	DeleteGroupMember(http.ResponseWriter, *http.Request)
 
 	GetDrives(w http.ResponseWriter, r *http.Request)
 }
@@ -123,6 +124,7 @@ func NewService(opts ...Option) Service {
 					r.Route("/members", func(r chi.Router) {
 						r.Get("/", svc.GetGroupMembers)
 						r.Post("/$ref", svc.PostGroupMember)
+						r.Delete("/{memberID}/$ref", svc.DeleteGroupMember)
 					})
 				})
 			})

@@ -615,6 +615,56 @@ func (i *LDAP) AddMemberToGroup(ctx context.Context, groupID string, memberID st
 	return nil
 }
 
+// RemoveMemberFromGroup implements the Backend Interface.
+func (i *LDAP) RemoveMemberFromGroup(ctx context.Context, groupID string, memberID string) error {
+	ge, err := i.getLDAPGroupByID(groupID, true)
+	if err != nil {
+		i.logger.Warn().Str("backend", "ldap").Str("groupID", groupID).Msg("Error looking up group")
+		return err
+	}
+	me, err := i.getLDAPUserByID(memberID)
+	if err != nil {
+		i.logger.Warn().Str("backend", "ldap").Str("memberID", memberID).Msg("Error looking up group member")
+		return err
+	}
+	i.logger.Debug().Str("backend", "ldap").Str("groupdn", ge.DN).Str("member", me.DN).Msg("remove member")
+
+	nOldMemberDN, err := ldapdn.ParseNormalize(me.DN)
+	members := ge.GetEqualFoldAttributeValues(i.groupAttributeMap.member)
+	found := false
+	for _, member := range members {
+		if member == "" {
+			continue
+		}
+		if nMember, err := ldapdn.ParseNormalize(member); err != nil {
+			// We couldn't parse the member value as a DN. Let's keep it
+			// as it is but log a warning
+			i.logger.Warn().Str("memberDN", member).Err(err).Msg("Couldn't parse DN")
+			continue
+		} else {
+			if nMember == nOldMemberDN {
+				found = true
+			}
+		}
+	}
+	if !found {
+		i.logger.Debug().Str("backend", "ldap").Str("groupdn", ge.DN).Str("member", me.DN).
+			Msg("The target is not a member of the group")
+		return nil
+	}
+
+	mr := ldap.ModifyRequest{DN: ge.DN}
+	if len(members) == 1 {
+		mr.Add(i.groupAttributeMap.member, []string{""})
+	}
+	mr.Delete(i.groupAttributeMap.member, []string{me.DN})
+
+	if err := i.conn.Modify(&mr); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 	if e == nil {
 		return nil

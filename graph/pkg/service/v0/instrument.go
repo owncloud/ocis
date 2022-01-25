@@ -84,6 +84,11 @@ func (i instrument) PostGroupMember(w http.ResponseWriter, r *http.Request) {
 	i.next.PostGroupMember(w, r)
 }
 
+// DeleteGroupMember implements the Service interface.
+func (i instrument) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
+	i.next.DeleteGroupMember(w, r)
+}
+
 // GetDrives implements the Service interface.
 func (i instrument) GetDrives(w http.ResponseWriter, r *http.Request) {
 	i.next.GetDrives(w, r)
