@@ -581,6 +581,7 @@ class SpacesContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $spaceName
+	 * @param string $path
 	 *
 	 * @return void
 	 *
@@ -588,7 +589,8 @@ class SpacesContext implements Context {
 	 */
 	public function theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
 		string $user,
-		string $spaceName
+		string $spaceName,
+		string $foldersPath = ''
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
 		Assert::assertIsArray($space);
@@ -596,7 +598,7 @@ class SpacesContext implements Context {
 		Assert::assertNotEmpty($spaceWebDavUrl = $space["root"]["webDavUrl"]);
 		$this->featureContext->setResponse(
 			$this->sendPropfindRequestToUrl(
-				$spaceWebDavUrl,
+				$spaceWebDavUrl . '/' . $foldersPath,
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				"",
@@ -679,7 +681,39 @@ class SpacesContext implements Context {
 		);
 		$this->propfindResultShouldContainEntries(
 			$shouldOrNot,
+			$expectedFiles
+		);
+	}
+
+	/**
+	 * @Then /^for user "([^"]*)" folder "([^"]*)" of the space "([^"]*)" should (not|)\s?contain these (?:files|entries):$/
+	 *
+	 * @param string    $user
+	 * @param string    $folderPath
+	 * @param string    $spaceName
+	 * @param string    $shouldOrNot   (not|)
+	 * @param TableNode $expectedFiles
+	 *
+	 * @return void
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function folderOfTheSpaceShouldContainEntries(
+		string $user,
+		string $folderPath,
+		string $spaceName,
+		string $shouldOrNot,
+		TableNode $expectedFiles
+	): void {
+		$this->theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
+			$user,
+			$spaceName,
+			$folderPath
+		);
+		$this->propfindResultShouldContainEntries(
+			$shouldOrNot,
 			$expectedFiles,
+			$folderPath
 		);
 	}
 
@@ -786,6 +820,7 @@ class SpacesContext implements Context {
 	/**
 	 * @param string    $shouldOrNot   (not|)
 	 * @param TableNode $expectedFiles
+	 * @param string $folderPath
 	 *
 	 * @return void
 	 *
@@ -793,7 +828,8 @@ class SpacesContext implements Context {
 	 */
 	public function propfindResultShouldContainEntries(
 		string $shouldOrNot,
-		TableNode $expectedFiles
+		TableNode $expectedFiles,
+		string $folderPath = ''
 	): void {
 		$this->verifyTableNodeColumnsCount($expectedFiles, 1);
 		$elementRows = $expectedFiles->getRows();
@@ -801,7 +837,8 @@ class SpacesContext implements Context {
 
 		foreach ($elementRows as $expectedFile) {
 			$fileFound = $this->findEntryFromPropfindResponse(
-				$expectedFile[0]
+				$expectedFile[0],
+				$folderPath
 			);
 			if ($should) {
 				Assert::assertNotEmpty(
@@ -852,7 +889,8 @@ class SpacesContext implements Context {
 	 * boolean false if $entryNameToSearch is given and is not found
 	 */
 	public function findEntryFromPropfindResponse(
-		string $entryNameToSearch = null
+		string $entryNameToSearch = null,
+		string $folderPath = ''
 	): array {
 		$spaceId = $this->getResponseSpaceId();
 		//if we are using that step the second time in a scenario e.g. 'But ... should not'
@@ -870,7 +908,7 @@ class SpacesContext implements Context {
 
 		// topWebDavPath should be something like /remote.php/webdav/ or
 		// /remote.php/dav/files/alice/
-		$topWebDavPath = "/" . "dav/spaces/" . $spaceId . "/";
+		$topWebDavPath = "/" . "dav/spaces/" . $spaceId . "/" . $folderPath;
 
 		Assert::assertIsArray(
 			$this->responseXml,
@@ -902,7 +940,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" creates a folder "([^"]*)" in space "([^"]*)" using the WebDav Api$/
+	 * @When /^user "([^"]*)" creates a (?:folder|subfolder) "([^"]*)" in space "([^"]*)" using the WebDav Api$/
 	 *
 	 * @param string $user
 	 * @param string $folder
@@ -917,11 +955,16 @@ class SpacesContext implements Context {
 		string $folder,
 		string $spaceName
 	): void {
-        $this->theUserCreatesAFolderToAnotherOwnerSpaceUsingTheGraphApi($user, $folder, $spaceName);
+		$exploded = explode('/', $folder);
+		$path = '';
+		for ($i = 0; $i < count($exploded); $i++) {
+			$path = $path . $exploded[$i] . '/';
+			$this->theUserCreatesAFolderToAnotherOwnerSpaceUsingTheGraphApi($user, $path, $spaceName);
+		};
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has created a folder "([^"]*)" in space "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has created a (?:folder|subfolder) "([^"]*)" in space "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $folder
@@ -1330,5 +1373,43 @@ class SpacesContext implements Context {
 		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares/" . $space['id'] . "?shareWith=" . $userRecipient;
 
 		HttpRequestHelper::delete($fullUrl, "", $user, $this->featureContext->getPasswordForUser($user));
+	}
+
+	/**
+	 * @When /^user "([^"]*)" removes the object "([^"]*)" from space "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $object
+	 * @param  string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function sendRemoveObjectFromSpaceRequest(
+		string $user,
+		string $object,
+		string $spaceName
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$spaceWebDavUrl = $space["root"]["webDavUrl"] . '/' . $object;
+		HttpRequestHelper::delete($spaceWebDavUrl, "", $user, $this->featureContext->getPasswordForUser($user));
+	}
+
+	/**
+	 * @When /^user "([^"]*)" removes a space "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function sendRemoveSpaceRequest(
+		string $user,
+		string $spaceName
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$spaceWebDavUrl = $space["root"]["webDavUrl"];
+		HttpRequestHelper::delete($spaceWebDavUrl, "", $user, $this->featureContext->getPasswordForUser($user));
 	}
 }

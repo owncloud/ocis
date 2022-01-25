@@ -21,3 +21,9 @@
 #### [Overwriting a file in the space within the allowed quota does not work](https://github.com/owncloud/ocis/issues/2829)
 - [apiSpaces/quota.feature:56](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/quota.feature#L56)
 
+#### [Viewer has the possibility to delete the space](https://github.com/owncloud/ocis/issues/3031)
+- [apiSpaces/removeSpaces.feature:130](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/removeSpaces.feature#L130)
+- [apiSpaces/removeSpaces.feature:140](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/removeSpaces.feature#L140)
+- [apiSpaces/removeSpaces.feature:150](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/removeSpaces.feature#L150)
+- [apiSpaces/removeSpaces.feature:160](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/removeSpaces.feature#L160)
+- [apiSpaces/removeSpaces.feature:171](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/removeSpaces.feature#L171)
