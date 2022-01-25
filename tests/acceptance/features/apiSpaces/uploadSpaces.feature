@@ -20,7 +20,7 @@ Feature: Upload files into a space
       | mainFolder        |
 
 
-  Scenario: A user can create a subfolders in a Space via the Graph API
+  Scenario: A user can create subfolders in a Space via the Graph API
     Given user "Alice" has created a space "Subfolders in Project" of type "project" with quota "2000"
     When user "Alice" creates a subfolder "mainFolder/subFolder1/subFolder2" in space "Subfolders in Project" using the WebDav Api
     Then the HTTP status code should be "201"
@@ -28,6 +28,7 @@ Feature: Upload files into a space
       | mainFolder |
     And for user "Alice" folder "mainFolder/subFolder1/" of the space "Subfolders in Project" should contain these entries:
       | subFolder2 |
+
 
   Scenario: A user cannot create a folder in a Space if they do not have permission
     Given user "Alice" has created a space "Project Merkur" of type "project" with quota "2000"
@@ -46,6 +47,7 @@ Feature: Upload files into a space
     And for user "Alice" the space "Project Moon" should contain these entries:
       | NewFolder        |
       | test.txt         |
+
 
   Scenario: A user cannot upload a file in a Space if they do not have permission
     Given user "Alice" has created a space "Project Pluto" of type "project" with quota "2000"

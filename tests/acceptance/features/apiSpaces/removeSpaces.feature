@@ -15,7 +15,7 @@ Feature: Remove files, folder and spaces
 
 #   owner of space
 
-  Scenario: A owner can delete a folder with some subfolders in a Space via the webDav API
+  Scenario: An owner can delete a folder with some subfolders in a Space via the webDav API
     Given user "Alice" has created a space "Owner deletes folder" of type "project" with quota "10"
     And user "Alice" has created a folder "folderForDeleting/sub1/sub2" in space "Owner deletes folder"
     When user "Alice" removes the object "folderForDeleting" from space "Owner deletes folder"
@@ -24,7 +24,7 @@ Feature: Remove files, folder and spaces
       | folderForDeleting |
 
 
-  Scenario: A owner can delete a subfolder in a Space via the webDav API
+  Scenario: An owner can delete a subfolder in a Space via the webDav API
     Given user "Alice" has created a space "Owner deletes subfolder" of type "project" with quota "10"
     And user "Alice" has created a subfolder "folder/subFolderForDeleting" in space "Owner deletes subfolder"
     When user "Alice" removes the object "folder/subFolderForDeleting" from space "Owner deletes subfolder"
@@ -35,7 +35,7 @@ Feature: Remove files, folder and spaces
       | subFolderForDeleting |
 
 
-  Scenario: A owner can delete a file in a Space via the webDav API
+  Scenario: An owner can delete a file in a Space via the webDav API
     Given user "Alice" has created a space "Owner deletes file" of type "project" with quota "20"
     And user "Alice" has uploaded a file inside space "Owner deletes file" with content "some content" to "text.txt"
     When user "Alice" removes the object "text.txt" from space "Owner deletes file"
@@ -49,15 +49,15 @@ Feature: Remove files, folder and spaces
       | quota@@@used | 0                 |
 
 
-  Scenario: A owner can delete a empty Space via the webDav API
-    Given user "Alice" has created a space "Owner deletes empty space" of type "project" with quota "20"
-    When user "Alice" removes a space "Owner deletes empty space"
+  Scenario: An owner can delete an empty Space via the webDav API
+    Given user "Alice" has created a space "Owner deletes an empty space" of type "project" with quota "20"
+    When user "Alice" removes a space "Owner deletes an empty space"
     Then the HTTP status code should be "200"
     When user "Alice" lists all available spaces via the GraphApi
-    Then the json responded should not contain a space with name "Owner deletes empty space"
+    Then the json responded should not contain a space with name "Owner deletes an empty space"
 
 
-  Scenario: A owner can delete a Space containing folders and files via the webDav API
+  Scenario: An owner can delete a Space containing folders and files via the webDav API
     Given user "Alice" has created a space "Owner deletes space" of type "project" with quota "20"
     And user "Alice" has created a folder "folderForDeleting/sub1/sub2" in space "Owner deletes space"
     And user "Alice" has uploaded a file inside space "Owner deletes space" with content "some content" to "folderForDeleting/sub1/sub2/text.txt"
@@ -68,7 +68,7 @@ Feature: Remove files, folder and spaces
 
 #   editor role
 
-  Scenario: A editor can delete a folder with some subfolders in a Space via the webDav API
+  Scenario: An editor can delete a folder with some subfolders in a Space via the webDav API
     Given user "Alice" has created a space "Editor deletes folder" of type "project" with quota "10"
     And user "Alice" has created a folder "folderForDeleting/sub1/sub2" in space "Editor deletes folder"
     And user "Alice" has shared a space "Editor deletes folder" to user "Brian" with role "editor"
@@ -78,7 +78,7 @@ Feature: Remove files, folder and spaces
       | folderForDeleting |
 
 
-  Scenario: A editor can delete a subfolder in a Space via the webDav API
+  Scenario: An editor can delete a subfolder in a Space via the webDav API
     Given user "Alice" has created a space "Editor deletes subfolder" of type "project" with quota "10"
     And user "Alice" has created a subfolder "folder/subFolderForDeleting" in space "Editor deletes subfolder"
     And user "Alice" has shared a space "Editor deletes subfolder" to user "Brian" with role "editor"
@@ -90,7 +90,7 @@ Feature: Remove files, folder and spaces
       | subFolderForDeleting |
 
 
-  Scenario: A editor can delete a file in a Space via the webDav API
+  Scenario: An editor can delete a file in a Space via the webDav API
     Given user "Alice" has created a space "Editor deletes file" of type "project" with quota "20"
     And user "Alice" has uploaded a file inside space "Editor deletes file" with content "some content" to "text.txt"
     And user "Alice" has shared a space "Editor deletes file" to user "Brian" with role "editor"
@@ -105,16 +105,16 @@ Feature: Remove files, folder and spaces
       | quota@@@used | 0                  |
 
 
-  Scenario: A editor can delete a empty Space via the webDav API
-    Given user "Alice" has created a space "Editor deletes empty space" of type "project" with quota "20"
-    And user "Alice" has shared a space "Editor deletes empty space" to user "Brian" with role "editor"
-    When user "Brian" removes a space "Editor deletes empty space"
+  Scenario: An editor can delete an empty Space via the webDav API
+    Given user "Alice" has created a space "Editor deletes an empty space" of type "project" with quota "20"
+    And user "Alice" has shared a space "Editor deletes an empty space" to user "Brian" with role "editor"
+    When user "Brian" removes a space "Editor deletes an empty space"
     Then the HTTP status code should be "200"
     When user "Brian" lists all available spaces via the GraphApi
-    Then the json responded should not contain a space with name "Editor deletes empty space"
+    Then the json responded should not contain a space with name "Editor deletes an empty space"
 
 
-  Scenario: A editor can delete a Space containing folders and files via the webDav API
+  Scenario: An editor can delete a Space containing folders and files via the webDav API
     Given user "Alice" has created a space "Editor deletes space" of type "project" with quota "20"
     And user "Alice" has created a folder "folderForDeleting/sub1/sub2" in space "Editor deletes space"
     And user "Alice" has uploaded a file inside space "Editor deletes space" with content "some content" to "folderForDeleting/sub1/sub2/text.txt"
@@ -157,15 +157,15 @@ Feature: Remove files, folder and spaces
       | text.txt |
 
 
-  Scenario: A viewer cannot delete a empty Space via the webDav API
-    Given user "Alice" has created a space "Viewer deletes empty space" of type "project" with quota "20"
-    And user "Alice" has shared a space "Viewer deletes empty space" to user "Brian" with role "viewer"
-    When user "Brian" removes a space "Viewer deletes empty space"
+  Scenario: A viewer cannot delete an empty Space via the webDav API
+    Given user "Alice" has created a space "Viewer deletes an empty space" of type "project" with quota "20"
+    And user "Alice" has shared a space "Viewer deletes an empty space" to user "Brian" with role "viewer"
+    When user "Brian" removes a space "Viewer deletes an empty space"
     Then the HTTP status code should be "403"
     When user "Brian" lists all available spaces via the GraphApi
-    Then the json responded should contain a space "Viewer deletes empty space" with these key and value pairs:
+    Then the json responded should contain a space "Viewer deletes an empty space" with these key and value pairs:
       | key  | value                      |
-      | name | Viewer deletes empty space |
+      | name | Viewer deletes an empty space |
 
 
   Scenario: A viewer cannot delete a Space containing folders and files via the webDav API
