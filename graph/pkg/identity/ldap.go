@@ -552,6 +552,22 @@ func (i *LDAP) CreateGroup(ctx context.Context, group libregraph.Group) (*libreg
 	return i.createGroupModelFromLDAP(e), nil
 }
 
+// DeleteGroup implements the Backend Interface.
+func (i *LDAP) DeleteGroup(ctx context.Context, id string) error {
+	if !i.writeEnabled {
+		return errorcode.New(errorcode.NotAllowed, "server is configured read-only")
+	}
+	e, err := i.getLDAPGroupByID(id, false)
+	if err != nil {
+		return err
+	}
+	dr := ldap.DelRequest{DN: e.DN}
+	if err = i.conn.Del(&dr); err != nil {
+		return err
+	}
+	return nil
+}
+
 // AddMemberToGroup implements the Backend Interface for the LDAP backend.
 // Currently it is limited to adding Users as Group members. Adding other groups
 // as members is not yet implemented

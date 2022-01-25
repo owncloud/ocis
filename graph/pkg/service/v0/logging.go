@@ -69,6 +69,11 @@ func (l logging) PostGroup(w http.ResponseWriter, r *http.Request) {
 	l.next.PostGroup(w, r)
 }
 
+// DeleteGroup implements the Service interface.
+func (l logging) DeleteGroup(w http.ResponseWriter, r *http.Request) {
+	l.next.DeleteGroup(w, r)
+}
+
 // GetGroupMembers implements the Service interface.
 func (l logging) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 	l.next.GetGroupMembers(w, r)

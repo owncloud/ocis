@@ -65,6 +65,11 @@ func (t tracing) PostGroup(w http.ResponseWriter, r *http.Request) {
 	t.next.PostGroup(w, r)
 }
 
+// DeleteGroup implements the Service interface.
+func (t tracing) DeleteGroup(w http.ResponseWriter, r *http.Request) {
+	t.next.DeleteGroup(w, r)
+}
+
 // GetGroupMembers implements the Service interface.
 func (t tracing) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 	t.next.GetGroupMembers(w, r)

@@ -88,6 +88,35 @@ func (g Graph) GetGroup(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, group)
 }
 
+// DeleteGroup implements the Service interface.
+func (g Graph) DeleteGroup(w http.ResponseWriter, r *http.Request) {
+	groupID := chi.URLParam(r, "groupID")
+	groupID, err := url.PathUnescape(groupID)
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping group id failed")
+		return
+	}
+
+	if groupID == "" {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing group id")
+		return
+	}
+
+	err = g.identityBackend.DeleteGroup(r.Context(), groupID)
+
+	if err != nil {
+		var errcode errorcode.Error
+		if errors.As(err, &errcode) {
+			errcode.Render(w, r)
+		} else {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+	render.Status(r, http.StatusNoContent)
+	render.NoContent(w, r)
+}
+
 func (g Graph) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 	groupID := chi.URLParam(r, "groupID")
 	groupID, err := url.PathUnescape(groupID)
