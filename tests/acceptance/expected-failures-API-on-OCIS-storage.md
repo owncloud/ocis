@@ -1473,3 +1473,13 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 #### [Content-type is not multipart/byteranges when downloading file with Range Header](https://github.com/owncloud/ocis/issues/2677)
 -   [apiWebdavOperations/downloadFile.feature:169](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L169)
 -   [apiWebdavOperations/downloadFile.feature:170](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L170)
+
+#### [Creating a new folder which is a substring of Shares leads to Unknown Error](https://github.com/owncloud/ocis/issues/3033)
+-   [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L27)
+-   [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L29)
+-   [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L30)
+-   [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L32)
+-   [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L45)
+-   [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L48)
+-   [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L59)
+-   [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L60)
