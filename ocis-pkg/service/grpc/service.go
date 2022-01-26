@@ -18,7 +18,11 @@ import (
 var DefaultClient = getDefaultGrpcClient()
 
 func getDefaultGrpcClient() client.Client {
+
+	reg := registry.GetRegistry()
+
 	return mgrpcc.NewClient(
+		client.Registry(reg),
 		client.Wrap(mbreaker.NewClientWrapper()),
 	)
 }
