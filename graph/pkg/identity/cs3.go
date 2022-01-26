@@ -184,8 +184,8 @@ func (i *CS3) GetGroupMembers(ctx context.Context, groupID string) ([]*libregrap
 	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
 }
 
-// AddMemberToGroup implements the Backend Interface. It's currently not supported for the CS3 backend
-func (i *CS3) AddMemberToGroup(ctx context.Context, groupID string, memberID string) error {
+// AddMembersToGroup implements the Backend Interface. It's currently not supported for the CS3 backend
+func (i *CS3) AddMembersToGroup(ctx context.Context, groupID string, memberID []string) error {
 	return errorcode.New(errorcode.NotSupported, "not implemented")
 }
 

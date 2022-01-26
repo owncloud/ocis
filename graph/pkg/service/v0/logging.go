@@ -69,6 +69,11 @@ func (l logging) PostGroup(w http.ResponseWriter, r *http.Request) {
 	l.next.PostGroup(w, r)
 }
 
+// PatchGroup implements the Service interface.
+func (l logging) PatchGroup(w http.ResponseWriter, r *http.Request) {
+	l.next.PatchGroup(w, r)
+}
+
 // DeleteGroup implements the Service interface.
 func (l logging) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	l.next.DeleteGroup(w, r)

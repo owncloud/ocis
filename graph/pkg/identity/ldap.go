@@ -568,19 +568,14 @@ func (i *LDAP) DeleteGroup(ctx context.Context, id string) error {
 	return nil
 }
 
-// AddMemberToGroup implements the Backend Interface for the LDAP backend.
+// AddMembersToGroup implements the Backend Interface for the LDAP backend.
 // Currently it is limited to adding Users as Group members. Adding other groups
 // as members is not yet implemented
-func (i *LDAP) AddMemberToGroup(ctx context.Context, groupID string, memberID string) error {
+func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs []string) error {
 	ge, err := i.getLDAPGroupByID(groupID, true)
 	if err != nil {
 		return err
 	}
-	me, err := i.getLDAPUserByID(memberID)
-	if err != nil {
-		return err
-	}
-	i.logger.Debug().Str("backend", "ldap").Str("groupdn", ge.DN).Str("member", me.DN).Msg("Add Member")
 
 	mr := ldap.ModifyRequest{DN: ge.DN}
 	// Handle empty groups (using the empty member attribute)
@@ -588,29 +583,47 @@ func (i *LDAP) AddMemberToGroup(ctx context.Context, groupID string, memberID st
 	if len(current) == 1 && current[0] == "" {
 		mr.Delete(i.groupAttributeMap.member, []string{""})
 	}
-	nUserDN, err := ldapdn.ParseNormalize(me.DN)
-	for _, member := range current {
-		if member == "" {
-			continue
-		}
-		if nMember, err := ldapdn.ParseNormalize(member); err != nil {
-			// We couldn't parse the member value as a DN. Let's keep it
-			// as it is but log a warning
-			i.logger.Warn().Str("memberDN", member).Err(err).Msg("Couldn't parse DN")
-			continue
-		} else {
-			if nMember == nUserDN {
-				i.logger.Info().Str("memberDN", member).Msg("User already present. Nothing to do")
-				return nil
-			}
-		}
 
+	// Create a Set of current members for faster lookups
+	currentSet := make(map[string]struct{}, len(current))
+	for _, currentMember := range current {
+		// We can ignore any empty member value here
+		if currentMember == "" {
+			continue
+		}
+		nCurrentMember, err := ldapdn.ParseNormalize(currentMember)
+		if err != nil {
+			// We couldn't parse the member value as a DN. Let's skip it, but log a warning
+			i.logger.Warn().Str("memberDN", currentMember).Err(err).Msg("Couldn't parse DN")
+			continue
+		}
+		currentSet[nCurrentMember] = struct{}{}
 	}
 
-	mr.Add(i.groupAttributeMap.member, []string{me.DN})
+	var newMemberDNs []string
+	for _, memberID := range memberIDs {
+		me, err := i.getLDAPUserByID(memberID)
+		if err != nil {
+			return err
+		}
+		nDN, err := ldapdn.ParseNormalize(me.DN)
+		if err != nil {
+			i.logger.Error().Str("new member", me.DN).Err(err).Msg("Couldn't parse DN")
+			return err
+		}
+		if _, present := currentSet[nDN]; !present {
+			newMemberDNs = append(newMemberDNs, me.DN)
+		} else {
+			i.logger.Debug().Str("memberDN", me.DN).Msg("Member already present in group. Skipping")
+		}
+	}
 
-	if err := i.conn.Modify(&mr); err != nil {
-		return err
+	if len(newMemberDNs) > 0 {
+		mr.Add(i.groupAttributeMap.member, newMemberDNs)
+
+		if err := i.conn.Modify(&mr); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -630,6 +643,10 @@ func (i *LDAP) RemoveMemberFromGroup(ctx context.Context, groupID string, member
 	i.logger.Debug().Str("backend", "ldap").Str("groupdn", ge.DN).Str("member", me.DN).Msg("remove member")
 
 	nOldMemberDN, err := ldapdn.ParseNormalize(me.DN)
+	if err != nil {
+		i.logger.Error().Str("old member", me.DN).Err(err).Msg("Couldn't parse DN")
+		return err
+	}
 	members := ge.GetEqualFoldAttributeValues(i.groupAttributeMap.member)
 	found := false
 	for _, member := range members {

@@ -65,6 +65,11 @@ func (t tracing) PostGroup(w http.ResponseWriter, r *http.Request) {
 	t.next.PostGroup(w, r)
 }
 
+// PatchGroup implements the Service interface.
+func (t tracing) PatchGroup(w http.ResponseWriter, r *http.Request) {
+	t.next.PatchGroup(w, r)
+}
+
 // DeleteGroup implements the Service interface.
 func (t tracing) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	t.next.DeleteGroup(w, r)
