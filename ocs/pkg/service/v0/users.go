@@ -14,6 +14,7 @@ import (
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/pkg/auth/scope"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
@@ -410,12 +411,6 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 						},
 					},
 				},
-				{
-					Type: provider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
-					Term: &provider.ListStorageSpacesRequest_Filter_SpaceType{
-						SpaceType: "personal",
-					},
-				},
 			},
 		})
 		if err != nil {
@@ -432,6 +427,50 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 		for _, space := range lsRes.StorageSpaces {
 			dsRes, err := gwc.DeleteStorageSpace(ctx, &provider.DeleteStorageSpaceRequest{
+				Id: space.Id,
+			})
+			if err != nil {
+				o.logger.Error().Err(err).Msg("DeleteUser: could not make delete space request")
+				continue
+			}
+			if dsRes.Status.Code != rpcv1beta1.Code_CODE_OK && dsRes.Status.Code != rpcv1beta1.Code_CODE_NOT_FOUND {
+				o.logger.Error().
+					Interface("status", dsRes.Status).
+					Msg("DeleteUser: could not delete space")
+				continue
+			}
+		}
+		lsRes, err = gwc.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
+			Filters: []*provider.ListStorageSpacesRequest_Filter{
+				{
+					Type: provider.ListStorageSpacesRequest_Filter_TYPE_OWNER,
+					Term: &provider.ListStorageSpacesRequest_Filter_Owner{
+						Owner: &revauser.UserId{
+							Idp:      o.config.IdentityManagement.Address,
+							OpaqueId: account.Id,
+						},
+					},
+				},
+			},
+		})
+		if err != nil {
+			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, errors.Wrap(err, "could not list owned personal spaces").Error()))
+			return
+		}
+
+		if lsRes.Status.Code != rpcv1beta1.Code_CODE_OK {
+			o.logger.Error().
+				Interface("status", lsRes.Status).
+				Msg("DeleteUser: could not list personal spaces")
+			return
+		}
+		for _, space := range lsRes.StorageSpaces {
+			dsRes, err := gwc.DeleteStorageSpace(ctx, &provider.DeleteStorageSpaceRequest{
+				Opaque: &typesv1beta1.Opaque{
+					Map: map[string]*typesv1beta1.OpaqueEntry{
+						"purge": {},
+					},
+				},
 				Id: space.Id,
 			})
 			if err != nil {
