@@ -53,7 +53,7 @@ func (g Service) CheckPermission(ctx context.Context, req *permissions.CheckPerm
 	assignments, err := g.manager.ListRoleAssignments(accountID)
 	if err != nil {
 		return &permissions.CheckPermissionResponse{
-			Status: status.NewInternal(ctx, err, err.Error()),
+			Status: status.NewInternal(ctx, err.Error()),
 		}, nil
 	}
 
@@ -65,7 +65,7 @@ func (g Service) CheckPermission(ctx context.Context, req *permissions.CheckPerm
 	permission, err := g.manager.ReadPermissionByName(req.Permission, roleIDs)
 	if err != nil {
 		return &permissions.CheckPermissionResponse{
-			Status: status.NewInternal(ctx, err, err.Error()),
+			Status: status.NewInternal(ctx, err.Error()),
 		}, nil
 	}
 
