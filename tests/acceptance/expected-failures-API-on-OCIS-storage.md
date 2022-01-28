@@ -1525,6 +1525,8 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 #### [moveShareInsideAnotherShare behaves differently on oCIS than oC10](https://github.com/owncloud/ocis/issues/3047)
 - [apiShareManagementToShares/moveShareInsideAnotherShare.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/moveShareInsideAnotherShare.feature#L25)
-- [apiShareManagementToShares/moveShareInsideAnotherShare.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/moveShareInsideAnotherShare.feature#L45)
-- [apiShareManagementToShares/moveShareInsideAnotherShare.feature:56](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/moveShareInsideAnotherShare.feature#L56)
-- [apiShareManagementToShares/moveShareInsideAnotherShare.feature:73](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/moveShareInsideAnotherShare.feature#L73)
+- [apiShareManagementToShares/moveShareInsideAnotherShare.feature:86](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/moveShareInsideAnotherShare.feature#L86)
+- [apiShareManagementToShares/moveShareInsideAnotherShare.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/moveShareInsideAnotherShare.feature#L100)
+
+Note: always have an empty line at the end of this file.
+The bash script that processes this file requires that the last line has a newline on the end.
