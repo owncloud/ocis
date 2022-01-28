@@ -1,6 +1,8 @@
 package settings
 
 import (
+	"errors"
+
 	"github.com/owncloud/ocis/settings/pkg/config"
 	"github.com/owncloud/ocis/settings/pkg/proto/v0"
 )
@@ -8,6 +10,9 @@ import (
 var (
 	// Registry uses the strategy pattern as a registry
 	Registry = map[string]RegisterFunc{}
+
+	// ErrPermissionNotFound defines a new error for when a permission was not found
+	ErrPermissionNotFound = errors.New("permission not found")
 )
 
 // RegisterFunc stores store constructors
@@ -50,4 +55,5 @@ type RoleAssignmentManager interface {
 type PermissionManager interface {
 	ListPermissionsByResource(resource *proto.Resource, roleIDs []string) ([]*proto.Permission, error)
 	ReadPermissionByID(permissionID string, roleIDs []string) (*proto.Permission, error)
+	ReadPermissionByName(name string, roleIDs []string) (*proto.Permission, error)
 }

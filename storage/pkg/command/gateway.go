@@ -140,6 +140,7 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 					"preferencessvc":   cfg.Reva.Users.Endpoint,
 					"userprovidersvc":  cfg.Reva.Users.Endpoint,
 					"groupprovidersvc": cfg.Reva.Groups.Endpoint,
+					"permissionssvc":   cfg.Reva.Permissions.Endpoint,
 					// sharing is located on the sharing service
 					"usershareprovidersvc":          cfg.Reva.Sharing.Endpoint,
 					"publicshareprovidersvc":        cfg.Reva.Sharing.Endpoint,

@@ -421,6 +421,9 @@ func DefaultConfig() *Config {
 				OpenURL:      "/app/open",
 				NewURL:       "/app/new",
 			},
+			Permissions: Port{
+				Endpoint: "localhost:9191",
+			},
 			Configs:                     nil,
 			UploadMaxChunkSize:          1e+8,
 			UploadHTTPMethodOverride:    "",
