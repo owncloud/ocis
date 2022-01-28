@@ -2,6 +2,7 @@ package identity
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 
@@ -12,6 +13,11 @@ import (
 	"github.com/owncloud/ocis/graph/pkg/config"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+)
+
+var (
+	errReadOnly = errorcode.New(errorcode.NotAllowed, "server is configured read-only")
+	errNotFound = errorcode.New(errorcode.ItemNotFound, "not found")
 )
 
 type LDAP struct {
@@ -47,7 +53,7 @@ type groupAttributeMap struct {
 func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LDAP, error) {
 	if config.UserDisplayNameAttribute == "" || config.UserIDAttribute == "" ||
 		config.UserEmailAttribute == "" || config.UserNameAttribute == "" {
-		return nil, fmt.Errorf("Invalid user attribute mappings")
+		return nil, errors.New("invalid user attribute mappings")
 	}
 	uam := userAttributeMap{
 		displayName: config.UserDisplayNameAttribute,
@@ -57,7 +63,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 	}
 
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
-		return nil, fmt.Errorf("Invalid group attribute mappings")
+		return nil, errors.New("invalid group attribute mappings")
 	}
 	gam := groupAttributeMap{
 		name: config.GroupNameAttribute,
@@ -67,11 +73,11 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 	var userScope, groupScope int
 	var err error
 	if userScope, err = stringToScope(config.UserSearchScope); err != nil {
-		return nil, fmt.Errorf("Error configuring user scope: %w", err)
+		return nil, fmt.Errorf("error configuring user scope: %w", err)
 	}
 
 	if groupScope, err = stringToScope(config.GroupSearchScope); err != nil {
-		return nil, fmt.Errorf("Error configuring group scope: %w", err)
+		return nil, fmt.Errorf("error configuring group scope: %w", err)
 	}
 
 	return &LDAP{
@@ -95,7 +101,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 // configured LDAP server
 func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregraph.User, error) {
 	if !i.writeEnabled {
-		return nil, errorcode.New(errorcode.NotAllowed, "server is configured read-only")
+		return nil, errReadOnly
 	}
 	ar := ldap.AddRequest{
 		DN: fmt.Sprintf("uid=%s,%s", *user.OnPremisesSamAccountName, i.userBaseDN),
@@ -161,7 +167,7 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 // by name or id from the LDAP server
 func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
 	if !i.writeEnabled {
-		return errorcode.New(errorcode.NotAllowed, "server is configured read-only")
+		return errReadOnly
 	}
 	e, err := i.getLDAPUserByNameOrID(nameOrID)
 	if err != nil {
@@ -177,7 +183,7 @@ func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
 // UpdateUser implements the Backend Interface. It's currently not suported for the CS3 backedn
 func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.User) (*libregraph.User, error) {
 	if !i.writeEnabled {
-		return nil, errorcode.New(errorcode.NotAllowed, "server is configured read-only")
+		return nil, errReadOnly
 	}
 	e, err := i.getLDAPUserByNameOrID(nameOrID)
 	if err != nil {
@@ -249,7 +255,7 @@ func (i *LDAP) getUserByDN(dn string) (*ldap.Entry, error) {
 		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
 	}
 	if len(res.Entries) == 0 {
-		return nil, errorcode.New(errorcode.ItemNotFound, "not found")
+		return nil, errNotFound
 	}
 
 	return res.Entries[0], nil
@@ -283,7 +289,7 @@ func (i *LDAP) getLDAPUserByNameOrID(nameOrID string) (*ldap.Entry, error) {
 		return nil, errorcode.New(errorcode.ItemNotFound, errmsg)
 	}
 	if len(res.Entries) == 0 {
-		return nil, errorcode.New(errorcode.ItemNotFound, "not found")
+		return nil, errNotFound
 	}
 
 	return res.Entries[0], nil
@@ -367,7 +373,7 @@ func (i *LDAP) GetGroup(ctx context.Context, groupID string) (*libregraph.Group,
 		return nil, errorcode.New(errorcode.ItemNotFound, errmsg)
 	}
 	if len(res.Entries) == 0 {
-		return nil, errorcode.New(errorcode.ItemNotFound, "not found")
+		return nil, errNotFound
 	}
 
 	return i.createGroupModelFromLDAP(res.Entries[0]), nil
@@ -449,7 +455,7 @@ func stringToScope(scope string) (int, error) {
 	case "base":
 		s = ldap.ScopeBaseObject
 	default:
-		return 0, fmt.Errorf("Invalid Scope '%s'", scope)
+		return 0, fmt.Errorf("invalid Scope '%s'", scope)
 	}
 	return s, nil
 }

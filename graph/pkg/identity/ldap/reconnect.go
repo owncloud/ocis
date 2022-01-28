@@ -14,6 +14,10 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
+var (
+	errMaxRetries = errors.New("max retries")
+)
+
 type ldapConnection struct {
 	Conn  *ldap.Conn
 	Error error
@@ -61,7 +65,7 @@ func (c ConnWithReconnect) Search(sr *ldap.SearchRequest) (*ldap.SearchResult, e
 		c.logger.Debug().Msg("retrying LDAP Search")
 	}
 	// if we get here we reached the maximum retries. So return an error
-	return nil, ldap.NewError(ldap.ErrorNetwork, errors.New("max retries"))
+	return nil, ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
 func (c ConnWithReconnect) Add(a *ldap.AddRequest) error {
@@ -84,7 +88,7 @@ func (c ConnWithReconnect) Add(a *ldap.AddRequest) error {
 		c.logger.Debug().Msg("retrying LDAP Add")
 	}
 	// if we get here we reached the maximum retries. So return an error
-	return ldap.NewError(ldap.ErrorNetwork, errors.New("max retries"))
+	return ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
 func (c ConnWithReconnect) Del(d *ldap.DelRequest) error {
@@ -108,7 +112,7 @@ func (c ConnWithReconnect) Del(d *ldap.DelRequest) error {
 		c.logger.Debug().Msg("retrying LDAP Del")
 	}
 	// if we get here we reached the maximum retries. So return an error
-	return ldap.NewError(ldap.ErrorNetwork, errors.New("max retries"))
+	return ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
 func (c ConnWithReconnect) Modify(m *ldap.ModifyRequest) error {
@@ -132,7 +136,7 @@ func (c ConnWithReconnect) Modify(m *ldap.ModifyRequest) error {
 		c.logger.Debug().Msg("retrying LDAP Modify")
 	}
 	// if we get here we reached the maximum retries. So return an error
-	return ldap.NewError(ldap.ErrorNetwork, errors.New("max retries"))
+	return ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
 func (c ConnWithReconnect) ModifyDN(m *ldap.ModifyDNRequest) error {
@@ -156,7 +160,7 @@ func (c ConnWithReconnect) ModifyDN(m *ldap.ModifyDNRequest) error {
 		c.logger.Debug().Msg("retrying LDAP ModifyDN")
 	}
 	// if we get here we reached the maximum retries. So return an error
-	return ldap.NewError(ldap.ErrorNetwork, errors.New("max retries"))
+	return ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
 func (c ConnWithReconnect) GetConnection() (*ldap.Conn, error) {
