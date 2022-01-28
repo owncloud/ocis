@@ -1480,7 +1480,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "STORAGE_USERS_DRIVER_OWNCLOUDSQL_REDIS_ADDR": "redis:6379",
             # ownCloud sharing driver
             "STORAGE_SHARING_USER_DRIVER": "oc10-sql",
-            "STORAGE_SHARING_USER_SQL_USERNAME":  "owncloud",
+            "STORAGE_SHARING_USER_SQL_USERNAME": "owncloud",
             "STORAGE_SHARING_USER_SQL_PASSWORD": "owncloud",
             "STORAGE_SHARING_USER_SQL_HOST": "oc10-db",
             "STORAGE_SHARING_USER_SQL_PORT": 3306,
