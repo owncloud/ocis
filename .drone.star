@@ -1478,10 +1478,19 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBNAME": "owncloud",
             # TODO: redis is not yet supported
             "STORAGE_USERS_DRIVER_OWNCLOUDSQL_REDIS_ADDR": "redis:6379",
+            # ownCloud sharing driver
+            "STORAGE_SHARING_USER_DRIVER": "oc10-sql",
+            "STORAGE_SHARING_USER_SQL_USERNAME":  "owncloud",
+            "STORAGE_SHARING_USER_SQL_PASSWORD": "owncloud",
+            "STORAGE_SHARING_USER_SQL_HOST": "oc10-db",
+            "STORAGE_SHARING_USER_SQL_PORT": 3306,
+            "STORAGE_SHARING_USER_SQL_NAME": "owncloud",
             # ownCloud storage readonly
             # TODO: conflict with OWNCLOUDSQL -> https://github.com/owncloud/ocis/issues/2303
             "OCIS_STORAGE_READ_ONLY": "false",
             # General oCIS config
+            # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
+            "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy",
             "OCIS_LOG_LEVEL": "error",
             "OCIS_URL": OCIS_URL,
             "PROXY_TLS": "true",
