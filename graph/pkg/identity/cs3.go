@@ -15,6 +15,10 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
+var (
+	errNotImplemented = errorcode.New(errorcode.NotSupported, "not implemented")
+)
+
 type CS3 struct {
 	Config *config.Reva
 	Logger *log.Logger
@@ -22,17 +26,17 @@ type CS3 struct {
 
 // CreateUser implements the Backend Interface. It's currently not supported for the CS3 backend
 func (i *CS3) CreateUser(ctx context.Context, user libregraph.User) (*libregraph.User, error) {
-	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
+	return nil, errNotImplemented
 }
 
 // DeleteUser implements the Backend Interface. It's currently not supported for the CS3 backend
 func (i *CS3) DeleteUser(ctx context.Context, nameOrID string) error {
-	return errorcode.New(errorcode.NotSupported, "not implemented")
+	return errNotImplemented
 }
 
 // UpdateUser implements the Backend Interface. It's currently not suported for the CS3 backend
 func (i *CS3) UpdateUser(ctx context.Context, nameOrID string, user libregraph.User) (*libregraph.User, error) {
-	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
+	return nil, errNotImplemented
 }
 
 func (i *CS3) GetUser(ctx context.Context, userID string) (*libregraph.User, error) {

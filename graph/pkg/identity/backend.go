@@ -13,15 +13,15 @@ type Backend interface {
 	CreateUser(ctx context.Context, user libregraph.User) (*libregraph.User, error)
 
 	// DeleteUser deletes a given user, identified by username or id, from the backend
-	DeleteUser(ctx context.Context, nameOrId string) error
+	DeleteUser(ctx context.Context, nameOrID string) error
 
 	// UpdateUser applies changes to given user, identified by username or id
-	UpdateUser(ctx context.Context, nameOrId string, user libregraph.User) (*libregraph.User, error)
+	UpdateUser(ctx context.Context, nameOrID string, user libregraph.User) (*libregraph.User, error)
 
-	GetUser(ctx context.Context, nameOrId string) (*libregraph.User, error)
+	GetUser(ctx context.Context, nameOrID string) (*libregraph.User, error)
 	GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error)
 
-	GetGroup(ctx context.Context, nameOrId string) (*libregraph.Group, error)
+	GetGroup(ctx context.Context, nameOrID string) (*libregraph.Group, error)
 	GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error)
 }
 
