@@ -2,6 +2,7 @@ package store
 
 import (
 	"github.com/owncloud/ocis/settings/pkg/proto/v0"
+	"github.com/owncloud/ocis/settings/pkg/settings"
 	"github.com/owncloud/ocis/settings/pkg/util"
 )
 
@@ -54,7 +55,7 @@ func (s Store) ReadPermissionByName(name string, roleIDs []string) (*proto.Permi
 			}
 		}
 	}
-	return nil, nil
+	return nil, settings.ErrPermissionNotFound
 }
 
 // extractPermissionsByResource collects all permissions from the provided role that match the requested resource

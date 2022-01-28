@@ -71,6 +71,8 @@ type permissionsServiceHandler struct {
 
 func (h *permissionsServiceHandler) CheckPermission(ctx context.Context, req *permissions.CheckPermissionRequest, res *permissions.CheckPermissionResponse) error {
 	r, err := h.api.CheckPermission(ctx, req)
-	*res = *r
+	if r != nil {
+		*res = *r
+	}
 	return err
 }

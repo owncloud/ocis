@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
@@ -64,9 +65,11 @@ func (g Service) CheckPermission(ctx context.Context, req *permissions.CheckPerm
 
 	permission, err := g.manager.ReadPermissionByName(req.Permission, roleIDs)
 	if err != nil {
-		return &permissions.CheckPermissionResponse{
-			Status: status.NewInternal(ctx, err.Error()),
-		}, nil
+		if !errors.Is(err, settings.ErrPermissionNotFound) {
+			return &permissions.CheckPermissionResponse{
+				Status: status.NewInternal(ctx, err.Error()),
+			}, nil
+		}
 	}
 
 	if permission == nil {
