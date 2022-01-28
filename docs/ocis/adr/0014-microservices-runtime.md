@@ -13,12 +13,14 @@ geekdocFilePath: 0014-microservices-runtime.md
 
 ## Context and Problem Statement
 
-In an environment where shipping a single binary beats the deployment wars, framing a whole family of microservices within a package and running it using Go language mechanisms has plenty of value. In such environment, a runtime is necessary to orchestrate the services that run within it.
+In an environment where shipping a single binary makes it easier for the end user to use oCIS, embedding a whole family of microservices within a package and running it leveraging the use of the Go language has plenty of value. In such environment, a runtime is necessary to orchestrate the services that run within it. Other solutions are hot right now, such as Kubernetes, but for a single deployment this entails orbital measures.
 
 ## Decision Drivers
 
-- Start oCIS microservices with a single command (`ocis server`)
-- Clear separation of concerns
+- Start oCIS microservices with a single command (`ocis server`).
+- Clear separation of concerns between services.
+- Control the lifecycle of the running services.
+- Services can be distributed across multiple machines and still be controllable somehow.
 
 ## Considered Options
 
@@ -46,12 +48,15 @@ Pros
 - Implementation based in swappable interfaces.
 - Multiple implementations, either in-memory or through external services
 - Production ready
+- Good compromise between high and low level code.
 
 ## Decision Outcome
 
 Number 3: A hybrid solution between framework and in-house.
 
 ### Design
+
+{{< svg src="extensions/storage/static/runtime.drawio.svg" >}}
 
 First of, every ocis service IS a go-micro service, and because go-micro makes use of urfave/cli, a service can be conveniently wrapped inside a subcommand. Writing a supervisor is then a choice. We do use a supervisor to ensure long-running processes and embrace the "let it crash" mentality. The piece we use for this end is called [Suture](https://github.com/thejerf/suture).
 
