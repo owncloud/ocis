@@ -1372,7 +1372,14 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares/" . $space['id'] . "?shareWith=" . $userRecipient;
 
-		HttpRequestHelper::delete($fullUrl, "", $user, $this->featureContext->getPasswordForUser($user));
+		$this->featureContext->setResponse(
+			HttpRequestHelper::delete(
+				$fullUrl,
+				"",
+				$user,
+				$this->featureContext->getPasswordForUser($user)
+			)
+		);
 	}
 
 	/**
@@ -1392,11 +1399,18 @@ class SpacesContext implements Context {
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$spaceWebDavUrl = $space["root"]["webDavUrl"] . '/' . $object;
-		HttpRequestHelper::delete($spaceWebDavUrl, "", $user, $this->featureContext->getPasswordForUser($user));
+		$this->featureContext->setResponse(
+			HttpRequestHelper::delete(
+				$spaceWebDavUrl,
+				"",
+				$user,
+				$this->featureContext->getPasswordForUser($user)
+			)
+		);
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes a space "([^"]*)"$/
+	 * @When /^user "([^"]*)" disables a space "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
@@ -1404,12 +1418,68 @@ class SpacesContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function sendRemoveSpaceRequest(
+	public function sendDisableSpaceRequest(
 		string $user,
 		string $spaceName
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$spaceWebDavUrl = $space["root"]["webDavUrl"];
-		HttpRequestHelper::delete($spaceWebDavUrl, "", $user, $this->featureContext->getPasswordForUser($user));
+		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/" . $space["id"];
+		$this->featureContext->setResponse(
+			HttpRequestHelper::delete(
+				$fullUrl,
+				"",
+				$user,
+				$this->featureContext->getPasswordForUser($user)
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" has disabled a space "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function sendUserHasDisabledSpaceRequest(
+		string $user,
+		string $spaceName
+	): void {
+		$this->sendDisableSpaceRequest($user, $spaceName);
+		$expectedHTTPStatus = "204";
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+            $expectedHTTPStatus,
+			"Expected response status code should be $expectedHTTPStatus"
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" deletes a space "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function sendDeleteSpaceRequest(
+		string $user,
+		string $spaceName
+	): void {
+		$header = ["Purge" => "T"];
+		$space = $this->getSpaceByName($user, $spaceName);
+		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/" . $space["id"];
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::delete(
+				$fullUrl,
+				"",
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$header
+			)
+		);
 	}
 }
