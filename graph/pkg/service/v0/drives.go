@@ -360,7 +360,7 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storag
 					// TODO cache until ./.config/ocis/space.yaml file changes
 					s = append(s, *sdi)
 				}
-				res.Special = &s
+				res.Special = s
 			}
 		}
 		// TODO this overwrites the quota that might already have been mapped in cs3StorageSpaceToDrive above ... move this into the cs3StorageSpaceToDrive method?
