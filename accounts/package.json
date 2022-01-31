@@ -50,7 +50,7 @@
     "chromedriver": "^93.0.1",
     "cross-env": "^7.0.3",
     "easygettext": "^2.17.0",
-    "eslint": "7.24.0",
+    "eslint": "7.32.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.17.3",
     "eslint-plugin-node": "11.1.0",
