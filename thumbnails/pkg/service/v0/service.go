@@ -12,7 +12,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v1"
+	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
 	"github.com/owncloud/ocis/thumbnails/pkg/preprocessor"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"

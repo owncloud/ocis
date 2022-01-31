@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 )
 
 // Options are all the possible options.

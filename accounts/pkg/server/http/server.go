@@ -1,7 +1,7 @@
 package http
 
 import (
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"

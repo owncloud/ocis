@@ -8,7 +8,7 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
 	//. "github.com/owncloud/ocis/ocis-pkg/indexer/test"
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
 	"github.com/stretchr/testify/assert"
 )
 

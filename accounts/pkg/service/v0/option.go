@@ -4,7 +4,7 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 )
 
 // Option defines a single option function.

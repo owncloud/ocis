@@ -3,7 +3,7 @@ package settings
 import (
 	"errors"
 
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v1"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 	"github.com/owncloud/ocis/settings/pkg/config"
 )
 

@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
-	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v1"
+	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v0"
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
@@ -20,7 +20,7 @@ import (
 	pkgmiddleware "github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/version"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/config/parser"
 	"github.com/owncloud/ocis/proxy/pkg/cs3"

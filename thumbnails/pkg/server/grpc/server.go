@@ -4,7 +4,7 @@ import (
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/version"
-	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v1"
+	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
 	svc "github.com/owncloud/ocis/thumbnails/pkg/service/v0"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/storage"

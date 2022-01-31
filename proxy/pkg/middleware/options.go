@@ -6,9 +6,9 @@ import (
 
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
-	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v1"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
+	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v0"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/ocis-pkg/log"

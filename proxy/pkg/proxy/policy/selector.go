@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"sort"
 
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	revactx "github.com/cs3org/reva/pkg/ctx"

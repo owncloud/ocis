@@ -3,8 +3,8 @@ package command
 import (
 	"fmt"
 
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	"github.com/owncloud/ocis/accounts/pkg/config"

@@ -26,7 +26,7 @@ import (
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/net"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 	settingsServiceExt "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"gopkg.in/yaml.v2"
 

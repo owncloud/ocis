@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/gofrs/uuid"
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v1"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 	"github.com/owncloud/ocis/settings/pkg/store/errortypes"
 )
 

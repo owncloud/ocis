@@ -13,8 +13,8 @@ import (
 
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	storemsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/store/v1"
-	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v1"
+	storemsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/store/v0"
+	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 	"golang.org/x/crypto/pbkdf2"

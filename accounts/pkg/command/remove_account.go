@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
 	"github.com/owncloud/ocis/accounts/pkg/flagset"
 

@@ -11,7 +11,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -21,7 +21,7 @@ import (
 	ocsm "github.com/owncloud/ocis/ocs/pkg/middleware"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 )
 

@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v1"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 )
 
 // Manager manages a cache of roles by fetching unknown roles from the settings.RoleService.

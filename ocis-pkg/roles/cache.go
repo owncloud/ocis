@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/owncloud/ocis/ocis-pkg/sync"
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v1"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 )
 
 // cache is a cache implementation for roles, keyed by roleIDs.

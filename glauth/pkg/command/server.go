@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
 	glauthcfg "github.com/glauth/glauth/v2/pkg/config"
 	"github.com/oklog/run"

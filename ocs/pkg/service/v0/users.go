@@ -10,11 +10,11 @@ import (
 	"strconv"
 	"strings"
 
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
-	storemsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/store/v1"
-	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v1"
+	storemsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/store/v0"
+	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v0"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"

@@ -5,8 +5,8 @@ import (
 	"path"
 	"strconv"
 
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"

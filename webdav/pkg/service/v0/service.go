@@ -19,8 +19,8 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 
 	"github.com/go-chi/chi/v5"
-	thumbnailsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/thumbnails/v1"
-	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v1"
+	thumbnailsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/thumbnails/v0"
+	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
 	"github.com/owncloud/ocis/webdav/pkg/config"
 	"github.com/owncloud/ocis/webdav/pkg/dav/requests"
 )

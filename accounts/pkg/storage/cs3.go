@@ -18,7 +18,7 @@ import (
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
 	metadatastorage "github.com/owncloud/ocis/ocis-pkg/metadata_storage"
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
 	"google.golang.org/grpc/metadata"
 )
 

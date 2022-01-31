@@ -3,7 +3,7 @@ package svc
 import (
 	"context"
 
-	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v1"
+	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
 	"github.com/owncloud/ocis/thumbnails/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	"github.com/owncloud/ocis/accounts/pkg/config"

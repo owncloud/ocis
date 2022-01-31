@@ -1,7 +1,7 @@
 package svc
 
 import (
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v1"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 )
 
 func (g Service) hasPermission(

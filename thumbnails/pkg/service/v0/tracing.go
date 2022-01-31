@@ -5,7 +5,7 @@ import (
 
 	"go.opentelemetry.io/otel/trace"
 
-	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v1"
+	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
 	thumbnailsTracing "github.com/owncloud/ocis/thumbnails/pkg/tracing"
 	"go.opentelemetry.io/otel/attribute"
 )

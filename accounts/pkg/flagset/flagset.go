@@ -1,7 +1,7 @@
 package flagset
 
 import (
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
 
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/flags"

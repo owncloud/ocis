@@ -9,8 +9,8 @@ import (
 	"regexp"
 	"strconv"
 
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/go-chi/chi/v5"

@@ -16,8 +16,8 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v1"
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v1"
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
@@ -28,7 +28,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 	settings_svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"github.com/rs/zerolog"
 	merrors "go-micro.dev/v4/errors"

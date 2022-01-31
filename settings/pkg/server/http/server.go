@@ -8,7 +8,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/ocis-pkg/version"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/settings/pkg/assets"
 	svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"go-micro.dev/v4"

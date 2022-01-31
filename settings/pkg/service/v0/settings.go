@@ -1,8 +1,8 @@
 package svc
 
 import (
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v1"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v1"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 )
 
 const (
