@@ -2387,8 +2387,8 @@ def fixSharedDataPermissions():
         "image": OC_CI_PHP,
         "pull": "always",
         "commands": [
-            "chown -R www-data:www-data /var/www/owncloud/apps",
-            "chmod -R 777 /var/www/owncloud/apps",
+            "chown -R www-data:www-data /var/www/owncloud",
+            "chmod -R 777 /var/www/owncloud",
             "chown -R www-data:www-data /mnt/data",
             "chmod -R 777 /mnt/data/",
         ],
