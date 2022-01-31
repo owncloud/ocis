@@ -1519,7 +1519,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "environment": environment,
             "user": user,
             "commands": [
-                "apk add mailcap",  # install /etc/mime.types
                 "ocis/bin/ocis server",
             ],
             "volumes": volumes,
