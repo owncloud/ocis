@@ -1,0 +1,89 @@
+---
+title: "15. oCIS Event System"
+weight: 15
+date: 2022-02-01T12:56:53+01:00
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/ocis/adr
+geekdocFilePath: 0015-events.md
+---
+
+* Status: proposed
+* Deciders: @butonic, @micbar, @dragotin, @c0rby, @wkloucek
+* Date: 2022-01-21
+
+## Context and Problem Statement
+
+### Overview
+
+To be able to implement simple, flexible and independant inter server communication there is the idea to implement an event system in oCIS. A service can send out events which are received by one or more other services. The receiving service can cause different kind of actions based on the event by utilizing the information that the event carries.
+
+###  Example: EMail Notification
+
+A simple example is the notification feature for oCIS: Users should receive an email when another user shares a file with them. The information, that the file was shared should go out as an event from the share manager, carrying the information which file was shared to which receiver. A potential notification service that really sends out the email listens to these kind of events and sends the email out once on every received event of that specific type.
+
+## Decision Drivers
+
+- Events are supposed to simplify things and raise flexibility, also considering extensions that are not directly controlled by the ownCloud project.
+- Events should bring flexibility in the implementation of sending and receiving services.
+- Events should not obsolete other mechanisms to communicate, ie. grpc calls.
+- Sending an event has to be as little resource consuming for the sender as possible.
+- Events are never user visible.
+
+## Considered Options
+
+1. Lightweight Events with Event Queue and "At most once" QoS
+2. As 1., but with "At least once" QoS
+
+## Options
+
+### 1. Lightweight Events with Event Queue and "At most once" QoS
+
+Reva will get a messaging service that is available to all services within oCIS and Reva. It is considered as one of the mandatory services of the oCIS system. If the messaging backend is not running, neither Reva nor oCIS can be considered healthy and should shut down.
+
+All oCIS- and Reva-services can connect to the messaging bus and send so called events. The sender gets an immediate return if handing the event to the message bus was succesful or not.
+
+The sender can not make any assumptions about when the message is delivered to any receiving service, nor if zero, one or many services are listening to that event.
+
+#### Event Data
+
+Events are identified by their namespace and their respective name. The namespace is delimited by dots and starts with either "reva" or "ocis" or an future extension name. It is followed by the name of the sending service and an unique name of the event.
+
+Example: `ocis.ocdav.delete` - an event with that name sent out if an WebDAV DELETE request arrived in the oCDav service.
+
+An event can carry a payload which is encoded as json object. (See for example [NATS](https://docs.nats.io/using-nats/developer/sending/structure) ). There are no pre defined members in that object, it is fully up to the sender which data will be included in the payload. Receivers must be robust to deal with changes.
+
+#### Quality of Service
+
+Events are sent with "At most once" quality of service. That means, if a receiver is not present at the moment of publishing it might not receive the event. That requires that the receiver must have functionality to back up the situation that events were missed. Given that the event queue can be considered the backbone of the system, it is unlikely that it is not running.
+
+#### Transactions
+
+The described way of inter service communication with events is not transactional. It is not supposed to be, but only provides a lightweight, loosely coupled way to "inform".
+
+If transactions are required, proper GRPC API calls with synchron reply are to be used. Another way would be to build asynchronous flows with request- and reply events in an asynchronous way. That is only recommended for special cases.
+
+#### Pros
+- Simple setup
+- Flexible way of connecting services
+- "State of the art" pattern in microservices architectures
+
+#### Cons
+- Over engineering: Can we do without an extra message queue component?
+- Messages might get lost, so that eventual consistency is endangered
+- Message queue needs to be implemented in Reva
+
+### 2. Lightweight Events with Event Queue and "At-least once" QoS
+
+Exactly as described above, but with a higher service level quality.
+
+#### Pros
+- Better service level: Messages do not get lost.
+-
+
+
+
+## Decision Outcome
+
+
+### Design
+
