@@ -90,7 +90,7 @@ func (e ErrorCode) Render(w http.ResponseWriter, r *http.Request, status int, ms
 		Error: libregraph.OdataErrorMain{
 			Code:       e.String(),
 			Message:    msg,
-			Innererror: &innererror,
+			Innererror: innererror,
 		},
 	}
 	render.Status(r, status)
