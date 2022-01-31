@@ -50,7 +50,7 @@ require (
 	github.com/onsi/gomega v1.18.1
 	github.com/owncloud/libre-graph-api-go v0.8.0
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.12.0
+	github.com/prometheus/client_golang v1.12.1
 	github.com/rs/zerolog v1.26.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.3.0
