@@ -138,7 +138,7 @@
     "react-intl-cra": "^0.3.3",
     "react-intl-po": "^2.2.2",
     "resolve": "1.20.0",
-    "resolve-url-loader": "^3.1.2",
+    "resolve-url-loader": "^5.0.0",
     "sass-loader": "11.0.1",
     "source-map-explorer": "^2.5.2",
     "style-loader": "2.0.0",
