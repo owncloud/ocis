@@ -93,7 +93,7 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "render-if": "^0.1.1",
-    "semver": "7.3.4",
+    "semver": "7.3.5",
     "typeface-roboto": "^1.1.13"
   },
   "devDependencies": {
