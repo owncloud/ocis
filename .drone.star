@@ -1496,6 +1496,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_LOG_LEVEL": "error",
             "OCIS_URL": OCIS_URL,
             "PROXY_TLS": "true",
+            "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",
             # change default secrets
             "OCIS_JWT_SECRET": "Pive-Fumkiu4",
             "STORAGE_TRANSFER_SECRET": "replace-me-with-a-transfer-secret",
@@ -2297,7 +2298,7 @@ def fixSharedDataPermissions():
             "chown -R 33:33 /var/www/owncloud",  # www-data  user
             "chmod -R 777 /var/www/owncloud",
             "chown -R 33:33 /mnt/data",  # www-data  user
-            "chmod -R 777 /mnt/data/",
+            "chmod -R 777 /mnt/data",
         ],
         "volumes": [
             stepVolumeOC10Apps,
