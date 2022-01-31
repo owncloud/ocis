@@ -56,7 +56,7 @@ Number 3: A hybrid solution between framework and in-house.
 
 ### Design
 
-{{< svg src="extensions/storage/static/runtime.drawio.svg" >}}
+{{< svg src="ocis/static/runtime.drawio.svg" >}}
 
 First of, every ocis service IS a go-micro service, and because go-micro makes use of urfave/cli, a service can be conveniently wrapped inside a subcommand. Writing a supervisor is then a choice. We do use a supervisor to ensure long-running processes and embrace the "let it crash" mentality. The piece we use for this end is called [Suture](https://github.com/thejerf/suture).
 
