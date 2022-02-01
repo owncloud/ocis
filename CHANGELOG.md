@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the default tracing provider: [#2952](https://github.com/owncloud/ocis/pull/2952)
 * Bugfix - Fix configuration for space membership endpoint: [#2893](https://github.com/owncloud/ocis/pull/2893)
 * Change - Change log level default from debug to error: [#3071](https://github.com/owncloud/ocis/pull/3071)
+* Change - Remove the ownCloud storage driver: [#3072](https://github.com/owncloud/ocis/pull/3072)
 * Change - Unify configuration and commands: [#2818](https://github.com/owncloud/ocis/pull/2818)
 * Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 * Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
@@ -68,6 +69,16 @@ The following sections list the changes for unreleased.
    We've changed the default log level for all services from "info" to "error".
 
    https://github.com/owncloud/ocis/pull/3071
+
+* Change - Remove the ownCloud storage driver: [#3072](https://github.com/owncloud/ocis/pull/3072)
+
+   We've removed the ownCloud storage driver because it was no longer maintained after the
+   ownCloud SQL storage driver was added.
+
+   If you have been using the ownCloud storage driver, please switch to the ownCloud SQL storage
+   driver which brings you more features and is under active maintenance.
+
+   https://github.com/owncloud/ocis/pull/3072
 
 * Change - Unify configuration and commands: [#2818](https://github.com/owncloud/ocis/pull/2818)
 
