@@ -1,24 +1,16 @@
 ---
-title: "GRPC API"
-date: 2018-05-02T00:00:00+00:00
+title: "ocis.services.thumbnails.v0"
+url: /grpc_apis/ocis.services.thumbnails.v0
+date: 2022-02-01T08:15:10Z
 weight: 50
-geekdocRepo: https://github.com/owncloud/ocis-thumbnails
-geekdocEditPath: edit/master/docs
-geekdocFilePath: grpc.md
+geekdocRepo: https://github.com/owncloud/ocis
 ---
 
 {{< toc >}}
 
-## proto/v0/thumbnails.proto
-
-### CS3Source
 
 
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| path | [string](#string) |  |  |
-| authorization | [string](#string) |  |  |
+## ocis/services/thumbnails/v0/thumbnails.proto
 
 ### GetThumbnailRequest
 
@@ -30,8 +22,8 @@ A request to retrieve a thumbnail
 | thumbnail_type | [GetThumbnailRequest.ThumbnailType](#getthumbnailrequestthumbnailtype) |  | The type to which the thumbnail should get encoded to. |
 | width | [int32](#int32) |  | The width of the thumbnail |
 | height | [int32](#int32) |  | The height of the thumbnail |
-| webdav_source | [WebdavSource](#webdavsource) |  |  |
-| cs3_source | [CS3Source](#cs3source) |  |  |
+| webdav_source | [ocis.messages.thumbnails.v0.WebdavSource](/grpc_apis/ocis.messages.thumbnails.v0/#webdavsource) |  |  |
+| cs3_source | [ocis.messages.thumbnails.v0.CS3Source](/grpc_apis/ocis.messages.thumbnails.v0/#cs3source) |  |  |
 
 ### GetThumbnailResponse
 
@@ -41,18 +33,6 @@ The service response
 | ----- | ---- | ----- | ----------- |
 | thumbnail | [bytes](#bytes) |  | The thumbnail as a binary |
 | mimetype | [string](#string) |  | The mimetype of the thumbnail |
-
-### WebdavSource
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| url | [string](#string) |  | REQUIRED. |
-| is_public_link | [bool](#bool) |  | REQUIRED. |
-| webdav_authorization | [string](#string) |  | OPTIONAL. |
-| reva_authorization | [string](#string) |  | OPTIONAL. |
-| public_link_token | [string](#string) |  | OPTIONAL. |
 
 ### GetThumbnailRequest.ThumbnailType
 
@@ -90,3 +70,4 @@ A Service for handling thumbnail generation
 | {{< div id="bool" content="bool" >}} |  | bool | boolean |
 | {{< div id="string" content="string" >}} | A string must always contain UTF-8 encoded or 7-bit ASCII text. | string | String |
 | {{< div id="bytes" content="bytes" >}} | May contain any arbitrary sequence of bytes. | string | ByteString |
+

@@ -1,15 +1,16 @@
 ---
-title: "GRPC API"
-date: 2018-05-02T00:00:00+00:00
+title: "ocis.services.store.v0"
+url: /grpc_apis/ocis.services.store.v0
+date: 2022-02-01T08:15:11Z
 weight: 50
-geekdocRepo: https://github.com/owncloud/ocis-thumbnails
-geekdocEditPath: edit/master/docs
-geekdocFilePath: grpc.md
+geekdocRepo: https://github.com/owncloud/ocis
 ---
 
 {{< toc >}}
 
-## proto/v0/store.proto
+
+
+## ocis/services/store/v0/store.proto
 
 ### DatabasesRequest
 
@@ -24,15 +25,6 @@ geekdocFilePath: grpc.md
 | ----- | ---- | ----- | ----------- |
 | databases | [string](#string) | repeated |  |
 
-### DeleteOptions
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| database | [string](#string) |  |  |
-| table | [string](#string) |  |  |
-
 ### DeleteRequest
 
 
@@ -40,34 +32,12 @@ geekdocFilePath: grpc.md
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | key | [string](#string) |  |  |
-| options | [DeleteOptions](#deleteoptions) |  |  |
+| options | [ocis.messages.store.v0.DeleteOptions](/grpc_apis/ocis.messages.store.v0/#deleteoptions) |  |  |
 
 ### DeleteResponse
 
 
 
-
-### Field
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| type | [string](#string) |  | type of value e.g string, int, int64, bool, float64 |
-| value | [string](#string) |  | the actual value |
-
-### ListOptions
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| database | [string](#string) |  |  |
-| table | [string](#string) |  |  |
-| prefix | [string](#string) |  |  |
-| suffix | [string](#string) |  |  |
-| limit | [uint64](#uint64) |  |  |
-| offset | [uint64](#uint64) |  |  |
 
 ### ListRequest
 
@@ -75,7 +45,7 @@ geekdocFilePath: grpc.md
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| options | [ListOptions](#listoptions) |  |  |
+| options | [ocis.messages.store.v0.ListOptions](/grpc_apis/ocis.messages.store.v0/#listoptions) |  |  |
 
 ### ListResponse
 
@@ -85,29 +55,6 @@ geekdocFilePath: grpc.md
 | ----- | ---- | ----- | ----------- |
 | keys | [string](#string) | repeated |  |
 
-### ReadOptions
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| database | [string](#string) |  |  |
-| table | [string](#string) |  |  |
-| prefix | [bool](#bool) |  |  |
-| suffix | [bool](#bool) |  |  |
-| limit | [uint64](#uint64) |  |  |
-| offset | [uint64](#uint64) |  |  |
-| where | [ReadOptions.WhereEntry](#readoptionswhereentry) | repeated |  |
-
-### ReadOptions.WhereEntry
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| key | [string](#string) |  |  |
-| value | [Field](#field) |  |  |
-
 ### ReadRequest
 
 
@@ -115,7 +62,7 @@ geekdocFilePath: grpc.md
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | key | [string](#string) |  |  |
-| options | [ReadOptions](#readoptions) |  |  |
+| options | [ocis.messages.store.v0.ReadOptions](/grpc_apis/ocis.messages.store.v0/#readoptions) |  |  |
 
 ### ReadResponse
 
@@ -123,27 +70,7 @@ geekdocFilePath: grpc.md
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| records | [Record](#record) | repeated |  |
-
-### Record
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| key | [string](#string) |  | key of the recorda |
-| value | [bytes](#bytes) |  | value in the record |
-| expiry | [int64](#int64) |  | time.Duration (signed int64 nanoseconds) |
-| metadata | [Record.MetadataEntry](#recordmetadataentry) | repeated | the associated metadata |
-
-### Record.MetadataEntry
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| key | [string](#string) |  |  |
-| value | [Field](#field) |  |  |
+| records | [ocis.messages.store.v0.Record](/grpc_apis/ocis.messages.store.v0/#record) | repeated |  |
 
 ### TablesRequest
 
@@ -161,25 +88,14 @@ geekdocFilePath: grpc.md
 | ----- | ---- | ----- | ----------- |
 | tables | [string](#string) | repeated |  |
 
-### WriteOptions
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| database | [string](#string) |  |  |
-| table | [string](#string) |  |  |
-| expiry | [int64](#int64) |  | time.Time |
-| ttl | [int64](#int64) |  | time.Duration |
-
 ### WriteRequest
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| record | [Record](#record) |  |  |
-| options | [WriteOptions](#writeoptions) |  |  |
+| record | [ocis.messages.store.v0.Record](/grpc_apis/ocis.messages.store.v0/#record) |  |  |
+| options | [ocis.messages.store.v0.WriteOptions](/grpc_apis/ocis.messages.store.v0/#writeoptions) |  |  |
 
 ### WriteResponse
 
@@ -219,3 +135,4 @@ geekdocFilePath: grpc.md
 | {{< div id="bool" content="bool" >}} |  | bool | boolean |
 | {{< div id="string" content="string" >}} | A string must always contain UTF-8 encoded or 7-bit ASCII text. | string | String |
 | {{< div id="bytes" content="bytes" >}} | May contain any arbitrary sequence of bytes. | string | ByteString |
+

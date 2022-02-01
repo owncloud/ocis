@@ -1,49 +1,16 @@
 ---
-title: "GRPC API"
-date: 2018-05-02T00:00:00+00:00
+title: "ocis.messages.settings.v0"
+url: /grpc_apis/ocis.messages.settings.v0
+date: 2022-02-01T08:15:11Z
 weight: 50
-geekdocRepo: https://github.com/owncloud/ocis-thumbnails
-geekdocEditPath: edit/master/docs
-geekdocFilePath: grpc.md
+geekdocRepo: https://github.com/owncloud/ocis
 ---
 
 {{< toc >}}
 
-## proto/v0/settings.proto
-
-### AddSettingToBundleRequest
 
 
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| bundle_id | [string](#string) |  |  |
-| setting | [Setting](#setting) |  |  |
-
-### AddSettingToBundleResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| setting | [Setting](#setting) |  |  |
-
-### AssignRoleToUserRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| account_uuid | [string](#string) |  |  |
-| role_id | [string](#string) |  | the role_id is a bundle_id internally |
-
-### AssignRoleToUserResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| assignment | [UserRoleAssignment](#userroleassignment) |  |  |
+## ocis/messages/settings/v0/settings.proto
 
 ### Bool
 
@@ -68,63 +35,6 @@ geekdocFilePath: grpc.md
 | settings | [Setting](#setting) | repeated |  |
 | resource | [Resource](#resource) |  |  |
 
-### GetBundleRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| bundle_id | [string](#string) |  |  |
-
-### GetBundleResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| bundle | [Bundle](#bundle) |  |  |
-
-### GetPermissionByIDRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| permission_id | [string](#string) |  |  |
-
-### GetPermissionByIDResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| permission | [Permission](#permission) |  |  |
-
-### GetValueByUniqueIdentifiersRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| account_uuid | [string](#string) |  |  |
-| setting_id | [string](#string) |  |  |
-
-### GetValueRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| id | [string](#string) |  |  |
-
-### GetValueResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| value | [ValueWithIdentifier](#valuewithidentifier) |  |  |
-
 ### Identifier
 
 
@@ -147,22 +57,6 @@ geekdocFilePath: grpc.md
 | step | [int64](#int64) |  |  |
 | placeholder | [string](#string) |  |  |
 
-### ListBundlesRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| bundle_ids | [string](#string) | repeated |  |
-
-### ListBundlesResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| bundles | [Bundle](#bundle) | repeated |  |
-
 ### ListOption
 
 
@@ -182,38 +76,6 @@ geekdocFilePath: grpc.md
 | string_value | [string](#string) |  |  |
 | int_value | [int64](#int64) |  |  |
 
-### ListPermissionsByResourceRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| resource | [Resource](#resource) |  |  |
-
-### ListPermissionsByResourceResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| permissions | [Permission](#permission) | repeated |  |
-
-### ListRoleAssignmentsRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| account_uuid | [string](#string) |  |  |
-
-### ListRoleAssignmentsResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| assignments | [UserRoleAssignment](#userroleassignment) | repeated |  |
-
 ### ListValue
 
 
@@ -221,23 +83,6 @@ geekdocFilePath: grpc.md
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | values | [ListOptionValue](#listoptionvalue) | repeated |  |
-
-### ListValuesRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| bundle_id | [string](#string) |  |  |
-| account_uuid | [string](#string) |  |  |
-
-### ListValuesResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| values | [ValueWithIdentifier](#valuewithidentifier) | repeated |  |
 
 ### MultiChoiceList
 
@@ -256,23 +101,6 @@ geekdocFilePath: grpc.md
 | operation | [Permission.Operation](#permissionoperation) |  |  |
 | constraint | [Permission.Constraint](#permissionconstraint) |  |  |
 
-### RemoveRoleFromUserRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| id | [string](#string) |  |  |
-
-### RemoveSettingFromBundleRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| bundle_id | [string](#string) |  |  |
-| setting_id | [string](#string) |  |  |
-
 ### Resource
 
 
@@ -281,40 +109,6 @@ geekdocFilePath: grpc.md
 | ----- | ---- | ----- | ----------- |
 | type | [Resource.Type](#resourcetype) |  |  |
 | id | [string](#string) |  |  |
-
-### SaveBundleRequest
-
----
-requests and responses for settings bundles
----
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| bundle | [Bundle](#bundle) |  |  |
-
-### SaveBundleResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| bundle | [Bundle](#bundle) |  |  |
-
-### SaveValueRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| value | [Value](#value) |  |  |
-
-### SaveValueResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| value | [ValueWithIdentifier](#valuewithidentifier) |  |  |
 
 ### Setting
 
@@ -436,49 +230,6 @@ requests and responses for settings bundles
 | TYPE_USER | 6 |  |
 | TYPE_GROUP | 7 |  |
 
-### BundleService
-
-
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| SaveBundle | [SaveBundleRequest](#savebundlerequest) | [SaveBundleResponse](#savebundleresponse) |  |
-| GetBundle | [GetBundleRequest](#getbundlerequest) | [GetBundleResponse](#getbundleresponse) |  |
-| ListBundles | [ListBundlesRequest](#listbundlesrequest) | [ListBundlesResponse](#listbundlesresponse) |  |
-| AddSettingToBundle | [AddSettingToBundleRequest](#addsettingtobundlerequest) | [AddSettingToBundleResponse](#addsettingtobundleresponse) |  |
-| RemoveSettingFromBundle | [RemoveSettingFromBundleRequest](#removesettingfrombundlerequest) | [.google.protobuf.Empty](#googleprotobufempty) |  |
-
-### PermissionService
-
-
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| ListPermissionsByResource | [ListPermissionsByResourceRequest](#listpermissionsbyresourcerequest) | [ListPermissionsByResourceResponse](#listpermissionsbyresourceresponse) |  |
-| GetPermissionByID | [GetPermissionByIDRequest](#getpermissionbyidrequest) | [GetPermissionByIDResponse](#getpermissionbyidresponse) |  |
-
-### RoleService
-
-
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| ListRoles | [ListBundlesRequest](#listbundlesrequest) | [ListBundlesResponse](#listbundlesresponse) |  |
-| ListRoleAssignments | [ListRoleAssignmentsRequest](#listroleassignmentsrequest) | [ListRoleAssignmentsResponse](#listroleassignmentsresponse) |  |
-| AssignRoleToUser | [AssignRoleToUserRequest](#assignroletouserrequest) | [AssignRoleToUserResponse](#assignroletouserresponse) |  |
-| RemoveRoleFromUser | [RemoveRoleFromUserRequest](#removerolefromuserrequest) | [.google.protobuf.Empty](#googleprotobufempty) |  |
-
-### ValueService
-
-
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| SaveValue | [SaveValueRequest](#savevaluerequest) | [SaveValueResponse](#savevalueresponse) |  |
-| GetValue | [GetValueRequest](#getvaluerequest) | [GetValueResponse](#getvalueresponse) |  |
-| ListValues | [ListValuesRequest](#listvaluesrequest) | [ListValuesResponse](#listvaluesresponse) |  |
-| GetValueByUniqueIdentifiers | [GetValueByUniqueIdentifiersRequest](#getvaluebyuniqueidentifiersrequest) | [GetValueResponse](#getvalueresponse) |  |
-
 ## Scalar Value Types
 
 | .proto Type | Notes | C++ | Java |
@@ -498,3 +249,4 @@ requests and responses for settings bundles
 | {{< div id="bool" content="bool" >}} |  | bool | boolean |
 | {{< div id="string" content="string" >}} | A string must always contain UTF-8 encoded or 7-bit ASCII text. | string | String |
 | {{< div id="bytes" content="bytes" >}} | May contain any arbitrary sequence of bytes. | string | ByteString |
+
