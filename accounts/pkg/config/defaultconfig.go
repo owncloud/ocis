@@ -46,7 +46,6 @@ func DefaultConfig() *Config {
 			},
 			CS3: CS3{
 				ProviderAddr: "localhost:9215",
-				JWTSecret:    "Pive-Fumkiu4",
 			},
 		},
 		Index: Index{
