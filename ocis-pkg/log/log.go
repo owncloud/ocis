@@ -58,7 +58,7 @@ func NewLogger(opts ...Option) Logger {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		mlog.SetLevel(mlog.LevelTrace)
 	default:
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
 		mlog.SetLevel(mlog.LevelInfo)
 	}
 
