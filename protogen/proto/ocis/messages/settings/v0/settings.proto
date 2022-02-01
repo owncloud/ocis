@@ -1,0 +1,172 @@
+syntax = "proto3";
+
+package ocis.messages.settings.v0;
+
+option go_package = "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0";
+
+// ---
+// messages for settings values
+// ---
+
+message ValueWithIdentifier {
+  Identifier identifier = 1;
+  Value value = 2;
+}
+
+message Identifier {
+  string extension = 1;
+  string bundle = 2;
+  string setting = 3;
+}
+
+// ---
+// messages for role assignment
+// ---
+
+message UserRoleAssignment {
+  // id is generated upon saving the assignment
+  string id = 1;
+  string account_uuid = 2;
+  // the role_id is a bundle_id internally
+  string role_id = 3;
+}
+
+// ---
+// resource payloads
+// ---
+
+message Resource {
+  enum Type {
+    TYPE_UNKNOWN = 0;
+    TYPE_SYSTEM = 1;
+    TYPE_FILE = 2;
+    TYPE_SHARE = 3;
+    TYPE_SETTING = 4;
+    TYPE_BUNDLE = 5;
+    TYPE_USER = 6;
+    TYPE_GROUP = 7;
+  }
+  Type type = 1;
+  string id = 2;
+}
+
+// ---
+// payloads for bundles
+// ---
+
+message Bundle {
+  enum Type {
+    TYPE_UNKNOWN = 0;
+    TYPE_DEFAULT = 1;
+    TYPE_ROLE = 2;
+  }
+  string id = 1;
+  string name = 2;
+  Type type = 3;
+  string extension = 4;
+  string display_name = 5;
+  repeated Setting settings = 6;
+  Resource resource = 7;
+}
+
+message Setting {
+  string id = 1;
+  string name = 2;
+  string display_name = 3;
+  string description = 4;
+  oneof value {
+    Int int_value = 5;
+    String string_value = 6;
+    Bool bool_value = 7;
+    SingleChoiceList single_choice_value = 8;
+    MultiChoiceList multi_choice_value = 9;
+    Permission permission_value = 10;
+  }
+  Resource resource = 11;
+}
+
+message Int {
+  int64 default = 1;
+  int64 min = 2;
+  int64 max = 3;
+  int64 step = 4;
+  string placeholder = 5;
+}
+
+message String {
+  string default = 1;
+  bool required = 2;
+  int32 min_length = 3;
+  int32 max_length = 4;
+  string placeholder = 5;
+}
+
+message Bool {
+  bool default = 1;
+  string label = 2;
+}
+
+message SingleChoiceList {
+  repeated ListOption options = 1;
+}
+
+message MultiChoiceList {
+  repeated ListOption options = 1;
+}
+
+message ListOption {
+  ListOptionValue value = 1;
+  bool default = 2;
+  string display_value = 3;
+}
+
+message Permission {
+  enum Operation {
+    OPERATION_UNKNOWN = 0;
+    OPERATION_CREATE = 1;
+    OPERATION_READ = 2;
+    OPERATION_UPDATE = 3;
+    OPERATION_DELETE = 4;
+    OPERATION_WRITE = 5;// WRITE is a combination of CREATE and UPDATE
+    OPERATION_READWRITE = 6;// READWRITE is a combination of READ and WRITE
+  }
+  Operation operation = 1;
+  enum Constraint {
+    CONSTRAINT_UNKNOWN = 0;
+    CONSTRAINT_OWN = 1;
+    CONSTRAINT_SHARED = 2;
+    CONSTRAINT_ALL = 3;
+  }
+  Constraint constraint = 2;
+}
+
+// ---
+// payloads for values
+// ---
+
+message Value {
+  // id is the id of the Value. It is generated on saving it.
+  string id = 1;
+  string bundle_id = 2;
+  // setting_id is the id of the setting from within its bundle.
+  string setting_id = 3;
+  string account_uuid = 4;
+  Resource resource = 5;
+  oneof value {
+    bool bool_value = 6;
+    int64 int_value = 7;
+    string string_value = 8;
+    ListValue list_value = 9;
+  }
+}
+
+message ListValue {
+  repeated ListOptionValue values = 1;
+}
+
+message ListOptionValue {
+  oneof option {
+    string string_value = 1;
+    int64 int_value = 2;
+  }
+}

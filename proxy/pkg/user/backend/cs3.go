@@ -9,19 +9,19 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
-	settingsSvc "github.com/owncloud/ocis/settings/pkg/service/v0"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
+	settingsService "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
 
 type cs3backend struct {
-	settingsRoleService settings.RoleService
+	settingsRoleService settingssvc.RoleService
 	authProvider        RevaAuthenticator
 	machineAuthAPIKey   string
 	logger              log.Logger
 }
 
 // NewCS3UserBackend creates a user-provider which fetches users from a CS3 UserBackend
-func NewCS3UserBackend(rs settings.RoleService, ap RevaAuthenticator, machineAuthAPIKey string, logger log.Logger) UserBackend {
+func NewCS3UserBackend(rs settingssvc.RoleService, ap RevaAuthenticator, machineAuthAPIKey string, logger log.Logger) UserBackend {
 	return &cs3backend{
 		settingsRoleService: rs,
 		authProvider:        ap,
@@ -62,7 +62,7 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 	}
 
 	if len(roleIDs) == 0 {
-		roleIDs = append(roleIDs, settingsSvc.BundleUUIDRoleUser, settingsSvc.SelfManagementPermissionID)
+		roleIDs = append(roleIDs, settingsService.BundleUUIDRoleUser, settingsService.SelfManagementPermissionID)
 		// if roles are empty, assume we haven't seen the user before and assign a default user role. At least until
 		// proper roles are provided. See https://github.com/owncloud/ocis/issues/1825 for more context.
 		//return user, nil

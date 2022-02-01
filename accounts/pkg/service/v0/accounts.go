@@ -16,17 +16,19 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
 	fieldmask_utils "github.com/mennanov/fieldmask-utils"
-	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/accounts/pkg/storage"
 	accTracing "github.com/owncloud/ocis/accounts/pkg/tracing"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 	settings_svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"github.com/rs/zerolog"
 	merrors "go-micro.dev/v4/errors"
@@ -47,13 +49,13 @@ const passwordValidCacheExpiration = 10 * time.Minute
 // login eq \"teddy\" and password eq \"F&1!b90t111!\"
 var authQuery = regexp.MustCompile(`^login eq '(.*)' and password eq '(.*)'$`) // TODO how is ' escaped in the password?
 
-func (s Service) expandMemberOf(a *proto.Account) {
+func (s Service) expandMemberOf(a *accountsmsg.Account) {
 	if a == nil {
 		return
 	}
-	expanded := []*proto.Group{}
+	expanded := []*accountsmsg.Group{}
 	for i := range a.MemberOf {
-		g := &proto.Group{}
+		g := &accountsmsg.Group{}
 		// TODO resolve by name, when a create or update is issued they may not have an id? fall back to searching the group id in the index?
 		if err := s.repo.LoadGroup(context.Background(), a.MemberOf[i].Id, g); err == nil {
 			g.Members = nil // always hide members when expanding
@@ -112,8 +114,8 @@ func (s Service) serviceUserToIndex() (teardownServiceUser func()) {
 	return func() {}
 }
 
-func (s Service) getInMemoryServiceUser() proto.Account {
-	return proto.Account{
+func (s Service) getInMemoryServiceUser() accountsmsg.Account {
+	return accountsmsg.Account{
 		AccountEnabled:           true,
 		Id:                       s.Config.ServiceUser.UUID,
 		PreferredName:            s.Config.ServiceUser.Username,
@@ -126,7 +128,7 @@ func (s Service) getInMemoryServiceUser() proto.Account {
 
 // ListAccounts implements the AccountsServiceHandler interface
 // the query contains account properties
-func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest, out *proto.ListAccountsResponse) (err error) {
+func (s Service) ListAccounts(ctx context.Context, in *accountssvc.ListAccountsRequest, out *accountssvc.ListAccountsResponse) (err error) {
 	var span trace.Span
 	ctx, span = accTracing.TraceProvider.Tracer("accounts").Start(ctx, "Accounts.ListAccounts")
 	defer span.End()
@@ -152,18 +154,18 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
 		}
 
-		ids, err := s.index.FindBy(&proto.Account{}, "OnPremisesSamAccountName", match[1])
+		ids, err := s.index.FindBy(&accountsmsg.Account{}, "OnPremisesSamAccountName", match[1])
 		if err != nil || len(ids) > 1 {
 			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
 		}
 		if len(ids) == 0 {
-			ids, err = s.index.FindBy(&proto.Account{}, "Mail", match[1])
+			ids, err = s.index.FindBy(&accountsmsg.Account{}, "Mail", match[1])
 			if err != nil || len(ids) != 1 {
 				return merrors.Unauthorized(s.id, "account not found or invalid credentials")
 			}
 		}
 
-		a := &proto.Account{}
+		a := &accountsmsg.Account{}
 		err = s.repo.LoadAccount(ctx, ids[0], a)
 		if err != nil || a.PasswordProfile == nil || len(a.PasswordProfile.Password) == 0 {
 			return merrors.Unauthorized(s.id, "account not found or invalid credentials")
@@ -211,7 +213,7 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 		}
 
 		a.PasswordProfile.Password = ""
-		out.Accounts = []*proto.Account{a}
+		out.Accounts = []*accountsmsg.Account{a}
 
 		return nil
 	}
@@ -246,10 +248,10 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 	}
 
 	searchResults, err := s.findAccountsByQuery(ctx, in.Query)
-	out.Accounts = make([]*proto.Account, 0, len(searchResults))
+	out.Accounts = make([]*accountsmsg.Account, 0, len(searchResults))
 
 	for _, hit := range searchResults {
-		a := &proto.Account{}
+		a := &accountsmsg.Account{}
 		if hit == s.Config.ServiceUser.UUID {
 			acc := s.getInMemoryServiceUser()
 			a = &acc
@@ -276,11 +278,11 @@ func (s Service) ListAccounts(ctx context.Context, in *proto.ListAccountsRequest
 }
 
 func (s Service) findAccountsByQuery(ctx context.Context, query string) ([]string, error) {
-	return s.index.Query(ctx, &proto.Account{}, query)
+	return s.index.Query(ctx, &accountsmsg.Account{}, query)
 }
 
 // GetAccount implements the AccountsServiceHandler interface
-func (s Service) GetAccount(ctx context.Context, in *proto.GetAccountRequest, out *proto.Account) (err error) {
+func (s Service) GetAccount(ctx context.Context, in *accountssvc.GetAccountRequest, out *accountsmsg.Account) (err error) {
 	var span trace.Span
 
 	ctx, span = accTracing.TraceProvider.Tracer("accounts").Start(ctx, "Accounts.GetAccount")
@@ -337,7 +339,7 @@ func (s Service) GetAccount(ctx context.Context, in *proto.GetAccountRequest, ou
 }
 
 // CreateAccount implements the AccountsServiceHandler interface
-func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountRequest, out *proto.Account) (err error) {
+func (s Service) CreateAccount(ctx context.Context, in *accountssvc.CreateAccountRequest, out *accountsmsg.Account) (err error) {
 	var span trace.Span
 
 	ctx, span = accTracing.TraceProvider.Tracer("accounts").Start(ctx, "Accounts.CreateAccount")
@@ -428,8 +430,8 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 		out.GidNumber = userDefaultGID
 	}
 
-	r := proto.ListGroupsResponse{}
-	err = s.ListGroups(ctx, &proto.ListGroupsRequest{}, &r)
+	r := accountssvc.ListGroupsResponse{}
+	err = s.ListGroups(ctx, &accountssvc.ListGroupsRequest{}, &r)
 	if err != nil {
 		// rollback account creation
 		return err
@@ -453,7 +455,7 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 	if s.RoleService == nil {
 		return merrors.InternalServerError(s.id, "could not assign role to account: roleService not configured")
 	}
-	if _, err = s.RoleService.AssignRoleToUser(ctx, &settings.AssignRoleToUserRequest{
+	if _, err = s.RoleService.AssignRoleToUser(ctx, &settingssvc.AssignRoleToUserRequest{
 		AccountUuid: out.Id,
 		RoleId:      settings_svc.BundleUUIDRoleUser,
 	}); err != nil {
@@ -464,7 +466,7 @@ func (s Service) CreateAccount(ctx context.Context, in *proto.CreateAccountReque
 }
 
 // rollbackCreateAccount tries to rollback changes made by `CreateAccount` if parts of it failed.
-func (s Service) rollbackCreateAccount(ctx context.Context, acc *proto.Account) {
+func (s Service) rollbackCreateAccount(ctx context.Context, acc *accountsmsg.Account) {
 	err := s.index.Delete(acc)
 	if err != nil {
 		s.log.Err(err).Msg("failed to rollback account from indices")
@@ -478,7 +480,7 @@ func (s Service) rollbackCreateAccount(ctx context.Context, acc *proto.Account) 
 // UpdateAccount implements the AccountsServiceHandler interface
 // read only fields are ignored
 // TODO how can we unset specific values? using the update mask
-func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountRequest, out *proto.Account) (err error) {
+func (s Service) UpdateAccount(ctx context.Context, in *accountssvc.UpdateAccountRequest, out *accountsmsg.Account) (err error) {
 	var span trace.Span
 
 	ctx, span = accTracing.TraceProvider.Tracer("accounts").Start(ctx, "Accounts.UpdateAccount")
@@ -568,7 +570,7 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 
 	if in.Account.PasswordProfile != nil {
 		if out.PasswordProfile == nil {
-			out.PasswordProfile = &proto.PasswordProfile{}
+			out.PasswordProfile = &accountsmsg.PasswordProfile{}
 		}
 		if in.Account.PasswordProfile.Password != "" {
 			// encrypt password
@@ -601,7 +603,7 @@ func (s Service) UpdateAccount(ctx context.Context, in *proto.UpdateAccountReque
 	}
 
 	// We need to reload the old account state to be able to compute the update
-	old := &proto.Account{}
+	old := &accountsmsg.Account{}
 	if err = s.repo.LoadAccount(ctx, id, old); err != nil {
 		s.log.Error().Err(err).Str("id", out.Id).Msg("could not load old account representation during update, maybe the account got deleted meanwhile?")
 		return merrors.InternalServerError(s.id, "could not load current account for update: %v", err.Error())
@@ -653,7 +655,7 @@ var updatableAccountPaths = map[string]struct{}{
 }
 
 // DeleteAccount implements the AccountsServiceHandler interface
-func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountRequest, out *empty.Empty) (err error) {
+func (s Service) DeleteAccount(ctx context.Context, in *accountssvc.DeleteAccountRequest, out *empty.Empty) (err error) {
 	var span trace.Span
 
 	ctx, span = accTracing.TraceProvider.Tracer("accounts").Start(ctx, "Accounts.DeleteAccount")
@@ -668,7 +670,7 @@ func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 		return merrors.InternalServerError(s.id, "could not clean up account id: %v", err.Error())
 	}
 
-	a := &proto.Account{}
+	a := &accountsmsg.Account{}
 	if err = s.repo.LoadAccount(ctx, id, a); err != nil {
 		if storage.IsNotFoundErr(err) {
 			return merrors.NotFound(s.id, "account not found: %v", err.Error())
@@ -680,7 +682,7 @@ func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 
 	// delete member relationship in groups
 	for i := range a.MemberOf {
-		err = s.RemoveMember(ctx, &proto.RemoveMemberRequest{
+		err = s.RemoveMember(ctx, &accountssvc.RemoveMemberRequest{
 			GroupId:   a.MemberOf[i].Id,
 			AccountId: id,
 		}, a.MemberOf[i])
@@ -707,7 +709,7 @@ func (s Service) DeleteAccount(ctx context.Context, in *proto.DeleteAccountReque
 	return
 }
 
-func validateAccount(serviceID string, a *proto.Account) error {
+func validateAccount(serviceID string, a *accountsmsg.Account) error {
 	if err := validateAccountPreferredName(serviceID, a); err != nil {
 		return err
 	}
@@ -720,21 +722,21 @@ func validateAccount(serviceID string, a *proto.Account) error {
 	return nil
 }
 
-func validateAccountPreferredName(serviceID string, a *proto.Account) error {
+func validateAccountPreferredName(serviceID string, a *accountsmsg.Account) error {
 	if !isValidUsername(a.PreferredName) {
 		return merrors.BadRequest(serviceID, "preferred_name '%s' must be at least the local part of an email", a.PreferredName)
 	}
 	return nil
 }
 
-func validateAccountOnPremisesSamAccountName(serviceID string, a *proto.Account) error {
+func validateAccountOnPremisesSamAccountName(serviceID string, a *accountsmsg.Account) error {
 	if !isValidUsername(a.OnPremisesSamAccountName) {
 		return merrors.BadRequest(serviceID, "on_premises_sam_account_name '%s' must be at least the local part of an email", a.OnPremisesSamAccountName)
 	}
 	return nil
 }
 
-func validateAccountEmail(serviceID string, a *proto.Account) error {
+func validateAccountEmail(serviceID string, a *accountsmsg.Account) error {
 	if !isValidEmail(a.Mail) {
 		return merrors.BadRequest(serviceID, "mail '%s' must be a valid email", a.Mail)
 	}
@@ -808,7 +810,7 @@ func validateUpdate(mask *field_mask.FieldMask, updatablePaths map[string]struct
 }
 
 // debugLogAccount returns a debug-log event with detailed account-info, and filtered password data
-func (s Service) debugLogAccount(a *proto.Account) *zerolog.Event {
+func (s Service) debugLogAccount(a *accountsmsg.Account) *zerolog.Event {
 	return s.log.Debug().Fields(map[string]interface{}{
 		"Id":                           a.Id,
 		"Mail":                         a.Mail,
@@ -834,7 +836,7 @@ func (s Service) debugLogAccount(a *proto.Account) *zerolog.Event {
 
 func (s Service) accountExists(ctx context.Context, username, mail, id string) (exists bool, err error) {
 	var ids []string
-	ids, err = s.index.FindBy(&proto.Account{}, "preferred_name", username)
+	ids, err = s.index.FindBy(&accountsmsg.Account{}, "preferred_name", username)
 	if err != nil {
 		return false, err
 	}
@@ -842,7 +844,7 @@ func (s Service) accountExists(ctx context.Context, username, mail, id string) (
 		return true, nil
 	}
 
-	ids, err = s.index.FindBy(&proto.Account{}, "on_premises_sam_account_name", username)
+	ids, err = s.index.FindBy(&accountsmsg.Account{}, "on_premises_sam_account_name", username)
 	if err != nil {
 		return false, err
 	}
@@ -850,7 +852,7 @@ func (s Service) accountExists(ctx context.Context, username, mail, id string) (
 		return true, nil
 	}
 
-	ids, err = s.index.FindBy(&proto.Account{}, "mail", mail)
+	ids, err = s.index.FindBy(&accountsmsg.Account{}, "mail", mail)
 	if err != nil {
 		return false, err
 	}
@@ -858,7 +860,7 @@ func (s Service) accountExists(ctx context.Context, username, mail, id string) (
 		return true, nil
 	}
 
-	a := &proto.Account{}
+	a := &accountsmsg.Account{}
 	err = s.repo.LoadAccount(ctx, id, a)
 	if err == nil {
 		return true, nil

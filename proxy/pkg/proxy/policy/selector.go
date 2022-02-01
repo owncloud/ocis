@@ -6,9 +6,10 @@ import (
 	"regexp"
 	"sort"
 
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	revactx "github.com/cs3org/reva/pkg/ctx"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 )
@@ -84,7 +85,7 @@ func LoadSelector(cfg *config.PolicySelector) (Selector, error) {
 	if cfg.Migration != nil {
 		return NewMigrationSelector(
 			cfg.Migration,
-			accounts.NewAccountsService("com.owncloud.accounts", grpc.NewClient())), nil
+			accountssvc.NewAccountsService("com.owncloud.accounts", grpc.NewClient())), nil
 	}
 
 	if cfg.Claims != nil {
@@ -129,7 +130,7 @@ func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
 //
 // This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OCIS and
 // thus have an entry in ocis-accounts. All users without accounts entry are routed to the legacy ownCloud10 instance.
-func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.AccountsService) Selector {
+func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accountssvc.AccountsService) Selector {
 	var acc = ss
 	return func(r *http.Request) (s string, err error) {
 		var claims map[string]interface{}
@@ -144,7 +145,7 @@ func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accounts.Account
 			return cfg.AccNotFoundPolicy, nil
 		}
 
-		if _, err := acc.GetAccount(r.Context(), &accounts.GetAccountRequest{Id: userID}); err != nil {
+		if _, err := acc.GetAccount(r.Context(), &accountssvc.GetAccountRequest{Id: userID}); err != nil {
 			return cfg.AccNotFoundPolicy, nil
 		}
 		return cfg.AccFoundPolicy, nil

@@ -5,24 +5,24 @@ import (
 
 	"go.opentelemetry.io/otel/trace"
 
-	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
+	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
 	thumbnailsTracing "github.com/owncloud/ocis/thumbnails/pkg/tracing"
 	"go.opentelemetry.io/otel/attribute"
 )
 
 // NewTracing returns a service that instruments traces.
-func NewTracing(next v0proto.ThumbnailServiceHandler) v0proto.ThumbnailServiceHandler {
+func NewTracing(next thumbnailssvc.ThumbnailServiceHandler) thumbnailssvc.ThumbnailServiceHandler {
 	return tracing{
 		next: next,
 	}
 }
 
 type tracing struct {
-	next v0proto.ThumbnailServiceHandler
+	next thumbnailssvc.ThumbnailServiceHandler
 }
 
 // GetThumbnail implements the ThumbnailServiceHandler interface.
-func (t tracing) GetThumbnail(ctx context.Context, req *v0proto.GetThumbnailRequest, rsp *v0proto.GetThumbnailResponse) error {
+func (t tracing) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest, rsp *thumbnailssvc.GetThumbnailResponse) error {
 	var span trace.Span
 
 	if thumbnailsTracing.TraceProvider != nil {

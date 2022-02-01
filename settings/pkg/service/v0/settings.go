@@ -1,7 +1,8 @@
 package svc
 
 import (
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 )
 
 const (
@@ -56,8 +57,8 @@ const (
 )
 
 // generateBundlesDefaultRoles bootstraps the default roles.
-func generateBundlesDefaultRoles() []*settings.Bundle {
-	return []*settings.Bundle{
+func generateBundlesDefaultRoles() []*settingsmsg.Bundle {
+	return []*settingsmsg.Bundle{
 		generateBundleAdminRole(),
 		generateBundleUserRole(),
 		generateBundleGuestRole(),
@@ -65,70 +66,70 @@ func generateBundlesDefaultRoles() []*settings.Bundle {
 	}
 }
 
-func generateBundleAdminRole() *settings.Bundle {
-	return &settings.Bundle{
+func generateBundleAdminRole() *settingsmsg.Bundle {
+	return &settingsmsg.Bundle{
 		Id:          BundleUUIDRoleAdmin,
 		Name:        "admin",
-		Type:        settings.Bundle_TYPE_ROLE,
+		Type:        settingsmsg.Bundle_TYPE_ROLE,
 		Extension:   "ocis-roles",
 		DisplayName: "Admin",
-		Resource: &settings.Resource{
-			Type: settings.Resource_TYPE_SYSTEM,
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SYSTEM,
 		},
-		Settings: []*settings.Setting{},
+		Settings: []*settingsmsg.Setting{},
 	}
 }
 
-func generateBundleUserRole() *settings.Bundle {
-	return &settings.Bundle{
+func generateBundleUserRole() *settingsmsg.Bundle {
+	return &settingsmsg.Bundle{
 		Id:          BundleUUIDRoleUser,
 		Name:        "user",
-		Type:        settings.Bundle_TYPE_ROLE,
+		Type:        settingsmsg.Bundle_TYPE_ROLE,
 		Extension:   "ocis-roles",
 		DisplayName: "User",
-		Resource: &settings.Resource{
-			Type: settings.Resource_TYPE_SYSTEM,
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SYSTEM,
 		},
-		Settings: []*settings.Setting{},
+		Settings: []*settingsmsg.Setting{},
 	}
 }
 
-func generateBundleGuestRole() *settings.Bundle {
-	return &settings.Bundle{
+func generateBundleGuestRole() *settingsmsg.Bundle {
+	return &settingsmsg.Bundle{
 		Id:          BundleUUIDRoleGuest,
 		Name:        "guest",
-		Type:        settings.Bundle_TYPE_ROLE,
+		Type:        settingsmsg.Bundle_TYPE_ROLE,
 		Extension:   "ocis-roles",
 		DisplayName: "Guest",
-		Resource: &settings.Resource{
-			Type: settings.Resource_TYPE_SYSTEM,
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SYSTEM,
 		},
-		Settings: []*settings.Setting{},
+		Settings: []*settingsmsg.Setting{},
 	}
 }
 
-var languageSetting = settings.Setting_SingleChoiceValue{
-	SingleChoiceValue: &settings.SingleChoiceList{
-		Options: []*settings.ListOption{
+var languageSetting = settingsmsg.Setting_SingleChoiceValue{
+	SingleChoiceValue: &settingsmsg.SingleChoiceList{
+		Options: []*settingsmsg.ListOption{
 			{
-				Value: &settings.ListOptionValue{
-					Option: &settings.ListOptionValue_StringValue{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
 						StringValue: "cs",
 					},
 				},
 				DisplayValue: "Czech",
 			},
 			{
-				Value: &settings.ListOptionValue{
-					Option: &settings.ListOptionValue_StringValue{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
 						StringValue: "de",
 					},
 				},
 				DisplayValue: "Deutsch",
 			},
 			{
-				Value: &settings.ListOptionValue{
-					Option: &settings.ListOptionValue_StringValue{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
 						StringValue: "en",
 					},
 				},
@@ -136,32 +137,32 @@ var languageSetting = settings.Setting_SingleChoiceValue{
 				Default:      true,
 			},
 			{
-				Value: &settings.ListOptionValue{
-					Option: &settings.ListOptionValue_StringValue{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
 						StringValue: "es",
 					},
 				},
 				DisplayValue: "Español",
 			},
 			{
-				Value: &settings.ListOptionValue{
-					Option: &settings.ListOptionValue_StringValue{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
 						StringValue: "fr",
 					},
 				},
 				DisplayValue: "Français",
 			},
 			{
-				Value: &settings.ListOptionValue{
-					Option: &settings.ListOptionValue_StringValue{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
 						StringValue: "gl",
 					},
 				},
 				DisplayValue: "Galego",
 			},
 			{
-				Value: &settings.ListOptionValue{
-					Option: &settings.ListOptionValue_StringValue{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
 						StringValue: "it",
 					},
 				},
@@ -171,24 +172,24 @@ var languageSetting = settings.Setting_SingleChoiceValue{
 	},
 }
 
-func generateBundleProfileRequest() *settings.Bundle {
-	return &settings.Bundle{
+func generateBundleProfileRequest() *settingsmsg.Bundle {
+	return &settingsmsg.Bundle{
 		Id:        "2a506de7-99bd-4f0d-994e-c38e72c28fd9",
 		Name:      "profile",
 		Extension: "ocis-accounts",
-		Type:      settings.Bundle_TYPE_DEFAULT,
-		Resource: &settings.Resource{
-			Type: settings.Resource_TYPE_SYSTEM,
+		Type:      settingsmsg.Bundle_TYPE_DEFAULT,
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SYSTEM,
 		},
 		DisplayName: "Profile",
-		Settings: []*settings.Setting{
+		Settings: []*settingsmsg.Setting{
 			{
 				Id:          settingUUIDProfileLanguage,
 				Name:        "language",
 				DisplayName: "Language",
 				Description: "User language",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_USER,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
 				},
 				Value: &languageSetting,
 			},
@@ -196,207 +197,207 @@ func generateBundleProfileRequest() *settings.Bundle {
 	}
 }
 
-func generatePermissionRequests() []*settings.AddSettingToBundleRequest {
-	return []*settings.AddSettingToBundleRequest{
+func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
+	return []*settingssvc.AddSettingToBundleRequest{
 		{
 			BundleId: BundleUUIDRoleAdmin,
-			Setting: &settings.Setting{
+			Setting: &settingsmsg.Setting{
 				Id:          RoleManagementPermissionID,
 				Name:        RoleManagementPermissionName,
 				DisplayName: "Role Management",
 				Description: "This permission gives full access to everything that is related to role management.",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_USER,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
 					Id:   "all",
 				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READWRITE,
-						Constraint: settings.Permission_CONSTRAINT_ALL,
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 					},
 				},
 			},
 		},
 		{
 			BundleId: BundleUUIDRoleAdmin,
-			Setting: &settings.Setting{
+			Setting: &settingsmsg.Setting{
 				Id:          SettingsManagementPermissionID,
 				Name:        SettingsManagementPermissionName,
 				DisplayName: "Settings Management",
 				Description: "This permission gives full access to everything that is related to settings management.",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_USER,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
 					Id:   "all",
 				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READWRITE,
-						Constraint: settings.Permission_CONSTRAINT_ALL,
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 					},
 				},
 			},
 		},
 		{
 			BundleId: BundleUUIDRoleAdmin,
-			Setting: &settings.Setting{
+			Setting: &settingsmsg.Setting{
 				Id:          "7d81f103-0488-4853-bce5-98dcce36d649",
 				Name:        "language-readwrite",
 				DisplayName: "Permission to read and set the language (anyone)",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_SETTING,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SETTING,
 					Id:   settingUUIDProfileLanguage,
 				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READWRITE,
-						Constraint: settings.Permission_CONSTRAINT_ALL,
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 					},
 				},
 			},
 		},
 		{
 			BundleId: BundleUUIDRoleUser,
-			Setting: &settings.Setting{
+			Setting: &settingsmsg.Setting{
 				Id:          "640e00d2-4df8-41bd-b1c2-9f30a01e0e99",
 				Name:        "language-readwrite",
 				DisplayName: "Permission to read and set the language (self)",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_SETTING,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SETTING,
 					Id:   settingUUIDProfileLanguage,
 				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READWRITE,
-						Constraint: settings.Permission_CONSTRAINT_OWN,
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
 					},
 				},
 			},
 		},
 		{
 			BundleId: BundleUUIDRoleGuest,
-			Setting: &settings.Setting{
+			Setting: &settingsmsg.Setting{
 				Id:          "ca878636-8b1a-4fae-8282-8617a4c13597",
 				Name:        "language-readwrite",
 				DisplayName: "Permission to read and set the language (self)",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_SETTING,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SETTING,
 					Id:   settingUUIDProfileLanguage,
 				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READWRITE,
-						Constraint: settings.Permission_CONSTRAINT_OWN,
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
 					},
 				},
 			},
 		},
 		{
 			BundleId: BundleUUIDRoleAdmin,
-			Setting: &settings.Setting{
+			Setting: &settingsmsg.Setting{
 				Id:          AccountManagementPermissionID,
 				Name:        AccountManagementPermissionName,
 				DisplayName: "Account Management",
 				Description: "This permission gives full access to everything that is related to account management.",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_USER,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
 					Id:   "all",
 				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READWRITE,
-						Constraint: settings.Permission_CONSTRAINT_ALL,
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 					},
 				},
 			},
 		},
 		{
 			BundleId: BundleUUIDRoleAdmin,
-			Setting: &settings.Setting{
+			Setting: &settingsmsg.Setting{
 				Id:          GroupManagementPermissionID,
 				Name:        GroupManagementPermissionName,
 				DisplayName: "Group Management",
 				Description: "This permission gives full access to everything that is related to group management.",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_GROUP,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_GROUP,
 					Id:   "all",
 				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READWRITE,
-						Constraint: settings.Permission_CONSTRAINT_ALL,
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 					},
 				},
 			},
 		},
 		{
 			BundleId: BundleUUIDRoleUser,
-			Setting: &settings.Setting{
+			Setting: &settingsmsg.Setting{
 				Id:          SelfManagementPermissionID,
 				Name:        SelfManagementPermissionName,
 				DisplayName: "Self Management",
 				Description: "This permission gives access to self management.",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_USER,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
 					Id:   "me",
 				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READWRITE,
-						Constraint: settings.Permission_CONSTRAINT_OWN,
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
 					},
 				},
 			},
 		},
 		{
 			BundleId: BundleUUIDRoleAdmin,
-			Setting: &settings.Setting{
+			Setting: &settingsmsg.Setting{
 				Id:          SetSpaceQuotaPermissionID,
 				Name:        SetSpaceQuotaPermissionName,
 				DisplayName: "Set Space Quota",
 				Description: "This permission allows to manage space quotas.",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_SYSTEM,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READWRITE,
-						Constraint: settings.Permission_CONSTRAINT_ALL,
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 					},
 				},
 			},
 		},
 		{
 			BundleId: BundleUUIDRoleAdmin,
-			Setting: &settings.Setting{
+			Setting: &settingsmsg.Setting{
 				Id:          CreateSpacePermissionID,
 				Name:        CreateSpacePermissionName,
 				DisplayName: "Create Space",
 				Description: "This permission allows to create new spaces.",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_SYSTEM,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READWRITE,
-						Constraint: settings.Permission_CONSTRAINT_ALL,
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 					},
 				},
 			},
 		},
 		{
 			BundleId: BundleUUIDRoleAdmin,
-			Setting: &settings.Setting{
+			Setting: &settingsmsg.Setting{
 				Id:          ListAllSpacesPermissionID,
 				Name:        ListAllSpacesPermissionName,
 				DisplayName: "List All Spaces",
 				Description: "This permission allows list all spaces.",
-				Resource: &settings.Resource{
-					Type: settings.Resource_TYPE_SYSTEM,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
-				Value: &settings.Setting_PermissionValue{
-					PermissionValue: &settings.Permission{
-						Operation:  settings.Permission_OPERATION_READ,
-						Constraint: settings.Permission_CONSTRAINT_ALL,
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READ,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 					},
 				},
 			},
@@ -404,8 +405,8 @@ func generatePermissionRequests() []*settings.AddSettingToBundleRequest {
 	}
 }
 
-func defaultRoleAssignments() []*settings.UserRoleAssignment {
-	return []*settings.UserRoleAssignment{
+func defaultRoleAssignments() []*settingsmsg.UserRoleAssignment {
+	return []*settingsmsg.UserRoleAssignment{
 		// default admin users
 		{
 			AccountUuid: "058bff95-6708-4fe5-91e4-9ea3d377588b",

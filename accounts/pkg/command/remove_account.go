@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"os"
 
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+
 	"github.com/owncloud/ocis/accounts/pkg/flagset"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	"github.com/owncloud/ocis/accounts/pkg/config"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/urfave/cli/v2"
 )
 
@@ -29,8 +30,8 @@ func RemoveAccount(cfg *config.Config) *cli.Command {
 			}
 
 			uid := c.Args().First()
-			accSvc := accounts.NewAccountsService(accServiceID, grpc.NewClient())
-			_, err := accSvc.DeleteAccount(c.Context, &accounts.DeleteAccountRequest{Id: uid})
+			accSvc := accountssvc.NewAccountsService(accServiceID, grpc.NewClient())
+			_, err := accSvc.DeleteAccount(c.Context, &accountssvc.DeleteAccountRequest{Id: uid})
 
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not delete account %w", err))

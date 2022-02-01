@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	v0proto "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
+	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
 )
 
 // NewLogging returns a service that logs messages.
-func NewLogging(next v0proto.ThumbnailServiceHandler, logger log.Logger) v0proto.ThumbnailServiceHandler {
+func NewLogging(next thumbnailssvc.ThumbnailServiceHandler, logger log.Logger) thumbnailssvc.ThumbnailServiceHandler {
 	return logging{
 		next:   next,
 		logger: logger,
@@ -17,12 +17,12 @@ func NewLogging(next v0proto.ThumbnailServiceHandler, logger log.Logger) v0proto
 }
 
 type logging struct {
-	next   v0proto.ThumbnailServiceHandler
+	next   thumbnailssvc.ThumbnailServiceHandler
 	logger log.Logger
 }
 
 // GetThumbnail implements the ThumbnailServiceHandler interface.
-func (l logging) GetThumbnail(ctx context.Context, req *v0proto.GetThumbnailRequest, rsp *v0proto.GetThumbnailResponse) error {
+func (l logging) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest, rsp *thumbnailssvc.GetThumbnailResponse) error {
 	start := time.Now()
 	err := l.next.GetThumbnail(ctx, req, rsp)
 

@@ -6,7 +6,7 @@ import (
 	permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/version"
-	"github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 	svc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"go-micro.dev/v4/api"
 	"go-micro.dev/v4/server"
@@ -27,16 +27,16 @@ func Server(opts ...Option) grpc.Service {
 	)
 
 	handle := svc.NewService(options.Config, options.Logger)
-	if err := proto.RegisterBundleServiceHandler(service.Server(), handle); err != nil {
+	if err := settingssvc.RegisterBundleServiceHandler(service.Server(), handle); err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not register Bundle service handler")
 	}
-	if err := proto.RegisterValueServiceHandler(service.Server(), handle); err != nil {
+	if err := settingssvc.RegisterValueServiceHandler(service.Server(), handle); err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not register Value service handler")
 	}
-	if err := proto.RegisterRoleServiceHandler(service.Server(), handle); err != nil {
+	if err := settingssvc.RegisterRoleServiceHandler(service.Server(), handle); err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not register Role service handler")
 	}
-	if err := proto.RegisterPermissionServiceHandler(service.Server(), handle); err != nil {
+	if err := settingssvc.RegisterPermissionServiceHandler(service.Server(), handle); err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not register Permission service handler")
 	}
 

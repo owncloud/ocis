@@ -3,7 +3,7 @@ package grpc
 import (
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/version"
-	"github.com/owncloud/ocis/store/pkg/proto/v0"
+	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v0"
 	svc "github.com/owncloud/ocis/store/pkg/service/v0"
 )
 
@@ -28,7 +28,7 @@ func Server(opts ...Option) grpc.Service {
 	if err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not initialize service handler")
 	}
-	if err = proto.RegisterStoreHandler(service.Server(), hdlr); err != nil {
+	if err = storesvc.RegisterStoreHandler(service.Server(), hdlr); err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not register service handler")
 	}
 

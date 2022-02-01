@@ -10,17 +10,18 @@ import (
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/keyword"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	storemsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/store/v0"
+	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/store/pkg/config"
-	"github.com/owncloud/ocis/store/pkg/proto/v0"
 	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
 // BleveDocument wraps the generated Record.Metadata and adds a property that is used to distinguish documents in the index.
 type BleveDocument struct {
-	Metadata map[string]*proto.Field `json:"metadata"`
-	Database string                  `json:"database"`
-	Table    string                  `json:"table"`
+	Metadata map[string]*storemsg.Field `json:"metadata"`
+	Database string                     `json:"database"`
+	Table    string                     `json:"table"`
 }
 
 // New returns a new instance of Service
@@ -77,13 +78,13 @@ type Service struct {
 }
 
 // Read implements the StoreHandler interface.
-func (s *Service) Read(c context.Context, rreq *proto.ReadRequest, rres *proto.ReadResponse) error {
+func (s *Service) Read(c context.Context, rreq *storesvc.ReadRequest, rres *storesvc.ReadResponse) error {
 	if len(rreq.Key) != 0 {
 		id := getID(rreq.Options.Database, rreq.Options.Table, rreq.Key)
 		file := filepath.Join(s.Config.Datapath, "databases", id)
 
 		var data []byte
-		rec := &proto.Record{}
+		rec := &storemsg.Record{}
 		data, err := ioutil.ReadFile(file)
 		if err != nil {
 			return merrors.NotFound(s.id, "could not read record")
@@ -123,7 +124,7 @@ func (s *Service) Read(c context.Context, rreq *proto.ReadRequest, rres *proto.R
 		}
 
 		for _, hit := range searchResult.Hits {
-			rec := &proto.Record{}
+			rec := &storemsg.Record{}
 
 			dest := filepath.Join(s.Config.Datapath, "databases", hit.ID)
 
@@ -148,7 +149,7 @@ func (s *Service) Read(c context.Context, rreq *proto.ReadRequest, rres *proto.R
 }
 
 // Write implements the StoreHandler interface.
-func (s *Service) Write(c context.Context, wreq *proto.WriteRequest, wres *proto.WriteResponse) error {
+func (s *Service) Write(c context.Context, wreq *storesvc.WriteRequest, wres *storesvc.WriteResponse) error {
 	id := getID(wreq.Options.Database, wreq.Options.Table, wreq.Record.Key)
 	file := filepath.Join(s.Config.Datapath, "databases", id)
 
@@ -181,7 +182,7 @@ func (s *Service) Write(c context.Context, wreq *proto.WriteRequest, wres *proto
 }
 
 // Delete implements the StoreHandler interface.
-func (s *Service) Delete(c context.Context, dreq *proto.DeleteRequest, dres *proto.DeleteResponse) error {
+func (s *Service) Delete(c context.Context, dreq *storesvc.DeleteRequest, dres *storesvc.DeleteResponse) error {
 	id := getID(dreq.Options.Database, dreq.Options.Table, dreq.Key)
 	file := filepath.Join(s.Config.Datapath, "databases", id)
 	if err := os.Remove(file); err != nil {
@@ -201,12 +202,12 @@ func (s *Service) Delete(c context.Context, dreq *proto.DeleteRequest, dres *pro
 }
 
 // List implements the StoreHandler interface.
-func (s *Service) List(context.Context, *proto.ListRequest, proto.Store_ListStream) error {
+func (s *Service) List(context.Context, *storesvc.ListRequest, storesvc.Store_ListStream) error {
 	return nil
 }
 
 // Databases implements the StoreHandler interface.
-func (s *Service) Databases(c context.Context, dbreq *proto.DatabasesRequest, dbres *proto.DatabasesResponse) error {
+func (s *Service) Databases(c context.Context, dbreq *storesvc.DatabasesRequest, dbres *storesvc.DatabasesResponse) error {
 	file := filepath.Join(s.Config.Datapath, "databases")
 	f, err := os.Open(file)
 	if err != nil {
@@ -224,7 +225,7 @@ func (s *Service) Databases(c context.Context, dbreq *proto.DatabasesRequest, db
 }
 
 // Tables implements the StoreHandler interface.
-func (s *Service) Tables(ctx context.Context, in *proto.TablesRequest, out *proto.TablesResponse) error {
+func (s *Service) Tables(ctx context.Context, in *storesvc.TablesRequest, out *storesvc.TablesResponse) error {
 	file := filepath.Join(s.Config.Datapath, "databases", in.Database)
 	f, err := os.Open(file)
 	if err != nil {
@@ -300,7 +301,7 @@ func (s Service) indexRecords(recordsDir string) (err error) {
 
 				// read record
 				var data []byte
-				rec := &proto.Record{}
+				rec := &storemsg.Record{}
 				data, err = ioutil.ReadFile(kp)
 				if err != nil {
 					s.log.Error().Err(err).Str("id", id).Msg("could not read record")

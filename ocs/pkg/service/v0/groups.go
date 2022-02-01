@@ -9,9 +9,11 @@ import (
 	"regexp"
 	"strconv"
 
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/go-chi/chi/v5"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
 	ocstracing "github.com/owncloud/ocis/ocs/pkg/tracing"
@@ -26,7 +28,7 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 	}
-	var account *accounts.Account
+	var account *accountsmsg.Account
 
 	// short circuit if there is a user already in the context
 	if u, ok := revactx.ContextGetUser(r.Context()); ok {
@@ -50,7 +52,7 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if isValidUUID(userid) {
-		account, err = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
+		account, err = o.getAccountService().GetAccount(r.Context(), &accountssvc.GetAccountRequest{
 			Id: userid,
 		})
 	} else {
@@ -73,7 +75,7 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 		if account.MemberOf[i].OnPremisesSamAccountName == "" {
 			o.logger.Warn().Str("groupid", account.MemberOf[i].Id).Msg("group on_premises_sam_account_name is empty, trying to lookup by id")
 			// we can try to look up the name
-			group, err := o.getGroupsService().GetGroup(r.Context(), &accounts.GetGroupRequest{
+			group, err := o.getGroupsService().GetGroup(r.Context(), &accountssvc.GetGroupRequest{
 				Id: account.MemberOf[i].Id,
 			})
 
@@ -139,7 +141,7 @@ func (o Ocs) AddToGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = o.getGroupsService().AddMember(r.Context(), &accounts.AddMemberRequest{
+	_, err = o.getGroupsService().AddMember(r.Context(), &accountssvc.AddMemberRequest{
 		AccountId: account.Id,
 		GroupId:   group.Id,
 	})
@@ -192,10 +194,10 @@ func (o Ocs) RemoveFromGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var account *accounts.Account
+	var account *accountsmsg.Account
 
 	if isValidUUID(userid) {
-		account, _ = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
+		account, _ = o.getAccountService().GetAccount(r.Context(), &accountssvc.GetAccountRequest{
 			Id: userid,
 		})
 	} else {
@@ -225,7 +227,7 @@ func (o Ocs) RemoveFromGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = o.getGroupsService().RemoveMember(r.Context(), &accounts.RemoveMemberRequest{
+	_, err = o.getGroupsService().RemoveMember(r.Context(), &accountssvc.RemoveMemberRequest{
 		AccountId: account.Id,
 		GroupId:   group.Id,
 	})
@@ -253,7 +255,7 @@ func (o Ocs) ListGroups(w http.ResponseWriter, r *http.Request) {
 		query = fmt.Sprintf("id eq '%s' or on_premises_sam_account_name eq '%s'", escapeValue(search), escapeValue(search))
 	}
 
-	res, err := o.getGroupsService().ListGroups(r.Context(), &accounts.ListGroupsRequest{
+	res, err := o.getGroupsService().ListGroups(r.Context(), &accountssvc.ListGroupsRequest{
 		Query: query,
 	})
 
@@ -312,13 +314,13 @@ func (o Ocs) AddGroup(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	newGroup := &accounts.Group{
+	newGroup := &accountsmsg.Group{
 		Id:                       groupid,
 		DisplayName:              displayname,
 		OnPremisesSamAccountName: groupid,
 		GidNumber:                gidNumber,
 	}
-	group, err := o.getGroupsService().CreateGroup(r.Context(), &accounts.CreateGroupRequest{
+	group, err := o.getGroupsService().CreateGroup(r.Context(), &accountssvc.CreateGroupRequest{
 		Group: newGroup,
 	})
 	if err != nil {
@@ -366,7 +368,7 @@ func (o Ocs) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = o.getGroupsService().DeleteGroup(r.Context(), &accounts.DeleteGroupRequest{
+	_, err = o.getGroupsService().DeleteGroup(r.Context(), &accountssvc.DeleteGroupRequest{
 		Id: group.Id,
 	})
 
@@ -406,7 +408,7 @@ func (o Ocs) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := o.getGroupsService().ListMembers(r.Context(), &accounts.ListMembersRequest{Id: group.Id})
+	res, err := o.getGroupsService().ListMembers(r.Context(), &accountssvc.ListMembersRequest{Id: group.Id})
 
 	if err != nil {
 		merr := merrors.FromError(err)
@@ -433,9 +435,9 @@ func isValidUUID(uuid string) bool {
 	return r.MatchString(uuid)
 }
 
-func (o Ocs) fetchGroupByName(ctx context.Context, name string) (*accounts.Group, error) {
-	var res *accounts.ListGroupsResponse
-	res, err := o.getGroupsService().ListGroups(ctx, &accounts.ListGroupsRequest{
+func (o Ocs) fetchGroupByName(ctx context.Context, name string) (*accountsmsg.Group, error) {
+	var res *accountssvc.ListGroupsResponse
+	res, err := o.getGroupsService().ListGroups(ctx, &accountssvc.ListGroupsRequest{
 		Query: fmt.Sprintf("on_premises_sam_account_name eq '%v'", escapeValue(name)),
 	})
 	if err != nil {

@@ -4,19 +4,21 @@ import (
 	"errors"
 	"fmt"
 
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+
 	"github.com/owncloud/ocis/accounts/pkg/flagset"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	"github.com/owncloud/ocis/accounts/pkg/config"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/urfave/cli/v2"
 	"google.golang.org/genproto/protobuf/field_mask"
 )
 
 // UpdateAccount command for modifying accounts including password policies
 func UpdateAccount(cfg *config.Config) *cli.Command {
-	a := &accounts.Account{
-		PasswordProfile: &accounts.PasswordProfile{},
+	a := &accountsmsg.Account{
+		PasswordProfile: &accountsmsg.PasswordProfile{},
 	}
 	return &cli.Command{
 		Name:      "update",
@@ -42,8 +44,8 @@ func UpdateAccount(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			a.Id = c.Args().First()
 			accSvcID := cfg.GRPC.Namespace + "." + cfg.Service.Name
-			accSvc := accounts.NewAccountsService(accSvcID, grpc.NewClient())
-			_, err := accSvc.UpdateAccount(c.Context, &accounts.UpdateAccountRequest{
+			accSvc := accountssvc.NewAccountsService(accSvcID, grpc.NewClient())
+			_, err := accSvc.UpdateAccount(c.Context, &accountssvc.UpdateAccountRequest{
 				Account:    a,
 				UpdateMask: buildAccUpdateMask(c.FlagNames()),
 			})

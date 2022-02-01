@@ -4,41 +4,41 @@ import (
 	"testing"
 
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 	"github.com/stretchr/testify/assert"
 )
 
 var valueScenarios = []struct {
 	name  string
-	value *proto.Value
+	value *settingsmsg.Value
 }{
 	{
 		name: "generic-test-with-system-resource",
-		value: &proto.Value{
+		value: &settingsmsg.Value{
 			Id:          value1,
 			BundleId:    bundle1,
 			SettingId:   setting1,
 			AccountUuid: accountUUID1,
-			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_SYSTEM,
+			Resource: &settingsmsg.Resource{
+				Type: settingsmsg.Resource_TYPE_SYSTEM,
 			},
-			Value: &proto.Value_StringValue{
+			Value: &settingsmsg.Value_StringValue{
 				StringValue: "lalala",
 			},
 		},
 	},
 	{
 		name: "generic-test-with-file-resource",
-		value: &proto.Value{
+		value: &settingsmsg.Value{
 			Id:          value2,
 			BundleId:    bundle1,
 			SettingId:   setting2,
 			AccountUuid: accountUUID1,
-			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_FILE,
+			Resource: &settingsmsg.Resource{
+				Type: settingsmsg.Resource_TYPE_FILE,
 				Id:   "adfba82d-919a-41c3-9cd1-5a3f83b2bf76",
 			},
-			Value: &proto.Value_StringValue{
+			Value: &settingsmsg.Value_StringValue{
 				StringValue: "tralala",
 			},
 		},

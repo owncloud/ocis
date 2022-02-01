@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,30 +27,30 @@ var (
 		olog.Level("info"),
 	)
 
-	bundles = []*proto.Bundle{
+	bundles = []*settingsmsg.Bundle{
 		{
 			Id:          "f36db5e6-a03c-40df-8413-711c67e40b47",
-			Type:        proto.Bundle_TYPE_ROLE,
+			Type:        settingsmsg.Bundle_TYPE_ROLE,
 			DisplayName: "test role - reads | update",
 			Name:        "TEST_ROLE",
 			Extension:   "ocis-settings",
-			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+			Resource: &settingsmsg.Resource{
+				Type: settingsmsg.Resource_TYPE_BUNDLE,
 			},
-			Settings: []*proto.Setting{
+			Settings: []*settingsmsg.Setting{
 				{
 					Name: "update",
-					Value: &proto.Setting_PermissionValue{
-						PermissionValue: &proto.Permission{
-							Operation: proto.Permission_OPERATION_UPDATE,
+					Value: &settingsmsg.Setting_PermissionValue{
+						PermissionValue: &settingsmsg.Permission{
+							Operation: settingsmsg.Permission_OPERATION_UPDATE,
 						},
 					},
 				},
 				{
 					Name: "read",
-					Value: &proto.Setting_PermissionValue{
-						PermissionValue: &proto.Permission{
-							Operation: proto.Permission_OPERATION_READ,
+					Value: &settingsmsg.Setting_PermissionValue{
+						PermissionValue: &settingsmsg.Permission{
+							Operation: settingsmsg.Permission_OPERATION_READ,
 						},
 					},
 				},
@@ -58,19 +58,19 @@ var (
 		},
 		{
 			Id:          "44f1a664-0a7f-461a-b0be-5b59e46bbc7a",
-			Type:        proto.Bundle_TYPE_ROLE,
+			Type:        settingsmsg.Bundle_TYPE_ROLE,
 			DisplayName: "another",
 			Name:        "ANOTHER_TEST_ROLE",
 			Extension:   "ocis-settings",
-			Resource: &proto.Resource{
-				Type: proto.Resource_TYPE_BUNDLE,
+			Resource: &settingsmsg.Resource{
+				Type: settingsmsg.Resource_TYPE_BUNDLE,
 			},
-			Settings: []*proto.Setting{
+			Settings: []*settingsmsg.Setting{
 				{
 					Name: "read",
-					Value: &proto.Setting_PermissionValue{
-						PermissionValue: &proto.Permission{
-							Operation: proto.Permission_OPERATION_READ,
+					Value: &settingsmsg.Setting_PermissionValue{
+						PermissionValue: &settingsmsg.Permission{
+							Operation: settingsmsg.Permission_OPERATION_READ,
 						},
 					},
 				},

@@ -1,0 +1,95 @@
+---
+{{- $package := (index .Files 0).Package }}
+title: "{{ $package }}"
+url: /grpc_apis/{{ $package }}
+date: {{ now | date "2006-01-02T15:04:05Z07:00" }}
+weight: 50
+geekdocRepo: https://github.com/owncloud/ocis
+---
+
+{{`{{< toc >}}`}}
+
+{{ range .Files -}}
+{{ $filename := .Name }}
+{{ $filenameParts := splitList "/" $filename }}
+## {{ .Name }}
+
+{{ .Description }}
+{{- range .Messages -}}
+{{- /* remove newline */}}### {{ .LongName }}
+
+{{ .Description }}
+
+{{ if .HasFields -}}
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+{{ range .Fields -}}
+{{- $loca := printf "#%s" (.LongType | lower | replace "." "") -}}
+{{- if and (hasPrefix "ocis." .LongType) (ge (len $filenameParts) 3) -}}
+	{{- $ltypeSpl := .LongType | splitList "." -}}
+	{{- $ltypePkg := slice $ltypeSpl 0 (sub (len $ltypeSpl) 1) | join "." -}}
+	{{- $loca = printf "/grpc_apis/%s/#%s" $ltypePkg (.Type | lower) -}}
+{{- end -}}
+| {{.Name}} | [{{.LongType}}]({{ $loca }}) | {{.Label}} | {{ .Description | replace "\n" "<br>" }}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end }} |
+{{ end -}}
+{{ end }}
+{{ if .HasExtensions -}}
+| Extension | Type | Base | Number | Description |
+| --------- | ---- | ---- | ------ | ----------- |
+{{ range .Extensions -}}
+| {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{ .Description | replace "\n" "<br>" }}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}} |
+{{ end -}}
+{{ end -}}
+{{ end -}}
+{{- range .Enums -}}
+### {{ .LongName }}
+
+{{ .Description }}
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+{{range .Values -}}
+| {{.Name}} | {{.Number}} | {{ .Description | replace "\n" "<br>" }} |
+{{ end -}}
+{{ end -}}
+
+{{ if .HasExtensions }}
+
+### File-level Extensions
+| Extension | Type | Base | Number | Description |
+| --------- | ---- | ---- | ------ | ----------- |
+{{ range .Extensions -}}
+| {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{ .Description | replace "\n" "<br>" }}{{if .DefaultValue}} Default: `{{.DefaultValue}}`{{end}} |
+{{ end -}}
+{{ end -}} 
+{{- range .Services }}
+### {{ .Name }}
+
+{{ .Description }}
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+{{ range .Methods -}}
+{{- $reqLoca := printf "#%s" (.RequestLongType | lower | replace "." "") -}}
+{{- $respLoca := printf "#%s" (.ResponseLongType | lower | replace "." "") -}}
+{{- if and (hasPrefix ".ocis." .RequestLongType) (ge (len $filenameParts) 3) }}
+	{{- $ltypeSpl := .RequestLongType | substr 1 -1 | splitList "." -}}
+	{{- $ltypePkg := slice $ltypeSpl 0 (sub (len $ltypeSpl) 1) | join "." -}}
+	{{- $reqLoca = printf "/grpc_apis/%s/#%s" $ltypePkg (.RequestType | lower) -}}
+{{- end -}}
+{{- if and (hasPrefix ".ocis." .ResponseLongType) (ge (len $filenameParts) 3) }}
+	{{- $ltypeSpl := .ResponseLongType | substr 1 -1 | splitList "." -}}
+	{{- $ltypePkg := slice $ltypeSpl 0 (sub (len $ltypeSpl) 1) | join "." -}}
+	{{- $respLoca = printf "/grpc_apis/%s/#%s" $ltypePkg (.ResponseType | lower) -}}
+{{- end -}}
+| {{.Name}} | [{{.RequestLongType}}]({{ $reqLoca }}){{if .RequestStreaming}} stream{{end}} | [{{.ResponseLongType}}]({{ $respLoca }}){{if .ResponseStreaming}} stream{{end}} | {{ .Description | replace "\n" "<br>" }} |
+{{ end -}}
+{{ end -}}
+{{ end }}
+## Scalar Value Types
+
+| .proto Type | Notes | C++ | Java |
+| ----------- | ----- | --- | ---- |
+{{ range .Scalars -}}
+| {{`{{< div id="`}}{{.ProtoType}}{{`" content="`}}{{.ProtoType}}{{`" >}}`}} | {{.Notes}} | {{.CppType}} | {{.JavaType}} |
+{{ end }}

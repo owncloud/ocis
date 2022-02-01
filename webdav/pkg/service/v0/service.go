@@ -19,7 +19,8 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 
 	"github.com/go-chi/chi/v5"
-	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
+	thumbnailsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/thumbnails/v0"
+	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
 	"github.com/owncloud/ocis/webdav/pkg/config"
 	"github.com/owncloud/ocis/webdav/pkg/dav/requests"
 )
@@ -60,7 +61,7 @@ func NewService(opts ...Option) (Service, error) {
 		config:           conf,
 		log:              options.Logger,
 		mux:              m,
-		thumbnailsClient: thumbnails.NewThumbnailService("com.owncloud.api.thumbnails", grpc.DefaultClient),
+		thumbnailsClient: thumbnailssvc.NewThumbnailService("com.owncloud.api.thumbnails", grpc.DefaultClient),
 		revaClient:       gwc,
 	}
 
@@ -78,7 +79,7 @@ type Webdav struct {
 	config           *config.Config
 	log              log.Logger
 	mux              *chi.Mux
-	thumbnailsClient thumbnails.ThumbnailService
+	thumbnailsClient thumbnailssvc.ThumbnailService
 	revaClient       gatewayv1beta1.GatewayAPIClient
 }
 
@@ -109,13 +110,13 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fullPath := filepath.Join(templates.WithUser(userRes.User, g.config.WebdavNamespace), tr.Filepath)
-	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnails.GetThumbnailRequest{
+	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
 		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),
 		Width:         tr.Width,
 		Height:        tr.Height,
-		Source: &thumbnails.GetThumbnailRequest_Cs3Source{
-			Cs3Source: &thumbnails.CS3Source{
+		Source: &thumbnailssvc.GetThumbnailRequest_Cs3Source{
+			Cs3Source: &thumbnailsmsg.CS3Source{
 				Path:          fullPath,
 				Authorization: t,
 			},
@@ -153,13 +154,13 @@ func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnails.GetThumbnailRequest{
+	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
 		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),
 		Width:         tr.Width,
 		Height:        tr.Height,
-		Source: &thumbnails.GetThumbnailRequest_WebdavSource{
-			WebdavSource: &thumbnails.WebdavSource{
+		Source: &thumbnailssvc.GetThumbnailRequest_WebdavSource{
+			WebdavSource: &thumbnailsmsg.WebdavSource{
 				Url:             g.config.OcisPublicURL + r.URL.RequestURI(),
 				IsPublicLink:    true,
 				PublicLinkToken: tr.PublicLinkToken,
@@ -198,13 +199,13 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnails.GetThumbnailRequest{
+	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
 		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),
 		Width:         tr.Width,
 		Height:        tr.Height,
-		Source: &thumbnails.GetThumbnailRequest_WebdavSource{
-			WebdavSource: &thumbnails.WebdavSource{
+		Source: &thumbnailssvc.GetThumbnailRequest_WebdavSource{
+			WebdavSource: &thumbnailsmsg.WebdavSource{
 				Url:             g.config.OcisPublicURL + r.URL.RequestURI(),
 				IsPublicLink:    true,
 				PublicLinkToken: tr.PublicLinkToken,
@@ -235,12 +236,12 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func extensionToThumbnailType(ext string) thumbnails.GetThumbnailRequest_ThumbnailType {
+func extensionToThumbnailType(ext string) thumbnailssvc.GetThumbnailRequest_ThumbnailType {
 	switch strings.ToUpper(ext) {
 	case "GIF", "PNG":
-		return thumbnails.GetThumbnailRequest_PNG
+		return thumbnailssvc.GetThumbnailRequest_PNG
 	default:
-		return thumbnails.GetThumbnailRequest_JPG
+		return thumbnailssvc.GetThumbnailRequest_JPG
 	}
 }
 
@@ -298,7 +299,7 @@ func (t *thumbnailResponse) Render(w http.ResponseWriter, _ *http.Request) error
 	return err
 }
 
-func newThumbnailResponse(rsp *thumbnails.GetThumbnailResponse) *thumbnailResponse {
+func newThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse) *thumbnailResponse {
 	return &thumbnailResponse{
 		contentType: rsp.Mimetype,
 		thumbnail:   rsp.Thumbnail,

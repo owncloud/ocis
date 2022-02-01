@@ -1,10 +1,11 @@
 package http
 
 import (
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/accounts/pkg/assets"
-	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	"github.com/owncloud/ocis/ocis-pkg/cors"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
@@ -66,8 +67,8 @@ func Server(opts ...Option) http.Service {
 	))
 
 	mux.Route(options.Config.HTTP.Root, func(r chi.Router) {
-		proto.RegisterAccountsServiceWeb(r, handler)
-		proto.RegisterGroupsServiceWeb(r, handler)
+		accountssvc.RegisterAccountsServiceWeb(r, handler)
+		accountssvc.RegisterGroupsServiceWeb(r, handler)
 	})
 
 	err := micro.RegisterHandler(service.Server(), mux)

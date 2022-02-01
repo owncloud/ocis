@@ -8,12 +8,14 @@ import (
 	"strconv"
 	"strings"
 
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+
 	"github.com/glauth/glauth/v2/pkg/config"
 	"github.com/glauth/glauth/v2/pkg/handler"
 	"github.com/glauth/glauth/v2/pkg/stats"
 	ber "github.com/nmcclain/asn1-ber"
 	"github.com/nmcclain/ldap"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"go-micro.dev/v4/metadata"
@@ -27,8 +29,8 @@ const (
 )
 
 type ocisHandler struct {
-	as          accounts.AccountsService
-	gs          accounts.GroupsService
+	as          accountssvc.AccountsService
+	gs          accountssvc.GroupsService
 	log         log.Logger
 	basedn      string
 	nameFormat  string
@@ -86,7 +88,7 @@ func (h ocisHandler) Bind(bindDN, bindSimplePw string, conn net.Conn) (ldap.LDAP
 	ctx = metadata.Set(ctx, middleware.RoleIDs, string(roleIDs))
 
 	// check password
-	res, err := h.as.ListAccounts(ctx, &accounts.ListAccountsRequest{
+	res, err := h.as.ListAccounts(ctx, &accountssvc.ListAccountsRequest{
 		//Query: fmt.Sprintf("username eq '%s'", username),
 		// TODO this allows looking up users when you know the username using basic auth
 		// adding the password to the query is an option but sending this over the wire a la scim seems ugly
@@ -209,7 +211,7 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 		Msg("parsed query")
 	switch qtype {
 	case usersQuery:
-		accounts, err := h.as.ListAccounts(ctx, &accounts.ListAccountsRequest{
+		accounts, err := h.as.ListAccounts(ctx, &accountssvc.ListAccountsRequest{
 			Query: query,
 		})
 		if err != nil {
@@ -229,7 +231,7 @@ func (h ocisHandler) Search(bindDN string, searchReq ldap.SearchRequest, conn ne
 		}
 		entries = append(entries, h.mapAccounts(accounts.Accounts)...)
 	case groupsQuery:
-		groups, err := h.gs.ListGroups(ctx, &accounts.ListGroupsRequest{
+		groups, err := h.gs.ListGroups(ctx, &accountssvc.ListGroupsRequest{
 			Query: query,
 		})
 		if err != nil {
@@ -275,7 +277,7 @@ func attribute(name string, values ...string) *ldap.EntryAttribute {
 	}
 }
 
-func (h ocisHandler) mapAccounts(accounts []*accounts.Account) []*ldap.Entry {
+func (h ocisHandler) mapAccounts(accounts []*accountsmsg.Account) []*ldap.Entry {
 	entries := make([]*ldap.Entry, 0, len(accounts))
 	for i := range accounts {
 		attrs := []*ldap.EntryAttribute{
@@ -314,7 +316,7 @@ func (h ocisHandler) mapAccounts(accounts []*accounts.Account) []*ldap.Entry {
 	return entries
 }
 
-func (h ocisHandler) mapGroups(groups []*accounts.Group) []*ldap.Entry {
+func (h ocisHandler) mapGroups(groups []*accountsmsg.Group) []*ldap.Entry {
 	entries := make([]*ldap.Entry, 0, len(groups))
 	for i := range groups {
 		attrs := []*ldap.EntryAttribute{

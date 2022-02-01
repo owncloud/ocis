@@ -25,15 +25,15 @@ export const request = (method, url, body, queryParameters, form, config) => {
   }
 }
 /*==========================================================
- *                    
+ *
  ==========================================================*/
 /**
- * 
+ *
  * request: RoleService_AssignRoleToUser
  * url: RoleService_AssignRoleToUserURL
  * method: RoleService_AssignRoleToUser_TYPE
  * raw_url: RoleService_AssignRoleToUser_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const RoleService_AssignRoleToUser = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -74,12 +74,12 @@ export const RoleService_AssignRoleToUserURL = function(parameters = {}) {
   return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
 }
 /**
- * 
+ *
  * request: RoleService_ListRoleAssignments
  * url: RoleService_ListRoleAssignmentsURL
  * method: RoleService_ListRoleAssignments_TYPE
  * raw_url: RoleService_ListRoleAssignments_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const RoleService_ListRoleAssignments = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -120,12 +120,12 @@ export const RoleService_ListRoleAssignmentsURL = function(parameters = {}) {
   return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
 }
 /**
- * 
+ *
  * request: RoleService_RemoveRoleFromUser
  * url: RoleService_RemoveRoleFromUserURL
  * method: RoleService_RemoveRoleFromUser_TYPE
  * raw_url: RoleService_RemoveRoleFromUser_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const RoleService_RemoveRoleFromUser = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -166,12 +166,12 @@ export const RoleService_RemoveRoleFromUserURL = function(parameters = {}) {
   return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
 }
 /**
- * 
+ *
  * request: BundleService_GetBundle
  * url: BundleService_GetBundleURL
  * method: BundleService_GetBundle_TYPE
  * raw_url: BundleService_GetBundle_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const BundleService_GetBundle = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -212,12 +212,12 @@ export const BundleService_GetBundleURL = function(parameters = {}) {
   return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
 }
 /**
- * 
+ *
  * request: BundleService_SaveBundle
  * url: BundleService_SaveBundleURL
  * method: BundleService_SaveBundle_TYPE
  * raw_url: BundleService_SaveBundle_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const BundleService_SaveBundle = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -258,12 +258,12 @@ export const BundleService_SaveBundleURL = function(parameters = {}) {
   return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
 }
 /**
- * 
+ *
  * request: BundleService_AddSettingToBundle
  * url: BundleService_AddSettingToBundleURL
  * method: BundleService_AddSettingToBundle_TYPE
  * raw_url: BundleService_AddSettingToBundle_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const BundleService_AddSettingToBundle = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -304,12 +304,12 @@ export const BundleService_AddSettingToBundleURL = function(parameters = {}) {
   return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
 }
 /**
- * 
+ *
  * request: BundleService_ListBundles
  * url: BundleService_ListBundlesURL
  * method: BundleService_ListBundles_TYPE
  * raw_url: BundleService_ListBundles_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const BundleService_ListBundles = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -350,12 +350,12 @@ export const BundleService_ListBundlesURL = function(parameters = {}) {
   return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
 }
 /**
- * 
+ *
  * request: BundleService_RemoveSettingFromBundle
  * url: BundleService_RemoveSettingFromBundleURL
  * method: BundleService_RemoveSettingFromBundle_TYPE
  * raw_url: BundleService_RemoveSettingFromBundle_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const BundleService_RemoveSettingFromBundle = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -396,12 +396,12 @@ export const BundleService_RemoveSettingFromBundleURL = function(parameters = {}
   return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
 }
 /**
- * 
+ *
  * request: RoleService_ListRoles
  * url: RoleService_ListRolesURL
  * method: RoleService_ListRoles_TYPE
  * raw_url: RoleService_ListRoles_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const RoleService_ListRoles = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -442,12 +442,12 @@ export const RoleService_ListRolesURL = function(parameters = {}) {
   return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
 }
 /**
- * 
+ *
  * request: ValueService_GetValue
  * url: ValueService_GetValueURL
  * method: ValueService_GetValue_TYPE
  * raw_url: ValueService_GetValue_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const ValueService_GetValue = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -488,12 +488,12 @@ export const ValueService_GetValueURL = function(parameters = {}) {
   return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
 }
 /**
- * 
+ *
  * request: ValueService_GetValueByUniqueIdentifiers
  * url: ValueService_GetValueByUniqueIdentifiersURL
  * method: ValueService_GetValueByUniqueIdentifiers_TYPE
  * raw_url: ValueService_GetValueByUniqueIdentifiers_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const ValueService_GetValueByUniqueIdentifiers = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -534,12 +534,12 @@ export const ValueService_GetValueByUniqueIdentifiersURL = function(parameters =
   return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
 }
 /**
- * 
+ *
  * request: ValueService_ListValues
  * url: ValueService_ListValuesURL
  * method: ValueService_ListValues_TYPE
  * raw_url: ValueService_ListValues_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const ValueService_ListValues = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -580,12 +580,12 @@ export const ValueService_ListValuesURL = function(parameters = {}) {
   return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
 }
 /**
- * 
+ *
  * request: ValueService_SaveValue
  * url: ValueService_SaveValueURL
  * method: ValueService_SaveValue_TYPE
  * raw_url: ValueService_SaveValue_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const ValueService_SaveValue = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()

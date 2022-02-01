@@ -3,17 +3,19 @@ package command
 import (
 	"fmt"
 
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/accounts/pkg/flagset"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/urfave/cli/v2"
 )
 
 // AddAccount command creates a new account
 func AddAccount(cfg *config.Config) *cli.Command {
-	a := &accounts.Account{
-		PasswordProfile: &accounts.PasswordProfile{},
+	a := &accountsmsg.Account{
+		PasswordProfile: &accountsmsg.PasswordProfile{},
 	}
 	return &cli.Command{
 		Name:     "add",
@@ -43,8 +45,8 @@ func AddAccount(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			accSvcID := cfg.GRPC.Namespace + "." + cfg.Service.Name
-			accSvc := accounts.NewAccountsService(accSvcID, grpc.NewClient())
-			_, err := accSvc.CreateAccount(c.Context, &accounts.CreateAccountRequest{
+			accSvc := accountssvc.NewAccountsService(accSvcID, grpc.NewClient())
+			_, err := accSvc.CreateAccount(c.Context, &accountssvc.CreateAccountRequest{
 				Account: a,
 			})
 

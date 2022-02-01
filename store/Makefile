@@ -32,9 +32,6 @@ ci-node-generate:
 
 
 ############ protobuf ############
-PROTO_VERSION := v0
-PROTO_SRC := pkg/proto/$(PROTO_VERSION)
-
 include ../.make/protobuf.mk
 
 .PHONY: protobuf

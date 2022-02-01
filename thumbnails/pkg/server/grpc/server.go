@@ -4,7 +4,7 @@ import (
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/version"
-	"github.com/owncloud/ocis/thumbnails/pkg/proto/v0"
+	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
 	svc "github.com/owncloud/ocis/thumbnails/pkg/service/v0"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/storage"
@@ -30,7 +30,7 @@ func NewService(opts ...Option) grpc.Service {
 		options.Logger.Error().Err(err).Msg("could not get gateway client")
 		return grpc.Service{}
 	}
-	var thumbnail proto.ThumbnailServiceHandler
+	var thumbnail thumbnailssvc.ThumbnailServiceHandler
 	{
 		thumbnail = svc.NewService(
 			svc.Config(options.Config),
@@ -50,7 +50,7 @@ func NewService(opts ...Option) grpc.Service {
 		thumbnail = svc.NewTracing(thumbnail)
 	}
 
-	_ = proto.RegisterThumbnailServiceHandler(
+	_ = thumbnailssvc.RegisterThumbnailServiceHandler(
 		service.Server(),
 		thumbnail,
 	)

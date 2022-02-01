@@ -25,7 +25,7 @@ export const request = (method, url, body, queryParameters, form, config) => {
   }
 }
 /*==========================================================
- *                    
+ *
  ==========================================================*/
 /**
  * Creates an account
@@ -33,7 +33,7 @@ export const request = (method, url, body, queryParameters, form, config) => {
  * url: AccountsService_CreateAccountURL
  * method: AccountsService_CreateAccount_TYPE
  * raw_url: AccountsService_CreateAccount_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const AccountsService_CreateAccount = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -79,7 +79,7 @@ export const AccountsService_CreateAccountURL = function(parameters = {}) {
  * url: AccountsService_DeleteAccountURL
  * method: AccountsService_DeleteAccount_TYPE
  * raw_url: AccountsService_DeleteAccount_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const AccountsService_DeleteAccount = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -125,7 +125,7 @@ export const AccountsService_DeleteAccountURL = function(parameters = {}) {
  * url: AccountsService_GetAccountURL
  * method: AccountsService_GetAccount_TYPE
  * raw_url: AccountsService_GetAccount_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const AccountsService_GetAccount = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -171,7 +171,7 @@ export const AccountsService_GetAccountURL = function(parameters = {}) {
  * url: AccountsService_ListAccountsURL
  * method: AccountsService_ListAccounts_TYPE
  * raw_url: AccountsService_ListAccounts_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const AccountsService_ListAccounts = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -217,7 +217,7 @@ export const AccountsService_ListAccountsURL = function(parameters = {}) {
  * url: AccountsService_UpdateAccountURL
  * method: AccountsService_UpdateAccount_TYPE
  * raw_url: AccountsService_UpdateAccount_RAW_URL
- * @param body - 
+ * @param body -
  */
 export const AccountsService_UpdateAccount = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
@@ -287,7 +287,7 @@ display names that include both "Test" and "String"
 export const GroupsService_ListGroups = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/v0/groups'
+  let path = '/v1/groups'
   let body
   let queryParameters = {}
   let form = {}
@@ -311,7 +311,7 @@ export const GroupsService_ListGroups = function(parameters = {}) {
   return request('get', domain + path, body, queryParameters, form, config)
 }
 export const GroupsService_ListGroups_RAW_URL = function() {
-  return '/v0/groups'
+  return '/v1/groups'
 }
 export const GroupsService_ListGroups_TYPE = function() {
   return 'get'
@@ -319,7 +319,7 @@ export const GroupsService_ListGroups_TYPE = function() {
 export const GroupsService_ListGroupsURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/v0/groups'
+  let path = '/v1/groups'
   if (parameters['pageSize'] !== undefined) {
     queryParameters['page_size'] = parameters['pageSize']
   }
@@ -351,7 +351,7 @@ export const GroupsService_ListGroupsURL = function(parameters = {}) {
 export const GroupsService_CreateGroup = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/v0/groups'
+  let path = '/v1/groups'
   let body
   let queryParameters = {}
   let form = {}
@@ -369,7 +369,7 @@ export const GroupsService_CreateGroup = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const GroupsService_CreateGroup_RAW_URL = function() {
-  return '/v0/groups'
+  return '/v1/groups'
 }
 export const GroupsService_CreateGroup_TYPE = function() {
   return 'post'
@@ -377,7 +377,7 @@ export const GroupsService_CreateGroup_TYPE = function() {
 export const GroupsService_CreateGroupURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/v0/groups'
+  let path = '/v1/groups'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
@@ -399,7 +399,7 @@ Returned by default. Inherited from directoryObject. Key. Not nullable. Read-onl
 export const GroupsService_UpdateGroup = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/v0/groups/{group.id}'
+  let path = '/v1/groups/{group.id}'
   let body
   let queryParameters = {}
   let form = {}
@@ -421,7 +421,7 @@ export const GroupsService_UpdateGroup = function(parameters = {}) {
   return request('patch', domain + path, body, queryParameters, form, config)
 }
 export const GroupsService_UpdateGroup_RAW_URL = function() {
-  return '/v0/groups/{group.id}'
+  return '/v1/groups/{group.id}'
 }
 export const GroupsService_UpdateGroup_TYPE = function() {
   return 'patch'
@@ -429,7 +429,7 @@ export const GroupsService_UpdateGroup_TYPE = function() {
 export const GroupsService_UpdateGroupURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/v0/groups/{group.id}'
+  let path = '/v1/groups/{group.id}'
   path = path.replace('{group.id}', `${parameters['groupId']}`)
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
@@ -445,12 +445,12 @@ export const GroupsService_UpdateGroupURL = function(parameters = {}) {
  * url: GroupsService_GetGroupURL
  * method: GroupsService_GetGroup_TYPE
  * raw_url: GroupsService_GetGroup_RAW_URL
- * @param id - 
+ * @param id -
  */
 export const GroupsService_GetGroup = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/v0/groups/{id}'
+  let path = '/v1/groups/{id}'
   let body
   let queryParameters = {}
   let form = {}
@@ -466,7 +466,7 @@ export const GroupsService_GetGroup = function(parameters = {}) {
   return request('get', domain + path, body, queryParameters, form, config)
 }
 export const GroupsService_GetGroup_RAW_URL = function() {
-  return '/v0/groups/{id}'
+  return '/v1/groups/{id}'
 }
 export const GroupsService_GetGroup_TYPE = function() {
   return 'get'
@@ -474,7 +474,7 @@ export const GroupsService_GetGroup_TYPE = function() {
 export const GroupsService_GetGroupURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/v0/groups/{id}'
+  let path = '/v1/groups/{id}'
   path = path.replace('{id}', `${parameters['id']}`)
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
@@ -490,12 +490,12 @@ export const GroupsService_GetGroupURL = function(parameters = {}) {
  * url: GroupsService_DeleteGroupURL
  * method: GroupsService_DeleteGroup_TYPE
  * raw_url: GroupsService_DeleteGroup_RAW_URL
- * @param id - 
+ * @param id -
  */
 export const GroupsService_DeleteGroup = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/v0/groups/{id}'
+  let path = '/v1/groups/{id}'
   let body
   let queryParameters = {}
   let form = {}
@@ -511,7 +511,7 @@ export const GroupsService_DeleteGroup = function(parameters = {}) {
   return request('delete', domain + path, body, queryParameters, form, config)
 }
 export const GroupsService_DeleteGroup_RAW_URL = function() {
-  return '/v0/groups/{id}'
+  return '/v1/groups/{id}'
 }
 export const GroupsService_DeleteGroup_TYPE = function() {
   return 'delete'
@@ -519,7 +519,7 @@ export const GroupsService_DeleteGroup_TYPE = function() {
 export const GroupsService_DeleteGroupURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/v0/groups/{id}'
+  let path = '/v1/groups/{id}'
   path = path.replace('{id}', `${parameters['id']}`)
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
@@ -536,7 +536,7 @@ export const GroupsService_DeleteGroupURL = function(parameters = {}) {
 * method: GroupsService_ListMembers_TYPE
 * raw_url: GroupsService_ListMembers_RAW_URL
      * @param id - The group id
-     * @param pageSize - 
+     * @param pageSize -
      * @param pageToken - Optional. A pagination token returned from a previous call to `Get`
 that indicates from where search should continue.
      * @param fieldMaskPaths - The set of field mask paths.
@@ -560,7 +560,7 @@ display names that include both "Test" and "String"
 export const GroupsService_ListMembers = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/v0/groups/{id}/members/$ref'
+  let path = '/v1/groups/{id}/members/$ref'
   let body
   let queryParameters = {}
   let form = {}
@@ -588,7 +588,7 @@ export const GroupsService_ListMembers = function(parameters = {}) {
   return request('get', domain + path, body, queryParameters, form, config)
 }
 export const GroupsService_ListMembers_RAW_URL = function() {
-  return '/v0/groups/{id}/members/$ref'
+  return '/v1/groups/{id}/members/$ref'
 }
 export const GroupsService_ListMembers_TYPE = function() {
   return 'get'
@@ -596,7 +596,7 @@ export const GroupsService_ListMembers_TYPE = function() {
 export const GroupsService_ListMembersURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/v0/groups/{id}/members/$ref'
+  let path = '/v1/groups/{id}/members/$ref'
   path = path.replace('{id}', `${parameters['id']}`)
   if (parameters['pageSize'] !== undefined) {
     queryParameters['page_size'] = parameters['pageSize']
@@ -625,12 +625,12 @@ export const GroupsService_ListMembersURL = function(parameters = {}) {
  * method: GroupsService_AddMember_TYPE
  * raw_url: GroupsService_AddMember_RAW_URL
  * @param id - The account id to add
- * @param body - 
+ * @param body -
  */
 export const GroupsService_AddMember = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/v0/groups/{id}/members/$ref'
+  let path = '/v1/groups/{id}/members/$ref'
   let body
   let queryParameters = {}
   let form = {}
@@ -652,7 +652,7 @@ export const GroupsService_AddMember = function(parameters = {}) {
   return request('post', domain + path, body, queryParameters, form, config)
 }
 export const GroupsService_AddMember_RAW_URL = function() {
-  return '/v0/groups/{id}/members/$ref'
+  return '/v1/groups/{id}/members/$ref'
 }
 export const GroupsService_AddMember_TYPE = function() {
   return 'post'
@@ -660,7 +660,7 @@ export const GroupsService_AddMember_TYPE = function() {
 export const GroupsService_AddMemberURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/v0/groups/{id}/members/$ref'
+  let path = '/v1/groups/{id}/members/$ref'
   path = path.replace('{id}', `${parameters['id']}`)
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
@@ -682,7 +682,7 @@ export const GroupsService_AddMemberURL = function(parameters = {}) {
 export const GroupsService_RemoveMember = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   const config = parameters.$config
-  let path = '/v0/groups/{id}/members/{account_id}/$ref'
+  let path = '/v1/groups/{id}/members/{account_id}/$ref'
   let body
   let queryParameters = {}
   let form = {}
@@ -702,7 +702,7 @@ export const GroupsService_RemoveMember = function(parameters = {}) {
   return request('delete', domain + path, body, queryParameters, form, config)
 }
 export const GroupsService_RemoveMember_RAW_URL = function() {
-  return '/v0/groups/{id}/members/{account_id}/$ref'
+  return '/v1/groups/{id}/members/{account_id}/$ref'
 }
 export const GroupsService_RemoveMember_TYPE = function() {
   return 'delete'
@@ -710,7 +710,7 @@ export const GroupsService_RemoveMember_TYPE = function() {
 export const GroupsService_RemoveMemberURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
-  let path = '/v0/groups/{id}/members/{account_id}/$ref'
+  let path = '/v1/groups/{id}/members/{account_id}/$ref'
   path = path.replace('{id}', `${parameters['id']}`)
   path = path.replace('{account_id}', `${parameters['accountId']}`)
   if (parameters.$queryParameters) {

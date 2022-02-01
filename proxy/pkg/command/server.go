@@ -7,16 +7,20 @@ import (
 	"net/http"
 	"time"
 
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+
+	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v0"
+
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
 	"github.com/oklog/run"
-	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/version"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/config/parser"
 	"github.com/owncloud/ocis/proxy/pkg/cs3"
@@ -28,8 +32,6 @@ import (
 	proxyHTTP "github.com/owncloud/ocis/proxy/pkg/server/http"
 	"github.com/owncloud/ocis/proxy/pkg/tracing"
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
-	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/oauth2"
 )
@@ -125,7 +127,7 @@ func Server(cfg *config.Config) *cli.Command {
 }
 
 func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config) alice.Chain {
-	rolesClient := settings.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
+	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
 	revaClient, err := cs3.GetGatewayServiceClient(cfg.Reva.Address)
 	var userProvider backend.UserBackend
 	switch cfg.AccountBackend {
@@ -139,7 +141,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 				Msg("Failed to create token manager")
 		}
 		userProvider = backend.NewAccountsServiceUserBackend(
-			acc.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient),
+			accountssvc.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient),
 			rolesClient,
 			cfg.OIDC.Issuer,
 			tokenManager,
@@ -151,7 +153,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		logger.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)
 	}
 
-	storeClient := storepb.NewStoreService("com.owncloud.api.store", grpc.DefaultClient)
+	storeClient := storesvc.NewStoreService("com.owncloud.api.store", grpc.DefaultClient)
 	if err != nil {
 		logger.Error().Err(err).
 			Str("gateway", cfg.Reva.Address).

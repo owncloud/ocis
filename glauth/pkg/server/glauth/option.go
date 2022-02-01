@@ -3,8 +3,9 @@ package glauth
 import (
 	"context"
 
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+
 	"github.com/glauth/glauth/v2/pkg/config"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
@@ -23,8 +24,8 @@ type Options struct {
 	NameFormat      string
 	GroupFormat     string
 	RoleBundleUUID  string
-	AccountsService accounts.AccountsService
-	GroupsService   accounts.GroupsService
+	AccountsService accountssvc.AccountsService
+	GroupsService   accountssvc.GroupsService
 }
 
 // newOptions initializes the available default options.
@@ -102,14 +103,14 @@ func GroupFormat(val string) Option {
 }
 
 // AccountsService provides an AccountsService client to set the AccountsService option.
-func AccountsService(val accounts.AccountsService) Option {
+func AccountsService(val accountssvc.AccountsService) Option {
 	return func(o *Options) {
 		o.AccountsService = val
 	}
 }
 
 // GroupsService provides an GroupsService client to set the GroupsService option.
-func GroupsService(val accounts.GroupsService) Option {
+func GroupsService(val accountssvc.GroupsService) Option {
 	return func(o *Options) {
 		o.GroupsService = val
 	}

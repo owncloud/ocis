@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package ocis.services.thumbnails.v0;
+
+option go_package = "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0";
+
+import "ocis/messages/thumbnails/v0/thumbnails.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "ownCloud Infinite Scale thumbnails";
+    version: "1.0.0";
+    contact: {
+      name: "ownCloud GmbH";
+      url: "https://github.com/owncloud/ocis";
+      email: "support@owncloud.com";
+    };
+    license: {
+      name: "Apache-2.0";
+      url: "https://github.com/owncloud/ocis/blob/master/LICENSE";
+    };
+  };
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+  external_docs: {
+    description: "Developer Manual";
+    url: "https://owncloud.dev/extensions/thumbnails/";
+  };
+};
+
+// A Service for handling thumbnail generation
+service ThumbnailService {
+    // Generates the thumbnail and returns it.
+    rpc GetThumbnail(GetThumbnailRequest) returns (GetThumbnailResponse);
+}
+
+// A request to retrieve a thumbnail
+message GetThumbnailRequest {
+    // The path to the source image
+    string filepath = 1;
+    // The file types to which the thumbnail can get encoded to.
+    enum ThumbnailType {
+        PNG = 0; // Represents PNG type
+        JPG = 1; // Represents JPG type
+    }
+    // The type to which the thumbnail should get encoded to.
+    ThumbnailType thumbnail_type = 2;
+    // The width of the thumbnail
+    int32 width = 3;
+    // The height of the thumbnail
+    int32 height = 4;
+    oneof source {
+      ocis.messages.thumbnails.v0.WebdavSource webdav_source = 5;
+      ocis.messages.thumbnails.v0.CS3Source cs3_source = 6;
+    }
+}
+
+// The service response
+message GetThumbnailResponse {
+    // The thumbnail as a binary
+    bytes thumbnail = 1;
+    // The mimetype of the thumbnail
+    string mimetype = 2;
+}

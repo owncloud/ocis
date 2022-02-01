@@ -1,0 +1,1067 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "ownCloud Infinite Scale accounts",
+    "version": "1.0.0",
+    "contact": {
+      "name": "ownCloud GmbH",
+      "url": "https://github.com/owncloud/ocis",
+      "email": "support@owncloud.com"
+    },
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://github.com/owncloud/ocis/blob/master/LICENSE"
+    }
+  },
+  "tags": [
+    {
+      "name": "AccountsService"
+    },
+    {
+      "name": "GroupsService"
+    },
+    {
+      "name": "IndexService"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v0/accounts/accounts-create": {
+      "post": {
+        "summary": "Creates an account",
+        "operationId": "AccountsService_CreateAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0Account"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0CreateAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AccountsService"
+        ]
+      }
+    },
+    "/api/v0/accounts/accounts-delete": {
+      "post": {
+        "summary": "Deletes an account",
+        "operationId": "AccountsService_DeleteAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0DeleteAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AccountsService"
+        ]
+      }
+    },
+    "/api/v0/accounts/accounts-get": {
+      "post": {
+        "summary": "Gets an account",
+        "operationId": "AccountsService_GetAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0Account"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0GetAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AccountsService"
+        ]
+      }
+    },
+    "/api/v0/accounts/accounts-list": {
+      "post": {
+        "summary": "Lists accounts",
+        "operationId": "AccountsService_ListAccounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0ListAccountsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0ListAccountsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AccountsService"
+        ]
+      }
+    },
+    "/api/v0/accounts/accounts-update": {
+      "post": {
+        "summary": "Updates an account",
+        "operationId": "AccountsService_UpdateAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0Account"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0UpdateAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AccountsService"
+        ]
+      }
+    },
+    "/api/v0/accounts/groups-create": {
+      "post": {
+        "summary": "Creates a group",
+        "operationId": "GroupsService_CreateGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0Group"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0CreateGroupRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GroupsService"
+        ]
+      }
+    },
+    "/api/v0/accounts/groups-delete": {
+      "post": {
+        "summary": "Deletes a group",
+        "operationId": "GroupsService_DeleteGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0DeleteGroupRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GroupsService"
+        ]
+      }
+    },
+    "/api/v0/accounts/groups-get": {
+      "post": {
+        "summary": "Gets an groups",
+        "operationId": "GroupsService_GetGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0Group"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0GetGroupRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GroupsService"
+        ]
+      }
+    },
+    "/api/v0/accounts/groups-list": {
+      "post": {
+        "summary": "Lists groups",
+        "operationId": "GroupsService_ListGroups",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0ListGroupsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0ListGroupsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GroupsService"
+        ]
+      }
+    },
+    "/api/v0/accounts/groups-update": {
+      "post": {
+        "summary": "Updates a group",
+        "operationId": "GroupsService_UpdateGroup",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0Group"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0UpdateGroupRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GroupsService"
+        ]
+      }
+    },
+    "/api/v0/groups/{groupId}/members/$ref": {
+      "post": {
+        "summary": "group:addmember https://docs.microsoft.com/en-us/graph/api/group-post-members?view=graph-rest-1.0\u0026tabs=http",
+        "operationId": "GroupsService_AddMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0Group"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "groupId",
+            "description": "The id of the group to add a member to",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "accountId": {
+                  "type": "string",
+                  "title": "The account id to add"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "GroupsService"
+        ]
+      }
+    },
+    "/api/v0/groups/{groupId}/members/{accountId}/$ref": {
+      "post": {
+        "summary": "group:removemember https://docs.microsoft.com/en-us/graph/api/group-delete-members?view=graph-rest-1.0",
+        "operationId": "GroupsService_RemoveMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0Group"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "groupId",
+            "description": "The id of the group to remove a member from",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          },
+          {
+            "name": "accountId",
+            "description": "The account id to remove",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "tags": [
+          "GroupsService"
+        ]
+      }
+    },
+    "/api/v0/groups/{id}/members/$ref": {
+      "post": {
+        "summary": "group:listmembers https://docs.microsoft.com/en-us/graph/api/group-list-members?view=graph-rest-1.0",
+        "operationId": "GroupsService_ListMembers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0ListMembersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "The id of the group to list members from",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pageSize": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "pageToken": {
+                  "type": "string",
+                  "title": "Optional. A pagination token returned from a previous call to `Get`\nthat indicates from where search should continue"
+                },
+                "fieldMask": {
+                  "type": "string",
+                  "description": "Optional. Used to specify a subset of fields that should be\nreturned by a get operation or modified by an update operation."
+                },
+                "query": {
+                  "type": "string",
+                  "description": "TODO update query language\nQuery expressions can be used to restrict results based upon\nthe account properties where the operators `=`, `NOT`, `AND` and `OR`\ncan be used along with the suffix wildcard symbol `*`.\n\nThe string properties in a query expression should use escaped quotes\nfor values that include whitespace to prevent unexpected behavior.\n\nSome example queries are:\n\n* Query `display_name=Th*` returns accounts whose display_name\nstarts with \"Th\"\n* Query `display_name=\\\\\"Test String\\\\\"` returns groups with\ndisplay names that include both \"Test\" and \"String\"",
+                  "title": "Optional. Search criteria used to select the groups to return.\nIf no search criteria is specified then all groups will be\nreturned"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "GroupsService"
+        ]
+      }
+    },
+    "/api/v0/index/rebuild": {
+      "post": {
+        "operationId": "IndexService_RebuildIndex",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0RebuildIndexResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0RebuildIndexRequest"
+            }
+          }
+        ],
+        "tags": [
+          "IndexService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v0Account": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the user. Key. Not nullable. Non reassignable. Read-only."
+        },
+        "accountEnabled": {
+          "type": "boolean",
+          "description": "`true` if the account is enabled; otherwise, `false`. This property is required when a user is created. Supports $filter."
+        },
+        "isResourceAccount": {
+          "type": "boolean",
+          "description": "A resource account is also known as a /disabled user object/ in Azure AD, and can be used to represent resources in general.\nIn Exchange it might be used to represent conference rooms, for example, and allow them to have a phone number.\nYou could give printers or machines with a sync client resource accounts as well.\nA resource account can be homed in Microsoft 365 or on premises using Skype for Business Server 2019.\n`true` if the user is a resource account; otherwise, `false`. Null value should be considered false."
+        },
+        "creationType": {
+          "type": "string",
+          "description": "Indicates whether the account was created as\n- a regular school or work account (\"\" / emptystring),\n- a local account, fully managed by oCIS (LocalAccount), includes synced accounts or\n- an external account (Invitation),\n- self-service sign-up using email verification (EmailVerified). Read-only."
+        },
+        "identities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0Identities"
+          },
+          "description": "Represents the identities that can be used to sign in to this account.\nAn identity can be provided by oCIS (also known as a local account), by organizations, or by social identity providers such as Facebook, Google, and Microsoft, and is tied to an account.\nMay contain multiple items with the same signInType value. Supports $filter."
+        },
+        "displayName": {
+          "type": "string",
+          "title": "The name displayed in the address book for the account.\nThis is usually the combination of the user's first name, middle initial and last name.\nThis property is required when a user is created and it cannot be cleared during updates.\nSupports $filter and $orderby.\nposixaccount MUST cn"
+        },
+        "preferredName": {
+          "type": "string",
+          "title": "The username\nposixaccount MUST uid"
+        },
+        "uidNumber": {
+          "type": "string",
+          "format": "int64",
+          "title": "used for exposing the user using ldap\nposixaccount MUST uidnumber"
+        },
+        "gidNumber": {
+          "type": "string",
+          "format": "int64",
+          "title": "used for exposing the user using ldap\nposixaccount MUST gidnumber"
+        },
+        "mail": {
+          "type": "string",
+          "title": "The SMTP address for the user, for example, \"jeff@contoso.onmicrosoft.com\". Read-Only. Supports $filter.\ninetorgperson MAY mail"
+        },
+        "description": {
+          "type": "string",
+          "title": "A description, useful for resource accounts\nposixaccount MAY description"
+        },
+        "passwordProfile": {
+          "$ref": "#/definitions/v0PasswordProfile",
+          "title": "Specifies the password profile for the user.\nThe profile contains the user’s password. This property is required when a user is created.\nThe password in the profile must satisfy minimum requirements as specified by the passwordPolicies property.\nBy default, a strong password is required.\nposixaccount MAY authPassword"
+        },
+        "memberOf": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0Group"
+          },
+          "title": "The groups, directory roles and administrative units that the user is a member of. Read-only. Nullable.\nshould we only respond with repeated strings of ids? no clients should a proper filter mask!"
+        },
+        "createdDateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The created date of the account object."
+        },
+        "deletedDateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time the user was deleted. Returned only on $select."
+        },
+        "onPremisesSyncEnabled": {
+          "type": "boolean",
+          "title": "`true` if this object is synced from an on-premises directory;\n`false` if this object was originally synced from an on-premises directory but is no longer synced;\nnull if this object has never been synced from an on-premises directory (default). Read-only"
+        },
+        "onPremisesImmutableId": {
+          "type": "string",
+          "description": "This property is used to associate an on-premises LDAP user to the oCIS account object.\nThis property must be specified when creating a new user account in the Graph if you are using a federated domain for the user’s userPrincipalName (UPN) property.\nImportant: The $ and _ characters cannot be used when specifying this property. Supports $filter."
+        },
+        "onPremisesSecurityIdentifier": {
+          "type": "string",
+          "description": "Contains the on-premises security identifier (SID) for the user that was synchronized from on-premises to the cloud. Read-only."
+        },
+        "onPremisesDistinguishedName": {
+          "type": "string",
+          "description": "Contains the on-premises LDAP `distinguished name` or `DN`.\nThe property is only populated for customers who are synchronizing their on-premises directory to ocis-accounts. Read-only."
+        },
+        "onPremisesSamAccountName": {
+          "type": "string",
+          "description": "Contains the on-premises `samAccountName` synchronized from the on-premises directory.\nThe property is only populated for customers who are synchronizing their on-premises directory to ocis-accounts. Read-only."
+        },
+        "onPremisesDomainName": {
+          "type": "string",
+          "description": "Contains the on-premises `domainFQDN`, also called `dnsDomainName` synchronized from the on-premises directory\nThe property is only populated for customers who are synchronizing their on-premises directory to ocis-accounts. Read-only."
+        },
+        "onPremisesUserPrincipalName": {
+          "type": "string",
+          "description": "Contains the on-premises userPrincipalName synchronized from the on-premises directory.\nThe property is only populated for customers who are synchronizing their on-premises directory to ocis-accounts. Read-only."
+        },
+        "onPremisesLastSyncDateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Indicates the last time at which the object was synced with the on-premises directory; Read-only."
+        },
+        "onPremisesProvisioningErrors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0OnPremisesProvisioningError"
+          },
+          "description": "Errors when using synchronization during provisioning."
+        },
+        "externalUserState": {
+          "type": "string",
+          "description": "For an external user invited to the tenant using the invitation API, this property represents the invited user's invitation status.\nFor invited users, the state can be `PendingAcceptance` or `Accepted`, or \"\" / emptystring for all other users.\nReturned only on $select. Supports $filter with the supported values. For example: $filter=externalUserState eq 'PendingAcceptance'."
+        },
+        "externalUserStateChangeDateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Shows the timestamp for the latest change to the externalUserState property. Returned only on $select."
+        },
+        "refreshTokensValidFromDateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Any refresh tokens or sessions tokens (session cookies) issued before this time are invalid, and applications will get\nan error when using an invalid refresh or sessions token to acquire a delegated access token (to access APIs such as Microsoft Graph).\nIf this happens, the application will need to acquire a new refresh token by making a request to the authorize endpoint.\nReturned only on $select. Read-only. Use invalidateAllRefreshTokens to reset."
+        },
+        "signInSessionsValidFromDateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Any refresh tokens or sessions tokens (session cookies) issued before this time are invalid, and applications will get\nan error when using an invalid refresh or sessions token to acquire a delegated access token (to access APIs such as Microsoft Graph).\nIf this happens, the application will need to acquire a new refresh token by making a request to the authorize endpoint.\nRead-only. Use revokeSignInSessions to reset."
+        }
+      },
+      "title": "Account follows the properties of the ms graph api user resource.\nSee https://docs.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#properties"
+    },
+    "v0CreateAccountRequest": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/definitions/v0Account",
+          "title": "The account resource to create"
+        }
+      }
+    },
+    "v0CreateGroupRequest": {
+      "type": "object",
+      "properties": {
+        "group": {
+          "$ref": "#/definitions/v0Group",
+          "title": "The account resource to create"
+        }
+      }
+    },
+    "v0DeleteAccountRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v0DeleteGroupRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v0GetAccountRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v0GetGroupRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v0Group": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the group.\nReturned by default. Inherited from directoryObject. Key. Not nullable. Read-only."
+        },
+        "displayName": {
+          "type": "string",
+          "title": "The display name for the group. This property is required when a group is created and cannot be cleared during updates.\nReturned by default. Supports $filter and $orderby.\ngroupofnames MUST cn"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0Account"
+          },
+          "description": "Users, contacts, and groups that are members of this group. HTTP Methods: GET (supported for all groups), POST (supported for security groups and mail-enabled security groups), DELETE (supported only for security groups) Read-only. Nullable."
+        },
+        "owners": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0Account"
+          },
+          "title": "groupofnames MAY businessCategory\ngroupofnames MAY o\ngroupofnames MAY ou\ngroupofnames MAY owner, SINGLE-VALUE but there might be multiple owners"
+        },
+        "description": {
+          "type": "string",
+          "title": "An optional description for the group. Returned by default.\ngroupofnames MAY description"
+        },
+        "gidNumber": {
+          "type": "string",
+          "format": "int64",
+          "title": "used for exposing the user using ldap\nposixgroup MUST gidnumber"
+        },
+        "createdDateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of when the group was created. The value cannot be modified and is automatically populated when the group is created\nReturned by default. Read-only."
+        },
+        "deletedDateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "For some Azure Active Directory objects (user, group, application), if the object is deleted, it is first logically deleted, and this property is updated with the date and time when the object was deleted. Otherwise this property is null. If the object is restored, this property is updated to null.\nReturned by default. Read-only."
+        },
+        "expirationDateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of when the group is set to expire. The value cannot be modified and is automatically populated when the group is created.\nReturned by default. Read-only."
+        },
+        "hideFromAddressLists": {
+          "type": "boolean",
+          "description": "True if the group is not displayed in certain parts of the Outlook user interface:\nin the Address Book, in address lists for selecting message recipients, and in the Browse Groups dialog for searching groups; false otherwise. Default value is false.\nReturned only on $select."
+        },
+        "visibility": {
+          "type": "string",
+          "description": "Specifies the visibility of an Office 365 group. Possible values are: Private, Public, or Hiddenmembership; blank values are treated as public. See group visibility options to learn more.\nVisibility can be set only when a group is created; it is not editable.\nReturned by default."
+        },
+        "onPremisesSyncEnabled": {
+          "type": "boolean",
+          "description": "`true` if this group is synced from an on-premises directory;\n`false` if this group was originally synced from an on-premises directory but is no longer synced;\nnull if this object has never been synced from an on-premises directory (default).\nReturned by default. Read-only. Supports $filter."
+        },
+        "onPremisesImmutableId": {
+          "type": "string",
+          "description": "This property is used to associate an on-premises LDAP user to the oCIS account object.\nThis property must be specified when creating a new user account in the Graph if you are using a federated domain for the user’s userPrincipalName (UPN) property.\nImportant: The $ and _ characters cannot be used when specifying this property. Supports $filter."
+        },
+        "onPremisesSecurityIdentifier": {
+          "type": "string",
+          "description": "Contains the on-premises security identifier (SID) for the group that was synchronized from on-premises to the cloud. Returned by default. Read-only."
+        },
+        "onPremisesDistinguishedName": {
+          "type": "string",
+          "description": "Contains the on-premises LDAP `distinguished name` or `DN`.\nThe property is only populated for customers who are synchronizing their on-premises directory to ocis-accounts. Read-only."
+        },
+        "onPremisesSamAccountName": {
+          "type": "string",
+          "description": "Contains the on-premises `samAccountName` synchronized from the on-premises directory.\nThe property is only populated for customers who are synchronizing their on-premises directory to ocis-accounts. Returned by default. Read-only."
+        },
+        "onPremisesDomainName": {
+          "type": "string",
+          "description": "Contains the on-premises domain FQDN, also called dnsDomainName synchronized from the on-premises directory. The property is only populated for customers who are synchronizing their on-premises directory to Azure Active Directory via Azure AD Connect.\nReturned by default. Read-only."
+        },
+        "onPremisesNetBiosName": {
+          "type": "string",
+          "description": "Contains the on-premises netBios name synchronized from the on-premises directory. The property is only populated for customers who are synchronizing their on-premises directory to Azure Active Directory via Azure AD Connect.\nReturned by default. Read-only."
+        },
+        "onPremisesLastSyncDateTime": {
+          "type": "string",
+          "description": "Indicates the last time at which the group was synced with the on-premises directory.\nReturned by default. Read-only. Supports $filter."
+        },
+        "onPremisesProvisioningErrors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0OnPremisesProvisioningError"
+          },
+          "description": "Errors when using synchronization during provisioning."
+        }
+      }
+    },
+    "v0Identities": {
+      "type": "object",
+      "properties": {
+        "signInType": {
+          "type": "string",
+          "description": "Specifies the user sign-in types in your directory, such as `emailAddress`, `userName` or `federated`.\nHere, federated represents a unique identifier for a user from an issuer, that can be in any format chosen by the issuer.\nAdditional validation is enforced on *issuer_assigned_id* when the sign-in type is set to `emailAddress` or `userName`.\nThis property can also be set to any custom string."
+        },
+        "issuer": {
+          "type": "string",
+          "description": "Specifies the issuer of the identity, for example facebook.com.\nFor local accounts (where signInType is not federated), this property is\nthe local B2C tenant default domain name, for example contoso.onmicrosoft.com.\nFor external users from other Azure AD organization, this will be the domain of\nthe federated organization, for example contoso.com.\nSupports $filter. 512 character limit."
+        },
+        "issuerAssignedId": {
+          "type": "string",
+          "description": "Specifies the unique identifier assigned to the user by the issuer. The combination of *issuer* and *issuerAssignedId* must be unique within the organization. Represents the sign-in name for the user, when signInType is set to emailAddress or userName (also known as local accounts).\nWhen *signInType* is set to:\n* `emailAddress`, (or starts with `emailAddress` like `emailAddress1`) `issuerAssignedId` must be a valid email address\n* `userName`, issuer_assigned_id must be a valid local part of an email address\nSupports $filter. 512 character limit."
+        }
+      },
+      "description": "Identities Represents an identity used to sign in to a user account.\nAn identity can be provided by oCIS, by organizations, or by social identity providers such as Facebook, Google, or Microsoft, that are tied to a user account.\nThis enables the user to sign in to the user account with any of those associated identities.\nThey are also used to keep a history of old usernames."
+    },
+    "v0ListAccountsRequest": {
+      "type": "object",
+      "properties": {
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Optional. The maximum number of accounts to return in the response"
+        },
+        "pageToken": {
+          "type": "string",
+          "title": "Optional. A pagination token returned from a previous call to `Get`\nthat indicates from where search should continue"
+        },
+        "fieldMask": {
+          "type": "string",
+          "description": "Optional. Used to specify a subset of fields that should be\nreturned by a get operation or modified by an update operation."
+        },
+        "query": {
+          "type": "string",
+          "description": "TODO update query language\nQuery expressions can be used to restrict results based upon\nthe account properties where the operators `=`, `NOT`, `AND` and `OR`\ncan be used along with the suffix wildcard symbol `*`.\n\nThe string properties in a query expression should use escaped quotes\nfor values that include whitespace to prevent unexpected behavior.\n\nSome example queries are:\n\n* Query `display_name=Th*` returns accounts whose display_name\nstarts with \"Th\"\n* Query `email=foo@example.com` returns accounts with\n`email` set to `foo@example.com`\n* Query `display_name=\\\\\"Test String\\\\\"` returns accounts with\ndisplay names that include both \"Test\" and \"String\"",
+          "title": "Optional. Search criteria used to select the accounts to return.\nIf no search criteria is specified then all accounts will be\nreturned"
+        }
+      }
+    },
+    "v0ListAccountsResponse": {
+      "type": "object",
+      "properties": {
+        "accounts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0Account"
+          },
+          "title": "The field name should match the noun \"accounts\" in the method name.  There\nwill be a maximum number of items returned based on the page_size field\nin the request"
+        },
+        "nextPageToken": {
+          "type": "string",
+          "title": "Token to retrieve the next page of results, or empty if there are no\nmore results in the list"
+        }
+      }
+    },
+    "v0ListGroupsRequest": {
+      "type": "object",
+      "properties": {
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Optional. The maximum number of groups to return in the response"
+        },
+        "pageToken": {
+          "type": "string",
+          "title": "Optional. A pagination token returned from a previous call to `Get`\nthat indicates from where search should continue"
+        },
+        "fieldMask": {
+          "type": "string",
+          "description": "Optional. Used to specify a subset of fields that should be\nreturned by a get operation or modified by an update operation."
+        },
+        "query": {
+          "type": "string",
+          "description": "TODO update query language\nQuery expressions can be used to restrict results based upon\nthe account properties where the operators `=`, `NOT`, `AND` and `OR`\ncan be used along with the suffix wildcard symbol `*`.\n\nThe string properties in a query expression should use escaped quotes\nfor values that include whitespace to prevent unexpected behavior.\n\nSome example queries are:\n\n* Query `display_name=Th*` returns accounts whose display_name\nstarts with \"Th\"\n* Query `display_name=\\\\\"Test String\\\\\"` returns groups with\ndisplay names that include both \"Test\" and \"String\"",
+          "title": "Optional. Search criteria used to select the groups to return.\nIf no search criteria is specified then all groups will be\nreturned"
+        }
+      }
+    },
+    "v0ListGroupsResponse": {
+      "type": "object",
+      "properties": {
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0Group"
+          },
+          "title": "The field name should match the noun \"group\" in the method name.  There\nwill be a maximum number of items returned based on the page_size field\nin the request"
+        },
+        "nextPageToken": {
+          "type": "string",
+          "title": "Token to retrieve the next page of results, or empty if there are no\nmore results in the list"
+        }
+      }
+    },
+    "v0ListMembersResponse": {
+      "type": "object",
+      "properties": {
+        "members": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0Account"
+          },
+          "title": "The field name should match the noun \"members\" in the method name.  There\nwill be a maximum number of items returned based on the page_size field\nin the request"
+        },
+        "nextPageToken": {
+          "type": "string",
+          "title": "Token to retrieve the next page of results, or empty if there are no\nmore results in the list"
+        }
+      }
+    },
+    "v0OnPremisesProvisioningError": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "description": "Category of the provisioning error. Note: Currently, there is only one possible value. Possible value: PropertyConflict - indicates a property value is not unique. Other objects contain the same value for the property."
+        },
+        "occurredDateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time at which the error occurred."
+        },
+        "propertyCausingError": {
+          "type": "string",
+          "title": "Name of the directory property causing the error. Current possible values: UserPrincipalName or ProxyAddress"
+        },
+        "value": {
+          "type": "string",
+          "description": "Value of the property causing the error."
+        }
+      }
+    },
+    "v0PasswordProfile": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string",
+          "description": "The password for the user. This property is required when a user is created.\nIt can be updated, but the user will be required to change the password on the next login.\nThe password must satisfy minimum requirements as specified by the user’s passwordPolicies property. By default, a strong password is required."
+        },
+        "lastPasswordChangeDateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time when this account last changed their password."
+        },
+        "passwordPolicies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Specifies password policies for the user.\nThis value is an enumeration with one possible value being “DisableStrongPassword”, which allows weaker passwords than the default policy to be specified.\n“DisablePasswordExpiration” can also be specified."
+        },
+        "forceChangePasswordNextSignIn": {
+          "type": "boolean",
+          "description": "`true` if the user must change her password on the next login; otherwise false."
+        },
+        "forceChangePasswordNextSignInWithMfa": {
+          "type": "boolean",
+          "description": "If `true`, at next sign-in, the user must perform a multi-factor authentication (MFA) before being forced to change their password. The behavior is identical to forceChangePasswordNextSignIn except that the user is required to first perform a multi-factor authentication before password change. After a password change, this property will be automatically reset to false. If not set, default is false."
+        }
+      }
+    },
+    "v0RebuildIndexRequest": {
+      "type": "object"
+    },
+    "v0RebuildIndexResponse": {
+      "type": "object"
+    },
+    "v0UpdateAccountRequest": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/definitions/v0Account",
+          "title": "The account resource which replaces the resource on the server"
+        },
+        "updateMask": {
+          "type": "string",
+          "title": "The update mask applies to the resource. For the `FieldMask` definition,\nsee https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask"
+        }
+      }
+    },
+    "v0UpdateGroupRequest": {
+      "type": "object",
+      "properties": {
+        "group": {
+          "$ref": "#/definitions/v0Group",
+          "title": "The group resource which replaces the resource on the server"
+        },
+        "updateMask": {
+          "type": "string",
+          "title": "The update mask applies to the resource. For the `FieldMask` definition,\nsee https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Developer Manual",
+    "url": "https://owncloud.dev/extensions/accounts/"
+  }
+}

@@ -10,6 +10,12 @@ import (
 	"strconv"
 	"strings"
 
+	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+
+	storemsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/store/v0"
+	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v0"
+
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -21,11 +27,9 @@ import (
 	"github.com/cs3org/reva/pkg/token/manager/jwt"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	accounts "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
 	ocstracing "github.com/owncloud/ocis/ocs/pkg/tracing"
-	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
 	"github.com/pkg/errors"
 	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/genproto/protobuf/field_mask"
@@ -35,7 +39,7 @@ import (
 
 // GetSelf returns the currently logged in user
 func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
-	var account *accounts.Account
+	var account *accountsmsg.Account
 	var err error
 	u, ok := revactx.ContextGetUser(r.Context())
 	if !ok || u.Id == nil || u.Id.OpaqueId == "" {
@@ -43,7 +47,7 @@ func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	account, err = o.getAccountService().GetAccount(r.Context(), &accounts.GetAccountRequest{
+	account, err = o.getAccountService().GetAccount(r.Context(), &accountssvc.GetAccountRequest{
 		Id: u.Id.OpaqueId,
 	})
 
@@ -92,7 +96,7 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 	}
-	var account *accounts.Account
+	var account *accountsmsg.Account
 
 	switch {
 	case userid == "":
@@ -198,12 +202,12 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 		displayname = userid
 	}
 
-	newAccount := &accounts.Account{
+	newAccount := &accountsmsg.Account{
 		Id:                       uuid.New().String(),
 		DisplayName:              displayname,
 		PreferredName:            userid,
 		OnPremisesSamAccountName: userid,
-		PasswordProfile: &accounts.PasswordProfile{
+		PasswordProfile: &accountsmsg.PasswordProfile{
 			Password: password,
 		},
 		Mail:           email,
@@ -218,11 +222,11 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 		newAccount.GidNumber = gidNumber
 	}
 
-	var account *accounts.Account
+	var account *accountsmsg.Account
 
 	switch o.config.AccountBackend {
 	case "accounts":
-		account, err = o.getAccountService().CreateAccount(r.Context(), &accounts.CreateAccountRequest{
+		account, err = o.getAccountService().CreateAccount(r.Context(), &accountssvc.CreateAccountRequest{
 			Account: newAccount,
 		})
 	case "cs3":
@@ -284,7 +288,7 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 	}
 
-	var account *accounts.Account
+	var account *accountsmsg.Account
 	switch o.config.AccountBackend {
 	case "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
@@ -305,8 +309,8 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req := accounts.UpdateAccountRequest{
-		Account: &accounts.Account{
+	req := accountssvc.UpdateAccountRequest{
+		Account: &accountsmsg.Account{
 			Id: account.Id,
 		},
 	}
@@ -322,7 +326,7 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 		req.Account.OnPremisesSamAccountName = value
 		req.UpdateMask = &fieldmaskpb.FieldMask{Paths: []string{"PreferredName", "OnPremisesSamAccountName"}}
 	case "password":
-		req.Account.PasswordProfile = &accounts.PasswordProfile{
+		req.Account.PasswordProfile = &accountsmsg.PasswordProfile{
 			Password: value,
 		}
 		req.UpdateMask = &fieldmaskpb.FieldMask{Paths: []string{"PasswordProfile.Password"}}
@@ -365,7 +369,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 	}
 
-	var account *accounts.Account
+	var account *accountsmsg.Account
 	switch o.config.AccountBackend {
 	case "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
@@ -486,7 +490,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	req := accounts.DeleteAccountRequest{
+	req := accountssvc.DeleteAccountRequest{
 		Id: account.Id,
 	}
 
@@ -507,7 +511,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // TODO(refs) this to ocis-pkg ... we are minting tokens all over the place ... or use a service? ... like reva?
-func (o Ocs) mintTokenForUser(ctx context.Context, account *accounts.Account) (string, error) {
+func (o Ocs) mintTokenForUser(ctx context.Context, account *accountsmsg.Account) (string, error) {
 	tm, _ := jwt.New(map[string]interface{}{
 		"secret":  o.config.TokenManager.JWTSecret,
 		"expires": int64(24 * 60 * 60),
@@ -537,7 +541,7 @@ func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
 		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 	}
 
-	var account *accounts.Account
+	var account *accountsmsg.Account
 	switch o.config.AccountBackend {
 	case "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
@@ -560,7 +564,7 @@ func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
 
 	account.AccountEnabled = true
 
-	req := accounts.UpdateAccountRequest{
+	req := accountssvc.UpdateAccountRequest{
 		Account: account,
 		UpdateMask: &field_mask.FieldMask{
 			Paths: []string{"AccountEnabled"},
@@ -591,7 +595,7 @@ func (o Ocs) DisableUser(w http.ResponseWriter, r *http.Request) {
 		o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, err.Error()))
 	}
 
-	var account *accounts.Account
+	var account *accountsmsg.Account
 	switch o.config.AccountBackend {
 	case "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
@@ -614,7 +618,7 @@ func (o Ocs) DisableUser(w http.ResponseWriter, r *http.Request) {
 
 	account.AccountEnabled = false
 
-	req := accounts.UpdateAccountRequest{
+	req := accountssvc.UpdateAccountRequest{
 		Account: account,
 		UpdateMask: &field_mask.FieldMask{
 			Paths: []string{"AccountEnabled"},
@@ -651,9 +655,9 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	// use the user's UUID
 	userID := u.Id.OpaqueId
 
-	c := storepb.NewStoreService("com.owncloud.api.store", grpc.NewClient())
-	res, err := c.Read(r.Context(), &storepb.ReadRequest{
-		Options: &storepb.ReadOptions{
+	c := storesvc.NewStoreService("com.owncloud.api.store", grpc.NewClient())
+	res, err := c.Read(r.Context(), &storesvc.ReadRequest{
+		Options: &storemsg.ReadOptions{
 			Database: "proxy",
 			Table:    "signing-keys",
 		},
@@ -685,12 +689,12 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	}
 	signingKey := hex.EncodeToString(key)
 
-	_, err = c.Write(r.Context(), &storepb.WriteRequest{
-		Options: &storepb.WriteOptions{
+	_, err = c.Write(r.Context(), &storesvc.WriteRequest{
+		Options: &storemsg.WriteOptions{
 			Database: "proxy",
 			Table:    "signing-keys",
 		},
-		Record: &storepb.Record{
+		Record: &storemsg.Record{
 			Key:   userID,
 			Value: []byte(signingKey),
 			// TODO Expiry?
@@ -717,11 +721,11 @@ func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
 		query = fmt.Sprintf("on_premises_sam_account_name eq '%s'", escapeValue(search))
 	}
 
-	var res *accounts.ListAccountsResponse
+	var res *accountssvc.ListAccountsResponse
 	var err error
 	switch o.config.AccountBackend {
 	case "accounts":
-		res, err = o.getAccountService().ListAccounts(r.Context(), &accounts.ListAccountsRequest{
+		res, err = o.getAccountService().ListAccounts(r.Context(), &accountssvc.ListAccountsRequest{
 			Query: query,
 		})
 	case "cs3":
@@ -750,9 +754,9 @@ func escapeValue(value string) string {
 	return strings.ReplaceAll(value, "'", "''")
 }
 
-func (o Ocs) fetchAccountByUsername(ctx context.Context, name string) (*accounts.Account, error) {
-	var res *accounts.ListAccountsResponse
-	res, err := o.getAccountService().ListAccounts(ctx, &accounts.ListAccountsRequest{
+func (o Ocs) fetchAccountByUsername(ctx context.Context, name string) (*accountsmsg.Account, error) {
+	var res *accountssvc.ListAccountsResponse
+	res, err := o.getAccountService().ListAccounts(ctx, &accountssvc.ListAccountsRequest{
 		Query: fmt.Sprintf("on_premises_sam_account_name eq '%v'", escapeValue(name)),
 	})
 	if err != nil {
@@ -764,13 +768,13 @@ func (o Ocs) fetchAccountByUsername(ctx context.Context, name string) (*accounts
 	return nil, merrors.NotFound("", data.MessageUserNotFound)
 }
 
-func (o Ocs) fetchAccountFromCS3Backend(ctx context.Context, name string) (*accounts.Account, error) {
+func (o Ocs) fetchAccountFromCS3Backend(ctx context.Context, name string) (*accountsmsg.Account, error) {
 	backend := o.getCS3Backend()
 	u, _, err := backend.GetUserByClaims(ctx, "username", name, false)
 	if err != nil {
 		return nil, err
 	}
-	return &accounts.Account{
+	return &accountsmsg.Account{
 		OnPremisesSamAccountName: u.Username,
 		DisplayName:              u.DisplayName,
 		Mail:                     u.Mail,

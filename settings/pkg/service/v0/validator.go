@@ -5,7 +5,8 @@ import (
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
-	"github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 )
 
 var (
@@ -22,12 +23,12 @@ var (
 	}
 )
 
-func validateSaveBundle(req *proto.SaveBundleRequest) error {
+func validateSaveBundle(req *settingssvc.SaveBundleRequest) error {
 	if err := validation.ValidateStruct(
 		req.Bundle,
 		validation.Field(&req.Bundle.Id, validation.When(req.Bundle.Id != "", is.UUID)),
 		validation.Field(&req.Bundle.Name, requireAlphanumeric...),
-		validation.Field(&req.Bundle.Type, validation.NotIn(proto.Bundle_TYPE_UNKNOWN)),
+		validation.Field(&req.Bundle.Type, validation.NotIn(settingsmsg.Bundle_TYPE_UNKNOWN)),
 		validation.Field(&req.Bundle.Extension, requireAlphanumeric...),
 		validation.Field(&req.Bundle.DisplayName, validation.Required),
 		validation.Field(&req.Bundle.Settings, validation.Required),
@@ -45,22 +46,22 @@ func validateSaveBundle(req *proto.SaveBundleRequest) error {
 	return nil
 }
 
-func validateGetBundle(req *proto.GetBundleRequest) error {
+func validateGetBundle(req *settingssvc.GetBundleRequest) error {
 	return validation.Validate(&req.BundleId, is.UUID)
 }
 
-func validateListBundles(req *proto.ListBundlesRequest) error {
+func validateListBundles(req *settingssvc.ListBundlesRequest) error {
 	return nil
 }
 
-func validateAddSettingToBundle(req *proto.AddSettingToBundleRequest) error {
+func validateAddSettingToBundle(req *settingssvc.AddSettingToBundleRequest) error {
 	if err := validation.ValidateStruct(req, validation.Field(&req.BundleId, is.UUID)); err != nil {
 		return err
 	}
 	return validateSetting(req.Setting)
 }
 
-func validateRemoveSettingFromBundle(req *proto.RemoveSettingFromBundleRequest) error {
+func validateRemoveSettingFromBundle(req *settingssvc.RemoveSettingFromBundleRequest) error {
 	return validation.ValidateStruct(
 		req,
 		validation.Field(&req.BundleId, is.UUID),
@@ -68,7 +69,7 @@ func validateRemoveSettingFromBundle(req *proto.RemoveSettingFromBundleRequest) 
 	)
 }
 
-func validateSaveValue(req *proto.SaveValueRequest) error {
+func validateSaveValue(req *settingssvc.SaveValueRequest) error {
 	if err := validation.ValidateStruct(
 		req.Value,
 		validation.Field(&req.Value.Id, validation.When(req.Value.Id != "", is.UUID)),
@@ -87,11 +88,11 @@ func validateSaveValue(req *proto.SaveValueRequest) error {
 	return nil
 }
 
-func validateGetValue(req *proto.GetValueRequest) error {
+func validateGetValue(req *settingssvc.GetValueRequest) error {
 	return validation.Validate(req.Id, is.UUID)
 }
 
-func validateGetValueByUniqueIdentifiers(req *proto.GetValueByUniqueIdentifiersRequest) error {
+func validateGetValueByUniqueIdentifiers(req *settingssvc.GetValueByUniqueIdentifiersRequest) error {
 	return validation.ValidateStruct(
 		req,
 		validation.Field(&req.SettingId, is.UUID),
@@ -99,7 +100,7 @@ func validateGetValueByUniqueIdentifiers(req *proto.GetValueByUniqueIdentifiersR
 	)
 }
 
-func validateListValues(req *proto.ListValuesRequest) error {
+func validateListValues(req *settingssvc.ListValuesRequest) error {
 	return validation.ValidateStruct(
 		req,
 		validation.Field(&req.BundleId, validation.When(req.BundleId != "", is.UUID)),
@@ -107,15 +108,15 @@ func validateListValues(req *proto.ListValuesRequest) error {
 	)
 }
 
-func validateListRoles(req *proto.ListBundlesRequest) error {
+func validateListRoles(req *settingssvc.ListBundlesRequest) error {
 	return nil
 }
 
-func validateListRoleAssignments(req *proto.ListRoleAssignmentsRequest) error {
+func validateListRoleAssignments(req *settingssvc.ListRoleAssignmentsRequest) error {
 	return validation.Validate(req.AccountUuid, requireAccountID...)
 }
 
-func validateAssignRoleToUser(req *proto.AssignRoleToUserRequest) error {
+func validateAssignRoleToUser(req *settingssvc.AssignRoleToUserRequest) error {
 	return validation.ValidateStruct(
 		req,
 		validation.Field(&req.AccountUuid, requireAccountID...),
@@ -123,18 +124,18 @@ func validateAssignRoleToUser(req *proto.AssignRoleToUserRequest) error {
 	)
 }
 
-func validateRemoveRoleFromUser(req *proto.RemoveRoleFromUserRequest) error {
+func validateRemoveRoleFromUser(req *settingssvc.RemoveRoleFromUserRequest) error {
 	return validation.ValidateStruct(
 		req,
 		validation.Field(&req.Id, is.UUID),
 	)
 }
 
-func validateListPermissionsByResource(req *proto.ListPermissionsByResourceRequest) error {
+func validateListPermissionsByResource(req *settingssvc.ListPermissionsByResourceRequest) error {
 	return validateResource(req.Resource)
 }
 
-func validateGetPermissionByID(req *proto.GetPermissionByIDRequest) error {
+func validateGetPermissionByID(req *settingssvc.GetPermissionByIDRequest) error {
 	return validation.ValidateStruct(
 		req,
 		validation.Field(&req.PermissionId, requireAlphanumeric...),
@@ -142,15 +143,15 @@ func validateGetPermissionByID(req *proto.GetPermissionByIDRequest) error {
 }
 
 // validateResource is an internal helper for validating the content of a resource.
-func validateResource(resource *proto.Resource) error {
+func validateResource(resource *settingsmsg.Resource) error {
 	if err := validation.Validate(&resource, validation.Required); err != nil {
 		return err
 	}
-	return validation.Validate(&resource, validation.NotIn(proto.Resource_TYPE_UNKNOWN))
+	return validation.Validate(&resource, validation.NotIn(settingsmsg.Resource_TYPE_UNKNOWN))
 }
 
 // validateSetting is an internal helper for validating the content of a setting.
-func validateSetting(setting *proto.Setting) error {
+func validateSetting(setting *settingsmsg.Setting) error {
 	// TODO: make sanity checks, like for int settings, min <= default <= max.
 	if err := validation.ValidateStruct(
 		setting,

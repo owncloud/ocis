@@ -1,12 +1,14 @@
 package svc
 
-import "github.com/owncloud/ocis/settings/pkg/proto/v0"
+import (
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
+)
 
 func (g Service) hasPermission(
 	roleIDs []string,
-	resource *proto.Resource,
-	operations []proto.Permission_Operation,
-	constraint proto.Permission_Constraint,
+	resource *settingsmsg.Resource,
+	operations []settingsmsg.Permission_Operation,
+	constraint settingsmsg.Permission_Constraint,
 ) bool {
 	permissions, err := g.manager.ListPermissionsByResource(resource, roleIDs)
 	if err != nil {
@@ -21,8 +23,8 @@ func (g Service) hasPermission(
 }
 
 // filterPermissionsByOperations returns the subset of the given permissions, where at least one of the given operations is fulfilled.
-func getFilteredPermissionsByOperations(permissions []*proto.Permission, operations []proto.Permission_Operation) []*proto.Permission {
-	var filteredPermissions []*proto.Permission
+func getFilteredPermissionsByOperations(permissions []*settingsmsg.Permission, operations []settingsmsg.Permission_Operation) []*settingsmsg.Permission {
+	var filteredPermissions []*settingsmsg.Permission
 	for _, permission := range permissions {
 		if isAnyOperationFulfilled(permission, operations) {
 			filteredPermissions = append(filteredPermissions, permission)
@@ -32,7 +34,7 @@ func getFilteredPermissionsByOperations(permissions []*proto.Permission, operati
 }
 
 // isAnyOperationFulfilled checks if the permissions is about any of the operations
-func isAnyOperationFulfilled(permission *proto.Permission, operations []proto.Permission_Operation) bool {
+func isAnyOperationFulfilled(permission *settingsmsg.Permission, operations []settingsmsg.Permission_Operation) bool {
 	for _, operation := range operations {
 		if operation == permission.Operation {
 			return true
@@ -43,13 +45,13 @@ func isAnyOperationFulfilled(permission *proto.Permission, operations []proto.Pe
 
 // isConstraintFulfilled checks if one of the permissions has the same or a parent of the constraint.
 // this is only a comparison on ENUM level. More sophisticated checks cannot happen here...
-func isConstraintFulfilled(permissions []*proto.Permission, constraint proto.Permission_Constraint) bool {
+func isConstraintFulfilled(permissions []*settingsmsg.Permission, constraint settingsmsg.Permission_Constraint) bool {
 	for _, permission := range permissions {
 		// comparing enum by order is not a feasible solution, because `SHARED` is not a superset of `OWN`.
-		if permission.Constraint == proto.Permission_CONSTRAINT_ALL {
+		if permission.Constraint == settingsmsg.Permission_CONSTRAINT_ALL {
 			return true
 		}
-		if permission.Constraint != proto.Permission_CONSTRAINT_UNKNOWN && permission.Constraint == constraint {
+		if permission.Constraint != settingsmsg.Permission_CONSTRAINT_UNKNOWN && permission.Constraint == constraint {
 			return true
 		}
 	}

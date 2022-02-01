@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package ocis.messages.thumbnails.v0;
+
+option go_package = "github.com/owncloud/ocis/protogen/gen/ocis/messages/thumbnails/v0";
+
+message WebdavSource {
+    // REQUIRED.
+    string url = 1;
+    // REQUIRED.
+    bool is_public_link = 2;
+    // OPTIONAL.
+    string webdav_authorization = 3;
+    // OPTIONAL.
+    string reva_authorization = 4;
+    // OPTIONAL.
+    string public_link_token = 5;
+}
+
+message CS3Source {
+    string path = 1;
+    string authorization = 2;
+}

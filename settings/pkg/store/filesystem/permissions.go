@@ -1,14 +1,14 @@
 package store
 
 import (
-	"github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 	"github.com/owncloud/ocis/settings/pkg/settings"
 	"github.com/owncloud/ocis/settings/pkg/util"
 )
 
 // ListPermissionsByResource collects all permissions from the provided roleIDs that match the requested resource
-func (s Store) ListPermissionsByResource(resource *proto.Resource, roleIDs []string) ([]*proto.Permission, error) {
-	records := make([]*proto.Permission, 0)
+func (s Store) ListPermissionsByResource(resource *settingsmsg.Resource, roleIDs []string) ([]*settingsmsg.Permission, error) {
+	records := make([]*settingsmsg.Permission, 0)
 	for _, roleID := range roleIDs {
 		role, err := s.ReadBundle(roleID)
 		if err != nil {
@@ -21,7 +21,7 @@ func (s Store) ListPermissionsByResource(resource *proto.Resource, roleIDs []str
 }
 
 // ReadPermissionByID finds the permission in the roles, specified by the provided roleIDs
-func (s Store) ReadPermissionByID(permissionID string, roleIDs []string) (*proto.Permission, error) {
+func (s Store) ReadPermissionByID(permissionID string, roleIDs []string) (*settingsmsg.Permission, error) {
 	for _, roleID := range roleIDs {
 		role, err := s.ReadBundle(roleID)
 		if err != nil {
@@ -30,7 +30,7 @@ func (s Store) ReadPermissionByID(permissionID string, roleIDs []string) (*proto
 		}
 		for _, permission := range role.Settings {
 			if permission.Id == permissionID {
-				if value, ok := permission.Value.(*proto.Setting_PermissionValue); ok {
+				if value, ok := permission.Value.(*settingsmsg.Setting_PermissionValue); ok {
 					return value.PermissionValue, nil
 				}
 			}
@@ -40,7 +40,7 @@ func (s Store) ReadPermissionByID(permissionID string, roleIDs []string) (*proto
 }
 
 // ReadPermissionByName finds the permission in the roles, specified by the provided roleIDs
-func (s Store) ReadPermissionByName(name string, roleIDs []string) (*proto.Permission, error) {
+func (s Store) ReadPermissionByName(name string, roleIDs []string) (*settingsmsg.Permission, error) {
 	for _, roleID := range roleIDs {
 		role, err := s.ReadBundle(roleID)
 		if err != nil {
@@ -49,7 +49,7 @@ func (s Store) ReadPermissionByName(name string, roleIDs []string) (*proto.Permi
 		}
 		for _, permission := range role.Settings {
 			if permission.Name == name {
-				if value, ok := permission.Value.(*proto.Setting_PermissionValue); ok {
+				if value, ok := permission.Value.(*settingsmsg.Setting_PermissionValue); ok {
 					return value.PermissionValue, nil
 				}
 			}
@@ -59,10 +59,10 @@ func (s Store) ReadPermissionByName(name string, roleIDs []string) (*proto.Permi
 }
 
 // extractPermissionsByResource collects all permissions from the provided role that match the requested resource
-func extractPermissionsByResource(resource *proto.Resource, role *proto.Bundle) []*proto.Permission {
-	permissions := make([]*proto.Permission, 0)
+func extractPermissionsByResource(resource *settingsmsg.Resource, role *settingsmsg.Bundle) []*settingsmsg.Permission {
+	permissions := make([]*settingsmsg.Permission, 0)
 	for _, setting := range role.Settings {
-		if value, ok := setting.Value.(*proto.Setting_PermissionValue); ok {
+		if value, ok := setting.Value.(*settingsmsg.Setting_PermissionValue); ok {
 			if util.IsResourceMatched(setting.Resource, resource) {
 				permissions = append(permissions, value.PermissionValue)
 			}

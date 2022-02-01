@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 )
 
 // Options are all the possible options.
@@ -12,7 +12,7 @@ type Options struct {
 	size        int
 	ttl         time.Duration
 	logger      log.Logger
-	roleService settings.RoleService
+	roleService settingssvc.RoleService
 }
 
 // Option mutates option
@@ -40,7 +40,7 @@ func Logger(logger log.Logger) Option {
 }
 
 // RoleService provides endpoints for fetching roles.
-func RoleService(rs settings.RoleService) Option {
+func RoleService(rs settingssvc.RoleService) Option {
 	return func(o *Options) {
 		o.roleService = rs
 	}

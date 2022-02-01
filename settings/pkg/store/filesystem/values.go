@@ -7,23 +7,23 @@ import (
 	"path/filepath"
 
 	"github.com/gofrs/uuid"
-	"github.com/owncloud/ocis/settings/pkg/proto/v0"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 )
 
 // ListValues reads all values that match the given bundleId and accountUUID.
 // If the bundleId is empty, it's ignored for filtering.
 // If the accountUUID is empty, only values with empty accountUUID are returned.
 // If the accountUUID is not empty, values with an empty or with a matching accountUUID are returned.
-func (s Store) ListValues(bundleID, accountUUID string) ([]*proto.Value, error) {
+func (s Store) ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, error) {
 	valuesFolder := s.buildFolderPathForValues(false)
 	valueFiles, err := ioutil.ReadDir(valuesFolder)
 	if err != nil {
-		return []*proto.Value{}, nil
+		return []*settingsmsg.Value{}, nil
 	}
 
-	records := make([]*proto.Value, 0, len(valueFiles))
+	records := make([]*settingsmsg.Value, 0, len(valueFiles))
 	for _, valueFile := range valueFiles {
-		record := proto.Value{}
+		record := settingsmsg.Value{}
 		err := s.parseRecordFromFile(&record, filepath.Join(valuesFolder, valueFile.Name()))
 		if err != nil {
 			s.Logger.Warn().Msgf("error reading %v", valueFile)
@@ -47,9 +47,9 @@ func (s Store) ListValues(bundleID, accountUUID string) ([]*proto.Value, error) 
 }
 
 // ReadValue tries to find a value by the given valueId within the dataPath
-func (s Store) ReadValue(valueID string) (*proto.Value, error) {
+func (s Store) ReadValue(valueID string) (*settingsmsg.Value, error) {
 	filePath := s.buildFilePathForValue(valueID, false)
-	record := proto.Value{}
+	record := settingsmsg.Value{}
 	if err := s.parseRecordFromFile(&record, filePath); err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (s Store) ReadValue(valueID string) (*proto.Value, error) {
 }
 
 // ReadValueByUniqueIdentifiers tries to find a value given a set of unique identifiers
-func (s Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*proto.Value, error) {
+func (s Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*settingsmsg.Value, error) {
 	valuesFolder := s.buildFolderPathForValues(false)
 	files, err := ioutil.ReadDir(valuesFolder)
 	if err != nil {
@@ -67,11 +67,11 @@ func (s Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*pro
 	}
 	for i := range files {
 		if !files[i].IsDir() {
-			r := proto.Value{}
+			r := settingsmsg.Value{}
 			s.Logger.Debug().Msgf("reading contents from file: %v", filepath.Join(valuesFolder, files[i].Name()))
 			if err := s.parseRecordFromFile(&r, filepath.Join(valuesFolder, files[i].Name())); err != nil {
 				s.Logger.Debug().Msgf("match found: %v", filepath.Join(valuesFolder, files[i].Name()))
-				return &proto.Value{}, nil
+				return &settingsmsg.Value{}, nil
 			}
 
 			// if value saved without accountUUID, then it's a global value
@@ -89,14 +89,14 @@ func (s Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*pro
 }
 
 // WriteValue writes the given value into a file within the dataPath
-func (s Store) WriteValue(value *proto.Value) (*proto.Value, error) {
+func (s Store) WriteValue(value *settingsmsg.Value) (*settingsmsg.Value, error) {
 	s.Logger.Debug().Str("value", value.String()).Msg("writing value")
 	if value.Id == "" {
 		value.Id = uuid.Must(uuid.NewV4()).String()
 	}
 
 	// modify value depending on associated resource
-	if value.Resource.Type == proto.Resource_TYPE_SYSTEM {
+	if value.Resource.Type == settingsmsg.Resource_TYPE_SYSTEM {
 		value.AccountUuid = ""
 	}
 

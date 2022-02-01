@@ -6,13 +6,13 @@ import (
 
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 
-	settings "github.com/owncloud/ocis/settings/pkg/proto/v0"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
+	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v0"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	acc "github.com/owncloud/ocis/accounts/pkg/proto/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/proxy/pkg/config"
-	storepb "github.com/owncloud/ocis/store/pkg/proto/v0"
 )
 
 // Option defines a single option function.
@@ -29,11 +29,11 @@ type Options struct {
 	// HTTPClient to use for communication with the oidcAuth provider
 	HTTPClient *http.Client
 	// AccountsClient for resolving accounts
-	AccountsClient acc.AccountsService
+	AccountsClient accountssvc.AccountsService
 	// UP
 	UserProvider backend.UserBackend
 	// SettingsRoleService for the roles API in settings
-	SettingsRoleService settings.RoleService
+	SettingsRoleService settingssvc.RoleService
 	// OIDCProviderFunc to lazily initialize an oidc provider, must be set for the oidc_auth middleware
 	OIDCProviderFunc func() (OIDCProvider, error)
 	// OIDCIss is the oidcAuth-issuer
@@ -41,7 +41,7 @@ type Options struct {
 	// RevaGatewayClient to send requests to the reva gateway
 	RevaGatewayClient gateway.GatewayAPIClient
 	// Store for persisting data
-	Store storepb.StoreService
+	Store storesvc.StoreService
 	// PreSignedURLConfig to configure the middleware
 	PreSignedURLConfig config.PreSignedURL
 	// UserOIDCClaim to read from the oidc claims
@@ -100,14 +100,14 @@ func HTTPClient(c *http.Client) Option {
 }
 
 // AccountsClient provides a function to set the accounts client config option.
-func AccountsClient(ac acc.AccountsService) Option {
+func AccountsClient(ac accountssvc.AccountsService) Option {
 	return func(o *Options) {
 		o.AccountsClient = ac
 	}
 }
 
 // SettingsRoleService provides a function to set the role service option.
-func SettingsRoleService(rc settings.RoleService) Option {
+func SettingsRoleService(rc settingssvc.RoleService) Option {
 	return func(o *Options) {
 		o.SettingsRoleService = rc
 	}
@@ -142,7 +142,7 @@ func RevaGatewayClient(gc gateway.GatewayAPIClient) Option {
 }
 
 // Store provides a function to set the store option.
-func Store(sc storepb.StoreService) Option {
+func Store(sc storesvc.StoreService) Option {
 	return func(o *Options) {
 		o.Store = sc
 	}

@@ -1,7 +1,8 @@
 package grpc
 
 import (
-	"github.com/owncloud/ocis/accounts/pkg/proto/v0"
+	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 )
@@ -21,13 +22,13 @@ func Server(opts ...Option) grpc.Service {
 		grpc.Version(version.String),
 	)
 
-	if err := proto.RegisterAccountsServiceHandler(service.Server(), handler); err != nil {
+	if err := accountssvc.RegisterAccountsServiceHandler(service.Server(), handler); err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not register service handler")
 	}
-	if err := proto.RegisterGroupsServiceHandler(service.Server(), handler); err != nil {
+	if err := accountssvc.RegisterGroupsServiceHandler(service.Server(), handler); err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not register groups handler")
 	}
-	if err := proto.RegisterIndexServiceHandler(service.Server(), handler); err != nil {
+	if err := accountssvc.RegisterIndexServiceHandler(service.Server(), handler); err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not register index handler")
 	}
 
