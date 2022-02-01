@@ -1,4 +1,4 @@
-package svc
+package decorators
 
 import (
 	"context"
@@ -9,15 +9,15 @@ import (
 )
 
 // NewLogging returns a service that logs messages.
-func NewLogging(next thumbnailssvc.ThumbnailServiceHandler, logger log.Logger) thumbnailssvc.ThumbnailServiceHandler {
+func NewLogging(next DecoratedService, logger log.Logger) DecoratedService {
 	return logging{
-		next:   next,
-		logger: logger,
+		Decorator: Decorator{next: next},
+		logger:    logger,
 	}
 }
 
 type logging struct {
-	next   thumbnailssvc.ThumbnailServiceHandler
+	Decorator
 	logger log.Logger
 }
 

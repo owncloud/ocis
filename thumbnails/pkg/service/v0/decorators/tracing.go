@@ -1,4 +1,4 @@
-package svc
+package decorators
 
 import (
 	"context"
@@ -11,14 +11,14 @@ import (
 )
 
 // NewTracing returns a service that instruments traces.
-func NewTracing(next thumbnailssvc.ThumbnailServiceHandler) thumbnailssvc.ThumbnailServiceHandler {
+func NewTracing(next DecoratedService) DecoratedService {
 	return tracing{
-		next: next,
+		Decorator: Decorator{next: next},
 	}
 }
 
 type tracing struct {
-	next thumbnailssvc.ThumbnailServiceHandler
+	Decorator
 }
 
 // GetThumbnail implements the ThumbnailServiceHandler interface.

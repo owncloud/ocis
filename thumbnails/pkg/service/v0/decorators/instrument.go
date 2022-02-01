@@ -1,4 +1,4 @@
-package svc
+package decorators
 
 import (
 	"context"
@@ -9,15 +9,15 @@ import (
 )
 
 // NewInstrument returns a service that instruments metrics.
-func NewInstrument(next thumbnailssvc.ThumbnailServiceHandler, metrics *metrics.Metrics) thumbnailssvc.ThumbnailServiceHandler {
+func NewInstrument(next DecoratedService, metrics *metrics.Metrics) DecoratedService {
 	return instrument{
-		next:    next,
-		metrics: metrics,
+		Decorator: Decorator{next: next},
+		metrics:   metrics,
 	}
 }
 
 type instrument struct {
-	next    thumbnailssvc.ThumbnailServiceHandler
+	Decorator
 	metrics *metrics.Metrics
 }
 
