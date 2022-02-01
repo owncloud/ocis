@@ -218,7 +218,6 @@ type PublicStorage struct {
 type StorageConfig struct {
 	EOS         DriverEOS         `ocisConfig:"eos"`
 	Local       DriverCommon      `ocisConfig:"local"`
-	OwnCloud    DriverOwnCloud    `ocisConfig:"owncloud"`
 	OwnCloudSQL DriverOwnCloudSQL `ocisConfig:"owncloud_sql"`
 	S3          DriverS3          `ocisConfig:"s3"`
 	S3NG        DriverS3NG        `ocisConfig:"s3ng"`
@@ -304,15 +303,6 @@ type DriverOCIS struct {
 	DriverCommon
 
 	ServiceUserUUID string `ocisConfig:"service_user_uuid"`
-}
-
-// DriverOwnCloud defines the available ownCloud storage driver configuration.
-type DriverOwnCloud struct {
-	DriverCommon
-
-	UploadInfoDir string `ocisConfig:"upload_info_dir"`
-	Redis         string `ocisConfig:"redis"`
-	Scan          bool   `ocisConfig:"scan"`
 }
 
 // DriverOwnCloudSQL defines the available ownCloudSQL storage driver configuration.
@@ -583,10 +573,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"STORAGE_USERS_DRIVER"},
 			Destination: &cfg.Reva.StorageUsers.Driver,
-		},
-		{
-			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_DATADIR"},
-			Destination: &cfg.Reva.UserStorage.OwnCloud.Root,
 		},
 		{
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_OCIS_ROOT"},
@@ -1535,29 +1521,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_OCIS_SERVICE_USER_UUID"},
 			Destination: &cfg.Reva.UserStorage.OCIS.ServiceUserUUID,
 		},
-
-		// driver owncloud
-		{
-			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_UPLOADINFO_DIR"},
-			Destination: &cfg.Reva.UserStorage.OwnCloud.UploadInfoDir,
-		},
-		{
-			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_SHARE_FOLDER"},
-			Destination: &cfg.Reva.UserStorage.OwnCloud.ShareFolder,
-		},
-		{
-			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_SCAN"},
-			Destination: &cfg.Reva.UserStorage.OwnCloud.Scan,
-		},
-		{
-			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_REDIS_ADDR"},
-			Destination: &cfg.Reva.UserStorage.OwnCloud.Redis,
-		},
-		{
-			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUD_LAYOUT"},
-			Destination: &cfg.Reva.UserStorage.OwnCloud.UserLayout,
-		},
-
 		// driver owncloud sql
 		{
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DATADIR"},

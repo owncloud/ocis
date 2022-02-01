@@ -75,16 +75,6 @@ func UserDrivers(cfg *config.Config) map[string]interface{} {
 			"share_folder": cfg.Reva.UserStorage.Local.ShareFolder,
 			"user_layout":  cfg.Reva.UserStorage.Local.UserLayout,
 		},
-		"owncloud": map[string]interface{}{
-			"datadirectory":   cfg.Reva.UserStorage.OwnCloud.Root,
-			"upload_info_dir": cfg.Reva.UserStorage.OwnCloud.UploadInfoDir,
-			"share_folder":    cfg.Reva.UserStorage.OwnCloud.ShareFolder,
-			"user_layout":     cfg.Reva.UserStorage.OwnCloud.UserLayout,
-			"redis":           cfg.Reva.UserStorage.OwnCloud.Redis,
-			"enable_home":     false,
-			"scan":            cfg.Reva.UserStorage.OwnCloud.Scan,
-			"userprovidersvc": cfg.Reva.Users.Endpoint,
-		},
 		"owncloudsql": map[string]interface{}{
 			"datadirectory":   cfg.Reva.UserStorage.OwnCloudSQL.Root,
 			"upload_info_dir": cfg.Reva.UserStorage.OwnCloudSQL.UploadInfoDir,

@@ -20,7 +20,7 @@ geekdocFilePath: oc10_ocis_parallel.md
   - ownCloud 10 is configured to synchronize users from the LDAP server
   - ownCloud 10 is used to use OpenID Connect for authentication with Keycloak
 - oCIS running behind Traefik as reverse proxy
-  - oCIS is using the ownCloud storage driver on the same files and same database as ownCloud 10
+  - oCIS is using the ownCloudSQL storage driver on the same files and same database as ownCloud 10
   - oCIS is using Keycloak as OpenID Connect provider
   - oCIS is using the LDAP server as user backend
 - All requests to both oCIS and oC10 are routed through the oCIS proxy and will be routed based on an OIDC claim to one of them. Therefore admins can change on a user basis in the LDAP which backend is used.

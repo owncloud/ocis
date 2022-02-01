@@ -112,17 +112,6 @@ func DefaultConfig() *Config {
 					UserLayout:  "{{.Username}}",
 					EnableHome:  false,
 				},
-				OwnCloud: DriverOwnCloud{
-					DriverCommon: DriverCommon{
-						Root:        path.Join(defaults.BaseDataPath(), "storage", "owncloud"),
-						ShareFolder: defaultShareFolder,
-						UserLayout:  defaultUserLayout,
-						EnableHome:  false,
-					},
-					UploadInfoDir: path.Join(defaults.BaseDataPath(), "storage", "uploadinfo"),
-					Redis:         ":6379",
-					Scan:          true,
-				},
 				OwnCloudSQL: DriverOwnCloudSQL{
 					DriverCommon: DriverCommon{
 						Root:        path.Join(defaults.BaseDataPath(), "storage", "owncloud"),
@@ -196,7 +185,6 @@ func DefaultConfig() *Config {
 				Local: DriverCommon{
 					Root: path.Join(defaults.BaseDataPath(), "storage", "local", "metadata"),
 				},
-				OwnCloud:    DriverOwnCloud{},
 				OwnCloudSQL: DriverOwnCloudSQL{},
 				S3: DriverS3{
 					DriverCommon: DriverCommon{},
