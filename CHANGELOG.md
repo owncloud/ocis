@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Add `ocis storage-auth-machine` subcommand: [#2910](https://github.com/owncloud/ocis/pull/2910)
+* Bugfix - Use same jwt secret for accounts as for metadata storage: [#3081](https://github.com/owncloud/ocis/pull/3081)
 * Bugfix - Make the default grpc client use the registry settings: [#3041](https://github.com/owncloud/ocis/pull/3041)
 * Bugfix - Fix retry handling for LDAP connections: [#2974](https://github.com/owncloud/ocis/issues/2974)
 * Bugfix - Fix the default tracing provider: [#2952](https://github.com/owncloud/ocis/pull/2952)
@@ -35,6 +36,16 @@ The following sections list the changes for unreleased.
    We added the ocis subcommand to start the machine auth provider.
 
    https://github.com/owncloud/ocis/pull/2910
+
+* Bugfix - Use same jwt secret for accounts as for metadata storage: [#3081](https://github.com/owncloud/ocis/pull/3081)
+
+   We've the metadata storage uses the same jwt secret as all other REVA services. Therefore the
+   accounts service needs to use the same secret.
+
+   Secrets are documented here:
+   https://owncloud.dev/ocis/deployment/#change-default-secrets
+
+   https://github.com/owncloud/ocis/pull/3081
 
 * Bugfix - Make the default grpc client use the registry settings: [#3041](https://github.com/owncloud/ocis/pull/3041)
 
