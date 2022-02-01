@@ -142,6 +142,11 @@ func (i *CS3) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregra
 	return groups, nil
 }
 
+// CreateGroup implements the Backend Interface. It's currently not supported for the CS3 backend
+func (i *CS3) CreateGroup(ctx context.Context, group libregraph.Group) (*libregraph.Group, error) {
+	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
+}
+
 func (i *CS3) GetGroup(ctx context.Context, groupID string) (*libregraph.Group, error) {
 	client, err := pool.GetGatewayServiceClient(i.Config.Address)
 	if err != nil {
@@ -167,6 +172,26 @@ func (i *CS3) GetGroup(ctx context.Context, groupID string) (*libregraph.Group, 
 	}
 
 	return createGroupModelFromCS3(res.Group), nil
+}
+
+// DeleteGroup implements the Backend Interface. It's currently not supported for the CS3 backend
+func (i *CS3) DeleteGroup(ctx context.Context, id string) error {
+	return errorcode.New(errorcode.NotSupported, "not implemented")
+}
+
+// GetGroupMembers implements the Backend Interface. It's currently not supported for the CS3 backend
+func (i *CS3) GetGroupMembers(ctx context.Context, groupID string) ([]*libregraph.User, error) {
+	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
+}
+
+// AddMembersToGroup implements the Backend Interface. It's currently not supported for the CS3 backend
+func (i *CS3) AddMembersToGroup(ctx context.Context, groupID string, memberID []string) error {
+	return errorcode.New(errorcode.NotSupported, "not implemented")
+}
+
+// RemoveMemberFromGroup implements the Backend Interface. It's currently not supported for the CS3 backend
+func (i *CS3) RemoveMemberFromGroup(ctx context.Context, groupID string, memberID string) error {
+	return errorcode.New(errorcode.NotSupported, "not implemented")
 }
 
 func createGroupModelFromCS3(g *cs3group.Group) *libregraph.Group {

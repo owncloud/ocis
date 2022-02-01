@@ -54,6 +54,46 @@ func (i instrument) PatchUser(w http.ResponseWriter, r *http.Request) {
 	i.next.PatchUser(w, r)
 }
 
+// GetGroups implements the Service interface.
+func (i instrument) GetGroups(w http.ResponseWriter, r *http.Request) {
+	i.next.GetGroups(w, r)
+}
+
+// GetGroup implements the Service interface.
+func (i instrument) GetGroup(w http.ResponseWriter, r *http.Request) {
+	i.next.GetGroup(w, r)
+}
+
+// PostGroup implements the Service interface.
+func (i instrument) PostGroup(w http.ResponseWriter, r *http.Request) {
+	i.next.PostGroup(w, r)
+}
+
+// PatchGroup implements the Service interface.
+func (i instrument) PatchGroup(w http.ResponseWriter, r *http.Request) {
+	i.next.PatchGroup(w, r)
+}
+
+// DeleteGroup implements the Service interface.
+func (i instrument) DeleteGroup(w http.ResponseWriter, r *http.Request) {
+	i.next.DeleteGroup(w, r)
+}
+
+// GetGroupMembers implements the Service interface.
+func (i instrument) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
+	i.next.GetGroupMembers(w, r)
+}
+
+// PostGroupMember implements the Service interface.
+func (i instrument) PostGroupMember(w http.ResponseWriter, r *http.Request) {
+	i.next.PostGroupMember(w, r)
+}
+
+// DeleteGroupMember implements the Service interface.
+func (i instrument) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
+	i.next.DeleteGroupMember(w, r)
+}
+
 // GetDrives implements the Service interface.
 func (i instrument) GetDrives(w http.ResponseWriter, r *http.Request) {
 	i.next.GetDrives(w, r)
