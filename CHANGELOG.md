@@ -18,6 +18,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add graph endpoint to delete and purge spaces: [#2979](https://github.com/owncloud/ocis/pull/2979)
 * Enhancement - Add new file url of the app provider to the ocs capabilities: [#2884](https://github.com/owncloud/ocis/pull/2884)
 * Enhancement - Add spaces capability: [#2931](https://github.com/owncloud/ocis/pull/2931)
+* Enhancement - Introduce User and Group Management capabilities on GraphAPI: [#2947](https://github.com/owncloud/ocis/pull/2947)
 * Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
 * Enhancement - Update REVA to v1.16.1-0.20220112085026-07451f6cd806: [#2953](https://github.com/owncloud/ocis/pull/2953)
 * Enhancement - Add endpoint to retrieve a single space: [#2978](https://github.com/owncloud/ocis/pull/2978)
@@ -111,6 +112,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/2931
    https://github.com/cs3org/reva/pull/2015
    https://github.com/owncloud/ocis/pull/2965
+
+* Enhancement - Introduce User and Group Management capabilities on GraphAPI: [#2947](https://github.com/owncloud/ocis/pull/2947)
+
+   The GraphAPI LDAP Backend is now able to add/modify and delete Users and Groups
+
+   https://github.com/owncloud/ocis/pull/2947
+   https://github.com/owncloud/ocis/pull/2996
 
 * Enhancement - Support signature auth in the public share auth middleware: [#2831](https://github.com/owncloud/ocis/pull/2831)
 
