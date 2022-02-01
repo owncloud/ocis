@@ -90,7 +90,7 @@ The S3NG storage driver uses the same metadata layout on a POSIX storage as the 
 
 TODO add list of capabilities / tradeoffs
 
-#### Related Kernel limits 
+#### Related Kernel limits
 The decomposedfs currently stores CS3 grants in extended attributes. When listing extended attributes the result is currently limited to 64kB. Assuming a 20 byte uuid a grant has ~40 bytes. Which would limit the number of extended attributes to ~1630 entries or ~1600 shares. This can be extended by moving the grants from extended attributes into a dedicated file.
 
 From [Wikipedia on Extended file attributes](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux):
@@ -133,49 +133,6 @@ The *minimal* storage driver for a POSIX based filesystem. It literally supports
   - fuse filesystem overlay
 
 To provide the other storage aspects we plan to implement a FUSE overlay filesystem which will add the different aspects on top of local filesystems like ext4, btrfs or xfs. It should work on NFSv45 as well, although NFSv4 supports RichACLs and we will explore how to leverage them to implement sharing at a future date. The idea is to use the storages native capabilities to deliver the best user experience. But again: that means making the right tradeoffs.
-
-### OwnCloud Storage Driver
-
-{{< hint info >}}
-**Deprecated**
-The owncloud storage driver was used for testing purposes early on. For a parallel deployment focus has shifted to the owncloudsql.
-{{< /hint >}}
-
-While this storage driver implements the file tree (using redis, including id based lookup), ETag propagation, trash, versions and sharing (including expiry) using the data directory layout of ownCloud 10 it has [known limitations](https://github.com/owncloud/core/issues/28095) that cannot be fixed without changing the actual layout on disk.
-
-To setup it up properly in a distributed fashion, the storage-home and the storage-oc need to share the same underlying FS. Their "data" counterparts also need access to the same shared FS.
-For a simple docker-compose setup, you can create a volume which will be used by the "storage-storage-home", "storage-storage-home-data", "storage-storage-oc" and "storage-storage-oc-data" containers. Using the `owncloud/ocis` docker image, the volume would need to be hooked in the `/var/lib/ocis` folder inside the containers.
-
-- tree provided by a POSIX filesystem
-  - file layout is mapped to the old ownCloud 10 layout
-    - the root of tree for a user on disk is prefixed with `/path/to/data/<username>/files/`
-  - efficient path by id lookup
-    - all files and folders get assigned a uuid in the extended attributes
-    - when starting the storage provider it will walk all files to populate a redis kv store for uuid to path lookup
-    - slow to boot trees with lots of nodes
-  - build in ETag propagation
-    - ETags are calculated based on mtime
-    - mtime is propagated by the storage driver
-    - changes bypassing ocis are not picked up until a restart of the storage provider
-  - no subtree accounting, same options as for local storage
-  - efficient rename
-    - TODO [update the kv store for path lookup](https://github.com/cs3org/reva/issues/985), this is an O(n) operation
-  - arbitrary metadata using extended attributes
-- grant persistence
-  - using custom ACLs that are stored as extended attributes
-    - a grant corresponds to one extended attribute of 40-100 bytes, effectively limiting the number of shares to ~100-40
-    - extended attributes have varying limitations, based on the underlying filesystem
-      - the linux kernel imposes a limit of 255bytes per name and 64KiB per value
-      - ext2/3/4: total bytes for all attributes of a file is limited to 4KiB (a filesystem block)
-      - xfs: limit of 64KiB per value
-      - btrfs: total bytes used for the name, value, and implementation overhead bytes 16KiB (the default filesystem nodesize value)
-  -  does not require OS level integration
-- built in trash
-  - trashed files are moved to `/path/to/data/<username>/files_trashbin/`
-  - trashed files are appended a timestamp `.d<unixtime>`, which [breaks trashing of files that reach the filesystems specific name limit](https://github.com/owncloud/core/issues/28095)
-- built in versions
-  - file versions are stored in `/path/to/data/<username>/files_versions/`
-  - file versions are appended a timestamp `.d<unixtime>`, which [breaks versioning of files that reach the filesystems specific name limit](https://github.com/owncloud/core/issues/28095)
 
 ### EOS Storage Driver
 
