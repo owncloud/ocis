@@ -1208,6 +1208,16 @@ And other missing implementation of favorites
 - [apiWebdavUploadTUS/uploadToShare.feature:246](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L246)
 - [apiWebdavUploadTUS/uploadToShare.feature:292](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L292)
 - [apiWebdavUploadTUS/uploadToShare.feature:316](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L316)
+- [apiWebdavEtagPropagation1/moveFileFolder.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L182)
+- [apiWebdavEtagPropagation1/moveFileFolder.feature:215](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L215)
+- [apiWebdavEtagPropagation1/moveFileFolder.feature:255](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L255)
+- [apiWebdavEtagPropagation1/moveFileFolder.feature:295](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L295)
+- [apiWebdavEtagPropagation1/moveFileFolder.feature:335](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L335)
+- [apiWebdavEtagPropagation1/moveFileFolder.feature:375](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L375)
+- [apiWebdavEtagPropagation1/deleteFileFolder.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/deleteFileFolder.feature#L116)
+- [apiWebdavEtagPropagation1/deleteFileFolder.feature:151](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/deleteFileFolder.feature#L151)
+- [apiWebdavEtagPropagation1/deleteFileFolder.feature:188](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/deleteFileFolder.feature#L188)
+- [apiWebdavEtagPropagation1/deleteFileFolder.feature:225](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/deleteFileFolder.feature#L225)
 
 #### [WWW-Authenticate header for unauthenticated requests is not clear](https://github.com/owncloud/ocis/issues/2285)
 Scenario Outline: Unauthenticated call
