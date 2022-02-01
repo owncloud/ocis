@@ -1954,13 +1954,10 @@ def pipelineSanityChecks(ctx, pipelines):
 """
 
 #images
-OC_OCIS = "owncloud/ocis:latest"
 OC_OC10 = "owncloud/server:10"
 OC_UBUNTU = "owncloud/ubuntu:18.04"
 MARIADB = "mariadb:10.6"
 OSIXIA_OPENLDAP = "osixia/openldap:latest"
-QUAY_IO_KEYCLOAK = "quay.io/keycloak/keycloak:latest"
-POSTGRES = "postgres:alpine"
 
 # configs
 OCIS_URL = "https://ocis-server:9200"
