@@ -1413,7 +1413,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "STORAGE_HOME_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
-            "STORAGE_USERS_DRIVER_OWNCLOUD_DATADIR": "/srv/app/tmp/ocis/owncloud/data",
             "STORAGE_USERS_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/users",
             "STORAGE_METADATA_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/metadata",
             "STORAGE_SHARING_USER_JSON_FILE": "/srv/app/tmp/ocis/shares.json",
@@ -1465,7 +1464,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "STORAGE_LDAP_USERATTRIBUTEFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)({{attr}}={{value}}))",
             "STORAGE_LDAP_USERFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(|(ownclouduuid={{.OpaqueId}})(uid={{.OpaqueId}})))",
             "STORAGE_LDAP_USERFINDFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
-            # ownCloud storage driver
+            # ownCloudSQL storage driver
             "STORAGE_HOME_DRIVER": "owncloudsql",
             "STORAGE_USERS_DRIVER": "owncloudsql",
             "STORAGE_METADATA_DRIVER": "ocis",
@@ -1480,7 +1479,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBNAME": "owncloud",
             # TODO: redis is not yet supported
             "STORAGE_USERS_DRIVER_OWNCLOUDSQL_REDIS_ADDR": "redis:6379",
-            # ownCloud sharing driver
+            # ownCloudSQL sharing driver
             "STORAGE_SHARING_USER_DRIVER": "oc10-sql",
             "STORAGE_SHARING_USER_SQL_USERNAME": "owncloud",
             "STORAGE_SHARING_USER_SQL_PASSWORD": "owncloud",

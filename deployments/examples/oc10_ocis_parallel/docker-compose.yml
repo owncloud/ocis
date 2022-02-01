@@ -87,7 +87,7 @@ services:
       STORAGE_LDAP_USERATTRIBUTEFILTER: "(&(objectclass=posixAccount)(objectclass=owncloud)({{attr}}={{value}}))"
       STORAGE_LDAP_USERFILTER: "(&(objectclass=posixAccount)(objectclass=owncloud)(|(ownclouduuid={{.OpaqueId}})(uid={{.OpaqueId}})))"
       STORAGE_LDAP_USERFINDFILTER: "(&(objectclass=posixAccount)(objectclass=owncloud)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))"
-      # ownCloud storage driver
+      # ownCloudSQL storage driver
       STORAGE_USERS_DRIVER: owncloudsql
       STORAGE_METADATA_DRIVER: ocis # keep metadata on ocis storage since this are only small files atm
       STORAGE_USERS_DRIVER_OWNCLOUDSQL_DATADIR: /mnt/data/files
@@ -100,7 +100,7 @@ services:
       STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBPORT: 3306
       STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBNAME: owncloud
       STORAGE_USERS_DRIVER_OWNCLOUDSQL_REDIS_ADDR: redis:6379 # TODO: redis is not yet supported
-      # ownCloud sharing driver
+      # ownCloudSQL sharing driver
       STORAGE_SHARING_USER_DRIVER: oc10-sql
       STORAGE_SHARING_USER_SQL_USERNAME:  owncloud
       STORAGE_SHARING_USER_SQL_PASSWORD: owncloud

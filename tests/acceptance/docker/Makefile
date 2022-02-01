@@ -66,9 +66,6 @@ help:
 	@echo -e "${GREEN}Run full ownCloud test suites against oCIS with s3ng storage:${RESET}\n"
 	@echo -e "\tmake Core-API-Tests-s3ng-storage-${RED}X${RESET}\t\t${BLUE}run test suite number X, where ${RED}X = 1 .. 10${RESET}"
 	@echo
-	@echo -e "${GREEN}Run full ownCloud test suites against oCIS with ownCloud storage:${RESET}\n"
-	@echo -e "\tmake Core-API-Tests-owncloud-storage-${RED}X${RESET}\t\t${BLUE}run test suite number X, where ${RED}X = 1 .. 10${RESET}"
-	@echo
 	@echo -e "${GREEN}Run an oCIS feature test against oCIS with oCIS storage:${RESET}\n"
 	@echo -e "\tmake test-ocis-feature-ocis-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
 	@echo
@@ -80,9 +77,6 @@ help:
 	@echo
 	@echo -e "\twhere ${YELLOW}BEHAT_FEATURE='...'${RESET} contains a relative path to the feature definition."
 	@echo -e "\texample: ${RED}tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature${RESET}"
-	@echo
-	@echo -e "${GREEN}Run an oCIS feature test against oCIS with owncloud storage:${RESET}\n"
-	@echo -e "\tmake test-ocis-feature-owncloud-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
 	@echo
 	@echo -e "\twhere ${YELLOW}BEHAT_FEATURE='...'${RESET} contains a relative path to the feature definition."
 	@echo -e "\texample: ${RED}tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature${RESET}"
@@ -98,9 +92,6 @@ help:
 	@echo
 	@echo -e "\twhere ${YELLOW}BEHAT_FEATURE='...'${RESET} contains a relative path to the feature definition."
 	@echo -e "\texample: ${RED}tests/acceptance/features/apiAuth/cors.feature${RESET}"
-	@echo
-	@echo -e "${GREEN}Run an ownCloud feature test against oCIS with owncloud storage:${RESET}\n"
-	@echo -e "\tmake test-oc10-feature-owncloud-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
 	@echo
 	@echo -e "\twhere ${YELLOW}BEHAT_FEATURE='...'${RESET} contains a relative path to the feature definition."
 	@echo -e "\texample: ${RED}tests/acceptance/features/apiAuth/cors.feature${RESET}"
@@ -130,13 +121,6 @@ test-ocis-feature-s3ng-storage: ## test a ocis feature with s3ng storage, usage:
 	START_CEPH=1 \
 	$(MAKE) --no-print-directory testSuite
 
-.PHONY: test-ocis-feature-owncloud-storage
-test-ocis-feature-owncloud-storage: ## test a ocis feature with oc10 storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:10'
-	@TEST_SOURCE=ocis \
-	STORAGE_DRIVER=owncloud \
-	BEHAT_FEATURE=$(BEHAT_FEATURE) \
-	$(MAKE) --no-print-directory testSuite
-
 .PHONY: test-oc10-feature-ocis-storage
 test-oc10-feature-ocis-storage: ## test a oC10 feature with oCIS storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/apiAuth/cors.feature'
 	@TEST_SOURCE=oc10 \
@@ -152,13 +136,6 @@ test-oc10-feature-s3ng-storage: ## test a oC10 feature with s3ng storage, usage:
 	START_CEPH=1 \
 	$(MAKE) --no-print-directory testSuite
 
-.PHONY: test-oc10-feature-owncloud-storage
-test-oc10-feature-owncloud-storage: ## test a oC10 feature with oc10 storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/apiAuth/cors.feature'
-	@TEST_SOURCE=oc10 \
-	STORAGE_DRIVER=owncloud \
-	BEHAT_FEATURE=$(BEHAT_FEATURE) \
-	$(MAKE) --no-print-directory testSuite
-
 .PHONY: localApiTests-apiAccountsHashDifficulty-owncloud
 localApiTests-apiAccountsHashDifficulty-owncloud: ## run apiAccountsHashDifficulty test suite with owncloud storage
 	@TEST_SOURCE=ocis \
@@ -171,15 +148,6 @@ localApiTests-apiAccountsHashDifficulty-ocis: ## run apiAccountsHashDifficulty t
 	@TEST_SOURCE=ocis \
 	STORAGE_DRIVER=ocis \
 	BEHAT_SUITE=apiAccountsHashDifficulty \
-	$(MAKE) --no-print-directory testSuite
-
-targets = $(addprefix Core-API-Tests-owncloud-storage-,$(PARTS))
-.PHONY: $(targets)
-$(targets):
-	@$(eval RUN_PART=$(shell echo "$@" | tr -dc '0-9'))
-	@TEST_SOURCE=oc10 \
-	STORAGE_DRIVER=owncloud \
-	RUN_PART=$(RUN_PART) \
 	$(MAKE) --no-print-directory testSuite
 
 targets = $(addprefix Core-API-Tests-ocis-storage-,$(PARTS))
