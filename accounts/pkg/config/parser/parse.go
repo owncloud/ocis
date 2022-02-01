@@ -17,6 +17,28 @@ func ParseConfig(cfg *config.Config) error {
 		return err
 	}
 
+	err = EnsureDefaults(cfg)
+	if err != nil {
+		return err
+	}
+
+	// load all env variables relevant to the config in the current context.
+	if err := envdecode.Decode(cfg); err != nil {
+		// no environment variable set for this config is an expected "error"
+		if !errors.Is(err, envdecode.ErrNoTargetFieldsAreSet) {
+			return err
+		}
+	}
+
+	err = Sanitize(cfg)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func EnsureDefaults(cfg *config.Config) error {
 	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
 	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
 		cfg.Log = &config.Log{
@@ -40,19 +62,14 @@ func ParseConfig(cfg *config.Config) error {
 		cfg.Tracing = &config.Tracing{}
 	}
 
-	// load all env variables relevant to the config in the current context.
-	if err := envdecode.Decode(cfg); err != nil {
-		// no environment variable set for this config is an expected "error"
-		if !errors.Is(err, envdecode.ErrNoTargetFieldsAreSet) {
-			return err
-		}
-	}
+	return nil
+}
 
+func Sanitize(cfg *config.Config) error {
 	// sanitize config
 	if cfg.HTTP.Root != "/" {
 		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 	}
 	cfg.Repo.Backend = strings.ToLower(cfg.Repo.Backend)
-
 	return nil
 }
