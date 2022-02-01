@@ -60,7 +60,7 @@ config = {
             "suites": [
                 "apiShareManagement",
             ],
-            "skip": True,
+            "skip": False,
             "earlyFail": True,
             "cron": "nightly",
         },
@@ -68,7 +68,7 @@ config = {
             "suites": [
                 "apiWebdavOperations",
             ],
-            "skip": True,
+            "skip": False,
             "earlyFail": True,
             "cron": "nightly",
         },
@@ -1405,22 +1405,105 @@ def notify(ctx):
         },
     }
 
-def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
-    environment = {
-        "OCIS_URL": "https://ocis-server:9200",
-        "STORAGE_USERS_DRIVER": "%s" % (storage),
-        "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
-        "STORAGE_USERS_DRIVER_OWNCLOUD_DATADIR": "/srv/app/tmp/ocis/owncloud/data",
-        "STORAGE_USERS_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/users",
-        "STORAGE_METADATA_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/metadata",
-        "STORAGE_SHARING_USER_JSON_FILE": "/srv/app/tmp/ocis/shares.json",
-        "PROXY_ENABLE_BASIC_AUTH": True,
-        "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
-        "IDP_IDENTIFIER_REGISTRATION_CONF": "/drone/src/tests/config/drone/identifier-registration.yml",
-        "OCIS_LOG_LEVEL": "error",
-        "SETTINGS_DATA_PATH": "/srv/app/tmp/ocis/settings",
-        "OCIS_INSECURE": "true",
-    }
+def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], testing_parallel_deploy = False):
+    if not testing_parallel_deploy:
+        user = "0:0"
+        environment = {
+            "OCIS_URL": "https://ocis-server:9200",
+            "STORAGE_HOME_DRIVER": "%s" % (storage),
+            "STORAGE_USERS_DRIVER": "%s" % (storage),
+            "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
+            "STORAGE_USERS_DRIVER_OWNCLOUD_DATADIR": "/srv/app/tmp/ocis/owncloud/data",
+            "STORAGE_USERS_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/users",
+            "STORAGE_METADATA_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/metadata",
+            "STORAGE_SHARING_USER_JSON_FILE": "/srv/app/tmp/ocis/shares.json",
+            "PROXY_ENABLE_BASIC_AUTH": True,
+            "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
+            "IDP_IDENTIFIER_REGISTRATION_CONF": "/drone/src/tests/config/drone/identifier-registration.yml",
+            "OCIS_LOG_LEVEL": "error",
+            "SETTINGS_DATA_PATH": "/srv/app/tmp/ocis/settings",
+            "OCIS_INSECURE": "true",
+        }
+    else:
+        user = "33:33"
+        environment = {
+            # Keycloak IDP specific configuration
+            "PROXY_OIDC_ISSUER": "https://keycloak/auth/realmsowncloud",
+            "WEB_OIDC_AUTHORITY": "https://keycloak/auth/realms/owncloud",
+            "WEB_OIDC_CLIENT_ID": "ocis-web",
+            "WEB_OIDC_METADATA_URL": "https://keycloak/auth/realms/owncloud/.well-known/openid-configuration",
+            "STORAGE_OIDC_ISSUER": "https://keycloak",
+            "STORAGE_LDAP_IDP": "https://keycloak/auth/realms/owncloud",
+            "WEB_OIDC_SCOPE": "openid profile email owncloud",
+            # LDAP bind
+            "STORAGE_LDAP_HOSTNAME": "openldap",
+            "STORAGE_LDAP_PORT": 636,
+            "STORAGE_LDAP_INSECURE": "true",
+            "STORAGE_LDAP_BIND_DN": "cn=admin,dc=owncloud,dc=com",
+            "STORAGE_LDAP_BIND_PASSWORD": "admin",
+            # LDAP user settings
+            "PROXY_AUTOPROVISION_ACCOUNTS": "true",  # automatically create users when they login
+            "PROXY_ACCOUNT_BACKEND_TYPE": "cs3",  # proxy should get users from CS3APIS (which gets it from LDAP)
+            "PROXY_USER_OIDC_CLAIM": "ocis.user.uuid",  # claim was added in Keycloak
+            "PROXY_USER_CS3_CLAIM": "userid",  # equals STORAGE_LDAP_USER_SCHEMA_UID
+            "STORAGE_LDAP_BASE_DN": "dc=owncloud,dc=com",
+            "STORAGE_LDAP_GROUP_SCHEMA_DISPLAYNAME": "cn",
+            "STORAGE_LDAP_GROUP_SCHEMA_GID_NUMBER": "gidnumber",
+            "STORAGE_LDAP_GROUP_SCHEMA_GID": "cn",
+            "STORAGE_LDAP_GROUP_SCHEMA_MAIL": "mail",
+            "STORAGE_LDAP_GROUPATTRIBUTEFILTER": "(&(objectclass=posixGroup)(objectclass=owncloud)({{attr}}={{value}}))",
+            "STORAGE_LDAP_GROUPFILTER": "(&(objectclass=groupOfUniqueNames)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))",
+            "STORAGE_LDAP_GROUPMEMBERFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))",
+            "STORAGE_LDAP_USERGROUPFILTER": "(&(objectclass=posixGroup)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))",
+            "STORAGE_LDAP_USER_SCHEMA_CN": "cn",
+            "STORAGE_LDAP_USER_SCHEMA_DISPLAYNAME": "displayname",
+            "STORAGE_LDAP_USER_SCHEMA_GID_NUMBER": "gidnumber",
+            "STORAGE_LDAP_USER_SCHEMA_MAIL": "mail",
+            "STORAGE_LDAP_USER_SCHEMA_UID_NUMBER": "uidnumber",
+            "STORAGE_LDAP_USER_SCHEMA_UID": "ownclouduuid",
+            "STORAGE_LDAP_LOGINFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(|(uid={{login}})(mail={{login}})))",
+            "STORAGE_LDAP_USERATTRIBUTEFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)({{attr}}={{value}}))",
+            "STORAGE_LDAP_USERFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(|(ownclouduuid={{.OpaqueId}})(uid={{.OpaqueId}})))",
+            "STORAGE_LDAP_USERFINDFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
+            # ownCloud storage driver
+            "STORAGE_HOME_DRIVER": "owncloudsql",
+            "STORAGE_USERS_DRIVER": "owncloudsql",
+            "STORAGE_METADATA_DRIVER": "ocis",
+            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DATADIR": "/mnt/data/files",
+            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_UPLOADINFO_DIR": "/tmp",
+            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_SHARE_FOLDER": "/Shares",
+            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_LAYOUT": "{{.Username}}",
+            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBUSERNAME": "owncloud",
+            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBPASSWORD": "owncloud",
+            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBHOST": "oc10-db",
+            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBPORT": 3306,
+            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBNAME": "owncloud",
+            # TODO: redis is not yet supported
+            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_REDIS_ADDR": "redis:6379",
+            # ownCloud sharing driver
+            "STORAGE_SHARING_USER_DRIVER": "oc10-sql",
+            "STORAGE_SHARING_USER_SQL_USERNAME": "owncloud",
+            "STORAGE_SHARING_USER_SQL_PASSWORD": "owncloud",
+            "STORAGE_SHARING_USER_SQL_HOST": "oc10-db",
+            "STORAGE_SHARING_USER_SQL_PORT": 3306,
+            "STORAGE_SHARING_USER_SQL_NAME": "owncloud",
+            # ownCloud storage readonly
+            # TODO: conflict with OWNCLOUDSQL -> https://github.com/owncloud/ocis/issues/2303
+            "OCIS_STORAGE_READ_ONLY": "false",
+            # General oCIS config
+            # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
+            "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy",
+            "OCIS_LOG_LEVEL": "error",
+            "OCIS_URL": OCIS_URL,
+            "PROXY_TLS": "true",
+            "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",
+            # change default secrets
+            "OCIS_JWT_SECRET": "Pive-Fumkiu4",
+            "STORAGE_TRANSFER_SECRET": "replace-me-with-a-transfer-secret",
+            "OCIS_MACHINE_AUTH_API_KEY": "change-me-please",
+            "OCIS_INSECURE": "true",
+            "PROXY_ENABLE_BASIC_AUTH": "true",
+        }
 
     # Pass in "default" accounts_hash_difficulty to not set this environment variable.
     # That will allow OCIS to use whatever its built-in default is.
@@ -1435,11 +1518,12 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
             "image": OC_CI_ALPINE,
             "detach": True,
             "environment": environment,
+            "user": user,
             "commands": [
-                "apk add mailcap",  # install /etc/mime.types
                 "ocis/bin/ocis server",
             ],
             "volumes": volumes,
+            "depends_on": depends_on,
         },
         {
             "name": "wait-for-ocis-server",
@@ -1447,6 +1531,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = []):
             "commands": [
                 "wait-for -it ocis-server:9200 -t 300",
             ],
+            "depends_on": depends_on,
         },
     ]
 
@@ -1879,8 +1964,8 @@ QUAY_IO_KEYCLOAK = "quay.io/keycloak/keycloak:latest"
 POSTGRES = "postgres:alpine"
 
 # configs
-OCIS_URL = "https://ocis:9200"
-OCIS_DOMAIN = "ocis:9200"
+OCIS_URL = "https://ocis-server:9200"
+OCIS_DOMAIN = "ocis-server:9200"
 OC10_URL = "http://oc10:8080"
 PARALLEL_DEPLOY_CONFIG_PATH = "/drone/src/tests/parallelDeployAcceptance/drone"
 
@@ -1975,13 +2060,20 @@ def parallelDeployAcceptancePipeline(ctx):
                     "os": "linux",
                     "arch": "amd64",
                 },
-                "steps": cloneCoreRepos() +
+                "steps": skipIfUnchanged(ctx, "acceptance-tests") +
+                         restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+                         cloneCoreRepos() +
                          copyConfigs() +
-                         waitForServices() +
-                         oC10Server() +
+                         parallelDeploymentOC10Server() +
                          owncloudLog() +
                          fixSharedDataPermissions() +
-                         latestOcisServer() +
+                         ocisServer(
+                             "ocis",
+                             "default",
+                             [stepVolumeOC10OCISData, stepVolumeOCISConfig],
+                             ["fix-shared-data-permissions"],
+                             True,
+                         ) +
                          parallelAcceptance(environment) +
                          failEarly(ctx, early_fail),
                 "services": oc10DbService() +
@@ -1995,6 +2087,7 @@ def parallelDeployAcceptancePipeline(ctx):
                     pipeOCISConfigVol,
                     pipelineVolumeOC10Tests,
                 ],
+                "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
                 "trigger": {},
             }
 
@@ -2039,7 +2132,7 @@ def parallelAcceptance(env):
         "commands": [
             "make test-paralleldeployment-api",
         ],
-        "depends_on": ["clone-core-repos", "wait-for-oc10", "wait-for-ocis"],
+        "depends_on": ["clone-core-repos", "wait-for-oc10", "wait-for-ocis-server"],
         "volumes": [
             stepVolumeOC10Apps,
             stepVolumeOC10Tests,
@@ -2047,102 +2140,7 @@ def parallelAcceptance(env):
         ],
     }]
 
-def latestOcisServer():
-    environment = {
-        # Keycloak IDP specific configuration
-        "PROXY_OIDC_ISSUER": "https://keycloak/auth/realmsowncloud",
-        "WEB_OIDC_AUTHORITY": "https://keycloak/auth/realms/owncloud",
-        "WEB_OIDC_CLIENT_ID": "ocis-web",
-        "WEB_OIDC_METADATA_URL": "https://keycloak/auth/realms/owncloud/.well-known/openid-configuration",
-        "STORAGE_OIDC_ISSUER": "https://keycloak",
-        "STORAGE_LDAP_IDP": "https://keycloak/auth/realms/owncloud",
-        "WEB_OIDC_SCOPE": "openid profile email owncloud",
-        # LDAP bind
-        "STORAGE_LDAP_HOSTNAME": "openldap",
-        "STORAGE_LDAP_PORT": 636,
-        "STORAGE_LDAP_INSECURE": "true",
-        "STORAGE_LDAP_BIND_DN": "cn=admin,dc=owncloud,dc=com",
-        "STORAGE_LDAP_BIND_PASSWORD": "admin",
-        # LDAP user settings
-        "PROXY_AUTOPROVISION_ACCOUNTS": "true",  # automatically create users when they login
-        "PROXY_ACCOUNT_BACKEND_TYPE": "cs3",  # proxy should get users from CS3APIS (which gets it from LDAP)
-        "PROXY_USER_OIDC_CLAIM": "ocis.user.uuid",  # claim was added in Keycloak
-        "PROXY_USER_CS3_CLAIM": "userid",  # equals STORAGE_LDAP_USER_SCHEMA_UID
-        "STORAGE_LDAP_BASE_DN": "dc=owncloud,dc=com",
-        "STORAGE_LDAP_GROUP_SCHEMA_DISPLAYNAME": "cn",
-        "STORAGE_LDAP_GROUP_SCHEMA_GID_NUMBER": "gidnumber",
-        "STORAGE_LDAP_GROUP_SCHEMA_GID": "cn",
-        "STORAGE_LDAP_GROUP_SCHEMA_MAIL": "mail",
-        "STORAGE_LDAP_GROUPATTRIBUTEFILTER": "(&(objectclass=posixGroup)(objectclass=owncloud)({{attr}}={{value}}))",
-        "STORAGE_LDAP_GROUPFILTER": "(&(objectclass=groupOfUniqueNames)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))",
-        "STORAGE_LDAP_GROUPMEMBERFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))",
-        "STORAGE_LDAP_USERGROUPFILTER": "(&(objectclass=posixGroup)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))",
-        "STORAGE_LDAP_USER_SCHEMA_CN": "cn",
-        "STORAGE_LDAP_USER_SCHEMA_DISPLAYNAME": "displayname",
-        "STORAGE_LDAP_USER_SCHEMA_GID_NUMBER": "gidnumber",
-        "STORAGE_LDAP_USER_SCHEMA_MAIL": "mail",
-        "STORAGE_LDAP_USER_SCHEMA_UID_NUMBER": "uidnumber",
-        "STORAGE_LDAP_USER_SCHEMA_UID": "ownclouduuid",
-        "STORAGE_LDAP_LOGINFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(|(uid={{login}})(mail={{login}})))",
-        "STORAGE_LDAP_USERATTRIBUTEFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)({{attr}}={{value}}))",
-        "STORAGE_LDAP_USERFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(|(ownclouduuid={{.OpaqueId}})(uid={{.OpaqueId}})))",
-        "STORAGE_LDAP_USERFINDFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
-        # ownCloud storage driver
-        "STORAGE_USERS_DRIVER": "owncloudsql",
-        "STORAGE_METADATA_DRIVER": "ocis",
-        "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DATADIR": "/mnt/data/files",
-        "STORAGE_USERS_DRIVER_OWNCLOUDSQL_UPLOADINFO_DIR": "/tmp",
-        "STORAGE_USERS_DRIVER_OWNCLOUDSQL_SHARE_FOLDER": "/Shares",
-        "STORAGE_USERS_DRIVER_OWNCLOUDSQL_LAYOUT": "{{.Username}}",
-        "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBUSERNAME": "owncloud",
-        "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBPASSWORD": "owncloud",
-        "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBHOST": "oc10-db",
-        "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBPORT": 3306,
-        "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBNAME": "owncloud",
-        # TODO: redis is not yet supported
-        "STORAGE_USERS_DRIVER_OWNCLOUDSQL_REDIS_ADDR": "redis:6379",
-        # ownCloud storage readonly
-        # TODO: conflict with OWNCLOUDSQL -> https://github.com/owncloud/ocis/issues/2303
-        "OCIS_STORAGE_READ_ONLY": "false",
-        # General oCIS config
-        "OCIS_LOG_LEVEL": "error",
-        "OCIS_URL": OCIS_URL,
-        "PROXY_TLS": "true",
-        # change default secrets
-        "OCIS_JWT_SECRET": "Pive-Fumkiu4",
-        "STORAGE_TRANSFER_SECRET": "replace-me-with-a-transfer-secret",
-        "OCIS_MACHINE_AUTH_API_KEY": "change-me-please",
-        "OCIS_INSECURE": "true",
-        "PROXY_ENABLE_BASIC_AUTH": "true",
-    }
-
-    return [
-        {
-            "name": "ocis",
-            "image": OC_OCIS,
-            "environment": environment,
-            "detach": True,
-            "commands": [
-                "ocis server",
-            ],
-            "volumes": [
-                stepVolumeOC10OCISData,
-                stepVolumeOCISConfig,
-            ],
-            "user": "33:33",
-            "depends_on": ["fix-permissions"],
-        },
-        {
-            "name": "wait-for-ocis",
-            "image": OC_CI_WAIT_FOR,
-            "commands": [
-                "wait-for -it ocis:9200 -t 300",
-            ],
-            "depends_on": ["wait-for-oc10"],
-        },
-    ]
-
-def oC10Server():
+def parallelDeploymentOC10Server():
     return [
         {
             "name": "oc10",
@@ -2200,7 +2198,7 @@ def oC10Server():
                 stepVolumeOC10Templates,
                 stepVolumeOC10PreServer,
             ],
-            "depends_on": ["wait-for-services", "copy-configs"],
+            "depends_on": ["copy-configs"],
         },
         {
             "name": "wait-for-oc10",
@@ -2208,7 +2206,7 @@ def oC10Server():
             "commands": [
                 "wait-for -it oc10:8080 -t 300",
             ],
-            "depends_on": ["wait-for-services"],
+            "depends_on": ["oc10"],
         },
     ]
 
@@ -2293,27 +2291,18 @@ def owncloudLog():
 
 def fixSharedDataPermissions():
     return [{
-        "name": "fix-permissions",
+        "name": "fix-shared-data-permissions",
         "image": OC_CI_PHP,
         "pull": "always",
         "commands": [
-            "chown -R www-data:www-data /var/www/owncloud/apps",
-            "chmod -R 777 /var/www/owncloud/apps",
-            "chmod -R 777 /mnt/data/",
+            "chown -R 33:33 /var/www/owncloud",  # www-data  user
+            "chmod -R 777 /var/www/owncloud",
+            "chown -R 33:33 /mnt/data",  # www-data  user
+            "chmod -R 777 /mnt/data",
         ],
         "volumes": [
             stepVolumeOC10Apps,
             stepVolumeOC10OCISData,
         ],
         "depends_on": ["wait-for-oc10"],
-    }]
-
-def waitForServices():
-    return [{
-        "name": "wait-for-services",
-        "image": OC_CI_WAIT_FOR,
-        "commands": [
-            "wait-for -it oc10-db:3306 -t 300",
-            "wait-for -it openldap:636 -t 300",
-        ],
     }]
