@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix retry handling for LDAP connections: [#2974](https://github.com/owncloud/ocis/issues/2974)
 * Bugfix - Fix the default tracing provider: [#2952](https://github.com/owncloud/ocis/pull/2952)
 * Bugfix - Fix configuration for space membership endpoint: [#2893](https://github.com/owncloud/ocis/pull/2893)
+* Change - Change log level default from debug to error: [#3071](https://github.com/owncloud/ocis/pull/3071)
 * Change - Unify configuration and commands: [#2818](https://github.com/owncloud/ocis/pull/2818)
 * Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 * Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
@@ -61,6 +62,12 @@ The following sections list the changes for unreleased.
    Added a missing config value to the ocs config related to the space membership endpoint.
 
    https://github.com/owncloud/ocis/pull/2893
+
+* Change - Change log level default from debug to error: [#3071](https://github.com/owncloud/ocis/pull/3071)
+
+   We've changed the default log level for all services from "info" to "error".
+
+   https://github.com/owncloud/ocis/pull/3071
 
 * Change - Unify configuration and commands: [#2818](https://github.com/owncloud/ocis/pull/2818)
 
