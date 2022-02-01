@@ -15,7 +15,7 @@ geekdocFilePath: 0015-events.md
 
 ### Overview
 
-To be able to implement simple, flexible and independant inter server communication there is the idea to implement an event system in oCIS. A service can send out events which are received by one or more other services. The receiving service can cause different kind of actions based on the event by utilizing the information that the event carries.
+To be able to implement simple, flexible and independent inter service communication there is the idea to implement an event system in oCIS. A service can send out events which are received by one or more other services. The receiving service can cause different kinds of actions based on the event by utilizing the information that the event carries.
 
 ###  Example: EMail Notification
 
