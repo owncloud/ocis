@@ -17,17 +17,17 @@ geekdocFilePath: 0015-events.md
 
 To be able to implement simple, flexible and independent inter service communication there is the idea to implement an event system in oCIS. A service can send out events which are received by one or more other services. The receiving service can cause different kinds of actions based on the event by utilizing the information that the event carries.
 
-###  Example: Email Notification
+### Example: Email Notification
 
 A simple example is the notification feature for oCIS: Users should receive an email when another user shares a file with them. The information, that the file was shared should go out as an event from a storage provider or share manager, carrying the information which file was shared to which receiver. A potential notification service that sends out the email listens to these kind of events and sends the email out once on every received event of that specific type.
 
 ## Decision Drivers
 
-- Events are supposed to decouple services and raise flexibility, also considering extensions that are not directly controlled by the ownCloud project.
-- Events should bring flexibility in the implementation of sending and receiving services.
-- Events should not obsolete other mechanisms to communicate, ie. grpc calls.
-- Sending an event has to be as little resource consuming for the sender as possible.
-- Events are never user visible.
+* Events are supposed to decouple services and raise flexibility, also considering extensions that are not directly controlled by the ownCloud project.
+* Events should bring flexibility in the implementation of sending and receiving services.
+* Events should not obsolete other mechanisms to communicate, ie. grpc calls.
+* Sending an event has to be as little resource consuming for the sender as possible.
+* Events are never user visible.
 
 ## Considered Options
 
@@ -63,29 +63,34 @@ The described way of inter service communication with events is not transactiona
 If transactions are required, proper synchronous GRPC API calls should be used. Another way would be to build asynchronous flows with request- and reply events as in [saga pattern](https://microservices.io/patterns/data/saga.html). That is only recommended for special cases.
 
 #### Pros
-- Simple setup
-- Flexible way of connecting services
-- Stateless event queue
-- "State of the art" pattern in microservices architectures
+
+* Simple setup
+* Flexible way of connecting services
+* Stateless event queue
+* "State of the art" pattern in microservices architectures
 
 #### Cons
-- Over engineering: Can we do without an extra message queue component?
-- Messages might get lost, so that eventual consistency is endangered
-- Message queue needs to be implemented in Reva
+
+* Over engineering: Can we do without an extra message queue component?
+* Messages might get lost, so that eventual consistency is endangered
+* A service needs to hold more state to ensure consistency
+* Message queue needs to be implemented in Reva
 
 ### 2. Lightweight Events with Event Queue and "At-least once" QoS
 
 Exactly as described above, but with a higher service level quality.
 
 #### Pros
-- Better service level: Messages do not get lost.
+
+* Better service level: Messages do not get lost
+* Simplifies the design of the microservices because the events are "fire-and-forget"
+* Events would be idempotent. If a service goes down the events will stay in the queue until they are consumed
 
 #### Cons
-- Stateful event system with higher cost in terms of compute and storage.
 
+* Stateful event system with higher cost in terms of compute and storage
+* The queue could become a bottleneck and needs to be scaled
 
 ## Decision Outcome
 
-
 ### Design
-
