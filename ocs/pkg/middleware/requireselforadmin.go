@@ -11,6 +11,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
+	settingsService "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
 
 // RequireSelfOrAdmin middleware is used to require the requesting user to be an admin or the requested user himself
@@ -38,8 +39,20 @@ func RequireSelfOrAdmin(opts ...Option) func(next http.Handler) http.Handler {
 			// get roles from context
 			roleIDs, ok := roles.ReadRoleIDsFromContext(r.Context())
 			if !ok {
-				mustRender(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized"))
-				return
+				opt.Logger.Debug().Str("userid", u.Id.OpaqueId).Msg("No roles in context, contacting settings service")
+				var err error
+				roleIDs, err = opt.RoleManager.FindRoleIDsForUser(r.Context(), u.Id.OpaqueId)
+				if err != nil {
+					opt.Logger.Err(err).Str("userid", u.Id.OpaqueId).Msg("failed to get roles for user")
+					mustRender(w, r, response.ErrRender(data.MetaUnauthorized.StatusCode, "Unauthorized"))
+					return
+				}
+				if len(roleIDs) == 0 {
+					roleIDs = append(roleIDs, settingsService.BundleUUIDRoleUser, settingsService.SelfManagementPermissionID)
+					// if roles are empty, assume we haven't seen the user before and assign a default user role. At least until
+					// proper roles are provided. See https://github.com/owncloud/ocis/issues/1825 for more context.
+					//return user, nil
+				}
 			}
 
 			// check if account management permission is present in roles of the authenticated account
