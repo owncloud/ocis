@@ -270,6 +270,17 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
+	if restore, _ := strconv.ParseBool(r.Header.Get("restore")); restore {
+		updateSpaceRequest.Opaque = &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				"restore": {
+					Decoder: "plain",
+					Value:   []byte("true"),
+				},
+			},
+		}
+	}
+
 	if drive.Name != nil {
 		updateSpaceRequest.StorageSpace.Name = *drive.Name
 	}
@@ -422,6 +433,15 @@ func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpac
 		Root: &libregraph.DriveItem{
 			Id: &rootID,
 		},
+	}
+
+	if space.Opaque != nil && space.Opaque.Map != nil {
+		v, ok := space.Opaque.Map["trashed"]
+		if ok {
+			deleted := &libregraph.Deleted{}
+			deleted.SetState(string(v.Value))
+			drive.Root.Deleted = deleted
+		}
 	}
 
 	if baseURL != nil {
