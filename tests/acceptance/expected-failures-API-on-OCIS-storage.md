@@ -1218,6 +1218,14 @@ And other missing implementation of favorites
 - [apiWebdavEtagPropagation1/deleteFileFolder.feature:151](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/deleteFileFolder.feature#L151)
 - [apiWebdavEtagPropagation1/deleteFileFolder.feature:188](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/deleteFileFolder.feature#L188)
 - [apiWebdavEtagPropagation1/deleteFileFolder.feature:225](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/deleteFileFolder.feature#L225)
+- [apiWebdavEtagPropagation2/copyFileFolder.feature:188](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/copyFileFolder.feature#L188)
+- [apiWebdavEtagPropagation2/copyFileFolder.feature:231](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/copyFileFolder.feature#L231)
+- [apiWebdavEtagPropagation2/createFolder.feature:82](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/createFolder.feature#L82)
+- [apiWebdavEtagPropagation2/createFolder.feature:112](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/createFolder.feature#L112)
+- [apiWebdavEtagPropagation2/upload.feature:82](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/upload.feature#L82)
+- [apiWebdavEtagPropagation2/upload.feature:111](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/upload.feature#L111)
+- [apiWebdavEtagPropagation2/upload.feature:141](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/upload.feature#L141)
+- [apiWebdavEtagPropagation2/upload.feature:171](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/upload.feature#L171)
 
 #### [WWW-Authenticate header for unauthenticated requests is not clear](https://github.com/owncloud/ocis/issues/2285)
 Scenario Outline: Unauthenticated call
