@@ -20,7 +20,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.0
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220126114148-64c025ccdd19
-	github.com/cs3org/reva v1.16.1-0.20220128145007-1011a7b43e7e
+	github.com/cs3org/reva v1.16.1-0.20220204115525-d6a8f9b802df
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.7
@@ -49,7 +49,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.18.1
-	github.com/owncloud/libre-graph-api-go v0.9.0
+	github.com/owncloud/libre-graph-api-go v0.10.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.12.1
 	github.com/rs/zerolog v1.26.1
@@ -232,7 +232,7 @@ require (
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.19.1 // indirect
 	golang.org/x/mod v0.5.1 // indirect
-	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
 	golang.org/x/text v0.3.7 // indirect

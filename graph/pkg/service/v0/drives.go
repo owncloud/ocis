@@ -215,7 +215,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newDrive, err := cs3StorageSpaceToDrive(wdu, resp.StorageSpace)
+	newDrive, err := g.cs3StorageSpaceToDrive(wdu, resp.StorageSpace)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error parsing space")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -314,7 +314,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updatedDrive, err := cs3StorageSpaceToDrive(wdu, resp.StorageSpace)
+	updatedDrive, err := g.cs3StorageSpaceToDrive(wdu, resp.StorageSpace)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error parsing space")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -328,7 +328,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storageprovider.StorageSpace) ([]*libregraph.Drive, error) {
 	responses := make([]*libregraph.Drive, 0, len(mds))
 	for _, space := range mds {
-		res, err := cs3StorageSpaceToDrive(baseURL, space)
+		res, err := g.cs3StorageSpaceToDrive(baseURL, space)
 		if err != nil {
 			return nil, err
 		}
@@ -406,11 +406,67 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 	return res, err
 }
 
-func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpace) (*libregraph.Drive, error) {
+func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpace) (*libregraph.Drive, error) {
 	rootID := space.Root.StorageId + "!" + space.Root.OpaqueId
 	if space.Root.StorageId == space.Root.OpaqueId {
 		// omit opaqueid
 		rootID = space.Root.StorageId
+	}
+
+	var permissions []libregraph.Permission
+	if space.Opaque != nil {
+		var m map[string]*storageprovider.ResourcePermissions
+		entry, ok := space.Opaque.Map["grants"]
+		if ok {
+			err := json.Unmarshal(entry.Value, &m)
+			if err != nil {
+				g.logger.Error().
+					Err(err).
+					Str("space", space.Root.OpaqueId).
+					Msg("failed to read spaces grants")
+			}
+		}
+		if len(m) != 0 {
+			managerIdentities := []libregraph.IdentitySet{}
+			editorIdentities := []libregraph.IdentitySet{}
+			viewerIdentities := []libregraph.IdentitySet{}
+
+			for id, perm := range m {
+				// This temporary variable is necessary since we need to pass a pointer to the
+				// libregraph.Identity and if we pass the pointer from the loop every identity
+				// will have the same id.
+				tmp := id
+				identity := libregraph.IdentitySet{User: &libregraph.Identity{Id: &tmp}}
+				switch {
+				case perm.AddGrant:
+					managerIdentities = append(managerIdentities, identity)
+				case perm.InitiateFileUpload:
+					editorIdentities = append(editorIdentities, identity)
+				case perm.Stat:
+					viewerIdentities = append(viewerIdentities, identity)
+				}
+			}
+
+			permissions = make([]libregraph.Permission, 0, 3)
+			if len(managerIdentities) != 0 {
+				permissions = append(permissions, libregraph.Permission{
+					GrantedTo: managerIdentities,
+					Roles:     []string{"manager"},
+				})
+			}
+			if len(editorIdentities) != 0 {
+				permissions = append(permissions, libregraph.Permission{
+					GrantedTo: editorIdentities,
+					Roles:     []string{"editor"},
+				})
+			}
+			if len(viewerIdentities) != 0 {
+				permissions = append(permissions, libregraph.Permission{
+					GrantedTo: viewerIdentities,
+					Roles:     []string{"viewer"},
+				})
+			}
+		}
 	}
 
 	drive := &libregraph.Drive{
@@ -420,7 +476,8 @@ func cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpac
 		//"description": "string", // TODO read from StorageSpace ... needs Opaque for now
 		DriveType: &space.SpaceType,
 		Root: &libregraph.DriveItem{
-			Id: &rootID,
+			Id:          &rootID,
+			Permissions: permissions,
 		},
 	}
 
