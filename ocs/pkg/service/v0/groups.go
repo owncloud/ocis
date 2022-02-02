@@ -30,6 +30,11 @@ func (o Ocs) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 	}
 	var account *accountsmsg.Account
 
+	if o.config.AccountBackend == "cs3" {
+		o.mustRender(w, r, response.DataRender(&data.Groups{}))
+		return
+	}
+
 	// short circuit if there is a user already in the context
 	if u, ok := revactx.ContextGetUser(r.Context()); ok {
 		// we are not sure whether the current user in the context is the admin or the authenticated user.
