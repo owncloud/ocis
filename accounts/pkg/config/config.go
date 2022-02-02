@@ -56,7 +56,6 @@ type Disk struct {
 // CS3 is the cs3 implementation of the storage.
 type CS3 struct {
 	ProviderAddr string `ocisConfig:"provider_addr" env:"ACCOUNTS_STORAGE_CS3_PROVIDER_ADDR"`
-	JWTSecret    string `ocisConfig:"jwt_secret" env:"ACCOUNTS_STORAGE_CS3_JWT_SECRET"`
 }
 
 // ServiceUser defines the user required for EOS.

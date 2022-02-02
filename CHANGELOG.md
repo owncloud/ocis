@@ -7,7 +7,9 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Add `ocis storage-auth-machine` subcommand: [#2910](https://github.com/owncloud/ocis/pull/2910)
+* Bugfix - Use same jwt secret for accounts as for metadata storage: [#3081](https://github.com/owncloud/ocis/pull/3081)
 * Bugfix - Make the default grpc client use the registry settings: [#3041](https://github.com/owncloud/ocis/pull/3041)
+* Bugfix - Remove group memberships when deleting a user: [#3027](https://github.com/owncloud/ocis/issues/3027)
 * Bugfix - Fix retry handling for LDAP connections: [#2974](https://github.com/owncloud/ocis/issues/2974)
 * Bugfix - Fix the default tracing provider: [#2952](https://github.com/owncloud/ocis/pull/2952)
 * Bugfix - Fix configuration for space membership endpoint: [#2893](https://github.com/owncloud/ocis/pull/2893)
@@ -36,12 +38,29 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/2910
 
+* Bugfix - Use same jwt secret for accounts as for metadata storage: [#3081](https://github.com/owncloud/ocis/pull/3081)
+
+   We've the metadata storage uses the same jwt secret as all other REVA services. Therefore the
+   accounts service needs to use the same secret.
+
+   Secrets are documented here:
+   https://owncloud.dev/ocis/deployment/#change-default-secrets
+
+   https://github.com/owncloud/ocis/pull/3081
+
 * Bugfix - Make the default grpc client use the registry settings: [#3041](https://github.com/owncloud/ocis/pull/3041)
 
    We've fixed the default grpc client to use the registry settings. Previously it always used
    mdns.
 
    https://github.com/owncloud/ocis/pull/3041
+
+* Bugfix - Remove group memberships when deleting a user: [#3027](https://github.com/owncloud/ocis/issues/3027)
+
+   The LDAP backend in the graph API now takes care of removing a user's group membership when
+   deleting the user.
+
+   https://github.com/owncloud/ocis/issues/3027
 
 * Bugfix - Fix retry handling for LDAP connections: [#2974](https://github.com/owncloud/ocis/issues/2974)
 
