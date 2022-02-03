@@ -46,29 +46,18 @@ func Gateway(cfg *config.Config) *cli.Command {
 			tracing.Configure(cfg, logger)
 			gr := run.Group{}
 			ctx, cancel := context.WithCancel(context.Background())
+			serviceName := "gateway"
 			uuid := uuid.Must(uuid.NewV4())
-			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
+			pidFile := path.Join(os.TempDir(), "revad-"+serviceName+"-"+uuid.String()+".pid")
 			rcfg := gatewayConfigFromStruct(c, cfg, logger)
 			logger.Debug().
-				Str("server", "gateway").
+				Str("server", serviceName).
 				Interface("reva-config", rcfg).
 				Msg("config")
 
 			defer cancel()
 
 			gr.Add(func() error {
-				//err := external.RegisterGRPCEndpoint(
-				//	ctx,
-				//	"com.owncloud.storage",
-				//	uuid.String(),
-				//	cfg.Reva.Gateway.GRPCAddr,
-				//	version.String,
-				//	logger,
-				//)
-
-				//if err != nil {
-				//	return err
-				//}
 				reg := oreg.GetRevaRegistry()
 
 				runtime.RunWithOptions(
@@ -76,7 +65,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 					pidFile,
 					runtime.WithLogger(&logger.Logger),
 					runtime.WithRegistry(reg),
-					runtime.WithServiceName("gateway"),
+					runtime.WithServiceName(serviceName),
 					runtime.WithServiceUUID(uuid.String()),
 					runtime.WithNameSpaceConfig(map[string]string{
 						"grpc": "com.owncloud.api",

@@ -14,6 +14,7 @@ import (
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
+	oreg "github.com/owncloud/ocis/ocis-pkg/registry"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
@@ -44,8 +45,9 @@ func Frontend(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
+			serviceName := "frontend"
 			uuid := uuid.Must(uuid.NewV4())
-			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
+			pidFile := path.Join(os.TempDir(), "revad-"+serviceName+"-"+uuid.String()+".pid")
 
 			// pregenerate list of valid localhost ports for the desktop redirect_uri
 			// TODO use custom scheme like "owncloud://localhost/user/callback" tracked in
@@ -99,7 +101,20 @@ func Frontend(cfg *config.Config) *cli.Command {
 			revaCfg := frontendConfigFromStruct(c, cfg, filesCfg)
 
 			gr.Add(func() error {
-				runtime.RunWithOptions(revaCfg, pidFile, runtime.WithLogger(&logger.Logger))
+				reg := oreg.GetRevaRegistry()
+
+				runtime.RunWithOptions(
+					revaCfg,
+					pidFile,
+					runtime.WithLogger(&logger.Logger),
+					runtime.WithRegistry(reg),
+					runtime.WithServiceName(serviceName),
+					runtime.WithServiceUUID(uuid.String()),
+					runtime.WithNameSpaceConfig(map[string]string{
+						"grpc": "com.owncloud.api",
+						"http": "com.owncloud.web",
+					}),
+				)
 				return nil
 			}, func(_ error) {
 				logger.Info().Str("server", c.Command.Name).Msg("Shutting down server")

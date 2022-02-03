@@ -6,17 +6,16 @@ import (
 	"os"
 	"path"
 
+	oreg "github.com/owncloud/ocis/ocis-pkg/registry"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 
 	"github.com/cs3org/reva/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/storage/pkg/command/storagedrivers"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
-	"github.com/owncloud/ocis/storage/pkg/service/external"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
@@ -47,14 +46,26 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
+			serviceName := "metadata"
+			uuid := uuid.Must(uuid.NewV4())
+			pidFile := path.Join(os.TempDir(), "revad-"+serviceName+"-"+uuid.String()+".pid")
 			rcfg := storageMetadataFromStruct(c, cfg)
 
 			gr.Add(func() error {
+				reg := oreg.GetRevaRegistry()
+
 				runtime.RunWithOptions(
 					rcfg,
 					pidFile,
 					runtime.WithLogger(&logger.Logger),
+					runtime.WithRegistry(reg),
+					runtime.WithServiceName(serviceName),
+					runtime.WithServiceUUID(uuid.String()),
+					runtime.WithNameSpaceConfig(map[string]string{
+						//"grpc": "com.owncloud.api",
+						"grpc": "com.owncloud.storage",
+						"http": "com.owncloud.web",
+					}),
 				)
 				return nil
 			}, func(_ error) {
@@ -91,17 +102,6 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 
 			if !cfg.Reva.StorageMetadata.Supervised {
 				sync.Trap(&gr, cancel)
-			}
-
-			if err := external.RegisterGRPCEndpoint(
-				ctx,
-				"com.owncloud.storage.metadata",
-				uuid.Must(uuid.NewV4()).String(),
-				cfg.Reva.StorageMetadata.GRPCAddr,
-				version.String,
-				logger,
-			); err != nil {
-				logger.Fatal().Err(err).Msg("failed to register the grpc endpoint")
 			}
 
 			return gr.Run()

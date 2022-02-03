@@ -10,6 +10,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	oreg "github.com/owncloud/ocis/ocis-pkg/registry"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
@@ -34,14 +35,25 @@ func StoragePublicLink(cfg *config.Config) *cli.Command {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
-			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
+			serviceName := "storage-public-link"
+			uuid := uuid.Must(uuid.NewV4())
+			pidFile := path.Join(os.TempDir(), "revad-"+serviceName+"-"+uuid.String()+".pid")
 			rcfg := storagePublicLinkConfigFromStruct(c, cfg)
 
 			gr.Add(func() error {
+				reg := oreg.GetRevaRegistry()
+
 				runtime.RunWithOptions(
 					rcfg,
 					pidFile,
 					runtime.WithLogger(&logger.Logger),
+					runtime.WithRegistry(reg),
+					runtime.WithServiceName(serviceName),
+					runtime.WithServiceUUID(uuid.String()),
+					runtime.WithNameSpaceConfig(map[string]string{
+						"grpc": "com.owncloud.api",
+						"http": "com.owncloud.web",
+					}),
 				)
 				return nil
 			}, func(_ error) {
