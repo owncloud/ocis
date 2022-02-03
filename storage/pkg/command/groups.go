@@ -32,6 +32,7 @@ func Groups(cfg *config.Config) *cli.Command {
 			tracing.Configure(cfg, logger)
 			gr := run.Group{}
 			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
 
 			// pre-create folders
 			if cfg.Reva.Groups.Driver == "json" && cfg.Reva.Groups.JSON != "" {
@@ -40,9 +41,8 @@ func Groups(cfg *config.Config) *cli.Command {
 				}
 			}
 
-			uuid := uuid.Must(uuid.NewV4())
-			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
-			defer cancel()
+			cuuid := uuid.Must(uuid.NewV4())
+			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+cuuid.String()+".pid")
 
 			rcfg := groupsConfigFromStruct(c, cfg)
 
