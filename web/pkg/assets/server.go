@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"path"
 	"path/filepath"
-	"strings"
 )
 
 type fileServer struct {
@@ -20,12 +19,8 @@ func FileServer(root http.FileSystem) http.Handler {
 }
 
 func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	upath := r.URL.Path
-	if !strings.HasPrefix(upath, "/") {
-		upath = "/" + upath
-		r.URL.Path = upath
-	}
-	upath = path.Clean(upath)
+	upath := path.Clean(path.Join("/", r.URL.Path))
+	r.URL.Path = upath
 
 	asset, err := f.root.Open(upath)
 	if err != nil {
