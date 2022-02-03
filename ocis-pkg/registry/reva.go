@@ -1,7 +1,12 @@
 package registry
 
 import (
+	"time"
+
 	revareg "github.com/cs3org/reva/pkg/registry"
+	"github.com/owncloud/ocis/ocis-pkg/version"
+	"go-micro.dev/v4/broker"
+	"go-micro.dev/v4/registry"
 	microreg "go-micro.dev/v4/registry"
 )
 
@@ -19,6 +24,11 @@ func (r RevaRegistry) Add(s revareg.Service) error {
 	nodes := []*microreg.Node{}
 
 	for _, n := range s.Nodes() {
+		meta := n.Metadata()
+
+		meta["broker"] = broker.String()
+		meta["registry"] = microreg.String()
+
 		node := microreg.Node{
 			Address:  n.Address(),
 			Id:       n.ID(),
@@ -28,11 +38,13 @@ func (r RevaRegistry) Add(s revareg.Service) error {
 	}
 
 	svc := &microreg.Service{
-		Name:  s.Name(),
-		Nodes: nodes,
+		Name:    s.Name(),
+		Version: version.String,
+		Nodes:   nodes,
 	}
+	rOpts := []registry.RegisterOption{registry.RegisterTTL(time.Minute)}
 
-	return r.r.Register(svc)
+	return r.r.Register(svc, rOpts...)
 }
 
 func (r RevaRegistry) GetService(serviceName string) (revareg.Service, error) {

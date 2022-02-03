@@ -76,6 +76,12 @@ func Gateway(cfg *config.Config) *cli.Command {
 					pidFile,
 					runtime.WithLogger(&logger.Logger),
 					runtime.WithRegistry(reg),
+					runtime.WithServiceName("gateway"),
+					runtime.WithServiceUUID(uuid.String()),
+					runtime.WithNameSpaceConfig(map[string]string{
+						"grpc": "com.owncloud.api",
+						"http": "com.owncloud.web",
+					}),
 				)
 				return nil
 			}, func(_ error) {
