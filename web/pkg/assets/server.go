@@ -53,7 +53,7 @@ func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		_, _ = buf.ReadFrom(asset)
 	}
 
-	w.Write(buf.Bytes())
+	_, _ = w.Write(buf.Bytes())
 }
 
 func withBase(w io.Writer, r io.Reader, base string) error {
@@ -65,7 +65,7 @@ func withBase(w io.Writer, r io.Reader, base string) error {
 				Type: html.ElementNode,
 				Data: "base",
 				Attr: []html.Attribute{
-					html.Attribute{
+					{
 						Key: "href",
 						Val: base,
 					},
