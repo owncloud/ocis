@@ -59,8 +59,6 @@ services:
 
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
 
-      PROXY_ENABLE_BASIC_AUTH: "${OCIS_BASIC_AUTH:-false}"
-
       REVA_GATEWAY: storage-gateway:9142
 
       PROXY_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
@@ -74,7 +72,7 @@ services:
 
       PROXY_HTTP_ADDR: 0.0.0.0:9200
     volumes:
-      - "./config/proxy.json:/etc/ocis/proxy.json" #TODO: add config
+      - "./config/proxy/proxy.json:/etc/ocis/proxy.json"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=https"
@@ -94,9 +92,12 @@ services:
     networks:
       ocis-net: null
     entrypoint:
-      - ocis
-      - accounts
-      - server #TODO: change bind users' passwords
+      - /bin/sh
+      - /entrypoint-override.sh
+    #entrypoint:
+    #  - ocis
+    #  - accounts
+    #  - server
     environment:
       ACCOUNTS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
       ACCOUNTS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
@@ -105,15 +106,15 @@ services:
       ACCOUNTS_HTTP_ADDR: 0.0.0.0:9181
       ACCOUNTS_GRPC_ADDR: 0.0.0.0:9180
 
-      #TODO: make resolving of settings service use DNS instead of mDNS
-      # com.owncloud.api.settings
-      # https://github.com/asim/go-micro/tree/master/plugins/selector/static
-
-      ACCOUNTS_JWT_SECRET: ${OCIS_METADATA_JWT_SECRET:-Pive-Fumkiu4}
-
       ACCOUNTS_STORAGE_BACKEND: cs3
       ACCOUNTS_STORAGE_CS3_PROVIDER_ADDR: storage-metadata:9215
-      ACCOUNTS_STORAGE_CS3_JWT_SECRET: ${OCIS_METADATA_JWT_SECRET:-Pive-Fumkiu4}
+
+      IDP_LDAP_BIND_PASSWORD: ${IDP_LDAP_BIND_PASSWORD:-idp}
+      STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
+
+      ACCOUNTS_JWT_SECRET: ${OCIS_METADATA_JWT_SECRET:-Pive-Fumkiu4}
+    volumes:
+      - ./config/accounts/entrypoint-override.sh:/entrypoint-override.sh
     logging:
       driver: "local"
     restart: always
@@ -136,7 +137,7 @@ services:
       GLAUTH_LDAP_ADDR: 0.0.0.0:9125
       GLAUTH_LDAPS_ADDR: 0.0.0.0:9126
 
-      GLAUTH_BACKEND_INSECURE: "true" # TODO: is there a way around it?
+      GLAUTH_BACKEND_INSECURE: "true"
     logging:
       driver: "local"
     restart: always
@@ -159,8 +160,7 @@ services:
       IDP_HTTP_ADDR: 0.0.0.0:9130
 
       IDP_LDAP_URI: ldap://glauth:9125
-      #IDP_LDAP_BIND_DN: #TODO: change
-      #IDP_LDAP_BIND_PASSWORD:
+      IDP_LDAP_BIND_PASSWORD: ${IDP_LDAP_BIND_PASSWORD:-idp}
 
       IDP_ISS: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       IDP_INSECURE: "${INSECURE:-false}"
@@ -215,9 +215,8 @@ services:
       SETTINGS_GRPC_ADDR: 0.0.0.0:9191
 
       SETTINGS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-    #TODO: settings should use the store!?
     volumes:
-      - "ocis-settings:/var/lib/ocis" #TODO: /settings"
+      - "ocis-settings:/var/lib/ocis"
     logging:
       driver: "local"
     restart: always
@@ -238,9 +237,8 @@ services:
       STORE_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       STORE_GRPC_ADDR: 0.0.0.0:9460
-    # TODO: what is the store used for?
     volumes:
-      - "ocis-settings:/var/lib/ocis" #TODO: /store"
+      - "ocis-settings:/var/lib/ocis"
     logging:
       driver: "local"
     restart: always
@@ -262,12 +260,12 @@ services:
 
       THUMBNAILS_GRPC_ADDR: 0.0.0.0:9185
 
-      THUMBNAILS_CS3SOURCE_INSECURE: "true" #TODO: is there a way around it?
+      THUMBNAILS_CS3SOURCE_INSECURE: "true"
       REVA_GATEWAY: storage-gateway:9142
 
-    # optional shared thumbnail cache between services
     volumes:
-      - "ocis-settings:/var/lib/ocis" #TODO /thumbnails"
+      # optional shared thumbnail cache between services
+      - "ocis-settings:/var/lib/ocis"
     logging:
       driver: "local"
     restart: always
@@ -296,7 +294,6 @@ services:
       driver: "local"
     restart: always
 
-  # TODO: this webdav service handles only thumbnails
   webdav:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
@@ -346,8 +343,6 @@ services:
       driver: "local"
     restart: always
 
-  # TODO: add graph-explorer
-
   storage-metadata:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
@@ -359,29 +354,24 @@ services:
       - storage-metadata
       - server
     environment:
-      OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}" #TODO: storage services don't have a dedicated log setting
+      OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
       OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      #TODO: what's that?
       STORAGE_HOME_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
 
       STORAGE_METADATA_GRPC_PROVIDER_ADDR: 0.0.0.0:9215
       STORAGE_METADATA_HTTP_ADDR: 0.0.0.0:9216
       STORAGE_METADATA_DATA_SERVER_URL: http://storage-metadata:9216/data
 
-      #TODO: for metadata this is a totally different JWT secret
-      OCIS_JWT_SECRET: ${OCIS_METADATA_JWT_SECRET:-Pive-Fumkiu4}
       STORAGE_JWT_SECRET: ${OCIS_METADATA_JWT_SECRET:-Pive-Fumkiu4}
-
-      #TODO: is this even needed for metadata
       STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
 
-      STORAGE_METADATA_DRIVER: ocis #TODO: switch to S3 ?
+      STORAGE_METADATA_DRIVER: ocis
 
       REVA_GATEWAY: storage-gateway:9142
     volumes:
-      - "ocis-storage-metadata:/var/lib/ocis" #TODO: /storage/metadata"
+      - "ocis-storage-metadata:/var/lib/ocis"
     logging:
       driver: "local"
     restart: always
@@ -502,7 +492,7 @@ services:
 
       STORAGE_USERS_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
 
-      STORAGE_USERS_DRIVER: ocis #TODO use s3?
+      STORAGE_USERS_DRIVER: ocis
 
       STORAGE_USERS_GRPC_ADDR: 0.0.0.0:9157
       STORAGE_USERS_ENDPOINT: storage-users:9157
@@ -514,7 +504,7 @@ services:
       STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       REVA_GATEWAY: storage-gateway:9142
     volumes:
-      - "ocis-storage-users:/var/lib/ocis" #TODO /storage/users"
+      - "ocis-storage-users:/var/lib/ocis"
     logging:
       driver: "local"
     restart: always
@@ -561,16 +551,15 @@ services:
       STORAGE_SHARING_ENDPOINT: storage-sharing:9150
       STORAGE_SHARING_GRPC_ADDR: 0.0.0.0:9150
 
-      # TODO: does this scale?
       STORAGE_SHARING_USER_DRIVER: json
-      STORAGE_SHARING_USER_JSON_FILE: /var/lib/ocis/storage/sharing/shares.json #TODO: enable subfolder to make volumes easier?
+      STORAGE_SHARING_USER_JSON_FILE: /var/lib/ocis/storage/sharing/shares.json
       STORAGE_SHARING_PUBLIC_DRIVER: json
       STORAGE_SHARING_PUBLIC_JSON_FILE: /var/lib/ocis/storage/sharing/publicshares.json
 
       STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       REVA_GATEWAY: storage-gateway:9142
     volumes:
-      - "ocis-storage-sharing:/var/lib/ocis" #TODO: /storage/sharing/"
+      - "ocis-storage-sharing:/var/lib/ocis"
     logging:
       driver: "local"
     restart: always
@@ -591,14 +580,13 @@ services:
       OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       STORAGE_USERPROVIDER_ENDPOINT: storage-userprovider:9144
-      STORAGE_USERPROVIDER_ADDR: 0.0.0.0:9144 # TODO: should reflect this is GRPC
+      STORAGE_USERPROVIDER_ADDR: 0.0.0.0:9144
 
       STORAGE_USERPROVIDER_DRIVER: ldap
       STORAGE_LDAP_HOSTNAME: glauth
       STORAGE_LDAP_PORT: 9126
-      STORAGE_LDAP_INSECURE: "true" #TODO trust the certificate of the ldap server
-      #STORAGE_LDAP_BIND_DN:
-      #STORAGE_LDAP_BIND_PASSWORD:
+      STORAGE_LDAP_INSECURE: "true"
+      STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
       STORAGE_LDAP_IDP: https://${OCIS_DOMAIN:-ocis.owncloud.test}
 
       STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
@@ -623,14 +611,13 @@ services:
       OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       STORAGE_GROUPPROVIDER_ENDPOINT: storage-groupprovider:9160
-      STORAGE_GROUPPROVIDER_ADDR: 0.0.0.0:9160 #TODO: name should reflect this is GRPC
+      STORAGE_GROUPPROVIDER_ADDR: 0.0.0.0:9160
 
       STORAGE_GROUPPROVIDER_DRIVER: ldap
       STORAGE_LDAP_HOSTNAME: glauth
       STORAGE_LDAP_PORT: 9126
-      STORAGE_LDAP_INSECURE: "true" #TODO trust the certificate of the ldap server
-      #STORAGE_LDAP_BIND_DN:
-      #STORAGE_LDAP_BIND_PASSWORD:
+      STORAGE_LDAP_INSECURE: "true"
+      STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
       STORAGE_LDAP_IDP: https://${OCIS_DOMAIN:-ocis.owncloud.test}
 
       STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
@@ -653,13 +640,6 @@ services:
       STORAGE_FRONTEND_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
       STORAGE_FRONTEND_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       STORAGE_FRONTEND_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
-
-      # todo: split this up in multiple services:
-      # - appprovider
-      # - archiver
-      # - datagateway
-      # - ocdav
-      # - ocs
 
       STORAGE_FRONTEND_APPPROVIDER_INSECURE: "true"
       STORAGE_FRONTEND_ARCHIVER_INSECURE: "true"
@@ -695,13 +675,9 @@ services:
 
       REVA_GATEWAY: storage-gateway:9142
 
-      # TODO: check naming of config options
-
-      # TODO: check connection pool in REVA
-
       STORAGE_USERS_ENDPOINT: storage-users:9157
 
-      STORAGE_PUBLIC_LINK_ENDPOINT: storage-publiclink:9178 #TODO: this serves a auth and storage provider!?
+      STORAGE_PUBLIC_LINK_ENDPOINT: storage-publiclink:9178
 
       STORAGE_AUTH_BASIC_ENDPOINT: storage-authbasic:9146
       STORAGE_AUTH_BEARER_ENDPOINT: storage-authbearer:9166
@@ -712,6 +688,7 @@ services:
 
       STORAGE_GROUPPROVIDER_ENDPOINT: storage-groupprovider:9160
       STORAGE_USERPROVIDER_ENDPOINT: storage-userprovider:9144
+      STORAGE_PERMISSIONS_ENDPOINT: settings:9191
 
       STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
 

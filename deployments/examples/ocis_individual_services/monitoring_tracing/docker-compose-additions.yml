@@ -2,38 +2,200 @@
 version: "3.7"
 
 services:
-  # TODO: split this into the respective services
-  ocis:
+  proxy:
     environment:
       # tracing
       OCIS_TRACING_ENABLED: "true"
       OCIS_TRACING_TYPE: jaeger
       OCIS_TRACING_ENDPOINT: jaeger-agent:6831
       # metrics
-      APP_PROVIDER_DEBUG_ADDR: 0.0.0.0:9165
-      GLAUTH_DEBUG_ADDR: 0.0.0.0:9129
-      GRAPH_DEBUG_ADDR: 0.0.0.0:9124
-      GRAPH_EXPLORER_DEBUG_ADDR: 0.0.0.0:9136
-      IDP_DEBUG_ADDR: 0.0.0.0:9134
-      OCS_DEBUG_ADDR: 0.0.0.0:9114
       PROXY_DEBUG_ADDR: 0.0.0.0:9205
+
+  accounts:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+
+  glauth:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+      GLAUTH_DEBUG_ADDR: 0.0.0.0:9129
+  idp:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+      IDP_DEBUG_ADDR: 0.0.0.0:9134
+  ocs:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+      OCS_DEBUG_ADDR: 0.0.0.0:9114
+  settings:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
       SETTINGS_DEBUG_ADDR: 0.0.0.0:9194
-      STORAGE_AUTH_BASIC_DEBUG_ADDR: 0.0.0.0:9147
-      STORAGE_AUTH_BEARER_DEBUG_ADDR: 0.0.0.0:9149
-      STORAGE_AUTH_MACHINE_DEBUG_ADDR: 0.0.0.0:9167
-      STORAGE_FRONTEND_DEBUG_ADDR: 0.0.0.0:9141
-      STORAGE_GATEWAY_DEBUG_ADDR: 0.0.0.0:9143
-      STORAGE_GROUPPROVIDER_DEBUG_ADDR: 0.0.0.0:9161
-      STORAGE_METADATA_DEBUG_ADDR: 0.0.0.0:9217
-      STORAGE_PUBLIC_LINK_DEBUG_ADDR: 0.0.0.0:9179
-      STORAGE_SHARES_DEBUG_ADDR: 0.0.0.0:9156
-      STORAGE_SHARING_DEBUG_ADDR: 0.0.0.0:9151
-      STORAGE_USERPROVIDER_DEBUG_ADDR: 0.0.0.0:9145
-      STORAGE_USERS_DEBUG_ADDR: 0.0.0.0:9159
+  store:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
       STORE_DEBUG_ADDR: 0.0.0.0:9464
+  thumbnails:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
       THUMBNAILS_DEBUG_ADDR: 0.0.0.0:9189
+  web:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
       WEB_DEBUG_ADDR: 0.0.0.0:9104
+  webdav:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
       WEBDAV_DEBUG_ADDR: 0.0.0.0:9119
+  graph:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+      GRAPH_DEBUG_ADDR: 0.0.0.0:9124
+  #graph-explorer:
+  #  environment:
+  #    # tracing
+  #    OCIS_TRACING_ENABLED: "true"
+  #    OCIS_TRACING_TYPE: jaeger
+  #    OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+  #    # metrics
+  #    GRAPH_EXPLORER_DEBUG_ADDR: 0.0.0.0:9136
+  storage-metadata:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+      STORAGE_METADATA_DEBUG_ADDR: 0.0.0.0:9217
+  storage-authbasic:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+      STORAGE_AUTH_BASIC_DEBUG_ADDR: 0.0.0.0:9147
+  storage-authmachine:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+      STORAGE_AUTH_MACHINE_DEBUG_ADDR: 0.0.0.0:9167
+  storage-authbearer:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+      STORAGE_AUTH_BEARER_DEBUG_ADDR: 0.0.0.0:9149
+  storage-shares:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+      STORAGE_SHARES_DEBUG_ADDR: 0.0.0.0:9156
+  storage-users:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+      STORAGE_USERS_DEBUG_ADDR: 0.0.0.0:9159
+  storage-publiclink:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+      STORAGE_PUBLIC_LINK_DEBUG_ADDR: 0.0.0.0:9179
+  storage-sharing:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+      STORAGE_SHARING_DEBUG_ADDR: 0.0.0.0:9151
+  storage-userprovider:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+      STORAGE_USERPROVIDER_DEBUG_ADDR: 0.0.0.0:9145
+  storage-groupprovider:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+      STORAGE_GROUPPROVIDER_DEBUG_ADDR: 0.0.0.0:9161
+  storage-frontend:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+      STORAGE_FRONTEND_DEBUG_ADDR: 0.0.0.0:9141
+  storage-gateway:
+    environment:
+      # tracing
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: jaeger
+      OCIS_TRACING_ENDPOINT: jaeger-agent:6831
+      # metrics
+      STORAGE_GATEWAY_DEBUG_ADDR: 0.0.0.0:9143
+      APP_PROVIDER_DEBUG_ADDR: 0.0.0.0:9165
 
 networks:
   ocis-net:
