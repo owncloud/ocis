@@ -107,6 +107,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 					revaCfg,
 					pidFile,
 					runtime.WithLogger(&logger.Logger),
+					runtime.WithContext(ctx),
 					runtime.WithRegistry(reg),
 					runtime.WithServiceName(serviceName),
 					runtime.WithServiceUUID(uuid.String()),

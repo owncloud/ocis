@@ -58,11 +58,13 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 					rcfg,
 					pidFile,
 					runtime.WithLogger(&logger.Logger),
+					runtime.WithContext(ctx),
 					runtime.WithRegistry(reg),
 					runtime.WithServiceName(serviceName),
 					runtime.WithServiceUUID(uuid.String()),
 					runtime.WithNameSpaceConfig(map[string]string{
-						//"grpc": "com.owncloud.api",
+						//TODO: which namespace to use??
+						// "grpc": "com.owncloud.api",
 						"grpc": "com.owncloud.storage",
 						"http": "com.owncloud.web",
 					}),

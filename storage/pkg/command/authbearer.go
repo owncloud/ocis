@@ -46,6 +46,7 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 					rcfg,
 					pidFile,
 					runtime.WithLogger(&logger.Logger),
+					runtime.WithContext(ctx),
 					runtime.WithRegistry(reg),
 					runtime.WithServiceName(serviceName),
 					runtime.WithServiceUUID(uuid.String()),
