@@ -54,7 +54,7 @@ An event can carry a payload which is encoded as json object. (See for example [
 
 #### Quality of Service
 
-Events are sent with "At most once" quality of service. That means, if a receiver is not present at the moment of publishing it might not receive the event. That requires that the receiver must have functionality to back up the situation that events were missed. Given that the event queue can be considered the backbone of the system, it is unlikely that it is not running.
+Events are sent with "At most once" quality of service. That means, if a receiver is not present at the moment of publishing it might not receive the event. That requires that the sender must have functionality to back up the situation that events were missed. Given that the event queue can be considered the backbone of the system, it is unlikely that it is not running.
 
 #### Transactions
 
