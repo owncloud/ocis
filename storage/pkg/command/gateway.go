@@ -15,12 +15,11 @@ import (
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	oreg "github.com/owncloud/ocis/ocis-pkg/registry"
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
-	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/storage/pkg/config"
 	"github.com/owncloud/ocis/storage/pkg/server/debug"
-	"github.com/owncloud/ocis/storage/pkg/service/external"
 	"github.com/owncloud/ocis/storage/pkg/tracing"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
@@ -58,23 +57,25 @@ func Gateway(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			gr.Add(func() error {
-				err := external.RegisterGRPCEndpoint(
-					ctx,
-					"com.owncloud.storage",
-					uuid.String(),
-					cfg.Reva.Gateway.GRPCAddr,
-					version.String,
-					logger,
-				)
+				//err := external.RegisterGRPCEndpoint(
+				//	ctx,
+				//	"com.owncloud.storage",
+				//	uuid.String(),
+				//	cfg.Reva.Gateway.GRPCAddr,
+				//	version.String,
+				//	logger,
+				//)
 
-				if err != nil {
-					return err
-				}
+				//if err != nil {
+				//	return err
+				//}
+				reg := oreg.GetRevaRegistry()
 
 				runtime.RunWithOptions(
 					rcfg,
 					pidFile,
 					runtime.WithLogger(&logger.Logger),
+					runtime.WithRegistry(reg),
 				)
 				return nil
 			}, func(_ error) {
