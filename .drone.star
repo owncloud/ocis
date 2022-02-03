@@ -1667,13 +1667,15 @@ def skipIfUnchanged(ctx, type):
 
 def example_deploys(ctx):
     latest_configs = [
-        "ocis_ldap/latest.yml",
-        "ocis_keycloak/latest.yml",
-        "ocis_traefik/latest.yml",
-        "ocis_wopi/latest.yml",
-        "ocis_hello/latest.yml",
-        "ocis_s3/latest.yml",
-        "oc10_ocis_parallel/latest.yml",
+        # TODO: reenable
+        #"ocis_ldap/latest.yml",
+        #"ocis_keycloak/latest.yml",
+        #"ocis_traefik/latest.yml",
+        #"ocis_wopi/latest.yml",
+        #"ocis_hello/latest.yml",
+        #"ocis_s3/latest.yml",
+        #"oc10_ocis_parallel/latest.yml",
+        "ocis_individual_services/latest.yml",
     ]
     released_configs = [
         "ocis_ldap/released.yml",
@@ -1746,6 +1748,7 @@ def deploy(ctx, config, rebuild):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/invidivial-services-deployment-example",  #TODO: remove
                 "refs/tags/v*",
             ],
         },
