@@ -1,6 +1,3 @@
-# Sharing tests currently doesn't work
-# Accessing oc10 shares from ocis still WIP in PR #2232
-# https://github.com/owncloud/ocis/pull/2232
 @api
 Feature: sharing files and folders
   As a user
@@ -22,7 +19,7 @@ Feature: sharing files and folders
   Scenario: accept a pending share
     Given user "Alice" has shared folder "/textfile.txt" with user "Brian"
     And using "ocis" as owncloud selector
-    When user "Brian" accepts share "/textfile.txt" offered by user "Alice" using the sharing API
+    When user "Brian" accepts share "/Shares/textfile.txt" offered by user "Alice" using the sharing API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
     And the sharing API should report to user "Brian" that these shares are in the accepted state
