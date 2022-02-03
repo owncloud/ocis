@@ -54,7 +54,7 @@ An event can carry a payload which is encoded as json object. (See for example [
 
 #### Quality of Service
 
-Events are sent with "At most once" quality of service. That means, if a receiver is not present at the moment of publishing it might not receive the event. That requires that the sender must have functionality to back up the situation that events were missed. Given that the event queue can be considered the backbone of the system, it is unlikely that it is not running.
+Events are sent with "At most once" quality of service. That means, if a receiver is not present at the moment of publishing it might not receive the event. That requires that the sender and the receiver must have functionality to back up the situation that events were missed. That adds more state to the services because they always need to behave like a [FISM](https://en.wikipedia.org/wiki/Finite-state_machine). Given that the event queue can be considered the backbone of the system, it is unlikely that it is not running.
 
 #### Transactions
 
@@ -79,6 +79,10 @@ If transactions are required, proper synchronous GRPC API calls should be used. 
 ### 2. Lightweight Events with Event Queue and "At-least once" QoS
 
 Exactly as described above, but with a higher service level quality.
+
+#### Quality of Service
+
+Events are sent with "At least once" quality of service. That means the events will remain in the queue until they are received by all receivers. This puts more responsability on the event bus and adds state to the events. Given that the event queue can be considered the backbone of the system, it is required to be running.
 
 #### Pros
 
