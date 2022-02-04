@@ -1,7 +1,7 @@
 ---
 title: "ocis.services.thumbnails.v0"
-url: /grpc_apis/ocis.services.thumbnails.v0
-date: 2022-02-04T10:34:48Z
+url: /grpc_apis/ocis_services_thumbnails_v0
+date: 2022-02-04T11:18:46Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
@@ -22,8 +22,8 @@ A request to retrieve a thumbnail
 | thumbnail_type | [GetThumbnailRequest.ThumbnailType](#getthumbnailrequestthumbnailtype) |  | The type to which the thumbnail should get encoded to. |
 | width | [int32](#int32) |  | The width of the thumbnail |
 | height | [int32](#int32) |  | The height of the thumbnail |
-| webdav_source | [ocis.messages.thumbnails.v0.WebdavSource](/grpc_apis/ocis.messages.thumbnails.v0/#webdavsource) |  |  |
-| cs3_source | [ocis.messages.thumbnails.v0.CS3Source](/grpc_apis/ocis.messages.thumbnails.v0/#cs3source) |  |  |
+| webdav_source | [ocis.messages.thumbnails.v0.WebdavSource](/grpc_apis/ocis_messages_thumbnails_v0/#webdavsource) |  |  |
+| cs3_source | [ocis.messages.thumbnails.v0.CS3Source](/grpc_apis/ocis_messages_thumbnails_v0/#cs3source) |  |  |
 
 ### GetThumbnailResponse
 

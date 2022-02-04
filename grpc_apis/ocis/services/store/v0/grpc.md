@@ -1,7 +1,7 @@
 ---
 title: "ocis.services.store.v0"
-url: /grpc_apis/ocis.services.store.v0
-date: 2022-02-04T10:34:48Z
+url: /grpc_apis/ocis_services_store_v0
+date: 2022-02-04T11:18:46Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
@@ -32,7 +32,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | key | [string](#string) |  |  |
-| options | [ocis.messages.store.v0.DeleteOptions](/grpc_apis/ocis.messages.store.v0/#deleteoptions) |  |  |
+| options | [ocis.messages.store.v0.DeleteOptions](/grpc_apis/ocis_messages_store_v0/#deleteoptions) |  |  |
 
 ### DeleteResponse
 
@@ -45,7 +45,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| options | [ocis.messages.store.v0.ListOptions](/grpc_apis/ocis.messages.store.v0/#listoptions) |  |  |
+| options | [ocis.messages.store.v0.ListOptions](/grpc_apis/ocis_messages_store_v0/#listoptions) |  |  |
 
 ### ListResponse
 
@@ -62,7 +62,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | key | [string](#string) |  |  |
-| options | [ocis.messages.store.v0.ReadOptions](/grpc_apis/ocis.messages.store.v0/#readoptions) |  |  |
+| options | [ocis.messages.store.v0.ReadOptions](/grpc_apis/ocis_messages_store_v0/#readoptions) |  |  |
 
 ### ReadResponse
 
@@ -70,7 +70,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| records | [ocis.messages.store.v0.Record](/grpc_apis/ocis.messages.store.v0/#record) | repeated |  |
+| records | [ocis.messages.store.v0.Record](/grpc_apis/ocis_messages_store_v0/#record) | repeated |  |
 
 ### TablesRequest
 
@@ -94,8 +94,8 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| record | [ocis.messages.store.v0.Record](/grpc_apis/ocis.messages.store.v0/#record) |  |  |
-| options | [ocis.messages.store.v0.WriteOptions](/grpc_apis/ocis.messages.store.v0/#writeoptions) |  |  |
+| record | [ocis.messages.store.v0.Record](/grpc_apis/ocis_messages_store_v0/#record) |  |  |
+| options | [ocis.messages.store.v0.WriteOptions](/grpc_apis/ocis_messages_store_v0/#writeoptions) |  |  |
 
 ### WriteResponse
 

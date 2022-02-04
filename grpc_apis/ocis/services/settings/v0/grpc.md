@@ -1,7 +1,7 @@
 ---
 title: "ocis.services.settings.v0"
-url: /grpc_apis/ocis.services.settings.v0
-date: 2022-02-04T10:34:48Z
+url: /grpc_apis/ocis_services_settings_v0
+date: 2022-02-04T11:18:46Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
@@ -19,7 +19,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | bundle_id | [string](#string) |  |  |
-| setting | [ocis.messages.settings.v0.Setting](/grpc_apis/ocis.messages.settings.v0/#setting) |  |  |
+| setting | [ocis.messages.settings.v0.Setting](/grpc_apis/ocis_messages_settings_v0/#setting) |  |  |
 
 ### AddSettingToBundleResponse
 
@@ -27,7 +27,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| setting | [ocis.messages.settings.v0.Setting](/grpc_apis/ocis.messages.settings.v0/#setting) |  |  |
+| setting | [ocis.messages.settings.v0.Setting](/grpc_apis/ocis_messages_settings_v0/#setting) |  |  |
 
 ### AssignRoleToUserRequest
 
@@ -44,7 +44,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| assignment | [ocis.messages.settings.v0.UserRoleAssignment](/grpc_apis/ocis.messages.settings.v0/#userroleassignment) |  |  |
+| assignment | [ocis.messages.settings.v0.UserRoleAssignment](/grpc_apis/ocis_messages_settings_v0/#userroleassignment) |  |  |
 
 ### GetBundleRequest
 
@@ -60,7 +60,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| bundle | [ocis.messages.settings.v0.Bundle](/grpc_apis/ocis.messages.settings.v0/#bundle) |  |  |
+| bundle | [ocis.messages.settings.v0.Bundle](/grpc_apis/ocis_messages_settings_v0/#bundle) |  |  |
 
 ### GetPermissionByIDRequest
 
@@ -76,7 +76,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| permission | [ocis.messages.settings.v0.Permission](/grpc_apis/ocis.messages.settings.v0/#permission) |  |  |
+| permission | [ocis.messages.settings.v0.Permission](/grpc_apis/ocis_messages_settings_v0/#permission) |  |  |
 
 ### GetValueByUniqueIdentifiersRequest
 
@@ -101,7 +101,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| value | [ocis.messages.settings.v0.ValueWithIdentifier](/grpc_apis/ocis.messages.settings.v0/#valuewithidentifier) |  |  |
+| value | [ocis.messages.settings.v0.ValueWithIdentifier](/grpc_apis/ocis_messages_settings_v0/#valuewithidentifier) |  |  |
 
 ### ListBundlesRequest
 
@@ -117,7 +117,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| bundles | [ocis.messages.settings.v0.Bundle](/grpc_apis/ocis.messages.settings.v0/#bundle) | repeated |  |
+| bundles | [ocis.messages.settings.v0.Bundle](/grpc_apis/ocis_messages_settings_v0/#bundle) | repeated |  |
 
 ### ListPermissionsByResourceRequest
 
@@ -125,7 +125,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| resource | [ocis.messages.settings.v0.Resource](/grpc_apis/ocis.messages.settings.v0/#resource) |  |  |
+| resource | [ocis.messages.settings.v0.Resource](/grpc_apis/ocis_messages_settings_v0/#resource) |  |  |
 
 ### ListPermissionsByResourceResponse
 
@@ -133,7 +133,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| permissions | [ocis.messages.settings.v0.Permission](/grpc_apis/ocis.messages.settings.v0/#permission) | repeated |  |
+| permissions | [ocis.messages.settings.v0.Permission](/grpc_apis/ocis_messages_settings_v0/#permission) | repeated |  |
 
 ### ListRoleAssignmentsRequest
 
@@ -149,7 +149,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| assignments | [ocis.messages.settings.v0.UserRoleAssignment](/grpc_apis/ocis.messages.settings.v0/#userroleassignment) | repeated |  |
+| assignments | [ocis.messages.settings.v0.UserRoleAssignment](/grpc_apis/ocis_messages_settings_v0/#userroleassignment) | repeated |  |
 
 ### ListValuesRequest
 
@@ -166,7 +166,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| values | [ocis.messages.settings.v0.ValueWithIdentifier](/grpc_apis/ocis.messages.settings.v0/#valuewithidentifier) | repeated |  |
+| values | [ocis.messages.settings.v0.ValueWithIdentifier](/grpc_apis/ocis_messages_settings_v0/#valuewithidentifier) | repeated |  |
 
 ### RemoveRoleFromUserRequest
 
@@ -193,7 +193,7 @@ requests and responses for settings bundles
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| bundle | [ocis.messages.settings.v0.Bundle](/grpc_apis/ocis.messages.settings.v0/#bundle) |  |  |
+| bundle | [ocis.messages.settings.v0.Bundle](/grpc_apis/ocis_messages_settings_v0/#bundle) |  |  |
 
 ### SaveBundleResponse
 
@@ -201,7 +201,7 @@ requests and responses for settings bundles
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| bundle | [ocis.messages.settings.v0.Bundle](/grpc_apis/ocis.messages.settings.v0/#bundle) |  |  |
+| bundle | [ocis.messages.settings.v0.Bundle](/grpc_apis/ocis_messages_settings_v0/#bundle) |  |  |
 
 ### SaveValueRequest
 
@@ -209,7 +209,7 @@ requests and responses for settings bundles
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| value | [ocis.messages.settings.v0.Value](/grpc_apis/ocis.messages.settings.v0/#value) |  |  |
+| value | [ocis.messages.settings.v0.Value](/grpc_apis/ocis_messages_settings_v0/#value) |  |  |
 
 ### SaveValueResponse
 
@@ -217,7 +217,7 @@ requests and responses for settings bundles
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| value | [ocis.messages.settings.v0.ValueWithIdentifier](/grpc_apis/ocis.messages.settings.v0/#valuewithidentifier) |  |  |
+| value | [ocis.messages.settings.v0.ValueWithIdentifier](/grpc_apis/ocis_messages_settings_v0/#valuewithidentifier) |  |  |
 
 
 ### BundleService

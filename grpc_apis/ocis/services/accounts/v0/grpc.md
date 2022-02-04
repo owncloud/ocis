@@ -1,7 +1,7 @@
 ---
 title: "ocis.services.accounts.v0"
-url: /grpc_apis/ocis.services.accounts.v0
-date: 2022-02-04T10:34:48Z
+url: /grpc_apis/ocis_services_accounts_v0
+date: 2022-02-04T11:18:46Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
@@ -27,7 +27,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| account | [ocis.messages.accounts.v0.Account](/grpc_apis/ocis.messages.accounts.v0/#account) |  | The account resource to create |
+| account | [ocis.messages.accounts.v0.Account](/grpc_apis/ocis_messages_accounts_v0/#account) |  | The account resource to create |
 
 ### CreateGroupRequest
 
@@ -35,7 +35,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| group | [ocis.messages.accounts.v0.Group](/grpc_apis/ocis.messages.accounts.v0/#group) |  | The account resource to create |
+| group | [ocis.messages.accounts.v0.Group](/grpc_apis/ocis_messages_accounts_v0/#group) |  | The account resource to create |
 
 ### DeleteAccountRequest
 
@@ -86,7 +86,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| accounts | [ocis.messages.accounts.v0.Account](/grpc_apis/ocis.messages.accounts.v0/#account) | repeated | The field name should match the noun "accounts" in the method name.  There<br>will be a maximum number of items returned based on the page_size field<br>in the request |
+| accounts | [ocis.messages.accounts.v0.Account](/grpc_apis/ocis_messages_accounts_v0/#account) | repeated | The field name should match the noun "accounts" in the method name.  There<br>will be a maximum number of items returned based on the page_size field<br>in the request |
 | next_page_token | [string](#string) |  | Token to retrieve the next page of results, or empty if there are no<br>more results in the list |
 
 ### ListGroupsRequest
@@ -106,7 +106,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| groups | [ocis.messages.accounts.v0.Group](/grpc_apis/ocis.messages.accounts.v0/#group) | repeated | The field name should match the noun "group" in the method name.  There<br>will be a maximum number of items returned based on the page_size field<br>in the request |
+| groups | [ocis.messages.accounts.v0.Group](/grpc_apis/ocis_messages_accounts_v0/#group) | repeated | The field name should match the noun "group" in the method name.  There<br>will be a maximum number of items returned based on the page_size field<br>in the request |
 | next_page_token | [string](#string) |  | Token to retrieve the next page of results, or empty if there are no<br>more results in the list |
 
 ### ListMembersRequest
@@ -127,7 +127,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| members | [ocis.messages.accounts.v0.Account](/grpc_apis/ocis.messages.accounts.v0/#account) | repeated | The field name should match the noun "members" in the method name.  There<br>will be a maximum number of items returned based on the page_size field<br>in the request |
+| members | [ocis.messages.accounts.v0.Account](/grpc_apis/ocis_messages_accounts_v0/#account) | repeated | The field name should match the noun "members" in the method name.  There<br>will be a maximum number of items returned based on the page_size field<br>in the request |
 | next_page_token | [string](#string) |  | Token to retrieve the next page of results, or empty if there are no<br>more results in the list |
 
 ### RebuildIndexRequest
@@ -155,7 +155,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| account | [ocis.messages.accounts.v0.Account](/grpc_apis/ocis.messages.accounts.v0/#account) |  | The account resource which replaces the resource on the server |
+| account | [ocis.messages.accounts.v0.Account](/grpc_apis/ocis_messages_accounts_v0/#account) |  | The account resource which replaces the resource on the server |
 | update_mask | [google.protobuf.FieldMask](#googleprotobuffieldmask) |  | The update mask applies to the resource. For the `FieldMask` definition,<br>see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask |
 
 ### UpdateGroupRequest
@@ -164,7 +164,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| group | [ocis.messages.accounts.v0.Group](/grpc_apis/ocis.messages.accounts.v0/#group) |  | The group resource which replaces the resource on the server |
+| group | [ocis.messages.accounts.v0.Group](/grpc_apis/ocis_messages_accounts_v0/#group) |  | The group resource which replaces the resource on the server |
 | update_mask | [google.protobuf.FieldMask](#googleprotobuffieldmask) |  | The update mask applies to the resource. For the `FieldMask` definition,<br>see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask |
 
 
@@ -177,9 +177,9 @@ https://cloud.google.com/apis/design/naming_convention?hl=de
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | ListAccounts | [ListAccountsRequest](#listaccountsrequest) | [ListAccountsResponse](#listaccountsresponse) | Lists accounts |
-| GetAccount | [GetAccountRequest](#getaccountrequest) | [.ocis.messages.accounts.v0.Account](/grpc_apis/ocis.messages.accounts.v0/#account) | Gets an account |
-| CreateAccount | [CreateAccountRequest](#createaccountrequest) | [.ocis.messages.accounts.v0.Account](/grpc_apis/ocis.messages.accounts.v0/#account) | Creates an account |
-| UpdateAccount | [UpdateAccountRequest](#updateaccountrequest) | [.ocis.messages.accounts.v0.Account](/grpc_apis/ocis.messages.accounts.v0/#account) | Updates an account |
+| GetAccount | [GetAccountRequest](#getaccountrequest) | [.ocis.messages.accounts.v0.Account](/grpc_apis/ocis_messages_accounts_v0/#account) | Gets an account |
+| CreateAccount | [CreateAccountRequest](#createaccountrequest) | [.ocis.messages.accounts.v0.Account](/grpc_apis/ocis_messages_accounts_v0/#account) | Creates an account |
+| UpdateAccount | [UpdateAccountRequest](#updateaccountrequest) | [.ocis.messages.accounts.v0.Account](/grpc_apis/ocis_messages_accounts_v0/#account) | Updates an account |
 | DeleteAccount | [DeleteAccountRequest](#deleteaccountrequest) | [.google.protobuf.Empty](#googleprotobufempty) | Deletes an account |
 
 ### GroupsService
@@ -189,12 +189,12 @@ https://cloud.google.com/apis/design/naming_convention?hl=de
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | ListGroups | [ListGroupsRequest](#listgroupsrequest) | [ListGroupsResponse](#listgroupsresponse) | Lists groups |
-| GetGroup | [GetGroupRequest](#getgrouprequest) | [.ocis.messages.accounts.v0.Group](/grpc_apis/ocis.messages.accounts.v0/#group) | Gets an groups |
-| CreateGroup | [CreateGroupRequest](#creategrouprequest) | [.ocis.messages.accounts.v0.Group](/grpc_apis/ocis.messages.accounts.v0/#group) | Creates a group |
-| UpdateGroup | [UpdateGroupRequest](#updategrouprequest) | [.ocis.messages.accounts.v0.Group](/grpc_apis/ocis.messages.accounts.v0/#group) | Updates a group |
+| GetGroup | [GetGroupRequest](#getgrouprequest) | [.ocis.messages.accounts.v0.Group](/grpc_apis/ocis_messages_accounts_v0/#group) | Gets an groups |
+| CreateGroup | [CreateGroupRequest](#creategrouprequest) | [.ocis.messages.accounts.v0.Group](/grpc_apis/ocis_messages_accounts_v0/#group) | Creates a group |
+| UpdateGroup | [UpdateGroupRequest](#updategrouprequest) | [.ocis.messages.accounts.v0.Group](/grpc_apis/ocis_messages_accounts_v0/#group) | Updates a group |
 | DeleteGroup | [DeleteGroupRequest](#deletegrouprequest) | [.google.protobuf.Empty](#googleprotobufempty) | Deletes a group |
-| AddMember | [AddMemberRequest](#addmemberrequest) | [.ocis.messages.accounts.v0.Group](/grpc_apis/ocis.messages.accounts.v0/#group) | group:addmember https://docs.microsoft.com/en-us/graph/api/group-post-members?view=graph-rest-1.0&tabs=http |
-| RemoveMember | [RemoveMemberRequest](#removememberrequest) | [.ocis.messages.accounts.v0.Group](/grpc_apis/ocis.messages.accounts.v0/#group) | group:removemember https://docs.microsoft.com/en-us/graph/api/group-delete-members?view=graph-rest-1.0 |
+| AddMember | [AddMemberRequest](#addmemberrequest) | [.ocis.messages.accounts.v0.Group](/grpc_apis/ocis_messages_accounts_v0/#group) | group:addmember https://docs.microsoft.com/en-us/graph/api/group-post-members?view=graph-rest-1.0&tabs=http |
+| RemoveMember | [RemoveMemberRequest](#removememberrequest) | [.ocis.messages.accounts.v0.Group](/grpc_apis/ocis_messages_accounts_v0/#group) | group:removemember https://docs.microsoft.com/en-us/graph/api/group-delete-members?view=graph-rest-1.0 |
 | ListMembers | [ListMembersRequest](#listmembersrequest) | [ListMembersResponse](#listmembersresponse) | group:listmembers https://docs.microsoft.com/en-us/graph/api/group-list-members?view=graph-rest-1.0 |
 
 ### IndexService
