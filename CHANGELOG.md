@@ -16,6 +16,7 @@ The following sections list the changes for unreleased.
 * Change - Change log level default from debug to error: [#3071](https://github.com/owncloud/ocis/pull/3071)
 * Change - Remove the ownCloud storage driver: [#3072](https://github.com/owncloud/ocis/pull/3072)
 * Change - Unify configuration and commands: [#2818](https://github.com/owncloud/ocis/pull/2818)
+* Change - Functionality to restore spaces: [#3092](https://github.com/owncloud/ocis/pull/3092)
 * Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 * Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
 * Change - Return not found when updating non existent space: [#2869](https://github.com/cs3org/reva/pull/2869)
@@ -106,6 +107,13 @@ The following sections list the changes for unreleased.
    separate mapping.
 
    https://github.com/owncloud/ocis/pull/2818
+
+* Change - Functionality to restore spaces: [#3092](https://github.com/owncloud/ocis/pull/3092)
+
+   Disabled spaces can now be restored via the graph api. An information was added to the root item
+   of each space when it is deleted
+
+   https://github.com/owncloud/ocis/pull/3092
 
 * Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 
