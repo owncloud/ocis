@@ -1764,5 +1764,11 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3NG_BUCKET"},
 			Destination: &cfg.Reva.MetadataStorage.S3NG.Bucket,
 		},
+
+		// permissions
+		{
+			EnvVars:     []string{"STORAGE_PERMISSIONS_ENDPOINT"},
+			Destination: &cfg.Reva.Permissions.Endpoint,
+		},
 	}
 }
