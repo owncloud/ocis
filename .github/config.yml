@@ -7,6 +7,9 @@ updateDocsWhiteList:
   - Tests-only
   - tests-only
   - Tests-Only
+  - docs-only
+  - docs-Only
+  - Docs-Only
 
 updateDocsTargetFiles:
   - changelog/unreleased/
