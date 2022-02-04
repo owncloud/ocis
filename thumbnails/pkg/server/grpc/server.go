@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
 	svc "github.com/owncloud/ocis/thumbnails/pkg/service/v0"
+	"github.com/owncloud/ocis/thumbnails/pkg/service/v0/decorators"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/storage"
 )
@@ -30,7 +31,7 @@ func NewService(opts ...Option) grpc.Service {
 		options.Logger.Error().Err(err).Msg("could not get gateway client")
 		return grpc.Service{}
 	}
-	var thumbnail thumbnailssvc.ThumbnailServiceHandler
+	var thumbnail decorators.DecoratedService
 	{
 		thumbnail = svc.NewService(
 			svc.Config(options.Config),
@@ -45,9 +46,9 @@ func NewService(opts ...Option) grpc.Service {
 			svc.CS3Source(imgsource.NewCS3Source(tconf, gc)),
 			svc.CS3Client(gc),
 		)
-		thumbnail = svc.NewInstrument(thumbnail, options.Metrics)
-		thumbnail = svc.NewLogging(thumbnail, options.Logger)
-		thumbnail = svc.NewTracing(thumbnail)
+		thumbnail = decorators.NewInstrument(thumbnail, options.Metrics)
+		thumbnail = decorators.NewLogging(thumbnail, options.Logger)
+		thumbnail = decorators.NewTracing(thumbnail)
 	}
 
 	_ = thumbnailssvc.RegisterThumbnailServiceHandler(

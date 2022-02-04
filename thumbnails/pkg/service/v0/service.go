@@ -14,6 +14,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
 	"github.com/owncloud/ocis/thumbnails/pkg/preprocessor"
+	"github.com/owncloud/ocis/thumbnails/pkg/service/v0/decorators"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"
 	"github.com/pkg/errors"
@@ -22,7 +23,7 @@ import (
 )
 
 // NewService returns a service implementation for Service.
-func NewService(opts ...Option) thumbnailssvc.ThumbnailServiceHandler {
+func NewService(opts ...Option) decorators.DecoratedService {
 	options := newOptions(opts...)
 	logger := options.Logger
 	resolutions, err := thumbnail.ParseResolutions(options.Config.Thumbnail.Resolutions)
