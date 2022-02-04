@@ -1,7 +1,7 @@
 ---
 {{- $package := (index .Files 0).Package }}
 title: "{{ $package }}"
-url: /grpc_apis/{{ $package }}
+url: /grpc_apis/{{ $package | replace "." "_" }}
 date: {{ now | date "2006-01-02T15:04:05Z07:00" }}
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
@@ -27,7 +27,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 {{- $loca := printf "#%s" (.LongType | lower | replace "." "") -}}
 {{- if and (hasPrefix "ocis." .LongType) (ge (len $filenameParts) 3) -}}
 	{{- $ltypeSpl := .LongType | splitList "." -}}
-	{{- $ltypePkg := slice $ltypeSpl 0 (sub (len $ltypeSpl) 1) | join "." -}}
+	{{- $ltypePkg := slice $ltypeSpl 0 (sub (len $ltypeSpl) 1) | join "_" -}}
 	{{- $loca = printf "/grpc_apis/%s/#%s" $ltypePkg (.Type | lower) -}}
 {{- end -}}
 | {{.Name}} | [{{.LongType}}]({{ $loca }}) | {{.Label}} | {{ .Description | replace "\n" "<br>" }}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end }} |
@@ -74,12 +74,12 @@ geekdocRepo: https://github.com/owncloud/ocis
 {{- $respLoca := printf "#%s" (.ResponseLongType | lower | replace "." "") -}}
 {{- if and (hasPrefix ".ocis." .RequestLongType) (ge (len $filenameParts) 3) }}
 	{{- $ltypeSpl := .RequestLongType | substr 1 -1 | splitList "." -}}
-	{{- $ltypePkg := slice $ltypeSpl 0 (sub (len $ltypeSpl) 1) | join "." -}}
+	{{- $ltypePkg := slice $ltypeSpl 0 (sub (len $ltypeSpl) 1) | join "_" -}}
 	{{- $reqLoca = printf "/grpc_apis/%s/#%s" $ltypePkg (.RequestType | lower) -}}
 {{- end -}}
 {{- if and (hasPrefix ".ocis." .ResponseLongType) (ge (len $filenameParts) 3) }}
 	{{- $ltypeSpl := .ResponseLongType | substr 1 -1 | splitList "." -}}
-	{{- $ltypePkg := slice $ltypeSpl 0 (sub (len $ltypeSpl) 1) | join "." -}}
+	{{- $ltypePkg := slice $ltypeSpl 0 (sub (len $ltypeSpl) 1) | join "_" -}}
 	{{- $respLoca = printf "/grpc_apis/%s/#%s" $ltypePkg (.ResponseType | lower) -}}
 {{- end -}}
 | {{.Name}} | [{{.RequestLongType}}]({{ $reqLoca }}){{if .RequestStreaming}} stream{{end}} | [{{.ResponseLongType}}]({{ $respLoca }}){{if .ResponseStreaming}} stream{{end}} | {{ .Description | replace "\n" "<br>" }} |
