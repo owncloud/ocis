@@ -1046,7 +1046,6 @@ API, search, favorites, config, capabilities, not existing endpoints, CORS and o
 #### [Ability to return error messages in Webdav response bodies](https://github.com/owncloud/ocis/issues/1293)
 -   [apiAuthOcs/ocsDELETEAuth.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsDELETEAuth.feature#L10) Scenario: send DELETE requests to OCS endpoints as admin with wrong password
 -   [apiAuthOcs/ocsGETAuth.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L10) Scenario: using OCS anonymously
--   [apiAuthOcs/ocsGETAuth.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L33) Scenario: ocs config end point accessible by unauthorized users
 -   [apiAuthOcs/ocsGETAuth.feature:53](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L53) Scenario: using OCS with non-admin basic auth
 -   [apiAuthOcs/ocsGETAuth.feature:88](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L88) Scenario: using OCS as normal user with wrong password
 -   [apiAuthOcs/ocsGETAuth.feature:121](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L121) Scenario:using OCS with admin basic auth
@@ -1587,14 +1586,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiWebdavOperations/downloadFile.feature:170](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L170)
 
 #### [Creating a new folder which is a substring of Shares leads to Unknown Error](https://github.com/owncloud/ocis/issues/3033)
-- [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L27)
-- [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L29)
-- [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L30)
-- [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L32)
-- [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:52](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L52)
-- [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:55](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L55)
-- [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:73](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L73)
-- [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:74](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L74)
 - [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:79](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L79)
 - [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:96](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L96)
 
