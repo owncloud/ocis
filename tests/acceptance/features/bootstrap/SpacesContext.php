@@ -1482,4 +1482,56 @@ class SpacesContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @When /^user "([^"]*)" restores a disabled space "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function sendRestoreSpaceRequest(
+		string $user,
+		string $spaceName
+	): void {
+		$header = ["restore" => true];
+		$body = '{}';
+		$space = $this->getSpaceByName($user, $spaceName);
+		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/" . $space["id"];
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				"",
+				'PATCH',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$header,
+				$body
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" has restored a disabled space "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasRestoredSpaceRequest(
+		string $user,
+		string $spaceName
+	): void {
+		$this->sendRestoreSpaceRequest($user, $spaceName);
+		$expectedHTTPStatus = "200";
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+            $expectedHTTPStatus,
+			"Expected response status code should be $expectedHTTPStatus"
+		);
+	}
 }
