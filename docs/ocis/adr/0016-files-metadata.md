@@ -36,7 +36,7 @@ Chosen option: "Extended File Attributes", because we guarantee the consistency 
 ### Negative consequences
 
 * The storage inside extended file attributes has limits
-* Changes to extended attributes are not atomic
+* Changes to extended attributes are not atomic and need file locks
 
 ## Pros and Cons of the Options <!-- optional -->
 
@@ -70,3 +70,11 @@ We could store metadata in a metadata file next to the file content which has a 
 * Good, because there is more freedom to the content format
 * Bad, because it doubles the amount of read / write operations
 * Bad, because it needs additional measures against concurrent overwriting changes
+
+### Link metadata with an id in the extended attributes
+
+To link metadata to file content a single extended attribute with a file id (unique per storage space) is sufficient. This would also allow putting metadata in better suited storage systems like SQLite or a key value store.
+
+* Good, because it avoids extended attribute limits
+* Good, because the same mechanism could be used to look up files by id, when the underlying filesystem is an existing POSIX filesystem.
+* Bad, because backup needs to cover the metadata as well. Could be mitigated by sharing metadata per space and doing space wide snapshots.
