@@ -1100,39 +1100,36 @@ _ocdav: api compatibility, return correct status code_
 -   [apiCapabilities/capabilitiesWithNormalUser.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilitiesWithNormalUser.feature#L11) Scenario: getting default capabilities with normal user
 
 #### [REPORT request not implemented](https://github.com/owncloud/ocis/issues/1330)
-Scenario Outline: search for entry by pattern
 -   [apiWebdavOperations/search.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L42)
 -   [apiWebdavOperations/search.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L43)
-    Scenario Outline: search for entries by only some letters from the middle of the entry name
--   [apiWebdavOperations/search.feature:58](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L58)
--   [apiWebdavOperations/search.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L59)
-    Scenario Outline: search for files by extension
--   [apiWebdavOperations/search.feature:75](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L75)
--   [apiWebdavOperations/search.feature:76](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L76)
-    Scenario Outline: search with empty field
--   [apiWebdavOperations/search.feature:84](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L84)
--   [apiWebdavOperations/search.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L85)
-    Scenario Outline: limit returned search entries
+-   [apiWebdavOperations/search.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L48)
+-   [apiWebdavOperations/search.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L58)
+-   [apiWebdavOperations/search.feature:54](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L59)
+-   [apiWebdavOperations/search.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L70)
+-   [apiWebdavOperations/search.feature:87](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L87)
+-   [apiWebdavOperations/search.feature:88](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L88)
+-   [apiWebdavOperations/search.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L93)
 -   [apiWebdavOperations/search.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L102)
 -   [apiWebdavOperations/search.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L103)
-    Scenario Outline: limit returned search entries to only 1 entry
--   [apiWebdavOperations/search.feature:120](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L120)
--   [apiWebdavOperations/search.feature:121](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L121)
-    Scenario Outline: limit returned search entries to more entires than there are
--   [apiWebdavOperations/search.feature:139](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L139)
--   [apiWebdavOperations/search.feature:140](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L140)
-    Scenario Outline: report extra properties in search entries for a file
--   [apiWebdavOperations/search.feature:166](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L166)
--   [apiWebdavOperations/search.feature:167](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L167)
-    Scenario Outline: report extra properties in search entries for a folder
--   [apiWebdavOperations/search.feature:192](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L192)
--   [apiWebdavOperations/search.feature:193](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L193)
-    Scenario Outline: search for entry with emoji by pattern
--   [apiWebdavOperations/search.feature:211](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L211)
--   [apiWebdavOperations/search.feature:212](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L212)
--   [apiWebdavOperations/search.feature:214](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L214) Scenario: search for entry by tags using REPORT method
--   [apiWebdavOperations/search.feature:230](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L230) Scenario: share a tagged resource to another internal user and sharee searches for tag using REPORT method
--   [apiWebdavOperations/search.feature:255](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L255) Scenario: search for entries across various folders by tags using REPORT method
+-   [apiWebdavOperations/search.feature:108](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L108)
+-   [apiWebdavOperations/search.feature:126](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L126)
+-   [apiWebdavOperations/search.feature:127](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L127)
+-   [apiWebdavOperations/search.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L132)
+-   [apiWebdavOperations/search.feature:150](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L150)
+-   [apiWebdavOperations/search.feature:151](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L151)
+-   [apiWebdavOperations/search.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L156)
+-   [apiWebdavOperations/search.feature:174](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L174)
+-   [apiWebdavOperations/search.feature:175](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L175)
+-   [apiWebdavOperations/search.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L180)
+-   [apiWebdavOperations/search.feature:207](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L207)
+-   [apiWebdavOperations/search.feature:208](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L208)
+-   [apiWebdavOperations/search.feature:213](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L213)
+-   [apiWebdavOperations/search.feature:239](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L239)
+-   [apiWebdavOperations/search.feature:240](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L240)
+-   [apiWebdavOperations/search.feature:245](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L245)
+-   [apiWebdavOperations/search.feature:264](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L264)
+-   [apiWebdavOperations/search.feature:265](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L265)
+-   [apiWebdavOperations/search.feature:270](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L270)
 
 And other missing implementation of favorites
 -   [apiFavorites/favorites.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L158)
@@ -1390,6 +1387,10 @@ Scenario Outline: Unauthenticated call
 -   [apiTranslation/translation.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L26)
 -   [apiTranslation/translation.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L27)
 -   [apiTranslation/translation.feature:28](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L28)
+-   [apiTranslation/translation.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L33)
+-   [apiTranslation/translation.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L34)
+-   [apiTranslation/translation.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L35)
+-   [apiTranslation/translation.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L36)
 
 #### [Request to edit non-existing user by authorized admin gets unauthorized in http response](https://github.com/owncloud/core/issues/38423)
 -   [apiAuthOcs/ocsPUTAuth.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsPUTAuth.feature#L26)
@@ -1582,8 +1583,9 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 -   [apiShareOperationsToShares2/shareAccessByID.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L125)
 
 #### [Content-type is not multipart/byteranges when downloading file with Range Header](https://github.com/owncloud/ocis/issues/2677)
--   [apiWebdavOperations/downloadFile.feature:169](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L169)
--   [apiWebdavOperations/downloadFile.feature:170](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L170)
+-   [apiWebdavOperations/downloadFile.feature:222](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L222)
+-   [apiWebdavOperations/downloadFile.feature:223](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L223)
+-   [apiWebdavOperations/downloadFile.feature:228](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L228)
 
 #### [Creating a new folder which is a substring of Shares leads to Unknown Error](https://github.com/owncloud/ocis/issues/3033)
 -   [apiWebdavProperties1/createFileFolderWhenSharesExist.feature:79](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/createFileFolderWhenSharesExist.feature#L79)
@@ -1605,6 +1607,14 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 -   [apiWebdavUploadTUS/uploadFileMtimeShares.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFileMtimeShares.feature#L70)
 -   [apiWebdavUploadTUS/uploadFileMtimeShares.feature:90](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFileMtimeShares.feature#L90)
 -   [apiWebdavUploadTUS/uploadToShare.feature:341](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L341)
+
+#### [could not create system tag](https://github.com/owncloud/ocis/issues/3092)
+-   [apiWebdavOperations/search.feature:214](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L214)
+-   [apiWebdavOperations/search.feature:230](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L230)
+-   [apiWebdavOperations/search.feature:255](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L255)
+
+#### [Incorrect response while listing resources of a folder with depth infinity](https://github.com/owncloud/ocis/issues/3073)
+-   [apiWebdavOperations/listFiles.feature:128](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L128)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
