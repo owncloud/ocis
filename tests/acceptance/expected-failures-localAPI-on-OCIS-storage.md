@@ -23,5 +23,5 @@
 
 #### [Viewer and editor has the possibility to disable the space](https://github.com/owncloud/ocis/issues/3031)
 -   [apiSpaces/removeSpaceObjects.feature:121](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/removeSpaceObjects.feature#L121)
--   [apiSpaces/deleteSpaces.feature:60](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/deleteSpaces.feature#L60)
--   [apiSpaces/deleteSpaces.feature:71](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/deleteSpaces.feature#L71)
+-   [apiSpaces/deleteSpaces.feature:73](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/deleteSpaces.feature#L73)
+-   [apiSpaces/deleteSpaces.feature:84](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/deleteSpaces.feature#L84)
