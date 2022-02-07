@@ -82,3 +82,4 @@ To link metadata to file content a single extended attribute with a file id (uni
 * Good, because it avoids extended attribute limits
 * Good, because the same mechanism could be used to look up files by id, when the underlying filesystem is an existing POSIX filesystem.
 * Bad, because backup needs to cover the metadata as well. Could be mitigated by sharing metadata per space and doing space wide snapshots.
+* Bad, because it is a bit more effort to access it to read or index it.
