@@ -495,9 +495,9 @@ Other free text and markdown formatting can be used elsewhere in the document if
 -   [webUISharingPublicBasic/publicLinkCreate.feature:88](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicBasic/publicLinkCreate.feature#L88)
 
 ### Shares folder cannot be deleted and is always visible
--  [webUIDeleteFilesFolders/deleteFilesFolders.feature:77](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L77)
--  [webUIDeleteFilesFolders/deleteFilesFolders.feature:89](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L89)
--  [webUISharingAcceptShares/acceptShares.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L72)
+-   [webUIDeleteFilesFolders/deleteFilesFolders.feature:77](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L77)
+-   [webUIDeleteFilesFolders/deleteFilesFolders.feature:89](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L89)
+-   [webUISharingAcceptShares/acceptShares.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L72)
 
 
 ### [web config update is not properly reflected after the ocis start](https://github.com/owncloud/ocis/issues/2944)
