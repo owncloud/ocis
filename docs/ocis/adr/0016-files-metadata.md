@@ -10,7 +10,7 @@ title: "16. Storage for Files Metadata"
 
 In addition to the file content we need to store metadata which is attached to a file. Metadata describes additional properties of a file. These properties need to be stored as close as possible to the file content to avoid inconsistencies. Metadata are key to workflows and search. We consider them as an additional value which enhances the file content.
 
-## Decision Drivers <!-- optional -->
+## Decision Drivers
 
 * Metadata will become more important in the future
 * Metadata are key to automated data processing
@@ -22,6 +22,7 @@ In addition to the file content we need to store metadata which is attached to a
 * Database
 * Extended file attributes
 * Metadata file next to the file content
+* Linked metadata in separate file
 
 ## Decision Outcome
 
@@ -47,6 +48,7 @@ Use a Database or an external key/value store to persist metadata.
 * Good, because it scales well
 * Good, because databases provide efficient lookup mechanisms
 * Bad, because the file content and the metadata could run out of sync
+* Bad, because a storage backup doesn't cover the file metadata
 
 ### Extended File Attributes
 
@@ -59,6 +61,7 @@ From Wikipedia on [Extended file attributes](https://en.wikipedia.org/wiki/Exten
 * Good, because metadata is stored in the filesystem
 * Good, because consistency is easy to maintain
 * Good, because the data is attached to the file and survives file operations like copy and move
+* Good, because a storage backup also covers the file metadata
 * Bad, because we could hit the filesystem limit
 * Bad, because changes to extended attributes are not atomic
 
@@ -68,6 +71,7 @@ We could store metadata in a metadata file next to the file content which has a 
 
 * Good, because there are no size limits
 * Good, because there is more freedom to the content format
+* Good, because a storage backup also covers the file metadata
 * Bad, because it doubles the amount of read / write operations
 * Bad, because it needs additional measures against concurrent overwriting changes
 
