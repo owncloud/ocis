@@ -173,13 +173,16 @@ If you want to work on a specific issue
 
 Instruction on setup is available [here](https://owncloud.dev/ocis/deployment/oc10_ocis_parallel/#local-setup)
 
+Edit the `.env` file and uncomment this line:
+```
+COMPOSE_FILE=docker-compose.yml:testing/docker-compose-additions.yml
+```
+
 Start the docker stack with the following command:
 
 ```bash
-PROXY_ENABLE_BASIC_AUTH=true docker-compose up -d
+docker-compose up -d
 ```
-
-**NOTE**: `PROXY_ENABLE_BASIC_AUTH=true` is required as the tests use basic auth.
 
 ### Getting the test helpers
 

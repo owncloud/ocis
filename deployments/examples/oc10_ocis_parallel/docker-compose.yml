@@ -123,6 +123,7 @@ services:
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
       OCIS_INSECURE: "${INSECURE:-false}"
+      # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
       PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
     volumes:
       - ./config/ocis/proxy.json:/etc/ocis/proxy.json
@@ -144,8 +145,6 @@ services:
     image: owncloud/server:${OC10_DOCKER_TAG:-latest}
     networks:
       ocis-net:
-    ports:
-      - 8080:8080
     environment:
       # make ownCloud Web the default frontend
       OWNCLOUD_DEFAULT_APP: ${OWNCLOUD_DEFAULT_APP:-files} # can be switched to "web"
@@ -251,8 +250,6 @@ services:
     image: osixia/openldap:latest
     networks:
       ocis-net:
-    ports:
-      - 636:636
     command: --copy-service --loglevel debug
     environment:
       LDAP_TLS_VERIFY_CLIENT: never
