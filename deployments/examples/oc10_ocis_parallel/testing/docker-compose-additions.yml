@@ -1,0 +1,17 @@
+---
+version: "3.7"
+
+services:
+  ocis:
+    environment:
+      PROXY_ENABLE_BASIC_AUTH: "true"
+
+  oc10:
+    ports:
+      - 8080:8080
+    volumes:
+      - ./config/oc10/11-testing-app.sh:/etc/pre_server.d/11-testing-app.sh
+
+  openldap:
+    ports:
+      - 636:636
