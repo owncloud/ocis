@@ -332,6 +332,8 @@ github.com/cs3org/go-cs3apis v0.0.0-20220126114148-64c025ccdd19 h1:1jqPH58jCxvba
 github.com/cs3org/go-cs3apis v0.0.0-20220126114148-64c025ccdd19/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/cs3org/reva v1.16.1-0.20220204172901-983af9327c2f h1:ys9+w93vtCQrcIRwFf7epQP2xUFPnvXsz4Dg4e7BZfc=
 github.com/cs3org/reva v1.16.1-0.20220204172901-983af9327c2f/go.mod h1:EAKoGXYmyIKmUSq/fgmAsTGHgrgwSb1PffGiA/AmgSo=
+github.com/cs3org/reva v1.16.1-0.20220208091630-7660ee26dce7 h1:6U5hiLJ1vl3J8aoscg6qZLrpFvp5/Y4RnxZ2xS4RQWA=
+github.com/cs3org/reva v1.16.1-0.20220208091630-7660ee26dce7/go.mod h1:EAKoGXYmyIKmUSq/fgmAsTGHgrgwSb1PffGiA/AmgSo=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8/go.mod h1:4abs/jPXcmJzYoYGF91JF9Uq9s/KL5n1jvFDix8KcqY=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=

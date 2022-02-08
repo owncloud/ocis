@@ -9,3 +9,4 @@ https://github.com/owncloud/ocis/pull/2878
 https://github.com/owncloud/ocis/pull/2901
 https://github.com/owncloud/ocis/pull/2997
 https://github.com/owncloud/ocis/pull/3116
+https://github.com/owncloud/ocis/pull/3130
