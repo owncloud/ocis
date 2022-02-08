@@ -42,6 +42,15 @@ services:
       driver: "local"
     restart: always
 
+  consul-1:
+    image: consul:latest
+    command: consul agent -dev -client 0.0.0.0
+    networks:
+      ocis-net:
+    #ports:
+    #  - "8500:8500"
+      #- "8600:8600/udp"
+
   ocis-1:
     image: owncloud/ocis:${OCIS_1_DOCKER_TAG:-latest}
     networks:
@@ -50,6 +59,9 @@ services:
       - /bin/sh
       - /entrypoint-override.sh
     environment:
+      MICRO_REGISTRY: consul
+      MICRO_REGISTRY_ADDRESS: consul-1:8500
+
       OCIS_URL: https://${OCIS_1_DOMAIN:-ocis-1.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_1_LOG_LEVEL:-error} # make oCIS less verbose
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
@@ -75,6 +87,15 @@ services:
       driver: "local"
     restart: always
 
+  consul-2:
+    image: consul:latest
+    command: consul agent -dev -client 0.0.0.0
+    networks:
+      ocis-net:
+    #ports:
+    #  - "8500:8500"
+    #  - "8600:8600/udp"
+
   ocis-2:
     image: owncloud/ocis:${OCIS_2_DOCKER_TAG:-latest}
     networks:
@@ -83,6 +104,9 @@ services:
       - /bin/sh
       - /entrypoint-override.sh
     environment:
+      MICRO_REGISTRY: consul
+      MICRO_REGISTRY_ADDRESS: consul-2:8500
+
       OCIS_URL: https://${OCIS_2_DOMAIN:-ocis-2.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_2_LOG_LEVEL:-error} # make oCIS less verbose
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
