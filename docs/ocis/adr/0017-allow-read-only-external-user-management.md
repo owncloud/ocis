@@ -13,32 +13,33 @@ geekdocFilePath: 0017-allow-read-only-external-user-management.md
 
 ## Context and Problem Statement
 
-oCIS needs to be integrated with various external Authentication and Identity Management Systems. We
-settled on Open ID Connect (OIDC) as the central authentication protocol for OCIS.
+oCIS needs to be integrated with various external Authentication and Identity Management Systems.
 
-OCIS internally relies on a stable and persistent identifier (e.g. a UUID) for accounts in order to
-implement permissions and sharing. Unfortunately, some deployments are unable to deliver this kind
-of stable identifier for users:
-
-- In OIDC itself the only stable identifier that is guaranteed to be provided by the IDP is
-  combination of the sub and iss claims. IDPs can optionally return other claims, but we might not
-  be able to rely on a specific claim being present.
-- When no other services (LDAP, SCIM, ...) is available that could be used look up a user UUID
-
-Furthermore, there is a difference between users, identities and accounts: A user may have multiple
+Sidenote: There is a difference between users, identities and accounts: A user may have multiple
 identities whith which he can authenticate, e.g. his facebook, twitter, microsoft or google
 identity. Multiple identities can be linked to an account in ocis, allowing to fall back to another
 identity provider should one of them shut down. This also allows migrating from one identity
 provider to another.
 
-There are three cases that require access to users:
+There are different cases where oCIS requires access to users:
 
-1. During authentication we need to build a user object with at least an account UUID (to identify
-   the account) and the email (for display purposes)
-2. When searching for recipients we need to be able to query existing users in the external identity
-   management system
+1. While we settled on using OpenID Connect (OIDC) as the authentication protocol for oCIS, we
+   we need to build a user object during authentication with at least an account UUID (to identify
+   the account) and the email or a name (for display purposes). 
+2. When searching for share recipients we need to be able to query existing users in the external
+   identity management system
 3. When listing files we need to be able to look up a users display properties (username, email,
    avatar...) based on the account UUID
+
+oCIS internally relies on a stable and persistent identifier (e.g. a UUID) for accounts in order to
+implement permissions and sharing. Unfortunately, some deployments are unable to deliver this kind
+of stable identifier for users:
+
+- In OIDC itself the only stable identifier that is guaranteed to be provided by the IDP is
+  combination of the sub and iss claims. IDPs can optionally return other claims, but we cannot
+  rely on a specific claim being present.
+- When no other services (LDAP, SCIM, ...) is available that could be used look up a user UUID
+
 
 ## Decision Drivers
 
