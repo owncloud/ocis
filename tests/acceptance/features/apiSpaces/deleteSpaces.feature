@@ -8,8 +8,11 @@ Feature: Disabling and deleting space
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
-    And user "Brian" has been created with default attributes and without skeleton files
+    Given these users have been created with default attributes and without skeleton files:
+      | username |
+      | Alice    |
+      | Brian    |
+      | Bob      |
     And the administrator has given "Alice" the role "Admin" using the settings api
 
 
@@ -20,10 +23,20 @@ Feature: Disabling and deleting space
     Then the HTTP status code should be "204"
     When user "Alice" lists all available spaces via the GraphApi
     Then the json responded should contain a space "disable a space" with these key and value pairs:
-      | key  | value           |
-      | name | disable a space |
+      | key                    | value           |
+      | name                   | disable a space |
+      | root@@@deleted@@@state | trashed         |
+    
+
+   Scenario: Participants without a manager role cannot see the disabled space
+    Given user "Alice" has created a space "cannot see space" of type "project" with quota "10"
+    And user "Alice" has shared a space "cannot see space" to user "Brian" with role "editor"
+    And user "Alice" has shared a space "cannot see space" to user "Bob" with role "viewer"
+    And user "Alice" has disabled a space "cannot see space"  
     When user "Brian" lists all available spaces via the GraphApi
-    Then the json responded should not contain a space with name "disable a space"
+    Then the json responded should not contain a space with name "cannot see space"
+    When user "Bob" lists all available spaces via the GraphApi
+    Then the json responded should not contain a space with name "cannot see space"
 
 
   Scenario: An owner can delete a disabled Space via the webDav API
