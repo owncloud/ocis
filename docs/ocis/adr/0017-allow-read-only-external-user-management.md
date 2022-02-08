@@ -71,15 +71,22 @@ IdP sends all necessary claims: uuid, username, email, displayname, avatar url I
 display properties by the uuid or email/username
 
 * Good, because we can fully rely on the external identity management system
-* Bad, because we need write access to provision guest accounts
+* Bad, because we need write access to provision guest accounts (very few customers are willing to
+  provide that)
 
 ### External identity management system is read only and provides an interface to query users (e.g. Coporate Active Directy)
 
 IdP sends sub & iss and mail or username claims, Identity Management System provides APIs (e.g.
-LDAP, SCIM, REST ...) to lookup additional user information. All services use the CS3 API to look up the account for
-the given email or username, where CS3 then uses a backend that relies on the APIs provided by the IdM```
+LDAP, SCIM, REST ...) to lookup additional user information. All services use the CS3 API to look up
+the account for the given email or username, where CS3 then uses a backend that relies on the APIs
+provided by the IdM.
 
 * Good, because we can rely on the external identity management
+* Good, because ocis services only need to know about the CS3 user provider API, which acts as an
+  abstraction layer for different identitiy management systems
+* Good, because there is only an single source of truth (the external IdM) and we don't need to
+  implement a synchronization mechanism to maintain an internal user database (we will likely need
+  some form of caching though, see below)
 * Bad, because the identity managment needs to provide a stable, persistent, non-reassignable user
   identifier for an account, e.g. `owncloudUUID` or `ms-DS-ConsistencyGuid`
 * Bad, because we need to implment tools that can change the account id when it did change anyway
@@ -87,11 +94,13 @@ the given email or username, where CS3 then uses a backend that relies on the AP
 
 ### External identity management system is read only and does NOT provide an API to query users
 
-Idp sends sub & iss and mail or username claims. We need to provision an internal account mapping to
-look up user properties by account id.
+Idp sends sub & iss and mail or username claims. We need to provision an internal account mapping
+upon first login of a user to be able to look up user properties by account id.
 
 * Good, because this has very little external requirements
+* Good, because we have accounts fully under our control
 * Bad, because we have to provide the user lookup APIs
+* Bad, because users will only a visible after the first login
 
 ## Links <!-- optional -->
 
