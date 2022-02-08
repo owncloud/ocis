@@ -1,5 +1,10 @@
 ---
 title: "17. Allow read only external User Management"
+weight: 17
+date: 2022-02-08T10:53:00+01:00
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/ocis/adr
+geekdocFilePath: 0017-allow-read-only-external-user-management.md
 ---
 
 * Status: proposed
@@ -8,7 +13,7 @@ title: "17. Allow read only external User Management"
 
 ## Context and Problem Statement
 
-oCIS needs to be integrated with various external Authentication and Identity Management System. We
+oCIS needs to be integrated with various external Authentication and Identity Management Systems. We
 settled on Open ID Connect (OIDC) as the central authentication protocol for OCIS.
 
 OCIS internally relies on a stable and persistent identifier (e.g. a UUID) for accounts in order to
@@ -26,27 +31,27 @@ identity. Multiple identities can be linked to an account in ocis, allowing to f
 identity provider should one of them shut down. This also allows migrating from one identity
 provider to another.
 
-There are three cases that require access to users:a
+There are three cases that require access to users:
 
-1. During authentication we neet to build a user object with at least an account uuid (to identify
+1. During authentication we need to build a user object with at least an account UUID (to identify
    the account) and the email (for display purposes)
 2. When searching for recipients we need to be able to query existing users in the external identity
    management system
 3. When listing files we need to be able to look up a users display properties (username, email,
-   avatar...) based on the account uuid
+   avatar...) based on the account UUID
 
 ## Decision Drivers
 
 * oCIS should be a single binary that can run out of the box without external dependencies like an
   LDAP server.
 * Time: we want to build a release candidate asap.
-* oCIS should be able to be easily integrated with external standard identity mangement systems
+* oCIS should be easy to integrate with standard external identity mangement systems
 
 ## Considered Options
 
 * External identity management system is writeable and has all necessary APIs
-* External identity management system is read only and provides an interface to query users (e.g. 
-* IdP is read only and does not provide an API to query users
+* External identity management system is read only and provides an interface to query users
+* External identity management system is read only and does NOT provide an API to query users
 
 ## Decision Outcome
 
@@ -70,18 +75,17 @@ display properties by the uuid or email/username
 
 ### External identity management system is read only and provides an interface to query users (e.g. Coporate Active Directy)
 
-IdP ends sub & iss and mail or username claims, Identity Management System provides Interfaces (e.g.
-LDAP) to lookup additional user information. All services use the CS3 API to look up the account for
-the given email or username, where CS3 provides backends for LDAP, SCIM, REST ...
+IdP sends sub & iss and mail or username claims, Identity Management System provides APIs (e.g.
+LDAP, SCIM, REST ...) to lookup additional user information. All services use the CS3 API to look up the account for
+the given email or username, where CS3 then uses a backend that relies on the APIs provided by the IdM```
 
 * Good, because we can rely on the external identity management
-* Bad, because the Identity managment needs to provide a stable, persistent, non-reussignable user
-  identifier to identify the account, e.g. owncloudUUID or ms-DS-ConsistencyGuid
+* Bad, because the identity managment needs to provide a stable, persistent, non-reassignable user
+  identifier for an account, e.g. `owncloudUUID` or `ms-DS-ConsistencyGuid`
 * Bad, because we need to implment tools that can change the account id when it did change anyway
-* Bad, because we will hammer the identity management system with lookup requests (can mostly be
-  mitigated with caching)
+* Bad, because without caching we will hammer the identity management system with lookup requests
 
-### IdP is read only and does not provide an API to query users
+### External identity management system is read only and does NOT provide an API to query users
 
 Idp sends sub & iss and mail or username claims. We need to provision an internal account mapping to
 look up user properties by account id.
