@@ -1,7 +1,7 @@
 ---
 title: "ocis.messages.accounts.v0"
 url: /grpc_apis/ocis_messages_accounts_v0
-date: 2022-02-08T09:56:17Z
+date: 2022-02-08T10:32:31Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
