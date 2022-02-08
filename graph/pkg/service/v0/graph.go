@@ -39,6 +39,8 @@ type GatewayClient interface {
 	ListStorageSpaces(ctx context.Context, in *provider.ListStorageSpacesRequest, opts ...grpc.CallOption) (*provider.ListStorageSpacesResponse, error)
 	// Updates a storage space.
 	UpdateStorageSpace(ctx context.Context, in *provider.UpdateStorageSpaceRequest, opts ...grpc.CallOption) (*provider.UpdateStorageSpaceResponse, error)
+	// SetArbitraryMetadata stores key value metadata
+	SetArbitraryMetadata(ctx context.Context, in *provider.SetArbitraryMetadataRequest, opts ...grpc.CallOption) (*provider.SetArbitraryMetadataResponse, error)
 	// Deletes a storage space.
 	DeleteStorageSpace(ctx context.Context, in *provider.DeleteStorageSpaceRequest, opts ...grpc.CallOption) (*provider.DeleteStorageSpaceResponse, error)
 	// Returns the quota available under the provided
@@ -90,4 +92,9 @@ const (
 	NoSpaceFoundMessage           = "space with id `%s` not found"
 	ListStorageSpacesTransportErr = "transport error sending list storage spaces grpc request"
 	ListStorageSpacesReturnsErr   = "list storage spaces grpc request returns an errorcode in the response"
+	ReadmePathAttrName            = "space.readme"
+	ReadmePathSpecialFolderName   = "readme"
+	SpaceImageAttrName            = "space.image"
+	SpaceImageSpecialFolderName   = "image"
+	SpaceDescriptionAttrName      = "space.description"
 )
