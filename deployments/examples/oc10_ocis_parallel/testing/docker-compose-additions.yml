@@ -4,7 +4,7 @@ version: "3.7"
 services:
   ocis:
     environment:
-      PROXY_ENABLE_BASIC_AUTH: true
+      PROXY_ENABLE_BASIC_AUTH: "true"
 
   oc10:
     ports:
