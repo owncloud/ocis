@@ -175,6 +175,11 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 					},
 				},
 			},
+			"interceptors": map[string]interface{}{
+				"eventsmiddleware": map[string]interface{}{
+					"group": "sharing",
+				},
+			},
 		},
 	}
 	return rcfg
