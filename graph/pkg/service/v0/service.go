@@ -59,10 +59,21 @@ func NewService(opts ...Option) Service {
 		}
 	case "ldap":
 		var err error
+
+		var tlsConf *tls.Config
+		if options.Config.Identity.LDAP.Insecure {
+			tlsConf = &tls.Config{
+				InsecureSkipVerify: true,
+			}
+		}
+
 		conn := ldap.NewLDAPWithReconnect(&options.Logger,
-			options.Config.Identity.LDAP.URI,
-			options.Config.Identity.LDAP.BindDN,
-			options.Config.Identity.LDAP.BindPassword,
+			ldap.Config{
+				URI:          options.Config.Identity.LDAP.URI,
+				BindDN:       options.Config.Identity.LDAP.BindDN,
+				BindPassword: options.Config.Identity.LDAP.BindPassword,
+				TLSConfig:    tlsConf,
+			},
 		)
 		if backend, err = identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger); err != nil {
 			options.Logger.Error().Msgf("Error initializing LDAP Backend: '%s'", err)

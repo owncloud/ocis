@@ -30,6 +30,7 @@ func DefaultConfig() *Config {
 			Backend: "cs3",
 			LDAP: LDAP{
 				URI:                      "ldap://localhost:9125",
+				Insecure:                 false,
 				BindDN:                   "",
 				BindPassword:             "",
 				UseServerUUID:            false,
