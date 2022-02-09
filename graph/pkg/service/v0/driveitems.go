@@ -12,7 +12,6 @@ import (
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/pkg/utils"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
@@ -77,14 +76,11 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &listResponse{Value: files})
 }
 
-func (g Graph) getDriveItem(ctx context.Context, root *storageprovider.ResourceId, relativePath string) (*libregraph.DriveItem, error) {
-
+func (g Graph) getDriveItem(ctx context.Context, root *storageprovider.ResourceId) (*libregraph.DriveItem, error) {
 	client := g.GetGatewayClient()
 
 	ref := &storageprovider.Reference{
 		ResourceId: root,
-		// the path is always relative to the root of the drive, not the location of the .config/ocis/space.yaml file
-		Path: utils.MakeRelativePath(relativePath),
 	}
 	res, err := client.Stat(ctx, &storageprovider.StatRequest{Ref: ref})
 	if err != nil {
@@ -93,8 +89,21 @@ func (g Graph) getDriveItem(ctx context.Context, root *storageprovider.ResourceI
 	if res.Status.Code != cs3rpc.Code_CODE_OK {
 		return nil, fmt.Errorf("could not stat %s: %s", ref, res.Status.Message)
 	}
-
 	return cs3ResourceToDriveItem(res.Info)
+}
+
+func (g Graph) getPathForDriveItem(ctx context.Context, ID *storageprovider.ResourceId) (*string, error) {
+	client := g.GetGatewayClient()
+	var path *string
+	res, err := client.GetPath(ctx, &storageprovider.GetPathRequest{ResourceId: ID})
+	if err != nil {
+		return nil, err
+	}
+	if res.Status.Code != cs3rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("could not stat %s: %s", ID, res.Status.Message)
+	}
+	path = &res.Path
+	return path, err
 }
 
 func formatDriveItems(mds []*storageprovider.ResourceInfo) ([]*libregraph.DriveItem, error) {
@@ -145,85 +154,44 @@ func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*libregraph.Driv
 	return driveItem, nil
 }
 
-func (g Graph) getDriveMetadata(ctx context.Context, space *storageprovider.StorageSpace) (map[string]string, error) {
-	client := g.GetGatewayClient()
-	sResp, err := client.Stat(
-		ctx,
-		&storageprovider.StatRequest{
-			Ref: &storageprovider.Reference{
-				ResourceId: &storageprovider.ResourceId{
-					StorageId: space.Root.StorageId,
-					OpaqueId:  space.Root.OpaqueId,
-				},
-			},
-		},
-	)
-	if err != nil {
-		g.logger.Debug().Err(err).Interface("space", space).Msg("transport error")
-		return nil, err
-	}
-	if sResp.Status.Code != cs3rpc.Code_CODE_OK {
-		g.logger.Debug().Interface("space", space).Msg("space not found")
-		return nil, fmt.Errorf("space not found")
-	}
-	md := sResp.Info.ArbitraryMetadata.GetMetadata()
-	if md == nil {
-		g.logger.Error().Err(err).Interface("space", space).Msg("could not read metadata from space")
-		return nil, fmt.Errorf("could not read metadata from space")
-	}
-	return md, nil
-}
-
-func (g Graph) setSpaceMetadata(ctx context.Context, metadata map[string]string, resourceID *storageprovider.ResourceId) error {
-	if len(metadata) == 0 {
-		return nil
-	}
-	client := g.GetGatewayClient()
-	resMd, err := client.SetArbitraryMetadata(
-		ctx,
-		&storageprovider.SetArbitraryMetadataRequest{
-			ArbitraryMetadata: &storageprovider.ArbitraryMetadata{
-				Metadata: metadata,
-			},
-			Ref: &storageprovider.Reference{
-				ResourceId: resourceID,
-			},
-		},
-	)
-	if err != nil {
-		g.logger.Error().Msg("transport error, could not set metadata")
-		return err
-	}
-	if resMd.Status.Code != cs3rpc.Code_CODE_OK {
-		g.logger.Error().Msg("could not set metadata")
-		return fmt.Errorf("could not set metadata")
-	}
-	return nil
-}
-
-func (g Graph) GetSpecialSpaceItems(ctx context.Context, baseURL *url.URL, spaceRootID *storageprovider.ResourceId, metadata map[string]string) []libregraph.DriveItem {
+func (g Graph) GetSpecialSpaceItems(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace) []libregraph.DriveItem {
 	var spaceItems []libregraph.DriveItem
-	if metadata == nil {
+	if space.Opaque == nil {
 		return spaceItems
 	}
-	if readmePath, ok := metadata[ReadmePathAttrName]; ok {
-		readmeItem, err := g.getDriveItem(ctx, spaceRootID, readmePath)
-		if err != nil {
-			g.logger.Error().Err(err).Str(ReadmePathAttrName, readmePath).Msg("Could not get readme Item")
-		} else {
-			readmeItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(ReadmePathSpecialFolderName)}
-			readmeItem.WebDavUrl = libregraph.PtrString(baseURL.String() + filepath.Join(spaceRootID.OpaqueId, readmePath))
-			spaceItems = append(spaceItems, *readmeItem)
+	metadata := space.Opaque.Map
+	if readmeAttr, ok := metadata[ReadmeSpecialFolderName]; ok {
+		readmeID := string(readmeAttr.Value)
+		if readmeID != "" {
+			readmeItem, err := g.getDriveItem(ctx, &storageprovider.ResourceId{StorageId: space.Root.StorageId, OpaqueId: readmeID})
+			if err != nil {
+				g.logger.Error().Err(err).Str("ID", readmeID).Msg("Could not get readme Item")
+			}
+			readmePath, err := g.getPathForDriveItem(ctx, &storageprovider.ResourceId{StorageId: space.Root.StorageId, OpaqueId: readmeID})
+			if err != nil {
+				g.logger.Error().Err(err).Str("ID", readmeID).Msg("Could not get readme path")
+			} else {
+				readmeItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(ReadmeSpecialFolderName)}
+				readmeItem.WebDavUrl = libregraph.PtrString(baseURL.String() + filepath.Join(space.Root.OpaqueId, *readmePath))
+				spaceItems = append(spaceItems, *readmeItem)
+			}
 		}
 	}
-	if imagePath, ok := metadata[SpaceImageAttrName]; ok {
-		imageItem, err := g.getDriveItem(ctx, spaceRootID, imagePath)
-		if err != nil {
-			g.logger.Error().Err(err).Str(SpaceImageAttrName, imagePath).Msg("Could not get image Item")
-		} else {
-			imageItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(SpaceImageSpecialFolderName)}
-			imageItem.WebDavUrl = libregraph.PtrString(baseURL.String() + filepath.Join(spaceRootID.OpaqueId, imagePath))
-			spaceItems = append(spaceItems, *imageItem)
+	if metadataAttr, ok := metadata[SpaceImageSpecialFolderName]; ok {
+		imageID := string(metadataAttr.Value)
+		if imageID != "" {
+			imageItem, err := g.getDriveItem(ctx, &storageprovider.ResourceId{StorageId: space.Root.StorageId, OpaqueId: imageID})
+			if err != nil {
+				g.logger.Error().Err(err).Str("ID", imageID).Msg("Could not get image Item")
+			}
+			imagePath, err := g.getPathForDriveItem(ctx, &storageprovider.ResourceId{StorageId: space.Root.StorageId, OpaqueId: imageID})
+			if err != nil {
+				g.logger.Error().Err(err).Str("ID", imageID).Msg("Could not get image path")
+			} else {
+				imageItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(SpaceImageSpecialFolderName)}
+				imageItem.WebDavUrl = libregraph.PtrString(baseURL.String() + filepath.Join(space.Root.OpaqueId, *imagePath))
+				spaceItems = append(spaceItems, *imageItem)
+			}
 		}
 	}
 	return spaceItems

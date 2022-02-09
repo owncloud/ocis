@@ -7,7 +7,6 @@ import (
 	"math"
 	"net/http"
 	"net/url"
-	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -192,6 +191,18 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		Quota: getQuota(drive.Quota, g.config.Spaces.DefaultQuota),
 	}
 
+	spaceDescription := *drive.Description
+	if spaceDescription != "" {
+		csr.Opaque = &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				"permissions": {
+					Decoder: "plain",
+					Value:   []byte(spaceDescription),
+				},
+			},
+		}
+	}
+
 	resp, err := client.CreateStorageSpace(r.Context(), &csr)
 	if err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -265,6 +276,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
+	// Use the Opaque prop of the request
 	if restore, _ := strconv.ParseBool(r.Header.Get("restore")); restore {
 		updateSpaceRequest.Opaque = &types.Opaque{
 			Map: map[string]*types.OpaqueEntry{
@@ -276,37 +288,28 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Use the Opaque prop of the space
+	opaque := make(map[string]*types.OpaqueEntry)
+	spaceDescription := *drive.Description
+	if spaceDescription != "" {
+		opaque["description"] = &types.OpaqueEntry{
+			Decoder: "plain",
+			Value:   []byte(spaceDescription),
+		}
+	}
+
+	for _, special := range drive.Special {
+		if special.Id != nil {
+			opaque[*special.SpecialFolder.Name] = &types.OpaqueEntry{
+				Decoder: "plain",
+				Value:   []byte(*special.Id),
+			}
+		}
+	}
+	updateSpaceRequest.StorageSpace.Opaque = &types.Opaque{Map: opaque}
+
 	if drive.Name != nil {
 		updateSpaceRequest.StorageSpace.Name = *drive.Name
-	}
-	metadata := make(map[string]string)
-	for _, specialItem := range drive.Special {
-
-		baseUrl, err := url.Parse(g.config.Spaces.WebDavBase + g.config.Spaces.WebDavPath + driveID)
-		if err != nil {
-			g.logger.Error().Err(err)
-		}
-		newURL, err := filepath.Rel(baseUrl.String(), *specialItem.WebDavUrl)
-		if err != nil {
-			g.logger.Error().Err(err)
-		}
-		switch *specialItem.SpecialFolder.Name {
-		case SpaceImageSpecialFolderName:
-			metadata[SpaceImageAttrName] = newURL
-		case ReadmePathSpecialFolderName:
-			metadata[ReadmePathAttrName] = newURL
-		}
-	}
-
-	if drive.Description != nil {
-		metadata[SpaceDescriptionAttrName] = *drive.Description
-	}
-
-	if metadata != nil {
-		err = g.setSpaceMetadata(r.Context(), metadata, root)
-		if err != nil {
-			g.logger.Error().Err(err)
-		}
 	}
 
 	if drive.Quota.HasTotal() {
@@ -360,33 +363,15 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, spaces[0])
 }
 
-func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storageprovider.StorageSpace) ([]*libregraph.Drive, error) {
-	responses := make([]*libregraph.Drive, 0, len(mds))
-	for i := range mds {
-		res, err := g.cs3StorageSpaceToDrive(baseURL, mds[i])
+func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces []*storageprovider.StorageSpace) ([]*libregraph.Drive, error) {
+	responses := make([]*libregraph.Drive, 0, len(storageSpaces))
+	for _, storageSpace := range storageSpaces {
+		res, err := g.cs3StorageSpaceToDrive(baseURL, storageSpace)
 		if err != nil {
 			return nil, err
 		}
-		md, err := g.getDriveMetadata(ctx, mds[i])
-		if err != nil {
-			g.logger.Error().Err(err).Interface("space", mds[i]).Msg("error reading extendedSpaceProperties")
-			continue
-		}
-
-		if sd, ok := md[SpaceDescriptionAttrName]; ok {
-			res.Description = libregraph.PtrString(sd)
-		}
-		res.Special = g.GetSpecialSpaceItems(
-			ctx,
-			baseURL,
-			&storageprovider.ResourceId{
-				StorageId: mds[i].Root.StorageId,
-				OpaqueId:  mds[i].Root.OpaqueId,
-			},
-			md,
-		)
-
-		res.Quota, err = g.getDriveQuota(ctx, mds[i])
+		res.Special = g.GetSpecialSpaceItems(ctx, baseURL, storageSpace)
+		res.Quota, err = g.getDriveQuota(ctx, storageSpace)
 		if err != nil {
 			return nil, err
 		}
@@ -501,6 +486,11 @@ func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.S
 			Id:          &rootID,
 			Permissions: permissions,
 		},
+	}
+	if space.Opaque != nil {
+		if description, ok := space.Opaque.Map["description"]; ok {
+			drive.Description = libregraph.PtrString(string(description.Value))
+		}
 	}
 
 	if space.Opaque != nil && space.Opaque.Map != nil {

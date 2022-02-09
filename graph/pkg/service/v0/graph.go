@@ -23,6 +23,8 @@ type GatewayClient interface {
 	// Returns the home path for the given authenticated user.
 	// When a user has access to multiple storage providers, one of them is the home.
 	GetHome(ctx context.Context, in *provider.GetHomeRequest, opts ...grpc.CallOption) (*provider.GetHomeResponse, error)
+	// GetPath does a path lookup for a resource by ID
+	GetPath(ctx context.Context, in *provider.GetPathRequest, opts ...grpc.CallOption) (*provider.GetPathResponse, error)
 	// Returns a list of resource information
 	// for the provided reference.
 	// MUST return CODE_NOT_FOUND if the reference does not exists.
@@ -39,8 +41,6 @@ type GatewayClient interface {
 	ListStorageSpaces(ctx context.Context, in *provider.ListStorageSpacesRequest, opts ...grpc.CallOption) (*provider.ListStorageSpacesResponse, error)
 	// Updates a storage space.
 	UpdateStorageSpace(ctx context.Context, in *provider.UpdateStorageSpaceRequest, opts ...grpc.CallOption) (*provider.UpdateStorageSpaceResponse, error)
-	// SetArbitraryMetadata stores key value metadata
-	SetArbitraryMetadata(ctx context.Context, in *provider.SetArbitraryMetadataRequest, opts ...grpc.CallOption) (*provider.SetArbitraryMetadataResponse, error)
 	// Deletes a storage space.
 	DeleteStorageSpace(ctx context.Context, in *provider.DeleteStorageSpaceRequest, opts ...grpc.CallOption) (*provider.DeleteStorageSpaceResponse, error)
 	// Returns the quota available under the provided
@@ -92,9 +92,6 @@ const (
 	NoSpaceFoundMessage           = "space with id `%s` not found"
 	ListStorageSpacesTransportErr = "transport error sending list storage spaces grpc request"
 	ListStorageSpacesReturnsErr   = "list storage spaces grpc request returns an errorcode in the response"
-	ReadmePathAttrName            = "space.readme"
-	ReadmePathSpecialFolderName   = "readme"
-	SpaceImageAttrName            = "space.image"
+	ReadmeSpecialFolderName       = "readme"
 	SpaceImageSpecialFolderName   = "image"
-	SpaceDescriptionAttrName      = "space.description"
 )
