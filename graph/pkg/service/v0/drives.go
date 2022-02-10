@@ -191,13 +191,12 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		Quota: getQuota(drive.Quota, g.config.Spaces.DefaultQuota),
 	}
 
-	spaceDescription := *drive.Description
-	if spaceDescription != "" {
+	if drive.Description != nil {
 		csr.Opaque = &types.Opaque{
 			Map: map[string]*types.OpaqueEntry{
 				"permissions": {
 					Decoder: "plain",
-					Value:   []byte(spaceDescription),
+					Value:   []byte(*drive.Description),
 				},
 			},
 		}
