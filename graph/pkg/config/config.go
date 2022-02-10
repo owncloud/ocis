@@ -37,6 +37,7 @@ type Spaces struct {
 
 type LDAP struct {
 	URI           string `ocisConfig:"uri" env:"GRAPH_LDAP_URI"`
+	Insecure      bool   `ocisConfig:"insecure" env:"OCIS_INSECURE;GRAPH_LDAP_INSECURE"`
 	BindDN        string `ocisConfig:"bind_dn" env:"GRAPH_LDAP_BIND_DN"`
 	BindPassword  string `ocisConfig:"bind_password" env:"GRAPH_LDAP_BIND_PASSWORD"`
 	UseServerUUID bool   `ocisConfig:"use_server_uuid" env:"GRAPH_LDAP_SERVER_UUID"`
