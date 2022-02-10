@@ -31,14 +31,21 @@ type ConnWithReconnect struct {
 	logger  *log.Logger
 }
 
-func NewLDAPWithReconnect(logger *log.Logger, ldapURI, bindDN, bindPassword string) ConnWithReconnect {
+type Config struct {
+	URI          string
+	BindDN       string
+	BindPassword string
+	TLSConfig    *tls.Config
+}
+
+func NewLDAPWithReconnect(logger *log.Logger, config Config) ConnWithReconnect {
 	conn := ConnWithReconnect{
 		conn:    make(chan ldapConnection),
 		reset:   make(chan *ldap.Conn),
 		retries: 1,
 		logger:  logger,
 	}
-	go conn.ldapAutoConnect(ldapURI, bindDN, bindPassword)
+	go conn.ldapAutoConnect(config)
 	return conn
 }
 
@@ -172,8 +179,8 @@ func (c ConnWithReconnect) GetConnection() (*ldap.Conn, error) {
 	return c.reconnect(conn.Conn)
 }
 
-func (c ConnWithReconnect) ldapAutoConnect(ldapURI, bindDN, bindPassword string) {
-	l, err := c.ldapConnect(ldapURI, bindDN, bindPassword)
+func (c ConnWithReconnect) ldapAutoConnect(config Config) {
+	l, err := c.ldapConnect(config)
 	if err != nil {
 		c.logger.Error().Err(err).Msg("autoconnect could not get ldap Connection")
 	}
@@ -190,7 +197,7 @@ func (c ConnWithReconnect) ldapAutoConnect(ldapURI, bindDN, bindPassword string)
 			}
 			if l == resConn || l == nil {
 				c.logger.Debug().Msg("reconnecting to LDAP")
-				l, err = c.ldapConnect(ldapURI, bindDN, bindPassword)
+				l, err = c.ldapConnect(config)
 			} else {
 				c.logger.Debug().Msg("already reconnected")
 			}
@@ -199,16 +206,24 @@ func (c ConnWithReconnect) ldapAutoConnect(ldapURI, bindDN, bindPassword string)
 	}
 }
 
-func (c ConnWithReconnect) ldapConnect(ldapURI, bindDN, bindPassword string) (*ldap.Conn, error) {
-	c.logger.Debug().Msgf("Connecting to %s", ldapURI)
-	l, err := ldap.DialURL(ldapURI)
+func (c ConnWithReconnect) ldapConnect(config Config) (*ldap.Conn, error) {
+	c.logger.Debug().Msgf("Connecting to %s", config.URI)
+
+	var err error
+	var l *ldap.Conn
+	if config.TLSConfig != nil {
+		l, err = ldap.DialURL(config.URI, ldap.DialWithTLSConfig(config.TLSConfig))
+	} else {
+		l, err = ldap.DialURL(config.URI)
+	}
+
 	if err != nil {
 		c.logger.Error().Err(err).Msg("could not get ldap Connection")
 	} else {
 		c.logger.Debug().Msg("LDAP Connected")
-		if bindDN != "" {
-			c.logger.Debug().Msgf("Binding as %s", bindDN)
-			err = l.Bind(bindDN, bindPassword)
+		if config.BindDN != "" {
+			c.logger.Debug().Msgf("Binding as %s", config.BindDN)
+			err = l.Bind(config.BindDN, config.BindPassword)
 			if err != nil {
 				c.logger.Error().Err(err).Msg("Bind failed")
 				l.Close()
