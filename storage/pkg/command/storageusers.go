@@ -112,9 +112,6 @@ func storageUsersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string
 					"tmp_folder":         cfg.Reva.StorageUsers.TempFolder,
 				},
 			},
-			"interceptors": map[string]interface{}{
-				"eventsmiddleware": map[string]interface{}{},
-			},
 		},
 		"http": map[string]interface{}{
 			"network": cfg.Reva.StorageUsers.HTTPNetwork,
@@ -132,9 +129,11 @@ func storageUsersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string
 			},
 		},
 	}
-	if cfg.Reva.StorageShares.ReadOnly {
+	if cfg.Reva.StorageUsers.ReadOnly {
 		gcfg := rcfg["grpc"].(map[string]interface{})
-		gcfg["interceptors"].(map[string]interface{})["readonly"] = map[string]interface{}{}
+		gcfg["interceptors"] = map[string]interface{}{
+			"readonly": map[string]interface{}{},
+		}
 	}
 	return rcfg
 }

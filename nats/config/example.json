@@ -1,0 +1,18 @@
+{
+  "debug": {
+    "addr": "0.0.0.0:9194",
+    "token": "",
+    "pprof": false,
+    "zpages": false
+  },
+  "http": {
+    "addr": "0.0.0.0:9190"
+  },
+  "tracing": {
+    "enabled": false,
+    "type": "jaeger",
+    "endpoint": "localhost:6831",
+    "collector": "http://localhost:14268/api/traces",
+    "service": "settings"
+  }
+}

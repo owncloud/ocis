@@ -23,6 +23,7 @@ import (
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/graph/pkg/command"
 	idp "github.com/owncloud/ocis/idp/pkg/command"
+	nats "github.com/owncloud/ocis/nats/pkg/command"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -91,6 +92,7 @@ func NewService(options ...Option) (*Service, error) {
 	}
 
 	s.ServicesRegistry["settings"] = settings.NewSutureService
+	s.ServicesRegistry["nats"] = nats.NewSutureService
 	s.ServicesRegistry["storage-metadata"] = storage.NewStorageMetadata
 	s.ServicesRegistry["glauth"] = glauth.NewSutureService
 	s.ServicesRegistry["graph"] = graph.NewSutureService

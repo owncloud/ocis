@@ -106,14 +106,13 @@ func storageSharesConfigFromStruct(c *cli.Context, cfg *config.Config) map[strin
 					"gateway_addr":         cfg.Reva.Gateway.Endpoint,
 				},
 			},
-			"interceptors": map[string]interface{}{
-				"eventsmiddleware": map[string]interface{}{},
-			},
 		},
 	}
 	if cfg.Reva.StorageShares.ReadOnly {
 		gcfg := rcfg["grpc"].(map[string]interface{})
-		gcfg["interceptors"].(map[string]interface{})["readonly"] = map[string]interface{}{}
+		gcfg["interceptors"] = map[string]interface{}{
+			"readonly": map[string]interface{}{},
+		}
 	}
 	return rcfg
 }
