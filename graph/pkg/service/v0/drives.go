@@ -289,11 +289,10 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 
 	// Use the Opaque prop of the space
 	opaque := make(map[string]*types.OpaqueEntry)
-	spaceDescription := *drive.Description
-	if spaceDescription != "" {
+	if drive.Description != nil {
 		opaque["description"] = &types.OpaqueEntry{
 			Decoder: "plain",
-			Value:   []byte(spaceDescription),
+			Value:   []byte(*drive.Description),
 		}
 	}
 

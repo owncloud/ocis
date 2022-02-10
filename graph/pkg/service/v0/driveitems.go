@@ -166,14 +166,15 @@ func (g Graph) GetSpecialSpaceItems(ctx context.Context, baseURL *url.URL, space
 			readmeItem, err := g.getDriveItem(ctx, &storageprovider.ResourceId{StorageId: space.Root.StorageId, OpaqueId: readmeID})
 			if err != nil {
 				g.logger.Error().Err(err).Str("ID", readmeID).Msg("Could not get readme Item")
-			}
-			readmePath, err := g.getPathForDriveItem(ctx, &storageprovider.ResourceId{StorageId: space.Root.StorageId, OpaqueId: readmeID})
-			if err != nil {
-				g.logger.Error().Err(err).Str("ID", readmeID).Msg("Could not get readme path")
 			} else {
-				readmeItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(ReadmeSpecialFolderName)}
-				readmeItem.WebDavUrl = libregraph.PtrString(baseURL.String() + filepath.Join(space.Root.OpaqueId, *readmePath))
-				spaceItems = append(spaceItems, *readmeItem)
+				readmePath, err := g.getPathForDriveItem(ctx, &storageprovider.ResourceId{StorageId: space.Root.StorageId, OpaqueId: readmeID})
+				if err != nil {
+					g.logger.Error().Err(err).Str("ID", readmeID).Msg("Could not get readme path")
+				} else {
+					readmeItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(ReadmeSpecialFolderName)}
+					readmeItem.WebDavUrl = libregraph.PtrString(baseURL.String() + filepath.Join(space.Root.OpaqueId, *readmePath))
+					spaceItems = append(spaceItems, *readmeItem)
+				}
 			}
 		}
 	}
@@ -183,14 +184,15 @@ func (g Graph) GetSpecialSpaceItems(ctx context.Context, baseURL *url.URL, space
 			imageItem, err := g.getDriveItem(ctx, &storageprovider.ResourceId{StorageId: space.Root.StorageId, OpaqueId: imageID})
 			if err != nil {
 				g.logger.Error().Err(err).Str("ID", imageID).Msg("Could not get image Item")
-			}
-			imagePath, err := g.getPathForDriveItem(ctx, &storageprovider.ResourceId{StorageId: space.Root.StorageId, OpaqueId: imageID})
-			if err != nil {
-				g.logger.Error().Err(err).Str("ID", imageID).Msg("Could not get image path")
 			} else {
-				imageItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(SpaceImageSpecialFolderName)}
-				imageItem.WebDavUrl = libregraph.PtrString(baseURL.String() + filepath.Join(space.Root.OpaqueId, *imagePath))
-				spaceItems = append(spaceItems, *imageItem)
+				imagePath, err := g.getPathForDriveItem(ctx, &storageprovider.ResourceId{StorageId: space.Root.StorageId, OpaqueId: imageID})
+				if err != nil {
+					g.logger.Error().Err(err).Str("ID", imageID).Msg("Could not get image path")
+				} else {
+					imageItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(SpaceImageSpecialFolderName)}
+					imageItem.WebDavUrl = libregraph.PtrString(baseURL.String() + filepath.Join(space.Root.OpaqueId, *imagePath))
+					spaceItems = append(spaceItems, *imageItem)
+				}
 			}
 		}
 	}

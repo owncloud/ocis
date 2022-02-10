@@ -64,10 +64,6 @@ Feature: List and create spaces
       | name             | Project Mars |
       | quota@@@total    | 1000000000   |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
-    When user "Alice" lists all available spaces via the GraphApi
-    And user "Alice" lists the content of the space with the name "Project Mars" using the WebDav Api
-    Then the propfind result of the space should contain these entries:
-      | .space/ |
 
   Scenario: An admin user can create a Space via the Graph API with certain quota
     Given the administrator has given "Alice" the role "Admin" using the settings api
