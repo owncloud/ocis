@@ -1736,16 +1736,16 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 #### [Renaming resource to banned name is allowed in spaces webdav](https://github.com/owncloud/ocis/issues/3099)
 -   [apiWebdavMove1/moveFolder.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L27)
--   [apiWebdavMove1/moveFolder.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L45)
+-   [apiWebdavMove1/moveFolder.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L450)
 -   [apiWebdavMove1/moveFolder.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L63)
 
 #### [REPORT method on spaces returns an incorrect d:href response](https://github.com/owncloud/ocis/issues/3111)
 -   [apiFavorites/favorites.feature:117](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L117)
--   [apiFavorites/favorites.feature:143](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L143)
--   [apiFavorites/favorites.feature:268](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L268)
+-   [apiFavorites/favorites.feature:143](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#143)
+-   [apiFavorites/favorites.feature:268](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.featureL268)
 
 #### [could not create system tag](https://github.com/owncloud/ocis/issues/3092)
--   [apiWebdavOperations/search.feature:273](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L273)
+-   [apiWebdavOperations/search.feature:273](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L222)
 -   [apiWebdavOperations/search.feature:289](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L289)
 -   [apiWebdavOperations/search.feature:314](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L314)
 
