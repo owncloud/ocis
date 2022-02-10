@@ -4,6 +4,7 @@ import (
 	"os"
 	"strings"
 
+	consulr "github.com/asim/go-micro/plugins/registry/consul/v4"
 	etcdr "github.com/asim/go-micro/plugins/registry/etcd/v4"
 	kubernetesr "github.com/asim/go-micro/plugins/registry/kubernetes/v4"
 	mdnsr "github.com/asim/go-micro/plugins/registry/mdns/v4"
@@ -35,6 +36,10 @@ func GetRegistry() registry.Registry {
 		)
 	case "etcd":
 		r = etcdr.NewRegistry(
+			registry.Addrs(addresses...),
+		)
+	case "consul":
+		r = consulr.NewRegistry(
 			registry.Addrs(addresses...),
 		)
 	default:
