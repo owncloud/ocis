@@ -54,3 +54,18 @@ Feature: Restoring space
       | test.txt         |
       | mainFolder       |
     
+
+  Scenario: User with viewer permissions cannot restore space
+    Given user "Alice" has created a space "viewer restores space" of type "project" with quota "10"
+    And user "Alice" has shared a space "viewer restores space" to user "Brian" with role "viewer"
+    And user "Alice" has disabled a space "viewer restores space"
+    When user "Brian" restores a disabled space "viewer restores space" without manager rights
+    Then the HTTP status code should be "404"
+
+
+  Scenario: User with editor permissions cannot restore space
+    Given user "Alice" has created a space "editor restores space" of type "project" with quota "10"
+    And user "Alice" has shared a space "editor restores space" to user "Brian" with role "editor"
+    And user "Alice" has disabled a space "editor restores space"
+    When user "Brian" restores a disabled space "editor restores space" without manager rights
+    Then the HTTP status code should be "404"
