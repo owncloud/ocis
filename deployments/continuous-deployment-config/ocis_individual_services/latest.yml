@@ -28,7 +28,7 @@
     docker_compose_projects:
       - name: ocis
         git_url: https://github.com/owncloud/ocis.git
-        ref: invidivial-services-deployment-example
+        ref: master
         docker_compose_path: deployments/examples/ocis_individual_services
         env:
           INSECURE: "false"
@@ -39,7 +39,7 @@
           COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
       - name: monitoring
         git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git
-        ref: support-scaleout-deployment # TODO: master
+        ref: master
         env:
           NETWORK_NAME: ocis-net
           TELEMETRY_SERVE_DOMAIN: telemetry.ocis-individual-services.latest.owncloud.works
