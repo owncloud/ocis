@@ -1491,7 +1491,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_STORAGE_READ_ONLY": "false",
             # General oCIS config
             # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
-            "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy",
+            "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,nats",
             "OCIS_LOG_LEVEL": "error",
             "OCIS_URL": OCIS_URL,
             "PROXY_TLS": "true",
