@@ -9,6 +9,7 @@ Feature: Share spaces
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Brian" has been created with default attributes and without skeleton files
+    And user "Bob" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "Admin" using the settings api
 
 
@@ -32,13 +33,22 @@ Feature: Share spaces
     Given user "Alice" has created a space "Share space to Brian" of type "project" with quota "10"
     And user "Alice" has shared a space "Share space to Brian" to user "Brian" with role "viewer"
     When user "Brian" lists all available spaces via the GraphApi
-    Then the json responded should contain a space "Share space to Brian" with these key and value pairs:
-      | key              | value                            |
-      | driveType        | project                          |
-      | id               | %space_id%                       |
-      | name             | Share space to Brian             |
-      | quota@@@state    | normal                           |
-      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+    Then the json responded should contain a space "Share space to Brian" owned by "Alice" with these key and value pairs:
+      | key               | value                |
+      | driveType         | project              |
+      | id                | %space_id%           |
+      | name              | Share space to Brian |
+      | owner@@@user@@@id | %user_id%            | 
+
+  
+  Scenario: A user can see who has been granted access
+    Given user "Alice" has created a space "Share space to Brian" of type "project" with quota "10"
+    And user "Alice" has shared a space "Share space to Brian" to user "Brian" with role "viewer"
+    When user "Alice" lists all available spaces via the GraphApi
+    Then the json responded should contain a space "Share space to Brian" granted to "Brian" with these key and value pairs:
+      | key                                                    | value      |
+      | root@@@permissions@@@1@@@grantedTo@@@0@@@user@@@id     | %user_id%  | 
+      | root@@@permissions@@@1@@@roles@@@0                     | viewer     |
 
 
   Scenario: A user can see a file in a received shared space
