@@ -227,8 +227,11 @@ class SpacesContext implements Context {
 		);
 		if ($this->featureContext->getResponse()) {
 			$rawBody = $this->featureContext->getResponse()->getBody()->getContents();
-			if (isset(\json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["accounts"])) {
-				$accounts = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["accounts"];
+			$response = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
+			if (isset($response["accounts"])) {
+				$accounts = $response["accounts"];
+			} else {
+				throw new Exception(__METHOD__ . " accounts-list is empty");
 			}
 		}
 		foreach ($accounts as $account) {
@@ -1530,7 +1533,7 @@ class SpacesContext implements Context {
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
-	 * @param  string $userWithManagerRigths
+	 * @param  string $userWithManagerRights
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -1538,10 +1541,10 @@ class SpacesContext implements Context {
 	public function sendRestoreSpaceRequest(
 		string $user,
 		string $spaceName,
-		string $userWithManagerRigths = ''
+		string $userWithManagerRights = ''
 	): void {
-		if (!empty($userWithManagerRigths)) {
-			$space = $this->getSpaceByName($userWithManagerRigths, $spaceName);
+		if (!empty($userWithManagerRights)) {
+			$space = $this->getSpaceByName($userWithManagerRights, $spaceName);
 		} else {
 			$space = $this->getSpaceByName($user, $spaceName);
 		}

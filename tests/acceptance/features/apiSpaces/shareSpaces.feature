@@ -45,7 +45,7 @@ Feature: Share spaces
     Given user "Alice" has created a space "Share space to Brian" of type "project" with quota "10"
     And user "Alice" has shared a space "Share space to Brian" to user "Brian" with role "viewer"
     When user "Alice" lists all available spaces via the GraphApi
-    And the json responded should contain a space "Share space to Brian" granted to "Brian" with these key and value pairs:
+    Then the json responded should contain a space "Share space to Brian" granted to "Brian" with these key and value pairs:
       | key                                                    | value      |
       | root@@@permissions@@@1@@@grantedTo@@@0@@@user@@@id     | %user_id%  | 
       | root@@@permissions@@@1@@@roles@@@0                     | viewer     |
