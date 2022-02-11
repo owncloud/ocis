@@ -206,6 +206,43 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * The method returns userId
+	 *
+	 * @param string $userName
+	 *
+	 * @return string
+	 */
+	public function getUserIdByUserName(string $userName): string {
+
+		$fullUrl = $this->baseUrl . "/api/v0/accounts/accounts-list";
+		$this->featureContext->setResponse(
+			HttpRequestHelper::post(
+				$fullUrl, 
+				"", 
+				$this->featureContext->getAdminUsername(), 
+				$this->featureContext->getAdminPassword(), 
+				[], 
+				"{}"
+			)
+		);
+		if ($this->featureContext->getResponse()) {
+			$rawBody = $this->featureContext->getResponse()->getBody()->getContents();
+			$response = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
+			if (isset($response["accounts"])) {
+				$accounts = $response["accounts"];
+			} else {
+				throw new Exception(__METHOD__ . " accounts-list is empty");
+			}
+		}
+		foreach ($accounts as $account) {
+			if ($account["preferredName"] === $userName) {
+				return $account["id"];
+			}
+		}
+		throw new Exception(__METHOD__ . " user with name $userName not found");
+	}
+
+	/**
 	 * @BeforeScenario
 	 *
 	 * @param BeforeScenarioScope $scope
@@ -718,9 +755,10 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^the json responded should contain a space "([^"]*)" with these key and value pairs:$/
-	 *
+	 * @Then /^the json responded should contain a space "([^"]*)" (?:|(?:owned by|granted to) "([^"]*)" )with these key and value pairs:$/
+	 * 
 	 * @param string $spaceName
+	 * @param string $userName
 	 * @param TableNode $table
 	 *
 	 * @return void
@@ -728,6 +766,7 @@ class SpacesContext implements Context {
 	 */
 	public function jsonRespondedShouldContain(
 		string $spaceName,
+		string $userName = '',
 		TableNode $table
 	): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
@@ -745,7 +784,13 @@ class SpacesContext implements Context {
 						"function" =>
 							[$this, "getSpaceIdByNameFromResponse"],
 						"parameter" => [$spaceName]
-					]
+					],
+					[ 
+						"code" => "%user_id%",
+						"function" =>
+							[$this, "getUserIdByUserName"],
+						"parameter" => [$userName]
+					],
 				]
 			);
 			$segments = explode("@@@", $row["key"]);
@@ -1488,19 +1533,24 @@ class SpacesContext implements Context {
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
+	 * @param  string $userWithManagerRights
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function sendRestoreSpaceRequest(
 		string $user,
-		string $spaceName
+		string $spaceName,
+		string $userWithManagerRights = ''
 	): void {
+		if (!empty($userWithManagerRights)) {
+			$space = $this->getSpaceByName($userWithManagerRights, $spaceName);
+		} else {
+			$space = $this->getSpaceByName($user, $spaceName);
+		}
 		$header = ["restore" => true];
 		$body = '{}';
-		$space = $this->getSpaceByName($user, $spaceName);
 		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/" . $space["id"];
-
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$fullUrl,
@@ -1512,6 +1562,22 @@ class SpacesContext implements Context {
 				$body
 			)
 		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" restores a disabled space "([^"]*)" without manager rights$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function sendRestoreSpaceWithoutRightsRequest(
+		string $user,
+		string $spaceName
+	): void {
+		$this->sendRestoreSpaceRequest($user, $spaceName, $this->featureContext->getAdminUsername());
 	}
 
 	/**
