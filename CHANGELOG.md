@@ -17,6 +17,7 @@ The following sections list the changes for unreleased.
 * Change - Remove the ownCloud storage driver: [#3072](https://github.com/owncloud/ocis/pull/3072)
 * Change - Unify configuration and commands: [#2818](https://github.com/owncloud/ocis/pull/2818)
 * Change - Functionality to restore spaces: [#3092](https://github.com/owncloud/ocis/pull/3092)
+* Change - Extended Space Properties: [#3141](https://github.com/owncloud/ocis/pull/3141)
 * Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 * Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
 * Change - Return not found when updating non existent space: [#2869](https://github.com/cs3org/reva/pull/2869)
@@ -116,6 +117,13 @@ The following sections list the changes for unreleased.
    of each space when it is deleted
 
    https://github.com/owncloud/ocis/pull/3092
+
+* Change - Extended Space Properties: [#3141](https://github.com/owncloud/ocis/pull/3141)
+
+   We can now set and modify short description, space image and space readme. Only managers can set
+   the short description. Editors can change the space image and readme id.
+
+   https://github.com/owncloud/ocis/pull/3141
 
 * Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 
