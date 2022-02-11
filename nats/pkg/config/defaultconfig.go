@@ -8,5 +8,9 @@ func DefaultConfig() *Config {
 		Service: Service{
 			Name: "nats",
 		},
+		Nats: Nats{
+			Host: "127.0.0.1",
+			Port: 4222,
+		},
 	}
 }
