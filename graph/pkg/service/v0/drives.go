@@ -7,10 +7,8 @@ import (
 	"math"
 	"net/http"
 	"net/url"
-	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/CiscoM31/godata"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -19,17 +17,13 @@ import (
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/pkg/ctx"
-	"github.com/cs3org/reva/pkg/rhttp"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
-	"github.com/owncloud/ocis/graph/pkg/service/v0/net"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 	settingsServiceExt "github.com/owncloud/ocis/settings/pkg/service/v0"
-	"gopkg.in/yaml.v2"
-
 	merrors "go-micro.dev/v4/errors"
 )
 
@@ -197,6 +191,17 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		Quota: getQuota(drive.Quota, g.config.Spaces.DefaultQuota),
 	}
 
+	if drive.Description != nil {
+		csr.Opaque = &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{
+				"description": {
+					Decoder: "plain",
+					Value:   []byte(*drive.Description),
+				},
+			},
+		}
+	}
+
 	resp, err := client.CreateStorageSpace(r.Context(), &csr)
 	if err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -270,6 +275,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
+	// Note: this is the Opaque prop of the request
 	if restore, _ := strconv.ParseBool(r.Header.Get("restore")); restore {
 		updateSpaceRequest.Opaque = &types.Opaque{
 			Map: map[string]*types.OpaqueEntry{
@@ -280,6 +286,25 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 			},
 		}
 	}
+
+	// Note: this is the Opaque prop of the space itself
+	opaque := make(map[string]*types.OpaqueEntry)
+	if drive.Description != nil {
+		opaque["description"] = &types.OpaqueEntry{
+			Decoder: "plain",
+			Value:   []byte(*drive.Description),
+		}
+	}
+
+	for _, special := range drive.Special {
+		if special.Id != nil {
+			opaque[*special.SpecialFolder.Name] = &types.OpaqueEntry{
+				Decoder: "plain",
+				Value:   []byte(*special.Id),
+			}
+		}
+	}
+	updateSpaceRequest.StorageSpace.Opaque = &types.Opaque{Map: opaque}
 
 	if drive.Name != nil {
 		updateSpaceRequest.StorageSpace.Name = *drive.Name
@@ -310,7 +335,10 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	if resp.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
 		switch resp.Status.GetCode() {
 		case cs3rpc.Code_CODE_NOT_FOUND:
-			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, resp.GetStatus().GetMessage())
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "Space not found")
+			return
+		case cs3rpc.Code_CODE_PERMISSION_DENIED:
+			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, resp.GetStatus().GetMessage())
 			return
 		default:
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, resp.GetStatus().GetMessage())
@@ -325,7 +353,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updatedDrive, err := g.cs3StorageSpaceToDrive(wdu, resp.StorageSpace)
+	spaces, err := g.formatDrives(r.Context(), wdu, []*storageprovider.StorageSpace{resp.StorageSpace})
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error parsing space")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -333,49 +361,18 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, updatedDrive)
+	render.JSON(w, r, spaces[0])
 }
 
-func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, mds []*storageprovider.StorageSpace) ([]*libregraph.Drive, error) {
-	responses := make([]*libregraph.Drive, 0, len(mds))
-	for _, space := range mds {
-		res, err := g.cs3StorageSpaceToDrive(baseURL, space)
+func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces []*storageprovider.StorageSpace) ([]*libregraph.Drive, error) {
+	responses := make([]*libregraph.Drive, 0, len(storageSpaces))
+	for _, storageSpace := range storageSpaces {
+		res, err := g.cs3StorageSpaceToDrive(baseURL, storageSpace)
 		if err != nil {
 			return nil, err
 		}
-		spaceProperties, err := g.getExtendedSpaceProperties(ctx, space)
-		if err != nil {
-			g.logger.Error().Err(err).Interface("space", space).Msg("error reading extendedSpaceProperties")
-			continue
-		}
-		if err == nil {
-			if spaceProperties.Description != "" {
-				res.Description = &spaceProperties.Description
-			}
-			if len(spaceProperties.Special) > 0 {
-				s := make([]libregraph.DriveItem, 0, len(spaceProperties.Special))
-				for name, relativePath := range spaceProperties.Special {
-					sdi, err := g.getDriveItem(ctx, space.Root, relativePath)
-					if err != nil {
-						// TODO cach not found response
-						g.logger.Debug().Err(err).Interface("space", space).Interface("path", relativePath).Msg("error fetching drive item")
-						continue
-					}
-					n := name // copy the name to a dedicated variable
-					sdi.SpecialFolder = &libregraph.SpecialFolder{
-						Name: &n,
-					}
-					webdavURL := baseURL.String() + filepath.Join(space.Id.OpaqueId, relativePath)
-					sdi.WebDavUrl = &webdavURL
-
-					// TODO cache until ./.config/ocis/space.yaml file changes
-					s = append(s, *sdi)
-				}
-				res.Special = s
-			}
-		}
-		// TODO this overwrites the quota that might already have been mapped in cs3StorageSpaceToDrive above ... move this into the cs3StorageSpaceToDrive method?
-		res.Quota, err = g.getDriveQuota(ctx, space)
+		res.Special = g.GetExtendedSpaceProperties(ctx, baseURL, storageSpace)
+		res.Quota, err = g.getDriveQuota(ctx, storageSpace)
 		if err != nil {
 			return nil, err
 		}
@@ -491,6 +488,11 @@ func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.S
 			Permissions: permissions,
 		},
 	}
+	if space.Opaque != nil {
+		if description, ok := space.Opaque.Map["description"]; ok {
+			drive.Description = libregraph.PtrString(string(description.Value))
+		}
+	}
 
 	if space.Opaque != nil && space.Opaque.Map != nil {
 		v, ok := space.Opaque.Map["trashed"]
@@ -576,155 +578,6 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 	qta.State = &state
 
 	return &qta, nil
-}
-
-// ExtendedSpaceProperties are stored in a file
-type ExtendedSpaceProperties struct {
-	Version     string `yaml:"version" json:"version"`
-	Description string `yaml:"description" json:"description"`
-	// map of {name} -> {relative path to resource}, eg:
-	// readme -> readme.md
-	// image -> .config/ocis/space.png
-	Special map[string]string `yaml:"special" json:"special"`
-}
-
-// generates a space root stat cache key used to detect changes in a space
-func spaceRootStatKey(id *storageprovider.ResourceId) string {
-	if id == nil || id.StorageId == "" || id.OpaqueId == "" {
-		return ""
-	}
-	return "sid:" + id.StorageId + "!oid:" + id.OpaqueId
-}
-
-type spacePropertiesEntry struct {
-	spaceProperties ExtendedSpaceProperties
-	rootMtime       *types.Timestamp
-}
-
-func (g Graph) getExtendedSpaceProperties(ctx context.Context, space *storageprovider.StorageSpace) (*ExtendedSpaceProperties, error) {
-
-	// if the root is older or equal to our cache we can reuse the cached extended spaces properties
-	if syc, err := g.spacePropertiesCache.Get(spaceRootStatKey(space.Root)); err == nil {
-		if spe, ok := syc.(spacePropertiesEntry); ok {
-			if spe.rootMtime != nil && space.Mtime != nil {
-				if spe.rootMtime.Seconds > space.Mtime.Seconds { // second precision is good enough
-					return &spe.spaceProperties, nil
-				}
-			}
-		}
-	}
-
-	client := g.GetGatewayClient()
-
-	dlReq := &storageprovider.InitiateFileDownloadRequest{
-		Ref: &storageprovider.Reference{
-			ResourceId: &storageprovider.ResourceId{
-				StorageId: space.Root.StorageId,
-				OpaqueId:  space.Root.OpaqueId,
-			},
-			Path: "./.config/ocis/space.yaml",
-			// TODO what if a public share should have a readme and an image?
-			// should we just default to a ./Readme.md and ./folder.png/jpg?
-			// what existing conventions could we use? .desktop file? .env file?
-			// how should users set a README fo public link file shares? They only point to a file, not a folder that could contain a readme and image
-			// should weo reuse the readme and image of the space that contains the file shared via link?
-		},
-	}
-	//ctx = metadata.AppendToOutgoingContext(ctx, headers.IfModifiedSince, "TODO grpc has no official cache headers")
-	// FIXME how can clients retrieve a file just by id?
-	// The drive Item does currently not have a relative path ...
-	// so clients would have to make a request by id ... but webdav cannot do that ...
-	// TODO initiate file download only if the etag does not match
-	rsp, err := client.InitiateFileDownload(ctx, dlReq)
-	if err != nil {
-		return nil, err
-	}
-	switch rsp.Status.Code {
-	case cs3rpc.Code_CODE_OK:
-		// continue
-	case cs3rpc.Code_CODE_NOT_FOUND:
-		// cache an empty instance
-		spacePropertiesEntry := spacePropertiesEntry{
-			spaceProperties: ExtendedSpaceProperties{},
-			rootMtime:       space.Mtime,
-		}
-		if err := g.spacePropertiesCache.SetWithTTL(spaceRootStatKey(space.Root), spacePropertiesEntry, time.Second*time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL)); err != nil {
-			g.logger.Error().Err(err).Msg("could not cache extended space properties")
-		}
-
-		return &spacePropertiesEntry.spaceProperties, nil
-	default:
-		return nil, fmt.Errorf("could not initiate download of %s: %s", dlReq.Ref.Path, rsp.Status.Message)
-	}
-
-	var ep, tk string
-	for _, p := range rsp.Protocols {
-		if p.Protocol == "spaces" {
-			ep, tk = p.DownloadEndpoint, p.Token
-		}
-	}
-	if ep == "" {
-		return nil, fmt.Errorf("space does not support the spaces download protocol")
-	}
-
-	httpReq, err := rhttp.NewRequest(ctx, http.MethodGet, ep, nil)
-	if err != nil {
-		return nil, err
-	}
-	httpReq.Header.Set(net.HeaderTokenTransport, tk)
-
-	httpClient := g.GetHTTPClient()
-
-	resp, err := httpClient.Do(httpReq) // nolint:bodyclose
-	if err != nil {
-		return nil, err
-	}
-
-	switch resp.StatusCode {
-	case http.StatusOK:
-		// continue
-	case http.StatusNotFound:
-		// cache an empty instance
-		spacePropertiesEntry := spacePropertiesEntry{
-			spaceProperties: ExtendedSpaceProperties{},
-			rootMtime:       space.Mtime,
-		}
-		if err := g.spacePropertiesCache.SetWithTTL(spaceRootStatKey(space.Root), spacePropertiesEntry, time.Second*time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL)); err != nil {
-			g.logger.Error().Err(err).Msg("could not cache extended space properties")
-		}
-
-		return &spacePropertiesEntry.spaceProperties, nil
-	default:
-		return nil, fmt.Errorf("could not get the .space.yaml. Request returned with statuscode %d ", resp.StatusCode)
-	}
-
-	spaceProperties := ExtendedSpaceProperties{}
-	if err := yaml.NewDecoder(resp.Body).Decode(&spaceProperties); err != nil {
-		g.logger.Debug().Err(err).Msg("invalid space yaml, ignoring")
-
-		// cache an empty instance
-		// TODO insert an 'invalid yaml' item? how can we return an error to the user?
-		spacePropertiesEntry := spacePropertiesEntry{
-			spaceProperties: ExtendedSpaceProperties{},
-			rootMtime:       space.Mtime,
-		}
-		if err := g.spacePropertiesCache.SetWithTTL(spaceRootStatKey(space.Root), spacePropertiesEntry, time.Second*time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL)); err != nil {
-			g.logger.Error().Err(err).Msg("could not cache extended space properties")
-		}
-
-		return &spacePropertiesEntry.spaceProperties, nil
-	}
-
-	// cache properties
-	spacePropertiesEntry := spacePropertiesEntry{
-		spaceProperties: spaceProperties,
-		rootMtime:       space.Mtime,
-	}
-	if err := g.spacePropertiesCache.SetWithTTL(spaceRootStatKey(space.Root), spacePropertiesEntry, time.Second*time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL)); err != nil {
-		g.logger.Error().Err(err).Msg("could not cache extended space properties")
-	}
-
-	return &spaceProperties, nil
 }
 
 func calculateQuotaState(total int64, used int64) (state string) {
