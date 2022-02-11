@@ -4,7 +4,7 @@
       <template v-if="initialized">
         <oc-alert v-if="extensions.length === 0" variation="primary" no-close>
           <p class="uk-flex uk-flex-middle">
-            <oc-icon name="info" class="oc-mr-s" />
+            <oc-icon name="information" class="oc-mr-s" />
             <translate>No settings available</translate>
           </p>
         </oc-alert>

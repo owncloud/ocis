@@ -11,7 +11,7 @@ function $gettext (msg) {
 const appInfo = {
   name: $gettext('Accounts'),
   id: 'accounts',
-  icon: 'text-vcard',
+  icon: 'team',
   isFileEditor: false,
   extensions: []
 }
@@ -20,9 +20,7 @@ const routes = [
   {
     name: 'accounts',
     path: '/',
-    components: {
-      app: App
-    }
+    component: App
   }
 ]
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <main class="uk-flex uk-flex-column uk-height-1-1" id="accounts-app">
+    <main class="uk-flex uk-flex-column uk-height-1-1 oc-px-s" id="accounts-app">
       <template v-if="isInitialized">
         <h1 class="oc-invisible-sr">
           <translate>Accounts</translate>
@@ -21,7 +21,7 @@
       </template>
       <template v-else-if="hasFailed">
         <oc-alert variation="warning" no-close class="oc-m" id="accounts-list-loading-failed">
-          <oc-icon name="warning" variation="warning" class="uk-float-left oc-mr-s" />
+          <oc-icon name="error-warning" variation="warning" class="uk-float-left oc-mr-s" />
           <translate>You don't have permissions to manage accounts.</translate>
         </oc-alert>
       </template>
