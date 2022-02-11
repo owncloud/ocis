@@ -194,7 +194,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	if drive.Description != nil {
 		csr.Opaque = &types.Opaque{
 			Map: map[string]*types.OpaqueEntry{
-				"permissions": {
+				"description": {
 					Decoder: "plain",
 					Value:   []byte(*drive.Description),
 				},
@@ -275,7 +275,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	// Use the Opaque prop of the request
+	// Note: this is the Opaque prop of the request
 	if restore, _ := strconv.ParseBool(r.Header.Get("restore")); restore {
 		updateSpaceRequest.Opaque = &types.Opaque{
 			Map: map[string]*types.OpaqueEntry{
@@ -287,7 +287,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Use the Opaque prop of the space
+	// Note: this is the Opaque prop of the space itself
 	opaque := make(map[string]*types.OpaqueEntry)
 	if drive.Description != nil {
 		opaque["description"] = &types.OpaqueEntry{
@@ -335,7 +335,10 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	if resp.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
 		switch resp.Status.GetCode() {
 		case cs3rpc.Code_CODE_NOT_FOUND:
-			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, resp.GetStatus().GetMessage())
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "Space not found")
+			return
+		case cs3rpc.Code_CODE_PERMISSION_DENIED:
+			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, resp.GetStatus().GetMessage())
 			return
 		default:
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, resp.GetStatus().GetMessage())
@@ -368,7 +371,7 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 		if err != nil {
 			return nil, err
 		}
-		res.Special = g.GetSpecialSpaceItems(ctx, baseURL, storageSpace)
+		res.Special = g.GetExtendedSpaceProperties(ctx, baseURL, storageSpace)
 		res.Quota, err = g.getDriveQuota(ctx, storageSpace)
 		if err != nil {
 			return nil, err
