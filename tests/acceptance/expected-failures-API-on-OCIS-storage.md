@@ -1,4 +1,5 @@
 ## Scenarios from ownCloud10 core API tests that are expected to fail with OCIS storage
+The expected failures in this file are from features in the owncloud/core repo.
 
 ### File
 Basic file management like up and download, move, copy, properties, trash, versions and chunking.
