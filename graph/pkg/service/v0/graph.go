@@ -23,6 +23,8 @@ type GatewayClient interface {
 	// Returns the home path for the given authenticated user.
 	// When a user has access to multiple storage providers, one of them is the home.
 	GetHome(ctx context.Context, in *provider.GetHomeRequest, opts ...grpc.CallOption) (*provider.GetHomeResponse, error)
+	// GetPath does a path lookup for a resource by ID
+	GetPath(ctx context.Context, in *provider.GetPathRequest, opts ...grpc.CallOption) (*provider.GetPathResponse, error)
 	// Returns a list of resource information
 	// for the provided reference.
 	// MUST return CODE_NOT_FOUND if the reference does not exists.
@@ -90,4 +92,6 @@ const (
 	NoSpaceFoundMessage           = "space with id `%s` not found"
 	ListStorageSpacesTransportErr = "transport error sending list storage spaces grpc request"
 	ListStorageSpacesReturnsErr   = "list storage spaces grpc request returns an errorcode in the response"
+	ReadmeSpecialFolderName       = "readme"
+	SpaceImageSpecialFolderName   = "image"
 )
