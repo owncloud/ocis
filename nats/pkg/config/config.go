@@ -12,15 +12,10 @@ type Config struct {
 
 	Service Service
 
-	Tracing *Tracing `ocisConfig:"tracing"`
-	Log     *Log     `ocisConfig:"log"`
-	Debug   Debug    `ocisConfig:"debug"`
+	Log   *Log  `ocisConfig:"log"`
+	Debug Debug `ocisConfig:"debug"`
 
 	Nats Nats `ociConfig:"nats"`
-
-	HTTP HTTP `ocisConfig:"http"`
-
-	DataPath string `ocisConfig:"data_path" env:"NATS_DATA_PATH"`
 
 	Context context.Context
 }
