@@ -6,6 +6,7 @@ import (
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/graph/pkg/config"
 	idp "github.com/owncloud/ocis/idp/pkg/config"
+	nats "github.com/owncloud/ocis/nats/pkg/config"
 	ocs "github.com/owncloud/ocis/ocs/pkg/config"
 	proxy "github.com/owncloud/ocis/proxy/pkg/config"
 	settings "github.com/owncloud/ocis/settings/pkg/config"
@@ -29,6 +30,7 @@ func DefaultConfig() *Config {
 		GLAuth:        glauth.DefaultConfig(),
 		Graph:         graph.DefaultConfig(),
 		IDP:           idp.DefaultConfig(),
+		Nats:          nats.DefaultConfig(),
 		Proxy:         proxy.DefaultConfig(),
 		GraphExplorer: graphExplorer.DefaultConfig(),
 		OCS:           ocs.DefaultConfig(),

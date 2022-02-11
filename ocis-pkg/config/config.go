@@ -8,6 +8,7 @@ import (
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/graph/pkg/config"
 	idp "github.com/owncloud/ocis/idp/pkg/config"
+	nats "github.com/owncloud/ocis/nats/pkg/config"
 	ocs "github.com/owncloud/ocis/ocs/pkg/config"
 	proxy "github.com/owncloud/ocis/proxy/pkg/config"
 	settings "github.com/owncloud/ocis/settings/pkg/config"
@@ -60,6 +61,7 @@ type Config struct {
 	Graph         *graph.Config         `ocisConfig:"graph"`
 	GraphExplorer *graphExplorer.Config `ocisConfig:"graph_explorer"`
 	IDP           *idp.Config           `ocisConfig:"idp"`
+	Nats          *nats.Config          `ocisConfig:"nats"`
 	OCS           *ocs.Config           `ocisConfig:"ocs"`
 	Web           *web.Config           `ocisConfig:"web"`
 	Proxy         *proxy.Config         `ocisConfig:"proxy"`
