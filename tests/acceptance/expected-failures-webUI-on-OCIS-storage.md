@@ -1,4 +1,5 @@
 ## Scenarios from web tests that are expected to fail on OCIS with OCIS storage
+The expected failures in this file are from features in the owncloud/web repo.
 
 Lines that contain a format like "[someSuite.someFeature.feature:n](https://github.com/owncloud/web/path/to/feature)"
 are lines that document a specific expected failure. Follow that with a URL to the line in the feature file in GitHub.
