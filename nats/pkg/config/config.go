@@ -19,10 +19,8 @@ type Config struct {
 	Nats Nats `ociConfig:"nats"`
 
 	HTTP HTTP `ocisConfig:"http"`
-	GRPC GRPC `ocisConfig:"grpc"`
 
-	DataPath     string       `ocisConfig:"data_path" env:"SETTINGS_DATA_PATH"`
-	TokenManager TokenManager `ocisConfig:"token_manager"`
+	DataPath string `ocisConfig:"data_path" env:"NATS_DATA_PATH"`
 
 	Context context.Context
 }
