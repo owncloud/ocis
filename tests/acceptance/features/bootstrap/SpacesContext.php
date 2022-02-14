@@ -217,11 +217,11 @@ class SpacesContext implements Context {
 		$fullUrl = $this->baseUrl . "/api/v0/accounts/accounts-list";
 		$this->featureContext->setResponse(
 			HttpRequestHelper::post(
-				$fullUrl, 
-				"", 
-				$this->featureContext->getAdminUsername(), 
-				$this->featureContext->getAdminPassword(), 
-				[], 
+				$fullUrl,
+				"",
+				$this->featureContext->getAdminUsername(),
+				$this->featureContext->getAdminPassword(),
+				[],
 				"{}"
 			)
 		);
@@ -756,7 +756,7 @@ class SpacesContext implements Context {
 
 	/**
 	 * @Then /^the json responded should contain a space "([^"]*)" (?:|(?:owned by|granted to) "([^"]*)" )with these key and value pairs:$/
-	 * 
+	 *
 	 * @param string $spaceName
 	 * @param string $userName
 	 * @param TableNode $table
@@ -785,7 +785,7 @@ class SpacesContext implements Context {
 							[$this, "getSpaceIdByNameFromResponse"],
 						"parameter" => [$spaceName]
 					],
-					[ 
+					[
 						"code" => "%user_id%",
 						"function" =>
 							[$this, "getUserIdByUserName"],
@@ -1196,6 +1196,38 @@ class SpacesContext implements Context {
 	}
 
 	/**
+    	 * @When /^user "([^"]*)" changes the description of the "([^"]*)" space to "([^"]*)"$/
+    	 *
+    	 * @param string $user
+    	 * @param string $spaceName
+    	 * @param string $newName
+    	 *
+    	 * @return void
+    	 * @throws GuzzleException
+    	 * @throws Exception
+    	 */
+    	public function updateSpaceDescription(
+    		string $user,
+    		string $spaceName,
+    		string $newDescription
+    	): void {
+    		$space = $this->getSpaceByName($user, $spaceName);
+    		$spaceId = $space["id"];
+
+    		$bodyData = ["description" => $newDescription];
+    		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
+
+    		$this->featureContext->setResponse(
+    			$this->sendUpdateSpaceRequest(
+    				$user,
+    				$this->featureContext->getPasswordForUser($user),
+    				$body,
+    				$spaceId
+    			)
+    		);
+    	}
+
+	/**
 	 * @When /^user "([^"]*)" changes the quota of the "([^"]*)" space to "([^"]*)"$/
 	 *
 	 * @param string $user
@@ -1351,9 +1383,9 @@ class SpacesContext implements Context {
 		}
 		$space = $this->getSpaceByName($user, $spaceName);
 		$body = [
-			"space_ref" => $space['id'], 
-			"shareType" => 7, 
-			"shareWith" => $userRecipient, 
+			"space_ref" => $space['id'],
+			"shareType" => 7,
+			"shareWith" => $userRecipient,
 			"permissions" => $role
 		];
 
