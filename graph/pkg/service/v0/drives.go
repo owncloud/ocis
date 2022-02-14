@@ -184,30 +184,20 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	csr := storageprovider.CreateStorageSpaceRequest{
+		Owner: us,
+		Type:  driveType,
+		Name:  spaceName,
+		Quota: getQuota(drive.Quota, g.config.Spaces.DefaultQuota),
+	}
+
 	opaque := make(map[string]*types.OpaqueEntry, 1)
 	if drive.Description != nil {
 		opaque["description"] = &types.OpaqueEntry{
 			Decoder: "plain",
 			Value:   []byte(*drive.Description),
 		}
-	}
-	csr := storageprovider.CreateStorageSpaceRequest{
-		Owner:  us,
-		Type:   driveType,
-		Name:   spaceName,
-		Quota:  getQuota(drive.Quota, g.config.Spaces.DefaultQuota),
-		Opaque: &types.Opaque{Map: opaque},
-	}
-
-	if drive.Description != nil {
-		csr.Opaque = &types.Opaque{
-			Map: map[string]*types.OpaqueEntry{
-				"description": {
-					Decoder: "plain",
-					Value:   []byte(*drive.Description),
-				},
-			},
-		}
+		csr.Opaque = &types.Opaque{Map: opaque}
 	}
 
 	resp, err := client.CreateStorageSpace(r.Context(), &csr)
