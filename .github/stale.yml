@@ -8,6 +8,7 @@ exemptLabels:
   - "Type:Bug"
   - "Type:Technical-Debt"
   - "Category:Research"
+  - "QA:team"
 # Label to use when marking an issue as stale
 staleLabel: "Status:Stale"
 # Comment to post when marking an issue as stale. Set to `false` to disable
