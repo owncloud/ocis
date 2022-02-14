@@ -1,16 +1,16 @@
 <template>
   <div class="oc-p">
-    <main class="uk-flex uk-flex-column" id="settings-app">
+    <main class="oc-flex oc-flex-column" id="settings-app">
       <template v-if="initialized">
         <oc-alert v-if="extensions.length === 0" variation="primary" no-close>
-          <p class="uk-flex uk-flex-middle">
+          <p class="oc-flex oc-flex-middle">
             <oc-icon name="information" class="oc-mr-s" />
             <translate>No settings available</translate>
           </p>
         </oc-alert>
         <template v-else>
           <template v-if="selectedExtensionName">
-            <div class="uk-flex uk-flex-between uk-flex-middle">
+            <div class="oc-flex oc-flex-between oc-flex-middle">
               <h1 class="oc-page-title">
                 {{ selectedExtensionName }}
               </h1>
@@ -96,7 +96,7 @@ export default {
          */
         const navItem = {
           name: this.getExtensionName(extension),
-          iconMaterial: this.getExtensionIcon(extension),
+          icon: this.getExtensionIcon(extension),
           route: {
             name: 'settings',
             path: `/settings/${extension}`
@@ -126,7 +126,7 @@ export default {
       extension = extension || ''
       switch (extension) {
         case 'ocis-accounts':
-          return 'account_circle'
+          return 'team'
         case 'ocis-hello':
           return 'tag_faces'
         default:

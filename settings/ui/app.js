@@ -4,7 +4,7 @@ import store from './store'
 import translations from './../l10n/translations.json'
 
 // just a dummy function to trick gettext tools
-function $gettext (msg) {
+function $gettext(msg) {
   return msg
 }
 
@@ -12,8 +12,7 @@ const appInfo = {
   name: $gettext('Settings'),
   id: 'settings',
   icon: 'settings-4',
-  isFileEditor: false,
-  extensions: []
+  isFileEditor: false
 }
 
 const routes = [
@@ -27,7 +26,7 @@ const routes = [
 const navItems = [
   {
     name: $gettext('Settings'),
-    iconMaterial: appInfo.icon,
+    icon: appInfo.icon,
     route: {
       name: 'settings',
       path: `/${appInfo.id}/`

@@ -12,8 +12,7 @@ const appInfo = {
   name: $gettext('Accounts'),
   id: 'accounts',
   icon: 'team',
-  isFileEditor: false,
-  extensions: []
+  isFileEditor: false
 }
 
 const routes = [
@@ -27,7 +26,7 @@ const routes = [
 const navItems = [
   {
     name: $gettext('Accounts'),
-    iconMaterial: appInfo.icon,
+    icon: appInfo.icon,
     route: {
       name: 'accounts',
       path: `/${appInfo.id}/`

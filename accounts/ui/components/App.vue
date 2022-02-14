@@ -1,6 +1,6 @@
 <template>
   <div>
-    <main class="uk-flex uk-flex-column uk-height-1-1 oc-px-s" id="accounts-app">
+    <main class="oc-flex oc-flex-column oc-height-1-1 oc-p-m" id="accounts-app">
       <template v-if="isInitialized">
         <h1 class="oc-invisible-sr">
           <translate>Accounts</translate>
@@ -13,15 +13,24 @@
           />
           <accounts-create v-else />
         </div>
-        <oc-grid class="uk-flex-1 uk-overflow-auto">
-          <div class="uk-width-expand">
+        <oc-grid class="oc-flex-1 oc-overflow-auto">
+          <div class="oc-width-expand">
             <accounts-list :accounts="accounts" />
           </div>
         </oc-grid>
       </template>
       <template v-else-if="hasFailed">
-        <oc-alert variation="warning" no-close class="oc-m" id="accounts-list-loading-failed">
-          <oc-icon name="error-warning" variation="warning" class="uk-float-left oc-mr-s" />
+        <oc-alert
+          variation="warning"
+          no-close
+          class="oc-m"
+          id="accounts-list-loading-failed"
+        >
+          <oc-icon
+            name="error-warning"
+            variation="warning"
+            class="oc-float-left oc-mr-s"
+          />
           <translate>You don't have permissions to manage accounts.</translate>
         </oc-alert>
       </template>
@@ -40,7 +49,12 @@ export default {
   name: 'App',
   components: { AccountsBatchActions, AccountsList, AccountsCreate },
   computed: {
-    ...mapGetters('Accounts', ['isInitialized', 'hasFailed', 'getAccountsSorted', 'isAnyAccountSelected']),
+    ...mapGetters('Accounts', [
+      'isInitialized',
+      'hasFailed',
+      'getAccountsSorted',
+      'isAnyAccountSelected'
+    ]),
     ...mapState('Accounts', ['selectedAccounts']),
 
     accounts () {

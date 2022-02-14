@@ -7,7 +7,7 @@ OC_CI_GOLANG = "owncloudci/golang:1.17"
 OC_CI_NODEJS = "owncloudci/nodejs:14"
 OC_CI_PHP = "owncloudci/php:7.4"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
-OC_TESTING_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.3.0"
+OC_TESTING_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.3.1"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
 REDIS = "redis:6-alpine"
 
@@ -635,16 +635,10 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                     "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
                     "cd /srv/app/web",
                     "git checkout $WEB_COMMITID",
-                    "cp -r tests/acceptance/filesForUpload/* /uploads",
                     "cd tests/acceptance/",
                     "yarn install --immutable",
                     "./run.sh",
                 ],
-                "volumes": [stepVolumeOC10Tests] +
-                           [{
-                               "name": "uploads",
-                               "path": "/uploads",
-                           }],
             },
         ] + failEarly(ctx, early_fail),
         "services": selenium() + middlewareService(),
