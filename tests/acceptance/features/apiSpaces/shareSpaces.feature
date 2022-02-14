@@ -85,18 +85,10 @@ Feature: Share spaces
     Given user "Alice" has created a space "Multiple Managers" of type "project" with quota "10"
     And user "Alice" has uploaded a file inside space "Multiple Managers" with content "Test" to "test.txt"
     When user "Alice" has shared a space "Multiple Managers" to user "Brian" with role "manager"
-    Then user "Brian" lists all available spaces via the GraphApi
-    And the json responded should contain a space "Multiple Managers" granted to "Brian" with these key and value pairs:
-      | key                                                    | value       |
-      | root@@@permissions@@@0@@@grantedTo@@@1@@@user@@@id     | %user_id%   |
-      | root@@@permissions@@@0@@@roles@@@0                     | manager     |
-      | driveType                                              | project     |
+    And user "Brian" lists all available spaces via the GraphApi
+    Then the json responded should contain a space "Multiple Managers" granted to "Brian" with role "manager"
     When user "Brian" has shared a space "Multiple Managers" to user "Bob" with role "viewer"
-    Then user "Bob" lists all available spaces via the GraphApi
-    And the json responded should contain a space "Multiple Managers" granted to "Bob" with these key and value pairs:
-      | key                                                    | value       |
-      | root@@@permissions@@@1@@@grantedTo@@@0@@@user@@@id     | %user_id%   |
-      | root@@@permissions@@@1@@@roles@@@0                     | viewer      |
-      | driveType                                              | project     |
+    And user "Bob" lists all available spaces via the GraphApi
+    Then the json responded should contain a space "Multiple Managers" granted to "Bob" with role "viewer"
     And for user "Bob" the space "Multiple Managers" should contain these entries:
       | test.txt |

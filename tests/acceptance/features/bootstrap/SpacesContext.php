@@ -810,6 +810,35 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Then /^the json responded should contain a space "([^"]*)" granted to "([^"]*)" with role "([^"]*)"$/
+	 *
+	 * @param string $spaceName
+	 * @param string $userName
+	 * @param string $role
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function checkPermissionsInResponse(
+		string $spaceName,
+		string $userName,
+		string $role
+	): void {
+		Assert::assertIsArray($spaceAsArray = $this->getSpaceByNameFromResponse($spaceName), "No space with name $spaceName found");
+		$permissions = $spaceAsArray["root"]["permissions"];
+		$userId = $this->getUserIdByUserName($userName);
+		
+		$userRole = "";
+		foreach ($permissions as $permission) {
+			foreach ($permission["grantedTo"] as $grantedTo)
+			if ($grantedTo["user"]["id"] === $userId) {
+				$userRole = $permission["roles"][0];
+			} 
+		}
+		Assert::assertEquals($userRole, $role, "the user $userName with the role $role could not be found");
+	}
+
+	/**
 	 * @Then /^the json responded should not contain a space with name "([^"]*)"$/
 	 *
 	 * @param string $spaceName
