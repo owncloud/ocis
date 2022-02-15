@@ -2,6 +2,9 @@ package command
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/cs3org/reva/pkg/events/server"
 	"github.com/owncloud/ocis/nats/pkg/config"
@@ -25,6 +28,8 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			ch := make(chan os.Signal, 1)
+			signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 			err := server.RunNatsServer(server.Host(cfg.Nats.Host), server.Port(cfg.Nats.Port), server.StanOpts(func(o *stanServer.Options) {
 				o.CustomLogger = &logWrapper{logger}
 			}))
@@ -32,6 +37,14 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 			for {
+				select {
+				case <-ch:
+					// TODO: Should we shut down the NatsServer in a proper way here?
+					// That would require a reference to the StanServer instance for being able to call
+					// StanServer.Shutdown() github.com/cs3org/reva/pkg/events/server doesn't provide that
+					// currently
+					return nil
+				}
 			}
 		},
 	}
