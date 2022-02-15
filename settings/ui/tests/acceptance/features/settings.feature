@@ -8,7 +8,7 @@ Feature: Set user specific settings
 			| username |
 			| user1    |
 			| user2    |
-		And user "user1" has created folder "simple-folder"
+		And user "user1" has created folder "simple-folder" in the server
 
 	Scenario: Check the default settings
 		Given user "user1" has logged in using the webUI

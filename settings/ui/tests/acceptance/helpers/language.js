@@ -4,6 +4,7 @@ const filesMenu = {
     'Shared with me',
     'Shared with others',
     'Shared via link',
+    'Spaces',
     'Deleted files'
   ],
   Deutsch: [
@@ -11,6 +12,7 @@ const filesMenu = {
     'Mit mir geteilt',
     'Mit anderen geteilt',
     'Per Link geteilt',
+    'Spaces',
     'Gelöschte Dateien'
   ],
   Español: [
@@ -18,6 +20,7 @@ const filesMenu = {
     'Compartido conmigo',
     'Compartido con otros',
     'Shared via link',
+    'Spaces',
     'Archivos borrados'
   ],
   Français: [
@@ -25,30 +28,35 @@ const filesMenu = {
     'Partagé avec moi',
     'Partagé avec autres',
     'Shared via link',
+    'Spaces',
     'Fichiers supprimés'
   ]
 }
 
 const accountMenu = {
   English: [
-    'Profile',
+    'N\nnull\nuser1@example.com',
     'Settings',
-    'Log out'
+    'Log out',
+    'Personal storage (0.2% used)\n5.06 GB of 2.85 TB used'
   ],
   Deutsch: [
-    'Profil',
+    'N\nnull\nuser1@example.com',
     'Einstellungen',
-    'Abmelden'
+    'Abmelden',
+    'Persönlicher Speicher (0.2% benutzt)\n5.06 GB von 2.85 TB benutzt'
   ],
   Español: [
-    'Profile',
+    'N\nnull\nuser1@example.com',
     'Configuración',
-    'Salir'
+    'Salir',
+    'Personal storage (0.2% used)\n5.06 GB of 2.85 TB used'
   ],
   Français: [
-    'Profil',
+    'N\nnull\nuser1@example.com',
     'Settings',
-    'Se déconnecter'
+    'Se déconnecter',
+    'Personal storage (0.2% used)\n5.06 GB of 2.85 TB used'
   ]
 }
 

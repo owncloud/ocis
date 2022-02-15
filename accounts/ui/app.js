@@ -11,25 +11,22 @@ function $gettext (msg) {
 const appInfo = {
   name: $gettext('Accounts'),
   id: 'accounts',
-  icon: 'text-vcard',
-  isFileEditor: false,
-  extensions: []
+  icon: 'team',
+  isFileEditor: false
 }
 
 const routes = [
   {
     name: 'accounts',
     path: '/',
-    components: {
-      app: App
-    }
+    component: App
   }
 ]
 
 const navItems = [
   {
     name: $gettext('Accounts'),
-    iconMaterial: appInfo.icon,
+    icon: appInfo.icon,
     route: {
       name: 'accounts',
       path: `/${appInfo.id}/`

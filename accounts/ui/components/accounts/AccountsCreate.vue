@@ -28,7 +28,7 @@
         :disabled="isRequestInProgress"
         @keydown.enter="createAccount"
       />
-      <div class="uk-flex">
+      <div class="oc-flex">
         <oc-button
           class="oc-mr-s oc-mb-s"
           v-text="$gettext('Cancel')"
@@ -51,7 +51,11 @@
             size="small"
             aria-hidden="true"
           />
-          <span v-text="isRequestInProgress ? $gettext('Creating') : $gettext('Create')" />
+          <span
+            v-text="
+              isRequestInProgress ? $gettext('Creating') : $gettext('Create')
+            "
+          />
         </oc-button>
       </div>
     </oc-grid>
@@ -65,7 +69,7 @@
           gap-size="small"
           @click="setFormInProgress(true)"
         >
-          <oc-icon name="add" />
+          <oc-icon name="user-add" />
           <translate>Create new account</translate>
         </oc-button>
       </div>

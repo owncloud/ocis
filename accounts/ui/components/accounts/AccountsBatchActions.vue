@@ -1,22 +1,45 @@
 <template>
-  <oc-grid key="selected-accounts-info" gutter="small" class="uk-flex-middle">
+  <oc-grid key="selected-accounts-info" gutter="small" class="oc-flex-middle">
     <span v-text="selectionInfoText" />
     <span>|</span>
     <div>
-      <oc-button v-text="$gettext('Clear selection')" appearance="raw" @click="RESET_ACCOUNTS_SELECTION" />
+      <oc-button
+        v-text="$gettext('Clear selection')"
+        appearance="raw"
+        @click="RESET_ACCOUNTS_SELECTION"
+      />
     </div>
     <oc-grid gutter="small" id="accounts-batch-actions">
       <div v-for="action in actions" :key="action.label">
-        <div v-if="isConfirmationInProgress[action.id]" :variation="action.confirmation.variation || 'primary'" noClose class="uk-flex uk-flex-middle tmp-alert-fixes">
+        <div
+          v-if="isConfirmationInProgress[action.id]"
+          :variation="action.confirmation.variation || 'primary'"
+          noClose
+          class="oc-flex oc-flex-middle tmp-alert-fixes"
+        >
           <span>{{ action.confirmation.message }}</span>
-          <oc-button :id="action.confirmation.cancel.id" @click="action.confirmation.cancel.handler" :variation="action.confirmation.cancel.variation || 'passive'">
+          <oc-button
+            :id="action.confirmation.cancel.id"
+            @click="action.confirmation.cancel.handler"
+            :variation="action.confirmation.cancel.variation || 'passive'"
+          >
             {{ action.confirmation.cancel.label }}
           </oc-button>
-          <oc-button :id="action.confirmation.confirm.id" @click="action.confirmation.confirm.handler" :variation="action.confirmation.confirm.variation || 'primary'">
+          <oc-button
+            :id="action.confirmation.confirm.id"
+            @click="action.confirmation.confirm.handler"
+            :variation="action.confirmation.confirm.variation || 'primary'"
+          >
             {{ action.confirmation.confirm.label }}
           </oc-button>
         </div>
-        <oc-button v-else :id="action.id" @click="action.handler" :variation="action.variation || 'primary'" :icon="action.icon">
+        <oc-button
+          v-else
+          :id="action.id"
+          @click="action.handler"
+          :variation="action.variation || 'primary'"
+          :icon="action.icon"
+        >
           {{ action.label }}
         </oc-button>
       </div>

@@ -12,16 +12,24 @@
       />
     </oc-td>
     <oc-td>
-      <avatar :user-name="account.displayName || account.onPremisesSamAccountName" :userid="account.id" :width="35" />
+      <avatar
+        :user-name="account.displayName || account.onPremisesSamAccountName"
+        :userid="account.id"
+        :width="35"
+      />
     </oc-td>
     <oc-td v-text="account.onPremisesSamAccountName" />
     <oc-td v-text="account.displayName || '-'" />
     <oc-td v-text="account.mail" />
     <oc-td>
-      <oc-button :id="`accounts-roles-select-trigger-${account.id}`" class="accounts-roles-select-trigger" appearance="outline">
-        <span class="uk-flex uk-flex-middle accounts-roles-current-role">
-          {{ currentRole ? currentRole.displayName : $gettext('Select role') }}
-          <oc-icon name="expand_more" aria-hidden="true" />
+      <oc-button
+        :id="`accounts-roles-select-trigger-${account.id}`"
+        class="accounts-roles-select-trigger"
+        appearance="outline"
+      >
+        <span class="oc-flex oc-flex-middle accounts-roles-current-role">
+          {{ currentRole ? currentRole.displayName : $gettext("Select role") }}
+          <oc-icon name="arrow-down-s" aria-hidden="true" />
         </span>
       </oc-button>
       <oc-drop
@@ -31,7 +39,7 @@
         close-on-click
         :options="{ delayHide: 0 }"
       >
-        <ul class="uk-list">
+        <ul class="oc-list">
           <li v-for="role in roles" :key="role.id">
             <oc-radio
               class="accounts-roles-dropdown-role"
@@ -48,15 +56,15 @@
       <oc-icon
         v-if="account.accountEnabled"
         key="account-icon-enabled"
-        name="ready"
+        name="user-follow"
         variation="success"
         :aria-label="$gettext('Account is activated')"
         class="accounts-status-indicator-enabled"
       />
       <oc-icon
         v-else
-        name="deprecated"
         key="account-icon-disabled"
+        name="user-unfollow"
         variation="danger"
         :aria-label="$gettext('Account is blocked')"
         class="accounts-status-indicator-disabled"

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <oc-table-simple id="accounts-user-list">
+    <oc-table-simple id="accounts-user-list" class="oc-mt-l">
       <oc-thead>
         <oc-tr>
           <oc-th shrink type="head" align-h="center">
@@ -17,7 +17,12 @@
           <oc-th type="head" v-text="$gettext('Display name')" />
           <oc-th type="head" v-text="$gettext('Email')" />
           <oc-th type="head" v-text="$gettext('Role')" />
-          <oc-th shrink type="head" v-text="$gettext('Activated')" align-h="center"/>
+          <oc-th
+            shrink
+            type="head"
+            v-text="$gettext('Activated')"
+            align-h="center"
+          />
         </oc-tr>
       </oc-thead>
       <oc-tbody>

@@ -1,19 +1,26 @@
 <template>
-  <div class="uk-width-1-1 uk-width-2-3@m uk-width-1-2@l uk-width-1-3@xl">
+  <div class="oc-width-1-1 oc-width-2-3@m oc-width-1-2@l oc-width-1-3@xl">
     <h2 class="oc-mb-s">
       <translate>{{ bundle.displayName }}</translate>
     </h2>
     <oc-grid gutter="small">
       <template>
-        <div class="uk-width-1-1" v-for="setting in bundle.settings" :key="setting.id">
-          <label class="oc-label" :for="setting.id">{{ setting.displayName }}</label>
-          <div class="uk-position-relative"
-               :is="getSettingComponent(setting)"
-               :id="setting.id"
-               :bundle="bundle"
-               :setting="setting"
-               :persisted-value="getValue(setting)"
-               @onSave="onSaveValue"
+        <div
+          class="oc-width-1-1"
+          v-for="setting in bundle.settings"
+          :key="setting.id"
+        >
+          <label class="oc-label" :for="setting.id">{{
+            setting.displayName
+          }}</label>
+          <div
+            class="oc-position-relative"
+            :is="getSettingComponent(setting)"
+            :id="setting.id"
+            :bundle="bundle"
+            :setting="setting"
+            :persisted-value="getValue(setting)"
+            @onSave="onSaveValue"
           />
         </div>
       </template>

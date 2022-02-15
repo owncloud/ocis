@@ -1,6 +1,6 @@
 <template>
   <oc-grid flex>
-    <div class="uk-width-expand">
+    <div class="oc-width-expand">
       <oc-text-input
         v-model="value"
         :placeholder="setting.stringValue.placeholder"
