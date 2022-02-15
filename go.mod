@@ -263,3 +263,6 @@ require (
 	stash.kopano.io/kgol/kcc-go/v5 v5.0.1 // indirect
 	stash.kopano.io/kgol/oidc-go v0.3.2 // indirect
 )
+
+// we need to use a fork to make the windows build pass
+replace github.com/pkg/xattr => github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7
