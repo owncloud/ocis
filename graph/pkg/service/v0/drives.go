@@ -18,6 +18,7 @@ import (
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/utils"
+	"github.com/cs3org/reva/pkg/utils/resourceid"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -409,7 +410,7 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 }
 
 func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpace) (*libregraph.Drive, error) {
-	rootID := space.Root.StorageId + "!" + space.Root.OpaqueId
+	rootID := resourceid.OwnCloudResourceIDWrap(space.Root)
 	if space.Root.StorageId == space.Root.OpaqueId {
 		// omit opaqueid
 		rootID = space.Root.StorageId
