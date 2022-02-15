@@ -33,7 +33,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add endpoint to retrieve a single space: [#2978](https://github.com/owncloud/ocis/pull/2978)
 * Enhancement - Add filter by driveType and id to /me/drives: [#2946](https://github.com/owncloud/ocis/pull/2946)
 * Enhancement - Update REVA to xxx: [#2878](https://github.com/owncloud/ocis/pull/2878)
-* Enhancement - Update ownCloud Web to v4.8.0: [#2895](https://github.com/owncloud/ocis/pull/2895)
+* Enhancement - Update ownCloud Web to v5.0.0: [#2895](https://github.com/owncloud/ocis/pull/2895)
 
 ## Details
 
@@ -233,15 +233,17 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/3116
    https://github.com/owncloud/ocis/pull/3130
 
-* Enhancement - Update ownCloud Web to v4.8.0: [#2895](https://github.com/owncloud/ocis/pull/2895)
+* Enhancement - Update ownCloud Web to v5.0.0: [#2895](https://github.com/owncloud/ocis/pull/2895)
 
    Tags: web
 
-   We updated ownCloud Web to v4.8.0. Please refer to the changelog (linked) for details on the web
+   We updated ownCloud Web to v5.0.0. Please refer to the changelog (linked) for details on the web
    release.
 
    https://github.com/owncloud/ocis/pull/2895
+   https://github.com/owncloud/ocis/pull/3157
    https://github.com/owncloud/web/releases/tag/v4.8.0
+   https://github.com/owncloud/web/releases/tag/v5.0.0
 # Changelog for [1.16.0] (2021-12-10)
 
 The following sections list the changes for 1.16.0.
