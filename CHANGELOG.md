@@ -21,6 +21,7 @@ The following sections list the changes for unreleased.
 * Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 * Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
 * Change - Return not found when updating non existent space: [#2869](https://github.com/cs3org/reva/pull/2869)
+* Enhancement - Provide Description when creating a space: [#3167](https://github.com/owncloud/ocis/pull/3167)
 * Enhancement - Add graph endpoint to delete and purge spaces: [#2979](https://github.com/owncloud/ocis/pull/2979)
 * Enhancement - Add permissions to graph drives: [#3095](https://github.com/owncloud/ocis/pull/3095)
 * Enhancement - Add new file url of the app provider to the ocs capabilities: [#2884](https://github.com/owncloud/ocis/pull/2884)
@@ -142,6 +143,12 @@ The following sections list the changes for unreleased.
    If a spaceid of a space which is updated doesn't exist, handle it as a not found error.
 
    https://github.com/cs3org/reva/pull/2869
+
+* Enhancement - Provide Description when creating a space: [#3167](https://github.com/owncloud/ocis/pull/3167)
+
+   We added the possibility to send a short description when creating a space.
+
+   https://github.com/owncloud/ocis/pull/3167
 
 * Enhancement - Add graph endpoint to delete and purge spaces: [#2979](https://github.com/owncloud/ocis/pull/2979)
 
