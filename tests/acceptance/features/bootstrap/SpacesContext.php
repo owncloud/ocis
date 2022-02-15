@@ -1405,11 +1405,7 @@ class SpacesContext implements Context {
 			"space_ref" => $space['id'],
 			"shareType" => 7,
 			"shareWith" => $userRecipient,
-<<<<<<< HEAD
-			"permissions" => $role
-=======
 			"role" => $role // role overrides the permissions parameter
->>>>>>> 122b17511 (add Api test for adding space managers)
 		];
 
 		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares";
