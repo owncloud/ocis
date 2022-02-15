@@ -17,6 +17,7 @@ import (
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/pkg/ctx"
+	"github.com/cs3org/reva/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -192,14 +193,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if drive.Description != nil {
-		csr.Opaque = &types.Opaque{
-			Map: map[string]*types.OpaqueEntry{
-				"description": {
-					Decoder: "plain",
-					Value:   []byte(*drive.Description),
-				},
-			},
-		}
+		csr.Opaque = utils.AppendPlainToOpaque(csr.Opaque, "description", *drive.Description)
 	}
 
 	resp, err := client.CreateStorageSpace(r.Context(), &csr)
