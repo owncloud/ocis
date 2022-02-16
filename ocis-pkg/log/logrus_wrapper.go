@@ -1,4 +1,4 @@
-package logging
+package log
 
 import (
 	"io/ioutil"
@@ -26,7 +26,7 @@ type LogrusWrapper struct {
 
 // Wrap return a logrus logger which internally logs to /dev/null. Messages are passed to the
 // underlying zerolog via hooks.
-func Wrap(zr zerolog.Logger) *logrus.Logger {
+func LogrusWrap(zr zerolog.Logger) *logrus.Logger {
 	lr := logrus.New()
 	lr.SetOutput(ioutil.Discard)
 	lr.SetLevel(logrusLevel(zr.GetLevel()))
