@@ -33,12 +33,11 @@ Feature: Share spaces
     Given user "Alice" has created a space "Share space to Brian" of type "project" with quota "10"
     And user "Alice" has shared a space "Share space to Brian" to user "Brian" with role "viewer"
     When user "Brian" lists all available spaces via the GraphApi
-    Then the json responded should contain a space "Share space to Brian" owned by "Alice" with these key and value pairs:
+    Then the json responded should contain a space "Share space to Brian" with these key and value pairs:
       | key               | value                |
       | driveType         | project              |
       | id                | %space_id%           |
       | name              | Share space to Brian |
-      | owner@@@user@@@id | %user_id%            |
 
 
   Scenario: A user can see who has been granted access
@@ -80,6 +79,7 @@ Feature: Share spaces
     Then the HTTP status code should be "200"
     And user "Brian" lists all available spaces via the GraphApi
     And the json responded should not contain a space with name "Unshare space"
+
 
   Scenario: A user can add another user to the space managers to enable him
     Given user "Alice" has created a space "Multiple Managers" of type "project" with quota "10"
