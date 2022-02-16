@@ -232,6 +232,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/2997
    https://github.com/owncloud/ocis/pull/3116
    https://github.com/owncloud/ocis/pull/3130
+   https://github.com/owncloud/ocis/pull/3175
 
 * Enhancement - Update ownCloud Web to v5.0.0: [#2895](https://github.com/owncloud/ocis/pull/2895)
 
