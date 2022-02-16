@@ -330,7 +330,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	if resp.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
 		switch resp.Status.GetCode() {
 		case cs3rpc.Code_CODE_NOT_FOUND:
-			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "Space not found")
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, resp.GetStatus().GetMessage())
 			return
 		case cs3rpc.Code_CODE_PERMISSION_DENIED:
 			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, resp.GetStatus().GetMessage())
