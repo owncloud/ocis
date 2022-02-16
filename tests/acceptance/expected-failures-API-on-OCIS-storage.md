@@ -479,6 +479,8 @@ cannot share a folder with create permission
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L20)
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L30)
 -   [apiSharePublicLink1/accessToPublicLinkShare.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L44)
+-   [apiSharePublicLink1/createPublicLinkShare.feature:587](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L587)
+-   [apiSharePublicLink1/createPublicLinkShare.feature:608](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L608)
 
 #### [download previews of other users file](https://github.com/owncloud/ocis/issues/2071)
 
@@ -509,24 +511,12 @@ cannot share a folder with create permission
 
 #### [various sharing settings cannot be set](https://github.com/owncloud/ocis/issues/1328)
 
--   [apiSharePublicLink1/createPublicLinkShare.feature:319](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L319)
--   [apiSharePublicLink1/createPublicLinkShare.feature:320](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L320)
--   [apiSharePublicLink1/createPublicLinkShare.feature:347](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L347)
--   [apiSharePublicLink1/createPublicLinkShare.feature:348](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L348)
--   [apiSharePublicLink1/createPublicLinkShare.feature:377](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L377)
--   [apiSharePublicLink1/createPublicLinkShare.feature:378](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L378)
--   [apiSharePublicLink1/createPublicLinkShare.feature:411](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L411)
--   [apiSharePublicLink1/createPublicLinkShare.feature:412](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L412)
--   [apiSharePublicLink1/createPublicLinkShare.feature:413](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L413)
--   [apiSharePublicLink1/createPublicLinkShare.feature:414](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L414)
--   [apiSharePublicLink1/createPublicLinkShare.feature:415](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L415)
--   [apiSharePublicLink1/createPublicLinkShare.feature:416](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L416)
--   [apiSharePublicLink1/createPublicLinkShare.feature:443](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L443)
--   [apiSharePublicLink1/createPublicLinkShare.feature:444](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L444)
--   [apiSharePublicLink1/createPublicLinkShare.feature:459](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L459)
--   [apiSharePublicLink1/createPublicLinkShare.feature:460](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L460)
--   [apiSharePublicLink1/createPublicLinkShare.feature:561](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L561)
--   [apiSharePublicLink1/createPublicLinkShare.feature:562](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L562)
+-   [apiSharePublicLink1/createPublicLinkShare.feature:375](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L375)
+-   [apiSharePublicLink1/createPublicLinkShare.feature:376](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L376)
+-   [apiSharePublicLink1/createPublicLinkShare.feature:477](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L477)
+-   [apiSharePublicLink1/createPublicLinkShare.feature:478](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L478)
+-   [apiSharePublicLink1/createPublicLinkShare.feature:566](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L566)
+-   [apiSharePublicLink1/createPublicLinkShare.feature:567](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L567)
 -   [apiShareManagementBasicToShares/deleteShareFromShares.feature:212](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L212)
 -   [apiShareManagementBasicToShares/deleteShareFromShares.feature:213](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L213)
 -   [apiShareManagementBasicToShares/deleteShareFromShares.feature:214](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L214)
@@ -538,11 +528,6 @@ cannot share a folder with create permission
 -   [apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:104](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature#L104)
 -   [apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:105](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature#L105)
 
-#### [Public cannot upload file with mtime set on a public link share with new version of WebDAV API](https://github.com/owncloud/core/issues/37605)
-
--   [apiSharePublicLink1/createPublicLinkShare.feature:671](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L671)
--   [apiSharePublicLink1/createPublicLinkShare.feature:692](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L692)
-
 #### [copying a folder within a public link folder to folder with same name as an already existing file overwrites the parent file](https://github.com/owncloud/ocis/issues/1232)
 
 -   [apiSharePublicLink2/copyFromPublicLink.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/copyFromPublicLink.feature#L59)
@@ -553,8 +538,12 @@ cannot share a folder with create permission
 -   [apiSharePublicLink2/copyFromPublicLink.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/copyFromPublicLink.feature#L182)
 -   [apiSharePublicLink2/updatePublicLinkShare.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L45)
 -   [apiSharePublicLink2/updatePublicLinkShare.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L46)
--   [apiSharePublicLink2/updatePublicLinkShare.feature:117](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L117)
 -   [apiSharePublicLink2/updatePublicLinkShare.feature:118](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L118)
+-   [apiSharePublicLink2/updatePublicLinkShare.feature:119](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L119)
+-   [apiSharePublicLink2/updatePublicLinkShare.feature:120](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L120)
+-   [apiSharePublicLink2/updatePublicLinkShare.feature:121](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L121)
+-   [apiSharePublicLink2/updatePublicLinkShare.feature:126](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L126)
+-   [apiSharePublicLink2/updatePublicLinkShare.feature:127](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L127)
 
 #### [OCIS share permissions not enforced](https://github.com/owncloud/product/issues/270)
 
@@ -565,24 +554,24 @@ cannot share a folder with create permission
 
 #### [Adding public upload to a read only shared folder as a recipient is allowed ](https://github.com/owncloud/ocis/issues/2164)
 
--   [apiSharePublicLink2/updatePublicLinkShare.feature:332](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L332)
--   [apiSharePublicLink2/updatePublicLinkShare.feature:333](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L333)
--   [apiSharePublicLink2/updatePublicLinkShare.feature:392](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L392)
--   [apiSharePublicLink2/updatePublicLinkShare.feature:393](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L393)
+-   [apiSharePublicLink2/updatePublicLinkShare.feature:342](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L342)
+-   [apiSharePublicLink2/updatePublicLinkShare.feature:343](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L343)
+-   [apiSharePublicLink2/updatePublicLinkShare.feature:402](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L402)
+-   [apiSharePublicLink2/updatePublicLinkShare.feature:403](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L403)
 
 #### [Upload-only shares must not overwrite but create a separate file](https://github.com/owncloud/ocis-reva/issues/286)
 
 -   [apiSharePublicLink2/uploadToPublicLinkShare.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L24)
--   [apiSharePublicLink2/uploadToPublicLinkShare.feature:268](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L268)
+-   [apiSharePublicLink2/uploadToPublicLinkShare.feature:273](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L273)
 
 #### [Set quota over settings](https://github.com/owncloud/ocis/issues/1290)
--   [apiSharePublicLink2/uploadToPublicLinkShare.feature:152](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L152)
--   [apiSharePublicLink2/uploadToPublicLinkShare.feature:171](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L171)
+-   [apiSharePublicLink2/uploadToPublicLinkShare.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L158)
+-   [apiSharePublicLink2/uploadToPublicLinkShare.feature:177](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L177)
 
 #### [various sharing settings cannot be set](https://github.com/owncloud/ocis/issues/1328)
 
--   [apiSharePublicLink2/uploadToPublicLinkShare.feature:190](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L190)
--   [apiSharePublicLink2/uploadToPublicLinkShare.feature:210](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L210)
+-   [apiSharePublicLink2/uploadToPublicLinkShare.feature:196](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L196)
+-   [apiSharePublicLink2/uploadToPublicLinkShare.feature:215](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L215)
 
 #### [Resharing does not work with ocis storage](https://github.com/owncloud/product/issues/265)
 
@@ -860,10 +849,6 @@ Scenario Outline: Moving a file into a shared folder as the sharee and as the sh
 -   [apiShareReshareToShares3/reShareWithExpiryDate.feature:249](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareWithExpiryDate.feature#L249)
 -   [apiShareReshareToShares3/reShareWithExpiryDate.feature:250](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareWithExpiryDate.feature#L250)
 -   [apiShareReshareToShares3/reShareWithExpiryDate.feature:251](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareWithExpiryDate.feature#L251)
-
-#### Expiration date of public link shares
--   [apiSharePublicLink1/createPublicLinkShare.feature:650](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L650)
--   [apiSharePublicLink1/createPublicLinkShare.feature:651](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L651)
 
 #### [incorrect ocs(v2) status value when sharing to group that does not exist should be 404, gives 998](https://github.com/owncloud/product/issues/250)
 _ocs: api compatibility, return correct status code_
