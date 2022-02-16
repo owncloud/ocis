@@ -34,21 +34,22 @@ Feature: Share spaces
     And user "Alice" has shared a space "Share space to Brian" to user "Brian" with role "viewer"
     When user "Brian" lists all available spaces via the GraphApi
     Then the json responded should contain a space "Share space to Brian" owned by "Alice" with these key and value pairs:
-      | key               | value                |
-      | driveType         | project              |
-      | id                | %space_id%           |
-      | name              | Share space to Brian |
-      | owner@@@user@@@id | %user_id%            | 
+      | key                                                | value                |
+      | driveType                                          | project              |
+      | id                                                 | %space_id%           |
+      | name                                               | Share space to Brian |
+      | root@@@permissions@@@0@@@grantedTo@@@0@@@user@@@id | %user_id%            |
+      | root@@@permissions@@@0@@@roles@@@0                 | manager              |
 
-  
+
   Scenario: A user can see who has been granted access
     Given user "Alice" has created a space "Share space to Brian" of type "project" with quota "10"
     And user "Alice" has shared a space "Share space to Brian" to user "Brian" with role "viewer"
     When user "Alice" lists all available spaces via the GraphApi
     Then the json responded should contain a space "Share space to Brian" granted to "Brian" with these key and value pairs:
-      | key                                                    | value      |
-      | root@@@permissions@@@1@@@grantedTo@@@0@@@user@@@id     | %user_id%  | 
-      | root@@@permissions@@@1@@@roles@@@0                     | viewer     |
+      | key                                                | value     |
+      | root@@@permissions@@@1@@@grantedTo@@@0@@@user@@@id | %user_id% |
+      | root@@@permissions@@@1@@@roles@@@0                 | viewer    |
 
 
   Scenario: A user can see a file in a received shared space
