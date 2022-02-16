@@ -798,6 +798,9 @@ class SpacesContext implements Context {
 			foreach ($segments as $segment) {
 				$arrayKeyExists = \array_key_exists($segment, $spaceAsArray);
 				$key = $row["key"];
+				if ($arrayKeyExists == false) {
+					\var_dump($original);
+				}
 				Assert::assertTrue($arrayKeyExists, "The key $key does not exist on the response");
 				if ($arrayKeyExists) {
 					$spaceAsArray = $spaceAsArray[$segment];
