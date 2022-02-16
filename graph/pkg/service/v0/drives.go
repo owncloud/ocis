@@ -411,10 +411,6 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 
 func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpace) (*libregraph.Drive, error) {
 	rootID := resourceid.OwnCloudResourceIDWrap(space.Root)
-	if space.Root.StorageId == space.Root.OpaqueId {
-		// omit opaqueid
-		rootID = space.Root.StorageId
-	}
 
 	var permissions []libregraph.Permission
 	if space.Opaque != nil {
@@ -473,7 +469,7 @@ func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.S
 	}
 
 	drive := &libregraph.Drive{
-		Id:   &rootID,
+		Id:   &space.Root.StorageId,
 		Name: &space.Name,
 		//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
 		//"description": "string", // TODO read from StorageSpace ... needs Opaque for now
@@ -502,7 +498,7 @@ func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.S
 		// TODO read from StorageSpace ... needs Opaque for now
 		// TODO how do we build the url?
 		// for now: read from request
-		webDavURL := baseURL.String() + rootID
+		webDavURL := baseURL.String() + space.Root.StorageId
 		drive.Root.WebDavUrl = &webDavURL
 	}
 
