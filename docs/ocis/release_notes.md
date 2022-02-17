@@ -32,6 +32,10 @@ You can also read the full [ownCloud Infinite Scale changelog](https://github.co
 
 ### Breaking changes
 {{< hint warning >}}
+Due to some breaking changes, the [WOPI Server extension]({{< ref "https://github.com/cs3org/wopiserver" >}}) that is required for online office integrations (Collabora Online, ONLYOFFICE, Microsoft Office Online) is not compatible with the 1.17.0 release. This issue is under investigation and will be fixed with the next releases.
+{{< /hint >}}
+
+{{< hint warning >}}
 We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
 {{< /hint >}}
 
