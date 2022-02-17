@@ -9,10 +9,11 @@ geekdocFilePath: release_notes.md
 
 ## ownCloud Infinite Scale 1.17.0 Technology Preview
 
-Version 1.17.0 brings major changes, new features and improvements. ownCloud Web 5.0.0 comes with a full rework of the design and user experience and introduces initial support for the 'Spaces' feauture. Additionally ownCloud Web now supports Collabora Online with the ownCloud 10 backend.
+Version 1.17.0 brings major changes, new features and improvements. The Infinite Scale backend introduces an event system as an important platform component. ownCloud Web 5.0.0 comes with a full rework of the design and user experience and introduces initial support for the 'Spaces' feauture. Additionally ownCloud Web now supports Collabora Online with the ownCloud 10 backend.
 
 The most prominent changes in ownCloud Infinite Scale 1.17.0 and ownCloud Web 5.0.0 comprise:
 
+- ownCloud Infinite Scale now comes with the foundations of an event system based on [NATS](nats.io). The events system allows the oCIS services to communicate between each other based on events and will be the key component for features like notifications, auditing and other event-driven extensions/mechanisms. [cs3org/reva#2522](https://github.com/cs3org/reva/pull/2522)
 - ownCloud Web has been completely reworked in terms of design and user experience (main layout, app switcher, navigation sidebar, icons, user menu, etc.). [web#6102](https://github.com/owncloud/web/issues/6102) [web#6036](https://github.com/owncloud/web/issues/6036) [web#6272](https://github.com/owncloud/web/pull/6272)
 - Initial support for the 'Spaces' feature in Infinite Scale and ownCloud Web. [web#6254](https://github.com/owncloud/web/pull/6254) [web#6199](https://github.com/owncloud/web/pull/6199) [web#6262](https://github.com/owncloud/web/pull/6262) [ocis#2931](https://github.com/owncloud/ocis/pull/2931) [ocis#3095](https://github.com/owncloud/ocis/pull/3095)
 - Spaces can now be disabled, restored and permanently deleted. [ocis#3092](https://github.com/owncloud/ocis/pull/3092)
