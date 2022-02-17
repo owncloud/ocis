@@ -810,6 +810,35 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Then /^the json responded should contain a space "([^"]*)" granted to "([^"]*)" with role "([^"]*)"$/
+	 *
+	 * @param string $spaceName
+	 * @param string $userName
+	 * @param string $role
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function checkPermissionsInResponse(
+		string $spaceName,
+		string $userName,
+		string $role
+	): void {
+		Assert::assertIsArray($spaceAsArray = $this->getSpaceByNameFromResponse($spaceName), "No space with name $spaceName found");
+		$permissions = $spaceAsArray["root"]["permissions"];
+		$userId = $this->getUserIdByUserName($userName);
+		
+		$userRole = "";
+		foreach ($permissions as $permission) {
+			foreach ($permission["grantedTo"] as $grantedTo)
+			if ($grantedTo["user"]["id"] === $userId) {
+				$userRole = $permission["roles"][0];
+			} 
+		}
+		Assert::assertEquals($userRole, $role, "the user $userName with the role $role could not be found");
+	}
+
+	/**
 	 * @Then /^the json responded should not contain a space with name "([^"]*)"$/
 	 *
 	 * @param string $spaceName
@@ -1371,22 +1400,12 @@ class SpacesContext implements Context {
 		string $userRecipient,
 		string $role
 	): void {
-		switch ($role) {
-			case "viewer":
-				$role = 1;
-				break;
-			case "editor":
-				$role = 15;
-				break;
-			default:
-				$role = 1;
-		}
 		$space = $this->getSpaceByName($user, $spaceName);
 		$body = [
 			"space_ref" => $space['id'],
 			"shareType" => 7,
 			"shareWith" => $userRecipient,
-			"permissions" => $role
+			"role" => $role // role overrides the permissions parameter
 		];
 
 		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares";

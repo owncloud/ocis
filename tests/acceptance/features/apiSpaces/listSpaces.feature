@@ -78,11 +78,12 @@ Feature: List and create spaces
 
   Scenario: A user can list his personal space via multiple endpoints
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'personal'"
-    Then the json responded should contain a space "Alice Hansen" with these key and value pairs:
+    Then the json responded should contain a space "Alice Hansen" owned by "Alice" with these key and value pairs:
       | key              | value         |
       | driveType        | personal      |
       | name             | Alice Hansen  |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+      | owner@@@user@@@id | %user_id%    |
     When user "Alice" looks up the single space "Alice Hansen" via the GraphApi by using its id
     Then the json responded should contain a space "Alice Hansen" with these key and value pairs:
       | key              | value         |
