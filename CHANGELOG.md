@@ -18,6 +18,7 @@ The following sections list the changes for unreleased.
 * Change - Unify configuration and commands: [#2818](https://github.com/owncloud/ocis/pull/2818)
 * Change - Functionality to restore spaces: [#3092](https://github.com/owncloud/ocis/pull/3092)
 * Change - Extended Space Properties: [#3141](https://github.com/owncloud/ocis/pull/3141)
+* Change - Unify file IDs: [#3185](https://github.com/owncloud/ocis/pull/3185)
 * Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 * Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
 * Change - Return not found when updating non existent space: [#2869](https://github.com/cs3org/reva/pull/2869)
@@ -125,6 +126,14 @@ The following sections list the changes for unreleased.
    the short description. Editors can change the space image and readme id.
 
    https://github.com/owncloud/ocis/pull/3141
+
+* Change - Unify file IDs: [#3185](https://github.com/owncloud/ocis/pull/3185)
+
+   We changed the file IDs to be consistent across all our APIs (WebDAV, LibreGraph, OCS). We
+   removed the base64 encoding. Now they are formatted like <storageID>!<opaqueID>. They are
+   using a reserved character ``!`` as a URL safe separator.
+
+   https://github.com/owncloud/ocis/pull/3185
 
 * Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 
