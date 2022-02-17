@@ -74,7 +74,7 @@ ci-golangci-lint: $(GOLANGCI_LINT)
 
 .PHONY: test
 test:
-	@go test -v -coverprofile coverage.out ./...
+	@go test -v -tags '$(TAGS)' -coverprofile coverage.out ./...
 
 .PHONY: go-coverage
 go-coverage:

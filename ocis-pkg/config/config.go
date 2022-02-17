@@ -7,6 +7,7 @@ import (
 	glauth "github.com/owncloud/ocis/glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/graph/pkg/config"
+	idm "github.com/owncloud/ocis/idm/pkg/config"
 	idp "github.com/owncloud/ocis/idp/pkg/config"
 	nats "github.com/owncloud/ocis/nats/pkg/config"
 	notifications "github.com/owncloud/ocis/notifications/pkg/config"
@@ -62,6 +63,7 @@ type Config struct {
 	Graph         *graph.Config         `ocisConfig:"graph"`
 	GraphExplorer *graphExplorer.Config `ocisConfig:"graph_explorer"`
 	IDP           *idp.Config           `ocisConfig:"idp"`
+	IDM           *idm.Config           `ocisConfig:"idm"`
 	Nats          *nats.Config          `ocisConfig:"nats"`
 	Notifications *notifications.Config `ocisConfig:"notifications"`
 	OCS           *ocs.Config           `ocisConfig:"ocs"`
