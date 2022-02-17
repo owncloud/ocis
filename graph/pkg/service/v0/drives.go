@@ -18,6 +18,7 @@ import (
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/pkg/ctx"
 	"github.com/cs3org/reva/pkg/utils"
+	"github.com/cs3org/reva/pkg/utils/resourceid"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -329,7 +330,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	if resp.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
 		switch resp.Status.GetCode() {
 		case cs3rpc.Code_CODE_NOT_FOUND:
-			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "Space not found")
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, resp.GetStatus().GetMessage())
 			return
 		case cs3rpc.Code_CODE_PERMISSION_DENIED:
 			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, resp.GetStatus().GetMessage())
@@ -409,11 +410,7 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 }
 
 func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpace) (*libregraph.Drive, error) {
-	rootID := space.Root.StorageId + "!" + space.Root.OpaqueId
-	if space.Root.StorageId == space.Root.OpaqueId {
-		// omit opaqueid
-		rootID = space.Root.StorageId
-	}
+	rootID := resourceid.OwnCloudResourceIDWrap(space.Root)
 
 	var permissions []libregraph.Permission
 	if space.Opaque != nil {
@@ -472,7 +469,7 @@ func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.S
 	}
 
 	drive := &libregraph.Drive{
-		Id:   &rootID,
+		Id:   &space.Root.StorageId,
 		Name: &space.Name,
 		//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
 		//"description": "string", // TODO read from StorageSpace ... needs Opaque for now
@@ -501,7 +498,7 @@ func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.S
 		// TODO read from StorageSpace ... needs Opaque for now
 		// TODO how do we build the url?
 		// for now: read from request
-		webDavURL := baseURL.String() + rootID
+		webDavURL := baseURL.String() + space.Root.StorageId
 		drive.Root.WebDavUrl = &webDavURL
 	}
 

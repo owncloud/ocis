@@ -90,11 +90,11 @@ var _ = Describe("Graph", func() {
 				"value":[
 					{
 						"driveType":"aspacetype",
-						"id":"aspaceid!anopaqueid",
+						"id":"aspaceid",
 						"name":"aspacename",
 						"root":{
 							"id":"aspaceid!anopaqueid",
-							"webDavUrl":"https://localhost:9200/dav/spaces/aspaceid!anopaqueid"
+							"webDavUrl":"https://localhost:9200/dav/spaces/aspaceid"
 						}
 					}
 				]

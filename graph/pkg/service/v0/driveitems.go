@@ -11,6 +11,7 @@ import (
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/pkg/utils/resourceid"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
@@ -113,7 +114,7 @@ func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*libregraph.Driv
 	*size = int64(res.Size) // TODO lurking overflow: make size of libregraph drive item use uint64
 
 	driveItem := &libregraph.DriveItem{
-		Id:   &res.Id.OpaqueId,
+		Id:   libregraph.PtrString(resourceid.OwnCloudResourceIDWrap(res.Id)),
 		Size: size,
 	}
 
@@ -164,7 +165,7 @@ func (g Graph) GetExtendedSpaceProperties(ctx context.Context, baseURL *url.URL,
 
 	for _, itemName := range names {
 		if itemID, ok := metadata[itemName]; ok {
-			spaceItem := g.getSpecialDriveItem(ctx, string(itemID.Value), itemName, baseURL, space)
+			spaceItem := g.getSpecialDriveItem(ctx, resourceid.OwnCloudResourceIDUnwrap(string(itemID.Value)), itemName, baseURL, space)
 			if spaceItem != nil {
 				spaceItems = append(spaceItems, *spaceItem)
 			}
@@ -173,20 +174,20 @@ func (g Graph) GetExtendedSpaceProperties(ctx context.Context, baseURL *url.URL,
 	return spaceItems
 }
 
-func (g Graph) getSpecialDriveItem(ctx context.Context, itemID string, itemName string, baseURL *url.URL, space *storageprovider.StorageSpace) *libregraph.DriveItem {
+func (g Graph) getSpecialDriveItem(ctx context.Context, ID *storageprovider.ResourceId, itemName string, baseURL *url.URL, space *storageprovider.StorageSpace) *libregraph.DriveItem {
 	var spaceItem *libregraph.DriveItem
-	if itemID == "" {
+	if ID == nil {
 		return nil
 	}
 
-	spaceItem, err := g.getDriveItem(ctx, &storageprovider.ResourceId{StorageId: space.Root.StorageId, OpaqueId: itemID})
+	spaceItem, err := g.getDriveItem(ctx, ID)
 	if err != nil {
-		g.logger.Error().Err(err).Str("ID", itemID).Msg("Could not get readme Item")
+		g.logger.Error().Err(err).Str("ID", ID.OpaqueId).Msg("Could not get readme Item")
 		return nil
 	}
-	itemPath, err := g.getPathForDriveItem(ctx, &storageprovider.ResourceId{StorageId: space.Root.StorageId, OpaqueId: itemID})
+	itemPath, err := g.getPathForDriveItem(ctx, ID)
 	if err != nil {
-		g.logger.Error().Err(err).Str("ID", itemID).Msg("Could not get readme path")
+		g.logger.Error().Err(err).Str("ID", ID.OpaqueId).Msg("Could not get readme path")
 		return nil
 	}
 	spaceItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(itemName)}
