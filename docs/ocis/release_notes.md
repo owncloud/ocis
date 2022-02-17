@@ -7,6 +7,40 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.17.0 Technology Preview
+
+Version 1.17.0 brings major changes, new features and improvements. The Infinite Scale backend introduces an event system as an important platform component and adds support for file locking. ownCloud Web 5.0.0 comes with a full rework of the design and user experience and introduces initial support for the 'Spaces' feauture. Additionally ownCloud Web now supports Collabora Online with the ownCloud 10 backend.
+
+The most prominent changes in ownCloud Infinite Scale 1.17.0 and ownCloud Web 5.0.0 comprise:
+
+- Infinite Scale now comes with the foundations of an event system based on [NATS](nats.io). The events system allows the oCIS services to communicate between each other based on events and will be the key component for features like notifications, auditing and other event-driven extensions/mechanisms. [cs3org/reva#2522](https://github.com/cs3org/reva/pull/2522)
+- ownCloud Web has been completely reworked in terms of design and user experience (main layout, app switcher, navigation sidebar, icons, user menu, etc.). [web#6102](https://github.com/owncloud/web/issues/6102) [web#6036](https://github.com/owncloud/web/issues/6036) [web#6272](https://github.com/owncloud/web/pull/6272)
+- Initial support for the 'Spaces' feature in Infinite Scale and ownCloud Web has been added. [web#6254](https://github.com/owncloud/web/pull/6254) [web#6199](https://github.com/owncloud/web/pull/6199) [web#6262](https://github.com/owncloud/web/pull/6262) [ocis#2931](https://github.com/owncloud/ocis/pull/2931) [ocis#3095](https://github.com/owncloud/ocis/pull/3095)
+- Infinite Scale now supports file locking on CS3 and WebDAV levels to prevent concurrent/conflicting edits in shared areas. ownCloud Web will soon follow-up with the respective actions and indicators. [cs3org/reva#2460](https://github.com/cs3org/reva/pull/2460)
+- Spaces can now be disabled, restored and permanently deleted. [ocis#3092](https://github.com/owncloud/ocis/pull/3092)
+- ownCloud Web now provides a light and dark mode with an interactive switcher. [web#6242](https://github.com/owncloud/web/issues/6242)
+- ownCloud Web now provides skeleton loading bars in the file list. [web#6204](https://github.com/owncloud/web/pull/6204)
+- ownCloud Web now provides an ID- and path-based URL scheme according to https://owncloud.dev/ocis/adr/0011-global-url-format/#mixed-global-urls. [web#6137](https://github.com/owncloud/web/pull/6137)
+- ownCloud Web now supports Collabora Online with the ownCloud 10 backend. More information on configuration can be found in the [documentation](https://owncloud.dev/clients/web/deployments/oc10-app/#collabora-online).
+- ownCloud Web now respects share expiration date enforcement and defaults with the ownCloud 10 backend. [web#6176](https://github.com/owncloud/web/pull/6176)
+- The People sharing dialog in ownCloud Web has received a couple of improvements. [web#6039](https://github.com/owncloud/web/pull/6039)
+- ownCloud Web now persists sorting preferences. [web#5930](https://github.com/owncloud/web/issues/5930)
+- ownCloud Web will now sort properly, even on paginated views. [web#5687](https://github.com/owncloud/web/issues/5687)
+- The right-click menu works again in public links. [web#6123](https://github.com/owncloud/web/issues/6123)
+- GraphAPI endpoints for Spaces and user/group management are now available. [ocis#2858](https://github.com/owncloud/ocis/pull/2858) [ocis#2947](https://github.com/owncloud/ocis/pull/2947) [ocis#2946](https://github.com/owncloud/ocis/pull/2946) [ocis#2978](https://github.com/owncloud/ocis/pull/2978) [ocis#2979](https://github.com/owncloud/ocis/pull/2979)
+- Public links with passwords now work properly. [ocis#2831](https://github.com/owncloud/ocis/pull/2831)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.17.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v5.0.0) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+Due to some breaking changes, the [WOPI Server extension](https://github.com/cs3org/wopiserver) that is required for online office integrations (Collabora Online, ONLYOFFICE, Microsoft Office Online) is not compatible with the 1.17.0 release. This issue is under investigation and will be fixed with the next releases.
+{{< /hint >}}
+
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.16.0 Technology Preview
 
 Version 1.16.0 brings bug fixes, new features and progress for ongoing feature implementations like 'Spaces' and application integrations. ownCloud Web comes with a couple of usability improvements (e.g., breadcrumb context menu, right-click menu for multi-select). Infinite Scale has got a revamped config handling that makes deployments easier and more flexible. Additionally, it enables easy and fast collaboration via public links.
