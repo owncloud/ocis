@@ -2,7 +2,26 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.16.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.17.0...master
+
+## Summary
+
+* Change - Unify file IDs: [#3185](https://github.com/owncloud/ocis/pull/3185)
+
+## Details
+
+* Change - Unify file IDs: [#3185](https://github.com/owncloud/ocis/pull/3185)
+
+   We changed the file IDs to be consistent across all our APIs (WebDAV, LibreGraph, OCS). We
+   removed the base64 encoding. Now they are formatted like <storageID>!<opaqueID>. They are
+   using a reserved character ``!`` as a URL safe separator.
+
+   https://github.com/owncloud/ocis/pull/3185
+# Changelog for [1.17.0] (2022-02-16)
+
+The following sections list the changes for 1.17.0.
+
+[1.17.0]: https://github.com/owncloud/ocis/compare/v1.16.0...v1.17.0
 
 ## Summary
 
@@ -18,7 +37,6 @@ The following sections list the changes for unreleased.
 * Change - Unify configuration and commands: [#2818](https://github.com/owncloud/ocis/pull/2818)
 * Change - Functionality to restore spaces: [#3092](https://github.com/owncloud/ocis/pull/3092)
 * Change - Extended Space Properties: [#3141](https://github.com/owncloud/ocis/pull/3141)
-* Change - Unify file IDs: [#3185](https://github.com/owncloud/ocis/pull/3185)
 * Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 * Change - Update libre-graph-api to v0.3.0: [#2858](https://github.com/owncloud/ocis/pull/2858)
 * Change - Return not found when updating non existent space: [#2869](https://github.com/cs3org/reva/pull/2869)
@@ -33,7 +51,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update REVA to v1.16.1-0.20220112085026-07451f6cd806: [#2953](https://github.com/owncloud/ocis/pull/2953)
 * Enhancement - Add endpoint to retrieve a single space: [#2978](https://github.com/owncloud/ocis/pull/2978)
 * Enhancement - Add filter by driveType and id to /me/drives: [#2946](https://github.com/owncloud/ocis/pull/2946)
-* Enhancement - Update REVA to xxx: [#2878](https://github.com/owncloud/ocis/pull/2878)
+* Enhancement - Update REVA to v1.16.1-0.20220215130802-df1264deff58: [#2878](https://github.com/owncloud/ocis/pull/2878)
 * Enhancement - Update ownCloud Web to v5.0.0: [#2895](https://github.com/owncloud/ocis/pull/2895)
 
 ## Details
@@ -126,14 +144,6 @@ The following sections list the changes for unreleased.
    the short description. Editors can change the space image and readme id.
 
    https://github.com/owncloud/ocis/pull/3141
-
-* Change - Unify file IDs: [#3185](https://github.com/owncloud/ocis/pull/3185)
-
-   We changed the file IDs to be consistent across all our APIs (WebDAV, LibreGraph, OCS). We
-   removed the base64 encoding. Now they are formatted like <storageID>!<opaqueID>. They are
-   using a reserved character ``!`` as a URL safe separator.
-
-   https://github.com/owncloud/ocis/pull/3185
 
 * Change - Update the graph api: [#2885](https://github.com/owncloud/ocis/pull/2885)
 
@@ -230,9 +240,9 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/2946
 
-* Enhancement - Update REVA to xxx: [#2878](https://github.com/owncloud/ocis/pull/2878)
+* Enhancement - Update REVA to v1.16.1-0.20220215130802-df1264deff58: [#2878](https://github.com/owncloud/ocis/pull/2878)
 
-   Updated REVA to xxx This update includes:
+   Updated REVA to v1.16.1-0.20220215130802-df1264deff58 This update includes:
 
   * Enh [cs3org/reva#2524](https://github.com/cs3org/reva/pull/2524): Remove space members
   * Fix [cs3org/reva#2541](https://github.com/cs3org/reva/pull/2541): fix xattr error types, remove error wrapper
