@@ -24,6 +24,7 @@ import (
 	graph "github.com/owncloud/ocis/graph/pkg/command"
 	idp "github.com/owncloud/ocis/idp/pkg/command"
 	nats "github.com/owncloud/ocis/nats/pkg/command"
+	notifications "github.com/owncloud/ocis/notifications/pkg/command"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -114,6 +115,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["storage-shares"] = storage.NewStorageShares
 	s.ServicesRegistry["storage-public-link"] = storage.NewStoragePublicLink
 	s.ServicesRegistry["storage-appprovider"] = storage.NewAppProvider
+	s.ServicesRegistry["notifications"] = notifications.NewSutureService
 
 	// populate delayed services
 	s.Delayed["storage-sharing"] = storage.NewSharing
