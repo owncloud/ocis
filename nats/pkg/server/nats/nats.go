@@ -1,6 +1,7 @@
 package nats
 
 import (
+	"context"
 	"time"
 
 	natsServer "github.com/nats-io/nats-server/v2/server"
@@ -8,14 +9,18 @@ import (
 )
 
 type NATSServer struct {
+	ctx context.Context
+
 	natsOpts *natsServer.Options
 	stanOpts *stanServer.Options
 
 	server *stanServer.StanServer
 }
 
-func NewNATSServer(opts ...Option) (*NATSServer, error) {
+func NewNATSServer(ctx context.Context, opts ...Option) (*NATSServer, error) {
+
 	server := &NATSServer{
+		ctx:      ctx,
 		natsOpts: &stanServer.DefaultNatsServerOptions,
 		stanOpts: stanServer.GetDefaultOptions(),
 	}
@@ -28,7 +33,6 @@ func NewNATSServer(opts ...Option) (*NATSServer, error) {
 }
 
 func (n *NATSServer) ListenAndServe() (err error) {
-
 	n.server, err = stanServer.RunServerWithOpts(
 		n.stanOpts,
 		n.natsOpts,
@@ -37,13 +41,19 @@ func (n *NATSServer) ListenAndServe() (err error) {
 		return err
 	}
 
+	defer n.Shutdown()
+
 	for {
 		// check if NATs server has an encountered an error
 		if err := n.server.LastError(); err != nil {
 			return err
 		}
-		// check if th NATs server is still running
+		// check if the NATs server is still running
 		if n.server.State() == stanServer.Shutdown {
+			return nil
+		}
+		// check if context was cancelled
+		if n.ctx.Err() != nil {
 			return nil
 		}
 		time.Sleep(1 * time.Second)

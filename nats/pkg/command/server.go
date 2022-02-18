@@ -36,6 +36,7 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			natsServer, err := nats.NewNATSServer(
+				ctx,
 				nats.Host(cfg.Nats.Host),
 				nats.Port(cfg.Nats.Port),
 				nats.Logger(logging.NewLogWrapper(logger)),
