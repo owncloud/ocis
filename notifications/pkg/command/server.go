@@ -6,6 +6,7 @@ import (
 	"github.com/asim/go-micro/plugins/events/nats/v4"
 	"github.com/cs3org/reva/pkg/events"
 	"github.com/cs3org/reva/pkg/events/server"
+	"github.com/owncloud/ocis/notifications/pkg/channels"
 	"github.com/owncloud/ocis/notifications/pkg/config"
 	"github.com/owncloud/ocis/notifications/pkg/config/parser"
 	"github.com/owncloud/ocis/notifications/pkg/logging"
@@ -39,8 +40,11 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-
-			svc := service.NewEventsNotifier(evts, logger)
+			channel, err := channels.NewMailChanel(logger)
+			if err != nil {
+				return err
+			}
+			svc := service.NewEventsNotifier(evts, channel, logger)
 			return svc.Run()
 		},
 	}

@@ -1,11 +1,12 @@
 package service
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/cs3org/reva/pkg/events"
+	"github.com/owncloud/ocis/notifications/pkg/channels"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
@@ -13,9 +14,10 @@ type Service interface {
 	Run() error
 }
 
-func NewEventsNotifier(events <-chan interface{}, logger log.Logger) Service {
+func NewEventsNotifier(events <-chan interface{}, channel channels.Channel, logger log.Logger) Service {
 	return eventsNotifier{
 		logger:  logger,
+		channel: channel,
 		events:  events,
 		signals: make(chan os.Signal, 1),
 	}
@@ -23,6 +25,7 @@ func NewEventsNotifier(events <-chan interface{}, logger log.Logger) Service {
 
 type eventsNotifier struct {
 	logger  log.Logger
+	channel channels.Channel
 	events  <-chan interface{}
 	signals chan os.Signal
 }
@@ -35,7 +38,14 @@ func (s eventsNotifier) Run() error {
 		select {
 		case evt := <-s.events:
 			go func() {
-				fmt.Println(evt)
+				switch e := evt.(type) {
+				case events.ShareCreated:
+					if err := s.channel.SendMessage(e.GranteeUserID.OpaqueId, "You got a share"); err != nil {
+						s.logger.Error().
+							Err(err).
+							Msg("failed to send a message")
+					}
+				}
 			}()
 		case <-s.signals:
 			s.logger.Debug().
