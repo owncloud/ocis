@@ -721,14 +721,14 @@ func (g Graph) sortSpaces(req *godata.GoDataRequest, spaces []*libregraph.Drive)
 			if req.Query.OrderBy.OrderByItems[0].Order == "desc" {
 				sort.Slice(spaces,
 					func(p, q int) bool {
-						return *spaces[p].Name < *spaces[q].Name
+						return *spaces[p].Name > *spaces[q].Name
 					},
 				)
 			}
 			if req.Query.OrderBy.OrderByItems[0].Order == "asc" {
 				sort.Slice(spaces,
 					func(p, q int) bool {
-						return *spaces[p].Name > *spaces[q].Name
+						return *spaces[p].Name < *spaces[q].Name
 					},
 				)
 			}
