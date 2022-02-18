@@ -2,6 +2,7 @@ package nats
 
 import (
 	natsServer "github.com/nats-io/nats-server/v2/server"
+	"github.com/nats-io/nats-streaming-server/logger"
 	stanServer "github.com/nats-io/nats-streaming-server/server"
 )
 
@@ -22,16 +23,9 @@ func Port(port int) Option {
 	}
 }
 
-// NatsOpts allows setting Options from nats package directly
-func NatsOpts(opt func(*natsServer.Options)) Option {
-	return func(no *natsServer.Options, _ *stanServer.Options) {
-		opt(no)
-	}
-}
-
-// StanOpts allows setting Options from stan package directly
-func StanOpts(opt func(*stanServer.Options)) Option {
-	return func(_ *natsServer.Options, so *stanServer.Options) {
-		opt(so)
+// Port sets the host URL for the nats server
+func Logger(logger logger.Logger) Option {
+	return func(no *natsServer.Options, so *stanServer.Options) {
+		so.CustomLogger = logger
 	}
 }

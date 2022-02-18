@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/oklog/run"
 
@@ -12,9 +11,6 @@ import (
 	"github.com/owncloud/ocis/nats/pkg/logging"
 	"github.com/owncloud/ocis/nats/pkg/server/nats"
 	"github.com/urfave/cli/v2"
-
-	// TODO: .Logger Option on events/server would make this import redundant
-	stanServer "github.com/nats-io/nats-streaming-server/server"
 )
 
 // Server is the entrypoint for the server command.
@@ -39,46 +35,22 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			var natsServer *stanServer.StanServer
+			natsServer, err := nats.NewNATSServer(
+				nats.Host(cfg.Nats.Host),
+				nats.Port(cfg.Nats.Port),
+				nats.Logger(logging.NewLogWrapper(logger)),
+			)
+			if err != nil {
+				return err
+			}
 
 			gr.Add(func() error {
-				var err error
-
-				natsServer, err = nats.RunNatsServer(
-					nats.Host(cfg.Nats.Host),
-					nats.Port(cfg.Nats.Port),
-					nats.StanOpts(
-						func(o *stanServer.Options) {
-							o.CustomLogger = logging.NewLogWrapper(logger)
-						},
-					),
-				)
-
-				if err != nil {
-					return err
-				}
-
-				errChan := make(chan error)
-
-				go func() {
-					for {
-						// check if NATs server has an encountered an error
-						if err := natsServer.LastError(); err != nil {
-							errChan <- err
-							return
-						}
-						if ctx.Err() != nil {
-							return // context closed
-						}
-						time.Sleep(1 * time.Second)
-					}
-				}()
-
+				err := make(chan error)
 				select {
 				case <-ctx.Done():
 					return nil
-				case err = <-errChan:
-					return err
+				case err <- natsServer.ListenAndServe():
+					return <-err
 				}
 
 			}, func(_ error) {
