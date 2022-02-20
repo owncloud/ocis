@@ -715,63 +715,76 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Graph) sortSpaces(req *godata.GoDataRequest, spaces []*libregraph.Drive) []*libregraph.Drive {
-	if req.Query.OrderBy != nil {
-		switch req.Query.OrderBy.OrderByItems[0].Field.Value {
-		case "name":
-			if req.Query.OrderBy.OrderByItems[0].Order == "desc" {
-				sort.Slice(spaces,
-					func(p, q int) bool {
-						return *spaces[p].Name > *spaces[q].Name
-					},
-				)
-			}
-			if req.Query.OrderBy.OrderByItems[0].Order == "asc" {
-				sort.Slice(spaces,
-					func(p, q int) bool {
-						return *spaces[p].Name < *spaces[q].Name
-					},
-				)
-			}
-		case "lastModifiedDateTime":
-			if req.Query.OrderBy.OrderByItems[0].Order == "desc" {
-				sort.Slice(spaces,
-					func(p, q int) bool {
-						// compare the items when both dates are set
-						if spaces[p].LastModifiedDateTime != nil && spaces[q].LastModifiedDateTime != nil {
-							return spaces[p].LastModifiedDateTime.After(*spaces[q].LastModifiedDateTime)
-						}
-						// move left item down if it has no value
-						if spaces[p].LastModifiedDateTime == nil && spaces[q].LastModifiedDateTime != nil {
-							return false
-						}
-						// move right item down if it has no value
-						if spaces[p].LastModifiedDateTime != nil && spaces[q].LastModifiedDateTime == nil {
-							return true
-						}
-						return false
-					},
-				)
-			}
-			if req.Query.OrderBy.OrderByItems[0].Order == "asc" {
-				sort.Slice(spaces,
-					func(p, q int) bool {
-						// compare the items when both dates are set
-						if spaces[p].LastModifiedDateTime != nil && spaces[q].LastModifiedDateTime != nil {
-							return spaces[p].LastModifiedDateTime.Before(*spaces[q].LastModifiedDateTime)
-						}
-						// move left item up if it has no value
-						if spaces[p].LastModifiedDateTime == nil && spaces[q].LastModifiedDateTime != nil {
-							return true
-						}
-						// move right item up if it has no value
-						if spaces[p].LastModifiedDateTime != nil && spaces[q].LastModifiedDateTime == nil {
-							return false
-						}
-						return true
-					},
-				)
-			}
-		}
+	if req.Query.OrderBy == nil {
+		return spaces
+	}
+	switch req.Query.OrderBy.OrderByItems[0].Field.Value {
+	case "name":
+		spaces = sortByName(req.Query.OrderBy.OrderByItems[0].Order, spaces)
+	case "lastModifiedDateTime":
+		spaces = sortByLastModifiedDateTime(req.Query.OrderBy.OrderByItems[0].Order, spaces)
+	}
+	return spaces
+}
+
+func sortByName(order string, spaces []*libregraph.Drive) []*libregraph.Drive {
+	if order == "desc" {
+		sort.Slice(spaces,
+			func(p, q int) bool {
+				return *spaces[p].Name > *spaces[q].Name
+			},
+		)
+	}
+	if order == "asc" {
+		sort.Slice(spaces,
+			func(p, q int) bool {
+				return *spaces[p].Name < *spaces[q].Name
+			},
+		)
+	}
+	return spaces
+}
+
+func sortByLastModifiedDateTime(order string, spaces []*libregraph.Drive) []*libregraph.Drive {
+	if order == "desc" {
+		sort.Slice(spaces,
+			func(p, q int) bool {
+				// compare the items when both dates are set
+				if spaces[p].LastModifiedDateTime != nil && spaces[q].LastModifiedDateTime != nil {
+					return spaces[p].LastModifiedDateTime.After(*spaces[q].LastModifiedDateTime)
+				}
+				// move left item down if it has no value
+				if spaces[p].LastModifiedDateTime == nil && spaces[q].LastModifiedDateTime != nil {
+					return false
+				}
+				// move right item down if it has no value
+				if spaces[p].LastModifiedDateTime != nil && spaces[q].LastModifiedDateTime == nil {
+					return true
+				}
+				// fallback to name if no dateTime is set on both items
+				return *spaces[p].Name > *spaces[q].Name
+			},
+		)
+	}
+	if order == "asc" {
+		sort.Slice(spaces,
+			func(p, q int) bool {
+				// compare the items when both dates are set
+				if spaces[p].LastModifiedDateTime != nil && spaces[q].LastModifiedDateTime != nil {
+					return spaces[p].LastModifiedDateTime.Before(*spaces[q].LastModifiedDateTime)
+				}
+				// move left item up if it has no value
+				if spaces[p].LastModifiedDateTime == nil && spaces[q].LastModifiedDateTime != nil {
+					return true
+				}
+				// move right item up if it has no value
+				if spaces[p].LastModifiedDateTime != nil && spaces[q].LastModifiedDateTime == nil {
+					return false
+				}
+				// fallback to name if no dateTime is set on both items
+				return *spaces[p].Name < *spaces[q].Name
+			},
+		)
 	}
 	return spaces
 }
