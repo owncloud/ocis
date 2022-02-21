@@ -1234,7 +1234,7 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Reva.StorageMetadata.GRPCNetwork,
 		},
 		{
-			EnvVars:     []string{"STORAGE_METADATA_GRPC_PROVIDER_ADDR"},
+			EnvVars:     []string{"STORAGE_METADATA_GRPC_ADDR"},
 			Destination: &cfg.Reva.StorageMetadata.GRPCAddr,
 		},
 		{
