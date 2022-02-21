@@ -2,6 +2,7 @@ package svc_test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,9 +13,11 @@ import (
 	"github.com/cs3org/reva/pkg/rgrpc/status"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/graph/mocks"
 	"github.com/owncloud/ocis/graph/pkg/config"
 	service "github.com/owncloud/ocis/graph/pkg/service/v0"
+	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -163,6 +166,52 @@ var _ = Describe("Graph", func() {
 				]
 			}
 			`))
+		})
+		It("can not list spaces with wrong sort parameter", func() {
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status:        status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{}}, nil)
+			gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Return(&gateway.InitiateFileDownloadResponse{
+				Status: status.NewNotFound(ctx, "not found"),
+			}, nil)
+			gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+				Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?$orderby=owner%20asc", nil)
+			rr := httptest.NewRecorder()
+			svc.GetDrives(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+
+			body, _ := io.ReadAll(rr.Body)
+			var libreError libregraph.OdataError
+			err := json.Unmarshal(body, &libreError)
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(libreError.Error.Message).To(Equal("we do not support <owner> as a order parameter"))
+			Expect(libreError.Error.Code).To(Equal(errorcode.InvalidRequest.String()))
+		})
+		It("can list a spaces with invalid query parameter", func() {
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status:        status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{}}, nil)
+			gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Return(&gateway.InitiateFileDownloadResponse{
+				Status: status.NewNotFound(ctx, "not found"),
+			}, nil)
+			gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+				Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?§orderby=owner%20asc", nil)
+			rr := httptest.NewRecorder()
+			svc.GetDrives(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+
+			body, _ := io.ReadAll(rr.Body)
+			var libreError libregraph.OdataError
+			err := json.Unmarshal(body, &libreError)
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(libreError.Error.Message).To(Equal("Query parameter '§orderby' is not supported. Cause: Query parameter '§orderby' is not supported"))
+			Expect(libreError.Error.Code).To(Equal(errorcode.InvalidRequest.String()))
 		})
 	})
 })
