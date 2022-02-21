@@ -37,9 +37,10 @@ func Server(cfg *config.Config) *cli.Command {
 
 			natsServer, err := nats.NewNATSServer(
 				ctx,
+				logging.NewLogWrapper(logger),
 				nats.Host(cfg.Nats.Host),
 				nats.Port(cfg.Nats.Port),
-				nats.Logger(logging.NewLogWrapper(logger)),
+				nats.ClusterID("ocis-cluster"),
 			)
 			if err != nil {
 				return err

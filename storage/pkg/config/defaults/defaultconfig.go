@@ -364,7 +364,7 @@ func DefaultConfig() *config.Config {
 				UserStorageMountID:               "",
 				Events: config.Events{
 					Address:   "127.0.0.1:9233",
-					ClusterID: "test-cluster",
+					ClusterID: "ocis-cluster",
 				},
 			},
 			StorageShares: config.StoragePort{
