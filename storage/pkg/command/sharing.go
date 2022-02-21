@@ -179,7 +179,7 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 				"eventsmiddleware": map[string]interface{}{
 					"group":     "sharing",
 					"type":      "nats",
-					"address":   "127.0.0.1:4222",
+					"address":   "127.0.0.1:9233",
 					"clusterID": "test-cluster",
 				},
 			},
