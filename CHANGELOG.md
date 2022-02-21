@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Change - Unify file IDs: [#3185](https://github.com/owncloud/ocis/pull/3185)
+* Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
 
 ## Details
 
@@ -17,6 +18,16 @@ The following sections list the changes for unreleased.
    using a reserved character ``!`` as a URL safe separator.
 
    https://github.com/owncloud/ocis/pull/3185
+
+* Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
+
+   Tags: web
+
+   We updated ownCloud Web to v5.1.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/ocis/pull/3202
+   https://github.com/owncloud/web/releases/tag/v5.1.0
 # Changelog for [1.17.0] (2022-02-16)
 
 The following sections list the changes for 1.17.0.
