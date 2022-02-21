@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Align storage metadata GPRC bind port with other variable names: [#3169](https://github.com/owncloud/ocis/pull/3169)
 * Change - Unify file IDs: [#3185](https://github.com/owncloud/ocis/pull/3185)
+* Enhancement - Add sorting to list Spaces: [#3200](https://github.com/owncloud/ocis/issues/3200)
 * Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
 
 ## Details
@@ -26,6 +27,18 @@ The following sections list the changes for unreleased.
    using a reserved character ``!`` as a URL safe separator.
 
    https://github.com/owncloud/ocis/pull/3185
+
+* Enhancement - Add sorting to list Spaces: [#3200](https://github.com/owncloud/ocis/issues/3200)
+
+   We added the OData query param "orderBy" for listing spaces. We can now order by Space Name and
+   LastModifiedDateTime.
+
+   Example 1:
+   https://localhost:9200/graph/v1.0/me/drives/?$orderby=lastModifiedDateTime desc
+   Example 2: https://localhost:9200/graph/v1.0/me/drives/?$orderby=name asc
+
+   https://github.com/owncloud/ocis/issues/3200
+   https://github.com/owncloud/ocis/pull/3201
 
 * Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
 
