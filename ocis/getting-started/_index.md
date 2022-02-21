@@ -37,7 +37,7 @@ For this example, assuming version 1.16.0 of oCIS running on a Linux AMD64 host:
 
 ```console
 # download
-curl https://download.owncloud.com/ocis/ocis/1.16.0/ocis-1.16.0-linux-amd64 --output ocis
+curl https://download.owncloud.com/ocis/ocis/1.17.0/ocis-1.17.0-linux-amd64 --output ocis
 
 # make binary executable
 chmod +x ocis
