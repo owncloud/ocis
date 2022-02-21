@@ -7,6 +7,7 @@ import (
 	"math"
 	"net/http"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -72,15 +73,22 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-	files, err := g.formatDrives(ctx, wdu, res.StorageSpaces)
+	spaces, err := g.formatDrives(ctx, wdu, res.StorageSpaces)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error encoding response as json")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
+	spaces, err = sortSpaces(odataReq, spaces)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error sorting the spaces list")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &listResponse{Value: files})
+	render.JSON(w, r, &listResponse{Value: spaces})
 }
 
 // GetSingleDrive does a lookup of a single space by spaceId
@@ -709,4 +717,25 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func sortSpaces(req *godata.GoDataRequest, spaces []*libregraph.Drive) ([]*libregraph.Drive, error) {
+	var sorter sort.Interface
+	if req.Query.OrderBy == nil || len(req.Query.OrderBy.OrderByItems) != 1 {
+		return spaces, nil
+	}
+	switch req.Query.OrderBy.OrderByItems[0].Field.Value {
+	case "name":
+		sorter = spacesByName{spaces}
+	case "lastModifiedDateTime":
+		sorter = spacesByLastModifiedDateTime{spaces}
+	default:
+		return nil, fmt.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)
+	}
+
+	if req.Query.OrderBy.OrderByItems[0].Order == "asc" {
+		sorter = sort.Reverse(sorter)
+	}
+	sort.Sort(sorter)
+	return spaces, nil
 }
