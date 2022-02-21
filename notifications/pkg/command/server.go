@@ -26,21 +26,20 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 
-			group := "notifications"
-
 			evs := []events.Unmarshaller{
 				events.ShareCreated{},
 			}
 
-			client, err := server.NewNatsStream(nats.Address("127.0.0.1:4222"), nats.ClusterID("test-cluster"))
+			evtsCfg := cfg.Notifications.Events
+			client, err := server.NewNatsStream(nats.Address(evtsCfg.Endpoint), nats.ClusterID(evtsCfg.Cluster))
 			if err != nil {
 				return err
 			}
-			evts, err := events.Consume(client, group, evs...)
+			evts, err := events.Consume(client, evtsCfg.ConsumerGroup, evs...)
 			if err != nil {
 				return err
 			}
-			channel, err := channels.NewMailChanel(logger)
+			channel, err := channels.NewMailChannel(*cfg, logger)
 			if err != nil {
 				return err
 			}

@@ -8,5 +8,20 @@ func DefaultConfig() *Config {
 		Service: Service{
 			Name: "notifications",
 		},
+		Notifications: Notifications{
+			SMTP: SMTP{
+				Host:     "127.0.0.1",
+				Port:     "1025",
+				Sender:   "god@example.com",
+				Password: "godisdead",
+			},
+			Events: Events{
+				Endpoint:      "127.0.0.1:4222",
+				Cluster:       "test-cluster",
+				ConsumerGroup: "notifications",
+			},
+			RevaGateway:       "127.0.0.1:9142",
+			MachineAuthSecret: "change-me-please",
+		},
 	}
 }
