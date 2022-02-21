@@ -63,7 +63,8 @@ func NewService(opts ...Option) Service {
 		var tlsConf *tls.Config
 		if options.Config.Identity.LDAP.Insecure {
 			tlsConf = &tls.Config{
-				InsecureSkipVerify: true,
+				//nolint:gosec // We need the ability to run with "insecure" (dev/testing)
+				InsecureSkipVerify: options.Config.Identity.LDAP.Insecure,
 			}
 		}
 
