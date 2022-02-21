@@ -80,7 +80,12 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	spaces = g.sortSpaces(odataReq, spaces)
+	spaces, err = sortSpaces(odataReq, spaces)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error sorting the spaces list")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &listResponse{Value: spaces})
@@ -714,77 +719,23 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (g Graph) sortSpaces(req *godata.GoDataRequest, spaces []*libregraph.Drive) []*libregraph.Drive {
-	if req.Query.OrderBy == nil {
-		return spaces
+func sortSpaces(req *godata.GoDataRequest, spaces []*libregraph.Drive) ([]*libregraph.Drive, error) {
+	var sorter sort.Interface
+	if req.Query.OrderBy == nil || len(req.Query.OrderBy.OrderByItems) != 1 {
+		return spaces, nil
 	}
 	switch req.Query.OrderBy.OrderByItems[0].Field.Value {
 	case "name":
-		spaces = sortByName(req.Query.OrderBy.OrderByItems[0].Order, spaces)
+		sorter = spacesByName{spaces}
 	case "lastModifiedDateTime":
-		spaces = sortByLastModifiedDateTime(req.Query.OrderBy.OrderByItems[0].Order, spaces)
+		sorter = spacesByLastModifiedDateTime{spaces}
+	default:
+		return nil, fmt.Errorf("we do not support %s as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)
 	}
-	return spaces
-}
 
-func sortByName(order string, spaces []*libregraph.Drive) []*libregraph.Drive {
-	if order == "desc" {
-		sort.Slice(spaces,
-			func(p, q int) bool {
-				return *spaces[p].Name > *spaces[q].Name
-			},
-		)
+	if req.Query.OrderBy.OrderByItems[0].Order == "asc" {
+		sorter = sort.Reverse(sorter)
 	}
-	if order == "asc" {
-		sort.Slice(spaces,
-			func(p, q int) bool {
-				return *spaces[p].Name < *spaces[q].Name
-			},
-		)
-	}
-	return spaces
-}
-
-func sortByLastModifiedDateTime(order string, spaces []*libregraph.Drive) []*libregraph.Drive {
-	if order == "desc" {
-		sort.Slice(spaces,
-			func(p, q int) bool {
-				// compare the items when both dates are set
-				if spaces[p].LastModifiedDateTime != nil && spaces[q].LastModifiedDateTime != nil {
-					return spaces[p].LastModifiedDateTime.After(*spaces[q].LastModifiedDateTime)
-				}
-				// move left item down if it has no value
-				if spaces[p].LastModifiedDateTime == nil && spaces[q].LastModifiedDateTime != nil {
-					return false
-				}
-				// move right item down if it has no value
-				if spaces[p].LastModifiedDateTime != nil && spaces[q].LastModifiedDateTime == nil {
-					return true
-				}
-				// fallback to name if no dateTime is set on both items
-				return *spaces[p].Name > *spaces[q].Name
-			},
-		)
-	}
-	if order == "asc" {
-		sort.Slice(spaces,
-			func(p, q int) bool {
-				// compare the items when both dates are set
-				if spaces[p].LastModifiedDateTime != nil && spaces[q].LastModifiedDateTime != nil {
-					return spaces[p].LastModifiedDateTime.Before(*spaces[q].LastModifiedDateTime)
-				}
-				// move left item up if it has no value
-				if spaces[p].LastModifiedDateTime == nil && spaces[q].LastModifiedDateTime != nil {
-					return true
-				}
-				// move right item up if it has no value
-				if spaces[p].LastModifiedDateTime != nil && spaces[q].LastModifiedDateTime == nil {
-					return false
-				}
-				// fallback to name if no dateTime is set on both items
-				return *spaces[p].Name < *spaces[q].Name
-			},
-		)
-	}
-	return spaces
+	sort.Sort(sorter)
+	return spaces, nil
 }

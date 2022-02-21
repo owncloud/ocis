@@ -15,24 +15,24 @@ type sortTest struct {
 	DrivesSorted []*libregraph.Drive
 }
 
-var Time1 = time.Date(2022, 02, 02, 15, 00, 00, 00, time.UTC)
-var Time2 = time.Date(2022, 02, 03, 15, 00, 00, 00, time.UTC)
-var Time3, Time5, Time6 *time.Time
-var Time4 = time.Date(2022, 02, 05, 15, 00, 00, 00, time.UTC)
-var Drives = []*libregraph.Drive{
-	{Id: libregraph.PtrString("3"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Admin"), LastModifiedDateTime: Time3},
-	{Id: libregraph.PtrString("1"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Einstein"), LastModifiedDateTime: &Time1},
-	{Id: libregraph.PtrString("2"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Marie"), LastModifiedDateTime: &Time2},
-	{Id: libregraph.PtrString("4"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Richard"), LastModifiedDateTime: &Time4},
+var time1 = time.Date(2022, 02, 02, 15, 00, 00, 00, time.UTC)
+var time2 = time.Date(2022, 02, 03, 15, 00, 00, 00, time.UTC)
+var time3, time5, time6 *time.Time
+var time4 = time.Date(2022, 02, 05, 15, 00, 00, 00, time.UTC)
+var drives = []*libregraph.Drive{
+	drive("3", "project", "Admin", time3),
+	drive("1", "project", "Einstein", &time1),
+	drive("2", "project", "Marie", &time2),
+	drive("4", "project", "Richard", &time4),
 }
-var DrivesLong = append(Drives, []*libregraph.Drive{
-	{Id: libregraph.PtrString("5"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Bob"), LastModifiedDateTime: Time5},
-	{Id: libregraph.PtrString("6"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Alice"), LastModifiedDateTime: Time6},
+var drivesLong = append(drives, []*libregraph.Drive{
+	drive("5", "project", "Bob", time5),
+	drive("6", "project", "Alice", time6),
 }...)
 
 var sortTests = []sortTest{
 	{
-		Drives: Drives,
+		Drives: drives,
 		Query: godata.GoDataRequest{
 			Query: &godata.GoDataQuery{
 				OrderBy: &godata.GoDataOrderByQuery{
@@ -43,14 +43,14 @@ var sortTests = []sortTest{
 			},
 		},
 		DrivesSorted: []*libregraph.Drive{
-			{Id: libregraph.PtrString("3"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Admin"), LastModifiedDateTime: Time3},
-			{Id: libregraph.PtrString("1"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Einstein"), LastModifiedDateTime: &Time1},
-			{Id: libregraph.PtrString("2"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Marie"), LastModifiedDateTime: &Time2},
-			{Id: libregraph.PtrString("4"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Richard"), LastModifiedDateTime: &Time4},
+			drive("3", "project", "Admin", time3),
+			drive("1", "project", "Einstein", &time1),
+			drive("2", "project", "Marie", &time2),
+			drive("4", "project", "Richard", &time4),
 		},
 	},
 	{
-		Drives: Drives,
+		Drives: drives,
 		Query: godata.GoDataRequest{
 			Query: &godata.GoDataQuery{
 				OrderBy: &godata.GoDataOrderByQuery{
@@ -61,14 +61,14 @@ var sortTests = []sortTest{
 			},
 		},
 		DrivesSorted: []*libregraph.Drive{
-			{Id: libregraph.PtrString("4"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Richard"), LastModifiedDateTime: &Time4},
-			{Id: libregraph.PtrString("2"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Marie"), LastModifiedDateTime: &Time2},
-			{Id: libregraph.PtrString("1"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Einstein"), LastModifiedDateTime: &Time1},
-			{Id: libregraph.PtrString("3"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Admin"), LastModifiedDateTime: Time3},
+			drive("4", "project", "Richard", &time4),
+			drive("2", "project", "Marie", &time2),
+			drive("1", "project", "Einstein", &time1),
+			drive("3", "project", "Admin", time3),
 		},
 	},
 	{
-		Drives: DrivesLong,
+		Drives: drivesLong,
 		Query: godata.GoDataRequest{
 			Query: &godata.GoDataQuery{
 				OrderBy: &godata.GoDataOrderByQuery{
@@ -79,16 +79,16 @@ var sortTests = []sortTest{
 			},
 		},
 		DrivesSorted: []*libregraph.Drive{
-			{Id: libregraph.PtrString("3"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Admin"), LastModifiedDateTime: Time3},
-			{Id: libregraph.PtrString("6"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Alice"), LastModifiedDateTime: Time6},
-			{Id: libregraph.PtrString("5"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Bob"), LastModifiedDateTime: Time5},
-			{Id: libregraph.PtrString("1"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Einstein"), LastModifiedDateTime: &Time1},
-			{Id: libregraph.PtrString("2"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Marie"), LastModifiedDateTime: &Time2},
-			{Id: libregraph.PtrString("4"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Richard"), LastModifiedDateTime: &Time4},
+			drive("3", "project", "Admin", time3),
+			drive("6", "project", "Alice", time6),
+			drive("5", "project", "Bob", time5),
+			drive("1", "project", "Einstein", &time1),
+			drive("2", "project", "Marie", &time2),
+			drive("4", "project", "Richard", &time4),
 		},
 	},
 	{
-		Drives: DrivesLong,
+		Drives: drivesLong,
 		Query: godata.GoDataRequest{
 			Query: &godata.GoDataQuery{
 				OrderBy: &godata.GoDataOrderByQuery{
@@ -99,28 +99,25 @@ var sortTests = []sortTest{
 			},
 		},
 		DrivesSorted: []*libregraph.Drive{
-			{Id: libregraph.PtrString("4"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Richard"), LastModifiedDateTime: &Time4},
-			{Id: libregraph.PtrString("2"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Marie"), LastModifiedDateTime: &Time2},
-			{Id: libregraph.PtrString("1"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Einstein"), LastModifiedDateTime: &Time1},
-			{Id: libregraph.PtrString("5"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Bob"), LastModifiedDateTime: Time5},
-			{Id: libregraph.PtrString("6"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Alice"), LastModifiedDateTime: Time6},
-			{Id: libregraph.PtrString("3"), DriveType: libregraph.PtrString("project"), Name: libregraph.PtrString("Admin"), LastModifiedDateTime: Time3},
+			drive("4", "project", "Richard", &time4),
+			drive("2", "project", "Marie", &time2),
+			drive("1", "project", "Einstein", &time1),
+			drive("5", "project", "Bob", time5),
+			drive("6", "project", "Alice", time6),
+			drive("3", "project", "Admin", time3),
 		},
 	},
 }
 
+func drive(ID string, dType string, name string, lastModified *time.Time) *libregraph.Drive {
+	return &libregraph.Drive{Id: libregraph.PtrString(ID), DriveType: libregraph.PtrString(dType), Name: libregraph.PtrString(name), LastModifiedDateTime: lastModified}
+}
+
+// TestSort tests the available orderby queries
 func TestSort(t *testing.T) {
-	graph := Graph{
-		config:               nil,
-		mux:                  nil,
-		logger:               nil,
-		identityBackend:      nil,
-		gatewayClient:        nil,
-		httpClient:           nil,
-		spacePropertiesCache: nil,
-	}
 	for _, test := range sortTests {
-		sorted := graph.sortSpaces(&test.Query, test.Drives)
+		sorted, err := sortSpaces(&test.Query, test.Drives)
+		assert.NoError(t, err)
 		assert.Equal(t, test.DrivesSorted, sorted)
 	}
 }
