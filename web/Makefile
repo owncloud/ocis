@@ -1,5 +1,6 @@
 SHELL := bash
 NAME := web
+WEB_ASSETS_VERSION = v5.1.0
 
 include ../.make/recursion.mk
 
@@ -28,8 +29,6 @@ ci-go-generate: # CI runs ci-node-generate automatically before this target
 
 .PHONY: ci-node-generate
 ci-node-generate: pull-assets
-
-WEB_ASSETS_VERSION = v5.0.0
 
 .PHONY: pull-assets
 pull-assets:
