@@ -6,10 +6,18 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Align storage metadata GPRC bind port with other variable names: [#3169](https://github.com/owncloud/ocis/pull/3169)
 * Change - Unify file IDs: [#3185](https://github.com/owncloud/ocis/pull/3185)
 * Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
 
 ## Details
+
+* Bugfix - Align storage metadata GPRC bind port with other variable names: [#3169](https://github.com/owncloud/ocis/pull/3169)
+
+   Changed STORAGE_METADATA_GRPC_PROVIDER_ADDR to STORAGE_METADATA_GRPC_ADDR so it aligns
+   with standard environment variable naming conventions used in oCIS.
+
+   https://github.com/owncloud/ocis/pull/3169
 
 * Change - Unify file IDs: [#3185](https://github.com/owncloud/ocis/pull/3185)
 
