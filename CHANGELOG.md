@@ -47,6 +47,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3200
    https://github.com/owncloud/ocis/pull/3201
+   https://github.com/owncloud/ocis/pull/3218
 
 * Enhancement - Change NATS port: [#3210](https://github.com/owncloud/ocis/pull/3210)
 
