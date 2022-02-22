@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Align storage metadata GPRC bind port with other variable names: [#3169](https://github.com/owncloud/ocis/pull/3169)
 * Change - Unify file IDs: [#3185](https://github.com/owncloud/ocis/pull/3185)
 * Enhancement - Add sorting to list Spaces: [#3200](https://github.com/owncloud/ocis/issues/3200)
+* Enhancement - Change NATS port: [#3210](https://github.com/owncloud/ocis/pull/3210)
 * Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
 
 ## Details
@@ -39,6 +40,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3200
    https://github.com/owncloud/ocis/pull/3201
+
+* Enhancement - Change NATS port: [#3210](https://github.com/owncloud/ocis/pull/3210)
+
+   Currently only a certain range of ports is allowed for ocis application. Use a supported port
+   for nats server
+
+   https://github.com/owncloud/ocis/pull/3210
 
 * Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
 
