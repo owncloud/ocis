@@ -26,8 +26,8 @@ var drives = []*libregraph.Drive{
 	drive("4", "project", "Richard", &time4),
 }
 var drivesLong = append(drives, []*libregraph.Drive{
-	drive("5", "project", "Bob", time5),
-	drive("6", "project", "Alice", time6),
+	drive("5", "project", "bob", time5),
+	drive("6", "project", "alice", time6),
 }...)
 
 var sortTests = []sortTest{
@@ -80,8 +80,8 @@ var sortTests = []sortTest{
 		},
 		DrivesSorted: []*libregraph.Drive{
 			drive("3", "project", "Admin", time3),
-			drive("6", "project", "Alice", time6),
-			drive("5", "project", "Bob", time5),
+			drive("6", "project", "alice", time6),
+			drive("5", "project", "bob", time5),
 			drive("1", "project", "Einstein", &time1),
 			drive("2", "project", "Marie", &time2),
 			drive("4", "project", "Richard", &time4),
@@ -102,8 +102,8 @@ var sortTests = []sortTest{
 			drive("4", "project", "Richard", &time4),
 			drive("2", "project", "Marie", &time2),
 			drive("1", "project", "Einstein", &time1),
-			drive("5", "project", "Bob", time5),
-			drive("6", "project", "Alice", time6),
+			drive("5", "project", "bob", time5),
+			drive("6", "project", "alice", time6),
 			drive("3", "project", "Admin", time3),
 		},
 	},

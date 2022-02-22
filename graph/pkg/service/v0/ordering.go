@@ -1,6 +1,8 @@
 package svc
 
 import (
+	"strings"
+
 	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
@@ -22,7 +24,7 @@ type spacesByLastModifiedDateTime struct {
 // Less reports whether the element with index i
 // must sort before the element with index j.
 func (s spacesByName) Less(i, j int) bool {
-	return *s.spacesSlice[i].Name > *s.spacesSlice[j].Name
+	return strings.ToLower(*s.spacesSlice[i].Name) > strings.ToLower(*s.spacesSlice[j].Name)
 }
 
 // Less reports whether the element with index i
@@ -41,5 +43,5 @@ func (s spacesByLastModifiedDateTime) Less(i, j int) bool {
 		return true
 	}
 	// fallback to name if no dateTime is set on both items
-	return *s.spacesSlice[i].Name > *s.spacesSlice[j].Name
+	return strings.ToLower(*s.spacesSlice[i].Name) > strings.ToLower(*s.spacesSlice[j].Name)
 }
