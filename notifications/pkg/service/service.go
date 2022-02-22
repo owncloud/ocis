@@ -40,9 +40,17 @@ func (s eventsNotifier) Run() error {
 			go func() {
 				switch e := evt.(type) {
 				case events.ShareCreated:
-					if err := s.channel.SendMessage(e.GranteeUserID.OpaqueId, "You got a share"); err != nil {
+					msg := "You got a share!"
+					var err error
+					if e.GranteeUserID != nil {
+						err = s.channel.SendMessage([]string{e.GranteeUserID.OpaqueId}, msg)
+					} else if e.GranteeGroupID != nil {
+						err = s.channel.SendMessageToGroup(e.GranteeGroupID, msg)
+					}
+					if err != nil {
 						s.logger.Error().
 							Err(err).
+							Str("event", "ShareCreated").
 							Msg("failed to send a message")
 					}
 				}
