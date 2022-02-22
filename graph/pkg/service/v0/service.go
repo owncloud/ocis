@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
@@ -12,8 +13,12 @@ import (
 
 	"github.com/owncloud/ocis/graph/pkg/identity"
 	"github.com/owncloud/ocis/graph/pkg/identity/ldap"
+	graphm "github.com/owncloud/ocis/graph/pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	opkgm "github.com/owncloud/ocis/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/ocis-pkg/roles"
+	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 )
 
 const (
@@ -111,6 +116,23 @@ func NewService(opts ...Option) Service {
 		svc.httpClient = options.HTTPClient
 	}
 
+	roleService := options.RoleService
+	if roleService == nil {
+		roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
+	}
+	roleManager := options.RoleManager
+	if roleManager == nil {
+		m := roles.NewManager(
+			roles.CacheSize(1024),
+			roles.CacheTTL(time.Hour),
+			roles.Logger(options.Logger),
+			roles.RoleService(roleService),
+		)
+		roleManager = &m
+	}
+
+	requireAdmin := graphm.RequireAdmin(roleManager, options.Logger)
+
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Use(middleware.StripSlashes)
 		r.Route("/v1.0", func(r chi.Router) {
@@ -120,25 +142,25 @@ func NewService(opts ...Option) Service {
 				r.Get("/drive/root/children", svc.GetRootDriveChildren)
 			})
 			r.Route("/users", func(r chi.Router) {
-				r.Get("/", svc.GetUsers)
-				r.Post("/", svc.PostUser)
+				r.With(requireAdmin).Get("/", svc.GetUsers)
+				r.With(requireAdmin).Post("/", svc.PostUser)
 				r.Route("/{userID}", func(r chi.Router) {
 					r.Get("/", svc.GetUser)
-					r.Delete("/", svc.DeleteUser)
-					r.Patch("/", svc.PatchUser)
+					r.With(requireAdmin).Delete("/", svc.DeleteUser)
+					r.With(requireAdmin).Patch("/", svc.PatchUser)
 				})
 			})
 			r.Route("/groups", func(r chi.Router) {
-				r.Get("/", svc.GetGroups)
-				r.Post("/", svc.PostGroup)
+				r.With(requireAdmin).Get("/", svc.GetGroups)
+				r.With(requireAdmin).Post("/", svc.PostGroup)
 				r.Route("/{groupID}", func(r chi.Router) {
 					r.Get("/", svc.GetGroup)
-					r.Delete("/", svc.DeleteGroup)
-					r.Patch("/", svc.PatchGroup)
+					r.With(requireAdmin).Delete("/", svc.DeleteGroup)
+					r.With(requireAdmin).Patch("/", svc.PatchGroup)
 					r.Route("/members", func(r chi.Router) {
-						r.Get("/", svc.GetGroupMembers)
-						r.Post("/$ref", svc.PostGroupMember)
-						r.Delete("/{memberID}/$ref", svc.DeleteGroupMember)
+						r.With(requireAdmin).Get("/", svc.GetGroupMembers)
+						r.With(requireAdmin).Post("/$ref", svc.PostGroupMember)
+						r.With(requireAdmin).Delete("/{memberID}/$ref", svc.DeleteGroupMember)
 					})
 				})
 			})

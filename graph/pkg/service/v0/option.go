@@ -5,6 +5,8 @@ import (
 
 	"github.com/owncloud/ocis/graph/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/roles"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 )
 
 // Option defines a single option function.
@@ -17,6 +19,8 @@ type Options struct {
 	Middleware    []func(http.Handler) http.Handler
 	GatewayClient GatewayClient
 	HTTPClient    HTTPClient
+	RoleService   settingssvc.RoleService
+	RoleManager   *roles.Manager
 }
 
 // newOptions initializes the available default options.
@@ -62,5 +66,19 @@ func WithGatewayClient(val GatewayClient) Option {
 func WithHTTPClient(val HTTPClient) Option {
 	return func(o *Options) {
 		o.HTTPClient = val
+	}
+}
+
+// RoleService provides a function to set the RoleService option.
+func RoleService(val settingssvc.RoleService) Option {
+	return func(o *Options) {
+		o.RoleService = val
+	}
+}
+
+// RoleManager provides a function to set the RoleManager option.
+func RoleManager(val *roles.Manager) Option {
+	return func(o *Options) {
+		o.RoleManager = val
 	}
 }
