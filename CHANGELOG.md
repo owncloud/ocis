@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Make events settings configurable: [#3214](https://github.com/owncloud/ocis/pull/3214)
 * Bugfix - Align storage metadata GPRC bind port with other variable names: [#3169](https://github.com/owncloud/ocis/pull/3169)
 * Change - Unify file IDs: [#3185](https://github.com/owncloud/ocis/pull/3185)
 * Enhancement - Add sorting to list Spaces: [#3200](https://github.com/owncloud/ocis/issues/3200)
@@ -13,6 +14,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
 
 ## Details
+
+* Bugfix - Make events settings configurable: [#3214](https://github.com/owncloud/ocis/pull/3214)
+
+   We've fixed the hardcoded events settings to be configurable.
+
+   https://github.com/owncloud/ocis/pull/3214
 
 * Bugfix - Align storage metadata GPRC bind port with other variable names: [#3169](https://github.com/owncloud/ocis/pull/3169)
 
