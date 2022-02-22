@@ -89,6 +89,12 @@ type Sharing struct {
 	PublicEnableExpiredSharesCleanup bool   `ocisConfig:"public_enable_expired_shares_cleanup"`
 	PublicJanitorRunInterval         int    `ocisConfig:"public_janitor_run_interval"`
 	UserStorageMountID               string `ocisConfig:"user_storage_mount_id"`
+	Events                           Events `ocisConfig:"events"`
+}
+
+type Events struct {
+	Address   string `ocisConfig:"address"`
+	ClusterID string `ocisConfig:"cluster_id"`
 }
 
 // Port defines the available port configuration.
@@ -1222,6 +1228,14 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"STORAGE_SHARING_USER_SQL_NAME"},
 			Destination: &cfg.Reva.Sharing.UserSQLName,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_EVENTS_ADDRESS"},
+			Destination: &cfg.Reva.Sharing.Events.Address,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_EVENTS_CLUSTER_ID"},
+			Destination: &cfg.Reva.Sharing.Events.ClusterID,
 		},
 
 		// storage metadata
