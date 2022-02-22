@@ -7,3 +7,4 @@ Example 2: https://localhost:9200/graph/v1.0/me/drives/?$orderby=name asc
 
 https://github.com/owncloud/ocis/issues/3200
 https://github.com/owncloud/ocis/pull/3201
+https://github.com/owncloud/ocis/pull/3218
