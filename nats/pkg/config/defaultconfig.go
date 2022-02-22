@@ -10,7 +10,7 @@ func DefaultConfig() *Config {
 		},
 		Nats: Nats{
 			Host: "127.0.0.1",
-			Port: 4222,
+			Port: 9233,
 		},
 	}
 }
