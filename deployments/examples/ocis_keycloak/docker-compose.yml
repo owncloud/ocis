@@ -101,7 +101,8 @@ services:
     restart: always
 
   keycloak:
-    image: quay.io/keycloak/keycloak:latest
+    # Keycloak WildFly distribution, Quarkus is not ready yet for automatic setup https://github.com/keycloak/keycloak/issues/10216
+    image: quay.io/keycloak/keycloak:legacy
     networks:
       ocis-net:
     entrypoint: ["/bin/sh", "/opt/jboss/tools/docker-entrypoint-override.sh"]
