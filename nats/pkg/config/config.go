@@ -22,6 +22,6 @@ type Config struct {
 
 // Nats is the nats config
 type Nats struct {
-	Host string
-	Port int
+	Host string `ocisConfig:"host" env:"NATS_NATS_HOST"`
+	Port int    `ocisConfig:"port" env:"NATS_NATS_PORT"`
 }

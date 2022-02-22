@@ -348,6 +348,10 @@ func DefaultConfig() *Config {
 				PublicEnableExpiredSharesCleanup: true,
 				PublicJanitorRunInterval:         60,
 				UserStorageMountID:               "",
+				Events: Events{
+					Address:   "127.0.0.1:9233",
+					ClusterID: "test-cluster",
+				},
 			},
 			StorageShares: StoragePort{
 				Port: Port{
