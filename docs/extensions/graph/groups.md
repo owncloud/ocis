@@ -142,12 +142,12 @@ Example:
 curl -k --request DELETE 'https://localhost:9200/graph/v1.0/groups/7a20f238-8a22-4458-902d-47674c317e5f' -u user:password
 ```
 
-When successful the API returns no Response Body and the HTTP status code 204 (No Content)
+When successful the API returns no response body and the HTTP status code 204 (No Content)
 
 #### `PATCH /groups/{id}`
 
 Updating attributes of a single group is supposed to be done with a patch request. This is however currently not fully 
-implemented for our write-enabled backends. The PATCH request can however to used to add multiple members to a group at once.
+implemented for our write-enabled backends. The PATCH request can however be used to add multiple members to a group at once.
 See below.
 
 ### Adding a single member to a group
@@ -164,7 +164,7 @@ curl -k --header "Content-Type: application/json" \
 
 ```
 
-When successful the API returns no Response Body and the HTTP status code 204 (No Content)
+When successful the API returns no response body and the HTTP status code 204 (No Content)
 
 ### Adding multiple members in a single request
 
@@ -182,11 +182,11 @@ Example:
 }
 ```
 
-When successful the API returns no Response Body and the HTTP status code 204 (No Content)
+When successful the API returns no response body and the HTTP status code 204 (No Content)
 
 ### Removing a member
 
-#### `DELETE /groups/{groupid}/members/{id}/$ret`
+#### `DELETE /groups/{groupid}/members/{id}/$ref`
 
 Example
 
@@ -196,4 +196,4 @@ curl -k --request DELETE  \
      -u user:password
 ```
 
-When successful the API returns no Response Body and the HTTP status code 204 (No Content)
+When successful the API returns no response body and the HTTP status code 204 (No Content)
