@@ -2,10 +2,12 @@ package svc
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -141,28 +143,19 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 	if !strings.HasSuffix(rootWithSlash, "/") {
 		rootWithSlash = rootWithSlash + "/"
 	}
-	assets := assets.New(
-		assets.Logger(p.logger),
-		assets.Config(p.config),
-	)
-
-	notFoundFunc := func(w http.ResponseWriter, r *http.Request) {
-		// TODO: replace the redirect with a not found page containing a link to the Web UI
-		http.Redirect(w, r, rootWithSlash, http.StatusTemporaryRedirect)
-	}
 
 	static := http.StripPrefix(
 		rootWithSlash,
-		interceptNotFound(
-			http.FileServer(assets),
-			notFoundFunc,
+		assets.FileServer(
+			assets.New(
+				assets.Logger(p.logger),
+				assets.Config(p.config),
+			),
 		),
 	)
 
-	// TODO: investigate broken caching - https://github.com/owncloud/ocis/issues/1094
-	// we don't have a last modification date of the static assets, so we use the service start date
-	//lastModified := time.Now().UTC().Format(http.TimeFormat)
-	//expires := time.Now().Add(time.Second * time.Duration(ttl)).UTC().Format(http.TimeFormat)
+	lastModified := time.Now().UTC().Format(http.TimeFormat)
+	expires := time.Now().Add(time.Second * time.Duration(ttl)).UTC().Format(http.TimeFormat)
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		if rootWithSlash != "/" && r.URL.Path == p.config.HTTP.Root {
@@ -175,49 +168,11 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 			return
 		}
 
-		if r.URL.Path != rootWithSlash && strings.HasSuffix(r.URL.Path, "/") {
-			notFoundFunc(w, r)
-			return
-		}
-
-		// TODO: investigate broken caching - https://github.com/owncloud/ocis/issues/1094
-		//w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s, must-revalidate", strconv.Itoa(ttl)))
-		//w.Header().Set("Expires", expires)
-		//w.Header().Set("Last-Modified", lastModified)
-		w.Header().Set("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate, value")
-		w.Header().Set("Expires", "Thu, 01 Jan 1970 00:00:00 GMT")
-		w.Header().Set("Last-Modified", time.Now().UTC().Format(http.TimeFormat))
+		w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s, must-revalidate", strconv.Itoa(ttl)))
+		w.Header().Set("Expires", expires)
+		w.Header().Set("Last-Modified", lastModified)
 		w.Header().Set("SameSite", "Strict")
 
 		static.ServeHTTP(w, r)
 	}
-}
-
-func interceptNotFound(h http.Handler, notFoundFunc func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		notFoundInterceptor := &NotFoundInterceptor{ResponseWriter: w}
-		h.ServeHTTP(notFoundInterceptor, r)
-		if notFoundInterceptor.status == http.StatusNotFound {
-			notFoundFunc(w, r)
-		}
-	}
-}
-
-type NotFoundInterceptor struct {
-	http.ResponseWriter
-	status int
-}
-
-func (w *NotFoundInterceptor) WriteHeader(status int) {
-	w.status = status
-	if status != http.StatusNotFound {
-		w.ResponseWriter.WriteHeader(status)
-	}
-}
-
-func (w *NotFoundInterceptor) Write(p []byte) (int, error) {
-	if w.status != http.StatusNotFound {
-		return w.ResponseWriter.Write(p)
-	}
-	return len(p), nil
 }
