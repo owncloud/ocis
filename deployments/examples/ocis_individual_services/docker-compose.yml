@@ -85,6 +85,27 @@ services:
       driver: "local"
     restart: always
 
+  nats:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    deploy:
+      replicas: 1
+    networks:
+      ocis-net: null
+    entrypoint:
+      - ocis
+      - nats-server
+      - server
+    environment:
+      NATS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      NATS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      NATS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+
+      NATS_NATS_HOST: 0.0.0.0
+      NATS_NATS_PORT: 9233
+    logging:
+      driver: "local"
+    restart: always
+
   accounts:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
@@ -360,7 +381,7 @@ services:
 
       STORAGE_HOME_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
 
-      STORAGE_METADATA_GRPC_PROVIDER_ADDR: 0.0.0.0:9215
+      STORAGE_METADATA_GRPC_ADDR: 0.0.0.0:9215
       STORAGE_METADATA_HTTP_ADDR: 0.0.0.0:9216
       STORAGE_METADATA_DATA_SERVER_URL: http://storage-metadata:9216/data
 
@@ -555,6 +576,8 @@ services:
       STORAGE_SHARING_USER_JSON_FILE: /var/lib/ocis/storage/sharing/shares.json
       STORAGE_SHARING_PUBLIC_DRIVER: json
       STORAGE_SHARING_PUBLIC_JSON_FILE: /var/lib/ocis/storage/sharing/publicshares.json
+
+      STORAGE_SHARING_EVENTS_ADDRESS: nats:9233
 
       STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       REVA_GATEWAY: storage-gateway:9142
