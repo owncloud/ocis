@@ -11,6 +11,8 @@ The following sections list the changes for unreleased.
 * Change - Unify file IDs: [#3185](https://github.com/owncloud/ocis/pull/3185)
 * Enhancement - Add sorting to list Spaces: [#3200](https://github.com/owncloud/ocis/issues/3200)
 * Enhancement - Change NATS port: [#3210](https://github.com/owncloud/ocis/pull/3210)
+* Enhancement - Re-Enabling web cache control: [#3109](https://github.com/owncloud/ocis/pull/3109)
+* Enhancement - Add SPA conform fileserver for web: [#3109](https://github.com/owncloud/ocis/pull/3109)
 * Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
 
 ## Details
@@ -55,6 +57,21 @@ The following sections list the changes for unreleased.
    for nats server
 
    https://github.com/owncloud/ocis/pull/3210
+
+* Enhancement - Re-Enabling web cache control: [#3109](https://github.com/owncloud/ocis/pull/3109)
+
+   We've re-enable browser caching headers (`Expires` and `Last-Modified`) for the web
+   service, this was disabled due to a problem in the fileserver used before. Since we're now using
+   our own fileserver implementation this works again and is enabled by default.
+
+   https://github.com/owncloud/ocis/pull/3109
+
+* Enhancement - Add SPA conform fileserver for web: [#3109](https://github.com/owncloud/ocis/pull/3109)
+
+   We've added an SPA conform fileserver to the web service. It enables web to use vue's history
+   mode and behaves like nginx try_files.
+
+   https://github.com/owncloud/ocis/pull/3109
 
 * Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
 
