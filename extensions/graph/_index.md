@@ -9,3 +9,5 @@ geekdocCollapseSection: true
 ---
 
 This service provides a simple graph world API which can be used by clients or other extensions.
+
+{{< toc-tree >}}
