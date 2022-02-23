@@ -148,7 +148,7 @@ Example:
 curl -k --request DELETE 'https://localhost:9200/graph/v1.0/users/c067b139-c91c-4e47-8be6-669156a0587b' -u user:password
 ```
 
-When successful the API returns no Response Body and the HTTP status code 204 (No Content)
+When successful the API returns no response body and the HTTP status code 204 (No Content)
 
 
 #### `PATCH /users/{id}`
