@@ -108,7 +108,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   If you want to change the OIDC client id of th ownCloud Web frontend, you can do this by setting the name to `OCIS_OIDC_CLIENT_ID=`.
 
-  You also must override three default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD` and `OCIS_JWT_SECRET` in order to secure your oCIS instance. Choose some random strings eg. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}}).
+  You also must override the default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD`, `OCIS_JWT_SECRET`, `STORAGE_TRANSFER_SECRET` and `OCIS_MACHINE_AUTH_API_KEY`  in order to secure your oCIS instance. Choose some random strings eg. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}}).
 
   Set your domain for the Keycloak administration panel and authentication endpoints to `KEYCLOAK_DOMAIN=` eg. `KEYCLOAK_DOMAIN=keycloak.owncloud.test`.
 
