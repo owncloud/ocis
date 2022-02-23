@@ -51,7 +51,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.18.1
-	github.com/owncloud/libre-graph-api-go v0.10.0
+	github.com/owncloud/libre-graph-api-go v0.11.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.12.1
 	github.com/rs/zerolog v1.26.1
