@@ -89,6 +89,9 @@ func (ms MetadataStorage) SimpleUpload(ctx context.Context, uploadpath string, c
 	if err != nil {
 		return err
 	}
+	if res.Status.Code != v1beta11.Code_CODE_OK {
+		return errtypes.NewErrtypeFromStatus(res.Status)
+	}
 
 	var endpoint string
 

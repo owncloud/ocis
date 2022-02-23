@@ -418,6 +418,9 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 }
 
 func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpace) (*libregraph.Drive, error) {
+	if space.Root == nil {
+		return nil, fmt.Errorf("space has no root")
+	}
 	rootID := resourceid.OwnCloudResourceIDWrap(space.Root)
 
 	var permissions []libregraph.Permission

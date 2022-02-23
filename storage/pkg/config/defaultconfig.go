@@ -141,12 +141,11 @@ func DefaultConfig() *Config {
 						UserLayout:  defaultUserLayout,
 						EnableHome:  false,
 					},
-					ServiceUserUUID: defaultServiceUserUUID,
-					Region:          "default",
-					AccessKey:       "",
-					SecretKey:       "",
-					Endpoint:        "",
-					Bucket:          "",
+					Region:    "default",
+					AccessKey: "",
+					SecretKey: "",
+					Endpoint:  "",
+					Bucket:    "",
 				},
 				OCIS: DriverOCIS{
 					DriverCommon: DriverCommon{
@@ -154,7 +153,6 @@ func DefaultConfig() *Config {
 						ShareFolder: defaultShareFolder,
 						UserLayout:  defaultUserLayout,
 					},
-					ServiceUserUUID: defaultServiceUserUUID,
 				},
 			},
 			MetadataStorage: StorageConfig{
@@ -197,12 +195,11 @@ func DefaultConfig() *Config {
 						UserLayout:  defaultUserLayout,
 						EnableHome:  false,
 					},
-					ServiceUserUUID: defaultServiceUserUUID,
-					Region:          "default",
-					AccessKey:       "",
-					SecretKey:       "",
-					Endpoint:        "",
-					Bucket:          "",
+					Region:    "default",
+					AccessKey: "",
+					SecretKey: "",
+					Endpoint:  "",
+					Bucket:    "",
 				},
 				OCIS: DriverOCIS{
 					DriverCommon: DriverCommon{
@@ -211,7 +208,6 @@ func DefaultConfig() *Config {
 						UserLayout:  defaultUserLayout,
 						EnableHome:  false,
 					},
-					ServiceUserUUID: defaultServiceUserUUID,
 				},
 			},
 			Frontend: FrontendPort{
