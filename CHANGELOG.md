@@ -14,6 +14,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Change NATS port: [#3210](https://github.com/owncloud/ocis/pull/3210)
 * Enhancement - Re-Enabling web cache control: [#3109](https://github.com/owncloud/ocis/pull/3109)
 * Enhancement - Add SPA conform fileserver for web: [#3109](https://github.com/owncloud/ocis/pull/3109)
+* Enhancement - Implement notifications service: [#3217](https://github.com/owncloud/ocis/pull/3217)
 * Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
 
 ## Details
@@ -81,6 +82,13 @@ The following sections list the changes for unreleased.
    mode and behaves like nginx try_files.
 
    https://github.com/owncloud/ocis/pull/3109
+
+* Enhancement - Implement notifications service: [#3217](https://github.com/owncloud/ocis/pull/3217)
+
+   Implemented the minimal version of the notifications service to be able to notify a user when
+   they received a share.
+
+   https://github.com/owncloud/ocis/pull/3217
 
 * Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
 
