@@ -2,13 +2,12 @@
 package store
 
 import (
+	"encoding/json"
 	"errors"
-	"sync"
+	"fmt"
 
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 )
-
-var m = &sync.RWMutex{}
 
 // ListBundles returns all bundles in the dataPath folder that match the given type.
 func (s Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []string) ([]*settingsmsg.Bundle, error) {
@@ -25,9 +24,13 @@ func (s Store) ReadSetting(settingID string) (*settingsmsg.Setting, error) {
 	return nil, errors.New("not implemented")
 }
 
-// WriteBundle writes the given record into a file within the dataPath.
+// WriteBundle sends the givens record to the metadataclient. returns `record` for legacy reasons
 func (s Store) WriteBundle(record *settingsmsg.Bundle) (*settingsmsg.Bundle, error) {
-	return nil, errors.New("not implemented")
+	b, err := json.Marshal(record)
+	if err != nil {
+		return nil, err
+	}
+	return record, s.mdc.SimpleUpload(nil, bundlePath(record.Id), b)
 }
 
 // AddSettingToBundle adds the given setting to the bundle with the given bundleID.
@@ -38,4 +41,8 @@ func (s Store) AddSettingToBundle(bundleID string, setting *settingsmsg.Setting)
 // RemoveSettingFromBundle removes the setting from the bundle with the given ids.
 func (s Store) RemoveSettingFromBundle(bundleID string, settingID string) error {
 	return errors.New("not implemented")
+}
+
+func bundlePath(id string) string {
+	return fmt.Sprintf("bundle/%s", id)
 }

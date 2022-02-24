@@ -1,6 +1,9 @@
 package store
 
-import "context"
+import (
+	"context"
+	"strings"
+)
 
 const (
 	// account UUIDs
@@ -33,6 +36,13 @@ type MockedMetadataClient struct {
 	data map[string][]byte
 }
 
+func keys(m map[string][]byte) (s []string) {
+	for k := range m {
+		s = append(s, k)
+	}
+	return
+}
+
 // SimpleDownload returns nil if not found
 func (m *MockedMetadataClient) SimpleDownload(_ context.Context, id string) ([]byte, error) {
 	return m.data[id], nil
@@ -48,6 +58,21 @@ func (m *MockedMetadataClient) SimpleUpload(_ context.Context, id string, conten
 func (m *MockedMetadataClient) Delete(_ context.Context, id string) error {
 	delete(m.data, id)
 	return nil
+}
+
+// ReadDir returns nil, nil if not found
+// Known flaw: lists also subdirs
+func (m *MockedMetadataClient) ReadDir(_ context.Context, id string) ([]string, error) {
+	var out []string
+	for k := range m.data {
+		if strings.HasPrefix(k, id) {
+			dir := strings.TrimPrefix(k, id+"/")
+			// filter subfolders the lame way
+			s := strings.Trim(strings.SplitAfter(dir, "/")[0], "/")
+			out = append(out, s)
+		}
+	}
+	return out, nil
 }
 
 // IDExists is a helper to check if an id exists

@@ -6,7 +6,7 @@ import (
 
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -109,25 +109,25 @@ func TestAssignmentUniqueness(t *testing.T) {
 		scenario := scenario
 		t.Run(scenario.name, func(t *testing.T) {
 			firstAssignment, err := s.WriteRoleAssignment(scenario.userID, scenario.firstRole)
-			assert.NoError(t, err)
-			assert.Equal(t, firstAssignment.RoleId, scenario.firstRole)
+			require.NoError(t, err)
+			require.Equal(t, firstAssignment.RoleId, scenario.firstRole)
 			// TODO: check entry exists
 
 			list, err := s.ListRoleAssignments(scenario.userID)
-			assert.NoError(t, err)
-			assert.Equal(t, 1, len(list))
-			assert.Equal(t, list[0].RoleId, scenario.firstRole)
+			require.NoError(t, err)
+			require.Equal(t, 1, len(list))
+			require.Equal(t, list[0].RoleId, scenario.firstRole)
 
 			// creating another assignment shouldn't add another entry, as we support max one role per user.
 			// assigning the second role should remove the old
 			secondAssignment, err := s.WriteRoleAssignment(scenario.userID, scenario.secondRole)
-			assert.NoError(t, err)
-			assert.Equal(t, secondAssignment.RoleId, scenario.secondRole)
+			require.NoError(t, err)
+			require.Equal(t, secondAssignment.RoleId, scenario.secondRole)
 
 			list, err = s.ListRoleAssignments(scenario.userID)
-			assert.NoError(t, err)
-			assert.Equal(t, 1, len(list))
-			assert.Equal(t, list[0].RoleId, scenario.secondRole)
+			require.NoError(t, err)
+			require.Equal(t, 1, len(list))
+			require.Equal(t, list[0].RoleId, scenario.secondRole)
 		})
 	}
 }
@@ -151,26 +151,27 @@ func TestDeleteAssignment(t *testing.T) {
 		scenario := scenario
 		t.Run(scenario.name, func(t *testing.T) {
 			assignment, err := s.WriteRoleAssignment(scenario.userID, scenario.firstRole)
-			assert.NoError(t, err)
-			assert.Equal(t, assignment.RoleId, scenario.firstRole)
+			require.NoError(t, err)
+			require.Equal(t, assignment.RoleId, scenario.firstRole)
 			// TODO: uncomment
-			// assert.True(t, mdc.IDExists(assignment.RoleId))
+			// require.True(t, mdc.IDExists(assignment.RoleId))
 
 			list, err := s.ListRoleAssignments(scenario.userID)
-			assert.NoError(t, err)
-			assert.Equal(t, 1, len(list))
+			require.NoError(t, err)
+			require.Equal(t, 1, len(list))
+			require.Equal(t, assignment.Id, list[0].Id)
 
 			err = s.RemoveRoleAssignment(assignment.Id)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			// TODO: uncomment
-			// assert.False(t, mdc.IDExists(assignment.RoleId))
+			// require.False(t, mdc.IDExists(assignment.RoleId))
 
 			list, err = s.ListRoleAssignments(scenario.userID)
-			assert.NoError(t, err)
-			assert.Equal(t, 0, len(list))
+			require.NoError(t, err)
+			require.Equal(t, 0, len(list))
 
 			err = s.RemoveRoleAssignment(assignment.Id)
-			assert.Error(t, err)
+			require.Error(t, err)
 			// TODO: do we want a custom error message?
 		})
 	}

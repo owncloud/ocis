@@ -21,6 +21,7 @@ type MetadataClient interface {
 	SimpleDownload(ctx context.Context, id string) ([]byte, error)
 	SimpleUpload(ctx context.Context, id string, content []byte) error
 	Delete(ctx context.Context, id string) error
+	ReadDir(ctx context.Context, id string) ([]string, error)
 }
 
 // Store interacts with the filesystem to manage settings information
