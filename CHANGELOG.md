@@ -16,6 +16,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add SPA conform fileserver for web: [#3109](https://github.com/owncloud/ocis/pull/3109)
 * Enhancement - Implement notifications service: [#3217](https://github.com/owncloud/ocis/pull/3217)
 * Enhancement - Thumbnails in spaces: [#3219](https://github.com/owncloud/ocis/pull/3219)
+* Enhancement - Update reva to v1.16.1-0.20220224114254-d4ffaf323e70: [#3231](https://github.com/owncloud/ocis/pull/3231)
 * Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
 
 ## Details
@@ -96,6 +97,12 @@ The following sections list the changes for unreleased.
    Added support for thumbnails in spaces.
 
    https://github.com/owncloud/ocis/pull/3219
+
+* Enhancement - Update reva to v1.16.1-0.20220224114254-d4ffaf323e70: [#3231](https://github.com/owncloud/ocis/pull/3231)
+
+   We updated reva to the latest edge branch.
+
+   https://github.com/owncloud/ocis/pull/3231
 
 * Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
 
