@@ -52,7 +52,8 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 				StorageId: spaceID,
 				OpaqueId:  spaceID,
 			},
-			Path: path,
+			// Spaces requests need relative paths.
+			Path: "." + path,
 		}
 	} else {
 		ref = &provider.Reference{
