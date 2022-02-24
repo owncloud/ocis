@@ -1098,10 +1098,6 @@ API, search, favorites, config, capabilities, not existing endpoints, CORS and o
 #### [no robots.txt available](https://github.com/owncloud/ocis/issues/1314)
 -   [apiMain/main.feature:5](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/main.feature#L5) Scenario: robots.txt file should be accessible
 
-#### [Different version, edition and productname in status request and capabilities request](https://github.com/owncloud/ocis/issues/2174)
--   [apiMain/status.feature:5](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/status.feature#L5) Scenario: Status.php is correct
-#### [ocs config endpoint only accessible by authorized users](https://github.com/owncloud/ocis/issues/1338)
-
 #### [Ability to return error messages in Webdav response bodies](https://github.com/owncloud/ocis/issues/1293)
 -   [apiAuthOcs/ocsDELETEAuth.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsDELETEAuth.feature#L10) Scenario: send DELETE requests to OCS endpoints as admin with wrong password
 -   [apiAuthOcs/ocsGETAuth.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L10) Scenario: using OCS anonymously
