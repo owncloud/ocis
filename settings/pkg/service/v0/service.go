@@ -15,7 +15,7 @@ import (
 	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/settings/pkg/config"
 	"github.com/owncloud/ocis/settings/pkg/settings"
-	store "github.com/owncloud/ocis/settings/pkg/store/filesystem"
+	store "github.com/owncloud/ocis/settings/pkg/store/metadata"
 	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
