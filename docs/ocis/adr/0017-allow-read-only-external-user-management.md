@@ -14,12 +14,12 @@ geekdocFilePath: 0017-allow-read-only-external-user-management.md
 ## Context and Problem Statement
 
 oCIS needs to be integrated with various external Authentication and Identity Management Systems.
-Usually oCIS will no have administrative access to such a system and we will not be allowed to
-reconfigure it suite our needs (e.g. we will not be able to enhance the schema of an already existing
-LDAP Directory). In most case our access will be read-only. 
+Usually oCIS will have no administrative access to such a system and we will not be allowed to
+reconfigure it to suit our needs (e.g. we will not be able to enhance the schema of an already existing
+LDAP Directory). In most of the cases our access will be read-only. 
 
 Sidenote: There is a difference between users, identities and accounts: A user may have multiple
-identities whith which he can authenticate, e.g. his facebook, twitter, microsoft or google
+identities which he can authenticate with, e.g. his facebook, twitter, microsoft or google
 identity. Multiple identities can be linked to an account in ocis, allowing to fall back to another
 identity provider should one of them shut down. This also allows migrating from one identity
 provider to another.
@@ -41,7 +41,7 @@ of stable identifier for users:
 - In OIDC itself the only stable identifier that is guaranteed to be provided by the IDP is
   combination of the sub and iss claims. IDPs can optionally return other claims, but we cannot
   rely on a specific claim being present.
-- When no other services (LDAP, SCIM, ...) is available that could be used look up a user UUID
+- When no other services (LDAP, SCIM, ...) are available that could be used look up a user UUID
 
 
 ## Decision Drivers
@@ -83,7 +83,7 @@ the APIs provided by the IdM.
 * Good, because we can rely on the external identity management
 * Good, because ocis services only need to know about the CS3 user provider API, which acts as an
   abstraction layer for different identitiy management systems
-* Good, because there is only an single source of truth (the external IdM) and we don't need to
+* Good, because there is only a single source of truth (the external IdM) and we don't need to
   implement a synchronization mechanism to maintain an internal user database (we will likely need
   some form of caching though, see below)
 * Bad, because the identity managment needs to provide a stable, persistent, non-reassignable user
