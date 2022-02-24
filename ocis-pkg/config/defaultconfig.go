@@ -7,6 +7,7 @@ import (
 	graph "github.com/owncloud/ocis/graph/pkg/config"
 	idp "github.com/owncloud/ocis/idp/pkg/config"
 	nats "github.com/owncloud/ocis/nats/pkg/config"
+	notifications "github.com/owncloud/ocis/notifications/pkg/config"
 	ocs "github.com/owncloud/ocis/ocs/pkg/config"
 	proxy "github.com/owncloud/ocis/proxy/pkg/config"
 	settings "github.com/owncloud/ocis/settings/pkg/config"
@@ -31,6 +32,7 @@ func DefaultConfig() *Config {
 		Graph:         graph.DefaultConfig(),
 		IDP:           idp.DefaultConfig(),
 		Nats:          nats.DefaultConfig(),
+		Notifications: notifications.DefaultConfig(),
 		Proxy:         proxy.DefaultConfig(),
 		GraphExplorer: graphExplorer.DefaultConfig(),
 		OCS:           ocs.DefaultConfig(),
