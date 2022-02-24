@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -42,12 +43,24 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	if !ok {
 		return nil, errors.New("cs3source: authorization missing")
 	}
-	ctx = metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
-	rsp, err := s.client.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{
-		Ref: &provider.Reference{
+	var ref *provider.Reference
+	if strings.Contains(path, "!") {
+		parts := strings.Split(path, "!")
+		spaceID, path := parts[0], parts[1]
+		ref = &provider.Reference{
+			ResourceId: &provider.ResourceId{
+				StorageId: spaceID,
+				OpaqueId:  spaceID,
+			},
 			Path: path,
-		},
-	})
+		}
+	} else {
+		ref = &provider.Reference{
+			Path: path,
+		}
+	}
+	ctx = metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
+	rsp, err := s.client.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: ref})
 
 	if err != nil {
 		return nil, err

@@ -217,11 +217,24 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 	ctx := metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
 
-	req := &provider.StatRequest{
-		Ref: &provider.Reference{
+	var ref *provider.Reference
+	if strings.Contains(path, "!") {
+		parts := strings.Split(path, "!")
+		spaceID, path := parts[0], parts[1]
+		ref = &provider.Reference{
+			ResourceId: &provider.ResourceId{
+				StorageId: spaceID,
+				OpaqueId:  spaceID,
+			},
 			Path: path,
-		},
+		}
+	} else {
+		ref = &provider.Reference{
+			Path: path,
+		}
 	}
+
+	req := &provider.StatRequest{Ref: ref}
 	rsp, err := g.cs3Client.Stat(ctx, req)
 	if err != nil {
 		g.logger.Error().Err(err).Str("path", path).Msg("could not stat file")
