@@ -11,8 +11,6 @@ import (
 	"github.com/owncloud/ocis/proxy/pkg/webdav"
 )
 
-const publicFilesEndpoint = "/remote.php/dav/public-files/"
-
 // BasicAuth provides a middleware to check if BasicAuth is provided
 func BasicAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
@@ -111,7 +109,25 @@ type basicAuth struct {
 
 func (m basicAuth) isPublicLink(req *http.Request) bool {
 	login, _, ok := req.BasicAuth()
-	return ok && login == "public" && strings.HasPrefix(req.URL.Path, publicFilesEndpoint)
+
+	if !ok || login != "public" {
+		return false
+	}
+
+	publicPaths := []string{
+		"/remote.php/dav/public-files/",
+		"/ocs/v1.php/cloud/capabilities",
+	}
+	isPublic := false
+
+	for _, p := range publicPaths {
+		if strings.HasPrefix(req.URL.Path, p) {
+			isPublic = true
+			break
+		}
+	}
+
+	return isPublic
 }
 
 // The token auth endpoint uses basic auth for clients, see https://openid.net/specs/openid-connect-basic-1_0.html#TokenRequest

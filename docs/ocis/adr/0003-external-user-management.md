@@ -7,9 +7,9 @@ geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0003-external-user-management.md
 ---
 
-* Status: accepted
+* Status: superseded by [17. Allow read only external User Management]({{< ref "0017-allow-read-only-external-user-management.md" >}})
 * Deciders: @butonic, @micbar, @dragotin, @hodyroff, @pmaier1
-* Date: 2020-12-09
+* Date: 2022-02-08
 
 Technical Story: [Skip account-service by talking to CS3 user-api](https://github.com/owncloud/ocis/pull/1020)
 
@@ -112,3 +112,4 @@ We should use an existing LDAP server and make GLAuth a drop in replacement for 
 
 ## Links
 * supersedes [ADR-0001]({{< ref "0001-introduce-accounts-service.md" >}})
+* superseded by [17. Allow read only external User Management]({{< ref "0017-allow-read-only-external-user-management.md" >}})

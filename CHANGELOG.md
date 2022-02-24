@@ -6,14 +6,28 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Capabilities for password protected public links: [#3229](https://github.com/owncloud/ocis/pull/3229)
 * Bugfix - Make events settings configurable: [#3214](https://github.com/owncloud/ocis/pull/3214)
 * Bugfix - Align storage metadata GPRC bind port with other variable names: [#3169](https://github.com/owncloud/ocis/pull/3169)
 * Change - Unify file IDs: [#3185](https://github.com/owncloud/ocis/pull/3185)
 * Enhancement - Add sorting to list Spaces: [#3200](https://github.com/owncloud/ocis/issues/3200)
 * Enhancement - Change NATS port: [#3210](https://github.com/owncloud/ocis/pull/3210)
+* Enhancement - Re-Enabling web cache control: [#3109](https://github.com/owncloud/ocis/pull/3109)
+* Enhancement - Add SPA conform fileserver for web: [#3109](https://github.com/owncloud/ocis/pull/3109)
+* Enhancement - Implement notifications service: [#3217](https://github.com/owncloud/ocis/pull/3217)
+* Enhancement - Thumbnails in spaces: [#3219](https://github.com/owncloud/ocis/pull/3219)
+* Enhancement - Update reva to v1.16.1-0.20220224114254-d4ffaf323e70: [#3231](https://github.com/owncloud/ocis/pull/3231)
 * Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
 
 ## Details
+
+* Bugfix - Capabilities for password protected public links: [#3229](https://github.com/owncloud/ocis/pull/3229)
+
+   Allow password protected public links to request capabilities.
+
+   https://github.com/owncloud/web/issues/5863
+   https://github.com/owncloud/ocis/pull/3229
+   https://github.com/owncloud/web/pull/6471
 
 * Bugfix - Make events settings configurable: [#3214](https://github.com/owncloud/ocis/pull/3214)
 
@@ -55,6 +69,40 @@ The following sections list the changes for unreleased.
    for nats server
 
    https://github.com/owncloud/ocis/pull/3210
+
+* Enhancement - Re-Enabling web cache control: [#3109](https://github.com/owncloud/ocis/pull/3109)
+
+   We've re-enable browser caching headers (`Expires` and `Last-Modified`) for the web
+   service, this was disabled due to a problem in the fileserver used before. Since we're now using
+   our own fileserver implementation this works again and is enabled by default.
+
+   https://github.com/owncloud/ocis/pull/3109
+
+* Enhancement - Add SPA conform fileserver for web: [#3109](https://github.com/owncloud/ocis/pull/3109)
+
+   We've added an SPA conform fileserver to the web service. It enables web to use vue's history
+   mode and behaves like nginx try_files.
+
+   https://github.com/owncloud/ocis/pull/3109
+
+* Enhancement - Implement notifications service: [#3217](https://github.com/owncloud/ocis/pull/3217)
+
+   Implemented the minimal version of the notifications service to be able to notify a user when
+   they received a share.
+
+   https://github.com/owncloud/ocis/pull/3217
+
+* Enhancement - Thumbnails in spaces: [#3219](https://github.com/owncloud/ocis/pull/3219)
+
+   Added support for thumbnails in spaces.
+
+   https://github.com/owncloud/ocis/pull/3219
+
+* Enhancement - Update reva to v1.16.1-0.20220224114254-d4ffaf323e70: [#3231](https://github.com/owncloud/ocis/pull/3231)
+
+   We updated reva to the latest edge branch. Changelog will follow.
+
+   https://github.com/owncloud/ocis/pull/3231
 
 * Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
 
