@@ -16,7 +16,7 @@ func DefaultConfig() *Config {
 				Password: "godisdead",
 			},
 			Events: Events{
-				Endpoint:      "127.0.0.1:4222",
+				Endpoint:      "127.0.0.1:9233",
 				Cluster:       "test-cluster",
 				ConsumerGroup: "notifications",
 			},
