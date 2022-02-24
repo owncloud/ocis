@@ -5,7 +5,7 @@ import (
 
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var bundleScenarios = []struct {
@@ -115,33 +115,35 @@ func TestBundles(t *testing.T) {
 
 	// write bundles
 	for i := range bundleScenarios {
-		index := i
-		t.Run(bundleScenarios[index].name, func(t *testing.T) {
-			_, err := s.WriteBundle(bundleScenarios[index].bundle)
-			assert.NoError(t, err)
-			// TODO: check entry exists
+		b := bundleScenarios[i]
+		t.Run(b.name, func(t *testing.T) {
+			_, err := s.WriteBundle(b.bundle)
+			require.NoError(t, err)
+			bundle, err := s.ReadBundle(b.bundle.Id)
+			require.NoError(t, err)
+			require.Equal(t, b.bundle, bundle)
 		})
 	}
 
 	// check that ListBundles only returns bundles with type DEFAULT
 	bundles, err := s.ListBundles(settingsmsg.Bundle_TYPE_DEFAULT, []string{})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	for i := range bundles {
-		assert.Equal(t, settingsmsg.Bundle_TYPE_DEFAULT, bundles[i].Type)
+		require.Equal(t, settingsmsg.Bundle_TYPE_DEFAULT, bundles[i].Type)
 	}
 
 	// check that ListBundles filtered by an id only returns that bundle
 	filteredBundles, err := s.ListBundles(settingsmsg.Bundle_TYPE_DEFAULT, []string{bundle2})
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(filteredBundles))
+	require.NoError(t, err)
+	require.Equal(t, 1, len(filteredBundles))
 	if len(filteredBundles) == 1 {
-		assert.Equal(t, bundle2, filteredBundles[0].Id)
+		require.Equal(t, bundle2, filteredBundles[0].Id)
 	}
 
 	// check that ListRoles only returns bundles with type ROLE
 	roles, err := s.ListBundles(settingsmsg.Bundle_TYPE_ROLE, []string{})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	for i := range roles {
-		assert.Equal(t, settingsmsg.Bundle_TYPE_ROLE, roles[i].Type)
+		require.Equal(t, settingsmsg.Bundle_TYPE_ROLE, roles[i].Type)
 	}
 }

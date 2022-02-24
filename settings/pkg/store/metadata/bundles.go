@@ -11,12 +11,36 @@ import (
 
 // ListBundles returns all bundles in the dataPath folder that match the given type.
 func (s Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []string) ([]*settingsmsg.Bundle, error) {
-	return nil, errors.New("not implemented")
+	var bundles []*settingsmsg.Bundle
+	for _, id := range bundleIDs {
+		b, err := s.mdc.SimpleDownload(nil, bundlePath(id))
+		if err != nil {
+			return nil, err
+		}
+
+		bundle := &settingsmsg.Bundle{}
+		err = json.Unmarshal(b, bundle)
+		if err != nil {
+			return nil, err
+		}
+
+		if bundle.Type == bundleType {
+			bundles = append(bundles, bundle)
+		}
+
+	}
+	return bundles, nil
 }
 
 // ReadBundle tries to find a bundle by the given id within the dataPath.
 func (s Store) ReadBundle(bundleID string) (*settingsmsg.Bundle, error) {
-	return nil, errors.New("not implemented")
+	b, err := s.mdc.SimpleDownload(nil, bundlePath(bundleID))
+	if err != nil {
+		return nil, err
+	}
+
+	bundle := &settingsmsg.Bundle{}
+	return bundle, json.Unmarshal(b, bundle)
 }
 
 // ReadSetting tries to find a setting by the given id within the dataPath.
