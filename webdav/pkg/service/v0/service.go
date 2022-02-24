@@ -66,7 +66,8 @@ func NewService(opts ...Option) (Service, error) {
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
-		r.Get("/remote.php/dav/files/{user}/*", svc.Thumbnail)
+		r.Get("/remote.php/dav/spaces/{id}/*", svc.SpacesThumbnail)
+		r.Get("/remote.php/dav/files/{id}/*", svc.Thumbnail)
 		r.Get("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnail)
 		r.Head("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnailHead)
 	})
@@ -88,6 +89,53 @@ func (g Webdav) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.mux.ServeHTTP(w, r)
 }
 
+// SpacesThumbnail is the endpoint for retrieving thumbnails inside of spaces.
+func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
+	tr, err := requests.ParseThumbnailRequest(r)
+	if err != nil {
+		g.log.Error().Err(err).Msg("could not create Request")
+		renderError(w, r, errBadRequest(err.Error()))
+		return
+	}
+	t := r.Header.Get(TokenHeader)
+
+	fullPath := tr.Identifier + "!" + tr.Filepath
+	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
+		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
+		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),
+		Width:         tr.Width,
+		Height:        tr.Height,
+		Source: &thumbnailssvc.GetThumbnailRequest_Cs3Source{
+			Cs3Source: &thumbnailsmsg.CS3Source{
+				Path:          fullPath,
+				Authorization: t,
+			},
+		},
+	})
+	if err != nil {
+		e := merrors.Parse(err.Error())
+		switch e.Code {
+		case http.StatusNotFound:
+			// StatusNotFound is expected for unsupported files
+			renderError(w, r, errNotFound(notFoundMsg(tr.Filename)))
+			return
+		case http.StatusBadRequest:
+			renderError(w, r, errBadRequest(err.Error()))
+		default:
+			renderError(w, r, errInternalError(err.Error()))
+		}
+		g.log.Error().Err(err).Msg("could not get thumbnail")
+		return
+	}
+
+	if len(rsp.Thumbnail) == 0 {
+		renderError(w, r, errNotFound(""))
+		return
+	}
+
+	g.mustRender(w, r, newThumbnailResponse(rsp))
+}
+
 // Thumbnail implements the Service interface.
 func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	tr, err := requests.ParseThumbnailRequest(r)
@@ -101,7 +149,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	ctx := metadata.AppendToOutgoingContext(r.Context(), TokenHeader, t)
 	userRes, err := g.revaClient.GetUserByClaim(ctx, &userv1beta1.GetUserByClaimRequest{
 		Claim: "username",
-		Value: tr.Username,
+		Value: tr.Identifier,
 	})
 	if err != nil || userRes.Status.Code != rpcv1beta1.Code_CODE_OK {
 		g.log.Error().Err(err).Msg("could not get user")
