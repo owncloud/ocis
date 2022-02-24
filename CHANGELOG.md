@@ -97,6 +97,7 @@ The following sections list the changes for unreleased.
    Added support for thumbnails in spaces.
 
    https://github.com/owncloud/ocis/pull/3219
+   https://github.com/owncloud/ocis/pull/3235
 
 * Enhancement - Update reva to v1.16.1-0.20220224114254-d4ffaf323e70: [#3231](https://github.com/owncloud/ocis/pull/3231)
 
