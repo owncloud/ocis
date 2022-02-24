@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Capabilities for password protected public links: [#3229](https://github.com/owncloud/ocis/pull/3229)
 * Bugfix - Make events settings configurable: [#3214](https://github.com/owncloud/ocis/pull/3214)
 * Bugfix - Align storage metadata GPRC bind port with other variable names: [#3169](https://github.com/owncloud/ocis/pull/3169)
 * Change - Unify file IDs: [#3185](https://github.com/owncloud/ocis/pull/3185)
@@ -16,6 +17,14 @@ The following sections list the changes for unreleased.
 * Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
 
 ## Details
+
+* Bugfix - Capabilities for password protected public links: [#3229](https://github.com/owncloud/ocis/pull/3229)
+
+   Allow password protected public links to request capabilities.
+
+   https://github.com/owncloud/web/issues/5863
+   https://github.com/owncloud/ocis/pull/3229
+   https://github.com/owncloud/web/pull/6471
 
 * Bugfix - Make events settings configurable: [#3214](https://github.com/owncloud/ocis/pull/3214)
 
