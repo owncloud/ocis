@@ -100,7 +100,7 @@ The following sections list the changes for unreleased.
 
 * Enhancement - Update reva to v1.16.1-0.20220224114254-d4ffaf323e70: [#3231](https://github.com/owncloud/ocis/pull/3231)
 
-   We updated reva to the latest edge branch.
+   We updated reva to the latest edge branch. Changelog will follow.
 
    https://github.com/owncloud/ocis/pull/3231
 
