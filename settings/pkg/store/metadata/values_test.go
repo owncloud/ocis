@@ -5,7 +5,7 @@ import (
 
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var valueScenarios = []struct {
@@ -60,12 +60,12 @@ func TestValues(t *testing.T) {
 		t.Run(valueScenarios[index].name, func(t *testing.T) {
 			value := valueScenarios[index].value
 			v, err := s.WriteValue(value)
-			assert.NoError(t, err)
-			assert.Equal(t, value, v)
+			require.NoError(t, err)
+			require.Equal(t, value, v)
 
 			v, err = s.ReadValue(value.Id)
-			assert.NoError(t, err)
-			assert.Equal(t, value, v)
+			require.NoError(t, err)
+			require.Equal(t, value, v)
 
 		})
 	}
