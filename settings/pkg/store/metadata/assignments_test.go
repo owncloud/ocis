@@ -24,7 +24,7 @@ var (
 		olog.Level("info"),
 	)
 
-	mdc = &MockedMetadataClient{data: make(map[string][]byte)}
+	mdc = NewMDC()
 
 	bundles = []*settingsmsg.Bundle{
 		{

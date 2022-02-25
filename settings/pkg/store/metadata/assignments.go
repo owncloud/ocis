@@ -9,8 +9,6 @@ import (
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 )
 
-var accountsFolderLocation = "settings/accounts"
-
 // ListRoleAssignments loads and returns all role assignments matching the given assignment identifier.
 func (s Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRoleAssignment, error) {
 	assIDs, err := s.mdc.ReadDir(nil, accountPath(accountUUID))
@@ -39,17 +37,16 @@ func (s Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRoleA
 // WriteRoleAssignment appends the given role assignment to the existing assignments of the respective account.
 func (s Store) WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.UserRoleAssignment, error) {
 	// as per https://github.com/owncloud/product/issues/103 "Each user can have exactly one role"
-	assIDs, err := s.mdc.ReadDir(nil, accountPath(accountUUID))
+	err := s.mdc.Delete(nil, accountPath(accountUUID))
+	if err != nil {
+		// TODO: How to differentiate between 'not found' and other errors?
+	}
+
+	err = s.mdc.MakeDirIfNotExist(nil, accountPath(accountUUID))
 	if err != nil {
 		return nil, err
 	}
 
-	for _, assID := range assIDs {
-		err := s.mdc.Delete(nil, assignmentPath(accountUUID, assID))
-		if err != nil {
-			return nil, err
-		}
-	}
 	ass := &settingsmsg.UserRoleAssignment{
 		Id:          uuid.Must(uuid.NewV4()).String(),
 		AccountUuid: accountUUID,

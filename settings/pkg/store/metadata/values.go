@@ -42,5 +42,5 @@ func (s Store) WriteValue(value *settingsmsg.Value) (*settingsmsg.Value, error) 
 }
 
 func valuePath(id string) string {
-	return fmt.Sprintf("%s/%s", "settings/values", id)
+	return fmt.Sprintf("%s/%s", valuesFolderLocation, id)
 }

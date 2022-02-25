@@ -3,6 +3,8 @@ package store
 import (
 	"context"
 	"strings"
+
+	"github.com/owncloud/ocis/settings/pkg/config"
 )
 
 const (
@@ -31,9 +33,23 @@ const (
 	//value3 = "b42702d2-5e4d-4d73-b133-e1f9e285355e"
 )
 
+// use "unit" or "integration" do define test type. You need a running ocis instance for integration tests
+var testtype = "unit"
+
 // MockedMetadataClient mocks the metadataservice inmemory
 type MockedMetadataClient struct {
 	data map[string][]byte
+}
+
+// NewMDC instantiates a mocked MetadataClient
+func NewMDC() MetadataClient {
+	switch testtype {
+	case "unit":
+		return &MockedMetadataClient{data: make(map[string][]byte)}
+	case "integration":
+		return NewMetadataClient(&config.Config{})
+	}
+	return nil
 }
 
 func keys(m map[string][]byte) (s []string) {
@@ -56,12 +72,15 @@ func (m *MockedMetadataClient) SimpleUpload(_ context.Context, id string, conten
 
 // Delete can't error either
 func (m *MockedMetadataClient) Delete(_ context.Context, id string) error {
-	delete(m.data, id)
+	for k := range m.data {
+		if strings.HasPrefix(k, id) {
+			delete(m.data, k)
+		}
+	}
 	return nil
 }
 
 // ReadDir returns nil, nil if not found
-// Known flaw: lists also subdirs
 func (m *MockedMetadataClient) ReadDir(_ context.Context, id string) ([]string, error) {
 	var out []string
 	for k := range m.data {
@@ -73,6 +92,11 @@ func (m *MockedMetadataClient) ReadDir(_ context.Context, id string) ([]string, 
 		}
 	}
 	return out, nil
+}
+
+// MakeDirIfNotExist does nothing
+func (m *MockedMetadataClient) MakeDirIfNotExist(_ context.Context, id string) error {
+	return nil
 }
 
 // IDExists is a helper to check if an id exists

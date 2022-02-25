@@ -68,5 +68,5 @@ func (s Store) RemoveSettingFromBundle(bundleID string, settingID string) error 
 }
 
 func bundlePath(id string) string {
-	return fmt.Sprintf("bundle/%s", id)
+	return fmt.Sprintf("%s/%s", bundleFolderLocation, id)
 }

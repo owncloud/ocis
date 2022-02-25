@@ -46,7 +46,7 @@ var valueScenarios = []struct {
 }
 
 func TestValues(t *testing.T) {
-	mdc := &MockedMetadataClient{data: make(map[string][]byte)}
+	mdc := NewMDC()
 	s := Store{
 		Logger: olog.NewLogger(
 			olog.Color(true),
