@@ -25,6 +25,7 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+	v0 "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 	settingsServiceExt "github.com/owncloud/ocis/settings/pkg/service/v0"
 	merrors "go-micro.dev/v4/errors"
@@ -151,6 +152,22 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func canCreateSpace(ctx context.Context, ownPersonalHome bool) bool {
+	s := settingssvc.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
+
+	pr, err := s.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{
+		PermissionId: settingsServiceExt.CreateSpacePermissionID,
+	})
+	if err != nil || pr.Permission == nil {
+		return false
+	}
+	// TODO @C0rby shouldn't the permissions service check this? aka shouldn't we call CheckPermission?
+	if pr.Permission.Constraint == v0.Permission_CONSTRAINT_OWN && !ownPersonalHome {
+		return false
+	}
+	return true
+}
+
 // CreateDrive creates a storage drive (space).
 func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	us, ok := ctxpkg.ContextGetUser(r.Context())
@@ -159,12 +176,8 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s := settingssvc.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient)
-
-	_, err := s.GetPermissionByID(r.Context(), &settingssvc.GetPermissionByIDRequest{
-		PermissionId: settingsServiceExt.CreateSpacePermissionID,
-	})
-	if err != nil {
+	// TODO determine if the user tries to create his own personal space and pass that as a boolean
+	if !canCreateSpace(r.Context(), false) {
 		// if the permission is not existing for the user in context we can assume we don't have it. Return 401.
 		errorcode.GeneralException.Render(w, r, http.StatusUnauthorized, "insufficient permissions to create a space.")
 		return
