@@ -22,6 +22,7 @@ import (
 	glauth "github.com/owncloud/ocis/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/graph/pkg/command"
+	idm "github.com/owncloud/ocis/idm/pkg/command"
 	idp "github.com/owncloud/ocis/idp/pkg/command"
 	nats "github.com/owncloud/ocis/nats/pkg/command"
 	notifications "github.com/owncloud/ocis/notifications/pkg/command"
@@ -99,6 +100,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["graph"] = graph.NewSutureService
 	s.ServicesRegistry["graph-explorer"] = graphExplorer.NewSutureService
 	s.ServicesRegistry["idp"] = idp.NewSutureService
+	s.ServicesRegistry["idm"] = idm.NewSutureService
 	s.ServicesRegistry["ocs"] = ocs.NewSutureService
 	s.ServicesRegistry["store"] = store.NewSutureService
 	s.ServicesRegistry["thumbnails"] = thumbnails.NewSutureService

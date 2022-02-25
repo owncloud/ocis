@@ -29,6 +29,7 @@ require (
 	github.com/go-chi/cors v1.2.0
 	github.com/go-chi/render v1.0.1
 	github.com/go-ldap/ldap/v3 v3.4.2
+	github.com/go-ldap/ldif v0.0.0-20200320164324-fd88d9b715b3
 	github.com/go-logr/logr v1.2.2
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/gofrs/uuid v4.2.0+incompatible
@@ -40,7 +41,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.3
 	github.com/iancoleman/strcase v0.2.0
 	github.com/justinas/alice v1.2.0
-	github.com/libregraph/idm v0.3.1-0.20220120080913-d0003ade935e
+	github.com/libregraph/idm v0.3.1-0.20220222123017-f9d520ac1f11
 	github.com/libregraph/lico v0.53.1
 	github.com/mennanov/fieldmask-utils v0.5.0
 	github.com/mitchellh/mapstructure v1.4.3
@@ -91,7 +92,10 @@ require (
 	github.com/ProtonMail/go-crypto v0.0.0-20211112122917-428f8eabeeb3 // indirect
 	github.com/RoaringBitmap/roaring v0.9.4 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
+	github.com/alexedwards/argon2id v0.0.0-20211130144151-3585854a6387 // indirect
+	github.com/amoghe/go-crypt v0.0.0-20220222110647-20eada5f5964 // indirect
 	github.com/armon/go-metrics v0.3.10 // indirect
+	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/aws/aws-sdk-go v1.42.39 // indirect
 	github.com/beevik/etree v1.1.0 // indirect
@@ -129,6 +133,7 @@ require (
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/eternnoir/gncp v0.0.0-20170707042257-c70df2d0cd68 // indirect
@@ -235,9 +240,11 @@ require (
 	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749 // indirect
 	github.com/shurcooL/vfsgen v0.0.0-20200824052919-0d455de96546 // indirect
 	github.com/sony/gobreaker v0.5.0 // indirect
+	github.com/spacewander/go-suffix-tree v0.0.0-20191010040751-0865e368c784 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/steveyen/gtreap v0.1.0 // indirect
 	github.com/stretchr/objx v0.3.0 // indirect
+	github.com/trustelem/zxcvbn v1.0.1 // indirect
 	github.com/tus/tusd v1.8.0 // indirect
 	github.com/wk8/go-ordered-map v0.2.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
