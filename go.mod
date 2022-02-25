@@ -19,7 +19,7 @@ require (
 	github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v4 v4.0.0-20220118152736-9e0be6c85d75
-	github.com/blevesearch/bleve/v2 v2.3.0
+	github.com/blevesearch/bleve/v2 v2.3.1
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220126114148-64c025ccdd19
 	github.com/cs3org/reva v1.16.1-0.20220224115936-e17c65a48a5a
@@ -106,11 +106,11 @@ require (
 	github.com/blevesearch/snowballstem v0.9.0 // indirect
 	github.com/blevesearch/upsidedown_store_api v1.0.1 // indirect
 	github.com/blevesearch/vellum v1.0.7 // indirect
-	github.com/blevesearch/zapx/v11 v11.3.2 // indirect
-	github.com/blevesearch/zapx/v12 v12.3.2 // indirect
-	github.com/blevesearch/zapx/v13 v13.3.2 // indirect
-	github.com/blevesearch/zapx/v14 v14.3.2 // indirect
-	github.com/blevesearch/zapx/v15 v15.3.2 // indirect
+	github.com/blevesearch/zapx/v11 v11.3.3 // indirect
+	github.com/blevesearch/zapx/v12 v12.3.3 // indirect
+	github.com/blevesearch/zapx/v13 v13.3.3 // indirect
+	github.com/blevesearch/zapx/v14 v14.3.3 // indirect
+	github.com/blevesearch/zapx/v15 v15.3.3 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f // indirect
 	github.com/boombuler/barcode v1.0.1 // indirect
