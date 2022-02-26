@@ -88,6 +88,11 @@ func (g Service) CheckPermission(ctx context.Context, req *permissions.CheckPerm
 
 // RegisterDefaultRoles composes default roles and saves them. Skipped if the roles already exist.
 func (g Service) RegisterDefaultRoles() {
+	// TODO: we can't register on service start any more because metadata might not be up yet
+	// we need to lazy initialize
+	if true {
+		return
+	}
 	// FIXME: we're writing default roles per service start (i.e. twice at the moment, for http and grpc server). has to happen only once.
 	for _, role := range generateBundlesDefaultRoles() {
 		bundleID := role.Extension + "." + role.Id

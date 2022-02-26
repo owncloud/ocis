@@ -11,6 +11,7 @@ import (
 
 // ListBundles returns all bundles in the dataPath folder that match the given type.
 func (s Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []string) ([]*settingsmsg.Bundle, error) {
+	s.Init()
 	var bundles []*settingsmsg.Bundle
 	for _, id := range bundleIDs {
 		b, err := s.mdc.SimpleDownload(nil, bundlePath(id))
@@ -34,6 +35,7 @@ func (s Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []strin
 
 // ReadBundle tries to find a bundle by the given id within the dataPath.
 func (s Store) ReadBundle(bundleID string) (*settingsmsg.Bundle, error) {
+	s.Init()
 	b, err := s.mdc.SimpleDownload(nil, bundlePath(bundleID))
 	if err != nil {
 		return nil, err
@@ -50,6 +52,7 @@ func (s Store) ReadSetting(settingID string) (*settingsmsg.Setting, error) {
 
 // WriteBundle sends the givens record to the metadataclient. returns `record` for legacy reasons
 func (s Store) WriteBundle(record *settingsmsg.Bundle) (*settingsmsg.Bundle, error) {
+	s.Init()
 	b, err := json.Marshal(record)
 	if err != nil {
 		return nil, err

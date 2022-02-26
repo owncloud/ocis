@@ -95,7 +95,12 @@ func (m *MockedMetadataClient) ReadDir(_ context.Context, id string) ([]string, 
 }
 
 // MakeDirIfNotExist does nothing
-func (m *MockedMetadataClient) MakeDirIfNotExist(_ context.Context, id string) error {
+func (*MockedMetadataClient) MakeDirIfNotExist(_ context.Context, _ string) error {
+	return nil
+}
+
+// Init does nothing
+func (*MockedMetadataClient) Init(_ context.Context, _ string) error {
 	return nil
 }
 

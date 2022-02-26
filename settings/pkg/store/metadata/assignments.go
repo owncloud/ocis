@@ -11,6 +11,7 @@ import (
 
 // ListRoleAssignments loads and returns all role assignments matching the given assignment identifier.
 func (s Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRoleAssignment, error) {
+	s.Init()
 	assIDs, err := s.mdc.ReadDir(nil, accountPath(accountUUID))
 	if err != nil {
 		return nil, err
@@ -36,6 +37,7 @@ func (s Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRoleA
 
 // WriteRoleAssignment appends the given role assignment to the existing assignments of the respective account.
 func (s Store) WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.UserRoleAssignment, error) {
+	s.Init()
 	// as per https://github.com/owncloud/product/issues/103 "Each user can have exactly one role"
 	err := s.mdc.Delete(nil, accountPath(accountUUID))
 	if err != nil {
@@ -61,6 +63,7 @@ func (s Store) WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.Use
 
 // RemoveRoleAssignment deletes the given role assignment from the existing assignments of the respective account.
 func (s Store) RemoveRoleAssignment(assignmentID string) error {
+	s.Init()
 	accounts, err := s.mdc.ReadDir(nil, accountsFolderLocation)
 	if err != nil {
 		return err

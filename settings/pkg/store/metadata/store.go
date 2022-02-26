@@ -3,8 +3,8 @@ package store
 
 import (
 	"context"
-	"fmt"
 	"log"
+	"sync"
 
 	"github.com/cs3org/reva/pkg/storage/utils/metadata"
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
@@ -30,6 +30,7 @@ type MetadataClient interface {
 	Delete(ctx context.Context, id string) error
 	ReadDir(ctx context.Context, id string) ([]string, error)
 	MakeDirIfNotExist(ctx context.Context, id string) error
+	Init(ctx context.Context, id string) error
 }
 
 // Store interacts with the filesystem to manage settings information
@@ -37,6 +38,34 @@ type Store struct {
 	Logger olog.Logger
 
 	mdc MetadataClient
+	cfg *config.Config
+
+	init *sync.Once
+	l    *sync.Mutex
+}
+
+// Init initialize the store once, later calls are noops
+func (s Store) Init() {
+	if s.mdc != nil {
+		return
+	}
+
+	s.l.Lock()
+	defer s.l.Unlock()
+	var err error
+	s.init.Do(func() {
+		//b := backoff.NewExponentialBackOff()
+		//b.MaxElapsedTime = 4 * time.Second
+		//backoff.Retry(func() error {
+		err = s.initMetadataClient()
+		//return err
+
+		//}, b)
+
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 // New creates a new store
@@ -48,9 +77,10 @@ func New(cfg *config.Config) settings.Manager {
 		//olog.Level(cfg.Log.Level),
 		//olog.File(cfg.Log.File),
 		//),
+		l:    &sync.Mutex{},
+		init: &sync.Once{},
 	}
 
-	s.mdc = NewMetadataClient(cfg)
 	return &s
 }
 
@@ -60,11 +90,17 @@ func NewMetadataClient(cfg *config.Config) MetadataClient {
 	if err != nil {
 		log.Fatal("error connecting to mdc:", err)
 	}
+	return mdc
 
-	fmt.Println(settingsSpaceID)
-	err = mdc.Init(nil, settingsSpaceID)
+}
+
+// we need to lazy initialize the MetadataClient because metadata service might not be ready
+func (s Store) initMetadataClient() error {
+	s.mdc = NewMetadataClient(s.cfg)
+
+	err := s.mdc.Init(nil, settingsSpaceID)
 	if err != nil {
-		log.Fatal("error initializing mdc:", err)
+		return err
 	}
 
 	for _, p := range []string{
@@ -73,13 +109,12 @@ func NewMetadataClient(cfg *config.Config) MetadataClient {
 		bundleFolderLocation,
 		valuesFolderLocation,
 	} {
-		err = mdc.MakeDirIfNotExist(nil, p)
+		err = s.mdc.MakeDirIfNotExist(nil, p)
 		if err != nil {
-			log.Fatalf("error creating settings folder '%s': %s", p, err)
+			return err
 		}
 	}
-	return mdc
-
+	return nil
 }
 
 func init() {

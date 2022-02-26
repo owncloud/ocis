@@ -19,6 +19,7 @@ func (s Store) ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, e
 
 // ReadValue tries to find a value by the given valueId within the dataPath
 func (s Store) ReadValue(valueID string) (*settingsmsg.Value, error) {
+	s.Init()
 	b, err := s.mdc.SimpleDownload(nil, valuePath(valueID))
 	if err != nil {
 		return nil, err
@@ -34,6 +35,7 @@ func (s Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*set
 
 // WriteValue writes the given value into a file within the dataPath
 func (s Store) WriteValue(value *settingsmsg.Value) (*settingsmsg.Value, error) {
+	s.Init()
 	b, err := json.Marshal(value)
 	if err != nil {
 		return nil, err
