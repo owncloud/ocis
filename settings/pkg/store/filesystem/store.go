@@ -22,7 +22,7 @@ type Store struct {
 }
 
 // New creates a new store
-func New(cfg *config.Config) settings.Manager {
+func New(cfg *config.Config, initStore func(settings.Manager)) settings.Manager {
 	s := Store{
 		//Logger: olog.NewLogger(
 		//	olog.Color(cfg.Log.Color),
@@ -42,6 +42,7 @@ func New(cfg *config.Config) settings.Manager {
 	}
 
 	s.dataPath = cfg.DataPath
+	initStore(&s)
 	return &s
 }
 

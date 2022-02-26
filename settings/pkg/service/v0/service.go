@@ -32,12 +32,11 @@ type Service struct {
 // NewService returns a service implementation for Service.
 func NewService(cfg *config.Config, logger log.Logger) Service {
 	service := Service{
-		id:      "ocis-settings",
-		config:  cfg,
-		logger:  logger,
-		manager: store.New(cfg),
+		id:     "ocis-settings",
+		config: cfg,
+		logger: logger,
 	}
-	service.RegisterDefaultRoles()
+	service.manager = store.New(cfg, service.RegisterDefaultRoles)
 	return service
 }
 
@@ -87,23 +86,20 @@ func (g Service) CheckPermission(ctx context.Context, req *permissions.CheckPerm
 }
 
 // RegisterDefaultRoles composes default roles and saves them. Skipped if the roles already exist.
-func (g Service) RegisterDefaultRoles() {
-	// TODO: we can't register on service start any more because metadata might not be up yet
-	// we need to lazy initialize
-	if true {
-		return
-	}
+// NOTE: we can't register on service start any more because metadata might not be up yet
+// we need to lazy initialize
+func (g Service) RegisterDefaultRoles(m settings.Manager) {
 	// FIXME: we're writing default roles per service start (i.e. twice at the moment, for http and grpc server). has to happen only once.
 	for _, role := range generateBundlesDefaultRoles() {
 		bundleID := role.Extension + "." + role.Id
 		// check if the role already exists
-		bundle, _ := g.manager.ReadBundle(role.Id)
+		bundle, _ := m.ReadBundle(role.Id)
 		if bundle != nil {
 			g.logger.Debug().Str("bundleID", bundleID).Msg("bundle already exists. skipping.")
 			continue
 		}
 		// create the role
-		_, err := g.manager.WriteBundle(role)
+		_, err := m.WriteBundle(role)
 		if err != nil {
 			g.logger.Error().Err(err).Str("bundleID", bundleID).Msg("failed to register bundle")
 		}
@@ -111,7 +107,7 @@ func (g Service) RegisterDefaultRoles() {
 	}
 
 	for _, req := range generatePermissionRequests() {
-		_, err := g.manager.AddSettingToBundle(req.GetBundleId(), req.GetSetting())
+		_, err := m.AddSettingToBundle(req.GetBundleId(), req.GetSetting())
 		if err != nil {
 			g.logger.Error().
 				Err(err).
@@ -122,7 +118,7 @@ func (g Service) RegisterDefaultRoles() {
 	}
 
 	for _, req := range defaultRoleAssignments() {
-		if _, err := g.manager.WriteRoleAssignment(req.AccountUuid, req.RoleId); err != nil {
+		if _, err := m.WriteRoleAssignment(req.AccountUuid, req.RoleId); err != nil {
 			g.logger.Error().Err(err).Msg("failed to register role assignment")
 		}
 	}

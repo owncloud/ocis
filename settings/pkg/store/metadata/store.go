@@ -37,8 +37,9 @@ type MetadataClient interface {
 type Store struct {
 	Logger olog.Logger
 
-	mdc MetadataClient
-	cfg *config.Config
+	mdc       MetadataClient
+	cfg       *config.Config
+	initStore func(settings.Manager)
 
 	init *sync.Once
 	l    *sync.Mutex
@@ -69,16 +70,17 @@ func (s Store) Init() {
 }
 
 // New creates a new store
-func New(cfg *config.Config) settings.Manager {
+func New(cfg *config.Config, initstore func(settings.Manager)) settings.Manager {
 	s := Store{
-		//Logger: olog.NewLogger(
-		//olog.Color(cfg.Log.Color),
-		//olog.Pretty(cfg.Log.Pretty),
-		//olog.Level(cfg.Log.Level),
-		//olog.File(cfg.Log.File),
-		//),
-		l:    &sync.Mutex{},
-		init: &sync.Once{},
+		Logger: olog.NewLogger(
+			olog.Color(cfg.Log.Color),
+			olog.Pretty(cfg.Log.Pretty),
+			olog.Level(cfg.Log.Level),
+			olog.File(cfg.Log.File),
+		),
+		initStore: initstore,
+		l:         &sync.Mutex{},
+		init:      &sync.Once{},
 	}
 
 	return &s
@@ -98,6 +100,7 @@ func NewMetadataClient(cfg *config.Config) MetadataClient {
 func (s Store) initMetadataClient() error {
 	s.mdc = NewMetadataClient(s.cfg)
 
+	// TODO: this fails because of authentication issues
 	err := s.mdc.Init(nil, settingsSpaceID)
 	if err != nil {
 		return err
@@ -114,6 +117,8 @@ func (s Store) initMetadataClient() error {
 			return err
 		}
 	}
+
+	s.initStore(s)
 	return nil
 }
 

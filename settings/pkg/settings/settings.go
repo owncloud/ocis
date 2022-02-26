@@ -16,7 +16,7 @@ var (
 )
 
 // RegisterFunc stores store constructors
-type RegisterFunc func(*config.Config) Manager
+type RegisterFunc func(*config.Config, func(Manager)) Manager
 
 // Manager combines service interfaces for abstraction of storage implementations
 type Manager interface {
