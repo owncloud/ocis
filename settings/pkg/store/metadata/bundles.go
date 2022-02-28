@@ -11,6 +11,30 @@ import (
 
 // ListBundles returns all bundles in the dataPath folder that match the given type.
 func (s Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []string) ([]*settingsmsg.Bundle, error) {
+	// TODO: this is needed for initialization - we need to find a better way to fix this
+	if s.mdc == nil && len(bundleIDs) == 1 && bundleIDs[0] == "71881883-1768-46bd-a24d-a356a2afdf7f" {
+		return []*settingsmsg.Bundle{{
+			Id: "71881883-1768-46bd-a24d-a356a2afdf7f",
+			Settings: []*settingsmsg.Setting{
+				{
+					Id:          "8e587774-d929-4215-910b-a317b1e80f73",
+					Name:        "account-management",
+					DisplayName: "Account Management",
+					Description: "This permission gives full access to everything that is related to account management.",
+					Resource: &settingsmsg.Resource{
+						Type: settingsmsg.Resource_TYPE_USER,
+						Id:   "all",
+					},
+					Value: &settingsmsg.Setting_PermissionValue{
+						PermissionValue: &settingsmsg.Permission{
+							Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+							Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+						},
+					},
+				},
+			},
+		}}, nil
+	}
 	s.Init()
 	var bundles []*settingsmsg.Bundle
 	for _, id := range bundleIDs {
