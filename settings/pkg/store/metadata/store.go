@@ -118,7 +118,9 @@ func (s Store) initMetadataClient() error {
 		}
 	}
 
-	s.initStore(s)
+	if s.initStore != nil {
+		s.initStore(s)
+	}
 	return nil
 }
 

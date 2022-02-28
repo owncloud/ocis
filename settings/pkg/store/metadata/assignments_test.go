@@ -2,6 +2,7 @@ package store
 
 import (
 	"log"
+	"sync"
 	"testing"
 
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
@@ -16,6 +17,7 @@ var (
 	s = Store{
 		Logger: logger,
 		mdc:    mdc,
+		l:      &sync.Mutex{},
 	}
 
 	logger = olog.NewLogger(
@@ -85,7 +87,7 @@ func init() {
 func setupRoles() {
 	for i := range bundles {
 		if _, err := s.WriteBundle(bundles[i]); err != nil {
-			log.Fatal(err)
+			log.Fatal("error initializing ", err)
 		}
 	}
 }

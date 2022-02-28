@@ -1,6 +1,7 @@
 package store
 
 import (
+	"sync"
 	"testing"
 
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
@@ -101,6 +102,42 @@ var bundleScenarios = []struct {
 	},
 }
 
+var (
+	appendTestBundleID = "append-test-bundle"
+
+	appendTestSetting1 = &settingsmsg.Setting{
+		Id:          "append-test-setting-1",
+		Description: "test-desc-3",
+		DisplayName: "test-displayname-3",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SETTING,
+			Id:   setting1,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_READ,
+				Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
+			},
+		},
+	}
+
+	appendTestSetting2 = &settingsmsg.Setting{
+		Id:          "append-test-setting-2",
+		Description: "test-desc-3",
+		DisplayName: "test-displayname-3",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SETTING,
+			Id:   setting1,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_READ,
+				Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
+			},
+		},
+	}
+)
+
 func TestBundles(t *testing.T) {
 	mdc := NewMDC()
 	s := Store{
@@ -110,6 +147,7 @@ func TestBundles(t *testing.T) {
 			olog.Level("info"),
 		),
 
+		l:   &sync.Mutex{},
 		mdc: mdc,
 	}
 
@@ -146,4 +184,34 @@ func TestBundles(t *testing.T) {
 	for i := range roles {
 		require.Equal(t, settingsmsg.Bundle_TYPE_ROLE, roles[i].Type)
 	}
+}
+
+func TestAppendSetting(t *testing.T) {
+	mdc := NewMDC()
+	s := Store{
+		Logger: olog.NewLogger(
+			olog.Color(true),
+			olog.Pretty(true),
+			olog.Level("info"),
+		),
+
+		l:   &sync.Mutex{},
+		mdc: mdc,
+	}
+
+	// appending to non existing bundle creates new
+	_, err := s.AddSettingToBundle(appendTestBundleID, appendTestSetting1)
+	require.NoError(t, err)
+
+	b, err := s.ReadBundle(appendTestBundleID)
+	require.NoError(t, err)
+	require.Len(t, b.Settings, 1)
+
+	_, err = s.AddSettingToBundle(appendTestBundleID, appendTestSetting2)
+	require.NoError(t, err)
+
+	b, err = s.ReadBundle(appendTestBundleID)
+	require.NoError(t, err)
+	require.Len(t, b.Settings, 2)
+
 }

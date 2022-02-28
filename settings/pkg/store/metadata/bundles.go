@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 )
 
@@ -86,7 +87,22 @@ func (s Store) WriteBundle(record *settingsmsg.Bundle) (*settingsmsg.Bundle, err
 
 // AddSettingToBundle adds the given setting to the bundle with the given bundleID.
 func (s Store) AddSettingToBundle(bundleID string, setting *settingsmsg.Setting) (*settingsmsg.Setting, error) {
-	return nil, errors.New("not implemented")
+	s.Init()
+	b, err := s.ReadBundle(bundleID)
+	if err != nil {
+		// TODO: How to differentiate 'not found'?
+		b = new(settingsmsg.Bundle)
+		b.Id = bundleID
+		b.Type = settingsmsg.Bundle_TYPE_DEFAULT
+	}
+
+	if setting.Id == "" {
+		setting.Id = uuid.Must(uuid.NewV4()).String()
+	}
+
+	b.Settings = append(b.Settings, setting)
+	_, err = s.WriteBundle(b)
+	return setting, err
 }
 
 // RemoveSettingFromBundle removes the setting from the bundle with the given ids.
