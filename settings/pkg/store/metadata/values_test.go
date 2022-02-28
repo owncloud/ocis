@@ -3,7 +3,6 @@ package store
 import (
 	"testing"
 
-	olog "github.com/owncloud/ocis/ocis-pkg/log"
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 	"github.com/stretchr/testify/require"
 )
@@ -46,15 +45,15 @@ var valueScenarios = []struct {
 }
 
 func TestValues(t *testing.T) {
-	mdc := NewMDC()
-	s := Store{
-		Logger: olog.NewLogger(
-			olog.Color(true),
-			olog.Pretty(true),
-			olog.Level("info"),
-		),
-		mdc: mdc,
-	}
+	//mdc := NewMDC()
+	//s := Store{
+	//Logger: olog.NewLogger(
+	//olog.Color(true),
+	//olog.Pretty(true),
+	//olog.Level("info"),
+	//),
+	//mdc: mdc,
+	//}
 	for i := range valueScenarios {
 		index := i
 		t.Run(valueScenarios[index].name, func(t *testing.T) {

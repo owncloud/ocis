@@ -1,10 +1,9 @@
 package store
 
 import (
-	"sync"
 	"testing"
 
-	olog "github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 	"github.com/stretchr/testify/require"
 )
@@ -103,7 +102,7 @@ var bundleScenarios = []struct {
 }
 
 var (
-	appendTestBundleID = "append-test-bundle"
+	appendTestBundleID = uuid.Must(uuid.NewV4()).String()
 
 	appendTestSetting1 = &settingsmsg.Setting{
 		Id:          "append-test-setting-1",
@@ -139,17 +138,16 @@ var (
 )
 
 func TestBundles(t *testing.T) {
-	mdc := NewMDC()
-	s := Store{
-		Logger: olog.NewLogger(
-			olog.Color(true),
-			olog.Pretty(true),
-			olog.Level("info"),
-		),
+	//s := &Store{
+	//Logger: olog.NewLogger(
+	//olog.Color(true),
+	//olog.Pretty(true),
+	//olog.Level("info"),
+	//),
 
-		l:   &sync.Mutex{},
-		mdc: mdc,
-	}
+	//l: &sync.Mutex{},
+	//}
+	//NewMDC(s)
 
 	// write bundles
 	for i := range bundleScenarios {
@@ -187,17 +185,17 @@ func TestBundles(t *testing.T) {
 }
 
 func TestAppendSetting(t *testing.T) {
-	mdc := NewMDC()
-	s := Store{
-		Logger: olog.NewLogger(
-			olog.Color(true),
-			olog.Pretty(true),
-			olog.Level("info"),
-		),
+	//mdc := NewMDC()
+	//s := Store{
+	//Logger: olog.NewLogger(
+	//olog.Color(true),
+	//olog.Pretty(true),
+	//olog.Level("info"),
+	//),
 
-		l:   &sync.Mutex{},
-		mdc: mdc,
-	}
+	//l:   &sync.Mutex{},
+	//mdc: mdc,
+	//}
 
 	// appending to non existing bundle creates new
 	_, err := s.AddSettingToBundle(appendTestBundleID, appendTestSetting1)

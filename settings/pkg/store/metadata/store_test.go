@@ -42,13 +42,15 @@ type MockedMetadataClient struct {
 }
 
 // NewMDC instantiates a mocked MetadataClient
-func NewMDC() MetadataClient {
+func NewMDC(s *Store) MetadataClient {
+	var mdc MetadataClient
 	switch testtype {
 	case "unit":
-		return &MockedMetadataClient{data: make(map[string][]byte)}
+		mdc = &MockedMetadataClient{data: make(map[string][]byte)}
 	case "integration":
-		return NewMetadataClient(&config.Config{})
+		mdc = NewMetadataClient(&config.Config{})
 	}
+	s.initMetadataClient(mdc)
 	return nil
 }
 

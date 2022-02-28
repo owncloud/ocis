@@ -46,7 +46,7 @@ type Store struct {
 }
 
 // Init initialize the store once, later calls are noops
-func (s Store) Init() {
+func (s *Store) Init() {
 	if s.mdc != nil {
 		return
 	}
@@ -58,7 +58,7 @@ func (s Store) Init() {
 		//b := backoff.NewExponentialBackOff()
 		//b.MaxElapsedTime = 4 * time.Second
 		//backoff.Retry(func() error {
-		err = s.initMetadataClient()
+		err = s.initMetadataClient(NewMetadataClient(s.cfg))
 		//return err
 
 		//}, b)
@@ -72,12 +72,12 @@ func (s Store) Init() {
 // New creates a new store
 func New(cfg *config.Config, initstore func(settings.Manager)) settings.Manager {
 	s := Store{
-		Logger: olog.NewLogger(
-			olog.Color(cfg.Log.Color),
-			olog.Pretty(cfg.Log.Pretty),
-			olog.Level(cfg.Log.Level),
-			olog.File(cfg.Log.File),
-		),
+		//Logger: olog.NewLogger(
+		//olog.Color(cfg.Log.Color),
+		//olog.Pretty(cfg.Log.Pretty),
+		//olog.Level(cfg.Log.Level),
+		//olog.File(cfg.Log.File),
+		//),
 		initStore: initstore,
 		l:         &sync.Mutex{},
 		init:      &sync.Once{},
@@ -97,8 +97,8 @@ func NewMetadataClient(cfg *config.Config) MetadataClient {
 }
 
 // we need to lazy initialize the MetadataClient because metadata service might not be ready
-func (s Store) initMetadataClient() error {
-	s.mdc = NewMetadataClient(s.cfg)
+func (s *Store) initMetadataClient(mdc MetadataClient) error {
+	s.mdc = mdc
 
 	// TODO: this fails because of authentication issues
 	err := s.mdc.Init(nil, settingsSpaceID)
