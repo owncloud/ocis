@@ -40,8 +40,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}()
 
 			defer cancel()
-			start(ctx, logger, cfg)
-			return nil
+			return start(ctx, logger, cfg)
 		},
 	}
 }
@@ -67,8 +66,9 @@ func start(ctx context.Context, logger log.Logger, cfg *config.Config) error {
 	}
 	if _, err := os.Stat(servercfg.BoltDBFile); errors.Is(err, os.ErrNotExist) {
 		logger.Debug().Msg("Bootstrapping IDM database")
-		err = bootstrap(logger, cfg, servercfg)
-		logger.Error().Err(err).Msg("failed")
+		if err = bootstrap(logger, cfg, servercfg); err != nil {
+			logger.Error().Err(err).Msg("failed to bootstrap idm database")
+		}
 	}
 
 	svc, err := server.NewServer(&servercfg)
