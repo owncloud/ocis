@@ -13,7 +13,6 @@ const (
 	defaultStorageNamespace = "/users/{{.Id.OpaqueId}}"
 	defaultGatewayAddr      = "127.0.0.1:9142"
 	defaultUserLayout       = "{{.Id.OpaqueId}}"
-	defaultServiceUserUUID  = "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad"
 )
 
 func DefaultConfig() *Config {
