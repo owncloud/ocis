@@ -318,3 +318,63 @@ Public links would have the same format: `https://<host>/files?id=<resource_id>`
 {{< hint warning >}}
 Since there is no difference between public and private files a logged in user cannot see the public version of a link unless he logs out.
 {{< /hint >}}
+
+
+## CERN Proposal
+
+> I'm adding this here to start the discussion. This document needs to be properly updated first and the following suggestions might be merged in other sections (when they are not specific to cern).
+
+### Configurable Home
+
+We would like to register `eos` as a namespaced alias, so that we can do `https://<host>/files/eos/user/<letter>/<username>/<relative/path/to/resource>`.
+
+But, since we want to expose other mounts besides EOS, maybe it would be more convenient to have i.e `https://<host>/files/all/eos/user/d/dalvesde/<relative/path/to/resource>`.
+
+Listing `/files/all/` would give us `eos`, `cephfs`, ...
+
+
+
+> Instead of `/home` the URL always has to reflect the user: `/personal/einstein`
+
+What we want to avoid is to have `/personal/einstein/eos/user/e/einstein/etc`, because then it wouldn't be a global url.
+We should just need to change (configure) the home dir - as we do now - to a different namespace than `personal`.
+
+---
+
+(!) This document seems to be outdated, as there was a need to prepend `spaces` to the namespace aliases (correct? Or is this an incomplete step towards spaces?). Then our suggestions above will need to reflect that as well.
+
+Either way, the current implementation still does not correspond to what is described on this document:
+
+* Web has `/files/spaces/personal/home` instead of `/files/spaces/personal/<username>`
+
+### Application URLs
+
+This section is missing from this document but it is important and these are actually the more contentious urls. There should be a recommendation for app creators and for the internal apps to follow.
+
+In general, urls should be of the type:
+
+* `<app-name>/</namespaced/alias></relative/path/to/resource>` or
+* `<app-name>/public/<token></relative/path/to/resource>` for public links (allowing to distinguish if they need to be authenticated or not)
+
+Example: `https://<host>/draw-io/spaces/all/eos/user/d/dalvesde/CERNBox/cbox transition.drawio`
+
+This would preserve the exact same schema used in the files app (just the app name changes). In order to know where to return on close, just add a `goback` query parameter with the previous route.
+
+We would also recommend that the go back route is ommited from applications opened in a new tab, as closing the tab should be the recommended way of getting back to the previously opened files.
+
+#### Special case: external app
+
+Two options:
+
+* `/external/<app-name>/full/path/to/doc` (where app-name can be "default")
+* `/external/full/path/to/doc?app=<app-name>` (where ommiting the app name opens the default)
+
+### Examples
+
+| Current | Proposed |
+|---------|----------|
+| https://cernbox.cern.ch/files/spaces/personal/home/eos/user/d/dalvesde?items-per-page=100&sort-by=name&sort-dir=asc | https://cernbox.cern.ch/files/spaces/all/eos/user/d/dalvesde?items-per-page=100&sort-by=name&sort-dir=asc |
+| https://cernbox.cern.ch/draw-io/files-spaces-personal-home/files/dalvesde/eos/user/d/dalvesde/cbox%20transition.drawio?contextRouteParams.storage=home&contextRouteParams.item=/eos/user/d/dalvesde | https://cernbox.cern.ch/draw-io/spaces/all/eos/user/d/dalvesde/cbox%20transition.drawio?goback=/files/spaces/all/eos/user/d/dalvesde |
+| https://cernbox.cern.ch/external/files-spaces-personal-home/eoshome-d!1377773/Microsoft%20Office?contextRouteParams.storage=home&contextRouteParams.item=%2Feos%2Fuser%2Fd%2Fdalvesde | https://cernbox.cern.ch/external/spaces/all/eos/user/d/dalvesde/New%20file.docx?app=microsoft-office&goback=/files/spaces/all/eos/user/d/dalvesde |
+| https://cernbox.cern.ch/files/public/show/sstLvrDFEpxwwxL?items-per-page=100 | https://cernbox.cern.ch/files/public/sstLvrDFEpxwwxL?items-per-page=100 ?? (do we need `show`?) |
+| https://cernbox.cern.ch/external/files-public-files/eoshome-d!2639/Microsoft%20Office?contextRouteParams.item=sstLvrDFEpxwwxL&public-token=sstLvrDFEpxwwxL | https://cernbox.cern.ch/external/public/sstLvrDFEpxwwxL/New%20file.docx?app=microsoft-office&goback=/files/public/sstLvrDFEpxwwxL |
