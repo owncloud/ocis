@@ -1,0 +1,73 @@
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"reflect"
+    "strings"
+	"text/template"
+
+    {{- range $key, $value := .}}
+    pkg{{$key}} "{{$value}}"
+    {{- end}})
+
+type ConfigField struct {
+	Name         string
+	DefaultValue string
+	Type         string
+	Description  string
+}
+
+func main() {
+content, err := ioutil.ReadFile("../../../docs/templates/CONFIGURATION.tmpl")
+if err != nil {
+    log.Fatal(err)
+}
+replacer := strings.NewReplacer(
+		"github.com/owncloud/ocis/", "",
+		"/pkg/config", "",
+	)
+var fields []ConfigField
+var targetFile *os.File
+tpl := template.Must(template.New("").Parse(string(content)))
+{{ range $key, $value := .}}
+	fields = GetAnnotatedVariables(*pkg{{ $key }}.DefaultConfig())
+    if len(fields) > 0 {
+        targetFolder := "../../../docs/extensions/" + replacer.Replace("{{ $value }}")
+        os.MkdirAll(targetFolder, 0700)
+        targetFile, err = os.Create(targetFolder + "/configvars.md")
+        if err != nil {
+            log.Fatal(err)
+        }
+        tpl.Execute(targetFile, fields)
+        targetFile.Close()
+    }
+{{ end }}
+}
+
+func GetAnnotatedVariables(s interface{}) []ConfigField {
+	t := reflect.TypeOf(s)
+	v := reflect.ValueOf(s)
+
+	var fields []ConfigField
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		value := v.Field(i)
+
+		switch value.Kind() {
+		default:
+			desc := field.Tag.Get("desc")
+			env, ok := field.Tag.Lookup("env")
+			if !ok {
+				continue
+			}
+			v := fmt.Sprintf("%v", value.Interface())
+			fields = append(fields, ConfigField{Name: env, DefaultValue: v, Description: desc, Type: value.Type().Name()})
+		case reflect.Struct:
+			fields = append(fields, GetAnnotatedVariables(value.Interface())...)
+		}
+	}
+	return fields
+}
