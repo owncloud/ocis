@@ -30,7 +30,7 @@ const (
 	// value ids
 	value1 = "fd3b6221-dc13-4a22-824d-2480495f1cdb"
 	value2 = "2a0bd9b0-ca1d-491a-8c56-d2ddfd68ded8"
-	//value3 = "b42702d2-5e4d-4d73-b133-e1f9e285355e"
+	value3 = "b42702d2-5e4d-4d73-b133-e1f9e285355e"
 )
 
 // use "unit" or "integration" do define test type. You need a running ocis instance for integration tests

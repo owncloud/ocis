@@ -14,7 +14,42 @@ import (
 // If the accountUUID is empty, only values with empty accountUUID are returned.
 // If the accountUUID is not empty, values with an empty or with a matching accountUUID are returned.
 func (s *Store) ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, error) {
-	return nil, errors.New("not implemented")
+	s.Init()
+
+	vIDs, err := s.mdc.ReadDir(nil, valuesFolderLocation)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: refine logic not to spam metadata service
+	var values []*settingsmsg.Value
+	for _, vid := range vIDs {
+		b, err := s.mdc.SimpleDownload(nil, valuePath(vid))
+		if err != nil {
+			return nil, err
+		}
+
+		v := &settingsmsg.Value{}
+		err = json.Unmarshal(b, v)
+		if err != nil {
+			return nil, err
+		}
+
+		if bundleID != "" && v.BundleId != bundleID {
+			continue
+		}
+
+		if v.AccountUuid == "" {
+			values = append(values, v)
+			continue
+		}
+
+		if v.AccountUuid == accountUUID {
+			values = append(values, v)
+			continue
+		}
+	}
+	return values, nil
 }
 
 // ReadValue tries to find a value by the given valueId within the dataPath
@@ -30,6 +65,7 @@ func (s *Store) ReadValue(valueID string) (*settingsmsg.Value, error) {
 
 // ReadValueByUniqueIdentifiers tries to find a value given a set of unique identifiers
 func (s *Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*settingsmsg.Value, error) {
+	fmt.Println("ReadValueByUniqueIdentifiers not implemented")
 	return nil, errors.New("not implemented")
 }
 
