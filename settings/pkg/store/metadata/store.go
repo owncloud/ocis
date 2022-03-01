@@ -3,13 +3,17 @@ package store
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"sync"
 
 	"github.com/cs3org/reva/pkg/storage/utils/metadata"
+	"github.com/gofrs/uuid"
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
+	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 	"github.com/owncloud/ocis/settings/pkg/config"
 	"github.com/owncloud/ocis/settings/pkg/settings"
+	"github.com/owncloud/ocis/settings/pkg/store/defaults"
 )
 
 var (
@@ -116,10 +120,41 @@ func (s *Store) initMetadataClient(mdc MetadataClient) error {
 		}
 	}
 
-	s.mdc = mdc
-	if s.initStore != nil {
-		s.initStore(s)
+	for _, p := range defaults.GenerateBundlesDefaultRoles() {
+		b, err := json.Marshal(p)
+		if err != nil {
+			return err
+		}
+		err = mdc.SimpleUpload(nil, bundlePath(p.Id), b)
+		if err != nil {
+			return err
+		}
 	}
+
+	for _, p := range defaults.DefaultRoleAssignments() {
+		accountUUID := p.AccountUuid
+		roleID := p.RoleId
+		err = mdc.MakeDirIfNotExist(nil, accountPath(accountUUID))
+		if err != nil {
+			return err
+		}
+
+		ass := &settingsmsg.UserRoleAssignment{
+			Id:          uuid.Must(uuid.NewV4()).String(),
+			AccountUuid: accountUUID,
+			RoleId:      roleID,
+		}
+		b, err := json.Marshal(ass)
+		if err != nil {
+			return err
+		}
+		err = mdc.SimpleUpload(nil, assignmentPath(accountUUID, ass.Id), b)
+		if err != nil {
+			return err
+		}
+	}
+
+	s.mdc = mdc
 	return nil
 }
 

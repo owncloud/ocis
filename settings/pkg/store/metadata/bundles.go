@@ -14,10 +14,19 @@ import (
 // ListBundles returns all bundles in the dataPath folder that match the given type.
 func (s *Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []string) ([]*settingsmsg.Bundle, error) {
 	// TODO: this is needed for initialization - we need to find a better way to fix this
-	if s.mdc == nil {
+	if s.mdc == nil && len(bundleIDs) == 1 {
 		return defaultBundle(bundleType, bundleIDs[0]), nil
 	}
-	//s.Init()
+	s.Init()
+
+	if len(bundleIDs) == 0 {
+		bIDs, err := s.mdc.ReadDir(nil, bundleFolderLocation)
+		if err != nil {
+			return nil, err
+		}
+
+		bundleIDs = bIDs
+	}
 	var bundles []*settingsmsg.Bundle
 	for _, id := range bundleIDs {
 		b, err := s.mdc.SimpleDownload(nil, bundlePath(id))
@@ -53,6 +62,7 @@ func (s *Store) ReadBundle(bundleID string) (*settingsmsg.Bundle, error) {
 
 // ReadSetting tries to find a setting by the given id within the dataPath.
 func (s *Store) ReadSetting(settingID string) (*settingsmsg.Setting, error) {
+	fmt.Println("ReadSetting not implemented")
 	return nil, errors.New("not implemented")
 }
 
@@ -88,6 +98,7 @@ func (s *Store) AddSettingToBundle(bundleID string, setting *settingsmsg.Setting
 
 // RemoveSettingFromBundle removes the setting from the bundle with the given ids.
 func (s *Store) RemoveSettingFromBundle(bundleID string, settingID string) error {
+	fmt.Println("RemoveSettingFromBundle not implemented")
 	return errors.New("not implemented")
 }
 
