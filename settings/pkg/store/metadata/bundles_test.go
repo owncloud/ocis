@@ -138,18 +138,6 @@ var (
 )
 
 func TestBundles(t *testing.T) {
-	//s := &Store{
-	//Logger: olog.NewLogger(
-	//olog.Color(true),
-	//olog.Pretty(true),
-	//olog.Level("info"),
-	//),
-
-	//l: &sync.Mutex{},
-	//}
-	//NewMDC(s)
-
-	// write bundles
 	for i := range bundleScenarios {
 		b := bundleScenarios[i]
 		t.Run(b.name, func(t *testing.T) {
@@ -182,6 +170,11 @@ func TestBundles(t *testing.T) {
 	for i := range roles {
 		require.Equal(t, settingsmsg.Bundle_TYPE_ROLE, roles[i].Type)
 	}
+
+	// check that ReadSetting works
+	setting, err := s.ReadSetting(setting1)
+	require.NoError(t, err)
+	require.Equal(t, "test-desc-1", setting.Description) // could be tested better ;)
 }
 
 func TestAppendSetting(t *testing.T) {

@@ -60,10 +60,30 @@ func (s *Store) ReadBundle(bundleID string) (*settingsmsg.Bundle, error) {
 	return bundle, json.Unmarshal(b, bundle)
 }
 
-// ReadSetting tries to find a setting by the given id within the dataPath.
+// ReadSetting tries to find a setting by the given id from the metadata service
 func (s *Store) ReadSetting(settingID string) (*settingsmsg.Setting, error) {
-	fmt.Println("ReadSetting not implemented")
-	return nil, errors.New("not implemented")
+	s.Init()
+
+	ids, err := s.mdc.ReadDir(nil, bundleFolderLocation)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: avoid spamming metadata service
+	for _, id := range ids {
+		b, err := s.ReadBundle(id)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, setting := range b.Settings {
+			if setting.Id == settingID {
+				return setting, nil
+			}
+		}
+
+	}
+	return nil, fmt.Errorf("setting '%s' not found", settingID)
 }
 
 // WriteBundle sends the givens record to the metadataclient. returns `record` for legacy reasons
