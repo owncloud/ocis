@@ -25,8 +25,8 @@ type Config struct {
 	Repo               Repo
 	Index              Index
 	ServiceUser        ServiceUser
-	HashDifficulty     int  `env:"ACCOUNTS_HASH_DIFFICULTY"`
-	DemoUsersAndGroups bool `env:"ACCOUNTS_DEMO_USERS_AND_GROUPS"`
+	HashDifficulty     int  `env:"ACCOUNTS_HASH_DIFFICULTY" desc:"The hash difficulty makes sure that validating a password takes at least a certain amount of time."`
+	DemoUsersAndGroups bool `env:"ACCOUNTS_DEMO_USERS_AND_GROUPS" desc:"If this flag is set the service will setup the demo users and groups."`
 
 	Context context.Context `yaml:"-"`
 }
