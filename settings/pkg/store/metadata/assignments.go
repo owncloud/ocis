@@ -7,10 +7,14 @@ import (
 
 	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
+	"github.com/owncloud/ocis/settings/pkg/store/defaults"
 )
 
 // ListRoleAssignments loads and returns all role assignments matching the given assignment identifier.
 func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRoleAssignment, error) {
+	if s.mdc == nil {
+		return defaultRoleAssignments(accountUUID), nil
+	}
 	s.Init()
 	assIDs, err := s.mdc.ReadDir(nil, accountPath(accountUUID))
 	if err != nil {
@@ -84,6 +88,16 @@ func (s *Store) RemoveRoleAssignment(assignmentID string) error {
 		}
 	}
 	return fmt.Errorf("assignmentID '%s' not found", assignmentID)
+}
+
+func defaultRoleAssignments(accID string) []*settingsmsg.UserRoleAssignment {
+	var assmnts []*settingsmsg.UserRoleAssignment
+	for _, r := range defaults.DefaultRoleAssignments() {
+		if r.AccountUuid == accID {
+			assmnts = append(assmnts, r)
+		}
+	}
+	return assmnts
 }
 
 func accountPath(accountUUID string) string {

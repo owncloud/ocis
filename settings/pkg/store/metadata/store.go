@@ -47,25 +47,22 @@ type Store struct {
 
 // Init initialize the store once, later calls are noops
 func (s *Store) Init() {
-	if s.mdc != nil {
-		return
-	}
-
 	s.l.Lock()
 	defer s.l.Unlock()
+
 	var err error
-	s.init.Do(func() {
-		//b := backoff.NewExponentialBackOff()
-		//b.MaxElapsedTime = 4 * time.Second
-		//backoff.Retry(func() error {
-		err = s.initMetadataClient(NewMetadataClient(s.cfg))
-		//return err
+	//s.init.Do(func() {
+	//b := backoff.NewExponentialBackOff()
+	//b.MaxElapsedTime = 4 * time.Second
+	//backoff.Retry(func() error {
+	err = s.initMetadataClient(NewMetadataClient(s.cfg))
+	//return err
 
-		//}, b)
+	//}, b)
 
-	})
+	//})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("error initializing metadata client: ", err)
 	}
 }
 
@@ -98,10 +95,7 @@ func NewMetadataClient(cfg *config.Config) MetadataClient {
 
 // we need to lazy initialize the MetadataClient because metadata service might not be ready
 func (s *Store) initMetadataClient(mdc MetadataClient) error {
-	s.mdc = mdc
-
-	// TODO: this fails because of authentication issues
-	err := s.mdc.Init(nil, settingsSpaceID)
+	err := mdc.Init(nil, settingsSpaceID)
 	if err != nil {
 		return err
 	}
@@ -112,12 +106,13 @@ func (s *Store) initMetadataClient(mdc MetadataClient) error {
 		bundleFolderLocation,
 		valuesFolderLocation,
 	} {
-		err = s.mdc.MakeDirIfNotExist(nil, p)
+		err = mdc.MakeDirIfNotExist(nil, p)
 		if err != nil {
 			return err
 		}
 	}
 
+	s.mdc = mdc
 	if s.initStore != nil {
 		s.initStore(s)
 	}
