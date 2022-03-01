@@ -37,19 +37,27 @@ var (
 			},
 			Settings: []*settingsmsg.Setting{
 				{
+					Id:   "updateID",
 					Name: "update",
 					Value: &settingsmsg.Setting_PermissionValue{
 						PermissionValue: &settingsmsg.Permission{
 							Operation: settingsmsg.Permission_OPERATION_UPDATE,
 						},
 					},
+					Resource: &settingsmsg.Resource{
+						Type: settingsmsg.Resource_TYPE_SETTING,
+					},
 				},
 				{
+					Id:   "readID",
 					Name: "read",
 					Value: &settingsmsg.Setting_PermissionValue{
 						PermissionValue: &settingsmsg.Permission{
 							Operation: settingsmsg.Permission_OPERATION_READ,
 						},
+					},
+					Resource: &settingsmsg.Resource{
+						Type: settingsmsg.Resource_TYPE_BUNDLE,
 					},
 				},
 			},
@@ -65,6 +73,7 @@ var (
 			},
 			Settings: []*settingsmsg.Setting{
 				{
+					Id:   "readID",
 					Name: "read",
 					Value: &settingsmsg.Setting_PermissionValue{
 						PermissionValue: &settingsmsg.Permission{

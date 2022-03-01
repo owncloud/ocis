@@ -50,6 +50,10 @@ func (s *Store) Init() {
 	s.l.Lock()
 	defer s.l.Unlock()
 
+	if s.mdc != nil {
+		return
+	}
+
 	var err error
 	//s.init.Do(func() {
 	//b := backoff.NewExponentialBackOff()
