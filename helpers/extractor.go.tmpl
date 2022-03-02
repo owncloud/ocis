@@ -1,0 +1,85 @@
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
+	"reflect"
+	"strings"
+	"text/template"
+
+    {{- range $key, $value := .}}
+    pkg{{$key}} "{{$value}}"
+    {{- end}})
+
+type ConfigField struct {
+	Name         string
+	DefaultValue string
+	Type         string
+	Description  string
+}
+
+func main() {
+fmt.Println("Generating documentation for environment variables:")
+content, err := ioutil.ReadFile("../../../docs/templates/CONFIGURATION.tmpl")
+if err != nil {
+    log.Fatal(err)
+}
+replacer := strings.NewReplacer(
+		"github.com/owncloud/ocis/", "",
+		"/pkg/config", "",
+	)
+var fields []ConfigField
+var targetFile *os.File
+tpl := template.Must(template.New("").Parse(string(content)))
+
+m := map[string]interface{}{
+{{- range $key, $value := .}}
+	"{{$value}}": *pkg{{$key}}.DefaultConfig(),
+{{- end }}
+}
+
+    targetFolder := "../../../docs/extensions/_includes/"
+    for pkg, conf := range m {
+	fields = GetAnnotatedVariables(conf)
+	if len(fields) > 0 {
+	fmt.Printf("... %s\n", pkg)
+		targetFile, err = os.Create(filepath.Join(targetFolder, replacer.Replace(pkg) + "_configvars.md"))
+		if err != nil {
+			log.Fatalf("Failed to create target file: %s", err)
+		}
+		defer targetFile.Close()
+		if err := tpl.Execute(targetFile, fields); err != nil {
+			log.Fatalf("Failed to execute template: %s", err)
+		}
+	}
+    }
+	fmt.Println("done")
+}
+
+func GetAnnotatedVariables(s interface{}) []ConfigField {
+	t := reflect.TypeOf(s)
+	v := reflect.ValueOf(s)
+
+	var fields []ConfigField
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		value := v.Field(i)
+
+		switch value.Kind() {
+		default:
+			desc := field.Tag.Get("desc")
+			env, ok := field.Tag.Lookup("env")
+			if !ok {
+				continue
+			}
+			v := fmt.Sprintf("%v", value.Interface())
+			fields = append(fields, ConfigField{Name: env, DefaultValue: v, Description: desc, Type: value.Type().Name()})
+		case reflect.Struct:
+			fields = append(fields, GetAnnotatedVariables(value.Interface())...)
+		}
+	}
+	return fields
+}
