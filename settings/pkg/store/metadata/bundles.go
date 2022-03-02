@@ -50,6 +50,9 @@ func (s *Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []stri
 
 // ReadBundle tries to find a bundle by the given id within the dataPath.
 func (s *Store) ReadBundle(bundleID string) (*settingsmsg.Bundle, error) {
+	if s.mdc == nil {
+		return defaultBundle(settingsmsg.Bundle_TYPE_ROLE, bundleID)[0], nil
+	}
 	s.Init()
 	b, err := s.mdc.SimpleDownload(nil, bundlePath(bundleID))
 	if err != nil {
