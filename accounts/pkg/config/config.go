@@ -44,8 +44,8 @@ type TokenManager struct {
 // Repo defines which storage implementation is to be used.
 type Repo struct {
 	Backend string `ocisConfig:"backend" env:"ACCOUNTS_STORAGE_BACKEND" desc:"Defines which storage implementation is to be used"`
-	Disk    Disk
-	CS3     CS3
+	Disk    Disk   `ocisConfig:"disk"`
+	CS3     CS3    `ocisConfig:"cs3"`
 }
 
 // Disk is the local disk implementation of the storage.
