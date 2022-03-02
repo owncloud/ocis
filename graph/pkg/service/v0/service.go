@@ -116,17 +116,19 @@ func NewService(opts ...Option) Service {
 		svc.httpClient = options.HTTPClient
 	}
 
-	roleService := options.RoleService
-	if roleService == nil {
-		roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
+	if options.RoleService == nil {
+		svc.roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
+	} else {
+		svc.roleService = options.RoleService
 	}
+
 	roleManager := options.RoleManager
 	if roleManager == nil {
 		m := roles.NewManager(
 			roles.CacheSize(1024),
 			roles.CacheTTL(time.Hour),
 			roles.Logger(options.Logger),
-			roles.RoleService(roleService),
+			roles.RoleService(svc.roleService),
 		)
 		roleManager = &m
 	}
