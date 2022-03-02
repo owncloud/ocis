@@ -50,11 +50,10 @@ func MetadataDrivers(cfg *config.Config) map[string]interface{} {
 		},
 		"ocis": map[string]interface{}{
 			"root":                cfg.Reva.MetadataStorage.OCIS.Root,
-			"enable_home":         false,
 			"user_layout":         cfg.Reva.MetadataStorage.OCIS.UserLayout,
 			"treetime_accounting": false,
 			"treesize_accounting": false,
-			"owner":               cfg.Reva.MetadataStorage.OCIS.ServiceUserUUID, // the accounts service system account uuid
+			"permissionssvc":      cfg.Reva.Permissions.Endpoint,
 		},
 		"s3": map[string]interface{}{
 			"region":     cfg.Reva.MetadataStorage.S3.Region,
@@ -69,7 +68,7 @@ func MetadataDrivers(cfg *config.Config) map[string]interface{} {
 			"user_layout":         cfg.Reva.MetadataStorage.S3NG.UserLayout,
 			"treetime_accounting": false,
 			"treesize_accounting": false,
-			"owner":               cfg.Reva.MetadataStorage.S3NG.ServiceUserUUID, // the accounts service system account uuid
+			"permissionssvc":      cfg.Reva.Permissions.Endpoint,
 			"s3.region":           cfg.Reva.MetadataStorage.S3NG.Region,
 			"s3.access_key":       cfg.Reva.MetadataStorage.S3NG.AccessKey,
 			"s3.secret_key":       cfg.Reva.MetadataStorage.S3NG.SecretKey,

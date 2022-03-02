@@ -5,6 +5,7 @@ import (
 	glauth "github.com/owncloud/ocis/glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/graph/pkg/config"
+	idm "github.com/owncloud/ocis/idm/pkg/config"
 	idp "github.com/owncloud/ocis/idp/pkg/config"
 	nats "github.com/owncloud/ocis/nats/pkg/config"
 	notifications "github.com/owncloud/ocis/notifications/pkg/config"
@@ -31,6 +32,7 @@ func DefaultConfig() *Config {
 		GLAuth:        glauth.DefaultConfig(),
 		Graph:         graph.DefaultConfig(),
 		IDP:           idp.DefaultConfig(),
+		IDM:           idm.DefaultConfig(),
 		Nats:          nats.DefaultConfig(),
 		Notifications: notifications.DefaultConfig(),
 		Proxy:         proxy.DefaultConfig(),
