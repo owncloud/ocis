@@ -11,8 +11,8 @@ type HTTP struct {
 
 // CORS defines the available cors configuration.
 type CORS struct {
-	AllowedOrigins   []string
-	AllowedMethods   []string
-	AllowedHeaders   []string
-	AllowCredentials bool
+	AllowedOrigins   []string `ocisConfig:"allowed_origins"`
+	AllowedMethods   []string `ocisConfig:"allowed_methods"`
+	AllowedHeaders   []string `ocisConfig:"allowed_headers"`
+	AllowCredentials bool     `ocisConfig:"allowed_credentials"`
 }
