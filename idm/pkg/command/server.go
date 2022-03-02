@@ -13,6 +13,7 @@ import (
 	"github.com/libregraph/idm/pkg/ldappassword"
 	"github.com/libregraph/idm/pkg/ldbbolt"
 	"github.com/libregraph/idm/server"
+	"github.com/owncloud/ocis/idm"
 	"github.com/owncloud/ocis/idm/pkg/config"
 	"github.com/owncloud/ocis/idm/pkg/config/parser"
 	"github.com/owncloud/ocis/idm/pkg/logging"
@@ -53,7 +54,7 @@ func start(ctx context.Context, logger log.Logger, cfg *config.Config) error {
 		TLSCertFile:     cfg.IDM.Cert,
 		TLSKeyFile:      cfg.IDM.Key,
 		LDAPBaseDN:      "o=libregraph-idm",
-		LDAPAdminDN:     "uid=libregrah,o=libregraph-idm",
+		LDAPAdminDN:     "uid=libregraph,ou=sysusers,o=libregraph-idm",
 
 		BoltDBFile: cfg.IDM.DatabasePath,
 	}
@@ -80,15 +81,26 @@ func start(ctx context.Context, logger log.Logger, cfg *config.Config) error {
 
 func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) error {
 	// Hash password if the config does not supply a hash already
-	var pwhash string
 	var err error
-	if strings.HasPrefix(cfg.IDM.AdminPassword, "$argon2id$") {
-		// password is alread hashed
-		pwhash = "{ARGON2}" + cfg.IDM.AdminPassword
-	} else {
-		if pwhash, err = ldappassword.Hash(cfg.IDM.AdminPassword, "{ARGON2}"); err != nil {
-			return err
-		}
+
+	type svcUser struct {
+		Name     string
+		Password string
+	}
+
+	serviceUsers := []svcUser{
+		{
+			Name:     "libregraph",
+			Password: cfg.ServiceUserPasswords.IdmAdmin,
+		},
+		{
+			Name:     "idp",
+			Password: cfg.ServiceUserPasswords.Idp,
+		},
+		{
+			Name:     "reva",
+			Password: cfg.ServiceUserPasswords.Reva,
+		},
 	}
 
 	bdb := &ldbbolt.LdbBolt{}
@@ -103,22 +115,38 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 	}
 
 	// Prepare the initial Data from template. To be able to set the
-	// supplied admin password
-	tmpl, err := template.New("baseldif").Parse(baseldif)
+	// supplied service user passwords
+	tmpl, err := template.New("baseldif").Parse(idm.BaseLDIF)
 	if err != nil {
 		return err
 	}
 
+	for i := range serviceUsers {
+		if strings.HasPrefix(serviceUsers[i].Password, "$argon2id$") {
+			// password is alread hashed
+			serviceUsers[i].Password = "{ARGON2}" + serviceUsers[i].Password
+		} else {
+			if serviceUsers[i].Password, err = ldappassword.Hash(serviceUsers[i].Password, "{ARGON2}"); err != nil {
+				return err
+			}
+		}
+		// We need to treat the hash as binary in the LDIF template to avoid
+		// go-ldap/ldif to to any fancy escaping
+		serviceUsers[i].Password = base64.StdEncoding.EncodeToString([]byte(serviceUsers[i].Password))
+	}
 	var tmplWriter strings.Builder
-	// We need to treat the hash as binary in the LDIF template to avoid
-	// go-ldap/ldif to to any fancy escaping
-	b64 := base64.StdEncoding.EncodeToString([]byte(pwhash))
-	err = tmpl.Execute(&tmplWriter, b64)
+	err = tmpl.Execute(&tmplWriter, serviceUsers)
 	if err != nil {
 		return err
 	}
 
-	s := strings.NewReader(tmplWriter.String())
+	bootstrapData := tmplWriter.String()
+
+	if cfg.CreateDemoUsers {
+		bootstrapData = bootstrapData + "\n" + idm.DemoUsersLDIF
+	}
+
+	s := strings.NewReader(bootstrapData)
 	lf := &ldif.LDIF{}
 	err = ldif.Unmarshal(s, lf)
 	if err != nil {
@@ -131,23 +159,6 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 			return fmt.Errorf("error adding Entry '%s': %w", entry.DN, err)
 		}
 	}
+
 	return nil
 }
-
-var baseldif string = `dn: o=libregraph-idm
-o: libregraph-idm
-objectClass: organization
-
-dn: ou=users,o=libregraph-idm
-objectClass: organizationalUnit
-ou: users
-
-dn: ou=groups,o=libregraph-idm
-objectClass: organizationalUnit
-ou: groups
-
-dn: uid=libregraph,o=libregraph-idm
-objectClass: account
-objectClass: simpleSecurityObject
-uid: libregraph
-userPassword:: {{.}}`
