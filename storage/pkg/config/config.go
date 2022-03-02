@@ -307,8 +307,6 @@ type DriverEOS struct {
 // DriverOCIS defines the available oCIS storage driver configuration.
 type DriverOCIS struct {
 	DriverCommon
-
-	ServiceUserUUID string `ocisConfig:"service_user_uuid"`
 }
 
 // DriverOwnCloudSQL defines the available ownCloudSQL storage driver configuration.
@@ -338,12 +336,11 @@ type DriverS3 struct {
 type DriverS3NG struct {
 	DriverCommon
 
-	ServiceUserUUID string `ocisConfig:"service_user_uuid"`
-	Region          string `ocisConfig:"region"`
-	AccessKey       string `ocisConfig:"access_key"`
-	SecretKey       string `ocisConfig:"secret_key"`
-	Endpoint        string `ocisConfig:"endpoint"`
-	Bucket          string `ocisConfig:"bucket"`
+	Region    string `ocisConfig:"region"`
+	AccessKey string `ocisConfig:"access_key"`
+	SecretKey string `ocisConfig:"secret_key"`
+	Endpoint  string `ocisConfig:"endpoint"`
+	Bucket    string `ocisConfig:"bucket"`
 }
 
 // OIDC defines the available OpenID Connect configuration.
@@ -1531,10 +1528,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_OCIS_SHARE_FOLDER"},
 			Destination: &cfg.Reva.UserStorage.OCIS.ShareFolder,
 		},
-		{
-			EnvVars:     []string{"STORAGE_USERS_DRIVER_OCIS_SERVICE_USER_UUID"},
-			Destination: &cfg.Reva.UserStorage.OCIS.ServiceUserUUID,
-		},
 		// driver owncloud sql
 		{
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DATADIR"},
@@ -1603,10 +1596,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_LAYOUT"},
 			Destination: &cfg.Reva.UserStorage.S3NG.UserLayout,
-		},
-		{
-			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_SERVICE_USER_UUID"},
-			Destination: &cfg.Reva.UserStorage.S3NG.ServiceUserUUID,
 		},
 		{
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_SHARE_FOLDER"},
@@ -1718,10 +1707,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			EnvVars:     []string{"STORAGE_METADATA_DRIVER_OCIS_LAYOUT"},
 			Destination: &cfg.Reva.MetadataStorage.OCIS.UserLayout,
 		},
-		{
-			EnvVars:     []string{"STORAGE_METADATA_DRIVER_OCIS_SERVICE_USER_UUID"},
-			Destination: &cfg.Reva.MetadataStorage.OCIS.ServiceUserUUID,
-		},
 
 		// metadata driver s3
 		{
@@ -1753,10 +1738,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3NG_LAYOUT"},
 			Destination: &cfg.Reva.MetadataStorage.S3NG.UserLayout,
-		},
-		{
-			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3NG_SERVICE_USER_UUID"},
-			Destination: &cfg.Reva.MetadataStorage.S3NG.ServiceUserUUID,
 		},
 		{
 			EnvVars:     []string{"STORAGE_METADATA_DRIVER_S3NG_REGION"},

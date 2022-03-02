@@ -13,7 +13,6 @@ const (
 	defaultStorageNamespace = "/users/{{.Id.OpaqueId}}"
 	defaultGatewayAddr      = "127.0.0.1:9142"
 	defaultUserLayout       = "{{.Id.OpaqueId}}"
-	defaultServiceUserUUID  = "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad"
 )
 
 func DefaultConfig() *Config {
@@ -141,12 +140,11 @@ func DefaultConfig() *Config {
 						UserLayout:  defaultUserLayout,
 						EnableHome:  false,
 					},
-					ServiceUserUUID: defaultServiceUserUUID,
-					Region:          "default",
-					AccessKey:       "",
-					SecretKey:       "",
-					Endpoint:        "",
-					Bucket:          "",
+					Region:    "default",
+					AccessKey: "",
+					SecretKey: "",
+					Endpoint:  "",
+					Bucket:    "",
 				},
 				OCIS: DriverOCIS{
 					DriverCommon: DriverCommon{
@@ -154,7 +152,6 @@ func DefaultConfig() *Config {
 						ShareFolder: defaultShareFolder,
 						UserLayout:  defaultUserLayout,
 					},
-					ServiceUserUUID: defaultServiceUserUUID,
 				},
 			},
 			MetadataStorage: StorageConfig{
@@ -197,12 +194,11 @@ func DefaultConfig() *Config {
 						UserLayout:  defaultUserLayout,
 						EnableHome:  false,
 					},
-					ServiceUserUUID: defaultServiceUserUUID,
-					Region:          "default",
-					AccessKey:       "",
-					SecretKey:       "",
-					Endpoint:        "",
-					Bucket:          "",
+					Region:    "default",
+					AccessKey: "",
+					SecretKey: "",
+					Endpoint:  "",
+					Bucket:    "",
 				},
 				OCIS: DriverOCIS{
 					DriverCommon: DriverCommon{
@@ -211,7 +207,6 @@ func DefaultConfig() *Config {
 						UserLayout:  defaultUserLayout,
 						EnableHome:  false,
 					},
-					ServiceUserUUID: defaultServiceUserUUID,
 				},
 			},
 			Frontend: FrontendPort{
