@@ -8,6 +8,7 @@ help:
 
 .PHONY: docs-generate
 docs-generate: ## run docs-generate for all oCIS extensions
+	@pushd helpers && go run configenvextractor.go; popd
 	@$(MAKE) --no-print-directory -C ../ docs-generate
 
 .PHONY: docs-init
