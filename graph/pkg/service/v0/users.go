@@ -14,6 +14,8 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/graph/pkg/identity"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
+	settings "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
+	settingssvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
 
 // GetMe implements the Service interface.
@@ -86,6 +88,19 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// All users get the user role by default currently.
+	// to all new users for now, as create Account request does not have any role field
+	if g.roleService == nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not assign role to account: roleService not configured")
+		return
+	}
+	if _, err = g.roleService.AssignRoleToUser(r.Context(), &settings.AssignRoleToUserRequest{
+		AccountUuid: *u.Id,
+		RoleId:      settingssvc.BundleUUIDRoleUser,
+	}); err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Sprintf("could not assign role to account %s", err.Error()))
+		return
+	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, u)
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/owncloud/ocis/graph/pkg/config"
 	"github.com/owncloud/ocis/graph/pkg/identity"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 	"google.golang.org/grpc"
 )
 
@@ -66,6 +67,7 @@ type Graph struct {
 	identityBackend      identity.Backend
 	gatewayClient        GatewayClient
 	httpClient           HTTPClient
+	roleService          settingssvc.RoleService
 	spacePropertiesCache *ttlcache.Cache
 }
 
