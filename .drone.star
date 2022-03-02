@@ -1260,7 +1260,7 @@ def docs(ctx):
             {
                 "name": "docs-generate",
                 "image": OC_CI_GOLANG,
-                "commands": ["make -C %s docs-generate" % (module) for module in config["modules"]],
+                "commands": ["make -C docs docs-generate"],
             },
             {
                 "name": "prepare",
