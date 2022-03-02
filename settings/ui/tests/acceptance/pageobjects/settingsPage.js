@@ -1,9 +1,8 @@
 const { client } = require('nightwatch-api')
-const util = require('util')
 
 module.exports = {
   url: function () {
-    return this.api.launchUrl + '/#/settings'
+    return this.api.launchUrl + '/settings'
   },
 
   commands: {
@@ -78,6 +77,6 @@ module.exports = {
     languageInput: {
       selector: "//label[.='Language']/..//input",
       locateStrategy: 'xpath'
-    },
+    }
   }
 }
