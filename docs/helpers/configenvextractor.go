@@ -35,6 +35,7 @@ func main() {
 	}
 	tpl.Execute(runner, paths)
 	os.Chdir("output")
+	os.Setenv("OCIS_BASE_DATA_PATH", "~/.ocis")
 	out, err := exec.Command("go", "run", "runner.go").Output()
 	if err != nil {
 		log.Fatal(err)

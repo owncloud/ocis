@@ -5,8 +5,9 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"reflect"
-    "strings"
+	"strings"
 	"text/template"
 
     {{- range $key, $value := .}}
@@ -32,19 +33,27 @@ replacer := strings.NewReplacer(
 var fields []ConfigField
 var targetFile *os.File
 tpl := template.Must(template.New("").Parse(string(content)))
-{{ range $key, $value := .}}
-	fields = GetAnnotatedVariables(*pkg{{ $key }}.DefaultConfig())
-    if len(fields) > 0 {
-        targetFolder := "../../../docs/extensions/" + replacer.Replace("{{ $value }}")
-        os.MkdirAll(targetFolder, 0700)
-        targetFile, err = os.Create(targetFolder + "/configvars.md")
-        if err != nil {
-            log.Fatal(err)
-        }
-        tpl.Execute(targetFile, fields)
-        targetFile.Close()
+
+m := map[string]interface{}{
+{{- range $key, $value := .}}
+	"{{$value}}": *pkg{{$key}}.DefaultConfig(),
+{{- end }}
+}
+
+    targetFolder := "../../../docs/extensions/_includes/"
+    for pkg, conf := range m {
+	fields = GetAnnotatedVariables(conf)
+	if len(fields) > 0 {
+		targetFile, err = os.Create(filepath.Join(targetFolder, replacer.Replace(pkg) + "_configvars.md"))
+		if err != nil {
+			log.Fatalf("Failed to create target file: %s", err)
+		}
+		defer targetFile.Close()
+		if err := tpl.Execute(targetFile, fields); err != nil {
+			log.Fatalf("Failed to execute template: %s", err)
+		}
+	}
     }
-{{ end }}
 }
 
 func GetAnnotatedVariables(s interface{}) []ConfigField {
