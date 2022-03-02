@@ -51,12 +51,12 @@ type Store struct {
 
 // Init initialize the store once, later calls are noops
 func (s *Store) Init() {
-	s.l.Lock()
-	defer s.l.Unlock()
-
 	if s.mdc != nil {
 		return
 	}
+
+	s.l.Lock()
+	defer s.l.Unlock()
 
 	var err error
 	//s.init.Do(func() {

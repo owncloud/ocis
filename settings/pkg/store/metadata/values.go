@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 )
 
@@ -72,6 +73,9 @@ func (s *Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*se
 // WriteValue writes the given value into a file within the dataPath
 func (s *Store) WriteValue(value *settingsmsg.Value) (*settingsmsg.Value, error) {
 	s.Init()
+	if value.Id == "" {
+		value.Id = uuid.Must(uuid.NewV4()).String()
+	}
 	b, err := json.Marshal(value)
 	if err != nil {
 		return nil, err
