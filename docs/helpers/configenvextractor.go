@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
+	fmt.Println("Getting relevant packages")
 	paths, err := filepath.Glob("../../*/pkg/config/defaultconfig.go")
 	if err != nil {
 		log.Fatal(err)
@@ -27,6 +28,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("Generating intermediate go code")
 	tpl := template.Must(template.New("").Parse(string(content)))
 	os.Mkdir("output", 0700)
 	runner, err := os.Create("output/runner.go")
@@ -34,13 +36,15 @@ func main() {
 		log.Fatal(err)
 	}
 	tpl.Execute(runner, paths)
+	fmt.Println("Running intermediate go code")
 	os.Chdir("output")
 	os.Setenv("OCIS_BASE_DATA_PATH", "~/.ocis")
 	out, err := exec.Command("go", "run", "runner.go").Output()
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println(string(out))
+	fmt.Println("Cleaning up")
 	os.Chdir("../")
 	os.RemoveAll("output")
-	fmt.Println(string(out))
 }
