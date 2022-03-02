@@ -3,8 +3,10 @@ package svc
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
+	"regexp"
 
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/go-chi/chi/v5"
@@ -56,7 +58,18 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if isNilOrEmpty(u.DisplayName) || isNilOrEmpty(u.OnPremisesSamAccountName) || isNilOrEmpty(u.Mail) {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Missing Required Attribute")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if !isValidUsername(*u.OnPremisesSamAccountName) {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
+			fmt.Sprintf("username '%s' must be at least the local part of an email", *u.OnPremisesSamAccountName))
+		return
+	}
+	if !isValidEmail(*u.Mail) {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
+			fmt.Sprintf("'%s' is not a valid email address", *u.Mail))
 		return
 	}
 
@@ -151,6 +164,13 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	mail := changes.GetMail()
+	if !isValidEmail(mail) {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
+			fmt.Sprintf("'%s' is not a valid email address", mail))
+		return
+	}
+
 	u, err := g.identityBackend.UpdateUser(r.Context(), nameOrID, *changes)
 	if err != nil {
 		var errcode errorcode.Error
@@ -168,4 +188,26 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 
 func isNilOrEmpty(s *string) bool {
 	return s == nil || *s == ""
+}
+
+// We want to allow email addresses as usernames so they show up when using them in ACLs on storages that allow integration with our glauth LDAP service
+// so we are adding a few restrictions from https://stackoverflow.com/questions/6949667/what-are-the-real-rules-for-linux-usernames-on-centos-6-and-rhel-6
+// names should not start with numbers
+var usernameRegex = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]*(@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)*$")
+
+func isValidUsername(e string) bool {
+	if len(e) < 1 && len(e) > 254 {
+		return false
+	}
+	return usernameRegex.MatchString(e)
+}
+
+// regex from https://www.w3.org/TR/2016/REC-html51-20161101/sec-forms.html#valid-e-mail-address
+var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+
+func isValidEmail(e string) bool {
+	if len(e) < 3 && len(e) > 254 {
+		return false
+	}
+	return emailRegex.MatchString(e)
 }
