@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/cs3org/reva/pkg/token/manager/jwt"
+	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"

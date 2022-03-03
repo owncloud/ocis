@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/cs3org/reva/pkg/events/server"
+	"github.com/cs3org/reva/v2/pkg/events/server"
 	"github.com/owncloud/ocis/nats/pkg/config"
 	"github.com/owncloud/ocis/nats/pkg/config/parser"
 	"github.com/owncloud/ocis/nats/pkg/logging"

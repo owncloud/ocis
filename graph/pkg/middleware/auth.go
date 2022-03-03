@@ -3,9 +3,9 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/cs3org/reva/pkg/auth/scope"
-	revactx "github.com/cs3org/reva/pkg/ctx"
-	"github.com/cs3org/reva/pkg/token/manager/jwt"
+	"github.com/cs3org/reva/v2/pkg/auth/scope"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	"google.golang.org/grpc/metadata"

@@ -12,7 +12,7 @@ import (
 	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v0"
 
 	"github.com/coreos/go-oidc/v3/oidc"
-	"github.com/cs3org/reva/pkg/token/manager/jwt"
+	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
 	"github.com/oklog/run"

@@ -11,8 +11,8 @@ import (
 
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/pkg/auth/scope"
-	"github.com/cs3org/reva/pkg/token"
+	"github.com/cs3org/reva/v2/pkg/auth/scope"
+	"github.com/cs3org/reva/v2/pkg/token"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"

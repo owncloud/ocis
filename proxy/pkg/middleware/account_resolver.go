@@ -6,7 +6,7 @@ import (
 
 	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 
-	revactx "github.com/cs3org/reva/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 )

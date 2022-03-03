@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/url"
 
-	revactx "github.com/cs3org/reva/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	accounts "github.com/owncloud/ocis/accounts/pkg/service/v0"

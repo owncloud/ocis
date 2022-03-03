@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	revactx "github.com/cs3org/reva/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
 	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"

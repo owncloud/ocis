@@ -8,7 +8,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	groups "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/notifications/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/pkg/errors"
