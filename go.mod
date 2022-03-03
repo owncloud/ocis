@@ -276,4 +276,4 @@ require (
 // we need to use a fork to make the windows build pass
 replace github.com/pkg/xattr => github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7
 
-replace github.com/cs3org/reva => github.com/cs3org/reva v1.16.1-0.20220228144359-3e80be7f6667
+replace github.com/cs3org/reva => github.com/kobergj/reva v1.13.1-0.20220303101200-03258eac912d
