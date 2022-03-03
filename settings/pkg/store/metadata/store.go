@@ -63,7 +63,7 @@ func (s *Store) Init() {
 	err = s.initMetadataClient(NewMetadataClient(s.cfg.Metadata))
 	//})
 	if err != nil {
-		log.Fatal("error initializing metadata client: ", err)
+		s.Logger.Error().Err(err).Msg("error initializing metadata client")
 	}
 }
 
