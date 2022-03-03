@@ -2,7 +2,7 @@ const util = require('util')
 
 module.exports = {
   url: function () {
-    return this.api.launchUrl + '/#/accounts'
+    return this.api.launchUrl + '/accounts'
   },
 
   commands: {

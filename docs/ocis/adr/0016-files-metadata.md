@@ -1,5 +1,10 @@
 ---
 title: "16. Storage for Files Metadata"
+weight: 16
+date: 2022-03-02T00:00:00+01:00
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/ocis/adr
+geekdocFilePath: 0016-files-metadata.md
 ---
 
 * Status: proposed

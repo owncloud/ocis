@@ -3,8 +3,10 @@ package svc
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
+	"regexp"
 
 	revactx "github.com/cs3org/reva/pkg/ctx"
 	"github.com/go-chi/chi/v5"
@@ -12,6 +14,8 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/graph/pkg/identity"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
+	settings "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
+	settingssvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
 
 // GetMe implements the Service interface.
@@ -56,7 +60,18 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if isNilOrEmpty(u.DisplayName) || isNilOrEmpty(u.OnPremisesSamAccountName) || isNilOrEmpty(u.Mail) {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Missing Required Attribute")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if !isValidUsername(*u.OnPremisesSamAccountName) {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
+			fmt.Sprintf("username '%s' must be at least the local part of an email", *u.OnPremisesSamAccountName))
+		return
+	}
+	if !isValidEmail(*u.Mail) {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
+			fmt.Sprintf("'%s' is not a valid email address", *u.Mail))
 		return
 	}
 
@@ -73,6 +88,19 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// All users get the user role by default currently.
+	// to all new users for now, as create Account request does not have any role field
+	if g.roleService == nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not assign role to account: roleService not configured")
+		return
+	}
+	if _, err = g.roleService.AssignRoleToUser(r.Context(), &settings.AssignRoleToUserRequest{
+		AccountUuid: *u.Id,
+		RoleId:      settingssvc.BundleUUIDRoleUser,
+	}); err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Sprintf("could not assign role to account %s", err.Error()))
+		return
+	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, u)
 }
@@ -151,6 +179,13 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	mail := changes.GetMail()
+	if !isValidEmail(mail) {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
+			fmt.Sprintf("'%s' is not a valid email address", mail))
+		return
+	}
+
 	u, err := g.identityBackend.UpdateUser(r.Context(), nameOrID, *changes)
 	if err != nil {
 		var errcode errorcode.Error
@@ -168,4 +203,26 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 
 func isNilOrEmpty(s *string) bool {
 	return s == nil || *s == ""
+}
+
+// We want to allow email addresses as usernames so they show up when using them in ACLs on storages that allow integration with our glauth LDAP service
+// so we are adding a few restrictions from https://stackoverflow.com/questions/6949667/what-are-the-real-rules-for-linux-usernames-on-centos-6-and-rhel-6
+// names should not start with numbers
+var usernameRegex = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]*(@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)*$")
+
+func isValidUsername(e string) bool {
+	if len(e) < 1 && len(e) > 254 {
+		return false
+	}
+	return usernameRegex.MatchString(e)
+}
+
+// regex from https://www.w3.org/TR/2016/REC-html51-20161101/sec-forms.html#valid-e-mail-address
+var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+
+func isValidEmail(e string) bool {
+	if len(e) < 3 && len(e) > 254 {
+		return false
+	}
+	return emailRegex.MatchString(e)
 }
