@@ -324,7 +324,7 @@ Since there is no difference between public and private files a logged in user c
 
 We believe that URLs exposed in the browser address are a critical area to be properly maintained and evolved. Changes to bookmarked URLs can and will break user behaviour.
 We think that the current URLs exposed in the recent changes in Web can be improved and we propose some changes for discussion.
-We have also realized that this ADR is outdated and does not reflect that current URLs used in the Web: spaces are not taking into account.
+We have also realized that this ADR is outdated and does not reflect the current URLs used in the Web: spaces are not taking into account.
 
 The way this section is written is to start a discussion to formulate better URLs and make a more formalised proposal to this document.
 
