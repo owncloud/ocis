@@ -320,36 +320,41 @@ Since there is no difference between public and private files a logged in user c
 {{< /hint >}}
 
 
-## CERN Proposal
+## CERN Proposal for cleaner and user friendly URLs
 
-> I'm adding this here to start the discussion. This document needs to be properly updated first and the following suggestions might be merged in other sections (when they are not specific to cern).
+We believe that URLs exposed in the browser address are a critical area to be properly maintained and evolved. Changes to bookmarked URLs can and will break user behaviour.
+We think that the current URLs exposed in the recent changes in Web can be improved and we propose some changes for discussion.
+We have also realized that this ADR is outdated and does not reflect that current URLs used in the Web: spaces are not taking into account.
 
-### Configurable Home
+The way this section is written is to start a discussion to formulate better URLs and make a more formalised proposal to this document.
 
-We would like to register `eos` as a namespaced alias, so that we can do `https://<host>/files/eos/user/<letter>/<username>/<relative/path/to/resource>`.
+We propose you to take a look at the following examples and the inner motivations for improvement:
 
-But, since we want to expose other mounts besides EOS, maybe it would be more convenient to have i.e `https://<host>/files/all/eos/user/d/dalvesde/<relative/path/to/resource>`.
+### Examples
 
-Listing `/files/all/` would give us `eos`, `cephfs`, ...
+| Current | Proposed |
+|---------|----------|
+| https://cernbox.cern.ch/files/spaces/personal/home/eos/user/d/dalvesde?items-per-page=100&sort-by=name&sort-dir=asc | https://cernbox.cern.ch/files/spaces/eos/user/d/dalvesde?items-per-page=100&sort-by=name&sort-dir=asc |
+| https://cernbox.cern.ch/draw-io/files-spaces-personal-home/files/dalvesde/eos/user/d/dalvesde/cbox%20transition.drawio?contextRouteParams.storage=home&contextRouteParams.item=/eos/user/d/dalvesde | https://cernbox.cern.ch/draw-io/spaces/eos/user/d/dalvesde/cbox%20transition.drawio?previous=/files/spaces/eos/user/d/dalvesde |
+| https://cernbox.cern.ch/external/files-spaces-personal-home/eoshome-d!1377773/Microsoft%20Office?contextRouteParams.storage=home&contextRouteParams.item=%2Feos%2Fuser%2Fd%2Fdalvesde | https://cernbox.cern.ch/external/spaces/eos/user/d/dalvesde/New%20file.docx?app=microsoft-office&previous=/files/spaces/eos/user/d/dalvesde |
+| https://cernbox.cern.ch/files/public/show/sstLvrDFEpxwwxL?items-per-page=100 | https://cernbox.cern.ch/files/public/sstLvrDFEpxwwxL?items-per-page=100 ?? (do we need `show`?) |
+| https://cernbox.cern.ch/external/files-public-files/eoshome-d!2639/Microsoft%20Office?contextRouteParams.item=sstLvrDFEpxwwxL&public-token=sstLvrDFEpxwwxL | https://cernbox.cern.ch/external/public/sstLvrDFEpxwwxL/New%20file.docx?app=microsoft-office&previous=/files/public/sstLvrDFEpxwwxL |
 
 
+* We strip off `personal/home` as it does not bring any value to the URL and makes the URL relative to the current user, making it impossible to just copy and paste the URL to be reused by another user.
+* The files app works with slashes (files/spaces/personal/home/) adn the application works with dashes (files-spaces-personal-home). We find no sense to this distinction.
+Applications should not behave differently that the files app (another application).
+* We find the usage of query parameters `contextRouteParams.*` confusing and we prefer to opt for a more natural value (the previous url) with the `previous or previous` query parameter. Note that this query parameter should only be used for applications rendered inside the Web (not for external applications opening in a tab).
 
-> Instead of `/home` the URL always has to reflect the user: `/personal/einstein`
+### Preserving the possibility to copy and paste URLs based on paths
 
-What we want to avoid is to have `/personal/einstein/eos/user/e/einstein/etc`, because then it wouldn't be a global url.
-We should just need to change (configure) the home dir - as we do now - to a different namespace than `personal`.
+We would like to register `eos` as a space alias, so that we can continue providing the nominal file path: `https://<host>/files/spaces/eos/user/<letter>/<username>/<relative/path/to/resource>`.
+The usage of UUIDs is not user friendly and does not bring semantic meaning for the user.
 
----
-
-(!) This document seems to be outdated, as there was a need to prepend `spaces` to the namespace aliases (correct? Or is this an incomplete step towards spaces?). Then our suggestions above will need to reflect that as well.
-
-Either way, the current implementation still does not correspond to what is described on this document:
-
-* Web has `/files/spaces/personal/home` instead of `/files/spaces/personal/<username>`
 
 ### Application URLs
 
-This section is missing from this document but it is important and these are actually the more contentious urls. There should be a recommendation for app creators and for the internal apps to follow.
+Applications are a key technoly enabled  for web user and we want our users to be engaged in a rich experience by using a vast array of applications inside the OCIS platform, not limiting the usage to just uploading and downloading files. Therefore, we believe application URLs should be a fundamental design choice alongside the files application routes, providing (and enforcing) application developers to follow guidelines for url routing.
 
 In general, urls should be of the type:
 
@@ -358,23 +363,15 @@ In general, urls should be of the type:
 
 Example: `https://<host>/draw-io/spaces/all/eos/user/d/dalvesde/CERNBox/cbox transition.drawio`
 
-This would preserve the exact same schema used in the files app (just the app name changes). In order to know where to return on close, just add a `goback` query parameter with the previous route.
+This would preserve the exact same schema used in the files app (just the app name changes). In order to know where to return on close, just add a `previous` query parameter with the previous route.
 
-We would also recommend that the go back route is ommited from applications opened in a new tab, as closing the tab should be the recommended way of getting back to the previously opened files.
+We would also recommend that the previous route is ommited from applications opened in a new tab, as closing the tab should be the recommended way of getting back to the previously opened files.
 
 #### Special case: external app
+This application acts as as bridge to other (external) applications, hence the name. 
 
 Two options:
 
 * `/external/<app-name>/full/path/to/doc` (where app-name can be "default")
 * `/external/full/path/to/doc?app=<app-name>` (where ommiting the app name opens the default)
 
-### Examples
-
-| Current | Proposed |
-|---------|----------|
-| https://cernbox.cern.ch/files/spaces/personal/home/eos/user/d/dalvesde?items-per-page=100&sort-by=name&sort-dir=asc | https://cernbox.cern.ch/files/spaces/all/eos/user/d/dalvesde?items-per-page=100&sort-by=name&sort-dir=asc |
-| https://cernbox.cern.ch/draw-io/files-spaces-personal-home/files/dalvesde/eos/user/d/dalvesde/cbox%20transition.drawio?contextRouteParams.storage=home&contextRouteParams.item=/eos/user/d/dalvesde | https://cernbox.cern.ch/draw-io/spaces/all/eos/user/d/dalvesde/cbox%20transition.drawio?goback=/files/spaces/all/eos/user/d/dalvesde |
-| https://cernbox.cern.ch/external/files-spaces-personal-home/eoshome-d!1377773/Microsoft%20Office?contextRouteParams.storage=home&contextRouteParams.item=%2Feos%2Fuser%2Fd%2Fdalvesde | https://cernbox.cern.ch/external/spaces/all/eos/user/d/dalvesde/New%20file.docx?app=microsoft-office&goback=/files/spaces/all/eos/user/d/dalvesde |
-| https://cernbox.cern.ch/files/public/show/sstLvrDFEpxwwxL?items-per-page=100 | https://cernbox.cern.ch/files/public/sstLvrDFEpxwwxL?items-per-page=100 ?? (do we need `show`?) |
-| https://cernbox.cern.ch/external/files-public-files/eoshome-d!2639/Microsoft%20Office?contextRouteParams.item=sstLvrDFEpxwwxL&public-token=sstLvrDFEpxwwxL | https://cernbox.cern.ch/external/public/sstLvrDFEpxwwxL/New%20file.docx?app=microsoft-office&goback=/files/public/sstLvrDFEpxwwxL |
