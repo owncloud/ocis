@@ -41,9 +41,9 @@ type MetadataClient interface {
 type Store struct {
 	Logger olog.Logger
 
-	mdc       MetadataClient
-	cfg       *config.Config
-	initStore func(settings.Manager)
+	mdc MetadataClient
+	cfg *config.Config
+	//initStore func(settings.Manager)
 
 	init *sync.Once
 	l    *sync.Mutex
@@ -60,14 +60,7 @@ func (s *Store) Init() {
 
 	var err error
 	//s.init.Do(func() {
-	//b := backoff.NewExponentialBackOff()
-	//b.MaxElapsedTime = 4 * time.Second
-	//backoff.Retry(func() error {
-	err = s.initMetadataClient(NewMetadataClient(s.cfg))
-	//return err
-
-	//}, b)
-
+	err = s.initMetadataClient(NewMetadataClient(s.cfg.Metadata))
 	//})
 	if err != nil {
 		log.Fatal("error initializing metadata client: ", err)
@@ -83,17 +76,17 @@ func New(cfg *config.Config, initstore func(settings.Manager)) settings.Manager 
 		//olog.Level(cfg.Log.Level),
 		//olog.File(cfg.Log.File),
 		//),
-		initStore: initstore,
-		l:         &sync.Mutex{},
-		init:      &sync.Once{},
+		cfg:  cfg,
+		l:    &sync.Mutex{},
+		init: &sync.Once{},
 	}
 
 	return &s
 }
 
 // NewMetadataClient returns the MetadataClient
-func NewMetadataClient(cfg *config.Config) MetadataClient {
-	mdc, err := metadata.NewCS3Storage("127.0.0.1:9142", "127.0.0.1:9215", "058bff95-6708-4fe5-91e4-9ea3d377588b", "change-me-please")
+func NewMetadataClient(cfg config.Metadata) MetadataClient {
+	mdc, err := metadata.NewCS3Storage(cfg.GatewayAddress, cfg.StorageAddress, cfg.ServiceUserID, cfg.MachineAuthAPIKey)
 	if err != nil {
 		log.Fatal("error connecting to mdc:", err)
 	}

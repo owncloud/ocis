@@ -33,12 +33,20 @@ func DefaultConfig() *Config {
 			Addr:      "127.0.0.1:9191",
 			Namespace: "com.owncloud.api",
 		},
-		DataPath: path.Join(defaults.BaseDataPath(), "settings"),
+		StoreType: "metadata", // use metadata or filesystem
+		DataPath:  path.Join(defaults.BaseDataPath(), "settings"),
 		Asset: Asset{
 			Path: "",
 		},
 		TokenManager: TokenManager{
 			JWTSecret: "Pive-Fumkiu4",
+		},
+
+		Metadata: Metadata{
+			GatewayAddress:    "127.0.0.1:9142",
+			StorageAddress:    "127.0.0.1:9215",
+			ServiceUserID:     "058bff95-6708-4fe5-91e4-9ea3d377588b",
+			MachineAuthAPIKey: "change-me-please",
 		},
 	}
 }
