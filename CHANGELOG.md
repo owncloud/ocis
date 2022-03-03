@@ -17,7 +17,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Implement notifications service: [#3217](https://github.com/owncloud/ocis/pull/3217)
 * Enhancement - Thumbnails in spaces: [#3219](https://github.com/owncloud/ocis/pull/3219)
 * Enhancement - Update reva to v1.16.1-0.20220224114254-d4ffaf323e70: [#3231](https://github.com/owncloud/ocis/pull/3231)
-* Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
+* Enhancement - Update ownCloud Web to v5.2.0: [#6506](https://github.com/owncloud/web/pull/6506)
 
 ## Details
 
@@ -105,15 +105,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3231
 
-* Enhancement - Update ownCloud Web to v5.1.0: [#3202](https://github.com/owncloud/ocis/pull/3202)
+* Enhancement - Update ownCloud Web to v5.2.0: [#6506](https://github.com/owncloud/web/pull/6506)
 
    Tags: web
 
-   We updated ownCloud Web to v5.1.0. Please refer to the changelog (linked) for details on the web
+   We updated ownCloud Web to v5.2.0. Please refer to the changelog (linked) for details on the web
    release.
 
+   https://github.com/owncloud/web/pull/6506
    https://github.com/owncloud/ocis/pull/3202
-   https://github.com/owncloud/web/releases/tag/v5.1.0
+   https://github.com/owncloud/web/releases/tag/v5.2.0
 # Changelog for [1.17.0] (2022-02-16)
 
 The following sections list the changes for 1.17.0.
