@@ -361,7 +361,7 @@ In general, urls should be of the type:
 * `<app-name>/</namespaced/alias></relative/path/to/resource>` or
 * `<app-name>/public/<token></relative/path/to/resource>` for public links (allowing to distinguish if they need to be authenticated or not)
 
-Example: `https://<host>/draw-io/spaces/all/eos/user/d/dalvesde/CERNBox/cbox transition.drawio`
+Example: `https://<host>/draw-io/spaces/eos/user/d/dalvesde/CERNBox/cbox transition.drawio`
 
 This would preserve the exact same schema used in the files app (just the app name changes). In order to know where to return on close, just add a `previous` query parameter with the previous route.
 
