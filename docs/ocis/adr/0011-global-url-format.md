@@ -324,7 +324,7 @@ Since there is no difference between public and private files a logged in user c
 
 We believe that URLs exposed in the browser address are a critical area to be properly maintained and evolved. Changes to bookmarked URLs can and will break user behaviour.
 We think that the current URLs exposed in the recent changes in Web can be improved and we propose some changes for discussion.
-We have also realized that this ADR is outdated and does not reflect the current URLs used in the Web: spaces are not taking into account.
+We have also realized that this ADR is outdated and does not reflect the current URLs used in the Web: spaces are not taken into account.
 
 The way this section is written is to start a discussion to formulate better URLs and make a more formalised proposal to this document.
 
@@ -342,9 +342,9 @@ We propose you to take a look at the following examples and the inner motivation
 
 
 * We strip off `personal/home` as it does not bring any value to the URL and makes the URL relative to the current user, making it impossible to just copy and paste the URL to be reused by another user.
-* The files app works with slashes (files/spaces/personal/home/) adn the application works with dashes (files-spaces-personal-home). We find no sense to this distinction.
+* The files app works with slashes (files/spaces/personal/home/) and the application works with dashes (files-spaces-personal-home). We find no sense to this distinction.
 Applications should not behave differently that the files app (another application).
-* We find the usage of query parameters `contextRouteParams.*` confusing and we prefer to opt for a more natural value (the previous url) with the `previous or previous` query parameter. Note that this query parameter should only be used for applications rendered inside the Web (not for external applications opening in a tab).
+* We find the usage of query parameters `contextRouteParams.*` confusing and we prefer to opt for a more natural value (the previous url) with the `previous` query parameter. Note that this query parameter should only be used for applications rendered inside the Web (not for external applications opening in a tab).
 
 ### Preserving the possibility to copy and paste URLs based on paths
 
@@ -354,7 +354,7 @@ The usage of UUIDs is not user friendly and does not bring semantic meaning for 
 
 ### Application URLs
 
-Applications are a key technoly enabled  for web user and we want our users to be engaged in a rich experience by using a vast array of applications inside the OCIS platform, not limiting the usage to just uploading and downloading files. Therefore, we believe application URLs should be a fundamental design choice alongside the files application routes, providing (and enforcing) application developers to follow guidelines for url routing.
+Applications are a key technology enables for users and we want users to be fully engaged in a rich experience by using a vast array of applications inside the OCIS platform, not limiting the usage to just uploading and downloading files. Therefore, we believe application URLs should be a fundamental design choice alongside the files application routes, providing (and enforcing) application developers to follow guidelines for url routing.
 
 In general, urls should be of the type:
 
@@ -368,7 +368,7 @@ This would preserve the exact same schema used in the files app (just the app na
 We would also recommend that the previous route is ommited from applications opened in a new tab, as closing the tab should be the recommended way of getting back to the previously opened files.
 
 #### Special case: external app
-This application acts as as bridge to other (external) applications, hence the name. 
+This application acts as bridge to other (external) applications, hence the name. 
 
 Two options:
 
