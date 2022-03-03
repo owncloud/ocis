@@ -48,7 +48,7 @@ func NewMDC(s *Store) MetadataClient {
 	case "unit":
 		mdc = &MockedMetadataClient{data: make(map[string][]byte)}
 	case "integration":
-		mdc = NewMetadataClient(&config.Config{})
+		mdc = NewMetadataClient(config.DefaultConfig().Metadata)
 	}
 	s.initMetadataClient(mdc)
 	return nil
