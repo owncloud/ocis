@@ -16,9 +16,9 @@ import (
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/pkg/auth/scope"
-	"github.com/cs3org/reva/pkg/token"
-	"github.com/cs3org/reva/pkg/token/manager/jwt"
+	"github.com/cs3org/reva/v2/pkg/auth/scope"
+	"github.com/cs3org/reva/v2/pkg/token"
+	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/golang/protobuf/ptypes/empty"
 	accountsCfg "github.com/owncloud/ocis/accounts/pkg/config"
 	accountsLogging "github.com/owncloud/ocis/accounts/pkg/logging"

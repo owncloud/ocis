@@ -7,7 +7,7 @@ import (
 	cs3group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	cs3user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/owncloud/ocis/graph/pkg/config"

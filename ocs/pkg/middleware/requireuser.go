@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	revactx "github.com/cs3org/reva/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/go-chi/render"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"

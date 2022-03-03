@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cs3org/reva/cmd/revad/runtime"
+	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"

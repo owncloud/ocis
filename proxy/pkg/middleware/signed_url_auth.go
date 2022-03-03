@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	revactx "github.com/cs3org/reva/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	storemsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/store/v0"
 	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v0"

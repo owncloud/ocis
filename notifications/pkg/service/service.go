@@ -5,7 +5,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/cs3org/reva/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/notifications/pkg/channels"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )

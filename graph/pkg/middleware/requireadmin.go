@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	revactx "github.com/cs3org/reva/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	accounts "github.com/owncloud/ocis/accounts/pkg/service/v0"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/ocis-pkg/log"

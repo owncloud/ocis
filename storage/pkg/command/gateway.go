@@ -9,7 +9,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/cs3org/reva/cmd/revad/runtime"
+	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/mapstructure"
 	"github.com/oklog/run"

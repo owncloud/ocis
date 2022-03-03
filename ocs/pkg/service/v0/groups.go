@@ -12,7 +12,7 @@ import (
 	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
 	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
-	revactx "github.com/cs3org/reva/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
