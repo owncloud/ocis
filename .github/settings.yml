@@ -10,7 +10,7 @@ repository:
   private: false
   has_issues: true
   has_projects: false
-  has_wiki: true
+  has_wiki: false
   has_downloads: false
 
   default_branch: master
@@ -35,7 +35,7 @@ labels:
     color: "#3F7A62"
   - name: Storage:ownCloudSQL
     color: "#3F7A62"
-  
+
 teams:
   - name: ci
     permission: admin
