@@ -87,7 +87,7 @@ var (
 )
 
 func init() {
-	NewMDC(s)
+	_ = NewMDC(s)
 	setupRoles()
 }
 

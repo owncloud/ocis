@@ -46,12 +46,10 @@ func (s *Store) WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.Us
 	s.Init()
 	ctx := context.TODO()
 	// as per https://github.com/owncloud/product/issues/103 "Each user can have exactly one role"
-	err := s.mdc.Delete(ctx, accountPath(accountUUID))
-	if err != nil {
-		// TODO: How to differentiate between 'not found' and other errors?
-	}
+	_ = s.mdc.Delete(ctx, accountPath(accountUUID))
+	// TODO: How to differentiate between 'not found' and other errors?
 
-	err = s.mdc.MakeDirIfNotExist(ctx, accountPath(accountUUID))
+	err := s.mdc.MakeDirIfNotExist(ctx, accountPath(accountUUID))
 	if err != nil {
 		return nil, err
 	}
