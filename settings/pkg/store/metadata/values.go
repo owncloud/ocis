@@ -2,6 +2,7 @@
 package store
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -16,8 +17,9 @@ import (
 // If the accountUUID is not empty, values with an empty or with a matching accountUUID are returned.
 func (s *Store) ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, error) {
 	s.Init()
+	ctx := context.TODO()
 
-	vIDs, err := s.mdc.ReadDir(nil, valuesFolderLocation)
+	vIDs, err := s.mdc.ReadDir(ctx, valuesFolderLocation)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +27,7 @@ func (s *Store) ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, 
 	// TODO: refine logic not to spam metadata service
 	var values []*settingsmsg.Value
 	for _, vid := range vIDs {
-		b, err := s.mdc.SimpleDownload(nil, valuePath(vid))
+		b, err := s.mdc.SimpleDownload(ctx, valuePath(vid))
 		if err != nil {
 			return nil, err
 		}
@@ -56,7 +58,9 @@ func (s *Store) ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, 
 // ReadValue tries to find a value by the given valueId within the dataPath
 func (s *Store) ReadValue(valueID string) (*settingsmsg.Value, error) {
 	s.Init()
-	b, err := s.mdc.SimpleDownload(nil, valuePath(valueID))
+	ctx := context.TODO()
+
+	b, err := s.mdc.SimpleDownload(ctx, valuePath(valueID))
 	if err != nil {
 		return nil, err
 	}
@@ -73,6 +77,8 @@ func (s *Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*se
 // WriteValue writes the given value into a file within the dataPath
 func (s *Store) WriteValue(value *settingsmsg.Value) (*settingsmsg.Value, error) {
 	s.Init()
+	ctx := context.TODO()
+
 	if value.Id == "" {
 		value.Id = uuid.Must(uuid.NewV4()).String()
 	}
@@ -80,7 +86,7 @@ func (s *Store) WriteValue(value *settingsmsg.Value) (*settingsmsg.Value, error)
 	if err != nil {
 		return nil, err
 	}
-	return value, s.mdc.SimpleUpload(nil, valuePath(value.Id), b)
+	return value, s.mdc.SimpleUpload(ctx, valuePath(value.Id), b)
 }
 
 func valuePath(id string) string {

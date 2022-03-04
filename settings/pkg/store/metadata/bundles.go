@@ -2,6 +2,7 @@
 package store
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -18,9 +19,10 @@ func (s *Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []stri
 		return defaultBundle(bundleType, bundleIDs[0]), nil
 	}
 	s.Init()
+	ctx := context.TODO()
 
 	if len(bundleIDs) == 0 {
-		bIDs, err := s.mdc.ReadDir(nil, bundleFolderLocation)
+		bIDs, err := s.mdc.ReadDir(ctx, bundleFolderLocation)
 		if err != nil {
 			return nil, err
 		}
@@ -29,7 +31,7 @@ func (s *Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []stri
 	}
 	var bundles []*settingsmsg.Bundle
 	for _, id := range bundleIDs {
-		b, err := s.mdc.SimpleDownload(nil, bundlePath(id))
+		b, err := s.mdc.SimpleDownload(ctx, bundlePath(id))
 		if err != nil {
 			return nil, err
 		}
@@ -54,7 +56,8 @@ func (s *Store) ReadBundle(bundleID string) (*settingsmsg.Bundle, error) {
 		return defaultBundle(settingsmsg.Bundle_TYPE_ROLE, bundleID)[0], nil
 	}
 	s.Init()
-	b, err := s.mdc.SimpleDownload(nil, bundlePath(bundleID))
+	ctx := context.TODO()
+	b, err := s.mdc.SimpleDownload(ctx, bundlePath(bundleID))
 	if err != nil {
 		return nil, err
 	}
@@ -66,8 +69,9 @@ func (s *Store) ReadBundle(bundleID string) (*settingsmsg.Bundle, error) {
 // ReadSetting tries to find a setting by the given id from the metadata service
 func (s *Store) ReadSetting(settingID string) (*settingsmsg.Setting, error) {
 	s.Init()
+	ctx := context.TODO()
 
-	ids, err := s.mdc.ReadDir(nil, bundleFolderLocation)
+	ids, err := s.mdc.ReadDir(ctx, bundleFolderLocation)
 	if err != nil {
 		return nil, err
 	}
@@ -92,11 +96,13 @@ func (s *Store) ReadSetting(settingID string) (*settingsmsg.Setting, error) {
 // WriteBundle sends the givens record to the metadataclient. returns `record` for legacy reasons
 func (s *Store) WriteBundle(record *settingsmsg.Bundle) (*settingsmsg.Bundle, error) {
 	s.Init()
+	ctx := context.TODO()
+
 	b, err := json.Marshal(record)
 	if err != nil {
 		return nil, err
 	}
-	return record, s.mdc.SimpleUpload(nil, bundlePath(record.Id), b)
+	return record, s.mdc.SimpleUpload(ctx, bundlePath(record.Id), b)
 }
 
 // AddSettingToBundle adds the given setting to the bundle with the given bundleID.

@@ -15,15 +15,15 @@ var (
 	//marie    = "3c054db3-eec1-4ca4-b985-bc56dcf560cb"
 
 	s = &Store{
-		l: &sync.Mutex{},
+		Logger: logger,
+		l:      &sync.Mutex{},
 	}
+
 	logger = olog.NewLogger(
 		olog.Color(true),
 		olog.Pretty(true),
 		olog.Level("info"),
 	)
-
-	mdc = NewMDC(s)
 
 	bundles = []*settingsmsg.Bundle{
 		{
@@ -87,6 +87,7 @@ var (
 )
 
 func init() {
+	NewMDC(s)
 	setupRoles()
 }
 

@@ -58,13 +58,11 @@ func (s *Store) Init() {
 	s.l.Lock()
 	defer s.l.Unlock()
 
-	var err error
 	//s.init.Do(func() {
-	err = s.initMetadataClient(NewMetadataClient(s.cfg.Metadata))
-	//})
-	if err != nil {
+	if err := s.initMetadataClient(NewMetadataClient(s.cfg.Metadata)); err != nil {
 		s.Logger.Error().Err(err).Msg("error initializing metadata client")
 	}
+	//})
 }
 
 // New creates a new store
@@ -96,7 +94,8 @@ func NewMetadataClient(cfg config.Metadata) MetadataClient {
 
 // we need to lazy initialize the MetadataClient because metadata service might not be ready
 func (s *Store) initMetadataClient(mdc MetadataClient) error {
-	err := mdc.Init(nil, settingsSpaceID)
+	ctx := context.TODO()
+	err := mdc.Init(ctx, settingsSpaceID)
 	if err != nil {
 		return err
 	}
@@ -107,7 +106,7 @@ func (s *Store) initMetadataClient(mdc MetadataClient) error {
 		bundleFolderLocation,
 		valuesFolderLocation,
 	} {
-		err = mdc.MakeDirIfNotExist(nil, p)
+		err = mdc.MakeDirIfNotExist(ctx, p)
 		if err != nil {
 			return err
 		}
@@ -118,7 +117,7 @@ func (s *Store) initMetadataClient(mdc MetadataClient) error {
 		if err != nil {
 			return err
 		}
-		err = mdc.SimpleUpload(nil, bundlePath(p.Id), b)
+		err = mdc.SimpleUpload(ctx, bundlePath(p.Id), b)
 		if err != nil {
 			return err
 		}
@@ -127,7 +126,7 @@ func (s *Store) initMetadataClient(mdc MetadataClient) error {
 	for _, p := range defaults.DefaultRoleAssignments() {
 		accountUUID := p.AccountUuid
 		roleID := p.RoleId
-		err = mdc.MakeDirIfNotExist(nil, accountPath(accountUUID))
+		err = mdc.MakeDirIfNotExist(ctx, accountPath(accountUUID))
 		if err != nil {
 			return err
 		}
@@ -141,7 +140,7 @@ func (s *Store) initMetadataClient(mdc MetadataClient) error {
 		if err != nil {
 			return err
 		}
-		err = mdc.SimpleUpload(nil, assignmentPath(accountUUID, ass.Id), b)
+		err = mdc.SimpleUpload(ctx, assignmentPath(accountUUID, ass.Id), b)
 		if err != nil {
 			return err
 		}

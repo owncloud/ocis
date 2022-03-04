@@ -42,7 +42,7 @@ type MockedMetadataClient struct {
 }
 
 // NewMDC instantiates a mocked MetadataClient
-func NewMDC(s *Store) MetadataClient {
+func NewMDC(s *Store) error {
 	var mdc MetadataClient
 	switch testtype {
 	case "unit":
@@ -50,15 +50,7 @@ func NewMDC(s *Store) MetadataClient {
 	case "integration":
 		mdc = NewMetadataClient(config.DefaultConfig().Metadata)
 	}
-	s.initMetadataClient(mdc)
-	return nil
-}
-
-func keys(m map[string][]byte) (s []string) {
-	for k := range m {
-		s = append(s, k)
-	}
-	return
+	return s.initMetadataClient(mdc)
 }
 
 // SimpleDownload returns nil if not found

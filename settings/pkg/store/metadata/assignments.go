@@ -2,6 +2,7 @@
 package store
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -16,14 +17,15 @@ func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRole
 		return defaultRoleAssignments(accountUUID), nil
 	}
 	s.Init()
-	assIDs, err := s.mdc.ReadDir(nil, accountPath(accountUUID))
+	ctx := context.TODO()
+	assIDs, err := s.mdc.ReadDir(ctx, accountPath(accountUUID))
 	if err != nil {
 		return nil, err
 	}
 
-	var ass []*settingsmsg.UserRoleAssignment
+	ass := make([]*settingsmsg.UserRoleAssignment, 0, len(assIDs))
 	for _, assID := range assIDs {
-		b, err := s.mdc.SimpleDownload(nil, assignmentPath(accountUUID, assID))
+		b, err := s.mdc.SimpleDownload(ctx, assignmentPath(accountUUID, assID))
 		if err != nil {
 			return nil, err
 		}
@@ -42,13 +44,14 @@ func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRole
 // WriteRoleAssignment appends the given role assignment to the existing assignments of the respective account.
 func (s *Store) WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.UserRoleAssignment, error) {
 	s.Init()
+	ctx := context.TODO()
 	// as per https://github.com/owncloud/product/issues/103 "Each user can have exactly one role"
-	err := s.mdc.Delete(nil, accountPath(accountUUID))
+	err := s.mdc.Delete(ctx, accountPath(accountUUID))
 	if err != nil {
 		// TODO: How to differentiate between 'not found' and other errors?
 	}
 
-	err = s.mdc.MakeDirIfNotExist(nil, accountPath(accountUUID))
+	err = s.mdc.MakeDirIfNotExist(ctx, accountPath(accountUUID))
 	if err != nil {
 		return nil, err
 	}
@@ -62,20 +65,21 @@ func (s *Store) WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.Us
 	if err != nil {
 		return nil, err
 	}
-	return ass, s.mdc.SimpleUpload(nil, assignmentPath(accountUUID, ass.Id), b)
+	return ass, s.mdc.SimpleUpload(ctx, assignmentPath(accountUUID, ass.Id), b)
 }
 
 // RemoveRoleAssignment deletes the given role assignment from the existing assignments of the respective account.
 func (s *Store) RemoveRoleAssignment(assignmentID string) error {
 	s.Init()
-	accounts, err := s.mdc.ReadDir(nil, accountsFolderLocation)
+	ctx := context.TODO()
+	accounts, err := s.mdc.ReadDir(ctx, accountsFolderLocation)
 	if err != nil {
 		return err
 	}
 
 	// TODO: use indexer to avoid spamming Metadata service
 	for _, accID := range accounts {
-		assIDs, err := s.mdc.ReadDir(nil, accountPath(accID))
+		assIDs, err := s.mdc.ReadDir(ctx, accountPath(accID))
 		if err != nil {
 			// TODO: error?
 			continue
@@ -83,7 +87,7 @@ func (s *Store) RemoveRoleAssignment(assignmentID string) error {
 
 		for _, assID := range assIDs {
 			if assID == assignmentID {
-				return s.mdc.Delete(nil, assignmentPath(accID, assID))
+				return s.mdc.Delete(ctx, assignmentPath(accID, assID))
 			}
 		}
 	}
