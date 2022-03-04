@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"regexp"
 
-	revactx "github.com/cs3org/reva/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"

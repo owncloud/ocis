@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/asim/go-micro/plugins/events/nats/v4"
-	"github.com/cs3org/reva/pkg/events"
-	"github.com/cs3org/reva/pkg/events/server"
+	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/events/server"
 	"github.com/owncloud/ocis/notifications/pkg/channels"
 	"github.com/owncloud/ocis/notifications/pkg/config"
 	"github.com/owncloud/ocis/notifications/pkg/config/parser"

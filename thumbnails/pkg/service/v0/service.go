@@ -10,7 +10,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	revactx "github.com/cs3org/reva/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
 	"github.com/owncloud/ocis/thumbnails/pkg/preprocessor"

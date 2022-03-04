@@ -10,7 +10,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"

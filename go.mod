@@ -22,7 +22,8 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.1
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220126114148-64c025ccdd19
-	github.com/cs3org/reva v1.16.1-0.20220301130454-abc01bbfa855
+	github.com/cs3org/reva v0.0.0-00010101000000-000000000000
+	github.com/cs3org/reva/v2 v2.0.0
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.7
@@ -38,7 +39,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/gookit/config/v2 v2.0.27
 	github.com/gorilla/mux v1.8.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.3
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.8.0
 	github.com/iancoleman/strcase v0.2.0
 	github.com/justinas/alice v1.2.0
 	github.com/libregraph/idm v0.3.1-0.20220222123017-f9d520ac1f11
@@ -72,8 +73,8 @@ require (
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd
-	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
-	google.golang.org/genproto v0.0.0-20220118154757-00ab72f36ad5
+	golang.org/x/oauth2 v0.0.0-20220223155221-ee480838109b
+	google.golang.org/genproto v0.0.0-20220302033224-9aa15565e42a
 	google.golang.org/grpc v1.44.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/yaml.v2 v2.4.0

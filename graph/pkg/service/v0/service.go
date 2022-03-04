@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
-	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 

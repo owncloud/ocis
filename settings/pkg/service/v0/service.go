@@ -7,7 +7,7 @@ import (
 
 	permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	"github.com/cs3org/reva/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/roles"

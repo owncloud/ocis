@@ -9,7 +9,7 @@ import (
 	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
 	"github.com/asim/go-micro/plugins/client/grpc/v4"
-	revactx "github.com/cs3org/reva/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 )

@@ -15,11 +15,11 @@ import (
 
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	revactx "github.com/cs3org/reva/pkg/ctx"
-	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/pkg/token"
-	"github.com/cs3org/reva/pkg/token/manager/jwt"
-	"github.com/cs3org/reva/pkg/utils"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/token"
+	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/ocis/ocis-pkg/indexer/index"
