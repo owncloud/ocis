@@ -23,7 +23,7 @@ require (
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220126114148-64c025ccdd19
 	github.com/cs3org/reva v0.0.0-00010101000000-000000000000
-	github.com/cs3org/reva/v2 v2.0.0
+	github.com/cs3org/reva/v2 v2.0.0-20220304131900-b8be80d1ba81
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.7
