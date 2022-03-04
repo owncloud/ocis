@@ -34,7 +34,8 @@
       "type": "string",
       "enum": [
         "PNG",
-        "JPG"
+        "JPG",
+        "GIF"
       ],
       "default": "PNG",
       "description": "The file types to which the thumbnail can get encoded to."

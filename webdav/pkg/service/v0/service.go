@@ -286,7 +286,9 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 
 func extensionToThumbnailType(ext string) thumbnailssvc.GetThumbnailRequest_ThumbnailType {
 	switch strings.ToUpper(ext) {
-	case "GIF", "PNG":
+	case "GIF":
+		return thumbnailssvc.GetThumbnailRequest_GIF
+	case "PNG":
 		return thumbnailssvc.GetThumbnailRequest_PNG
 	default:
 		return thumbnailssvc.GetThumbnailRequest_JPG

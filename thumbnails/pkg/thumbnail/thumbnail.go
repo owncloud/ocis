@@ -2,12 +2,13 @@ package thumbnail
 
 import (
 	"bytes"
-	"github.com/disintegration/imaging"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/storage"
 	"image"
+	"image/gif"
 	"mime"
 	"strings"
+
+	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/storage"
 )
 
 var (
@@ -24,13 +25,14 @@ var (
 type Request struct {
 	Resolution image.Rectangle
 	Encoder    Encoder
+	Generator  Generator
 	Checksum   string
 }
 
 // Manager is responsible for generating thumbnails
 type Manager interface {
 	// Generate will return a thumbnail for a file
-	Generate(Request, image.Image) ([]byte, error)
+	Generate(Request, interface{}) ([]byte, error)
 	// Get loads the thumbnail from the storage.
 	// It will return nil if no image is stored for the given context.
 	Get(Request) ([]byte, bool)
@@ -54,12 +56,22 @@ type SimpleManager struct {
 
 // Generate creates a thumbnail and stores it.
 // The created thumbnail is also being returned.
-func (s SimpleManager) Generate(r Request, img image.Image) ([]byte, error) {
-	match := s.resolutions.ClosestMatch(r.Resolution, img.Bounds())
-	thumbnail := s.generate(match, img)
+func (s SimpleManager) Generate(r Request, img interface{}) ([]byte, error) {
+	var match image.Rectangle
+	switch m := img.(type) {
+	case *gif.GIF:
+		match = s.resolutions.ClosestMatch(r.Resolution, m.Image[0].Bounds())
+	case image.Image:
+		match = s.resolutions.ClosestMatch(r.Resolution, m.Bounds())
+	}
+
+	thumbnail, err := r.Generator.GenerateThumbnail(match, img)
+	if err != nil {
+		return nil, err
+	}
 
 	dst := new(bytes.Buffer)
-	err := r.Encoder.Encode(dst, thumbnail)
+	err = r.Encoder.Encode(dst, thumbnail)
 	if err != nil {
 		return nil, err
 	}
@@ -77,10 +89,6 @@ func (s SimpleManager) Generate(r Request, img image.Image) ([]byte, error) {
 func (s SimpleManager) Get(r Request) ([]byte, bool) {
 	k := s.storage.BuildKey(mapToStorageRequest(r))
 	return s.storage.Get(k)
-}
-
-func (s SimpleManager) generate(r image.Rectangle, img image.Image) image.Image {
-	return imaging.Thumbnail(img, r.Dx(), r.Dy(), imaging.Lanczos)
 }
 
 func mapToStorageRequest(r Request) storage.Request {

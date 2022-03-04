@@ -71,19 +71,23 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumb
 		g.logger.Debug().Str("thumbnail_type", req.ThumbnailType.String()).Msg("unsupported thumbnail type")
 		return nil
 	}
-	encoder := thumbnail.EncoderForType(req.ThumbnailType.String())
-	if encoder == nil {
+	generator, err := thumbnail.GeneratorForType(req.ThumbnailType.String())
+	if err != nil {
+		g.logger.Debug().Str("thumbnail_type", req.ThumbnailType.String()).Msg("unsupported thumbnail type")
+		return nil
+	}
+	encoder, err := thumbnail.EncoderForType(req.ThumbnailType.String())
+	if err != nil {
 		g.logger.Debug().Str("thumbnail_type", req.ThumbnailType.String()).Msg("unsupported thumbnail type")
 		return nil
 	}
 
 	var thumb []byte
-	var err error
 	switch {
 	case req.GetWebdavSource() != nil:
-		thumb, err = g.handleWebdavSource(ctx, req, encoder)
+		thumb, err = g.handleWebdavSource(ctx, req, generator, encoder)
 	case req.GetCs3Source() != nil:
-		thumb, err = g.handleCS3Source(ctx, req, encoder)
+		thumb, err = g.handleCS3Source(ctx, req, generator, encoder)
 	default:
 		g.logger.Error().Msg("no image source provided")
 		return merrors.BadRequest(g.serviceID, "image source is missing")
@@ -97,7 +101,7 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumb
 	return nil
 }
 
-func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest, encoder thumbnail.Encoder) ([]byte, error) {
+func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest, generator thumbnail.Generator, encoder thumbnail.Encoder) ([]byte, error) {
 	src := req.GetCs3Source()
 	sRes, err := g.stat(src.Path, src.Authorization)
 	if err != nil {
@@ -106,6 +110,7 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 
 	tr := thumbnail.Request{
 		Resolution: image.Rect(0, 0, int(req.Width), int(req.Height)),
+		Generator:  generator,
 		Encoder:    encoder,
 		Checksum:   sRes.GetInfo().GetChecksum().GetSum(),
 	}
@@ -136,7 +141,7 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 	return thumb, nil
 }
 
-func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest, encoder thumbnail.Encoder) ([]byte, error) {
+func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest, generator thumbnail.Generator, encoder thumbnail.Encoder) ([]byte, error) {
 	src := req.GetWebdavSource()
 	imgURL, err := url.Parse(src.Url)
 	if err != nil {
@@ -182,6 +187,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	}
 	tr := thumbnail.Request{
 		Resolution: image.Rect(0, 0, int(req.Width), int(req.Height)),
+		Generator:  generator,
 		Encoder:    encoder,
 		Checksum:   sRes.GetInfo().GetChecksum().GetSum(),
 	}

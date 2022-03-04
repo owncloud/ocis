@@ -45,6 +45,7 @@ message GetThumbnailRequest {
     enum ThumbnailType {
         PNG = 0; // Represents PNG type
         JPG = 1; // Represents JPG type
+        GIF = 2; // Represents GIF type
     }
     // The type to which the thumbnail should get encoded to.
     ThumbnailType thumbnail_type = 2;

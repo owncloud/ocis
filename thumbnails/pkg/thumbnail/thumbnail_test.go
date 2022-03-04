@@ -33,14 +33,14 @@ func BenchmarkGet(b *testing.B) {
 	res, _ := ParseResolution("32x32")
 	req := Request{
 		Resolution: res,
-		Checksum:       "1872ade88f3013edeb33decd74a4f947",
+		Checksum:   "1872ade88f3013edeb33decd74a4f947",
 	}
 	cwd, _ := os.Getwd()
 	p := filepath.Join(cwd, "../../testdata/oc.png")
 	f, _ := os.Open(p)
 	defer f.Close()
 	img, ext, _ := image.Decode(f)
-	req.Encoder = EncoderForType(ext)
+	req.Encoder, _ = EncoderForType(ext)
 	for i := 0; i < b.N; i++ {
 		_, _ = sut.Generate(req, img)
 	}
