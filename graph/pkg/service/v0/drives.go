@@ -507,14 +507,15 @@ func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.S
 		if description, ok := space.Opaque.Map["description"]; ok {
 			drive.Description = libregraph.PtrString(string(description.Value))
 		}
-	}
 
-	if space.Opaque != nil && space.Opaque.Map != nil {
-		v, ok := space.Opaque.Map["trashed"]
-		if ok {
+		if v, ok := space.Opaque.Map["trashed"]; ok {
 			deleted := &libregraph.Deleted{}
 			deleted.SetState(string(v.Value))
 			drive.Root.Deleted = deleted
+		}
+
+		if entry, ok := space.Opaque.Map["etag"]; ok {
+			drive.Root.ETag = libregraph.PtrString(string(entry.Value))
 		}
 	}
 
