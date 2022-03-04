@@ -7,13 +7,47 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.18.0 Technology Preview
+
+Version 1.18.0 brings major improvements, new features and bug fixes to the platform. Infinite Scale can now send user notifications via email and the 'Spaces' feauture has made a lot of progress towards its initial feature completeness. ownCloud Web comes furthermore with many design and usability improvements that round off the recent redesigning initiative.
+
+The most prominent changes in ownCloud Infinite Scale 1.18.0 and ownCloud Web 5.2.0 comprise:
+
+- Infinite Scale introduces a notification service to provide user notifications. Currently it can send email notifications for the event of creating a share with another user. The template used for the notification is basic and will be improved with the next versions. See the [developer documentation](https://owncloud.dev/extensions/notifications/configuration/) on how to configure notification settings. [ocis#3217](https://github.com/owncloud/ocis/pull/3217)
+- Spaces now have a right sidebar for Space properties like quota, actions and more. [web#6437](https://github.com/owncloud/web/pull/6437)
+- Space descriptions and images can now be updated. [web#6410](https://github.com/owncloud/web/pull/6410)
+- The readme for Spaces can now be modified via a lightweight modal editor. [web#6509](https://github.com/owncloud/web/pull/6509)
+- Spaces now support thumbnail previews. [ocis#3219](https://github.com/owncloud/ocis/pull/3219)
+- The design of the breadcrumb in ownCloud Web has been improved. [web#6218](https://github.com/owncloud/web/issues/6218)
+- The "+ New" button in ownCloud Web has been split into "+ New" and "Upload". The design and context menu have been improved. [web#6279](https://github.com/owncloud/web/issues/6279)
+- The file list in ownCloud Web has received a number of visual and usability improvements. [web#6207](https://github.com/owncloud/web/issues/6207)
+- The endpoint to list Spaces now supports sorting by name and last modification time. [ocis#3201](https://github.com/owncloud/ocis/pull/3201)
+- The Search feature in ownCloud Web has been fixed and improved, e.g., the context menu works again properly (only available on ownCloud 10 currently). [web#6445](https://github.com/owncloud/web/pull/6445) [web#6496](https://github.com/owncloud/web/issues/6496)
+- Creating a new file now refreshes the file list in ownCloud Web. [web#5530](https://github.com/owncloud/web/issues/5530)
+- Further improvements have been made to comply with the URL scheme defined in https://owncloud.dev/ocis/adr/0011-global-url-format/#mixed-global-urls. [web#6363](https://github.com/owncloud/web/pull/6363) [ocis#3109](https://github.com/owncloud/ocis/pull/3109)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.18.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v5.2.0) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+Due to some breaking changes, the [WOPI Server extension](https://github.com/cs3org/wopiserver) that is required for online office integrations (Collabora Online, ONLYOFFICE, Microsoft Office Online) is not compatible with the 1.18.0 release. This issue is under investigation and will be fixed with the next releases.
+{{< /hint >}}
+
+{{< hint warning >}}
+The archive download for multiple files and whole folders is currently disabled for public links. This issue is under investigation and will be fixed with the next releases.
+{{< /hint >}}
+
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.17.0 Technology Preview
 
 Version 1.17.0 brings major changes, new features and improvements. The Infinite Scale backend introduces an event system as an important platform component and adds support for file locking. ownCloud Web 5.0.0 comes with a full rework of the design and user experience and introduces initial support for the 'Spaces' feauture. Additionally ownCloud Web now supports Collabora Online with the ownCloud 10 backend.
 
 The most prominent changes in ownCloud Infinite Scale 1.17.0 and ownCloud Web 5.0.0 comprise:
 
-- Infinite Scale now comes with the foundations of an event system based on [NATS](nats.io). The events system allows the oCIS services to communicate between each other based on events and will be the key component for features like notifications, auditing and other event-driven extensions/mechanisms. [cs3org/reva#2522](https://github.com/cs3org/reva/pull/2522)
+- Infinite Scale now comes with the foundations of an event system based on [NATS](https://nats.io). The events system allows the oCIS services to communicate between each other based on events and will be the key component for features like notifications, auditing and other event-driven extensions/mechanisms. [cs3org/reva#2522](https://github.com/cs3org/reva/pull/2522)
 - ownCloud Web has been completely reworked in terms of design and user experience (main layout, app switcher, navigation sidebar, icons, user menu, etc.). [web#6102](https://github.com/owncloud/web/issues/6102) [web#6036](https://github.com/owncloud/web/issues/6036) [web#6272](https://github.com/owncloud/web/pull/6272)
 - Initial support for the 'Spaces' feature in Infinite Scale and ownCloud Web has been added. [web#6254](https://github.com/owncloud/web/pull/6254) [web#6199](https://github.com/owncloud/web/pull/6199) [web#6262](https://github.com/owncloud/web/pull/6262) [ocis#2931](https://github.com/owncloud/ocis/pull/2931) [ocis#3095](https://github.com/owncloud/ocis/pull/3095)
 - Infinite Scale now supports file locking on CS3 and WebDAV levels to prevent concurrent/conflicting edits in shared areas. ownCloud Web will soon follow-up with the respective actions and indicators. [cs3org/reva#2460](https://github.com/cs3org/reva/pull/2460)
