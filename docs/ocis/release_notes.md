@@ -9,7 +9,7 @@ geekdocFilePath: release_notes.md
 
 ## ownCloud Infinite Scale 1.18.0 Technology Preview
 
-Version 1.18.0 brings major improvements, new features and bug fixes to the platform. Infinite Scale can now send user notifications via email and the 'Spaces' feature has made a lot of progress towards its initial feature completeness. ownCloud Web comes furthermore with many design and usability improvements that round off the recent redesign initiative.
+Version 1.18.0 brings major improvements, new features and bug fixes to the platform. Infinite Scale can now send user notifications via email and the 'Spaces' feature has made a lot of progress towards its initial feature completeness. Furthermore, ownCloud Web comes with many design and usability improvements that round off the recent redesign initiative.
 
 The most prominent changes in ownCloud Infinite Scale 1.18.0 and ownCloud Web 5.2.0 comprise:
 
