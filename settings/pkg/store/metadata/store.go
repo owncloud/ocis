@@ -43,10 +43,8 @@ type Store struct {
 
 	mdc MetadataClient
 	cfg *config.Config
-	//initStore func(settings.Manager)
 
-	init *sync.Once
-	l    *sync.Mutex
+	l *sync.Mutex
 }
 
 // Init initialize the store once, later calls are noops
@@ -62,26 +60,23 @@ func (s *Store) Init() {
 		return
 	}
 
-	//s.init.Do(func() {
 	mdc := &CachedMDC{next: NewMetadataClient(s.cfg.Metadata)}
 	if err := s.initMetadataClient(mdc); err != nil {
 		s.Logger.Error().Err(err).Msg("error initializing metadata client")
 	}
-	//})
 }
 
 // New creates a new store
-func New(cfg *config.Config, initstore func(settings.Manager)) settings.Manager {
+func New(cfg *config.Config) settings.Manager {
 	s := Store{
-		//Logger: olog.NewLogger(
-		//olog.Color(cfg.Log.Color),
-		//olog.Pretty(cfg.Log.Pretty),
-		//olog.Level(cfg.Log.Level),
-		//olog.File(cfg.Log.File),
-		//),
-		cfg:  cfg,
-		l:    &sync.Mutex{},
-		init: &sync.Once{},
+		Logger: olog.NewLogger(
+			olog.Color(cfg.Log.Color),
+			olog.Pretty(cfg.Log.Pretty),
+			olog.Level(cfg.Log.Level),
+			olog.File(cfg.Log.File),
+		),
+		cfg: cfg,
+		l:   &sync.Mutex{},
 	}
 
 	return &s

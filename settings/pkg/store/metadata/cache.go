@@ -36,7 +36,7 @@ func (c *CachedMDC) SimpleDownload(ctx context.Context, id string) ([]byte, erro
 		return nil, err
 	}
 
-	c.files.Set(id, b)
+	_ = c.files.Set(id, b)
 	return b, nil
 }
 
@@ -54,15 +54,14 @@ func (c *CachedMDC) SimpleUpload(ctx context.Context, id string, content []byte)
 	}
 
 	// invalidate caches
-	err = c.dirs.Remove(path.Dir(id))
-	err = c.files.Set(id, content)
+	_ = c.dirs.Remove(path.Dir(id))
+	_ = c.files.Set(id, content)
 	return nil
 }
 
 // Delete invalidates the cache when operation was successful
 func (c *CachedMDC) Delete(ctx context.Context, id string) error {
-	err := c.next.Delete(ctx, id)
-	if err != nil {
+	if err := c.next.Delete(ctx, id); err != nil {
 		return err
 	}
 

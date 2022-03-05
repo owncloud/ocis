@@ -15,7 +15,8 @@ import (
 	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/settings/pkg/config"
 	"github.com/owncloud/ocis/settings/pkg/settings"
-	store "github.com/owncloud/ocis/settings/pkg/store/metadata"
+	filestore "github.com/owncloud/ocis/settings/pkg/store/filesystem"
+	metastore "github.com/owncloud/ocis/settings/pkg/store/metadata"
 	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -36,7 +37,17 @@ func NewService(cfg *config.Config, logger log.Logger) Service {
 		config: cfg,
 		logger: logger,
 	}
-	service.manager = store.New(cfg, service.RegisterDefaultRoles)
+
+	switch cfg.StoreType {
+	default:
+		fallthrough
+	case "metadata":
+		service.manager = metastore.New(cfg)
+	case "filesystem":
+		service.manager = filestore.New(cfg)
+		// TODO: if we want to further support filesystem store it should use default permissions from store/defaults.go instead using this duplicate
+		service.RegisterDefaultRoles()
+	}
 	return service
 }
 
@@ -86,20 +97,18 @@ func (g Service) CheckPermission(ctx context.Context, req *permissions.CheckPerm
 }
 
 // RegisterDefaultRoles composes default roles and saves them. Skipped if the roles already exist.
-// NOTE: we can't register on service start any more because metadata might not be up yet
-// we need to lazy initialize
-func (g Service) RegisterDefaultRoles(m settings.Manager) {
+func (g Service) RegisterDefaultRoles() {
 	// FIXME: we're writing default roles per service start (i.e. twice at the moment, for http and grpc server). has to happen only once.
 	for _, role := range generateBundlesDefaultRoles() {
 		bundleID := role.Extension + "." + role.Id
 		// check if the role already exists
-		bundle, _ := m.ReadBundle(role.Id)
+		bundle, _ := g.manager.ReadBundle(role.Id)
 		if bundle != nil {
 			g.logger.Debug().Str("bundleID", bundleID).Msg("bundle already exists. skipping.")
 			continue
 		}
 		// create the role
-		_, err := m.WriteBundle(role)
+		_, err := g.manager.WriteBundle(role)
 		if err != nil {
 			g.logger.Error().Err(err).Str("bundleID", bundleID).Msg("failed to register bundle")
 		}
@@ -107,7 +116,7 @@ func (g Service) RegisterDefaultRoles(m settings.Manager) {
 	}
 
 	for _, req := range generatePermissionRequests() {
-		_, err := m.AddSettingToBundle(req.GetBundleId(), req.GetSetting())
+		_, err := g.manager.AddSettingToBundle(req.GetBundleId(), req.GetSetting())
 		if err != nil {
 			g.logger.Error().
 				Err(err).
@@ -118,7 +127,7 @@ func (g Service) RegisterDefaultRoles(m settings.Manager) {
 	}
 
 	for _, req := range defaultRoleAssignments() {
-		if _, err := m.WriteRoleAssignment(req.AccountUuid, req.RoleId); err != nil {
+		if _, err := g.manager.WriteRoleAssignment(req.AccountUuid, req.RoleId); err != nil {
 			g.logger.Error().Err(err).Msg("failed to register role assignment")
 		}
 	}
