@@ -45,7 +45,7 @@ func DefaultConfig() *Config {
 		Metadata: Metadata{
 			GatewayAddress:    "127.0.0.1:9142",
 			StorageAddress:    "127.0.0.1:9215",
-			ServiceUserID:     "058bff95-6708-4fe5-91e4-9ea3d377588b",
+			ServiceUserID:     "ddc2004c-0977-11eb-9d3f-a793888cd0f8",
 			MachineAuthAPIKey: "change-me-please",
 		},
 	}
