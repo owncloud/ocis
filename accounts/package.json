@@ -28,7 +28,7 @@
     "core-js": "^3.17.3",
     "debounce": "^1.2.1",
     "validator": "^13.1.1",
-    "vuex": "^3.5.1"
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.15.5",
