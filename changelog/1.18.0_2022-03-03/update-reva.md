@@ -96,5 +96,4 @@ We updated reva to the version 2.0.0.
 * Enh [cs3org/reva#2526](https://github.com/cs3org/reva/pull/2526) :  Upgrade ginkgo to v2
 
 https://github.com/owncloud/ocis/pull/3231
-https://github.com/owncloud/ocis/pull/3231
-
+https://github.com/owncloud/ocis/pull/3258
