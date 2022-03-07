@@ -40,5 +40,6 @@ type Metadata struct {
 	StorageAddress string `ocisConfig:"storage_addr" env:"STORAGE_GRPC_ADDR"`
 
 	ServiceUserID     string `ocisConfig:"service_user_id" env:"METADATA_SERVICE_USER_UUID"`
+	ServiceUserIDP    string `ocisConfig:"service_user_idp" env:"METADATA_SERVICE_USER_IDP"`
 	MachineAuthAPIKey string `ocisConfig:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY"`
 }

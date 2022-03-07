@@ -46,6 +46,7 @@ func DefaultConfig() *Config {
 			GatewayAddress:    "127.0.0.1:9142",
 			StorageAddress:    "127.0.0.1:9215",
 			ServiceUserID:     "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
+			ServiceUserIDP:    "localhost:9200",
 			MachineAuthAPIKey: "change-me-please",
 		},
 	}
