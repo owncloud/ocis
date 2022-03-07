@@ -59,10 +59,10 @@ func DefaultConfig() *Config {
 			},
 		},
 		ServiceUser: ServiceUser{
-			UUID:     "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-			Username: "service user",
-			UID:      0,
-			GID:      0,
+			UUID: "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
+			// Username: "service user",
+			UID: 0,
+			GID: 0,
 		},
 	}
 }

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"os"
 	"path"
 
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
@@ -45,8 +46,8 @@ func DefaultConfig() *Config {
 		Metadata: Metadata{
 			GatewayAddress:    "127.0.0.1:9142",
 			StorageAddress:    "127.0.0.1:9215",
-			ServiceUserID:     "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-			ServiceUserIDP:    "localhost:9200",
+			ServiceUserID:     "ddc2004c-0977-11eb-9d3f-a793888cd0f8",
+			ServiceUserIDP:    os.Getenv("OCIS_URL"),
 			MachineAuthAPIKey: "change-me-please",
 		},
 	}
