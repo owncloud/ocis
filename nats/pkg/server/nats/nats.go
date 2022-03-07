@@ -8,6 +8,8 @@ import (
 	stanServer "github.com/nats-io/nats-streaming-server/server"
 )
 
+var NATSListenAndServeLoopTimer = 1 * time.Second
+
 type NATSServer struct {
 	ctx context.Context
 
@@ -17,6 +19,7 @@ type NATSServer struct {
 	server *stanServer.StanServer
 }
 
+// NewNATSServer returns a new NATSServer
 func NewNATSServer(ctx context.Context, opts ...Option) (*NATSServer, error) {
 
 	server := &NATSServer{
@@ -32,6 +35,7 @@ func NewNATSServer(ctx context.Context, opts ...Option) (*NATSServer, error) {
 	return server, nil
 }
 
+// ListenAndServe runs the NATSServer in a blocking way until the server is shutdown or an error occurs
 func (n *NATSServer) ListenAndServe() (err error) {
 	n.server, err = stanServer.RunServerWithOpts(
 		n.stanOpts,
@@ -56,7 +60,7 @@ func (n *NATSServer) ListenAndServe() (err error) {
 		if n.ctx.Err() != nil {
 			return nil
 		}
-		time.Sleep(1 * time.Second)
+		time.Sleep(NATSListenAndServeLoopTimer)
 	}
 }
 
