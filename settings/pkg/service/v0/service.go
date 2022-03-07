@@ -45,7 +45,7 @@ func NewService(cfg *config.Config, logger log.Logger) Service {
 		service.manager = metastore.New(cfg)
 	case "filesystem":
 		service.manager = filestore.New(cfg)
-		// TODO: if we want to further support filesystem store it should use default permissions from store/defaults.go instead using this duplicate
+		// TODO: if we want to further support filesystem store it should use default permissions from store/defaults/defaults.go instead using this duplicate
 		service.RegisterDefaultRoles()
 	}
 	return service

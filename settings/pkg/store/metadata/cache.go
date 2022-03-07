@@ -2,7 +2,6 @@ package store
 
 import (
 	"context"
-	"fmt"
 	"path"
 	"strings"
 	"time"
@@ -78,9 +77,7 @@ func (c *CachedMDC) ReadDir(ctx context.Context, id string) ([]string, error) {
 		return i.([]string), nil
 	}
 
-	fmt.Println("readdir calling metadataservice", id)
 	s, err := c.next.ReadDir(ctx, id)
-	fmt.Println("readdir calling metadataservice result", s, err)
 	if err != nil {
 		return nil, err
 	}

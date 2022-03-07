@@ -50,7 +50,7 @@ func (s *Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []stri
 	return bundles, nil
 }
 
-// ReadBundle tries to find a bundle by the given id within the dataPath.
+// ReadBundle tries to find a bundle by the given id from the metadata service
 func (s *Store) ReadBundle(bundleID string) (*settingsmsg.Bundle, error) {
 	if s.mdc == nil {
 		return defaultBundle(settingsmsg.Bundle_TYPE_ROLE, bundleID)[0], nil
