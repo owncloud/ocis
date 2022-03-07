@@ -2,7 +2,24 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.17.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.18.0...master
+
+## Summary
+
+* Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
+
+## Details
+
+* Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
+
+   Added etags in the response of list drives.
+
+   https://github.com/owncloud/ocis/pull/3267
+# Changelog for [1.18.0] (2022-03-03)
+
+The following sections list the changes for 1.18.0.
+
+[1.18.0]: https://github.com/owncloud/ocis/compare/v1.17.0...v1.18.0
 
 ## Summary
 
@@ -15,7 +32,6 @@ The following sections list the changes for unreleased.
 * Enhancement - Re-Enabling web cache control: [#3109](https://github.com/owncloud/ocis/pull/3109)
 * Enhancement - Add SPA conform fileserver for web: [#3109](https://github.com/owncloud/ocis/pull/3109)
 * Enhancement - Implement notifications service: [#3217](https://github.com/owncloud/ocis/pull/3217)
-* Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
 * Enhancement - Thumbnails in spaces: [#3219](https://github.com/owncloud/ocis/pull/3219)
 * Enhancement - Update reva to v2.0.0: [#3231](https://github.com/owncloud/ocis/pull/3231)
 * Enhancement - Update ownCloud Web to v5.2.0: [#6506](https://github.com/owncloud/web/pull/6506)
@@ -92,12 +108,6 @@ The following sections list the changes for unreleased.
    they received a share.
 
    https://github.com/owncloud/ocis/pull/3217
-
-* Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
-
-   Added etags in the response of list drives.
-
-   https://github.com/owncloud/ocis/pull/3267
 
 * Enhancement - Thumbnails in spaces: [#3219](https://github.com/owncloud/ocis/pull/3219)
 
@@ -204,7 +214,7 @@ The following sections list the changes for unreleased.
   * Enh [cs3org/reva#2526](https://github.com/cs3org/reva/pull/2526) :  Upgrade ginkgo to v2
 
    https://github.com/owncloud/ocis/pull/3231
-   https://github.com/owncloud/ocis/pull/3231
+   https://github.com/owncloud/ocis/pull/3258
 
 * Enhancement - Update ownCloud Web to v5.2.0: [#6506](https://github.com/owncloud/web/pull/6506)
 
