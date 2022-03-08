@@ -142,6 +142,13 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 							"db_port":          cfg.Reva.Sharing.UserSQLPort,
 							"db_name":          cfg.Reva.Sharing.UserSQLName,
 						},
+						"cs3": map[string]interface{}{
+							"gateway_addr":        cfg.Reva.Gateway.Endpoint,
+							"provider_addr":       cfg.Reva.Sharing.UserCS3ProviderAddr,
+							"service_user_id":     cfg.Reva.Sharing.UserCS3ServiceUser,
+							"service_user_idp":    cfg.Reva.Sharing.UserCS3ServiceUserIdp,
+							"machine_auth_apikey": cfg.Reva.AuthMachineConfig.MachineAuthAPIKey,
+						},
 					},
 				},
 				"publicshareprovider": map[string]interface{}{

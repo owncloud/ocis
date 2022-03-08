@@ -347,6 +347,8 @@ func DefaultConfig() *config.Config {
 				UserSQLHost:                      "",
 				UserSQLPort:                      1433,
 				UserSQLName:                      "",
+				UserCS3ProviderAddr:              "127.0.0.1:9215",
+				UserCS3ServiceUser:               "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
 				PublicDriver:                     "json",
 				PublicJSONFile:                   path.Join(defaults.BaseDataPath(), "storage", "publicshares.json"),
 				PublicPasswordHashCost:           11,

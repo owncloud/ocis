@@ -78,6 +78,9 @@ type Sharing struct {
 	Port
 	UserDriver                       string `ocisConfig:"user_driver"`
 	UserJSONFile                     string `ocisConfig:"user_json_file"`
+	UserCS3ProviderAddr              string `ocisConfig:"provider_addr"`
+	UserCS3ServiceUser               string `ocisConfig:"service_user_id"`
+	UserCS3ServiceUserIdp            string `ocisConfig:"service_user_idp"`
 	UserSQLUsername                  string `ocisConfig:"user_sql_username"`
 	UserSQLPassword                  string `ocisConfig:"user_sql_password"`
 	UserSQLHost                      string `ocisConfig:"user_sql_host"`
@@ -1205,7 +1208,22 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Reva.Sharing.PublicJanitorRunInterval,
 		},
 
-		// shqringsql
+		// sharing cs3
+
+		{
+			EnvVars:     []string{"STORAGE_SHARING_USER_CS3_PROVIDER_ADDR"},
+			Destination: &cfg.Reva.Sharing.UserCS3ProviderAddr,
+		},
+		{
+			EnvVars:     []string{"STORAGE_SHARING_USER_CS3_SERVICE_USER"},
+			Destination: &cfg.Reva.Sharing.UserCS3ServiceUser,
+		},
+		{
+			EnvVars:     []string{"OCIS_URL", "STORAGE_SHARING_USER_CS3_SERVICE_USER_IDP"},
+			Destination: &cfg.Reva.Sharing.UserCS3ServiceUserIdp,
+		},
+
+		// sharingsql
 		{
 			EnvVars:     []string{"STORAGE_SHARING_USER_SQL_USERNAME"},
 			Destination: &cfg.Reva.Sharing.UserSQLUsername,
