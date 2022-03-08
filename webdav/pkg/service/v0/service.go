@@ -2,6 +2,7 @@ package svc
 
 import (
 	"encoding/xml"
+	"io"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -128,12 +129,7 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(rsp.Thumbnail) == 0 {
-		renderError(w, r, errNotFound(""))
-		return
-	}
-
-	g.mustRender(w, r, newThumbnailResponse(rsp))
+	g.sendThumbnailResponse(rsp, w, r)
 }
 
 // Thumbnail implements the Service interface.
@@ -186,12 +182,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(rsp.Thumbnail) == 0 {
-		renderError(w, r, errNotFound(""))
-		return
-	}
-
-	g.mustRender(w, r, newThumbnailResponse(rsp))
+	g.sendThumbnailResponse(rsp, w, r)
 }
 
 func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
@@ -231,12 +222,7 @@ func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(rsp.Thumbnail) == 0 {
-		renderError(w, r, errNotFound(""))
-		return
-	}
-
-	g.mustRender(w, r, newThumbnailResponse(rsp))
+	g.sendThumbnailResponse(rsp, w, r)
 }
 
 func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
@@ -247,7 +233,7 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
+	_, err = g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
 		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),
 		Width:         tr.Width,
@@ -276,28 +262,56 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(rsp.Thumbnail) == 0 {
-		renderError(w, r, errNotFound(""))
+	w.WriteHeader(http.StatusOK)
+}
+
+func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w http.ResponseWriter, r *http.Request) {
+	client := &http.Client{
+		// Timeout: time.Second * 5,
+	}
+
+	dlReq, err := http.NewRequest(http.MethodGet, rsp.DataEndpoint, http.NoBody)
+	if err != nil {
+		renderError(w, r, errInternalError(err.Error()))
+		g.log.Error().Err(err).Msg("could not download thumbnail")
+		return
+	}
+	dlReq.Header.Set("Transfer-Token", rsp.TransferToken)
+
+	dlRsp, err := client.Do(dlReq)
+	if err != nil {
+		renderError(w, r, errInternalError(err.Error()))
+		g.log.Error().Err(err).Msg("could not download thumbnail")
+		return
+	}
+	defer dlRsp.Body.Close()
+
+	if dlRsp.StatusCode != http.StatusOK {
+		g.log.Error().
+			Str("transfer_token", rsp.TransferToken).
+			Str("data_endpoint", rsp.DataEndpoint).
+			Str("response_status", dlRsp.Status).
+			Msg("could not download thumbnail")
+		renderError(w, r, errInternalError("could not download thumbnail"))
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-}
-
-func extensionToThumbnailType(ext string) thumbnailssvc.GetThumbnailRequest_ThumbnailType {
-	switch strings.ToUpper(ext) {
-	case "GIF":
-		return thumbnailssvc.GetThumbnailRequest_GIF
-	case "PNG":
-		return thumbnailssvc.GetThumbnailRequest_PNG
-	default:
-		return thumbnailssvc.GetThumbnailRequest_JPG
+	w.Header().Set("Content-Type", rsp.Mimetype)
+	_, err = io.Copy(w, dlRsp.Body)
+	if err != nil {
+		g.log.Error().Err(err).Msg("failed to write thumbnail to response writer")
 	}
 }
 
-func (g Webdav) mustRender(w http.ResponseWriter, r *http.Request, renderer render.Renderer) {
-	if err := render.Render(w, r, renderer); err != nil {
-		g.log.Err(err).Msg("failed to write response")
+func extensionToThumbnailType(ext string) thumbnailsmsg.ThumbnailType {
+	switch strings.ToUpper(ext) {
+	case "GIF":
+		return thumbnailsmsg.ThumbnailType_GIF
+	case "PNG":
+		return thumbnailsmsg.ThumbnailType_PNG
+	default:
+		return thumbnailsmsg.ThumbnailType_JPG
 	}
 }
 
@@ -335,25 +349,6 @@ func errBadRequest(msg string) *errResponse {
 
 func errNotFound(msg string) *errResponse {
 	return newErrResponse(http.StatusNotFound, msg)
-}
-
-type thumbnailResponse struct {
-	contentType string
-	thumbnail   []byte
-}
-
-func (t *thumbnailResponse) Render(w http.ResponseWriter, _ *http.Request) error {
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", t.contentType)
-	_, err := w.Write(t.thumbnail)
-	return err
-}
-
-func newThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse) *thumbnailResponse {
-	return &thumbnailResponse{
-		contentType: rsp.Mimetype,
-		thumbnail:   rsp.Thumbnail,
-	}
 }
 
 func renderError(w http.ResponseWriter, r *http.Request, err *errResponse) {

@@ -17,9 +17,14 @@ type InMemory struct {
 	store map[string][]byte
 }
 
+func (s InMemory) Stat(key string) bool {
+	_, exists := s.store[key]
+	return exists
+}
+
 // Get loads the thumbnail from memory.
-func (s InMemory) Get(key string) ([]byte, bool) {
-	return s.store[key], true
+func (s InMemory) Get(key string) ([]byte, error) {
+	return s.store[key], nil
 }
 
 // Set stores the thumbnail in memory.

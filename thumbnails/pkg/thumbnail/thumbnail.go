@@ -5,19 +5,19 @@ import (
 	"image"
 	"image/gif"
 	"mime"
-	"strings"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/storage"
 )
 
 var (
-	SupportedMimeTypes = [...]string{
-		"image/png",
-		"image/jpg",
-		"image/jpeg",
-		"image/gif",
-		"text/plain",
+	// SupportedMimeTypes contains a all mimetypes which are supported by the thumbnailer.
+	SupportedMimeTypes = map[string]struct{}{
+		"image/png":  {},
+		"image/jpg":  {},
+		"image/jpeg": {},
+		"image/gif":  {},
+		"text/plain": {},
 	}
 )
 
@@ -31,11 +31,14 @@ type Request struct {
 
 // Manager is responsible for generating thumbnails
 type Manager interface {
-	// Generate will return a thumbnail for a file
-	Generate(Request, interface{}) ([]byte, error)
-	// Get loads the thumbnail from the storage.
-	// It will return nil if no image is stored for the given context.
-	Get(Request) ([]byte, bool)
+	// Generate creates a thumbnail and stores it.
+	// The function returns a key with which the actual file can be retrieved.
+	Generate(Request, interface{}) (string, error)
+	// CheckThumbnail checks if a thumbnail with the requested attributes exists.
+	// The function will return a status if the file exists and the key to the file.
+	CheckThumbnail(Request) (string, bool)
+	// GetThumbnail will load the thumbnail from the storage and return its content.
+	GetThumbnail(key string) ([]byte, error)
 }
 
 // NewSimpleManager creates a new instance of SimpleManager
@@ -54,9 +57,7 @@ type SimpleManager struct {
 	resolutions Resolutions
 }
 
-// Generate creates a thumbnail and stores it.
-// The created thumbnail is also being returned.
-func (s SimpleManager) Generate(r Request, img interface{}) ([]byte, error) {
+func (s SimpleManager) Generate(r Request, img interface{}) (string, error) {
 	var match image.Rectangle
 	switch m := img.(type) {
 	case *gif.GIF:
@@ -67,28 +68,29 @@ func (s SimpleManager) Generate(r Request, img interface{}) ([]byte, error) {
 
 	thumbnail, err := r.Generator.GenerateThumbnail(match, img)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	dst := new(bytes.Buffer)
-	err = r.Encoder.Encode(dst, thumbnail)
-	if err != nil {
-		return nil, err
+	buf := new(bytes.Buffer)
+	if err := r.Encoder.Encode(buf, thumbnail); err != nil {
+		return "", err
 	}
 
 	k := s.storage.BuildKey(mapToStorageRequest(r))
-	err = s.storage.Put(k, dst.Bytes())
-	if err != nil {
-		s.logger.Warn().Err(err).Msg("could not store thumbnail")
+	if err := s.storage.Put(k, buf.Bytes()); err != nil {
+		s.logger.Error().Err(err).Msg("could not store thumbnail")
+		return "", err
 	}
-	return dst.Bytes(), nil
+	return k, nil
 }
 
-// Get tries to get the stored thumbnail and return it.
-// If there is no cached thumbnail it will return nil
-func (s SimpleManager) Get(r Request) ([]byte, bool) {
+func (s SimpleManager) CheckThumbnail(r Request) (string, bool) {
 	k := s.storage.BuildKey(mapToStorageRequest(r))
-	return s.storage.Get(k)
+	return k, s.storage.Stat(k)
+}
+
+func (s SimpleManager) GetThumbnail(key string) ([]byte, error) {
+	return s.storage.Get(key)
 }
 
 func mapToStorageRequest(r Request) storage.Request {
@@ -104,10 +106,6 @@ func IsMimeTypeSupported(m string) bool {
 	if err != nil {
 		return false
 	}
-	for _, mt := range SupportedMimeTypes {
-		if strings.EqualFold(mt, mimeType) {
-			return true
-		}
-	}
-	return false
+	_, supported := SupportedMimeTypes[mimeType]
+	return supported
 }

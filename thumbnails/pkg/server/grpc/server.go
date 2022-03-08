@@ -5,8 +5,8 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
-	svc "github.com/owncloud/ocis/thumbnails/pkg/service/v0"
-	"github.com/owncloud/ocis/thumbnails/pkg/service/v0/decorators"
+	svc "github.com/owncloud/ocis/thumbnails/pkg/service/grpc/v0"
+	"github.com/owncloud/ocis/thumbnails/pkg/service/grpc/v0/decorators"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/storage"
 )

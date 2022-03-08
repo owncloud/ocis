@@ -18,6 +18,11 @@ func DefaultConfig() *Config {
 			Addr:      "127.0.0.1:9185",
 			Namespace: "com.owncloud.api",
 		},
+		HTTP: HTTP{
+			Addr:      "127.0.0.1:9186",
+			Root:      "/thumbnails",
+			Namespace: "com.owncloud.web",
+		},
 		Service: Service{
 			Name: "thumbnails",
 		},
@@ -29,6 +34,8 @@ func DefaultConfig() *Config {
 			WebdavAllowInsecure: true,
 			RevaGateway:         "127.0.0.1:9142",
 			CS3AllowInsecure:    false,
+			TransferTokenSecret: "changemeplease",
+			DataEndpoint:        "http://127.0.0.1:9186/thumbnails/data",
 		},
 	}
 }

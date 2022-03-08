@@ -30,16 +30,6 @@
   ],
   "paths": {},
   "definitions": {
-    "GetThumbnailRequestThumbnailType": {
-      "type": "string",
-      "enum": [
-        "PNG",
-        "JPG",
-        "GIF"
-      ],
-      "default": "PNG",
-      "description": "The file types to which the thumbnail can get encoded to."
-    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -81,10 +71,13 @@
     "v0GetThumbnailResponse": {
       "type": "object",
       "properties": {
-        "thumbnail": {
+        "dataEndpoint": {
           "type": "string",
-          "format": "byte",
-          "title": "The thumbnail as a binary"
+          "description": "The endpoint where the thumbnail can be downloaded."
+        },
+        "transferToken": {
+          "type": "string",
+          "description": "The transfer token to be able to download the thumbnail."
         },
         "mimetype": {
           "type": "string",
@@ -92,6 +85,16 @@
         }
       },
       "title": "The service response"
+    },
+    "v0ThumbnailType": {
+      "type": "string",
+      "enum": [
+        "PNG",
+        "JPG",
+        "GIF"
+      ],
+      "default": "PNG",
+      "description": "The file types to which the thumbnail can be encoded to."
     },
     "v0WebdavSource": {
       "type": "object",
