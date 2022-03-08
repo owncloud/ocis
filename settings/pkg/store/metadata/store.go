@@ -7,7 +7,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/cs3org/reva/pkg/storage/utils/metadata"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/gofrs/uuid"
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
