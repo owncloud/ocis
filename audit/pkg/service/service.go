@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -29,33 +30,36 @@ func AuditLoggerFromConfig(cfg config.Auditlog, ch <-chan interface{}, log log.L
 		logs = append(logs, WriteToFile(cfg.FilePath, log))
 	}
 
-	StartAuditLogger(ch, log, Marshal(cfg.Format, log), logs...)
+	StartAuditLogger(context.TODO(), ch, log, Marshal(cfg.Format, log), logs...)
 
 }
 
 // StartAuditLogger will block. run in seperate go routine
-func StartAuditLogger(ch <-chan interface{}, log log.Logger, marshaller Marshaller, logto ...Log) {
+func StartAuditLogger(ctx context.Context, ch <-chan interface{}, log log.Logger, marshaller Marshaller, logto ...Log) {
 	for {
-		i := <-ch
+		select {
+		case <-ctx.Done():
+			return
+		case i := <-ch:
+			var auditEvent interface{}
+			switch ev := i.(type) {
+			case events.ShareCreated:
+				auditEvent = types.ShareCreated(ev)
+			default:
+				log.Error().Interface("event", ev).Msg(fmt.Sprintf("can't handle event of type '%T'", ev))
+				continue
 
-		var auditEvent interface{}
-		switch ev := i.(type) {
-		case events.ShareCreated:
-			auditEvent = types.ShareCreated(ev)
-		default:
-			log.Error().Interface("event", ev).Msg(fmt.Sprintf("can't handle event of type '%T'", ev))
-			continue
+			}
 
-		}
+			b, err := marshaller(auditEvent)
+			if err != nil {
+				log.Error().Err(err).Msg("error marshaling the event")
+				continue
+			}
 
-		b, err := marshaller(auditEvent)
-		if err != nil {
-			log.Error().Err(err).Msg("error marshaling the event")
-			continue
-		}
-
-		for _, l := range logto {
-			l(b)
+			for _, l := range logto {
+				l(b)
+			}
 		}
 	}
 
