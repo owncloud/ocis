@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/owncloud/ocis/accounts/pkg/command"
-	defaults "github.com/owncloud/ocis/accounts/pkg/config/defaults"
+	"github.com/owncloud/ocis/accounts/pkg/config/defaults"
 )
 
 func main() {

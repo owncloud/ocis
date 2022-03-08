@@ -4,8 +4,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/settings/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {
@@ -19,14 +19,17 @@ func FullDefaultConfig() *config.Config {
 
 func DefaultConfig() *config.Config {
 	return &config.Config{
+		Service: config.Service{
+			Name: "settings",
+		},
 		Debug: config.Debug{
-			Addr:   "127.0.0.1:9182",
+			Addr:   "127.0.0.1:9194",
 			Token:  "",
 			Pprof:  false,
 			Zpages: false,
 		},
 		HTTP: config.HTTP{
-			Addr:      "127.0.0.1:9181",
+			Addr:      "127.0.0.1:9190",
 			Namespace: "com.owncloud.web",
 			Root:      "/",
 			CacheTTL:  604800, // 7 days
@@ -38,47 +41,20 @@ func DefaultConfig() *config.Config {
 			},
 		},
 		GRPC: config.GRPC{
-			Addr:      "127.0.0.1:9180",
+			Addr:      "127.0.0.1:9191",
 			Namespace: "com.owncloud.api",
 		},
-		Service: config.Service{
-			Name: "accounts",
+		DataPath: path.Join(defaults.BaseDataPath(), "settings"),
+		Asset: config.Asset{
+			Path: "",
 		},
-		Asset: config.Asset{},
 		TokenManager: config.TokenManager{
 			JWTSecret: "Pive-Fumkiu4",
-		},
-		HashDifficulty:     11,
-		DemoUsersAndGroups: true,
-		Repo: config.Repo{
-			Backend: "CS3",
-			Disk: config.Disk{
-				Path: path.Join(defaults.BaseDataPath(), "accounts"),
-			},
-			CS3: config.CS3{
-				ProviderAddr: "localhost:9215",
-			},
-		},
-		Index: config.Index{
-			UID: config.UIDBound{
-				Lower: 0,
-				Upper: 1000,
-			},
-			GID: config.GIDBound{
-				Lower: 0,
-				Upper: 1000,
-			},
-		},
-		ServiceUser: config.ServiceUser{
-			UUID:     "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-			Username: "",
-			UID:      0,
-			GID:      0,
 		},
 	}
 }
 
-func EnsureDefaults(cfg *config.Config) error {
+func EnsureDefaults(cfg *config.Config) {
 	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
 	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
 		cfg.Log = &config.Log{
@@ -101,8 +77,6 @@ func EnsureDefaults(cfg *config.Config) error {
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
 	}
-
-	return nil
 }
 
 func Sanitize(cfg *config.Config) {
@@ -110,5 +84,4 @@ func Sanitize(cfg *config.Config) {
 	if cfg.HTTP.Root != "/" {
 		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 	}
-	cfg.Repo.Backend = strings.ToLower(cfg.Repo.Backend)
 }

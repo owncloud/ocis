@@ -83,7 +83,7 @@ func DefaultConfig() *config.Config {
 	}
 }
 
-func EnsureDefaults(cfg *config.Config) error {
+func EnsureDefaults(cfg *config.Config) {
 	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
 	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
 		cfg.Log = &config.Log{
@@ -106,14 +106,11 @@ func EnsureDefaults(cfg *config.Config) error {
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
 	}
-
-	return nil
 }
 
-func Sanitize(cfg *config.Config) error {
+func Sanitize(cfg *config.Config) {
 	// sanitize config
 	if cfg.HTTP.Root != "/" {
 		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 	}
-	return nil
 }

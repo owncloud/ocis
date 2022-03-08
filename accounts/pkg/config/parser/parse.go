@@ -30,10 +30,7 @@ func ParseConfig(cfg *config.Config) error {
 		}
 	}
 
-	err = defaults.Sanitize(cfg)
-	if err != nil {
-		return err
-	}
+	defaults.Sanitize(cfg)
 
 	return nil
 }

@@ -1,11 +1,9 @@
 package defaults
 
 import (
-	"path"
 	"strings"
 
-	"github.com/owncloud/ocis/accounts/pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/ocs/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {
@@ -20,16 +18,15 @@ func FullDefaultConfig() *config.Config {
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
-			Addr:   "127.0.0.1:9182",
+			Addr:   "127.0.0.1:9114",
 			Token:  "",
 			Pprof:  false,
 			Zpages: false,
 		},
 		HTTP: config.HTTP{
-			Addr:      "127.0.0.1:9181",
+			Addr:      "127.0.0.1:9110",
+			Root:      "/ocs",
 			Namespace: "com.owncloud.web",
-			Root:      "/",
-			CacheTTL:  604800, // 7 days
 			CORS: config.CORS{
 				AllowedOrigins:   []string{"*"},
 				AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
@@ -37,48 +34,26 @@ func DefaultConfig() *config.Config {
 				AllowCredentials: true,
 			},
 		},
-		GRPC: config.GRPC{
-			Addr:      "127.0.0.1:9180",
-			Namespace: "com.owncloud.api",
-		},
 		Service: config.Service{
-			Name: "accounts",
+			Name: "ocs",
 		},
-		Asset: config.Asset{},
+
 		TokenManager: config.TokenManager{
 			JWTSecret: "Pive-Fumkiu4",
 		},
-		HashDifficulty:     11,
-		DemoUsersAndGroups: true,
-		Repo: config.Repo{
-			Backend: "CS3",
-			Disk: config.Disk{
-				Path: path.Join(defaults.BaseDataPath(), "accounts"),
-			},
-			CS3: config.CS3{
-				ProviderAddr: "localhost:9215",
-			},
+		AccountBackend: "accounts",
+		Reva: config.Reva{
+			Address: "127.0.0.1:9142",
 		},
-		Index: config.Index{
-			UID: config.UIDBound{
-				Lower: 0,
-				Upper: 1000,
-			},
-			GID: config.GIDBound{
-				Lower: 0,
-				Upper: 1000,
-			},
-		},
-		ServiceUser: config.ServiceUser{
-			UUID:     "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-			Username: "",
-			UID:      0,
-			GID:      0,
+		StorageUsersDriver: "ocis",
+		MachineAuthAPIKey:  "change-me-please",
+		IdentityManagement: config.IdentityManagement{
+			Address: "https://localhost:9200",
 		},
 	}
 }
 
-func EnsureDefaults(cfg *config.Config) error {
+func EnsureDefaults(cfg *config.Config) {
 	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
 	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
 		cfg.Log = &config.Log{
@@ -102,7 +77,6 @@ func EnsureDefaults(cfg *config.Config) error {
 		cfg.Tracing = &config.Tracing{}
 	}
 
-	return nil
 }
 
 func Sanitize(cfg *config.Config) {
@@ -110,5 +84,4 @@ func Sanitize(cfg *config.Config) {
 	if cfg.HTTP.Root != "/" {
 		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 	}
-	cfg.Repo.Backend = strings.ToLower(cfg.Repo.Backend)
 }

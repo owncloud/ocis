@@ -17,10 +17,7 @@ func ParseConfig(cfg *config.Config) error {
 		return err
 	}
 
-	err = defaults.EnsureDefaults(cfg)
-	if err != nil {
-		return err
-	}
+	defaults.EnsureDefaults(cfg)
 
 	// load all env variables relevant to the config in the current context.
 	if err := envdecode.Decode(cfg); err != nil {
@@ -30,10 +27,7 @@ func ParseConfig(cfg *config.Config) error {
 		}
 	}
 
-	err = defaults.Sanitize(cfg)
-	if err != nil {
-		return err
-	}
+	defaults.Sanitize(cfg)
 
 	return nil
 }
