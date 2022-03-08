@@ -39,7 +39,7 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			svc.StartAuditLogger(cfg.Auditlog, evts, logger)
+			svc.AuditLoggerFromConfig(cfg.Auditlog, evts, logger)
 			return nil
 		},
 	}
