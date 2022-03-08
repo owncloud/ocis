@@ -1,13 +1,13 @@
 package config
 
 import (
-	accounts "github.com/owncloud/ocis/accounts/pkg/config"
+	accounts "github.com/owncloud/ocis/accounts/pkg/config/defaults"
 	audit "github.com/owncloud/ocis/audit/pkg/config"
 	glauth "github.com/owncloud/ocis/glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/graph/pkg/config"
 	idm "github.com/owncloud/ocis/idm/pkg/config"
-	idp "github.com/owncloud/ocis/idp/pkg/config"
+	idp "github.com/owncloud/ocis/idp/pkg/config/defaults"
 	nats "github.com/owncloud/ocis/nats/pkg/config"
 	notifications "github.com/owncloud/ocis/notifications/pkg/config"
 	ocs "github.com/owncloud/ocis/ocs/pkg/config"

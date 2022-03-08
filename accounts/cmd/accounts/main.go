@@ -4,11 +4,11 @@ import (
 	"os"
 
 	"github.com/owncloud/ocis/accounts/pkg/command"
-	"github.com/owncloud/ocis/accounts/pkg/config"
+	defaults "github.com/owncloud/ocis/accounts/pkg/config/defaults"
 )
 
 func main() {
-	if err := command.Execute(config.DefaultConfig()); err != nil {
+	if err := command.Execute(defaults.DefaultConfig()); err != nil {
 		os.Exit(1)
 	}
 }
