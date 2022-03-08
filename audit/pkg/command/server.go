@@ -6,11 +6,10 @@ import (
 	"github.com/asim/go-micro/plugins/events/nats/v4"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/server"
-	"github.com/owncloud/ocis/notifications/pkg/channels"
-	"github.com/owncloud/ocis/notifications/pkg/config"
-	"github.com/owncloud/ocis/notifications/pkg/config/parser"
-	"github.com/owncloud/ocis/notifications/pkg/logging"
-	"github.com/owncloud/ocis/notifications/pkg/service"
+	"github.com/owncloud/ocis/audit/pkg/config"
+	"github.com/owncloud/ocis/audit/pkg/config/parser"
+	"github.com/owncloud/ocis/audit/pkg/logging"
+	svc "github.com/owncloud/ocis/audit/pkg/service"
 	"github.com/urfave/cli/v2"
 )
 
@@ -30,7 +29,7 @@ func Server(cfg *config.Config) *cli.Command {
 				events.ShareCreated{},
 			}
 
-			evtsCfg := cfg.Notifications.Events
+			evtsCfg := cfg.Events
 			client, err := server.NewNatsStream(nats.Address(evtsCfg.Endpoint), nats.ClusterID(evtsCfg.Cluster))
 			if err != nil {
 				return err
@@ -39,12 +38,9 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-			channel, err := channels.NewMailChannel(*cfg, logger)
-			if err != nil {
-				return err
-			}
-			svc := service.NewEventsNotifier(evts, channel, logger)
-			return svc.Run()
+
+			svc.StartAuditLogger(cfg.Auditlog, evts, logger)
+			return nil
 		},
 	}
 }

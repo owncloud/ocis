@@ -18,7 +18,9 @@ import (
 	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v4"
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
+
 	accounts "github.com/owncloud/ocis/accounts/pkg/command"
+	audit "github.com/owncloud/ocis/audit/pkg/command"
 	glauth "github.com/owncloud/ocis/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/graph/pkg/command"
@@ -93,6 +95,7 @@ func NewService(options ...Option) (*Service, error) {
 		cfg:          opts.Config,
 	}
 
+	s.ServicesRegistry["audit"] = audit.NewSutureService
 	s.ServicesRegistry["settings"] = settings.NewSutureService
 	s.ServicesRegistry["nats"] = nats.NewSutureService
 	s.ServicesRegistry["storage-metadata"] = storage.NewStorageMetadata

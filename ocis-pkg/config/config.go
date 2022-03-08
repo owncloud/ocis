@@ -4,6 +4,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 
 	accounts "github.com/owncloud/ocis/accounts/pkg/config"
+	audit "github.com/owncloud/ocis/audit/pkg/config"
 	glauth "github.com/owncloud/ocis/glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/graph/pkg/config"
@@ -58,6 +59,7 @@ type Config struct {
 	TokenManager TokenManager `ocisConfig:"token_manager"`
 	Runtime      Runtime      `ocisConfig:"runtime"`
 
+	Audit         *audit.Config         `ocsiConfig:"audit"`
 	Accounts      *accounts.Config      `ocisConfig:"accounts"`
 	GLAuth        *glauth.Config        `ocisConfig:"glauth"`
 	Graph         *graph.Config         `ocisConfig:"graph"`

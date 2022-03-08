@@ -1,48 +1,69 @@
 package svc
 
 import (
-	"github.com/go-chi/chi"
+	"encoding/json"
+	"fmt"
+	"os"
+
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/audit/pkg/config"
+	"github.com/owncloud/ocis/audit/pkg/types"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
-// Service defines the extension handlers.
-type Service interface {
-	ListenForEvents()
-}
+// StartAuditLogger starts the audit logger
+func StartAuditLogger(c config.Auditlog, ch <-chan interface{}, log log.Logger) {
+	for {
+		i := <-ch
 
-// NewService returns a service implementation for Service.
-func NewService(opts ...Option) Service {
-	options := newOptions(opts...)
+		var auditEvent interface{}
+		switch ev := i.(type) {
+		case events.ShareCreated:
+			auditEvent = types.ShareCreated(ev)
+		default:
+			log.Error().Interface("event", ev).Msg(fmt.Sprintf("can't handle event of type '%T'", ev))
+			continue
 
-	m := chi.NewMux()
-	m.Use(options.Middleware...)
+		}
 
-	svc := Audit{
-		logger: options.Logger,
-		config: options.Config,
-		mux:    m,
+		b, err := marshal(auditEvent, c.Format)
+		if err != nil {
+			log.Error().Err(err).Msg("error marshaling the event")
+			continue
+		}
+
+		if c.LogToConsole {
+			log.Error().Msg(string(b))
+		}
+
+		if c.LogToFile {
+			err := writeToFile(c.FilePath, b)
+			if err != nil {
+				log.Error().Err(err).Msg("error writing audit log file")
+			}
+		}
+
 	}
 
-	go svc.ListenForEvents()
-	return svc
 }
 
-// Audit defines implements the business logic for Service.
-type Audit struct {
-	logger log.Logger
-	config *config.Config
-	mux    *chi.Mux
-}
-
-// ListenForEvents hooks into event queue and logs interesting events
-func (g Audit) ListenForEvents() {
-	log := g.logger
-	ch, err := startConsumer(g.config.Eventstream, log)
+func writeToFile(path string, ev []byte) error {
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
-		log.Fatal().Err(err).Msg("can't listen for events")
-		return
+		return err
 	}
+	defer file.Close()
+	if _, err := fmt.Fprintln(file, string(ev)); err != nil {
+		return err
+	}
+	return nil
+}
 
-	startAuditLogger(g.config.Auditlog, ch, log)
+func marshal(ev interface{}, format string) ([]byte, error) {
+	switch format {
+	default:
+		return nil, fmt.Errorf("unsupported format '%s'", format)
+	case "json":
+		return json.Marshal(ev)
+	}
 }

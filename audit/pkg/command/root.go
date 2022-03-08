@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/owncloud/ocis/notifications/pkg/config"
+	"github.com/owncloud/ocis/audit/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/clihelper"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/thejerf/suture/v4"
@@ -25,11 +25,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the notifications command.
+// Execute is the entry point for the audit command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:     "notifications",
-		Usage:    "starts notifications service",
+		Name:     "audit",
+		Usage:    "starts audit service",
 		Commands: GetCommands(cfg),
 	})
 
@@ -41,16 +41,16 @@ func Execute(cfg *config.Config) error {
 	return app.Run(os.Args)
 }
 
-// SutureService allows for the notifications command to be embedded and supervised by a suture supervisor tree.
+// SutureService allows for the audit command to be embedded and supervised by a suture supervisor tree.
 type SutureService struct {
 	cfg *config.Config
 }
 
-// NewSutureService creates a new notifications.SutureService
+// NewSutureService creates a new audit.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
 	cfg.Settings.Commons = cfg.Commons
 	return SutureService{
-		cfg: cfg.Notifications,
+		cfg: cfg.Audit,
 	}
 }
 

@@ -2,6 +2,7 @@ package config
 
 import (
 	accounts "github.com/owncloud/ocis/accounts/pkg/config"
+	audit "github.com/owncloud/ocis/audit/pkg/config"
 	glauth "github.com/owncloud/ocis/glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/graph/pkg/config"
@@ -28,6 +29,7 @@ func DefaultConfig() *Config {
 			Port: "9250",
 			Host: "localhost",
 		},
+		Audit:         audit.DefaultConfig(),
 		Accounts:      accounts.DefaultConfig(),
 		GLAuth:        glauth.DefaultConfig(),
 		Graph:         graph.DefaultConfig(),
