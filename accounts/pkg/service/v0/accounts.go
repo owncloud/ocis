@@ -99,33 +99,6 @@ func (s Service) hasSelfManagementPermissions(ctx context.Context) bool {
 	return s.RoleManager.FindPermissionByID(ctx, roleIDs, SelfManagementPermissionID) != nil
 }
 
-// serviceUserToIndex temporarily adds a service user to the index, which is supposed to be removed before the lock on the handler function is released
-func (s Service) serviceUserToIndex() (teardownServiceUser func()) {
-	if s.Config.ServiceUser.Username != "" && s.Config.ServiceUser.UUID != "" {
-		_, err := s.index.Add(s.getInMemoryServiceUser())
-		if err != nil {
-			s.log.Logger.Err(err).Msg("service user was configured but failed to be added to the index")
-		} else {
-			return func() {
-				_ = s.index.Delete(s.getInMemoryServiceUser())
-			}
-		}
-	}
-	return func() {}
-}
-
-func (s Service) getInMemoryServiceUser() accountsmsg.Account {
-	return accountsmsg.Account{
-		AccountEnabled:           true,
-		Id:                       s.Config.ServiceUser.UUID,
-		PreferredName:            s.Config.ServiceUser.Username,
-		OnPremisesSamAccountName: s.Config.ServiceUser.Username,
-		DisplayName:              s.Config.ServiceUser.Username,
-		UidNumber:                s.Config.ServiceUser.UID,
-		GidNumber:                s.Config.ServiceUser.GID,
-	}
-}
-
 // ListAccounts implements the AccountsServiceHandler interface
 // the query contains account properties
 func (s Service) ListAccounts(ctx context.Context, in *accountssvc.ListAccountsRequest, out *accountssvc.ListAccountsResponse) (err error) {
@@ -145,8 +118,6 @@ func (s Service) ListAccounts(ctx context.Context, in *accountssvc.ListAccountsR
 	}
 	onlySelf := hasSelf && !hasManagement
 
-	teardownServiceUser := s.serviceUserToIndex()
-	defer teardownServiceUser()
 	match, authRequest := getAuthQueryMatch(in.Query)
 	if authRequest {
 		password := match[2]
