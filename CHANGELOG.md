@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
+* Enhancement - Improve thumbnails API: [#3272](https://github.com/owncloud/ocis/pull/3272)
 
 ## Details
 
@@ -15,6 +16,14 @@ The following sections list the changes for unreleased.
    Added etags in the response of list drives.
 
    https://github.com/owncloud/ocis/pull/3267
+
+* Enhancement - Improve thumbnails API: [#3272](https://github.com/owncloud/ocis/pull/3272)
+
+   Changed the thumbnails API to no longer transfer images via GRPC. GRPC has a limited message
+   size and isn't very efficient with large binary data. The new API transports the images over
+   HTTP.
+
+   https://github.com/owncloud/ocis/pull/3272
 # Changelog for [1.18.0] (2022-03-03)
 
 The following sections list the changes for 1.18.0.
