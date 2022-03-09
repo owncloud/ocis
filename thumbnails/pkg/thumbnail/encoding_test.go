@@ -14,7 +14,7 @@ func TestEncoderForType(t *testing.T) {
 	}
 
 	for k, v := range table {
-		e := EncoderForType(k)
+		e, _ := EncoderForType(k)
 		if e != v {
 			t.Fail()
 		}

@@ -17,6 +17,7 @@ type Config struct {
 	Debug   Debug    `ocisConfig:"debug"`
 
 	GRPC GRPC `ocisConfig:"grpc"`
+	HTTP HTTP `ocisConfig:"http"`
 
 	Thumbnail Thumbnail `ocisConfig:"thumbnail"`
 
@@ -41,4 +42,6 @@ type Thumbnail struct {
 	CS3AllowInsecure    bool              `ocisConfig:"cs3_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_CS3SOURCE_INSECURE"`
 	RevaGateway         string            `ocisConfig:"reva_gateway" env:"REVA_GATEWAY"` //TODO: use REVA config
 	FontMapFile         string            `ocisConfig:"font_map_file" env:"THUMBNAILS_TXT_FONTMAP_FILE"`
+	TransferTokenSecret string            `ocisConfig:"transfer_token" env:"THUMBNAILS_TRANSFER_TOKEN"`
+	DataEndpoint        string            `ocisConfig:"data_endpoint" env:"THUMBNAILS_DATA_ENDPOINT"`
 }

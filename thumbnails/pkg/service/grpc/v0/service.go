@@ -6,15 +6,19 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	thumbnailsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/thumbnails/v0"
 	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
 	"github.com/owncloud/ocis/thumbnails/pkg/preprocessor"
-	"github.com/owncloud/ocis/thumbnails/pkg/service/v0/decorators"
+	"github.com/owncloud/ocis/thumbnails/pkg/service/grpc/v0/decorators"
+	tjwt "github.com/owncloud/ocis/thumbnails/pkg/service/jwt"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail"
 	"github.com/owncloud/ocis/thumbnails/pkg/thumbnail/imgsource"
 	"github.com/pkg/errors"
@@ -44,6 +48,8 @@ func NewService(opts ...Option) decorators.DecoratedService {
 		preprocessorOpts: PreprocessorOpts{
 			TxtFontFileMap: options.Config.Thumbnail.FontMapFile,
 		},
+		dataEndpoint:        options.Config.Thumbnail.DataEndpoint,
+		transferTokenSecret: options.Config.Thumbnail.TransferTokenSecret,
 	}
 
 	return svc
@@ -51,13 +57,15 @@ func NewService(opts ...Option) decorators.DecoratedService {
 
 // Thumbnail implements the GRPC handler.
 type Thumbnail struct {
-	serviceID        string
-	manager          thumbnail.Manager
-	webdavSource     imgsource.Source
-	cs3Source        imgsource.Source
-	logger           log.Logger
-	cs3Client        gateway.GatewayAPIClient
-	preprocessorOpts PreprocessorOpts
+	serviceID           string
+	dataEndpoint        string
+	transferTokenSecret string
+	manager             thumbnail.Manager
+	webdavSource        imgsource.Source
+	cs3Source           imgsource.Source
+	logger              log.Logger
+	cs3Client           gateway.GatewayAPIClient
+	preprocessorOpts    PreprocessorOpts
 }
 
 type PreprocessorOpts struct {
@@ -66,24 +74,28 @@ type PreprocessorOpts struct {
 
 // GetThumbnail retrieves a thumbnail for an image
 func (g Thumbnail) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest, rsp *thumbnailssvc.GetThumbnailResponse) error {
-	_, ok := thumbnailssvc.GetThumbnailRequest_ThumbnailType_value[req.ThumbnailType.String()]
+	tType, ok := thumbnailsmsg.ThumbnailType_name[int32(req.ThumbnailType)]
 	if !ok {
-		g.logger.Debug().Str("thumbnail_type", req.ThumbnailType.String()).Msg("unsupported thumbnail type")
+		g.logger.Debug().Str("thumbnail_type", tType).Msg("unsupported thumbnail type")
 		return nil
 	}
-	encoder := thumbnail.EncoderForType(req.ThumbnailType.String())
-	if encoder == nil {
-		g.logger.Debug().Str("thumbnail_type", req.ThumbnailType.String()).Msg("unsupported thumbnail type")
+	generator, err := thumbnail.GeneratorForType(tType)
+	if err != nil {
+		g.logger.Debug().Str("thumbnail_type", tType).Msg("unsupported thumbnail type")
+		return nil
+	}
+	encoder, err := thumbnail.EncoderForType(tType)
+	if err != nil {
+		g.logger.Debug().Str("thumbnail_type", tType).Msg("unsupported thumbnail type")
 		return nil
 	}
 
-	var thumb []byte
-	var err error
+	var key string
 	switch {
 	case req.GetWebdavSource() != nil:
-		thumb, err = g.handleWebdavSource(ctx, req, encoder)
+		key, err = g.handleWebdavSource(ctx, req, generator, encoder)
 	case req.GetCs3Source() != nil:
-		thumb, err = g.handleCS3Source(ctx, req, encoder)
+		key, err = g.handleCS3Source(ctx, req, generator, encoder)
 	default:
 		g.logger.Error().Msg("no image source provided")
 		return merrors.BadRequest(g.serviceID, "image source is missing")
@@ -92,33 +104,53 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumb
 		return err
 	}
 
-	rsp.Thumbnail = thumb
+	claims := tjwt.ThumbnailClaims{
+		Key: key,
+		RegisteredClaims: jwt.RegisteredClaims{
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Minute)),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	transferToken, err := token.SignedString([]byte(g.transferTokenSecret))
+	if err != nil {
+		g.logger.Error().
+			Err(err).
+			Msg("GetThumbnail: failed to sign token")
+		return merrors.InternalServerError(g.serviceID, "couldn't finish request")
+	}
+	rsp.DataEndpoint = g.dataEndpoint
+	rsp.TransferToken = transferToken
 	rsp.Mimetype = encoder.MimeType()
 	return nil
 }
 
-func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest, encoder thumbnail.Encoder) ([]byte, error) {
+func (g Thumbnail) handleCS3Source(ctx context.Context,
+	req *thumbnailssvc.GetThumbnailRequest,
+	generator thumbnail.Generator,
+	encoder thumbnail.Encoder) (string, error) {
 	src := req.GetCs3Source()
 	sRes, err := g.stat(src.Path, src.Authorization)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	tr := thumbnail.Request{
 		Resolution: image.Rect(0, 0, int(req.Width), int(req.Height)),
+		Generator:  generator,
 		Encoder:    encoder,
 		Checksum:   sRes.GetInfo().GetChecksum().GetSum(),
 	}
 
-	thumb, ok := g.manager.Get(tr)
-	if ok {
-		return thumb, nil
+	if key, exists := g.manager.CheckThumbnail(tr); exists {
+		return key, nil
 	}
 
 	ctx = imgsource.ContextSetAuthorization(ctx, src.Authorization)
 	r, err := g.cs3Source.Get(ctx, src.Path)
 	if err != nil {
-		return nil, merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
+		return "", merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
 	defer r.Close() // nolint:errcheck
 	ppOpts := map[string]interface{}{
@@ -127,20 +159,24 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 	pp := preprocessor.ForType(sRes.GetInfo().GetMimeType(), ppOpts)
 	img, err := pp.Convert(r)
 	if img == nil || err != nil {
-		return nil, merrors.InternalServerError(g.serviceID, "could not get image")
-	}
-	if thumb, err = g.manager.Generate(tr, img); err != nil {
-		return nil, err
+		return "", merrors.InternalServerError(g.serviceID, "could not get image")
 	}
 
-	return thumb, nil
+	key, err := g.manager.Generate(tr, img)
+	if err != nil {
+		return "", err
+	}
+	return key, nil
 }
 
-func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest, encoder thumbnail.Encoder) ([]byte, error) {
+func (g Thumbnail) handleWebdavSource(ctx context.Context,
+	req *thumbnailssvc.GetThumbnailRequest,
+	generator thumbnail.Generator,
+	encoder thumbnail.Encoder) (string, error) {
 	src := req.GetWebdavSource()
 	imgURL, err := url.Parse(src.Url)
 	if err != nil {
-		return nil, errors.Wrap(err, "source url is invalid")
+		return "", errors.Wrap(err, "source url is invalid")
 	}
 
 	var auth, statPath string
@@ -168,7 +204,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 		}
 
 		if err != nil {
-			return nil, merrors.InternalServerError(g.serviceID, "could not authenticate: %s", err.Error())
+			return "", merrors.InternalServerError(g.serviceID, "could not authenticate: %s", err.Error())
 		}
 		auth = rsp.Token
 		statPath = path.Join("/public", src.PublicLinkToken, req.Filepath)
@@ -178,16 +214,17 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	}
 	sRes, err := g.stat(statPath, auth)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	tr := thumbnail.Request{
 		Resolution: image.Rect(0, 0, int(req.Width), int(req.Height)),
+		Generator:  generator,
 		Encoder:    encoder,
 		Checksum:   sRes.GetInfo().GetChecksum().GetSum(),
 	}
-	thumb, ok := g.manager.Get(tr)
-	if ok {
-		return thumb, nil
+
+	if key, exists := g.manager.CheckThumbnail(tr); exists {
+		return key, nil
 	}
 
 	if src.WebdavAuthorization != "" {
@@ -196,7 +233,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	imgURL.RawQuery = ""
 	r, err := g.webdavSource.Get(ctx, imgURL.String())
 	if err != nil {
-		return nil, merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
+		return "", merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
 	defer r.Close() // nolint:errcheck
 	ppOpts := map[string]interface{}{
@@ -205,13 +242,14 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	pp := preprocessor.ForType(sRes.GetInfo().GetMimeType(), ppOpts)
 	img, err := pp.Convert(r)
 	if img == nil || err != nil {
-		return nil, merrors.InternalServerError(g.serviceID, "could not get image")
-	}
-	if thumb, err = g.manager.Generate(tr, img); err != nil {
-		return nil, err
+		return "", merrors.InternalServerError(g.serviceID, "could not get image")
 	}
 
-	return thumb, nil
+	key, err := g.manager.Generate(tr, img)
+	if err != nil {
+		return "", err
+	}
+	return key, nil
 }
 
 func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
