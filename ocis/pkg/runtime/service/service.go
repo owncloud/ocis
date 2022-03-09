@@ -19,8 +19,6 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
 
-	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/command"
-	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/command"
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/command"
@@ -97,7 +95,6 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["settings"] = settings.NewSutureService
 	s.ServicesRegistry["nats"] = nats.NewSutureService
 	s.ServicesRegistry["storage-metadata"] = storage.NewStorageMetadata
-	s.ServicesRegistry["glauth"] = glauth.NewSutureService
 	s.ServicesRegistry["graph"] = graph.NewSutureService
 	s.ServicesRegistry["graph-explorer"] = graphExplorer.NewSutureService
 	s.ServicesRegistry["idp"] = idp.NewSutureService
@@ -123,7 +120,6 @@ func NewService(options ...Option) (*Service, error) {
 
 	// populate delayed services
 	s.Delayed["storage-sharing"] = storage.NewSharing
-	s.Delayed["accounts"] = accounts.NewSutureService
 	s.Delayed["proxy"] = proxy.NewSutureService
 
 	return s, nil

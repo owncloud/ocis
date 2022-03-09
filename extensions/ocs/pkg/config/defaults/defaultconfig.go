@@ -41,7 +41,7 @@ func DefaultConfig() *config.Config {
 		TokenManager: config.TokenManager{
 			JWTSecret: "Pive-Fumkiu4",
 		},
-		AccountBackend: "accounts",
+		AccountBackend: "cs3",
 		Reva: config.Reva{
 			Address: "127.0.0.1:9142",
 		},
