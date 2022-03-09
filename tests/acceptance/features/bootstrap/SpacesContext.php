@@ -229,6 +229,10 @@ class SpacesContext implements Context {
 				"{}"
 			)
 		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"file $fileName not found"
+		);
 		return $this->featureContext->getResponse()->getHeaders();
 	}
 
@@ -268,7 +272,6 @@ class SpacesContext implements Context {
 	 * @return string
 	 */
 	public function getUserIdByUserName(string $userName): string {
-
 		$fullUrl = $this->baseUrl . "/api/v0/accounts/accounts-list";
 		$this->featureContext->setResponse(
 			HttpRequestHelper::post(
@@ -485,7 +488,7 @@ class SpacesContext implements Context {
 			$this->listMySpacesRequest(
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				"?". $query
+				"?" . $query
 			)
 		);
 	}
@@ -898,10 +901,11 @@ class SpacesContext implements Context {
 		
 		$userRole = "";
 		foreach ($permissions as $permission) {
-			foreach ($permission["grantedTo"] as $grantedTo)
-			if ($grantedTo["user"]["id"] === $userId) {
-				$userRole = $permission["roles"][0];
-			} 
+			foreach ($permission["grantedTo"] as $grantedTo) {
+				if ($grantedTo["user"]["id"] === $userId) {
+					$userRole = $permission["roles"][0];
+				}
+			}
 		}
 		Assert::assertEquals($userRole, $role, "the user $userName with the role $role could not be found");
 	}
@@ -943,18 +947,18 @@ class SpacesContext implements Context {
 			)
 		);
 		$matches = [];
-		foreach($spaces["value"] as $space) {
-			if($onlyOrNot === "not") {
+		foreach ($spaces["value"] as $space) {
+			if ($onlyOrNot === "not") {
 				Assert::assertNotEquals($space["driveType"], $type);
 			}
-			if($onlyOrNot === "only") {
+			if ($onlyOrNot === "only") {
 				Assert::assertEquals($space["driveType"], $type);
 			}
-			if($onlyOrNot === "" && $space["driveType"] === $type) {
+			if ($onlyOrNot === "" && $space["driveType"] === $type) {
 				$matches[] = $space;
 			}
 		}
-		if($onlyOrNot === "") {
+		if ($onlyOrNot === "") {
 			Assert::assertNotEmpty($matches);
 		}
 	}
@@ -1099,7 +1103,7 @@ class SpacesContext implements Context {
 	): void {
 		$exploded = explode('/', $folder);
 		$path = '';
-		for ($i = 0; $i < count($exploded); $i++) {
+		for ($i = 0; $i < \count($exploded); $i++) {
 			$path = $path . $exploded[$i] . '/';
 			$this->theUserCreatesAFolderToAnotherOwnerSpaceUsingTheGraphApi($user, $path, $spaceName);
 		};
@@ -1293,36 +1297,36 @@ class SpacesContext implements Context {
 	}
 
 	/**
-    	 * @When /^user "([^"]*)" changes the description of the "([^"]*)" space to "([^"]*)"$/
-    	 *
-    	 * @param string $user
-    	 * @param string $spaceName
-    	 * @param string $newName
-    	 *
-    	 * @return void
-    	 * @throws GuzzleException
-    	 * @throws Exception
-    	 */
-    	public function updateSpaceDescription(
-    		string $user,
-    		string $spaceName,
-    		string $newDescription
-    	): void {
-    		$space = $this->getSpaceByName($user, $spaceName);
-    		$spaceId = $space["id"];
+	 * @When /^user "([^"]*)" changes the description of the "([^"]*)" space to "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $newName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function updateSpaceDescription(
+		string $user,
+		string $spaceName,
+		string $newDescription
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$spaceId = $space["id"];
 
-    		$bodyData = ["description" => $newDescription];
-    		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
+		$bodyData = ["description" => $newDescription];
+		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
 
-    		$this->featureContext->setResponse(
-    			$this->sendUpdateSpaceRequest(
-    				$user,
-    				$this->featureContext->getPasswordForUser($user),
-    				$body,
-    				$spaceId
-    			)
-    		);
-    	}
+		$this->featureContext->setResponse(
+			$this->sendUpdateSpaceRequest(
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$body,
+				$spaceId
+			)
+		);
+	}
 
 	/**
 	 * @When /^user "([^"]*)" changes the quota of the "([^"]*)" space to "([^"]*)"$/
@@ -1357,7 +1361,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" sets the file "([^"]*)" as a (description|space image)\s? in a special section of the "([^"]*)" space$/ 
+	 * @When /^user "([^"]*)" sets the file "([^"]*)" as a (description|space image)\s? in a special section of the "([^"]*)" space$/
 	 *
 	 * @param string $user
 	 * @param string $file
@@ -1380,7 +1384,9 @@ class SpacesContext implements Context {
 
 		if ($type === "description") {
 			$type = "readme";
-		} else $type = "image";
+		} else {
+			$type = "image";
+		}
 
 		$bodyData = ["special" => [["specialFolder" => ["name" => "$type"], "id" => "$fileId"]]];
 		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
@@ -1580,10 +1586,10 @@ class SpacesContext implements Context {
 
 		$expectedHTTPStatus = "200";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
-            $expectedHTTPStatus,
+			$expectedHTTPStatus,
 			"Expected response status code should be $expectedHTTPStatus"
 		);
-        $expectedOCSStatus = "200";
+		$expectedOCSStatus = "200";
 		$this->ocsContext->theOCSStatusCodeShouldBe($expectedOCSStatus, "Expected OCS response status code $expectedOCSStatus");
 	}
 
@@ -1683,7 +1689,7 @@ class SpacesContext implements Context {
 		$this->sendDisableSpaceRequest($user, $spaceName);
 		$expectedHTTPStatus = "204";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
-            $expectedHTTPStatus,
+			$expectedHTTPStatus,
 			"Expected response status code should be $expectedHTTPStatus"
 		);
 	}
@@ -1784,7 +1790,7 @@ class SpacesContext implements Context {
 		$this->sendRestoreSpaceRequest($user, $spaceName);
 		$expectedHTTPStatus = "200";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
-            $expectedHTTPStatus,
+			$expectedHTTPStatus,
 			"Expected response status code should be $expectedHTTPStatus"
 		);
 	}
