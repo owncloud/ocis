@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/asim/go-micro/plugins/events/nats/v4"
@@ -10,6 +11,7 @@ import (
 	"github.com/owncloud/ocis/audit/pkg/config/parser"
 	"github.com/owncloud/ocis/audit/pkg/logging"
 	svc "github.com/owncloud/ocis/audit/pkg/service"
+	"github.com/owncloud/ocis/audit/pkg/types"
 	"github.com/urfave/cli/v2"
 )
 
@@ -25,21 +27,24 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 
-			evs := []events.Unmarshaller{
-				events.ShareCreated{},
+			ctx := cfg.Context
+			if ctx == nil {
+				ctx = context.Background()
 			}
+			ctx, cancel := context.WithCancel(ctx)
+			defer cancel()
 
 			evtsCfg := cfg.Events
 			client, err := server.NewNatsStream(nats.Address(evtsCfg.Endpoint), nats.ClusterID(evtsCfg.Cluster))
 			if err != nil {
 				return err
 			}
-			evts, err := events.Consume(client, evtsCfg.ConsumerGroup, evs...)
+			evts, err := events.Consume(client, evtsCfg.ConsumerGroup, types.RegisteredEvents()...)
 			if err != nil {
 				return err
 			}
 
-			svc.AuditLoggerFromConfig(cfg.Auditlog, evts, logger)
+			svc.AuditLoggerFromConfig(ctx, cfg.Auditlog, evts, logger)
 			return nil
 		},
 	}

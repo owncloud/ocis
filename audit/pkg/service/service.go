@@ -19,7 +19,7 @@ type Log func([]byte)
 type Marshaller func(interface{}) ([]byte, error)
 
 // AuditLoggerFromConfig will start a new AuditLogger generated from the config
-func AuditLoggerFromConfig(cfg config.Auditlog, ch <-chan interface{}, log log.Logger) {
+func AuditLoggerFromConfig(ctx context.Context, cfg config.Auditlog, ch <-chan interface{}, log log.Logger) {
 	var logs []Log
 
 	if cfg.LogToConsole {
@@ -30,7 +30,7 @@ func AuditLoggerFromConfig(cfg config.Auditlog, ch <-chan interface{}, log log.L
 		logs = append(logs, WriteToFile(cfg.FilePath, log))
 	}
 
-	StartAuditLogger(context.TODO(), ch, log, Marshal(cfg.Format, log), logs...)
+	StartAuditLogger(ctx, ch, log, Marshal(cfg.Format, log), logs...)
 
 }
 
