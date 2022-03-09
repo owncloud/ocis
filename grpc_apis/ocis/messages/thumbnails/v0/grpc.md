@@ -1,7 +1,7 @@
 ---
 title: "ocis.messages.thumbnails.v0"
 url: /grpc_apis/ocis_messages_thumbnails_v0
-date: 2022-03-09T00:55:58Z
+date: 2022-03-09T11:07:55Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
@@ -33,6 +33,15 @@ geekdocRepo: https://github.com/owncloud/ocis
 | reva_authorization | [string](#string) |  | OPTIONAL. |
 | public_link_token | [string](#string) |  | OPTIONAL. |
 
+### ThumbnailType
+
+The file types to which the thumbnail can be encoded to.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| PNG | 0 | Represents PNG type |
+| JPG | 1 | Represents JPG type |
+| GIF | 2 | Represents GIF type |
 
 ## Scalar Value Types
 

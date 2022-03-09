@@ -1,7 +1,7 @@
 ---
 title: "ocis.services.thumbnails.v0"
 url: /grpc_apis/ocis_services_thumbnails_v0
-date: 2022-03-09T00:55:58Z
+date: 2022-03-09T11:07:55Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
@@ -19,7 +19,7 @@ A request to retrieve a thumbnail
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | filepath | [string](#string) |  | The path to the source image |
-| thumbnail_type | [GetThumbnailRequest.ThumbnailType](#getthumbnailrequestthumbnailtype) |  | The type to which the thumbnail should get encoded to. |
+| thumbnail_type | [ocis.messages.thumbnails.v0.ThumbnailType](/grpc_apis/ocis_messages_thumbnails_v0/#thumbnailtype) |  | The type to which the thumbnail should get encoded to. |
 | width | [int32](#int32) |  | The width of the thumbnail |
 | height | [int32](#int32) |  | The height of the thumbnail |
 | webdav_source | [ocis.messages.thumbnails.v0.WebdavSource](/grpc_apis/ocis_messages_thumbnails_v0/#webdavsource) |  |  |
@@ -31,17 +31,10 @@ The service response
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| thumbnail | [bytes](#bytes) |  | The thumbnail as a binary |
+| data_endpoint | [string](#string) |  | The endpoint where the thumbnail can be downloaded. |
+| transfer_token | [string](#string) |  | The transfer token to be able to download the thumbnail. |
 | mimetype | [string](#string) |  | The mimetype of the thumbnail |
 
-### GetThumbnailRequest.ThumbnailType
-
-The file types to which the thumbnail can get encoded to.
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| PNG | 0 | Represents PNG type |
-| JPG | 1 | Represents JPG type |
 
 ### ThumbnailService
 
