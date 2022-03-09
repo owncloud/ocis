@@ -67,6 +67,8 @@ type LDAPDriver struct {
 	BindPassword     string   `env:"LDAP_BIND_PASSWORD;USERS_LDAP_BIND_PASSWORD"`
 	UserBaseDN       string   `env:"LDAP_USER_BASE_DN;USERS_LDAP_USER_BASE_DN"`
 	GroupBaseDN      string   `env:"LDAP_GROUP_BASE_DN;USERS_LDAP_GROUP_BASE_DN"`
+	UserScope        string   `env:"LDAP_USER_SCOPE;USERS_LDAP_USER_SCOPE"`
+	GroupScope       string   `env:"LDAP_GROUP_SCOPE;USERS_LDAP_GROUP_SCOPE"`
 	UserFilter       string   `env:"LDAP_USERFILTER;USERS_LDAP_USERFILTER"`
 	GroupFilter      string   `env:"LDAP_GROUPFILTER;USERS_LDAP_USERFILTER"`
 	UserObjectClass  string   `env:"LDAP_USER_OBJECTCLASS;USERS_LDAP_USER_OBJECTCLASS"`

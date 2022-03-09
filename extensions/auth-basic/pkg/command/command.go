@@ -193,6 +193,8 @@ func ldapConfigFromString(cfg config.LDAPProvider) map[string]interface{} {
 		"group_base_dn":     cfg.GroupBaseDN,
 		"user_filter":       cfg.UserFilter,
 		"group_filter":      cfg.GroupFilter,
+		"user_scope":        cfg.UserScope,
+		"group_scope":       cfg.GroupScope,
 		"user_objectclass":  cfg.UserObjectClass,
 		"group_objectclass": cfg.GroupObjectClass,
 		"login_attributes":  cfg.LoginAttributes,

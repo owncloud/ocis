@@ -254,10 +254,18 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 	}
 
 	for name := range s.ServicesRegistry {
+		// don't run glauth by default but keep the possiblity to start it via cfg.Runtime.Extensions for now
+		if name == "glauth" {
+			continue
+		}
 		runset = append(runset, name)
 	}
 
 	for name := range s.Delayed {
+		// don't run accounts by default but keep the possiblity to start it via cfg.Runtime.Extensions for now
+		if name == "accounts" {
+			continue
+		}
 		runset = append(runset, name)
 	}
 }

@@ -209,6 +209,8 @@ func ldapConfigFromString(cfg config.LDAPDriver) map[string]interface{} {
 		"bind_password":     cfg.BindPassword,
 		"user_base_dn":      cfg.UserBaseDN,
 		"group_base_dn":     cfg.GroupBaseDN,
+		"user_scope":        cfg.UserScope,
+		"group_scope":       cfg.GroupScope,
 		"user_filter":       cfg.UserFilter,
 		"group_filter":      cfg.GroupFilter,
 		"user_objectclass":  cfg.UserObjectClass,
