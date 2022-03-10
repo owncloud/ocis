@@ -1,34 +1,26 @@
 const filesMenu = {
   English: [
-    'All files',
-    'Shared with me',
-    'Shared with others',
-    'Shared via link',
-    'Spaces',
+    'Personal',
+    'Shares',
+    'Spaces\nbeta',
     'Deleted files'
   ],
   Deutsch: [
-    'Alle Dateien',
-    'Mit mir geteilt',
-    'Mit anderen geteilt',
-    'Per Link geteilt',
-    'Spaces',
+    'Persöhnlich',
+    'Shares',
+    'Spaces\nbeta',
     'Gelöschte Dateien'
   ],
   Español: [
-    'Todos los archivos',
-    'Compartido conmigo',
-    'Compartido con otros',
-    'Shared via link',
-    'Spaces',
+    'Personal',
+    'Shares',
+    'Spaces\nbeta',
     'Archivos borrados'
   ],
   Français: [
-    'Tous les fichiers',
-    'Partagé avec moi',
-    'Partagé avec autres',
-    'Shared via link',
-    'Spaces',
+    'Personal',
+    'Shares',
+    'Spaces\nbeta',
     'Fichiers supprimés'
   ]
 }
