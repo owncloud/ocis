@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
 * Enhancement - Improve thumbnails API: [#3272](https://github.com/owncloud/ocis/pull/3272)
+* Enhancement - Update ownCloud Web to v5.3.0-rc.1: [#6561](https://github.com/owncloud/web/pull/6561)
 
 ## Details
 
@@ -24,6 +25,17 @@ The following sections list the changes for unreleased.
    HTTP.
 
    https://github.com/owncloud/ocis/pull/3272
+
+* Enhancement - Update ownCloud Web to v5.3.0-rc.1: [#6561](https://github.com/owncloud/web/pull/6561)
+
+   Tags: web
+
+   We updated ownCloud Web to v5.3.0-rc.1. Please refer to the changelog (linked) for details on
+   the web release.
+
+   https://github.com/owncloud/web/pull/6561
+   https://github.com/owncloud/ocis/pull/3291
+   https://github.com/owncloud/web/releases/tag/v5.3.0-rc.1
 # Changelog for [1.18.0] (2022-03-03)
 
 The following sections list the changes for 1.18.0.
