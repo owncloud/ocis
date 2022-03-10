@@ -447,7 +447,6 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 func defaultRoleAssignments() []*settingsmsg.UserRoleAssignment {
 	return []*settingsmsg.UserRoleAssignment{
 		// accounts service user for the metadata user is allowed to create spaces
-
 		{
 			AccountUuid: "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
 			RoleId:      BundleUUIDRoleAdmin,
@@ -476,6 +475,18 @@ func defaultRoleAssignments() []*settingsmsg.UserRoleAssignment {
 		}, {
 			AccountUuid: "932b4540-8d16-481e-8ef4-588e4b6b151c",
 			RoleId:      BundleUUIDRoleUser,
+		}, {
+			AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7",
+			RoleId:      BundleUUIDRoleUser,
+		},
+		// kjohnson with additional role "space-manager" (ListAllSpaces + CreateSpace)
+		{
+			AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7",
+			RoleId:      ListAllSpacesPermissionID,
+		},
+		{
+			AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7",
+			RoleId:      CreateSpacePermissionID,
 		},
 	}
 }

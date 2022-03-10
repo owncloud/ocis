@@ -16,12 +16,13 @@ To skip the generation of demo users, run the inital setup step with an addition
 
 Following users are available in the demo set:
 
-| username | password      | email                | role  | groups                                                                  |
-| -------- | ------------- | -------------------- | ----- | ----------------------------------------------------------------------- |
-| admin    | admin         | admin@example.org    | admin | users                                                                   |
-| einstein | relativity    | einstein@example.org | user  | users, philosophy-haters, physics-lovers, sailing-lovers, violin-haters |
-| marie    | radioactivity | marie@example.org    | user  | users, physics-lovers, polonium-lovers, radium-lovers                   |
-| moss     | vista         | moss@example.org     | admin | users                                                                   |
-| richard  | superfluidity | richard@example.org  | user  | users, philosophy-haters, physics-lovers, quantum-lovers                |
+| username  | password      | email                 | role                | groups                                                                  |
+| --------- | ------------- | --------------------- | ------------------- | ----------------------------------------------------------------------- |
+| admin     | admin         | admin@example.org     | admin               | users                                                                   |
+| einstein  | relativity    | einstein@example.org  | user                | users, philosophy-haters, physics-lovers, sailing-lovers, violin-haters |
+| marie     | radioactivity | marie@example.org     | user                | users, physics-lovers, polonium-lovers, radium-lovers                   |
+| moss      | vista         | moss@example.org      | admin               | users                                                                   |
+| richard   | superfluidity | richard@example.org   | user                | users, philosophy-haters, physics-lovers, quantum-lovers                |
+| katherine | gemini        | katherine@example.org | user, space-manager | users, sailing-lovers, physics-lovers, quantum-lovers                   |
 
 You may also want to run oCIS with only your custom users by [deleting the demo users]({{< ref "../deployment#delete-demo-users" >}}).

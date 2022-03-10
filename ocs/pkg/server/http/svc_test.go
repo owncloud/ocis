@@ -49,13 +49,14 @@ const (
 )
 
 const (
-	userEinstein string = "einstein"
-	userMarie    string = "marie"
-	userRichard  string = "richard"
-	userIDP      string = "idp"
-	userReva     string = "reva"
-	userMoss     string = "moss"
-	userAdmin    string = "admin"
+	userEinstein  string = "einstein"
+	userMarie     string = "marie"
+	userRichard   string = "richard"
+	userIDP       string = "idp"
+	userReva      string = "reva"
+	userMoss      string = "moss"
+	userAdmin     string = "admin"
+	userKatherine string = "katherine"
 )
 const (
 	groupPhilosophyHaters string = "philosophy-haters"
@@ -100,6 +101,12 @@ var defaultMemberOf = map[string][]string{
 	userAdmin: {
 		groupUsers,
 	},
+	userKatherine: {
+		groupUsers,
+		groupSailingLovers,
+		groupQuantumLovers,
+		groupPhysicsLovers,
+	},
 }
 
 var defaultMembers = map[string][]string{
@@ -111,9 +118,11 @@ var defaultMembers = map[string][]string{
 		userEinstein,
 		userMarie,
 		userRichard,
+		userKatherine,
 	},
 	groupSailingLovers: {
 		userEinstein,
+		userKatherine,
 	},
 	groupViolinHaters: {
 		userEinstein,
@@ -123,6 +132,7 @@ var defaultMembers = map[string][]string{
 	},
 	groupQuantumLovers: {
 		userRichard,
+		userKatherine,
 	},
 	groupPhilosophyHaters: {
 		userRichard,
@@ -131,18 +141,20 @@ var defaultMembers = map[string][]string{
 		userEinstein,
 		userMarie,
 		userRichard,
+		userKatherine,
 	},
 }
 
 // These account ids are only needed for cleanup
 const (
-	userIDEinstein string = "4c510ada-c86b-4815-8820-42cdf82c3d51"
-	userIDMarie    string = "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"
-	userIDFeynman  string = "932b4540-8d16-481e-8ef4-588e4b6b151c"
-	userIDIDP      string = "820ba2a1-3f54-4538-80a4-2d73007e30bf"
-	userIDReva     string = "bc596f3c-c955-4328-80a0-60d018b4ad57"
-	userIDMoss     string = "058bff95-6708-4fe5-91e4-9ea3d377588b"
-	userIDAdmin    string = "ddc2004c-0977-11eb-9d3f-a793888cd0f8"
+	userIDEinstein  string = "4c510ada-c86b-4815-8820-42cdf82c3d51"
+	userIDMarie     string = "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"
+	userIDFeynman   string = "932b4540-8d16-481e-8ef4-588e4b6b151c"
+	userIDIDP       string = "820ba2a1-3f54-4538-80a4-2d73007e30bf"
+	userIDReva      string = "bc596f3c-c955-4328-80a0-60d018b4ad57"
+	userIDMoss      string = "058bff95-6708-4fe5-91e4-9ea3d377588b"
+	userIDAdmin     string = "ddc2004c-0977-11eb-9d3f-a793888cd0f8"
+	userIDKatherine string = "534bb038-6f9d-4093-946f-133be61fa4e7"
 )
 
 // These group ids are only needed for cleanup
@@ -181,6 +193,7 @@ var defaultUsers = []string{
 	userMarie,
 	userMoss,
 	userAdmin,
+	userKatherine,
 }
 var defaultUserIDs = []string{
 	userIDEinstein,
@@ -190,6 +203,7 @@ var defaultUserIDs = []string{
 	userIDMarie,
 	userIDMoss,
 	userIDAdmin,
+	userIDKatherine,
 }
 
 var defaultGroups = []string{

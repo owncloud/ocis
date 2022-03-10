@@ -253,6 +253,25 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 				{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
 			},
 		},
+		{
+			Id:                       "534bb038-6f9d-4093-946f-133be61fa4e7",
+			PreferredName:            "katherine",
+			OnPremisesSamAccountName: "katherine",
+			Mail:                     "katherine@example.org",
+			DisplayName:              "Katherine Johnson",
+			UidNumber:                20005,
+			GidNumber:                30000,
+			PasswordProfile: &accountsmsg.PasswordProfile{
+				Password: "$2a$11$6SIBlZ.8BzjBsDTRrThUyuz6OvP.XLo7101oFiwHHB.jufKGS9.Ji",
+			},
+			AccountEnabled: true,
+			MemberOf: []*accountsmsg.Group{
+				{Id: "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"}, // users
+				{Id: "6040aa17-9c64-4fef-9bd0-77234d71bad0"}, // sailing-lovers
+				{Id: "a1726108-01f8-4c30-88df-2b1a9d1cba1a"}, // quantum-lovers
+				{Id: "262982c1-2362-4afa-bfdf-8cbfef64a06e"}, // physics-lovers
+			},
+		},
 		// technical users for kopano and reva
 		{
 			Id:                       "820ba2a1-3f54-4538-80a4-2d73007e30bf",
@@ -353,9 +372,11 @@ func (s Service) createDefaultGroups(withDemoGroups bool) (err error) {
 			{Id: "4c510ada-c86b-4815-8820-42cdf82c3d51"}, // einstein
 			{Id: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"}, // marie
 			{Id: "932b4540-8d16-481e-8ef4-588e4b6b151c"}, // feynman
+			{Id: "534bb038-6f9d-4093-946f-133be61fa4e7"}, // katherine
 		}},
 		{Id: "6040aa17-9c64-4fef-9bd0-77234d71bad0", GidNumber: 30001, OnPremisesSamAccountName: "sailing-lovers", DisplayName: "Sailing lovers", Members: []*accountsmsg.Account{
 			{Id: "4c510ada-c86b-4815-8820-42cdf82c3d51"}, // einstein
+			{Id: "534bb038-6f9d-4093-946f-133be61fa4e7"}, // katherine
 		}},
 		{Id: "dd58e5ec-842e-498b-8800-61f2ec6f911f", GidNumber: 30002, OnPremisesSamAccountName: "violin-haters", DisplayName: "Violin haters", Members: []*accountsmsg.Account{
 			{Id: "4c510ada-c86b-4815-8820-42cdf82c3d51"}, // einstein
@@ -368,6 +389,7 @@ func (s Service) createDefaultGroups(withDemoGroups bool) (err error) {
 		}},
 		{Id: "a1726108-01f8-4c30-88df-2b1a9d1cba1a", GidNumber: 30005, OnPremisesSamAccountName: "quantum-lovers", DisplayName: "Quantum lovers", Members: []*accountsmsg.Account{
 			{Id: "932b4540-8d16-481e-8ef4-588e4b6b151c"}, // feynman
+			{Id: "534bb038-6f9d-4093-946f-133be61fa4e7"}, // katherine
 		}},
 		{Id: "167cbee2-0518-455a-bfb2-031fe0621e5d", GidNumber: 30006, OnPremisesSamAccountName: "philosophy-haters", DisplayName: "Philosophy haters", Members: []*accountsmsg.Account{
 			{Id: "932b4540-8d16-481e-8ef4-588e4b6b151c"}, // feynman
@@ -376,6 +398,7 @@ func (s Service) createDefaultGroups(withDemoGroups bool) (err error) {
 			{Id: "4c510ada-c86b-4815-8820-42cdf82c3d51"}, // einstein
 			{Id: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"}, // marie
 			{Id: "932b4540-8d16-481e-8ef4-588e4b6b151c"}, // feynman
+			{Id: "534bb038-6f9d-4093-946f-133be61fa4e7"}, // katherine
 		}},
 	}
 
