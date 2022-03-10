@@ -963,7 +963,7 @@ def binaryRelease(ctx, name):
         folder = "stable"
         buildref = ctx.build.ref.replace("refs/tags/v", "")
         buildref = buildref.lower()
-        if buildref.find("-") != -1: # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
+        if buildref.find("-") != -1:  # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
             folder = "testing"
         target = "/ocis/%s/%s/%s" % (ctx.repo.name.replace("ocis-", ""), folder, buildref)
 
