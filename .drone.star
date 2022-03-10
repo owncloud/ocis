@@ -956,11 +956,16 @@ def binaryReleases(ctx):
     return pipelines
 
 def binaryRelease(ctx, name):
-    # uploads binary to https://download.owncloud.com/ocis/ocis/testing/
-    target = "/ocis/%s/testing" % (ctx.repo.name.replace("ocis-", ""))
+    # uploads binary to https://download.owncloud.com/ocis/ocis/daily/
+    target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
     if ctx.build.event == "tag":
         # uploads binary to eg. https://download.owncloud.com/ocis/ocis/1.0.0-beta9/
-        target = "/ocis/%s/%s" % (ctx.repo.name.replace("ocis-", ""), ctx.build.ref.replace("refs/tags/v", ""))
+        folder = "stable"
+        buildref = ctx.build.ref.replace("refs/tags/v", "")
+        buildref = buildref.lower()
+        if buildref.find("-") != -1: # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
+            folder = "testing"
+        target = "/ocis/%s/%s/%s" % (ctx.repo.name.replace("ocis-", ""), folder, buildref)
 
     settings = {
         "endpoint": {
