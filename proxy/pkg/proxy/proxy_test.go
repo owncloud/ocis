@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/owncloud/ocis/proxy/pkg/config"
+	"github.com/owncloud/ocis/proxy/pkg/config/defaults"
 )
 
 type matchertest struct {
@@ -13,8 +13,8 @@ type matchertest struct {
 }
 
 func TestPrefixRouteMatcher(t *testing.T) {
-	cfg := config.DefaultConfig()
-	cfg.Policies = config.DefaultPolicies()
+	cfg := defaults.DefaultConfig()
+	cfg.Policies = defaults.DefaultPolicies()
 	p := NewMultiHostReverseProxy(Config(cfg))
 
 	table := []matchertest{
@@ -33,8 +33,8 @@ func TestPrefixRouteMatcher(t *testing.T) {
 }
 
 func TestQueryRouteMatcher(t *testing.T) {
-	cfg := config.DefaultConfig()
-	cfg.Policies = config.DefaultPolicies()
+	cfg := defaults.DefaultConfig()
+	cfg.Policies = defaults.DefaultPolicies()
 	p := NewMultiHostReverseProxy(Config(cfg))
 
 	table := []matchertest{
@@ -61,8 +61,8 @@ func TestQueryRouteMatcher(t *testing.T) {
 }
 
 func TestRegexRouteMatcher(t *testing.T) {
-	cfg := config.DefaultConfig()
-	cfg.Policies = config.DefaultPolicies()
+	cfg := defaults.DefaultConfig()
+	cfg.Policies = defaults.DefaultPolicies()
 	p := NewMultiHostReverseProxy(Config(cfg))
 
 	table := []matchertest{
