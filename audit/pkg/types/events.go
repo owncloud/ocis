@@ -9,5 +9,7 @@ func RegisteredEvents() []events.Unmarshaller {
 	return []events.Unmarshaller{
 		events.ShareCreated{},
 		events.ShareUpdated{},
+		events.LinkCreated{},
+		events.LinkUpdated{},
 	}
 }

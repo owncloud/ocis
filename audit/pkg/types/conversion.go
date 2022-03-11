@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/events"
@@ -62,6 +63,26 @@ func ShareCreated(ev events.ShareCreated) AuditEventShareCreated {
 	}
 }
 
+// LinkCreated converts a ShareCreated Event to an AuditEventShareCreated
+func LinkCreated(ev events.LinkCreated) AuditEventShareCreated {
+	uid := ev.Sharer.OpaqueId
+	with, typ := "", "link"
+	base := BasicAuditEvent(uid, formatTime(ev.CTime), MessageLinkCreated(uid, ev.ItemID.OpaqueId, ev.ShareID.OpaqueId), ActionShareCreated)
+	return AuditEventShareCreated{
+		AuditEventSharing: SharingAuditEvent("", ev.ItemID.OpaqueId, uid, base),
+		ShareOwner:        uid,
+		ShareWith:         with,
+		ShareType:         typ,
+		ExpirationDate:    formatTime(ev.Expiration),
+		SharePass:         ev.PasswordProtected,
+		Permissions:       ev.Permissions.String(),
+		ShareToken:        ev.Token,
+
+		// NOTE: those values are not in the event and can therefore not be filled at the moment
+		ItemType: "",
+	}
+}
+
 // ShareUpdated converts a ShareUpdated event to an AuditEventShareUpdated
 func ShareUpdated(ev events.ShareUpdated) AuditEventShareUpdated {
 	uid := ev.Sharer.OpaqueId
@@ -82,6 +103,25 @@ func ShareUpdated(ev events.ShareUpdated) AuditEventShareUpdated {
 	}
 }
 
+// LinkUpdated converts a LinkUpdated event to an AuditEventShareUpdated
+func LinkUpdated(ev events.LinkUpdated) AuditEventShareUpdated {
+	uid := ev.Sharer.OpaqueId
+	with, typ := "", "link"
+	base := BasicAuditEvent(uid, formatTime(ev.CTime), MessageLinkUpdated(uid, ev.ShareID.OpaqueId, ev.FieldUpdated), updateType(ev.FieldUpdated))
+	return AuditEventShareUpdated{
+		AuditEventSharing: SharingAuditEvent(ev.ShareID.GetOpaqueId(), ev.ItemID.OpaqueId, uid, base),
+		ShareOwner:        uid,
+		ShareWith:         with,
+		ShareType:         typ,
+		Permissions:       ev.Permissions.Permissions.String(),
+		ExpirationDate:    formatTime(ev.Expiration),
+		SharePass:         ev.PasswordProtected,
+		ShareToken:        ev.Token,
+
+		// NOTE: those values are not in the event and can therefore not be filled at the moment
+		ItemType: "",
+	}
+}
 func extractGrantee(uid *user.UserId, gid *group.GroupId) (string, string) {
 	switch {
 	case uid != nil && uid.OpaqueId != "":
@@ -94,6 +134,9 @@ func extractGrantee(uid *user.UserId, gid *group.GroupId) (string, string) {
 }
 
 func formatTime(t *types.Timestamp) string {
+	if t == nil {
+		return ""
+	}
 	return time.Unix(int64(t.Seconds), int64(t.Nanos)).Format(time.RFC3339)
 }
 
@@ -103,7 +146,16 @@ func updateType(u string) string {
 		return ActionSharePermissionUpdated
 	case u == "displayname":
 		return ActionShareDisplayNameUpdated
+	case u == "TYPE_PERMISSIONS":
+		return ActionSharePermissionUpdated
+	case u == "TYPE_DISPLAYNAME":
+		return ActionShareDisplayNameUpdated
+	case u == "TYPE_PASSWORD":
+		return ActionSharePasswordUpdated
+	case u == "TYPE_EXPIRATION":
+		return ActionShareExpirationUpdated
 	default:
+		fmt.Println("Unknown update type", u)
 		return ""
 	}
 }
