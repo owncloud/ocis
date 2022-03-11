@@ -122,6 +122,50 @@ func LinkUpdated(ev events.LinkUpdated) AuditEventShareUpdated {
 		ItemType: "",
 	}
 }
+
+// ShareRemoved converts a ShareRemoved event to an AuditEventShareRemoved
+func ShareRemoved(ev events.ShareRemoved) AuditEventShareRemoved {
+	sid, uid, iid, with, typ := "", "", "", "", ""
+	if ev.ShareID != nil {
+		sid = ev.ShareID.GetOpaqueId()
+	}
+
+	if ev.ShareKey != nil {
+		uid = ev.ShareKey.GetOwner().GetOpaqueId()
+		iid = ev.ShareKey.GetResourceId().GetOpaqueId()
+		with, typ = extractGrantee(ev.ShareKey.GetGrantee().GetUserId(), ev.ShareKey.GetGrantee().GetGroupId())
+	}
+	base := BasicAuditEvent(uid, "", MessageShareRemoved(uid, sid, iid), ActionShareRemoved)
+	return AuditEventShareRemoved{
+		AuditEventSharing: SharingAuditEvent(sid, iid, uid, base),
+		ShareWith:         with,
+		ShareType:         typ,
+
+		// NOTE: those values are not in the event and can therefore not be filled at the moment
+		ItemType: "",
+	}
+}
+
+// LinkRemoved converts a LinkRemoved event to an AuditEventShareRemoved
+func LinkRemoved(ev events.LinkRemoved) AuditEventShareRemoved {
+	uid, sid, typ := "", "", "link"
+	if ev.ShareID != nil {
+		sid = ev.ShareID.GetOpaqueId()
+	} else {
+		sid = ev.ShareToken
+	}
+
+	base := BasicAuditEvent(uid, "", MessageLinkRemoved(sid), ActionShareRemoved)
+	return AuditEventShareRemoved{
+		AuditEventSharing: SharingAuditEvent(sid, "", uid, base),
+		ShareWith:         "",
+		ShareType:         typ,
+
+		// NOTE: those values are not in the event and can therefore not be filled at the moment
+		ItemType: "",
+	}
+}
+
 func extractGrantee(uid *user.UserId, gid *group.GroupId) (string, string) {
 	switch {
 	case uid != nil && uid.OpaqueId != "":

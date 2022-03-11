@@ -52,3 +52,11 @@ type AuditEventShareUpdated struct {
 	ShareOwner     string // The UID of the share owner.
 	ShareToken     string // For link shares the unique token, else null
 }
+
+// AuditEventShareRemoved is the event logged when a share is removed
+type AuditEventShareRemoved struct {
+	AuditEventSharing
+	ItemType  string // file or folder
+	ShareType string // group user or link
+	ShareWith string // The UID or GID of the share recipient.
+}
