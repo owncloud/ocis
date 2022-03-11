@@ -8,5 +8,6 @@ import (
 func RegisteredEvents() []events.Unmarshaller {
 	return []events.Unmarshaller{
 		events.ShareCreated{},
+		events.ShareUpdated{},
 	}
 }

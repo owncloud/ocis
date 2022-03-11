@@ -45,6 +45,8 @@ func StartAuditLogger(ctx context.Context, ch <-chan interface{}, log log.Logger
 			switch ev := i.(type) {
 			case events.ShareCreated:
 				auditEvent = types.ShareCreated(ev)
+			case events.ShareUpdated:
+				auditEvent = types.ShareUpdated(ev)
 			default:
 				log.Error().Interface("event", ev).Msg(fmt.Sprintf("can't handle event of type '%T'", ev))
 				continue
@@ -95,5 +97,20 @@ func Marshal(format string, log log.Logger) Marshaller {
 		return nil
 	case "json":
 		return json.Marshal
+	case "minimal":
+		return func(ev interface{}) ([]byte, error) {
+			b, err := json.Marshal(ev)
+			if err != nil {
+				return nil, err
+			}
+
+			m := make(map[string]interface{})
+			if err := json.Unmarshal(b, &m); err != nil {
+				return nil, err
+			}
+
+			format := fmt.Sprintf("%s)\n   %s", m["Action"], m["Message"])
+			return []byte(format), nil
+		}
 	}
 }
