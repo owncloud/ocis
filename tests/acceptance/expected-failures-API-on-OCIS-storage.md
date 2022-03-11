@@ -497,7 +497,7 @@ cannot share a folder with create permission
 - [apiSharePublicLink1/accessToPublicLinkShare.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L10)
 - [apiSharePublicLink1/accessToPublicLinkShare.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L20)
 - [apiSharePublicLink1/accessToPublicLinkShare.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L30)
-- [apiSharePublicLink1/accessToPublicLinkShare.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L44)
+- [apiSharePublicLink1/accessToPublicLinkShare.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L45)
 - [apiSharePublicLink1/createPublicLinkShare.feature:587](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L587)
 - [apiSharePublicLink1/createPublicLinkShare.feature:608](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L608)
 
@@ -573,17 +573,16 @@ cannot share a folder with create permission
 #### [Upload-only shares must not overwrite but create a separate file](https://github.com/owncloud/ocis-reva/issues/286)
 
 - [apiSharePublicLink2/uploadToPublicLinkShare.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L24)
-- [apiSharePublicLink2/uploadToPublicLinkShare.feature:273](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L273)
+- [apiSharePublicLink2/uploadToPublicLinkShare.feature:277](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L277)
 
 #### [Set quota over settings](https://github.com/owncloud/ocis/issues/1290)
 
-- [apiSharePublicLink2/uploadToPublicLinkShare.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L158)
-- [apiSharePublicLink2/uploadToPublicLinkShare.feature:177](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L177)
+- [apiSharePublicLink2/uploadToPublicLinkShare.feature:160](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L160)
+- [apiSharePublicLink2/uploadToPublicLinkShare.feature:179](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L179)
 
 #### [various sharing settings cannot be set](https://github.com/owncloud/ocis/issues/1328)
 
-- [apiSharePublicLink2/uploadToPublicLinkShare.feature:196](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L196)
-- [apiSharePublicLink2/uploadToPublicLinkShare.feature:215](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L215)
+- [apiSharePublicLink2/uploadToPublicLinkShare.feature:198](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L198)
 
 #### [Resharing does not work with ocis storage](https://github.com/owncloud/product/issues/265)
 
