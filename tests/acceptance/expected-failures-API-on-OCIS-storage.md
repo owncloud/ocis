@@ -729,19 +729,19 @@ _getting and setting quota_
 Scenario Outline: Moving a file into a shared folder as the sharee and as the sharer
 
 - [apiWebdavMove2/moveShareOnOcis.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L30)
-- [apiWebdavMove2/moveShareOnOcis.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L31)
+- [apiWebdavMove2/moveShareOnOcis.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L32)
   Scenario Outline: Moving a file out of a shared folder as the sharee and as the sharer
 - [apiWebdavMove2/moveShareOnOcis.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L60)
-- [apiWebdavMove2/moveShareOnOcis.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L61)
+- [apiWebdavMove2/moveShareOnOcis.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L62)
   Scenario Outline: Moving a folder into a shared folder as the sharee and as the sharer
 - [apiWebdavMove2/moveShareOnOcis.feature:91](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L91)
-- [apiWebdavMove2/moveShareOnOcis.feature:92](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L92)
+- [apiWebdavMove2/moveShareOnOcis.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L93)
   Scenario Outline: Moving a folder out of a shared folder as the sharee and as the sharer
-- [apiWebdavMove2/moveShareOnOcis.feature:122](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L122)
-- [apiWebdavMove2/moveShareOnOcis.feature:123](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L123)
+- [apiWebdavMove2/moveShareOnOcis.feature:124](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L124)
+- [apiWebdavMove2/moveShareOnOcis.feature:126](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L126)
   Scenario Outline: Moving a file to a shared folder with no permissions
-- [apiWebdavMove2/moveShareOnOcis.feature:151](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L151)
 - [apiWebdavMove2/moveShareOnOcis.feature:152](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L152)
+- [apiWebdavMove2/moveShareOnOcis.feature:153](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L153)
 
 #### [restoring an older version of a shared file deletes the share](https://github.com/owncloud/ocis/issues/765)
 
@@ -1380,10 +1380,10 @@ And other missing implementation of favorites
 - [apiWebdavMove2/moveShareOnOcis.feature:68](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L68)
 - [apiWebdavMove2/moveShareOnOcis.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L99)
 - [apiWebdavMove2/moveShareOnOcis.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L100)
-- [apiWebdavMove2/moveShareOnOcis.feature:130](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L130)
-- [apiWebdavMove2/moveShareOnOcis.feature:157](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L157)
-- [apiWebdavMove2/moveShareOnOcis.feature:184](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L184)
-- [apiWebdavMove2/moveShareOnOcis.feature:216](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L216)
+- [apiWebdavMove2/moveShareOnOcis.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L132)
+- [apiWebdavMove2/moveShareOnOcis.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L158)
+- [apiWebdavMove2/moveShareOnOcis.feature:185](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L185)
+- [apiWebdavMove2/moveShareOnOcis.feature:220](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L220)
 
 #### [WWW-Authenticate header for unauthenticated requests is not clear](https://github.com/owncloud/ocis/issues/2285)
 
@@ -1704,9 +1704,9 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature#L38)
 - [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature#L39)
 - [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature#L40)
-- [apiWebdavMove2/moveFile.feature:286](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L286)
 - [apiWebdavMove2/moveFile.feature:287](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L287)
-- [apiWebdavMove2/moveFile.feature:292](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L292)
+- [apiWebdavMove2/moveFile.feature:288](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L288)
+- [apiWebdavMove2/moveFile.feature:293](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L293)
 
 #### [cannot set blacklisted file names](https://github.com/owncloud/product/issues/260)
 
@@ -1816,7 +1816,7 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiWebdavMove1/moveFolder.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L27)
 - [apiWebdavMove1/moveFolder.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L45)
 - [apiWebdavMove1/moveFolder.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L63)
-- [apiWebdavMove2/moveFile.feature:225](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L225)
+- [apiWebdavMove2/moveFile.feature:224](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L224)
 - [apiWebdavMove2/moveFileToBlacklistedName.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFileToBlacklistedName.feature#L25)
 - [apiWebdavMove2/moveFileToBlacklistedName.feature:41](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFileToBlacklistedName.feature#L41)
 - [apiWebdavMove2/moveFileToBlacklistedName.feature:80](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFileToBlacklistedName.feature#L80)
