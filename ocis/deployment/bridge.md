@@ -92,9 +92,9 @@ basedn = "dc=ocis,dc=test"                               # base dn to construct 
 
 {{< hint >}}
 There is a bug in the config merging for environment variables, cli flags and config files causing log settings not to be picked up from the config file when specifying `--extensions`. That is why I will
-* configure most of the config in a file, 
+* configure most of the config in a file,
 * adjust logging using `OCIS_LOG_*` environment variables and
-* specify which extension to run using `ocis/bin/ocis server --extensions "comma, separated, list, of, extensions"`. 
+* specify which extension to run using `ocis/bin/ocis server --extensions "comma, separated, list, of, extensions"`.
 {{< /hint >}}
 
 #### Run it!
@@ -129,7 +129,7 @@ To configure LDAP to use our glauth we add this section to the config file:
 ```toml
 [storage.reva.ldap]
 idp = "https://ocis.ocis.test"
-basedn = "dc=ocis,dc=test" 
+basedn = "dc=ocis,dc=test"
 binddn = "cn=admin,dc=ocis,dc=test" # an admin user in your oc10
 bindpassword = "secret"
 userschema = { uid = "uid", displayname = "givenname" } # TODO make glauth return an ownclouduuid and displayname attribute
@@ -158,7 +158,7 @@ Please use `exit` or `Ctrl-D` to exit this program.
 username: jfd
 password: OK
 >> whoami
-id:<idp:"https://ocis.ocis.test" opaque_id:"jfd" type:USER_TYPE_PRIMARY > username:"jfd" mail:"jfd@butonic.de" display_name:"J\303\266rn" uid_number:99 gid_number:99 
+id:<idp:"https://ocis.ocis.test" opaque_id:"jfd" type:USER_TYPE_PRIMARY > username:"jfd" mail:"jfd@butonic.de" display_name:"J\303\266rn" uid_number:99 gid_number:99
 >> exit
 ```
 
