@@ -1039,10 +1039,10 @@ special character username not valid
 - [apiProvisioning-v1/editUser.feature:57](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L57)
 - [apiProvisioning-v1/editUser.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L129)
 - [apiProvisioning-v2/editUser.feature:58](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L58)
-- [apiProvisioning-v2/editUser.feature:128](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L128)
+- [apiProvisioning-v2/editUser.feature:130](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L130)
 - [apiProvisioning-v2/enableUser.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L40)
 - [apiProvisioning-v2/enableUser.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L62)
-- [apiProvisioning-v2/enableUser.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L70)
+- [apiProvisioning-v2/enableUser.feature:72](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L72)
 
 #### [user can get info of other users/ cloud/users endpoints not authenticated](https://github.com/owncloud/product/issues/248)
 
