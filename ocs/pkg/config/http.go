@@ -4,8 +4,8 @@ package config
 type HTTP struct {
 	Addr      string `ocisConfig:"addr" env:"OCS_HTTP_ADDR"`
 	Root      string `ocisConfig:"root" env:"OCS_HTTP_ROOT"`
-	Namespace string
-	CORS      CORS `ocisConfig:"cors"`
+	Namespace string `ocisConfig:"-" yaml:"-"`
+	CORS      CORS   `ocisConfig:"cors"`
 }
 
 // CORS defines the available cors configuration.

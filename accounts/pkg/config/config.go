@@ -8,9 +8,9 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons
+	*shared.Commons `ocisConfig:"-" yaml:"-"`
 
-	Service Service
+	Service Service `ocisConfig:"-" yaml:"-"`
 
 	Tracing *Tracing `ocisConfig:"tracing"`
 	Log     *Log     `ocisConfig:"log"`
@@ -28,7 +28,7 @@ type Config struct {
 	HashDifficulty     int         `ocisConfig:"hash_difficulty" env:"ACCOUNTS_HASH_DIFFICULTY" desc:"The hash difficulty makes sure that validating a password takes at least a certain amount of time."`
 	DemoUsersAndGroups bool        `ocisConfig:"demo_users_and_groups" env:"ACCOUNTS_DEMO_USERS_AND_GROUPS" desc:"If this flag is set the service will setup the demo users and groups."`
 
-	Context context.Context
+	Context context.Context `ocisConfig:"-" yaml:"-"`
 }
 
 // Asset defines the available asset configuration.

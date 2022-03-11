@@ -11,7 +11,7 @@ type CORS struct {
 // HTTP defines the available http configuration.
 type HTTP struct {
 	Addr      string `ocisConfig:"addr" env:"WEBDAV_HTTP_ADDR"`
-	Namespace string
+	Namespace string `ocisConfig:"-" yaml:"-"`
 	Root      string `ocisConfig:"root" env:"WEBDAV_HTTP_ROOT"`
 	CORS      CORS   `ocisConfig:"cors"`
 }

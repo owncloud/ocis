@@ -41,7 +41,7 @@ func DefaultConfig() *config.Config {
 			FileSystemStorage: config.FileSystemStorage{
 				RootDirectory: path.Join(defaults.BaseDataPath(), "thumbnails"),
 			},
-			WebdavAllowInsecure: true,
+			WebdavAllowInsecure: false,
 			RevaGateway:         "127.0.0.1:9142",
 			CS3AllowInsecure:    false,
 			TransferTokenSecret: "changemeplease",

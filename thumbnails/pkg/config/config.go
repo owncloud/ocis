@@ -8,9 +8,9 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons
+	*shared.Commons `ocisConfig:"-" yaml:"-"`
 
-	Service Service
+	Service Service `ocisConfig:"-" yaml:"-"`
 
 	Tracing *Tracing `ocisConfig:"tracing"`
 	Log     *Log     `ocisConfig:"log"`
@@ -21,7 +21,7 @@ type Config struct {
 
 	Thumbnail Thumbnail `ocisConfig:"thumbnail"`
 
-	Context context.Context
+	Context context.Context `ocisConfig:"-" yaml:"-"`
 }
 
 // FileSystemStorage defines the available filesystem storage configuration.

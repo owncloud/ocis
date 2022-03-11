@@ -4,5 +4,5 @@ package config
 type HTTP struct {
 	Addr      string `ocisConfig:"addr" env:"THUMBNAILS_HTTP_ADDR"`
 	Root      string `ocisConfig:"root" env:"THUMBNAILS_HTTP_ROOT"`
-	Namespace string
+	Namespace string `ocisConfig:"-" yaml:"-"`
 }

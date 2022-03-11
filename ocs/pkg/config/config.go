@@ -8,9 +8,9 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons
+	*shared.Commons `ocisConfig:"-" yaml:"-"`
 
-	Service Service
+	Service Service `ocisConfig:"-" yaml:"-"`
 
 	Tracing *Tracing `ocisConfig:"tracing"`
 	Log     *Log     `ocisConfig:"log"`
@@ -27,7 +27,7 @@ type Config struct {
 	StorageUsersDriver string `ocisConfig:"storage_users_driver" env:"STORAGE_USERS_DRIVER;OCS_STORAGE_USERS_DRIVER"`
 	MachineAuthAPIKey  string `ocisConfig:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;OCS_MACHINE_AUTH_API_KEY"`
 
-	Context context.Context
+	Context context.Context `ocisConfig:"-" yaml:"-"`
 }
 
 // IdentityManagement keeps track of the OIDC address. This is because Reva requisite of uniqueness for users

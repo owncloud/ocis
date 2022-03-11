@@ -8,9 +8,9 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons
+	*shared.Commons `ocisConfig:"-" yaml:"-"`
 
-	Service Service
+	Service Service `ocisConfig:"-" yaml:"-"`
 
 	Tracing *Tracing `ocisConfig:"tracing"`
 	Log     *Log     `ocisConfig:"log"`
@@ -24,7 +24,7 @@ type Config struct {
 	Spaces   Spaces   `ocisConfig:"spaces"`
 	Identity Identity `ocisConfig:"identity"`
 
-	Context context.Context
+	Context context.Context `ocisConfig:"-" yaml:"-"`
 }
 
 type Spaces struct {
