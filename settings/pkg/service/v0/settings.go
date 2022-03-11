@@ -12,6 +12,9 @@ const (
 	// BundleUUIDRoleAdmin represents the admin role
 	BundleUUIDRoleAdmin = "71881883-1768-46bd-a24d-a356a2afdf7f"
 
+	// BundleUUIDRoleSpaceManager represents the space manager role
+	BundleUUIDRoleSpaceManager = "2aadd357-682c-406b-8874-293091995fdd"
+
 	// BundleUUIDRoleUser represents the user role.
 	BundleUUIDRoleUser = "d7beeea8-8ff4-406b-8fb6-ab2dd81e6b11"
 
@@ -63,6 +66,7 @@ const (
 func generateBundlesDefaultRoles() []*settingsmsg.Bundle {
 	return []*settingsmsg.Bundle{
 		generateBundleAdminRole(),
+		generateBundleSpaceManagerRole(),
 		generateBundleUserRole(),
 		generateBundleGuestRole(),
 		generateBundleProfileRequest(),
@@ -76,6 +80,20 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 		Type:        settingsmsg.Bundle_TYPE_ROLE,
 		Extension:   "ocis-roles",
 		DisplayName: "Admin",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SYSTEM,
+		},
+		Settings: []*settingsmsg.Setting{},
+	}
+}
+
+func generateBundleSpaceManagerRole() *settingsmsg.Bundle {
+	return &settingsmsg.Bundle{
+		Id:          BundleUUIDRoleSpaceManager,
+		Name:        "spacemanager",
+		Type:        settingsmsg.Bundle_TYPE_ROLE,
+		Extension:   "ocis-roles",
+		DisplayName: "Spacemanager",
 		Resource: &settingsmsg.Resource{
 			Type: settingsmsg.Resource_TYPE_SYSTEM,
 		},
@@ -424,6 +442,42 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 			},
 		},
 		{
+			BundleId: BundleUUIDRoleSpaceManager,
+			Setting: &settingsmsg.Setting{
+				Id:          CreateSpacePermissionID,
+				Name:        CreateSpacePermissionName,
+				DisplayName: "Create Space",
+				Description: "This permission allows to create new spaces.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SYSTEM,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+		},
+		{
+			BundleId: BundleUUIDRoleSpaceManager,
+			Setting: &settingsmsg.Setting{
+				Id:          ListAllSpacesPermissionID,
+				Name:        ListAllSpacesPermissionName,
+				DisplayName: "List All Spaces",
+				Description: "This permission allows list all spaces.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SYSTEM,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READ,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+		},
+		{
 			BundleId: BundleUUIDRoleMetadata,
 			Setting: &settingsmsg.Setting{
 				Id:          CreateSpacePermissionID,
@@ -479,14 +533,10 @@ func defaultRoleAssignments() []*settingsmsg.UserRoleAssignment {
 			AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7",
 			RoleId:      BundleUUIDRoleUser,
 		},
-		// kjohnson with additional role "space-manager" (ListAllSpaces + CreateSpace)
+		// kjohnson with additional role "spacemanager"
 		{
 			AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7",
-			RoleId:      ListAllSpacesPermissionID,
-		},
-		{
-			AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7",
-			RoleId:      CreateSpacePermissionID,
+			RoleId:      BundleUUIDRoleSpaceManager,
 		},
 	}
 }
