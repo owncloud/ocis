@@ -41,12 +41,11 @@ m := map[string]interface{}{
 {{- end }}
 }
 
-    targetFolder := "../../../docs/extensions/_includes/"
+    targetFolder := "../../docs/extensions/_includes/"
     for pkg, conf := range m {
 	fields = GetAnnotatedVariables(conf)
 	if len(fields) > 0 {
 	fmt.Printf("... %s\n", pkg)
-		os.MkdirAll(filepath.Join(targetFolder, replacer.Replace(pkg)), 0700)
 		targetFile, err = os.Create(filepath.Join(targetFolder, replacer.Replace(pkg) + "_configvars.md"))
 		if err != nil {
 			log.Fatalf("Failed to create target file: %s", err)
