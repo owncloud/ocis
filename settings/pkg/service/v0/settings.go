@@ -462,6 +462,24 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 		{
 			BundleId: BundleUUIDRoleSpaceManager,
 			Setting: &settingsmsg.Setting{
+				Id:          SetSpaceQuotaPermissionID,
+				Name:        SetSpaceQuotaPermissionName,
+				DisplayName: "Set Space Quota",
+				Description: "This permission allows to manage space quotas.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SYSTEM,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+		},
+		{
+			BundleId: BundleUUIDRoleSpaceManager,
+			Setting: &settingsmsg.Setting{
 				Id:          ListAllSpacesPermissionID,
 				Name:        ListAllSpacesPermissionName,
 				DisplayName: "List All Spaces",
@@ -473,6 +491,43 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 					PermissionValue: &settingsmsg.Permission{
 						Operation:  settingsmsg.Permission_OPERATION_READ,
 						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+		},
+		{
+			BundleId: BundleUUIDRoleSpaceManager,
+			Setting: &settingsmsg.Setting{
+				Id:          "640e00d2-4df8-41bd-b1c2-9f30a01e0e99",
+				Name:        "language-readwrite",
+				DisplayName: "Permission to read and set the language (self)",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SETTING,
+					Id:   settingUUIDProfileLanguage,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
+					},
+				},
+			},
+		},
+		{
+			BundleId: BundleUUIDRoleSpaceManager,
+			Setting: &settingsmsg.Setting{
+				Id:          SelfManagementPermissionID,
+				Name:        SelfManagementPermissionName,
+				DisplayName: "Self Management",
+				Description: "This permission gives access to self management.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+					Id:   "me",
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
 					},
 				},
 			},
@@ -533,7 +588,7 @@ func defaultRoleAssignments() []*settingsmsg.UserRoleAssignment {
 			AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7",
 			RoleId:      BundleUUIDRoleUser,
 		},
-		// kjohnson with additional role "spacemanager"
+		// default users with role "spacemanager"
 		{
 			AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7",
 			RoleId:      BundleUUIDRoleSpaceManager,
