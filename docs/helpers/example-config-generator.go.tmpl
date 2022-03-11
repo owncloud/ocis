@@ -14,8 +14,6 @@ import (
 )
 
 func main() {
-    targetFolder := "example-yaml/"
-	os.MkdirAll(targetFolder, 0700)
 	replacer := strings.NewReplacer(
 		"github.com/owncloud/ocis/", "",
 		"/pkg/config/defaults", "",
@@ -36,7 +34,9 @@ func main() {
 		{{- end}}
 	}
 	for pkg, yml := range cfg {
-		targetYamlFile, err := os.Create(filepath.Join(targetFolder, replacer.Replace(pkg) + "-example.yaml"))
+		targetFolder := filepath.Join("../../", pkg, "/config")
+		os.MkdirAll(targetFolder, 0700)
+		targetYamlFile, err := os.Create(filepath.Join(targetFolder, replacer.Replace(pkg) + "-config-example.yaml"))
 		if err != nil {
 			log.Fatalf("Failed to create target file for : %s", err)
 		}
