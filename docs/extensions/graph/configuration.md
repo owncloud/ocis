@@ -7,6 +7,8 @@ geekdocEditPath: edit/master/docs/extensions/graph
 geekdocFilePath: configuration.md
 geekdocCollapseSection: true
 ---
+## Example YAML Config
 
+{{< include file="extensions/_includes/graph-config-example.yaml"  language="yaml" >}}
 
 {{< include file="extensions/_includes/graph_configvars.md" >}}

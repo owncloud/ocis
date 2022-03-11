@@ -34,14 +34,20 @@ func main() {
 		{{- end}}
 	}
 	for pkg, yml := range cfg {
-		targetFolder := filepath.Join("../../", pkg, "/config")
-		os.MkdirAll(targetFolder, 0700)
-		targetYamlFile, err := os.Create(filepath.Join(targetFolder, replacer.Replace(pkg) + "-config-example.yaml"))
-		if err != nil {
-			log.Fatalf("Failed to create target file for : %s", err)
+		targetFolders := []string{
+			// TODO: comment in when it is clear how to commit this to the structure of the master|main branch
+			// filepath.Join("../../", pkg, "/config"),
+			"../../docs/extensions/_includes/",
 		}
-		defer targetYamlFile.Close()
-		targetYamlFile.WriteString(yml)
+		for _, targetFolder := range targetFolders {
+			os.MkdirAll(targetFolder, 0700)
+			targetYamlFile, err := os.Create(filepath.Join(targetFolder, replacer.Replace(pkg) + "-config-example.yaml"))
+			if err != nil {
+				log.Fatalf("Failed to create target file for : %s", err)
+			}
+			defer targetYamlFile.Close()
+			targetYamlFile.WriteString(yml)
+		}
 	}
 }
 
