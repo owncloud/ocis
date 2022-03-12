@@ -29,7 +29,7 @@ func MessageShareUpdated(sharer, shareID, fieldUpdated string) string {
 
 // MessageLinkUpdated returns the human readable string that describes the action
 func MessageLinkUpdated(sharer, shareid, fieldUpdated string) string {
-	return fmt.Sprintf("user '%s' modified field '%s' of public link '%s'", sharer, fieldUpdated, shareid)
+	return fmt.Sprintf("user '%s' updated field '%s' of public link '%s'", sharer, fieldUpdated, shareid)
 }
 
 // MessageShareRemoved returns the human readable string that describes the action
