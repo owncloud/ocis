@@ -247,6 +247,53 @@ var testCases = []struct {
 			require.Equal(t, "user", ev.ShareType)
 			require.Equal(t, "beshared-userid", ev.ShareWith)
 		},
+	}, {
+		Alias: "Link accessed - success",
+		SystemEvent: events.LinkAccessed{
+			ShareID:           linkID("shareid"),
+			Sharer:            userID("sharing-userid"),
+			ItemID:            resourceID("storage-1", "itemid-1"),
+			Permissions:       linkPermissions("stat"),
+			DisplayName:       "link",
+			Expiration:        timestamp(10e8 + 10e5),
+			PasswordProtected: true,
+			CTime:             timestamp(10e8),
+			Token:             "token-123",
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventLinkAccessed{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "sharing-userid", "2001-09-09T03:46:40+02:00", "link 'shareid' was accessed. Success: true", "public_link_accessed")
+			// AuditEventSharing fields
+			checkSharingAuditEvent(t, ev.AuditEventSharing, "itemid-1", "sharing-userid", "shareid")
+			// AuditEventShareUpdated fields
+			require.Equal(t, "", ev.ItemType) // not implemented atm
+			require.Equal(t, "token-123", ev.ShareToken)
+			require.Equal(t, true, ev.Success)
+		},
+	}, {
+		Alias: "Link accessed - failure",
+		SystemEvent: events.LinkAccessFailed{
+			ShareID: linkID("shareid"),
+			Token:   "token-123",
+			Status:  8,
+			Message: "access denied",
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventLinkAccessed{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "link 'shareid' was accessed. Success: false", "public_link_accessed")
+			// AuditEventSharing fields
+			checkSharingAuditEvent(t, ev.AuditEventSharing, "", "", "shareid")
+			// AuditEventShareUpdated fields
+			require.Equal(t, "", ev.ItemType) // not implemented atm
+			require.Equal(t, "token-123", ev.ShareToken)
+			require.Equal(t, false, ev.Success)
+		},
 	},
 }
 

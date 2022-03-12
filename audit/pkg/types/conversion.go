@@ -195,12 +195,29 @@ func ReceivedShareUpdated(ev events.ReceivedShareUpdated) AuditEventReceivedShar
 
 // LinkAccessed converts a LinkAccessed event to an AuditEventLinkAccessed
 func LinkAccessed(ev events.LinkAccessed) AuditEventLinkAccessed {
-	return AuditEventLinkAccessed{}
+	uid := ev.Sharer.OpaqueId
+	base := BasicAuditEvent(uid, formatTime(ev.CTime), MessageLinkAccessed(ev.ShareID.GetOpaqueId(), true), ActionLinkAccessed)
+	return AuditEventLinkAccessed{
+		AuditEventSharing: SharingAuditEvent(ev.ShareID.GetOpaqueId(), ev.ItemID.OpaqueId, uid, base),
+		ShareToken:        ev.Token,
+		Success:           true,
+
+		// NOTE: those values are not in the event and can therefore not be filled at the moment
+		ItemType: "",
+	}
 }
 
 // LinkAccessFailed converts a LinkAccessFailed event to an AuditEventLinkAccessed
 func LinkAccessFailed(ev events.LinkAccessFailed) AuditEventLinkAccessed {
-	return AuditEventLinkAccessed{}
+	base := BasicAuditEvent("", "", MessageLinkAccessed(ev.ShareID.GetOpaqueId(), false), ActionLinkAccessed)
+	return AuditEventLinkAccessed{
+		AuditEventSharing: SharingAuditEvent(ev.ShareID.GetOpaqueId(), "", "", base),
+		ShareToken:        ev.Token,
+		Success:           false,
+
+		// NOTE: those values are not in the event and can therefore not be filled at the moment
+		ItemType: "",
+	}
 }
 
 func extractGrantee(uid *user.UserId, gid *group.GroupId) (string, string) {
