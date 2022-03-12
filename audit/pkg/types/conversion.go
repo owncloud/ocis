@@ -166,6 +166,21 @@ func LinkRemoved(ev events.LinkRemoved) AuditEventShareRemoved {
 	}
 }
 
+// ReceivedShareUpdated converts a ReceivedShareUpdated event to an AuditEventReceivedShareUpdated
+func ReceivedShareUpdated(ev events.ReceivedShareUpdated) AuditEventReceivedShareUpdated {
+	return AuditEventReceivedShareUpdated{}
+}
+
+// LinkAccessed converts a LinkAccessed event to an AuditEventLinkAccessed
+func LinkAccessed(ev events.LinkAccessed) AuditEventLinkAccessed {
+	return AuditEventLinkAccessed{}
+}
+
+// LinkAccessFailed converts a LinkAccessFailed event to an AuditEventLinkAccessed
+func LinkAccessFailed(ev events.LinkAccessFailed) AuditEventLinkAccessed {
+	return AuditEventLinkAccessed{}
+}
+
 func extractGrantee(uid *user.UserId, gid *group.GroupId) (string, string) {
 	switch {
 	case uid != nil && uid.OpaqueId != "":

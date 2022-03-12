@@ -13,5 +13,8 @@ func RegisteredEvents() []events.Unmarshaller {
 		events.LinkUpdated{},
 		events.ShareRemoved{},
 		events.LinkRemoved{},
+		events.ReceivedShareUpdated{},
+		events.LinkAccessed{},
+		events.LinkAccessFailed{},
 	}
 }

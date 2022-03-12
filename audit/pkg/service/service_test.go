@@ -140,6 +140,88 @@ var testCases = []struct {
 			require.Equal(t, "sharing-userid", ev.ShareOwner)
 			require.Equal(t, "token-123", ev.ShareToken)
 		},
+	}, {
+		Alias: "ShareRemoved",
+		SystemEvent: events.ShareRemoved{
+			ShareID:  shareID("shareid"),
+			ShareKey: nil,
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventShareRemoved{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "share id:'shareid' uid:'' item-id:'' was removed", "file_unshared")
+			// AuditEventSharing fields
+			checkSharingAuditEvent(t, ev.AuditEventSharing, "", "", "shareid")
+			// AuditEventShareUpdated fields
+			require.Equal(t, "", ev.ItemType) // not implemented atm
+			require.Equal(t, "", ev.ShareType)
+			require.Equal(t, "", ev.ShareWith) // not filled on links
+		},
+	}, {
+		Alias: "LinkRemoved - id",
+		SystemEvent: events.LinkRemoved{
+			ShareID:    linkID("shareid"),
+			ShareToken: "",
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventShareRemoved{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "public link id:'shareid' was removed", "file_unshared")
+			// AuditEventSharing fields
+			checkSharingAuditEvent(t, ev.AuditEventSharing, "", "", "shareid")
+			// AuditEventShareUpdated fields
+			require.Equal(t, "", ev.ItemType) // not implemented atm
+			require.Equal(t, "link", ev.ShareType)
+			require.Equal(t, "", ev.ShareWith) // not filled on links
+		},
+	}, {
+		Alias: "LinkRemoved - token",
+		SystemEvent: events.LinkRemoved{
+			ShareID:    nil,
+			ShareToken: "token-123",
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventShareRemoved{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "public link id:'token-123' was removed", "file_unshared")
+			// AuditEventSharing fields
+			checkSharingAuditEvent(t, ev.AuditEventSharing, "", "", "token-123")
+			// AuditEventShareUpdated fields
+			require.Equal(t, "", ev.ItemType) // not implemented atm
+			require.Equal(t, "link", ev.ShareType)
+			require.Equal(t, "", ev.ShareWith) // not filled on links
+		},
+	}, {
+		Alias: "Share accepted",
+		SystemEvent: events.ReceivedShareUpdated{
+			ShareID:        shareID("shareid"),
+			ItemID:         resourceID("storageid-1", "itemid-1"),
+			Permissions:    sharePermissions("get_quota"),
+			GranteeUserID:  userID("beshared-userid"),
+			GranteeGroupID: nil,
+			Sharer:         userID("sharing-userid"),
+			MTime:          timestamp(10e8),
+			State:          "SHARE_STATE_ACCEPTED",
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventReceivedShareUpdated{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "public link id:'token-123' was removed", "file_unshared")
+			// AuditEventSharing fields
+			checkSharingAuditEvent(t, ev.AuditEventSharing, "", "", "token-123")
+			// AuditEventShareUpdated fields
+			require.Equal(t, "", ev.ItemType) // not implemented atm
+			require.Equal(t, "link", ev.ShareType)
+			require.Equal(t, "", ev.ShareWith) // not filled on links
+		},
 	},
 }
 

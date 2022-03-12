@@ -60,3 +60,23 @@ type AuditEventShareRemoved struct {
 	ShareType string // group user or link
 	ShareWith string // The UID or GID of the share recipient.
 }
+
+// AuditEventReceivedShareUpdated is the event logged when a share is accepted or declined
+type AuditEventReceivedShareUpdated struct {
+	AuditEventSharing
+	ItemType  string // file or folder
+	ShareType string // group user or link
+	ShareWith string // The UID or GID of the share recipient.
+	Path      string // The path of the shared item.
+	Owner     string // The UID of the owner of the shared item.
+	FileID    string // The file identifier for the item shared.
+	ShareID   string // The sharing identifier. (not available for public_link_accessed)
+}
+
+// AuditEventLinkAccessed is the event logged when a link is accessed
+type AuditEventLinkAccessed struct {
+	AuditEventSharing
+	ShareToken string // The share token.
+	Success    bool   // If the request was successful.
+	ItemType   string // file or folder
+}
