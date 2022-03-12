@@ -10,6 +10,9 @@ const (
 	ActionSharePasswordUpdated    = "share_password_updated"
 	ActionShareExpirationUpdated  = "share_expiration_updated"
 	ActionShareRemoved            = "file_unshared"
+	ActionShareAccepted           = "share_accepted"
+	ActionShareDeclined           = "share_declined"
+	ActionLinkAccessed            = "public_link_accessed"
 )
 
 // MessageShareCreated returns the human readable string that describes the action
@@ -40,4 +43,19 @@ func MessageShareRemoved(sharer, shareid, itemid string) string {
 // MessageLinkRemoved returns the human readable string that describes the action
 func MessageLinkRemoved(shareid string) string {
 	return fmt.Sprintf("public link id:'%s' was removed", shareid)
+}
+
+// MessageShareAccepted returns the human readable string that describes the action
+func MessageShareAccepted(userid, shareid, sharerid string) string {
+	return fmt.Sprintf("user '%s' accepted share '%s' from user '%s'", userid, shareid, sharerid)
+}
+
+// MessageShareDeclined returns the human readable string that describes the action
+func MessageShareDeclined(userid, shareid, sharerid string) string {
+	return fmt.Sprintf("user '%s' declined share '%s' from user '%s'", userid, shareid, sharerid)
+}
+
+// MessageLinkAccessed returns the human readable string that describes the action
+func MessageLinkAccessed(linkid string, success bool) string {
+	return fmt.Sprintf("link '%s' was accessed. Success: %b", linkid, success)
 }

@@ -214,13 +214,38 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "public link id:'token-123' was removed", "file_unshared")
+			checkBaseAuditEvent(t, ev.AuditEvent, "beshared-userid", "2001-09-09T03:46:40+02:00", "user 'beshared-userid' accepted share 'shareid' from user 'sharing-userid'", "share_accepted")
 			// AuditEventSharing fields
-			checkSharingAuditEvent(t, ev.AuditEventSharing, "", "", "token-123")
+			checkSharingAuditEvent(t, ev.AuditEventSharing, "itemid-1", "sharing-userid", "shareid")
 			// AuditEventShareUpdated fields
-			require.Equal(t, "", ev.ItemType) // not implemented atm
-			require.Equal(t, "link", ev.ShareType)
-			require.Equal(t, "", ev.ShareWith) // not filled on links
+			require.Equal(t, "", ev.ItemType)
+			require.Equal(t, "user", ev.ShareType)
+			require.Equal(t, "beshared-userid", ev.ShareWith)
+		},
+	}, {
+		Alias: "Share declined",
+		SystemEvent: events.ReceivedShareUpdated{
+			ShareID:        shareID("shareid"),
+			ItemID:         resourceID("storageid-1", "itemid-1"),
+			Permissions:    sharePermissions("get_quota"),
+			GranteeUserID:  userID("beshared-userid"),
+			GranteeGroupID: nil,
+			Sharer:         userID("sharing-userid"),
+			MTime:          timestamp(10e8),
+			State:          "SHARE_STATE_DECLINED",
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventReceivedShareUpdated{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "beshared-userid", "2001-09-09T03:46:40+02:00", "user 'beshared-userid' declined share 'shareid' from user 'sharing-userid'", "share_declined")
+			// AuditEventSharing fields
+			checkSharingAuditEvent(t, ev.AuditEventSharing, "itemid-1", "sharing-userid", "shareid")
+			// AuditEventShareUpdated fields
+			require.Equal(t, "", ev.ItemType)
+			require.Equal(t, "user", ev.ShareType)
+			require.Equal(t, "beshared-userid", ev.ShareWith)
 		},
 	},
 }

@@ -168,7 +168,29 @@ func LinkRemoved(ev events.LinkRemoved) AuditEventShareRemoved {
 
 // ReceivedShareUpdated converts a ReceivedShareUpdated event to an AuditEventReceivedShareUpdated
 func ReceivedShareUpdated(ev events.ReceivedShareUpdated) AuditEventReceivedShareUpdated {
-	return AuditEventReceivedShareUpdated{}
+	uid := ev.Sharer.GetOpaqueId()
+	sid := ev.ShareID.GetOpaqueId()
+	with, typ := extractGrantee(ev.GranteeUserID, ev.GranteeGroupID)
+	itemID := ev.ItemID.GetOpaqueId()
+
+	msg, utype := "", ""
+	switch ev.State {
+	case "SHARE_STATE_ACCEPTED":
+		msg = MessageShareAccepted(with, sid, uid)
+		utype = ActionShareAccepted
+	case "SHARE_STATE_DECLINED":
+		msg = MessageShareDeclined(with, sid, uid)
+		utype = ActionShareDeclined
+	}
+	base := BasicAuditEvent(with, formatTime(ev.MTime), msg, utype)
+	return AuditEventReceivedShareUpdated{
+		AuditEventSharing: SharingAuditEvent(sid, itemID, uid, base),
+		ShareType:         typ,
+		ShareWith:         with,
+
+		// NOTE: those values are not in the event and can therefore not be filled at the moment
+		ItemType: "",
+	}
 }
 
 // LinkAccessed converts a LinkAccessed event to an AuditEventLinkAccessed
