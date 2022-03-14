@@ -47,7 +47,7 @@ services:
     deploy:
       replicas: ${OCIS_SCALE:-1}
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - proxy
@@ -90,7 +90,7 @@ services:
     deploy:
       replicas: 1
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - nats-server
@@ -111,7 +111,7 @@ services:
     deploy:
       replicas: 1
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - /bin/sh
       - /entrypoint-override.sh
@@ -145,7 +145,7 @@ services:
     deploy:
       replicas: ${OCIS_SCALE:-1}
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - glauth
@@ -168,7 +168,7 @@ services:
     deploy:
       replicas: 1
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - idp
@@ -194,7 +194,7 @@ services:
     deploy:
       replicas: ${OCIS_SCALE:-1}
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - ocs
@@ -222,7 +222,7 @@ services:
     deploy:
       replicas: 1
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - settings
@@ -247,7 +247,7 @@ services:
     deploy:
       replicas: 1
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - store
@@ -269,7 +269,7 @@ services:
     deploy:
       replicas: ${OCIS_SCALE:-1}
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - thumbnails
@@ -296,7 +296,7 @@ services:
     deploy:
       replicas: ${OCIS_SCALE:-1}
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - web
@@ -320,7 +320,7 @@ services:
     deploy:
       replicas: ${OCIS_SCALE:-1}
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - webdav
@@ -343,7 +343,7 @@ services:
     deploy:
       replicas: ${OCIS_SCALE:-1}
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - graph
@@ -369,7 +369,7 @@ services:
     deploy:
       replicas: 1
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - storage-metadata
@@ -402,7 +402,7 @@ services:
     deploy:
       replicas: ${OCIS_SCALE:-1}
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - storage-auth-basic
@@ -426,7 +426,7 @@ services:
     deploy:
       replicas: ${OCIS_SCALE:-1}
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - storage-auth-machine
@@ -450,7 +450,7 @@ services:
     deploy:
       replicas: ${OCIS_SCALE:-1}
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - storage-auth-bearer
@@ -474,7 +474,7 @@ services:
     deploy:
       replicas: ${OCIS_SCALE:-1}
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - storage-shares
@@ -501,7 +501,7 @@ services:
     deploy:
       replicas: 1
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - storage-users
@@ -535,7 +535,7 @@ services:
     deploy:
       replicas: ${OCIS_SCALE:-1}
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - storage-public-link
@@ -559,7 +559,7 @@ services:
     deploy:
       replicas: 1
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - storage-sharing
@@ -592,7 +592,7 @@ services:
     deploy:
       replicas: ${OCIS_SCALE:-1}
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - storage-userprovider
@@ -623,7 +623,7 @@ services:
     deploy:
       replicas: ${OCIS_SCALE:-1}
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - storage-groupprovider
@@ -654,7 +654,7 @@ services:
     deploy:
       replicas: ${OCIS_SCALE:-1}
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - storage-frontend
@@ -684,7 +684,7 @@ services:
     deploy:
       replicas: ${OCIS_SCALE:-1}
     networks:
-      ocis-net: null
+      ocis-net:
     entrypoint:
       - ocis
       - storage-gateway
@@ -731,4 +731,3 @@ volumes:
 
 networks:
   ocis-net:
-    external: true
