@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Network configuration in individiual_services example: [#3238](https://github.com/owncloud/ocis/pull/3238)
 * Bugfix - Improve gif thumbnails: [#3305](https://github.com/owncloud/ocis/pull/3305)
+* Enhancement - Log sharing events in audit service: [#3301](https://github.com/owncloud/ocis/pull/3301)
 * Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
 * Enhancement - Improve thumbnails API: [#3272](https://github.com/owncloud/ocis/pull/3272)
 * Enhancement - Update ownCloud Web to v5.3.0-rc.1: [#6561](https://github.com/owncloud/web/pull/6561)
@@ -26,6 +27,12 @@ The following sections list the changes for unreleased.
    Improved the gif thumbnail generation for gifs with different disposal strategies.
 
    https://github.com/owncloud/ocis/pull/3305
+
+* Enhancement - Log sharing events in audit service: [#3301](https://github.com/owncloud/ocis/pull/3301)
+
+   Contains sharing related events. See full list in audit/pkg/types/events.go
+
+   https://github.com/owncloud/ocis/pull/3301
 
 * Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
 
