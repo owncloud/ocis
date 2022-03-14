@@ -242,6 +242,51 @@ services:
       driver: "local"
     restart: always
 
+  audit:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    deploy:
+      replicas: 1
+    networks:
+      ocis-net: null
+    entrypoint:
+      - ocis
+      - audit
+      - server
+    environment:
+      AUDIT_EVENTS_ENDPOINT: nats:9233
+    logging:
+      driver: "local"
+    restart: always
+
+  notifications:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    deploy:
+      replicas: 1
+    networks:
+      ocis-net: null
+    entrypoint:
+      - ocis
+      - notifications
+      - server
+    environment:
+      NOTIFICATIONS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      NOTIFICATIONS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      NOTIFICATIONS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+
+      # replace with your own
+      NOTIFICATIONS_SMTP_HOST: 127.0.0.1
+      NOTIFICATIONS_SMTP_PORT: 1025
+      NOTIFICATIONS_SMTP_SENDER: ocis@owncloud.test
+      NOTIFICATIONS_SMTP_PASSWORD: lorem-ipsum
+
+      NOTIFICATIONS_EVENTS_ENDPOINT: nats:9233
+
+      REVA_GATEWAY: storage-gateway:9142
+      PROXY_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
+    logging:
+      driver: "local"
+    restart: always
+
   store:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
