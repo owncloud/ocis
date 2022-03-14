@@ -6,12 +6,20 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Network configuration in individiual_services example: [#3238](https://github.com/owncloud/ocis/pull/3238)
 * Bugfix - Improve gif thumbnails: [#3305](https://github.com/owncloud/ocis/pull/3305)
 * Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
 * Enhancement - Improve thumbnails API: [#3272](https://github.com/owncloud/ocis/pull/3272)
 * Enhancement - Update ownCloud Web to v5.3.0-rc.1: [#6561](https://github.com/owncloud/web/pull/6561)
 
 ## Details
+
+* Bugfix - Network configuration in individiual_services example: [#3238](https://github.com/owncloud/ocis/pull/3238)
+
+   Tidy up the deployments/examples/ocis_individual_services example so that the
+   instructions work.
+
+   https://github.com/owncloud/ocis/pull/3238
 
 * Bugfix - Improve gif thumbnails: [#3305](https://github.com/owncloud/ocis/pull/3305)
 
