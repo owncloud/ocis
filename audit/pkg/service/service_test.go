@@ -37,7 +37,7 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "sharing-userid", "1970-01-01T01:00:00+01:00", "user 'sharing-userid' shared file 'itemid-1' with 'beshared-userid'", "file_shared")
+			checkBaseAuditEvent(t, ev.AuditEvent, "sharing-userid", "1970-01-01T00:00:00Z", "user 'sharing-userid' shared file 'itemid-1' with 'beshared-userid'", "file_shared")
 			// AuditEventSharing fields
 			checkSharingAuditEvent(t, ev.AuditEventSharing, "itemid-1", "sharing-userid", "")
 			// AuditEventShareCreated fields
@@ -64,7 +64,7 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "sharing-userid", "2001-09-09T03:46:40+02:00", "user 'sharing-userid' shared file 'itemid-1' with 'beshared-groupid'", "file_shared")
+			checkBaseAuditEvent(t, ev.AuditEvent, "sharing-userid", "2001-09-09T01:46:40Z", "user 'sharing-userid' shared file 'itemid-1' with 'beshared-groupid'", "file_shared")
 			// AuditEventSharing fields
 			checkSharingAuditEvent(t, ev.AuditEventSharing, "itemid-1", "sharing-userid", "")
 			// AuditEventShareCreated fields
@@ -95,7 +95,7 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "sharing-userid", "2001-09-09T03:46:40+02:00", "user 'sharing-userid' updated field 'permissions' of share 'shareid'", "share_permission_updated")
+			checkBaseAuditEvent(t, ev.AuditEvent, "sharing-userid", "2001-09-09T01:46:40Z", "user 'sharing-userid' updated field 'permissions' of share 'shareid'", "share_permission_updated")
 			// AuditEventSharing fields
 			checkSharingAuditEvent(t, ev.AuditEventSharing, "itemid-1", "sharing-userid", "shareid")
 			// AuditEventShareUpdated fields
@@ -127,12 +127,12 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "sharing-userid", "2001-09-09T03:46:40+02:00", "user 'sharing-userid' updated field 'permissions' of public link 'shareid'", "share_permission_updated")
+			checkBaseAuditEvent(t, ev.AuditEvent, "sharing-userid", "2001-09-09T01:46:40Z", "user 'sharing-userid' updated field 'permissions' of public link 'shareid'", "share_permission_updated")
 			// AuditEventSharing fields
 			checkSharingAuditEvent(t, ev.AuditEventSharing, "itemid-1", "sharing-userid", "shareid")
 			// AuditEventShareUpdated fields
 			require.Equal(t, "", ev.ItemType) // not implemented atm
-			require.Equal(t, "2001-09-20T17:33:20+02:00", ev.ExpirationDate)
+			require.Equal(t, "2001-09-20T15:33:20Z", ev.ExpirationDate)
 			require.Equal(t, true, ev.SharePass)
 			require.Equal(t, "stat:true ", ev.Permissions)
 			require.Equal(t, "link", ev.ShareType)
@@ -214,7 +214,7 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "beshared-userid", "2001-09-09T03:46:40+02:00", "user 'beshared-userid' accepted share 'shareid' from user 'sharing-userid'", "share_accepted")
+			checkBaseAuditEvent(t, ev.AuditEvent, "beshared-userid", "2001-09-09T01:46:40Z", "user 'beshared-userid' accepted share 'shareid' from user 'sharing-userid'", "share_accepted")
 			// AuditEventSharing fields
 			checkSharingAuditEvent(t, ev.AuditEventSharing, "itemid-1", "sharing-userid", "shareid")
 			// AuditEventShareUpdated fields
@@ -239,7 +239,7 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "beshared-userid", "2001-09-09T03:46:40+02:00", "user 'beshared-userid' declined share 'shareid' from user 'sharing-userid'", "share_declined")
+			checkBaseAuditEvent(t, ev.AuditEvent, "beshared-userid", "2001-09-09T01:46:40Z", "user 'beshared-userid' declined share 'shareid' from user 'sharing-userid'", "share_declined")
 			// AuditEventSharing fields
 			checkSharingAuditEvent(t, ev.AuditEventSharing, "itemid-1", "sharing-userid", "shareid")
 			// AuditEventShareUpdated fields
@@ -265,7 +265,7 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "sharing-userid", "2001-09-09T03:46:40+02:00", "link 'shareid' was accessed. Success: true", "public_link_accessed")
+			checkBaseAuditEvent(t, ev.AuditEvent, "sharing-userid", "2001-09-09T01:46:40Z", "link 'shareid' was accessed. Success: true", "public_link_accessed")
 			// AuditEventSharing fields
 			checkSharingAuditEvent(t, ev.AuditEventSharing, "itemid-1", "sharing-userid", "shareid")
 			// AuditEventShareUpdated fields

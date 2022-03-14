@@ -235,7 +235,7 @@ func formatTime(t *types.Timestamp) string {
 	if t == nil {
 		return ""
 	}
-	return time.Unix(int64(t.Seconds), int64(t.Nanos)).Format(time.RFC3339)
+	return time.Unix(int64(t.Seconds), int64(t.Nanos)).UTC().Format(time.RFC3339)
 }
 
 func updateType(u string) string {
