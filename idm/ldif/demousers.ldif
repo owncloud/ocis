@@ -1,0 +1,162 @@
+dn: uid=einstein,ou=users,o=libregraph-idm
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: ownCloud
+objectClass: person
+objectClass: top
+uid: einstein
+givenName: Albert
+sn: Einstein
+cn: einstein
+displayName: Albert Einstein
+description: A German-born theoretical physicist who developed the theory of relativity, one of the two pillars of modern physics (alongside quantum mechanics).
+mail: einstein@example.org
+ownCloudUUID: 4c510ada-c86b-4815-8820-42cdf82c3d51
+userPassword:: e0FSR09OMn0kYXJnb24yaWQkdj0xOSRtPTY1NTM2LHQ9MSxwPTIkOFpyclR0NXA1a0VmVlhL
+ akNHaVBEUSRnemZCWWwrTHdzTUhXQWJSMEJ2NnRiZk1XZjZaOVJ0Mms5Z3VkSWJ5bzg4
+
+dn: uid=marie,ou=users,o=libregraph-idm
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: ownCloud
+objectClass: person
+objectClass: top
+uid: marie
+givenName: Marie
+sn: Curie
+cn: marie
+displayName: Marie Skłodowska Curie
+description: A Polish and naturalized-French physicist and chemist who conducted pioneering research on radioactivity.
+mail: marie@example.org
+ownCloudUUID: f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c
+userPassword:: e0FSR09OMn0kYXJnb24yaWQkdj0xOSRtPTY1NTM2LHQ9MSxwPTIkUHJzWkpQQW9pMkFwZHlJ
+ a2Q1NGkzQSRnalZzR3doTmk2K0djenJ4SVdPalN2UlBpWXhKSXpHVG4vcnpQZzkvSlZN
+
+dn: uid=richard,ou=users,o=libregraph-idm
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: ownCloud
+objectClass: person
+objectClass: top
+uid: richard
+givenName: Richard
+sn: Feynman
+cn: richard
+displayName: Richard Phillips Feynman
+description: An American theoretical physicist, known for his work in the path integral formulation of quantum mechanics, the theory of quantum electrodynamics, the physics of the superfluidity of supercooled liquid helium, as well as his work in particle physics for which he proposed the parton model.
+mail: richard@example.org
+ownCloudUUID: 932b4540-8d16-481e-8ef4-588e4b6b151c
+userPassword:: e0FSR09OMn0kYXJnb24yaWQkdj0xOSRtPTY1NTM2LHQ9MSxwPTIkNjlNcUQxem5sUUZ2SUha
+ d2dxU00xQSRVQmNEa2NDZktMemVpQnlyb0JjOTdCSVRhTFo2WjZIL2dhbytSTVh6OHhn
+
+dn: uid=moss,ou=users,o=libregraph-idm
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: ownCloud
+objectClass: person
+objectClass: top
+uid: moss
+givenName: Maurice
+sn: Moss
+cn: moss
+displayName: Maurice Moss
+description: A worker in the IT Department of Reynholm Industries. Of all the working staff in the IT Department, he is the most hard-working, the most experienced, and the most capable of doing his job well. He puts a lot of effort into his work, however he does not get the credit he deserves.
+mail: moss@example.org
+ownCloudUUID: 058bff95-6708-4fe5-91e4-9ea3d377588b
+userPassword:: e0FSR09OMn0kYXJnb24yaWQkdj0xOSRtPTY1NTM2LHQ9MSxwPTIkZU0xaXR6amQ2dlNSSERx
+ NlZCbXBlQSQxNzBhcTB3YjJZZ2NLU2cwWDhHY3l6ckZwMUllcGplMTNraDdVNjUyNXk4
+
+dn: uid=admin,ou=users,o=libregraph-idm
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: ownCloud
+objectClass: person
+objectClass: top
+uid: admin
+givenName: Admin
+sn: Admin
+cn: admin
+displayName: Admin
+description: An admin for this oCIS instance.
+mail: admin@example.org
+ownCloudUUID: ddc2004c-0977-11eb-9d3f-a793888cd0f8
+userPassword:: e0FSR09OMn0kYXJnb24yaWQkdj0xOSRtPTY1NTM2LHQ9MSxwPTIkRXdwYUhJeVErcG9wdkcv
+ Tk81R0o2USRNWHp4czNvdHBhOWp3S0hxc1lLMlZodzAralUxSFowMUNpOXducWZlT1pn
+
+dn: cn=users,ou=groups,o=libregraph-idm
+objectClass: groupOfNames
+objectClass: ownCloud
+objectClass: top
+cn: users
+description: Users
+ownCloudUUID: 509a9dcd-bb37-4f4f-a01a-19dca27d9cfa
+member: uid=einstein,ou=users,o=libregraph-idm
+member: uid=marie,ou=users,o=libregraph-idm
+member: uid=richard,ou=users,o=libregraph-idm
+member: uid=moss,ou=users,o=libregraph-idm
+member: uid=admin,ou=users,o=libregraph-idm
+
+dn: cn=sailing-lovers,ou=groups,o=libregraph-idm
+objectClass: groupOfNames
+objectClass: ownCloud
+objectClass: top
+cn: sailing-lovers
+description: Sailing lovers
+ownCloudUUID: 6040aa17-9c64-4fef-9bd0-77234d71bad0
+member: uid=einstein,ou=users,o=libregraph-idm
+
+dn: cn=violin-haters,ou=groups,o=libregraph-idm
+objectClass: groupOfNames
+objectClass: ownCloud
+objectClass: top
+cn: violin-haters
+description: Violin haters
+ownCloudUUID: dd58e5ec-842e-498b-8800-61f2ec6f911f
+member: uid=einstein,ou=users,o=libregraph-idm
+
+dn: cn=radium-lovers,ou=groups,o=libregraph-idm
+objectClass: groupOfNames
+objectClass: ownCloud
+objectClass: top
+cn: radium-lovers
+description: Radium lovers
+ownCloudUUID: 7b87fd49-286e-4a5f-bafd-c535d5dd997a
+member: uid=marie,ou=users,o=libregraph-idm
+
+dn: cn=polonium-lovers,ou=groups,o=libregraph-idm
+objectClass: groupOfNames
+objectClass: ownCloud
+objectClass: top
+cn: polonium-lovers
+description: Polonium lovers
+ownCloudUUID: cedc21aa-4072-4614-8676-fa9165f598ff
+member: uid=marie,ou=users,o=libregraph-idm
+
+dn: cn=quantum-lovers,ou=groups,o=libregraph-idm
+objectClass: groupOfNames
+objectClass: ownCloud
+objectClass: top
+cn: quantum-lovers
+description: Quantum lovers
+ownCloudUUID: a1726108-01f8-4c30-88df-2b1a9d1cba1a
+member: uid=richard,ou=users,o=libregraph-idm
+
+dn: cn=philosophy-haters,ou=groups,o=libregraph-idm
+objectClass: groupOfNames
+objectClass: ownCloud
+objectClass: top
+cn: philosophy-haters
+description: Philosophy haters
+ownCloudUUID: 167cbee2-0518-455a-bfb2-031fe0621e5d
+member: uid=richard,ou=users,o=libregraph-idm
+
+dn: cn=physics-lovers,ou=groups,o=libregraph-idm
+objectClass: groupOfNames
+objectClass: ownCloud
+objectClass: top
+cn: physics-lovers
+description: Physics lovers
+ownCloudUUID: 262982c1-2362-4afa-bfdf-8cbfef64a06e
+member: uid=einstein,ou=users,o=libregraph-idm
+member: uid=marie,ou=users,o=libregraph-idm
+member: uid=richard,ou=users,o=libregraph-idm

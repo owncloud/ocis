@@ -4,5 +4,5 @@ package config
 type Ldap struct {
 	Enabled   bool   `ocisConfig:"enabled" env:"GLAUTH_LDAP_ENABLED"`
 	Addr      string `ocisConfig:"addr" env:"GLAUTH_LDAP_ADDR"`
-	Namespace string
+	Namespace string `ocisConfig:"-" yaml:"-"`
 }

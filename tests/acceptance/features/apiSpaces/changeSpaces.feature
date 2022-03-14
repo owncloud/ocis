@@ -33,3 +33,44 @@ Feature: Change data of space
       | key              | value         |
       | name             | Project Earth |
       | quota@@@total    | 100           |
+
+
+  Scenario: An user set readme file as description of the space via the Graph API
+    Given user "Alice" has created a space "add special section" with the default quota using the GraphApi
+    And user "Alice" has created a folder ".space" in space "add special section"
+    And user "Alice" has uploaded a file inside space "add special section" with content "space description" to ".space/readme.md"
+    When user "Alice" sets the file ".space/readme.md" as a description in a special section of the "add special section" space
+    Then the HTTP status code should be "200"
+    When user "Alice" lists all available spaces via the GraphApi
+    Then the json responded should contain a space "add special section" owned by "Alice" with description file ".space/readme.md" with these key and value pairs:
+      | key                                | value               |
+      | name                               | add special section |
+      | special@@@0@@@size                 | 17                  |
+      | special@@@0@@@name                 | readme.md           |
+      | special@@@0@@@specialFolder@@@name | readme              |
+      | special@@@0@@@file@@@mimeType       | text/markdown       |
+      | special@@@0@@@id                   | %file_id%            |
+      | special@@@0@@@eTag                 | %eTag%              |
+
+
+  Scenario Outline: An user set image file as space image of the space via the Graph API
+    Given user "Alice" has created a space "add special section" with the default quota using the GraphApi
+    And user "Alice" has created a folder ".space" in space "add special section"
+    And user "Alice" has uploaded a file inside space "add special section" with content "" to "<fileName>"
+    When user "Alice" sets the file "<fileName>" as a space image in a special section of the "add special section" space
+    Then the HTTP status code should be "200"
+    When user "Alice" lists all available spaces via the GraphApi
+    Then the json responded should contain a space "add special section" owned by "Alice" with description file "<fileName>" with these key and value pairs:
+      | key                                | value               |
+      | name                               | add special section |
+      | special@@@0@@@size                 | 0                   |
+      | special@@@0@@@name                 | <nameInResponse>    |
+      | special@@@0@@@specialFolder@@@name | image               |
+      | special@@@0@@@file@@@mimeType       | <mimeType>          |
+      | special@@@0@@@id                   | %file_id%            |
+      | special@@@0@@@eTag                 | %eTag%              |
+    Examples:
+      | fileName                | nameInResponse  | mimeType   |
+      | .space/spaceImage.jpeg | spaceImage.jpeg | image/jpeg |
+      | .space/spaceImage.png  | spaceImage.png  | image/png  |
+      | .space/spaceImage.gif  | spaceImage.gif  | image/gif  |

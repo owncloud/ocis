@@ -1,12 +1,14 @@
 package storage
 
 import (
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/thumbnails/pkg/config"
-	"github.com/pkg/errors"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strconv"
+
+	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/thumbnails/pkg/config"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -14,8 +16,8 @@ const (
 )
 
 // NewFileSystemStorage creates a new instance of FileSystem
-func NewFileSystemStorage(cfg config.FileSystemStorage, logger log.Logger) *FileSystem {
-	return &FileSystem{
+func NewFileSystemStorage(cfg config.FileSystemStorage, logger log.Logger) FileSystem {
+	return FileSystem{
 		root:   cfg.RootDirectory,
 		logger: logger,
 	}
@@ -27,21 +29,27 @@ type FileSystem struct {
 	logger log.Logger
 }
 
-// Get loads the image from the file system.
-func (s *FileSystem) Get(key string) ([]byte, bool) {
+func (s FileSystem) Stat(key string) bool {
+	img := filepath.Join(s.root, filesDir, key)
+	if _, err := os.Stat(img); err != nil {
+		return false
+	}
+	return true
+}
+
+func (s FileSystem) Get(key string) ([]byte, error) {
 	img := filepath.Join(s.root, filesDir, key)
 	content, err := os.ReadFile(img)
 	if err != nil {
-		if !os.IsNotExist(err) {
+		if !errors.Is(err, fs.ErrNotExist) {
 			s.logger.Debug().Str("err", err.Error()).Str("key", key).Msg("could not load thumbnail from store")
 		}
-		return nil, false
+		return nil, err
 	}
-	return content, true
+	return content, nil
 }
 
-// Set writes the image to the file system.
-func (s *FileSystem) Put(key string, img []byte) error {
+func (s FileSystem) Put(key string, img []byte) error {
 	imgPath := filepath.Join(s.root, filesDir, key)
 	dir := filepath.Dir(imgPath)
 	if err := os.MkdirAll(dir, 0700); err != nil {
@@ -71,7 +79,7 @@ func (s *FileSystem) Put(key string, img []byte) error {
 // e.g. 97/9f/4c8db98f7b82e768ef478d3c8612/500x300.png
 //
 // The key also represents the path to the thumbnail in the filesystem under the configured root directory.
-func (s *FileSystem) BuildKey(r Request) string {
+func (s FileSystem) BuildKey(r Request) string {
 	checksum := r.Checksum
 	filetype := r.Types[0]
 	filename := strconv.Itoa(r.Resolution.Dx()) + "x" + strconv.Itoa(r.Resolution.Dy()) + "." + filetype

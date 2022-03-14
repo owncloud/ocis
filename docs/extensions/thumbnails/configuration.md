@@ -8,5 +8,8 @@ geekdocFilePath: configuration.md
 geekdocCollapseSection: true
 ---
 
+## Example YAML Config
+
+{{< include file="extensions/_includes/thumbnails-config-example.yaml"  language="yaml" >}}
 
 {{< include file="extensions/_includes/thumbnails_configvars.md" >}}

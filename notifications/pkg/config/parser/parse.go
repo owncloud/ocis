@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/owncloud/ocis/notifications/pkg/config"
+	"github.com/owncloud/ocis/notifications/pkg/config/defaults"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 
 	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
@@ -16,17 +17,7 @@ func ParseConfig(cfg *config.Config) error {
 		return err
 	}
 
-	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
-	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
-		cfg.Log = &config.Log{
-			Level:  cfg.Commons.Log.Level,
-			Pretty: cfg.Commons.Log.Pretty,
-			Color:  cfg.Commons.Log.Color,
-			File:   cfg.Commons.Log.File,
-		}
-	} else if cfg.Log == nil {
-		cfg.Log = &config.Log{}
-	}
+	defaults.EnsureDefaults(cfg)
 
 	// load all env variables relevant to the config in the current context.
 	if err := envdecode.Decode(cfg); err != nil {
@@ -35,6 +26,8 @@ func ParseConfig(cfg *config.Config) error {
 			return err
 		}
 	}
+
+	defaults.Sanitize(cfg)
 
 	return nil
 }

@@ -206,6 +206,65 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * The method finds file by fileName and spaceName and returns data of file wich contains in responseHeader
+	 * fileName contains the path, if the file is in the folder
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $fileName
+	 *
+	 * @return array
+	 */
+	public function getFileData(string $user, string $spaceName, string $fileName): array {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$fullUrl = $this->baseUrl . "/remote.php/dav/spaces/" . $space["id"] . "/" . $fileName;
+		
+		$this->featureContext->setResponse(
+			HttpRequestHelper::get(
+				$fullUrl,
+				"",
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				"{}"
+			)
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"file $fileName not found"
+		);
+		return $this->featureContext->getResponse()->getHeaders();
+	}
+
+	/**
+	 * The method returns fileId
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $fileName
+	 *
+	 * @return string
+	 */
+	public function getFileId(string $user, string $spaceName, string $fileName): string {
+		$fileData = $this->getFileData($user, $spaceName, $fileName);
+		return $fileData["Oc-Fileid"][0];
+	}
+
+	/**
+	 * The method returns eTag
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $fileName
+	 *
+	 * @return string
+	 */
+	public function getETag(string $user, string $spaceName, string $fileName): string {
+		$fileData = $this->getFileData($user, $spaceName, $fileName);
+		return $fileData["Etag"][0];
+	}
+
+	/**
 	 * The method returns userId
 	 *
 	 * @param string $userName
@@ -213,7 +272,6 @@ class SpacesContext implements Context {
 	 * @return string
 	 */
 	public function getUserIdByUserName(string $userName): string {
-
 		$fullUrl = $this->baseUrl . "/api/v0/accounts/accounts-list";
 		$this->featureContext->setResponse(
 			HttpRequestHelper::post(
@@ -430,7 +488,7 @@ class SpacesContext implements Context {
 			$this->listMySpacesRequest(
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				"?". $query
+				"?" . $query
 			)
 		);
 	}
@@ -755,7 +813,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^the json responded should contain a space "([^"]*)" (?:|(?:owned by|granted to) "([^"]*)" )with these key and value pairs:$/
+	 * @Then /^the json responded should contain a space "([^"]*)" (?:|(?:owned by|granted to) "([^"]*)" )(?:|(?:with description file|with space image) "([^"]*)" )with these key and value pairs:$/
 	 *
 	 * @param string $spaceName
 	 * @param string $userName
@@ -767,6 +825,7 @@ class SpacesContext implements Context {
 	public function jsonRespondedShouldContain(
 		string $spaceName,
 		string $userName = '',
+		string $fileName = '',
 		TableNode $table
 	): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
@@ -790,6 +849,18 @@ class SpacesContext implements Context {
 						"function" =>
 							[$this, "getUserIdByUserName"],
 						"parameter" => [$userName]
+					],
+					[
+						"code" => "%file_id%",
+						"function" =>
+							[$this, "getFileId"],
+						"parameter" => [$userName, $spaceName, $fileName]
+					],
+					[
+						"code" => "%eTag%",
+						"function" =>
+							[$this, "getETag"],
+						"parameter" => [$userName, $spaceName, $fileName]
 					],
 				]
 			);
@@ -830,10 +901,11 @@ class SpacesContext implements Context {
 		
 		$userRole = "";
 		foreach ($permissions as $permission) {
-			foreach ($permission["grantedTo"] as $grantedTo)
-			if ($grantedTo["user"]["id"] === $userId) {
-				$userRole = $permission["roles"][0];
-			} 
+			foreach ($permission["grantedTo"] as $grantedTo) {
+				if ($grantedTo["user"]["id"] === $userId) {
+					$userRole = $permission["roles"][0];
+				}
+			}
 		}
 		Assert::assertEquals($userRole, $role, "the user $userName with the role $role could not be found");
 	}
@@ -875,18 +947,18 @@ class SpacesContext implements Context {
 			)
 		);
 		$matches = [];
-		foreach($spaces["value"] as $space) {
-			if($onlyOrNot === "not") {
+		foreach ($spaces["value"] as $space) {
+			if ($onlyOrNot === "not") {
 				Assert::assertNotEquals($space["driveType"], $type);
 			}
-			if($onlyOrNot === "only") {
+			if ($onlyOrNot === "only") {
 				Assert::assertEquals($space["driveType"], $type);
 			}
-			if($onlyOrNot === "" && $space["driveType"] === $type) {
+			if ($onlyOrNot === "" && $space["driveType"] === $type) {
 				$matches[] = $space;
 			}
 		}
-		if($onlyOrNot === "") {
+		if ($onlyOrNot === "") {
 			Assert::assertNotEmpty($matches);
 		}
 	}
@@ -1031,7 +1103,7 @@ class SpacesContext implements Context {
 	): void {
 		$exploded = explode('/', $folder);
 		$path = '';
-		for ($i = 0; $i < count($exploded); $i++) {
+		for ($i = 0; $i < \count($exploded); $i++) {
 			$path = $path . $exploded[$i] . '/';
 			$this->theUserCreatesAFolderToAnotherOwnerSpaceUsingTheGraphApi($user, $path, $spaceName);
 		};
@@ -1225,36 +1297,36 @@ class SpacesContext implements Context {
 	}
 
 	/**
-    	 * @When /^user "([^"]*)" changes the description of the "([^"]*)" space to "([^"]*)"$/
-    	 *
-    	 * @param string $user
-    	 * @param string $spaceName
-    	 * @param string $newName
-    	 *
-    	 * @return void
-    	 * @throws GuzzleException
-    	 * @throws Exception
-    	 */
-    	public function updateSpaceDescription(
-    		string $user,
-    		string $spaceName,
-    		string $newDescription
-    	): void {
-    		$space = $this->getSpaceByName($user, $spaceName);
-    		$spaceId = $space["id"];
+	 * @When /^user "([^"]*)" changes the description of the "([^"]*)" space to "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $newName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function updateSpaceDescription(
+		string $user,
+		string $spaceName,
+		string $newDescription
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$spaceId = $space["id"];
 
-    		$bodyData = ["description" => $newDescription];
-    		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
+		$bodyData = ["description" => $newDescription];
+		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
 
-    		$this->featureContext->setResponse(
-    			$this->sendUpdateSpaceRequest(
-    				$user,
-    				$this->featureContext->getPasswordForUser($user),
-    				$body,
-    				$spaceId
-    			)
-    		);
-    	}
+		$this->featureContext->setResponse(
+			$this->sendUpdateSpaceRequest(
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$body,
+				$spaceId
+			)
+		);
+	}
 
 	/**
 	 * @When /^user "([^"]*)" changes the quota of the "([^"]*)" space to "([^"]*)"$/
@@ -1276,6 +1348,47 @@ class SpacesContext implements Context {
 		$spaceId = $space["id"];
 
 		$bodyData = ["quota" => ["total" => $newQuota]];
+		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
+
+		$this->featureContext->setResponse(
+			$this->sendUpdateSpaceRequest(
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$body,
+				$spaceId
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" sets the file "([^"]*)" as a (description|space image)\s? in a special section of the "([^"]*)" space$/
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param string $type
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function updateSpaceSpecialSection(
+		string $user,
+		string $file,
+		string $type,
+		string $spaceName
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$spaceId = $space["id"];
+		$fileId = $this->getFileId($user, $spaceName, $file);
+
+		if ($type === "description") {
+			$type = "readme";
+		} else {
+			$type = "image";
+		}
+
+		$bodyData = ["special" => [["specialFolder" => ["name" => "$type"], "id" => "$fileId"]]];
 		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
 
 		$this->featureContext->setResponse(
@@ -1334,6 +1447,36 @@ class SpacesContext implements Context {
 	): void {
 		$space = ["Name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
 		$body = json_encode($space);
+		$this->featureContext->setResponse(
+			$this->sendCreateSpaceRequest(
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$body
+			)
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			"Expected response status code should be 201 (Created)"
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" has created a space "([^"]*)" with the default quota using the GraphApi$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserHasCreatedASpaceByDefaultUsingTheGraphApi(
+		string $user,
+		string $spaceName
+	): void {
+		$space = ["Name" => $spaceName];
+		$body = json_encode($space, JSON_THROW_ON_ERROR);
 		$this->featureContext->setResponse(
 			$this->sendCreateSpaceRequest(
 				$user,
@@ -1443,10 +1586,10 @@ class SpacesContext implements Context {
 
 		$expectedHTTPStatus = "200";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
-            $expectedHTTPStatus,
+			$expectedHTTPStatus,
 			"Expected response status code should be $expectedHTTPStatus"
 		);
-        $expectedOCSStatus = "200";
+		$expectedOCSStatus = "200";
 		$this->ocsContext->theOCSStatusCodeShouldBe($expectedOCSStatus, "Expected OCS response status code $expectedOCSStatus");
 	}
 
@@ -1546,7 +1689,7 @@ class SpacesContext implements Context {
 		$this->sendDisableSpaceRequest($user, $spaceName);
 		$expectedHTTPStatus = "204";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
-            $expectedHTTPStatus,
+			$expectedHTTPStatus,
 			"Expected response status code should be $expectedHTTPStatus"
 		);
 	}
@@ -1647,7 +1790,7 @@ class SpacesContext implements Context {
 		$this->sendRestoreSpaceRequest($user, $spaceName);
 		$expectedHTTPStatus = "200";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
-            $expectedHTTPStatus,
+			$expectedHTTPStatus,
 			"Expected response status code should be $expectedHTTPStatus"
 		);
 	}

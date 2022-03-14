@@ -6,15 +6,58 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Network configuration in individiual_services example: [#3238](https://github.com/owncloud/ocis/pull/3238)
+* Bugfix - Improve gif thumbnails: [#3305](https://github.com/owncloud/ocis/pull/3305)
+* Enhancement - Log sharing events in audit service: [#3301](https://github.com/owncloud/ocis/pull/3301)
 * Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
+* Enhancement - Improve thumbnails API: [#3272](https://github.com/owncloud/ocis/pull/3272)
+* Enhancement - Update ownCloud Web to v5.3.0-rc.1: [#6561](https://github.com/owncloud/web/pull/6561)
 
 ## Details
+
+* Bugfix - Network configuration in individiual_services example: [#3238](https://github.com/owncloud/ocis/pull/3238)
+
+   Tidy up the deployments/examples/ocis_individual_services example so that the
+   instructions work.
+
+   https://github.com/owncloud/ocis/pull/3238
+
+* Bugfix - Improve gif thumbnails: [#3305](https://github.com/owncloud/ocis/pull/3305)
+
+   Improved the gif thumbnail generation for gifs with different disposal strategies.
+
+   https://github.com/owncloud/ocis/pull/3305
+
+* Enhancement - Log sharing events in audit service: [#3301](https://github.com/owncloud/ocis/pull/3301)
+
+   Contains sharing related events. See full list in audit/pkg/types/events.go
+
+   https://github.com/owncloud/ocis/pull/3301
 
 * Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
 
    Added etags in the response of list drives.
 
    https://github.com/owncloud/ocis/pull/3267
+
+* Enhancement - Improve thumbnails API: [#3272](https://github.com/owncloud/ocis/pull/3272)
+
+   Changed the thumbnails API to no longer transfer images via GRPC. GRPC has a limited message
+   size and isn't very efficient with large binary data. The new API transports the images over
+   HTTP.
+
+   https://github.com/owncloud/ocis/pull/3272
+
+* Enhancement - Update ownCloud Web to v5.3.0-rc.1: [#6561](https://github.com/owncloud/web/pull/6561)
+
+   Tags: web
+
+   We updated ownCloud Web to v5.3.0-rc.1. Please refer to the changelog (linked) for details on
+   the web release.
+
+   https://github.com/owncloud/web/pull/6561
+   https://github.com/owncloud/ocis/pull/3291
+   https://github.com/owncloud/web/releases/tag/v5.3.0-rc.1
 # Changelog for [1.18.0] (2022-03-03)
 
 The following sections list the changes for 1.18.0.

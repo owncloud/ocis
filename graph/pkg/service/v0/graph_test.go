@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/graph/mocks"
-	"github.com/owncloud/ocis/graph/pkg/config"
+	"github.com/owncloud/ocis/graph/pkg/config/defaults"
 	service "github.com/owncloud/ocis/graph/pkg/service/v0"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 	"github.com/stretchr/testify/mock"
@@ -34,7 +34,7 @@ var _ = Describe("Graph", func() {
 		gatewayClient = &mocks.GatewayClient{}
 		httpClient = &mocks.HTTPClient{}
 		svc = service.NewService(
-			service.Config(config.DefaultConfig()),
+			service.Config(defaults.DefaultConfig()),
 			service.WithGatewayClient(gatewayClient),
 			service.WithHTTPClient(httpClient),
 		)

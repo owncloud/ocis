@@ -8,18 +8,19 @@ import (
 type Request struct {
 	// The checksum of the source file
 	// Will be used to determine if a thumbnail exists
-	Checksum   string
+	Checksum string
 	// Types provided by the encoder.
 	// Contains the mimetypes of the thumbnail.
 	// In case of jpg/jpeg it will contain both.
-	Types      []string
+	Types []string
 	// The resolution of the thumbnail
 	Resolution image.Rectangle
 }
 
 // Storage defines the interface for a thumbnail store.
 type Storage interface {
-	Get(string) ([]byte, bool)
+	Stat(string) bool
+	Get(string) ([]byte, error)
 	Put(string, []byte) error
 	BuildKey(Request) string
 }

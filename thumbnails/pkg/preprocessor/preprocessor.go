@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"image"
 	"image/draw"
+	"image/gif"
 	"io"
 	"math"
 	"mime"
@@ -16,13 +17,23 @@ import (
 )
 
 type FileConverter interface {
-	Convert(r io.Reader) (image.Image, error)
+	Convert(r io.Reader) (interface{}, error)
 }
 
 type ImageDecoder struct{}
 
-func (i ImageDecoder) Convert(r io.Reader) (image.Image, error) {
+func (i ImageDecoder) Convert(r io.Reader) (interface{}, error) {
 	img, _, err := image.Decode(r)
+	if err != nil {
+		return nil, errors.Wrap(err, `could not decode the image`)
+	}
+	return img, nil
+}
+
+type GifDecoder struct{}
+
+func (i GifDecoder) Convert(r io.Reader) (interface{}, error) {
+	img, err := gif.DecodeAll(r)
 	if err != nil {
 		return nil, errors.Wrap(err, `could not decode the image`)
 	}
@@ -33,7 +44,7 @@ type TxtToImageConverter struct {
 	fontLoader *FontLoader
 }
 
-func (t TxtToImageConverter) Convert(r io.Reader) (image.Image, error) {
+func (t TxtToImageConverter) Convert(r io.Reader) (interface{}, error) {
 	img := image.NewRGBA(image.Rect(0, 0, 640, 480))
 
 	imgBounds := img.Bounds()
@@ -183,6 +194,8 @@ func ForType(mimeType string, opts map[string]interface{}) FileConverter {
 		return TxtToImageConverter{
 			fontLoader: fontLoader,
 		}
+	case "image/gif":
+		return GifDecoder{}
 	default:
 		return ImageDecoder{}
 	}

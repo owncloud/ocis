@@ -1,0 +1,24 @@
+dn: o=libregraph-idm
+o: libregraph-idm
+objectClass: organization
+
+dn: ou=users,o=libregraph-idm
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=sysusers,o=libregraph-idm
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=groups,o=libregraph-idm
+objectClass: organizationalUnit
+ou: groups
+
+{{ range . -}}
+dn: uid={{ .Name }},ou=sysusers,o=libregraph-idm
+objectClass: account
+objectClass: simpleSecurityObject
+uid: {{ .Name }}
+userPassword:: {{ .Password }}
+
+{{ end -}}

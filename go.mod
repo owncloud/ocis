@@ -22,7 +22,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.1
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220126114148-64c025ccdd19
-	github.com/cs3org/reva/v2 v2.0.0-20220308091509-e4509f177c98
+	github.com/cs3org/reva/v2 v2.0.0-20220314085001-8e5b22a20a3f
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.7
@@ -61,6 +61,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.0
+	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.2
 	github.com/urfave/cli/v2 v2.3.0
 	go-micro.dev/v4 v4.6.0

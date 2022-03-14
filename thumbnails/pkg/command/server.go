@@ -12,6 +12,7 @@ import (
 	"github.com/owncloud/ocis/thumbnails/pkg/metrics"
 	"github.com/owncloud/ocis/thumbnails/pkg/server/debug"
 	"github.com/owncloud/ocis/thumbnails/pkg/server/grpc"
+	"github.com/owncloud/ocis/thumbnails/pkg/server/http"
 	"github.com/owncloud/ocis/thumbnails/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
@@ -57,9 +58,7 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.Metrics(metrics),
 			)
 
-			gr.Add(func() error {
-				return service.Run()
-			}, func(_ error) {
+			gr.Add(service.Run, func(_ error) {
 				fmt.Println("shutting down grpc server")
 				cancel()
 			})
@@ -76,6 +75,28 @@ func Server(cfg *config.Config) *cli.Command {
 
 			gr.Add(server.ListenAndServe, func(_ error) {
 				_ = server.Shutdown(ctx)
+				cancel()
+			})
+
+			httpServer, err := http.Server(
+				http.Logger(logger),
+				http.Context(ctx),
+				http.Config(cfg),
+				http.Metrics(metrics),
+				http.Namespace(cfg.HTTP.Namespace),
+			)
+
+			if err != nil {
+				logger.Info().
+					Err(err).
+					Str("transport", "http").
+					Msg("Failed to initialize server")
+
+				return err
+			}
+
+			gr.Add(httpServer.Run, func(_ error) {
+				logger.Info().Str("server", "http").Msg("shutting down server")
 				cancel()
 			})
 

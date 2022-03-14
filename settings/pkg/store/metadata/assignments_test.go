@@ -7,7 +7,7 @@ import (
 
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
-	"github.com/owncloud/ocis/settings/pkg/config"
+	"github.com/owncloud/ocis/settings/pkg/config/defaults"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,7 +18,7 @@ var (
 	s = &Store{
 		Logger: logger,
 		l:      &sync.Mutex{},
-		cfg:    config.DefaultConfig(),
+		cfg:    defaults.DefaultConfig(),
 	}
 
 	logger = olog.NewLogger(

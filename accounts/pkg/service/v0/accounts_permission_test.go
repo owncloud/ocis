@@ -13,7 +13,7 @@ import (
 	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/owncloud/ocis/accounts/pkg/config"
+	config "github.com/owncloud/ocis/accounts/pkg/config/defaults"
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/roles"

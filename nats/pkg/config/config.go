@@ -8,16 +8,16 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons
+	*shared.Commons `ocisConfig:"-" yaml:"-"`
 
-	Service Service
+	Service Service `ocisConfig:"-" yaml:"-"`
 
 	Log   *Log  `ocisConfig:"log"`
 	Debug Debug `ocisConfig:"debug"`
 
 	Nats Nats `ociConfig:"nats"`
 
-	Context context.Context
+	Context context.Context `ocisConfig:"-" yaml:"-"`
 }
 
 // Nats is the nats config

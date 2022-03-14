@@ -18,6 +18,7 @@ import (
 	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v4"
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
+
 	accounts "github.com/owncloud/ocis/accounts/pkg/command"
 	glauth "github.com/owncloud/ocis/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/command"

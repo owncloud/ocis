@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/owncloud/ocis/settings/pkg/config"
+	"github.com/owncloud/ocis/settings/pkg/config/defaults"
 )
 
 const (
@@ -48,7 +48,7 @@ func NewMDC(s *Store) error {
 	case "unit":
 		mdc = &MockedMetadataClient{data: make(map[string][]byte)}
 	case "integration":
-		mdc = NewMetadataClient(config.DefaultConfig().Metadata)
+		mdc = NewMetadataClient(defaults.DefaultConfig().Metadata)
 	}
 	return s.initMetadataClient(mdc)
 }

@@ -8,9 +8,9 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons
+	*shared.Commons `ocisConfig:"-" yaml:"-"`
 
-	Service Service
+	Service Service `ocisConfig:"-" yaml:"-"`
 
 	Tracing *Tracing `ocisConfig:"tracing"`
 	Log     *Log     `ocisConfig:"log"`
@@ -34,7 +34,7 @@ type Config struct {
 	InsecureBackends      bool            `ocisConfig:"insecure_backends" env:"PROXY_INSECURE_BACKENDS"`
 	AuthMiddleware        AuthMiddleware  `ocisConfig:"auth_middleware"`
 
-	Context context.Context
+	Context context.Context `ocisConfig:"-" yaml:"-"`
 }
 
 // Policy enables us to use multiple directors.

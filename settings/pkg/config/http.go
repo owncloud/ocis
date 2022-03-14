@@ -3,7 +3,7 @@ package config
 // HTTP defines the available http configuration.
 type HTTP struct {
 	Addr      string `ocisConfig:"addr" env:"SETTINGS_HTTP_ADDR"`
-	Namespace string
+	Namespace string `ocisConfig:"-" yaml:"-"`
 	Root      string `ocisConfig:"root" env:"SETTINGS_HTTP_ROOT"`
 	CacheTTL  int    `ocisConfig:"cache_ttl" env:"SETTINGS_CACHE_TTL"`
 	CORS      CORS   `ocisConfig:"cors"`
