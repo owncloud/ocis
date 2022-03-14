@@ -23,13 +23,13 @@ type ConfigField struct {
 
 func main() {
 fmt.Println("Generating documentation for environment variables:")
-content, err := ioutil.ReadFile("../../../docs/templates/CONFIGURATION.tmpl")
+content, err := ioutil.ReadFile("../../docs/templates/CONFIGURATION.tmpl")
 if err != nil {
     log.Fatal(err)
 }
 replacer := strings.NewReplacer(
 		"github.com/owncloud/ocis/", "",
-		"/pkg/config", "",
+		"/pkg/config/defaults", "",
 	)
 var fields []ConfigField
 var targetFile *os.File
@@ -41,7 +41,7 @@ m := map[string]interface{}{
 {{- end }}
 }
 
-    targetFolder := "../../../docs/extensions/_includes/"
+    targetFolder := "../../docs/extensions/_includes/"
     for pkg, conf := range m {
 	fields = GetAnnotatedVariables(conf)
 	if len(fields) > 0 {
