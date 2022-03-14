@@ -1,4 +1,4 @@
-Bugfix: Network configuration in individiual_services example.
+Bugfix: Network configuration in individiual_services example
 
 Tidy up the deployments/examples/ocis_individual_services example so that the instructions work.
 
