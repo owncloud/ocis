@@ -16,6 +16,7 @@ config = {
     "modules": [
         # if you add a module here please also add it to the root level Makefile
         "accounts",
+        "audit",
         "glauth",
         "graph-explorer",
         "graph",

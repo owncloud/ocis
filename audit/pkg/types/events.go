@@ -8,5 +8,13 @@ import (
 func RegisteredEvents() []events.Unmarshaller {
 	return []events.Unmarshaller{
 		events.ShareCreated{},
+		events.ShareUpdated{},
+		events.LinkCreated{},
+		events.LinkUpdated{},
+		events.ShareRemoved{},
+		events.LinkRemoved{},
+		events.ReceivedShareUpdated{},
+		events.LinkAccessed{},
+		events.LinkAccessFailed{},
 	}
 }

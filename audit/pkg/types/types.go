@@ -38,3 +38,41 @@ type AuditEventShareCreated struct {
 	ShareOwner     string // The UID of the share owner.
 	ShareToken     string // For link shares the unique token, else null
 }
+
+// AuditEventShareUpdated is the event logged when a share is updated
+type AuditEventShareUpdated struct {
+	AuditEventSharing
+
+	ItemType       string // file or folder
+	ExpirationDate string // The text expiration date in format 'yyyy-mm-dd'
+	SharePass      bool   // If the share is password protected.
+	Permissions    string // The permissions string eg: "READ"
+	ShareType      string // group user or link
+	ShareWith      string // The UID or GID of the share recipient. (not available for public link)
+	ShareOwner     string // The UID of the share owner.
+	ShareToken     string // For link shares the unique token, else null
+}
+
+// AuditEventShareRemoved is the event logged when a share is removed
+type AuditEventShareRemoved struct {
+	AuditEventSharing
+	ItemType  string // file or folder
+	ShareType string // group user or link
+	ShareWith string // The UID or GID of the share recipient.
+}
+
+// AuditEventReceivedShareUpdated is the event logged when a share is accepted or declined
+type AuditEventReceivedShareUpdated struct {
+	AuditEventSharing
+	ItemType  string // file or folder
+	ShareType string // group user or link
+	ShareWith string // The UID or GID of the share recipient.
+}
+
+// AuditEventLinkAccessed is the event logged when a link is accessed
+type AuditEventLinkAccessed struct {
+	AuditEventSharing
+	ShareToken string // The share token.
+	Success    bool   // If the request was successful.
+	ItemType   string // file or folder
+}
