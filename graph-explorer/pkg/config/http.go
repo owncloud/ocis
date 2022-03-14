@@ -4,7 +4,7 @@ package config
 type HTTP struct {
 	Addr      string `ocisConfig:"addr" env:"GRAPH_EXPLORER_HTTP_ADDR"`
 	Root      string `ocisConfig:"root" env:"GRAPH_EXPLORER_HTTP_ROOT"`
-	Namespace string
+	Namespace string `ocisConfig:"-" yaml:"-"`
 }
 
 // CORS defines the available cors configuration.

@@ -1,10 +1,11 @@
-package config
+package defaults
 
 import (
 	"os"
 	"path"
 
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/storage/pkg/config"
 )
 
 const (
@@ -15,23 +16,32 @@ const (
 	defaultUserLayout       = "{{.Id.OpaqueId}}"
 )
 
-func DefaultConfig() *Config {
-	return &Config{
+func FullDefaultConfig() *config.Config {
+	cfg := DefaultConfig()
+
+	EnsureDefaults(cfg)
+	Sanitize(cfg)
+
+	return cfg
+}
+
+func DefaultConfig() *config.Config {
+	return &config.Config{
 		// log is inherited
-		Debug: Debug{
+		Debug: config.Debug{
 			Addr: "127.0.0.1:9109",
 		},
-		Reva: Reva{
+		Reva: config.Reva{
 			JWTSecret:             "Pive-Fumkiu4",
 			SkipUserGroupsInToken: false,
 			TransferSecret:        "replace-me-with-a-transfer-secret",
 			TransferExpires:       24 * 60 * 60,
-			OIDC: OIDC{
+			OIDC: config.OIDC{
 				Issuer:   defaultPublicURL,
 				Insecure: false,
 				IDClaim:  "preferred_username",
 			},
-			LDAP: LDAP{
+			LDAP: config.LDAP{
 				Hostname:             "localhost",
 				Port:                 9126,
 				CACert:               path.Join(defaults.BaseDataPath(), "ldap", "ldap.crt"),
@@ -49,7 +59,7 @@ func DefaultConfig() *Config {
 				BindDN:               "cn=reva,ou=sysusers,dc=ocis,dc=test",
 				BindPassword:         "reva",
 				IDP:                  defaultPublicURL,
-				UserSchema: LDAPUserSchema{
+				UserSchema: config.LDAPUserSchema{
 					UID:         "ownclouduuid",
 					Mail:        "mail",
 					DisplayName: "displayname",
@@ -57,7 +67,7 @@ func DefaultConfig() *Config {
 					UIDNumber:   "uidnumber",
 					GIDNumber:   "gidnumber",
 				},
-				GroupSchema: LDAPGroupSchema{
+				GroupSchema: config.LDAPGroupSchema{
 					GID:         "cn",
 					Mail:        "mail",
 					DisplayName: "cn",
@@ -65,10 +75,10 @@ func DefaultConfig() *Config {
 					GIDNumber:   "gidnumber",
 				},
 			},
-			UserGroupRest: UserGroupRest{
+			UserGroupRest: config.UserGroupRest{
 				RedisAddress: "localhost:6379",
 			},
-			UserOwnCloudSQL: UserOwnCloudSQL{
+			UserOwnCloudSQL: config.UserOwnCloudSQL{
 				DBUsername:         "owncloud",
 				DBPassword:         "secret",
 				DBHost:             "mysql",
@@ -80,18 +90,18 @@ func DefaultConfig() *Config {
 				JoinOwnCloudUUID:   false,
 				EnableMedialSearch: false,
 			},
-			OCDav: OCDav{
+			OCDav: config.OCDav{
 				WebdavNamespace:   defaultStorageNamespace,
 				DavFilesNamespace: defaultStorageNamespace,
 			},
-			Archiver: Archiver{
+			Archiver: config.Archiver{
 				MaxNumFiles: 10000,
 				MaxSize:     1073741824,
 				ArchiverURL: "/archiver",
 			},
-			UserStorage: StorageConfig{
-				EOS: DriverEOS{
-					DriverCommon: DriverCommon{
+			UserStorage: config.StorageConfig{
+				EOS: config.DriverEOS{
+					DriverCommon: config.DriverCommon{
 						Root:        "/eos/dockertest/reva",
 						ShareFolder: defaultShareFolder,
 						UserLayout:  "{{substr 0 1 .Username}}/{{.Username}}",
@@ -105,14 +115,14 @@ func DefaultConfig() *Config {
 					CacheDirectory:   os.TempDir(),
 					GatewaySVC:       defaultGatewayAddr,
 				},
-				Local: DriverCommon{
+				Local: config.DriverCommon{
 					Root:        path.Join(defaults.BaseDataPath(), "storage", "local", "users"),
 					ShareFolder: defaultShareFolder,
 					UserLayout:  "{{.Username}}",
 					EnableHome:  false,
 				},
-				OwnCloudSQL: DriverOwnCloudSQL{
-					DriverCommon: DriverCommon{
+				OwnCloudSQL: config.DriverOwnCloudSQL{
+					DriverCommon: config.DriverCommon{
 						Root:        path.Join(defaults.BaseDataPath(), "storage", "owncloud"),
 						ShareFolder: defaultShareFolder,
 						UserLayout:  "{{.Username}}",
@@ -125,16 +135,16 @@ func DefaultConfig() *Config {
 					DBPort:        3306,
 					DBName:        "owncloud",
 				},
-				S3: DriverS3{
-					DriverCommon: DriverCommon{},
+				S3: config.DriverS3{
+					DriverCommon: config.DriverCommon{},
 					Region:       "default",
 					AccessKey:    "",
 					SecretKey:    "",
 					Endpoint:     "",
 					Bucket:       "",
 				},
-				S3NG: DriverS3NG{
-					DriverCommon: DriverCommon{
+				S3NG: config.DriverS3NG{
+					DriverCommon: config.DriverCommon{
 						Root:        path.Join(defaults.BaseDataPath(), "storage", "users"),
 						ShareFolder: defaultShareFolder,
 						UserLayout:  defaultUserLayout,
@@ -146,17 +156,17 @@ func DefaultConfig() *Config {
 					Endpoint:  "",
 					Bucket:    "",
 				},
-				OCIS: DriverOCIS{
-					DriverCommon: DriverCommon{
+				OCIS: config.DriverOCIS{
+					DriverCommon: config.DriverCommon{
 						Root:        path.Join(defaults.BaseDataPath(), "storage", "users"),
 						ShareFolder: defaultShareFolder,
 						UserLayout:  defaultUserLayout,
 					},
 				},
 			},
-			MetadataStorage: StorageConfig{
-				EOS: DriverEOS{
-					DriverCommon: DriverCommon{
+			MetadataStorage: config.StorageConfig{
+				EOS: config.DriverEOS{
+					DriverCommon: config.DriverCommon{
 						Root:        "/eos/dockertest/reva",
 						ShareFolder: defaultShareFolder,
 						UserLayout:  "{{substr 0 1 .Username}}/{{.Username}}",
@@ -179,16 +189,16 @@ func DefaultConfig() *Config {
 					SingleUsername:      "",
 					GatewaySVC:          defaultGatewayAddr,
 				},
-				Local: DriverCommon{
+				Local: config.DriverCommon{
 					Root: path.Join(defaults.BaseDataPath(), "storage", "local", "metadata"),
 				},
-				OwnCloudSQL: DriverOwnCloudSQL{},
-				S3: DriverS3{
-					DriverCommon: DriverCommon{},
+				OwnCloudSQL: config.DriverOwnCloudSQL{},
+				S3: config.DriverS3{
+					DriverCommon: config.DriverCommon{},
 					Region:       "default",
 				},
-				S3NG: DriverS3NG{
-					DriverCommon: DriverCommon{
+				S3NG: config.DriverS3NG{
+					DriverCommon: config.DriverCommon{
 						Root:        path.Join(defaults.BaseDataPath(), "storage", "metadata"),
 						ShareFolder: "",
 						UserLayout:  defaultUserLayout,
@@ -200,8 +210,8 @@ func DefaultConfig() *Config {
 					Endpoint:  "",
 					Bucket:    "",
 				},
-				OCIS: DriverOCIS{
-					DriverCommon: DriverCommon{
+				OCIS: config.DriverOCIS{
+					DriverCommon: config.DriverCommon{
 						Root:        path.Join(defaults.BaseDataPath(), "storage", "metadata"),
 						ShareFolder: "",
 						UserLayout:  defaultUserLayout,
@@ -209,8 +219,8 @@ func DefaultConfig() *Config {
 					},
 				},
 			},
-			Frontend: FrontendPort{
-				Port: Port{
+			Frontend: config.FrontendPort{
+				Port: config.Port{
 					MaxCPUs:     "",
 					LogLevel:    "",
 					GRPCNetwork: "",
@@ -241,14 +251,14 @@ func DefaultConfig() *Config {
 				OCSCacheWarmupDriver:       "",
 				OCSAdditionalInfoAttribute: "{{.Mail}}",
 				OCSResourceInfoCacheTTL:    0,
-				Middleware:                 Middleware{},
+				Middleware:                 config.Middleware{},
 			},
-			DataGateway: DataGatewayPort{
-				Port:      Port{},
+			DataGateway: config.DataGatewayPort{
+				Port:      config.Port{},
 				PublicURL: "",
 			},
-			Gateway: Gateway{
-				Port: Port{
+			Gateway: config.Gateway{
+				Port: config.Port{
 					Endpoint:    defaultGatewayAddr,
 					DebugAddr:   "127.0.0.1:9143",
 					GRPCNetwork: "tcp",
@@ -262,17 +272,17 @@ func DefaultConfig() *Config {
 				HomeMapping:                "",
 				EtagCacheTTL:               0,
 			},
-			StorageRegistry: StorageRegistry{
+			StorageRegistry: config.StorageRegistry{
 				Driver:       "spaces",
 				HomeProvider: "/home", // unused for spaces, static currently not supported
 				JSON:         "",
 			},
-			AppRegistry: AppRegistry{
+			AppRegistry: config.AppRegistry{
 				Driver:        "static",
 				MimetypesJSON: "",
 			},
-			Users: Users{
-				Port: Port{
+			Users: config.Users{
+				Port: config.Port{
 					Endpoint:    "localhost:9144",
 					DebugAddr:   "127.0.0.1:9145",
 					GRPCNetwork: "tcp",
@@ -282,8 +292,8 @@ func DefaultConfig() *Config {
 				Driver:                    "ldap",
 				UserGroupsCacheExpiration: 5,
 			},
-			Groups: Groups{
-				Port: Port{
+			Groups: config.Groups{
+				Port: config.Port{
 					Endpoint:    "localhost:9160",
 					DebugAddr:   "127.0.0.1:9161",
 					GRPCNetwork: "tcp",
@@ -293,37 +303,37 @@ func DefaultConfig() *Config {
 				Driver:                      "ldap",
 				GroupMembersCacheExpiration: 5,
 			},
-			AuthProvider: Users{
-				Port:                      Port{},
+			AuthProvider: config.Users{
+				Port:                      config.Port{},
 				Driver:                    "ldap",
 				UserGroupsCacheExpiration: 0,
 			},
-			AuthBasic: Port{
+			AuthBasic: config.Port{
 				GRPCNetwork: "tcp",
 				GRPCAddr:    "127.0.0.1:9146",
 				DebugAddr:   "127.0.0.1:9147",
 				Services:    []string{"authprovider"},
 				Endpoint:    "localhost:9146",
 			},
-			AuthBearer: Port{
+			AuthBearer: config.Port{
 				GRPCNetwork: "tcp",
 				GRPCAddr:    "127.0.0.1:9148",
 				DebugAddr:   "127.0.0.1:9149",
 				Services:    []string{"authprovider"},
 				Endpoint:    "localhost:9148",
 			},
-			AuthMachine: Port{
+			AuthMachine: config.Port{
 				GRPCNetwork: "tcp",
 				GRPCAddr:    "127.0.0.1:9166",
 				DebugAddr:   "127.0.0.1:9167",
 				Services:    []string{"authprovider"},
 				Endpoint:    "localhost:9166",
 			},
-			AuthMachineConfig: AuthMachineConfig{
+			AuthMachineConfig: config.AuthMachineConfig{
 				MachineAuthAPIKey: "change-me-please",
 			},
-			Sharing: Sharing{
-				Port: Port{
+			Sharing: config.Sharing{
+				Port: config.Port{
 					Endpoint:    "localhost:9150",
 					DebugAddr:   "127.0.0.1:9151",
 					GRPCNetwork: "tcp",
@@ -343,13 +353,13 @@ func DefaultConfig() *Config {
 				PublicEnableExpiredSharesCleanup: true,
 				PublicJanitorRunInterval:         60,
 				UserStorageMountID:               "",
-				Events: Events{
+				Events: config.Events{
 					Address:   "127.0.0.1:9233",
 					ClusterID: "test-cluster",
 				},
 			},
-			StorageShares: StoragePort{
-				Port: Port{
+			StorageShares: config.StoragePort{
+				Port: config.Port{
 					Endpoint:    "localhost:9154",
 					DebugAddr:   "127.0.0.1:9156",
 					GRPCNetwork: "tcp",
@@ -361,8 +371,8 @@ func DefaultConfig() *Config {
 				AlternativeID: "1284d238-aa92-42ce-bdc4-0b0000009154",
 				MountID:       "1284d238-aa92-42ce-bdc4-0b0000009157",
 			},
-			StorageUsers: StoragePort{
-				Port: Port{
+			StorageUsers: config.StoragePort{
+				Port: config.Port{
 					Endpoint:    "localhost:9157",
 					DebugAddr:   "127.0.0.1:9159",
 					GRPCNetwork: "tcp",
@@ -376,9 +386,9 @@ func DefaultConfig() *Config {
 				HTTPPrefix:    "data",
 				TempFolder:    path.Join(defaults.BaseDataPath(), "tmp", "users"),
 			},
-			StoragePublicLink: PublicStorage{
-				StoragePort: StoragePort{
-					Port: Port{
+			StoragePublicLink: config.PublicStorage{
+				StoragePort: config.StoragePort{
+					Port: config.Port{
 						Endpoint:    "localhost:9178",
 						DebugAddr:   "127.0.0.1:9179",
 						GRPCNetwork: "tcp",
@@ -389,8 +399,8 @@ func DefaultConfig() *Config {
 				PublicShareProviderAddr: "",
 				UserProviderAddr:        "",
 			},
-			StorageMetadata: StoragePort{
-				Port: Port{
+			StorageMetadata: config.StoragePort{
+				Port: config.Port{
 					GRPCNetwork: "tcp",
 					GRPCAddr:    "127.0.0.1:9215",
 					HTTPNetwork: "tcp",
@@ -401,10 +411,10 @@ func DefaultConfig() *Config {
 				ExposeDataServer: false,
 				DataServerURL:    "http://localhost:9216/data",
 				TempFolder:       path.Join(defaults.BaseDataPath(), "tmp", "metadata"),
-				DataProvider:     DataProvider{},
+				DataProvider:     config.DataProvider{},
 			},
-			AppProvider: AppProvider{
-				Port: Port{
+			AppProvider: config.AppProvider{
+				Port: config.Port{
 					GRPCNetwork: "tcp",
 					GRPCAddr:    "127.0.0.1:9164",
 					DebugAddr:   "127.0.0.1:9165",
@@ -412,12 +422,12 @@ func DefaultConfig() *Config {
 					Services:    []string{"appprovider"},
 				},
 				ExternalAddr: "127.0.0.1:9164",
-				WopiDriver:   WopiDriver{},
+				WopiDriver:   config.WopiDriver{},
 				AppsURL:      "/app/list",
 				OpenURL:      "/app/open",
 				NewURL:       "/app/new",
 			},
-			Permissions: Port{
+			Permissions: config.Port{
 				Endpoint: "localhost:9191",
 			},
 			Configs:                     nil,
@@ -427,10 +437,18 @@ func DefaultConfig() *Config {
 			ChecksumPreferredUploadType: "",
 			DefaultUploadProtocol:       "tus",
 		},
-		Tracing: Tracing{
+		Tracing: config.Tracing{
 			Service: "storage",
 			Type:    "jaeger",
 		},
-		Asset: Asset{},
+		Asset: config.Asset{},
 	}
+}
+
+func EnsureDefaults(cfg *config.Config) {
+	// TODO: IMPLEMENT ME!
+}
+
+func Sanitize(cfg *config.Config) {
+	// TODO: IMPLEMENT ME!
 }

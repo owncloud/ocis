@@ -8,5 +8,8 @@ geekdocFilePath: configuration.md
 geekdocCollapseSection: true
 ---
 
+## Example YAML Config
+
+{{< include file="extensions/_includes/nats-config-example.yaml"  language="yaml" >}}
 
 {{< include file="extensions/_includes/nats_configvars.md" >}}

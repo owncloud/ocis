@@ -1,18 +1,20 @@
-package config
+package defaults
 
 import (
 	"path"
+	"strings"
 
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/proxy/pkg/config"
 )
 
-func DefaultConfig() *Config {
-	return &Config{
-		Debug: Debug{
+func DefaultConfig() *config.Config {
+	return &config.Config{
+		Debug: config.Debug{
 			Addr:  "127.0.0.1:9205",
 			Token: "",
 		},
-		HTTP: HTTP{
+		HTTP: config.HTTP{
 			Addr:      "0.0.0.0:9200",
 			Root:      "/",
 			Namespace: "com.owncloud.web",
@@ -20,26 +22,26 @@ func DefaultConfig() *Config {
 			TLSKey:    path.Join(defaults.BaseDataPath(), "proxy", "server.key"),
 			TLS:       true,
 		},
-		Service: Service{
+		Service: config.Service{
 			Name: "proxy",
 		},
-		OIDC: OIDC{
+		OIDC: config.OIDC{
 			Issuer:   "https://localhost:9200",
 			Insecure: true,
 			//Insecure: true,
-			UserinfoCache: UserinfoCache{
+			UserinfoCache: config.UserinfoCache{
 				Size: 1024,
 				TTL:  10,
 			},
 		},
-		TokenManager: TokenManager{
+		TokenManager: config.TokenManager{
 			JWTSecret: "Pive-Fumkiu4",
 		},
 		PolicySelector: nil,
-		Reva: Reva{
+		Reva: config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		PreSignedURL: PreSignedURL{
+		PreSignedURL: config.PreSignedURL{
 			AllowedHTTPMethods: []string{"GET"},
 			Enabled:            true,
 		},
@@ -55,11 +57,11 @@ func DefaultConfig() *Config {
 	}
 }
 
-func DefaultPolicies() []Policy {
-	return []Policy{
+func DefaultPolicies() []config.Policy {
+	return []config.Policy{
 		{
 			Name: "ocis",
-			Routes: []Route{
+			Routes: []config.Route{
 				{
 					Endpoint: "/",
 					Backend:  "http://localhost:9100",
@@ -81,7 +83,7 @@ func DefaultPolicies() []Policy {
 					Backend:  "http://localhost:9140",
 				},
 				{
-					Type:     RegexRoute,
+					Type:     config.RegexRoute,
 					Endpoint: "/ocs/v[12].php/cloud/(users?|groups)", // we have `user`, `users` and `groups` in ocis-ocs
 					Backend:  "http://localhost:9110",
 				},
@@ -90,7 +92,7 @@ func DefaultPolicies() []Policy {
 					Backend:  "http://localhost:9140",
 				},
 				{
-					Type:     QueryRoute,
+					Type:     config.QueryRoute,
 					Endpoint: "/remote.php/?preview=1",
 					Backend:  "http://localhost:9115",
 				},
@@ -152,7 +154,7 @@ func DefaultPolicies() []Policy {
 		},
 		{
 			Name: "oc10",
-			Routes: []Route{
+			Routes: []config.Route{
 				{
 					Endpoint: "/",
 					Backend:  "http://localhost:9100",
@@ -210,5 +212,42 @@ func DefaultPolicies() []Policy {
 				},
 			},
 		},
+	}
+}
+
+func EnsureDefaults(cfg *config.Config) {
+	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &config.Log{
+			Level:  cfg.Commons.Log.Level,
+			Pretty: cfg.Commons.Log.Pretty,
+			Color:  cfg.Commons.Log.Color,
+			File:   cfg.Commons.Log.File,
+		}
+	} else if cfg.Log == nil {
+		cfg.Log = &config.Log{}
+	}
+	// provide with defaults for shared tracing, since we need a valid destination address for BindEnv.
+	if cfg.Tracing == nil && cfg.Commons != nil && cfg.Commons.Tracing != nil {
+		cfg.Tracing = &config.Tracing{
+			Enabled:   cfg.Commons.Tracing.Enabled,
+			Type:      cfg.Commons.Tracing.Type,
+			Endpoint:  cfg.Commons.Tracing.Endpoint,
+			Collector: cfg.Commons.Tracing.Collector,
+		}
+	} else if cfg.Tracing == nil {
+		cfg.Tracing = &config.Tracing{}
+	}
+
+}
+
+func Sanitize(cfg *config.Config) {
+	// sanitize config
+	if cfg.Policies == nil {
+		cfg.Policies = DefaultPolicies()
+	}
+
+	if cfg.HTTP.Root != "/" {
+		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 	}
 }

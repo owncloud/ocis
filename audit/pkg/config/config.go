@@ -8,9 +8,9 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons
+	*shared.Commons `ocisConfig:"-" yaml:"-"`
 
-	Service Service
+	Service Service `ocisConfig:"-" yaml:"-"`
 
 	Log   *Log  `ocisConfig:"log"`
 	Debug Debug `ocisConfig:"debug"`
@@ -18,7 +18,7 @@ type Config struct {
 	Events   Events   `ocisConfig:"events"`
 	Auditlog Auditlog `ocisConfig:"auditlog"`
 
-	Context context.Context
+	Context context.Context `ocisConfig:"-" yaml:"-"`
 }
 
 // Events combines the configuration options for the event bus.
