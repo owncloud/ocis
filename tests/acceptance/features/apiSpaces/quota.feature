@@ -13,7 +13,7 @@ Feature: State of the quota
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has given "Alice" the role "Spacemanager" using the settings api
 
 
   Scenario Outline: Quota information is returned in the list of spaces returned via the Graph API

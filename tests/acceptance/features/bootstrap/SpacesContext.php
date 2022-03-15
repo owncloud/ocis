@@ -1329,6 +1329,29 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" has changed the description of the "([^"]*)" space to "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $newName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userHasUpdatedSpaceDescription(
+		string $user,
+		string $spaceName,
+		string $newDescription
+	): void {
+		$this->updateSpaceDescription($user, $spaceName, $newDescription);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" changes the quota of the "([^"]*)" space to "([^"]*)"$/
 	 *
 	 * @param string $user
@@ -1398,6 +1421,31 @@ class SpacesContext implements Context {
 				$body,
 				$spaceId
 			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" has set the file "([^"]*)" as a (description|space image)\s? in a special section of the "([^"]*)" space$/
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param string $type
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userHasUpdatedSpaceSpecialSection(
+		string $user,
+		string $file,
+		string $type,
+		string $spaceName
+	): void {
+		$this->updateSpaceSpecialSection($user, $file, $type, $spaceName);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
 		);
 	}
 

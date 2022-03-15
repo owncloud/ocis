@@ -1,5 +1,5 @@
 @api @skipOnOcV10
-Feature: List and create spaces
+Feature: List spaces
   As a user
   I want to be able to work with personal and project spaces
 
@@ -8,6 +8,7 @@ Feature: List and create spaces
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
+
 
   Scenario: An ordinary user can request information about their Space via the Graph API
     When user "Alice" lists all available spaces via the GraphApi
@@ -26,6 +27,7 @@ Feature: List and create spaces
       | name             | Shares Jail |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
 
+
   Scenario: An ordinary user can request information about their Space via the Graph API using a filter
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'personal'"
     Then the HTTP status code should be "200"
@@ -39,42 +41,19 @@ Feature: List and create spaces
     And the json responded should not contain a space with name "Shares Jail"
     And the json responded should only contain spaces of type "personal"
 
+
   Scenario: An ordinary user will not see any space when using a filter for project
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'project'"
     Then the HTTP status code should be "200"
     And the json responded should not contain a space with name "Alice Hansen"
     And the json responded should not contain spaces of type "personal"
 
+
   Scenario: An ordinary user can access their Space via the webDav API
     When user "Alice" lists all available spaces via the GraphApi
     And user "Alice" lists the content of the space with the name "Alice Hansen" using the WebDav Api
     Then the HTTP status code should be "207"
 
-  Scenario: An ordinary user cannot create a Space via Graph API
-    When user "Alice" creates a space "Project Mars" of type "project" with the default quota using the GraphApi
-    Then the HTTP status code should be "401"
-
-  Scenario: An admin user can create a Space via the Graph API with default quota
-    Given the administrator has given "Alice" the role "Admin" using the settings api
-    When user "Alice" creates a space "Project Mars" of type "project" with the default quota using the GraphApi
-    Then the HTTP status code should be "201"
-    And the json responded should contain a space "Project Mars" with these key and value pairs:
-      | key              | value        |
-      | driveType        | project      |
-      | name             | Project Mars |
-      | quota@@@total    | 1000000000   |
-      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
-
-  Scenario: An admin user can create a Space via the Graph API with certain quota
-    Given the administrator has given "Alice" the role "Admin" using the settings api
-    When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
-    Then the HTTP status code should be "201"
-    And the json responded should contain a space "Project Venus" with these key and value pairs:
-      | key              | value         |
-      | driveType        | project       |
-      | name             | Project Venus |
-      | quota@@@total    | 2000          |
-      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
 
   Scenario: A user can list his personal space via multiple endpoints
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'personal'"
@@ -91,16 +70,10 @@ Feature: List and create spaces
       | name             | Alice Hansen  |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
 
+
   Scenario: A user can list his created spaces via multiple endpoints
-    Given the administrator has given "Alice" the role "Admin" using the settings api
-    When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
-    Then the HTTP status code should be "201"
-    And the json responded should contain a space "Project Venus" with these key and value pairs:
-      | key              | value         |
-      | driveType        | project       |
-      | name             | Project Venus |
-      | quota@@@total    | 2000          |
-      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+    Given the administrator has given "Alice" the role "Spacemanager" using the settings api
+    And user "Alice" has created a space "Project Venus" of type "project" with quota "2000"
     When user "Alice" looks up the single space "Project Venus" via the GraphApi by using its id
     Then the json responded should contain a space "Project Venus" with these key and value pairs:
       | key              | value         |
