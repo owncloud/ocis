@@ -86,7 +86,31 @@ func New(opts ...Option) (s *Service, err error) {
 	if err = s.createDefaultGroups(cfg.DemoUsersAndGroups); err != nil {
 		return nil, err
 	}
+
+	s.serviceUserToIndex()
 	return
+}
+
+// serviceUserToIndex temporarily adds a service user to the index, which is supposed to be removed before the lock on the handler function is released
+func (s Service) serviceUserToIndex() {
+	if s.Config.ServiceUser.Username != "" && s.Config.ServiceUser.UUID != "" {
+		_, err := s.index.Add(s.getInMemoryServiceUser())
+		if err != nil {
+			s.log.Logger.Err(err).Msg("service user was configured but failed to be added to the index")
+		}
+	}
+}
+
+func (s Service) getInMemoryServiceUser() accountsmsg.Account {
+	return accountsmsg.Account{
+		AccountEnabled:           true,
+		Id:                       s.Config.ServiceUser.UUID,
+		PreferredName:            s.Config.ServiceUser.Username,
+		OnPremisesSamAccountName: s.Config.ServiceUser.Username,
+		DisplayName:              s.Config.ServiceUser.Username,
+		UidNumber:                s.Config.ServiceUser.UID,
+		GidNumber:                s.Config.ServiceUser.GID,
+	}
 }
 
 func (s Service) buildIndex() (*indexer.Indexer, error) {

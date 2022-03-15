@@ -46,6 +46,7 @@ func (m *Manager) List(ctx context.Context, roleIDs []string) []*settingsmsg.Bun
 		res, err := m.roleService.ListRoles(ctx, request)
 		if err != nil {
 			m.logger.Debug().Err(err).Msg("failed to fetch roles by roleIDs")
+			return nil
 		}
 		for _, role := range res.Bundles {
 			m.cache.set(role.Id, role)

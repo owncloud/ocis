@@ -15,7 +15,8 @@ import (
 	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/settings/pkg/config"
 	"github.com/owncloud/ocis/settings/pkg/settings"
-	store "github.com/owncloud/ocis/settings/pkg/store/filesystem"
+	filestore "github.com/owncloud/ocis/settings/pkg/store/filesystem"
+	metastore "github.com/owncloud/ocis/settings/pkg/store/metadata"
 	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -32,12 +33,21 @@ type Service struct {
 // NewService returns a service implementation for Service.
 func NewService(cfg *config.Config, logger log.Logger) Service {
 	service := Service{
-		id:      "ocis-settings",
-		config:  cfg,
-		logger:  logger,
-		manager: store.New(cfg),
+		id:     "ocis-settings",
+		config: cfg,
+		logger: logger,
 	}
-	service.RegisterDefaultRoles()
+
+	switch cfg.StoreType {
+	default:
+		fallthrough
+	case "metadata":
+		service.manager = metastore.New(cfg)
+	case "filesystem":
+		service.manager = filestore.New(cfg)
+		// TODO: if we want to further support filesystem store it should use default permissions from store/defaults/defaults.go instead using this duplicate
+		service.RegisterDefaultRoles()
+	}
 	return service
 }
 

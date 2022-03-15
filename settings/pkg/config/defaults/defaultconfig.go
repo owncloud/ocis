@@ -17,6 +17,7 @@ func FullDefaultConfig() *config.Config {
 	return cfg
 }
 
+// DefaultConfig returns the default config
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Service: config.Service{
@@ -44,12 +45,21 @@ func DefaultConfig() *config.Config {
 			Addr:      "127.0.0.1:9191",
 			Namespace: "com.owncloud.api",
 		},
-		DataPath: path.Join(defaults.BaseDataPath(), "settings"),
+		StoreType: "metadata", // use metadata or filesystem
+		DataPath:  path.Join(defaults.BaseDataPath(), "settings"),
 		Asset: config.Asset{
 			Path: "",
 		},
 		TokenManager: config.TokenManager{
 			JWTSecret: "Pive-Fumkiu4",
+		},
+
+		Metadata: config.Metadata{
+			GatewayAddress:    "127.0.0.1:9142",
+			StorageAddress:    "127.0.0.1:9215",
+			ServiceUserID:     "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
+			ServiceUserIDP:    "https://localhost:9200",
+			MachineAuthAPIKey: "change-me-please",
 		},
 	}
 }
