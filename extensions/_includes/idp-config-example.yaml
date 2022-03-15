@@ -44,6 +44,7 @@ idp:
   identifierdefaultbannerlogo: ""
   identifierdefaultsigninpagetext: ""
   identifierdefaultusernamehinttext: ""
+  identifieruilocales: []
   signingkid: ""
   signingmethod: PS256
   signingprivatekeyfiles: []
