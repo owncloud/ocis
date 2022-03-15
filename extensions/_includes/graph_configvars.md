@@ -9,7 +9,7 @@
 | GRAPH_HTTP_ADDR | string | 127.0.0.1:9120 | |
 | GRAPH_HTTP_ROOT | string | /graph | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
-| OCIS_JWT_SECRET;OCS_JWT_SECRET | string | Pive-Fumkiu4 | |
+| OCIS_JWT_SECRET;GRAPH_JWT_SECRET | string | Pive-Fumkiu4 | |
 | OCIS_URL;GRAPH_SPACES_WEBDAV_BASE | string | https://localhost:9200 | |
 | GRAPH_SPACES_WEBDAV_PATH | string | /dav/spaces/ | |
 | GRAPH_SPACES_DEFAULT_QUOTA | string | 1000000000 | |
