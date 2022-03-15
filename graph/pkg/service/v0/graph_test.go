@@ -65,11 +65,11 @@ var _ = Describe("Graph", func() {
 				Status: status.NewOK(ctx),
 				StorageSpaces: []*provider.StorageSpace{
 					{
-						Id:        &provider.StorageSpaceId{OpaqueId: "aspaceid"},
+						Id:        &provider.StorageSpaceId{OpaqueId: "sameID"},
 						SpaceType: "aspacetype",
 						Root: &provider.ResourceId{
-							StorageId: "aspaceid",
-							OpaqueId:  "anopaqueid",
+							StorageId: "sameID",
+							OpaqueId:  "sameID",
 						},
 						Name: "aspacename",
 					},
@@ -94,11 +94,11 @@ var _ = Describe("Graph", func() {
 				"value":[
 					{
 						"driveType":"aspacetype",
-						"id":"aspaceid",
+						"id":"sameID",
 						"name":"aspacename",
 						"root":{
-							"id":"aspaceid!anopaqueid",
-							"webDavUrl":"https://localhost:9200/dav/spaces/aspaceid"
+							"id":"sameID!sameID",
+							"webDavUrl":"https://localhost:9200/dav/spaces/sameID"
 						}
 					}
 				]
@@ -110,11 +110,11 @@ var _ = Describe("Graph", func() {
 				Status: status.NewOK(ctx),
 				StorageSpaces: []*provider.StorageSpace{
 					{
-						Id:        &provider.StorageSpaceId{OpaqueId: "bspaceid"},
+						Id:        &provider.StorageSpaceId{OpaqueId: "bsameID"},
 						SpaceType: "bspacetype",
 						Root: &provider.ResourceId{
-							StorageId: "bspaceid",
-							OpaqueId:  "bopaqueid",
+							StorageId: "bsameID",
+							OpaqueId:  "bsameID",
 						},
 						Name: "bspacename",
 						Opaque: &typesv1beta1.Opaque{
@@ -125,11 +125,11 @@ var _ = Describe("Graph", func() {
 						},
 					},
 					{
-						Id:        &provider.StorageSpaceId{OpaqueId: "aspaceid"},
+						Id:        &provider.StorageSpaceId{OpaqueId: "asameID"},
 						SpaceType: "aspacetype",
 						Root: &provider.ResourceId{
-							StorageId: "aspaceid",
-							OpaqueId:  "anopaqueid",
+							StorageId: "asameID",
+							OpaqueId:  "asameID",
 						},
 						Name: "aspacename",
 						Opaque: &typesv1beta1.Opaque{
@@ -161,23 +161,23 @@ var _ = Describe("Graph", func() {
 					{
 						"driveAlias":"aspacetype/aspacename",
 						"driveType":"aspacetype",
-						"id":"aspaceid",
+						"id":"asameID",
 						"name":"aspacename",
 						"root":{
 							"eTag":"101112131415",
-							"id":"aspaceid!anopaqueid",
-							"webDavUrl":"https://localhost:9200/dav/spaces/aspaceid"
+							"id":"asameID!asameID",
+							"webDavUrl":"https://localhost:9200/dav/spaces/asameID"
 						}
 					},
 					{
 						"driveAlias":"bspacetype/bspacename",
 						"driveType":"bspacetype",
-						"id":"bspaceid",
+						"id":"bsameID",
 						"name":"bspacename",
 						"root":{
 							"eTag":"123456789",
-							"id":"bspaceid!bopaqueid",
-							"webDavUrl":"https://localhost:9200/dav/spaces/bspaceid"
+							"id":"bsameID!bsameID",
+							"webDavUrl":"https://localhost:9200/dav/spaces/bsameID"
 						}
 					}
 				]
