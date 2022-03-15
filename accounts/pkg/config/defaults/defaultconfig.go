@@ -71,7 +71,7 @@ func DefaultConfig() *config.Config {
 		},
 		ServiceUser: config.ServiceUser{
 			UUID:     "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-			Username: "",
+			Username: "service user",
 			UID:      0,
 			GID:      0,
 		},

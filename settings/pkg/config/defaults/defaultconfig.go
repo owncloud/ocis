@@ -1,7 +1,6 @@
 package defaults
 
 import (
-	"os"
 	"path"
 	"strings"
 
@@ -58,8 +57,8 @@ func DefaultConfig() *config.Config {
 		Metadata: config.Metadata{
 			GatewayAddress:    "127.0.0.1:9142",
 			StorageAddress:    "127.0.0.1:9215",
-			ServiceUserID:     "ddc2004c-0977-11eb-9d3f-a793888cd0f8",
-			ServiceUserIDP:    os.Getenv("OCIS_URL"),
+			ServiceUserID:     "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
+			ServiceUserIDP:    "https://localhost:9200",
 			MachineAuthAPIKey: "change-me-please",
 		},
 	}
