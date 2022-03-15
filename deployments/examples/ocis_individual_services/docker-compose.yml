@@ -281,8 +281,8 @@ services:
 
       NOTIFICATIONS_EVENTS_ENDPOINT: nats:9233
 
+      NOTIFICATIONS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       REVA_GATEWAY: storage-gateway:9142
-      PROXY_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
     logging:
       driver: "local"
     restart: always
@@ -304,7 +304,7 @@ services:
 
       STORE_GRPC_ADDR: 0.0.0.0:9460
     volumes:
-      - "ocis-settings:/var/lib/ocis"
+      - "ocis-store:/var/lib/ocis"
     logging:
       driver: "local"
     restart: always
@@ -325,6 +325,11 @@ services:
       THUMBNAILS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       THUMBNAILS_GRPC_ADDR: 0.0.0.0:9185
+      THUMBNAILS_HTTP_ADDR: 0.0.0.0:9186
+
+      THUMBNAILS_DATA_ENDPOINT: http://thumbnails:9186/thumbnails/data
+
+      THUMBNAILS_TRANSFER_TOKEN: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
 
       THUMBNAILS_CS3SOURCE_INSECURE: "true"
       REVA_GATEWAY: storage-gateway:9142
@@ -430,6 +435,8 @@ services:
       STORAGE_METADATA_HTTP_ADDR: 0.0.0.0:9216
       STORAGE_METADATA_DATA_SERVER_URL: http://storage-metadata:9216/data
 
+      STORAGE_PERMISSIONS_ENDPOINT: settings:9191
+
       STORAGE_JWT_SECRET: ${OCIS_METADATA_JWT_SECRET:-Pive-Fumkiu4}
       STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
 
@@ -484,6 +491,7 @@ services:
       STORAGE_AUTH_MACHINE_GRPC_ADDR: 0.0.0.0:9148
       STORAGE_AUTH_MACHINE_ENDPOINT: storage-authmachine:9148
 
+      STORAGE_AUTH_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       REVA_GATEWAY: storage-gateway:9142
     logging:
@@ -565,6 +573,8 @@ services:
 
       STORAGE_USERS_HTTP_ADDR: 0.0.0.0:9158
       STORAGE_USERS_DATA_SERVER_URL: http://storage-users:9158/data
+
+      STORAGE_PERMISSIONS_ENDPOINT: settings:9191
 
       STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
       STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
@@ -718,7 +728,9 @@ services:
 
       STORAGE_SHARING_ENDPOINT: storage-sharing:9150
 
+      STORAGE_AUTH_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
       REVA_GATEWAY: storage-gateway:9142
     logging:
       driver: "local"
