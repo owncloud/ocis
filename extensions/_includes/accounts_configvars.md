@@ -20,7 +20,7 @@
 | ACCOUNTS_GID_INDEX_LOWER_BOUND | int64 | 0 | The lowest possible gid value for the indexer.|
 | ACCOUNTS_GID_INDEX_UPPER_BOUND | int64 | 1000 | The highest possible gid value for the indexer.|
 | ACCOUNTS_SERVICE_USER_UUID | string | 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad | The id of the accounts service user.|
-| ACCOUNTS_SERVICE_USER_USERNAME | string |  | The username of the accounts service user.|
+| ACCOUNTS_SERVICE_USER_USERNAME | string | 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad | The username of the accounts service user.|
 | ACCOUNTS_SERVICE_USER_UID | int64 | 0 | The uid of the accounts service user.|
 | ACCOUNTS_SERVICE_USER_GID | int64 | 0 | The gid of the accounts service user.|
 | ACCOUNTS_HASH_DIFFICULTY | int | 11 | The hash difficulty makes sure that validating a password takes at least a certain amount of time.|

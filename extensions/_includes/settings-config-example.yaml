@@ -37,7 +37,14 @@ http:
     allowcredentials: true
 grpc:
   addr: 127.0.0.1:9191
+storetype: metadata
 datapath: ~/.ocis/settings
+metadata:
+  gatewayaddress: 127.0.0.1:9142
+  storageaddress: 127.0.0.1:9215
+  serviceuserid: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
+  serviceuseridp: https://localhost:9200
+  machineauthapikey: change-me-please
 asset:
   path: ""
 tokenmanager:

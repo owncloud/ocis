@@ -56,7 +56,7 @@ index:
     upper: 1000
 serviceuser:
   uuid: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
-  username: ""
+  username: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
   uid: 0
   gid: 0
 hashdifficulty: 11
