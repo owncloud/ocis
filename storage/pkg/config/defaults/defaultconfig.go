@@ -266,7 +266,7 @@ func DefaultConfig() *config.Config {
 				},
 				CommitShareToStorageGrant:  true,
 				CommitShareToStorageRef:    true,
-				DisableHomeCreationOnLogin: false,
+				DisableHomeCreationOnLogin: true,
 				ShareFolder:                "Shares",
 				LinkGrants:                 "",
 				HomeMapping:                "",
