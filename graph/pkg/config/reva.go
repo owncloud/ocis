@@ -7,5 +7,5 @@ type Reva struct {
 
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
-	JWTSecret string `ocisConfig:"jwt_secret" env:"OCIS_JWT_SECRET;OCS_JWT_SECRET"`
+	JWTSecret string `ocisConfig:"jwt_secret" env:"OCIS_JWT_SECRET;GRAPH_JWT_SECRET"`
 }
