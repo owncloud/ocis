@@ -84,6 +84,7 @@ type Settings struct {
 	IdentifierDefaultBannerLogo       string
 	IdentifierDefaultSignInPageText   string
 	IdentifierDefaultUsernameHintText string
+	IdentifierUILocales               []string
 
 	SigningKid             string   `ocisConfig:"signing_kid" env:"IDP_SIGNING_KID"`
 	SigningMethod          string   `ocisConfig:"signing_method" env:"IDP_SIGNING_METHOD"`
