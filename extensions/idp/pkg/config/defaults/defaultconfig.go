@@ -42,7 +42,7 @@ func DefaultConfig() *config.Config {
 			SignedOutURI:                      "",
 			AuthorizationEndpointURI:          "",
 			EndsessionEndpointURI:             "",
-			Insecure:                          true,
+			Insecure:                          false,
 			TrustedProxy:                      nil,
 			AllowScope:                        nil,
 			AllowClientGuests:                 false,
@@ -69,6 +69,7 @@ func DefaultConfig() *config.Config {
 		},
 		Ldap: config.Ldap{
 			URI:               "ldaps://localhost:9235",
+			TLSCACert:         path.Join(defaults.BaseDataPath(), "idm", "ldap.crt"),
 			BindDN:            "uid=idp,ou=sysusers,o=libregraph-idm",
 			BindPassword:      "idp",
 			BaseDN:            "ou=users,o=libregraph-idm",
