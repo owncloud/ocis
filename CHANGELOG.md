@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Improve gif thumbnails: [#3305](https://github.com/owncloud/ocis/pull/3305)
 * Change - Settings service now stores its data via metadata service: [#3232](https://github.com/owncloud/ocis/pull/3232)
 * Enhancement - Log sharing events in audit service: [#3301](https://github.com/owncloud/ocis/pull/3301)
+* Enhancement - Add space aliases: [#3283](https://github.com/owncloud/ocis/pull/3283)
 * Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
 * Enhancement - Improve thumbnails API: [#3272](https://github.com/owncloud/ocis/pull/3272)
 * Enhancement - Update ownCloud Web to v5.3.0-rc.1: [#6561](https://github.com/owncloud/web/pull/6561)
@@ -40,6 +41,12 @@ The following sections list the changes for unreleased.
    Contains sharing related events. See full list in audit/pkg/types/events.go
 
    https://github.com/owncloud/ocis/pull/3301
+
+* Enhancement - Add space aliases: [#3283](https://github.com/owncloud/ocis/pull/3283)
+
+   Space aliases can be used to resolve spaceIDs in a client.
+
+   https://github.com/owncloud/ocis/pull/3283
 
 * Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
 
