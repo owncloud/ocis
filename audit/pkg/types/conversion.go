@@ -220,6 +220,41 @@ func LinkAccessFailed(ev events.LinkAccessFailed) AuditEventLinkAccessed {
 	}
 }
 
+// FileUploaded converts a FileUploaded event to an AuditEventFileCreated
+func FileUploaded(ev events.FileUploaded) AuditEventFileCreated {
+	return AuditEventFileCreated{}
+}
+
+// FileDownloaded converts a FileDownloaded event to an AuditEventFileRead
+func FileDownloaded(ev events.FileDownloaded) AuditEventFileRead {
+	return AuditEventFileRead{}
+}
+
+// ItemMoved converts a ItemMoved event to an AuditEventFileRenamed
+func ItemMoved(ev events.ItemMoved) AuditEventFileRenamed {
+	return AuditEventFileRenamed{}
+}
+
+// ItemTrashed converts a ItemTrashed event to an AuditEventFileDeleted
+func ItemTrashed(ev events.ItemTrashed) AuditEventFileDeleted {
+	return AuditEventFileDeleted{}
+}
+
+// ItemPurged converts a ItemPurged event to an AuditEventFilePurged
+func ItemPurged(ev events.ItemPurged) AuditEventFilePurged {
+	return AuditEventFilePurged{}
+}
+
+// ItemRestored converts a ItemRestored event to an AuditEventFileRestored
+func ItemRestored(ev events.ItemRestored) AuditEventFileRestored {
+	return AuditEventFileRestored{}
+}
+
+// FileVersionRestored converts a FileVersionRestored event to an AuditEventFileVersionRestored
+func FileVersionRestored(ev events.FileVersionRestored) AuditEventFileVersionRestored {
+	return AuditEventFileVersionRestored{}
+}
+
 func extractGrantee(uid *user.UserId, gid *group.GroupId) (string, string) {
 	switch {
 	case uid != nil && uid.OpaqueId != "":

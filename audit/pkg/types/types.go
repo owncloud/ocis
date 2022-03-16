@@ -15,6 +15,10 @@ type AuditEvent struct {
 	Level      int    // the log level of the entry (usually 1 for audit events)
 }
 
+/*
+   Sharing
+*/
+
 // AuditEventSharing is the basic audit event for shares
 type AuditEventSharing struct {
 	AuditEvent
@@ -75,4 +79,72 @@ type AuditEventLinkAccessed struct {
 	ShareToken string // The share token.
 	Success    bool   // If the request was successful.
 	ItemType   string // file or folder
+}
+
+/*
+   Files
+*/
+
+// AuditEventFiles is the basic audit event for files
+type AuditEventFiles struct {
+	AuditEvent
+
+	Path   string // The full path to the create file.
+	Owner  string // The UID of the owner of the file.
+	FileID string // The newly created files identifier.
+}
+
+// AuditEventFileCreated is the event logged when a file is created
+type AuditEventFileCreated struct {
+	AuditEventFiles
+}
+
+// AuditEventFileRead is the event logged when a file is read (aka downloaded)
+type AuditEventFileRead struct {
+	AuditEventFiles
+}
+
+// AuditEventFileUpdated is the event logged when a file is updated
+// TODO: How to differentiate between new uploads and new version uploads?
+// FIXME: implement
+type AuditEventFileUpdated struct {
+	AuditEventFiles
+}
+
+// AuditEventFileDeleted is the event logged when a file is deleted (aka trashed)
+type AuditEventFileDeleted struct {
+	AuditEventFiles
+}
+
+// AuditEventFileCopied is the event logged when a file is copied
+// TODO: copy is a download&upload for now. How to know it was a copy?
+// FIXME: implement
+type AuditEventFileCopied struct {
+	AuditEventFiles
+}
+
+// AuditEventFileRenamed is the event logged when a file is renamed (moved)
+type AuditEventFileRenamed struct {
+	AuditEventFiles
+}
+
+// AuditEventFilePurged is the event logged when a file is purged (deleted from trashbin)
+type AuditEventFilePurged struct {
+	AuditEventFiles
+}
+
+// AuditEventFileRestored is the event logged when a file is restored (from trashbin)
+type AuditEventFileRestored struct {
+	AuditEventFiles
+}
+
+// AuditEventFileVersionRestored is the event logged when a file version is restored
+type AuditEventFileVersionRestored struct {
+	AuditEventFiles
+}
+
+// AuditEventFileVersionDeleted is the event logged when a file version is deleted
+// TODO: is this even possible?
+type AuditEventFileVersionDeleted struct {
+	AuditEventFiles
 }
