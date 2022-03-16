@@ -284,7 +284,7 @@ reva:
       supervised: false
     commitsharetostoragegrant: true
     commitsharetostorageref: true
-    disablehomecreationonlogin: false
+    disablehomecreationonlogin: true
     sharefolder: Shares
     linkgrants: ""
     homemapping: ""
