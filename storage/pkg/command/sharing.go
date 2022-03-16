@@ -179,6 +179,13 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 							"enable_expired_shares_cleanup": cfg.Reva.Sharing.PublicEnableExpiredSharesCleanup,
 							"janitor_run_interval":          cfg.Reva.Sharing.PublicJanitorRunInterval,
 						},
+						"cs3": map[string]interface{}{
+							"gateway_addr":        cfg.Reva.Gateway.Endpoint,
+							"provider_addr":       cfg.Reva.Sharing.CS3ProviderAddr,
+							"service_user_id":     cfg.Reva.Sharing.CS3ServiceUser,
+							"service_user_idp":    cfg.Reva.Sharing.CS3ServiceUserIdp,
+							"machine_auth_apikey": cfg.Reva.AuthMachineConfig.MachineAuthAPIKey,
+						},
 					},
 				},
 			},
