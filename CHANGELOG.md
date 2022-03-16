@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add space aliases: [#3283](https://github.com/owncloud/ocis/pull/3283)
 * Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
 * Enhancement - Improve thumbnails API: [#3272](https://github.com/owncloud/ocis/pull/3272)
+* Enhancement - Update reva to vXXXX: [#3330](https://github.com/owncloud/ocis/pull/3330)
 * Enhancement - Update ownCloud Web to v5.3.0-rc.1: [#6561](https://github.com/owncloud/web/pull/6561)
 
 ## Details
@@ -61,6 +62,16 @@ The following sections list the changes for unreleased.
    HTTP.
 
    https://github.com/owncloud/ocis/pull/3272
+
+* Enhancement - Update reva to vXXXX: [#3330](https://github.com/owncloud/ocis/pull/3330)
+
+   Updated reva to version XXXX. This update includes:
+
+  * Enh [cs3org/reva#2622](https://github.com/cs3org/reva/pull/2622): Implement listing shares in spaces
+  * Enh [cs3org/reva#2624](https://github.com/cs3org/reva/pull/2624): Include spaces etags in virtual spaces
+  * Enh [cs3org/reva#2628](https://github.com/cs3org/reva/pull/2628): Webdav trash-bin API for spaces
+
+   https://github.com/owncloud/ocis/pull/3330
 
 * Enhancement - Update ownCloud Web to v5.3.0-rc.1: [#6561](https://github.com/owncloud/web/pull/6561)
 
