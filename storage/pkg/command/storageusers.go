@@ -112,6 +112,14 @@ func storageUsersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string
 					"tmp_folder":         cfg.Reva.StorageUsers.TempFolder,
 				},
 			},
+			"interceptors": map[string]interface{}{
+				"eventsmiddleware": map[string]interface{}{
+					"group":     "sharing",
+					"type":      "nats",
+					"address":   cfg.Reva.Sharing.Events.Address,
+					"clusterID": cfg.Reva.Sharing.Events.ClusterID,
+				},
+			},
 		},
 		"http": map[string]interface{}{
 			"network": cfg.Reva.StorageUsers.HTTPNetwork,
