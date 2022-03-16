@@ -1168,10 +1168,10 @@ API, search, favorites, config, capabilities, not existing endpoints, CORS and o
 
 - [apiAuthOcs/ocsDELETEAuth.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsDELETEAuth.feature#L10) Scenario: send DELETE requests to OCS endpoints as admin with wrong password
 - [apiAuthOcs/ocsGETAuth.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L10) Scenario: using OCS anonymously
-- [apiAuthOcs/ocsGETAuth.feature:53](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L53) Scenario: using OCS with non-admin basic auth
-- [apiAuthOcs/ocsGETAuth.feature:88](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L88) Scenario: using OCS as normal user with wrong password
-- [apiAuthOcs/ocsGETAuth.feature:121](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L121) Scenario:using OCS with admin basic auth
-- [apiAuthOcs/ocsGETAuth.feature:139](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L139) Scenario: using OCS as admin user with wrong password
+- [apiAuthOcs/ocsGETAuth.feature:51](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L51) Scenario: using OCS with non-admin basic auth
+- [apiAuthOcs/ocsGETAuth.feature:84](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L84) Scenario: using OCS as normal user with wrong password
+- [apiAuthOcs/ocsGETAuth.feature:115](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L115) Scenario:using OCS with admin basic auth
+- [apiAuthOcs/ocsGETAuth.feature:133](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L133) Scenario: using OCS as admin user with wrong password
 - [apiAuthOcs/ocsPOSTAuth.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsPOSTAuth.feature#L10) Scenario: send POST requests to OCS endpoints as normal user with wrong password
 - [apiAuthOcs/ocsPUTAuth.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsPUTAuth.feature#L10) Scenario: send PUT request to OCS endpoints as admin with wrong password
 
@@ -1400,28 +1400,18 @@ And other missing implementation of favorites
 - [apiAuth/cors.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L31)
 - [apiAuth/cors.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L32)
 - [apiAuth/cors.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L33)
-- [apiAuth/cors.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L34)
-- [apiAuth/cors.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L35)
-- [apiAuth/cors.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L36)
-- [apiAuth/cors.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L37)
-- [apiAuth/cors.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L38)
-- [apiAuth/cors.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L39)
-- [apiAuth/cors.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L40)
-- [apiAuth/cors.feature:41](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L41)
-- [apiAuth/cors.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L60)
-- [apiAuth/cors.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L61)
-- [apiAuth/cors.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L62)
-- [apiAuth/cors.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L63)
-- [apiAuth/cors.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L64)
-- [apiAuth/cors.feature:65](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L65)
-- [apiAuth/cors.feature:84](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L84)
-- [apiAuth/cors.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L85)
-- [apiAuth/cors.feature:86](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L86)
-- [apiAuth/cors.feature:87](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L87)
-- [apiAuth/cors.feature:88](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L88)
-- [apiAuth/cors.feature:89](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L89)
-- [apiAuth/cors.feature:90](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L90)
-- [apiAuth/cors.feature:91](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L91)
+- [apiAuth/cors.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L44)
+- [apiAuth/cors.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L45)
+- [apiAuth/cors.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L46)
+- [apiAuth/cors.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L47)
+- [apiAuth/cors.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L48)
+- [apiAuth/cors.feature:49](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L49)
+- [apiAuth/cors.feature:68](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L68)
+- [apiAuth/cors.feature:69](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L69)
+- [apiAuth/cors.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L70)
+- [apiAuth/cors.feature:71](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L71)
+- [apiAuth/cors.feature:72](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L72)
+- [apiAuth/cors.feature:73](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L73)
 - [apiAuth/cors.feature:92](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L92)
 - [apiAuth/cors.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L93)
 - [apiAuth/cors.feature:94](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L94)
@@ -1432,34 +1422,38 @@ And other missing implementation of favorites
 - [apiAuth/cors.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L99)
 - [apiAuth/cors.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L100)
 - [apiAuth/cors.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L101)
-- [apiAuth/cors.feature:120](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L120)
-- [apiAuth/cors.feature:121](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L121)
-- [apiAuth/cors.feature:122](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L122)
-- [apiAuth/cors.feature:123](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L123)
-- [apiAuth/cors.feature:124](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L124)
-- [apiAuth/cors.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L125)
-- [apiAuth/cors.feature:144](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L144)
-- [apiAuth/cors.feature:145](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L145)
-- [apiAuth/cors.feature:146](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L146)
-- [apiAuth/cors.feature:147](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L147)
-- [apiAuth/cors.feature:148](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L148)
-- [apiAuth/cors.feature:149](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L149)
-- [apiAuth/cors.feature:150](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L150)
-- [apiAuth/cors.feature:151](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L151)
-- [apiAuth/cors.feature:152](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L152)
-- [apiAuth/cors.feature:153](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L153)
-- [apiAuth/cors.feature:154](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L154)
-- [apiAuth/cors.feature:155](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L155)
-- [apiAuth/cors.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L156)
-- [apiAuth/cors.feature:157](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L157)
-- [apiAuth/cors.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L158)
-- [apiAuth/cors.feature:159](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L159)
+- [apiAuth/cors.feature:112](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L112)
+- [apiAuth/cors.feature:113](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L113)
+- [apiAuth/cors.feature:114](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L114)
+- [apiAuth/cors.feature:115](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L115)
+- [apiAuth/cors.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L116)
+- [apiAuth/cors.feature:117](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L117)
+- [apiAuth/cors.feature:136](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L136)
+- [apiAuth/cors.feature:137](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L137)
+- [apiAuth/cors.feature:138](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L138)
+- [apiAuth/cors.feature:139](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L139)
+- [apiAuth/cors.feature:140](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L140)
+- [apiAuth/cors.feature:141](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L141)
+- [apiAuth/cors.feature:160](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L160)
+- [apiAuth/cors.feature:161](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L161)
+- [apiAuth/cors.feature:162](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L162)
+- [apiAuth/cors.feature:163](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L163)
+- [apiAuth/cors.feature:164](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L164)
+- [apiAuth/cors.feature:165](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L165)
+- [apiAuth/cors.feature:166](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L166)
+- [apiAuth/cors.feature:167](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L167)
+- [apiAuth/cors.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L178)
+- [apiAuth/cors.feature:179](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L179)
 - [apiAuth/cors.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L180)
 - [apiAuth/cors.feature:181](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L181)
 - [apiAuth/cors.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L182)
 - [apiAuth/cors.feature:183](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L183)
-- [apiAuth/cors.feature:184](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L184)
-- [apiAuth/cors.feature:185](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L185)
+- [apiAuth/cors.feature:204](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L204)
+- [apiAuth/cors.feature:205](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L205)
+- [apiAuth/cors.feature:206](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L206)
+- [apiAuth/cors.feature:207](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L207)
+- [apiAuth/cors.feature:208](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L208)
+- [apiAuth/cors.feature:209](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L209)
 
 #### [App Passwords/Tokens for legacy WebDAV clients](https://github.com/owncloud/ocis/issues/197)
 
@@ -1861,5 +1855,11 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 #### [Trying to modify a shared file using spaces end-point returns 409 HTTP status code](https://github.com/owncloud/ocis/issues/3241)
 
 - [apiMain/checksums.feature:233](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L233)
+
+#### [status does not have new product data item](https://github.com/owncloud/ocis/issues/3317)
+
+- [apiCapabilities/capabilities.feature:959](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L959)
+- [apiMain/status.feature:5](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/status.feature#L5)
+
   Note: always have an empty line at the end of this file.
   The bash script that processes this file requires that the last line has a newline on the end.
