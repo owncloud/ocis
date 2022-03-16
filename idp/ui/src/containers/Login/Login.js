@@ -9,6 +9,7 @@ import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import green from '@material-ui/core/colors/green';
 import Typography from '@material-ui/core/Typography';
+import Link from '@material-ui/core/Link';
 
 import TextInput from '../../components/TextInput'
 
@@ -55,7 +56,8 @@ class Login extends React.PureComponent {
   }
 
   render() {
-    const { loading, errors, classes, username } = this.props;
+    const { loading, errors, classes, username, passwordResetLink } = this.props;
+    const loginFailed = errors.http;
     const hasError = errors.http || errors.username || errors.password;
     const errorMessage = errors.http
       ? <ErrorMessage error={errors.http}></ErrorMessage>
@@ -109,6 +111,8 @@ class Login extends React.PureComponent {
               {hasError && <Typography id="oc-login-error-message" variant="subtitle2" component="span" color="error"
                                        className={classes.message}>{errorMessage}</Typography>}
               <div className={classes.wrapper}>
+                {loginFailed && passwordResetLink && <Link id="oc-login-password-reset" href={passwordResetLink} variant="subtitle2">{"Reset password?"}</Link>}
+                <br />
                 <Button
                     type="submit"
                     color="primary"
@@ -150,6 +154,7 @@ Login.propTypes = {
   loading: PropTypes.string.isRequired,
   username: PropTypes.string.isRequired,
   password: PropTypes.string.isRequired,
+  passwordResetLink: PropTypes.string.isRequired,
   errors: PropTypes.object.isRequired,
   hello: PropTypes.object,
   query: PropTypes.object.isRequired,
@@ -160,7 +165,7 @@ Login.propTypes = {
 
 const mapStateToProps = (state) => {
   const { loading, username, password, errors} = state.login;
-  const { hello, query } = state.common;
+  const { hello, query, passwordResetLink } = state.common;
 
   return {
     loading,
@@ -168,7 +173,8 @@ const mapStateToProps = (state) => {
     password,
     errors,
     hello,
-    query
+    query,
+    passwordResetLink
   };
 };
 

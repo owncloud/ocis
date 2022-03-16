@@ -214,6 +214,8 @@ func (idp IDP) Index() http.HandlerFunc {
 	nonce := rndm.GenerateRandomString(32)
 	indexHTML = bytes.Replace(indexHTML, []byte("__CSP_NONCE__"), []byte(nonce), 1)
 
+	indexHTML = bytes.Replace(indexHTML, []byte("__PASSWORD_RESET_LINK__"), []byte(idp.config.Service.PasswordResetURI), 1)
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write(indexHTML); err != nil {
