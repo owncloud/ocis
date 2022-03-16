@@ -7,7 +7,7 @@ geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0008-search.md
 ---
 
-* Status: accepted
+* Status: proposed
 * Deciders: @butonic, @micbar, @dragotin
 * Date: 2021-06-08
 
