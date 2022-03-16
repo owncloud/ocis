@@ -84,6 +84,8 @@ reva:
         sharefolder: /Shares
         userlayout: '{{substr 0 1 .Username}}/{{.Username}}'
         enablehome: false
+        personalspacealiastemplate: ""
+        generalspacealiastemplate: ""
       shadownamespace: ""
       uploadsnamespace: ""
       eosbinary: /usr/bin/eos
@@ -105,12 +107,16 @@ reva:
       sharefolder: /Shares
       userlayout: '{{.Username}}'
       enablehome: false
+      personalspacealiastemplate: ""
+      generalspacealiastemplate: ""
     owncloudsql:
       drivercommon:
         root: ~/.ocis/storage/owncloud
         sharefolder: /Shares
         userlayout: '{{.Username}}'
         enablehome: false
+        personalspacealiastemplate: ""
+        generalspacealiastemplate: ""
       uploadinfodir: ~/.ocis/storage/uploadinfo
       dbusername: owncloud
       dbpassword: owncloud
@@ -123,6 +129,8 @@ reva:
         sharefolder: ""
         userlayout: ""
         enablehome: false
+        personalspacealiastemplate: ""
+        generalspacealiastemplate: ""
       region: default
       accesskey: ""
       secretkey: ""
@@ -134,6 +142,9 @@ reva:
         sharefolder: /Shares
         userlayout: '{{.Id.OpaqueId}}'
         enablehome: false
+        personalspacealiastemplate: '{{.SpaceType}}/{{.User.Username | lower}}'
+        generalspacealiastemplate: '{{.SpaceType}}/{{.SpaceName | replace " " "-"
+          | lower}}'
       region: default
       accesskey: ""
       secretkey: ""
@@ -145,6 +156,9 @@ reva:
         sharefolder: /Shares
         userlayout: '{{.Id.OpaqueId}}'
         enablehome: false
+        personalspacealiastemplate: '{{.SpaceType}}/{{.User.Username | lower}}'
+        generalspacealiastemplate: '{{.SpaceType}}/{{.SpaceName | replace " " "-"
+          | lower}}'
   metadatastorage:
     eos:
       drivercommon:
@@ -152,6 +166,8 @@ reva:
         sharefolder: /Shares
         userlayout: '{{substr 0 1 .Username}}/{{.Username}}'
         enablehome: false
+        personalspacealiastemplate: ""
+        generalspacealiastemplate: ""
       shadownamespace: ""
       uploadsnamespace: ""
       eosbinary: /usr/bin/eos
@@ -173,12 +189,16 @@ reva:
       sharefolder: ""
       userlayout: ""
       enablehome: false
+      personalspacealiastemplate: ""
+      generalspacealiastemplate: ""
     owncloudsql:
       drivercommon:
         root: ""
         sharefolder: ""
         userlayout: ""
         enablehome: false
+        personalspacealiastemplate: ""
+        generalspacealiastemplate: ""
       uploadinfodir: ""
       dbusername: ""
       dbpassword: ""
@@ -191,6 +211,8 @@ reva:
         sharefolder: ""
         userlayout: ""
         enablehome: false
+        personalspacealiastemplate: ""
+        generalspacealiastemplate: ""
       region: default
       accesskey: ""
       secretkey: ""
@@ -202,6 +224,8 @@ reva:
         sharefolder: ""
         userlayout: '{{.Id.OpaqueId}}'
         enablehome: false
+        personalspacealiastemplate: ""
+        generalspacealiastemplate: ""
       region: default
       accesskey: ""
       secretkey: ""
@@ -213,6 +237,8 @@ reva:
         sharefolder: ""
         userlayout: '{{.Id.OpaqueId}}'
         enablehome: false
+        personalspacealiastemplate: ""
+        generalspacealiastemplate: ""
   frontend:
     port:
       maxcpus: ""
