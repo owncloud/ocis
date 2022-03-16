@@ -10,6 +10,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -116,6 +117,12 @@ var _ = Describe("Graph", func() {
 							OpaqueId:  "bopaqueid",
 						},
 						Name: "bspacename",
+						Opaque: &typesv1beta1.Opaque{
+							Map: map[string]*typesv1beta1.OpaqueEntry{
+								"spaceAlias": {Decoder: "plain", Value: []byte("bspacetype/bspacename")},
+								"etag":       {Decoder: "plain", Value: []byte("123456789")},
+							},
+						},
 					},
 					{
 						Id:        &provider.StorageSpaceId{OpaqueId: "aspaceid"},
@@ -125,6 +132,12 @@ var _ = Describe("Graph", func() {
 							OpaqueId:  "anopaqueid",
 						},
 						Name: "aspacename",
+						Opaque: &typesv1beta1.Opaque{
+							Map: map[string]*typesv1beta1.OpaqueEntry{
+								"spaceAlias": {Decoder: "plain", Value: []byte("aspacetype/aspacename")},
+								"etag":       {Decoder: "plain", Value: []byte("101112131415")},
+							},
+						},
 					},
 				},
 			}, nil)
@@ -146,19 +159,23 @@ var _ = Describe("Graph", func() {
 			{
 				"value":[
 					{
+						"driveAlias":"aspacetype/aspacename",
 						"driveType":"aspacetype",
 						"id":"aspaceid",
 						"name":"aspacename",
 						"root":{
+							"eTag":"101112131415",
 							"id":"aspaceid!anopaqueid",
 							"webDavUrl":"https://localhost:9200/dav/spaces/aspaceid"
 						}
 					},
 					{
+						"driveAlias":"bspacetype/bspacename",
 						"driveType":"bspacetype",
 						"id":"bspaceid",
 						"name":"bspacename",
 						"root":{
+							"eTag":"123456789",
 							"id":"bspaceid!bopaqueid",
 							"webDavUrl":"https://localhost:9200/dav/spaces/bspaceid"
 						}

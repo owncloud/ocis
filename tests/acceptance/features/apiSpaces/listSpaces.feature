@@ -15,6 +15,7 @@ Feature: List and create spaces
     And the json responded should contain a space "Alice Hansen" with these key and value pairs:
       | key              | value        |
       | driveType        | personal     |
+      | driveAlias       | personal/alice |
       | id               | %space_id%   |
       | name             | Alice Hansen |
       | quota@@@state    | normal       |
@@ -61,6 +62,7 @@ Feature: List and create spaces
     And the json responded should contain a space "Project Mars" with these key and value pairs:
       | key              | value        |
       | driveType        | project      |
+      | driveAlias       | project/project-mars |
       | name             | Project Mars |
       | quota@@@total    | 1000000000   |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
@@ -98,6 +100,7 @@ Feature: List and create spaces
     And the json responded should contain a space "Project Venus" with these key and value pairs:
       | key              | value         |
       | driveType        | project       |
+      | driveAlias       | project/project-venus |
       | name             | Project Venus |
       | quota@@@total    | 2000          |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
@@ -105,6 +108,7 @@ Feature: List and create spaces
     Then the json responded should contain a space "Project Venus" with these key and value pairs:
       | key              | value         |
       | driveType        | project       |
+      | driveAlias       | project/project-venus |
       | name             | Project Venus |
       | quota@@@total    | 2000          |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |

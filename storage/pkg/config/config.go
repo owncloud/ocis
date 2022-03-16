@@ -241,6 +241,12 @@ type DriverCommon struct {
 	UserLayout string `ocisConfig:"user_layout"`
 	// EnableHome enables the creation of home directories.
 	EnableHome bool `ocisConfig:"enable_home"`
+	// PersonalSpaceAliasTemplate  contains the template used to construct
+	// the personal space alias, eg: `"{{.SpaceType}}/{{.User.Username | lower}}"`
+	PersonalSpaceAliasTemplate string `ocisConfig:"personalspacealias_template"`
+	// GeneralSpaceAliasTemplate contains the template used to construct
+	// the general space alias, eg: `{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}`
+	GeneralSpaceAliasTemplate string `ocisConfig:"generalspacealias_template"`
 }
 
 // DriverEOS defines the available EOS driver configuration.
@@ -1528,6 +1534,14 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_OCIS_SHARE_FOLDER"},
 			Destination: &cfg.Reva.UserStorage.OCIS.ShareFolder,
 		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OCIS_PERSONAL_SPACE_ALIAS_TEMPLATE"},
+			Destination: &cfg.Reva.UserStorage.OCIS.PersonalSpaceAliasTemplate,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_OCIS_GENERAL_SPACE_ALIAS_TEMPLATE"},
+			Destination: &cfg.Reva.UserStorage.OCIS.GeneralSpaceAliasTemplate,
+		},
 		// driver owncloud sql
 		{
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DATADIR"},
@@ -1600,6 +1614,14 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_SHARE_FOLDER"},
 			Destination: &cfg.Reva.UserStorage.S3NG.ShareFolder,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE"},
+			Destination: &cfg.Reva.UserStorage.S3NG.PersonalSpaceAliasTemplate,
+		},
+		{
+			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE"},
+			Destination: &cfg.Reva.UserStorage.S3NG.GeneralSpaceAliasTemplate,
 		},
 		{
 			EnvVars:     []string{"STORAGE_USERS_DRIVER_S3NG_REGION"},

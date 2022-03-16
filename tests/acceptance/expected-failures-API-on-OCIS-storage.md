@@ -1859,7 +1859,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 #### [status does not have new product data item](https://github.com/owncloud/ocis/issues/3317)
 
 - [apiCapabilities/capabilities.feature:959](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L959)
-- [apiMain/status.feature:5](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/status.feature#L5)
 
   Note: always have an empty line at the end of this file.
   The bash script that processes this file requires that the last line has a newline on the end.
