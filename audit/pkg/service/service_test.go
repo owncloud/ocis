@@ -294,6 +294,20 @@ var testCases = []struct {
 			require.Equal(t, "token-123", ev.ShareToken)
 			require.Equal(t, false, ev.Success)
 		},
+	}, {
+		Alias: "File uploaded",
+		SystemEvent: events.FileUploaded{
+			FileID: reference("sto-123", "iid-123", "./item"),
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventFileCreated{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "link 'shareid' was accessed. Success: false", "public_link_accessed")
+			// AuditEventSharing fields
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "", "", "shareid")
+		},
 	},
 }
 
@@ -343,6 +357,12 @@ func checkSharingAuditEvent(t *testing.T, ev types.AuditEventSharing, itemID str
 	require.Equal(t, shareID, ev.ShareID)
 }
 
+func checkFilesAuditEvent(t *testing.T, ev types.AuditEventFiles, itemID string, owner string, path string) {
+	require.Equal(t, itemID, ev.FileID)
+	require.Equal(t, owner, ev.Owner)
+	require.Equal(t, path, ev.Path)
+}
+
 func shareID(id string) *collaboration.ShareId {
 	return &collaboration.ShareId{
 		OpaqueId: id,
@@ -376,6 +396,13 @@ func resourceID(sid, oid string) *provider.ResourceId {
 	}
 }
 
+func reference(sid, oid, path string) *provider.Reference {
+	return &provider.Reference{
+		ResourceId: resourceID(sid, oid),
+		Path:       path,
+	}
+}
+
 func timestamp(seconds uint64) *rtypes.Timestamp {
 	return &rtypes.Timestamp{
 		Seconds: seconds,
@@ -394,6 +421,7 @@ func linkPermissions(perms ...string) *link.PublicSharePermissions {
 		Permissions: permissions(perms...),
 	}
 }
+
 func permissions(permissions ...string) *provider.ResourcePermissions {
 	perms := &provider.ResourcePermissions{}
 
