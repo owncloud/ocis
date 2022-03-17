@@ -8,6 +8,7 @@ import (
 
 	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 )
 
@@ -221,7 +222,7 @@ func LinkAccessFailed(ev events.LinkAccessFailed) AuditEventLinkAccessed {
 }
 
 // FilesAuditEvent creates an AuditEventFiles from the given values
-func FilesAuditEvent(base AuditEvent, itemid string, owner string, path string) AuditEventFiles {
+func FilesAuditEvent(base AuditEvent, itemid, owner, path string) AuditEventFiles {
 	return AuditEventFiles{
 		AuditEvent: base,
 		FileID:     itemid,
@@ -232,16 +233,7 @@ func FilesAuditEvent(base AuditEvent, itemid string, owner string, path string) 
 
 // FileUploaded converts a FileUploaded event to an AuditEventFileCreated
 func FileUploaded(ev events.FileUploaded) AuditEventFileCreated {
-	iid, path := "", ""
-	if ev.FileID != nil {
-		iid = ev.FileID.GetResourceId().GetOpaqueId()
-		path = ev.FileID.GetPath()
-	}
-
-	uid := ""
-	if ev.Owner != nil {
-		uid = ev.Owner.GetOpaqueId()
-	}
+	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
 	base := BasicAuditEvent(uid, "", MessageFileCreated(iid), ActionFileCreated)
 	return AuditEventFileCreated{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
@@ -250,32 +242,71 @@ func FileUploaded(ev events.FileUploaded) AuditEventFileCreated {
 
 // FileDownloaded converts a FileDownloaded event to an AuditEventFileRead
 func FileDownloaded(ev events.FileDownloaded) AuditEventFileRead {
-	return AuditEventFileRead{}
+	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+	base := BasicAuditEvent(uid, "", MessageFileRead(iid), ActionFileRead)
+	return AuditEventFileRead{
+		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
+	}
 }
 
 // ItemMoved converts a ItemMoved event to an AuditEventFileRenamed
 func ItemMoved(ev events.ItemMoved) AuditEventFileRenamed {
-	return AuditEventFileRenamed{}
+	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+
+	oldpath := ""
+	if ev.OldReference != nil {
+		oldpath = ev.OldReference.GetPath()
+	}
+
+	base := BasicAuditEvent(uid, "", MessageFileRenamed(iid, oldpath, path), ActionFileRenamed)
+	return AuditEventFileRenamed{
+		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
+		OldPath:         oldpath,
+	}
 }
 
 // ItemTrashed converts a ItemTrashed event to an AuditEventFileDeleted
 func ItemTrashed(ev events.ItemTrashed) AuditEventFileDeleted {
-	return AuditEventFileDeleted{}
+	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+	base := BasicAuditEvent(uid, "", MessageFileTrashed(iid), ActionFileTrashed)
+	return AuditEventFileDeleted{
+		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
+	}
 }
 
 // ItemPurged converts a ItemPurged event to an AuditEventFilePurged
 func ItemPurged(ev events.ItemPurged) AuditEventFilePurged {
-	return AuditEventFilePurged{}
+	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+	base := BasicAuditEvent(uid, "", MessageFilePurged(iid), ActionFilePurged)
+	return AuditEventFilePurged{
+		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
+	}
 }
 
 // ItemRestored converts a ItemRestored event to an AuditEventFileRestored
 func ItemRestored(ev events.ItemRestored) AuditEventFileRestored {
-	return AuditEventFileRestored{}
+	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+
+	oldpath := ""
+	if ev.OldReference != nil {
+		oldpath = ev.OldReference.GetPath()
+	}
+
+	base := BasicAuditEvent(uid, "", MessageFileRestored(iid, oldpath, path), ActionFileRestored)
+	return AuditEventFileRestored{
+		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
+		OldPath:         oldpath,
+	}
 }
 
 // FileVersionRestored converts a FileVersionRestored event to an AuditEventFileVersionRestored
 func FileVersionRestored(ev events.FileVersionRestored) AuditEventFileVersionRestored {
-	return AuditEventFileVersionRestored{}
+	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+	base := BasicAuditEvent(uid, "", MessageFileVersionRestored(iid, ev.Key), ActionFileVersionRestored)
+	return AuditEventFileVersionRestored{
+		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
+		Key:             ev.Key,
+	}
 }
 
 func extractGrantee(uid *user.UserId, gid *group.GroupId) (string, string) {
@@ -287,6 +318,20 @@ func extractGrantee(uid *user.UserId, gid *group.GroupId) (string, string) {
 	}
 
 	return "", ""
+}
+
+func extractFileDetails(ref *provider.Reference, owner *user.UserId) (string, string, string) {
+	iid, path := "", ""
+	if ref != nil {
+		iid = ref.GetResourceId().GetOpaqueId()
+		path = ref.GetPath()
+	}
+
+	uid := ""
+	if owner != nil {
+		uid = owner.GetOpaqueId()
+	}
+	return iid, path, uid
 }
 
 func formatTime(t *types.Timestamp) string {

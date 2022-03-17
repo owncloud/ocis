@@ -126,6 +126,8 @@ type AuditEventFileCopied struct {
 // AuditEventFileRenamed is the event logged when a file is renamed (moved)
 type AuditEventFileRenamed struct {
 	AuditEventFiles
+
+	OldPath string
 }
 
 // AuditEventFilePurged is the event logged when a file is purged (deleted from trashbin)
@@ -136,11 +138,15 @@ type AuditEventFilePurged struct {
 // AuditEventFileRestored is the event logged when a file is restored (from trashbin)
 type AuditEventFileRestored struct {
 	AuditEventFiles
+
+	OldPath string
 }
 
 // AuditEventFileVersionRestored is the event logged when a file version is restored
 type AuditEventFileVersionRestored struct {
 	AuditEventFiles
+
+	Key string
 }
 
 // AuditEventFileVersionDeleted is the event logged when a file version is deleted

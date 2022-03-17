@@ -295,7 +295,7 @@ var testCases = []struct {
 			require.Equal(t, false, ev.Success)
 		},
 	}, {
-		Alias: "File uploaded",
+		Alias: "File created",
 		SystemEvent: events.FileUploaded{
 			FileID: reference("sto-123", "iid-123", "./item"),
 			Owner:  userID("uid-123"), // NOTE: owner not yet implemented in reva
@@ -305,9 +305,112 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'iid-123' was created", "file_created")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'iid-123' was created", "file_create")
 			// AuditEventSharing fields
 			checkFilesAuditEvent(t, ev.AuditEventFiles, "iid-123", "uid-123", "./item")
+		},
+	}, {
+		Alias: "File read",
+		SystemEvent: events.FileDownloaded{
+			FileID: reference("sto-123", "iid-123", "./item"),
+			Owner:  userID("uid-123"), // NOTE: owner not yet implemented in reva
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventFileRead{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'iid-123' was read", "file_read")
+			// AuditEventSharing fields
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "iid-123", "uid-123", "./item")
+		},
+	}, {
+		Alias: "File trashed",
+		SystemEvent: events.ItemTrashed{
+			FileID: reference("sto-123", "iid-123", "./item"),
+			Owner:  userID("uid-123"), // NOTE: owner not yet implemented in reva
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventFileDeleted{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'iid-123' was trashed", "file_delete")
+			// AuditEventSharing fields
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "iid-123", "uid-123", "./item")
+		},
+	}, {
+		Alias: "File renamed",
+		SystemEvent: events.ItemMoved{
+			FileID:       reference("sto-123", "iid-123", "./item"),
+			OldReference: reference("sto-123", "iid-123", "./anotheritem"),
+			Owner:        userID("uid-123"), // NOTE: owner not yet implemented in reva
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventFileRenamed{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'iid-123' was moved from './anotheritem' to './item'", "file_rename")
+			// AuditEventSharing fields
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "iid-123", "uid-123", "./item")
+			// AuditEventFileRenamed fields
+			require.Equal(t, "./anotheritem", ev.OldPath)
+
+		},
+	}, {
+		Alias: "File purged",
+		SystemEvent: events.ItemPurged{
+			FileID: reference("sto-123", "iid-123", "./item"),
+			Owner:  userID("uid-123"), // NOTE: owner not yet implemented in reva
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventFilePurged{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'iid-123' was removed from trashbin", "file_trash_delete")
+			// AuditEventSharing fields
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "iid-123", "uid-123", "./item")
+		},
+	}, {
+		Alias: "File restored",
+		SystemEvent: events.ItemRestored{
+			FileID:       reference("sto-123", "iid-123", "./item"),
+			Owner:        userID("uid-123"), // NOTE: owner not yet implemented in reva
+			OldReference: reference("sto-123", "iid-123", "./oldpath"),
+			Key:          "",
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventFileRestored{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'iid-123' was restored from trashbin to './item' (previous location: './oldpath')", "file_trash_restore")
+			// AuditEventSharing fields
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "iid-123", "uid-123", "./item")
+			// AuditEventFileRestored fields
+			require.Equal(t, "./oldpath", ev.OldPath)
+
+		},
+	}, {
+		Alias: "File version restored",
+		SystemEvent: events.FileVersionRestored{
+			FileID: reference("sto-123", "iid-123", "./item"),
+			Owner:  userID("uid-123"), // NOTE: owner not yet implemented in reva
+			Key:    "v1",
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventFileVersionRestored{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'iid-123' was restored in version 'v1'", "file_version_restore")
+			// AuditEventSharing fields
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "iid-123", "uid-123", "./item")
+			// AuditEventFileRestored fields
+			require.Equal(t, "v1", ev.Key)
+
 		},
 	},
 }

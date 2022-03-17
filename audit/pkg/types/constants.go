@@ -16,12 +16,12 @@ const (
 	ActionLinkAccessed            = "public_link_accessed"
 
 	// Files
-	ActionFileCreated         = "file_created"
+	ActionFileCreated         = "file_create"
 	ActionFileRead            = "file_read"
 	ActionFileTrashed         = "file_delete"
-	ActionFileRename          = "file_renamed"
+	ActionFileRenamed         = "file_rename"
 	ActionFilePurged          = "file_trash_delete"
-	ActionFileRestored        = "file_trash_restored"
+	ActionFileRestored        = "file_trash_restore"
 	ActionFileVersionRestored = "file_version_restore"
 )
 
@@ -96,8 +96,8 @@ func MessageFilePurged(item string) string {
 }
 
 // MessageFileRestored returns the human readable string that describes the action
-func MessageFileRestored(item string, path string) string {
-	return fmt.Sprintf("File '%s' was restored from trashbin to '%s'", item, path)
+func MessageFileRestored(item, oldpath, path string) string {
+	return fmt.Sprintf("File '%s' was restored from trashbin to '%s' (previous location: '%s')", item, path, oldpath)
 }
 
 // MessageFileVersionRestored returns the human readable string that describes the action
