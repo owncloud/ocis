@@ -342,6 +342,7 @@ func DefaultConfig() *config.Config {
 				},
 				CS3ProviderAddr:                  "127.0.0.1:9215",
 				CS3ServiceUser:                   "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
+				CS3ServiceUserIdp:                "https://localhost:9200",
 				UserDriver:                       "json",
 				UserJSONFile:                     path.Join(defaults.BaseDataPath(), "storage", "shares.json"),
 				UserSQLUsername:                  "",
