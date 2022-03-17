@@ -155,7 +155,7 @@ services:
 
 
   collabora:
-    image: collabora/code:6.4.11.3
+    image: collabora/code:latest
     networks:
       ocis-net:
     environment:
