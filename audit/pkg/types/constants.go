@@ -96,8 +96,8 @@ func MessageFilePurged(item string) string {
 }
 
 // MessageFileRestored returns the human readable string that describes the action
-func MessageFileRestored(item, oldpath, path string) string {
-	return fmt.Sprintf("File '%s' was restored from trashbin to '%s' (previous location: '%s')", item, path, oldpath)
+func MessageFileRestored(item, path string) string {
+	return fmt.Sprintf("File '%s' was restored from trashbin to '%s'", item, path)
 }
 
 // MessageFileVersionRestored returns the human readable string that describes the action

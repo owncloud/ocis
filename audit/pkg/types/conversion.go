@@ -292,7 +292,7 @@ func ItemRestored(ev events.ItemRestored) AuditEventFileRestored {
 		oldpath = ev.OldReference.GetPath()
 	}
 
-	base := BasicAuditEvent(uid, "", MessageFileRestored(iid, oldpath, path), ActionFileRestored)
+	base := BasicAuditEvent(uid, "", MessageFileRestored(iid, path), ActionFileRestored)
 	return AuditEventFileRestored{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
 		OldPath:         oldpath,
@@ -321,17 +321,19 @@ func extractGrantee(uid *user.UserId, gid *group.GroupId) (string, string) {
 }
 
 func extractFileDetails(ref *provider.Reference, owner *user.UserId) (string, string, string) {
-	iid, path := "", ""
+	id, path := "", ""
 	if ref != nil {
-		iid = ref.GetResourceId().GetOpaqueId()
 		path = ref.GetPath()
+		if rid := ref.GetResourceId(); rid != nil {
+			id = rid.GetStorageId() + "!" + rid.GetOpaqueId() + "!" + path
+		}
 	}
 
 	uid := ""
 	if owner != nil {
 		uid = owner.GetOpaqueId()
 	}
-	return iid, path, uid
+	return id, path, uid
 }
 
 func formatTime(t *types.Timestamp) string {
