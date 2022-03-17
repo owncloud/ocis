@@ -61,11 +61,21 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 		}
 	}
 
+	// if roles are empty, assume we haven't seen the user before and assign a
+	// default user role. At least until proper roles are provided. See
+	// https://github.com/owncloud/ocis/issues/1825 for more context.
 	if len(roleIDs) == 0 {
-		roleIDs = append(roleIDs, settingsService.BundleUUIDRoleUser, settingsService.SelfManagementPermissionID)
-		// if roles are empty, assume we haven't seen the user before and assign a default user role. At least until
-		// proper roles are provided. See https://github.com/owncloud/ocis/issues/1825 for more context.
-		//return user, nil
+		if user.Id.Type == cs3.UserType_USER_TYPE_PRIMARY {
+			c.logger.Info().Str("userid", user.Id.OpaqueId).Msg("user has no role assigned, assigning default user role")
+			_, err := c.settingsRoleService.AssignRoleToUser(ctx, &settingssvc.AssignRoleToUserRequest{
+				AccountUuid: user.Id.OpaqueId,
+				RoleId:      settingsService.BundleUUIDRoleUser,
+			})
+			if err != nil {
+				c.logger.Error().Err(err).Msg("Could not add default role")
+			}
+			roleIDs = append(roleIDs, settingsService.BundleUUIDRoleUser)
+		}
 	}
 
 	enc, err := encodeRoleIDs(roleIDs)

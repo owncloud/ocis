@@ -218,6 +218,10 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		csr.Opaque = utils.AppendPlainToOpaque(csr.Opaque, "description", *drive.Description)
 	}
 
+	if drive.DriveAlias != nil {
+		csr.Opaque = utils.AppendPlainToOpaque(csr.Opaque, "spaceAlias", *drive.DriveAlias)
+	}
+
 	resp, err := client.CreateStorageSpace(r.Context(), &csr)
 	if err != nil {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -303,24 +307,19 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Note: this is the Opaque prop of the space itself
-	opaque := make(map[string]*types.OpaqueEntry)
 	if drive.Description != nil {
-		opaque["description"] = &types.OpaqueEntry{
-			Decoder: "plain",
-			Value:   []byte(*drive.Description),
-		}
+		updateSpaceRequest.StorageSpace.Opaque = utils.AppendPlainToOpaque(updateSpaceRequest.StorageSpace.Opaque, "description", *drive.Description)
+	}
+
+	if drive.DriveAlias != nil {
+		updateSpaceRequest.StorageSpace.Opaque = utils.AppendPlainToOpaque(updateSpaceRequest.StorageSpace.Opaque, "spaceAlias", *drive.DriveAlias)
 	}
 
 	for _, special := range drive.Special {
 		if special.Id != nil {
-			opaque[*special.SpecialFolder.Name] = &types.OpaqueEntry{
-				Decoder: "plain",
-				Value:   []byte(*special.Id),
-			}
+			updateSpaceRequest.StorageSpace.Opaque = utils.AppendPlainToOpaque(updateSpaceRequest.StorageSpace.Opaque, *special.SpecialFolder.Name, *special.Id)
 		}
 	}
-	updateSpaceRequest.StorageSpace.Opaque = &types.Opaque{Map: opaque}
 
 	if drive.Name != nil {
 		updateSpaceRequest.StorageSpace.Name = *drive.Name
@@ -506,6 +505,10 @@ func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.S
 	if space.Opaque != nil {
 		if description, ok := space.Opaque.Map["description"]; ok {
 			drive.Description = libregraph.PtrString(string(description.Value))
+		}
+
+		if alias, ok := space.Opaque.Map["spaceAlias"]; ok {
+			drive.DriveAlias = libregraph.PtrString(string(alias.Value))
 		}
 
 		if v, ok := space.Opaque.Map["trashed"]; ok {

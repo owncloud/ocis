@@ -9,11 +9,13 @@ import (
 )
 
 const (
-	defaultPublicURL        = "https://localhost:9200"
-	defaultShareFolder      = "/Shares"
-	defaultStorageNamespace = "/users/{{.Id.OpaqueId}}"
-	defaultGatewayAddr      = "127.0.0.1:9142"
-	defaultUserLayout       = "{{.Id.OpaqueId}}"
+	defaultPublicURL                  = "https://localhost:9200"
+	defaultShareFolder                = "/Shares"
+	defaultStorageNamespace           = "/users/{{.Id.OpaqueId}}"
+	defaultGatewayAddr                = "127.0.0.1:9142"
+	defaultUserLayout                 = "{{.Id.OpaqueId}}"
+	defaultPersonalSpaceAliasTemplate = "{{.SpaceType}}/{{.User.Username | lower}}"
+	defaultGeneralSpaceAliasTemplate  = "{{.SpaceType}}/{{.SpaceName | replace \" \" \"-\" | lower}}"
 )
 
 func FullDefaultConfig() *config.Config {
@@ -145,10 +147,12 @@ func DefaultConfig() *config.Config {
 				},
 				S3NG: config.DriverS3NG{
 					DriverCommon: config.DriverCommon{
-						Root:        path.Join(defaults.BaseDataPath(), "storage", "users"),
-						ShareFolder: defaultShareFolder,
-						UserLayout:  defaultUserLayout,
-						EnableHome:  false,
+						Root:                       path.Join(defaults.BaseDataPath(), "storage", "users"),
+						ShareFolder:                defaultShareFolder,
+						UserLayout:                 defaultUserLayout,
+						PersonalSpaceAliasTemplate: defaultPersonalSpaceAliasTemplate,
+						GeneralSpaceAliasTemplate:  defaultGeneralSpaceAliasTemplate,
+						EnableHome:                 false,
 					},
 					Region:    "default",
 					AccessKey: "",
@@ -158,9 +162,11 @@ func DefaultConfig() *config.Config {
 				},
 				OCIS: config.DriverOCIS{
 					DriverCommon: config.DriverCommon{
-						Root:        path.Join(defaults.BaseDataPath(), "storage", "users"),
-						ShareFolder: defaultShareFolder,
-						UserLayout:  defaultUserLayout,
+						Root:                       path.Join(defaults.BaseDataPath(), "storage", "users"),
+						ShareFolder:                defaultShareFolder,
+						UserLayout:                 defaultUserLayout,
+						PersonalSpaceAliasTemplate: defaultPersonalSpaceAliasTemplate,
+						GeneralSpaceAliasTemplate:  defaultGeneralSpaceAliasTemplate,
 					},
 				},
 			},
@@ -266,7 +272,7 @@ func DefaultConfig() *config.Config {
 				},
 				CommitShareToStorageGrant:  true,
 				CommitShareToStorageRef:    true,
-				DisableHomeCreationOnLogin: false,
+				DisableHomeCreationOnLogin: true,
 				ShareFolder:                "Shares",
 				LinkGrants:                 "",
 				HomeMapping:                "",

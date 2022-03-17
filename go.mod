@@ -22,7 +22,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.1
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220126114148-64c025ccdd19
-	github.com/cs3org/reva/v2 v2.0.0-20220314085001-8e5b22a20a3f
+	github.com/cs3org/reva/v2 v2.0.0-20220316045927-99115670eb33
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.7
@@ -63,14 +63,14 @@ require (
 	github.com/stretchr/testify v1.7.1
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.2
-	github.com/urfave/cli/v2 v2.3.0
+	github.com/urfave/cli/v2 v2.4.0
 	go-micro.dev/v4 v4.6.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.29.0
-	go.opentelemetry.io/otel v1.4.1
+	go.opentelemetry.io/otel v1.5.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.4.1
-	go.opentelemetry.io/otel/sdk v1.4.1
-	go.opentelemetry.io/otel/trace v1.4.1
+	go.opentelemetry.io/otel/sdk v1.5.0
+	go.opentelemetry.io/otel/trace v1.5.0
 	golang.org/x/crypto v0.0.0-20220314234724-5d542ad81a58
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
