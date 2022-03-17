@@ -220,9 +220,32 @@ func LinkAccessFailed(ev events.LinkAccessFailed) AuditEventLinkAccessed {
 	}
 }
 
+// FilesAuditEvent creates an AuditEventFiles from the given values
+func FilesAuditEvent(base AuditEvent, itemid string, owner string, path string) AuditEventFiles {
+	return AuditEventFiles{
+		AuditEvent: base,
+		FileID:     itemid,
+		Owner:      owner,
+		Path:       path,
+	}
+}
+
 // FileUploaded converts a FileUploaded event to an AuditEventFileCreated
 func FileUploaded(ev events.FileUploaded) AuditEventFileCreated {
-	return AuditEventFileCreated{}
+	iid, path := "", ""
+	if ev.FileID != nil {
+		iid = ev.FileID.GetResourceId().GetOpaqueId()
+		path = ev.FileID.GetPath()
+	}
+
+	uid := ""
+	if ev.Owner != nil {
+		uid = ev.Owner.GetOpaqueId()
+	}
+	base := BasicAuditEvent(uid, "", MessageFileCreated(iid), ActionFileCreated)
+	return AuditEventFileCreated{
+		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
+	}
 }
 
 // FileDownloaded converts a FileDownloaded event to an AuditEventFileRead

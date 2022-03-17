@@ -298,15 +298,16 @@ var testCases = []struct {
 		Alias: "File uploaded",
 		SystemEvent: events.FileUploaded{
 			FileID: reference("sto-123", "iid-123", "./item"),
+			Owner:  userID("uid-123"), // NOTE: owner not yet implemented in reva
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventFileCreated{}
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "link 'shareid' was accessed. Success: false", "public_link_accessed")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'iid-123' was created", "file_created")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "", "", "shareid")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "iid-123", "uid-123", "./item")
 		},
 	},
 }
