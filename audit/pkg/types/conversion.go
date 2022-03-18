@@ -310,6 +310,28 @@ func FileVersionRestored(ev events.FileVersionRestored) AuditEventFileVersionRes
 	}
 }
 
+// SpacesAuditEvent creates an AuditEventSpaces from the given values
+func SpacesAuditEvent(base AuditEvent, spaceID string) AuditEventSpaces {
+	return AuditEventSpaces{
+		AuditEvent: base,
+		SpaceID:    spaceID,
+	}
+}
+
+// SpaceCreated converts a SpaceCreated event to an AuditEventSpaceCreated
+func SpaceCreated(ev events.SpaceCreated) AuditEventSpaceCreated {
+	sid := ev.ID.GetOpaqueId()
+	iid, _, owner := extractFileDetails(&provider.Reference{ResourceId: ev.Root}, ev.Owner)
+	base := BasicAuditEvent("", formatTime(ev.MTime), MessageSpaceCreated(sid, ev.Name), ActionSpaceCreated)
+	return AuditEventSpaceCreated{
+		AuditEventSpaces: SpacesAuditEvent(base, sid),
+		Owner:            owner,
+		RootItem:         iid,
+		Name:             ev.Name,
+		Type:             ev.Type,
+	}
+}
+
 func extractGrantee(uid *user.UserId, gid *group.GroupId) (string, string) {
 	switch {
 	case uid != nil && uid.OpaqueId != "":

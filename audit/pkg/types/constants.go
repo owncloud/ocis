@@ -23,6 +23,13 @@ const (
 	ActionFilePurged          = "file_trash_delete"
 	ActionFileRestored        = "file_trash_restore"
 	ActionFileVersionRestored = "file_version_restore"
+
+	// Spaces
+	ActionSpaceCreated  = "space_created"
+	ActionSpaceRenamed  = "space_renamed"
+	ActionSpaceDisabled = "space_disabled"
+	ActionSpaceEnabled  = "space_enabled"
+	ActionSpaceDeleted  = "space_deleted"
 )
 
 // MessageShareCreated returns the human readable string that describes the action
@@ -103,4 +110,29 @@ func MessageFileRestored(item, path string) string {
 // MessageFileVersionRestored returns the human readable string that describes the action
 func MessageFileVersionRestored(item string, version string) string {
 	return fmt.Sprintf("File '%s' was restored in version '%s'", item, version)
+}
+
+// MessageSpaceCreated returns the human readable string that describes the action
+func MessageSpaceCreated(spaceID string, name string) string {
+	return fmt.Sprintf("Space '%s' with name '%s' was created", spaceID, name)
+}
+
+// MessageSpaceRenamed returns the human readable string that describes the action
+func MessageSpaceRenamed(spaceID string, name string) string {
+	return fmt.Sprintf("Space '%s' was renamed to '%s'", spaceID, name)
+}
+
+// MessageSpaceDisabled returns the human readable string that describes the action
+func MessageSpaceDisabled(spaceID string) string {
+	return fmt.Sprintf("Space '%s' was disabled", spaceID)
+}
+
+// MessageSpaceEnabled returns the human readable string that describes the action
+func MessageSpaceEnabled(spaceID string) string {
+	return fmt.Sprintf("Space '%s' was (re-) enabled", spaceID)
+}
+
+// MessageSpaceDeleted returns the human readable string that describes the action
+func MessageSpaceDeleted(spaceID string) string {
+	return fmt.Sprintf("Space '%s' was deleted", spaceID)
 }

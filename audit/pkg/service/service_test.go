@@ -412,6 +412,31 @@ var testCases = []struct {
 			require.Equal(t, "v1", ev.Key)
 
 		},
+	}, {
+		Alias: "Space created",
+		SystemEvent: events.SpaceCreated{
+			ID:    &provider.StorageSpaceId{OpaqueId: "space-123"},
+			Owner: userID("uid-123"),
+			Root:  resourceID("sto-123", "iid-123"),
+			Name:  "test-space",
+			Type:  "project",
+			Quota: nil, // Quota not interesting atm
+			MTime: timestamp(10e9),
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventSpaceCreated{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "2286-11-20T17:46:40Z", "Space 'space-123' with name 'test-space' was created", "space_created")
+			// AuditEventSpaces fields
+			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "space-123")
+			// AuditEventFileRestored fields
+			require.Equal(t, "uid-123", ev.Owner)
+			require.Equal(t, "sto-123!iid-123", ev.RootItem)
+			require.Equal(t, "test-space", ev.Name)
+			require.Equal(t, "project", ev.Type)
+		},
 	},
 }
 
@@ -467,6 +492,9 @@ func checkFilesAuditEvent(t *testing.T, ev types.AuditEventFiles, itemID string,
 	require.Equal(t, path, ev.Path)
 }
 
+func checkSpacesAuditEvent(t *testing.T, ev types.AuditEventSpaces, spaceID string) {
+	require.Equal(t, spaceID, ev.SpaceID)
+}
 func shareID(id string) *collaboration.ShareId {
 	return &collaboration.ShareId{
 		OpaqueId: id,

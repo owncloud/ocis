@@ -154,3 +154,46 @@ type AuditEventFileVersionRestored struct {
 type AuditEventFileVersionDeleted struct {
 	AuditEventFiles
 }
+
+/*
+   Spaces
+*/
+
+// AuditEventSpaces is the basic audit event for spaces
+type AuditEventSpaces struct {
+	AuditEvent
+
+	SpaceID string
+}
+
+// AuditEventSpaceCreated is the event logged when a space is created
+type AuditEventSpaceCreated struct {
+	AuditEventSpaces
+
+	Owner    string
+	RootItem string
+	Name     string
+	Type     string
+}
+
+// AuditEventSpaceRenamed is the event logged when a space is renamed
+type AuditEventSpaceRenamed struct {
+	AuditEventSpaces
+
+	NewName string
+}
+
+// AuditEventSpaceDisabled is the event logged when a space is disabled
+type AuditEventSpaceDisabled struct {
+	AuditEventSpaces
+}
+
+// AuditEventSpaceEnabled is the event logged when a space is (re-)enabled
+type AuditEventSpaceEnabled struct {
+	AuditEventSpaces
+}
+
+// AuditEventSpaceDeleted is the event logged when a space is deleted
+type AuditEventSpaceDeleted struct {
+	AuditEventSpaces
+}
