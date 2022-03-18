@@ -20,13 +20,24 @@ const defaultPathPrefix = (() => {
   return pathPrefix;
 })();
 
+const defaultPasswordResetLink = (() => {
+  const root = document.getElementById('root');
+  let link = root ? root.getAttribute('passwort-reset-link') : null;
+  if (!link || link === '__PASSWORD_RESET_LINK__') {
+    // Not replaced, probably we are running in debug mode or whatever. Use sane default.
+    link = '';
+  }
+  return link;
+})();
+
 const defaultState = {
   hello: null,
   error: null,
   flow: flow,
   query: query,
   updateAvailable: false,
-  pathPrefix: defaultPathPrefix
+  pathPrefix: defaultPathPrefix,
+  passwordResetLink: defaultPasswordResetLink
 };
 
 function commonReducer(state = defaultState, action) {
