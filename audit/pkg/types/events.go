@@ -16,5 +16,12 @@ func RegisteredEvents() []events.Unmarshaller {
 		events.ReceivedShareUpdated{},
 		events.LinkAccessed{},
 		events.LinkAccessFailed{},
+		events.FileUploaded{},
+		events.FileDownloaded{},
+		events.ItemTrashed{},
+		events.ItemMoved{},
+		events.ItemPurged{},
+		events.ItemRestored{},
+		events.FileVersionRestored{},
 	}
 }

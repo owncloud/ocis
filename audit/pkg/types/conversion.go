@@ -5,9 +5,11 @@ import (
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/utils"
 
 	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 )
 
@@ -220,6 +222,94 @@ func LinkAccessFailed(ev events.LinkAccessFailed) AuditEventLinkAccessed {
 	}
 }
 
+// FilesAuditEvent creates an AuditEventFiles from the given values
+func FilesAuditEvent(base AuditEvent, itemid, owner, path string) AuditEventFiles {
+	return AuditEventFiles{
+		AuditEvent: base,
+		FileID:     itemid,
+		Owner:      owner,
+		Path:       path,
+	}
+}
+
+// FileUploaded converts a FileUploaded event to an AuditEventFileCreated
+func FileUploaded(ev events.FileUploaded) AuditEventFileCreated {
+	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+	base := BasicAuditEvent(uid, "", MessageFileCreated(iid), ActionFileCreated)
+	return AuditEventFileCreated{
+		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
+	}
+}
+
+// FileDownloaded converts a FileDownloaded event to an AuditEventFileRead
+func FileDownloaded(ev events.FileDownloaded) AuditEventFileRead {
+	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+	base := BasicAuditEvent(uid, "", MessageFileRead(iid), ActionFileRead)
+	return AuditEventFileRead{
+		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
+	}
+}
+
+// ItemMoved converts a ItemMoved event to an AuditEventFileRenamed
+func ItemMoved(ev events.ItemMoved) AuditEventFileRenamed {
+	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+
+	oldpath := ""
+	if ev.OldReference != nil {
+		oldpath = ev.OldReference.GetPath()
+	}
+
+	base := BasicAuditEvent(uid, "", MessageFileRenamed(iid, oldpath, path), ActionFileRenamed)
+	return AuditEventFileRenamed{
+		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
+		OldPath:         oldpath,
+	}
+}
+
+// ItemTrashed converts a ItemTrashed event to an AuditEventFileDeleted
+func ItemTrashed(ev events.ItemTrashed) AuditEventFileDeleted {
+	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+	base := BasicAuditEvent(uid, "", MessageFileTrashed(iid), ActionFileTrashed)
+	return AuditEventFileDeleted{
+		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
+	}
+}
+
+// ItemPurged converts a ItemPurged event to an AuditEventFilePurged
+func ItemPurged(ev events.ItemPurged) AuditEventFilePurged {
+	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+	base := BasicAuditEvent(uid, "", MessageFilePurged(iid), ActionFilePurged)
+	return AuditEventFilePurged{
+		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
+	}
+}
+
+// ItemRestored converts a ItemRestored event to an AuditEventFileRestored
+func ItemRestored(ev events.ItemRestored) AuditEventFileRestored {
+	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+
+	oldpath := ""
+	if ev.OldReference != nil {
+		oldpath = ev.OldReference.GetPath()
+	}
+
+	base := BasicAuditEvent(uid, "", MessageFileRestored(iid, path), ActionFileRestored)
+	return AuditEventFileRestored{
+		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
+		OldPath:         oldpath,
+	}
+}
+
+// FileVersionRestored converts a FileVersionRestored event to an AuditEventFileVersionRestored
+func FileVersionRestored(ev events.FileVersionRestored) AuditEventFileVersionRestored {
+	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+	base := BasicAuditEvent(uid, "", MessageFileVersionRestored(iid, ev.Key), ActionFileVersionRestored)
+	return AuditEventFileVersionRestored{
+		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
+		Key:             ev.Key,
+	}
+}
+
 func extractGrantee(uid *user.UserId, gid *group.GroupId) (string, string) {
 	switch {
 	case uid != nil && uid.OpaqueId != "":
@@ -229,6 +319,20 @@ func extractGrantee(uid *user.UserId, gid *group.GroupId) (string, string) {
 	}
 
 	return "", ""
+}
+
+func extractFileDetails(ref *provider.Reference, owner *user.UserId) (string, string, string) {
+	id, path := "", ""
+	if ref != nil {
+		path = ref.GetPath()
+		id, _ = utils.FormatStorageSpaceReference(ref)
+	}
+
+	uid := ""
+	if owner != nil {
+		uid = owner.GetOpaqueId()
+	}
+	return id, path, uid
 }
 
 func formatTime(t *types.Timestamp) string {

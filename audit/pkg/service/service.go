@@ -61,6 +61,20 @@ func StartAuditLogger(ctx context.Context, ch <-chan interface{}, log log.Logger
 				auditEvent = types.LinkAccessed(ev)
 			case events.LinkAccessFailed:
 				auditEvent = types.LinkAccessFailed(ev)
+			case events.FileUploaded:
+				auditEvent = types.FileUploaded(ev)
+			case events.FileDownloaded:
+				auditEvent = types.FileDownloaded(ev)
+			case events.ItemMoved:
+				auditEvent = types.ItemMoved(ev)
+			case events.ItemTrashed:
+				auditEvent = types.ItemTrashed(ev)
+			case events.ItemPurged:
+				auditEvent = types.ItemPurged(ev)
+			case events.ItemRestored:
+				auditEvent = types.ItemRestored(ev)
+			case events.FileVersionRestored:
+				auditEvent = types.FileVersionRestored(ev)
 			default:
 				log.Error().Interface("event", ev).Msg(fmt.Sprintf("can't handle event of type '%T'", ev))
 				continue
