@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Network configuration in individiual_services example: [#3238](https://github.com/owncloud/ocis/pull/3238)
 * Bugfix - Improve gif thumbnails: [#3305](https://github.com/owncloud/ocis/pull/3305)
 * Change - Settings service now stores its data via metadata service: [#3232](https://github.com/owncloud/ocis/pull/3232)
+* Enhancement - Add password reset link to login page: [#3329](https://github.com/owncloud/ocis/pull/3329)
 * Enhancement - Log sharing events in audit service: [#3301](https://github.com/owncloud/ocis/pull/3301)
 * Enhancement - Add space aliases: [#3283](https://github.com/owncloud/ocis/pull/3283)
 * Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
@@ -36,6 +37,13 @@ The following sections list the changes for unreleased.
    Instead of writing files to disk it will use metadata service to do so
 
    https://github.com/owncloud/ocis/pull/3232
+
+* Enhancement - Add password reset link to login page: [#3329](https://github.com/owncloud/ocis/pull/3329)
+
+   Added a configurable passwort reset link to the login page. It can be set via
+   `IDP_PASSWORD_RESET_URI`. If the option is not set the link will not be shown.
+
+   https://github.com/owncloud/ocis/pull/3329
 
 * Enhancement - Log sharing events in audit service: [#3301](https://github.com/owncloud/ocis/pull/3301)
 
