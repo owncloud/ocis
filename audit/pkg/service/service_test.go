@@ -437,6 +437,24 @@ var testCases = []struct {
 			require.Equal(t, "test-space", ev.Name)
 			require.Equal(t, "project", ev.Type)
 		},
+	}, {
+		Alias: "Space renamed",
+		SystemEvent: events.SpaceRenamed{
+			ID:    &provider.StorageSpaceId{OpaqueId: "space-123"},
+			Owner: userID("uid-123"),
+			Name:  "new-name",
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventSpaceRenamed{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "Space 'space-123' was renamed to 'new-name'", "space_renamed")
+			// AuditEventSpaces fields
+			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "space-123")
+			// AuditEventSpaceRenamed fields
+			require.Equal(t, "new-name", ev.NewName)
+		},
 	},
 }
 

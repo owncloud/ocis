@@ -332,6 +332,16 @@ func SpaceCreated(ev events.SpaceCreated) AuditEventSpaceCreated {
 	}
 }
 
+// SpaceRenamed converts a SpaceRenamed event to an AuditEventSpaceRenamed
+func SpaceRenamed(ev events.SpaceRenamed) AuditEventSpaceRenamed {
+	sid := ev.ID.GetOpaqueId()
+	base := BasicAuditEvent("", "", MessageSpaceRenamed(sid, ev.Name), ActionSpaceRenamed)
+	return AuditEventSpaceRenamed{
+		AuditEventSpaces: SpacesAuditEvent(base, sid),
+		NewName:          ev.Name,
+	}
+}
+
 func extractGrantee(uid *user.UserId, gid *group.GroupId) (string, string) {
 	switch {
 	case uid != nil && uid.OpaqueId != "":

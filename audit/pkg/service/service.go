@@ -77,6 +77,8 @@ func StartAuditLogger(ctx context.Context, ch <-chan interface{}, log log.Logger
 				auditEvent = types.FileVersionRestored(ev)
 			case events.SpaceCreated:
 				auditEvent = types.SpaceCreated(ev)
+			case events.SpaceRenamed:
+				auditEvent = types.SpaceRenamed(ev)
 			default:
 				log.Error().Interface("event", ev).Msg(fmt.Sprintf("can't handle event of type '%T'", ev))
 				continue
