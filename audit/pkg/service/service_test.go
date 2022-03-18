@@ -305,9 +305,9 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'sto-123!iid-123!./item' was created", "file_create")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'sto-123!iid-123/item' was created", "file_create")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123!./item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123/item", "uid-123", "./item")
 		},
 	}, {
 		Alias: "File read",
@@ -320,9 +320,9 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'sto-123!iid-123!./item' was read", "file_read")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'sto-123!iid-123/item' was read", "file_read")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123!./item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123/item", "uid-123", "./item")
 		},
 	}, {
 		Alias: "File trashed",
@@ -335,9 +335,9 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'sto-123!iid-123!./item' was trashed", "file_delete")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'sto-123!iid-123/item' was trashed", "file_delete")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123!./item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123/item", "uid-123", "./item")
 		},
 	}, {
 		Alias: "File renamed",
@@ -351,9 +351,9 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'sto-123!iid-123!./item' was moved from './anotheritem' to './item'", "file_rename")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'sto-123!iid-123/item' was moved from './anotheritem' to './item'", "file_rename")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123!./item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123/item", "uid-123", "./item")
 			// AuditEventFileRenamed fields
 			require.Equal(t, "./anotheritem", ev.OldPath)
 
@@ -369,16 +369,16 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'sto-123!iid-123!./item' was removed from trashbin", "file_trash_delete")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'sto-123!iid-123/item' was removed from trashbin", "file_trash_delete")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123!./item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123/item", "uid-123", "./item")
 		},
 	}, {
 		Alias: "File restored",
 		SystemEvent: events.ItemRestored{
 			FileID:       reference("sto-123", "iid-123", "./item"),
 			Owner:        userID("uid-123"), // NOTE: owner not yet implemented in reva
-			OldReference: reference("sto-123", "sto-123!iid-123!./item", "./oldpath"),
+			OldReference: reference("sto-123", "sto-123!iid-123/item", "./oldpath"),
 			Key:          "",
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
@@ -386,9 +386,9 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'sto-123!iid-123!./item' was restored from trashbin to './item'", "file_trash_restore")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'sto-123!iid-123/item' was restored from trashbin to './item'", "file_trash_restore")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123!./item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123/item", "uid-123", "./item")
 			// AuditEventFileRestored fields
 			require.Equal(t, "./oldpath", ev.OldPath)
 
@@ -405,9 +405,9 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'sto-123!iid-123!./item' was restored in version 'v1'", "file_version_restore")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "File 'sto-123!iid-123/item' was restored in version 'v1'", "file_version_restore")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123!./item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123/item", "uid-123", "./item")
 			// AuditEventFileRestored fields
 			require.Equal(t, "v1", ev.Key)
 

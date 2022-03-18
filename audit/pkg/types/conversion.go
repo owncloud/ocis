@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/utils"
 
 	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -324,9 +325,7 @@ func extractFileDetails(ref *provider.Reference, owner *user.UserId) (string, st
 	id, path := "", ""
 	if ref != nil {
 		path = ref.GetPath()
-		if rid := ref.GetResourceId(); rid != nil {
-			id = rid.GetStorageId() + "!" + rid.GetOpaqueId() + "!" + path
-		}
+		id, _ = utils.FormatStorageSpaceReference(ref)
 	}
 
 	uid := ""
