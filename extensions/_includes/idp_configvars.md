@@ -2,6 +2,7 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
+| IDP_PASSWORD_RESET_URI | string |  | The URI where a user can reset their password.|
 | IDP_DEBUG_ADDR | string | 127.0.0.1:9134 | |
 | IDP_DEBUG_TOKEN | string |  | |
 | IDP_DEBUG_PPROF | bool | false | |
