@@ -455,6 +455,48 @@ var testCases = []struct {
 			// AuditEventSpaceRenamed fields
 			require.Equal(t, "new-name", ev.NewName)
 		},
+	}, {
+		Alias: "Space disabled",
+		SystemEvent: events.SpaceDisabled{
+			ID: &provider.StorageSpaceId{OpaqueId: "space-123"},
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventSpaceDisabled{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "Space 'space-123' was disabled", "space_disabled")
+			// AuditEventSpaces fields
+			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "space-123")
+		},
+	}, {
+		Alias: "Space enabled",
+		SystemEvent: events.SpaceEnabled{
+			ID: &provider.StorageSpaceId{OpaqueId: "space-123"},
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventSpaceEnabled{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "Space 'space-123' was (re-) enabled", "space_enabled")
+			// AuditEventSpaces fields
+			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "space-123")
+		},
+	}, {
+		Alias: "Space deleted",
+		SystemEvent: events.SpaceDeleted{
+			ID: &provider.StorageSpaceId{OpaqueId: "space-123"},
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventSpaceDeleted{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "Space 'space-123' was deleted", "space_deleted")
+			// AuditEventSpaces fields
+			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "space-123")
+		},
 	},
 }
 

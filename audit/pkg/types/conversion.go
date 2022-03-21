@@ -342,6 +342,33 @@ func SpaceRenamed(ev events.SpaceRenamed) AuditEventSpaceRenamed {
 	}
 }
 
+// SpaceDisabled converts a SpaceDisabled event to an AuditEventSpaceDisabled
+func SpaceDisabled(ev events.SpaceDisabled) AuditEventSpaceDisabled {
+	sid := ev.ID.GetOpaqueId()
+	base := BasicAuditEvent("", "", MessageSpaceDisabled(sid), ActionSpaceDisabled)
+	return AuditEventSpaceDisabled{
+		AuditEventSpaces: SpacesAuditEvent(base, sid),
+	}
+}
+
+// SpaceEnabled converts a SpaceEnabled event to an AuditEventSpaceEnabled
+func SpaceEnabled(ev events.SpaceEnabled) AuditEventSpaceEnabled {
+	sid := ev.ID.GetOpaqueId()
+	base := BasicAuditEvent("", "", MessageSpaceEnabled(sid), ActionSpaceEnabled)
+	return AuditEventSpaceEnabled{
+		AuditEventSpaces: SpacesAuditEvent(base, sid),
+	}
+}
+
+// SpaceDeleted converts a SpaceDeleted event to an AuditEventSpaceDeleted
+func SpaceDeleted(ev events.SpaceDeleted) AuditEventSpaceDeleted {
+	sid := ev.ID.GetOpaqueId()
+	base := BasicAuditEvent("", "", MessageSpaceDeleted(sid), ActionSpaceDeleted)
+	return AuditEventSpaceDeleted{
+		AuditEventSpaces: SpacesAuditEvent(base, sid),
+	}
+}
+
 func extractGrantee(uid *user.UserId, gid *group.GroupId) (string, string) {
 	switch {
 	case uid != nil && uid.OpaqueId != "":
