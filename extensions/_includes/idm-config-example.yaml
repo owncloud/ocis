@@ -19,8 +19,8 @@ idm:
   cert: ~/.ocis/idm/ldap.crt
   key: ~/.ocis/idm/ldap.key
   databasepath: ~/.ocis/idm/ocis.boltdb
-createdemousers: false
+createdemousers: true
 serviceuserpasswords:
-  idmadmin: ""
-  reva: ""
-  idp: ""
+  idmadmin: idm
+  reva: reva
+  idp: idp
