@@ -3,13 +3,41 @@
 
 # images
 OC_CI_ALPINE = "owncloudci/alpine:latest"
+OC_CI_NODEJS = "owncloudci/nodejs:%s"
 OC_CI_GOLANG = "owncloudci/golang:1.17"
-OC_CI_NODEJS = "owncloudci/nodejs:14"
-OC_CI_PHP = "owncloudci/php:7.4"
+OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
-OC_TESTING_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.3.1"
+OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.3.1"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
 REDIS = "redis:6-alpine"
+BANST_AWS_CLI = "banst/awscli"
+DRONE_CLI = "drone/cli:alpine"
+OC_CI_DRONE_CANCEL_PREVIOUS_BUILDS = "owncloudci/drone-cancel-previous-builds"
+OC_CI_DRONE_SKIP_PIPELINE = "owncloudci/drone-skip-pipeline"
+PLUGINS_SLACK = "plugins/slack:1"
+THEGEEKLAB_DRONE_GITHUB_COMMENT = "thegeeklab/drone-github-comment:1"
+PLUGINS_S3 = "plugins/s3:latest"
+ALPINE_GIT = "alpine/git:latest"
+PLUGINS_CODACY = "plugins/codacy:1"
+PLUGINS_DOCKER = "plugins/docker:latest"
+SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:latest"
+PLUGINS_GITHUB_RELEASE = "plugins/github-release:1"
+PLUGINS_MANIFEST = "plugins/manifest:1"
+PLUGINS_GIT_ACTION = "plugins/git-action:1"
+CHKO_DOCKER_PUSHRM = "chko/docker-pushrm:1"
+PLUGINS_GH_PAGES = "plugins/gh-pages:1"
+PLUGINS_DOWNSTREAM = "plugins/downstream:latest"
+SELENIUM_STANDALONE_CHROME_DEBUG = "selenium/standalone-chrome-debug:3.141.59"
+OC_CI_DRONE_ANSIBLE = "owncloudci/drone-ansible:latest"
+OC_CI_BAZEL_BUILDIFIER = "owncloudci/bazel-buildifier:latest"
+MELTWATER_DRONE_CACHE = "meltwater/drone-cache:v1"
+OC_SERVER = "owncloud/server:10"
+OC_UBUNTU = "owncloud/ubuntu:18.04"
+MARIADB = "mariadb:10.6"
+OSIXIA_OPEN_LDAP = "osixia/openldap:latest"
+
+DEFAULT_PHP_VERSION = "7.4"
+DEFAULT_NODEJS_VERSION = "14"
 
 # configuration
 config = {
@@ -218,7 +246,7 @@ def cancelPreviousBuilds():
         },
         "steps": [{
             "name": "cancel-previous-builds",
-            "image": "owncloudci/drone-cancel-previous-builds",
+            "image": OC_CI_DRONE_CANCEL_PREVIOUS_BUILDS,
             "settings": {
                 "DRONE_TOKEN": {
                     "from_secret": "drone_token",
@@ -282,7 +310,7 @@ def testOcisModule(ctx, module):
         },
         {
             "name": "scan-result-cache",
-            "image": "plugins/s3:latest",
+            "image": PLUGINS_S3,
             "settings": {
                 "endpoint": {
                     "from_secret": "cache_s3_endpoint",
@@ -379,7 +407,7 @@ def uploadScanResults(ctx):
         "steps": [
             {
                 "name": "clone",
-                "image": "alpine/git:latest",
+                "image": ALPINE_GIT,
                 "commands": [
                                 # Always use the owncloud/ocis repository as base to have an up to date default branch.
                                 # This is needed for the skipIfUnchanged step, since it references a commit on master (which could be absent on a fork)
@@ -405,7 +433,7 @@ def uploadScanResults(ctx):
             },
             {
                 "name": "codacy",
-                "image": "plugins/codacy:1",
+                "image": PLUGINS_CODACY,
                 "settings": {
                     "token": {
                         "from_secret": "codacy_token",
@@ -414,7 +442,7 @@ def uploadScanResults(ctx):
             },
             {
                 "name": "sonarcloud",
-                "image": "sonarsource/sonar-scanner-cli:latest",
+                "image": SONARSOURCE_SONAR_SCANNER_CLI,
                 "environment": sonar_env,
             },
             {
@@ -455,7 +483,7 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
                  cloneCoreRepos() + [
             {
                 "name": "localApiTests-%s-%s" % (suite, storage),
-                "image": OC_CI_PHP,
+                "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
                 "environment": {
                     "TEST_SERVER_URL": "https://ocis-server:9200",
                     "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
@@ -504,7 +532,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                  cloneCoreRepos() + [
             {
                 "name": "oC10ApiTests-%s-storage-%s" % (storage, part_number),
-                "image": OC_CI_PHP,
+                "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
                 "environment": {
                     "TEST_SERVER_URL": "https://ocis-server:9200",
                     "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
@@ -614,7 +642,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                  ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() + [
             {
                 "name": "webUITests",
-                "image": OC_CI_NODEJS,
+                "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
                 "environment": {
                     "SERVER_HOST": "https://ocis-server:9200",
                     "BACKEND_HOST": "https://ocis-server:9200",
@@ -673,7 +701,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                  ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() + [
             {
                 "name": "WebUIAcceptanceTests",
-                "image": OC_CI_NODEJS,
+                "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
                 "environment": {
                     "SERVER_HOST": "https://ocis-server:9200",
                     "BACKEND_HOST": "https://ocis-server:9200",
@@ -737,7 +765,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                  ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() + [
             {
                 "name": "WebUIAcceptanceTests",
-                "image": OC_CI_NODEJS,
+                "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
                 "environment": {
                     "SERVER_HOST": "https://ocis-server:9200",
                     "BACKEND_HOST": "https://ocis-server:9200",
@@ -773,7 +801,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
         "services": [
             {
                 "name": "redis",
-                "image": "redis:6-alpine",
+                "image": REDIS,
             },
         ] + selenium() + middlewareService(),
         "volumes": [stepVolumeOC10Tests] +
@@ -808,7 +836,7 @@ def failEarly(ctx, early_fail):
         return [
             {
                 "name": "github-comment",
-                "image": "thegeeklab/drone-github-comment:1",
+                "image": THEGEEKLAB_DRONE_GITHUB_COMMENT,
                 "settings": {
                     "message": ":boom: Acceptance test [<strong>${DRONE_STAGE_NAME}</strong>](${DRONE_BUILD_LINK}/${DRONE_STAGE_NUMBER}/1) failed. Further test are cancelled...",
                     "key": "pr-${DRONE_PULL_REQUEST}",  #TODO: we could delete the comment after a successful CI run
@@ -828,7 +856,7 @@ def failEarly(ctx, early_fail):
             },
             {
                 "name": "stop-build",
-                "image": "drone/cli:alpine",
+                "image": DRONE_CLI,
                 # # https://github.com/drone/runner-go/blob/0bd0f8fc31c489817572060d17c6e24aaa487470/pipeline/runtime/const.go#L95-L102
                 # "failure": "fail-fast",
                 # would be an alternative, but is currently broken
@@ -895,7 +923,7 @@ def dockerRelease(ctx, arch):
             },
             {
                 "name": "dryrun",
-                "image": "plugins/docker:latest",
+                "image": PLUGINS_DOCKER,
                 "settings": {
                     "dry_run": True,
                     "context": "ocis",
@@ -914,7 +942,7 @@ def dockerRelease(ctx, arch):
             },
             {
                 "name": "docker",
-                "image": "plugins/docker:latest",
+                "image": PLUGINS_DOCKER,
                 "settings": {
                     "username": {
                         "from_secret": "docker_username",
@@ -1020,7 +1048,7 @@ def binaryRelease(ctx, name):
             },
             {
                 "name": "upload",
-                "image": "plugins/s3:latest",
+                "image": PLUGINS_S3,
                 "settings": settings,
                 "when": {
                     "ref": [
@@ -1043,7 +1071,7 @@ def binaryRelease(ctx, name):
             },
             {
                 "name": "release",
-                "image": "plugins/github-release:1",
+                "image": PLUGINS_GITHUB_RELEASE,
                 "settings": {
                     "api_key": {
                         "from_secret": "github_token",
@@ -1090,7 +1118,7 @@ def releaseSubmodule(ctx):
         "steps": [
             {
                 "name": "release-submodule",
-                "image": "plugins/github-release:1",
+                "image": PLUGINS_GITHUB_RELEASE,
                 "settings": {
                     "api_key": {
                         "from_secret": "github_token",
@@ -1129,7 +1157,7 @@ def releaseDockerManifest(ctx):
         "steps": [
             {
                 "name": "execute",
-                "image": "plugins/manifest:1",
+                "image": PLUGINS_MANIFEST,
                 "settings": {
                     "username": {
                         "from_secret": "docker_username",
@@ -1184,7 +1212,7 @@ def changelog(ctx):
             },
             {
                 "name": "publish",
-                "image": "plugins/git-action:1",
+                "image": PLUGINS_GIT_ACTION,
                 "settings": {
                     "actions": [
                         "commit",
@@ -1231,7 +1259,7 @@ def releaseDockerReadme(ctx):
         "steps": [
             {
                 "name": "execute",
-                "image": "chko/docker-pushrm:1",
+                "image": CHKO_DOCKER_PUSHRM,
                 "environment": {
                     "DOCKER_USER": {
                         "from_secret": "docker_username",
@@ -1284,7 +1312,7 @@ def docs(ctx):
             },
             {
                 "name": "publish",
-                "image": "plugins/gh-pages:1",
+                "image": PLUGINS_GH_PAGES,
                 "settings": {
                     "username": {
                         "from_secret": "github_username",
@@ -1313,7 +1341,7 @@ def docs(ctx):
             },
             {
                 "name": "downstream",
-                "image": "plugins/downstream:latest",
+                "image": PLUGINS_DOWNSTREAM,
                 "settings": {
                     "server": "https://drone.owncloud.com/",
                     "token": {
@@ -1348,7 +1376,7 @@ def makeNodeGenerate(module):
     return [
         {
             "name": "generate nodejs",
-            "image": OC_CI_NODEJS,
+            "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
             "commands": [
                 "%s ci-node-generate" % (make),
             ],
@@ -1383,7 +1411,7 @@ def notify(ctx):
         "steps": [
             {
                 "name": "notify-rocketchat",
-                "image": "plugins/slack:1",
+                "image": PLUGINS_SLACK,
                 "settings": {
                     "webhook": {
                         "from_secret": config["rocketchat"]["from_secret"],
@@ -1526,7 +1554,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         },
         {
             "name": "wait-for-ocis-server",
-            "image": "owncloudci/wait-for:latest",
+            "image": OC_CI_WAIT_FOR,
             "commands": [
                 "wait-for -it ocis-server:9200 -t 300",
             ],
@@ -1537,7 +1565,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
 def middlewareService():
     return [{
         "name": "middleware",
-        "image": OC_TESTING_MIDDLEWARE,
+        "image": OC_OC_TEST_MIDDLEWARE,
         "environment": {
             "BACKEND_HOST": "https://ocis-server:9200",
             "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/storage/owncloud/",
@@ -1599,7 +1627,7 @@ def selenium():
     return [
         {
             "name": "selenium",
-            "image": "selenium/standalone-chrome-debug:3.141.59",
+            "image": SELENIUM_STANDALONE_CHROME_DEBUG,
             "volumes": [{
                 "name": "uploads",
                 "path": "/uploads",
@@ -1659,8 +1687,7 @@ def skipIfUnchanged(ctx, type):
 
     return [{
         "name": "skip-if-unchanged",
-        "image": "owncloudci/drone-skip-pipeline",
-        "pull": "always",
+        "image": OC_CI_DRONE_SKIP_PIPELINE,
         "settings": {
             "ALLOW_SKIP_CHANGED": skip,
         },
@@ -1719,7 +1746,7 @@ def deploy(ctx, config, rebuild):
         "steps": [
             {
                 "name": "clone continuous deployment playbook",
-                "image": "alpine/git:latest",
+                "image": ALPINE_GIT,
                 "commands": [
                     "cd deployments/continuous-deployment-config",
                     "git clone https://github.com/owncloud-devops/continuous-deployment.git",
@@ -1727,7 +1754,7 @@ def deploy(ctx, config, rebuild):
             },
             {
                 "name": "deploy",
-                "image": "owncloudci/drone-ansible:latest",
+                "image": SELENIUM_STANDALONE_CHROME_DEBUG,
                 "failure": "ignore",
                 "environment": {
                     "CONTINUOUS_DEPLOY_SERVERS_CONFIG": "../%s" % (config),
@@ -1766,14 +1793,14 @@ def checkStarlark():
         "steps": [
             {
                 "name": "format-check-starlark",
-                "image": "owncloudci/bazel-buildifier:latest",
+                "image": OC_CI_BAZEL_BUILDIFIER,
                 "commands": [
                     "buildifier --mode=check .drone.star",
                 ],
             },
             {
                 "name": "show-diff",
-                "image": "owncloudci/bazel-buildifier:latest",
+                "image": OC_CI_BAZEL_BUILDIFIER,
                 "commands": [
                     "buildifier --mode=fix .drone.star",
                     "git diff",
@@ -1805,7 +1832,7 @@ def genericCache(name, action, mounts, cache_key):
 
     step = {
         "name": "%s_%s" % (action, name),
-        "image": "meltwater/drone-cache:v1",
+        "image": MELTWATER_DRONE_CACHE,
         "environment": {
             "AWS_ACCESS_KEY_ID": {
                 "from_secret": "cache_s3_access_key",
@@ -1953,12 +1980,6 @@ def pipelineSanityChecks(ctx, pipelines):
 
 """Parallel Deployment configs
 """
-
-#images
-OC_OC10 = "owncloud/server:10"
-OC_UBUNTU = "owncloud/ubuntu:18.04"
-MARIADB = "mariadb:10.6"
-OSIXIA_OPENLDAP = "osixia/openldap:latest"
 
 # configs
 OCIS_URL = "https://ocis-server:9200"
@@ -2124,7 +2145,7 @@ def parallelAcceptance(env):
 
     return [{
         "name": "acceptance-tests",
-        "image": OC_CI_PHP,
+        "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
         "environment": environment,
         "commands": [
             "make test-paralleldeployment-api",
@@ -2141,8 +2162,7 @@ def parallelDeploymentOC10Server():
     return [
         {
             "name": "oc10",
-            "image": OC_OC10,
-            "pull": "always",
+            "image": OC_SERVER,
             "detach": True,
             "environment": {
                 # can be switched to "web"
@@ -2210,8 +2230,7 @@ def parallelDeploymentOC10Server():
 def ldapService():
     return [{
         "name": "openldap",
-        "image": OSIXIA_OPENLDAP,
-        "pull": "always",
+        "image": OSIXIA_OPEN_LDAP,
         "environment": {
             "LDAP_TLS_VERIFY_CLIENT": "never",
             "LDAP_DOMAIN": "owncloud.com",
@@ -2233,7 +2252,6 @@ def oc10DbService():
         {
             "name": "oc10-db",
             "image": MARIADB,
-            "pull": "always",
             "environment": {
                 "MYSQL_ROOT_PASSWORD": "owncloud",
                 "MYSQL_USER": "owncloud",
@@ -2251,8 +2269,7 @@ def oc10DbService():
 def copyConfigs():
     return [{
         "name": "copy-configs",
-        "image": OC_OC10,
-        "pull": "always",
+        "image": OC_SERVER,
         "commands": [
             # ocis proxy config
             "mkdir -p /etc/ocis",
@@ -2275,7 +2292,6 @@ def owncloudLog():
     return [{
         "name": "owncloud-log",
         "image": OC_UBUNTU,
-        "pull": "always",
         "detach": True,
         "commands": [
             "tail -f /mnt/data/owncloud.log",
@@ -2289,8 +2305,7 @@ def owncloudLog():
 def fixSharedDataPermissions():
     return [{
         "name": "fix-shared-data-permissions",
-        "image": OC_CI_PHP,
-        "pull": "always",
+        "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
         "commands": [
             "chown -R 33:33 /var/www/owncloud",  # www-data  user
             "chmod -R 777 /var/www/owncloud",
