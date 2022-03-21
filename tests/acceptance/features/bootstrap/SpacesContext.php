@@ -1566,6 +1566,95 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" shares the following entity "([^"]*)" inside of space "([^"]*)" with user "([^"]*)" with role "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $entity
+	 * @param  string $spaceName
+	 * @param  string $userRecipient
+	 * @param  string $role
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function sendShareEntityInsideOfSpaceRequest(
+		string $user,
+		string $entity,
+		string $spaceName,
+		string $userRecipient,
+		string $role
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$body = [
+			"space_ref" => $space['id'] . "/" . $entity,
+			"shareType" => 0,
+			"shareWith" => $userRecipient,
+			"role" => $role
+		];
+
+		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares";
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::post(
+				$fullUrl,
+				"",
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				$body
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" creates a public link share inside of space "([^"]*)" with settings:$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param TableNode|null $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function createPublicLinkToEntityInsideOfSpaceRequest(
+		string $user,
+		string $spaceName,
+		?TableNode $table
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$rows = $table->getRowsHash();
+
+		$rows["path"] = \array_key_exists("path", $rows) ? $rows["path"] : null;
+		$rows["shareType"] = \array_key_exists("shareType", $rows) ? $rows["shareType"] : null;
+		$rows["permissions"] = \array_key_exists("permissions", $rows) ? $rows["permissions"] : null;
+		$rows["password"] = \array_key_exists("password", $rows) ? $rows["password"] : null;
+		$rows["name"] = \array_key_exists("name", $rows) ? $rows["name"] : null;
+		$rows["expireDate"] = \array_key_exists("expireDate", $rows) ? $rows["expireDate"] : null;
+		
+		$body = [
+			"space_ref" => $space['id'] . "/" . $rows["path"],
+			"shareType" => $rows["shareType"],
+			"permissions" => $rows["permissions"],
+			"password" => $rows["password"],
+			"name" => $rows["name"],
+			"expireDate" => $rows["expireDate"]
+		];
+
+		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares";
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::post(
+				$fullUrl,
+				"",
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				$body
+			)
+		);
+	}
+
+	/**
 	 * @Given /^user "([^"]*)" has shared a space "([^"]*)" to user "([^"]*)" with role "([^"]*)"$/
 	 *
 	 * @param  string $user
