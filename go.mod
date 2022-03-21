@@ -38,7 +38,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/gookit/config/v2 v2.0.27
 	github.com/gorilla/mux v1.8.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.8.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.9.0
 	github.com/iancoleman/strcase v0.2.0
 	github.com/justinas/alice v1.2.0
 	github.com/libregraph/idm v0.3.1-0.20220315094434-e9a5cff3dd05
@@ -74,8 +74,8 @@ require (
 	golang.org/x/crypto v0.0.0-20220314234724-5d542ad81a58
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
-	golang.org/x/oauth2 v0.0.0-20220223155221-ee480838109b
-	google.golang.org/genproto v0.0.0-20220302033224-9aa15565e42a
+	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a
+	google.golang.org/genproto v0.0.0-20220314164441-57ef72a4c106
 	google.golang.org/grpc v1.45.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/yaml.v2 v2.4.0
