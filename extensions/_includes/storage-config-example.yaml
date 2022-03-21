@@ -445,6 +445,9 @@ reva:
       supervised: false
     userdriver: json
     userjsonfile: ~/.ocis/storage/shares.json
+    cs3provideraddr: 127.0.0.1:9215
+    cs3serviceuser: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
+    cs3serviceuseridp: https://localhost:9200
     usersqlusername: ""
     usersqlpassword: ""
     usersqlhost: ""
