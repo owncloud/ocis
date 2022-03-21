@@ -412,6 +412,91 @@ var testCases = []struct {
 			require.Equal(t, "v1", ev.Key)
 
 		},
+	}, {
+		Alias: "Space created",
+		SystemEvent: events.SpaceCreated{
+			ID:    &provider.StorageSpaceId{OpaqueId: "space-123"},
+			Owner: userID("uid-123"),
+			Root:  resourceID("sto-123", "iid-123"),
+			Name:  "test-space",
+			Type:  "project",
+			Quota: nil, // Quota not interesting atm
+			MTime: timestamp(10e9),
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventSpaceCreated{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "2286-11-20T17:46:40Z", "Space 'space-123' with name 'test-space' was created", "space_created")
+			// AuditEventSpaces fields
+			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "space-123")
+			// AuditEventFileRestored fields
+			require.Equal(t, "uid-123", ev.Owner)
+			require.Equal(t, "sto-123!iid-123", ev.RootItem)
+			require.Equal(t, "test-space", ev.Name)
+			require.Equal(t, "project", ev.Type)
+		},
+	}, {
+		Alias: "Space renamed",
+		SystemEvent: events.SpaceRenamed{
+			ID:    &provider.StorageSpaceId{OpaqueId: "space-123"},
+			Owner: userID("uid-123"),
+			Name:  "new-name",
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventSpaceRenamed{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "Space 'space-123' was renamed to 'new-name'", "space_renamed")
+			// AuditEventSpaces fields
+			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "space-123")
+			// AuditEventSpaceRenamed fields
+			require.Equal(t, "new-name", ev.NewName)
+		},
+	}, {
+		Alias: "Space disabled",
+		SystemEvent: events.SpaceDisabled{
+			ID: &provider.StorageSpaceId{OpaqueId: "space-123"},
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventSpaceDisabled{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "Space 'space-123' was disabled", "space_disabled")
+			// AuditEventSpaces fields
+			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "space-123")
+		},
+	}, {
+		Alias: "Space enabled",
+		SystemEvent: events.SpaceEnabled{
+			ID: &provider.StorageSpaceId{OpaqueId: "space-123"},
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventSpaceEnabled{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "Space 'space-123' was (re-) enabled", "space_enabled")
+			// AuditEventSpaces fields
+			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "space-123")
+		},
+	}, {
+		Alias: "Space deleted",
+		SystemEvent: events.SpaceDeleted{
+			ID: &provider.StorageSpaceId{OpaqueId: "space-123"},
+		},
+		CheckAuditEvent: func(t *testing.T, b []byte) {
+			ev := types.AuditEventSpaceDeleted{}
+			require.NoError(t, json.Unmarshal(b, &ev))
+
+			// AuditEvent fields
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "Space 'space-123' was deleted", "space_deleted")
+			// AuditEventSpaces fields
+			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "space-123")
+		},
 	},
 }
 
@@ -467,6 +552,9 @@ func checkFilesAuditEvent(t *testing.T, ev types.AuditEventFiles, itemID string,
 	require.Equal(t, path, ev.Path)
 }
 
+func checkSpacesAuditEvent(t *testing.T, ev types.AuditEventSpaces, spaceID string) {
+	require.Equal(t, spaceID, ev.SpaceID)
+}
 func shareID(id string) *collaboration.ShareId {
 	return &collaboration.ShareId{
 		OpaqueId: id,

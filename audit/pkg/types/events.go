@@ -23,5 +23,10 @@ func RegisteredEvents() []events.Unmarshaller {
 		events.ItemPurged{},
 		events.ItemRestored{},
 		events.FileVersionRestored{},
+		events.SpaceCreated{},
+		events.SpaceRenamed{},
+		events.SpaceEnabled{},
+		events.SpaceDisabled{},
+		events.SpaceDeleted{},
 	}
 }

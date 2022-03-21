@@ -310,6 +310,65 @@ func FileVersionRestored(ev events.FileVersionRestored) AuditEventFileVersionRes
 	}
 }
 
+// SpacesAuditEvent creates an AuditEventSpaces from the given values
+func SpacesAuditEvent(base AuditEvent, spaceID string) AuditEventSpaces {
+	return AuditEventSpaces{
+		AuditEvent: base,
+		SpaceID:    spaceID,
+	}
+}
+
+// SpaceCreated converts a SpaceCreated event to an AuditEventSpaceCreated
+func SpaceCreated(ev events.SpaceCreated) AuditEventSpaceCreated {
+	sid := ev.ID.GetOpaqueId()
+	iid, _, owner := extractFileDetails(&provider.Reference{ResourceId: ev.Root}, ev.Owner)
+	base := BasicAuditEvent("", formatTime(ev.MTime), MessageSpaceCreated(sid, ev.Name), ActionSpaceCreated)
+	return AuditEventSpaceCreated{
+		AuditEventSpaces: SpacesAuditEvent(base, sid),
+		Owner:            owner,
+		RootItem:         iid,
+		Name:             ev.Name,
+		Type:             ev.Type,
+	}
+}
+
+// SpaceRenamed converts a SpaceRenamed event to an AuditEventSpaceRenamed
+func SpaceRenamed(ev events.SpaceRenamed) AuditEventSpaceRenamed {
+	sid := ev.ID.GetOpaqueId()
+	base := BasicAuditEvent("", "", MessageSpaceRenamed(sid, ev.Name), ActionSpaceRenamed)
+	return AuditEventSpaceRenamed{
+		AuditEventSpaces: SpacesAuditEvent(base, sid),
+		NewName:          ev.Name,
+	}
+}
+
+// SpaceDisabled converts a SpaceDisabled event to an AuditEventSpaceDisabled
+func SpaceDisabled(ev events.SpaceDisabled) AuditEventSpaceDisabled {
+	sid := ev.ID.GetOpaqueId()
+	base := BasicAuditEvent("", "", MessageSpaceDisabled(sid), ActionSpaceDisabled)
+	return AuditEventSpaceDisabled{
+		AuditEventSpaces: SpacesAuditEvent(base, sid),
+	}
+}
+
+// SpaceEnabled converts a SpaceEnabled event to an AuditEventSpaceEnabled
+func SpaceEnabled(ev events.SpaceEnabled) AuditEventSpaceEnabled {
+	sid := ev.ID.GetOpaqueId()
+	base := BasicAuditEvent("", "", MessageSpaceEnabled(sid), ActionSpaceEnabled)
+	return AuditEventSpaceEnabled{
+		AuditEventSpaces: SpacesAuditEvent(base, sid),
+	}
+}
+
+// SpaceDeleted converts a SpaceDeleted event to an AuditEventSpaceDeleted
+func SpaceDeleted(ev events.SpaceDeleted) AuditEventSpaceDeleted {
+	sid := ev.ID.GetOpaqueId()
+	base := BasicAuditEvent("", "", MessageSpaceDeleted(sid), ActionSpaceDeleted)
+	return AuditEventSpaceDeleted{
+		AuditEventSpaces: SpacesAuditEvent(base, sid),
+	}
+}
+
 func extractGrantee(uid *user.UserId, gid *group.GroupId) (string, string) {
 	switch {
 	case uid != nil && uid.OpaqueId != "":
