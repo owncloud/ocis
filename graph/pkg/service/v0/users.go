@@ -46,6 +46,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		} else {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
+		return
 	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &listResponse{Value: users})
