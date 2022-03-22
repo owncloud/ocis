@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Network configuration in individiual_services example: [#3238](https://github.com/owncloud/ocis/pull/3238)
 * Bugfix - Improve gif thumbnails: [#3305](https://github.com/owncloud/ocis/pull/3305)
+* Bugfix - Fix error handling in GraphAPI GetUsers call: [#3357](https://github.com/owncloud/ocis/pull/3357)
 * Change - Settings service now stores its data via metadata service: [#3232](https://github.com/owncloud/ocis/pull/3232)
 * Enhancement - Audit logger will now log file events: [#3332](https://github.com/owncloud/ocis/pull/3332)
 * Enhancement - Add password reset link to login page: [#3329](https://github.com/owncloud/ocis/pull/3329)
@@ -32,6 +33,13 @@ The following sections list the changes for unreleased.
    Improved the gif thumbnail generation for gifs with different disposal strategies.
 
    https://github.com/owncloud/ocis/pull/3305
+
+* Bugfix - Fix error handling in GraphAPI GetUsers call: [#3357](https://github.com/owncloud/ocis/pull/3357)
+
+   A missing return statement caused GetUsers to return misleading results when the identity
+   backend returned an error.
+
+   https://github.com/owncloud/ocis/pull/3357
 
 * Change - Settings service now stores its data via metadata service: [#3232](https://github.com/owncloud/ocis/pull/3232)
 
