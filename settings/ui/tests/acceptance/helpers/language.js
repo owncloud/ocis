@@ -6,8 +6,8 @@ const filesMenu = {
     'Deleted files'
   ],
   Deutsch: [
-    'Persöhnlich',
-    'Shares',
+    'Persönlich',
+    'Geteilt',
     'Spaces\nbeta',
     'Gelöschte Dateien'
   ],
@@ -55,24 +55,28 @@ const accountMenu = {
 const filesListHeaderMenu = {
   English: [
     'Name',
+    'Shares',
     'Size',
     'Modified',
     'Actions'
   ],
   Deutsch: [
     'Name',
+    'Geteilt',
     'Größe',
     'Bearbeitet',
     'Aktionen'
   ],
   Español: [
     'Nombre',
+    'Shares',
     'Tamaño',
     'Modificado',
     'Acciones'
   ],
   Français: [
     'Nom',
+    'Shares',
     'Taille',
     'Modifié',
     'Actions'
