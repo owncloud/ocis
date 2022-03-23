@@ -2272,7 +2272,7 @@ def copyConfigs():
         "commands": [
             # ocis proxy config
             "mkdir -p /etc/ocis",
-            "cp %s/ocis/proxy.json /etc/ocis/proxy.json" % (PARALLEL_DEPLOY_CONFIG_PATH),
+            "cp %s/ocis/proxy.yaml /etc/ocis/proxy.yaml" % (PARALLEL_DEPLOY_CONFIG_PATH),
             # oc10 configs
             "mkdir -p /etc/templates",
             "mkdir -p /etc/pre_server.d",
