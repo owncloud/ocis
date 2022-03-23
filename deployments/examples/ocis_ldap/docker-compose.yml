@@ -91,7 +91,7 @@ services:
     volumes:
       - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/ocis/web-config.dist.json:/config/web-config.dist.json
-      - ./config/ocis/proxy.json:/etc/ocis/proxy.json
+      - ./config/ocis/proxy.yaml:/etc/ocis/proxy.yaml
       - ocis-data:/var/lib/ocis
     labels:
       - "traefik.enable=true"
