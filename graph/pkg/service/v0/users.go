@@ -180,11 +180,12 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mail := changes.GetMail()
-	if !isValidEmail(mail) {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
-			fmt.Sprintf("'%s' is not a valid email address", mail))
-		return
+	if mail, ok := changes.GetMailOk(); ok {
+		if !isValidEmail(*mail) {
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
+				fmt.Sprintf("'%s' is not a valid email address", *mail))
+			return
+		}
 	}
 
 	u, err := g.identityBackend.UpdateUser(r.Context(), nameOrID, *changes)
