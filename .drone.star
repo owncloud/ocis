@@ -1753,7 +1753,7 @@ def deploy(ctx, config, rebuild):
             },
             {
                 "name": "deploy",
-                "image": SELENIUM_STANDALONE_CHROME_DEBUG,
+                "image": OC_CI_DRONE_ANSIBLE,
                 "failure": "ignore",
                 "environment": {
                     "CONTINUOUS_DEPLOY_SERVERS_CONFIG": "../%s" % (config),
