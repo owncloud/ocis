@@ -7,7 +7,10 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"sort"
+	"strings"
 
+	"github.com/CiscoM31/godata"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -38,7 +41,25 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 
 // GetUsers implements the Service interface.
 func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
+	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
+	if err != nil {
+		g.logger.Err(err).Interface("query", r.URL.Query()).Msg("query error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
 	users, err := g.identityBackend.GetUsers(r.Context(), r.URL.Query())
+	if err != nil {
+		var errcode errorcode.Error
+		if errors.As(err, &errcode) {
+			errcode.Render(w, r)
+		} else {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	users, err = sortUsers(odataReq, users)
 	if err != nil {
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
@@ -233,4 +254,27 @@ func isValidEmail(e string) bool {
 		return false
 	}
 	return emailRegex.MatchString(e)
+}
+
+func sortUsers(req *godata.GoDataRequest, users []*libregraph.User) ([]*libregraph.User, error) {
+	var sorter sort.Interface
+	if req.Query.OrderBy == nil || len(req.Query.OrderBy.OrderByItems) != 1 {
+		return users, nil
+	}
+	switch req.Query.OrderBy.OrderByItems[0].Field.Value {
+	case "displayName":
+		sorter = usersByDisplayName{users}
+	case "mail":
+		sorter = usersByMail{users}
+	case "onPremisesSamAccountName":
+		sorter = usersByOnPremisesSamAccountName{users}
+	default:
+		return nil, fmt.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)
+	}
+
+	if req.Query.OrderBy.OrderByItems[0].Order == "asc" {
+		sorter = sort.Reverse(sorter)
+	}
+	sort.Sort(sorter)
+	return users, nil
 }
