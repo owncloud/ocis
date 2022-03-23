@@ -171,7 +171,7 @@ require (
 	github.com/hashicorp/go-plugin v1.4.3 // indirect
 	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
-	github.com/hashicorp/raft v1.3.6 // indirect
+	github.com/hashicorp/raft v1.3.3 // indirect
 	github.com/hashicorp/serf v0.9.6 // indirect
 	github.com/hashicorp/yamux v0.0.0-20211028200310-0bc27b27de87 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
@@ -209,7 +209,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/nats-io/jwt/v2 v2.2.1-0.20220113022732-58e87895b296 // indirect
-	github.com/nats-io/nats-streaming-server v0.24.3 // indirect
+	github.com/nats-io/nats-streaming-server v0.24.1 // indirect
 	github.com/nats-io/nats.go v1.13.1-0.20220308171302-2f2f6968e98d // indirect
 	github.com/nats-io/nkeys v0.3.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect

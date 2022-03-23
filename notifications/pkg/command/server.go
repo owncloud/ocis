@@ -38,10 +38,7 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-			evts, err := events.Consume(
-				client, evtsCfg.ConsumerGroup,
-				evs...,
-			)
+			evts, err := events.Consume(client, evtsCfg.ConsumerGroup, evs...)
 			if err != nil {
 				return err
 			}

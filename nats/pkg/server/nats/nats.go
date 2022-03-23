@@ -15,29 +15,28 @@ type NATSServer struct {
 	server          *nserver.Server
 }
 
-func NewNATSServer(ctx context.Context, logger nserver.Logger, opts ...Option) (*NATSServer, error) {
-	options := &nserver.Options{}
+func NewNATSServer(ctx context.Context, logger nserver.Logger, natsOpts []NatsOption, jetstreamOpts []JetStreamOption) (*NATSServer, error) {
+	natsOptions := &nserver.Options{}
+	jetStreamOptions := &nserver.JetStreamConfig{}
 
-	for _, o := range opts {
-		o(options)
+	for _, o := range natsOpts {
+		o(natsOptions)
 	}
 
-	server, err := nserver.NewServer(
-		options,
-	)
+	for _, o := range jetstreamOpts {
+		o(jetStreamOptions)
+	}
+
+	server, err := nserver.NewServer(natsOptions)
 	if err != nil {
 		return nil, err
 	}
 
 	server.SetLoggerV2(logger, true, true, false)
 
-	c := &nserver.JetStreamConfig{
-		StoreDir: "/tmp/ocis-jetstream", // TODO: configurable
-	}
-
 	return &NATSServer{
 		ctx:             ctx,
-		jetStreamConfig: c,
+		jetStreamConfig: jetStreamOptions,
 		server:          server,
 	}, nil
 }
