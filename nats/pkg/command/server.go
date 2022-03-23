@@ -41,7 +41,7 @@ func Server(cfg *config.Config) *cli.Command {
 				[]nats.NatsOption{
 					nats.Host(cfg.Nats.Host),
 					nats.Port(cfg.Nats.Port),
-					nats.ClusterID("ocis-cluster"),
+					nats.ClusterID(cfg.Nats.ClusterID),
 				},
 				[]nats.JetStreamOption{
 					nats.JetStreamStoreDir(cfg.Nats.StoreDir),

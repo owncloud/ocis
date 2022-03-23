@@ -20,7 +20,7 @@ func DefaultConfig() *config.Config {
 		},
 		Events: config.Events{
 			Endpoint:      "127.0.0.1:9233",
-			Cluster:       "test-cluster",
+			Cluster:       "ocis-cluster",
 			ConsumerGroup: "audit",
 		},
 		Auditlog: config.Auditlog{

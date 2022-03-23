@@ -22,7 +22,8 @@ type Config struct {
 
 // Nats is the nats config
 type Nats struct {
-	Host     string `ocisConfig:"host" env:"NATS_NATS_HOST"`
-	Port     int    `ocisConfig:"port" env:"NATS_NATS_PORT"`
-	StoreDir string `ocisConfig:"store_dir" env:"NATS_NATS_STORE_DIR"`
+	Host      string `ocisConfig:"host" env:"NATS_NATS_HOST"`
+	Port      int    `ocisConfig:"port" env:"NATS_NATS_PORT"`
+	ClusterID string `ocisConfig:"clusterid" env:"NATS_NATS_CLUSTER_ID"`
+	StoreDir  string `ocisConfig:"store_dir" env:"NATS_NATS_STORE_DIR"`
 }

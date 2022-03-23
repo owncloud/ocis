@@ -25,9 +25,10 @@ func DefaultConfig() *config.Config {
 			Name: "nats",
 		},
 		Nats: config.Nats{
-			Host:     "127.0.0.1",
-			Port:     9233,
-			StoreDir: path.Join(defaults.BaseDataPath(), "nats"),
+			Host:      "127.0.0.1",
+			Port:      9233,
+			ClusterID: "ocis-cluster",
+			StoreDir:  path.Join(defaults.BaseDataPath(), "nats"),
 		},
 	}
 }
