@@ -601,7 +601,7 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 	}
 
 	var t int64
-	if total != 0 || (total == 0 && remaining == 0) {
+	if total != 0 {
 		// A quota was set
 		qta.Total = &total
 		t = total
