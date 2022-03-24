@@ -8,3 +8,5 @@
 | NATS_DEBUG_ZPAGES | bool | false | |
 | NATS_NATS_HOST | string | 127.0.0.1 | |
 | NATS_NATS_PORT | int | 9233 | |
+| NATS_NATS_CLUSTER_ID | string | ocis-cluster | |
+| NATS_NATS_STORE_DIR | string | ~/.ocis/nats | |

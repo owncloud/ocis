@@ -461,7 +461,7 @@ reva:
     userstoragemountid: ""
     events:
       address: 127.0.0.1:9233
-      clusterid: test-cluster
+      clusterid: ocis-cluster
   storageshares:
     port:
       maxcpus: ""

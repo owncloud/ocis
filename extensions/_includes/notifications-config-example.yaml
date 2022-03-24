@@ -17,7 +17,7 @@ notifications:
     password: godisdead
   events:
     endpoint: 127.0.0.1:9233
-    cluster: test-cluster
+    cluster: ocis-cluster
     consumergroup: notifications
   revagateway: 127.0.0.1:9142
   machineauthsecret: change-me-please
