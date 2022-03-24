@@ -98,30 +98,34 @@ func DefaultPolicies() []config.Policy {
 				},
 				{
 					Endpoint: "/remote.php/",
-					Backend:  "http://localhost:9140",
+					Service:  "ocdav",
 				},
 				{
 					Endpoint: "/dav/",
-					Backend:  "http://localhost:9140",
+					Service:  "ocdav",
 				},
 				{
 					Endpoint: "/webdav/",
-					Backend:  "http://localhost:9140",
+					Service:  "ocdav",
 				},
 				{
 					Endpoint: "/status.php",
-					Backend:  "http://localhost:9140",
+					Service:  "ocdav",
 				},
 				{
 					Endpoint: "/index.php/",
-					Backend:  "http://localhost:9140",
+					Service:  "ocdav",
+				},
+				{
+					Endpoint: "/apps/",
+					Service:  "ocdav",
 				},
 				{
 					Endpoint: "/data",
 					Backend:  "http://localhost:9140",
 				},
 				{
-					Endpoint: "/app/",
+					Endpoint: "/app/", // /app or /apps? ocdav only handles /apps
 					Backend:  "http://localhost:9140",
 				},
 				{

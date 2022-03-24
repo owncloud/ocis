@@ -43,12 +43,15 @@ type Policy struct {
 	Routes []Route `ocisConfig:"routes"`
 }
 
-// Route define forwarding routes
+// Route defines forwarding routes
 type Route struct {
-	Type        RouteType `ocisConfig:"type"`
-	Endpoint    string    `ocisConfig:"endpoint"`
-	Backend     string    `ocisConfig:"backend"`
-	ApacheVHost bool      `ocisConfig:"apache-vhost"`
+	Type     RouteType `ocisConfig:"type"`
+	Endpoint string    `ocisConfig:"endpoint"`
+	// Backend is a static URL to forward the request to
+	Backend string `ocisConfig:"backend"`
+	// Service name to look up in the registry
+	Service     string `ocisConfig:"service"`
+	ApacheVHost bool   `ocisConfig:"apache-vhost"`
 }
 
 // RouteType defines the type of a route

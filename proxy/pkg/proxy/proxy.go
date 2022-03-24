@@ -12,10 +12,12 @@ import (
 	"time"
 
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"go-micro.dev/v4/selector"
 
 	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/registry"
 	pkgtrace "github.com/owncloud/ocis/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/proxy/policy"
@@ -86,6 +88,7 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 	for _, pol := range options.Config.Policies {
 		for _, route := range pol.Routes {
 			rp.logger.Debug().Str("fwd: ", route.Endpoint)
+			// TODO check either Backend or Service is set
 			uri, err2 := url.Parse(route.Backend)
 			if err2 != nil {
 				rp.logger.
@@ -95,6 +98,7 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 					Msg("malformed url")
 			}
 
+			// here the backend is used as a uri
 			rp.AddHost(pol.Name, uri, route)
 		}
 	}
@@ -184,9 +188,31 @@ func (p *MultiHostReverseProxy) AddHost(policy string, target *url.URL, rt confi
 	if p.Directors[policy][routeType] == nil {
 		p.Directors[policy][routeType] = make(map[string]func(req *http.Request))
 	}
+
+	reg := registry.GetRegistry()
+	sel := selector.NewSelector(selector.Registry(reg))
+
 	p.Directors[policy][routeType][rt.Endpoint] = func(req *http.Request) {
-		req.URL.Scheme = target.Scheme
-		req.URL.Host = target.Host
+		if rt.Service != "" {
+			// select next node
+			next, err := sel.Select(rt.Service)
+			if err != nil {
+				fmt.Println(fmt.Errorf("could not select %s service from the registry: %v", rt.Service, err))
+				return // TODO error?
+			}
+			node, err := next()
+			if err != nil {
+				fmt.Println(fmt.Errorf("could not select next node for service %s: %v", rt.Service, err))
+				return // TODO error?
+			}
+			req.URL.Host = node.Address
+			req.URL.Scheme = node.Metadata["protocol"] // TODO check property exists?
+
+		} else {
+			req.URL.Host = target.Host
+			req.URL.Scheme = target.Scheme
+		}
+
 		// Apache deployments host addresses need to match on req.Host and req.URL.Host
 		// see https://stackoverflow.com/questions/34745654/golang-reverseproxy-with-apache2-sni-hostname-error
 		if rt.ApacheVHost {
