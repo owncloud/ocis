@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Network configuration in individiual_services example: [#3238](https://github.com/owncloud/ocis/pull/3238)
 * Bugfix - Improve gif thumbnails: [#3305](https://github.com/owncloud/ocis/pull/3305)
 * Bugfix - Fix error handling in GraphAPI GetUsers call: [#3357](https://github.com/owncloud/ocis/pull/3357)
+* Bugfix - Replace public mountpoint fileid with grant fileid: [#3349](https://github.com/owncloud/ocis/pull/3349)
 * Change - Settings service now stores its data via metadata service: [#3232](https://github.com/owncloud/ocis/pull/3232)
 * Enhancement - Audit logger will now log file events: [#3332](https://github.com/owncloud/ocis/pull/3332)
 * Enhancement - Add password reset link to login page: [#3329](https://github.com/owncloud/ocis/pull/3329)
@@ -40,6 +41,14 @@ The following sections list the changes for unreleased.
    backend returned an error.
 
    https://github.com/owncloud/ocis/pull/3357
+
+* Bugfix - Replace public mountpoint fileid with grant fileid: [#3349](https://github.com/owncloud/ocis/pull/3349)
+
+   We now show the same resoucre id for resources when accessing them via a public links as when
+   using a logged in user. This allows the web ui to start a WOPI session with the correct resource
+   id.
+
+   https://github.com/owncloud/ocis/pull/3349
 
 * Change - Settings service now stores its data via metadata service: [#3232](https://github.com/owncloud/ocis/pull/3232)
 
