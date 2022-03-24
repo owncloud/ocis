@@ -45,7 +45,7 @@ _TODO allow limiting the web ui switch to an 'early adopters' group_
 </div>
 
 #### Validation
-Ensure switching back an forth between the classic ownCloud 10 web UI and ownCloud web works as at our https://demo.owncloud.com.
+Ensure switching back and forth between the classic ownCloud 10 web UI and ownCloud web works as at our https://demo.owncloud.com.
 
 #### Rollback
 Should there be problems with ownCloud web at this point it can simply be removed from the menu and be undeployed.
@@ -82,7 +82,7 @@ When introducing OpenID Connect, the clients will detect the new authentication 
 reauthorize at the OpenID Connect IdP, which again, may be configured to skip the consent step for trusted clients.
 
 #### Steps
-1. There are multiple products that can be used as an OpenID Connect IdP. We test with [LibreGraph Connect](https://github.com/libregraph/lico), which is also [embedded in oCIS](https://github.com/owncloud/web/). Other alternatives include [Keycloak](https://www.keycloak.org/) or [Ping](https://www.pingidentity.com/). Please refer to the corresponding setup instructions for the product you intent to use.
+1. There are multiple products that can be used as an OpenID Connect IdP. We test with [LibreGraph Connect](https://github.com/libregraph/lico), which is also [embedded in oCIS](https://github.com/owncloud/web/). Other alternatives include [Keycloak](https://www.keycloak.org/) or [Ping](https://www.pingidentity.com/). Please refer to the corresponding setup instructions for the product you intend to use.
 
 <div class="editpage">
 
@@ -308,7 +308,7 @@ _Feel free to add your question as a PR to this document using the link at the t
 <div style="break-after: page"></div>
 
 ### Stage-6: parallel deployment
-Running ownCloud 10 and oCIS in parallel is a crucial stage for the migration: it allows users access to group shares regardless of the system that is being used to to access the data. A user by user migration with multiple domains would technically break group shares when users vanish because they (and their data) are no longer available in the old system.
+Running ownCloud 10 and oCIS in parallel is a crucial stage for the migration: it allows users access to group shares regardless of the system that is being used to access the data. A user by user migration with multiple domains would technically break group shares when users vanish because they (and their data) are no longer available in the old system.
 
 Depending on the amount of power users on an instance, the admin may want to allow users to voluntarily migrate to the oCIS backend. A monitoring system can be used to visualize the behavior for the two systems and gain trust in the overall stability and performance.
 
@@ -324,7 +324,7 @@ _TODO @butonic update performance comparisons nightly_
 #### Steps
 There are several options to move users to the oCIS backend:
 - Use a canary app to let users decide themselves
-- Use an early adopters group with an opt in
+- Use an early adopters group with an opt-in
 - Force migrate users in batch or one by one at the administrators will
 
 #### Verification
@@ -469,8 +469,8 @@ Depending on chosen the share manager provider some sharing requests should be f
 
 _TODO for HA implement share manager with redis / nats / ... key value store backend: use the micro store interface please ..._
 _TODO for batch migration implement share data migration cli with progress that reads all shares via the cs3 api from one provider and writes them into another provider_
-_TODO for seamless migration implement tiered/chained share provider that reads share data from the old provider and writes newc shares to the new one_
-_TODO for storage provider as source of truth persist ALL share data in the storage provider. Currently, part is stored in the share manager, part is in the storage provider. We can keep both, but the the share manager should directly persist its metadata to the storage system used by the storage provider so metadata is kept in sync_
+_TODO for seamless migration implement tiered/chained share provider that reads share data from the old provider and writes new shares to the new one_
+_TODO for storage provider as source of truth persist ALL share data in the storage provider. Currently, part is stored in the share manager, part is in the storage provider. We can keep both, but the share manager should directly persist its metadata to the storage system used by the storage provider so metadata is kept in sync_
 
 </div>
 
@@ -588,7 +588,7 @@ The `filecache` table itself has more metadata:
 | `checksum`         | varchar(255)  | YES  |     | NULL    |                | *same as blob checksum* | SHOULD become the checksum in the storage provider. eos calculates it itself, `ocis` driver stores it in extended attributes |
 
 
-> Note: for EOS a hot migration only works seamlessly if file ids in oc10 are already read from eos. otherwise either a mapping from the oc10 filecache file id to the new eos file id has to be created under the assumption that these id sets do not intersect or files and corresponding shares need to be exported and imported offline to generate a new set of ids. While this will preserve public links, user, group and even federated shares, old internal links may still point to different files because they contain the oc10 fileid
+> Note: for EOS a hot migration only works seamlessly if file ids in oc10 are already read from eos. Otherwise, either a mapping from the oc10 filecache file id to the new eos file id has to be created under the assumption that these id sets do not intersect or files and corresponding shares need to be exported and imported offline to generate a new set of ids. While this will preserve public links, user, group and even federated shares, old internal links may still point to different files because they contain the oc10 fileid
 
 <div style="break-after: page"></div>
 
@@ -682,7 +682,7 @@ _TODO clarify how OCM handles this and where we store / configure this. It seems
 
 Users are migrated in two steps:
 1. They should all be authenticated using OpenID Connect, which already moves them to a common identity management system.
-2. To search share recipients, both, ownCloud 10 and oCIS need access to the same user directory using eg. LDAP.
+2. To search share recipients, both, ownCloud 10 and oCIS need access to the same user directory using e.g. LDAP.
 
 <div class="editpage">
 
