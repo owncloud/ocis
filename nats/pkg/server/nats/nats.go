@@ -10,24 +10,21 @@ import (
 var NATSListenAndServeLoopTimer = 1 * time.Second
 
 type NATSServer struct {
-	ctx             context.Context
-	jetStreamConfig *nserver.JetStreamConfig
-	server          *nserver.Server
+	ctx    context.Context
+	server *nserver.Server
 }
 
-func NewNATSServer(ctx context.Context, logger nserver.Logger, natsOpts []NatsOption, jetstreamOpts []JetStreamOption) (*NATSServer, error) {
-	natsOptions := &nserver.Options{}
-	jetStreamOptions := &nserver.JetStreamConfig{}
+func NewNATSServer(ctx context.Context, logger nserver.Logger, opts ...NatsOption) (*NATSServer, error) {
+	natsOpts := &nserver.Options{}
 
-	for _, o := range natsOpts {
-		o(natsOptions)
+	for _, o := range opts {
+		o(natsOpts)
 	}
 
-	for _, o := range jetstreamOpts {
-		o(jetStreamOptions)
-	}
+	// enable JetStream
+	natsOpts.JetStream = true
 
-	server, err := nserver.NewServer(natsOptions)
+	server, err := nserver.NewServer(natsOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -35,22 +32,14 @@ func NewNATSServer(ctx context.Context, logger nserver.Logger, natsOpts []NatsOp
 	server.SetLoggerV2(logger, true, true, false)
 
 	return &NATSServer{
-		ctx:             ctx,
-		jetStreamConfig: jetStreamOptions,
-		server:          server,
+		ctx:    ctx,
+		server: server,
 	}, nil
 }
 
 // ListenAndServe runs the NATSServer in a blocking way until the server is shutdown or an error occurs
 func (n *NATSServer) ListenAndServe() (err error) {
-	// start NATS first
 	go n.server.Start()
-	// start NATS JetStream second
-	n.server.EnableJetStream(n.jetStreamConfig)
-	if err != nil {
-		return err
-	}
-
 	<-n.ctx.Done()
 	return nil
 }

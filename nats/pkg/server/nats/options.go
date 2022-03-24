@@ -28,12 +28,9 @@ func ClusterID(clusterID string) NatsOption {
 	}
 }
 
-// NatsOption configures the nats server
-type JetStreamOption func(*nserver.JetStreamConfig)
-
-// ClusterID sets the name for the nats cluster
-func JetStreamStoreDir(StoreDir string) JetStreamOption {
-	return func(o *nserver.JetStreamConfig) {
+// StoreDir sets the folder for persistence
+func StoreDir(StoreDir string) NatsOption {
+	return func(o *nserver.Options) {
 		o.StoreDir = StoreDir
 	}
 }
