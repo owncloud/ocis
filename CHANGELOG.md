@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Network configuration in individiual_services example: [#3238](https://github.com/owncloud/ocis/pull/3238)
 * Bugfix - Improve gif thumbnails: [#3305](https://github.com/owncloud/ocis/pull/3305)
 * Bugfix - Fix error handling in GraphAPI GetUsers call: [#3357](https://github.com/owncloud/ocis/pull/3357)
+* Bugfix - Replace public mountpoint fileid with grant fileid: [#3349](https://github.com/owncloud/ocis/pull/3349)
 * Change - Settings service now stores its data via metadata service: [#3232](https://github.com/owncloud/ocis/pull/3232)
 * Enhancement - Audit logger will now log file events: [#3332](https://github.com/owncloud/ocis/pull/3332)
 * Enhancement - Add password reset link to login page: [#3329](https://github.com/owncloud/ocis/pull/3329)
@@ -17,7 +18,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
 * Enhancement - Improve thumbnails API: [#3272](https://github.com/owncloud/ocis/pull/3272)
 * Enhancement - Update reva to vXXXX: [#3330](https://github.com/owncloud/ocis/pull/3330)
-* Enhancement - Update ownCloud Web to v5.3.0-rc.1: [#6561](https://github.com/owncloud/web/pull/6561)
+* Enhancement - Update ownCloud Web to v5.3.0: [#6561](https://github.com/owncloud/web/pull/6561)
 
 ## Details
 
@@ -40,6 +41,14 @@ The following sections list the changes for unreleased.
    backend returned an error.
 
    https://github.com/owncloud/ocis/pull/3357
+
+* Bugfix - Replace public mountpoint fileid with grant fileid: [#3349](https://github.com/owncloud/ocis/pull/3349)
+
+   We now show the same resoucre id for resources when accessing them via a public links as when
+   using a logged in user. This allows the web ui to start a WOPI session with the correct resource
+   id.
+
+   https://github.com/owncloud/ocis/pull/3349
 
 * Change - Settings service now stores its data via metadata service: [#3232](https://github.com/owncloud/ocis/pull/3232)
 
@@ -96,16 +105,17 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3330
 
-* Enhancement - Update ownCloud Web to v5.3.0-rc.1: [#6561](https://github.com/owncloud/web/pull/6561)
+* Enhancement - Update ownCloud Web to v5.3.0: [#6561](https://github.com/owncloud/web/pull/6561)
 
    Tags: web
 
-   We updated ownCloud Web to v5.3.0-rc.1. Please refer to the changelog (linked) for details on
-   the web release.
+   We updated ownCloud Web to v5.3.0. Please refer to the changelog (linked) for details on the web
+   release.
 
    https://github.com/owncloud/web/pull/6561
    https://github.com/owncloud/ocis/pull/3291
-   https://github.com/owncloud/web/releases/tag/v5.3.0-rc.1
+   https://github.com/owncloud/ocis/pull/3375
+   https://github.com/owncloud/web/releases/tag/v5.3.0
 # Changelog for [1.18.0] (2022-03-03)
 
 The following sections list the changes for 1.18.0.

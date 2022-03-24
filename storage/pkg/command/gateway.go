@@ -253,8 +253,12 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 		// public link storage returns the mount id of the actual storage
 		cfg.Reva.StoragePublicLink.Endpoint: {
 			"spaces": map[string]interface{}{
-				"public": map[string]interface{}{
-					"mount_point": "/public",
+				"grant": map[string]interface{}{
+					"mount_point": ".",
+				},
+				"mountpoint": map[string]interface{}{
+					"mount_point":   "/public",
+					"path_template": "/public/{{.Space.Root.OpaqueId}}",
 				},
 			},
 		},
