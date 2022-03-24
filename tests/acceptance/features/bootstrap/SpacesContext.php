@@ -57,6 +57,11 @@ class SpacesContext implements Context {
 	private array $createdSpaces;
 
 	/**
+	 * @var string
+	 */
+	private $ocsApiUrl = '/ocs/v2.php/apps/files_sharing/api/v1/shares';
+
+	/**
 	 * @param string $spaceName
 	 *
 	 * @return string name of the user that created the space
@@ -1551,7 +1556,7 @@ class SpacesContext implements Context {
 			"role" => $role // role overrides the permissions parameter
 		];
 
-		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares";
+		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
 
 		$this->featureContext->setResponse(
 			HttpRequestHelper::post(
@@ -1592,7 +1597,7 @@ class SpacesContext implements Context {
 			"role" => $role
 		];
 
-		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares";
+		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
 
 		$this->featureContext->setResponse(
 			HttpRequestHelper::post(
@@ -1640,7 +1645,7 @@ class SpacesContext implements Context {
 			"expireDate" => $rows["expireDate"]
 		];
 
-		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares";
+		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
 
 		$this->featureContext->setResponse(
 			HttpRequestHelper::post(
@@ -1698,7 +1703,7 @@ class SpacesContext implements Context {
 		string $userRecipient
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares/" . $space['id'] . "?shareWith=" . $userRecipient;
+		$fullUrl = $this->baseUrl . $this->ocsApiUrl . "/" . $space['id'] . "?shareWith=" . $userRecipient;
 
 		$this->featureContext->setResponse(
 			HttpRequestHelper::delete(
