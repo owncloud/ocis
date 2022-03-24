@@ -1,6 +1,11 @@
 package defaults
 
-import "github.com/owncloud/ocis/nats/pkg/config"
+import (
+	"path"
+
+	"github.com/owncloud/ocis/nats/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
+)
 
 // NOTE: Most of this configuration is not needed to keep it as simple as possible
 // TODO: Clean up unneeded configuration
@@ -20,8 +25,10 @@ func DefaultConfig() *config.Config {
 			Name: "nats",
 		},
 		Nats: config.Nats{
-			Host: "127.0.0.1",
-			Port: 9233,
+			Host:      "127.0.0.1",
+			Port:      9233,
+			ClusterID: "ocis-cluster",
+			StoreDir:  path.Join(defaults.BaseDataPath(), "nats"),
 		},
 	}
 }

@@ -3,7 +3,7 @@ package command
 import (
 	"fmt"
 
-	"github.com/asim/go-micro/plugins/events/nats/v4"
+	"github.com/asim/go-micro/plugins/events/natsjs/v4"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/server"
 	"github.com/owncloud/ocis/notifications/pkg/channels"
@@ -31,7 +31,10 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			evtsCfg := cfg.Notifications.Events
-			client, err := server.NewNatsStream(nats.Address(evtsCfg.Endpoint), nats.ClusterID(evtsCfg.Cluster))
+			client, err := server.NewNatsStream(
+				natsjs.Address(evtsCfg.Endpoint),
+				natsjs.ClusterID(evtsCfg.Cluster),
+			)
 			if err != nil {
 				return err
 			}
