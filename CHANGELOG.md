@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Improve gif thumbnails: [#3305](https://github.com/owncloud/ocis/pull/3305)
 * Bugfix - Fix error handling in GraphAPI GetUsers call: [#3357](https://github.com/owncloud/ocis/pull/3357)
 * Bugfix - Replace public mountpoint fileid with grant fileid: [#3349](https://github.com/owncloud/ocis/pull/3349)
+* Change - Switch NATS backend: [#3192](https://github.com/owncloud/ocis/pull/3192)
 * Change - Settings service now stores its data via metadata service: [#3232](https://github.com/owncloud/ocis/pull/3232)
 * Enhancement - Audit logger will now log file events: [#3332](https://github.com/owncloud/ocis/pull/3332)
 * Enhancement - Add password reset link to login page: [#3329](https://github.com/owncloud/ocis/pull/3329)
@@ -49,6 +50,14 @@ The following sections list the changes for unreleased.
    id.
 
    https://github.com/owncloud/ocis/pull/3349
+
+* Change - Switch NATS backend: [#3192](https://github.com/owncloud/ocis/pull/3192)
+
+   We've switched the NATS backend from Streaming to JetStream, since NATS Streaming is
+   depreciated.
+
+   https://github.com/owncloud/ocis/pull/3192
+   https://github.com/cs3org/reva/pull/2574
 
 * Change - Settings service now stores its data via metadata service: [#3232](https://github.com/owncloud/ocis/pull/3232)
 
