@@ -71,6 +71,10 @@ docker run --rm -ti -p 9200:9200 -e OCIS_INSECURE=true owncloud/ocis
 When you're using oCIS with self-signed certificates, you need to set the environment variable `OCIS_INSECURE=true`, in order to make oCIS work.
 {{< /hint >}}
 
+{{< hint info >}}
+If you want to do `curl` commands to easily use/test the API manually, then you need to also set the environment variable `PROXY_ENABLE_BASIC_AUTH=true`.
+{{< /hint >}}
+
 {{< hint warning >}}
 In order to persist your data, you need to mount a docker volume or create a host bind-mount at `/var/lib/ocis`, for example with: `-v /some/host/dir:/var/lib/ocis`
 

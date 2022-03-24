@@ -12,7 +12,7 @@ geekdocCollapseSection: true
 ## WebDAV with Basic Authentication
 
 {{< hint danger >}}
-Basic Authentication is disabled by default in oCIS because of security considerations. In order to make the following Rclone commands work the oCIS administrator needs to enable Basic Authentication eg. by setting the the environment variable `PROXY_ENABLE_BASIC_AUTH` to `true`. 
+Basic Authentication is disabled by default in oCIS because of security considerations. In order to make the following Rclone commands work the oCIS administrator needs to enable Basic Authentication eg. by setting the environment variable `PROXY_ENABLE_BASIC_AUTH` to `true`.
 
 Please consider to use [Rclone with OpenID Connect]({{< ref "webdav-sync-oidc.md" >}}) instead.
 {{< /hint >}}
@@ -43,4 +43,4 @@ We now can use Rclone to sync the local folder `/tmp/test` to `/test` in your oC
 rclone sync :local:/tmp :webdav:/test
 ```
 
-If your oCIS doesn't use valid SSL certificates, you may need to use `rclone --no-check-certificate sync ...`. 
+If your oCIS doesn't use valid SSL certificates, you may need to use `rclone --no-check-certificate sync ...`.
