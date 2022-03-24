@@ -12,7 +12,7 @@ geekdocCollapseSection: true
 ## WebDAV with Basic Authentication
 
 {{< hint danger >}}
-Basic Authentication is disabled by default in oCIS because of security considerations. In order to make the following Rclone commands work the oCIS administrator needs to enable Basic Authentication eg. by setting the environment variable `PROXY_ENABLE_BASIC_AUTH` to `true`.
+Basic Authentication is disabled by default in oCIS because of security considerations. In order to make the following Rclone commands work the oCIS administrator needs to enable Basic Authentication e.g. by setting the environment variable `PROXY_ENABLE_BASIC_AUTH` to `true`.
 
 Please consider to use [Rclone with OpenID Connect]({{< ref "webdav-sync-oidc.md" >}}) instead.
 {{< /hint >}}

@@ -28,7 +28,7 @@ Basically we have two sources for feature tests and test suites:
 
 At the moment both can be applied to oCIS since the api of oCIS is designed to be compatible to ownCloud.
 
-Since we have to offer an migration path to existing users of ownCloud, you can use your existing ownCloud as storage backend for oCIS. As another storage backend we offer oCIS native storage, also called "oCIS". This stores files directly on disk. Which storage backend is used is also reflected in the tests, there are always different tests for oCIS storage and ownCloud storage.
+Since we have to offer a migration path to existing users of ownCloud, you can use your existing ownCloud as storage backend for oCIS. As another storage backend we offer oCIS native storage, also called "oCIS". This stores files directly on disk. Which storage backend is used is also reflected in the tests, there are always different tests for oCIS storage and ownCloud storage.
 
 You can invoke two types of test suite runs:
 
@@ -55,7 +55,7 @@ This must be pointing to a valid feature definition.
 
 ### oCIS image to be tested (or: skip build and take existing image)
 
-By default the tests will be run against docker image built from your current working state of the oCIS repository. For some purposes it might also be handy to use a oCIS image from Docker Hub. Therefore you can provide the optional flag `OCIS_IMAGE_TAG=...` which must contain an available docker tag of the [owncloud/ocis registry on Docker Hub](https://hub.docker.com/r/owncloud/ocis) (eg. 'latest').
+By default, the tests will be run against the docker image built from your current working state of the oCIS repository. For some purposes it might also be handy to use a oCIS image from Docker Hub. Therefore you can provide the optional flag `OCIS_IMAGE_TAG=...` which must contain an available docker tag of the [owncloud/ocis registry on Docker Hub](https://hub.docker.com/r/owncloud/ocis) (eg. 'latest').
 
 ```
 make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-ocis OCIS_IMAGE_TAG=latest
@@ -75,7 +75,7 @@ The log output is opened in `less`. You can navigate up and down with your curso
 
 ### Cleanup
 
-During testing we start an redis and oCIS docker container. These will not be stopped automatically. You can stop them with:
+During testing we start a redis and oCIS docker container. These will not be stopped automatically. You can stop them with:
 
 ```
 make -C tests/acceptance/docker clean
