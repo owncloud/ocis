@@ -12,8 +12,8 @@ const (
 	// BundleUUIDRoleAdmin represents the admin role
 	BundleUUIDRoleAdmin = "71881883-1768-46bd-a24d-a356a2afdf7f"
 
-	// BundleUUIDRoleSpaceManager represents the space manager role
-	BundleUUIDRoleSpaceManager = "2aadd357-682c-406b-8874-293091995fdd"
+	// BundleUUIDRoleSpaceAdmin represents the space admin role
+	BundleUUIDRoleSpaceAdmin = "2aadd357-682c-406b-8874-293091995fdd"
 
 	// BundleUUIDRoleUser represents the user role.
 	BundleUUIDRoleUser = "d7beeea8-8ff4-406b-8fb6-ab2dd81e6b11"
@@ -66,7 +66,7 @@ const (
 func generateBundlesDefaultRoles() []*settingsmsg.Bundle {
 	return []*settingsmsg.Bundle{
 		generateBundleAdminRole(),
-		generateBundleSpaceManagerRole(),
+		generateBundleSpaceAdminRole(),
 		generateBundleUserRole(),
 		generateBundleGuestRole(),
 		generateBundleProfileRequest(),
@@ -87,13 +87,13 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 	}
 }
 
-func generateBundleSpaceManagerRole() *settingsmsg.Bundle {
+func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 	return &settingsmsg.Bundle{
-		Id:          BundleUUIDRoleSpaceManager,
-		Name:        "spacemanager",
+		Id:          BundleUUIDRoleSpaceAdmin,
+		Name:        "spaceadmin",
 		Type:        settingsmsg.Bundle_TYPE_ROLE,
 		Extension:   "ocis-roles",
-		DisplayName: "Spacemanager",
+		DisplayName: "Space Admin",
 		Resource: &settingsmsg.Resource{
 			Type: settingsmsg.Resource_TYPE_SYSTEM,
 		},
@@ -442,7 +442,7 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 			},
 		},
 		{
-			BundleId: BundleUUIDRoleSpaceManager,
+			BundleId: BundleUUIDRoleSpaceAdmin,
 			Setting: &settingsmsg.Setting{
 				Id:          CreateSpacePermissionID,
 				Name:        CreateSpacePermissionName,
@@ -460,7 +460,7 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 			},
 		},
 		{
-			BundleId: BundleUUIDRoleSpaceManager,
+			BundleId: BundleUUIDRoleSpaceAdmin,
 			Setting: &settingsmsg.Setting{
 				Id:          SetSpaceQuotaPermissionID,
 				Name:        SetSpaceQuotaPermissionName,
@@ -478,7 +478,7 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 			},
 		},
 		{
-			BundleId: BundleUUIDRoleSpaceManager,
+			BundleId: BundleUUIDRoleSpaceAdmin,
 			Setting: &settingsmsg.Setting{
 				Id:          ListAllSpacesPermissionID,
 				Name:        ListAllSpacesPermissionName,
@@ -496,7 +496,7 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 			},
 		},
 		{
-			BundleId: BundleUUIDRoleSpaceManager,
+			BundleId: BundleUUIDRoleSpaceAdmin,
 			Setting: &settingsmsg.Setting{
 				Id:          "640e00d2-4df8-41bd-b1c2-9f30a01e0e99",
 				Name:        "language-readwrite",
@@ -514,7 +514,7 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 			},
 		},
 		{
-			BundleId: BundleUUIDRoleSpaceManager,
+			BundleId: BundleUUIDRoleSpaceAdmin,
 			Setting: &settingsmsg.Setting{
 				Id:          SelfManagementPermissionID,
 				Name:        SelfManagementPermissionName,
@@ -581,17 +581,11 @@ func defaultRoleAssignments() []*settingsmsg.UserRoleAssignment {
 		}, {
 			AccountUuid: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c",
 			RoleId:      BundleUUIDRoleUser,
-		}, {
-			AccountUuid: "932b4540-8d16-481e-8ef4-588e4b6b151c",
-			RoleId:      BundleUUIDRoleUser,
-		}, {
-			AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7",
-			RoleId:      BundleUUIDRoleUser,
 		},
-		// default users with role "spacemanager"
+		// default users with role "spaceadmin"
 		{
 			AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7",
-			RoleId:      BundleUUIDRoleSpaceManager,
+			RoleId:      BundleUUIDRoleSpaceAdmin,
 		},
 	}
 }
