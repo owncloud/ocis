@@ -179,6 +179,7 @@ Prerequisite:
 | access webDAV with the "remote-files" function of LibreOffice | files are accessible and can be written back                |                                                                                                              |
 
 # Tips for testing
+
 ## WebDav
 WebDav is accessible under two different path
 - https://\<ocis-server\>/remote.php/webdav
@@ -225,3 +226,6 @@ To decode the HTTPS traffic we need the keys that were used to encrypt the traff
 ## format output
 - piping **xml** results to `xmllint` gives you nice formats. E.g. `curl -k --user marie:radioactivity "https://localhost:9200/ocs/v1.php/apps/files_sharing/api/v1/shares" | xmllint --format -`
 - piping **json** results to `jq` gives you nice formats. E.g. `curl -k --user marie:radioactivity "https://localhost:9200/ocs/v1.php/apps/files_sharing/api/v1/shares?format=json" | jq`
+
+## create corner cases
+- (Big List of Naughty Strings)[https://github.com/minimaxir/big-list-of-naughty-strings]
