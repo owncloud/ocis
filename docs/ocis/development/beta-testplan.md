@@ -156,18 +156,18 @@ Prerequisite:
 Prerequisite:
 - start ocis with basic auth `OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true bin/ocis server`
 
-| Test Case                                                     | Expected Result                                             | Comment                                                                                                |
-|---------------------------------------------------------------|-------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
-| use ocis as webDAV external storage in ownCloud 10            | resource access works                                       |                                                                                                        |
-| use ocis as webDAV external storage in ownCloud 10            | resource access works                                       |                                                                                                        |
-| access webDAV with your file-manager                          | that will not give you a good UX, but ocis should not crash | Urls: https://<ocis-server>/remote.php/webdav  & https://<ocis-server>/remote.php/dav/files/<username> |
-| access webDAV with the "remote-files" function of LibreOffice | files are accessible and can be written back                |                                                                                                        |
+| Test Case                                                     | Expected Result                                             | Comment                                                                                                      |
+|---------------------------------------------------------------|-------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| use ocis as webDAV external storage in ownCloud 10            | resource access works                                       |                                                                                                              |
+| use ocis as webDAV external storage in ownCloud 10            | resource access works                                       |                                                                                                              |
+| access webDAV with your file-manager                          | that will not give you a good UX, but ocis should not crash | Urls: https://\<ocis-server\>/remote.php/webdav  & https://\<ocis-server\>/remote.php/dav/files/\<username\> |
+| access webDAV with the "remote-files" function of LibreOffice | files are accessible and can be written back                |                                                                                                              |
 
 # Tips for testing
 ## WebDav
 WebDav is accessible under two different path
-- https://<ocis-server>/remote.php/webdav
-- https://<ocis-server>/remote.php/dav/files/<username>
+- https://\<ocis-server\>/remote.php/webdav
+- https://\<ocis-server\>/remote.php/dav/files/\<username\>
 
 WebDav specifications can be found on http://webdav.org/
 
