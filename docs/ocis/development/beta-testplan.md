@@ -77,23 +77,62 @@ documentations resources:
 ## Spaces
 
 Prerequisite:
+- variable declaration, for curl examples:
+```shell
+SERVER_URI=https://localhost:9200
+GRAPH_API_PATH=graph/v1.0
+SHARE_API_PATH=ocs/v2.php/apps/files_sharing/api/v1/shares
+USER=admin
+PASSWORD=admin
+```
 - create a new user  TODO curl commands
-- give the user the "Admin" role  TODO curl commands
+- give the user the "Admin" role
+  1. get the id of the admin role `curl -k -u $USER:$PASSWORD  $SERVER_URI/api/v0/settings/roles-list -d"{}" | jq '.bundles[] | select (.name | test("admin")) | .id'`
+  2. get the id of the user: `curl -k -u $USER:$PASSWORD  $SERVER_URI/api/v0/accounts/accounts-list -d"{}" | jq '.accounts[] | select (.preferredName | test("<user-name>")) | .id'`
+  3. assign role user to role: `curl -k -u $USER:$PASSWORD  $SERVER_URI/api/v0/settings/assignments-add -d'{"account_uuid":"<user-id>","role_id":"<admin-role-id>"}`
+- create a space: `curl -k -u $USER:$PASSWORD  "$SERVER_URI/$GRAPH_API_PATH/drives" -X POST -d'{"Name":"Space for finance","driveType":"project", "description":"we need some space"}'`
+- list spaces: `curl -k -u $USER:$PASSWORD  $SERVER_URI/$GRAPH_API_PATH/me/drives`
+- disable a space: `curl -k -u $USER:$PASSWORD  $SERVER_URI/$GRAPH_API_PATH/drives/<space-id> -X DELETE`
+- delete a space: `curl -k -u $USER:$PASSWORD  $SERVER_URI/$GRAPH_API_PATH/drives/<space-id> -X DELETE -H'Purge: T'`
+- restore a space: `curl -k -u $USER:$PASSWORD  $SERVER_URI/$GRAPH_API_PATH/drives/<space-id> -X PATCH -d"{}" -H"Restore: true"`
+- share a space: `curl -k -u $USER:$PASSWORD $SERVER_URI/$SHARE_API_PATH  -d'space_ref=<space-id>&shareType=7&shareWith=<receiver-username>&role=<role>'`
+  - Roles:
+    - viewer
+    - editor
+    - manager
+- share a resource within a space `curl -k -u $USER:$PASSWORD $SERVER_URI/$SHARE_API_PATH -d'shareType=0&shareWith=<receiver-username>&space_ref=<space-id>%2F<resource>&permissions=<permissions>`
+  - possible permissions
+    - 1 = read
+    - 2 = update
+    - 4 = create
+    - 8 = delete
+    - 15 = read/write
+    - 16 = share
+    - 31 = All permissions
+- WebDAV
+  - root: `https://<server-uri>/dav/spaces/<space-id>`
+  - [example commands for operations](#webdav)
 
-| Test Case                                                                                         | Expected Result                                                                   | Example / Comment                                                               |
-|---------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
-| create a space                                                                                    | space should exist                                                                | TODO curl commands                                                              |
-| create a space with special characters as a name & description                                    | space should exist                                                                | TODO curl commands / **what are valid characters for space name/ description?** |
-| create a space, delete the space                                                                  | space should not exist                                                            | TODO curl commands                                                              |
-| create a space, share the space with a user                                                       | space should be accessible                                                        | TODO curl commands                                                              |
-| create a space, share the space with a group                                                      | space should be accessible, space content is shared among all users               | TODO curl commands                                                              |
-| create a space, share the space with a group, disable the space                                   | space should not be accessible                                                    | TODO curl commands                                                              |
-| create a space, disable the space, try to share the space                                         | sharing the space should not be possible                                          | TODO curl commands                                                              |
-| create & share a space with a group with viewer role, do CRUD file/folder operations              | space content is readable but neither space not content should not be writable    | TODO curl commands                                                              |
-| create & share a space with a group with editor role, do CRUD file/folder operations              | space and content should be writable                                              | TODO curl commands                                                              |
-| create a space, try CRUD file/folder operations on the space with a user that its not shared with | space and content should not be accessible                                        | TODO curl commands                                                              |
-| create a space with a quota, share the space, upload files till the quota is exceeded             | upload should work till quota is full, uploads should not work when quota is full | TODO curl commands                                                              |
-| share file/folders from inside a space (see other sharing section)                                |                                                                                   |                                                                                 |
+| Test Case                                                                                                     | Expected Result                                                                   | Example / Comment |
+|---------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|-------------------|
+| create a space                                                                                                | space should exist                                                                |                   |
+| create a space with special characters as a name & description                                                | space should exist                                                                |                   |
+| create a space, delete the space                                                                              | space should not exist                                                            |                   |
+| create a space, share the space with a user                                                                   | space should be accessible                                                        |                   |
+| create a space, share the space with a group                                                                  | space should be accessible, space content is shared among all users               |                   |
+| create a space, share the space with a group, disable the space                                               | space should not be accessible                                                    |                   |
+| create a space, share the space with a user, disable the space, restore the space                             | space should be accessible                                                        |                   |
+| create a space, disable the space, delete the space, restore the space                                        | it should not be possible to restore the space                                    |                   |
+| create a space, disable the space, try to share the space                                                     | sharing the space should not be possible                                          |                   |
+| create a space, try delete the space                                                                          | it should not be possible to delete an enabled space                              |                   |
+| create & share a space with a group with viewer role, do CRUD file/folder operations with WebDAV              | space content is readable but neither space not content should not be writable    |                   |
+| create & share a space with a group with editor role, do CRUD file/folder operations with WebDAV              | space and content should be writable                                              |                   |
+| create a space, try CRUD file/folder operations with WebDAV on the space with a user that its not shared with | space and content should not be accessible                                        |                   |
+| create a space with a quota, share the space, upload files till the quota is exceeded                         | upload should work till quota is full, uploads should not work when quota is full |                   |
+| share file/folders from inside a space (see other sharing section)                                            | sharing works and obeys the permissions                                           |                   |
+| try the various space operations with invalid data                                                            | good error output, server does not crash                                          |                   |
+| try the various space operations without the correct permissions                                              | operations are not possible without sufficient permissions                        |                   |
+
 
 ## Web
 
@@ -183,9 +222,10 @@ Prerequisite:
 # Tips for testing
 
 ## WebDav
-WebDav is accessible under two different path
-- https://\<ocis-server\>/remote.php/webdav
-- https://\<ocis-server\>/remote.php/dav/files/\<username\>
+WebDav is accessible under different path
+- old: https://\<ocis-server\>/remote.php/webdav
+- new: https://\<ocis-server\>/remote.php/dav/files/\<username\>
+- spaces: https://\<ocis-server\>/dav/spaces/\<space-id\>
 
 WebDav specifications can be found on http://webdav.org/
 
