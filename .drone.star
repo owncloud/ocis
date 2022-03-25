@@ -1385,6 +1385,11 @@ def licenseChecks(ctx):
                     "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install-v1.sh | bash",
                     "fossa",
                 ],
+                "environment": {
+                    "FOSSA_API_KEY": {
+                        "from_secret": "fossa_api_key",
+                    },
+                },
             },
         ],
         "trigger": {
