@@ -14,7 +14,7 @@ Feature: Change data of space
     Given user "Alice" has created a space "Project Jupiter" of type "project" with quota "20"
     When user "Alice" changes the name of the "Project Jupiter" space to "Project Death Star"
     And user "Alice" changes the description of the "Project Death Star" space to "The Death Star is a fictional mobile space station"
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "400"
     When user "Alice" lists all available spaces via the GraphApi
     Then the json responded should contain a space "Project Death Star" with these key and value pairs:
       | key              | value                            |
