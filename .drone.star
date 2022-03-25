@@ -195,6 +195,7 @@ def main(ctx):
     build_release_helpers = [
         changelog(ctx),
         docs(ctx),
+        licenseChecks(ctx),
     ]
 
     test_pipelines.append(
@@ -1357,6 +1358,33 @@ def docs(ctx):
                         ],
                     },
                 },
+            },
+        ],
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/pull/**",
+            ],
+        },
+    }
+
+def licenseChecks(ctx):
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "license checks",
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": [
+            {
+                "name": "fossa",
+                "image": OC_CI_ALPINE,
+                "commands": [
+                    "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install-v1.sh | bash",
+                    "fossa",
+                ],
             },
         ],
         "trigger": {
