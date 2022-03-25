@@ -15,7 +15,7 @@ require (
 	github.com/asim/go-micro/plugins/registry/mdns/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/asim/go-micro/plugins/registry/nats/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/asim/go-micro/plugins/server/grpc/v4 v4.0.0-20220118152736-9e0be6c85d75
-	github.com/asim/go-micro/plugins/server/http/v4 v4.0.0-20220118152736-9e0be6c85d75
+	github.com/asim/go-micro/plugins/server/http/v4 v4.0.0-20220317022205-c6d352c83291
 	github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v4 v4.0.0-20220118152736-9e0be6c85d75
@@ -272,3 +272,6 @@ require (
 
 // we need to use a fork to make the windows build pass
 replace github.com/pkg/xattr => github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7
+
+// testing for https://github.com/cs3org/reva/pull/2665
+replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20220325151037-b6c1e6bbdff2
