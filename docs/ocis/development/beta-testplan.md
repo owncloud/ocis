@@ -9,24 +9,47 @@ geekdocFilePath: beta-testplan.md
 
 ## user / groups from LDAP
 
-- connect ocis to your preferred LDAP server  TODO link documentation
+Prerequisite:
+- connect ocis to your preferred LDAP server
 - create users and groups in LDAP
 - start ocis with basic auth `OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true bin/ocis server`
 
-| Test Case                                                                                             | Expected Result                                                                       | Example / Comment          |
-|-------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|----------------------------|
-| share file / folder to a group                                                                        | member of the group can access shared item                                            | TODO curl commands         |
-| share file / folder to a group, remove member from group in LDAP                                      | removed member should not have access to the shared item                              | TODO curl commands         |
-| share file / folder to a group with different permissions, as receiver try to violate the permissions | receiver should not be able to violate the permissions                               | TODO curl commands         |
-| try to login with wrong credentials                                                                   | login should not be possible                                                          | TODO curl commands         |
-| set a quota in LDAP, upload files till the quota is exceeded                                          | upload should work till quota is full, uploads should not work when quota is full     | **Is that even possible?** |
-| try to access files / folders of other users                                                          | access should not be possible                                                         | TODO curl commands         |
-| try to share with non-existing users and groups                                                       | sharing should not be possible                                                        | TODO curl commands         |
-| try to share with user/groups-names that contain special characters                                   | sharing should be possible, access shares with that user does not create any problems | TODO curl commands         |
+documentations resources:
+  - configure ocis with LDAP **TODO link documentation**
+  - [sharing API is compatible to ownCloud 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
+
+
+| Test Case                                                                                             | Expected Result                                                                       | Example / Comment |
+|-------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|-------------------|
+| share file / folder to a group                                                                        | member of the group can access shared item                                            |                   |
+| share file / folder to a group, remove member from group in LDAP                                      | removed member should not have access to the shared item                              |                   |
+| share file / folder to a group with different permissions, as receiver try to violate the permissions | receiver should not be able to violate the permissions                                |                   |
+| try to login with wrong credentials                                                                   | login should not be possible                                                          |                   |
+| set a quota in LDAP, upload files till the quota is exceeded                                          | upload should work till quota is full, uploads should not work when quota is full     |                   |
+| try to access files / folders of other users                                                          | access should not be possible                                                         |                   |
+| try to share with non-existing users and groups                                                       | sharing should not be possible                                                        |                   |
+| try to share with user/groups-names that contain special characters                                   | sharing should be possible, access shares with that user does not create any problems |                   |
+
+## other sharing
+
+should be tried in various ways and in different environment
+
+documentations resources:
+- [sharing API is compatible to ownCloud 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
+
+| Test Case                                                                             | Expected Result                                                       | Example / Comment                                         |
+|---------------------------------------------------------------------------------------|-----------------------------------------------------------------------|-----------------------------------------------------------|
+| share a file/folder with the same name from different users                           | receiver can accept and access both file/folders and distinguish them | [known bug](https://github.com/owncloud/ocis/issues/2131) |
+| share a file/folder with the same name but different permissions from different users | receiver can access both file/folders according to the permissions    | [known bug](https://github.com/owncloud/ocis/issues/2131) |
+| share a file/folder with the same name but different locations from one user          | receiver can accept and access both file/folders and distinguish them | [known bug](https://github.com/owncloud/ocis/issues/2131) |
+| share a file/folder back to the sharer                                                | sharing back should not be possible                                   |                                                           |
+| re-share a file/folder with different permissions                                     | sharing with lower permissions is possible, but not with higher       |                                                           |
+| decline received share                                                                | share should be gone                                                  |                                                           |
+
 
 ## parallel deployment
 
-- setup oC10 and ocis is parallel TODO documentation link
+- setup oC10 and ocis is parallel **TODO documentation link**
 - create users and groups in LDAP
 
 | Test Case                                                                                                                                                        | Expected Result                                          | Example / Comment          |
@@ -40,20 +63,20 @@ Prerequisite:
 - create a new user  TODO curl commands
 - give the user the "Admin" role  TODO curl commands
 
-| Test Case                                                                                         | Expected Result                                                                    | Example / Comment                                                               |
-|---------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
-| create a space                                                                                    | space should exist                                                                 | TODO curl commands                                                              |
-| create a space with special characters as a name & description                                    | space should exist                                                                 | TODO curl commands / **what are valid characters for space name/ description?** |
-| create a space, delete the space                                                                  | space should not exist                                                             | TODO curl commands                                                              |
-| create a space, share the space with a user                                                       | space should be accessible                                                         | TODO curl commands                                                              |
-| create a space, share the space with a group                                                      | space should be accessible, space content is shared among all users                | TODO curl commands                                                              |
-| create a space, share the space with a group, disable the space                                   | space should not be accessible                                                     | TODO curl commands                                                              |
-| create a space, disable the space, try to share the space                                         | sharing the space should not be possible                                           | TODO curl commands                                                              |
-| create & share a space with a group with viewer role, do CRUD file/folder operations              | space content is readable but neither space not content should not be writable     | TODO curl commands                                                              |
-| create & share a space with a group with editor role, do CRUD file/folder operations              | space and content should be writable                                               | TODO curl commands                                                              |
-| create a space, try CRUD file/folder operations on the space with a user that its not shared with | space and content should not be accessible                                         | TODO curl commands                                                              |
-| create a space with a quota, share the space, upload files till the quota is exceeded             | upload should work till quota is full, uploads should not work when quota is full  | TODO curl commands                                                              |
-
+| Test Case                                                                                         | Expected Result                                                                   | Example / Comment                                                               |
+|---------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| create a space                                                                                    | space should exist                                                                | TODO curl commands                                                              |
+| create a space with special characters as a name & description                                    | space should exist                                                                | TODO curl commands / **what are valid characters for space name/ description?** |
+| create a space, delete the space                                                                  | space should not exist                                                            | TODO curl commands                                                              |
+| create a space, share the space with a user                                                       | space should be accessible                                                        | TODO curl commands                                                              |
+| create a space, share the space with a group                                                      | space should be accessible, space content is shared among all users               | TODO curl commands                                                              |
+| create a space, share the space with a group, disable the space                                   | space should not be accessible                                                    | TODO curl commands                                                              |
+| create a space, disable the space, try to share the space                                         | sharing the space should not be possible                                          | TODO curl commands                                                              |
+| create & share a space with a group with viewer role, do CRUD file/folder operations              | space content is readable but neither space not content should not be writable    | TODO curl commands                                                              |
+| create & share a space with a group with editor role, do CRUD file/folder operations              | space and content should be writable                                              | TODO curl commands                                                              |
+| create a space, try CRUD file/folder operations on the space with a user that its not shared with | space and content should not be accessible                                        | TODO curl commands                                                              |
+| create a space with a quota, share the space, upload files till the quota is exceeded             | upload should work till quota is full, uploads should not work when quota is full | TODO curl commands                                                              |
+| share file/folders from inside a space (see other sharing section)                                |                                                                                   |                                                                                 |
 
 ## Web
 
@@ -127,3 +150,63 @@ Prerequisite:
 | Connect to server, see files, download one.   | No problems while downloading.           |         |
 | Upload a file using mobile client.            | No problems while uploading.             |         |
 | Share a file with userB using mobile client.  | File is correctly shared.                |         |
+
+## other WebDAV clients
+
+Prerequisite:
+- start ocis with basic auth `OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true bin/ocis server`
+
+| Test Case                                                     | Expected Result                                             | Comment                                                                                                |
+|---------------------------------------------------------------|-------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| use ocis as webDAV external storage in ownCloud 10            | resource access works                                       |                                                                                                        |
+| use ocis as webDAV external storage in ownCloud 10            | resource access works                                       |                                                                                                        |
+| access webDAV with your file-manager                          | that will not give you a good UX, but ocis should not crash | Urls: https://<ocis-server>/remote.php/webdav  & https://<ocis-server>/remote.php/dav/files/<username> |
+| access webDAV with the "remote-files" function of LibreOffice | files are accessible and can be written back                |                                                                                                        |
+
+# Tips for testing
+## WebDav
+WebDav is accessible under two different path
+- https://<ocis-server>/remote.php/webdav
+- https://<ocis-server>/remote.php/dav/files/<username>
+
+WebDav specifications can be found on http://webdav.org/
+
+here some general WebDav requests examples:
+
+variable declaration:
+```shell
+SERVER_URI=https://localhost:9200
+API_PATH=remote.php/webdav
+USER=admin
+PASSWORD=admin
+```
+- list content of root folder: `curl -k -u $USER:$PASSWORD  "$SERVER_URI/$API_PATH/" -X PROPFIND`
+- list content of sub-folder: `curl -k -u $USER:$PASSWORD  "$SERVER_URI/$API_PATH/f1" -X PROPFIND`
+- create a folder: `curl -k -u $USER:$PASSWORD  "$SERVER_URI/$API_PATH/folder" -X MKCOL`
+- delete a resource: `curl -k -u $USER:$PASSWORD  "$SERVER_URI/$API_PATH/folder" -X DELETE`
+- rename / move a resource: `curl -k -u $USER:$PASSWORD  "$SERVER_URI/$API_PATH/folder" -X MOVE -H "Destination: $SERVER_URI/$API_PATH/renamed"`
+- copy a resource: `curl -k -u $USER:$PASSWORD  "$SERVER_URI/$API_PATH/folder" -X COPY -H "Destination: $SERVER_URI/$API_PATH/folder-copy"`
+
+## decode HTTPS traffic with wireshark
+To decode the HTTPS traffic we need the keys that were used to encrypt the traffic. Those keys are kept secret by the clients, but we can request the clients to save them in a specific file, so that wireshark can use them to decrypt the traffic again.
+
+1. create key file: `touch /tmp/sslkey.log`
+2. start wireshark
+3. set log filename
+    - navigate to Edit=>Preferences=>Protocols=>TLS
+    - in the field `(Pre)-Master-Secret log filename` enter `/tmp/sslkey.log`
+4. decode as HTTP
+    - navigate to Analyze=>Decode As...
+    - click the + button
+    - set Field: `TLS Port; Value=9200; Type: Integer, base 10; Default (none); Current HTTP` (adjust the port if you are using another one than 9200)
+5. start recording
+    - use `port 9200` as capture filter to only record ocis packages
+    - use `http` as display filter to see only decoded traffic
+6. run test-software with `SSLKEYLOGFILE=/tmp/sslkey.log` as env. variable e.g.
+   - curl: `SSLKEYLOGFILE=/tmp/sslkey.log curl -k -u admin:admin https://localhost:9200/ocs/v1.php/cloud/users`
+   - Browser: `SSLKEYLOGFILE=/tmp/sslkey.log firefox`
+   - LibreOffice: `SSLKEYLOGFILE=/tmp/sslkey.log libreoffice`
+
+## format output
+- piping **xml** results to `xmllint` gives you nice formats. E.g. `curl -k --user marie:radioactivity "https://localhost:9200/ocs/v1.php/apps/files_sharing/api/v1/shares" | xmllint --format -`
+- piping **json** results to `jq` gives you nice formats. E.g. `curl -k --user marie:radioactivity "https://localhost:9200/ocs/v1.php/apps/files_sharing/api/v1/shares?format=json" | jq`
