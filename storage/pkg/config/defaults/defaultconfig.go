@@ -449,6 +449,7 @@ func DefaultConfig() *config.Config {
 			SharesNamespace: defaultShareFolder,
 			PublicURL:       defaultPublicURL,
 			Prefix:          "",
+			GatewaySVC:      defaultGatewayAddr,
 			Insecure:        false, // true?
 			Timeout:         84300,
 			JWTSecret:       "Pive-Fumkiu4",
