@@ -14,11 +14,11 @@ This document is supposed to give you some ideas how and what to test on ocis. I
 One option to create new test-cases and to stress the system is to examine what the [API acceptance-tests](https://owncloud.dev/ocis/development/testing/#testing-with-test-suite-natively-installed) or the [web-UI](#web) does, [examine the requests](#decode-https-traffic-with-wireshark) and do something a bit different with curl. This is also a good way to find out how APIs work that are not already fully documented.
 
 Some cases have suggested setup steps, but feel free to use other setups. This can include:
-- different deployment methods (e.g. running compiled binary, docker-container, docker-compose setup)
-- different identity managers (e.g. different external LDAP, internal IDM) **TODO documentation link**
-- different reverse proxies **TODO documentation link**
+- different deployment methods (e.g. running single binary, docker-container, docker-compose setup, [individual services in own docker containers](https://owncloud.dev/ocis/deployment/ocis_individual_services/))
+- different identity managers (e.g. [different external LDAP](https://owncloud.dev/ocis/deployment/ocis_ldap/), internal IDM)
+- different reverse proxies (e.g. [traefik](https://owncloud.dev/ocis/deployment/ocis_traefik/))
 - different IdPs **TODO documentation link**
-- different storage systems ([cephfs](https://owncloud.dev/ocis/storage-backends/cephfs/), decompose fs, [decompose fs on NFS](https://owncloud.dev/ocis/storage-backends/dcfsnfs/), [EOS](https://owncloud.dev/ocis/storage-backends/eos/), S3 ) **are that the things we want to support?**
+- different storage systems ([cephfs](https://owncloud.dev/ocis/storage-backends/cephfs/), decompose fs, [decompose fs on NFS](https://owncloud.dev/ocis/storage-backends/dcfsnfs/), [EOS](https://owncloud.dev/ocis/storage-backends/eos/), [S3](https://owncloud.dev/ocis/deployment/ocis_s3/) ) **are that the things we want to support?**
 
 It's a good idea to test ocis in the same environment where you are planning to use it later (with the LDAP server, storage system, etc. of your organisation).
 
@@ -32,9 +32,9 @@ Prerequisite:
 - start ocis with basic auth `OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true bin/ocis server`
 
 documentations resources:
-  - configure ocis with LDAP **TODO link documentation**
+  - [configure ocis with LDAP](https://owncloud.dev/ocis/deployment/ocis_ldap/)
   - [sharing API is compatible to ownCloud 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
-
+  - [webDav operations](#webdav)
 
 | Test Case                                                                                             | Expected Result                                                                       | Example / Comment |
 |-------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|-------------------|
@@ -53,6 +53,7 @@ should be tried in various ways and in different environment
 
 documentations resources:
 - [sharing API is compatible to ownCloud 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
+- [webDav operations](#webdav)
 
 | Test Case                                                                             | Expected Result                                                       | Example / Comment                                         |
 |---------------------------------------------------------------------------------------|-----------------------------------------------------------------------|-----------------------------------------------------------|
@@ -66,13 +67,17 @@ documentations resources:
 
 ## parallel deployment
 
-- setup oC10 and ocis is parallel **TODO documentation link**
+- [configure ocis with LDAP](https://owncloud.dev/ocis/deployment/ocis_ldap/)
+- [setup oC10 and ocis is parallel](https://owncloud.dev/ocis/deployment/oc10_ocis_parallel/)
 - create users and groups in LDAP
 
-| Test Case                                                                                                                                                        | Expected Result                                          | Example / Comment          |
-|------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------|----------------------------|
-| share file / folder to a group in one implementation (use different permissions), access the items with the other implementation, try to violate the permissions | receiver should not be able to violate the permissions   | TODO curl commands         |
-| share file / folder to a group, remove member from group in LDAP, try to access items with the removed member from both implementations                          | removed member should not have access to the shared item | TODO curl commands         |
+documentations resources:
+- [sharing API is compatible to ownCloud 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
+
+| Test Case                                                                                                                                                        | Expected Result                                          | Example / Comment |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------|-------------------|
+| share file / folder to a group in one implementation (use different permissions), access the items with the other implementation, try to violate the permissions | receiver should not be able to violate the permissions   |                   |
+| share file / folder to a group, remove member from group in LDAP, try to access items with the removed member from both implementations                          | removed member should not have access to the shared item |                   |
 
 ## Spaces
 
@@ -85,7 +90,7 @@ SHARE_API_PATH=ocs/v2.php/apps/files_sharing/api/v1/shares
 USER=admin
 PASSWORD=admin
 ```
-- create a new user  TODO curl commands
+- create a new user `curl -k -u $USER:$PASSWORD $SERVER_URI/ocs/v2.php/cloud/users -d'userid=<username>&password=<password>&displayname=<displayName>&username=<username>&email=<email>'`
 - give the user the "Admin" role
   1. get the id of the admin role `curl -k -u $USER:$PASSWORD  $SERVER_URI/api/v0/settings/roles-list -d"{}" | jq '.bundles[] | select (.name | test("admin")) | .id'`
   2. get the id of the user: `curl -k -u $USER:$PASSWORD  $SERVER_URI/api/v0/accounts/accounts-list -d"{}" | jq '.accounts[] | select (.preferredName | test("<user-name>")) | .id'`
@@ -137,7 +142,7 @@ PASSWORD=admin
 ## Web
 
 Prerequisite:
-- connect ocis to your preferred LDAP server
+- [connect ocis to your preferred LDAP server](https://owncloud.dev/ocis/deployment/ocis_ldap/)
 - create users and groups in LDAP
 - Use your preferred browser
 
@@ -185,7 +190,7 @@ Prerequisite:
 ## Desktop Client
 
 Prerequisite:
-- connect ocis to your preferred LDAP server
+- [connect ocis to your preferred LDAP server](https://owncloud.dev/ocis/deployment/ocis_ldap/)
 - create users and groups in LDAP
 - use your preferred OS for the desktop client
 
@@ -198,7 +203,7 @@ Prerequisite:
 ## Mobile Clients (iOS || Android)
 
 Prerequisite:
-- connect ocis to your preferred LDAP server
+- [connect ocis to your preferred LDAP server](https://owncloud.dev/ocis/deployment/ocis_ldap/)
 - create users and groups in LDAP
 
 | Test Case                                     | Expected Result                          | Comment |
@@ -270,5 +275,5 @@ To decode the HTTPS traffic we need the keys that were used to encrypt the traff
 - piping **xml** results to `xmllint` gives you nice formats. E.g. `curl -k --user marie:radioactivity "https://localhost:9200/ocs/v1.php/apps/files_sharing/api/v1/shares" | xmllint --format -`
 - piping **json** results to `jq` gives you nice formats. E.g. `curl -k --user marie:radioactivity "https://localhost:9200/ocs/v1.php/apps/files_sharing/api/v1/shares?format=json" | jq`
 
-## create corner cases
+## create edge cases
 - [Big List of Naughty Strings](https://github.com/minimaxir/big-list-of-naughty-strings)
