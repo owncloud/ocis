@@ -7,6 +7,21 @@ geekdocEditPath: edit/master/docs/ocis/development
 geekdocFilePath: beta-testplan.md
 ---
 
+# Beta Testing
+
+This document is supposed to give you some ideas how and what to test on ocis. It's not ment to be an extensive list of all tests to be done, rather it should help you, as beta-tester, to get started and enable you to get creative and create own test-cases. [Derive from these examples, be creative, do unusual and unconventional things, to try to break things](https://twitter.com/sempf/status/514473420277694465).
+
+Some cases have suggested setup steps, but feel free to use other setups. This can include:
+- different deployment methods (e.g. running compiled binary, docker-container, docker-compose setup)
+- different identity managers (e.g. different external LDAP, internal IDM) **TODO documentation link**
+- different reverse proxies **TODO documentation link**
+- different IdPs **TODO documentation link**
+- different storage systems ([cephfs](https://owncloud.dev/ocis/storage-backends/cephfs/), decompose fs, [decompose fs on NFS](https://owncloud.dev/ocis/storage-backends/dcfsnfs/), [EOS](https://owncloud.dev/ocis/storage-backends/eos/), S3 ) **are that the things we want to support?**
+
+It's a good idea to test ocis in the same environment where you are planning to use it later (with the LDAP server, storage system, etc. of your organisation).
+
+# Testplan
+
 ## user / groups from LDAP
 
 Prerequisite:
