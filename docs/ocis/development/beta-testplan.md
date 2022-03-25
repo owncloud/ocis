@@ -11,8 +11,7 @@ geekdocFilePath: beta-testplan.md
 
 This document is supposed to give you some ideas how and what to test on ocis. It's not ment to be an extensive list of all tests to be done, rather it should help you, as beta-tester, to get started and enable you to get creative and create own test-cases. [Derive from these examples, be creative, do unusual and unconventional things, to try to break things](https://twitter.com/sempf/status/514473420277694465).
 
-One option to create new test-cases and to stress the system is to examine what the [API acceptance-tests](https://owncloud.dev/ocis/development/testing/#testing-with-test-suite-natively-installed) or the [web-UI](#web) does, [examine the requests](#
-decode-https-traffic-with-wireshark) and do something a bit different with curl. This is also a good way to find out how APIs work that are not already fully documented.
+One option to create new test-cases and to stress the system is to examine what the [API acceptance-tests](https://owncloud.dev/ocis/development/testing/#testing-with-test-suite-natively-installed) or the [web-UI](#web) does, [examine the requests](#decode-https-traffic-with-wireshark) and do something a bit different with curl. This is also a good way to find out how APIs work that are not already fully documented.
 
 Some cases have suggested setup steps, but feel free to use other setups. This can include:
 - different deployment methods (e.g. running compiled binary, docker-container, docker-compose setup)
@@ -232,4 +231,4 @@ To decode the HTTPS traffic we need the keys that were used to encrypt the traff
 - piping **json** results to `jq` gives you nice formats. E.g. `curl -k --user marie:radioactivity "https://localhost:9200/ocs/v1.php/apps/files_sharing/api/v1/shares?format=json" | jq`
 
 ## create corner cases
-- (Big List of Naughty Strings)[https://github.com/minimaxir/big-list-of-naughty-strings]
+- [Big List of Naughty Strings](https://github.com/minimaxir/big-list-of-naughty-strings)
