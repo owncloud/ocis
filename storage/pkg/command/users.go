@@ -19,7 +19,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Users is the entrypoint for the sharing command.
+// Users is the entrypoint for the users command.
 func Users(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "users",

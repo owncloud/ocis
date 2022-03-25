@@ -92,10 +92,6 @@ func DefaultConfig() *config.Config {
 				JoinOwnCloudUUID:   false,
 				EnableMedialSearch: false,
 			},
-			OCDav: config.OCDav{
-				WebdavNamespace:   defaultStorageNamespace,
-				DavFilesNamespace: defaultStorageNamespace,
-			},
 			Archiver: config.Archiver{
 				MaxNumFiles: 10000,
 				MaxSize:     1073741824,
@@ -236,7 +232,7 @@ func DefaultConfig() *config.Config {
 					Protocol:    "",
 					Endpoint:    "",
 					DebugAddr:   "127.0.0.1:9141",
-					Services:    []string{"datagateway", "ocdav", "ocs", "appprovider"},
+					Services:    []string{"datagateway", "ocs", "appprovider"},
 					Config:      nil,
 					Context:     nil,
 					Supervised:  false,
@@ -248,8 +244,6 @@ func DefaultConfig() *config.Config {
 				DatagatewayPrefix:          "data",
 				Favorites:                  false,
 				ProjectSpaces:              true,
-				OCDavInsecure:              false, // true?
-				OCDavPrefix:                "",
 				OCSPrefix:                  "ocs",
 				OCSSharePrefix:             defaultShareFolder,
 				OCSHomeNamespace:           defaultStorageNamespace,
@@ -445,6 +439,19 @@ func DefaultConfig() *config.Config {
 			ChecksumSupportedTypes:      []string{"sha1", "md5", "adler32"},
 			ChecksumPreferredUploadType: "",
 			DefaultUploadProtocol:       "tus",
+		},
+		// TODO move ocdav config to a separate service
+		OCDav: config.OCDav{
+			Addr:            "127.0.0.1:0", // :0 to pick any local free port
+			DebugAddr:       "127.0.0.1:9163",
+			WebdavNamespace: defaultStorageNamespace,
+			FilesNamespace:  defaultStorageNamespace,
+			SharesNamespace: defaultShareFolder,
+			PublicURL:       defaultPublicURL,
+			Prefix:          "",
+			Insecure:        false, // true?
+			Timeout:         84300,
+			JWTSecret:       "Pive-Fumkiu4",
 		},
 		Tracing: config.Tracing{
 			Service: "storage",

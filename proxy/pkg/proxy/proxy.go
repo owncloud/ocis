@@ -198,12 +198,12 @@ func (p *MultiHostReverseProxy) AddHost(policy string, target *url.URL, rt confi
 			next, err := sel.Select(rt.Service)
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not select %s service from the registry: %v", rt.Service, err))
-				return // TODO error?
+				return // TODO error? fallback to target.Host & Scheme?
 			}
 			node, err := next()
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not select next node for service %s: %v", rt.Service, err))
-				return // TODO error?
+				return // TODO error? fallback to target.Host & Scheme?
 			}
 			req.URL.Host = node.Address
 			req.URL.Scheme = node.Metadata["protocol"] // TODO check property exists?
