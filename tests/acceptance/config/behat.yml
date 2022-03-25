@@ -56,5 +56,19 @@ default:
         - FilesVersionsContext:
         - PublicWebDavContext:
 
+    apiGraphUser:
+      paths:
+        - '%paths.base%/../features/apiGraphUser'
+      contexts:
+        - GraphContext:
+        - FeatureContext: *common_feature_context_params
+
+    apiGraphGroup:
+      paths:
+        - '%paths.base%/../features/apiGraphGroup'
+      contexts:
+        - GraphContext:
+        - FeatureContext: *common_feature_context_params
+
   extensions:
     Cjm\Behat\StepThroughExtension: ~
