@@ -516,7 +516,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 			var err error
 			remoteItem, err = g.getRemoteItem(ctx, &grantID, baseURL)
 			if err != nil {
-				g.logger.Debug().Err(err).Msg("Could not fetch remote item for mountpoint")
+				g.logger.Debug().Err(err).Msg(err.Error())
 			}
 		}
 		if remoteItem != nil {

@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -105,7 +106,7 @@ func (g Graph) getRemoteItem(ctx context.Context, root *storageprovider.Resource
 	if res.Status.Code != cs3rpc.Code_CODE_OK {
 		// Only log this, there could be mountpoints which have no grant
 		g.logger.Debug().Msg(res.Status.Message)
-		return nil, nil
+		return nil, errors.New("could not fetch grant resource for the mountpoint")
 	}
 	item, err := cs3ResourceToRemoteItem(res.Info)
 	if err != nil {

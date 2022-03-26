@@ -184,6 +184,78 @@ var _ = Describe("Graph", func() {
 			}
 			`))
 		})
+		It("can list a spaces type mountpoint", func() {
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status: status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{
+					{
+						Id:        &provider.StorageSpaceId{OpaqueId: "aID!differentID"},
+						SpaceType: "mountpoint",
+						Root: &provider.ResourceId{
+							StorageId: "aID",
+							OpaqueId:  "differentID",
+						},
+						Name: "New Folder",
+						Opaque: &typesv1beta1.Opaque{
+							Map: map[string]*typesv1beta1.OpaqueEntry{
+								"spaceAlias":     {Decoder: "plain", Value: []byte("mountpoint/new-folder")},
+								"etag":           {Decoder: "plain", Value: []byte("101112131415")},
+								"grantStorageID": {Decoder: "plain", Value: []byte("ownerStorageID")},
+								"grantOpaqueID":  {Decoder: "plain", Value: []byte("opaqueID")},
+							},
+						},
+					},
+				},
+			}, nil)
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &provider.ResourceInfo{
+					Etag:  "123456789",
+					Type:  provider.ResourceType_RESOURCE_TYPE_CONTAINER,
+					Id:    &provider.ResourceId{StorageId: "ownerStorageID", OpaqueId: "opaqueID"},
+					Path:  "New Folder",
+					Mtime: &typesv1beta1.Timestamp{Seconds: 1648327606},
+					Size:  uint64(1234),
+				},
+			}, nil)
+			gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+				Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
+			rr := httptest.NewRecorder()
+			svc.GetDrives(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+
+			body, _ := io.ReadAll(rr.Body)
+			Expect(body).To(MatchJSON(`
+			{
+				"value":[
+					{
+						"driveAlias":"mountpoint/new-folder",
+						"driveType":"mountpoint",
+						"id":"aID!differentID",
+						"name":"New Folder",
+						"root":{
+							"eTag":"101112131415",
+							"id":"aID!differentID",
+							"remoteItem":{
+								"eTag":"123456789",
+								"folder":{},
+								"id":"ownerStorageID!opaqueID",
+								"lastModifiedDateTime":"2022-03-26T21:46:46+01:00",
+								"name":"New Folder",
+								"size":1234,
+								"webDavUrl":"https://localhost:9200/dav/spaces/ownerStorageID!opaqueID"
+							},
+							"webDavUrl":"https://localhost:9200/dav/spaces/aID!differentID"
+						}
+					}
+				]
+			}
+			`))
+		})
 		It("can not list spaces with wrong sort parameter", func() {
 			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
 				Status:        status.NewOK(ctx),
