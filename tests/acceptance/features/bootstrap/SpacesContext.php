@@ -57,6 +57,11 @@ class SpacesContext implements Context {
 	private array $createdSpaces;
 
 	/**
+	 * @var string
+	 */
+	private $ocsApiUrl = '/ocs/v2.php/apps/files_sharing/api/v1/shares';
+
+	/**
 	 * @param string $spaceName
 	 *
 	 * @return string name of the user that created the space
@@ -1551,7 +1556,96 @@ class SpacesContext implements Context {
 			"role" => $role // role overrides the permissions parameter
 		];
 
-		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares";
+		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::post(
+				$fullUrl,
+				"",
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				$body
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" shares the following entity "([^"]*)" inside of space "([^"]*)" with user "([^"]*)" with role "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $entity
+	 * @param  string $spaceName
+	 * @param  string $userRecipient
+	 * @param  string $role
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function sendShareEntityInsideOfSpaceRequest(
+		string $user,
+		string $entity,
+		string $spaceName,
+		string $userRecipient,
+		string $role
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$body = [
+			"space_ref" => $space['id'] . "/" . $entity,
+			"shareType" => 0,
+			"shareWith" => $userRecipient,
+			"role" => $role
+		];
+
+		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::post(
+				$fullUrl,
+				"",
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				$body
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" creates a public link share inside of space "([^"]*)" with settings:$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param TableNode|null $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function createPublicLinkToEntityInsideOfSpaceRequest(
+		string $user,
+		string $spaceName,
+		?TableNode $table
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$rows = $table->getRowsHash();
+
+		$rows["path"] = \array_key_exists("path", $rows) ? $rows["path"] : null;
+		$rows["shareType"] = \array_key_exists("shareType", $rows) ? $rows["shareType"] : null;
+		$rows["permissions"] = \array_key_exists("permissions", $rows) ? $rows["permissions"] : null;
+		$rows["password"] = \array_key_exists("password", $rows) ? $rows["password"] : null;
+		$rows["name"] = \array_key_exists("name", $rows) ? $rows["name"] : null;
+		$rows["expireDate"] = \array_key_exists("expireDate", $rows) ? $rows["expireDate"] : null;
+		
+		$body = [
+			"space_ref" => $space['id'] . "/" . $rows["path"],
+			"shareType" => $rows["shareType"],
+			"permissions" => $rows["permissions"],
+			"password" => $rows["password"],
+			"name" => $rows["name"],
+			"expireDate" => $rows["expireDate"]
+		];
+
+		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
 
 		$this->featureContext->setResponse(
 			HttpRequestHelper::post(
@@ -1609,7 +1703,7 @@ class SpacesContext implements Context {
 		string $userRecipient
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $this->baseUrl . "/ocs/v2.php/apps/files_sharing/api/v1/shares/" . $space['id'] . "?shareWith=" . $userRecipient;
+		$fullUrl = $this->baseUrl . $this->ocsApiUrl . "/" . $space['id'] . "?shareWith=" . $userRecipient;
 
 		$this->featureContext->setResponse(
 			HttpRequestHelper::delete(
