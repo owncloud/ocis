@@ -245,7 +245,7 @@ var _ = Describe("Graph", func() {
 			Expect(*value.Root.Id).To(Equal("aID!differentID"))
 			Expect(*value.Root.RemoteItem.ETag).To(Equal("123456789"))
 			Expect(*value.Root.RemoteItem.Id).To(Equal("ownerStorageID!opaqueID"))
-			Expect(*value.Root.RemoteItem.LastModifiedDateTime).To(Equal(time.Unix(1648327606, 0)))
+			Expect(value.Root.RemoteItem.LastModifiedDateTime.UTC()).To(Equal(time.Unix(1648327606, 0).UTC()))
 			Expect(*value.Root.RemoteItem.Folder).To(Equal(libregraph.Folder{}))
 			Expect(*value.Root.RemoteItem.Name).To(Equal("New Folder"))
 			Expect(*value.Root.RemoteItem.Size).To(Equal(int64(1234)))
