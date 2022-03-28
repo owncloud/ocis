@@ -121,6 +121,7 @@ The following sections list the changes for unreleased.
   * Enh [cs3org/reva#2628](https://github.com/cs3org/reva/pull/2628): Webdav trash-bin API for spaces
 
    https://github.com/owncloud/ocis/pull/3330
+   https://github.com/owncloud/ocis/pull/3405
 
 * Enhancement - Update ownCloud Web to v5.3.0: [#6561](https://github.com/owncloud/web/pull/6561)
 
