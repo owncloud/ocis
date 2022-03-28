@@ -188,6 +188,7 @@ def main(ctx):
 
     test_pipelines = \
         cancelPreviousBuilds() + \
+        [goLicenseCheck(ctx)] + \
         [buildOcisBinaryForTesting(ctx)] + \
         testOcisModules(ctx) + \
         testPipelines(ctx)
@@ -369,6 +370,37 @@ def buildOcisBinaryForTesting(ctx):
                  makeGoGenerate("") +
                  build() +
                  rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis"),
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/tags/v*",
+                "refs/pull/**",
+            ],
+        },
+        "volumes": [pipelineVolumeGo],
+    }
+
+def goLicenseCheck(ctx):
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "go-license-check",
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") +
+                 makeNodeGenerate("") +
+                 makeGoGenerate("") +
+                 build() +
+                 [{
+                     "name": "check-go-license",
+                     "image": OC_CI_GOLANG,
+                     "commands": [
+                         "make check-go-licenses",
+                     ],
+                     "volumes": [stepVolumeGo],
+                 }],
         "trigger": {
             "ref": [
                 "refs/heads/master",

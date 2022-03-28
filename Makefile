@@ -174,6 +174,16 @@ protobuf:
 bingo-update: $(BINGO)
 	$(BINGO) get -l -u
 
+.PHONY: check-go-licenses
+check-go-licenses: $(GO_LICENSES)
+	$(GO_LICENSES) check ./...
+
+.PHONY: save-go-licenses
+save-go-licenses: $(GO_LICENSES)
+	$(GO_LICENSES) csv ./... > ./licenses.csv
+	$(GO_LICENSES) save ./... --force --save_path="./licenses"
+
+
 CHANGELOG_VERSION =
 
 .PHONY: changelog
