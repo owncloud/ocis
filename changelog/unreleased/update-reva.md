@@ -7,3 +7,4 @@ Updated reva to version XXXX. This update includes:
   * Enh [cs3org/reva#2628](https://github.com/cs3org/reva/pull/2628): Webdav trash-bin API for spaces
 
 https://github.com/owncloud/ocis/pull/3330
+https://github.com/owncloud/ocis/pull/3405
