@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -214,7 +215,7 @@ var _ = Describe("Graph", func() {
 					Type:  provider.ResourceType_RESOURCE_TYPE_CONTAINER,
 					Id:    &provider.ResourceId{StorageId: "ownerStorageID", OpaqueId: "opaqueID"},
 					Path:  "New Folder",
-					Mtime: &typesv1beta1.Timestamp{Seconds: 1648327606},
+					Mtime: &typesv1beta1.Timestamp{Seconds: 1648327606, Nanos: 0},
 					Size:  uint64(1234),
 				},
 			}, nil)
@@ -229,32 +230,26 @@ var _ = Describe("Graph", func() {
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
 			body, _ := io.ReadAll(rr.Body)
-			Expect(body).To(MatchJSON(`
-			{
-				"value":[
-					{
-						"driveAlias":"mountpoint/new-folder",
-						"driveType":"mountpoint",
-						"id":"aID!differentID",
-						"name":"New Folder",
-						"root":{
-							"eTag":"101112131415",
-							"id":"aID!differentID",
-							"remoteItem":{
-								"eTag":"123456789",
-								"folder":{},
-								"id":"ownerStorageID!opaqueID",
-								"lastModifiedDateTime":"2022-03-26T21:46:46+01:00",
-								"name":"New Folder",
-								"size":1234,
-								"webDavUrl":"https://localhost:9200/dav/spaces/ownerStorageID!opaqueID"
-							},
-							"webDavUrl":"https://localhost:9200/dav/spaces/aID!differentID"
-						}
-					}
-				]
-			}
-			`))
+
+			var response map[string][]libregraph.Drive
+			err := json.Unmarshal(body, &response)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(response["value"])).To(Equal(1))
+			value := response["value"][0]
+			Expect(*value.DriveAlias).To(Equal("mountpoint/new-folder"))
+			Expect(*value.DriveType).To(Equal("mountpoint"))
+			Expect(*value.Id).To(Equal("aID!differentID"))
+			Expect(*value.Name).To(Equal("New Folder"))
+			Expect(*value.Root.WebDavUrl).To(Equal("https://localhost:9200/dav/spaces/aID!differentID"))
+			Expect(*value.Root.ETag).To(Equal("101112131415"))
+			Expect(*value.Root.Id).To(Equal("aID!differentID"))
+			Expect(*value.Root.RemoteItem.ETag).To(Equal("123456789"))
+			Expect(*value.Root.RemoteItem.Id).To(Equal("ownerStorageID!opaqueID"))
+			Expect(*value.Root.RemoteItem.LastModifiedDateTime).To(Equal(time.Unix(1648327606, 0)))
+			Expect(*value.Root.RemoteItem.Folder).To(Equal(libregraph.Folder{}))
+			Expect(*value.Root.RemoteItem.Name).To(Equal("New Folder"))
+			Expect(*value.Root.RemoteItem.Size).To(Equal(int64(1234)))
+			Expect(*value.Root.RemoteItem.WebDavUrl).To(Equal("https://localhost:9200/dav/spaces/ownerStorageID!opaqueID"))
 		})
 		It("can not list spaces with wrong sort parameter", func() {
 			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
