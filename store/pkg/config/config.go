@@ -8,17 +8,17 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons `ocisConfig:"-" yaml:"-"`
+	*shared.Commons `yaml:"-"`
 
-	Service Service `ocisConfig:"-" yaml:"-"`
+	Service Service `yaml:"-"`
 
-	Tracing *Tracing `ocisConfig:"tracing"`
-	Log     *Log     `ocisConfig:"log"`
-	Debug   Debug    `ocisConfig:"debug"`
+	Tracing *Tracing `yaml:"tracing"`
+	Log     *Log     `yaml:"log"`
+	Debug   Debug    `yaml:"debug"`
 
-	GRPC GRPC `ocisConfig:"grpc"`
+	GRPC GRPC `yaml:"grpc"`
 
-	Datapath string `ocisConfig:"data_path" env:"STORE_DATA_PATH"`
+	Datapath string `yaml:"data_path" env:"STORE_DATA_PATH"`
 
-	Context context.Context `ocisConfig:"-" yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
