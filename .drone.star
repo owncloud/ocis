@@ -1454,7 +1454,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         user = "33:33"
         environment = {
             # Keycloak IDP specific configuration
-            "PROXY_OIDC_ISSUER": "https://keycloak/auth/realmsowncloud",
+            "PROXY_OIDC_ISSUER": "https://keycloak/auth/realms/owncloud",
             "WEB_OIDC_AUTHORITY": "https://keycloak/auth/realms/owncloud",
             "WEB_OIDC_CLIENT_ID": "ocis-web",
             "WEB_OIDC_METADATA_URL": "https://keycloak/auth/realms/owncloud/.well-known/openid-configuration",
