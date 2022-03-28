@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	gofig "github.com/gookit/config/v2"
-	goojson "github.com/gookit/config/v2/json"
 	gooyaml "github.com/gookit/config/v2/yaml"
 )
 
@@ -22,7 +21,6 @@ var (
 	supportedExtensions = []string{
 		"yaml",
 		"yml",
-		"json",
 	}
 )
 
@@ -73,7 +71,6 @@ func BindSourcesToStructs(extension string, dst interface{}) (*gofig.Config, err
 		options.DecoderConfig.TagName = "ocisConfig"
 	})
 	cnf.AddDriver(gooyaml.Driver)
-	cnf.AddDriver(goojson.Driver)
 	_ = cnf.LoadFiles(sources...)
 
 	err := cnf.BindStruct("", &dst)
