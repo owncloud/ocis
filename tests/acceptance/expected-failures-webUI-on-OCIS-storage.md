@@ -63,8 +63,8 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUISharingInternalUsersCollaborator/shareWithUsers.feature:35](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersCollaborator/shareWithUsers.feature#L35)
 - [webUISharingInternalUsersCollaborator/shareWithUsers.feature:36](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersCollaborator/shareWithUsers.feature#L36)
 - [webUISharingInternalUsersCollaborator/shareWithUsers.feature:37](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersCollaborator/shareWithUsers.feature#L37)
-- [webUISharingInternalUsersShareWithPage/shareWithUsers.feature:156](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersShareWithPage/shareWithUsers.feature#L156)
-- [webUISharingInternalUsersShareWithPage/shareWithUsers.feature:199](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersShareWithPage/shareWithUsers.feature#L199)
+- [webUISharingInternalUsersShareWithPage/shareWithUsers.feature:156](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersShareWithPage/shareWithUsers.feature#L155)
+- [webUISharingInternalUsersShareWithPage/shareWithUsers.feature:199](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersShareWithPage/shareWithUsers.feature#L198)
 - [webUISharingPermissionsUsers/sharePermissionsUsers.feature:21](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L21)
 - [webUISharingPermissionsUsers/sharePermissionsUsers.feature:36](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L36)
 - [webUISharingPermissionsUsers/sharePermissionsUsers.feature:52](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L52)
@@ -359,7 +359,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUITrashbinDelete/trashbinDelete.feature:48](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L48)
 
 ### [Tags page not implemented yet](https://github.com/owncloud/web/issues/5017)
-- [webUIDeleteFilesFolders/deleteFilesFolders.feature:145](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L145)
+- [webUIDeleteFilesFolders/deleteFilesFolders.feature:145](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L136)
 - [webUIFilesSearch/search.feature:63](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L63)
 - [webUIFilesSearch/search.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L71)
 - [webUIFilesSearch/search.feature:84](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L84)
@@ -484,8 +484,8 @@ Other free text and markdown formatting can be used elsewhere in the document if
 
 ### [[oCIS] Received share cannot be deleted/unshared if not shared with full permissions](https://github.com/owncloud/web/issues/5531)
 - [webUISharingAcceptShares/acceptShares.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L50)
-- [webUISharingAcceptShares/acceptShares.feature:162](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L162)
-- [webUISharingAcceptShares/acceptShares.feature:201](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L201)
+- [webUISharingAcceptShares/acceptShares.feature:162](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L158)
+- [webUISharingAcceptShares/acceptShares.feature:201](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L198)
 
 ### [not possible to overwrite a received shared file](https://github.com/owncloud/ocis/issues/2267)
 - [webUISharingInternalGroups/shareWithGroups.feature:77](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L77)

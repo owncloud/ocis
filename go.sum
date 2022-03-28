@@ -337,12 +337,6 @@ github.com/crewjam/saml v0.4.6/go.mod h1:ZBOXnNPFzB3CgOkRm7Nd6IVdkG+l/wF+0ZXLqD9
 github.com/cs3org/cato v0.0.0-20200828125504-e418fc54dd5e/go.mod h1:XJEZ3/EQuI3BXTp/6DUzFr850vlxq11I6satRtz0YQ4=
 github.com/cs3org/go-cs3apis v0.0.0-20220126114148-64c025ccdd19 h1:1jqPH58jCxvbaJ9WLIJ7W2/m622bWS6ChptzljSG6IQ=
 github.com/cs3org/go-cs3apis v0.0.0-20220126114148-64c025ccdd19/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
-github.com/cs3org/reva/v2 v2.0.0-20220324071614-82800d7ef768 h1:9QNIi4oyHyv1ua8oPyeBdLcMU6hKDyNmGuSxWmf01BM=
-github.com/cs3org/reva/v2 v2.0.0-20220324071614-82800d7ef768/go.mod h1:kFqm3iwrRHyEnP606H+wSWmJzjk0nj2kPShsowriqxg=
-github.com/cs3org/reva/v2 v2.0.0-20220328094822-506516e945eb h1:cAj77j0jVtZlrTUue8pT/wFDKrt0oEppLHg+0QkD6gQ=
-github.com/cs3org/reva/v2 v2.0.0-20220328094822-506516e945eb/go.mod h1:kFqm3iwrRHyEnP606H+wSWmJzjk0nj2kPShsowriqxg=
-github.com/cs3org/reva/v2 v2.0.0-20220328125240-96279f215b6e h1:ciwo9RflVAQmgkIhhtuwJdfSKIrqg9fdj/lWJ53fm/k=
-github.com/cs3org/reva/v2 v2.0.0-20220328125240-96279f215b6e/go.mod h1:kFqm3iwrRHyEnP606H+wSWmJzjk0nj2kPShsowriqxg=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8/go.mod h1:4abs/jPXcmJzYoYGF91JF9Uq9s/KL5n1jvFDix8KcqY=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
@@ -992,6 +986,8 @@ github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103 h1:Z/i1e+gTZrmcGeZy
 github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103/go.mod h1:o9YPB5aGP8ob35Vy6+vyq3P3bWe7NQWzf+JLiXCiMaE=
 github.com/mennanov/fieldmask-utils v0.5.0 h1:8em4akN0NM3hmmrg8VbvOPfdS4SSBdbFd53m9VtfOg0=
 github.com/mennanov/fieldmask-utils v0.5.0/go.mod h1:lah2lHczE2ff+7SqnNKpB+YzaO7M3h5iNO4LgPTJheM=
+github.com/micbar/reva/v2 v2.0.0-20220325152342-12eabed07d4b h1:5oWofosj7SRMGSjGdMgaIc4ASyYtvct2XZH6Hfyeh2A=
+github.com/micbar/reva/v2 v2.0.0-20220325152342-12eabed07d4b/go.mod h1:kFqm3iwrRHyEnP606H+wSWmJzjk0nj2kPShsowriqxg=
 github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7 h1:M0R40eUlyqxMuZn3Knx4DJTwHE3TiPFzcWUA/BKtDMM=
 github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7/go.mod h1:sBD3RAqlr8Q+RC3FutZcikpT8nyDrIEEBw2J744gVWs=
 github.com/miekg/dns v1.0.14/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
