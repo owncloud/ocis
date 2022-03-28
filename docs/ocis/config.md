@@ -3,7 +3,7 @@ title: "Configuration"
 date: "2021-11-09T00:03:16+0100"
 weight: 2
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/ocis/templates
+geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: config.md
 ---
 

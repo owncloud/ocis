@@ -72,7 +72,7 @@ services:
 
       PROXY_HTTP_ADDR: 0.0.0.0:9200
     volumes:
-      - "./config/proxy/proxy.json:/etc/ocis/proxy.json"
+      - "./config/proxy/proxy.yaml:/etc/ocis/proxy.yaml"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=https"
