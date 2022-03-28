@@ -584,16 +584,32 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 		return nil, err
 	}
 
-	total := int64(res.TotalBytes)
+	var remaining int64
+	if res.Opaque != nil {
+		m := res.Opaque.Map
+		if e, ok := m["remaining"]; ok {
+			remaining, _ = strconv.ParseInt(string(e.Value), 10, 64)
+		}
+	}
 
 	used := int64(res.UsedBytes)
-	remaining := total - used
 	qta := libregraph.Quota{
 		Remaining: &remaining,
-		Total:     &total,
 		Used:      &used,
 	}
-	state := calculateQuotaState(total, used)
+
+	var t int64
+	if total := int64(res.TotalBytes); total != 0 {
+
+		// A quota was set
+		qta.Total = &total
+		t = total
+	} else {
+		// Quota was not set
+		// Use remaining bytes to calculate state
+		t = remaining
+	}
+	state := calculateQuotaState(t, used)
 	qta.State = &state
 
 	return &qta, nil
