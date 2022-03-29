@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Improve gif thumbnails: [#3305](https://github.com/owncloud/ocis/pull/3305)
 * Bugfix - Fix error handling in GraphAPI GetUsers call: [#3357](https://github.com/owncloud/ocis/pull/3357)
 * Bugfix - Replace public mountpoint fileid with grant fileid: [#3349](https://github.com/owncloud/ocis/pull/3349)
+* Change - Add remote item to mountpoint and fix spaceID: [#3365](https://github.com/owncloud/ocis/pull/3365)
 * Change - Switch NATS backend: [#3192](https://github.com/owncloud/ocis/pull/3192)
 * Change - Drop json config file support: [#3366](https://github.com/owncloud/ocis/pull/3366)
 * Change - Settings service now stores its data via metadata service: [#3232](https://github.com/owncloud/ocis/pull/3232)
@@ -51,6 +52,14 @@ The following sections list the changes for unreleased.
    id.
 
    https://github.com/owncloud/ocis/pull/3349
+
+* Change - Add remote item to mountpoint and fix spaceID: [#3365](https://github.com/owncloud/ocis/pull/3365)
+
+   A mountpoint represents the mounted share on the share receivers side. The original resource
+   is located where the grant has been set. This item is now shown as libregraph remoteItem on the
+   mountpoint. While adding this, we fixed the spaceID for mountpoints.
+
+   https://github.com/owncloud/ocis/pull/3365
 
 * Change - Switch NATS backend: [#3192](https://github.com/owncloud/ocis/pull/3192)
 
