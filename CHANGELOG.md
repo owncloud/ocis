@@ -2,12 +2,39 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.18.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.19.0...master
+
+## Summary
+
+* Bugfix - Ensure the same data on /ocs/v?.php/config like oC10: [#3113](https://github.com/owncloud/ocis/pull/3113)
+* Enhancement - Add sorting to GraphAPI users and groups: [#3360](https://github.com/owncloud/ocis/issues/3360)
+
+## Details
+
+* Bugfix - Ensure the same data on /ocs/v?.php/config like oC10: [#3113](https://github.com/owncloud/ocis/pull/3113)
+
+   We've fixed the returned values on the /ocs/v?.php/config endpoints, so that they now return
+   the same values as an oC10 would do.
+
+   https://github.com/owncloud/ocis/pull/3113
+
+* Enhancement - Add sorting to GraphAPI users and groups: [#3360](https://github.com/owncloud/ocis/issues/3360)
+
+   The GraphAPI endpoints for users and groups support ordering now. User can be ordered by
+   displayName, onPremisesSamAccountName and mail. Groups can be ordered by displayName.
+
+   Example: https://localhost:9200/graph/v1.0/groups?$orderby=displayName asc
+
+   https://github.com/owncloud/ocis/issues/3360
+# Changelog for [1.19.0] (2022-03-29)
+
+The following sections list the changes for 1.19.0.
+
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
 * Bugfix - Network configuration in individiual_services example: [#3238](https://github.com/owncloud/ocis/pull/3238)
-* Bugfix - Ensure the same data on /ocs/v?.php/config like oC10: [#3113](https://github.com/owncloud/ocis/pull/3113)
 * Bugfix - Improve gif thumbnails: [#3305](https://github.com/owncloud/ocis/pull/3305)
 * Bugfix - Fix error handling in GraphAPI GetUsers call: [#3357](https://github.com/owncloud/ocis/pull/3357)
 * Bugfix - Fix request validation on GraphAPI User updates: [#3167](https://github.com/owncloud/ocis/issues/3167)
@@ -17,7 +44,6 @@ The following sections list the changes for unreleased.
 * Change - Drop json config file support: [#3366](https://github.com/owncloud/ocis/pull/3366)
 * Change - Settings service now stores its data via metadata service: [#3232](https://github.com/owncloud/ocis/pull/3232)
 * Enhancement - Audit logger will now log file events: [#3332](https://github.com/owncloud/ocis/pull/3332)
-* Enhancement - Add sorting to GraphAPI users and groups: [#3360](https://github.com/owncloud/ocis/issues/3360)
 * Enhancement - Add password reset link to login page: [#3329](https://github.com/owncloud/ocis/pull/3329)
 * Enhancement - Log sharing events in audit service: [#3301](https://github.com/owncloud/ocis/pull/3301)
 * Enhancement - Add space aliases: [#3283](https://github.com/owncloud/ocis/pull/3283)
@@ -34,13 +60,6 @@ The following sections list the changes for unreleased.
    instructions work.
 
    https://github.com/owncloud/ocis/pull/3238
-
-* Bugfix - Ensure the same data on /ocs/v?.php/config like oC10: [#3113](https://github.com/owncloud/ocis/pull/3113)
-
-   We've fixed the returned values on the /ocs/v?.php/config endpoints, so that they now return
-   the same values as an oC10 would do.
-
-   https://github.com/owncloud/ocis/pull/3113
 
 * Bugfix - Improve gif thumbnails: [#3305](https://github.com/owncloud/ocis/pull/3305)
 
@@ -103,15 +122,6 @@ The following sections list the changes for unreleased.
    See full list of supported events in `audit/pkg/types/types.go`
 
    https://github.com/owncloud/ocis/pull/3332
-
-* Enhancement - Add sorting to GraphAPI users and groups: [#3360](https://github.com/owncloud/ocis/issues/3360)
-
-   The GraphAPI endpoints for users and groups support ordering now. User can be ordered by
-   displayName, onPremisesSamAccountName and mail. Groups can be ordered by displayName.
-
-   Example: https://localhost:9200/graph/v1.0/groups?$orderby=displayName asc
-
-   https://github.com/owncloud/ocis/issues/3360
 
 * Enhancement - Add password reset link to login page: [#3329](https://github.com/owncloud/ocis/pull/3329)
 
