@@ -16,6 +16,7 @@ The following sections list the changes for unreleased.
 * Change - Drop json config file support: [#3366](https://github.com/owncloud/ocis/pull/3366)
 * Change - Settings service now stores its data via metadata service: [#3232](https://github.com/owncloud/ocis/pull/3232)
 * Enhancement - Audit logger will now log file events: [#3332](https://github.com/owncloud/ocis/pull/3332)
+* Enhancement - Add sorting to GraphAPI users and groups: [#3360](https://github.com/owncloud/ocis/issues/3360)
 * Enhancement - Add password reset link to login page: [#3329](https://github.com/owncloud/ocis/pull/3329)
 * Enhancement - Log sharing events in audit service: [#3301](https://github.com/owncloud/ocis/pull/3301)
 * Enhancement - Add space aliases: [#3283](https://github.com/owncloud/ocis/pull/3283)
@@ -94,6 +95,15 @@ The following sections list the changes for unreleased.
    See full list of supported events in `audit/pkg/types/types.go`
 
    https://github.com/owncloud/ocis/pull/3332
+
+* Enhancement - Add sorting to GraphAPI users and groups: [#3360](https://github.com/owncloud/ocis/issues/3360)
+
+   The GraphAPI endpoints for users and groups support ordering now. User can be ordered by
+   displayName, onPremisesSamAccountName and mail. Groups can be ordered by displayName.
+
+   Example: https://localhost:9200/graph/v1.0/groups?$orderby=displayName asc
+
+   https://github.com/owncloud/ocis/issues/3360
 
 * Enhancement - Add password reset link to login page: [#3329](https://github.com/owncloud/ocis/pull/3329)
 
