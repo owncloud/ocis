@@ -791,7 +791,7 @@ func sortSpaces(req *godata.GoDataRequest, spaces []*libregraph.Drive) ([]*libre
 		return nil, fmt.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)
 	}
 
-	if req.Query.OrderBy.OrderByItems[0].Order == "asc" {
+	if req.Query.OrderBy.OrderByItems[0].Order == "desc" {
 		sorter = sort.Reverse(sorter)
 	}
 	sort.Sort(sorter)
