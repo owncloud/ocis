@@ -39,7 +39,7 @@
     "@babel/polyfill": "^7.10.1",
     "@babel/preset-env": "^7.16.11",
     "@babel/register": "^7.17.0",
-    "@cucumber/cucumber": "^7.3.1",
+    "@cucumber/cucumber": "^7.3.2",
     "@cucumber/pretty-formatter": "^1.0.0-alpha.1",
     "@erquhart/rollup-plugin-node-builtins": "^2.1.5",
     "@rollup/plugin-commonjs": "^17.1.0",
