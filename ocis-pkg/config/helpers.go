@@ -68,7 +68,7 @@ func BindSourcesToStructs(extension string, dst interface{}) (*gofig.Config, err
 	sources := DefaultConfigSources(extension, supportedExtensions)
 	cnf := gofig.NewWithOptions(extension)
 	cnf.WithOptions(func(options *gofig.Options) {
-		options.DecoderConfig.TagName = "ocisConfig"
+		options.DecoderConfig.TagName = "yaml"
 	})
 	cnf.AddDriver(gooyaml.Driver)
 	_ = cnf.LoadFiles(sources...)
