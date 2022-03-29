@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Network configuration in individiual_services example: [#3238](https://github.com/owncloud/ocis/pull/3238)
 * Bugfix - Improve gif thumbnails: [#3305](https://github.com/owncloud/ocis/pull/3305)
 * Bugfix - Fix error handling in GraphAPI GetUsers call: [#3357](https://github.com/owncloud/ocis/pull/3357)
+* Bugfix - Fix request validation on GraphAPI User updates: [#3167](https://github.com/owncloud/ocis/issues/3167)
 * Bugfix - Replace public mountpoint fileid with grant fileid: [#3349](https://github.com/owncloud/ocis/pull/3349)
 * Change - Add remote item to mountpoint and fix spaceID: [#3365](https://github.com/owncloud/ocis/pull/3365)
 * Change - Switch NATS backend: [#3192](https://github.com/owncloud/ocis/pull/3192)
@@ -44,6 +45,12 @@ The following sections list the changes for unreleased.
    backend returned an error.
 
    https://github.com/owncloud/ocis/pull/3357
+
+* Bugfix - Fix request validation on GraphAPI User updates: [#3167](https://github.com/owncloud/ocis/issues/3167)
+
+   Fix PATCH on graph/v1.0/users when no 'mail' attribute is present in the request body
+
+   https://github.com/owncloud/ocis/issues/3167
 
 * Bugfix - Replace public mountpoint fileid with grant fileid: [#3349](https://github.com/owncloud/ocis/pull/3349)
 
