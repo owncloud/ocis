@@ -39,6 +39,7 @@ web:
     - files
     - search
     - media-viewer
+    - pdf-viewer
     - external
     externalapps: []
     options: {}
