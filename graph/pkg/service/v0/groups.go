@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sort"
 	"strings"
 
+	"github.com/CiscoM31/godata"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 
@@ -19,6 +21,14 @@ const memberRefsLimit = 20
 
 // GetGroups implements the Service interface.
 func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
+	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
+	if err != nil {
+		g.logger.Err(err).Interface("query", r.URL.Query()).Msg("query error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	groups, err := g.identityBackend.GetGroups(r.Context(), r.URL.Query())
 
 	if err != nil {
@@ -28,6 +38,17 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 		} else {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
+	}
+
+	groups, err = sortGroups(odataReq, groups)
+	if err != nil {
+		var errcode errorcode.Error
+		if errors.As(err, &errcode) {
+			errcode.Render(w, r)
+		} else {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		}
+		return
 	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &listResponse{Value: groups})
@@ -317,4 +338,23 @@ func (g Graph) parseMemberRef(ref string) (string, string, error) {
 	id := segments[len(segments)-1]
 	memberType := segments[len(segments)-2]
 	return memberType, id, nil
+}
+
+func sortGroups(req *godata.GoDataRequest, groups []*libregraph.Group) ([]*libregraph.Group, error) {
+	var sorter sort.Interface
+	if req.Query.OrderBy == nil || len(req.Query.OrderBy.OrderByItems) != 1 {
+		return groups, nil
+	}
+	switch req.Query.OrderBy.OrderByItems[0].Field.Value {
+	case "displayName":
+		sorter = groupsByDisplayName{groups}
+	default:
+		return nil, fmt.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)
+	}
+
+	if req.Query.OrderBy.OrderByItems[0].Order == "desc" {
+		sorter = sort.Reverse(sorter)
+	}
+	sort.Sort(sorter)
+	return groups, nil
 }
