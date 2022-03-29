@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -92,6 +93,30 @@ func (g Graph) getDriveItem(ctx context.Context, root *storageprovider.ResourceI
 	return cs3ResourceToDriveItem(res.Info)
 }
 
+func (g Graph) getRemoteItem(ctx context.Context, root *storageprovider.ResourceId, baseURL *url.URL) (*libregraph.RemoteItem, error) {
+	client := g.GetGatewayClient()
+
+	ref := &storageprovider.Reference{
+		ResourceId: root,
+	}
+	res, err := client.Stat(ctx, &storageprovider.StatRequest{Ref: ref})
+	if err != nil {
+		return nil, err
+	}
+	if res.Status.Code != cs3rpc.Code_CODE_OK {
+		// Only log this, there could be mountpoints which have no grant
+		g.logger.Debug().Msg(res.Status.Message)
+		return nil, errors.New("could not fetch grant resource for the mountpoint")
+	}
+	item, err := cs3ResourceToRemoteItem(res.Info)
+	if err != nil {
+		return nil, err
+	}
+
+	item.WebDavUrl = libregraph.PtrString(baseURL.String() + resourceid.OwnCloudResourceIDWrap(root))
+	return item, nil
+}
+
 func formatDriveItems(mds []*storageprovider.ResourceInfo) ([]*libregraph.DriveItem, error) {
 	responses := make([]*libregraph.DriveItem, 0, len(mds))
 	for i := range mds {
@@ -140,7 +165,38 @@ func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*libregraph.Driv
 	return driveItem, nil
 }
 
-func (g Graph) getPathForDriveItem(ctx context.Context, ID *storageprovider.ResourceId) (*string, error) {
+func cs3ResourceToRemoteItem(res *storageprovider.ResourceInfo) (*libregraph.RemoteItem, error) {
+	size := new(int64)
+	*size = int64(res.Size) // TODO lurking overflow: make size of libregraph drive item use uint64
+
+	remoteItem := &libregraph.RemoteItem{
+		Id:   libregraph.PtrString(resourceid.OwnCloudResourceIDWrap(res.Id)),
+		Size: size,
+	}
+
+	if name := path.Base(res.Path); name != "" {
+		remoteItem.Name = &name
+	}
+	if res.Etag != "" {
+		remoteItem.ETag = &res.Etag
+	}
+	if res.Mtime != nil {
+		lastModified := cs3TimestampToTime(res.Mtime)
+		remoteItem.LastModifiedDateTime = &lastModified
+	}
+	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_FILE && res.MimeType != "" {
+		// We cannot use a libregraph.File here because the openapi codegenerator autodetects 'File' as a go type ...
+		remoteItem.File = &libregraph.OpenGraphFile{
+			MimeType: &res.MimeType,
+		}
+	}
+	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER {
+		remoteItem.Folder = &libregraph.Folder{}
+	}
+	return remoteItem, nil
+}
+
+func (g Graph) getPathForResource(ctx context.Context, ID *storageprovider.ResourceId) (*string, error) {
 	client := g.GetGatewayClient()
 	var path *string
 	res, err := client.GetPath(ctx, &storageprovider.GetPathRequest{ResourceId: ID})
@@ -185,13 +241,13 @@ func (g Graph) getSpecialDriveItem(ctx context.Context, ID *storageprovider.Reso
 		g.logger.Error().Err(err).Str("ID", ID.OpaqueId).Msg("Could not get readme Item")
 		return nil
 	}
-	itemPath, err := g.getPathForDriveItem(ctx, ID)
+	itemPath, err := g.getPathForResource(ctx, ID)
 	if err != nil {
 		g.logger.Error().Err(err).Str("ID", ID.OpaqueId).Msg("Could not get readme path")
 		return nil
 	}
 	spaceItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(itemName)}
-	spaceItem.WebDavUrl = libregraph.PtrString(baseURL.String() + path.Join(space.Root.OpaqueId, *itemPath))
+	spaceItem.WebDavUrl = libregraph.PtrString(baseURL.String() + path.Join(space.Id.String(), *itemPath))
 
 	return spaceItem
 }
