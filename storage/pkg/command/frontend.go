@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"net/url"
 	"os"
 	"path"
 	"strconv"
@@ -97,11 +96,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 				}
 			}
 
-			revaCfg, err := frontendConfigFromStruct(c, cfg, filesCfg)
-			if err != nil {
-				logger.Error().Err(err).Msg("could not generate frontend configuration")
-				return err
-			}
+			revaCfg := frontendConfigFromStruct(c, cfg, filesCfg)
 
 			gr.Add(func() error {
 				runtime.RunWithOptions(revaCfg, pidFile, runtime.WithLogger(&logger.Logger))
@@ -144,12 +139,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 }
 
 // frontendConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
-func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[string]interface{}) (map[string]interface{}, error) {
-	frontendURL, err := url.Parse(cfg.Reva.Frontend.PublicURL)
-	if err != nil {
-		return map[string]interface{}{}, err
-	}
-
+func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[string]interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"core": map[string]interface{}{
 			"max_cpus":             cfg.Reva.Users.MaxCPUs,
@@ -227,7 +217,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 					"config": map[string]interface{}{
 						"version": "1.7",
 						"website": "ownCloud",
-						"host":    frontendURL.Host + frontendURL.Path,
+						"host":    cfg.Reva.Frontend.PublicURL,
 						"contact": "",
 						"ssl":     "false",
 					},
@@ -318,7 +308,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 				},
 			},
 		},
-	}, nil
+	}
 }
 
 // loadUserAgent reads the user-agent-whitelist-lock-in, since it is a string flag, and attempts to construct a map of
