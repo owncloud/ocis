@@ -459,9 +459,23 @@ func getValidatedAccountUUID(ctx context.Context, accountUUID string) string {
 
 // getRoleIDs extracts the roleIDs of the authenticated user from the context.
 func (g Service) getRoleIDs(ctx context.Context) []string {
+	var ownRoleIDs []string
 	if ownRoleIDs, ok := roles.ReadRoleIDsFromContext(ctx); ok {
 		return ownRoleIDs
 	}
+	if accountID, ok := metadata.Get(ctx, middleware.AccountID); ok {
+		assignments, err := g.manager.ListRoleAssignments(accountID)
+		if err != nil {
+			g.logger.Info().Err(err).Str("userid", accountID).Msg("failed to get roles for user")
+			return []string{}
+		}
+
+		for _, a := range assignments {
+			ownRoleIDs = append(ownRoleIDs, a.RoleId)
+		}
+		return ownRoleIDs
+	}
+	g.logger.Info().Msg("failed to get accountID from context")
 	return []string{}
 }
 
