@@ -247,7 +247,7 @@ func (g Graph) getSpecialDriveItem(ctx context.Context, ID *storageprovider.Reso
 		return nil
 	}
 	spaceItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(itemName)}
-	spaceItem.WebDavUrl = libregraph.PtrString(baseURL.String() + path.Join(space.Id.String(), *itemPath))
+	spaceItem.WebDavUrl = libregraph.PtrString(baseURL.String() + path.Join(space.Id.OpaqueId, *itemPath))
 
 	return spaceItem
 }
