@@ -33,6 +33,9 @@ release-linux-docker-arm: release-dirs
 		-o '$(DIST)/binaries/$(EXECUTABLE)-linux-arm' \
 		./cmd/$(NAME)
 
+	@# https://github.com/golang/go/issues/50405
+	@# -buildmode=pie not easily doable for arm
+
 release-linux-docker-arm64: release-dirs
 	GOOS=linux \
 	GOARCH=arm64 \
@@ -83,6 +86,9 @@ release-linux: release-dirs
 		-ldflags '-extldflags "-static" $(LDFLAGS)' \
 		-o '$(DIST)/binaries/$(EXECUTABLE)-linux-arm' \
 		./cmd/$(NAME)
+
+	@# https://github.com/golang/go/issues/50405
+	@# -buildmode=pie not easily doable for arm
 
 .PHONY: release-windows
 release-windows: release-dirs
