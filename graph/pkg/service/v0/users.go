@@ -60,26 +60,36 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if isNilOrEmpty(u.DisplayName) || isNilOrEmpty(u.OnPremisesSamAccountName) || isNilOrEmpty(u.Mail) {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+	if _, ok := u.GetDisplayNameOk(); !ok {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'displayName'")
+		return
+	}
+	if accountName, ok := u.GetOnPremisesSamAccountNameOk(); ok {
+		if !isValidUsername(*accountName) {
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
+				fmt.Sprintf("username '%s' must be at least the local part of an email", *u.OnPremisesSamAccountName))
+			return
+		}
+	} else {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'onPremisesSamAccountName'")
 		return
 	}
 
-	if !isValidUsername(*u.OnPremisesSamAccountName) {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
-			fmt.Sprintf("username '%s' must be at least the local part of an email", *u.OnPremisesSamAccountName))
-		return
-	}
-	if !isValidEmail(*u.Mail) {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
-			fmt.Sprintf("'%s' is not a valid email address", *u.Mail))
+	if mail, ok := u.GetMailOk(); ok {
+		if !isValidEmail(*mail) {
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
+				fmt.Sprintf("'%s' is not a valid email address", *u.Mail))
+			return
+		}
+	} else {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'mail'")
 		return
 	}
 
 	// Disallow user-supplied IDs. It's supposed to be readonly. We're either
 	// generating them in the backend ourselves or rely on the Backend's
 	// storage (e.g. LDAP) to provide a unique ID.
-	if !isNilOrEmpty(u.Id) {
+	if _, ok := u.GetIdOk(); ok {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user id is a read-only attribute")
 		return
 	}
@@ -201,10 +211,6 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, u)
 
-}
-
-func isNilOrEmpty(s *string) bool {
-	return s == nil || *s == ""
 }
 
 // We want to allow email addresses as usernames so they show up when using them in ACLs on storages that allow integration with our glauth LDAP service

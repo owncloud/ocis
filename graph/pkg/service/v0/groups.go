@@ -42,7 +42,7 @@ func (g Graph) PostGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if isNilOrEmpty(grp.DisplayName) {
+	if _, ok := grp.GetDisplayNameOk(); !ok {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Missing Required Attribute")
 		return
 	}
@@ -50,7 +50,7 @@ func (g Graph) PostGroup(w http.ResponseWriter, r *http.Request) {
 	// Disallow user-supplied IDs. It's supposed to be readonly. We're either
 	// generating them in the backend ourselves or rely on the Backend's
 	// storage (e.g. LDAP) to provide a unique ID.
-	if !isNilOrEmpty(grp.Id) {
+	if _, ok := grp.GetIdOk(); ok {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "group id is a read-only attribute")
 		return
 	}
