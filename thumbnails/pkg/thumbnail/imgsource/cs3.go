@@ -74,7 +74,11 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	for _, p := range rsp.Protocols {
 		if p.Protocol == "spaces" {
 			ep, tk = p.DownloadEndpoint, p.Token
+			break
 		}
+	}
+	if (ep == "" || tk == "") && len(rsp.Protocols) > 0 {
+		ep, tk = rsp.Protocols[0].DownloadEndpoint, rsp.Protocols[0].Token
 	}
 
 	httpReq, err := rhttp.NewRequest(ctx, "GET", ep, nil)
