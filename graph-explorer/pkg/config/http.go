@@ -2,15 +2,15 @@ package config
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string `ocisConfig:"addr" env:"GRAPH_EXPLORER_HTTP_ADDR"`
-	Root      string `ocisConfig:"root" env:"GRAPH_EXPLORER_HTTP_ROOT"`
-	Namespace string `ocisConfig:"-" yaml:"-"`
+	Addr      string `yaml:"addr" env:"GRAPH_EXPLORER_HTTP_ADDR"`
+	Root      string `yaml:"root" env:"GRAPH_EXPLORER_HTTP_ROOT"`
+	Namespace string `yaml:"-"`
 }
 
 // CORS defines the available cors configuration.
 type CORS struct {
-	AllowedOrigins   []string `ocisConfig:"allowed_origins"`
-	AllowedMethods   []string `ocisConfig:"allowed_methods"`
-	AllowedHeaders   []string `ocisConfig:"allowed_headers"`
-	AllowCredentials bool     `ocisConfig:"allowed_credentials"`
+	AllowedOrigins   []string `yaml:"allowed_origins"`
+	AllowedMethods   []string `yaml:"allowed_methods"`
+	AllowedHeaders   []string `yaml:"allowed_headers"`
+	AllowCredentials bool     `yaml:"allowed_credentials"`
 }

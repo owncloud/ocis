@@ -2,16 +2,16 @@ package config
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string `ocisConfig:"addr" env:"OCS_HTTP_ADDR"`
-	Root      string `ocisConfig:"root" env:"OCS_HTTP_ROOT"`
-	Namespace string `ocisConfig:"-" yaml:"-"`
-	CORS      CORS   `ocisConfig:"cors"`
+	Addr      string `yaml:"addr" env:"OCS_HTTP_ADDR"`
+	Root      string `yaml:"root" env:"OCS_HTTP_ROOT"`
+	Namespace string `yaml:"-"`
+	CORS      CORS   `yaml:"cors"`
 }
 
 // CORS defines the available cors configuration.
 type CORS struct {
-	AllowedOrigins   []string `ocisConfig:"allowed_origins"`
-	AllowedMethods   []string `ocisConfig:"allowed_methods"`
-	AllowedHeaders   []string `ocisConfig:"allowed_headers"`
-	AllowCredentials bool     `ocisConfig:"allowed_credentials"`
+	AllowedOrigins   []string `yaml:"allowed_origins"`
+	AllowedMethods   []string `yaml:"allowed_methods"`
+	AllowedHeaders   []string `yaml:"allowed_headers"`
+	AllowCredentials bool     `yaml:"allowed_credentials"`
 }
