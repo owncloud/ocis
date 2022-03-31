@@ -390,9 +390,9 @@ def goLicenseCheck(ctx):
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                 makeNodeGenerate("") +
-                 makeGoGenerate("") +
-                 build() +
+                 #makeNodeGenerate("") +
+                 #makeGoGenerate("") +
+                 #build() +
                  [
                      {
                          "name": "check-go-license",
