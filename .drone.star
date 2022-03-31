@@ -393,14 +393,24 @@ def goLicenseCheck(ctx):
                  makeNodeGenerate("") +
                  makeGoGenerate("") +
                  build() +
-                 [{
-                     "name": "check-go-license",
-                     "image": OC_CI_GOLANG,
-                     "commands": [
-                         "make check-go-licenses",
-                     ],
-                     "volumes": [stepVolumeGo],
-                 }],
+                 [
+                     {
+                         "name": "check-go-license",
+                         "image": OC_CI_GOLANG,
+                         "commands": [
+                             "make check-go-licenses",
+                         ],
+                         "volumes": [stepVolumeGo],
+                     },
+                     {
+                         "name": "save-go-licenses",
+                         "image": OC_CI_GOLANG,
+                         "commands": [
+                             "make save-go-licenses",
+                         ],
+                         "volumes": [stepVolumeGo],
+                     },
+                 ],
         "trigger": {
             "ref": [
                 "refs/heads/master",
