@@ -17,28 +17,28 @@ debug:
 http:
   addr: 127.0.0.1:9181
   root: /
-  cachettl: 604800
+  cache_ttl: 604800
   cors:
-    allowedorigins:
+    allowed_origins:
     - '*'
-    allowedmethods:
+    allowed_methods:
     - GET
     - POST
     - PUT
     - PATCH
     - DELETE
     - OPTIONS
-    allowedheaders:
+    allowed_headers:
     - Authorization
     - Origin
     - Content-Type
     - Accept
     - X-Requested-With
-    allowcredentials: true
+    allowed_credentials: true
 grpc:
   addr: 127.0.0.1:9180
-tokenmanager:
-  jwtsecret: Pive-Fumkiu4
+token_manager:
+  jwt_secret: Pive-Fumkiu4
 asset:
   path: ""
 repo:
@@ -46,7 +46,7 @@ repo:
   disk:
     path: ~/.ocis/accounts
   cs3:
-    provideraddr: localhost:9215
+    provider_addr: localhost:9215
 index:
   uid:
     lower: 0
@@ -54,10 +54,10 @@ index:
   gid:
     lower: 0
     upper: 1000
-serviceuser:
+service_user:
   uuid: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
   username: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
   uid: 0
   gid: 0
-hashdifficulty: 11
-demousersandgroups: true
+hash_difficulty: 11
+demo_users_and_groups: true

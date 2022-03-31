@@ -17,23 +17,23 @@ debug:
 http:
   addr: 127.0.0.1:9100
   root: /
-  cachettl: 604800
+  cache_ttl: 604800
 asset:
   path: ""
 file: ""
 web:
   path: ""
-  themeserver: https://localhost:9200
-  themepath: /themes/owncloud/theme.json
+  theme_server: https://localhost:9200
+  theme_path: /themes/owncloud/theme.json
   config:
     server: https://localhost:9200
     theme: ""
     version: 0.1.0
-    openidconnect:
-      metadataurl: https://localhost:9200/.well-known/openid-configuration
+    oids:
+      metadata_url: https://localhost:9200/.well-known/openid-configuration
       authority: https://localhost:9200
-      clientid: web
-      responsetype: code
+      client_id: web
+      response_type: code
       scope: openid profile email
     apps:
     - files
@@ -41,5 +41,5 @@ web:
     - media-viewer
     - pdf-viewer
     - external
-    externalapps: []
+    external_apps: []
     options: {}

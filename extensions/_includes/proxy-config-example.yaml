@@ -17,8 +17,8 @@ debug:
 http:
   addr: 0.0.0.0:9200
   root: /
-  tlscert: ~/.ocis/proxy/server.crt
-  tlskey: ~/.ocis/proxy/server.key
+  tls_cert: ~/.ocis/proxy/server.crt
+  tls_key: ~/.ocis/proxy/server.key
   tls: true
 reva:
   address: 127.0.0.1:9142
@@ -28,156 +28,111 @@ policies:
   - type: ""
     endpoint: /
     backend: http://localhost:9100
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /.well-known/
     backend: http://localhost:9130
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /konnect/
     backend: http://localhost:9130
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /signin/
     backend: http://localhost:9130
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /archiver
     backend: http://localhost:9140
-    apachevhost: false
+    apache-vhost: false
   - type: regex
     endpoint: /ocs/v[12].php/cloud/(users?|groups)
     backend: http://localhost:9110
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /ocs/
     backend: http://localhost:9140
-    apachevhost: false
+    apache-vhost: false
   - type: query
     endpoint: /remote.php/?preview=1
     backend: http://localhost:9115
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /remote.php/
     backend: http://localhost:9140
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /dav/
     backend: http://localhost:9140
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /webdav/
     backend: http://localhost:9140
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /status.php
     backend: http://localhost:9140
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /index.php/
     backend: http://localhost:9140
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /data
     backend: http://localhost:9140
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /app/
     backend: http://localhost:9140
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /graph/
     backend: http://localhost:9120
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /graph-explorer
     backend: http://localhost:9135
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /api/v0/accounts
     backend: http://localhost:9181
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /accounts.js
     backend: http://localhost:9181
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /api/v0/settings
     backend: http://localhost:9190
-    apachevhost: false
+    apache-vhost: false
   - type: ""
     endpoint: /settings.js
     backend: http://localhost:9190
-    apachevhost: false
-- name: oc10
-  routes:
-  - type: ""
-    endpoint: /
-    backend: http://localhost:9100
-    apachevhost: false
-  - type: ""
-    endpoint: /.well-known/
-    backend: http://localhost:9130
-    apachevhost: false
-  - type: ""
-    endpoint: /konnect/
-    backend: http://localhost:9130
-    apachevhost: false
-  - type: ""
-    endpoint: /signin/
-    backend: http://localhost:9130
-    apachevhost: false
-  - type: ""
-    endpoint: /archiver
-    backend: http://localhost:9140
-    apachevhost: false
-  - type: ""
-    endpoint: /ocs/
-    backend: https://demo.owncloud.com
-    apachevhost: true
-  - type: ""
-    endpoint: /remote.php/
-    backend: https://demo.owncloud.com
-    apachevhost: true
-  - type: ""
-    endpoint: /dav/
-    backend: https://demo.owncloud.com
-    apachevhost: true
-  - type: ""
-    endpoint: /webdav/
-    backend: https://demo.owncloud.com
-    apachevhost: true
-  - type: ""
-    endpoint: /status.php
-    backend: https://demo.owncloud.com
-    apachevhost: true
-  - type: ""
-    endpoint: /index.php/
-    backend: https://demo.owncloud.com
-    apachevhost: true
-  - type: ""
-    endpoint: /data
-    backend: https://demo.owncloud.com
-    apachevhost: true
+    apache-vhost: false
 oidc:
   issuer: https://localhost:9200
   insecure: true
-  userinfocache:
+  user_info_cache:
     size: 1024
     ttl: 10
-tokenmanager:
-  jwtsecret: Pive-Fumkiu4
-policyselector: null
-presignedurl:
-  allowedhttpmethods:
+token_manager:
+  jwt_secret: Pive-Fumkiu4
+policy_selector:
+  static:
+    policy: ocis
+  migration: null
+  claims: null
+  regex: null
+pre_signed_url:
+  allowed_http_methods:
   - GET
   enabled: true
-accountbackend: accounts
-useroidcclaim: email
-usercs3claim: mail
-machineauthapikey: change-me-please
-autoprovisionaccounts: false
-enablebasicauth: false
-insecurebackends: false
-authmiddleware:
-  credentialsbyuseragent: {}
+account_backend: accounts
+user_oidc_claim: email
+user_cs3_claim: mail
+machine_auth_api_key: change-me-please
+auto_provision_accounts: false
+enable_basic_auth: false
+insecure_backends: false
+auth_middleware:
+  credentials_by_user_agent: {}

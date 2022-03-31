@@ -18,22 +18,22 @@ http:
   addr: 127.0.0.1:9115
   root: /
   cors:
-    allowedorigins:
+    allowed_origins:
     - '*'
-    allowedmethods:
+    allowed_methods:
     - GET
     - POST
     - PUT
     - PATCH
     - DELETE
     - OPTIONS
-    allowedheaders:
+    allowed_headers:
     - Authorization
     - Origin
     - Content-Type
     - Accept
     - X-Requested-With
-    allowcredentials: true
-ocispublicurl: https://127.0.0.1:9200
-webdavnamespace: /users/{{.Id.OpaqueId}}
-revagateway: 127.0.0.1:9142
+    allow_credentials: true
+ocis_public_url: https://127.0.0.1:9200
+webdav_namespace: /users/{{.Id.OpaqueId}}
+reva_gateway: 127.0.0.1:9142

@@ -16,4 +16,4 @@ debug:
   zpages: false
 grpc:
   addr: 127.0.0.1:9460
-datapath: ~/.ocis/store
+data_path: ~/.ocis/store

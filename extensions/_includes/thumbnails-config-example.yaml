@@ -28,11 +28,11 @@ thumbnail:
   - 1920x1080
   - 3840x2160
   - 7680x4320
-  filesystemstorage:
-    rootdirectory: ~/.ocis/thumbnails
-  webdavallowinsecure: false
-  cs3allowinsecure: false
-  revagateway: 127.0.0.1:9142
-  fontmapfile: ""
-  transfertokensecret: changemeplease
-  dataendpoint: http://127.0.0.1:9186/thumbnails/data
+  filesystem_storage:
+    root_directory: ~/.ocis/thumbnails
+  webdav_allow_insecure: false
+  cs3_allow_insecure: false
+  reva_gateway: 127.0.0.1:9142
+  font_map_file: ""
+  transfer_token: changemeplease
+  data_endpoint: http://127.0.0.1:9186/thumbnails/data

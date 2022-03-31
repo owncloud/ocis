@@ -18,28 +18,28 @@ http:
   addr: 127.0.0.1:9110
   root: /ocs
   cors:
-    allowedorigins:
+    allowed_origins:
     - '*'
-    allowedmethods:
+    allowed_methods:
     - GET
     - POST
     - PUT
     - PATCH
     - DELETE
     - OPTIONS
-    allowedheaders:
+    allowed_headers:
     - Authorization
     - Origin
     - Content-Type
     - Accept
     - X-Requested-With
-    allowcredentials: true
-tokenmanager:
-  jwtsecret: Pive-Fumkiu4
+    allowed_credentials: true
+token_manager:
+  jwt_secret: Pive-Fumkiu4
 reva:
   address: 127.0.0.1:9142
-identitymanagement:
+identity_management:
   address: https://localhost:9200
-accountbackend: accounts
-storageusersdriver: ocis
-machineauthapikey: change-me-please
+account_backend: accounts
+storage_users_driver: ocis
+machine_auth_api_key: change-me-please

@@ -8,248 +8,248 @@ debug:
   pprof: false
   zpages: false
 reva:
-  jwtsecret: Pive-Fumkiu4
-  skipusergroupsintoken: false
-  transfersecret: replace-me-with-a-transfer-secret
-  transferexpires: 86400
+  jwt_secret: Pive-Fumkiu4
+  skip_user_grooups_in_token: false
+  transfer_secret: replace-me-with-a-transfer-secret
+  transfer_expires: 86400
   oidc:
     issuer: https://localhost:9200
     insecure: false
-    idclaim: preferred_username
-    uidclaim: ""
-    gidclaim: ""
+    id_claim: preferred_username
+    uid_claim: ""
+    gid_claim: ""
   ldap:
     hostname: localhost
     port: 9126
-    cacert: ~/.ocis/ldap/ldap.crt
+    ca_cert: ~/.ocis/ldap/ldap.crt
     insecure: false
-    basedn: dc=ocis,dc=test
-    loginfilter: (&(objectclass=posixAccount)(|(cn={{login}})(mail={{login}})))
-    userfilter: (&(objectclass=posixAccount)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))
-    userattributefilter: (&(objectclass=posixAccount)({{attr}}={{value}}))
-    userfindfilter: (&(objectclass=posixAccount)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))
-    usergroupfilter: (&(objectclass=posixGroup)(cn={{query}}*))
-    groupfilter: (&(objectclass=posixGroup)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))
-    groupattributefilter: (&(objectclass=posixGroup)({{attr}}={{value}}))
-    groupfindfilter: (&(objectclass=posixGroup)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))
-    groupmemberfilter: (&(objectclass=posixAccount)(ownclouduuid={{.OpaqueId}}*))
-    binddn: cn=reva,ou=sysusers,dc=ocis,dc=test
-    bindpassword: reva
+    base_dn: dc=ocis,dc=test
+    login_filter: (&(objectclass=posixAccount)(|(cn={{login}})(mail={{login}})))
+    user_filter: (&(objectclass=posixAccount)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))
+    user_attribute_filter: (&(objectclass=posixAccount)({{attr}}={{value}}))
+    user_find_filter: (&(objectclass=posixAccount)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))
+    user_group_filter: (&(objectclass=posixGroup)(cn={{query}}*))
+    group_filter: (&(objectclass=posixGroup)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))
+    group_attribute_filter: (&(objectclass=posixGroup)({{attr}}={{value}}))
+    group_finder_filter: (&(objectclass=posixGroup)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))
+    group_member_filter: (&(objectclass=posixAccount)(ownclouduuid={{.OpaqueId}}*))
+    bind_dn: cn=reva,ou=sysusers,dc=ocis,dc=test
+    bind_password: reva
     idp: https://localhost:9200
-    userschema:
+    user_schema:
       uid: ownclouduuid
       mail: mail
-      displayname: displayname
+      display_name: displayname
       cn: cn
-      uidnumber: uidnumber
-      gidnumber: gidnumber
-    groupschema:
+      uid_number: uidnumber
+      gid_number: gidnumber
+    group_schema:
       gid: cn
       mail: mail
-      displayname: cn
+      display_name: cn
       cn: cn
-      gidnumber: gidnumber
-  usergrouprest:
-    clientid: ""
-    clientsecret: ""
-    redisaddress: localhost:6379
-    redisusername: ""
-    redispassword: ""
-    idprovider: ""
-    apibaseurl: ""
-    oidctokenendpoint: ""
-    targetapi: ""
-  userowncloudsql:
-    dbusername: owncloud
-    dbpassword: secret
-    dbhost: mysql
-    dbport: 3306
-    dbname: owncloud
+      gid_number: gidnumber
+  user_group_rest:
+    client_id: ""
+    client_secret: ""
+    redis_address: localhost:6379
+    redis_username: ""
+    redis_password: ""
+    idp_provider: ""
+    api_base_url: ""
+    oidc_token_endpoint: ""
+    target_api: ""
+  user_owncloud_sql:
+    db_username: owncloud
+    db_password: secret
+    db_host: mysql
+    db_port: 3306
+    db_name: owncloud
     idp: https://localhost:9200
     nobody: 90
-    joinusername: false
-    joinownclouduuid: false
-    enablemedialsearch: false
+    join_username: false
+    join_owncloud_uuid: false
+    enable_medial_search: false
   ocdav:
-    webdavnamespace: /users/{{.Id.OpaqueId}}
-    davfilesnamespace: /users/{{.Id.OpaqueId}}
+    webdav_namespace: /users/{{.Id.OpaqueId}}
+    dav_files_namespace: /users/{{.Id.OpaqueId}}
   archiver:
-    maxnumfiles: 10000
-    maxsize: 1073741824
-    archiverurl: /archiver
-  userstorage:
+    max_num_files: 10000
+    max_size: 1073741824
+    archiver_url: /archiver
+  user_storage:
     eos:
       drivercommon:
         root: /eos/dockertest/reva
-        sharefolder: /Shares
-        userlayout: '{{substr 0 1 .Username}}/{{.Username}}'
-        enablehome: false
-        personalspacealiastemplate: ""
-        generalspacealiastemplate: ""
-      shadownamespace: ""
-      uploadsnamespace: ""
-      eosbinary: /usr/bin/eos
-      xrdcopybinary: /usr/bin/xrdcopy
-      masterurl: root://eos-mgm1.eoscluster.cern.ch:1094
-      grpcuri: ""
-      slaveurl: root://eos-mgm1.eoscluster.cern.ch:1094
-      cachedirectory: /tmp
-      enablelogging: false
-      showhiddensysfiles: false
-      forcesingleusermode: false
-      usekeytab: false
-      secprotocol: ""
+        share_folder: /Shares
+        user_layout: '{{substr 0 1 .Username}}/{{.Username}}'
+        enable_home: false
+        personalspacealias_template: ""
+        generalspacealias_template: ""
+      shadow_namespace: ""
+      uploads_namespace: ""
+      eos_binary: /usr/bin/eos
+      xrd_copy_binary: /usr/bin/xrdcopy
+      master_url: root://eos-mgm1.eoscluster.cern.ch:1094
+      grpc_uri: ""
+      slave_url: root://eos-mgm1.eoscluster.cern.ch:1094
+      cache_directory: /tmp
+      enable_logging: false
+      shadow_hidden_files: false
+      force_single_user_mode: false
+      user_keytab: false
+      sec_protocol: ""
       keytab: ""
-      singleusername: ""
-      gatewaysvc: 127.0.0.1:9142
+      single_username: ""
+      gateway_svc: 127.0.0.1:9142
     local:
       root: ~/.ocis/storage/local/users
-      sharefolder: /Shares
-      userlayout: '{{.Username}}'
-      enablehome: false
-      personalspacealiastemplate: ""
-      generalspacealiastemplate: ""
-    owncloudsql:
+      share_folder: /Shares
+      user_layout: '{{.Username}}'
+      enable_home: false
+      personalspacealias_template: ""
+      generalspacealias_template: ""
+    owncloud_sql:
       drivercommon:
         root: ~/.ocis/storage/owncloud
-        sharefolder: /Shares
-        userlayout: '{{.Username}}'
-        enablehome: false
-        personalspacealiastemplate: ""
-        generalspacealiastemplate: ""
-      uploadinfodir: ~/.ocis/storage/uploadinfo
-      dbusername: owncloud
-      dbpassword: owncloud
-      dbhost: ""
-      dbport: 3306
-      dbname: owncloud
+        share_folder: /Shares
+        user_layout: '{{.Username}}'
+        enable_home: false
+        personalspacealias_template: ""
+        generalspacealias_template: ""
+      upload_info_dir: ~/.ocis/storage/uploadinfo
+      db_username: owncloud
+      db_password: owncloud
+      db_host: ""
+      db_port: 3306
+      db_name: owncloud
     s3:
       drivercommon:
         root: ""
-        sharefolder: ""
-        userlayout: ""
-        enablehome: false
-        personalspacealiastemplate: ""
-        generalspacealiastemplate: ""
+        share_folder: ""
+        user_layout: ""
+        enable_home: false
+        personalspacealias_template: ""
+        generalspacealias_template: ""
       region: default
-      accesskey: ""
-      secretkey: ""
+      access_key: ""
+      secret_key: ""
       endpoint: ""
       bucket: ""
     s3ng:
       drivercommon:
         root: ~/.ocis/storage/users
-        sharefolder: /Shares
-        userlayout: '{{.Id.OpaqueId}}'
-        enablehome: false
-        personalspacealiastemplate: '{{.SpaceType}}/{{.User.Username | lower}}'
-        generalspacealiastemplate: '{{.SpaceType}}/{{.SpaceName | replace " " "-"
+        share_folder: /Shares
+        user_layout: '{{.Id.OpaqueId}}'
+        enable_home: false
+        personalspacealias_template: '{{.SpaceType}}/{{.User.Username | lower}}'
+        generalspacealias_template: '{{.SpaceType}}/{{.SpaceName | replace " " "-"
           | lower}}'
       region: default
-      accesskey: ""
-      secretkey: ""
+      access_key: ""
+      secret_key: ""
       endpoint: ""
       bucket: ""
     ocis:
       drivercommon:
         root: ~/.ocis/storage/users
-        sharefolder: /Shares
-        userlayout: '{{.Id.OpaqueId}}'
-        enablehome: false
-        personalspacealiastemplate: '{{.SpaceType}}/{{.User.Username | lower}}'
-        generalspacealiastemplate: '{{.SpaceType}}/{{.SpaceName | replace " " "-"
+        share_folder: /Shares
+        user_layout: '{{.Id.OpaqueId}}'
+        enable_home: false
+        personalspacealias_template: '{{.SpaceType}}/{{.User.Username | lower}}'
+        generalspacealias_template: '{{.SpaceType}}/{{.SpaceName | replace " " "-"
           | lower}}'
-  metadatastorage:
+  metadata_storage:
     eos:
       drivercommon:
         root: /eos/dockertest/reva
-        sharefolder: /Shares
-        userlayout: '{{substr 0 1 .Username}}/{{.Username}}'
-        enablehome: false
-        personalspacealiastemplate: ""
-        generalspacealiastemplate: ""
-      shadownamespace: ""
-      uploadsnamespace: ""
-      eosbinary: /usr/bin/eos
-      xrdcopybinary: /usr/bin/xrdcopy
-      masterurl: root://eos-mgm1.eoscluster.cern.ch:1094
-      grpcuri: ""
-      slaveurl: root://eos-mgm1.eoscluster.cern.ch:1094
-      cachedirectory: /tmp
-      enablelogging: false
-      showhiddensysfiles: false
-      forcesingleusermode: false
-      usekeytab: false
-      secprotocol: ""
+        share_folder: /Shares
+        user_layout: '{{substr 0 1 .Username}}/{{.Username}}'
+        enable_home: false
+        personalspacealias_template: ""
+        generalspacealias_template: ""
+      shadow_namespace: ""
+      uploads_namespace: ""
+      eos_binary: /usr/bin/eos
+      xrd_copy_binary: /usr/bin/xrdcopy
+      master_url: root://eos-mgm1.eoscluster.cern.ch:1094
+      grpc_uri: ""
+      slave_url: root://eos-mgm1.eoscluster.cern.ch:1094
+      cache_directory: /tmp
+      enable_logging: false
+      shadow_hidden_files: false
+      force_single_user_mode: false
+      user_keytab: false
+      sec_protocol: ""
       keytab: ""
-      singleusername: ""
-      gatewaysvc: 127.0.0.1:9142
+      single_username: ""
+      gateway_svc: 127.0.0.1:9142
     local:
       root: ~/.ocis/storage/local/metadata
-      sharefolder: ""
-      userlayout: ""
-      enablehome: false
-      personalspacealiastemplate: ""
-      generalspacealiastemplate: ""
-    owncloudsql:
+      share_folder: ""
+      user_layout: ""
+      enable_home: false
+      personalspacealias_template: ""
+      generalspacealias_template: ""
+    owncloud_sql:
       drivercommon:
         root: ""
-        sharefolder: ""
-        userlayout: ""
-        enablehome: false
-        personalspacealiastemplate: ""
-        generalspacealiastemplate: ""
-      uploadinfodir: ""
-      dbusername: ""
-      dbpassword: ""
-      dbhost: ""
-      dbport: 0
-      dbname: ""
+        share_folder: ""
+        user_layout: ""
+        enable_home: false
+        personalspacealias_template: ""
+        generalspacealias_template: ""
+      upload_info_dir: ""
+      db_username: ""
+      db_password: ""
+      db_host: ""
+      db_port: 0
+      db_name: ""
     s3:
       drivercommon:
         root: ""
-        sharefolder: ""
-        userlayout: ""
-        enablehome: false
-        personalspacealiastemplate: ""
-        generalspacealiastemplate: ""
+        share_folder: ""
+        user_layout: ""
+        enable_home: false
+        personalspacealias_template: ""
+        generalspacealias_template: ""
       region: default
-      accesskey: ""
-      secretkey: ""
+      access_key: ""
+      secret_key: ""
       endpoint: ""
       bucket: ""
     s3ng:
       drivercommon:
         root: ~/.ocis/storage/metadata
-        sharefolder: ""
-        userlayout: '{{.Id.OpaqueId}}'
-        enablehome: false
-        personalspacealiastemplate: ""
-        generalspacealiastemplate: ""
+        share_folder: ""
+        user_layout: '{{.Id.OpaqueId}}'
+        enable_home: false
+        personalspacealias_template: ""
+        generalspacealias_template: ""
       region: default
-      accesskey: ""
-      secretkey: ""
+      access_key: ""
+      secret_key: ""
       endpoint: ""
       bucket: ""
     ocis:
       drivercommon:
         root: ~/.ocis/storage/metadata
-        sharefolder: ""
-        userlayout: '{{.Id.OpaqueId}}'
-        enablehome: false
-        personalspacealiastemplate: ""
-        generalspacealiastemplate: ""
+        share_folder: ""
+        user_layout: '{{.Id.OpaqueId}}'
+        enable_home: false
+        personalspacealias_template: ""
+        generalspacealias_template: ""
   frontend:
     port:
-      maxcpus: ""
-      loglevel: ""
-      grpcnetwork: ""
-      grpcaddr: ""
-      httpnetwork: tcp
-      httpaddr: 127.0.0.1:9140
+      max_cpus: ""
+      log_level: ""
+      grpc_network: ""
+      grpc_addr: ""
+      http_network: tcp
+      http_addr: 127.0.0.1:9140
       protocol: ""
       endpoint: ""
-      debugaddr: 127.0.0.1:9141
+      debug_addr: 127.0.0.1:9141
       services:
       - datagateway
       - ocdav
@@ -258,36 +258,36 @@ reva:
       config: {}
       context: null
       supervised: false
-    appproviderinsecure: false
-    appproviderprefix: ""
-    archiverinsecure: false
-    archiverprefix: archiver
-    datagatewayprefix: data
+    app_provider_insecure: false
+    app_provider_prefix: ""
+    archiver_insecure: false
+    archiver_prefix: archiver
+    data_gateway_prefix: data
     favorites: false
-    projectspaces: true
-    ocdavinsecure: false
-    ocdavprefix: ""
-    ocsprefix: ocs
-    ocsshareprefix: /Shares
-    ocshomenamespace: /users/{{.Id.OpaqueId}}
-    publicurl: https://localhost:9200
-    ocscachewarmupdriver: ""
-    ocsadditionalinfoattribute: '{{.Mail}}'
-    ocsresourceinfocachettl: 0
+    project_spaces: true
+    ocdav_insecure: false
+    ocdav_prefix: ""
+    ocs_prefix: ocs
+    ocs_share_prefix: /Shares
+    ocs_home_namespace: /users/{{.Id.OpaqueId}}
+    public_url: https://localhost:9200
+    ocs_cache_warmup_driver: ""
+    ocs_additional_info_attribute: '{{.Mail}}'
+    ocs_resource_info_cache_ttl: 0
     middleware:
       auth:
-        credentialsbyuseragent: {}
-  datagateway:
+        credentials_by_user_agenr: {}
+  data_gateway:
     port:
-      maxcpus: ""
-      loglevel: ""
-      grpcnetwork: ""
-      grpcaddr: ""
-      httpnetwork: ""
-      httpaddr: ""
+      max_cpus: ""
+      log_level: ""
+      grpc_network: ""
+      grpc_addr: ""
+      http_network: ""
+      http_addr: ""
       protocol: ""
       endpoint: ""
-      debugaddr: ""
+      debug_addr: ""
       services: []
       config: {}
       context: null
@@ -295,45 +295,45 @@ reva:
     publicurl: ""
   gateway:
     port:
-      maxcpus: ""
-      loglevel: ""
-      grpcnetwork: tcp
-      grpcaddr: 127.0.0.1:9142
-      httpnetwork: ""
-      httpaddr: ""
+      max_cpus: ""
+      log_level: ""
+      grpc_network: tcp
+      grpc_addr: 127.0.0.1:9142
+      http_network: ""
+      http_addr: ""
       protocol: ""
       endpoint: 127.0.0.1:9142
-      debugaddr: 127.0.0.1:9143
+      debug_addr: 127.0.0.1:9143
       services: []
       config: {}
       context: null
       supervised: false
-    commitsharetostoragegrant: true
-    commitsharetostorageref: true
-    disablehomecreationonlogin: true
-    sharefolder: Shares
-    linkgrants: ""
-    homemapping: ""
-    etagcachettl: 0
-  storageregistry:
+    commit_share_to_storage_grant: true
+    commit_share_to_storage_ref: true
+    disable_home_creation_on_login: true
+    share_folder: Shares
+    link_grants: ""
+    home_mapping: ""
+    etag_cache_ttl: 0
+  storage_registry:
     driver: spaces
-    homeprovider: /home
+    home_provider: /home
     rules: []
     json: ""
-  appregistry:
+  app_registry:
     driver: static
-    mimetypesjson: ""
+    mime_types_json: ""
   users:
     port:
-      maxcpus: ""
-      loglevel: ""
-      grpcnetwork: tcp
-      grpcaddr: 127.0.0.1:9144
-      httpnetwork: ""
-      httpaddr: ""
+      max_cpus: ""
+      log_level: ""
+      grpc_network: tcp
+      grpc_addr: 127.0.0.1:9144
+      http_network: ""
+      http_addr: ""
       protocol: ""
       endpoint: localhost:9144
-      debugaddr: 127.0.0.1:9145
+      debug_addr: 127.0.0.1:9145
       services:
       - userprovider
       config: {}
@@ -341,18 +341,18 @@ reva:
       supervised: false
     driver: ldap
     json: ""
-    usergroupscacheexpiration: 5
+    user_groups_cache_expiration: 5
   groups:
     port:
-      maxcpus: ""
-      loglevel: ""
-      grpcnetwork: tcp
-      grpcaddr: 127.0.0.1:9160
-      httpnetwork: ""
-      httpaddr: ""
+      max_cpus: ""
+      log_level: ""
+      grpc_network: tcp
+      grpc_addr: 127.0.0.1:9160
+      http_network: ""
+      http_addr: ""
       protocol: ""
       endpoint: localhost:9160
-      debugaddr: 127.0.0.1:9161
+      debug_addr: 127.0.0.1:9161
       services:
       - groupprovider
       config: {}
@@ -360,270 +360,270 @@ reva:
       supervised: false
     driver: ldap
     json: ""
-    groupmemberscacheexpiration: 5
-  authprovider:
+    group_members_cache_expiration: 5
+  auth_provider:
     port:
-      maxcpus: ""
-      loglevel: ""
-      grpcnetwork: ""
-      grpcaddr: ""
-      httpnetwork: ""
-      httpaddr: ""
+      max_cpus: ""
+      log_level: ""
+      grpc_network: ""
+      grpc_addr: ""
+      http_network: ""
+      http_addr: ""
       protocol: ""
       endpoint: ""
-      debugaddr: ""
+      debug_addr: ""
       services: []
       config: {}
       context: null
       supervised: false
     driver: ldap
     json: ""
-    usergroupscacheexpiration: 0
-  authbasic:
-    maxcpus: ""
-    loglevel: ""
-    grpcnetwork: tcp
-    grpcaddr: 127.0.0.1:9146
-    httpnetwork: ""
-    httpaddr: ""
+    user_groups_cache_expiration: 0
+  auth_basic:
+    max_cpus: ""
+    log_level: ""
+    grpc_network: tcp
+    grpc_addr: 127.0.0.1:9146
+    http_network: ""
+    http_addr: ""
     protocol: ""
     endpoint: localhost:9146
-    debugaddr: 127.0.0.1:9147
+    debug_addr: 127.0.0.1:9147
     services:
     - authprovider
     config: {}
     context: null
     supervised: false
-  authbearer:
-    maxcpus: ""
-    loglevel: ""
-    grpcnetwork: tcp
-    grpcaddr: 127.0.0.1:9148
-    httpnetwork: ""
-    httpaddr: ""
+  auth_bearer:
+    max_cpus: ""
+    log_level: ""
+    grpc_network: tcp
+    grpc_addr: 127.0.0.1:9148
+    http_network: ""
+    http_addr: ""
     protocol: ""
     endpoint: localhost:9148
-    debugaddr: 127.0.0.1:9149
+    debug_addr: 127.0.0.1:9149
     services:
     - authprovider
     config: {}
     context: null
     supervised: false
-  authmachine:
-    maxcpus: ""
-    loglevel: ""
-    grpcnetwork: tcp
-    grpcaddr: 127.0.0.1:9166
-    httpnetwork: ""
-    httpaddr: ""
+  auth_machine:
+    max_cpus: ""
+    log_level: ""
+    grpc_network: tcp
+    grpc_addr: 127.0.0.1:9166
+    http_network: ""
+    http_addr: ""
     protocol: ""
     endpoint: localhost:9166
-    debugaddr: 127.0.0.1:9167
+    debug_addr: 127.0.0.1:9167
     services:
     - authprovider
     config: {}
     context: null
     supervised: false
-  authmachineconfig:
-    machineauthapikey: change-me-please
+  auth_machine_config:
+    machine_auth_api_key: change-me-please
   sharing:
     port:
-      maxcpus: ""
-      loglevel: ""
-      grpcnetwork: tcp
-      grpcaddr: 127.0.0.1:9150
-      httpnetwork: ""
-      httpaddr: ""
+      max_cpus: ""
+      log_level: ""
+      grpc_network: tcp
+      grpc_addr: 127.0.0.1:9150
+      http_network: ""
+      http_addr: ""
       protocol: ""
       endpoint: localhost:9150
-      debugaddr: 127.0.0.1:9151
+      debug_addr: 127.0.0.1:9151
       services:
       - usershareprovider
       - publicshareprovider
       config: {}
       context: null
       supervised: false
-    userdriver: json
-    userjsonfile: ~/.ocis/storage/shares.json
-    cs3provideraddr: 127.0.0.1:9215
-    cs3serviceuser: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
-    cs3serviceuseridp: https://localhost:9200
-    usersqlusername: ""
-    usersqlpassword: ""
-    usersqlhost: ""
-    usersqlport: 1433
-    usersqlname: ""
-    publicdriver: json
-    publicjsonfile: ~/.ocis/storage/publicshares.json
-    publicpasswordhashcost: 11
-    publicenableexpiredsharescleanup: true
-    publicjanitorruninterval: 60
-    userstoragemountid: ""
+    user_driver: json
+    user_json_file: ~/.ocis/storage/shares.json
+    provider_addr: 127.0.0.1:9215
+    service_user_id: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
+    service_user_idp: https://localhost:9200
+    user_sql_username: ""
+    user_sql_password: ""
+    user_sql_host: ""
+    user_sql_port: 1433
+    user_sql_name: ""
+    public_driver: json
+    public_json_file: ~/.ocis/storage/publicshares.json
+    public_password_hash_cost: 11
+    public_enable_expired_shares_cleanup: true
+    public_janitor_run_interval: 60
+    user_storage_mount_id: ""
     events:
       address: 127.0.0.1:9233
-      clusterid: ocis-cluster
-  storageshares:
+      cluster_id: ocis-cluster
+  storage_shares:
     port:
-      maxcpus: ""
-      loglevel: ""
-      grpcnetwork: tcp
-      grpcaddr: 127.0.0.1:9154
-      httpnetwork: tcp
-      httpaddr: 127.0.0.1:9155
+      max_cpus: ""
+      log_level: ""
+      grpc_network: tcp
+      grpc_addr: 127.0.0.1:9154
+      http_network: tcp
+      http_addr: 127.0.0.1:9155
       protocol: ""
       endpoint: localhost:9154
-      debugaddr: 127.0.0.1:9156
+      debug_addr: 127.0.0.1:9156
       services: []
       config: {}
       context: null
       supervised: false
     driver: ""
-    mountid: 1284d238-aa92-42ce-bdc4-0b0000009157
-    alternativeid: 1284d238-aa92-42ce-bdc4-0b0000009154
-    exposedataserver: false
-    dataserverurl: ""
-    httpprefix: ""
-    tempfolder: ""
-    readonly: false
-    dataprovider:
+    mount_id: 1284d238-aa92-42ce-bdc4-0b0000009157
+    alternative_id: 1284d238-aa92-42ce-bdc4-0b0000009154
+    expose_data_server: false
+    data_server_url: ""
+    http_prefix: ""
+    temp_folder: ""
+    read_only: false
+    data_provider:
       insecure: false
-    gatewayendpoint: ""
-  storageusers:
+    gateway_endpoint: ""
+  storage_users:
     port:
-      maxcpus: ""
-      loglevel: ""
-      grpcnetwork: tcp
-      grpcaddr: 127.0.0.1:9157
-      httpnetwork: tcp
-      httpaddr: 127.0.0.1:9158
+      max_cpus: ""
+      log_level: ""
+      grpc_network: tcp
+      grpc_addr: 127.0.0.1:9157
+      http_network: tcp
+      http_addr: 127.0.0.1:9158
       protocol: ""
       endpoint: localhost:9157
-      debugaddr: 127.0.0.1:9159
+      debug_addr: 127.0.0.1:9159
       services: []
       config: {}
       context: null
       supervised: false
     driver: ocis
-    mountid: 1284d238-aa92-42ce-bdc4-0b0000009157
-    alternativeid: ""
-    exposedataserver: false
-    dataserverurl: http://localhost:9158/data
-    httpprefix: data
-    tempfolder: ~/.ocis/tmp/users
-    readonly: false
-    dataprovider:
+    mount_id: 1284d238-aa92-42ce-bdc4-0b0000009157
+    alternative_id: ""
+    expose_data_server: false
+    data_server_url: http://localhost:9158/data
+    http_prefix: data
+    temp_folder: ~/.ocis/tmp/users
+    read_only: false
+    data_provider:
       insecure: false
-    gatewayendpoint: ""
-  storagepubliclink:
+    gateway_endpoint: ""
+  storage_public_link:
     storageport:
       port:
-        maxcpus: ""
-        loglevel: ""
-        grpcnetwork: tcp
-        grpcaddr: 127.0.0.1:9178
-        httpnetwork: ""
-        httpaddr: ""
+        max_cpus: ""
+        log_level: ""
+        grpc_network: tcp
+        grpc_addr: 127.0.0.1:9178
+        http_network: ""
+        http_addr: ""
         protocol: ""
         endpoint: localhost:9178
-        debugaddr: 127.0.0.1:9179
+        debug_addr: 127.0.0.1:9179
         services: []
         config: {}
         context: null
         supervised: false
       driver: ""
-      mountid: 7993447f-687f-490d-875c-ac95e89a62a4
-      alternativeid: ""
-      exposedataserver: false
-      dataserverurl: ""
-      httpprefix: ""
-      tempfolder: ""
-      readonly: false
-      dataprovider:
+      mount_id: 7993447f-687f-490d-875c-ac95e89a62a4
+      alternative_id: ""
+      expose_data_server: false
+      data_server_url: ""
+      http_prefix: ""
+      temp_folder: ""
+      read_only: false
+      data_provider:
         insecure: false
-      gatewayendpoint: ""
-    publicshareprovideraddr: ""
-    userprovideraddr: ""
-  storagemetadata:
+      gateway_endpoint: ""
+    public_share_provider_addr: ""
+    user_provider_addr: ""
+  storage_metadata:
     port:
-      maxcpus: ""
-      loglevel: ""
-      grpcnetwork: tcp
-      grpcaddr: 127.0.0.1:9215
-      httpnetwork: tcp
-      httpaddr: 127.0.0.1:9216
+      max_cpus: ""
+      log_level: ""
+      grpc_network: tcp
+      grpc_addr: 127.0.0.1:9215
+      http_network: tcp
+      http_addr: 127.0.0.1:9216
       protocol: ""
       endpoint: ""
-      debugaddr: 127.0.0.1:9217
+      debug_addr: 127.0.0.1:9217
       services: []
       config: {}
       context: null
       supervised: false
     driver: ocis
-    mountid: ""
-    alternativeid: ""
-    exposedataserver: false
-    dataserverurl: http://localhost:9216/data
-    httpprefix: ""
-    tempfolder: ~/.ocis/tmp/metadata
-    readonly: false
-    dataprovider:
+    mount_id: ""
+    alternative_id: ""
+    expose_data_server: false
+    data_server_url: http://localhost:9216/data
+    http_prefix: ""
+    temp_folder: ~/.ocis/tmp/metadata
+    read_only: false
+    data_provider:
       insecure: false
-    gatewayendpoint: ""
-  appprovider:
+    gateway_endpoint: ""
+  app_provider:
     port:
-      maxcpus: ""
-      loglevel: ""
-      grpcnetwork: tcp
-      grpcaddr: 127.0.0.1:9164
-      httpnetwork: ""
-      httpaddr: ""
+      max_cpus: ""
+      log_level: ""
+      grpc_network: tcp
+      grpc_addr: 127.0.0.1:9164
+      http_network: ""
+      http_addr: ""
       protocol: ""
       endpoint: localhost:9164
-      debugaddr: 127.0.0.1:9165
+      debug_addr: 127.0.0.1:9165
       services:
       - appprovider
       config: {}
       context: null
       supervised: false
-    externaladdr: 127.0.0.1:9164
+    external_addr: 127.0.0.1:9164
     driver: ""
-    wopidriver:
-      appapikey: ""
-      appdesktoponly: false
-      appiconuri: ""
-      appinternalurl: ""
-      appname: ""
-      appurl: ""
+    wopi_driver:
+      app_api_key: ""
+      app_desktop_only: false
+      app_icon_uri: ""
+      app_internal_url: ""
+      app_name: ""
+      app_url: ""
       insecure: false
-      iopsecret: ""
-      jwtsecret: ""
-      wopiurl: ""
-    appsurl: /app/list
-    openurl: /app/open
-    newurl: /app/new
+      ipo_secret: ""
+      jwt_secret: ""
+      wopi_url: ""
+    apps_url: /app/list
+    open_url: /app/open
+    new_url: /app/new
   permissions:
-    maxcpus: ""
-    loglevel: ""
-    grpcnetwork: ""
-    grpcaddr: ""
-    httpnetwork: ""
-    httpaddr: ""
+    max_cpus: ""
+    log_level: ""
+    grpc_network: ""
+    grpc_addr: ""
+    http_network: ""
+    http_addr: ""
     protocol: ""
     endpoint: localhost:9191
-    debugaddr: ""
+    debug_addr: ""
     services: []
     config: {}
     context: null
     supervised: false
   configs: {}
-  uploadmaxchunksize: 100000000
-  uploadhttpmethodoverride: ""
-  checksumsupportedtypes:
+  uppload_max_chunk_size: 100000000
+  upload_http_method_override: ""
+  checksum_supported_types:
   - sha1
   - md5
   - adler32
-  checksumpreferreduploadtype: ""
-  defaultuploadprotocol: tus
+  checksum_preferred_upload_type: ""
+  default_upload_protocol: tus
 tracing:
   enabled: false
   type: jaeger

@@ -17,35 +17,35 @@ debug:
 http:
   addr: 127.0.0.1:9190
   root: /
-  cachettl: 604800
+  cache_ttl: 604800
   cors:
-    allowedorigins:
+    allowed_origins:
     - '*'
-    allowedmethods:
+    allowed_methods:
     - GET
     - POST
     - PUT
     - PATCH
     - DELETE
     - OPTIONS
-    allowedheaders:
+    allowed_headers:
     - Authorization
     - Origin
     - Content-Type
     - Accept
     - X-Requested-With
-    allowcredentials: true
+    allowed_credentials: true
 grpc:
   addr: 127.0.0.1:9191
-storetype: metadata
-datapath: ~/.ocis/settings
-metadata:
-  gatewayaddress: 127.0.0.1:9142
-  storageaddress: 127.0.0.1:9215
-  serviceuserid: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
-  serviceuseridp: https://localhost:9200
-  machineauthapikey: change-me-please
+store_type: metadata
+data_path: ~/.ocis/settings
+metadata_config:
+  gateway_addr: 127.0.0.1:9142
+  storage_addr: 127.0.0.1:9215
+  service_user_id: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
+  service_user_idp: https://localhost:9200
+  machine_auth_api_key: change-me-please
 asset:
   path: ""
-tokenmanager:
-  jwtsecret: Pive-Fumkiu4
+token_manager:
+  jwt_secret: Pive-Fumkiu4

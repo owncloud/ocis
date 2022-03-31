@@ -10,14 +10,14 @@ debug:
   pprof: false
   zpages: false
 notifications:
-  smtp:
-    host: 127.0.0.1
-    port: "1025"
-    sender: god@example.com
-    password: godisdead
+  SMTP:
+    smtp_host: 127.0.0.1
+    smtp_port: "1025"
+    smtp_sender: god@example.com
+    smtp_password: godisdead
   events:
-    endpoint: 127.0.0.1:9233
-    cluster: ocis-cluster
-    consumergroup: notifications
-  revagateway: 127.0.0.1:9142
-  machineauthsecret: change-me-please
+    events_endpoint: 127.0.0.1:9233
+    events_cluster: ocis-cluster
+    events_group: notifications
+  reva_gateway: 127.0.0.1:9142
+  machine_auth_api_key: change-me-please

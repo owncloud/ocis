@@ -24,20 +24,20 @@ ldaps:
   key: ~/.ocis/ldap/ldap.key
 backend:
   datastore: accounts
-  basedn: dc=ocis,dc=test
+  base_dn: dc=ocis,dc=test
   insecure: false
-  nameformat: cn
-  groupformat: ou
+  name_format: cn
+  group_format: ou
   servers: []
-  sshkeyattr: sshPublicKey
-  usegraphapi: true
+  ssh_key_attr: sshPublicKey
+  use_graph_api: true
 fallback:
   datastore: ""
-  basedn: dc=ocis,dc=test
+  base_dn: dc=ocis,dc=test
   insecure: false
-  nameformat: cn
-  groupformat: ou
+  name_format: cn
+  group_format: ou
   servers: []
-  sshkeyattr: sshPublicKey
-  usegraphapi: true
-rolebundleuuid: 71881883-1768-46bd-a24d-a356a2afdf7f
+  ssh_key_attr: sshPublicKey
+  use_graph_api: true
+role_bundle_uuid: 71881883-1768-46bd-a24d-a356a2afdf7f

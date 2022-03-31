@@ -19,32 +19,32 @@ http:
   root: /graph
 reva:
   address: 127.0.0.1:9142
-tokenmanager:
-  jwtsecret: Pive-Fumkiu4
+token_manager:
+  jwt_secret: Pive-Fumkiu4
 spaces:
-  webdavbase: https://localhost:9200
-  webdavpath: /dav/spaces/
-  defaultquota: "1000000000"
+  webdav_base: https://localhost:9200
+  webdav_path: /dav/spaces/
+  default_quota: "1000000000"
   insecure: false
-  extendedspacepropertiescachettl: 0
+  extended_space_properties_cache_ttl: 0
 identity:
   backend: cs3
   ldap:
     uri: ldap://localhost:9125
     insecure: false
-    binddn: ""
-    bindpassword: ""
-    useserveruuid: false
-    writeenabled: false
-    userbasedn: ou=users,dc=ocis,dc=test
-    usersearchscope: sub
-    userfilter: (objectClass=inetOrgPerson)
-    useremailattribute: mail
-    userdisplaynameattribute: displayName
-    usernameattribute: uid
-    useridattribute: owncloudUUID
-    groupbasedn: ou=groups,dc=ocis,dc=test
-    groupsearchscope: sub
-    groupfilter: (objectclass=groupOfNames)
-    groupnameattribute: cn
-    groupidattribute: owncloudUUID
+    bind_dn: ""
+    bind_password: ""
+    use_server_uuid: false
+    write_enabled: false
+    user_base_dn: ou=users,dc=ocis,dc=test
+    user_search_scope: sub
+    user_filter: (objectClass=inetOrgPerson)
+    user_mail_attribute: mail
+    user_displayname_attribute: displayName
+    user_name_attribute: uid
+    user_id_attribute: owncloudUUID
+    group_base_dn: ou=groups,dc=ocis,dc=test
+    group_search_scope: sub
+    group_filter: (objectclass=groupOfNames)
+    group_name_attribute: cn
+    group_id_attribute: owncloudUUID

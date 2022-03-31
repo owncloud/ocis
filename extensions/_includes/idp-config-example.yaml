@@ -17,53 +17,53 @@ debug:
 http:
   addr: 127.0.0.1:9130
   root: /
-  tlscert: ~/.ocis/idp/server.crt
-  tlskey: ~/.ocis/idp/server.key
+  tls_cert: ~/.ocis/idp/server.crt
+  tls_key: ~/.ocis/idp/server.key
   tls: false
 asset:
-  path: ""
+  asset: ""
 idp:
   iss: https://localhost:9200
-  identitymanager: ldap
-  uribasepath: ""
-  signinuri: ""
-  signedouturi: ""
-  authorizationendpointuri: ""
-  endsessionendpointuri: ""
+  identity_manager: ldap
+  uri_base_path: ""
+  sign_in_uri: ""
+  signed_out_uri: ""
+  authorization_endpoint_uri: ""
+  end_session_endpoint_uri: ""
   insecure: false
-  trustedproxy: []
-  allowscope: []
-  allowclientguests: false
-  allowdynamicclientregistration: false
-  encryptionsecretfile: ""
+  trusted_proxy: []
+  allow_scope: []
+  allow_client_guests: false
+  allow_dynamic_client_registration: false
+  encrypt_secret_file: ""
   listen: ""
-  identifierclientdisabled: true
-  identifierclientpath: ~/.ocis/idp
-  identifierregistrationconf: ~/.ocis/idp/identifier-registration.yaml
-  identifierscopesconf: ""
+  identifier_client_disabled: true
+  identifier_client_path: ~/.ocis/idp
+  identifier_registration_conf: ~/.ocis/idp/identifier-registration.yaml
+  identifier_scopes_conf: ""
   identifierdefaultbannerlogo: ""
   identifierdefaultsigninpagetext: ""
   identifierdefaultusernamehinttext: ""
   identifieruilocales: []
-  signingkid: ""
-  signingmethod: PS256
-  signingprivatekeyfiles: []
-  validationkeyspath: ""
+  signing_kid: ""
+  signing_method: PS256
+  signing_private_key_files: []
+  validation_keys_path: ""
   cookiebackenduri: ""
   cookienames: []
-  accesstokendurationseconds: 600
-  idtokendurationseconds: 3600
-  refreshtokendurationseconds: 94608000
-  dyamicclientsecretdurationseconds: 0
+  access_token_duration_seconds: 600
+  id_token_duration_seconds: 3600
+  refresh_token_duration_seconds: 94608000
+  dynamic_client_secret_duration_seconds: 0
 ldap:
   uri: ldap://localhost:9125
-  binddn: cn=idp,ou=sysusers,dc=ocis,dc=test
-  bindpassword: idp
-  basedn: ou=users,dc=ocis,dc=test
+  bind_dn: cn=idp,ou=sysusers,dc=ocis,dc=test
+  bind_password: idp
+  base_dn: ou=users,dc=ocis,dc=test
   scope: sub
-  loginattribute: cn
-  emailattribute: mail
-  nameattribute: sn
-  uuidattribute: uid
-  uuidattributetype: text
+  login_attribute: cn
+  email_attribute: mail
+  name_attribute: sn
+  uuid_attribute: uid
+  uuid_attribute_type: text
   filter: (objectClass=posixaccount)

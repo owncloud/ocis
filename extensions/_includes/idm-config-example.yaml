@@ -15,12 +15,12 @@ debug:
   pprof: false
   zpages: false
 idm:
-  ldapsaddr: 127.0.0.1:9235
+  ldaps_addr: 127.0.0.1:9235
   cert: ~/.ocis/idm/ldap.crt
   key: ~/.ocis/idm/ldap.key
-  databasepath: ~/.ocis/idm/ocis.boltdb
-createdemousers: true
-serviceuserpasswords:
-  idmadmin: idm
-  reva: reva
-  idp: idp
+  database: ~/.ocis/idm/ocis.boltdb
+create_demo_users: true
+service_user_passwords:
+  admin_password: idm
+  reva_password: reva
+  idp_password: idp

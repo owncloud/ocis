@@ -13,4 +13,4 @@ nats:
   host: 127.0.0.1
   port: 9233
   clusterid: ocis-cluster
-  storedir: ~/.ocis/nats
+  store_dir: ~/.ocis/nats

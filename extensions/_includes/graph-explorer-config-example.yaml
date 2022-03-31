@@ -17,8 +17,8 @@ debug:
 http:
   addr: 127.0.0.1:9135
   root: /graph-explorer
-graphexplorer:
-  clientid: ocis-explorer.js
+graph_explorer:
+  client_id: ocis-explorer.js
   issuer: https://localhost:9200
-  graphurlbase: https://localhost:9200
-  graphurlpath: /graph
+  graph_url_base: https://localhost:9200
+  graph_url_path: /graph
