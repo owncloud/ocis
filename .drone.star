@@ -1376,6 +1376,9 @@ def makeNodeGenerate(module):
         {
             "name": "generate nodejs",
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+            "environment": {
+                "CHROMEDRIVER_SKIP_DOWNLOAD": "true",  # install fails on arm and chromedriver is a test only dependency
+            },
             "commands": [
                 "%s ci-node-generate" % (make),
             ],
