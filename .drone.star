@@ -393,14 +393,14 @@ def licenseCheck(ctx):
                  [
                      {
                          "name": "node-check-licenses",
-                         "image": OC_CI_NODEJS,
+                         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
                          "commands": [
                              "make ci-node-check-licenses",
                          ],
                      },
                      {
                          "name": "node-save-licenses",
-                         "image": OC_CI_NODEJS,
+                         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
                          "commands": [
                              "make ci-node-save-licenses",
                          ],
