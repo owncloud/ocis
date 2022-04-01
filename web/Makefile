@@ -33,4 +33,4 @@ ci-node-generate: pull-assets
 .PHONY: pull-assets
 pull-assets:
 	@git clean -xfd assets
-	@curl -slL -o- https://github.com/owncloud/web/releases/download/$(WEB_ASSETS_VERSION)/web.tar.gz | tar xzf - -C assets/
+	@curl --fail -slL -o- https://github.com/owncloud/web/releases/download/$(WEB_ASSETS_VERSION)/web.tar.gz | tar xzf - -C assets/
