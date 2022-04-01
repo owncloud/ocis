@@ -16,7 +16,7 @@ The ability to find files based on certain search terms is a key requirement for
 
 ## Decision Drivers
 
-* Have a simple yet powerful way of finding files in oCIS
+* Have a simple yet powerful, scalable and performant way of finding files in oCIS
 * Be able to construct intelligent searches based on metadata
 * Allow the user to filter the search queries based on metadata
 

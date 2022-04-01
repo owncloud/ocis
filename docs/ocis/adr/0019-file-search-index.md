@@ -24,7 +24,7 @@ Sharing adds more complexity because the index also needs to react to create, de
 
 ## Decision Drivers
 
-* Have a simple yet powerful way of finding files in oCIS
+* Have a simple yet powerful, scalable and performant way of finding files in oCIS
 * Be able to construct intelligent searches based on metadata
 * Allow the user to filter the search queries based on metadata
 * Basic File Search needs to be implemented out of the box without external dependencies
