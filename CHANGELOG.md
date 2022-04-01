@@ -65,7 +65,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/web/pull/6709
    https://github.com/owncloud/ocis/pull/3437
-   https://github.com/owncloud/web/releases/tag/v5.4.0-rv.3
+   https://github.com/owncloud/web/releases/tag/v5.4.0-rc.3
 # Changelog for [1.19.1] (2022-03-29)
 
 The following sections list the changes for 1.19.1.
