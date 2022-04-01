@@ -187,7 +187,7 @@ ci-go-check-licenses: $(GO_LICENSES)
 .PHONY: ci-node-check-licenses
 ci-node-check-licenses:
 	@for mod in $(OCIS_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod ci-node-check-licenses || exit 1; \
+        echo -e "% check-license $$mod:"; $(MAKE) --no-print-directory -C $$mod ci-node-check-licenses || exit 1; \
     done
 
 .PHONY: ci-go-save-licenses

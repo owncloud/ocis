@@ -38,6 +38,8 @@ pull-assets:
 ############ licenses ############
 .PHONY: ci-node-check-licenses
 ci-node-check-licenses:
+	# TODO: check again? probably not
 
 .PHONY: ci-node-save-licenses
 ci-node-save-licenses:
+	# TODO: use saved licenses from the web release (because we bundle them)
