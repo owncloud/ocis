@@ -111,63 +111,63 @@ composer.lock: composer.json
 .PHONY: generate
 generate:
 	@for mod in $(OCIS_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod generate; \
+        $(MAKE) --no-print-directory -C $$mod generate || exit 1; \
     done
 
 .PHONY: vet
 vet:
 	@for mod in $(OCIS_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod vet; \
+        $(MAKE) --no-print-directory -C $$mod vet  || exit 1; \
     done
 
 .PHONY: clean
 clean:
 	@for mod in $(OCIS_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod clean; \
+        $(MAKE) --no-print-directory -C $$mod clean || exit 1; \
     done
 
 .PHONY: docs-generate
 docs-generate:
 	@for mod in $(OCIS_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod docs-generate; \
+        $(MAKE) --no-print-directory -C $$mod docs-generate || exit 1; \
     done
 
 .PHONY: ci-go-generate
 ci-go-generate:
 	@for mod in $(OCIS_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod ci-go-generate; \
+        $(MAKE) --no-print-directory -C $$mod ci-go-generate || exit 1; \
     done
 
 .PHONY: ci-node-generate
 ci-node-generate:
 	@if [ $(MAKE_DEPTH) -le 1 ]; then \
 	for mod in $(OCIS_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod ci-node-generate; \
+        $(MAKE) --no-print-directory -C $$mod ci-node-generate || exit 1; \
     done; fi;
 
 .PHONY: go-mod-tidy
 go-mod-tidy:
 	@for mod in $(OCIS_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod go-mod-tidy; \
+        $(MAKE) --no-print-directory -C $$mod go-mod-tidy || exit 1; \
     done
 
 .PHONY: test
 test:
 	@for mod in $(OCIS_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod test; \
+        $(MAKE) --no-print-directory -C $$mod test || exit 1; \
     done
 
 .PHONY: go-coverage
 go-coverage:
 	@if [ ! -f coverage.out ]; then $(MAKE) test  &>/dev/null; fi;
 	@for mod in $(OCIS_MODULES); do \
-        echo -n "% coverage $$mod: "; $(MAKE) --no-print-directory -C $$mod go-coverage; \
+        echo -n "% coverage $$mod: "; $(MAKE) --no-print-directory -C $$mod go-coverage || exit 1; \
     done
 
 .PHONY: protobuf
 protobuf:
 	@for mod in $(OCIS_MODULES); do \
-        echo -n "% protobuf $$mod: "; $(MAKE) --no-print-directory -C $$mod protobuf; \
+        echo -n "% protobuf $$mod: "; $(MAKE) --no-print-directory -C $$mod protobuf || exit 1; \
     done
 
 .PHONY: bingo-update
@@ -186,31 +186,31 @@ endif
 .PHONY: l10n-push
 l10n-push:
 	@for extension in $(L10N_MODULES); do \
-		$(MAKE) -C $$extension l10n-push; \
+		$(MAKE) -C $$extension l10n-push || exit 1; \
 	done
 
 .PHONY: l10n-pull
 l10n-pull:
 	@for extension in $(L10N_MODULES); do \
-		$(MAKE) -C $$extension l10n-pull; \
+		$(MAKE) -C $$extension l10n-pull || exit 1; \
 	done
 
 .PHONY: l10n-clean
 l10n-clean:
 	@for extension in $(L10N_MODULES); do \
-		$(MAKE) -C $$extension l10n-clean; \
+		$(MAKE) -C $$extension l10n-clean || exit 1; \
 	done
 
 .PHONY: l10n-read
 l10n-read:
 	@for extension in $(L10N_MODULES); do \
-		$(MAKE) -C $$extension l10n-read; \
+		$(MAKE) -C $$extension l10n-read || exit 1; \
     done
 
 .PHONY: l10n-write
 l10n-write:
 	@for extension in $(L10N_MODULES); do \
-		$(MAKE) -C $$extension l10n-write; \
+		$(MAKE) -C $$extension l10n-write || exit 1; \
     done
 
 .PHONY: ci-format
