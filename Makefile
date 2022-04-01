@@ -174,15 +174,33 @@ protobuf:
 bingo-update: $(BINGO)
 	$(BINGO) get -l -u
 
-.PHONY: check-go-licenses
-check-go-licenses: $(GO_LICENSES)
+.PHONY: check-licenses
+check-licenses: ci-go-check-licenses ci-node-check-licenses
+
+.PHONY: save-licenses
+save-licenses: ci-go-save-licenses ci-node-save-licenses
+
+.PHONY: ci-go-check-licenses
+ci-go-check-licenses: $(GO_LICENSES)
 	$(GO_LICENSES) check ./...
 
-.PHONY: save-go-licenses
-save-go-licenses: $(GO_LICENSES)
-	$(GO_LICENSES) csv ./... > ./licenses.csv
-	$(GO_LICENSES) save ./... --force --save_path="./licenses"
+.PHONY: ci-node-check-licenses
+ci-node-check-licenses:
+	@for mod in $(OCIS_MODULES); do \
+        @$(MAKE) --no-print-directory -C $$mod ci-node-check-licenses || exit 1; \
+    done
 
+.PHONY: ci-go-save-licenses
+ci-go-save-licenses: $(GO_LICENSES)
+	@mkdir -p ./licenses/go/ocis/licenses
+	$(GO_LICENSES) csv ./... > ./licenses/go/ocis/licenses.csv
+	$(GO_LICENSES) save ./... --force --save_path="./licenses/go/ocis/licenses"
+
+.PHONY: ci-node-save-licenses
+ci-node-save-licenses:
+	@for mod in $(OCIS_MODULES); do \
+        @$(MAKE) --no-print-directory -C $$mod ci-node-save-licenses || exit 1; \
+    done
 
 CHANGELOG_VERSION =
 

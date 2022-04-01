@@ -30,3 +30,10 @@ ci-go-generate: $(MOCKERY) # CI runs ci-node-generate automatically before this 
 
 .PHONY: ci-node-generate
 ci-node-generate:
+
+############ licenses ############
+.PHONY: ci-node-licenses-check
+ci-node-licenses-check:
+
+.PHONY: ci-node-licenses-save
+ci-node-licenses-save:

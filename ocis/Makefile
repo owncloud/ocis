@@ -42,3 +42,10 @@ ci-node-generate: # ocis needs assets of all other modules
 	@if [ $(MAKE_DEPTH) -le 1 ]; then \
 	$(MAKE) --no-print-directory -C .. ci-node-generate \
 	; fi;
+
+############ licenses ############
+.PHONY: ci-node-licenses-check
+ci-node-licenses-check:
+
+.PHONY: ci-node-licenses-save
+ci-node-licenses-save:

@@ -34,3 +34,10 @@ ci-node-generate: pull-assets
 pull-assets:
 	@git clean -xfd assets
 	@curl --fail -slL -o- https://github.com/owncloud/web/releases/download/$(WEB_ASSETS_VERSION)/web.tar.gz | tar xzf - -C assets/
+
+############ licenses ############
+.PHONY: ci-node-licenses-check
+ci-node-licenses-check:
+
+.PHONY: ci-node-licenses-save
+ci-node-licenses-save:

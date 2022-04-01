@@ -17,7 +17,10 @@
     "generate-api": "node node_modules/swagger-vue-generator/bin/generate-api.js --package-version v0 --source pkg/proto/v0/accounts.swagger.json --moduleName accounts --destination ui/client/accounts/index.js",
     "lint": "eslint ui/**/*.vue ui/**/*.js --color --global requirejs --global require",
     "test": "echo 'Not implemented'",
-    "watch": "rollup -c -w"
+    "watch": "rollup -c -w",
+    "licenses:check": "license-checker-rseidelsohn --summary --relativeLicensePath --onlyAllow 'Python-2.0;Apache*;Apache License, Version 2.0;Apache-2.0;Apache 2.0;Artistic-2.0;BSD;BSD-3-Clause;CC-BY-3.0;CC-BY-4.0;CC0-1.0;ISC;MIT;MPL-2.0;Public Domain;Unicode-TOU;Unlicense;WTFPL' --excludePackages 'ocis-accounts@0.0.0'",
+    "licenses:csv": "license-checker-rseidelsohn --relativeLicensePath --csv --out ../licenses/node/accounts/licenses.csv",
+    "licenses:save": "license-checker-rseidelsohn --relativeLicensePath --out /dev/null --files ../licenses/node/accounts/licenses"
   },
   "browserslist": [
     "> 1%",
@@ -60,6 +63,7 @@
     "fs-extra": "^9.0.1",
     "join-path": "^1.1.1",
     "ldapjs": "^2.2.3",
+    "license-checker-rseidelsohn": "^3.1.0",
     "nightwatch": "1.7.11",
     "nightwatch-api": "3.0.2",
     "nightwatch-vrt": "^0.2.10",

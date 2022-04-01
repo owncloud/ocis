@@ -41,5 +41,4 @@ vendor-bin/**/composer.lock
 protogen/buf.sha1.lock
 
 # licenses
-licenses.csv
 /licenses

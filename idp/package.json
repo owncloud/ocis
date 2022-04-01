@@ -9,7 +9,10 @@
     "deduplicate": "yarn-deduplicate -s fewer yarn.lock",
     "licenses": "NODE_PATH=./node_modules node ../scripts/js-license-ranger.js",
     "start": "node scripts/start.js",
-    "test": "node scripts/test.js --env=jsdom"
+    "test": "node scripts/test.js --env=jsdom",
+    "licenses:check": "license-checker-rseidelsohn --summary --relativeLicensePath --onlyAllow 'Python-2.0;Apache*;Apache License, Version 2.0;Apache-2.0;Apache 2.0;Artistic-2.0;BSD;BSD-3-Clause;CC-BY-3.0;CC-BY-4.0;CC0-1.0;ISC;MIT;MPL-2.0;Public Domain;Unicode-TOU;Unlicense;WTFPL'",
+    "licenses:csv": "license-checker-rseidelsohn --relativeLicensePath --csv --out ../licenses/node/idp/licenses.csv",
+    "licenses:save": "license-checker-rseidelsohn --relativeLicensePath --out /dev/null --files ../licenses/node/idp/licenses"
   },
   "babel": {
     "presets": [
@@ -125,6 +128,7 @@
     "jest-environment-jsdom-fourteen": "1.0.1",
     "jest-resolve": "27.2.2",
     "jest-watch-typeahead": "0.6.1",
+    "license-checker-rseidelsohn": "^3.1.0",
     "mini-css-extract-plugin": "1.3.9",
     "optimize-css-assets-webpack-plugin": "5.0.4",
     "pnp-webpack-plugin": "1.6.4",
