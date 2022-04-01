@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Add `owncloudsql` driver to authprovider config: [#3435](https://github.com/owncloud/ocis/pull/3435)
+* Bugfix - Corrected documentation: [#3439](https://github.com/owncloud/ocis/pull/3439)
 * Bugfix - Ensure the same data on /ocs/v?.php/config like oC10: [#3113](https://github.com/owncloud/ocis/pull/3113)
 * Bugfix - Use the default server download protocol if spaces are not supported: [#3386](https://github.com/owncloud/ocis/pull/3386)
 * Change - Fix keys with underscores in the config files: [#3412](https://github.com/owncloud/ocis/pull/3412)
@@ -18,6 +19,12 @@ The following sections list the changes for unreleased.
 * Bugfix - Add `owncloudsql` driver to authprovider config: [#3435](https://github.com/owncloud/ocis/pull/3435)
 
    https://github.com/owncloud/ocis/pull/3435
+
+* Bugfix - Corrected documentation: [#3439](https://github.com/owncloud/ocis/pull/3439)
+
+   - ocis-pkg log File Option
+
+   https://github.com/owncloud/ocis/pull/3439
 
 * Bugfix - Ensure the same data on /ocs/v?.php/config like oC10: [#3113](https://github.com/owncloud/ocis/pull/3113)
 
