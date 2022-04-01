@@ -188,7 +188,7 @@ def main(ctx):
 
     test_pipelines = \
         cancelPreviousBuilds() + \
-        [goLicenseCheck(ctx)] + \
+        [licenseCheck(ctx)] + \
         [buildOcisBinaryForTesting(ctx)] + \
         testOcisModules(ctx) + \
         testPipelines(ctx)
@@ -380,7 +380,7 @@ def buildOcisBinaryForTesting(ctx):
         "volumes": [pipelineVolumeGo],
     }
 
-def goLicenseCheck(ctx):
+def licenseCheck(ctx):
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -392,18 +392,32 @@ def goLicenseCheck(ctx):
         "steps": skipIfUnchanged(ctx, "go-mod") +
                  [
                      {
-                         "name": "check-go-license",
+                         "name": "node-check-licenses",
+                         "image": OC_CI_NODEJS,
+                         "commands": [
+                             "make ci-node-check-licenses",
+                         ],
+                     },
+                     {
+                         "name": "node-save-licenses",
+                         "image": OC_CI_NODEJS,
+                         "commands": [
+                             "make ci-node-save-licenses",
+                         ],
+                     },
+                     {
+                         "name": "go-check-licenses",
                          "image": OC_CI_GOLANG,
                          "commands": [
-                             "make check-go-licenses",
+                             "make ci-go-check-licenses",
                          ],
                          "volumes": [stepVolumeGo],
                      },
                      {
-                         "name": "save-go-licenses",
+                         "name": "go-save-licenses",
                          "image": OC_CI_GOLANG,
                          "commands": [
-                             "make save-go-licenses",
+                             "make ci-go-save-licenses",
                          ],
                          "volumes": [stepVolumeGo],
                      },
@@ -1756,7 +1770,7 @@ def skipIfUnchanged(ctx, type):
     ]
     go_mod = [
         "^go.mod",
-        "^go.sum"
+        "^go.sum",
     ]
 
     skip = []

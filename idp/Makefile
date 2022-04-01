@@ -58,14 +58,14 @@ yarn-build: node_modules
 
 .PHONY: node_modules
 node_modules:
-	yarn install --immutable
+	@yarn install --immutable 2>&1 >/dev/null
 
 ############ licenses ############
-.PHONY: ci-node-licenses-check
-ci-node-licenses-check:
+.PHONY: ci-node-check-licenses
+ci-node-check-licenses: node_modules
 	yarn licenses:check
 
-.PHONY: ci-node-licenses-save
-ci-node-licenses-save:
+.PHONY: ci-node-save-licenses
+ci-node-save-licenses: node_modules
 	yarn licenses:csv
 	yarn licenses:save
