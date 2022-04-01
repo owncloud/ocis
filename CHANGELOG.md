@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Use the default server download protocol if spaces are not supported: [#3386](https://github.com/owncloud/ocis/pull/3386)
 * Change - Fix keys with underscores in the config files: [#3412](https://github.com/owncloud/ocis/pull/3412)
 * Enhancement - Add sorting to GraphAPI users and groups: [#3360](https://github.com/owncloud/ocis/issues/3360)
+* Enhancement - Update reva to v2.x.x: [#3430](https://github.com/owncloud/ocis/pull/3430)
 * Enhancement - Update ownCloud Web to v5.4.0-rv.3: [#6709](https://github.com/owncloud/web/pull/6709)
 
 ## Details
@@ -55,6 +56,14 @@ The following sections list the changes for unreleased.
    Example: https://localhost:9200/graph/v1.0/groups?$orderby=displayName asc
 
    https://github.com/owncloud/ocis/issues/3360
+
+* Enhancement - Update reva to v2.x.x: [#3430](https://github.com/owncloud/ocis/pull/3430)
+
+   Updated reva to version 2.x.x. This update includes:
+
+  * TODO
+
+   https://github.com/owncloud/ocis/pull/3430
 
 * Enhancement - Update ownCloud Web to v5.4.0-rv.3: [#6709](https://github.com/owncloud/web/pull/6709)
 
