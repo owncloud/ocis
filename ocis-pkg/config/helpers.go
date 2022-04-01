@@ -32,7 +32,8 @@ func DefaultConfigSources(filename string, drivers []string) []string {
 	var sources []string
 
 	locations := []string{}
-	if os.Getenv("OCIS_CONFIG_DIR") != "" {
+	if v := os.Getenv("OCIS_CONFIG_DIR"); v != "" {
+	    locations = append(locations, v)
 		// only use the configured config dir
 		locations = append(locations, os.Getenv("OCIS_CONFIG_DIR"))
 	} else {
