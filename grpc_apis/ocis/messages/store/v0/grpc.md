@@ -1,7 +1,7 @@
 ---
 title: "ocis.messages.store.v0"
 url: /grpc_apis/ocis_messages_store_v0
-date: 2022-04-01T21:37:26Z
+date: 2022-04-02T00:42:13Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
