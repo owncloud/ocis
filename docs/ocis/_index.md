@@ -21,7 +21,7 @@ The below diagram shows the core conceps that are the foundation for the new arc
 - [*Storage spaces*]({{< ref "../extensions/storage/terminology#storage-spaces" >}}) represent a collection of files and folders. A users personal files are contained in a *storage space*, a group or project drive is a *storage space*, and even incoming shares are treated and implemented as *storage spaces*. Each with properties like owners, permissions, quota and type.
 - [*Storage providers*]({{< ref "../extensions/storage/terminology#storage-providers" >}}) can hold multiple *storage spaces*. At an oCIS instance, there might be a dedicated *storage provider* responsible for users personal storage spaces. There might be multiple, either to shard the load, provide different levels of redundancy or support custom workflows. Or there might be just one, hosting all types of *storage spaces*.
 
-{{< svg src="ocis/static/idea.drawio.svg" >}}
+{{< svg src="ocis/static/idea.drawio.svg" width="100%" >}}
 
 As an example, Einstein might want to share something with Marie, who has an account at a different identity provider and uses a different storage space registry. The process makes use of [OpenID Connect (OIDC)](https://openid.net/specs/openid-connect-core-1_0.html) for authentication and would look something like this:
 
@@ -63,4 +63,4 @@ We run a huge [test suite](https://github.com/owncloud/core/tree/master/tests), 
 
 Running `bin/ocis server` will start the below services, all of which can be scaled and deployed on a single node or in a cloud native environment, as needed.
 
-{{< svg src="ocis/static/architecture-overview.drawio.svg" >}}
+{{< svg src="ocis/static/architecture-overview.drawio.svg" width="100%" >}}
