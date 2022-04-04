@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * ownCloud
  *
@@ -19,6 +21,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>
  *
  */
+
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
@@ -218,12 +221,12 @@ class SpacesContext implements Context {
 	 * @param string $spaceName
 	 * @param string $fileName
 	 *
-	 * @return array
+	 * @return ResponseInterface
 	 */
-	public function getFileData(string $user, string $spaceName, string $fileName): array {
+	public function getFileData(string $user, string $spaceName, string $fileName): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$fullUrl = $this->baseUrl . "/remote.php/dav/spaces/" . $space["id"] . "/" . $fileName;
-		
+
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$fullUrl,
@@ -238,7 +241,7 @@ class SpacesContext implements Context {
 			200,
 			"file $fileName not found"
 		);
-		return $this->featureContext->getResponse()->getHeaders();
+		return $this->featureContext->getResponse();
 	}
 
 	/**
@@ -251,7 +254,7 @@ class SpacesContext implements Context {
 	 * @return string
 	 */
 	public function getFileId(string $user, string $spaceName, string $fileName): string {
-		$fileData = $this->getFileData($user, $spaceName, $fileName);
+		$fileData = $this->getFileData($user, $spaceName, $fileName)->getHeaders();
 		return $fileData["Oc-Fileid"][0];
 	}
 
@@ -265,7 +268,7 @@ class SpacesContext implements Context {
 	 * @return string
 	 */
 	public function getETag(string $user, string $spaceName, string $fileName): string {
-		$fileData = $this->getFileData($user, $spaceName, $fileName);
+		$fileData = $this->getFileData($user, $spaceName, $fileName)->getHeaders();
 		return $fileData["Etag"][0];
 	}
 
@@ -818,6 +821,28 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Then /^for user "([^"]*)" the content of the file "([^"]*)" of the space "([^"]*)" should be "([^"]*)"$/
+	 *
+	 * @param string    $user
+	 * @param string    $file
+	 * @param string    $spaceName
+	 * @param string    $fileContent
+	 *
+	 * @return void
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function checkFileContent(
+		string $user,
+		string $file,
+		string $spaceName,
+		string $fileContent
+	): void {
+		$actualFileContent = $this->getFileData($user, $spaceName, $file)->getBody()->getContents();
+		Assert::assertEquals($fileContent, $actualFileContent, "$file does not contain $fileContent");
+	}
+
+	/**
 	 * @Then /^the json responded should contain a space "([^"]*)" (?:|(?:owned by|granted to) "([^"]*)" )(?:|(?:with description file|with space image) "([^"]*)" )with these key and value pairs:$/
 	 *
 	 * @param string $spaceName
@@ -846,25 +871,25 @@ class SpacesContext implements Context {
 					[
 						"code" => "%space_id%",
 						"function" =>
-							[$this, "getSpaceIdByNameFromResponse"],
+						[$this, "getSpaceIdByNameFromResponse"],
 						"parameter" => [$spaceName]
 					],
 					[
 						"code" => "%user_id%",
 						"function" =>
-							[$this, "getUserIdByUserName"],
+						[$this, "getUserIdByUserName"],
 						"parameter" => [$userName]
 					],
 					[
 						"code" => "%file_id%",
 						"function" =>
-							[$this, "getFileId"],
+						[$this, "getFileId"],
 						"parameter" => [$userName, $spaceName, $fileName]
 					],
 					[
 						"code" => "%eTag%",
 						"function" =>
-							[$this, "getETag"],
+						[$this, "getETag"],
 						"parameter" => [$userName, $spaceName, $fileName]
 					],
 				]
@@ -903,7 +928,7 @@ class SpacesContext implements Context {
 		Assert::assertIsArray($spaceAsArray = $this->getSpaceByNameFromResponse($spaceName), "No space with name $spaceName found");
 		$permissions = $spaceAsArray["root"]["permissions"];
 		$userId = $this->getUserIdByUserName($userName);
-		
+
 		$userRole = "";
 		foreach ($permissions as $permission) {
 			foreach ($permission["grantedTo"] as $grantedTo) {
@@ -1407,6 +1432,31 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" has set the file "([^"]*)" as a (description|space image)\s? in a special section of the "([^"]*)" space$/
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param string $type
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userHasUpdatedSpaceSpecialSection(
+		string $user,
+		string $file,
+		string $type,
+		string $spaceName
+	): void {
+		$this->updateSpaceSpecialSection($user, $file, $type, $spaceName);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+	}
+
+	/**
 	 * Send Graph Update Space Request
 	 *
 	 * @param  string $user
@@ -1635,7 +1685,7 @@ class SpacesContext implements Context {
 		$rows["password"] = \array_key_exists("password", $rows) ? $rows["password"] : null;
 		$rows["name"] = \array_key_exists("name", $rows) ? $rows["name"] : null;
 		$rows["expireDate"] = \array_key_exists("expireDate", $rows) ? $rows["expireDate"] : null;
-		
+
 		$body = [
 			"space_ref" => $space['id'] . "/" . $rows["path"],
 			"shareType" => $rows["shareType"],
