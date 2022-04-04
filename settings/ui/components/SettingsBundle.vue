@@ -49,7 +49,7 @@ export default {
   methods: {
     ...mapActions('Settings', ['saveValue']),
     getSettingComponent (setting) {
-      return 'Setting' + setting.type[0].toUpperCase() + setting.type.substr(1)
+      return 'Setting' + setting.type[0].toUpperCase() + setting.type.slice(1)
     },
     getValue (setting) {
       return this.getSettingsValue({ settingId: setting.id })
