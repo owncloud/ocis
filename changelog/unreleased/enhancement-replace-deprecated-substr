@@ -1,4 +1,4 @@
-Change: Replace deprecated String.prototype.substr()
+Enhancement: Replace deprecated String.prototype.substr()
 
 We've replaced all occurrences of the deprecated String.prototype.substr()
 function with String.prototype.slice() which works similarly but isn't
