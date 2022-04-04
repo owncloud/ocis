@@ -7,7 +7,10 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"sort"
+	"strings"
 
+	"github.com/CiscoM31/godata"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -38,7 +41,25 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 
 // GetUsers implements the Service interface.
 func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
+	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
+	if err != nil {
+		g.logger.Err(err).Interface("query", r.URL.Query()).Msg("query error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
 	users, err := g.identityBackend.GetUsers(r.Context(), r.URL.Query())
+	if err != nil {
+		var errcode errorcode.Error
+		if errors.As(err, &errcode) {
+			errcode.Render(w, r)
+		} else {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	users, err = sortUsers(odataReq, users)
 	if err != nil {
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
@@ -60,26 +81,36 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if isNilOrEmpty(u.DisplayName) || isNilOrEmpty(u.OnPremisesSamAccountName) || isNilOrEmpty(u.Mail) {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+	if _, ok := u.GetDisplayNameOk(); !ok {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'displayName'")
+		return
+	}
+	if accountName, ok := u.GetOnPremisesSamAccountNameOk(); ok {
+		if !isValidUsername(*accountName) {
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
+				fmt.Sprintf("username '%s' must be at least the local part of an email", *u.OnPremisesSamAccountName))
+			return
+		}
+	} else {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'onPremisesSamAccountName'")
 		return
 	}
 
-	if !isValidUsername(*u.OnPremisesSamAccountName) {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
-			fmt.Sprintf("username '%s' must be at least the local part of an email", *u.OnPremisesSamAccountName))
-		return
-	}
-	if !isValidEmail(*u.Mail) {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
-			fmt.Sprintf("'%s' is not a valid email address", *u.Mail))
+	if mail, ok := u.GetMailOk(); ok {
+		if !isValidEmail(*mail) {
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
+				fmt.Sprintf("'%s' is not a valid email address", *u.Mail))
+			return
+		}
+	} else {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'mail'")
 		return
 	}
 
 	// Disallow user-supplied IDs. It's supposed to be readonly. We're either
 	// generating them in the backend ourselves or rely on the Backend's
 	// storage (e.g. LDAP) to provide a unique ID.
-	if !isNilOrEmpty(u.Id) {
+	if _, ok := u.GetIdOk(); ok {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user id is a read-only attribute")
 		return
 	}
@@ -180,11 +211,12 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mail := changes.GetMail()
-	if !isValidEmail(mail) {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
-			fmt.Sprintf("'%s' is not a valid email address", mail))
-		return
+	if mail, ok := changes.GetMailOk(); ok {
+		if !isValidEmail(*mail) {
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
+				fmt.Sprintf("'%s' is not a valid email address", *mail))
+			return
+		}
 	}
 
 	u, err := g.identityBackend.UpdateUser(r.Context(), nameOrID, *changes)
@@ -200,10 +232,6 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, u)
 
-}
-
-func isNilOrEmpty(s *string) bool {
-	return s == nil || *s == ""
 }
 
 // We want to allow email addresses as usernames so they show up when using them in ACLs on storages that allow integration with our glauth LDAP service
@@ -226,4 +254,27 @@ func isValidEmail(e string) bool {
 		return false
 	}
 	return emailRegex.MatchString(e)
+}
+
+func sortUsers(req *godata.GoDataRequest, users []*libregraph.User) ([]*libregraph.User, error) {
+	var sorter sort.Interface
+	if req.Query.OrderBy == nil || len(req.Query.OrderBy.OrderByItems) != 1 {
+		return users, nil
+	}
+	switch req.Query.OrderBy.OrderByItems[0].Field.Value {
+	case "displayName":
+		sorter = usersByDisplayName{users}
+	case "mail":
+		sorter = usersByMail{users}
+	case "onPremisesSamAccountName":
+		sorter = usersByOnPremisesSamAccountName{users}
+	default:
+		return nil, fmt.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)
+	}
+
+	if req.Query.OrderBy.OrderByItems[0].Order == "desc" {
+		sorter = sort.Reverse(sorter)
+	}
+	sort.Sort(sorter)
+	return users, nil
 }

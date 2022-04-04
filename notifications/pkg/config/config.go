@@ -8,37 +8,37 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons `ocisConfig:"-" yaml:"-"`
+	*shared.Commons `yaml:"-"`
 
-	Service Service `ocisConfig:"-" yaml:"-"`
+	Service Service `yaml:"-"`
 
-	Log   *Log  `ocisConfig:"log"`
-	Debug Debug `ocisConfig:"debug"`
+	Log   *Log  `yaml:"log"`
+	Debug Debug `yaml:"debug"`
 
-	Notifications Notifications `ocisConfig:"notifications"`
+	Notifications Notifications `yaml:"notifications"`
 
-	Context context.Context `ocisConfig:"-" yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 // Notifications definces the config options for the notifications service.
 type Notifications struct {
-	SMTP              SMTP   `ocisConfig:"SMTP"`
-	Events            Events `ocisConfig:"events"`
-	RevaGateway       string `ocisConfig:"reva_gateway" env:"REVA_GATEWAY;NOTIFICATIONS_REVA_GATEWAY"`
-	MachineAuthSecret string `ocisConfig:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;NOTIFICATIONS_MACHINE_AUTH_API_KEY"`
+	SMTP              SMTP   `yaml:"SMTP"`
+	Events            Events `yaml:"events"`
+	RevaGateway       string `yaml:"reva_gateway" env:"REVA_GATEWAY;NOTIFICATIONS_REVA_GATEWAY"`
+	MachineAuthSecret string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;NOTIFICATIONS_MACHINE_AUTH_API_KEY"`
 }
 
 // SMTP combines the smtp configuration options.
 type SMTP struct {
-	Host     string `ocisConfig:"smtp_host" env:"NOTIFICATIONS_SMTP_HOST"`
-	Port     string `ocisConfig:"smtp_port" env:"NOTIFICATIONS_SMTP_PORT"`
-	Sender   string `ocisConfig:"smtp_sender" env:"NOTIFICATIONS_SMTP_SENDER"`
-	Password string `ocisConfig:"smtp_password" env:"NOTIFICATIONS_SMTP_PASSWORD"`
+	Host     string `yaml:"smtp_host" env:"NOTIFICATIONS_SMTP_HOST"`
+	Port     string `yaml:"smtp_port" env:"NOTIFICATIONS_SMTP_PORT"`
+	Sender   string `yaml:"smtp_sender" env:"NOTIFICATIONS_SMTP_SENDER"`
+	Password string `yaml:"smtp_password" env:"NOTIFICATIONS_SMTP_PASSWORD"`
 }
 
 // Events combines the configuration options for the event bus.
 type Events struct {
-	Endpoint      string `ocisConfig:"events_endpoint" env:"NOTIFICATIONS_EVENTS_ENDPOINT"`
-	Cluster       string `ocisConfig:"events_cluster" env:"NOTIFICATIONS_EVENTS_CLUSTER"`
-	ConsumerGroup string `ocisConfig:"events_group" env:"NOTIFICATIONS_EVENTS_GROUP"`
+	Endpoint      string `yaml:"events_endpoint" env:"NOTIFICATIONS_EVENTS_ENDPOINT"`
+	Cluster       string `yaml:"events_cluster" env:"NOTIFICATIONS_EVENTS_CLUSTER"`
+	ConsumerGroup string `yaml:"events_group" env:"NOTIFICATIONS_EVENTS_GROUP"`
 }

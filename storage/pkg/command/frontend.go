@@ -207,10 +207,10 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 						},
 					},
 					"config": map[string]interface{}{
-						"version": "1.8",
-						"website": "reva",
+						"version": "1.7",
+						"website": "ownCloud",
 						"host":    cfg.Reva.Frontend.PublicURL,
-						"contact": "admin@localhost",
+						"contact": "",
 						"ssl":     "false",
 					},
 					"default_upload_protocol": cfg.Reva.DefaultUploadProtocol,

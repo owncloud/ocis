@@ -56,7 +56,7 @@ func Color(val bool) Option {
 	}
 }
 
-// File provides a function to set the color option.
+// File provides a function to set the file option.
 func File(val string) Option {
 	return func(o *Options) {
 		o.File = val

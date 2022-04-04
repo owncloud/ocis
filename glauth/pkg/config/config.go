@@ -8,45 +8,45 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons `ocisConfig:"-" yaml:"-"`
+	*shared.Commons `yaml:"-"`
 
-	Service Service `ocisConfig:"-" yaml:"-"`
+	Service Service `yaml:"-"`
 
-	Tracing *Tracing `ocisConfig:"tracing"`
-	Log     *Log     `ocisConfig:"log"`
-	Debug   Debug    `ocisConfig:"debug"`
+	Tracing *Tracing `yaml:"tracing"`
+	Log     *Log     `yaml:"log"`
+	Debug   Debug    `yaml:"debug"`
 
-	Ldap  Ldap  `ocisConfig:"ldap"`
-	Ldaps Ldaps `ocisConfig:"ldaps"`
+	Ldap  Ldap  `yaml:"ldap"`
+	Ldaps Ldaps `yaml:"ldaps"`
 
-	Backend  Backend         `ocisConfig:"backend"`
-	Fallback FallbackBackend `ocisConfig:"fallback"`
+	Backend  Backend         `yaml:"backend"`
+	Fallback FallbackBackend `yaml:"fallback"`
 
-	RoleBundleUUID string `ocisConfig:"role_bundle_uuid" env:"GLAUTH_ROLE_BUNDLE_ID"`
+	RoleBundleUUID string `yaml:"role_bundle_uuid" env:"GLAUTH_ROLE_BUNDLE_ID"`
 
-	Context context.Context `ocisConfig:"-" yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 // Backend defined the available backend configuration.
 type Backend struct {
-	Datastore   string   `ocisConfig:"datastore"`
-	BaseDN      string   `ocisConfig:"base_dn"`
-	Insecure    bool     `ocisConfig:"insecure"`
-	NameFormat  string   `ocisConfig:"name_format"`
-	GroupFormat string   `ocisConfig:"group_format"`
-	Servers     []string `ocisConfig:"servers"`
-	SSHKeyAttr  string   `ocisConfig:"ssh_key_attr"`
-	UseGraphAPI bool     `ocisConfig:"use_graph_api"`
+	Datastore   string   `yaml:"datastore"`
+	BaseDN      string   `yaml:"base_dn"`
+	Insecure    bool     `yaml:"insecure"`
+	NameFormat  string   `yaml:"name_format"`
+	GroupFormat string   `yaml:"group_format"`
+	Servers     []string `yaml:"servers"`
+	SSHKeyAttr  string   `yaml:"ssh_key_attr"`
+	UseGraphAPI bool     `yaml:"use_graph_api"`
 }
 
 // FallbackBackend defined the available fallback backend configuration.
 type FallbackBackend struct {
-	Datastore   string   `ocisConfig:"datastore"`
-	BaseDN      string   `ocisConfig:"base_dn"`
-	Insecure    bool     `ocisConfig:"insecure"`
-	NameFormat  string   `ocisConfig:"name_format"`
-	GroupFormat string   `ocisConfig:"group_format"`
-	Servers     []string `ocisConfig:"servers"`
-	SSHKeyAttr  string   `ocisConfig:"ssh_key_attr"`
-	UseGraphAPI bool     `ocisConfig:"use_graph_api"`
+	Datastore   string   `yaml:"datastore"`
+	BaseDN      string   `yaml:"base_dn"`
+	Insecure    bool     `yaml:"insecure"`
+	NameFormat  string   `yaml:"name_format"`
+	GroupFormat string   `yaml:"group_format"`
+	Servers     []string `yaml:"servers"`
+	SSHKeyAttr  string   `yaml:"ssh_key_attr"`
+	UseGraphAPI bool     `yaml:"use_graph_api"`
 }

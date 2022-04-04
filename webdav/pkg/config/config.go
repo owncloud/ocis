@@ -8,19 +8,19 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons `ocisConfig:"-" yaml:"-"`
+	*shared.Commons `yaml:"-"`
 
-	Service Service `ocisConfig:"-" yaml:"-"`
+	Service Service `yaml:"-"`
 
-	Tracing *Tracing `ocisConfig:"tracing"`
-	Log     *Log     `ocisConfig:"log"`
-	Debug   Debug    `ocisConfig:"debug"`
+	Tracing *Tracing `yaml:"tracing"`
+	Log     *Log     `yaml:"log"`
+	Debug   Debug    `yaml:"debug"`
 
-	HTTP HTTP `ocisConfig:"http"`
+	HTTP HTTP `yaml:"http"`
 
-	OcisPublicURL   string `ocisConfig:"ocis_public_url" env:"OCIS_URL;OCIS_PUBLIC_URL"`
-	WebdavNamespace string `ocisConfig:"webdav_namespace" env:"STORAGE_WEBDAV_NAMESPACE"` //TODO: prevent this cross config
-	RevaGateway     string `ocisConfig:"reva_gateway" env:"REVA_GATEWAY"`
+	OcisPublicURL   string `yaml:"ocis_public_url" env:"OCIS_URL;OCIS_PUBLIC_URL"`
+	WebdavNamespace string `yaml:"webdav_namespace" env:"STORAGE_WEBDAV_NAMESPACE"` //TODO: prevent this cross config
+	RevaGateway     string `yaml:"reva_gateway" env:"REVA_GATEWAY"`
 
-	Context context.Context `ocisConfig:"-" yaml:"-"`
+	Context context.Context `yaml:"-"`
 }

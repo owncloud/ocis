@@ -2,15 +2,128 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.18.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.19.1...master
+
+## Summary
+
+* Bugfix - Add `owncloudsql` driver to authprovider config: [#3435](https://github.com/owncloud/ocis/pull/3435)
+* Bugfix - Corrected documentation: [#3439](https://github.com/owncloud/ocis/pull/3439)
+* Bugfix - Ensure the same data on /ocs/v?.php/config like oC10: [#3113](https://github.com/owncloud/ocis/pull/3113)
+* Bugfix - Use the default server download protocol if spaces are not supported: [#3386](https://github.com/owncloud/ocis/pull/3386)
+* Change - Fix keys with underscores in the config files: [#3412](https://github.com/owncloud/ocis/pull/3412)
+* Enhancement - Alias links: [#3454](https://github.com/owncloud/ocis/pull/3454)
+* Enhancement - Add sorting to GraphAPI users and groups: [#3360](https://github.com/owncloud/ocis/issues/3360)
+* Enhancement - Make config dir configurable: [#3440](https://github.com/owncloud/ocis/pull/3440)
+* Enhancement - Update reva to v2.x.x: [#3430](https://github.com/owncloud/ocis/pull/3430)
+* Enhancement - Update ownCloud Web to v5.4.0-rv.3: [#6709](https://github.com/owncloud/web/pull/6709)
+
+## Details
+
+* Bugfix - Add `owncloudsql` driver to authprovider config: [#3435](https://github.com/owncloud/ocis/pull/3435)
+
+   https://github.com/owncloud/ocis/pull/3435
+
+* Bugfix - Corrected documentation: [#3439](https://github.com/owncloud/ocis/pull/3439)
+
+   - ocis-pkg log File Option
+
+   https://github.com/owncloud/ocis/pull/3439
+
+* Bugfix - Ensure the same data on /ocs/v?.php/config like oC10: [#3113](https://github.com/owncloud/ocis/pull/3113)
+
+   We've fixed the returned values on the /ocs/v?.php/config endpoints, so that they now return
+   the same values as an oC10 would do.
+
+   https://github.com/owncloud/ocis/pull/3113
+
+* Bugfix - Use the default server download protocol if spaces are not supported: [#3386](https://github.com/owncloud/ocis/pull/3386)
+
+   https://github.com/owncloud/ocis/pull/3386
+
+* Change - Fix keys with underscores in the config files: [#3412](https://github.com/owncloud/ocis/pull/3412)
+
+   We've fixed some config keys in configuration files that previously didn't contain
+   underscores but should.
+
+   Please check the documentation on https://owncloud.dev for latest configuration
+   documentation.
+
+   https://github.com/owncloud/ocis/pull/3412
+
+* Enhancement - Alias links: [#3454](https://github.com/owncloud/ocis/pull/3454)
+
+   Bumps reva and configures ocs token endpoint to be unprotected
+
+   https://github.com/owncloud/ocis/pull/3454
+
+* Enhancement - Add sorting to GraphAPI users and groups: [#3360](https://github.com/owncloud/ocis/issues/3360)
+
+   The GraphAPI endpoints for users and groups support ordering now. User can be ordered by
+   displayName, onPremisesSamAccountName and mail. Groups can be ordered by displayName.
+
+   Example: https://localhost:9200/graph/v1.0/groups?$orderby=displayName asc
+
+   https://github.com/owncloud/ocis/issues/3360
+
+* Enhancement - Make config dir configurable: [#3440](https://github.com/owncloud/ocis/pull/3440)
+
+   We have added an `OCIS_CONFIG_DIR` environment variable the will take precedence over the
+   default `/etc/ocis`, `~/.ocis` and `.config` locations. When it is set the default locations
+   will be ignored and only the configuration files in that directory will be read.
+
+   https://github.com/owncloud/ocis/pull/3440
+
+* Enhancement - Update reva to v2.x.x: [#3430](https://github.com/owncloud/ocis/pull/3430)
+
+   Updated reva to version 2.x.x. This update includes:
+
+  * TODO
+
+   https://github.com/owncloud/ocis/pull/3430
+
+* Enhancement - Update ownCloud Web to v5.4.0-rv.3: [#6709](https://github.com/owncloud/web/pull/6709)
+
+   Tags: web
+
+   We updated ownCloud Web to v5.4.0-rv.3. Please refer to the changelog (linked) for details on
+   the web release.
+
+   https://github.com/owncloud/web/pull/6709
+   https://github.com/owncloud/ocis/pull/3437
+   https://github.com/owncloud/web/releases/tag/v5.4.0-rc.3
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
+# Changelog for [1.19.0] (2022-03-29)
+
+The following sections list the changes for 1.19.0.
+
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
 * Bugfix - Network configuration in individiual_services example: [#3238](https://github.com/owncloud/ocis/pull/3238)
 * Bugfix - Improve gif thumbnails: [#3305](https://github.com/owncloud/ocis/pull/3305)
 * Bugfix - Fix error handling in GraphAPI GetUsers call: [#3357](https://github.com/owncloud/ocis/pull/3357)
+* Bugfix - Fix request validation on GraphAPI User updates: [#3167](https://github.com/owncloud/ocis/issues/3167)
 * Bugfix - Replace public mountpoint fileid with grant fileid: [#3349](https://github.com/owncloud/ocis/pull/3349)
+* Change - Add remote item to mountpoint and fix spaceID: [#3365](https://github.com/owncloud/ocis/pull/3365)
 * Change - Switch NATS backend: [#3192](https://github.com/owncloud/ocis/pull/3192)
+* Change - Drop json config file support: [#3366](https://github.com/owncloud/ocis/pull/3366)
 * Change - Settings service now stores its data via metadata service: [#3232](https://github.com/owncloud/ocis/pull/3232)
 * Enhancement - Audit logger will now log file events: [#3332](https://github.com/owncloud/ocis/pull/3332)
 * Enhancement - Add password reset link to login page: [#3329](https://github.com/owncloud/ocis/pull/3329)
@@ -18,7 +131,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add space aliases: [#3283](https://github.com/owncloud/ocis/pull/3283)
 * Enhancement - Include etags in drives listing: [#3267](https://github.com/owncloud/ocis/pull/3267)
 * Enhancement - Improve thumbnails API: [#3272](https://github.com/owncloud/ocis/pull/3272)
-* Enhancement - Update reva to vXXXX: [#3330](https://github.com/owncloud/ocis/pull/3330)
+* Enhancement - Update reva to v2.1.0: [#3330](https://github.com/owncloud/ocis/pull/3330)
 * Enhancement - Update ownCloud Web to v5.3.0: [#6561](https://github.com/owncloud/web/pull/6561)
 
 ## Details
@@ -43,6 +156,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3357
 
+* Bugfix - Fix request validation on GraphAPI User updates: [#3167](https://github.com/owncloud/ocis/issues/3167)
+
+   Fix PATCH on graph/v1.0/users when no 'mail' attribute is present in the request body
+
+   https://github.com/owncloud/ocis/issues/3167
+
 * Bugfix - Replace public mountpoint fileid with grant fileid: [#3349](https://github.com/owncloud/ocis/pull/3349)
 
    We now show the same resoucre id for resources when accessing them via a public links as when
@@ -51,6 +170,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3349
 
+* Change - Add remote item to mountpoint and fix spaceID: [#3365](https://github.com/owncloud/ocis/pull/3365)
+
+   A mountpoint represents the mounted share on the share receivers side. The original resource
+   is located where the grant has been set. This item is now shown as libregraph remoteItem on the
+   mountpoint. While adding this, we fixed the spaceID for mountpoints.
+
+   https://github.com/owncloud/ocis/pull/3365
+
 * Change - Switch NATS backend: [#3192](https://github.com/owncloud/ocis/pull/3192)
 
    We've switched the NATS backend from Streaming to JetStream, since NATS Streaming is
@@ -58,6 +185,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3192
    https://github.com/cs3org/reva/pull/2574
+
+* Change - Drop json config file support: [#3366](https://github.com/owncloud/ocis/pull/3366)
+
+   We've remove the support to configure oCIS and it's service with a json file. From now on we only
+   support yaml configuration files, since they have the possibility to add comments.
+
+   https://github.com/owncloud/ocis/pull/3366
 
 * Change - Settings service now stores its data via metadata service: [#3232](https://github.com/owncloud/ocis/pull/3232)
 
@@ -104,15 +238,37 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3272
 
-* Enhancement - Update reva to vXXXX: [#3330](https://github.com/owncloud/ocis/pull/3330)
+* Enhancement - Update reva to v2.1.0: [#3330](https://github.com/owncloud/ocis/pull/3330)
 
-   Updated reva to version XXXX. This update includes:
+   Updated reva to version 2.1.0. This update includes:
 
-  * Enh [cs3org/reva#2622](https://github.com/cs3org/reva/pull/2622): Implement listing shares in spaces
-  * Enh [cs3org/reva#2624](https://github.com/cs3org/reva/pull/2624): Include spaces etags in virtual spaces
-  * Enh [cs3org/reva#2628](https://github.com/cs3org/reva/pull/2628): Webdav trash-bin API for spaces
+  * Fix [cs3org/reva#2636](https://github.com/cs3org/reva/pull/2636): Delay reconnect log for events
+  * Fix [cs3org/reva#2645](https://github.com/cs3org/reva/pull/2645): Avoid warning about missing .flock files
+  * Fix [cs3org/reva#2625](https://github.com/cs3org/reva/pull/2625): Fix locking on publik links and the decomposed filesystem
+  * Fix [cs3org/reva#2643](https://github.com/cs3org/reva/pull/2643): Emit linkaccessfailed event when share is nil
+  * Fix [cs3org/reva#2646](https://github.com/cs3org/reva/pull/2646): Replace public mountpoint fileid with grant fileid in ocdav
+  * Fix [cs3org/reva#2612](https://github.com/cs3org/reva/pull/2612): Adjust the scope handling to support the spaces architecture
+  * Fix [cs3org/reva#2621](https://github.com/cs3org/reva/pull/2621): Send events only if response code is `OK`
+  * Chg [cs3org/reva#2574](https://github.com/cs3org/reva/pull/2574): Switch NATS backend
+  * Chg [cs3org/reva#2667](https://github.com/cs3org/reva/pull/2667): Allow LDAP groups to have no gidNumber
+  * Chg [cs3org/reva#3233](https://github.com/cs3org/reva/pull/3233): Improve quota handling
+  * Chg [cs3org/reva#2600](https://github.com/cs3org/reva/pull/2600): Use the cs3 share api to manage spaces
+  * Enh [cs3org/reva#2644](https://github.com/cs3org/reva/pull/2644): Add new public share manager
+  * Enh [cs3org/reva#2626](https://github.com/cs3org/reva/pull/2626): Add new share manager
+  * Enh [cs3org/reva#2624](https://github.com/cs3org/reva/pull/2624): Add etags to virtual spaces
+  * Enh [cs3org/reva#2639](https://github.com/cs3org/reva/pull/2639): File Events
+  * Enh [cs3org/reva#2627](https://github.com/cs3org/reva/pull/2627): Add events for sharing action
+  * Enh [cs3org/reva#2664](https://github.com/cs3org/reva/pull/2664): Add grantID to mountpoint
+  * Enh [cs3org/reva#2622](https://github.com/cs3org/reva/pull/2622): Allow listing shares in spaces via the OCS API
+  * Enh [cs3org/reva#2623](https://github.com/cs3org/reva/pull/2623): Add space aliases
+  * Enh [cs3org/reva#2647](https://github.com/cs3org/reva/pull/2647): Add space specific events
+  * Enh [cs3org/reva#3345](https://github.com/cs3org/reva/pull/3345): Add the spaceid to propfind responses
+  * Enh [cs3org/reva#2616](https://github.com/cs3org/reva/pull/2616): Add etag to spaces response
+  * Enh [cs3org/reva#2628](https://github.com/cs3org/reva/pull/2628): Add spaces aware trash-bin API
 
    https://github.com/owncloud/ocis/pull/3330
+   https://github.com/owncloud/ocis/pull/3405
+   https://github.com/owncloud/ocis/pull/3416
 
 * Enhancement - Update ownCloud Web to v5.3.0: [#6561](https://github.com/owncloud/web/pull/6561)
 

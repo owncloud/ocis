@@ -20,12 +20,6 @@ Feature: List and create spaces
       | name             | Alice Hansen |
       | quota@@@state    | normal       |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
-    And the json responded should contain a space "Shares Jail" with these key and value pairs:
-      | key              | value        |
-      | driveType        | virtual     |
-      | id               | %space_id%   |
-      | name             | Shares Jail |
-      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
 
   Scenario: An ordinary user can request information about their Space via the Graph API using a filter
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'personal'"

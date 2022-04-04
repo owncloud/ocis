@@ -8,46 +8,46 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons `ocisConfig:"-" yaml:"-"`
+	*shared.Commons `yaml:"-"`
 
-	Service Service `ocisConfig:"-" yaml:"-"`
+	Service Service `yaml:"-"`
 
-	Tracing *Tracing `ocisConfig:"tracing"`
-	Log     *Log     `ocisConfig:"log"`
-	Debug   Debug    `ocisConfig:"debug"`
+	Tracing *Tracing `yaml:"tracing"`
+	Log     *Log     `yaml:"log"`
+	Debug   Debug    `yaml:"debug"`
 
-	HTTP HTTP `ocisConfig:"http"`
+	HTTP HTTP `yaml:"http"`
 
-	Asset Asset  `ocisConfig:"asset"`
-	File  string `ocisConfig:"file" env:"WEB_UI_CONFIG"` // TODO: rename this to a more self explaining string
-	Web   Web    `ocisConfig:"web"`
+	Asset Asset  `yaml:"asset"`
+	File  string `yaml:"file" env:"WEB_UI_CONFIG"` // TODO: rename this to a more self explaining string
+	Web   Web    `yaml:"web"`
 
-	Context context.Context `ocisConfig:"-" yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 // Asset defines the available asset configuration.
 type Asset struct {
-	Path string `ocisConfig:"path" env:"WEB_ASSET_PATH"`
+	Path string `yaml:"path" env:"WEB_ASSET_PATH"`
 }
 
 // WebConfig defines the available web configuration for a dynamically rendered config.json.
 type WebConfig struct {
-	Server        string                 `json:"server,omitempty" ocisConfig:"server" env:"OCIS_URL;WEB_UI_CONFIG_SERVER"`
-	Theme         string                 `json:"theme,omitempty" ocisConfig:"theme" env:""`
-	Version       string                 `json:"version,omitempty" ocisConfig:"version" env:"WEB_UI_CONFIG_VERSION"`
-	OpenIDConnect OIDC                   `json:"openIdConnect,omitempty" ocisConfig:"oids"`
-	Apps          []string               `json:"apps" ocisConfig:"apps"`
-	ExternalApps  []ExternalApp          `json:"external_apps,omitempty" ocisConfig:"external_apps"`
-	Options       map[string]interface{} `json:"options,omitempty" ocisConfig:"options"`
+	Server        string                 `json:"server,omitempty" yaml:"server" env:"OCIS_URL;WEB_UI_CONFIG_SERVER"`
+	Theme         string                 `json:"theme,omitempty" yaml:"theme" env:""`
+	Version       string                 `json:"version,omitempty" yaml:"version" env:"WEB_UI_CONFIG_VERSION"`
+	OpenIDConnect OIDC                   `json:"openIdConnect,omitempty" yaml:"oids"`
+	Apps          []string               `json:"apps" yaml:"apps"`
+	ExternalApps  []ExternalApp          `json:"external_apps,omitempty" yaml:"external_apps"`
+	Options       map[string]interface{} `json:"options,omitempty" yaml:"options"`
 }
 
 // OIDC defines the available oidc configuration
 type OIDC struct {
-	MetadataURL  string `json:"metadata_url,omitempty" ocisConfig:"metadata_url" env:"WEB_OIDC_METADATA_URL"`
-	Authority    string `json:"authority,omitempty" ocisConfig:"authority" env:"OCIS_URL;WEB_OIDC_AUTHORITY"`
-	ClientID     string `json:"client_id,omitempty" ocisConfig:"client_id" env:"WEB_OIDC_CLIENT_ID"`
-	ResponseType string `json:"response_type,omitempty" ocisConfig:"response_type" env:"WEB_OIDC_RESPONSE_TYPE"`
-	Scope        string `json:"scope,omitempty" ocisConfig:"scope" env:"WEB_OIDC_SCOPE"`
+	MetadataURL  string `json:"metadata_url,omitempty" yaml:"metadata_url" env:"WEB_OIDC_METADATA_URL"`
+	Authority    string `json:"authority,omitempty" yaml:"authority" env:"OCIS_URL;WEB_OIDC_AUTHORITY"`
+	ClientID     string `json:"client_id,omitempty" yaml:"client_id" env:"WEB_OIDC_CLIENT_ID"`
+	ResponseType string `json:"response_type,omitempty" yaml:"response_type" env:"WEB_OIDC_RESPONSE_TYPE"`
+	Scope        string `json:"scope,omitempty" yaml:"scope" env:"WEB_OIDC_SCOPE"`
 }
 
 // ExternalApp defines an external web app.
@@ -59,21 +59,21 @@ type OIDC struct {
 //	  }
 //  }
 type ExternalApp struct {
-	ID   string `json:"id,omitempty" ocisConfig:"id"`
-	Path string `json:"path,omitempty" ocisConfig:"path"`
+	ID   string `json:"id,omitempty" yaml:"id"`
+	Path string `json:"path,omitempty" yaml:"path"`
 	// Config is completely dynamic, because it depends on the extension
-	Config map[string]interface{} `json:"config,omitempty" ocisConfig:"config"`
+	Config map[string]interface{} `json:"config,omitempty" yaml:"config"`
 }
 
 // ExternalAppConfig defines an external web app configuration.
 type ExternalAppConfig struct {
-	URL string `json:"url,omitempty" ocisConfig:"url" env:""`
+	URL string `json:"url,omitempty" yaml:"url" env:""`
 }
 
 // Web defines the available web configuration.
 type Web struct {
-	Path        string    `ocisConfig:"path" env:"WEB_UI_PATH"`
-	ThemeServer string    `ocisConfig:"theme_server" env:"OCIS_URL;WEB_UI_THEME_SERVER"` // used to build Theme in WebConfig
-	ThemePath   string    `ocisConfig:"theme_path" env:"WEB_UI_THEME_PATH"`              // used to build Theme in WebConfig
-	Config      WebConfig `ocisConfig:"config"`
+	Path        string    `yaml:"path" env:"WEB_UI_PATH"`
+	ThemeServer string    `yaml:"theme_server" env:"OCIS_URL;WEB_UI_THEME_SERVER"` // used to build Theme in WebConfig
+	ThemePath   string    `yaml:"theme_path" env:"WEB_UI_THEME_PATH"`              // used to build Theme in WebConfig
+	Config      WebConfig `yaml:"config"`
 }

@@ -240,7 +240,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newDrive, err := g.cs3StorageSpaceToDrive(wdu, resp.StorageSpace)
+	newDrive, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, resp.StorageSpace)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error parsing space")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -382,7 +382,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces []*storageprovider.StorageSpace) ([]*libregraph.Drive, error) {
 	responses := make([]*libregraph.Drive, 0, len(storageSpaces))
 	for _, storageSpace := range storageSpaces {
-		res, err := g.cs3StorageSpaceToDrive(baseURL, storageSpace)
+		res, err := g.cs3StorageSpaceToDrive(ctx, baseURL, storageSpace)
 		if err != nil {
 			return nil, err
 		}
@@ -429,7 +429,7 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 	return res, err
 }
 
-func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.StorageSpace) (*libregraph.Drive, error) {
+func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace) (*libregraph.Drive, error) {
 	if space.Root == nil {
 		return nil, fmt.Errorf("space has no root")
 	}
@@ -491,8 +491,12 @@ func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.S
 		}
 	}
 
+	spaceID := space.Root.StorageId
+	if space.Root.OpaqueId != space.Root.StorageId {
+		spaceID = rootID
+	}
 	drive := &libregraph.Drive{
-		Id:   &space.Root.StorageId,
+		Id:   &spaceID,
 		Name: &space.Name,
 		//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
 		//"description": "string", // TODO read from StorageSpace ... needs Opaque for now
@@ -502,6 +506,24 @@ func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.S
 			Permissions: permissions,
 		},
 	}
+	if space.SpaceType == "mountpoint" {
+		var remoteItem *libregraph.RemoteItem
+		grantID := storageprovider.ResourceId{
+			StorageId: utils.ReadPlainFromOpaque(space.Opaque, "grantStorageID"),
+			OpaqueId:  utils.ReadPlainFromOpaque(space.Opaque, "grantOpaqueID"),
+		}
+		if grantID.StorageId != "" && grantID.OpaqueId != "" {
+			var err error
+			remoteItem, err = g.getRemoteItem(ctx, &grantID, baseURL)
+			if err != nil {
+				g.logger.Debug().Err(err).Msg(err.Error())
+			}
+		}
+		if remoteItem != nil {
+			drive.Root.RemoteItem = remoteItem
+		}
+	}
+
 	if space.Opaque != nil {
 		if description, ok := space.Opaque.Map["description"]; ok {
 			drive.Description = libregraph.PtrString(string(description.Value))
@@ -526,7 +548,7 @@ func (g Graph) cs3StorageSpaceToDrive(baseURL *url.URL, space *storageprovider.S
 		// TODO read from StorageSpace ... needs Opaque for now
 		// TODO how do we build the url?
 		// for now: read from request
-		webDavURL := baseURL.String() + space.Root.StorageId
+		webDavURL := baseURL.String() + spaceID
 		drive.Root.WebDavUrl = &webDavURL
 	}
 
@@ -584,16 +606,32 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 		return nil, err
 	}
 
-	total := int64(res.TotalBytes)
+	var remaining int64
+	if res.Opaque != nil {
+		m := res.Opaque.Map
+		if e, ok := m["remaining"]; ok {
+			remaining, _ = strconv.ParseInt(string(e.Value), 10, 64)
+		}
+	}
 
 	used := int64(res.UsedBytes)
-	remaining := total - used
 	qta := libregraph.Quota{
 		Remaining: &remaining,
-		Total:     &total,
 		Used:      &used,
 	}
-	state := calculateQuotaState(total, used)
+
+	var t int64
+	if total := int64(res.TotalBytes); total != 0 {
+
+		// A quota was set
+		qta.Total = &total
+		t = total
+	} else {
+		// Quota was not set
+		// Use remaining bytes to calculate state
+		t = remaining
+	}
+	state := calculateQuotaState(t, used)
 	qta.State = &state
 
 	return &qta, nil
@@ -753,7 +791,7 @@ func sortSpaces(req *godata.GoDataRequest, spaces []*libregraph.Drive) ([]*libre
 		return nil, fmt.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)
 	}
 
-	if req.Query.OrderBy.OrderByItems[0].Order == "asc" {
+	if req.Query.OrderBy.OrderByItems[0].Order == "desc" {
 		sorter = sort.Reverse(sorter)
 	}
 	sort.Sort(sorter)

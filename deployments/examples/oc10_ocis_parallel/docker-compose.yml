@@ -116,7 +116,6 @@ services:
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
       OCIS_URL: https://${CLOUD_DOMAIN:-cloud.owncloud.test}
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
-      PROXY_CONFIG_FILE: "/var/tmp/ocis/.config/proxy-config.json"
       # change default secrets
       OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
@@ -126,7 +125,7 @@ services:
       # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
       PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
     volumes:
-      - ./config/ocis/proxy.json:/etc/ocis/proxy.json
+      - ./config/ocis/proxy.yaml:/etc/ocis/proxy.yaml
       - ocis-data:/var/lib/ocis
       # shared volume with oC10
       - oc10-data:/mnt/data

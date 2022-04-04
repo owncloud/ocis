@@ -52,8 +52,6 @@ func DefaultConfig() *config.Config {
 		AutoprovisionAccounts: false,
 		EnableBasicAuth:       false,
 		InsecureBackends:      false,
-		// TODO: enable
-		//Policies: defaultPolicies(),
 	}
 }
 
@@ -156,66 +154,6 @@ func DefaultPolicies() []config.Policy {
 				},
 			},
 		},
-		{
-			Name: "oc10",
-			Routes: []config.Route{
-				{
-					Endpoint: "/",
-					Backend:  "http://localhost:9100",
-				},
-				{
-					Endpoint: "/.well-known/",
-					Backend:  "http://localhost:9130",
-				},
-				{
-					Endpoint: "/konnect/",
-					Backend:  "http://localhost:9130",
-				},
-				{
-					Endpoint: "/signin/",
-					Backend:  "http://localhost:9130",
-				},
-				{
-					Endpoint: "/archiver",
-					Backend:  "http://localhost:9140",
-				},
-				{
-					Endpoint:    "/ocs/",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/remote.php/",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/dav/",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/webdav/",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/status.php",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/index.php/",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/data",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-			},
-		},
 	}
 }
 
@@ -249,6 +187,14 @@ func Sanitize(cfg *config.Config) {
 	// sanitize config
 	if cfg.Policies == nil {
 		cfg.Policies = DefaultPolicies()
+	}
+
+	if cfg.PolicySelector == nil {
+		cfg.PolicySelector = &config.PolicySelector{
+			Static: &config.StaticSelectorConf{
+				Policy: "ocis",
+			},
+		}
 	}
 
 	if cfg.HTTP.Root != "/" {
