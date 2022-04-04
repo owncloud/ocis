@@ -192,9 +192,9 @@ ci-node-check-licenses:
 
 .PHONY: ci-go-save-licenses
 ci-go-save-licenses: $(GO_LICENSES)
-	@mkdir -p ./licenses/go/ocis/licenses
-	$(GO_LICENSES) csv ./... > ./licenses/go/ocis/licenses.csv
-	$(GO_LICENSES) save ./... --force --save_path="./licenses/go/ocis/licenses"
+	@mkdir -p ./third-party-licenses/go/ocis/third-party-licenses
+	$(GO_LICENSES) csv ./... > ./third-party-licenses/go/ocis/third-party-licenses.csv
+	$(GO_LICENSES) save ./... --force --save_path="./third-party-licenses/go/ocis/third-party-licenses"
 
 .PHONY: ci-node-save-licenses
 ci-node-save-licenses:

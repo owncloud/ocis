@@ -48,6 +48,7 @@ vendor: .yarninstall
 
 .PHONY: licenses
 licenses:
+	# TODO: what's that???
 	echo "## Konnect identifier webapp\n"
 	@$(YARN) run  -s licenses
 

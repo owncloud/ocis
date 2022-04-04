@@ -38,7 +38,6 @@ pull-assets:
 ############ licenses ############
 .PHONY: ci-node-check-licenses
 ci-node-check-licenses:
-	# TODO: check again? probably not
 
 .PHONY: ci-node-save-licenses
 ci-node-save-licenses:
