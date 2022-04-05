@@ -273,4 +273,4 @@ require (
 replace github.com/pkg/xattr => github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7
 
 // testing for https://github.com/cs3org/reva/pull/2665
-replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20220325151037-b6c1e6bbdff2
+replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20220406120538-05be89cb7ca4

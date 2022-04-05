@@ -260,8 +260,8 @@ github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f/go.mod h1:8rLXio+Wji
 github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/boombuler/barcode v1.0.1 h1:NDBbPmhS+EqABEs5Kg3n/5ZNjy73Pz7SIV+KCeqyXcs=
 github.com/boombuler/barcode v1.0.1/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
-github.com/butonic/reva/v2 v2.0.0-20220325151037-b6c1e6bbdff2 h1:bzpf9Kkegij0fcJ1lIMobWFz8Y+VF7kDmPnX6c5Xsm8=
-github.com/butonic/reva/v2 v2.0.0-20220325151037-b6c1e6bbdff2/go.mod h1:i4SDzlZEeJ8DxZGB2uo+6NZTgiZewaH9y53kwtY5eJY=
+github.com/butonic/reva/v2 v2.0.0-20220405125253-aef9d67ee0a2 h1:UhKmRwg5ywJdZZ4NRcJOchwNehm0M89aLkUJU3Kt00o=
+github.com/butonic/reva/v2 v2.0.0-20220405125253-aef9d67ee0a2/go.mod h1:YnwsFUd7K/sweINNfF5uiqlozgtd0qyjKw1zWB78Rro=
 github.com/c-bata/go-prompt v0.2.5/go.mod h1:vFnjEGDIIA/Lib7giyE4E9c50Lvl8j0S+7FVlAwDAVw=
 github.com/cenkalti/backoff v2.2.1+incompatible h1:tNowT99t7UNflLxfYYSlKYsBpXdEet03Pg2g16Swow4=
 github.com/cenkalti/backoff v2.2.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
@@ -337,7 +337,6 @@ github.com/crewjam/httperr v0.2.0/go.mod h1:Jlz+Sg/XqBQhyMjdDiC+GNNRzZTD7x39Gu3p
 github.com/crewjam/saml v0.4.6 h1:XCUFPkQSJLvzyl4cW9OvpWUbRf0gE7VUpU8ZnilbeM4=
 github.com/crewjam/saml v0.4.6/go.mod h1:ZBOXnNPFzB3CgOkRm7Nd6IVdkG+l/wF+0ZXLqD96t1A=
 github.com/cs3org/cato v0.0.0-20200828125504-e418fc54dd5e/go.mod h1:XJEZ3/EQuI3BXTp/6DUzFr850vlxq11I6satRtz0YQ4=
-github.com/cs3org/go-cs3apis v0.0.0-20220126114148-64c025ccdd19/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/cs3org/go-cs3apis v0.0.0-20220328105952-297bef33e13f h1:emnlOWc1s2gx77MViLnZH9yh5TRHKsykRu6rJjx3lkM=
 github.com/cs3org/go-cs3apis v0.0.0-20220328105952-297bef33e13f/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
