@@ -22,6 +22,14 @@ Some cases have suggested setup steps, but feel free to use other setups. This c
 
 It's a good idea to test ocis in the same environment where you are planning to use it later (with the LDAP server, storage system, etc. of your organisation).
 
+# run oCIS
+For a quick start, please have a look into the [getting started documentation of oCIS]({{< ref "../getting-started/run-ocis" >}})
+If you would like
+to access oCIS remotely please refer to the [Basic Remote Setup]({{< ref "../deployment/basic-remote-setup" >}}) section.
+
+## additional tips
+- to allow basic auth (e.g. to easily access oCIS using curl commands) you have to set `PROXY_ENABLE_BASIC_AUTH=true` environment variable
+
 # Testplan
 
 ## user / groups from LDAP
@@ -29,7 +37,7 @@ It's a good idea to test ocis in the same environment where you are planning to 
 Prerequisite:
 - connect ocis to your preferred LDAP server
 - create users and groups in LDAP
-- start ocis with basic auth `OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true bin/ocis server`
+- start ocis with basic auth
 
 documentations resources:
   - [configure ocis with LDAP](https://owncloud.dev/ocis/deployment/ocis_ldap/)
@@ -82,6 +90,7 @@ documentations resources:
 ## Spaces
 
 Prerequisite:
+- start ocis with basic auth
 - variable declaration, for curl examples:
 ```shell
 SERVER_URI=https://localhost:9200
@@ -157,7 +166,7 @@ PASSWORD=admin
 Prerequisite:
 - [connect ocis to your preferred LDAP server](https://owncloud.dev/ocis/deployment/ocis_ldap/)
 - create users and groups in LDAP
-- Use your preferred browser
+- Use your preferred browser to access the build-in webUI (by default: https://localhost:9200)
 
 | Test Case                                                                                                          | Expected Result                                                        | Comment |
 |--------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|---------|
@@ -204,9 +213,14 @@ Prerequisite:
 ## Desktop Client
 
 Prerequisite:
-- [connect ocis to your preferred LDAP server](https://owncloud.dev/ocis/deployment/ocis_ldap/)
-- create users and groups in LDAP
-- use your preferred OS for the desktop client
+- [install the desktop client on your preferred OS](https://owncloud.com/desktop-app/)
+- start ocis
+- connect a new account in the desktop client to ocis e.g. `https://localhost:9200` if you are running the server and the client on the same machine
+- accept the self-signed certificate
+- you will be redirected to the browser, accept the certificate there also
+- login as any user
+- allow the "ownCloud desktop app" to access ocis
+- select a folder to sync
 
 | Test Case                                                                                               | Expected Result                                                              | Comment |
 |---------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|---------|
@@ -217,8 +231,14 @@ Prerequisite:
 ## Mobile Clients (iOS || Android)
 
 Prerequisite:
-- [connect ocis to your preferred LDAP server](https://owncloud.dev/ocis/deployment/ocis_ldap/)
-- create users and groups in LDAP
+- [install the ownCloud app on your mobile](https://owncloud.com/mobile-apps/)
+- start oCIS as described in [Basic Remote Setup]({{< ref "../deployment/basic-remote-setup" >}})
+- connect a new account in the mobile client to ocis
+- accept the self-signed certificate
+- you will be redirected to the browser, accept the certificate there also
+- login as any user
+- allow the mobile app to access ocis
+
 
 | Test Case                                     | Expected Result                          | Comment |
 |-----------------------------------------------|------------------------------------------|---------|
@@ -229,7 +249,7 @@ Prerequisite:
 ## other WebDAV clients
 
 Prerequisite:
-- start ocis with basic auth `OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true bin/ocis server`
+- start ocis with basic auth
 
 | Test Case                                                     | Expected Result                                             | Comment                                                                                                      |
 |---------------------------------------------------------------|-------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
