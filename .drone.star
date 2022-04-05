@@ -17,6 +17,7 @@ OC_CI_GOLANG = "owncloudci/golang:1.17"
 OC_CI_NODEJS = "owncloudci/nodejs:%s"
 OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
+OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:latest"
 OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.4.0"
 OC_SERVER = "owncloud/server:10"
 OC_UBUNTU = "owncloud/ubuntu:18.04"
@@ -59,6 +60,10 @@ config = {
         "web",
         "webdav",
     ],
+    "cs3ApiTests": {
+        "skip": False,
+        "earlyFail": True,
+    },
     "localApiTests": {
         "skip": False,
         "earlyFail": True,
@@ -261,8 +266,10 @@ def cancelPreviousBuilds():
 
 def testPipelines(ctx):
     pipelines = []
+    if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
+        pipelines += [cs3ApiTests(ctx, "ocis", "default")]
     if "skip" not in config["localApiTests"] or not config["localApiTests"]["skip"]:
-        pipelines = [
+        pipelines += [
             localApiTests(ctx, "ocis", "apiAccountsHashDifficulty", "default"),
             localApiTests(ctx, "ocis", "apiSpaces", "default"),
             localApiTests(ctx, "ocis", "apiArchiver", "default"),
@@ -513,6 +520,38 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
             ],
         },
         "volumes": [pipelineVolumeOC10Tests],
+    }
+
+def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
+    early_fail = config["cs3ApiTests"]["earlyFail"] if "earlyFail" in config["cs3ApiTests"] else False
+
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "cs3ApiTests-%s" % (storage),
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+                 ocisServer(storage, accounts_hash_difficulty, []) + [
+            {
+                "name": "cs3ApiTests-%s" % (storage),
+                "image": OC_CS3_API_VALIDATOR,
+                "environment": {},
+                "commands": [
+                    "/usr/bin/cs3api-validator /var/lib/cs3api-validator --endpoint=ocis-server:9142",
+                ],
+            },
+        ] + failEarly(ctx, early_fail),
+        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/tags/v*",
+                "refs/pull/**",
+            ],
+        },
     }
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
@@ -1440,6 +1479,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         user = "0:0"
         environment = {
             "OCIS_URL": "https://ocis-server:9200",
+            "STORAGE_GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
             "STORAGE_HOME_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
