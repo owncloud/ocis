@@ -166,7 +166,7 @@ PASSWORD=admin
 Prerequisite:
 - [connect ocis to your preferred LDAP server](https://owncloud.dev/ocis/deployment/ocis_ldap/)
 - create users and groups in LDAP
-- Use your preferred browser to access the build-in webUI (by default: https://localhost:9200)
+- Use your preferred browser (Firefox 94-96, Chrome 92-97, Opera 81-82, Edge 96-97, Safari 14-15) to access the build-in webUI (by default: https://localhost:9200)
 
 | Test Case                                                                                                          | Expected Result                                                        | Comment |
 |--------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|---------|
