@@ -269,10 +269,10 @@ def testPipelines(ctx):
     if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
         pipelines += [cs3ApiTests(ctx, "ocis", "default")]
     if "skip" not in config["localApiTests"] or not config["localApiTests"]["skip"]:
-        pipelines += [
-            localApiTests(ctx, "ocis", "apiAccountsHashDifficulty", "default"),
-            localApiTests(ctx, "ocis", "apiSpaces", "default"),
-            localApiTests(ctx, "ocis", "apiArchiver", "default"),
+        pipelines = [
+            localApiTests(ctx, "ocis", "apiAccountsHashDifficulty"),
+            localApiTests(ctx, "ocis", "apiSpaces"),
+            localApiTests(ctx, "ocis", "apiArchiver"),
         ]
 
     if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
@@ -2129,7 +2129,7 @@ def parallelDeployAcceptancePipeline(ctx):
                          fixSharedDataPermissions() +
                          ocisServer(
                              "ocis",
-                             "default",
+                             4,
                              [stepVolumeOC10OCISData, stepVolumeOCISConfig],
                              ["fix-shared-data-permissions"],
                              True,
