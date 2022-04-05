@@ -1,5 +1,7 @@
 package types
 
+import "github.com/cs3org/reva/v2/pkg/events"
+
 // AuditEvent is the basic audit event
 type AuditEvent struct {
 	RemoteAddr string // the remote client IP
@@ -196,4 +198,49 @@ type AuditEventSpaceEnabled struct {
 // AuditEventSpaceDeleted is the event logged when a space is deleted
 type AuditEventSpaceDeleted struct {
 	AuditEventSpaces
+}
+
+// AuditEventUserCreated is the event logged when a user is created
+type AuditEventUserCreated struct {
+	AuditEvent
+	UserID string
+}
+
+// AuditEventUserDeleted is the event logged when a user is deleted
+type AuditEventUserDeleted struct {
+	AuditEvent
+	UserID string
+}
+
+// AuditEventUserFeatureChanged is the event logged when a user feature is changed
+type AuditEventUserFeatureChanged struct {
+	AuditEvent
+	UserID   string
+	Features []events.UserFeature
+}
+
+// AuditEventGroupCreated is the event logged when a group is created
+type AuditEventGroupCreated struct {
+	AuditEvent
+	GroupID string
+}
+
+// AuditEventGroupDeleted is the event logged when a group is deleted
+type AuditEventGroupDeleted struct {
+	AuditEvent
+	GroupID string
+}
+
+// AuditEventGroupMemberAdded is the event logged when a group member is added
+type AuditEventGroupMemberAdded struct {
+	AuditEvent
+	GroupID string
+	UserID  string
+}
+
+// AuditEventGroupMemberRemoved is the event logged when a group member is removed
+type AuditEventGroupMemberRemoved struct {
+	AuditEvent
+	GroupID string
+	UserID  string
 }

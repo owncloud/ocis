@@ -369,6 +369,75 @@ func SpaceDeleted(ev events.SpaceDeleted) AuditEventSpaceDeleted {
 	}
 }
 
+// UserCreated converts a UserCreated event to an AuditEventUserCreated
+func UserCreated(ev events.UserCreated) AuditEventUserCreated {
+	base := BasicAuditEvent("", "", MessageUserCreated(ev.UserID), ActionUserCreated)
+	return AuditEventUserCreated{
+		AuditEvent: base,
+		UserID:     ev.UserID,
+	}
+}
+
+// UserDeleted converts a UserDeleted event to an AuditEventUserDeleted
+func UserDeleted(ev events.UserDeleted) AuditEventUserDeleted {
+	base := BasicAuditEvent("", "", MessageUserDeleted(ev.UserID), ActionUserDeleted)
+	return AuditEventUserDeleted{
+		AuditEvent: base,
+		UserID:     ev.UserID,
+	}
+}
+
+// UserFeatureChanged converts a UserFeatureChanged event to an AuditEventUserFeatureChanged
+func UserFeatureChanged(ev events.UserFeatureChanged) AuditEventUserFeatureChanged {
+	msg := MessageUserFeatureChanged(ev.UserID, ev.Features)
+	base := BasicAuditEvent("", "", msg, ActionUserFeatureChanged)
+	return AuditEventUserFeatureChanged{
+		AuditEvent: base,
+		UserID:     ev.UserID,
+		Features:   ev.Features,
+	}
+}
+
+// GroupCreated converts a GroupCreated event to an AuditEventGroupCreated
+func GroupCreated(ev events.GroupCreated) AuditEventGroupCreated {
+	base := BasicAuditEvent("", "", MessageGroupCreated(ev.GroupID), ActionGroupCreated)
+	return AuditEventGroupCreated{
+		AuditEvent: base,
+		GroupID:    ev.GroupID,
+	}
+}
+
+// GroupDeleted converts a GroupDeleted event to an AuditEventGroupDeleted
+func GroupDeleted(ev events.GroupDeleted) AuditEventGroupDeleted {
+	base := BasicAuditEvent("", "", MessageGroupDeleted(ev.GroupID), ActionGroupDeleted)
+	return AuditEventGroupDeleted{
+		AuditEvent: base,
+		GroupID:    ev.GroupID,
+	}
+}
+
+// GroupMemberAdded converts a GroupMemberAdded event to an AuditEventGroupMemberAdded
+func GroupMemberAdded(ev events.GroupMemberAdded) AuditEventGroupMemberAdded {
+	msg := MessageGroupMemberAdded(ev.GroupID, ev.UserID)
+	base := BasicAuditEvent("", "", msg, ActionGroupMemberAdded)
+	return AuditEventGroupMemberAdded{
+		AuditEvent: base,
+		GroupID:    ev.GroupID,
+		UserID:     ev.UserID,
+	}
+}
+
+// GroupMemberRemoved converts a GroupMemberRemoved event to an AuditEventGroupMemberRemove
+func GroupMemberRemoved(ev events.GroupMemberRemoved) AuditEventGroupMemberRemoved {
+	msg := MessageGroupMemberRemoved(ev.GroupID, ev.UserID)
+	base := BasicAuditEvent("", "", msg, ActionGroupMemberRemoved)
+	return AuditEventGroupMemberRemoved{
+		AuditEvent: base,
+		GroupID:    ev.GroupID,
+		UserID:     ev.UserID,
+	}
+}
+
 func extractGrantee(uid *user.UserId, gid *group.GroupId) (string, string) {
 	switch {
 	case uid != nil && uid.OpaqueId != "":

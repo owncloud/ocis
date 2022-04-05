@@ -3,6 +3,7 @@ package svc
 import (
 	"net/http"
 
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/graph/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
@@ -14,13 +15,14 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger        log.Logger
-	Config        *config.Config
-	Middleware    []func(http.Handler) http.Handler
-	GatewayClient GatewayClient
-	HTTPClient    HTTPClient
-	RoleService   settingssvc.RoleService
-	RoleManager   *roles.Manager
+	Logger          log.Logger
+	Config          *config.Config
+	Middleware      []func(http.Handler) http.Handler
+	GatewayClient   GatewayClient
+	HTTPClient      HTTPClient
+	RoleService     settingssvc.RoleService
+	RoleManager     *roles.Manager
+	EventsPublisher events.Publisher
 }
 
 // newOptions initializes the available default options.
@@ -80,5 +82,12 @@ func RoleService(val settingssvc.RoleService) Option {
 func RoleManager(val *roles.Manager) Option {
 	return func(o *Options) {
 		o.RoleManager = val
+	}
+}
+
+// EventsPublisher provides a function to set the EventsPublisher option.
+func EventsPublisher(val events.Publisher) Option {
+	return func(o *Options) {
+		o.EventsPublisher = val
 	}
 }

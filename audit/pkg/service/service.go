@@ -85,6 +85,20 @@ func StartAuditLogger(ctx context.Context, ch <-chan interface{}, log log.Logger
 				auditEvent = types.SpaceEnabled(ev)
 			case events.SpaceDeleted:
 				auditEvent = types.SpaceDeleted(ev)
+			case events.UserCreated:
+				auditEvent = types.UserCreated(ev)
+			case events.UserDeleted:
+				auditEvent = types.UserDeleted(ev)
+			case events.UserFeatureChanged:
+				auditEvent = types.UserFeatureChanged(ev)
+			case events.GroupCreated:
+				auditEvent = types.GroupCreated(ev)
+			case events.GroupDeleted:
+				auditEvent = types.GroupDeleted(ev)
+			case events.GroupMemberAdded:
+				auditEvent = types.GroupMemberAdded(ev)
+			case events.GroupMemberRemoved:
+				auditEvent = types.GroupMemberRemoved(ev)
 			default:
 				log.Error().Interface("event", ev).Msg(fmt.Sprintf("can't handle event of type '%T'", ev))
 				continue

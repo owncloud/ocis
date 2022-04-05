@@ -23,6 +23,7 @@ type Config struct {
 
 	Spaces   Spaces   `yaml:"spaces"`
 	Identity Identity `yaml:"identity"`
+	Events   Events   `yaml:"events"`
 
 	Context context.Context `yaml:"-"`
 }
@@ -61,4 +62,10 @@ type LDAP struct {
 type Identity struct {
 	Backend string `yaml:"backend" env:"GRAPH_IDENTITY_BACKEND"`
 	LDAP    LDAP   `yaml:"ldap"`
+}
+
+// Events combines the configuration options for the event bus.
+type Events struct {
+	Endpoint string `yaml:"events_endpoint" env:"GRAPH_EVENTS_ENDPOINT" desc:"the address of the streaming service"`
+	Cluster  string `yaml:"events_cluster" env:"GRAPH_EVENTS_CLUSTER" desc:"the clusterID of the streaming service. Mandatory when using nats"`
 }
