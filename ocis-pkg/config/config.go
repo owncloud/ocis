@@ -24,7 +24,7 @@ import (
 
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
-	JWTSecret string `ocisConfig:"jwt_secret" env:"OCIS_JWT_SECRET"`
+	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET"`
 }
 
 const (
@@ -39,41 +39,41 @@ type Mode int
 
 // Runtime configures the oCIS runtime when running in supervised mode.
 type Runtime struct {
-	Port       string `ocisConfig:"port" env:"OCIS_RUNTIME_PORT"`
-	Host       string `ocisConfig:"host" env:"OCIS_RUNTIME_HOST"`
-	Extensions string `ocisConfig:"extensions" env:"OCIS_RUN_EXTENSIONS"`
+	Port       string `yaml:"port" env:"OCIS_RUNTIME_PORT"`
+	Host       string `yaml:"host" env:"OCIS_RUNTIME_HOST"`
+	Extensions string `yaml:"extensions" env:"OCIS_RUN_EXTENSIONS"`
 }
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons `ocisConfig:"shared"`
+	*shared.Commons `yaml:"shared"`
 
-	Tracing shared.Tracing `ocisConfig:"tracing"`
-	Log     *shared.Log    `ocisConfig:"log"`
+	Tracing shared.Tracing `yaml:"tracing"`
+	Log     *shared.Log    `yaml:"log"`
 
 	Mode    Mode // DEPRECATED
 	File    string
-	OcisURL string `ocisConfig:"ocis_url"`
+	OcisURL string `yaml:"ocis_url"`
 
-	Registry     string       `ocisConfig:"registry"`
-	TokenManager TokenManager `ocisConfig:"token_manager"`
-	Runtime      Runtime      `ocisConfig:"runtime"`
+	Registry     string       `yaml:"registry"`
+	TokenManager TokenManager `yaml:"token_manager"`
+	Runtime      Runtime      `yaml:"runtime"`
 
-	Audit         *audit.Config         `ocsiConfig:"audit"`
-	Accounts      *accounts.Config      `ocisConfig:"accounts"`
-	GLAuth        *glauth.Config        `ocisConfig:"glauth"`
-	Graph         *graph.Config         `ocisConfig:"graph"`
-	GraphExplorer *graphExplorer.Config `ocisConfig:"graph_explorer"`
-	IDP           *idp.Config           `ocisConfig:"idp"`
-	IDM           *idm.Config           `ocisConfig:"idm"`
-	Nats          *nats.Config          `ocisConfig:"nats"`
-	Notifications *notifications.Config `ocisConfig:"notifications"`
-	OCS           *ocs.Config           `ocisConfig:"ocs"`
-	Web           *web.Config           `ocisConfig:"web"`
-	Proxy         *proxy.Config         `ocisConfig:"proxy"`
-	Settings      *settings.Config      `ocisConfig:"settings"`
-	Storage       *storage.Config       `ocisConfig:"storage"`
-	Store         *store.Config         `ocisConfig:"store"`
-	Thumbnails    *thumbnails.Config    `ocisConfig:"thumbnails"`
-	WebDAV        *webdav.Config        `ocisConfig:"webdav"`
+	Audit         *audit.Config         `yaml:"audit"`
+	Accounts      *accounts.Config      `yaml:"accounts"`
+	GLAuth        *glauth.Config        `yaml:"glauth"`
+	Graph         *graph.Config         `yaml:"graph"`
+	GraphExplorer *graphExplorer.Config `yaml:"graph_explorer"`
+	IDP           *idp.Config           `yaml:"idp"`
+	IDM           *idm.Config           `yaml:"idm"`
+	Nats          *nats.Config          `yaml:"nats"`
+	Notifications *notifications.Config `yaml:"notifications"`
+	OCS           *ocs.Config           `yaml:"ocs"`
+	Web           *web.Config           `yaml:"web"`
+	Proxy         *proxy.Config         `yaml:"proxy"`
+	Settings      *settings.Config      `yaml:"settings"`
+	Storage       *storage.Config       `yaml:"storage"`
+	Store         *store.Config         `yaml:"store"`
+	Thumbnails    *thumbnails.Config    `yaml:"thumbnails"`
+	WebDAV        *webdav.Config        `yaml:"webdav"`
 }

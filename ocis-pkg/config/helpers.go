@@ -31,14 +31,24 @@ var (
 func DefaultConfigSources(filename string, drivers []string) []string {
 	var sources []string
 
-	for i := range defaultLocations {
-		dirFS := os.DirFS(defaultLocations[i])
+	locations := []string{}
+	if v := os.Getenv("OCIS_CONFIG_DIR"); v != "" {
+	    locations = append(locations, v)
+		// only use the configured config dir
+		locations = append(locations, os.Getenv("OCIS_CONFIG_DIR"))
+	} else {
+		// merge config from all default locations
+		locations = append(locations, defaultLocations...)
+	}
+
+	for i := range locations {
+		dirFS := os.DirFS(locations[i])
 		pattern := filename + ".*"
 		matched, _ := fs.Glob(dirFS, pattern)
 		if len(matched) > 0 {
 			// prepend path to results
 			for j := 0; j < len(matched); j++ {
-				matched[j] = filepath.Join(defaultLocations[i], matched[j])
+				matched[j] = filepath.Join(locations[i], matched[j])
 			}
 		}
 		sources = append(sources, matched...)
@@ -68,7 +78,7 @@ func BindSourcesToStructs(extension string, dst interface{}) (*gofig.Config, err
 	sources := DefaultConfigSources(extension, supportedExtensions)
 	cnf := gofig.NewWithOptions(extension)
 	cnf.WithOptions(func(options *gofig.Options) {
-		options.DecoderConfig.TagName = "ocisConfig"
+		options.DecoderConfig.TagName = "yaml"
 	})
 	cnf.AddDriver(gooyaml.Driver)
 	_ = cnf.LoadFiles(sources...)

@@ -8,25 +8,25 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons `ocisConfig:"-" yaml:"-"`
+	*shared.Commons `yaml:"-"`
 
-	Service Service `ocisConfig:"-" yaml:"-"`
+	Service Service `yaml:"-"`
 
-	Tracing *Tracing `ocisConfig:"tracing"`
-	Log     *Log     `ocisConfig:"log"`
-	Debug   Debug    `ocisConfig:"debug"`
+	Tracing *Tracing `yaml:"tracing"`
+	Log     *Log     `yaml:"log"`
+	Debug   Debug    `yaml:"debug"`
 
-	HTTP HTTP `ocisConfig:"http"`
+	HTTP HTTP `yaml:"http"`
 
-	GraphExplorer GraphExplorer `ocisConfig:"graph_explorer"`
+	GraphExplorer GraphExplorer `yaml:"graph_explorer"`
 
-	Context context.Context `ocisConfig:"-" yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 // GraphExplorer defines the available graph-explorer configuration.
 type GraphExplorer struct {
-	ClientID     string `ocisConfig:"client_id" env:"GRAPH_EXPLORER_CLIENT_ID"`
-	Issuer       string `ocisConfig:"issuer" env:"OCIS_URL;GRAPH_EXPLORER_ISSUER"`
-	GraphURLBase string `ocisConfig:"graph_url_base" env:"OCIS_URL;GRAPH_EXPLORER_GRAPH_URL_BASE"`
-	GraphURLPath string `ocisConfig:"graph_url_path" env:"GRAPH_EXPLORER_GRAPH_URL_PATH"`
+	ClientID     string `yaml:"client_id" env:"GRAPH_EXPLORER_CLIENT_ID"`
+	Issuer       string `yaml:"issuer" env:"OCIS_URL;GRAPH_EXPLORER_ISSUER"`
+	GraphURLBase string `yaml:"graph_url_base" env:"OCIS_URL;GRAPH_EXPLORER_GRAPH_URL_BASE"`
+	GraphURLPath string `yaml:"graph_url_path" env:"GRAPH_EXPLORER_GRAPH_URL_PATH"`
 }

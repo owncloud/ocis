@@ -17,7 +17,7 @@ OC_CI_GOLANG = "owncloudci/golang:1.17"
 OC_CI_NODEJS = "owncloudci/nodejs:%s"
 OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
-OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.3.1"
+OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.4.0"
 OC_SERVER = "owncloud/server:10"
 OC_UBUNTU = "owncloud/ubuntu:18.04"
 OSIXIA_OPEN_LDAP = "osixia/openldap:latest"
@@ -1376,6 +1376,9 @@ def makeNodeGenerate(module):
         {
             "name": "generate nodejs",
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+            "environment": {
+                "CHROMEDRIVER_SKIP_DOWNLOAD": "true",  # install fails on arm and chromedriver is a test only dependency
+            },
             "commands": [
                 "%s ci-node-generate" % (make),
             ],

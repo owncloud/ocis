@@ -121,7 +121,8 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 					"driver": cfg.Reva.Sharing.UserDriver,
 					"drivers": map[string]interface{}{
 						"json": map[string]interface{}{
-							"file": cfg.Reva.Sharing.UserJSONFile,
+							"file":         cfg.Reva.Sharing.UserJSONFile,
+							"gateway_addr": cfg.Reva.Gateway.Endpoint,
 						},
 						"sql": map[string]interface{}{ // cernbox sql
 							"db_username":                   cfg.Reva.Sharing.UserSQLUsername,
@@ -155,7 +156,8 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 					"driver": cfg.Reva.Sharing.PublicDriver,
 					"drivers": map[string]interface{}{
 						"json": map[string]interface{}{
-							"file": cfg.Reva.Sharing.PublicJSONFile,
+							"file":         cfg.Reva.Sharing.PublicJSONFile,
+							"gateway_addr": cfg.Reva.Gateway.Endpoint,
 						},
 						"sql": map[string]interface{}{
 							"db_username":                   cfg.Reva.Sharing.UserSQLUsername,

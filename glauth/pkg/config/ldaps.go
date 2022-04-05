@@ -2,9 +2,9 @@ package config
 
 // Ldaps defined the available LDAPS configuration.
 type Ldaps struct {
-	Enabled   bool   `ocisConfig:"enabled" env:"GLAUTH_LDAPS_ENABLED"`
-	Addr      string `ocisConfig:"addr" env:"GLAUTH_LDAPS_ADDR"`
-	Namespace string `ocisConfig:"-" yaml:"-"`
-	Cert      string `ocisConfig:"cert" env:"GLAUTH_LDAPS_CERT"`
-	Key       string `ocisConfig:"key" env:"GLAUTH_LDAPS_KEY"`
+	Enabled   bool   `yaml:"enabled" env:"GLAUTH_LDAPS_ENABLED"`
+	Addr      string `yaml:"addr" env:"GLAUTH_LDAPS_ADDR"`
+	Namespace string `yaml:"-"`
+	Cert      string `yaml:"cert" env:"GLAUTH_LDAPS_CERT"`
+	Key       string `yaml:"key" env:"GLAUTH_LDAPS_KEY"`
 }
