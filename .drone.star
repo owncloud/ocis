@@ -61,31 +61,31 @@ config = {
         "ocis",
     ],
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "localApiTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "accountsUITests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "settingsUITests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "parallelApiTests": {
@@ -93,7 +93,7 @@ config = {
             "suites": [
                 "apiShareManagement",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
             "cron": "nightly",
         },
@@ -101,10 +101,16 @@ config = {
             "suites": [
                 "apiWebdavOperations",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
             "cron": "nightly",
         },
+    },
+    "graphApiTests": {
+        "skip": False,
+        "earlyFali": False,
+        "numberOfParts": 10,
+        "skipExceptParts": [],
     },
     "rocketchat": {
         "channel": "ocis-internal",
@@ -189,7 +195,6 @@ def main(ctx):
     test_pipelines = \
         cancelPreviousBuilds() + \
         [buildOcisBinaryForTesting(ctx)] + \
-        testOcisModules(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -290,6 +295,9 @@ def testPipelines(ctx):
 
     if "skip" not in config["parallelApiTests"] or not config["parallelApiTests"]["skip"]:
         pipelines += parallelDeployAcceptancePipeline(ctx)
+
+    if "skip" not in config["graphApiTests"] or not config["graphApiTests"]["skip"]:
+        pipelines += graphApiAcceptancePipeline(ctx)
 
     return pipelines
 
@@ -1005,7 +1013,7 @@ def dockerRelease(ctx, arch):
                 },
             },
         ],
-        "depends_on": getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
+        "depends_on": getPipelineNames(testPipelines(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -1130,7 +1138,7 @@ def binaryRelease(ctx, name):
                 },
             },
         ],
-        "depends_on": getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
+        "depends_on": getPipelineNames(testPipelines(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -1609,7 +1617,67 @@ def notify(ctx):
         },
     }
 
-def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], testing_parallel_deploy = False):
+def ocisServerWithIdp():
+    environment = {
+        "GRAPH_IDENTITY_BACKEND": "ldap",
+        "GRAPH_LDAP_URI": "ldaps://0.0.0.0:9235",
+        "GRAPH_LDAP_BIND_DN": "uid=libregraph,ou=sysusers,o=libregraph-idm",
+        "GRAPH_LDAP_BIND_PASSWORD": "idm",
+        "GRAPH_LDAP_USER_EMAIL_ATTRIBUTE": "mail",
+        "GRAPH_LDAP_USER_NAME_ATTRIBUTE": "uid",
+        "GRAPH_LDAP_USER_BASE_DN": "ou=users,o=libregraph-idm",
+        "GRAPH_LDAP_GROUP_BASE_DN": "ou=groups,o=libregraph-idm",
+        "GRAPH_LDAP_SERVER_WRITE_ENABLED": "true",
+        "IDP_INSECURE": "true",
+        "IDP_LDAP_FILTER": "(&(objectclass=inetOrgPerson)(objectClass=owncloud))",
+        "IDP_LDAP_URI": "ldaps://0.0.0.0:9235",
+        "IDP_LDAP_BIND_DN": "uid=idp,ou=sysusers,o=libregraph-idm",
+        "IDP_LDAP_BIND_PASSWORD": "idp",
+        "IDP_LDAP_BASE_DN": "ou=users,o=libregraph-idm",
+        "IDP_LDAP_LOGIN_ATTRIBUTE": "uid",
+        "IDP_LDAP_UUID_ATTRIBUTE": "ownclouduuid",
+        "IDP_LDAP_UUID_ATTRIBUTE_TYPE": "binary",
+        "PROXY_ACCOUNT_BACKEND_TYPE": "cs3",
+        "OCS_ACCOUNT_BACKEND_TYPE": "cs3",
+        "STORAGE_LDAP_HOSTNAME": "0.0.0.0",
+        "STORAGE_LDAP_PORT": 9235,
+        "STORAGE_LDAP_INSECURE": "true",
+        "STORAGE_LDAP_BASE_DN": "o=libregraph-idm",
+        "STORAGE_LDAP_BIND_DN": "uid=reva,ou=sysusers,o=libregraph-idm",
+        "STORAGE_LDAP_BIND_PASSWORD": "reva",
+        "STORAGE_LDAP_LOGINFILTER": "(&(objectclass=inetOrgPerson)(objectclass=owncloud)(|(uid={{login}})(mail={{login}})))",
+        "STORAGE_LDAP_USERFILTER": "(&(objectclass=inetOrgPerson)(objectclass=owncloud)(|(ownclouduuid={{.OpaqueId}})(uid={{.OpaqueId}})))",
+        "STORAGE_LDAP_USERATTRIBUTEFILTER": "(&(objectclass=owncloud)({{attr}}={{value}}))",
+        "STORAGE_LDAP_USERFINDFILTER": "(&(objectclass=owncloud)(|(uid={{query}}*)(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)(description={{query}}*)))",
+        "STORAGE_LDAP_USERGROUPFILER": "(&(objectclass=groupOfNames)(member={{query}}*))",
+        "STORAGE_LDAP_GROUPFILTER": "(&(objectclass=groupOfNames)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))",
+        "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,idp,nats,idm",
+        "OCIS_INSECURE": "true",
+        "PROXY_ENABLE_BASIC_AUTH": "true",
+    }
+    return [
+        {
+            "name": "ocis-server",
+            "image": OC_CI_ALPINE,
+            "detach": True,
+            "environment": environment,
+            "commands": [
+                "ocis/bin/ocis server",
+            ],
+            "volumes": [stepVolumeOC10Tests],
+            "depends_on": [],
+        },
+        {
+            "name": "wait-for-ocis-server",
+            "image": OC_CI_WAIT_FOR,
+            "commands": [
+                "wait-for -it ocis-server:9200 -t 300",
+            ],
+            "depends_on": [],
+        },
+    ]
+
+def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], testing_parallel_deploy = False, testing_graph_api = False):
     if not testing_parallel_deploy:
         user = "0:0"
         environment = {
@@ -2414,6 +2482,72 @@ def parallelDeploymentOC10Server():
             "depends_on": ["oc10"],
         },
     ]
+
+def graphApiAcceptancePipeline(ctx):
+    pipelines = []
+
+    debugParts = config["graphApiTests"]["skipExceptParts"]
+    debugPartsEnabled = (len(debugParts) != 0)
+    for runPart in range(1, config["graphApiTests"]["numberOfParts"] + 1):
+        if (not debugPartsEnabled or (debugPartsEnabled and runPart in debugParts)):
+            pipelines.append(
+                graphApiTests(ctx, runPart, config["graphApiTests"]["numberOfParts"]),
+            )
+
+    return pipelines
+
+def graphApiTests(ctx, part_number = 1, number_of_parts = 1):
+    storage = "ocis"
+    early_fail = config["graphApiTests"]["earlyFail"] if "earlyFail" in config["graphApiTests"] else False
+    filterTags = "~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OCIS-Storage&&~@issue-ocis-3023"
+
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "Graph-Core-API-Tests-%s-storage-%s" % (storage, part_number),
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") +
+                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+                 ocisServerWithIdp() +
+                 cloneCoreRepos() + [
+            {
+                "name": "Graph-oC10ApiTests-%s-storage-%s" % (storage, part_number),
+                "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
+                "environment": {
+                    "TEST_WITH_GRAPH_API": "true",
+                    "PATH_TO_OCIS": "/drone/src",
+                    "PATH_TO_CORE": "/srv/app/testrunner",
+                    "TEST_SERVER_URL": "https://ocis-server:9200",
+                    "SKELETON_DIR": "/srv/app/tmp/testing/data/apiSkeleton",
+                    "OCIS_SKELETON_STRATEGY": "upload",
+                    "TEST_OCIS": "true",
+                    "SEND_SCENARIO_LINE_REFERENCES": "true",
+                    "STORAGE_DRIVER": storage,
+                    "BEHAT_FILTER_TAGS": filterTags,
+                    "DIVIDE_INTO_NUM_PARTS": number_of_parts,
+                    "RUN_PART": part_number,
+                    "UPLOAD_DELETE_WAIT_TIME": 0,
+                },
+                "commands": [
+                    "cd /srv/app/testrunner",
+                    "make test-acceptance-api",
+                ],
+                "volumes": [stepVolumeOC10Tests],
+            },
+        ] + failEarly(ctx, early_fail),
+        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/tags/v*",
+                "refs/pull/**",
+            ],
+        },
+        "volumes": [pipelineVolumeOC10Tests],
+    }
 
 def ldapService():
     return [{

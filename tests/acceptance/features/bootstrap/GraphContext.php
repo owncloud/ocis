@@ -101,13 +101,17 @@ class GraphContext implements Context {
 	 */
 	public function adminHasRetrievedUserUsingTheGraphApi(string $user):void {
 		$user = $this->featureContext->getActualUsername($user);
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		try {
+			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		} catch (Exception $e) {
+			$userId = $user;
+		}
 		$result = GraphHelper::getUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getAdminUsername(),
 			$this->featureContext->getAdminPassword(),
-			($userId) ?: $user
+			$userId
 		);
 		$this->featureContext->setResponse($result);
 		$this->featureContext->thenTheHTTPStatusCodeShouldBe(200);
@@ -250,13 +254,14 @@ class GraphContext implements Context {
 		return $found;
 	}
 
-	/**
-	 * @param string $user
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws JsonException
-	 */
+    /**
+     * @param string $user
+     * @param string $group
+     *
+     * @return void
+     * @throws JsonException
+     * @throws GuzzleException
+     */
 	public function userShouldNotBeMemberInGroupUsingTheGraphApi(string $user, string $group):void {
 		$found = $this->getUserPresenceInGroupUsingTheGraphApi($user, $group);
 		Assert::assertFalse($found, __METHOD__ . " User $user is member of group $group");
@@ -268,6 +273,7 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 * @throws JsonException
+	 * @throws GuzzleException
 	 */
 	public function userShouldBeMemberInGroupUsingTheGraphApi(string $user, string $group):void {
 		$found = $this->getUserPresenceInGroupUsingTheGraphApi($user, $group);
@@ -310,17 +316,26 @@ class GraphContext implements Context {
 			$this->featureContext->getAdminUsername(),
 			$this->featureContext->getAdminPassword()
 		);
-		$jsonBody = $this->featureContext->getJsonDecodedResponse($response);
 		if ($response->getStatusCode() === 200) {
-			return $jsonBody;
+			return $this->featureContext->getJsonDecodedResponse($response);
 		} else {
-			throw new Exception(
-				__METHOD__
-				. "\nCould not retrieve groups list."
-				. "\nHTTP status code: " . $response->getStatusCode()
-				. "\nError code: " . $jsonBody["error"]["code"]
-				. "\nMessage: " . $jsonBody["error"]["message"]
-			);
+			try {
+				$jsonBody = $this->featureContext->getJsonDecodedResponse($response);
+				throw new Exception(
+					__METHOD__
+					. "\nCould not retrieve groups list."
+					. "\nHTTP status code: " . $response->getStatusCode()
+					. "\nError code: " . $jsonBody["error"]["code"]
+					. "\nMessage: " . $jsonBody["error"]["message"]
+				);
+			} catch (TypeError $e) {
+				throw new Exception(
+					__METHOD__
+					. "\nCould not retrieve groups list."
+					. "\nHTTP status code: " . $response->getStatusCode()
+					. "\nResponse body: " . $response->getBody()
+				);
+			}
 		}
 	}
 
@@ -341,17 +356,26 @@ class GraphContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			$this->featureContext->getAttributeOfCreatedGroup($group, 'id')
 		);
-		$jsonBody = $this->featureContext->getJsonDecodedResponse($response);
 		if ($response->getStatusCode() === 200) {
-			return $jsonBody;
+			return $this->featureContext->getJsonDecodedResponse($response);
 		} else {
-			throw new Exception(
-				__METHOD__
-				. "\nCould not retrieve members list for group $group."
-				. "\nHTTP status code: " . $response->getStatusCode()
-				. "\nError code: " . $jsonBody["error"]["code"]
-				. "\nMessage: " . $jsonBody["error"]["message"]
-			);
+			try {
+				$jsonBody = $this->featureContext->getJsonDecodedResponse($response);
+				throw new Exception(
+					__METHOD__
+					. "\nCould not retrieve members list for group $group."
+					. "\nHTTP status code: " . $response->getStatusCode()
+					. "\nError code: " . $jsonBody["error"]["code"]
+					. "\nMessage: " . $jsonBody["error"]["message"]
+				);
+			} catch (TypeError $e) {
+				throw new Exception(
+					__METHOD__
+					. "\nCould not retrieve members list for group $group."
+					. "\nHTTP status code: " . $response->getStatusCode()
+					. "\nResponse body: " . $response->getBody()
+				);
+			}
 		}
 	}
 
@@ -383,24 +407,33 @@ class GraphContext implements Context {
 			$email,
 			$displayName
 		);
-		$jsonBody = $this->featureContext->getJsonDecodedResponse($response);
 		if ($response->getStatusCode() !== 200) {
-			throw new Exception(
-				__METHOD__
-				. "\nCould not create user $user"
-				. "\nError code: {$jsonBody['error']['code']}"
-				. "\nError message: {$jsonBody['error']['message']}"
-			);
+			try {
+				$jsonResponseBody = $this->featureContext->getJsonDecodedResponse($response);
+				throw new Exception(
+					__METHOD__
+					. "\nCould not create user $user"
+					. "\nError code: {$jsonResponseBody['error']['code']}"
+					. "\nError message: {$jsonResponseBody['error']['message']}"
+				);
+			} catch (TypeError $e) {
+				throw new Exception(
+					__METHOD__
+					. "\nCould not create user $user"
+					. "\nHTTP status code: " . $response->getStatusCode()
+					. "\nResponse body: " . $response->getBody()
+				);
+			}
 		} else {
-			return $jsonBody;
+			return $this->featureContext->getJsonDecodedResponse($response);
 		}
 	}
 
 	/**
 	 * adds a user to a group
 	 *
-	 * @param string $group
 	 * @param string $user
+	 * @param string $group
 	 * @param bool $checkResult
 	 *
 	 * @return void
@@ -409,8 +442,8 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function adminHasAddedUserToGroupUsingTheGraphApi(
-		string $group,
 		string $user,
+		string $group,
 		bool $checkResult = true
 	) {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
@@ -425,8 +458,10 @@ class GraphContext implements Context {
 		);
 		if ($checkResult && ($result->getStatusCode() !== 204)) {
 			throw new Exception(
-				"could not add user to group. "
-				. $result->getStatusCode() . " " . $result->getBody()
+				__METHOD__
+				. "\nCould not add user to group. "
+				. "\n HTTP status: " . $result->getStatusCode()
+				. "\n Response body: " . $result->getBody()
 			);
 		}
 	}
@@ -448,16 +483,25 @@ class GraphContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			$group,
 		);
-		$jsonBody = $this->featureContext->getJsonDecodedResponse($result);
 		if ($result->getStatusCode() === 200) {
-			return $jsonBody;
+			return $this->featureContext->getJsonDecodedResponse($result);
 		} else {
-			throw new Exception(
-				__METHOD__
-				. "\nError: failed creating group '$group'"
-				. "\nStatus code: " . $jsonBody['error']['code']
-				. "\nMessage: " . $jsonBody['error']['message']
-			);
+			try {
+				$jsonBody = $this->featureContext->getJsonDecodedResponse($result);
+				throw new Exception(
+					__METHOD__
+					. "\nError: failed creating group '$group'"
+					. "\nStatus code: " . $jsonBody['error']['code']
+					. "\nMessage: " . $jsonBody['error']['message']
+				);
+			} catch (TypeError $e) {
+				throw new Exception(
+					__METHOD__
+					. "\nError: failed creating group '$group'"
+					. "\nHTTP status code: " . $result->getStatusCode()
+					. "\nResponse body: " . $result->getBody()
+				);
+			}
 		}
 	}
 }
