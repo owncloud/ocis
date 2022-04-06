@@ -23,7 +23,7 @@ Some cases have suggested setup steps, but feel free to use other setups. This c
 It's a good idea to test ocis in the same environment where you are planning to use it later (with the LDAP server, storage system, etc. of your organisation).
 
 # run oCIS
-For a quick start, please have a look into the [getting started documentation of oCIS]({{< ref "../getting-started/run-ocis" >}})
+For a quick start, please have a look into the [getting started documentation of oCIS]({{< ref "../getting-started/#run-ocis" >}})
 If you would like
 to access oCIS remotely please refer to the [Basic Remote Setup]({{< ref "../deployment/basic-remote-setup" >}}) section.
 
@@ -46,16 +46,16 @@ documentations resources:
   - [sharing API is compatible to ownCloud 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
   - [webDav operations](#webdav)
 
-| Test Case                                                                                             | Expected Result                                                                       | Example / Comment |
-|-------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|-------------------|
-| share file / folder to a group                                                                        | member of the group can access shared item                                            |                   |
-| share file / folder to a group, remove member from group in LDAP                                      | removed member should not have access to the shared item                              |                   |
-| share file / folder to a group with different permissions, as receiver try to violate the permissions | receiver should not be able to violate the permissions                                |                   |
-| try to login with wrong credentials                                                                   | login should not be possible                                                          |                   |
-| set a quota in LDAP, upload files till the quota is exceeded                                          | upload should work till quota is full, uploads should not work when quota is full     |                   |
-| try to access files / folders of other users                                                          | access should not be possible                                                         |                   |
-| try to share with non-existing users and groups                                                       | sharing should not be possible                                                        |                   |
-| try to share with user/groups-names that contain special characters                                   | sharing should be possible, access shares with that user does not create any problems |                   |
+| Test Case                                                                                             | Expected Result                                                                       | Comment |
+|-------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|---------|
+| share file / folder to a group                                                                        | member of the group can access shared item                                            |         |
+| share file / folder to a group, remove member from group in LDAP                                      | removed member should not have access to the shared item                              |         |
+| share file / folder to a group with different permissions, as receiver try to violate the permissions | receiver should not be able to violate the permissions                                |         |
+| try to login with wrong credentials                                                                   | login should not be possible                                                          |         |
+| set a quota in LDAP, upload files till the quota is exceeded                                          | upload should work till quota is full, uploads should not work when quota is full     |         |
+| try to access files / folders of other users                                                          | access should not be possible                                                         |         |
+| try to share with non-existing users and groups                                                       | sharing should not be possible                                                        |         |
+| try to share with user/groups-names that contain special characters                                   | sharing should be possible, access shares with that user does not create any problems |         |
 
 ## other sharing
 
@@ -65,7 +65,7 @@ documentations resources:
 - [sharing API is compatible to ownCloud 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
 - [webDav operations](#webdav)
 
-| Test Case                                                                             | Expected Result                                                       | Example / Comment                                         |
+| Test Case                                                                             | Expected Result                                                       | Comment                                                   |
 |---------------------------------------------------------------------------------------|-----------------------------------------------------------------------|-----------------------------------------------------------|
 | share a file/folder with the same name from different users                           | receiver can accept and access both file/folders and distinguish them | [known bug](https://github.com/owncloud/ocis/issues/2131) |
 | share a file/folder with the same name but different permissions from different users | receiver can access both file/folders according to the permissions    | [known bug](https://github.com/owncloud/ocis/issues/2131) |
@@ -84,10 +84,10 @@ documentations resources:
 documentations resources:
 - [sharing API is compatible to ownCloud 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
 
-| Test Case                                                                                                                                                        | Expected Result                                          | Example / Comment |
-|------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------|-------------------|
-| share file / folder to a group in one implementation (use different permissions), access the items with the other implementation, try to violate the permissions | receiver should not be able to violate the permissions   |                   |
-| share file / folder to a group, remove member from group in LDAP, try to access items with the removed member from both implementations                          | removed member should not have access to the shared item |                   |
+| Test Case                                                                                                                                                        | Expected Result                                          | Comment |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------|---------|
+| share file / folder to a group in one implementation (use different permissions), access the items with the other implementation, try to violate the permissions | receiver should not be able to violate the permissions   |         |
+| share file / folder to a group, remove member from group in LDAP, try to access items with the removed member from both implementations                          | removed member should not have access to the shared item |         |
 
 ## Spaces
 
@@ -136,31 +136,31 @@ PASSWORD=admin
   - root: `https://<server-uri>/dav/spaces/<space-id>`
   - [example commands for operations](#webdav)
 
-| Test Case                                                                                                         | Expected Result                                                                   | Example / Comment |
-|-------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|-------------------|
-| create a space                                                                                                    | space should exist                                                                |                   |
-| create a space with special characters as a name & description                                                    | space should exist                                                                |                   |
-| create a space, delete the space                                                                                  | space should not exist                                                            |                   |
-| create a space, share the space with a user                                                                       | space should be accessible                                                        |                   |
-| create a space, share the space with a group                                                                      | space should be accessible, space content is shared among all users               |                   |
-| create a space, share the space with a group, disable the space                                                   | space should not be accessible                                                    |                   |
-| create a space, share the space with a user, disable the space, restore the space                                 | space should be accessible                                                        |                   |
-| create a space, disable the space, delete the space, restore the space                                            | it should not be possible to restore the space                                    |                   |
-| create a space, disable the space, try to share the space                                                         | sharing the space should not be possible                                          |                   |
-| create a space, try delete the space                                                                              | it should not be possible to delete an enabled space                              |                   |
-| create & share a space with a group with viewer role, do CRUD file/folder operations with WebDAV                  | space content is readable but neither space not content should not be writable    |                   |
-| create & share a space with a group with editor role, do CRUD file/folder operations with WebDAV                  | space and content should be writable                                              |                   |
-| create a space, try CRUD file/folder operations with WebDAV on the space with a user that its not shared with     | space and content should not be accessible                                        |                   |
-| create a space with a quota, share the space, upload files till the quota is exceeded                             | upload should work till quota is full, uploads should not work when quota is full |                   |
-| share file/folders from inside a space (see other sharing section)                                                | sharing works and obeys the permissions                                           |                   |
-| create a space, rename the space                                                                                  | new name should be displayed in API calls and web                                 |                   |
-| create a space, change description of the space                                                                   | new description should be displayed in API calls and web                          |                   |
-| create a space, set quota, change quota of the space                                                              | new quota is obeyed                                                               |                   |
-| create a space, set quota, change quota of the space to a value that is lower than the sum of data already stored | new quota is obeyed, new files cannot be uploaded                                 |                   |
-| try the various space operations with invalid data                                                                | good error output, server does not crash                                          |                   |
-| try the various space operations without the correct permissions                                                  | operations are not possible without sufficient permissions                        |                   |
-| try the various space operations on personal and virtual spaces                                                   | server should not crash, good error responses                                     |                   |
-| try the various space operations sending invalid data (invalid numbers, wrong types, invalid JSON, etc.)          | server should not crash, good error responses                                     |                   |
+| Test Case                                                                                                         | Expected Result                                                                   | Comment |
+|-------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|---------|
+| create a space                                                                                                    | space should exist                                                                |         |
+| create a space with special characters as a name & description                                                    | space should exist                                                                |         |
+| create a space, delete the space                                                                                  | space should not exist                                                            |         |
+| create a space, share the space with a user                                                                       | space should be accessible                                                        |         |
+| create a space, share the space with a group                                                                      | space should be accessible, space content is shared among all users               |         |
+| create a space, share the space with a group, disable the space                                                   | space should not be accessible                                                    |         |
+| create a space, share the space with a user, disable the space, restore the space                                 | space should be accessible                                                        |         |
+| create a space, disable the space, delete the space, restore the space                                            | it should not be possible to restore the space                                    |         |
+| create a space, disable the space, try to share the space                                                         | sharing the space should not be possible                                          |         |
+| create a space, try delete the space                                                                              | it should not be possible to delete an enabled space                              |         |
+| create & share a space with a group with viewer role, do CRUD file/folder operations with WebDAV                  | space content is readable but neither space not content should not be writable    |         |
+| create & share a space with a group with editor role, do CRUD file/folder operations with WebDAV                  | space and content should be writable                                              |         |
+| create a space, try CRUD file/folder operations with WebDAV on the space with a user that its not shared with     | space and content should not be accessible                                        |         |
+| create a space with a quota, share the space, upload files till the quota is exceeded                             | upload should work till quota is full, uploads should not work when quota is full |         |
+| share file/folders from inside a space (see other sharing section)                                                | sharing works and obeys the permissions                                           |         |
+| create a space, rename the space                                                                                  | new name should be displayed in API calls and web                                 |         |
+| create a space, change description of the space                                                                   | new description should be displayed in API calls and web                          |         |
+| create a space, set quota, change quota of the space                                                              | new quota is obeyed                                                               |         |
+| create a space, set quota, change quota of the space to a value that is lower than the sum of data already stored | new quota is obeyed, new files cannot be uploaded                                 |         |
+| try the various space operations with invalid data                                                                | good error output, server does not crash                                          |         |
+| try the various space operations without the correct permissions                                                  | operations are not possible without sufficient permissions                        |         |
+| try the various space operations on personal and virtual spaces                                                   | server should not crash, good error responses                                     |         |
+| try the various space operations sending invalid data (invalid numbers, wrong types, invalid JSON, etc.)          | server should not crash, good error responses                                     |         |
 
 
 ## Web
