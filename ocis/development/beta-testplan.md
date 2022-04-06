@@ -9,7 +9,7 @@ geekdocFilePath: beta-testplan.md
 
 # Beta Testing
 
-This document is supposed to give you some ideas how and what to test on ocis. It's not ment to be an extensive list of all tests to be done, rather it should help you, as beta-tester, to get started and enable you to get creative and create own test-cases. [Derive from these examples, be creative, do unusual and unconventional things, to try to break things](https://twitter.com/sempf/status/514473420277694465).
+This document is supposed to give you some ideas how and what to test on ocis. It's not meant to be an extensive list of all tests to be done, rather it should help you, as beta-tester, to get started and enable you to get creative and create your own test-cases. [Derive from these examples, be creative, do unusual and unconventional things, to try to break things](https://twitter.com/sempf/status/514473420277694465).
 
 One option to create new test-cases and to stress the system is to examine what the [API acceptance-tests](https://owncloud.dev/ocis/development/testing/#testing-with-test-suite-natively-installed) or the [web-UI](#web) does, [examine the requests](#decode-https-traffic-with-wireshark) and do something a bit different with curl. This is also a good way to find out how APIs work that are not already fully documented.
 
@@ -44,7 +44,7 @@ Prerequisite:
 - create users and groups in LDAP
 - start ocis with basic auth
 
-documentations resources:
+documentation resources:
   - [configure ocis with LDAP](https://owncloud.dev/ocis/deployment/ocis_ldap/)
   - [sharing API is compatible to ownCloud 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
   - [webDav operations](#webdav)
@@ -62,9 +62,9 @@ documentations resources:
 
 ## other sharing
 
-should be tried in various ways and in different environment
+should be tried in various ways and in different environments
 
-documentations resources:
+documentation resources:
 - [sharing API is compatible to ownCloud 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
 - [webDav operations](#webdav)
 
@@ -75,16 +75,16 @@ documentations resources:
 | share a file/folder with the same name but different locations from one user          | receiver can accept and access both file/folders and distinguish them | [known bug](https://github.com/owncloud/ocis/issues/2131) |
 | share a file/folder back to the sharer                                                | sharing back should not be possible                                   |                                                           |
 | re-share a file/folder with different permissions                                     | sharing with lower permissions is possible, but not with higher       |                                                           |
-| decline received share                                                                | share should be gone                                                  |                                                           |
+| decline received share                                                                | shared resource should not be shown to the receiver                   |                                                           |
 
 
 ## parallel deployment
 
 - [configure ocis with LDAP](https://owncloud.dev/ocis/deployment/ocis_ldap/)
-- [setup oC10 and ocis is parallel](https://owncloud.dev/ocis/deployment/oc10_ocis_parallel/)
+- [setup oC10 and ocis in parallel](https://owncloud.dev/ocis/deployment/oc10_ocis_parallel/)
 - create users and groups in LDAP
 
-documentations resources:
+documentation resources:
 - [sharing API is compatible to ownCloud 10](https://doc.owncloud.com/server/10.9/developer_manual/core/apis/ocs-share-api.html)
 
 | Test Case                                                                                                                                                        | Expected Result                                          | Comment |
@@ -150,7 +150,7 @@ PASSWORD=admin
 | create a space, share the space with a user, disable the space, restore the space                                 | space should be accessible                                                        |         |
 | create a space, disable the space, delete the space, restore the space                                            | it should not be possible to restore the space                                    |         |
 | create a space, disable the space, try to share the space                                                         | sharing the space should not be possible                                          |         |
-| create a space, try delete the space                                                                              | it should not be possible to delete an enabled space                              |         |
+| create a space, try to delete the space                                                                           | it should not be possible to delete an enabled space                              |         |
 | create & share a space with a group with viewer role, do CRUD file/folder operations with WebDAV                  | space content is readable but neither space not content should not be writable    |         |
 | create & share a space with a group with editor role, do CRUD file/folder operations with WebDAV                  | space and content should be writable                                              |         |
 | create a space, try CRUD file/folder operations with WebDAV on the space with a user that its not shared with     | space and content should not be accessible                                        |         |
@@ -171,7 +171,7 @@ PASSWORD=admin
 Prerequisite:
 - [connect ocis to your preferred LDAP server](https://owncloud.dev/ocis/deployment/ocis_ldap/)
 - create users and groups in LDAP
-- Use your preferred browser (Firefox 94-96, Chrome 92-97, Opera 81-82, Edge 96-97, Safari 14-15) to access the build-in webUI (by default: https://localhost:9200)
+- Use your preferred browser (Firefox 94-96, Chrome 92-97, Opera 81-82, Edge 96-97, Safari 14-15) to access the built-in webUI (by default: https://localhost:9200)
 
 | Test Case                                                                                                          | Expected Result                                                                       | Comment |
 |--------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|---------|
@@ -182,17 +182,17 @@ Prerequisite:
 | Rename a file.                                                                                                     | File is renamed.                                                                      |         |
 | Upload a file.                                                                                                     | File is uploaded, no problems found.                                                  |         |
 | Upload multiple files at once.                                                                                     | Files are uploaded, no problems found.                                                |         |
-| delete all content of a folder at once.                                                                            | Folder is cleanded, items are visible in the trashbin                                 |         |
+| delete all content of a folder at once.                                                                            | Folder is cleaned, items are visible in the trashbin                                  |         |
 | Overwrite a file by uploading a new version.                                                                       | File is uploaded and overwritten, file versions are displayed                         |         |
 | Overwrite a file by uploading a new version, restore the original version.                                         | File is restored correctly                                                            |         |
 | upload a huge file                                                                                                 | File is uploaded, no problems found.                                                  |         |
 | upload a huge file, cancel the upload, restart the upload                                                          | Upload continues at the position where it was cancelled, file is uploaded completely. |         |
 | Remove a file.                                                                                                     | File is removed correctly, it appears in the trashbin.                                |         |
-| Restore the deleted file from trashbin                                                                             | File is restores correctly                                                            |         |
+| Restore the deleted file from trashbin                                                                             | File is restored correctly                                                            |         |
 | Remove multiple files that have the same name but are located in different folders                                 | Files are removed correctly, they appear in the trashbin.                             |         |
 | Restore some of the deleted files from trashbin                                                                    | Files are restored correctly in the correct folders.                                  |         |
 | Restore some of the deleted files from trashbin, but delete the original containing folder before                  | Files are restored correctly                                                          |         |
-| Clean files from the trashbin                                                                                      | files are permanetly deleted                                                          |         |
+| Clean files from the trashbin                                                                                      | files are permanently deleted                                                         |         |
 | Create a lot of files, delete a lot of files, empty the trashbin                                                   | trashbin is cleaned                                                                   |         |
 | Move a file inside a folder.                                                                                       | There are not problems on the process.                                                |         |
 | Move a file inside a folder that already contains a file with the same name                                        | File is not moved, content in the destination is not overwritten                      |         |
@@ -202,9 +202,9 @@ Prerequisite:
 | Create a folder with a lot of subfolders, use special characters in the name                                       | Folder is created, no MKCOL problems appear.                                          |         |
 | Delete a folder.                                                                                                   | Folder is removed.                                                                    |         |
 | Move a folder inside another.                                                                                      | No problems while moving the folder.                                                  |         |
-| open images in mediaviewer                                                                                         | files are displayed  correctly.                                                       |         |
-| open videos in mediaviewer                                                                                         | files are displayed  correctly.                                                       |         |
-| switch through videos and images in mediaviewer                                                                    | files are displayed  correctly.                                                       |         |
+| open images in mediaviewer                                                                                         | files are displayed correctly.                                                        |         |
+| open videos in mediaviewer                                                                                         | files are displayed correctly.                                                        |         |
+| switch through videos and images in mediaviewer                                                                    | files are displayed correctly.                                                        |         |
 | Share a file by public link.                                                                                       | Link is created and can be accessed.                                                  |         |
 | Share a folder by public link.                                                                                     | Link is created and can be accessed.                                                  |         |
 | Share a file with another user.                                                                                    | It is shared correctly.                                                               |         |
@@ -259,7 +259,6 @@ Prerequisite:
 | Test Case                                                     | Expected Result                                             | Comment                                                                                                      |
 |---------------------------------------------------------------|-------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
 | use ocis as webDAV external storage in ownCloud 10            | resource access works                                       |                                                                                                              |
-| use ocis as webDAV external storage in ownCloud 10            | resource access works                                       |                                                                                                              |
 | access webDAV with your file-manager                          | that will not give you a good UX, but ocis should not crash | Urls: https://\<ocis-server\>/remote.php/webdav  & https://\<ocis-server\>/remote.php/dav/files/\<username\> |
 | access webDAV with the "remote-files" function of LibreOffice | files are accessible and can be written back                |                                                                                                              |
 
@@ -273,7 +272,7 @@ WebDav is accessible under different path
 
 WebDav specifications can be found on http://webdav.org/
 
-here some general WebDav requests examples:
+here some general WebDav request examples:
 
 variable declaration:
 ```shell
