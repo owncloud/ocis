@@ -32,16 +32,16 @@ class GraphHelper {
 		return $fullUrl;
 	}
 
-    /**
-     * @param string $baseUrl
-     * @param string $xRequestId
-     * @param string $method
-     * @param string $path
-     * @param string|null $body
-     * @param array|null $headers
-     *
-     * @return RequestInterface
-     */
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $method
+	 * @param string $path
+	 * @param string|null $body
+	 * @param array|null $headers
+	 *
+	 * @return RequestInterface
+	 */
 	public static function createRequest(
 		string $baseUrl,
 		string $xRequestId,
@@ -101,60 +101,59 @@ class GraphHelper {
 		);
 	}
 
-    /**
-     * @param string $baseUrl
-     * @param string $xRequestId
-     * @param string $adminUser
-     * @param string $adminPassword
-     * @param string $userId
-     * @param string|null $userName
-     * @param string|null $password
-     * @param string|null $email
-     * @param string|null $displayName
-     *
-     * @return ResponseInterface
-     */
-    public static function editUser(
-        string $baseUrl,
-        string $xRequestId,
-        string $adminUser,
-        string $adminPassword,
-        string $userId,
-        ?string $userName = null,
-        ?string $password = null,
-        ?string $email = null,
-        ?string $displayName = null
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $adminUser
+	 * @param string $adminPassword
+	 * @param string $userId
+	 * @param string|null $userName
+	 * @param string|null $password
+	 * @param string|null $email
+	 * @param string|null $displayName
+	 *
+	 * @return ResponseInterface
+	 */
+	public static function editUser(
+		string $baseUrl,
+		string $xRequestId,
+		string $adminUser,
+		string $adminPassword,
+		string $userId,
+		?string $userName = null,
+		?string $password = null,
+		?string $email = null,
+		?string $displayName = null
+	): ResponseInterface {
+		$payload = self::preparePatchUserPayload(
+			$userName,
+			$password,
+			$email,
+			$displayName
+		);
+		$headers = ['Content-Type' => 'application/json'];
+		$url = self::getFullUrl($baseUrl, 'users/' . $userId);
+		return HttpRequestHelper::sendRequest(
+			$url,
+			$xRequestId,
+			"PATCH",
+			$adminUser,
+			$adminPassword,
+			$headers,
+			$payload
+		);
+	}
 
-    ): ResponseInterface {
-        $payload = self::preparePatchUserPayload(
-            $userName,
-            $password,
-            $email,
-            $displayName
-        );
-        $headers = ['Content-Type' => 'application/json'];
-        $url = self::getFullUrl($baseUrl, 'users/' . $userId);
-        return HttpRequestHelper::sendRequest(
-            $url,
-            $xRequestId,
-            "PATCH",
-            $adminUser,
-            $adminPassword,
-            $headers,
-            $payload
-        );
-    }
-
-    /**
-     * @param string $baseUrl
-     * @param string $xRequestId
-     * @param string $adminUser
-     * @param string $adminPassword
-     * @param string $userName
-     *
-     * @return ResponseInterface
-     * @throws GuzzleException
-     */
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $adminUser
+	 * @param string $adminPassword
+	 * @param string $userName
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
 	public static function getUser(
 		string $baseUrl,
 		string $xRequestId,
@@ -386,6 +385,17 @@ class GraphHelper {
 		);
 	}
 
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $adminUser
+	 * @param string $adminPassword
+	 * @param string $userId
+	 * @param string $groupId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
 	public static function addUserToGroup(
 		string $baseUrl,
 		string $xRequestId,
@@ -408,6 +418,17 @@ class GraphHelper {
 		);
 	}
 
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $adminUser
+	 * @param string $adminPassword
+	 * @param string $userId
+	 * @param string $groupId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
 	public static function removeUserFromGroup(
 		string $baseUrl,
 		string $xRequestId,
@@ -425,42 +446,51 @@ class GraphHelper {
 		);
 	}
 
-    public static function getMembersList(
-        string $baseUrl,
-        string $xRequestId,
-        string $adminUser,
-        string $adminPassword,
-        string $userId,
-        string $groupId
-    ): bool {
-        $url = self::getFullUrl($baseUrl, 'groups/' . $groupId . '/members/' . $userId . '/$ref');
-        return HttpRequestHelper::get(
-            $url,
-            $xRequestId,
-            $adminUser,
-            $adminPassword
-        );
-    }
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $adminUser
+	 * @param string $adminPassword
+	 * @param string $groupId
+	 *
+	 * @return bool
+	 * @throws GuzzleException
+	 */
+	public static function getMembersList(
+		string $baseUrl,
+		string $xRequestId,
+		string $adminUser,
+		string $adminPassword,
+		string $groupId
+	): bool {
+		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId . '/members');
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$adminUser,
+			$adminPassword
+		);
+	}
 
-    /**
-     * @param string $baseUrl
-     * @param string $xRequestId
-     * @param string $adminUser
-     * @param string $adminPassword
-     * @param string $userId
-     *
-     * @return void
-     */
-    public static function getGroupListOfAUser(
-        string $baseUrl,
-        string $xRequestId,
-        string $adminUser,
-        string $adminPassword,
-        string $userId
-    ) {
-        // TODO: endpoint not available https://github.com/owncloud/ocis/issues/3363
-        // Not implemented yet
-    }
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $adminUser
+	 * @param string $adminPassword
+	 * @param string $userId
+	 *
+	 * @return void
+	 */
+	public static function getGroupListOfAUser(
+		string $baseUrl,
+		string $xRequestId,
+		string $adminUser,
+		string $adminPassword,
+		string $userId
+	) {
+		// TODO: endpoint not available https://github.com/owncloud/ocis/issues/3363
+		// Not implemented yet
+	}
 
 	/**
 	 * @param string|null $userName
@@ -471,28 +501,36 @@ class GraphHelper {
 	 * @return string
 	 */
 	public static function prepareCreateUserPayload(
-        string $userName,
-        string $password,
-        ?string $email,
-        ?string $displayName
-    ): string {
+		string $userName,
+		string $password,
+		?string $email,
+		?string $displayName
+	): string {
 		$payload['onPremisesSamAccountName'] = $userName;
 		$payload['passwordProfile'] = ['password' => $password];
 		$payload['displayName'] = $displayName ?? $userName;
 		$payload['mail'] = $email ?? $userName . '@example.com';
 		return \json_encode($payload);
 	}
-    public static function preparePatchUserPayload(
-        ?string $userName,
-        ?string $password,
-        ?string $email,
-        ?string $displayName
-    ): string {
-        $payload = [];
-        if ($userName) $payload['onPremisesSamAccountName'] = $userName;
-        if ($password) $payload['passwordProfile'] = ['password' => $password];
-        if ($displayName) $payload['displayName'] = $displayName;
-        if ($email) $payload['mail'] = $email;
-        return \json_encode($payload);
-    }
+	public static function preparePatchUserPayload(
+		?string $userName,
+		?string $password,
+		?string $email,
+		?string $displayName
+	): string {
+		$payload = [];
+		if ($userName) {
+			$payload['onPremisesSamAccountName'] = $userName;
+		}
+		if ($password) {
+			$payload['passwordProfile'] = ['password' => $password];
+		}
+		if ($displayName) {
+			$payload['displayName'] = $displayName;
+		}
+		if ($email) {
+			$payload['mail'] = $email;
+		}
+		return \json_encode($payload);
+	}
 }
