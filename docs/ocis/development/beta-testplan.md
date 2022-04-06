@@ -18,7 +18,7 @@ Some cases have suggested setup steps, but feel free to use other setups. This c
 - different identity managers (e.g. [different external LDAP](https://owncloud.dev/ocis/deployment/ocis_ldap/), internal IDM)
 - different reverse proxies (e.g. [traefik](https://owncloud.dev/ocis/deployment/ocis_traefik/))
 - different IdPs **TODO documentation link**
-- different storage systems ([cephfs](https://owncloud.dev/ocis/storage-backends/cephfs/), decompose fs, [decompose fs on NFS](https://owncloud.dev/ocis/storage-backends/dcfsnfs/), [EOS](https://owncloud.dev/ocis/storage-backends/eos/), [S3](https://owncloud.dev/ocis/deployment/ocis_s3/) ) **are that the things we want to support?**
+- different storage systems (decomposedFS on local POSIX (default), [decomposedFS on NFS](https://owncloud.dev/ocis/storage-backends/dcfsnfs/), [S3](https://owncloud.dev/ocis/deployment/ocis_s3/) )
 
 It's a good idea to test ocis in the same environment where you are planning to use it later (with the LDAP server, storage system, etc. of your organisation).
 
