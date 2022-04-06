@@ -46,6 +46,13 @@ func Groups(cfg *config.Config) *cli.Command {
 
 			rcfg := groupsConfigFromStruct(c, cfg)
 
+			if cfg.Reva.Groups.Driver == "ldap" {
+				if err := waitForLDAPCA(logger, &cfg.Reva.LDAP); err != nil {
+					logger.Error().Err(err).Msg("The configured LDAP CA cert does not exist")
+					return err
+				}
+			}
+
 			gr.Add(func() error {
 				runtime.RunWithOptions(
 					rcfg,
@@ -113,28 +120,7 @@ func groupsConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inter
 						"json": map[string]interface{}{
 							"groups": cfg.Reva.Groups.JSON,
 						},
-						"ldap": map[string]interface{}{
-							"hostname":        cfg.Reva.LDAP.Hostname,
-							"port":            cfg.Reva.LDAP.Port,
-							"cacert":          cfg.Reva.LDAP.CACert,
-							"insecure":        cfg.Reva.LDAP.Insecure,
-							"base_dn":         cfg.Reva.LDAP.BaseDN,
-							"groupfilter":     cfg.Reva.LDAP.GroupFilter,
-							"attributefilter": cfg.Reva.LDAP.GroupAttributeFilter,
-							"findfilter":      cfg.Reva.LDAP.GroupFindFilter,
-							"memberfilter":    cfg.Reva.LDAP.GroupMemberFilter,
-							"bind_username":   cfg.Reva.LDAP.BindDN,
-							"bind_password":   cfg.Reva.LDAP.BindPassword,
-							"idp":             cfg.Reva.LDAP.IDP,
-							"schema": map[string]interface{}{
-								"dn":          "dn",
-								"gid":         cfg.Reva.LDAP.GroupSchema.GID,
-								"mail":        cfg.Reva.LDAP.GroupSchema.Mail,
-								"displayName": cfg.Reva.LDAP.GroupSchema.DisplayName,
-								"cn":          cfg.Reva.LDAP.GroupSchema.CN,
-								"gidNumber":   cfg.Reva.LDAP.GroupSchema.GIDNumber,
-							},
-						},
+						"ldap": ldapConfigFromString(cfg),
 						"rest": map[string]interface{}{
 							"client_id":                      cfg.Reva.UserGroupRest.ClientID,
 							"client_secret":                  cfg.Reva.UserGroupRest.ClientSecret,

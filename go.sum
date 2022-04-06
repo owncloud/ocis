@@ -335,8 +335,6 @@ github.com/crewjam/httperr v0.2.0/go.mod h1:Jlz+Sg/XqBQhyMjdDiC+GNNRzZTD7x39Gu3p
 github.com/crewjam/saml v0.4.6 h1:XCUFPkQSJLvzyl4cW9OvpWUbRf0gE7VUpU8ZnilbeM4=
 github.com/crewjam/saml v0.4.6/go.mod h1:ZBOXnNPFzB3CgOkRm7Nd6IVdkG+l/wF+0ZXLqD96t1A=
 github.com/cs3org/cato v0.0.0-20200828125504-e418fc54dd5e/go.mod h1:XJEZ3/EQuI3BXTp/6DUzFr850vlxq11I6satRtz0YQ4=
-github.com/cs3org/reva/v2 v2.0.0-20220408142652-148b87297214 h1:8Akb8HGdilByInCNDEzwo2TSRTd7JNcHjU73Y3f6Yuo=
-github.com/cs3org/reva/v2 v2.0.0-20220408142652-148b87297214/go.mod h1:rE2wCGoiGiUuQ3zj6aD7sZ+BhboLyNsNQ3z3auunWm4=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8/go.mod h1:4abs/jPXcmJzYoYGF91JF9Uq9s/KL5n1jvFDix8KcqY=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
@@ -1219,6 +1217,8 @@ github.com/prometheus/statsd_exporter v0.22.4/go.mod h1:N4Z1+iSqc9rnxlT1N8Qn3l65
 github.com/prometheus/tsdb v0.7.1/go.mod h1:qhTCs0VvXwvX/y3TZrWD7rabWM+ijKTux40TwIPHuXU=
 github.com/rainycape/memcache v0.0.0-20150622160815-1031fa0ce2f2/go.mod h1:7tZKcyumwBO6qip7RNQ5r77yrssm9bfCowcLEBcU5IA=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
+github.com/rhafer/reva/v2 v2.0.0-20220407163203-9c01a18d0d08 h1:78yYZJkoSr5v/zA2ARh/YSbHqBLWSwaNFirR1rQDVIs=
+github.com/rhafer/reva/v2 v2.0.0-20220407163203-9c01a18d0d08/go.mod h1:rE2wCGoiGiUuQ3zj6aD7sZ+BhboLyNsNQ3z3auunWm4=
 github.com/rickb777/date v1.12.4/go.mod h1:xP0eo/I5qmUt97yRGClHZfyLZ3ikMw6v6SU5MOGZTE0=
 github.com/rickb777/date v1.17.0 h1:Qk1MUtTLFfIWYhRaNRyk1t7LmjfkjOEELacQPsoh7Nw=
 github.com/rickb777/date v1.17.0/go.mod h1:b3AnLwjEdg1YWLUFnAd/lUq3JDJmMRXi/Onm8q0zlQg=

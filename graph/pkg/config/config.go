@@ -37,26 +37,28 @@ type Spaces struct {
 }
 
 type LDAP struct {
-	URI           string `yaml:"uri" env:"GRAPH_LDAP_URI"`
+	URI           string `yaml:"uri" env:"LDAP_URI;GRAPH_LDAP_URI"`
 	Insecure      bool   `yaml:"insecure" env:"OCIS_INSECURE;GRAPH_LDAP_INSECURE"`
-	BindDN        string `yaml:"bind_dn" env:"GRAPH_LDAP_BIND_DN"`
-	BindPassword  string `yaml:"bind_password" env:"GRAPH_LDAP_BIND_PASSWORD"`
+	BindDN        string `yaml:"bind_dn" env:"LDAP_BIND_DN;GRAPH_LDAP_BIND_DN"`
+	BindPassword  string `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;GRAPH_LDAP_BIND_PASSWORD"`
 	UseServerUUID bool   `yaml:"use_server_uuid" env:"GRAPH_LDAP_SERVER_UUID"`
 	WriteEnabled  bool   `yaml:"write_enabled" env:"GRAPH_LDAP_SERVER_WRITE_ENABLED"`
 
-	UserBaseDN               string `yaml:"user_base_dn" env:"GRAPH_LDAP_USER_BASE_DN"`
-	UserSearchScope          string `yaml:"user_search_scope" env:"GRAPH_LDAP_USER_SCOPE"`
-	UserFilter               string `yaml:"user_filter" env:"GRAPH_LDAP_USER_FILTER"`
-	UserEmailAttribute       string `yaml:"user_mail_attribute" env:"GRAPH_LDAP_USER_EMAIL_ATTRIBUTE"`
-	UserDisplayNameAttribute string `yaml:"user_displayname_attribute" env:"GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE"`
-	UserNameAttribute        string `yaml:"user_name_attribute" env:"GRAPH_LDAP_USER_NAME_ATTRIBUTE"`
-	UserIDAttribute          string `yaml:"user_id_attribute" env:"GRAPH_LDAP_USER_UID_ATTRIBUTE"`
+	UserBaseDN               string `yaml:"user_base_dn" env:"LDAP_USER_BASE_DN;GRAPH_LDAP_USER_BASE_DN"`
+	UserSearchScope          string `yaml:"user_search_scope" env:"LDAP_USER_SCOPE;GRAPH_LDAP_USER_SCOPE"`
+	UserFilter               string `yaml:"user_filter" env:"LDAP_USER_FILTER;GRAPH_LDAP_USER_FILTER"`
+	UserObjectClass          string `yaml:"user_objectclass" env:"LDAP_USER_OBJECTCLASS;GRAPH_LDAP_USER_OBJECTCLASS"`
+	UserEmailAttribute       string `yaml:"user_mail_attribute" env:"LDAP_USER_SCHEMA_MAIL;GRAPH_LDAP_USER_EMAIL_ATTRIBUTE"`
+	UserDisplayNameAttribute string `yaml:"user_displayname_attribute" env:"LDAP_USER_SCHEMA_DISPLAY_NAME;GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE"`
+	UserNameAttribute        string `yaml:"user_name_attribute" env:"LDAP_USER_SCHEMA_USERNAME;GRAPH_LDAP_USER_NAME_ATTRIBUTE"`
+	UserIDAttribute          string `yaml:"user_id_attribute" env:"LDAP_USER_SCHEMA_ID;GRAPH_LDAP_USER_UID_ATTRIBUTE"`
 
-	GroupBaseDN        string `yaml:"group_base_dn" env:"GRAPH_LDAP_GROUP_BASE_DN"`
-	GroupSearchScope   string `yaml:"group_search_scope" env:"GRAPH_LDAP_GROUP_SEARCH_SCOPE"`
-	GroupFilter        string `yaml:"group_filter" env:"GRAPH_LDAP_GROUP_FILTER"`
-	GroupNameAttribute string `yaml:"group_name_attribute" env:"GRAPH_LDAP_GROUP_NAME_ATTRIBUTE"`
-	GroupIDAttribute   string `yaml:"group_id_attribute" env:"GRAPH_LDAP_GROUP_ID_ATTRIBUTE"`
+	GroupBaseDN        string `yaml:"group_base_dn" env:"LDAP_GROUP_BASE_DN;GRAPH_LDAP_GROUP_BASE_DN"`
+	GroupSearchScope   string `yaml:"group_search_scope" env:"LDAP_GROUP_SCOPE;GRAPH_LDAP_GROUP_SEARCH_SCOPE"`
+	GroupFilter        string `yaml:"group_filter" env:"LDAP_GROUP_FILTER;GRAPH_LDAP_GROUP_FILTER"`
+	GroupObjectClass   string `yaml:"group_objectclass" env:"LDAP_GROUP_OBJECTCLASS;GRAPH_LDAP_GROUP_OBJECTCLASS"`
+	GroupNameAttribute string `yaml:"group_name_attribute" env:"LDAP_GROUP_SCHEMA_GROUPNAME;GRAPH_LDAP_GROUP_NAME_ATTRIBUTE"`
+	GroupIDAttribute   string `yaml:"group_id_attribute" env:"LDAP_GROUP_SCHEMA_ID;GRAPH_LDAP_GROUP_ID_ATTRIBUTE"`
 }
 
 type Identity struct {
