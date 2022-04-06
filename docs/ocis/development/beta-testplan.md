@@ -29,6 +29,8 @@ to access oCIS remotely please refer to the [Basic Remote Setup]({{< ref "../dep
 
 ## additional tips
 - to allow basic auth (e.g. to easily access oCIS using curl commands) you have to set `PROXY_ENABLE_BASIC_AUTH=true` environment variable
+- if you cannot use real SSL Certificates set `OCIS_INSECURE=true` as environment variable
+
 
 # Testplan
 
