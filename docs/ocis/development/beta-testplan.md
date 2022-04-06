@@ -170,47 +170,47 @@ Prerequisite:
 - create users and groups in LDAP
 - Use your preferred browser (Firefox 94-96, Chrome 92-97, Opera 81-82, Edge 96-97, Safari 14-15) to access the build-in webUI (by default: https://localhost:9200)
 
-| Test Case                                                                                                          | Expected Result                                                        | Comment |
-|--------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------|---------|
-| Login with the created user                                                                                        | Admin logs in.                                                         |         |
-| Create a text file.                                                                                                | Text editor can open, file is saved.                                   |         |
-| Create a text file with special characters as name                                                                 | file is created if the name is legal otherwise an error is displayed   |         |
-| Modify a text file.                                                                                                | File can be modified, no problems found.                               |         |
-| Rename a file.                                                                                                     | File is renamed.                                                       |         |
-| Upload a file.                                                                                                     | File is uploaded, no problems found.                                   |         |
-| Upload multiple files at once.                                                                                     | Files are uploaded, no problems found.                                 |         |
-| delete all content of a folder at once.                                                                            | Folder is cleanded, items are visible in the trashbin                  |         |
-| Overwrite a file by uploading a new version.                                                                       | File is uploaded and overwritten, file versions are displayed          |         |
-| Overwrite a file by uploading a new version, restore the original version.                                         | File is restored correctly                                             |         |
-| upload a huge file                                                                                                 | File is uploaded, no problems found.                                   |         |
-| upload a huge file, cancel the upload, restart the upload                                                          | File is uploaded, no problems founnd.                                  |         |
-| Remove a file.                                                                                                     | File is removed correctly, it appears in the trashbin.                 |         |
-| Restore the deleted file from trashbin                                                                             | File is restores correctly                                             |         |
-| Remove multiple files that have the same name but are located in different folders                                 | Files are removed correctly, they appear in the trashbin.              |         |
-| Restore some of the deleted files from trashbin                                                                    | Files are restored correctly in the correct folders.                   |         |
-| Restore some of the deleted files from trashbin, but delete the original containing folder before                  | Files are restored correctly                                           |         |
-| Clean files from the trashbin                                                                                      | files are permanetly deleted                                           |         |
-| Create a lot of files, delete a lot of files, empty the trashbin                                                   | trashbin is cleaned                                                    |         |
-| Move a file inside a folder.                                                                                       | There are not problems on the process.                                 |         |
-| Move a file inside a folder that already contains a file with the same name                                        | File is not moved, content in the destination is not overwritten       |         |
-| Create a folder.                                                                                                   | Folder is created, no MKCOL problems appear.                           |         |
-| Create a folder with special characters as name                                                                    | Folder is created if the name is legal otherwise an error is displayed |         |
-| Create a folder with a name of an already existing file/folder                                                     | Folder is not created, an error is displayed                           |         |
-| Create a folder with a lot of subfolders, use special characters in the name                                       | Folder is created, no MKCOL problems appear.                           |         |
-| Delete a folder.                                                                                                   | Folder is removed.                                                     |         |
-| Move a folder inside another.                                                                                      | No problems while moving the folder.                                   |         |
-| open images in mediaviewer                                                                                         | files are displayed  correctly.                                        |         |
-| open videos in mediaviewer                                                                                         | files are displayed  correctly.                                        |         |
-| switch through videos and images in mediaviewer                                                                    | files are displayed  correctly.                                        |         |
-| Share a file by public link.                                                                                       | Link is created and can be accessed.                                   |         |
-| Share a folder by public link.                                                                                     | Link is created and can be accessed.                                   |         |
-| Share a file with another user.                                                                                    | It is shared correctly.                                                |         |
-| Share a folder with another user.                                                                                  | It is shared correctly.                                                |         |
-| Share a file with a group.                                                                                         | It is shared correctly.                                                |         |
-| Share a folder with a group.                                                                                       | It is shared correctly.                                                |         |
-| Share a folder with userB giving edit permissions. As userB do CRUD operations on items inside the received folder | userB doesn't find any problem while interacting with files.           |         |
-| Use your mobile device to access the UI                                                                            | All elements reachable                                                 |         |
-| do tests mentioned in the [spaces](#spaces) section using the web-UI                                               |                                                                        |         |
+| Test Case                                                                                                          | Expected Result                                                                       | Comment |
+|--------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|---------|
+| Login with the created user                                                                                        | Admin logs in.                                                                        |         |
+| Create a text file.                                                                                                | Text editor can open, file is saved.                                                  |         |
+| Create a text file with special characters as name                                                                 | file is created if the name is legal otherwise an error is displayed                  |         |
+| Modify a text file.                                                                                                | File can be modified, no problems found.                                              |         |
+| Rename a file.                                                                                                     | File is renamed.                                                                      |         |
+| Upload a file.                                                                                                     | File is uploaded, no problems found.                                                  |         |
+| Upload multiple files at once.                                                                                     | Files are uploaded, no problems found.                                                |         |
+| delete all content of a folder at once.                                                                            | Folder is cleanded, items are visible in the trashbin                                 |         |
+| Overwrite a file by uploading a new version.                                                                       | File is uploaded and overwritten, file versions are displayed                         |         |
+| Overwrite a file by uploading a new version, restore the original version.                                         | File is restored correctly                                                            |         |
+| upload a huge file                                                                                                 | File is uploaded, no problems found.                                                  |         |
+| upload a huge file, cancel the upload, restart the upload                                                          | Upload continues at the position where it was cancelled, file is uploaded completely. |         |
+| Remove a file.                                                                                                     | File is removed correctly, it appears in the trashbin.                                |         |
+| Restore the deleted file from trashbin                                                                             | File is restores correctly                                                            |         |
+| Remove multiple files that have the same name but are located in different folders                                 | Files are removed correctly, they appear in the trashbin.                             |         |
+| Restore some of the deleted files from trashbin                                                                    | Files are restored correctly in the correct folders.                                  |         |
+| Restore some of the deleted files from trashbin, but delete the original containing folder before                  | Files are restored correctly                                                          |         |
+| Clean files from the trashbin                                                                                      | files are permanetly deleted                                                          |         |
+| Create a lot of files, delete a lot of files, empty the trashbin                                                   | trashbin is cleaned                                                                   |         |
+| Move a file inside a folder.                                                                                       | There are not problems on the process.                                                |         |
+| Move a file inside a folder that already contains a file with the same name                                        | File is not moved, content in the destination is not overwritten                      |         |
+| Create a folder.                                                                                                   | Folder is created, no MKCOL problems appear.                                          |         |
+| Create a folder with special characters as name                                                                    | Folder is created if the name is legal otherwise an error is displayed                |         |
+| Create a folder with a name of an already existing file/folder                                                     | Folder is not created, an error is displayed                                          |         |
+| Create a folder with a lot of subfolders, use special characters in the name                                       | Folder is created, no MKCOL problems appear.                                          |         |
+| Delete a folder.                                                                                                   | Folder is removed.                                                                    |         |
+| Move a folder inside another.                                                                                      | No problems while moving the folder.                                                  |         |
+| open images in mediaviewer                                                                                         | files are displayed  correctly.                                                       |         |
+| open videos in mediaviewer                                                                                         | files are displayed  correctly.                                                       |         |
+| switch through videos and images in mediaviewer                                                                    | files are displayed  correctly.                                                       |         |
+| Share a file by public link.                                                                                       | Link is created and can be accessed.                                                  |         |
+| Share a folder by public link.                                                                                     | Link is created and can be accessed.                                                  |         |
+| Share a file with another user.                                                                                    | It is shared correctly.                                                               |         |
+| Share a folder with another user.                                                                                  | It is shared correctly.                                                               |         |
+| Share a file with a group.                                                                                         | It is shared correctly.                                                               |         |
+| Share a folder with a group.                                                                                       | It is shared correctly.                                                               |         |
+| Share a folder with userB giving edit permissions. As userB do CRUD operations on items inside the received folder | userB doesn't find any problem while interacting with files.                          |         |
+| Use your mobile device to access the UI                                                                            | All elements reachable                                                                |         |
+| do tests mentioned in the [spaces](#spaces) section using the web-UI                                               |                                                                                       |         |
 
 ## Desktop Client
 
