@@ -17,7 +17,10 @@ Some cases have suggested setup steps, but feel free to use other setups. This c
 - different deployment methods (e.g. running single binary, docker-container, docker-compose setup, [individual services in own docker containers](https://owncloud.dev/ocis/deployment/ocis_individual_services/))
 - different identity managers (e.g. [different external LDAP](https://owncloud.dev/ocis/deployment/ocis_ldap/), internal IDM)
 - different reverse proxies (e.g. [traefik](https://owncloud.dev/ocis/deployment/ocis_traefik/))
-- different IdPs **TODO documentation link**
+- different OpenIDConnect IDPs (e.g builtin IDP, [keycloak](https://owncloud.dev/ocis/deployment/ocis_keycloak/), AzureAD)
+  - for some functionalities you will need an [LDAP server](https://owncloud.dev/ocis/deployment/ocis_ldap/) where the IDP and oCIS both get the users from
+  - [keycloak example](https://owncloud.dev/ocis/deployment/ocis_keycloak/)
+  - [service configuration](https://owncloud.dev/extensions/idp/configuration/)
 - different storage systems (decomposedFS on local POSIX (default), [decomposedFS on NFS](https://owncloud.dev/ocis/storage-backends/dcfsnfs/), [S3](https://owncloud.dev/ocis/deployment/ocis_s3/) )
 
 It's a good idea to test ocis in the same environment where you are planning to use it later (with the LDAP server, storage system, etc. of your organisation).
