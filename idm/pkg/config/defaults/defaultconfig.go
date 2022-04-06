@@ -21,7 +21,7 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "idm",
 		},
-		CreateDemoUsers: true,
+		CreateDemoUsers: false,
 		ServiceUserPasswords: config.ServiceUserPasswords{
 			IdmAdmin: "idm",
 			Idp:      "idp",

@@ -1627,6 +1627,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_LOG_LEVEL": "error",
             "SETTINGS_DATA_PATH": "/srv/app/tmp/ocis/settings",
             "OCIS_INSECURE": "true",
+            "ACCOUNTS_DEMO_USERS_AND_GROUPS": True,  # deprecated, remove after switching to LibreIDM
+            "IDM_CREATE_DEMO_USERS": True,
         }
     else:
         user = "33:33"
@@ -1707,6 +1709,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_MACHINE_AUTH_API_KEY": "change-me-please",
             "OCIS_INSECURE": "true",
             "PROXY_ENABLE_BASIC_AUTH": "true",
+            "ACCOUNTS_DEMO_USERS_AND_GROUPS": True,  # deprecated, remove after switching to LibreIDM
+            "IDM_CREATE_DEMO_USERS": True,
         }
 
     # Pass in "default" accounts_hash_difficulty to not set this environment variable.
