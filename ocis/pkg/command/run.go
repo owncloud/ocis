@@ -36,7 +36,7 @@ func RunCommand(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			client, err := rpc.DialHTTP("tcp", net.JoinHostPort(cfg.Runtime.Host, cfg.Runtime.Port))
 			if err != nil {
-				log.Fatal("dialing:", err)
+				log.Fatalf("Failed to connect to the runtime. Is the runtime running and did you configure the right runtime address (\"%s\")", cfg.Runtime.Host+":"+cfg.Runtime.Port)
 			}
 
 			var reply int
