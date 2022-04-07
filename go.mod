@@ -22,7 +22,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.2
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220328105952-297bef33e13f
-	github.com/cs3org/reva/v2 v2.0.0-20220404075659-19fd0b28297b
+	github.com/cs3org/reva/v2 v2.0.0-20220407085842-3cb849aed454
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.7
@@ -271,6 +271,8 @@ require (
 
 // we need to use a fork to make the windows build pass
 replace github.com/pkg/xattr => github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7
+
+replace github.com/cs3org/go-cs3apis => github.com/kobergj/go-cs3apis v0.0.0-20220406134716-65f04386eb09 // temp fork until cs3api change is merged
 
 // testing for https://github.com/cs3org/reva/pull/2665
 replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20220406120538-05be89cb7ca4

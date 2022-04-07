@@ -80,6 +80,7 @@ The following sections list the changes for unreleased.
   * TODO
 
    https://github.com/owncloud/ocis/pull/3430
+   https://github.com/owncloud/ocis/pull/3482
 
 * Enhancement - Update ownCloud Web to v5.4.0-rv.3: [#6709](https://github.com/owncloud/web/pull/6709)
 
