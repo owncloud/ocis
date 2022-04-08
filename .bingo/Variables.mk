@@ -95,11 +95,11 @@ $(PROTOC_GEN_MICROWEB): $(BINGO_DIR)/protoc-gen-microweb.mod
 	@echo "(re)installing $(GOBIN)/protoc-gen-microweb-v0.0.0-20220407065143-a4a3e07bbb7c"
 	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=protoc-gen-microweb.mod -o=$(GOBIN)/protoc-gen-microweb-v0.0.0-20220407065143-a4a3e07bbb7c "github.com/owncloud/protoc-gen-microweb"
 
-PROTOC_GEN_OPENAPIV2 := $(GOBIN)/protoc-gen-openapiv2-v2.7.2
+PROTOC_GEN_OPENAPIV2 := $(GOBIN)/protoc-gen-openapiv2-v2.10.0
 $(PROTOC_GEN_OPENAPIV2): $(BINGO_DIR)/protoc-gen-openapiv2.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/protoc-gen-openapiv2-v2.7.2"
-	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=protoc-gen-openapiv2.mod -o=$(GOBIN)/protoc-gen-openapiv2-v2.7.2 "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2"
+	@echo "(re)installing $(GOBIN)/protoc-gen-openapiv2-v2.10.0"
+	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=protoc-gen-openapiv2.mod -o=$(GOBIN)/protoc-gen-openapiv2-v2.10.0 "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2"
 
 REFLEX := $(GOBIN)/reflex-v0.3.1
 $(REFLEX): $(BINGO_DIR)/reflex.mod
