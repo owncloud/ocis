@@ -188,12 +188,12 @@ def main(ctx):
 
     test_pipelines = \
         cancelPreviousBuilds() + \
-        [licenseCheck(ctx)] + \
         [buildOcisBinaryForTesting(ctx)] + \
         testOcisModules(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
+        [licenseCheck(ctx)] + \
         dockerReleases(ctx) + \
         binaryReleases(ctx) + \
         [releaseSubmodule(ctx)]
