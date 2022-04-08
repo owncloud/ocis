@@ -35,7 +35,7 @@ func KillCommand(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			client, err := rpc.DialHTTP("tcp", net.JoinHostPort(cfg.Runtime.Host, cfg.Runtime.Port))
 			if err != nil {
-				log.Fatalf("Failed to connect to the runtime. Is the runtime running and did you configure the right runtime address (\"%s\")", cfg.Runtime.Host+":"+cfg.Runtime.Port)
+				log.Fatalf("Failed to connect to the runtime. Has the runtime been started and did you configure the right runtime address (\"%s\")", cfg.Runtime.Host+":"+cfg.Runtime.Port)
 			}
 
 			var arg1 int
