@@ -30,3 +30,10 @@ ci-go-generate: # CI runs ci-node-generate automatically before this target
 
 .PHONY: ci-node-generate
 ci-node-generate:
+
+############ licenses ############
+.PHONY: ci-node-check-licenses
+ci-node-check-licenses:
+
+.PHONY: ci-node-save-licenses
+ci-node-save-licenses:

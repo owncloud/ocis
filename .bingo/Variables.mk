@@ -41,6 +41,12 @@ $(CALENS): $(BINGO_DIR)/calens.mod
 	@echo "(re)installing $(GOBIN)/calens-v0.2.0"
 	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=calens.mod -o=$(GOBIN)/calens-v0.2.0 "github.com/restic/calens"
 
+GO_LICENSES := $(GOBIN)/go-licenses-v1.0.1-0.20220228171150-d483853b331e
+$(GO_LICENSES): $(BINGO_DIR)/go-licenses.mod
+	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
+	@echo "(re)installing $(GOBIN)/go-licenses-v1.0.1-0.20220228171150-d483853b331e"
+	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=go-licenses.mod -o=$(GOBIN)/go-licenses-v1.0.1-0.20220228171150-d483853b331e "github.com/google/go-licenses"
+
 GOLANGCI_LINT := $(GOBIN)/golangci-lint-v1.43.0
 $(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.

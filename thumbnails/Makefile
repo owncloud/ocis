@@ -35,3 +35,10 @@ include ../.make/protobuf.mk
 
 .PHONY: protobuf
 protobuf: buf-generate
+
+############ licenses ############
+.PHONY: ci-node-check-licenses
+ci-node-check-licenses:
+
+.PHONY: ci-node-save-licenses
+ci-node-save-licenses:
