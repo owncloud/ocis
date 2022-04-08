@@ -1438,7 +1438,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" has set the file "([^"]*)" as a (description|space image)\s? in a special section of the "([^"]*)" space$/
+	 * @Given /^user "([^"]*)" has set the file "([^"]*)" as a (description|space image)\s? in a special section of the "([^"]*)" space$/
 	 *
 	 * @param string $user
 	 * @param string $file
@@ -1522,7 +1522,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" has created a space "([^"]*)" with the default quota using the GraphApi$/
+	 * @Given /^user "([^"]*)" has created a space "([^"]*)" with the default quota using the GraphApi$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
@@ -1772,7 +1772,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes the object "([^"]*)" from space "([^"]*)"$/
+	 * @When /^user "([^"]*)" removes the (?:file|folder) "([^"]*)" from space "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $object
@@ -1824,7 +1824,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" has removed the object "([^"]*)" from space "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has removed the (?:file|folder) "([^"]*)" from space "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $object
@@ -1847,7 +1847,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" has disabled a space "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has disabled a space "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
@@ -1948,7 +1948,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" has restored a disabled space "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has restored a disabled space "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
@@ -2040,7 +2040,7 @@ class SpacesContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function listObjectsInTrashbin(
+	public function checkExistanceOfObjectsInTrashbin(
 		string $user,
 		string $object,
 		string $shouldOrNot,
