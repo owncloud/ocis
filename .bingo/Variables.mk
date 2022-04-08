@@ -29,11 +29,11 @@ $(BUF): $(BINGO_DIR)/buf.mod
 	@echo "(re)installing $(GOBIN)/buf-v0.56.0"
 	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=buf.mod -o=$(GOBIN)/buf-v0.56.0 "github.com/bufbuild/buf/cmd/buf"
 
-BUILDIFIER := $(GOBIN)/buildifier-v0.0.0-20211129135157-cdedcc0318b9
+BUILDIFIER := $(GOBIN)/buildifier-v0.0.0-20220323134444-a9f46b2bb3de
 $(BUILDIFIER): $(BINGO_DIR)/buildifier.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/buildifier-v0.0.0-20211129135157-cdedcc0318b9"
-	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=buildifier.mod -o=$(GOBIN)/buildifier-v0.0.0-20211129135157-cdedcc0318b9 "github.com/bazelbuild/buildtools/buildifier"
+	@echo "(re)installing $(GOBIN)/buildifier-v0.0.0-20220323134444-a9f46b2bb3de"
+	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=buildifier.mod -o=$(GOBIN)/buildifier-v0.0.0-20220323134444-a9f46b2bb3de "github.com/bazelbuild/buildtools/buildifier"
 
 CALENS := $(GOBIN)/calens-v0.2.0
 $(CALENS): $(BINGO_DIR)/calens.mod
