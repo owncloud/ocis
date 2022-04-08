@@ -98,7 +98,7 @@
     "typeface-roboto": "^1.1.13"
   },
   "devDependencies": {
-    "@babel/runtime": "7.13.10",
+    "@babel/runtime": "7.17.9",
     "@svgr/webpack": "5.5.0",
     "@typescript-eslint/eslint-plugin": "^4.17.0",
     "@typescript-eslint/parser": "^4.32.0",
