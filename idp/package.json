@@ -6,11 +6,9 @@
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "build": "node scripts/build.js && rm -f build/service-worker.js",
-    "deduplicate": "yarn-deduplicate -s fewer yarn.lock",
-    "licenses": "NODE_PATH=./node_modules node ../scripts/js-license-ranger.js",
     "start": "node scripts/start.js",
     "test": "node scripts/test.js --env=jsdom",
-    "licenses:check": "license-checker-rseidelsohn --summary --relativeLicensePath --onlyAllow 'Python-2.0;Apache*;Apache License, Version 2.0;Apache-2.0;Apache 2.0;Artistic-2.0;BSD;BSD-3-Clause;CC-BY-3.0;CC-BY-4.0;CC0-1.0;ISC;MIT;MPL-2.0;Public Domain;Unicode-TOU;Unlicense;WTFPL'",
+    "licenses:check": "license-checker-rseidelsohn --summary --relativeLicensePath --onlyAllow 'Python-2.0;Apache*;Apache License, Version 2.0;Apache-2.0;Apache 2.0;Artistic-2.0;BSD;BSD-3-Clause;CC-BY-3.0;CC-BY-4.0;CC0-1.0;ISC;MIT;MPL-2.0;Public Domain;Unicode-TOU;Unlicense;WTFPL'  --excludePackages 'identifier;kpop'",
     "licenses:csv": "license-checker-rseidelsohn --relativeLicensePath --csv --out ../third-party-licenses/node/idp/third-party-licenses.csv",
     "licenses:save": "license-checker-rseidelsohn --relativeLicensePath --out /dev/null --files ../third-party-licenses/node/idp/third-party-licenses"
   },
@@ -119,7 +117,6 @@
     "eslint-plugin-i18n-text": "^1.0.0",
     "eslint-plugin-import": "2.22.1",
     "eslint-plugin-jest": "^24.2.1",
-    "eslint-plugin-jsx-a11y": "6.4.1",
     "eslint-plugin-react": "7.22.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "eslint-plugin-react-intl-format": "^1.1.6",
