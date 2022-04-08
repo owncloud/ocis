@@ -117,6 +117,7 @@ func fromFields(fields map[string]interface{}) (search.Match, error) {
 				OpaqueId:  IDParts[1],
 			},
 			Path: fields["Name"].(string),
+			Size: uint64(fields["Size"].(float64)),
 		},
 	}, nil
 }

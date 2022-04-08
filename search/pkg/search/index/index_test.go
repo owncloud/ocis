@@ -42,6 +42,7 @@ var _ = Describe("Index", func() {
 				OpaqueId:  "opaqueid",
 			},
 			Path: "foo.pdf",
+			Size: 12345,
 		}
 	})
 
@@ -78,6 +79,7 @@ var _ = Describe("Index", func() {
 			Expect(res.Matches[0].Reference.ResourceId).To(Equal(ref.ResourceId))
 			Expect(res.Matches[0].Info.Id).To(Equal(ri.Id))
 			Expect(res.Matches[0].Info.Path).To(Equal(ri.Path))
+			Expect(res.Matches[0].Info.Size).To(Equal(ri.Size))
 		})
 
 		PIt("finds files living deeper in the tree by prefix")
