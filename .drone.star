@@ -1216,7 +1216,7 @@ def licenseCheck(ctx):
                 "name": "tarball",
                 "image": OC_CI_ALPINE,
                 "commands": [
-                    "tar -czf third-party-licenses.tar.gz -C third-party-licenses *",
+                    "cd third-party-licenses && tar -czf ../third-party-licenses.tar.gz *",
                 ],
             },
             {
