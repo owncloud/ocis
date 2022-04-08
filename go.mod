@@ -275,4 +275,4 @@ replace github.com/pkg/xattr => github.com/micbar/xattr v0.4.6-0.20220215112335-
 replace github.com/cs3org/go-cs3apis => github.com/kobergj/go-cs3apis v0.0.0-20220406134716-65f04386eb09 // temp fork until cs3api change is merged
 
 // testing for https://github.com/cs3org/reva/pull/2665
-replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20220406120538-05be89cb7ca4
+replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20220408075257-493d305e0c37
