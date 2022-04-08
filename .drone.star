@@ -1144,6 +1144,7 @@ def binaryRelease(ctx, name):
 def licenseCheck(ctx):
     # uploads third-party-licenses to https://download.owncloud.com/ocis/ocis/daily/
     target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
+    depends_on = []
     if ctx.build.event == "tag":
         # uploads third-party-licenses to eg. https://download.owncloud.com/ocis/ocis/1.0.0-beta9/
         folder = "stable"
@@ -1152,6 +1153,7 @@ def licenseCheck(ctx):
         if buildref.find("-") != -1:  # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
             folder = "testing"
         target = "/ocis/%s/%s/%s" % (ctx.repo.name.replace("ocis-", ""), folder, buildref)
+        depends_on = getPipelineNames(testOcisModules(ctx) + testPipelines(ctx))
 
     settings = {
         "endpoint": {
@@ -1262,7 +1264,7 @@ def licenseCheck(ctx):
                 },
             },
         ],
-        "depends_on": getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
+        "depends_on": depends_on,
         "trigger": {
             "ref": [
                 "refs/heads/master",
