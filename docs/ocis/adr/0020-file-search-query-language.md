@@ -27,7 +27,6 @@ From the users perspective, the interface to search is just a single form field 
 
 ## Considered Options
 
-* [Keyword Query Language](#keyword-query-language-kql)
 * [Simple Query](#simplified-query)
 * [Lucene Query Language](#lucene-query-language)
 * [Solr Query Language](#solr-query-language)
@@ -35,26 +34,18 @@ From the users perspective, the interface to search is just a single form field 
 
 ## Decision Outcome
 
-Chosen option: "[option 1]", because [justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force force | … | comes out best (see below)].
+Chosen option: [Simple Query](#simplified-query), because it is a suitable MVP.
 
 ### Positive Consequences
 
-* [e.g., improvement of quality attribute satisfaction, follow-up decisions required, …]
-* …
+* We can do a quick implementation
 
 ### Negative consequences
 
-* [e.g., compromising quality attribute, follow-up decisions required, …]
-* …
+* We cannot specify terms or other search criteria
+* We will need to find a good point in time to use a query language before we start working around it
 
 ## Pros and Cons of the Options
-
-### Keyword Query Language (KQL)
-
-Implement a search based on the Keyword Query Language (KQL), adopted from Sharepoint.
-
-* Good, because microsoft already uses it togethe with the GraphAPI
-* Bad, because there is no go package
 
 ### Simplified Query
 
@@ -62,6 +53,7 @@ Implement a very simple search approach: Return all files which contain at least
 
 * Good, because that covers 80% of the users needs
 * Good, because it is very straightforward
+* Good, because it is a suitable solution for GA
 * Bad, because it is below the industry standard
 * Bad, because it only provides one search query
 
@@ -97,7 +89,6 @@ Elasticsearch provides a full Query DSL (Domain Specific Language) based on JSON
 
 * [Search API](0018-file-search-api.md)
 * [Search Indexing](0019-file-search-index.md)
-* [KQL](https://github.com/SharePoint/sp-dev-docs/blob/master/docs/general-development/keyword-query-language-kql-syntax-reference.md)
 * [Apache Lucene](https://lucene.apache.org/)
 * [Apache Solr](https://solr.apache.org/)
 * [Elastic Search](https://solr.apache.org/)

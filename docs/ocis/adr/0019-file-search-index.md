@@ -31,6 +31,7 @@ Sharing adds more complexity because the index also needs to react to create, de
 * The Search Indexing Service should be replacable with more sophisticated technologies like Elasticsearch
 * Make use of the spaces architecture to shard search indexes by space
 * The Search Indexing Service needs to deal with multiple users accessing the same resources due to shares
+* The Search Service should be compatible with different search indexing technologies
 
 ## Considered Options
 
