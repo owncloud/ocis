@@ -380,58 +380,6 @@ def buildOcisBinaryForTesting(ctx):
         "volumes": [pipelineVolumeGo],
     }
 
-def licenseCheck(ctx):
-    return {
-        "kind": "pipeline",
-        "type": "docker",
-        "name": "license-check",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
-        "steps": skipIfUnchanged(ctx, "go-mod") +
-                 [
-                     {
-                         "name": "node-check-licenses",
-                         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-                         "commands": [
-                             "make ci-node-check-licenses",
-                         ],
-                     },
-                     {
-                         "name": "node-save-licenses",
-                         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-                         "commands": [
-                             "make ci-node-save-licenses",
-                         ],
-                     },
-                     {
-                         "name": "go-check-licenses",
-                         "image": OC_CI_GOLANG,
-                         "commands": [
-                             "make ci-go-check-licenses",
-                         ],
-                         "volumes": [stepVolumeGo],
-                     },
-                     {
-                         "name": "go-save-licenses",
-                         "image": OC_CI_GOLANG,
-                         "commands": [
-                             "make ci-go-save-licenses",
-                         ],
-                         "volumes": [stepVolumeGo],
-                     },
-                 ],
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-                "refs/pull/**",
-            ],
-        },
-        "volumes": [pipelineVolumeGo],
-    }
-
 def uploadScanResults(ctx):
     sonar_env = {
         "SONAR_TOKEN": {
@@ -1169,6 +1117,138 @@ def binaryRelease(ctx, name):
                     },
                     "files": [
                         "ocis/dist/release/*",
+                    ],
+                    "title": ctx.build.ref.replace("refs/tags/v", ""),
+                    "note": "ocis/dist/CHANGELOG.md",
+                    "overwrite": True,
+                    "prerelease": len(ctx.build.ref.split("-")) > 1,
+                },
+                "when": {
+                    "ref": [
+                        "refs/tags/v*",
+                    ],
+                },
+            },
+        ],
+        "depends_on": getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/tags/v*",
+                "refs/pull/**",
+            ],
+        },
+        "volumes": [pipelineVolumeGo],
+    }
+
+def licenseCheck(ctx):
+    # uploads third-party-licenses to https://download.owncloud.com/ocis/ocis/daily/
+    target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
+    if ctx.build.event == "tag":
+        # uploads third-party-licenses to eg. https://download.owncloud.com/ocis/ocis/1.0.0-beta9/
+        folder = "stable"
+        buildref = ctx.build.ref.replace("refs/tags/v", "")
+        buildref = buildref.lower()
+        if buildref.find("-") != -1:  # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
+            folder = "testing"
+        target = "/ocis/%s/%s/%s" % (ctx.repo.name.replace("ocis-", ""), folder, buildref)
+
+    settings = {
+        "endpoint": {
+            "from_secret": "s3_endpoint",
+        },
+        "access_key": {
+            "from_secret": "aws_access_key_id",
+        },
+        "secret_key": {
+            "from_secret": "aws_secret_access_key",
+        },
+        "bucket": {
+            "from_secret": "s3_bucket",
+        },
+        "path_style": True,
+        "source": "third-party-licenses.tar.gz",
+        "target": target,
+    }
+
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "check-licenses",
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": [
+            {
+                "name": "node-check-licenses",
+                "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+                "commands": [
+                    "make ci-node-check-licenses",
+                ],
+            },
+            {
+                "name": "node-save-licenses",
+                "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+                "commands": [
+                    "make ci-node-save-licenses",
+                ],
+            },
+            {
+                "name": "go-check-licenses",
+                "image": OC_CI_GOLANG,
+                "commands": [
+                    "make ci-go-check-licenses",
+                ],
+                "volumes": [stepVolumeGo],
+            },
+            {
+                "name": "go-save-licenses",
+                "image": OC_CI_GOLANG,
+                "commands": [
+                    "make ci-go-save-licenses",
+                ],
+                "volumes": [stepVolumeGo],
+            },
+            {
+                "name": "tarball",
+                "image": OC_CI_ALPINE,
+                "commands": [
+                    "tar -czf third-party-licenses.tar.gz -C third-party-licenses *",
+                ],
+            },
+            {
+                "name": "upload",
+                "image": PLUGINS_S3,
+                "settings": settings,
+                "when": {
+                    "ref": [
+                        "refs/heads/master",
+                        "refs/tags/v*",
+                    ],
+                },
+            },
+            {
+                "name": "changelog",
+                "image": OC_CI_GOLANG,
+                "commands": [
+                    "make changelog CHANGELOG_VERSION=%s" % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
+                ],
+                "when": {
+                    "ref": [
+                        "refs/tags/v*",
+                    ],
+                },
+            },
+            {
+                "name": "release",
+                "image": PLUGINS_GITHUB_RELEASE,
+                "settings": {
+                    "api_key": {
+                        "from_secret": "github_token",
+                    },
+                    "files": [
+                        "third-party-licenses.tar.gz",
                     ],
                     "title": ctx.build.ref.replace("refs/tags/v", ""),
                     "note": "ocis/dist/CHANGELOG.md",
