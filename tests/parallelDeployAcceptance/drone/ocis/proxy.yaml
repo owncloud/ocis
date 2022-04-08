@@ -19,15 +19,17 @@ policies:
         endpoint: "/remote.php/?preview=1"
         backend: http://localhost:9115
       - endpoint: "/remote.php/"
-        backend: http://localhost:9140
+        service: "ocdav"
       - endpoint: "/dav/"
-        backend: http://localhost:9140
+        service: "ocdav"
       - endpoint: "/webdav/"
-        backend: http://localhost:9140
+        service: "ocdav"
       - endpoint: "/status.php"
-        backend: http://localhost:9140
+        service: "ocdav"
       - endpoint: "/index.php/"
-        backend: http://localhost:9140
+        service: "ocdav"
+      - endpoint: "/apps/"
+        service: "ocdav"
       - endpoint: "/index.php/login"
         backend: http://localhost:9100
       - endpoint: "/login"
