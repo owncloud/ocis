@@ -1,6 +1,7 @@
 ---
 title: "19. File Search Index"
 date: 2022-03-18T09:00:00+01:00
+weight: 19
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0019-file-search-index.md

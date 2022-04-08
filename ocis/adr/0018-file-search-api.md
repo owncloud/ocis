@@ -1,6 +1,7 @@
 ---
 title: "18. File Search API"
 date: 2022-03-18T09:00:00+01:00
+weight: 18
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/adr
 geekdocFilePath: 0018-file-search-api.md
