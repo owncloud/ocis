@@ -1850,14 +1850,8 @@ def skipIfUnchanged(ctx, type):
     acceptance = [
         "^tests/acceptance/.*",
     ]
-    go_mod = [
-        "^go.mod",
-        "^go.sum",
-    ]
 
     skip = []
-    if type == "go-mod":
-        skip = go_mod
     if type == "acceptance-tests":
         skip = base + unit
     if type == "unit-tests":
