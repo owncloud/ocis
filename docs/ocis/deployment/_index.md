@@ -50,8 +50,7 @@ You can change it by setting the `OCIS_MACHINE_AUTH_API_KEY` environment variabl
 {{< hint info >}}
 Before deleting the demo users mentioned below, you must create a new account for yourself and assign it to the administrator role.
 
-To skip the generation of demo users in the first place, run the inital setup step with an additional environment variable.
-`ACCOUNTS_DEMO_USERS_AND_GROUPS=false ./bin/ocis server` generates only the admin, and one user for IDP and Reva respectively.
+By default, oCIS doesn't create any demo users. During the first startup, it generates only the admin and one user for IDP and Reva respectively.
 {{< /hint >}}
 
 oCIS ships with a few demo users besides the system users:
