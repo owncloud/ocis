@@ -36,6 +36,7 @@ type Index struct {
 
 type Entity struct {
 	RootID string
+	Path   string
 	ID     string
 
 	Name string
@@ -94,6 +95,7 @@ func BuildMapping() mapping.IndexMapping {
 func toEntity(ref *sprovider.Reference, ri *sprovider.ResourceInfo) *Entity {
 	return &Entity{
 		RootID: ref.ResourceId.GetStorageId() + ":" + ref.ResourceId.GetOpaqueId(),
+		Path:   ref.Path,
 		ID:     ri.Id.GetStorageId() + ":" + ri.Id.GetOpaqueId(),
 		Name:   ri.Path,
 		Size:   ri.Size,
@@ -110,6 +112,7 @@ func fromFields(fields map[string]interface{}) (search.Match, error) {
 				StorageId: rootIDParts[0],
 				OpaqueId:  rootIDParts[1],
 			},
+			Path: fields["Path"].(string),
 		},
 		Info: &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
