@@ -50,7 +50,7 @@ func DefaultConfig() *config.Config {
 					ResponseType: "code",
 					Scope:        "openid profile email",
 				},
-				Apps: []string{"files", "search", "media-viewer", "pdf-viewer", "external"},
+				Apps: []string{"files", "search", "preview", "text-editor", "pdf-viewer", "external"},
 			},
 		},
 	}
