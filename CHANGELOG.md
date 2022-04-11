@@ -15,7 +15,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add sorting to GraphAPI users and groups: [#3360](https://github.com/owncloud/ocis/issues/3360)
 * Enhancement - Make config dir configurable: [#3440](https://github.com/owncloud/ocis/pull/3440)
 * Enhancement - Update reva to v2.x.x: [#3430](https://github.com/owncloud/ocis/pull/3430)
-* Enhancement - Update ownCloud Web to v5.4.0-rv.3: [#6709](https://github.com/owncloud/web/pull/6709)
+* Enhancement - Update ownCloud Web to v5.4.0-rc.4: [#6709](https://github.com/owncloud/web/pull/6709)
 
 ## Details
 
@@ -81,17 +81,19 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3430
    https://github.com/owncloud/ocis/pull/3482
+   https://github.com/owncloud/ocis/pull/3497
 
-* Enhancement - Update ownCloud Web to v5.4.0-rv.3: [#6709](https://github.com/owncloud/web/pull/6709)
+* Enhancement - Update ownCloud Web to v5.4.0-rc.4: [#6709](https://github.com/owncloud/web/pull/6709)
 
    Tags: web
 
-   We updated ownCloud Web to v5.4.0-rv.3. Please refer to the changelog (linked) for details on
+   We updated ownCloud Web to v5.4.0-rc.4. Please refer to the changelog (linked) for details on
    the web release.
 
    https://github.com/owncloud/web/pull/6709
    https://github.com/owncloud/ocis/pull/3437
-   https://github.com/owncloud/web/releases/tag/v5.4.0-rc.3
+   https://github.com/owncloud/ocis/pull/3487
+   https://github.com/owncloud/web/releases/tag/v5.4.0-rc.4
 # Changelog for [1.19.1] (2022-03-29)
 
 The following sections list the changes for 1.19.1.
