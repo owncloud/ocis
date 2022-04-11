@@ -64,6 +64,10 @@ func (i *Index) Add(ref *sprovider.Reference, ri *sprovider.ResourceInfo) error 
 	return i.bleveIndex.Index(entity.ID, entity)
 }
 
+func (i *Index) Remove(ri *sprovider.ResourceInfo) error {
+	return i.bleveIndex.Delete(ri.Id.GetStorageId() + ":" + ri.Id.GetOpaqueId())
+}
+
 func (i *Index) Search(ctx context.Context, req *search.SearchIndexRequest) (*search.SearchIndexResult, error) {
 	query := bleve.NewConjunctionQuery(
 		bleve.NewQueryStringQuery(req.Query),

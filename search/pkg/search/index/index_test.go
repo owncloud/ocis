@@ -90,8 +90,6 @@ var _ = Describe("Index", func() {
 				}
 			})
 
-			PIt("finds directories by prefix")
-
 			Context("and an additional file in a subdirectory", func() {
 				var (
 					nestedRef *sprovider.Reference
@@ -187,6 +185,16 @@ var _ = Describe("Index", func() {
 	})
 
 	Describe("Remove", func() {
-		PIt("removes a resource from the index")
+		It("removes a resource from the index", func() {
+			err := i.Add(ref, ri)
+			Expect(err).ToNot(HaveOccurred())
+			count, _ := bleveIndex.DocCount()
+			Expect(count).To(Equal(uint64(1)))
+
+			err = i.Remove(ri)
+			Expect(err).ToNot(HaveOccurred())
+			count, _ = bleveIndex.DocCount()
+			Expect(count).To(Equal(uint64(0)))
+		})
 	})
 })
