@@ -53,26 +53,21 @@ services:
       - /entrypoint-override.sh
     environment:
       # CS3 users from ldap specific configuration
-      IDP_LDAP_FILTER: "(&(objectclass=inetOrgPerson)(objectClass=owncloud))"
-      IDP_LDAP_URI: ldap://ldap-server:389
-      IDP_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
-      IDP_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
-      IDP_LDAP_BASE_DN: "dc=owncloud,dc=com"
-      IDP_LDAP_LOGIN_ATTRIBUTE: uid
+      LDAP_URI: ldaps://ldap-server
+      LDAP_INSECURE: "true"
+      LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
+      LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      LDAP_GROUP_BASE_DN: "dc=owncloud,dc=com"
+      LDAP_GROUPFILTER: "(objectclass=owncloud)"
+      LDAP_GROUP_OBJECTCLASS: "groupOfUniqueNames"
+      LDAP_USER_BASE_DN: "dc=owncloud,dc=com"
+      LDAP_USERFILTER: "(objectclass=owncloud)"
+      LDAP_USER_OBEJECTCLASS: "inetOrgPerson"
+      LDAP_LOGIN_ATTRIBUTES: "uid,mail"
+      IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
       IDP_LDAP_UUID_ATTRIBUTE: "ownclouduuid"
       IDP_LDAP_UUID_ATTRIBUTE_TYPE: binary
       PROXY_ACCOUNT_BACKEND_TYPE: cs3
-      STORAGE_LDAP_HOSTNAME: ldap-server
-      STORAGE_LDAP_PORT: 636
-      STORAGE_LDAP_INSECURE: "true"
-      STORAGE_LDAP_BASE_DN: "dc=owncloud,dc=com"
-      STORAGE_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
-      STORAGE_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
-      STORAGE_LDAP_LOGINFILTER: '(&(objectclass=inetOrgPerson)(objectclass=owncloud)(|(uid={{login}})(mail={{login}})))'
-      STORAGE_LDAP_USERFILTER: '(&(objectclass=inetOrgPerson)(objectclass=owncloud)(|(ownclouduuid={{.OpaqueId}})(uid={{.OpaqueId}})))'
-      STORAGE_LDAP_ATTRIBUTEFILTER: '(&(objectclass=owncloud)({{attr}}={{value}}))'
-      STORAGE_LDAP_FINDFILTER: '(&(objectclass=owncloud)(|(uid={{query}}*)(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)(description={{query}}*)))'
-      STORAGE_LDAP_GROUPFILTER: '(&(objectclass=groupOfUniqueNames)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))'
       # web ui
       WEB_UI_CONFIG: "/var/tmp/ocis/.config/web-config.json"
       # General oCIS config

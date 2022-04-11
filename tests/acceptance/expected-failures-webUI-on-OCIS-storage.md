@@ -350,7 +350,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUITags/createTags.feature:79](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITags/createTags.feature#L79)
 
 ### [When a user shares folder to a group, the sharer is shown as group in group member's sharing-sidebar](https://github.com/owncloud/web/issues/5216)
- - [webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature:41](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature#L41)
 - [webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature#L42)
 
 ### [impossible to navigate into a folder in the trashbin](https://github.com/owncloud/web/issues/1725)

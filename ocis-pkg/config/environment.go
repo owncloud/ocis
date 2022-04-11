@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"reflect"
+	"strings"
 
 	gofig "github.com/gookit/config/v2"
 	"github.com/owncloud/ocis/ocis-pkg/shared"
@@ -35,6 +36,11 @@ func bindEnv(c *gofig.Config, bindings []shared.EnvBinding) error {
 					// defaults to float64
 					r := c.Float(bindings[i].EnvVars[j])
 					*bindings[i].Destination.(*float64) = r
+				case "*[]string":
+					// Treat values a comma-separated list
+					r := c.String(bindings[i].EnvVars[j])
+					vals := envStringToSlice(r)
+					*bindings[i].Destination.(*[]string) = vals
 				default:
 					// it is unlikely we will ever get here. Let this serve more as a runtime check for when debugging.
 					return fmt.Errorf("invalid type for env var: `%v`", bindings[i].EnvVars[j])
@@ -44,4 +50,12 @@ func bindEnv(c *gofig.Config, bindings []shared.EnvBinding) error {
 	}
 
 	return nil
+}
+
+func envStringToSlice(value string) []string {
+	vals := strings.Split(value, ",")
+	for i := range vals {
+		vals[i] = strings.TrimSpace(vals[i])
+	}
+	return vals
 }
