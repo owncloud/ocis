@@ -23,9 +23,10 @@ func DefaultConfig() *config.Config {
 		},
 		CreateDemoUsers: false,
 		ServiceUserPasswords: config.ServiceUserPasswords{
-			IdmAdmin: "idm",
-			Idp:      "idp",
-			Reva:     "reva",
+			OcisAdmin: "admin",
+			Idm:       "idm",
+			Idp:       "idp",
+			Reva:      "reva",
 		},
 		IDM: config.Settings{
 			LDAPSAddr:    "127.0.0.1:9235",
