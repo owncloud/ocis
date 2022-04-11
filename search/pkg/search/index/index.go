@@ -65,7 +65,11 @@ func (i *Index) Add(ref *sprovider.Reference, ri *sprovider.ResourceInfo) error 
 }
 
 func (i *Index) Search(ctx context.Context, req *search.SearchIndexRequest) (*search.SearchIndexResult, error) {
-	bleveReq := bleve.NewSearchRequest(bleve.NewQueryStringQuery(req.Query))
+	query := bleve.NewConjunctionQuery(
+		bleve.NewQueryStringQuery(req.Query),
+		bleve.NewQueryStringQuery("Path:"+req.Reference.Path+"*"), // Limit search to this directory in the space
+	)
+	bleveReq := bleve.NewSearchRequest(query)
 	bleveReq.Fields = []string{"*"}
 	res, err := i.bleveIndex.Search(bleveReq)
 	if err != nil {

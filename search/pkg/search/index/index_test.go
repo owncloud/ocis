@@ -70,89 +70,88 @@ var _ = Describe("Index", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("finds files by filename", func() {
-				res, err := i.Search(ctx, &search.SearchIndexRequest{
-					Reference: &sprovider.Reference{
-						ResourceId: ref.ResourceId,
-					},
-					Query: "foo.pdf",
-				})
-				Expect(err).ToNot(HaveOccurred())
-				Expect(res).ToNot(BeNil())
-				Expect(len(res.Matches)).To(Equal(1))
-				Expect(res.Matches[0].Reference.ResourceId).To(Equal(ref.ResourceId))
-				Expect(res.Matches[0].Reference.Path).To(Equal(ref.Path))
-				Expect(res.Matches[0].Info.Id).To(Equal(ri.Id))
-				Expect(res.Matches[0].Info.Path).To(Equal(ri.Path))
-				Expect(res.Matches[0].Info.Size).To(Equal(ri.Size))
-			})
-
-			It("finds files by filename prefix", func() {
-				res, err := i.Search(ctx, &search.SearchIndexRequest{
-					Reference: &sprovider.Reference{
-						ResourceId: ref.ResourceId,
-					},
-					Query: "foo*",
-				})
-				Expect(err).ToNot(HaveOccurred())
-				Expect(res).ToNot(BeNil())
-				Expect(len(res.Matches)).To(Equal(1))
-				Expect(res.Matches[0].Reference.ResourceId).To(Equal(ref.ResourceId))
-				Expect(res.Matches[0].Reference.Path).To(Equal(ref.Path))
-				Expect(res.Matches[0].Info.Id).To(Equal(ri.Id))
-				Expect(res.Matches[0].Info.Path).To(Equal(ri.Path))
-				Expect(res.Matches[0].Info.Size).To(Equal(ri.Size))
+			It("finds files by name, prefix or substring match", func() {
+				queries := []string{"foo.pdf", "foo*", "*oo.p*"}
+				for _, query := range queries {
+					res, err := i.Search(ctx, &search.SearchIndexRequest{
+						Reference: &sprovider.Reference{
+							ResourceId: ref.ResourceId,
+						},
+						Query: query,
+					})
+					Expect(err).ToNot(HaveOccurred())
+					Expect(res).ToNot(BeNil())
+					Expect(len(res.Matches)).To(Equal(1), "query returned no result: "+query)
+					Expect(res.Matches[0].Reference.ResourceId).To(Equal(ref.ResourceId))
+					Expect(res.Matches[0].Reference.Path).To(Equal(ref.Path))
+					Expect(res.Matches[0].Info.Id).To(Equal(ri.Id))
+					Expect(res.Matches[0].Info.Path).To(Equal(ri.Path))
+					Expect(res.Matches[0].Info.Size).To(Equal(ri.Size))
+				}
 			})
 
 			PIt("finds directories by prefix")
-		})
 
-		Context("with a file in a subdirectory", func() {
-			var (
-				nestedRef *sprovider.Reference
-				nestedRI  *sprovider.ResourceInfo
-			)
+			Context("and an additional file in a subdirectory", func() {
+				var (
+					nestedRef *sprovider.Reference
+					nestedRI  *sprovider.ResourceInfo
+				)
 
-			BeforeEach(func() {
-				nestedRef = &sprovider.Reference{
-					ResourceId: &sprovider.ResourceId{
-						StorageId: "storageid",
-						OpaqueId:  "rootopaqueid",
-					},
-					Path: "./nested/nestedpdf.pdf",
-				}
-				nestedRI = &sprovider.ResourceInfo{
-					Id: &sprovider.ResourceId{
-						StorageId: "storageid",
-						OpaqueId:  "opaqueid",
-					},
-					Path: "nestedpdf.pdf",
-					Size: 12345,
-				}
-				err := i.Add(nestedRef, nestedRI)
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			It("finds files living deeper in the tree by filename", func() {
-				res, err := i.Search(ctx, &search.SearchIndexRequest{
-					Reference: &sprovider.Reference{
-						ResourceId: ref.ResourceId,
-					},
-					Query: "nestedpdf.pdf",
+				BeforeEach(func() {
+					nestedRef = &sprovider.Reference{
+						ResourceId: &sprovider.ResourceId{
+							StorageId: "storageid",
+							OpaqueId:  "rootopaqueid",
+						},
+						Path: "./nested/nestedpdf.pdf",
+					}
+					nestedRI = &sprovider.ResourceInfo{
+						Id: &sprovider.ResourceId{
+							StorageId: "storageid",
+							OpaqueId:  "nestedopaqueid",
+						},
+						Path: "nestedpdf.pdf",
+						Size: 12345,
+					}
+					err := i.Add(nestedRef, nestedRI)
+					Expect(err).ToNot(HaveOccurred())
 				})
-				Expect(err).ToNot(HaveOccurred())
-				Expect(res).ToNot(BeNil())
-				Expect(len(res.Matches)).To(Equal(1))
-				Expect(res.Matches[0].Reference.ResourceId).To(Equal(nestedRef.ResourceId))
-				Expect(res.Matches[0].Reference.Path).To(Equal(nestedRef.Path))
-				Expect(res.Matches[0].Info.Id).To(Equal(nestedRI.Id))
-				Expect(res.Matches[0].Info.Path).To(Equal(nestedRI.Path))
-				Expect(res.Matches[0].Info.Size).To(Equal(nestedRI.Size))
+
+				It("finds files living deeper in the tree by filename, prefix or substring match", func() {
+					queries := []string{"nestedpdf.pdf", "nested*", "*tedpdf.*"}
+					for _, query := range queries {
+						res, err := i.Search(ctx, &search.SearchIndexRequest{
+							Reference: &sprovider.Reference{
+								ResourceId: ref.ResourceId,
+							},
+							Query: query,
+						})
+						Expect(err).ToNot(HaveOccurred())
+						Expect(res).ToNot(BeNil())
+						Expect(len(res.Matches)).To(Equal(1), "query returned no result: "+query)
+						Expect(res.Matches[0].Reference.ResourceId).To(Equal(nestedRef.ResourceId))
+						Expect(res.Matches[0].Reference.Path).To(Equal(nestedRef.Path))
+						Expect(res.Matches[0].Info.Id).To(Equal(nestedRI.Id))
+						Expect(res.Matches[0].Info.Path).To(Equal(nestedRI.Path))
+						Expect(res.Matches[0].Info.Size).To(Equal(nestedRI.Size))
+					}
+				})
+
+				It("does not find the higher levels when limiting the searched directory", func() {
+					res, err := i.Search(ctx, &search.SearchIndexRequest{
+						Reference: &sprovider.Reference{
+							ResourceId: ref.ResourceId,
+							Path:       "./nested/",
+						},
+						Query: "foo.pdf",
+					})
+					Expect(err).ToNot(HaveOccurred())
+					Expect(res).ToNot(BeNil())
+					Expect(len(res.Matches)).To(Equal(0))
+				})
 			})
-
-			PIt("finds directories living deeper in the tree by prefix")
 		})
-
 	})
 
 	Describe("Scan", func() {
