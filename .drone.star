@@ -1618,10 +1618,12 @@ def notify(ctx):
     }
 
 def ocisServerWithIdp():
+    ldapPort = 9235
+    ldapHost = "0.0.0.0"
+    ldapUri = "ldaps://%s:%d" % (ldapHost, ldapPort)
     environment = {
-        "OCIS_LOG_LEVEL": "debug",
         "GRAPH_IDENTITY_BACKEND": "ldap",
-        "GRAPH_LDAP_URI": "ldaps://0.0.0.0:9235",
+        "GRAPH_LDAP_URI": ldapUri,
         "GRAPH_LDAP_BIND_DN": "uid=libregraph,ou=sysusers,o=libregraph-idm",
         "GRAPH_LDAP_BIND_PASSWORD": "idm",
         "GRAPH_LDAP_USER_EMAIL_ATTRIBUTE": "mail",
@@ -1631,7 +1633,7 @@ def ocisServerWithIdp():
         "GRAPH_LDAP_SERVER_WRITE_ENABLED": "true",
         "IDP_INSECURE": "true",
         "IDP_LDAP_FILTER": "(&(objectclass=inetOrgPerson)(objectClass=owncloud))",
-        "IDP_LDAP_URI": "ldaps://0.0.0.0:9235",
+        "IDP_LDAP_URI": ldapUri,
         "IDP_LDAP_BIND_DN": "uid=idp,ou=sysusers,o=libregraph-idm",
         "IDP_LDAP_BIND_PASSWORD": "idp",
         "IDP_LDAP_BASE_DN": "ou=users,o=libregraph-idm",
@@ -1640,8 +1642,8 @@ def ocisServerWithIdp():
         "IDP_LDAP_UUID_ATTRIBUTE_TYPE": "binary",
         "PROXY_ACCOUNT_BACKEND_TYPE": "cs3",
         "OCS_ACCOUNT_BACKEND_TYPE": "cs3",
-        "STORAGE_LDAP_HOSTNAME": "0.0.0.0",
-        "STORAGE_LDAP_PORT": 9235,
+        "STORAGE_LDAP_HOSTNAME": ldapHost,
+        "STORAGE_LDAP_PORT": ldapPort,
         "STORAGE_LDAP_INSECURE": "true",
         "STORAGE_LDAP_BASE_DN": "o=libregraph-idm",
         "STORAGE_LDAP_BIND_DN": "uid=reva,ou=sysusers,o=libregraph-idm",
@@ -1653,8 +1655,9 @@ def ocisServerWithIdp():
         "STORAGE_LDAP_USERGROUPFILER": "(&(objectclass=groupOfNames)(member={{query}}*))",
         "STORAGE_LDAP_GROUPFILTER": "(&(objectclass=groupOfNames)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))",
         "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,idp,nats,idm",
-        "OCIS_INSECURE": "true",
         "PROXY_ENABLE_BASIC_AUTH": "true",
+        "OCIS_LOG_LEVEL": "debug",
+        "OCIS_INSECURE": "true",
     }
     return [
         {
@@ -2501,6 +2504,7 @@ def graphApiTests(ctx, part_number = 1, number_of_parts = 1):
     storage = "ocis"
     early_fail = config["graphApiTests"]["earlyFail"] if "earlyFail" in config["graphApiTests"] else False
     filterTags = "~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OCIS-Storage&&~@issue-ocis-3023"
+    expectedToFailuresFile = "/drone/src/tests/acceptance/expected-failures-graphAPI-on-OCIS-storage.md"
 
     return {
         "kind": "pipeline",
@@ -2531,6 +2535,7 @@ def graphApiTests(ctx, part_number = 1, number_of_parts = 1):
                     "DIVIDE_INTO_NUM_PARTS": number_of_parts,
                     "RUN_PART": part_number,
                     "UPLOAD_DELETE_WAIT_TIME": 0,
+                    "EXPECTED_FAILURES_FILE": expectedToFailuresFile,
                 },
                 "commands": [
                     "cd /srv/app/testrunner",
