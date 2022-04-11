@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Change - Fix keys with underscores in the config files: [#3412](https://github.com/owncloud/ocis/pull/3412)
 * Change - Don't create demo users by default: [#3474](https://github.com/owncloud/ocis/pull/3474)
 * Enhancement - Alias links: [#3454](https://github.com/owncloud/ocis/pull/3454)
+* Enhancement - Replace deprecated String.prototype.substr(): [#3448](https://github.com/owncloud/ocis/pull/3448)
 * Enhancement - Add sorting to GraphAPI users and groups: [#3360](https://github.com/owncloud/ocis/issues/3360)
 * Enhancement - Make config dir configurable: [#3440](https://github.com/owncloud/ocis/pull/3440)
 * Enhancement - Update reva to v2.x.x: [#3430](https://github.com/owncloud/ocis/pull/3430)
@@ -65,6 +66,13 @@ The following sections list the changes for unreleased.
    Bumps reva and configures ocs token endpoint to be unprotected
 
    https://github.com/owncloud/ocis/pull/3454
+
+* Enhancement - Replace deprecated String.prototype.substr(): [#3448](https://github.com/owncloud/ocis/pull/3448)
+
+   We've replaced all occurrences of the deprecated String.prototype.substr() function with
+   String.prototype.slice() which works similarly but isn't deprecated.
+
+   https://github.com/owncloud/ocis/pull/3448
 
 * Enhancement - Add sorting to GraphAPI users and groups: [#3360](https://github.com/owncloud/ocis/issues/3360)
 
