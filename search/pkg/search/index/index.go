@@ -30,10 +30,12 @@ import (
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 )
 
+// Index represents a bleve based search index
 type Index struct {
 	bleveIndex bleve.Index
 }
 
+// Entity describes an Entity stored in the index
 type Entity struct {
 	RootID string
 	Path   string
@@ -43,31 +45,34 @@ type Entity struct {
 	Size uint64
 }
 
+// NewPersisted returns a new instance of Index with the data being persisted in the given directory
 func NewPersisted(path string) (*Index, error) {
 	bi, err := bleve.New(path, BuildMapping())
 	if err != nil {
 		return nil, err
 	}
-	return &Index{
-		bleveIndex: bi,
-	}, nil
+	return New(bi)
 }
 
+// New returns a new instance of Index using the given bleve Index as the backend
 func New(bleveIndex bleve.Index) (*Index, error) {
 	return &Index{
 		bleveIndex: bleveIndex,
 	}, nil
 }
 
+// Add adds a new entity to the Index
 func (i *Index) Add(ref *sprovider.Reference, ri *sprovider.ResourceInfo) error {
 	entity := toEntity(ref, ri)
 	return i.bleveIndex.Index(entity.ID, entity)
 }
 
+// Remove removes an entity from the index
 func (i *Index) Remove(ri *sprovider.ResourceInfo) error {
 	return i.bleveIndex.Delete(ri.Id.GetStorageId() + ":" + ri.Id.GetOpaqueId())
 }
 
+// Search searches the index according to the criteria specified in the given SearchIndexRequest
 func (i *Index) Search(ctx context.Context, req *search.SearchIndexRequest) (*search.SearchIndexResult, error) {
 	query := bleve.NewConjunctionQuery(
 		bleve.NewQueryStringQuery(req.Query),
@@ -94,6 +99,7 @@ func (i *Index) Search(ctx context.Context, req *search.SearchIndexRequest) (*se
 	}, nil
 }
 
+// BuildMapping builds a bleve index mapping which can be used for indexing
 func BuildMapping() mapping.IndexMapping {
 	indexMapping := bleve.NewIndexMapping()
 	indexMapping.DefaultAnalyzer = keyword.Name

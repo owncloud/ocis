@@ -27,35 +27,39 @@ import (
 //go:generate mockery --name=ProviderClient
 //go:generate mockery --name=IndexClient
 
+// SearchRequest represents a search request from a user to the search provider
 type SearchRequest struct {
 	Query string
 }
 
+// Match holds the information of a matched resource in a search
 type Match struct {
 	Reference *sprovider.Reference
 	Info      *sprovider.ResourceInfo
 }
 
+// SearchResult contains the matches being returned for a search
 type SearchResult struct {
 	Matches []Match
 }
 
-type SearchIndexRequest struct {
-	// Reference is not a list because the Path is used as a filter which is
-	// cut off in the matches by the provider. Multiple paths would not be
-	// distinguishable.
-	Reference *sprovider.Reference
-	Query     string
-}
-
-type SearchIndexResult struct {
-	Matches []Match
-}
-
+// ProviderClient is the interface to the search provider service
 type ProviderClient interface {
 	Search(ctx context.Context, req *SearchRequest) (*SearchResult, error)
 }
 
+// SearchIndexRequest represents a search request to the index
+type SearchIndexRequest struct {
+	Reference *sprovider.Reference
+	Query     string
+}
+
+// SearchResult contains the matches in the index being returned for a search
+type SearchIndexResult struct {
+	Matches []Match
+}
+
+// IndexClient is the interface to the search index
 type IndexClient interface {
 	Search(ctx context.Context, req *SearchIndexRequest) (*SearchIndexResult, error)
 }

@@ -152,10 +152,6 @@ var _ = Describe("Index", func() {
 		})
 	})
 
-	Describe("Scan", func() {
-		PIt("adds the given resource recursively")
-	})
-
 	Describe("Index", func() {
 		It("adds a resourceInfo to the index", func() {
 			err := i.Add(ref, ri)
