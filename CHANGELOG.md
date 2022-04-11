@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Alias links: [#3454](https://github.com/owncloud/ocis/pull/3454)
 * Enhancement - Replace deprecated String.prototype.substr(): [#3448](https://github.com/owncloud/ocis/pull/3448)
 * Enhancement - Add sorting to GraphAPI users and groups: [#3360](https://github.com/owncloud/ocis/issues/3360)
+* Enhancement - Unify LDAP config settings accross services: [#3476](https://github.com/owncloud/ocis/pull/3476)
 * Enhancement - Make config dir configurable: [#3440](https://github.com/owncloud/ocis/pull/3440)
 * Enhancement - Update reva to v2.x.x: [#3430](https://github.com/owncloud/ocis/pull/3430)
 * Enhancement - Update ownCloud Web to v5.4.0: [#6709](https://github.com/owncloud/web/pull/6709)
@@ -83,6 +84,29 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3360
 
+* Enhancement - Unify LDAP config settings accross services: [#3476](https://github.com/owncloud/ocis/pull/3476)
+
+   The storage services where updated to adapt for the recent changes of the LDAP settings in reva.
+
+   Also we allow now to use a new set of top-level LDAP environment variables that are shared
+   between all LDAP-using services in ocis (graph, idp, storage-auth-basic,
+   storage-userprovider, storage-groupprovider, idm). This should simplify the most LDAP
+   based configurations considerably.
+
+   Here is a list of the new environment variables: LDAP_URI LDAP_INSECURE LDAP_CACERT
+   LDAP_BIND_DN LDAP_BIND_PASSWORD LDAP_LOGIN_ATTRIBUTES LDAP_USER_BASE_DN
+   LDAP_USER_SCOPE LDAP_USER_FILTER LDAP_USER_OBJECTCLASS LDAP_USER_SCHEMA_MAIL
+   LDAP_USER_SCHEMA_DISPLAY_NAME LDAP_USER_SCHEMA_USERNAME LDAP_USER_SCHEMA_ID
+   LDAP_USER_SCHEMA_ID_IS_OCTETSTRING LDAP_GROUP_BASE_DN LDAP_GROUP_SCOPE
+   LDAP_GROUP_FILTER LDAP_GROUP_OBJECTCLASS LDAP_GROUP_SCHEMA_GROUPNAME
+   LDAP_GROUP_SCHEMA_ID LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING
+
+   Where need these can be overwritten by service specific variables. E.g. it is possible to use
+   STORAGE_LDAP_URI to overide the top-level LDAP_URI variable.
+
+   https://github.com/owncloud/ocis/issues/3150
+   https://github.com/owncloud/ocis/pull/3476
+
 * Enhancement - Make config dir configurable: [#3440](https://github.com/owncloud/ocis/pull/3440)
 
    We have added an `OCIS_CONFIG_DIR` environment variable the will take precedence over the
@@ -98,6 +122,7 @@ The following sections list the changes for unreleased.
   * TODO
 
    https://github.com/owncloud/ocis/pull/3430
+   https://github.com/owncloud/ocis/pull/3476
    https://github.com/owncloud/ocis/pull/3482
    https://github.com/owncloud/ocis/pull/3497
 
