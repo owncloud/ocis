@@ -12,12 +12,12 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. This file lists the expected-failures of those ocisSmokeTest scenarios.
 
 ### [enable re-sharing is not possible](https://github.com/owncloud/ocis/issues/1743)
-- [webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:67](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature#L67)
-- [webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:66](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature#L66)
-- [webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:65](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature#L65)
-- [webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:64](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature#L64)
-- [webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:63](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature#L63)
-- [webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:62](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature#L62)
+- [webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:47](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature#L47)
+- [webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:48](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature#L48)
+- [webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:49](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature#L49)
+- [webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature#L50)
+- [webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:51](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature#L51)
+- [webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature:52](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingFilePermissionMultipleUsers/shareFileWithMultipleUsers.feature#L52)
 
 ### [name of public link is empty and not "Public link" when not specified in the create request](https://github.com/owncloud/ocis/issues/1237)
 - [webUISharingPublicBasic/publicLinkCreate.feature:11](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicBasic/publicLinkCreate.feature#L11)
