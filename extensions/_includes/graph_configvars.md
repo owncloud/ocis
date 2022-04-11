@@ -34,3 +34,5 @@
 | GRAPH_LDAP_GROUP_FILTER | string | (objectclass=groupOfNames) | |
 | GRAPH_LDAP_GROUP_NAME_ATTRIBUTE | string | cn | |
 | GRAPH_LDAP_GROUP_ID_ATTRIBUTE | string | owncloudUUID | |
+| GRAPH_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | the address of the streaming service|
+| GRAPH_EVENTS_CLUSTER | string | ocis-cluster | the clusterID of the streaming service. Mandatory when using nats|
