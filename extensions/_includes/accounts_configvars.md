@@ -24,4 +24,4 @@
 | ACCOUNTS_SERVICE_USER_UID | int64 | 0 | The uid of the accounts service user.|
 | ACCOUNTS_SERVICE_USER_GID | int64 | 0 | The gid of the accounts service user.|
 | ACCOUNTS_HASH_DIFFICULTY | int | 11 | The hash difficulty makes sure that validating a password takes at least a certain amount of time.|
-| ACCOUNTS_DEMO_USERS_AND_GROUPS | bool | true | If this flag is set the service will setup the demo users and groups.|
+| ACCOUNTS_DEMO_USERS_AND_GROUPS | bool | false | If this flag is set the service will setup the demo users and groups.|

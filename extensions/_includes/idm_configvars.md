@@ -10,7 +10,7 @@
 | IDM_LDAPS_CERT | string | ~/.ocis/idm/ldap.crt | File name of the TLS server certificate for the ldaps listener|
 | IDM_LDAPS_KEY | string | ~/.ocis/idm/ldap.key | File name for the TLS certificate key for the server certificate|
 | IDM_DATABASE_PATH | string | ~/.ocis/idm/ocis.boltdb | Full path to the idm backend database|
-| IDM_CREATE_DEMO_USERS;ACCOUNTS_DEMO_USERS_AND_GROUPS | bool | true | Flag to enabe/disable the creation of the demo users|
+| IDM_CREATE_DEMO_USERS;ACCOUNTS_DEMO_USERS_AND_GROUPS | bool | false | Flag to enabe/disable the creation of the demo users|
 | IDM_ADMIN_PASSWORD | string | idm | Password to set for the "idm" service users. Either cleartext or an argon2id hash|
 | IDM_REVASVC_PASSWORD | string | reva | Password to set for the "reva" service users. Either cleartext or an argon2id hash|
 | IDM_IDPSVC_PASSWORD | string | idp | Password to set for the "idp" service users. Either cleartext or an argon2id hash|

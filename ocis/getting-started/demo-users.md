@@ -7,11 +7,11 @@ geekdocEditPath: edit/master/docs/ocis/getting-started
 geekdocFilePath: demo-users.md
 ---
 
-As long as oCIS is released as [technology preview]({{< ref "../release_roadmap#release_roadmap" >}}) it will come with default demo users. These enable you to do quick testing and developing.
+oCIS has the option to create demo users during the first startup. These enable you to do quick testing and developing.
 
 {{< hint info >}}
-To skip the generation of demo users, run the inital setup step with an additional environment variable.
-`ACCOUNTS_DEMO_USERS_AND_GROUPS=false ./bin/ocis server` generates only the admin, and one user for IDP and Reva respectively.
+To create the demo users, run the inital setup step with an additional environment variable.
+`ACCOUNTS_DEMO_USERS_AND_GROUPS=true ./bin/ocis server` will generate the demo users listed in the table below. By default, it only generates the admin and one user for IDP and Reva respectively.
 {{< /hint >}}
 
 Following users are available in the demo set:

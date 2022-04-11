@@ -60,4 +60,4 @@ service_user:
   uid: 0
   gid: 0
 hash_difficulty: 11
-demo_users_and_groups: true
+demo_users_and_groups: false
