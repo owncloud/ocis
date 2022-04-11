@@ -124,6 +124,9 @@ services:
       OCIS_INSECURE: "${INSECURE:-false}"
       # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
       PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
+      # demo users
+      ACCOUNTS_DEMO_USERS_AND_GROUPS: "${DEMO_USERS:-false}"  # deprecated, remove after switching to LibreIDM
+      IDM_CREATE_DEMO_USERS: "${DEMO_USERS:-false}"
     volumes:
       - ./config/ocis/proxy.yaml:/etc/ocis/proxy.yaml
       - ocis-data:/var/lib/ocis
