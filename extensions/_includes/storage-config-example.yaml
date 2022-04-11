@@ -19,35 +19,38 @@ reva:
     uid_claim: ""
     gid_claim: ""
   ldap:
-    hostname: localhost
-    port: 9126
+    uri: ldaps://localhost:9126
     ca_cert: ~/.ocis/ldap/ldap.crt
     insecure: false
-    base_dn: dc=ocis,dc=test
-    login_filter: (&(objectclass=posixAccount)(|(cn={{login}})(mail={{login}})))
-    user_filter: (&(objectclass=posixAccount)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))
-    user_attribute_filter: (&(objectclass=posixAccount)({{attr}}={{value}}))
-    user_find_filter: (&(objectclass=posixAccount)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))
-    user_group_filter: (&(objectclass=posixGroup)(cn={{query}}*))
-    group_filter: (&(objectclass=posixGroup)(|(ownclouduuid={{.OpaqueId}})(cn={{.OpaqueId}})))
-    group_attribute_filter: (&(objectclass=posixGroup)({{attr}}={{value}}))
-    group_finder_filter: (&(objectclass=posixGroup)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))
-    group_member_filter: (&(objectclass=posixAccount)(ownclouduuid={{.OpaqueId}}*))
+    user_base_dn: dc=ocis,dc=test
+    group_base_dn: dc=ocis,dc=test
+    user_scope: sub
+    group_scope: sub
+    user_objectclass: posixAccount
+    group_objectclass: posixGroup
+    user_filter: ""
+    group_filter: ""
+    login_attributes:
+    - cn
+    - mail
     bind_dn: cn=reva,ou=sysusers,dc=ocis,dc=test
     bind_password: reva
     idp: https://localhost:9200
     user_schema:
-      uid: ownclouduuid
+      id: ownclouduuid
+      id_is_octet_string: false
       mail: mail
       display_name: displayname
-      cn: cn
+      user_name: cn
       uid_number: uidnumber
       gid_number: gidnumber
     group_schema:
-      gid: cn
+      id: cn
+      id_is_octet_string: false
       mail: mail
       display_name: cn
-      cn: cn
+      group_name: cn
+      member: cn
       gid_number: gidnumber
   user_group_rest:
     client_id: ""

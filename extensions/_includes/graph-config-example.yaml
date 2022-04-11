@@ -38,14 +38,16 @@ identity:
     write_enabled: false
     user_base_dn: ou=users,dc=ocis,dc=test
     user_search_scope: sub
-    user_filter: (objectClass=inetOrgPerson)
+    user_filter: ""
+    user_objectclass: inetOrgPerson
     user_mail_attribute: mail
     user_displayname_attribute: displayName
     user_name_attribute: uid
     user_id_attribute: owncloudUUID
     group_base_dn: ou=groups,dc=ocis,dc=test
     group_search_scope: sub
-    group_filter: (objectclass=groupOfNames)
+    group_filter: ""
+    group_objectclass: groupOfNames
     group_name_attribute: cn
     group_id_attribute: owncloudUUID
 events:

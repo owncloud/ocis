@@ -63,7 +63,8 @@ ldap:
   scope: sub
   login_attribute: cn
   email_attribute: mail
-  name_attribute: sn
+  name_attribute: displayName
   uuid_attribute: uid
   uuid_attribute_type: text
-  filter: (objectClass=posixaccount)
+  filter: ""
+  objectclass: posixAccount
