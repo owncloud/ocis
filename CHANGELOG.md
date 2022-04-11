@@ -17,6 +17,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Make config dir configurable: [#3440](https://github.com/owncloud/ocis/pull/3440)
 * Enhancement - Update reva to v2.x.x: [#3430](https://github.com/owncloud/ocis/pull/3430)
 * Enhancement - Update ownCloud Web to v5.4.0-rc.4: [#6709](https://github.com/owncloud/web/pull/6709)
+* Enhancement - Implement audit events for user and groups: [#3467](https://github.com/owncloud/ocis/pull/3467)
 
 ## Details
 
@@ -103,6 +104,14 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/3437
    https://github.com/owncloud/ocis/pull/3487
    https://github.com/owncloud/web/releases/tag/v5.4.0-rc.4
+
+* Enhancement - Implement audit events for user and groups: [#3467](https://github.com/owncloud/ocis/pull/3467)
+
+   Added audit events for users and groups. This will log: * User creation * User deletion * User
+   property change (currently only email) * Group creation * Group deletion * Group member add *
+   Group member remove
+
+   https://github.com/owncloud/ocis/pull/3467
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
