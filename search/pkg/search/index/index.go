@@ -64,7 +64,7 @@ func (i *Index) Add(ref *sprovider.Reference, ri *sprovider.ResourceInfo) error 
 }
 
 func (i *Index) Search(ctx context.Context, req *search.SearchIndexRequest) (*search.SearchIndexResult, error) {
-	bleveReq := bleve.NewSearchRequest(bleve.NewMatchQuery(req.Query))
+	bleveReq := bleve.NewSearchRequest(bleve.NewQueryStringQuery(req.Query))
 	bleveReq.Fields = []string{"*"}
 	res, err := i.bleveIndex.Search(bleveReq)
 	if err != nil {
