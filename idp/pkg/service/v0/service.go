@@ -124,6 +124,10 @@ func createConfigsIfNotExist(assets http.FileSystem, filePath, ocisURL string) e
 
 // Init vars which are currently not accessible via idp api
 func initLicoInternalEnvVars(ldap *config.Ldap) error {
+	filter := fmt.Sprintf("(objectclass=%s)", ldap.ObjectClass)
+	if ldap.Filter != "" {
+		filter = fmt.Sprintf("(&%s%s)", ldap.Filter, filter)
+	}
 	var defaults = map[string]string{
 		"LDAP_URI":                 ldap.URI,
 		"LDAP_BINDDN":              ldap.BindDN,
@@ -135,7 +139,7 @@ func initLicoInternalEnvVars(ldap *config.Ldap) error {
 		"LDAP_NAME_ATTRIBUTE":      ldap.NameAttribute,
 		"LDAP_UUID_ATTRIBUTE":      ldap.UUIDAttribute,
 		"LDAP_UUID_ATTRIBUTE_TYPE": ldap.UUIDAttributeType,
-		"LDAP_FILTER":              ldap.Filter,
+		"LDAP_FILTER":              filter,
 	}
 
 	for k, v := range defaults {

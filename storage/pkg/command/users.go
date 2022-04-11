@@ -48,10 +48,18 @@ func Users(cfg *config.Config) *cli.Command {
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
 
 			rcfg := usersConfigFromStruct(c, cfg)
+
 			logger.Debug().
 				Str("server", "users").
 				Interface("reva-config", rcfg).
 				Msg("config")
+
+			if cfg.Reva.Users.Driver == "ldap" {
+				if err := waitForLDAPCA(logger, &cfg.Reva.LDAP); err != nil {
+					logger.Error().Err(err).Msg("The configured LDAP CA cert does not exist")
+					return err
+				}
+			}
 
 			gr.Add(func() error {
 				runtime.RunWithOptions(
@@ -120,29 +128,7 @@ func usersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interf
 						"json": map[string]interface{}{
 							"users": cfg.Reva.Users.JSON,
 						},
-						"ldap": map[string]interface{}{
-							"hostname":        cfg.Reva.LDAP.Hostname,
-							"port":            cfg.Reva.LDAP.Port,
-							"cacert":          cfg.Reva.LDAP.CACert,
-							"insecure":        cfg.Reva.LDAP.Insecure,
-							"base_dn":         cfg.Reva.LDAP.BaseDN,
-							"userfilter":      cfg.Reva.LDAP.UserFilter,
-							"attributefilter": cfg.Reva.LDAP.UserAttributeFilter,
-							"findfilter":      cfg.Reva.LDAP.UserFindFilter,
-							"groupfilter":     cfg.Reva.LDAP.UserGroupFilter,
-							"bind_username":   cfg.Reva.LDAP.BindDN,
-							"bind_password":   cfg.Reva.LDAP.BindPassword,
-							"idp":             cfg.Reva.LDAP.IDP,
-							"schema": map[string]interface{}{
-								"dn":          "dn",
-								"uid":         cfg.Reva.LDAP.UserSchema.UID,
-								"mail":        cfg.Reva.LDAP.UserSchema.Mail,
-								"displayName": cfg.Reva.LDAP.UserSchema.DisplayName,
-								"cn":          cfg.Reva.LDAP.UserSchema.CN,
-								"uidNumber":   cfg.Reva.LDAP.UserSchema.UIDNumber,
-								"gidNumber":   cfg.Reva.LDAP.UserSchema.GIDNumber,
-							},
-						},
+						"ldap": ldapConfigFromString(cfg),
 						"rest": map[string]interface{}{
 							"client_id":                    cfg.Reva.UserGroupRest.ClientID,
 							"client_secret":                cfg.Reva.UserGroupRest.ClientSecret,

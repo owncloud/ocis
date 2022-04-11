@@ -361,25 +361,23 @@ type OIDC struct {
 
 // LDAP defines the available ldap configuration.
 type LDAP struct {
-	Hostname             string          `yaml:"hostname"`
-	Port                 int             `yaml:"port"`
-	CACert               string          `yaml:"ca_cert"`
-	Insecure             bool            `yaml:"insecure"`
-	BaseDN               string          `yaml:"base_dn"`
-	LoginFilter          string          `yaml:"login_filter"`
-	UserFilter           string          `yaml:"user_filter"`
-	UserAttributeFilter  string          `yaml:"user_attribute_filter"`
-	UserFindFilter       string          `yaml:"user_find_filter"`
-	UserGroupFilter      string          `yaml:"user_group_filter"`
-	GroupFilter          string          `yaml:"group_filter"`
-	GroupAttributeFilter string          `yaml:"group_attribute_filter"`
-	GroupFindFilter      string          `yaml:"group_finder_filter"`
-	GroupMemberFilter    string          `yaml:"group_member_filter"`
-	BindDN               string          `yaml:"bind_dn"`
-	BindPassword         string          `yaml:"bind_password"`
-	IDP                  string          `yaml:"idp"`
-	UserSchema           LDAPUserSchema  `yaml:"user_schema"`
-	GroupSchema          LDAPGroupSchema `yaml:"group_schema"`
+	URI              string          `yaml:"uri"`
+	CACert           string          `yaml:"ca_cert"`
+	Insecure         bool            `yaml:"insecure"`
+	UserBaseDN       string          `yaml:"user_base_dn"`
+	GroupBaseDN      string          `yaml:"group_base_dn"`
+	UserScope        string          `yaml:"user_scope"`
+	GroupScope       string          `yaml:"group_scope"`
+	UserObjectClass  string          `yaml:"user_objectclass"`
+	GroupObjectClass string          `yaml:"group_objectclass"`
+	UserFilter       string          `yaml:"user_filter"`
+	GroupFilter      string          `yaml:"group_filter"`
+	LoginAttributes  []string        `yaml:"login_attributes"`
+	BindDN           string          `yaml:"bind_dn"`
+	BindPassword     string          `yaml:"bind_password"`
+	IDP              string          `yaml:"idp"`
+	UserSchema       LDAPUserSchema  `yaml:"user_schema"`
+	GroupSchema      LDAPGroupSchema `yaml:"group_schema"`
 }
 
 // UserGroupRest defines the REST driver specification for user and group resolution.
@@ -411,21 +409,24 @@ type UserOwnCloudSQL struct {
 
 // LDAPUserSchema defines the available ldap user schema configuration.
 type LDAPUserSchema struct {
-	UID         string `yaml:"uid"`
-	Mail        string `yaml:"mail"`
-	DisplayName string `yaml:"display_name"`
-	CN          string `yaml:"cn"`
-	UIDNumber   string `yaml:"uid_number"`
-	GIDNumber   string `yaml:"gid_number"`
+	ID              string `yaml:"id"`
+	IDIsOctetString bool   `yaml:"id_is_octet_string"`
+	Mail            string `yaml:"mail"`
+	DisplayName     string `yaml:"display_name"`
+	Username        string `yaml:"user_name"`
+	UIDNumber       string `yaml:"uid_number"`
+	GIDNumber       string `yaml:"gid_number"`
 }
 
 // LDAPGroupSchema defines the available ldap group schema configuration.
 type LDAPGroupSchema struct {
-	GID         string `yaml:"gid"`
-	Mail        string `yaml:"mail"`
-	DisplayName string `yaml:"display_name"`
-	CN          string `yaml:"cn"`
-	GIDNumber   string `yaml:"gid_number"`
+	ID              string `yaml:"id"`
+	IDIsOctetString bool   `yaml:"id_is_octet_string"`
+	Mail            string `yaml:"mail"`
+	DisplayName     string `yaml:"display_name"`
+	Groupname       string `yaml:"group_name"`
+	Member          string `yaml:"member"`
+	GIDNumber       string `yaml:"gid_number"`
 }
 
 // OCDav defines the available ocdav configuration.
@@ -1016,111 +1017,115 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 
 		// ldap
 		{
-			EnvVars:     []string{"STORAGE_LDAP_HOSTNAME"},
-			Destination: &cfg.Reva.LDAP.Hostname,
+			EnvVars:     []string{"LDAP_URI", "STORAGE_LDAP_URI"},
+			Destination: &cfg.Reva.LDAP.URI,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_PORT"},
-			Destination: &cfg.Reva.LDAP.Port,
-		},
-		{
-			EnvVars:     []string{"STORAGE_LDAP_CACERT"},
+			EnvVars:     []string{"LDAP_CACERT", "STORAGE_LDAP_CACERT"},
 			Destination: &cfg.Reva.LDAP.CACert,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_INSECURE"},
+			EnvVars:     []string{"LDAP_INSECURE", "STORAGE_LDAP_INSECURE"},
 			Destination: &cfg.Reva.LDAP.Insecure,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_BASE_DN"},
-			Destination: &cfg.Reva.LDAP.BaseDN,
+			EnvVars:     []string{"LDAP_USER_BASE_DN", "STORAGE_LDAP_USER_BASE_DN"},
+			Destination: &cfg.Reva.LDAP.UserBaseDN,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_LOGINFILTER"},
-			Destination: &cfg.Reva.LDAP.LoginFilter,
+			EnvVars:     []string{"LDAP_GROUP_BASE_DN", "STORAGE_LDAP_GROUP_BASE_DN"},
+			Destination: &cfg.Reva.LDAP.GroupBaseDN,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_USERFILTER"},
+			EnvVars:     []string{"LDAP_USER_SCOPE", "STORAGE_LDAP_USER_SCOPE"},
+			Destination: &cfg.Reva.LDAP.UserScope,
+		},
+		{
+			EnvVars:     []string{"LDAP_GROUP_SCOPE", "STORAGE_LDAP_GROUP_SCOPE"},
+			Destination: &cfg.Reva.LDAP.GroupScope,
+		},
+		{
+			EnvVars:     []string{"LDAP_USER_OBJECTCLASS", "STORAGE_LDAP_USER_OBJECTCLASS"},
+			Destination: &cfg.Reva.LDAP.UserObjectClass,
+		},
+		{
+			EnvVars:     []string{"LDAP_GROUP_OBJECTCLASS", "STORAGE_LDAP_GROUP_OBJECTCLASS"},
+			Destination: &cfg.Reva.LDAP.GroupObjectClass,
+		},
+		{
+			EnvVars:     []string{"LDAP_LOGIN_ATTRIBUTES", "STORAGE_LDAP_LOGIN_ATTRIBUTES"},
+			Destination: &cfg.Reva.LDAP.LoginAttributes,
+		},
+		{
+			EnvVars:     []string{"LDAP_USERFILTER", "STORAGE_LDAP_USERFILTER"},
 			Destination: &cfg.Reva.LDAP.UserFilter,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_USERATTRIBUTEFILTER"},
-			Destination: &cfg.Reva.LDAP.UserAttributeFilter,
-		},
-		{
-			EnvVars:     []string{"STORAGE_LDAP_USERFINDFILTER"},
-			Destination: &cfg.Reva.LDAP.UserFindFilter,
-		},
-		{
-			EnvVars:     []string{"STORAGE_LDAP_USERGROUPFILTER"},
-			Destination: &cfg.Reva.LDAP.UserGroupFilter,
-		},
-		{
-			EnvVars:     []string{"STORAGE_LDAP_GROUPFILTER"},
+			EnvVars:     []string{"LDAP_GROUPFILTER", "STORAGE_LDAP_GROUPFILTER"},
 			Destination: &cfg.Reva.LDAP.GroupFilter,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_GROUPATTRIBUTEFILTER"},
-			Destination: &cfg.Reva.LDAP.GroupAttributeFilter,
-		},
-		{
-			EnvVars:     []string{"STORAGE_LDAP_GROUPFINDFILTER"},
-			Destination: &cfg.Reva.LDAP.GroupFindFilter,
-		},
-		{
-			EnvVars:     []string{"STORAGE_LDAP_GROUPMEMBERFILTER"},
-			Destination: &cfg.Reva.LDAP.GroupMemberFilter,
-		},
-		{
-			EnvVars:     []string{"STORAGE_LDAP_BIND_DN"},
+			EnvVars:     []string{"LDAP_BIND_DN", "STORAGE_LDAP_BIND_DN"},
 			Destination: &cfg.Reva.LDAP.BindDN,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_BIND_PASSWORD"},
+			EnvVars:     []string{"LDAP_BIND_PASSWORD", "STORAGE_LDAP_BIND_PASSWORD"},
 			Destination: &cfg.Reva.LDAP.BindPassword,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_USER_SCHEMA_UID"},
-			Destination: &cfg.Reva.LDAP.UserSchema.UID,
+			EnvVars:     []string{"LDAP_USER_SCHEMA_ID", "STORAGE_LDAP_USER_SCHEMA_ID"},
+			Destination: &cfg.Reva.LDAP.UserSchema.ID,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_USER_SCHEMA_MAIL"},
+			EnvVars:     []string{"LDAP_USER_SCHEMA_ID_IS_OCTETSTRING", "STORAGE_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING"},
+			Destination: &cfg.Reva.LDAP.UserSchema.IDIsOctetString,
+		},
+		{
+			EnvVars:     []string{"LDAP_USER_SCHEMA_MAIL", "STORAGE_LDAP_USER_SCHEMA_MAIL"},
 			Destination: &cfg.Reva.LDAP.UserSchema.Mail,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_USER_SCHEMA_DISPLAYNAME"},
+			EnvVars:     []string{"LDAP_USER_SCHEMA_DISPLAYNAME", "STORAGE_LDAP_USER_SCHEMA_DISPLAYNAME"},
 			Destination: &cfg.Reva.LDAP.UserSchema.DisplayName,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_USER_SCHEMA_CN"},
-			Destination: &cfg.Reva.LDAP.UserSchema.CN,
+			EnvVars:     []string{"LDAP_USER_SCHEMA_USERNAME", "STORAGE_LDAP_USER_SCHEMA_USERNAME"},
+			Destination: &cfg.Reva.LDAP.UserSchema.Username,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_USER_SCHEMA_UID_NUMBER"},
+			EnvVars:     []string{"LDAP_USER_SCHEMA_UID_NUMBER", "STORAGE_LDAP_USER_SCHEMA_UID_NUMBER"},
 			Destination: &cfg.Reva.LDAP.UserSchema.UIDNumber,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_USER_SCHEMA_GID_NUMBER"},
+			EnvVars:     []string{"LDAP_USER_SCHEMA_GID_NUMBER", "STORAGE_LDAP_USER_SCHEMA_GID_NUMBER"},
 			Destination: &cfg.Reva.LDAP.UserSchema.GIDNumber,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_GROUP_SCHEMA_GID"},
-			Destination: &cfg.Reva.LDAP.GroupSchema.GID,
+			EnvVars:     []string{"LDAP_GROUP_SCHEMA_ID", "STORAGE_LDAP_GROUP_SCHEMA_ID"},
+			Destination: &cfg.Reva.LDAP.GroupSchema.ID,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_GROUP_SCHEMA_MAIL"},
+			EnvVars:     []string{"LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING", "STORAGE_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING"},
+			Destination: &cfg.Reva.LDAP.GroupSchema.IDIsOctetString,
+		},
+		{
+			EnvVars:     []string{"LDAP_GROUP_SCHEMA_MAIL", "STORAGE_LDAP_GROUP_SCHEMA_MAIL"},
 			Destination: &cfg.Reva.LDAP.GroupSchema.Mail,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_GROUP_SCHEMA_DISPLAYNAME"},
+			EnvVars:     []string{"LDAP_GROUP_SCHEMA_DISPLAYNAME", "STORAGE_LDAP_GROUP_SCHEMA_DISPLAYNAME"},
 			Destination: &cfg.Reva.LDAP.GroupSchema.DisplayName,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_GROUP_SCHEMA_CN"},
-			Destination: &cfg.Reva.LDAP.GroupSchema.CN,
+			EnvVars:     []string{"LDAP_GROUP_SCHEMA_GROUPNAME", "STORAGE_LDAP_GROUP_SCHEMA_GROUPNAME"},
+			Destination: &cfg.Reva.LDAP.GroupSchema.Groupname,
 		},
 		{
-			EnvVars:     []string{"STORAGE_LDAP_GROUP_SCHEMA_GID_NUMBER"},
+			EnvVars:     []string{"LDAP_GROUP_SCHEMA_MEMBER", "STORAGE_LDAP_GROUP_SCHEMA_MEMBER"},
+			Destination: &cfg.Reva.LDAP.GroupSchema.Member,
+		},
+		{
+			EnvVars:     []string{"LDAP_GROUP_SCHEMA_GID_NUMBER", "STORAGE_LDAP_GROUP_SCHEMA_GID_NUMBER"},
 			Destination: &cfg.Reva.LDAP.GroupSchema.GIDNumber,
 		},
 

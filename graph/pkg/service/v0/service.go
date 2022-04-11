@@ -96,6 +96,7 @@ func NewService(opts ...Option) Service {
 		logger:               &options.Logger,
 		identityBackend:      backend,
 		spacePropertiesCache: ttlcache.NewCache(),
+		eventsPublisher:      options.EventsPublisher,
 	}
 	if options.GatewayClient == nil {
 		var err error

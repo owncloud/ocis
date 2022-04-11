@@ -27,21 +27,22 @@ type Config struct {
 
 // Ldap defines the available LDAP configuration.
 type Ldap struct {
-	URI string `yaml:"uri" env:"IDP_LDAP_URI"`
+	URI string `yaml:"uri" env:"LDAP_URI;IDP_LDAP_URI"`
 
-	BindDN       string `yaml:"bind_dn" env:"IDP_LDAP_BIND_DN"`
-	BindPassword string `yaml:"bind_password" env:"IDP_LDAP_BIND_PASSWORD"`
+	BindDN       string `yaml:"bind_dn" env:"LDAP_BIND_DN;IDP_LDAP_BIND_DN"`
+	BindPassword string `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;IDP_LDAP_BIND_PASSWORD"`
 
-	BaseDN string `yaml:"base_dn" env:"IDP_LDAP_BASE_DN"`
-	Scope  string `yaml:"scope" env:"IDP_LDAP_SCOPE"`
+	BaseDN string `yaml:"base_dn" env:"LDAP_USER_BASE_DN,IDP_LDAP_BASE_DN"`
+	Scope  string `yaml:"scope" env:"LDAP_USER_SCOPE;IDP_LDAP_SCOPE"`
 
 	LoginAttribute    string `yaml:"login_attribute" env:"IDP_LDAP_LOGIN_ATTRIBUTE"`
-	EmailAttribute    string `yaml:"email_attribute" env:"IDP_LDAP_EMAIL_ATTRIBUTE"`
-	NameAttribute     string `yaml:"name_attribute" env:"IDP_LDAP_NAME_ATTRIBUTE"`
-	UUIDAttribute     string `yaml:"uuid_attribute" env:"IDP_LDAP_UUID_ATTRIBUTE"`
+	EmailAttribute    string `yaml:"email_attribute" env:"LDAP_USER_SCHEMA_MAIL;IDP_LDAP_EMAIL_ATTRIBUTE"`
+	NameAttribute     string `yaml:"name_attribute" env:"LDAP_USER_SCHEMA_USERNAME;IDP_LDAP_NAME_ATTRIBUTE"`
+	UUIDAttribute     string `yaml:"uuid_attribute" env:"LDAP_USER_SCHEMA_ID;IDP_LDAP_UUID_ATTRIBUTE"`
 	UUIDAttributeType string `yaml:"uuid_attribute_type" env:"IDP_LDAP_UUID_ATTRIBUTE_TYPE"`
 
-	Filter string `yaml:"filter" env:"IDP_LDAP_FILTER"`
+	Filter      string `yaml:"filter" env:"LDAP_USER_FILTER;IDP_LDAP_FILTER"`
+	ObjectClass string `yaml:"objectclass" env:"LDAP_USER_OBJECTCLASS;IDP_LDAP_OBJECTCLASS"`
 }
 
 // Asset defines the available asset configuration.

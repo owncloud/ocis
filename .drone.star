@@ -1627,6 +1627,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_LOG_LEVEL": "error",
             "SETTINGS_DATA_PATH": "/srv/app/tmp/ocis/settings",
             "OCIS_INSECURE": "true",
+            "ACCOUNTS_DEMO_USERS_AND_GROUPS": True,  # deprecated, remove after switching to LibreIDM
+            "IDM_CREATE_DEMO_USERS": True,
         }
     else:
         user = "33:33"
@@ -1640,8 +1642,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "STORAGE_LDAP_IDP": "https://keycloak/auth/realms/owncloud",
             "WEB_OIDC_SCOPE": "openid profile email owncloud",
             # LDAP bind
-            "STORAGE_LDAP_HOSTNAME": "openldap",
-            "STORAGE_LDAP_PORT": 636,
+            "STORAGE_LDAP_URI": "ldaps://openldap",
             "STORAGE_LDAP_INSECURE": "true",
             "STORAGE_LDAP_BIND_DN": "cn=admin,dc=owncloud,dc=com",
             "STORAGE_LDAP_BIND_PASSWORD": "admin",
@@ -1650,25 +1651,24 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "PROXY_ACCOUNT_BACKEND_TYPE": "cs3",  # proxy should get users from CS3APIS (which gets it from LDAP)
             "PROXY_USER_OIDC_CLAIM": "ocis.user.uuid",  # claim was added in Keycloak
             "PROXY_USER_CS3_CLAIM": "userid",  # equals STORAGE_LDAP_USER_SCHEMA_UID
-            "STORAGE_LDAP_BASE_DN": "dc=owncloud,dc=com",
+            "STORAGE_LDAP_GROUP_BASE_DN": "ou=testgroups,dc=owncloud,dc=com",
+            "STORAGE_LDAP_GROUP_OBJECTCLASS": "groupOfUniqueNames",
+            "STORAGE_LDAP_GROUPFILTER": "(objectclass=owncloud)",
             "STORAGE_LDAP_GROUP_SCHEMA_DISPLAYNAME": "cn",
             "STORAGE_LDAP_GROUP_SCHEMA_GID_NUMBER": "gidnumber",
-            "STORAGE_LDAP_GROUP_SCHEMA_GID": "cn",
+            "STORAGE_LDAP_GROUP_SCHEMA_ID": "cn",
             "STORAGE_LDAP_GROUP_SCHEMA_MAIL": "mail",
-            "STORAGE_LDAP_GROUPATTRIBUTEFILTER": "(&(objectclass=posixGroup)(objectclass=owncloud)({{attr}}={{value}}))",
-            "STORAGE_LDAP_GROUPFILTER": "(&(objectclass=groupOfUniqueNames)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))",
-            "STORAGE_LDAP_GROUPMEMBERFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))",
-            "STORAGE_LDAP_USERGROUPFILTER": "(&(objectclass=posixGroup)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))",
-            "STORAGE_LDAP_USER_SCHEMA_CN": "cn",
+            "STORAGE_LDAP_GROUP_SCHEMA_MEMBER": "cn",
+            "STORAGE_LDAP_USER_BASE_DN": "ou=testusers,dc=owncloud,dc=com",
+            "STORAGE_LDAP_USER_OBJECTCLASS": "posixAccount",
+            "STORAGE_LDAP_USERFILTER": "(objectclass=owncloud)",
+            "STORAGE_LDAP_USER_SCHEMA_USERNAME": "cn",
             "STORAGE_LDAP_USER_SCHEMA_DISPLAYNAME": "displayname",
             "STORAGE_LDAP_USER_SCHEMA_GID_NUMBER": "gidnumber",
             "STORAGE_LDAP_USER_SCHEMA_MAIL": "mail",
             "STORAGE_LDAP_USER_SCHEMA_UID_NUMBER": "uidnumber",
-            "STORAGE_LDAP_USER_SCHEMA_UID": "ownclouduuid",
-            "STORAGE_LDAP_LOGINFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(|(uid={{login}})(mail={{login}})))",
-            "STORAGE_LDAP_USERATTRIBUTEFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)({{attr}}={{value}}))",
-            "STORAGE_LDAP_USERFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(|(ownclouduuid={{.OpaqueId}})(uid={{.OpaqueId}})))",
-            "STORAGE_LDAP_USERFINDFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
+            "STORAGE_LDAP_USER_SCHEMA_ID": "ownclouduuid",
+            "STORAGE_LDAP_LOGIN_ATTRIBUTES": "uid,mail",
             # ownCloudSQL storage driver
             "STORAGE_HOME_DRIVER": "owncloudsql",
             "STORAGE_USERS_DRIVER": "owncloudsql",
@@ -1707,6 +1707,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_MACHINE_AUTH_API_KEY": "change-me-please",
             "OCIS_INSECURE": "true",
             "PROXY_ENABLE_BASIC_AUTH": "true",
+            "ACCOUNTS_DEMO_USERS_AND_GROUPS": True,  # deprecated, remove after switching to LibreIDM
+            "IDM_CREATE_DEMO_USERS": True,
         }
 
     # Pass in "default" accounts_hash_difficulty to not set this environment variable.

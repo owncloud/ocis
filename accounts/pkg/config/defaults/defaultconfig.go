@@ -49,7 +49,7 @@ func DefaultConfig() *config.Config {
 			JWTSecret: "Pive-Fumkiu4",
 		},
 		HashDifficulty:     11,
-		DemoUsersAndGroups: true,
+		DemoUsersAndGroups: false,
 		Repo: config.Repo{
 			Backend: "CS3",
 			Disk: config.Disk{

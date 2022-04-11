@@ -22,7 +22,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.2
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220328105952-297bef33e13f
-	github.com/cs3org/reva/v2 v2.0.0-20220408142652-148b87297214
+	github.com/cs3org/reva/v2 v2.0.0-20220411200520-865ba723f25a
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.7
@@ -52,6 +52,7 @@ require (
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
+	github.com/onsi/ginkgo/v2 v2.1.3
 	github.com/onsi/gomega v1.19.0
 	github.com/owncloud/libre-graph-api-go v0.13.3
 	github.com/pkg/errors v0.9.1
@@ -273,6 +274,3 @@ require (
 replace github.com/pkg/xattr => github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7
 
 replace github.com/cs3org/go-cs3apis => github.com/kobergj/go-cs3apis v0.0.0-20220406134716-65f04386eb09 // temp fork until cs3api change is merged
-
-// testing for https://github.com/cs3org/reva/pull/2665
-replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20220408075257-493d305e0c37

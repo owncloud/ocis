@@ -13,6 +13,7 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/graph/pkg/service/v0/errorcode"
 
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
@@ -81,6 +82,9 @@ func (g Graph) PostGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if grp != nil && grp.Id != nil {
+		g.publishEvent(events.GroupCreated{GroupID: *grp.Id})
+	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, grp)
 }
@@ -197,6 +201,8 @@ func (g Graph) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	g.publishEvent(events.GroupDeleted{GroupID: groupID})
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
 }
@@ -279,6 +285,8 @@ func (g Graph) PostGroupMember(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	g.publishEvent(events.GroupMemberAdded{GroupID: groupID, UserID: id})
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
 }
@@ -322,6 +330,7 @@ func (g Graph) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	g.publishEvent(events.GroupMemberRemoved{GroupID: groupID, UserID: memberID})
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
 }
