@@ -1619,6 +1619,7 @@ def notify(ctx):
 
 def ocisServerWithIdp():
     environment = {
+        "OCIS_LOG_LEVEL": "debug",
         "GRAPH_IDENTITY_BACKEND": "ldap",
         "GRAPH_LDAP_URI": "ldaps://0.0.0.0:9235",
         "GRAPH_LDAP_BIND_DN": "uid=libregraph,ou=sysusers,o=libregraph-idm",
