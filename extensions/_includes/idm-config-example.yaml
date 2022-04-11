@@ -21,6 +21,7 @@ idm:
   database: ~/.ocis/idm/ocis.boltdb
 create_demo_users: false
 service_user_passwords:
-  admin_password: idm
+  admin_password: admin
+  idm_password: idm
   reva_password: reva
   idp_password: idp
