@@ -85,7 +85,7 @@ function Chooseaccount({ loading, errors, classes, hello, history, dispatch }) {
             className={classes.accountListItem}
             disabled={!!loading}
             onClick={(event) => logon(event)}
-          ><ListItemAvatar><Avatar>{username.substr(0, 1)}</Avatar></ListItemAvatar>
+          ><ListItemAvatar><Avatar>{username.slice(0, 1)}</Avatar></ListItemAvatar>
             <ListItemText className="oc-light" primary={username} />
           </ListItem>
           <ListItem
