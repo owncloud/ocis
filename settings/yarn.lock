@@ -1337,10 +1337,10 @@
     reflect-metadata "0.1.13"
     uuid "8.3.2"
 
-"@cucumber/pretty-formatter@^1.0.0-alpha.1":
-  version "1.0.0-alpha.1"
-  resolved "https://registry.yarnpkg.com/@cucumber/pretty-formatter/-/pretty-formatter-1.0.0-alpha.1.tgz#361eb972036c6cf114f2978b42c79c48ea800f0e"
-  integrity sha512-emVFdRkEFAqksd3X9cMWn7cOE2fIPB0aTwZAFZPMO55ZRf+7IaZ7VlEY2Pd5qPxhTXNmyZvaBf6AOoZmx47pmA==
+"@cucumber/pretty-formatter@^1.0.0-alpha.2":
+  version "1.0.0-alpha.2"
+  resolved "https://registry.yarnpkg.com/@cucumber/pretty-formatter/-/pretty-formatter-1.0.0-alpha.2.tgz#929d29b45f2fa9b7d36e4371e8dd0869e9f32f52"
+  integrity sha512-+tFbS2idJ8yL+saEYGBaJLkhU9glxmS6FMD22S/bfZsi/c3LeLMeo1ZkNeyzuxV7Yq9jGFjiwgZ+iRaO/bN8hw==
   dependencies:
     ansi-styles "^5.0.0"
     cli-table3 "^0.6.0"
