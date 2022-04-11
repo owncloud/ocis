@@ -15,10 +15,27 @@ objectClass: organizationalUnit
 ou: groups
 
 {{ range . -}}
+{{ if eq .Name "admin" -}}
+dn: uid=admin,ou=users,o=libregraph-idm
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: ownCloud
+objectClass: person
+objectClass: top
+uid: admin
+givenName: Admin
+sn: Admin
+cn: admin
+displayName: Admin
+description: An admin for this oCIS instance.
+mail: admin@example.org
+ownCloudUUID: ddc2004c-0977-11eb-9d3f-a793888cd0f8
+{{ else -}}
 dn: uid={{ .Name }},ou=sysusers,o=libregraph-idm
 objectClass: account
 objectClass: simpleSecurityObject
 uid: {{ .Name }}
+{{ end -}}
 userPassword:: {{ .Password }}
 
 {{ end -}}

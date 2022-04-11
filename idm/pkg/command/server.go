@@ -90,8 +90,12 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 
 	serviceUsers := []svcUser{
 		{
+			Name:     "admin",
+			Password: cfg.ServiceUserPasswords.OcisAdmin,
+		},
+		{
 			Name:     "libregraph",
-			Password: cfg.ServiceUserPasswords.IdmAdmin,
+			Password: cfg.ServiceUserPasswords.Idm,
 		},
 		{
 			Name:     "idp",
@@ -141,7 +145,6 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 	}
 
 	bootstrapData := tmplWriter.String()
-
 	if cfg.CreateDemoUsers {
 		bootstrapData = bootstrapData + "\n" + idm.DemoUsersLDIF
 	}
