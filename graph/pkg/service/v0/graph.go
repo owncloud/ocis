@@ -7,11 +7,13 @@ import (
 	"github.com/ReneKroon/ttlcache/v2"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/graph/pkg/config"
 	"github.com/owncloud/ocis/graph/pkg/identity"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
+	mevents "go-micro.dev/v4/events"
 	"google.golang.org/grpc"
 )
 
@@ -51,6 +53,11 @@ type GatewayClient interface {
 	GetQuota(ctx context.Context, in *gateway.GetQuotaRequest, opts ...grpc.CallOption) (*provider.GetQuotaResponse, error)
 }
 
+// Publisher is the interface for events publisher
+type Publisher interface {
+	Publish(string, interface{}, ...mevents.PublishOption) error
+}
+
 // HTTPClient is the subset of the http.Client that is being used to interact with the download gateway
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
@@ -69,6 +76,7 @@ type Graph struct {
 	httpClient           HTTPClient
 	roleService          settingssvc.RoleService
 	spacePropertiesCache *ttlcache.Cache
+	eventsPublisher      events.Publisher
 }
 
 // ServeHTTP implements the Service interface.
@@ -84,6 +92,14 @@ func (g Graph) GetGatewayClient() GatewayClient {
 // GetClient returns a gateway client to talk to reva
 func (g Graph) GetHTTPClient() HTTPClient {
 	return g.httpClient
+}
+
+func (g Graph) publishEvent(ev interface{}) {
+	if err := events.Publish(g.eventsPublisher, ev); err != nil {
+		g.logger.Error().
+			Err(err).
+			Msg("could not publish user created event")
+	}
 }
 
 type listResponse struct {

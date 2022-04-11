@@ -25,20 +25,23 @@ import (
 
 var _ = Describe("Graph", func() {
 	var (
-		svc           service.Service
-		gatewayClient *mocks.GatewayClient
-		httpClient    *mocks.HTTPClient
-		ctx           context.Context
+		svc             service.Service
+		gatewayClient   *mocks.GatewayClient
+		httpClient      *mocks.HTTPClient
+		eventsPublisher mocks.Publisher
+		ctx             context.Context
 	)
 
 	JustBeforeEach(func() {
 		ctx = context.Background()
 		gatewayClient = &mocks.GatewayClient{}
 		httpClient = &mocks.HTTPClient{}
+		eventsPublisher = mocks.Publisher{}
 		svc = service.NewService(
 			service.Config(defaults.DefaultConfig()),
 			service.WithGatewayClient(gatewayClient),
 			service.WithHTTPClient(httpClient),
+			service.EventsPublisher(&eventsPublisher),
 		)
 	})
 

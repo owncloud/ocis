@@ -12,6 +12,7 @@ import (
 
 	"github.com/CiscoM31/godata"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -133,6 +134,9 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Sprintf("could not assign role to account %s", err.Error()))
 		return
 	}
+
+	g.publishEvent(events.UserCreated{UserID: *u.Id})
+
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, u)
 }
@@ -187,6 +191,9 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
 	}
+
+	g.publishEvent(events.UserDeleted{UserID: userID})
+
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
 }
@@ -211,12 +218,18 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var features []events.UserFeature
 	if mail, ok := changes.GetMailOk(); ok {
 		if !isValidEmail(*mail) {
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
 				fmt.Sprintf("'%s' is not a valid email address", *mail))
 			return
 		}
+		features = append(features, events.UserFeature{Name: "email", Value: *mail})
+	}
+
+	if name, ok := changes.GetDisplayNameOk(); ok {
+		features = append(features, events.UserFeature{Name: "displayname", Value: *name})
 	}
 
 	u, err := g.identityBackend.UpdateUser(r.Context(), nameOrID, *changes)
@@ -229,6 +242,12 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	g.publishEvent(
+		events.UserFeatureChanged{
+			UserID:   nameOrID,
+			Features: features,
+		},
+	)
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, u)
 
