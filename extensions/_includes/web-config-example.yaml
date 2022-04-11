@@ -38,7 +38,8 @@ web:
     apps:
     - files
     - search
-    - media-viewer
+    - preview
+    - text-editor
     - pdf-viewer
     - external
     external_apps: []
