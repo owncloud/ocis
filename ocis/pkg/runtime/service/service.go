@@ -108,6 +108,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["web"] = web.NewSutureService
 	s.ServicesRegistry["webdav"] = webdav.NewSutureService
 	s.ServicesRegistry["storage-frontend"] = storage.NewFrontend
+	s.ServicesRegistry["ocdav"] = storage.NewOCDav
 	s.ServicesRegistry["storage-gateway"] = storage.NewGateway
 	s.ServicesRegistry["storage-userprovider"] = storage.NewUserProvider
 	s.ServicesRegistry["storage-groupprovider"] = storage.NewGroupProvider

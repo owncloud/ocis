@@ -43,12 +43,15 @@ type Policy struct {
 	Routes []Route `yaml:"routes"`
 }
 
-// Route define forwarding routes
+// Route defines forwarding routes
 type Route struct {
-	Type        RouteType `yaml:"type"`
-	Endpoint    string    `yaml:"endpoint"`
-	Backend     string    `yaml:"backend"`
-	ApacheVHost bool      `yaml:"apache-vhost"`
+	Type     RouteType `yaml:"type"`
+	Endpoint string    `yaml:"endpoint"`
+	// Backend is a static URL to forward the request to
+	Backend string `yaml:"backend"`
+	// Service name to look up in the registry
+	Service     string `yaml:"service"`
+	ApacheVHost bool   `yaml:"apache-vhost"`
 }
 
 // RouteType defines the type of a route

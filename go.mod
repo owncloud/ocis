@@ -15,14 +15,14 @@ require (
 	github.com/asim/go-micro/plugins/registry/mdns/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/asim/go-micro/plugins/registry/nats/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/asim/go-micro/plugins/server/grpc/v4 v4.0.0-20220118152736-9e0be6c85d75
-	github.com/asim/go-micro/plugins/server/http/v4 v4.0.0-20220118152736-9e0be6c85d75
+	github.com/asim/go-micro/plugins/server/http/v4 v4.0.0-20220317022205-c6d352c83291
 	github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/blevesearch/bleve/v2 v2.3.2
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220328105952-297bef33e13f
-	github.com/cs3org/reva/v2 v2.0.0-20220411161034-134ed5a0801f
+	github.com/cs3org/reva/v2 v2.0.0-20220411200520-865ba723f25a
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.7
