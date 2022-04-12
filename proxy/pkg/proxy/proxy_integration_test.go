@@ -108,6 +108,36 @@ func TestProxyIntegration(t *testing.T) {
 			},
 		})).withRequest("GET", "https://example.com/user/1234", nil).
 			expectProxyTo("http://users.example.com/user/1234"),
+
+		// Method routing
+		test("mixed_types", withPolicy("ocis", withRoutes{
+			{
+				Type:     config.PrefixRoute,
+				Endpoint: "/dav/",
+				Backend:  "http://reva-ocdav",
+			},
+			{
+				Type:     config.PrefixRoute,
+				Method:   "REPORT",
+				Endpoint: "/dav/",
+				Backend:  "http://ocis-webdav",
+			},
+		})).withRequest("REPORT", "https://example.com/dav/files/1234", nil).
+			expectProxyTo("http://ocis-webdav/dav/files/1234"),
+		test("mixed_types", withPolicy("ocis", withRoutes{
+			{
+				Type:     config.PrefixRoute,
+				Endpoint: "/dav/",
+				Backend:  "http://reva-ocdav",
+			},
+			{
+				Type:     config.PrefixRoute,
+				Method:   "REPORT",
+				Endpoint: "/dav/",
+				Backend:  "http://ocis-webdav",
+			},
+		})).withRequest("PROPFIND", "https://example.com/dav/files/1234", nil).
+			expectProxyTo("http://reva-ocdav/dav/files/1234"),
 	}
 
 	for k := range tests {
