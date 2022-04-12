@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/owncloud/ocis/idm/pkg/command"
-	"github.com/owncloud/ocis/idm/pkg/config/defaults"
+	"github.com/owncloud/ocis/extensions/idm/pkg/command"
+	"github.com/owncloud/ocis/extensions/idm/pkg/config/defaults"
 )
 
 func main() {

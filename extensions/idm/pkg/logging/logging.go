@@ -1,7 +1,7 @@
 package logging
 
 import (
-	"github.com/owncloud/ocis/idm/pkg/config"
+	"github.com/owncloud/ocis/extensions/idm/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 

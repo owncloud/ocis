@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/owncloud/ocis/idm/pkg/config"
-	"github.com/owncloud/ocis/idm/pkg/config/parser"
-	"github.com/owncloud/ocis/idm/pkg/logging"
+	"github.com/owncloud/ocis/extensions/idm/pkg/config"
+	"github.com/owncloud/ocis/extensions/idm/pkg/config/parser"
+	"github.com/owncloud/ocis/extensions/idm/pkg/logging"
 	"github.com/urfave/cli/v2"
 )
 
