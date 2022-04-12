@@ -11,7 +11,7 @@ import (
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/config"
 	idp "github.com/owncloud/ocis/extensions/idp/pkg/config"
 	nats "github.com/owncloud/ocis/extensions/nats/pkg/config"
-	notifications "github.com/owncloud/ocis/notifications/pkg/config"
+	notifications "github.com/owncloud/ocis/extensions/notifications/pkg/config"
 	ocs "github.com/owncloud/ocis/ocs/pkg/config"
 	proxy "github.com/owncloud/ocis/proxy/pkg/config"
 	settings "github.com/owncloud/ocis/settings/pkg/config"

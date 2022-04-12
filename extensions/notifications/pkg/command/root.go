@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/owncloud/ocis/notifications/pkg/config"
+	"github.com/owncloud/ocis/extensions/notifications/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/clihelper"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/thejerf/suture/v4"

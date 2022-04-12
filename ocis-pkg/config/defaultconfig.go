@@ -9,7 +9,7 @@ import (
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/config/defaults"
 	idp "github.com/owncloud/ocis/extensions/idp/pkg/config/defaults"
 	nats "github.com/owncloud/ocis/extensions/nats/pkg/config/defaults"
-	notifications "github.com/owncloud/ocis/notifications/pkg/config/defaults"
+	notifications "github.com/owncloud/ocis/extensions/notifications/pkg/config/defaults"
 	ocs "github.com/owncloud/ocis/ocs/pkg/config/defaults"
 	proxy "github.com/owncloud/ocis/proxy/pkg/config/defaults"
 	settings "github.com/owncloud/ocis/settings/pkg/config/defaults"

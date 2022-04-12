@@ -26,7 +26,7 @@ import (
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/command"
 	idp "github.com/owncloud/ocis/extensions/idp/pkg/command"
 	nats "github.com/owncloud/ocis/extensions/nats/pkg/command"
-	notifications "github.com/owncloud/ocis/notifications/pkg/command"
+	notifications "github.com/owncloud/ocis/extensions/notifications/pkg/command"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"

@@ -1,7 +1,7 @@
 package logging
 
 import (
-	"github.com/owncloud/ocis/notifications/pkg/config"
+	"github.com/owncloud/ocis/extensions/notifications/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
