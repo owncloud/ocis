@@ -4,12 +4,14 @@
 
 ocis/config/identifier-registration.yaml
 */bin
+extensions/*/bin
 dist/
 /hugo
 *.key
 *crt
 node_modules/
 */assets
+extensions/*/assets
 ocis/ocis
 ocis/cmd/ocis/__debug_bin
 ocis/cmd/ocis/config/
