@@ -1,0 +1,50 @@
+<!-- Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information. -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Graph explorer depends on ACE editor -->
+        <!-- Must be inclued separetely -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.0/ace.js"></script>
+
+        <!--hello.js-->
+        <script src="node_modules/hellojs/dist/hello.all.js"></script>
+
+        <!--Fabric-->
+        <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-js/1.4.0/css/fabric.min.css">
+        <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-js/1.4.0/css/fabric.components.min.css">
+        <script src="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-js/1.4.0/js/fabric.min.js"></script>
+
+        <!-- MWF -->
+        <link rel="stylesheet"
+        href="https://www.microsoft.com/mwf/css/bundle/1.57.4/west-european/default/mwf-main.min.css?apiVersion=1.0">
+        <script src="https://mwf-service.akamaized.net/mwf/js/bundle/1.57.4/mwf-auto-init-main.var.min.js"></script>
+
+        <link rel="stylesheet" href="src/custom.css" />
+
+        <!-- moment js -->
+        <script src="node_modules/moment/min/moment-with-locales.min.js"></script>
+
+        <!-- jQuery -->
+        <script
+            src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+
+        <!-- clientId, scopes, redirectUrl -->
+        <script src="secrets.js"></script>
+        <script src="config.js"></script>
+
+        <!-- Polyfill(s) for older browsers -->
+        <script src="node_modules/core-js/client/shim.min.js"></script>
+
+        <script src="node_modules/zone.js/dist/zone.js"></script>
+        <script src="node_modules/systemjs/dist/system.src.js"></script>
+
+    </head>
+    <body>
+
+        <api-explorer></api-explorer>
+
+        <script src="dist/explorer.js"></script>
+    </body>
+</html>

@@ -1,0 +1,131 @@
+/* ------------------------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
+// ------------------------------------------------------------------------------*/
+.ace_editor {
+    box-shadow: none !important;
+    position: relative;
+}
+
+#response-viewer-labels {
+    margin-top: 10px;
+}
+
+.ms-Pivot-link:focus {
+    outline: none;
+}
+
+#jsonViewer, #response-header-viewer {
+    height: 50vh;
+    border: 1px solid #ccc;
+}
+
+.ace_link_marker {
+    position: absolute;
+    border-bottom: 1px solid blue;
+}
+
+.ace-tm .ace_invalid {
+    color: inherit;
+    background-color: inherit;
+}
+
+#graph-version-select #-Other {
+    display: none;
+}
+
+api-explorer button {
+    min-width: initial;
+}
+
+.ms-Spinner-circle {
+    background-color: white !important;
+}
+
+api-explorer .c-select-menu>a:after, api-explorer .c-select-menu>button:after {
+    position: absolute;
+    font-size: 8px;
+    color: rgba(0,0,0,.8);
+    font-weight: 700;
+    background: white;
+    height: 100%;
+    padding-right: 5px;
+    right: 0px;
+    top: 0px;
+    padding-top: 14px;
+    padding-left: 5px;
+}
+
+#httpMethodSelect button {
+    color: white;
+    width: 85px;
+    text-align: center;
+}
+
+#httpMethodSelect.GET .c-select-menu.f-border button {
+    background-color: #000fdf;
+}
+
+#httpMethodSelect.POST .c-select-menu.f-border button {
+    background-color: #008412;
+}
+
+#httpMethodSelect.PATCH .c-select-menu.f-border button {
+    background-color: #be8b00;
+}
+
+#httpMethodSelect.DELETE .c-select-menu.f-border button {
+    background-color: #a10000;
+}
+
+#httpMethodSelect.PUT .c-select-menu.f-border button {
+    background-color: #5C005C;
+}
+
+.m-auto-suggest .c-menu-item strong {
+    font-weight: normal;
+}
+
+
+/*override mwf*/
+.fixed-with-mwf-menu ul.c-menu {
+    width: 100px !important;
+}
+
+/* frontdoor */
+.ms-PanelHost {
+    z-index: 3000002;
+}
+
+#deltaUi {
+    display: none;
+}
+
+.ms-Overlay.is-visible {
+    z-index: 990;
+}
+
+.c-menu-item {
+    margin-bottom: 0px;
+}
+
+.ms-Panel.is-open {
+    z-index: 999;
+}
+
+.c-search input[type=search] {
+    padding: 7px;
+    max-height: 32px;
+    padding-right: 0px;
+}
+
+.ms-Dialog {
+    z-index: 999;
+}
+
+*:focus {
+    outline: 2px solid #4fc3f7;
+}
+
+.link {
+    color: #006cd8 !important;
+}
