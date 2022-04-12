@@ -1,15 +1,19 @@
 package proxy
 
 import (
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"testing"
 
+	"github.com/owncloud/ocis/proxy/pkg/config"
 	"github.com/owncloud/ocis/proxy/pkg/config/defaults"
 )
 
 type matchertest struct {
-	endpoint, target string
-	matches          bool
+	method, endpoint, target string
+	matches                  bool
 }
 
 func TestPrefixRouteMatcher(t *testing.T) {
@@ -96,6 +100,38 @@ func TestSingleJoiningSlash(t *testing.T) {
 		p := singleJoiningSlash(test.a, test.b)
 		if p != test.result {
 			t.Errorf("SingleJoiningSlash got %s expected %s", p, test.result)
+		}
+	}
+}
+
+func TestDirectorSelectionDirector(t *testing.T) {
+
+	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "ok")
+	}))
+	defer svr.Close()
+
+	p := NewMultiHostReverseProxy(Config(&config.Config{
+		PolicySelector: &config.PolicySelector{
+			Static: &config.StaticSelectorConf{
+				Policy: "default",
+			},
+		},
+	}))
+	p.AddHost("default", &url.URL{Host: "ocdav"}, config.Route{Type: config.PrefixRoute, Method: "", Endpoint: "/dav", Backend: "ocdav"})
+	p.AddHost("default", &url.URL{Host: "ocis-webdav"}, config.Route{Type: config.PrefixRoute, Method: "REPORT", Endpoint: "/dav", Backend: "ocis-webdav"})
+
+	table := []matchertest{
+		{method: "PROPFIND", endpoint: "/dav/files/demo/", target: "ocdav"},
+		{method: "REPORT", endpoint: "/dav/files/demo/", target: "ocis-webdav"},
+	}
+
+	for _, test := range table {
+		r := httptest.NewRequest(http.MethodGet, "/dav/files/demo/", nil)
+		p.directorSelectionDirector(r)
+		if r.Host != test.target {
+			t.Errorf("TestDirectorSelectionDirector got host %s expected %s", r.Host, test.target)
+
 		}
 	}
 }

@@ -45,10 +45,12 @@ type Policy struct {
 
 // Route define forwarding routes
 type Route struct {
-	Type        RouteType `ocisConfig:"type"`
-	Endpoint    string    `ocisConfig:"endpoint"`
-	Backend     string    `ocisConfig:"backend"`
-	ApacheVHost bool      `ocisConfig:"apache-vhost"`
+	Type RouteType `ocisConfig:"type"`
+	// Method optionally limits the route to this HTTP method
+	Method      string `ocisConfig:"method"`
+	Endpoint    string `ocisConfig:"endpoint"`
+	Backend     string `ocisConfig:"backend"`
+	ApacheVHost bool   `ocisConfig:"apache-vhost"`
 }
 
 // RouteType defines the type of a route
