@@ -13,7 +13,7 @@ import (
 	nats "github.com/owncloud/ocis/extensions/nats/pkg/config"
 	notifications "github.com/owncloud/ocis/extensions/notifications/pkg/config"
 	ocs "github.com/owncloud/ocis/extensions/ocs/pkg/config"
-	proxy "github.com/owncloud/ocis/proxy/pkg/config"
+	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config"
 	settings "github.com/owncloud/ocis/settings/pkg/config"
 	storage "github.com/owncloud/ocis/storage/pkg/config"
 	store "github.com/owncloud/ocis/store/pkg/config"

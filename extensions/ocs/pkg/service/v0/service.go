@@ -17,12 +17,12 @@ import (
 	ocsm "github.com/owncloud/ocis/extensions/ocs/pkg/middleware"
 	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/response"
+	"github.com/owncloud/ocis/extensions/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/ocis-pkg/account"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	opkgm "github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
-	"github.com/owncloud/ocis/proxy/pkg/user/backend"
 )
 
 // Service defines the extension handlers.
