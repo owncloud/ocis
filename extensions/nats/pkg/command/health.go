@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/owncloud/ocis/nats/pkg/config"
+	"github.com/owncloud/ocis/extensions/nats/pkg/config"
 	"github.com/urfave/cli/v2"
 )
 

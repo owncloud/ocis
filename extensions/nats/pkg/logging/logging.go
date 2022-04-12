@@ -1,7 +1,7 @@
 package logging
 
 import (
-	"github.com/owncloud/ocis/nats/pkg/config"
+	"github.com/owncloud/ocis/extensions/nats/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
