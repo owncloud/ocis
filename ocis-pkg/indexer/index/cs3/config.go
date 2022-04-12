@@ -1,7 +1,7 @@
 package cs3
 
 import (
-	acccfg "github.com/owncloud/ocis/accounts/pkg/config"
+	acccfg "github.com/owncloud/ocis/extensions/accounts/pkg/config"
 )
 
 // Config represents cs3conf. Should be deprecated in favor of config.Config.

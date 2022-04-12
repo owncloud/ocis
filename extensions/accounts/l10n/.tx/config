@@ -1,0 +1,10 @@
+[main]
+host = https://www.transifex.com
+
+[owncloud.ocis-accounts]
+file_filter = locale/<lang>/LC_MESSAGES/app.po
+minimum_perc = 0
+source_file = template.pot
+source_lang = en
+type = PO
+

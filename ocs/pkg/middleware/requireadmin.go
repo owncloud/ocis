@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/render"
-	accounts "github.com/owncloud/ocis/accounts/pkg/service/v0"
+	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/service/v0"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/ocs/pkg/service/v0/response"
