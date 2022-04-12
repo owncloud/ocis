@@ -1658,6 +1658,7 @@ def ocisServerWithIdp():
         "PROXY_ENABLE_BASIC_AUTH": "true",
         "OCIS_LOG_LEVEL": "debug",
         "OCIS_INSECURE": "true",
+        "ACCOUNTS_DEMO_USERS_AND_GROUPS": "true",
     }
     return [
         {
