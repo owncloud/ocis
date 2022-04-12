@@ -134,7 +134,7 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 							"enable_expired_shares_cleanup": cfg.Reva.Sharing.PublicEnableExpiredSharesCleanup,
 							"janitor_run_interval":          cfg.Reva.Sharing.PublicJanitorRunInterval,
 						},
-						"oc10-sql": map[string]interface{}{
+						"owncloudsql": map[string]interface{}{
 							"gateway_addr":     cfg.Reva.Gateway.Endpoint,
 							"storage_mount_id": cfg.Reva.Sharing.UserStorageMountID,
 							"db_username":      cfg.Reva.Sharing.UserSQLUsername,
@@ -169,7 +169,7 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 							"enable_expired_shares_cleanup": cfg.Reva.Sharing.PublicEnableExpiredSharesCleanup,
 							"janitor_run_interval":          cfg.Reva.Sharing.PublicJanitorRunInterval,
 						},
-						"oc10-sql": map[string]interface{}{
+						"owncloudsql": map[string]interface{}{
 							"gateway_addr":                  cfg.Reva.Gateway.Endpoint,
 							"storage_mount_id":              cfg.Reva.Sharing.UserStorageMountID,
 							"db_username":                   cfg.Reva.Sharing.UserSQLUsername,
