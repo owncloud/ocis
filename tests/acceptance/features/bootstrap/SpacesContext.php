@@ -50,6 +50,11 @@ class SpacesContext implements Context {
 	private OCSContext $ocsContext;
 
 	/**
+	 * @var TrashbinContext
+	 */
+	private TrashbinContext $trashbinContext;
+
+	/**
 	 * @var string
 	 */
 	private string $baseUrl;
@@ -323,6 +328,7 @@ class SpacesContext implements Context {
 		// Get all the contexts you need in this context
 		$this->featureContext = $environment->getContext('FeatureContext');
 		$this->ocsContext = $environment->getContext('OCSContext');
+		$this->trashbinContext = $environment->getContext('TrashbinContext');
 		// Run the BeforeScenario function in OCSContext to set it up correctly
 		$this->ocsContext->before($scope);
 		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");
@@ -1432,7 +1438,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" has set the file "([^"]*)" as a (description|space image)\s? in a special section of the "([^"]*)" space$/
+	 * @Given /^user "([^"]*)" has set the file "([^"]*)" as a (description|space image)\s? in a special section of the "([^"]*)" space$/
 	 *
 	 * @param string $user
 	 * @param string $file
@@ -1516,7 +1522,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" has created a space "([^"]*)" with the default quota using the GraphApi$/
+	 * @Given /^user "([^"]*)" has created a space "([^"]*)" with the default quota using the GraphApi$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
@@ -1766,7 +1772,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" removes the object "([^"]*)" from space "([^"]*)"$/
+	 * @When /^user "([^"]*)" removes the (?:file|folder) "([^"]*)" from space "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $object
@@ -1818,7 +1824,30 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" has disabled a space "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has removed the (?:file|folder) "([^"]*)" from space "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $object
+	 * @param  string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function sendUserHasRemovedObjectFromSpaceRequest(
+		string $user,
+		string $object,
+		string $spaceName
+	): void {
+		$this->sendRemoveObjectFromSpaceRequest($user, $object, $spaceName);
+		$expectedHTTPStatus = "204";
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			$expectedHTTPStatus,
+			"Expected response status code should be $expectedHTTPStatus"
+		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has disabled a space "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
@@ -1919,7 +1948,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" has restored a disabled space "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has restored a disabled space "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
@@ -1936,6 +1965,141 @@ class SpacesContext implements Context {
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			$expectedHTTPStatus,
 			"Expected response status code should be $expectedHTTPStatus"
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" lists all deleted files in the trash bin of the space "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userListAllDeletedFilesinTrash(
+		string $user,
+		string $spaceName
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$fullUrl = $this->baseUrl . "/remote.php/dav/spaces/trash-bin/" . $space["id"];
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				"",
+				'PROPFIND',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				""
+			)
+		);
+	}
+
+	/**
+	 * User get all objects in the trash of project space 
+	 * 
+	 * method "getTrashbinContentFromResponseXml" borrowed from core repository
+	 * and return array like:
+	 * 	[1] => Array
+	 *       (
+	 *             [href] => /remote.php/dav/spaces/trash-bin/spaceId/objectId/
+	 *             [name] => deleted folder
+	 *             [mtime] => 1649147272
+	 *             [original-location] => deleted folder
+	 *        )
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 *
+	 * @return array
+	 * @throws GuzzleException
+	 */
+	public function getObjectsInTrashbin(
+		string $user,
+		string $spaceName
+	): array {
+		$this->userListAllDeletedFilesinTrash($user, $spaceName);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			207,
+			"Expected response status code should be 207"
+		);
+		return $this->trashbinContext->getTrashbinContentFromResponseXml(
+			$this->featureContext->getResponseXml($this->featureContext->getResponse())
+		);
+	}
+
+	/**
+	 * @Then /^as "([^"]*)" (?:file|folder|entry) "([^"]*)" should (not|)\s?exist in the trashbin of the space "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $object
+	 * @param  string $shouldOrNot   (not|)
+	 * @param  string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function checkExistanceOfObjectsInTrashbin(
+		string $user,
+		string $object,
+		string $shouldOrNot,
+		string $spaceName
+	): void {
+		$objectsInTrash = $this->getObjectsInTrashbin($user, $spaceName);
+
+		$expectedObject = "";
+		foreach ($objectsInTrash as $objectInTrash) {
+			if ($objectInTrash["name"] === $object) {
+				$expectedObject = $objectInTrash["name"];
+			}
+		};
+		if ($shouldOrNot === "not") {
+			Assert::assertEmpty($expectedObject, "$object is found in the trash, but should not be there");
+		} else Assert::assertNotEmpty($expectedObject, "$object is not found in the trash");
+	}
+
+	/**
+	 * @When /^user "([^"]*)" restores the (?:file|folder) "([^"]*)" from the trash of the space "([^"]*)" to "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $object
+	 * @param  string $spaceName
+	 * @param  string $destination
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userRestoresSpaceObjectsFromTrashRequest(
+		string $user,
+		string $object,
+		string $spaceName,
+		string $destination
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+
+		// find object in trash
+		$objectsInTrash = $this->getObjectsInTrashbin($user, $spaceName);
+		foreach ($objectsInTrash as $objectInTrash) {
+			if ($objectInTrash["name"] === $object) {
+				$pathToDeletedObject = $objectInTrash["href"];
+			}
+		};
+
+		$destination = $this->baseUrl . "/remote.php/dav/spaces/" . $space["id"] . $destination;
+		$header = ["Destination" => $destination, "Overwrite" => "F"];
+
+		$fullUrl = $this->baseUrl . $pathToDeletedObject;
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				"",
+				'MOVE',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$header,
+				""
+			)
 		);
 	}
 }
