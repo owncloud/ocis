@@ -9,6 +9,7 @@
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
 use PHPUnit\Framework\Assert;
 
@@ -79,17 +80,7 @@ class GraphContext implements Context {
 			$displayName
 		);
 		$this->featureContext->setResponse($response);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
-		$response = GraphHelper::getUser(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$requester,
-			$requesterPassword,
-			$userId
-		);
-		$this->featureContext->setResponse($response);
-		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
-		return $this->featureContext->getJsonDecodedResponse();
+		$this->featureContext->theHttpStatusCodeShouldBe(200);
 	}
 
 	/**
@@ -254,14 +245,14 @@ class GraphContext implements Context {
 		return $found;
 	}
 
-    /**
-     * @param string $user
-     * @param string $group
-     *
-     * @return void
-     * @throws JsonException
-     * @throws GuzzleException
-     */
+	/**
+	 * @param string $user
+	 * @param string $group
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
 	public function userShouldNotBeMemberInGroupUsingTheGraphApi(string $user, string $group):void {
 		$found = $this->getUserPresenceInGroupUsingTheGraphApi($user, $group);
 		Assert::assertFalse($found, __METHOD__ . " User $user is member of group $group");
@@ -306,8 +297,11 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * returns list of all groups
+	 *
 	 * @return array
 	 * @throws Exception
+	 * @throws GuzzleException
 	 */
 	public function adminHasRetrievedGroupListUsingTheGraphApi():array {
 		$response =  GraphHelper::getGroups(
@@ -317,25 +311,10 @@ class GraphContext implements Context {
 			$this->featureContext->getAdminPassword()
 		);
 		if ($response->getStatusCode() === 200) {
-			return $this->featureContext->getJsonDecodedResponse($response);
+			$jsonResponseBody = $this->featureContext->getJsonDecodedResponse($response);
+			return $jsonResponseBody["value"];
 		} else {
-			try {
-				$jsonBody = $this->featureContext->getJsonDecodedResponse($response);
-				throw new Exception(
-					__METHOD__
-					. "\nCould not retrieve groups list."
-					. "\nHTTP status code: " . $response->getStatusCode()
-					. "\nError code: " . $jsonBody["error"]["code"]
-					. "\nMessage: " . $jsonBody["error"]["message"]
-				);
-			} catch (TypeError $e) {
-				throw new Exception(
-					__METHOD__
-					. "\nCould not retrieve groups list."
-					. "\nHTTP status code: " . $response->getStatusCode()
-					. "\nResponse body: " . $response->getBody()
-				);
-			}
+			$this->throwHttpException($response, "Could not retrieve groups list.");
 		}
 	}
 
@@ -359,23 +338,7 @@ class GraphContext implements Context {
 		if ($response->getStatusCode() === 200) {
 			return $this->featureContext->getJsonDecodedResponse($response);
 		} else {
-			try {
-				$jsonBody = $this->featureContext->getJsonDecodedResponse($response);
-				throw new Exception(
-					__METHOD__
-					. "\nCould not retrieve members list for group $group."
-					. "\nHTTP status code: " . $response->getStatusCode()
-					. "\nError code: " . $jsonBody["error"]["code"]
-					. "\nMessage: " . $jsonBody["error"]["message"]
-				);
-			} catch (TypeError $e) {
-				throw new Exception(
-					__METHOD__
-					. "\nCould not retrieve members list for group $group."
-					. "\nHTTP status code: " . $response->getStatusCode()
-					. "\nResponse body: " . $response->getBody()
-				);
-			}
+			$this->throwHttpException($response, "Could not retrieve members list for group $group.");
 		}
 	}
 
@@ -408,22 +371,7 @@ class GraphContext implements Context {
 			$displayName
 		);
 		if ($response->getStatusCode() !== 200) {
-			try {
-				$jsonResponseBody = $this->featureContext->getJsonDecodedResponse($response);
-				throw new Exception(
-					__METHOD__
-					. "\nCould not create user $user"
-					. "\nError code: {$jsonResponseBody['error']['code']}"
-					. "\nError message: {$jsonResponseBody['error']['message']}"
-				);
-			} catch (TypeError $e) {
-				throw new Exception(
-					__METHOD__
-					. "\nCould not create user $user"
-					. "\nHTTP status code: " . $response->getStatusCode()
-					. "\nResponse body: " . $response->getBody()
-				);
-			}
+			$this->throwHttpException($response, "Could not create user $user");
 		} else {
 			return $this->featureContext->getJsonDecodedResponse($response);
 		}
@@ -437,7 +385,6 @@ class GraphContext implements Context {
 	 * @param bool $checkResult
 	 *
 	 * @return void
-	 * @throws JsonException
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
@@ -457,12 +404,7 @@ class GraphContext implements Context {
 			$groupId
 		);
 		if ($checkResult && ($result->getStatusCode() !== 204)) {
-			throw new Exception(
-				__METHOD__
-				. "\nCould not add user to group. "
-				. "\n HTTP status: " . $result->getStatusCode()
-				. "\n Response body: " . $result->getBody()
-			);
+			$this->throwHttpException($result, "Could not add user '$user' to group '$group'.");
 		}
 	}
 
@@ -486,22 +428,34 @@ class GraphContext implements Context {
 		if ($result->getStatusCode() === 200) {
 			return $this->featureContext->getJsonDecodedResponse($result);
 		} else {
-			try {
-				$jsonBody = $this->featureContext->getJsonDecodedResponse($result);
-				throw new Exception(
-					__METHOD__
-					. "\nError: failed creating group '$group'"
-					. "\nStatus code: " . $jsonBody['error']['code']
-					. "\nMessage: " . $jsonBody['error']['message']
-				);
-			} catch (TypeError $e) {
-				throw new Exception(
-					__METHOD__
-					. "\nError: failed creating group '$group'"
-					. "\nHTTP status code: " . $result->getStatusCode()
-					. "\nResponse body: " . $result->getBody()
-				);
-			}
+			$this->throwHttpException($result, "Could not create group '$group'.");
+		}
+	}
+
+	/**
+	 * @param ResponseInterface $response
+	 * @param string $errorMsg
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	private function throwHttpException(ResponseInterface $response, string $errorMsg) {
+		try {
+			$jsonBody = $this->featureContext->getJsonDecodedResponse($response);
+			throw new Exception(
+				__METHOD__
+				. "\n$errorMsg"
+				. "\nHTTP status code: " . $response->getStatusCode()
+				. "\nError code: " . $jsonBody["error"]["code"]
+				. "\nMessage: " . $jsonBody["error"]["message"]
+			);
+		} catch (TypeError $e) {
+			throw new Exception(
+				__METHOD__
+				. "\n$errorMsg"
+				. "\nHTTP status code: " . $response->getStatusCode()
+				. "\nResponse body: " . $response->getBody()
+			);
 		}
 	}
 }

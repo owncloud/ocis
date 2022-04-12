@@ -17,6 +17,11 @@ use Psr\Http\Message\ResponseInterface;
  * A helper class for managing users and groups using the Graph API
  */
 class GraphHelper {
+	private static function getGraphHeaders() {
+		return [
+			'Content-Type' => 'application/json',
+		];
+	}
 	/**
 	 * @param string $baseUrl
 	 * @param string $path
@@ -89,14 +94,13 @@ class GraphHelper {
 			$displayName
 		);
 
-		$headers = ['Content-Type' => 'application/json'];
 		$url = self::getFullUrl($baseUrl, 'users');
 		return HttpRequestHelper::post(
 			$url,
 			$xRequestId,
 			$adminUser,
 			$adminPassword,
-			$headers,
+			self::getGraphHeaders(),
 			$payload
 		);
 	}
@@ -131,7 +135,6 @@ class GraphHelper {
 			$email,
 			$displayName
 		);
-		$headers = ['Content-Type' => 'application/json'];
 		$url = self::getFullUrl($baseUrl, 'users/' . $userId);
 		return HttpRequestHelper::sendRequest(
 			$url,
@@ -139,7 +142,7 @@ class GraphHelper {
 			"PATCH",
 			$adminUser,
 			$adminPassword,
-			$headers,
+			self::getGraphHeaders(),
 			$payload
 		);
 	}
@@ -167,7 +170,7 @@ class GraphHelper {
 			$xRequestId,
 			$adminUser,
 			$adminPassword,
-			["Content-Type" => "application/json"]
+			self::getGraphHeaders()
 		);
 	}
 
@@ -198,48 +201,6 @@ class GraphHelper {
 	}
 
 	/**
-	 * can send a request to the graph api to:
-	 * - create a group
-	 * - update a group
-	 *
-	 * displayName is the only field that can be assigned/updated
-	 *
-	 * @param string $baseUrl
-	 * @param string $xRequestId
-	 * @param string $adminUser
-	 * @param string $adminPassword
-	 * @param string $groupName - the displayName of the group
-	 * @param bool|null $update
-	 *
-	 * @return ResponseInterface
-	 * @throws GuzzleException
-	 */
-	private static function postPatchGroup(
-		string $baseUrl,
-		string $xRequestId,
-		string $adminUser,
-		string $adminPassword,
-		string $groupName,
-		?bool $update = false
-	): ResponseInterface {
-		$url = ($update)
-			? self::getFullUrl($baseUrl, 'groups/' . $groupName)
-			: self::getFullUrl($baseUrl, 'groups');
-		$method = ($update) ? 'PATCH' : 'POST';
-		$headers = ['Content-Type' => 'application/json'];
-		$payload['displayName'] = $groupName;
-		return HttpRequestHelper::sendRequest(
-			$url,
-			$xRequestId,
-			$method,
-			$adminUser,
-			$adminPassword,
-			$headers,
-			\json_encode($payload)
-		);
-	}
-
-	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
 	 * @param string $adminUser
@@ -256,12 +217,16 @@ class GraphHelper {
 		string $adminPassword,
 		string $groupName
 	):ResponseInterface {
-		return self::postPatchGroup(
-			$baseUrl,
+		$url = self::getFullUrl($baseUrl, 'groups');
+		$payload['displayName'] = $groupName;
+		return HttpRequestHelper::sendRequest(
+			$url,
 			$xRequestId,
+			"POST",
 			$adminUser,
 			$adminPassword,
-			$groupName
+			self::getGraphHeaders(),
+			\json_encode($payload)
 		);
 	}
 
@@ -284,13 +249,16 @@ class GraphHelper {
 		string $groupId,
 		string $displayName
 	):ResponseInterface {
-		return self::postPatchGroup(
-			$baseUrl,
+		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId);
+		$payload['displayName'] = $displayName;
+		return HttpRequestHelper::sendRequest(
+			$url,
 			$xRequestId,
+			"PATCH",
 			$adminUser,
 			$adminPassword,
-			$displayName,
-			true
+			self::getGraphHeaders(),
+			\json_encode($payload)
 		);
 	}
 
@@ -301,27 +269,47 @@ class GraphHelper {
 	 * @param string $adminPassword
 	 *
 	 * @return array
-	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public static function getUsers(
+		string $baseUrl,
+		string $xRequestId,
+		string $adminUser,
+		string $adminPassword
+	):array {
+		$url = self::getFullUrl($baseUrl, 'users');
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$adminUser,
+			$adminPassword,
+			self::getGraphHeaders(),
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $adminUser
+	 * @param string $adminPassword
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
 	 */
 	public static function getGroups(
 		string $baseUrl,
 		string $xRequestId,
 		string $adminUser,
 		string $adminPassword
-	):array {
+	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups');
-		$response = HttpRequestHelper::get(
+		return HttpRequestHelper::get(
 			$url,
 			$xRequestId,
 			$adminUser,
-			$adminPassword
+			$adminPassword,
+			self::getGraphHeaders(),
 		);
-		$groupsListEncoded = \json_decode($response->getBody()->getContents(), true);
-		if (!isset($groupsListEncoded['value'])) {
-			throw new Exception('No groups found');
-		} else {
-			return $groupsListEncoded['value'];
-		}
 	}
 
 	/**
@@ -356,7 +344,8 @@ class GraphHelper {
 	 * @param string $adminUser
 	 * @param string $adminPassword
 	 * @param string $groupId
-	 * @param array $users expects users array with user ids [ [ 'id' => 'some_id' ], ]
+	 * @param array $users expects users array with user ids
+	 *              [ [ 'id' => 'some_id' ], ]
 	 *
 	 * @return ResponseInterface
 	 */
@@ -380,7 +369,7 @@ class GraphHelper {
 			$xRequestId,
 			$adminUser,
 			$adminPassword,
-			['Content-Type' => 'application/json'],
+			self::getGraphHeaders(),
 			\json_encode($payload)
 		);
 	}
@@ -413,7 +402,7 @@ class GraphHelper {
 			$xRequestId,
 			$adminUser,
 			$adminPassword,
-			["application/json"],
+			self::getGraphHeaders(),
 			\json_encode($body)
 		);
 	}
@@ -453,7 +442,7 @@ class GraphHelper {
 	 * @param string $adminPassword
 	 * @param string $groupId
 	 *
-	 * @return bool
+	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function getMembersList(
@@ -462,7 +451,7 @@ class GraphHelper {
 		string $adminUser,
 		string $adminPassword,
 		string $groupId
-	): bool {
+	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId . '/members');
 		return HttpRequestHelper::get(
 			$url,
@@ -470,26 +459,6 @@ class GraphHelper {
 			$adminUser,
 			$adminPassword
 		);
-	}
-
-	/**
-	 * @param string $baseUrl
-	 * @param string $xRequestId
-	 * @param string $adminUser
-	 * @param string $adminPassword
-	 * @param string $userId
-	 *
-	 * @return void
-	 */
-	public static function getGroupListOfAUser(
-		string $baseUrl,
-		string $xRequestId,
-		string $adminUser,
-		string $adminPassword,
-		string $userId
-	) {
-		// TODO: endpoint not available https://github.com/owncloud/ocis/issues/3363
-		// Not implemented yet
 	}
 
 	/**

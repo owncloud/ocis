@@ -1997,8 +1997,8 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * User get all objects in the trash of project space 
-	 * 
+	 * User get all objects in the trash of project space
+	 *
 	 * method "getTrashbinContentFromResponseXml" borrowed from core repository
 	 * and return array like:
 	 * 	[1] => Array
@@ -2056,7 +2056,9 @@ class SpacesContext implements Context {
 		};
 		if ($shouldOrNot === "not") {
 			Assert::assertEmpty($expectedObject, "$object is found in the trash, but should not be there");
-		} else Assert::assertNotEmpty($expectedObject, "$object is not found in the trash");
+		} else {
+			Assert::assertNotEmpty($expectedObject, "$object is not found in the trash");
+		}
 	}
 
 	/**
