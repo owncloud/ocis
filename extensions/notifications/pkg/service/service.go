@@ -6,7 +6,7 @@ import (
 	"syscall"
 
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/owncloud/ocis/notifications/pkg/channels"
+	"github.com/owncloud/ocis/extensions/notifications/pkg/channels"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
