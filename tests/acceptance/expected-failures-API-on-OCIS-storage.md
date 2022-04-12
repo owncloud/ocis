@@ -921,8 +921,8 @@ _ocs: api compatibility, return correct status code_
 
 #### [reshared resource is not listed for sharee after accepting share](https://github.com/owncloud/ocis/issues/2214)
 
-- [apiShareReshareToShares2/reShareSubfolder.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareSubfolder.feature#L180)
-- [apiShareReshareToShares2/reShareSubfolder.feature:181](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareSubfolder.feature#L181)
+- [apiShareReshareToShares2/reShareSubfolder.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareSubfolder.feature#L178)
+- [apiShareReshareToShares2/reShareSubfolder.feature:179](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareSubfolder.feature#L179)
 
 #### [various sharing settings cannot be set](https://github.com/owncloud/ocis/issues/1328)
 
