@@ -335,8 +335,10 @@ github.com/crewjam/httperr v0.2.0/go.mod h1:Jlz+Sg/XqBQhyMjdDiC+GNNRzZTD7x39Gu3p
 github.com/crewjam/saml v0.4.6 h1:XCUFPkQSJLvzyl4cW9OvpWUbRf0gE7VUpU8ZnilbeM4=
 github.com/crewjam/saml v0.4.6/go.mod h1:ZBOXnNPFzB3CgOkRm7Nd6IVdkG+l/wF+0ZXLqD96t1A=
 github.com/cs3org/cato v0.0.0-20200828125504-e418fc54dd5e/go.mod h1:XJEZ3/EQuI3BXTp/6DUzFr850vlxq11I6satRtz0YQ4=
-github.com/cs3org/reva/v2 v2.0.0-20220411200520-865ba723f25a h1:/3filuu6As9ZMznQ3ddShjveqNr0NrjfZynQT3LyTmQ=
-github.com/cs3org/reva/v2 v2.0.0-20220411200520-865ba723f25a/go.mod h1:l1dhodFXCp88/Lc0VhzSeaLSQUTn2AdwwkTFtaLCJhk=
+github.com/cs3org/go-cs3apis v0.0.0-20220412090512-93c5918b4bde h1:WrD9O8ZaWvsm0eBzpzVBIuczDhqVq50Nmjc7PGHHA9Y=
+github.com/cs3org/go-cs3apis v0.0.0-20220412090512-93c5918b4bde/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
+github.com/cs3org/reva/v2 v2.0.0-20220412125706-8b210924f665 h1:XbFCdhbfdOshRvU5uX5ud90+8A7KGIMp8DVa87Xp+M0=
+github.com/cs3org/reva/v2 v2.0.0-20220412125706-8b210924f665/go.mod h1:ThLaoO0196KODVwlvCoTSe2EaNS8+TJGv8CXviIVA/w=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8/go.mod h1:4abs/jPXcmJzYoYGF91JF9Uq9s/KL5n1jvFDix8KcqY=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
@@ -896,8 +898,6 @@ github.com/klauspost/cpuid/v2 v2.0.1/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa02
 github.com/klauspost/cpuid/v2 v2.0.4/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa0213Md/qVLRg=
 github.com/klauspost/cpuid/v2 v2.0.9 h1:lgaqFMSdTdQYdZ04uHyN2d/eKdOMyi2YLSvlQIBFYa4=
 github.com/klauspost/cpuid/v2 v2.0.9/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa0213Md/qVLRg=
-github.com/kobergj/go-cs3apis v0.0.0-20220406134716-65f04386eb09 h1:i1caLRatgEscEdtcplmwjxHSVve13rQTuRDxo42FZI8=
-github.com/kobergj/go-cs3apis v0.0.0-20220406134716-65f04386eb09/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/kolo/xmlrpc v0.0.0-20200310150728-e0350524596b/go.mod h1:o03bZfuBwAXHetKXuInt4S7omeXUu62/A845kiycsSQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.2/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
