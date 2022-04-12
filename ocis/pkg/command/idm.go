@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/owncloud/ocis/idm/pkg/command"
+	"github.com/owncloud/ocis/extensions/idm/pkg/command"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/parser"
 	"github.com/owncloud/ocis/ocis/pkg/register"

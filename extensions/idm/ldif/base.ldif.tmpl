@@ -1,0 +1,56 @@
+dn: o=libregraph-idm
+o: libregraph-idm
+objectClass: organization
+
+dn: ou=users,o=libregraph-idm
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=sysusers,o=libregraph-idm
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=groups,o=libregraph-idm
+objectClass: organizationalUnit
+ou: groups
+
+{{ range . -}}
+{{ if eq .Name "admin" -}}
+dn: uid=admin,ou=users,o=libregraph-idm
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: ownCloud
+objectClass: person
+objectClass: top
+uid: admin
+givenName: Admin
+sn: Admin
+cn: admin
+displayName: Admin
+description: An admin for this oCIS instance.
+mail: admin@example.org
+ownCloudUUID: ddc2004c-0977-11eb-9d3f-a793888cd0f8
+{{ else -}}
+dn: uid={{ .Name }},ou=sysusers,o=libregraph-idm
+objectClass: account
+objectClass: simpleSecurityObject
+uid: {{ .Name }}
+{{ end -}}
+userPassword:: {{ .Password }}
+
+{{ end -}}
+
+## Service user for the settings service
+dn: uid=95cb8724-03b2-11eb-a0a6-c33ef8ef53ad,ou=users,o=libregraph-idm
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: ownCloud
+objectClass: person
+objectClass: top
+uid: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
+givenName: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
+sn: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
+cn: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
+displayName: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
+ownCloudUUID: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
+

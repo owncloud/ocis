@@ -23,7 +23,7 @@ import (
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/command"
-	idm "github.com/owncloud/ocis/idm/pkg/command"
+	idm "github.com/owncloud/ocis/extensions/idm/pkg/command"
 	idp "github.com/owncloud/ocis/idp/pkg/command"
 	nats "github.com/owncloud/ocis/nats/pkg/command"
 	notifications "github.com/owncloud/ocis/notifications/pkg/command"
