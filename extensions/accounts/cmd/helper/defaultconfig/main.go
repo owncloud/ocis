@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	accountsdefaults "github.com/owncloud/ocis/extensions/accounts/pkg/config/defaults"
-	idpdefaults "github.com/owncloud/ocis/idp/pkg/config/defaults"
+	idpdefaults "github.com/owncloud/ocis/extensions/idp/pkg/config/defaults"
 	"gopkg.in/yaml.v2"
 )
 

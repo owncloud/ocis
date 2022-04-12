@@ -1,0 +1,310 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2019-05-09T14:09:27.715Z\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"MIME-Version: 1.0\n"
+"X-Generator: react-intl-po\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"PO-Revision-Date: 2019-08-30 11:46+0200\n"
+"Last-Translator: root <root@transdoc.kopano.io>\n"
+"Language-Team: Slovenian\n"
+"Language: sl\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
+"%100==4 ? 2 : 3);\n"
+
+#. [konnect.chooseaccount.useOther.persona.label]
+#. defaultMessage is:
+#. ?
+#: i18n/src/messages.json
+msgctxt "konnect.chooseaccount.useOther.persona.label"
+msgid "?"
+msgstr ""
+
+#. [konnect.scopeDescription.aliasBasic]
+#. defaultMessage is:
+#. Access your basic account information
+#: i18n/src/messages.json
+msgctxt "konnect.scopeDescription.aliasBasic"
+msgid "Access your basic account information"
+msgstr ""
+
+#. [konnect.consent.allowButton.label]
+#. defaultMessage is:
+#. Allow
+#: i18n/src/messages.json
+msgctxt "konnect.consent.allowButton.label"
+msgid "Allow"
+msgstr ""
+
+#. [konnect.consent.question]
+#. defaultMessage is:
+#. Allow {clientDisplayName} to do this?
+#: i18n/src/messages.json
+msgctxt "konnect.consent.question"
+msgid "Allow {clientDisplayName} to do this?"
+msgstr ""
+
+#. [konnect.consent.consequence]
+#. defaultMessage is:
+#. By clicking Allow, you allow this app to use your information.
+#: i18n/src/messages.json
+msgctxt "konnect.consent.consequence"
+msgid "By clicking Allow, you allow this app to use your information."
+msgstr ""
+
+#. [konnect.consent.cancelButton.label]
+#. defaultMessage is:
+#. Cancel
+#: i18n/src/messages.json
+msgctxt "konnect.consent.cancelButton.label"
+msgid "Cancel"
+msgstr ""
+
+#. [konnect.chooseaccount.headline]
+#. defaultMessage is:
+#. Choose an account
+#: i18n/src/messages.json
+msgctxt "konnect.chooseaccount.headline"
+msgid "Choose an account"
+msgstr ""
+
+#. [konnect.consent.tooltip.client]
+#. defaultMessage is:
+#. Clicking "Allow" will redirect you to: {redirectURI}
+#: i18n/src/messages.json
+msgctxt "konnect.consent.tooltip.client"
+msgid "Clicking \"Allow\" will redirect you to: {redirectURI}"
+msgstr ""
+
+#. [konnect.error.login.validate.missingPassword]
+#. defaultMessage is:
+#. Enter a password
+#: i18n/src/messages.json
+msgctxt "konnect.error.login.validate.missingPassword"
+msgid "Enter a password"
+msgstr ""
+
+#. [konnect.error.login.validate.missingUsername]
+#. defaultMessage is:
+#. Enter an username
+#: i18n/src/messages.json
+msgctxt "konnect.error.login.validate.missingUsername"
+msgid "Enter an username"
+msgstr ""
+
+#. [konnect.loading.error.headline]
+#. defaultMessage is:
+#. Failed to connect to server
+#: i18n/src/messages.json
+msgctxt "konnect.loading.error.headline"
+msgid "Failed to connect to server"
+msgstr ""
+
+#. [konnect.goodbye.headline]
+#. defaultMessage is:
+#. Goodbye
+#: i18n/src/messages.json
+msgctxt "konnect.goodbye.headline"
+msgid "Goodbye"
+msgstr ""
+
+#. [konnect.goodbye.confirm.headline]
+#. defaultMessage is:
+#. Hello {displayName}
+#: i18n/src/messages.json
+msgctxt "konnect.goodbye.confirm.headline"
+msgid "Hello {displayName}"
+msgstr ""
+
+#. [konnect.consent.headline]
+#. defaultMessage is:
+#. Hi {displayName}
+#: i18n/src/messages.json
+msgctxt "konnect.consent.headline"
+msgid "Hi {displayName}"
+msgstr ""
+
+#. [konnect.scopeDescription.offlineAccess]
+#. defaultMessage is:
+#. Keep the allowed access persistently and forever
+#: i18n/src/messages.json
+msgctxt "konnect.scopeDescription.offlineAccess"
+msgid "Keep the allowed access persistently and forever"
+msgstr ""
+
+#. [konnect.error.login.failed]
+#. defaultMessage is:
+#. Logon failed. Please verify your credentials and try again.
+#: i18n/src/messages.json
+msgctxt "konnect.error.login.failed"
+msgid "Logon failed. Please verify your credentials and try again."
+msgstr ""
+
+#. [konnet.error.http.networkError]
+#. defaultMessage is:
+#. Network error. Please check your connection and try again.
+#: i18n/src/messages.json
+msgctxt "konnet.error.http.networkError"
+msgid "Network error. Please check your connection and try again."
+msgstr ""
+
+#. [konnect.login.nextButton.label]
+#. defaultMessage is:
+#. Next
+#: i18n/src/messages.json
+msgctxt "konnect.login.nextButton.label"
+msgid "Next"
+msgstr ""
+
+#. [konnect.login.passwordField.label]
+#. defaultMessage is:
+#. Password
+#: i18n/src/messages.json
+msgctxt "konnect.login.passwordField.label"
+msgid "Password"
+msgstr ""
+
+#. [konnect.goodbye.message.confirm]
+#. defaultMessage is:
+#. Press the button below, to sign out from your Kopano account now.
+#: i18n/src/messages.json
+msgctxt "konnect.goodbye.message.confirm"
+msgid "Press the button below, to sign out from your Kopano account now."
+msgstr ""
+
+#. [konnect.login.retryButton.label]
+#. defaultMessage is:
+#. Retry
+#: i18n/src/messages.json
+msgctxt "konnect.login.retryButton.label"
+msgid "Retry"
+msgstr ""
+
+#. [konnect.scopeDescription.scope]
+#. defaultMessage is:
+#. Scope: {scope}
+#: i18n/src/messages.json
+msgctxt "konnect.scopeDescription.scope"
+msgid "Scope: {scope}"
+msgstr ""
+
+#. [konnect.login.headline]
+#. defaultMessage is:
+#. Sign in
+#: i18n/src/messages.json
+msgctxt "konnect.login.headline"
+msgid "Sign in"
+msgstr ""
+
+#. [konnect.goodbye.signoutButton.label]
+#. defaultMessage is:
+#. Sign out
+#: i18n/src/messages.json
+msgctxt "konnect.goodbye.signoutButton.label"
+msgid "Sign out"
+msgstr ""
+
+#. [konnect.welcome.signoutButton.label]
+#. defaultMessage is:
+#. Sign out
+#: i18n/src/messages.json
+msgctxt "konnect.welcome.signoutButton.label"
+msgid "Sign out"
+msgstr ""
+
+#. [konnect.error.http.unexpectedResponseStatus]
+#. defaultMessage is:
+#. Unexpected HTTP response: {status}. Please check your connection and try again.
+#: i18n/src/messages.json
+msgctxt "konnect.error.http.unexpectedResponseStatus"
+msgid "Unexpected HTTP response: {status}. Please check your connection and try again."
+msgstr ""
+
+#. [konnect.error.http.unexpectedResponseState]
+#. defaultMessage is:
+#. Unexpected response state: {state}
+#: i18n/src/messages.json
+msgctxt "konnect.error.http.unexpectedResponseState"
+msgid "Unexpected response state: {state}"
+msgstr ""
+
+#. [konnect.chooseaccount.useOther.label]
+#. defaultMessage is:
+#. Use another account
+#: i18n/src/messages.json
+msgctxt "konnect.chooseaccount.useOther.label"
+msgid "Use another account"
+msgstr ""
+
+#. [konnect.login.usernameField.label]
+#. defaultMessage is:
+#. Username
+#: i18n/src/messages.json
+msgctxt "konnect.login.usernameField.label"
+msgid "Username"
+msgstr ""
+
+#. [konnect.welcome.headline]
+#. defaultMessage is:
+#. Welcome {displayName}
+#: i18n/src/messages.json
+msgctxt "konnect.welcome.headline"
+msgid "Welcome {displayName}"
+msgstr ""
+
+#. [konnect.welcome.message]
+#. defaultMessage is:
+#. You are signed in - awesome!
+#: i18n/src/messages.json
+msgctxt "konnect.welcome.message"
+msgid "You are signed in - awesome!"
+msgstr ""
+
+#. [konnect.goodbye.message.close]
+#. defaultMessage is:
+#. You can close this window now.
+#: i18n/src/messages.json
+msgctxt "konnect.goodbye.message.close"
+msgid "You can close this window now."
+msgstr ""
+
+#. [konnect.goodbye.confirm.subHeader]
+#. defaultMessage is:
+#. please confirm sign out
+#: i18n/src/messages.json
+msgctxt "konnect.goodbye.confirm.subHeader"
+msgid "please confirm sign out"
+msgstr ""
+
+#. [konnect.chooseaccount.subHeader]
+#. defaultMessage is:
+#. to sign in to Kopano
+#: i18n/src/messages.json
+msgctxt "konnect.chooseaccount.subHeader"
+msgid "to sign in to Kopano"
+msgstr ""
+
+#. [konnect.login.subHeader]
+#. defaultMessage is:
+#. with your Kopano account
+#: i18n/src/messages.json
+msgctxt "konnect.login.subHeader"
+msgid "with your Kopano account"
+msgstr ""
+
+#. [konnect.goodbye.subHeader]
+#. defaultMessage is:
+#. you have been signed out from your Kopano account
+#: i18n/src/messages.json
+msgctxt "konnect.goodbye.subHeader"
+msgid "you have been signed out from your Kopano account"
+msgstr ""
+
+#. [konnect.consent.message]
+#. defaultMessage is:
+#. {clientDisplayName} wants to
+#: i18n/src/messages.json
+msgctxt "konnect.consent.message"
+msgid "{clientDisplayName} wants to"
+msgstr ""

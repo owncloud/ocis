@@ -1,0 +1,157 @@
+/* additional css on top of kpop */
+html {
+  font-family: 'Open Sans', sans-serif;
+}
+
+strong {
+  font-weight: 600;
+}
+
+.oc-login-bg {
+  background-image: url(./images/background.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 0;
+}
+
+#loader {
+  /* NOTE(longsleep): White here needed because of the background image */
+  color: white;
+  text-shadow: #000 0 0 1px;
+}
+
+.oc-logo {
+  position: absolute;
+  top: -130px;
+  left: 50%;
+  height: 80px;
+  transform: translateX(-50%);
+}
+
+.oc-progress {
+  /* Needs to be important to overwrite material-ui */
+  background-color: rgba(78, 133, 200, 0.8) !important;
+  height: 4px;
+  width: 100px;
+}
+
+.oc-progress > div {
+  /* Needs to be important to overwrite material-ui */
+  background-color: #4a76ac !important;
+}
+
+.oc-input {
+  background-color: #042047;
+  border: 1px solid rgba(78, 133, 200, 0.8);
+  border-radius: 3px;
+  color: rgba(255, 255, 255, 0.8);
+  height: 40px;
+  width: 300px;
+  padding: 16px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.oc-label {
+  color: #fff;
+  display: inline-block;
+  margin-bottom: 5px;
+}
+
+.oc-input.error {
+  outline: none;
+  border: 1px solid #fe4600;
+}
+
+.MuiTypography-colorError {
+  color: #fe4600 !important;
+}
+
+.oc-input:focus {
+  outline: none;
+  border: 1px solid #fff;
+}
+
+.oc-input::placeholder {
+  color: rgba(78, 133, 200, 0.8);
+}
+
+.oc-input + .oc-input {
+  margin-top: 15px;
+}
+
+.MuiTouchRipple-root {
+  display: none !important;
+}
+
+.oc-button {
+  /* Needs to be important to overwrite material-ui */
+  font-size: 1.0625rem !important;
+}
+
+.oc-button-primary {
+  /* Needs to be important to overwrite material-ui */
+  background-color: #4a76ac !important;
+  border: 1px solid transparent !important;
+}
+
+.oc-button-primary:hover,
+.oc-button-primary:focus {
+  /* Needs to be important to overwrite material-ui */
+  background-color: #4a76ac !important;
+  border: 1px solid white !important;
+}
+
+.oc-checkbox-dark svg {
+  /* Needs to be important to overwrite material-ui */
+  fill: white !important;
+}
+
+.oc-footer-message {
+  color: white;
+  padding: 10px;
+  font-size: 0.8rem;
+}
+
+@media only screen and (max-width: 768px) {
+  .oc-logo {
+    height: 60px;
+    top: -90px;
+  }
+}
+
+/* Helpers */
+.oc-mt-l {
+  margin-top: 30px !important;
+}
+
+.oc-mb-m {
+  margin-bottom: 20px !important;
+}
+
+.oc-light {
+  color: #fff !important;
+}
+
+.oc-login-form div:not(:last-of-type) {
+  margin-bottom: 15px;
+}
+
+
+/*
+ * Special SR classes
+ * Used to hide an element visually, but keeping it accessible for accessibility tools.
+ */
+.oc-invisible-sr {
+  border: 0 !important;
+  clip: rect(1px, 1px, 1px, 1px) !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  /* Need to make sure we override any existing styles. */
+  position: absolute !important;
+  top: 0;
+  white-space: nowrap;
+  width: 1px !important;
+}
