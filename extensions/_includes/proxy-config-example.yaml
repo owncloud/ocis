@@ -28,86 +28,112 @@ policies:
   - type: ""
     endpoint: /
     backend: http://localhost:9100
+    service: ""
     apache-vhost: false
   - type: ""
     endpoint: /.well-known/
     backend: http://localhost:9130
+    service: ""
     apache-vhost: false
   - type: ""
     endpoint: /konnect/
     backend: http://localhost:9130
+    service: ""
     apache-vhost: false
   - type: ""
     endpoint: /signin/
     backend: http://localhost:9130
+    service: ""
     apache-vhost: false
   - type: ""
     endpoint: /archiver
     backend: http://localhost:9140
+    service: ""
     apache-vhost: false
   - type: regex
     endpoint: /ocs/v[12].php/cloud/(users?|groups)
     backend: http://localhost:9110
+    service: ""
     apache-vhost: false
   - type: ""
     endpoint: /ocs/
     backend: http://localhost:9140
+    service: ""
     apache-vhost: false
   - type: query
     endpoint: /remote.php/?preview=1
     backend: http://localhost:9115
+    service: ""
     apache-vhost: false
   - type: ""
     endpoint: /remote.php/
-    backend: http://localhost:9140
+    backend: ""
+    service: ocdav
     apache-vhost: false
   - type: ""
     endpoint: /dav/
-    backend: http://localhost:9140
+    backend: ""
+    service: ocdav
     apache-vhost: false
   - type: ""
     endpoint: /webdav/
-    backend: http://localhost:9140
+    backend: ""
+    service: ocdav
     apache-vhost: false
   - type: ""
     endpoint: /status.php
-    backend: http://localhost:9140
+    backend: ""
+    service: ocdav
     apache-vhost: false
   - type: ""
     endpoint: /index.php/
-    backend: http://localhost:9140
+    backend: ""
+    service: ocdav
+    apache-vhost: false
+  - type: ""
+    endpoint: /apps/
+    backend: ""
+    service: ocdav
     apache-vhost: false
   - type: ""
     endpoint: /data
     backend: http://localhost:9140
+    service: ""
     apache-vhost: false
   - type: ""
     endpoint: /app/
     backend: http://localhost:9140
+    service: ""
     apache-vhost: false
   - type: ""
     endpoint: /graph/
     backend: http://localhost:9120
+    service: ""
     apache-vhost: false
   - type: ""
     endpoint: /graph-explorer
     backend: http://localhost:9135
+    service: ""
     apache-vhost: false
   - type: ""
     endpoint: /api/v0/accounts
     backend: http://localhost:9181
+    service: ""
     apache-vhost: false
   - type: ""
     endpoint: /accounts.js
     backend: http://localhost:9181
+    service: ""
     apache-vhost: false
   - type: ""
     endpoint: /api/v0/settings
     backend: http://localhost:9190
+    service: ""
     apache-vhost: false
   - type: ""
     endpoint: /settings.js
     backend: http://localhost:9190
+    service: ""
     apache-vhost: false
 oidc:
   issuer: https://localhost:9200

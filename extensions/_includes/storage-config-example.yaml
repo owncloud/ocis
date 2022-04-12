@@ -7,6 +7,18 @@ debug:
   token: ""
   pprof: false
   zpages: false
+ocdav:
+  addr: 127.0.0.1:0
+  prefix: ""
+  webdav_namespace: /users/{{.Id.OpaqueId}}
+  files_namespace: /users/{{.Id.OpaqueId}}
+  shares_namespace: /Shares
+  public_url: https://localhost:9200
+  debug_addr: 127.0.0.1:9163
+  gateway_svc: 127.0.0.1:9142
+  jwt_secret: Pive-Fumkiu4
+  insecure: false
+  timeout: 84300
 reva:
   jwt_secret: Pive-Fumkiu4
   skip_user_grooups_in_token: false
@@ -73,9 +85,6 @@ reva:
     join_username: false
     join_owncloud_uuid: false
     enable_medial_search: false
-  ocdav:
-    webdav_namespace: /users/{{.Id.OpaqueId}}
-    dav_files_namespace: /users/{{.Id.OpaqueId}}
   archiver:
     max_num_files: 10000
     max_size: 1073741824
@@ -255,7 +264,6 @@ reva:
       debug_addr: 127.0.0.1:9141
       services:
       - datagateway
-      - ocdav
       - ocs
       - appprovider
       config: {}
@@ -268,8 +276,6 @@ reva:
     data_gateway_prefix: data
     favorites: false
     project_spaces: true
-    ocdav_insecure: false
-    ocdav_prefix: ""
     ocs_prefix: ocs
     ocs_share_prefix: /Shares
     ocs_home_namespace: /users/{{.Id.OpaqueId}}
@@ -619,7 +625,7 @@ reva:
     context: null
     supervised: false
   configs: {}
-  uppload_max_chunk_size: 100000000
+  upload_max_chunk_size: 100000000
   upload_http_method_override: ""
   checksum_supported_types:
   - sha1
