@@ -1,8 +1,8 @@
 package config
 
 import (
-	accounts "github.com/owncloud/ocis/accounts/pkg/config/defaults"
 	audit "github.com/owncloud/ocis/audit/pkg/config/defaults"
+	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/config/defaults"
 	glauth "github.com/owncloud/ocis/glauth/pkg/config/defaults"
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/config/defaults"
 	graph "github.com/owncloud/ocis/graph/pkg/config/defaults"

@@ -19,7 +19,7 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
 
-	accounts "github.com/owncloud/ocis/accounts/pkg/command"
+	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/command"
 	glauth "github.com/owncloud/ocis/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/graph/pkg/command"
