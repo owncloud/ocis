@@ -8,7 +8,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/version"
 
 	tw "github.com/olekukonko/tablewriter"
-	"github.com/owncloud/ocis/glauth/pkg/config"
+	"github.com/owncloud/ocis/extensions/glauth/pkg/config"
 	"github.com/urfave/cli/v2"
 )
 

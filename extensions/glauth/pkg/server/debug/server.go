@@ -4,7 +4,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/owncloud/ocis/glauth/pkg/config"
+	"github.com/owncloud/ocis/extensions/glauth/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 )

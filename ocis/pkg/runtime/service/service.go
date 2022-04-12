@@ -20,7 +20,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/command"
-	glauth "github.com/owncloud/ocis/glauth/pkg/command"
+	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/graph/pkg/command"
 	idm "github.com/owncloud/ocis/idm/pkg/command"

@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/owncloud/ocis/glauth/pkg/command"
-	"github.com/owncloud/ocis/glauth/pkg/config/defaults"
+	"github.com/owncloud/ocis/extensions/glauth/pkg/command"
+	"github.com/owncloud/ocis/extensions/glauth/pkg/config/defaults"
 )
 
 func main() {
