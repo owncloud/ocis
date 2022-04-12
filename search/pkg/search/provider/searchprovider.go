@@ -29,6 +29,9 @@ import (
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/search/pkg/search"
+
+	searchmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0"
+	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
 )
 
 type Provider struct {
@@ -43,7 +46,7 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient) *Pro
 	}
 }
 
-func (p *Provider) Search(ctx context.Context, req *search.SearchRequest) (*search.SearchResult, error) {
+func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error) {
 	if req.Query == "" {
 		return nil, errtypes.PreconditionFailed("empty query provided")
 	}
@@ -60,7 +63,7 @@ func (p *Provider) Search(ctx context.Context, req *search.SearchRequest) (*sear
 		return nil, err
 	}
 
-	matches := []search.Match{}
+	matches := []*searchmsg.Match{}
 	for _, space := range listSpacesRes.StorageSpaces {
 		pathPrefix := ""
 		if space.SpaceType == "grant" {
@@ -76,11 +79,14 @@ func (p *Provider) Search(ctx context.Context, req *search.SearchRequest) (*sear
 			pathPrefix = utils.MakeRelativePath(gpRes.Path)
 		}
 
-		res, err := p.indexClient.Search(ctx, &search.SearchIndexRequest{
+		res, err := p.indexClient.Search(ctx, &searchsvc.SearchIndexRequest{
 			Query: req.Query,
-			Reference: &providerv1beta1.Reference{
-				ResourceId: space.Root,
-				Path:       pathPrefix,
+			Ref: &searchmsg.Reference{
+				ResourceId: &searchmsg.ResourceID{
+					StorageId: space.Root.StorageId,
+					OpaqueId:  space.Root.OpaqueId,
+				},
+				Path: pathPrefix,
 			},
 		})
 		if err != nil {
@@ -89,11 +95,13 @@ func (p *Provider) Search(ctx context.Context, req *search.SearchRequest) (*sear
 
 		for _, match := range res.Matches {
 			if pathPrefix != "" {
-				match.Reference.Path = utils.MakeRelativePath(strings.TrimPrefix(match.Reference.Path, pathPrefix))
+				match.Entity.Ref.Path = utils.MakeRelativePath(strings.TrimPrefix(match.Entity.Ref.Path, pathPrefix))
 			}
 			matches = append(matches, match)
 		}
 	}
 
-	return &search.SearchResult{Matches: matches}, nil
+	return &searchsvc.SearchResponse{
+		Matches: matches,
+	}, nil
 }

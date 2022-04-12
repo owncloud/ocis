@@ -1,10 +1,8 @@
 package service
 
 import (
-	"github.com/owncloud/ocis/accounts/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/roles"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/search/pkg/config"
 )
 
 // Option defines a single option function.
@@ -12,10 +10,8 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger      log.Logger
-	Config      *config.Config
-	RoleService settingssvc.RoleService
-	RoleManager *roles.Manager
+	Logger log.Logger
+	Config *config.Config
 }
 
 func newOptions(opts ...Option) Options {
@@ -39,19 +35,5 @@ func Logger(val log.Logger) Option {
 func Config(val *config.Config) Option {
 	return func(o *Options) {
 		o.Config = val
-	}
-}
-
-// RoleService provides a function to set the RoleService option.
-func RoleService(val settingssvc.RoleService) Option {
-	return func(o *Options) {
-		o.RoleService = val
-	}
-}
-
-// RoleManager provides a function to set the RoleManager option.
-func RoleManager(val *roles.Manager) Option {
-	return func(o *Options) {
-		o.RoleManager = val
 	}
 }

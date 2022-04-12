@@ -30,7 +30,8 @@ import (
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
-	"github.com/owncloud/ocis/search/pkg/search"
+	searchmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0"
+	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/search/pkg/search/mocks"
 	provider "github.com/owncloud/ocis/search/pkg/search/provider"
 )
@@ -80,7 +81,7 @@ var _ = Describe("Searchprovider", func() {
 
 	Describe("Search", func() {
 		It("fails when an empty query is given", func() {
-			res, err := p.Search(ctx, &search.SearchRequest{
+			res, err := p.Search(ctx, &searchsvc.SearchRequest{
 				Query: "",
 			})
 			Expect(err).To(HaveOccurred())
@@ -96,19 +97,22 @@ var _ = Describe("Searchprovider", func() {
 					Status:        status.NewOK(ctx),
 					StorageSpaces: []*sprovider.StorageSpace{personalSpace},
 				}, nil)
-				indexClient.On("Search", mock.Anything, mock.Anything).Return(&search.SearchIndexResult{
-					Matches: []search.Match{
+				indexClient.On("Search", mock.Anything, mock.Anything).Return(&searchsvc.SearchIndexResponse{
+					Matches: []*searchmsg.Match{
 						{
-							Reference: &sprovider.Reference{
-								ResourceId: personalSpace.Root,
-								Path:       "./path/to/Foo.pdf",
-							},
-							Info: &sprovider.ResourceInfo{
-								Id: &sprovider.ResourceId{
+							Entity: &searchmsg.Entity{
+								Ref: &searchmsg.Reference{
+									ResourceId: &searchmsg.ResourceID{
+										StorageId: personalSpace.Root.StorageId,
+										OpaqueId:  personalSpace.Root.OpaqueId,
+									},
+									Path: "./path/to/Foo.pdf",
+								},
+								Id: &searchmsg.ResourceID{
 									StorageId: personalSpace.Root.StorageId,
 									OpaqueId:  "foo-id",
 								},
-								Path: "Foo.pdf",
+								Name: "Foo.pdf",
 							},
 						},
 					},
@@ -116,20 +120,20 @@ var _ = Describe("Searchprovider", func() {
 			})
 
 			It("searches the personal user space", func() {
-				res, err := p.Search(ctx, &search.SearchRequest{
+				res, err := p.Search(ctx, &searchsvc.SearchRequest{
 					Query: "foo",
 				})
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res).ToNot(BeNil())
 				Expect(len(res.Matches)).To(Equal(1))
 				match := res.Matches[0]
-				Expect(match.Info.Id.OpaqueId).To(Equal("foo-id"))
-				Expect(match.Info.Path).To(Equal("Foo.pdf"))
-				Expect(match.Reference.ResourceId).To(Equal(personalSpace.Root))
-				Expect(match.Reference.Path).To(Equal("./path/to/Foo.pdf"))
+				Expect(match.Entity.Id.OpaqueId).To(Equal("foo-id"))
+				Expect(match.Entity.Name).To(Equal("Foo.pdf"))
+				Expect(match.Entity.Ref.ResourceId.OpaqueId).To(Equal(personalSpace.Root.OpaqueId))
+				Expect(match.Entity.Ref.Path).To(Equal("./path/to/Foo.pdf"))
 
-				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *search.SearchIndexRequest) bool {
-					return req.Query == "foo" && req.Reference.ResourceId == personalSpace.Root && req.Reference.Path == ""
+				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+					return req.Query == "foo" && req.Ref.ResourceId.OpaqueId == personalSpace.Root.OpaqueId && req.Ref.Path == ""
 				}))
 			})
 		})
@@ -161,38 +165,41 @@ var _ = Describe("Searchprovider", func() {
 					Status:        status.NewOK(ctx),
 					StorageSpaces: []*sprovider.StorageSpace{grantSpace},
 				}, nil)
-				indexClient.On("Search", mock.Anything, mock.Anything).Return(&search.SearchIndexResult{
-					Matches: []search.Match{
+				indexClient.On("Search", mock.Anything, mock.Anything).Return(&searchsvc.SearchIndexResponse{
+					Matches: []*searchmsg.Match{
 						{
-							Reference: &sprovider.Reference{
-								ResourceId: grantSpace.Root,
-								Path:       "./grant/path/to/Shared.pdf",
-							},
-							Info: &sprovider.ResourceInfo{
-								Id: &sprovider.ResourceId{
+							Entity: &searchmsg.Entity{
+								Ref: &searchmsg.Reference{
+									ResourceId: &searchmsg.ResourceID{
+										StorageId: grantSpace.Root.StorageId,
+										OpaqueId:  grantSpace.Root.OpaqueId,
+									},
+									Path: "./grant/path/to/Shared.pdf",
+								},
+								Id: &searchmsg.ResourceID{
 									StorageId: grantSpace.Root.StorageId,
 									OpaqueId:  "grant-shared-id",
 								},
-								Path: "Shared.pdf",
+								Name: "Shared.pdf",
 							},
 						},
 					},
 				}, nil)
 
-				res, err := p.Search(ctx, &search.SearchRequest{
+				res, err := p.Search(ctx, &searchsvc.SearchRequest{
 					Query: "foo",
 				})
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res).ToNot(BeNil())
 				Expect(len(res.Matches)).To(Equal(1))
 				match := res.Matches[0]
-				Expect(match.Info.Id.OpaqueId).To(Equal("grant-shared-id"))
-				Expect(match.Info.Path).To(Equal("Shared.pdf"))
-				Expect(match.Reference.ResourceId).To(Equal(grantSpace.Root))
-				Expect(match.Reference.Path).To(Equal("./to/Shared.pdf"))
+				Expect(match.Entity.Id.OpaqueId).To(Equal("grant-shared-id"))
+				Expect(match.Entity.Name).To(Equal("Shared.pdf"))
+				Expect(match.Entity.Ref.ResourceId.OpaqueId).To(Equal(grantSpace.Root.OpaqueId))
+				Expect(match.Entity.Ref.Path).To(Equal("./to/Shared.pdf"))
 
-				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *search.SearchIndexRequest) bool {
-					return req.Query == "foo" && req.Reference.ResourceId == grantSpace.Root && req.Reference.Path == "./grant/path"
+				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+					return req.Query == "foo" && req.Ref.ResourceId.OpaqueId == grantSpace.Root.OpaqueId && req.Ref.Path == "./grant/path"
 				}))
 			})
 
@@ -204,52 +211,58 @@ var _ = Describe("Searchprovider", func() {
 					Status:        status.NewOK(ctx),
 					StorageSpaces: []*sprovider.StorageSpace{personalSpace, grantSpace},
 				}, nil)
-				indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *search.SearchIndexRequest) bool {
-					return req.Reference.ResourceId == grantSpace.Root
-				})).Return(&search.SearchIndexResult{
-					Matches: []search.Match{
+				indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+					return req.Ref.ResourceId.OpaqueId == grantSpace.Root.OpaqueId
+				})).Return(&searchsvc.SearchIndexResponse{
+					Matches: []*searchmsg.Match{
 						{
-							Reference: &sprovider.Reference{
-								ResourceId: grantSpace.Root,
-								Path:       "./grant/path/to/Shared.pdf",
-							},
-							Info: &sprovider.ResourceInfo{
-								Id: &sprovider.ResourceId{
+							Entity: &searchmsg.Entity{
+								Ref: &searchmsg.Reference{
+									ResourceId: &searchmsg.ResourceID{
+										StorageId: grantSpace.Root.StorageId,
+										OpaqueId:  grantSpace.Root.OpaqueId,
+									},
+									Path: "./grant/path/to/Shared.pdf",
+								},
+								Id: &searchmsg.ResourceID{
 									StorageId: grantSpace.Root.StorageId,
 									OpaqueId:  "grant-shared-id",
 								},
-								Path: "Shared.pdf",
+								Name: "Shared.pdf",
 							},
 						},
 					},
 				}, nil)
-				indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *search.SearchIndexRequest) bool {
-					return req.Reference.ResourceId == personalSpace.Root
-				})).Return(&search.SearchIndexResult{
-					Matches: []search.Match{
+				indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+					return req.Ref.ResourceId.OpaqueId == personalSpace.Root.OpaqueId
+				})).Return(&searchsvc.SearchIndexResponse{
+					Matches: []*searchmsg.Match{
 						{
-							Reference: &sprovider.Reference{
-								ResourceId: personalSpace.Root,
-								Path:       "./path/to/Foo.pdf",
-							},
-							Info: &sprovider.ResourceInfo{
-								Id: &sprovider.ResourceId{
+							Entity: &searchmsg.Entity{
+								Ref: &searchmsg.Reference{
+									ResourceId: &searchmsg.ResourceID{
+										StorageId: personalSpace.Root.StorageId,
+										OpaqueId:  personalSpace.Root.OpaqueId,
+									},
+									Path: "./path/to/Foo.pdf",
+								},
+								Id: &searchmsg.ResourceID{
 									StorageId: personalSpace.Root.StorageId,
 									OpaqueId:  "foo-id",
 								},
-								Path: "Foo.pdf",
+								Name: "Foo.pdf",
 							},
 						},
 					},
 				}, nil)
 
-				res, err := p.Search(ctx, &search.SearchRequest{
+				res, err := p.Search(ctx, &searchsvc.SearchRequest{
 					Query: "foo",
 				})
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res).ToNot(BeNil())
 				Expect(len(res.Matches)).To(Equal(2))
-				ids := []string{res.Matches[0].Info.Id.OpaqueId, res.Matches[1].Info.Id.OpaqueId}
+				ids := []string{res.Matches[0].Entity.Id.OpaqueId, res.Matches[1].Entity.Id.OpaqueId}
 				Expect(ids).To(ConsistOf("foo-id", "grant-shared-id"))
 			})
 		})

@@ -21,45 +21,18 @@ package search
 import (
 	"context"
 
-	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
 )
 
 //go:generate mockery --name=ProviderClient
 //go:generate mockery --name=IndexClient
 
-// SearchRequest represents a search request from a user to the search provider
-type SearchRequest struct {
-	Query string
-}
-
-// Match holds the information of a matched resource in a search
-type Match struct {
-	Reference *sprovider.Reference
-	Info      *sprovider.ResourceInfo
-}
-
-// SearchResult contains the matches being returned for a search
-type SearchResult struct {
-	Matches []Match
-}
-
 // ProviderClient is the interface to the search provider service
 type ProviderClient interface {
-	Search(ctx context.Context, req *SearchRequest) (*SearchResult, error)
-}
-
-// SearchIndexRequest represents a search request to the index
-type SearchIndexRequest struct {
-	Reference *sprovider.Reference
-	Query     string
-}
-
-// SearchResult contains the matches in the index being returned for a search
-type SearchIndexResult struct {
-	Matches []Match
+	Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error)
 }
 
 // IndexClient is the interface to the search index
 type IndexClient interface {
-	Search(ctx context.Context, req *SearchIndexRequest) (*SearchIndexResult, error)
+	Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (*searchsvc.SearchIndexResponse, error)
 }

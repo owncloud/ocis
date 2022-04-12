@@ -17,6 +17,10 @@ func DefaultConfig() *config.Config {
 			Namespace: "com.owncloud.search",
 			Root:      "/search",
 		},
+		GRPC: config.GRPC{
+			Addr:      "127.0.0.1:9180",
+			Namespace: "com.owncloud.api",
+		},
 		Service: config.Service{
 			Name: "search",
 		},

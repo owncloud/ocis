@@ -17,6 +17,7 @@ type Config struct {
 	Debug   Debug    `ocisConfig:"debug"`
 
 	HTTP HTTP `ocisConfig:"http"`
+	GRPC GRPC `ocisConfig:"grpc"`
 
 	Reva         Reva         `ocisConfig:"reva"`
 	TokenManager TokenManager `ocisConfig:"token_manager"`

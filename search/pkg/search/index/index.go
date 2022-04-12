@@ -35,16 +35,6 @@ type Index struct {
 	bleveIndex bleve.Index
 }
 
-// Entity describes an Entity stored in the index
-type Entity struct {
-	RootID string
-	Path   string
-	ID     string
-
-	Name string
-	Size uint64
-}
-
 // NewPersisted returns a new instance of Index with the data being persisted in the given directory
 func NewPersisted(path string) (*Index, error) {
 	bi, err := bleve.New(path, BuildMapping())

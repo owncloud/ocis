@@ -5,13 +5,14 @@ import (
 	"fmt"
 
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/idp/pkg/server/http"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/owncloud/ocis/search/pkg/config"
 	"github.com/owncloud/ocis/search/pkg/config/parser"
 	"github.com/owncloud/ocis/search/pkg/logging"
 	"github.com/owncloud/ocis/search/pkg/metrics"
 	"github.com/owncloud/ocis/search/pkg/server/debug"
+	"github.com/owncloud/ocis/search/pkg/server/grpc"
+	svc "github.com/owncloud/ocis/search/pkg/service/v0"
 	"github.com/owncloud/ocis/search/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
@@ -45,47 +46,40 @@ func Server(cfg *config.Config) *cli.Command {
 
 			mtrcs.BuildInfo.WithLabelValues(version.String).Set(1)
 
-			{
-				server, err := http.Server(
-					http.Logger(logger),
-					http.Context(ctx),
-					http.Config(cfg),
-					http.Metrics(mtrcs),
-				)
+			handler, err := svc.New(svc.Logger(logger), svc.Config(cfg))
+			if err != nil {
+				logger.Error().Err(err).Msg("handler init")
+				return err
+			}
+			grpcServer := grpc.Server(
+				grpc.Config(cfg),
+				grpc.Logger(logger),
+				grpc.Name(cfg.Service.Name),
+				grpc.Context(ctx),
+				grpc.Metrics(mtrcs),
+				grpc.Handler(handler),
+			)
 
-				if err != nil {
-					logger.Info().Err(err).Str("transport", "http").Msg("Failed to initialize server")
-					return err
-				}
+			gr.Add(grpcServer.Run, func(_ error) {
+				logger.Info().Str("server", "grpc").Msg("shutting down server")
+				cancel()
+			})
 
-				gr.Add(func() error {
-					return server.Run()
-				}, func(_ error) {
-					logger.Info().
-						Str("transport", "http").
-						Msg("Shutting down server")
+			server, err := debug.Server(
+				debug.Logger(logger),
+				debug.Context(ctx),
+				debug.Config(cfg),
+			)
 
-					cancel()
-				})
+			if err != nil {
+				logger.Info().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
+				return err
 			}
 
-			{
-				server, err := debug.Server(
-					debug.Logger(logger),
-					debug.Context(ctx),
-					debug.Config(cfg),
-				)
-
-				if err != nil {
-					logger.Info().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
-					return err
-				}
-
-				gr.Add(server.ListenAndServe, func(_ error) {
-					_ = server.Shutdown(ctx)
-					cancel()
-				})
-			}
+			gr.Add(server.ListenAndServe, func(_ error) {
+				_ = server.Shutdown(ctx)
+				cancel()
+			})
 
 			return gr.Run()
 		},
