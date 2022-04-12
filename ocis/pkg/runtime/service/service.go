@@ -21,8 +21,8 @@ import (
 
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/command"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/command"
+	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/command"
-	graphExplorer "github.com/owncloud/ocis/graph-explorer/pkg/command"
 	idm "github.com/owncloud/ocis/idm/pkg/command"
 	idp "github.com/owncloud/ocis/idp/pkg/command"
 	nats "github.com/owncloud/ocis/nats/pkg/command"
