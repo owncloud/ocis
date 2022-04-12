@@ -165,8 +165,6 @@ type FrontendPort struct {
 	DatagatewayPrefix          string     `yaml:"data_gateway_prefix"`
 	Favorites                  bool       `yaml:"favorites"`
 	ProjectSpaces              bool       `yaml:"project_spaces"`
-	OCDavInsecure              bool       `yaml:"ocdav_insecure"`
-	OCDavPrefix                string     `yaml:"ocdav_prefix"`
 	OCSPrefix                  string     `yaml:"ocs_prefix"`
 	OCSSharePrefix             string     `yaml:"ocs_share_prefix"`
 	OCSHomeNamespace           string     `yaml:"ocs_home_namespace"`
@@ -433,8 +431,26 @@ type LDAPGroupSchema struct {
 
 // OCDav defines the available ocdav configuration.
 type OCDav struct {
-	WebdavNamespace   string `yaml:"webdav_namespace"`
-	DavFilesNamespace string `yaml:"dav_files_namespace"`
+	// Addr to listen to with the http server for the ocdav service
+	Addr            string `yaml:"addr"`
+	Prefix          string `yaml:"prefix"`
+	WebdavNamespace string `yaml:"webdav_namespace"`
+	FilesNamespace  string `yaml:"files_namespace"`
+	SharesNamespace string `yaml:"shares_namespace"`
+	// PublicURL used to redirect /s/{token} URLs to
+	PublicURL string `yaml:"public_url"`
+
+	// Addr to listen to with the debug http server
+	DebugAddr string `yaml:"debug_addr"`
+
+	// GatewaySVC to forward CS3 requests to TODO use registry
+	GatewaySVC string `yaml:"gateway_svc"`
+	// JWTSecret used to verify reva access token
+	JWTSecret string `yaml:"jwt_secret"`
+	// Insecure certificates allowed when making requests to the gateway
+	Insecure bool `yaml:"insecure"`
+	// Timeout in seconds when making requests to the gateway
+	Timeout int64 `yaml:"timeout"`
 }
 
 // Archiver defines the available archiver configuration.
@@ -455,7 +471,6 @@ type Reva struct {
 	LDAP                  LDAP            `yaml:"ldap"`
 	UserGroupRest         UserGroupRest   `yaml:"user_group_rest"`
 	UserOwnCloudSQL       UserOwnCloudSQL `yaml:"user_owncloud_sql"`
-	OCDav                 OCDav           `yaml:"ocdav"`
 	Archiver              Archiver        `yaml:"archiver"`
 	UserStorage           StorageConfig   `yaml:"user_storage"`
 	MetadataStorage       StorageConfig   `yaml:"metadata_storage"`
@@ -483,7 +498,7 @@ type Reva struct {
 	// Services and Ports will be ignored if this is used
 	Configs map[string]interface{} `yaml:"configs"`
 	// chunking and resumable upload config (TUS)
-	UploadMaxChunkSize       int    `yaml:"uppload_max_chunk_size"`
+	UploadMaxChunkSize       int    `yaml:"upload_max_chunk_size"`
 	UploadHTTPMethodOverride string `yaml:"upload_http_method_override"`
 	// checksumming capabilities
 	ChecksumSupportedTypes      []string `yaml:"checksum_supported_types"`
@@ -512,6 +527,7 @@ type Config struct {
 	File    string      `yaml:"file"`
 	Log     *shared.Log `yaml:"log"`
 	Debug   Debug       `yaml:"debug"`
+	OCDav   OCDav       `yaml:"ocdav"`
 	Reva    Reva        `yaml:"reva"`
 	Tracing Tracing     `yaml:"tracing"`
 	Asset   Asset       `yaml:"asset"`
@@ -566,10 +582,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"OCIS_INSECURE", "STORAGE_FRONTEND_ARCHIVER_INSECURE"},
 			Destination: &cfg.Reva.Frontend.ArchiverInsecure,
-		},
-		{
-			EnvVars:     []string{"OCIS_INSECURE", "STORAGE_FRONTEND_OCDAV_INSECURE"},
-			Destination: &cfg.Reva.Frontend.OCDavInsecure,
 		},
 		{
 			EnvVars:     []string{"OCIS_INSECURE", "STORAGE_OIDC_INSECURE"},
@@ -774,18 +786,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 			Destination: &cfg.Reva.TransferSecret,
 		},
 		{
-			EnvVars:     []string{"STORAGE_CHUNK_FOLDER"},
-			Destination: &cfg.Reva.OCDav.WebdavNamespace,
-		},
-		{
-			EnvVars:     []string{"STORAGE_WEBDAV_NAMESPACE"},
-			Destination: &cfg.Reva.OCDav.WebdavNamespace,
-		},
-		{
-			EnvVars:     []string{"STORAGE_DAV_FILES_NAMESPACE"},
-			Destination: &cfg.Reva.OCDav.DavFilesNamespace,
-		},
-		{
 			EnvVars:     []string{"STORAGE_ARCHIVER_MAX_NUM_FILES"},
 			Destination: &cfg.Reva.Archiver.MaxNumFiles,
 		},
@@ -820,10 +820,6 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"STORAGE_FRONTEND_PROJECT_SPACES"},
 			Destination: &cfg.Reva.Frontend.ProjectSpaces,
-		},
-		{
-			EnvVars:     []string{"STORAGE_FRONTEND_OCDAV_PREFIX"},
-			Destination: &cfg.Reva.Frontend.OCDavPrefix,
 		},
 		{
 			EnvVars:     []string{"STORAGE_FRONTEND_OCS_PREFIX"},
@@ -1809,6 +1805,44 @@ func structMappings(cfg *Config) []shared.EnvBinding {
 		{
 			EnvVars:     []string{"STORAGE_PERMISSIONS_ENDPOINT"},
 			Destination: &cfg.Reva.Permissions.Endpoint,
+		},
+
+		// ocdav
+		{
+			EnvVars:     []string{"OCDAV_ADDR"},
+			Destination: &cfg.OCDav.Addr,
+		},
+		{
+			EnvVars:     []string{"OCDAV_DEBUG_ADDR"},
+			Destination: &cfg.OCDav.DebugAddr,
+		},
+		{
+			EnvVars:     []string{"OCDAV_PREFIX"},
+			Destination: &cfg.OCDav.Prefix,
+		},
+		{
+			EnvVars:     []string{"OCDAV_WEBDAV_NAMESPACE"},
+			Destination: &cfg.OCDav.WebdavNamespace,
+		},
+		{
+			EnvVars:     []string{"OCDAV_FILES_NAMESPACE"},
+			Destination: &cfg.OCDav.FilesNamespace,
+		},
+		{
+			EnvVars:     []string{"OCDAV_SHARES_NAMESPACE"},
+			Destination: &cfg.OCDav.SharesNamespace,
+		},
+		{
+			EnvVars:     []string{"OCIS_URL", "OCDAV_PUBLIC_URL"},
+			Destination: &cfg.OCDav.PublicURL,
+		},
+		{
+			EnvVars:     []string{"OCIS_INSECURE", "OCDAV_INSECURE"},
+			Destination: &cfg.OCDav.Insecure,
+		},
+		{
+			EnvVars:     []string{"OCIS_JWT_SECRET", "OCDAV_JWT_SECRET"},
+			Destination: &cfg.OCDav.JWTSecret,
 		},
 	}
 }

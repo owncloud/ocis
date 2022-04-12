@@ -17,7 +17,8 @@ The following sections list the changes for unreleased.
 * Enhancement - Add sorting to GraphAPI users and groups: [#3360](https://github.com/owncloud/ocis/issues/3360)
 * Enhancement - Unify LDAP config settings accross services: [#3476](https://github.com/owncloud/ocis/pull/3476)
 * Enhancement - Make config dir configurable: [#3440](https://github.com/owncloud/ocis/pull/3440)
-* Enhancement - Update reva to v2.x.x: [#3430](https://github.com/owncloud/ocis/pull/3430)
+* Enhancement - Use embeddable ocdav go micro service: [#3397](https://github.com/owncloud/ocis/pull/3397)
+* Enhancement - Update reva to v2.x.x: [#3397](https://github.com/owncloud/ocis/pull/3397)
 * Enhancement - Update ownCloud Web to v5.4.0: [#6709](https://github.com/owncloud/web/pull/6709)
 * Enhancement - Implement audit events for user and groups: [#3467](https://github.com/owncloud/ocis/pull/3467)
 
@@ -115,12 +116,20 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3440
 
-* Enhancement - Update reva to v2.x.x: [#3430](https://github.com/owncloud/ocis/pull/3430)
+* Enhancement - Use embeddable ocdav go micro service: [#3397](https://github.com/owncloud/ocis/pull/3397)
+
+   We now use the reva `pgk/micro/ocdav` package that implements a go micro compatible version of
+   the ocdav service.
+
+   https://github.com/owncloud/ocis/pull/3397
+
+* Enhancement - Update reva to v2.x.x: [#3397](https://github.com/owncloud/ocis/pull/3397)
 
    Updated reva to version 2.x.x. This update includes:
 
   * TODO
 
+   https://github.com/owncloud/ocis/pull/3397
    https://github.com/owncloud/ocis/pull/3430
    https://github.com/owncloud/ocis/pull/3476
    https://github.com/owncloud/ocis/pull/3482

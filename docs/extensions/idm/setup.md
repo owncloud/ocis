@@ -50,7 +50,7 @@ export STORAGE_LDAP_USERATTRIBUTEFILTER='(&(objectclass=owncloud)({{attr}}={{val
 export STORAGE_LDAP_USERFINDFILTER='(&(objectclass=owncloud)(|(uid={{query}}*)(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)(description={{query}}*)))'
 export STORAGE_LDAP_USERGROUPFILER='(&(objectclass=groupOfNames)(member={{query}}*))'
 export STORAGE_LDAP_GROUPFILTER='(&(objectclass=groupOfNames)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))'
-export OCIS_RUN_EXTENSIONS=settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,idp,nats,idm
+export OCIS_RUN_EXTENSIONS=settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,idp,nats,idm,ocdav
 export OCIS_INSECURE=true
 bin/ocis server
 ```
