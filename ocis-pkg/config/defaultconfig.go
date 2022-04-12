@@ -7,7 +7,7 @@ import (
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/config/defaults"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/config/defaults"
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/config/defaults"
-	idp "github.com/owncloud/ocis/idp/pkg/config/defaults"
+	idp "github.com/owncloud/ocis/extensions/idp/pkg/config/defaults"
 	nats "github.com/owncloud/ocis/nats/pkg/config/defaults"
 	notifications "github.com/owncloud/ocis/notifications/pkg/config/defaults"
 	ocs "github.com/owncloud/ocis/ocs/pkg/config/defaults"
