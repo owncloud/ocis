@@ -88,7 +88,10 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 	for _, pol := range options.Config.Policies {
 		for _, route := range pol.Routes {
 			rp.logger.Debug().Str("fwd: ", route.Endpoint)
-			// TODO check either Backend or Service is set
+
+			if route.Backend == "" && route.Service == "" {
+				rp.logger.Fatal().Interface("route", route).Msg("neither Backend nor Service is set")
+			}
 			uri, err2 := url.Parse(route.Backend)
 			if err2 != nil {
 				rp.logger.
