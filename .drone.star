@@ -1644,11 +1644,11 @@ def ocisServerWithIdp():
         "IDP_LDAP_BASE_DN": "ou=users,o=libregraph-idm",
         "IDP_LDAP_LOGIN_ATTRIBUTE": "uid",
         "PROXY_ACCOUNT_BACKEND_TYPE": "cs3",
-        "OCS_ACCOUNT_BACKEND_TYPE": "cs3",
+        "PROXY_ENABLE_BASIC_AUTH": "true",
         "STORAGE_LDAP_BIND_DN": "uid=reva,ou=sysusers,o=libregraph-idm",
         "STORAGE_LDAP_BIND_PASSWORD": "reva",
+        "OCS_ACCOUNT_BACKEND_TYPE": "cs3",
         "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,idp,nats,idm",
-        "PROXY_ENABLE_BASIC_AUTH": "true",
         "OCIS_LOG_LEVEL": "debug",
         "OCIS_INSECURE": "true",
     }
