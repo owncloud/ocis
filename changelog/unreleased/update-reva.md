@@ -24,4 +24,3 @@ https://github.com/owncloud/ocis/pull/3482
 https://github.com/owncloud/ocis/pull/3497
 https://github.com/owncloud/ocis/pull/3513
 https://github.com/owncloud/ocis/pull/3514
-
