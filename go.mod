@@ -15,14 +15,14 @@ require (
 	github.com/asim/go-micro/plugins/registry/mdns/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/asim/go-micro/plugins/registry/nats/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/asim/go-micro/plugins/server/grpc/v4 v4.0.0-20220118152736-9e0be6c85d75
-	github.com/asim/go-micro/plugins/server/http/v4 v4.0.0-20220118152736-9e0be6c85d75
+	github.com/asim/go-micro/plugins/server/http/v4 v4.0.0-20220317022205-c6d352c83291
 	github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/blevesearch/bleve/v2 v2.3.2
 	github.com/coreos/go-oidc/v3 v3.1.0
-	github.com/cs3org/go-cs3apis v0.0.0-20220328105952-297bef33e13f
-	github.com/cs3org/reva/v2 v2.0.0-20220411161034-134ed5a0801f
+	github.com/cs3org/go-cs3apis v0.0.0-20220412090512-93c5918b4bde
+	github.com/cs3org/reva/v2 v2.0.0-20220412125706-8b210924f665
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.7
@@ -272,5 +272,3 @@ require (
 
 // we need to use a fork to make the windows build pass
 replace github.com/pkg/xattr => github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7
-
-replace github.com/cs3org/go-cs3apis => github.com/kobergj/go-cs3apis v0.0.0-20220406134716-65f04386eb09 // temp fork until cs3api change is merged
