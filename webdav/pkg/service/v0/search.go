@@ -30,6 +30,12 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if rep.SearchFiles == nil {
+		renderError(w, r, errBadRequest("missing search-files tag"))
+		g.log.Error().Err(err).Msg("error reading report")
+		return
+	}
+
 	rsp, err := g.searchClient.Search(r.Context(), &searchsvc.SearchRequest{
 		Query: rep.SearchFiles.Search.Pattern,
 	})
