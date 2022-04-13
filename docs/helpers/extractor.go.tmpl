@@ -28,7 +28,7 @@ if err != nil {
     log.Fatal(err)
 }
 replacer := strings.NewReplacer(
-		"github.com/owncloud/ocis/", "",
+		"github.com/owncloud/ocis/extensions/", "",
 		"/pkg/config/defaults", "",
 	)
 var fields []ConfigField
