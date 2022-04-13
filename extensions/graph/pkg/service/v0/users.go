@@ -18,8 +18,8 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/extensions/graph/pkg/identity"
 	"github.com/owncloud/ocis/extensions/graph/pkg/service/v0/errorcode"
+	settingssvc "github.com/owncloud/ocis/extensions/settings/pkg/service/v0"
 	settings "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
-	settingssvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
 
 // GetMe implements the Service interface.

@@ -10,8 +10,8 @@ import (
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/service/v0"
 	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/response"
+	settingsService "github.com/owncloud/ocis/extensions/settings/pkg/service/v0"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
-	settingsService "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
 
 // RequireSelfOrAdmin middleware is used to require the requesting user to be an admin or the requested user himself

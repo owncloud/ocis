@@ -14,7 +14,7 @@ import (
 	notifications "github.com/owncloud/ocis/extensions/notifications/pkg/config"
 	ocs "github.com/owncloud/ocis/extensions/ocs/pkg/config"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config"
-	settings "github.com/owncloud/ocis/settings/pkg/config"
+	settings "github.com/owncloud/ocis/extensions/settings/pkg/config"
 	storage "github.com/owncloud/ocis/storage/pkg/config"
 	store "github.com/owncloud/ocis/store/pkg/config"
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/config"

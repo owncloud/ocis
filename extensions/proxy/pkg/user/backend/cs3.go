@@ -8,9 +8,9 @@ import (
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	settingsService "github.com/owncloud/ocis/extensions/settings/pkg/service/v0"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
-	settingsService "github.com/owncloud/ocis/settings/pkg/service/v0"
 )
 
 type cs3backend struct {
