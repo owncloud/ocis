@@ -45,7 +45,7 @@ codeofficetypes = .odt .ott .ods .ots .odp .otp .odg .otg .doc .dot .xls .xlt .x
 tokenvalidity = 86400
 
 # WOPI lock expiration time [seconds]
-wopilockexpiration = 7200
+wopilockexpiration = 3600
 
 # WOPI lock strict check: if True, WOPI locks will be compared according to specs,
 # that is their representation must match. False (default) allows for a more relaxed
@@ -53,17 +53,35 @@ wopilockexpiration = 7200
 # on-premise setups.
 #wopilockstrictcheck = False
 
+# Enable support of rename operations from WOPI apps. This is currently
+# disabled by default as it has been observed that both MS Office and Collabora
+# Online do not play well with this feature.
+enablerename = False
+
+# Detection of external Microsoft Office or LibreOffice locks. By default, lock files
+# compatible with Office for Desktop applications are detected, assuming that the
+# underlying storage can be mounted as a remote filesystem: in this case, WOPI GetLock
+# and SetLock operations return such locks and prevent online apps from entering edit mode.
+# This feature can be disabled in order to operate a pure WOPI server for online apps.
+detectexternallocks = False
+
+# Location of the webconflict files. By default, such files are stored in the same path
+# as the original file. If that fails (e.g. because of missing permissions),
+# an attempt is made to store such files in this path if specified, otherwise
+# the system falls back to the recovery space (cf. io|recoverypath).
+# The keywords <user_initial> and <username> are replaced with the actual username's
+# initial letter and the actual username, respectively, so you can use e.g.
+# /your_storage/home/user_initial/username
+#conflictpath = /
+
+# ownCloud's WOPI proxy configuration. Disabled by default.
+#wopiproxy = https://external-wopi-proxy.org
+#wopiproxykey = key_for_proxy_jwt_encoding
+#proxiedappname = name_of_your_proxied_app
+
 # Logging level. Debug enables the Flask debug mode as well.
 # Valid values are: Debug, Info, Warning, Error.
 loglevel = Info
-
-# Location of the lock files. Currently, two modes are supported:
-# if a path is provided, all locks will be stored there with a hashed name,
-# otherwise the lock is stored on the same path as the original file.
-# This latter mode will eventually be dropped once the system is deemed
-# stable enough and lock files are hidden away.
-#lockpath = /your_storage/wopilocks
-
 
 [security]
 # Location of the secret files. Requires a restart of the
