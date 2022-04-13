@@ -17,8 +17,8 @@ import (
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/config"
 	storage "github.com/owncloud/ocis/extensions/storage/pkg/config"
 	store "github.com/owncloud/ocis/extensions/store/pkg/config"
+	web "github.com/owncloud/ocis/extensions/web/pkg/config"
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/config"
-	web "github.com/owncloud/ocis/web/pkg/config"
 	webdav "github.com/owncloud/ocis/webdav/pkg/config"
 )
 
