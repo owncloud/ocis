@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/owncloud/ocis/audit/pkg/types"
+	"github.com/owncloud/ocis/extensions/audit/pkg/types"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/test-go/testify/require"
 

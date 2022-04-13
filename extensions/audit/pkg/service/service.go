@@ -7,8 +7,8 @@ import (
 	"os"
 
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/owncloud/ocis/audit/pkg/config"
-	"github.com/owncloud/ocis/audit/pkg/types"
+	"github.com/owncloud/ocis/extensions/audit/pkg/config"
+	"github.com/owncloud/ocis/extensions/audit/pkg/types"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
