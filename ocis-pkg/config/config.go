@@ -17,9 +17,9 @@ import (
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/config"
 	storage "github.com/owncloud/ocis/extensions/storage/pkg/config"
 	store "github.com/owncloud/ocis/extensions/store/pkg/config"
+	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
 	web "github.com/owncloud/ocis/extensions/web/pkg/config"
 	webdav "github.com/owncloud/ocis/extensions/webdav/pkg/config"
-	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/config"
 )
 
 // TokenManager is the config for using the reva token manager
