@@ -3,6 +3,7 @@ package grpc
 import (
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/ocis-pkg/version"
+	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
 )
 
 // Server initializes a new go-micro service ready to run
@@ -20,7 +21,7 @@ func Server(opts ...Option) grpc.Service {
 		grpc.Version(version.String),
 	)
 
-	if err := searchsvc.RegisterSearchServiceHandler(service.Server(), handler); err != nil {
+	if err := searchsvc.RegisterSearchProviderHandler(service.Server(), handler); err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not register service handler")
 	}
 

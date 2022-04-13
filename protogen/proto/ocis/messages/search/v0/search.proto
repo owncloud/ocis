@@ -18,7 +18,7 @@ message Entity {
 	Reference ref = 1;
 	ResourceID id = 2;
 	string name = 3;
-	int64 size = 4;
+	uint64 size = 4;
 }
 
 message Match {
