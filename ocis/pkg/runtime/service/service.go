@@ -32,6 +32,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	ocs "github.com/owncloud/ocis/ocs/pkg/command"
 	proxy "github.com/owncloud/ocis/proxy/pkg/command"
+	search "github.com/owncloud/ocis/search/pkg/command"
 	settings "github.com/owncloud/ocis/settings/pkg/command"
 	storage "github.com/owncloud/ocis/storage/pkg/command"
 	store "github.com/owncloud/ocis/store/pkg/command"
@@ -120,6 +121,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["storage-public-link"] = storage.NewStoragePublicLink
 	s.ServicesRegistry["storage-appprovider"] = storage.NewAppProvider
 	s.ServicesRegistry["notifications"] = notifications.NewSutureService
+	s.ServicesRegistry["search"] = search.NewSutureService
 
 	// populate delayed services
 	s.Delayed["storage-sharing"] = storage.NewSharing

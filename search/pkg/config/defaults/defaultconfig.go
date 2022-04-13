@@ -1,24 +1,17 @@
 package defaults
 
 import (
-	"strings"
-
 	"github.com/owncloud/ocis/search/pkg/config"
 )
 
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
-			Addr:  "127.0.0.1:9124",
+			Addr:  "127.0.0.1:9224",
 			Token: "",
 		},
-		HTTP: config.HTTP{
-			Addr:      "127.0.0.1:9120",
-			Namespace: "com.owncloud.search",
-			Root:      "/search",
-		},
 		GRPC: config.GRPC{
-			Addr:      "127.0.0.1:9180",
+			Addr:      "127.0.0.1:9220",
 			Namespace: "com.owncloud.api",
 		},
 		Service: config.Service{
@@ -59,8 +52,5 @@ func EnsureDefaults(cfg *config.Config) {
 }
 
 func Sanitize(cfg *config.Config) {
-	// sanitize config
-	if cfg.HTTP.Root != "/" {
-		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
-	}
+	// no http endpoint to be sanitized
 }

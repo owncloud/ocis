@@ -108,17 +108,17 @@ func BuildMapping() mapping.IndexMapping {
 
 func toEntity(ref *sprovider.Reference, ri *sprovider.ResourceInfo) *indexDocument {
 	return &indexDocument{
-		RootID: ref.ResourceId.GetStorageId() + ":" + ref.ResourceId.GetOpaqueId(),
+		RootID: ref.ResourceId.GetStorageId() + "!" + ref.ResourceId.GetOpaqueId(),
 		Path:   ref.Path,
-		ID:     ri.Id.GetStorageId() + ":" + ri.Id.GetOpaqueId(),
+		ID:     ri.Id.GetStorageId() + "!" + ri.Id.GetOpaqueId(),
 		Name:   ri.Path,
 		Size:   ri.Size,
 	}
 }
 
 func fromFields(fields map[string]interface{}) (*searchmsg.Match, error) {
-	rootIDParts := strings.SplitN(fields["RootID"].(string), ":", 2)
-	IDParts := strings.SplitN(fields["ID"].(string), ":", 2)
+	rootIDParts := strings.SplitN(fields["RootID"].(string), "!", 2)
+	IDParts := strings.SplitN(fields["ID"].(string), "!", 2)
 
 	return &searchmsg.Match{
 		Entity: &searchmsg.Entity{
@@ -140,5 +140,5 @@ func fromFields(fields map[string]interface{}) (*searchmsg.Match, error) {
 }
 
 func idToBleveId(id *sprovider.ResourceId) string {
-	return id.StorageId + ":" + id.OpaqueId
+	return id.StorageId + "!" + id.OpaqueId
 }

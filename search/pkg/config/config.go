@@ -16,7 +16,6 @@ type Config struct {
 	Log     *Log     `ocisConfig:"log"`
 	Debug   Debug    `ocisConfig:"debug"`
 
-	HTTP HTTP `ocisConfig:"http"`
 	GRPC GRPC `ocisConfig:"grpc"`
 
 	Reva         Reva         `ocisConfig:"reva"`

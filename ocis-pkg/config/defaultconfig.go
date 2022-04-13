@@ -12,6 +12,7 @@ import (
 	notifications "github.com/owncloud/ocis/notifications/pkg/config/defaults"
 	ocs "github.com/owncloud/ocis/ocs/pkg/config/defaults"
 	proxy "github.com/owncloud/ocis/proxy/pkg/config/defaults"
+	search "github.com/owncloud/ocis/search/pkg/config/defaults"
 	settings "github.com/owncloud/ocis/settings/pkg/config/defaults"
 	storage "github.com/owncloud/ocis/storage/pkg/config/defaults"
 	store "github.com/owncloud/ocis/store/pkg/config/defaults"
@@ -40,6 +41,7 @@ func DefaultConfig() *Config {
 		Proxy:         proxy.DefaultConfig(),
 		GraphExplorer: graphExplorer.DefaultConfig(),
 		OCS:           ocs.DefaultConfig(),
+		Search:        search.DefaultConfig(),
 		Settings:      settings.DefaultConfig(),
 		Web:           web.DefaultConfig(),
 		Store:         store.DefaultConfig(),

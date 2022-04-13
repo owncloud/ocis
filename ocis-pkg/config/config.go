@@ -14,6 +14,7 @@ import (
 	notifications "github.com/owncloud/ocis/notifications/pkg/config"
 	ocs "github.com/owncloud/ocis/ocs/pkg/config"
 	proxy "github.com/owncloud/ocis/proxy/pkg/config"
+	search "github.com/owncloud/ocis/search/pkg/config"
 	settings "github.com/owncloud/ocis/settings/pkg/config"
 	storage "github.com/owncloud/ocis/storage/pkg/config"
 	store "github.com/owncloud/ocis/store/pkg/config"
@@ -71,6 +72,7 @@ type Config struct {
 	OCS           *ocs.Config           `yaml:"ocs"`
 	Web           *web.Config           `yaml:"web"`
 	Proxy         *proxy.Config         `yaml:"proxy"`
+	Search        *search.Config        `yaml:"search"`
 	Settings      *settings.Config      `yaml:"settings"`
 	Storage       *storage.Config       `yaml:"storage"`
 	Store         *store.Config         `yaml:"store"`

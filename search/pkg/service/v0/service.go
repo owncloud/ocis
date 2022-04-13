@@ -1,21 +1,21 @@
 package service
 
 import (
+	"context"
+
 	"github.com/blevesearch/bleve/v2"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/search/pkg/config"
 	"github.com/owncloud/ocis/search/pkg/search"
 	"github.com/owncloud/ocis/search/pkg/search/index"
 	searchprovider "github.com/owncloud/ocis/search/pkg/search/provider"
 )
 
-// userDefaultGID is the default integer representing the "users" group.
-const userDefaultGID = 30000
-
-// New returns a new instance of Service
-func New(opts ...Option) (*Service, error) {
+// NewHandler returns a service implementation for Service.
+func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
 	options := newOptions(opts...)
 	logger := options.Logger
 	cfg := options.Config
@@ -31,7 +31,7 @@ func New(opts ...Option) (*Service, error) {
 
 	gwclient, err := pool.GetGatewayServiceClient(cfg.Reva.Address)
 	if err != nil {
-		logger.Fatal().Msgf("could not get reva client at address %s", cfg.Reva.Address)
+		logger.Fatal().Err(err).Str("addr", cfg.Reva.Address).Msg("could not get reva client")
 	}
 
 	provider := searchprovider.New(gwclient, index)
@@ -50,4 +50,8 @@ type Service struct {
 	log      log.Logger
 	Config   *config.Config
 	provider search.ProviderClient
+}
+
+func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *searchsvc.SearchResponse) error {
+	return nil
 }

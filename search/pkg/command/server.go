@@ -12,7 +12,6 @@ import (
 	"github.com/owncloud/ocis/search/pkg/metrics"
 	"github.com/owncloud/ocis/search/pkg/server/debug"
 	"github.com/owncloud/ocis/search/pkg/server/grpc"
-	svc "github.com/owncloud/ocis/search/pkg/service/v0"
 	"github.com/owncloud/ocis/search/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
@@ -40,24 +39,17 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 				return context.WithCancel(cfg.Context)
 			}()
-			mtrcs := metrics.New()
-
 			defer cancel()
 
+			mtrcs := metrics.New()
 			mtrcs.BuildInfo.WithLabelValues(version.String).Set(1)
 
-			handler, err := svc.New(svc.Logger(logger), svc.Config(cfg))
-			if err != nil {
-				logger.Error().Err(err).Msg("handler init")
-				return err
-			}
 			grpcServer := grpc.Server(
 				grpc.Config(cfg),
 				grpc.Logger(logger),
 				grpc.Name(cfg.Service.Name),
 				grpc.Context(ctx),
 				grpc.Metrics(mtrcs),
-				grpc.Handler(handler),
 			)
 
 			gr.Add(grpcServer.Run, func(_ error) {
