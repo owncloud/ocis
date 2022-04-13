@@ -29,7 +29,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
-	settings_svc "github.com/owncloud/ocis/settings/pkg/service/v0"
+	settings_svc "github.com/owncloud/ocis/extensions/settings/pkg/service/v0"
 	"github.com/rs/zerolog"
 	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"

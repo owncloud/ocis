@@ -14,12 +14,12 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 	config "github.com/owncloud/ocis/extensions/accounts/pkg/config/defaults"
+	ssvc "github.com/owncloud/ocis/extensions/settings/pkg/service/v0"
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/roles"
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
-	ssvc "github.com/owncloud/ocis/settings/pkg/service/v0"
 	"github.com/stretchr/testify/assert"
 	"go-micro.dev/v4/client"
 	merrors "go-micro.dev/v4/errors"
