@@ -209,6 +209,7 @@ changelog: $(CALENS)
 ifndef CHANGELOG_VERSION
 	$(error CHANGELOG_VERSION is undefined)
 endif
+	mkdir -p ocis/dist
 	$(CALENS) --version $(CHANGELOG_VERSION) -o ocis/dist/CHANGELOG.md
 
 .PHONY: l10n-push
