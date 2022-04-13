@@ -8,6 +8,7 @@
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
@@ -135,6 +136,31 @@ class GraphContext implements Context {
 		$this->featureContext->thenTheHTTPStatusCodeShouldBe(200);
 	}
 
+    /**
+     * @param string $groupId
+     * @param bool $checkResult
+     *
+     * @return void
+     * @throws GuzzleException
+     */
+    public function adminDeletesGroupWithGroupId(
+        string $groupId,
+        bool $checkResult = false
+    ) {
+        $this->featureContext->setResponse(
+            GraphHelper::deleteGroup(
+                $this->featureContext->getBaseUrl(),
+                $this->featureContext->getStepLineRef(),
+                $this->featureContext->getAdminUsername(),
+                $this->featureContext->getAdminPassword(),
+                $groupId
+            )
+        );
+        if ($checkResult) {
+            $this->featureContext->thenTheHTTPStatusCodeShouldBe(204);
+        }
+    }
+
 	/**
 	 * @param string $group
 	 *
@@ -147,15 +173,7 @@ class GraphContext implements Context {
 	) {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		if ($groupId) {
-			$this->featureContext->setResponse(
-				GraphHelper::deleteGroup(
-					$this->featureContext->getBaseUrl(),
-					$this->featureContext->getStepLineRef(),
-					$this->featureContext->getAdminUsername(),
-					$this->featureContext->getAdminPassword(),
-					$groupId
-				)
-			);
+			$this->adminDeletesGroupWithGroupId($groupId);
 		} else {
 			throw new Exception(
 				"Group id does not exist for '$group' in the created list."
@@ -351,7 +369,7 @@ class GraphContext implements Context {
 	 * @param string $email
 	 * @param string $displayName
 	 *
-	 * @return array
+	 * @return void
 	 * @throws Exception
 	 */
 	public function theAdminHasCreatedUser(
@@ -359,7 +377,7 @@ class GraphContext implements Context {
 		string $password,
 		string $email,
 		string $displayName
-	): array {
+	): void {
 		$response = GraphHelper::createUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -373,7 +391,7 @@ class GraphContext implements Context {
 		if ($response->getStatusCode() !== 200) {
 			$this->throwHttpException($response, "Could not create user $user");
 		} else {
-			return $this->featureContext->getJsonDecodedResponse($response);
+			$this->featureContext->setResponse($response);
 		}
 	}
 
@@ -458,4 +476,36 @@ class GraphContext implements Context {
 			);
 		}
 	}
+
+    /**
+     * @param string $shouldOrNot (not|)
+     * @param TableNode $table
+     *
+     * @throws GuzzleException
+     * @throws Exception
+     */
+    public function theseGroupsShouldNotExist(string $shouldOrNot, TableNode $table):void {
+        $should = ($shouldOrNot !== "not");
+        $this->featureContext->verifyTableNodeColumns($table, ['groupname']);
+        $actualGroupsList = $this->adminHasRetrievedGroupListUsingTheGraphApi();
+        $expectedGroups = $table->getColumnsHash();
+        // check if every expected group is(not) in the actual groups list
+        foreach ($expectedGroups as $expectedGroup) {
+            $groupName = $expectedGroup['groupname'];
+            $groupExists = false;
+            foreach ($actualGroupsList as $actualGroup) {
+                if ($actualGroup['displayName'] === $groupName) {
+                    $groupExists = true;
+                    break;
+                }
+            }
+            if ($groupExists !== $should) {
+                throw new Exception(
+                    __METHOD__
+                    . "\nGroup '$groupName' is expected " . ($should ? "" : "not ")
+                    . "to exist, but it does" . ($should ? " not" : "") . " exist."
+                );
+            }
+        }
+    }
 }
