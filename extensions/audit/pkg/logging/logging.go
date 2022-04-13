@@ -1,7 +1,7 @@
 package logging
 
 import (
-	"github.com/owncloud/ocis/audit/pkg/config"
+	"github.com/owncloud/ocis/extensions/audit/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 

@@ -7,11 +7,11 @@ import (
 	"github.com/asim/go-micro/plugins/events/natsjs/v4"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/server"
-	"github.com/owncloud/ocis/audit/pkg/config"
-	"github.com/owncloud/ocis/audit/pkg/config/parser"
-	"github.com/owncloud/ocis/audit/pkg/logging"
-	svc "github.com/owncloud/ocis/audit/pkg/service"
-	"github.com/owncloud/ocis/audit/pkg/types"
+	"github.com/owncloud/ocis/extensions/audit/pkg/config"
+	"github.com/owncloud/ocis/extensions/audit/pkg/config/parser"
+	"github.com/owncloud/ocis/extensions/audit/pkg/logging"
+	svc "github.com/owncloud/ocis/extensions/audit/pkg/service"
+	"github.com/owncloud/ocis/extensions/audit/pkg/types"
 	"github.com/urfave/cli/v2"
 )
 

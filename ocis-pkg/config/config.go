@@ -3,8 +3,8 @@ package config
 import (
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 
-	audit "github.com/owncloud/ocis/audit/pkg/config"
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/config"
+	audit "github.com/owncloud/ocis/extensions/audit/pkg/config"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/config"
