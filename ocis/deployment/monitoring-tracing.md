@@ -17,7 +17,7 @@ This documentation describes how to set up a long running monitoring & tracing i
 
 # Overview about the proposed solution
 
-{{< svg src="ocis/static/monitoring_tracing_overview.drawio.svg" >}}
+{{< figure src="/ocis/static/monitoring_tracing_overview.drawio.svg" >}}
 
 ## Monitoring & tracing clients
 
