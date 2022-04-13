@@ -751,7 +751,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "LOCAL_UPLOAD_DIR": "/uploads",
                     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
                     "WEB_PATH": "/srv/app/web",
-                    "FEATURE_PATH": "/drone/src/accounts/ui/tests/acceptance/features",
+                    "FEATURE_PATH": "/drone/src/extensions/accounts/ui/tests/acceptance/features",
                     "MIDDLEWARE_HOST": "http://middleware:3000",
                 },
                 "commands": [
@@ -762,7 +762,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "git checkout $WEB_COMMITID",
                     # TODO: settings/package.json has all the acceptance test dependencies
                     # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
-                    "cd /drone/src/accounts",
+                    "cd /drone/src/extensions/accounts",
                     "yarn install --immutable",
                     "make test-acceptance-webui",
                 ],
@@ -815,7 +815,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "LOCAL_UPLOAD_DIR": "/uploads",
                     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
                     "WEB_PATH": "/srv/app/web",
-                    "FEATURE_PATH": "/drone/src/settings/ui/tests/acceptance/features",
+                    "FEATURE_PATH": "/drone/src/extensions/settings/ui/tests/acceptance/features",
                     "MIDDLEWARE_HOST": "http://middleware:3000",
                 },
                 "commands": [
@@ -826,7 +826,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "git checkout $WEB_COMMITID",
                     # TODO: settings/package.json has all the acceptance test dependencies
                     # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
-                    "cd /drone/src/settings",
+                    "cd /drone/src/extensions/settings",
                     "yarn install --immutable",
                     "make test-acceptance-webui",
                 ],
@@ -1630,6 +1630,14 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "ACCOUNTS_DEMO_USERS_AND_GROUPS": True,  # deprecated, remove after switching to LibreIDM
             "IDM_CREATE_DEMO_USERS": True,
         }
+        wait_for_ocis = {
+            "name": "wait-for-ocis-server",
+            "image": OC_CI_ALPINE,
+            "commands": [
+                "curl -k -u admin:admin --fail --retry-connrefused --retry 10 --retry-all-errors 'https://ocis-server:9200/graph/v1.0/users/ddc2004c-0977-11eb-9d3f-a793888cd0f8'",
+            ],
+            "depends_on": depends_on,
+        }
     else:
         user = "33:33"
         environment = {
@@ -1710,6 +1718,14 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "ACCOUNTS_DEMO_USERS_AND_GROUPS": True,  # deprecated, remove after switching to LibreIDM
             "IDM_CREATE_DEMO_USERS": True,
         }
+        wait_for_ocis = {
+            "name": "wait-for-ocis-server",
+            "image": OC_CI_WAIT_FOR,
+            "commands": [
+                "wait-for -it ocis-server:9200 -t 300",
+            ],
+            "depends_on": depends_on,
+        }
 
     # Pass in "default" accounts_hash_difficulty to not set this environment variable.
     # That will allow OCIS to use whatever its built-in default is.
@@ -1731,14 +1747,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "volumes": volumes,
             "depends_on": depends_on,
         },
-        {
-            "name": "wait-for-ocis-server",
-            "image": OC_CI_ALPINE,
-            "commands": [
-                "curl -k -u admin:admin --retry 10 --retry-all-errors 'https://ocis-server:9200/graph/v1.0/users/ddc2004c-0977-11eb-9d3f-a793888cd0f8'",
-            ],
-            "depends_on": depends_on,
-        },
+        wait_for_ocis,
     ]
 
 def middlewareService():
