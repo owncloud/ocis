@@ -1618,13 +1618,10 @@ def notify(ctx):
     }
 
 def ocisServerWithIdp():
-    ldapPort = 9235
-    ldapHost = "0.0.0.0"
-    ldapUri = "ldaps://%s:%d" % (ldapHost, ldapPort)
     environment = {
         "GRAPH_IDENTITY_BACKEND": "ldap",
         "GRAPH_LDAP_SERVER_WRITE_ENABLED": "true",
-        "LDAP_URI": ldapUri,
+        "LDAP_URI": "ldaps://0.0.0.0:9235",
         "LDAP_INSECURE": "true",
         "LDAP_BIND_DN": "uid=libregraph,ou=sysusers,o=libregraph-idm",
         "LDAP_BIND_PASSWORD": "idm",
