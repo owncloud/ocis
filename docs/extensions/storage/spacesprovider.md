@@ -17,18 +17,18 @@ The current implementation in oCIS might not yet fully reflect this concept. Fee
 A *storage provider* manages [*resources*]({{< ref "#resources" >}}) identified by a [*reference*]({{< ref "#references" >}})
 by accessing a [*storage system*]({{< ref "#storage-systems" >}}) with a [*storage driver*]({{< ref "./storagedrivers.md" >}}).
 
-{{< svg src="extensions/storage/static/spacesprovider.drawio.svg" >}}
+{{< figure src="/extensions/storage/static/spacesprovider.drawio.svg" >}}
 
 
 ## Frontend
 
 The oCIS frontend service starts all services that handle incoming HTTP requests:
 - *ocdav* for ownCloud flavoured WebDAV
-- *ocs* for sharing, user provisioning, capabilities and other OCS API endpoints 
+- *ocs* for sharing, user provisioning, capabilities and other OCS API endpoints
 - *datagateway* for up and downloads
 - TODO: *ocm*
 
-{{< svg src="extensions/storage/static/frontend.drawio.svg" >}}
+{{< figure src="/extensions/storage/static/frontend.drawio.svg" >}}
 
 ### WebDAV
 
@@ -83,7 +83,7 @@ The API [already returns the storage id](https://doc.owncloud.com/server/develop
     <file_source>3994486</file_source>
     <file_parent>3994485</file_parent>
     <file_target>/Shared/Paris.jpg</file_target>
-``` 
+```
 [Creating shares only takes the **path** as the argument](https://doc.owncloud.com/server/developer_manual/core/apis/ocs-share-api.html#function-arguments) so creating and navigating shares only needs the path. When you update or delete a share it takes the `share id` not the `file id`.
 {{< /hint >}}
 
@@ -109,4 +109,4 @@ It is used by the reva *gateway*
 to look up `address` and `port` of the [*storage provider*]({{< ref "#storage-providers" >}})
 that should handle a [*reference*]({{< ref "#references" >}}).
 
-{{< svg src="extensions/storage/static/storageregistry.drawio.svg" >}}
+{{< figure src="/extensions/storage/static/storageregistry.drawio.svg" >}}

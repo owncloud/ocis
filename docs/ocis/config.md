@@ -15,7 +15,7 @@ In order to simplify deployments and development the configuration model from oC
 
 ## Overview of the approach
 
-{{< svg src="ocis/static/ocis-config-redesign.drawio.svg" >}}
+{{< figure src="/ocis/static/ocis-config-redesign.drawio.svg" >}}
 
 ## In-depth configuration
 
