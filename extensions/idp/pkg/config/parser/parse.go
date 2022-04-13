@@ -12,7 +12,7 @@ import (
 
 // ParseConfig loads accounts configuration from known paths.
 func ParseConfig(cfg *config.Config) error {
-	_, err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg)
+	_, err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg.ConfigFile, cfg.ConfigFileHasBeenSet, cfg)
 	if err != nil {
 		return err
 	}

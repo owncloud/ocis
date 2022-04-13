@@ -10,6 +10,9 @@ import (
 type Config struct {
 	*shared.Commons `yaml:"-"`
 
+	ConfigFile           string `yaml:"-" env:"ACCOUNTS_CONFIG_FILE" desc:"config file to be used by the accounts extension"`
+	ConfigFileHasBeenSet bool   `yaml:"-"`
+
 	Service Service `yaml:"-"`
 
 	Tracing *Tracing `yaml:"tracing"`
