@@ -15,7 +15,7 @@ import (
 	ocs "github.com/owncloud/ocis/extensions/ocs/pkg/config"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config"
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/config"
-	storage "github.com/owncloud/ocis/storage/pkg/config"
+	storage "github.com/owncloud/ocis/extensions/storage/pkg/config"
 	store "github.com/owncloud/ocis/store/pkg/config"
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/config"
 	web "github.com/owncloud/ocis/web/pkg/config"
