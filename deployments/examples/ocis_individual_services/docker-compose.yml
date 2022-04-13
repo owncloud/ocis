@@ -134,6 +134,8 @@ services:
       STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
 
       ACCOUNTS_JWT_SECRET: ${OCIS_METADATA_JWT_SECRET:-Pive-Fumkiu4}
+      # demo users
+      ACCOUNTS_DEMO_USERS_AND_GROUPS: "${DEMO_USERS:-false}"  # deprecated, remove after switching to LibreIDM
     volumes:
       - ./config/accounts/entrypoint-override.sh:/entrypoint-override.sh
     logging:
@@ -606,8 +608,7 @@ services:
       STORAGE_USERPROVIDER_ADDR: 0.0.0.0:9144
 
       STORAGE_USERPROVIDER_DRIVER: ldap
-      STORAGE_LDAP_HOSTNAME: glauth
-      STORAGE_LDAP_PORT: 9126
+      STORAGE_LDAP_URI: "ldaps://glauth:9126"
       STORAGE_LDAP_INSECURE: "true"
       STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
       STORAGE_LDAP_IDP: https://${OCIS_DOMAIN:-ocis.owncloud.test}
@@ -637,8 +638,7 @@ services:
       STORAGE_GROUPPROVIDER_ADDR: 0.0.0.0:9160
 
       STORAGE_GROUPPROVIDER_DRIVER: ldap
-      STORAGE_LDAP_HOSTNAME: glauth
-      STORAGE_LDAP_PORT: 9126
+      STORAGE_LDAP_URI: "ldaps://glauth:9126"
       STORAGE_LDAP_INSECURE: "true"
       STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
       STORAGE_LDAP_IDP: https://${OCIS_DOMAIN:-ocis.owncloud.test}

@@ -186,14 +186,6 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 					"timeout":                86400,
 					"insecure":               true,
 				},
-				"ocdav": map[string]interface{}{
-					"prefix":           cfg.Reva.Frontend.OCDavPrefix,
-					"files_namespace":  cfg.Reva.OCDav.DavFilesNamespace,
-					"webdav_namespace": cfg.Reva.OCDav.WebdavNamespace,
-					"timeout":          86400,
-					"insecure":         cfg.Reva.Frontend.OCDavInsecure,
-					"public_url":       cfg.Reva.Frontend.PublicURL,
-				},
 				"ocs": map[string]interface{}{
 					"storage_registry_svc":      cfg.Reva.Gateway.Endpoint,
 					"share_prefix":              cfg.Reva.Frontend.OCSSharePrefix,

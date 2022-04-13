@@ -75,10 +75,11 @@ func DefaultConfig() *config.Config {
 			Scope:             "sub",
 			LoginAttribute:    "cn",
 			EmailAttribute:    "mail",
-			NameAttribute:     "sn",
+			NameAttribute:     "displayName",
 			UUIDAttribute:     "uid",
 			UUIDAttributeType: "text",
-			Filter:            "(objectClass=posixaccount)",
+			Filter:            "",
+			ObjectClass:       "posixAccount",
 		},
 	}
 }

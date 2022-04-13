@@ -56,7 +56,7 @@ release-linux: release-dirs
 		-buildmode=pie \
 		-trimpath \
 		-ldflags '-extldflags "-static" $(LDFLAGS)' \
-		-o '$(DIST)/binaries/$(EXECUTABLE)-linux-amd64' \
+		-o '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-linux-amd64' \
 		./cmd/$(NAME)
 
 	GOOS=linux \
@@ -65,7 +65,7 @@ release-linux: release-dirs
 		-tags 'netgo $(TAGS)' \
 		-trimpath \
 		-ldflags '-extldflags "-static" $(LDFLAGS)' \
-		-o '$(DIST)/binaries/$(EXECUTABLE)-linux-386' \
+		-o '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-linux-386' \
 		./cmd/$(NAME)
 
 	GOOS=linux \
@@ -75,7 +75,7 @@ release-linux: release-dirs
 		-buildmode=pie \
 		-trimpath \
 		-ldflags '-extldflags "-static" $(LDFLAGS)' \
-		-o '$(DIST)/binaries/$(EXECUTABLE)-linux-arm64' \
+		-o '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-linux-arm64' \
 		./cmd/$(NAME)
 
 	GOOS=linux \
@@ -84,7 +84,7 @@ release-linux: release-dirs
 		-tags 'netgo $(TAGS)' \
 		-trimpath \
 		-ldflags '-extldflags "-static" $(LDFLAGS)' \
-		-o '$(DIST)/binaries/$(EXECUTABLE)-linux-arm' \
+		-o '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-linux-arm' \
 		./cmd/$(NAME)
 
 	@# https://github.com/golang/go/issues/50405
@@ -99,7 +99,7 @@ release-windows: release-dirs
 		-buildmode=pie \
 		-trimpath \
 		-ldflags '-extldflags "-static" $(LDFLAGS)' \
-		-o '$(DIST)/binaries/$(EXECUTABLE)-windows-amd64' \
+		-o '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-windows-amd64' \
 		./cmd/$(NAME)
 
 .PHONY: release-darwin
@@ -111,7 +111,7 @@ release-darwin: release-dirs
 		-buildmode=pie \
 		-trimpath \
 		-ldflags '$(LDFLAGS)' \
-		-o '$(DIST)/binaries/$(EXECUTABLE)-darwin-amd64' \
+		-o '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-darwin-amd64' \
 		./cmd/$(NAME)
 
 	GOOS=darwin \
@@ -121,7 +121,7 @@ release-darwin: release-dirs
 		-buildmode=pie \
 		-trimpath \
 		-ldflags '$(LDFLAGS)' \
-		-o '$(DIST)/binaries/$(EXECUTABLE)-darwin-arm64' \
+		-o '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-darwin-arm64' \
 		./cmd/$(NAME)
 
 .PHONY: release-copy

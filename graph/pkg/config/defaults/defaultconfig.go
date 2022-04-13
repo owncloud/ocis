@@ -43,7 +43,8 @@ func DefaultConfig() *config.Config {
 				WriteEnabled:             false,
 				UserBaseDN:               "ou=users,dc=ocis,dc=test",
 				UserSearchScope:          "sub",
-				UserFilter:               "(objectClass=inetOrgPerson)",
+				UserFilter:               "",
+				UserObjectClass:          "inetOrgPerson",
 				UserEmailAttribute:       "mail",
 				UserDisplayNameAttribute: "displayName",
 				UserNameAttribute:        "uid",
@@ -52,10 +53,15 @@ func DefaultConfig() *config.Config {
 				UserIDAttribute:    "owncloudUUID",
 				GroupBaseDN:        "ou=groups,dc=ocis,dc=test",
 				GroupSearchScope:   "sub",
-				GroupFilter:        "(objectclass=groupOfNames)",
+				GroupFilter:        "",
+				GroupObjectClass:   "groupOfNames",
 				GroupNameAttribute: "cn",
 				GroupIDAttribute:   "owncloudUUID",
 			},
+		},
+		Events: config.Events{
+			Endpoint: "127.0.0.1:9233",
+			Cluster:  "ocis-cluster",
 		},
 	}
 }

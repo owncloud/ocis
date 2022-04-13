@@ -2,15 +2,37 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.19.1...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.19.0...master
 
 ## Summary
 
+* Bugfix - Add `owncloudsql` driver to authprovider config: [#3435](https://github.com/owncloud/ocis/pull/3435)
+* Bugfix - Corrected documentation: [#3439](https://github.com/owncloud/ocis/pull/3439)
 * Bugfix - Ensure the same data on /ocs/v?.php/config like oC10: [#3113](https://github.com/owncloud/ocis/pull/3113)
 * Bugfix - Use the default server download protocol if spaces are not supported: [#3386](https://github.com/owncloud/ocis/pull/3386)
+* Change - Fix keys with underscores in the config files: [#3412](https://github.com/owncloud/ocis/pull/3412)
+* Change - Don't create demo users by default: [#3474](https://github.com/owncloud/ocis/pull/3474)
+* Enhancement - Alias links: [#3454](https://github.com/owncloud/ocis/pull/3454)
+* Enhancement - Replace deprecated String.prototype.substr(): [#3448](https://github.com/owncloud/ocis/pull/3448)
 * Enhancement - Add sorting to GraphAPI users and groups: [#3360](https://github.com/owncloud/ocis/issues/3360)
+* Enhancement - Unify LDAP config settings accross services: [#3476](https://github.com/owncloud/ocis/pull/3476)
+* Enhancement - Make config dir configurable: [#3440](https://github.com/owncloud/ocis/pull/3440)
+* Enhancement - Use embeddable ocdav go micro service: [#3397](https://github.com/owncloud/ocis/pull/3397)
+* Enhancement - Update reva to v2.2.0: [#3397](https://github.com/owncloud/ocis/pull/3397)
+* Enhancement - Update ownCloud Web to v5.4.0: [#6709](https://github.com/owncloud/web/pull/6709)
+* Enhancement - Implement audit events for user and groups: [#3467](https://github.com/owncloud/ocis/pull/3467)
 
 ## Details
+
+* Bugfix - Add `owncloudsql` driver to authprovider config: [#3435](https://github.com/owncloud/ocis/pull/3435)
+
+   https://github.com/owncloud/ocis/pull/3435
+
+* Bugfix - Corrected documentation: [#3439](https://github.com/owncloud/ocis/pull/3439)
+
+   - ocis-pkg log File Option
+
+   https://github.com/owncloud/ocis/pull/3439
 
 * Bugfix - Ensure the same data on /ocs/v?.php/config like oC10: [#3113](https://github.com/owncloud/ocis/pull/3113)
 
@@ -23,6 +45,37 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3386
 
+* Change - Fix keys with underscores in the config files: [#3412](https://github.com/owncloud/ocis/pull/3412)
+
+   We've fixed some config keys in configuration files that previously didn't contain
+   underscores but should.
+
+   Please check the documentation on https://owncloud.dev for latest configuration
+   documentation.
+
+   https://github.com/owncloud/ocis/pull/3412
+
+* Change - Don't create demo users by default: [#3474](https://github.com/owncloud/ocis/pull/3474)
+
+   As we are coming closer to the first beta, we need to disable the creation of the demo users by
+   default.
+
+   https://github.com/owncloud/ocis/issues/3181
+   https://github.com/owncloud/ocis/pull/3474
+
+* Enhancement - Alias links: [#3454](https://github.com/owncloud/ocis/pull/3454)
+
+   Bumps reva and configures ocs token endpoint to be unprotected
+
+   https://github.com/owncloud/ocis/pull/3454
+
+* Enhancement - Replace deprecated String.prototype.substr(): [#3448](https://github.com/owncloud/ocis/pull/3448)
+
+   We've replaced all occurrences of the deprecated String.prototype.substr() function with
+   String.prototype.slice() which works similarly but isn't deprecated.
+
+   https://github.com/owncloud/ocis/pull/3448
+
 * Enhancement - Add sorting to GraphAPI users and groups: [#3360](https://github.com/owncloud/ocis/issues/3360)
 
    The GraphAPI endpoints for users and groups support ordering now. User can be ordered by
@@ -31,28 +84,97 @@ The following sections list the changes for unreleased.
    Example: https://localhost:9200/graph/v1.0/groups?$orderby=displayName asc
 
    https://github.com/owncloud/ocis/issues/3360
-# Changelog for [1.19.1] (2022-03-29)
 
-The following sections list the changes for 1.19.1.
+* Enhancement - Unify LDAP config settings accross services: [#3476](https://github.com/owncloud/ocis/pull/3476)
 
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+   The storage services where updated to adapt for the recent changes of the LDAP settings in reva.
 
-## Summary
+   Also we allow now to use a new set of top-level LDAP environment variables that are shared
+   between all LDAP-using services in ocis (graph, idp, storage-auth-basic,
+   storage-userprovider, storage-groupprovider, idm). This should simplify the most LDAP
+   based configurations considerably.
 
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+   Here is a list of the new environment variables: LDAP_URI LDAP_INSECURE LDAP_CACERT
+   LDAP_BIND_DN LDAP_BIND_PASSWORD LDAP_LOGIN_ATTRIBUTES LDAP_USER_BASE_DN
+   LDAP_USER_SCOPE LDAP_USER_FILTER LDAP_USER_OBJECTCLASS LDAP_USER_SCHEMA_MAIL
+   LDAP_USER_SCHEMA_DISPLAY_NAME LDAP_USER_SCHEMA_USERNAME LDAP_USER_SCHEMA_ID
+   LDAP_USER_SCHEMA_ID_IS_OCTETSTRING LDAP_GROUP_BASE_DN LDAP_GROUP_SCOPE
+   LDAP_GROUP_FILTER LDAP_GROUP_OBJECTCLASS LDAP_GROUP_SCHEMA_GROUPNAME
+   LDAP_GROUP_SCHEMA_ID LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING
 
-## Details
+   Where need these can be overwritten by service specific variables. E.g. it is possible to use
+   STORAGE_LDAP_URI to overide the top-level LDAP_URI variable.
 
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+   https://github.com/owncloud/ocis/issues/3150
+   https://github.com/owncloud/ocis/pull/3476
 
-   URLs for Special items (space image, readme) were broken.
+* Enhancement - Make config dir configurable: [#3440](https://github.com/owncloud/ocis/pull/3440)
 
-   https://github.com/owncloud/ocis/pull/3419
+   We have added an `OCIS_CONFIG_DIR` environment variable the will take precedence over the
+   default `/etc/ocis`, `~/.ocis` and `.config` locations. When it is set the default locations
+   will be ignored and only the configuration files in that directory will be read.
+
+   https://github.com/owncloud/ocis/pull/3440
+
+* Enhancement - Use embeddable ocdav go micro service: [#3397](https://github.com/owncloud/ocis/pull/3397)
+
+   We now use the reva `pgk/micro/ocdav` package that implements a go micro compatible version of
+   the ocdav service.
+
+   https://github.com/owncloud/ocis/pull/3397
+
+* Enhancement - Update reva to v2.2.0: [#3397](https://github.com/owncloud/ocis/pull/3397)
+
+   Updated reva to version 2.2.0. This update includes:
+
+  * Bugfix [cs3org/reva#3373](https://github.com/cs3org/reva/pull/3373):  Fix the permissions attribute in propfind responses
+  * Bugfix [cs3org/reva#2721](https://github.com/cs3org/reva/pull/2721):  Fix locking and public link scope checker to make the WOPI server work
+  * Bugfix [cs3org/reva#2668](https://github.com/cs3org/reva/pull/2668):  Minor cleanup
+  * Bugfix [cs3org/reva#2692](https://github.com/cs3org/reva/pull/2692):  Ensure that the host in the ocs config endpoint has no protocol
+  * Bugfix [cs3org/reva#2709](https://github.com/cs3org/reva/pull/2709):  Decomposed FS: return precondition failed if already locked
+  * Change [cs3org/reva#2687](https://github.com/cs3org/reva/pull/2687):  Allow link with no or edit permission
+  * Change [cs3org/reva#2658](https://github.com/cs3org/reva/pull/2658):  Small clean up of the ocdav code
+  * Change [cs3org/reva#2691](https://github.com/cs3org/reva/pull/2691):  Decomposed FS: return a reference to the parent
+  * Enhancement [cs3org/reva#2708](https://github.com/cs3org/reva/pull/2708):  Rework LDAP configuration of user and group providers
+  * Enhancement [cs3org/reva#2665](https://github.com/cs3org/reva/pull/2665):  Add embeddable ocdav go micro service
+  * Enhancement [cs3org/reva#2715](https://github.com/cs3org/reva/pull/2715):  Introduced quicklinks
+  * Enhancement [cs3org/reva#3370](https://github.com/cs3org/reva/pull/3370):  Enable all spaces members to list public shares
+  * Enhancement [cs3org/reva#3370](https://github.com/cs3org/reva/pull/3370):  Enable space members to list shares inside the space
+  * Enhancement [cs3org/reva#2717](https://github.com/cs3org/reva/pull/2717):  Add definitions for user and group events
+
+   https://github.com/owncloud/ocis/pull/3397
+   https://github.com/owncloud/ocis/pull/3430
+   https://github.com/owncloud/ocis/pull/3476
+   https://github.com/owncloud/ocis/pull/3482
+   https://github.com/owncloud/ocis/pull/3497
+   https://github.com/owncloud/ocis/pull/3513
+   https://github.com/owncloud/ocis/pull/3514
+
+* Enhancement - Update ownCloud Web to v5.4.0: [#6709](https://github.com/owncloud/web/pull/6709)
+
+   Tags: web
+
+   We updated ownCloud Web to v5.4.0. Please refer to the changelog (linked) for details on the web
+   release.
+
+   https://github.com/owncloud/web/pull/6709
+   https://github.com/owncloud/ocis/pull/3437
+   https://github.com/owncloud/ocis/pull/3487
+   https://github.com/owncloud/ocis/pull/3509
+   https://github.com/owncloud/web/releases/tag/v5.4.0
+
+* Enhancement - Implement audit events for user and groups: [#3467](https://github.com/owncloud/ocis/pull/3467)
+
+   Added audit events for users and groups. This will log: * User creation * User deletion * User
+   property change (currently only email) * Group creation * Group deletion * Group member add *
+   Group member remove
+
+   https://github.com/owncloud/ocis/pull/3467
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -221,6 +343,23 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 # Changelog for [1.18.0] (2022-03-03)
 
 The following sections list the changes for 1.18.0.

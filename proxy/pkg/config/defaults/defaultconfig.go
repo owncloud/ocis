@@ -52,8 +52,6 @@ func DefaultConfig() *config.Config {
 		AutoprovisionAccounts: false,
 		EnableBasicAuth:       false,
 		InsecureBackends:      false,
-		// TODO: enable
-		//Policies: defaultPolicies(),
 	}
 }
 
@@ -107,30 +105,34 @@ func DefaultPolicies() []config.Policy {
 				},
 				{
 					Endpoint: "/remote.php/",
-					Backend:  "http://localhost:9140",
+					Service:  "ocdav",
 				},
 				{
 					Endpoint: "/dav/",
-					Backend:  "http://localhost:9140",
+					Service:  "ocdav",
 				},
 				{
 					Endpoint: "/webdav/",
-					Backend:  "http://localhost:9140",
+					Service:  "ocdav",
 				},
 				{
 					Endpoint: "/status.php",
-					Backend:  "http://localhost:9140",
+					Service:  "ocdav",
 				},
 				{
 					Endpoint: "/index.php/",
-					Backend:  "http://localhost:9140",
+					Service:  "ocdav",
+				},
+				{
+					Endpoint: "/apps/",
+					Service:  "ocdav",
 				},
 				{
 					Endpoint: "/data",
 					Backend:  "http://localhost:9140",
 				},
 				{
-					Endpoint: "/app/",
+					Endpoint: "/app/", // /app or /apps? ocdav only handles /apps
 					Backend:  "http://localhost:9140",
 				},
 				{
@@ -158,66 +160,6 @@ func DefaultPolicies() []config.Policy {
 				{
 					Endpoint: "/settings.js",
 					Backend:  "http://localhost:9190",
-				},
-			},
-		},
-		{
-			Name: "oc10",
-			Routes: []config.Route{
-				{
-					Endpoint: "/",
-					Backend:  "http://localhost:9100",
-				},
-				{
-					Endpoint: "/.well-known/",
-					Backend:  "http://localhost:9130",
-				},
-				{
-					Endpoint: "/konnect/",
-					Backend:  "http://localhost:9130",
-				},
-				{
-					Endpoint: "/signin/",
-					Backend:  "http://localhost:9130",
-				},
-				{
-					Endpoint: "/archiver",
-					Backend:  "http://localhost:9140",
-				},
-				{
-					Endpoint:    "/ocs/",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/remote.php/",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/dav/",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/webdav/",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/status.php",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/index.php/",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
-				},
-				{
-					Endpoint:    "/data",
-					Backend:     "https://demo.owncloud.com",
-					ApacheVHost: true,
 				},
 			},
 		},
@@ -254,6 +196,14 @@ func Sanitize(cfg *config.Config) {
 	// sanitize config
 	if cfg.Policies == nil {
 		cfg.Policies = DefaultPolicies()
+	}
+
+	if cfg.PolicySelector == nil {
+		cfg.PolicySelector = &config.PolicySelector{
+			Static: &config.StaticSelectorConf{
+				Policy: "ocis",
+			},
+		}
 	}
 
 	if cfg.HTTP.Root != "/" {

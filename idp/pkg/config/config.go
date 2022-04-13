@@ -8,94 +8,95 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons `ocisConfig:"-" yaml:"-"`
+	*shared.Commons `yaml:"-"`
 
-	Service Service `ocisConfig:"-" yaml:"-"`
+	Service Service `yaml:"-"`
 
-	Tracing *Tracing `ocisConfig:"tracing"`
-	Log     *Log     `ocisConfig:"log"`
-	Debug   Debug    `ocisConfig:"debug"`
+	Tracing *Tracing `yaml:"tracing"`
+	Log     *Log     `yaml:"log"`
+	Debug   Debug    `yaml:"debug"`
 
-	HTTP HTTP `ocisConfig:"http"`
+	HTTP HTTP `yaml:"http"`
 
-	Asset Asset    `ocisConfig:"asset"`
-	IDP   Settings `ocisConfig:"idp"`
-	Ldap  Ldap     `ocisConfig:"ldap"`
+	Asset Asset    `yaml:"asset"`
+	IDP   Settings `yaml:"idp"`
+	Ldap  Ldap     `yaml:"ldap"`
 
-	Context context.Context `ocisConfig:"-" yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 // Ldap defines the available LDAP configuration.
 type Ldap struct {
-	URI string `ocisConfig:"uri" env:"IDP_LDAP_URI"`
+	URI string `yaml:"uri" env:"LDAP_URI;IDP_LDAP_URI"`
 
-	BindDN       string `ocisConfig:"bind_dn" env:"IDP_LDAP_BIND_DN"`
-	BindPassword string `ocisConfig:"bind_password" env:"IDP_LDAP_BIND_PASSWORD"`
+	BindDN       string `yaml:"bind_dn" env:"LDAP_BIND_DN;IDP_LDAP_BIND_DN"`
+	BindPassword string `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;IDP_LDAP_BIND_PASSWORD"`
 
-	BaseDN string `ocisConfig:"base_dn" env:"IDP_LDAP_BASE_DN"`
-	Scope  string `ocisConfig:"scope" env:"IDP_LDAP_SCOPE"`
+	BaseDN string `yaml:"base_dn" env:"LDAP_USER_BASE_DN,IDP_LDAP_BASE_DN"`
+	Scope  string `yaml:"scope" env:"LDAP_USER_SCOPE;IDP_LDAP_SCOPE"`
 
-	LoginAttribute    string `ocisConfig:"login_attribute" env:"IDP_LDAP_LOGIN_ATTRIBUTE"`
-	EmailAttribute    string `ocisConfig:"email_attribute" env:"IDP_LDAP_EMAIL_ATTRIBUTE"`
-	NameAttribute     string `ocisConfig:"name_attribute" env:"IDP_LDAP_NAME_ATTRIBUTE"`
-	UUIDAttribute     string `ocisConfig:"uuid_attribute" env:"IDP_LDAP_UUID_ATTRIBUTE"`
-	UUIDAttributeType string `ocisConfig:"uuid_attribute_type" env:"IDP_LDAP_UUID_ATTRIBUTE_TYPE"`
+	LoginAttribute    string `yaml:"login_attribute" env:"IDP_LDAP_LOGIN_ATTRIBUTE"`
+	EmailAttribute    string `yaml:"email_attribute" env:"LDAP_USER_SCHEMA_MAIL;IDP_LDAP_EMAIL_ATTRIBUTE"`
+	NameAttribute     string `yaml:"name_attribute" env:"LDAP_USER_SCHEMA_USERNAME;IDP_LDAP_NAME_ATTRIBUTE"`
+	UUIDAttribute     string `yaml:"uuid_attribute" env:"LDAP_USER_SCHEMA_ID;IDP_LDAP_UUID_ATTRIBUTE"`
+	UUIDAttributeType string `yaml:"uuid_attribute_type" env:"IDP_LDAP_UUID_ATTRIBUTE_TYPE"`
 
-	Filter string `ocisConfig:"filter" env:"IDP_LDAP_FILTER"`
+	Filter      string `yaml:"filter" env:"LDAP_USER_FILTER;IDP_LDAP_FILTER"`
+	ObjectClass string `yaml:"objectclass" env:"LDAP_USER_OBJECTCLASS;IDP_LDAP_OBJECTCLASS"`
 }
 
 // Asset defines the available asset configuration.
 type Asset struct {
-	Path string `ocisConfig:"asset" env:"IDP_ASSET_PATH"`
+	Path string `yaml:"asset" env:"IDP_ASSET_PATH"`
 }
 
 type Settings struct {
 	// don't change the order of elements in this struct
 	// it needs to match github.com/libregraph/lico/bootstrap.Settings
 
-	Iss string `ocisConfig:"iss" env:"OCIS_URL;IDP_ISS"`
+	Iss string `yaml:"iss" env:"OCIS_URL;IDP_ISS"`
 
-	IdentityManager string `ocisConfig:"identity_manager" env:"IDP_IDENTITY_MANAGER"`
+	IdentityManager string `yaml:"identity_manager" env:"IDP_IDENTITY_MANAGER"`
 
-	URIBasePath string `ocisConfig:"uri_base_path" env:"IDP_URI_BASE_PATH"`
+	URIBasePath string `yaml:"uri_base_path" env:"IDP_URI_BASE_PATH"`
 
-	SignInURI    string `ocisConfig:"sign_in_uri" env:"IDP_SIGN_IN_URI"`
-	SignedOutURI string `ocisConfig:"signed_out_uri" env:"IDP_SIGN_OUT_URI"`
+	SignInURI    string `yaml:"sign_in_uri" env:"IDP_SIGN_IN_URI"`
+	SignedOutURI string `yaml:"signed_out_uri" env:"IDP_SIGN_OUT_URI"`
 
-	AuthorizationEndpointURI string `ocisConfig:"authorization_endpoint_uri" env:"IDP_ENDPOINT_URI"`
-	EndsessionEndpointURI    string `ocisConfig:"end_session_endpoint_uri" env:"IDP_ENDSESSION_ENDPOINT_URI"`
+	AuthorizationEndpointURI string `yaml:"authorization_endpoint_uri" env:"IDP_ENDPOINT_URI"`
+	EndsessionEndpointURI    string `yaml:"end_session_endpoint_uri" env:"IDP_ENDSESSION_ENDPOINT_URI"`
 
-	Insecure bool `ocisConfig:"insecure" env:"IDP_INSECURE"`
+	Insecure bool `yaml:"insecure" env:"IDP_INSECURE"`
 
-	TrustedProxy []string `ocisConfig:"trusted_proxy"` //TODO: how to configure this via env?
+	TrustedProxy []string `yaml:"trusted_proxy"` //TODO: how to configure this via env?
 
-	AllowScope                     []string `ocisConfig:"allow_scope"` // TODO: is this even needed?
-	AllowClientGuests              bool     `ocisConfig:"allow_client_guests" env:"IDP_ALLOW_CLIENT_GUESTS"`
-	AllowDynamicClientRegistration bool     `ocisConfig:"allow_dynamic_client_registration" env:"IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION"`
+	AllowScope                     []string `yaml:"allow_scope"` // TODO: is this even needed?
+	AllowClientGuests              bool     `yaml:"allow_client_guests" env:"IDP_ALLOW_CLIENT_GUESTS"`
+	AllowDynamicClientRegistration bool     `yaml:"allow_dynamic_client_registration" env:"IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION"`
 
-	EncryptionSecretFile string `ocisConfig:"encrypt_secret_file" env:"IDP_ENCRYPTION_SECRET"`
+	EncryptionSecretFile string `yaml:"encrypt_secret_file" env:"IDP_ENCRYPTION_SECRET"`
 
 	Listen string
 
-	IdentifierClientDisabled          bool   `ocisConfig:"identifier_client_disabled" env:"IDP_DISABLE_IDENTIFIER_WEBAPP"`
-	IdentifierClientPath              string `ocisConfig:"identifier_client_path" env:"IDP_IDENTIFIER_CLIENT_PATH"`
-	IdentifierRegistrationConf        string `ocisConfig:"identifier_registration_conf" env:"IDP_IDENTIFIER_REGISTRATION_CONF"`
-	IdentifierScopesConf              string `ocisConfig:"identifier_scopes_conf" env:"IDP_IDENTIFIER_SCOPES_CONF"`
+	IdentifierClientDisabled          bool   `yaml:"identifier_client_disabled" env:"IDP_DISABLE_IDENTIFIER_WEBAPP"`
+	IdentifierClientPath              string `yaml:"identifier_client_path" env:"IDP_IDENTIFIER_CLIENT_PATH"`
+	IdentifierRegistrationConf        string `yaml:"identifier_registration_conf" env:"IDP_IDENTIFIER_REGISTRATION_CONF"`
+	IdentifierScopesConf              string `yaml:"identifier_scopes_conf" env:"IDP_IDENTIFIER_SCOPES_CONF"`
 	IdentifierDefaultBannerLogo       string
 	IdentifierDefaultSignInPageText   string
 	IdentifierDefaultUsernameHintText string
 	IdentifierUILocales               []string
 
-	SigningKid             string   `ocisConfig:"signing_kid" env:"IDP_SIGNING_KID"`
-	SigningMethod          string   `ocisConfig:"signing_method" env:"IDP_SIGNING_METHOD"`
-	SigningPrivateKeyFiles []string `ocisConfig:"signing_private_key_files"` // TODO: is this even needed?
-	ValidationKeysPath     string   `ocisConfig:"validation_keys_path" env:"IDP_VALIDATION_KEYS_PATH"`
+	SigningKid             string   `yaml:"signing_kid" env:"IDP_SIGNING_KID"`
+	SigningMethod          string   `yaml:"signing_method" env:"IDP_SIGNING_METHOD"`
+	SigningPrivateKeyFiles []string `yaml:"signing_private_key_files"` // TODO: is this even needed?
+	ValidationKeysPath     string   `yaml:"validation_keys_path" env:"IDP_VALIDATION_KEYS_PATH"`
 
 	CookieBackendURI string
 	CookieNames      []string
 
-	AccessTokenDurationSeconds        uint64 `ocisConfig:"access_token_duration_seconds" env:"IDP_ACCESS_TOKEN_EXPIRATION"`
-	IDTokenDurationSeconds            uint64 `ocisConfig:"id_token_duration_seconds" env:"IDP_ID_TOKEN_EXPIRATION"`
-	RefreshTokenDurationSeconds       uint64 `ocisConfig:"refresh_token_duration_seconds" env:"IDP_REFRESH_TOKEN_EXPIRATION"`
-	DyamicClientSecretDurationSeconds uint64 `ocisConfig:"dynamic_client_secret_duration_seconds" env:""`
+	AccessTokenDurationSeconds        uint64 `yaml:"access_token_duration_seconds" env:"IDP_ACCESS_TOKEN_EXPIRATION"`
+	IDTokenDurationSeconds            uint64 `yaml:"id_token_duration_seconds" env:"IDP_ID_TOKEN_EXPIRATION"`
+	RefreshTokenDurationSeconds       uint64 `yaml:"refresh_token_duration_seconds" env:"IDP_REFRESH_TOKEN_EXPIRATION"`
+	DyamicClientSecretDurationSeconds uint64 `yaml:"dynamic_client_secret_duration_seconds" env:""`
 }

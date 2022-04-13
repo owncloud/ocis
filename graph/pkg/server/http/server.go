@@ -1,6 +1,8 @@
 package http
 
 import (
+	"github.com/asim/go-micro/plugins/events/natsjs/v4"
+	"github.com/cs3org/reva/v2/pkg/events/server"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	graphMiddleware "github.com/owncloud/ocis/graph/pkg/middleware"
 	svc "github.com/owncloud/ocis/graph/pkg/service/v0"
@@ -8,6 +10,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/ocis-pkg/version"
+	"github.com/pkg/errors"
 	"go-micro.dev/v4"
 )
 
@@ -24,6 +27,17 @@ func Server(opts ...Option) (http.Service, error) {
 		http.Context(options.Context),
 		http.Flags(options.Flags...),
 	)
+
+	publisher, err := server.NewNatsStream(
+		natsjs.Address(options.Config.Events.Endpoint),
+		natsjs.ClusterID(options.Config.Events.Cluster),
+	)
+	if err != nil {
+		options.Logger.Error().
+			Err(err).
+			Msg("Error initializing events publisher")
+		return http.Service{}, errors.Wrap(err, "could not initialize events publisher")
+	}
 
 	handle := svc.NewService(
 		svc.Logger(options.Logger),
@@ -42,6 +56,7 @@ func Server(opts ...Option) (http.Service, error) {
 				account.JWTSecret(options.Config.TokenManager.JWTSecret),
 			),
 		),
+		svc.EventsPublisher(publisher),
 	)
 
 	{

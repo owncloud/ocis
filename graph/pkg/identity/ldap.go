@@ -27,11 +27,13 @@ type LDAP struct {
 
 	userBaseDN       string
 	userFilter       string
+	userObjectClass  string
 	userScope        int
 	userAttributeMap userAttributeMap
 
 	groupBaseDN       string
 	groupFilter       string
+	groupObjectClass  string
 	groupScope        int
 	groupAttributeMap groupAttributeMap
 
@@ -89,10 +91,12 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		useServerUUID:     config.UseServerUUID,
 		userBaseDN:        config.UserBaseDN,
 		userFilter:        config.UserFilter,
+		userObjectClass:   config.UserObjectClass,
 		userScope:         userScope,
 		userAttributeMap:  uam,
 		groupBaseDN:       config.GroupBaseDN,
 		groupFilter:       config.GroupFilter,
+		groupObjectClass:  config.GroupObjectClass,
 		groupScope:        groupScope,
 		groupAttributeMap: gam,
 		logger:            logger,
@@ -311,7 +315,7 @@ func (i *LDAP) getLDAPUserByNameOrID(nameOrID string) (*ldap.Entry, error) {
 func (i *LDAP) getLDAPUserByFilter(filter string) (*ldap.Entry, error) {
 	searchRequest := ldap.NewSearchRequest(
 		i.userBaseDN, i.userScope, ldap.NeverDerefAliases, 1, 0, false,
-		fmt.Sprintf("(&%s%s)", i.userFilter, filter),
+		fmt.Sprintf("(&%s(objectClass=%s)%s)", i.userFilter, i.userObjectClass, filter),
 		[]string{
 			i.userAttributeMap.displayName,
 			i.userAttributeMap.id,
@@ -357,7 +361,7 @@ func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregra
 	if search == "" {
 		search = queryParam.Get("$search")
 	}
-	userFilter := i.userFilter
+	userFilter := fmt.Sprintf("%s(objectClass=%s)", i.userFilter, i.userObjectClass)
 	if search != "" {
 		search = ldap.EscapeFilter(search)
 		userFilter = fmt.Sprintf(
@@ -428,7 +432,7 @@ func (i *LDAP) getLDAPGroupByFilter(filter string, requestMembers bool) (*ldap.E
 
 // Search for LDAP Groups matching the specified filter, if requestMembers is true the groupMemberShip
 // attribute will be part of the result attributes. The LDAP filter is combined with the configured groupFilter
-// resulting in a filter like "(&(LDAP.groupFilter)(<filter_from_args>))"
+// resulting in a filter like "(&(LDAP.groupFilter)(objectClass=LDAP.groupObjectClass)(<filter_from_args>))"
 func (i *LDAP) getLDAPGroupsByFilter(filter string, requestMembers, single bool) ([]*ldap.Entry, error) {
 	attrs := []string{
 		i.groupAttributeMap.name,
@@ -445,7 +449,7 @@ func (i *LDAP) getLDAPGroupsByFilter(filter string, requestMembers, single bool)
 	}
 	searchRequest := ldap.NewSearchRequest(
 		i.groupBaseDN, i.groupScope, ldap.NeverDerefAliases, sizelimit, 0, false,
-		fmt.Sprintf("(&%s%s)", i.groupFilter, filter),
+		fmt.Sprintf("(&%s(objectClass=%s)%s)", i.groupFilter, i.groupObjectClass, filter),
 		attrs,
 		nil,
 	)
@@ -511,7 +515,7 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 	if search == "" {
 		search = queryParam.Get("$search")
 	}
-	groupFilter := i.groupFilter
+	groupFilter := fmt.Sprintf("%s(objectClass=%s)", i.groupFilter, i.groupObjectClass)
 	if search != "" {
 		search = ldap.EscapeFilter(search)
 		groupFilter = fmt.Sprintf(

@@ -27,6 +27,15 @@ include ../.make/generate.mk
 ci-go-generate: $(MOCKERY) # CI runs ci-node-generate automatically before this target
 	$(MOCKERY) --dir pkg/service/v0 --case underscore --name GatewayClient
 	$(MOCKERY) --dir pkg/service/v0 --case underscore --name HTTPClient
+	$(MOCKERY) --dir pkg/service/v0 --case underscore --name Publisher
+
 
 .PHONY: ci-node-generate
 ci-node-generate:
+
+############ licenses ############
+.PHONY: ci-node-check-licenses
+ci-node-check-licenses:
+
+.PHONY: ci-node-save-licenses
+ci-node-save-licenses:

@@ -28,5 +28,12 @@ func RegisteredEvents() []events.Unmarshaller {
 		events.SpaceEnabled{},
 		events.SpaceDisabled{},
 		events.SpaceDeleted{},
+		events.UserCreated{},
+		events.UserDeleted{},
+		events.UserFeatureChanged{},
+		events.GroupCreated{},
+		events.GroupDeleted{},
+		events.GroupMemberAdded{},
+		events.GroupMemberRemoved{},
 	}
 }

@@ -42,8 +42,8 @@ curl https://download.owncloud.com/ocis/ocis/stable/1.19.1/ocis-1.19.1-linux-amd
 # make binary executable
 chmod +x ocis
 
-# run
-OCIS_INSECURE=true ./ocis server
+# run with demo users
+OCIS_INSECURE=true ACCOUNTS_DEMO_USERS_AND_GROUPS=true ./ocis server
 ```
 
 The default primary storage location is `~/.ocis` or `/var/lib/ocis` depending on the packaging format and your operating system user. You can change that value by configuration.
@@ -64,11 +64,15 @@ The `latest` tag always reflects the current master branch.
 
 ```console
 docker pull owncloud/ocis
-docker run --rm -ti -p 9200:9200 -e OCIS_INSECURE=true owncloud/ocis
+docker run --rm -ti -p 9200:9200 -e OCIS_INSECURE=true -e ACCOUNTS_DEMO_USERS_AND_GROUPS=true owncloud/ocis
 ```
 
 {{< hint info >}}
 When you're using oCIS with self-signed certificates, you need to set the environment variable `OCIS_INSECURE=true`, in order to make oCIS work.
+{{< /hint >}}
+
+{{< hint warming >}}
+When you're creating the [demo users]({{< ref "./demo-users" >}}) by setting `ACCOUNTS_DEMO_USERS_AND_GROUPS=true`, you need to be sure that this instance is not used in prodution because the passwords are public.
 {{< /hint >}}
 
 {{< hint warning >}}

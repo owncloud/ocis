@@ -50,6 +50,13 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 				Interface("reva-config", rcfg).
 				Msg("config")
 
+			if cfg.Reva.AuthProvider.Driver == "ldap" {
+				if err := waitForLDAPCA(logger, &cfg.Reva.LDAP); err != nil {
+					logger.Error().Err(err).Msg("The configured LDAP CA cert does not exist")
+					return err
+				}
+			}
+
 			gr.Add(func() error {
 				runtime.RunWithOptions(rcfg, pidFile, runtime.WithLogger(&logger.Logger))
 				return nil
@@ -113,24 +120,17 @@ func authBasicConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 						"json": map[string]interface{}{
 							"users": cfg.Reva.AuthProvider.JSON,
 						},
-						"ldap": map[string]interface{}{
-							"hostname":      cfg.Reva.LDAP.Hostname,
-							"port":          cfg.Reva.LDAP.Port,
-							"cacert":        cfg.Reva.LDAP.CACert,
-							"insecure":      cfg.Reva.LDAP.Insecure,
-							"base_dn":       cfg.Reva.LDAP.BaseDN,
-							"loginfilter":   cfg.Reva.LDAP.LoginFilter,
-							"bind_username": cfg.Reva.LDAP.BindDN,
-							"bind_password": cfg.Reva.LDAP.BindPassword,
-							"idp":           cfg.Reva.LDAP.IDP,
-							"gatewaysvc":    cfg.Reva.Gateway.Endpoint,
-							"schema": map[string]interface{}{
-								"dn":          "dn",
-								"uid":         cfg.Reva.LDAP.UserSchema.UID,
-								"mail":        cfg.Reva.LDAP.UserSchema.Mail,
-								"displayName": cfg.Reva.LDAP.UserSchema.DisplayName,
-								"cn":          cfg.Reva.LDAP.UserSchema.CN,
-							},
+						"ldap": ldapConfigFromString(cfg),
+						"owncloudsql": map[string]interface{}{
+							"dbusername":        cfg.Reva.UserOwnCloudSQL.DBUsername,
+							"dbpassword":        cfg.Reva.UserOwnCloudSQL.DBPassword,
+							"dbhost":            cfg.Reva.UserOwnCloudSQL.DBHost,
+							"dbport":            cfg.Reva.UserOwnCloudSQL.DBPort,
+							"dbname":            cfg.Reva.UserOwnCloudSQL.DBName,
+							"idp":               cfg.Reva.UserOwnCloudSQL.Idp,
+							"nobody":            cfg.Reva.UserOwnCloudSQL.Nobody,
+							"join_username":     cfg.Reva.UserOwnCloudSQL.JoinUsername,
+							"join_ownclouduuid": cfg.Reva.UserOwnCloudSQL.JoinOwnCloudUUID,
 						},
 					},
 				},

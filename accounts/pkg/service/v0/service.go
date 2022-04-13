@@ -196,7 +196,7 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 			UidNumber:                20000,
 			GidNumber:                30000,
 			PasswordProfile: &accountsmsg.PasswordProfile{
-				Password: "$2a$11$4WNffzgU/WrIRiDnwu8OnOwgOIIUqR/2Ptvp7WJAQCTSgSrylyuvC",
+				Password: "$2a$04$L.Rkpa0/nOhF3SsFo.QY9uzjMG8zB9a8dZP./LZBCDgsiuI8w10Em",
 			},
 			AccountEnabled: true,
 			MemberOf: []*accountsmsg.Group{
@@ -215,7 +215,7 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 			UidNumber:                20001,
 			GidNumber:                30000,
 			PasswordProfile: &accountsmsg.PasswordProfile{
-				Password: "$2a$11$Wu2XcDnE6G2No8C88FVWluNHyXuQQi0cHzSe82Vni8AdwIO12fphC",
+				Password: "$2a$04$AZd1k6OVpzP7E4hw5.ysFuuL2.XjjgakAuRs2zdBvIMizF0KaZkNG",
 			},
 			AccountEnabled: true,
 			MemberOf: []*accountsmsg.Group{
@@ -234,7 +234,7 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 			UidNumber:                20002,
 			GidNumber:                30000,
 			PasswordProfile: &accountsmsg.PasswordProfile{
-				Password: "$2a$11$6Lak4zh1xUkpObg2rrOotOTdQYGj2Uu/sowcVLhub.8qYIr.CxzEW",
+				Password: "$2a$04$aeVYaBH3LCTj9DviV6Y4xO2reoEzY9vnc7a5/0mhJWQUDtPqPINme",
 			},
 			AccountEnabled: true,
 			MemberOf: []*accountsmsg.Group{
@@ -254,7 +254,7 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 			UidNumber:                20003,
 			GidNumber:                30000,
 			PasswordProfile: &accountsmsg.PasswordProfile{
-				Password: "$2a$11$jvI6PHuvrimpcCHzL2Q2WOqfm1FGdYAuSYZBDahr/B48fpiFxyDy2",
+				Password: "$2a$04$la2yFV6N.pPySwHnLIxyAuBCJ2t/DxWfXJGnIooA9Ebb3.lSTKXby",
 			},
 			AccountEnabled: true,
 			MemberOf: []*accountsmsg.Group{
@@ -270,7 +270,7 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 			UidNumber:                20004,
 			GidNumber:                30000,
 			PasswordProfile: &accountsmsg.PasswordProfile{
-				Password: "$2a$11$En9VIUtqOdDyUl.LuUq2KeuBb5A2n8zE0lkJ2v6IDRSaOamhNq6Uu",
+				Password: "$2a$04$zqpfwdtBUDg89cpltxd.9ef7ZMzsor1BLCJyTEcdoitmEuS3Hr/Q6",
 			},
 			AccountEnabled: true,
 			MemberOf: []*accountsmsg.Group{
@@ -286,7 +286,7 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 			UidNumber:                20005,
 			GidNumber:                30000,
 			PasswordProfile: &accountsmsg.PasswordProfile{
-				Password: "$2a$11$6SIBlZ.8BzjBsDTRrThUyuz6OvP.XLo7101oFiwHHB.jufKGS9.Ji",
+				Password: "$2a$04$j0//gOyZ3xg/WtMOk4XUaOMJ1r5niD3paPcFh1O/PNr8pL7yC8rhG",
 			},
 			AccountEnabled: true,
 			MemberOf: []*accountsmsg.Group{
@@ -306,7 +306,7 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 			UidNumber:                10000,
 			GidNumber:                15000,
 			PasswordProfile: &accountsmsg.PasswordProfile{
-				Password: "$2y$12$ywfGLDPsSlBTVZU0g.2GZOPO8Wap3rVOpm8e3192VlytNdGWH7x72",
+				Password: "$2a$04$TiuPj61Lkwt9hPOj4UUdwO.fupKBO3gpMv1EoXo0XF8Z8L9rFN8Nm",
 			},
 			AccountEnabled: true,
 			MemberOf: []*accountsmsg.Group{
@@ -322,7 +322,7 @@ func (s Service) createDefaultAccounts(withDemoAccounts bool) (err error) {
 			UidNumber:                10001,
 			GidNumber:                15000,
 			PasswordProfile: &accountsmsg.PasswordProfile{
-				Password: "$2a$11$40xzy3rO8Tq4j2VkFbKz8Ow19BRaqaixEjAR0IbvQXxtOvMtkjwzy",
+				Password: "$2a$04$.cYhDMMXsvoCJzH9rX0eKev7fsLZwUv.VsRn66iaCXj2KlgpzHu3a",
 			},
 			AccountEnabled: true,
 			MemberOf: []*accountsmsg.Group{

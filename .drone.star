@@ -17,7 +17,8 @@ OC_CI_GOLANG = "owncloudci/golang:1.17"
 OC_CI_NODEJS = "owncloudci/nodejs:%s"
 OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
-OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.3.1"
+OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:latest"
+OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.4.0"
 OC_SERVER = "owncloud/server:10"
 OC_UBUNTU = "owncloud/ubuntu:18.04"
 OSIXIA_OPEN_LDAP = "osixia/openldap:latest"
@@ -59,6 +60,10 @@ config = {
         "web",
         "webdav",
     ],
+    "cs3ApiTests": {
+        "skip": False,
+        "earlyFail": True,
+    },
     "localApiTests": {
         "skip": False,
         "earlyFail": True,
@@ -188,6 +193,7 @@ def main(ctx):
         testPipelines(ctx)
 
     build_release_pipelines = \
+        [licenseCheck(ctx)] + \
         dockerReleases(ctx) + \
         binaryReleases(ctx) + \
         [releaseSubmodule(ctx)]
@@ -261,11 +267,13 @@ def cancelPreviousBuilds():
 
 def testPipelines(ctx):
     pipelines = []
+    if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
+        pipelines += [cs3ApiTests(ctx, "ocis", "default")]
     if "skip" not in config["localApiTests"] or not config["localApiTests"]["skip"]:
-        pipelines = [
-            localApiTests(ctx, "ocis", "apiAccountsHashDifficulty", "default"),
-            localApiTests(ctx, "ocis", "apiSpaces", "default"),
-            localApiTests(ctx, "ocis", "apiArchiver", "default"),
+        pipelines += [
+            localApiTests(ctx, "ocis", "apiAccountsHashDifficulty"),
+            localApiTests(ctx, "ocis", "apiSpaces"),
+            localApiTests(ctx, "ocis", "apiArchiver"),
         ]
 
     if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
@@ -513,6 +521,38 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
             ],
         },
         "volumes": [pipelineVolumeOC10Tests],
+    }
+
+def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
+    early_fail = config["cs3ApiTests"]["earlyFail"] if "earlyFail" in config["cs3ApiTests"] else False
+
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "cs3ApiTests-%s" % (storage),
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+                 ocisServer(storage, accounts_hash_difficulty, []) + [
+            {
+                "name": "cs3ApiTests-%s" % (storage),
+                "image": OC_CS3_API_VALIDATOR,
+                "environment": {},
+                "commands": [
+                    "/usr/bin/cs3api-validator /var/lib/cs3api-validator --endpoint=ocis-server:9142",
+                ],
+            },
+        ] + failEarly(ctx, early_fail),
+        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/tags/v*",
+                "refs/pull/**",
+            ],
+        },
     }
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
@@ -1101,6 +1141,140 @@ def binaryRelease(ctx, name):
         "volumes": [pipelineVolumeGo],
     }
 
+def licenseCheck(ctx):
+    # uploads third-party-licenses to https://download.owncloud.com/ocis/ocis/daily/
+    target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
+    depends_on = []
+    if ctx.build.event == "tag":
+        # uploads third-party-licenses to eg. https://download.owncloud.com/ocis/ocis/1.0.0-beta9/
+        folder = "stable"
+        buildref = ctx.build.ref.replace("refs/tags/v", "")
+        buildref = buildref.lower()
+        if buildref.find("-") != -1:  # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
+            folder = "testing"
+        target = "/ocis/%s/%s/%s" % (ctx.repo.name.replace("ocis-", ""), folder, buildref)
+        depends_on = getPipelineNames(testOcisModules(ctx) + testPipelines(ctx))
+
+    settings = {
+        "endpoint": {
+            "from_secret": "s3_endpoint",
+        },
+        "access_key": {
+            "from_secret": "aws_access_key_id",
+        },
+        "secret_key": {
+            "from_secret": "aws_secret_access_key",
+        },
+        "bucket": {
+            "from_secret": "s3_bucket",
+        },
+        "path_style": True,
+        "source": "third-party-licenses.tar.gz",
+        "target": target,
+    }
+
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "check-licenses",
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": [
+            {
+                "name": "node-check-licenses",
+                "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+                "commands": [
+                    "make ci-node-check-licenses",
+                ],
+            },
+            {
+                "name": "node-save-licenses",
+                "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+                "commands": [
+                    "make ci-node-save-licenses",
+                ],
+            },
+            {
+                "name": "go-check-licenses",
+                "image": OC_CI_GOLANG,
+                "commands": [
+                    "make ci-go-check-licenses",
+                ],
+                "volumes": [stepVolumeGo],
+            },
+            {
+                "name": "go-save-licenses",
+                "image": OC_CI_GOLANG,
+                "commands": [
+                    "make ci-go-save-licenses",
+                ],
+                "volumes": [stepVolumeGo],
+            },
+            {
+                "name": "tarball",
+                "image": OC_CI_ALPINE,
+                "commands": [
+                    "cd third-party-licenses && tar -czf ../third-party-licenses.tar.gz *",
+                ],
+            },
+            {
+                "name": "upload",
+                "image": PLUGINS_S3,
+                "settings": settings,
+                "when": {
+                    "ref": [
+                        "refs/heads/master",
+                        "refs/tags/v*",
+                    ],
+                },
+            },
+            {
+                "name": "changelog",
+                "image": OC_CI_GOLANG,
+                "commands": [
+                    "make changelog CHANGELOG_VERSION=%s" % ctx.build.ref.replace("refs/tags/v", "").split("-")[0],
+                ],
+                "when": {
+                    "ref": [
+                        "refs/tags/v*",
+                    ],
+                },
+            },
+            {
+                "name": "release",
+                "image": PLUGINS_GITHUB_RELEASE,
+                "settings": {
+                    "api_key": {
+                        "from_secret": "github_token",
+                    },
+                    "files": [
+                        "third-party-licenses.tar.gz",
+                    ],
+                    "title": ctx.build.ref.replace("refs/tags/v", ""),
+                    "note": "ocis/dist/CHANGELOG.md",
+                    "overwrite": True,
+                    "prerelease": len(ctx.build.ref.split("-")) > 1,
+                },
+                "when": {
+                    "ref": [
+                        "refs/tags/v*",
+                    ],
+                },
+            },
+        ],
+        "depends_on": depends_on,
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/tags/v*",
+                "refs/pull/**",
+            ],
+        },
+        "volumes": [pipelineVolumeGo],
+    }
+
 def releaseSubmodule(ctx):
     depends = []
     if len(ctx.build.ref.replace("refs/tags/", "").split("/")) == 2:
@@ -1376,6 +1550,9 @@ def makeNodeGenerate(module):
         {
             "name": "generate nodejs",
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+            "environment": {
+                "CHROMEDRIVER_SKIP_DOWNLOAD": "true",  # install fails on arm and chromedriver is a test only dependency
+            },
             "commands": [
                 "%s ci-node-generate" % (make),
             ],
@@ -1437,6 +1614,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         user = "0:0"
         environment = {
             "OCIS_URL": "https://ocis-server:9200",
+            "STORAGE_GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
             "STORAGE_HOME_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
@@ -1449,6 +1627,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_LOG_LEVEL": "error",
             "SETTINGS_DATA_PATH": "/srv/app/tmp/ocis/settings",
             "OCIS_INSECURE": "true",
+            "ACCOUNTS_DEMO_USERS_AND_GROUPS": True,  # deprecated, remove after switching to LibreIDM
+            "IDM_CREATE_DEMO_USERS": True,
         }
     else:
         user = "33:33"
@@ -1462,8 +1642,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "STORAGE_LDAP_IDP": "https://keycloak/auth/realms/owncloud",
             "WEB_OIDC_SCOPE": "openid profile email owncloud",
             # LDAP bind
-            "STORAGE_LDAP_HOSTNAME": "openldap",
-            "STORAGE_LDAP_PORT": 636,
+            "STORAGE_LDAP_URI": "ldaps://openldap",
             "STORAGE_LDAP_INSECURE": "true",
             "STORAGE_LDAP_BIND_DN": "cn=admin,dc=owncloud,dc=com",
             "STORAGE_LDAP_BIND_PASSWORD": "admin",
@@ -1472,25 +1651,24 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "PROXY_ACCOUNT_BACKEND_TYPE": "cs3",  # proxy should get users from CS3APIS (which gets it from LDAP)
             "PROXY_USER_OIDC_CLAIM": "ocis.user.uuid",  # claim was added in Keycloak
             "PROXY_USER_CS3_CLAIM": "userid",  # equals STORAGE_LDAP_USER_SCHEMA_UID
-            "STORAGE_LDAP_BASE_DN": "dc=owncloud,dc=com",
+            "STORAGE_LDAP_GROUP_BASE_DN": "ou=testgroups,dc=owncloud,dc=com",
+            "STORAGE_LDAP_GROUP_OBJECTCLASS": "groupOfUniqueNames",
+            "STORAGE_LDAP_GROUPFILTER": "(objectclass=owncloud)",
             "STORAGE_LDAP_GROUP_SCHEMA_DISPLAYNAME": "cn",
             "STORAGE_LDAP_GROUP_SCHEMA_GID_NUMBER": "gidnumber",
-            "STORAGE_LDAP_GROUP_SCHEMA_GID": "cn",
+            "STORAGE_LDAP_GROUP_SCHEMA_ID": "cn",
             "STORAGE_LDAP_GROUP_SCHEMA_MAIL": "mail",
-            "STORAGE_LDAP_GROUPATTRIBUTEFILTER": "(&(objectclass=posixGroup)(objectclass=owncloud)({{attr}}={{value}}))",
-            "STORAGE_LDAP_GROUPFILTER": "(&(objectclass=groupOfUniqueNames)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))",
-            "STORAGE_LDAP_GROUPMEMBERFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))",
-            "STORAGE_LDAP_USERGROUPFILTER": "(&(objectclass=posixGroup)(objectclass=owncloud)(ownclouduuid={{.OpaqueId}}*))",
-            "STORAGE_LDAP_USER_SCHEMA_CN": "cn",
+            "STORAGE_LDAP_GROUP_SCHEMA_MEMBER": "cn",
+            "STORAGE_LDAP_USER_BASE_DN": "ou=testusers,dc=owncloud,dc=com",
+            "STORAGE_LDAP_USER_OBJECTCLASS": "posixAccount",
+            "STORAGE_LDAP_USERFILTER": "(objectclass=owncloud)",
+            "STORAGE_LDAP_USER_SCHEMA_USERNAME": "cn",
             "STORAGE_LDAP_USER_SCHEMA_DISPLAYNAME": "displayname",
             "STORAGE_LDAP_USER_SCHEMA_GID_NUMBER": "gidnumber",
             "STORAGE_LDAP_USER_SCHEMA_MAIL": "mail",
             "STORAGE_LDAP_USER_SCHEMA_UID_NUMBER": "uidnumber",
-            "STORAGE_LDAP_USER_SCHEMA_UID": "ownclouduuid",
-            "STORAGE_LDAP_LOGINFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(|(uid={{login}})(mail={{login}})))",
-            "STORAGE_LDAP_USERATTRIBUTEFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)({{attr}}={{value}}))",
-            "STORAGE_LDAP_USERFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(|(ownclouduuid={{.OpaqueId}})(uid={{.OpaqueId}})))",
-            "STORAGE_LDAP_USERFINDFILTER": "(&(objectclass=posixAccount)(objectclass=owncloud)(|(cn={{query}}*)(displayname={{query}}*)(mail={{query}}*)))",
+            "STORAGE_LDAP_USER_SCHEMA_ID": "ownclouduuid",
+            "STORAGE_LDAP_LOGIN_ATTRIBUTES": "uid,mail",
             # ownCloudSQL storage driver
             "STORAGE_HOME_DRIVER": "owncloudsql",
             "STORAGE_USERS_DRIVER": "owncloudsql",
@@ -1518,7 +1696,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_STORAGE_READ_ONLY": "false",
             # General oCIS config
             # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
-            "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,nats",
+            "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,nats,ocdav",
             "OCIS_LOG_LEVEL": "error",
             "OCIS_URL": OCIS_URL,
             "PROXY_TLS": "true",
@@ -1529,6 +1707,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_MACHINE_AUTH_API_KEY": "change-me-please",
             "OCIS_INSECURE": "true",
             "PROXY_ENABLE_BASIC_AUTH": "true",
+            "ACCOUNTS_DEMO_USERS_AND_GROUPS": True,  # deprecated, remove after switching to LibreIDM
+            "IDM_CREATE_DEMO_USERS": True,
         }
 
     # Pass in "default" accounts_hash_difficulty to not set this environment variable.
@@ -1553,9 +1733,9 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         },
         {
             "name": "wait-for-ocis-server",
-            "image": OC_CI_WAIT_FOR,
+            "image": OC_CI_ALPINE,
             "commands": [
-                "wait-for -it ocis-server:9200 -t 300",
+                "curl -k -u admin:admin --retry 10 --retry-all-errors 'https://ocis-server:9200/graph/v1.0/users/ddc2004c-0977-11eb-9d3f-a793888cd0f8'",
             ],
             "depends_on": depends_on,
         },
@@ -2086,7 +2266,7 @@ def parallelDeployAcceptancePipeline(ctx):
                          fixSharedDataPermissions() +
                          ocisServer(
                              "ocis",
-                             "default",
+                             4,
                              [stepVolumeOC10OCISData, stepVolumeOCISConfig],
                              ["fix-shared-data-permissions"],
                              True,

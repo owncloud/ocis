@@ -10,24 +10,24 @@ type EnvBinding struct {
 
 // Log defines the available logging configuration.
 type Log struct {
-	Level  string `ocisConfig:"level" env:"OCIS_LOG_LEVEL"`
-	Pretty bool   `ocisConfig:"pretty" env:"OCIS_LOG_PRETTY"`
-	Color  bool   `ocisConfig:"color" env:"OCIS_LOG_COLOR"`
-	File   string `ocisConfig:"file" env:"OCIS_LOG_FILE"`
+	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL"`
+	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY"`
+	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR"`
+	File   string `yaml:"file" env:"OCIS_LOG_FILE"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `ocisConfig:"enabled" env:"OCIS_TRACING_ENABLED"`
-	Type      string `ocisConfig:"type" env:"OCIS_TRACING_TYPE"`
-	Endpoint  string `ocisConfig:"endpoint" env:"OCIS_TRACING_ENDPOINT"`
-	Collector string `ocisConfig:"collector" env:"OCIS_TRACING_COLLECTOR"`
+	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED"`
+	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE"`
+	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT"`
+	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR"`
 }
 
 // Commons holds configuration that are common to all extensions. Each extension can then decide whether
 // to overwrite its values.
 type Commons struct {
-	Log     *Log     `ocisConfig:"log"`
-	Tracing *Tracing `ocisConfig:"tracing"`
-	OcisURL string   `ocisConfig:"ocis_url" env:"OCIS_URL"`
+	Log     *Log     `yaml:"log"`
+	Tracing *Tracing `yaml:"tracing"`
+	OcisURL string   `yaml:"ocis_url" env:"OCIS_URL"`
 }
