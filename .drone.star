@@ -1696,7 +1696,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_STORAGE_READ_ONLY": "false",
             # General oCIS config
             # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
-            "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,nats",
+            "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,nats,ocdav",
             "OCIS_LOG_LEVEL": "error",
             "OCIS_URL": OCIS_URL,
             "PROXY_TLS": "true",
@@ -1733,9 +1733,9 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         },
         {
             "name": "wait-for-ocis-server",
-            "image": OC_CI_WAIT_FOR,
+            "image": OC_CI_ALPINE,
             "commands": [
-                "wait-for -it ocis-server:9200 -t 300",
+                "curl -k -u admin:admin --retry 10 --retry-all-errors 'https://ocis-server:9200/graph/v1.0/users/ddc2004c-0977-11eb-9d3f-a793888cd0f8'",
             ],
             "depends_on": depends_on,
         },
