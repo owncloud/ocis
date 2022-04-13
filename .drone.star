@@ -61,31 +61,31 @@ config = {
         "ocis",
     ],
     "cs3ApiTests": {
-        "skip": True,
+        "skip": False,
         "earlyFail": True,
     },
     "localApiTests": {
-        "skip": True,
+        "skip": False,
         "earlyFail": True,
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "accountsUITests": {
-        "skip": True,
+        "skip": False,
         "earlyFail": True,
     },
     "settingsUITests": {
-        "skip": True,
+        "skip": False,
         "earlyFail": True,
     },
     "parallelApiTests": {
@@ -93,7 +93,7 @@ config = {
             "suites": [
                 "apiShareManagement",
             ],
-            "skip": True,
+            "skip": False,
             "earlyFail": True,
             "cron": "nightly",
         },
@@ -101,7 +101,7 @@ config = {
             "suites": [
                 "apiWebdavOperations",
             ],
-            "skip": True,
+            "skip": False,
             "earlyFail": True,
             "cron": "nightly",
         },
@@ -195,6 +195,7 @@ def main(ctx):
     test_pipelines = \
         cancelPreviousBuilds() + \
         [buildOcisBinaryForTesting(ctx)] + \
+        testOcisModules(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -1013,7 +1014,7 @@ def dockerRelease(ctx, arch):
                 },
             },
         ],
-        "depends_on": getPipelineNames(testPipelines(ctx)),
+        "depends_on": getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -1138,7 +1139,7 @@ def binaryRelease(ctx, name):
                 },
             },
         ],
-        "depends_on": getPipelineNames(testPipelines(ctx)),
+        "depends_on": getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/master",
