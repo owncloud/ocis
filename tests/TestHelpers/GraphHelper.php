@@ -8,7 +8,7 @@
 
 namespace TestHelpers;
 
-use Exception;
+use TestHelpers\HttpRequestHelper;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -17,7 +17,10 @@ use Psr\Http\Message\ResponseInterface;
  * A helper class for managing users and groups using the Graph API
  */
 class GraphHelper {
-	private static function getGraphHeaders() {
+	/**
+	 * @return string[]
+	 */
+	private static function getRequestHeaders(): array {
 		return [
 			'Content-Type' => 'application/json',
 		];
@@ -100,7 +103,7 @@ class GraphHelper {
 			$xRequestId,
 			$adminUser,
 			$adminPassword,
-			self::getGraphHeaders(),
+			self::getRequestHeaders(),
 			$payload
 		);
 	}
@@ -142,7 +145,7 @@ class GraphHelper {
 			"PATCH",
 			$adminUser,
 			$adminPassword,
-			self::getGraphHeaders(),
+			self::getRequestHeaders(),
 			$payload
 		);
 	}
@@ -170,7 +173,7 @@ class GraphHelper {
 			$xRequestId,
 			$adminUser,
 			$adminPassword,
-			self::getGraphHeaders()
+			self::getRequestHeaders()
 		);
 	}
 
@@ -225,7 +228,7 @@ class GraphHelper {
 			"POST",
 			$adminUser,
 			$adminPassword,
-			self::getGraphHeaders(),
+			self::getRequestHeaders(),
 			\json_encode($payload)
 		);
 	}
@@ -257,7 +260,7 @@ class GraphHelper {
 			"PATCH",
 			$adminUser,
 			$adminPassword,
-			self::getGraphHeaders(),
+			self::getRequestHeaders(),
 			\json_encode($payload)
 		);
 	}
@@ -283,7 +286,7 @@ class GraphHelper {
 			$xRequestId,
 			$adminUser,
 			$adminPassword,
-			self::getGraphHeaders(),
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -308,7 +311,7 @@ class GraphHelper {
 			$xRequestId,
 			$adminUser,
 			$adminPassword,
-			self::getGraphHeaders(),
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -345,7 +348,7 @@ class GraphHelper {
 	 * @param string $adminPassword
 	 * @param string $groupId
 	 * @param array $users expects users array with user ids
-	 *              [ [ 'id' => 'some_id' ], ]
+	 *                     [ [ 'id' => 'some_id' ], ]
 	 *
 	 * @return ResponseInterface
 	 */
@@ -369,7 +372,7 @@ class GraphHelper {
 			$xRequestId,
 			$adminUser,
 			$adminPassword,
-			self::getGraphHeaders(),
+			self::getRequestHeaders(),
 			\json_encode($payload)
 		);
 	}
@@ -402,7 +405,7 @@ class GraphHelper {
 			$xRequestId,
 			$adminUser,
 			$adminPassword,
-			self::getGraphHeaders(),
+			self::getRequestHeaders(),
 			\json_encode($body)
 		);
 	}
@@ -462,6 +465,8 @@ class GraphHelper {
 	}
 
 	/**
+	 * returns json encoded payload for user creating request
+	 *
 	 * @param string|null $userName
 	 * @param string|null $password
 	 * @param string|null $email
@@ -481,6 +486,17 @@ class GraphHelper {
 		$payload['mail'] = $email ?? $userName . '@example.com';
 		return \json_encode($payload);
 	}
+
+	/**
+	 * returns encoded json payload for user patching requests
+	 *
+	 * @param string|null $userName
+	 * @param string|null $password
+	 * @param string|null $email
+	 * @param string|null $displayName
+	 *
+	 * @return string
+	 */
 	public static function preparePatchUserPayload(
 		?string $userName,
 		?string $password,
