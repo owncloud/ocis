@@ -25,10 +25,20 @@ import (
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/keyword"
 	"github.com/blevesearch/bleve/v2/mapping"
-	"github.com/owncloud/ocis/search/pkg/search"
 
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	searchmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0"
+	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
 )
+
+type indexDocument struct {
+	RootID string
+	Path   string
+	ID     string
+
+	Name string
+	Size uint64
+}
 
 // Index represents a bleve based search index
 type Index struct {
@@ -54,19 +64,19 @@ func New(bleveIndex bleve.Index) (*Index, error) {
 // Add adds a new entity to the Index
 func (i *Index) Add(ref *sprovider.Reference, ri *sprovider.ResourceInfo) error {
 	entity := toEntity(ref, ri)
-	return i.bleveIndex.Index(entity.ID, entity)
+	return i.bleveIndex.Index(idToBleveId(ri.Id), entity)
 }
 
 // Remove removes an entity from the index
 func (i *Index) Remove(ri *sprovider.ResourceInfo) error {
-	return i.bleveIndex.Delete(ri.Id.GetStorageId() + ":" + ri.Id.GetOpaqueId())
+	return i.bleveIndex.Delete(idToBleveId(ri.Id))
 }
 
 // Search searches the index according to the criteria specified in the given SearchIndexRequest
-func (i *Index) Search(ctx context.Context, req *search.SearchIndexRequest) (*search.SearchIndexResult, error) {
+func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (*searchsvc.SearchIndexResponse, error) {
 	query := bleve.NewConjunctionQuery(
 		bleve.NewQueryStringQuery(req.Query),
-		bleve.NewQueryStringQuery("Path:"+req.Reference.Path+"*"), // Limit search to this directory in the space
+		bleve.NewQueryStringQuery("Path:"+req.Ref.Path+"*"), // Limit search to this directory in the space
 	)
 	bleveReq := bleve.NewSearchRequest(query)
 	bleveReq.Fields = []string{"*"}
@@ -75,7 +85,7 @@ func (i *Index) Search(ctx context.Context, req *search.SearchIndexRequest) (*se
 		return nil, err
 	}
 
-	matches := []search.Match{}
+	matches := []*searchmsg.Match{}
 	for _, h := range res.Hits {
 		match, err := fromFields(h.Fields)
 		if err != nil {
@@ -84,7 +94,7 @@ func (i *Index) Search(ctx context.Context, req *search.SearchIndexRequest) (*se
 		matches = append(matches, match)
 	}
 
-	return &search.SearchIndexResult{
+	return &searchsvc.SearchIndexResponse{
 		Matches: matches,
 	}, nil
 }
@@ -96,8 +106,8 @@ func BuildMapping() mapping.IndexMapping {
 	return indexMapping
 }
 
-func toEntity(ref *sprovider.Reference, ri *sprovider.ResourceInfo) *Entity {
-	return &Entity{
+func toEntity(ref *sprovider.Reference, ri *sprovider.ResourceInfo) *indexDocument {
+	return &indexDocument{
 		RootID: ref.ResourceId.GetStorageId() + ":" + ref.ResourceId.GetOpaqueId(),
 		Path:   ref.Path,
 		ID:     ri.Id.GetStorageId() + ":" + ri.Id.GetOpaqueId(),
@@ -106,25 +116,29 @@ func toEntity(ref *sprovider.Reference, ri *sprovider.ResourceInfo) *Entity {
 	}
 }
 
-func fromFields(fields map[string]interface{}) (search.Match, error) {
+func fromFields(fields map[string]interface{}) (*searchmsg.Match, error) {
 	rootIDParts := strings.SplitN(fields["RootID"].(string), ":", 2)
 	IDParts := strings.SplitN(fields["ID"].(string), ":", 2)
 
-	return search.Match{
-		Reference: &sprovider.Reference{
-			ResourceId: &sprovider.ResourceId{
-				StorageId: rootIDParts[0],
-				OpaqueId:  rootIDParts[1],
+	return &searchmsg.Match{
+		Entity: &searchmsg.Entity{
+			Ref: &searchmsg.Reference{
+				ResourceId: &searchmsg.ResourceID{
+					StorageId: rootIDParts[0],
+					OpaqueId:  rootIDParts[1],
+				},
+				Path: fields["Path"].(string),
 			},
-			Path: fields["Path"].(string),
-		},
-		Info: &sprovider.ResourceInfo{
-			Id: &sprovider.ResourceId{
+			Id: &searchmsg.ResourceID{
 				StorageId: IDParts[0],
 				OpaqueId:  IDParts[1],
 			},
-			Path: fields["Name"].(string),
+			Name: fields["Name"].(string),
 			Size: uint64(fields["Size"].(float64)),
 		},
 	}, nil
+}
+
+func idToBleveId(id *sprovider.ResourceId) string {
+	return id.StorageId + ":" + id.OpaqueId
 }

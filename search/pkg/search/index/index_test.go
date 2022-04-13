@@ -5,7 +5,8 @@ import (
 
 	"github.com/blevesearch/bleve/v2"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/owncloud/ocis/search/pkg/search"
+	searchmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0"
+	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/search/pkg/search/index"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -73,20 +74,23 @@ var _ = Describe("Index", func() {
 			It("finds files by name, prefix or substring match", func() {
 				queries := []string{"foo.pdf", "foo*", "*oo.p*"}
 				for _, query := range queries {
-					res, err := i.Search(ctx, &search.SearchIndexRequest{
-						Reference: &sprovider.Reference{
-							ResourceId: ref.ResourceId,
+					res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
+						Ref: &searchmsg.Reference{
+							ResourceId: &searchmsg.ResourceID{
+								StorageId: ref.ResourceId.StorageId,
+								OpaqueId:  ref.ResourceId.OpaqueId,
+							},
 						},
 						Query: query,
 					})
 					Expect(err).ToNot(HaveOccurred())
 					Expect(res).ToNot(BeNil())
 					Expect(len(res.Matches)).To(Equal(1), "query returned no result: "+query)
-					Expect(res.Matches[0].Reference.ResourceId).To(Equal(ref.ResourceId))
-					Expect(res.Matches[0].Reference.Path).To(Equal(ref.Path))
-					Expect(res.Matches[0].Info.Id).To(Equal(ri.Id))
-					Expect(res.Matches[0].Info.Path).To(Equal(ri.Path))
-					Expect(res.Matches[0].Info.Size).To(Equal(ri.Size))
+					Expect(res.Matches[0].Entity.Ref.ResourceId.OpaqueId).To(Equal(ref.ResourceId.OpaqueId))
+					Expect(res.Matches[0].Entity.Ref.Path).To(Equal(ref.Path))
+					Expect(res.Matches[0].Entity.Id.OpaqueId).To(Equal(ri.Id.OpaqueId))
+					Expect(res.Matches[0].Entity.Name).To(Equal(ri.Path))
+					Expect(res.Matches[0].Entity.Size).To(Equal(ri.Size))
 				}
 			})
 
@@ -119,28 +123,34 @@ var _ = Describe("Index", func() {
 				It("finds files living deeper in the tree by filename, prefix or substring match", func() {
 					queries := []string{"nestedpdf.pdf", "nested*", "*tedpdf.*"}
 					for _, query := range queries {
-						res, err := i.Search(ctx, &search.SearchIndexRequest{
-							Reference: &sprovider.Reference{
-								ResourceId: ref.ResourceId,
+						res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
+							Ref: &searchmsg.Reference{
+								ResourceId: &searchmsg.ResourceID{
+									StorageId: ref.ResourceId.StorageId,
+									OpaqueId:  ref.ResourceId.OpaqueId,
+								},
 							},
 							Query: query,
 						})
 						Expect(err).ToNot(HaveOccurred())
 						Expect(res).ToNot(BeNil())
 						Expect(len(res.Matches)).To(Equal(1), "query returned no result: "+query)
-						Expect(res.Matches[0].Reference.ResourceId).To(Equal(nestedRef.ResourceId))
-						Expect(res.Matches[0].Reference.Path).To(Equal(nestedRef.Path))
-						Expect(res.Matches[0].Info.Id).To(Equal(nestedRI.Id))
-						Expect(res.Matches[0].Info.Path).To(Equal(nestedRI.Path))
-						Expect(res.Matches[0].Info.Size).To(Equal(nestedRI.Size))
+						Expect(res.Matches[0].Entity.Ref.ResourceId.OpaqueId).To(Equal(nestedRef.ResourceId.OpaqueId))
+						Expect(res.Matches[0].Entity.Ref.Path).To(Equal(nestedRef.Path))
+						Expect(res.Matches[0].Entity.Id.OpaqueId).To(Equal(nestedRI.Id.OpaqueId))
+						Expect(res.Matches[0].Entity.Name).To(Equal(nestedRI.Path))
+						Expect(res.Matches[0].Entity.Size).To(Equal(nestedRI.Size))
 					}
 				})
 
 				It("does not find the higher levels when limiting the searched directory", func() {
-					res, err := i.Search(ctx, &search.SearchIndexRequest{
-						Reference: &sprovider.Reference{
-							ResourceId: ref.ResourceId,
-							Path:       "./nested/",
+					res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
+						Ref: &searchmsg.Reference{
+							ResourceId: &searchmsg.ResourceID{
+								StorageId: ref.ResourceId.StorageId,
+								OpaqueId:  ref.ResourceId.OpaqueId,
+							},
+							Path: "./nested/",
 						},
 						Query: "foo.pdf",
 					})
