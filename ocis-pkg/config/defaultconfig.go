@@ -14,7 +14,7 @@ import (
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config/defaults"
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/config/defaults"
 	storage "github.com/owncloud/ocis/extensions/storage/pkg/config/defaults"
-	store "github.com/owncloud/ocis/store/pkg/config/defaults"
+	store "github.com/owncloud/ocis/extensions/store/pkg/config/defaults"
 	thumbnails "github.com/owncloud/ocis/thumbnails/pkg/config/defaults"
 	web "github.com/owncloud/ocis/web/pkg/config/defaults"
 	webdav "github.com/owncloud/ocis/webdav/pkg/config/defaults"

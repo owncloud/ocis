@@ -1,10 +1,8 @@
-package debug
+package service
 
 import (
-	"context"
-
+	"github.com/owncloud/ocis/extensions/store/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/store/pkg/config"
 )
 
 // Option defines a single option function.
@@ -12,12 +10,13 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger  log.Logger
-	Context context.Context
-	Config  *config.Config
+	Logger log.Logger
+	Config *config.Config
+
+	Database, Table string
+	Nodes           []string
 }
 
-// newOptions initializes the available default options.
 func newOptions(opts ...Option) Options {
 	opt := Options{}
 
@@ -35,14 +34,28 @@ func Logger(val log.Logger) Option {
 	}
 }
 
-// Context provides a function to set the context option.
-func Context(val context.Context) Option {
+// Database configures the database option.
+func Database(val *config.Config) Option {
 	return func(o *Options) {
-		o.Context = val
+		o.Config = val
 	}
 }
 
-// Config provides a function to set the config option.
+// Table configures the Table option.
+func Table(val *config.Config) Option {
+	return func(o *Options) {
+		o.Config = val
+	}
+}
+
+// Nodes configures the Nodes option.
+func Nodes(val *config.Config) Option {
+	return func(o *Options) {
+		o.Config = val
+	}
+}
+
+// Config configures the Config option.
 func Config(val *config.Config) Option {
 	return func(o *Options) {
 		o.Config = val
