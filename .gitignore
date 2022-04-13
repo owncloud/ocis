@@ -1,5 +1,7 @@
 */coverage.out
+extensions/*/coverage.out
 */checkstyle.xml
+extensions/*/checkstyle.xml
 */package-lock.json
 
 ocis/config/identifier-registration.yaml
