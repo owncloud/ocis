@@ -76,7 +76,8 @@ func (i *Index) Remove(ri *sprovider.ResourceInfo) error {
 func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (*searchsvc.SearchIndexResponse, error) {
 	query := bleve.NewConjunctionQuery(
 		bleve.NewQueryStringQuery(req.Query),
-		bleve.NewQueryStringQuery("Path:"+req.Ref.Path+"*"), // Limit search to this directory in the space
+		bleve.NewQueryStringQuery("RootID:"+req.Ref.ResourceId.StorageId+"!"+req.Ref.ResourceId.OpaqueId), // Limit search to the space
+		bleve.NewQueryStringQuery("Path:"+req.Ref.Path+"*"),                                               // Limit search to this directory in the space
 	)
 	bleveReq := bleve.NewSearchRequest(query)
 	bleveReq.Fields = []string{"*"}
@@ -108,9 +109,9 @@ func BuildMapping() mapping.IndexMapping {
 
 func toEntity(ref *sprovider.Reference, ri *sprovider.ResourceInfo) *indexDocument {
 	return &indexDocument{
-		RootID: ref.ResourceId.GetStorageId() + "!" + ref.ResourceId.GetOpaqueId(),
+		RootID: idToBleveId(ref.ResourceId),
 		Path:   ref.Path,
-		ID:     ri.Id.GetStorageId() + "!" + ri.Id.GetOpaqueId(),
+		ID:     idToBleveId(ri.Id),
 		Name:   ri.Path,
 		Size:   ri.Size,
 	}
