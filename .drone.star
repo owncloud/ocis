@@ -751,7 +751,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "LOCAL_UPLOAD_DIR": "/uploads",
                     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
                     "WEB_PATH": "/srv/app/web",
-                    "FEATURE_PATH": "/drone/src/accounts/ui/tests/acceptance/features",
+                    "FEATURE_PATH": "/drone/src/extensions/accounts/ui/tests/acceptance/features",
                     "MIDDLEWARE_HOST": "http://middleware:3000",
                 },
                 "commands": [
@@ -762,7 +762,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "git checkout $WEB_COMMITID",
                     # TODO: settings/package.json has all the acceptance test dependencies
                     # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
-                    "cd /drone/src/accounts",
+                    "cd /drone/src/extensions/accounts",
                     "yarn install --immutable",
                     "make test-acceptance-webui",
                 ],
@@ -815,7 +815,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "LOCAL_UPLOAD_DIR": "/uploads",
                     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
                     "WEB_PATH": "/srv/app/web",
-                    "FEATURE_PATH": "/drone/src/settings/ui/tests/acceptance/features",
+                    "FEATURE_PATH": "/drone/src/extensions/settings/ui/tests/acceptance/features",
                     "MIDDLEWARE_HOST": "http://middleware:3000",
                 },
                 "commands": [
@@ -826,7 +826,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "git checkout $WEB_COMMITID",
                     # TODO: settings/package.json has all the acceptance test dependencies
                     # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
-                    "cd /drone/src/settings",
+                    "cd /drone/src/extensions/settings",
                     "yarn install --immutable",
                     "make test-acceptance-webui",
                 ],
