@@ -43,22 +43,22 @@ DEFAULT_NODEJS_VERSION = "14"
 config = {
     "modules": [
         # if you add a module here please also add it to the root level Makefile
-        "accounts",
-        "audit",
-        "glauth",
-        "graph-explorer",
-        "graph",
-        "idp",
+        "extensions/accounts",
+        "extensions/audit",
+        "extensions/glauth",
+        "extensions/graph-explorer",
+        "extensions/graph",
+        "extensions/idp",
+        "extensions/ocs",
+        "extensions/proxy",
+        "extensions/settings",
+        "extensions/storage",
+        "extensions/store",
+        "extensions/thumbnails",
+        "extensions/web",
+        "extensions/webdav",
         "ocis-pkg",
         "ocis",
-        "ocs",
-        "proxy",
-        "settings",
-        "storage",
-        "store",
-        "thumbnails",
-        "web",
-        "webdav",
     ],
     "cs3ApiTests": {
         "skip": False,
@@ -301,7 +301,7 @@ def testOcisModule(ctx, module):
             "commands": [
                 "mkdir -p cache/checkstyle",
                 "make -C %s ci-golangci-lint" % (module),
-                "mv %s/checkstyle.xml cache/checkstyle/%s_checkstyle.xml" % (module, module),
+                "mv %s/checkstyle.xml cache/checkstyle/$(basename %s)_checkstyle.xml" % (module, module),
             ],
             "volumes": [stepVolumeGo],
         },
@@ -311,7 +311,7 @@ def testOcisModule(ctx, module):
             "commands": [
                 "mkdir -p cache/coverage",
                 "make -C %s test" % (module),
-                "mv %s/coverage.out cache/coverage/%s_coverage.out" % (module, module),
+                "mv %s/coverage.out cache/coverage/$(basename %s)_coverage.out" % (module, module),
             ],
             "volumes": [stepVolumeGo],
         },
@@ -751,7 +751,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "LOCAL_UPLOAD_DIR": "/uploads",
                     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
                     "WEB_PATH": "/srv/app/web",
-                    "FEATURE_PATH": "/drone/src/accounts/ui/tests/acceptance/features",
+                    "FEATURE_PATH": "/drone/src/extensions/accounts/ui/tests/acceptance/features",
                     "MIDDLEWARE_HOST": "http://middleware:3000",
                 },
                 "commands": [
@@ -762,7 +762,7 @@ def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "git checkout $WEB_COMMITID",
                     # TODO: settings/package.json has all the acceptance test dependencies
                     # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
-                    "cd /drone/src/accounts",
+                    "cd /drone/src/extensions/accounts",
                     "yarn install --immutable",
                     "make test-acceptance-webui",
                 ],
@@ -815,7 +815,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "LOCAL_UPLOAD_DIR": "/uploads",
                     "NODE_TLS_REJECT_UNAUTHORIZED": 0,
                     "WEB_PATH": "/srv/app/web",
-                    "FEATURE_PATH": "/drone/src/settings/ui/tests/acceptance/features",
+                    "FEATURE_PATH": "/drone/src/extensions/settings/ui/tests/acceptance/features",
                     "MIDDLEWARE_HOST": "http://middleware:3000",
                 },
                 "commands": [
@@ -826,7 +826,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "git checkout $WEB_COMMITID",
                     # TODO: settings/package.json has all the acceptance test dependencies
                     # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
-                    "cd /drone/src/settings",
+                    "cd /drone/src/extensions/settings",
                     "yarn install --immutable",
                     "make test-acceptance-webui",
                 ],
@@ -1630,6 +1630,14 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "ACCOUNTS_DEMO_USERS_AND_GROUPS": True,  # deprecated, remove after switching to LibreIDM
             "IDM_CREATE_DEMO_USERS": True,
         }
+        wait_for_ocis = {
+            "name": "wait-for-ocis-server",
+            "image": OC_CI_ALPINE,
+            "commands": [
+                "curl -k -u admin:admin --fail --retry-connrefused --retry 10 --retry-all-errors 'https://ocis-server:9200/graph/v1.0/users/ddc2004c-0977-11eb-9d3f-a793888cd0f8'",
+            ],
+            "depends_on": depends_on,
+        }
     else:
         user = "33:33"
         environment = {
@@ -1710,6 +1718,14 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "ACCOUNTS_DEMO_USERS_AND_GROUPS": True,  # deprecated, remove after switching to LibreIDM
             "IDM_CREATE_DEMO_USERS": True,
         }
+        wait_for_ocis = {
+            "name": "wait-for-ocis-server",
+            "image": OC_CI_WAIT_FOR,
+            "commands": [
+                "wait-for -it ocis-server:9200 -t 300",
+            ],
+            "depends_on": depends_on,
+        }
 
     # Pass in "default" accounts_hash_difficulty to not set this environment variable.
     # That will allow OCIS to use whatever its built-in default is.
@@ -1731,14 +1747,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "volumes": volumes,
             "depends_on": depends_on,
         },
-        {
-            "name": "wait-for-ocis-server",
-            "image": OC_CI_ALPINE,
-            "commands": [
-                "curl -k -u admin:admin --retry 10 --retry-all-errors 'https://ocis-server:9200/graph/v1.0/users/ddc2004c-0977-11eb-9d3f-a793888cd0f8'",
-            ],
-            "depends_on": depends_on,
-        },
+        wait_for_ocis,
     ]
 
 def middlewareService():
