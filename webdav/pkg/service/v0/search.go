@@ -130,7 +130,7 @@ type reportSearchFiles struct {
 	Search  reportSearchFilesSearch `xml:"search"`
 }
 type reportSearchFilesSearch struct {
-	Pattern string `xml:"search"`
+	Pattern string `xml:"pattern"`
 	Limit   int    `xml:"limit"`
 	Offset  int    `xml:"offset"`
 }
