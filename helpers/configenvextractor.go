@@ -19,7 +19,7 @@ var targets = map[string]string{
 
 func main() {
 	fmt.Println("Getting relevant packages")
-	paths, err := filepath.Glob("../../*/pkg/config/defaults/defaultconfig.go")
+	paths, err := filepath.Glob("../../extensions/*/pkg/config/defaults/defaultconfig.go")
 	if err != nil {
 		log.Fatal(err)
 	}
