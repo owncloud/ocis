@@ -53,5 +53,14 @@ type Service struct {
 }
 
 func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *searchsvc.SearchResponse) error {
+	res, err := s.provider.Search(ctx, &searchsvc.SearchRequest{
+		Query: in.Query,
+	})
+	if err != nil {
+		return nil
+	}
+
+	out.Matches = res.Matches
+	out.NextPageToken = res.NextPageToken
 	return nil
 }
