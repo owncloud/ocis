@@ -7,4 +7,4 @@ geekdocEditPath: edit/master/docs/architecture
 geekdocFilePath: services-communication.md
 ---
 
-{{< svg src="/ocis/static/ocis-services-communication.drawio.svg" >}}
+{{< figure src="/ocis/static/ocis-services-communication.drawio.svg" >}}

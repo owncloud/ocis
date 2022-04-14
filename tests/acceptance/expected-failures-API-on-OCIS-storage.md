@@ -921,8 +921,8 @@ _ocs: api compatibility, return correct status code_
 
 #### [reshared resource is not listed for sharee after accepting share](https://github.com/owncloud/ocis/issues/2214)
 
-- [apiShareReshareToShares2/reShareSubfolder.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareSubfolder.feature#L180)
-- [apiShareReshareToShares2/reShareSubfolder.feature:181](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareSubfolder.feature#L181)
+- [apiShareReshareToShares2/reShareSubfolder.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareSubfolder.feature#L178)
+- [apiShareReshareToShares2/reShareSubfolder.feature:179](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareSubfolder.feature#L179)
 
 #### [various sharing settings cannot be set](https://github.com/owncloud/ocis/issues/1328)
 
@@ -1597,8 +1597,8 @@ And other missing implementation of favorites
 
 #### [Share inaccessible if folder with same name was deleted and recreated](https://github.com/owncloud/ocis/issues/1787)
 
-- [apiShareReshareToShares1/reShare.feature:269](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L269)
-- [apiShareReshareToShares1/reShare.feature:270](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L270)
+- [apiShareReshareToShares1/reShare.feature:259](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L259)
+- [apiShareReshareToShares1/reShare.feature:260](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L260)
 
 #### [Trying to accept a share with invalid ID gives incorrect OCS and HTTP status](https://github.com/owncloud/ocis/issues/2111)
 
