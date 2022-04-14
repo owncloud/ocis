@@ -16,22 +16,22 @@ L10N_MODULES := $(shell find . -path '*.tx*' -name 'config' | sed 's|/[^/]*$$||'
 
 # if you add a module here please also add it to the .drone.star file
 OCIS_MODULES = \
-	accounts \
-	audit \
-	glauth \
-	graph \
-	graph-explorer \
-	idp \
+	extensions/accounts \
+	extensions/audit \
+	extensions/glauth \
+	extensions/graph \
+	extensions/graph-explorer \
+	extensions/idp \
+	extensions/ocs \
+	extensions/proxy \
+	extensions/settings \
+	extensions/storage \
+	extensions/store \
+	extensions/thumbnails \
+	extensions/web \
+	extensions/webdav\
 	ocis \
-	ocis-pkg \
-	ocs \
-	proxy \
-	settings \
-	storage \
-	store \
-	thumbnails \
-	web \
-	webdav
+	ocis-pkg
 
 # bin file definitions
 PHP_CS_FIXER=php -d zend.enable_gc=0 vendor-bin/owncloud-codestyle/vendor/bin/php-cs-fixer
@@ -209,6 +209,7 @@ changelog: $(CALENS)
 ifndef CHANGELOG_VERSION
 	$(error CHANGELOG_VERSION is undefined)
 endif
+	mkdir -p ocis/dist
 	$(CALENS) --version $(CHANGELOG_VERSION) -o ocis/dist/CHANGELOG.md
 
 .PHONY: l10n-push

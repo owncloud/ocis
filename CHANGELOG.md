@@ -1,8 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [1.20.0] (2022-04-13)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 1.20.0.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.19.0...master
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 

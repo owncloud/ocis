@@ -5,7 +5,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/owncloud/ocis/accounts/pkg/config"
+	"github.com/owncloud/ocis/extensions/accounts/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/indexer/errors"
 	"github.com/owncloud/ocis/ocis-pkg/indexer/index"
 	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
