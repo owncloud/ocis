@@ -9,7 +9,7 @@ geekdocFilePath: release_notes.md
 
 ## ownCloud Infinite Scale 1.20.0 Technology Preview
 
-Version 1.20.0 brings major improvements, new features and bug fixes to the platform. Infinite Scale now provides complete Auditing capabilities and the basic Spaces' feature has reached initial feature completeness. Furthermore, ownCloud Web introduces a number of smaller features as well as more design and usability improvements.
+Version 1.20.0 brings major improvements, new features and bug fixes to the platform. Infinite Scale now provides complete Auditing capabilities and the basic 'Spaces' feature has reached initial feature completeness. Furthermore, ownCloud Web introduces a number of smaller features as well as more design and usability improvements.
 
 The most prominent changes in ownCloud Infinite Scale 1.20.0 and ownCloud Web 5.4.0 comprise:
 
@@ -20,8 +20,6 @@ The most prominent changes in ownCloud Infinite Scale 1.20.0 and ownCloud Web 5.
 * All sharing options (users & links) are now united in one panel in ownCloud Web. [web#6701](https://github.com/owncloud/web/pull/6701)
 * The "Media Viewer" in ownCloud Web has been renamed to "Preview". [web#6514](https://github.com/owncloud/web/pull/6514)
 * ownCloud Web now has support for audio playback in "Preview" (e.g., MP3, WAV, FLAC, OGG). [web#6514](https://github.com/owncloud/web/pull/6514)
-* Public links on single files can now be created with the Editor role. [#6618](https://github.com/owncloud/web/pull/6618)
-* ownCloud Web can now download multiple files and folders as archives when used with the ownCloud 10 backend. [web#6239](https://github.com/owncloud/web/issues/6239)
 * The feedback link in ownCloud Web is now customizable. See https://owncloud.dev/clients/web/getting-started/#options for more information. [web#6702](https://github.com/owncloud/web/issues/6702) 
 * ownCloud Web now supports full screen mode for external apps like web office. [web#6688](https://github.com/owncloud/web/pull/6688)
 * ownCloud Web introduces an integrated PDF viewer that user native browser capabilities. [web#6654](https://github.com/owncloud/web/pull/6654)
