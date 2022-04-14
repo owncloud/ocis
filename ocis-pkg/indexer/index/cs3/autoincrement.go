@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/owncloud/ocis/accounts/pkg/storage"
+	"github.com/owncloud/ocis/extensions/accounts/pkg/storage"
 
 	idxerrs "github.com/owncloud/ocis/ocis-pkg/indexer/errors"
 
