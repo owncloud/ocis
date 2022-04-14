@@ -97,7 +97,7 @@ services:
       STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBNAME: owncloud
       STORAGE_USERS_DRIVER_OWNCLOUDSQL_REDIS_ADDR: redis:6379 # TODO: redis is not yet supported
       # ownCloudSQL sharing driver
-      STORAGE_SHARING_USER_DRIVER: oc10-sql
+      STORAGE_SHARING_USER_DRIVER: owncloudsql
       STORAGE_SHARING_USER_SQL_USERNAME: owncloud
       STORAGE_SHARING_USER_SQL_PASSWORD: owncloud
       STORAGE_SHARING_USER_SQL_HOST: oc10-db
