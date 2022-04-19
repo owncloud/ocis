@@ -180,6 +180,25 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 				"storageregistry": map[string]interface{}{
 					"driver": cfg.Reva.StorageRegistry.Driver,
 					"drivers": map[string]interface{}{
+						"static": map[string]interface{}{
+							"home_provider": "/home", // TODO use /users/{{.OpaqueId}} ?
+							"rules": map[string]interface{}{
+								"/home": map[string]interface{}{
+									"address":     "127.0.0.1:9157",
+									"provider_id": "1284d238-aa92-42ce-bdc4-0b0000009157",
+								},
+								//"/users/{{.Id.OpaqueId}}": map[string]interface{}{
+								"/users": map[string]interface{}{
+									"address":       "127.0.0.1:9157",
+									"provider_id":   "1284d238-aa92-42ce-bdc4-0b0000009157",
+									"provider_path": "/users",
+								},
+								"1284d238-aa92-42ce-bdc4-0b0000009157": map[string]interface{}{
+									"address":     "127.0.0.1:9157",
+									"provider_id": "1284d238-aa92-42ce-bdc4-0b0000009157",
+								},
+							},
+						},
 						"spaces": map[string]interface{}{
 							"providers": spacesProviders(cfg, logger),
 						},

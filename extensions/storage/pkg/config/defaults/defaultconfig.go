@@ -272,7 +272,7 @@ func DefaultConfig() *config.Config {
 				EtagCacheTTL:               0,
 			},
 			StorageRegistry: config.StorageRegistry{
-				Driver:       "spaces",
+				Driver:       "static",
 				HomeProvider: "/home", // unused for spaces, static currently not supported
 				JSON:         "",
 			},
