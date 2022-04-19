@@ -36,7 +36,7 @@ Chosen option: "GLAuth wraps accounts service", because we need write access to 
 
 ### Positive Consequences
 
-* We can build a self contained user management in the accounts service and can adjust it to our requirements.
+* We can build a self-contained user management in the accounts service and can adjust it to our requirements.
 * We do not rely on an LDAP server which would only be possible by implementing write support in the LDAP libraries used by GLAuth (hard to estimate effort, when will that be merged upstream).
 
 ### Negative Consequences

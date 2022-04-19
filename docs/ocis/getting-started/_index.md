@@ -72,7 +72,7 @@ When you're using oCIS with self-signed certificates, you need to set the enviro
 {{< /hint >}}
 
 {{< hint warming >}}
-When you're creating the [demo users]({{< ref "./demo-users" >}}) by setting `ACCOUNTS_DEMO_USERS_AND_GROUPS=true`, you need to be sure that this instance is not used in prodution because the passwords are public.
+When you're creating the [demo users]({{< ref "./demo-users" >}}) by setting `ACCOUNTS_DEMO_USERS_AND_GROUPS=true`, you need to be sure that this instance is not used in production because the passwords are public.
 {{< /hint >}}
 
 {{< hint warning >}}
