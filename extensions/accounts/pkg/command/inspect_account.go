@@ -10,7 +10,7 @@ import (
 
 	"github.com/owncloud/ocis/extensions/accounts/pkg/flagset"
 
-	"github.com/asim/go-micro/plugins/client/grpc/v4"
+	"github.com/go-micro/plugins/v4/client/grpc"
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/extensions/accounts/pkg/config"
 	"github.com/urfave/cli/v2"

@@ -1,9 +1,9 @@
 package http
 
 import (
-	"github.com/asim/go-micro/plugins/events/natsjs/v4"
 	"github.com/cs3org/reva/v2/pkg/events/server"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/go-micro/plugins/v4/events/natsjs"
 	graphMiddleware "github.com/owncloud/ocis/extensions/graph/pkg/middleware"
 	svc "github.com/owncloud/ocis/extensions/graph/pkg/service/v0"
 	"github.com/owncloud/ocis/ocis-pkg/account"

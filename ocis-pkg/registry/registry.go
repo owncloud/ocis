@@ -4,11 +4,11 @@ import (
 	"os"
 	"strings"
 
-	consulr "github.com/asim/go-micro/plugins/registry/consul/v4"
-	etcdr "github.com/asim/go-micro/plugins/registry/etcd/v4"
-	kubernetesr "github.com/asim/go-micro/plugins/registry/kubernetes/v4"
-	mdnsr "github.com/asim/go-micro/plugins/registry/mdns/v4"
-	natsr "github.com/asim/go-micro/plugins/registry/nats/v4"
+	consulr "github.com/go-micro/plugins/v4/registry/consul"
+	etcdr "github.com/go-micro/plugins/v4/registry/etcd"
+	kubernetesr "github.com/go-micro/plugins/v4/registry/kubernetes"
+	mdnsr "github.com/go-micro/plugins/v4/registry/mdns"
+	natsr "github.com/go-micro/plugins/v4/registry/nats"
 
 	"go-micro.dev/v4/registry"
 )

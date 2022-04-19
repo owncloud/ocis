@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/asim/go-micro/plugins/events/natsjs/v4"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/server"
+	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/owncloud/ocis/extensions/audit/pkg/config"
 	"github.com/owncloud/ocis/extensions/audit/pkg/config/parser"
 	"github.com/owncloud/ocis/extensions/audit/pkg/logging"

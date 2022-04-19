@@ -16,7 +16,6 @@ import (
 	storemsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/store/v0"
 	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v0"
 
-	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -26,6 +25,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-micro/plugins/v4/client/grpc"
 	"github.com/google/uuid"
 	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/response"
