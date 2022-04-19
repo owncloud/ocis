@@ -43,8 +43,8 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			// pre-create folders
-			if cfg.Service.AuthManager == "json" && cfg.Service.AuthManagers.JSON.Users != "" {
-				if err := os.MkdirAll(filepath.Dir(cfg.Service.AuthManagers.JSON.Users), os.FileMode(0700)); err != nil {
+			if cfg.AuthProvider == "json" && cfg.AuthProviders.JSON.File != "" {
+				if err := os.MkdirAll(filepath.Dir(cfg.AuthProviders.JSON.File), os.FileMode(0700)); err != nil {
 					return err
 				}
 			}
@@ -59,8 +59,8 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 				Interface("reva-config", rcfg).
 				Msg("config")
 
-			if cfg.Service.AuthManager == "ldap" {
-				ldapCfg := cfg.Service.AuthManagers.LDAP
+			if cfg.AuthProvider == "ldap" {
+				ldapCfg := cfg.AuthProviders.LDAP
 				if err := ldap.WaitForCA(logger, ldapCfg.Insecure, ldapCfg.CACert); err != nil {
 					logger.Error().Err(err).Msg("The configured LDAP CA cert does not exist")
 					return err
@@ -80,12 +80,12 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 
 			debugServer, err := debug.Server(
 				debug.Name(c.Command.Name+"-debug"),
-				debug.Addr(cfg.DebugService.Address),
+				debug.Addr(cfg.Debug.Addr),
 				debug.Logger(logger),
 				debug.Context(ctx),
-				debug.Pprof(cfg.DebugService.Pprof),
-				debug.Zpages(cfg.DebugService.Zpages),
-				debug.Token(cfg.DebugService.Token),
+				debug.Pprof(cfg.Debug.Pprof),
+				debug.Zpages(cfg.Debug.Zpages),
+				debug.Token(cfg.Debug.Token),
 			)
 
 			if err != nil {
@@ -110,39 +110,38 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 func authBasicConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
 	rcfg := map[string]interface{}{
 		"core": map[string]interface{}{
-			// "max_cpus":             cfg.Reva.AuthBasic.MaxCPUs, <-- Default is use all CPUs so remove this.
 			"tracing_enabled":      cfg.Tracing.Enabled,
 			"tracing_endpoint":     cfg.Tracing.Endpoint,
 			"tracing_collector":    cfg.Tracing.Collector,
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.Service.JWTSecret,
-			"gatewaysvc":                cfg.Service.GatewayEndpoint,
-			"skip_user_groups_in_token": cfg.Service.SkipUserGroupsInToken,
+			"jwt_secret":                cfg.JWTSecret,
+			"gatewaysvc":                cfg.GatewayEndpoint,
+			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
-			"network": cfg.Service.Network,
-			"address": cfg.Service.Address,
+			"network": cfg.GRPC.Protocol,
+			"address": cfg.GRPC.Addr,
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"authprovider": map[string]interface{}{
-					"auth_manager": cfg.Service.AuthManager,
+					"auth_manager": cfg.AuthProvider,
 					"auth_managers": map[string]interface{}{
 						"json": map[string]interface{}{
-							"users": cfg.Service.AuthManagers.JSON.Users, // TODO rename config option
+							"users": cfg.AuthProviders.JSON.File,
 						},
-						"ldap": ldapConfigFromString(cfg.Service.AuthManagers.LDAP),
+						"ldap": ldapConfigFromString(cfg.AuthProviders.LDAP),
 						"owncloudsql": map[string]interface{}{
-							"dbusername":        cfg.Service.AuthManagers.OwnCloudSQL.DBUsername,
-							"dbpassword":        cfg.Service.AuthManagers.OwnCloudSQL.DBPassword,
-							"dbhost":            cfg.Service.AuthManagers.OwnCloudSQL.DBHost,
-							"dbport":            cfg.Service.AuthManagers.OwnCloudSQL.DBPort,
-							"dbname":            cfg.Service.AuthManagers.OwnCloudSQL.DBName,
-							"idp":               cfg.Service.AuthManagers.OwnCloudSQL.IDP,
-							"nobody":            cfg.Service.AuthManagers.OwnCloudSQL.Nobody,
-							"join_username":     cfg.Service.AuthManagers.OwnCloudSQL.JoinUsername,
-							"join_ownclouduuid": cfg.Service.AuthManagers.OwnCloudSQL.JoinOwnCloudUUID,
+							"dbusername":        cfg.AuthProviders.OwnCloudSQL.DBUsername,
+							"dbpassword":        cfg.AuthProviders.OwnCloudSQL.DBPassword,
+							"dbhost":            cfg.AuthProviders.OwnCloudSQL.DBHost,
+							"dbport":            cfg.AuthProviders.OwnCloudSQL.DBPort,
+							"dbname":            cfg.AuthProviders.OwnCloudSQL.DBName,
+							"idp":               cfg.AuthProviders.OwnCloudSQL.IDP,
+							"nobody":            cfg.AuthProviders.OwnCloudSQL.Nobody,
+							"join_username":     cfg.AuthProviders.OwnCloudSQL.JoinUsername,
+							"join_ownclouduuid": cfg.AuthProviders.OwnCloudSQL.JoinOwnCloudUUID,
 						},
 					},
 				},
@@ -187,7 +186,7 @@ func (s AuthBasicSutureService) Serve(ctx context.Context) error {
 	return nil
 }
 
-func ldapConfigFromString(cfg config.LDAPManager) map[string]interface{} {
+func ldapConfigFromString(cfg config.LDAPProvider) map[string]interface{} {
 	return map[string]interface{}{
 		"uri":               cfg.URI,
 		"cacert":            cfg.CACert,
