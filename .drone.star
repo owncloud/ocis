@@ -1635,6 +1635,7 @@ def ocisServerWithIdp():
         "LDAP_GROUP_SCHEMA_ID": "ownclouduuid",
         "LDAP_GROUP_SCHEMA_MAIL": "mail",
         "LDAP_GROUP_SCHEMA_GROUPNAME": "cn",
+        "LDAP_GROUP_SCHEMA_MEMBER": "member",
         "LDAP_GROUP_OBJECTCLASS": "groupOfNames",
         "IDP_INSECURE": "true",
         "IDP_LDAP_BIND_DN": "uid=idp,ou=sysusers,o=libregraph-idm",
@@ -1647,7 +1648,7 @@ def ocisServerWithIdp():
         "STORAGE_LDAP_BIND_PASSWORD": "reva",
         "OCS_ACCOUNT_BACKEND_TYPE": "cs3",
         "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,idp,nats,idm,ocdav",
-        "OCIS_LOG_LEVEL": "debug",
+        "OCIS_LOG_LEVEL": "error",
         "OCIS_INSECURE": "true",
     }
     return [
@@ -1672,7 +1673,7 @@ def ocisServerWithIdp():
         },
     ]
 
-def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], testing_parallel_deploy = False, testing_graph_api = False):
+def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], testing_parallel_deploy = False):
     if not testing_parallel_deploy:
         user = "0:0"
         environment = {
@@ -2495,7 +2496,7 @@ def graphApiTests(ctx, part_number = 1, number_of_parts = 1):
     storage = "ocis"
     early_fail = config["graphApiTests"]["earlyFail"] if "earlyFail" in config["graphApiTests"] else False
     filterTags = "~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OCIS-Storage&&~@issue-ocis-3023"
-    expectedToFailuresFile = "/drone/src/tests/acceptance/expected-failures-graphAPI-on-OCIS-storage.md"
+    expectedFailuresFile = "/drone/src/tests/acceptance/expected-failures-graphAPI-on-OCIS-storage.md"
 
     return {
         "kind": "pipeline",
@@ -2526,7 +2527,7 @@ def graphApiTests(ctx, part_number = 1, number_of_parts = 1):
                     "DIVIDE_INTO_NUM_PARTS": number_of_parts,
                     "RUN_PART": part_number,
                     "UPLOAD_DELETE_WAIT_TIME": 0,
-                    "EXPECTED_FAILURES_FILE": expectedToFailuresFile,
+                    "EXPECTED_FAILURES_FILE": expectedFailuresFile,
                 },
                 "commands": [
                     "cd /srv/app/testrunner",
