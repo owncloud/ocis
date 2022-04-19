@@ -6,8 +6,6 @@ require (
 	github.com/CiscoM31/godata v1.0.5
 	github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
-	github.com/asim/go-micro/plugins/client/grpc/v4 v4.0.0-20220118152736-9e0be6c85d75
-	github.com/asim/go-micro/plugins/server/grpc/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/blevesearch/bleve/v2 v2.3.2
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220412090512-93c5918b4bde
@@ -28,6 +26,7 @@ require (
 	github.com/go-micro/plugins/v4/registry/kubernetes v1.0.0
 	github.com/go-micro/plugins/v4/registry/mdns v1.0.0
 	github.com/go-micro/plugins/v4/registry/nats v1.0.0
+	github.com/go-micro/plugins/v4/server/grpc v1.0.1-0.20220419141935-d7731316a76a
 	github.com/go-micro/plugins/v4/server/http v1.0.0
 	github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.0.0
 	github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus v1.0.0
