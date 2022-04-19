@@ -100,8 +100,8 @@ func DefaultPolicies() []config.Policy {
 					// TODO or we allow a REPORT on /dav/spaces to search all spaces and /dav/space/{spaceid} to search a specific space
 					// send webdav REPORT requests to search service
 					Method:   "REPORT",
-					Endpoint: "/dav/",
-					Backend:  "http://localhost:????", // TODO use registry?
+					Endpoint: "/remote.php/dav/",
+					Backend:  "http://localhost:9115", // TODO use registry?
 				},
 				{
 					Endpoint: "/remote.php/",
