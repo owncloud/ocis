@@ -17,6 +17,7 @@ import (
 	storage "github.com/owncloud/ocis/extensions/storage/pkg/config/defaults"
 	store "github.com/owncloud/ocis/extensions/store/pkg/config/defaults"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config/defaults"
+	user "github.com/owncloud/ocis/extensions/user/pkg/config/defaults"
 	web "github.com/owncloud/ocis/extensions/web/pkg/config/defaults"
 	webdav "github.com/owncloud/ocis/extensions/webdav/pkg/config/defaults"
 )
@@ -48,5 +49,6 @@ func DefaultConfig() *Config {
 		WebDAV:        webdav.DefaultConfig(),
 		Storage:       storage.DefaultConfig(),
 		AuthBasic:     authbasic.FullDefaultConfig(),
+		User:          user.FullDefaultConfig(),
 	}
 }

@@ -19,6 +19,7 @@ import (
 	storage "github.com/owncloud/ocis/extensions/storage/pkg/config"
 	store "github.com/owncloud/ocis/extensions/store/pkg/config"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
+	user "github.com/owncloud/ocis/extensions/user/pkg/config"
 	web "github.com/owncloud/ocis/extensions/web/pkg/config"
 	webdav "github.com/owncloud/ocis/extensions/webdav/pkg/config"
 )
@@ -75,6 +76,7 @@ type Config struct {
 	Settings      *settings.Config      `yaml:"settings"`
 	Storage       *storage.Config       `yaml:"storage"`
 	AuthBasic     *authbasic.Config     `yaml:"auth_basic"`
+	User          *user.Config          `yaml:"user"`
 	Store         *store.Config         `yaml:"store"`
 	Thumbnails    *thumbnails.Config    `yaml:"thumbnails"`
 	WebDAV        *webdav.Config        `yaml:"webdav"`

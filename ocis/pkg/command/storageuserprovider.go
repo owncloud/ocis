@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/owncloud/ocis/extensions/storage/pkg/command"
+	"github.com/owncloud/ocis/extensions/user/pkg/command"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
@@ -14,11 +14,11 @@ func StorageUserProviderCommand(cfg *config.Config) *cli.Command {
 		Usage:    "start storage userprovider service",
 		Category: "extensions",
 		//Flags:    flagset.UsersWithConfig(cfg.Storage),
-		Before: func(ctx *cli.Context) error {
-			return ParseStorageCommon(ctx, cfg)
-		},
+		// Before: func(ctx *cli.Context) error {
+		// 	return ParseStorageCommon(ctx, cfg)
+		// },
 		Action: func(c *cli.Context) error {
-			origCmd := command.Users(cfg.Storage)
+			origCmd := command.User(cfg.User)
 			return handleOriginalAction(c, origCmd)
 		},
 	}

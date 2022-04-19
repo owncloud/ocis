@@ -34,6 +34,7 @@ import (
 	storage "github.com/owncloud/ocis/extensions/storage/pkg/command"
 	store "github.com/owncloud/ocis/extensions/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/command"
+	user "github.com/owncloud/ocis/extensions/user/pkg/command"
 	web "github.com/owncloud/ocis/extensions/web/pkg/command"
 	webdav "github.com/owncloud/ocis/extensions/webdav/pkg/command"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
@@ -110,7 +111,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["storage-frontend"] = storage.NewFrontend
 	s.ServicesRegistry["ocdav"] = storage.NewOCDav
 	s.ServicesRegistry["storage-gateway"] = storage.NewGateway
-	s.ServicesRegistry["storage-userprovider"] = storage.NewUserProvider
+	s.ServicesRegistry["storage-userprovider"] = user.NewUserProvider
 	s.ServicesRegistry["storage-groupprovider"] = storage.NewGroupProvider
 	s.ServicesRegistry["storage-authbasic"] = authbasic.NewAuthBasic
 	s.ServicesRegistry["storage-authbearer"] = storage.NewAuthBearer
