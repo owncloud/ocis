@@ -35,7 +35,7 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function before(BeforeScenarioScope $scope):void {
+	public function before(BeforeScenarioScope $scope): void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context from here
@@ -51,7 +51,7 @@ class GraphContext implements Context {
 	 * @param string|null $requester
 	 * @param string|null $requesterPassword
 	 *
-	 * @return array
+	 * @return void
 	 * @throws JsonException
 	 * @throws GuzzleException
 	 */
@@ -63,7 +63,7 @@ class GraphContext implements Context {
 		?string $displayName = null,
 		?string $requester = null,
 		?string $requesterPassword = null
-	): array {
+	): void {
 		if (!$requester) {
 			$requester = $this->featureContext->getAdminUsername();
 			$requesterPassword = $this->featureContext->getAdminPassword();
@@ -91,7 +91,7 @@ class GraphContext implements Context {
 	 * @throws JsonException
 	 * @throws GuzzleException
 	 */
-	public function adminHasRetrievedUserUsingTheGraphApi(string $user):void {
+	public function adminHasRetrievedUserUsingTheGraphApi(string $user): void {
 		$user = $this->featureContext->getActualUsername($user);
 		try {
 			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
@@ -120,7 +120,7 @@ class GraphContext implements Context {
 	public function userHasRetrievedUserUsingTheGraphApi(
 		$requestingUser,
 		$targetUser
-	):void {
+	): void {
 		$requester = $this->featureContext->getActualUsername($requestingUser);
 		$requesterPassword = $this->featureContext->getPasswordForUser($requestingUser);
 		$user = $this->featureContext->getActualUsername($targetUser);
@@ -136,30 +136,30 @@ class GraphContext implements Context {
 		$this->featureContext->thenTheHTTPStatusCodeShouldBe(200);
 	}
 
-    /**
-     * @param string $groupId
-     * @param bool $checkResult
-     *
-     * @return void
-     * @throws GuzzleException
-     */
-    public function adminDeletesGroupWithGroupId(
-        string $groupId,
-        bool $checkResult = false
-    ) {
-        $this->featureContext->setResponse(
-            GraphHelper::deleteGroup(
-                $this->featureContext->getBaseUrl(),
-                $this->featureContext->getStepLineRef(),
-                $this->featureContext->getAdminUsername(),
-                $this->featureContext->getAdminPassword(),
-                $groupId
-            )
-        );
-        if ($checkResult) {
-            $this->featureContext->thenTheHTTPStatusCodeShouldBe(204);
-        }
-    }
+	/**
+	 * @param string $groupId
+	 * @param bool $checkResult
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function adminDeletesGroupWithGroupId(
+		string $groupId,
+		bool $checkResult = false
+	): void {
+		$this->featureContext->setResponse(
+			GraphHelper::deleteGroup(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$this->featureContext->getAdminUsername(),
+				$this->featureContext->getAdminPassword(),
+				$groupId
+			)
+		);
+		if ($checkResult) {
+			$this->featureContext->thenTheHTTPStatusCodeShouldBe(204);
+		}
+	}
 
 	/**
 	 * @param string $group
@@ -170,7 +170,7 @@ class GraphContext implements Context {
 	 */
 	public function adminDeletesGroupUsingTheGraphApi(
 		string $group
-	) {
+	): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		if ($groupId) {
 			$this->adminDeletesGroupWithGroupId($groupId);
@@ -189,7 +189,7 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function adminHasDeletedGroupUsingTheGraphApi(string $group):void {
+	public function adminHasDeletedGroupUsingTheGraphApi(string $group): void {
 		$this->adminDeletesGroupUsingTheGraphApi($group);
 		$this->featureContext->thenTheHTTPStatusCodeShouldBe(204);
 	}
@@ -202,7 +202,7 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function adminDeletesUserUsingTheGraphApi(string $user) {
+	public function adminDeletesUserUsingTheGraphApi(string $user): void {
 		$this->featureContext->setResponse(
 			GraphHelper::deleteUser(
 				$this->featureContext->getBaseUrl(),
@@ -222,7 +222,7 @@ class GraphContext implements Context {
 	 * @throws JsonException
 	 * @throws GuzzleException
 	 */
-	public function adminHasRemovedUserFromGroupUsingTheGraphApi(string $user, string $group):void {
+	public function adminHasRemovedUserFromGroupUsingTheGraphApi(string $user, string $group): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
@@ -271,7 +271,7 @@ class GraphContext implements Context {
 	 * @throws JsonException
 	 * @throws GuzzleException
 	 */
-	public function userShouldNotBeMemberInGroupUsingTheGraphApi(string $user, string $group):void {
+	public function userShouldNotBeMemberInGroupUsingTheGraphApi(string $user, string $group): void {
 		$found = $this->getUserPresenceInGroupUsingTheGraphApi($user, $group);
 		Assert::assertFalse($found, __METHOD__ . " User $user is member of group $group");
 	}
@@ -284,7 +284,7 @@ class GraphContext implements Context {
 	 * @throws JsonException
 	 * @throws GuzzleException
 	 */
-	public function userShouldBeMemberInGroupUsingTheGraphApi(string $user, string $group):void {
+	public function userShouldBeMemberInGroupUsingTheGraphApi(string $user, string $group): void {
 		$found = $this->getUserPresenceInGroupUsingTheGraphApi($user, $group);
 		Assert::assertTrue($found, __METHOD__ . "User $user is not member of group $group");
 	}
@@ -299,7 +299,7 @@ class GraphContext implements Context {
 	public function adminChangesPasswordOfUserToUsingTheGraphApi(
 		string $user,
 		string $password
-	):void {
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
 		$response = GraphHelper::editUser(
@@ -321,7 +321,7 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function adminHasRetrievedGroupListUsingTheGraphApi():array {
+	public function adminHasRetrievedGroupListUsingTheGraphApi(): array {
 		$response =  GraphHelper::getGroups(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -345,7 +345,7 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function theAdminHasRetrievedMembersListOfGroupUsingTheGraphApi(string $group):array {
+	public function theAdminHasRetrievedMembersListOfGroupUsingTheGraphApi(string $group): array {
 		$response = GraphHelper::getMembersList(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -410,7 +410,7 @@ class GraphContext implements Context {
 		string $user,
 		string $group,
 		bool $checkResult = true
-	) {
+	): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		$result = GraphHelper::addUserToGroup(
@@ -435,7 +435,7 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function adminHasCreatedGroupUsingTheGraphApi(string $group):array {
+	public function adminHasCreatedGroupUsingTheGraphApi(string $group): array {
 		$result = GraphHelper::createGroup(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -457,7 +457,7 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	private function throwHttpException(ResponseInterface $response, string $errorMsg) {
+	private function throwHttpException(ResponseInterface $response, string $errorMsg): void {
 		try {
 			$jsonBody = $this->featureContext->getJsonDecodedResponse($response);
 			throw new Exception(
@@ -477,35 +477,35 @@ class GraphContext implements Context {
 		}
 	}
 
-    /**
-     * @param string $shouldOrNot (not|)
-     * @param TableNode $table
-     *
-     * @throws GuzzleException
-     * @throws Exception
-     */
-    public function theseGroupsShouldNotExist(string $shouldOrNot, TableNode $table):void {
-        $should = ($shouldOrNot !== "not");
-        $this->featureContext->verifyTableNodeColumns($table, ['groupname']);
-        $actualGroupsList = $this->adminHasRetrievedGroupListUsingTheGraphApi();
-        $expectedGroups = $table->getColumnsHash();
-        // check if every expected group is(not) in the actual groups list
-        foreach ($expectedGroups as $expectedGroup) {
-            $groupName = $expectedGroup['groupname'];
-            $groupExists = false;
-            foreach ($actualGroupsList as $actualGroup) {
-                if ($actualGroup['displayName'] === $groupName) {
-                    $groupExists = true;
-                    break;
-                }
-            }
-            if ($groupExists !== $should) {
-                throw new Exception(
-                    __METHOD__
-                    . "\nGroup '$groupName' is expected " . ($should ? "" : "not ")
-                    . "to exist, but it does" . ($should ? " not" : "") . " exist."
-                );
-            }
-        }
-    }
+	/**
+	 * @param string $shouldOrNot (not|)
+	 * @param TableNode $table
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theseGroupsShouldNotExist(string $shouldOrNot, TableNode $table): void {
+		$should = ($shouldOrNot !== "not");
+		$this->featureContext->verifyTableNodeColumns($table, ['groupname']);
+		$actualGroupsList = $this->adminHasRetrievedGroupListUsingTheGraphApi();
+		$expectedGroups = $table->getColumnsHash();
+		// check if every expected group is(not) in the actual groups list
+		foreach ($expectedGroups as $expectedGroup) {
+			$groupName = $expectedGroup['groupname'];
+			$groupExists = false;
+			foreach ($actualGroupsList as $actualGroup) {
+				if ($actualGroup['displayName'] === $groupName) {
+					$groupExists = true;
+					break;
+				}
+			}
+			if ($groupExists !== $should) {
+				throw new Exception(
+					__METHOD__
+					. "\nGroup '$groupName' is expected " . ($should ? "" : "not ")
+					. "to exist, but it does" . ($should ? " not" : "") . " exist."
+				);
+			}
+		}
+	}
 }

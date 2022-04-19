@@ -5,6 +5,7 @@ The expected failures in this file are from features in the owncloud/core repo.
 TODO: group list of expected failures to their respective issues.
 
 ### apiAuth
+
 - [apiAuth/cors.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L24)
 - [apiAuth/cors.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L25)
 - [apiAuth/cors.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L26)
@@ -70,8 +71,8 @@ TODO: group list of expected failures to their respective issues.
 - [apiAuth/cors.feature:208](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L208)
 - [apiAuth/cors.feature:209](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L209)
 
-
 ### apiAuthOcs
+
 - [apiAuthOcs/ocsDELETEAuth.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsDELETEAuth.feature#L10)
 - [apiAuthOcs/ocsGETAuth.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L10)
 - [apiAuthOcs/ocsGETAuth.feature:51](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsGETAuth.feature#L51)
@@ -83,6 +84,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiAuthOcs/ocsPUTAuth.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsPUTAuth.feature#L26)
 
 ### apiAuthWebDav
+
 - [apiAuthWebDav/webDavDELETEAuth.feature:136](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavDELETEAuth.feature#L136)
 - [apiAuthWebDav/webDavDELETEAuth.feature:150](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavDELETEAuth.feature#L150)
 - [apiAuthWebDav/webDavDELETEAuth.feature:162](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavDELETEAuth.feature#L162)
@@ -117,6 +119,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiAuthWebDav/webDavSpecialURLs.feature:195](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavSpecialURLs.feature#L195)
 
 ### apiCapabilities
+
 - [apiCapabilities/capabilities.feature:8](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L8)
 - [apiCapabilities/capabilities.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L15)
 - [apiCapabilities/capabilities.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L22)
@@ -169,6 +172,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiCapabilities/capabilitiesWithNormalUser.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilitiesWithNormalUser.feature#L11)
 
 ### apiFavorites
+
 - [apiFavorites/favorites.feature:121](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L121)
 - [apiFavorites/favorites.feature:147](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L147)
 - [apiFavorites/favorites.feature:162](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L162)
@@ -190,6 +194,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiFavorites/favoritesSharingToShares.feature:108](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favoritesSharingToShares.feature#L108)
 
 ### apiMain
+
 - [apiMain/caldav.feature:8](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/caldav.feature#L8)
 - [apiMain/caldav.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/caldav.feature#L15)
 - [apiMain/caldav.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/caldav.feature#L23)
@@ -205,52 +210,65 @@ TODO: group list of expected failures to their respective issues.
 - [apiMain/main.feature:5](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/main.feature#L5)
 
 ### apiShareCreateSpecialToShares1
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:58](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L58)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L59)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:86](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L86)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:87](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L87)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:113](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L113)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:114](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L114)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:140](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L140)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:141](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L141)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:162](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L162)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:163](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L163)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:193](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L193)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:194](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L194)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:223](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L223)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:224](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L224)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:252](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L252)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:253](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L253)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:282](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L282)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:283](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L283)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:303](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L303)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:304](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L304)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:325](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L325)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:326](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L326)
+
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:52](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L52)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:53](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L53)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:76](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L76)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:77](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L77)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L102)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L103)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:128](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L128)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L129)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:148](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L148)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:149](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L149)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:175](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L175)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:176](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L176)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:201](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L201)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:202](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L202)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:229](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L229)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:230](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L230)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:258](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L258)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:259](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L259)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:279](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L279)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:280](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L280)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:301](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L301)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:302](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L302)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:323](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L323)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:324](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L324)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:346](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L346)
 - [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:347](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L347)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:348](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L348)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:370](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L370)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:371](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L371)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:388](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L388)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:389](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L389)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:406](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L406)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:407](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L407)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:429](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L429)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:430](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L430)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:453](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L453)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:454](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L454)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:363](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L363)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:364](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L364)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:380](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L380)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:381](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L381)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:403](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L403)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:404](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L404)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:427](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L427)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:428](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L428)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:451](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L451)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:452](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L452)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:476](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L476)
 - [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:477](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L477)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:478](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L478)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:502](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L502)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:503](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L503)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:524](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L524)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:525](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L525)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:546](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L546)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:547](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L547)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:566](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L566)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:567](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L567)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:606](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L606)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:607](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L607)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:497](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L497)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:498](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L498)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:518](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L518)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:519](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L519)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:537](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L537)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:538](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L538)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:576](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L576)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:577](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L577)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:599](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L599)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:600](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L600)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:601](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L601)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:602](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L602)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:603](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L603)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:624](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L624)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:625](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L625)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:626](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L626)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:627](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L627)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:628](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L628)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:629](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L629)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:630](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L630)
 - [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:631](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L631)
 - [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:632](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L632)
 - [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:633](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L633)
@@ -262,30 +280,18 @@ TODO: group list of expected failures to their respective issues.
 - [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:659](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L659)
 - [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:660](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L660)
 - [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:661](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L661)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:662](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L662)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:663](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L663)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:664](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L664)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:665](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L665)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:666](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L666)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:667](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L667)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:688](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L688)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:689](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L689)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:690](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L690)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:691](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L691)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:692](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L692)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:693](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L693)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:714](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L714)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:715](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L715)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:716](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L716)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:717](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L717)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:718](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L718)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:719](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L719)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:740](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L740)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:741](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L741)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:762](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L762)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:763](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L763)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:784](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L784)
-- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:785](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L785)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:682](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L682)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:683](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L683)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:684](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L684)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:685](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L685)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:686](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L686)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:687](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L687)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:708](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L708)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:709](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L709)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:732](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L732)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:733](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L733)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:756](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L756)
+- [apiShareCreateSpecialToShares1/createShareExpirationDate.feature:757](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareExpirationDate.feature#L757)
 - [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L45)
 - [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L46)
 - [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:71](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L71)
@@ -311,9 +317,9 @@ TODO: group list of expected failures to their respective issues.
 - [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:667](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L667)
 - [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:693](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L693)
 - [apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature:694](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareReceivedInMultipleWays.feature#L694)
-- [apiShareCreateSpecialToShares1/createShareResourceCaseSensitiveName.feature:148](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareResourceCaseSensitiveName.feature#L148)
-- [apiShareCreateSpecialToShares1/createShareResourceCaseSensitiveName.feature:193](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareResourceCaseSensitiveName.feature#L193)
-- [apiShareCreateSpecialToShares1/createShareResourceCaseSensitiveName.feature:238](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareResourceCaseSensitiveName.feature#L238)
+- [apiShareCreateSpecialToShares1/createShareResourceCaseSensitiveName.feature:154](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareResourceCaseSensitiveName.feature#L154)
+- [apiShareCreateSpecialToShares1/createShareResourceCaseSensitiveName.feature:201](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareResourceCaseSensitiveName.feature#L201)
+- [apiShareCreateSpecialToShares1/createShareResourceCaseSensitiveName.feature:248](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareResourceCaseSensitiveName.feature#L248)
 - [apiShareCreateSpecialToShares1/createShareUniqueReceivedNames.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareUniqueReceivedNames.feature#L15)
 - [apiShareCreateSpecialToShares1/createShareWhenExcludedFromSharing.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareWhenExcludedFromSharing.feature#L25)
 - [apiShareCreateSpecialToShares1/createShareWhenExcludedFromSharing.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareWhenExcludedFromSharing.feature#L26)
@@ -324,8 +330,8 @@ TODO: group list of expected failures to their respective issues.
 - [apiShareCreateSpecialToShares1/createShareWhenExcludedFromSharing.feature:78](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareWhenExcludedFromSharing.feature#L78)
 - [apiShareCreateSpecialToShares1/createShareWhenExcludedFromSharing.feature:79](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareWhenExcludedFromSharing.feature#L79)
 
-
 ### apiShareCreateSpecialToShares2
+
 - [apiShareCreateSpecialToShares2/createShareGroupAndUserWithSameName.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareGroupAndUserWithSameName.feature#L10)
 - [apiShareCreateSpecialToShares2/createShareGroupAndUserWithSameName.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareGroupAndUserWithSameName.feature#L34)
 - [apiShareCreateSpecialToShares2/createShareGroupAndUserWithSameName.feature:58](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareGroupAndUserWithSameName.feature#L58)
@@ -358,6 +364,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature#L29)
 
 ### apiShareManagementBasicToShares
+
 - [apiShareManagementBasicToShares/createShareToSharesFolder.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L116)
 - [apiShareManagementBasicToShares/createShareToSharesFolder.feature:117](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L117)
 - [apiShareManagementBasicToShares/createShareToSharesFolder.feature:131](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L131)
@@ -415,6 +422,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature:147](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/excludeGroupFromReceivingSharesToSharesFolder.feature#L147)
 
 ### apiShareManagementToShares
+
 - [apiShareManagementToShares/acceptShares.feature:65](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L65)
 - [apiShareManagementToShares/acceptShares.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L93)
 - [apiShareManagementToShares/acceptShares.feature:228](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L228)
@@ -453,10 +461,12 @@ TODO: group list of expected failures to their respective issues.
 - [apiShareManagementToShares/moveShareInsideAnotherShare.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/moveShareInsideAnotherShare.feature#L100)
 
 ### apiShareReshareToShares1
+
 - [apiShareReshareToShares1/reShare.feature:259](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L259)
 - [apiShareReshareToShares1/reShare.feature:260](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares1/reShare.feature#L260)
 
 ### apiShareReshareToShares2
+
 - [apiShareReshareToShares2/reShareDisabled.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareDisabled.feature#L27)
 - [apiShareReshareToShares2/reShareDisabled.feature:28](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareDisabled.feature#L28)
 - [apiShareReshareToShares2/reShareSubfolder.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareSubfolder.feature#L178)
@@ -467,6 +477,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiShareReshareToShares2/reShareWhenShareWithOnlyMembershipGroups.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareWhenShareWithOnlyMembershipGroups.feature#L46)
 
 ### apiShareReshareToShares3
+
 - [apiShareReshareToShares3/reShareUpdate.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareUpdate.feature#L61)
 - [apiShareReshareToShares3/reShareUpdate.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareUpdate.feature#L62)
 - [apiShareReshareToShares3/reShareUpdate.feature:114](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareUpdate.feature#L114)
@@ -521,43 +532,46 @@ TODO: group list of expected failures to their respective issues.
 - [apiShareReshareToShares3/reShareWithExpiryDate.feature:469](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareWithExpiryDate.feature#L469)
 
 ### apiShareUpdateToShares
-- [apiShareUpdateToShares/updateShare.feature:97](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L97)
+
 - [apiShareUpdateToShares/updateShare.feature:98](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L98)
-- [apiShareUpdateToShares/updateShare.feature:112](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L112)
+- [apiShareUpdateToShares/updateShare.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L99)
 - [apiShareUpdateToShares/updateShare.feature:113](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L113)
-- [apiShareUpdateToShares/updateShare.feature:130](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L130)
+- [apiShareUpdateToShares/updateShare.feature:114](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L114)
 - [apiShareUpdateToShares/updateShare.feature:131](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L131)
 - [apiShareUpdateToShares/updateShare.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L132)
 - [apiShareUpdateToShares/updateShare.feature:133](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L133)
 - [apiShareUpdateToShares/updateShare.feature:134](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L134)
 - [apiShareUpdateToShares/updateShare.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L135)
-- [apiShareUpdateToShares/updateShare.feature:154](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L154)
+- [apiShareUpdateToShares/updateShare.feature:136](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L136)
 - [apiShareUpdateToShares/updateShare.feature:155](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L155)
 - [apiShareUpdateToShares/updateShare.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L156)
 - [apiShareUpdateToShares/updateShare.feature:157](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L157)
 - [apiShareUpdateToShares/updateShare.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L158)
 - [apiShareUpdateToShares/updateShare.feature:159](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L159)
-- [apiShareUpdateToShares/updateShare.feature:241](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L241)
-- [apiShareUpdateToShares/updateShare.feature:287](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L287)
+- [apiShareUpdateToShares/updateShare.feature:160](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L160)
+- [apiShareUpdateToShares/updateShare.feature:196](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L196)
+- [apiShareUpdateToShares/updateShare.feature:242](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L242)
 - [apiShareUpdateToShares/updateShare.feature:288](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L288)
-- [apiShareUpdateToShares/updateShare.feature:310](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L310)
+- [apiShareUpdateToShares/updateShare.feature:289](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L289)
 - [apiShareUpdateToShares/updateShare.feature:311](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L311)
-- [apiShareUpdateToShares/updateShare.feature:324](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L324)
+- [apiShareUpdateToShares/updateShare.feature:312](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L312)
 - [apiShareUpdateToShares/updateShare.feature:325](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L325)
+- [apiShareUpdateToShares/updateShare.feature:326](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L326)
 - [apiShareUpdateToShares/updateShare.feature:350](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L350)
 - [apiShareUpdateToShares/updateShare.feature:351](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L351)
-- [apiShareUpdateToShares/updateShare.feature:367](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L367)
-- [apiShareUpdateToShares/updateShare.feature:368](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L368)
+- [apiShareUpdateToShares/updateShare.feature:369](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L369)
+- [apiShareUpdateToShares/updateShare.feature:370](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L370)
 - [apiShareUpdateToShares/updateShare.feature:396](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L396)
 - [apiShareUpdateToShares/updateShare.feature:397](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L397)
+- [apiShareUpdateToShares/updateShare.feature:426](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L426)
 - [apiShareUpdateToShares/updateShare.feature:427](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L427)
-- [apiShareUpdateToShares/updateShare.feature:428](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L428)
 - [apiShareUpdateToShares/updateShareGroupAndUserWithSameName.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShareGroupAndUserWithSameName.feature#L34)
 - [apiShareUpdateToShares/updateShareGroupAndUserWithSameName.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShareGroupAndUserWithSameName.feature#L35)
 - [apiShareUpdateToShares/updateShareGroupAndUserWithSameName.feature:54](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShareGroupAndUserWithSameName.feature#L54)
 - [apiShareUpdateToShares/updateShareGroupAndUserWithSameName.feature:55](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShareGroupAndUserWithSameName.feature#L55)
 
 ### apiSharees
+
 - [apiSharees/sharees.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L32)
 - [apiSharees/sharees.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L33)
 - [apiSharees/sharees.feature:54](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L54)
@@ -582,6 +596,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiSharees/sharees.feature:681](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L681)
 
 ### apiTranslation
+
 - [apiTranslation/translation.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L21)
 - [apiTranslation/translation.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L22)
 - [apiTranslation/translation.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L23)
@@ -596,6 +611,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiTranslation/translation.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L36)
 
 ### apiTrashbin
+
 - [apiTrashbin/trashbinFilesFolders.feature:208](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L208)
 - [apiTrashbin/trashbinFilesFolders.feature:209](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L209)
 - [apiTrashbin/trashbinFilesFolders.feature:254](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L254)
@@ -618,6 +634,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiTrashbin/trashbinSharingToShares.feature:161](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L161)
 
 ### apiVersions
+
 - [apiVersions/fileVersionAuthor.feature:14](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L14)
 - [apiVersions/fileVersionAuthor.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L36)
 - [apiVersions/fileVersionAuthor.feature:56](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L56)
@@ -636,6 +653,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiVersions/fileVersionsSharingToShares.feature:305](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L305)
 
 ### apiWebdavEtagPropagation1
+
 - [apiWebdavEtagPropagation1/deleteFileFolder.feature:120](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/deleteFileFolder.feature#L120)
 - [apiWebdavEtagPropagation1/deleteFileFolder.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/deleteFileFolder.feature#L156)
 - [apiWebdavEtagPropagation1/deleteFileFolder.feature:194](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/deleteFileFolder.feature#L194)
@@ -648,6 +666,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiWebdavEtagPropagation1/moveFileFolder.feature:387](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/moveFileFolder.feature#L387)
 
 ### apiWebdavEtagPropagation2
+
 - [apiWebdavEtagPropagation2/copyFileFolder.feature:194](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/copyFileFolder.feature#L194)
 - [apiWebdavEtagPropagation2/copyFileFolder.feature:238](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/copyFileFolder.feature#L238)
 - [apiWebdavEtagPropagation2/createFolder.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/createFolder.feature#L85)
@@ -658,6 +677,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiWebdavEtagPropagation2/upload.feature:175](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/upload.feature#L175)
 
 ### apiWebdavLocks
+
 - [apiWebdavLocks/exclusiveLocks.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/exclusiveLocks.feature#L43)
 - [apiWebdavLocks/exclusiveLocks.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/exclusiveLocks.feature#L44)
 - [apiWebdavLocks/exclusiveLocks.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/exclusiveLocks.feature#L45)
@@ -791,6 +811,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiWebdavLocks/requestsWithToken.feature:162](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/requestsWithToken.feature#L162)
 
 ### apiWebdavLocks2
+
 - [apiWebdavLocks2/resharedSharesToShares.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks2/resharedSharesToShares.feature#L31)
 - [apiWebdavLocks2/resharedSharesToShares.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks2/resharedSharesToShares.feature#L32)
 - [apiWebdavLocks2/resharedSharesToShares.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks2/resharedSharesToShares.feature#L33)
@@ -900,6 +921,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiWebdavLocks2/setTimeoutSharesToShares.feature:84](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks2/setTimeoutSharesToShares.feature#L84)
 
 ### apiWebdavLocks3
+
 - [apiWebdavLocks3/independentLocks.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks3/independentLocks.feature#L25)
 - [apiWebdavLocks3/independentLocks.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks3/independentLocks.feature#L26)
 - [apiWebdavLocks3/independentLocks.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks3/independentLocks.feature#L27)
@@ -956,6 +978,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiWebdavLocks3/independentLocksShareToShares.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks3/independentLocksShareToShares.feature#L125)
 
 ### apiWebdavLocksUnlock
+
 - [apiWebdavLocksUnlock/unlock.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlock.feature#L30)
 - [apiWebdavLocksUnlock/unlock.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlock.feature#L31)
 - [apiWebdavLocksUnlock/unlock.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlock.feature#L46)
@@ -1025,6 +1048,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiWebdavLocksUnlock/unlockSharingToShares.feature:219](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L219)
 
 ### apiWebdavMove1
+
 - [apiWebdavMove1/moveFolder.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L27)
 - [apiWebdavMove1/moveFolder.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L45)
 - [apiWebdavMove1/moveFolder.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolder.feature#L63)
@@ -1048,6 +1072,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiWebdavMove1/moveFolderToExcludedDirectory.feature:90](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove1/moveFolderToExcludedDirectory.feature#L90)
 
 ### apiWebdavMove2
+
 - [apiWebdavMove2/moveFile.feature:224](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L224)
 - [apiWebdavMove2/moveFile.feature:287](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L287)
 - [apiWebdavMove2/moveFile.feature:288](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFile.feature#L288)
@@ -1091,6 +1116,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiWebdavMove2/moveShareOnOcis.feature:220](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L220)
 
 ### apiWebdavOperations
+
 - [apiWebdavOperations/downloadFile.feature:229](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L229)
 - [apiWebdavOperations/downloadFile.feature:230](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L230)
 - [apiWebdavOperations/downloadFile.feature:235](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/downloadFile.feature#L235)
@@ -1138,6 +1164,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiWebdavOperations/search.feature:314](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L314)
 
 ### apiWebdavPreviews
+
 - [apiWebdavPreviews/previews.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L101)
 - [apiWebdavPreviews/previews.feature:110](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L110)
 - [apiWebdavPreviews/previews.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L125)
@@ -1151,8 +1178,8 @@ TODO: group list of expected failures to their respective issues.
 - [apiWebdavPreviews/previews.feature:219](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L219)
 - [apiWebdavPreviews/previews.feature:237](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavPreviews/previews.feature#L237)
 
-
 ### apiWebdavUpload1
+
 - [apiWebdavUpload1/uploadFile.feature:181](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L181)
 - [apiWebdavUpload1/uploadFile.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L182)
 - [apiWebdavUpload1/uploadFile.feature:187](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFile.feature#L187)
@@ -1172,8 +1199,8 @@ TODO: group list of expected failures to their respective issues.
 - [apiWebdavUpload1/uploadFileToExcludedDirectory.feature:82](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToExcludedDirectory.feature#L82)
 - [apiWebdavUpload1/uploadFileToExcludedDirectory.feature:87](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload1/uploadFileToExcludedDirectory.feature#L87)
 
-
 ### apiWebdavUpload2
+
 - [apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature#L19)
 - [apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature#L35)
 - [apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature#L36)
@@ -1185,6 +1212,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature#L40)
 
 ### apiWebdavUploadTUS
+
 - [apiWebdavUploadTUS/checksums.feature:18](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L18)
 - [apiWebdavUploadTUS/checksums.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L19)
 - [apiWebdavUploadTUS/checksums.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/checksums.feature#L20)
@@ -1398,6 +1426,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiWebdavUploadTUS/uploadToShare.feature:378](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadToShare.feature#L378)
 
 ### apiWebdavProperties1
+
 - [apiWebdavProperties1/copyFile.feature:89](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L89)
 - [apiWebdavProperties1/copyFile.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L116)
 - [apiWebdavProperties1/copyFile.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/copyFile.feature#L132)
@@ -1450,6 +1479,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiWebdavProperties1/setFileProperties.feature:84](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L84)
 
 ### apiShareOperationsToShares1
+
 - [apiShareOperationsToShares1/accessToShare.feature:74](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/accessToShare.feature#L74)
 - [apiShareOperationsToShares1/accessToShare.feature:75](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/accessToShare.feature#L75)
 - [apiShareOperationsToShares1/changingFilesShare.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/changingFilesShare.feature#L24)
@@ -1623,6 +1653,7 @@ TODO: group list of expected failures to their respective issues.
 - [apiSharePublicLink2/uploadToPublicLinkShare.feature:277](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/uploadToPublicLinkShare.feature#L277)
 
 ### apiWebdavProperties2
+
 - [apiWebdavProperties2/getFileProperties.feature:215](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L215)
 - [apiWebdavProperties2/getFileProperties.feature:216](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L216)
 - [apiWebdavProperties2/getFileProperties.feature:221](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L221)

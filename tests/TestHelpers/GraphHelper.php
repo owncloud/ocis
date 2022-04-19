@@ -25,13 +25,14 @@ class GraphHelper {
 			'Content-Type' => 'application/json',
 		];
 	}
+
 	/**
 	 * @param string $baseUrl
 	 * @param string $path
 	 *
 	 * @return string
 	 */
-	private static function getFullUrl(string $baseUrl, string $path):string {
+	private static function getFullUrl(string $baseUrl, string $path): string {
 		$fullUrl = $baseUrl;
 		if (\substr($fullUrl, -1) !== '/') {
 			$fullUrl .= '/';
@@ -49,6 +50,7 @@ class GraphHelper {
 	 * @param array|null $headers
 	 *
 	 * @return RequestInterface
+	 * @throws GuzzleException
 	 */
 	public static function createRequest(
 		string $baseUrl,
@@ -79,6 +81,7 @@ class GraphHelper {
 	 * @param string|null $displayName
 	 *
 	 * @return ResponseInterface
+	 * @throws GuzzleException
 	 */
 	public static function createUser(
 		string $baseUrl,
@@ -89,7 +92,7 @@ class GraphHelper {
 		string $password,
 		?string $email = null,
 		?string $displayName = null
-	):ResponseInterface {
+	): ResponseInterface {
 		$payload = self::prepareCreateUserPayload(
 			$userName,
 			$password,
@@ -120,6 +123,7 @@ class GraphHelper {
 	 * @param string|null $displayName
 	 *
 	 * @return ResponseInterface
+	 * @throws GuzzleException
 	 */
 	public static function editUser(
 		string $baseUrl,
@@ -166,7 +170,7 @@ class GraphHelper {
 		string $adminUser,
 		string $adminPassword,
 		string $userName
-	):ResponseInterface {
+	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $userName);
 		return HttpRequestHelper::get(
 			$url,
@@ -193,7 +197,7 @@ class GraphHelper {
 		string $adminUser,
 		string $adminPassword,
 		string $userName
-	):ResponseInterface {
+	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $userName);
 		return HttpRequestHelper::delete(
 			$url,
@@ -219,7 +223,7 @@ class GraphHelper {
 		string $adminUser,
 		string $adminPassword,
 		string $groupName
-	):ResponseInterface {
+	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups');
 		$payload['displayName'] = $groupName;
 		return HttpRequestHelper::sendRequest(
@@ -251,7 +255,7 @@ class GraphHelper {
 		string $adminPassword,
 		string $groupId,
 		string $displayName
-	):ResponseInterface {
+	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId);
 		$payload['displayName'] = $displayName;
 		return HttpRequestHelper::sendRequest(
@@ -271,7 +275,7 @@ class GraphHelper {
 	 * @param string $adminUser
 	 * @param string $adminPassword
 	 *
-	 * @return array
+	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function getUsers(
@@ -279,7 +283,7 @@ class GraphHelper {
 		string $xRequestId,
 		string $adminUser,
 		string $adminPassword
-	):array {
+	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users');
 		return HttpRequestHelper::get(
 			$url,
@@ -331,7 +335,7 @@ class GraphHelper {
 		string $adminUser,
 		string $adminPassword,
 		string $groupId
-	):ResponseInterface {
+	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId);
 		return HttpRequestHelper::delete(
 			$url,
@@ -351,6 +355,7 @@ class GraphHelper {
 	 *                     [ [ 'id' => 'some_id' ], ]
 	 *
 	 * @return ResponseInterface
+	 * @throws GuzzleException
 	 */
 	public static function addUsersToGroup(
 		string $baseUrl,
@@ -359,7 +364,7 @@ class GraphHelper {
 		string $adminPassword,
 		string $groupId,
 		array $users
-	):ResponseInterface {
+	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId . '/users');
 		$payload = [
 			"members@odata.bind" => []
@@ -395,7 +400,7 @@ class GraphHelper {
 		string $adminPassword,
 		string $userId,
 		string $groupId
-	):ResponseInterface {
+	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId . '/members/$ref');
 		$body = [
 			"@odata.id" => self::getFullUrl($baseUrl, 'users/' . $userId)
