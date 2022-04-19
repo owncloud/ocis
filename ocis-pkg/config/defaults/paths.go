@@ -32,7 +32,7 @@ func BaseDataPath() string {
 			// fallback to BaseDatapathValue for users without home
 			return BaseDataPathValue
 		}
-		return path.Join(dir, ".ocis", "config")
+		return path.Join(dir, ".ocis")
 	case "path":
 		return BaseDataPathValue
 	default:
@@ -65,7 +65,7 @@ func BaseConfigPath() string {
 			// fallback to BaseConfigPathValue for users without home
 			return BaseConfigPathValue
 		}
-		return path.Join(dir, ".ocis")
+		return path.Join(dir, ".ocis", "config")
 	case "path":
 		return BaseConfigPathValue
 	default:

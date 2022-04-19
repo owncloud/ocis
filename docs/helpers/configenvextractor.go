@@ -56,8 +56,7 @@ func GenerateIntermediateCode(templatePath string, intermediateCodePath string, 
 
 func RunIntermediateCode(intermediateCodePath string) {
 	fmt.Println("Running intermediate go code for " + intermediateCodePath)
-	os.Setenv("OCIS_BASE_DATA_PATH", "~/.ocis")
-	os.Setenv("OCIS_CONFIG_DIR", "~/.ocis")
+	os.Setenv("HOME", "~") // don't write the current absolute user directory for the documentation
 	out, err := exec.Command("go", "run", intermediateCodePath).Output()
 	if err != nil {
 		log.Fatal(err)
