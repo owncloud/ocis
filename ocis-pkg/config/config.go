@@ -5,6 +5,7 @@ import (
 
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/config"
 	audit "github.com/owncloud/ocis/extensions/audit/pkg/config"
+	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/config"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/config"
@@ -73,6 +74,7 @@ type Config struct {
 	Proxy         *proxy.Config         `yaml:"proxy"`
 	Settings      *settings.Config      `yaml:"settings"`
 	Storage       *storage.Config       `yaml:"storage"`
+	AuthBasic     *authbasic.Config     `yaml:"auth_basic"`
 	Store         *store.Config         `yaml:"store"`
 	Thumbnails    *thumbnails.Config    `yaml:"thumbnails"`
 	WebDAV        *webdav.Config        `yaml:"webdav"`

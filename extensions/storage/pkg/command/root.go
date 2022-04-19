@@ -17,7 +17,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 		Users(cfg),
 		Groups(cfg),
 		AppProvider(cfg),
-		AuthBasic(cfg),
+		// AuthBasic(cfg),
 		AuthBearer(cfg),
 		AuthMachine(cfg),
 		Sharing(cfg),

@@ -17,6 +17,9 @@ type Options struct {
 	Logger  log.Logger
 	Context context.Context
 	Config  *config.Config
+	Pprof   bool
+	Zpages  bool
+	Token   string
 }
 
 // newOptions initializes the available default options.
@@ -62,5 +65,26 @@ func Context(val context.Context) Option {
 func Config(val *config.Config) Option {
 	return func(o *Options) {
 		o.Config = val
+	}
+}
+
+// Pprof provides a function to set the pprof option.
+func Pprof(val bool) Option {
+	return func(o *Options) {
+		o.Pprof = val
+	}
+}
+
+// Zpages provides a function to set the zpages option.
+func Zpages(val bool) Option {
+	return func(o *Options) {
+		o.Zpages = val
+	}
+}
+
+// Token provides a function to set the token option.
+func Token(val string) Option {
+	return func(o *Options) {
+		o.Token = val
 	}
 }

@@ -3,6 +3,7 @@ package config
 import (
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/config/defaults"
 	audit "github.com/owncloud/ocis/extensions/audit/pkg/config/defaults"
+	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/config/defaults"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/config/defaults"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/config/defaults"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/config/defaults"
@@ -46,5 +47,6 @@ func DefaultConfig() *Config {
 		Thumbnails:    thumbnails.DefaultConfig(),
 		WebDAV:        webdav.DefaultConfig(),
 		Storage:       storage.DefaultConfig(),
+		AuthBasic:     authbasic.FullDefaultConfig(),
 	}
 }

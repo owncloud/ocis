@@ -20,6 +20,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/command"
+	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/command"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/command"
@@ -35,7 +36,6 @@ import (
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/command"
 	web "github.com/owncloud/ocis/extensions/web/pkg/command"
 	webdav "github.com/owncloud/ocis/extensions/webdav/pkg/command"
-	"github.com/owncloud/ocis/ocis-pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/rs/zerolog"
@@ -112,7 +112,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["storage-gateway"] = storage.NewGateway
 	s.ServicesRegistry["storage-userprovider"] = storage.NewUserProvider
 	s.ServicesRegistry["storage-groupprovider"] = storage.NewGroupProvider
-	s.ServicesRegistry["storage-authbasic"] = storage.NewAuthBasic
+	s.ServicesRegistry["storage-authbasic"] = authbasic.NewAuthBasic
 	s.ServicesRegistry["storage-authbearer"] = storage.NewAuthBearer
 	s.ServicesRegistry["storage-authmachine"] = storage.NewAuthMachine
 	s.ServicesRegistry["storage-users"] = storage.NewStorageUsers
@@ -241,7 +241,7 @@ func scheduleServiceTokens(s *Service, funcSet serviceFuncMap) {
 
 // generateRunSet interprets the cfg.Runtime.Extensions config option to cherry-pick which services to start using
 // the runtime.
-func (s *Service) generateRunSet(cfg *config.Config) {
+func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 	if cfg.Runtime.Extensions != "" {
 		e := strings.Split(strings.ReplaceAll(cfg.Runtime.Extensions, " ", ""), ",")
 		for i := range e {
