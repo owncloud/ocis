@@ -12,17 +12,17 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	Tracing *Tracing `yaml:"tracing"`
-	Log     *Log     `yaml:"log"`
-	Debug   Debug    `yaml:"debug"`
+	Tracing *Tracing `yaml:"tracing,omitempty"`
+	Log     *Log     `yaml:"log,omitempty"`
+	Debug   Debug    `yaml:"debug,omitempty"`
 
-	Ldap  Ldap  `yaml:"ldap"`
-	Ldaps Ldaps `yaml:"ldaps"`
+	Ldap  Ldap  `yaml:"ldap,omitempty"`
+	Ldaps Ldaps `yaml:"ldaps,omitempty"`
 
-	Backend  Backend         `yaml:"backend"`
-	Fallback FallbackBackend `yaml:"fallback"`
+	Backend  Backend         `yaml:"backend,omitempty"`
+	Fallback FallbackBackend `yaml:"fallback,omitempty"`
 
-	RoleBundleUUID string `yaml:"role_bundle_uuid" env:"GLAUTH_ROLE_BUNDLE_ID"`
+	RoleBundleUUID string `yaml:"role_bundle_uuid,omitempty" env:"GLAUTH_ROLE_BUNDLE_ID"`
 
 	Context context.Context `yaml:"-"`
 }

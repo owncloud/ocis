@@ -12,15 +12,15 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	Tracing *Tracing `yaml:"tracing"`
-	Log     *Log     `yaml:"log"`
-	Debug   Debug    `yaml:"debug"`
+	Tracing *Tracing `yaml:"tracing,omitempty"`
+	Log     *Log     `yaml:"log,omitempty"`
+	Debug   Debug    `yaml:"debug,omitempty"`
 
-	HTTP HTTP `yaml:"http"`
+	HTTP HTTP `yaml:"http,omitempty"`
 
-	Asset Asset  `yaml:"asset"`
-	File  string `yaml:"file" env:"WEB_UI_CONFIG"` // TODO: rename this to a more self explaining string
-	Web   Web    `yaml:"web"`
+	Asset Asset  `yaml:"asset,omitempty"`
+	File  string `yaml:"file,omitempty" env:"WEB_UI_CONFIG"` // TODO: rename this to a more self explaining string
+	Web   Web    `yaml:"web,omitempty"`
 
 	Context context.Context `yaml:"-"`
 }

@@ -12,15 +12,15 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	Tracing *Tracing `yaml:"tracing"`
-	Log     *Log     `yaml:"log"`
-	Debug   Debug    `yaml:"debug"`
+	Tracing *Tracing `yaml:"tracing,omitempty"`
+	Log     *Log     `yaml:"log,omitempty"`
+	Debug   Debug    `yaml:"debug,omitempty"`
 
-	HTTP HTTP `yaml:"http"`
+	HTTP HTTP `yaml:"http,omitempty"`
 
-	Asset Asset    `yaml:"asset"`
-	IDP   Settings `yaml:"idp"`
-	Ldap  Ldap     `yaml:"ldap"`
+	Asset Asset    `yaml:"asset,omitempty"`
+	IDP   Settings `yaml:"idp,omitempty"`
+	Ldap  Ldap     `yaml:"ldap,omitempty"`
 
 	Context context.Context `yaml:"-"`
 }

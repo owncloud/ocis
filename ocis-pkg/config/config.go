@@ -46,34 +46,34 @@ type Runtime struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons `yaml:"shared"`
+	*shared.Commons `yaml:"shared,omitempty"`
 
-	Tracing shared.Tracing `yaml:"tracing"`
-	Log     *shared.Log    `yaml:"log"`
+	Tracing shared.Tracing `yaml:"tracing,omitempty"`
+	Log     *shared.Log    `yaml:"log,omitempty"`
 
-	Mode    Mode // DEPRECATED
-	File    string
-	OcisURL string `yaml:"ocis_url"`
+	Mode    Mode   `yaml:",omitempty"` // DEPRECATED
+	File    string `yaml:",omitempty"`
+	OcisURL string `yaml:"ocis_url,omitempty"`
 
-	Registry     string       `yaml:"registry"`
-	TokenManager TokenManager `yaml:"token_manager"`
-	Runtime      Runtime      `yaml:"runtime"`
+	Registry     string       `yaml:"registry,omitempty"`
+	TokenManager TokenManager `yaml:"token_manager,omitempty"`
+	Runtime      Runtime      `yaml:"runtime,omitempty"`
 
-	Audit         *audit.Config         `yaml:"audit"`
-	Accounts      *accounts.Config      `yaml:"accounts"`
-	GLAuth        *glauth.Config        `yaml:"glauth"`
-	Graph         *graph.Config         `yaml:"graph"`
-	GraphExplorer *graphExplorer.Config `yaml:"graph_explorer"`
-	IDP           *idp.Config           `yaml:"idp"`
-	IDM           *idm.Config           `yaml:"idm"`
-	Nats          *nats.Config          `yaml:"nats"`
-	Notifications *notifications.Config `yaml:"notifications"`
-	OCS           *ocs.Config           `yaml:"ocs"`
-	Web           *web.Config           `yaml:"web"`
-	Proxy         *proxy.Config         `yaml:"proxy"`
-	Settings      *settings.Config      `yaml:"settings"`
-	Storage       *storage.Config       `yaml:"storage"`
-	Store         *store.Config         `yaml:"store"`
-	Thumbnails    *thumbnails.Config    `yaml:"thumbnails"`
-	WebDAV        *webdav.Config        `yaml:"webdav"`
+	Audit         *audit.Config         `yaml:"audit,omitempty"`
+	Accounts      *accounts.Config      `yaml:"accounts,omitempty"`
+	GLAuth        *glauth.Config        `yaml:"glauth,omitempty"`
+	Graph         *graph.Config         `yaml:"graph,omitempty"`
+	GraphExplorer *graphExplorer.Config `yaml:"graph_explorer,omitempty"`
+	IDP           *idp.Config           `yaml:"idp,omitempty"`
+	IDM           *idm.Config           `yaml:"idm,omitempty"`
+	Nats          *nats.Config          `yaml:"nats,omitempty"`
+	Notifications *notifications.Config `yaml:"notifications,omitempty"`
+	OCS           *ocs.Config           `yaml:"ocs,omitempty"`
+	Web           *web.Config           `yaml:"web,omitempty"`
+	Proxy         *proxy.Config         `yaml:"proxy,omitempty"`
+	Settings      *settings.Config      `yaml:"settings,omitempty"`
+	Storage       *storage.Config       `yaml:"storage,omitempty"`
+	Store         *store.Config         `yaml:"store,omitempty"`
+	Thumbnails    *thumbnails.Config    `yaml:"thumbnails,omitempty"`
+	WebDAV        *webdav.Config        `yaml:"webdav,omitempty"`
 }

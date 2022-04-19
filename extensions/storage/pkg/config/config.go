@@ -522,15 +522,15 @@ type Asset struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons
+	*shared.Commons `yaml:",omitempty"`
 
-	File    string      `yaml:"file"`
-	Log     *shared.Log `yaml:"log"`
-	Debug   Debug       `yaml:"debug"`
-	OCDav   OCDav       `yaml:"ocdav"`
-	Reva    Reva        `yaml:"reva"`
-	Tracing Tracing     `yaml:"tracing"`
-	Asset   Asset       `yaml:"asset"`
+	File    string      `yaml:"file,omitempty"`
+	Log     *shared.Log `yaml:"log,omitempty"`
+	Debug   Debug       `yaml:"debug,omitempty"`
+	OCDav   OCDav       `yaml:"ocdav,omitempty"`
+	Reva    Reva        `yaml:"reva,omitempty"`
+	Tracing Tracing     `yaml:"tracing,omitempty"`
+	Asset   Asset       `yaml:"asset,omitempty"`
 }
 
 // New initializes a new configuration with or without defaults.

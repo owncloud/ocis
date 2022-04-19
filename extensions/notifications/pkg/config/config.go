@@ -12,10 +12,10 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	Log   *Log  `yaml:"log"`
-	Debug Debug `yaml:"debug"`
+	Log   *Log  `yaml:"log,omitempty"`
+	Debug Debug `yaml:"debug,omitempty"`
 
-	Notifications Notifications `yaml:"notifications"`
+	Notifications Notifications `yaml:"notifications,omitempty"`
 
 	Context context.Context `yaml:"-"`
 }

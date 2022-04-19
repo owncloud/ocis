@@ -12,27 +12,27 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	Tracing *Tracing `yaml:"tracing"`
-	Log     *Log     `yaml:"log"`
-	Debug   Debug    `yaml:"debug"`
+	Tracing *Tracing `yaml:"tracing,omitempty"`
+	Log     *Log     `yaml:"log,omitempty"`
+	Debug   Debug    `yaml:"debug,omitempty"`
 
-	HTTP HTTP `yaml:"http"`
+	HTTP HTTP `yaml:"http,omitempty"`
 
-	Reva Reva `yaml:"reva"`
+	Reva Reva `yaml:"reva,omitempty"`
 
-	Policies              []Policy        `yaml:"policies"`
-	OIDC                  OIDC            `yaml:"oidc"`
-	TokenManager          TokenManager    `yaml:"token_manager"`
-	PolicySelector        *PolicySelector `yaml:"policy_selector"`
-	PreSignedURL          PreSignedURL    `yaml:"pre_signed_url"`
-	AccountBackend        string          `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE"`
-	UserOIDCClaim         string          `yaml:"user_oidc_claim" env:"PROXY_USER_OIDC_CLAIM"`
-	UserCS3Claim          string          `yaml:"user_cs3_claim" env:"PROXY_USER_CS3_CLAIM"`
-	MachineAuthAPIKey     string          `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY"`
-	AutoprovisionAccounts bool            `yaml:"auto_provision_accounts" env:"PROXY_AUTOPROVISION_ACCOUNTS"`
-	EnableBasicAuth       bool            `yaml:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH"`
-	InsecureBackends      bool            `yaml:"insecure_backends" env:"PROXY_INSECURE_BACKENDS"`
-	AuthMiddleware        AuthMiddleware  `yaml:"auth_middleware"`
+	Policies              []Policy        `yaml:"policies,omitempty"`
+	OIDC                  OIDC            `yaml:"oidc,omitempty"`
+	TokenManager          TokenManager    `yaml:"token_manager,omitempty"`
+	PolicySelector        *PolicySelector `yaml:"policy_selector,omitempty"`
+	PreSignedURL          PreSignedURL    `yaml:"pre_signed_url,omitempty"`
+	AccountBackend        string          `yaml:"account_backend,omitempty" env:"PROXY_ACCOUNT_BACKEND_TYPE"`
+	UserOIDCClaim         string          `yaml:"user_oidc_claim,omitempty" env:"PROXY_USER_OIDC_CLAIM"`
+	UserCS3Claim          string          `yaml:"user_cs3_claim,omitempty" env:"PROXY_USER_CS3_CLAIM"`
+	MachineAuthAPIKey     string          `yaml:"machine_auth_api_key,omitempty" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY"`
+	AutoprovisionAccounts bool            `yaml:"auto_provision_accounts,omitempty" env:"PROXY_AUTOPROVISION_ACCOUNTS"`
+	EnableBasicAuth       bool            `yaml:"enable_basic_auth,omitempty" env:"PROXY_ENABLE_BASIC_AUTH"`
+	InsecureBackends      bool            `yaml:"insecure_backends,omitempty" env:"PROXY_INSECURE_BACKENDS"`
+	AuthMiddleware        AuthMiddleware  `yaml:"auth_middleware,omitempty"`
 
 	Context context.Context `yaml:"-"`
 }

@@ -12,12 +12,12 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	Tracing *Tracing `yaml:"tracing"`
-	Log     *Log     `yaml:"log"`
-	Debug   Debug    `yaml:"debug"`
+	Tracing *Tracing `yaml:"tracing,omitempty"`
+	Log     *Log     `yaml:"log,omitempty"`
+	Debug   Debug    `yaml:"debug,omitempty"`
 
-	IDM             Settings `yaml:"idm"`
-	CreateDemoUsers bool     `yaml:"create_demo_users" env:"IDM_CREATE_DEMO_USERS;ACCOUNTS_DEMO_USERS_AND_GROUPS" desc:"Flag to enabe/disable the creation of the demo users"`
+	IDM             Settings `yaml:"idm,omitempty"`
+	CreateDemoUsers bool     `yaml:"create_demo_users,omitempty" env:"IDM_CREATE_DEMO_USERS;ACCOUNTS_DEMO_USERS_AND_GROUPS" desc:"Flag to enabe/disable the creation of the demo users"`
 
 	ServiceUserPasswords ServiceUserPasswords `yaml:"service_user_passwords"`
 

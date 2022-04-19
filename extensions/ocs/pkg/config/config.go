@@ -12,20 +12,20 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	Tracing *Tracing `yaml:"tracing"`
-	Log     *Log     `yaml:"log"`
-	Debug   Debug    `yaml:"debug"`
+	Tracing *Tracing `yaml:"tracing,omitempty"`
+	Log     *Log     `yaml:"log,omitempty"`
+	Debug   Debug    `yaml:"debug,omitempty"`
 
-	HTTP HTTP `yaml:"http"`
+	HTTP HTTP `yaml:"http,omitempty"`
 
-	TokenManager TokenManager `yaml:"token_manager"`
-	Reva         Reva         `yaml:"reva"`
+	TokenManager TokenManager `yaml:"token_manager,omitempty"`
+	Reva         Reva         `yaml:"reva,omitempty"`
 
-	IdentityManagement IdentityManagement `yaml:"identity_management"`
+	IdentityManagement IdentityManagement `yaml:"identity_management,omitempty"`
 
-	AccountBackend     string `yaml:"account_backend" env:"OCS_ACCOUNT_BACKEND_TYPE"`
-	StorageUsersDriver string `yaml:"storage_users_driver" env:"STORAGE_USERS_DRIVER;OCS_STORAGE_USERS_DRIVER"`
-	MachineAuthAPIKey  string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;OCS_MACHINE_AUTH_API_KEY"`
+	AccountBackend     string `yaml:"account_backend,omitempty" env:"OCS_ACCOUNT_BACKEND_TYPE"`
+	StorageUsersDriver string `yaml:"storage_users_driver,omitempty" env:"STORAGE_USERS_DRIVER;OCS_STORAGE_USERS_DRIVER"`
+	MachineAuthAPIKey  string `yaml:"machine_auth_api_key,omitempty" env:"OCIS_MACHINE_AUTH_API_KEY;OCS_MACHINE_AUTH_API_KEY"`
 
 	Context context.Context `yaml:"-"`
 }

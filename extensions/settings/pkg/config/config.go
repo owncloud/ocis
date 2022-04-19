@@ -12,19 +12,19 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	Tracing *Tracing `yaml:"tracing"`
-	Log     *Log     `yaml:"log"`
-	Debug   Debug    `yaml:"debug"`
+	Tracing *Tracing `yaml:"tracing,omitempty"`
+	Log     *Log     `yaml:"log,omitempty"`
+	Debug   Debug    `yaml:"debug,omitempty"`
 
-	HTTP HTTP `yaml:"http"`
-	GRPC GRPC `yaml:"grpc"`
+	HTTP HTTP `yaml:"http,omitempty"`
+	GRPC GRPC `yaml:"grpc,omitempty"`
 
-	StoreType string   `yaml:"store_type" env:"SETTINGS_STORE_TYPE"`
-	DataPath  string   `yaml:"data_path" env:"SETTINGS_DATA_PATH"`
-	Metadata  Metadata `yaml:"metadata_config"`
+	StoreType string   `yaml:"store_type,omitempty" env:"SETTINGS_STORE_TYPE"`
+	DataPath  string   `yaml:"data_path,omitempty" env:"SETTINGS_DATA_PATH"`
+	Metadata  Metadata `yaml:"metadata_config,omitempty"`
 
-	Asset        Asset        `yaml:"asset"`
-	TokenManager TokenManager `yaml:"token_manager"`
+	Asset        Asset        `yaml:"asset,omitempty"`
+	TokenManager TokenManager `yaml:"token_manager,omitempty"`
 
 	Context context.Context `yaml:"-"`
 }
