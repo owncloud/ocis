@@ -3,7 +3,6 @@ package command
 import (
 	"github.com/owncloud/ocis/extensions/graph-explorer/pkg/command"
 	"github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/config/parser"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
 )
@@ -14,9 +13,6 @@ func GraphExplorerCommand(cfg *config.Config) *cli.Command {
 		Name:     cfg.GraphExplorer.Service.Name,
 		Usage:    subcommandDescription(cfg.GraphExplorer.Service.Name),
 		Category: "extensions",
-		Before: func(ctx *cli.Context) error {
-			return parser.ParseConfig(cfg)
-		},
 		Subcommands: command.GetCommands(cfg.GraphExplorer),
 	}
 }

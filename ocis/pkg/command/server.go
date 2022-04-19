@@ -20,7 +20,7 @@ func Server(cfg *config.Config) *cli.Command {
 			&cli.StringFlag{
 				Name:        "config-file",
 				Value:       cfg.ConfigFile,
-				Usage:       "config file to be loaded by the extension",
+				Usage:       "config file to be loaded by the oCIS runtime",
 				Destination: &cfg.ConfigFile,
 			},
 		},
