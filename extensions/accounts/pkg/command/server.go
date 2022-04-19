@@ -20,12 +20,11 @@ import (
 
 // Server is the entry point for the server command.
 func Server(cfg *config.Config) *cli.Command {
-	configFile := ""
 	configFileFlag := cli.StringFlag{
 		Name:        "config-file",
-		DefaultText: cfg.ConfigFile,
+		Value:       cfg.ConfigFile,
 		Usage:       "config file to be loaded by the extension",
-		Destination: &configFile,
+		Destination: &cfg.ConfigFile,
 	}
 
 	return &cli.Command{
@@ -36,12 +35,6 @@ func Server(cfg *config.Config) *cli.Command {
 			&configFileFlag,
 		},
 		Before: func(c *cli.Context) error {
-
-			if configFile != "" {
-				cfg.ConfigFile = configFile
-				cfg.ConfigFileHasBeenSet = true
-			}
-
 			err := parser.ParseConfig(cfg)
 			if err != nil {
 				logger := logging.Configure(cfg.Service.Name, &config.Log{})
