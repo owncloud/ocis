@@ -6,7 +6,7 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/registry"
 
-	mhttps "github.com/asim/go-micro/plugins/server/http/v4"
+	mhttps "github.com/go-micro/plugins/v4/server/http"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/server"
 )

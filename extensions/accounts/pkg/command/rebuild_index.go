@@ -6,7 +6,7 @@ import (
 
 	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
-	"github.com/asim/go-micro/plugins/client/grpc/v4"
+	"github.com/go-micro/plugins/v4/client/grpc"
 	"github.com/owncloud/ocis/extensions/accounts/pkg/config"
 	"github.com/urfave/cli/v2"
 	merrors "go-micro.dev/v4/errors"

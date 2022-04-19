@@ -8,8 +8,8 @@ import (
 
 	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
 
-	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/go-micro/plugins/v4/client/grpc"
 	"github.com/owncloud/ocis/extensions/proxy/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/oidc"
 )
