@@ -1,9 +1,11 @@
 package defaults
 
 import (
+	"path"
 	"strings"
 
 	"github.com/owncloud/ocis/extensions/ocs/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 )
 
 func FullDefaultConfig() *config.Config {
@@ -17,6 +19,8 @@ func FullDefaultConfig() *config.Config {
 
 func DefaultConfig() *config.Config {
 	return &config.Config{
+		ConfigFile: path.Join(defaults.BaseConfigPath(), "ocs.yaml"),
+
 		Debug: config.Debug{
 			Addr:   "127.0.0.1:9114",
 			Token:  "",

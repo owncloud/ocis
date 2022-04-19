@@ -22,6 +22,8 @@ type Config struct {
 	IDP   Settings `yaml:"idp"`
 	Ldap  Ldap     `yaml:"ldap"`
 
+	ConfigFile string `yaml:"-" env:"IDP_CONFIG_FILE" desc:"config file to be used by the IDP extension"`
+
 	Context context.Context `yaml:"-"`
 }
 

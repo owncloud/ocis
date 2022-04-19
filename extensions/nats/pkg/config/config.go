@@ -17,6 +17,8 @@ type Config struct {
 
 	Nats Nats `ociConfig:"nats"`
 
+	ConfigFile string `yaml:"-" env:"NATS_CONFIG_FILE" desc:"config file to be used by the NATS extension"`
+
 	Context context.Context `yaml:"-"`
 }
 

@@ -1,6 +1,11 @@
 package defaults
 
-import "github.com/owncloud/ocis/extensions/notifications/pkg/config"
+import (
+	"path"
+
+	"github.com/owncloud/ocis/extensions/notifications/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
+)
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
@@ -16,6 +21,8 @@ func FullDefaultConfig() *config.Config {
 
 func DefaultConfig() *config.Config {
 	return &config.Config{
+		ConfigFile: path.Join(defaults.BaseConfigPath(), "notifications.yaml"),
+
 		Service: config.Service{
 			Name: "notifications",
 		},

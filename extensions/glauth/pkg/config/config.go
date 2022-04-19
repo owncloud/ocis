@@ -24,6 +24,8 @@ type Config struct {
 
 	RoleBundleUUID string `yaml:"role_bundle_uuid" env:"GLAUTH_ROLE_BUNDLE_ID"`
 
+	ConfigFile string `yaml:"-" env:"GLAUTH_CONFIG_FILE" desc:"config file to be used by the glauth extension"`
+
 	Context context.Context `yaml:"-"`
 }
 

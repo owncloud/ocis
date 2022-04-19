@@ -26,6 +26,8 @@ type Config struct {
 	Asset        Asset        `yaml:"asset"`
 	TokenManager TokenManager `yaml:"token_manager"`
 
+	ConfigFile string `yaml:"-" env:"SETTINGS_CONFIG_FILE" desc:"config file to be used by the settings extension"`
+
 	Context context.Context `yaml:"-"`
 }
 

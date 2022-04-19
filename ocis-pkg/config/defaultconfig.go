@@ -1,6 +1,8 @@
 package config
 
 import (
+	"path"
+
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/config/defaults"
 	audit "github.com/owncloud/ocis/extensions/audit/pkg/config/defaults"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/config/defaults"
@@ -18,10 +20,13 @@ import (
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config/defaults"
 	web "github.com/owncloud/ocis/extensions/web/pkg/config/defaults"
 	webdav "github.com/owncloud/ocis/extensions/webdav/pkg/config/defaults"
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 )
 
 func DefaultConfig() *Config {
 	return &Config{
+		ConfigFile: path.Join(defaults.BaseConfigPath(), "ocis.yaml"),
+
 		TokenManager: TokenManager{
 			JWTSecret: "Pive-Fumkiu4",
 		},

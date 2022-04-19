@@ -20,6 +20,8 @@ func FullDefaultConfig() *config.Config {
 // DefaultConfig returns the default config
 func DefaultConfig() *config.Config {
 	return &config.Config{
+		ConfigFile: path.Join(defaults.BaseConfigPath(), "settings.yaml"),
+
 		Service: config.Service{
 			Name: "settings",
 		},

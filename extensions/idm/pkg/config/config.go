@@ -17,9 +17,11 @@ type Config struct {
 	Debug   Debug    `yaml:"debug"`
 
 	IDM             Settings `yaml:"idm"`
-	CreateDemoUsers bool     `yaml:"create_demo_users" env:"IDM_CREATE_DEMO_USERS;ACCOUNTS_DEMO_USERS_AND_GROUPS" desc:"Flag to enabe/disable the creation of the demo users"`
+	CreateDemoUsers bool     `yaml:"create_demo_users" env:"IDM_CREATE_DEMO_USERS;ACCOUNTS_DEMO_USERS_AND_GROUPS" desc:"Flag to enable/disable the creation of the demo users"`
 
 	ServiceUserPasswords ServiceUserPasswords `yaml:"service_user_passwords"`
+
+	ConfigFile string `yaml:"-" env:"IDM_CONFIG_FILE" desc:"config file to be used by the IDM extension"`
 
 	Context context.Context `yaml:"-"`
 }

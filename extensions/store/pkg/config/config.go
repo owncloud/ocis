@@ -20,5 +20,7 @@ type Config struct {
 
 	Datapath string `yaml:"data_path" env:"STORE_DATA_PATH"`
 
+	ConfigFile string `yaml:"-" env:"STORE_CONFIG_FILE" desc:"config file to be used by the store extension"`
+
 	Context context.Context `yaml:"-"`
 }

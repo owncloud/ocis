@@ -20,19 +20,17 @@ import (
 
 // Server is the entry point for the server command.
 func Server(cfg *config.Config) *cli.Command {
-	configFileFlag := cli.StringFlag{
-		Name:        "config-file",
-		Value:       cfg.ConfigFile,
-		Usage:       "config file to be loaded by the extension",
-		Destination: &cfg.ConfigFile,
-	}
-
 	return &cli.Command{
 		Name:     "server",
 		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
 		Category: "server",
 		Flags: []cli.Flag{
-			&configFileFlag,
+			&cli.StringFlag{
+				Name:        "config-file",
+				Value:       cfg.ConfigFile,
+				Usage:       "config file to be loaded by the extension",
+				Destination: &cfg.ConfigFile,
+			},
 		},
 		Before: func(c *cli.Context) error {
 			err := parser.ParseConfig(cfg)

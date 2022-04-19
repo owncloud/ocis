@@ -27,6 +27,8 @@ type Config struct {
 	StorageUsersDriver string `yaml:"storage_users_driver" env:"STORAGE_USERS_DRIVER;OCS_STORAGE_USERS_DRIVER"`
 	MachineAuthAPIKey  string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;OCS_MACHINE_AUTH_API_KEY"`
 
+	ConfigFile string `yaml:"-" env:"OCS_CONFIG_FILE" desc:"config file to be used by the ocs extension"`
+
 	Context context.Context `yaml:"-"`
 }
 

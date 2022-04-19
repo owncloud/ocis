@@ -531,6 +531,8 @@ type Config struct {
 	Reva    Reva        `yaml:"reva"`
 	Tracing Tracing     `yaml:"tracing"`
 	Asset   Asset       `yaml:"asset"`
+
+	ConfigFile string `yaml:"-" env:"STORAGE_CONFIG_FILE" desc:"config file to be used by the storage extensions"`
 }
 
 // New initializes a new configuration with or without defaults.

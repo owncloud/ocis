@@ -51,8 +51,6 @@ type Config struct {
 	Tracing shared.Tracing `yaml:"tracing"`
 	Log     *shared.Log    `yaml:"log"`
 
-	Mode    Mode // DEPRECATED
-	File    string
 	OcisURL string `yaml:"ocis_url"`
 
 	Registry     string       `yaml:"registry"`
@@ -76,4 +74,7 @@ type Config struct {
 	Store         *store.Config         `yaml:"store"`
 	Thumbnails    *thumbnails.Config    `yaml:"thumbnails"`
 	WebDAV        *webdav.Config        `yaml:"webdav"`
+
+	ConfigPath string `yaml:"-"` // TODO: use me ?
+	ConfigFile string `yaml:"-" env:"OCIS_CONFIG_FILE" desc:"config file to be used by the oCIS runtime"`
 }

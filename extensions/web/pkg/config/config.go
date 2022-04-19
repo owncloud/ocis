@@ -22,6 +22,8 @@ type Config struct {
 	File  string `yaml:"file" env:"WEB_UI_CONFIG"` // TODO: rename this to a more self explaining string
 	Web   Web    `yaml:"web"`
 
+	ConfigFile string `yaml:"-" env:"WEB_CONFIG_FILE" desc:"config file to be used by the web extension"`
+
 	Context context.Context `yaml:"-"`
 }
 

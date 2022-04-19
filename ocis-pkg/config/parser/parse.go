@@ -10,7 +10,12 @@ import (
 
 // ParseConfig loads ocis configuration.
 func ParseConfig(cfg *config.Config) error {
-	_, err := config.BindSourcesToStructs("ocis", cfg)
+	// cfg.ConfigFile can be set via env variable, therefore we need to do a environment variable run first
+	if err := loadEnv(cfg); err != nil {
+		return err
+	}
+
+	_, err := config.BindSourcesToStructs("ocis", cfg.ConfigFile, cfg.ConfigFile != config.DefaultConfig().ConfigFile, cfg)
 	if err != nil {
 		return err
 	}
@@ -27,6 +32,14 @@ func ParseConfig(cfg *config.Config) error {
 		cfg.Log = &shared.Log{}
 	}
 
+	if err := loadEnv(cfg); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func loadEnv(cfg *config.Config) error {
 	// load all env variables relevant to the config in the current context.
 	if err := envdecode.Decode(cfg); err != nil {
 		// no environment variable set for this config is an expected "error"
@@ -34,6 +47,5 @@ func ParseConfig(cfg *config.Config) error {
 			return err
 		}
 	}
-
 	return nil
 }

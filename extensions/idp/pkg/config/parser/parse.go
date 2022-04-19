@@ -12,13 +12,29 @@ import (
 
 // ParseConfig loads accounts configuration from known paths.
 func ParseConfig(cfg *config.Config) error {
-	_, err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg.ConfigFile, cfg.ConfigFileHasBeenSet, cfg)
+
+	// cfg.ConfigFile can be set via env variable, therefore we need to do a environment variable run first
+	if err := loadEnv(cfg); err != nil {
+		return err
+	}
+
+	_, err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg.ConfigFile, cfg.ConfigFile != defaults.DefaultConfig().ConfigFile, cfg)
 	if err != nil {
 		return err
 	}
 
 	defaults.EnsureDefaults(cfg)
 
+	if err := loadEnv(cfg); err != nil {
+		return err
+	}
+
+	defaults.Sanitize(cfg)
+
+	return nil
+}
+
+func loadEnv(cfg *config.Config) error {
 	// load all env variables relevant to the config in the current context.
 	if err := envdecode.Decode(cfg); err != nil {
 		// no environment variable set for this config is an expected "error"
@@ -26,8 +42,5 @@ func ParseConfig(cfg *config.Config) error {
 			return err
 		}
 	}
-
-	defaults.Sanitize(cfg)
-
 	return nil
 }

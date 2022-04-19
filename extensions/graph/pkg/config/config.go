@@ -25,6 +25,8 @@ type Config struct {
 	Identity Identity `yaml:"identity"`
 	Events   Events   `yaml:"events"`
 
+	ConfigFile string `yaml:"-" env:"GRAPH_CONFIG_FILE" desc:"config file to be used by the graph extension"`
+
 	Context context.Context `yaml:"-"`
 }
 

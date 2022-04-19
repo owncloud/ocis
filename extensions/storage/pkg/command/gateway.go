@@ -14,6 +14,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/extensions/storage/pkg/config"
+	"github.com/owncloud/ocis/extensions/storage/pkg/config/defaults"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/extensions/storage/pkg/service/external"
 	"github.com/owncloud/ocis/extensions/storage/pkg/tracing"
@@ -415,7 +416,7 @@ func (s GatewaySutureService) Serve(ctx context.Context) error {
 
 // ParseConfig loads accounts configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config, storageExtension string) error {
-	conf, err := ociscfg.BindSourcesToStructs(storageExtension, cfg)
+	conf, err := ociscfg.BindSourcesToStructs(storageExtension, cfg.ConfigFile,  cfg.ConfigFile != defaults.DefaultConfig().ConfigFile, cfg)
 	if err != nil {
 		return err
 	}

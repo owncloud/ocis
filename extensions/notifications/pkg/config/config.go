@@ -17,6 +17,8 @@ type Config struct {
 
 	Notifications Notifications `yaml:"notifications"`
 
+	ConfigFile string `yaml:"-" env:"NOTIFICATIONS_CONFIG_FILE" desc:"config file to be used by the notifications extension"`
+
 	Context context.Context `yaml:"-"`
 }
 

@@ -1,7 +1,10 @@
 package defaults
 
 import (
+	"path"
+
 	"github.com/owncloud/ocis/extensions/audit/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 )
 
 func FullDefaultConfig() *config.Config {
@@ -15,6 +18,8 @@ func FullDefaultConfig() *config.Config {
 
 func DefaultConfig() *config.Config {
 	return &config.Config{
+		ConfigFile: path.Join(defaults.BaseConfigPath(), "audit.yaml"),
+
 		Service: config.Service{
 			Name: "audit",
 		},

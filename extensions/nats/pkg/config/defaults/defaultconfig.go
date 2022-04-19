@@ -21,6 +21,8 @@ func FullDefaultConfig() *config.Config {
 
 func DefaultConfig() *config.Config {
 	return &config.Config{
+		ConfigFile: path.Join(defaults.BaseConfigPath(), "nats.yaml"),
+
 		Service: config.Service{
 			Name: "nats",
 		},

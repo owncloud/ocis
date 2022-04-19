@@ -42,8 +42,21 @@ func Server(cfg *config.Config) *cli.Command {
 		Name:     "server",
 		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
 		Category: "server",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "config-file",
+				Value:       cfg.ConfigFile,
+				Usage:       "config file to be loaded by the extension",
+				Destination: &cfg.ConfigFile,
+			},
+		},
 		Before: func(c *cli.Context) error {
-			return parser.ParseConfig(cfg)
+			err := parser.ParseConfig(cfg)
+			if err != nil {
+				logger := logging.Configure(cfg.Service.Name, &config.Log{})
+				logger.Error().Err(err).Msg("couldn't find the specified config file")
+			}
+			return err
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)

@@ -18,6 +18,8 @@ func FullDefaultConfig() *config.Config {
 
 func DefaultConfig() *config.Config {
 	return &config.Config{
+		ConfigFile: path.Join(defaults.BaseConfigPath(), "store.yaml"),
+
 		Debug: config.Debug{
 			Addr:   "127.0.0.1:9464",
 			Token:  "",

@@ -20,6 +20,8 @@ type Config struct {
 
 	GraphExplorer GraphExplorer `yaml:"graph_explorer"`
 
+	ConfigFile string `yaml:"-" env:"GRAPH_EXPLORER_CONFIG_FILE" desc:"config file to be used by the graph-explorer extension"`
+
 	Context context.Context `yaml:"-"`
 }
 

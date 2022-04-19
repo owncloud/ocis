@@ -1,13 +1,17 @@
 package defaults
 
 import (
+	"path"
 	"strings"
 
 	"github.com/owncloud/ocis/extensions/graph/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 )
 
 func DefaultConfig() *config.Config {
 	return &config.Config{
+		ConfigFile: path.Join(defaults.BaseConfigPath(), "graph.yaml"),
+
 		Debug: config.Debug{
 			Addr:  "127.0.0.1:9124",
 			Token: "",

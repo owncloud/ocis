@@ -21,6 +21,8 @@ type Config struct {
 
 	Thumbnail Thumbnail `yaml:"thumbnail"`
 
+	ConfigFile string `yaml:"-" env:"THUMBNAILS_CONFIG_FILE" desc:"config file to be used by the thumbnails extension"`
+
 	Context context.Context `yaml:"-"`
 }
 

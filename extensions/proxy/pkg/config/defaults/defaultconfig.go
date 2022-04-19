@@ -10,6 +10,8 @@ import (
 
 func DefaultConfig() *config.Config {
 	return &config.Config{
+		ConfigFile: path.Join(defaults.BaseConfigPath(), "proxy.yaml"),
+
 		Debug: config.Debug{
 			Addr:  "127.0.0.1:9205",
 			Token: "",

@@ -18,6 +18,8 @@ type Config struct {
 	Events   Events   `yaml:"events"`
 	Auditlog Auditlog `yaml:"auditlog"`
 
+	ConfigFile string `yaml:"-" env:"AUDIT_CONFIG_FILE" desc:"config file to be used by the audit extension"`
+
 	Context context.Context `yaml:"-"`
 }
 

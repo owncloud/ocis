@@ -29,6 +29,8 @@ func FullDefaultConfig() *config.Config {
 
 func DefaultConfig() *config.Config {
 	return &config.Config{
+		ConfigFile: path.Join(defaults.BaseConfigPath(), "storage.yaml"),
+
 		// log is inherited
 		Debug: config.Debug{
 			Addr: "127.0.0.1:9109",

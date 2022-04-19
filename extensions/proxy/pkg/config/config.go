@@ -34,6 +34,8 @@ type Config struct {
 	InsecureBackends      bool            `yaml:"insecure_backends" env:"PROXY_INSECURE_BACKENDS"`
 	AuthMiddleware        AuthMiddleware  `yaml:"auth_middleware"`
 
+	ConfigFile string `yaml:"-" env:"PROXY_CONFIG_FILE" desc:"config file to be used by the proxy extension"`
+
 	Context context.Context `yaml:"-"`
 }
 
