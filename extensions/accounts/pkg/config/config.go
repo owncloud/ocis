@@ -10,9 +10,6 @@ import (
 type Config struct {
 	*shared.Commons `yaml:"-"`
 
-	ConfigFile           string `yaml:"-" env:"ACCOUNTS_CONFIG_FILE" desc:"config file to be used by the accounts extension"`
-	ConfigFileHasBeenSet bool   `yaml:"-"`
-
 	Service Service `yaml:"-"`
 
 	Tracing *Tracing `yaml:"tracing"`
@@ -30,6 +27,9 @@ type Config struct {
 	ServiceUser        ServiceUser `yaml:"service_user"`
 	HashDifficulty     int         `yaml:"hash_difficulty" env:"ACCOUNTS_HASH_DIFFICULTY" desc:"The hash difficulty makes sure that validating a password takes at least a certain amount of time."`
 	DemoUsersAndGroups bool        `yaml:"demo_users_and_groups" env:"ACCOUNTS_DEMO_USERS_AND_GROUPS" desc:"If this flag is set the service will setup the demo users and groups."`
+
+	ConfigFile           string `yaml:"-" env:"ACCOUNTS_CONFIG_FILE"` // config file to be used by the accounts extension
+	ConfigFileHasBeenSet bool   `yaml:"-"`
 
 	Context context.Context `yaml:"-"`
 }
