@@ -7,6 +7,7 @@ import (
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/config/defaults"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/config/defaults"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/config/defaults"
+	group "github.com/owncloud/ocis/extensions/group/pkg/config/defaults"
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/config/defaults"
 	idp "github.com/owncloud/ocis/extensions/idp/pkg/config/defaults"
 	nats "github.com/owncloud/ocis/extensions/nats/pkg/config/defaults"
@@ -50,5 +51,6 @@ func DefaultConfig() *Config {
 		Storage:       storage.DefaultConfig(),
 		AuthBasic:     authbasic.FullDefaultConfig(),
 		User:          user.FullDefaultConfig(),
+		Group:         group.FullDefaultConfig(),
 	}
 }

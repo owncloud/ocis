@@ -15,7 +15,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 		Frontend(cfg),
 		Gateway(cfg),
 		// Users(cfg),
-		Groups(cfg),
+		// Groups(cfg),
 		AppProvider(cfg),
 		// AuthBasic(cfg),
 		AuthBearer(cfg),

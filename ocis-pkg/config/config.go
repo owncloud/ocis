@@ -9,6 +9,7 @@ import (
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/config"
+	group "github.com/owncloud/ocis/extensions/group/pkg/config"
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/config"
 	idp "github.com/owncloud/ocis/extensions/idp/pkg/config"
 	nats "github.com/owncloud/ocis/extensions/nats/pkg/config"
@@ -77,6 +78,7 @@ type Config struct {
 	Storage       *storage.Config       `yaml:"storage"`
 	AuthBasic     *authbasic.Config     `yaml:"auth_basic"`
 	User          *user.Config          `yaml:"user"`
+	Group         *group.Config         `yaml:"group"`
 	Store         *store.Config         `yaml:"store"`
 	Thumbnails    *thumbnails.Config    `yaml:"thumbnails"`
 	WebDAV        *webdav.Config        `yaml:"webdav"`

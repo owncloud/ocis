@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/owncloud/ocis/extensions/storage/pkg/command"
+	"github.com/owncloud/ocis/extensions/group/pkg/command"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
@@ -18,7 +18,7 @@ func StorageGroupProviderCommand(cfg *config.Config) *cli.Command {
 			return ParseStorageCommon(ctx, cfg)
 		},
 		Action: func(c *cli.Context) error {
-			origCmd := command.Groups(cfg.Storage)
+			origCmd := command.Groups(cfg.Group)
 			return handleOriginalAction(c, origCmd)
 		},
 	}

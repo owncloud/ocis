@@ -24,6 +24,7 @@ import (
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/command"
+	group "github.com/owncloud/ocis/extensions/group/pkg/command"
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/command"
 	idp "github.com/owncloud/ocis/extensions/idp/pkg/command"
 	nats "github.com/owncloud/ocis/extensions/nats/pkg/command"
@@ -112,7 +113,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["ocdav"] = storage.NewOCDav
 	s.ServicesRegistry["storage-gateway"] = storage.NewGateway
 	s.ServicesRegistry["storage-userprovider"] = user.NewUserProvider
-	s.ServicesRegistry["storage-groupprovider"] = storage.NewGroupProvider
+	s.ServicesRegistry["storage-groupprovider"] = group.NewGroupProvider
 	s.ServicesRegistry["storage-authbasic"] = authbasic.NewAuthBasic
 	s.ServicesRegistry["storage-authbearer"] = storage.NewAuthBearer
 	s.ServicesRegistry["storage-authmachine"] = storage.NewAuthMachine
