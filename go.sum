@@ -463,6 +463,8 @@ github.com/go-micro/plugins/v4/registry/nats v1.0.0 h1:8X5gitlE546kY+k7hdNoY4mci
 github.com/go-micro/plugins/v4/registry/nats v1.0.0/go.mod h1:Sq9N8ETykCmWVhj2/Hrc9268rl6TTsEIoSXaqsFvgk0=
 github.com/go-micro/plugins/v4/server/grpc v1.0.1-0.20220419141935-d7731316a76a h1:vqdSw0y596DS4tNPZzWOgKirdY7fesrbs24VKpR7mrM=
 github.com/go-micro/plugins/v4/server/grpc v1.0.1-0.20220419141935-d7731316a76a/go.mod h1:+eiInCaAvLiDSY4QGwIr+Z44gLZAsQSXIN42BJViR90=
+github.com/go-micro/plugins/v4/server/grpc v1.0.1 h1:lVaVm1HE6PqoQlFvPpHJshJKOWgTCm9yUTQaAMlvLkw=
+github.com/go-micro/plugins/v4/server/grpc v1.0.1/go.mod h1:+eiInCaAvLiDSY4QGwIr+Z44gLZAsQSXIN42BJViR90=
 github.com/go-micro/plugins/v4/server/http v1.0.0 h1:cuSp4F8uS7sWjvmsJ8M4k18rZF3AxA2qdLA6kFxPktM=
 github.com/go-micro/plugins/v4/server/http v1.0.0/go.mod h1:E8eoUONK91jcMpvkcFUsqbgDyKyri3x7ty2GuM5SsI0=
 github.com/go-micro/plugins/v4/transport/grpc v1.0.0 h1:QbwEGFo9tiDwqJWZ37FJ8gK5xnApy47EnKcmQWRRSJs=

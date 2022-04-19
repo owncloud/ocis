@@ -26,7 +26,7 @@ require (
 	github.com/go-micro/plugins/v4/registry/kubernetes v1.0.0
 	github.com/go-micro/plugins/v4/registry/mdns v1.0.0
 	github.com/go-micro/plugins/v4/registry/nats v1.0.0
-	github.com/go-micro/plugins/v4/server/grpc v1.0.1-0.20220419141935-d7731316a76a
+	github.com/go-micro/plugins/v4/server/grpc v1.0.1
 	github.com/go-micro/plugins/v4/server/http v1.0.0
 	github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.0.0
 	github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus v1.0.0
