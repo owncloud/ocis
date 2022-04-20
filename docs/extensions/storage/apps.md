@@ -11,7 +11,7 @@ oCIS is all about files. But most of the time you want to do something with file
 
 ## App provider capability
 
-The capabilities endpoint (eg. `https://localhost:9200/ocs/v1.php/cloud/capabilities?format=json`) gives you following capabilities which are relevant for the app provider:
+The capabilities endpoint (e.g. `https://localhost:9200/ocs/v1.php/cloud/capabilities?format=json`) gives you following capabilities which are relevant for the app provider:
 
 ```json
 {
@@ -399,7 +399,7 @@ You will receive a file id of the freshly created file, which you can use to ope
   }
   ```
 
-- `filename` is invalid (eg. includes a path segment)
+- `filename` is invalid (e.g. includes a path segment)
 
   HTTP status code: 400
 
@@ -428,7 +428,7 @@ App drivers represent apps, if the app is not able to register itself. Currently
 
 ### CS3org WOPI server app driver
 
-The CS3org WOPI server app driver is included in oCIS by default. It needs at least one WOPI compliant app (eg. Collabora, OnlyOffice or Microsoft Online Online Server) or a CS3org WOPI bridge supported app (CodiMD or Etherpad) and the CS3org WOPI server.
+The CS3org WOPI server app driver is included in oCIS by default. It needs at least one WOPI compliant app (e.g. Collabora, OnlyOffice or Microsoft Online Online Server) or a CS3org WOPI bridge supported app (CodiMD or Etherpad) and the CS3org WOPI server.
 
 Here is a closer look at the configuration of the actual app provider in a docker-compose example (see also [full example](https://github.com/owncloud/ocis/blob/master/deployments/examples/ocis_wopi/docker-compose.yml)):
 

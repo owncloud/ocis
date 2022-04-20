@@ -16,7 +16,7 @@ What does ETag propagation mean? Whenever a file changes its content or metadata
 {{<mermaid class="text-center">}}
 graph TD
   linkStyle default interpolate basis
-  
+
   subgraph final ETag propagation
     ert3(( etag:N )) --- el3(( etag:O )) & er3(( etag:N ))
     er3 --- erl3(( etag:O )) & err3(( etag:N ))
@@ -27,7 +27,7 @@ graph TD
     er2 --- erl2(( etag:O )) & err2(( etag:N ))
   end
 
-  subgraph initial file change 
+  subgraph initial file change
     ert(( etag:O )) --- el(( etag:O )) & er(( etag:O ))
     er --- erl(( etag:O )) & err(( etag:N ))
   end
@@ -48,9 +48,9 @@ graph TD
 
   ec( client ) -->|"stat()"|ert
 
-  subgraph  
+  subgraph
     ert(( )) --- el(( )) & er(( ))
-    er --- erl(( )) & err(( ))  
+    er --- erl(( )) & err(( ))
   end
 {{</mermaid>}}
 
@@ -65,21 +65,21 @@ graph TD
 
   ec( client ) -->|"stat()"|ert
 
-  subgraph  
+  subgraph
     ert(( )) --- el(( )) & er(( ))
     er --- erl(( )) & err(( ))
   end
-  
+
   mc( client ) -->|"stat()"|mrt
 
-  subgraph  
+  subgraph
     mrt(( )) --- ml(( )) & mr(( ))
     mr --- mrl(( )) & mrr(( ))
   end
 
   fc( client ) -->|"stat()"|frt
 
-  subgraph  
+  subgraph
     frt(( )) --- fl(( )) & fr(( ))
     fr --- frl(( )) & frr(( ))
   end
@@ -88,14 +88,14 @@ graph TD
 ## Sharing
 *Storage providers* are responsible for persisting shares as close to the storage as possible.
 
-One implementation may persist shares using ACLs, another might use custom extended attributes. The chosen implementation is storage specific and always a tradeoff between various requirements. Yet, the goal is to treat the storage provider as the single source of truth for all metadata. 
+One implementation may persist shares using ACLs, another might use custom extended attributes. The chosen implementation is storage specific and always a tradeoff between various requirements. Yet, the goal is to treat the storage provider as the single source of truth for all metadata.
 
-If users can bypass the storage provider using eg. `ssh` additional mechanisms needs to make sure no inconsistencies arise:
+If users can bypass the storage provider using e.g. `ssh` additional mechanisms needs to make sure no inconsistencies arise:
 - the ETag must still be propagated in a tree, eg using inotify, a policy engine or workflows triggered by other means
-- deleted files should land in the trash (eg. `rm` could be wrapped to move files to trash)
+- deleted files should land in the trash (e.g. `rm` could be wrapped to move files to trash)
 - overwriting files should create a new version ... other than a fuse fs I see no way of providing this for normal posix filesystems. Other storage backends that use the s3 protocol might provide versions natively.
 
-The storage provider is also responsible for keeps track of references eg. using a shadow tree that users normally cannot see or representing them as symbolic links in the filesystem (Beware of symbolic link cycles. The clients are currently unaware of them and would flood the filesystem).
+The storage provider is also responsible for keeps track of references e.g. using a shadow tree that users normally cannot see or representing them as symbolic links in the filesystem (Beware of symbolic link cycles. The clients are currently unaware of them and would flood the filesystem).
 
 To prevent write amplification ETags must not propagate across references. When a file that was shared by einstein changes the ETag must not be propagated into any share recipients tree.
 
@@ -106,7 +106,7 @@ graph TD
 
   ec( einsteins client ) -->|"stat()"|ert
 
-  subgraph  
+  subgraph
     ml --- mlr(( ))
     mrt(( )) --- ml(( )) & mr(( ))
     mr --- mrl(( )) & mrr(( ))
@@ -114,11 +114,11 @@ graph TD
 
   mlr -. reference .-> er
 
-  subgraph  
+  subgraph
     ert(( )) --- el(( )) & er(( ))
     er --- erl(( )) & err(( ))
   end
-  
+
   mc( maries client ) -->|"stat()"|mrt
 
 {{</mermaid>}}
@@ -151,14 +151,14 @@ graph TD
   mvr --- mrt
   fvr --- frt
 
-  subgraph  
+  subgraph
     ert(( )) --- el(( )) & er(( ))
     er --- erl(( )) & err(( ))
   end
-  
+
   mc( client ) -->|"stat()"|mvr
 
-  subgraph  
+  subgraph
     mrt(( )) --- ml(( )) & mr(( ))
     ml --- mlm(( ))
     mr --- mrl(( )) & mrr(( ))
@@ -169,7 +169,7 @@ graph TD
 
   fc( client ) -->|"stat()"|fvr
 
-  subgraph  
+  subgraph
     frt(( )) --- fl(( )) & fr(( ))
     fr --- frl(( )) & frr(( ))
   end

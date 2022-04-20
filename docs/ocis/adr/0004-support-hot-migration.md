@@ -19,7 +19,7 @@ Migration is one of the most important topics of the oCIS story. We need to prov
 
 ## Decision Drivers
 
-- Do not lose file blob or meta data.
+- Do not lose file blob or metadata.
   - To prevent a sync surge from clients the etag for files should be migrated.
   - To prevent internal links from breaking or pointing to wrong files the file id of existing files needs to be migrated.
   - To prevent data loss trash and version blobs should be migrated.
@@ -27,7 +27,7 @@ Migration is one of the most important topics of the oCIS story. We need to prov
   - To prevent internal shares the share type, permissions and expiry needs to be migrated.
   - To prevent public links from breaking the url token, permissions, expiry and password needs to be migrated.
   - *What about federated shares?*
-  - *What about additional share permissions, eg. comment on office files?*
+  - *What about additional share permissions, e.g. comment on office files?*
 - Legacy clients need to keep working
   - To keep existing clients working the `remote.php/webdav` and `dav/files/<username>` webdav endpoints as well as the ocs API need to be available.
 - *What about [app passwords/tokens](https://doc.owncloud.com/server/user_manual/personal_settings/security.html#app-passwords-tokens)?*
@@ -55,7 +55,7 @@ Chosen option: "\[option 1\]", because \[justification. e.g., only option, which
 
 ### Cold Migration
 
-The migration happens while the service is offline. File metadata, blobs and share data is exported from ownCloud 10 and imported in oCIS. This can happen user by user, where every user export would contain the file blobs, their metadata, trash, versions, shares and all metadata that belongs to the users storage. To prevent group shares from breaking, users in the same groups must be migrated in batch. Depending on the actual group shares in an instance this may effectively require a complete migration in a single batch. 
+The migration happens while the service is offline. File metadata, blobs and share data is exported from ownCloud 10 and imported in oCIS. This can happen user by user, where every user export would contain the file blobs, their metadata, trash, versions, shares and all metadata that belongs to the users storage. To prevent group shares from breaking, users in the same groups must be migrated in batch. Depending on the actual group shares in an instance this may effectively require a complete migration in a single batch.
 
 - Good, because oCIS can be tested in a staging system without writing to the production system.
 - Good, because file layout on disk can be changed to support new storage driver capabilities.
@@ -76,5 +76,5 @@ The migration happens in subsequent stages while the service is online.
 
 ## Links
 
-        
-- [Clarify responsibilities of share providers and storage providers · Issue #1377 · cs3org/reva (github.com)](https://github.com/cs3org/reva/issues/1377) because the share manager for oCIS should store share information on the storage system. And [storageprovider should persist share creator · Issue #93 · cs3org/cs3apis (github.com)](https://github.com/cs3org/cs3apis/issues/93) finally: [eos: store share id in inherited xattr · Issue #543 · cs3org/reva (github.com)](https://github.com/cs3org/reva/issues/543)
+
+- [Clarify responsibilities of share providers and storage providers · Issue #1377 · cs3org/reva (github.com)](https://github.com/cs3org/reva/issues/1377) because the share manager for oCIS should store share information on the storage system. And [storage provider should persist share creator · Issue #93 · cs3org/cs3apis (github.com)](https://github.com/cs3org/cs3apis/issues/93) finally: [eos: store share id in inherited xattr · Issue #543 · cs3org/reva (github.com)](https://github.com/cs3org/reva/issues/543)

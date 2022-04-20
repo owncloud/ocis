@@ -9,7 +9,7 @@ geekdocFilePath: bridge.md
 
 {{< toc >}}
 
-We are planning to build a bridge from ownCloud 10 to ocis. The idea is to have a reverse proxy infront of ownCloud 10 that will forward requests to ownCloud 10 or ocis-reva, depending on the migration status of the logged in user.
+We are planning to build a bridge from ownCloud 10 to ocis. The idea is to have a reverse proxy in front of ownCloud 10 that will forward requests to ownCloud 10 or ocis-reva, depending on the migration status of the logged-in user.
 
 This document is a work in progress of the current setup.
 
@@ -80,7 +80,7 @@ We are going to use the built binary and ownCloud 10 graphapi app to turn ownClo
 
 #### configure it
 
-While ocis can be configured using environment variables, eg. for a docker compose setup we are going to use a more traditional config file here.
+While ocis can be configured using environment variables, e.g. for a docker compose setup we are going to use a more traditional config file here.
 Create a config file for ocis in either `/etc/ocis`, `$HOME/.ocis` or `./.config`. You can use `.json`, `.yaml` or `.toml`. I will use toml here, because ... reasons.
 
 ```toml
@@ -191,7 +191,7 @@ ERROR:
 
 #### Set environment variables
 
-The built in [libregraph/lico](https://github.com/libregraph/lico) needs environment variables to configure the LDAP server:
+The built-in [libregraph/lico](https://github.com/libregraph/lico) needs environment variables to configure the LDAP server:
 ```console
 export OCIS_URL=https://ocis.ocis.test
 export IDP_LDAP_URI=ldap://127.0.0.1:9125
@@ -226,7 +226,7 @@ $ ocis/bin/ocis idp server --iss http://127.0.0.1:9130 --signing-kid gen1-2020-0
 
 {{< hint warning >}}
 * TODO: the port in the `--iss` needs to be changed when hiding the idp behind the proxy
-* TODO: the signing keys and encryption keys should be precerated so they are reused between restarts. Otherwise all client sessions will become invalid when restarting the IdP.
+* TODO: the signing keys and encryption keys should be precreated so they are reused between restarts. Otherwise all client sessions will become invalid when restarting the IdP.
 {{< /hint >}}
 
 
@@ -275,7 +275,7 @@ $ bin/web server --web-config-server https://cloud.example.com --oidc-authority 
 `ocis-web` needs to know
 - `--web-config-server https://cloud.example.com` is ownCloud url with webdav and ocs endpoints (oc10 or ocis)
 - `--oidc-authority https://192.168.1.100:9130` the openid connect issuing authority, in our case `oidc-idp`, running on port 9130
-- `--oidc-metadata-url https://192.168.1.100:9130/.well-known/openid-configuration` the openid connect configuration endpoint, typically the issuer host with `.well-known/openid-configuration`, but there are cases when another endpoint is used, eg. ping identity provides multiple endpoints to separate domains
+- `--oidc-metadata-url https://192.168.1.100:9130/.well-known/openid-configuration` the openid connect configuration endpoint, typically the issuer host with `.well-known/openid-configuration`, but there are cases when another endpoint is used, e.g. ping identity provides multiple endpoints to separate domains
 - `--oidc-client-id ocis` the client id we will register later with `ocis-idp` in the `identifier-registration.yaml`
 
 ### Patch owncloud
@@ -304,7 +304,7 @@ $CONFIG = [
     'client-id' => 'ocis',
     'loginButtonName' => 'OpenId Connect @ Konnectd',
   ],
-  'debug' => true, // if using self signed certificates
+  'debug' => true, // if using self-signed certificates
   // allow the different domains access to the ocs and webdav endpoints:
   'cors.allowed-domains' => [
     'https://cloud.example.com',

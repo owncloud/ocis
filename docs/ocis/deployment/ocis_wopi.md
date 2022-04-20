@@ -18,7 +18,7 @@ OnlyOffice and CodiMD are not yet fully integrated and there are known issues. F
 * oCIS, Wopi server, Collabora, OnlyOffice and CodiMD running behind Traefik as reverse proxy
 * Collabora, OnlyOffice and CodiMD enable you to edit documents in your browser
 * Wopi server acts as a bridge to make the oCIS storage accessible to Collabora, OnlyOffice and CodiMD
-* Traefik generating self signed certificates for local setup or obtaining valid SSL certificates for a server setup
+* Traefik generating self-signed certificates for local setup or obtaining valid SSL certificates for a server setup
 
 [Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_wopi)
 
@@ -64,7 +64,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
     INSECURE=true
 
     ### Traefik settings ###
-    # Serve Treafik dashboard. Defaults to "false".
+    # Serve Traefik dashboard. Defaults to "false".
     TRAEFIK_DASHBOARD=
     # Domain of Traefik, where you can find the dashboard. Defaults to "traefik.owncloud.test"
     TRAEFIK_DOMAIN=
@@ -120,17 +120,17 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
 
-  If you want to use the Traefik dashboard, set TRAEFIK_DASHBOARD to `true` (default is `false` and therefore not active). If you activate it, you must set a domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` eg. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
+  If you want to use the Traefik dashboard, set TRAEFIK_DASHBOARD to `true` (default is `false` and therefore not active). If you activate it, you must set a domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` e.g. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
 
-  The Traefik dashboard is secured by basic auth. Default credentials are the user `admin` with the password `admin`. To set your own credentials, generate a htpasswd (eg. by using [an online tool](https://htpasswdgenerator.de/) or a cli tool).
+  The Traefik dashboard is secured by basic auth. Default credentials are the user `admin` with the password `admin`. To set your own credentials, generate a htpasswd (e.g. by using [an online tool](https://htpasswdgenerator.de/) or a cli tool).
 
   Traefik will issue certificates with LetsEncrypt and therefore you must set an email address in `TRAEFIK_ACME_MAIL=`.
 
   By default oCIS will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OCIS_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
 
-  Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, eg. `OCIS_DOMAIN=ocis.owncloud.test`.
+  Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, e.g. `OCIS_DOMAIN=ocis.owncloud.test`.
 
-  You also must override the default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD`, `OCIS_JWT_SECRET`, `STORAGE_TRANSFER_SECRET` and `OCIS_MACHINE_AUTH_API_KEY`  in order to secure your oCIS instance. Choose some random strings eg. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}}).
+  You also must override the default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD`, `OCIS_JWT_SECRET`, `STORAGE_TRANSFER_SECRET` and `OCIS_MACHINE_AUTH_API_KEY`  in order to secure your oCIS instance. Choose some random strings e.g. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}}).
 
   By default the CS3Org WOPI server will also be started in the `latest` version. If you want to start a specific version of it, you can set the version to `WOPISERVER_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/cs3org/wopiserver/tags?page=1&ordering=last_updated).
 
@@ -140,7 +140,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   Now it's time to set up Collabora and you need to configure the domain of Collabora in `COLLABORA_DOMAIN=`.
 
-  If you want to use the Collabora admin panel you need to set user name and passwort for in `COLLABORA_ADMIN_USER=` and `COLLABORA_ADMIN_PASSWORD=`.
+  If you want to use the Collabora admin panel you need to set user name and password for in `COLLABORA_ADMIN_USER=` and `COLLABORA_ADMIN_PASSWORD=`.
 
   Next up is OnlyOffice, which also needs a domain in `ONLYOFFICE_DOMAIN=`.
 
@@ -157,7 +157,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 ## Local setup
 For a more simple local ocis setup see [Getting started]({{< ref "../getting-started" >}})
 
-This docker stack can also be run locally. One downside is that Traefik can not obtain valid SSL certificates and therefore will create self signed ones. This means that your browser will show scary warnings. Another downside is that you can not point DNS entries to your localhost. So you have to add static host entries to your computer.
+This docker stack can also be run locally. One downside is that Traefik can not obtain valid SSL certificates and therefore will create self-signed ones. This means that your browser will show scary warnings. Another downside is that you can not point DNS entries to your localhost. So you have to add static host entries to your computer.
 
 On Linux and macOS you can add them to your `/etc/hosts` files like this:
 ```
