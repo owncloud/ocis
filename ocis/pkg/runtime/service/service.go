@@ -34,6 +34,7 @@ import (
 	ocs "github.com/owncloud/ocis/extensions/ocs/pkg/command"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/command"
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/command"
+	sharing "github.com/owncloud/ocis/extensions/sharing/pkg/command"
 	storage "github.com/owncloud/ocis/extensions/storage/pkg/command"
 	store "github.com/owncloud/ocis/extensions/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/command"
@@ -126,7 +127,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["notifications"] = notifications.NewSutureService
 
 	// populate delayed services
-	s.Delayed["storage-sharing"] = storage.NewSharing
+	s.Delayed["storage-sharing"] = sharing.NewSharing
 	s.Delayed["accounts"] = accounts.NewSutureService
 	s.Delayed["proxy"] = proxy.NewSutureService
 

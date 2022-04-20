@@ -19,6 +19,7 @@ import (
 	ocs "github.com/owncloud/ocis/extensions/ocs/pkg/config"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config"
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/config"
+	sharing "github.com/owncloud/ocis/extensions/sharing/pkg/config"
 	storage "github.com/owncloud/ocis/extensions/storage/pkg/config"
 	store "github.com/owncloud/ocis/extensions/store/pkg/config"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
@@ -83,6 +84,7 @@ type Config struct {
 	User          *user.Config          `yaml:"user"`
 	Group         *group.Config         `yaml:"group"`
 	AppProvider   *appprovider.Config   `yaml:"app_provider"`
+	Sharing       *sharing.Config       `yaml:"app_provider"`
 	Store         *store.Config         `yaml:"store"`
 	Thumbnails    *thumbnails.Config    `yaml:"thumbnails"`
 	WebDAV        *webdav.Config        `yaml:"webdav"`

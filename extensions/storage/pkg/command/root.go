@@ -20,7 +20,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 		// AuthBasic(cfg),
 		// AuthBearer(cfg),
 		AuthMachine(cfg),
-		Sharing(cfg),
+		// Sharing(cfg),
 		StoragePublicLink(cfg),
 		StorageShares(cfg),
 		StorageUsers(cfg),

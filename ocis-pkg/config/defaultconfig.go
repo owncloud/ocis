@@ -17,6 +17,7 @@ import (
 	ocs "github.com/owncloud/ocis/extensions/ocs/pkg/config/defaults"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config/defaults"
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/config/defaults"
+	sharing "github.com/owncloud/ocis/extensions/sharing/pkg/config/defaults"
 	storage "github.com/owncloud/ocis/extensions/storage/pkg/config/defaults"
 	store "github.com/owncloud/ocis/extensions/store/pkg/config/defaults"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config/defaults"
@@ -55,6 +56,7 @@ func DefaultConfig() *Config {
 		AuthBearer:    authbearer.FullDefaultConfig(),
 		User:          user.FullDefaultConfig(),
 		Group:         group.FullDefaultConfig(),
+		Sharing:       sharing.FullDefaultConfig(),
 		AppProvider:   appprovider.FullDefaultConfig(),
 	}
 }
