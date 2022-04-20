@@ -13,14 +13,14 @@ oCIS intends to make the aspects of existing storage systems available as transp
 
 ## Development
 
-The cephfs development happens in a [Reva branch](https://github.com/cs3org/reva/pull/1209) and is currently driven by CERN. 
+The cephfs development happens in a [Reva branch](https://github.com/cs3org/reva/pull/1209) and is currently driven by CERN.
 
 ## Architecture
 
 In the original approach the driver was based on the [localfs](https://github.com/cs3org/reva/blob/a8c61401b662d8e09175416c0556da8ef3ba8ed6/pkg/storage/utils/localfs/localfs.go) driver, relying on a locally mounted cephfs. It would interface with it using the POSIX apis. This has been changed to directly call the Ceph API using https://github.com/ceph/go-ceph. It allows using the ceph admin APIs to create subvolumes for user homes and maintain a file id to path mapping using symlinks.
 
 ## Implemented Aspects
-The recursive change time built ino cephfs is used to implement the etag propagation expected by the ownCloud clients. This allows oCIS to pick up changes that have been made by external tools, bypassing any oCIS APIs. 
+The recursive change time built ino cephfs is used to implement the etag propagation expected by the ownCloud clients. This allows oCIS to pick up changes that have been made by external tools, bypassing any oCIS APIs.
 
 Like other filesystems cephfs uses inodes and like most other filesystems inodes are reused. To get stable file identifiers the current cephfs driver assigns every node a file id and maintains a custom fileid to path mapping in a system directory:
 ```
@@ -42,7 +42,7 @@ Versions are not file but snapshot based, a [native feature of cephfs](https://d
 
 Trash is not implemented, as cephfs has no native recycle bin and instead relies on the snapshot functionality that can be triggered by end users. It should be possible to automatically create a snapshot before deleting a file. This needs to be explored.
 
-Shares [are be mapped to ACLs](https://github.com/cs3org/reva/pull/1209/files#diff-5e532e61f99bffb5754263bc6ce75f84a30c6f507a58ba506b0b487a50eda1d9R168-R224) supported by cephfs. The share manager is used to persist the intent of a share and can be used to periodically verify or reset the ACLs on cephfs.
+Shares [are mapped to ACLs](https://github.com/cs3org/reva/pull/1209/files#diff-5e532e61f99bffb5754263bc6ce75f84a30c6f507a58ba506b0b487a50eda1d9R168-R224) supported by cephfs. The share manager is used to persist the intent of a share and can be used to periodically verify or reset the ACLs on cephfs.
 
 ## Future work
 - The spaces concept matches cephfs subvolumes. We can implement the CreateStorageSpace call with that, keep track of the list of storage spaces using symlinks, like for the id based lookup.
@@ -51,8 +51,8 @@ Shares [are be mapped to ACLs](https://github.com/cs3org/reva/pull/1209/files#di
 - As it basically provides two lists, *shared with me* and *shared with others*, we could persist them directly on cephfs!
   - If needed for redundancy, the share manager can be run multiple times, backed by the same cephfs
   - To save disk io the data can be cached in memory, and invalidated using stat requests.
-- A good tradeoff would be a folder for each user with a json file for each list. That way, we only have to open and read a single file when the user want's to list the shares.    
-- To allow deprovisioning a user the data should by sharded by userid. That way all share information belonging to a user can easily be removed from the system. If necessary it can also be restored easily by copying the user specific folder back in place.
+- A good tradeoff would be a folder for each user with a json file for each list. That way, we only have to open and read a single file when the user want's to list the shares.
+- To allow deprovisioning a user the data should be sharded by userid. That way all share information belonging to a user can easily be removed from the system. If necessary it can also be restored easily by copying the user specific folder back in place.
 - For consistency over metadata any file blob data, backups can be done using snapshots.
 - An example where einstein has shared a file with marie would look like this on disk:
 ```

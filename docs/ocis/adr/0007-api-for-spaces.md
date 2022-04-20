@@ -151,6 +151,6 @@ Meaningful fields of the root element in the context of the Open Graph API:
 
 ### Open Topics
 
-- What are the WebDAV pathes for Trashbin, Versions
+- What are the WebDAV paths for Trashbin, Versions
     + option: additional entries in the reply struct
 - The identitySet object used for "owner" and "coowner" require to implement the [https://docs.microsoft.com/de-de/graph/api/resources/identityset?view=graph-rest-1.0](IdentitySet) JSON object, which contains information that seems to be of limited benefit for oCIS. An alternative would be to implement a simpler identity object for oCIS and use that.

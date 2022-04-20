@@ -55,7 +55,7 @@ This must be pointing to a valid feature definition.
 
 ### oCIS image to be tested (or: skip build and take existing image)
 
-By default, the tests will be run against the docker image built from your current working state of the oCIS repository. For some purposes it might also be handy to use a oCIS image from Docker Hub. Therefore you can provide the optional flag `OCIS_IMAGE_TAG=...` which must contain an available docker tag of the [owncloud/ocis registry on Docker Hub](https://hub.docker.com/r/owncloud/ocis) (eg. 'latest').
+By default, the tests will be run against the docker image built from your current working state of the oCIS repository. For some purposes it might also be handy to use a oCIS image from Docker Hub. Therefore you can provide the optional flag `OCIS_IMAGE_TAG=...` which must contain an available docker tag of the [owncloud/ocis registry on Docker Hub](https://hub.docker.com/r/owncloud/ocis) (e.g. 'latest').
 
 ```
 make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-ocis OCIS_IMAGE_TAG=latest

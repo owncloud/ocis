@@ -16,7 +16,7 @@ geekdocFilePath: 0017-allow-read-only-external-user-management.md
 oCIS needs to be integrated with various external Authentication and Identity Management Systems.
 Usually oCIS will have no administrative access to such a system and we will not be allowed to
 reconfigure it to suit our needs (e.g. we will not be able to enhance the schema of an already existing
-LDAP Directory). In most of the cases our access will be read-only. 
+LDAP Directory). In most of the cases our access will be read-only.
 
 Sidenote: There is a difference between users, identities and accounts: A user may have multiple
 identities which he can authenticate with, e.g. his facebook, twitter, microsoft or google
@@ -27,8 +27,8 @@ provider to another.
 There are different cases where oCIS requires access to users:
 
 1. While we settled on using OpenID Connect (OIDC) as the authentication protocol for oCIS, we
-   we need to build a user object during authentication with at least an account UUID (to identify
-   the account) and the email or a name (for display purposes). 
+   need to build a user object during authentication with at least an account UUID (to identify
+   the account) and the email or a name (for display purposes).
 2. When searching for share recipients we need to be able to query existing users in the external
    identity management system
 3. When listing files we need to be able to look up a users display properties (username, email,
@@ -49,7 +49,7 @@ of stable identifier for users:
 * oCIS should be a single binary that can run out of the box without external dependencies like an
   LDAP server.
 * Time: we want to build a release candidate asap.
-* oCIS should be easy to integrate with standard external identity mangement systems
+* oCIS should be easy to integrate with standard external identity management systems
 
 ## Considered Options
 
@@ -73,7 +73,7 @@ to support both scenarios.
 
 ## Pros and Cons of the Options <!-- optional -->
 
-### External identity management system is read only and provides an interface to query users (e.g. Coporate Active Directy)
+### External identity management system is read only and provides an interface to query users (e.g. Corporate Active Directory)
 
 IdP sends sub & iss and mail or username claims, Identity Management System provides APIs (e.g.
 LDAP, SCIM, REST ...) to lookup additional user information. All oCIS services use the CS3 API to
@@ -82,20 +82,20 @@ the APIs provided by the IdM.
 
 * Good, because we can rely on the external identity management
 * Good, because ocis services only need to know about the CS3 user provider API, which acts as an
-  abstraction layer for different identitiy management systems
+  abstraction layer for different identity management systems
 * Good, because there is only a single source of truth (the external IdM) and we don't need to
   implement a synchronization mechanism to maintain an internal user database (we will likely need
   some form of caching though, see below)
-* Bad, because the identity managment needs to provide a stable, persistent, non-reassignable user
+* Bad, because the identity management needs to provide a stable, persistent, non-reassignable user
   identifier for an account, e.g. `owncloudUUID` or `ms-DS-ConsistencyGuid`
-* Bad, because we need to implment tools that can change the account id when it did change anyway
+* Bad, because we need to implement tools that can change the account id when it did change anyway
 * Bad, because without caching we will hammer the identity management system with lookup requests
 
 ### External identity management system is read only and does NOT provide an API to query users
 
 Idp sends sub & iss and mail or username claims. We need to provision an internal account mapping,
 creating a unique ID, upon the first login of a user to be able to look up user properties by account
-id. 
+id.
 
 * Good, because this has very little external requirements
 * Good, because we have accounts fully under our control

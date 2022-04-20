@@ -7,7 +7,7 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_roadmap.md
 ---
 
-You may have asked yourself why there are major version 1 tags in our GitHub repository but the Readme still states `ownCloud Infinite Scale is currently in a technical preview state. It will be subject to a lot of changes and is not yet ready for general production deployments.`. How can that be if its a major version 1?
+You may have asked yourself why there are major version 1 tags in our GitHub repository but the Readme still states `ownCloud Infinite Scale is currently in a technical preview state. It will be subject to a lot of changes and is not yet ready for general production deployments.`. How can that be if it's a major version 1?
 
 Our initial and also our current plan is to stick to SemVer as versioning scheme. But sometimes there are other factors which cross your plans. Therefore we started releasing oCIS with version `1.0.0 Tech Preview`.
 
@@ -19,7 +19,7 @@ We will be fixing bugs if you report them and truly appreciate every report and 
 
 We are going to stick to major version 1 until we feel confident about running oCIS in production environments. As a consequence of this we cannot raise the major version, like SemVer requires it, even if we need to introduce breaking changes. We will do our best to avoid breaking changes. If there is no way to circumvent this, we will add an automatic migration or at least point out manual migration steps, since we as oCIS developers are already using oCIS on a personal basis. The best place to see if a breaking change happens is our changelog which is available for every release. If things are not working out for you please contact us immediately. We want to know about this and solve it for you.
 
-It isn't our intention to scare you with our addendum "Tech Preview". We want you to have a clear picture of what you can expect from oCIS. You could take it as a disclaimer or even compare it to running an Linux kernel in alpha stage. It can be very pleasing to be on the latest codebase but you could also find yourself with a lot of problems arising because of that.
+It isn't our intention to scare you with our addendum "Tech Preview". We want you to have a clear picture of what you can expect from oCIS. You could take it as a disclaimer or even compare it to running a Linux kernel in alpha stage. It can be very pleasing to be on the latest codebase but you could also find yourself with a lot of problems arising because of that.
 
 You clearly can expect a totally new experience of file-sync and share with oCIS and we want you to use it now - but with understanding and caution.
 

@@ -1693,7 +1693,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             # TODO: redis is not yet supported
             "STORAGE_USERS_DRIVER_OWNCLOUDSQL_REDIS_ADDR": "redis:6379",
             # ownCloudSQL sharing driver
-            "STORAGE_SHARING_USER_DRIVER": "oc10-sql",
+            "STORAGE_SHARING_USER_DRIVER": "owncloudsql",
             "STORAGE_SHARING_USER_SQL_USERNAME": "owncloud",
             "STORAGE_SHARING_USER_SQL_PASSWORD": "owncloud",
             "STORAGE_SHARING_USER_SQL_HOST": "oc10-db",

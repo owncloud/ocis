@@ -1,3 +1,31 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v1.20.0...master
+
+## Summary
+
+* Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
+* Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
+
+## Details
+
+* Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
+
+   The ocs API was just exiting with a fatal error on any update request, when configured for the cs3
+   backend. Now it returns a proper error.
+
+   https://github.com/owncloud/ocis/issues/3483
+
+* Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
+
+   It is now possible to share a single file by link with edit permissions. Therefore we need a
+   public share capability to enable that feature in the clients. At the same time, we improved the
+   WebDAV permissions for public links.
+
+   https://github.com/owncloud/web/pull/6787
+   https://github.com/owncloud/ocis/pull/3538
 # Changelog for [1.20.0] (2022-04-13)
 
 The following sections list the changes for 1.20.0.

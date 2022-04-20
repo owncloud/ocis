@@ -40,7 +40,7 @@ For reasons of simplicity we are using the root user and group to run oCIS which
 
 
 In the service definition we referenced `/etc/ocis/ocis.env` as our file containing environment variables for the oCIS process.
-In order to create the file we need first to create the folder `/etc/ocis/` and than we can add the actual `/etc/ocis/ocis.env` with following content:
+In order to create the file we need first to create the folder `/etc/ocis/` and then we can add the actual `/etc/ocis/ocis.env` with following content:
 
 ```
 OCIS_URL=https://some-hostname-or-ip:9200
@@ -57,7 +57,7 @@ PROXY_TRANSPORT_TLS_CERT=/etc/ocis/proxy/server.crt
 PROXY_TRANSPORT_TLS_KEY=/etc/ocis/proxy/server.key
 ```
 
-Please change your `OCIS_URL` in order to reflect your actual deployment. If you are using self signed certificates you need to set `OCIS_INSECURE=true` in `/etc/ocis/ocis.env`.
+Please change your `OCIS_URL` in order to reflect your actual deployment. If you are using self-signed certificates you need to set `OCIS_INSECURE=true` in `/etc/ocis/ocis.env`.
 
 
 ## Starting the oCIS service
