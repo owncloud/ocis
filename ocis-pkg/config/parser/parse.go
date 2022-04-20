@@ -5,6 +5,7 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
@@ -17,6 +18,10 @@ func ParseConfig(cfg *config.Config) error {
 
 	_, err := config.BindSourcesToStructs("ocis", cfg.ConfigFile, cfg.ConfigFile != config.DefaultConfig().ConfigFile, cfg)
 	if err != nil {
+		logger := log.NewLogger(
+			log.Name("oCIS"),
+		)
+		logger.Error().Err(err).Msg("couldn't find the specified config file")
 		return err
 	}
 

@@ -75,5 +75,5 @@ type Config struct {
 	Thumbnails    *thumbnails.Config    `yaml:"thumbnails"`
 	WebDAV        *webdav.Config        `yaml:"webdav"`
 
-	ConfigFile string `yaml:"-" env:"OCIS_CONFIG_FILE" desc:"config file to be used by the oCIS runtime"`
+	ConfigFile string `yaml:"-" env:"OCIS_CONFIG_FILE" desc:"config file to be used by the oCIS runtime and extensions"`
 }
