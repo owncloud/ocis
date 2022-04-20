@@ -2,10 +2,12 @@ package command
 
 import (
 	"bufio"
+	"crypto/rand"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/big"
 	"os"
 	"path"
 	"strings"
@@ -21,6 +23,7 @@ import (
 )
 
 const configFilename string = "ocis.yml"
+const passwordLength int = 32
 
 func InitCommand(cfg *config.Config) *cli.Command {
 	// TODO: remove homedir get
@@ -117,11 +120,26 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 		//WebDAV:        &webdav.Config{},
 	}
 
-	idmServicePassword := "randomizeme"
-	idpServicePassword := "randomizeme"
-	ocisAdminServicePassword := "randomizeme"
-	revaServicePassword := "randomizeme"
-	tokenManagerJwtSecret := "randomizeme"
+	idmServicePassword, err := generateRandomPassword(passwordLength)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Could not generate random password for idm: %s", err))
+	}
+	idpServicePassword, err := generateRandomPassword(passwordLength)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Could not generate random password for idp: %s", err))
+	}
+	ocisAdminServicePassword, err := generateRandomPassword(passwordLength)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Could not generate random password for ocis admin: %s", err))
+	}
+	revaServicePassword, err := generateRandomPassword(passwordLength)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Could not generate random password for reva: %s", err))
+	}
+	tokenManagerJwtSecret, err := generateRandomPassword(passwordLength)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Could not generate random password for tokenmanager: %s", err))
+	}
 
 	// TODO: generate outputs for all occurences above
 	cfg.TokenManager.JWTSecret = tokenManagerJwtSecret
@@ -133,7 +151,7 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	cfg.IDM.ServiceUserPasswords.Reva = revaServicePassword
 	yamlOutput, err := yaml.Marshal(cfg)
 	if err != nil {
-		return err
+		return errors.New(fmt.Sprintf("Could not marshall config into yaml: %s", err))
 	}
 	targetPath := path.Join(configPath, configFilename)
 	err = ioutil.WriteFile(targetPath, yamlOutput, 0600)
@@ -162,4 +180,18 @@ func stringPrompt(label string) string {
 		}
 	}
 	return strings.TrimSpace(input)
+}
+
+func generateRandomPassword(length int) (string, error) {
+	const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-=+!@#$%^&*."
+	ret := make([]byte, length)
+	for i := 0; i < length; i++ {
+		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(chars))))
+		if err != nil {
+			return "", err
+		}
+		ret[i] = chars[num.Int64()]
+	}
+
+	return string(ret), nil
 }
