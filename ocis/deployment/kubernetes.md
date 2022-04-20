@@ -17,7 +17,7 @@ Formally described as:
 
 _[source](https://kubernetes.io/docs/concepts/overview/what-is-kubernetes/)_
 
-Without getting too deep in definitions, and for the purpose of compactness, Kubernetes can be summarized as a way of managing containers that run applications to ensure that there is no downtime and a optimal usage of resources. It provides with a framework in which to run distributed systems.
+Without getting too deep in definitions, and for the purpose of compactness, Kubernetes can be summarized as a way of managing containers that run applications to ensure that there is no downtime and an optimal usage of resources. It provides with a framework in which to run distributed systems.
 
 Kubernetes provides you with:
 - **Service discovery and load balancing**: Kubernetes can expose a container using the DNS name or using their own IP address. If traffic to a container is high, Kubernetes is able to load balance and distribute the network traffic so that the deployment is stable.

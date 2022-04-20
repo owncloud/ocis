@@ -19,7 +19,7 @@ Currently, when a user accepts a share, a cs3 reference is created in the users 
 
 Furthermore, the *gateway* treats `/home/shares` different than any other path: it will stat all children and calculate an etag to allow clients to discover changes in accepted shares. This requires the storage provider to cooperate and provide this special `/shares` folder in the root of a users home when it is accessed as a home storage. That is the origin of the `enable_home` config flag that needs to be implemented for every storage driver.
 
-In order to have a single source of truth we need to make the *share manager* aware of the mount point. We can then move all the logic that aggregates the etag in the share folder to a dedicated *shares storage provider* that is using the *share manager* for persistence. The *shares storage provider* would provide a `/shares` namespace outside of `/home` that lists all accepted shares for the current user. As a result the storage drivers no longer need to have a `enable_home` flag that jails users into their home. The `/home/shares` folder would move outside of the `/home`. In fact `/home` will no longer be needed, because the home folder concept can be implemented as a space: `CreateHome` would create a `personal` space on the. 
+In order to have a single source of truth we need to make the *share manager* aware of the mount point. We can then move all the logic that aggregates the etag in the share folder to a dedicated *shares storage provider* that is using the *share manager* for persistence. The *shares storage provider* would provide a `/shares` namespace outside of `/home` that lists all accepted shares for the current user. As a result the storage drivers no longer need to have a `enable_home` flag that jails users into their home. The `/home/shares` folder would move outside of the `/home`. In fact `/home` will no longer be needed, because the home folder concept can be implemented as a space: `CreateHome` would create a `personal` space on the.
 
 Work on this is done in https://github.com/cs3org/reva/pull/2023
 
@@ -39,9 +39,9 @@ Work is done in https://github.com/cs3org/reva/pull/1866
 
 ## URL escaped string representation of a CS3 reference
 
-For the spaces concept we introduced the `/dav/spaces/` endpoint. It encodes a cs3 *reference* in a URL compatible way. 
+For the spaces concept we introduced the `/dav/spaces/` endpoint. It encodes a cs3 *reference* in a URL compatible way.
 1. We can separate the path using a `/`: `/dav/spaces/<spaceid>/<path>`
-2. The `spaceid` currently is a cs3 resourceid, consisting of `<storageid>` and `<opaqueid>`. Since the opaqueid might contain `/` eg. for the local driver we have to urlencode the spaceid.
+2. The `spaceid` currently is a cs3 resourceid, consisting of `<storageid>` and `<opaqueid>`. Since the opaqueid might contain `/` e.g. for the local driver we have to urlencode the spaceid.
 
 To access resources by id we need to make the `/dav/meta/<resourceid>` able to list directories... Otherwise id based navigation first has to look up the path. Or we use the libregraph api for id based navigation.
 
@@ -52,8 +52,8 @@ A *reference* is a logical concept. It identifies a [*resource*]({{< ref "#resou
 While all components are optional, only three cases are used:
 | format | example | description |
 |-|-|-|
-| `!:<absolute_path>` | `!:/absolute/path/to/file.ext` | absolute path | 
-| `<storage_space>!:<relative_path>` | `ee1687e5-ac7f-426d-a6c0-03fed91d5f62!:path/to/file.ext` | path relative to the root of the storage space | 
+| `!:<absolute_path>` | `!:/absolute/path/to/file.ext` | absolute path |
+| `<storage_space>!:<relative_path>` | `ee1687e5-ac7f-426d-a6c0-03fed91d5f62!:path/to/file.ext` | path relative to the root of the storage space |
 | `<storage_space>!<root>:<relative_path>` | `ee1687e5-ac7f-426d-a6c0-03fed91d5f62!c3cf23bb-8f47-4719-a150-1d25a1f6fb56:to/file.ext` | path relative to the specified node in the storage space, used to reference resources without disclosing parent paths |
 
 `<storage_space>` should be a UUID to prevent references from breaking when a *user* or [*storage space*]({{< ref "#storage-spaces" >}}) gets renamed. But it can also be derived from a migration of an oc10 instance by concatenating an instance identifier and the numeric storage id from oc10, e.g. `oc10-instance-a$1234`.
@@ -81,8 +81,8 @@ The `:`, `!` and `$` are chosen from the set of [RFC3986 sub delimiters](https:/
 | `ee1687e5-ac7f-426d-a6c0-03fed91d5f62!56f7ceca-e7f8-4530-9a7a-fe4b7ec8089a:` | node id in the given storage space, `:` must be present |
 | `ee1687e5-ac7f-426d-a6c0-03fed91d5f62` | root of the storage space, all delimiters omitted, can be distinguished by the `/` |
 
-## space providers 
-When looking up an id based resource the reference must use a logical space id, not a CS3 resource id. Otherwise id based requests, which only have a resourceid consisting of a storage id and a node id cannot be routed to the correct storage provider if the storage has moved from one storage provider to another. 
+## space providers
+When looking up an id based resource the reference must use a logical space id, not a CS3 resource id. Otherwise id based requests, which only have a resourceid consisting of a storage id and a node id cannot be routed to the correct storage provider if the storage has moved from one storage provider to another.
 
 if the registry routes based on the storageid AND the nodeid it has to keep a cache of all nodeids in order to route all requests for a storage space (which consists of storage it + nodeid) to the correct storage provider. the correct resourceid for a node in a storage space would be `<storageid>$<rootnodeid>!<nodeid>`. The `<storageid>$<rootnodeid>` part allow the storage registry to route all id based requests to the correct storage provider. This becomes relevant when the storage space was moved from one storage provider to another. The storage space id remains the same, but the internal address and port change.
 
@@ -107,11 +107,11 @@ The TUS upload can take metadata, for PUT we might need a header.
 
 ### Space id vs resource id vs storage id
 
-We have `/dav/meta/<fileid>` where the `fileid` is a string that was returned by a PROPFIND or by the `/graph/v1.0/me/drives/` endpoint? That returns a space id and the root drive item which has an `id` 
+We have `/dav/meta/<fileid>` where the `fileid` is a string that was returned by a PROPFIND or by the `/graph/v1.0/me/drives/` endpoint? That returns a space id and the root drive item which has an `id`
 
 Does that `id` have a specific format? We currently concatenate as `<storageid>!<nodeid>`.
 
-A request against `/dav/meta/fileid` will use the reva storage registry to look up a path. 
+A request against `/dav/meta/fileid` will use the reva storage registry to look up a path.
 
 What if the storage space is moved to another storage provider. This happens during a migration:
 

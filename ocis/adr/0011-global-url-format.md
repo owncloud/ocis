@@ -26,7 +26,7 @@ When the URL contains a `fileid` parameter the server will look up the correspon
 GET https://demo.owncloud.com/apps/files/?dir=/path/to/resource
 ```
 
-The `dir` parameter is then used to make a WebDAV request against the `/dav/files` endpoint of the currently logged in user:
+The `dir` parameter is then used to make a WebDAV request against the `/dav/files` endpoint of the currently logged-in user:
 
 ```
 PROPFIND https://demo.owncloud.com/remote.php/dav/files/demo/path/to/resource
@@ -42,7 +42,7 @@ https://demo.owncloud.com/#/files/list/all/path/to/resource
 
 Currently, there is no `fileid` like parameter in the browser URL, making bookmarks of it fragile (they break when a bookmarked folder is renamed).
 
-The oCIS web UI just takes the path and uses the `/webdav` endpoint of the currently logged in user:
+The oCIS web UI just takes the path and uses the `/webdav` endpoint of the currently logged-in user:
 
 ```
 PROPFIND https://demo.owncloud.com/remote.php/webdav/path/to/resource
@@ -78,7 +78,7 @@ This ADR is limited to the scope of "how will a web client deal with the browser
 
 
 {{< hint >}}
-@jfd: The graph api returns a `path` in the `parentReference`, which is part of the `root` in a `drive` resource. But it contains a value in the namespace of the `graph` endpoint, eg.: `/drive/root:/Bilder` for the `/Bilder` folder in the root of the currently logged in users personal drive/space. Which is again relative to the drive. To give the clients a way to determine the mount point we need to add a new `mountpath/point/alias` property.
+@jfd: The graph api returns a `path` in the `parentReference`, which is part of the `root` in a `drive` resource. But it contains a value in the namespace of the `graph` endpoint, e.g.: `/drive/root:/Bilder` for the `/Bilder` folder in the root of the currently logged-in users personal drive/space. Which is again relative to the drive. To give the clients a way to determine the mount point we need to add a new `mountpath/point/alias` property.
 {{< /hint >}}
 
 ## Decision Drivers
@@ -130,7 +130,7 @@ It contains a path and a `fileid` (which takes precedence).
 * Bad, because URLs still contain a long prefix `(/index.php)/apps/files`
 * Bad, because the `fileid` needs to be accompanied by a `storageid` to allow efficient routing in ocis
 * Bad, because if not configured properly an additional `/index.php` prefixes the route
-* Bad, because powerusers cannot navigate by updating only the path in the URL, as the `fileid` takes precedence. They have to delete the `fileid` to navigate
+* Bad, because power users cannot navigate by updating only the path in the URL, as the `fileid` takes precedence. They have to delete the `fileid` to navigate
 
 ### ID based URLs
 
@@ -160,7 +160,7 @@ There is a customized ownCloud instance that uses path only based URLs:
 | `https://demo.owncloud.com/apps/files/?dir=/path/to/resource&` | sub folder `/path/to/resource` |
 
 * Good, because the URLs reveal the full path context to users
-* Good, because powerusers can navigate by updating the path in the url
+* Good, because power users can navigate by updating the path in the url
 * Bad, because the web UI needs to look up the space id in a registry to build an API request for the `/dav/space` endpoint
 * Bad, because the bookmarks break when someone renames a folder in the path
 * Bad, because there is no id that can be used as a fallback lookup mechanism
@@ -185,7 +185,7 @@ There is a customized ownCloud instance that uses path only based URLs:
 * Good, because the web UI does not need to look up the space id in a registry to build an API request for the `/dav/space` endpoint
 * Good, because the URLs reveal a relevant path context to users
 * Good, because everything after the `#` is not sent to the server, building the webdav request to list the folder is offloaded to the clients
-* Good, because powerusers can navigate by updating the path in the url
+* Good, because power users can navigate by updating the path in the url
 * Bad, because the current ids are uuid based, leading to very long URLs where the path component nearly vanishes between two very long strings
 * Bad, because the `#` in the URL is just a technical requirement
 * Bad, because ocis web requires a `/#/files/s` at the root of the route to distinguish the files app from other apps
@@ -266,14 +266,14 @@ In order to be able to copy and paste URLs all resources must be uniquely identi
 * An url shortener can create urls like `/s/<token>` which could be used as a stable link to a resource.
 * Links for anonymous users will resolve to `/public/<token>`
 
-The alias namespace hierarchy and depth can be pre determined by the admin. Even if aliases change the `id` parameter prevents bookmarks from breaking. A user can decide to build a different hierarchy by using his own registry.
+The alias namespace hierarchy and depth can be pre-determined by the admin. Even if aliases change the `id` parameter prevents bookmarks from breaking. A user can decide to build a different hierarchy by using his own registry.
 
-What about shares? Similar to `/home` it must reflect the user: `/shares/einstein` would list all shares *by* einstein for the currently logged in user. The ui needs to apply the same URL rewriting as for space based URLs: when navigating into a share the URL has to switch from `/personal/einstein/relative/path/to/shared/resource` to `/shares/einstein/<unique and potentially namespaced alias for shared resource>`. When more than one `resource` was shared a name collision would occur. To prevent this we can use ids `/shares/einstein/id/<resource_id` or namespaced aliases `/shares/einstein/files/alias`. Similar to the `/trash` prefix we could treat `/shares` as a filter for the shared resources a user has access to, but that would disclose unshared path segments in personal spaces. We could make that a feature and let users create an alias for a shared resource, similar as for public links. Then they can decide if they want to disclose the full path in their personal space (or another workspace) or if they want to use an alias which is then accessed at `/shares/einstein/<alias>`. As a default we could take the alias at creation time from the filename. That way two shares to a resource with the same name, eg.: `/personal/einstein/project AAA/foo` and `/personal/einstein/project BBB/foo` would lead to `/shares/einstein/foo` (a CS3 internal reference to `/personal/einstein/project AAA/foo`) and `/shares/einstein/foo (2)` (a CS3 internal reference to `/personal/einstein/project BBB/foo`). `foo (2)` would keep its name even when `foo` is deleted or renamed. Well an id as the alias might be better then, because users might rename these aliases, which would break URLs if they have been bookmarked. In any case this would make end user more aware of what they share AND it would allow them to choose an arbitrary context for the links they want to send out: personal internal share URLs.
+What about shares? Similar to `/home` it must reflect the user: `/shares/einstein` would list all shares *by* einstein for the currently logged-in user. The ui needs to apply the same URL rewriting as for space based URLs: when navigating into a share the URL has to switch from `/personal/einstein/relative/path/to/shared/resource` to `/shares/einstein/<unique and potentially namespaced alias for shared resource>`. When more than one `resource` was shared a name collision would occur. To prevent this we can use ids `/shares/einstein/id/<resource_id` or namespaced aliases `/shares/einstein/files/alias`. Similar to the `/trash` prefix we could treat `/shares` as a filter for the shared resources a user has access to, but that would disclose unshared path segments in personal spaces. We could make that a feature and let users create an alias for a shared resource, similar as for public links. Then they can decide if they want to disclose the full path in their personal space (or another workspace) or if they want to use an alias which is then accessed at `/shares/einstein/<alias>`. As a default we could take the alias at creation time from the filename. That way two shares to a resource with the same name, e.g.: `/personal/einstein/project AAA/foo` and `/personal/einstein/project BBB/foo` would lead to `/shares/einstein/foo` (a CS3 internal reference to `/personal/einstein/project AAA/foo`) and `/shares/einstein/foo (2)` (a CS3 internal reference to `/personal/einstein/project BBB/foo`). `foo (2)` would keep its name even when `foo` is deleted or renamed. Well an id as the alias might be better then, because users might rename these aliases, which would break URLs if they have been bookmarked. In any case this would make end user more aware of what they share AND it would allow them to choose an arbitrary context for the links they want to send out: personal internal share URLs.
 
 With these different namespaces the `/files` part in the URL becomes obsolete, because the files application can be registered for multiple namespaces: `/personal`, `/workspaces`, `/shares`, `/trash` ...
 
 * Good, because it contains a global path
-* Good, because spaces with namespaced aliases can by bookmarked and copied into mails or chat without disclosing unshared path segments, as the space is supposed to be shared
+* Good, because spaces with namespaced aliases can be bookmarked and copied into mails or chat without disclosing unshared path segments, as the space is supposed to be shared
 * Good, because the UI can detect broken paths and notify the user to update his bookmark if the resource could be found by `id`
 * Good, because the `/files` part might only be required for `id` only based lookup to let the web ui know which app is responsible for the route
 * Good, because it turns shares into deliberately named spaces in `/shares/<owner>/<alias>`
@@ -297,7 +297,7 @@ When a file is selected the filename also becomes part of the URL so individual 
 
 If navigation is id based we need to look up the path for the id so we can make a webdav request, or we need to implement the graph drives and driveItem resources.
 
-The URL  `https://<host>/files?id=<resource_id>̀` is sent to the server. It has to look up the correct path and redirect the request, including the the path. But that would make all bookmarks contain tha path again, even if paths were configured to not be part of the URL.
+The URL  `https://<host>/files?id=<resource_id>̀` is sent to the server. It has to look up the correct path and redirect the request, including the path. But that would make all bookmarks contain tha path again, even if paths were configured to not be part of the URL.
 
 The `/meta/<fileid>` webdav endpoint can be used to look up the path with property `meta-path-for-user`.
 
@@ -307,7 +307,7 @@ For now, we would use path based navigation with URLs like this:
 https://<host>/files</namespaced/alias></relative/path/to/resource>?id=<resource_id>
 ```
 
-This means that only the _resource path_ is part of the URL path. Any other parameter, eg. file `id`, `page` or sort order must be given as URL parameters.
+This means that only the _resource path_ is part of the URL path. Any other parameter, e.g. file `id`, `page` or sort order must be given as URL parameters.
 
 - [ ] To make lookup by id possible we need to implement the `/meta/<fileid>` endpoint so the sdk can use it to look up the path. We should not implement a redirect on the ocis server side because the same redirect logic would need to be added to oc10. Having it in ocis web is the right place.
 
@@ -316,5 +316,5 @@ This means that only the _resource path_ is part of the URL path. Any other para
 Public links would have the same format: `https://<host>/files?id=<resource_id>` The web UI has to detect if the user is logged in or not and adjust the ui accordingly.
 
 {{< hint warning >}}
-Since there is no difference between public and private files a logged in user cannot see the public version of a link unless he logs out.
+Since there is no difference between public and private files a logged-in user cannot see the public version of a link unless he logs out.
 {{< /hint >}}

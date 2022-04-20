@@ -42,7 +42,7 @@ ownCloud Web allows you to write an extension for itself and therefore offers a 
 
 To make ownCloud Web pick up your extension, you need to activate it in the configuration like seen in the [Hello extension](https://owncloud.dev/extensions/ocis_hello/running/#configure-and-start-ocis).
 
-For a consistent look and feel, ownCloud Web uses a external design library, the [ownCloud design system](https://github.com/owncloud/owncloud-design-system). Since its classes and components are available through the wrapping `web runtime`, we highly recommend you to leverage it in your extension as well.
+For a consistent look and feel, ownCloud Web uses an external design library, the [ownCloud design system](https://github.com/owncloud/owncloud-design-system). Since its classes and components are available through the wrapping `web runtime`, we highly recommend you to leverage it in your extension as well.
 
 ### Settings
 
@@ -52,7 +52,7 @@ An extension likely has some behaviour which the user can configure. Fundamental
 
 The Proxy is an API gateway and acts as the single connection point where all external request from users and devices need to pass through.
 
-To make sure that requests can reach your extension's API, you need to register one or multiple endpoints at the proxy. The registration is a easy task and can be seen best on the [oCIS Hello example](https://owncloud.dev/extensions/ocis_hello/running/#configure-and-start-ocis).
+To make sure that requests can reach your extension's API, you need to register one or multiple endpoints at the proxy. The registration is an easy task and can be seen best on the [oCIS Hello example](https://owncloud.dev/extensions/ocis_hello/running/#configure-and-start-ocis).
 
 As files in ownCloud must always stay private (unless you share them with your friends or coworkers), requests to oCIS have an authenticated user context. This user context is also available to your extension and can be used to interact with the user's files. How to get the user context and authentication can be seen on the [oCIS Hello example](https://owncloud.dev/extensions/ocis_hello/settings/#account-uuid).
 
