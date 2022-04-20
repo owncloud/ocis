@@ -2,6 +2,7 @@ package config
 
 import (
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/config/defaults"
+	appprovider "github.com/owncloud/ocis/extensions/appprovider/pkg/config/defaults"
 	audit "github.com/owncloud/ocis/extensions/audit/pkg/config/defaults"
 	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/config/defaults"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/config/defaults"
@@ -52,5 +53,6 @@ func DefaultConfig() *Config {
 		AuthBasic:     authbasic.FullDefaultConfig(),
 		User:          user.FullDefaultConfig(),
 		Group:         group.FullDefaultConfig(),
+		AppProvider:   appprovider.FullDefaultConfig(),
 	}
 }

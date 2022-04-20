@@ -4,6 +4,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/config"
+	appprovider "github.com/owncloud/ocis/extensions/appprovider/pkg/config"
 	audit "github.com/owncloud/ocis/extensions/audit/pkg/config"
 	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/config"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/config"
@@ -79,6 +80,7 @@ type Config struct {
 	AuthBasic     *authbasic.Config     `yaml:"auth_basic"`
 	User          *user.Config          `yaml:"user"`
 	Group         *group.Config         `yaml:"group"`
+	AppProvider   *appprovider.Config   `yaml:"app_provider"`
 	Store         *store.Config         `yaml:"store"`
 	Thumbnails    *thumbnails.Config    `yaml:"thumbnails"`
 	WebDAV        *webdav.Config        `yaml:"webdav"`

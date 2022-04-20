@@ -9,11 +9,12 @@ import (
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/extensions/storage/pkg/config"
+	"github.com/owncloud/ocis/extensions/appprovider/pkg/config"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
-	"github.com/owncloud/ocis/extensions/storage/pkg/tracing"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/tracing"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
 )
@@ -23,12 +24,18 @@ func AppProvider(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "app-provider",
 		Usage: "start appprovider for providing apps",
-		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg, "storage-app-provider")
-		},
+		// Before: func(c *cli.Context) error {
+		// 	return ParseConfig(c, cfg, "storage-app-provider")
+		// },
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-			tracing.Configure(cfg, logger)
+			logCfg := cfg.Logging
+			logger := log.NewLogger(
+				log.Level(logCfg.Level),
+				log.File(logCfg.File),
+				log.Pretty(logCfg.Pretty),
+				log.Color(logCfg.Color),
+			)
+			tracing.Configure(cfg.Tracing.Enabled, cfg.Tracing.Type, logger)
 			gr := run.Group{}
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
@@ -51,10 +58,12 @@ func AppProvider(cfg *config.Config) *cli.Command {
 
 			debugServer, err := debug.Server(
 				debug.Name(c.Command.Name+"-debug"),
-				debug.Addr(cfg.Reva.AppProvider.DebugAddr),
+				debug.Addr(cfg.Debug.Addr),
 				debug.Logger(logger),
 				debug.Context(ctx),
-				debug.Config(cfg),
+				debug.Pprof(cfg.Debug.Pprof),
+				debug.Zpages(cfg.Debug.Zpages),
+				debug.Token(cfg.Debug.Token),
 			)
 
 			if err != nil {
@@ -66,7 +75,7 @@ func AppProvider(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.AppProvider.Supervised {
+			if !cfg.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
@@ -80,38 +89,37 @@ func appProviderConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 
 	rcfg := map[string]interface{}{
 		"core": map[string]interface{}{
-			"max_cpus":             cfg.Reva.AppProvider.MaxCPUs,
 			"tracing_enabled":      cfg.Tracing.Enabled,
 			"tracing_endpoint":     cfg.Tracing.Endpoint,
 			"tracing_collector":    cfg.Tracing.Collector,
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.Reva.JWTSecret,
-			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
-			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
+			"jwt_secret":                cfg.JWTSecret,
+			"gatewaysvc":                cfg.GatewayEndpoint,
+			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
-			"network": cfg.Reva.AppProvider.GRPCNetwork,
-			"address": cfg.Reva.AppProvider.GRPCAddr,
+			"network": cfg.GRPC.Protocol,
+			"address": cfg.GRPC.Addr,
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"appprovider": map[string]interface{}{
-					"gatewaysvc":       cfg.Reva.Gateway.Endpoint,
-					"app_provider_url": cfg.Reva.AppProvider.ExternalAddr,
-					"driver":           cfg.Reva.AppProvider.Driver,
+					// "gatewaysvc":       cfg.Reva.Gateway.Endpoint,
+					"app_provider_url": cfg.ExternalAddr,
+					"driver":           cfg.Driver,
 					"drivers": map[string]interface{}{
 						"wopi": map[string]interface{}{
-							"app_api_key":          cfg.Reva.AppProvider.WopiDriver.AppAPIKey,
-							"app_desktop_only":     cfg.Reva.AppProvider.WopiDriver.AppDesktopOnly,
-							"app_icon_uri":         cfg.Reva.AppProvider.WopiDriver.AppIconURI,
-							"app_int_url":          cfg.Reva.AppProvider.WopiDriver.AppInternalURL,
-							"app_name":             cfg.Reva.AppProvider.WopiDriver.AppName,
-							"app_url":              cfg.Reva.AppProvider.WopiDriver.AppURL,
-							"insecure_connections": cfg.Reva.AppProvider.WopiDriver.Insecure,
-							"iop_secret":           cfg.Reva.AppProvider.WopiDriver.IopSecret,
-							"jwt_secret":           cfg.Reva.AppProvider.WopiDriver.JWTSecret,
-							"wopi_url":             cfg.Reva.AppProvider.WopiDriver.WopiURL,
+							"app_api_key":          cfg.Drivers.WOPI.AppAPIKey,
+							"app_desktop_only":     cfg.Drivers.WOPI.AppDesktopOnly,
+							"app_icon_uri":         cfg.Drivers.WOPI.AppIconURI,
+							"app_int_url":          cfg.Drivers.WOPI.AppInternalURL,
+							"app_name":             cfg.Drivers.WOPI.AppName,
+							"app_url":              cfg.Drivers.WOPI.AppURL,
+							"insecure_connections": cfg.Drivers.WOPI.Insecure,
+							"iop_secret":           cfg.Drivers.WOPI.IopSecret,
+							"jwt_secret":           cfg.JWTSecret,
+							"wopi_url":             cfg.Drivers.WOPI.WopiURL,
 						},
 					},
 				},
@@ -128,28 +136,29 @@ type AppProviderSutureService struct {
 
 // NewAppProvider creates a new store.AppProviderSutureService
 func NewAppProvider(cfg *ociscfg.Config) suture.Service {
-	cfg.Storage.Commons = cfg.Commons
+	cfg.AppProvider.Commons = cfg.Commons
 	return AppProviderSutureService{
-		cfg: cfg.Storage,
+		cfg: cfg.AppProvider,
 	}
 }
 
 func (s AppProviderSutureService) Serve(ctx context.Context) error {
-	s.cfg.Reva.AppProvider.Context = ctx
+	// s.cfg.Reva.AppProvider.Context = ctx
+	cmd := AppProvider(s.cfg)
 	f := &flag.FlagSet{}
-	cmdFlags := AppProvider(s.cfg).Flags
+	cmdFlags := cmd.Flags
 	for k := range cmdFlags {
 		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}
 	cliCtx := cli.NewContext(nil, f, nil)
-	if AppProvider(s.cfg).Before != nil {
-		if err := AppProvider(s.cfg).Before(cliCtx); err != nil {
+	if cmd.Before != nil {
+		if err := cmd.Before(cliCtx); err != nil {
 			return err
 		}
 	}
-	if err := AppProvider(s.cfg).Action(cliCtx); err != nil {
+	if err := cmd.Action(cliCtx); err != nil {
 		return err
 	}
 

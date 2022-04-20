@@ -20,6 +20,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/command"
+	appprovider "github.com/owncloud/ocis/extensions/appprovider/pkg/command"
 	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/command"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/command"
@@ -120,7 +121,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["storage-users"] = storage.NewStorageUsers
 	s.ServicesRegistry["storage-shares"] = storage.NewStorageShares
 	s.ServicesRegistry["storage-public-link"] = storage.NewStoragePublicLink
-	s.ServicesRegistry["storage-appprovider"] = storage.NewAppProvider
+	s.ServicesRegistry["storage-appprovider"] = appprovider.NewAppProvider
 	s.ServicesRegistry["notifications"] = notifications.NewSutureService
 
 	// populate delayed services
