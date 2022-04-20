@@ -416,7 +416,7 @@ func (s GatewaySutureService) Serve(ctx context.Context) error {
 
 // ParseConfig loads accounts configuration from known paths.
 func ParseConfig(c *cli.Context, cfg *config.Config, storageExtension string) error {
-	conf, err := ociscfg.BindSourcesToStructs(storageExtension, cfg.ConfigFile,  cfg.ConfigFile != defaults.DefaultConfig().ConfigFile, cfg)
+	conf, err := ociscfg.BindSourcesToStructs(storageExtension, cfg.ConfigFile, cfg.ConfigFile != defaults.DefaultConfig().ConfigFile, cfg)
 	if err != nil {
 		return err
 	}

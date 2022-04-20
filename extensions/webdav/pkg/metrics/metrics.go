@@ -28,8 +28,8 @@ func New() *Metrics {
 		BuildInfo: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: Namespace,
 			Subsystem: Subsystem,
-			Name: "build_info",
-			Help: "Build Information",
+			Name:      "build_info",
+			Help:      "Build Information",
 		}, []string{"version"}),
 	}
 

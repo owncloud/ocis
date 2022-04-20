@@ -5,6 +5,7 @@ import (
 
 	"github.com/owncloud/ocis/extensions/webdav/pkg/config"
 	"github.com/owncloud/ocis/extensions/webdav/pkg/config/defaults"
+	"github.com/owncloud/ocis/extensions/webdav/pkg/logging"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 
 	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
@@ -20,6 +21,8 @@ func ParseConfig(cfg *config.Config) error {
 
 	_, err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg.ConfigFile, cfg.ConfigFile != defaults.DefaultConfig().ConfigFile, cfg)
 	if err != nil {
+		logger := logging.Configure(cfg.Service.Name, &config.Log{})
+		logger.Error().Err(err).Msg("couldn't find the specified config file")
 		return err
 	}
 

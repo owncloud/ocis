@@ -8,7 +8,7 @@ type Users struct {
 // User holds the payload for a GetUser response
 type User struct {
 	Enabled           string `json:"enabled" xml:"enabled"`
-	UserID            string `json:"id" xml:"id"`// UserID is mapped to the preferred_name attribute in accounts
+	UserID            string `json:"id" xml:"id"` // UserID is mapped to the preferred_name attribute in accounts
 	DisplayName       string `json:"display-name" xml:"display-name"`
 	LegacyDisplayName string `json:"displayname" xml:"displayname"`
 	Email             string `json:"email" xml:"email"`

@@ -51,12 +51,7 @@ func Server(cfg *config.Config) *cli.Command {
 			},
 		},
 		Before: func(c *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
-				logger := logging.Configure(cfg.Service.Name, &config.Log{})
-				logger.Error().Err(err).Msg("couldn't find the specified config file")
-			}
-			return err
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
