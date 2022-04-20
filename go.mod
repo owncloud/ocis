@@ -100,8 +100,6 @@ require (
 	github.com/armon/go-metrics v0.3.10 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
-	github.com/asim/go-micro/plugins/events/natsjs/v4 v4.0.0-20220311080335-e5a35d38f931 // indirect
-	github.com/asim/go-micro/plugins/server/http/v4 v4.0.0-20220317022205-c6d352c83291 // indirect
 	github.com/aws/aws-sdk-go v1.42.39 // indirect
 	github.com/beevik/etree v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -276,4 +274,4 @@ require (
 // we need to use a fork to make the windows build pass
 replace github.com/pkg/xattr => github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7
 
-replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20220420094237-12de4ae09eda
+replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20220420100653-c8a9fa1599b0
