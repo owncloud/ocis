@@ -29,7 +29,7 @@ Sharing adds more complexity because the index also needs to react to create, de
 * Be able to construct intelligent searches based on metadata
 * Allow the user to filter the search queries based on metadata
 * Basic File Search needs to be implemented out of the box without external dependencies
-* The Search Indexing Service should be replacable with more sophisticated technologies like Elasticsearch
+* The Search Indexing Service should be replaceable with more sophisticated technologies like Elasticsearch
 * Make use of the spaces architecture to shard search indexes by space
 * The Search Indexing Service needs to deal with multiple users accessing the same resources due to shares
 * The Search Service should be compatible with different search indexing technologies

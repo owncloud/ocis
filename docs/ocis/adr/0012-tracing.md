@@ -46,4 +46,4 @@ Chosen option: option 3; Migrate to OpenTelemetry. OpenCensus is deprecated, and
 - The unit that ultimately does the work will change the state of the span to error if any occurred.
 
 
-With this premises, this is by no means a fixed document and the more we learn about the usage of an instance the more context we can add to the traces.
+With these premises, this is by no means a fixed document and the more we learn about the usage of an instance the more context we can add to the traces.

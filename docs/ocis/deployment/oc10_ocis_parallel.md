@@ -12,7 +12,7 @@ geekdocFilePath: oc10_ocis_parallel.md
 ## Overview
 
 - This setup reflects [stage 6 of the oC10 to oCIS migration plan]({{< ref "migration#stage-6-parallel-deployment" >}})
-- Traefik generating self signed certificates for local setup or obtaining valid SSL certificates for a server setup
+- Traefik generating self-signed certificates for local setup or obtaining valid SSL certificates for a server setup
 - OpenLDAP server with demo users
 - LDAP admin interface to edit users
 - Keycloak as OpenID Connect provider in federation with the LDAP server
@@ -35,7 +35,7 @@ geekdocFilePath: oc10_ocis_parallel.md
 - four domains set up and pointing to your server
   - cloud.\* for serving oCIS
   - keycloak.\* for serving Keycloak
-  - ldap .\* for serving the LDAP managment UI
+  - ldap .\* for serving the LDAP management UI
   - traefik.\* for serving the Traefik dashboard
 
 See also [example server setup]({{< ref "preparing_server" >}})
@@ -60,7 +60,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
       ### Traefik settings ###
       TRAEFIK_LOG_LEVEL=
-      # Serve Treafik dashboard. Defaults to "false".
+      # Serve Traefik dashboard. Defaults to "false".
       TRAEFIK_DASHBOARD=
       # Domain of Traefik, where you can find the dashboard. Defaults to "traefik.owncloud.test"
       TRAEFIK_DOMAIN=
@@ -100,7 +100,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
       LDAP_MANAGER_DOMAIN=
 
       ### Keycloak ###
-      # Domain of Keycloak, where you can find the managment and authentication frontend. Defaults to "keycloak.owncloud.test"
+      # Domain of Keycloak, where you can find the management and authentication frontend. Defaults to "keycloak.owncloud.test"
       KEYCLOAK_DOMAIN=
       # Realm which to be used with oC10 and oCIS. Defaults to "owncloud"
       KEYCLOAK_REALM=
@@ -112,17 +112,17 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
 
-  If you want to use the Traefik dashboard, set TRAEFIK_DASHBOARD to `true` (default is `false` and therefore not active). If you activate it, you must set a domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` eg. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
+  If you want to use the Traefik dashboard, set TRAEFIK_DASHBOARD to `true` (default is `false` and therefore not active). If you activate it, you must set a domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` e.g. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
 
-  The Traefik dashboard is secured by basic auth. Default credentials are the user `admin` with the password `admin`. To set your own credentials, generate a htpasswd (eg. by using [an online tool](https://htpasswdgenerator.de/) or a cli tool).
+  The Traefik dashboard is secured by basic auth. Default credentials are the user `admin` with the password `admin`. To set your own credentials, generate a htpasswd (e.g. by using [an online tool](https://htpasswdgenerator.de/) or a cli tool).
 
   Traefik will issue certificates with LetsEncrypt and therefore you must set an email address in `TRAEFIK_ACME_MAIL=`.
 
   By default oCIS will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OCIS_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
 
-  Set your domain for the oC10 and oCIS frontend in `CLOUD_DOMAIN=`, eg. `CLOUD_DOMAIN=cloud.owncloud.test`.
+  Set your domain for the oC10 and oCIS frontend in `CLOUD_DOMAIN=`, e.g. `CLOUD_DOMAIN=cloud.owncloud.test`.
 
-  You also must override the default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD`, `OCIS_JWT_SECRET`, `STORAGE_TRANSFER_SECRET` and `OCIS_MACHINE_AUTH_API_KEY`  in order to secure your oCIS instance. Choose some random strings eg. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}}).
+  You also must override the default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD`, `OCIS_JWT_SECRET`, `STORAGE_TRANSFER_SECRET` and `OCIS_MACHINE_AUTH_API_KEY`  in order to secure your oCIS instance. Choose some random strings e.g. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}}).
 
   By default ownCloud 10 will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OC10_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
 
@@ -130,11 +130,11 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   In oder to change the default link open action which defaults to the classic UI (`OWNCLOUD_WEB_REWRITE_LINKS=false`) you can set it to `OWNCLOUD_WEB_REWRITE_LINKS=true`. This will lead to links being opened in ownCloud Web.
 
-  The OpenLDAP server in this example deployment has an admin users, which is also used as bind user in order to keep theses examples simple. You can change the default password "admin" to a different one by setting it to `LDAP_ADMIN_PASSWORD=...`.
+  The OpenLDAP server in this example deployment has an admin users, which is also used as bind user in order to keep these examples simple. You can change the default password "admin" to a different one by setting it to `LDAP_ADMIN_PASSWORD=...`.
 
-  Set your domain for the LDAP manager UI in `LDAP_MANAGER_DOMAIN=`, eg. `ldap.owncloud.test`.
+  Set your domain for the LDAP manager UI in `LDAP_MANAGER_DOMAIN=`, e.g. `ldap.owncloud.test`.
 
-  Set your domain for the Keycloak administration panel and authentication endpoints to `KEYCLOAK_DOMAIN=` eg. `KEYCLOAK_DOMAIN=keycloak.owncloud.test`.
+  Set your domain for the Keycloak administration panel and authentication endpoints to `KEYCLOAK_DOMAIN=` e.g. `KEYCLOAK_DOMAIN=keycloak.owncloud.test`.
 
   Changing the used Keycloak realm can be done by setting `KEYCLOAK_REALM=`. This defaults to the ownCloud realm `KEYCLOAK_REALM=owncloud`. The ownCloud realm will be automatically imported on startup and includes our demo users.
 
@@ -152,7 +152,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
 For a more simple local ocis setup see [Getting started]({{< ref "../getting-started" >}})
 
-This docker stack can also be run locally. One downside is that Traefik can not obtain valid SSL certificates and therefore will create self signed ones. This means that your browser will show scary warnings. Another downside is that you can not point DNS entries to your localhost. So you have to add static host entries to your computer.
+This docker stack can also be run locally. One downside is that Traefik can not obtain valid SSL certificates and therefore will create self-signed ones. This means that your browser will show scary warnings. Another downside is that you can not point DNS entries to your localhost. So you have to add static host entries to your computer.
 
 On Linux and macOS you can add them to your `/etc/hosts` files like this:
 

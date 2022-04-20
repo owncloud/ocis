@@ -20,7 +20,7 @@ The most prominent changes in ownCloud Infinite Scale 1.20.0 and ownCloud Web 5.
 * All sharing options (users & links) are now united in one panel in ownCloud Web. [web#6701](https://github.com/owncloud/web/pull/6701)
 * The "Media Viewer" in ownCloud Web has been renamed to "Preview". [web#6514](https://github.com/owncloud/web/pull/6514)
 * ownCloud Web now has support for audio playback in "Preview" (e.g., MP3, WAV, FLAC, OGG). [web#6514](https://github.com/owncloud/web/pull/6514)
-* The feedback link in ownCloud Web is now customizable. See https://owncloud.dev/clients/web/getting-started/#options for more information. [web#6702](https://github.com/owncloud/web/issues/6702) 
+* The feedback link in ownCloud Web is now customizable. See https://owncloud.dev/clients/web/getting-started/#options for more information. [web#6702](https://github.com/owncloud/web/issues/6702)
 * ownCloud Web now supports full screen mode for external apps like web office. [web#6688](https://github.com/owncloud/web/pull/6688)
 * ownCloud Web introduces an integrated PDF viewer that user native browser capabilities. [web#6654](https://github.com/owncloud/web/pull/6654)
 * The Text Editor in ownCloud Web has received a couple of improvements. [web#6667](https://github.com/owncloud/web/pull/6667)
@@ -150,7 +150,7 @@ We are currently in a Tech Preview state and breaking changes may occur at any t
 
 ## ownCloud Infinite Scale 1.17.0 Technology Preview
 
-Version 1.17.0 brings major changes, new features and improvements. The Infinite Scale backend introduces an event system as an important platform component and adds support for file locking. ownCloud Web 5.0.0 comes with a full rework of the design and user experience and introduces initial support for the 'Spaces' feauture. Additionally ownCloud Web now supports Collabora Online with the ownCloud 10 backend.
+Version 1.17.0 brings major changes, new features and improvements. The Infinite Scale backend introduces an event system as an important platform component and adds support for file locking. ownCloud Web 5.0.0 comes with a full rework of the design and user experience and introduces initial support for the 'Spaces' feature. Additionally ownCloud Web now supports Collabora Online with the ownCloud 10 backend.
 
 The most prominent changes in ownCloud Infinite Scale 1.17.0 and ownCloud Web 5.0.0 comprise:
 
@@ -529,7 +529,7 @@ You have to follow these steps to be able to access your data again in oCIS:
 1. stop oCIS
 1. navigate to `/var/tmp/ocis/storage/users/nodes/root/`
 1. in this directory you will find directories with UUID as names. These are the home folders of the oCIS users. Find the ones with content your oCIS users uploaded to oCIS.
-1. create an temporary directory eg. `/tmp/dereferenced-ocis-storage`
+1. create an temporary directory e.g. `/tmp/dereferenced-ocis-storage`
 1. copy the data from oCIS to the temporary directory while dereferencing symlinks. On Linux you can do this by running `cp --recursive --dereference /var/tmp/ocis/storage/users/nodes/root/ /tmp/dereferenced-ocis-storage`
 1. you now have a backup of all users data in `/tmp/dereferenced-ocis-storage` and can follow our recommended update strategy above
 

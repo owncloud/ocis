@@ -13,18 +13,18 @@ geekdocFilePath: 0018-file-search-query-language.md
 
 ## Context and Problem Statement
 
-From the users perspective, the interface to search is just a single form field where the user enters one or more search terms. The minimum expectation is that the search returns file names and links to files that
+From the users perspective, the interface to search is just a single form field where the user enters one or more search terms. The minimum expectation is that the search returns file names and links to files that:
 
 * have a file name that contains at least one of the search terms
 * contain at least one of the search terms in the file contents
-* have meta data that is equal or contains one of the search terms
+* have metadata that is equal or contains one of the search terms
 
 ## Decision Drivers
 
 * The standard user should not be bothered by a query syntax
 * The power user should also be able to narrow his search with an efficient and flexible syntax
 * We need to consider different backend technologies which we need to access through an abstraction layer
-* Using different indexing systems should lead to a slightly different feature set whitout changing the syntax completely
+* Using different indexing systems should lead to a slightly different feature set without changing the syntax completely
 
 ## Considered Options
 
@@ -65,16 +65,16 @@ The Lucene Query Parser syntax supports advanced queries like term, phrase, wild
 * Good, because it is a well documented and powerful syntax
 * Good, because it is very close to the Elasticsearch and the Solr syntax which enhances compatibility
 * Bad, because there is no powerful and well tested query parser for golang available
-* Bad, because it adds complexity and fulfilling all the different query usecases can be an "uphill battle"
+* Bad, because it adds complexity and fulfilling all the different query use-cases can be an "uphill battle"
 
 ### Solr Query Language
 
-Solr is highly reliable, scalable and fault tolerant, providing distributed indexing, replication and load-balanced querying, automated failover and recovery, centralized configuration and more. Solr powers the search and navigation features of many of the world's largest internet sites.
+Solr is highly reliable, scalable and fault-tolerant, providing distributed indexing, replication and load-balanced querying, automated failover and recovery, centralized configuration and more. Solr powers the search and navigation features of many of the world's largest internet sites.
 
 * Good, because it is a well documented and powerful syntax
 * Good, because it is very close to the Elasticsearch and the Lucene syntax which enhances compatibility
 * Good, because it has a strong community with large resources and knowledge
-* Bad, because it adds complexity and fulfilling all the different query usecases can be an "uphill battle"
+* Bad, because it adds complexity and fulfilling all the different query use-cases can be an "uphill battle"
 
 ### Elasticsearch Query Language
 
@@ -83,8 +83,8 @@ Elasticsearch provides a full Query DSL (Domain Specific Language) based on JSON
 * Good, because it is a well documented and powerful syntax
 * Good, because it is very close to the Elasticsearch and the Solr syntax which enhances compatibility
 * Good, because there is a stable and well tested go client which brings a query builder
-* Good, because it could be used as the query language which supports different search backends by just implementing what is needed for our usecase
-* Bad, because it adds complexity and fulfilling all the different query usecases can be an "uphill battle"
+* Good, because it could be used as the query language which supports different search backends by just implementing what is needed for our use-case
+* Bad, because it adds complexity and fulfilling all the different query use-cases can be an "uphill battle"
 
 ## Links
 
