@@ -9,11 +9,12 @@ import (
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/extensions/storage/pkg/config"
+	"github.com/owncloud/ocis/extensions/auth-bearer/pkg/config"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
-	"github.com/owncloud/ocis/extensions/storage/pkg/tracing"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/tracing"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
 )
@@ -23,12 +24,18 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-bearer",
 		Usage: "start authprovider for bearer auth",
-		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg, "storage-auth-bearer")
-		},
+		// Before: func(c *cli.Context) error {
+		// 	return ParseConfig(c, cfg, "storage-auth-bearer")
+		// },
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-			tracing.Configure(cfg, logger)
+			logCfg := cfg.Logging
+			logger := log.NewLogger(
+				log.Level(logCfg.Level),
+				log.File(logCfg.File),
+				log.Pretty(logCfg.Pretty),
+				log.Color(logCfg.Color),
+			)
+			tracing.Configure(cfg.Tracing.Enabled, cfg.Tracing.Type, logger)
 			gr := run.Group{}
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
@@ -54,10 +61,12 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 
 			debugServer, err := debug.Server(
 				debug.Name(c.Command.Name+"-debug"),
-				debug.Addr(cfg.Reva.AuthBearer.DebugAddr),
+				debug.Addr(cfg.Debug.Addr),
 				debug.Logger(logger),
 				debug.Context(ctx),
-				debug.Config(cfg),
+				debug.Pprof(cfg.Debug.Pprof),
+				debug.Zpages(cfg.Debug.Zpages),
+				debug.Token(cfg.Debug.Token),
 			)
 
 			if err != nil {
@@ -69,7 +78,7 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.AuthBearer.Supervised {
+			if !cfg.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
@@ -82,32 +91,30 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 func authBearerConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"core": map[string]interface{}{
-			"max_cpus":             cfg.Reva.AuthBearer.MaxCPUs,
 			"tracing_enabled":      cfg.Tracing.Enabled,
 			"tracing_endpoint":     cfg.Tracing.Endpoint,
 			"tracing_collector":    cfg.Tracing.Collector,
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.Reva.JWTSecret,
-			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
-			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
+			"jwt_secret":                cfg.JWTSecret,
+			"gatewaysvc":                cfg.GatewayEndpoint,
+			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
-			"network": cfg.Reva.AuthBearer.GRPCNetwork,
-			"address": cfg.Reva.AuthBearer.GRPCAddr,
+			"network": cfg.GRPC.Protocol,
+			"address": cfg.GRPC.Addr,
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"authprovider": map[string]interface{}{
-					"auth_manager": "oidc",
+					"auth_manager": cfg.AuthProvider,
 					"auth_managers": map[string]interface{}{
 						"oidc": map[string]interface{}{
-							"issuer":     cfg.Reva.OIDC.Issuer,
-							"insecure":   cfg.Reva.OIDC.Insecure,
-							"id_claim":   cfg.Reva.OIDC.IDClaim,
-							"uid_claim":  cfg.Reva.OIDC.UIDClaim,
-							"gid_claim":  cfg.Reva.OIDC.GIDClaim,
-							"gatewaysvc": cfg.Reva.Gateway.Endpoint,
+							"issuer":    cfg.AuthProviders.OIDC.Issuer,
+							"insecure":  cfg.AuthProviders.OIDC.Insecure,
+							"id_claim":  cfg.AuthProviders.OIDC.IDClaim,
+							"uid_claim": cfg.AuthProviders.OIDC.UIDClaim,
+							"gid_claim": cfg.AuthProviders.OIDC.GIDClaim,
 						},
 					},
 				},
@@ -123,28 +130,29 @@ type AuthBearerSutureService struct {
 
 // NewAuthBearerSutureService creates a new gateway.AuthBearerSutureService
 func NewAuthBearer(cfg *ociscfg.Config) suture.Service {
-	cfg.Storage.Commons = cfg.Commons
+	cfg.AuthBearer.Commons = cfg.Commons
 	return AuthBearerSutureService{
-		cfg: cfg.Storage,
+		cfg: cfg.AuthBearer,
 	}
 }
 
 func (s AuthBearerSutureService) Serve(ctx context.Context) error {
-	s.cfg.Reva.AuthBearer.Context = ctx
+	// s.cfg.Reva.AuthBearer.Context = ctx
+	cmd := AuthBearer(s.cfg)
 	f := &flag.FlagSet{}
-	cmdFlags := AuthBearer(s.cfg).Flags
+	cmdFlags := cmd.Flags
 	for k := range cmdFlags {
 		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}
 	cliCtx := cli.NewContext(nil, f, nil)
-	if AuthBearer(s.cfg).Before != nil {
-		if err := AuthBearer(s.cfg).Before(cliCtx); err != nil {
+	if cmd.Before != nil {
+		if err := cmd.Before(cliCtx); err != nil {
 			return err
 		}
 	}
-	if err := AuthBearer(s.cfg).Action(cliCtx); err != nil {
+	if err := cmd.Action(cliCtx); err != nil {
 		return err
 	}
 

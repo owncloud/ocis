@@ -22,6 +22,7 @@ import (
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/command"
 	appprovider "github.com/owncloud/ocis/extensions/appprovider/pkg/command"
 	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/command"
+	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/command"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/command"
@@ -116,7 +117,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["storage-userprovider"] = user.NewUserProvider
 	s.ServicesRegistry["storage-groupprovider"] = group.NewGroupProvider
 	s.ServicesRegistry["storage-authbasic"] = authbasic.NewAuthBasic
-	s.ServicesRegistry["storage-authbearer"] = storage.NewAuthBearer
+	s.ServicesRegistry["storage-authbearer"] = authbearer.NewAuthBearer
 	s.ServicesRegistry["storage-authmachine"] = storage.NewAuthMachine
 	s.ServicesRegistry["storage-users"] = storage.NewStorageUsers
 	s.ServicesRegistry["storage-shares"] = storage.NewStorageShares
