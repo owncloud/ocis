@@ -15,7 +15,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.7
-	github.com/go-chi/cors v1.2.0
+	github.com/go-chi/cors v1.2.1
 	github.com/go-chi/render v1.0.1
 	github.com/go-ldap/ldap/v3 v3.4.3
 	github.com/go-ldap/ldif v0.0.0-20200320164324-fd88d9b715b3
