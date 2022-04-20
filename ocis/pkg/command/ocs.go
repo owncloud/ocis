@@ -14,6 +14,14 @@ func OCSCommand(cfg *config.Config) *cli.Command {
 		Name:     cfg.OCS.Service.Name,
 		Usage:    subcommandDescription(cfg.OCS.Service.Name),
 		Category: "extensions",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "ocis-config-file",
+				Value:       cfg.ConfigFile,
+				Usage:       "oCIS config file to be loaded by the runtime and extensions",
+				Destination: &cfg.ConfigFile,
+			},
+		},
 		Before: func(ctx *cli.Context) error {
 			return parser.ParseConfig(cfg)
 		},

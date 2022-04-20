@@ -13,7 +13,14 @@ func StoragePublicLinkCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-public-link",
 		Usage:    "start storage public link storage",
 		Category: "extensions",
-		//Flags:    flagset.StoragePublicLink(cfg.Storage),
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "ocis-config-file",
+				Value:       cfg.ConfigFile,
+				Usage:       "oCIS config file to be loaded by the runtime and extensions",
+				Destination: &cfg.ConfigFile,
+			},
+		},
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)
 		},

@@ -13,7 +13,14 @@ func StorageFrontendCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-frontend",
 		Usage:    "start storage frontend",
 		Category: "extensions",
-		//Flags:    flagset.FrontendWithConfig(cfg.Storage),
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "ocis-config-file",
+				Value:       cfg.ConfigFile,
+				Usage:       "oCIS config file to be loaded by the runtime and extensions",
+				Destination: &cfg.ConfigFile,
+			},
+		},
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)
 		},

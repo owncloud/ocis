@@ -14,6 +14,14 @@ func AuditCommand(cfg *config.Config) *cli.Command {
 		Name:     "audit",
 		Usage:    "start audit service",
 		Category: "extensions",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "ocis-config-file",
+				Value:       cfg.ConfigFile,
+				Usage:       "oCIS config file to be loaded by the extension",
+				Destination: &cfg.ConfigFile,
+			},
+		},
 		Before: func(ctx *cli.Context) error {
 			return parser.ParseConfig(cfg)
 		},

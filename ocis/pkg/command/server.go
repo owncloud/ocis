@@ -3,7 +3,6 @@ package command
 import (
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/parser"
-	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/ocis/pkg/runtime"
@@ -18,21 +17,14 @@ func Server(cfg *config.Config) *cli.Command {
 		Category: "fullstack",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:        "config-file",
+				Name:        "ocis-config-file",
 				Value:       cfg.ConfigFile,
-				Usage:       "config file to be loaded by the extension",
+				Usage:       "oCIS config file to be loaded by the runtime and extensions",
 				Destination: &cfg.ConfigFile,
 			},
 		},
 		Before: func(c *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
-				logger := log.NewLogger(
-					log.Name("oCIS"),
-				)
-				logger.Error().Err(err).Msg("couldn't find the specified config file")
-			}
-			return err
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
 

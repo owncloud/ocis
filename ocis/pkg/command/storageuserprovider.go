@@ -13,7 +13,14 @@ func StorageUserProviderCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-userprovider",
 		Usage:    "start storage userprovider service",
 		Category: "extensions",
-		//Flags:    flagset.UsersWithConfig(cfg.Storage),
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "ocis-config-file",
+				Value:       cfg.ConfigFile,
+				Usage:       "oCIS config file to be loaded by the runtime and extensions",
+				Destination: &cfg.ConfigFile,
+			},
+		},
 		Before: func(ctx *cli.Context) error {
 			return ParseStorageCommon(ctx, cfg)
 		},
