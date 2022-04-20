@@ -136,6 +136,7 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 					"drivers":         storagedrivers.MetadataDrivers(cfg),
 					"data_server_url": cfg.Reva.StorageMetadata.DataServerURL,
 					"tmp_folder":      cfg.Reva.StorageMetadata.TempFolder,
+					"mount_id":        cfg.Reva.StorageMetadata.MountID,
 				},
 			},
 		},

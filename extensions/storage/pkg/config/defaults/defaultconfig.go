@@ -409,6 +409,7 @@ func DefaultConfig() *config.Config {
 					HTTPAddr:    "127.0.0.1:9216",
 					DebugAddr:   "127.0.0.1:9217",
 				},
+				MountID:          "0dba9855-3ab1-432f-ace7-e01224fe2c65",
 				Driver:           "ocis",
 				ExposeDataServer: false,
 				DataServerURL:    "http://localhost:9216/data",

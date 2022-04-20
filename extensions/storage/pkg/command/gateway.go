@@ -186,6 +186,7 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 								"/home": map[string]interface{}{
 									"address":     "127.0.0.1:9157",
 									"provider_id": "1284d238-aa92-42ce-bdc4-0b0000009157",
+									"space_type":  "personal",
 								},
 								//"/users/{{.Id.OpaqueId}}": map[string]interface{}{
 								"/users": map[string]interface{}{
@@ -196,6 +197,15 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 								"1284d238-aa92-42ce-bdc4-0b0000009157": map[string]interface{}{
 									"address":     "127.0.0.1:9157",
 									"provider_id": "1284d238-aa92-42ce-bdc4-0b0000009157",
+								},
+								"metadata": map[string]interface{}{
+									"address":     "127.0.0.1:9215",
+									"provider_id": "0dba9855-3ab1-432f-ace7-e01224fe2c65",
+								},
+								"0dba9855-3ab1-432f-ace7-e01224fe2c65": map[string]interface{}{
+									"address":       "127.0.0.1:9215",
+									"provider_id":   "0dba9855-3ab1-432f-ace7-e01224fe2c65",
+									"provider_path": "metadata",
 								},
 							},
 						},
