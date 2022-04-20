@@ -19,7 +19,11 @@ import (
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/config"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/config"
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/config"
+	notifications "github.com/owncloud/ocis/extensions/notifications/pkg/config"
+	ocs "github.com/owncloud/ocis/extensions/ocs/pkg/config"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config"
+	settings "github.com/owncloud/ocis/extensions/settings/pkg/config"
+	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
 )
 
 const configFilename string = "ocis.yml"
@@ -105,17 +109,17 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 		IDM:   &idm.Config{},
 		//IDP:           &idp.Config{},
 		//Nats:          &nats.Config{},
-		//Notifications: &notifications.Config{},
-		//OCS:           &ocs.Config{},
-		//Settings:      &settings.Config{},
+		Notifications: &notifications.Config{},
+		Proxy:         &proxy.Config{},
+		OCS:           &ocs.Config{},
+		Settings:      &settings.Config{},
 		//Storage:       &storage.Config{},
-		//Thumbnails:    &thumbnails.Config{},
+		Thumbnails: &thumbnails.Config{},
 		//Web:           &web.Config{},
 		//WebDAV:        &webdav.Config{},
 	}
 
 	if insecure {
-		cfg.Proxy = &proxy.Config{}
 		cfg.Proxy.InsecureBackends = insecure
 	}
 
@@ -139,8 +143,15 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	if err != nil {
 		return fmt.Errorf("Could not generate random password for tokenmanager: %s", err)
 	}
+	machineAuthSecret, err := generateRandomPassword(passwordLength)
+	if err != nil {
+		return fmt.Errorf("Could not generate random password for machineauthsecret: %s", err)
+	}
+	thumbnailTransferTokenSecret, err := generateRandomPassword(passwordLength)
+	if err != nil {
+		return fmt.Errorf("Could not generate random password for machineauthsecret: %s", err)
+	}
 
-	// TODO: generate outputs for all occurences above
 	cfg.TokenManager.JWTSecret = tokenManagerJwtSecret
 	cfg.Accounts.TokenManager.JWTSecret = tokenManagerJwtSecret
 	cfg.Graph.TokenManager.JWTSecret = tokenManagerJwtSecret
@@ -148,6 +159,13 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	cfg.IDM.ServiceUserPasswords.Idp = idpServicePassword
 	cfg.IDM.ServiceUserPasswords.OcisAdmin = ocisAdminServicePassword
 	cfg.IDM.ServiceUserPasswords.Reva = revaServicePassword
+	cfg.Notifications.Notifications.MachineAuthSecret = machineAuthSecret
+	cfg.OCS.MachineAuthAPIKey = machineAuthSecret
+	cfg.Proxy.TokenManager.JWTSecret = tokenManagerJwtSecret
+	cfg.Proxy.MachineAuthAPIKey = machineAuthSecret
+	cfg.Settings.Metadata.MachineAuthAPIKey = machineAuthSecret
+	cfg.Settings.TokenManager.JWTSecret = tokenManagerJwtSecret
+	cfg.Thumbnails.Thumbnail.TransferTokenSecret = thumbnailTransferTokenSecret
 	yamlOutput, err := yaml.Marshal(cfg)
 	if err != nil {
 		return fmt.Errorf("Could not marshall config into yaml: %s", err)

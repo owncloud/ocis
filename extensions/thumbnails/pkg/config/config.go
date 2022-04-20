@@ -36,12 +36,12 @@ type FileSystemSource struct {
 
 // Thumbnail defines the available thumbnail related configuration.
 type Thumbnail struct {
-	Resolutions         []string          `yaml:"resolutions"`
-	FileSystemStorage   FileSystemStorage `yaml:"filesystem_storage"`
-	WebdavAllowInsecure bool              `yaml:"webdav_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_WEBDAVSOURCE_INSECURE"`
-	CS3AllowInsecure    bool              `yaml:"cs3_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_CS3SOURCE_INSECURE"`
-	RevaGateway         string            `yaml:"reva_gateway" env:"REVA_GATEWAY"` //TODO: use REVA config
-	FontMapFile         string            `yaml:"font_map_file" env:"THUMBNAILS_TXT_FONTMAP_FILE"`
-	TransferTokenSecret string            `yaml:"transfer_token" env:"THUMBNAILS_TRANSFER_TOKEN"`
-	DataEndpoint        string            `yaml:"data_endpoint" env:"THUMBNAILS_DATA_ENDPOINT"`
+	Resolutions         []string          `yaml:"resolutions,omitempty"`
+	FileSystemStorage   FileSystemStorage `yaml:"filesystem_storage,omitempty"`
+	WebdavAllowInsecure bool              `yaml:"webdav_allow_insecure,omitempty" env:"OCIS_INSECURE;THUMBNAILS_WEBDAVSOURCE_INSECURE"`
+	CS3AllowInsecure    bool              `yaml:"cs3_allow_insecure,omitempty" env:"OCIS_INSECURE;THUMBNAILS_CS3SOURCE_INSECURE"`
+	RevaGateway         string            `yaml:"reva_gateway,omitempty" env:"REVA_GATEWAY"` //TODO: use REVA config
+	FontMapFile         string            `yaml:"font_map_file,omitempty" env:"THUMBNAILS_TXT_FONTMAP_FILE"`
+	TransferTokenSecret string            `yaml:"transfer_token,omitempty" env:"THUMBNAILS_TRANSFER_TOKEN"`
+	DataEndpoint        string            `yaml:"data_endpoint,omitempty" env:"THUMBNAILS_DATA_ENDPOINT"`
 }
