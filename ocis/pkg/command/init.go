@@ -3,7 +3,6 @@ package command
 import (
 	"bufio"
 	"crypto/rand"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -20,11 +19,13 @@ import (
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/config"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/config"
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/config"
+	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config"
 )
 
 const configFilename string = "ocis.yml"
 const passwordLength int = 32
 
+// InitCommand is the entrypoint for the init command
 func InitCommand(cfg *config.Config) *cli.Command {
 	// TODO: remove homedir get
 	homeDir, err := os.UserHomeDir()
@@ -56,21 +57,16 @@ func InitCommand(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			insecureFlag := c.String("insecure")
+			insecure := false
 			if insecureFlag == "ask" {
 				answer := strings.ToLower(stringPrompt("Insecure Backends? [Yes|No]"))
 				if answer == "yes" || answer == "y" {
-					cfg.Proxy.InsecureBackends = true
-				} else {
-					cfg.Proxy.InsecureBackends = false
+					insecure = true
 				}
-			} else {
-				if insecureFlag == "true" {
-					cfg.Proxy.InsecureBackends = true
-				} else {
-					cfg.Proxy.InsecureBackends = false
-				}
+			} else if insecureFlag == "true" {
+				insecure = true
 			}
-			err := createConfig(cfg.Proxy.InsecureBackends, c.Bool("force-overwrite"), c.String("config-path"))
+			err := createConfig(insecure, c.Bool("force-overwrite"), c.String("config-path"))
 			if err != nil {
 				log.Fatalf("Could not create config: %s", err)
 			}
@@ -85,16 +81,15 @@ func init() {
 
 func checkConfigPath(configPath string) error {
 	targetPath := path.Join(configPath, configFilename)
-	_, err := os.Stat(targetPath)
-	if err == nil {
-		return errors.New(fmt.Sprintf("Config in %s already exists", targetPath))
+	if _, err := os.Stat(targetPath); err == nil {
+		return fmt.Errorf("Config in %s already exists", targetPath)
 	}
 	return nil
 }
 
 func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	err := checkConfigPath(configPath)
-	if err != nil && forceOverwrite == false {
+	if err != nil && !forceOverwrite {
 		return err
 	}
 	err = os.MkdirAll(configPath, 0700)
@@ -112,7 +107,6 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 		//Nats:          &nats.Config{},
 		//Notifications: &notifications.Config{},
 		//OCS:           &ocs.Config{},
-		//Proxy:         &proxy.Config{},
 		//Settings:      &settings.Config{},
 		//Storage:       &storage.Config{},
 		//Thumbnails:    &thumbnails.Config{},
@@ -120,25 +114,30 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 		//WebDAV:        &webdav.Config{},
 	}
 
+	if insecure {
+		cfg.Proxy = &proxy.Config{}
+		cfg.Proxy.InsecureBackends = insecure
+	}
+
 	idmServicePassword, err := generateRandomPassword(passwordLength)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Could not generate random password for idm: %s", err))
+		return fmt.Errorf("Could not generate random password for idm: %s", err)
 	}
 	idpServicePassword, err := generateRandomPassword(passwordLength)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Could not generate random password for idp: %s", err))
+		return fmt.Errorf("Could not generate random password for idp: %s", err)
 	}
 	ocisAdminServicePassword, err := generateRandomPassword(passwordLength)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Could not generate random password for ocis admin: %s", err))
+		return fmt.Errorf("Could not generate random password for ocis admin: %s", err)
 	}
 	revaServicePassword, err := generateRandomPassword(passwordLength)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Could not generate random password for reva: %s", err))
+		return fmt.Errorf("Could not generate random password for reva: %s", err)
 	}
 	tokenManagerJwtSecret, err := generateRandomPassword(passwordLength)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Could not generate random password for tokenmanager: %s", err))
+		return fmt.Errorf("Could not generate random password for tokenmanager: %s", err)
 	}
 
 	// TODO: generate outputs for all occurences above
@@ -151,7 +150,7 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	cfg.IDM.ServiceUserPasswords.Reva = revaServicePassword
 	yamlOutput, err := yaml.Marshal(cfg)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Could not marshall config into yaml: %s", err))
+		return fmt.Errorf("Could not marshall config into yaml: %s", err)
 	}
 	targetPath := path.Join(configPath, configFilename)
 	err = ioutil.WriteFile(targetPath, yamlOutput, 0600)
