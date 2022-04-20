@@ -269,7 +269,7 @@ _Feel free to add your question as a PR to this document using the link at the t
 <div style="break-after: page"></div>
 
 ### Stage-5: introduce user aware proxy
-In the previous stages oCIS was only accessible for administrators with access to the network. To expose only a single service to the internet, oCIS comes with a user aware proxy that can be used to route requests to the existing ownCloud 10 installation or oCIS, based on the authenticated user. The proxy uses OIDC to identify the logged in user and route them to the configured backend.
+In the previous stages oCIS was only accessible for administrators with access to the network. To expose only a single service to the internet, oCIS comes with a user aware proxy that can be used to route requests to the existing ownCloud 10 installation or oCIS, based on the authenticated user. The proxy uses OIDC to identify the logged-in user and route them to the configured backend.
 
 #### User impact
 The IP address of the ownCloud host changes. There is no change for the file sync and share functionality when requests are handled by the oCIS codebase as it uses the same database and storage system as owncloud 10.
@@ -537,7 +537,7 @@ data
 │   ├── thumbnails
 │   │   └── 123
 │   │   │   ├── 2048-1536-max.png
-│   │   │   └── 32-32.png                 // the file id, eg. of /Photos/Portugal.jpg
+│   │   │   └── 32-32.png                 // the file id, e.g. of /Photos/Portugal.jpg
 │   └── uploads
 ├── marie
 │   ├── cache
@@ -553,7 +553,7 @@ data
 
 The *data directory* may also contain subfolders for ownCloud 10 applications like `avatars`, `gallery`, `files_external` and `cache`.
 
-When an object storage is used as the primary storage all file blobs are stored by their file id and a prefix, eg.: `urn:oid:<fileid>`.
+When an object storage is used as the primary storage all file blobs are stored by their file id and a prefix, e.g.: `urn:oid:<fileid>`.
 
 The three types of blobs we need to migrate are stored in
 - `files` for file blobs, the current file content,

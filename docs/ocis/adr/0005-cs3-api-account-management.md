@@ -155,7 +155,7 @@ Creating an account using the first option looks currently is implemented in ven
 └──────────────────────────────────────────────────┘
 ```
 
-As explained before, during this flow no Reva middlewares are ran. Creating an account will only use the embedded accounts js file alongside a minted jwt token (by the oCIS proxy) to communicate with the accounts service.
+As explained before, during this flow no Reva middlewares are run. Creating an account will only use the embedded accounts js file alongside a minted jwt token (by the oCIS proxy) to communicate with the accounts service.
 
 ### Add account management to the CS3 API
 

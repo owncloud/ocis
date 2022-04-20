@@ -11,7 +11,7 @@ geekdocFilePath: basic-remote-setup.md
 
 The default configuration of the oCIS binary and the `owncloud/ocis` docker image assume, that you access oCIS on `localhost`. This enables you to do quick testing and development without any configuration.
 
-If you need to access oCIS running in a docker container, on a VM or a remote machine via an other hostname than `localhost`, you need to configure this hostname in oCIS. The same applies if you are not using hostnames but instead an IP (eg. `192.168.178.25`).
+If you need to access oCIS running in a docker container, on a VM or a remote machine via another hostname than `localhost`, you need to configure this hostname in oCIS. The same applies if you are not using hostnames but instead an IP (e.g. `192.168.178.25`).
 
 ## Start the oCIS fullstack server from binary
 
@@ -31,7 +31,7 @@ For the following examples you need to have the oCIS binary in your current work
 
 ### Using automatically generated certificates
 
-In order to run oCIS with automatically generated and self signed certificates please execute following command. You need to replace `your-host` with an IP or hostname. Since you have only self signed certificates you need to have `OCIS_INSECURE` set to `true`.
+In order to run oCIS with automatically generated and self-signed certificates please execute following command. You need to replace `your-host` with an IP or hostname. Since you have only self-signed certificates you need to have `OCIS_INSECURE` set to `true`.
 
 ```bash
 OCIS_INSECURE=true \

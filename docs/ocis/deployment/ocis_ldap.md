@@ -12,7 +12,7 @@ geekdocFilePath: ocis_ldap.md
 
 ## Overview
 
-- Traefik generating self signed certificates for local setup or obtaining valid SSL certificates for a server setup
+- Traefik generating self-signed certificates for local setup or obtaining valid SSL certificates for a server setup
 - OpenLDAP server with demo users
 - LDAP admin interface to edit users
 - oCIS running behind Traefik as reverse proxy
@@ -27,7 +27,7 @@ geekdocFilePath: ocis_ldap.md
 - Linux server with docker and docker-compose installed
 - four domains set up and pointing to your server
   - ocis.\* for serving oCIS
-  - ldap .\* for serving the LDAP managment UI
+  - ldap .\* for serving the LDAP management UI
   - traefik.\* for serving the Traefik dashboard
 
 See also [example server setup]({{< ref "preparing_server" >}})
@@ -51,7 +51,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
   INSECURE=true
 
   ### Traefik settings ###
-  # Serve Treafik dashboard. Defaults to "false".
+  # Serve Traefik dashboard. Defaults to "false".
   TRAEFIK_DASHBOARD=
   # Domain of Traefik, where you can find the dashboard. Defaults to "traefik.owncloud.test"
   TRAEFIK_DOMAIN=
@@ -83,21 +83,21 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
 
-  If you want to use the Traefik dashboard, set TRAEFIK_DASHBOARD to `true` (default is `false` and therefore not active). If you activate it, you must set a domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` eg. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
+  If you want to use the Traefik dashboard, set TRAEFIK_DASHBOARD to `true` (default is `false` and therefore not active). If you activate it, you must set a domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` e.g. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
 
-  The Traefik dashboard is secured by basic auth. Default credentials are the user `admin` with the password `admin`. To set your own credentials, generate a htpasswd (eg. by using [an online tool](https://htpasswdgenerator.de/) or a cli tool).
+  The Traefik dashboard is secured by basic auth. Default credentials are the user `admin` with the password `admin`. To set your own credentials, generate a htpasswd (e.g. by using [an online tool](https://htpasswdgenerator.de/) or a cli tool).
 
   Traefik will issue certificates with LetsEncrypt and therefore you must set an email address in `TRAEFIK_ACME_MAIL=`.
 
   By default oCIS will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OCIS_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
 
-  Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, eg. `OCIS_DOMAIN=cloud.owncloud.test`.
+  Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, e.g. `OCIS_DOMAIN=cloud.owncloud.test`.
 
-  You also must override the default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD`, `OCIS_JWT_SECRET`, `STORAGE_TRANSFER_SECRET` and `OCIS_MACHINE_AUTH_API_KEY`  in order to secure your oCIS instance. Choose some random strings eg. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}}).
+  You also must override the default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD`, `OCIS_JWT_SECRET`, `STORAGE_TRANSFER_SECRET` and `OCIS_MACHINE_AUTH_API_KEY`  in order to secure your oCIS instance. Choose some random strings e.g. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}}).
 
-  The OpenLDAP server in this example deployment has an admin users, which is also used as bind user in order to keep theses examples simple. You can change the default password "admin" to a different one by setting it to `LDAP_ADMIN_PASSWORD=...`.
+  The OpenLDAP server in this example deployment has an admin users, which is also used as bind user in order to keep these examples simple. You can change the default password "admin" to a different one by setting it to `LDAP_ADMIN_PASSWORD=...`.
 
-  Set your domain for the LDAP manager UI in `LDAP_MANAGER_DOMAIN=`, eg. `ldap.owncloud.test`.
+  Set your domain for the LDAP manager UI in `LDAP_MANAGER_DOMAIN=`, e.g. `ldap.owncloud.test`.
 
   Now you have configured everything and can save the file.
 
@@ -111,7 +111,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
 For a more simple local ocis setup see [Getting started]({{< ref "../getting-started" >}})
 
-This docker stack can also be run locally. One downside is that Traefik can not obtain valid SSL certificates and therefore will create self signed ones. This means that your browser will show scary warnings. Another downside is that you can not point DNS entries to your localhost. So you have to add static host entries to your computer.
+This docker stack can also be run locally. One downside is that Traefik can not obtain valid SSL certificates and therefore will create self-signed ones. This means that your browser will show scary warnings. Another downside is that you can not point DNS entries to your localhost. So you have to add static host entries to your computer.
 
 On Linux and macOS you can add them to your `/etc/hosts` files like this:
 

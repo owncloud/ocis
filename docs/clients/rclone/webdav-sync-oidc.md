@@ -15,7 +15,7 @@ Rclone itself is not able to open and maintain an OpenID Connect session. But it
 
 ### Setting up the OIDC-agent
 
-You need to install the [OIDC-agent](https://github.com/indigo-dc/oidc-agent) from your OS' package repository (eg. [Debian](https://github.com/indigo-dc/oidc-agent#debian-packages) or [MacOS](https://github.com/indigo-dc/oidc-agent#debian-packages)).
+You need to install the [OIDC-agent](https://github.com/indigo-dc/oidc-agent) from your OS' package repository (e.g. [Debian](https://github.com/indigo-dc/oidc-agent#debian-packages) or [MacOS](https://github.com/indigo-dc/oidc-agent#debian-packages)).
 
 
 ### Configuring the the OIDC-agent
@@ -63,4 +63,4 @@ We now can use Rclone to sync the local folder `/tmp/test` to `/test` in your oC
 rclone sync :local:/tmp :webdav:/test
 ```
 
-If your oCIS doesn't use valid SSL certificates, you may need to use `rclone --no-check-certificate sync ...`. 
+If your oCIS doesn't use valid SSL certificates, you may need to use `rclone --no-check-certificate sync ...`.

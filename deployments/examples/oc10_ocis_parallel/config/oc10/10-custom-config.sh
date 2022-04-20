@@ -6,7 +6,7 @@ gomplate \
   -f /etc/templates/oidc.config.php \
   -o ${OWNCLOUD_VOLUME_CONFIG}/oidc.config.php
 
-# we need at least version 2.1.0 of the oenidconnect app
+# we need at least version 2.1.0 of the openidconnect app
 occ market:upgrade --major openidconnect
 occ app:enable openidconnect
 

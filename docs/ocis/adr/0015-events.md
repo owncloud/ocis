@@ -19,7 +19,7 @@ To be able to implement simple, flexible and independent inter service communica
 
 ### Example: Email Notification
 
-A simple example is the notification feature for oCIS: Users should receive an email when another user shares a file with them. The information, that the file was shared should go out as an event from a storage provider or share manager, carrying the information which file was shared to which receiver. A potential notification service that sends out the email listens to these kind of events and sends the email out once on every received event of that specific type.
+A simple example is the notification feature for oCIS: Users should receive an email when another user shares a file with them. The information, that the file was shared should go out as an event from a storage provider or share manager, carrying the information which file was shared to which receiver. A potential notification service that sends out the email listens to these kinds of events and sends the email out once on every received event of that specific type.
 
 ## Decision Drivers
 
@@ -40,17 +40,17 @@ A simple example is the notification feature for oCIS: Users should receive an e
 
 Reva will get a messaging service that is available to all services within oCIS and Reva. It is considered as one of the mandatory services of the oCIS system. If the messaging backend is not running, neither Reva nor oCIS can be considered healthy and should shut down.
 
-All oCIS- and Reva-services can connect to the messaging bus and send so called events. The sender gets an immediate return if handing the event to the message bus was succesful or not.
+All oCIS- and Reva-services can connect to the messaging bus and send so-called events. The sender gets an immediate return if handing the event to the message bus was successful or not.
 
 The sender can not make any assumptions when the message is delivered to any receiving service. Depending on the QoS model (as proposed as alternatives in this ADR) it might even be not guaranteed that the event is delivered at all. Also, the sender can not know if zero, one or many services are listening to that event.
 
 #### Event Data
 
-Events are identified by their namespace and their respective name. The namespace is delimited by dots and starts with either "reva" or "ocis" or an future extension name. It is followed by the name of the sending service and an unique name of the event.
+Events are identified by their namespace and their respective name. The namespace is delimited by dots and starts with either "reva" or "ocis" or a future extension name. It is followed by the name of the sending service and an unique name of the event.
 
 Example: `ocis.ocdav.delete` - an event with that name sent out if an WebDAV DELETE request arrived in the oCDav service.
 
-An event can carry a payload which is encoded as json object. (See for example [NATS](https://docs.nats.io/using-nats/developer/sending/structure) ). There are no pre defined members in that object, it is fully up to the sender which data will be included in the payload. Receivers must be robust to deal with changes.
+An event can carry a payload which is encoded as json object. (See for example [NATS](https://docs.nats.io/using-nats/developer/sending/structure) ). There are no pre-defined members in that object, it is fully up to the sender which data will be included in the payload. Receivers must be robust to deal with changes.
 
 #### Quality of Service
 
@@ -82,7 +82,7 @@ Exactly as described above, but with a higher service level quality.
 
 #### Quality of Service
 
-Events are sent with "At least once" quality of service. That means the events will remain in the queue until they are received by all receivers. This puts more responsability on the event bus and adds state to the events. Given that the event queue can be considered the backbone of the system, it is required to be running.
+Events are sent with "At least once" quality of service. That means the events will remain in the queue until they are received by all receivers. This puts more responsibility on the event bus and adds state to the events. Given that the event queue can be considered the backbone of the system, it is required to be running.
 
 #### Pros
 

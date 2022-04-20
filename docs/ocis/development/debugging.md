@@ -13,7 +13,7 @@ geekdocFilePath: debugging.md
 
 As a single binary for easy deployment running `ocis server` just forks itself to start all the services, which makes debugging those processes a little harder.
 
-Ultimately, we want to be able to stop a single service using eg. `ocis kill web` so that you can start the service you want to debug in debug mode. We need to [change the way we fork processes](https://github.com/owncloud/ocis/issues/77) though, otherwise the runtime will automatically restart a service if killed.
+Ultimately, we want to be able to stop a single service using e.g. `ocis kill web` so that you can start the service you want to debug in debug mode. We need to [change the way we fork processes](https://github.com/owncloud/ocis/issues/77) though, otherwise the runtime will automatically restart a service if killed.
 
 ### Start ocis
 
@@ -135,7 +135,7 @@ bin/ocis --log-level=$LOG_LEVEL proxy &
 # kill 17628
 ```
 
-4. Start the service you are interested in in debug mode. When using make to build the binary there is already a `bin/ocis-debug` binary for you. When running an IDE tell it which service to start by providing the corresponding sub command, eg. `bin\ocis-debug reva-frontend`.
+4. Start the service you are interested in debug mode. When using make to build the binary there is already a `bin/ocis-debug` binary for you. When running an IDE tell it which service to start by providing the corresponding sub command, e.g. `bin\ocis-debug reva-frontend`.
 
 ### Gather error messages
 
@@ -160,7 +160,7 @@ This popped up when I tried to add `marie` as a collaborator in ownCloud Web. Th
 ```
 
 {{< hint info >}}
-The username and password only work when basic auth is available. Otherwise you have to obtain a bearer token, eg. by grabbing it from the browser.
+The username and password only work when basic auth is available. Otherwise you have to obtain a bearer token, e.g. by grabbing it from the browser.
 {{< /hint >}}
 {{< hint danger >}}
 TODO add ocis cli tool to obtain a bearer token.
@@ -190,7 +190,7 @@ The last line gives us a hint where the log message originated: `.../github.com/
 95:     }
 ```
 
-Ok, so this seems to be a convenience method that is called from multiple places an also handles errors. Unfortunately, this hides the actual source of the error. We could set a breakpoint in line 94 and reproduce the problem, which can be a lot harder than just clicking the share button or sending a curl request again. So let us see what else the log tells us.
+Ok, so this seems to be a convenience method that is called from multiple places and also handles errors. Unfortunately, this hides the actual source of the error. We could set a breakpoint in line 94 and reproduce the problem, which can be a lot harder than just clicking the share button or sending a curl request again. So let us see what else the log tells us.
 
 The previous line tells us that a Stat request failed: `uri=/cs3.gateway.v1beta1.GatewayAPI/Stat`. This time the line is written by the grpc log interceptor. What else is there?
 
@@ -214,7 +214,7 @@ replace github.com/cs3org/reva => ../reva
 ```
 
 {{< hint info >}}
-The username and password only work when basic auth is available. Otherwise you have to obtain a bearer token, eg. by grabbing it from the browser.
+The username and password only work when basic auth is available. Otherwise you have to obtain a bearer token, e.g. by grabbing it from the browser.
 {{< /hint >}}
 
 Rebuild ocis to make sure the dependency is used. It should be sufficient to just restart the service you want to debug.

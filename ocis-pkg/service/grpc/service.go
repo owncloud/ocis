@@ -6,9 +6,9 @@ import (
 
 	mgrpcc "github.com/asim/go-micro/plugins/client/grpc/v4"
 	mgrpcs "github.com/asim/go-micro/plugins/server/grpc/v4"
-	mbreaker "github.com/asim/go-micro/plugins/wrapper/breaker/gobreaker/v4"
-	"github.com/asim/go-micro/plugins/wrapper/monitoring/prometheus/v4"
-	"github.com/asim/go-micro/plugins/wrapper/trace/opencensus/v4"
+	mbreaker "github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker"
+	"github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus"
+	"github.com/go-micro/plugins/v4/wrapper/trace/opencensus"
 	"github.com/owncloud/ocis/ocis-pkg/registry"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/client"
