@@ -45,7 +45,7 @@ require (
 	github.com/libregraph/idm v0.3.1-0.20220315094434-e9a5cff3dd05
 	github.com/libregraph/lico v0.54.1-0.20220325072321-31efc3995d63
 	github.com/mennanov/fieldmask-utils v0.5.0
-	github.com/mitchellh/mapstructure v1.4.3
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nats-io/nats-server/v2 v2.8.0
 	github.com/nmcclain/asn1-ber v0.0.0-20170104154839-2661553a0484
