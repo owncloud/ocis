@@ -22,7 +22,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 		// AuthMachine(cfg),
 		// Sharing(cfg),
 		// StoragePublicLink(cfg),
-		StorageShares(cfg),
+		// StorageShares(cfg),
 		// StorageUsers(cfg),
 		// StorageMetadata(cfg),
 		Health(cfg),

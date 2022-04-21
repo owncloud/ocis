@@ -6,14 +6,15 @@ import (
 	"os"
 	"path"
 
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/tracing"
 
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/extensions/storage/pkg/config"
+	"github.com/owncloud/ocis/extensions/storage-shares/pkg/config"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
-	"github.com/owncloud/ocis/extensions/storage/pkg/tracing"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
@@ -24,14 +25,18 @@ func StorageShares(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-shares",
 		Usage: "start storage-shares service",
-		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg, "storage-shares")
-		},
+		// Before: func(c *cli.Context) error {
+		// 	return ParseConfig(c, cfg, "storage-shares")
+		// },
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-
-			tracing.Configure(cfg, logger)
-
+			logCfg := cfg.Logging
+			logger := log.NewLogger(
+				log.Level(logCfg.Level),
+				log.File(logCfg.File),
+				log.Pretty(logCfg.Pretty),
+				log.Color(logCfg.Color),
+			)
+			tracing.Configure(cfg.Tracing.Enabled, cfg.Tracing.Type, logger)
 			gr := run.Group{}
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
@@ -58,10 +63,12 @@ func StorageShares(cfg *config.Config) *cli.Command {
 
 			debugServer, err := debug.Server(
 				debug.Name(c.Command.Name+"-debug"),
-				debug.Addr(cfg.Reva.StorageShares.DebugAddr),
+				debug.Addr(cfg.Debug.Addr),
 				debug.Logger(logger),
 				debug.Context(ctx),
-				debug.Config(cfg),
+				debug.Pprof(cfg.Debug.Pprof),
+				debug.Zpages(cfg.Debug.Zpages),
+				debug.Token(cfg.Debug.Token),
 			)
 
 			if err != nil {
@@ -73,7 +80,7 @@ func StorageShares(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageShares.Supervised {
+			if !cfg.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
@@ -86,29 +93,27 @@ func StorageShares(cfg *config.Config) *cli.Command {
 func storageSharesConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
 	rcfg := map[string]interface{}{
 		"core": map[string]interface{}{
-			"max_cpus":             cfg.Reva.StorageShares.MaxCPUs,
 			"tracing_enabled":      cfg.Tracing.Enabled,
 			"tracing_endpoint":     cfg.Tracing.Endpoint,
 			"tracing_collector":    cfg.Tracing.Collector,
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.Reva.JWTSecret,
-			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
-			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
+			"jwt_secret":                cfg.JWTSecret,
+			"gatewaysvc":                cfg.GatewayEndpoint,
+			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
-			"network": cfg.Reva.StorageShares.GRPCNetwork,
-			"address": cfg.Reva.StorageShares.GRPCAddr,
+			"network": cfg.GRPC.Protocol,
+			"address": cfg.GRPC.Addr,
 			"services": map[string]interface{}{
 				"sharesstorageprovider": map[string]interface{}{
-					"usershareprovidersvc": cfg.Reva.Sharing.Endpoint,
-					"gateway_addr":         cfg.Reva.Gateway.Endpoint,
+					"usershareprovidersvc": cfg.SharesProviderEndpoint,
 				},
 			},
 		},
 	}
-	if cfg.Reva.StorageShares.ReadOnly {
+	if cfg.ReadOnly {
 		gcfg := rcfg["grpc"].(map[string]interface{})
 		gcfg["interceptors"] = map[string]interface{}{
 			"readonly": map[string]interface{}{},
@@ -124,28 +129,29 @@ type StorageSharesSutureService struct {
 
 // NewStorageShares creates a new storage.StorageSharesSutureService
 func NewStorageShares(cfg *ociscfg.Config) suture.Service {
-	cfg.Storage.Commons = cfg.Commons
+	cfg.StorageShares.Commons = cfg.Commons
 	return StorageSharesSutureService{
-		cfg: cfg.Storage,
+		cfg: cfg.StorageShares,
 	}
 }
 
 func (s StorageSharesSutureService) Serve(ctx context.Context) error {
-	s.cfg.Reva.StorageShares.Context = ctx
+	// s.cfg.Reva.StorageShares.Context = ctx
+	cmd := StorageShares(s.cfg)
 	f := &flag.FlagSet{}
-	cmdFlags := StorageShares(s.cfg).Flags
+	cmdFlags := cmd.Flags
 	for k := range cmdFlags {
 		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}
 	cliCtx := cli.NewContext(nil, f, nil)
-	if StorageShares(s.cfg).Before != nil {
-		if err := StorageShares(s.cfg).Before(cliCtx); err != nil {
+	if cmd.Before != nil {
+		if err := cmd.Before(cliCtx); err != nil {
 			return err
 		}
 	}
-	if err := StorageShares(s.cfg).Action(cliCtx); err != nil {
+	if err := cmd.Action(cliCtx); err != nil {
 		return err
 	}
 
