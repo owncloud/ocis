@@ -6,6 +6,7 @@ import (
 	audit "github.com/owncloud/ocis/extensions/audit/pkg/config/defaults"
 	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/config/defaults"
 	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/config/defaults"
+	authmachine "github.com/owncloud/ocis/extensions/auth-machine/pkg/config/defaults"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/config/defaults"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/config/defaults"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/config/defaults"
@@ -55,6 +56,7 @@ func DefaultConfig() *Config {
 		Storage:         storage.DefaultConfig(),
 		AuthBasic:       authbasic.FullDefaultConfig(),
 		AuthBearer:      authbearer.FullDefaultConfig(),
+		AuthMachine:     authmachine.FullDefaultConfig(),
 		User:            user.FullDefaultConfig(),
 		Group:           group.FullDefaultConfig(),
 		Sharing:         sharing.FullDefaultConfig(),

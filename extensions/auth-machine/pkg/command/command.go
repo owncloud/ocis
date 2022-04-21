@@ -9,11 +9,12 @@ import (
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/extensions/storage/pkg/config"
+	"github.com/owncloud/ocis/extensions/auth-machine/pkg/config"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
-	"github.com/owncloud/ocis/extensions/storage/pkg/tracing"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/tracing"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
 )
@@ -23,12 +24,18 @@ func AuthMachine(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-machine",
 		Usage: "start authprovider for machine auth",
-		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg, "storage-auth-machine")
-		},
+		// Before: func(c *cli.Context) error {
+		// 	return ParseConfig(c, cfg, "storage-auth-machine")
+		// },
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-			tracing.Configure(cfg, logger)
+			logCfg := cfg.Logging
+			logger := log.NewLogger(
+				log.Level(logCfg.Level),
+				log.File(logCfg.File),
+				log.Pretty(logCfg.Pretty),
+				log.Color(logCfg.Color),
+			)
+			tracing.Configure(cfg.Tracing.Enabled, cfg.Tracing.Type, logger)
 			gr := run.Group{}
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
@@ -54,10 +61,12 @@ func AuthMachine(cfg *config.Config) *cli.Command {
 
 			debugServer, err := debug.Server(
 				debug.Name(c.Command.Name+"-debug"),
-				debug.Addr(cfg.Reva.AuthMachine.DebugAddr),
+				debug.Addr(cfg.Debug.Addr),
 				debug.Logger(logger),
 				debug.Context(ctx),
-				debug.Config(cfg),
+				debug.Pprof(cfg.Debug.Pprof),
+				debug.Zpages(cfg.Debug.Zpages),
+				debug.Token(cfg.Debug.Token),
 			)
 
 			if err != nil {
@@ -69,7 +78,7 @@ func AuthMachine(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.AuthMachine.Supervised {
+			if !cfg.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
@@ -82,28 +91,26 @@ func AuthMachine(cfg *config.Config) *cli.Command {
 func authMachineConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"core": map[string]interface{}{
-			"max_cpus":             cfg.Reva.AuthMachine.MaxCPUs,
 			"tracing_enabled":      cfg.Tracing.Enabled,
 			"tracing_endpoint":     cfg.Tracing.Endpoint,
 			"tracing_collector":    cfg.Tracing.Collector,
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.Reva.JWTSecret,
-			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
-			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
+			"jwt_secret":                cfg.JWTSecret,
+			"gatewaysvc":                cfg.GatewayEndpoint,
+			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
-			"network": cfg.Reva.AuthMachine.GRPCNetwork,
-			"address": cfg.Reva.AuthMachine.GRPCAddr,
+			"network": cfg.GRPC.Protocol,
+			"address": cfg.GRPC.Addr,
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"authprovider": map[string]interface{}{
 					"auth_manager": "machine",
 					"auth_managers": map[string]interface{}{
 						"machine": map[string]interface{}{
-							"api_key":      cfg.Reva.AuthMachineConfig.MachineAuthAPIKey,
-							"gateway_addr": cfg.Reva.Gateway.Endpoint,
+							"api_key": cfg.AuthProviders.Machine.APIKey,
 						},
 					},
 				},
@@ -119,28 +126,29 @@ type AuthMachineSutureService struct {
 
 // NewAuthMachineSutureService creates a new gateway.AuthMachineSutureService
 func NewAuthMachine(cfg *ociscfg.Config) suture.Service {
-	cfg.Storage.Commons = cfg.Commons
+	cfg.AuthMachine.Commons = cfg.Commons
 	return AuthMachineSutureService{
-		cfg: cfg.Storage,
+		cfg: cfg.AuthMachine,
 	}
 }
 
 func (s AuthMachineSutureService) Serve(ctx context.Context) error {
-	s.cfg.Reva.AuthMachine.Context = ctx
+	// s.cfg.Reva.AuthMachine.Context = ctx
+	cmd := AuthMachine(s.cfg)
 	f := &flag.FlagSet{}
-	cmdFlags := AuthMachine(s.cfg).Flags
+	cmdFlags := cmd.Flags
 	for k := range cmdFlags {
 		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}
 	cliCtx := cli.NewContext(nil, f, nil)
-	if AuthMachine(s.cfg).Before != nil {
-		if err := AuthMachine(s.cfg).Before(cliCtx); err != nil {
+	if cmd.Before != nil {
+		if err := cmd.Before(cliCtx); err != nil {
 			return err
 		}
 	}
-	if err := AuthMachine(s.cfg).Action(cliCtx); err != nil {
+	if err := cmd.Action(cliCtx); err != nil {
 		return err
 	}
 
