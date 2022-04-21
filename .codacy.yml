@@ -15,5 +15,6 @@ exclude_paths:
   - 'deployments/**'
   - 'tests/acceptance/expected-failures-*.md'
   - 'tests/acceptance/features/bootstrap/**'
+  - 'tests/TestHelpers/**'
 
 ...
