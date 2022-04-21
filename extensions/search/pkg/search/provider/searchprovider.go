@@ -5,26 +5,71 @@ import (
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/extensions/search/pkg/search"
+	"google.golang.org/grpc/metadata"
 
 	searchmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
 )
 
 type Provider struct {
-	gwClient    gateway.GatewayAPIClient
-	indexClient search.IndexClient
+	gwClient          gateway.GatewayAPIClient
+	indexClient       search.IndexClient
+	machineAuthAPIKey string
 }
 
-func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient) *Provider {
+func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, machineAuthAPIKey string, eventsChan <-chan interface{}) *Provider {
+	go func() {
+		for {
+			ev := <-eventsChan
+			var ref *providerv1beta1.Reference
+			var owner *user.User
+			switch e := ev.(type) {
+			case events.FileUploaded:
+				ref = e.FileID
+				owner = &user.User{
+					Id: e.Executant,
+				}
+			default:
+				// Not sure what to do here. Skip.
+				continue
+			}
+
+			// Get auth
+			ownerCtx := ctxpkg.ContextSetUser(context.Background(), owner)
+			authRes, err := gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
+				Type:         "machine",
+				ClientId:     "userid:" + owner.Id.OpaqueId,
+				ClientSecret: machineAuthAPIKey,
+			})
+			if err != nil || authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+				// TODO: log error
+			}
+			ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token)
+
+			// Stat changed resource resource
+			statRes, err := gwClient.Stat(ownerCtx, &providerv1beta1.StatRequest{Ref: ref})
+			if err != nil || statRes.Status.Code != rpc.Code_CODE_OK {
+				// TODO: log error
+			}
+
+			indexClient.Add(ref, statRes.Info)
+		}
+	}()
+
 	return &Provider{
-		gwClient:    gwClient,
-		indexClient: indexClient,
+		gwClient:          gwClient,
+		indexClient:       indexClient,
+		machineAuthAPIKey: machineAuthAPIKey,
 	}
 }
 

@@ -7,9 +7,11 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/owncloud/ocis/extensions/search/pkg/search/mocks"
@@ -24,7 +26,8 @@ var _ = Describe("Searchprovider", func() {
 		gwClient    *cs3mocks.GatewayAPIClient
 		indexClient *mocks.IndexClient
 
-		ctx context.Context
+		ctx        context.Context
+		eventsChan chan interface{}
 
 		otherUser = &userv1beta1.User{
 			Id: &userv1beta1.UserId{
@@ -44,20 +47,65 @@ var _ = Describe("Searchprovider", func() {
 			Root: &sprovider.ResourceId{OpaqueId: "personalspaceroot"},
 			Name: "personalspace",
 		}
+
+		ref = &sprovider.Reference{
+			ResourceId: &sprovider.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "rootopaqueid",
+			},
+			Path: "./foo.pdf",
+		}
+		ri = &sprovider.ResourceInfo{
+			Id: &sprovider.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "opaqueid",
+			},
+			Path: "foo.pdf",
+			Size: 12345,
+		}
 	)
 
 	BeforeEach(func() {
 		ctx = context.Background()
+		eventsChan = make(chan interface{})
 		gwClient = &cs3mocks.GatewayAPIClient{}
 		indexClient = &mocks.IndexClient{}
 
-		p = provider.New(gwClient, indexClient)
+		p = provider.New(gwClient, indexClient, "", eventsChan)
 	})
 
 	Describe("New", func() {
 		It("returns a new instance", func() {
-			p := provider.New(gwClient, indexClient)
+			p := provider.New(gwClient, indexClient, "", eventsChan)
 			Expect(p).ToNot(BeNil())
+		})
+	})
+
+	Describe("events", func() {
+		BeforeEach(func() {
+			gwClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
+				Token: "authtoken",
+			}, nil)
+			gwClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+				Status: status.NewOK(context.Background()),
+				Info:   ri,
+			}, nil)
+		})
+
+		It("trigger an index change", func() {
+			called := false
+			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
+				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
+			})).Return(nil).Run(func(args mock.Arguments) {
+				called = true
+			})
+			eventsChan <- events.FileUploaded{
+				FileID: ref,
+			}
+
+			Eventually(func() bool {
+				return called
+			}).Should(BeTrue())
 		})
 	})
 

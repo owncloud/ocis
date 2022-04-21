@@ -3,9 +3,13 @@ package service
 import (
 	"context"
 
+	"github.com/asim/go-micro/plugins/events/natsjs/v4"
 	"github.com/blevesearch/bleve/v2"
+	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/events/server"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 
+	"github.com/owncloud/ocis/extensions/audit/pkg/types"
 	"github.com/owncloud/ocis/extensions/search/pkg/config"
 	"github.com/owncloud/ocis/extensions/search/pkg/search"
 	"github.com/owncloud/ocis/extensions/search/pkg/search/index"
@@ -19,6 +23,20 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
 	options := newOptions(opts...)
 	logger := options.Logger
 	cfg := options.Config
+
+	// Connect to nats to listen for changes that need to trigger an index update
+	evtsCfg := cfg.Events
+	client, err := server.NewNatsStream(
+		natsjs.Address(evtsCfg.Endpoint),
+		natsjs.ClusterID(evtsCfg.Cluster),
+	)
+	if err != nil {
+		return nil, err
+	}
+	evts, err := events.Consume(client, evtsCfg.ConsumerGroup, types.RegisteredEvents()...)
+	if err != nil {
+		return nil, err
+	}
 
 	bleveIndex, err := bleve.NewMemOnly(index.BuildMapping())
 	if err != nil {
@@ -34,7 +52,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
 		logger.Fatal().Err(err).Str("addr", cfg.Reva.Address).Msg("could not get reva client")
 	}
 
-	provider := searchprovider.New(gwclient, index)
+	provider := searchprovider.New(gwclient, index, cfg.MachineAuthAPIKey, evts)
 
 	return &Service{
 		id:       cfg.GRPC.Namespace + "." + cfg.Service.Name,

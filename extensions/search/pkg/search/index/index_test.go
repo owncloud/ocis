@@ -177,7 +177,7 @@ var _ = Describe("Index", func() {
 		})
 	})
 
-	Describe("Index", func() {
+	Describe("Add", func() {
 		It("adds a resourceInfo to the index", func() {
 			err := i.Add(ref, ri)
 			Expect(err).ToNot(HaveOccurred())

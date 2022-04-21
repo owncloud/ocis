@@ -23,6 +23,12 @@ func DefaultConfig() *config.Config {
 		TokenManager: config.TokenManager{
 			JWTSecret: "Pive-Fumkiu4",
 		},
+		Events: config.Events{
+			Endpoint:      "127.0.0.1:9233",
+			Cluster:       "ocis-cluster",
+			ConsumerGroup: "search",
+		},
+		MachineAuthAPIKey: "change-me-please",
 	}
 }
 

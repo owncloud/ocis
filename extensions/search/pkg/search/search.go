@@ -21,6 +21,7 @@ package search
 import (
 	"context"
 
+	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
 )
 
@@ -35,4 +36,5 @@ type ProviderClient interface {
 // IndexClient is the interface to the search index
 type IndexClient interface {
 	Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (*searchsvc.SearchIndexResponse, error)
+	Add(ref *providerv1beta1.Reference, ri *providerv1beta1.ResourceInfo) error
 }
