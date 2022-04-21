@@ -35,21 +35,21 @@ _ocdav: double check the webdav property parsing when custom namespaces are used
 
 #### [downloading an old version of a file returns 501](https://github.com/owncloud/ocis/issues/2261)
 
-- [apiVersions/fileVersions.feature:426](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L426)
 - [apiVersions/fileVersions.feature:444](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L444)
-- [apiVersions/fileVersionsSharingToShares.feature:305](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L305)
+- [apiVersions/fileVersions.feature:462](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L462)
+- [apiVersions/fileVersionsSharingToShares.feature:306](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L306)
 
 #### [file versions do not report the version author](https://github.com/owncloud/ocis/issues/2914)
 
 - [apiVersions/fileVersionAuthor.feature:14](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L14)
-- [apiVersions/fileVersionAuthor.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L36)
-- [apiVersions/fileVersionAuthor.feature:56](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L56)
-- [apiVersions/fileVersionAuthor.feature:75](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L75)
-- [apiVersions/fileVersionAuthor.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L101)
-- [apiVersions/fileVersionAuthor.feature:128](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L128)
-- [apiVersions/fileVersionAuthor.feature:155](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L155)
+- [apiVersions/fileVersionAuthor.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L37)
+- [apiVersions/fileVersionAuthor.feature:58](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L58)
+- [apiVersions/fileVersionAuthor.feature:78](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L78)
+- [apiVersions/fileVersionAuthor.feature:104](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L104)
+- [apiVersions/fileVersionAuthor.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L129)
+- [apiVersions/fileVersionAuthor.feature:154](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L154)
 - [apiVersions/fileVersionAuthor.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L180)
-- [apiVersions/fileVersionAuthor.feature:220](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L220)
+- [apiVersions/fileVersionAuthor.feature:223](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L223)
 
 ### Sync
 
@@ -686,8 +686,8 @@ Scenario Outline: Moving a file into a shared folder as the sharee and as the sh
 
 #### [not possible to move file into a received folder](https://github.com/owncloud/ocis/issues/764)
 
-- [apiVersions/fileVersionsSharingToShares.feature:219](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L219)
 - [apiVersions/fileVersionsSharingToShares.feature:220](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L220)
+- [apiVersions/fileVersionsSharingToShares.feature:221](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L221)
 
 #### [Expiration date for shares is not implemented](https://github.com/owncloud/ocis/issues/1250)
 
@@ -890,7 +890,7 @@ _ocs: api compatibility, return correct status code_
 
 #### [user can access version metadata of a received share before accepting it](https://github.com/owncloud/ocis/issues/760)
 
-- [apiVersions/fileVersionsSharingToShares.feature:282](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L282)
+- [apiVersions/fileVersionsSharingToShares.feature:283](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L283)
 
 #### [Share lists deleted user as 'user'](https://github.com/owncloud/ocis/issues/903)
 
@@ -1060,22 +1060,22 @@ And other missing implementation of favorites
 - [apiFavorites/favoritesSharingToShares.feature:83](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favoritesSharingToShares.feature#L83)
 - [apiFavorites/favoritesSharingToShares.feature:108](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favoritesSharingToShares.feature#L108)
 - [apiMain/checksums.feature:211](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L211)
-- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:49](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L49)
-- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:75](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L75)
-- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:94](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L94)
-- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:120](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L120)
-- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:139](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L139)
-- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:165](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L165)
-- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:203](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L203)
-- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:228](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L228)
-- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:247](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L247)
-- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:273](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L273)
-- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:292](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L292)
-- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:318](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L318)
-- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:337](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L337)
-- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:363](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L363)
-- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:382](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L382)
-- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:408](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L408)
+- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:51](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L51)
+- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:78](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L78)
+- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:98](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L98)
+- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L125)
+- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:145](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L145)
+- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:172](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L172)
+- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:212](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L212)
+- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:238](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L238)
+- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:258](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L258)
+- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:285](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L285)
+- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:305](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L305)
+- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:332](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L332)
+- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:352](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L352)
+- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:379](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L379)
+- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:399](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L399)
+- [apiShareOperationsToShares2/getWebDAVSharePermissions.feature:426](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/getWebDAVSharePermissions.feature#L426)
 - [apiShareOperationsToShares2/uploadToShare.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L47)
 - [apiShareOperationsToShares2/uploadToShare.feature:78](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L78)
 - [apiShareOperationsToShares2/uploadToShare.feature:111](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L111)
@@ -1657,20 +1657,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature:52](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature#L52)
 - [apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature:53](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature#L53)
 - [apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature:54](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature#L54)
-
-### [url doesn't have value 'AN_URL'](https://github.com/owncloud/ocis/issues/)
-
-- [apiSharePublicLink2/updatePublicLinkShare.feature:79](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L79)
-- [apiSharePublicLink2/updatePublicLinkShare.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L180)
-- [apiSharePublicLink2/updatePublicLinkShare.feature:181](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L181)
-- [apiSharePublicLink2/updatePublicLinkShare.feature:212](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L212)
-- [apiSharePublicLink2/updatePublicLinkShare.feature:213](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L213)
-- [apiSharePublicLink2/updatePublicLinkShare.feature:244](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L244)
-- [apiSharePublicLink2/updatePublicLinkShare.feature:245](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L245)
-- [apiSharePublicLink2/updatePublicLinkShare.feature:276](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L276)
-- [apiSharePublicLink2/updatePublicLinkShare.feature:277](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L277)
-- [apiSharePublicLink2/updatePublicLinkShare.feature:308](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L308)
-- [apiSharePublicLink2/updatePublicLinkShare.feature:309](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/updatePublicLinkShare.feature#L309)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
