@@ -6,16 +6,16 @@ import (
 	"os"
 	"path"
 
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/tracing"
 
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/extensions/storage/pkg/command/storagedrivers"
-	"github.com/owncloud/ocis/extensions/storage/pkg/config"
+	"github.com/owncloud/ocis/extensions/storage-metadata/pkg/config"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/extensions/storage/pkg/service/external"
-	"github.com/owncloud/ocis/extensions/storage/pkg/tracing"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/thejerf/suture/v4"
@@ -27,22 +27,25 @@ import (
 // It provides a ocis-specific storage store metadata (shares,account,settings...)
 func StorageMetadata(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "storage-metadata",
-		Usage: "start storage-metadata service",
-		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg, "storage-metadata")
-		},
+		Name:     "storage-metadata",
+		Usage:    "start storage-metadata service",
 		Category: "extensions",
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-			tracing.Configure(cfg, logger)
+			logCfg := cfg.Logging
+			logger := log.NewLogger(
+				log.Level(logCfg.Level),
+				log.File(logCfg.File),
+				log.Pretty(logCfg.Pretty),
+				log.Color(logCfg.Color),
+			)
+			tracing.Configure(cfg.Tracing.Enabled, cfg.Tracing.Type, logger)
 
 			gr := run.Group{}
 			ctx, cancel := func() (context.Context, context.CancelFunc) {
-				if cfg.Reva.StorageMetadata.Context == nil {
+				if cfg.Context == nil {
 					return context.WithCancel(context.Background())
 				}
-				return context.WithCancel(cfg.Reva.StorageMetadata.Context)
+				return context.WithCancel(cfg.Context)
 			}()
 
 			defer cancel()
@@ -67,10 +70,12 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 
 			debugServer, err := debug.Server(
 				debug.Name(c.Command.Name+"-debug"),
-				debug.Addr(cfg.Reva.StorageMetadata.DebugAddr),
+				debug.Addr(cfg.Debug.Addr),
 				debug.Logger(logger),
 				debug.Context(ctx),
-				debug.Config(cfg),
+				debug.Pprof(cfg.Debug.Pprof),
+				debug.Zpages(cfg.Debug.Zpages),
+				debug.Token(cfg.Debug.Token),
 			)
 
 			if err != nil {
@@ -89,7 +94,7 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageMetadata.Supervised {
+			if !cfg.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
@@ -97,7 +102,7 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 				ctx,
 				"com.owncloud.storage.metadata",
 				uuid.Must(uuid.NewV4()).String(),
-				cfg.Reva.StorageMetadata.GRPCAddr,
+				cfg.GRPC.Addr,
 				version.String,
 				logger,
 			); err != nil {
@@ -113,43 +118,42 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
 	rcfg := map[string]interface{}{
 		"core": map[string]interface{}{
-			"max_cpus":             cfg.Reva.StorageMetadata.MaxCPUs,
 			"tracing_enabled":      cfg.Tracing.Enabled,
 			"tracing_endpoint":     cfg.Tracing.Endpoint,
 			"tracing_collector":    cfg.Tracing.Collector,
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.Reva.JWTSecret,
-			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
-			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
+			"jwt_secret":                cfg.JWTSecret,
+			"gatewaysvc":                cfg.GatewayEndpoint,
+			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
-			"network": cfg.Reva.StorageMetadata.GRPCNetwork,
-			"address": cfg.Reva.StorageMetadata.GRPCAddr,
+			"network": cfg.GRPC.Protocol,
+			"address": cfg.GRPC.Addr,
 			"interceptors": map[string]interface{}{
 				"log": map[string]interface{}{},
 			},
 			"services": map[string]interface{}{
 				"storageprovider": map[string]interface{}{
-					"driver":          cfg.Reva.StorageMetadata.Driver,
-					"drivers":         storagedrivers.MetadataDrivers(cfg),
-					"data_server_url": cfg.Reva.StorageMetadata.DataServerURL,
-					"tmp_folder":      cfg.Reva.StorageMetadata.TempFolder,
+					"driver":          cfg.Driver,
+					"drivers":         config.MetadataDrivers(cfg),
+					"data_server_url": cfg.DataServerURL,
+					"tmp_folder":      cfg.TempFolder,
 				},
 			},
 		},
 		"http": map[string]interface{}{
-			"network": cfg.Reva.StorageMetadata.HTTPNetwork,
-			"address": cfg.Reva.StorageMetadata.HTTPAddr,
+			"network": cfg.HTTP.Protocol,
+			"address": cfg.HTTP.Addr,
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"dataprovider": map[string]interface{}{
 					"prefix":      "data",
-					"driver":      cfg.Reva.StorageMetadata.Driver,
-					"drivers":     storagedrivers.MetadataDrivers(cfg),
+					"driver":      cfg.Driver,
+					"drivers":     config.MetadataDrivers(cfg),
 					"timeout":     86400,
-					"insecure":    cfg.Reva.StorageMetadata.DataProvider.Insecure,
+					"insecure":    cfg.DataProviderInsecure,
 					"disable_tus": true,
 				},
 			},
@@ -165,14 +169,14 @@ type MetadataSutureService struct {
 
 // NewSutureService creates a new storagemetadata.SutureService
 func NewStorageMetadata(cfg *ociscfg.Config) suture.Service {
-	cfg.Storage.Commons = cfg.Commons
+	cfg.StorageMetadata.Commons = cfg.Commons
 	return MetadataSutureService{
-		cfg: cfg.Storage,
+		cfg: cfg.StorageMetadata,
 	}
 }
 
 func (s MetadataSutureService) Serve(ctx context.Context) error {
-	s.cfg.Reva.StorageMetadata.Context = ctx
+	s.cfg.Context = ctx
 	f := &flag.FlagSet{}
 	cmdFlags := StorageMetadata(s.cfg).Flags
 	for k := range cmdFlags {

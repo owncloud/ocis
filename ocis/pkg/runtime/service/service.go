@@ -35,6 +35,7 @@ import (
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/command"
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/command"
 	sharing "github.com/owncloud/ocis/extensions/sharing/pkg/command"
+	storagemetadata "github.com/owncloud/ocis/extensions/storage-metadata/pkg/command"
 	storage "github.com/owncloud/ocis/extensions/storage/pkg/command"
 	store "github.com/owncloud/ocis/extensions/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/command"
@@ -101,7 +102,7 @@ func NewService(options ...Option) (*Service, error) {
 
 	s.ServicesRegistry["settings"] = settings.NewSutureService
 	s.ServicesRegistry["nats"] = nats.NewSutureService
-	s.ServicesRegistry["storage-metadata"] = storage.NewStorageMetadata
+	s.ServicesRegistry["storage-metadata"] = storagemetadata.NewStorageMetadata
 	s.ServicesRegistry["glauth"] = glauth.NewSutureService
 	s.ServicesRegistry["graph"] = graph.NewSutureService
 	s.ServicesRegistry["graph-explorer"] = graphExplorer.NewSutureService

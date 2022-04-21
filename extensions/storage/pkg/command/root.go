@@ -24,7 +24,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 		StoragePublicLink(cfg),
 		StorageShares(cfg),
 		StorageUsers(cfg),
-		StorageMetadata(cfg),
+		// StorageMetadata(cfg),
 		Health(cfg),
 	}
 }

@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/owncloud/ocis/extensions/storage/pkg/command"
+	"github.com/owncloud/ocis/extensions/storage-metadata/pkg/command"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
@@ -13,11 +13,11 @@ func StorageMetadataCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-metadata",
 		Usage:    "start storage and data service for metadata",
 		Category: "extensions",
-		Before: func(ctx *cli.Context) error {
-			return ParseStorageCommon(ctx, cfg)
-		},
+		// Before: func(ctx *cli.Context) error {
+		// 	return ParseStorageCommon(ctx, cfg)
+		// },
 		Action: func(c *cli.Context) error {
-			origCmd := command.StorageMetadata(cfg.Storage)
+			origCmd := command.StorageMetadata(cfg.StorageMetadata)
 			return handleOriginalAction(c, origCmd)
 		},
 	}
