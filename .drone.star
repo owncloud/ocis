@@ -76,16 +76,16 @@ config = {
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "accountsUITests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "settingsUITests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "parallelApiTests": {
@@ -107,7 +107,7 @@ config = {
         },
     },
     "graphApiTests": {
-        "skip": False,
+        "skip": True,
         "earlyFali": False,
         "numberOfParts": 10,
         "skipExceptParts": [],
@@ -501,6 +501,9 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
                 "name": "localApiTests-%s-%s" % (suite, storage),
                 "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
                 "environment": {
+                    "TEST_WITH_GRAPH_API": "true",
+                    "PATH_TO_OCIS": "/drone/src",
+                    "PATH_TO_CORE": "/srv/app/testrunner",
                     "TEST_SERVER_URL": "https://ocis-server:9200",
                     "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
                     "SKELETON_DIR": "/srv/app/tmp/testing/data/apiSkeleton",
@@ -509,8 +512,7 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
                     "SEND_SCENARIO_LINE_REFERENCES": "true",
                     "STORAGE_DRIVER": storage,
                     "BEHAT_SUITE": suite,
-                    "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
-                    "PATH_TO_CORE": "/srv/app/testrunner",
+                    "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
                     "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (storage.upper()),
                     "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                 },
@@ -566,6 +568,8 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
     early_fail = config["apiTests"]["earlyFail"] if "earlyFail" in config["apiTests"] else False
+    filterTags = "~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage&&~@issue-ocis-3023" % ("OC" if storage == "owncloud" else "OCIS")
+    expectedFailuresFile = "/drone/src/tests/acceptance/expected-failures-graphAPI-on-%s-storage.md" % (storage.upper())
 
     return {
         "kind": "pipeline",
@@ -582,6 +586,9 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                 "name": "oC10ApiTests-%s-storage-%s" % (storage, part_number),
                 "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
                 "environment": {
+                    "TEST_WITH_GRAPH_API": "true",
+                    "PATH_TO_OCIS": "/drone/src",
+                    "PATH_TO_CORE": "/srv/app/testrunner",
                     "TEST_SERVER_URL": "https://ocis-server:9200",
                     "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
                     "SKELETON_DIR": "/srv/app/tmp/testing/data/apiSkeleton",
@@ -589,10 +596,10 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                     "TEST_OCIS": "true",
                     "SEND_SCENARIO_LINE_REFERENCES": "true",
                     "STORAGE_DRIVER": storage,
-                    "BEHAT_FILTER_TAGS": "~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage&&~@issue-ocis-3023" % ("OC" if storage == "owncloud" else "OCIS"),
+                    "BEHAT_FILTER_TAGS": filterTags,
                     "DIVIDE_INTO_NUM_PARTS": number_of_parts,
                     "RUN_PART": part_number,
-                    "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-API-on-%s-storage.md" % (storage.upper()),
+                    "EXPECTED_FAILURES_FILE": expectedFailuresFile,
                     "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                 },
                 "commands": [
@@ -1689,10 +1696,9 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "PROXY_ENABLE_BASIC_AUTH": True,
             "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
             "IDP_IDENTIFIER_REGISTRATION_CONF": "/drone/src/tests/config/drone/identifier-registration.yml",
-            "OCIS_LOG_LEVEL": "error",
+            "OCIS_LOG_LEVEL": "debug",
             "SETTINGS_DATA_PATH": "/srv/app/tmp/ocis/settings",
             "OCIS_INSECURE": "true",
-            "ACCOUNTS_DEMO_USERS_AND_GROUPS": True,  # deprecated, remove after switching to LibreIDM
             "IDM_CREATE_DEMO_USERS": True,
         }
         wait_for_ocis = {
@@ -1706,6 +1712,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
     else:
         user = "33:33"
         environment = {
+            "GRAPH_IDENTITY_BACKEND": "cs3",
+            "GRAPH_LDAP_SERVER_WRITE_ENABLED": "false",
             # Keycloak IDP specific configuration
             "PROXY_OIDC_ISSUER": "https://keycloak/auth/realms/owncloud",
             "WEB_OIDC_AUTHORITY": "https://keycloak/auth/realms/owncloud",
@@ -1780,7 +1788,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_MACHINE_AUTH_API_KEY": "change-me-please",
             "OCIS_INSECURE": "true",
             "PROXY_ENABLE_BASIC_AUTH": "true",
-            "ACCOUNTS_DEMO_USERS_AND_GROUPS": True,  # deprecated, remove after switching to LibreIDM
             "IDM_CREATE_DEMO_USERS": True,
         }
         wait_for_ocis = {
@@ -2509,7 +2516,7 @@ def graphApiTests(ctx, part_number = 1, number_of_parts = 1):
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                 ocisServerWithIdp() +
+                 ocisServer() +
                  cloneCoreRepos() + [
             {
                 "name": "Graph-oC10ApiTests-%s-storage-%s" % (storage, part_number),
