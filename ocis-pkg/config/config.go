@@ -22,6 +22,7 @@ import (
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/config"
 	sharing "github.com/owncloud/ocis/extensions/sharing/pkg/config"
 	storagemetadata "github.com/owncloud/ocis/extensions/storage-metadata/pkg/config"
+	storagepublic "github.com/owncloud/ocis/extensions/storage-publiclink/pkg/config"
 	storage "github.com/owncloud/ocis/extensions/storage/pkg/config"
 	store "github.com/owncloud/ocis/extensions/store/pkg/config"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
@@ -67,29 +68,30 @@ type Config struct {
 	TokenManager TokenManager `yaml:"token_manager"`
 	Runtime      Runtime      `yaml:"runtime"`
 
-	Audit           *audit.Config           `yaml:"audit"`
-	Accounts        *accounts.Config        `yaml:"accounts"`
-	GLAuth          *glauth.Config          `yaml:"glauth"`
-	Graph           *graph.Config           `yaml:"graph"`
-	GraphExplorer   *graphExplorer.Config   `yaml:"graph_explorer"`
-	IDP             *idp.Config             `yaml:"idp"`
-	IDM             *idm.Config             `yaml:"idm"`
-	Nats            *nats.Config            `yaml:"nats"`
-	Notifications   *notifications.Config   `yaml:"notifications"`
-	OCS             *ocs.Config             `yaml:"ocs"`
-	Web             *web.Config             `yaml:"web"`
-	Proxy           *proxy.Config           `yaml:"proxy"`
-	Settings        *settings.Config        `yaml:"settings"`
-	Storage         *storage.Config         `yaml:"storage"`
-	AuthBasic       *authbasic.Config       `yaml:"auth_basic"`
-	AuthBearer      *authbearer.Config      `yaml:"auth_bearer"`
-	AuthMachine     *authmachine.Config     `yaml:"auth_machine"`
-	User            *user.Config            `yaml:"user"`
-	Group           *group.Config           `yaml:"group"`
-	AppProvider     *appprovider.Config     `yaml:"app_provider"`
-	Sharing         *sharing.Config         `yaml:"app_provider"`
-	StorageMetadata *storagemetadata.Config `yaml:"storage_metadata"`
-	Store           *store.Config           `yaml:"store"`
-	Thumbnails      *thumbnails.Config      `yaml:"thumbnails"`
-	WebDAV          *webdav.Config          `yaml:"webdav"`
+	Audit             *audit.Config           `yaml:"audit"`
+	Accounts          *accounts.Config        `yaml:"accounts"`
+	GLAuth            *glauth.Config          `yaml:"glauth"`
+	Graph             *graph.Config           `yaml:"graph"`
+	GraphExplorer     *graphExplorer.Config   `yaml:"graph_explorer"`
+	IDP               *idp.Config             `yaml:"idp"`
+	IDM               *idm.Config             `yaml:"idm"`
+	Nats              *nats.Config            `yaml:"nats"`
+	Notifications     *notifications.Config   `yaml:"notifications"`
+	OCS               *ocs.Config             `yaml:"ocs"`
+	Web               *web.Config             `yaml:"web"`
+	Proxy             *proxy.Config           `yaml:"proxy"`
+	Settings          *settings.Config        `yaml:"settings"`
+	Storage           *storage.Config         `yaml:"storage"`
+	AuthBasic         *authbasic.Config       `yaml:"auth_basic"`
+	AuthBearer        *authbearer.Config      `yaml:"auth_bearer"`
+	AuthMachine       *authmachine.Config     `yaml:"auth_machine"`
+	User              *user.Config            `yaml:"user"`
+	Group             *group.Config           `yaml:"group"`
+	AppProvider       *appprovider.Config     `yaml:"app_provider"`
+	Sharing           *sharing.Config         `yaml:"app_provider"`
+	StorageMetadata   *storagemetadata.Config `yaml:"storage_metadata"`
+	StoragePublicLink *storagepublic.Config   `yaml:"storage_public"`
+	Store             *store.Config           `yaml:"store"`
+	Thumbnails        *thumbnails.Config      `yaml:"thumbnails"`
+	WebDAV            *webdav.Config          `yaml:"webdav"`
 }
