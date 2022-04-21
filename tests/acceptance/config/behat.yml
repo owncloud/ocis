@@ -16,7 +16,7 @@ default:
         - RevaContext:
         - OccContext:
         - FeatureContext: &common_feature_context_params
-            baseUrl:  http://localhost:8080
+            baseUrl: http://localhost:8080
             adminUsername: admin
             adminPassword: admin
             regularUserPassword: 123456
@@ -57,8 +57,4 @@ default:
         - PublicWebDavContext:
 
   extensions:
-    jarnaiz\JUnitFormatter\JUnitFormatterExtension:
-      filename: report.xml
-      outputDir: '%paths.base%/../output/'
-
     Cjm\Behat\StepThroughExtension: ~
