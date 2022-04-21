@@ -21,6 +21,7 @@ import (
 	sharing "github.com/owncloud/ocis/extensions/sharing/pkg/config/defaults"
 	storagemetadata "github.com/owncloud/ocis/extensions/storage-metadata/pkg/config/defaults"
 	storagepublic "github.com/owncloud/ocis/extensions/storage-publiclink/pkg/config/defaults"
+	storageusers "github.com/owncloud/ocis/extensions/storage-users/pkg/config/defaults"
 	storage "github.com/owncloud/ocis/extensions/storage/pkg/config/defaults"
 	store "github.com/owncloud/ocis/extensions/store/pkg/config/defaults"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config/defaults"
@@ -63,6 +64,7 @@ func DefaultConfig() *Config {
 		Sharing:           sharing.FullDefaultConfig(),
 		StorageMetadata:   storagemetadata.FullDefaultConfig(),
 		StoragePublicLink: storagepublic.FullDefaultConfig(),
+		StorageUsers:      storageusers.FullDefaultConfig(),
 		AppProvider:       appprovider.FullDefaultConfig(),
 	}
 }

@@ -23,6 +23,7 @@ import (
 	sharing "github.com/owncloud/ocis/extensions/sharing/pkg/config"
 	storagemetadata "github.com/owncloud/ocis/extensions/storage-metadata/pkg/config"
 	storagepublic "github.com/owncloud/ocis/extensions/storage-publiclink/pkg/config"
+	storageusers "github.com/owncloud/ocis/extensions/storage-users/pkg/config"
 	storage "github.com/owncloud/ocis/extensions/storage/pkg/config"
 	store "github.com/owncloud/ocis/extensions/store/pkg/config"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
@@ -91,6 +92,7 @@ type Config struct {
 	Sharing           *sharing.Config         `yaml:"app_provider"`
 	StorageMetadata   *storagemetadata.Config `yaml:"storage_metadata"`
 	StoragePublicLink *storagepublic.Config   `yaml:"storage_public"`
+	StorageUsers      *storageusers.Config    `yaml:"storage_users"`
 	Store             *store.Config           `yaml:"store"`
 	Thumbnails        *thumbnails.Config      `yaml:"thumbnails"`
 	WebDAV            *webdav.Config          `yaml:"webdav"`

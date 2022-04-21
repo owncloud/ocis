@@ -38,6 +38,7 @@ import (
 	sharing "github.com/owncloud/ocis/extensions/sharing/pkg/command"
 	storagemetadata "github.com/owncloud/ocis/extensions/storage-metadata/pkg/command"
 	storagepublic "github.com/owncloud/ocis/extensions/storage-publiclink/pkg/command"
+	storageusers "github.com/owncloud/ocis/extensions/storage-users/pkg/command"
 	storage "github.com/owncloud/ocis/extensions/storage/pkg/command"
 	store "github.com/owncloud/ocis/extensions/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/command"
@@ -123,7 +124,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["storage-authbasic"] = authbasic.NewAuthBasic
 	s.ServicesRegistry["storage-authbearer"] = authbearer.NewAuthBearer
 	s.ServicesRegistry["storage-authmachine"] = authmachine.NewAuthMachine
-	s.ServicesRegistry["storage-users"] = storage.NewStorageUsers
+	s.ServicesRegistry["storage-users"] = storageusers.NewStorageUsers
 	s.ServicesRegistry["storage-shares"] = storage.NewStorageShares
 	s.ServicesRegistry["storage-public-link"] = storagepublic.NewStoragePublicLink
 	s.ServicesRegistry["storage-appprovider"] = appprovider.NewAppProvider

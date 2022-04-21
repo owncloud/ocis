@@ -9,12 +9,12 @@ import (
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/extensions/storage/pkg/command/storagedrivers"
-	"github.com/owncloud/ocis/extensions/storage/pkg/config"
+	"github.com/owncloud/ocis/extensions/storage-users/pkg/config"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
-	"github.com/owncloud/ocis/extensions/storage/pkg/tracing"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/tracing"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
 )
@@ -24,17 +24,20 @@ func StorageUsers(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-users",
 		Usage: "start storage-users service",
-		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg, "storage-userprovider")
-		},
+		// Before: func(c *cli.Context) error {
+		// 	return ParseConfig(c, cfg, "storage-userprovider")
+		// },
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-
-			tracing.Configure(cfg, logger)
-
+			logCfg := cfg.Logging
+			logger := log.NewLogger(
+				log.Level(logCfg.Level),
+				log.File(logCfg.File),
+				log.Pretty(logCfg.Pretty),
+				log.Color(logCfg.Color),
+			)
+			tracing.Configure(cfg.Tracing.Enabled, cfg.Tracing.Type, logger)
 			gr := run.Group{}
 			ctx, cancel := context.WithCancel(context.Background())
-
 			defer cancel()
 
 			uuid := uuid.Must(uuid.NewV4())
@@ -59,10 +62,12 @@ func StorageUsers(cfg *config.Config) *cli.Command {
 
 			debugServer, err := debug.Server(
 				debug.Name(c.Command.Name+"-debug"),
-				debug.Addr(cfg.Reva.StorageUsers.DebugAddr),
+				debug.Addr(cfg.Debug.Addr),
 				debug.Logger(logger),
 				debug.Context(ctx),
-				debug.Config(cfg),
+				debug.Pprof(cfg.Debug.Pprof),
+				debug.Zpages(cfg.Debug.Zpages),
+				debug.Token(cfg.Debug.Token),
 			)
 
 			if err != nil {
@@ -74,7 +79,7 @@ func StorageUsers(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.StorageUsers.Supervised {
+			if !cfg.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
@@ -87,57 +92,56 @@ func StorageUsers(cfg *config.Config) *cli.Command {
 func storageUsersConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]interface{} {
 	rcfg := map[string]interface{}{
 		"core": map[string]interface{}{
-			"max_cpus":             cfg.Reva.StorageUsers.MaxCPUs,
 			"tracing_enabled":      cfg.Tracing.Enabled,
 			"tracing_endpoint":     cfg.Tracing.Endpoint,
 			"tracing_collector":    cfg.Tracing.Collector,
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.Reva.JWTSecret,
-			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
-			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
+			"jwt_secret":                cfg.JWTSecret,
+			"gatewaysvc":                cfg.GatewayEndpoint,
+			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
-			"network": cfg.Reva.StorageUsers.GRPCNetwork,
-			"address": cfg.Reva.StorageUsers.GRPCAddr,
+			"network": cfg.GRPC.Protocol,
+			"address": cfg.GRPC.Addr,
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"storageprovider": map[string]interface{}{
-					"driver":             cfg.Reva.StorageUsers.Driver,
-					"drivers":            storagedrivers.UserDrivers(cfg),
-					"mount_id":           cfg.Reva.StorageUsers.MountID,
-					"expose_data_server": cfg.Reva.StorageUsers.ExposeDataServer,
-					"data_server_url":    cfg.Reva.StorageUsers.DataServerURL,
-					"tmp_folder":         cfg.Reva.StorageUsers.TempFolder,
+					"driver":             cfg.Driver,
+					"drivers":            config.UserDrivers(cfg),
+					"mount_id":           cfg.MountID,
+					"expose_data_server": cfg.ExposeDataServer,
+					"data_server_url":    cfg.DataServerURL,
+					"tmp_folder":         cfg.TempFolder,
 				},
 			},
 			"interceptors": map[string]interface{}{
 				"eventsmiddleware": map[string]interface{}{
 					"group":     "sharing",
 					"type":      "nats",
-					"address":   cfg.Reva.Sharing.Events.Address,
-					"clusterID": cfg.Reva.Sharing.Events.ClusterID,
+					"address":   cfg.Events.Addr,
+					"clusterID": cfg.Events.ClusterID,
 				},
 			},
 		},
 		"http": map[string]interface{}{
-			"network": cfg.Reva.StorageUsers.HTTPNetwork,
-			"address": cfg.Reva.StorageUsers.HTTPAddr,
+			"network": cfg.HTTP.Protocol,
+			"address": cfg.HTTP.Addr,
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"dataprovider": map[string]interface{}{
-					"prefix":      cfg.Reva.StorageUsers.HTTPPrefix,
-					"driver":      cfg.Reva.StorageUsers.Driver,
-					"drivers":     storagedrivers.UserDrivers(cfg),
+					"prefix":      cfg.HTTP.Prefix,
+					"driver":      cfg.Driver,
+					"drivers":     config.UserDrivers(cfg),
 					"timeout":     86400,
-					"insecure":    cfg.Reva.StorageUsers.DataProvider.Insecure,
+					"insecure":    cfg.DataProviderInsecure,
 					"disable_tus": false,
 				},
 			},
 		},
 	}
-	if cfg.Reva.StorageUsers.ReadOnly {
+	if cfg.ReadOnly {
 		gcfg := rcfg["grpc"].(map[string]interface{})
 		gcfg["interceptors"] = map[string]interface{}{
 			"readonly": map[string]interface{}{},
@@ -153,28 +157,29 @@ type StorageUsersSutureService struct {
 
 // NewStorageUsersSutureService creates a new storage.StorageUsersSutureService
 func NewStorageUsers(cfg *ociscfg.Config) suture.Service {
-	cfg.Storage.Commons = cfg.Commons
+	cfg.StorageUsers.Commons = cfg.Commons
 	return StorageUsersSutureService{
-		cfg: cfg.Storage,
+		cfg: cfg.StorageUsers,
 	}
 }
 
 func (s StorageUsersSutureService) Serve(ctx context.Context) error {
-	s.cfg.Reva.StorageUsers.Context = ctx
+	// s.cfg.Reva.StorageUsers.Context = ctx
+	cmd := StorageUsers(s.cfg)
 	f := &flag.FlagSet{}
-	cmdFlags := StorageUsers(s.cfg).Flags
+	cmdFlags := cmd.Flags
 	for k := range cmdFlags {
 		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}
 	cliCtx := cli.NewContext(nil, f, nil)
-	if StorageUsers(s.cfg).Before != nil {
-		if err := StorageUsers(s.cfg).Before(cliCtx); err != nil {
+	if cmd.Before != nil {
+		if err := cmd.Before(cliCtx); err != nil {
 			return err
 		}
 	}
-	if err := StorageUsers(s.cfg).Action(cliCtx); err != nil {
+	if err := cmd.Action(cliCtx); err != nil {
 		return err
 	}
 
