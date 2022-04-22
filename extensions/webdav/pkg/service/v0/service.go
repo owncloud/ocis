@@ -75,7 +75,7 @@ func NewService(opts ...Option) (Service, error) {
 		r.Get("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnail)
 		r.Head("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnailHead)
 
-		r.MethodFunc("REPORT", "/remote.php/dav/files/{id}", svc.Search)
+		r.MethodFunc("REPORT", "/remote.php/dav/files/{id}/*", svc.Search)
 	})
 
 	return svc, nil
