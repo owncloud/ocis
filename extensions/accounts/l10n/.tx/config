@@ -7,4 +7,3 @@ minimum_perc = 0
 source_file = template.pot
 source_lang = en
 type = PO
-

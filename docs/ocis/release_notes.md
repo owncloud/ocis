@@ -7,6 +7,42 @@ geekdocEditPath: edit/master/docs/ocis
 geekdocFilePath: release_notes.md
 ---
 
+## ownCloud Infinite Scale 1.20.0 Technology Preview
+
+Version 1.20.0 brings major improvements, new features and bug fixes to the platform. Infinite Scale now provides complete Auditing capabilities and the basic 'Spaces' feature has reached initial feature completeness. Furthermore, ownCloud Web introduces a number of smaller features as well as more design and usability improvements.
+
+The most prominent changes in ownCloud Infinite Scale 1.20.0 and ownCloud Web 5.4.0 comprise:
+
+* The implementation of the basic 'Auditing' feature is now complete. [ocis#3467](https://github.com/owncloud/ocis/pull/3467)
+* The implementation of the basic 'Spaces' feature is now complete. [web#6693](https://github.com/owncloud/web/pull/6693) [web#6659](https://github.com/owncloud/web/pull/6659) [web#6639](https://github.com/owncloud/web/pull/6639) [web#6633](https://github.com/owncloud/web/pull/6633) [web#6662](https://github.com/owncloud/web/pull/6662) [web#6642](https://github.com/owncloud/web/pull/6642)
+* All Space members can now list all links and shares. [ocis#3370](https://github.com/owncloud/ocis/issues/3370)
+* The LDAP configuration settings have been simplified and unified across services. [#3476](https://github.com/owncloud/ocis/pull/3476)
+* All sharing options (users & links) are now united in one panel in ownCloud Web. [web#6701](https://github.com/owncloud/web/pull/6701)
+* The "Media Viewer" in ownCloud Web has been renamed to "Preview". [web#6514](https://github.com/owncloud/web/pull/6514)
+* ownCloud Web now has support for audio playback in "Preview" (e.g., MP3, WAV, FLAC, OGG). [web#6514](https://github.com/owncloud/web/pull/6514)
+* The feedback link in ownCloud Web is now customizable. See https://owncloud.dev/clients/web/getting-started/#options for more information. [web#6702](https://github.com/owncloud/web/issues/6702) 
+* ownCloud Web now supports full screen mode for external apps like web office. [web#6688](https://github.com/owncloud/web/pull/6688)
+* ownCloud Web introduces an integrated PDF viewer that user native browser capabilities. [web#6654](https://github.com/owncloud/web/pull/6654)
+* The Text Editor in ownCloud Web has received a couple of improvements. [web#6667](https://github.com/owncloud/web/pull/6667)
+* The "Shared with me" and "Shared with others" pages in ownCloud Web have received a couple of improvements. [web#5976](https://github.com/owncloud/web/issues/5976) [web#6140](https://github.com/owncloud/web/issues/6140)
+* The configuration file directory is now configurable. [ocis#3440](https://github.com/owncloud/ocis/pull/3440)
+* Infinite Scale will not create demo users by default anymore. [ocis#3474](https://github.com/owncloud/ocis/pull/3474)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v1.20.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v5.4.0) for further details on what has changed.
+
+### Breaking changes
+{{< hint warning >}}
+Due to some breaking changes, the [WOPI Server extension](https://github.com/cs3org/wopiserver) that is required for online office integrations (Collabora Online, ONLYOFFICE, Microsoft Office Online) is not compatible with the 1.20.0 release. This issue is under investigation and will be fixed with the next releases.
+{{< /hint >}}
+
+{{< hint warning >}}
+The archive download for multiple files and whole folders is currently disabled for public links. This issue is under investigation and will be fixed with the next releases.
+{{< /hint >}}
+
+{{< hint warning >}}
+We are currently in a Tech Preview state and breaking changes may occur at any time. For more information see our [release roadmap]({{< ref "./release_roadmap" >}})
+{{< /hint >}}
+
 ## ownCloud Infinite Scale 1.19.1 Technology Preview
 
 Version 1.19.1 is a bugfix release which fixes a regression in version 1.19.0.

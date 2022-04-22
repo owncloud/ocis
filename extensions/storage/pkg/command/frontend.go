@@ -264,6 +264,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 									"expire_date": map[string]interface{}{
 										"enabled": false,
 									},
+									"can_edit": true,
 								},
 								"user": map[string]interface{}{
 									"send_mail":       true,
