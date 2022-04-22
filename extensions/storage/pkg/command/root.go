@@ -13,7 +13,7 @@ import (
 func GetCommands(cfg *config.Config) cli.Commands {
 	return []*cli.Command{
 		// Frontend(cfg),
-		Gateway(cfg),
+		// Gateway(cfg),
 		// Users(cfg),
 		// Groups(cfg),
 		// AppProvider(cfg),

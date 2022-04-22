@@ -13,10 +13,6 @@ func StorageGroupProviderCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-groupprovider",
 		Usage:    "start storage groupprovider service",
 		Category: "extensions",
-		//Flags:    flagset.GroupsWithConfig(cfg.Storage),
-		Before: func(ctx *cli.Context) error {
-			return ParseStorageCommon(ctx, cfg)
-		},
 		Action: func(c *cli.Context) error {
 			origCmd := command.Groups(cfg.Group)
 			return handleOriginalAction(c, origCmd)

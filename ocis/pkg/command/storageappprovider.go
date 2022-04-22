@@ -13,10 +13,6 @@ func StorageAppProviderCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-app-provider",
 		Usage:    "start storage app-provider service",
 		Category: "extensions",
-		//Flags:    flagset.AppProviderWithConfig(cfg.Storage),
-		// Before: func(ctx *cli.Context) error {
-		// 	return ParseStorageCommon(ctx, cfg)
-		// },
 		Action: func(c *cli.Context) error {
 			origCmd := command.AppProvider(cfg.AppProvider)
 			return handleOriginalAction(c, origCmd)

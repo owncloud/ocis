@@ -8,6 +8,7 @@ import (
 	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/config/defaults"
 	authmachine "github.com/owncloud/ocis/extensions/auth-machine/pkg/config/defaults"
 	frontend "github.com/owncloud/ocis/extensions/frontend/pkg/config/defaults"
+	gateway "github.com/owncloud/ocis/extensions/gateway/pkg/config/defaults"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/config/defaults"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/config/defaults"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/config/defaults"
@@ -25,7 +26,6 @@ import (
 	storagepublic "github.com/owncloud/ocis/extensions/storage-publiclink/pkg/config/defaults"
 	storageshares "github.com/owncloud/ocis/extensions/storage-shares/pkg/config/defaults"
 	storageusers "github.com/owncloud/ocis/extensions/storage-users/pkg/config/defaults"
-	storage "github.com/owncloud/ocis/extensions/storage/pkg/config/defaults"
 	store "github.com/owncloud/ocis/extensions/store/pkg/config/defaults"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config/defaults"
 	user "github.com/owncloud/ocis/extensions/user/pkg/config/defaults"
@@ -58,7 +58,7 @@ func DefaultConfig() *Config {
 		Store:             store.DefaultConfig(),
 		Thumbnails:        thumbnails.DefaultConfig(),
 		WebDAV:            webdav.DefaultConfig(),
-		Storage:           storage.DefaultConfig(),
+		Gateway:           gateway.FullDefaultConfig(),
 		AuthBasic:         authbasic.FullDefaultConfig(),
 		AuthBearer:        authbearer.FullDefaultConfig(),
 		AuthMachine:       authmachine.FullDefaultConfig(),

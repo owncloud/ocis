@@ -10,6 +10,7 @@ import (
 	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/config"
 	authmachine "github.com/owncloud/ocis/extensions/auth-machine/pkg/config"
 	frontend "github.com/owncloud/ocis/extensions/frontend/pkg/config"
+	gateway "github.com/owncloud/ocis/extensions/gateway/pkg/config"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/config"
@@ -27,7 +28,6 @@ import (
 	storagepublic "github.com/owncloud/ocis/extensions/storage-publiclink/pkg/config"
 	storageshares "github.com/owncloud/ocis/extensions/storage-shares/pkg/config"
 	storageusers "github.com/owncloud/ocis/extensions/storage-users/pkg/config"
-	storage "github.com/owncloud/ocis/extensions/storage/pkg/config"
 	store "github.com/owncloud/ocis/extensions/store/pkg/config"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
 	user "github.com/owncloud/ocis/extensions/user/pkg/config"
@@ -85,7 +85,7 @@ type Config struct {
 	Web               *web.Config             `yaml:"web"`
 	Proxy             *proxy.Config           `yaml:"proxy"`
 	Settings          *settings.Config        `yaml:"settings"`
-	Storage           *storage.Config         `yaml:"storage"`
+	Gateway           *gateway.Config         `yaml:"gateway"`
 	Frontend          *frontend.Config        `yaml:"frontend"`
 	AuthBasic         *authbasic.Config       `yaml:"auth_basic"`
 	AuthBearer        *authbearer.Config      `yaml:"auth_bearer"`

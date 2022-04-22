@@ -13,10 +13,6 @@ func StorageFrontendCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-frontend",
 		Usage:    "start storage frontend",
 		Category: "extensions",
-		//Flags:    flagset.FrontendWithConfig(cfg.Storage),
-		// Before: func(ctx *cli.Context) error {
-		// 	return ParseStorageCommon(ctx, cfg)
-		// },
 		Action: func(c *cli.Context) error {
 			origCmd := command.Frontend(cfg.Frontend)
 			return handleOriginalAction(c, origCmd)

@@ -13,10 +13,6 @@ func StorageUsersCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-users",
 		Usage:    "start storage and data provider for /users mount",
 		Category: "extensions",
-		//Flags:    flagset.StorageUsersWithConfig(cfg.Storage),
-		// Before: func(ctx *cli.Context) error {
-		// 	return ParseStorageCommon(ctx, cfg)
-		// },
 		Action: func(c *cli.Context) error {
 			origCmd := command.StorageUsers(cfg.StorageUsers)
 			return handleOriginalAction(c, origCmd)

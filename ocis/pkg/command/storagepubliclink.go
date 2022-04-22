@@ -13,10 +13,6 @@ func StoragePublicLinkCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-public-link",
 		Usage:    "start storage public link storage",
 		Category: "extensions",
-		//Flags:    flagset.StoragePublicLink(cfg.Storage),
-		// Before: func(ctx *cli.Context) error {
-		// 	return ParseStorageCommon(ctx, cfg)
-		// },
 		Action: func(c *cli.Context) error {
 			origCmd := command.StoragePublicLink(cfg.StoragePublicLink)
 			return handleOriginalAction(c, origCmd)

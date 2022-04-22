@@ -13,10 +13,6 @@ func StorageAuthMachineCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-auth-machine",
 		Usage:    "start storage auth-machine service",
 		Category: "extensions",
-		//Flags:    flagset.AuthMachineWithConfig(cfg.Storage),
-		// Before: func(ctx *cli.Context) error {
-		// 	return ParseStorageCommon(ctx, cfg)
-		// },
 		Action: func(c *cli.Context) error {
 			origCmd := command.AuthMachine(cfg.AuthMachine)
 			return handleOriginalAction(c, origCmd)

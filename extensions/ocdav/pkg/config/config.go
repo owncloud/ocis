@@ -24,7 +24,7 @@ type Config struct {
 	PublicURL string `yaml:"public_url"`
 
 	// Insecure certificates allowed when making requests to the gateway
-	Insecure bool `yaml:"insecure"`
+	Insecure bool `yaml:"insecure" env:"OCIS_INSECURE;OCDAV_INSECURE"`
 	// Timeout in seconds when making requests to the gateway
 	Timeout    int64 `yaml:"timeout"`
 	Middleware Middleware

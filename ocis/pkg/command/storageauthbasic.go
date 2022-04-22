@@ -13,10 +13,6 @@ func StorageAuthBasicCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-auth-basic",
 		Usage:    "start storage auth-basic service",
 		Category: "extensions",
-		//Flags:    flagset.AuthBasicWithConfig(cfg.Storage),
-		Before: func(ctx *cli.Context) error {
-			return ParseStorageCommon(ctx, cfg)
-		},
 		Action: func(c *cli.Context) error {
 			origCmd := command.AuthBasic(cfg.AuthBasic)
 			return handleOriginalAction(c, origCmd)

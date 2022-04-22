@@ -13,14 +13,13 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/mapstructure"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/extensions/storage/pkg/config"
+	"github.com/owncloud/ocis/extensions/gateway/pkg/config"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/extensions/storage/pkg/service/external"
-	"github.com/owncloud/ocis/extensions/storage/pkg/tracing"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
@@ -32,19 +31,25 @@ func Gateway(cfg *config.Config) *cli.Command {
 		Name:  "gateway",
 		Usage: "start gateway",
 		Before: func(c *cli.Context) error {
-			if err := ParseConfig(c, cfg, "storage-gateway"); err != nil {
-				return err
-			}
+			// if err := ParseConfig(c, cfg, "storage-gateway"); err != nil {
+			// 	return err
+			// }
 
-			if cfg.Reva.DataGateway.PublicURL == "" {
-				cfg.Reva.DataGateway.PublicURL = strings.TrimRight(cfg.Reva.Frontend.PublicURL, "/") + "/data"
+			if cfg.DataGatewayPublicURL == "" {
+				cfg.DataGatewayPublicURL = strings.TrimRight(cfg.FrontendPublicURL, "/") + "/data"
 			}
 
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-			tracing.Configure(cfg, logger)
+			logCfg := cfg.Logging
+			logger := log.NewLogger(
+				log.Level(logCfg.Level),
+				log.File(logCfg.File),
+				log.Pretty(logCfg.Pretty),
+				log.Color(logCfg.Color),
+			)
+			tracing.Configure(cfg.Tracing.Enabled, cfg.Tracing.Type, logger)
 			gr := run.Group{}
 			ctx, cancel := context.WithCancel(context.Background())
 			uuid := uuid.Must(uuid.NewV4())
@@ -62,7 +67,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 					ctx,
 					"com.owncloud.storage",
 					uuid.String(),
-					cfg.Reva.Gateway.GRPCAddr,
+					cfg.GRPC.Addr,
 					version.String,
 					logger,
 				)
@@ -87,10 +92,12 @@ func Gateway(cfg *config.Config) *cli.Command {
 
 			debugServer, err := debug.Server(
 				debug.Name(c.Command.Name+"-debug"),
-				debug.Addr(cfg.Reva.Gateway.DebugAddr),
+				debug.Addr(cfg.Debug.Addr),
 				debug.Logger(logger),
 				debug.Context(ctx),
-				debug.Config(cfg),
+				debug.Pprof(cfg.Debug.Pprof),
+				debug.Zpages(cfg.Debug.Zpages),
+				debug.Token(cfg.Debug.Token),
 			)
 
 			if err != nil {
@@ -102,7 +109,7 @@ func Gateway(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
-			if !cfg.Reva.Gateway.Supervised {
+			if !cfg.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
@@ -115,56 +122,55 @@ func Gateway(cfg *config.Config) *cli.Command {
 func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logger) map[string]interface{} {
 	rcfg := map[string]interface{}{
 		"core": map[string]interface{}{
-			"max_cpus":             cfg.Reva.Users.MaxCPUs,
 			"tracing_enabled":      cfg.Tracing.Enabled,
 			"tracing_endpoint":     cfg.Tracing.Endpoint,
 			"tracing_collector":    cfg.Tracing.Collector,
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.Reva.JWTSecret,
-			"gatewaysvc":                cfg.Reva.Gateway.Endpoint,
-			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
+			"jwt_secret":                cfg.JWTSecret,
+			"gatewaysvc":                cfg.GatewayEndpoint,
+			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
-			"network": cfg.Reva.Gateway.GRPCNetwork,
-			"address": cfg.Reva.Gateway.GRPCAddr,
+			"network": cfg.GRPC.Protocol,
+			"address": cfg.GRPC.Addr,
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"gateway": map[string]interface{}{
 					// registries is located on the gateway
-					"authregistrysvc":    cfg.Reva.Gateway.Endpoint,
-					"storageregistrysvc": cfg.Reva.Gateway.Endpoint,
-					"appregistrysvc":     cfg.Reva.Gateway.Endpoint,
+					"authregistrysvc":    cfg.GatewayEndpoint,
+					"storageregistrysvc": cfg.GatewayEndpoint,
+					"appregistrysvc":     cfg.GatewayEndpoint,
 					// user metadata is located on the users services
-					"preferencessvc":   cfg.Reva.Users.Endpoint,
-					"userprovidersvc":  cfg.Reva.Users.Endpoint,
-					"groupprovidersvc": cfg.Reva.Groups.Endpoint,
-					"permissionssvc":   cfg.Reva.Permissions.Endpoint,
+					"preferencessvc":   cfg.UsersEndpoint,
+					"userprovidersvc":  cfg.UsersEndpoint,
+					"groupprovidersvc": cfg.GroupsEndpoint,
+					"permissionssvc":   cfg.PermissionsEndpoint,
 					// sharing is located on the sharing service
-					"usershareprovidersvc":          cfg.Reva.Sharing.Endpoint,
-					"publicshareprovidersvc":        cfg.Reva.Sharing.Endpoint,
-					"ocmshareprovidersvc":           cfg.Reva.Sharing.Endpoint,
-					"commit_share_to_storage_grant": cfg.Reva.Gateway.CommitShareToStorageGrant,
-					"commit_share_to_storage_ref":   cfg.Reva.Gateway.CommitShareToStorageRef,
-					"share_folder":                  cfg.Reva.Gateway.ShareFolder, // ShareFolder is the location where to create shares in the recipient's storage provider.
+					"usershareprovidersvc":          cfg.SharingEndpoint,
+					"publicshareprovidersvc":        cfg.SharingEndpoint,
+					"ocmshareprovidersvc":           cfg.SharingEndpoint,
+					"commit_share_to_storage_grant": cfg.CommitShareToStorageGrant,
+					"commit_share_to_storage_ref":   cfg.CommitShareToStorageRef,
+					"share_folder":                  cfg.ShareFolder, // ShareFolder is the location where to create shares in the recipient's storage provider.
 					// other
-					"disable_home_creation_on_login": cfg.Reva.Gateway.DisableHomeCreationOnLogin,
-					"datagateway":                    cfg.Reva.DataGateway.PublicURL,
-					"transfer_shared_secret":         cfg.Reva.TransferSecret,
-					"transfer_expires":               cfg.Reva.TransferExpires,
-					"home_mapping":                   cfg.Reva.Gateway.HomeMapping,
-					"etag_cache_ttl":                 cfg.Reva.Gateway.EtagCacheTTL,
+					"disable_home_creation_on_login": cfg.DisableHomeCreationOnLogin,
+					"datagateway":                    cfg.DataGatewayPublicURL,
+					"transfer_shared_secret":         cfg.TransferSecret,
+					"transfer_expires":               cfg.TransferExpires,
+					"home_mapping":                   cfg.HomeMapping,
+					"etag_cache_ttl":                 cfg.EtagCacheTTL,
 				},
 				"authregistry": map[string]interface{}{
 					"driver": "static",
 					"drivers": map[string]interface{}{
 						"static": map[string]interface{}{
 							"rules": map[string]interface{}{
-								"basic":        cfg.Reva.AuthBasic.Endpoint,
-								"bearer":       cfg.Reva.AuthBearer.Endpoint,
-								"machine":      cfg.Reva.AuthMachine.Endpoint,
-								"publicshares": cfg.Reva.StoragePublicLink.Endpoint,
+								"basic":        cfg.AuthBasicEndpoint,
+								"bearer":       cfg.AuthBearerEndpoint,
+								"machine":      cfg.AuthMachineEndpoint,
+								"publicshares": cfg.StoragePublicLinkEndpoint,
 							},
 						},
 					},
@@ -178,7 +184,7 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 					},
 				},
 				"storageregistry": map[string]interface{}{
-					"driver": cfg.Reva.StorageRegistry.Driver,
+					"driver": cfg.StorageRegistry.Driver,
 					"drivers": map[string]interface{}{
 						"spaces": map[string]interface{}{
 							"providers": spacesProviders(cfg, logger),
@@ -194,20 +200,20 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[string]interface{} {
 
 	// if a list of rules is given it overrides the generated rules from below
-	if len(cfg.Reva.StorageRegistry.Rules) > 0 {
+	if len(cfg.StorageRegistry.Rules) > 0 {
 		rules := map[string]map[string]interface{}{}
-		for i := range cfg.Reva.StorageRegistry.Rules {
-			parts := strings.SplitN(cfg.Reva.StorageRegistry.Rules[i], "=", 2)
+		for i := range cfg.StorageRegistry.Rules {
+			parts := strings.SplitN(cfg.StorageRegistry.Rules[i], "=", 2)
 			rules[parts[0]] = map[string]interface{}{"address": parts[1]}
 		}
 		return rules
 	}
 
 	// check if the rules have to be read from a json file
-	if cfg.Reva.StorageRegistry.JSON != "" {
-		data, err := ioutil.ReadFile(cfg.Reva.StorageRegistry.JSON)
+	if cfg.StorageRegistry.JSON != "" {
+		data, err := ioutil.ReadFile(cfg.StorageRegistry.JSON)
 		if err != nil {
-			logger.Error().Err(err).Msg("Failed to read storage registry rules from JSON file: " + cfg.Reva.StorageRegistry.JSON)
+			logger.Error().Err(err).Msg("Failed to read storage registry rules from JSON file: " + cfg.StorageRegistry.JSON)
 			return nil
 		}
 		var rules map[string]map[string]interface{}
@@ -220,7 +226,7 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 
 	// generate rules based on default config
 	return map[string]map[string]interface{}{
-		cfg.Reva.StorageUsers.Endpoint: {
+		cfg.StorageUsersEndpoint: {
 			"spaces": map[string]interface{}{
 				"personal": map[string]interface{}{
 					"mount_point":   "/users",
@@ -232,7 +238,7 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 				},
 			},
 		},
-		cfg.Reva.StorageShares.Endpoint: {
+		cfg.StorageSharesEndpoint: {
 			"spaces": map[string]interface{}{
 				"virtual": map[string]interface{}{
 					// The root of the share jail is mounted here
@@ -251,7 +257,7 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 			},
 		},
 		// public link storage returns the mount id of the actual storage
-		cfg.Reva.StoragePublicLink.Endpoint: {
+		cfg.StoragePublicLinkEndpoint: {
 			"spaces": map[string]interface{}{
 				"grant": map[string]interface{}{
 					"mount_point": ".",
@@ -281,10 +287,10 @@ func mimetypes(cfg *config.Config, logger log.Logger) []map[string]interface{} {
 	var m []map[string]interface{}
 
 	// load default app mimetypes from a json file
-	if cfg.Reva.AppRegistry.MimetypesJSON != "" {
-		data, err := ioutil.ReadFile(cfg.Reva.AppRegistry.MimetypesJSON)
+	if cfg.AppRegistry.MimetypesJSON != "" {
+		data, err := ioutil.ReadFile(cfg.AppRegistry.MimetypesJSON)
 		if err != nil {
-			logger.Error().Err(err).Msg("Failed to read app registry mimetypes from JSON file: " + cfg.Reva.AppRegistry.MimetypesJSON)
+			logger.Error().Err(err).Msg("Failed to read app registry mimetypes from JSON file: " + cfg.AppRegistry.MimetypesJSON)
 			return nil
 		}
 		if err = json.Unmarshal(data, &mimetypes); err != nil {
@@ -385,56 +391,31 @@ type GatewaySutureService struct {
 
 // NewGatewaySutureService creates a new gateway.GatewaySutureService
 func NewGateway(cfg *ociscfg.Config) suture.Service {
-	cfg.Storage.Commons = cfg.Commons
+	cfg.Gateway.Commons = cfg.Commons
 	return GatewaySutureService{
-		cfg: cfg.Storage,
+		cfg: cfg.Gateway,
 	}
 }
 
 func (s GatewaySutureService) Serve(ctx context.Context) error {
-	s.cfg.Reva.Gateway.Context = ctx
+	// s.cfg.Reva.Gateway.Context = ctx
+	cmd := Gateway(s.cfg)
 	f := &flag.FlagSet{}
-	cmdFlags := Gateway(s.cfg).Flags
+	cmdFlags := cmd.Flags
 	for k := range cmdFlags {
 		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}
 	cliCtx := cli.NewContext(nil, f, nil)
-	if Gateway(s.cfg).Before != nil {
-		if err := Gateway(s.cfg).Before(cliCtx); err != nil {
+	if cmd.Before != nil {
+		if err := cmd.Before(cliCtx); err != nil {
 			return err
 		}
 	}
-	if err := Gateway(s.cfg).Action(cliCtx); err != nil {
+	if err := cmd.Action(cliCtx); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-// ParseConfig loads accounts configuration from known paths.
-func ParseConfig(c *cli.Context, cfg *config.Config, storageExtension string) error {
-	conf, err := ociscfg.BindSourcesToStructs(storageExtension, cfg)
-	if err != nil {
-		return err
-	}
-
-	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
-	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
-		cfg.Log = &shared.Log{
-			Level:  cfg.Commons.Log.Level,
-			Pretty: cfg.Commons.Log.Pretty,
-			Color:  cfg.Commons.Log.Color,
-			File:   cfg.Commons.Log.File,
-		}
-	} else if cfg.Log == nil {
-		cfg.Log = &shared.Log{}
-	}
-
-	// load all env variables relevant to the config in the current context.
-	conf.LoadOSEnv(config.GetEnv(cfg), false)
-
-	bindings := config.StructMappings(cfg)
-	return ociscfg.BindEnv(conf, bindings)
 }

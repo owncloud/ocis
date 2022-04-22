@@ -13,10 +13,6 @@ func StorageAuthBearerCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-auth-bearer",
 		Usage:    "Start storage auth-bearer service",
 		Category: "extensions",
-		//Flags:    flagset.AuthBearerWithConfig(cfg.Storage),
-		// Before: func(ctx *cli.Context) error {
-		// 	return ParseStorageCommon(ctx, cfg)
-		// },
 		Action: func(c *cli.Context) error {
 			origCmd := command.AuthBearer(cfg.AuthBearer)
 			return handleOriginalAction(c, origCmd)

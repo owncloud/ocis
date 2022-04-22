@@ -25,6 +25,7 @@ import (
 	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/command"
 	authmachine "github.com/owncloud/ocis/extensions/auth-machine/pkg/command"
 	frontend "github.com/owncloud/ocis/extensions/frontend/pkg/command"
+	gateway "github.com/owncloud/ocis/extensions/gateway/pkg/command"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/command"
@@ -42,7 +43,6 @@ import (
 	storagepublic "github.com/owncloud/ocis/extensions/storage-publiclink/pkg/command"
 	storageshares "github.com/owncloud/ocis/extensions/storage-shares/pkg/command"
 	storageusers "github.com/owncloud/ocis/extensions/storage-users/pkg/command"
-	storage "github.com/owncloud/ocis/extensions/storage/pkg/command"
 	store "github.com/owncloud/ocis/extensions/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/command"
 	user "github.com/owncloud/ocis/extensions/user/pkg/command"
@@ -121,7 +121,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["webdav"] = webdav.NewSutureService
 	s.ServicesRegistry["storage-frontend"] = frontend.NewFrontend
 	s.ServicesRegistry["ocdav"] = ocdav.NewOCDav
-	s.ServicesRegistry["storage-gateway"] = storage.NewGateway
+	s.ServicesRegistry["storage-gateway"] = gateway.NewGateway
 	s.ServicesRegistry["storage-userprovider"] = user.NewUserProvider
 	s.ServicesRegistry["storage-groupprovider"] = group.NewGroupProvider
 	s.ServicesRegistry["storage-authbasic"] = authbasic.NewAuthBasic
@@ -183,15 +183,6 @@ func Start(o ...Option) error {
 			Log: &shared.Log{},
 		}
 	}
-
-	if s.cfg.Storage.Log == nil {
-		s.cfg.Storage.Log = &shared.Log{}
-	}
-
-	s.cfg.Storage.Log.Color = s.cfg.Commons.Log.Color
-	s.cfg.Storage.Log.Level = s.cfg.Commons.Log.Level
-	s.cfg.Storage.Log.Pretty = s.cfg.Commons.Log.Pretty
-	s.cfg.Storage.Log.File = s.cfg.Commons.Log.File
 
 	if err = rpc.Register(s); err != nil {
 		if s != nil {
