@@ -46,7 +46,7 @@ require (
 	github.com/mennanov/fieldmask-utils v0.5.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/nats-io/nats-server/v2 v2.8.0
+	github.com/nats-io/nats-server/v2 v2.8.1
 	github.com/nmcclain/asn1-ber v0.0.0-20170104154839-2661553a0484
 	github.com/nmcclain/ldap v0.0.0-20210720162743-7f8d1e44eeba
 	github.com/oklog/run v1.1.0
