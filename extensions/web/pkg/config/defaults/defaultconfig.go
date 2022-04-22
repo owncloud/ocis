@@ -51,6 +51,9 @@ func DefaultConfig() *config.Config {
 					Scope:        "openid profile email",
 				},
 				Apps: []string{"files", "search", "preview", "text-editor", "pdf-viewer", "external"},
+				Options: map[string]interface{}{
+					"hideSearchBar": false,
+				},
 			},
 		},
 	}
