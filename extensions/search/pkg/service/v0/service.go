@@ -2,12 +2,16 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/asim/go-micro/plugins/events/natsjs/v4"
 	"github.com/blevesearch/bleve/v2"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/server"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"go-micro.dev/v4/metadata"
+	grpcmetadata "google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/ocis/extensions/audit/pkg/types"
 	"github.com/owncloud/ocis/extensions/search/pkg/config"
@@ -71,11 +75,19 @@ type Service struct {
 }
 
 func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *searchsvc.SearchResponse) error {
+	// Get token from the context (go-micro) and make it known to the reva client too (grpc)
+	t, ok := metadata.Get(ctx, revactx.TokenHeader)
+	if !ok {
+		s.log.Error().Msg("Could not get token from context")
+		return errors.New("could not get token from context")
+	}
+	ctx = grpcmetadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
+
 	res, err := s.provider.Search(ctx, &searchsvc.SearchRequest{
 		Query: in.Query,
 	})
 	if err != nil {
-		return nil
+		return err
 	}
 
 	out.Matches = res.Matches

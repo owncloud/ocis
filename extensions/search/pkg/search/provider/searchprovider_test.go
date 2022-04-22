@@ -92,7 +92,7 @@ var _ = Describe("Searchprovider", func() {
 			}, nil)
 		})
 
-		It("trigger an index change", func() {
+		It("trigger an index update when a file has been uploaded", func() {
 			called := false
 			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
 				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId

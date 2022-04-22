@@ -5,14 +5,17 @@ import (
 	"encoding/xml"
 	"io"
 	"net/http"
+	"path"
 	"strconv"
 
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/extensions/webdav/pkg/net"
 	"github.com/owncloud/ocis/extensions/webdav/pkg/prop"
 	"github.com/owncloud/ocis/extensions/webdav/pkg/propfind"
 	searchmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
 	merrors "go-micro.dev/v4/errors"
+	"go-micro.dev/v4/metadata"
 )
 
 const (
@@ -22,7 +25,6 @@ const (
 
 // Search is the endpoint for retrieving search results for REPORT requests
 func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
-
 	rep, err := readReport(r.Body)
 	if err != nil {
 		renderError(w, r, errBadRequest(err.Error()))
@@ -36,7 +38,10 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rsp, err := g.searchClient.Search(r.Context(), &searchsvc.SearchRequest{
+	t := r.Header.Get(TokenHeader)
+	ctx := revactx.ContextSetToken(r.Context(), t)
+	ctx = metadata.Set(ctx, revactx.TokenHeader, t)
+	rsp, err := g.searchClient.Search(ctx, &searchsvc.SearchRequest{
 		Query: rep.SearchFiles.Search.Pattern,
 	})
 	if err != nil {
@@ -93,7 +98,7 @@ func multistatusResponse(ctx context.Context, matches []*searchmsg.Match) ([]byt
 func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind.ResponseXML, error) {
 
 	response := propfind.ResponseXML{
-		Href:     net.EncodePath(match.Entity.Ref.Path),
+		Href:     net.EncodePath(path.Join("/dav/spaces/", match.Entity.Ref.ResourceId.StorageId+"!"+match.Entity.Ref.ResourceId.OpaqueId, match.Entity.Ref.Path)),
 		Propstat: []propfind.PropstatXML{},
 	}
 
