@@ -96,7 +96,6 @@ func multistatusResponse(ctx context.Context, matches []*searchmsg.Match) ([]byt
 }
 
 func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind.ResponseXML, error) {
-
 	response := propfind.ResponseXML{
 		Href:     net.EncodePath(path.Join("/dav/spaces/", match.Entity.Ref.ResourceId.StorageId+"!"+match.Entity.Ref.ResourceId.OpaqueId, match.Entity.Ref.Path)),
 		Propstat: []propfind.PropstatXML{},
@@ -107,7 +106,7 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind
 		Prop:   []prop.PropertyXML{},
 	}
 
-	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:id", match.Entity.Id.StorageId+"!"+match.Entity.Id.OpaqueId))
+	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:fileid", match.Entity.Id.StorageId+"!"+match.Entity.Id.OpaqueId))
 
 	size := strconv.FormatUint(match.Entity.Size, 10)
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:size", size))
