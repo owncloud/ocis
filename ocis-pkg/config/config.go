@@ -9,6 +9,7 @@ import (
 	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/config"
 	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/config"
 	authmachine "github.com/owncloud/ocis/extensions/auth-machine/pkg/config"
+	frontend "github.com/owncloud/ocis/extensions/frontend/pkg/config"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/config"
@@ -85,6 +86,7 @@ type Config struct {
 	Proxy             *proxy.Config           `yaml:"proxy"`
 	Settings          *settings.Config        `yaml:"settings"`
 	Storage           *storage.Config         `yaml:"storage"`
+	Frontend          *frontend.Config        `yaml:"frontend"`
 	AuthBasic         *authbasic.Config       `yaml:"auth_basic"`
 	AuthBearer        *authbearer.Config      `yaml:"auth_bearer"`
 	AuthMachine       *authmachine.Config     `yaml:"auth_machine"`

@@ -12,12 +12,13 @@ import (
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/extensions/storage/pkg/config"
+	"github.com/owncloud/ocis/extensions/frontend/pkg/config"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
-	"github.com/owncloud/ocis/extensions/storage/pkg/tracing"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/tracing"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
 )
@@ -31,12 +32,18 @@ func Frontend(cfg *config.Config) *cli.Command {
 			if err := loadUserAgent(c, cfg); err != nil {
 				return err
 			}
-			return ParseConfig(c, cfg, "storage-frontend")
+			// return ParseConfig(c, cfg, "storage-frontend")
+			return nil
 		},
 		Action: func(c *cli.Context) error {
-			logger := NewLogger(cfg)
-
-			tracing.Configure(cfg, logger)
+			logCfg := cfg.Logging
+			logger := log.NewLogger(
+				log.Level(logCfg.Level),
+				log.File(logCfg.File),
+				log.Pretty(logCfg.Pretty),
+				log.Color(logCfg.Color),
+			)
+			tracing.Configure(cfg.Tracing.Enabled, cfg.Tracing.Type, logger)
 
 			gr := run.Group{}
 			ctx, cancel := context.WithCancel(context.Background())
@@ -59,9 +66,9 @@ func Frontend(cfg *config.Config) *cli.Command {
 					"enabled":       true,
 					"version":       "2.0.0",
 					"formats":       []string{"tar", "zip"},
-					"archiver_url":  cfg.Reva.Archiver.ArchiverURL,
-					"max_num_files": strconv.FormatInt(cfg.Reva.Archiver.MaxNumFiles, 10),
-					"max_size":      strconv.FormatInt(cfg.Reva.Archiver.MaxSize, 10),
+					"archiver_url":  cfg.Archiver.URL,
+					"max_num_files": strconv.FormatInt(cfg.Archiver.MaxNumFiles, 10),
+					"max_size":      strconv.FormatInt(cfg.Archiver.MaxSize, 10),
 				},
 			}
 
@@ -69,9 +76,9 @@ func Frontend(cfg *config.Config) *cli.Command {
 				{
 					"enabled":  true,
 					"version":  "1.0.0",
-					"apps_url": cfg.Reva.AppProvider.AppsURL,
-					"open_url": cfg.Reva.AppProvider.OpenURL,
-					"new_url":  cfg.Reva.AppProvider.NewURL,
+					"apps_url": cfg.AppProvider.AppsURL,
+					"open_url": cfg.AppProvider.OpenURL,
+					"new_url":  cfg.AppProvider.NewURL,
 				},
 			}
 
@@ -83,16 +90,16 @@ func Frontend(cfg *config.Config) *cli.Command {
 				"versioning":        true,
 				"archivers":         archivers,
 				"app_providers":     appProviders,
-				"favorites":         cfg.Reva.Frontend.Favorites,
+				"favorites":         cfg.EnableFavorites,
 			}
 
-			if cfg.Reva.DefaultUploadProtocol == "tus" {
+			if cfg.DefaultUploadProtocol == "tus" {
 				filesCfg["tus_support"] = map[string]interface{}{
 					"version":              "1.0.0",
 					"resumable":            "1.0.0",
 					"extension":            "creation,creation-with-upload",
-					"http_method_override": cfg.Reva.UploadHTTPMethodOverride,
-					"max_chunk_size":       cfg.Reva.UploadMaxChunkSize,
+					"http_method_override": cfg.UploadHTTPMethodOverride,
+					"max_chunk_size":       cfg.UploadMaxChunkSize,
 				}
 			}
 
@@ -109,10 +116,12 @@ func Frontend(cfg *config.Config) *cli.Command {
 			{
 				server, err := debug.Server(
 					debug.Name(c.Command.Name+"-debug"),
-					debug.Addr(cfg.Reva.Frontend.DebugAddr),
+					debug.Addr(cfg.Debug.Addr),
 					debug.Logger(logger),
 					debug.Context(ctx),
-					debug.Config(cfg),
+					debug.Pprof(cfg.Debug.Pprof),
+					debug.Zpages(cfg.Debug.Zpages),
+					debug.Token(cfg.Debug.Token),
 				)
 
 				if err != nil {
@@ -129,7 +138,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 				})
 			}
 
-			if !cfg.Reva.Frontend.Supervised {
+			if !cfg.Supervised {
 				sync.Trap(&gr, cancel)
 			}
 
@@ -142,78 +151,77 @@ func Frontend(cfg *config.Config) *cli.Command {
 func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[string]interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"core": map[string]interface{}{
-			"max_cpus":             cfg.Reva.Users.MaxCPUs,
 			"tracing_enabled":      cfg.Tracing.Enabled,
 			"tracing_endpoint":     cfg.Tracing.Endpoint,
 			"tracing_collector":    cfg.Tracing.Collector,
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.Reva.JWTSecret,
-			"gatewaysvc":                cfg.Reva.Gateway.Endpoint, // Todo or address?
-			"skip_user_groups_in_token": cfg.Reva.SkipUserGroupsInToken,
+			"jwt_secret":                cfg.JWTSecret,
+			"gatewaysvc":                cfg.GatewayEndpoint, // Todo or address?
+			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"http": map[string]interface{}{
-			"network": cfg.Reva.Frontend.HTTPNetwork,
-			"address": cfg.Reva.Frontend.HTTPAddr,
+			"network": cfg.HTTP.Protocol,
+			"address": cfg.HTTP.Addr,
 			"middlewares": map[string]interface{}{
 				"cors": map[string]interface{}{
 					"allow_credentials": true,
 				},
 				"auth": map[string]interface{}{
-					"credentials_by_user_agent": cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent,
+					"credentials_by_user_agent": cfg.Middleware.Auth.CredentialsByUserAgent,
 					"credential_chain":          []string{"bearer"},
 				},
 			},
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"appprovider": map[string]interface{}{
-					"prefix":                 cfg.Reva.Frontend.AppProviderPrefix,
-					"transfer_shared_secret": cfg.Reva.TransferSecret,
+					"prefix":                 cfg.AppProvider.Prefix,
+					"transfer_shared_secret": cfg.TransferSecret,
 					"timeout":                86400,
-					"insecure":               cfg.Reva.Frontend.AppProviderInsecure,
+					"insecure":               cfg.AppProvider.Insecure,
 				},
 				"archiver": map[string]interface{}{
-					"prefix":        cfg.Reva.Frontend.ArchiverPrefix,
+					"prefix":        cfg.Archiver.Prefix,
 					"timeout":       86400,
-					"insecure":      cfg.Reva.Frontend.ArchiverInsecure,
-					"max_num_files": cfg.Reva.Archiver.MaxNumFiles,
-					"max_size":      cfg.Reva.Archiver.MaxSize,
+					"insecure":      cfg.Archiver.Insecure,
+					"max_num_files": cfg.Archiver.MaxNumFiles,
+					"max_size":      cfg.Archiver.MaxSize,
 				},
 				"datagateway": map[string]interface{}{
-					"prefix":                 cfg.Reva.Frontend.DatagatewayPrefix,
-					"transfer_shared_secret": cfg.Reva.TransferSecret,
+					"prefix":                 cfg.DataGateway.Prefix,
+					"transfer_shared_secret": cfg.TransferSecret,
 					"timeout":                86400,
 					"insecure":               true,
 				},
 				"ocs": map[string]interface{}{
-					"storage_registry_svc":      cfg.Reva.Gateway.Endpoint,
-					"share_prefix":              cfg.Reva.Frontend.OCSSharePrefix,
-					"home_namespace":            cfg.Reva.Frontend.OCSHomeNamespace,
-					"resource_info_cache_ttl":   cfg.Reva.Frontend.OCSResourceInfoCacheTTL,
-					"prefix":                    cfg.Reva.Frontend.OCSPrefix,
-					"additional_info_attribute": cfg.Reva.Frontend.OCSAdditionalInfoAttribute,
-					"machine_auth_apikey":       cfg.Reva.AuthMachineConfig.MachineAuthAPIKey,
-					"cache_warmup_driver":       cfg.Reva.Frontend.OCSCacheWarmupDriver,
+					"storage_registry_svc":      cfg.GatewayEndpoint,
+					"share_prefix":              cfg.OCS.SharePrefix,
+					"home_namespace":            cfg.OCS.HomeNamespace,
+					"resource_info_cache_ttl":   cfg.OCS.ResourceInfoCacheTTL,
+					"prefix":                    cfg.OCS.Prefix,
+					"additional_info_attribute": cfg.OCS.AdditionalInfoAttribute,
+					"machine_auth_apikey":       cfg.AuthMachine.APIKey,
+					"cache_warmup_driver":       cfg.OCS.CacheWarmupDriver,
 					"cache_warmup_drivers": map[string]interface{}{
 						"cbox": map[string]interface{}{
-							"db_username": cfg.Reva.Sharing.UserSQLUsername,
-							"db_password": cfg.Reva.Sharing.UserSQLPassword,
-							"db_host":     cfg.Reva.Sharing.UserSQLHost,
-							"db_port":     cfg.Reva.Sharing.UserSQLPort,
-							"db_name":     cfg.Reva.Sharing.UserSQLName,
-							"namespace":   cfg.Reva.UserStorage.EOS.Root,
-							"gatewaysvc":  cfg.Reva.Gateway.Endpoint,
+							"db_username": cfg.OCS.CacheWarmupDrivers.CBOX.DBUsername,
+							"db_password": cfg.OCS.CacheWarmupDrivers.CBOX.DBPassword,
+							"db_host":     cfg.OCS.CacheWarmupDrivers.CBOX.DBHost,
+							"db_port":     cfg.OCS.CacheWarmupDrivers.CBOX.DBPort,
+							"db_name":     cfg.OCS.CacheWarmupDrivers.CBOX.DBName,
+							"namespace":   cfg.OCS.CacheWarmupDrivers.CBOX.Namespace,
+							"gatewaysvc":  cfg.GatewayEndpoint,
 						},
 					},
 					"config": map[string]interface{}{
 						"version": "1.7",
 						"website": "ownCloud",
-						"host":    cfg.Reva.Frontend.PublicURL,
+						"host":    cfg.PublicURL,
 						"contact": "",
 						"ssl":     "false",
 					},
-					"default_upload_protocol": cfg.Reva.DefaultUploadProtocol,
+					"default_upload_protocol": cfg.DefaultUploadProtocol,
 					"capabilities": map[string]interface{}{
 						"capabilities": map[string]interface{}{
 							"core": map[string]interface{}{
@@ -232,8 +240,8 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 								"support_url_signing": true,
 							},
 							"checksums": map[string]interface{}{
-								"supported_types":       cfg.Reva.ChecksumSupportedTypes,
-								"preferred_upload_type": cfg.Reva.ChecksumPreferredUploadType,
+								"supported_types":       cfg.Checksums.SupportedTypes,
+								"preferred_upload_type": cfg.Checksums.PreferredUploadType,
 							},
 							"files": filesCfg,
 							"dav":   map[string]interface{}{},
@@ -287,7 +295,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 							},
 							"spaces": map[string]interface{}{
 								"version": "0.0.1",
-								"enabled": cfg.Reva.Frontend.ProjectSpaces,
+								"enabled": cfg.EnableProjectSpaces,
 							},
 						},
 						"version": map[string]interface{}{
@@ -313,7 +321,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 // have the indexes reversed and the tuple is in the format of [challenge:user-agent], then the same process is applied
 // in reverse for each individual part
 func loadUserAgent(c *cli.Context, cfg *config.Config) error {
-	cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent = make(map[string]string)
+	cfg.Middleware.Auth.CredentialsByUserAgent = make(map[string]string)
 	locks := c.StringSlice("user-agent-whitelist-lock-in")
 
 	for _, v := range locks {
@@ -323,7 +331,7 @@ func loadUserAgent(c *cli.Context, cfg *config.Config) error {
 			return fmt.Errorf("unexpected config value for user-agent lock-in: %v, expected format is user-agent:challenge", v)
 		}
 
-		cfg.Reva.Frontend.Middleware.Auth.CredentialsByUserAgent[conversions.Reverse(parts[1])] = conversions.Reverse(parts[0])
+		cfg.Middleware.Auth.CredentialsByUserAgent[conversions.Reverse(parts[1])] = conversions.Reverse(parts[0])
 	}
 
 	return nil
@@ -336,28 +344,29 @@ type FrontendSutureService struct {
 
 // NewFrontend creates a new frontend.FrontendSutureService
 func NewFrontend(cfg *ociscfg.Config) suture.Service {
-	cfg.Storage.Commons = cfg.Commons
+	cfg.Frontend.Commons = cfg.Commons
 	return FrontendSutureService{
-		cfg: cfg.Storage,
+		cfg: cfg.Frontend,
 	}
 }
 
 func (s FrontendSutureService) Serve(ctx context.Context) error {
-	s.cfg.Reva.Frontend.Context = ctx
+	// s.cfg.Reva.Frontend.Context = ctx
+	cmd := Frontend(s.cfg)
 	f := &flag.FlagSet{}
-	cmdFlags := Frontend(s.cfg).Flags
+	cmdFlags := cmd.Flags
 	for k := range cmdFlags {
 		if err := cmdFlags[k].Apply(f); err != nil {
 			return err
 		}
 	}
 	cliCtx := cli.NewContext(nil, f, nil)
-	if Frontend(s.cfg).Before != nil {
-		if err := Frontend(s.cfg).Before(cliCtx); err != nil {
+	if cmd.Before != nil {
+		if err := cmd.Before(cliCtx); err != nil {
 			return err
 		}
 	}
-	if err := Frontend(s.cfg).Action(cliCtx); err != nil {
+	if err := cmd.Action(cliCtx); err != nil {
 		return err
 	}
 

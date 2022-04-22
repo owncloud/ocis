@@ -24,6 +24,7 @@ import (
 	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/command"
 	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/command"
 	authmachine "github.com/owncloud/ocis/extensions/auth-machine/pkg/command"
+	frontend "github.com/owncloud/ocis/extensions/frontend/pkg/command"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/command"
@@ -118,7 +119,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["thumbnails"] = thumbnails.NewSutureService
 	s.ServicesRegistry["web"] = web.NewSutureService
 	s.ServicesRegistry["webdav"] = webdav.NewSutureService
-	s.ServicesRegistry["storage-frontend"] = storage.NewFrontend
+	s.ServicesRegistry["storage-frontend"] = frontend.NewFrontend
 	s.ServicesRegistry["ocdav"] = ocdav.NewOCDav
 	s.ServicesRegistry["storage-gateway"] = storage.NewGateway
 	s.ServicesRegistry["storage-userprovider"] = user.NewUserProvider

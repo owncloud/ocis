@@ -7,6 +7,7 @@ import (
 	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/config/defaults"
 	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/config/defaults"
 	authmachine "github.com/owncloud/ocis/extensions/auth-machine/pkg/config/defaults"
+	frontend "github.com/owncloud/ocis/extensions/frontend/pkg/config/defaults"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/config/defaults"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/config/defaults"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/config/defaults"
@@ -69,6 +70,7 @@ func DefaultConfig() *Config {
 		StorageUsers:      storageusers.FullDefaultConfig(),
 		StorageShares:     storageshares.FullDefaultConfig(),
 		AppProvider:       appprovider.FullDefaultConfig(),
+		Frontend:          frontend.FullDefaultConfig(),
 		OCDav:             ocdav.FullDefaultConfig(),
 	}
 }
