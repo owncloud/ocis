@@ -6,8 +6,6 @@ require (
 	github.com/CiscoM31/godata v1.0.5
 	github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
-	github.com/asim/go-micro/plugins/client/grpc/v4 v4.0.0-20220118152736-9e0be6c85d75
-	github.com/asim/go-micro/plugins/server/grpc/v4 v4.0.0-20220118152736-9e0be6c85d75
 	github.com/blevesearch/bleve/v2 v2.3.2
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220412090512-93c5918b4bde
@@ -21,13 +19,14 @@ require (
 	github.com/go-ldap/ldif v0.0.0-20200320164324-fd88d9b715b3
 	github.com/go-logr/logr v1.2.3
 	github.com/go-micro/plugins/v4/client/grpc v1.0.0
-	github.com/go-micro/plugins/v4/events/natsjs v1.0.0
+	github.com/go-micro/plugins/v4/events/natsjs v1.0.1
 	github.com/go-micro/plugins/v4/logger/zerolog v1.0.0
 	github.com/go-micro/plugins/v4/registry/consul v1.0.0
 	github.com/go-micro/plugins/v4/registry/etcd v1.0.0
 	github.com/go-micro/plugins/v4/registry/kubernetes v1.0.0
 	github.com/go-micro/plugins/v4/registry/mdns v1.0.0
 	github.com/go-micro/plugins/v4/registry/nats v1.0.0
+	github.com/go-micro/plugins/v4/server/grpc v1.0.1
 	github.com/go-micro/plugins/v4/server/http v1.0.0
 	github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.0.0
 	github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus v1.0.0
@@ -45,9 +44,9 @@ require (
 	github.com/libregraph/idm v0.3.1-0.20220315094434-e9a5cff3dd05
 	github.com/libregraph/lico v0.54.1-0.20220325072321-31efc3995d63
 	github.com/mennanov/fieldmask-utils v0.5.0
-	github.com/mitchellh/mapstructure v1.4.3
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/nats-io/nats-server/v2 v2.8.0
+	github.com/nats-io/nats-server/v2 v2.8.1
 	github.com/nmcclain/asn1-ber v0.0.0-20170104154839-2661553a0484
 	github.com/nmcclain/ldap v0.0.0-20210720162743-7f8d1e44eeba
 	github.com/oklog/run v1.1.0
@@ -64,7 +63,7 @@ require (
 	github.com/stretchr/testify v1.7.1
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.2
-	github.com/urfave/cli/v2 v2.4.0
+	github.com/urfave/cli/v2 v2.4.4
 	go-micro.dev/v4 v4.6.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.31.0

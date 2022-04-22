@@ -1,4 +1,4 @@
-## Scenarios from ownCloud10 core API tests that are expected to fail with OCIS storage
+## Scenarios from ownCloud10 core API tests that are expected to fail with OCIS storage while running with the Graph API
 
 The expected failures in this file are from features in the owncloud/core repo.
 
@@ -637,49 +637,6 @@ cannot share a folder with create permission
 - [apiTrashbin/trashbinSharingToShares.feature:160](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L160)
 - [apiTrashbin/trashbinSharingToShares.feature:161](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L161)
 
-#### [changing user quota gives ocs status 103 / cannot set user quota using the ocs endpoint](https://github.com/owncloud/product/issues/247)
-
-_getting and setting quota_
-
-- [apiMain/quota.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L10)
-- [apiMain/quota.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L23)
-- [apiMain/quota.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L38)
-- [apiMain/quota.feature:53](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L53)
-- [apiMain/quota.feature:72](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L72)
-- [apiMain/quota.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L93)
-- [apiMain/quota.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L116)
-- [apiMain/quota.feature:139](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L139)
-- [apiMain/quota.feature:166](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L166)
-- [apiMain/quota.feature:187](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L187)
-- [apiMain/quota.feature:210](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L210)
-- [apiMain/quota.feature:217](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L217)
-- [apiMain/quota.feature:224](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L224)
-- [apiMain/quota.feature:239](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L239)
-- [apiMain/quota.feature:253](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L253)
-- [apiMain/quota.feature:269](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L269)
-- [apiMain/quota.feature:283](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L283)
-- [apiMain/quota.feature:289](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/quota.feature#L289)
-  Scenario Outline: Retrieving folder quota when no quota is set
-- [apiWebdavProperties1/getQuota.feature:18](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L18)
-- [apiWebdavProperties1/getQuota.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L19)
-- [apiWebdavProperties1/getQuota.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L24)
-  Scenario Outline: Retrieving folder quota when quota is set
-- [apiWebdavProperties1/getQuota.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L34)
-- [apiWebdavProperties1/getQuota.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L35)
-- [apiWebdavProperties1/getQuota.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L40)
-  Scenario Outline: Retrieving folder quota of shared folder with quota when no quota is set for recipient
-- [apiWebdavProperties1/getQuota.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L61)
-- [apiWebdavProperties1/getQuota.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L62)
-- [apiWebdavProperties1/getQuota.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L67)
-  Scenario Outline: Retrieving folder quota when quota is set and a file was uploaded
-- [apiWebdavProperties1/getQuota.feature:81](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L81)
-- [apiWebdavProperties1/getQuota.feature:82](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L82)
-- [apiWebdavProperties1/getQuota.feature:87](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L87)
-  Scenario Outline: Retrieving folder quota when quota is set and a file was received
-- [apiWebdavProperties1/getQuota.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L103)
-- [apiWebdavProperties1/getQuota.feature:104](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L104)
-- [apiWebdavProperties1/getQuota.feature:109](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/getQuota.feature#L109)
-
 #### [Private link support](https://github.com/owncloud/product/issues/201)
 
 #### [oc:privatelink property not returned in webdav responses](https://github.com/owncloud/product/issues/262)
@@ -690,21 +647,9 @@ _getting and setting quota_
 
 #### [changing user quota gives ocs status 103 / Cannot set quota](https://github.com/owncloud/product/issues/247)
 
-- [apiShareOperationsToShares2/uploadToShare.feature:193](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L193)
-- [apiShareOperationsToShares2/uploadToShare.feature:194](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L194)
-- [apiShareOperationsToShares2/uploadToShare.feature:199](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L199)
-- [apiShareOperationsToShares2/uploadToShare.feature:218](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L218)
-- [apiShareOperationsToShares2/uploadToShare.feature:219](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L219)
-- [apiShareOperationsToShares2/uploadToShare.feature:224](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L224)
 - [apiShareOperationsToShares2/uploadToShare.feature:245](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L245)
 - [apiShareOperationsToShares2/uploadToShare.feature:246](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L246)
 - [apiShareOperationsToShares2/uploadToShare.feature:251](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L251)
-- [apiShareOperationsToShares2/uploadToShare.feature:270](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L270)
-- [apiShareOperationsToShares2/uploadToShare.feature:271](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L271)
-- [apiShareOperationsToShares2/uploadToShare.feature:276](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L276)
-- [apiShareOperationsToShares2/uploadToShare.feature:297](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L297)
-- [apiShareOperationsToShares2/uploadToShare.feature:298](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L298)
-- [apiShareOperationsToShares2/uploadToShare.feature:303](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L303)
 
 #### [not possible to move file into a received folder](https://github.com/owncloud/ocis/issues/764)
 
@@ -965,108 +910,12 @@ User and group management features
 
 special character username not valid
 
-- [apiProvisioning-v1/addUser.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/addUser.feature#L20)
-- [apiProvisioning-v1/addUser.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/addUser.feature#L40)
-- [apiProvisioning-v1/addUser.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/addUser.feature#L47)
-- [apiProvisioning-v1/addUser.feature:83](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/addUser.feature#L83)
-- [apiProvisioning-v1/addUser.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/addUser.feature#L116)
-- [apiProvisioning-v1/addUser.feature:123](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/addUser.feature#L123)
-- [apiProvisioning-v1/addUser.feature:205](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/addUser.feature#L205)
-- [apiProvisioning-v1/deleteUser.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/deleteUser.feature#L19)
-- [apiProvisioning-v1/disableUser.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L19)
-- [apiProvisioning-v1/editUser.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L29)
-- [apiProvisioning-v1/editUser.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L30)
-- [apiProvisioning-v1/enableUser.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/enableUser.feature#L20)
-- [apiProvisioning-v1/getUser.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L38)
-- [apiProvisioning-v1/getUser.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L39)
-- [apiProvisioning-v2/addUser.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L20)
-- [apiProvisioning-v2/addUser.feature:123](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/addUser.feature#L123)
-- [apiProvisioning-v2/deleteUser.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/deleteUser.feature#L19)
-- [apiProvisioning-v2/disableUser.feature:19](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L19)
-- [apiProvisioning-v2/editUser.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L29)
-- [apiProvisioning-v2/editUser.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L30)
-- [apiProvisioning-v2/enableUser.feature:20](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L20)
-- [apiProvisioning-v2/getUser.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L38)
-- [apiProvisioning-v2/getUser.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L39)
 - [apiTrashbin/trashbinFilesFolders.feature:254](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L254)
 - [apiTrashbin/trashbinFilesFolders.feature:255](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L255)
 - [apiTrashbin/trashbinFilesFolders.feature:256](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L256)
 - [apiTrashbin/trashbinFilesFolders.feature:260](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L260)
 - [apiTrashbin/trashbinFilesFolders.feature:261](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L261)
 - [apiTrashbin/trashbinFilesFolders.feature:262](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L262)
-
-#### [Client token generation not implemented](https://github.com/owncloud/ocis/issues/197)
-
-- [apiProvisioning-v1/apiProvisioningUsingAppPassword.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/apiProvisioningUsingAppPassword.feature#L39)
-- [apiProvisioning-v1/apiProvisioningUsingAppPassword.feature:68](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/apiProvisioningUsingAppPassword.feature#L68)
-- [apiProvisioning-v2/apiProvisioningUsingAppPassword.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/apiProvisioningUsingAppPassword.feature#L39)
-- [apiProvisioning-v2/apiProvisioningUsingAppPassword.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/apiProvisioningUsingAppPassword.feature#L67)
-
-#### [disable users /cloud/users/disable|enable not available](https://github.com/owncloud/ocis/issues/1420)
-
-- [apiProvisioning-v1/enableUser.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/enableUser.feature#L100)
-- [apiProvisioning-v1/enableUser.feature:110](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/enableUser.feature#L110)
-- [apiProvisioning-v1/enableUser.feature:137](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/enableUser.feature#L137)
-- [apiProvisioning-v1/disableUser.feature:104](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L104)
-- [apiProvisioning-v1/disableUser.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L135)
-- [apiProvisioning-v1/disableUser.feature:177](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L177)
-- [apiProvisioning-v1/disableUser.feature:185](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L185)
-- [apiProvisioning-v1/disableUser.feature:251](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L251)
-- [apiProvisioning-v1/disableUser.feature:271](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/disableUser.feature#L271)
-- [apiProvisioning-v2/disableUser.feature:82](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L82)
-- [apiProvisioning-v2/disableUser.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L102)
-- [apiProvisioning-v2/disableUser.feature:111](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L111)
-- [apiProvisioning-v2/disableUser.feature:133](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L133)
-- [apiProvisioning-v2/disableUser.feature:174](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L174)
-- [apiProvisioning-v2/disableUser.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L182)
-- [apiProvisioning-v2/disableUser.feature:248](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L248)
-- [apiProvisioning-v2/disableUser.feature:268](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/disableUser.feature#L268)
-
-#### [Update displayname to empty value is successful](https://github.com/owncloud/ocis/issues/2167)
-
-- [apiProvisioning-v1/editUser.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L48)
-- [apiProvisioning-v2/editUser.feature:49](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L49)
-
-#### [changing user quota gives ocs status 103 / Cannot set quota](https://github.com/owncloud/product/issues/247)
-
-- [apiProvisioning-v1/editUser.feature:57](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L57)
-- [apiProvisioning-v1/editUser.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/editUser.feature#L129)
-- [apiProvisioning-v2/editUser.feature:58](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L58)
-- [apiProvisioning-v2/editUser.feature:130](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/editUser.feature#L130)
-- [apiProvisioning-v2/enableUser.feature:40](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L40)
-- [apiProvisioning-v2/enableUser.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L62)
-- [apiProvisioning-v2/enableUser.feature:72](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/enableUser.feature#L72)
-
-#### [user can get info of other users/ cloud/users endpoints not authenticated](https://github.com/owncloud/product/issues/248)
-
-- [apiProvisioning-v2/deleteUser.feature:57](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/deleteUser.feature#L57)
-- [apiProvisioning-v2/getUser.feature:92](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L92)
-- [apiProvisioning-v2/getUsers.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUsers.feature#L44)
-
-#### [incorrect ocs(v2) status value when getting info of user that does not exist should be 404, gives 998](https://github.com/owncloud/product/issues/250)
-
-_ocs: api compatibility, return correct status code_
-
-- [apiProvisioning-v2/getUser.feature:55](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L55)
-
-#### [Provisioning API does not provide last_login in response](https://github.com/owncloud/ocis/issues/2729)
-
-- [apiProvisioning-v1/getUser.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L11)
-- [apiProvisioning-v1/getUser.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L42)
-- [apiProvisioning-v1/getUser.feature:92](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L92)
-- [apiProvisioning-v1/getUser.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L103)
-- [apiProvisioning-v1/getUser.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L129)
-- [apiProvisioning-v1/getUser.feature:130](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L130)
-- [apiProvisioning-v1/getUser.feature:146](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L146)
-- [apiProvisioning-v1/getUser.feature:147](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L147)
-- [apiProvisioning-v1/getUser.feature:150](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/getUser.feature#L150)
-- [apiProvisioning-v2/getUser.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L11)
-- [apiProvisioning-v2/getUser.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L42)
-- [apiProvisioning-v2/getUser.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L103)
-- [apiProvisioning-v2/getUser.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L116)
-- [apiProvisioning-v2/getUser.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L129)
-- [apiProvisioning-v2/getUser.feature:142](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L142)
-- [apiProvisioning-v2/getUser.feature:155](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v2/getUser.feature#L155)
 
 #### [incorrect ocs(v2) status value when getting info of share that does not exist should be 404, gives 998](https://github.com/owncloud/product/issues/250)
 
@@ -1080,74 +929,6 @@ _ocs: api compatibility, return correct status code_
 - [apiShareOperationsToShares2/shareAccessByID.feature:53](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L53)
 - [apiShareOperationsToShares2/shareAccessByID.feature:54](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L54)
 - [apiShareOperationsToShares2/shareAccessByID.feature:55](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L55)
-
-#### [Different ocs status-text and status-code in oCIS and oC10 using ocs api v1](https://github.com/owncloud/ocis/issues/1777)
-
-- [apiProvisioningGroups-v1/addToGroup.feature:150](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L150)
-
-#### [creating existing group doesn't gives error](https://github.com/owncloud/product/issues/282)
-
-- [apiProvisioningGroups-v1/addGroup.feature:134](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addGroup.feature#L134)
-- [apiProvisioningGroups-v2/addGroup.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addGroup.feature#L129)
-
-#### [group names with space at the start or end should not be allowed](https://github.com/owncloud/ocis/issues/2876)
-
-- [apiProvisioningGroups-v1/addGroup.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addGroup.feature#L158)
-- [apiProvisioningGroups-v1/addGroup.feature:166](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addGroup.feature#L166)
-- [apiProvisioningGroups-v1/addGroup.feature:174](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addGroup.feature#L174)
-- [apiProvisioningGroups-v2/addGroup.feature:154](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addGroup.feature#L154)
-- [apiProvisioningGroups-v2/addGroup.feature:162](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addGroup.feature#L162)
-- [apiProvisioningGroups-v2/addGroup.feature:170](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addGroup.feature#L170)
-
-#### [cannot create group with '/'](https://github.com/owncloud/product/issues/285)
-
-- [apiProvisioningGroups-v1/addToGroup.feature:82](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L82)
-- [apiProvisioningGroups-v1/deleteGroup.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/deleteGroup.feature#L85)
-- [apiProvisioningGroups-v1/deleteGroup.feature:86](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/deleteGroup.feature#L86)
-- [apiProvisioningGroups-v1/deleteGroup.feature:87](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/deleteGroup.feature#L87)
-- [apiProvisioningGroups-v1/getUserGroups.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/getUserGroups.feature#L38)
-- [apiProvisioningGroups-v1/removeFromGroup.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/removeFromGroup.feature#L132)
-
-- [apiProvisioningGroups-v2/addToGroup.feature:82](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addToGroup.feature#L82)
-- [apiProvisioningGroups-v2/deleteGroup.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/deleteGroup.feature#L85)
-- [apiProvisioningGroups-v2/deleteGroup.feature:86](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/deleteGroup.feature#L86)
-- [apiProvisioningGroups-v2/deleteGroup.feature:87](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/deleteGroup.feature#L87)
-- [apiProvisioningGroups-v2/getUserGroups.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getUserGroups.feature#L38)
-- [apiProvisioningGroups-v2/removeFromGroup.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/removeFromGroup.feature#L132)
-
-#### [adding user to non-existent group gives wrong statuscode](https://github.com/owncloud/product/issues/286)
-
-- [apiProvisioningGroups-v1/addToGroup.feature:159](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L159)
-- [apiProvisioningGroups-v1/removeFromGroup.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/removeFromGroup.feature#L178)
-- [apiProvisioningGroups-v2/removeFromGroup.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/removeFromGroup.feature#L178)
-
-#### [adding user to empty group gives wrong statuscode](https://github.com/owncloud/product/issues/287)
-
-- [apiProvisioningGroups-v1/addToGroup.feature:167](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/addToGroup.feature#L167)
-
-#### [Cannot create user with different username and emails](https://github.com/owncloud/product/issues/187)
-
-_special character username not valid_
-
-- [apiProvisioningGroups-v1/getGroup.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/getGroup.feature#L11)
-- [apiProvisioningGroups-v2/getGroup.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getGroup.feature#L11)
-
-#### [normal users can list the members of the group](https://github.com/owncloud/product/issues/290)
-
-- [apiProvisioningGroups-v1/getGroup.feature:81](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/getGroup.feature#L81)
-- [apiProvisioningGroups-v1/deleteGroup.feature:90](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v1/deleteGroup.feature#L90)
-- [apiProvisioningGroups-v2/getGroup.feature:83](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getGroup.feature#L83)
-
-#### [ocs v2 invalid status code for group endpoints](https://github.com/owncloud/product/issues/291)
-
-- [apiProvisioningGroups-v2/addGroup.feature:137](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addGroup.feature#L137)
-- [apiProvisioningGroups-v2/addToGroup.feature:133](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addToGroup.feature#L133)
-- [apiProvisioningGroups-v2/addToGroup.feature:141](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addToGroup.feature#L141)
-- [apiProvisioningGroups-v2/addToGroup.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/addToGroup.feature#L158)
-- [apiProvisioningGroups-v2/deleteGroup.feature:91](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/deleteGroup.feature#L91)
-- [apiProvisioningGroups-v2/getGroup.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getGroup.feature#L33)
-- [apiProvisioningGroups-v2/getUserGroups.feature:73](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/getUserGroups.feature#L73)
-- [apiProvisioningGroups-v2/removeFromGroup.feature:215](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioningGroups-v2/removeFromGroup.feature#L215)
 
 ### Other
 
@@ -1841,10 +1622,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiWebdavOperations/listFiles.feature:254](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L254)
 - [apiWebdavOperations/listFiles.feature:291](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L291)
 
-#### [OCS response is not returned when a disabled user tries to enable himself](https://github.com/owncloud/ocis/issues/3254)
-
-- [apiProvisioning-v1/enableUser.feature:62](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiProvisioning-v1/enableUser.feature#L62)
-
 #### [Trying to modify a shared file using spaces end-point returns 409 HTTP status code](https://github.com/owncloud/ocis/issues/3241)
 
 - [apiMain/checksums.feature:233](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L233)
@@ -1866,5 +1643,20 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiShareManagementBasicToShares/createShareToSharesFolder.feature:131](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L131)
 - [apiShareManagementBasicToShares/createShareToSharesFolder.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L132)
 
-  Note: always have an empty line at the end of this file.
-  The bash script that processes this file requires that the last line has a newline on the end.
+### [graph/users: enable/disable users](https://github.com/owncloud/ocis/issues/3064)
+
+- [apiWebdavOperations/refuseAccess.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L35)
+- [apiWebdavOperations/refuseAccess.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L36)
+- [apiWebdavOperations/refuseAccess.feature:41](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L41)
+
+### [Group name is case-insensitive](https://github.com/owncloud/ocis/issues/3167#issuecomment-1090045359)
+
+- [apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature:49](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature#L49)
+- [apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature:50](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature#L50)
+- [apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature:51](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature#L51)
+- [apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature:52](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature#L52)
+- [apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature:53](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature#L53)
+- [apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature:54](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature#L54)
+
+Note: always have an empty line at the end of this file.
+The bash script that processes this file requires that the last line has a newline on the end.
