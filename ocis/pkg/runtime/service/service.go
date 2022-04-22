@@ -32,6 +32,7 @@ import (
 	idp "github.com/owncloud/ocis/extensions/idp/pkg/command"
 	nats "github.com/owncloud/ocis/extensions/nats/pkg/command"
 	notifications "github.com/owncloud/ocis/extensions/notifications/pkg/command"
+	ocdav "github.com/owncloud/ocis/extensions/ocdav/pkg/command"
 	ocs "github.com/owncloud/ocis/extensions/ocs/pkg/command"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/command"
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/command"
@@ -118,7 +119,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["web"] = web.NewSutureService
 	s.ServicesRegistry["webdav"] = webdav.NewSutureService
 	s.ServicesRegistry["storage-frontend"] = storage.NewFrontend
-	s.ServicesRegistry["ocdav"] = storage.NewOCDav
+	s.ServicesRegistry["ocdav"] = ocdav.NewOCDav
 	s.ServicesRegistry["storage-gateway"] = storage.NewGateway
 	s.ServicesRegistry["storage-userprovider"] = user.NewUserProvider
 	s.ServicesRegistry["storage-groupprovider"] = group.NewGroupProvider

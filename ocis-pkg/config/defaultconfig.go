@@ -15,6 +15,7 @@ import (
 	idp "github.com/owncloud/ocis/extensions/idp/pkg/config/defaults"
 	nats "github.com/owncloud/ocis/extensions/nats/pkg/config/defaults"
 	notifications "github.com/owncloud/ocis/extensions/notifications/pkg/config/defaults"
+	ocdav "github.com/owncloud/ocis/extensions/ocdav/pkg/config/defaults"
 	ocs "github.com/owncloud/ocis/extensions/ocs/pkg/config/defaults"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config/defaults"
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/config/defaults"
@@ -68,5 +69,6 @@ func DefaultConfig() *Config {
 		StorageUsers:      storageusers.FullDefaultConfig(),
 		StorageShares:     storageshares.FullDefaultConfig(),
 		AppProvider:       appprovider.FullDefaultConfig(),
+		OCDav:             ocdav.FullDefaultConfig(),
 	}
 }

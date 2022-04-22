@@ -17,6 +17,7 @@ import (
 	idp "github.com/owncloud/ocis/extensions/idp/pkg/config"
 	nats "github.com/owncloud/ocis/extensions/nats/pkg/config"
 	notifications "github.com/owncloud/ocis/extensions/notifications/pkg/config"
+	ocdav "github.com/owncloud/ocis/extensions/ocdav/pkg/config"
 	ocs "github.com/owncloud/ocis/extensions/ocs/pkg/config"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config"
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/config"
@@ -95,6 +96,7 @@ type Config struct {
 	StoragePublicLink *storagepublic.Config   `yaml:"storage_public"`
 	StorageUsers      *storageusers.Config    `yaml:"storage_users"`
 	StorageShares     *storageshares.Config   `yaml:"storage_shares"`
+	OCDav             *ocdav.Config           `yaml:"ocdav"`
 	Store             *store.Config           `yaml:"store"`
 	Thumbnails        *thumbnails.Config      `yaml:"thumbnails"`
 	WebDAV            *webdav.Config          `yaml:"webdav"`

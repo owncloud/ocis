@@ -1,0 +1,71 @@
+package config
+
+import "github.com/owncloud/ocis/ocis-pkg/shared"
+
+type Config struct {
+	*shared.Commons `yaml:"-"`
+	Service         Service  `yaml:"-"`
+	Tracing         *Tracing `yaml:"tracing"`
+	Logging         *Logging `yaml:"log"`
+	Debug           Debug    `yaml:"debug"`
+	Supervised      bool
+
+	HTTP HTTPConfig `yaml:"http"`
+
+	// JWTSecret used to verify reva access token
+	JWTSecret             string `yaml:"jwt_secret"`
+	GatewayEndpoint       string
+	SkipUserGroupsInToken bool
+
+	WebdavNamespace string `yaml:"webdav_namespace"`
+	FilesNamespace  string `yaml:"files_namespace"`
+	SharesNamespace string `yaml:"shares_namespace"`
+	// PublicURL used to redirect /s/{token} URLs to
+	PublicURL string `yaml:"public_url"`
+
+	// Insecure certificates allowed when making requests to the gateway
+	Insecure bool `yaml:"insecure"`
+	// Timeout in seconds when making requests to the gateway
+	Timeout    int64 `yaml:"timeout"`
+	Middleware Middleware
+}
+type Tracing struct {
+	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;OCDAV_TRACING_ENABLED" desc:"Activates tracing."`
+	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;OCDAV_TRACING_TYPE"`
+	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;OCDAV_TRACING_ENDPOINT" desc:"The endpoint to the tracing collector."`
+	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;OCDAV_TRACING_COLLECTOR"`
+}
+
+type Logging struct {
+	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;OCDAV_LOG_LEVEL" desc:"The log level."`
+	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;OCDAV_LOG_PRETTY" desc:"Activates pretty log output."`
+	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR;OCDAV_LOG_COLOR" desc:"Activates colorized log output."`
+	File   string `yaml:"file" env:"OCIS_LOG_FILE;OCDAV_LOG_FILE" desc:"The target log file."`
+}
+
+type Service struct {
+	Name string `yaml:"-"`
+}
+
+type Debug struct {
+	Addr   string `yaml:"addr" env:"OCDAV_DEBUG_ADDR"`
+	Token  string `yaml:"token" env:"OCDAV_DEBUG_TOKEN"`
+	Pprof  bool   `yaml:"pprof" env:"OCDAV_DEBUG_PPROF"`
+	Zpages bool   `yaml:"zpages" env:"OCDAV_DEBUG_ZPAGES"`
+}
+
+type HTTPConfig struct {
+	Addr     string `yaml:"addr" env:"OCDAV_HTTP_ADDR" desc:"The address of the http service."`
+	Protocol string `yaml:"protocol" env:"OCDAV_HTTP_PROTOCOL" desc:"The transport protocol of the http service."`
+	Prefix   string `yaml:"prefix"`
+}
+
+// Middleware configures reva middlewares.
+type Middleware struct {
+	Auth Auth `yaml:"auth"`
+}
+
+// Auth configures reva http auth middleware.
+type Auth struct {
+	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agenr"`
+}
