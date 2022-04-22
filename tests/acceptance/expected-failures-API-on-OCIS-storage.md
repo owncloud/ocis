@@ -1866,5 +1866,11 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiShareManagementBasicToShares/createShareToSharesFolder.feature:131](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L131)
 - [apiShareManagementBasicToShares/createShareToSharesFolder.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L132)
 
+#### [resource path is no longer included in the returned error message](https://github.com/owncloud/ocis/issues/3344)
+
+- [apiWebdavProperties2/getFileProperties.feature:324](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L324)
+- [apiWebdavProperties2/getFileProperties.feature:336](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L336)
+- [apiWebdavProperties2/getFileProperties.feature:337](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L337)
+
   Note: always have an empty line at the end of this file.
   The bash script that processes this file requires that the last line has a newline on the end.
