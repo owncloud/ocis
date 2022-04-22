@@ -86,6 +86,21 @@ var _ = Describe("Index", func() {
 				Expect(len(res.Matches)).To(Equal(0))
 			})
 
+			It("limits the search to the relevant fields", func() {
+				res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
+					Ref: &searchmsg.Reference{
+						ResourceId: &searchmsg.ResourceID{
+							StorageId: ref.ResourceId.StorageId,
+							OpaqueId:  ref.ResourceId.OpaqueId,
+						},
+					},
+					Query: "*" + ref.ResourceId.OpaqueId + "*",
+				})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res).ToNot(BeNil())
+				Expect(len(res.Matches)).To(Equal(0))
+			})
+
 			It("finds files by name, prefix or substring match", func() {
 				queries := []string{"foo.pdf", "foo*", "*oo.p*"}
 				for _, query := range queries {

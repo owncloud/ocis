@@ -75,7 +75,7 @@ func (i *Index) Remove(ri *sprovider.ResourceInfo) error {
 // Search searches the index according to the criteria specified in the given SearchIndexRequest
 func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (*searchsvc.SearchIndexResponse, error) {
 	query := bleve.NewConjunctionQuery(
-		bleve.NewQueryStringQuery(req.Query),
+		bleve.NewQueryStringQuery("Name:"+req.Query),
 		bleve.NewQueryStringQuery("RootID:"+req.Ref.ResourceId.StorageId+"!"+req.Ref.ResourceId.OpaqueId), // Limit search to the space
 		bleve.NewQueryStringQuery("Path:"+req.Ref.Path+"*"),                                               // Limit search to this directory in the space
 	)
