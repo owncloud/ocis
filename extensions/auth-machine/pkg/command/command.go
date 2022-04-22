@@ -24,9 +24,6 @@ func AuthMachine(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-machine",
 		Usage: "start authprovider for machine auth",
-		// Before: func(c *cli.Context) error {
-		// 	return ParseConfig(c, cfg, "storage-auth-machine")
-		// },
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
 			logger := log.NewLogger(

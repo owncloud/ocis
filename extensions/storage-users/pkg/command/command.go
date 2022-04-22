@@ -24,9 +24,6 @@ func StorageUsers(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-users",
 		Usage: "start storage-users service",
-		// Before: func(c *cli.Context) error {
-		// 	return ParseConfig(c, cfg, "storage-userprovider")
-		// },
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
 			logger := log.NewLogger(

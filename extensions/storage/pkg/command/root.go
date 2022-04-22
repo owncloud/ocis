@@ -35,9 +35,9 @@ func Execute(cfg *config.Config) error {
 		Name:  "storage",
 		Usage: "Storage service for oCIS",
 
-		Before: func(c *cli.Context) error {
-			return ParseConfig(c, cfg, "storage")
-		},
+		// Before: func(c *cli.Context) error {
+		// 	return ParseConfig(c, cfg, "storage")
+		// },
 
 		Commands: GetCommands(cfg),
 	})

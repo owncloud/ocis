@@ -26,9 +26,6 @@ func AuthBasic(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-basic",
 		Usage: "start authprovider for basic auth",
-		// Before: func(c *cli.Context) error {
-		// 	return ParseConfig(c, cfg, "storage-auth-basic")
-		// },
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
 			logger := log.NewLogger(

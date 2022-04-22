@@ -25,9 +25,6 @@ func StorageShares(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-shares",
 		Usage: "start storage-shares service",
-		// Before: func(c *cli.Context) error {
-		// 	return ParseConfig(c, cfg, "storage-shares")
-		// },
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
 			logger := log.NewLogger(

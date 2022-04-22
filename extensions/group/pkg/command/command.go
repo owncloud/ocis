@@ -26,9 +26,6 @@ func Groups(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "groups",
 		Usage: "start groups service",
-		// Before: func(c *cli.Context) error {
-		// 	return ParseConfig(c, cfg, "storage-groups")
-		// },
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
 			logger := log.NewLogger(

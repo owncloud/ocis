@@ -29,7 +29,6 @@ func OCDav(cfg *config.Config) *cli.Command {
 			if err := loadUserAgent(c, cfg); err != nil {
 				return err
 			}
-			// return ParseConfig(c, cfg, "ocdav")
 			return nil
 		},
 		Action: func(c *cli.Context) error {

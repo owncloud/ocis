@@ -31,10 +31,6 @@ func Gateway(cfg *config.Config) *cli.Command {
 		Name:  "gateway",
 		Usage: "start gateway",
 		Before: func(c *cli.Context) error {
-			// if err := ParseConfig(c, cfg, "storage-gateway"); err != nil {
-			// 	return err
-			// }
-
 			if cfg.DataGatewayPublicURL == "" {
 				cfg.DataGatewayPublicURL = strings.TrimRight(cfg.FrontendPublicURL, "/") + "/data"
 			}

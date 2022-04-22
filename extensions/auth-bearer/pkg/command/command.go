@@ -24,9 +24,6 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-bearer",
 		Usage: "start authprovider for bearer auth",
-		// Before: func(c *cli.Context) error {
-		// 	return ParseConfig(c, cfg, "storage-auth-bearer")
-		// },
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
 			logger := log.NewLogger(
