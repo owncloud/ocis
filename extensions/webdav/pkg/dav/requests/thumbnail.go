@@ -7,9 +7,10 @@ import (
 	"net/url"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	"github.com/go-chi/chi/v5"
+
+	"github.com/owncloud/ocis/extensions/webdav/pkg/constants"
 )
 
 const (
@@ -39,12 +40,16 @@ type ThumbnailRequest struct {
 
 // ParseThumbnailRequest extracts all required parameters from a http request.
 func ParseThumbnailRequest(r *http.Request) (*ThumbnailRequest, error) {
-	fp, id, err := extractFilePath(r)
-	if err != nil {
-		return nil, err
-	}
-	q := r.URL.Query()
+	ctx := r.Context()
 
+	fp := ctx.Value(constants.ContextKeyPath).(string)
+	if fp == "" {
+		return nil, errors.New("invalid file path")
+	}
+
+	id := ctx.Value(constants.ContextKeyID).(string)
+
+	q := r.URL.Query()
 	width, height, err := parseDimensions(q)
 	if err != nil {
 		return nil, err
@@ -59,32 +64,6 @@ func ParseThumbnailRequest(r *http.Request) (*ThumbnailRequest, error) {
 		PublicLinkToken: chi.URLParam(r, "token"),
 		Identifier:      id,
 	}, nil
-}
-
-// the url looks as followed
-//
-// /remote.php/dav/files/<user>/<filepath>
-//
-// User and filepath are dynamic and filepath can contain slashes
-// So using the URLParam function is not possible.
-func extractFilePath(r *http.Request) (string, string, error) {
-	id := chi.URLParam(r, "id")
-	id, err := url.QueryUnescape(id)
-	if err != nil {
-		return "", "", errors.New("could not unescape user")
-	}
-	if id != "" {
-		parts := strings.SplitN(r.URL.Path, id, 2)
-		return parts[1], id, nil
-	}
-
-	// This is for public links
-	token := chi.URLParam(r, "token")
-	if token != "" {
-		parts := strings.SplitN(r.URL.Path, token, 2)
-		return parts[1], "", nil
-	}
-	return "", "", errors.New("could not extract file path")
 }
 
 func parseDimensions(q url.Values) (int64, int64, error) {

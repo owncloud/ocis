@@ -1,9 +1,14 @@
 package svc
 
 import (
+	"context"
 	"encoding/xml"
 	"io"
 	"net/http"
+<<<<<<< HEAD
+=======
+	"net/url"
+>>>>>>> 60f1081e8 (implement thumbnails also for webdav and non remote.php routes)
 	"path"
 	"path/filepath"
 	"strings"
@@ -11,6 +16,7 @@ import (
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/templates"
 	"github.com/go-chi/render"
@@ -21,11 +27,19 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 
 	"github.com/go-chi/chi/v5"
+<<<<<<< HEAD
 	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/config"
 	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/dav/requests"
 	thumbnailsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
+=======
+	"github.com/owncloud/ocis/extensions/webdav/pkg/config"
+	"github.com/owncloud/ocis/extensions/webdav/pkg/constants"
+	"github.com/owncloud/ocis/extensions/webdav/pkg/dav/requests"
+	thumbnailsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/thumbnails/v0"
+	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
+>>>>>>> 60f1081e8 (implement thumbnails also for webdav and non remote.php routes)
 )
 
 const (
@@ -73,26 +87,30 @@ func NewService(opts ...Option) (Service, error) {
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
-		r.Get("/remote.php/dav/spaces/{id}/*", svc.SpacesThumbnail)
-		r.Get("/remote.php/dav/files/{id}/*", svc.Thumbnail)
-		r.Get("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnail)
-		r.Head("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnailHead)
 
-		r.Get("/remote.php/webdav/spaces/{id}/*", svc.SpacesThumbnail)
-		r.Get("/remote.php/webdav/files/{id}/*", svc.Thumbnail)
-		r.Get("/remote.php/webdav/public-files/{token}/*", svc.PublicThumbnail)
-		r.Head("/remote.php/webdav/public-files/{token}/*", svc.PublicThumbnailHead)
+		r.Group(func(r chi.Router) {
+			r.Use(svc.DavContext())
 
-		r.Get("/dav/spaces/{id}/*", svc.SpacesThumbnail)
-		r.Get("/dav/files/{id}/*", svc.Thumbnail)
-		r.Get("/dav/public-files/{token}/*", svc.PublicThumbnail)
-		r.Head("/dav/public-files/{token}/*", svc.PublicThumbnailHead)
+			r.Get("/remote.php/dav/spaces/{id}/*", svc.SpacesThumbnail)
+			r.Get("/dav/spaces/{id}/*", svc.SpacesThumbnail)
 
-		r.Get("/webdav/spaces/{id}/*", svc.SpacesThumbnail)
-		r.Get("/webdav/files/{id}/*", svc.Thumbnail)
-		r.Get("/webdav/public-files/{token}/*", svc.PublicThumbnail)
-		r.Head("/webdav/public-files/{token}/*", svc.PublicThumbnailHead)
+			r.Get("/remote.php/dav/files/{id}/*", svc.Thumbnail)
+			r.Get("/dav/files/{id}/*", svc.Thumbnail)
 
+			r.Head("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnailHead)
+			r.Head("/dav/public-files/{token}/*", svc.PublicThumbnailHead)
+
+			r.Get("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnail)
+			r.Get("/dav/public-files/{token}/*", svc.PublicThumbnail)
+		})
+
+		r.Group(func(r chi.Router) {
+			r.Use(svc.WebdavContext())
+
+			r.Get("/remote.php/webdav/*", svc.Thumbnail)
+			r.Get("/webdav/*", svc.Thumbnail)
+		})
+		
 		// r.MethodFunc("REPORT", "/remote.php/dav/files/{id}/*", svc.Search)
 
 		// This is a workaround for the go-chi concurrent map read write issue.
@@ -127,6 +145,63 @@ type Webdav struct {
 // ServeHTTP implements the Service interface.
 func (g Webdav) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.mux.ServeHTTP(w, r)
+}
+
+func (g Webdav) DavContext() func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+
+			id := chi.URLParam(r, "id")
+			id, err := url.QueryUnescape(id)
+			if err == nil && id != "" {
+				ctx = context.WithValue(ctx, constants.ContextKeyID, id)
+			}
+
+			filePath := r.URL.Path
+			if id != "" {
+				filePath = strings.TrimPrefix(filePath, path.Join("/remote.php/dav/spaces", id)+"/")
+				filePath = strings.TrimPrefix(filePath, path.Join("/dav/spaces", id)+"/")
+
+				filePath = strings.TrimPrefix(filePath, path.Join("/remote.php/dav/files", id)+"/")
+				filePath = strings.TrimPrefix(filePath, path.Join("/dav/files", id)+"/")
+			}
+
+			// token for public links
+			token := chi.URLParam(r, "token")
+
+			if token != "" {
+				filePath = strings.TrimPrefix(filePath, path.Join("/remote.php/dav/public-files", token)+"/")
+				filePath = strings.TrimPrefix(filePath, path.Join("/dav/public-files", token)+"/")
+			}
+			ctx = context.WithValue(ctx, constants.ContextKeyPath, filePath)
+
+			next.ServeHTTP(w, r.WithContext(ctx))
+
+		})
+	}
+}
+
+func (g Webdav) WebdavContext() func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+
+			u, ok := revactx.ContextGetUser(r.Context())
+			if ok {
+				if u.Id == nil || u.Id.OpaqueId != "" {
+					ctx = context.WithValue(ctx, constants.ContextKeyID, u.Id.OpaqueId)
+				}
+			}
+
+			filePath := r.URL.Path
+			filePath = strings.TrimPrefix(filePath, "/remote.php/webdav/")
+			filePath = strings.TrimPrefix(filePath, "/webdav/")
+			ctx = context.WithValue(ctx, constants.ContextKeyPath, filePath)
+
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
 }
 
 // SpacesThumbnail is the endpoint for retrieving thumbnails inside of spaces.
