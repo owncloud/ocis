@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 
-	"github.com/asim/go-micro/plugins/events/natsjs/v4"
 	"github.com/blevesearch/bleve/v2"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/server"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/go-micro/plugins/v4/events/natsjs"
 	"go-micro.dev/v4/metadata"
 	grpcmetadata "google.golang.org/grpc/metadata"
 
