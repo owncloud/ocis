@@ -15,7 +15,7 @@ import (
 
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 
-	mzlog "github.com/asim/go-micro/plugins/logger/zerolog/v4"
+	mzlog "github.com/go-micro/plugins/v4/logger/zerolog"
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
 

@@ -16,7 +16,6 @@ import (
 	storemsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/store/v0"
 	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v0"
 
-	"github.com/asim/go-micro/plugins/client/grpc/v4"
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -26,6 +25,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-micro/plugins/v4/client/grpc"
 	"github.com/google/uuid"
 	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/response"
@@ -230,7 +230,8 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 			Account: newAccount,
 		})
 	case "cs3":
-		o.logger.Fatal().Msg("cs3 backend doesn't support adding users")
+		o.cs3WriteNotSupported(w, r)
+		return
 	default:
 		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
 	}
@@ -293,7 +294,8 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 	case "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
 	case "cs3":
-		o.logger.Fatal().Msg("cs3 backend doesn't support editing users")
+		o.cs3WriteNotSupported(w, r)
+		return
 	default:
 		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
 	}
@@ -374,7 +376,8 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	case "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
 	case "cs3":
-		o.logger.Fatal().Msg("cs3 backend doesn't support deleting users")
+		o.cs3WriteNotSupported(w, r)
+		return
 	default:
 		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
 	}
@@ -546,7 +549,8 @@ func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
 	case "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
 	case "cs3":
-		o.logger.Fatal().Msg("cs3 backend doesn't support enabling users")
+		o.cs3WriteNotSupported(w, r)
+		return
 	default:
 		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
 	}
@@ -600,7 +604,8 @@ func (o Ocs) DisableUser(w http.ResponseWriter, r *http.Request) {
 	case "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
 	case "cs3":
-		o.logger.Fatal().Msg("cs3 backend doesn't support disabling users")
+		o.cs3WriteNotSupported(w, r)
+		return
 	default:
 		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
 	}
@@ -730,7 +735,8 @@ func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
 		})
 	case "cs3":
 		// TODO
-		o.logger.Fatal().Msg("cs3 backend doesn't support listing users")
+		o.cs3WriteNotSupported(w, r)
+		return
 	default:
 		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
 	}
@@ -781,4 +787,10 @@ func (o Ocs) fetchAccountFromCS3Backend(ctx context.Context, name string) (*acco
 		UidNumber:                u.UidNumber,
 		GidNumber:                u.GidNumber,
 	}, nil
+}
+
+func (o Ocs) cs3WriteNotSupported(w http.ResponseWriter, r *http.Request) {
+	o.logger.Warn().Msg("the CS3 backend does not support adding or updating users")
+	o.NotImplementedStub(w, r)
+	return
 }

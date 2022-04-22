@@ -66,6 +66,6 @@ Create a git repository with an extension containing the boilerplate code.
 We have the ocis-hello repository which acts as an example extension containing a grpc and http service and a web UI. It also demonstrates the usage of the settings service.
 
 * Good, because it contains a bit more code than just the plain boilerplate
-* Good, because the integration into oCIS is already tested for the Hello extension (eg. with Proxy and Settings). This will ensure, that the example extension is up to date.
+* Good, because the integration into oCIS is already tested for the Hello extension (e.g. with Proxy and Settings). This will ensure, that the example extension is up-to-date.
 * Bad, because if you don't require all features you have to delete stuff
 

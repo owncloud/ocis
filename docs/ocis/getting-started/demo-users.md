@@ -10,7 +10,7 @@ geekdocFilePath: demo-users.md
 oCIS has the option to create demo users during the first startup. These enable you to do quick testing and developing.
 
 {{< hint info >}}
-To create the demo users, run the inital setup step with an additional environment variable.
+To create the demo users, run the initial setup step with an additional environment variable.
 `ACCOUNTS_DEMO_USERS_AND_GROUPS=true ./bin/ocis server` will generate the demo users listed in the table below. By default, it only generates the admin and one user for IDP and Reva respectively.
 {{< /hint >}}
 

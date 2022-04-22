@@ -115,7 +115,7 @@ If the problem persists, please check the [troubleshooting section about uploads
 
 ## Further exploration
 
-EOS has a built in shell that you can enter using
+EOS has a built-in shell that you can enter using
 ```
 $ docker-compose exec mgm-master eos
 # ---------------------------------------------------------------------------
@@ -223,7 +223,7 @@ The ocis logs can be accessed using `docker-compose logs ocis`. Add `-f` for fol
 
 1. `docker-compose exec ocis make clean build` to update the binary
 2. `docker-compose exec ocis ./bin/ocis kill <service>` to kill the service
-3. `docker-compose exec ocis ./bin/ocis run <service>` to start the service. Do not forget to set any env vars, eg.
+3. `docker-compose exec ocis ./bin/ocis run <service>` to start the service. Do not forget to set any env vars, e.g.
   `docker-compose exec -e STORAGE_HOME_DRIVER=eoshome -e STORAGE_DRIVER_EOS_LAYOUT="{{substr 0 1 .Id.OpaqueId}}/{{.Id.OpaqueId}}"  ocis ./bin/ocis run storage-home`
 
 ### Creation and upload of files does not work

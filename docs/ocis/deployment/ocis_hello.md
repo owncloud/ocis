@@ -13,7 +13,7 @@ geekdocFilePath: ocis_hello.md
 
 - oCIS running behind Traefik as reverse proxy
 - oCIS Hello extension runs beside the main oCIS stack and providing the Hello functionality
-- Traefik generating self signed certificates for local setup or obtaining valid SSL certificates for a server setup
+- Traefik generating self-signed certificates for local setup or obtaining valid SSL certificates for a server setup
 
 [Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_hello)
 
@@ -21,7 +21,7 @@ The docker stack consists of 3 containers. One of them is Traefik, a proxy which
 
 The next container is oCIS itself in a configuration like the [oCIS with Traefik example]({{< ref "ocis_traefik" >}}), except that for this example a custom proxy and web UI configuration is used to enable the oCIS Hello extension.
 
-The oCIS Hello extension is running in another container and enables you to use its' functionality from within ownCloud Web.
+The oCIS Hello extension is running in another container and enables you to use its functionality from within ownCloud Web.
 
 ## Server Deployment
 
@@ -53,7 +53,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
       INSECURE=true
 
       ### Traefik settings ###
-      # Serve Treafik dashboard. Defaults to "false".
+      # Serve Traefik dashboard. Defaults to "false".
       TRAEFIK_DASHBOARD=
       # Domain of Traefik, where you can find the dashboard. Defaults to "traefik.owncloud.test"
       TRAEFIK_DOMAIN=
@@ -85,17 +85,17 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
 
-  If you want to use the Traefik dashboard, set TRAEFIK_DASHBOARD to `true` (default is `false` and therefore not active). If you activate it, you must set a domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` eg. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
+  If you want to use the Traefik dashboard, set TRAEFIK_DASHBOARD to `true` (default is `false` and therefore not active). If you activate it, you must set a domain for the Traefik dashboard in `TRAEFIK_DOMAIN=` e.g. `TRAEFIK_DOMAIN=traefik.owncloud.test`.
 
-  The Traefik dashboard is secured by basic auth. Default credentials are the user `admin` with the password `admin`. To set your own credentials, generate a htpasswd (eg. by using [an online tool](https://htpasswdgenerator.de/) or a cli tool).
+  The Traefik dashboard is secured by basic auth. Default credentials are the user `admin` with the password `admin`. To set your own credentials, generate a htpasswd (e.g. by using [an online tool](https://htpasswdgenerator.de/) or a cli tool).
 
   Traefik will issue certificates with LetsEncrypt and therefore you must set an email address in `TRAEFIK_ACME_MAIL=`.
 
   By default oCIS will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OCIS_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
 
-  Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, eg. `OCIS_DOMAIN=ocis.owncloud.test`.
+  Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, e.g. `OCIS_DOMAIN=ocis.owncloud.test`.
 
-  You also must override the default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD`, `OCIS_JWT_SECRET`, `STORAGE_TRANSFER_SECRET` and `OCIS_MACHINE_AUTH_API_KEY`  in order to secure your oCIS instance. Choose some random strings eg. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}}).
+  You also must override the default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD`, `OCIS_JWT_SECRET`, `STORAGE_TRANSFER_SECRET` and `OCIS_MACHINE_AUTH_API_KEY`  in order to secure your oCIS instance. Choose some random strings e.g. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}}).
 
   By default the oCIS Hello extension will be started in the `latest` version. If you want to start a specific version of oCIS Hello set the version to `OCIS_HELLO_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis-hello/tags?page=1&ordering=last_updated).
 
@@ -111,7 +111,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
 For a more simple local ocis setup see [Getting started]({{< ref "../getting-started" >}})
 
-This docker stack can also be run locally. One downside is that Traefik can not obtain valid SSL certificates and therefore will create self signed ones. This means that your browser will show scary warnings. Another downside is that you can not point DNS entries to your localhost. So you have to add static host entries to your computer.
+This docker stack can also be run locally. One downside is that Traefik can not obtain valid SSL certificates and therefore will create self-signed ones. This means that your browser will show scary warnings. Another downside is that you can not point DNS entries to your localhost. So you have to add static host entries to your computer.
 
 On Linux and macOS you can add them to your `/etc/hosts` files like this:
 
