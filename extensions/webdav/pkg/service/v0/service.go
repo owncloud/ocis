@@ -78,6 +78,21 @@ func NewService(opts ...Option) (Service, error) {
 		r.Get("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnail)
 		r.Head("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnailHead)
 
+		r.Get("/remote.php/webdav/spaces/{id}/*", svc.SpacesThumbnail)
+		r.Get("/remote.php/webdav/files/{id}/*", svc.Thumbnail)
+		r.Get("/remote.php/webdav/public-files/{token}/*", svc.PublicThumbnail)
+		r.Head("/remote.php/webdav/public-files/{token}/*", svc.PublicThumbnailHead)
+
+		r.Get("/dav/spaces/{id}/*", svc.SpacesThumbnail)
+		r.Get("/dav/files/{id}/*", svc.Thumbnail)
+		r.Get("/dav/public-files/{token}/*", svc.PublicThumbnail)
+		r.Head("/dav/public-files/{token}/*", svc.PublicThumbnailHead)
+
+		r.Get("/webdav/spaces/{id}/*", svc.SpacesThumbnail)
+		r.Get("/webdav/files/{id}/*", svc.Thumbnail)
+		r.Get("/webdav/public-files/{token}/*", svc.PublicThumbnail)
+		r.Head("/webdav/public-files/{token}/*", svc.PublicThumbnailHead)
+
 		// r.MethodFunc("REPORT", "/remote.php/dav/files/{id}/*", svc.Search)
 
 		// This is a workaround for the go-chi concurrent map read write issue.
