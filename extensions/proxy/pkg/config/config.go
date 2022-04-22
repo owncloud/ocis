@@ -22,7 +22,7 @@ type Config struct {
 
 	Policies              []Policy        `yaml:"policies,omitempty"`
 	OIDC                  OIDC            `yaml:"oidc,omitempty"`
-	TokenManager          TokenManager    `yaml:"token_manager,omitempty"`
+	TokenManager          *TokenManager   `yaml:"token_manager,omitempty"`
 	PolicySelector        *PolicySelector `yaml:"policy_selector,omitempty"`
 	PreSignedURL          PreSignedURL    `yaml:"pre_signed_url,omitempty"`
 	AccountBackend        string          `yaml:"account_backend,omitempty" env:"PROXY_ACCOUNT_BACKEND_TYPE"`

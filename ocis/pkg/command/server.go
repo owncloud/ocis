@@ -21,7 +21,9 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 
 			cfg.Commons = &shared.Commons{
-				Log: cfg.Log,
+				Log:          cfg.Log,
+				Tracing:      cfg.Tracing,
+				TokenManager: cfg.TokenManager,
 			}
 
 			r := runtime.New(cfg)

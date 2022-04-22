@@ -34,9 +34,6 @@ func DefaultConfig() *config.Config {
 				TTL:  10,
 			},
 		},
-		TokenManager: config.TokenManager{
-			JWTSecret: "Pive-Fumkiu4",
-		},
 		PolicySelector: nil,
 		Reva: config.Reva{
 			Address: "127.0.0.1:9142",
@@ -181,6 +178,13 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else {
+		cfg.TokenManager = &config.TokenManager{}
+	}
 }
 
 func Sanitize(cfg *config.Config) {

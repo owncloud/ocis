@@ -2,31 +2,30 @@ package command
 
 import (
 	"bufio"
-	"crypto/rand"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"math/big"
 	"os"
 	"path"
 	"strings"
 
 	"github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/generators"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	cli "github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v3"
 
-	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/config"
-	graph "github.com/owncloud/ocis/extensions/graph/pkg/config"
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/config"
 	notifications "github.com/owncloud/ocis/extensions/notifications/pkg/config"
 	ocs "github.com/owncloud/ocis/extensions/ocs/pkg/config"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config"
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/config"
+	storage "github.com/owncloud/ocis/extensions/storage/pkg/config"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
 )
 
-const configFilename string = "ocis.yml"
+const configFilename string = "ocis.yaml"
 const passwordLength int = 32
 
 // InitCommand is the entrypoint for the init command
@@ -54,7 +53,7 @@ func InitCommand(cfg *config.Config) *cli.Command {
 			&cli.StringFlag{
 				Name: "config-path",
 				//Value: cfg.ConfigPath, // TODO: as soon as PR 3480 is merged, remove quotes
-				Value: path.Join(homeDir, ".ocis"), // TODO: this is temporary for experimenting, line above is relevant
+				Value: path.Join(homeDir, ".ocis/config"), // TODO: this is temporary for experimenting, line above is relevant
 				Usage: "config path for the ocis runtime",
 				// Destination: &cfg.ConfigFile, // TODO: same as above
 			},
@@ -101,70 +100,86 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 		return err
 	}
 	cfg := config.Config{
-		Accounts: &accounts.Config{},
+		TokenManager: &shared.TokenManager{},
+		//Accounts: &accounts.Config{},
 		//Audit:    &audit.Config{},
 		//GLAuth:        &glauth.Config{},
 		//GraphExplorer: &graphExplorer.Config{},
-		Graph: &graph.Config{},
-		IDM:   &idm.Config{},
+		//Graph: &graph.Config{},
+		IDM: &idm.Config{},
 		//IDP:           &idp.Config{},
 		//Nats:          &nats.Config{},
 		Notifications: &notifications.Config{},
-		Proxy:         &proxy.Config{},
-		OCS:           &ocs.Config{},
-		Settings:      &settings.Config{},
-		//Storage:       &storage.Config{},
+		//Proxy:         &proxy.Config{},
+		OCS:        &ocs.Config{},
+		Settings:   &settings.Config{},
+		Storage:    &storage.Config{},
 		Thumbnails: &thumbnails.Config{},
 		//Web:           &web.Config{},
 		//WebDAV:        &webdav.Config{},
 	}
 
 	if insecure {
+		cfg.Proxy = &proxy.Config{}
 		cfg.Proxy.InsecureBackends = insecure
 	}
 
-	idmServicePassword, err := generateRandomPassword(passwordLength)
+	idmServicePassword, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("Could not generate random password for idm: %s", err)
 	}
-	idpServicePassword, err := generateRandomPassword(passwordLength)
+	idpServicePassword, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("Could not generate random password for idp: %s", err)
 	}
-	ocisAdminServicePassword, err := generateRandomPassword(passwordLength)
+	ocisAdminServicePassword, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("Could not generate random password for ocis admin: %s", err)
 	}
-	revaServicePassword, err := generateRandomPassword(passwordLength)
+	revaServicePassword, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("Could not generate random password for reva: %s", err)
 	}
-	tokenManagerJwtSecret, err := generateRandomPassword(passwordLength)
+	tokenManagerJwtSecret, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("Could not generate random password for tokenmanager: %s", err)
 	}
-	machineAuthSecret, err := generateRandomPassword(passwordLength)
+	machineAuthSecret, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("Could not generate random password for machineauthsecret: %s", err)
 	}
-	thumbnailTransferTokenSecret, err := generateRandomPassword(passwordLength)
+	thumbnailTransferTokenSecret, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("Could not generate random password for machineauthsecret: %s", err)
 	}
 
+	// TODO: IDP config is missing (LDAP + GROUP provider)
+	// TODO: REVA config is missing (LDAP + GROUP provider)
+	// TODO: graph needs IDM password configured
+	// TODO: add missing insecure occurences
+	// TODO: search for missing transfer secrets
+	// TODO: move TokenManager for all extensions to shared
+	// TODO: move machineauthsecret for all extensions to shared
+	// TODO: move transfersecret for all extensions to shared
+
 	cfg.TokenManager.JWTSecret = tokenManagerJwtSecret
-	cfg.Accounts.TokenManager.JWTSecret = tokenManagerJwtSecret
-	cfg.Graph.TokenManager.JWTSecret = tokenManagerJwtSecret
+	//cfg.Commons.TokenManager.JWTSecret = tokenManagerJwtSecret
+	//cfg.Accounts.TokenManager.JWTSecret = tokenManagerJwtSecret
+	//cfg.Graph.TokenManager.JWTSecret = tokenManagerJwtSecret
+	//fmt.Printf("%v\n", cfg.Graph.TokenManager)
 	cfg.IDM.ServiceUserPasswords.Idm = idmServicePassword
 	cfg.IDM.ServiceUserPasswords.Idp = idpServicePassword
 	cfg.IDM.ServiceUserPasswords.OcisAdmin = ocisAdminServicePassword
 	cfg.IDM.ServiceUserPasswords.Reva = revaServicePassword
 	cfg.Notifications.Notifications.MachineAuthSecret = machineAuthSecret
 	cfg.OCS.MachineAuthAPIKey = machineAuthSecret
-	cfg.Proxy.TokenManager.JWTSecret = tokenManagerJwtSecret
+	//cfg.Proxy.TokenManager.JWTSecret = tokenManagerJwtSecret
+	//fmt.Printf("%v\n", cfg.Proxy.TokenManager)
 	cfg.Proxy.MachineAuthAPIKey = machineAuthSecret
 	cfg.Settings.Metadata.MachineAuthAPIKey = machineAuthSecret
-	cfg.Settings.TokenManager.JWTSecret = tokenManagerJwtSecret
+	//cfg.Settings.TokenManager.JWTSecret = tokenManagerJwtSecret
+	cfg.Storage.Reva.JWTSecret = tokenManagerJwtSecret
+	cfg.Storage.OCDav.JWTSecret = tokenManagerJwtSecret
 	cfg.Thumbnails.Thumbnail.TransferTokenSecret = thumbnailTransferTokenSecret
 	yamlOutput, err := yaml.Marshal(cfg)
 	if err != nil {
@@ -197,18 +212,4 @@ func stringPrompt(label string) string {
 		}
 	}
 	return strings.TrimSpace(input)
-}
-
-func generateRandomPassword(length int) (string, error) {
-	const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-=+!@#$%^&*."
-	ret := make([]byte, length)
-	for i := 0; i < length; i++ {
-		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(chars))))
-		if err != nil {
-			return "", err
-		}
-		ret[i] = chars[num.Int64()]
-	}
-
-	return string(ret), nil
 }

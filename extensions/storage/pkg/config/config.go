@@ -8,123 +8,123 @@ import (
 
 // Log defines the available logging configuration.
 type Log struct {
-	Level  string `yaml:"level"`
-	Pretty bool   `yaml:"pretty"`
-	Color  bool   `yaml:"color"`
-	File   string `yaml:"file"`
+	Level  string `yaml:"level,omitempty"`
+	Pretty bool   `yaml:"pretty,omitempty"`
+	Color  bool   `yaml:"color,omitempty"`
+	File   string `yaml:"file,omitempty"`
 }
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string `yaml:"addr"`
-	Token  string `yaml:"token"`
-	Pprof  bool   `yaml:"pprof"`
-	Zpages bool   `yaml:"zpages"`
+	Addr   string `yaml:"addr,omitempty"`
+	Token  string `yaml:"token,omitempty"`
+	Pprof  bool   `yaml:"pprof,omitempty"`
+	Zpages bool   `yaml:"zpages,omitempty"`
 }
 
 // Gateway defines the available gateway configuration.
 type Gateway struct {
 	Port
-	CommitShareToStorageGrant  bool   `yaml:"commit_share_to_storage_grant"`
-	CommitShareToStorageRef    bool   `yaml:"commit_share_to_storage_ref"`
-	DisableHomeCreationOnLogin bool   `yaml:"disable_home_creation_on_login"`
-	ShareFolder                string `yaml:"share_folder"`
-	LinkGrants                 string `yaml:"link_grants"`
-	HomeMapping                string `yaml:"home_mapping"`
-	EtagCacheTTL               int    `yaml:"etag_cache_ttl"`
+	CommitShareToStorageGrant  bool   `yaml:"commit_share_to_storage_grant,omitempty"`
+	CommitShareToStorageRef    bool   `yaml:"commit_share_to_storage_ref,omitempty"`
+	DisableHomeCreationOnLogin bool   `yaml:"disable_home_creation_on_login,omitempty"`
+	ShareFolder                string `yaml:"share_folder,omitempty"`
+	LinkGrants                 string `yaml:"link_grants,omitempty"`
+	HomeMapping                string `yaml:"home_mapping,omitempty"`
+	EtagCacheTTL               int    `yaml:"etag_cache_ttl,omitempty"`
 }
 
 // StorageRegistry defines the available storage registry configuration
 type StorageRegistry struct {
-	Driver string `yaml:"driver"`
+	Driver string `yaml:"driver,omitempty"`
 	// HomeProvider is the path in the global namespace that the static storage registry uses to determine the home storage
-	HomeProvider string   `yaml:"home_provider"`
-	Rules        []string `yaml:"rules"`
-	JSON         string   `yaml:"json"`
+	HomeProvider string   `yaml:"home_provider,omitempty"`
+	Rules        []string `yaml:"rules,omitempty"`
+	JSON         string   `yaml:"json,omitempty"`
 }
 
 // AppRegistry defines the available app registry configuration
 type AppRegistry struct {
-	Driver        string `yaml:"driver"`
-	MimetypesJSON string `yaml:"mime_types_json"`
+	Driver        string `yaml:"driver,omitempty"`
+	MimetypesJSON string `yaml:"mime_types_json,omitempty"`
 }
 
 // AppProvider defines the available app provider configuration
 type AppProvider struct {
 	Port
-	ExternalAddr string     `yaml:"external_addr"`
-	Driver       string     `yaml:"driver"`
-	WopiDriver   WopiDriver `yaml:"wopi_driver"`
-	AppsURL      string     `yaml:"apps_url"`
-	OpenURL      string     `yaml:"open_url"`
-	NewURL       string     `yaml:"new_url"`
+	ExternalAddr string     `yaml:"external_addr,omitempty"`
+	Driver       string     `yaml:"driver,omitempty"`
+	WopiDriver   WopiDriver `yaml:"wopi_driver,omitempty"`
+	AppsURL      string     `yaml:"apps_url,omitempty"`
+	OpenURL      string     `yaml:"open_url,omitempty"`
+	NewURL       string     `yaml:"new_url,omitempty"`
 }
 
 type WopiDriver struct {
-	AppAPIKey      string `yaml:"app_api_key"`
-	AppDesktopOnly bool   `yaml:"app_desktop_only"`
-	AppIconURI     string `yaml:"app_icon_uri"`
-	AppInternalURL string `yaml:"app_internal_url"`
-	AppName        string `yaml:"app_name"`
-	AppURL         string `yaml:"app_url"`
-	Insecure       bool   `yaml:"insecure"`
-	IopSecret      string `yaml:"ipo_secret"`
-	JWTSecret      string `yaml:"jwt_secret"`
-	WopiURL        string `yaml:"wopi_url"`
+	AppAPIKey      string `yaml:"app_api_key,omitempty"`
+	AppDesktopOnly bool   `yaml:"app_desktop_only,omitempty"`
+	AppIconURI     string `yaml:"app_icon_uri,omitempty"`
+	AppInternalURL string `yaml:"app_internal_url,omitempty"`
+	AppName        string `yaml:"app_name,omitempty"`
+	AppURL         string `yaml:"app_url,omitempty"`
+	Insecure       bool   `yaml:"insecure,omitempty"`
+	IopSecret      string `yaml:"ipo_secret,omitempty"`
+	JWTSecret      string `yaml:"jwt_secret,omitempty"`
+	WopiURL        string `yaml:"wopi_url,omitempty"`
 }
 
 // Sharing defines the available sharing configuration.
 type Sharing struct {
 	Port
-	UserDriver                       string `yaml:"user_driver"`
-	UserJSONFile                     string `yaml:"user_json_file"`
-	CS3ProviderAddr                  string `yaml:"provider_addr"`
-	CS3ServiceUser                   string `yaml:"service_user_id"`
-	CS3ServiceUserIdp                string `yaml:"service_user_idp"`
-	UserSQLUsername                  string `yaml:"user_sql_username"`
-	UserSQLPassword                  string `yaml:"user_sql_password"`
-	UserSQLHost                      string `yaml:"user_sql_host"`
-	UserSQLPort                      int    `yaml:"user_sql_port"`
-	UserSQLName                      string `yaml:"user_sql_name"`
-	PublicDriver                     string `yaml:"public_driver"`
-	PublicJSONFile                   string `yaml:"public_json_file"`
-	PublicPasswordHashCost           int    `yaml:"public_password_hash_cost"`
-	PublicEnableExpiredSharesCleanup bool   `yaml:"public_enable_expired_shares_cleanup"`
-	PublicJanitorRunInterval         int    `yaml:"public_janitor_run_interval"`
-	UserStorageMountID               string `yaml:"user_storage_mount_id"`
-	Events                           Events `yaml:"events"`
+	UserDriver                       string `yaml:"user_driver,omitempty"`
+	UserJSONFile                     string `yaml:"user_json_file,omitempty"`
+	CS3ProviderAddr                  string `yaml:"provider_addr,omitempty"`
+	CS3ServiceUser                   string `yaml:"service_user_id,omitempty"`
+	CS3ServiceUserIdp                string `yaml:"service_user_idp,omitempty"`
+	UserSQLUsername                  string `yaml:"user_sql_username,omitempty"`
+	UserSQLPassword                  string `yaml:"user_sql_password,omitempty"`
+	UserSQLHost                      string `yaml:"user_sql_host,omitempty"`
+	UserSQLPort                      int    `yaml:"user_sql_port,omitempty"`
+	UserSQLName                      string `yaml:"user_sql_name,omitempty"`
+	PublicDriver                     string `yaml:"public_driver,omitempty"`
+	PublicJSONFile                   string `yaml:"public_json_file,omitempty"`
+	PublicPasswordHashCost           int    `yaml:"public_password_hash_cost,omitempty"`
+	PublicEnableExpiredSharesCleanup bool   `yaml:"public_enable_expired_shares_cleanup,omitempty"`
+	PublicJanitorRunInterval         int    `yaml:"public_janitor_run_interval,omitempty"`
+	UserStorageMountID               string `yaml:"user_storage_mount_id,omitempty"`
+	Events                           Events `yaml:"events,omitempty"`
 }
 
 type Events struct {
-	Address   string `yaml:"address"`
-	ClusterID string `yaml:"cluster_id"`
+	Address   string `yaml:"address,omitempty"`
+	ClusterID string `yaml:"cluster_id,omitempty"`
 }
 
 // Port defines the available port configuration.
 type Port struct {
 	// MaxCPUs can be a number or a percentage
-	MaxCPUs  string `yaml:"max_cpus"`
-	LogLevel string `yaml:"log_level"`
+	MaxCPUs  string `yaml:"max_cpus,omitempty"`
+	LogLevel string `yaml:"log_level,omitempty"`
 	// GRPCNetwork can be tcp, udp or unix
-	GRPCNetwork string `yaml:"grpc_network"`
+	GRPCNetwork string `yaml:"grpc_network,omitempty"`
 	// GRPCAddr to listen on, hostname:port (0.0.0.0:9999 for all interfaces) or socket (/var/run/reva/sock)
-	GRPCAddr string `yaml:"grpc_addr"`
+	GRPCAddr string `yaml:"grpc_addr,omitempty"`
 	// Protocol can be grpc or http
 	// HTTPNetwork can be tcp, udp or unix
-	HTTPNetwork string `yaml:"http_network"`
+	HTTPNetwork string `yaml:"http_network,omitempty"`
 	// HTTPAddr to listen on, hostname:port (0.0.0.0:9100 for all interfaces) or socket (/var/run/reva/sock)
-	HTTPAddr string `yaml:"http_addr"`
+	HTTPAddr string `yaml:"http_addr,omitempty"`
 	// Protocol can be grpc or http
-	Protocol string `yaml:"protocol"`
+	Protocol string `yaml:"protocol,omitempty"`
 	// Endpoint is used by the gateway and registries (eg localhost:9100 or cloud.example.com)
-	Endpoint string `yaml:"endpoint"`
+	Endpoint string `yaml:"endpoint,omitempty"`
 	// DebugAddr for the debug endpoint to bind to
-	DebugAddr string `yaml:"debug_addr"`
+	DebugAddr string `yaml:"debug_addr,omitempty"`
 	// Services can be used to give a list of services that should be started on this port
-	Services []string `yaml:"services"`
+	Services []string `yaml:"services,omitempty"`
 	// Config can be used to configure the reva instance.
 	// Services and Protocol will be ignored if this is used
-	Config map[string]interface{} `yaml:"config"`
+	Config map[string]interface{} `yaml:"config,omitempty"`
 
 	// Context allows for context cancellation and propagation
 	Context context.Context
@@ -136,118 +136,118 @@ type Port struct {
 // Users defines the available users configuration.
 type Users struct {
 	Port
-	Driver                    string `yaml:"driver"`
-	JSON                      string `yaml:"json"`
-	UserGroupsCacheExpiration int    `yaml:"user_groups_cache_expiration"`
+	Driver                    string `yaml:"driver,omitempty"`
+	JSON                      string `yaml:"json,omitempty"`
+	UserGroupsCacheExpiration int    `yaml:"user_groups_cache_expiration,omitempty"`
 }
 
 // AuthMachineConfig defines the available configuration for the machine auth driver.
 type AuthMachineConfig struct {
-	MachineAuthAPIKey string `yaml:"machine_auth_api_key"`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key,omitempty"`
 }
 
 // Groups defines the available groups configuration.
 type Groups struct {
 	Port
-	Driver                      string `yaml:"driver"`
-	JSON                        string `yaml:"json"`
-	GroupMembersCacheExpiration int    `yaml:"group_members_cache_expiration"`
+	Driver                      string `yaml:"driver,omitempty"`
+	JSON                        string `yaml:"json,omitempty"`
+	GroupMembersCacheExpiration int    `yaml:"group_members_cache_expiration,omitempty"`
 }
 
 // FrontendPort defines the available frontend configuration.
 type FrontendPort struct {
 	Port
 
-	AppProviderInsecure        bool       `yaml:"app_provider_insecure"`
-	AppProviderPrefix          string     `yaml:"app_provider_prefix"`
-	ArchiverInsecure           bool       `yaml:"archiver_insecure"`
-	ArchiverPrefix             string     `yaml:"archiver_prefix"`
-	DatagatewayPrefix          string     `yaml:"data_gateway_prefix"`
-	Favorites                  bool       `yaml:"favorites"`
-	ProjectSpaces              bool       `yaml:"project_spaces"`
-	OCSPrefix                  string     `yaml:"ocs_prefix"`
-	OCSSharePrefix             string     `yaml:"ocs_share_prefix"`
-	OCSHomeNamespace           string     `yaml:"ocs_home_namespace"`
-	PublicURL                  string     `yaml:"public_url"`
-	OCSCacheWarmupDriver       string     `yaml:"ocs_cache_warmup_driver"`
-	OCSAdditionalInfoAttribute string     `yaml:"ocs_additional_info_attribute"`
-	OCSResourceInfoCacheTTL    int        `yaml:"ocs_resource_info_cache_ttl"`
-	Middleware                 Middleware `yaml:"middleware"`
+	AppProviderInsecure        bool       `yaml:"app_provider_insecure,omitempty"`
+	AppProviderPrefix          string     `yaml:"app_provider_prefix,omitempty"`
+	ArchiverInsecure           bool       `yaml:"archiver_insecure,omitempty"`
+	ArchiverPrefix             string     `yaml:"archiver_prefix,omitempty"`
+	DatagatewayPrefix          string     `yaml:"data_gateway_prefix,omitempty"`
+	Favorites                  bool       `yaml:"favorites,omitempty"`
+	ProjectSpaces              bool       `yaml:"project_spaces,omitempty"`
+	OCSPrefix                  string     `yaml:"ocs_prefix,omitempty"`
+	OCSSharePrefix             string     `yaml:"ocs_share_prefix,omitempty"`
+	OCSHomeNamespace           string     `yaml:"ocs_home_namespace,omitempty"`
+	PublicURL                  string     `yaml:"public_url,omitempty"`
+	OCSCacheWarmupDriver       string     `yaml:"ocs_cache_warmup_driver,omitempty"`
+	OCSAdditionalInfoAttribute string     `yaml:"ocs_additional_info_attribute,omitempty"`
+	OCSResourceInfoCacheTTL    int        `yaml:"ocs_resource_info_cache_ttl,omitempty"`
+	Middleware                 Middleware `yaml:"middleware,omitempty"`
 }
 
 // Middleware configures reva middlewares.
 type Middleware struct {
-	Auth Auth `yaml:"auth"`
+	Auth Auth `yaml:"auth,omitempty"`
 }
 
 // Auth configures reva http auth middleware.
 type Auth struct {
-	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agenr"`
+	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agenr,omitempty"`
 }
 
 // DataGatewayPort has a public url
 type DataGatewayPort struct {
 	Port
-	PublicURL string `yaml:""`
+	PublicURL string `yaml:",omitempty"`
 }
 
 type DataProvider struct {
-	Insecure bool `yaml:"insecure"`
+	Insecure bool `yaml:"insecure,omitempty"`
 }
 
 // StoragePort defines the available storage configuration.
 type StoragePort struct {
 	Port
-	Driver           string `yaml:"driver"`
-	MountID          string `yaml:"mount_id"`
-	AlternativeID    string `yaml:"alternative_id"`
-	ExposeDataServer bool   `yaml:"expose_data_server"`
+	Driver           string `yaml:"driver,omitempty"`
+	MountID          string `yaml:"mount_id,omitempty"`
+	AlternativeID    string `yaml:"alternative_id,omitempty"`
+	ExposeDataServer bool   `yaml:"expose_data_server,omitempty"`
 	// url the data gateway will use to route requests
-	DataServerURL string `yaml:"data_server_url"`
+	DataServerURL string `yaml:"data_server_url,omitempty"`
 
 	// for HTTP ports with only one http service
-	HTTPPrefix      string       `yaml:"http_prefix"`
-	TempFolder      string       `yaml:"temp_folder"`
-	ReadOnly        bool         `yaml:"read_only"`
-	DataProvider    DataProvider `yaml:"data_provider"`
-	GatewayEndpoint string       `yaml:"gateway_endpoint"`
+	HTTPPrefix      string       `yaml:"http_prefix,omitempty"`
+	TempFolder      string       `yaml:"temp_folder,omitempty"`
+	ReadOnly        bool         `yaml:"read_only,omitempty"`
+	DataProvider    DataProvider `yaml:"data_provider,omitempty"`
+	GatewayEndpoint string       `yaml:"gateway_endpoint,omitempty"`
 }
 
 // PublicStorage configures a public storage provider
 type PublicStorage struct {
 	StoragePort
 
-	PublicShareProviderAddr string `yaml:"public_share_provider_addr"`
-	UserProviderAddr        string `yaml:"user_provider_addr"`
+	PublicShareProviderAddr string `yaml:"public_share_provider_addr,omitempty"`
+	UserProviderAddr        string `yaml:"user_provider_addr,omitempty"`
 }
 
 // StorageConfig combines all available storage driver configuration parts.
 type StorageConfig struct {
-	EOS         DriverEOS         `yaml:"eos"`
-	Local       DriverCommon      `yaml:"local"`
-	OwnCloudSQL DriverOwnCloudSQL `yaml:"owncloud_sql"`
-	S3          DriverS3          `yaml:"s3"`
-	S3NG        DriverS3NG        `yaml:"s3ng"`
-	OCIS        DriverOCIS        `yaml:"ocis"`
+	EOS         DriverEOS         `yaml:"eos,omitempty"`
+	Local       DriverCommon      `yaml:"local,omitempty"`
+	OwnCloudSQL DriverOwnCloudSQL `yaml:"owncloud_sql,omitempty"`
+	S3          DriverS3          `yaml:"s3,omitempty"`
+	S3NG        DriverS3NG        `yaml:"s3ng,omitempty"`
+	OCIS        DriverOCIS        `yaml:"ocis,omitempty"`
 }
 
 // DriverCommon defines common driver configuration options.
 type DriverCommon struct {
 	// Root is the absolute path to the location of the data
-	Root string `yaml:"root"`
+	Root string `yaml:"root,omitempty"`
 	//ShareFolder defines the name of the folder jailing all shares
-	ShareFolder string `yaml:"share_folder"`
+	ShareFolder string `yaml:"share_folder,omitempty"`
 	// UserLayout contains the template used to construct
 	// the internal path, eg: `{{substr 0 1 .Username}}/{{.Username}}`
-	UserLayout string `yaml:"user_layout"`
+	UserLayout string `yaml:"user_layout,omitempty"`
 	// EnableHome enables the creation of home directories.
-	EnableHome bool `yaml:"enable_home"`
+	EnableHome bool `yaml:"enable_home,omitempty"`
 	// PersonalSpaceAliasTemplate  contains the template used to construct
-	// the personal space alias, eg: `"{{.SpaceType}}/{{.User.Username | lower}}"`
-	PersonalSpaceAliasTemplate string `yaml:"personalspacealias_template"`
+	// the personal space alias, eg: `"{{.SpaceType}}/{{.User.Username | lower}},omitempty"`
+	PersonalSpaceAliasTemplate string `yaml:"personalspacealias_template,omitempty"`
 	// GeneralSpaceAliasTemplate contains the template used to construct
 	// the general space alias, eg: `{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}`
-	GeneralSpaceAliasTemplate string `yaml:"generalspacealias_template"`
+	GeneralSpaceAliasTemplate string `yaml:"generalspacealias_template,omitempty"`
 }
 
 // DriverEOS defines the available EOS driver configuration.
@@ -255,60 +255,60 @@ type DriverEOS struct {
 	DriverCommon
 
 	// ShadowNamespace for storing shadow data
-	ShadowNamespace string `yaml:"shadow_namespace"`
+	ShadowNamespace string `yaml:"shadow_namespace,omitempty"`
 
 	// UploadsNamespace for storing upload data
-	UploadsNamespace string `yaml:"uploads_namespace"`
+	UploadsNamespace string `yaml:"uploads_namespace,omitempty"`
 
 	// Location of the eos binary.
 	// Default is /usr/bin/eos.
-	EosBinary string `yaml:"eos_binary"`
+	EosBinary string `yaml:"eos_binary,omitempty"`
 
 	// Location of the xrdcopy binary.
 	// Default is /usr/bin/xrdcopy.
-	XrdcopyBinary string `yaml:"xrd_copy_binary"`
+	XrdcopyBinary string `yaml:"xrd_copy_binary,omitempty"`
 
 	// URL of the Master EOS MGM.
 	// Default is root://eos-example.org
-	MasterURL string `yaml:"master_url"`
+	MasterURL string `yaml:"master_url,omitempty"`
 
 	// URI of the EOS MGM grpc server
 	// Default is empty
-	GrpcURI string `yaml:"grpc_uri"`
+	GrpcURI string `yaml:"grpc_uri,omitempty"`
 
 	// URL of the Slave EOS MGM.
 	// Default is root://eos-example.org
-	SlaveURL string `yaml:"slave_url"`
+	SlaveURL string `yaml:"slave_url,omitempty"`
 
 	// Location on the local fs where to store reads.
 	// Defaults to os.TempDir()
-	CacheDirectory string `yaml:"cache_directory"`
+	CacheDirectory string `yaml:"cache_directory,omitempty"`
 
 	// Enables logging of the commands executed
 	// Defaults to false
-	EnableLogging bool `yaml:"enable_logging"`
+	EnableLogging bool `yaml:"enable_logging,omitempty"`
 
 	// ShowHiddenSysFiles shows internal EOS files like
 	// .sys.v# and .sys.a# files.
-	ShowHiddenSysFiles bool `yaml:"shadow_hidden_files"`
+	ShowHiddenSysFiles bool `yaml:"shadow_hidden_files,omitempty"`
 
 	// ForceSingleUserMode will force connections to EOS to use SingleUsername
-	ForceSingleUserMode bool `yaml:"force_single_user_mode"`
+	ForceSingleUserMode bool `yaml:"force_single_user_mode,omitempty"`
 
 	// UseKeyTabAuth changes will authenticate requests by using an EOS keytab.
-	UseKeytab bool `yaml:"user_keytab"`
+	UseKeytab bool `yaml:"user_keytab,omitempty"`
 
 	// SecProtocol specifies the xrootd security protocol to use between the server and EOS.
-	SecProtocol string `yaml:"sec_protocol"`
+	SecProtocol string `yaml:"sec_protocol,omitempty"`
 
 	// Keytab specifies the location of the keytab to use to authenticate to EOS.
-	Keytab string `yaml:"keytab"`
+	Keytab string `yaml:"keytab,omitempty"`
 
 	// SingleUsername is the username to use when SingleUserMode is enabled
-	SingleUsername string `yaml:"single_username"`
+	SingleUsername string `yaml:"single_username,omitempty"`
 
 	// gateway service to use for uid lookups
-	GatewaySVC string `yaml:"gateway_svc"`
+	GatewaySVC string `yaml:"gateway_svc,omitempty"`
 }
 
 // DriverOCIS defines the available oCIS storage driver configuration.
@@ -320,204 +320,204 @@ type DriverOCIS struct {
 type DriverOwnCloudSQL struct {
 	DriverCommon
 
-	UploadInfoDir string `yaml:"upload_info_dir"`
-	DBUsername    string `yaml:"db_username"`
-	DBPassword    string `yaml:"db_password"`
-	DBHost        string `yaml:"db_host"`
-	DBPort        int    `yaml:"db_port"`
-	DBName        string `yaml:"db_name"`
+	UploadInfoDir string `yaml:"upload_info_dir,omitempty"`
+	DBUsername    string `yaml:"db_username,omitempty"`
+	DBPassword    string `yaml:"db_password,omitempty"`
+	DBHost        string `yaml:"db_host,omitempty"`
+	DBPort        int    `yaml:"db_port,omitempty"`
+	DBName        string `yaml:"db_name,omitempty"`
 }
 
 // DriverS3 defines the available S3 storage driver configuration.
 type DriverS3 struct {
 	DriverCommon
 
-	Region    string `yaml:"region"`
-	AccessKey string `yaml:"access_key"`
-	SecretKey string `yaml:"secret_key"`
-	Endpoint  string `yaml:"endpoint"`
-	Bucket    string `yaml:"bucket"`
+	Region    string `yaml:"region,omitempty"`
+	AccessKey string `yaml:"access_key,omitempty"`
+	SecretKey string `yaml:"secret_key,omitempty"`
+	Endpoint  string `yaml:"endpoint,omitempty"`
+	Bucket    string `yaml:"bucket,omitempty"`
 }
 
 // DriverS3NG defines the available s3ng storage driver configuration.
 type DriverS3NG struct {
 	DriverCommon
 
-	Region    string `yaml:"region"`
-	AccessKey string `yaml:"access_key"`
-	SecretKey string `yaml:"secret_key"`
-	Endpoint  string `yaml:"endpoint"`
-	Bucket    string `yaml:"bucket"`
+	Region    string `yaml:"region,omitempty"`
+	AccessKey string `yaml:"access_key,omitempty"`
+	SecretKey string `yaml:"secret_key,omitempty"`
+	Endpoint  string `yaml:"endpoint,omitempty"`
+	Bucket    string `yaml:"bucket,omitempty"`
 }
 
 // OIDC defines the available OpenID Connect configuration.
 type OIDC struct {
-	Issuer   string `yaml:"issuer"`
-	Insecure bool   `yaml:"insecure"`
-	IDClaim  string `yaml:"id_claim"`
-	UIDClaim string `yaml:"uid_claim"`
-	GIDClaim string `yaml:"gid_claim"`
+	Issuer   string `yaml:"issuer,omitempty"`
+	Insecure bool   `yaml:"insecure,omitempty"`
+	IDClaim  string `yaml:"id_claim,omitempty"`
+	UIDClaim string `yaml:"uid_claim,omitempty"`
+	GIDClaim string `yaml:"gid_claim,omitempty"`
 }
 
 // LDAP defines the available ldap configuration.
 type LDAP struct {
-	URI              string          `yaml:"uri"`
-	CACert           string          `yaml:"ca_cert"`
-	Insecure         bool            `yaml:"insecure"`
-	UserBaseDN       string          `yaml:"user_base_dn"`
-	GroupBaseDN      string          `yaml:"group_base_dn"`
-	UserScope        string          `yaml:"user_scope"`
-	GroupScope       string          `yaml:"group_scope"`
-	UserObjectClass  string          `yaml:"user_objectclass"`
-	GroupObjectClass string          `yaml:"group_objectclass"`
-	UserFilter       string          `yaml:"user_filter"`
-	GroupFilter      string          `yaml:"group_filter"`
-	LoginAttributes  []string        `yaml:"login_attributes"`
-	BindDN           string          `yaml:"bind_dn"`
-	BindPassword     string          `yaml:"bind_password"`
-	IDP              string          `yaml:"idp"`
-	UserSchema       LDAPUserSchema  `yaml:"user_schema"`
-	GroupSchema      LDAPGroupSchema `yaml:"group_schema"`
+	URI              string          `yaml:"uri,omitempty"`
+	CACert           string          `yaml:"ca_cert,omitempty"`
+	Insecure         bool            `yaml:"insecure,omitempty"`
+	UserBaseDN       string          `yaml:"user_base_dn,omitempty"`
+	GroupBaseDN      string          `yaml:"group_base_dn,omitempty"`
+	UserScope        string          `yaml:"user_scope,omitempty"`
+	GroupScope       string          `yaml:"group_scope,omitempty"`
+	UserObjectClass  string          `yaml:"user_objectclass,omitempty"`
+	GroupObjectClass string          `yaml:"group_objectclass,omitempty"`
+	UserFilter       string          `yaml:"user_filter,omitempty"`
+	GroupFilter      string          `yaml:"group_filter,omitempty"`
+	LoginAttributes  []string        `yaml:"login_attributes,omitempty"`
+	BindDN           string          `yaml:"bind_dn,omitempty"`
+	BindPassword     string          `yaml:"bind_password,omitempty"`
+	IDP              string          `yaml:"idp,omitempty"`
+	UserSchema       LDAPUserSchema  `yaml:"user_schema,omitempty"`
+	GroupSchema      LDAPGroupSchema `yaml:"group_schema,omitempty"`
 }
 
 // UserGroupRest defines the REST driver specification for user and group resolution.
 type UserGroupRest struct {
-	ClientID          string `yaml:"client_id"`
-	ClientSecret      string `yaml:"client_secret"`
-	RedisAddress      string `yaml:"redis_address"`
-	RedisUsername     string `yaml:"redis_username"`
-	RedisPassword     string `yaml:"redis_password"`
-	IDProvider        string `yaml:"idp_provider"`
-	APIBaseURL        string `yaml:"api_base_url"`
-	OIDCTokenEndpoint string `yaml:"oidc_token_endpoint"`
-	TargetAPI         string `yaml:"target_api"`
+	ClientID          string `yaml:"client_id,omitempty"`
+	ClientSecret      string `yaml:"client_secret,omitempty"`
+	RedisAddress      string `yaml:"redis_address,omitempty"`
+	RedisUsername     string `yaml:"redis_username,omitempty"`
+	RedisPassword     string `yaml:"redis_password,omitempty"`
+	IDProvider        string `yaml:"idp_provider,omitempty"`
+	APIBaseURL        string `yaml:"api_base_url,omitempty"`
+	OIDCTokenEndpoint string `yaml:"oidc_token_endpoint,omitempty"`
+	TargetAPI         string `yaml:"target_api,omitempty"`
 }
 
 // UserOwnCloudSQL defines the available ownCloudSQL user provider configuration.
 type UserOwnCloudSQL struct {
-	DBUsername         string `yaml:"db_username"`
-	DBPassword         string `yaml:"db_password"`
-	DBHost             string `yaml:"db_host"`
-	DBPort             int    `yaml:"db_port"`
-	DBName             string `yaml:"db_name"`
-	Idp                string `yaml:"idp"`
-	Nobody             int64  `yaml:"nobody"`
-	JoinUsername       bool   `yaml:"join_username"`
-	JoinOwnCloudUUID   bool   `yaml:"join_owncloud_uuid"`
-	EnableMedialSearch bool   `yaml:"enable_medial_search"`
+	DBUsername         string `yaml:"db_username,omitempty"`
+	DBPassword         string `yaml:"db_password,omitempty"`
+	DBHost             string `yaml:"db_host,omitempty"`
+	DBPort             int    `yaml:"db_port,omitempty"`
+	DBName             string `yaml:"db_name,omitempty"`
+	Idp                string `yaml:"idp,omitempty"`
+	Nobody             int64  `yaml:"nobody,omitempty"`
+	JoinUsername       bool   `yaml:"join_username,omitempty"`
+	JoinOwnCloudUUID   bool   `yaml:"join_owncloud_uuid,omitempty"`
+	EnableMedialSearch bool   `yaml:"enable_medial_search,omitempty"`
 }
 
 // LDAPUserSchema defines the available ldap user schema configuration.
 type LDAPUserSchema struct {
-	ID              string `yaml:"id"`
-	IDIsOctetString bool   `yaml:"id_is_octet_string"`
-	Mail            string `yaml:"mail"`
-	DisplayName     string `yaml:"display_name"`
-	Username        string `yaml:"user_name"`
-	UIDNumber       string `yaml:"uid_number"`
-	GIDNumber       string `yaml:"gid_number"`
+	ID              string `yaml:"id,omitempty"`
+	IDIsOctetString bool   `yaml:"id_is_octet_string,omitempty"`
+	Mail            string `yaml:"mail,omitempty"`
+	DisplayName     string `yaml:"display_name,omitempty"`
+	Username        string `yaml:"user_name,omitempty"`
+	UIDNumber       string `yaml:"uid_number,omitempty"`
+	GIDNumber       string `yaml:"gid_number,omitempty"`
 }
 
 // LDAPGroupSchema defines the available ldap group schema configuration.
 type LDAPGroupSchema struct {
-	ID              string `yaml:"id"`
-	IDIsOctetString bool   `yaml:"id_is_octet_string"`
-	Mail            string `yaml:"mail"`
-	DisplayName     string `yaml:"display_name"`
-	Groupname       string `yaml:"group_name"`
-	Member          string `yaml:"member"`
-	GIDNumber       string `yaml:"gid_number"`
+	ID              string `yaml:"id,omitempty"`
+	IDIsOctetString bool   `yaml:"id_is_octet_string,omitempty"`
+	Mail            string `yaml:"mail,omitempty"`
+	DisplayName     string `yaml:"display_name,omitempty"`
+	Groupname       string `yaml:"group_name,omitempty"`
+	Member          string `yaml:"member,omitempty"`
+	GIDNumber       string `yaml:"gid_number,omitempty"`
 }
 
 // OCDav defines the available ocdav configuration.
 type OCDav struct {
 	// Addr to listen to with the http server for the ocdav service
-	Addr            string `yaml:"addr"`
-	Prefix          string `yaml:"prefix"`
-	WebdavNamespace string `yaml:"webdav_namespace"`
-	FilesNamespace  string `yaml:"files_namespace"`
-	SharesNamespace string `yaml:"shares_namespace"`
+	Addr            string `yaml:"addr,omitempty"`
+	Prefix          string `yaml:"prefix,omitempty"`
+	WebdavNamespace string `yaml:"webdav_namespace,omitempty"`
+	FilesNamespace  string `yaml:"files_namespace,omitempty"`
+	SharesNamespace string `yaml:"shares_namespace,omitempty"`
 	// PublicURL used to redirect /s/{token} URLs to
-	PublicURL string `yaml:"public_url"`
+	PublicURL string `yaml:"public_url,omitempty"`
 
 	// Addr to listen to with the debug http server
-	DebugAddr string `yaml:"debug_addr"`
+	DebugAddr string `yaml:"debug_addr,omitempty"`
 
 	// GatewaySVC to forward CS3 requests to TODO use registry
-	GatewaySVC string `yaml:"gateway_svc"`
+	GatewaySVC string `yaml:"gateway_svc,omitempty"`
 	// JWTSecret used to verify reva access token
-	JWTSecret string `yaml:"jwt_secret"`
+	JWTSecret string `yaml:"jwt_secret,omitempty"`
 	// Insecure certificates allowed when making requests to the gateway
-	Insecure bool `yaml:"insecure"`
+	Insecure bool `yaml:"insecure,omitempty"`
 	// Timeout in seconds when making requests to the gateway
-	Timeout int64 `yaml:"timeout"`
+	Timeout int64 `yaml:"timeout,omitempty"`
 }
 
 // Archiver defines the available archiver configuration.
 type Archiver struct {
-	MaxNumFiles int64  `yaml:"max_num_files"`
-	MaxSize     int64  `yaml:"max_size"`
-	ArchiverURL string `yaml:"archiver_url"`
+	MaxNumFiles int64  `yaml:"max_num_files,omitempty"`
+	MaxSize     int64  `yaml:"max_size,omitempty"`
+	ArchiverURL string `yaml:"archiver_url,omitempty"`
 }
 
 // Reva defines the available reva configuration.
 type Reva struct {
 	// JWTSecret used to sign jwt tokens between services
-	JWTSecret             string          `yaml:"jwt_secret"`
-	SkipUserGroupsInToken bool            `yaml:"skip_user_grooups_in_token"`
-	TransferSecret        string          `yaml:"transfer_secret"`
-	TransferExpires       int             `yaml:"transfer_expires"`
-	OIDC                  OIDC            `yaml:"oidc"`
-	LDAP                  LDAP            `yaml:"ldap"`
-	UserGroupRest         UserGroupRest   `yaml:"user_group_rest"`
-	UserOwnCloudSQL       UserOwnCloudSQL `yaml:"user_owncloud_sql"`
-	Archiver              Archiver        `yaml:"archiver"`
-	UserStorage           StorageConfig   `yaml:"user_storage"`
-	MetadataStorage       StorageConfig   `yaml:"metadata_storage"`
+	JWTSecret             string          `yaml:"jwt_secret,omitempty"`
+	SkipUserGroupsInToken bool            `yaml:"skip_user_grooups_in_token,omitempty"`
+	TransferSecret        string          `yaml:"transfer_secret,omitempty"`
+	TransferExpires       int             `yaml:"transfer_expires,omitempty"`
+	OIDC                  OIDC            `yaml:"oidc,omitempty"`
+	LDAP                  LDAP            `yaml:"ldap,omitempty"`
+	UserGroupRest         UserGroupRest   `yaml:"user_group_rest,omitempty"`
+	UserOwnCloudSQL       UserOwnCloudSQL `yaml:"user_owncloud_sql,omitempty"`
+	Archiver              Archiver        `yaml:"archiver,omitempty"`
+	UserStorage           StorageConfig   `yaml:"user_storage,omitempty"`
+	MetadataStorage       StorageConfig   `yaml:"metadata_storage,omitempty"`
 	// Ports are used to configure which services to start on which port
-	Frontend          FrontendPort      `yaml:"frontend"`
-	DataGateway       DataGatewayPort   `yaml:"data_gateway"`
-	Gateway           Gateway           `yaml:"gateway"`
-	StorageRegistry   StorageRegistry   `yaml:"storage_registry"`
-	AppRegistry       AppRegistry       `yaml:"app_registry"`
-	Users             Users             `yaml:"users"`
-	Groups            Groups            `yaml:"groups"`
-	AuthProvider      Users             `yaml:"auth_provider"`
-	AuthBasic         Port              `yaml:"auth_basic"`
-	AuthBearer        Port              `yaml:"auth_bearer"`
-	AuthMachine       Port              `yaml:"auth_machine"`
-	AuthMachineConfig AuthMachineConfig `yaml:"auth_machine_config"`
-	Sharing           Sharing           `yaml:"sharing"`
-	StorageShares     StoragePort       `yaml:"storage_shares"`
-	StorageUsers      StoragePort       `yaml:"storage_users"`
-	StoragePublicLink PublicStorage     `yaml:"storage_public_link"`
-	StorageMetadata   StoragePort       `yaml:"storage_metadata"`
-	AppProvider       AppProvider       `yaml:"app_provider"`
-	Permissions       Port              `yaml:"permissions"`
+	Frontend          FrontendPort      `yaml:"frontend,omitempty"`
+	DataGateway       DataGatewayPort   `yaml:"data_gateway,omitempty"`
+	Gateway           Gateway           `yaml:"gateway,omitempty"`
+	StorageRegistry   StorageRegistry   `yaml:"storage_registry,omitempty"`
+	AppRegistry       AppRegistry       `yaml:"app_registry,omitempty"`
+	Users             Users             `yaml:"users,omitempty"`
+	Groups            Groups            `yaml:"groups,omitempty"`
+	AuthProvider      Users             `yaml:"auth_provider,omitempty"`
+	AuthBasic         Port              `yaml:"auth_basic,omitempty"`
+	AuthBearer        Port              `yaml:"auth_bearer,omitempty"`
+	AuthMachine       Port              `yaml:"auth_machine,omitempty"`
+	AuthMachineConfig AuthMachineConfig `yaml:"auth_machine_config,omitempty"`
+	Sharing           Sharing           `yaml:"sharing,omitempty"`
+	StorageShares     StoragePort       `yaml:"storage_shares,omitempty"`
+	StorageUsers      StoragePort       `yaml:"storage_users,omitempty"`
+	StoragePublicLink PublicStorage     `yaml:"storage_public_link,omitempty"`
+	StorageMetadata   StoragePort       `yaml:"storage_metadata,omitempty"`
+	AppProvider       AppProvider       `yaml:"app_provider,omitempty"`
+	Permissions       Port              `yaml:"permissions,omitempty"`
 	// Configs can be used to configure the reva instance.
 	// Services and Ports will be ignored if this is used
-	Configs map[string]interface{} `yaml:"configs"`
+	Configs map[string]interface{} `yaml:"configs,omitempty"`
 	// chunking and resumable upload config (TUS)
-	UploadMaxChunkSize       int    `yaml:"upload_max_chunk_size"`
-	UploadHTTPMethodOverride string `yaml:"upload_http_method_override"`
+	UploadMaxChunkSize       int    `yaml:"upload_max_chunk_size,omitempty"`
+	UploadHTTPMethodOverride string `yaml:"upload_http_method_override,omitempty"`
 	// checksumming capabilities
-	ChecksumSupportedTypes      []string `yaml:"checksum_supported_types"`
-	ChecksumPreferredUploadType string   `yaml:"checksum_preferred_upload_type"`
-	DefaultUploadProtocol       string   `yaml:"default_upload_protocol"`
+	ChecksumSupportedTypes      []string `yaml:"checksum_supported_types,omitempty"`
+	ChecksumPreferredUploadType string   `yaml:"checksum_preferred_upload_type,omitempty"`
+	DefaultUploadProtocol       string   `yaml:"default_upload_protocol,omitempty"`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `yaml:"enabled"`
-	Type      string `yaml:"type"`
-	Endpoint  string `yaml:"endpoint"`
-	Collector string `yaml:"collector"`
-	Service   string `yaml:"service"`
+	Enabled   bool   `yaml:"enabled,omitempty"`
+	Type      string `yaml:"type,omitempty"`
+	Endpoint  string `yaml:"endpoint,omitempty"`
+	Collector string `yaml:"collector,omitempty"`
+	Service   string `yaml:"service,omitempty"`
 }
 
 // Asset defines the available asset configuration.
 type Asset struct {
-	Path string `yaml:"path"`
+	Path string `yaml:"path,omitempty"`
 }
 
 // Config combines all available configuration parts.

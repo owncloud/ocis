@@ -23,8 +23,8 @@ type Config struct {
 	DataPath  string   `yaml:"data_path,omitempty" env:"SETTINGS_DATA_PATH"`
 	Metadata  Metadata `yaml:"metadata_config,omitempty"`
 
-	Asset        Asset        `yaml:"asset,omitempty"`
-	TokenManager TokenManager `yaml:"token_manager,omitempty"`
+	Asset        Asset                `yaml:"asset,omitempty"`
+	TokenManager *shared.TokenManager `yaml:"token_manager,omitempty"`
 
 	Context context.Context `yaml:"-"`
 }

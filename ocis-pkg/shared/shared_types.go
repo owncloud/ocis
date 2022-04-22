@@ -24,10 +24,16 @@ type Tracing struct {
 	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR"`
 }
 
+// TokenManager is the config for using the reva token manager
+type TokenManager struct {
+	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET" desc:"The secret to mint jwt tokens."`
+}
+
 // Commons holds configuration that are common to all extensions. Each extension can then decide whether
 // to overwrite its values.
 type Commons struct {
-	Log     *Log     `yaml:"log"`
-	Tracing *Tracing `yaml:"tracing"`
-	OcisURL string   `yaml:"ocis_url" env:"OCIS_URL"`
+	Log          *Log          `yaml:"log"`
+	Tracing      *Tracing      `yaml:"tracing"`
+	OcisURL      string        `yaml:"ocis_url" env:"OCIS_URL"`
+	TokenManager *TokenManager `yaml:"token_manager"`
 }

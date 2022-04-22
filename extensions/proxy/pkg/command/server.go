@@ -212,7 +212,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		middleware.AccountResolver(
 			middleware.Logger(logger),
 			middleware.UserProvider(userProvider),
-			middleware.TokenManagerConfig(cfg.TokenManager),
+			middleware.TokenManagerConfig(*cfg.TokenManager),
 			middleware.UserOIDCClaim(cfg.UserOIDCClaim),
 			middleware.UserCS3Claim(cfg.UserCS3Claim),
 			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
@@ -227,7 +227,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(logger),
-			middleware.TokenManagerConfig(cfg.TokenManager),
+			middleware.TokenManagerConfig(*cfg.TokenManager),
 			middleware.RevaGatewayClient(revaClient),
 		),
 		middleware.PublicShareAuth(

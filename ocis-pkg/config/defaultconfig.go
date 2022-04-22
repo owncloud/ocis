@@ -18,11 +18,12 @@ import (
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config/defaults"
 	web "github.com/owncloud/ocis/extensions/web/pkg/config/defaults"
 	webdav "github.com/owncloud/ocis/extensions/webdav/pkg/config/defaults"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
 func DefaultConfig() *Config {
 	return &Config{
-		TokenManager: TokenManager{
+		TokenManager: &shared.TokenManager{
 			JWTSecret: "Pive-Fumkiu4",
 		},
 		Runtime: Runtime{

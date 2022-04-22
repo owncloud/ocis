@@ -15,16 +15,39 @@ func ParseConfig(cfg *config.Config) error {
 		return err
 	}
 
-	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
-	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
-		cfg.Log = &shared.Log{
-			Level:  cfg.Commons.Log.Level,
-			Pretty: cfg.Commons.Log.Pretty,
-			Color:  cfg.Commons.Log.Color,
-			File:   cfg.Commons.Log.File,
+	if cfg.Commons == nil {
+		cfg.Commons = &shared.Commons{}
+	}
+
+	if cfg.Log != nil {
+		cfg.Commons.Log = &shared.Log{
+			Level:  cfg.Log.Level,
+			Pretty: cfg.Log.Pretty,
+			Color:  cfg.Log.Color,
+			File:   cfg.File,
 		}
-	} else if cfg.Log == nil {
+	} else {
+		cfg.Commons.Log = &shared.Log{}
 		cfg.Log = &shared.Log{}
+	}
+
+	if cfg.Tracing != nil {
+		cfg.Commons.Tracing = &shared.Tracing{
+			Enabled:   cfg.Tracing.Enabled,
+			Type:      cfg.Tracing.Type,
+			Endpoint:  cfg.Tracing.Endpoint,
+			Collector: cfg.Tracing.Collector,
+		}
+	} else {
+		cfg.Commons.Tracing = &shared.Tracing{}
+		cfg.Tracing = &shared.Tracing{}
+	}
+
+	if cfg.TokenManager != nil {
+		cfg.Commons.TokenManager = cfg.TokenManager
+	} else {
+		cfg.Commons.TokenManager = &shared.TokenManager{}
+		cfg.TokenManager = cfg.Commons.TokenManager
 	}
 
 	// load all env variables relevant to the config in the current context.

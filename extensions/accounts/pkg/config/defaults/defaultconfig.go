@@ -6,6 +6,7 @@ import (
 
 	"github.com/owncloud/ocis/extensions/accounts/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
 func FullDefaultConfig() *config.Config {
@@ -44,10 +45,7 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "accounts",
 		},
-		Asset: config.Asset{},
-		TokenManager: config.TokenManager{
-			JWTSecret: "Pive-Fumkiu4",
-		},
+		Asset:              config.Asset{},
 		HashDifficulty:     11,
 		DemoUsersAndGroups: false,
 		Repo: config.Repo{
@@ -100,6 +98,14 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &shared.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else {
+		cfg.TokenManager = &shared.TokenManager{}
 	}
 }
 

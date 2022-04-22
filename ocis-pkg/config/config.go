@@ -23,9 +23,9 @@ import (
 )
 
 // TokenManager is the config for using the reva token manager
-type TokenManager struct {
+/*type TokenManager struct {
 	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET"`
-}
+}*/
 
 const (
 	// SUPERVISED sets the runtime mode as supervised threads.
@@ -48,16 +48,16 @@ type Runtime struct {
 type Config struct {
 	*shared.Commons `yaml:"shared,omitempty"`
 
-	Tracing shared.Tracing `yaml:"tracing,omitempty"`
-	Log     *shared.Log    `yaml:"log,omitempty"`
+	Tracing *shared.Tracing `yaml:"tracing,omitempty"`
+	Log     *shared.Log     `yaml:"log,omitempty"`
 
 	Mode    Mode   `yaml:",omitempty"` // DEPRECATED
 	File    string `yaml:",omitempty"`
 	OcisURL string `yaml:"ocis_url,omitempty"`
 
-	Registry     string       `yaml:"registry,omitempty"`
-	TokenManager TokenManager `yaml:"token_manager,omitempty"`
-	Runtime      Runtime      `yaml:"runtime,omitempty"`
+	Registry     string               `yaml:"registry,omitempty"`
+	TokenManager *shared.TokenManager `yaml:"token_manager,omitempty"`
+	Runtime      Runtime              `yaml:"runtime,omitempty"`
 
 	Audit         *audit.Config         `yaml:"audit,omitempty"`
 	Accounts      *accounts.Config      `yaml:"accounts,omitempty"`

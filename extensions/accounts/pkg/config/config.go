@@ -19,7 +19,7 @@ type Config struct {
 	HTTP HTTP `yaml:"http,omitempty"`
 	GRPC GRPC `yaml:"grpc,omitempty"`
 
-	TokenManager TokenManager `yaml:"token_manager"`
+	TokenManager *shared.TokenManager `yaml:"token_manager,omitempty"`
 
 	Asset              Asset       `yaml:"asset,omitempty"`
 	Repo               Repo        `yaml:"repo,omitempty"`
@@ -34,11 +34,6 @@ type Config struct {
 // Asset defines the available asset configuration.
 type Asset struct {
 	Path string `yaml:"path" env:"ACCOUNTS_ASSET_PATH" desc:"The path to the ui assets."`
-}
-
-// TokenManager is the config for using the reva token manager
-type TokenManager struct {
-	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET;ACCOUNTS_JWT_SECRET" desc:"The secret to mint jwt tokens."`
 }
 
 // Repo defines which storage implementation is to be used.
