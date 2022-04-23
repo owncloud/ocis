@@ -1,7 +1,7 @@
 ---
 title: "ocis.services.accounts.v0"
 url: /grpc_apis/ocis_services_accounts_v0
-date: 2022-04-22T14:55:31Z
+date: 2022-04-23T01:23:35Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
