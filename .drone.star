@@ -65,7 +65,7 @@ config = {
         "earlyFail": True,
     },
     "localApiTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "apiTests": {
@@ -76,7 +76,7 @@ config = {
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
         "earlyFail": True,
     },
