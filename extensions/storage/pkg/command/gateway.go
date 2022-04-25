@@ -212,15 +212,15 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 									"provider_path": "/project",
 									"space_type":    "project",
 								},
-								"/public-files": map[string]interface{}{
+								"/public": map[string]interface{}{
 									"address":       "localhost:9178",
 									"provider_id":   "7993447f-687f-490d-875c-ac95e89a62a4",
-									"provider_path": "/public-files",
+									"provider_path": "/public",
 								},
 								"7993447f-687f-490d-875c-ac95e89a62a4": map[string]interface{}{
 									"address":       "localhost:9178",
 									"provider_id":   "7993447f-687f-490d-875c-ac95e89a62a4",
-									"provider_path": "/public-files",
+									"provider_path": "/public",
 								},
 								/*
 									"metadata": map[string]interface{}{
