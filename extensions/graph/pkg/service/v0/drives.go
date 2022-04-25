@@ -71,7 +71,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 	u := ctxpkg.ContextMustGetUser(ctx)
 	var sps []*storageprovider.StorageSpace
 	for _, s := range res.StorageSpaces {
-		if utils.UserEqual(s.Owner.Id, u.Id) {
+		if utils.UserEqual(s.Owner.GetId(), u.GetId()) {
 			sps = append(sps, s)
 			continue
 		}

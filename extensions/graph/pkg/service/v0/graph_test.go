@@ -10,8 +10,10 @@ import (
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -25,18 +27,24 @@ import (
 
 var _ = Describe("Graph", func() {
 	var (
-		svc             service.Service
-		gatewayClient   *mocks.GatewayClient
-		httpClient      *mocks.HTTPClient
-		eventsPublisher mocks.Publisher
-		ctx             context.Context
+		svc               service.Service
+		gatewayClient     *mocks.GatewayClient
+		httpClient        *mocks.HTTPClient
+		eventsPublisher   mocks.Publisher
+		ctx               context.Context
+		grantsOpaqueEntry *typesv1beta1.OpaqueEntry
 	)
 
 	JustBeforeEach(func() {
 		ctx = context.Background()
+		ctx = ctxpkg.ContextSetUser(ctx, &userpb.User{Id: &userpb.UserId{OpaqueId: "userID"}})
 		gatewayClient = &mocks.GatewayClient{}
 		httpClient = &mocks.HTTPClient{}
 		eventsPublisher = mocks.Publisher{}
+		grantsOpaqueEntry = &typesv1beta1.OpaqueEntry{
+			Decoder: "json",
+			Value:   []byte(`{"userID": "anypermissioncounts"}`),
+		}
 		svc = service.NewService(
 			service.Config(defaults.DefaultConfig()),
 			service.WithGatewayClient(gatewayClient),
@@ -58,7 +66,7 @@ var _ = Describe("Graph", func() {
 				StorageSpaces: []*provider.StorageSpace{},
 			}, nil)
 
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil).WithContext(ctx)
 			rr := httptest.NewRecorder()
 			svc.GetDrives(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
@@ -69,6 +77,12 @@ var _ = Describe("Graph", func() {
 				Status: status.NewOK(ctx),
 				StorageSpaces: []*provider.StorageSpace{
 					{
+						Opaque: &typesv1beta1.Opaque{
+							Map: map[string]*typesv1beta1.OpaqueEntry{
+								"grants": grantsOpaqueEntry,
+							},
+						},
+
 						Id:        &provider.StorageSpaceId{OpaqueId: "sameID"},
 						SpaceType: "aspacetype",
 						Root: &provider.ResourceId{
@@ -86,7 +100,7 @@ var _ = Describe("Graph", func() {
 				Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
 			}, nil)
 
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil).WithContext(ctx)
 			rr := httptest.NewRecorder()
 			svc.GetDrives(rr, r)
 
@@ -102,6 +116,7 @@ var _ = Describe("Graph", func() {
 						"name":"aspacename",
 						"root":{
 							"id":"sameID!sameID",
+							"permissions": [],
 							"webDavUrl":"https://localhost:9200/dav/spaces/sameID"
 						}
 					}
@@ -125,6 +140,7 @@ var _ = Describe("Graph", func() {
 							Map: map[string]*typesv1beta1.OpaqueEntry{
 								"spaceAlias": {Decoder: "plain", Value: []byte("bspacetype/bspacename")},
 								"etag":       {Decoder: "plain", Value: []byte("123456789")},
+								"grants":     grantsOpaqueEntry,
 							},
 						},
 					},
@@ -140,6 +156,7 @@ var _ = Describe("Graph", func() {
 							Map: map[string]*typesv1beta1.OpaqueEntry{
 								"spaceAlias": {Decoder: "plain", Value: []byte("aspacetype/aspacename")},
 								"etag":       {Decoder: "plain", Value: []byte("101112131415")},
+								"grants":     grantsOpaqueEntry,
 							},
 						},
 					},
@@ -152,7 +169,7 @@ var _ = Describe("Graph", func() {
 				Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
 			}, nil)
 
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?$orderby=name%20asc", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?$orderby=name%20asc", nil).WithContext(ctx)
 			rr := httptest.NewRecorder()
 			svc.GetDrives(rr, r)
 
@@ -170,6 +187,7 @@ var _ = Describe("Graph", func() {
 						"root":{
 							"eTag":"101112131415",
 							"id":"asameID!asameID",
+							"permissions": [],
 							"webDavUrl":"https://localhost:9200/dav/spaces/asameID"
 						}
 					},
@@ -181,6 +199,7 @@ var _ = Describe("Graph", func() {
 						"root":{
 							"eTag":"123456789",
 							"id":"bsameID!bsameID",
+							"permissions": [],
 							"webDavUrl":"https://localhost:9200/dav/spaces/bsameID"
 						}
 					}
@@ -199,7 +218,8 @@ var _ = Describe("Graph", func() {
 							StorageId: "aID",
 							OpaqueId:  "differentID",
 						},
-						Name: "New Folder",
+						Owner: &userpb.User{Id: &userpb.UserId{OpaqueId: "userID"}},
+						Name:  "New Folder",
 						Opaque: &typesv1beta1.Opaque{
 							Map: map[string]*typesv1beta1.OpaqueEntry{
 								"spaceAlias":     {Decoder: "plain", Value: []byte("mountpoint/new-folder")},
@@ -226,7 +246,7 @@ var _ = Describe("Graph", func() {
 				Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
 			}, nil)
 
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil).WithContext(ctx)
 			rr := httptest.NewRecorder()
 			svc.GetDrives(rr, r)
 
@@ -265,7 +285,7 @@ var _ = Describe("Graph", func() {
 				Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
 			}, nil)
 
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?$orderby=owner%20asc", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?$orderby=owner%20asc", nil).WithContext(ctx)
 			rr := httptest.NewRecorder()
 			svc.GetDrives(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -288,7 +308,7 @@ var _ = Describe("Graph", func() {
 				Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
 			}, nil)
 
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?§orderby=owner%20asc", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?§orderby=owner%20asc", nil).WithContext(ctx)
 			rr := httptest.NewRecorder()
 			svc.GetDrives(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
