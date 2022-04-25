@@ -93,7 +93,7 @@ type Config struct {
 	User              *user.Config            `yaml:"user"`
 	Group             *group.Config           `yaml:"group"`
 	AppProvider       *appprovider.Config     `yaml:"app_provider"`
-	Sharing           *sharing.Config         `yaml:"app_provider"`
+	Sharing           *sharing.Config         `yaml:"sharing"`
 	StorageMetadata   *storagemetadata.Config `yaml:"storage_metadata"`
 	StoragePublicLink *storagepublic.Config   `yaml:"storage_public"`
 	StorageUsers      *storageusers.Config    `yaml:"storage_users"`
