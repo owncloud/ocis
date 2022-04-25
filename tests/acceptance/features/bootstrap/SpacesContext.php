@@ -30,6 +30,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\SetupHelper;
+use TestHelpers\GraphHelper;
 use PHPUnit\Framework\Assert;
 
 require_once 'bootstrap.php';
@@ -285,31 +286,23 @@ class SpacesContext implements Context {
 	 * @return string
 	 */
 	public function getUserIdByUserName(string $userName): string {
-		$fullUrl = $this->baseUrl . "/api/v0/accounts/accounts-list";
-		$this->featureContext->setResponse(
-			HttpRequestHelper::post(
-				$fullUrl,
-				"",
-				$this->featureContext->getAdminUsername(),
-				$this->featureContext->getAdminPassword(),
-				[],
-				"{}"
-			)
-		);
+		$this->featureContext->setResponse(GraphHelper::getUser(
+                        $this->featureContext->getBaseUrl(),
+                        $this->featureContext->getStepLineRef(),
+                        $this->featureContext->getAdminUsername(),
+                        $this->featureContext->getAdminPassword(),
+                        $userName
+                ));
 		if ($this->featureContext->getResponse()) {
 			$rawBody = $this->featureContext->getResponse()->getBody()->getContents();
 			$response = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
-			if (isset($response["accounts"])) {
-				$accounts = $response["accounts"];
+			if (isset($response["id"])) {
+				$user = $response;
 			} else {
 				throw new Exception(__METHOD__ . " accounts-list is empty");
 			}
 		}
-		foreach ($accounts as $account) {
-			if ($account["preferredName"] === $userName) {
-				return $account["id"];
-			}
-		}
+		return $user["id"];
 		throw new Exception(__METHOD__ . " user with name $userName not found");
 	}
 
@@ -607,7 +600,6 @@ class SpacesContext implements Context {
 		$password = $this->featureContext->getAdminPassword();
 		$headers = [];
 		$bundles = [];
-		$accounts = [];
 		$assignment = [];
 
 		// get the roles list first
@@ -628,22 +620,20 @@ class SpacesContext implements Context {
 		}
 		Assert::assertNotEmpty($roleToAssign, "The selected role $role could not be found");
 
-		// get the accounts list first
-		$fullUrl = $this->baseUrl . "/api/v0/accounts/accounts-list";
-		$this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, "{}"));
+		$this->featureContext->setResponse(GraphHelper::getUser(
+                        $this->featureContext->getBaseUrl(),
+                        $this->featureContext->getStepLineRef(),
+                        $this->featureContext->getAdminUsername(),
+                        $this->featureContext->getAdminPassword(),
+                        $user
+                ));
 		if ($this->featureContext->getResponse()) {
 			$rawBody = $this->featureContext->getResponse()->getBody()->getContents();
-			if (isset(\json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["accounts"])) {
-				$accounts = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["accounts"];
+			if (isset(\json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["id"])) {
+				$accountToChange = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
 			}
 		}
-		$accountToChange = "";
-		foreach ($accounts as $account) {
-			// find the selected user
-			if ($account["preferredName"] === $user) {
-				$accountToChange = $account;
-			}
-		}
+
 		Assert::assertNotEmpty($accountToChange, "The selected account $user does not exist");
 
 		// set the new role
