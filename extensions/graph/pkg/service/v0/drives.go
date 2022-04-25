@@ -68,13 +68,32 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	u := ctxpkg.ContextMustGetUser(ctx)
+	var sps []*storageprovider.StorageSpace
+	for _, s := range res.StorageSpaces {
+		if utils.UserEqual(s.Owner.Id, u.Id) {
+			sps = append(sps, s)
+			continue
+		}
+
+		m := make(map[string]interface{})
+		if err := utils.ReadJSONFromOpaque(s.Opaque, "grants", &m); err != nil {
+			continue
+		}
+
+		if m[u.Id.OpaqueId] != nil {
+			sps = append(sps, s)
+			continue
+		}
+	}
+
 	wdu, err := url.Parse(g.config.Spaces.WebDavBase + g.config.Spaces.WebDavPath)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error parsing url")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-	spaces, err := g.formatDrives(ctx, wdu, res.StorageSpaces)
+	spaces, err := g.formatDrives(ctx, wdu, sps)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error encoding response as json")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())

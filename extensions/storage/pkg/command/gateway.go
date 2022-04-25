@@ -184,9 +184,10 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 							"home_provider": "/home", // TODO use /users/{{.OpaqueId}} ?
 							"rules": map[string]interface{}{
 								"/home": map[string]interface{}{
-									"address":     "127.0.0.1:9157",
-									"provider_id": "1284d238-aa92-42ce-bdc4-0b0000009157",
-									"space_type":  "personal",
+									"address":       "127.0.0.1:9157",
+									"provider_id":   "1284d238-aa92-42ce-bdc4-0b0000009157",
+									"provider_path": "/users",
+									"space_type":    "personal",
 								},
 								//"/users/{{.Id.OpaqueId}}": map[string]interface{}{
 								"/users": map[string]interface{}{
@@ -195,18 +196,43 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 									"provider_path": "/users",
 								},
 								"1284d238-aa92-42ce-bdc4-0b0000009157": map[string]interface{}{
-									"address":     "127.0.0.1:9157",
-									"provider_id": "1284d238-aa92-42ce-bdc4-0b0000009157",
+									"address":       "127.0.0.1:9157",
+									"provider_id":   "1284d238-aa92-42ce-bdc4-0b0000009157",
+									"provider_path": "/users",
 								},
-								"metadata": map[string]interface{}{
-									"address":     "127.0.0.1:9215",
-									"provider_id": "0dba9855-3ab1-432f-ace7-e01224fe2c65",
+								"/project": map[string]interface{}{
+									"address":       "127.0.0.1:9157",
+									"provider_id":   "df7debc5-3491-4b7a-8b0d-6888009adb28",
+									"provider_path": "/project",
+									"space_type":    "project",
 								},
-								"0dba9855-3ab1-432f-ace7-e01224fe2c65": map[string]interface{}{
-									"address":       "127.0.0.1:9215",
-									"provider_id":   "0dba9855-3ab1-432f-ace7-e01224fe2c65",
-									"provider_path": "metadata",
+								"df7debc5-3491-4b7a-8b0d-6888009adb28": map[string]interface{}{
+									"address":       "127.0.0.1:9157",
+									"provider_id":   "df7debc5-3491-4b7a-8b0d-6888009adb28",
+									"provider_path": "/project",
+									"space_type":    "project",
 								},
+								"/public-files": map[string]interface{}{
+									"address":       "localhost:9178",
+									"provider_id":   "7993447f-687f-490d-875c-ac95e89a62a4",
+									"provider_path": "/public-files",
+								},
+								"7993447f-687f-490d-875c-ac95e89a62a4": map[string]interface{}{
+									"address":       "localhost:9178",
+									"provider_id":   "7993447f-687f-490d-875c-ac95e89a62a4",
+									"provider_path": "/public-files",
+								},
+								/*
+									"metadata": map[string]interface{}{
+										"address":     "127.0.0.1:9215",
+										"provider_id": "0dba9855-3ab1-432f-ace7-e01224fe2c65",
+									},
+									"0dba9855-3ab1-432f-ace7-e01224fe2c65": map[string]interface{}{
+										"address":       "127.0.0.1:9215",
+										"provider_id":   "0dba9855-3ab1-432f-ace7-e01224fe2c65",
+										"provider_path": "metadata",
+									},
+								*/
 							},
 						},
 						"spaces": map[string]interface{}{
