@@ -4,7 +4,10 @@
     "platform": {
       "php": "7.2"
     },
-    "vendor-dir": "./vendor-php"
+    "vendor-dir": "./vendor-php",
+    "allow-plugins": {
+      "bamarni/composer-bin-plugin": true
+    }
   },
   "require": {
   },

@@ -6,9 +6,19 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
+* Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
+* Enhancement - Update reva to v2.x.x: [#3552](https://github.com/owncloud/ocis/pull/3552)
 
 ## Details
+
+* Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
+
+   The ocs API was just exiting with a fatal error on any update request, when configured for the cs3
+   backend. Now it returns a proper error.
+
+   https://github.com/owncloud/ocis/issues/3483
 
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 
@@ -18,6 +28,23 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/web/pull/6787
    https://github.com/owncloud/ocis/pull/3538
+
+* Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
+
+   We have updated the capabilities regarding password enforcement and expiration dates of
+   public links. They were previously hardcoded in a way that didn't reflect the actual backend
+   functionality anymore.
+
+   https://github.com/owncloud/ocis/pull/3579
+
+* Enhancement - Update reva to v2.x.x: [#3552](https://github.com/owncloud/ocis/pull/3552)
+
+   Updated reva to version 2.x.x. This update includes:
+
+  * TODO
+
+   https://github.com/owncloud/ocis/pull/3552
+   https://github.com/owncloud/ocis/pull/3570
 # Changelog for [1.20.0] (2022-04-13)
 
 The following sections list the changes for 1.20.0.

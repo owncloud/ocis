@@ -254,15 +254,15 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 									"multiple":             true,
 									"supports_upload_only": true,
 									"password": map[string]interface{}{
-										"enforced": true,
+										"enforced": false,
 										"enforced_for": map[string]interface{}{
-											"read_only":   true,
-											"read_write":  true,
-											"upload_only": true,
+											"read_only":   false,
+											"read_write":  false,
+											"upload_only": false,
 										},
 									},
 									"expire_date": map[string]interface{}{
-										"enabled": false,
+										"enabled": true,
 									},
 									"can_edit": true,
 								},

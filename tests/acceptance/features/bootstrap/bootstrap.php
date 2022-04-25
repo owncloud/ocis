@@ -33,5 +33,6 @@ $classLoader->addPsr4(
 	$pathToCore . "/tests/acceptance/features/bootstrap",
 	true
 );
+$classLoader->addPsr4("TestHelpers\\", __DIR__ . "/../../../TestHelpers", true);
 
 $classLoader->register();

@@ -4,8 +4,8 @@ import (
 	"strings"
 	"time"
 
-	mgrpcc "github.com/asim/go-micro/plugins/client/grpc/v4"
-	mgrpcs "github.com/asim/go-micro/plugins/server/grpc/v4"
+	mgrpcc "github.com/go-micro/plugins/v4/client/grpc"
+	mgrpcs "github.com/go-micro/plugins/v4/server/grpc"
 	mbreaker "github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker"
 	"github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus"
 	"github.com/go-micro/plugins/v4/wrapper/trace/opencensus"
