@@ -137,9 +137,22 @@
         "name": {
           "type": "string"
         },
+        "etag": {
+          "type": "string"
+        },
         "size": {
           "type": "string",
           "format": "uint64"
+        },
+        "lastModifiedTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "mimeType": {
+          "type": "string"
+        },
+        "permissions": {
+          "type": "string"
         }
       }
     },

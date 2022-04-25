@@ -5,6 +5,7 @@ import (
 
 	"github.com/blevesearch/bleve/v2"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/owncloud/ocis/extensions/search/pkg/search/index"
 	searchmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
@@ -43,8 +44,11 @@ var _ = Describe("Index", func() {
 				StorageId: "storageid",
 				OpaqueId:  "opaqueid",
 			},
-			Path: "foo.pdf",
-			Size: 12345,
+			Path:     "foo.pdf",
+			Size:     12345,
+			Etag:     "abcde",
+			MimeType: "application/pdf",
+			Mtime:    &typesv1beta1.Timestamp{Seconds: 4000},
 		}
 	})
 
@@ -99,6 +103,30 @@ var _ = Describe("Index", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res).ToNot(BeNil())
 				Expect(len(res.Matches)).To(Equal(0))
+			})
+
+			It("returns all desired fields", func() {
+				res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
+					Ref: &searchmsg.Reference{
+						ResourceId: &searchmsg.ResourceID{
+							StorageId: ref.ResourceId.StorageId,
+							OpaqueId:  ref.ResourceId.OpaqueId,
+						},
+					},
+					Query: "foo.pdf",
+				})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res).ToNot(BeNil())
+				Expect(len(res.Matches)).To(Equal(1))
+				match := res.Matches[0]
+				Expect(match.Entity.Ref.ResourceId.OpaqueId).To(Equal(ref.ResourceId.OpaqueId))
+				Expect(match.Entity.Ref.Path).To(Equal(ref.Path))
+				Expect(match.Entity.Id.OpaqueId).To(Equal(ri.Id.OpaqueId))
+				Expect(match.Entity.Name).To(Equal(ri.Path))
+				Expect(match.Entity.Size).To(Equal(ri.Size))
+				Expect(match.Entity.Etag).To(Equal(ri.Etag))
+				Expect(match.Entity.MimeType).To(Equal(ri.MimeType))
+				Expect(uint64(match.Entity.LastModifiedTime.AsTime().Unix())).To(Equal(ri.Mtime.Seconds))
 			})
 
 			It("finds files by name, prefix or substring match", func() {
@@ -165,11 +193,6 @@ var _ = Describe("Index", func() {
 						Expect(err).ToNot(HaveOccurred())
 						Expect(res).ToNot(BeNil())
 						Expect(len(res.Matches)).To(Equal(1), "query returned no result: "+query)
-						Expect(res.Matches[0].Entity.Ref.ResourceId.OpaqueId).To(Equal(nestedRef.ResourceId.OpaqueId))
-						Expect(res.Matches[0].Entity.Ref.Path).To(Equal(nestedRef.Path))
-						Expect(res.Matches[0].Entity.Id.OpaqueId).To(Equal(nestedRI.Id.OpaqueId))
-						Expect(res.Matches[0].Entity.Name).To(Equal(nestedRI.Path))
-						Expect(res.Matches[0].Entity.Size).To(Equal(nestedRI.Size))
 					}
 				})
 

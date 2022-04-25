@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"path"
 	"strconv"
+	"time"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/extensions/webdav/pkg/net"
@@ -60,7 +61,6 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Webdav) sendSearchResponse(rsp *searchsvc.SearchResponse, w http.ResponseWriter, r *http.Request) {
-
 	responsesXML, err := multistatusResponse(r.Context(), rsp.Matches)
 	if err != nil {
 		g.log.Error().Err(err).Msg("error formatting propfind")
@@ -107,9 +107,13 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind
 	}
 
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:fileid", match.Entity.Id.StorageId+"!"+match.Entity.Id.OpaqueId))
+	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getetag", match.Entity.Etag))
+	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getlastmodified", match.Entity.LastModifiedTime.AsTime().Format(time.RFC3339)))
+	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getcontenttype", match.Entity.MimeType))
 
 	size := strconv.FormatUint(match.Entity.Size, 10)
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:size", size))
+	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getcontentlength", size))
 
 	// TODO find name for score property
 	score := strconv.FormatFloat(float64(match.Score), 'f', -1, 64)

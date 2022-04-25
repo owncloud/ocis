@@ -6,6 +6,7 @@ package v0
 import (
 	fmt "fmt"
 	proto "google.golang.org/protobuf/proto"
+	_ "google.golang.org/protobuf/types/known/timestamppb"
 	math "math"
 )
 

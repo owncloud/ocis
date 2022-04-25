@@ -21,10 +21,12 @@ package index
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/keyword"
 	"github.com/blevesearch/bleve/v2/mapping"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	searchmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0"
@@ -36,8 +38,11 @@ type indexDocument struct {
 	Path   string
 	ID     string
 
-	Name string
-	Size uint64
+	Name     string
+	Etag     string
+	Size     uint64
+	Mtime    string
+	MimeType string
 }
 
 // Index represents a bleve based search index
@@ -108,20 +113,28 @@ func BuildMapping() mapping.IndexMapping {
 }
 
 func toEntity(ref *sprovider.Reference, ri *sprovider.ResourceInfo) *indexDocument {
-	return &indexDocument{
-		RootID: idToBleveId(ref.ResourceId),
-		Path:   ref.Path,
-		ID:     idToBleveId(ri.Id),
-		Name:   ri.Path,
-		Size:   ri.Size,
+	doc := &indexDocument{
+		RootID:   idToBleveId(ref.ResourceId),
+		Path:     ref.Path,
+		ID:       idToBleveId(ri.Id),
+		Name:     ri.Path,
+		Etag:     ri.Etag,
+		Size:     ri.Size,
+		MimeType: ri.MimeType,
 	}
+
+	if ri.Mtime != nil {
+		doc.Mtime = time.Unix(int64(ri.Mtime.Seconds), int64(ri.Mtime.Nanos)).UTC().Format(time.RFC3339)
+	}
+
+	return doc
 }
 
 func fromFields(fields map[string]interface{}) (*searchmsg.Match, error) {
 	rootIDParts := strings.SplitN(fields["RootID"].(string), "!", 2)
 	IDParts := strings.SplitN(fields["ID"].(string), "!", 2)
 
-	return &searchmsg.Match{
+	match := &searchmsg.Match{
 		Entity: &searchmsg.Entity{
 			Ref: &searchmsg.Reference{
 				ResourceId: &searchmsg.ResourceID{
@@ -134,10 +147,18 @@ func fromFields(fields map[string]interface{}) (*searchmsg.Match, error) {
 				StorageId: IDParts[0],
 				OpaqueId:  IDParts[1],
 			},
-			Name: fields["Name"].(string),
-			Size: uint64(fields["Size"].(float64)),
+			Name:     fields["Name"].(string),
+			Size:     uint64(fields["Size"].(float64)),
+			Etag:     fields["Etag"].(string),
+			MimeType: fields["MimeType"].(string),
 		},
-	}, nil
+	}
+
+	if mtime, err := time.Parse(time.RFC3339, fields["Mtime"].(string)); err == nil {
+		match.Entity.LastModifiedTime = &timestamppb.Timestamp{Seconds: mtime.Unix(), Nanos: int32(mtime.Nanosecond())}
+	}
+
+	return match, nil
 }
 
 func idToBleveId(id *sprovider.ResourceId) string {
