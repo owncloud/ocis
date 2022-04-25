@@ -235,8 +235,8 @@ github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f/go.mod h1:8rLXio+Wji
 github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/boombuler/barcode v1.0.1 h1:NDBbPmhS+EqABEs5Kg3n/5ZNjy73Pz7SIV+KCeqyXcs=
 github.com/boombuler/barcode v1.0.1/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
-github.com/butonic/reva/v2 v2.0.0-20220425103624-26d787ffbba9 h1:vv9mXbOW2bsWvr8wBQJ2JIHl+aoXzRkc+Xp16SYMjWg=
-github.com/butonic/reva/v2 v2.0.0-20220425103624-26d787ffbba9/go.mod h1:2e/4HcIy54Mic3V7Ow0bz4n5dkZU0dHIZSWomFe5vng=
+github.com/butonic/reva/v2 v2.0.0-20220425155436-0689582d3921 h1:3ccPmUDlGR7UTAQDnz8hzGgXHaqFwh+AnmCUXPNHa18=
+github.com/butonic/reva/v2 v2.0.0-20220425155436-0689582d3921/go.mod h1:2e/4HcIy54Mic3V7Ow0bz4n5dkZU0dHIZSWomFe5vng=
 github.com/c-bata/go-prompt v0.2.5/go.mod h1:vFnjEGDIIA/Lib7giyE4E9c50Lvl8j0S+7FVlAwDAVw=
 github.com/cenkalti/backoff v2.2.1+incompatible h1:tNowT99t7UNflLxfYYSlKYsBpXdEet03Pg2g16Swow4=
 github.com/cenkalti/backoff v2.2.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
