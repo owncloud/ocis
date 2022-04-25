@@ -46,8 +46,10 @@ func DefaultConfig() *config.Config {
 			Insecure: false,
 		},
 		Archiver: config.Archiver{
-			Insecure: false,
-			Prefix:   "archiver",
+			Insecure:    false,
+			Prefix:      "archiver",
+			MaxNumFiles: 10000,
+			MaxSize:     1073741824,
 		},
 		DataGateway: config.DataGateway{
 			Prefix: "data",
