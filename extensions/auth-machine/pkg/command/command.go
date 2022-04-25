@@ -107,7 +107,8 @@ func authMachineConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 					"auth_manager": "machine",
 					"auth_managers": map[string]interface{}{
 						"machine": map[string]interface{}{
-							"api_key": cfg.AuthProviders.Machine.APIKey,
+							"api_key":      cfg.AuthProviders.Machine.APIKey,
+							"gateway_addr": cfg.GatewayEndpoint,
 						},
 					},
 				},

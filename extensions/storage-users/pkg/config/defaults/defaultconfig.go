@@ -83,6 +83,7 @@ func DefaultConfig() *config.Config {
 				Region:                     "default",
 				PersonalSpaceAliasTemplate: "{{.SpaceType}}/{{.User.Username | lower}}",
 				GeneralSpaceAliasTemplate:  "{{.SpaceType}}/{{.SpaceName | replace \" \" \"-\" | lower}}",
+				PermissionsEndpoint:        "127.0.0.1:9191",
 			},
 			OCIS: config.OCISDriver{
 				Root:                       filepath.Join(defaults.BaseDataPath(), "storage", "users"),
@@ -90,6 +91,7 @@ func DefaultConfig() *config.Config {
 				UserLayout:                 "{{.Id.OpaqueId}}",
 				PersonalSpaceAliasTemplate: "{{.SpaceType}}/{{.User.Username | lower}}",
 				GeneralSpaceAliasTemplate:  "{{.SpaceType}}/{{.SpaceName | replace \" \" \"-\" | lower}}",
+				PermissionsEndpoint:        "127.0.0.1:9191",
 			},
 		},
 		Events: config.Events{

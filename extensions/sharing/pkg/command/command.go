@@ -155,7 +155,8 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 					"driver": cfg.PublicSharingDriver,
 					"drivers": map[string]interface{}{
 						"json": map[string]interface{}{
-							"file": cfg.PublicSharingDrivers.JSON.File,
+							"file":         cfg.PublicSharingDrivers.JSON.File,
+							"gateway_addr": cfg.GatewayEndpoint,
 						},
 						"sql": map[string]interface{}{
 							"db_username":                   cfg.PublicSharingDrivers.SQL.DBUsername,

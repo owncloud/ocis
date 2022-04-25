@@ -68,13 +68,15 @@ func DefaultConfig() *config.Config {
 				Region: "default",
 			},
 			S3NG: config.S3NGDriver{
-				Root:       filepath.Join(defaults.BaseDataPath(), "storage", "metadata"),
-				UserLayout: "{{.Id.OpaqueId}}",
-				Region:     "default",
+				Root:                filepath.Join(defaults.BaseDataPath(), "storage", "metadata"),
+				UserLayout:          "{{.Id.OpaqueId}}",
+				Region:              "default",
+				PermissionsEndpoint: "127.0.0.1:9191",
 			},
 			OCIS: config.OCISDriver{
-				Root:       filepath.Join(defaults.BaseDataPath(), "storage", "metadata"),
-				UserLayout: "{{.Id.OpaqueId}}",
+				Root:                filepath.Join(defaults.BaseDataPath(), "storage", "metadata"),
+				UserLayout:          "{{.Id.OpaqueId}}",
+				PermissionsEndpoint: "127.0.0.1:9191",
 			},
 		},
 	}
