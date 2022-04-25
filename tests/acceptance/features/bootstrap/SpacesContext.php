@@ -24,6 +24,7 @@ declare(strict_types=1);
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Behat\Hook\Call\AfterScenario;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\Environment\Environment;
 use GuzzleHttp\Exception\GuzzleException;
@@ -331,6 +332,55 @@ class SpacesContext implements Context {
 			$this->baseUrl,
 			$this->featureContext->getOcPath()
 		);
+	}
+
+	/**
+	 * @AfterScenario
+	 *
+	 * @return void
+	 *
+	 * @throws Exception
+	 */
+	public function cleanDataAfterTests(): void
+	{
+		$this->deleteAllSpacesOfTheType('project');
+	}
+
+	/**
+	 * The method first disables and then deletes spaces
+	 * @param  string $driveType
+	 * 
+	 * @return void
+	 *
+	 * @throws Exception
+	 */
+	public function deleteAllSpacesOfTheType(string $driveType): void
+	{
+		$query = "\$filter=driveType eq $driveType";
+		$userAdmin = $this->featureContext->getAdminUsername();
+
+		for ($i = 0; $i < 2; ++$i) {
+			$this->theUserListsAllHisAvailableSpacesUsingTheGraphApiWithFilter(
+				$userAdmin,
+				$query
+			);
+
+			$rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
+			$drives = json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
+			if (isset($drives["value"])) {
+				$drives = $drives["value"];
+			}
+
+			if (!empty($drives)) {
+				foreach ($drives as $value) {
+					if (!array_key_exists("deleted", $value["root"])) {
+						$this->sendDisableSpaceRequest($userAdmin, $value["name"]);
+					} else {
+						$this->sendDeleteSpaceRequest($userAdmin, $value["name"]);
+					}
+				}
+			}
+		}
 	}
 
 	/**
