@@ -65,7 +65,7 @@ func Frontend(cfg *config.Config) *cli.Command {
 					"enabled":       true,
 					"version":       "2.0.0",
 					"formats":       []string{"tar", "zip"},
-					"archiver_url":  cfg.Archiver.URL,
+					"archiver_url":  path.Join("/", cfg.Archiver.Prefix),
 					"max_num_files": strconv.FormatInt(cfg.Archiver.MaxNumFiles, 10),
 					"max_size":      strconv.FormatInt(cfg.Archiver.MaxSize, 10),
 				},

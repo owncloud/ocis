@@ -76,9 +76,8 @@ type Auth struct {
 }
 
 type Archiver struct {
-	MaxNumFiles int64  `yaml:"max_num_files"`
-	MaxSize     int64  `yaml:"max_size"`
-	URL         string `yaml:"url"`
+	MaxNumFiles int64 `yaml:"max_num_files"`
+	MaxSize     int64 `yaml:"max_size"`
 	Prefix      string
 	Insecure    bool
 }
