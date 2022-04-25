@@ -59,39 +59,39 @@ type JSONProvider struct {
 }
 
 type LDAPProvider struct {
-	URI              string
-	CACert           string
-	Insecure         bool
-	BindDN           string
-	BindPassword     string
-	UserBaseDN       string
-	GroupBaseDN      string
-	UserFilter       string
-	GroupFilter      string
-	UserObjectClass  string
-	GroupObjectClass string
-	LoginAttributes  []string
-	IDP              string `env:"OCIS_URL;AUTH_BASIC_IDP_URL"` // TODO what is this for?
-	GatewayEndpoint  string // TODO do we need this here?
+	URI              string   `env:"LDAP_URI;AUTH_BASIC_LDAP_URI"`
+	CACert           string   `env:"LDAP_CACERT;AUTH_BASIC_LDAP_CACERT"`
+	Insecure         bool     `env:"LDAP_INSECURE;AUTH_BASIC_LDAP_INSECURE"`
+	BindDN           string   `env:"LDAP_BIND_DN;AUTH_BASIC_LDAP_BIND_DN"`
+	BindPassword     string   `env:"LDAP_BIND_PASSWORD;AUTH_BASIC_LDAP_BIND_PASSWORD"`
+	UserBaseDN       string   `env:"LDAP_USER_BASE_DN;AUTH_BASIC_LDAP_USER_BASE_DN"`
+	GroupBaseDN      string   `env:"LDAP_GROUP_BASE_DN;AUTH_BASIC_LDAP_GROUP_BASE_DN"`
+	UserFilter       string   `env:"LDAP_USERFILTER;AUTH_BASIC_LDAP_USERFILTER"`
+	GroupFilter      string   `env:"LDAP_GROUPFILTER;AUTH_BASIC_LDAP_USERFILTER"`
+	UserObjectClass  string   `env:"LDAP_USER_OBJECTCLASS;AUTH_BASIC_LDAP_USER_OBJECTCLASS"`
+	GroupObjectClass string   `env:"LDAP_GROUP_OBJECTCLASS;AUTH_BASIC_LDAP_GROUP_OBJECTCLASS"`
+	LoginAttributes  []string `env:"LDAP_LOGIN_ATTRIBUTES;AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES"`
+	IDP              string   `env:"OCIS_URL;AUTH_BASIC_IDP_URL"` // TODO what is this for?
+	GatewayEndpoint  string   // TODO do we need this here?
 	UserSchema       LDAPUserSchema
 	GroupSchema      LDAPGroupSchema
 }
 
 type LDAPUserSchema struct {
-	ID              string
-	IDIsOctetString bool
-	Mail            string
-	DisplayName     string
-	Username        string
+	ID              string `env:"LDAP_USER_SCHEMA_ID;AUTH_BASIC_LDAP_USER_SCHEMA_ID"`
+	IDIsOctetString bool   `env:"LDAP_USER_SCHEMA_ID_IS_OCTETSTRING;AUTH_BASIC_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING"`
+	Mail            string `env:"LDAP_USER_SCHEMA_MAIL;AUTH_BASIC_LDAP_USER_SCHEMA_MAIL"`
+	DisplayName     string `env:"LDAP_USER_SCHEMA_DISPLAYNAME;AUTH_BASIC_LDAP_USER_SCHEMA_DISPLAYNAME"`
+	Username        string `env:"LDAP_USER_SCHEMA_USERNAME;AUTH_BASIC_LDAP_USER_SCHEMA_USERNAME"`
 }
 
 type LDAPGroupSchema struct {
-	ID              string
-	IDIsOctetString bool
-	Mail            string
-	DisplayName     string
-	Groupname       string
-	Member          string
+	ID              string `env:"LDAP_GROUP_SCHEMA_ID;AUTH_BASIC_LDAP_GROUP_SCHEMA_ID"`
+	IDIsOctetString bool   `env:"LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING;AUTH_BASIC_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING"`
+	Mail            string `env:"LDAP_GROUP_SCHEMA_MAIL;AUTH_BASIC_LDAP_GROUP_SCHEMA_MAIL"`
+	DisplayName     string `env:"LDAP_GROUP_SCHEMA_DISPLAYNAME;AUTH_BASIC_LDAP_GROUP_SCHEMA_DISPLAYNAME"`
+	Groupname       string `env:"LDAP_GROUP_SCHEMA_GROUPNAME;AUTH_BASIC_LDAP_GROUP_SCHEMA_GROUPNAME"`
+	Member          string `env:"LDAP_GROUP_SCHEMA_MEMBER;AUTH_BASIC_LDAP_GROUP_SCHEMA_MEMBER"`
 }
 
 type OwnCloudSQLProvider struct {

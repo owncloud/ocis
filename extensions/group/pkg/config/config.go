@@ -59,41 +59,40 @@ type Drivers struct {
 type JSONDriver struct {
 	File string
 }
-
 type LDAPDriver struct {
-	URI              string
-	CACert           string
-	Insecure         bool
-	BindDN           string
-	BindPassword     string
-	UserBaseDN       string
-	GroupBaseDN      string
-	UserFilter       string
-	GroupFilter      string
-	UserObjectClass  string
-	GroupObjectClass string
-	LoginAttributes  []string
-	IDP              string `env:"OCIS_URL;GROUP_IDP_URL"` // TODO what is this for?
-	GatewayEndpoint  string // TODO do we need this here?
+	URI              string   `env:"LDAP_URI;GROUPS_LDAP_URI"`
+	CACert           string   `env:"LDAP_CACERT;GROUPS_LDAP_CACERT"`
+	Insecure         bool     `env:"LDAP_INSECURE;GROUPS_LDAP_INSECURE"`
+	BindDN           string   `env:"LDAP_BIND_DN;GROUPS_LDAP_BIND_DN"`
+	BindPassword     string   `env:"LDAP_BIND_PASSWORD;GROUPS_LDAP_BIND_PASSWORD"`
+	UserBaseDN       string   `env:"LDAP_USER_BASE_DN;GROUPS_LDAP_USER_BASE_DN"`
+	GroupBaseDN      string   `env:"LDAP_GROUP_BASE_DN;GROUPS_LDAP_GROUP_BASE_DN"`
+	UserFilter       string   `env:"LDAP_USERFILTER;GROUPS_LDAP_USERFILTER"`
+	GroupFilter      string   `env:"LDAP_GROUPFILTER;GROUPS_LDAP_USERFILTER"`
+	UserObjectClass  string   `env:"LDAP_USER_OBJECTCLASS;GROUPS_LDAP_USER_OBJECTCLASS"`
+	GroupObjectClass string   `env:"LDAP_GROUP_OBJECTCLASS;GROUPS_LDAP_GROUP_OBJECTCLASS"`
+	LoginAttributes  []string `env:"LDAP_LOGIN_ATTRIBUTES;GROUPS_LDAP_LOGIN_ATTRIBUTES"`
+	IDP              string   `env:"OCIS_URL;GROUPS_IDP_URL"` // TODO what is this for?
+	GatewayEndpoint  string   // TODO do we need this here?
 	UserSchema       LDAPUserSchema
 	GroupSchema      LDAPGroupSchema
 }
 
 type LDAPUserSchema struct {
-	ID              string
-	IDIsOctetString bool
-	Mail            string
-	DisplayName     string
-	Username        string
+	ID              string `env:"LDAP_USER_SCHEMA_ID;GROUPS_LDAP_USER_SCHEMA_ID"`
+	IDIsOctetString bool   `env:"LDAP_USER_SCHEMA_ID_IS_OCTETSTRING;GROUPS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING"`
+	Mail            string `env:"LDAP_USER_SCHEMA_MAIL;GROUPS_LDAP_USER_SCHEMA_MAIL"`
+	DisplayName     string `env:"LDAP_USER_SCHEMA_DISPLAYNAME;GROUPS_LDAP_USER_SCHEMA_DISPLAYNAME"`
+	Username        string `env:"LDAP_USER_SCHEMA_USERNAME;GROUPS_LDAP_USER_SCHEMA_USERNAME"`
 }
 
 type LDAPGroupSchema struct {
-	ID              string
-	IDIsOctetString bool
-	Mail            string
-	DisplayName     string
-	Groupname       string
-	Member          string
+	ID              string `env:"LDAP_GROUP_SCHEMA_ID;GROUPS_LDAP_GROUP_SCHEMA_ID"`
+	IDIsOctetString bool   `env:"LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING;GROUPS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING"`
+	Mail            string `env:"LDAP_GROUP_SCHEMA_MAIL;GROUPS_LDAP_GROUP_SCHEMA_MAIL"`
+	DisplayName     string `env:"LDAP_GROUP_SCHEMA_DISPLAYNAME;GROUPS_LDAP_GROUP_SCHEMA_DISPLAYNAME"`
+	Groupname       string `env:"LDAP_GROUP_SCHEMA_GROUPNAME;GROUPS_LDAP_GROUP_SCHEMA_GROUPNAME"`
+	Member          string `env:"LDAP_GROUP_SCHEMA_MEMBER;GROUPS_LDAP_GROUP_SCHEMA_MEMBER"`
 }
 
 type OwnCloudSQLDriver struct {
