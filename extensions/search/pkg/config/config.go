@@ -18,6 +18,7 @@ type Config struct {
 
 	GRPC GRPC `ocisConfig:"grpc"`
 
+	Datapath     string       `yaml:"data_path" env:"SEARCH_DATA_PATH"`
 	Reva         Reva         `ocisConfig:"reva"`
 	TokenManager TokenManager `ocisConfig:"token_manager"`
 	Events       Events       `yaml:"events"`

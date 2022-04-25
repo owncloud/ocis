@@ -1,7 +1,10 @@
 package defaults
 
 import (
+	"path"
+
 	"github.com/owncloud/ocis/extensions/search/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 )
 
 func DefaultConfig() *config.Config {
@@ -17,6 +20,7 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "search",
 		},
+		Datapath: path.Join(defaults.BaseDataPath(), "search"),
 		Reva: config.Reva{
 			Address: "127.0.0.1:9142",
 		},

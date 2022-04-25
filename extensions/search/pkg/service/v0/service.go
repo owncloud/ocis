@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"path/filepath"
 
 	"github.com/blevesearch/bleve/v2"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
@@ -42,9 +43,13 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
 		return nil, err
 	}
 
-	bleveIndex, err := bleve.NewMemOnly(index.BuildMapping())
+	indexDir := filepath.Join(cfg.Datapath, "index.bleve")
+	bleveIndex, err := bleve.Open(indexDir)
 	if err != nil {
-		return nil, err
+		bleveIndex, err = bleve.New(indexDir, index.BuildMapping())
+		if err != nil {
+			return nil, err
+		}
 	}
 	index, err := index.New(bleveIndex)
 	if err != nil {
