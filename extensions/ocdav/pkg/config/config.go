@@ -21,7 +21,7 @@ type Config struct {
 	FilesNamespace  string `yaml:"files_namespace"`
 	SharesNamespace string `yaml:"shares_namespace"`
 	// PublicURL used to redirect /s/{token} URLs to
-	PublicURL string `yaml:"public_url"`
+	PublicURL string `yaml:"public_url" env:"OCIS_URL;OCDAV_PUBLIC_URL"`
 
 	// Insecure certificates allowed when making requests to the gateway
 	Insecure bool `yaml:"insecure" env:"OCIS_INSECURE;OCDAV_INSECURE"`

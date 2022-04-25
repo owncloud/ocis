@@ -30,7 +30,7 @@ type Config struct {
 	PermissionsEndpoint       string
 	SharingEndpoint           string
 	DataGatewayPublicURL      string
-	FrontendPublicURL         string
+	FrontendPublicURL         string `env:"OCIS_URL;GATEWAY_FRONTEND_PUBLIC_URL"`
 	AuthBasicEndpoint         string
 	AuthBearerEndpoint        string
 	AuthMachineEndpoint       string

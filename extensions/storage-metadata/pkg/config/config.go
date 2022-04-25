@@ -121,7 +121,7 @@ type LocalDriver struct {
 
 type OCISDriver struct {
 	// Root is the absolute path to the location of the data
-	Root                string `yaml:"root"`
+	Root                string `yaml:"root" env:"STORAGE_METADATA_DRIVER_OCIS_ROOT"`
 	UserLayout          string
 	PermissionsEndpoint string
 }

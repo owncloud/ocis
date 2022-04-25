@@ -58,7 +58,7 @@ type UserSharingDrivers struct {
 }
 
 type UserSharingJSONDriver struct {
-	File string
+	File string `env:"SHARING_USER_JSON_FILE"`
 }
 
 type UserSharingSQLDriver struct {
@@ -76,7 +76,7 @@ type UserSharingSQLDriver struct {
 type UserSharingCS3Driver struct {
 	ProviderAddr      string
 	ServiceUserID     string
-	ServiceUserIDP    string
+	ServiceUserIDP    string `env:"OCIS_URL;SHARING_CS3_SERVICE_USER_IDP"`
 	MachineAuthAPIKey string
 }
 

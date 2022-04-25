@@ -23,7 +23,7 @@ type Config struct {
 	UploadHTTPMethodOverride string `yaml:"upload_http_method_override"`
 	DefaultUploadProtocol    string `yaml:"default_upload_protocol"`
 	TransferSecret           string `yaml:"transfer_secret"`
-	PublicURL                string
+	PublicURL                string `yaml:"public_url" env:"OCIS_URL;FRONTEND_PUBLIC_URL"`
 
 	Archiver    Archiver
 	AppProvider AppProvider

@@ -71,7 +71,7 @@ type LDAPProvider struct {
 	UserObjectClass  string
 	GroupObjectClass string
 	LoginAttributes  []string
-	IDP              string // TODO what is this for?
+	IDP              string `env:"OCIS_URL;AUTH_BASIC_IDP_URL"` // TODO what is this for?
 	GatewayEndpoint  string // TODO do we need this here?
 	UserSchema       LDAPUserSchema
 	GroupSchema      LDAPGroupSchema

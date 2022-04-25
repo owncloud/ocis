@@ -73,7 +73,7 @@ type LDAPDriver struct {
 	UserObjectClass  string
 	GroupObjectClass string
 	LoginAttributes  []string
-	IDP              string // TODO what is this for?
+	IDP              string `env:"OCIS_URL;GROUP_IDP_URL"` // TODO what is this for?
 	GatewayEndpoint  string // TODO do we need this here?
 	UserSchema       LDAPUserSchema
 	GroupSchema      LDAPGroupSchema
