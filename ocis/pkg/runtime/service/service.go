@@ -120,7 +120,6 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["web"] = web.NewSutureService
 	s.ServicesRegistry["webdav"] = webdav.NewSutureService
 	s.ServicesRegistry["storage-frontend"] = frontend.NewFrontend
-	s.ServicesRegistry["ocdav"] = ocdav.NewOCDav
 	s.ServicesRegistry["storage-gateway"] = gateway.NewGateway
 	s.ServicesRegistry["storage-userprovider"] = user.NewUserProvider
 	s.ServicesRegistry["storage-groupprovider"] = group.NewGroupProvider
@@ -137,6 +136,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.Delayed["storage-sharing"] = sharing.NewSharing
 	s.Delayed["accounts"] = accounts.NewSutureService
 	s.Delayed["proxy"] = proxy.NewSutureService
+	s.Delayed["ocdav"] = ocdav.NewOCDav
 
 	return s, nil
 }
