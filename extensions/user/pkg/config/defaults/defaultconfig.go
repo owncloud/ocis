@@ -107,3 +107,7 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 }
+
+func Sanitize(cfg *config.Config) {
+	// nothing to sanitize here atm
+}
