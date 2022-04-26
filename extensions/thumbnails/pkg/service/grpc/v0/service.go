@@ -49,7 +49,7 @@ func NewService(opts ...Option) decorators.DecoratedService {
 			TxtFontFileMap: options.Config.Thumbnail.FontMapFile,
 		},
 		dataEndpoint:        options.Config.Thumbnail.DataEndpoint,
-		transferTokenSecret: options.Config.Thumbnail.TransferTokenSecret,
+		transferTokenSecret: options.Config.Thumbnail.TransferSecret,
 	}
 
 	return svc

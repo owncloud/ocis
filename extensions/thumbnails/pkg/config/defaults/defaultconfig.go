@@ -1,6 +1,7 @@
 package defaults
 
 import (
+	"log"
 	"path"
 
 	"github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
@@ -44,7 +45,6 @@ func DefaultConfig() *config.Config {
 			WebdavAllowInsecure: false,
 			RevaGateway:         "127.0.0.1:9142",
 			CS3AllowInsecure:    false,
-			TransferTokenSecret: "changemeplease",
 			DataEndpoint:        "http://127.0.0.1:9186/thumbnails/data",
 		},
 	}
@@ -72,6 +72,12 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.Thumbnail.TransferSecret == "" && cfg.Commons != nil && cfg.Commons.TransferSecret != "" {
+		cfg.Thumbnail.TransferSecret = cfg.Commons.TransferSecret
+	} else {
+		log.Fatalf("reva transfer secret is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 }
 

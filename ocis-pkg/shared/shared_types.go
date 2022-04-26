@@ -37,4 +37,5 @@ type Commons struct {
 	OcisURL           string        `yaml:"ocis_url" env:"OCIS_URL"`
 	TokenManager      *TokenManager `yaml:"token_manager"`
 	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY"`
+	TransferSecret    string        `yaml:"transfer_secret,omitempty" env:"REVA_TRANSFER_SECRET"`
 }

@@ -102,7 +102,7 @@ func (s Thumbnails) TransferTokenValidator(next http.Handler) http.Handler {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
-			return []byte(s.config.Thumbnail.TransferTokenSecret), nil
+			return []byte(s.config.Thumbnail.TransferSecret), nil
 		})
 		if err != nil {
 			s.logger.Error().

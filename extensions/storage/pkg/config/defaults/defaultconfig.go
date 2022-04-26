@@ -1,6 +1,7 @@
 package defaults
 
 import (
+	"log"
 	"os"
 	"path"
 
@@ -36,7 +37,6 @@ func DefaultConfig() *config.Config {
 		Reva: config.Reva{
 			JWTSecret:             "Pive-Fumkiu4",
 			SkipUserGroupsInToken: false,
-			TransferSecret:        "replace-me-with-a-transfer-secret",
 			TransferExpires:       24 * 60 * 60,
 			OIDC: config.OIDC{
 				Issuer:   defaultPublicURL,
@@ -460,7 +460,11 @@ func DefaultConfig() *config.Config {
 }
 
 func EnsureDefaults(cfg *config.Config) {
-	// TODO: IMPLEMENT ME!
+	if cfg.TransferSecret == "" && cfg.Commons != nil && cfg.Commons.TransferSecret != "" {
+		cfg.TransferSecret = cfg.Commons.TransferSecret
+	} else {
+		log.Fatal("reva transfer secret is not set up properly, bailing out (storage)")
+	}
 }
 
 func Sanitize(cfg *config.Config) {

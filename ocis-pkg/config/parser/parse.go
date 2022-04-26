@@ -57,6 +57,12 @@ func ParseConfig(cfg *config.Config) error {
 		log.Fatalf("machine auth api key is not set up properly, bailing out (ocis)")
 	}
 
+	if cfg.TransferSecret != "" {
+		cfg.Commons.TransferSecret = cfg.TransferSecret
+	} else {
+		log.Fatalf("reva transfer secret not properly set, bailing out (ocis)")
+	}
+
 	// load all env variables relevant to the config in the current context.
 	if err := envdecode.Decode(cfg); err != nil {
 		// no environment variable set for this config is an expected "error"

@@ -19,7 +19,6 @@ import (
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/config"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config"
 	storage "github.com/owncloud/ocis/extensions/storage/pkg/config"
-	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
 )
 
 const configFilename string = "ocis.yaml"
@@ -110,8 +109,8 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 		//Proxy:         &proxy.Config{},
 		//OCS:        &ocs.Config{},
 		//Settings:   &settings.Config{},
-		Storage:    &storage.Config{},
-		Thumbnails: &thumbnails.Config{},
+		Storage: &storage.Config{},
+		//Thumbnails: &thumbnails.Config{},
 		//Web:           &web.Config{},
 		//WebDAV:        &webdav.Config{},
 	}
@@ -145,7 +144,7 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	if err != nil {
 		return fmt.Errorf("Could not generate random password for machineauthsecret: %s", err)
 	}
-	thumbnailTransferTokenSecret, err := generators.GenerateRandomPassword(passwordLength)
+	revaTransferTokenSecret, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("Could not generate random password for machineauthsecret: %s", err)
 	}
@@ -154,10 +153,9 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	// TODO: REVA config is missing (LDAP + GROUP provider)
 	// TODO: graph needs IDM password configured
 	// TODO: add missing insecure occurences
-	// TODO: search for missing transfer secrets
-	// TODO: move transfersecret for all extensions to shared
 
 	cfg.MachineAuthAPIKey = machineAuthApiKey
+	cfg.TransferSecret = revaTransferTokenSecret
 	cfg.TokenManager.JWTSecret = tokenManagerJwtSecret
 	//cfg.Commons.TokenManager.JWTSecret = tokenManagerJwtSecret
 	//cfg.Accounts.TokenManager.JWTSecret = tokenManagerJwtSecret
@@ -176,7 +174,7 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	//cfg.Settings.TokenManager.JWTSecret = tokenManagerJwtSecret
 	cfg.Storage.Reva.JWTSecret = tokenManagerJwtSecret
 	cfg.Storage.OCDav.JWTSecret = tokenManagerJwtSecret
-	cfg.Thumbnails.Thumbnail.TransferTokenSecret = thumbnailTransferTokenSecret
+	//cfg.Thumbnails.Thumbnail.TransferSecret = revaTransferTokenSecret
 	yamlOutput, err := yaml.Marshal(cfg)
 	if err != nil {
 		return fmt.Errorf("Could not marshall config into yaml: %s", err)
