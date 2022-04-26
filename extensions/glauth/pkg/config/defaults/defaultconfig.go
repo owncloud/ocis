@@ -86,5 +86,5 @@ func EnsureDefaults(cfg *config.Config) {
 }
 
 func Sanitize(cfg *config.Config) {
-	// nothing to santizie here atm
+	// nothing to sanitize here atm
 }

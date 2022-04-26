@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/owncloud/ocis/extensions/storage/pkg/command"
+	"github.com/owncloud/ocis/extensions/auth-machine/pkg/command"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
@@ -13,12 +13,8 @@ func StorageAuthMachineCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-auth-machine",
 		Usage:    "start storage auth-machine service",
 		Category: "extensions",
-		//Flags:    flagset.AuthMachineWithConfig(cfg.Storage),
-		Before: func(ctx *cli.Context) error {
-			return ParseStorageCommon(ctx, cfg)
-		},
 		Action: func(c *cli.Context) error {
-			origCmd := command.AuthMachine(cfg.Storage)
+			origCmd := command.AuthMachine(cfg.AuthMachine)
 			return handleOriginalAction(c, origCmd)
 		},
 	}

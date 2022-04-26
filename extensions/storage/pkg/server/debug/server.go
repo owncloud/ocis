@@ -18,9 +18,9 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.Name(options.Name),
 		debug.Version(version.String),
 		debug.Address(options.Addr),
-		debug.Token(options.Config.Debug.Token),
-		debug.Pprof(options.Config.Debug.Pprof),
-		debug.Zpages(options.Config.Debug.Zpages),
+		debug.Token(options.Token),
+		debug.Pprof(options.Pprof),
+		debug.Zpages(options.Zpages),
 		debug.Health(health(options.Config)),
 		debug.Ready(ready(options.Config)),
 	), nil
