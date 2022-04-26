@@ -88,13 +88,17 @@ func NewService(opts ...Option) (Service, error) {
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 
 		r.Group(func(r chi.Router) {
-			r.Use(svc.DavContext())
+			r.Use(svc.DavUserContext())
 
 			r.Get("/remote.php/dav/spaces/{id}/*", svc.SpacesThumbnail)
 			r.Get("/dav/spaces/{id}/*", svc.SpacesThumbnail)
 
 			r.Get("/remote.php/dav/files/{id}/*", svc.Thumbnail)
 			r.Get("/dav/files/{id}/*", svc.Thumbnail)
+		})
+
+		r.Group(func(r chi.Router) {
+			r.Use(svc.DavPublicContext())
 
 			r.Head("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnailHead)
 			r.Head("/dav/public-files/{token}/*", svc.PublicThumbnailHead)
@@ -147,10 +151,11 @@ func (g Webdav) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.mux.ServeHTTP(w, r)
 }
 
-func (g Webdav) DavContext() func(next http.Handler) http.Handler {
+func (g Webdav) DavUserContext() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
+			filePath := r.URL.Path
 
 			id := chi.URLParam(r, "id")
 			id, err := url.QueryUnescape(id)
@@ -158,7 +163,6 @@ func (g Webdav) DavContext() func(next http.Handler) http.Handler {
 				ctx = context.WithValue(ctx, constants.ContextKeyID, id)
 			}
 
-			filePath := r.URL.Path
 			if id != "" {
 				filePath = strings.TrimPrefix(filePath, path.Join("/remote.php/dav/spaces", id)+"/")
 				filePath = strings.TrimPrefix(filePath, path.Join("/dav/spaces", id)+"/")
@@ -167,10 +171,21 @@ func (g Webdav) DavContext() func(next http.Handler) http.Handler {
 				filePath = strings.TrimPrefix(filePath, path.Join("/dav/files", id)+"/")
 			}
 
-			// token for public links
-			token := chi.URLParam(r, "token")
+			ctx = context.WithValue(ctx, constants.ContextKeyPath, filePath)
 
-			if token != "" {
+			next.ServeHTTP(w, r.WithContext(ctx))
+
+		})
+	}
+}
+
+func (g Webdav) DavPublicContext() func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			filePath := r.URL.Path
+
+			if token := chi.URLParam(r, "token"); token != "" {
 				filePath = strings.TrimPrefix(filePath, path.Join("/remote.php/dav/public-files", token)+"/")
 				filePath = strings.TrimPrefix(filePath, path.Join("/dav/public-files", token)+"/")
 			}
