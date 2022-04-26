@@ -328,9 +328,7 @@ func DefaultConfig() *config.Config {
 				Services:    []string{"authprovider"},
 				Endpoint:    "localhost:9166",
 			},
-			AuthMachineConfig: config.AuthMachineConfig{
-				MachineAuthAPIKey: "change-me-please",
-			},
+			AuthMachineConfig: config.AuthMachineConfig{},
 			Sharing: config.Sharing{
 				Port: config.Port{
 					Endpoint:    "localhost:9150",

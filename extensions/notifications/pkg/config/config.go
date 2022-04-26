@@ -22,10 +22,11 @@ type Config struct {
 
 // Notifications definces the config options for the notifications service.
 type Notifications struct {
+	*shared.Commons   `yaml:"-"`
 	SMTP              SMTP   `yaml:"SMTP,omitempty"`
 	Events            Events `yaml:"events,omitempty"`
 	RevaGateway       string `yaml:"reva_gateway,omitempty" env:"REVA_GATEWAY;NOTIFICATIONS_REVA_GATEWAY"`
-	MachineAuthSecret string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;NOTIFICATIONS_MACHINE_AUTH_API_KEY"`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;NOTIFICATIONS_MACHINE_AUTH_API_KEY"`
 }
 
 // SMTP combines the smtp configuration options.

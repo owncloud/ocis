@@ -1,6 +1,7 @@
 package defaults
 
 import (
+	"log"
 	"strings"
 
 	"github.com/owncloud/ocis/extensions/ocs/pkg/config"
@@ -44,7 +45,6 @@ func DefaultConfig() *config.Config {
 			Address: "127.0.0.1:9142",
 		},
 		StorageUsersDriver: "ocis",
-		MachineAuthAPIKey:  "change-me-please",
 		IdentityManagement: config.IdentityManagement{
 			Address: "https://localhost:9200",
 		},
@@ -81,6 +81,12 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else {
 		cfg.TokenManager = &shared.TokenManager{}
+	}
+
+	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	} else {
+		log.Fatalf("machine auth api key is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 }
 

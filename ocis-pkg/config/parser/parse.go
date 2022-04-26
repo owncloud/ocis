@@ -2,6 +2,7 @@ package parser
 
 import (
 	"errors"
+	"log"
 
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
@@ -48,6 +49,12 @@ func ParseConfig(cfg *config.Config) error {
 	} else {
 		cfg.Commons.TokenManager = &shared.TokenManager{}
 		cfg.TokenManager = cfg.Commons.TokenManager
+	}
+
+	if cfg.MachineAuthAPIKey != "" {
+		cfg.Commons.MachineAuthAPIKey = cfg.MachineAuthAPIKey
+	} else {
+		log.Fatalf("machine auth api key is not set up properly, bailing out (ocis)")
 	}
 
 	// load all env variables relevant to the config in the current context.

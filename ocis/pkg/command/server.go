@@ -3,7 +3,6 @@ package command
 import (
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/parser"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/owncloud/ocis/ocis/pkg/runtime"
 	"github.com/urfave/cli/v2"
@@ -19,12 +18,6 @@ func Server(cfg *config.Config) *cli.Command {
 			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
-
-			cfg.Commons = &shared.Commons{
-				Log:          cfg.Log,
-				Tracing:      cfg.Tracing,
-				TokenManager: cfg.TokenManager,
-			}
 
 			r := runtime.New(cfg)
 			return r.Start()

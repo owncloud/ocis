@@ -1,6 +1,7 @@
 package defaults
 
 import (
+	"log"
 	"path"
 	"strings"
 
@@ -53,11 +54,10 @@ func DefaultConfig() *config.Config {
 		},
 
 		Metadata: config.Metadata{
-			GatewayAddress:    "127.0.0.1:9142",
-			StorageAddress:    "127.0.0.1:9215",
-			ServiceUserID:     "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-			ServiceUserIDP:    "https://localhost:9200",
-			MachineAuthAPIKey: "change-me-please",
+			GatewayAddress: "127.0.0.1:9142",
+			StorageAddress: "127.0.0.1:9215",
+			ServiceUserID:  "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
+			ServiceUserIDP: "https://localhost:9200",
 		},
 	}
 }
@@ -92,6 +92,12 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else {
 		cfg.TokenManager = &shared.TokenManager{}
+	}
+
+	if cfg.Metadata.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	} else {
+		log.Fatalf("machine auth api key is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 }
 

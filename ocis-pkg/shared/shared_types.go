@@ -32,8 +32,9 @@ type TokenManager struct {
 // Commons holds configuration that are common to all extensions. Each extension can then decide whether
 // to overwrite its values.
 type Commons struct {
-	Log          *Log          `yaml:"log"`
-	Tracing      *Tracing      `yaml:"tracing"`
-	OcisURL      string        `yaml:"ocis_url" env:"OCIS_URL"`
-	TokenManager *TokenManager `yaml:"token_manager"`
+	Log               *Log          `yaml:"log"`
+	Tracing           *Tracing      `yaml:"tracing"`
+	OcisURL           string        `yaml:"ocis_url" env:"OCIS_URL"`
+	TokenManager      *TokenManager `yaml:"token_manager"`
+	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY"`
 }

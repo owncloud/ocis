@@ -55,9 +55,10 @@ type Config struct {
 	File    string `yaml:",omitempty"`
 	OcisURL string `yaml:"ocis_url,omitempty"`
 
-	Registry     string               `yaml:"registry,omitempty"`
-	TokenManager *shared.TokenManager `yaml:"token_manager,omitempty"`
-	Runtime      Runtime              `yaml:"runtime,omitempty"`
+	Registry          string               `yaml:"registry,omitempty"`
+	TokenManager      *shared.TokenManager `yaml:"token_manager,omitempty"`
+	MachineAuthAPIKey string
+	Runtime           Runtime `yaml:"runtime,omitempty"`
 
 	Audit         *audit.Config         `yaml:"audit,omitempty"`
 	Accounts      *accounts.Config      `yaml:"accounts,omitempty"`

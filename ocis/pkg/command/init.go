@@ -17,10 +17,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/config"
-	notifications "github.com/owncloud/ocis/extensions/notifications/pkg/config"
-	ocs "github.com/owncloud/ocis/extensions/ocs/pkg/config"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config"
-	settings "github.com/owncloud/ocis/extensions/settings/pkg/config"
 	storage "github.com/owncloud/ocis/extensions/storage/pkg/config"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
 )
@@ -109,10 +106,10 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 		IDM: &idm.Config{},
 		//IDP:           &idp.Config{},
 		//Nats:          &nats.Config{},
-		Notifications: &notifications.Config{},
+		//Notifications: &notifications.Config{},
 		//Proxy:         &proxy.Config{},
-		OCS:        &ocs.Config{},
-		Settings:   &settings.Config{},
+		//OCS:        &ocs.Config{},
+		//Settings:   &settings.Config{},
 		Storage:    &storage.Config{},
 		Thumbnails: &thumbnails.Config{},
 		//Web:           &web.Config{},
@@ -144,7 +141,7 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	if err != nil {
 		return fmt.Errorf("Could not generate random password for tokenmanager: %s", err)
 	}
-	machineAuthSecret, err := generators.GenerateRandomPassword(passwordLength)
+	machineAuthApiKey, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("Could not generate random password for machineauthsecret: %s", err)
 	}
@@ -158,10 +155,9 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	// TODO: graph needs IDM password configured
 	// TODO: add missing insecure occurences
 	// TODO: search for missing transfer secrets
-	// TODO: move TokenManager for all extensions to shared
-	// TODO: move machineauthsecret for all extensions to shared
 	// TODO: move transfersecret for all extensions to shared
 
+	cfg.MachineAuthAPIKey = machineAuthApiKey
 	cfg.TokenManager.JWTSecret = tokenManagerJwtSecret
 	//cfg.Commons.TokenManager.JWTSecret = tokenManagerJwtSecret
 	//cfg.Accounts.TokenManager.JWTSecret = tokenManagerJwtSecret
@@ -171,12 +167,12 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	cfg.IDM.ServiceUserPasswords.Idp = idpServicePassword
 	cfg.IDM.ServiceUserPasswords.OcisAdmin = ocisAdminServicePassword
 	cfg.IDM.ServiceUserPasswords.Reva = revaServicePassword
-	cfg.Notifications.Notifications.MachineAuthSecret = machineAuthSecret
-	cfg.OCS.MachineAuthAPIKey = machineAuthSecret
+	//cfg.Notifications.Notifications.MachineAuthAPIKey = machineAuthSecret
+	//cfg.OCS.MachineAuthAPIKey = machineAuthSecret
 	//cfg.Proxy.TokenManager.JWTSecret = tokenManagerJwtSecret
 	//fmt.Printf("%v\n", cfg.Proxy.TokenManager)
-	cfg.Proxy.MachineAuthAPIKey = machineAuthSecret
-	cfg.Settings.Metadata.MachineAuthAPIKey = machineAuthSecret
+	//cfg.Proxy.MachineAuthAPIKey = machineAuthSecret
+	//cfg.Settings.Metadata.MachineAuthAPIKey = machineAuthSecret
 	//cfg.Settings.TokenManager.JWTSecret = tokenManagerJwtSecret
 	cfg.Storage.Reva.JWTSecret = tokenManagerJwtSecret
 	cfg.Storage.OCDav.JWTSecret = tokenManagerJwtSecret
