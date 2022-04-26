@@ -15,14 +15,13 @@ var (
 // BindSourcesToStructs assigns any config value from a config file / env variable to struct `dst`. Its only purpose
 // is to solely modify `dst`, not dealing with the config structs; and do so in a thread safe manner.
 func BindSourcesToStructs(extension, ConfigFile string, failOnLoadErr bool, dst interface{}) (*gofig.Config, error) {
-	sources := []string{ConfigFile}
 	cnf := gofig.NewWithOptions(extension)
 	cnf.WithOptions(func(options *gofig.Options) {
 		options.DecoderConfig.TagName = decoderConfigTagName
 	})
 	cnf.AddDriver(gooyaml.Driver)
 
-	err := cnf.LoadFiles(sources...)
+	err := cnf.LoadFiles([]string{ConfigFile}...)
 	if err != nil && failOnLoadErr {
 		// fail only if config file was explicitly set
 		return nil, err
