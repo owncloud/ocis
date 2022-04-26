@@ -275,4 +275,7 @@ require (
 // we need to use a fork to make the windows build pass
 replace github.com/pkg/xattr => github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7
 
-replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20220425155436-0689582d3921
+replace ( // temp replacements
+	github.com/cs3org/go-cs3apis => github.com/kobergj/go-cs3apis v0.0.0-20220426153245-19c6c0ff7800
+	github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20220426153742-3a0d70f4b72a
+)
