@@ -1708,11 +1708,11 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         environment = {
             # Keycloak IDP specific configuration
             "PROXY_OIDC_ISSUER": "https://keycloak/auth/realms/owncloud",
+            "LDAP_IDP": "https://keycloak/auth/realms/owncloud",
             "WEB_OIDC_AUTHORITY": "https://keycloak/auth/realms/owncloud",
             "WEB_OIDC_CLIENT_ID": "ocis-web",
             "WEB_OIDC_METADATA_URL": "https://keycloak/auth/realms/owncloud/.well-known/openid-configuration",
             "AUTH_BEARER_OIDC_ISSUER": "https://keycloak",
-            "LDAP_IDP": "https://keycloak/auth/realms/owncloud",
             "WEB_OIDC_SCOPE": "openid profile email owncloud",
             # LDAP bind
             "LDAP_URI": "ldaps://openldap",
@@ -1728,7 +1728,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "LDAP_GROUP_OBJECTCLASS": "groupOfUniqueNames",
             "LDAP_GROUPFILTER": "(objectclass=owncloud)",
             "LDAP_GROUP_SCHEMA_DISPLAYNAME": "cn",
-            "LDAP_GROUP_SCHEMA_GID_NUMBER": "gidnumber",
             "LDAP_GROUP_SCHEMA_ID": "cn",
             "LDAP_GROUP_SCHEMA_MAIL": "mail",
             "LDAP_GROUP_SCHEMA_MEMBER": "cn",
@@ -1737,9 +1736,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "LDAP_USERFILTER": "(objectclass=owncloud)",
             "LDAP_USER_SCHEMA_USERNAME": "cn",
             "LDAP_USER_SCHEMA_DISPLAYNAME": "displayname",
-            "LDAP_USER_SCHEMA_GID_NUMBER": "gidnumber",
             "LDAP_USER_SCHEMA_MAIL": "mail",
-            "LDAP_USER_SCHEMA_UID_NUMBER": "uidnumber",
             "LDAP_USER_SCHEMA_ID": "ownclouduuid",
             "LDAP_LOGIN_ATTRIBUTES": "uid,mail",
             # ownCloudSQL storage driver
@@ -1769,7 +1766,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             # General oCIS config
             # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
             "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,nats,ocdav",
-            "OCIS_LOG_LEVEL": "error",
+            "OCIS_LOG_LEVEL": "info",
             "OCIS_URL": OCIS_URL,
             "PROXY_TLS": "true",
             "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",
@@ -1779,8 +1776,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_MACHINE_AUTH_API_KEY": "change-me-please",
             "OCIS_INSECURE": "true",
             "PROXY_ENABLE_BASIC_AUTH": "true",
-            "ACCOUNTS_DEMO_USERS_AND_GROUPS": True,  # deprecated, remove after switching to LibreIDM
-            "IDM_CREATE_DEMO_USERS": True,
         }
         wait_for_ocis = {
             "name": "wait-for-ocis-server",
