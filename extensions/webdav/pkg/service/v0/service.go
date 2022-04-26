@@ -16,7 +16,6 @@ import (
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/templates"
 	"github.com/go-chi/render"
@@ -105,10 +104,11 @@ func NewService(opts ...Option) (Service, error) {
 		})
 
 		r.Group(func(r chi.Router) {
-			r.Use(svc.WebdavContext())
-
-			r.Get("/remote.php/webdav/*", svc.Thumbnail)
-			r.Get("/webdav/*", svc.Thumbnail)
+			// currently not implemented
+			// If we implement this endpoint, we need to get the user from the access token.
+			// We decided against doing it, so that this service can be started without the JWT secret.
+			r.Get("/remote.php/webdav/*", http.NotFound)
+			r.Get("/webdav/*", http.NotFound)
 		})
 		
 		// r.MethodFunc("REPORT", "/remote.php/dav/files/{id}/*", svc.Search)
@@ -178,28 +178,6 @@ func (g Webdav) DavContext() func(next http.Handler) http.Handler {
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 
-		})
-	}
-}
-
-func (g Webdav) WebdavContext() func(next http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := r.Context()
-
-			u, ok := revactx.ContextGetUser(r.Context())
-			if ok {
-				if u.Id == nil || u.Id.OpaqueId != "" {
-					ctx = context.WithValue(ctx, constants.ContextKeyID, u.Id.OpaqueId)
-				}
-			}
-
-			filePath := r.URL.Path
-			filePath = strings.TrimPrefix(filePath, "/remote.php/webdav/")
-			filePath = strings.TrimPrefix(filePath, "/webdav/")
-			ctx = context.WithValue(ctx, constants.ContextKeyPath, filePath)
-
-			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
 }
