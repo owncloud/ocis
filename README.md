@@ -14,6 +14,8 @@
 
 Please see [Getting Started](https://owncloud.dev/ocis/getting-started/)
 
+Trigger CI
+
 ## Development
 
 Please see [Development - Getting Started](https://owncloud.dev/ocis/development/getting-started/)
