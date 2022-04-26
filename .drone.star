@@ -110,9 +110,7 @@ config = {
             "suites": [
                 "apiShareManagement",
             ],
-            # The tests fail after the storage config changes
-            # They will be fixed later.
-            "skip": True,
+            "skip": False,
             "earlyFail": True,
             "cron": "nightly",
         },
@@ -120,9 +118,7 @@ config = {
             "suites": [
                 "apiWebdavOperations",
             ],
-            # The tests fail after the storage config changes
-            # They will be fixed later.
-            "skip": True,
+            "skip": False,
             "earlyFail": True,
             "cron": "nightly",
         },
