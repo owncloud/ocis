@@ -39,15 +39,16 @@ Let's explore the various flows with examples and workflows.
 
 Let's explore with examples this approach.
 
-#### Expected loading locations:
+#### Expected loading locations
 
-- `$HOME/.ocis/config/`
-- `/etc/ocis/`
-- `.config/`
+- docker images: `/etc/ocis/`
+- binary releases: `$HOME/.ocis/config/`
 
-followed by the extension name. When configuring the proxy, a valid full path that will get loaded is `$HOME/.ocis/config/proxy.yaml`.
+followed by the `<extension name>.yaml`, eg `proxy.yaml` for the extension configuration. You also can put an `ocis.yaml` config file to the expected loading location to use a single config file.
 
-####  Only config files
+You can set another directory as config path in the environment variable `OCIS_CONFIG_DIR`. It will then pick the same file names, but from the folder you configured.
+
+#### Only config files
 
 The following config files are present in the default loading locations:
 
