@@ -1697,7 +1697,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "SETTINGS_DATA_PATH": "/srv/app/tmp/ocis/settings",
             "OCIS_INSECURE": "true",
             "ACCOUNTS_DEMO_USERS_AND_GROUPS": True,  # deprecated, remove after switching to LibreIDM
-            "IDM_CREATE_DEMO_USERS": True,
         }
         wait_for_ocis = {
             "name": "wait-for-ocis-server",
