@@ -26,6 +26,10 @@ func Server(cfg *config.Config) *cli.Command {
 				Usage:       "config file to be loaded by the extension",
 				Destination: &cfg.ConfigFile,
 			},
+			&cli.StringFlag{
+				Name:   "ocis-config-file",
+				Hidden: true,
+			},
 		},
 		Before: func(c *cli.Context) error {
 			return parser.ParseConfig(cfg)
