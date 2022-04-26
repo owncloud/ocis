@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
+* Change - Load configuration files just from one directory: [#3587](https://github.com/owncloud/ocis/pull/3587)
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 * Enhancement - Update reva to v2.x.x: [#3552](https://github.com/owncloud/ocis/pull/3552)
@@ -19,6 +20,18 @@ The following sections list the changes for unreleased.
    backend. Now it returns a proper error.
 
    https://github.com/owncloud/ocis/issues/3483
+
+* Change - Load configuration files just from one directory: [#3587](https://github.com/owncloud/ocis/pull/3587)
+
+   We've changed the configuration file loading behavior and are now only loading configuration
+   files from ONE single directory. This directory can be set on compile time or via an environment
+   variable on startup (`OCIS_CONFIG_DIR`).
+
+   We are using following configuration default paths:
+
+   - Docker images: `/etc/ocis/` - Binary releases: `$HOME/.ocis/config/`
+
+   https://github.com/owncloud/ocis/pull/3587
 
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 
