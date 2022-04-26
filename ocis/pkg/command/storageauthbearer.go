@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/owncloud/ocis/extensions/storage/pkg/command"
+	"github.com/owncloud/ocis/extensions/auth-bearer/pkg/command"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
@@ -13,12 +13,8 @@ func StorageAuthBearerCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-auth-bearer",
 		Usage:    "Start storage auth-bearer service",
 		Category: "extensions",
-		//Flags:    flagset.AuthBearerWithConfig(cfg.Storage),
-		Before: func(ctx *cli.Context) error {
-			return ParseStorageCommon(ctx, cfg)
-		},
 		Action: func(c *cli.Context) error {
-			origCmd := command.AuthBearer(cfg.Storage)
+			origCmd := command.AuthBearer(cfg.AuthBearer)
 			return handleOriginalAction(c, origCmd)
 		},
 	}

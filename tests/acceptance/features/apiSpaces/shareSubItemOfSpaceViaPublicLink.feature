@@ -3,11 +3,17 @@ Feature: Share a file or folder that is inside a space via public link
       As an user with manager space role
       I want to be able to share the data inside the space via public link
 
+      folder permissions:
       | role        | permissions |
       | viewer      | 1           |
       | uploader    | 4           |
       | contributor | 5           |
       | editor      | 15          |
+
+      file permissions:
+      | role   | permissions |
+      | viewer | 1           |
+      | editor | 3           |
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -17,7 +23,6 @@ Feature: Share a file or folder that is inside a space via public link
       | username |
       | Alice    |
       | Brian    |
-      | Bob      |
     And the administrator has given "Alice" the role "Admin" using the settings api
     And user "Alice" has created a space "share sub-item" with the default quota using the GraphApi
     And user "Alice" has created a folder "folder" in space "share sub-item"
@@ -44,6 +49,7 @@ Feature: Share a file or folder that is inside a space via public link
       | folder          | 5           | 200      |      | 2042-03-25T23:59:59+0100 |
       | folder          | 15          |          | link |                          |
       | folder/file.txt | 1           | 123      | link | 2042-03-25T23:59:59+0100 |
+      | folder/file.txt | 3           | 123      | link | 2042-03-25T23:59:59+0100 |
 
 
   Scenario Outline: An user participant of the project space with space manager role can share an entrity inside project space via public link
@@ -84,3 +90,30 @@ Feature: Share a file or folder that is inside a space via public link
       | folder          | viewer    |
       | folder/file.txt | editor    |
       | folder/file.txt | viewer    |
+
+
+  Scenario Outline: User creates a new public link share of a file with edit permissions
+    Given using OCS API version "<ocs_api_version>"
+    And user "Alice" has uploaded file with content "Random data" to "/file.txt"
+    When user "Alice" creates a public link share using the sharing API with settings
+      | path        | file.txt    |
+      | permissions | read,update |
+    Then the OCS status code should be "<ocs_status_code>"
+    And the HTTP status code should be "200"
+    And the fields of the last response to user "Alice" should include
+      | item_type              | file          |
+      | mimetype               | text/plain    |
+      | file_target            | /file.txt     |
+      | path                   | /file.txt     |
+      | permissions            | read,update   |
+      | share_type             | public_link   |
+      | displayname_file_owner | %displayname% |
+      | displayname_owner      | %displayname% |
+      | uid_file_owner         | %username%    |
+      | uid_owner              | %username%    |
+    And the public should be able to download the last publicly shared file using the <webdav_api_version> public WebDAV API without a password and the content should be "Random data"
+    And the public upload to the last publicly shared file using the <webdav_api_version> public WebDAV API should pass with HTTP status code "204"
+    Examples:
+      | ocs_api_version | ocs_status_code | webdav_api_version |
+      | 1               | 100             | new                |
+      | 2               | 200             | new                |

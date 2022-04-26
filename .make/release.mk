@@ -11,6 +11,7 @@ release-dirs:
 
 # docker specific packaging flags
 DOCKER_LDFLAGS += -X "$(OCIS_REPO)/ocis-pkg/config/defaults.BaseDataPathType=path" -X "$(OCIS_REPO)/ocis-pkg/config/defaults.BaseDataPathValue=/var/lib/ocis"
+DOCKER_LDFLAGS += -X "$(OCIS_REPO)/ocis-pkg/config/defaults.BaseConfigPathType=path" -X "$(OCIS_REPO)/ocis-pkg/config/defaults.BaseConfigPathValue=/etc/ocis"
 
 release-linux-docker-amd64: release-dirs
 	GOOS=linux \

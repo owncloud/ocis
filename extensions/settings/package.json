@@ -67,7 +67,7 @@
     "nightwatch": "1.7.11",
     "nightwatch-api": "3.0.2",
     "nightwatch-vrt": "^0.2.10",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.7",
     "qs": "^6.10.3",
     "rimraf": "^3.0.0",
     "rollup": "^2.70.1",
