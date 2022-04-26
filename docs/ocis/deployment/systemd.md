@@ -10,17 +10,18 @@ geekdocFilePath: systemd.md
 {{< toc >}}
 
 ## Install the oCIS binary
+
 Download the oCIS binary of your preferred version and for your CPU architecture and operating system from [download.owncloud.com](https://download.owncloud.com/ocis/ocis).
 
 Rename the downloaded binary to `ocis` and move it to `/usr/bin/`. As a next step, you need to mark it as executable with `chmod +x /usr/bin/ocis`.
 
 When you now run `ocis help` on your command line, you should see the available options for the oCIS command.
 
-
 ## Systemd service definition
 
 Create the Systemd service definition for oCIS in the file `/etc/systemd/system/ocis.service` with following content:
-```
+
+```systemd
 [Unit]
 Description=OCIS server
 
@@ -49,15 +50,15 @@ OCIS_INSECURE=false
 
 OCIS_LOG_LEVEL=error
 
-GLAUTH_LDAPS_CERT=/etc/ocis/ldap/ldaps.crt
-GLAUTH_LDAPS_KEY=/etc/ocis/ldap/ldaps.key
-IDP_TRANSPORT_TLS_CERT=/etc/ocis/idp/server.crt
-IDP_TRANSPORT_TLS_KEY=/etc/ocis/idp/server.key
-PROXY_TRANSPORT_TLS_CERT=/etc/ocis/proxy/server.crt
-PROXY_TRANSPORT_TLS_KEY=/etc/ocis/proxy/server.key
+OCIS_CONFIG_DIR=/etc/ocis
+OCIS_BASE_DATA_PATH=/var/lib/ocis
 ```
 
+Since we set `OCIS_CONFIG_DIR` to `/etc/ocis` you can also place configuration files in this directory.
+
 Please change your `OCIS_URL` in order to reflect your actual deployment. If you are using self-signed certificates you need to set `OCIS_INSECURE=true` in `/etc/ocis/ocis.env`.
+
+oCIS will store all data in `/var/lib/ocis`, because we configured it so by setting `OCIS_BASE_DATA_PATH`. Therefore you need to create that directory and make it accessible to the user, you use to start oCIS.
 
 
 ## Starting the oCIS service

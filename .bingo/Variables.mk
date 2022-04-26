@@ -17,11 +17,11 @@ GO     ?= $(shell which go)
 #	@echo "Running bingo"
 #	@$(BINGO) <flags/args..>
 #
-BINGO := $(GOBIN)/bingo-v0.5.2
+BINGO := $(GOBIN)/bingo-v0.6.0
 $(BINGO): $(BINGO_DIR)/bingo.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/bingo-v0.5.2"
-	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=bingo.mod -o=$(GOBIN)/bingo-v0.5.2 "github.com/bwplotka/bingo"
+	@echo "(re)installing $(GOBIN)/bingo-v0.6.0"
+	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=bingo.mod -o=$(GOBIN)/bingo-v0.6.0 "github.com/bwplotka/bingo"
 
 BUF := $(GOBIN)/buf-v1.3.1
 $(BUF): $(BINGO_DIR)/buf.mod

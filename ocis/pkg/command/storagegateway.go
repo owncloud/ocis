@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/owncloud/ocis/extensions/storage/pkg/command"
+	"github.com/owncloud/ocis/extensions/gateway/pkg/command"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
@@ -14,11 +14,11 @@ func StorageGatewayCommand(cfg *config.Config) *cli.Command {
 		Usage:    "start storage gateway",
 		Category: "extensions",
 		//Flags:    flagset.GatewayWithConfig(cfg.Storage),
-		Before: func(ctx *cli.Context) error {
-			return ParseStorageCommon(ctx, cfg)
-		},
+		// Before: func(ctx *cli.Context) error {
+		// 	return ParseStorageCommon(ctx, cfg)
+		// },
 		Action: func(c *cli.Context) error {
-			origCmd := command.Gateway(cfg.Storage)
+			origCmd := command.Gateway(cfg.Gateway)
 			return handleOriginalAction(c, origCmd)
 		},
 	}

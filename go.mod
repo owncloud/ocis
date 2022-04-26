@@ -63,7 +63,7 @@ require (
 	github.com/stretchr/testify v1.7.1
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.2
-	github.com/urfave/cli/v2 v2.4.4
+	github.com/urfave/cli/v2 v2.5.0
 	go-micro.dev/v4 v4.6.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.31.0
@@ -76,7 +76,7 @@ require (
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
 	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a
 	google.golang.org/genproto v0.0.0-20220324131243-acbaeb5b85eb
-	google.golang.org/grpc v1.45.0
+	google.golang.org/grpc v1.46.0
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/v3 v3.1.0
