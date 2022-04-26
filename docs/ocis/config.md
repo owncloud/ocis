@@ -44,9 +44,13 @@ Let's explore with examples this approach.
 - docker images: `/etc/ocis/`
 - binary releases: `$HOME/.ocis/config/`
 
-followed by the extension name. When configuring the proxy, a valid full path that will get loaded is `$HOME/.ocis/config/proxy.yaml`.
+followed by the `<extension name>.yaml`, eg `proxy.yaml` for the extension configuration. You also can put an `ocis.yaml` config file to the expected loading location to use a single config file.
 
-You can always set another directory as config path in the environment variable `OCIS_CONFIG_DIR`.
+You can set another directory as config path in the environment variable `OCIS_CONFIG_DIR`. It will then pick the same file names, but from the folder you configured.
+
+Another option is to set the `--ocis-config-file` option for the runtime `ocis server --ocis-config-file /path/to/ocis.yaml` or for an extension without runtime `ocis proxy --ocis-config-file /path/to/ocis.yaml server`. For both cases, you can achieve the same by setting the environment variable `OCIS_CONFIG_FILE=/path/to/ocis.yaml`.
+
+For unsupervised extensions (without runtime), you also can specify a `--config-file` flag to use a non default config file, eg. `ocis proxy server --config-file /path/to/proxy.yaml`. An alternative is to set the extension specific configuration file path environment variable, e.g. `PROXY_CONFIG_FILE=/path/to/proxy.yaml` for the proxy extension.
 
 #### Only config files
 
