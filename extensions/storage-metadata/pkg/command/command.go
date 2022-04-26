@@ -125,16 +125,83 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 		},
 		"shared": map[string]interface{}{
 			"jwt_secret":                cfg.JWTSecret,
-			"gatewaysvc":                cfg.GatewayEndpoint,
+			"gatewaysvc":                cfg.GRPC.Addr,
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.GRPC.Protocol,
 			"address": cfg.GRPC.Addr,
-			"interceptors": map[string]interface{}{
-				"log": map[string]interface{}{},
-			},
+			//"interceptors": map[string]interface{}{
+			//	"log": map[string]interface{}{},
+			//},
 			"services": map[string]interface{}{
+				"gateway": map[string]interface{}{
+					// registries are located on the gateway
+					"authregistrysvc":    cfg.GRPC.Addr,
+					"storageregistrysvc": cfg.GRPC.Addr,
+					// user metadata is located on the users services
+					"userprovidersvc":  cfg.GRPC.Addr,
+					"groupprovidersvc": cfg.GRPC.Addr,
+					"permissionssvc":   cfg.GRPC.Addr,
+					// other
+					"disable_home_creation_on_login": true,
+					//"datagateway":                    cfg.Reva.StorageMetadata.HTTPAddr, // needs to start with a protocol
+					"transfer_shared_secret": cfg.TransferSecret,
+					"transfer_expires":       cfg.TransferExpires,
+					//"home_mapping":           cfg.Reva.Gateway.HomeMapping,
+					//"etag_cache_ttl":         cfg.Reva.Gateway.EtagCacheTTL,
+				},
+				"userprovider": map[string]interface{}{
+					"driver": "memory",
+					"drivers": map[string]interface{}{
+						"memory": map[string]interface{}{
+							"users": map[string]interface{}{
+								"serviceuser": map[string]interface{}{
+									"id": map[string]interface{}{
+										"opaqueId": "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
+										"idp":      "internal",
+										"type":     1, // user.UserType_USER_TYPE_PRIMARY
+									},
+									"username": "serviceuser",
+									// "secret":       // TODO should not have a secret
+									"mail":         "admin@example.org",
+									"display_name": "System User",
+								},
+							},
+						},
+					},
+				},
+				"authregistry": map[string]interface{}{
+					"driver": "static",
+					"drivers": map[string]interface{}{
+						"static": map[string]interface{}{
+							"rules": map[string]interface{}{
+								"machine": cfg.GRPC.Addr,
+							},
+						},
+					},
+				},
+				"authprovider": map[string]interface{}{
+					"auth_manager": "machine",
+					"auth_managers": map[string]interface{}{
+						"machine": map[string]interface{}{
+							"api_key":      cfg.MachineAuthAPIKey,
+							"gateway_addr": cfg.GRPC.Addr,
+						},
+					},
+				},
+				"storageregistry": map[string]interface{}{
+					"driver": "static",
+					"drivers": map[string]interface{}{
+						"static": map[string]interface{}{
+							"rules": map[string]interface{}{
+								"/": map[string]interface{}{
+									"address": cfg.GRPC.Addr,
+								},
+							},
+						},
+					},
+				},
 				"storageprovider": map[string]interface{}{
 					"driver":          cfg.Driver,
 					"drivers":         config.MetadataDrivers(cfg),

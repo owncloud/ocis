@@ -55,10 +55,10 @@ func DefaultConfig() *config.Config {
 		},
 
 		Metadata: config.Metadata{
-			GatewayAddress:    "127.0.0.1:9142",
+			GatewayAddress:    "127.0.0.1:9215",
 			StorageAddress:    "127.0.0.1:9215",
 			ServiceUserID:     "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-			ServiceUserIDP:    "https://localhost:9200",
+			ServiceUserIDP:    "internal",
 			MachineAuthAPIKey: "change-me-please",
 		},
 	}

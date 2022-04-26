@@ -24,6 +24,11 @@ func DefaultConfig() *config.Config {
 			Pprof:  false,
 			Zpages: false,
 		},
+		Logging: &config.Logging{
+			Level:  "debug",
+			Pretty: true,
+			Color:  true,
+		},
 		GRPC: config.GRPCConfig{
 			Addr:     "127.0.0.1:9215",
 			Protocol: "tcp",
@@ -35,11 +40,14 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "storage-metadata",
 		},
-		GatewayEndpoint: "127.0.0.1:9142",
-		JWTSecret:       "Pive-Fumkiu4",
-		TempFolder:      filepath.Join(defaults.BaseDataPath(), "tmp", "metadata"),
-		DataServerURL:   "http://localhost:9216/data",
-		Driver:          "ocis",
+		GatewayEndpoint:   "127.0.0.1:9215", // metadata is a self contained reva instance
+		JWTSecret:         "Pive-Fumkiu4",
+		TempFolder:        filepath.Join(defaults.BaseDataPath(), "tmp", "metadata"),
+		DataServerURL:     "http://localhost:9216/data",
+		TransferSecret:    "replace-me-with-a-transfer-secret-for-metadata",
+		TransferExpires:   24 * 60 * 60,
+		MachineAuthAPIKey: "change-me-please",
+		Driver:            "ocis",
 		Drivers: config.Drivers{
 			EOS: config.EOSDriver{
 				Root:                "/eos/dockertest/reva",
@@ -59,7 +67,7 @@ func DefaultConfig() *config.Config {
 				SecProtocol:         "",
 				Keytab:              "",
 				SingleUsername:      "",
-				GatewaySVC:          "127.0.0.1:9142",
+				GatewaySVC:          "127.0.0.1:9215",
 			},
 			Local: config.LocalDriver{
 				Root: filepath.Join(defaults.BaseDataPath(), "storage", "local", "metadata"),
@@ -71,12 +79,12 @@ func DefaultConfig() *config.Config {
 				Root:                filepath.Join(defaults.BaseDataPath(), "storage", "metadata"),
 				UserLayout:          "{{.Id.OpaqueId}}",
 				Region:              "default",
-				PermissionsEndpoint: "127.0.0.1:9191",
+				PermissionsEndpoint: "127.0.0.1:9191", // fixme
 			},
 			OCIS: config.OCISDriver{
 				Root:                filepath.Join(defaults.BaseDataPath(), "storage", "metadata"),
 				UserLayout:          "{{.Id.OpaqueId}}",
-				PermissionsEndpoint: "127.0.0.1:9191",
+				PermissionsEndpoint: "127.0.0.1:9191", // fixme
 			},
 		},
 	}

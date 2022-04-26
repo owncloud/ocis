@@ -25,7 +25,10 @@ type Config struct {
 	Drivers               Drivers `yaml:"drivers"`
 	DataServerURL         string
 	TempFolder            string
-	DataProviderInsecure  bool `env:"OCIS_INSECURE;STORAGE_METADATA_DATAPROVIDER_INSECURE"`
+	TransferSecret        string `yaml:"transfer_secret" env:"STORAGE_METADATA_TRANSFER_SECRET"`
+	TransferExpires       int    `yaml:"transfer_expires" env:"STORAGE_METADATA_TRANSFER_EXPIRES"`
+	DataProviderInsecure  bool   `env:"OCIS_INSECURE;STORAGE_METADATA_DATAPROVIDER_INSECURE"`
+	MachineAuthAPIKey     string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;STORAGE_METADATA_MACHINE_AUTH_API_KEY"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;STORAGE_METADATA_TRACING_ENABLED" desc:"Activates tracing."`
