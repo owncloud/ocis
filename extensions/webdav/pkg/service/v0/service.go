@@ -5,10 +5,7 @@ import (
 	"encoding/xml"
 	"io"
 	"net/http"
-<<<<<<< HEAD
-=======
 	"net/url"
->>>>>>> 60f1081e8 (implement thumbnails also for webdav and non remote.php routes)
 	"path"
 	"path/filepath"
 	"strings"
@@ -18,27 +15,19 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/templates"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/grpc/metadata"
 
+	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/constants"
+	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/dav/requests"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
-
-	"github.com/go-chi/chi/v5"
-<<<<<<< HEAD
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/dav/requests"
 	thumbnailsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
-=======
-	"github.com/owncloud/ocis/extensions/webdav/pkg/config"
-	"github.com/owncloud/ocis/extensions/webdav/pkg/constants"
-	"github.com/owncloud/ocis/extensions/webdav/pkg/dav/requests"
-	thumbnailsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/thumbnails/v0"
-	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
->>>>>>> 60f1081e8 (implement thumbnails also for webdav and non remote.php routes)
 )
 
 const (
@@ -114,7 +103,7 @@ func NewService(opts ...Option) (Service, error) {
 			r.Get("/remote.php/webdav/*", http.NotFound)
 			r.Get("/webdav/*", http.NotFound)
 		})
-		
+
 		// r.MethodFunc("REPORT", "/remote.php/dav/files/{id}/*", svc.Search)
 
 		// This is a workaround for the go-chi concurrent map read write issue.
