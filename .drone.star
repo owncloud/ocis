@@ -76,7 +76,7 @@ config = {
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
         "earlyFail": True,
     },
@@ -698,7 +698,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() + [
+                 ocisServerWithAccounts(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() + [
             {
                 "name": "webUITests",
                 "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
@@ -1629,40 +1629,50 @@ def notify(ctx):
         },
     }
 
-def ocisServerWithIdp():
+def ocisServerWithAccounts(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = []):
     environment = {
-        "GRAPH_IDENTITY_BACKEND": "ldap",
-        "GRAPH_LDAP_SERVER_WRITE_ENABLED": "true",
-        "LDAP_URI": "ldaps://0.0.0.0:9235",
+        "GRAPH_IDENTITY_BACKEND": "cs3",
+        "GRAPH_LDAP_SERVER_WRITE_ENABLED": "false",
+        "LDAP_URI": "ldaps://0.0.0.0:9126",
         "LDAP_INSECURE": "true",
-        "GRAPH_LDAP_BIND_DN": "uid=libregraph,ou=sysusers,o=libregraph-idm",
-        "GRAPH_LDAP_BIND_PASSWORD": "idm",
-        "LDAP_USER_BASE_DN": "ou=users,o=libregraph-idm",
+        "LDAP_BIND_DN": "cn=admin,dc=ocis,dc=test",
+        "LDAP_BIND_PASSWORD": "admin",
+        "LDAP_USER_BASE_DN": "dc=ocis,dc=test",
         "LDAP_USER_SCHEMA_ID": "ownclouduuid",
         "LDAP_USER_SCHEMA_MAIL": "mail",
-        "LDAP_USER_SCHEMA_USERNAME": "uid",
-        "LDAP_USER_OBJECTCLASS": "inetOrgPerson",
-        "LDAP_GROUP_BASE_DN": "ou=groups,o=libregraph-idm",
-        "LDAP_GROUP_SCHEMA_ID": "ownclouduuid",
+        "LDAP_USER_SCHEMA_USERNAME": "cn",
+        "LDAP_USER_OBJECTCLASS": "posixAccount",
+        "LDAP_GROUP_BASE_DN": "dc=ocis,dc=test",
+        "LDAP_GROUP_SCHEMA_ID": "cn",
         "LDAP_GROUP_SCHEMA_MAIL": "mail",
         "LDAP_GROUP_SCHEMA_GROUPNAME": "cn",
-        "LDAP_GROUP_SCHEMA_MEMBER": "member",
-        "LDAP_GROUP_OBJECTCLASS": "groupOfNames",
-        "IDP_INSECURE": "true",
-        "IDP_LDAP_BIND_DN": "uid=idp,ou=sysusers,o=libregraph-idm",
-        "IDP_LDAP_BIND_PASSWORD": "idp",
-        "IDP_LDAP_BASE_DN": "ou=users,o=libregraph-idm",
+        "LDAP_GROUP_SCHEMA_MEMBER": "cn",
+        "LDAP_GROUP_OBJECTCLASS": "posixGroup",
+        "IDP_LDAP_BIND_DN": "cn=admin,dc=ocis,dc=test",
+        "LDAP_CACERT": "/root/.ocis/ldap/ldap.crt",
+        "IDP_LDAP_BIND_PASSWORD": "admin",
         "IDP_LDAP_LOGIN_ATTRIBUTE": "uid",
-        "PROXY_ACCOUNT_BACKEND_TYPE": "cs3",
-        "PROXY_ENABLE_BASIC_AUTH": "true",
-        "LDAP_BIND_DN": "uid=reva,ou=sysusers,o=libregraph-idm",
-        "LDAP_BIND_PASSWORD": "reva",
-        "OCS_ACCOUNT_BACKEND_TYPE": "cs3",
-        "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,idp,nats,idm,ocdav",
-        "OCIS_LOG_LEVEL": "error",
+        "PROXY_ACCOUNT_BACKEND_TYPE": "accounts",
+        "OCS_ACCOUNT_BACKEND_TYPE": "accounts",
+        "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,idp,nats,accounts,glauth,ocdav",
         "OCIS_INSECURE": "true",
+        "PROXY_ENABLE_BASIC_AUTH": "true",
+        "IDP_INSECURE": "true",
+        "OCIS_LOG_LEVEL": "error",
         "OCIS_URL": "https://ocis-server:9200",
+        "ACCOUNTS_DEMO_USERS_AND_GROUPS": True,
+        "STORAGE_HOME_DRIVER": "%s" % (storage),
+        "STORAGE_USERS_DRIVER": "%s" % (storage),
+        "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
     }
+
+    # Pass in "default" accounts_hash_difficulty to not set this environment variable.
+    # That will allow OCIS to use whatever its built-in default is.
+    # Otherwise pass in a value from 4 to about 11 or 12 (default 4, for making regular tests fast)
+    # The high values cause lots of CPU to be used when hashing passwords, and really slow down the tests.
+    if (accounts_hash_difficulty != "default"):
+        environment["ACCOUNTS_HASH_DIFFICULTY"] = accounts_hash_difficulty
+
     return [
         {
             "name": "ocis-server",
@@ -1672,16 +1682,16 @@ def ocisServerWithIdp():
             "commands": [
                 "ocis/bin/ocis server",
             ],
-            "volumes": [stepVolumeOC10Tests],
-            "depends_on": [],
+            "volumes": volumes,
+            "depends_on": depends_on,
         },
         {
             "name": "wait-for-ocis-server",
-            "image": OC_CI_WAIT_FOR,
+            "image": OC_CI_ALPINE,
             "commands": [
-                "wait-for -it ocis-server:9200 -t 300",
+                "curl -k -u admin:admin --fail --retry-connrefused --retry 10 --retry-all-errors 'https://ocis-server:9200/graph/v1.0/users/ddc2004c-0977-11eb-9d3f-a793888cd0f8'",
             ],
-            "depends_on": [],
+            "depends_on": depends_on,
         },
     ]
 
