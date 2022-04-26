@@ -25,7 +25,7 @@ type Config struct {
 	Drivers               Drivers `yaml:"drivers"`
 	DataServerURL         string
 	TempFolder            string
-	DataProviderInsecure  bool
+	DataProviderInsecure  bool `env:"OCIS_INSECURE;STORAGE_USERS_DATAPROVIDER_INSECURE"`
 	Events                Events
 	MountID               string
 	ExposeDataServer      bool

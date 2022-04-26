@@ -79,7 +79,7 @@ type Archiver struct {
 	MaxNumFiles int64 `yaml:"max_num_files"`
 	MaxSize     int64 `yaml:"max_size"`
 	Prefix      string
-	Insecure    bool
+	Insecure    bool `env:"OCIS_INSECURE;FRONTEND_ARCHIVER_INSECURE"`
 }
 
 type AppProvider struct {
@@ -90,7 +90,7 @@ type AppProvider struct {
 	OpenURL  string `yaml:"open_url"`
 	NewURL   string `yaml:"new_url"`
 	Prefix   string
-	Insecure bool
+	Insecure bool `env:"OCIS_INSECURE;FRONTEND_APPPROVIDER_INSECURE"`
 }
 
 type DataGateway struct {

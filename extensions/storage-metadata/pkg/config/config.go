@@ -25,7 +25,7 @@ type Config struct {
 	Drivers               Drivers `yaml:"drivers"`
 	DataServerURL         string
 	TempFolder            string
-	DataProviderInsecure  bool
+	DataProviderInsecure  bool `env:"OCIS_INSECURE;STORAGE_METADATA_DATAPROVIDER_INSECURE"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;STORAGE_METADATA_TRACING_ENABLED" desc:"Activates tracing."`

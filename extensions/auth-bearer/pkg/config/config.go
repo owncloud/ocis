@@ -54,7 +54,7 @@ type AuthProviders struct {
 
 type OIDCProvider struct {
 	Issuer   string `yaml:"issuer" env:"OCIS_URL;AUTH_BEARER_OIDC_ISSUER"`
-	Insecure bool   `yaml:"insecure"`
+	Insecure bool   `yaml:"insecure" env:"OCIS_INSECURE;AUTH_BEARER_OIDC_INSECURE"`
 	IDClaim  string `yaml:"id_claim"`
 	UIDClaim string `yaml:"uid_claim"`
 	GIDClaim string `yaml:"gid_claim"`
