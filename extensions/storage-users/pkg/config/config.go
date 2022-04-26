@@ -177,16 +177,16 @@ type S3NGDriver struct {
 
 type OwnCloudSQLDriver struct {
 	// Root is the absolute path to the location of the data
-	Root string `yaml:"root"`
+	Root string `yaml:"root" env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DATADIR"`
 	//ShareFolder defines the name of the folder jailing all shares
-	ShareFolder           string `yaml:"share_folder"`
-	UserLayout            string
-	UploadInfoDir         string `yaml:"upload_info_dir"`
-	DBUsername            string `yaml:"db_username"`
-	DBPassword            string `yaml:"db_password"`
-	DBHost                string `yaml:"db_host"`
-	DBPort                int    `yaml:"db_port"`
-	DBName                string `yaml:"db_name"`
+	ShareFolder           string `yaml:"share_folder" env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_SHARE_FOLDER"`
+	UserLayout            string `env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_LAYOUT"`
+	UploadInfoDir         string `yaml:"upload_info_dir" env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_UPLOADINFO_DIR"`
+	DBUsername            string `yaml:"db_username" env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBUSERNAME"`
+	DBPassword            string `yaml:"db_password" env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBPASSWORD"`
+	DBHost                string `yaml:"db_host" env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBHOST"`
+	DBPort                int    `yaml:"db_port" env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBPORT"`
+	DBName                string `yaml:"db_name" env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBNAME"`
 	UsersProviderEndpoint string
 }
 

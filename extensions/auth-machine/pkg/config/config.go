@@ -53,5 +53,5 @@ type AuthProviders struct {
 }
 
 type MachineProvider struct {
-	APIKey string `yaml:"api_key" env:"AUTH_MACHINE_PROVIDER_API_KEY" desc:"The api key for the machine auth provider."`
+	APIKey string `yaml:"api_key" env:"OCIS_MACHINE_AUTH_API_KEY;AUTH_MACHINE_PROVIDER_API_KEY" desc:"The api key for the machine auth provider."`
 }

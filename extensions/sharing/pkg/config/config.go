@@ -62,11 +62,11 @@ type UserSharingJSONDriver struct {
 }
 
 type UserSharingSQLDriver struct {
-	DBUsername                 string
-	DBPassword                 string
-	DBHost                     string
-	DBPort                     int
-	DBName                     string
+	DBUsername                 string `env:"SHARING_USER_SQL_USERNAME"`
+	DBPassword                 string `env:"SHARING_USER_SQL_PASSWORD"`
+	DBHost                     string `env:"SHARING_USER_SQL_HOST"`
+	DBPort                     int    `env:"SHARING_USER_SQL_PORT"`
+	DBName                     string `env:"SHARING_USER_SQL_NAME"`
 	PasswordHashCost           int
 	EnableExpiredSharesCleanup bool
 	JanitorRunInterval         int
@@ -77,7 +77,7 @@ type UserSharingCS3Driver struct {
 	ProviderAddr      string
 	ServiceUserID     string
 	ServiceUserIDP    string `env:"OCIS_URL;SHARING_CS3_SERVICE_USER_IDP"`
-	MachineAuthAPIKey string
+	MachineAuthAPIKey string `env:"OCIS_MACHINE_AUTH_API_KEY"`
 }
 
 type PublicSharingDrivers struct {
@@ -106,7 +106,7 @@ type PublicSharingCS3Driver struct {
 	ProviderAddr      string
 	ServiceUserID     string
 	ServiceUserIDP    string
-	MachineAuthAPIKey string
+	MachineAuthAPIKey string `env:"OCIS_MACHINE_AUTH_API_KEY"`
 }
 
 type Events struct {

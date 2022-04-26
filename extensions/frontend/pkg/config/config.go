@@ -22,7 +22,7 @@ type Config struct {
 	UploadMaxChunkSize       int    `yaml:"upload_max_chunk_size"`
 	UploadHTTPMethodOverride string `yaml:"upload_http_method_override"`
 	DefaultUploadProtocol    string `yaml:"default_upload_protocol"`
-	TransferSecret           string `yaml:"transfer_secret"`
+	TransferSecret           string `yaml:"transfer_secret" env:"STORAGE_TRANSFER_SECRET"`
 	PublicURL                string `yaml:"public_url" env:"OCIS_URL;FRONTEND_PUBLIC_URL"`
 
 	Archiver    Archiver
@@ -121,7 +121,7 @@ type CBOXDriver struct {
 }
 
 type AuthMachine struct {
-	APIKey string
+	APIKey string `env:"OCIS_MACHINE_AUTH_API_KEY"`
 }
 
 type Checksums struct {

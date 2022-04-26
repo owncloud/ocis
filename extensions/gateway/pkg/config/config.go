@@ -20,7 +20,7 @@ type Config struct {
 	CommitShareToStorageRef    bool
 	ShareFolder                string
 	DisableHomeCreationOnLogin bool
-	TransferSecret             string
+	TransferSecret             string `env:"STORAGE_TRANSFER_SECRET"`
 	TransferExpires            int
 	HomeMapping                string
 	EtagCacheTTL               int

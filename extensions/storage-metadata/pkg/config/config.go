@@ -21,7 +21,7 @@ type Config struct {
 	JWTSecret             string
 	GatewayEndpoint       string
 	SkipUserGroupsInToken bool
-	Driver                string  `yaml:"driver" env:"STORAGE_METADATA_AUTH_PROVIDER" desc:"The auth provider which should be used by the service"`
+	Driver                string  `yaml:"driver" env:"STORAGE_METADATA_DRIVER" desc:"The driver which should be used by the service"`
 	Drivers               Drivers `yaml:"drivers"`
 	DataServerURL         string
 	TempFolder            string
