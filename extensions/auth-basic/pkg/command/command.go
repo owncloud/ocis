@@ -162,7 +162,6 @@ func NewAuthBasic(cfg *ociscfg.Config) suture.Service {
 }
 
 func (s AuthBasicSutureService) Serve(ctx context.Context) error {
-	// s.cfg.Reva.AuthBasic.Context = ctx
 	f := &flag.FlagSet{}
 	cmdFlags := AuthBasic(s.cfg).Flags
 	for k := range cmdFlags {

@@ -24,9 +24,6 @@ func AppProvider(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "app-provider",
 		Usage: "start appprovider for providing apps",
-		// Before: func(c *cli.Context) error {
-		// 	return ParseConfig(c, cfg, "storage-app-provider")
-		// },
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
 			logger := log.NewLogger(
@@ -105,7 +102,6 @@ func appProviderConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"appprovider": map[string]interface{}{
-					// "gatewaysvc":       cfg.Reva.Gateway.Endpoint,
 					"app_provider_url": cfg.ExternalAddr,
 					"driver":           cfg.Driver,
 					"drivers": map[string]interface{}{
@@ -143,7 +139,6 @@ func NewAppProvider(cfg *ociscfg.Config) suture.Service {
 }
 
 func (s AppProviderSutureService) Serve(ctx context.Context) error {
-	// s.cfg.Reva.AppProvider.Context = ctx
 	cmd := AppProvider(s.cfg)
 	f := &flag.FlagSet{}
 	cmdFlags := cmd.Flags

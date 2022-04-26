@@ -12,19 +12,6 @@ import (
 // GetCommands provides all commands for this service
 func GetCommands(cfg *config.Config) cli.Commands {
 	return []*cli.Command{
-		// Frontend(cfg),
-		// Gateway(cfg),
-		// Users(cfg),
-		// Groups(cfg),
-		// AppProvider(cfg),
-		// AuthBasic(cfg),
-		// AuthBearer(cfg),
-		// AuthMachine(cfg),
-		// Sharing(cfg),
-		// StoragePublicLink(cfg),
-		// StorageShares(cfg),
-		// StorageUsers(cfg),
-		// StorageMetadata(cfg),
 		Health(cfg),
 	}
 }
@@ -34,10 +21,6 @@ func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:  "storage",
 		Usage: "Storage service for oCIS",
-
-		// Before: func(c *cli.Context) error {
-		// 	return ParseConfig(c, cfg, "storage")
-		// },
 
 		Commands: GetCommands(cfg),
 	})

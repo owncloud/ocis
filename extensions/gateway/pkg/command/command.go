@@ -394,7 +394,6 @@ func NewGateway(cfg *ociscfg.Config) suture.Service {
 }
 
 func (s GatewaySutureService) Serve(ctx context.Context) error {
-	// s.cfg.Reva.Gateway.Context = ctx
 	cmd := Gateway(s.cfg)
 	f := &flag.FlagSet{}
 	cmdFlags := cmd.Flags

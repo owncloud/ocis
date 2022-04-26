@@ -14,9 +14,6 @@ func Health(cfg *config.Config) *cli.Command {
 		Name:     "health",
 		Usage:    "check health status",
 		Category: "info",
-		// Before: func(c *cli.Context) error {
-		// 	return ParseConfig(c, cfg, "storage")
-		// },
 		Action: func(c *cli.Context) error {
 			logger := NewLogger(cfg)
 
