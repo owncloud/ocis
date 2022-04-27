@@ -9,19 +9,19 @@ import (
 type Config struct {
 	*shared.Commons `yaml:"-"`
 	Service         Service  `yaml:"-"`
-	Tracing         *Tracing `yaml:"tracing"`
-	Logging         *Logging `yaml:"log"`
-	Debug           Debug    `yaml:"debug"`
-	Supervised      bool
+	Tracing         *Tracing `yaml:"tracing,omitempty"`
+	Logging         *Logging `yaml:"log,omitempty"`
+	Debug           Debug    `yaml:"debug,omitempty"`
+	Supervised      bool     `yaml:"supervised,omitempty"`
 
-	GRPC GRPCConfig `yaml:"grpc"`
+	GRPC GRPCConfig `yaml:"grpc,omitempty"`
 
-	Context               context.Context
-	JWTSecret             string
-	GatewayEndpoint       string
-	SkipUserGroupsInToken bool
-	AuthProvider          AuthProvider
-	StorageProvider       StorageProvider
+	Context               context.Context `yaml:"context,omitempty"`
+	JWTSecret             string          `yaml:"jwt_secret,omitempty"`
+	GatewayEndpoint       string          `yaml:"gateway_endpoint,omitempty"`
+	SkipUserGroupsInToken bool            `yaml:"skip_user_groups_in_token,omitempty"`
+	AuthProvider          AuthProvider    `yaml:"auth_provider,omitempty"`
+	StorageProvider       StorageProvider `yaml:"storage_provider,omitempty"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;STORAGE_METADATA_TRACING_ENABLED" desc:"Activates tracing."`

@@ -5,41 +5,41 @@ import "github.com/owncloud/ocis/ocis-pkg/shared"
 type Config struct {
 	*shared.Commons `yaml:"-"`
 	Service         Service  `yaml:"-"`
-	Tracing         *Tracing `yaml:"tracing"`
-	Logging         *Logging `yaml:"log"`
-	Debug           Debug    `yaml:"debug"`
-	Supervised      bool
+	Tracing         *Tracing `yaml:"tracing,omitempty"`
+	Logging         *Logging `yaml:"log,omitempty"`
+	Debug           Debug    `yaml:"debug,omitempty"`
+	Supervised      bool     `yaml:"supervised,omitempty"`
 
-	GRPC GRPCConfig `yaml:"grpc"`
+	GRPC GRPCConfig `yaml:"grpc,omitempty"`
 
-	JWTSecret             string
-	GatewayEndpoint       string
-	SkipUserGroupsInToken bool
+	JWTSecret             string `yaml:"jwt_secret,omitempty"`
+	GatewayEndpoint       string `yaml:",omitempty"`
+	SkipUserGroupsInToken bool   `yaml:",omitempty"`
 
-	CommitShareToStorageGrant  bool
-	CommitShareToStorageRef    bool
-	ShareFolder                string
-	DisableHomeCreationOnLogin bool
-	TransferSecret             string `env:"STORAGE_TRANSFER_SECRET"`
-	TransferExpires            int
-	HomeMapping                string
-	EtagCacheTTL               int
+	CommitShareToStorageGrant  bool   `yaml:"commit_share_to_storage_grant,omitempty"`
+	CommitShareToStorageRef    bool   `yaml:"commit_share_to_storage_ref,omitempty"`
+	ShareFolder                string `yaml:"share_folder,omitempty"`
+	DisableHomeCreationOnLogin bool   `yaml:"disable_home_creation_on_login,omitempty"`
+	TransferSecret             string `yaml:"transfer_secret,omitempty" env:"STORAGE_TRANSFER_SECRET"`
+	TransferExpires            int    `yaml:"transfer_expires,omitempty"`
+	HomeMapping                string `yaml:"home_mapping,omitempty"`
+	EtagCacheTTL               int    `yaml:"etag_cache_ttl,omitempty"`
 
-	UsersEndpoint             string
-	GroupsEndpoint            string
-	PermissionsEndpoint       string
-	SharingEndpoint           string
-	DataGatewayPublicURL      string
-	FrontendPublicURL         string `env:"OCIS_URL;GATEWAY_FRONTEND_PUBLIC_URL"`
-	AuthBasicEndpoint         string
-	AuthBearerEndpoint        string
-	AuthMachineEndpoint       string
-	StoragePublicLinkEndpoint string
-	StorageUsersEndpoint      string
-	StorageSharesEndpoint     string
+	UsersEndpoint             string `yaml:"users_endpoint,omitempty"`
+	GroupsEndpoint            string `yaml:"groups_endpoint,omitempty"`
+	PermissionsEndpoint       string `yaml:"permissions_endpoint,omitempty"`
+	SharingEndpoint           string `yaml:"sharing_endpoint,omitempty"`
+	DataGatewayPublicURL      string `yaml:"data_gateway_public_url,omitempty"`
+	FrontendPublicURL         string `yaml:"frontend_public_url,omitempty" env:"OCIS_URL;GATEWAY_FRONTEND_PUBLIC_URL"`
+	AuthBasicEndpoint         string `yaml:"auth_basic_endpoint,omitempty"`
+	AuthBearerEndpoint        string `yaml:"auth_bearer_endpoint,omitempty"`
+	AuthMachineEndpoint       string `yaml:"auth_machine_endpoint,omitempty"`
+	StoragePublicLinkEndpoint string `yaml:"storage_public_link_endpoint,omitempty"`
+	StorageUsersEndpoint      string `yaml:"storage_users_endpoint,omitempty"`
+	StorageSharesEndpoint     string `yaml:"storage_shares_endpoint,omitempty"`
 
-	StorageRegistry StorageRegistry
-	AppRegistry     AppRegistry
+	StorageRegistry StorageRegistry `yaml:"storage_registry,omitempty"`
+	AppRegistry     AppRegistry     `yaml:"app_registry,omitempty"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;GATEWAY_TRACING_ENABLED" desc:"Activates tracing."`

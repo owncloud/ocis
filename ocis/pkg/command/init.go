@@ -16,9 +16,21 @@ import (
 	cli "github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v3"
 
+	appprovider "github.com/owncloud/ocis/extensions/appprovider/pkg/config"
+	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/config"
+	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/config"
+	authmachine "github.com/owncloud/ocis/extensions/auth-machine/pkg/config"
+	gateway "github.com/owncloud/ocis/extensions/gateway/pkg/config"
+	group "github.com/owncloud/ocis/extensions/group/pkg/config"
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/config"
+	ocdav "github.com/owncloud/ocis/extensions/ocdav/pkg/config"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config"
-	storage "github.com/owncloud/ocis/extensions/storage/pkg/config"
+	sharing "github.com/owncloud/ocis/extensions/sharing/pkg/config"
+	storagemetadata "github.com/owncloud/ocis/extensions/storage-metadata/pkg/config"
+	storagepublic "github.com/owncloud/ocis/extensions/storage-publiclink/pkg/config"
+	storageshares "github.com/owncloud/ocis/extensions/storage-shares/pkg/config"
+	storageusers "github.com/owncloud/ocis/extensions/storage-users/pkg/config"
+	user "github.com/owncloud/ocis/extensions/user/pkg/config"
 )
 
 const configFilename string = "ocis.yaml"
@@ -109,7 +121,20 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 		//Proxy:         &proxy.Config{},
 		//OCS:        &ocs.Config{},
 		//Settings:   &settings.Config{},
-		Storage: &storage.Config{},
+		// TODO: fix storage
+		AuthBasic:         &authbasic.Config{},
+		AuthBearer:        &authbearer.Config{},
+		AppProvider:       &appprovider.Config{},
+		AuthMachine:       &authmachine.Config{},
+		Gateway:           &gateway.Config{},
+		Group:             &group.Config{},
+		Sharing:           &sharing.Config{},
+		StorageMetadata:   &storagemetadata.Config{},
+		StorageUsers:      &storageusers.Config{},
+		StorageShares:     &storageshares.Config{},
+		StoragePublicLink: &storagepublic.Config{},
+		User:              &user.Config{},
+		OCDav:             &ocdav.Config{},
 		//Thumbnails: &thumbnails.Config{},
 		//Web:           &web.Config{},
 		//WebDAV:        &webdav.Config{},
@@ -172,8 +197,24 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	//cfg.Proxy.MachineAuthAPIKey = machineAuthSecret
 	//cfg.Settings.Metadata.MachineAuthAPIKey = machineAuthSecret
 	//cfg.Settings.TokenManager.JWTSecret = tokenManagerJwtSecret
-	cfg.Storage.Reva.JWTSecret = tokenManagerJwtSecret
-	cfg.Storage.OCDav.JWTSecret = tokenManagerJwtSecret
+
+	//TODO: move all jwt secrets to shared.common
+	cfg.AppProvider.JWTSecret = tokenManagerJwtSecret
+	cfg.AuthBasic.JWTSecret = tokenManagerJwtSecret
+	cfg.AuthBearer.JWTSecret = tokenManagerJwtSecret
+	cfg.AuthMachine.JWTSecret = tokenManagerJwtSecret
+	cfg.Gateway.JWTSecret = tokenManagerJwtSecret
+	//TODO: following line is defunc, figure out why
+	//cfg.Gateway.MachineAuthAPIKey = machineAuthApiKey
+	cfg.Group.JWTSecret = tokenManagerJwtSecret
+	cfg.Sharing.JWTSecret = tokenManagerJwtSecret
+	cfg.StorageMetadata.JWTSecret = tokenManagerJwtSecret
+	cfg.StoragePublicLink.JWTSecret = tokenManagerJwtSecret
+	cfg.StorageShares.JWTSecret = tokenManagerJwtSecret
+	cfg.StorageUsers.JWTSecret = tokenManagerJwtSecret
+	cfg.User.JWTSecret = tokenManagerJwtSecret
+	cfg.OCDav.JWTSecret = tokenManagerJwtSecret
+
 	//cfg.Thumbnails.Thumbnail.TransferSecret = revaTransferTokenSecret
 	yamlOutput, err := yaml.Marshal(cfg)
 	if err != nil {

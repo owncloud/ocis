@@ -5,21 +5,21 @@ import "github.com/owncloud/ocis/ocis-pkg/shared"
 type Config struct {
 	*shared.Commons `yaml:"-"`
 	Service         Service  `yaml:"-"`
-	Tracing         *Tracing `yaml:"tracing"`
-	Logging         *Logging `yaml:"log"`
-	Debug           Debug    `yaml:"debug"`
-	Supervised      bool
+	Tracing         *Tracing `yaml:"tracing,omitempty"`
+	Logging         *Logging `yaml:"log,omitempty"`
+	Debug           Debug    `yaml:"debug,omitempty"`
+	Supervised      bool     `yaml:"supervised,omitempty"`
 
-	GRPC GRPCConfig `yaml:"grpc"`
+	GRPC GRPCConfig `yaml:"grpc,omitempty"`
 
-	JWTSecret             string
-	GatewayEndpoint       string
-	SkipUserGroupsInToken bool
-	UserSharingDriver     string
-	UserSharingDrivers    UserSharingDrivers
-	PublicSharingDriver   string
-	PublicSharingDrivers  PublicSharingDrivers
-	Events                Events
+	JWTSecret             string               `yaml:"jwt_secret,omitempty"`
+	GatewayEndpoint       string               `yaml:"gateway_endpoint,omitempty"`
+	SkipUserGroupsInToken bool                 `yaml:"skip_user_groups_in_token,omitempty"`
+	UserSharingDriver     string               `yaml:"user_sharing_driver,omitempty"`
+	UserSharingDrivers    UserSharingDrivers   `yaml:"user_sharin_drivers,omitempty"`
+	PublicSharingDriver   string               `yaml:"public_sharing_driver,omitempty"`
+	PublicSharingDrivers  PublicSharingDrivers `yaml:"public_sharing_drivers,omitempty"`
+	Events                Events               `yaml:"events,omitempty"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;SHARING_TRACING_ENABLED" desc:"Activates tracing."`

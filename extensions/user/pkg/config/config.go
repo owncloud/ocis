@@ -5,19 +5,19 @@ import "github.com/owncloud/ocis/ocis-pkg/shared"
 type Config struct {
 	*shared.Commons `yaml:"-"`
 	Service         Service  `yaml:"-"`
-	Tracing         *Tracing `yaml:"tracing"`
-	Logging         *Logging `yaml:"log"`
-	Debug           Debug    `yaml:"debug"`
-	Supervised      bool
+	Tracing         *Tracing `yaml:"tracing,omitempty"`
+	Logging         *Logging `yaml:"log,omitempty"`
+	Debug           Debug    `yaml:"debug,omitempty"`
+	Supervised      bool     `yaml:"supervised,omitempty"`
 
-	GRPC GRPCConfig `yaml:"grpc"`
+	GRPC GRPCConfig `yaml:"grpc,omitempty"`
 
-	JWTSecret             string
-	GatewayEndpoint       string
-	SkipUserGroupsInToken bool
-	UsersCacheExpiration  int
-	Driver                string
-	Drivers               Drivers
+	JWTSecret             string  `yaml:"jwt_secret,omitempty"`
+	GatewayEndpoint       string  `yaml:"gateway_endpoint,omitempty"`
+	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token,omitempty"`
+	UsersCacheExpiration  int     `yaml:"users_cache_expiration,omitempty"`
+	Driver                string  `yaml:"driver,omitempty"`
+	Drivers               Drivers `yaml:"drivers,omitempty"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;USERS_TRACING_ENABLED" desc:"Activates tracing."`
