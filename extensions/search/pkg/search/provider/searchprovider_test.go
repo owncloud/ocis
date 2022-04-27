@@ -16,6 +16,7 @@ import (
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/owncloud/ocis/extensions/search/pkg/search/mocks"
 	provider "github.com/owncloud/ocis/extensions/search/pkg/search/provider"
+	"github.com/owncloud/ocis/ocis-pkg/log"
 	searchmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
 )
@@ -29,6 +30,12 @@ var _ = Describe("Searchprovider", func() {
 		ctx        context.Context
 		eventsChan chan interface{}
 
+		logger = log.NewLogger()
+		user   = &userv1beta1.User{
+			Id: &userv1beta1.UserId{
+				OpaqueId: "user",
+			},
+		}
 		otherUser = &userv1beta1.User{
 			Id: &userv1beta1.UserId{
 				OpaqueId: "otheruser",
@@ -71,27 +78,27 @@ var _ = Describe("Searchprovider", func() {
 		gwClient = &cs3mocks.GatewayAPIClient{}
 		indexClient = &mocks.IndexClient{}
 
-		p = provider.New(gwClient, indexClient, "", eventsChan)
+		p = provider.New(gwClient, indexClient, "", eventsChan, logger)
+
+		gwClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
+			Status: status.NewOK(ctx),
+			Token:  "authtoken",
+		}, nil)
+		gwClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+			Status: status.NewOK(context.Background()),
+			Info:   ri,
+		}, nil)
+		indexClient.On("DocCount").Return(uint64(1), nil)
 	})
 
 	Describe("New", func() {
 		It("returns a new instance", func() {
-			p := provider.New(gwClient, indexClient, "", eventsChan)
+			p := provider.New(gwClient, indexClient, "", eventsChan, logger)
 			Expect(p).ToNot(BeNil())
 		})
 	})
 
 	Describe("events", func() {
-		BeforeEach(func() {
-			gwClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
-				Token: "authtoken",
-			}, nil)
-			gwClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
-				Status: status.NewOK(context.Background()),
-				Info:   ri,
-			}, nil)
-		})
-
 		It("trigger an index update when a file has been uploaded", func() {
 			called := false
 			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
@@ -100,12 +107,32 @@ var _ = Describe("Searchprovider", func() {
 				called = true
 			})
 			eventsChan <- events.FileUploaded{
-				FileID: ref,
+				FileID:    ref,
+				Executant: user.Id,
 			}
 
 			Eventually(func() bool {
 				return called
 			}).Should(BeTrue())
+		})
+	})
+
+	Describe("IndexSpace", func() {
+		It("walks the space and indexes all files", func() {
+			gwClient.On("GetUserByClaim", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserByClaimResponse{
+				Status: status.NewOK(context.Background()),
+				User:   user,
+			}, nil)
+			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
+				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
+			})).Return(nil)
+
+			res, err := p.IndexSpace(ctx, &searchsvc.IndexSpaceRequest{
+				SpaceId: "storageid",
+				UserId:  "user",
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res).ToNot(BeNil())
 		})
 	})
 

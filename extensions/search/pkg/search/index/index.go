@@ -39,7 +39,6 @@ type indexDocument struct {
 	ID     string
 
 	Name     string
-	Etag     string
 	Size     uint64
 	Mtime    string
 	MimeType string
@@ -123,7 +122,6 @@ func toEntity(ref *sprovider.Reference, ri *sprovider.ResourceInfo) *indexDocume
 		Path:     ref.Path,
 		ID:       idToBleveId(ri.Id),
 		Name:     ri.Path,
-		Etag:     ri.Etag,
 		Size:     ri.Size,
 		MimeType: ri.MimeType,
 	}
@@ -154,7 +152,6 @@ func fromFields(fields map[string]interface{}) (*searchmsg.Match, error) {
 			},
 			Name:     fields["Name"].(string),
 			Size:     uint64(fields["Size"].(float64)),
-			Etag:     fields["Etag"].(string),
 			MimeType: fields["MimeType"].(string),
 		},
 	}

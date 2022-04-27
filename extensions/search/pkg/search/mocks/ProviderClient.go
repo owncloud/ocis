@@ -15,6 +15,29 @@ type ProviderClient struct {
 	mock.Mock
 }
 
+// IndexSpace provides a mock function with given fields: ctx, req
+func (_m *ProviderClient) IndexSpace(ctx context.Context, req *v0.IndexSpaceRequest) (*v0.IndexSpaceResponse, error) {
+	ret := _m.Called(ctx, req)
+
+	var r0 *v0.IndexSpaceResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *v0.IndexSpaceRequest) *v0.IndexSpaceResponse); ok {
+		r0 = rf(ctx, req)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v0.IndexSpaceResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v0.IndexSpaceRequest) error); ok {
+		r1 = rf(ctx, req)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // Search provides a mock function with given fields: ctx, req
 func (_m *ProviderClient) Search(ctx context.Context, req *v0.SearchRequest) (*v0.SearchResponse, error) {
 	ret := _m.Called(ctx, req)

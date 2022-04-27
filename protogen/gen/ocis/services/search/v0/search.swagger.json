@@ -32,6 +32,38 @@
     "application/json"
   ],
   "paths": {
+    "/api/v0/search/index-space": {
+      "post": {
+        "operationId": "SearchProvider_IndexSpace",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0IndexSpaceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0IndexSpaceRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SearchProvider"
+        ]
+      }
+    },
     "/api/v0/search/index/search": {
       "post": {
         "operationId": "IndexProvider_Search",
@@ -155,6 +187,20 @@
           "type": "string"
         }
       }
+    },
+    "v0IndexSpaceRequest": {
+      "type": "object",
+      "properties": {
+        "spaceId": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        }
+      }
+    },
+    "v0IndexSpaceResponse": {
+      "type": "object"
     },
     "v0Match": {
       "type": "object",

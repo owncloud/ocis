@@ -36,17 +36,21 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 service SearchProvider {
 	rpc Search(SearchRequest) returns (SearchResponse) {
-    // List method maps to HTTP GET
     option (google.api.http) = {
         post: "/api/v0/search/search",
         body: "*"
     };
   };
+  rpc IndexSpace(IndexSpaceRequest) returns (IndexSpaceResponse) {
+    option (google.api.http) = {
+        post: "/api/v0/search/index-space",
+        body: "*"
+    };
+  }
 }
 
 service IndexProvider {
 	rpc Search(SearchIndexRequest) returns (SearchIndexResponse) {
-    // List method maps to HTTP GET
     option (google.api.http) = {
         post: "/api/v0/search/index/search",
         body: "*"
@@ -92,4 +96,12 @@ message SearchIndexResponse {
     // Token to retrieve the next page of results, or empty if there are no
     // more results in the list
     string next_page_token = 2;
+}
+
+message IndexSpaceRequest {
+  string space_id = 1;
+  string user_id = 2;
+}
+
+message IndexSpaceResponse {
 }

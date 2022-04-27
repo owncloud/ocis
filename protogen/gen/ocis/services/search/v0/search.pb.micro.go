@@ -42,6 +42,13 @@ func NewSearchProviderEndpoints() []*api.Endpoint {
 			Body:    "*",
 			Handler: "rpc",
 		},
+		{
+			Name:    "SearchProvider.IndexSpace",
+			Path:    []string{"/api/v0/search/index-space"},
+			Method:  []string{"POST"},
+			Body:    "*",
+			Handler: "rpc",
+		},
 	}
 }
 
@@ -49,6 +56,7 @@ func NewSearchProviderEndpoints() []*api.Endpoint {
 
 type SearchProviderService interface {
 	Search(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*SearchResponse, error)
+	IndexSpace(ctx context.Context, in *IndexSpaceRequest, opts ...client.CallOption) (*IndexSpaceResponse, error)
 }
 
 type searchProviderService struct {
@@ -73,15 +81,27 @@ func (c *searchProviderService) Search(ctx context.Context, in *SearchRequest, o
 	return out, nil
 }
 
+func (c *searchProviderService) IndexSpace(ctx context.Context, in *IndexSpaceRequest, opts ...client.CallOption) (*IndexSpaceResponse, error) {
+	req := c.c.NewRequest(c.name, "SearchProvider.IndexSpace", in)
+	out := new(IndexSpaceResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for SearchProvider service
 
 type SearchProviderHandler interface {
 	Search(context.Context, *SearchRequest, *SearchResponse) error
+	IndexSpace(context.Context, *IndexSpaceRequest, *IndexSpaceResponse) error
 }
 
 func RegisterSearchProviderHandler(s server.Server, hdlr SearchProviderHandler, opts ...server.HandlerOption) error {
 	type searchProvider interface {
 		Search(ctx context.Context, in *SearchRequest, out *SearchResponse) error
+		IndexSpace(ctx context.Context, in *IndexSpaceRequest, out *IndexSpaceResponse) error
 	}
 	type SearchProvider struct {
 		searchProvider
@@ -90,6 +110,13 @@ func RegisterSearchProviderHandler(s server.Server, hdlr SearchProviderHandler, 
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "SearchProvider.Search",
 		Path:    []string{"/api/v0/search/search"},
+		Method:  []string{"POST"},
+		Body:    "*",
+		Handler: "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:    "SearchProvider.IndexSpace",
+		Path:    []string{"/api/v0/search/index-space"},
 		Method:  []string{"POST"},
 		Body:    "*",
 		Handler: "rpc",
@@ -103,6 +130,10 @@ type searchProviderHandler struct {
 
 func (h *searchProviderHandler) Search(ctx context.Context, in *SearchRequest, out *SearchResponse) error {
 	return h.SearchProviderHandler.Search(ctx, in, out)
+}
+
+func (h *searchProviderHandler) IndexSpace(ctx context.Context, in *IndexSpaceRequest, out *IndexSpaceResponse) error {
+	return h.SearchProviderHandler.IndexSpace(ctx, in, out)
 }
 
 // Api Endpoints for IndexProvider service

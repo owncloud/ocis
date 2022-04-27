@@ -46,7 +46,6 @@ var _ = Describe("Index", func() {
 			},
 			Path:     "foo.pdf",
 			Size:     12345,
-			Etag:     "abcde",
 			MimeType: "application/pdf",
 			Mtime:    &typesv1beta1.Timestamp{Seconds: 4000},
 		}
@@ -124,7 +123,6 @@ var _ = Describe("Index", func() {
 				Expect(match.Entity.Id.OpaqueId).To(Equal(ri.Id.OpaqueId))
 				Expect(match.Entity.Name).To(Equal(ri.Path))
 				Expect(match.Entity.Size).To(Equal(ri.Size))
-				Expect(match.Entity.Etag).To(Equal(ri.Etag))
 				Expect(match.Entity.MimeType).To(Equal(ri.MimeType))
 				Expect(uint64(match.Entity.LastModifiedTime.AsTime().Unix())).To(Equal(ri.Mtime.Seconds))
 			})

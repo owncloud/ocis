@@ -31,10 +31,13 @@ import (
 // ProviderClient is the interface to the search provider service
 type ProviderClient interface {
 	Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error)
+	IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequest) (*searchsvc.IndexSpaceResponse, error)
 }
 
 // IndexClient is the interface to the search index
 type IndexClient interface {
 	Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (*searchsvc.SearchIndexResponse, error)
 	Add(ref *providerv1beta1.Reference, ri *providerv1beta1.ResourceInfo) error
+	Remove(ri *providerv1beta1.ResourceInfo) error
+	DocCount() (uint64, error)
 }

@@ -106,6 +106,22 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind
 		Prop:   []prop.PropertyXML{},
 	}
 
+	// <oc:permissions>RDNVW</oc:permissions>
+	// <oc:favorite>0</oc:favorite>
+	// <oc:owner-id>demo</oc:owner-id>
+	// <oc:owner-display-name>demo</oc:owner-display-name>
+	// <oc:share-types/>
+	// <oc:privatelink>https://demo.owncloud.com/f/7</oc:privatelink>
+	// <d:getcontenttype>application/pdf</d:getcontenttype>
+	// <d:resourcetype/>
+	// <oc:downloadURL/>
+	// done:
+	// <oc:fileid>7</oc:fileid>
+	// <oc:size>6668668</oc:size>
+	// <d:getcontentlength>6668668</d:getcontentlength>
+	// <d:getetag>"0cdcdd1bb13a8fed3e54d3b2325dc97c"</d:getetag>
+	// <d:getlastmodified>Mon, 25 Apr 2022 06:48:26 GMT</d:getlastmodified>
+
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:fileid", match.Entity.Id.StorageId+"!"+match.Entity.Id.OpaqueId))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getetag", match.Entity.Etag))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getlastmodified", match.Entity.LastModifiedTime.AsTime().Format(time.RFC3339)))

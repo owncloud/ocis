@@ -44,6 +44,28 @@ func (h *webSearchProviderHandler) Search(w http.ResponseWriter, r *http.Request
 	render.JSON(w, r, resp)
 }
 
+func (h *webSearchProviderHandler) IndexSpace(w http.ResponseWriter, r *http.Request) {
+	req := &IndexSpaceRequest{}
+	resp := &IndexSpaceResponse{}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusPreconditionFailed)
+		return
+	}
+
+	if err := h.h.IndexSpace(
+		r.Context(),
+		req,
+		resp,
+	); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	render.Status(r, http.StatusCreated)
+	render.JSON(w, r, resp)
+}
+
 func RegisterSearchProviderWeb(r chi.Router, i SearchProviderHandler, middlewares ...func(http.Handler) http.Handler) {
 	handler := &webSearchProviderHandler{
 		r: r,
@@ -51,6 +73,7 @@ func RegisterSearchProviderWeb(r chi.Router, i SearchProviderHandler, middleware
 	}
 
 	r.MethodFunc("POST", "/api/v0/search/search", handler.Search)
+	r.MethodFunc("POST", "/api/v0/search/index-space", handler.IndexSpace)
 }
 
 type webIndexProviderHandler struct {
@@ -236,3 +259,75 @@ func (m *SearchIndexResponse) UnmarshalJSON(b []byte) error {
 }
 
 var _ json.Unmarshaler = (*SearchIndexResponse)(nil)
+
+// IndexSpaceRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of IndexSpaceRequest. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var IndexSpaceRequestJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *IndexSpaceRequest) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := IndexSpaceRequestJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*IndexSpaceRequest)(nil)
+
+// IndexSpaceRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of IndexSpaceRequest. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var IndexSpaceRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *IndexSpaceRequest) UnmarshalJSON(b []byte) error {
+	return IndexSpaceRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*IndexSpaceRequest)(nil)
+
+// IndexSpaceResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of IndexSpaceResponse. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var IndexSpaceResponseJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *IndexSpaceResponse) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := IndexSpaceResponseJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*IndexSpaceResponse)(nil)
+
+// IndexSpaceResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of IndexSpaceResponse. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var IndexSpaceResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *IndexSpaceResponse) UnmarshalJSON(b []byte) error {
+	return IndexSpaceResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*IndexSpaceResponse)(nil)
