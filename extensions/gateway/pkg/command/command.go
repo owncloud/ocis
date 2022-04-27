@@ -183,16 +183,11 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 					"driver": cfg.StorageRegistry.Driver,
 					"drivers": map[string]interface{}{
 						"static": map[string]interface{}{
-							"home_provider": "/home", // TODO use /users/{{.OpaqueId}} ?
+							"home_provider": "/users",
 							"rules": map[string]interface{}{
-								"/home": map[string]interface{}{
-									"address":       "127.0.0.1:9157",
-									"provider_id":   "1284d238-aa92-42ce-bdc4-0b0000009157",
-									"provider_path": "/users",
-									"space_type":    "personal",
-								},
 								//"/users/{{.Id.OpaqueId}}": map[string]interface{}{
 								"/users": map[string]interface{}{
+									"space_type":    "personal",
 									"address":       "127.0.0.1:9157",
 									"provider_id":   "1284d238-aa92-42ce-bdc4-0b0000009157",
 									"provider_path": "/users",
@@ -212,7 +207,6 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 									"address":       "127.0.0.1:9157",
 									"provider_id":   "df7debc5-3491-4b7a-8b0d-6888009adb28",
 									"provider_path": "/project",
-									"space_type":    "project",
 								},
 								"/public": map[string]interface{}{
 									"address":       "localhost:9178",
