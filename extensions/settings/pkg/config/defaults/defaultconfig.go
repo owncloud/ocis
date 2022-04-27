@@ -95,7 +95,7 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.Metadata.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
 		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
-	} else {
+	} else if cfg.MachineAuthAPIKey == "" {
 		log.Fatalf("machine auth api key is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 }

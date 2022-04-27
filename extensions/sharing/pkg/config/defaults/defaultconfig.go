@@ -1,6 +1,7 @@
 package defaults
 
 import (
+	"log"
 	"path/filepath"
 
 	"github.com/owncloud/ocis/extensions/sharing/pkg/config"
@@ -114,12 +115,24 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Reva = &config.Reva{}
 	}
 
-		if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
 		cfg.TokenManager = &config.TokenManager{
 			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
 		}
 	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
+	}
+
+	if cfg.UserSharingDrivers.CS3.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.UserSharingDrivers.CS3.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	} else if cfg.UserSharingDrivers.CS3.MachineAuthAPIKey == "" {
+		log.Fatalf("machine auth api key for the cs3 user sharing driver is not set up properly, bailing out (%s)", cfg.Service.Name)
+	}
+
+	if cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	} else if cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey == "" {
+		log.Fatalf("machine auth api key for the cs3 public sharing driver is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 }
 

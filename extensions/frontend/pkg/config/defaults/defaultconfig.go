@@ -117,7 +117,7 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.TransferSecret == "" && cfg.Commons != nil && cfg.Commons.TransferSecret != "" {
 		cfg.TransferSecret = cfg.Commons.TransferSecret
-	} else {
+	} else if cfg.TransferSecret == "" {
 		log.Fatalf("reva transfer secret is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 }
