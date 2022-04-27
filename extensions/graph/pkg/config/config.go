@@ -29,11 +29,11 @@ type Config struct {
 }
 
 type Spaces struct {
-	WebDavBase                      string `yaml:"webdav_base" env:"OCIS_URL;GRAPH_SPACES_WEBDAV_BASE"`
-	WebDavPath                      string `yaml:"webdav_path" env:"GRAPH_SPACES_WEBDAV_PATH"`
-	DefaultQuota                    string `yaml:"default_quota" env:"GRAPH_SPACES_DEFAULT_QUOTA"`
-	Insecure                        bool   `yaml:"insecure" env:"OCIS_INSECURE;GRAPH_SPACES_INSECURE"`
-	ExtendedSpacePropertiesCacheTTL int    `yaml:"extended_space_properties_cache_ttl" env:"GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL"`
+	WebDavBase                      string `yaml:"webdav_base,omitempty" env:"OCIS_URL;GRAPH_SPACES_WEBDAV_BASE"`
+	WebDavPath                      string `yaml:"webdav_path,omitempty" env:"GRAPH_SPACES_WEBDAV_PATH"`
+	DefaultQuota                    string `yaml:"default_quota,omitempty" env:"GRAPH_SPACES_DEFAULT_QUOTA"`
+	Insecure                        bool   `yaml:"insecure,omitempty" env:"OCIS_INSECURE;GRAPH_SPACES_INSECURE"`
+	ExtendedSpacePropertiesCacheTTL int    `yaml:"extended_space_properties_cache_ttl,omitempty" env:"GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL"`
 }
 
 type LDAP struct {

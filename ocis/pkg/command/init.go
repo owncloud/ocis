@@ -17,8 +17,15 @@ import (
 	cli "github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v3"
 
+	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/config"
+	frontend "github.com/owncloud/ocis/extensions/frontend/pkg/config"
+	graph "github.com/owncloud/ocis/extensions/graph/pkg/config"
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/config"
+	ocdav "github.com/owncloud/ocis/extensions/ocdav/pkg/config"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config"
+	storagemetadata "github.com/owncloud/ocis/extensions/storage-metadata/pkg/config"
+	storageusers "github.com/owncloud/ocis/extensions/storage-users/pkg/config"
+	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
 )
 
 const configFilename string = "ocis.yaml" // TODO: use also a constant for reading this file
@@ -90,12 +97,48 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	}
 	cfg := config.Config{
 		TokenManager: &shared.TokenManager{},
-		IDM: &idm.Config{},
+		IDM:          &idm.Config{},
 	}
 
 	if insecure {
-		cfg.Proxy = &proxy.Config{}
-		cfg.Proxy.InsecureBackends = insecure
+		cfg.Proxy = &proxy.Config{
+			InsecureBackends: true,
+		}
+		cfg.AuthBearer = &authbearer.Config{
+			AuthProviders: authbearer.AuthProviders{
+				OIDC: authbearer.OIDCProvider{
+					Insecure: true,
+				},
+			},
+		}
+		cfg.Frontend = &frontend.Config{
+			AppProvider: frontend.AppProvider{
+				Insecure: true,
+			},
+			Archiver: frontend.Archiver{
+				Insecure: true,
+			},
+		}
+		cfg.Graph = &graph.Config{
+			Spaces: graph.Spaces{
+				Insecure: true,
+			},
+		}
+		cfg.OCDav = &ocdav.Config{
+			Insecure: true,
+		}
+		cfg.StorageMetadata = &storagemetadata.Config{
+			DataProviderInsecure: true,
+		}
+		cfg.StorageUsers = &storageusers.Config{
+			DataProviderInsecure: true,
+		}
+		cfg.Thumbnails = &thumbnails.Config{
+			Thumbnail: thumbnails.Thumbnail{
+				WebdavAllowInsecure: true,
+				CS3AllowInsecure:    true,
+			},
+		}
 	}
 
 	idmServicePassword, err := generators.GenerateRandomPassword(passwordLength)
