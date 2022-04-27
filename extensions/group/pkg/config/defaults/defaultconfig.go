@@ -50,7 +50,6 @@ func DefaultConfig() *config.Config {
 				UserObjectClass:  "inetOrgPerson",
 				GroupObjectClass: "groupOfNames",
 				BindDN:           "uid=reva,ou=sysusers,o=libregraph-idm",
-				BindPassword:     "reva",
 				IDP:              "https://localhost:9200",
 				UserSchema: config.LDAPUserSchema{
 					ID:          "ownclouduuid",

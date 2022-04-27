@@ -50,9 +50,9 @@ type GRPCConfig struct {
 }
 
 type AuthProviders struct {
-	JSON        JSONProvider        `yaml:"json"`
-	LDAP        LDAPProvider        `yaml:"ldap"`
-	OwnCloudSQL OwnCloudSQLProvider `yaml:"owncloud_sql"`
+	JSON        JSONProvider        `yaml:"json,omitempty"`
+	LDAP        LDAPProvider        `yaml:"ldap,omitempty"`
+	OwnCloudSQL OwnCloudSQLProvider `yaml:"owncloud_sql,omitempty"`
 }
 
 type JSONProvider struct {
@@ -60,24 +60,24 @@ type JSONProvider struct {
 }
 
 type LDAPProvider struct {
-	URI              string   `env:"LDAP_URI;AUTH_BASIC_LDAP_URI"`
-	CACert           string   `env:"LDAP_CACERT;AUTH_BASIC_LDAP_CACERT"`
-	Insecure         bool     `env:"LDAP_INSECURE;AUTH_BASIC_LDAP_INSECURE"`
-	BindDN           string   `env:"LDAP_BIND_DN;AUTH_BASIC_LDAP_BIND_DN"`
-	BindPassword     string   `env:"LDAP_BIND_PASSWORD;AUTH_BASIC_LDAP_BIND_PASSWORD"`
-	UserBaseDN       string   `env:"LDAP_USER_BASE_DN;AUTH_BASIC_LDAP_USER_BASE_DN"`
-	GroupBaseDN      string   `env:"LDAP_GROUP_BASE_DN;AUTH_BASIC_LDAP_GROUP_BASE_DN"`
-	UserScope        string   `env:"LDAP_USER_SCOPE;AUTH_BASIC_LDAP_USER_SCOPE"`
-	GroupScope       string   `env:"LDAP_GROUP_SCOPE;AUTH_BASIC_LDAP_GROUP_SCOPE"`
-	UserFilter       string   `env:"LDAP_USERFILTER;AUTH_BASIC_LDAP_USERFILTER"`
-	GroupFilter      string   `env:"LDAP_GROUPFILTER;AUTH_BASIC_LDAP_USERFILTER"`
-	UserObjectClass  string   `env:"LDAP_USER_OBJECTCLASS;AUTH_BASIC_LDAP_USER_OBJECTCLASS"`
-	GroupObjectClass string   `env:"LDAP_GROUP_OBJECTCLASS;AUTH_BASIC_LDAP_GROUP_OBJECTCLASS"`
-	LoginAttributes  []string `env:"LDAP_LOGIN_ATTRIBUTES;AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES"`
-	IDP              string   `env:"OCIS_URL;AUTH_BASIC_IDP_URL"` // TODO what is this for?
-	GatewayEndpoint  string   // TODO do we need this here?
-	UserSchema       LDAPUserSchema
-	GroupSchema      LDAPGroupSchema
+	URI              string          `yaml:",omitempty" env:"LDAP_URI;AUTH_BASIC_LDAP_URI"`
+	CACert           string          `yaml:",omitempty" env:"LDAP_CACERT;AUTH_BASIC_LDAP_CACERT"`
+	Insecure         bool            `yaml:",omitempty" env:"LDAP_INSECURE;AUTH_BASIC_LDAP_INSECURE"`
+	BindDN           string          `yaml:",omitempty" env:"LDAP_BIND_DN;AUTH_BASIC_LDAP_BIND_DN"`
+	BindPassword     string          `yaml:",omitempty" env:"LDAP_BIND_PASSWORD;AUTH_BASIC_LDAP_BIND_PASSWORD"`
+	UserBaseDN       string          `yaml:",omitempty" env:"LDAP_USER_BASE_DN;AUTH_BASIC_LDAP_USER_BASE_DN"`
+	GroupBaseDN      string          `yaml:",omitempty" env:"LDAP_GROUP_BASE_DN;AUTH_BASIC_LDAP_GROUP_BASE_DN"`
+	UserScope        string          `yaml:",omitempty" env:"LDAP_USER_SCOPE;AUTH_BASIC_LDAP_USER_SCOPE"`
+	GroupScope       string          `yaml:",omitempty" env:"LDAP_GROUP_SCOPE;AUTH_BASIC_LDAP_GROUP_SCOPE"`
+	UserFilter       string          `yaml:",omitempty" env:"LDAP_USERFILTER;AUTH_BASIC_LDAP_USERFILTER"`
+	GroupFilter      string          `yaml:",omitempty" env:"LDAP_GROUPFILTER;AUTH_BASIC_LDAP_USERFILTER"`
+	UserObjectClass  string          `yaml:",omitempty" env:"LDAP_USER_OBJECTCLASS;AUTH_BASIC_LDAP_USER_OBJECTCLASS"`
+	GroupObjectClass string          `yaml:",omitempty" env:"LDAP_GROUP_OBJECTCLASS;AUTH_BASIC_LDAP_GROUP_OBJECTCLASS"`
+	LoginAttributes  []string        `yaml:",omitempty" env:"LDAP_LOGIN_ATTRIBUTES;AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES"`
+	IDP              string          `yaml:",omitempty" env:"OCIS_URL;AUTH_BASIC_IDP_URL"` // TODO what is this for?
+	GatewayEndpoint  string          `yaml:",omitempty"`                                   // TODO do we need this here?
+	UserSchema       LDAPUserSchema  `yaml:",omitempty"`
+	GroupSchema      LDAPGroupSchema `yaml:",omitempty"`
 }
 
 type LDAPUserSchema struct {

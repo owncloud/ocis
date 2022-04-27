@@ -22,12 +22,6 @@ func DefaultConfig() *config.Config {
 			Name: "idm",
 		},
 		CreateDemoUsers: false,
-		ServiceUserPasswords: config.ServiceUserPasswords{
-			OcisAdmin: "admin",
-			Idm:       "idm",
-			Idp:       "idp",
-			Reva:      "reva",
-		},
 		IDM: config.Settings{
 			LDAPSAddr:    "127.0.0.1:9235",
 			Cert:         path.Join(defaults.BaseDataPath(), "idm", "ldap.crt"),

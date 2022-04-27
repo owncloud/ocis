@@ -1,6 +1,8 @@
 package defaults
 
 import (
+	"log"
+
 	"github.com/owncloud/ocis/extensions/auth-machine/pkg/config"
 )
 
@@ -31,11 +33,6 @@ func DefaultConfig() *config.Config {
 			Address: "127.0.0.1:9142",
 		},
 		AuthProvider: "ldap",
-		AuthProviders: config.AuthProviders{
-			Machine: config.MachineProvider{
-				APIKey: "change-me-please",
-			},
-		},
 	}
 }
 
@@ -77,6 +74,12 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
+	}
+
+	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	} else if cfg.MachineAuthAPIKey == "" {
+		log.Fatalf("machine auth api key is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 }
 

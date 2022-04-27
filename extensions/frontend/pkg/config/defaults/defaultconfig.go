@@ -64,9 +64,6 @@ func DefaultConfig() *config.Config {
 			AdditionalInfoAttribute: "{{.Mail}}",
 			ResourceInfoCacheTTL:    0,
 		},
-		AuthMachine: config.AuthMachine{
-			APIKey: "change-me-please",
-		},
 		Middleware: config.Middleware{
 			Auth: config.Auth{
 				CredentialsByUserAgent: map[string]string{},

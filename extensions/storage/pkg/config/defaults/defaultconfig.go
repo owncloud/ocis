@@ -57,7 +57,6 @@ func DefaultConfig() *config.Config {
 				UserObjectClass:  "inetOrgPerson",
 				GroupObjectClass: "groupOfNames",
 				BindDN:           "uid=reva,ou=sysusers,o=libregraph-idm",
-				BindPassword:     "reva",
 				IDP:              defaultPublicURL,
 				UserSchema: config.LDAPUserSchema{
 					ID:          "ownclouduuid",
@@ -81,7 +80,6 @@ func DefaultConfig() *config.Config {
 			},
 			UserOwnCloudSQL: config.UserOwnCloudSQL{
 				DBUsername:         "owncloud",
-				DBPassword:         "secret",
 				DBHost:             "mysql",
 				DBPort:             3306,
 				DBName:             "owncloud",

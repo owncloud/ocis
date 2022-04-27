@@ -51,34 +51,34 @@ type GRPCConfig struct {
 }
 
 type Drivers struct {
-	JSON        JSONDriver
-	LDAP        LDAPDriver
-	OwnCloudSQL OwnCloudSQLDriver
-	REST        RESTProvider
+	JSON        JSONDriver        `yaml:",omitempty"`
+	LDAP        LDAPDriver        `yaml:",omitempty"`
+	OwnCloudSQL OwnCloudSQLDriver `yaml:",omitempty"`
+	REST        RESTProvider      `yaml:",omitempty"`
 }
 
 type JSONDriver struct {
 	File string
 }
 type LDAPDriver struct {
-	URI              string   `env:"LDAP_URI;USERS_LDAP_URI"`
-	CACert           string   `env:"LDAP_CACERT;USERS_LDAP_CACERT"`
-	Insecure         bool     `env:"LDAP_INSECURE;USERS_LDAP_INSECURE"`
-	BindDN           string   `env:"LDAP_BIND_DN;USERS_LDAP_BIND_DN"`
-	BindPassword     string   `env:"LDAP_BIND_PASSWORD;USERS_LDAP_BIND_PASSWORD"`
-	UserBaseDN       string   `env:"LDAP_USER_BASE_DN;USERS_LDAP_USER_BASE_DN"`
-	GroupBaseDN      string   `env:"LDAP_GROUP_BASE_DN;USERS_LDAP_GROUP_BASE_DN"`
-	UserScope        string   `env:"LDAP_USER_SCOPE;USERS_LDAP_USER_SCOPE"`
-	GroupScope       string   `env:"LDAP_GROUP_SCOPE;USERS_LDAP_GROUP_SCOPE"`
-	UserFilter       string   `env:"LDAP_USERFILTER;USERS_LDAP_USERFILTER"`
-	GroupFilter      string   `env:"LDAP_GROUPFILTER;USERS_LDAP_USERFILTER"`
-	UserObjectClass  string   `env:"LDAP_USER_OBJECTCLASS;USERS_LDAP_USER_OBJECTCLASS"`
-	GroupObjectClass string   `env:"LDAP_GROUP_OBJECTCLASS;USERS_LDAP_GROUP_OBJECTCLASS"`
-	LoginAttributes  []string `env:"LDAP_LOGIN_ATTRIBUTES;USERS_LDAP_LOGIN_ATTRIBUTES"`
-	IDP              string   `env:"OCIS_URL;USERS_IDP_URL"` // TODO what is this for?
-	GatewayEndpoint  string   // TODO do we need this here?
-	UserSchema       LDAPUserSchema
-	GroupSchema      LDAPGroupSchema
+	URI              string          `yaml:",omitempty" env:"LDAP_URI;USERS_LDAP_URI"`
+	CACert           string          `yaml:",omitempty" env:"LDAP_CACERT;USERS_LDAP_CACERT"`
+	Insecure         bool            `yaml:",omitempty" env:"LDAP_INSECURE;USERS_LDAP_INSECURE"`
+	BindDN           string          `yaml:",omitempty" env:"LDAP_BIND_DN;USERS_LDAP_BIND_DN"`
+	BindPassword     string          `yaml:",omitempty" env:"LDAP_BIND_PASSWORD;USERS_LDAP_BIND_PASSWORD"`
+	UserBaseDN       string          `yaml:",omitempty" env:"LDAP_USER_BASE_DN;USERS_LDAP_USER_BASE_DN"`
+	GroupBaseDN      string          `yaml:",omitempty" env:"LDAP_GROUP_BASE_DN;USERS_LDAP_GROUP_BASE_DN"`
+	UserScope        string          `yaml:",omitempty" env:"LDAP_USER_SCOPE;USERS_LDAP_USER_SCOPE"`
+	GroupScope       string          `yaml:",omitempty" env:"LDAP_GROUP_SCOPE;USERS_LDAP_GROUP_SCOPE"`
+	UserFilter       string          `yaml:",omitempty" env:"LDAP_USERFILTER;USERS_LDAP_USERFILTER"`
+	GroupFilter      string          `yaml:",omitempty" env:"LDAP_GROUPFILTER;USERS_LDAP_USERFILTER"`
+	UserObjectClass  string          `yaml:",omitempty" env:"LDAP_USER_OBJECTCLASS;USERS_LDAP_USER_OBJECTCLASS"`
+	GroupObjectClass string          `yaml:",omitempty" env:"LDAP_GROUP_OBJECTCLASS;USERS_LDAP_GROUP_OBJECTCLASS"`
+	LoginAttributes  []string        `yaml:",omitempty" env:"LDAP_LOGIN_ATTRIBUTES;USERS_LDAP_LOGIN_ATTRIBUTES"`
+	IDP              string          `yaml:",omitempty" env:"OCIS_URL;USERS_IDP_URL"` // TODO what is this for?
+	GatewayEndpoint  string          `yaml:",omitempty"`                              // TODO do we need this here?
+	UserSchema       LDAPUserSchema  `yaml:",omitempty"`
+	GroupSchema      LDAPGroupSchema `yaml:",omitempty"`
 }
 
 type LDAPUserSchema struct {

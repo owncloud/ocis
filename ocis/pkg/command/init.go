@@ -17,15 +17,19 @@ import (
 	cli "github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v3"
 
+	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/config"
 	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/config"
 	frontend "github.com/owncloud/ocis/extensions/frontend/pkg/config"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/config"
+	group "github.com/owncloud/ocis/extensions/group/pkg/config"
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/config"
+	idp "github.com/owncloud/ocis/extensions/idp/pkg/config"
 	ocdav "github.com/owncloud/ocis/extensions/ocdav/pkg/config"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config"
 	storagemetadata "github.com/owncloud/ocis/extensions/storage-metadata/pkg/config"
 	storageusers "github.com/owncloud/ocis/extensions/storage-users/pkg/config"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
+	user "github.com/owncloud/ocis/extensions/user/pkg/config"
 )
 
 const configFilename string = "ocis.yaml" // TODO: use also a constant for reading this file
@@ -98,12 +102,25 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	cfg := config.Config{
 		TokenManager: &shared.TokenManager{},
 		IDM:          &idm.Config{},
+		AuthBasic: &authbasic.Config{
+			AuthProviders: authbasic.AuthProviders{
+				LDAP: authbasic.LDAPProvider{},
+			},
+		},
+		Group: &group.Config{
+			Drivers: group.Drivers{
+				LDAP: group.LDAPDriver{},
+			},
+		},
+		User: &user.Config{
+			Drivers: user.Drivers{
+				LDAP: user.LDAPDriver{},
+			},
+		},
+		IDP: &idp.Config{},
 	}
 
 	if insecure {
-		cfg.Proxy = &proxy.Config{
-			InsecureBackends: true,
-		}
 		cfg.AuthBearer = &authbearer.Config{
 			AuthProviders: authbearer.AuthProviders{
 				OIDC: authbearer.OIDCProvider{
@@ -127,6 +144,10 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 		cfg.OCDav = &ocdav.Config{
 			Insecure: true,
 		}
+		cfg.Proxy = &proxy.Config{
+			InsecureBackends: true,
+		}
+
 		cfg.StorageMetadata = &storagemetadata.Config{
 			DataProviderInsecure: true,
 		}
@@ -139,6 +160,7 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 				CS3AllowInsecure:    true,
 			},
 		}
+
 	}
 
 	idmServicePassword, err := generators.GenerateRandomPassword(passwordLength)
@@ -180,9 +202,17 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	cfg.TokenManager.JWTSecret = tokenManagerJwtSecret
 
 	cfg.IDM.ServiceUserPasswords.Idm = idmServicePassword
+	cfg.Graph.Identity.LDAP.BindPassword = idmServicePassword
+
 	cfg.IDM.ServiceUserPasswords.Idp = idpServicePassword
-	cfg.IDM.ServiceUserPasswords.OcisAdmin = ocisAdminServicePassword
+	cfg.IDP.Ldap.BindPassword = idpServicePassword
+
 	cfg.IDM.ServiceUserPasswords.Reva = revaServicePassword
+	cfg.AuthBasic.AuthProviders.LDAP.BindPassword = revaServicePassword
+	cfg.Group.Drivers.LDAP.BindPassword = revaServicePassword
+	cfg.User.Drivers.LDAP.BindPassword = revaServicePassword
+
+	cfg.IDM.ServiceUserPasswords.OcisAdmin = ocisAdminServicePassword
 
 	yamlOutput, err := yaml.Marshal(cfg)
 	if err != nil {
