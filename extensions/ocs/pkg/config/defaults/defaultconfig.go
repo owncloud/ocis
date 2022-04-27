@@ -38,8 +38,7 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "ocs",
 		},
-
-		AccountBackend: "accounts",
+		AccountBackend: "cs3",
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},

@@ -67,6 +67,8 @@ type LDAPProvider struct {
 	BindPassword     string   `env:"LDAP_BIND_PASSWORD;AUTH_BASIC_LDAP_BIND_PASSWORD"`
 	UserBaseDN       string   `env:"LDAP_USER_BASE_DN;AUTH_BASIC_LDAP_USER_BASE_DN"`
 	GroupBaseDN      string   `env:"LDAP_GROUP_BASE_DN;AUTH_BASIC_LDAP_GROUP_BASE_DN"`
+	UserScope        string   `env:"LDAP_USER_SCOPE;AUTH_BASIC_LDAP_USER_SCOPE"`
+	GroupScope       string   `env:"LDAP_GROUP_SCOPE;AUTH_BASIC_LDAP_GROUP_SCOPE"`
 	UserFilter       string   `env:"LDAP_USERFILTER;AUTH_BASIC_LDAP_USERFILTER"`
 	GroupFilter      string   `env:"LDAP_GROUPFILTER;AUTH_BASIC_LDAP_USERFILTER"`
 	UserObjectClass  string   `env:"LDAP_USER_OBJECTCLASS;AUTH_BASIC_LDAP_USER_OBJECTCLASS"`

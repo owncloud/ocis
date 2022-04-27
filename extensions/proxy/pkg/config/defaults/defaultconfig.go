@@ -43,7 +43,7 @@ func DefaultConfig() *config.Config {
 			AllowedHTTPMethods: []string{"GET"},
 			Enabled:            true,
 		},
-		AccountBackend:        "accounts",
+		AccountBackend:        "cs3",
 		UserOIDCClaim:         "email",
 		UserCS3Claim:          "mail",
 		AutoprovisionAccounts: false,
