@@ -66,6 +66,11 @@ func New(bleveIndex bleve.Index) (*Index, error) {
 	}, nil
 }
 
+// DocCount returns the number of elemenst in the index
+func (i *Index) DocCount() (uint64, error) {
+	return i.bleveIndex.DocCount()
+}
+
 // Add adds a new entity to the Index
 func (i *Index) Add(ref *sprovider.Reference, ri *sprovider.ResourceInfo) error {
 	entity := toEntity(ref, ri)

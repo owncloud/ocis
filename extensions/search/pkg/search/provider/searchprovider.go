@@ -66,11 +66,15 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 		}
 	}()
 
-	return &Provider{
-		gwClient:          gwClient,
-		indexClient:       indexClient,
-		machineAuthAPIKey: machineAuthAPIKey,
+	return p
+}
+
+func (p *Provider) logDocCount() {
+	c, err := p.indexClient.DocCount()
+	if err != nil {
+		p.logger.Error().Err(err).Msg("error getting document count from the index")
 	}
+	p.logger.Debug().Interface("count", c).Msg("new document count")
 }
 
 func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error) {
