@@ -190,6 +190,12 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 						},
 					},
 				},
+				"permissions": map[string]interface{}{
+					"driver": "demo",
+					"drivers": map[string]interface{}{
+						"demo": map[string]interface{}{},
+					},
+				},
 				"storageregistry": map[string]interface{}{
 					"driver": "static",
 					"drivers": map[string]interface{}{

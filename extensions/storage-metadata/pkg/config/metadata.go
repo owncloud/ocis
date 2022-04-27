@@ -49,7 +49,7 @@ func MetadataDrivers(cfg *Config) map[string]interface{} {
 			"user_layout":         cfg.Drivers.OCIS.UserLayout,
 			"treetime_accounting": false,
 			"treesize_accounting": false,
-			"permissionssvc":      cfg.Drivers.OCIS.PermissionsEndpoint,
+			"permissionssvc":      cfg.GRPC.Addr,
 		},
 		"s3": map[string]interface{}{
 			"region":     cfg.Drivers.S3.Region,
