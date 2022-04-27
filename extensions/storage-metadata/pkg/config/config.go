@@ -19,14 +19,11 @@ type Config struct {
 
 	Context               context.Context
 	JWTSecret             string
-	GatewayEndpoint       string
 	SkipUserGroupsInToken bool
 	Driver                string  `yaml:"driver" env:"STORAGE_METADATA_DRIVER" desc:"The driver which should be used by the service"`
 	Drivers               Drivers `yaml:"drivers"`
 	DataServerURL         string
 	TempFolder            string
-	TransferSecret        string `yaml:"transfer_secret" env:"STORAGE_METADATA_TRANSFER_SECRET"`
-	TransferExpires       int    `yaml:"transfer_expires" env:"STORAGE_METADATA_TRANSFER_EXPIRES"`
 	DataProviderInsecure  bool   `env:"OCIS_INSECURE;STORAGE_METADATA_DATAPROVIDER_INSECURE"`
 	MachineAuthAPIKey     string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;STORAGE_METADATA_MACHINE_AUTH_API_KEY"`
 }

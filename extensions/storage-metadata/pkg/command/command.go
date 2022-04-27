@@ -131,9 +131,6 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 		"grpc": map[string]interface{}{
 			"network": cfg.GRPC.Protocol,
 			"address": cfg.GRPC.Addr,
-			//"interceptors": map[string]interface{}{
-			//	"log": map[string]interface{}{},
-			//},
 			"services": map[string]interface{}{
 				"gateway": map[string]interface{}{
 					// registries are located on the gateway
@@ -144,12 +141,8 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 					"groupprovidersvc": cfg.GRPC.Addr,
 					"permissionssvc":   cfg.GRPC.Addr,
 					// other
-					"disable_home_creation_on_login": true,
-					//"datagateway":                    cfg.Reva.StorageMetadata.HTTPAddr, // needs to start with a protocol
-					"transfer_shared_secret": cfg.TransferSecret,
-					"transfer_expires":       cfg.TransferExpires,
-					//"home_mapping":           cfg.Reva.Gateway.HomeMapping,
-					//"etag_cache_ttl":         cfg.Reva.Gateway.EtagCacheTTL,
+					"disable_home_creation_on_login": true, // metadata manually creates a space
+					// metadata always uses the simple upload, so no transfer secret or datagateway needed
 				},
 				"userprovider": map[string]interface{}{
 					"driver": "memory",
@@ -162,9 +155,7 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 										"idp":      "internal",
 										"type":     1, // user.UserType_USER_TYPE_PRIMARY
 									},
-									"username": "serviceuser",
-									// "secret":       // TODO should not have a secret
-									"mail":         "admin@example.org",
+									"username":     "serviceuser",
 									"display_name": "System User",
 								},
 							},
@@ -219,7 +210,7 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 		"http": map[string]interface{}{
 			"network": cfg.HTTP.Protocol,
 			"address": cfg.HTTP.Addr,
-			// TODO build services dynamically
+			// no datagateway needed as the metadata clients directly talk to the dataprovider with the simple protocol
 			"services": map[string]interface{}{
 				"dataprovider": map[string]interface{}{
 					"prefix":      "data",
