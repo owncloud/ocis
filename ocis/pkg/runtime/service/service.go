@@ -112,7 +112,6 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["glauth"] = glauth.NewSutureService
 	s.ServicesRegistry["graph"] = graph.NewSutureService
 	s.ServicesRegistry["graph-explorer"] = graphExplorer.NewSutureService
-	s.ServicesRegistry["idp"] = idp.NewSutureService
 	s.ServicesRegistry["idm"] = idm.NewSutureService
 	s.ServicesRegistry["ocs"] = ocs.NewSutureService
 	s.ServicesRegistry["store"] = store.NewSutureService
@@ -137,6 +136,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.Delayed["accounts"] = accounts.NewSutureService
 	s.Delayed["proxy"] = proxy.NewSutureService
 	s.Delayed["ocdav"] = ocdav.NewOCDav
+	s.Delayed["idp"] = idp.NewSutureService
 
 	return s, nil
 }
@@ -254,10 +254,18 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 	}
 
 	for name := range s.ServicesRegistry {
+		// don't run glauth by default but keep the possiblity to start it via cfg.Runtime.Extensions for now
+		if name == "glauth" {
+			continue
+		}
 		runset = append(runset, name)
 	}
 
 	for name := range s.Delayed {
+		// don't run accounts by default but keep the possiblity to start it via cfg.Runtime.Extensions for now
+		if name == "accounts" {
+			continue
+		}
 		runset = append(runset, name)
 	}
 }

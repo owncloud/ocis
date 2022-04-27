@@ -33,15 +33,15 @@ func DefaultConfig() *config.Config {
 			Insecure:     false,
 		},
 		Identity: config.Identity{
-			Backend: "cs3",
+			Backend: "ldap",
 			LDAP: config.LDAP{
-				URI:                      "ldap://localhost:9125",
-				Insecure:                 false,
-				BindDN:                   "",
-				BindPassword:             "",
+				URI:                      "ldaps://localhost:9235",
+				Insecure:                 true,
+				BindDN:                   "uid=libregraph,ou=sysusers,o=libregraph-idm",
+				BindPassword:             "idm",
 				UseServerUUID:            false,
-				WriteEnabled:             false,
-				UserBaseDN:               "ou=users,dc=ocis,dc=test",
+				WriteEnabled:             true,
+				UserBaseDN:               "ou=users,o=libregraph-idm",
 				UserSearchScope:          "sub",
 				UserFilter:               "",
 				UserObjectClass:          "inetOrgPerson",
@@ -51,7 +51,7 @@ func DefaultConfig() *config.Config {
 				// FIXME: switch this to some more widely available attribute by default
 				//        ideally this needs to	be constant for the lifetime of a users
 				UserIDAttribute:    "owncloudUUID",
-				GroupBaseDN:        "ou=groups,dc=ocis,dc=test",
+				GroupBaseDN:        "ou=groups,o=libregraph-idm",
 				GroupSearchScope:   "sub",
 				GroupFilter:        "",
 				GroupObjectClass:   "groupOfNames",
