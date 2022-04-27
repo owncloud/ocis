@@ -90,35 +90,7 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	}
 	cfg := config.Config{
 		TokenManager: &shared.TokenManager{},
-		//Accounts: &accounts.Config{},
-		//Audit:    &audit.Config{},
-		//GLAuth:        &glauth.Config{},
-		//GraphExplorer: &graphExplorer.Config{},
-		//Graph: &graph.Config{},
 		IDM: &idm.Config{},
-		//IDP:           &idp.Config{},
-		//Nats:          &nats.Config{},
-		//Notifications: &notifications.Config{},
-		//Proxy:         &proxy.Config{},
-		//OCS:        &ocs.Config{},
-		//Settings:   &settings.Config{},
-		// TODO: fix storage
-		//AuthBasic:         &authbasic.Config{},
-		//AuthBearer:        &authbearer.Config{},
-		//AppProvider:       &appprovider.Config{},
-		//AuthMachine:       &authmachine.Config{},
-		//Gateway:           &gateway.Config{},
-		//Group:             &group.Config{},
-		//Sharing:           &sharing.Config{},
-		//StorageMetadata:   &storagemetadata.Config{},
-		//StorageUsers:      &storageusers.Config{},
-		//StorageShares:     &storageshares.Config{},
-		//StoragePublicLink: &storagepublic.Config{},
-		//User:              &user.Config{},
-		//OCDav:             &ocdav.Config{},
-		//Thumbnails: &thumbnails.Config{},
-		//Web:           &web.Config{},
-		//WebDAV:        &webdav.Config{},
 	}
 
 	if insecure {
@@ -163,41 +135,12 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	cfg.MachineAuthAPIKey = machineAuthApiKey
 	cfg.TransferSecret = revaTransferSecret
 	cfg.TokenManager.JWTSecret = tokenManagerJwtSecret
-	//cfg.Commons.TokenManager.JWTSecret = tokenManagerJwtSecret
-	//cfg.Accounts.TokenManager.JWTSecret = tokenManagerJwtSecret
-	//cfg.Graph.TokenManager.JWTSecret = tokenManagerJwtSecret
-	//fmt.Printf("%v\n", cfg.Graph.TokenManager)
+
 	cfg.IDM.ServiceUserPasswords.Idm = idmServicePassword
 	cfg.IDM.ServiceUserPasswords.Idp = idpServicePassword
 	cfg.IDM.ServiceUserPasswords.OcisAdmin = ocisAdminServicePassword
 	cfg.IDM.ServiceUserPasswords.Reva = revaServicePassword
-	//cfg.Notifications.Notifications.MachineAuthAPIKey = machineAuthSecret
-	//cfg.OCS.MachineAuthAPIKey = machineAuthSecret
-	//cfg.Proxy.TokenManager.JWTSecret = tokenManagerJwtSecret
-	//fmt.Printf("%v\n", cfg.Proxy.TokenManager)
-	//cfg.Proxy.MachineAuthAPIKey = machineAuthSecret
-	//cfg.Settings.Metadata.MachineAuthAPIKey = machineAuthSecret
-	//cfg.Settings.TokenManager.JWTSecret = tokenManagerJwtSecret
 
-	//TODO: move all jwt secrets to shared.common
-	//cfg.AppProvider.JWTSecret = tokenManagerJwtSecret
-	//cfg.AuthBasic.JWTSecret = tokenManagerJwtSecret
-	//cfg.AuthBearer.JWTSecret = tokenManagerJwtSecret
-	//cfg.AuthMachine.JWTSecret = tokenManagerJwtSecret
-	//cfg.Gateway.JWTSecret = tokenManagerJwtSecret
-	//cfg.Group.JWTSecret = tokenManagerJwtSecret
-	//cfg.Sharing.JWTSecret = tokenManagerJwtSecret
-	//cfg.StorageMetadata.JWTSecret = tokenManagerJwtSecret
-	//cfg.StoragePublicLink.JWTSecret = tokenManagerJwtSecret
-	//cfg.StorageShares.JWTSecret = tokenManagerJwtSecret
-	//cfg.StorageUsers.JWTSecret = tokenManagerJwtSecret
-	//cfg.User.JWTSecret = tokenManagerJwtSecret
-	//cfg.OCDav.JWTSecret = tokenManagerJwtSecret
-
-	//TODO: following line is defunc, figure out why
-	//cfg.Gateway.MachineAuthAPIKey = machineAuthApiKey
-
-	//cfg.Thumbnails.Thumbnail.TransferSecret = revaTransferTokenSecret
 	yamlOutput, err := yaml.Marshal(cfg)
 	if err != nil {
 		return fmt.Errorf("could not marshall config into yaml: %s", err)

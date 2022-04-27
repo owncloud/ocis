@@ -4,11 +4,12 @@ import "github.com/owncloud/ocis/ocis-pkg/shared"
 
 type Config struct {
 	*shared.Commons `yaml:"-"`
-	Service         Service  `yaml:"-"`
-	Tracing         *Tracing `yaml:"tracing,omitempty"`
-	Logging         *Logging `yaml:"log,omitempty"`
-	Debug           Debug    `yaml:"debug,omitempty"`
-	Supervised      bool     `yaml:"supervised,omitempty"`
+
+	Service    Service  `yaml:"-"`
+	Tracing    *Tracing `yaml:"tracing,omitempty"`
+	Logging    *Logging `yaml:"log,omitempty"`
+	Debug      Debug    `yaml:"debug,omitempty"`
+	Supervised bool     `yaml:"supervised,omitempty"`
 
 	GRPC GRPCConfig `yaml:"grpc,omitempty"`
 
