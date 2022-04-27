@@ -27,19 +27,21 @@ drivers:
   json:
     file: ""
   ldap:
-    uri: ldaps://localhost:9126
-    cacert: ~/.ocis/ldap/ldap.crt
+    uri: ldaps://localhost:9235
+    cacert: ~/.ocis/idm/ldap.crt
     insecure: false
-    binddn: cn=reva,ou=sysusers,dc=ocis,dc=test
+    binddn: uid=reva,ou=sysusers,o=libregraph-idm
     bindpassword: reva
-    userbasedn: dc=ocis,dc=test
-    groupbasedn: dc=ocis,dc=test
+    userbasedn: ou=users,o=libregraph-idm
+    groupbasedn: ou=groups,o=libregraph-idm
+    userscope: sub
+    groupscope: sub
     userfilter: ""
     groupfilter: ""
-    userobjectclass: posixAccount
-    groupobjectclass: posixGroup
+    userobjectclass: inetOrgPerson
+    groupobjectclass: groupOfNames
     loginattributes:
-    - cn
+    - uid
     - mail
     idp: https://localhost:9200
     gatewayendpoint: ""
@@ -48,14 +50,14 @@ drivers:
       idisoctetstring: false
       mail: mail
       displayname: displayname
-      username: cn
+      username: uid
     groupschema:
-      id: cn
+      id: ownclouduuid
       idisoctetstring: false
       mail: mail
       displayname: cn
       groupname: cn
-      member: cn
+      member: member
   owncloudsql:
     dbusername: owncloud
     dbpassword: secret

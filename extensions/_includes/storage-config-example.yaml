@@ -31,21 +31,21 @@ reva:
     uid_claim: ""
     gid_claim: ""
   ldap:
-    uri: ldaps://localhost:9126
-    ca_cert: ~/.ocis/ldap/ldap.crt
+    uri: ldaps://localhost:9235
+    ca_cert: ~/.ocis/idm/ldap.crt
     insecure: false
-    user_base_dn: dc=ocis,dc=test
-    group_base_dn: dc=ocis,dc=test
+    user_base_dn: ou=users,o=libregraph-idm
+    group_base_dn: ou=groups,o=libregraph-idm
     user_scope: sub
     group_scope: sub
-    user_objectclass: posixAccount
-    group_objectclass: posixGroup
+    user_objectclass: inetOrgPerson
+    group_objectclass: groupOfNames
     user_filter: ""
     group_filter: ""
     login_attributes:
-    - cn
+    - uid
     - mail
-    bind_dn: cn=reva,ou=sysusers,dc=ocis,dc=test
+    bind_dn: uid=reva,ou=sysusers,o=libregraph-idm
     bind_password: reva
     idp: https://localhost:9200
     user_schema:
@@ -53,16 +53,16 @@ reva:
       id_is_octet_string: false
       mail: mail
       display_name: displayname
-      user_name: cn
+      user_name: uid
       uid_number: uidnumber
       gid_number: gidnumber
     group_schema:
-      id: cn
+      id: ownclouduuid
       id_is_octet_string: false
       mail: mail
       display_name: cn
       group_name: cn
-      member: cn
+      member: member
       gid_number: gidnumber
   user_group_rest:
     client_id: ""

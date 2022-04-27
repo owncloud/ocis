@@ -56,15 +56,16 @@ idp:
   refresh_token_duration_seconds: 94608000
   dynamic_client_secret_duration_seconds: 0
 ldap:
-  uri: ldap://localhost:9125
-  bind_dn: cn=idp,ou=sysusers,dc=ocis,dc=test
+  uri: ldaps://localhost:9235
+  cacert: ~/.ocis/idm/ldap.crt
+  bind_dn: uid=idp,ou=sysusers,o=libregraph-idm
   bind_password: idp
-  base_dn: ou=users,dc=ocis,dc=test
+  base_dn: ou=users,o=libregraph-idm
   scope: sub
-  login_attribute: cn
+  login_attribute: uid
   email_attribute: mail
   name_attribute: displayName
   uuid_attribute: uid
   uuid_attribute_type: text
   filter: ""
-  objectclass: posixAccount
+  objectclass: inetOrgPerson

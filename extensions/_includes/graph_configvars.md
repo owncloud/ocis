@@ -15,14 +15,14 @@
 | GRAPH_SPACES_DEFAULT_QUOTA | string | 1000000000 | |
 | OCIS_INSECURE;GRAPH_SPACES_INSECURE | bool | false | |
 | GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL | int | 0 | |
-| GRAPH_IDENTITY_BACKEND | string | cs3 | |
-| LDAP_URI;GRAPH_LDAP_URI | string | ldap://localhost:9125 | |
-| OCIS_INSECURE;GRAPH_LDAP_INSECURE | bool | false | |
-| LDAP_BIND_DN;GRAPH_LDAP_BIND_DN | string |  | |
-| LDAP_BIND_PASSWORD;GRAPH_LDAP_BIND_PASSWORD | string |  | |
+| GRAPH_IDENTITY_BACKEND | string | ldap | |
+| LDAP_URI;GRAPH_LDAP_URI | string | ldaps://localhost:9235 | |
+| OCIS_INSECURE;GRAPH_LDAP_INSECURE | bool | true | |
+| LDAP_BIND_DN;GRAPH_LDAP_BIND_DN | string | uid=libregraph,ou=sysusers,o=libregraph-idm | |
+| LDAP_BIND_PASSWORD;GRAPH_LDAP_BIND_PASSWORD | string | idm | |
 | GRAPH_LDAP_SERVER_UUID | bool | false | |
-| GRAPH_LDAP_SERVER_WRITE_ENABLED | bool | false | |
-| LDAP_USER_BASE_DN;GRAPH_LDAP_USER_BASE_DN | string | ou=users,dc=ocis,dc=test | |
+| GRAPH_LDAP_SERVER_WRITE_ENABLED | bool | true | |
+| LDAP_USER_BASE_DN;GRAPH_LDAP_USER_BASE_DN | string | ou=users,o=libregraph-idm | |
 | LDAP_USER_SCOPE;GRAPH_LDAP_USER_SCOPE | string | sub | |
 | LDAP_USER_FILTER;GRAPH_LDAP_USER_FILTER | string |  | |
 | LDAP_USER_OBJECTCLASS;GRAPH_LDAP_USER_OBJECTCLASS | string | inetOrgPerson | |
@@ -30,7 +30,7 @@
 | LDAP_USER_SCHEMA_DISPLAY_NAME;GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE | string | displayName | |
 | LDAP_USER_SCHEMA_USERNAME;GRAPH_LDAP_USER_NAME_ATTRIBUTE | string | uid | |
 | LDAP_USER_SCHEMA_ID;GRAPH_LDAP_USER_UID_ATTRIBUTE | string | owncloudUUID | |
-| LDAP_GROUP_BASE_DN;GRAPH_LDAP_GROUP_BASE_DN | string | ou=groups,dc=ocis,dc=test | |
+| LDAP_GROUP_BASE_DN;GRAPH_LDAP_GROUP_BASE_DN | string | ou=groups,o=libregraph-idm | |
 | LDAP_GROUP_SCOPE;GRAPH_LDAP_GROUP_SEARCH_SCOPE | string | sub | |
 | LDAP_GROUP_FILTER;GRAPH_LDAP_GROUP_FILTER | string |  | |
 | LDAP_GROUP_OBJECTCLASS;GRAPH_LDAP_GROUP_OBJECTCLASS | string | groupOfNames | |

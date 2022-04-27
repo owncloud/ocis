@@ -35,15 +35,16 @@
 | IDP_ID_TOKEN_EXPIRATION | uint64 | 3600 | |
 | IDP_REFRESH_TOKEN_EXPIRATION | uint64 | 94608000 | |
 |  | uint64 | 0 | |
-| LDAP_URI;IDP_LDAP_URI | string | ldap://localhost:9125 | |
-| LDAP_BIND_DN;IDP_LDAP_BIND_DN | string | cn=idp,ou=sysusers,dc=ocis,dc=test | |
+| LDAP_URI;IDP_LDAP_URI | string | ldaps://localhost:9235 | |
+| LDAP_CACERT;IDP_LDAP_TLS_CACERT | string | ~/.ocis/idm/ldap.crt | |
+| LDAP_BIND_DN;IDP_LDAP_BIND_DN | string | uid=idp,ou=sysusers,o=libregraph-idm | |
 | LDAP_BIND_PASSWORD;IDP_LDAP_BIND_PASSWORD | string | idp | |
-| LDAP_USER_BASE_DN,IDP_LDAP_BASE_DN | string | ou=users,dc=ocis,dc=test | |
+| LDAP_USER_BASE_DN,IDP_LDAP_BASE_DN | string | ou=users,o=libregraph-idm | |
 | LDAP_USER_SCOPE;IDP_LDAP_SCOPE | string | sub | |
-| IDP_LDAP_LOGIN_ATTRIBUTE | string | cn | |
+| IDP_LDAP_LOGIN_ATTRIBUTE | string | uid | |
 | LDAP_USER_SCHEMA_MAIL;IDP_LDAP_EMAIL_ATTRIBUTE | string | mail | |
 | LDAP_USER_SCHEMA_USERNAME;IDP_LDAP_NAME_ATTRIBUTE | string | displayName | |
 | LDAP_USER_SCHEMA_ID;IDP_LDAP_UUID_ATTRIBUTE | string | uid | |
 | IDP_LDAP_UUID_ATTRIBUTE_TYPE | string | text | |
 | LDAP_USER_FILTER;IDP_LDAP_FILTER | string |  | |
-| LDAP_USER_OBJECTCLASS;IDP_LDAP_OBJECTCLASS | string | posixAccount | |
+| LDAP_USER_OBJECTCLASS;IDP_LDAP_OBJECTCLASS | string | inetOrgPerson | |

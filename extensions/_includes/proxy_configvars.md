@@ -18,7 +18,7 @@
 | PROXY_OIDC_USERINFO_CACHE_TTL | int | 10 | |
 | OCIS_JWT_SECRET;PROXY_JWT_SECRET | string | Pive-Fumkiu4 | |
 | PROXY_ENABLE_PRESIGNEDURLS | bool | true | |
-| PROXY_ACCOUNT_BACKEND_TYPE | string | accounts | |
+| PROXY_ACCOUNT_BACKEND_TYPE | string | cs3 | |
 | PROXY_USER_OIDC_CLAIM | string | email | |
 | PROXY_USER_CS3_CLAIM | string | mail | |
 | OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY | string | change-me-please | |

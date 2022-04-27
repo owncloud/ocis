@@ -28,15 +28,15 @@ spaces:
   insecure: false
   extended_space_properties_cache_ttl: 0
 identity:
-  backend: cs3
+  backend: ldap
   ldap:
-    uri: ldap://localhost:9125
-    insecure: false
-    bind_dn: ""
-    bind_password: ""
+    uri: ldaps://localhost:9235
+    insecure: true
+    bind_dn: uid=libregraph,ou=sysusers,o=libregraph-idm
+    bind_password: idm
     use_server_uuid: false
-    write_enabled: false
-    user_base_dn: ou=users,dc=ocis,dc=test
+    write_enabled: true
+    user_base_dn: ou=users,o=libregraph-idm
     user_search_scope: sub
     user_filter: ""
     user_objectclass: inetOrgPerson
@@ -44,7 +44,7 @@ identity:
     user_displayname_attribute: displayName
     user_name_attribute: uid
     user_id_attribute: owncloudUUID
-    group_base_dn: ou=groups,dc=ocis,dc=test
+    group_base_dn: ou=groups,o=libregraph-idm
     group_search_scope: sub
     group_filter: ""
     group_objectclass: groupOfNames
