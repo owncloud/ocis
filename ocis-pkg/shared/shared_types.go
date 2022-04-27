@@ -29,6 +29,11 @@ type TokenManager struct {
 	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET" desc:"The secret to mint jwt tokens."`
 }
 
+// Reva defines all available REVA configuration.
+type Reva struct {
+	Address string `yaml:"address" env:"REVA_GATEWAY"`
+}
+
 // Commons holds configuration that are common to all extensions. Each extension can then decide whether
 // to overwrite its values.
 type Commons struct {
@@ -36,6 +41,7 @@ type Commons struct {
 	Tracing           *Tracing      `yaml:"tracing"`
 	OcisURL           string        `yaml:"ocis_url" env:"OCIS_URL"`
 	TokenManager      *TokenManager `yaml:"token_manager"`
+	Reva              *Reva         `yaml:"reva"`
 	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY"`
 	TransferSecret    string        `yaml:"transfer_secret,omitempty" env:"REVA_TRANSFER_SECRET"`
 }

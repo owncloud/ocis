@@ -11,6 +11,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/extensions/group/pkg/config"
+	"github.com/owncloud/ocis/extensions/group/pkg/config/parser"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/ldap"
@@ -26,6 +27,9 @@ func Groups(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "groups",
 		Usage: "start groups service",
+		Before: func(ctx *cli.Context) error {
+			return parser.ParseConfig(cfg)
+		},
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
 			logger := log.NewLogger(
@@ -111,8 +115,8 @@ func groupsConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inter
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.JWTSecret,
-			"gatewaysvc":                cfg.GatewayEndpoint,
+			"jwt_secret":                cfg.TokenManager.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Address,
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{

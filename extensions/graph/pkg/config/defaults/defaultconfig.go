@@ -20,7 +20,7 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "graph",
 		},
-		Reva: config.Reva{
+		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
 		Spaces: config.Spaces{
@@ -91,7 +91,7 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.TokenManager = &config.TokenManager{
 			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
 		}
-	} else {
+	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
 	}
 }

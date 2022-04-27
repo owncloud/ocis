@@ -7,7 +7,7 @@ import (
 	_ "github.com/owncloud/ocis/ocis-pkg/generators"
 )
 
-var _ = Describe("Generators", func() {
-	It("Returns an error ", func() {})
-	PIt("Returns expected passwords", func() {})
-})
+//var _ = Describe("Generators", func() {
+//	It("Returns an error ", func() {})
+//	PIt("Returns expected passwords", func() {})
+//})

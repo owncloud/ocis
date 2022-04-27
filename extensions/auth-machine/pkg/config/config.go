@@ -12,8 +12,9 @@ type Config struct {
 
 	GRPC GRPCConfig `yaml:"grpc,omitempty"`
 
-	JWTSecret             string        `yaml:"jwt_secret,omitempty"`
-	GatewayEndpoint       string        `yaml:"gateway_entpoint,omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
+	Reva         *Reva         `yaml:"reva,omitempty"`
+
 	SkipUserGroupsInToken bool          `yaml:"skip_user_groups_in_token,omitempty"`
 	AuthProvider          string        `yaml:"auth_provider,omitempty" env:"AUTH_MACHINE_AUTH_PROVIDER" desc:"The auth provider which should be used by the service"`
 	AuthProviders         AuthProviders `yaml:"auth_providers,omitempty"`

@@ -16,8 +16,9 @@ type Config struct {
 
 	TransferSecret string `yaml:"transfer_secret" env:"STORAGE_TRANSFER_SECRET"`
 
-	JWTSecret string `yaml:"jwt_secret"`
-	GatewayEndpoint       string
+	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
+	Reva         *Reva         `yaml:"reva,omitempty"`
+
 	SkipUserGroupsInToken bool
 
 	EnableFavorites          bool `yaml:"favorites"`

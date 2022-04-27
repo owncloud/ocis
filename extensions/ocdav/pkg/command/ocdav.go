@@ -9,6 +9,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/micro/ocdav"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/extensions/ocdav/pkg/config"
+	"github.com/owncloud/ocis/extensions/ocdav/pkg/config/parser"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
@@ -25,11 +26,15 @@ func OCDav(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "ocdav",
 		Usage: "start ocdav service",
-		Before: func(c *cli.Context) error {
-			if err := loadUserAgent(c, cfg); err != nil {
-				return err
-			}
-			return nil
+		// TODO: check
+		//Before: func(c *cli.Context) error {
+		//	if err := loadUserAgent(c, cfg); err != nil {
+		//		return err
+		//	}
+		//	return nil
+		//},
+		Before: func(ctx *cli.Context) error {
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
@@ -59,8 +64,8 @@ func OCDav(cfg *config.Config) *cli.Command {
 					ocdav.Insecure(cfg.Insecure),
 					ocdav.PublicURL(cfg.PublicURL),
 					ocdav.Prefix(cfg.HTTP.Prefix),
-					ocdav.GatewaySvc(cfg.GatewayEndpoint),
-					ocdav.JWTSecret(cfg.JWTSecret),
+					ocdav.GatewaySvc(cfg.Reva.Address),
+					ocdav.JWTSecret(cfg.TokenManager.JWTSecret),
 					// ocdav.FavoriteManager() // FIXME needs a proper persistence implementation
 					// ocdav.LockSystem(), // will default to the CS3 lock system
 					// ocdav.TLSConfig() // tls config for the http server

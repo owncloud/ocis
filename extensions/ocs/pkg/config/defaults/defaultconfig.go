@@ -40,7 +40,7 @@ func DefaultConfig() *config.Config {
 		},
 
 		AccountBackend: "accounts",
-		Reva: config.Reva{
+		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
 		StorageUsersDriver: "ocis",
@@ -74,11 +74,19 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
+	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
+		cfg.Reva = &config.Reva{
+			Address: cfg.Commons.Reva.Address,
+		}
+	} else if cfg.Reva == nil {
+		cfg.Reva = &config.Reva{}
+	}
+
 	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
 		cfg.TokenManager = &config.TokenManager{
 			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
 		}
-	} else {
+	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
 	}
 

@@ -13,6 +13,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/extensions/frontend/pkg/config"
+	"github.com/owncloud/ocis/extensions/frontend/pkg/config/parser"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/conversions"
@@ -28,11 +29,13 @@ func Frontend(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "frontend",
 		Usage: "start frontend service",
-		Before: func(c *cli.Context) error {
-			if err := loadUserAgent(c, cfg); err != nil {
-				return err
-			}
-			return nil
+		Before: func(ctx *cli.Context) error {
+			// TODO: what !?
+			//if err := loadUserAgent(c, cfg); err != nil {
+			//	return err
+			//}
+			//return nil
+			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
@@ -156,8 +159,8 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.JWTSecret,
-			"gatewaysvc":                cfg.GatewayEndpoint, // Todo or address?
+			"jwt_secret":                cfg.TokenManager.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Address, // Todo or address?
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"http": map[string]interface{}{
@@ -194,7 +197,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 					"insecure":               true,
 				},
 				"ocs": map[string]interface{}{
-					"storage_registry_svc":      cfg.GatewayEndpoint,
+					"storage_registry_svc":      cfg.Reva.Address,
 					"share_prefix":              cfg.OCS.SharePrefix,
 					"home_namespace":            cfg.OCS.HomeNamespace,
 					"resource_info_cache_ttl":   cfg.OCS.ResourceInfoCacheTTL,
@@ -210,7 +213,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 							"db_port":     cfg.OCS.CacheWarmupDrivers.CBOX.DBPort,
 							"db_name":     cfg.OCS.CacheWarmupDrivers.CBOX.DBName,
 							"namespace":   cfg.OCS.CacheWarmupDrivers.CBOX.Namespace,
-							"gatewaysvc":  cfg.GatewayEndpoint,
+							"gatewaysvc":  cfg.Reva.Address,
 						},
 					},
 					"config": map[string]interface{}{

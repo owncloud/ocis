@@ -14,6 +14,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/extensions/storage-shares/pkg/config"
+	"github.com/owncloud/ocis/extensions/storage-shares/pkg/config/parser"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/thejerf/suture/v4"
@@ -25,6 +26,9 @@ func StorageShares(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "storage-shares",
 		Usage: "start storage-shares service",
+		Before: func(ctx *cli.Context) error {
+			return parser.ParseConfig(cfg)
+		},
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
 			logger := log.NewLogger(
@@ -96,8 +100,8 @@ func storageSharesConfigFromStruct(c *cli.Context, cfg *config.Config) map[strin
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.JWTSecret,
-			"gatewaysvc":                cfg.GatewayEndpoint,
+			"jwt_secret":                cfg.TokenManager.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Address,
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{

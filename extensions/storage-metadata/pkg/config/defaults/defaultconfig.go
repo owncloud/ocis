@@ -35,11 +35,12 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "storage-metadata",
 		},
-		GatewayEndpoint: "127.0.0.1:9142",
-		JWTSecret:       "Pive-Fumkiu4",
-		TempFolder:      filepath.Join(defaults.BaseDataPath(), "tmp", "metadata"),
-		DataServerURL:   "http://localhost:9216/data",
-		Driver:          "ocis",
+		Reva: &config.Reva{
+			Address: "127.0.0.1:9142",
+		},
+		TempFolder:    filepath.Join(defaults.BaseDataPath(), "tmp", "metadata"),
+		DataServerURL: "http://localhost:9216/data",
+		Driver:        "ocis",
 		Drivers: config.Drivers{
 			EOS: config.EOSDriver{
 				Root:                "/eos/dockertest/reva",
@@ -104,6 +105,22 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
+		cfg.Reva = &config.Reva{
+			Address: cfg.Commons.Reva.Address,
+		}
+	} else if cfg.Reva == nil {
+		cfg.Reva = &config.Reva{}
+	}
+
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
 	}
 }
 

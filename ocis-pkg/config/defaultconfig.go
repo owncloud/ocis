@@ -31,47 +31,43 @@ import (
 	user "github.com/owncloud/ocis/extensions/user/pkg/config/defaults"
 	web "github.com/owncloud/ocis/extensions/web/pkg/config/defaults"
 	webdav "github.com/owncloud/ocis/extensions/webdav/pkg/config/defaults"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
 func DefaultConfig() *Config {
 	return &Config{
-		TokenManager: &shared.TokenManager{
-			JWTSecret: "Pive-Fumkiu4",
-		},
 		Runtime: Runtime{
 			Port: "9250",
 			Host: "localhost",
 		},
-		Audit:             audit.DefaultConfig(),
 		Accounts:          accounts.DefaultConfig(),
+		AppProvider:       appprovider.DefaultConfig(),
+		Audit:             audit.DefaultConfig(),
+		AuthBasic:         authbasic.DefaultConfig(),
+		AuthBearer:        authbearer.DefaultConfig(),
+		AuthMachine:       authmachine.DefaultConfig(),
+		Frontend:          frontend.DefaultConfig(),
+		Gateway:           gateway.DefaultConfig(),
 		GLAuth:            glauth.DefaultConfig(),
 		Graph:             graph.DefaultConfig(),
-		IDP:               idp.DefaultConfig(),
+		GraphExplorer:     graphExplorer.DefaultConfig(),
+		Group:             group.DefaultConfig(),
 		IDM:               idm.DefaultConfig(),
+		IDP:               idp.DefaultConfig(),
 		Nats:              nats.DefaultConfig(),
 		Notifications:     notifications.DefaultConfig(),
-		Proxy:             proxy.DefaultConfig(),
-		GraphExplorer:     graphExplorer.DefaultConfig(),
+		OCDav:             ocdav.DefaultConfig(),
 		OCS:               ocs.DefaultConfig(),
+		Proxy:             proxy.DefaultConfig(),
 		Settings:          settings.DefaultConfig(),
-		Web:               web.DefaultConfig(),
+		Sharing:           sharing.DefaultConfig(),
+		StorageMetadata:   storagemetadata.DefaultConfig(),
+		StoragePublicLink: storagepublic.DefaultConfig(),
+		StorageShares:     storageshares.DefaultConfig(),
+		StorageUsers:      storageusers.DefaultConfig(),
 		Store:             store.DefaultConfig(),
 		Thumbnails:        thumbnails.DefaultConfig(),
+		User:              user.DefaultConfig(),
+		Web:               web.DefaultConfig(),
 		WebDAV:            webdav.DefaultConfig(),
-		Gateway:           gateway.FullDefaultConfig(),
-		AuthBasic:         authbasic.FullDefaultConfig(),
-		AuthBearer:        authbearer.FullDefaultConfig(),
-		AuthMachine:       authmachine.FullDefaultConfig(),
-		User:              user.FullDefaultConfig(),
-		Group:             group.FullDefaultConfig(),
-		Sharing:           sharing.FullDefaultConfig(),
-		StorageMetadata:   storagemetadata.FullDefaultConfig(),
-		StoragePublicLink: storagepublic.FullDefaultConfig(),
-		StorageUsers:      storageusers.FullDefaultConfig(),
-		StorageShares:     storageshares.FullDefaultConfig(),
-		AppProvider:       appprovider.FullDefaultConfig(),
-		Frontend:          frontend.FullDefaultConfig(),
-		OCDav:             ocdav.FullDefaultConfig(),
 	}
 }

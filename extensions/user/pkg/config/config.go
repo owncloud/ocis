@@ -12,8 +12,9 @@ type Config struct {
 
 	GRPC GRPCConfig `yaml:"grpc,omitempty"`
 
-	JWTSecret             string  `yaml:"jwt_secret,omitempty"`
-	GatewayEndpoint       string  `yaml:"gateway_endpoint,omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
+	Reva         *Reva         `yaml:"reva,omitempty"`
+
 	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token,omitempty"`
 	UsersCacheExpiration  int     `yaml:"users_cache_expiration,omitempty"`
 	Driver                string  `yaml:"driver,omitempty"`

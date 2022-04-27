@@ -18,7 +18,7 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http,omitempty"`
 
-	Reva         Reva          `yaml:"reva,omitempty"`
+	Reva         *Reva         `yaml:"reva,omitempty"`
 	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
 
 	Spaces   Spaces   `yaml:"spaces,omitempty"`

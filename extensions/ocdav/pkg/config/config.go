@@ -12,10 +12,10 @@ type Config struct {
 
 	HTTP HTTPConfig `yaml:"http,omitempty"`
 
-	// JWTSecret used to verify reva access token
-	JWTSecret             string `yaml:"jwt_secret"`
-	GatewayEndpoint       string `yaml:"gateway_endpoint,omitempty"`
-	SkipUserGroupsInToken bool   `yaml:"skip_user_groups_in_token,omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
+	Reva         *Reva         `yaml:"reva,omitempty"`
+
+	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token,omitempty"`
 
 	WebdavNamespace string `yaml:"webdav_namespace,omitempty"`
 	FilesNamespace  string `yaml:"files_namespace,omitempty"`

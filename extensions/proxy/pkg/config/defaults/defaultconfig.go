@@ -36,7 +36,7 @@ func DefaultConfig() *config.Config {
 			},
 		},
 		PolicySelector: nil,
-		Reva: config.Reva{
+		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
 		PreSignedURL: config.PreSignedURL{
@@ -182,7 +182,7 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.TokenManager = &config.TokenManager{
 			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
 		}
-	} else {
+	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
 	}
 
@@ -190,6 +190,22 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	} else {
 		log.Fatalf("machine auth api key is not set up properly, bailing out (%s)", cfg.Service.Name)
+	}
+
+	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
+		cfg.Reva = &config.Reva{
+			Address: cfg.Commons.Reva.Address,
+		}
+	} else if cfg.Reva == nil {
+		cfg.Reva = &config.Reva{}
+	}
+
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
 	}
 }
 

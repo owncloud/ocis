@@ -12,9 +12,10 @@ type Config struct {
 
 	GRPC GRPCConfig `yaml:"grpc,omitempty"`
 
-	JWTSecret             string `yaml:"jwt_secret,omitempty"`
-	GatewayEndpoint       string `yaml:",omitempty"`
-	SkipUserGroupsInToken bool   `yaml:",omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
+	Reva         *Reva         `yaml:"reva,omitempty"`
+
+	SkipUserGroupsInToken bool `yaml:",omitempty"`
 
 	CommitShareToStorageGrant  bool   `yaml:"commit_share_to_storage_grant,omitempty"`
 	CommitShareToStorageRef    bool   `yaml:"commit_share_to_storage_ref,omitempty"`
@@ -29,7 +30,6 @@ type Config struct {
 	GroupsEndpoint            string `yaml:"groups_endpoint,omitempty"`
 	PermissionsEndpoint       string `yaml:"permissions_endpoint,omitempty"`
 	SharingEndpoint           string `yaml:"sharing_endpoint,omitempty"`
-	DataGatewayPublicURL      string `yaml:"data_gateway_public_url,omitempty"`
 	FrontendPublicURL         string `yaml:"frontend_public_url,omitempty" env:"OCIS_URL;GATEWAY_FRONTEND_PUBLIC_URL"`
 	AuthBasicEndpoint         string `yaml:"auth_basic_endpoint,omitempty"`
 	AuthBearerEndpoint        string `yaml:"auth_bearer_endpoint,omitempty"`

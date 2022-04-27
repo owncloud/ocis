@@ -103,7 +103,7 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.TokenManager = &config.TokenManager{
 			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
 		}
-	} else {
+	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
 	}
 }

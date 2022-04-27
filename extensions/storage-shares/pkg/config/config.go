@@ -17,9 +17,10 @@ type Config struct {
 	GRPC GRPCConfig `yaml:"grpc,omitempty"`
 	HTTP HTTPConfig `yaml:"http,omitempty"`
 
+	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
+	Reva         *Reva         `yaml:"reva,omitempty"`
+
 	Context                context.Context `yaml:"context,omitempty"`
-	JWTSecret              string          `yaml:"jwt_secret,omitempty"`
-	GatewayEndpoint        string          `yaml:"gateway_endpoint,omitempty"`
 	SkipUserGroupsInToken  bool            `yaml:"skip_user_groups_in_token,omitempty"`
 	ReadOnly               bool            `yaml:"readonly,omitempty"`
 	SharesProviderEndpoint string          `yaml:"shares_provider_endpoint,omitempty"`

@@ -27,9 +27,10 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "auth-bearer",
 		},
-		GatewayEndpoint: "127.0.0.1:9142",
-		JWTSecret:       "Pive-Fumkiu4",
-		AuthProvider:    "ldap",
+		Reva: &config.Reva{
+			Address: "127.0.0.1:9142",
+		},
+		AuthProvider: "ldap",
 		AuthProviders: config.AuthProviders{
 			OIDC: config.OIDCProvider{
 				Issuer:   "https://localhost:9200",
@@ -62,6 +63,22 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
+		cfg.Reva = &config.Reva{
+			Address: cfg.Commons.Reva.Address,
+		}
+	} else if cfg.Reva == nil {
+		cfg.Reva = &config.Reva{}
+	}
+
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
 	}
 }
 

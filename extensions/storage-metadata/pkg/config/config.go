@@ -17,15 +17,17 @@ type Config struct {
 	GRPC GRPCConfig `yaml:"grpc,omitempty"`
 	HTTP HTTPConfig `yaml:"http,omitempty"`
 
-	Context               context.Context `yaml:"context,omitempty"`
-	JWTSecret             string          `yaml:"jwt_secret,omitempty"`
-	GatewayEndpoint       string          `yaml:"gateway_endpoint,omitempty"`
-	SkipUserGroupsInToken bool            `yaml:"skip_user_groups_in_token,omitempty"`
-	Driver                string          `yaml:"driver,omitempty" env:"STORAGE_METADATA_DRIVER" desc:"The driver which should be used by the service"`
-	Drivers               Drivers         `yaml:"drivers,omitempty"`
-	DataServerURL         string          `yaml:"data_server_url,omitempty"`
-	TempFolder            string          `yaml:"temp_folder,omitempty"`
-	DataProviderInsecure  bool            `yaml:"data_providcer_insecure,omitempty" env:"OCIS_INSECURE;STORAGE_METADATA_DATAPROVIDER_INSECURE"`
+	Context context.Context `yaml:"context,omitempty"`
+
+	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
+	Reva         *Reva         `yaml:"reva,omitempty"`
+
+	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token,omitempty"`
+	Driver                string  `yaml:"driver,omitempty" env:"STORAGE_METADATA_DRIVER" desc:"The driver which should be used by the service"`
+	Drivers               Drivers `yaml:"drivers,omitempty"`
+	DataServerURL         string  `yaml:"data_server_url,omitempty"`
+	TempFolder            string  `yaml:"temp_folder,omitempty"`
+	DataProviderInsecure  bool    `yaml:"data_providcer_insecure,omitempty" env:"OCIS_INSECURE;STORAGE_METADATA_DATAPROVIDER_INSECURE"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;STORAGE_METADATA_TRACING_ENABLED" desc:"Activates tracing."`

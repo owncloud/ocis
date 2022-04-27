@@ -12,8 +12,9 @@ type Config struct {
 
 	GRPC GRPCConfig `yaml:"grpc,omitempty"`
 
-	JWTSecret             string               `yaml:"jwt_secret,omitempty"`
-	GatewayEndpoint       string               `yaml:"gateway_endpoint,omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
+	Reva         *Reva         `yaml:"reva,omitempty"`
+
 	SkipUserGroupsInToken bool                 `yaml:"skip_user_groups_in_token,omitempty"`
 	UserSharingDriver     string               `yaml:"user_sharing_driver,omitempty"`
 	UserSharingDrivers    UserSharingDrivers   `yaml:"user_sharin_drivers,omitempty"`

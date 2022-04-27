@@ -15,6 +15,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/extensions/sharing/pkg/config"
+	"github.com/owncloud/ocis/extensions/sharing/pkg/config/parser"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/thejerf/suture/v4"
@@ -26,6 +27,9 @@ func Sharing(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "sharing",
 		Usage: "start sharing service",
+		Before: func(ctx *cli.Context) error {
+			return parser.ParseConfig(cfg)
+		},
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
 			logger := log.NewLogger(
@@ -109,8 +113,8 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.JWTSecret,
-			"gatewaysvc":                cfg.GatewayEndpoint,
+			"jwt_secret":                cfg.TokenManager.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Address,
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
@@ -123,7 +127,7 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 					"drivers": map[string]interface{}{
 						"json": map[string]interface{}{
 							"file":         cfg.UserSharingDrivers.JSON.File,
-							"gateway_addr": cfg.GatewayEndpoint,
+							"gateway_addr": cfg.Reva.Address,
 						},
 						"sql": map[string]interface{}{ // cernbox sql
 							"db_username":                   cfg.UserSharingDrivers.SQL.DBUsername,
@@ -156,7 +160,7 @@ func sharingConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]inte
 					"drivers": map[string]interface{}{
 						"json": map[string]interface{}{
 							"file":         cfg.PublicSharingDrivers.JSON.File,
-							"gateway_addr": cfg.GatewayEndpoint,
+							"gateway_addr": cfg.Reva.Address,
 						},
 						"sql": map[string]interface{}{
 							"db_username":                   cfg.PublicSharingDrivers.SQL.DBUsername,

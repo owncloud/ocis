@@ -17,19 +17,21 @@ type Config struct {
 	GRPC GRPCConfig `yaml:"grpc,omitempty"`
 	HTTP HTTPConfig `yaml:"http,omitempty"`
 
-	Context               context.Context `yaml:"context,omitempty"`
-	JWTSecret             string          `yaml:"jwt_secret,omitempty"`
-	GatewayEndpoint       string          `yaml:"gateway_endpoint,omitempty"`
-	SkipUserGroupsInToken bool            `yaml:"skip_user_groups_in_token,omitempty"`
-	Driver                string          `yaml:"driver,omitempty" env:"STORAGE_USERS_DRIVER" desc:"The storage driver which should be used by the service"`
-	Drivers               Drivers         `yaml:"drivers,omitempty"`
-	DataServerURL         string          `yaml:"data_server_url,omitempty"`
-	TempFolder            string          `yaml:"temp_folder,omitempty"`
-	DataProviderInsecure  bool            `yaml:"data_provider_insecure,omitempty" env:"OCIS_INSECURE;STORAGE_USERS_DATAPROVIDER_INSECURE"`
-	Events                Events          `yaml:"events,omitempty"`
-	MountID               string          `yaml:"mount_id,omitempty"`
-	ExposeDataServer      bool            `yaml:"expose_data_server,omitempty"`
-	ReadOnly              bool            `yaml:"readonly,omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
+	Reva         *Reva         `yaml:"reva,omitempty"`
+
+	Context context.Context `yaml:"context,omitempty"`
+
+	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token,omitempty"`
+	Driver                string  `yaml:"driver,omitempty" env:"STORAGE_USERS_DRIVER" desc:"The storage driver which should be used by the service"`
+	Drivers               Drivers `yaml:"drivers,omitempty"`
+	DataServerURL         string  `yaml:"data_server_url,omitempty"`
+	TempFolder            string  `yaml:"temp_folder,omitempty"`
+	DataProviderInsecure  bool    `yaml:"data_provider_insecure,omitempty" env:"OCIS_INSECURE;STORAGE_USERS_DATAPROVIDER_INSECURE"`
+	Events                Events  `yaml:"events,omitempty"`
+	MountID               string  `yaml:"mount_id,omitempty"`
+	ExposeDataServer      bool    `yaml:"expose_data_server,omitempty"`
+	ReadOnly              bool    `yaml:"readonly,omitempty"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;STORAGE_USERS_TRACING_ENABLED" desc:"Activates tracing."`
