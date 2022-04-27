@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
+* Bugfix - URL encode the webdav url in the graph API: [#3597](https://github.com/owncloud/ocis/pull/3597)
 * Change - Load configuration files just from one directory: [#3587](https://github.com/owncloud/ocis/pull/3587)
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
@@ -20,6 +21,14 @@ The following sections list the changes for unreleased.
    backend. Now it returns a proper error.
 
    https://github.com/owncloud/ocis/issues/3483
+
+* Bugfix - URL encode the webdav url in the graph API: [#3597](https://github.com/owncloud/ocis/pull/3597)
+
+   Fixed the webdav URL in the drives responses. Without encoding the URL could be broken by files
+   with spaces in the file name.
+
+   https://github.com/owncloud/ocis/issues/3538
+   https://github.com/owncloud/ocis/pull/3597
 
 * Change - Load configuration files just from one directory: [#3587](https://github.com/owncloud/ocis/pull/3587)
 
