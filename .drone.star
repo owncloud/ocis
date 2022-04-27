@@ -18,7 +18,7 @@ OC_CI_NODEJS = "owncloudci/nodejs:%s"
 OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
 OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:latest"
-OC_OC_TEST_MIDDLEWARE = "56940/owncloud-test-middleware:latest"
+OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:latest"
 OC_SERVER = "owncloud/server:10"
 OC_UBUNTU = "owncloud/ubuntu:18.04"
 OSIXIA_OPEN_LDAP = "osixia/openldap:latest"
@@ -1845,7 +1845,7 @@ def middlewareService():
             "REMOTE_UPLOAD_DIR": "/uploads",
             "NODE_TLS_REJECT_UNAUTHORIZED": "0",
             "MIDDLEWARE_HOST": "middleware",
-            "RUN_WITH_IDM": "true",
+            "TEST_WITH_GRAPH_API": "true",
         },
         "volumes": [{
             "name": "uploads",
