@@ -130,12 +130,12 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry["storage-public-link"] = storagepublic.NewStoragePublicLink
 	s.ServicesRegistry["storage-appprovider"] = appprovider.NewAppProvider
 	s.ServicesRegistry["notifications"] = notifications.NewSutureService
+	s.ServicesRegistry["ocdav"] = ocdav.NewOCDav
 
 	// populate delayed services
 	s.Delayed["storage-sharing"] = sharing.NewSharing
 	s.Delayed["accounts"] = accounts.NewSutureService
 	s.Delayed["proxy"] = proxy.NewSutureService
-	s.Delayed["ocdav"] = ocdav.NewOCDav
 	s.Delayed["idp"] = idp.NewSutureService
 
 	return s, nil

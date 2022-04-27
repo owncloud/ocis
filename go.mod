@@ -274,3 +274,5 @@ require (
 
 // we need to use a fork to make the windows build pass
 replace github.com/pkg/xattr => github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7
+
+replace github.com/go-chi/chi/v5 => github.com/c0rby/chi/v5 v5.0.8-0.20220427135321-96fdd4c2556b
