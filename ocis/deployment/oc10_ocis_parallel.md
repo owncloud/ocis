@@ -154,7 +154,7 @@ For a more simple local ocis setup see [Getting started]({{< ref "../getting-sta
 
 This docker stack can also be run locally. One downside is that Traefik can not obtain valid SSL certificates and therefore will create self-signed ones. This means that your browser will show scary warnings. Another downside is that you can not point DNS entries to your localhost. So you have to add static host entries to your computer.
 
-On Linux and macOS you can add them to your `/etc/hosts` files like this:
+On Linux and macOS you can add them to your `/etc/hosts` file and on Windows to `C:\Windows\System32\Drivers\etc\hosts` file like this:
 
 ```
 127.0.0.1 cloud.owncloud.test
