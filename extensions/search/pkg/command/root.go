@@ -19,6 +19,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 		Server(cfg),
 
 		// interaction with this service
+		Index(cfg),
 
 		// infos about this service
 		Health(cfg),
