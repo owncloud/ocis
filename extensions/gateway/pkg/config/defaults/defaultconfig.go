@@ -53,7 +53,7 @@ func DefaultConfig() *config.Config {
 		StorageSharesEndpoint:     "localhost:9154",
 
 		StorageRegistry: config.StorageRegistry{
-			Driver: "spaces",
+			Driver: "static",
 			JSON:   "",
 		},
 		AppRegistry: config.AppRegistry{

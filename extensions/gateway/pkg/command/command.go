@@ -208,6 +208,16 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 									"provider_id":   "df7debc5-3491-4b7a-8b0d-6888009adb28",
 									"provider_path": "/project",
 								},
+								"/users/[^/]+/Shares": map[string]interface{}{
+									"address":     "127.0.0.1:9154",
+									"provider_id": "a0ca6a90-a365-4782-871e-d44447bbc668",
+									//"provider_path": "/shares", // providerpath is filled in by the regex
+								},
+								"a0ca6a90-a365-4782-871e-d44447bbc668": map[string]interface{}{
+									"address":       "127.0.0.1:9154",
+									"provider_id":   "a0ca6a90-a365-4782-871e-d44447bbc668",
+									"provider_path": "/shares",
+								},
 								"/public": map[string]interface{}{
 									"address":       "localhost:9178",
 									"provider_id":   "7993447f-687f-490d-875c-ac95e89a62a4",
