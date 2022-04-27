@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/owncloud/ocis/extensions/ocs/pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
 func FullDefaultConfig() *config.Config {
@@ -76,11 +75,11 @@ func EnsureDefaults(cfg *config.Config) {
 	}
 
 	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
-		cfg.TokenManager = &shared.TokenManager{
+		cfg.TokenManager = &config.TokenManager{
 			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
 		}
 	} else {
-		cfg.TokenManager = &shared.TokenManager{}
+		cfg.TokenManager = &config.TokenManager{}
 	}
 
 	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {

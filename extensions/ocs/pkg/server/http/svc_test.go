@@ -28,7 +28,6 @@ import (
 	ssvc "github.com/owncloud/ocis/extensions/settings/pkg/service/v0"
 	ocisLog "github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
 	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
@@ -724,7 +723,7 @@ func getService() svc.Service {
 			Root: "/",
 			Addr: "localhost:9110",
 		},
-		TokenManager: &shared.TokenManager{
+		TokenManager: &config.TokenManager{
 			JWTSecret: jwtSecret,
 		},
 		Log: &config.Log{

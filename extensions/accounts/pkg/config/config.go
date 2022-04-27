@@ -19,7 +19,7 @@ type Config struct {
 	HTTP HTTP `yaml:"http,omitempty"`
 	GRPC GRPC `yaml:"grpc,omitempty"`
 
-	TokenManager *shared.TokenManager `yaml:"token_manager,omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
 
 	Asset              Asset       `yaml:"asset,omitempty"`
 	Repo               Repo        `yaml:"repo,omitempty"`
