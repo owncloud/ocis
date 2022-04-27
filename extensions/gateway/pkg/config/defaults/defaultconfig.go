@@ -1,6 +1,8 @@
 package defaults
 
 import (
+	"log"
+
 	"github.com/owncloud/ocis/extensions/gateway/pkg/config"
 )
 
@@ -35,7 +37,6 @@ func DefaultConfig() *config.Config {
 		CommitShareToStorageRef:    true,
 		ShareFolder:                "Shares",
 		DisableHomeCreationOnLogin: true,
-		TransferSecret:             "replace-me-with-a-transfer-secret",
 		TransferExpires:            24 * 60 * 60,
 		HomeMapping:                "",
 		EtagCacheTTL:               0,
@@ -100,6 +101,12 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
+	}
+
+	if cfg.TransferSecret == "" && cfg.Commons != nil && cfg.Commons.TransferSecret != "" {
+		cfg.TransferSecret = cfg.Commons.TransferSecret
+	} else {
+		log.Fatalf("reva transfer secret is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 }
 

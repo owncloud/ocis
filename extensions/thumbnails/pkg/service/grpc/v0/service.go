@@ -48,8 +48,8 @@ func NewService(opts ...Option) decorators.DecoratedService {
 		preprocessorOpts: PreprocessorOpts{
 			TxtFontFileMap: options.Config.Thumbnail.FontMapFile,
 		},
-		dataEndpoint:        options.Config.Thumbnail.DataEndpoint,
-		transferTokenSecret: options.Config.Thumbnail.TransferSecret,
+		dataEndpoint:   options.Config.Thumbnail.DataEndpoint,
+		transferSecret: options.Config.Thumbnail.TransferSecret,
 	}
 
 	return svc
@@ -57,15 +57,15 @@ func NewService(opts ...Option) decorators.DecoratedService {
 
 // Thumbnail implements the GRPC handler.
 type Thumbnail struct {
-	serviceID           string
-	dataEndpoint        string
-	transferTokenSecret string
-	manager             thumbnail.Manager
-	webdavSource        imgsource.Source
-	cs3Source           imgsource.Source
-	logger              log.Logger
-	cs3Client           gateway.GatewayAPIClient
-	preprocessorOpts    PreprocessorOpts
+	serviceID        string
+	dataEndpoint     string
+	transferSecret   string
+	manager          thumbnail.Manager
+	webdavSource     imgsource.Source
+	cs3Source        imgsource.Source
+	logger           log.Logger
+	cs3Client        gateway.GatewayAPIClient
+	preprocessorOpts PreprocessorOpts
 }
 
 type PreprocessorOpts struct {
@@ -113,7 +113,7 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumb
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	transferToken, err := token.SignedString([]byte(g.transferTokenSecret))
+	transferToken, err := token.SignedString([]byte(g.transferSecret))
 	if err != nil {
 		g.logger.Error().
 			Err(err).

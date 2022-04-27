@@ -150,7 +150,7 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	if err != nil {
 		return fmt.Errorf("could not generate random password for machineauthsecret: %s", err)
 	}
-	revaTransferTokenSecret, err := generators.GenerateRandomPassword(passwordLength)
+	revaTransferSecret, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("could not generate random password for machineauthsecret: %s", err)
 	}
@@ -161,7 +161,7 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	// TODO: add missing insecure occurences
 
 	cfg.MachineAuthAPIKey = machineAuthApiKey
-	cfg.TransferSecret = revaTransferTokenSecret
+	cfg.TransferSecret = revaTransferSecret
 	cfg.TokenManager.JWTSecret = tokenManagerJwtSecret
 	//cfg.Commons.TokenManager.JWTSecret = tokenManagerJwtSecret
 	//cfg.Accounts.TokenManager.JWTSecret = tokenManagerJwtSecret

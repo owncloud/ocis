@@ -1,6 +1,8 @@
 package defaults
 
 import (
+	"log"
+
 	"github.com/owncloud/ocis/extensions/frontend/pkg/config"
 )
 
@@ -37,7 +39,6 @@ func DefaultConfig() *config.Config {
 		UploadMaxChunkSize:       1e+8,
 		UploadHTTPMethodOverride: "",
 		DefaultUploadProtocol:    "tus",
-		TransferSecret:           "replace-me-with-a-transfer-secret",
 		Checksums: config.Checksums{
 			SupportedTypes:      []string{"sha1", "md5", "adler32"},
 			PreferredUploadType: "",
@@ -112,6 +113,12 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
+	}
+
+	if cfg.TransferSecret == "" && cfg.Commons != nil && cfg.Commons.TransferSecret != "" {
+		cfg.TransferSecret = cfg.Commons.TransferSecret
+	} else {
+		log.Fatalf("reva transfer secret is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 }
 
