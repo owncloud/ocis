@@ -94,7 +94,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 
 // GetSingleDrive does a lookup of a single space by spaceId
 func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
-	driveID := chi.URLParam(r, "driveID")
+	driveID, _ := url.PathUnescape(chi.URLParam(r, "driveID"))
 	if driveID == "" {
 		err := fmt.Errorf("no valid space id retrieved")
 		g.logger.Err(err)
