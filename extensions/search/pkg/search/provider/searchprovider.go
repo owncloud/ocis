@@ -47,7 +47,7 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 			var owner *user.User
 			switch e := ev.(type) {
 			case events.FileUploaded:
-				ref = e.FileID
+				ref = e.Ref
 				owner = &user.User{
 					Id: e.Executant,
 				}
