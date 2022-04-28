@@ -1,6 +1,8 @@
 package command
 
 import (
+	"fmt"
+
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/parser"
 	"github.com/owncloud/ocis/ocis/pkg/register"
@@ -15,10 +17,13 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage:    "start a fullstack server (runtime and all extensions in supervised mode)",
 		Category: "fullstack",
 		Before: func(c *cli.Context) error {
-			return parser.ParseConfig(cfg)
+			err := parser.ParseConfig(cfg)
+			if err != nil {
+				fmt.Printf("%v", err)
+			}
+			return err
 		},
 		Action: func(c *cli.Context) error {
-
 			r := runtime.New(cfg)
 			return r.Start()
 		},

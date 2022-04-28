@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -28,7 +29,11 @@ func User(cfg *config.Config) *cli.Command {
 		Name:  "users",
 		Usage: "start users service",
 		Before: func(ctx *cli.Context) error {
-			return parser.ParseConfig(cfg)
+			err := parser.ParseConfig(cfg)
+			if err != nil {
+				fmt.Printf("%v", err)
+			}
+			return err
 		},
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -32,7 +33,11 @@ func Gateway(cfg *config.Config) *cli.Command {
 		Name:  "gateway",
 		Usage: "start gateway",
 		Before: func(ctx *cli.Context) error {
-			return parser.ParseConfig(cfg)
+			err := parser.ParseConfig(cfg)
+			if err != nil {
+				fmt.Printf("%v", err)
+			}
+			return err
 		},
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging

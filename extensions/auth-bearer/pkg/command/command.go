@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"path"
 
@@ -26,7 +27,11 @@ func AuthBearer(cfg *config.Config) *cli.Command {
 		Name:  "auth-bearer",
 		Usage: "start authprovider for bearer auth",
 		Before: func(ctx *cli.Context) error {
-			return parser.ParseConfig(cfg)
+			err := parser.ParseConfig(cfg)
+			if err != nil {
+				fmt.Printf("%v", err)
+			}
+			return err
 		},
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
