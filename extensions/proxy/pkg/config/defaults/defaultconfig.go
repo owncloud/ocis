@@ -8,6 +8,13 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 )
 
+func FullDefaultConfig() *config.Config {
+	cfg := DefaultConfig()
+	EnsureDefaults(cfg)
+	Sanitize(cfg)
+	return cfg
+}
+
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
