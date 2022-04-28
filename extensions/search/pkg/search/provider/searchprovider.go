@@ -51,6 +51,21 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 				owner = &user.User{
 					Id: e.Executant,
 				}
+			case events.ItemMoved:
+				ref = e.Ref
+				owner = &user.User{
+					Id: e.Executant,
+				}
+			case events.ItemRestored:
+				ref = e.Ref
+				owner = &user.User{
+					Id: e.Executant,
+				}
+			case events.FileVersionRestored:
+				ref = e.Ref
+				owner = &user.User{
+					Id: e.Executant,
+				}
 			case events.ItemTrashed:
 				err := p.indexClient.Remove(e.Id)
 				if err != nil {

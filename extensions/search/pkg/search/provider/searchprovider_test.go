@@ -137,6 +137,57 @@ var _ = Describe("Searchprovider", func() {
 				return called
 			}).Should(BeTrue())
 		})
+
+		It("indexes items when they are being restored", func() {
+			called := false
+			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
+				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
+			})).Return(nil).Run(func(args mock.Arguments) {
+				called = true
+			})
+			eventsChan <- events.ItemRestored{
+				Ref:       ref,
+				Executant: user.Id,
+			}
+
+			Eventually(func() bool {
+				return called
+			}).Should(BeTrue())
+		})
+
+		It("indexes items when a version has been restored", func() {
+			called := false
+			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
+				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
+			})).Return(nil).Run(func(args mock.Arguments) {
+				called = true
+			})
+			eventsChan <- events.FileVersionRestored{
+				Ref:       ref,
+				Executant: user.Id,
+			}
+
+			Eventually(func() bool {
+				return called
+			}).Should(BeTrue())
+		})
+
+		It("indexes items when they are being moved", func() {
+			called := false
+			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
+				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
+			})).Return(nil).Run(func(args mock.Arguments) {
+				called = true
+			})
+			eventsChan <- events.ItemMoved{
+				Ref:       ref,
+				Executant: user.Id,
+			}
+
+			Eventually(func() bool {
+				return called
+			}).Should(BeTrue())
+		})
 	})
 
 	Describe("IndexSpace", func() {
