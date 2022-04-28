@@ -2,24 +2,44 @@ package parser
 
 import (
 	"errors"
-	"log"
+	"fmt"
 
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
-// ParseConfig loads ocis configuration.
+// ParseConfig loads the ocis configuration and
+// copies applicable parts into the commons part, from
+// where the extensions can copy it into their own config
 func ParseConfig(cfg *config.Config) error {
 	_, err := config.BindSourcesToStructs("ocis", cfg)
 	if err != nil {
 		return err
 	}
 
+	EnsureDefaultsAndCommons(cfg)
+
+	// load all env variables relevant to the config in the current context.
+	if err := envdecode.Decode(cfg); err != nil {
+		// no environment variable set for this config is an expected "error"
+		if !errors.Is(err, envdecode.ErrNoTargetFieldsAreSet) {
+			return err
+		}
+	}
+
+	return Validate(cfg)
+}
+
+// EnsureDefaultsAndCommons copies applicable parts of the oCIS config into the commons part
+// and also ensure that all pointers in the oCIS config (not the extensions configs) are initialized
+func EnsureDefaultsAndCommons(cfg *config.Config) {
+	// ensure the commons part is initialized
 	if cfg.Commons == nil {
 		cfg.Commons = &shared.Commons{}
 	}
 
+	// copy config to the commons part if set
 	if cfg.Log != nil {
 		cfg.Commons.Log = &shared.Log{
 			Level:  cfg.Log.Level,
@@ -32,6 +52,7 @@ func ParseConfig(cfg *config.Config) error {
 		cfg.Log = &shared.Log{}
 	}
 
+	// copy tracing to the commons part if set
 	if cfg.Tracing != nil {
 		cfg.Commons.Tracing = &shared.Tracing{
 			Enabled:   cfg.Tracing.Enabled,
@@ -44,6 +65,7 @@ func ParseConfig(cfg *config.Config) error {
 		cfg.Tracing = &shared.Tracing{}
 	}
 
+	// copy token manager to the commons part if set
 	if cfg.TokenManager != nil {
 		cfg.Commons.TokenManager = cfg.TokenManager
 	} else {
@@ -51,24 +73,29 @@ func ParseConfig(cfg *config.Config) error {
 		cfg.TokenManager = cfg.Commons.TokenManager
 	}
 
+	// copy machine auth api key to the commons part if set
 	if cfg.MachineAuthAPIKey != "" {
 		cfg.Commons.MachineAuthAPIKey = cfg.MachineAuthAPIKey
-	} else {
-		log.Fatalf("machine auth api key is not set up properly, bailing out (ocis)")
 	}
 
+	// copy transfer secret to the commons part if set
 	if cfg.TransferSecret != "" {
 		cfg.Commons.TransferSecret = cfg.TransferSecret
-	} else {
-		log.Fatalf("reva transfer secret not properly set, bailing out (ocis)")
 	}
 
-	// load all env variables relevant to the config in the current context.
-	if err := envdecode.Decode(cfg); err != nil {
-		// no environment variable set for this config is an expected "error"
-		if !errors.Is(err, envdecode.ErrNoTargetFieldsAreSet) {
-			return err
-		}
+}
+
+func Validate(cfg *config.Config) error {
+	if cfg.TokenManager.JWTSecret == "" {
+		return fmt.Errorf("jwt secret is not set up properly, bailing out (ocis)")
+	}
+
+	if cfg.TransferSecret == "" {
+		return fmt.Errorf("transfer secret is not set up properly, bailing out (ocis)")
+	}
+
+	if cfg.MachineAuthAPIKey == "" {
+		return fmt.Errorf("machine auth api key is not set up properly, bailing out (ocis)")
 	}
 
 	return nil
