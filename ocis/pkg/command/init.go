@@ -192,11 +192,6 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 		return fmt.Errorf("could not generate random password for machineauthsecret: %s", err)
 	}
 
-	// TODO: IDP config is missing (LDAP + GROUP provider)
-	// TODO: REVA config is missing (LDAP + GROUP provider)
-	// TODO: graph needs IDM password configured
-	// TODO: add missing insecure occurences
-
 	cfg.MachineAuthAPIKey = machineAuthApiKey
 	cfg.TransferSecret = revaTransferSecret
 	cfg.TokenManager.JWTSecret = tokenManagerJwtSecret
