@@ -1680,6 +1680,7 @@ def ocisServerWithAccounts(storage, accounts_hash_difficulty = 4, volumes = [], 
             "detach": True,
             "environment": environment,
             "commands": [
+                "ocis/bin/ocis init --insecure true",
                 "ocis/bin/ocis server",
             ],
             "volumes": volumes,
@@ -1700,8 +1701,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         user = "0:0"
         environment = {
             "OCIS_URL": "https://ocis-server:9200",
-            "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
-            "STORAGE_HOME_DRIVER": "%s" % (storage),
+            "GATEWAY_GRPC_ADDR": "0.0.0.0:9142", # cs3api-validator needs the cs3api gatway exposed
             "STORAGE_USERS_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
             "STORAGE_USERS_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/users",
@@ -1712,8 +1712,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "IDP_IDENTIFIER_REGISTRATION_CONF": "/drone/src/tests/config/drone/identifier-registration.yml",
             "OCIS_LOG_LEVEL": "error",
             "SETTINGS_DATA_PATH": "/srv/app/tmp/ocis/settings",
-            "OCIS_INSECURE": "true",
             "IDM_CREATE_DEMO_USERS": True,
+            "IDM_ADMIN_PASSWORD": "admin", # override the random admin password from `ocis init`
         }
         wait_for_ocis = {
             "name": "wait-for-ocis-server",
@@ -1782,24 +1782,16 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "SHARING_USER_SQL_HOST": "oc10-db",
             "SHARING_USER_SQL_PORT": 3306,
             "SHARING_USER_SQL_NAME": "owncloud",
-            # ownCloud storage readonly
-            # TODO: conflict with OWNCLOUDSQL -> https://github.com/owncloud/ocis/issues/2303
-            "OCIS_STORAGE_READ_ONLY": "false",
             # General oCIS config
             # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
             "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,nats,ocdav",
             "OCIS_LOG_LEVEL": "info",
             "OCIS_URL": OCIS_URL,
-            "PROXY_TLS": "true",
             "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",
             "OCIS_CONFIG_DIR": "/etc/ocis",
-            # change default secrets
-            "OCIS_JWT_SECRET": "Pive-Fumkiu4",
-            "STORAGE_TRANSFER_SECRET": "replace-me-with-a-transfer-secret",
-            "OCIS_MACHINE_AUTH_API_KEY": "change-me-please",
-            "OCIS_INSECURE": "true",
             "PROXY_ENABLE_BASIC_AUTH": "true",
             "IDM_CREATE_DEMO_USERS": True,
+            "IDM_ADMIN_PASSWORD": "admin", # override the random admin password from `ocis init`
         }
         wait_for_ocis = {
             "name": "wait-for-ocis-server",
@@ -1825,6 +1817,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "environment": environment,
             "user": user,
             "commands": [
+                "ocis/bin/ocis init --insecure true",
                 "ocis/bin/ocis server",
             ],
             "volumes": volumes,
