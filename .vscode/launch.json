@@ -19,9 +19,25 @@
                 "PROXY_ENABLE_BASIC_AUTH": "true",
                 // set insecure options because we don't have valid certificates in dev environments
                 "OCIS_INSECURE": "true",
+                // set some hardcoded secrets
+                "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
+                "STORAGE_TRANSFER_SECRET": "some-ocis-transfer-secret",
+                "OCIS_MACHINE_AUTH_API_KEY": "some-ocis-machine-auth-api-key",
+                // idm ldap
+                "IDM_SVC_PASSWORD": "some-ldap-idm-password",
+                "GRAPH_LDAP_BIND_PASSWORD": "some-ldap-idm-password",
+                // reva ldap
+                "IDM_REVASVC_PASSWORD": "some-ldap-reva-password",
+                "GROUPS_LDAP_BIND_PASSWORD": "some-ldap-reva-password",
+                "USERS_LDAP_BIND_PASSWORD": "some-ldap-reva-password",
+                "AUTH_BASIC_LDAP_BIND_PASSWORD": "some-ldap-reva-password",
+                // idp ldap
+                "IDM_IDPSVC_PASSWORD": "some-ldap-idp-password",
+                "IDP_LDAP_BIND_PASSWORD": "some-ldap-idp-password",
+                // admin user default password
+                "IDM_ADMIN_PASSWORD": "admin",
                 // demo users
-                "ACCOUNTS_DEMO_USERS_AND_GROUPS": "true",
-                "IDM_CREATE_DEMO_USERS": "true"
+                "IDM_CREATE_DEMO_USERS": "true",
                 // OCIS_RUN_EXTENSIONS allows to start a subset of extensions even in the supervised mode
                 //"OCIS_RUN_EXTENSIONS": "settings,storage-metadata,glauth,graph,graph-explorer,idp,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,accounts,proxy,ocdav",
             }

@@ -35,7 +35,7 @@ func ParseConfig(cfg *config.Config) error {
 }
 
 func Validate(cfg *config.Config) error {
-	if cfg.TransferSecret == "" {
+	if cfg.Thumbnail.TransferSecret == "" {
 		return fmt.Errorf("reva transfer secret is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 

@@ -18,7 +18,7 @@ func ParseConfig(cfg *config.Config) error {
 		return err
 	}
 
-	EnsureDefaultsAndCommons(cfg)
+	EnsureDefaults(cfg)
 
 	// load all env variables relevant to the config in the current context.
 	if err := envdecode.Decode(cfg); err != nil {
@@ -28,12 +28,27 @@ func ParseConfig(cfg *config.Config) error {
 		}
 	}
 
+	EnsureCommons(cfg)
+
 	return Validate(cfg)
 }
 
-// EnsureDefaultsAndCommons copies applicable parts of the oCIS config into the commons part
-// and also ensure that all pointers in the oCIS config (not the extensions configs) are initialized
-func EnsureDefaultsAndCommons(cfg *config.Config) {
+// EnsureDefaults, ensures that all pointers in the
+// oCIS config (not the extensions configs) are initialized
+func EnsureDefaults(cfg *config.Config) {
+	if cfg.Tracing == nil {
+		cfg.Tracing = &shared.Tracing{}
+	}
+	if cfg.Log == nil {
+		cfg.Log = &shared.Log{}
+	}
+	if cfg.TokenManager == nil {
+		cfg.TokenManager = &shared.TokenManager{}
+	}
+}
+
+// EnsureCommons copies applicable parts of the oCIS config into the commons part
+func EnsureCommons(cfg *config.Config) {
 	// ensure the commons part is initialized
 	if cfg.Commons == nil {
 		cfg.Commons = &shared.Commons{}
@@ -49,7 +64,6 @@ func EnsureDefaultsAndCommons(cfg *config.Config) {
 		}
 	} else {
 		cfg.Commons.Log = &shared.Log{}
-		cfg.Log = &shared.Log{}
 	}
 
 	// copy tracing to the commons part if set
@@ -62,7 +76,6 @@ func EnsureDefaultsAndCommons(cfg *config.Config) {
 		}
 	} else {
 		cfg.Commons.Tracing = &shared.Tracing{}
-		cfg.Tracing = &shared.Tracing{}
 	}
 
 	// copy token manager to the commons part if set
@@ -70,7 +83,6 @@ func EnsureDefaultsAndCommons(cfg *config.Config) {
 		cfg.Commons.TokenManager = cfg.TokenManager
 	} else {
 		cfg.Commons.TokenManager = &shared.TokenManager{}
-		cfg.TokenManager = cfg.Commons.TokenManager
 	}
 
 	// copy machine auth api key to the commons part if set
