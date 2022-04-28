@@ -12,7 +12,7 @@ type Config struct {
 	Tracing         *Tracing `yaml:"tracing"`
 	Logging         *Logging `yaml:"log"`
 	Debug           Debug    `yaml:"debug"`
-	Supervised      bool     `yaml:"supervised"`
+	Supervised      bool     `yaml:"-"`
 
 	GRPC GRPCConfig `yaml:"grpc"`
 	HTTP HTTPConfig `yaml:"http"`
@@ -27,7 +27,7 @@ type Config struct {
 	Drivers               Drivers `yaml:"drivers"`
 	DataServerURL         string  `yaml:"data_server_url"`
 	TempFolder            string  `yaml:"temp_folder"`
-	DataProviderInsecure  bool    `yaml:"data_providcer_insecure" env:"OCIS_INSECURE;STORAGE_METADATA_DATAPROVIDER_INSECURE"`
+	DataProviderInsecure  bool    `yaml:"data_provider_insecure" env:"OCIS_INSECURE;STORAGE_METADATA_DATAPROVIDER_INSECURE"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;STORAGE_METADATA_TRACING_ENABLED" desc:"Activates tracing."`

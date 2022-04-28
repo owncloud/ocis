@@ -12,7 +12,7 @@ type Config struct {
 	Tracing         *Tracing `yaml:"tracing"`
 	Logging         *Logging `yaml:"log"`
 	Debug           Debug    `yaml:"debug"`
-	Supervised      bool     `yaml:"supervised"`
+	Supervised      bool     `yaml:"-"`
 
 	GRPC GRPCConfig `yaml:"grpc"`
 	HTTP HTTPConfig `yaml:"http"`
