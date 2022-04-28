@@ -1701,7 +1701,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         user = "0:0"
         environment = {
             "OCIS_URL": "https://ocis-server:9200",
-            "GATEWAY_GRPC_ADDR": "0.0.0.0:9142", # cs3api-validator needs the cs3api gatway exposed
+            "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",  # cs3api-validator needs the cs3api gatway exposed
             "STORAGE_USERS_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
             "STORAGE_USERS_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/users",
@@ -1713,7 +1713,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_LOG_LEVEL": "error",
             "SETTINGS_DATA_PATH": "/srv/app/tmp/ocis/settings",
             "IDM_CREATE_DEMO_USERS": True,
-            "IDM_ADMIN_PASSWORD": "admin", # override the random admin password from `ocis init`
+            "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
         }
         wait_for_ocis = {
             "name": "wait-for-ocis-server",
@@ -1791,7 +1791,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_CONFIG_DIR": "/etc/ocis",
             "PROXY_ENABLE_BASIC_AUTH": "true",
             "IDM_CREATE_DEMO_USERS": True,
-            "IDM_ADMIN_PASSWORD": "admin", # override the random admin password from `ocis init`
+            "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
         }
         wait_for_ocis = {
             "name": "wait-for-ocis-server",
