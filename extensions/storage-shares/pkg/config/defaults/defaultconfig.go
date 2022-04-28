@@ -29,7 +29,7 @@ func DefaultConfig() *config.Config {
 			Protocol: "tcp",
 		},
 		Service: config.Service{
-			Name: "storage-metadata",
+			Name: "storage-shares",
 		},
 		GatewayEndpoint:        "127.0.0.1:9142",
 		JWTSecret:              "Pive-Fumkiu4",

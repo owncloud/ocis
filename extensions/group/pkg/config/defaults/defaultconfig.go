@@ -28,7 +28,7 @@ func DefaultConfig() *config.Config {
 			Protocol: "tcp",
 		},
 		Service: config.Service{
-			Name: "user",
+			Name: "group",
 		},
 		GroupMembersCacheExpiration: 5,
 		GatewayEndpoint:             "127.0.0.1:9142",
