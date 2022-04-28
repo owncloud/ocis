@@ -14,28 +14,99 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/ocis-pkg/generators"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	cli "github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v3"
-
-	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/config"
-	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/config"
-	frontend "github.com/owncloud/ocis/extensions/frontend/pkg/config"
-	graph "github.com/owncloud/ocis/extensions/graph/pkg/config"
-	group "github.com/owncloud/ocis/extensions/group/pkg/config"
-	idm "github.com/owncloud/ocis/extensions/idm/pkg/config"
-	idp "github.com/owncloud/ocis/extensions/idp/pkg/config"
-	ocdav "github.com/owncloud/ocis/extensions/ocdav/pkg/config"
-	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config"
-	storagemetadata "github.com/owncloud/ocis/extensions/storage-metadata/pkg/config"
-	storageusers "github.com/owncloud/ocis/extensions/storage-users/pkg/config"
-	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
-	user "github.com/owncloud/ocis/extensions/user/pkg/config"
 )
 
 const configFilename string = "ocis.yaml" // TODO: use also a constant for reading this file
 const passwordLength int = 32
+
+type tokenManager struct {
+	JWT_Secret string
+}
+
+type insecureExtension struct {
+	Insecure bool
+}
+
+type insecureProxyExtension struct {
+	Insecure_backends bool
+}
+
+type dataProviderInsecureSettings struct {
+	Data_provider_insecure bool
+}
+
+type ldapSettings struct {
+	Bind_password string
+}
+type ldapBasedExtension struct {
+	Ldap ldapSettings
+}
+
+type graphExtension struct {
+	Spaces   insecureExtension
+	Identity ldapBasedExtension
+}
+
+type serviceUserPasswordsSettings struct {
+	Admin_password string
+	Idm_password   string
+	Reva_password  string
+	Idp_password   string
+}
+type idmExtension struct {
+	Service_user_Passwords serviceUserPasswordsSettings
+}
+
+type frontendExtension struct {
+	Archiver     insecureExtension
+	App_provider insecureExtension
+}
+
+type authbasicExtension struct {
+	Auth_providers ldapBasedExtension
+}
+
+type authProviderSettings struct {
+	Oidc insecureExtension
+}
+type authbearerExtension struct {
+	Auth_providers authProviderSettings
+}
+
+type userAndGroupExtension struct {
+	Drivers ldapBasedExtension
+}
+
+type thumbnailSettings struct {
+	Webdav_allow_insecure bool
+	Cs3_allow_insecure    bool
+}
+
+type thumbNailExtension struct {
+	Thumbnail thumbnailSettings
+}
+
+type ocisConfig struct {
+	Token_manager        tokenManager
+	Machine_auth_api_key string
+	Transfer_secret      string
+	Graph                graphExtension
+	Idp                  ldapBasedExtension
+	Idm                  idmExtension
+	Proxy                insecureProxyExtension
+	Frontend             frontendExtension
+	Auth_basic           authbasicExtension
+	Auth_bearer          authbearerExtension
+	User                 userAndGroupExtension
+	Group                userAndGroupExtension
+	Storage_metadata     dataProviderInsecureSettings
+	Storage_users        dataProviderInsecureSettings
+	Ocdav                insecureExtension
+	Thumbnails           thumbNailExtension
+}
 
 // InitCommand is the entrypoint for the init command
 func InitCommand(cfg *config.Config) *cli.Command {
@@ -129,69 +200,6 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	if err != nil {
 		return err
 	}
-	cfg := config.Config{
-		TokenManager: &shared.TokenManager{},
-		IDM:          &idm.Config{},
-		AuthBasic: &authbasic.Config{
-			AuthProviders: authbasic.AuthProviders{
-				LDAP: authbasic.LDAPProvider{},
-			},
-		},
-		Group: &group.Config{
-			Drivers: group.Drivers{
-				LDAP: group.LDAPDriver{},
-			},
-		},
-		User: &user.Config{
-			Drivers: user.Drivers{
-				LDAP: user.LDAPDriver{},
-			},
-		},
-		IDP: &idp.Config{},
-	}
-
-	if insecure {
-		cfg.AuthBearer = &authbearer.Config{
-			AuthProviders: authbearer.AuthProviders{
-				OIDC: authbearer.OIDCProvider{
-					Insecure: true,
-				},
-			},
-		}
-		cfg.Frontend = &frontend.Config{
-			AppProvider: frontend.AppProvider{
-				Insecure: true,
-			},
-			Archiver: frontend.Archiver{
-				Insecure: true,
-			},
-		}
-		cfg.Graph = &graph.Config{
-			Spaces: graph.Spaces{
-				Insecure: true,
-			},
-		}
-		cfg.OCDav = &ocdav.Config{
-			Insecure: true,
-		}
-		cfg.Proxy = &proxy.Config{
-			InsecureBackends: true,
-		}
-
-		cfg.StorageMetadata = &storagemetadata.Config{
-			DataProviderInsecure: true,
-		}
-		cfg.StorageUsers = &storageusers.Config{
-			DataProviderInsecure: true,
-		}
-		cfg.Thumbnails = &thumbnails.Config{
-			Thumbnail: thumbnails.Thumbnail{
-				WebdavAllowInsecure: true,
-				CS3AllowInsecure:    true,
-			},
-		}
-
-	}
 
 	idmServicePassword, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
@@ -222,22 +230,93 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 		return fmt.Errorf("could not generate random password for machineauthsecret: %s", err)
 	}
 
-	cfg.MachineAuthAPIKey = machineAuthApiKey
-	cfg.TransferSecret = revaTransferSecret
-	cfg.TokenManager.JWTSecret = tokenManagerJwtSecret
+	cfg := ocisConfig{
+		Token_manager: tokenManager{
+			JWT_Secret: tokenManagerJwtSecret,
+		},
+		Machine_auth_api_key: machineAuthApiKey,
+		Transfer_secret:      revaTransferSecret,
+		Idm: idmExtension{
+			Service_user_Passwords: serviceUserPasswordsSettings{
+				Admin_password: ocisAdminServicePassword,
+				Idp_password:   idpServicePassword,
+				Reva_password:  revaServicePassword,
+				Idm_password:   idmServicePassword,
+			},
+		},
+		Idp: ldapBasedExtension{
+			Ldap: ldapSettings{
+				Bind_password: idpServicePassword,
+			},
+		},
+		Auth_basic: authbasicExtension{
+			Auth_providers: ldapBasedExtension{
+				Ldap: ldapSettings{
+					Bind_password: revaServicePassword,
+				},
+			},
+		},
+		Group: userAndGroupExtension{
+			Drivers: ldapBasedExtension{
+				Ldap: ldapSettings{
+					Bind_password: revaServicePassword,
+				},
+			},
+		},
+		User: userAndGroupExtension{
+			Drivers: ldapBasedExtension{
+				Ldap: ldapSettings{
+					Bind_password: revaServicePassword,
+				},
+			},
+		},
+		Graph: graphExtension{
+			Identity: ldapBasedExtension{
+				Ldap: ldapSettings{
+					Bind_password: idmServicePassword,
+				},
+			},
+		},
+	}
 
-	cfg.IDM.ServiceUserPasswords.Idm = idmServicePassword
-	cfg.Graph.Identity.LDAP.BindPassword = idmServicePassword
-
-	cfg.IDM.ServiceUserPasswords.Idp = idpServicePassword
-	cfg.IDP.Ldap.BindPassword = idpServicePassword
-
-	cfg.IDM.ServiceUserPasswords.Reva = revaServicePassword
-	cfg.AuthBasic.AuthProviders.LDAP.BindPassword = revaServicePassword
-	cfg.Group.Drivers.LDAP.BindPassword = revaServicePassword
-	cfg.User.Drivers.LDAP.BindPassword = revaServicePassword
-
-	cfg.IDM.ServiceUserPasswords.OcisAdmin = ocisAdminServicePassword
+	if insecure {
+		cfg.Auth_bearer = authbearerExtension{
+			Auth_providers: authProviderSettings{
+				Oidc: insecureExtension{
+					Insecure: true,
+				},
+			},
+		}
+		cfg.Frontend = frontendExtension{
+			App_provider: insecureExtension{
+				Insecure: true,
+			},
+			Archiver: insecureExtension{
+				Insecure: true,
+			},
+		}
+		cfg.Graph.Spaces = insecureExtension{
+			Insecure: true,
+		}
+		cfg.Ocdav = insecureExtension{
+			Insecure: true,
+		}
+		cfg.Proxy = insecureProxyExtension{
+			Insecure_backends: true,
+		}
+		cfg.Storage_metadata = dataProviderInsecureSettings{
+			Data_provider_insecure: true,
+		}
+		cfg.Storage_users = dataProviderInsecureSettings{
+			Data_provider_insecure: true,
+		}
+		cfg.Thumbnails = thumbNailExtension{
+			Thumbnail: thumbnailSettings{
+				Webdav_allow_insecure: true,
+				Cs3_allow_insecure:    true,
+			},
+		}
+	}
 
 	yamlOutput, err := yaml.Marshal(cfg)
 	if err != nil {
