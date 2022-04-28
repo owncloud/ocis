@@ -248,7 +248,7 @@ var _ = Describe("Index", func() {
 			count, _ := bleveIndex.DocCount()
 			Expect(count).To(Equal(uint64(1)))
 
-			err = i.Remove(ri)
+			err = i.Remove(ri.Id)
 			Expect(err).ToNot(HaveOccurred())
 			count, _ = bleveIndex.DocCount()
 			Expect(count).To(Equal(uint64(0)))

@@ -107,7 +107,29 @@ var _ = Describe("Searchprovider", func() {
 				called = true
 			})
 			eventsChan <- events.FileUploaded{
-				FileID:    ref,
+				Ref:       ref,
+				Executant: user.Id,
+			}
+
+			Eventually(func() bool {
+				return called
+			}).Should(BeTrue())
+		})
+
+		It("removes an entry from the index when the file has been deleted", func() {
+			called := false
+
+			gwClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+				Status: status.NewNotFound(context.Background(), ""),
+			}, nil)
+			indexClient.On("Remove", mock.MatchedBy(func(id *sprovider.ResourceId) bool {
+				return id.OpaqueId == ri.Id.OpaqueId
+			})).Return(nil).Run(func(args mock.Arguments) {
+				called = true
+			})
+			eventsChan <- events.ItemTrashed{
+				Ref:       ref,
+				Id:        ri.Id,
 				Executant: user.Id,
 			}
 

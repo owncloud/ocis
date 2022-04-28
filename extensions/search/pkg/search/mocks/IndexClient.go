@@ -52,11 +52,11 @@ func (_m *IndexClient) DocCount() (uint64, error) {
 }
 
 // Remove provides a mock function with given fields: ri
-func (_m *IndexClient) Remove(ri *providerv1beta1.ResourceInfo) error {
+func (_m *IndexClient) Remove(ri *providerv1beta1.ResourceId) error {
 	ret := _m.Called(ri)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*providerv1beta1.ResourceInfo) error); ok {
+	if rf, ok := ret.Get(0).(func(*providerv1beta1.ResourceId) error); ok {
 		r0 = rf(ri)
 	} else {
 		r0 = ret.Error(0)

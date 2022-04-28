@@ -51,6 +51,12 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 				owner = &user.User{
 					Id: e.Executant,
 				}
+			case events.ItemTrashed:
+				err := p.indexClient.Remove(e.Id)
+				if err != nil {
+					p.logger.Error().Err(err).Interface("Id", e.Id).Msg("failed to remove item from index")
+				}
+				continue
 			default:
 				// Not sure what to do here. Skip.
 				continue
@@ -70,13 +76,19 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 
 			// Stat changed resource resource
 			statRes, err := gwClient.Stat(ownerCtx, &provider.StatRequest{Ref: ref})
-			if err != nil || statRes.Status.Code != rpc.Code_CODE_OK {
-				p.logger.Error().Err(err).Interface("statRes", statRes).Msg("failed to stat the changed resource")
+			if err != nil {
+				p.logger.Error().Err(err).Msg("failed to stat the changed resource")
 			}
 
-			err = p.indexClient.Add(ref, statRes.Info)
+			switch statRes.Status.Code {
+			case rpc.Code_CODE_OK:
+				err = p.indexClient.Add(ref, statRes.Info)
+			default:
+				p.logger.Error().Interface("statRes", statRes).Msg("failed to stat the changed resource")
+			}
+
 			if err != nil {
-				p.logger.Error().Err(err).Msg("error adding resource to the index")
+				p.logger.Error().Err(err).Msg("error adding updating the resource in the index")
 			} else {
 				p.logDocCount()
 			}

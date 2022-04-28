@@ -77,8 +77,8 @@ func (i *Index) Add(ref *sprovider.Reference, ri *sprovider.ResourceInfo) error 
 }
 
 // Remove removes an entity from the index
-func (i *Index) Remove(ri *sprovider.ResourceInfo) error {
-	return i.bleveIndex.Delete(idToBleveId(ri.Id))
+func (i *Index) Remove(id *sprovider.ResourceId) error {
+	return i.bleveIndex.Delete(idToBleveId(id))
 }
 
 // Search searches the index according to the criteria specified in the given SearchIndexRequest
