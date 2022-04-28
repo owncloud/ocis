@@ -17,6 +17,7 @@ import (
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/extensions/graph/mocks"
+	"github.com/owncloud/ocis/extensions/graph/pkg/config"
 	"github.com/owncloud/ocis/extensions/graph/pkg/config/defaults"
 	service "github.com/owncloud/ocis/extensions/graph/pkg/service/v0"
 	"github.com/owncloud/ocis/extensions/graph/pkg/service/v0/errorcode"
@@ -30,15 +31,19 @@ var _ = Describe("Graph", func() {
 		httpClient      *mocks.HTTPClient
 		eventsPublisher mocks.Publisher
 		ctx             context.Context
+		cfg             *config.Config
 	)
 
 	JustBeforeEach(func() {
 		ctx = context.Background()
+		cfg = defaults.FullDefaultConfig()
+		cfg.TokenManager.JWTSecret = "loremipsum"
+
 		gatewayClient = &mocks.GatewayClient{}
 		httpClient = &mocks.HTTPClient{}
 		eventsPublisher = mocks.Publisher{}
 		svc = service.NewService(
-			service.Config(defaults.FullDefaultConfig()),
+			service.Config(cfg),
 			service.WithGatewayClient(gatewayClient),
 			service.WithHTTPClient(httpClient),
 			service.EventsPublisher(&eventsPublisher),
