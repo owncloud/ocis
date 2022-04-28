@@ -9,25 +9,25 @@ import (
 type Config struct {
 	*shared.Commons `yaml:"-"`
 	Service         Service  `yaml:"-"`
-	Tracing         *Tracing `yaml:"tracing,omitempty"`
-	Logging         *Logging `yaml:"log,omitempty"`
-	Debug           Debug    `yaml:"debug,omitempty"`
-	Supervised      bool     `yaml:"supervised,omitempty"`
+	Tracing         *Tracing `yaml:"tracing"`
+	Logging         *Logging `yaml:"log"`
+	Debug           Debug    `yaml:"debug"`
+	Supervised      bool     `yaml:"supervised"`
 
-	GRPC GRPCConfig `yaml:"grpc,omitempty"`
-	HTTP HTTPConfig `yaml:"http,omitempty"`
+	GRPC GRPCConfig `yaml:"grpc"`
+	HTTP HTTPConfig `yaml:"http"`
 
-	Context context.Context `yaml:"context,omitempty"`
+	Context context.Context `yaml:"context"`
 
-	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
-	Reva         *Reva         `yaml:"reva,omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token,omitempty"`
-	Driver                string  `yaml:"driver,omitempty" env:"STORAGE_METADATA_DRIVER" desc:"The driver which should be used by the service"`
-	Drivers               Drivers `yaml:"drivers,omitempty"`
-	DataServerURL         string  `yaml:"data_server_url,omitempty"`
-	TempFolder            string  `yaml:"temp_folder,omitempty"`
-	DataProviderInsecure  bool    `yaml:"data_providcer_insecure,omitempty" env:"OCIS_INSECURE;STORAGE_METADATA_DATAPROVIDER_INSECURE"`
+	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token"`
+	Driver                string  `yaml:"driver" env:"STORAGE_METADATA_DRIVER" desc:"The driver which should be used by the service"`
+	Drivers               Drivers `yaml:"drivers"`
+	DataServerURL         string  `yaml:"data_server_url"`
+	TempFolder            string  `yaml:"temp_folder"`
+	DataProviderInsecure  bool    `yaml:"data_providcer_insecure" env:"OCIS_INSECURE;STORAGE_METADATA_DATAPROVIDER_INSECURE"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;STORAGE_METADATA_TRACING_ENABLED" desc:"Activates tracing."`

@@ -5,19 +5,19 @@ import "github.com/owncloud/ocis/ocis-pkg/shared"
 type Config struct {
 	*shared.Commons `yaml:"-"`
 	Service         Service  `yaml:"-"`
-	Tracing         *Tracing `yaml:"tracing,omitempty"`
-	Logging         *Logging `yaml:"log,omitempty"`
-	Debug           Debug    `yaml:"debug,omitempty"`
-	Supervised      bool     `yaml:"supervised,omitempty"`
+	Tracing         *Tracing `yaml:"tracing"`
+	Logging         *Logging `yaml:"log"`
+	Debug           Debug    `yaml:"debug"`
+	Supervised      bool     `yaml:"supervised"`
 
-	GRPC GRPCConfig `yaml:"grpc,omitempty"`
+	GRPC GRPCConfig `yaml:"grpc"`
 
-	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
-	Reva         *Reva         `yaml:"reva,omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool          `yaml:"skip_user_groups_in_token,omitempty"`
-	AuthProvider          string        `yaml:"auth_provider,omitempty" env:"AUTH_MACHINE_AUTH_PROVIDER" desc:"The auth provider which should be used by the service"`
-	AuthProviders         AuthProviders `yaml:"auth_providers,omitempty"`
+	SkipUserGroupsInToken bool          `yaml:"skip_user_groups_in_token"`
+	AuthProvider          string        `yaml:"auth_provider" env:"AUTH_MACHINE_AUTH_PROVIDER" desc:"The auth provider which should be used by the service"`
+	AuthProviders         AuthProviders `yaml:"auth_providers"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;AUTH_MACHINE_TRACING_ENABLED" desc:"Activates tracing."`

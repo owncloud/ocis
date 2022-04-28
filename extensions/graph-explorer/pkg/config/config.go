@@ -12,13 +12,13 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	Tracing *Tracing `yaml:"tracing,omitempty"`
-	Log     *Log     `yaml:"log,omitempty"`
-	Debug   Debug    `yaml:"debug,omitempty"`
+	Tracing *Tracing `yaml:"tracing"`
+	Log     *Log     `yaml:"log"`
+	Debug   Debug    `yaml:"debug"`
 
-	HTTP HTTP `yaml:"http,omitempty"`
+	HTTP HTTP `yaml:"http"`
 
-	GraphExplorer GraphExplorer `yaml:"graph_explorer,omitempty"`
+	GraphExplorer GraphExplorer `yaml:"graph_explorer"`
 
 	Context context.Context `yaml:"-"`
 }

@@ -5,19 +5,19 @@ import "github.com/owncloud/ocis/ocis-pkg/shared"
 type Config struct {
 	*shared.Commons `yaml:"-"`
 	Service         Service  `yaml:"-"`
-	Tracing         *Tracing `yaml:"tracing,omitempty"`
-	Logging         *Logging `yaml:"log,omitempty"`
-	Debug           Debug    `yaml:"debug,omitempty"`
-	Supervised      bool     `yaml:"supervised,omitempty"`
+	Tracing         *Tracing `yaml:"tracing"`
+	Logging         *Logging `yaml:"log"`
+	Debug           Debug    `yaml:"debug"`
+	Supervised      bool     `yaml:"supervised"`
 
-	GRPC GRPCConfig `yaml:"grpc,omitempty"`
+	GRPC GRPCConfig `yaml:"grpc"`
 
-	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
-	Reva         *Reva         `yaml:"reva,omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool          `yaml:"skip_user_groups_in_token,omitempty"`
-	AuthProvider          string        `yaml:"auth_provider,omitempty" env:"AUTH_BEARER_AUTH_PROVIDER" desc:"The auth provider which should be used by the service"`
-	AuthProviders         AuthProviders `yaml:"auth_providers,omitempty"`
+	SkipUserGroupsInToken bool          `yaml:"skip_user_groups_in_token"`
+	AuthProvider          string        `yaml:"auth_provider" env:"AUTH_BEARER_AUTH_PROVIDER" desc:"The auth provider which should be used by the service"`
+	AuthProviders         AuthProviders `yaml:"auth_providers"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;AUTH_BEARER_TRACING_ENABLED" desc:"Activates tracing."`
@@ -38,25 +38,25 @@ type Service struct {
 }
 
 type Debug struct {
-	Addr   string `yaml:"addr,omitempty" env:"AUTH_BEARER_DEBUG_ADDR"`
-	Token  string `yaml:"token,omitempty" env:"AUTH_BEARER_DEBUG_TOKEN"`
-	Pprof  bool   `yaml:"pprof,omitempty" env:"AUTH_BEARER_DEBUG_PPROF"`
-	Zpages bool   `yaml:"zpages,omitempty" env:"AUTH_BEARER_DEBUG_ZPAGES"`
+	Addr   string `yaml:"addr" env:"AUTH_BEARER_DEBUG_ADDR"`
+	Token  string `yaml:"token" env:"AUTH_BEARER_DEBUG_TOKEN"`
+	Pprof  bool   `yaml:"pprof" env:"AUTH_BEARER_DEBUG_PPROF"`
+	Zpages bool   `yaml:"zpages" env:"AUTH_BEARER_DEBUG_ZPAGES"`
 }
 
 type GRPCConfig struct {
-	Addr     string `yaml:"addr,omitempty" env:"AUTH_BEARER_GRPC_ADDR" desc:"The address of the grpc service."`
-	Protocol string `yaml:"protocol,omitempty" env:"AUTH_BEARER_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
+	Addr     string `yaml:"addr" env:"AUTH_BEARER_GRPC_ADDR" desc:"The address of the grpc service."`
+	Protocol string `yaml:"protocol" env:"AUTH_BEARER_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
 }
 
 type AuthProviders struct {
-	OIDC OIDCProvider `yaml:"oidc,omitempty"`
+	OIDC OIDCProvider `yaml:"oidc"`
 }
 
 type OIDCProvider struct {
-	Issuer   string `yaml:"issuer,omitempty" env:"OCIS_URL;AUTH_BEARER_OIDC_ISSUER"`
-	Insecure bool   `yaml:"insecure,omitempty" env:"OCIS_INSECURE;AUTH_BEARER_OIDC_INSECURE"`
-	IDClaim  string `yaml:"id_claim,omitempty"`
-	UIDClaim string `yaml:"uid_claim,omitempty"`
-	GIDClaim string `yaml:"gid_claim,omitempty"`
+	Issuer   string `yaml:"issuer" env:"OCIS_URL;AUTH_BEARER_OIDC_ISSUER"`
+	Insecure bool   `yaml:"insecure" env:"OCIS_INSECURE;AUTH_BEARER_OIDC_INSECURE"`
+	IDClaim  string `yaml:"id_claim"`
+	UIDClaim string `yaml:"uid_claim"`
+	GIDClaim string `yaml:"gid_claim"`
 }

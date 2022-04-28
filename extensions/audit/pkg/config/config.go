@@ -12,11 +12,11 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	Log   *Log  `yaml:"log,omitempty"`
-	Debug Debug `yaml:"debug,omitempty"`
+	Log   *Log  `yaml:"log"`
+	Debug Debug `yaml:"debug"`
 
-	Events   Events   `yaml:"events,omitempty"`
-	Auditlog Auditlog `yaml:"auditlog,omitempty"`
+	Events   Events   `yaml:"events"`
+	Auditlog Auditlog `yaml:"auditlog"`
 
 	Context context.Context `yaml:"-"`
 }

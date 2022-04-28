@@ -5,20 +5,20 @@ import "github.com/owncloud/ocis/ocis-pkg/shared"
 type Config struct {
 	*shared.Commons `yaml:"-"`
 	Service         Service  `yaml:"-"`
-	Tracing         *Tracing `yaml:"tracing,omitempty"`
-	Logging         *Logging `yaml:"log,omitempty"`
-	Debug           Debug    `yaml:"debug,omitempty"`
-	Supervised      bool     `yaml:"supervised,omitempty"`
+	Tracing         *Tracing `yaml:"tracing"`
+	Logging         *Logging `yaml:"log"`
+	Debug           Debug    `yaml:"debug"`
+	Supervised      bool     `yaml:"supervised"`
 
-	GRPC GRPCConfig `yaml:"grpc,omitempty"`
+	GRPC GRPCConfig `yaml:"grpc"`
 
-	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
-	Reva         *Reva         `yaml:"reva,omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token,omitempty"`
-	ExternalAddr          string  `yaml:"external_addr,omitempty"`
-	Driver                string  `yaml:"driver,omitempty"`
-	Drivers               Drivers `yaml:"drivers,omitempty"`
+	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token"`
+	ExternalAddr          string  `yaml:"external_addr"`
+	Driver                string  `yaml:"driver"`
+	Drivers               Drivers `yaml:"drivers"`
 }
 
 type Tracing struct {

@@ -12,21 +12,21 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	Tracing *Tracing `yaml:"tracing,omitempty"`
-	Log     *Log     `yaml:"log,omitempty"`
-	Debug   Debug    `yaml:"debug,omitempty"`
+	Tracing *Tracing `yaml:"tracing"`
+	Log     *Log     `yaml:"log"`
+	Debug   Debug    `yaml:"debug"`
 
-	HTTP HTTP `yaml:"http,omitempty"`
-	GRPC GRPC `yaml:"grpc,omitempty"`
+	HTTP HTTP `yaml:"http"`
+	GRPC GRPC `yaml:"grpc"`
 
-	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager"`
 
-	Asset              Asset       `yaml:"asset,omitempty"`
-	Repo               Repo        `yaml:"repo,omitempty"`
-	Index              Index       `yaml:"index,omitempty"`
-	ServiceUser        ServiceUser `yaml:"service_user,omitempty"`
-	HashDifficulty     int         `yaml:"hash_difficulty,omitempty" env:"ACCOUNTS_HASH_DIFFICULTY" desc:"The hash difficulty makes sure that validating a password takes at least a certain amount of time."`
-	DemoUsersAndGroups bool        `yaml:"demo_users_and_groups,omitempty" env:"ACCOUNTS_DEMO_USERS_AND_GROUPS" desc:"If this flag is set the service will setup the demo users and groups."`
+	Asset              Asset       `yaml:"asset"`
+	Repo               Repo        `yaml:"repo"`
+	Index              Index       `yaml:"index"`
+	ServiceUser        ServiceUser `yaml:"service_user"`
+	HashDifficulty     int         `yaml:"hash_difficulty" env:"ACCOUNTS_HASH_DIFFICULTY" desc:"The hash difficulty makes sure that validating a password takes at least a certain amount of time."`
+	DemoUsersAndGroups bool        `yaml:"demo_users_and_groups" env:"ACCOUNTS_DEMO_USERS_AND_GROUPS" desc:"If this flag is set the service will setup the demo users and groups."`
 
 	Context context.Context `yaml:"-"`
 }

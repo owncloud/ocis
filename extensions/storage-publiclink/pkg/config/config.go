@@ -9,21 +9,21 @@ import (
 type Config struct {
 	*shared.Commons `yaml:"-"`
 	Service         Service  `yaml:"-"`
-	Tracing         *Tracing `yaml:"tracing,omitempty"`
-	Logging         *Logging `yaml:"log,omitempty"`
-	Debug           Debug    `yaml:"debug,omitempty"`
-	Supervised      bool     `yaml:"supervised,omitempty"`
+	Tracing         *Tracing `yaml:"tracing"`
+	Logging         *Logging `yaml:"log"`
+	Debug           Debug    `yaml:"debug"`
+	Supervised      bool     `yaml:"supervised"`
 
-	GRPC GRPCConfig `yaml:"grpc,omitempty"`
+	GRPC GRPCConfig `yaml:"grpc"`
 
-	Context context.Context `yaml:"context,omitempty"`
+	Context context.Context `yaml:"context"`
 
-	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
-	Reva         *Reva         `yaml:"reva,omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool            `yaml:"skip_user_groups_in_token,omitempty"`
-	AuthProvider          AuthProvider    `yaml:"auth_provider,omitempty"`
-	StorageProvider       StorageProvider `yaml:"storage_provider,omitempty"`
+	SkipUserGroupsInToken bool            `yaml:"skip_user_groups_in_token"`
+	AuthProvider          AuthProvider    `yaml:"auth_provider"`
+	StorageProvider       StorageProvider `yaml:"storage_provider"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;STORAGE_METADATA_TRACING_ENABLED" desc:"Activates tracing."`

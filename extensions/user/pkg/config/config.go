@@ -5,20 +5,20 @@ import "github.com/owncloud/ocis/ocis-pkg/shared"
 type Config struct {
 	*shared.Commons `yaml:"-"`
 	Service         Service  `yaml:"-"`
-	Tracing         *Tracing `yaml:"tracing,omitempty"`
-	Logging         *Logging `yaml:"log,omitempty"`
-	Debug           Debug    `yaml:"debug,omitempty"`
-	Supervised      bool     `yaml:"supervised,omitempty"`
+	Tracing         *Tracing `yaml:"tracing"`
+	Logging         *Logging `yaml:"log"`
+	Debug           Debug    `yaml:"debug"`
+	Supervised      bool     `yaml:"supervised"`
 
-	GRPC GRPCConfig `yaml:"grpc,omitempty"`
+	GRPC GRPCConfig `yaml:"grpc"`
 
-	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
-	Reva         *Reva         `yaml:"reva,omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token,omitempty"`
-	UsersCacheExpiration  int     `yaml:"users_cache_expiration,omitempty"`
-	Driver                string  `yaml:"driver,omitempty"`
-	Drivers               Drivers `yaml:"drivers,omitempty"`
+	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token"`
+	UsersCacheExpiration  int     `yaml:"users_cache_expiration"`
+	Driver                string  `yaml:"driver"`
+	Drivers               Drivers `yaml:"drivers"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;USERS_TRACING_ENABLED" desc:"Activates tracing."`
@@ -51,34 +51,34 @@ type GRPCConfig struct {
 }
 
 type Drivers struct {
-	JSON        JSONDriver        `yaml:",omitempty"`
-	LDAP        LDAPDriver        `yaml:",omitempty"`
-	OwnCloudSQL OwnCloudSQLDriver `yaml:",omitempty"`
-	REST        RESTProvider      `yaml:",omitempty"`
+	JSON        JSONDriver        `yaml:""`
+	LDAP        LDAPDriver        `yaml:""`
+	OwnCloudSQL OwnCloudSQLDriver `yaml:""`
+	REST        RESTProvider      `yaml:""`
 }
 
 type JSONDriver struct {
 	File string
 }
 type LDAPDriver struct {
-	URI              string          `yaml:",omitempty" env:"LDAP_URI;USERS_LDAP_URI"`
-	CACert           string          `yaml:",omitempty" env:"LDAP_CACERT;USERS_LDAP_CACERT"`
-	Insecure         bool            `yaml:",omitempty" env:"LDAP_INSECURE;USERS_LDAP_INSECURE"`
-	BindDN           string          `yaml:",omitempty" env:"LDAP_BIND_DN;USERS_LDAP_BIND_DN"`
-	BindPassword     string          `yaml:",omitempty" env:"LDAP_BIND_PASSWORD;USERS_LDAP_BIND_PASSWORD"`
-	UserBaseDN       string          `yaml:",omitempty" env:"LDAP_USER_BASE_DN;USERS_LDAP_USER_BASE_DN"`
-	GroupBaseDN      string          `yaml:",omitempty" env:"LDAP_GROUP_BASE_DN;USERS_LDAP_GROUP_BASE_DN"`
-	UserScope        string          `yaml:",omitempty" env:"LDAP_USER_SCOPE;USERS_LDAP_USER_SCOPE"`
-	GroupScope       string          `yaml:",omitempty" env:"LDAP_GROUP_SCOPE;USERS_LDAP_GROUP_SCOPE"`
-	UserFilter       string          `yaml:",omitempty" env:"LDAP_USERFILTER;USERS_LDAP_USERFILTER"`
-	GroupFilter      string          `yaml:",omitempty" env:"LDAP_GROUPFILTER;USERS_LDAP_USERFILTER"`
-	UserObjectClass  string          `yaml:",omitempty" env:"LDAP_USER_OBJECTCLASS;USERS_LDAP_USER_OBJECTCLASS"`
-	GroupObjectClass string          `yaml:",omitempty" env:"LDAP_GROUP_OBJECTCLASS;USERS_LDAP_GROUP_OBJECTCLASS"`
-	LoginAttributes  []string        `yaml:",omitempty" env:"LDAP_LOGIN_ATTRIBUTES;USERS_LDAP_LOGIN_ATTRIBUTES"`
-	IDP              string          `yaml:",omitempty" env:"OCIS_URL;USERS_IDP_URL"` // TODO what is this for?
-	GatewayEndpoint  string          `yaml:",omitempty"`                              // TODO do we need this here?
-	UserSchema       LDAPUserSchema  `yaml:",omitempty"`
-	GroupSchema      LDAPGroupSchema `yaml:",omitempty"`
+	URI              string          `yaml:"" env:"LDAP_URI;USERS_LDAP_URI"`
+	CACert           string          `yaml:"" env:"LDAP_CACERT;USERS_LDAP_CACERT"`
+	Insecure         bool            `yaml:"" env:"LDAP_INSECURE;USERS_LDAP_INSECURE"`
+	BindDN           string          `yaml:"" env:"LDAP_BIND_DN;USERS_LDAP_BIND_DN"`
+	BindPassword     string          `yaml:"" env:"LDAP_BIND_PASSWORD;USERS_LDAP_BIND_PASSWORD"`
+	UserBaseDN       string          `yaml:"" env:"LDAP_USER_BASE_DN;USERS_LDAP_USER_BASE_DN"`
+	GroupBaseDN      string          `yaml:"" env:"LDAP_GROUP_BASE_DN;USERS_LDAP_GROUP_BASE_DN"`
+	UserScope        string          `yaml:"" env:"LDAP_USER_SCOPE;USERS_LDAP_USER_SCOPE"`
+	GroupScope       string          `yaml:"" env:"LDAP_GROUP_SCOPE;USERS_LDAP_GROUP_SCOPE"`
+	UserFilter       string          `yaml:"" env:"LDAP_USERFILTER;USERS_LDAP_USERFILTER"`
+	GroupFilter      string          `yaml:"" env:"LDAP_GROUPFILTER;USERS_LDAP_USERFILTER"`
+	UserObjectClass  string          `yaml:"" env:"LDAP_USER_OBJECTCLASS;USERS_LDAP_USER_OBJECTCLASS"`
+	GroupObjectClass string          `yaml:"" env:"LDAP_GROUP_OBJECTCLASS;USERS_LDAP_GROUP_OBJECTCLASS"`
+	LoginAttributes  []string        `yaml:"" env:"LDAP_LOGIN_ATTRIBUTES;USERS_LDAP_LOGIN_ATTRIBUTES"`
+	IDP              string          `yaml:"" env:"OCIS_URL;USERS_IDP_URL"` // TODO what is this for?
+	GatewayEndpoint  string          `yaml:""`                              // TODO do we need this here?
+	UserSchema       LDAPUserSchema  `yaml:""`
+	GroupSchema      LDAPGroupSchema `yaml:""`
 }
 
 type LDAPUserSchema struct {

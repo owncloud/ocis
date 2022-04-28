@@ -9,21 +9,21 @@ import (
 type Config struct {
 	*shared.Commons `yaml:"-"`
 	Service         Service  `yaml:"-"`
-	Tracing         *Tracing `yaml:"tracing,omitempty"`
-	Logging         *Logging `yaml:"log,omitempty"`
-	Debug           Debug    `yaml:"debug,omitempty"`
-	Supervised      bool     `yaml:"supervised,omitempty"`
+	Tracing         *Tracing `yaml:"tracing"`
+	Logging         *Logging `yaml:"log"`
+	Debug           Debug    `yaml:"debug"`
+	Supervised      bool     `yaml:"supervised"`
 
-	GRPC GRPCConfig `yaml:"grpc,omitempty"`
-	HTTP HTTPConfig `yaml:"http,omitempty"`
+	GRPC GRPCConfig `yaml:"grpc"`
+	HTTP HTTPConfig `yaml:"http"`
 
-	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
-	Reva         *Reva         `yaml:"reva,omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
 
-	Context                context.Context `yaml:"context,omitempty"`
-	SkipUserGroupsInToken  bool            `yaml:"skip_user_groups_in_token,omitempty"`
-	ReadOnly               bool            `yaml:"readonly,omitempty"`
-	SharesProviderEndpoint string          `yaml:"shares_provider_endpoint,omitempty"`
+	Context                context.Context `yaml:"context"`
+	SkipUserGroupsInToken  bool            `yaml:"skip_user_groups_in_token"`
+	ReadOnly               bool            `yaml:"readonly"`
+	SharesProviderEndpoint string          `yaml:"shares_provider_endpoint"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;STORAGE_METADATA_TRACING_ENABLED" desc:"Activates tracing."`

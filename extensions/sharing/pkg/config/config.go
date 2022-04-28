@@ -5,22 +5,22 @@ import "github.com/owncloud/ocis/ocis-pkg/shared"
 type Config struct {
 	*shared.Commons `yaml:"-"`
 	Service         Service  `yaml:"-"`
-	Tracing         *Tracing `yaml:"tracing,omitempty"`
-	Logging         *Logging `yaml:"log,omitempty"`
-	Debug           Debug    `yaml:"debug,omitempty"`
-	Supervised      bool     `yaml:"supervised,omitempty"`
+	Tracing         *Tracing `yaml:"tracing"`
+	Logging         *Logging `yaml:"log"`
+	Debug           Debug    `yaml:"debug"`
+	Supervised      bool     `yaml:"supervised"`
 
-	GRPC GRPCConfig `yaml:"grpc,omitempty"`
+	GRPC GRPCConfig `yaml:"grpc"`
 
-	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
-	Reva         *Reva         `yaml:"reva,omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool                 `yaml:"skip_user_groups_in_token,omitempty"`
-	UserSharingDriver     string               `yaml:"user_sharing_driver,omitempty"`
-	UserSharingDrivers    UserSharingDrivers   `yaml:"user_sharin_drivers,omitempty"`
-	PublicSharingDriver   string               `yaml:"public_sharing_driver,omitempty"`
-	PublicSharingDrivers  PublicSharingDrivers `yaml:"public_sharing_drivers,omitempty"`
-	Events                Events               `yaml:"events,omitempty"`
+	SkipUserGroupsInToken bool                 `yaml:"skip_user_groups_in_token"`
+	UserSharingDriver     string               `yaml:"user_sharing_driver"`
+	UserSharingDrivers    UserSharingDrivers   `yaml:"user_sharin_drivers"`
+	PublicSharingDriver   string               `yaml:"public_sharing_driver"`
+	PublicSharingDrivers  PublicSharingDrivers `yaml:"public_sharing_drivers"`
+	Events                Events               `yaml:"events"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;SHARING_TRACING_ENABLED" desc:"Activates tracing."`

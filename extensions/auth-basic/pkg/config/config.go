@@ -5,19 +5,19 @@ import "github.com/owncloud/ocis/ocis-pkg/shared"
 type Config struct {
 	*shared.Commons `yaml:"-"`
 	Service         Service  `yaml:"-"`
-	Tracing         *Tracing `yaml:"tracing,omitempty"`
-	Logging         *Logging `yaml:"log,omitempty"`
-	Debug           Debug    `yaml:"debug,omitempty"`
-	Supervised      bool     `yaml:"supervised,omitempty"`
+	Tracing         *Tracing `yaml:"tracing"`
+	Logging         *Logging `yaml:"log"`
+	Debug           Debug    `yaml:"debug"`
+	Supervised      bool     `yaml:"supervised"`
 
-	GRPC GRPCConfig `yaml:"grpc,omitempty"`
+	GRPC GRPCConfig `yaml:"grpc"`
 
-	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
-	Reva         *Reva         `yaml:"reva,omitempty"`
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool          `yaml:"skip_user_groups_in_token,omitempty"`
-	AuthProvider          string        `yaml:"auth_provider,omitempty" env:"AUTH_BASIC_AUTH_PROVIDER" desc:"The auth provider which should be used by the service"`
-	AuthProviders         AuthProviders `yaml:"auth_providers,omitempty"`
+	SkipUserGroupsInToken bool          `yaml:"skip_user_groups_in_token"`
+	AuthProvider          string        `yaml:"auth_provider" env:"AUTH_BASIC_AUTH_PROVIDER" desc:"The auth provider which should be used by the service"`
+	AuthProviders         AuthProviders `yaml:"auth_providers"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;AUTH_BASIC_TRACING_ENABLED" desc:"Activates tracing."`
@@ -50,9 +50,9 @@ type GRPCConfig struct {
 }
 
 type AuthProviders struct {
-	JSON        JSONProvider        `yaml:"json,omitempty"`
-	LDAP        LDAPProvider        `yaml:"ldap,omitempty"`
-	OwnCloudSQL OwnCloudSQLProvider `yaml:"owncloud_sql,omitempty"`
+	JSON        JSONProvider        `yaml:"json"`
+	LDAP        LDAPProvider        `yaml:"ldap"`
+	OwnCloudSQL OwnCloudSQLProvider `yaml:"owncloud_sql"`
 }
 
 type JSONProvider struct {
@@ -60,24 +60,24 @@ type JSONProvider struct {
 }
 
 type LDAPProvider struct {
-	URI              string          `yaml:",omitempty" env:"LDAP_URI;AUTH_BASIC_LDAP_URI"`
-	CACert           string          `yaml:",omitempty" env:"LDAP_CACERT;AUTH_BASIC_LDAP_CACERT"`
-	Insecure         bool            `yaml:",omitempty" env:"LDAP_INSECURE;AUTH_BASIC_LDAP_INSECURE"`
-	BindDN           string          `yaml:",omitempty" env:"LDAP_BIND_DN;AUTH_BASIC_LDAP_BIND_DN"`
-	BindPassword     string          `yaml:",omitempty" env:"LDAP_BIND_PASSWORD;AUTH_BASIC_LDAP_BIND_PASSWORD"`
-	UserBaseDN       string          `yaml:",omitempty" env:"LDAP_USER_BASE_DN;AUTH_BASIC_LDAP_USER_BASE_DN"`
-	GroupBaseDN      string          `yaml:",omitempty" env:"LDAP_GROUP_BASE_DN;AUTH_BASIC_LDAP_GROUP_BASE_DN"`
-	UserScope        string          `yaml:",omitempty" env:"LDAP_USER_SCOPE;AUTH_BASIC_LDAP_USER_SCOPE"`
-	GroupScope       string          `yaml:",omitempty" env:"LDAP_GROUP_SCOPE;AUTH_BASIC_LDAP_GROUP_SCOPE"`
-	UserFilter       string          `yaml:",omitempty" env:"LDAP_USERFILTER;AUTH_BASIC_LDAP_USERFILTER"`
-	GroupFilter      string          `yaml:",omitempty" env:"LDAP_GROUPFILTER;AUTH_BASIC_LDAP_USERFILTER"`
-	UserObjectClass  string          `yaml:",omitempty" env:"LDAP_USER_OBJECTCLASS;AUTH_BASIC_LDAP_USER_OBJECTCLASS"`
-	GroupObjectClass string          `yaml:",omitempty" env:"LDAP_GROUP_OBJECTCLASS;AUTH_BASIC_LDAP_GROUP_OBJECTCLASS"`
-	LoginAttributes  []string        `yaml:",omitempty" env:"LDAP_LOGIN_ATTRIBUTES;AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES"`
-	IDP              string          `yaml:",omitempty" env:"OCIS_URL;AUTH_BASIC_IDP_URL"` // TODO what is this for?
-	GatewayEndpoint  string          `yaml:",omitempty"`                                   // TODO do we need this here?
-	UserSchema       LDAPUserSchema  `yaml:",omitempty"`
-	GroupSchema      LDAPGroupSchema `yaml:",omitempty"`
+	URI              string          `yaml:"" env:"LDAP_URI;AUTH_BASIC_LDAP_URI"`
+	CACert           string          `yaml:"" env:"LDAP_CACERT;AUTH_BASIC_LDAP_CACERT"`
+	Insecure         bool            `yaml:"" env:"LDAP_INSECURE;AUTH_BASIC_LDAP_INSECURE"`
+	BindDN           string          `yaml:"" env:"LDAP_BIND_DN;AUTH_BASIC_LDAP_BIND_DN"`
+	BindPassword     string          `yaml:"" env:"LDAP_BIND_PASSWORD;AUTH_BASIC_LDAP_BIND_PASSWORD"`
+	UserBaseDN       string          `yaml:"" env:"LDAP_USER_BASE_DN;AUTH_BASIC_LDAP_USER_BASE_DN"`
+	GroupBaseDN      string          `yaml:"" env:"LDAP_GROUP_BASE_DN;AUTH_BASIC_LDAP_GROUP_BASE_DN"`
+	UserScope        string          `yaml:"" env:"LDAP_USER_SCOPE;AUTH_BASIC_LDAP_USER_SCOPE"`
+	GroupScope       string          `yaml:"" env:"LDAP_GROUP_SCOPE;AUTH_BASIC_LDAP_GROUP_SCOPE"`
+	UserFilter       string          `yaml:"" env:"LDAP_USERFILTER;AUTH_BASIC_LDAP_USERFILTER"`
+	GroupFilter      string          `yaml:"" env:"LDAP_GROUPFILTER;AUTH_BASIC_LDAP_USERFILTER"`
+	UserObjectClass  string          `yaml:"" env:"LDAP_USER_OBJECTCLASS;AUTH_BASIC_LDAP_USER_OBJECTCLASS"`
+	GroupObjectClass string          `yaml:"" env:"LDAP_GROUP_OBJECTCLASS;AUTH_BASIC_LDAP_GROUP_OBJECTCLASS"`
+	LoginAttributes  []string        `yaml:"" env:"LDAP_LOGIN_ATTRIBUTES;AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES"`
+	IDP              string          `yaml:"" env:"OCIS_URL;AUTH_BASIC_IDP_URL"` // TODO what is this for?
+	GatewayEndpoint  string          `yaml:""`                                   // TODO do we need this here?
+	UserSchema       LDAPUserSchema  `yaml:""`
+	GroupSchema      LDAPGroupSchema `yaml:""`
 }
 
 type LDAPUserSchema struct {

@@ -12,19 +12,19 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	Tracing *Tracing `yaml:"tracing,omitempty"`
-	Log     *Log     `yaml:"log,omitempty"`
-	Debug   Debug    `yaml:"debug,omitempty"`
+	Tracing *Tracing `yaml:"tracing"`
+	Log     *Log     `yaml:"log"`
+	Debug   Debug    `yaml:"debug"`
 
-	HTTP HTTP `yaml:"http,omitempty"`
-	GRPC GRPC `yaml:"grpc,omitempty"`
+	HTTP HTTP `yaml:"http"`
+	GRPC GRPC `yaml:"grpc"`
 
-	StoreType string   `yaml:"store_type,omitempty" env:"SETTINGS_STORE_TYPE"`
-	DataPath  string   `yaml:"data_path,omitempty" env:"SETTINGS_DATA_PATH"`
-	Metadata  Metadata `yaml:"metadata_config,omitempty"`
+	StoreType string   `yaml:"store_type" env:"SETTINGS_STORE_TYPE"`
+	DataPath  string   `yaml:"data_path" env:"SETTINGS_DATA_PATH"`
+	Metadata  Metadata `yaml:"metadata_config"`
 
-	Asset        Asset         `yaml:"asset,omitempty"`
-	TokenManager *TokenManager `yaml:"token_manager,omitempty"`
+	Asset        Asset         `yaml:"asset"`
+	TokenManager *TokenManager `yaml:"token_manager"`
 
 	Context context.Context `yaml:"-"`
 }
@@ -36,10 +36,10 @@ type Asset struct {
 
 // Metadata configures the metadata store to use
 type Metadata struct {
-	GatewayAddress string `yaml:"gateway_addr,omitempty" env:"STORAGE_GATEWAY_GRPC_ADDR"`
-	StorageAddress string `yaml:"storage_addr,omitempty" env:"STORAGE_GRPC_ADDR"`
+	GatewayAddress string `yaml:"gateway_addr" env:"STORAGE_GATEWAY_GRPC_ADDR"`
+	StorageAddress string `yaml:"storage_addr" env:"STORAGE_GRPC_ADDR"`
 
-	ServiceUserID     string `yaml:"service_user_id,omitempty" env:"METADATA_SERVICE_USER_UUID"`
-	ServiceUserIDP    string `yaml:"service_user_idp,omitempty" env:"OCIS_URL;METADATA_SERVICE_USER_IDP"`
-	MachineAuthAPIKey string `yaml:"machine_auth_api_key,omitempty" env:"OCIS_MACHINE_AUTH_API_KEY"`
+	ServiceUserID     string `yaml:"service_user_id" env:"METADATA_SERVICE_USER_UUID"`
+	ServiceUserIDP    string `yaml:"service_user_idp" env:"OCIS_URL;METADATA_SERVICE_USER_IDP"`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY"`
 }

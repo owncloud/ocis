@@ -12,10 +12,10 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	Log   *Log  `yaml:"log,omitempty"`
-	Debug Debug `yaml:"debug,omitempty"`
+	Log   *Log  `yaml:"log"`
+	Debug Debug `yaml:"debug"`
 
-	Notifications Notifications `yaml:"notifications,omitempty"`
+	Notifications Notifications `yaml:"notifications"`
 
 	Context context.Context `yaml:"-"`
 }
@@ -23,9 +23,9 @@ type Config struct {
 // Notifications definces the config options for the notifications service.
 type Notifications struct {
 	*shared.Commons   `yaml:"-"`
-	SMTP              SMTP   `yaml:"SMTP,omitempty"`
-	Events            Events `yaml:"events,omitempty"`
-	RevaGateway       string `yaml:"reva_gateway,omitempty" env:"REVA_GATEWAY;NOTIFICATIONS_REVA_GATEWAY"`
+	SMTP              SMTP   `yaml:"SMTP"`
+	Events            Events `yaml:"events"`
+	RevaGateway       string `yaml:"reva_gateway" env:"REVA_GATEWAY;NOTIFICATIONS_REVA_GATEWAY"`
 	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;NOTIFICATIONS_MACHINE_AUTH_API_KEY"`
 }
 
