@@ -1,0 +1,48 @@
+[caption=]
+.Environment variables for the appprovider extension
+[width="100%",cols="~,~,~,~,~",options="header"]
+|===
+| Name
+| Type
+| Default Value
+| Since Version
+| Description
+
+| `APP_PROVIDER_DEBUG_ADDR`
+| string
+| 127.0.0.1:9165
+| +1.20.0
+|
+
+| `APP_PROVIDER_DEBUG_TOKEN`
+| string
+|
+| +1.20.0
+|
+
+| `APP_PROVIDER_DEBUG_PPROF`
+| bool
+| false
+| +1.20.0
+|
+
+| `APP_PROVIDER_DEBUG_ZPAGES`
+| bool
+| false
+| +1.20.0
+|
+
+| `APP_PROVIDER_GRPC_ADDR`
+| string
+| 127.0.0.1:9164
+| +1.20.0
+| The address of the grpc service.
+
+| `APP_PROVIDER_GRPC_PROTOCOL`
+| string
+| tcp
+| +1.20.0
+| The transport protocol of the grpc service.
+|===
+
+Since Version: `+` added, `-` deprecated

@@ -1,0 +1,48 @@
+[caption=]
+.Environment variables for the store_configvars extension
+[width="100%",cols="~,~,~,~,~",options="header"]
+|===
+| Name
+| Type
+| Default Value
+| Since Version
+| Description
+
+| `STORE_DEBUG_ADDR`
+| string
+| 127.0.0.1:9464
+| +1.20.0
+|
+
+| `STORE_DEBUG_TOKEN`
+| string
+|
+| +1.20.0
+|
+
+| `STORE_DEBUG_PPROF`
+| bool
+| false
+| +1.20.0
+|
+
+| `STORE_DEBUG_ZPAGES`
+| bool
+| false
+| +1.20.0
+|
+
+| `STORE_GRPC_ADDR`
+| string
+| 127.0.0.1:9460
+| +1.20.0
+|
+
+| `STORE_DATA_PATH`
+| string
+| ~/.ocis/store
+| +1.20.0
+|
+|===
+
+Since Version: `+` added, `-` deprecated

@@ -1,0 +1,230 @@
+[caption=]
+.Environment variables for the group extension
+[width="100%",cols="~,~,~,~,~",options="header"]
+|===
+| Name
+| Type
+| Default Value
+| Since Version
+| Description
+
+| GROUPS_DEBUG_ADDR
+| string
+| 127.0.0.1:9161
+| +1.120.0
+|
+
+| `GROUPS_DEBUG_TOKEN`
+| string
+|
+| +1.120.0
+|
+
+| `GROUPS_DEBUG_PPROF`
+| bool
+| false
+| +1.120.0
+|
+
+| `GROUPS_DEBUG_ZPAGES`
+| bool
+| false
+| +1.120.0
+|
+
+| `GROUPS_GRPC_ADDR`
+| string
+| 127.0.0.1:9160
+| +1.120.0
+| The address of the grpc service.
+
+| `GROUPS_GRPC_PROTOCOL`
+| string
+| tcp
+| +1.120.0
+| The transport protocol of the grpc service.
+
+| `LDAP_URI` +
+`GROUPS_LDAP_URI`
+| string
+| ldaps://localhost:9235
+| +1.120.0
+|
+
+| `LDAP_CACERT` +
+`GROUPS_LDAP_CACERT`
+| string
+| ~/.ocis/idm/ldap.crt
+| +1.120.0
+|
+
+| `LDAP_INSECURE` +
+`GROUPS_LDAP_INSECURE`
+| bool
+| false
+| +1.120.0
+|
+
+| `LDAP_BIND_DN` +
+`GROUPS_LDAP_BIND_DN`
+| string
+| uid=reva,ou=sysusers,o=libregraph-idm
+| +1.120.0
+|
+
+| `LDAP_BIND_PASSWORD` +
+`GROUPS_LDAP_BIND_PASSWORD`
+| string
+| reva
+| +1.120.0
+|
+
+| `LDAP_USER_BASE_DN` +
+`GROUPS_LDAP_USER_BASE_DN`
+| string
+| ou=users,o=libregraph-idm
+| +1.120.0
+|
+
+| `LDAP_GROUP_BASE_DN` +
+`GROUPS_LDAP_GROUP_BASE_DN`
+| string
+| ou=groups,o=libregraph-idm
+| +1.120.0
+|
+
+| `LDAP_USER_SCOPE` +
+`GROUPS_LDAP_USER_SCOPE`
+| string
+| sub
+| +1.120.0
+|
+
+| `LDAP_GROUP_SCOPE` +
+`GROUPS_LDAP_GROUP_SCOPE`
+| string
+| sub
+| +1.120.0
+|
+
+| `LDAP_USERFILTER` +
+`GROUPS_LDAP_USERFILTER`
+| string
+|
+| +1.120.0
+|
+
+| `LDAP_GROUPFILTER` +
+`GROUPS_LDAP_USERFILTER`
+| string
+|
+| +1.120.0
+|
+
+| `LDAP_USER_OBJECTCLASS` +
+`GROUPS_LDAP_USER_OBJECTCLASS`
+| string
+| inetOrgPerson
+| +1.120.0
+|
+
+| `LDAP_GROUP_OBJECTCLASS` +
+`GROUPS_LDAP_GROUP_OBJECTCLASS`
+| string
+| groupOfNames
+| +1.120.0
+|
+
+| `LDAP_LOGIN_ATTRIBUTES` +
+`GROUPS_LDAP_LOGIN_ATTRIBUTES`
+|
+| [uid mail]
+| +1.120.0
+|
+
+| `OCIS_URL` +
+`GROUPS_IDP_URL`
+| string
+| \https://localhost:9200
+| +1.120.0
+|
+
+| `LDAP_USER_SCHEMA_ID` +
+`GROUPS_LDAP_USER_SCHEMA_ID`
+| string
+| ownclouduuid
+| +1.120.0
+|
+
+| `LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
+`GROUPS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
+| bool
+| false
+| +1.120.0
+|
+
+| `LDAP_USER_SCHEMA_MAIL` +
+`GROUPS_LDAP_USER_SCHEMA_MAIL`
+| string
+| mail
+| +1.120.0
+|
+
+| `LDAP_USER_SCHEMA_DISPLAYNAME` +
+`GROUPS_LDAP_USER_SCHEMA_DISPLAYNAME`
+| string
+| displayname
+| +1.120.0
+|
+
+| `LDAP_USER_SCHEMA_USERNAME` +
+`GROUPS_LDAP_USER_SCHEMA_USERNAME`
+| string
+| uid
+| +1.120.0
+|
+
+| `LDAP_GROUP_SCHEMA_ID` +
+`GROUPS_LDAP_GROUP_SCHEMA_ID`
+| string
+| ownclouduuid
+| +1.120.0
+|
+
+| `LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING` +
+`GROUPS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
+| bool
+| false
+| +1.120.0
+|
+
+| `LDAP_GROUP_SCHEMA_MAIL` +
+`GROUPS_LDAP_GROUP_SCHEMA_MAIL`
+| string
+| mail
+| +1.120.0
+|
+
+| `LDAP_GROUP_SCHEMA_DISPLAYNAME` +
+`GROUPS_LDAP_GROUP_SCHEMA_DISPLAYNAME`
+| string
+| cn
+| +1.120.0
+|
+
+| `LDAP_GROUP_SCHEMA_GROUPNAME` +
+`GROUPS_LDAP_GROUP_SCHEMA_GROUPNAME`
+| string
+| cn
+| +1.120.0
+|
+
+| `LDAP_GROUP_SCHEMA_MEMBER` +
+`GROUPS_LDAP_GROUP_SCHEMA_MEMBER`
+| string
+| member
+| +1.120.0
+|
+|===
+
+Since Version: `+` added, `-` deprecated

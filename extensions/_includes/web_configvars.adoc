@@ -1,0 +1,129 @@
+[caption=]
+.Environment variables for the web extension
+[width="100%",cols="~,~,~,~,~",options="header"]
+|===
+| Name
+| Type
+| Default Value
+| Since Version
+| Description
+
+| `WEB_DEBUG_ADDR`
+| string
+| 127.0.0.1:9104
+| +1.20.0
+|
+
+| `WEB_DEBUG_TOKEN`
+| string
+|
+| +1.20.0
+|
+
+| `WEB_DEBUG_PPROF`
+| bool
+| false
+| +1.20.0
+|
+
+| `WEB_DEBUG_ZPAGES`
+| bool
+| false
+| +1.20.0
+|
+
+| `WEB_HTTP_ADDR`
+| string
+| 127.0.0.1:9100
+| +1.20.0
+|
+
+| `WEB_HTTP_ROOT`
+| string
+| /
+| +1.20.0
+|
+
+| `WEB_CACHE_TTL`
+| int
+| 604800
+| +1.20.0
+|
+
+| `WEB_ASSET_PATH`
+| string
+|
+| +1.20.0
+|
+
+| `WEB_UI_CONFIG`
+| string
+|
+| +1.20.0
+|
+
+| `WEB_UI_PATH`
+| string
+|
+| +1.20.0
+|
+
+| `OCIS_URL` +
+`WEB_UI_THEME_SERVER`
+| string
+| \https://localhost:9200
+| +1.20.0
+|
+
+| `WEB_UI_THEME_PATH`
+| string
+| /themes/owncloud/theme.json
+| +1.20.0
+|
+
+| `OCIS_URL` +
+`WEB_UI_CONFIG_SERVER`
+| string
+| \https://localhost:9200
+| +1.20.0
+|
+
+| `WEB_UI_CONFIG_VERSION`
+| string
+| 0.1.0
+| +1.20.0
+|
+
+| `WEB_OIDC_METADATA_URL`
+| string
+|
+| +1.20.0
+|
+
+| `OCIS_URL` +
+`WEB_OIDC_AUTHORITY`
+| string
+| \https://localhost:9200
+| +1.20.0
+|
+
+| `WEB_OIDC_CLIENT_ID`
+| string
+| web
+| +1.20.0
+|
+
+| `WEB_OIDC_RESPONSE_TYPE`
+| string
+| code
+| +1.20.0
+|
+
+| `WEB_OIDC_SCOPE`
+| string
+| openid profile email
+| +1.20.0
+|
+|===
+
+Since Version: `+` added, `-` deprecated

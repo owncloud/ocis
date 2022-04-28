@@ -1,0 +1,91 @@
+[caption=]
+.Environment variables for the idm extension
+[width="100%",cols="~,~,~,~,~",options="header"]
+|===
+| Name
+| Type
+| Default Value
+| Since Version
+| Description
+
+| `IDM_DEBUG_ADDR`
+| string
+|
+| +1.20.0
+|
+
+| `IDM_DEBUG_TOKEN`
+| string
+|
+| +1.20.0
+|
+
+| `IDM_DEBUG_PPROF`
+| bool
+| false
+| +1.20.0
+|
+
+| `IDM_DEBUG_ZPAGES`
+| bool
+| false
+| +1.20.0
+|
+
+| `IDM_LDAPS_ADDR`
+| string
+| 127.0.0.1:9235
+| +1.20.0
+| Listen address for the ldaps listener (ip-addr:port)
+
+| `IDM_LDAPS_CERT`
+| string
+| ~/.ocis/idm/ldap.crt
+| +1.20.0
+| File name of the TLS server certificate for the ldaps listener
+
+| `IDM_LDAPS_KEY`
+| string
+| ~/.ocis/idm/ldap.key 
+| +1.20.0
+| File name for the TLS certificate key for the server certificate
+
+| `IDM_DATABASE_PATH`
+| string
+| ~/.ocis/idm/ocis.boltdb
+| +1.20.0
+| Full path to the idm backend database
+
+| `IDM_CREATE_DEMO_USERS` +
+`ACCOUNTS_DEMO_USERS_AND_GROUPS`
+| bool
+| false
+| +1.20.0
+| Flag to enabe/disable the creation of the demo users
+
+| `IDM_ADMIN_PASSWORD`
+| string
+| admin
+| +1.20.0
+| Password to set for the ocis "admin" user. Either cleartext or an argon2id hash
+
+| `IDM_SVC_PASSWORD`
+| string
+| idm
+|
+| Password to set for the "idm" service user. Either cleartext or an argon2id hash
+
+| `IDM_REVASVC_PASSWORD`
+| string
+| reva
+| +1.20.0
+| Password to set for the "reva" service user. Either cleartext or an argon2id hash
+
+| `IDM_IDPSVC_PASSWORD`
+| string
+| idp
+| +1.20.0
+| Password to set for the "idp" service user. Either cleartext or an argon2id hash
+|===
+
+Since Version: `+` added, `-` deprecated
