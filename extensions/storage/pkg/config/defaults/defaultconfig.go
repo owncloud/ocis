@@ -1,7 +1,6 @@
 package defaults
 
 import (
-	"log"
 	"os"
 	"path"
 
@@ -21,10 +20,8 @@ const (
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
-
 	EnsureDefaults(cfg)
 	Sanitize(cfg)
-
 	return cfg
 }
 
@@ -458,11 +455,9 @@ func DefaultConfig() *config.Config {
 }
 
 func EnsureDefaults(cfg *config.Config) {
-	if cfg.TransferSecret == "" && cfg.Commons != nil && cfg.Commons.TransferSecret != "" {
-		cfg.TransferSecret = cfg.Commons.TransferSecret
-	} else {
-		log.Fatal("reva transfer secret is not set up properly, bailing out (storage)")
-	}
+	//if cfg.TransferSecret == "" && cfg.Commons != nil && cfg.Commons.TransferSecret != "" {
+	//	cfg.TransferSecret = cfg.Commons.TransferSecret
+	//}
 }
 
 func Sanitize(cfg *config.Config) {

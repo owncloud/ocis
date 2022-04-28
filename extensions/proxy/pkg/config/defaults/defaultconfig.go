@@ -1,7 +1,6 @@
 package defaults
 
 import (
-	"log"
 	"path"
 	"strings"
 
@@ -188,8 +187,6 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
 		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
-	} else if cfg.MachineAuthAPIKey == "" {
-		log.Fatalf("machine auth api key is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 
 	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {

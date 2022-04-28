@@ -2,6 +2,7 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/owncloud/ocis/extensions/sharing/pkg/config"
 	"github.com/owncloud/ocis/extensions/sharing/pkg/config/defaults"
@@ -28,6 +29,18 @@ func ParseConfig(cfg *config.Config) error {
 	}
 
 	defaults.Sanitize(cfg)
+
+	return Validate(cfg)
+}
+
+func Validate(cfg *config.Config) error {
+	if cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey == "" {
+		return fmt.Errorf("machine auth api key for the cs3 public sharing driver is not set up properly, bailing out (%s)", cfg.Service.Name)
+	}
+
+	if cfg.UserSharingDrivers.CS3.MachineAuthAPIKey == "" {
+		return fmt.Errorf("machine auth api key for the cs3 user sharing driver is not set up properly, bailing out (%s)", cfg.Service.Name)
+	}
 
 	return nil
 }

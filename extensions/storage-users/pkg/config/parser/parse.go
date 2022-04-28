@@ -29,5 +29,9 @@ func ParseConfig(cfg *config.Config) error {
 
 	defaults.Sanitize(cfg)
 
+	return Validate(cfg)
+}
+
+func Validate(cfg *config.Config) error {
 	return nil
 }

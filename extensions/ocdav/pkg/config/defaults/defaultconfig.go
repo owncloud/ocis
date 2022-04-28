@@ -6,9 +6,8 @@ import (
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
-
 	EnsureDefaults(cfg)
-
+	Sanitize(cfg)
 	return cfg
 }
 

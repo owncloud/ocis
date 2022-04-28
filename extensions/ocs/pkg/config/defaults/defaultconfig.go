@@ -1,7 +1,6 @@
 package defaults
 
 import (
-	"log"
 	"strings"
 
 	"github.com/owncloud/ocis/extensions/ocs/pkg/config"
@@ -9,10 +8,8 @@ import (
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
-
 	EnsureDefaults(cfg)
 	Sanitize(cfg)
-
 	return cfg
 }
 
@@ -91,8 +88,6 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
 		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
-	} else if cfg.MachineAuthAPIKey == "" {
-		log.Fatalf("machine auth api key is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 }
 

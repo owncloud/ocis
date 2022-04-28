@@ -1,16 +1,13 @@
 package defaults
 
 import (
-	"log"
-
 	"github.com/owncloud/ocis/extensions/frontend/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
-
 	EnsureDefaults(cfg)
-
+	Sanitize(cfg)
 	return cfg
 }
 
@@ -114,8 +111,6 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.TransferSecret == "" && cfg.Commons != nil && cfg.Commons.TransferSecret != "" {
 		cfg.TransferSecret = cfg.Commons.TransferSecret
-	} else if cfg.TransferSecret == "" {
-		log.Fatalf("reva transfer secret is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 }
 

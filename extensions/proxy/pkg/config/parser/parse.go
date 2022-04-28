@@ -2,6 +2,7 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/owncloud/ocis/extensions/proxy/pkg/config"
 	"github.com/owncloud/ocis/extensions/proxy/pkg/config/defaults"
@@ -27,6 +28,14 @@ func ParseConfig(cfg *config.Config) error {
 	}
 
 	defaults.Sanitize(cfg)
+
+	return Validate(cfg)
+}
+
+func Validate(cfg *config.Config) error {
+	if cfg.MachineAuthAPIKey == "" {
+		return fmt.Errorf("machine auth api key is not set up properly, bailing out (%s)", cfg.Service.Name)
+	}
 
 	return nil
 }

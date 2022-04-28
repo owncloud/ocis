@@ -1,17 +1,13 @@
 package defaults
 
 import (
-	"log"
-
 	"github.com/owncloud/ocis/extensions/notifications/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
-
 	EnsureDefaults(cfg)
 	Sanitize(cfg)
-
 	return cfg
 }
 
@@ -55,8 +51,6 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.Notifications.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
 		cfg.Notifications.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
-	} else if cfg.Notifications.MachineAuthAPIKey == "" {
-		log.Fatalf("machine auth api key is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 }
 

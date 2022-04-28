@@ -1,7 +1,6 @@
 package defaults
 
 import (
-	"log"
 	"path/filepath"
 
 	"github.com/owncloud/ocis/extensions/sharing/pkg/config"
@@ -10,9 +9,8 @@ import (
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
-
 	EnsureDefaults(cfg)
-
+	Sanitize(cfg)
 	return cfg
 }
 
@@ -125,14 +123,10 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.UserSharingDrivers.CS3.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
 		cfg.UserSharingDrivers.CS3.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
-	} else if cfg.UserSharingDrivers.CS3.MachineAuthAPIKey == "" {
-		log.Fatalf("machine auth api key for the cs3 user sharing driver is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 
 	if cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
 		cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
-	} else if cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey == "" {
-		log.Fatalf("machine auth api key for the cs3 public sharing driver is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 }
 

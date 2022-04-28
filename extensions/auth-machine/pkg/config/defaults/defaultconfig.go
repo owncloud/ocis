@@ -1,16 +1,13 @@
 package defaults
 
 import (
-	"log"
-
 	"github.com/owncloud/ocis/extensions/auth-machine/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
-
 	EnsureDefaults(cfg)
-
+	Sanitize(cfg)
 	return cfg
 }
 
@@ -78,8 +75,6 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.AuthProviders.Machine.APIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
 		cfg.AuthProviders.Machine.APIKey = cfg.Commons.MachineAuthAPIKey
-	} else if cfg.AuthProviders.Machine.APIKey == "" {
-		log.Fatalf("machine auth api key is not set up properly, bailing out (%s)", cfg.Service.Name)
 	}
 }
 

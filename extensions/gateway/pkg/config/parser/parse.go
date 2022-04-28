@@ -2,6 +2,7 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/owncloud/ocis/extensions/gateway/pkg/config"
 	"github.com/owncloud/ocis/extensions/gateway/pkg/config/defaults"
@@ -28,6 +29,14 @@ func ParseConfig(cfg *config.Config) error {
 	}
 
 	defaults.Sanitize(cfg)
+
+	return Validate(cfg)
+}
+
+func Validate(cfg *config.Config) error {
+	if cfg.TransferSecret == "" {
+		return fmt.Errorf("reva transfer secret is not set up properly, bailing out (%s)", cfg.Service.Name)
+	}
 
 	return nil
 }
