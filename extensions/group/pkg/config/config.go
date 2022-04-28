@@ -51,34 +51,34 @@ type GRPCConfig struct {
 }
 
 type Drivers struct {
-	JSON        JSONDriver        `yaml:""`
-	LDAP        LDAPDriver        `yaml:""`
-	OwnCloudSQL OwnCloudSQLDriver `yaml:""`
-	REST        RESTProvider      `yaml:""`
+	JSON        JSONDriver
+	LDAP        LDAPDriver
+	OwnCloudSQL OwnCloudSQLDriver
+	REST        RESTProvider
 }
 
 type JSONDriver struct {
 	File string
 }
 type LDAPDriver struct {
-	URI              string          `yaml:"" env:"LDAP_URI;GROUPS_LDAP_URI"`
-	CACert           string          `yaml:"" env:"LDAP_CACERT;GROUPS_LDAP_CACERT"`
-	Insecure         bool            `yaml:"" env:"LDAP_INSECURE;GROUPS_LDAP_INSECURE"`
-	BindDN           string          `yaml:"" env:"LDAP_BIND_DN;GROUPS_LDAP_BIND_DN"`
-	BindPassword     string          `yaml:"" env:"LDAP_BIND_PASSWORD;GROUPS_LDAP_BIND_PASSWORD"`
-	UserBaseDN       string          `yaml:"" env:"LDAP_USER_BASE_DN;GROUPS_LDAP_USER_BASE_DN"`
-	GroupBaseDN      string          `yaml:"" env:"LDAP_GROUP_BASE_DN;GROUPS_LDAP_GROUP_BASE_DN"`
-	UserScope        string          `yaml:"" env:"LDAP_USER_SCOPE;GROUPS_LDAP_USER_SCOPE"`
-	GroupScope       string          `yaml:"" env:"LDAP_GROUP_SCOPE;GROUPS_LDAP_GROUP_SCOPE"`
-	UserFilter       string          `yaml:"" env:"LDAP_USERFILTER;GROUPS_LDAP_USERFILTER"`
-	GroupFilter      string          `yaml:"" env:"LDAP_GROUPFILTER;GROUPS_LDAP_USERFILTER"`
-	UserObjectClass  string          `yaml:"" env:"LDAP_USER_OBJECTCLASS;GROUPS_LDAP_USER_OBJECTCLASS"`
-	GroupObjectClass string          `yaml:"" env:"LDAP_GROUP_OBJECTCLASS;GROUPS_LDAP_GROUP_OBJECTCLASS"`
-	LoginAttributes  []string        `yaml:"" env:"LDAP_LOGIN_ATTRIBUTES;GROUPS_LDAP_LOGIN_ATTRIBUTES"`
-	IDP              string          `yaml:"" env:"OCIS_URL;GROUPS_IDP_URL"` // TODO what is this for?
-	GatewayEndpoint  string          `yaml:""`                               // TODO do we need this here?
-	UserSchema       LDAPUserSchema  `yaml:""`
-	GroupSchema      LDAPGroupSchema `yaml:""`
+	URI              string   `env:"LDAP_URI;GROUPS_LDAP_URI"`
+	CACert           string   `env:"LDAP_CACERT;GROUPS_LDAP_CACERT"`
+	Insecure         bool     `env:"LDAP_INSECURE;GROUPS_LDAP_INSECURE"`
+	BindDN           string   `env:"LDAP_BIND_DN;GROUPS_LDAP_BIND_DN"`
+	BindPassword     string   `env:"LDAP_BIND_PASSWORD;GROUPS_LDAP_BIND_PASSWORD"`
+	UserBaseDN       string   `env:"LDAP_USER_BASE_DN;GROUPS_LDAP_USER_BASE_DN"`
+	GroupBaseDN      string   `env:"LDAP_GROUP_BASE_DN;GROUPS_LDAP_GROUP_BASE_DN"`
+	UserScope        string   `env:"LDAP_USER_SCOPE;GROUPS_LDAP_USER_SCOPE"`
+	GroupScope       string   `env:"LDAP_GROUP_SCOPE;GROUPS_LDAP_GROUP_SCOPE"`
+	UserFilter       string   `env:"LDAP_USERFILTER;GROUPS_LDAP_USERFILTER"`
+	GroupFilter      string   `env:"LDAP_GROUPFILTER;GROUPS_LDAP_USERFILTER"`
+	UserObjectClass  string   `env:"LDAP_USER_OBJECTCLASS;GROUPS_LDAP_USER_OBJECTCLASS"`
+	GroupObjectClass string   `env:"LDAP_GROUP_OBJECTCLASS;GROUPS_LDAP_GROUP_OBJECTCLASS"`
+	LoginAttributes  []string `env:"LDAP_LOGIN_ATTRIBUTES;GROUPS_LDAP_LOGIN_ATTRIBUTES"`
+	IDP              string   `env:"OCIS_URL;GROUPS_IDP_URL"` // TODO what is this for?
+	GatewayEndpoint  string   // TODO do we need this here?
+	UserSchema       LDAPUserSchema
+	GroupSchema      LDAPGroupSchema
 }
 
 type LDAPUserSchema struct {

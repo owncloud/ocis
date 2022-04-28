@@ -188,7 +188,7 @@ type Auth struct {
 // DataGatewayPort has a public url
 type DataGatewayPort struct {
 	Port
-	PublicURL string `yaml:""`
+	PublicURL string
 }
 
 type DataProvider struct {
@@ -522,7 +522,7 @@ type Asset struct {
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons `yaml:""`
+	*shared.Commons
 
 	File    string      `yaml:"file"`
 	Log     *shared.Log `yaml:"log"`

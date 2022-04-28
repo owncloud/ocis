@@ -64,8 +64,8 @@ type Config struct {
 	Tracing *shared.Tracing `yaml:"tracing"`
 	Log     *shared.Log     `yaml:"log"`
 
-	Mode    Mode   `yaml:""` // DEPRECATED
-	File    string `yaml:""`
+	Mode    Mode // DEPRECATED
+	File    string
 	OcisURL string `yaml:"ocis_url"`
 
 	Registry          string               `yaml:"registry"`

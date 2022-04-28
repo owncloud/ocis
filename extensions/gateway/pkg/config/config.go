@@ -16,7 +16,7 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool `yaml:""`
+	SkipUserGroupsInToken bool
 
 	CommitShareToStorageGrant  bool   `yaml:"commit_share_to_storage_grant"`
 	CommitShareToStorageRef    bool   `yaml:"commit_share_to_storage_ref"`
