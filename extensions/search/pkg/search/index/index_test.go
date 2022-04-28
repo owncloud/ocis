@@ -44,6 +44,10 @@ var _ = Describe("Index", func() {
 				StorageId: "storageid",
 				OpaqueId:  "opaqueid",
 			},
+			ParentId: &sprovider.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "parentopaqueid",
+			},
 			Path:     "foo.pdf",
 			Size:     12345,
 			MimeType: "application/pdf",
@@ -124,6 +128,7 @@ var _ = Describe("Index", func() {
 				Expect(match.Entity.Name).To(Equal(ri.Path))
 				Expect(match.Entity.Size).To(Equal(ri.Size))
 				Expect(match.Entity.MimeType).To(Equal(ri.MimeType))
+				Expect(match.Entity.ParentId.OpaqueId).To(Equal(ri.ParentId.OpaqueId))
 				Expect(uint64(match.Entity.LastModifiedTime.AsTime().Unix())).To(Equal(ri.Mtime.Seconds))
 			})
 

@@ -34,9 +34,10 @@ import (
 )
 
 type indexDocument struct {
-	RootID string
-	Path   string
-	ID     string
+	RootID   string
+	Path     string
+	ID       string
+	ParentID string
 
 	Name     string
 	Size     uint64
@@ -121,6 +122,7 @@ func toEntity(ref *sprovider.Reference, ri *sprovider.ResourceInfo) *indexDocume
 		RootID:   idToBleveId(ref.ResourceId),
 		Path:     ref.Path,
 		ID:       idToBleveId(ri.Id),
+		ParentID: idToBleveId(ri.ParentId),
 		Name:     ri.Path,
 		Size:     ri.Size,
 		MimeType: ri.MimeType,
@@ -159,10 +161,20 @@ func fromFields(fields map[string]interface{}) (*searchmsg.Match, error) {
 	if mtime, err := time.Parse(time.RFC3339, fields["Mtime"].(string)); err == nil {
 		match.Entity.LastModifiedTime = &timestamppb.Timestamp{Seconds: mtime.Unix(), Nanos: int32(mtime.Nanosecond())}
 	}
+	if fields["ParentID"] != "" {
+		parentIDParts := strings.SplitN(fields["ParentID"].(string), "!", 2)
+		match.Entity.ParentId = &searchmsg.ResourceID{
+			StorageId: parentIDParts[0],
+			OpaqueId:  parentIDParts[1],
+		}
+	}
 
 	return match, nil
 }
 
 func idToBleveId(id *sprovider.ResourceId) string {
+	if id == nil {
+		return ""
+	}
 	return id.StorageId + "!" + id.OpaqueId
 }
