@@ -69,7 +69,7 @@ func DefaultConfig() *config.Config {
 			URI:               "ldaps://localhost:9235",
 			TLSCACert:         path.Join(defaults.BaseDataPath(), "idm", "ldap.crt"),
 			BindDN:            "uid=idp,ou=sysusers,o=libregraph-idm",
-			BindPassword:      "idp",
+			BindPassword:      "",
 			BaseDN:            "ou=users,o=libregraph-idm",
 			Scope:             "sub",
 			LoginAttribute:    "uid",

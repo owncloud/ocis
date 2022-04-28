@@ -65,7 +65,7 @@ type LDAPDriver struct {
 	CACert           string   `env:"LDAP_CACERT;USERS_LDAP_CACERT"`
 	Insecure         bool     `env:"LDAP_INSECURE;USERS_LDAP_INSECURE"`
 	BindDN           string   `env:"LDAP_BIND_DN;USERS_LDAP_BIND_DN"`
-	BindPassword     string   `env:"LDAP_BIND_PASSWORD;USERS_LDAP_BIND_PASSWORD"`
+	BindPassword     string   `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;USERS_LDAP_BIND_PASSWORD"`
 	UserBaseDN       string   `env:"LDAP_USER_BASE_DN;USERS_LDAP_USER_BASE_DN"`
 	GroupBaseDN      string   `env:"LDAP_GROUP_BASE_DN;USERS_LDAP_GROUP_BASE_DN"`
 	UserScope        string   `env:"LDAP_USER_SCOPE;USERS_LDAP_USER_SCOPE"`

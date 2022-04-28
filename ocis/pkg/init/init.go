@@ -33,7 +33,7 @@ type DataProviderInsecureSettings struct {
 }
 
 type LdapSettings struct {
-	Bindpassword string
+	Bind_password string
 }
 type LdapBasedExtension struct {
 	Ldap LdapSettings
@@ -193,34 +193,34 @@ func CreateConfig(insecure, forceOverwrite bool, configPath string) error {
 		},
 		Idp: LdapBasedExtension{
 			Ldap: LdapSettings{
-				Bindpassword: idpServicePassword,
+				Bind_password: idpServicePassword,
 			},
 		},
 		Auth_basic: AuthbasicExtension{
 			Auth_providers: LdapBasedExtension{
 				Ldap: LdapSettings{
-					Bindpassword: revaServicePassword,
+					Bind_password: revaServicePassword,
 				},
 			},
 		},
 		Group: UserAndGroupExtension{
 			Drivers: LdapBasedExtension{
 				Ldap: LdapSettings{
-					Bindpassword: revaServicePassword,
+					Bind_password: revaServicePassword,
 				},
 			},
 		},
 		User: UserAndGroupExtension{
 			Drivers: LdapBasedExtension{
 				Ldap: LdapSettings{
-					Bindpassword: revaServicePassword,
+					Bind_password: revaServicePassword,
 				},
 			},
 		},
 		Graph: GraphExtension{
 			Identity: LdapBasedExtension{
 				Ldap: LdapSettings{
-					Bindpassword: idmServicePassword,
+					Bind_password: idmServicePassword,
 				},
 			},
 		},
