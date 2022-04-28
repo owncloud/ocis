@@ -1654,7 +1654,7 @@ def ocisServerWithAccounts(storage, accounts_hash_difficulty = 4, volumes = [], 
         "IDP_LDAP_LOGIN_ATTRIBUTE": "uid",
         "PROXY_ACCOUNT_BACKEND_TYPE": "accounts",
         "OCS_ACCOUNT_BACKEND_TYPE": "accounts",
-        "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,idp,nats,accounts,glauth,ocdav",
+        "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,frontend,gateway,user,group,auth-basic,auth-bearer,auth-machine,storage-users,storage-shares,storage-publiclink,appprovider,sharing,proxy,idp,nats,accounts,glauth,ocdav",
         "OCIS_INSECURE": "true",
         "PROXY_ENABLE_BASIC_AUTH": "true",
         "IDP_INSECURE": "true",
@@ -1787,7 +1787,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_STORAGE_READ_ONLY": "false",
             # General oCIS config
             # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
-            "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,nats,ocdav",
+            "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,frontend,gateway,user,group,auth-basic,auth-bearer,auth-machine,storage-users,storage-shares,storage-publiclink,appprovider,sharing,proxy,nats,ocdav",
             "OCIS_LOG_LEVEL": "info",
             "OCIS_URL": OCIS_URL,
             "PROXY_TLS": "true",
