@@ -6,6 +6,15 @@ import (
 	"github.com/owncloud/ocis/extensions/graph/pkg/config"
 )
 
+func FullDefaultConfig() *config.Config {
+	cfg := DefaultConfig()
+
+	EnsureDefaults(cfg)
+	Sanitize(cfg)
+
+	return cfg
+}
+
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{

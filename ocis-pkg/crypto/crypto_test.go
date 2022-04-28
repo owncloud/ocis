@@ -8,7 +8,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	cfg "github.com/owncloud/ocis/ocis-pkg/config"
 )
 
