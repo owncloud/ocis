@@ -3,11 +3,13 @@ package command
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
@@ -90,10 +92,38 @@ func checkConfigPath(configPath string) error {
 	return nil
 }
 
+func backupOcisConfigFile(configPath string) (string, error) {
+	sourceConfig := path.Join(configPath, configFilename)
+	targetBackupConfig := path.Join(configPath, configFilename+"."+time.Now().Format("2006-01-02-15-04-05")+".backup")
+	source, err := os.Open(sourceConfig)
+	if err != nil {
+		log.Fatalf("Could not read %s (%s)", sourceConfig, err)
+	}
+	defer source.Close()
+	target, err := os.Create(targetBackupConfig)
+	if err != nil {
+		log.Fatalf("Could not generate backup %s (%s)", targetBackupConfig, err)
+	}
+	defer target.Close()
+	_, err = io.Copy(target, source)
+	if err != nil {
+		log.Fatalf("Could not write backup %s (%s)", targetBackupConfig, err)
+	}
+	return targetBackupConfig, nil
+}
+
 func createConfig(insecure, forceOverwrite bool, configPath string) error {
 	err := checkConfigPath(configPath)
+	targetBackupConfig := ""
 	if err != nil && !forceOverwrite {
 		return err
+	} else if forceOverwrite {
+		targetBackupConfig, err = backupOcisConfigFile(configPath)
+		if err != nil {
+			return err
+		} else {
+
+		}
 	}
 	err = os.MkdirAll(configPath, 0700)
 	if err != nil {
@@ -219,13 +249,18 @@ func createConfig(insecure, forceOverwrite bool, configPath string) error {
 		return err
 	}
 	fmt.Printf(
-		"======================================\n"+
+		"\n\n=========================================\n"+
 			" generated OCIS Config\n"+
-			"======================================\n"+
+			"=========================================\n"+
 			" configpath : %s\n"+
 			" user       : admin\n"+
-			" password   : %s\n",
+			" password   : %s\n\n",
 		targetPath, ocisAdminServicePassword)
+	if targetBackupConfig != "" {
+		fmt.Printf("\n=========================================\n"+
+			"An older config file has been backuped to\n %s\n\n",
+			targetBackupConfig)
+	}
 	return nil
 }
 
