@@ -209,8 +209,10 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 									"provider_path": "/project",
 								},
 								"/users/[^/]+/Shares": map[string]interface{}{
+									//"/users/[^/]+": map[string]interface{}{
 									"address":     "127.0.0.1:9154",
 									"provider_id": "a0ca6a90-a365-4782-871e-d44447bbc668",
+									"space_type":  "virtual", // makes the static registry return it in addition to a shorter match, here the /users
 									//"provider_path": "/shares", // providerpath is filled in by the regex
 								},
 								"a0ca6a90-a365-4782-871e-d44447bbc668": map[string]interface{}{
