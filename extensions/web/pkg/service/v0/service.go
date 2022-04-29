@@ -85,10 +85,6 @@ func (p Web) getPayload() (payload []byte, err error) {
 					ID:   "settings",
 					Path: "/settings.js",
 				},
-				{
-					ID:   "accounts",
-					Path: "/accounts.js",
-				},
 			}
 		}
 
