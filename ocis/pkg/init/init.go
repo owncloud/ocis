@@ -17,7 +17,7 @@ const configFilename string = "ocis.yaml" // TODO: use also a constant for readi
 const passwordLength int = 32
 
 type TokenManager struct {
-	JWT_Secret string
+	JWTSecret string `yaml:"jwt_secret"`
 }
 
 type InsecureExtension struct {
@@ -45,29 +45,29 @@ type GraphExtension struct {
 }
 
 type ServiceUserPasswordsSettings struct {
-	Admin_password string
-	Idm_password   string
-	Reva_password  string
-	Idp_password   string
+	AdminPassword string `yaml:"admin_password"`
+	IdmPassword   string `yaml:"idm_password"`
+	RevaPassword  string `yaml:"reva_password"`
+	IdpPassword   string `yaml:"idp_password"`
 }
 type IdmExtension struct {
-	Service_user_Passwords ServiceUserPasswordsSettings
+	ServiceUserPasswords ServiceUserPasswordsSettings `yaml:"service_user_passwords"`
 }
 
 type FrontendExtension struct {
-	Archiver     InsecureExtension
-	App_provider InsecureExtension
+	Archiver    InsecureExtension
+	AppProvider InsecureExtension `yaml:"app_provider"`
 }
 
 type AuthbasicExtension struct {
-	Auth_providers LdapBasedExtension
+	AuthProviders LdapBasedExtension `yaml:"auth_providers"`
 }
 
 type AuthProviderSettings struct {
 	Oidc InsecureExtension
 }
 type AuthbearerExtension struct {
-	Auth_providers AuthProviderSettings
+	AuthProviders AuthProviderSettings `yaml:"auth_providers"`
 }
 
 type UserAndGroupExtension struct {
@@ -75,31 +75,43 @@ type UserAndGroupExtension struct {
 }
 
 type ThumbnailSettings struct {
-	Webdav_allow_insecure bool
-	Cs3_allow_insecure    bool
+	WebdavAllowInsecure bool `yaml:"webdav_allow_insecure"`
+	Cs3AllowInsecure    bool `yaml:"cs3_allow_insecure"`
 }
 
 type ThumbNailExtension struct {
 	Thumbnail ThumbnailSettings
 }
 
+// TODO: use the oCIS config struct instead of this custom struct
+// We can't use it right now, because it would need  "omitempty" on
+// all elements, in order to produce a slim config file with `ocis init`.
+// We can't just add these "omitempty" tags, since we want to generate
+// full example configuration files with that struct, too.
+// Proposed solution to  get rid of this temporary solution:
+// - use the oCIS config struct
+// - set the needed values like below
+// - marshal it to yaml
+// - unmarshal it into yaml.Node
+// - recurse through the nodes and delete empty / default ones
+// - marshal it to yaml
 type OcisConfig struct {
-	Token_manager        TokenManager
-	Machine_auth_api_key string
-	Transfer_secret      string
-	Graph                GraphExtension
-	Idp                  LdapBasedExtension
-	Idm                  IdmExtension
-	Proxy                InsecureProxyExtension
-	Frontend             FrontendExtension
-	Auth_basic           AuthbasicExtension
-	Auth_bearer          AuthbearerExtension
-	User                 UserAndGroupExtension
-	Group                UserAndGroupExtension
-	Storage_metadata     DataProviderInsecureSettings
-	Storage_users        DataProviderInsecureSettings
-	Ocdav                InsecureExtension
-	Thumbnails           ThumbNailExtension
+	TokenManager      TokenManager `yaml:"token_manager"`
+	MachineAuthApiKey string       `yaml:"machine_auth_api_key"`
+	TransferSecret    string       `yaml:"transfer_secret"`
+	Graph             GraphExtension
+	Idp               LdapBasedExtension
+	Idm               IdmExtension
+	Proxy             InsecureProxyExtension
+	Frontend          FrontendExtension
+	AuthBasic         AuthbasicExtension  `yaml:"auth_basic"`
+	AuthBearer        AuthbearerExtension `yaml:"auth_bearer"`
+	User              UserAndGroupExtension
+	Group             UserAndGroupExtension
+	StorageMetadata   DataProviderInsecureSettings `yaml:"storage_metadata"`
+	StorageUsers      DataProviderInsecureSettings `yaml:"storage_users"`
+	Ocdav             InsecureExtension
+	Thumbnails        ThumbNailExtension
 }
 
 func checkConfigPath(configPath string) error {
@@ -178,17 +190,17 @@ func CreateConfig(insecure, forceOverwrite bool, configPath string) error {
 	}
 
 	cfg := OcisConfig{
-		Token_manager: TokenManager{
-			JWT_Secret: tokenManagerJwtSecret,
+		TokenManager: TokenManager{
+			JWTSecret: tokenManagerJwtSecret,
 		},
-		Machine_auth_api_key: machineAuthApiKey,
-		Transfer_secret:      revaTransferSecret,
+		MachineAuthApiKey: machineAuthApiKey,
+		TransferSecret:    revaTransferSecret,
 		Idm: IdmExtension{
-			Service_user_Passwords: ServiceUserPasswordsSettings{
-				Admin_password: ocisAdminServicePassword,
-				Idp_password:   idpServicePassword,
-				Reva_password:  revaServicePassword,
-				Idm_password:   idmServicePassword,
+			ServiceUserPasswords: ServiceUserPasswordsSettings{
+				AdminPassword: ocisAdminServicePassword,
+				IdpPassword:   idpServicePassword,
+				RevaPassword:  revaServicePassword,
+				IdmPassword:   idmServicePassword,
 			},
 		},
 		Idp: LdapBasedExtension{
@@ -196,8 +208,8 @@ func CreateConfig(insecure, forceOverwrite bool, configPath string) error {
 				Bind_password: idpServicePassword,
 			},
 		},
-		Auth_basic: AuthbasicExtension{
-			Auth_providers: LdapBasedExtension{
+		AuthBasic: AuthbasicExtension{
+			AuthProviders: LdapBasedExtension{
 				Ldap: LdapSettings{
 					Bind_password: revaServicePassword,
 				},
@@ -227,15 +239,15 @@ func CreateConfig(insecure, forceOverwrite bool, configPath string) error {
 	}
 
 	if insecure {
-		cfg.Auth_bearer = AuthbearerExtension{
-			Auth_providers: AuthProviderSettings{
+		cfg.AuthBearer = AuthbearerExtension{
+			AuthProviders: AuthProviderSettings{
 				Oidc: InsecureExtension{
 					Insecure: true,
 				},
 			},
 		}
 		cfg.Frontend = FrontendExtension{
-			App_provider: InsecureExtension{
+			AppProvider: InsecureExtension{
 				Insecure: true,
 			},
 			Archiver: InsecureExtension{
@@ -251,16 +263,16 @@ func CreateConfig(insecure, forceOverwrite bool, configPath string) error {
 		cfg.Proxy = InsecureProxyExtension{
 			Insecure_backends: true,
 		}
-		cfg.Storage_metadata = DataProviderInsecureSettings{
+		cfg.StorageMetadata = DataProviderInsecureSettings{
 			Data_provider_insecure: true,
 		}
-		cfg.Storage_users = DataProviderInsecureSettings{
+		cfg.StorageUsers = DataProviderInsecureSettings{
 			Data_provider_insecure: true,
 		}
 		cfg.Thumbnails = ThumbNailExtension{
 			Thumbnail: ThumbnailSettings{
-				Webdav_allow_insecure: true,
-				Cs3_allow_insecure:    true,
+				WebdavAllowInsecure: true,
+				Cs3AllowInsecure:    true,
 			},
 		}
 	}
