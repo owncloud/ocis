@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
 * Bugfix - URL encode the webdav url in the graph API: [#3597](https://github.com/owncloud/ocis/pull/3597)
 * Change - Load configuration files just from one directory: [#3587](https://github.com/owncloud/ocis/pull/3587)
+* Change - Switched default configuration to use libregraph/idm: [#3331](https://github.com/owncloud/ocis/pull/3331)
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 * Enhancement - Update reva to v2.x.x: [#3552](https://github.com/owncloud/ocis/pull/3552)
@@ -50,6 +51,15 @@ The following sections list the changes for unreleased.
    - Docker images: `/etc/ocis/` - Binary releases: `$HOME/.ocis/config/`
 
    https://github.com/owncloud/ocis/pull/3587
+
+* Change - Switched default configuration to use libregraph/idm: [#3331](https://github.com/owncloud/ocis/pull/3331)
+
+   We switched the default configuration of oCIS to use the "idm" service (based on
+   libregraph/idm) as the standard source for user and group information. The accounts and
+   glauth services are no longer enabled by default and will be removed with an upcoming release.
+
+   https://github.com/owncloud/ocis/pull/3331
+   https://github.com/owncloud/ocis/pull/3633
 
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 
