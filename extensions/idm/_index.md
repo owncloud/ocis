@@ -22,8 +22,8 @@ of the LDAP tree is `o=libregraph-idm`. IDM gives LDAP write permissions to a si
 [boltdb](https://github.com/etcd-io/bbolt) file `idm/ocis.boltdb` inside the oCIS base data directory.
 
 Note: IDM is limited in its functionality. It only supports a subset of the LDAP operations (namely BIND, SEARCH, ADD, MODIFY, DELETE).
-Also IDM currently does not do any Schema Verification (e.g. structural vs. auxiliary Objectclasses, require and option Attributes,
-Syntax Checks, ...). So it's not meant as a general purpose LDAP server.
+Also IDM currently does not do any schema verification (e.g. structural vs. auxiliary object classes, require and option attributes,
+syntax checks, ...). So it's not meant as a general purpose LDAP server.
 
 ## Table of Contents
 
