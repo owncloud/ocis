@@ -349,7 +349,7 @@ class SpacesContext implements Context {
 	/**
 	 * The method first disables and then deletes spaces
 	 * @param  string $driveType
-	 * 
+	 *
 	 * @return void
 	 *
 	 * @throws Exception
