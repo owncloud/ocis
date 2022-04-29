@@ -234,7 +234,7 @@ func FilesAuditEvent(base AuditEvent, itemid, owner, path string) AuditEventFile
 
 // FileUploaded converts a FileUploaded event to an AuditEventFileCreated
 func FileUploaded(ev events.FileUploaded) AuditEventFileCreated {
-	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+	iid, path, uid := extractFileDetails(ev.Ref, ev.Owner)
 	base := BasicAuditEvent(uid, "", MessageFileCreated(iid), ActionFileCreated)
 	return AuditEventFileCreated{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
@@ -243,7 +243,7 @@ func FileUploaded(ev events.FileUploaded) AuditEventFileCreated {
 
 // FileDownloaded converts a FileDownloaded event to an AuditEventFileRead
 func FileDownloaded(ev events.FileDownloaded) AuditEventFileRead {
-	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+	iid, path, uid := extractFileDetails(ev.Ref, ev.Owner)
 	base := BasicAuditEvent(uid, "", MessageFileRead(iid), ActionFileRead)
 	return AuditEventFileRead{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
@@ -252,7 +252,7 @@ func FileDownloaded(ev events.FileDownloaded) AuditEventFileRead {
 
 // ItemMoved converts a ItemMoved event to an AuditEventFileRenamed
 func ItemMoved(ev events.ItemMoved) AuditEventFileRenamed {
-	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+	iid, path, uid := extractFileDetails(ev.Ref, ev.Owner)
 
 	oldpath := ""
 	if ev.OldReference != nil {
@@ -268,7 +268,7 @@ func ItemMoved(ev events.ItemMoved) AuditEventFileRenamed {
 
 // ItemTrashed converts a ItemTrashed event to an AuditEventFileDeleted
 func ItemTrashed(ev events.ItemTrashed) AuditEventFileDeleted {
-	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+	iid, path, uid := extractFileDetails(ev.Ref, ev.Owner)
 	base := BasicAuditEvent(uid, "", MessageFileTrashed(iid), ActionFileTrashed)
 	return AuditEventFileDeleted{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
@@ -277,7 +277,7 @@ func ItemTrashed(ev events.ItemTrashed) AuditEventFileDeleted {
 
 // ItemPurged converts a ItemPurged event to an AuditEventFilePurged
 func ItemPurged(ev events.ItemPurged) AuditEventFilePurged {
-	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+	iid, path, uid := extractFileDetails(ev.Ref, ev.Owner)
 	base := BasicAuditEvent(uid, "", MessageFilePurged(iid), ActionFilePurged)
 	return AuditEventFilePurged{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
@@ -286,7 +286,7 @@ func ItemPurged(ev events.ItemPurged) AuditEventFilePurged {
 
 // ItemRestored converts a ItemRestored event to an AuditEventFileRestored
 func ItemRestored(ev events.ItemRestored) AuditEventFileRestored {
-	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+	iid, path, uid := extractFileDetails(ev.Ref, ev.Owner)
 
 	oldpath := ""
 	if ev.OldReference != nil {
@@ -302,7 +302,7 @@ func ItemRestored(ev events.ItemRestored) AuditEventFileRestored {
 
 // FileVersionRestored converts a FileVersionRestored event to an AuditEventFileVersionRestored
 func FileVersionRestored(ev events.FileVersionRestored) AuditEventFileVersionRestored {
-	iid, path, uid := extractFileDetails(ev.FileID, ev.Owner)
+	iid, path, uid := extractFileDetails(ev.Ref, ev.Owner)
 	base := BasicAuditEvent(uid, "", MessageFileVersionRestored(iid, ev.Key), ActionFileVersionRestored)
 	return AuditEventFileVersionRestored{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
