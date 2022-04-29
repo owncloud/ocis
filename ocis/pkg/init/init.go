@@ -144,12 +144,12 @@ func backupOcisConfigFile(configPath string) (string, error) {
 
 // CreateConfig creates a config file with random passwords at configPath
 func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword string) error {
-	targetBackupConfig := ""
-
 	err := checkConfigPath(configPath)
 	if err != nil && !forceOverwrite {
 		return err
-	} else if forceOverwrite && err != nil {
+	}
+	targetBackupConfig := ""
+	if err != nil {
 		targetBackupConfig, err = backupOcisConfigFile(configPath)
 		if err != nil {
 			return err
