@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/owncloud/ocis/extensions/storage/pkg/command"
+	"github.com/owncloud/ocis/extensions/auth-basic/pkg/command"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
@@ -13,12 +13,8 @@ func StorageAuthBasicCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-auth-basic",
 		Usage:    "start storage auth-basic service",
 		Category: "extensions",
-		//Flags:    flagset.AuthBasicWithConfig(cfg.Storage),
-		Before: func(ctx *cli.Context) error {
-			return ParseStorageCommon(ctx, cfg)
-		},
 		Action: func(c *cli.Context) error {
-			origCmd := command.AuthBasic(cfg.Storage)
+			origCmd := command.AuthBasic(cfg.AuthBasic)
 			return handleOriginalAction(c, origCmd)
 		},
 	}

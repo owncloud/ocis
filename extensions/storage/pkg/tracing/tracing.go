@@ -9,25 +9,25 @@ import (
 // to Reva services.
 func Configure(cfg *config.Config, logger log.Logger) {
 	if cfg.Tracing.Enabled {
-		switch t := cfg.Tracing.Type; t {
+		switch cfg.Tracing.Type {
 		case "agent":
 			logger.Error().
-				Str("type", t).
+				Str("type", cfg.Tracing.Type).
 				Msg("Reva only supports the jaeger tracing backend")
 
 		case "jaeger":
 			logger.Info().
-				Str("type", t).
+				Str("type", cfg.Tracing.Type).
 				Msg("configuring storage to use the jaeger tracing backend")
 
 		case "zipkin":
 			logger.Error().
-				Str("type", t).
+				Str("type", cfg.Tracing.Type).
 				Msg("Reva only supports the jaeger tracing backend")
 
 		default:
 			logger.Warn().
-				Str("type", t).
+				Str("type", cfg.Tracing.Type).
 				Msg("Unknown tracing backend")
 		}
 

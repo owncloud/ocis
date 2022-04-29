@@ -142,6 +142,10 @@ func initLicoInternalEnvVars(ldap *config.Ldap) error {
 		"LDAP_FILTER":              filter,
 	}
 
+	if ldap.TLSCACert != "" {
+		defaults["LDAP_TLS_CACERT"] = ldap.TLSCACert
+	}
+
 	for k, v := range defaults {
 		if err := os.Setenv(k, v); err != nil {
 			return fmt.Errorf("could not set env var %s=%s", k, v)

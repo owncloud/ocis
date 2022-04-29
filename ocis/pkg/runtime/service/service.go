@@ -20,23 +20,35 @@ import (
 	"github.com/olekukonko/tablewriter"
 
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/command"
+	appprovider "github.com/owncloud/ocis/extensions/appprovider/pkg/command"
+	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/command"
+	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/command"
+	authmachine "github.com/owncloud/ocis/extensions/auth-machine/pkg/command"
+	frontend "github.com/owncloud/ocis/extensions/frontend/pkg/command"
+	gateway "github.com/owncloud/ocis/extensions/gateway/pkg/command"
 	glauth "github.com/owncloud/ocis/extensions/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/extensions/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/extensions/graph/pkg/command"
+	group "github.com/owncloud/ocis/extensions/group/pkg/command"
 	idm "github.com/owncloud/ocis/extensions/idm/pkg/command"
 	idp "github.com/owncloud/ocis/extensions/idp/pkg/command"
 	nats "github.com/owncloud/ocis/extensions/nats/pkg/command"
 	notifications "github.com/owncloud/ocis/extensions/notifications/pkg/command"
+	ocdav "github.com/owncloud/ocis/extensions/ocdav/pkg/command"
 	ocs "github.com/owncloud/ocis/extensions/ocs/pkg/command"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/command"
 	search "github.com/owncloud/ocis/extensions/search/pkg/command"
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/command"
-	storage "github.com/owncloud/ocis/extensions/storage/pkg/command"
+	sharing "github.com/owncloud/ocis/extensions/sharing/pkg/command"
+	storagemetadata "github.com/owncloud/ocis/extensions/storage-metadata/pkg/command"
+	storagepublic "github.com/owncloud/ocis/extensions/storage-publiclink/pkg/command"
+	storageshares "github.com/owncloud/ocis/extensions/storage-shares/pkg/command"
+	storageusers "github.com/owncloud/ocis/extensions/storage-users/pkg/command"
 	store "github.com/owncloud/ocis/extensions/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/command"
+	user "github.com/owncloud/ocis/extensions/user/pkg/command"
 	web "github.com/owncloud/ocis/extensions/web/pkg/command"
 	webdav "github.com/owncloud/ocis/extensions/webdav/pkg/command"
-	"github.com/owncloud/ocis/ocis-pkg/config"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/rs/zerolog"
@@ -97,36 +109,36 @@ func NewService(options ...Option) (*Service, error) {
 
 	s.ServicesRegistry["settings"] = settings.NewSutureService
 	s.ServicesRegistry["nats"] = nats.NewSutureService
-	s.ServicesRegistry["storage-metadata"] = storage.NewStorageMetadata
+	s.ServicesRegistry["storage-metadata"] = storagemetadata.NewStorageMetadata
 	s.ServicesRegistry["glauth"] = glauth.NewSutureService
 	s.ServicesRegistry["graph"] = graph.NewSutureService
 	s.ServicesRegistry["graph-explorer"] = graphExplorer.NewSutureService
-	s.ServicesRegistry["idp"] = idp.NewSutureService
 	s.ServicesRegistry["idm"] = idm.NewSutureService
 	s.ServicesRegistry["ocs"] = ocs.NewSutureService
 	s.ServicesRegistry["store"] = store.NewSutureService
 	s.ServicesRegistry["thumbnails"] = thumbnails.NewSutureService
 	s.ServicesRegistry["web"] = web.NewSutureService
 	s.ServicesRegistry["webdav"] = webdav.NewSutureService
-	s.ServicesRegistry["storage-frontend"] = storage.NewFrontend
-	s.ServicesRegistry["ocdav"] = storage.NewOCDav
-	s.ServicesRegistry["storage-gateway"] = storage.NewGateway
-	s.ServicesRegistry["storage-userprovider"] = storage.NewUserProvider
-	s.ServicesRegistry["storage-groupprovider"] = storage.NewGroupProvider
-	s.ServicesRegistry["storage-authbasic"] = storage.NewAuthBasic
-	s.ServicesRegistry["storage-authbearer"] = storage.NewAuthBearer
-	s.ServicesRegistry["storage-authmachine"] = storage.NewAuthMachine
-	s.ServicesRegistry["storage-users"] = storage.NewStorageUsers
-	s.ServicesRegistry["storage-shares"] = storage.NewStorageShares
-	s.ServicesRegistry["storage-public-link"] = storage.NewStoragePublicLink
-	s.ServicesRegistry["storage-appprovider"] = storage.NewAppProvider
+	s.ServicesRegistry["storage-frontend"] = frontend.NewFrontend
+	s.ServicesRegistry["ocdav"] = ocdav.NewOCDav
+	s.ServicesRegistry["storage-gateway"] = gateway.NewGateway
+	s.ServicesRegistry["storage-userprovider"] = user.NewUserProvider
+	s.ServicesRegistry["storage-groupprovider"] = group.NewGroupProvider
+	s.ServicesRegistry["storage-authbasic"] = authbasic.NewAuthBasic
+	s.ServicesRegistry["storage-authbearer"] = authbearer.NewAuthBearer
+	s.ServicesRegistry["storage-authmachine"] = authmachine.NewAuthMachine
+	s.ServicesRegistry["storage-users"] = storageusers.NewStorageUsers
+	s.ServicesRegistry["storage-shares"] = storageshares.NewStorageShares
+	s.ServicesRegistry["storage-public-link"] = storagepublic.NewStoragePublicLink
+	s.ServicesRegistry["storage-appprovider"] = appprovider.NewAppProvider
 	s.ServicesRegistry["notifications"] = notifications.NewSutureService
 	s.ServicesRegistry["search"] = search.NewSutureService
 
 	// populate delayed services
-	s.Delayed["storage-sharing"] = storage.NewSharing
+	s.Delayed["storage-sharing"] = sharing.NewSharing
 	s.Delayed["accounts"] = accounts.NewSutureService
 	s.Delayed["proxy"] = proxy.NewSutureService
+	s.Delayed["idp"] = idp.NewSutureService
 
 	return s, nil
 }
@@ -173,15 +185,6 @@ func Start(o ...Option) error {
 			Log: &shared.Log{},
 		}
 	}
-
-	if s.cfg.Storage.Log == nil {
-		s.cfg.Storage.Log = &shared.Log{}
-	}
-
-	s.cfg.Storage.Log.Color = s.cfg.Commons.Log.Color
-	s.cfg.Storage.Log.Level = s.cfg.Commons.Log.Level
-	s.cfg.Storage.Log.Pretty = s.cfg.Commons.Log.Pretty
-	s.cfg.Storage.Log.File = s.cfg.Commons.Log.File
 
 	if err = rpc.Register(s); err != nil {
 		if s != nil {
@@ -243,7 +246,7 @@ func scheduleServiceTokens(s *Service, funcSet serviceFuncMap) {
 
 // generateRunSet interprets the cfg.Runtime.Extensions config option to cherry-pick which services to start using
 // the runtime.
-func (s *Service) generateRunSet(cfg *config.Config) {
+func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 	if cfg.Runtime.Extensions != "" {
 		e := strings.Split(strings.ReplaceAll(cfg.Runtime.Extensions, " ", ""), ",")
 		for i := range e {
@@ -253,10 +256,18 @@ func (s *Service) generateRunSet(cfg *config.Config) {
 	}
 
 	for name := range s.ServicesRegistry {
+		// don't run glauth by default but keep the possiblity to start it via cfg.Runtime.Extensions for now
+		if name == "glauth" {
+			continue
+		}
 		runset = append(runset, name)
 	}
 
 	for name := range s.Delayed {
+		// don't run accounts by default but keep the possiblity to start it via cfg.Runtime.Extensions for now
+		if name == "accounts" {
+			continue
+		}
 		runset = append(runset, name)
 	}
 }

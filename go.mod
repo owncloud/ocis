@@ -10,7 +10,7 @@ require (
 	github.com/blevesearch/bleve_index_api v1.0.1
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220412090512-93c5918b4bde
-	github.com/cs3org/reva/v2 v2.0.0-20220419100641-50aa8636af59
+	github.com/cs3org/reva/v2 v2.0.0-20220427203355-0164880ac7d3
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.7
@@ -64,7 +64,7 @@ require (
 	github.com/stretchr/testify v1.7.1
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.2
-	github.com/urfave/cli/v2 v2.4.4
+	github.com/urfave/cli/v2 v2.5.0
 	go-micro.dev/v4 v4.6.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.31.0
@@ -77,7 +77,7 @@ require (
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
 	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a
 	google.golang.org/genproto v0.0.0-20220324131243-acbaeb5b85eb
-	google.golang.org/grpc v1.45.0
+	google.golang.org/grpc v1.46.0
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/v3 v3.1.0

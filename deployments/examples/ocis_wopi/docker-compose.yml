@@ -173,9 +173,10 @@ services:
     networks:
       ocis-net:
     entrypoint:
-      - /bin/sh
+      - /bin/bash
       - /entrypoint-override.sh
     environment:
+      WOPISERVER_INSECURE: "${INSECURE:-false}"
       WOPISECRET: ${WOPI_JWT_SECRET:-LoremIpsum567}
       IOPSECRET: ${WOPI_IOP_SECRET:-LoremIpsum123}
       CODIMDSECRET: ${CODIMD_SECRET:-LoremIpsum456}

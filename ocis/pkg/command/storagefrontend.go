@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/owncloud/ocis/extensions/storage/pkg/command"
+	"github.com/owncloud/ocis/extensions/frontend/pkg/command"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
@@ -13,12 +13,8 @@ func StorageFrontendCommand(cfg *config.Config) *cli.Command {
 		Name:     "storage-frontend",
 		Usage:    "start storage frontend",
 		Category: "extensions",
-		//Flags:    flagset.FrontendWithConfig(cfg.Storage),
-		Before: func(ctx *cli.Context) error {
-			return ParseStorageCommon(ctx, cfg)
-		},
 		Action: func(c *cli.Context) error {
-			origCmd := command.Frontend(cfg.Storage)
+			origCmd := command.Frontend(cfg.Frontend)
 			return handleOriginalAction(c, origCmd)
 		},
 	}
