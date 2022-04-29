@@ -39,11 +39,10 @@ WantedBy=multi-user.target
 
 For reasons of simplicity we are using the root user and group to run oCIS which is not recommended. Please use a non-root user in production environments and modify the oCIS service definition accordingly.
 
-
 In the service definition we referenced `/etc/ocis/ocis.env` as our file containing environment variables for the oCIS process.
 In order to create the file we need first to create the folder `/etc/ocis/` and then we can add the actual `/etc/ocis/ocis.env` with following content:
 
-```
+```bash
 OCIS_URL=https://some-hostname-or-ip:9200
 PROXY_HTTP_ADDR=0.0.0.0:9200
 OCIS_INSECURE=false
@@ -60,8 +59,9 @@ Please change your `OCIS_URL` in order to reflect your actual deployment. If you
 
 oCIS will store all data in `/var/lib/ocis`, because we configured it so by setting `OCIS_BASE_DATA_PATH`. Therefore you need to create that directory and make it accessible to the user, you use to start oCIS.
 
-
 ## Starting the oCIS service
+
+Initialize the oCIS configuration by running `OCIS_CONFIG_DIR=/etc/ocis ocis init`.
 
 You can enable oCIS now by running `systemctl enable --now ocis`. It will ensure that oCIS also is restarted after a reboot of the host.
 

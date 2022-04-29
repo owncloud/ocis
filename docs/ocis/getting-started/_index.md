@@ -95,6 +95,12 @@ Open [https://localhost:9200](https://localhost:9200) and [login using one of th
 
 The oCIS single binary contains multiple extensions and the `ocis` command helps you to manage them. You already used `ocis server` to run all available extensions in the [Run oCIS]({{< ref "#run-ocis" >}}) section. We now will show you some more management commands, which you may also explore by typing `ocis --help` or going to the [docs]({{< ref "../config" >}}).
 
+To initialize the oCIS configuration:
+
+{{< highlight txt >}}
+ocis init
+{{< / highlight >}}
+
 To start oCIS server:
 
 {{< highlight txt >}}

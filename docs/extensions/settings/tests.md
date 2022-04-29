@@ -19,9 +19,10 @@ Make sure you've cloned the [web frontend repo](https://github.com/owncloud/web/
 {{< hint info >}}
 For now, an IDP configuration file gets generated once and will fail upon changing the oCIS url as done below. To avoid any clashes, remove this file before starting the tests:
 
-```
+```bash
 rm ~/.ocis/idp/identifier-registration.yaml
 ```
+
 {{< /hint >}}
 
 ### In the web repo
@@ -30,7 +31,7 @@ rm ~/.ocis/idp/identifier-registration.yaml
 
 Install dependencies and bundle the frontend with a watcher by running
 
-```
+```bash
 yarn && yarn build:w
 ```
 
@@ -40,7 +41,7 @@ If you skip the step above, the currently bundled frontend from the oCIS binary 
 
 Start the necessary acceptance test services by using Docker (Compose):
 
-```
+```bash
 docker compose up selenium middleware-ocis vnc
 ```
 
@@ -50,7 +51,7 @@ docker compose up selenium middleware-ocis vnc
 
 Navigate into the settings service via `cd ../settings/` and install dependencies and build the bundled settings UI with a watcher by running
 
-```
+```bash
 yarn && yarn watch
 ```
 
@@ -58,13 +59,14 @@ yarn && yarn watch
 
 Navigate into the oCIS directory inside the oCIS repository and build the oCIS binary by running
 
-```
+```bash
 make clean build
 ```
 
 Then, start oCIS from the binary via
 
-```
+```bash
+ocis init
 OCIS_URL=https://host.docker.internal:9200 OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true WEB_UI_CONFIG=../../web/dev/docker/ocis.web.config.json ./bin/ocis server
 ```
 
@@ -78,6 +80,6 @@ If you want visual feedback on the test run, visit http://host.docker.internal:6
 
 Navigate into the settings service via `cd ../settings/` and start the acceptance tests by running
 
-```
+```bash
 SERVER_HOST=https://host.docker.internal:9200 BACKEND_HOST=https://host.docker.internal:9200 RUN_ON_OCIS=true NODE_TLS_REJECT_UNAUTHORIZED=0 WEB_PATH=../../web WEB_UI_CONFIG=../../web/tests/drone/config-ocis.json MIDDLEWARE_HOST=http://host.docker.internal:3000 ./ui/tests/run-acceptance-test.sh ./ui/tests/acceptance/features/
 ```
