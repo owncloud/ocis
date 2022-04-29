@@ -22,6 +22,7 @@ import (
 	"github.com/owncloud/ocis/extensions/idp/pkg/assets"
 	"github.com/owncloud/ocis/extensions/idp/pkg/config"
 	"github.com/owncloud/ocis/extensions/idp/pkg/middleware"
+	"github.com/owncloud/ocis/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"stash.kopano.io/kgol/rndm"
 )
@@ -41,6 +42,14 @@ func NewService(opts ...Option) Service {
 		assets.Config(options.Config),
 	)
 
+	if err := ldap.WaitForCA(options.Logger, options.Config.IDP.Insecure, options.Config.Ldap.TLSCACert); err != nil {
+		logger.Fatal().Err(err).Msg("The configured LDAP CA cert does not exist")
+	}
+	if options.Config.IDP.Insecure {
+		// force CACert to be empty to avoid lico try to load it
+		options.Config.Ldap.TLSCACert = ""
+	}
+
 	if err := initLicoInternalEnvVars(&options.Config.Ldap); err != nil {
 		logger.Fatal().Err(err).Msg("could not initialize env vars")
 	}
@@ -56,7 +65,6 @@ func NewService(opts ...Option) Service {
 
 	// https://play.golang.org/p/Mh8AVJCd593
 	idpSettings := bootstrap.Settings(options.Config.IDP)
-
 	bs, err := bootstrap.Boot(ctx, &idpSettings, &licoconfig.Config{
 		Logger: log.LogrusWrap(logger),
 	})
