@@ -122,7 +122,7 @@ var _ = Describe("Searchprovider", func() {
 			gwClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
 				Status: status.NewNotFound(context.Background(), ""),
 			}, nil)
-			indexClient.On("Remove", mock.MatchedBy(func(id *sprovider.ResourceId) bool {
+			indexClient.On("Delete", mock.MatchedBy(func(id *sprovider.ResourceId) bool {
 				return id.OpaqueId == ri.Id.OpaqueId
 			})).Return(nil).Run(func(args mock.Arguments) {
 				called = true

@@ -18,10 +18,63 @@ var _ = Describe("Index", func() {
 	var (
 		i          *index.Index
 		bleveIndex bleve.Index
-		ref        *sprovider.Reference
-		ri         *sprovider.ResourceInfo
+		ctx        context.Context
 
-		ctx context.Context
+		rootId = &sprovider.ResourceId{
+			StorageId: "storageid",
+			OpaqueId:  "rootopaqueid",
+		}
+		ref = &sprovider.Reference{
+			ResourceId: rootId,
+			Path:       "./foo.pdf",
+		}
+		ri = &sprovider.ResourceInfo{
+			Id: &sprovider.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "opaqueid",
+			},
+			ParentId: &sprovider.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "someopaqueid",
+			},
+			Path:     "foo.pdf",
+			Size:     12345,
+			Type:     sprovider.ResourceType_RESOURCE_TYPE_FILE,
+			MimeType: "application/pdf",
+			Mtime:    &typesv1beta1.Timestamp{Seconds: 4000},
+		}
+		parentRef = &sprovider.Reference{
+			ResourceId: rootId,
+			Path:       "./sudbir",
+		}
+		parentRi = &sprovider.ResourceInfo{
+			Id: &sprovider.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "parentopaqueid",
+			},
+			Path:  "subdir",
+			Size:  12345,
+			Type:  sprovider.ResourceType_RESOURCE_TYPE_CONTAINER,
+			Mtime: &typesv1beta1.Timestamp{Seconds: 4000},
+		}
+		childRef = &sprovider.Reference{
+			ResourceId: rootId,
+			Path:       "./sudbir/child.pdf",
+		}
+		childRi = &sprovider.ResourceInfo{
+			Id: &sprovider.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "childopaqueid",
+			},
+			ParentId: &sprovider.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "parentopaqueid",
+			},
+			Path:  "subdir",
+			Size:  12345,
+			Type:  sprovider.ResourceType_RESOURCE_TYPE_FILE,
+			Mtime: &typesv1beta1.Timestamp{Seconds: 4000},
+		}
 	)
 
 	BeforeEach(func() {
@@ -31,28 +84,6 @@ var _ = Describe("Index", func() {
 
 		i, err = index.New(bleveIndex)
 		Expect(err).ToNot(HaveOccurred())
-
-		ref = &sprovider.Reference{
-			ResourceId: &sprovider.ResourceId{
-				StorageId: "storageid",
-				OpaqueId:  "rootopaqueid",
-			},
-			Path: "./foo.pdf",
-		}
-		ri = &sprovider.ResourceInfo{
-			Id: &sprovider.ResourceId{
-				StorageId: "storageid",
-				OpaqueId:  "opaqueid",
-			},
-			ParentId: &sprovider.ResourceId{
-				StorageId: "storageid",
-				OpaqueId:  "parentopaqueid",
-			},
-			Path:     "foo.pdf",
-			Size:     12345,
-			MimeType: "application/pdf",
-			Mtime:    &typesv1beta1.Timestamp{Seconds: 4000},
-		}
 	})
 
 	Describe("New", func() {
@@ -127,8 +158,9 @@ var _ = Describe("Index", func() {
 				Expect(match.Entity.Id.OpaqueId).To(Equal(ri.Id.OpaqueId))
 				Expect(match.Entity.Name).To(Equal(ri.Path))
 				Expect(match.Entity.Size).To(Equal(ri.Size))
+				Expect(match.Entity.Type).To(Equal(uint64(ri.Type)))
 				Expect(match.Entity.MimeType).To(Equal(ri.MimeType))
-				Expect(match.Entity.ParentId.OpaqueId).To(Equal(ri.ParentId.OpaqueId))
+				Expect(match.Entity.Deleted).To(BeFalse())
 				Expect(uint64(match.Entity.LastModifiedTime.AsTime().Unix())).To(Equal(ri.Mtime.Seconds))
 			})
 
@@ -247,16 +279,68 @@ var _ = Describe("Index", func() {
 	})
 
 	Describe("Remove", func() {
-		It("removes a resource from the index", func() {
-			err := i.Add(ref, ri)
+		It("marks a resource as deleted", func() {
+			err := i.Add(parentRef, parentRi)
 			Expect(err).ToNot(HaveOccurred())
-			count, _ := bleveIndex.DocCount()
-			Expect(count).To(Equal(uint64(1)))
+			res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
+				Query: "subdir",
+				Ref: &searchmsg.Reference{
+					ResourceId: &searchmsg.ResourceID{
+						StorageId: rootId.StorageId,
+						OpaqueId:  rootId.OpaqueId,
+					},
+				},
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(res.Matches)).To(Equal(1))
 
-			err = i.Remove(ri.Id)
+			err = i.Delete(parentRi.Id)
 			Expect(err).ToNot(HaveOccurred())
-			count, _ = bleveIndex.DocCount()
-			Expect(count).To(Equal(uint64(0)))
+
+			res, err = i.Search(ctx, &searchsvc.SearchIndexRequest{
+				Query: "subdir",
+				Ref: &searchmsg.Reference{
+					ResourceId: &searchmsg.ResourceID{
+						StorageId: rootId.StorageId,
+						OpaqueId:  rootId.OpaqueId,
+					},
+				},
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(res.Matches)).To(Equal(0))
+		})
+
+		It("also marks child resources as deleted", func() {
+			err := i.Add(parentRef, parentRi)
+			Expect(err).ToNot(HaveOccurred())
+			err = i.Add(childRef, childRi)
+			Expect(err).ToNot(HaveOccurred())
+			res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
+				Query: "subdir",
+				Ref: &searchmsg.Reference{
+					ResourceId: &searchmsg.ResourceID{
+						StorageId: rootId.StorageId,
+						OpaqueId:  rootId.OpaqueId,
+					},
+				},
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(res.Matches)).To(Equal(2))
+
+			err = i.Delete(parentRi.Id)
+			Expect(err).ToNot(HaveOccurred())
+
+			res, err = i.Search(ctx, &searchsvc.SearchIndexRequest{
+				Query: "subdir",
+				Ref: &searchmsg.Reference{
+					ResourceId: &searchmsg.ResourceID{
+						StorageId: rootId.StorageId,
+						OpaqueId:  rootId.OpaqueId,
+					},
+				},
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(res.Matches)).To(Equal(0))
 		})
 	})
 })

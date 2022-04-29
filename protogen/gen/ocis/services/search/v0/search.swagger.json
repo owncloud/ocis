@@ -185,6 +185,13 @@
         },
         "permissions": {
           "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "deleted": {
+          "type": "boolean"
         }
       }
     },

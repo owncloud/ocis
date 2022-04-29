@@ -67,7 +67,7 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 					Id: e.Executant,
 				}
 			case events.ItemTrashed:
-				err := p.indexClient.Remove(e.Id)
+				err := p.indexClient.Delete(e.Id)
 				if err != nil {
 					p.logger.Error().Err(err).Interface("Id", e.Id).Msg("failed to remove item from index")
 				}

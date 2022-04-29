@@ -25,6 +25,8 @@ message Entity {
     google.protobuf.Timestamp last_modified_time = 6;
 	string mime_type = 7;
 	string permissions = 8;
+	uint64 type = 9;
+	bool deleted = 10;
 }
 
 message Match {

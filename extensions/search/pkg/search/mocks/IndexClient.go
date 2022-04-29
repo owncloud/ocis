@@ -30,6 +30,20 @@ func (_m *IndexClient) Add(ref *providerv1beta1.Reference, ri *providerv1beta1.R
 	return r0
 }
 
+// Delete provides a mock function with given fields: ri
+func (_m *IndexClient) Delete(ri *providerv1beta1.ResourceId) error {
+	ret := _m.Called(ri)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*providerv1beta1.ResourceId) error); ok {
+		r0 = rf(ri)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // DocCount provides a mock function with given fields:
 func (_m *IndexClient) DocCount() (uint64, error) {
 	ret := _m.Called()
@@ -51,8 +65,8 @@ func (_m *IndexClient) DocCount() (uint64, error) {
 	return r0, r1
 }
 
-// Remove provides a mock function with given fields: ri
-func (_m *IndexClient) Remove(ri *providerv1beta1.ResourceId) error {
+// Purge provides a mock function with given fields: ri
+func (_m *IndexClient) Purge(ri *providerv1beta1.ResourceId) error {
 	ret := _m.Called(ri)
 
 	var r0 error

@@ -20,6 +20,7 @@ package index
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"time"
 
@@ -34,15 +35,17 @@ import (
 )
 
 type indexDocument struct {
-	RootID   string
-	Path     string
-	ID       string
-	ParentID string
+	RootID string
+	Path   string
+	ID     string
 
 	Name     string
 	Size     uint64
 	Mtime    string
 	MimeType string
+	Type     uint64
+
+	Deleted bool
 }
 
 // Index represents a bleve based search index
@@ -77,15 +80,56 @@ func (i *Index) Add(ref *sprovider.Reference, ri *sprovider.ResourceInfo) error 
 	return i.bleveIndex.Index(idToBleveId(ri.Id), entity)
 }
 
-// Remove removes an entity from the index
-func (i *Index) Remove(id *sprovider.ResourceId) error {
+// Delete marks an entity from the index as delete (still keeping it around)
+func (i *Index) Delete(id *sprovider.ResourceId) error {
+	return i.markAsDeleted(idToBleveId(id))
+}
+
+func (i *Index) markAsDeleted(id string) error {
+	req := bleve.NewSearchRequest(bleve.NewDocIDQuery([]string{id}))
+	req.Fields = []string{"*"}
+	res, err := i.bleveIndex.Search(req)
+	if err != nil {
+		return err
+	}
+	if res.Hits.Len() == 0 {
+		return errors.New("entity not found")
+	}
+	entity := fieldsToEntity(res.Hits[0].Fields)
+	entity.Deleted = true
+
+	if entity.Type == uint64(sprovider.ResourceType_RESOURCE_TYPE_CONTAINER) {
+		query := bleve.NewConjunctionQuery(
+			bleve.NewQueryStringQuery("RootID:"+entity.RootID),
+			bleve.NewQueryStringQuery("Path:"+entity.Path+"/*"),
+		)
+		bleveReq := bleve.NewSearchRequest(query)
+		bleveReq.Fields = []string{"*"}
+		res, err := i.bleveIndex.Search(bleveReq)
+		if err != nil {
+			return err
+		}
+
+		for _, h := range res.Hits {
+			i.markAsDeleted(h.ID)
+		}
+	}
+
+	return i.bleveIndex.Index(entity.ID, entity)
+}
+
+// Purge removes an entity from the index
+func (i *Index) Purge(id *sprovider.ResourceId) error {
 	return i.bleveIndex.Delete(idToBleveId(id))
 }
 
 // Search searches the index according to the criteria specified in the given SearchIndexRequest
 func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (*searchsvc.SearchIndexResponse, error) {
+	deletedQuery := bleve.NewBoolFieldQuery(false)
+	deletedQuery.SetField("Deleted")
 	query := bleve.NewConjunctionQuery(
 		bleve.NewQueryStringQuery("Name:"+req.Query),
+		deletedQuery, // Skip documents that have been marked as deleted
 		bleve.NewQueryStringQuery("RootID:"+req.Ref.ResourceId.StorageId+"!"+req.Ref.ResourceId.OpaqueId), // Limit search to the space
 		bleve.NewQueryStringQuery("Path:"+req.Ref.Path+"*"),                                               // Limit search to this directory in the space
 	)
@@ -122,16 +166,32 @@ func toEntity(ref *sprovider.Reference, ri *sprovider.ResourceInfo) *indexDocume
 		RootID:   idToBleveId(ref.ResourceId),
 		Path:     ref.Path,
 		ID:       idToBleveId(ri.Id),
-		ParentID: idToBleveId(ri.ParentId),
 		Name:     ri.Path,
 		Size:     ri.Size,
 		MimeType: ri.MimeType,
+		Type:     uint64(ri.Type),
+		Deleted:  false,
 	}
 
 	if ri.Mtime != nil {
 		doc.Mtime = time.Unix(int64(ri.Mtime.Seconds), int64(ri.Mtime.Nanos)).UTC().Format(time.RFC3339)
 	}
 
+	return doc
+}
+
+func fieldsToEntity(fields map[string]interface{}) *indexDocument {
+	doc := &indexDocument{
+		RootID:   fields["RootID"].(string),
+		Path:     fields["Path"].(string),
+		ID:       fields["ID"].(string),
+		Name:     fields["Name"].(string),
+		Size:     uint64(fields["Size"].(float64)),
+		Mtime:    fields["Mtime"].(string),
+		MimeType: fields["MimeType"].(string),
+		Deleted:  fields["Deleted"].(bool),
+		Type:     uint64(fields["Type"].(float64)),
+	}
 	return doc
 }
 
@@ -154,19 +214,14 @@ func fromFields(fields map[string]interface{}) (*searchmsg.Match, error) {
 			},
 			Name:     fields["Name"].(string),
 			Size:     uint64(fields["Size"].(float64)),
+			Type:     uint64(fields["Type"].(float64)),
 			MimeType: fields["MimeType"].(string),
+			Deleted:  fields["Deleted"].(bool),
 		},
 	}
 
 	if mtime, err := time.Parse(time.RFC3339, fields["Mtime"].(string)); err == nil {
 		match.Entity.LastModifiedTime = &timestamppb.Timestamp{Seconds: mtime.Unix(), Nanos: int32(mtime.Nanosecond())}
-	}
-	if fields["ParentID"] != "" {
-		parentIDParts := strings.SplitN(fields["ParentID"].(string), "!", 2)
-		match.Entity.ParentId = &searchmsg.ResourceID{
-			StorageId: parentIDParts[0],
-			OpaqueId:  parentIDParts[1],
-		}
 	}
 
 	return match, nil
