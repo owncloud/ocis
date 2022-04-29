@@ -15,6 +15,8 @@ If you need to access oCIS running in a docker container, on a VM or a remote ma
 
 ## Start the oCIS fullstack server from binary
 
+Initialize the oCIS configuration by running `./bin/ocis init`.
+
 Upon first start of the oCIS fullstack server with `./bin/ocis server` it will generate a directory tree skeleton in `$HOME/.ocis`. If that is already existing it will not be overwritten as it contains all relevant data for oCIS.
 
 In `$HOME/.ocis/idp` is a file `identifier-registration.yaml`. It is used to configure the built-in identity provider and therefore contains the OpenID Connect issuer and also information about relying parties, for example ownCloud Web and our desktop and mobile applications.

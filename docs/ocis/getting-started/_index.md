@@ -42,14 +42,17 @@ curl https://download.owncloud.com/ocis/ocis/stable/1.20.0/ocis-1.20.0-linux-amd
 # make binary executable
 chmod +x ocis
 
+# initialize a minimal oCIS configuration
+./ocis init
+
 # run with demo users
-OCIS_INSECURE=true ACCOUNTS_DEMO_USERS_AND_GROUPS=true ./ocis server
+IDM_CREATE_DEMO_USERS=true ./ocis server
 ```
 
 The default primary storage location is `~/.ocis` or `/var/lib/ocis` depending on the packaging format and your operating system user. You can change that value by configuration.
 
 {{< hint info >}}
-When you're using oCIS with self-signed certificates, you need to set the environment variable `OCIS_INSECURE=true`, in order to make oCIS work.
+When you're using oCIS with self-signed certificates, you need to answer the the question for certificate checking with "yes" or set the environment variable `OCIS_INSECURE=true`, in order to make oCIS work.
 {{< /hint >}}
 
 {{< hint warning >}}
@@ -64,7 +67,8 @@ The `latest` tag always reflects the current master branch.
 
 ```console
 docker pull owncloud/ocis
-docker run --rm -ti -p 9200:9200 -e OCIS_INSECURE=true -e ACCOUNTS_DEMO_USERS_AND_GROUPS=true owncloud/ocis
+docker run --rm -it -v ocis-config:/etc/ocis -v ocis-data:/var/lib/ocis owncloud/ocis init
+docker run --rm -p 9200:9200 -v ocis-config:/etc/ocis -v ocis-data:/var/lib/ocis -e ACCOUNTS_DEMO_USERS_AND_GROUPS=true owncloud/ocis
 ```
 
 {{< hint info >}}
@@ -72,11 +76,11 @@ When you're using oCIS with self-signed certificates, you need to set the enviro
 {{< /hint >}}
 
 {{< hint warming >}}
-When you're creating the [demo users]({{< ref "./demo-users" >}}) by setting `ACCOUNTS_DEMO_USERS_AND_GROUPS=true`, you need to be sure that this instance is not used in production because the passwords are public.
+When you're creating the [demo users]({{< ref "./demo-users" >}}) by setting `IDM_CREATE_DEMO_USERS=true`, you need to be sure that this instance is not used in production because the passwords are public.
 {{< /hint >}}
 
 {{< hint warning >}}
-In order to persist your data, you need to mount a docker volume or create a host bind-mount at `/var/lib/ocis`, for example with: `-v /some/host/dir:/var/lib/ocis`
+We are using named volumes for the oCIS configuration and oCIS data in the above example (`-v ocis-config:/etc/ocis -v ocis-data:/var/lib/ocis`). You could instead also use host bind-mounts instead, eg. `-v /some/host/dir:/var/lib/ocis`.
 
 You cannot use bind mounts on MacOS, since extended attributes are not supported ([owncloud/ocis#182](https://github.com/owncloud/ocis/issues/182), [moby/moby#1070](https://github.com/moby/moby/issues/1070)).
 {{< /hint >}}
