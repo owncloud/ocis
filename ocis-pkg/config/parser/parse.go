@@ -2,7 +2,6 @@ package parser
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
@@ -99,15 +98,15 @@ func EnsureCommons(cfg *config.Config) {
 
 func Validate(cfg *config.Config) error {
 	if cfg.TokenManager.JWTSecret == "" {
-		return fmt.Errorf("jwt secret is not set up properly, bailing out (ocis)")
+		return shared.MissingJWTTokenError("ocis")
 	}
 
 	if cfg.TransferSecret == "" {
-		return fmt.Errorf("transfer secret is not set up properly, bailing out (ocis)")
+		return shared.MissingRevaTransferSecretError("ocis")
 	}
 
 	if cfg.MachineAuthAPIKey == "" {
-		return fmt.Errorf("machine auth api key is not set up properly, bailing out (ocis)")
+		return shared.MissingMachineAuthApiKeyError("ocis")
 	}
 
 	return nil

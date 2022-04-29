@@ -41,11 +41,11 @@ func InitCommand(cfg *config.Config) *cli.Command {
 			insecureFlag := c.String("insecure")
 			insecure := false
 			if insecureFlag == "ask" {
-				answer := strings.ToLower(stringPrompt("Insecure Backends? [Yes|No]"))
+				answer := strings.ToLower(stringPrompt("Do want to configure oCIS with certificate checking disabled?\n This is not recommended for public instances! [yes | no = default]"))
 				if answer == "yes" || answer == "y" {
 					insecure = true
 				}
-			} else if insecureFlag == "true" {
+			} else if insecureFlag == strings.ToLower("true") || insecureFlag == strings.ToLower("yes") || insecureFlag == strings.ToLower("y") {
 				insecure = true
 			}
 			err := ocisinit.CreateConfig(insecure, c.Bool("force-overwrite"), c.String("config-path"))

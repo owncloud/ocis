@@ -2,11 +2,11 @@ package parser
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/owncloud/ocis/extensions/frontend/pkg/config"
 	"github.com/owncloud/ocis/extensions/frontend/pkg/config/defaults"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 
 	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
 )
@@ -35,7 +35,7 @@ func ParseConfig(cfg *config.Config) error {
 
 func Validate(cfg *config.Config) error {
 	if cfg.TransferSecret == "" {
-		return fmt.Errorf("reva transfer secret is not set up properly, bailing out (%s)", cfg.Service.Name)
+		return shared.MissingRevaTransferSecretError(cfg.Service.Name)
 	}
 
 	return nil
