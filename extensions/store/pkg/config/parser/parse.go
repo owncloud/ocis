@@ -10,7 +10,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
 )
 
-// ParseConfig loads accounts configuration from known paths.
+// ParseConfig loads configuration from known paths.
 func ParseConfig(cfg *config.Config) error {
 	_, err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg)
 	if err != nil {
