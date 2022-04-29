@@ -77,11 +77,11 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &listResponse{Value: files})
 }
 
-func (g Graph) getDriveItem(ctx context.Context, root *storageprovider.ResourceId) (*libregraph.DriveItem, error) {
+func (g Graph) getDriveItem(ctx context.Context, root storageprovider.ResourceId) (*libregraph.DriveItem, error) {
 	client := g.GetGatewayClient()
 
 	ref := &storageprovider.Reference{
-		ResourceId: root,
+		ResourceId: &root,
 	}
 	res, err := client.Stat(ctx, &storageprovider.StatRequest{Ref: ref})
 	if err != nil {
@@ -196,18 +196,16 @@ func cs3ResourceToRemoteItem(res *storageprovider.ResourceInfo) (*libregraph.Rem
 	return remoteItem, nil
 }
 
-func (g Graph) getPathForResource(ctx context.Context, ID *storageprovider.ResourceId) (*string, error) {
+func (g Graph) getPathForResource(ctx context.Context, id storageprovider.ResourceId) (string, error) {
 	client := g.GetGatewayClient()
-	var path *string
-	res, err := client.GetPath(ctx, &storageprovider.GetPathRequest{ResourceId: ID})
+	res, err := client.GetPath(ctx, &storageprovider.GetPathRequest{ResourceId: &id})
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	if res.Status.Code != cs3rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("could not stat %s: %s", ID, res.Status.Message)
+		return "", fmt.Errorf("could not stat %v: %s", id, res.Status.Message)
 	}
-	path = &res.Path
-	return path, err
+	return res.Path, err
 }
 
 // GetExtendedSpaceProperties reads properties from the opaque and transforms them into driveItems
@@ -221,7 +219,7 @@ func (g Graph) GetExtendedSpaceProperties(ctx context.Context, baseURL *url.URL,
 
 	for _, itemName := range names {
 		if itemID, ok := metadata[itemName]; ok {
-			spaceItem := g.getSpecialDriveItem(ctx, resourceid.OwnCloudResourceIDUnwrap(string(itemID.Value)), itemName, baseURL, space)
+			spaceItem := g.getSpecialDriveItem(ctx, *resourceid.OwnCloudResourceIDUnwrap(string(itemID.Value)), itemName, baseURL, space)
 			if spaceItem != nil {
 				spaceItems = append(spaceItems, *spaceItem)
 			}
@@ -230,24 +228,26 @@ func (g Graph) GetExtendedSpaceProperties(ctx context.Context, baseURL *url.URL,
 	return spaceItems
 }
 
-func (g Graph) getSpecialDriveItem(ctx context.Context, ID *storageprovider.ResourceId, itemName string, baseURL *url.URL, space *storageprovider.StorageSpace) *libregraph.DriveItem {
+func (g Graph) getSpecialDriveItem(ctx context.Context, id storageprovider.ResourceId, itemName string, baseURL *url.URL, space *storageprovider.StorageSpace) *libregraph.DriveItem {
 	var spaceItem *libregraph.DriveItem
-	if ID == nil {
+	if id.StorageId == "" && id.OpaqueId == "" {
 		return nil
 	}
 
-	spaceItem, err := g.getDriveItem(ctx, ID)
+	spaceItem, err := g.getDriveItem(ctx, id)
 	if err != nil {
-		g.logger.Error().Err(err).Str("ID", ID.OpaqueId).Msg("Could not get readme Item")
+		g.logger.Error().Err(err).Str("ID", id.OpaqueId).Msg("Could not get readme Item")
 		return nil
 	}
-	itemPath, err := g.getPathForResource(ctx, ID)
+	itemPath, err := g.getPathForResource(ctx, id)
 	if err != nil {
-		g.logger.Error().Err(err).Str("ID", ID.OpaqueId).Msg("Could not get readme path")
+		g.logger.Error().Err(err).Str("ID", id.OpaqueId).Msg("Could not get readme path")
 		return nil
 	}
 	spaceItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(itemName)}
-	spaceItem.WebDavUrl = libregraph.PtrString(baseURL.String() + path.Join(space.Id.OpaqueId, *itemPath))
+	webdavURL := *baseURL
+	webdavURL.Path = path.Join(webdavURL.Path, space.Id.OpaqueId, itemPath)
+	spaceItem.WebDavUrl = libregraph.PtrString(webdavURL.String())
 
 	return spaceItem
 }
