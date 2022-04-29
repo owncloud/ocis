@@ -91,7 +91,7 @@ func EnsureDefaults(cfg *config.Config) {
 	}
 
 	if cfg.Metadata.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
-		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+		cfg.Metadata.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
 }
 
