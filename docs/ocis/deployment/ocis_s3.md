@@ -104,8 +104,6 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, e.g. `OCIS_DOMAIN=ocis.owncloud.test`.
 
-  You also must override the default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD`, `OCIS_JWT_SECRET`, `STORAGE_TRANSFER_SECRET` and `OCIS_MACHINE_AUTH_API_KEY`  in order to secure your oCIS instance. Choose some random strings e.g. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}}).
-
   Set your domain for the MinIO frontend in `MINIO_DOMAIN=`, e.g. `MINIO_DOMAIN=minio.owncloud.test`. If you are using other S3-compatible providers you need to configure the respective endpoint here.
 
   If you like you can change the default name of the S3 bucket by setting `MINIO_BUCKET=` to a different value.

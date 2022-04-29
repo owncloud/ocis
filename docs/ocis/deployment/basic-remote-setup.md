@@ -25,10 +25,6 @@ In `$HOME/.ocis/idp` is a file `identifier-registration.yaml`. It is used to con
 The `identifier-registration.yaml` file will only be generated if it does not exist yet. If you want to change certain environment variables like `OCIS_URL`, please delete this file first before doing so. Otherwise your changes will not be applied correctly and you will run into errors.
 {{< /hint >}}
 
-{{< hint warning >}}
-oCIS is currently in a Tech Preview state and is shipped with demo users. In order to secure your oCIS instances please follow following guide: [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}})
-{{< /hint >}}
-
 For the following examples you need to have the oCIS binary in your current working directory, we assume it is named `ocis` and it needs to be marked as executable. See [Getting Started]({{< ref "../getting-started/#binaries" >}}) for where to get the binary from.
 
 ### Using automatically generated certificates
