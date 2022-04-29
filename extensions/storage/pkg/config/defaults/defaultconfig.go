@@ -32,7 +32,6 @@ func DefaultConfig() *config.Config {
 			Addr: "127.0.0.1:9109",
 		},
 		Reva: config.Reva{
-			//JWTSecret:             "Pive-Fumkiu4",
 			SkipUserGroupsInToken: false,
 			TransferExpires:       24 * 60 * 60,
 			OIDC: config.OIDC{
@@ -444,7 +443,6 @@ func DefaultConfig() *config.Config {
 			GatewaySVC:      defaultGatewayAddr,
 			Insecure:        false, // true?
 			Timeout:         84300,
-			//JWTSecret:       "Pive-Fumkiu4",
 		},
 		Tracing: config.Tracing{
 			Service: "storage",
@@ -455,11 +453,7 @@ func DefaultConfig() *config.Config {
 }
 
 func EnsureDefaults(cfg *config.Config) {
-	//if cfg.TransferSecret == "" && cfg.Commons != nil && cfg.Commons.TransferSecret != "" {
-	//	cfg.TransferSecret = cfg.Commons.TransferSecret
-	//}
 }
 
 func Sanitize(cfg *config.Config) {
-	// TODO: IMPLEMENT ME!
 }

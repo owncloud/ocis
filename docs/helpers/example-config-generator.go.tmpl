@@ -23,8 +23,6 @@ func main() {
 		replacer.Replace("{{$value}}"): func() string {
 			fmt.Println("Generating example YAML config for {{ $value -}}")
 			c := pkg{{$key}}.FullDefaultConfig()
-			pkg{{$key}}.EnsureDefaults(c)
-			pkg{{$key}}.Sanitize(c)
 			yml, err := yaml.Marshal(c)
 			if err != nil {
 				log.Fatalf("Marshalling yaml for pkg0 failed: %s\n", err)

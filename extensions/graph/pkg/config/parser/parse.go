@@ -38,5 +38,9 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingJWTTokenError(cfg.Service.Name)
 	}
 
+	if cfg.Identity.Backend == "ldap" && cfg.Identity.LDAP.BindPassword == "" {
+		return shared.MissingLDAPBindPassword(cfg.Service.Name)
+	}
+
 	return nil
 }

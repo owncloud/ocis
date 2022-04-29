@@ -34,9 +34,10 @@ func InitCommand(cfg *config.Config) *cli.Command {
 				Usage:   "Force overwrite existing config file",
 			},
 			&cli.StringFlag{
-				Name:  "config-path",
-				Value: defaults.BaseConfigPath(),
-				Usage: "Config path for the ocis runtime",
+				Name:    "config-path",
+				Value:   defaults.BaseConfigPath(),
+				Usage:   "Config path for the ocis runtime",
+				EnvVars: []string{"OCIS_CONFIG_DIR"},
 			},
 			&cli.StringFlag{
 				Name:    "admin-password",

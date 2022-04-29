@@ -61,7 +61,7 @@ oCIS will store all data in `/var/lib/ocis`, because we configured it so by sett
 
 ## Starting the oCIS service
 
-Initialize the oCIS configuration by running `OCIS_CONFIG_DIR=/etc/ocis ocis init`.
+Initialize the oCIS configuration by running `ocis init --config-path /etc/ocis`.
 
 You can enable oCIS now by running `systemctl enable --now ocis`. It will ensure that oCIS also is restarted after a reboot of the host.
 

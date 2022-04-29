@@ -42,7 +42,6 @@ func DefaultConfig() *config.Config {
 				URI:                      "ldaps://localhost:9235",
 				Insecure:                 true,
 				BindDN:                   "uid=libregraph,ou=sysusers,o=libregraph-idm",
-				BindPassword:             "idm",
 				UseServerUUID:            false,
 				WriteEnabled:             true,
 				UserBaseDN:               "ou=users,o=libregraph-idm",

@@ -7,7 +7,6 @@ import (
 	"os"
 	"path"
 	"strconv"
-	"strings"
 
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
@@ -16,7 +15,6 @@ import (
 	"github.com/owncloud/ocis/extensions/frontend/pkg/config/parser"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/ocis-pkg/tracing"
@@ -30,11 +28,6 @@ func Frontend(cfg *config.Config) *cli.Command {
 		Name:  "frontend",
 		Usage: "start frontend service",
 		Before: func(ctx *cli.Context) error {
-			// TODO: what !?
-			//if err := loadUserAgent(c, cfg); err != nil {
-			//	return err
-			//}
-			//return nil
 			err := parser.ParseConfig(cfg)
 			if err != nil {
 				fmt.Printf("%v", err)
@@ -59,13 +52,6 @@ func Frontend(cfg *config.Config) *cli.Command {
 
 			uuid := uuid.Must(uuid.NewV4())
 			pidFile := path.Join(os.TempDir(), "revad-"+c.Command.Name+"-"+uuid.String()+".pid")
-
-			// pregenerate list of valid localhost ports for the desktop redirect_uri
-			// TODO use custom scheme like "owncloud://localhost/user/callback" tracked in
-			var desktopRedirectURIs [65535 - 1024]string
-			for port := 0; port < len(desktopRedirectURIs); port++ {
-				desktopRedirectURIs[port] = fmt.Sprintf("http://localhost:%d", (port + 1024))
-			}
 
 			archivers := []map[string]interface{}{
 				{
@@ -316,31 +302,6 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 			},
 		},
 	}
-}
-
-// loadUserAgent reads the user-agent-whitelist-lock-in, since it is a string flag, and attempts to construct a map of
-// "user-agent":"challenge" locks in for Reva.
-// Modifies cfg. Spaces don't need to be trimmed as urfavecli takes care of it. User agents with spaces are valid. i.e:
-// Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:83.0) Gecko/20100101 Firefox/83.0
-// This function works by relying in our format of specifying [user-agent:challenge] and the fact that the user agent
-// might contain ":" (colon), so the original string is reversed, split in two parts, by the time it is split we
-// have the indexes reversed and the tuple is in the format of [challenge:user-agent], then the same process is applied
-// in reverse for each individual part
-func loadUserAgent(c *cli.Context, cfg *config.Config) error {
-	cfg.Middleware.Auth.CredentialsByUserAgent = make(map[string]string)
-	locks := c.StringSlice("user-agent-whitelist-lock-in")
-
-	for _, v := range locks {
-		vv := conversions.Reverse(v)
-		parts := strings.SplitN(vv, ":", 2)
-		if len(parts) != 2 {
-			return fmt.Errorf("unexpected config value for user-agent lock-in: %v, expected format is user-agent:challenge", v)
-		}
-
-		cfg.Middleware.Auth.CredentialsByUserAgent[conversions.Reverse(parts[1])] = conversions.Reverse(parts[0])
-	}
-
-	return nil
 }
 
 // FrontendSutureService allows for the storage-frontend command to be embedded and supervised by a suture supervisor tree.
