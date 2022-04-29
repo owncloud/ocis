@@ -273,7 +273,8 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	identifierParts := strings.Split(driveID, "!")
 	switch len(identifierParts) {
 	case 1:
-		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[0]
+		sID, _ := resourceid.StorageIDUnwrap(identifierParts[0])
+		root.StorageId, root.OpaqueId = identifierParts[0], sID
 	case 2:
 		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[1]
 	default:
@@ -492,7 +493,8 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 	}
 
 	spaceID := space.Root.StorageId
-	if space.Root.OpaqueId != space.Root.StorageId {
+	sIDs := resourceid.OwnCloudResourceIDUnwrap(rootID)
+	if space.Root.OpaqueId != sIDs.OpaqueId {
 		spaceID = rootID
 	}
 	drive := &libregraph.Drive{
@@ -735,9 +737,10 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 	root := &storageprovider.ResourceId{}
 
 	identifierParts := strings.Split(driveID, "!")
+	sID, _ := resourceid.StorageIDUnwrap(identifierParts[0])
 	switch len(identifierParts) {
 	case 1:
-		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[0]
+		root.StorageId, root.OpaqueId = identifierParts[0], sID
 	case 2:
 		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[1]
 	default:
