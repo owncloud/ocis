@@ -143,16 +143,15 @@ func backupOcisConfigFile(configPath string) (string, error) {
 }
 
 func CreateConfig(insecure, forceOverwrite bool, configPath string) error {
-	err := checkConfigPath(configPath)
 	targetBackupConfig := ""
+
+	err := checkConfigPath(configPath)
 	if err != nil && !forceOverwrite {
 		return err
-	} else if forceOverwrite {
+	} else if forceOverwrite && err != nil {
 		targetBackupConfig, err = backupOcisConfigFile(configPath)
 		if err != nil {
 			return err
-		} else {
-
 		}
 	}
 	err = os.MkdirAll(configPath, 0700)
