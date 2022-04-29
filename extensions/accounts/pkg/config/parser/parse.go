@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/extensions/accounts/pkg/config"
 	defaults "github.com/owncloud/ocis/extensions/accounts/pkg/config/defaults"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 
 	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
 )
@@ -33,5 +34,8 @@ func ParseConfig(cfg *config.Config) error {
 }
 
 func Validate(cfg *config.Config) error {
+	if cfg.TokenManager.JWTSecret == "" {
+		return shared.MissingJWTTokenError(cfg.Service.Name)
+	}
 	return nil
 }

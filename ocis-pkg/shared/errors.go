@@ -26,3 +26,10 @@ func MissingRevaTransferSecretError(service string) error {
 		"(e.g. by running ocis init or setting STORAGE_TRANSFER_SECRET).\n",
 		service, defaults.BaseConfigPath())
 }
+
+func MissingLDAPBindPassword(service string) error {
+	return fmt.Errorf("bind_password has not been set properly in your config for %s. "+
+		"Make sure your %s config contains the proper values "+
+		"(e.g. by running ocis init or setting LDAP_BIND_PASSWORD).\n",
+		service, defaults.BaseConfigPath())
+}

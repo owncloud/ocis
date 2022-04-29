@@ -2,6 +2,7 @@ package defaults
 
 import (
 	"github.com/owncloud/ocis/extensions/appprovider/pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
 func FullDefaultConfig() *config.Config {
@@ -79,4 +80,12 @@ func EnsureDefaults(cfg *config.Config) {
 
 func Sanitize(cfg *config.Config) {
 	// nothing to sanitize here atm
+}
+
+func Validate(cfg *config.Config) error {
+	if cfg.TokenManager.JWTSecret == "" {
+		return shared.MissingJWTTokenError(cfg.Service.Name)
+	}
+
+	return nil
 }
