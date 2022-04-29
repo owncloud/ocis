@@ -221,6 +221,24 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * The method finds available spaces to the manager user and returns the space by spaceName
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @return array
+	 */
+	public function getSpaceByNameManager(string $user, string $spaceName): array {
+		$this->theUserListsAllAvailableSpacesUsingTheGraphApi($user);
+
+		$spaces = $this->getAvailableSpaces();
+		Assert::assertIsArray($spaces[$spaceName], "Space with name $spaceName for user $user not found");
+		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName for user $user not found");
+
+		return $spaces[$spaceName];
+	}
+
+	/**
 	 * The method finds file by fileName and spaceName and returns data of file wich contains in responseHeader
 	 * fileName contains the path, if the file is in the folder
 	 *
@@ -411,6 +429,33 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * Send Graph List All Spaces Request
+	 *
+	 * @param  string $user
+	 * @param  string $password
+	 * @param  string $urlArguments
+	 * @param  string $xRequestId
+	 * @param  array  $body
+	 * @param  array  $headers
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 */
+	public function listAllSpacesRequest(
+		string $user,
+		string $password,
+		string $urlArguments = '',
+		string $xRequestId = '',
+		array  $body = [],
+		array  $headers = []
+	): ResponseInterface {
+		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/" . $urlArguments;
+
+		return HttpRequestHelper::get($fullUrl, $xRequestId, $user, $password, $headers, $body);
+	}
+
+	/**
 	 * Send Graph List Single Space Request
 	 *
 	 * @param  string $user
@@ -523,6 +568,24 @@ class SpacesContext implements Context {
 	public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user): void {
 		$this->featureContext->setResponse(
 			$this->listMySpacesRequest(
+				$user,
+				$this->featureContext->getPasswordForUser($user)
+			)
+		);
+		$this->rememberTheAvailableSpaces();
+	}
+
+	/**
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 */
+	public function theUserListsAllAvailableSpacesUsingTheGraphApi(string $user): void {
+		$this->featureContext->setResponse(
+			$this->listAllSpacesRequest(
 				$user,
 				$this->featureContext->getPasswordForUser($user)
 			)
@@ -1951,7 +2014,7 @@ class SpacesContext implements Context {
 		string $userWithManagerRights = ''
 	): void {
 		if (!empty($userWithManagerRights)) {
-			$space = $this->getSpaceByName($userWithManagerRights, $spaceName);
+			$space = $this->getSpaceByNameManager($userWithManagerRights, $spaceName);
 		} else {
 			$space = $this->getSpaceByName($user, $spaceName);
 		}
