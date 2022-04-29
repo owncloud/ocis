@@ -43,7 +43,7 @@ func InitCommand(cfg *config.Config) *cli.Command {
 				Name:    "admin-password",
 				Aliases: []string{"ap"},
 				EnvVars: []string{"ADMIN_PASSWORD", "IDM_ADMIN_PASSWORD"},
-				Usage:   "Set admin password instead of using a random gnerated one",
+				Usage:   "Set admin password instead of using a random generated one",
 			},
 		},
 		Action: func(c *cli.Context) error {
