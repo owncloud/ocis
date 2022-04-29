@@ -174,7 +174,7 @@ var _ = Describe("Searchprovider", func() {
 
 		It("indexes items when they are being moved", func() {
 			called := false
-			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
+			indexClient.On("Move", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
 				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
 			})).Return(nil).Run(func(args mock.Arguments) {
 				called = true

@@ -74,12 +74,29 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 				}
 
 				continue
-			case events.FileUploaded:
+			case events.ItemMoved:
 				ref = e.Ref
 				owner = &user.User{
 					Id: e.Executant,
 				}
-			case events.ItemMoved:
+
+				statRes, err := p.statResource(ref, owner)
+				if err != nil {
+					p.logger.Error().Err(err).Msg("failed to stat the changed resource")
+				}
+
+				switch statRes.Status.Code {
+				case rpc.Code_CODE_OK:
+					err = p.indexClient.Move(statRes.Info)
+					if err != nil {
+						p.logger.Error().Err(err).Msg("failed to restore the changed resource in the index")
+					}
+				default:
+					p.logger.Error().Interface("statRes", statRes).Msg("failed to stat the changed resource")
+				}
+
+				continue
+			case events.FileUploaded:
 				ref = e.Ref
 				owner = &user.User{
 					Id: e.Executant,

@@ -70,10 +70,24 @@ var _ = Describe("Index", func() {
 				StorageId: "storageid",
 				OpaqueId:  "parentopaqueid",
 			},
-			Path:  "subdir",
+			Path:  "child.pdf",
 			Size:  12345,
 			Type:  sprovider.ResourceType_RESOURCE_TYPE_FILE,
 			Mtime: &typesv1beta1.Timestamp{Seconds: 4000},
+		}
+
+		assertDocCount = func(rootId *sprovider.ResourceId, query string, expectedCount int) {
+			res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
+				Query: query,
+				Ref: &searchmsg.Reference{
+					ResourceId: &searchmsg.ResourceID{
+						StorageId: rootId.StorageId,
+						OpaqueId:  rootId.OpaqueId,
+					},
+				},
+			})
+			ExpectWithOffset(1, err).ToNot(HaveOccurred())
+			ExpectWithOffset(1, len(res.Matches)).To(Equal(expectedCount))
 		}
 	)
 
@@ -278,8 +292,37 @@ var _ = Describe("Index", func() {
 		})
 	})
 
-	Describe("Restore", func() {
+	Describe("Delete", func() {
+		It("marks a resource as deleted", func() {
+			err := i.Add(parentRef, parentRi)
+			Expect(err).ToNot(HaveOccurred())
+			assertDocCount(rootId, "subdir", 1)
+
+			err = i.Delete(parentRi.Id)
+			Expect(err).ToNot(HaveOccurred())
+
+			assertDocCount(rootId, "subdir", 0)
+		})
+
 		It("also marks child resources as deleted", func() {
+			err := i.Add(parentRef, parentRi)
+			Expect(err).ToNot(HaveOccurred())
+			err = i.Add(childRef, childRi)
+			Expect(err).ToNot(HaveOccurred())
+
+			assertDocCount(rootId, "subdir", 1)
+			assertDocCount(rootId, "child.pdf", 1)
+
+			err = i.Delete(parentRi.Id)
+			Expect(err).ToNot(HaveOccurred())
+
+			assertDocCount(rootId, "subdir", 0)
+			assertDocCount(rootId, "child.pdf", 0)
+		})
+	})
+
+	Describe("Restore", func() {
+		It("also marks child resources as restored", func() {
 			err := i.Add(parentRef, parentRi)
 			Expect(err).ToNot(HaveOccurred())
 			err = i.Add(childRef, childRi)
@@ -287,41 +330,32 @@ var _ = Describe("Index", func() {
 			err = i.Delete(parentRi.Id)
 			Expect(err).ToNot(HaveOccurred())
 
-			res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
-				Query: "subdir",
-				Ref: &searchmsg.Reference{
-					ResourceId: &searchmsg.ResourceID{
-						StorageId: rootId.StorageId,
-						OpaqueId:  rootId.OpaqueId,
-					},
-				},
-			})
-			Expect(err).ToNot(HaveOccurred())
-			Expect(len(res.Matches)).To(Equal(0))
+			assertDocCount(rootId, "subdir", 0)
+			assertDocCount(rootId, "child.pdf", 0)
 
 			err = i.Restore(parentRi.Id)
 			Expect(err).ToNot(HaveOccurred())
 
-			res, err = i.Search(ctx, &searchsvc.SearchIndexRequest{
-				Query: "subdir",
-				Ref: &searchmsg.Reference{
-					ResourceId: &searchmsg.ResourceID{
-						StorageId: rootId.StorageId,
-						OpaqueId:  rootId.OpaqueId,
-					},
-				},
-			})
-			Expect(err).ToNot(HaveOccurred())
-			Expect(len(res.Matches)).To(Equal(2))
+			assertDocCount(rootId, "subdir", 1)
+			assertDocCount(rootId, "child.pdf", 1)
 		})
 	})
 
-	Describe("Delete", func() {
-		It("marks a resource as deleted", func() {
+	Describe("Move", func() {
+		It("moves the parent and its child resources", func() {
 			err := i.Add(parentRef, parentRi)
 			Expect(err).ToNot(HaveOccurred())
+			err = i.Add(childRef, childRi)
+			Expect(err).ToNot(HaveOccurred())
+
+			parentRi.Path = "newname"
+			err = i.Move(parentRi)
+			Expect(err).ToNot(HaveOccurred())
+
+			assertDocCount(rootId, "subdir", 0)
+
 			res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
-				Query: "subdir",
+				Query: "child.pdf",
 				Ref: &searchmsg.Reference{
 					ResourceId: &searchmsg.ResourceID{
 						StorageId: rootId.StorageId,
@@ -331,54 +365,7 @@ var _ = Describe("Index", func() {
 			})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(res.Matches)).To(Equal(1))
-
-			err = i.Delete(parentRi.Id)
-			Expect(err).ToNot(HaveOccurred())
-
-			res, err = i.Search(ctx, &searchsvc.SearchIndexRequest{
-				Query: "subdir",
-				Ref: &searchmsg.Reference{
-					ResourceId: &searchmsg.ResourceID{
-						StorageId: rootId.StorageId,
-						OpaqueId:  rootId.OpaqueId,
-					},
-				},
-			})
-			Expect(err).ToNot(HaveOccurred())
-			Expect(len(res.Matches)).To(Equal(0))
-		})
-
-		It("also marks child resources as deleted", func() {
-			err := i.Add(parentRef, parentRi)
-			Expect(err).ToNot(HaveOccurred())
-			err = i.Add(childRef, childRi)
-			Expect(err).ToNot(HaveOccurred())
-			res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
-				Query: "subdir",
-				Ref: &searchmsg.Reference{
-					ResourceId: &searchmsg.ResourceID{
-						StorageId: rootId.StorageId,
-						OpaqueId:  rootId.OpaqueId,
-					},
-				},
-			})
-			Expect(err).ToNot(HaveOccurred())
-			Expect(len(res.Matches)).To(Equal(2))
-
-			err = i.Delete(parentRi.Id)
-			Expect(err).ToNot(HaveOccurred())
-
-			res, err = i.Search(ctx, &searchsvc.SearchIndexRequest{
-				Query: "subdir",
-				Ref: &searchmsg.Reference{
-					ResourceId: &searchmsg.ResourceID{
-						StorageId: rootId.StorageId,
-						OpaqueId:  rootId.OpaqueId,
-					},
-				},
-			})
-			Expect(err).ToNot(HaveOccurred())
-			Expect(len(res.Matches)).To(Equal(0))
+			Expect(res.Matches[0].Entity.Ref.Path).To(Equal("./newname/child.pdf"))
 		})
 	})
 })

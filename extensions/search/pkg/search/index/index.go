@@ -21,6 +21,7 @@ package index
 import (
 	"context"
 	"errors"
+	"path"
 	"strings"
 	"time"
 
@@ -30,6 +31,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	searchmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
 )
@@ -91,22 +93,17 @@ func (i *Index) Restore(id *sprovider.ResourceId) error {
 }
 
 func (i *Index) markAsDeleted(id string, deleted bool) error {
-	req := bleve.NewSearchRequest(bleve.NewDocIDQuery([]string{id}))
-	req.Fields = []string{"*"}
-	res, err := i.bleveIndex.Search(req)
+	doc, err := i.updateEntity(id, func(doc *indexDocument) {
+		doc.Deleted = deleted
+	})
 	if err != nil {
 		return err
 	}
-	if res.Hits.Len() == 0 {
-		return errors.New("entity not found")
-	}
-	entity := fieldsToEntity(res.Hits[0].Fields)
-	entity.Deleted = deleted
 
-	if entity.Type == uint64(sprovider.ResourceType_RESOURCE_TYPE_CONTAINER) {
+	if doc.Type == uint64(sprovider.ResourceType_RESOURCE_TYPE_CONTAINER) {
 		query := bleve.NewConjunctionQuery(
-			bleve.NewQueryStringQuery("RootID:"+entity.RootID),
-			bleve.NewQueryStringQuery("Path:"+entity.Path+"/*"),
+			bleve.NewQueryStringQuery("RootID:"+doc.RootID),
+			bleve.NewQueryStringQuery("Path:"+doc.Path+"/*"),
 		)
 		bleveReq := bleve.NewSearchRequest(query)
 		bleveReq.Fields = []string{"*"}
@@ -116,16 +113,90 @@ func (i *Index) markAsDeleted(id string, deleted bool) error {
 		}
 
 		for _, h := range res.Hits {
-			i.markAsDeleted(h.ID, deleted)
+			_, err := i.updateEntity(h.ID, func(doc *indexDocument) {
+				doc.Deleted = deleted
+			})
+			if err != nil {
+				return err
+			}
 		}
 	}
 
-	return i.bleveIndex.Index(entity.ID, entity)
+	return nil
+}
+
+func (i *Index) updateEntity(id string, mutateFunc func(doc *indexDocument)) (*indexDocument, error) {
+	doc, err := i.getEntity(id)
+	if err != nil {
+		return nil, err
+	}
+	mutateFunc(doc)
+	err = i.bleveIndex.Index(doc.ID, doc)
+	if err != nil {
+		return nil, err
+	}
+
+	return doc, nil
+}
+
+func (i *Index) getEntity(id string) (*indexDocument, error) {
+	req := bleve.NewSearchRequest(bleve.NewDocIDQuery([]string{id}))
+	req.Fields = []string{"*"}
+	res, err := i.bleveIndex.Search(req)
+	if err != nil {
+		return nil, err
+	}
+	if res.Hits.Len() == 0 {
+		return nil, errors.New("entity not found")
+	}
+	return fieldsToEntity(res.Hits[0].Fields), nil
 }
 
 // Purge removes an entity from the index
 func (i *Index) Purge(id *sprovider.ResourceId) error {
 	return i.bleveIndex.Delete(idToBleveId(id))
+}
+
+// Purge removes an entity from the index
+func (i *Index) Move(ri *sprovider.ResourceInfo) error {
+	doc, err := i.getEntity(idToBleveId(ri.Id))
+	if err != nil {
+		return err
+	}
+	oldName := doc.Path
+	newName := utils.MakeRelativePath(ri.Path)
+
+	doc, err = i.updateEntity(idToBleveId(ri.Id), func(doc *indexDocument) {
+		doc.Path = newName
+		doc.Name = path.Base(newName)
+	})
+	if err != nil {
+		return err
+	}
+
+	if doc.Type == uint64(sprovider.ResourceType_RESOURCE_TYPE_CONTAINER) {
+		query := bleve.NewConjunctionQuery(
+			bleve.NewQueryStringQuery("RootID:"+doc.RootID),
+			bleve.NewQueryStringQuery("Path:"+oldName+"/*"),
+		)
+		bleveReq := bleve.NewSearchRequest(query)
+		bleveReq.Fields = []string{"*"}
+		res, err := i.bleveIndex.Search(bleveReq)
+		if err != nil {
+			return err
+		}
+
+		for _, h := range res.Hits {
+			_, err := i.updateEntity(h.ID, func(doc *indexDocument) {
+				doc.Path = strings.Replace(doc.Path, oldName, newName, 1)
+			})
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 // Search searches the index according to the criteria specified in the given SearchIndexRequest
