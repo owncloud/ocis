@@ -142,7 +142,7 @@ func backupOcisConfigFile(configPath string) (string, error) {
 	return targetBackupConfig, nil
 }
 
-func CreateConfig(insecure, forceOverwrite bool, configPath string) error {
+func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword string) error {
 	targetBackupConfig := ""
 
 	err := checkConfigPath(configPath)
@@ -167,10 +167,14 @@ func CreateConfig(insecure, forceOverwrite bool, configPath string) error {
 	if err != nil {
 		return fmt.Errorf("could not generate random password for idp: %s", err)
 	}
-	ocisAdminServicePassword, err := generators.GenerateRandomPassword(passwordLength)
-	if err != nil {
-		return fmt.Errorf("could not generate random password for ocis admin: %s", err)
+	ocisAdminServicePassword := adminPassword
+	if ocisAdminServicePassword == "" {
+		ocisAdminServicePassword, err = generators.GenerateRandomPassword(passwordLength)
+		if err != nil {
+			return fmt.Errorf("could not generate random password for ocis admin: %s", err)
+		}
 	}
+
 	revaServicePassword, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("could not generate random password for reva: %s", err)

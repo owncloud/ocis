@@ -24,17 +24,25 @@ func InitCommand(cfg *config.Config) *cli.Command {
 				Name:    "insecure",
 				EnvVars: []string{"OCIS_INSECURE"},
 				Value:   "ask",
+				Usage:   "Allow insecure oCIS config",
 			},
 			&cli.BoolFlag{
 				Name:    "force-overwrite",
 				Aliases: []string{"f"},
 				EnvVars: []string{"OCIS_FORCE_CONFIG_OVERWRITE"},
 				Value:   false,
+				Usage:   "Force overwrite existing config file",
 			},
 			&cli.StringFlag{
 				Name:  "config-path",
 				Value: defaults.BaseConfigPath(),
-				Usage: "config path for the ocis runtime",
+				Usage: "Config path for the ocis runtime",
+			},
+			&cli.StringFlag{
+				Name:    "admin-password",
+				Aliases: []string{"ap"},
+				EnvVars: []string{"ADMIN_PASSWORD"},
+				Usage:   "Set admin password instead of using a random gnerated one",
 			},
 		},
 		Action: func(c *cli.Context) error {
@@ -48,7 +56,7 @@ func InitCommand(cfg *config.Config) *cli.Command {
 			} else if insecureFlag == strings.ToLower("true") || insecureFlag == strings.ToLower("yes") || insecureFlag == strings.ToLower("y") {
 				insecure = true
 			}
-			err := ocisinit.CreateConfig(insecure, c.Bool("force-overwrite"), c.String("config-path"))
+			err := ocisinit.CreateConfig(insecure, c.Bool("force-overwrite"), c.String("config-path"), c.String("admin-password"))
 			if err != nil {
 				log.Fatalf("Could not create config: %s", err)
 			}
