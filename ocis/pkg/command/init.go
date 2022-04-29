@@ -41,7 +41,7 @@ func InitCommand(cfg *config.Config) *cli.Command {
 			&cli.StringFlag{
 				Name:    "admin-password",
 				Aliases: []string{"ap"},
-				EnvVars: []string{"ADMIN_PASSWORD"},
+				EnvVars: []string{"ADMIN_PASSWORD", "IDM_ADMIN_PASSWORD"},
 				Usage:   "Set admin password instead of using a random gnerated one",
 			},
 		},
