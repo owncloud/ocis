@@ -80,12 +80,17 @@ func (i *Index) Add(ref *sprovider.Reference, ri *sprovider.ResourceInfo) error 
 	return i.bleveIndex.Index(idToBleveId(ri.Id), entity)
 }
 
-// Delete marks an entity from the index as delete (still keeping it around)
+// Delete marks an entity from the index as deleten (still keeping it around)
 func (i *Index) Delete(id *sprovider.ResourceId) error {
-	return i.markAsDeleted(idToBleveId(id))
+	return i.markAsDeleted(idToBleveId(id), true)
 }
 
-func (i *Index) markAsDeleted(id string) error {
+// Restore marks an entity from the index as not being deleted
+func (i *Index) Restore(id *sprovider.ResourceId) error {
+	return i.markAsDeleted(idToBleveId(id), false)
+}
+
+func (i *Index) markAsDeleted(id string, deleted bool) error {
 	req := bleve.NewSearchRequest(bleve.NewDocIDQuery([]string{id}))
 	req.Fields = []string{"*"}
 	res, err := i.bleveIndex.Search(req)
@@ -96,7 +101,7 @@ func (i *Index) markAsDeleted(id string) error {
 		return errors.New("entity not found")
 	}
 	entity := fieldsToEntity(res.Hits[0].Fields)
-	entity.Deleted = true
+	entity.Deleted = deleted
 
 	if entity.Type == uint64(sprovider.ResourceType_RESOURCE_TYPE_CONTAINER) {
 		query := bleve.NewConjunctionQuery(
@@ -111,7 +116,7 @@ func (i *Index) markAsDeleted(id string) error {
 		}
 
 		for _, h := range res.Hits {
-			i.markAsDeleted(h.ID)
+			i.markAsDeleted(h.ID, deleted)
 		}
 	}
 

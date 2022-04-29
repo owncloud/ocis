@@ -278,7 +278,45 @@ var _ = Describe("Index", func() {
 		})
 	})
 
-	Describe("Remove", func() {
+	Describe("Restore", func() {
+		It("also marks child resources as deleted", func() {
+			err := i.Add(parentRef, parentRi)
+			Expect(err).ToNot(HaveOccurred())
+			err = i.Add(childRef, childRi)
+			Expect(err).ToNot(HaveOccurred())
+			err = i.Delete(parentRi.Id)
+			Expect(err).ToNot(HaveOccurred())
+
+			res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
+				Query: "subdir",
+				Ref: &searchmsg.Reference{
+					ResourceId: &searchmsg.ResourceID{
+						StorageId: rootId.StorageId,
+						OpaqueId:  rootId.OpaqueId,
+					},
+				},
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(res.Matches)).To(Equal(0))
+
+			err = i.Restore(parentRi.Id)
+			Expect(err).ToNot(HaveOccurred())
+
+			res, err = i.Search(ctx, &searchsvc.SearchIndexRequest{
+				Query: "subdir",
+				Ref: &searchmsg.Reference{
+					ResourceId: &searchmsg.ResourceID{
+						StorageId: rootId.StorageId,
+						OpaqueId:  rootId.OpaqueId,
+					},
+				},
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(res.Matches)).To(Equal(2))
+		})
+	})
+
+	Describe("Delete", func() {
 		It("marks a resource as deleted", func() {
 			err := i.Add(parentRef, parentRi)
 			Expect(err).ToNot(HaveOccurred())

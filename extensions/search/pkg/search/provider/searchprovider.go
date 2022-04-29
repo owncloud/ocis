@@ -46,6 +46,34 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 			var ref *provider.Reference
 			var owner *user.User
 			switch e := ev.(type) {
+			case events.ItemTrashed:
+				err := p.indexClient.Delete(e.ID)
+				if err != nil {
+					p.logger.Error().Err(err).Interface("Id", e.ID).Msg("failed to remove item from index")
+				}
+				continue
+			case events.ItemRestored:
+				ref = e.Ref
+				owner = &user.User{
+					Id: e.Executant,
+				}
+
+				statRes, err := p.statResource(ref, owner)
+				if err != nil {
+					p.logger.Error().Err(err).Msg("failed to stat the changed resource")
+				}
+
+				switch statRes.Status.Code {
+				case rpc.Code_CODE_OK:
+					err = p.indexClient.Restore(statRes.Info.Id)
+					if err != nil {
+						p.logger.Error().Err(err).Msg("failed to restore the changed resource in the index")
+					}
+				default:
+					p.logger.Error().Interface("statRes", statRes).Msg("failed to stat the changed resource")
+				}
+
+				continue
 			case events.FileUploaded:
 				ref = e.Ref
 				owner = &user.User{
@@ -56,41 +84,17 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 				owner = &user.User{
 					Id: e.Executant,
 				}
-			case events.ItemRestored:
-				ref = e.Ref
-				owner = &user.User{
-					Id: e.Executant,
-				}
 			case events.FileVersionRestored:
 				ref = e.Ref
 				owner = &user.User{
 					Id: e.Executant,
 				}
-			case events.ItemTrashed:
-				err := p.indexClient.Delete(e.Id)
-				if err != nil {
-					p.logger.Error().Err(err).Interface("Id", e.Id).Msg("failed to remove item from index")
-				}
-				continue
 			default:
 				// Not sure what to do here. Skip.
 				continue
 			}
 
-			// Get auth
-			ownerCtx := ctxpkg.ContextSetUser(context.Background(), owner)
-			authRes, err := p.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
-				Type:         "machine",
-				ClientId:     "userid:" + owner.Id.OpaqueId,
-				ClientSecret: machineAuthAPIKey,
-			})
-			if err != nil || authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
-				p.logger.Error().Err(err).Interface("authRes", authRes).Msg("error using machine auth")
-			}
-			ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token)
-
-			// Stat changed resource resource
-			statRes, err := gwClient.Stat(ownerCtx, &provider.StatRequest{Ref: ref})
+			statRes, err := p.statResource(ref, owner)
 			if err != nil {
 				p.logger.Error().Err(err).Msg("failed to stat the changed resource")
 			}
@@ -112,6 +116,23 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 	}()
 
 	return p
+}
+
+func (p *Provider) statResource(ref *provider.Reference, owner *user.User) (*provider.StatResponse, error) {
+	// Get auth
+	ownerCtx := ctxpkg.ContextSetUser(context.Background(), owner)
+	authRes, err := p.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
+		Type:         "machine",
+		ClientId:     "userid:" + owner.Id.OpaqueId,
+		ClientSecret: p.machineAuthAPIKey,
+	})
+	if err != nil || authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		p.logger.Error().Err(err).Interface("authRes", authRes).Msg("error using machine auth")
+	}
+	ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token)
+
+	// Stat changed resource resource
+	return p.gwClient.Stat(ownerCtx, &provider.StatRequest{Ref: ref})
 }
 
 func (p *Provider) logDocCount() {

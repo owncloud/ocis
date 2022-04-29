@@ -129,7 +129,7 @@ var _ = Describe("Searchprovider", func() {
 			})
 			eventsChan <- events.ItemTrashed{
 				Ref:       ref,
-				Id:        ri.Id,
+				ID:        ri.Id,
 				Executant: user.Id,
 			}
 
@@ -140,8 +140,8 @@ var _ = Describe("Searchprovider", func() {
 
 		It("indexes items when they are being restored", func() {
 			called := false
-			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
-				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
+			indexClient.On("Restore", mock.MatchedBy(func(id *sprovider.ResourceId) bool {
+				return id.OpaqueId == ri.Id.OpaqueId
 			})).Return(nil).Run(func(args mock.Arguments) {
 				called = true
 			})

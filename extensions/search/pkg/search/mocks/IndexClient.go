@@ -79,6 +79,20 @@ func (_m *IndexClient) Purge(ri *providerv1beta1.ResourceId) error {
 	return r0
 }
 
+// Restore provides a mock function with given fields: ri
+func (_m *IndexClient) Restore(ri *providerv1beta1.ResourceId) error {
+	ret := _m.Called(ri)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*providerv1beta1.ResourceId) error); ok {
+		r0 = rf(ri)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Search provides a mock function with given fields: ctx, req
 func (_m *IndexClient) Search(ctx context.Context, req *v0.SearchIndexRequest) (*v0.SearchIndexResponse, error) {
 	ret := _m.Called(ctx, req)
