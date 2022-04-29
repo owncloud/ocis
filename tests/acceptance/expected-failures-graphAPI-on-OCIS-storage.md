@@ -1579,7 +1579,7 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 #### [Incorrect response while listing resources of a folder with depth infinity](https://github.com/owncloud/ocis/issues/3073)
 
-- [apiWebdavOperations/listFiles.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L180)
+- [apiWebdavOperations/listFiles.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L182)
 
 ### [[spaces webdav] upload to a share that was locked by owner ends with status code 409](https://github.com/owncloud/ocis/issues/3128)
 
@@ -1596,9 +1596,9 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 #### [can't access public link resources with spaces webdav API](https://github.com/owncloud/ocis/issues/3085)
 
-- [apiWebdavOperations/listFiles.feature:216](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L216)
-- [apiWebdavOperations/listFiles.feature:254](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L254)
-- [apiWebdavOperations/listFiles.feature:291](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L291)
+- [apiWebdavOperations/listFiles.feature:218](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L218)
+- [apiWebdavOperations/listFiles.feature:256](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L256)
+- [apiWebdavOperations/listFiles.feature:294](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L294)
 
 #### [Trying to modify a shared file using spaces end-point returns 409 HTTP status code](https://github.com/owncloud/ocis/issues/3241)
 
