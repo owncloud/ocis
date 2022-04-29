@@ -67,8 +67,8 @@ The `latest` tag always reflects the current master branch.
 
 ```console
 docker pull owncloud/ocis
-docker run --rm -it -v ocis-config:/etc/ocis -v ocis-data:/var/lib/ocis owncloud/ocis init
-docker run --rm -p 9200:9200 -v ocis-config:/etc/ocis -v ocis-data:/var/lib/ocis -e ACCOUNTS_DEMO_USERS_AND_GROUPS=true owncloud/ocis
+docker run --rm -it -v ocis-config:/etc/ocis owncloud/ocis init
+docker run --rm -p 9200:9200 -v ocis-config:/etc/ocis -v ocis-data:/var/lib/ocis -e IDM_CREATE_DEMO_USERS=true owncloud/ocis
 ```
 
 {{< hint info >}}
