@@ -9,7 +9,7 @@ geekdocCollapseSection: true
 ---
 
 ## TLS Server Certificates
-By default IDM generates a self-signed certificate and key on startup to be
+By default IDM generates a self-signed certificate and key on first startup to be
 able to provide TLS protected services. The certificate is stored in
 `idm/ldap.crt` inside the oCIS base data directory. The key is in
 `idm/ldap.key` in the same directory. You can use a custom server
