@@ -22,7 +22,7 @@ in a separate subtree. The base DN of that subtree is:
 `ou=sysusers,o=libregraph-idm`. The service users are:
 
 * `uid=libregraph,ou=sysusers,o=libregraph-idm`: This is the only user with write
-  access to the LDAP tree. It is used by the Graph service to lookup, create, delete and
+  access to the LDAP tree. It is used by the Graph service to look up, create, delete and
   modify users and groups.
 * `uid=idp,ou=sysusers,o=libregraph-idm`: This user is used by the IDP service to
   perform user lookups for authentication.
@@ -40,8 +40,8 @@ command line clients. To e.g. list all users, this command can be used:
 ldapsearch -x -H ldaps://127.0.0.1:9235 -x -D uid=libregraph,ou=sysusers,o=libregraph-idm -w idm -b o=libregraph-idm objectclass=inetorgperson
 ```
 
-When using the default configuration with the self-signed server certificate
-you might need to switch off the Certificate Validation using `LDAPTL_REQCERT` env
+When using the default configuration with the self-signed server certificate,
+you might need to switch off the certificate validation using the `LDAPTL_REQCERT` env
 variable:
 
 ```
