@@ -472,3 +472,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 
 ### [publicLinkCreate.feature:172 is failing](https://github.com/owncloud/ocis/issues/3581)
 - [webUISharingPublicBasic/publicLinkCreate.feature:172](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicBasic/publicLinkCreate.feature#172)
+
+### [Creating group with problematic group name via graph api gives 500 error](https://github.com/owncloud/ocis/issues/3631)
+- [webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature:41](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature:41)
