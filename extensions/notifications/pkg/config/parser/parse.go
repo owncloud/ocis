@@ -37,5 +37,6 @@ func Validate(cfg *config.Config) error {
 	if cfg.Notifications.MachineAuthAPIKey == "" {
 		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
 	}
+
 	return nil
 }

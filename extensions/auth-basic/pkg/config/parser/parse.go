@@ -41,5 +41,6 @@ func Validate(cfg *config.Config) error {
 	if cfg.AuthProviders.LDAP.BindPassword == "" && cfg.AuthProvider == "ldap" {
 		return shared.MissingLDAPBindPassword(cfg.Service.Name)
 	}
+
 	return nil
 }

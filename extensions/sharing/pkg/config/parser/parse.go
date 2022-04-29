@@ -34,11 +34,15 @@ func ParseConfig(cfg *config.Config) error {
 }
 
 func Validate(cfg *config.Config) error {
-	if cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey == "" {
+	if cfg.TokenManager.JWTSecret == "" {
+		return shared.MissingJWTTokenError(cfg.Service.Name)
+	}
+
+	if cfg.PublicSharingDriver == "cs3" && cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey == "" {
 		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
 	}
 
-	if cfg.UserSharingDrivers.CS3.MachineAuthAPIKey == "" {
+	if cfg.UserSharingDriver == "cs3" && cfg.UserSharingDrivers.CS3.MachineAuthAPIKey == "" {
 		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
 	}
 

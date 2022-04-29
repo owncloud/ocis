@@ -9,27 +9,34 @@ import (
 func MissingMachineAuthApiKeyError(service string) error {
 	return fmt.Errorf("machine_auth_api_key has not your config for %s. "+
 		"Make sure your %s config contains the proper values "+
-		"(e.g. by running ocis init or setting OCIS_MACHINE_AUTH_API_KEY).\n",
+		"(e.g. by running ocis init or setting OCIS_MACHINE_AUTH_API_KEY)",
 		service, defaults.BaseConfigPath())
 }
 
 func MissingJWTTokenError(service string) error {
 	return fmt.Errorf("jwt_secret has not been set properly in your config for %s. "+
 		"Make sure your %s config contains the proper values "+
-		"(e.g. by running ocis init or setting OCIS_JWT_SECRET).\n",
+		"(e.g. by running ocis init or setting OCIS_JWT_SECRET)",
 		service, defaults.BaseConfigPath())
 }
 
 func MissingRevaTransferSecretError(service string) error {
 	return fmt.Errorf("transfer_secret has not been set properly in your config for %s. "+
 		"Make sure your %s config contains the proper values "+
-		"(e.g. by running ocis init or setting STORAGE_TRANSFER_SECRET).\n",
+		"(e.g. by running ocis init or setting STORAGE_TRANSFER_SECRET)",
 		service, defaults.BaseConfigPath())
 }
 
 func MissingLDAPBindPassword(service string) error {
 	return fmt.Errorf("bind_password has not been set properly in your config for %s. "+
 		"Make sure your %s config contains the proper values "+
-		"(e.g. by running ocis init or setting LDAP_BIND_PASSWORD).\n",
+		"(e.g. by running ocis init or setting LDAP_BIND_PASSWORD)",
 		service, defaults.BaseConfigPath())
+}
+
+func MissingServiceUserPassword(service, serviceUser string) error {
+	return fmt.Errorf("password of service user %s has not been set properly in your config for %s. "+
+		"Make sure your %s config contains the proper values "+
+		"(e.g. by running ocis init or setting it via environment variable)",
+		serviceUser, service, defaults.BaseConfigPath())
 }

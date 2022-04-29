@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/extensions/user/pkg/config"
 	"github.com/owncloud/ocis/extensions/user/pkg/config/defaults"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 
 	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
 )
@@ -33,5 +34,13 @@ func ParseConfig(cfg *config.Config) error {
 }
 
 func Validate(cfg *config.Config) error {
+	if cfg.TokenManager.JWTSecret == "" {
+		return shared.MissingJWTTokenError(cfg.Service.Name)
+	}
+
+	if cfg.Driver == "ldap" && cfg.Drivers.LDAP.BindPassword == "" {
+		return shared.MissingLDAPBindPassword(cfg.Service.Name)
+	}
+
 	return nil
 }
