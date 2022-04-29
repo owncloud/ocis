@@ -207,7 +207,7 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 					"resource_info_cache_ttl":   cfg.OCS.ResourceInfoCacheTTL,
 					"prefix":                    cfg.OCS.Prefix,
 					"additional_info_attribute": cfg.OCS.AdditionalInfoAttribute,
-					"machine_auth_apikey":       cfg.AuthMachine.APIKey,
+					"machine_auth_apikey":       cfg.MachineAuthAPIKey,
 					"cache_warmup_driver":       cfg.OCS.CacheWarmupDriver,
 					"cache_warmup_drivers": map[string]interface{}{
 						"cbox": map[string]interface{}{

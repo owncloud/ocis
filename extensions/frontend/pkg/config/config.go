@@ -16,8 +16,9 @@ type Config struct {
 
 	TransferSecret string `yaml:"transfer_secret" env:"STORAGE_TRANSFER_SECRET"`
 
-	TokenManager *TokenManager `yaml:"token_manager"`
-	Reva         *Reva         `yaml:"reva"`
+	TokenManager      *TokenManager `yaml:"token_manager"`
+	Reva              *Reva         `yaml:"reva"`
+	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;FRONTEND_MACHINE_AUTH_API_KEY"`
 
 	SkipUserGroupsInToken bool `yaml:"skip_users_groups_in_token"`
 
@@ -33,7 +34,6 @@ type Config struct {
 	AppProvider AppProvider `yaml:"app_provider"`
 	DataGateway DataGateway `yaml:"data_gateway"`
 	OCS         OCS         `yaml:"ocs"`
-	AuthMachine AuthMachine `yaml:"auth_machine"`
 	Checksums   Checksums   `yaml:"checksums"`
 
 	Middleware Middleware `yaml:"middleware"`
@@ -122,10 +122,6 @@ type CBOXDriver struct {
 	DBPort     int
 	DBName     string
 	Namespace  string
-}
-
-type AuthMachine struct {
-	APIKey string `env:"OCIS_MACHINE_AUTH_API_KEY"`
 }
 
 type Checksums struct {
