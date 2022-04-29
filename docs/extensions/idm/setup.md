@@ -45,6 +45,6 @@ export STORAGE_LDAP_BIND_DN="uid=reva,ou=sysusers,o=libregraph-idm"
 export STORAGE_LDAP_BIND_PASSWORD=reva
 export OCIS_RUN_EXTENSIONS=settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,idp,nats,idm,ocdav
 export OCIS_INSECURE=true
+ocis init
 bin/ocis server
 ```
-
