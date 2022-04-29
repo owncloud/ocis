@@ -7,36 +7,41 @@ import (
 )
 
 func MissingMachineAuthApiKeyError(service string) error {
-	return fmt.Errorf("machine_auth_api_key has not your config for %s. "+
+	return fmt.Errorf("The Machineauth API key has not been configured for %s. "+
 		"Make sure your %s config contains the proper values "+
-		"(e.g. by running ocis init or setting OCIS_MACHINE_AUTH_API_KEY)",
+		"(e.g. by running ocis init or setting it manually in "+
+		"the config/corresponding environment variable).",
 		service, defaults.BaseConfigPath())
 }
 
 func MissingJWTTokenError(service string) error {
 	return fmt.Errorf("jwt_secret has not been set properly in your config for %s. "+
 		"Make sure your %s config contains the proper values "+
-		"(e.g. by running ocis init or setting OCIS_JWT_SECRET)",
+		"(e.g. by running ocis init or setting it manually in "+
+		"the config/corresponding environment variable).",
 		service, defaults.BaseConfigPath())
 }
 
 func MissingRevaTransferSecretError(service string) error {
 	return fmt.Errorf("transfer_secret has not been set properly in your config for %s. "+
 		"Make sure your %s config contains the proper values "+
-		"(e.g. by running ocis init or setting STORAGE_TRANSFER_SECRET)",
+		"(e.g. by running ocis init or setting it manually in "+
+		"the config/corresponding environment variable).",
 		service, defaults.BaseConfigPath())
 }
 
 func MissingLDAPBindPassword(service string) error {
 	return fmt.Errorf("bind_password has not been set properly in your config for %s. "+
 		"Make sure your %s config contains the proper values "+
-		"(e.g. by running ocis init or setting LDAP_BIND_PASSWORD)",
+		"(e.g. by running ocis init or setting it manually in "+
+		"the config/corresponding environment variable).",
 		service, defaults.BaseConfigPath())
 }
 
 func MissingServiceUserPassword(service, serviceUser string) error {
 	return fmt.Errorf("password of service user %s has not been set properly in your config for %s. "+
 		"Make sure your %s config contains the proper values "+
-		"(e.g. by running ocis init or setting it via environment variable)",
+		"(e.g. by running ocis init or setting it manually in "+
+		"the config/corresponding environment variable).",
 		serviceUser, service, defaults.BaseConfigPath())
 }

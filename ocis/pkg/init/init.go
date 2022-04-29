@@ -286,7 +286,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath string) error {
 		return err
 	}
 	fmt.Printf(
-		"\n\n=========================================\n"+
+		"\n=========================================\n"+
 			" generated OCIS Config\n"+
 			"=========================================\n"+
 			" configpath : %s\n"+
