@@ -31,8 +31,19 @@ import (
 	merrors "go-micro.dev/v4/errors"
 )
 
-// GetDrives implements the Service interface.
+// GetDrives lists all drives the current user has access to
 func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
+	g.getDrives(w, r, false)
+}
+
+// GetAllDrives lists all drives, including other user's drives, if the current
+// user has the permission.
+func (g Graph) GetAllDrives(w http.ResponseWriter, r *http.Request) {
+	g.getDrives(w, r, true)
+}
+
+// getDrives implements the Service interface.
+func (g Graph) getDrives(w http.ResponseWriter, r *http.Request, unrestricted bool) {
 	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
 	// Parse the request with odata parser
 	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
@@ -41,7 +52,10 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
-	g.logger.Info().Interface("query", r.URL.Query()).Msg("Calling GetDrives")
+	g.logger.Debug().
+		Interface("query", r.URL.Query()).
+		Bool("unrestricted", unrestricted).
+		Msg("Calling getDrives")
 	ctx := r.Context()
 
 	filters, err := generateCs3Filters(odataReq)
@@ -50,7 +64,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		errorcode.NotSupported.Render(w, r, http.StatusNotImplemented, err.Error())
 		return
 	}
-	res, err := g.ListStorageSpacesWithFilters(ctx, filters)
+	res, err := g.ListStorageSpacesWithFilters(ctx, filters, unrestricted)
 	switch {
 	case err != nil:
 		g.logger.Error().Err(err).Msg(ListStorageSpacesTransportErr)
@@ -106,7 +120,7 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	filters := []*storageprovider.ListStorageSpacesRequest_Filter{listStorageSpacesIDFilter(driveID)}
-	res, err := g.ListStorageSpacesWithFilters(ctx, filters)
+	res, err := g.ListStorageSpacesWithFilters(ctx, filters, true)
 	switch {
 	case err != nil:
 		g.logger.Error().Err(err).Msg(ListStorageSpacesTransportErr)
@@ -399,7 +413,7 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 }
 
 // ListStorageSpacesWithFilters List Storage Spaces using filters
-func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*storageprovider.ListStorageSpacesRequest_Filter) (*storageprovider.ListStorageSpacesResponse, error) {
+func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*storageprovider.ListStorageSpacesRequest_Filter, unrestricted bool) (*storageprovider.ListStorageSpacesResponse, error) {
 	client := g.GetGatewayClient()
 
 	permissions := make(map[string]struct{}, 1)
@@ -423,6 +437,10 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 			"permissions": {
 				Decoder: "json",
 				Value:   value,
+			},
+			"unrestricted": {
+				Decoder: "plain",
+				Value:   []byte(strconv.FormatBool(unrestricted)),
 			},
 		}},
 		Filters: filters,
