@@ -58,8 +58,8 @@ type GRPCConfig struct {
 }
 
 type HTTPConfig struct {
-	Addr     string `yaml:"addr" env:"STORAGE_METADATA_GRPC_ADDR" desc:"The address of the grpc service."`
-	Protocol string `yaml:"protocol" env:"STORAGE_METADATA_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
+	Addr     string `yaml:"addr" env:"STORAGE_METADATA_HTTP_ADDR" desc:"The address of the http service."`
+	Protocol string `yaml:"protocol" env:"STORAGE_METADATA_HTTP_PROTOCOL" desc:"The transport protocol of the http service."`
 }
 
 type Drivers struct {
