@@ -134,6 +134,7 @@ func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (
 		bleve.NewQueryStringQuery("Path:"+req.Ref.Path+"*"),                                               // Limit search to this directory in the space
 	)
 	bleveReq := bleve.NewSearchRequest(query)
+	bleveReq.Size = 200
 	bleveReq.Fields = []string{"*"}
 	res, err := i.bleveIndex.Search(bleveReq)
 	if err != nil {
@@ -189,7 +190,6 @@ func fieldsToEntity(fields map[string]interface{}) *indexDocument {
 		Size:     uint64(fields["Size"].(float64)),
 		Mtime:    fields["Mtime"].(string),
 		MimeType: fields["MimeType"].(string),
-		Deleted:  fields["Deleted"].(bool),
 		Type:     uint64(fields["Type"].(float64)),
 	}
 	return doc
