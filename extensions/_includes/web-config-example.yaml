@@ -42,5 +42,6 @@ web:
     - text-editor
     - pdf-viewer
     - external
+    - user-management
     external_apps: []
     options: {}
