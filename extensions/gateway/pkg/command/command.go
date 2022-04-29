@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/mapstructure"
 	"github.com/oklog/run"
@@ -225,6 +226,7 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 	// generate rules based on default config
 	return map[string]map[string]interface{}{
 		cfg.StorageUsersEndpoint: {
+			"providerid": "1284d238-aa92-42ce-bdc4-0b0000009157",
 			"spaces": map[string]interface{}{
 				"personal": map[string]interface{}{
 					"mount_point":   "/users",
@@ -237,6 +239,7 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 			},
 		},
 		cfg.StorageSharesEndpoint: {
+			"providerid": utils.ShareStorageProviderID,
 			"spaces": map[string]interface{}{
 				"virtual": map[string]interface{}{
 					// The root of the share jail is mounted here
@@ -256,6 +259,7 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 		},
 		// public link storage returns the mount id of the actual storage
 		cfg.StoragePublicLinkEndpoint: {
+			"providerid": utils.PublicStorageProviderID,
 			"spaces": map[string]interface{}{
 				"grant": map[string]interface{}{
 					"mount_point": ".",

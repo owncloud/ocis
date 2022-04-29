@@ -69,6 +69,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/3570
    https://github.com/owncloud/ocis/pull/3601
    https://github.com/owncloud/ocis/pull/3605
+   https://github.com/owncloud/ocis/pull/3611
 # Changelog for [1.20.0] (2022-04-13)
 
 The following sections list the changes for 1.20.0.
