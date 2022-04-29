@@ -1145,7 +1145,7 @@ class SpacesContext implements Context {
 		$results = [];
 		if ($multistatusResults !== null) {
 			foreach ($multistatusResults as $multistatusResult) {
-				$entryPath = $multistatusResult['value'][0]['value'];
+				$entryPath = \urldecode($multistatusResult['value'][0]['value']);
 				$entryName = \str_replace($topWebDavPath, "", $entryPath);
 				$entryName = \rawurldecode($entryName);
 				$entryName = \trim($entryName, "/");
