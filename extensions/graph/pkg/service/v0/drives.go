@@ -448,11 +448,25 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 	return res, err
 }
 
+func generateSpaceId(id *storageprovider.ResourceId) (spaceID string) {
+	spaceID = id.GetStorageId()
+	// 2nd ID to compare is the opaque ID of the Space Root
+	spaceID2 := id.GetOpaqueId()
+	if strings.Contains(spaceID, "$") {
+		spaceID2, _ = resourceid.StorageIDUnwrap(spaceID)
+	}
+	// Append opaqueID only if it is different from the spaceID2
+	if id.OpaqueId != spaceID2 {
+		spaceID += "!" + id.OpaqueId
+	}
+	return spaceID
+}
+
 func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace) (*libregraph.Drive, error) {
 	if space.Root == nil {
 		return nil, fmt.Errorf("space has no root")
 	}
-	rootID := resourceid.OwnCloudResourceIDWrap(space.Root)
+	spaceID := generateSpaceId(space.Root)
 
 	var permissions []libregraph.Permission
 	if space.Opaque != nil {
@@ -510,19 +524,14 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 		}
 	}
 
-	spaceID := space.Root.StorageId
-	sIDs := resourceid.OwnCloudResourceIDUnwrap(rootID)
-	if space.Root.OpaqueId != sIDs.OpaqueId {
-		spaceID = rootID
-	}
 	drive := &libregraph.Drive{
-		Id:   &spaceID,
+		Id:   libregraph.PtrString(spaceID),
 		Name: &space.Name,
 		//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
 		//"description": "string", // TODO read from StorageSpace ... needs Opaque for now
 		DriveType: &space.SpaceType,
 		Root: &libregraph.DriveItem{
-			Id:          &rootID,
+			Id:          libregraph.PtrString(resourceid.OwnCloudResourceIDWrap(space.Root)),
 			Permissions: permissions,
 		},
 	}
