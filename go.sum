@@ -1014,8 +1014,8 @@ github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103 h1:Z/i1e+gTZrmcGeZy
 github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103/go.mod h1:o9YPB5aGP8ob35Vy6+vyq3P3bWe7NQWzf+JLiXCiMaE=
 github.com/mennanov/fieldmask-utils v0.5.0 h1:8em4akN0NM3hmmrg8VbvOPfdS4SSBdbFd53m9VtfOg0=
 github.com/mennanov/fieldmask-utils v0.5.0/go.mod h1:lah2lHczE2ff+7SqnNKpB+YzaO7M3h5iNO4LgPTJheM=
-github.com/micbar/reva/v2 v2.0.0-20220430184241-9ffcd414f24d h1:U707T1GTA0DDhBuqSHXYnI4Lzk823pzkWEycknYSLpo=
-github.com/micbar/reva/v2 v2.0.0-20220430184241-9ffcd414f24d/go.mod h1:2e/4HcIy54Mic3V7Ow0bz4n5dkZU0dHIZSWomFe5vng=
+github.com/micbar/reva/v2 v2.0.0-20220430214110-c6ef0c907aea h1:4B/g4AQybc33pRM44R1gdF4Rg8HTsLI1cok7W9+XPTw=
+github.com/micbar/reva/v2 v2.0.0-20220430214110-c6ef0c907aea/go.mod h1:2e/4HcIy54Mic3V7Ow0bz4n5dkZU0dHIZSWomFe5vng=
 github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7 h1:M0R40eUlyqxMuZn3Knx4DJTwHE3TiPFzcWUA/BKtDMM=
 github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7/go.mod h1:sBD3RAqlr8Q+RC3FutZcikpT8nyDrIEEBw2J744gVWs=
 github.com/miekg/dns v1.0.14/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
