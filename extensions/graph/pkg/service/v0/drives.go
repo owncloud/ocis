@@ -18,8 +18,8 @@ import (
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/cs3org/reva/v2/pkg/utils/resourceid"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -287,7 +287,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	identifierParts := strings.Split(driveID, "!")
 	switch len(identifierParts) {
 	case 1:
-		sID, _ := resourceid.StorageIDUnwrap(identifierParts[0])
+		_, sID := storagespace.SplitStorageID(identifierParts[0])
 		root.StorageId, root.OpaqueId = identifierParts[0], sID
 	case 2:
 		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[1]
@@ -453,7 +453,7 @@ func generateSpaceId(id *storageprovider.ResourceId) (spaceID string) {
 	// 2nd ID to compare is the opaque ID of the Space Root
 	spaceID2 := id.GetOpaqueId()
 	if strings.Contains(spaceID, "$") {
-		spaceID2, _ = resourceid.StorageIDUnwrap(spaceID)
+		_, spaceID2 = storagespace.SplitStorageID(spaceID)
 	}
 	// Append opaqueID only if it is different from the spaceID2
 	if id.OpaqueId != spaceID2 {
@@ -531,7 +531,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 		//"description": "string", // TODO read from StorageSpace ... needs Opaque for now
 		DriveType: &space.SpaceType,
 		Root: &libregraph.DriveItem{
-			Id:          libregraph.PtrString(resourceid.OwnCloudResourceIDWrap(space.Root)),
+			Id:          libregraph.PtrString(storagespace.FormatResourceID(*space.Root)),
 			Permissions: permissions,
 		},
 	}
@@ -764,7 +764,7 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 	root := &storageprovider.ResourceId{}
 
 	identifierParts := strings.Split(driveID, "!")
-	sID, _ := resourceid.StorageIDUnwrap(identifierParts[0])
+	_, sID := storagespace.SplitStorageID(identifierParts[0])
 	switch len(identifierParts) {
 	case 1:
 		root.StorageId, root.OpaqueId = identifierParts[0], sID
