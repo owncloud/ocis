@@ -17,7 +17,7 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/extensions/sharing/pkg/config"
 	"github.com/owncloud/ocis/extensions/sharing/pkg/config/parser"
-	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
+	"github.com/owncloud/ocis/extensions/sharing/pkg/server/debug"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
@@ -81,13 +81,9 @@ func Sharing(cfg *config.Config) *cli.Command {
 			})
 
 			debug, err := debug.Server(
-				debug.Name(c.Command.Name+"-debug"),
-				debug.Addr(cfg.Debug.Addr),
 				debug.Logger(logger),
 				debug.Context(ctx),
-				debug.Pprof(cfg.Debug.Pprof),
-				debug.Zpages(cfg.Debug.Zpages),
-				debug.Token(cfg.Debug.Token),
+				debug.Config(cfg),
 			)
 
 			if err != nil {

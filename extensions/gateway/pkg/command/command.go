@@ -17,10 +17,10 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/extensions/gateway/pkg/config"
 	"github.com/owncloud/ocis/extensions/gateway/pkg/config/parser"
-	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
-	"github.com/owncloud/ocis/extensions/storage/pkg/service/external"
+	"github.com/owncloud/ocis/extensions/gateway/pkg/server/debug"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/service/external"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/ocis-pkg/version"
@@ -90,13 +90,9 @@ func Gateway(cfg *config.Config) *cli.Command {
 			})
 
 			debugServer, err := debug.Server(
-				debug.Name(c.Command.Name+"-debug"),
-				debug.Addr(cfg.Debug.Addr),
 				debug.Logger(logger),
 				debug.Context(ctx),
-				debug.Pprof(cfg.Debug.Pprof),
-				debug.Zpages(cfg.Debug.Zpages),
-				debug.Token(cfg.Debug.Token),
+				debug.Config(cfg),
 			)
 
 			if err != nil {

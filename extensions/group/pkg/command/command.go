@@ -13,7 +13,7 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/extensions/group/pkg/config"
 	"github.com/owncloud/ocis/extensions/group/pkg/config/parser"
-	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
+	"github.com/owncloud/ocis/extensions/group/pkg/server/debug"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -83,13 +83,9 @@ func Groups(cfg *config.Config) *cli.Command {
 			})
 
 			debugServer, err := debug.Server(
-				debug.Name(c.Command.Name+"-debug"),
-				debug.Addr(cfg.Debug.Addr),
 				debug.Logger(logger),
 				debug.Context(ctx),
-				debug.Pprof(cfg.Debug.Pprof),
-				debug.Zpages(cfg.Debug.Zpages),
-				debug.Token(cfg.Debug.Token),
+				debug.Config(cfg),
 			)
 
 			if err != nil {
