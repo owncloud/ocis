@@ -1,6 +1,6 @@
 ---
-title: "ocis.messages.store.v0"
-url: /grpc_apis/ocis_messages_store_v0
+title: "ocis.messages.search.v0"
+url: /grpc_apis/ocis_messages_search_v0
 date: 2022-05-02T17:29:10Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
@@ -10,92 +10,51 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 
 
-## ocis/messages/store/v0/store.proto
+## ocis/messages/search/v0/search.proto
 
-### DeleteOptions
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| database | [string](#string) |  |  |
-| table | [string](#string) |  |  |
-
-### Field
+### Entity
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| type | [string](#string) |  | type of value e.g string, int, int64, bool, float64 |
-| value | [string](#string) |  | the actual value |
+| ref | [Reference](#reference) |  |  |
+| id | [ResourceID](#resourceid) |  |  |
+| name | [string](#string) |  |  |
+| etag | [string](#string) |  |  |
+| size | [uint64](#uint64) |  |  |
+| last_modified_time | [google.protobuf.Timestamp](#googleprotobuftimestamp) |  |  |
+| mime_type | [string](#string) |  |  |
+| permissions | [string](#string) |  |  |
+| type | [uint64](#uint64) |  |  |
+| deleted | [bool](#bool) |  |  |
 
-### ListOptions
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| database | [string](#string) |  |  |
-| table | [string](#string) |  |  |
-| prefix | [string](#string) |  |  |
-| suffix | [string](#string) |  |  |
-| limit | [uint64](#uint64) |  |  |
-| offset | [uint64](#uint64) |  |  |
-
-### ReadOptions
+### Match
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| database | [string](#string) |  |  |
-| table | [string](#string) |  |  |
-| prefix | [bool](#bool) |  |  |
-| suffix | [bool](#bool) |  |  |
-| limit | [uint64](#uint64) |  |  |
-| offset | [uint64](#uint64) |  |  |
-| where | [ReadOptions.WhereEntry](#readoptionswhereentry) | repeated |  |
+| entity | [Entity](#entity) |  | the matched entity |
+| score | [float](#float) |  | the match score |
 
-### ReadOptions.WhereEntry
+### Reference
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| key | [string](#string) |  |  |
-| value | [Field](#field) |  |  |
+| resource_id | [ResourceID](#resourceid) |  |  |
+| path | [string](#string) |  |  |
 
-### Record
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| key | [string](#string) |  | key of the recorda |
-| value | [bytes](#bytes) |  | value in the record |
-| expiry | [int64](#int64) |  | time.Duration (signed int64 nanoseconds) |
-| metadata | [Record.MetadataEntry](#recordmetadataentry) | repeated | the associated metadata |
-
-### Record.MetadataEntry
+### ResourceID
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| key | [string](#string) |  |  |
-| value | [Field](#field) |  |  |
-
-### WriteOptions
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| database | [string](#string) |  |  |
-| table | [string](#string) |  |  |
-| expiry | [int64](#int64) |  | time.Time |
-| ttl | [int64](#int64) |  | time.Duration |
+| storage_id | [string](#string) |  |  |
+| opaque_id | [string](#string) |  |  |
 
 
 ## Scalar Value Types

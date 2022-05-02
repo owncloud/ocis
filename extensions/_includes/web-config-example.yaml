@@ -44,4 +44,5 @@ web:
     - external
     - user-management
     external_apps: []
-    options: {}
+    options:
+      hideSearchBar: false

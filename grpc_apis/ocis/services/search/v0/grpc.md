@@ -1,6 +1,6 @@
 ---
-title: "ocis.messages.store.v0"
-url: /grpc_apis/ocis_messages_store_v0
+title: "ocis.services.search.v0"
+url: /grpc_apis/ocis_services_search_v0
 date: 2022-05-02T17:29:10Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
@@ -10,93 +10,78 @@ geekdocRepo: https://github.com/owncloud/ocis
 
 
 
-## ocis/messages/store/v0/store.proto
+## ocis/services/search/v0/search.proto
 
-### DeleteOptions
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| database | [string](#string) |  |  |
-| table | [string](#string) |  |  |
-
-### Field
+### IndexSpaceRequest
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| type | [string](#string) |  | type of value e.g string, int, int64, bool, float64 |
-| value | [string](#string) |  | the actual value |
+| space_id | [string](#string) |  |  |
+| user_id | [string](#string) |  |  |
 
-### ListOptions
+### IndexSpaceResponse
 
 
 
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| database | [string](#string) |  |  |
-| table | [string](#string) |  |  |
-| prefix | [string](#string) |  |  |
-| suffix | [string](#string) |  |  |
-| limit | [uint64](#uint64) |  |  |
-| offset | [uint64](#uint64) |  |  |
 
-### ReadOptions
+### SearchIndexRequest
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| database | [string](#string) |  |  |
-| table | [string](#string) |  |  |
-| prefix | [bool](#bool) |  |  |
-| suffix | [bool](#bool) |  |  |
-| limit | [uint64](#uint64) |  |  |
-| offset | [uint64](#uint64) |  |  |
-| where | [ReadOptions.WhereEntry](#readoptionswhereentry) | repeated |  |
+| page_size | [int32](#int32) |  | Optional. The maximum number of entries to return in the response |
+| page_token | [string](#string) |  | Optional. A pagination token returned from a previous call to `Get`<br>that indicates from where search should continue |
+| query | [string](#string) |  |  |
+| ref | [ocis.messages.search.v0.Reference](/grpc_apis/ocis_messages_search_v0/#reference) |  |  |
 
-### ReadOptions.WhereEntry
+### SearchIndexResponse
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| key | [string](#string) |  |  |
-| value | [Field](#field) |  |  |
+| matches | [ocis.messages.search.v0.Match](/grpc_apis/ocis_messages_search_v0/#match) | repeated |  |
+| next_page_token | [string](#string) |  | Token to retrieve the next page of results, or empty if there are no<br>more results in the list |
 
-### Record
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| key | [string](#string) |  | key of the recorda |
-| value | [bytes](#bytes) |  | value in the record |
-| expiry | [int64](#int64) |  | time.Duration (signed int64 nanoseconds) |
-| metadata | [Record.MetadataEntry](#recordmetadataentry) | repeated | the associated metadata |
-
-### Record.MetadataEntry
+### SearchRequest
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| key | [string](#string) |  |  |
-| value | [Field](#field) |  |  |
+| page_size | [int32](#int32) |  | Optional. The maximum number of entries to return in the response |
+| page_token | [string](#string) |  | Optional. A pagination token returned from a previous call to `Get`<br>that indicates from where search should continue |
+| query | [string](#string) |  |  |
 
-### WriteOptions
+### SearchResponse
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| database | [string](#string) |  |  |
-| table | [string](#string) |  |  |
-| expiry | [int64](#int64) |  | time.Time |
-| ttl | [int64](#int64) |  | time.Duration |
+| matches | [ocis.messages.search.v0.Match](/grpc_apis/ocis_messages_search_v0/#match) | repeated |  |
+| next_page_token | [string](#string) |  | Token to retrieve the next page of results, or empty if there are no<br>more results in the list |
 
+
+### IndexProvider
+
+
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| Search | [SearchIndexRequest](#searchindexrequest) | [SearchIndexResponse](#searchindexresponse) |  |
+
+### SearchProvider
+
+
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| Search | [SearchRequest](#searchrequest) | [SearchResponse](#searchresponse) |  |
+| IndexSpace | [IndexSpaceRequest](#indexspacerequest) | [IndexSpaceResponse](#indexspaceresponse) |  |
 
 ## Scalar Value Types
 

@@ -26,111 +26,139 @@ policies:
 - name: ocis
   routes:
   - type: ""
+    method: ""
     endpoint: /
     backend: http://localhost:9100
     service: ""
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /.well-known/
     backend: http://localhost:9130
     service: ""
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /konnect/
     backend: http://localhost:9130
     service: ""
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /signin/
     backend: http://localhost:9130
     service: ""
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /archiver
     backend: http://localhost:9140
     service: ""
     apache-vhost: false
   - type: regex
+    method: ""
     endpoint: /ocs/v[12].php/cloud/(users?|groups)
     backend: http://localhost:9110
     service: ""
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /ocs/
     backend: http://localhost:9140
     service: ""
     apache-vhost: false
   - type: query
+    method: ""
     endpoint: /remote.php/?preview=1
     backend: http://localhost:9115
     service: ""
     apache-vhost: false
   - type: ""
+    method: REPORT
+    endpoint: /remote.php/dav/
+    backend: http://localhost:9115
+    service: ""
+    apache-vhost: false
+  - type: ""
+    method: ""
     endpoint: /remote.php/
     backend: ""
     service: ocdav
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /dav/
     backend: ""
     service: ocdav
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /webdav/
     backend: ""
     service: ocdav
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /status.php
     backend: ""
     service: ocdav
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /index.php/
     backend: ""
     service: ocdav
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /apps/
     backend: ""
     service: ocdav
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /data
     backend: http://localhost:9140
     service: ""
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /app/
     backend: http://localhost:9140
     service: ""
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /graph/
     backend: http://localhost:9120
     service: ""
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /graph-explorer
     backend: http://localhost:9135
     service: ""
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /api/v0/accounts
     backend: http://localhost:9181
     service: ""
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /accounts.js
     backend: http://localhost:9181
     service: ""
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /api/v0/settings
     backend: http://localhost:9190
     service: ""
     apache-vhost: false
   - type: ""
+    method: ""
     endpoint: /settings.js
     backend: http://localhost:9190
     service: ""
