@@ -7,18 +7,18 @@ import (
 	"os"
 	"path"
 
-	"github.com/owncloud/ocis/extensions/storage-metadata/pkg/config/parser"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/sync"
-	"github.com/owncloud/ocis/ocis-pkg/tracing"
-
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/extensions/storage-metadata/pkg/config"
+	"github.com/owncloud/ocis/extensions/storage-metadata/pkg/config/parser"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/extensions/storage/pkg/service/external"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
@@ -162,7 +162,7 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 									"id": map[string]interface{}{
 										"opaqueId": "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad", // FIXME generate service user id
 										"idp":      "internal",
-										"type":     1, // user.UserType_USER_TYPE_PRIMARY
+										"type":     userpb.UserType_USER_TYPE_PRIMARY,
 									},
 									"username":     "serviceuser",
 									"display_name": "System User",
