@@ -96,6 +96,11 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 				}
 
 				continue
+			case events.ContainerCreated:
+				ref = e.Ref
+				owner = &user.User{
+					Id: e.Executant,
+				}
 			case events.FileUploaded:
 				ref = e.Ref
 				owner = &user.User{
