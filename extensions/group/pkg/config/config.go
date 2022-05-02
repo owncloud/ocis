@@ -99,16 +99,16 @@ type LDAPGroupSchema struct {
 }
 
 type OwnCloudSQLDriver struct {
-	DBUsername         string
-	DBPassword         string
-	DBHost             string
-	DBPort             int
-	DBName             string
-	IDP                string // TODO do we need this?
-	Nobody             int64  // TODO what is this?
-	JoinUsername       bool
-	JoinOwnCloudUUID   bool
-	EnableMedialSearch bool
+	DBUsername         string `yaml:"db_username" env:"GROUPS_OWNCLOUDSQL_DB_USERNAME"`
+	DBPassword         string `yaml:"db_password" env:"GROUPS_OWNCLOUDSQL_DB_PASSWORD"`
+	DBHost             string `yaml:"db_host" env:"GROUPS_OWNCLOUDSQL_DB_HOST"`
+	DBPort             int    `yaml:"db_port" env:"GROUPS_OWNCLOUDSQL_DB_PORT"`
+	DBName             string `yaml:"db_name" env:"GROUPS_OWNCLOUDSQL_DB_NAME"`
+	IDP                string `yaml:"idp" env:"GROUPS_OWNCLOUDSQL_IDP"`       // TODO do we need this?
+	Nobody             int64  `yaml:"nobody" env:"GROUPS_OWNCLOUDSQL_NOBODY"` // TODO what is this?
+	JoinUsername       bool   `yaml:"join_username" env:"GROUPS_OWNCLOUDSQL_JOIN_USERNAME"`
+	JoinOwnCloudUUID   bool   `yaml:"join_owncloud_uuid" env:"GROUPS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID"`
+	EnableMedialSearch bool   `yaml:"enable_medial_search" env:"GROUPS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH"`
 }
 
 type RESTProvider struct {

@@ -51,10 +51,10 @@ type GRPCConfig struct {
 }
 
 type Drivers struct {
-	JSON        JSONDriver // not supported by the oCIS product, therefore not part of docs
 	LDAP        LDAPDriver
 	OwnCloudSQL OwnCloudSQLDriver
-	REST        RESTProvider // not supported by the oCIS product, therefore not part of docs
+	JSON        JSONDriver   `yaml:"json,omitempty"` // not supported by the oCIS product, therefore not part of docs
+	REST        RESTProvider `yaml:"rest,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
 
 type JSONDriver struct {
@@ -76,7 +76,6 @@ type LDAPDriver struct {
 	GroupObjectClass string   `env:"LDAP_GROUP_OBJECTCLASS;USERS_LDAP_GROUP_OBJECTCLASS"`
 	LoginAttributes  []string `env:"LDAP_LOGIN_ATTRIBUTES;USERS_LDAP_LOGIN_ATTRIBUTES"`
 	IDP              string   `env:"OCIS_URL;USERS_IDP_URL"` // TODO what is this for?
-	GatewayEndpoint  string   // TODO do we need this here?
 	UserSchema       LDAPUserSchema
 	GroupSchema      LDAPGroupSchema
 }
@@ -99,16 +98,16 @@ type LDAPGroupSchema struct {
 }
 
 type OwnCloudSQLDriver struct {
-	DBUsername         string
-	DBPassword         string
-	DBHost             string
-	DBPort             int
-	DBName             string
-	IDP                string // TODO do we need this?
-	Nobody             int64  // TODO what is this?
-	JoinUsername       bool
-	JoinOwnCloudUUID   bool
-	EnableMedialSearch bool
+	DBUsername         string `yaml:"db_username" env:"USERS_OWNCLOUDSQL_DB_USERNAME"`
+	DBPassword         string `yaml:"db_password" env:"USERS_OWNCLOUDSQL_DB_PASSWORD"`
+	DBHost             string `yaml:"db_host" env:"USERS_OWNCLOUDSQL_DB_HOST"`
+	DBPort             int    `yaml:"db_port" env:"USERS_OWNCLOUDSQL_DB_PORT"`
+	DBName             string `yaml:"db_name" env:"USERS_OWNCLOUDSQL_DB_NAME"`
+	IDP                string `yaml:"idp" env:"USERS_OWNCLOUDSQL_IDP"`       // TODO do we need this?
+	Nobody             int64  `yaml:"nobody" env:"USERS_OWNCLOUDSQL_NOBODY"` // TODO what is this?
+	JoinUsername       bool   `yaml:"join_username" env:"USERS_OWNCLOUDSQL_JOIN_USERNAME"`
+	JoinOwnCloudUUID   bool   `yaml:"join_owncloud_uuid" env:"USERS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID"`
+	EnableMedialSearch bool   `yaml:"enable_medial_search" env:"USERS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH"`
 }
 
 type RESTProvider struct {

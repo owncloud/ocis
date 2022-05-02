@@ -50,61 +50,60 @@ type GRPCConfig struct {
 }
 
 type AuthProviders struct {
-	JSON        JSONProvider        `yaml:"json"` // not supported by the oCIS product, therefore not part of docs
+	JSON        JSONProvider        `yaml:"json,omitempty"` // not supported by the oCIS product, therefore not part of docs
 	LDAP        LDAPProvider        `yaml:"ldap"`
 	OwnCloudSQL OwnCloudSQLProvider `yaml:"owncloud_sql"`
 }
 
 type JSONProvider struct {
-	File string `yaml:"file" env:"AUTH_BASIC_JSON_PROVIDER_FILE" desc:"The file to which the json provider writes the data."`
+	File string `yaml:"file,omitempty"`
 }
 
 type LDAPProvider struct {
-	URI              string   `env:"LDAP_URI;AUTH_BASIC_LDAP_URI"`
-	CACert           string   `env:"LDAP_CACERT;AUTH_BASIC_LDAP_CACERT"`
-	Insecure         bool     `env:"LDAP_INSECURE;AUTH_BASIC_LDAP_INSECURE"`
-	BindDN           string   `env:"LDAP_BIND_DN;AUTH_BASIC_LDAP_BIND_DN"`
-	BindPassword     string   `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;AUTH_BASIC_LDAP_BIND_PASSWORD"`
-	UserBaseDN       string   `env:"LDAP_USER_BASE_DN;AUTH_BASIC_LDAP_USER_BASE_DN"`
-	GroupBaseDN      string   `env:"LDAP_GROUP_BASE_DN;AUTH_BASIC_LDAP_GROUP_BASE_DN"`
-	UserScope        string   `env:"LDAP_USER_SCOPE;AUTH_BASIC_LDAP_USER_SCOPE"`
-	GroupScope       string   `env:"LDAP_GROUP_SCOPE;AUTH_BASIC_LDAP_GROUP_SCOPE"`
-	UserFilter       string   `env:"LDAP_USERFILTER;AUTH_BASIC_LDAP_USERFILTER"`
-	GroupFilter      string   `env:"LDAP_GROUPFILTER;AUTH_BASIC_LDAP_USERFILTER"`
-	UserObjectClass  string   `env:"LDAP_USER_OBJECTCLASS;AUTH_BASIC_LDAP_USER_OBJECTCLASS"`
-	GroupObjectClass string   `env:"LDAP_GROUP_OBJECTCLASS;AUTH_BASIC_LDAP_GROUP_OBJECTCLASS"`
-	LoginAttributes  []string `env:"LDAP_LOGIN_ATTRIBUTES;AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES"`
-	IDP              string   `env:"OCIS_URL;AUTH_BASIC_IDP_URL"` // TODO what is this for?
-	GatewayEndpoint  string   // TODO do we need this here?
-	UserSchema       LDAPUserSchema
-	GroupSchema      LDAPGroupSchema
+	URI              string          `yaml:"uri" env:"LDAP_URI;AUTH_BASIC_LDAP_URI"`
+	CACert           string          `yaml:"ca_cert" env:"LDAP_CACERT;AUTH_BASIC_LDAP_CACERT"`
+	Insecure         bool            `yaml:"insecure" env:"LDAP_INSECURE;AUTH_BASIC_LDAP_INSECURE"`
+	BindDN           string          `yaml:"bind_dn" env:"LDAP_BIND_DN;AUTH_BASIC_LDAP_BIND_DN"`
+	BindPassword     string          `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;AUTH_BASIC_LDAP_BIND_PASSWORD"`
+	UserBaseDN       string          `yaml:"user_base_dn" env:"LDAP_USER_BASE_DN;AUTH_BASIC_LDAP_USER_BASE_DN"`
+	GroupBaseDN      string          `yaml:"group_base_dn" env:"LDAP_GROUP_BASE_DN;AUTH_BASIC_LDAP_GROUP_BASE_DN"`
+	UserScope        string          `yaml:"user_scope" env:"LDAP_USER_SCOPE;AUTH_BASIC_LDAP_USER_SCOPE"`
+	GroupScope       string          `yaml:"group_scope" env:"LDAP_GROUP_SCOPE;AUTH_BASIC_LDAP_GROUP_SCOPE"`
+	UserFilter       string          `yaml:"user_filter" env:"LDAP_USERFILTER;AUTH_BASIC_LDAP_USERFILTER"`
+	GroupFilter      string          `yaml:"group_filter" env:"LDAP_GROUPFILTER;AUTH_BASIC_LDAP_USERFILTER"`
+	UserObjectClass  string          `yaml:"user_object_filter" env:"LDAP_USER_OBJECTCLASS;AUTH_BASIC_LDAP_USER_OBJECTCLASS"`
+	GroupObjectClass string          `yaml:"group_object_class" env:"LDAP_GROUP_OBJECTCLASS;AUTH_BASIC_LDAP_GROUP_OBJECTCLASS"`
+	LoginAttributes  []string        `yaml:"login_attributes" env:"LDAP_LOGIN_ATTRIBUTES;AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES"`
+	IDP              string          `yaml:"idp" env:"OCIS_URL;AUTH_BASIC_IDP_URL"` // TODO what is this for?
+	UserSchema       LDAPUserSchema  `yaml:"user_schema"`
+	GroupSchema      LDAPGroupSchema `yaml:"group_schema"`
 }
 
 type LDAPUserSchema struct {
-	ID              string `env:"LDAP_USER_SCHEMA_ID;AUTH_BASIC_LDAP_USER_SCHEMA_ID"`
-	IDIsOctetString bool   `env:"LDAP_USER_SCHEMA_ID_IS_OCTETSTRING;AUTH_BASIC_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING"`
-	Mail            string `env:"LDAP_USER_SCHEMA_MAIL;AUTH_BASIC_LDAP_USER_SCHEMA_MAIL"`
-	DisplayName     string `env:"LDAP_USER_SCHEMA_DISPLAYNAME;AUTH_BASIC_LDAP_USER_SCHEMA_DISPLAYNAME"`
-	Username        string `env:"LDAP_USER_SCHEMA_USERNAME;AUTH_BASIC_LDAP_USER_SCHEMA_USERNAME"`
+	ID              string `yaml:"id" env:"LDAP_USER_SCHEMA_ID;AUTH_BASIC_LDAP_USER_SCHEMA_ID"`
+	IDIsOctetString bool   `yaml:"id_is_octet_string" env:"LDAP_USER_SCHEMA_ID_IS_OCTETSTRING;AUTH_BASIC_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING"`
+	Mail            string `yaml:"mail" env:"LDAP_USER_SCHEMA_MAIL;AUTH_BASIC_LDAP_USER_SCHEMA_MAIL"`
+	DisplayName     string `yaml:"display_name" env:"LDAP_USER_SCHEMA_DISPLAYNAME;AUTH_BASIC_LDAP_USER_SCHEMA_DISPLAYNAME"`
+	Username        string `yaml:"user_name" env:"LDAP_USER_SCHEMA_USERNAME;AUTH_BASIC_LDAP_USER_SCHEMA_USERNAME"`
 }
 
 type LDAPGroupSchema struct {
-	ID              string `env:"LDAP_GROUP_SCHEMA_ID;AUTH_BASIC_LDAP_GROUP_SCHEMA_ID"`
-	IDIsOctetString bool   `env:"LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING;AUTH_BASIC_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING"`
-	Mail            string `env:"LDAP_GROUP_SCHEMA_MAIL;AUTH_BASIC_LDAP_GROUP_SCHEMA_MAIL"`
-	DisplayName     string `env:"LDAP_GROUP_SCHEMA_DISPLAYNAME;AUTH_BASIC_LDAP_GROUP_SCHEMA_DISPLAYNAME"`
-	Groupname       string `env:"LDAP_GROUP_SCHEMA_GROUPNAME;AUTH_BASIC_LDAP_GROUP_SCHEMA_GROUPNAME"`
-	Member          string `env:"LDAP_GROUP_SCHEMA_MEMBER;AUTH_BASIC_LDAP_GROUP_SCHEMA_MEMBER"`
+	ID              string `yaml:"id" env:"LDAP_GROUP_SCHEMA_ID;AUTH_BASIC_LDAP_GROUP_SCHEMA_ID"`
+	IDIsOctetString bool   `yaml:"id_is_octet_string" env:"LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING;AUTH_BASIC_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING"`
+	Mail            string `yaml:"mail" env:"LDAP_GROUP_SCHEMA_MAIL;AUTH_BASIC_LDAP_GROUP_SCHEMA_MAIL"`
+	DisplayName     string `yaml:"display_name" env:"LDAP_GROUP_SCHEMA_DISPLAYNAME;AUTH_BASIC_LDAP_GROUP_SCHEMA_DISPLAYNAME"`
+	Groupname       string `yaml:"group_name" env:"LDAP_GROUP_SCHEMA_GROUPNAME;AUTH_BASIC_LDAP_GROUP_SCHEMA_GROUPNAME"`
+	Member          string `yaml:"member" env:"LDAP_GROUP_SCHEMA_MEMBER;AUTH_BASIC_LDAP_GROUP_SCHEMA_MEMBER"`
 }
 
 type OwnCloudSQLProvider struct {
-	DBUsername       string
-	DBPassword       string
-	DBHost           string
-	DBPort           int
-	DBName           string
-	IDP              string // TODO do we need this?
-	Nobody           int64  // TODO what is this?
-	JoinUsername     bool
-	JoinOwnCloudUUID bool
+	DBUsername       string `yaml:"db_username" env:"AUTH_BASIC_OWNCLOUDSQL_DB_USERNAME"`
+	DBPassword       string `yaml:"db_password" env:"AUTH_BASIC_OWNCLOUDSQL_DB_PASSWORD"`
+	DBHost           string `yaml:"db_host" env:"AUTH_BASIC_OWNCLOUDSQL_DB_HOST"`
+	DBPort           int    `yaml:"db_port" env:"AUTH_BASIC_OWNCLOUDSQL_DB_PORT"`
+	DBName           string `yaml:"db_name" env:"AUTH_BASIC_OWNCLOUDSQL_DB_NAME"`
+	IDP              string `yaml:"idp" env:"AUTH_BASIC_OWNCLOUDSQL_IDP"`       // TODO do we need this?
+	Nobody           int64  `yaml:"nobody" env:"AUTH_BASIC_OWNCLOUDSQL_NOBODY"` // TODO what is this?
+	JoinUsername     bool   `yaml:"join_username" env:"AUTH_BASIC_OWNCLOUDSQL_JOIN_USERNAME"`
+	JoinOwnCloudUUID bool   `yaml:"join_owncloud_uuid" env:"AUTH_BASIC_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID"`
 }
