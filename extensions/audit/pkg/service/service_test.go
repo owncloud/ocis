@@ -297,8 +297,8 @@ var testCases = []struct {
 	}, {
 		Alias: "File created",
 		SystemEvent: events.FileUploaded{
-			FileID: reference("sto-123", "iid-123", "./item"),
-			Owner:  userID("uid-123"), // NOTE: owner not yet implemented in reva
+			Ref:   reference("sto-123", "iid-123", "./item"),
+			Owner: userID("uid-123"), // NOTE: owner not yet implemented in reva
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventFileCreated{}
@@ -312,8 +312,8 @@ var testCases = []struct {
 	}, {
 		Alias: "File read",
 		SystemEvent: events.FileDownloaded{
-			FileID: reference("sto-123", "iid-123", "./item"),
-			Owner:  userID("uid-123"), // NOTE: owner not yet implemented in reva
+			Ref:   reference("sto-123", "iid-123", "./item"),
+			Owner: userID("uid-123"), // NOTE: owner not yet implemented in reva
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventFileRead{}
@@ -327,8 +327,8 @@ var testCases = []struct {
 	}, {
 		Alias: "File trashed",
 		SystemEvent: events.ItemTrashed{
-			FileID: reference("sto-123", "iid-123", "./item"),
-			Owner:  userID("uid-123"), // NOTE: owner not yet implemented in reva
+			Ref:   reference("sto-123", "iid-123", "./item"),
+			Owner: userID("uid-123"), // NOTE: owner not yet implemented in reva
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventFileDeleted{}
@@ -342,7 +342,7 @@ var testCases = []struct {
 	}, {
 		Alias: "File renamed",
 		SystemEvent: events.ItemMoved{
-			FileID:       reference("sto-123", "iid-123", "./item"),
+			Ref:          reference("sto-123", "iid-123", "./item"),
 			OldReference: reference("sto-123", "iid-123", "./anotheritem"),
 			Owner:        userID("uid-123"), // NOTE: owner not yet implemented in reva
 		},
@@ -361,8 +361,8 @@ var testCases = []struct {
 	}, {
 		Alias: "File purged",
 		SystemEvent: events.ItemPurged{
-			FileID: reference("sto-123", "iid-123", "./item"),
-			Owner:  userID("uid-123"), // NOTE: owner not yet implemented in reva
+			Ref:   reference("sto-123", "iid-123", "./item"),
+			Owner: userID("uid-123"), // NOTE: owner not yet implemented in reva
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventFilePurged{}
@@ -376,7 +376,7 @@ var testCases = []struct {
 	}, {
 		Alias: "File restored",
 		SystemEvent: events.ItemRestored{
-			FileID:       reference("sto-123", "iid-123", "./item"),
+			Ref:          reference("sto-123", "iid-123", "./item"),
 			Owner:        userID("uid-123"), // NOTE: owner not yet implemented in reva
 			OldReference: reference("sto-123", "sto-123!iid-123/item", "./oldpath"),
 			Key:          "",
@@ -396,9 +396,9 @@ var testCases = []struct {
 	}, {
 		Alias: "File version restored",
 		SystemEvent: events.FileVersionRestored{
-			FileID: reference("sto-123", "iid-123", "./item"),
-			Owner:  userID("uid-123"), // NOTE: owner not yet implemented in reva
-			Key:    "v1",
+			Ref:   reference("sto-123", "iid-123", "./item"),
+			Owner: userID("uid-123"), // NOTE: owner not yet implemented in reva
+			Key:   "v1",
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventFileVersionRestored{}

@@ -31,8 +31,19 @@ import (
 	merrors "go-micro.dev/v4/errors"
 )
 
-// GetDrives implements the Service interface.
+// GetDrives lists all drives the current user has access to
 func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
+	g.getDrives(w, r, false)
+}
+
+// GetAllDrives lists all drives, including other user's drives, if the current
+// user has the permission.
+func (g Graph) GetAllDrives(w http.ResponseWriter, r *http.Request) {
+	g.getDrives(w, r, true)
+}
+
+// getDrives implements the Service interface.
+func (g Graph) getDrives(w http.ResponseWriter, r *http.Request, unrestricted bool) {
 	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
 	// Parse the request with odata parser
 	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
@@ -41,7 +52,10 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
-	g.logger.Info().Interface("query", r.URL.Query()).Msg("Calling GetDrives")
+	g.logger.Debug().
+		Interface("query", r.URL.Query()).
+		Bool("unrestricted", unrestricted).
+		Msg("Calling getDrives")
 	ctx := r.Context()
 
 	filters, err := generateCs3Filters(odataReq)
@@ -50,7 +64,7 @@ func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 		errorcode.NotSupported.Render(w, r, http.StatusNotImplemented, err.Error())
 		return
 	}
-	res, err := g.ListStorageSpacesWithFilters(ctx, filters)
+	res, err := g.ListStorageSpacesWithFilters(ctx, filters, unrestricted)
 	switch {
 	case err != nil:
 		g.logger.Error().Err(err).Msg(ListStorageSpacesTransportErr)
@@ -106,7 +120,7 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	filters := []*storageprovider.ListStorageSpacesRequest_Filter{listStorageSpacesIDFilter(driveID)}
-	res, err := g.ListStorageSpacesWithFilters(ctx, filters)
+	res, err := g.ListStorageSpacesWithFilters(ctx, filters, true)
 	switch {
 	case err != nil:
 		g.logger.Error().Err(err).Msg(ListStorageSpacesTransportErr)
@@ -273,7 +287,8 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	identifierParts := strings.Split(driveID, "!")
 	switch len(identifierParts) {
 	case 1:
-		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[0]
+		sID, _ := resourceid.StorageIDUnwrap(identifierParts[0])
+		root.StorageId, root.OpaqueId = identifierParts[0], sID
 	case 2:
 		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[1]
 	default:
@@ -398,7 +413,7 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 }
 
 // ListStorageSpacesWithFilters List Storage Spaces using filters
-func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*storageprovider.ListStorageSpacesRequest_Filter) (*storageprovider.ListStorageSpacesResponse, error) {
+func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*storageprovider.ListStorageSpacesRequest_Filter, unrestricted bool) (*storageprovider.ListStorageSpacesResponse, error) {
 	client := g.GetGatewayClient()
 
 	permissions := make(map[string]struct{}, 1)
@@ -423,17 +438,35 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 				Decoder: "json",
 				Value:   value,
 			},
+			"unrestricted": {
+				Decoder: "plain",
+				Value:   []byte(strconv.FormatBool(unrestricted)),
+			},
 		}},
 		Filters: filters,
 	})
 	return res, err
 }
 
+func generateSpaceId(id *storageprovider.ResourceId) (spaceID string) {
+	spaceID = id.GetStorageId()
+	// 2nd ID to compare is the opaque ID of the Space Root
+	spaceID2 := id.GetOpaqueId()
+	if strings.Contains(spaceID, "$") {
+		spaceID2, _ = resourceid.StorageIDUnwrap(spaceID)
+	}
+	// Append opaqueID only if it is different from the spaceID2
+	if id.OpaqueId != spaceID2 {
+		spaceID += "!" + id.OpaqueId
+	}
+	return spaceID
+}
+
 func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace) (*libregraph.Drive, error) {
 	if space.Root == nil {
 		return nil, fmt.Errorf("space has no root")
 	}
-	rootID := resourceid.OwnCloudResourceIDWrap(space.Root)
+	spaceID := generateSpaceId(space.Root)
 
 	var permissions []libregraph.Permission
 	if space.Opaque != nil {
@@ -491,18 +524,14 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 		}
 	}
 
-	spaceID := space.Root.StorageId
-	if space.Root.OpaqueId != space.Root.StorageId {
-		spaceID = rootID
-	}
 	drive := &libregraph.Drive{
-		Id:   &spaceID,
+		Id:   libregraph.PtrString(spaceID),
 		Name: &space.Name,
 		//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
 		//"description": "string", // TODO read from StorageSpace ... needs Opaque for now
 		DriveType: &space.SpaceType,
 		Root: &libregraph.DriveItem{
-			Id:          &rootID,
+			Id:          libregraph.PtrString(resourceid.OwnCloudResourceIDWrap(space.Root)),
 			Permissions: permissions,
 		},
 	}
@@ -735,9 +764,10 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 	root := &storageprovider.ResourceId{}
 
 	identifierParts := strings.Split(driveID, "!")
+	sID, _ := resourceid.StorageIDUnwrap(identifierParts[0])
 	switch len(identifierParts) {
 	case 1:
-		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[0]
+		root.StorageId, root.OpaqueId = identifierParts[0], sID
 	case 2:
 		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[1]
 	default:
