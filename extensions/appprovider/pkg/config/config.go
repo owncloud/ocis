@@ -15,10 +15,9 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token"`
-	ExternalAddr          string  `yaml:"external_addr"`
-	Driver                string  `yaml:"driver"`
-	Drivers               Drivers `yaml:"drivers"`
+	ExternalAddr string  `yaml:"external_addr"`
+	Driver       string  `yaml:"driver"`
+	Drivers      Drivers `yaml:"drivers"`
 }
 
 type Tracing struct {
@@ -52,17 +51,17 @@ type GRPCConfig struct {
 }
 
 type Drivers struct {
-	WOPI WOPIDriver
+	WOPI WOPIDriver `yaml:"wopi" desc:"driver for the CS3org WOPI server"`
 }
 
 type WOPIDriver struct {
-	AppAPIKey      string `yaml:"app_api_key"`
-	AppDesktopOnly bool   `yaml:"app_desktop_only"`
-	AppIconURI     string `yaml:"app_icon_uri"`
-	AppInternalURL string `yaml:"app_internal_url"`
-	AppName        string `yaml:"app_name"`
-	AppURL         string `yaml:"app_url"`
-	Insecure       bool   `yaml:"insecure"`
-	IopSecret      string `yaml:"ipo_secret"`
-	WopiURL        string `yaml:"wopi_url"`
+	AppAPIKey      string `yaml:"app_api_key" env:"APP_PROVIDER_WOPI_APP_API_KEY" desc:"api key for the wopi app"`
+	AppDesktopOnly bool   `yaml:"app_desktop_only" env:"APP_PROVIDER_WOPI_APP_DESKTOP_ONLY" desc:"offer this app only on desktop"`
+	AppIconURI     string `yaml:"app_icon_uri" env:"APP_PROVIDER_WOPI_APP_ICON_URI" desc:"uri to an app icon to be used by clients"`
+	AppInternalURL string `yaml:"app_internal_url" env:"APP_PROVIDER_WOPI_APP_INTERNAL_URL" desc:"internal url to the app, eg in your DMZ"`
+	AppName        string `yaml:"app_name" env:"APP_PROVIDER_WOPI_APP_NAME" desc:"human readable app name"`
+	AppURL         string `yaml:"app_url" env:"APP_PROVIDER_WOPI_APP_URL" desc:"url for end users to access the app"`
+	Insecure       bool   `yaml:"insecure" env:"APP_PROVIDER_WOPI_INSECURE" desc:"allow insecure connections to the app"`
+	IopSecret      string `yaml:"wopi_server_iop_secret" env:"APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET" desc:"shared secret of the CS3org WOPI server"`
+	WopiURL        string `yaml:"wopi_server_external_url" env:"APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL" desc:"external url of the CS3org WOPI server"`
 }

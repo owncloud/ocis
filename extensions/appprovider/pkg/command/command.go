@@ -97,9 +97,8 @@ func appProviderConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.TokenManager.JWTSecret,
-			"gatewaysvc":                cfg.Reva.Address,
-			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
+			"jwt_secret": cfg.TokenManager.JWTSecret,
+			"gatewaysvc": cfg.Reva.Address,
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.GRPC.Protocol,
