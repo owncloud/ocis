@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Bugfix - URL encode the webdav url in the graph API: [#3597](https://github.com/owncloud/ocis/pull/3597)
 * Change - Load configuration files just from one directory: [#3587](https://github.com/owncloud/ocis/pull/3587)
 * Change - Introduce `ocis init` and remove all default secrets: [#3551](https://github.com/owncloud/ocis/pull/3551)
+* Change - Reduce drives in graph /me/drives API: [#3629](https://github.com/owncloud/ocis/pull/3629)
 * Change - Switched default configuration to use libregraph/idm: [#3331](https://github.com/owncloud/ocis/pull/3331)
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
@@ -64,6 +65,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3551
 
+* Change - Reduce drives in graph /me/drives API: [#3629](https://github.com/owncloud/ocis/pull/3629)
+
+   Reduced the drives in the graph `/me/drives` API to only the drives the user has access to. The
+   endpoint `/drives` will list all drives when the user has the permission.
+
+   https://github.com/owncloud/ocis/pull/3629
+
 * Change - Switched default configuration to use libregraph/idm: [#3331](https://github.com/owncloud/ocis/pull/3331)
 
    We switched the default configuration of oCIS to use the "idm" service (based on
@@ -101,6 +109,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/3601
    https://github.com/owncloud/ocis/pull/3605
    https://github.com/owncloud/ocis/pull/3611
+   https://github.com/owncloud/ocis/pull/3621
 # Changelog for [1.20.0] (2022-04-13)
 
 The following sections list the changes for 1.20.0.
