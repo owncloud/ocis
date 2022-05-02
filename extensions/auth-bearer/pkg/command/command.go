@@ -106,17 +106,16 @@ func authBearerConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]i
 		"grpc": map[string]interface{}{
 			"network": cfg.GRPC.Protocol,
 			"address": cfg.GRPC.Addr,
-			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"authprovider": map[string]interface{}{
-					"auth_manager": cfg.AuthProvider,
+					"auth_manager": "oidc",
 					"auth_managers": map[string]interface{}{
 						"oidc": map[string]interface{}{
-							"issuer":    cfg.AuthProviders.OIDC.Issuer,
-							"insecure":  cfg.AuthProviders.OIDC.Insecure,
-							"id_claim":  cfg.AuthProviders.OIDC.IDClaim,
-							"uid_claim": cfg.AuthProviders.OIDC.UIDClaim,
-							"gid_claim": cfg.AuthProviders.OIDC.GIDClaim,
+							"issuer":    cfg.OIDC.Issuer,
+							"insecure":  cfg.OIDC.Insecure,
+							"id_claim":  cfg.OIDC.IDClaim,
+							"uid_claim": cfg.OIDC.UIDClaim,
+							"gid_claim": cfg.OIDC.GIDClaim,
 						},
 					},
 				},

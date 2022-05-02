@@ -29,13 +29,10 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		AuthProvider: "ldap",
-		AuthProviders: config.AuthProviders{
-			OIDC: config.OIDCProvider{
-				Issuer:   "https://localhost:9200",
-				Insecure: false,
-				IDClaim:  "preferred_username",
-			},
+		OIDC: config.OIDC{
+			Issuer:   "https://localhost:9200",
+			Insecure: false,
+			IDClaim:  "preferred_username",
 		},
 	}
 }

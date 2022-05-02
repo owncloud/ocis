@@ -15,9 +15,8 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool          `yaml:"skip_user_groups_in_token"`
-	AuthProvider          string        `yaml:"auth_provider" env:"AUTH_BEARER_AUTH_PROVIDER" desc:"The auth provider which should be used by the service"`
-	AuthProviders         AuthProviders `yaml:"auth_providers"`
+	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token"`
+	OIDC                  OIDC `yaml:"oidc"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;AUTH_BEARER_TRACING_ENABLED" desc:"Activates tracing."`
@@ -49,14 +48,10 @@ type GRPCConfig struct {
 	Protocol string `yaml:"protocol" env:"AUTH_BEARER_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
 }
 
-type AuthProviders struct {
-	OIDC OIDCProvider `yaml:"oidc"`
-}
-
-type OIDCProvider struct {
+type OIDC struct {
 	Issuer   string `yaml:"issuer" env:"OCIS_URL;AUTH_BEARER_OIDC_ISSUER"`
 	Insecure bool   `yaml:"insecure" env:"OCIS_INSECURE;AUTH_BEARER_OIDC_INSECURE"`
-	IDClaim  string `yaml:"id_claim"`
-	UIDClaim string `yaml:"uid_claim"`
-	GIDClaim string `yaml:"gid_claim"`
+	IDClaim  string `yaml:"id_claim" env:"AUTH_BEARER_OIDC_ID_CLAIM"`
+	UIDClaim string `yaml:"uid_claim" env:"AUTH_BEARER_OIDC_UID_CLAIM"`
+	GIDClaim string `yaml:"gid_claim" env:"AUTH_BEARER_OIDC_GID_CLAIM"`
 }
