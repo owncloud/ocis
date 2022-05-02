@@ -37,6 +37,7 @@ import (
 	ocdav "github.com/owncloud/ocis/extensions/ocdav/pkg/command"
 	ocs "github.com/owncloud/ocis/extensions/ocs/pkg/command"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/command"
+	search "github.com/owncloud/ocis/extensions/search/pkg/command"
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/command"
 	sharing "github.com/owncloud/ocis/extensions/sharing/pkg/command"
 	storagemetadata "github.com/owncloud/ocis/extensions/storage-metadata/pkg/command"
@@ -131,6 +132,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.StoragePublicLink.Service.Name] = storagepublic.NewStoragePublicLink
 	s.ServicesRegistry[opts.Config.AppProvider.Service.Name] = appprovider.NewAppProvider
 	s.ServicesRegistry[opts.Config.Notifications.Service.Name] = notifications.NewSutureService
+	s.ServicesRegistry[opts.Config.Search.Service.Name] = search.NewSutureService
 
 	// populate delayed services
 	s.Delayed[opts.Config.Sharing.Service.Name] = sharing.NewSharing

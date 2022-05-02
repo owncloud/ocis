@@ -22,6 +22,7 @@ import (
 	ocdav "github.com/owncloud/ocis/extensions/ocdav/pkg/config"
 	ocs "github.com/owncloud/ocis/extensions/ocs/pkg/config"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config"
+	search "github.com/owncloud/ocis/extensions/search/pkg/config"
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/config"
 	sharing "github.com/owncloud/ocis/extensions/sharing/pkg/config"
 	storagemetadata "github.com/owncloud/ocis/extensions/storage-metadata/pkg/config"
@@ -100,4 +101,5 @@ type Config struct {
 	Store             *store.Config           `yaml:"store"`
 	Thumbnails        *thumbnails.Config      `yaml:"thumbnails"`
 	WebDAV            *webdav.Config          `yaml:"webdav"`
+	Search            *search.Config          `yaml:"search"`
 }

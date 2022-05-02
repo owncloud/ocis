@@ -1016,6 +1016,15 @@ _ocdav: api compatibility, return correct status code_
 - [apiWebdavOperations/search.feature:265](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L265)
 - [apiWebdavOperations/search.feature:270](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L270)
 
+#### [Support for favorites](https://github.com/owncloud/ocis/issues/1228)
+
+- [apiFavorites/favorites.feature:115](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L115)
+- [apiFavorites/favorites.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L116)
+- [apiFavorites/favorites.feature:141](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L141)
+- [apiFavorites/favorites.feature:142](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L142)
+- [apiFavorites/favorites.feature:267](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L267)
+- [apiFavorites/favorites.feature:268](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L268)
+
 And other missing implementation of favorites
 
 - [apiFavorites/favorites.feature:162](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiFavorites/favorites.feature#L162)

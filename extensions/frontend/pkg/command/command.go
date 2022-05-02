@@ -236,7 +236,9 @@ func frontendConfigFromStruct(c *cli.Context, cfg *config.Config, filesCfg map[s
 								"preferred_upload_type": cfg.Checksums.PreferredUploadType,
 							},
 							"files": filesCfg,
-							"dav":   map[string]interface{}{},
+							"dav": map[string]interface{}{
+								"reports": []string{"search-files"},
+							},
 							"files_sharing": map[string]interface{}{
 								"api_enabled":                       true,
 								"resharing":                         false,

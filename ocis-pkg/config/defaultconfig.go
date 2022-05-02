@@ -20,6 +20,7 @@ import (
 	ocdav "github.com/owncloud/ocis/extensions/ocdav/pkg/config/defaults"
 	ocs "github.com/owncloud/ocis/extensions/ocs/pkg/config/defaults"
 	proxy "github.com/owncloud/ocis/extensions/proxy/pkg/config/defaults"
+	search "github.com/owncloud/ocis/extensions/search/pkg/config/defaults"
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/config/defaults"
 	sharing "github.com/owncloud/ocis/extensions/sharing/pkg/config/defaults"
 	storagemetadata "github.com/owncloud/ocis/extensions/storage-metadata/pkg/config/defaults"
@@ -58,6 +59,7 @@ func DefaultConfig() *Config {
 		OCDav:             ocdav.DefaultConfig(),
 		OCS:               ocs.DefaultConfig(),
 		Proxy:             proxy.DefaultConfig(),
+		Search:            search.FullDefaultConfig(),
 		Settings:          settings.DefaultConfig(),
 		Sharing:           sharing.DefaultConfig(),
 		StorageMetadata:   storagemetadata.DefaultConfig(),

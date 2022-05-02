@@ -45,8 +45,10 @@ type Policy struct {
 
 // Route defines forwarding routes
 type Route struct {
-	Type     RouteType `yaml:"type"`
-	Endpoint string    `yaml:"endpoint"`
+	Type RouteType `yaml:"type"`
+	// Method optionally limits the route to this HTTP method
+	Method   string `yaml:"method"`
+	Endpoint string `yaml:"endpoint"`
 	// Backend is a static URL to forward the request to
 	Backend string `yaml:"backend"`
 	// Service name to look up in the registry

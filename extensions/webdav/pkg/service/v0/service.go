@@ -23,6 +23,7 @@ import (
 	"github.com/owncloud/ocis/extensions/webdav/pkg/config"
 	"github.com/owncloud/ocis/extensions/webdav/pkg/dav/requests"
 	thumbnailsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/thumbnails/v0"
+	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
 	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
 )
 
@@ -51,6 +52,7 @@ func NewService(opts ...Option) (Service, error) {
 	conf := options.Config
 
 	m := chi.NewMux()
+	chi.RegisterMethod("REPORT")
 	m.Use(options.Middleware...)
 
 	gwc, err := pool.GetGatewayServiceClient(conf.RevaGateway)
@@ -62,6 +64,7 @@ func NewService(opts ...Option) (Service, error) {
 		config:           conf,
 		log:              options.Logger,
 		mux:              m,
+		searchClient:     searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.DefaultClient),
 		thumbnailsClient: thumbnailssvc.NewThumbnailService("com.owncloud.api.thumbnails", grpc.DefaultClient),
 		revaClient:       gwc,
 	}
@@ -71,16 +74,19 @@ func NewService(opts ...Option) (Service, error) {
 		r.Get("/remote.php/dav/files/{id}/*", svc.Thumbnail)
 		r.Get("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnail)
 		r.Head("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnailHead)
+
+		r.MethodFunc("REPORT", "/remote.php/dav/files/{id}/*", svc.Search)
 	})
 
 	return svc, nil
 }
 
-// Webdav defines implements the business logic for Service.
+// Webdav implements the business logic for Service.
 type Webdav struct {
 	config           *config.Config
 	log              log.Logger
 	mux              *chi.Mux
+	searchClient     searchsvc.SearchProviderService
 	thumbnailsClient thumbnailssvc.ThumbnailService
 	revaClient       gatewayv1beta1.GatewayAPIClient
 }

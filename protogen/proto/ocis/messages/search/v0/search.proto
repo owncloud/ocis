@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package ocis.messages.search.v0;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0";
+
+message ResourceID {
+	string storage_id = 1;
+	string opaque_id = 2;
+}
+
+message Reference {
+	ResourceID resource_id = 1;
+	string path = 2;
+}
+
+message Entity {
+	Reference ref = 1;
+	ResourceID id = 2;
+	string name = 3;
+	string etag = 4;
+	uint64 size = 5;
+    google.protobuf.Timestamp last_modified_time = 6;
+	string mime_type = 7;
+	string permissions = 8;
+	uint64 type = 9;
+	bool deleted = 10;
+}
+
+message Match {
+	// the matched entity
+	Entity entity = 1;
+	// the match score
+	float score = 2;
+}

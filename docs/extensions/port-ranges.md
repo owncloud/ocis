@@ -42,7 +42,7 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 | 9205-9209  | [markdown-editor](https://github.com/owncloud/ocis-markdown-editor)           |
 | 9210-9214  | [reva](https://github.com/owncloud/ocis-reva) unused?                         |
 | 9215-9219  | reva metadata storage                                                         |
-| 9220-9224  | FREE                                                                          |
+| 9220-9224  | search                                                                          |
 | 9225-9229  | photoprism (state: PoC)                                                       |
 | 9230-9234  | [nats](https://github.com/owncloud/ocis/tree/master/nats)                     |
 | 9235-9239  | idm TBD                                                                       |

@@ -1,0 +1,320 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "ownCloud Infinite Scale search",
+    "version": "1.0.0",
+    "contact": {
+      "name": "ownCloud GmbH",
+      "url": "https://github.com/owncloud/ocis",
+      "email": "support@owncloud.com"
+    },
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://github.com/owncloud/ocis/blob/master/LICENSE"
+    }
+  },
+  "tags": [
+    {
+      "name": "SearchProvider"
+    },
+    {
+      "name": "IndexProvider"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v0/search/index-space": {
+      "post": {
+        "operationId": "SearchProvider_IndexSpace",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0IndexSpaceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0IndexSpaceRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SearchProvider"
+        ]
+      }
+    },
+    "/api/v0/search/index/search": {
+      "post": {
+        "operationId": "IndexProvider_Search",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0SearchIndexResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0SearchIndexRequest"
+            }
+          }
+        ],
+        "tags": [
+          "IndexProvider"
+        ]
+      }
+    },
+    "/api/v0/search/search": {
+      "post": {
+        "operationId": "SearchProvider_Search",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0SearchResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0SearchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SearchProvider"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v0Entity": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "$ref": "#/definitions/v0Reference"
+        },
+        "id": {
+          "$ref": "#/definitions/v0ResourceID"
+        },
+        "name": {
+          "type": "string"
+        },
+        "etag": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "lastModifiedTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "mimeType": {
+          "type": "string"
+        },
+        "permissions": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "deleted": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v0IndexSpaceRequest": {
+      "type": "object",
+      "properties": {
+        "spaceId": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        }
+      }
+    },
+    "v0IndexSpaceResponse": {
+      "type": "object"
+    },
+    "v0Match": {
+      "type": "object",
+      "properties": {
+        "entity": {
+          "$ref": "#/definitions/v0Entity",
+          "title": "the matched entity"
+        },
+        "score": {
+          "type": "number",
+          "format": "float",
+          "title": "the match score"
+        }
+      }
+    },
+    "v0Reference": {
+      "type": "object",
+      "properties": {
+        "resourceId": {
+          "$ref": "#/definitions/v0ResourceID"
+        },
+        "path": {
+          "type": "string"
+        }
+      }
+    },
+    "v0ResourceID": {
+      "type": "object",
+      "properties": {
+        "storageId": {
+          "type": "string"
+        },
+        "opaqueId": {
+          "type": "string"
+        }
+      }
+    },
+    "v0SearchIndexRequest": {
+      "type": "object",
+      "properties": {
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Optional. The maximum number of entries to return in the response"
+        },
+        "pageToken": {
+          "type": "string",
+          "title": "Optional. A pagination token returned from a previous call to `Get`\nthat indicates from where search should continue"
+        },
+        "query": {
+          "type": "string"
+        },
+        "ref": {
+          "$ref": "#/definitions/v0Reference"
+        }
+      }
+    },
+    "v0SearchIndexResponse": {
+      "type": "object",
+      "properties": {
+        "matches": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0Match"
+          }
+        },
+        "nextPageToken": {
+          "type": "string",
+          "title": "Token to retrieve the next page of results, or empty if there are no\nmore results in the list"
+        }
+      }
+    },
+    "v0SearchRequest": {
+      "type": "object",
+      "properties": {
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Optional. The maximum number of entries to return in the response"
+        },
+        "pageToken": {
+          "type": "string",
+          "title": "Optional. A pagination token returned from a previous call to `Get`\nthat indicates from where search should continue"
+        },
+        "query": {
+          "type": "string"
+        }
+      }
+    },
+    "v0SearchResponse": {
+      "type": "object",
+      "properties": {
+        "matches": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0Match"
+          }
+        },
+        "nextPageToken": {
+          "type": "string",
+          "title": "Token to retrieve the next page of results, or empty if there are no\nmore results in the list"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Developer Manual",
+    "url": "https://owncloud.dev/extensions/search/"
+  }
+}

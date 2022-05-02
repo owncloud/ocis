@@ -29,7 +29,8 @@ import (
 // MultiHostReverseProxy extends "httputil" to support multiple hosts with different policies
 type MultiHostReverseProxy struct {
 	httputil.ReverseProxy
-	Directors      map[string]map[config.RouteType]map[string]func(req *http.Request)
+	// Directors holds policy        route type        method    endpoint         Director
+	Directors      map[string]map[config.RouteType]map[string]map[string]func(req *http.Request)
 	PolicySelector policy.Selector
 	logger         log.Logger
 	config         *config.Config
@@ -40,7 +41,7 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 	options := newOptions(opts...)
 
 	rp := &MultiHostReverseProxy{
-		Directors: make(map[string]map[config.RouteType]map[string]func(req *http.Request)),
+		Directors: make(map[string]map[config.RouteType]map[string]map[string]func(req *http.Request)),
 		logger:    options.Logger,
 		config:    options.Config,
 	}
@@ -124,6 +125,7 @@ func (p *MultiHostReverseProxy) directorSelectionDirector(r *http.Request) {
 		return
 	}
 
+	method := ""
 	// find matching director
 	for _, rt := range config.RouteTypes {
 		var handler func(string, url.URL) bool
@@ -137,25 +139,36 @@ func (p *MultiHostReverseProxy) directorSelectionDirector(r *http.Request) {
 		default:
 			handler = p.prefixRouteMatcher
 		}
-		for endpoint := range p.Directors[pol][rt] {
+		if p.Directors[pol][rt][r.Method] != nil {
+			// use specific method
+			method = r.Method
+		}
+		for endpoint := range p.Directors[pol][rt][method] {
 			if handler(endpoint, *r.URL) {
 
 				p.logger.Debug().
 					Str("policy", pol).
+					Str("method", r.Method).
 					Str("prefix", endpoint).
 					Str("path", r.URL.Path).
 					Str("routeType", string(rt)).
 					Msg("director found")
 
-				p.Directors[pol][rt][endpoint](r)
+				p.Directors[pol][rt][method][endpoint](r)
 				return
 			}
 		}
 	}
 
 	// override default director with root. If any
-	if p.Directors[pol][config.PrefixRoute]["/"] != nil {
-		p.Directors[pol][config.PrefixRoute]["/"](r)
+	switch {
+	case p.Directors[pol][config.PrefixRoute][method]["/"] != nil:
+		// try specific method
+		p.Directors[pol][config.PrefixRoute][method]["/"](r)
+		return
+	case p.Directors[pol][config.PrefixRoute][""]["/"] != nil:
+		// fallback to unspecific method
+		p.Directors[pol][config.PrefixRoute][""]["/"](r)
 		return
 	}
 
@@ -182,20 +195,23 @@ func singleJoiningSlash(a, b string) string {
 func (p *MultiHostReverseProxy) AddHost(policy string, target *url.URL, rt config.Route) {
 	targetQuery := target.RawQuery
 	if p.Directors[policy] == nil {
-		p.Directors[policy] = make(map[config.RouteType]map[string]func(req *http.Request))
+		p.Directors[policy] = make(map[config.RouteType]map[string]map[string]func(req *http.Request))
 	}
 	routeType := config.DefaultRouteType
 	if rt.Type != "" {
 		routeType = rt.Type
 	}
 	if p.Directors[policy][routeType] == nil {
-		p.Directors[policy][routeType] = make(map[string]func(req *http.Request))
+		p.Directors[policy][routeType] = make(map[string]map[string]func(req *http.Request))
+	}
+	if p.Directors[policy][routeType][rt.Method] == nil {
+		p.Directors[policy][routeType][rt.Method] = make(map[string]func(req *http.Request))
 	}
 
 	reg := registry.GetRegistry()
 	sel := selector.NewSelector(selector.Registry(reg))
 
-	p.Directors[policy][routeType][rt.Endpoint] = func(req *http.Request) {
+	p.Directors[policy][routeType][rt.Method][rt.Endpoint] = func(req *http.Request) {
 		if rt.Service != "" {
 			// select next node
 			next, err := sel.Select(rt.Service)
