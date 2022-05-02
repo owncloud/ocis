@@ -28,7 +28,7 @@ func DefaultConfig() *config.Config {
 			Protocol: "tcp",
 		},
 		Service: config.Service{
-			Name: "storage-metadata",
+			Name: "storage-shares",
 		},
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",

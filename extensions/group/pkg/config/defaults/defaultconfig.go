@@ -27,7 +27,7 @@ func DefaultConfig() *config.Config {
 			Protocol: "tcp",
 		},
 		Service: config.Service{
-			Name: "user",
+			Name: "group",
 		},
 		GroupMembersCacheExpiration: 5,
 		Reva: &config.Reva{

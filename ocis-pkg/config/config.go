@@ -73,7 +73,7 @@ type Config struct {
 	Accounts          *accounts.Config        `yaml:"accounts"`
 	GLAuth            *glauth.Config          `yaml:"glauth"`
 	Graph             *graph.Config           `yaml:"graph"`
-	GraphExplorer     *graphExplorer.Config   `yaml:"graph_explorer"`
+	GraphExplorer     *graphExplorer.Config   `yaml:"graph-explorer"`
 	IDP               *idp.Config             `yaml:"idp"`
 	IDM               *idm.Config             `yaml:"idm"`
 	Nats              *nats.Config            `yaml:"nats"`
@@ -84,17 +84,17 @@ type Config struct {
 	Settings          *settings.Config        `yaml:"settings"`
 	Gateway           *gateway.Config         `yaml:"gateway"`
 	Frontend          *frontend.Config        `yaml:"frontend"`
-	AuthBasic         *authbasic.Config       `yaml:"auth_basic"`
-	AuthBearer        *authbearer.Config      `yaml:"auth_bearer"`
-	AuthMachine       *authmachine.Config     `yaml:"auth_machine"`
+	AuthBasic         *authbasic.Config       `yaml:"auth-basic"`
+	AuthBearer        *authbearer.Config      `yaml:"auth-bearer"`
+	AuthMachine       *authmachine.Config     `yaml:"auth-machine"`
 	User              *user.Config            `yaml:"user"`
 	Group             *group.Config           `yaml:"group"`
-	AppProvider       *appprovider.Config     `yaml:"app_provider"`
+	AppProvider       *appprovider.Config     `yaml:"appprovider"`
 	Sharing           *sharing.Config         `yaml:"sharing"`
-	StorageMetadata   *storagemetadata.Config `yaml:"storage_metadata"`
-	StoragePublicLink *storagepublic.Config   `yaml:"storage_public"`
-	StorageUsers      *storageusers.Config    `yaml:"storage_users"`
-	StorageShares     *storageshares.Config   `yaml:"storage_shares"`
+	StorageMetadata   *storagemetadata.Config `yaml:"storage-metadata"`
+	StoragePublicLink *storagepublic.Config   `yaml:"storage-public"`
+	StorageUsers      *storageusers.Config    `yaml:"storage-users"`
+	StorageShares     *storageshares.Config   `yaml:"storage-shares"`
 	OCDav             *ocdav.Config           `yaml:"ocdav"`
 	Store             *store.Config           `yaml:"store"`
 	Thumbnails        *thumbnails.Config      `yaml:"thumbnails"`
