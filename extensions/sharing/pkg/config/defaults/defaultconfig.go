@@ -48,9 +48,9 @@ func DefaultConfig() *config.Config {
 				JanitorRunInterval:         60,
 			},
 			CS3: config.UserSharingCS3Driver{
-				ProviderAddr:   "127.0.0.1:9215",
+				ProviderAddr:   "127.0.0.1:9215", // metadata storage
 				ServiceUserID:  "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-				ServiceUserIDP: "https://localhost:9200",
+				ServiceUserIDP: "internal",
 			},
 		},
 		PublicSharingDriver: "json",
@@ -69,9 +69,9 @@ func DefaultConfig() *config.Config {
 				JanitorRunInterval:         60,
 			},
 			CS3: config.PublicSharingCS3Driver{
-				ProviderAddr:   "127.0.0.1:9215",
+				ProviderAddr:   "127.0.0.1:9215", // metadata storage
 				ServiceUserID:  "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-				ServiceUserIDP: "https://localhost:9200",
+				ServiceUserIDP: "internal",
 			},
 		},
 		Events: config.Events{
