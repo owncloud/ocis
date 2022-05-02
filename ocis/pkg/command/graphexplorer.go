@@ -16,12 +16,13 @@ func GraphExplorerCommand(cfg *config.Config) *cli.Command {
 		Name:     cfg.GraphExplorer.Service.Name,
 		Usage:    subcommandDescription(cfg.GraphExplorer.Service.Name),
 		Category: "extensions",
-		Before: func(ctx *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
+		Before: func(c *cli.Context) error {
+			if err := parser.ParseConfig(cfg); err != nil {
 				fmt.Printf("%v", err)
+				return err
 			}
-			return err
+			cfg.GraphExplorer.Commons = cfg.Commons
+			return nil
 		},
 		Subcommands: command.GetCommands(cfg.GraphExplorer),
 	}

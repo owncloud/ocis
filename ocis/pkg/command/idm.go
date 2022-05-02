@@ -16,12 +16,13 @@ func IDMCommand(cfg *config.Config) *cli.Command {
 		Name:     "idm",
 		Usage:    "idm extension commands",
 		Category: "extensions",
-		Before: func(ctx *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
+		Before: func(c *cli.Context) error {
+			if err := parser.ParseConfig(cfg); err != nil {
 				fmt.Printf("%v", err)
+				return err
 			}
-			return err
+			cfg.IDM.Commons = cfg.Commons
+			return nil
 		},
 		Subcommands: command.GetCommands(cfg.IDM),
 	}

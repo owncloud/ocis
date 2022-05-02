@@ -16,12 +16,13 @@ func ProxyCommand(cfg *config.Config) *cli.Command {
 		Name:     cfg.Proxy.Service.Name,
 		Usage:    subcommandDescription(cfg.Proxy.Service.Name),
 		Category: "extensions",
-		Before: func(ctx *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
+		Before: func(c *cli.Context) error {
+			if err := parser.ParseConfig(cfg); err != nil {
 				fmt.Printf("%v", err)
+				return err
 			}
-			return err
+			cfg.Proxy.Commons = cfg.Commons
+			return nil
 		},
 		Subcommands: command.GetCommands(cfg.Proxy),
 	}
