@@ -10,7 +10,6 @@
 | ACCOUNTS_HTTP_ROOT | string | / | The root path of the http service.|
 | ACCOUNTS_CACHE_TTL | int | 604800 | The cache time for the static assets.|
 | ACCOUNTS_GRPC_ADDR | string | 127.0.0.1:9180 | The address of the grpc service.|
-| OCIS_JWT_SECRET;ACCOUNTS_JWT_SECRET | string | Pive-Fumkiu4 | The secret to mint jwt tokens.|
 | ACCOUNTS_ASSET_PATH | string |  | The path to the ui assets.|
 | ACCOUNTS_STORAGE_BACKEND | string | CS3 | Defines which storage implementation is to be used|
 | ACCOUNTS_STORAGE_DISK_PATH | string | ~/.ocis/accounts | The path where the accounts data is stored.|

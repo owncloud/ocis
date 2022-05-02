@@ -20,4 +20,4 @@ notifications:
     events_cluster: ocis-cluster
     events_group: notifications
   reva_gateway: 127.0.0.1:9142
-  machine_auth_api_key: change-me-please
+  machine_auth_api_key: ""

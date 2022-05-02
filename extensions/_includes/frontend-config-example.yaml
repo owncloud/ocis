@@ -14,35 +14,32 @@ debug:
   token: ""
   pprof: false
   zpages: false
-supervised: false
 http:
   addr: 127.0.0.1:9140
   protocol: tcp
   prefix: ""
-jwt_secret: Pive-Fumkiu4
-gatewayendpoint: 127.0.0.1:9142
-skipusergroupsintoken: false
+transfer_secret: ""
+token_manager:
+  jwt_secret: ""
+reva:
+  address: 127.0.0.1:9142
+machine_auth_api_key: ""
+skip_users_groups_in_token: false
 favorites: false
-enableprojectspaces: true
+enable_project_spaces: true
 upload_max_chunk_size: 100000000
 upload_http_method_override: ""
 default_upload_protocol: tus
-transfer_secret: replace-me-with-a-transfer-secret
 public_url: https://localhost:9200
 archiver:
   max_num_files: 10000
   max_size: 1073741824
-  prefix: archiver
   insecure: false
-appprovider:
+app_provider:
   external_addr: ""
   driver: ""
-  apps_url: ""
-  open_url: ""
-  new_url: ""
-  prefix: ""
   insecure: false
-datagateway:
+data_gateway:
   prefix: data
 ocs:
   prefix: ocs
@@ -59,8 +56,6 @@ ocs:
       dbport: 0
       dbname: ""
       namespace: ""
-authmachine:
-  apikey: change-me-please
 checksums:
   supported_types:
   - sha1
@@ -69,4 +64,4 @@ checksums:
   preferred_upload_type: ""
 middleware:
   auth:
-    credentials_by_user_agenr: {}
+    credentials_by_user_agent: {}

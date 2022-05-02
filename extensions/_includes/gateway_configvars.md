@@ -8,5 +8,5 @@
 | GATEWAY_DEBUG_ZPAGES | bool | false | |
 | GATEWAY_GRPC_ADDR | string | 127.0.0.1:9142 | The address of the grpc service.|
 | GATEWAY_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
-| STORAGE_TRANSFER_SECRET | string | replace-me-with-a-transfer-secret | |
+| STORAGE_TRANSFER_SECRET | string |  | |
 | OCIS_URL;GATEWAY_FRONTEND_PUBLIC_URL | string | https://localhost:9200 | |

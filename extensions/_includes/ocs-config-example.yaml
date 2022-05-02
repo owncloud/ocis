@@ -35,11 +35,11 @@ http:
     - X-Requested-With
     allowed_credentials: true
 token_manager:
-  jwt_secret: Pive-Fumkiu4
+  jwt_secret: ""
 reva:
   address: 127.0.0.1:9142
 identity_management:
   address: https://localhost:9200
 account_backend: cs3
 storage_users_driver: ocis
-machine_auth_api_key: change-me-please
+machine_auth_api_key: ""

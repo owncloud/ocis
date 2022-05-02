@@ -93,8 +93,6 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, e.g. `OCIS_DOMAIN=cloud.owncloud.test`.
 
-  You also must override the default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD`, `OCIS_JWT_SECRET`, `STORAGE_TRANSFER_SECRET` and `OCIS_MACHINE_AUTH_API_KEY`  in order to secure your oCIS instance. Choose some random strings e.g. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}}).
-
   The OpenLDAP server in this example deployment has an admin users, which is also used as bind user in order to keep these examples simple. You can change the default password "admin" to a different one by setting it to `LDAP_ADMIN_PASSWORD=...`.
 
   Set your domain for the LDAP manager UI in `LDAP_MANAGER_DOMAIN=`, e.g. `ldap.owncloud.test`.

@@ -14,5 +14,5 @@
 | OCIS_INSECURE;THUMBNAILS_CS3SOURCE_INSECURE | bool | false | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
 | THUMBNAILS_TXT_FONTMAP_FILE | string |  | |
-| THUMBNAILS_TRANSFER_TOKEN | string | changemeplease | |
+| STORAGE_TRANSFER_TOKEN;THUMBNAILS_TRANSFER_TOKEN | string |  | |
 | THUMBNAILS_DATA_ENDPOINT | string | http://127.0.0.1:9186/thumbnails/data | |

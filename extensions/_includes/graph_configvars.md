@@ -8,8 +8,6 @@
 | GRAPH_DEBUG_ZPAGES | bool | false | |
 | GRAPH_HTTP_ADDR | string | 127.0.0.1:9120 | |
 | GRAPH_HTTP_ROOT | string | /graph | |
-| REVA_GATEWAY | string | 127.0.0.1:9142 | |
-| OCIS_JWT_SECRET;GRAPH_JWT_SECRET | string | Pive-Fumkiu4 | |
 | OCIS_URL;GRAPH_SPACES_WEBDAV_BASE | string | https://localhost:9200 | |
 | GRAPH_SPACES_WEBDAV_PATH | string | /dav/spaces/ | |
 | GRAPH_SPACES_DEFAULT_QUOTA | string | 1000000000 | |
@@ -19,7 +17,7 @@
 | LDAP_URI;GRAPH_LDAP_URI | string | ldaps://localhost:9235 | |
 | OCIS_INSECURE;GRAPH_LDAP_INSECURE | bool | true | |
 | LDAP_BIND_DN;GRAPH_LDAP_BIND_DN | string | uid=libregraph,ou=sysusers,o=libregraph-idm | |
-| LDAP_BIND_PASSWORD;GRAPH_LDAP_BIND_PASSWORD | string | idm | |
+| LDAP_BIND_PASSWORD;GRAPH_LDAP_BIND_PASSWORD | string |  | |
 | GRAPH_LDAP_SERVER_UUID | bool | false | |
 | GRAPH_LDAP_SERVER_WRITE_ENABLED | bool | true | |
 | LDAP_USER_BASE_DN;GRAPH_LDAP_USER_BASE_DN | string | ou=users,o=libregraph-idm | |

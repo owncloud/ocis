@@ -16,13 +16,13 @@ ocdav:
   public_url: https://localhost:9200
   debug_addr: 127.0.0.1:9163
   gateway_svc: 127.0.0.1:9142
-  jwt_secret: Pive-Fumkiu4
+  jwt_secret: ""
   insecure: false
   timeout: 84300
 reva:
-  jwt_secret: Pive-Fumkiu4
+  jwt_secret: ""
   skip_user_grooups_in_token: false
-  transfer_secret: replace-me-with-a-transfer-secret
+  transfer_secret: ""
   transfer_expires: 86400
   oidc:
     issuer: https://localhost:9200
@@ -46,7 +46,7 @@ reva:
     - uid
     - mail
     bind_dn: uid=reva,ou=sysusers,o=libregraph-idm
-    bind_password: reva
+    bind_password: ""
     idp: https://localhost:9200
     user_schema:
       id: ownclouduuid
@@ -76,7 +76,7 @@ reva:
     target_api: ""
   user_owncloud_sql:
     db_username: owncloud
-    db_password: secret
+    db_password: ""
     db_host: mysql
     db_port: 3306
     db_name: owncloud
@@ -434,7 +434,7 @@ reva:
     context: null
     supervised: false
   auth_machine_config:
-    machine_auth_api_key: change-me-please
+    machine_auth_api_key: ""
   sharing:
     port:
       max_cpus: ""

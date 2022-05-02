@@ -14,7 +14,6 @@ debug:
   token: ""
   pprof: false
   zpages: false
-supervised: false
 grpc:
   addr: 127.0.0.1:9157
   protocol: tcp
@@ -22,10 +21,12 @@ http:
   addr: 127.0.0.1:9158
   protocol: tcp
   prefix: data
+token_manager:
+  jwt_secret: ""
+reva:
+  address: 127.0.0.1:9142
 context: null
-jwtsecret: Pive-Fumkiu4
-gatewayendpoint: 127.0.0.1:9142
-skipusergroupsintoken: false
+skip_user_groups_in_token: false
 driver: ocis
 drivers:
   eos:
@@ -89,12 +90,12 @@ drivers:
     db_port: 3306
     db_name: owncloud
     usersproviderendpoint: ""
-dataserverurl: http://localhost:9158/data
-tempfolder: ~/.ocis/tmp/users
-dataproviderinsecure: false
+data_server_url: http://localhost:9158/data
+temp_folder: ~/.ocis/tmp/users
+data_provider_insecure: false
 events:
   addr: 127.0.0.1:9233
   clusterid: ocis-cluster
-mountid: 1284d238-aa92-42ce-bdc4-0b0000009157
-exposedataserver: false
+mount_id: 1284d238-aa92-42ce-bdc4-0b0000009157
+expose_data_server: false
 readonly: false

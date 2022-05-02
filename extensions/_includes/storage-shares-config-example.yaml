@@ -14,16 +14,17 @@ debug:
   token: ""
   pprof: false
   zpages: false
-supervised: false
 grpc:
   addr: 127.0.0.1:9154
   protocol: tcp
 http:
   addr: 127.0.0.1:9155
   protocol: tcp
+token_manager:
+  jwt_secret: ""
+reva:
+  address: 127.0.0.1:9142
 context: null
-jwtsecret: Pive-Fumkiu4
-gatewayendpoint: 127.0.0.1:9142
-skipusergroupsintoken: false
+skip_user_groups_in_token: false
 readonly: false
-sharesproviderendpoint: localhost:9150
+shares_provider_endpoint: localhost:9150

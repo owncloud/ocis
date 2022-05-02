@@ -20,7 +20,7 @@ http:
 reva:
   address: 127.0.0.1:9142
 token_manager:
-  jwt_secret: Pive-Fumkiu4
+  jwt_secret: ""
 spaces:
   webdav_base: https://localhost:9200
   webdav_path: /dav/spaces/
@@ -33,7 +33,7 @@ identity:
     uri: ldaps://localhost:9235
     insecure: true
     bind_dn: uid=libregraph,ou=sysusers,o=libregraph-idm
-    bind_password: idm
+    bind_password: ""
     use_server_uuid: false
     write_enabled: true
     user_base_dn: ou=users,o=libregraph-idm

@@ -14,36 +14,36 @@ debug:
   token: ""
   pprof: false
   zpages: false
-supervised: false
 grpc:
   addr: 127.0.0.1:9142
   protocol: tcp
-jwtsecret: Pive-Fumkiu4
-gatewayendpoint: 127.0.0.1:9142
+token_manager:
+  jwt_secret: ""
+reva:
+  address: 127.0.0.1:9142
 skipusergroupsintoken: false
-commitsharetostoragegrant: true
-commitsharetostorageref: true
-sharefolder: Shares
-disablehomecreationonlogin: true
-transfersecret: replace-me-with-a-transfer-secret
-transferexpires: 86400
-homemapping: ""
-etagcachettl: 0
-usersendpoint: localhost:9144
-groupsendpoint: localhost:9160
-permissionsendpoint: localhost:9191
-sharingendpoint: localhost:9150
-datagatewaypublicurl: ""
-frontendpublicurl: https://localhost:9200
-authbasicendpoint: localhost:9146
-authbearerendpoint: localhost:9148
-authmachineendpoint: localhost:9166
-storagepubliclinkendpoint: localhost:9178
-storageusersendpoint: localhost:9157
-storagesharesendpoint: localhost:9154
-storageregistry:
+commit_share_to_storage_grant: true
+commit_share_to_storage_ref: true
+share_folder: Shares
+disable_home_creation_on_login: true
+transfer_secret: ""
+transfer_expires: 86400
+home_mapping: ""
+etag_cache_ttl: 0
+users_endpoint: localhost:9144
+groups_endpoint: localhost:9160
+permissions_endpoint: localhost:9191
+sharing_endpoint: localhost:9150
+frontend_public_url: https://localhost:9200
+auth_basic_endpoint: localhost:9146
+auth_bearer_endpoint: localhost:9148
+auth_machine_endpoint: localhost:9166
+storage_public_link_endpoint: localhost:9178
+storage_users_endpoint: localhost:9157
+storage_shares_endpoint: localhost:9154
+storage_registry:
   driver: spaces
   rules: []
   json: ""
-appregistry:
+app_registry:
   mimetypesjson: ""

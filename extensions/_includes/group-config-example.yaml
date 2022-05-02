@@ -14,14 +14,15 @@ debug:
   token: ""
   pprof: false
   zpages: false
-supervised: false
 grpc:
   addr: 127.0.0.1:9160
   protocol: tcp
-jwtsecret: Pive-Fumkiu4
-gatewayendpoint: 127.0.0.1:9142
-skipusergroupsintoken: false
-groupmemberscacheexpiration: 5
+token_manager:
+  jwt_secret: ""
+reva:
+  address: 127.0.0.1:9142
+skip_user_groups_in_token: false
+group_members_cache_expiration: 5
 driver: ldap
 drivers:
   json:
@@ -31,7 +32,7 @@ drivers:
     cacert: ~/.ocis/idm/ldap.crt
     insecure: false
     binddn: uid=reva,ou=sysusers,o=libregraph-idm
-    bindpassword: reva
+    bind_password: ""
     userbasedn: ou=users,o=libregraph-idm
     groupbasedn: ou=groups,o=libregraph-idm
     userscope: sub

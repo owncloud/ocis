@@ -59,7 +59,7 @@ ldap:
   uri: ldaps://localhost:9235
   cacert: ~/.ocis/idm/ldap.crt
   bind_dn: uid=idp,ou=sysusers,o=libregraph-idm
-  bind_password: idp
+  bind_password: ""
   base_dn: ou=users,o=libregraph-idm
   scope: sub
   login_attribute: uid

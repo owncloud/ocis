@@ -14,7 +14,6 @@ debug:
   token: ""
   pprof: false
   zpages: false
-supervised: false
 grpc:
   addr: 127.0.0.1:9215
   protocol: tcp
@@ -22,9 +21,11 @@ http:
   addr: 127.0.0.1:9216
   protocol: tcp
 context: null
-jwtsecret: Pive-Fumkiu4
-gatewayendpoint: 127.0.0.1:9142
-skipusergroupsintoken: false
+token_manager:
+  jwt_secret: ""
+reva:
+  address: 127.0.0.1:9142
+skip_user_groups_in_token: false
 driver: ocis
 drivers:
   eos:
@@ -67,6 +68,6 @@ drivers:
     secret_key: ""
     endpoint: ""
     bucket: ""
-dataserverurl: http://localhost:9216/data
-tempfolder: ~/.ocis/tmp/metadata
-dataproviderinsecure: false
+data_server_url: http://localhost:9216/data
+temp_folder: ~/.ocis/tmp/metadata
+data_provider_insecure: false

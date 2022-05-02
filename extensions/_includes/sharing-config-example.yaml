@@ -14,15 +14,16 @@ debug:
   token: ""
   pprof: false
   zpages: false
-supervised: false
 grpc:
   addr: 127.0.0.1:9150
   protocol: tcp
-jwtsecret: Pive-Fumkiu4
-gatewayendpoint: 127.0.0.1:9142
-skipusergroupsintoken: false
-usersharingdriver: json
-usersharingdrivers:
+token_manager:
+  jwt_secret: ""
+reva:
+  address: 127.0.0.1:9142
+skip_user_groups_in_token: false
+user_sharing_driver: json
+user_sharin_drivers:
   json:
     file: ~/.ocis/storage/shares.json
   sql:
@@ -40,8 +41,8 @@ usersharingdrivers:
     serviceuserid: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
     serviceuseridp: https://localhost:9200
     machineauthapikey: ""
-publicsharingdriver: json
-publicsharingdrivers:
+public_sharing_driver: json
+public_sharing_drivers:
   json:
     file: ~/.ocis/storage/publicshares.json
   sql:

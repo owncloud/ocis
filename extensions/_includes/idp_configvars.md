@@ -38,7 +38,7 @@
 | LDAP_URI;IDP_LDAP_URI | string | ldaps://localhost:9235 | |
 | LDAP_CACERT;IDP_LDAP_TLS_CACERT | string | ~/.ocis/idm/ldap.crt | |
 | LDAP_BIND_DN;IDP_LDAP_BIND_DN | string | uid=idp,ou=sysusers,o=libregraph-idm | |
-| LDAP_BIND_PASSWORD;IDP_LDAP_BIND_PASSWORD | string | idp | |
+| LDAP_BIND_PASSWORD;IDP_LDAP_BIND_PASSWORD | string |  | |
 | LDAP_USER_BASE_DN,IDP_LDAP_BASE_DN | string | ou=users,o=libregraph-idm | |
 | LDAP_USER_SCOPE;IDP_LDAP_SCOPE | string | sub | |
 | IDP_LDAP_LOGIN_ATTRIBUTE | string | uid | |

@@ -122,8 +122,6 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   Set your domain for the oC10 and oCIS frontend in `CLOUD_DOMAIN=`, e.g. `CLOUD_DOMAIN=cloud.owncloud.test`.
 
-  You also must override the default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD`, `OCIS_JWT_SECRET`, `STORAGE_TRANSFER_SECRET` and `OCIS_MACHINE_AUTH_API_KEY`  in order to secure your oCIS instance. Choose some random strings e.g. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}}).
-
   By default ownCloud 10 will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OC10_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
 
   You can switch the default application of ownCloud 10 by setting`OWNCLOUD_DEFAULT_APP=files` in oder to have the classic UI as frontend, which is also the default. If you prefer ownCloud Web as the default application in ownCloud 10 just set `OWNCLOUD_DEFAULT_APP=web`.

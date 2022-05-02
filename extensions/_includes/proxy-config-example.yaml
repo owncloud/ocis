@@ -142,7 +142,7 @@ oidc:
     size: 1024
     ttl: 10
 token_manager:
-  jwt_secret: Pive-Fumkiu4
+  jwt_secret: ""
 policy_selector:
   static:
     policy: ocis
@@ -156,7 +156,7 @@ pre_signed_url:
 account_backend: cs3
 user_oidc_claim: email
 user_cs3_claim: mail
-machine_auth_api_key: change-me-please
+machine_auth_api_key: ""
 auto_provision_accounts: false
 enable_basic_auth: false
 insecure_backends: false

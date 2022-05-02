@@ -34,5 +34,5 @@ thumbnail:
   cs3_allow_insecure: false
   reva_gateway: 127.0.0.1:9142
   font_map_file: ""
-  transfer_token: changemeplease
+  transfer_secret: ""
   data_endpoint: http://127.0.0.1:9186/thumbnails/data

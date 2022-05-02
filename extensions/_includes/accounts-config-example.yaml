@@ -38,7 +38,7 @@ http:
 grpc:
   addr: 127.0.0.1:9180
 token_manager:
-  jwt_secret: Pive-Fumkiu4
+  jwt_secret: ""
 asset:
   path: ""
 repo:

@@ -14,14 +14,15 @@ debug:
   token: ""
   pprof: false
   zpages: false
-supervised: false
 grpc:
   addr: 127.0.0.1:9166
   protocol: tcp
-jwtsecret: Pive-Fumkiu4
-gatewayendpoint: 127.0.0.1:9142
-skipusergroupsintoken: false
+token_manager:
+  jwt_secret: ""
+reva:
+  address: 127.0.0.1:9142
+skip_user_groups_in_token: false
 auth_provider: ldap
 auth_providers:
   machine:
-    api_key: change-me-please
+    api_key: ""

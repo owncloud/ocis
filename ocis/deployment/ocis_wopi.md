@@ -130,8 +130,6 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, e.g. `OCIS_DOMAIN=ocis.owncloud.test`.
 
-  You also must override the default secrets in `IDP_LDAP_BIND_PASSWORD`, `STORAGE_LDAP_BIND_PASSWORD`, `OCIS_JWT_SECRET`, `STORAGE_TRANSFER_SECRET` and `OCIS_MACHINE_AUTH_API_KEY`  in order to secure your oCIS instance. Choose some random strings e.g. from the output of `openssl rand -base64 32`. For more information see [secure an oCIS instance]({{< ref "./#secure-an-ocis-instance" >}}).
-
   By default the CS3Org WOPI server will also be started in the `latest` version. If you want to start a specific version of it, you can set the version to `WOPISERVER_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/cs3org/wopiserver/tags?page=1&ordering=last_updated).
 
   Set your domain for the CS3Org WOPI server in `WOPISERVER_DOMAIN=`, where all office suites can download the files via the WOPI protocol.

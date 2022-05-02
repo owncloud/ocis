@@ -14,13 +14,14 @@ debug:
   token: ""
   pprof: false
   zpages: false
-supervised: false
 grpc:
   addr: 127.0.0.1:9146
   protocol: tcp
-jwtsecret: Pive-Fumkiu4
-gatewayendpoint: 127.0.0.1:9142
-skipusergroupsintoken: false
+token_manager:
+  jwt_secret: ""
+reva:
+  address: 127.0.0.1:9142
+skip_user_groups_in_token: false
 auth_provider: ldap
 auth_providers:
   json:
@@ -30,7 +31,7 @@ auth_providers:
     cacert: ~/.ocis/idm/ldap.crt
     insecure: false
     binddn: uid=reva,ou=sysusers,o=libregraph-idm
-    bindpassword: reva
+    bind_password: ""
     userbasedn: ou=users,o=libregraph-idm
     groupbasedn: ou=groups,o=libregraph-idm
     userscope: sub
@@ -59,7 +60,7 @@ auth_providers:
       member: member
   owncloud_sql:
     dbusername: owncloud
-    dbpassword: secret
+    dbpassword: ""
     dbhost: mysql
     dbport: 3306
     dbname: owncloud

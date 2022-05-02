@@ -44,8 +44,8 @@ metadata_config:
   storage_addr: 127.0.0.1:9215
   service_user_id: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
   service_user_idp: https://localhost:9200
-  machine_auth_api_key: change-me-please
+  machine_auth_api_key: ""
 asset:
   path: ""
 token_manager:
-  jwt_secret: Pive-Fumkiu4
+  jwt_secret: ""

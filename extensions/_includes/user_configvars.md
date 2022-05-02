@@ -12,7 +12,7 @@
 | LDAP_CACERT;USERS_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | |
 | LDAP_INSECURE;USERS_LDAP_INSECURE | bool | false | |
 | LDAP_BIND_DN;USERS_LDAP_BIND_DN | string | uid=reva,ou=sysusers,o=libregraph-idm | |
-| LDAP_BIND_PASSWORD;USERS_LDAP_BIND_PASSWORD | string | reva | |
+| LDAP_BIND_PASSWORD;USERS_LDAP_BIND_PASSWORD | string |  | |
 | LDAP_USER_BASE_DN;USERS_LDAP_USER_BASE_DN | string | ou=users,o=libregraph-idm | |
 | LDAP_GROUP_BASE_DN;USERS_LDAP_GROUP_BASE_DN | string | ou=groups,o=libregraph-idm | |
 | LDAP_USER_SCOPE;USERS_LDAP_USER_SCOPE | string | sub | |
