@@ -26,10 +26,10 @@ RUN addgroup -g 1000 -S ocis-group && \
 
 RUN mkdir -p /var/lib/ocis && \
  chown -R ocis-user:ocis-group /var/lib/ocis && \
- chmod -R 700 /var/lib/ocis && \
+ chmod -R 750 /var/lib/ocis && \
  mkdir -p /etc/ocis && \
  chown -R ocis-user:ocis-group /etc/ocis && \
- chmod -R 700 /etc/ocis
+ chmod -R 750 /etc/ocis
 
 VOLUME [ "/var/lib/ocis", "/etc/ocis" ]
 WORKDIR /var/lib/ocis
