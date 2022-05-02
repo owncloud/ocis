@@ -17,17 +17,33 @@ L10N_MODULES := $(shell find . -path '*.tx*' -name 'config' | sed 's|/[^/]*$$||'
 # if you add a module here please also add it to the .drone.star file
 OCIS_MODULES = \
 	extensions/accounts \
+	extensions/appprovider \
 	extensions/audit \
+	extensions/auth-basic \
+	extensions/auth-bearer \
+	extensions/auth-machine \
+	extensions/frontend \
+	extensions/gateway \
 	extensions/glauth \
 	extensions/graph \
 	extensions/graph-explorer \
+	extensions/group \
+	extensions/idm \
 	extensions/idp \
+	extensions/nats \
+	extensions/notifications \
+	extensions/ocdav \
 	extensions/ocs \
 	extensions/proxy \
 	extensions/settings \
-	extensions/storage \
+	extensions/sharing \
+	extensions/storage-metadata \
+	extensions/storage-publiclink \
+	extensions/storage-shares \
+	extensions/storage-users \
 	extensions/store \
 	extensions/thumbnails \
+	extensions/user \
 	extensions/web \
 	extensions/webdav\
 	ocis \
@@ -111,7 +127,7 @@ composer.lock: composer.json
 .PHONY: generate
 generate:
 	@for mod in $(OCIS_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod generate || exit 1; \
+        $(MAKE) -C $$mod generate || exit 1; \
     done
 
 .PHONY: vet
