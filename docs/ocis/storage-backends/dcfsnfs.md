@@ -53,12 +53,11 @@ The oCIS server can be instructed to set up the decomposed FS at a certain path 
 
 The test setup started an oCIS tech preview single binary release using this start command:
 
-```
+```bash
+ocis init
 OCIS_BASE_DATA_PATH=/mnt/ocisdata/ OCIS_LOG_LEVEL=debug OCIS_INSECURE=true PROXY_HTTP_ADDR=0.0.0.0:9200 OCIS_URL=https://hostname:9200  ./ocis-1.18.0-linux-amd64 server
 ```
 
 This starts oCIS and a decomposed FS skeleton file system structure is set up on the NFS share.
 
 The oCIS instance is passing a smoke test.
-
-

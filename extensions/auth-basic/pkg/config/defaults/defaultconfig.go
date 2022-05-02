@@ -9,9 +9,8 @@ import (
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
-
 	EnsureDefaults(cfg)
-
+	Sanitize(cfg)
 	return cfg
 }
 
@@ -30,9 +29,10 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "auth-basic",
 		},
-		GatewayEndpoint: "127.0.0.1:9142",
-		JWTSecret:       "Pive-Fumkiu4",
-		AuthProvider:    "ldap",
+		Reva: &config.Reva{
+			Address: "127.0.0.1:9142",
+		},
+		AuthProvider: "ldap",
 		AuthProviders: config.AuthProviders{
 			LDAP: config.LDAPProvider{
 				URI:              "ldaps://localhost:9235",
@@ -48,7 +48,6 @@ func DefaultConfig() *config.Config {
 				UserObjectClass:  "inetOrgPerson",
 				GroupObjectClass: "groupOfNames",
 				BindDN:           "uid=reva,ou=sysusers,o=libregraph-idm",
-				BindPassword:     "reva",
 				IDP:              "https://localhost:9200",
 				UserSchema: config.LDAPUserSchema{
 					ID:          "ownclouduuid",
@@ -67,7 +66,6 @@ func DefaultConfig() *config.Config {
 			JSON: config.JSONProvider{},
 			OwnCloudSQL: config.OwnCloudSQLProvider{
 				DBUsername:       "owncloud",
-				DBPassword:       "secret",
 				DBHost:           "mysql",
 				DBPort:           3306,
 				DBName:           "owncloud",
@@ -103,6 +101,23 @@ func EnsureDefaults(cfg *config.Config) {
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
 	}
+
+	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
+		cfg.Reva = &config.Reva{
+			Address: cfg.Commons.Reva.Address,
+		}
+	} else if cfg.Reva == nil {
+		cfg.Reva = &config.Reva{}
+	}
+
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
+	}
+
 }
 
 func Sanitize(cfg *config.Config) {

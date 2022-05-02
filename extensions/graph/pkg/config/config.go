@@ -18,8 +18,8 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
-	Reva         Reva         `yaml:"reva"`
-	TokenManager TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
+	TokenManager *TokenManager `yaml:"token_manager"`
 
 	Spaces   Spaces   `yaml:"spaces"`
 	Identity Identity `yaml:"identity"`

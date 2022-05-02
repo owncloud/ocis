@@ -20,10 +20,8 @@ const (
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
-
 	EnsureDefaults(cfg)
 	Sanitize(cfg)
-
 	return cfg
 }
 
@@ -34,9 +32,7 @@ func DefaultConfig() *config.Config {
 			Addr: "127.0.0.1:9109",
 		},
 		Reva: config.Reva{
-			JWTSecret:             "Pive-Fumkiu4",
 			SkipUserGroupsInToken: false,
-			TransferSecret:        "replace-me-with-a-transfer-secret",
 			TransferExpires:       24 * 60 * 60,
 			OIDC: config.OIDC{
 				Issuer:   defaultPublicURL,
@@ -57,7 +53,6 @@ func DefaultConfig() *config.Config {
 				UserObjectClass:  "inetOrgPerson",
 				GroupObjectClass: "groupOfNames",
 				BindDN:           "uid=reva,ou=sysusers,o=libregraph-idm",
-				BindPassword:     "reva",
 				IDP:              defaultPublicURL,
 				UserSchema: config.LDAPUserSchema{
 					ID:          "ownclouduuid",
@@ -81,7 +76,6 @@ func DefaultConfig() *config.Config {
 			},
 			UserOwnCloudSQL: config.UserOwnCloudSQL{
 				DBUsername:         "owncloud",
-				DBPassword:         "secret",
 				DBHost:             "mysql",
 				DBPort:             3306,
 				DBName:             "owncloud",
@@ -328,9 +322,7 @@ func DefaultConfig() *config.Config {
 				Services:    []string{"authprovider"},
 				Endpoint:    "localhost:9166",
 			},
-			AuthMachineConfig: config.AuthMachineConfig{
-				MachineAuthAPIKey: "change-me-please",
-			},
+			AuthMachineConfig: config.AuthMachineConfig{},
 			Sharing: config.Sharing{
 				Port: config.Port{
 					Endpoint:    "localhost:9150",
@@ -451,7 +443,6 @@ func DefaultConfig() *config.Config {
 			GatewaySVC:      defaultGatewayAddr,
 			Insecure:        false, // true?
 			Timeout:         84300,
-			JWTSecret:       "Pive-Fumkiu4",
 		},
 		Tracing: config.Tracing{
 			Service: "storage",
@@ -462,9 +453,7 @@ func DefaultConfig() *config.Config {
 }
 
 func EnsureDefaults(cfg *config.Config) {
-	// TODO: IMPLEMENT ME!
 }
 
 func Sanitize(cfg *config.Config) {
-	// TODO: IMPLEMENT ME!
 }

@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"path"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/extensions/auth-machine/pkg/config"
+	"github.com/owncloud/ocis/extensions/auth-machine/pkg/config/parser"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -24,6 +26,13 @@ func AuthMachine(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "auth-machine",
 		Usage: "start authprovider for machine auth",
+		Before: func(ctx *cli.Context) error {
+			err := parser.ParseConfig(cfg)
+			if err != nil {
+				fmt.Printf("%v", err)
+			}
+			return err
+		},
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
 			logger := log.NewLogger(
@@ -94,8 +103,8 @@ func authMachineConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.JWTSecret,
-			"gatewaysvc":                cfg.GatewayEndpoint,
+			"jwt_secret":                cfg.TokenManager.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Address,
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
@@ -108,7 +117,7 @@ func authMachineConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 					"auth_managers": map[string]interface{}{
 						"machine": map[string]interface{}{
 							"api_key":      cfg.AuthProviders.Machine.APIKey,
-							"gateway_addr": cfg.GatewayEndpoint,
+							"gateway_addr": cfg.Reva.Address,
 						},
 					},
 				},

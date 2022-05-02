@@ -6,9 +6,8 @@ import (
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
-
 	EnsureDefaults(cfg)
-
+	Sanitize(cfg)
 	return cfg
 }
 
@@ -28,15 +27,15 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "frontend",
 		},
-		GatewayEndpoint:          "127.0.0.1:9142",
-		JWTSecret:                "Pive-Fumkiu4",
+		Reva: &config.Reva{
+			Address: "127.0.0.1:9142",
+		},
 		PublicURL:                "https://localhost:9200",
 		EnableFavorites:          false,
 		EnableProjectSpaces:      true,
 		UploadMaxChunkSize:       1e+8,
 		UploadHTTPMethodOverride: "",
 		DefaultUploadProtocol:    "tus",
-		TransferSecret:           "replace-me-with-a-transfer-secret",
 		Checksums: config.Checksums{
 			SupportedTypes:      []string{"sha1", "md5", "adler32"},
 			PreferredUploadType: "",
@@ -61,9 +60,6 @@ func DefaultConfig() *config.Config {
 			CacheWarmupDriver:       "",
 			AdditionalInfoAttribute: "{{.Mail}}",
 			ResourceInfoCacheTTL:    0,
-		},
-		AuthMachine: config.AuthMachine{
-			APIKey: "change-me-please",
 		},
 		Middleware: config.Middleware{
 			Auth: config.Auth{
@@ -96,6 +92,31 @@ func EnsureDefaults(cfg *config.Config) {
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
 	}
+
+	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
+		cfg.Reva = &config.Reva{
+			Address: cfg.Commons.Reva.Address,
+		}
+	} else if cfg.Reva == nil {
+		cfg.Reva = &config.Reva{}
+	}
+
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
+	}
+
+	if cfg.TransferSecret == "" && cfg.Commons != nil && cfg.Commons.TransferSecret != "" {
+		cfg.TransferSecret = cfg.Commons.TransferSecret
+	}
+
+	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	}
+
 }
 
 func Sanitize(cfg *config.Config) {

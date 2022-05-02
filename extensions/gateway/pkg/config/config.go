@@ -4,42 +4,43 @@ import "github.com/owncloud/ocis/ocis-pkg/shared"
 
 type Config struct {
 	*shared.Commons `yaml:"-"`
-	Service         Service  `yaml:"-"`
-	Tracing         *Tracing `yaml:"tracing"`
-	Logging         *Logging `yaml:"log"`
-	Debug           Debug    `yaml:"debug"`
-	Supervised      bool
+
+	Service    Service  `yaml:"-"`
+	Tracing    *Tracing `yaml:"tracing"`
+	Logging    *Logging `yaml:"log"`
+	Debug      Debug    `yaml:"debug"`
+	Supervised bool     `yaml:"-"`
 
 	GRPC GRPCConfig `yaml:"grpc"`
 
-	JWTSecret             string
-	GatewayEndpoint       string
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
+
 	SkipUserGroupsInToken bool
 
-	CommitShareToStorageGrant  bool
-	CommitShareToStorageRef    bool
-	ShareFolder                string
-	DisableHomeCreationOnLogin bool
-	TransferSecret             string `env:"STORAGE_TRANSFER_SECRET"`
-	TransferExpires            int
-	HomeMapping                string
-	EtagCacheTTL               int
+	CommitShareToStorageGrant  bool   `yaml:"commit_share_to_storage_grant"`
+	CommitShareToStorageRef    bool   `yaml:"commit_share_to_storage_ref"`
+	ShareFolder                string `yaml:"share_folder"`
+	DisableHomeCreationOnLogin bool   `yaml:"disable_home_creation_on_login"`
+	TransferSecret             string `yaml:"transfer_secret" env:"STORAGE_TRANSFER_SECRET"`
+	TransferExpires            int    `yaml:"transfer_expires"`
+	HomeMapping                string `yaml:"home_mapping"`
+	EtagCacheTTL               int    `yaml:"etag_cache_ttl"`
 
-	UsersEndpoint             string
-	GroupsEndpoint            string
-	PermissionsEndpoint       string
-	SharingEndpoint           string
-	DataGatewayPublicURL      string
-	FrontendPublicURL         string `env:"OCIS_URL;GATEWAY_FRONTEND_PUBLIC_URL"`
-	AuthBasicEndpoint         string
-	AuthBearerEndpoint        string
-	AuthMachineEndpoint       string
-	StoragePublicLinkEndpoint string
-	StorageUsersEndpoint      string
-	StorageSharesEndpoint     string
+	UsersEndpoint             string `yaml:"users_endpoint"`
+	GroupsEndpoint            string `yaml:"groups_endpoint"`
+	PermissionsEndpoint       string `yaml:"permissions_endpoint"`
+	SharingEndpoint           string `yaml:"sharing_endpoint"`
+	FrontendPublicURL         string `yaml:"frontend_public_url" env:"OCIS_URL;GATEWAY_FRONTEND_PUBLIC_URL"`
+	AuthBasicEndpoint         string `yaml:"auth_basic_endpoint"`
+	AuthBearerEndpoint        string `yaml:"auth_bearer_endpoint"`
+	AuthMachineEndpoint       string `yaml:"auth_machine_endpoint"`
+	StoragePublicLinkEndpoint string `yaml:"storage_public_link_endpoint"`
+	StorageUsersEndpoint      string `yaml:"storage_users_endpoint"`
+	StorageSharesEndpoint     string `yaml:"storage_shares_endpoint"`
 
-	StorageRegistry StorageRegistry
-	AppRegistry     AppRegistry
+	StorageRegistry StorageRegistry `yaml:"storage_registry"`
+	AppRegistry     AppRegistry     `yaml:"app_registry"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;GATEWAY_TRACING_ENABLED" desc:"Activates tracing."`

@@ -6,9 +6,8 @@ import (
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
-
 	EnsureDefaults(cfg)
-
+	Sanitize(cfg)
 	return cfg
 }
 
@@ -27,14 +26,10 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "auth-machine",
 		},
-		GatewayEndpoint: "127.0.0.1:9142",
-		JWTSecret:       "Pive-Fumkiu4",
-		AuthProvider:    "ldap",
-		AuthProviders: config.AuthProviders{
-			Machine: config.MachineProvider{
-				APIKey: "change-me-please",
-			},
+		Reva: &config.Reva{
+			Address: "127.0.0.1:9142",
 		},
+		AuthProvider: "ldap",
 	}
 }
 
@@ -60,6 +55,26 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
+		cfg.Reva = &config.Reva{
+			Address: cfg.Commons.Reva.Address,
+		}
+	} else if cfg.Reva == nil {
+		cfg.Reva = &config.Reva{}
+	}
+
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
+	}
+
+	if cfg.AuthProviders.Machine.APIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.AuthProviders.Machine.APIKey = cfg.Commons.MachineAuthAPIKey
 	}
 }
 

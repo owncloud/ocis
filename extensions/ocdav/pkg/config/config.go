@@ -8,14 +8,14 @@ type Config struct {
 	Tracing         *Tracing `yaml:"tracing"`
 	Logging         *Logging `yaml:"log"`
 	Debug           Debug    `yaml:"debug"`
-	Supervised      bool
+	Supervised      bool     `yaml:"-"`
 
 	HTTP HTTPConfig `yaml:"http"`
 
-	// JWTSecret used to verify reva access token
-	JWTSecret             string `yaml:"jwt_secret"`
-	GatewayEndpoint       string
-	SkipUserGroupsInToken bool
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
+
+	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token"`
 
 	WebdavNamespace string `yaml:"webdav_namespace"`
 	FilesNamespace  string `yaml:"files_namespace"`
@@ -26,8 +26,8 @@ type Config struct {
 	// Insecure certificates allowed when making requests to the gateway
 	Insecure bool `yaml:"insecure" env:"OCIS_INSECURE;OCDAV_INSECURE"`
 	// Timeout in seconds when making requests to the gateway
-	Timeout    int64 `yaml:"timeout"`
-	Middleware Middleware
+	Timeout    int64      `yaml:"timeout"`
+	Middleware Middleware `yaml:"middleware"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;OCDAV_TRACING_ENABLED" desc:"Activates tracing."`

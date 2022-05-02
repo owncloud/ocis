@@ -8,13 +8,14 @@ type Config struct {
 	Tracing         *Tracing `yaml:"tracing"`
 	Logging         *Logging `yaml:"log"`
 	Debug           Debug    `yaml:"debug"`
-	Supervised      bool
+	Supervised      bool     `yaml:"-"`
 
 	GRPC GRPCConfig `yaml:"grpc"`
 
-	JWTSecret             string
-	GatewayEndpoint       string
-	SkipUserGroupsInToken bool
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
+
+	SkipUserGroupsInToken bool          `yaml:"skip_user_groups_in_token"`
 	AuthProvider          string        `yaml:"auth_provider" env:"AUTH_BASIC_AUTH_PROVIDER" desc:"The auth provider which should be used by the service"`
 	AuthProviders         AuthProviders `yaml:"auth_providers"`
 }
@@ -63,7 +64,7 @@ type LDAPProvider struct {
 	CACert           string   `env:"LDAP_CACERT;AUTH_BASIC_LDAP_CACERT"`
 	Insecure         bool     `env:"LDAP_INSECURE;AUTH_BASIC_LDAP_INSECURE"`
 	BindDN           string   `env:"LDAP_BIND_DN;AUTH_BASIC_LDAP_BIND_DN"`
-	BindPassword     string   `env:"LDAP_BIND_PASSWORD;AUTH_BASIC_LDAP_BIND_PASSWORD"`
+	BindPassword     string   `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;AUTH_BASIC_LDAP_BIND_PASSWORD"`
 	UserBaseDN       string   `env:"LDAP_USER_BASE_DN;AUTH_BASIC_LDAP_USER_BASE_DN"`
 	GroupBaseDN      string   `env:"LDAP_GROUP_BASE_DN;AUTH_BASIC_LDAP_GROUP_BASE_DN"`
 	UserScope        string   `env:"LDAP_USER_SCOPE;AUTH_BASIC_LDAP_USER_SCOPE"`

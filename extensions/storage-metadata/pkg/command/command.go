@@ -3,9 +3,11 @@ package command
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"path"
 
+	"github.com/owncloud/ocis/extensions/storage-metadata/pkg/config/parser"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"github.com/owncloud/ocis/ocis-pkg/sync"
 	"github.com/owncloud/ocis/ocis-pkg/tracing"
@@ -30,6 +32,13 @@ func StorageMetadata(cfg *config.Config) *cli.Command {
 		Name:     "storage-metadata",
 		Usage:    "start storage-metadata service",
 		Category: "extensions",
+		Before: func(ctx *cli.Context) error {
+			err := parser.ParseConfig(cfg)
+			if err != nil {
+				fmt.Printf("%v", err)
+			}
+			return err
+		},
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
 			logger := log.NewLogger(
@@ -124,8 +133,8 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.JWTSecret,
-			"gatewaysvc":                cfg.GatewayEndpoint,
+			"jwt_secret":                cfg.TokenManager.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Address,
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{

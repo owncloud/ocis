@@ -188,7 +188,7 @@ type Auth struct {
 // DataGatewayPort has a public url
 type DataGatewayPort struct {
 	Port
-	PublicURL string `yaml:""`
+	PublicURL string
 }
 
 type DataProvider struct {

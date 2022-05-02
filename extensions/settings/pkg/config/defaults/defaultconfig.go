@@ -10,10 +10,8 @@ import (
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
-
 	EnsureDefaults(cfg)
 	Sanitize(cfg)
-
 	return cfg
 }
 
@@ -50,16 +48,12 @@ func DefaultConfig() *config.Config {
 		Asset: config.Asset{
 			Path: "",
 		},
-		TokenManager: config.TokenManager{
-			JWTSecret: "Pive-Fumkiu4",
-		},
 
 		Metadata: config.Metadata{
-			GatewayAddress:    "127.0.0.1:9142",
-			StorageAddress:    "127.0.0.1:9215",
-			ServiceUserID:     "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-			ServiceUserIDP:    "https://localhost:9200",
-			MachineAuthAPIKey: "change-me-please",
+			GatewayAddress: "127.0.0.1:9142",
+			StorageAddress: "127.0.0.1:9215",
+			ServiceUserID:  "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
+			ServiceUserIDP: "https://localhost:9200",
 		},
 	}
 }
@@ -86,6 +80,18 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
+	}
+
+	if cfg.Metadata.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.Metadata.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
 }
 

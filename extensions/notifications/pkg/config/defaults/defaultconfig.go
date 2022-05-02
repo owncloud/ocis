@@ -1,13 +1,13 @@
 package defaults
 
-import "github.com/owncloud/ocis/extensions/notifications/pkg/config"
+import (
+	"github.com/owncloud/ocis/extensions/notifications/pkg/config"
+)
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
-
 	EnsureDefaults(cfg)
 	Sanitize(cfg)
-
 	return cfg
 }
 
@@ -31,8 +31,7 @@ func DefaultConfig() *config.Config {
 				Cluster:       "ocis-cluster",
 				ConsumerGroup: "notifications",
 			},
-			RevaGateway:       "127.0.0.1:9142",
-			MachineAuthSecret: "change-me-please",
+			RevaGateway: "127.0.0.1:9142",
 		},
 	}
 }
@@ -48,6 +47,10 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Log == nil {
 		cfg.Log = &config.Log{}
+	}
+
+	if cfg.Notifications.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.Notifications.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
 }
 

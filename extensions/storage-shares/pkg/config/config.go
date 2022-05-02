@@ -12,17 +12,18 @@ type Config struct {
 	Tracing         *Tracing `yaml:"tracing"`
 	Logging         *Logging `yaml:"log"`
 	Debug           Debug    `yaml:"debug"`
-	Supervised      bool
+	Supervised      bool     `yaml:"-"`
 
 	GRPC GRPCConfig `yaml:"grpc"`
 	HTTP HTTPConfig `yaml:"http"`
 
-	Context                context.Context
-	JWTSecret              string
-	GatewayEndpoint        string
-	SkipUserGroupsInToken  bool
-	ReadOnly               bool
-	SharesProviderEndpoint string
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
+
+	Context                context.Context `yaml:"context"`
+	SkipUserGroupsInToken  bool            `yaml:"skip_user_groups_in_token"`
+	ReadOnly               bool            `yaml:"readonly"`
+	SharesProviderEndpoint string          `yaml:"shares_provider_endpoint"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;STORAGE_METADATA_TRACING_ENABLED" desc:"Activates tracing."`

@@ -723,7 +723,8 @@ func getService() svc.Service {
 			Root: "/",
 			Addr: "localhost:9110",
 		},
-		TokenManager: config.TokenManager{
+		Reva: &config.Reva{},
+		TokenManager: &config.TokenManager{
 			JWTSecret: jwtSecret,
 		},
 		Log: &config.Log{

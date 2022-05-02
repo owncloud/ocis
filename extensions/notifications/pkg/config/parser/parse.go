@@ -6,11 +6,12 @@ import (
 	"github.com/owncloud/ocis/extensions/notifications/pkg/config"
 	"github.com/owncloud/ocis/extensions/notifications/pkg/config/defaults"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 
 	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
 )
 
-// ParseConfig loads accounts configuration from known paths.
+// ParseConfig loads configuration from known paths.
 func ParseConfig(cfg *config.Config) error {
 	_, err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg)
 	if err != nil {
@@ -28,6 +29,14 @@ func ParseConfig(cfg *config.Config) error {
 	}
 
 	defaults.Sanitize(cfg)
+
+	return Validate(cfg)
+}
+
+func Validate(cfg *config.Config) error {
+	if cfg.Notifications.MachineAuthAPIKey == "" {
+		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
+	}
 
 	return nil
 }

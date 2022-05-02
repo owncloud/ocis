@@ -23,8 +23,8 @@ type Config struct {
 	DataPath  string   `yaml:"data_path" env:"SETTINGS_DATA_PATH"`
 	Metadata  Metadata `yaml:"metadata_config"`
 
-	Asset        Asset        `yaml:"asset"`
-	TokenManager TokenManager `yaml:"token_manager"`
+	Asset        Asset         `yaml:"asset"`
+	TokenManager *TokenManager `yaml:"token_manager"`
 
 	Context context.Context `yaml:"-"`
 }

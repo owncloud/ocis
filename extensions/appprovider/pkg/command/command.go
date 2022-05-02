@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"path"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/extensions/appprovider/pkg/config"
+	"github.com/owncloud/ocis/extensions/appprovider/pkg/config/parser"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -24,6 +26,13 @@ func AppProvider(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "app-provider",
 		Usage: "start appprovider for providing apps",
+		Before: func(ctx *cli.Context) error {
+			err := parser.ParseConfig(cfg)
+			if err != nil {
+				fmt.Printf("%v", err)
+			}
+			return err
+		},
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
 			logger := log.NewLogger(
@@ -92,8 +101,8 @@ func appProviderConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.JWTSecret,
-			"gatewaysvc":                cfg.GatewayEndpoint,
+			"jwt_secret":                cfg.TokenManager.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Address,
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
@@ -114,7 +123,7 @@ func appProviderConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 							"app_url":              cfg.Drivers.WOPI.AppURL,
 							"insecure_connections": cfg.Drivers.WOPI.Insecure,
 							"iop_secret":           cfg.Drivers.WOPI.IopSecret,
-							"jwt_secret":           cfg.JWTSecret,
+							"jwt_secret":           cfg.TokenManager.JWTSecret,
 							"wopi_url":             cfg.Drivers.WOPI.WopiURL,
 						},
 					},
