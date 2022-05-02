@@ -201,7 +201,7 @@ var _ = Describe("Graph", func() {
 						Id:        &provider.StorageSpaceId{OpaqueId: "aID!differentID"},
 						SpaceType: "mountpoint",
 						Root: &provider.ResourceId{
-							StorageId: "aID",
+							StorageId: "prID$aID",
 							OpaqueId:  "differentID",
 						},
 						Name: "New Folder",
@@ -246,11 +246,11 @@ var _ = Describe("Graph", func() {
 			value := response["value"][0]
 			Expect(*value.DriveAlias).To(Equal("mountpoint/new-folder"))
 			Expect(*value.DriveType).To(Equal("mountpoint"))
-			Expect(*value.Id).To(Equal("aID!differentID"))
+			Expect(*value.Id).To(Equal("prID$aID!differentID"))
 			Expect(*value.Name).To(Equal("New Folder"))
-			Expect(*value.Root.WebDavUrl).To(Equal("https://localhost:9200/dav/spaces/aID!differentID"))
+			Expect(*value.Root.WebDavUrl).To(Equal("https://localhost:9200/dav/spaces/prID$aID!differentID"))
 			Expect(*value.Root.ETag).To(Equal("101112131415"))
-			Expect(*value.Root.Id).To(Equal("aID!differentID"))
+			Expect(*value.Root.Id).To(Equal("prID$aID!differentID"))
 			Expect(*value.Root.RemoteItem.ETag).To(Equal("123456789"))
 			Expect(*value.Root.RemoteItem.Id).To(Equal("ownerStorageID!opaqueID"))
 			Expect(value.Root.RemoteItem.LastModifiedDateTime.UTC()).To(Equal(time.Unix(1648327606, 0).UTC()))

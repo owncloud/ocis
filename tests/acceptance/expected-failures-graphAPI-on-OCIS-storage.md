@@ -1639,10 +1639,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 #### [OCS status code zero](https://github.com/owncloud/ocis/issues/3621)
 - [apiShareManagementToShares/moveReceivedShare.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/moveReceivedShare.feature#L32)
 
-#### [share_with_user_type is not set in response](https://github.com/owncloud/ocis/issues/3622)
-- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L37)
-- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L38)
-
 #### [HTTP status code differ while listing the contents of another user's trash bin](https://github.com/owncloud/ocis/issues/3561)
 - [apiTrashbin/trashbinFilesFolders.feature:199](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L199)
 - [apiTrashbin/trashbinFilesFolders.feature:223](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L223)
