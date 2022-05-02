@@ -15,9 +15,8 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool          `yaml:"skip_user_groups_in_token"`
-	AuthProvider          string        `yaml:"auth_provider" env:"AUTH_MACHINE_AUTH_PROVIDER" desc:"The auth provider which should be used by the service"`
-	AuthProviders         AuthProviders `yaml:"auth_providers"`
+	SkipUserGroupsInToken bool   `yaml:"skip_user_groups_in_token"`
+	MachineAuthAPIKey     string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;AUTH_MACHINE_API_KEY"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;AUTH_MACHINE_TRACING_ENABLED" desc:"Activates tracing."`
@@ -47,12 +46,4 @@ type Debug struct {
 type GRPCConfig struct {
 	Addr     string `yaml:"addr" env:"AUTH_MACHINE_GRPC_ADDR" desc:"The address of the grpc service."`
 	Protocol string `yaml:"protocol" env:"AUTH_MACHINE_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
-}
-
-type AuthProviders struct {
-	Machine MachineProvider `yaml:"machine"`
-}
-
-type MachineProvider struct {
-	APIKey string `yaml:"api_key" env:"OCIS_MACHINE_AUTH_API_KEY;AUTH_MACHINE_PROVIDER_API_KEY" desc:"The api key for the machine auth provider."`
 }

@@ -106,13 +106,12 @@ func authMachineConfigFromStruct(c *cli.Context, cfg *config.Config) map[string]
 		"grpc": map[string]interface{}{
 			"network": cfg.GRPC.Protocol,
 			"address": cfg.GRPC.Addr,
-			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"authprovider": map[string]interface{}{
 					"auth_manager": "machine",
 					"auth_managers": map[string]interface{}{
 						"machine": map[string]interface{}{
-							"api_key":      cfg.AuthProviders.Machine.APIKey,
+							"api_key":      cfg.MachineAuthAPIKey,
 							"gateway_addr": cfg.Reva.Address,
 						},
 					},
