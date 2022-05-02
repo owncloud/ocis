@@ -25,6 +25,8 @@ token_manager:
   jwt_secret: ""
 reva:
   address: 127.0.0.1:9142
+machine_auth_api_key: ""
+metadata_user_id: ""
 skip_user_groups_in_token: false
 driver: ocis
 drivers:
@@ -44,7 +46,7 @@ drivers:
     shadow_hidden_files: false
     force_single_user_mode: false
     user_keytab: false
-    gateway_svc: 127.0.0.1:9142
+    gateway_svc: 127.0.0.1:9215
     grpcuri: ""
     userlayout: '{{substr 0 1 .Username}}/{{.Username}}'
   local:
@@ -52,7 +54,7 @@ drivers:
   ocis:
     root: ~/.ocis/storage/metadata
     userlayout: '{{.Id.OpaqueId}}'
-    permissionsendpoint: 127.0.0.1:9191
+    permissionsendpoint: 127.0.0.1:9215
   s3:
     region: default
     access_key: ""
@@ -62,7 +64,7 @@ drivers:
   s3ng:
     root: ~/.ocis/storage/metadata
     userlayout: '{{.Id.OpaqueId}}'
-    permissionsendpoint: 127.0.0.1:9191
+    permissionsendpoint: 127.0.0.1:9215
     region: default
     access_key: ""
     secret_key: ""

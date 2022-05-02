@@ -12,9 +12,9 @@
 | SETTINGS_GRPC_ADDR | string | 127.0.0.1:9191 | |
 | SETTINGS_STORE_TYPE | string | metadata | |
 | SETTINGS_DATA_PATH | string | ~/.ocis/settings | |
-| STORAGE_GATEWAY_GRPC_ADDR | string | 127.0.0.1:9142 | |
+| STORAGE_GATEWAY_GRPC_ADDR | string | 127.0.0.1:9215 | |
 | STORAGE_GRPC_ADDR | string | 127.0.0.1:9215 | |
-| METADATA_SERVICE_USER_UUID | string | 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad | |
-| OCIS_URL;METADATA_SERVICE_USER_IDP | string | https://localhost:9200 | |
+| METADATA_SERVICE_USER_UUID | string |  | |
+| METADATA_SERVICE_USER_IDP | string | internal | |
 | OCIS_MACHINE_AUTH_API_KEY | string |  | |
 | SETTINGS_ASSET_PATH | string |  | |

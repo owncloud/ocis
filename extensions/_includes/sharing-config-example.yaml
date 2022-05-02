@@ -38,8 +38,8 @@ user_sharin_drivers:
     userstoragemountid: ""
   cs3:
     provideraddr: 127.0.0.1:9215
-    serviceuserid: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
-    serviceuseridp: https://localhost:9200
+    serviceuserid: ""
+    serviceuseridp: internal
     machineauthapikey: ""
 public_sharing_driver: json
 public_sharing_drivers:
@@ -57,8 +57,8 @@ public_sharing_drivers:
     userstoragemountid: ""
   cs3:
     provideraddr: 127.0.0.1:9215
-    serviceuserid: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
-    serviceuseridp: https://localhost:9200
+    serviceuserid: ""
+    serviceuseridp: internal
     machineauthapikey: ""
 events:
   addr: 127.0.0.1:9233

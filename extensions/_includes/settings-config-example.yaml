@@ -40,10 +40,10 @@ grpc:
 store_type: metadata
 data_path: ~/.ocis/settings
 metadata_config:
-  gateway_addr: 127.0.0.1:9142
+  gateway_addr: 127.0.0.1:9215
   storage_addr: 127.0.0.1:9215
-  service_user_id: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
-  service_user_idp: https://localhost:9200
+  service_user_id: ""
+  service_user_idp: internal
   machine_auth_api_key: ""
 asset:
   path: ""

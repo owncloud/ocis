@@ -14,6 +14,6 @@
 | SHARING_USER_SQL_HOST | string |  | |
 | SHARING_USER_SQL_PORT | int | 1433 | |
 | SHARING_USER_SQL_NAME | string |  | |
-| OCIS_URL;SHARING_CS3_SERVICE_USER_IDP | string | https://localhost:9200 | |
+| OCIS_URL;SHARING_CS3_SERVICE_USER_IDP | string | internal | |
 | OCIS_MACHINE_AUTH_API_KEY | string |  | |
 | OCIS_MACHINE_AUTH_API_KEY | string |  | |

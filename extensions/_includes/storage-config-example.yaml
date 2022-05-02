@@ -456,7 +456,7 @@ reva:
     user_json_file: ~/.ocis/storage/shares.json
     provider_addr: 127.0.0.1:9215
     service_user_id: 95cb8724-03b2-11eb-a0a6-c33ef8ef53ad
-    service_user_idp: https://localhost:9200
+    service_user_idp: internal
     user_sql_username: ""
     user_sql_password: ""
     user_sql_host: ""
