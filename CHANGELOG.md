@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Change - Switched default configuration to use libregraph/idm: [#3331](https://github.com/owncloud/ocis/pull/3331)
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 * Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
+* Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 * Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
@@ -100,6 +101,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3602
    https://github.com/owncloud/ocis/pull/3647
+
+* Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
+
+   It is now possible to search for files and directories by their name using the web UI. Therefor
+   new search extension indexes files in a persistent local index.
+
+   https://github.com/owncloud/ocis/pull/3635
 
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 
