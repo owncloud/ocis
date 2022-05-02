@@ -9,6 +9,7 @@ import (
 	"path"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/owncloud/ocis/ocis-pkg/generators"
 	"gopkg.in/yaml.v2"
 )
@@ -99,6 +100,7 @@ type OcisConfig struct {
 	TokenManager      TokenManager `yaml:"token_manager"`
 	MachineAuthApiKey string       `yaml:"machine_auth_api_key"`
 	TransferSecret    string       `yaml:"transfer_secret"`
+	MetadataUserID    string       `yaml:"metadata_user_id"`
 	Graph             GraphExtension
 	Idp               LdapBasedExtension
 	Idm               IdmExtension
@@ -160,6 +162,8 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		return err
 	}
 
+	metadataUserID := uuid.Must(uuid.NewV4()).String()
+
 	idmServicePassword, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("could not generate random password for idm: %s", err)
@@ -199,6 +203,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		},
 		MachineAuthApiKey: machineAuthApiKey,
 		TransferSecret:    revaTransferSecret,
+		MetadataUserID:    metadataUserID,
 		Idm: IdmExtension{
 			ServiceUserPasswords: ServiceUserPasswordsSettings{
 				AdminPassword: ocisAdminServicePassword,

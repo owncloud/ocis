@@ -7,18 +7,18 @@ import (
 	"os"
 	"path"
 
-	"github.com/owncloud/ocis/extensions/storage-metadata/pkg/config/parser"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/sync"
-	"github.com/owncloud/ocis/ocis-pkg/tracing"
-
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/extensions/storage-metadata/pkg/config"
+	"github.com/owncloud/ocis/extensions/storage-metadata/pkg/config/parser"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/extensions/storage/pkg/service/external"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
@@ -140,10 +140,74 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 		"grpc": map[string]interface{}{
 			"network": cfg.GRPC.Protocol,
 			"address": cfg.GRPC.Addr,
-			"interceptors": map[string]interface{}{
-				"log": map[string]interface{}{},
-			},
 			"services": map[string]interface{}{
+				"gateway": map[string]interface{}{
+					// registries are located on the gateway
+					"authregistrysvc":    cfg.GRPC.Addr,
+					"storageregistrysvc": cfg.GRPC.Addr,
+					// user metadata is located on the users services
+					"userprovidersvc":  cfg.GRPC.Addr,
+					"groupprovidersvc": cfg.GRPC.Addr,
+					"permissionssvc":   cfg.GRPC.Addr,
+					// other
+					"disable_home_creation_on_login": true, // metadata manually creates a space
+					// metadata always uses the simple upload, so no transfer secret or datagateway needed
+				},
+				"userprovider": map[string]interface{}{
+					"driver": "memory",
+					"drivers": map[string]interface{}{
+						"memory": map[string]interface{}{
+							"users": map[string]interface{}{
+								"serviceuser": map[string]interface{}{
+									"id": map[string]interface{}{
+										"opaqueId": cfg.MetadataUserID,
+										"idp":      "internal",
+										"type":     userpb.UserType_USER_TYPE_PRIMARY,
+									},
+									"username":     "serviceuser",
+									"display_name": "System User",
+								},
+							},
+						},
+					},
+				},
+				"authregistry": map[string]interface{}{
+					"driver": "static",
+					"drivers": map[string]interface{}{
+						"static": map[string]interface{}{
+							"rules": map[string]interface{}{
+								"machine": cfg.GRPC.Addr,
+							},
+						},
+					},
+				},
+				"authprovider": map[string]interface{}{
+					"auth_manager": "machine",
+					"auth_managers": map[string]interface{}{
+						"machine": map[string]interface{}{
+							"api_key":      cfg.MachineAuthAPIKey,
+							"gateway_addr": cfg.GRPC.Addr,
+						},
+					},
+				},
+				"permissions": map[string]interface{}{
+					"driver": "demo",
+					"drivers": map[string]interface{}{
+						"demo": map[string]interface{}{},
+					},
+				},
+				"storageregistry": map[string]interface{}{
+					"driver": "static",
+					"drivers": map[string]interface{}{
+						"static": map[string]interface{}{
+							"rules": map[string]interface{}{
+								"/": map[string]interface{}{
+									"address": cfg.GRPC.Addr,
+								},
+							},
+						},
+					},
+				},
 				"storageprovider": map[string]interface{}{
 					"driver":          cfg.Driver,
 					"drivers":         config.MetadataDrivers(cfg),
@@ -155,7 +219,7 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 		"http": map[string]interface{}{
 			"network": cfg.HTTP.Protocol,
 			"address": cfg.HTTP.Addr,
-			// TODO build services dynamically
+			// no datagateway needed as the metadata clients directly talk to the dataprovider with the simple protocol
 			"services": map[string]interface{}{
 				"dataprovider": map[string]interface{}{
 					"prefix":      "data",

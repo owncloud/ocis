@@ -59,7 +59,7 @@ func DefaultConfig() *config.Config {
 				SecProtocol:         "",
 				Keytab:              "",
 				SingleUsername:      "",
-				GatewaySVC:          "127.0.0.1:9142",
+				GatewaySVC:          "127.0.0.1:9215",
 			},
 			Local: config.LocalDriver{
 				Root: filepath.Join(defaults.BaseDataPath(), "storage", "local", "metadata"),
@@ -71,12 +71,12 @@ func DefaultConfig() *config.Config {
 				Root:                filepath.Join(defaults.BaseDataPath(), "storage", "metadata"),
 				UserLayout:          "{{.Id.OpaqueId}}",
 				Region:              "default",
-				PermissionsEndpoint: "127.0.0.1:9191",
+				PermissionsEndpoint: "127.0.0.1:9215",
 			},
 			OCIS: config.OCISDriver{
 				Root:                filepath.Join(defaults.BaseDataPath(), "storage", "metadata"),
 				UserLayout:          "{{.Id.OpaqueId}}",
-				PermissionsEndpoint: "127.0.0.1:9191",
+				PermissionsEndpoint: "127.0.0.1:9215",
 			},
 		},
 	}
@@ -121,6 +121,15 @@ func EnsureDefaults(cfg *config.Config) {
 	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
 	}
+
+	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	}
+
+	if cfg.MetadataUserID == "" && cfg.Commons != nil && cfg.Commons.MetadataUserID != "" {
+		cfg.MetadataUserID = cfg.Commons.MetadataUserID
+	}
+
 }
 
 func Sanitize(cfg *config.Config) {

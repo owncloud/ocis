@@ -331,9 +331,9 @@ func DefaultConfig() *config.Config {
 					GRPCAddr:    "127.0.0.1:9150",
 					Services:    []string{"usershareprovider", "publicshareprovider"},
 				},
-				CS3ProviderAddr:                  "127.0.0.1:9215",
+				CS3ProviderAddr:                  "127.0.0.1:9215", // metadata storage
 				CS3ServiceUser:                   "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-				CS3ServiceUserIdp:                "https://localhost:9200",
+				CS3ServiceUserIdp:                "internal",
 				UserDriver:                       "json",
 				UserJSONFile:                     path.Join(defaults.BaseDataPath(), "storage", "shares.json"),
 				UserSQLUsername:                  "",

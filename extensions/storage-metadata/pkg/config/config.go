@@ -19,8 +19,10 @@ type Config struct {
 
 	Context context.Context `yaml:"context"`
 
-	TokenManager *TokenManager `yaml:"token_manager"`
-	Reva         *Reva         `yaml:"reva"`
+	TokenManager      *TokenManager `yaml:"token_manager"`
+	Reva              *Reva         `yaml:"reva"`
+	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"STORAGE_METADATA_MACHINE_AUTH_API_KEY"`
+	MetadataUserID    string        `yaml:"metadata_user_id"`
 
 	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token"`
 	Driver                string  `yaml:"driver" env:"STORAGE_METADATA_DRIVER" desc:"The driver which should be used by the service"`
@@ -60,8 +62,8 @@ type GRPCConfig struct {
 }
 
 type HTTPConfig struct {
-	Addr     string `yaml:"addr" env:"STORAGE_METADATA_GRPC_ADDR" desc:"The address of the grpc service."`
-	Protocol string `yaml:"protocol" env:"STORAGE_METADATA_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
+	Addr     string `yaml:"addr" env:"STORAGE_METADATA_HTTP_ADDR" desc:"The address of the http service."`
+	Protocol string `yaml:"protocol" env:"STORAGE_METADATA_HTTP_PROTOCOL" desc:"The transport protocol of the http service."`
 }
 
 type Drivers struct {

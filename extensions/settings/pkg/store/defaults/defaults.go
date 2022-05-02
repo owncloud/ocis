@@ -17,9 +17,6 @@ const (
 	// BundleUUIDRoleGuest represents the guest role.
 	BundleUUIDRoleGuest = "38071a68-456a-4553-846a-fa67bf5596cc"
 
-	// BundleUUIDRoleMetadata represents the metadata user role
-	BundleUUIDRoleMetadata = "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad"
-
 	// RoleManagementPermissionID is the hardcoded setting UUID for the role management permission
 	RoleManagementPermissionID string = "a53e601e-571f-4f86-8fec-d4576ef49c62"
 	// RoleManagementPermissionName is the hardcoded setting name for the role management permission
@@ -68,7 +65,6 @@ func GenerateBundlesDefaultRoles() []*settingsmsg.Bundle {
 		generateBundleUserRole(),
 		generateBundleGuestRole(),
 		generateBundleProfileRequest(),
-		generateBundleMetadataRole(),
 		generateBundleSpaceAdminRole(),
 	}
 }
@@ -434,36 +430,6 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 	}
 }
 
-func generateBundleMetadataRole() *settingsmsg.Bundle {
-	return &settingsmsg.Bundle{
-		Id:          BundleUUIDRoleMetadata,
-		Name:        "metadata",
-		Type:        settingsmsg.Bundle_TYPE_ROLE,
-		Extension:   "ocis-roles",
-		DisplayName: "Metadata",
-		Resource: &settingsmsg.Resource{
-			Type: settingsmsg.Resource_TYPE_SYSTEM,
-		},
-		Settings: []*settingsmsg.Setting{
-			{
-				Id:          CreateSpacePermissionID,
-				Name:        CreateSpacePermissionName,
-				DisplayName: "Create own Space",
-				Description: "This permission allows to create a space owned by the current user.",
-				Resource: &settingsmsg.Resource{
-					Type: settingsmsg.Resource_TYPE_SYSTEM, // TODO resource type space? self? me? own?
-				},
-				Value: &settingsmsg.Setting_PermissionValue{
-					PermissionValue: &settingsmsg.Permission{
-						Operation:  settingsmsg.Permission_OPERATION_CREATE,
-						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
-					},
-				},
-			},
-		},
-	}
-}
-
 // TODO: languageSetting needed?
 var languageSetting = settingsmsg.Setting_SingleChoiceValue{
 	SingleChoiceValue: &settingsmsg.SingleChoiceList{
@@ -532,11 +498,6 @@ var languageSetting = settingsmsg.Setting_SingleChoiceValue{
 // DefaultRoleAssignments returns (as one might guess) the default role assignments
 func DefaultRoleAssignments() []*settingsmsg.UserRoleAssignment {
 	return []*settingsmsg.UserRoleAssignment{
-		// accounts service user for the metadata user is allowed to create spaces
-		{
-			AccountUuid: "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-			RoleId:      BundleUUIDRoleAdmin,
-		},
 		// default admin users
 		{
 			AccountUuid: "058bff95-6708-4fe5-91e4-9ea3d377588b",
