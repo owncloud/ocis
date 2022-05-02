@@ -18,11 +18,11 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
-	Reva Reva `yaml:"reva"`
+	Reva *Reva `yaml:"reva"`
 
 	Policies              []Policy        `yaml:"policies"`
 	OIDC                  OIDC            `yaml:"oidc"`
-	TokenManager          TokenManager    `yaml:"token_manager"`
+	TokenManager          *TokenManager   `yaml:"token_manager"`
 	PolicySelector        *PolicySelector `yaml:"policy_selector"`
 	PreSignedURL          PreSignedURL    `yaml:"pre_signed_url"`
 	AccountBackend        string          `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE"`

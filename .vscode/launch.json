@@ -8,7 +8,7 @@
             "mode": "debug",
             "program": "${workspaceFolder}/ocis/cmd/ocis",
             "args": [
-                "server"
+                "storage-metadata"
             ],
             "env": {
                 // log settings for human developers
@@ -17,11 +17,10 @@
                 "OCIS_LOG_COLOR": "true",
                 // enable basic auth for dev setup so that we can use curl for testing
                 "PROXY_ENABLE_BASIC_AUTH": "true",
-                // set insecure options because we don't have valid certificates in dev environments
-                "OCIS_INSECURE": "true",
+                // admin user default password
+                "IDM_ADMIN_PASSWORD": "admin",
                 // demo users
-                "ACCOUNTS_DEMO_USERS_AND_GROUPS": "true",
-                "IDM_CREATE_DEMO_USERS": "true"
+                "IDM_CREATE_DEMO_USERS": "true",
                 // OCIS_RUN_EXTENSIONS allows to start a subset of extensions even in the supervised mode
                 //"OCIS_RUN_EXTENSIONS": "settings,storage-metadata,glauth,graph,graph-explorer,idp,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,accounts,proxy,ocdav",
             }

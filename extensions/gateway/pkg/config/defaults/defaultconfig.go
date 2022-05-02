@@ -6,9 +6,8 @@ import (
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
-
 	EnsureDefaults(cfg)
-
+	Sanitize(cfg)
 	return cfg
 }
 
@@ -27,14 +26,14 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "gateway",
 		},
-		GatewayEndpoint: "127.0.0.1:9142",
-		JWTSecret:       "Pive-Fumkiu4",
+		Reva: &config.Reva{
+			Address: "127.0.0.1:9142",
+		},
 
 		CommitShareToStorageGrant:  true,
 		CommitShareToStorageRef:    true,
 		ShareFolder:                "Shares",
 		DisableHomeCreationOnLogin: true,
-		TransferSecret:             "replace-me-with-a-transfer-secret",
 		TransferExpires:            24 * 60 * 60,
 		HomeMapping:                "",
 		EtagCacheTTL:               0,
@@ -43,7 +42,6 @@ func DefaultConfig() *config.Config {
 		GroupsEndpoint:            "localhost:9160",
 		PermissionsEndpoint:       "localhost:9191",
 		SharingEndpoint:           "localhost:9150",
-		DataGatewayPublicURL:      "",
 		FrontendPublicURL:         "https://localhost:9200",
 		AuthBasicEndpoint:         "localhost:9146",
 		AuthBearerEndpoint:        "localhost:9148",
@@ -84,6 +82,26 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
+		cfg.Reva = &config.Reva{
+			Address: cfg.Commons.Reva.Address,
+		}
+	} else if cfg.Reva == nil {
+		cfg.Reva = &config.Reva{}
+	}
+
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
+	}
+
+	if cfg.TransferSecret == "" && cfg.Commons != nil && cfg.Commons.TransferSecret != "" {
+		cfg.TransferSecret = cfg.Commons.TransferSecret
 	}
 }
 

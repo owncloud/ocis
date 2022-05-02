@@ -13,10 +13,11 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/extensions/graph/mocks"
+	"github.com/owncloud/ocis/extensions/graph/pkg/config"
 	"github.com/owncloud/ocis/extensions/graph/pkg/config/defaults"
 	service "github.com/owncloud/ocis/extensions/graph/pkg/service/v0"
 	"github.com/owncloud/ocis/extensions/graph/pkg/service/v0/errorcode"
@@ -30,15 +31,19 @@ var _ = Describe("Graph", func() {
 		httpClient      *mocks.HTTPClient
 		eventsPublisher mocks.Publisher
 		ctx             context.Context
+		cfg             *config.Config
 	)
 
 	JustBeforeEach(func() {
 		ctx = context.Background()
+		cfg = defaults.FullDefaultConfig()
+		cfg.TokenManager.JWTSecret = "loremipsum"
+
 		gatewayClient = &mocks.GatewayClient{}
 		httpClient = &mocks.HTTPClient{}
 		eventsPublisher = mocks.Publisher{}
 		svc = service.NewService(
-			service.Config(defaults.DefaultConfig()),
+			service.Config(cfg),
 			service.WithGatewayClient(gatewayClient),
 			service.WithHTTPClient(httpClient),
 			service.EventsPublisher(&eventsPublisher),

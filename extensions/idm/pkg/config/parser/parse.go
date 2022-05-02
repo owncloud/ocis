@@ -6,11 +6,12 @@ import (
 	"github.com/owncloud/ocis/extensions/idm/pkg/config"
 	"github.com/owncloud/ocis/extensions/idm/pkg/config/defaults"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 
 	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
 )
 
-// ParseConfig loads accounts configuration from known paths.
+// ParseConfig loads configuration from known paths.
 func ParseConfig(cfg *config.Config) error {
 	_, err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg)
 	if err != nil {
@@ -27,6 +28,25 @@ func ParseConfig(cfg *config.Config) error {
 	}
 
 	defaults.Sanitize(cfg)
+
+	return Validate(cfg)
+}
+
+func Validate(cfg *config.Config) error {
+	if cfg.ServiceUserPasswords.Idm == "" {
+		return shared.MissingServiceUserPassword(cfg.Service.Name, "IDM")
+	}
+
+	if cfg.ServiceUserPasswords.OcisAdmin == "" {
+		return shared.MissingServiceUserPassword(cfg.Service.Name, "admin")
+	}
+
+	if cfg.ServiceUserPasswords.Idp == "" {
+		return shared.MissingServiceUserPassword(cfg.Service.Name, "IDP")
+	}
+	if cfg.ServiceUserPasswords.Reva == "" {
+		return shared.MissingServiceUserPassword(cfg.Service.Name, "REVA")
+	}
 
 	return nil
 }

@@ -8,6 +8,13 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 )
 
+func FullDefaultConfig() *config.Config {
+	cfg := DefaultConfig()
+	EnsureDefaults(cfg)
+	Sanitize(cfg)
+	return cfg
+}
+
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
@@ -34,11 +41,8 @@ func DefaultConfig() *config.Config {
 				TTL:  10,
 			},
 		},
-		TokenManager: config.TokenManager{
-			JWTSecret: "Pive-Fumkiu4",
-		},
 		PolicySelector: nil,
-		Reva: config.Reva{
+		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
 		PreSignedURL: config.PreSignedURL{
@@ -48,7 +52,6 @@ func DefaultConfig() *config.Config {
 		AccountBackend:        "cs3",
 		UserOIDCClaim:         "email",
 		UserCS3Claim:          "mail",
-		MachineAuthAPIKey:     "change-me-please",
 		AutoprovisionAccounts: false,
 		EnableBasicAuth:       false,
 		InsecureBackends:      false,
@@ -181,6 +184,25 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
+	}
+
+	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	}
+
+	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
+		cfg.Reva = &config.Reva{
+			Address: cfg.Commons.Reva.Address,
+		}
+	} else if cfg.Reva == nil {
+		cfg.Reva = &config.Reva{}
+	}
 }
 
 func Sanitize(cfg *config.Config) {

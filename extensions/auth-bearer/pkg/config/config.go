@@ -8,13 +8,14 @@ type Config struct {
 	Tracing         *Tracing `yaml:"tracing"`
 	Logging         *Logging `yaml:"log"`
 	Debug           Debug    `yaml:"debug"`
-	Supervised      bool
+	Supervised      bool     `yaml:"-"`
 
 	GRPC GRPCConfig `yaml:"grpc"`
 
-	JWTSecret             string
-	GatewayEndpoint       string
-	SkipUserGroupsInToken bool
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
+
+	SkipUserGroupsInToken bool          `yaml:"skip_user_groups_in_token"`
 	AuthProvider          string        `yaml:"auth_provider" env:"AUTH_BEARER_AUTH_PROVIDER" desc:"The auth provider which should be used by the service"`
 	AuthProviders         AuthProviders `yaml:"auth_providers"`
 }

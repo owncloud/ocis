@@ -59,7 +59,7 @@ func NewService(opts ...Option) Service {
 	switch options.Config.Identity.Backend {
 	case "cs3":
 		backend = &identity.CS3{
-			Config: &options.Config.Reva,
+			Config: options.Config.Reva,
 			Logger: &options.Logger,
 		}
 	case "ldap":

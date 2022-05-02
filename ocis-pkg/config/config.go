@@ -35,11 +35,6 @@ import (
 	webdav "github.com/owncloud/ocis/extensions/webdav/pkg/config"
 )
 
-// TokenManager is the config for using the reva token manager
-type TokenManager struct {
-	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET"`
-}
-
 const (
 	// SUPERVISED sets the runtime mode as supervised threads.
 	SUPERVISED = iota
@@ -61,16 +56,18 @@ type Runtime struct {
 type Config struct {
 	*shared.Commons `yaml:"shared"`
 
-	Tracing shared.Tracing `yaml:"tracing"`
-	Log     *shared.Log    `yaml:"log"`
+	Tracing *shared.Tracing `yaml:"tracing"`
+	Log     *shared.Log     `yaml:"log"`
 
 	Mode    Mode // DEPRECATED
 	File    string
 	OcisURL string `yaml:"ocis_url"`
 
-	Registry     string       `yaml:"registry"`
-	TokenManager TokenManager `yaml:"token_manager"`
-	Runtime      Runtime      `yaml:"runtime"`
+	Registry          string               `yaml:"registry"`
+	TokenManager      *shared.TokenManager `yaml:"token_manager"`
+	MachineAuthAPIKey string               `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY"`
+	TransferSecret    string               `yaml:"transfer_secret" env:"STORAGE_TRANSFER_SECRET"`
+	Runtime           Runtime              `yaml:"runtime"`
 
 	Audit             *audit.Config           `yaml:"audit"`
 	Accounts          *accounts.Config        `yaml:"accounts"`

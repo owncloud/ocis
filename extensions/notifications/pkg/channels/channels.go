@@ -86,7 +86,7 @@ func (m Mail) getReceiverAddresses(receivers []string) ([]string, error) {
 		res, err := m.gatewayClient.Authenticate(context.Background(), &gateway.AuthenticateRequest{
 			Type:         "machine",
 			ClientId:     "userid:" + id,
-			ClientSecret: m.conf.Notifications.MachineAuthSecret,
+			ClientSecret: m.conf.Notifications.MachineAuthAPIKey,
 		})
 		if err != nil {
 			return nil, err

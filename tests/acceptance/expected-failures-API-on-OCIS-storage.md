@@ -1798,7 +1798,7 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 #### [Incorrect response while listing resources of a folder with depth infinity](https://github.com/owncloud/ocis/issues/3073)
 
-- [apiWebdavOperations/listFiles.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L180)
+- [apiWebdavOperations/listFiles.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L182)
 
 ### [[spaces webdav] upload to a share that was locked by owner ends with status code 409](https://github.com/owncloud/ocis/issues/3128)
 
@@ -1815,9 +1815,9 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 #### [can't access public link resources with spaces webdav API](https://github.com/owncloud/ocis/issues/3085)
 
-- [apiWebdavOperations/listFiles.feature:216](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L216)
-- [apiWebdavOperations/listFiles.feature:254](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L254)
-- [apiWebdavOperations/listFiles.feature:291](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L291)
+- [apiWebdavOperations/listFiles.feature:218](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L218)
+- [apiWebdavOperations/listFiles.feature:256](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L256)
+- [apiWebdavOperations/listFiles.feature:294](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L294)
 
 #### [OCS response is not returned when a disabled user tries to enable himself](https://github.com/owncloud/ocis/issues/3254)
 
@@ -1858,6 +1858,33 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 #### [HTTP status code differ while deleting file of another user's trash bin](https://github.com/owncloud/ocis/issues/3544)
 - [apiTrashbin/trashbinDelete.feature:108](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L108)
+
+#### [Problem accessing trashbin with personal space id](https://github.com/owncloud/ocis/issues/3639)
+- [apiTrashbin/trashbinDelete.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L35)
+- [apiTrashbin/trashbinDelete.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L36)
+- [apiTrashbin/trashbinDelete.feature:58](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L58)
+- [apiTrashbin/trashbinDelete.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L85)
+- [apiTrashbin/trashbinDelete.feature:130](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L130)
+- [apiTrashbin/trashbinDelete.feature:152](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L152)
+- [apiTrashbin/trashbinDelete.feature:177](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L177)
+- [apiTrashbin/trashbinDelete.feature:202](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L202)
+- [apiTrashbin/trashbinDelete.feature:239](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L239)
+- [apiTrashbin/trashbinDelete.feature:276](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L276)
+- [apiTrashbin/trashbinDelete.feature:324](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinDelete.feature#L324)
+- [apiTrashbin/trashbinFilesFolders.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L25)
+- [apiTrashbin/trashbinFilesFolders.feature:41](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L41)
+- [apiTrashbin/trashbinFilesFolders.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L59)
+- [apiTrashbin/trashbinFilesFolders.feature:80](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L80)
+- [apiTrashbin/trashbinFilesFolders.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L99)
+- [apiTrashbin/trashbinFilesFolders.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L135)
+- [apiTrashbin/trashbinFilesFolders.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L158)
+- [apiTrashbin/trashbinFilesFolders.feature:313](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L313)
+- [apiTrashbin/trashbinFilesFolders.feature:314](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L314)
+- [apiTrashbin/trashbinFilesFolders.feature:315](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L315)
+- [apiTrashbin/trashbinFilesFolders.feature:334](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L334)
+- [apiTrashbin/trashbinFilesFolders.feature:354](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L354)
+- [apiTrashbin/trashbinFilesFolders.feature:408](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L408)
+- [apiTrashbin/trashbinFilesFolders.feature:445](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L445)
 
   Note: always have an empty line at the end of this file.
   The bash script that processes this file requires that the last line has a newline on the end.

@@ -89,7 +89,7 @@ We are using the ownCloud 10 acceptance test suite against oCIS.
 
 All you need to do to get the acceptance tests is check out the core repo:
 
-```
+```bash
 git clone https://github.com/owncloud/core.git
 ```
 
@@ -97,7 +97,8 @@ git clone https://github.com/owncloud/core.git
 
 To start ocis:
 
-```
+```bash
+ocis init
 OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true bin/ocis server
 ```
 
@@ -108,12 +109,13 @@ OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true bin/ocis server
 First we will need to clone the testing app in owncloud which contains the skeleton files required for running the tests.
 In the ownCloud 10 core clone the testing app with the following command:
 
-```
+```bash
 git clone https://github.com/owncloud/testing apps/testing
 ```
 
 Then run the api acceptance tests with the following command from the root of the ownCloud 10 core repository:
-```
+
+```bash
 make test-acceptance-api \
 TEST_SERVER_URL=https://localhost:9200 \
 TEST_OCIS=true \
@@ -153,7 +155,7 @@ If you want to work on a specific issue
 
     E.g.:
 
-    ```
+    ```bash
     make test-acceptance-api \
     TEST_SERVER_URL=https://localhost:9200 \
     TEST_OCIS=true \
@@ -174,7 +176,8 @@ If you want to work on a specific issue
 Instruction on setup is available [here](https://owncloud.dev/ocis/deployment/oc10_ocis_parallel/#local-setup)
 
 Edit the `.env` file and uncomment this line:
-```
+
+```bash
 COMPOSE_FILE=docker-compose.yml:testing/docker-compose-additions.yml
 ```
 
