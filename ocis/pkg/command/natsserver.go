@@ -16,12 +16,13 @@ func NatsServerCommand(cfg *config.Config) *cli.Command {
 		Name:     "nats-server",
 		Usage:    "start nats server",
 		Category: "extensions",
-		Before: func(ctx *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
+		Before: func(c *cli.Context) error {
+			if err := parser.ParseConfig(cfg); err != nil {
 				fmt.Printf("%v", err)
+				return err
 			}
-			return err
+			cfg.Nats.Commons = cfg.Commons
+			return nil
 		},
 		Subcommands: command.GetCommands(cfg.Nats),
 	}

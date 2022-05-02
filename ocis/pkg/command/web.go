@@ -16,12 +16,13 @@ func WebCommand(cfg *config.Config) *cli.Command {
 		Name:     cfg.Web.Service.Name,
 		Usage:    subcommandDescription(cfg.Web.Service.Name),
 		Category: "extensions",
-		Before: func(ctx *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
+		Before: func(c *cli.Context) error {
+			if err := parser.ParseConfig(cfg); err != nil {
 				fmt.Printf("%v", err)
+				return err
 			}
-			return err
+			cfg.Web.Commons = cfg.Commons
+			return nil
 		},
 		Subcommands: command.GetCommands(cfg.Web),
 	}
