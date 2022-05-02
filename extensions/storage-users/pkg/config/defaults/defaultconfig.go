@@ -1,7 +1,6 @@
 package defaults
 
 import (
-	"os"
 	"path/filepath"
 
 	"github.com/owncloud/ocis/extensions/storage-users/pkg/config"
@@ -43,25 +42,6 @@ func DefaultConfig() *config.Config {
 		MountID:       "1284d238-aa92-42ce-bdc4-0b0000009157",
 		Driver:        "ocis",
 		Drivers: config.Drivers{
-			EOS: config.EOSDriver{
-				Root:             "/eos/dockertest/reva",
-				ShareFolder:      "/Shares",
-				UserLayout:       "{{substr 0 1 .Username}}/{{.Username}}",
-				ShadowNamespace:  "",
-				UploadsNamespace: "",
-				EosBinary:        "/usr/bin/eos",
-				XrdcopyBinary:    "/usr/bin/xrdcopy",
-				MasterURL:        "root://eos-mgm1.eoscluster.cern.ch:1094",
-				GRPCURI:          "",
-				SlaveURL:         "root://eos-mgm1.eoscluster.cern.ch:1094",
-				CacheDirectory:   os.TempDir(),
-				GatewaySVC:       "127.0.0.1:9142",
-			},
-			Local: config.LocalDriver{
-				Root:        filepath.Join(defaults.BaseDataPath(), "storage", "local", "users"),
-				ShareFolder: "/Shares",
-				UserLayout:  "{{.Username}}",
-			},
 			OwnCloudSQL: config.OwnCloudSQLDriver{
 				Root:          filepath.Join(defaults.BaseDataPath(), "storage", "owncloud"),
 				ShareFolder:   "/Shares",
@@ -72,9 +52,6 @@ func DefaultConfig() *config.Config {
 				DBHost:        "",
 				DBPort:        3306,
 				DBName:        "owncloud",
-			},
-			S3: config.S3Driver{
-				Region: "default",
 			},
 			S3NG: config.S3NGDriver{
 				Root:                       filepath.Join(defaults.BaseDataPath(), "storage", "users"),

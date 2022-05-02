@@ -50,7 +50,7 @@ type GRPCConfig struct {
 }
 
 type AuthProviders struct {
-	JSON        JSONProvider        `yaml:"json"`
+	JSON        JSONProvider        `yaml:"json"` // not supported by the oCIS product, therefore not part of docs
 	LDAP        LDAPProvider        `yaml:"ldap"`
 	OwnCloudSQL OwnCloudSQLProvider `yaml:"owncloud_sql"`
 }

@@ -70,10 +70,10 @@ type HTTPConfig struct {
 }
 
 type Drivers struct {
-	EOS         EOSDriver
-	Local       LocalDriver
+	EOS         EOSDriver   `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
+	Local       LocalDriver `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
 	OCIS        OCISDriver
-	S3          S3Driver
+	S3          S3Driver `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
 	S3NG        S3NGDriver
 	OwnCloudSQL OwnCloudSQLDriver
 }

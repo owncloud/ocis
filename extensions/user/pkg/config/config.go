@@ -51,10 +51,10 @@ type GRPCConfig struct {
 }
 
 type Drivers struct {
-	JSON        JSONDriver
+	JSON        JSONDriver // not supported by the oCIS product, therefore not part of docs
 	LDAP        LDAPDriver
 	OwnCloudSQL OwnCloudSQLDriver
-	REST        RESTProvider
+	REST        RESTProvider // not supported by the oCIS product, therefore not part of docs
 }
 
 type JSONDriver struct {
