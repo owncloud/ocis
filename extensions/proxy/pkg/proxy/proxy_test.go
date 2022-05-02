@@ -127,9 +127,9 @@ func TestDirectorSelectionDirector(t *testing.T) {
 	}
 
 	for _, test := range table {
-		r := httptest.NewRequest(http.MethodGet, "/dav/files/demo/", nil)
+		r := httptest.NewRequest(test.method, "/dav/files/demo/", nil)
 		p.directorSelectionDirector(r)
-		if r.Host != test.target {
+		if r.URL.Host != test.target {
 			t.Errorf("TestDirectorSelectionDirector got host %s expected %s", r.Host, test.target)
 
 		}
