@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
 * Bugfix - URL encode the webdav url in the graph API: [#3597](https://github.com/owncloud/ocis/pull/3597)
 * Change - Load configuration files just from one directory: [#3587](https://github.com/owncloud/ocis/pull/3587)
+* Change - Introduce `ocis init` and remove all default secrets: [#3551](https://github.com/owncloud/ocis/pull/3551)
 * Change - Switched default configuration to use libregraph/idm: [#3331](https://github.com/owncloud/ocis/pull/3331)
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
@@ -51,6 +52,17 @@ The following sections list the changes for unreleased.
    - Docker images: `/etc/ocis/` - Binary releases: `$HOME/.ocis/config/`
 
    https://github.com/owncloud/ocis/pull/3587
+
+* Change - Introduce `ocis init` and remove all default secrets: [#3551](https://github.com/owncloud/ocis/pull/3551)
+
+   We've removed all default secrets. This means you can't start oCIS any longer without setting
+   these via environment variable or configuration file.
+
+   In order to make this easy for you, we introduced a new command: `ocis init`. You can run this
+   command before starting oCIS with `ocis server` and it will bootstrap you a configuration file
+   for a secure oCIS instance.
+
+   https://github.com/owncloud/ocis/pull/3551
 
 * Change - Switched default configuration to use libregraph/idm: [#3331](https://github.com/owncloud/ocis/pull/3331)
 
