@@ -18,7 +18,7 @@ OC_CI_NODEJS = "owncloudci/nodejs:%s"
 OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
 OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:latest"
-OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.5.0"
+OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.6.0"
 OC_SERVER = "owncloud/server:10"
 OC_UBUNTU = "owncloud/ubuntu:18.04"
 OSIXIA_OPEN_LDAP = "osixia/openldap:latest"
@@ -698,7 +698,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                 ocisServerWithAccounts(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() + [
+                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() + [
             {
                 "name": "webUITests",
                 "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
@@ -1838,6 +1838,7 @@ def middlewareService():
             "REMOTE_UPLOAD_DIR": "/uploads",
             "NODE_TLS_REJECT_UNAUTHORIZED": "0",
             "MIDDLEWARE_HOST": "middleware",
+            "TEST_WITH_GRAPH_API": "true",
         },
         "volumes": [{
             "name": "uploads",
