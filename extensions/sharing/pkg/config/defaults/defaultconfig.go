@@ -49,7 +49,6 @@ func DefaultConfig() *config.Config {
 			},
 			CS3: config.UserSharingCS3Driver{
 				ProviderAddr:   "127.0.0.1:9215", // metadata storage
-				ServiceUserID:  "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
 				ServiceUserIDP: "internal",
 			},
 		},
@@ -70,7 +69,6 @@ func DefaultConfig() *config.Config {
 			},
 			CS3: config.PublicSharingCS3Driver{
 				ProviderAddr:   "127.0.0.1:9215", // metadata storage
-				ServiceUserID:  "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
 				ServiceUserIDP: "internal",
 			},
 		},
@@ -125,8 +123,16 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.UserSharingDrivers.CS3.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
 
+	if cfg.UserSharingDrivers.CS3.ServiceUserID == "" && cfg.Commons != nil && cfg.Commons.MetadataUserID != "" {
+		cfg.UserSharingDrivers.CS3.ServiceUserID = cfg.Commons.MetadataUserID
+	}
+
 	if cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
 		cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	}
+
+	if cfg.PublicSharingDrivers.CS3.ServiceUserID == "" && cfg.Commons != nil && cfg.Commons.MetadataUserID != "" {
+		cfg.PublicSharingDrivers.CS3.ServiceUserID = cfg.Commons.MetadataUserID
 	}
 }
 

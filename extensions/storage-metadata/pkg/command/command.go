@@ -160,7 +160,7 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 							"users": map[string]interface{}{
 								"serviceuser": map[string]interface{}{
 									"id": map[string]interface{}{
-										"opaqueId": "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad", // FIXME generate service user id
+										"opaqueId": cfg.MetadataUserID,
 										"idp":      "internal",
 										"type":     userpb.UserType_USER_TYPE_PRIMARY,
 									},

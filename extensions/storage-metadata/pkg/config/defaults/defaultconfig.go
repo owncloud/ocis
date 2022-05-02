@@ -125,6 +125,11 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
 		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
+
+	if cfg.MetadataUserID == "" && cfg.Commons != nil && cfg.Commons.MetadataUserID != "" {
+		cfg.MetadataUserID = cfg.Commons.MetadataUserID
+	}
+
 }
 
 func Sanitize(cfg *config.Config) {

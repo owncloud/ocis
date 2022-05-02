@@ -21,7 +21,8 @@ type Config struct {
 
 	TokenManager      *TokenManager `yaml:"token_manager"`
 	Reva              *Reva         `yaml:"reva"`
-	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;STORAGE_METADATA_MACHINE_AUTH_API_KEY"`
+	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"STORAGE_METADATA_MACHINE_AUTH_API_KEY"`
+	MetadataUserID    string        `yaml:"metadata_user_id"`
 
 	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token"`
 	Driver                string  `yaml:"driver" env:"STORAGE_METADATA_DRIVER" desc:"The driver which should be used by the service"`
