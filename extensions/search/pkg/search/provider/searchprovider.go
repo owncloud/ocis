@@ -124,16 +124,14 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 			switch statRes.Status.Code {
 			case rpc.Code_CODE_OK:
 				err = p.indexClient.Add(ref, statRes.Info)
+				if err != nil {
+					p.logger.Error().Err(err).Msg("error adding updating the resource in the index")
+				} else {
+					p.logDocCount()
+				}
 			default:
 				p.logger.Error().Interface("statRes", statRes).Msg("failed to stat the changed resource")
 			}
-
-			if err != nil {
-				p.logger.Error().Err(err).Msg("error adding updating the resource in the index")
-			} else {
-				p.logDocCount()
-			}
-
 		}
 	}()
 
