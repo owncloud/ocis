@@ -23,7 +23,8 @@ type Config struct {
 	SkipUserGroupsInToken bool `yaml:"skip_users_groups_in_token"`
 
 	EnableFavorites          bool   `yaml:"favorites"`
-	EnableProjectSpaces      bool   `yaml:"enable_project_spaces"`
+	EnableProjectSpaces      bool   `yaml:"enable_project_spaces" env:"FRONTEND_ENABLE_PROJECT_SPACES" desc:"Indicates to clients that project spaces are supposed to be made available."`
+	EnableShareJail          bool   `yaml:"enable_share_jail" env:"FRONTEND_ENABLE_SHARE_JAIL" desc:"Indicates to clients that the share jail is supposed to be used."`
 	UploadMaxChunkSize       int    `yaml:"upload_max_chunk_size"`
 	UploadHTTPMethodOverride string `yaml:"upload_http_method_override"`
 	DefaultUploadProtocol    string `yaml:"default_upload_protocol"`

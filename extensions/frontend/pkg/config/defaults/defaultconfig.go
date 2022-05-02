@@ -33,6 +33,7 @@ func DefaultConfig() *config.Config {
 		PublicURL:                "https://localhost:9200",
 		EnableFavorites:          false,
 		EnableProjectSpaces:      true,
+		EnableShareJail:          true,
 		UploadMaxChunkSize:       1e+8,
 		UploadHTTPMethodOverride: "",
 		DefaultUploadProtocol:    "tus",
