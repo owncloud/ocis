@@ -8,18 +8,19 @@ type Config struct {
 	Tracing         *Tracing `yaml:"tracing"`
 	Logging         *Logging `yaml:"log"`
 	Debug           Debug    `yaml:"debug"`
-	Supervised      bool
+	Supervised      bool     `yaml:"-"`
 
 	GRPC GRPCConfig `yaml:"grpc"`
 
-	JWTSecret             string
-	GatewayEndpoint       string
-	SkipUserGroupsInToken bool
-	UserSharingDriver     string
-	UserSharingDrivers    UserSharingDrivers
-	PublicSharingDriver   string
-	PublicSharingDrivers  PublicSharingDrivers
-	Events                Events
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
+
+	SkipUserGroupsInToken bool                 `yaml:"skip_user_groups_in_token"`
+	UserSharingDriver     string               `yaml:"user_sharing_driver"`
+	UserSharingDrivers    UserSharingDrivers   `yaml:"user_sharin_drivers"`
+	PublicSharingDriver   string               `yaml:"public_sharing_driver"`
+	PublicSharingDrivers  PublicSharingDrivers `yaml:"public_sharing_drivers"`
+	Events                Events               `yaml:"events"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;SHARING_TRACING_ENABLED" desc:"Activates tracing."`

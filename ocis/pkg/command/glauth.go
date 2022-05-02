@@ -1,6 +1,8 @@
 package command
 
 import (
+	"fmt"
+
 	"github.com/owncloud/ocis/extensions/glauth/pkg/command"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/parser"
@@ -14,8 +16,13 @@ func GLAuthCommand(cfg *config.Config) *cli.Command {
 		Name:     cfg.GLAuth.Service.Name,
 		Usage:    subcommandDescription(cfg.GLAuth.Service.Name),
 		Category: "extensions",
-		Before: func(ctx *cli.Context) error {
-			return parser.ParseConfig(cfg)
+		Before: func(c *cli.Context) error {
+			if err := parser.ParseConfig(cfg); err != nil {
+				fmt.Printf("%v", err)
+				return err
+			}
+			cfg.GLAuth.Commons = cfg.Commons
+			return nil
 		},
 		Subcommands: command.GetCommands(cfg.GLAuth),
 	}

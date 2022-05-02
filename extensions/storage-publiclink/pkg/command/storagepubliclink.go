@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"path"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/extensions/storage-publiclink/pkg/config"
+	"github.com/owncloud/ocis/extensions/storage-publiclink/pkg/config/parser"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -25,6 +27,13 @@ func StoragePublicLink(cfg *config.Config) *cli.Command {
 		Name:     "storage-public-link",
 		Usage:    "start storage-public-link service",
 		Category: "extensions",
+		Before: func(ctx *cli.Context) error {
+			err := parser.ParseConfig(cfg)
+			if err != nil {
+				fmt.Printf("%v", err)
+			}
+			return err
+		},
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
 			logger := log.NewLogger(
@@ -94,8 +103,8 @@ func storagePublicLinkConfigFromStruct(c *cli.Context, cfg *config.Config) map[s
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.JWTSecret,
-			"gatewaysvc":                cfg.GatewayEndpoint,
+			"jwt_secret":                cfg.TokenManager.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Address,
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{

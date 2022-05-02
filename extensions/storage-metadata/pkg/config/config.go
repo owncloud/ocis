@@ -12,20 +12,24 @@ type Config struct {
 	Tracing         *Tracing `yaml:"tracing"`
 	Logging         *Logging `yaml:"log"`
 	Debug           Debug    `yaml:"debug"`
-	Supervised      bool
+	Supervised      bool     `yaml:"-"`
 
 	GRPC GRPCConfig `yaml:"grpc"`
 	HTTP HTTPConfig `yaml:"http"`
 
-	Context               context.Context
-	JWTSecret             string
-	GatewayEndpoint       string
-	SkipUserGroupsInToken bool
+	Context context.Context `yaml:"context"`
+
+	TokenManager      *TokenManager `yaml:"token_manager"`
+	Reva              *Reva         `yaml:"reva"`
+	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"STORAGE_METADATA_MACHINE_AUTH_API_KEY"`
+	MetadataUserID    string        `yaml:"metadata_user_id"`
+
+	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token"`
 	Driver                string  `yaml:"driver" env:"STORAGE_METADATA_DRIVER" desc:"The driver which should be used by the service"`
 	Drivers               Drivers `yaml:"drivers"`
-	DataServerURL         string
-	TempFolder            string
-	DataProviderInsecure  bool `env:"OCIS_INSECURE;STORAGE_METADATA_DATAPROVIDER_INSECURE"`
+	DataServerURL         string  `yaml:"data_server_url"`
+	TempFolder            string  `yaml:"temp_folder"`
+	DataProviderInsecure  bool    `yaml:"data_provider_insecure" env:"OCIS_INSECURE;STORAGE_METADATA_DATAPROVIDER_INSECURE"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;STORAGE_METADATA_TRACING_ENABLED" desc:"Activates tracing."`
@@ -58,8 +62,8 @@ type GRPCConfig struct {
 }
 
 type HTTPConfig struct {
-	Addr     string `yaml:"addr" env:"STORAGE_METADATA_GRPC_ADDR" desc:"The address of the grpc service."`
-	Protocol string `yaml:"protocol" env:"STORAGE_METADATA_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
+	Addr     string `yaml:"addr" env:"STORAGE_METADATA_HTTP_ADDR" desc:"The address of the http service."`
+	Protocol string `yaml:"protocol" env:"STORAGE_METADATA_HTTP_PROTOCOL" desc:"The transport protocol of the http service."`
 }
 
 type Drivers struct {

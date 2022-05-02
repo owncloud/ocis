@@ -9,9 +9,8 @@ import (
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
-
 	EnsureDefaults(cfg)
-
+	Sanitize(cfg)
 	return cfg
 }
 
@@ -30,8 +29,9 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "sharing",
 		},
-		GatewayEndpoint:   "127.0.0.1:9142",
-		JWTSecret:         "Pive-Fumkiu4",
+		Reva: &config.Reva{
+			Address: "127.0.0.1:9142",
+		},
 		UserSharingDriver: "json",
 		UserSharingDrivers: config.UserSharingDrivers{
 			JSON: config.UserSharingJSONDriver{
@@ -48,9 +48,8 @@ func DefaultConfig() *config.Config {
 				JanitorRunInterval:         60,
 			},
 			CS3: config.UserSharingCS3Driver{
-				ProviderAddr:   "127.0.0.1:9215",
-				ServiceUserID:  "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-				ServiceUserIDP: "https://localhost:9200",
+				ProviderAddr:   "127.0.0.1:9215", // metadata storage
+				ServiceUserIDP: "internal",
 			},
 		},
 		PublicSharingDriver: "json",
@@ -69,9 +68,8 @@ func DefaultConfig() *config.Config {
 				JanitorRunInterval:         60,
 			},
 			CS3: config.PublicSharingCS3Driver{
-				ProviderAddr:   "127.0.0.1:9215",
-				ServiceUserID:  "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-				ServiceUserIDP: "https://localhost:9200",
+				ProviderAddr:   "127.0.0.1:9215", // metadata storage
+				ServiceUserIDP: "internal",
 			},
 		},
 		Events: config.Events{
@@ -103,6 +101,38 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
+		cfg.Reva = &config.Reva{
+			Address: cfg.Commons.Reva.Address,
+		}
+	} else if cfg.Reva == nil {
+		cfg.Reva = &config.Reva{}
+	}
+
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
+	}
+
+	if cfg.UserSharingDrivers.CS3.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.UserSharingDrivers.CS3.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	}
+
+	if cfg.UserSharingDrivers.CS3.ServiceUserID == "" && cfg.Commons != nil && cfg.Commons.MetadataUserID != "" {
+		cfg.UserSharingDrivers.CS3.ServiceUserID = cfg.Commons.MetadataUserID
+	}
+
+	if cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	}
+
+	if cfg.PublicSharingDrivers.CS3.ServiceUserID == "" && cfg.Commons != nil && cfg.Commons.MetadataUserID != "" {
+		cfg.PublicSharingDrivers.CS3.ServiceUserID = cfg.Commons.MetadataUserID
 	}
 }
 

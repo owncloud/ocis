@@ -6,11 +6,12 @@ import (
 	"github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
 	"github.com/owncloud/ocis/extensions/thumbnails/pkg/config/defaults"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 
 	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
 )
 
-// ParseConfig loads accounts configuration from known paths.
+// ParseConfig loads configuration from known paths.
 func ParseConfig(cfg *config.Config) error {
 	_, err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg)
 	if err != nil {
@@ -29,6 +30,14 @@ func ParseConfig(cfg *config.Config) error {
 
 	// sanitize config
 	defaults.Sanitize(cfg)
+
+	return Validate(cfg)
+}
+
+func Validate(cfg *config.Config) error {
+	if cfg.Thumbnail.TransferSecret == "" {
+		return shared.MissingRevaTransferSecretError(cfg.Service.Name)
+	}
 
 	return nil
 }

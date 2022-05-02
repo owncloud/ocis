@@ -1,6 +1,8 @@
 package command
 
 import (
+	"fmt"
+
 	"github.com/owncloud/ocis/extensions/idp/pkg/command"
 	"github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/parser"
@@ -14,8 +16,13 @@ func IDPCommand(cfg *config.Config) *cli.Command {
 		Name:     cfg.IDP.Service.Name,
 		Usage:    subcommandDescription(cfg.IDP.Service.Name),
 		Category: "extensions",
-		Before: func(ctx *cli.Context) error {
-			return parser.ParseConfig(cfg)
+		Before: func(c *cli.Context) error {
+			if err := parser.ParseConfig(cfg); err != nil {
+				fmt.Printf("%v", err)
+				return err
+			}
+			cfg.IDP.Commons = cfg.Commons
+			return nil
 		},
 		Subcommands: command.GetCommands(cfg.IDP),
 	}

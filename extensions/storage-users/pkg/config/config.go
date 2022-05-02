@@ -12,24 +12,26 @@ type Config struct {
 	Tracing         *Tracing `yaml:"tracing"`
 	Logging         *Logging `yaml:"log"`
 	Debug           Debug    `yaml:"debug"`
-	Supervised      bool
+	Supervised      bool     `yaml:"-"`
 
 	GRPC GRPCConfig `yaml:"grpc"`
 	HTTP HTTPConfig `yaml:"http"`
 
-	Context               context.Context
-	JWTSecret             string
-	GatewayEndpoint       string
-	SkipUserGroupsInToken bool
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
+
+	Context context.Context `yaml:"context"`
+
+	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token"`
 	Driver                string  `yaml:"driver" env:"STORAGE_USERS_DRIVER" desc:"The storage driver which should be used by the service"`
 	Drivers               Drivers `yaml:"drivers"`
-	DataServerURL         string
-	TempFolder            string
-	DataProviderInsecure  bool `env:"OCIS_INSECURE;STORAGE_USERS_DATAPROVIDER_INSECURE"`
-	Events                Events
-	MountID               string
-	ExposeDataServer      bool
-	ReadOnly              bool
+	DataServerURL         string  `yaml:"data_server_url"`
+	TempFolder            string  `yaml:"temp_folder"`
+	DataProviderInsecure  bool    `yaml:"data_provider_insecure" env:"OCIS_INSECURE;STORAGE_USERS_DATAPROVIDER_INSECURE"`
+	Events                Events  `yaml:"events"`
+	MountID               string  `yaml:"mount_id"`
+	ExposeDataServer      bool    `yaml:"expose_data_server"`
+	ReadOnly              bool    `yaml:"readonly"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;STORAGE_USERS_TRACING_ENABLED" desc:"Activates tracing."`

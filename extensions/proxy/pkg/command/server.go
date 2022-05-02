@@ -43,7 +43,11 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
 		Category: "server",
 		Before: func(c *cli.Context) error {
-			return parser.ParseConfig(cfg)
+			err := parser.ParseConfig(cfg)
+			if err != nil {
+				fmt.Printf("%v", err)
+			}
+			return err
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
@@ -212,7 +216,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		middleware.AccountResolver(
 			middleware.Logger(logger),
 			middleware.UserProvider(userProvider),
-			middleware.TokenManagerConfig(cfg.TokenManager),
+			middleware.TokenManagerConfig(*cfg.TokenManager),
 			middleware.UserOIDCClaim(cfg.UserOIDCClaim),
 			middleware.UserCS3Claim(cfg.UserCS3Claim),
 			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
@@ -227,7 +231,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(logger),
-			middleware.TokenManagerConfig(cfg.TokenManager),
+			middleware.TokenManagerConfig(*cfg.TokenManager),
 			middleware.RevaGatewayClient(revaClient),
 		),
 		middleware.PublicShareAuth(

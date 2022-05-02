@@ -13,7 +13,7 @@ import (
 
 // ListRoleAssignments loads and returns all role assignments matching the given assignment identifier.
 func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRoleAssignment, error) {
-	if s.mdc == nil || accountUUID == "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad" {
+	if s.mdc == nil {
 		return defaultRoleAssignments(accountUUID), nil
 	}
 	s.Init()

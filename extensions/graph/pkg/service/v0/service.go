@@ -59,7 +59,7 @@ func NewService(opts ...Option) Service {
 	switch options.Config.Identity.Backend {
 	case "cs3":
 		backend = &identity.CS3{
-			Config: &options.Config.Reva,
+			Config: options.Config.Reva,
 			Logger: &options.Logger,
 		}
 	case "ldap":
@@ -173,7 +173,7 @@ func NewService(opts ...Option) Service {
 					account.JWTSecret(options.Config.TokenManager.JWTSecret)),
 				)
 				r.Route("/drives", func(r chi.Router) {
-					r.Get("/", svc.GetDrives)
+					r.Get("/", svc.GetAllDrives)
 					r.Post("/", svc.CreateDrive)
 					r.Route("/{driveID}", func(r chi.Router) {
 						r.Patch("/", svc.UpdateDrive)

@@ -42,6 +42,6 @@ type Thumbnail struct {
 	CS3AllowInsecure    bool              `yaml:"cs3_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_CS3SOURCE_INSECURE"`
 	RevaGateway         string            `yaml:"reva_gateway" env:"REVA_GATEWAY"` //TODO: use REVA config
 	FontMapFile         string            `yaml:"font_map_file" env:"THUMBNAILS_TXT_FONTMAP_FILE"`
-	TransferTokenSecret string            `yaml:"transfer_token" env:"THUMBNAILS_TRANSFER_TOKEN"`
+	TransferSecret      string            `yaml:"transfer_secret" env:"STORAGE_TRANSFER_TOKEN;THUMBNAILS_TRANSFER_TOKEN"`
 	DataEndpoint        string            `yaml:"data_endpoint" env:"THUMBNAILS_DATA_ENDPOINT"`
 }

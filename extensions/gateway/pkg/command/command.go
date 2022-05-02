@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -15,6 +16,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/extensions/gateway/pkg/config"
+	"github.com/owncloud/ocis/extensions/gateway/pkg/config/parser"
 	"github.com/owncloud/ocis/extensions/storage/pkg/server/debug"
 	"github.com/owncloud/ocis/extensions/storage/pkg/service/external"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
@@ -31,12 +33,12 @@ func Gateway(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "gateway",
 		Usage: "start gateway",
-		Before: func(c *cli.Context) error {
-			if cfg.DataGatewayPublicURL == "" {
-				cfg.DataGatewayPublicURL = strings.TrimRight(cfg.FrontendPublicURL, "/") + "/data"
+		Before: func(ctx *cli.Context) error {
+			err := parser.ParseConfig(cfg)
+			if err != nil {
+				fmt.Printf("%v", err)
 			}
-
-			return nil
+			return err
 		},
 		Action: func(c *cli.Context) error {
 			logCfg := cfg.Logging
@@ -125,8 +127,8 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 			"tracing_service_name": c.Command.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret":                cfg.JWTSecret,
-			"gatewaysvc":                cfg.GatewayEndpoint,
+			"jwt_secret":                cfg.TokenManager.JWTSecret,
+			"gatewaysvc":                cfg.Reva.Address,
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
 		},
 		"grpc": map[string]interface{}{
@@ -136,9 +138,9 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 			"services": map[string]interface{}{
 				"gateway": map[string]interface{}{
 					// registries is located on the gateway
-					"authregistrysvc":    cfg.GatewayEndpoint,
-					"storageregistrysvc": cfg.GatewayEndpoint,
-					"appregistrysvc":     cfg.GatewayEndpoint,
+					"authregistrysvc":    cfg.Reva.Address,
+					"storageregistrysvc": cfg.Reva.Address,
+					"appregistrysvc":     cfg.Reva.Address,
 					// user metadata is located on the users services
 					"preferencessvc":   cfg.UsersEndpoint,
 					"userprovidersvc":  cfg.UsersEndpoint,
@@ -153,7 +155,7 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 					"share_folder":                  cfg.ShareFolder, // ShareFolder is the location where to create shares in the recipient's storage provider.
 					// other
 					"disable_home_creation_on_login": cfg.DisableHomeCreationOnLogin,
-					"datagateway":                    cfg.DataGatewayPublicURL,
+					"datagateway":                    strings.TrimRight(cfg.FrontendPublicURL, "/") + "/data",
 					"transfer_shared_secret":         cfg.TransferSecret,
 					"transfer_expires":               cfg.TransferExpires,
 					"home_mapping":                   cfg.HomeMapping,

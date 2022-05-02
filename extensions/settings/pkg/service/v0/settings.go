@@ -6,9 +6,6 @@ import (
 )
 
 const (
-	// BundleUUIDRoleMetadata represents the metadata user role
-	BundleUUIDRoleMetadata = "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad"
-
 	// BundleUUIDRoleAdmin represents the admin role
 	BundleUUIDRoleAdmin = "71881883-1768-46bd-a24d-a356a2afdf7f"
 
@@ -532,34 +529,11 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 				},
 			},
 		},
-		{
-			BundleId: BundleUUIDRoleMetadata,
-			Setting: &settingsmsg.Setting{
-				Id:          CreateSpacePermissionID,
-				Name:        CreateSpacePermissionName,
-				DisplayName: "Create own Space",
-				Description: "This permission allows to create a space owned by the current user.",
-				Resource: &settingsmsg.Resource{
-					Type: settingsmsg.Resource_TYPE_SYSTEM, // TODO resource type space? self? me? own?
-				},
-				Value: &settingsmsg.Setting_PermissionValue{
-					PermissionValue: &settingsmsg.Permission{
-						Operation:  settingsmsg.Permission_OPERATION_CREATE,
-						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
-					},
-				},
-			},
-		},
 	}
 }
 
 func defaultRoleAssignments() []*settingsmsg.UserRoleAssignment {
 	return []*settingsmsg.UserRoleAssignment{
-		// accounts service user for the metadata user is allowed to create spaces
-		{
-			AccountUuid: "95cb8724-03b2-11eb-a0a6-c33ef8ef53ad",
-			RoleId:      BundleUUIDRoleAdmin,
-		},
 		// default admin users
 		{
 			AccountUuid: "058bff95-6708-4fe5-91e4-9ea3d377588b",

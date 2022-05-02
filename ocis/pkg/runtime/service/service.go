@@ -107,38 +107,38 @@ func NewService(options ...Option) (*Service, error) {
 		cfg:          opts.Config,
 	}
 
-	s.ServicesRegistry["settings"] = settings.NewSutureService
-	s.ServicesRegistry["nats"] = nats.NewSutureService
-	s.ServicesRegistry["storage-metadata"] = storagemetadata.NewStorageMetadata
-	s.ServicesRegistry["glauth"] = glauth.NewSutureService
-	s.ServicesRegistry["graph"] = graph.NewSutureService
-	s.ServicesRegistry["graph-explorer"] = graphExplorer.NewSutureService
-	s.ServicesRegistry["idm"] = idm.NewSutureService
-	s.ServicesRegistry["ocs"] = ocs.NewSutureService
-	s.ServicesRegistry["store"] = store.NewSutureService
-	s.ServicesRegistry["thumbnails"] = thumbnails.NewSutureService
-	s.ServicesRegistry["web"] = web.NewSutureService
-	s.ServicesRegistry["webdav"] = webdav.NewSutureService
-	s.ServicesRegistry["storage-frontend"] = frontend.NewFrontend
-	s.ServicesRegistry["ocdav"] = ocdav.NewOCDav
-	s.ServicesRegistry["storage-gateway"] = gateway.NewGateway
-	s.ServicesRegistry["storage-userprovider"] = user.NewUserProvider
-	s.ServicesRegistry["storage-groupprovider"] = group.NewGroupProvider
-	s.ServicesRegistry["storage-authbasic"] = authbasic.NewAuthBasic
-	s.ServicesRegistry["storage-authbearer"] = authbearer.NewAuthBearer
-	s.ServicesRegistry["storage-authmachine"] = authmachine.NewAuthMachine
-	s.ServicesRegistry["storage-users"] = storageusers.NewStorageUsers
-	s.ServicesRegistry["storage-shares"] = storageshares.NewStorageShares
-	s.ServicesRegistry["storage-public-link"] = storagepublic.NewStoragePublicLink
-	s.ServicesRegistry["storage-appprovider"] = appprovider.NewAppProvider
-	s.ServicesRegistry["notifications"] = notifications.NewSutureService
-	s.ServicesRegistry["search"] = search.NewSutureService
+	s.ServicesRegistry[opts.Config.Settings.Service.Name] = settings.NewSutureService
+	s.ServicesRegistry[opts.Config.Nats.Service.Name] = nats.NewSutureService
+	s.ServicesRegistry[opts.Config.StorageMetadata.Service.Name] = storagemetadata.NewStorageMetadata
+	s.ServicesRegistry[opts.Config.GLAuth.Service.Name] = glauth.NewSutureService
+	s.ServicesRegistry[opts.Config.Graph.Service.Name] = graph.NewSutureService
+	s.ServicesRegistry[opts.Config.GraphExplorer.Service.Name] = graphExplorer.NewSutureService
+	s.ServicesRegistry[opts.Config.IDM.Service.Name] = idm.NewSutureService
+	s.ServicesRegistry[opts.Config.OCS.Service.Name] = ocs.NewSutureService
+	s.ServicesRegistry[opts.Config.Store.Service.Name] = store.NewSutureService
+	s.ServicesRegistry[opts.Config.Thumbnails.Service.Name] = thumbnails.NewSutureService
+	s.ServicesRegistry[opts.Config.Web.Service.Name] = web.NewSutureService
+	s.ServicesRegistry[opts.Config.WebDAV.Service.Name] = webdav.NewSutureService
+	s.ServicesRegistry[opts.Config.Frontend.Service.Name] = frontend.NewFrontend
+	s.ServicesRegistry[opts.Config.OCDav.Service.Name] = ocdav.NewOCDav
+	s.ServicesRegistry[opts.Config.Gateway.Service.Name] = gateway.NewGateway
+	s.ServicesRegistry[opts.Config.User.Service.Name] = user.NewUserProvider
+	s.ServicesRegistry[opts.Config.Group.Service.Name] = group.NewGroupProvider
+	s.ServicesRegistry[opts.Config.AuthBasic.Service.Name] = authbasic.NewAuthBasic
+	s.ServicesRegistry[opts.Config.AuthBearer.Service.Name] = authbearer.NewAuthBearer
+	s.ServicesRegistry[opts.Config.AuthMachine.Service.Name] = authmachine.NewAuthMachine
+	s.ServicesRegistry[opts.Config.StorageUsers.Service.Name] = storageusers.NewStorageUsers
+	s.ServicesRegistry[opts.Config.StorageShares.Service.Name] = storageshares.NewStorageShares
+	s.ServicesRegistry[opts.Config.StoragePublicLink.Service.Name] = storagepublic.NewStoragePublicLink
+	s.ServicesRegistry[opts.Config.AppProvider.Service.Name] = appprovider.NewAppProvider
+	s.ServicesRegistry[opts.Config.Notifications.Service.Name] = notifications.NewSutureService
+	s.ServicesRegistry[opts.Config.Search.Service.Name] = search.NewSutureService
 
 	// populate delayed services
-	s.Delayed["storage-sharing"] = sharing.NewSharing
-	s.Delayed["accounts"] = accounts.NewSutureService
-	s.Delayed["proxy"] = proxy.NewSutureService
-	s.Delayed["idp"] = idp.NewSutureService
+	s.Delayed[opts.Config.Sharing.Service.Name] = sharing.NewSharing
+	s.Delayed[opts.Config.Accounts.Service.Name] = accounts.NewSutureService
+	s.Delayed[opts.Config.Proxy.Service.Name] = proxy.NewSutureService
+	s.Delayed[opts.Config.IDP.Service.Name] = idp.NewSutureService
 
 	return s, nil
 }

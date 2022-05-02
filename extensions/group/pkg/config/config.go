@@ -8,16 +8,17 @@ type Config struct {
 	Tracing         *Tracing `yaml:"tracing"`
 	Logging         *Logging `yaml:"log"`
 	Debug           Debug    `yaml:"debug"`
-	Supervised      bool
+	Supervised      bool     `yaml:"-"`
 
 	GRPC GRPCConfig `yaml:"grpc"`
 
-	JWTSecret                   string
-	GatewayEndpoint             string
-	SkipUserGroupsInToken       bool
-	GroupMembersCacheExpiration int
-	Driver                      string
-	Drivers                     Drivers
+	TokenManager *TokenManager `yaml:"token_manager"`
+	Reva         *Reva         `yaml:"reva"`
+
+	SkipUserGroupsInToken       bool    `yaml:"skip_user_groups_in_token"`
+	GroupMembersCacheExpiration int     `yaml:"group_members_cache_expiration"`
+	Driver                      string  `yaml:"driver"`
+	Drivers                     Drivers `yaml:"drivers"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;GROUPS_TRACING_ENABLED" desc:"Activates tracing."`
@@ -64,7 +65,7 @@ type LDAPDriver struct {
 	CACert           string   `env:"LDAP_CACERT;GROUPS_LDAP_CACERT"`
 	Insecure         bool     `env:"LDAP_INSECURE;GROUPS_LDAP_INSECURE"`
 	BindDN           string   `env:"LDAP_BIND_DN;GROUPS_LDAP_BIND_DN"`
-	BindPassword     string   `env:"LDAP_BIND_PASSWORD;GROUPS_LDAP_BIND_PASSWORD"`
+	BindPassword     string   `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;GROUPS_LDAP_BIND_PASSWORD"`
 	UserBaseDN       string   `env:"LDAP_USER_BASE_DN;GROUPS_LDAP_USER_BASE_DN"`
 	GroupBaseDN      string   `env:"LDAP_GROUP_BASE_DN;GROUPS_LDAP_GROUP_BASE_DN"`
 	UserScope        string   `env:"LDAP_USER_SCOPE;GROUPS_LDAP_USER_SCOPE"`

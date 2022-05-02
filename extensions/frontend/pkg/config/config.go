@@ -8,31 +8,36 @@ type Config struct {
 	Tracing         *Tracing `yaml:"tracing"`
 	Logging         *Logging `yaml:"log"`
 	Debug           Debug    `yaml:"debug"`
-	Supervised      bool
+	Supervised      bool     `yaml:"-"`
 
 	HTTP HTTPConfig `yaml:"http"`
 
 	// JWTSecret used to verify reva access token
-	JWTSecret             string `yaml:"jwt_secret"`
-	GatewayEndpoint       string
-	SkipUserGroupsInToken bool
 
-	EnableFavorites          bool `yaml:"favorites"`
-	EnableProjectSpaces      bool
+	TransferSecret string `yaml:"transfer_secret" env:"STORAGE_TRANSFER_SECRET"`
+
+	TokenManager      *TokenManager `yaml:"token_manager"`
+	Reva              *Reva         `yaml:"reva"`
+	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;FRONTEND_MACHINE_AUTH_API_KEY"`
+
+	SkipUserGroupsInToken bool `yaml:"skip_users_groups_in_token"`
+
+	EnableFavorites          bool   `yaml:"favorites"`
+	EnableProjectSpaces      bool   `yaml:"enable_project_spaces" env:"FRONTEND_ENABLE_PROJECT_SPACES" desc:"Indicates to clients that project spaces are supposed to be made available."`
+	EnableShareJail          bool   `yaml:"enable_share_jail" env:"FRONTEND_ENABLE_SHARE_JAIL" desc:"Indicates to clients that the share jail is supposed to be used."`
 	UploadMaxChunkSize       int    `yaml:"upload_max_chunk_size"`
 	UploadHTTPMethodOverride string `yaml:"upload_http_method_override"`
 	DefaultUploadProtocol    string `yaml:"default_upload_protocol"`
-	TransferSecret           string `yaml:"transfer_secret" env:"STORAGE_TRANSFER_SECRET"`
-	PublicURL                string `yaml:"public_url" env:"OCIS_URL;FRONTEND_PUBLIC_URL"`
 
-	Archiver    Archiver
-	AppProvider AppProvider
-	DataGateway DataGateway
-	OCS         OCS
-	AuthMachine AuthMachine
-	Checksums   Checksums
+	PublicURL string `yaml:"public_url" env:"OCIS_URL;FRONTEND_PUBLIC_URL"`
 
-	Middleware Middleware
+	Archiver    Archiver    `yaml:"archiver"`
+	AppProvider AppProvider `yaml:"app_provider"`
+	DataGateway DataGateway `yaml:"data_gateway"`
+	OCS         OCS         `yaml:"ocs"`
+	Checksums   Checksums   `yaml:"checksums"`
+
+	Middleware Middleware `yaml:"middleware"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;FRONTEND_TRACING_ENABLED" desc:"Activates tracing."`
@@ -72,25 +77,25 @@ type Middleware struct {
 
 // Auth configures reva http auth middleware.
 type Auth struct {
-	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agenr"`
+	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agent"`
 }
 
 type Archiver struct {
-	MaxNumFiles int64 `yaml:"max_num_files"`
-	MaxSize     int64 `yaml:"max_size"`
-	Prefix      string
-	Insecure    bool `env:"OCIS_INSECURE;FRONTEND_ARCHIVER_INSECURE"`
+	MaxNumFiles int64  `yaml:"max_num_files"`
+	MaxSize     int64  `yaml:"max_size"`
+	Prefix      string `yaml:"-"`
+	Insecure    bool   `yaml:"insecure" env:"OCIS_INSECURE;FRONTEND_ARCHIVER_INSECURE"`
 }
 
 type AppProvider struct {
 	ExternalAddr string `yaml:"external_addr"`
 	Driver       string `yaml:"driver"`
 	// WopiDriver   WopiDriver `yaml:"wopi_driver"`
-	AppsURL  string `yaml:"apps_url"`
-	OpenURL  string `yaml:"open_url"`
-	NewURL   string `yaml:"new_url"`
-	Prefix   string
-	Insecure bool `env:"OCIS_INSECURE;FRONTEND_APPPROVIDER_INSECURE"`
+	AppsURL  string `yaml:"-"`
+	OpenURL  string `yaml:"-"`
+	NewURL   string `yaml:"-"`
+	Prefix   string `yaml:"-"`
+	Insecure bool   `yaml:"insecure" env:"OCIS_INSECURE;FRONTEND_APPPROVIDER_INSECURE"`
 }
 
 type DataGateway struct {
@@ -118,10 +123,6 @@ type CBOXDriver struct {
 	DBPort     int
 	DBName     string
 	Namespace  string
-}
-
-type AuthMachine struct {
-	APIKey string `env:"OCIS_MACHINE_AUTH_API_KEY"`
 }
 
 type Checksums struct {

@@ -6,6 +6,13 @@ import (
 	"github.com/owncloud/ocis/extensions/graph/pkg/config"
 )
 
+func FullDefaultConfig() *config.Config {
+	cfg := DefaultConfig()
+	EnsureDefaults(cfg)
+	Sanitize(cfg)
+	return cfg
+}
+
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
@@ -20,11 +27,8 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "graph",
 		},
-		Reva: config.Reva{
+		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
-		},
-		TokenManager: config.TokenManager{
-			JWTSecret: "Pive-Fumkiu4",
 		},
 		Spaces: config.Spaces{
 			WebDavBase:   "https://localhost:9200",
@@ -38,7 +42,6 @@ func DefaultConfig() *config.Config {
 				URI:                      "ldaps://localhost:9235",
 				Insecure:                 true,
 				BindDN:                   "uid=libregraph,ou=sysusers,o=libregraph-idm",
-				BindPassword:             "idm",
 				UseServerUUID:            false,
 				WriteEnabled:             true,
 				UserBaseDN:               "ou=users,o=libregraph-idm",
@@ -88,6 +91,14 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
 	}
 }
 

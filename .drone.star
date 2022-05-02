@@ -18,7 +18,7 @@ OC_CI_NODEJS = "owncloudci/nodejs:%s"
 OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
 OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:latest"
-OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.5.0"
+OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.6.0"
 OC_SERVER = "owncloud/server:10"
 OC_UBUNTU = "owncloud/ubuntu:18.04"
 OSIXIA_OPEN_LDAP = "osixia/openldap:latest"
@@ -698,7 +698,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                 ocisServerWithAccounts(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() + [
+                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() + [
             {
                 "name": "webUITests",
                 "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
@@ -1654,7 +1654,7 @@ def ocisServerWithAccounts(storage, accounts_hash_difficulty = 4, volumes = [], 
         "IDP_LDAP_LOGIN_ATTRIBUTE": "uid",
         "PROXY_ACCOUNT_BACKEND_TYPE": "accounts",
         "OCS_ACCOUNT_BACKEND_TYPE": "accounts",
-        "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,idp,nats,accounts,glauth,ocdav",
+        "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,frontend,gateway,user,group,auth-basic,auth-bearer,auth-machine,storage-users,storage-shares,storage-publiclink,appprovider,sharing,proxy,idp,nats,accounts,glauth,ocdav",
         "OCIS_INSECURE": "true",
         "PROXY_ENABLE_BASIC_AUTH": "true",
         "IDP_INSECURE": "true",
@@ -1680,6 +1680,7 @@ def ocisServerWithAccounts(storage, accounts_hash_difficulty = 4, volumes = [], 
             "detach": True,
             "environment": environment,
             "commands": [
+                "ocis/bin/ocis init --insecure true",
                 "ocis/bin/ocis server",
             ],
             "volumes": volumes,
@@ -1700,8 +1701,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         user = "0:0"
         environment = {
             "OCIS_URL": "https://ocis-server:9200",
-            "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
-            "STORAGE_HOME_DRIVER": "%s" % (storage),
+            "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",  # cs3api-validator needs the cs3api gatway exposed
             "STORAGE_USERS_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
             "STORAGE_USERS_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/users",
@@ -1712,8 +1712,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "IDP_IDENTIFIER_REGISTRATION_CONF": "/drone/src/tests/config/drone/identifier-registration.yml",
             "OCIS_LOG_LEVEL": "error",
             "SETTINGS_DATA_PATH": "/srv/app/tmp/ocis/settings",
-            "OCIS_INSECURE": "true",
             "IDM_CREATE_DEMO_USERS": True,
+            "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
         }
         wait_for_ocis = {
             "name": "wait-for-ocis-server",
@@ -1782,24 +1782,16 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "SHARING_USER_SQL_HOST": "oc10-db",
             "SHARING_USER_SQL_PORT": 3306,
             "SHARING_USER_SQL_NAME": "owncloud",
-            # ownCloud storage readonly
-            # TODO: conflict with OWNCLOUDSQL -> https://github.com/owncloud/ocis/issues/2303
-            "OCIS_STORAGE_READ_ONLY": "false",
             # General oCIS config
             # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
-            "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,proxy,nats,ocdav",
+            "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,frontend,gateway,user,group,auth-basic,auth-bearer,auth-machine,storage-users,storage-shares,storage-publiclink,appprovider,sharing,proxy,nats,ocdav",
             "OCIS_LOG_LEVEL": "info",
             "OCIS_URL": OCIS_URL,
-            "PROXY_TLS": "true",
             "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",
             "OCIS_CONFIG_DIR": "/etc/ocis",
-            # change default secrets
-            "OCIS_JWT_SECRET": "Pive-Fumkiu4",
-            "STORAGE_TRANSFER_SECRET": "replace-me-with-a-transfer-secret",
-            "OCIS_MACHINE_AUTH_API_KEY": "change-me-please",
-            "OCIS_INSECURE": "true",
             "PROXY_ENABLE_BASIC_AUTH": "true",
             "IDM_CREATE_DEMO_USERS": True,
+            "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
         }
         wait_for_ocis = {
             "name": "wait-for-ocis-server",
@@ -1825,6 +1817,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "environment": environment,
             "user": user,
             "commands": [
+                "ocis/bin/ocis init --insecure true",
                 "ocis/bin/ocis server",
             ],
             "volumes": volumes,
@@ -1845,6 +1838,7 @@ def middlewareService():
             "REMOTE_UPLOAD_DIR": "/uploads",
             "NODE_TLS_REJECT_UNAUTHORIZED": "0",
             "MIDDLEWARE_HOST": "middleware",
+            "TEST_WITH_GRAPH_API": "true",
         },
         "volumes": [{
             "name": "uploads",

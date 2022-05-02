@@ -10,9 +10,8 @@ import (
 
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
-
 	EnsureDefaults(cfg)
-
+	Sanitize(cfg)
 	return cfg
 }
 
@@ -35,11 +34,12 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "storage-metadata",
 		},
-		GatewayEndpoint: "127.0.0.1:9142",
-		JWTSecret:       "Pive-Fumkiu4",
-		TempFolder:      filepath.Join(defaults.BaseDataPath(), "tmp", "metadata"),
-		DataServerURL:   "http://localhost:9216/data",
-		Driver:          "ocis",
+		Reva: &config.Reva{
+			Address: "127.0.0.1:9142",
+		},
+		TempFolder:    filepath.Join(defaults.BaseDataPath(), "tmp", "metadata"),
+		DataServerURL: "http://localhost:9216/data",
+		Driver:        "ocis",
 		Drivers: config.Drivers{
 			EOS: config.EOSDriver{
 				Root:                "/eos/dockertest/reva",
@@ -59,7 +59,7 @@ func DefaultConfig() *config.Config {
 				SecProtocol:         "",
 				Keytab:              "",
 				SingleUsername:      "",
-				GatewaySVC:          "127.0.0.1:9142",
+				GatewaySVC:          "127.0.0.1:9215",
 			},
 			Local: config.LocalDriver{
 				Root: filepath.Join(defaults.BaseDataPath(), "storage", "local", "metadata"),
@@ -71,12 +71,12 @@ func DefaultConfig() *config.Config {
 				Root:                filepath.Join(defaults.BaseDataPath(), "storage", "metadata"),
 				UserLayout:          "{{.Id.OpaqueId}}",
 				Region:              "default",
-				PermissionsEndpoint: "127.0.0.1:9191",
+				PermissionsEndpoint: "127.0.0.1:9215",
 			},
 			OCIS: config.OCISDriver{
 				Root:                filepath.Join(defaults.BaseDataPath(), "storage", "metadata"),
 				UserLayout:          "{{.Id.OpaqueId}}",
-				PermissionsEndpoint: "127.0.0.1:9191",
+				PermissionsEndpoint: "127.0.0.1:9215",
 			},
 		},
 	}
@@ -105,6 +105,31 @@ func EnsureDefaults(cfg *config.Config) {
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
 	}
+
+	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
+		cfg.Reva = &config.Reva{
+			Address: cfg.Commons.Reva.Address,
+		}
+	} else if cfg.Reva == nil {
+		cfg.Reva = &config.Reva{}
+	}
+
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
+	}
+
+	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	}
+
+	if cfg.MetadataUserID == "" && cfg.Commons != nil && cfg.Commons.MetadataUserID != "" {
+		cfg.MetadataUserID = cfg.Commons.MetadataUserID
+	}
+
 }
 
 func Sanitize(cfg *config.Config) {

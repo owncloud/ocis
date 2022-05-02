@@ -36,11 +36,6 @@ import (
 	webdav "github.com/owncloud/ocis/extensions/webdav/pkg/config"
 )
 
-// TokenManager is the config for using the reva token manager
-type TokenManager struct {
-	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET"`
-}
-
 const (
 	// SUPERVISED sets the runtime mode as supervised threads.
 	SUPERVISED = iota
@@ -62,22 +57,25 @@ type Runtime struct {
 type Config struct {
 	*shared.Commons `yaml:"shared"`
 
-	Tracing shared.Tracing `yaml:"tracing"`
-	Log     *shared.Log    `yaml:"log"`
+	Tracing *shared.Tracing `yaml:"tracing"`
+	Log     *shared.Log     `yaml:"log"`
 
 	Mode    Mode // DEPRECATED
 	File    string
 	OcisURL string `yaml:"ocis_url"`
 
-	Registry     string       `yaml:"registry"`
-	TokenManager TokenManager `yaml:"token_manager"`
-	Runtime      Runtime      `yaml:"runtime"`
+	Registry          string               `yaml:"registry"`
+	TokenManager      *shared.TokenManager `yaml:"token_manager"`
+	MachineAuthAPIKey string               `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY"`
+	TransferSecret    string               `yaml:"transfer_secret" env:"STORAGE_TRANSFER_SECRET"`
+	MetadataUserID    string               `yaml:"metadata_user_id"`
+	Runtime           Runtime              `yaml:"runtime"`
 
 	Audit             *audit.Config           `yaml:"audit"`
 	Accounts          *accounts.Config        `yaml:"accounts"`
 	GLAuth            *glauth.Config          `yaml:"glauth"`
 	Graph             *graph.Config           `yaml:"graph"`
-	GraphExplorer     *graphExplorer.Config   `yaml:"graph_explorer"`
+	GraphExplorer     *graphExplorer.Config   `yaml:"graph-explorer"`
 	IDP               *idp.Config             `yaml:"idp"`
 	IDM               *idm.Config             `yaml:"idm"`
 	Nats              *nats.Config            `yaml:"nats"`
@@ -88,17 +86,17 @@ type Config struct {
 	Settings          *settings.Config        `yaml:"settings"`
 	Gateway           *gateway.Config         `yaml:"gateway"`
 	Frontend          *frontend.Config        `yaml:"frontend"`
-	AuthBasic         *authbasic.Config       `yaml:"auth_basic"`
-	AuthBearer        *authbearer.Config      `yaml:"auth_bearer"`
-	AuthMachine       *authmachine.Config     `yaml:"auth_machine"`
+	AuthBasic         *authbasic.Config       `yaml:"auth-basic"`
+	AuthBearer        *authbearer.Config      `yaml:"auth-bearer"`
+	AuthMachine       *authmachine.Config     `yaml:"auth-machine"`
 	User              *user.Config            `yaml:"user"`
 	Group             *group.Config           `yaml:"group"`
-	AppProvider       *appprovider.Config     `yaml:"app_provider"`
+	AppProvider       *appprovider.Config     `yaml:"appprovider"`
 	Sharing           *sharing.Config         `yaml:"sharing"`
-	StorageMetadata   *storagemetadata.Config `yaml:"storage_metadata"`
-	StoragePublicLink *storagepublic.Config   `yaml:"storage_public"`
-	StorageUsers      *storageusers.Config    `yaml:"storage_users"`
-	StorageShares     *storageshares.Config   `yaml:"storage_shares"`
+	StorageMetadata   *storagemetadata.Config `yaml:"storage-metadata"`
+	StoragePublicLink *storagepublic.Config   `yaml:"storage-public"`
+	StorageUsers      *storageusers.Config    `yaml:"storage-users"`
+	StorageShares     *storageshares.Config   `yaml:"storage-shares"`
 	OCDav             *ocdav.Config           `yaml:"ocdav"`
 	Store             *store.Config           `yaml:"store"`
 	Thumbnails        *thumbnails.Config      `yaml:"thumbnails"`
