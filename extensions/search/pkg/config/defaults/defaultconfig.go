@@ -32,9 +32,6 @@ func DefaultConfig() *config.Config {
 		Reva: config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		TokenManager: config.TokenManager{
-			JWTSecret: "Pive-Fumkiu4",
-		},
 		Events: config.Events{
 			Endpoint:      "127.0.0.1:9233",
 			Cluster:       "ocis-cluster",
@@ -66,6 +63,10 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
 }
 
