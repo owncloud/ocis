@@ -99,6 +99,7 @@ The following sections list the changes for unreleased.
    for the ocis settings service, share and public share providers.
 
    https://github.com/owncloud/ocis/pull/3602
+   https://github.com/owncloud/ocis/pull/3647
 
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 
