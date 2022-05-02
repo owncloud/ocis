@@ -1710,7 +1710,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "PROXY_ENABLE_BASIC_AUTH": True,
             "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
             "IDP_IDENTIFIER_REGISTRATION_CONF": "/drone/src/tests/config/drone/identifier-registration.yml",
-            "OCIS_LOG_LEVEL": "debug",
+            "OCIS_LOG_LEVEL": "error",
             "SETTINGS_DATA_PATH": "/srv/app/tmp/ocis/settings",
             "IDM_CREATE_DEMO_USERS": True,
             "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
