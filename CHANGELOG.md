@@ -14,6 +14,7 @@ The following sections list the changes for unreleased.
 * Change - Reduce drives in graph /me/drives API: [#3629](https://github.com/owncloud/ocis/pull/3629)
 * Change - Switched default configuration to use libregraph/idm: [#3331](https://github.com/owncloud/ocis/pull/3331)
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
+* Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 * Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
@@ -90,6 +91,15 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/3603
    https://github.com/owncloud/ocis/pull/3606
 
+* Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
+
+   We wrapped the metadata storage in a minimal reva instance with a dedicated gateway, including
+   static storage registry, static auth registry, in memory userprovider, machine
+   authprovider and demo permissions service. This allows us to preconfigure the service user
+   for the ocis settings service, share and public share providers.
+
+   https://github.com/owncloud/ocis/pull/3602
+
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 
    It is now possible to share a single file by link with edit permissions. Therefore we need a
@@ -124,6 +134,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/3552
    https://github.com/owncloud/ocis/pull/3570
    https://github.com/owncloud/ocis/pull/3601
+   https://github.com/owncloud/ocis/pull/3602
    https://github.com/owncloud/ocis/pull/3605
    https://github.com/owncloud/ocis/pull/3611
    https://github.com/owncloud/ocis/pull/3637
