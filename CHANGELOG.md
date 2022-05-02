@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Change - Switched default configuration to use libregraph/idm: [#3331](https://github.com/owncloud/ocis/pull/3331)
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
+* Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 * Enhancement - Update reva to v2.x.x: [#3552](https://github.com/owncloud/ocis/pull/3552)
 
@@ -98,6 +99,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/web/pull/6787
    https://github.com/owncloud/ocis/pull/3538
 
+* Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
+
+   We've added feature flags to the `spaces` capability to indicate to clients which features are
+   supposed to be shown to users.
+
+   https://github.com/owncloud/ocis/pull/3626
+
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 
    We have updated the capabilities regarding password enforcement and expiration dates of
@@ -112,12 +120,13 @@ The following sections list the changes for unreleased.
 
   * TODO
 
+   https://github.com/owncloud/ocis/issues/3621
    https://github.com/owncloud/ocis/pull/3552
    https://github.com/owncloud/ocis/pull/3570
    https://github.com/owncloud/ocis/pull/3601
    https://github.com/owncloud/ocis/pull/3605
    https://github.com/owncloud/ocis/pull/3611
-   https://github.com/owncloud/ocis/pull/3621
+   https://github.com/owncloud/ocis/pull/3637
 # Changelog for [1.20.0] (2022-04-13)
 
 The following sections list the changes for 1.20.0.
