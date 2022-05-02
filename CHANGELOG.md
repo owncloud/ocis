@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Change - Introduce `ocis init` and remove all default secrets: [#3551](https://github.com/owncloud/ocis/pull/3551)
 * Change - Reduce drives in graph /me/drives API: [#3629](https://github.com/owncloud/ocis/pull/3629)
 * Change - Switched default configuration to use libregraph/idm: [#3331](https://github.com/owncloud/ocis/pull/3331)
+* Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 * Enhancement - Update reva to v2.x.x: [#3552](https://github.com/owncloud/ocis/pull/3552)
@@ -80,6 +81,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3331
    https://github.com/owncloud/ocis/pull/3633
+
+* Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
+
+   We now reflect the configured service names when listing them in the ocis runtime
+
+   https://github.com/owncloud/ocis/issues/3603
+   https://github.com/owncloud/ocis/pull/3606
 
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 
