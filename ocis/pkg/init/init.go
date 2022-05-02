@@ -104,12 +104,12 @@ type OcisConfig struct {
 	Idm               IdmExtension
 	Proxy             InsecureProxyExtension
 	Frontend          FrontendExtension
-	AuthBasic         AuthbasicExtension  `yaml:"auth_basic"`
-	AuthBearer        AuthbearerExtension `yaml:"auth_bearer"`
+	AuthBasic         AuthbasicExtension  `yaml:"auth-basic"`
+	AuthBearer        AuthbearerExtension `yaml:"auth-bearer"`
 	User              UserAndGroupExtension
 	Group             UserAndGroupExtension
-	StorageMetadata   DataProviderInsecureSettings `yaml:"storage_metadata"`
-	StorageUsers      DataProviderInsecureSettings `yaml:"storage_users"`
+	StorageMetadata   DataProviderInsecureSettings `yaml:"storage-metadata"`
+	StorageUsers      DataProviderInsecureSettings `yaml:"storage-users"`
 	Ocdav             InsecureExtension
 	Thumbnails        ThumbNailExtension
 }
