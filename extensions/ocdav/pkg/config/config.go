@@ -20,16 +20,16 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"-"`
 
-	WebdavNamespace string `yaml:"webdav_namespace"`
-	FilesNamespace  string `yaml:"files_namespace"`
-	SharesNamespace string `yaml:"shares_namespace"`
+	WebdavNamespace string `yaml:"webdav_namespace" env:"OCDVAV_WEBDAV_NAMESPACE"`
+	FilesNamespace  string `yaml:"files_namespace" env:"OCDAV_FILES_NAMESPACE"`
+	SharesNamespace string `yaml:"shares_namespace" env:"OCDAV_SHARES_NAMESPACE"`
 	// PublicURL used to redirect /s/{token} URLs to
 	PublicURL string `yaml:"public_url" env:"OCIS_URL;OCDAV_PUBLIC_URL"`
 
 	// Insecure certificates allowed when making requests to the gateway
 	Insecure bool `yaml:"insecure" env:"OCIS_INSECURE;OCDAV_INSECURE"`
 	// Timeout in seconds when making requests to the gateway
-	Timeout    int64      `yaml:"timeout"`
+	Timeout    int64      `yaml:"gateway_request_timeout" env:"OCDAV_GATEWAY_REQUEST_TIMEOUT"`
 	Middleware Middleware `yaml:"middleware"`
 
 	Context context.Context `yaml:"-"`
@@ -63,7 +63,7 @@ type HTTPConfig struct {
 	Addr      string `yaml:"addr" env:"OCDAV_HTTP_ADDR" desc:"The address of the http service."`
 	Namespace string `yaml:"-"`
 	Protocol  string `yaml:"protocol" env:"OCDAV_HTTP_PROTOCOL" desc:"The transport protocol of the http service."`
-	Prefix    string `yaml:"prefix"`
+	Prefix    string `yaml:"prefix" env:"OCDAV_HTTP_PREFIX"`
 }
 
 // Middleware configures reva middlewares.
@@ -73,5 +73,5 @@ type Middleware struct {
 
 // Auth configures reva http auth middleware.
 type Auth struct {
-	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agenr"`
+	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agent"`
 }
