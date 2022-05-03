@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -152,7 +153,16 @@ func (p *Provider) statResource(ref *provider.Reference, owner *user.User) (*pro
 	ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token)
 
 	// Stat changed resource resource
-	return p.gwClient.Stat(ownerCtx, &provider.StatRequest{Ref: ref})
+	res, err := p.gwClient.Stat(ownerCtx, &provider.StatRequest{Ref: ref})
+	if res.Status.GetCode() != rpc.Code_CODE_OK {
+		// experimental change
+		// theory: this stat call comes earlier then the actual storage space has updated its parents
+		// if so, it should succeed after retry
+		time.Sleep(200 * time.Millisecond)
+		res, err = p.gwClient.Stat(ownerCtx, &provider.StatRequest{Ref: ref})
+
+	}
+	return res, err
 }
 
 func (p *Provider) logDocCount() {
