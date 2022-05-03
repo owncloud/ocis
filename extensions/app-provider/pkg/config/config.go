@@ -23,7 +23,7 @@ type Config struct {
 	Drivers      Drivers `yaml:"drivers"`
 
 	Supervised bool            `yaml:"-"`
-	Context context.Context `yaml:"-"`
+	Context    context.Context `yaml:"-"`
 }
 
 type Tracing struct {

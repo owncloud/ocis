@@ -44,8 +44,8 @@ config = {
     "modules": [
         # if you add a module here please also add it to the root level Makefile
         "extensions/accounts",
+        "extensions/app-provider",
         "extensions/app-registry",
-        "extensions/appprovider",
         "extensions/audit",
         "extensions/auth-basic",
         "extensions/auth-bearer",
@@ -1721,7 +1721,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "SHARING_USER_OWNCLOUDSQL_DB_NAME": "owncloud",
             # General oCIS config
             # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
-            "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,frontend,gateway,user,group,auth-basic,auth-bearer,auth-machine,storage-users,storage-shares,storage-publiclink,appprovider,sharing,proxy,nats,ocdav",
+            "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,frontend,gateway,user,group,auth-basic,auth-bearer,auth-machine,storage-users,storage-shares,storage-publiclink,app-provider,sharing,proxy,nats,ocdav",
             "OCIS_LOG_LEVEL": "info",
             "OCIS_URL": OCIS_URL,
             "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",
