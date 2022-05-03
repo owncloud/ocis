@@ -500,16 +500,10 @@ func DefaultRoleAssignments() []*settingsmsg.UserRoleAssignment {
 	return []*settingsmsg.UserRoleAssignment{
 		// default admin users
 		{
-			AccountUuid: "058bff95-6708-4fe5-91e4-9ea3d377588b",
+			AccountUuid: "058bff95-6708-4fe5-91e4-9ea3d377588b", // demo user "moss"
 			RoleId:      BundleUUIDRoleAdmin,
 		}, {
 			AccountUuid: "ddc2004c-0977-11eb-9d3f-a793888cd0f8",
-			RoleId:      BundleUUIDRoleAdmin,
-		}, {
-			AccountUuid: "820ba2a1-3f54-4538-80a4-2d73007e30bf",
-			RoleId:      BundleUUIDRoleAdmin,
-		}, {
-			AccountUuid: "bc596f3c-c955-4328-80a0-60d018b4ad57",
 			RoleId:      BundleUUIDRoleAdmin,
 		},
 		// default users with role "user"
