@@ -17,7 +17,7 @@ Feel free to "reserve" a free port range when you're developing an extension by 
 
 If you're developing a non-public extension, we recommend using ports outside of the ranges listed below.
 
-We also suggest to use the last port in your extensions' range as a debug/metrics port.****
+We also suggest to use the last port in your extensions' range as a debug/metrics port.
 
 
 ## Allocations
