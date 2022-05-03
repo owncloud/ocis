@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"io"
 	"net/http"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -52,7 +53,9 @@ func NewService(opts ...Option) (Service, error) {
 	conf := options.Config
 
 	m := chi.NewMux()
-	chi.RegisterMethod("REPORT")
+	// Comment back in after resolving the issue in go-chi.
+	// See comment in line 82.
+	// chi.RegisterMethod("REPORT")
 	m.Use(options.Middleware...)
 
 	gwc, err := pool.GetGatewayServiceClient(conf.RevaGateway)
@@ -75,7 +78,22 @@ func NewService(opts ...Option) (Service, error) {
 		r.Get("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnail)
 		r.Head("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnailHead)
 
-		r.MethodFunc("REPORT", "/remote.php/dav/files/{id}/*", svc.Search)
+		// r.MethodFunc("REPORT", "/remote.php/dav/files/{id}/*", svc.Search)
+
+		// This is a workaround for the go-chi concurrent map read write issue.
+		// After the issue has been solved upstream in go-chi we should switch
+		// back to using `chi.RegisterMethod`.
+		m.MethodNotAllowed(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			routePrefix := path.Join(options.Config.HTTP.Root, "/remote.php/dav/files/")
+			if req.Method == "REPORT" && strings.HasPrefix(req.URL.Path, routePrefix) {
+				// The URLParam will not be available here. If it is needed it
+				// needs to be passed manually or chi needs to be fixed
+				// To use it properly.
+				svc.Search(w, req)
+				return
+			}
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}))
 	})
 
 	return svc, nil
