@@ -41,7 +41,7 @@ func DefaultConfig() *config.Config {
 
 		FrontendPublicURL: "https://localhost:9200",
 
-		AppRegistryEndpoint:       "localhost:9222",
+		AppRegistryEndpoint:       "localhost:9242",
 		AuthBasicEndpoint:         "localhost:9146",
 		AuthBearerEndpoint:        "localhost:9148",
 		AuthMachineEndpoint:       "localhost:9166",
