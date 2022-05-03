@@ -12,7 +12,7 @@ import (
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/utils/resourceid"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/extensions/graph/pkg/service/v0/errorcode"
@@ -113,7 +113,7 @@ func (g Graph) getRemoteItem(ctx context.Context, root *storageprovider.Resource
 		return nil, err
 	}
 
-	item.WebDavUrl = libregraph.PtrString(baseURL.String() + resourceid.OwnCloudResourceIDWrap(root))
+	item.WebDavUrl = libregraph.PtrString(baseURL.String() + storagespace.FormatResourceID(*root))
 	return item, nil
 }
 
@@ -139,7 +139,7 @@ func cs3ResourceToDriveItem(res *storageprovider.ResourceInfo) (*libregraph.Driv
 	*size = int64(res.Size) // TODO lurking overflow: make size of libregraph drive item use uint64
 
 	driveItem := &libregraph.DriveItem{
-		Id:   libregraph.PtrString(resourceid.OwnCloudResourceIDWrap(res.Id)),
+		Id:   libregraph.PtrString(storagespace.FormatResourceID(*res.Id)),
 		Size: size,
 	}
 
@@ -170,7 +170,7 @@ func cs3ResourceToRemoteItem(res *storageprovider.ResourceInfo) (*libregraph.Rem
 	*size = int64(res.Size) // TODO lurking overflow: make size of libregraph drive item use uint64
 
 	remoteItem := &libregraph.RemoteItem{
-		Id:   libregraph.PtrString(resourceid.OwnCloudResourceIDWrap(res.Id)),
+		Id:   libregraph.PtrString(storagespace.FormatResourceID(*res.Id)),
 		Size: size,
 	}
 
@@ -219,7 +219,8 @@ func (g Graph) GetExtendedSpaceProperties(ctx context.Context, baseURL *url.URL,
 
 	for _, itemName := range names {
 		if itemID, ok := metadata[itemName]; ok {
-			spaceItem := g.getSpecialDriveItem(ctx, *resourceid.OwnCloudResourceIDUnwrap(string(itemID.Value)), itemName, baseURL, space)
+			rid, _ := storagespace.ParseID(string(itemID.Value))
+			spaceItem := g.getSpecialDriveItem(ctx, rid, itemName, baseURL, space)
 			if spaceItem != nil {
 				spaceItems = append(spaceItems, *spaceItem)
 			}

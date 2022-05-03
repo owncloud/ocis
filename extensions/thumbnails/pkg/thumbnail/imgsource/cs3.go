@@ -13,6 +13,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rhttp"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/metadata"
@@ -45,16 +46,11 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	}
 	var ref *provider.Reference
 	if strings.Contains(path, "!") {
-		parts := strings.Split(path, "!")
-		spaceID, path := parts[0], parts[1]
-		ref = &provider.Reference{
-			ResourceId: &provider.ResourceId{
-				StorageId: spaceID,
-				OpaqueId:  spaceID,
-			},
-			// Spaces requests need relative paths.
-			Path: "." + path,
+		parsed, err := storagespace.ParseReference(path)
+		if err != nil {
+			return nil, err
 		}
+		ref = &parsed
 	} else {
 		ref = &provider.Reference{
 			Path: path,
