@@ -30,12 +30,8 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		AuthProvider: config.AuthProvider{
-			GatewayEndpoint: "127.0.0.1:9142",
-		},
 		StorageProvider: config.StorageProvider{
-			MountID:         "7993447f-687f-490d-875c-ac95e89a62a4",
-			GatewayEndpoint: "127.0.0.1:9142",
+			MountID: "7993447f-687f-490d-875c-ac95e89a62a4",
 		},
 	}
 }
