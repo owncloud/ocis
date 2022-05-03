@@ -23,13 +23,13 @@ type Config struct {
 
 	Driver               string  `yaml:"driver" env:"STORAGE_USERS_DRIVER" desc:"The storage driver which should be used by the service"`
 	Drivers              Drivers `yaml:"drivers"`
-	DataServerURL        string  `yaml:"data_server_url"`
-	TempFolder           string  `yaml:"temp_folder"`
+	DataServerURL        string  `yaml:"data_server_url" env:"STORAGE_USERS_DATA_SERVER_URL"`
+	TempFolder           string  `yaml:"temp_folder" env:"STORAGE_USERS_TEMP_FOLDER"`
 	DataProviderInsecure bool    `yaml:"data_provider_insecure" env:"OCIS_INSECURE;STORAGE_USERS_DATAPROVIDER_INSECURE"`
 	Events               Events  `yaml:"events"`
-	MountID              string  `yaml:"mount_id"`
-	ExposeDataServer     bool    `yaml:"expose_data_server"`
-	ReadOnly             bool    `yaml:"readonly"`
+	MountID              string  `yaml:"mount_id" env:"STORAGE_USERS_MOUNT_ID"`
+	ExposeDataServer     bool    `yaml:"expose_data_server" env:"STORAGE_USERS_EXPOSE_DATA_SERVER"`
+	ReadOnly             bool    `yaml:"readonly" env:"STORAGE_USERS_READ_ONLY"`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
@@ -73,14 +73,78 @@ type HTTPConfig struct {
 }
 
 type Drivers struct {
-	EOS         EOSDriver   `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
-	Local       LocalDriver `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
-	OCIS        OCISDriver
-	S3          S3Driver `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
-	S3NG        S3NGDriver
-	OwnCloudSQL OwnCloudSQLDriver
+	OCIS        OCISDriver        `yaml:"ocis"`
+	S3NG        S3NGDriver        `yaml:"s3ng"`
+	OwnCloudSQL OwnCloudSQLDriver `yaml:"owncloud_sql"`
+
+	S3    S3Driver    `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
+	EOS   EOSDriver   `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
+	Local LocalDriver `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
 
+type OCISDriver struct {
+	// Root is the absolute path to the location of the data
+	Root                string `yaml:"root" env:"STORAGE_USERS_OCIS_ROOT"`
+	UserLayout          string `yaml:"user_layout" env:"STORAGE_USERS_OCIS_USER_LAYOUT"`
+	PermissionsEndpoint string `yaml:"permissions_endpoint" env:"STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT"`
+	// PersonalSpaceAliasTemplate  contains the template used to construct
+	// the personal space alias, eg: `"{{.SpaceType}}/{{.User.Username | lower}}"`
+	PersonalSpaceAliasTemplate string `yaml:"personalspacealias_template" env:"STORAGE_USERS_OCIS_PERSONAL_SPACE_ALIAS_TEMPLATE"`
+	// GeneralSpaceAliasTemplate contains the template used to construct
+	// the general space alias, eg: `{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}`
+	GeneralSpaceAliasTemplate string `yaml:"generalspacealias_template" env:"STORAGE_USERS_OCIS_GENERAL_SPACE_ALIAS_TEMPLATE"`
+	//ShareFolder defines the name of the folder jailing all shares
+	ShareFolder string `yaml:"share_folder" env:"STORAGE_USERS_OCIS_SHARE_FOLDER"`
+}
+
+type S3NGDriver struct {
+	// Root is the absolute path to the location of the data
+	Root                string `yaml:"root" env:"STORAGE_USERS_S3NG_ROOT"`
+	UserLayout          string `yaml:"user_layout" env:"STORAGE_USERS_S3NG_USER_LAYOUT"`
+	PermissionsEndpoint string `yaml:"permissions_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_S3NG_USERS_PROVIDER_ENDPOINT"`
+	Region              string `yaml:"region" env:"STORAGE_USERS_S3NG_REGION"`
+	AccessKey           string `yaml:"access_key" env:"STORAGE_USERS_S3NG_ACCESS_KEY"`
+	SecretKey           string `yaml:"secret_key" env:"STORAGE_USERS_S3NG_SECRET_KEY"`
+	Endpoint            string `yaml:"endpoint" env:"STORAGE_USERS_S3NG_ENDPOINT"`
+	Bucket              string `yaml:"bucket" env:"STORAGE_USERS_S3NG_BUCKET"`
+	// PersonalSpaceAliasTemplate  contains the template used to construct
+	// the personal space alias, eg: `"{{.SpaceType}}/{{.User.Username | lower}}"`
+	PersonalSpaceAliasTemplate string `yaml:"personalspacealias_template" env:"STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE"`
+	// GeneralSpaceAliasTemplate contains the template used to construct
+	// the general space alias, eg: `{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}`
+	GeneralSpaceAliasTemplate string `yaml:"generalspacealias_template" env:"STORAGE_USERS_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE"`
+	//ShareFolder defines the name of the folder jailing all shares
+	ShareFolder string `yaml:"share_folder" env:"STORAGE_USERS_S3NG_SHARE_FOLDER"`
+}
+
+type OwnCloudSQLDriver struct {
+	// Root is the absolute path to the location of the data
+	Root string `yaml:"root" env:"STORAGE_USERS_OWNCLOUDSQL_DATADIR"`
+	//ShareFolder defines the name of the folder jailing all shares
+	ShareFolder           string `yaml:"share_folder" env:"STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER"`
+	UserLayout            string `env:"STORAGE_USERS_OWNCLOUDSQL_LAYOUT"`
+	UploadInfoDir         string `yaml:"upload_info_dir" env:"STORAGE_USERS_UPLOADINFO_DIR"`
+	DBUsername            string `yaml:"db_username" env:"STORAGE_USERS_OWNCLOUDSQL_DB_USERNAME"`
+	DBPassword            string `yaml:"db_password" env:"STORAGE_USERS_OWNCLOUDSQL_DB_PASSWORD"`
+	DBHost                string `yaml:"db_host" env:"STORAGE_USERS_OWNCLOUDSQL_DB_HOST"`
+	DBPort                int    `yaml:"db_port" env:"STORAGE_USERS_OWNCLOUDSQL_DB_PORT"`
+	DBName                string `yaml:"db_name" env:"STORAGE_USERS_OWNCLOUDSQL_DB_NAME"`
+	UsersProviderEndpoint string `yaml:"users_provider_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT"`
+}
+
+type Events struct {
+	Addr      string `yaml:"endpoint" env:"STORAGE_USERS_EVENTS_ENDPOINT" desc:"the address of the streaming service"`
+	ClusterID string `yaml:"cluster" env:"STORAGE_USERS_EVENTS_CLUSTER" desc:"the clusterID of the streaming service. Mandatory when using nats"`
+}
+type S3Driver struct {
+	// Root is the absolute path to the location of the data
+	Root      string `yaml:"root"`
+	Region    string `yaml:"region"`
+	AccessKey string `yaml:"access_key"`
+	SecretKey string `yaml:"secret_key"`
+	Endpoint  string `yaml:"endpoint"`
+	Bucket    string `yaml:"bucket"`
+}
 type EOSDriver struct {
 	// Root is the absolute path to the location of the data
 	Root string `yaml:"root"`
@@ -129,73 +193,8 @@ type EOSDriver struct {
 
 type LocalDriver struct {
 	// Root is the absolute path to the location of the data
-	Root string `yaml:"root" env:"STORAGE_USERS_LOCAL_ROOT"`
+	Root string `yaml:"root"`
 	//ShareFolder defines the name of the folder jailing all shares
 	ShareFolder string `yaml:"share_folder"`
-	UserLayout  string
-}
-
-type OCISDriver struct {
-	// Root is the absolute path to the location of the data
-	Root                string `yaml:"root" env:"STORAGE_USERS_OCIS_ROOT"`
-	UserLayout          string
-	PermissionsEndpoint string
-	// PersonalSpaceAliasTemplate  contains the template used to construct
-	// the personal space alias, eg: `"{{.SpaceType}}/{{.User.Username | lower}}"`
-	PersonalSpaceAliasTemplate string `yaml:"personalspacealias_template"`
-	// GeneralSpaceAliasTemplate contains the template used to construct
-	// the general space alias, eg: `{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}`
-	GeneralSpaceAliasTemplate string `yaml:"generalspacealias_template"`
-	//ShareFolder defines the name of the folder jailing all shares
-	ShareFolder string `yaml:"share_folder"`
-}
-
-type S3Driver struct {
-	// Root is the absolute path to the location of the data
-	Root      string `yaml:"root"`
-	Region    string `yaml:"region"`
-	AccessKey string `yaml:"access_key"`
-	SecretKey string `yaml:"secret_key"`
-	Endpoint  string `yaml:"endpoint"`
-	Bucket    string `yaml:"bucket"`
-}
-
-type S3NGDriver struct {
-	// Root is the absolute path to the location of the data
-	Root                string `yaml:"root"`
-	UserLayout          string
-	PermissionsEndpoint string
-	Region              string `yaml:"region"`
-	AccessKey           string `yaml:"access_key"`
-	SecretKey           string `yaml:"secret_key"`
-	Endpoint            string `yaml:"endpoint"`
-	Bucket              string `yaml:"bucket"`
-	// PersonalSpaceAliasTemplate  contains the template used to construct
-	// the personal space alias, eg: `"{{.SpaceType}}/{{.User.Username | lower}}"`
-	PersonalSpaceAliasTemplate string `yaml:"personalspacealias_template"`
-	// GeneralSpaceAliasTemplate contains the template used to construct
-	// the general space alias, eg: `{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}`
-	GeneralSpaceAliasTemplate string `yaml:"generalspacealias_template"`
-	//ShareFolder defines the name of the folder jailing all shares
-	ShareFolder string `yaml:"share_folder"`
-}
-
-type OwnCloudSQLDriver struct {
-	// Root is the absolute path to the location of the data
-	Root string `yaml:"root" env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DATADIR"`
-	//ShareFolder defines the name of the folder jailing all shares
-	ShareFolder           string `yaml:"share_folder" env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_SHARE_FOLDER"`
-	UserLayout            string `env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_LAYOUT"`
-	UploadInfoDir         string `yaml:"upload_info_dir" env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_UPLOADINFO_DIR"`
-	DBUsername            string `yaml:"db_username" env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBUSERNAME"`
-	DBPassword            string `yaml:"db_password" env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBPASSWORD"`
-	DBHost                string `yaml:"db_host" env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBHOST"`
-	DBPort                int    `yaml:"db_port" env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBPORT"`
-	DBName                string `yaml:"db_name" env:"STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBNAME"`
-	UsersProviderEndpoint string
-}
-
-type Events struct {
-	Addr      string
-	ClusterID string
+	UserLayout  string `yaml:"user_layout"`
 }

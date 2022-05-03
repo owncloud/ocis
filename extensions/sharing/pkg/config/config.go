@@ -119,6 +119,6 @@ type PublicSharingCS3Driver struct {
 }
 
 type Events struct {
-	Addr      string `yaml:"addr" env:"SHARING_EVENTS_ADDR"`
-	ClusterID string `yaml:"cluster_id" env:"SHARING_EVENTS_CLUSTER_ID"`
+	Addr      string `yaml:"endpoint" env:"SHARING_EVENTS_ENDPOINT" desc:"the address of the streaming service"`
+	ClusterID string `yaml:"cluster" env:"SHARING_EVENTS_CLUSTER" desc:"the clusterID of the streaming service. Mandatory when using nats"`
 }
