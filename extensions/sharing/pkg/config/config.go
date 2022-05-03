@@ -18,12 +18,13 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool                 `yaml:"skip_user_groups_in_token"`
-	UserSharingDriver     string               `yaml:"user_sharing_driver"`
-	UserSharingDrivers    UserSharingDrivers   `yaml:"user_sharin_drivers"`
-	PublicSharingDriver   string               `yaml:"public_sharing_driver"`
-	PublicSharingDrivers  PublicSharingDrivers `yaml:"public_sharing_drivers"`
-	Events                Events               `yaml:"events"`
+	SkipUserGroupsInToken bool `yaml:"-"`
+
+	UserSharingDriver    string               `yaml:"user_sharing_driver"`
+	UserSharingDrivers   UserSharingDrivers   `yaml:"user_sharin_drivers"`
+	PublicSharingDriver  string               `yaml:"public_sharing_driver"`
+	PublicSharingDrivers PublicSharingDrivers `yaml:"public_sharing_drivers"`
+	Events               Events               `yaml:"events"`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`

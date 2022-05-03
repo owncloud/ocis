@@ -18,7 +18,8 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken       bool    `yaml:"skip_user_groups_in_token"`
+	SkipUserGroupsInToken bool `yaml:"-"`
+
 	GroupMembersCacheExpiration int     `yaml:"group_members_cache_expiration"`
 	Driver                      string  `yaml:"driver"`
 	Drivers                     Drivers `yaml:"drivers"`

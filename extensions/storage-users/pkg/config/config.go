@@ -19,16 +19,17 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token"`
-	Driver                string  `yaml:"driver" env:"STORAGE_USERS_DRIVER" desc:"The storage driver which should be used by the service"`
-	Drivers               Drivers `yaml:"drivers"`
-	DataServerURL         string  `yaml:"data_server_url"`
-	TempFolder            string  `yaml:"temp_folder"`
-	DataProviderInsecure  bool    `yaml:"data_provider_insecure" env:"OCIS_INSECURE;STORAGE_USERS_DATAPROVIDER_INSECURE"`
-	Events                Events  `yaml:"events"`
-	MountID               string  `yaml:"mount_id"`
-	ExposeDataServer      bool    `yaml:"expose_data_server"`
-	ReadOnly              bool    `yaml:"readonly"`
+	SkipUserGroupsInToken bool `yaml:"-"`
+
+	Driver               string  `yaml:"driver" env:"STORAGE_USERS_DRIVER" desc:"The storage driver which should be used by the service"`
+	Drivers              Drivers `yaml:"drivers"`
+	DataServerURL        string  `yaml:"data_server_url"`
+	TempFolder           string  `yaml:"temp_folder"`
+	DataProviderInsecure bool    `yaml:"data_provider_insecure" env:"OCIS_INSECURE;STORAGE_USERS_DATAPROVIDER_INSECURE"`
+	Events               Events  `yaml:"events"`
+	MountID              string  `yaml:"mount_id"`
+	ExposeDataServer     bool    `yaml:"expose_data_server"`
+	ReadOnly             bool    `yaml:"readonly"`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`

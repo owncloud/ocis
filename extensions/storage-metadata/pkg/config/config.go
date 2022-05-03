@@ -21,12 +21,13 @@ type Config struct {
 	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"STORAGE_METADATA_MACHINE_AUTH_API_KEY"`
 	MetadataUserID    string        `yaml:"metadata_user_id"`
 
-	SkipUserGroupsInToken bool    `yaml:"skip_user_groups_in_token"`
-	Driver                string  `yaml:"driver" env:"STORAGE_METADATA_DRIVER" desc:"The driver which should be used by the service"`
-	Drivers               Drivers `yaml:"drivers"`
-	DataServerURL         string  `yaml:"data_server_url"`
-	TempFolder            string  `yaml:"temp_folder"`
-	DataProviderInsecure  bool    `yaml:"data_provider_insecure" env:"OCIS_INSECURE;STORAGE_METADATA_DATAPROVIDER_INSECURE"`
+	SkipUserGroupsInToken bool `yaml:"-"`
+
+	Driver               string  `yaml:"driver" env:"STORAGE_METADATA_DRIVER" desc:"The driver which should be used by the service"`
+	Drivers              Drivers `yaml:"drivers"`
+	DataServerURL        string  `yaml:"data_server_url"`
+	TempFolder           string  `yaml:"temp_folder"`
+	DataProviderInsecure bool    `yaml:"data_provider_insecure" env:"OCIS_INSECURE;STORAGE_METADATA_DATAPROVIDER_INSECURE"`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`

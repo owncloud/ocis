@@ -42,10 +42,6 @@ func DefaultConfig() *config.Config {
 			SupportedTypes:      []string{"sha1", "md5", "adler32"},
 			PreferredUploadType: "",
 		},
-		AppProvider: config.AppProvider{
-			Prefix:   "",
-			Insecure: false,
-		},
 		Archiver: config.Archiver{
 			Insecure:    false,
 			Prefix:      "archiver",
@@ -59,7 +55,6 @@ func DefaultConfig() *config.Config {
 			Prefix:                  "ocs",
 			SharePrefix:             "/Shares",
 			HomeNamespace:           "/users/{{.Id.OpaqueId}}",
-			CacheWarmupDriver:       "",
 			AdditionalInfoAttribute: "{{.Mail}}",
 			ResourceInfoCacheTTL:    0,
 		},

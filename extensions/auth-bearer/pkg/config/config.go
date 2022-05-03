@@ -18,8 +18,9 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token"`
-	OIDC                  OIDC `yaml:"oidc"`
+	SkipUserGroupsInToken bool `yaml:"-"`
+
+	OIDC OIDC `yaml:"oidc"`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`

@@ -18,8 +18,9 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool   `yaml:"skip_user_groups_in_token"`
-	MachineAuthAPIKey     string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;AUTH_MACHINE_API_KEY"`
+	SkipUserGroupsInToken bool `yaml:"-"`
+
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;AUTH_MACHINE_API_KEY"`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
