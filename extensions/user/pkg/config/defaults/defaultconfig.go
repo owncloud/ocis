@@ -78,9 +78,6 @@ func DefaultConfig() *config.Config {
 				JoinOwnCloudUUID:   false,
 				EnableMedialSearch: false,
 			},
-			REST: config.RESTProvider{
-				RedisAddr: "localhost:6379",
-			},
 		},
 	}
 }
