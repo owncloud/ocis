@@ -10,20 +10,21 @@ type Config struct {
 	*shared.Commons `yaml:"-"`
 	Service         Service  `yaml:"-"`
 	Tracing         *Tracing `yaml:"tracing"`
-	Logging         *Logging `yaml:"log"`
+	Log             *Log     `yaml:"log"`
 	Debug           Debug    `yaml:"debug"`
-	Supervised      bool     `yaml:"-"`
 
 	GRPC GRPCConfig `yaml:"grpc"`
-	HTTP HTTPConfig `yaml:"http"`
 
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	Context                context.Context `yaml:"context"`
-	SkipUserGroupsInToken  bool            `yaml:"skip_user_groups_in_token"`
-	ReadOnly               bool            `yaml:"readonly"`
-	SharesProviderEndpoint string          `yaml:"shares_provider_endpoint"`
+	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_SHARES_SKIP_USER_GROUPS_IN_TOKEN"`
+
+	ReadOnly               bool   `yaml:"readonly" env:"STORAGE_SHARES_READ_ONLY"`
+	SharesProviderEndpoint string `yaml:"user_share_provider_endpoint" env:"STORAGE_SHARES_USER_SHARE_PROVIDER_ENDPOINT"`
+
+	Supervised bool            `yaml:"-"`
+	Context    context.Context `yaml:"-"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;STORAGE_SHARES_TRACING_ENABLED" desc:"Activates tracing."`
@@ -32,7 +33,7 @@ type Tracing struct {
 	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;STORAGE_SHARES_TRACING_COLLECTOR"`
 }
 
-type Logging struct {
+type Log struct {
 	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;STORAGE_SHARES_LOG_LEVEL" desc:"The log level."`
 	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;STORAGE_SHARES_LOG_PRETTY" desc:"Activates pretty log output."`
 	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR;STORAGE_SHARES_LOG_COLOR" desc:"Activates colorized log output."`
@@ -51,11 +52,7 @@ type Debug struct {
 }
 
 type GRPCConfig struct {
-	Addr     string `yaml:"addr" env:"STORAGE_SHARES_GRPC_ADDR" desc:"The address of the grpc service."`
-	Protocol string `yaml:"protocol" env:"STORAGE_SHARES_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
-}
-
-type HTTPConfig struct {
-	Addr     string `yaml:"addr" env:"STORAGE_SHARES_HTTP_ADDR" desc:"The address of the grpc service."`
-	Protocol string `yaml:"protocol" env:"STORAGE_SHARES_HTTP_PROTOCOL" desc:"The transport protocol of the grpc service."`
+	Addr      string `yaml:"addr" env:"STORAGE_SHARES_GRPC_ADDR" desc:"The address of the grpc service."`
+	Namespace string `yaml:"-"`
+	Protocol  string `yaml:"protocol" env:"STORAGE_SHARES_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
 }

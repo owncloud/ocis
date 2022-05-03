@@ -20,8 +20,9 @@ func DefaultConfig() *config.Config {
 			Zpages: false,
 		},
 		GRPC: config.GRPCConfig{
-			Addr:     "127.0.0.1:9178",
-			Protocol: "tcp",
+			Addr:      "127.0.0.1:9178",
+			Namespace: "com.owncloud.api",
+			Protocol:  "tcp",
 		},
 		Service: config.Service{
 			Name: "storage-publiclink",
@@ -29,27 +30,23 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		AuthProvider: config.AuthProvider{
-			GatewayEndpoint: "127.0.0.1:9142",
-		},
 		StorageProvider: config.StorageProvider{
-			MountID:         "7993447f-687f-490d-875c-ac95e89a62a4",
-			GatewayEndpoint: "127.0.0.1:9142",
+			MountID: "7993447f-687f-490d-875c-ac95e89a62a4",
 		},
 	}
 }
 
 func EnsureDefaults(cfg *config.Config) {
 	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
-	if cfg.Logging == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
-		cfg.Logging = &config.Logging{
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &config.Log{
 			Level:  cfg.Commons.Log.Level,
 			Pretty: cfg.Commons.Log.Pretty,
 			Color:  cfg.Commons.Log.Color,
 			File:   cfg.Commons.Log.File,
 		}
-	} else if cfg.Logging == nil {
-		cfg.Logging = &config.Logging{}
+	} else if cfg.Log == nil {
+		cfg.Log = &config.Log{}
 	}
 	// provide with defaults for shared tracing, since we need a valid destination address for BindEnv.
 	if cfg.Tracing == nil && cfg.Commons != nil && cfg.Commons.Tracing != nil {

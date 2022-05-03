@@ -48,7 +48,7 @@ type SutureService struct {
 
 // NewSutureService creates a new webdav.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	cfg.Proxy.Commons = cfg.Commons
+	cfg.WebDAV.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.WebDAV,
 	}

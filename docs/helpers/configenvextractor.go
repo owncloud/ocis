@@ -13,8 +13,8 @@ import (
 )
 
 var targets = map[string]string{
-	"example-config-generator.go.tmpl": "output/exampleconfig/example-config-generator.go",
-	"extractor.go.tmpl":                "output/env/runner.go",
+	"example-config-generator.go.tmpl":            "output/exampleconfig/example-config-generator.go",
+	"environment-variable-docs-generator.go.tmpl": "output/env/environment-variable-docs-generator.go",
 }
 
 func main() {

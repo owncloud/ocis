@@ -23,9 +23,9 @@ type Config struct {
 
 // Events combines the configuration options for the event bus.
 type Events struct {
-	Endpoint      string `yaml:"events_endpoint" env:"AUDIT_EVENTS_ENDPOINT" desc:"the address of the streaming service"`
-	Cluster       string `yaml:"events_cluster" env:"AUDIT_EVENTS_CLUSTER" desc:"the clusterID of the streaming service. Mandatory when using nats"`
-	ConsumerGroup string `yaml:"events_group" env:"AUDIT_EVENTS_GROUP" desc:"the customergroup of the service. One group will only get one vopy of an event"`
+	Endpoint      string `yaml:"endpoint" env:"AUDIT_EVENTS_ENDPOINT" desc:"the address of the streaming service"`
+	Cluster       string `yaml:"cluster" env:"AUDIT_EVENTS_CLUSTER" desc:"the clusterID of the streaming service. Mandatory when using nats"`
+	ConsumerGroup string `yaml:"group" env:"AUDIT_EVENTS_GROUP" desc:"the customergroup of the service. One group will only get one copy of an event"`
 }
 
 // Auditlog holds audit log information

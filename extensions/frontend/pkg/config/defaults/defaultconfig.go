@@ -20,9 +20,10 @@ func DefaultConfig() *config.Config {
 			Zpages: false,
 		},
 		HTTP: config.HTTPConfig{
-			Addr:     "127.0.0.1:9140",
-			Protocol: "tcp",
-			Prefix:   "",
+			Addr:      "127.0.0.1:9140",
+			Namespace: "com.owncloud.web",
+			Protocol:  "tcp",
+			Prefix:    "",
 		},
 		Service: config.Service{
 			Name: "frontend",
@@ -41,10 +42,6 @@ func DefaultConfig() *config.Config {
 			SupportedTypes:      []string{"sha1", "md5", "adler32"},
 			PreferredUploadType: "",
 		},
-		AppProvider: config.AppProvider{
-			Prefix:   "",
-			Insecure: false,
-		},
 		Archiver: config.Archiver{
 			Insecure:    false,
 			Prefix:      "archiver",
@@ -58,7 +55,6 @@ func DefaultConfig() *config.Config {
 			Prefix:                  "ocs",
 			SharePrefix:             "/Shares",
 			HomeNamespace:           "/users/{{.Id.OpaqueId}}",
-			CacheWarmupDriver:       "",
 			AdditionalInfoAttribute: "{{.Mail}}",
 			ResourceInfoCacheTTL:    0,
 		},
@@ -72,15 +68,15 @@ func DefaultConfig() *config.Config {
 
 func EnsureDefaults(cfg *config.Config) {
 	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
-	if cfg.Logging == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
-		cfg.Logging = &config.Logging{
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &config.Log{
 			Level:  cfg.Commons.Log.Level,
 			Pretty: cfg.Commons.Log.Pretty,
 			Color:  cfg.Commons.Log.Color,
 			File:   cfg.Commons.Log.File,
 		}
-	} else if cfg.Logging == nil {
-		cfg.Logging = &config.Logging{}
+	} else if cfg.Log == nil {
+		cfg.Log = &config.Log{}
 	}
 	// provide with defaults for shared tracing, since we need a valid destination address for BindEnv.
 	if cfg.Tracing == nil && cfg.Commons != nil && cfg.Commons.Tracing != nil {

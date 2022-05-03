@@ -10,11 +10,11 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// OCDavCommand is the entrypoint for the ocdav command.
+// OCDavCommand is the entrypoint for the OCDav command.
 func OCDavCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "ocdav",
-		Usage:    "start ocdav",
+		Name:     cfg.OCDav.Service.Name,
+		Usage:    subcommandDescription(cfg.OCDav.Service.Name),
 		Category: "extensions",
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg); err != nil {
@@ -24,10 +24,7 @@ func OCDavCommand(cfg *config.Config) *cli.Command {
 			cfg.OCDav.Commons = cfg.Commons
 			return nil
 		},
-		Action: func(c *cli.Context) error {
-			origCmd := command.OCDav(cfg.OCDav)
-			return handleOriginalAction(c, origCmd)
-		},
+		Subcommands: command.GetCommands(cfg.OCDav),
 	}
 }
 

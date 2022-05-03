@@ -28,7 +28,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the ocis-settings command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:     "ocis-settings",
+		Name:     "settings",
 		Usage:    "Provide settings and permissions for oCIS",
 		Commands: GetCommands(cfg),
 	})

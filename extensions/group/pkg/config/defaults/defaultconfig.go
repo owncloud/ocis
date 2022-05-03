@@ -23,8 +23,9 @@ func DefaultConfig() *config.Config {
 			Zpages: false,
 		},
 		GRPC: config.GRPCConfig{
-			Addr:     "127.0.0.1:9160",
-			Protocol: "tcp",
+			Addr:      "127.0.0.1:9160",
+			Namespace: "com.owncloud.api",
+			Protocol:  "tcp",
 		},
 		Service: config.Service{
 			Name: "group",
@@ -64,10 +65,9 @@ func DefaultConfig() *config.Config {
 					Member:      "member",
 				},
 			},
-			JSON: config.JSONDriver{},
 			OwnCloudSQL: config.OwnCloudSQLDriver{
 				DBUsername:         "owncloud",
-				DBPassword:         "secret",
+				DBPassword:         "",
 				DBHost:             "mysql",
 				DBPort:             3306,
 				DBName:             "owncloud",
@@ -77,24 +77,21 @@ func DefaultConfig() *config.Config {
 				JoinOwnCloudUUID:   false,
 				EnableMedialSearch: false,
 			},
-			REST: config.RESTProvider{
-				RedisAddr: "localhost:6379",
-			},
 		},
 	}
 }
 
 func EnsureDefaults(cfg *config.Config) {
 	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
-	if cfg.Logging == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
-		cfg.Logging = &config.Logging{
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &config.Log{
 			Level:  cfg.Commons.Log.Level,
 			Pretty: cfg.Commons.Log.Pretty,
 			Color:  cfg.Commons.Log.Color,
 			File:   cfg.Commons.Log.File,
 		}
-	} else if cfg.Logging == nil {
-		cfg.Logging = &config.Logging{}
+	} else if cfg.Log == nil {
+		cfg.Log = &config.Log{}
 	}
 	// provide with defaults for shared tracing, since we need a valid destination address for BindEnv.
 	if cfg.Tracing == nil && cfg.Commons != nil && cfg.Commons.Tracing != nil {
