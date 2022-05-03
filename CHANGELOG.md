@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
 * Bugfix - URL encode the webdav url in the graph API: [#3597](https://github.com/owncloud/ocis/pull/3597)
 * Change - Load configuration files just from one directory: [#3587](https://github.com/owncloud/ocis/pull/3587)
+* Change - Reduce permissions on docker image predeclared volumes: [#3641](https://github.com/owncloud/ocis/pull/3641)
 * Change - Introduce `ocis init` and remove all default secrets: [#3551](https://github.com/owncloud/ocis/pull/3551)
 * Change - Reduce drives in graph /me/drives API: [#3629](https://github.com/owncloud/ocis/pull/3629)
 * Change - Switched default configuration to use libregraph/idm: [#3331](https://github.com/owncloud/ocis/pull/3331)
@@ -57,6 +58,16 @@ The following sections list the changes for unreleased.
    - Docker images: `/etc/ocis/` - Binary releases: `$HOME/.ocis/config/`
 
    https://github.com/owncloud/ocis/pull/3587
+
+* Change - Reduce permissions on docker image predeclared volumes: [#3641](https://github.com/owncloud/ocis/pull/3641)
+
+   We've lowered the permissions on the predeclared volumes of the oCIS docker image from 777 to
+   750.
+
+   This change doesn't affect you, unless you use the docker image with the non default uid/guid to
+   start oCIS (default is 1000:1000).
+
+   https://github.com/owncloud/ocis/pull/3641
 
 * Change - Introduce `ocis init` and remove all default secrets: [#3551](https://github.com/owncloud/ocis/pull/3551)
 
