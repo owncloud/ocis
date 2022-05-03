@@ -37,7 +37,6 @@ func DefaultConfig() *config.Config {
 			Cluster:       "ocis-cluster",
 			ConsumerGroup: "search",
 		},
-		MachineAuthAPIKey: "change-me-please",
 	}
 }
 
