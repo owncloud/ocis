@@ -61,9 +61,11 @@ type GRPCConfig struct {
 }
 
 type UserSharingDrivers struct {
-	JSON UserSharingJSONDriver `yaml:"json"`
-	CS3  UserSharingCS3Driver  `yaml:"cs3"`
-	SQL  UserSharingSQLDriver  `yaml:"sql,omitempty"` // not supported by the oCIS product, therefore not part of docs
+	JSON        UserSharingJSONDriver        `yaml:"json"`
+	CS3         UserSharingCS3Driver         `yaml:"cs3"`
+	OwnCloudSQL UserSharingOwnCloudSQLDriver `yaml:"owncloudsql"`
+
+	SQL UserSharingSQLDriver `yaml:"sql,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
 
 type UserSharingJSONDriver struct {
@@ -82,6 +84,15 @@ type UserSharingSQLDriver struct {
 	UserStorageMountID         string `yaml:"user_storage_mount_id"`
 }
 
+type UserSharingOwnCloudSQLDriver struct {
+	DBUsername         string `yaml:"db_username" env:"SHARING_USER_OWNCLOUDSQL_DB_USERNAME"`
+	DBPassword         string `yaml:"db_password" env:"SHARING_USER_OWNCLOUDSQL_DB_PASSWORD"`
+	DBHost             string `yaml:"db_host" env:"SHARING_USER_OWNCLOUDSQL_DB_HOST"`
+	DBPort             int    `yaml:"db_port" env:"SHARING_USER_OWNCLOUDSQL_DB_PORT"`
+	DBName             string `yaml:"db_name" env:"SHARING_USER_OWNCLOUDSQL_DB_NAME"`
+	UserStorageMountID string `yaml:"user_storage_mount_id" env:"SHARING_USER_OWNCLOUDSQL_USER_STORAGE_MOUNT_ID"`
+}
+
 type UserSharingCS3Driver struct {
 	ProviderAddr      string `yaml:"provider_addr" env:"SHARING_USER_CS3_PROVIDER_ADDR"`
 	ServiceUserID     string `yaml:"service_user_id" env:"SHARING_USER_CS3_SERVICE_USER_ID"`
@@ -92,7 +103,8 @@ type UserSharingCS3Driver struct {
 type PublicSharingDrivers struct {
 	JSON PublicSharingJSONDriver `yaml:"json"`
 	CS3  PublicSharingCS3Driver  `yaml:"cs3"`
-	SQL  PublicSharingSQLDriver  `yaml:"sql,omitempty"` // not supported by the oCIS product, therefore not part of docs
+
+	SQL PublicSharingSQLDriver `yaml:"sql,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
 
 type PublicSharingJSONDriver struct {
