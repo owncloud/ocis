@@ -36,6 +36,7 @@
                 "IDP_LDAP_BIND_PASSWORD": "some-ldap-idp-password",
                 // admin user default password
                 "IDM_ADMIN_PASSWORD": "admin",
+                "ADMIN_USER_ID": "admin",
                 // demo users
                 "IDM_CREATE_DEMO_USERS": "true",
                 // metadata storage
