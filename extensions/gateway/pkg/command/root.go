@@ -28,7 +28,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the ocis-gateway command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:     "ocis-gateway",
+		Name:     "gateway",
 		Usage:    "Provide a CS3api gateway for oCIS",
 		Commands: GetCommands(cfg),
 	})

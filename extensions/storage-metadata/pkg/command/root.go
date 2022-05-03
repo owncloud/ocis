@@ -28,7 +28,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the ocis-storage-metadata command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:     "ocis-storage-metadata",
+		Name:     "storage-metadata",
 		Usage:    "Provide apps for oCIS",
 		Commands: GetCommands(cfg),
 	})

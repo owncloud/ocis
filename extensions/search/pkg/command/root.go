@@ -30,7 +30,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the ocis-search command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:     "ocis-search",
+		Name:     "search",
 		Usage:    "Serve search API for oCIS",
 		Commands: GetCommands(cfg),
 	})

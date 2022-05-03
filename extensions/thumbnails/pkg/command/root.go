@@ -28,7 +28,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the ocis-thumbnails command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:     "ocis-thumbnails",
+		Name:     "thumbnails",
 		Usage:    "Example usage",
 		Commands: GetCommands(cfg),
 	})

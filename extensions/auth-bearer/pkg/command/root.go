@@ -28,7 +28,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the ocis-auth-bearer command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:     "ocis-auth-bearer",
+		Name:     "auth-bearer",
 		Usage:    "Provide bearer authentication for oCIS",
 		Commands: GetCommands(cfg),
 	})

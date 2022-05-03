@@ -28,7 +28,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the storage-shares command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:     "ocis-storage-shares",
+		Name:     "storage-shares",
 		Usage:    "Provide a virtual storage for shares in oCIS",
 		Commands: GetCommands(cfg),
 	})

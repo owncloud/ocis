@@ -28,7 +28,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the ocis-app-registry command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:     "ocis-app-registry",
+		Name:     "app-registry",
 		Usage:    "Provide a app registry for oCIS",
 		Commands: GetCommands(cfg),
 	})

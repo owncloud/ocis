@@ -28,7 +28,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the ocis-auth-machine command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:     "ocis-auth-machine",
+		Name:     "auth-machine",
 		Usage:    "Provide machine authentication for oCIS",
 		Commands: GetCommands(cfg),
 	})

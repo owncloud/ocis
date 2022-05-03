@@ -28,7 +28,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the ocis-storage-users command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:     "ocis-storage-users",
+		Name:     "storage-users",
 		Usage:    "Provide storage for users and projects in oCIS",
 		Commands: GetCommands(cfg),
 	})

@@ -28,7 +28,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 // Execute is the entry point for the ocis-group command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:     "ocis-group",
+		Name:     "group",
 		Usage:    "Provide groups for oCIS",
 		Commands: GetCommands(cfg),
 	})
