@@ -57,9 +57,9 @@ type GRPCConfig struct {
 }
 
 type AuthProviders struct {
-	JSON        JSONProvider        `yaml:"json,omitempty"` // not supported by the oCIS product, therefore not part of docs
 	LDAP        LDAPProvider        `yaml:"ldap"`
 	OwnCloudSQL OwnCloudSQLProvider `yaml:"owncloud_sql"`
+	JSON        JSONProvider        `yaml:"json,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
 
 type JSONProvider struct {
@@ -81,7 +81,7 @@ type LDAPProvider struct {
 	UserObjectClass  string          `yaml:"user_object_filter" env:"LDAP_USER_OBJECTCLASS;AUTH_BASIC_LDAP_USER_OBJECTCLASS"`
 	GroupObjectClass string          `yaml:"group_object_class" env:"LDAP_GROUP_OBJECTCLASS;AUTH_BASIC_LDAP_GROUP_OBJECTCLASS"`
 	LoginAttributes  []string        `yaml:"login_attributes" env:"LDAP_LOGIN_ATTRIBUTES;AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES"`
-	IDP              string          `yaml:"idp" env:"OCIS_URL;AUTH_BASIC_IDP_URL"` // TODO what is this for?
+	IDP              string          `yaml:"idp" env:"OCIS_URL;AUTH_BASIC_IDP_URL"`
 	UserSchema       LDAPUserSchema  `yaml:"user_schema"`
 	GroupSchema      LDAPGroupSchema `yaml:"group_schema"`
 }
@@ -109,7 +109,7 @@ type OwnCloudSQLProvider struct {
 	DBHost           string `yaml:"db_host" env:"AUTH_BASIC_OWNCLOUDSQL_DB_HOST"`
 	DBPort           int    `yaml:"db_port" env:"AUTH_BASIC_OWNCLOUDSQL_DB_PORT"`
 	DBName           string `yaml:"db_name" env:"AUTH_BASIC_OWNCLOUDSQL_DB_NAME"`
-	IDP              string `yaml:"idp" env:"AUTH_BASIC_OWNCLOUDSQL_IDP"`       // TODO do we need this?
+	IDP              string `yaml:"idp" env:"AUTH_BASIC_OWNCLOUDSQL_IDP"`
 	Nobody           int64  `yaml:"nobody" env:"AUTH_BASIC_OWNCLOUDSQL_NOBODY"` // TODO what is this?
 	JoinUsername     bool   `yaml:"join_username" env:"AUTH_BASIC_OWNCLOUDSQL_JOIN_USERNAME"`
 	JoinOwnCloudUUID bool   `yaml:"join_owncloud_uuid" env:"AUTH_BASIC_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID"`

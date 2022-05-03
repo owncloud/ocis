@@ -65,10 +65,9 @@ func DefaultConfig() *config.Config {
 					Member:      "member",
 				},
 			},
-			JSON: config.JSONDriver{},
 			OwnCloudSQL: config.OwnCloudSQLDriver{
 				DBUsername:         "owncloud",
-				DBPassword:         "secret",
+				DBPassword:         "",
 				DBHost:             "mysql",
 				DBPort:             3306,
 				DBName:             "owncloud",
@@ -77,9 +76,6 @@ func DefaultConfig() *config.Config {
 				JoinUsername:       false,
 				JoinOwnCloudUUID:   false,
 				EnableMedialSearch: false,
-			},
-			REST: config.RESTProvider{
-				RedisAddr: "localhost:6379",
 			},
 		},
 	}
