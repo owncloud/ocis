@@ -17,7 +17,7 @@ Feel free to "reserve" a free port range when you're developing an extension by 
 
 If you're developing a non-public extension, we recommend using ports outside of the ranges listed below.
 
-We also suggest to use the last port in your extensions' range as a debug/metrics port.
+We also suggest to use the last port in your extensions' range as a debug/metrics port.****
 
 
 ## Allocations
@@ -46,7 +46,7 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 | 9225-9229  | photoprism (state: PoC)                                                       |
 | 9230-9234  | [nats](https://github.com/owncloud/ocis/tree/master/nats)                     |
 | 9235-9239  | idm TBD                                                                       |
-| 9240-9244  | FREE                                                                          |
+| 9240-9244  | [app-registry](https://github.com/owncloud/ocis/tree/master/extensions/app-registry)     |
 | 9245-9249  | FREE                                                                          |
 | 9250-9254  | oCIS Runtime                                                                  |
 | 9255-9259  | FREE                                                                          |

@@ -23,9 +23,9 @@ func DefaultConfig() *config.Config {
 			Zpages: false,
 		},
 		GRPC: config.GRPCConfig{
-			Addr:     "127.0.0.1:9146",
+			Addr:      "127.0.0.1:9146",
 			Namespace: "com.owncloud.api",
-			Protocol: "tcp",
+			Protocol:  "tcp",
 		},
 		Service: config.Service{
 			Name: "auth-basic",

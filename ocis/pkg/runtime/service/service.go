@@ -20,6 +20,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/command"
+	appregistry "github.com/owncloud/ocis/extensions/app-registry/pkg/command"
 	appprovider "github.com/owncloud/ocis/extensions/appprovider/pkg/command"
 	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/command"
 	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/command"
@@ -122,6 +123,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.Frontend.Service.Name] = frontend.NewSutureService
 	s.ServicesRegistry[opts.Config.OCDav.Service.Name] = ocdav.NewSutureService
 	s.ServicesRegistry[opts.Config.Gateway.Service.Name] = gateway.NewSutureService
+	s.ServicesRegistry[opts.Config.AppRegistry.Service.Name] = appregistry.NewSutureService
 	s.ServicesRegistry[opts.Config.User.Service.Name] = user.NewSutureService
 	s.ServicesRegistry[opts.Config.Group.Service.Name] = group.NewSutureService
 	s.ServicesRegistry[opts.Config.AuthBasic.Service.Name] = authbasic.NewSutureService

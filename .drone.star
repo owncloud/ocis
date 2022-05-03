@@ -44,6 +44,7 @@ config = {
     "modules": [
         # if you add a module here please also add it to the root level Makefile
         "extensions/accounts",
+        "extensions/app-registry",
         "extensions/appprovider",
         "extensions/audit",
         "extensions/auth-basic",
@@ -53,9 +54,9 @@ config = {
         "extensions/gateway",
         "extensions/glauth",
         "extensions/graph-explorer",
+        "extensions/graph",
         "extensions/group",
         "extensions/idm",
-        "extensions/graph",
         "extensions/idp",
         "extensions/nats",
         "extensions/notifications",
@@ -68,7 +69,6 @@ config = {
         "extensions/storage-publiclink",
         "extensions/storage-shares",
         "extensions/storage-users",
-        "extensions/storage",
         "extensions/store",
         "extensions/thumbnails",
         "extensions/user",
