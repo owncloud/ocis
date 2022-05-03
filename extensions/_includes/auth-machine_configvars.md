@@ -18,5 +18,5 @@
 | AUTH_MACHINE_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>AUTH_MACHINE_JWT_SECRET | string |  | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
-| AUTH_MACHINE_AUTH_PROVIDER | string | ldap | The auth provider which should be used by the service|
-| OCIS_MACHINE_AUTH_API_KEY<br/>AUTH_MACHINE_PROVIDER_API_KEY | string |  | The api key for the machine auth provider.|
+| AUTH_MACHINE_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
+| OCIS_MACHINE_AUTH_API_KEY<br/>AUTH_MACHINE_API_KEY | string |  | |

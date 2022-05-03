@@ -22,11 +22,9 @@ token_manager:
 reva:
   address: 127.0.0.1:9142
 skip_user_groups_in_token: false
-auth_provider: ldap
-auth_providers:
-  oidc:
-    issuer: https://localhost:9200
-    insecure: false
-    id_claim: preferred_username
-    uid_claim: ""
-    gid_claim: ""
+oidc:
+  issuer: https://localhost:9200
+  insecure: false
+  id_claim: preferred_username
+  uid_claim: ""
+  gid_claim: ""

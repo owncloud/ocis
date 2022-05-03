@@ -46,7 +46,7 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 | 9225-9229  | photoprism (state: PoC)                                                       |
 | 9230-9234  | [nats](https://github.com/owncloud/ocis/tree/master/nats)                     |
 | 9235-9239  | idm TBD                                                                       |
-| 9240-9244  | FREE                                                                          |
+| 9240-9244  | [app-registry](https://github.com/owncloud/ocis/tree/master/extensions/app-registry)     |
 | 9245-9249  | FREE                                                                          |
 | 9250-9254  | oCIS Runtime                                                                  |
 | 9255-9259  | FREE                                                                          |

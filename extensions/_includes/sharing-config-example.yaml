@@ -21,45 +21,32 @@ token_manager:
   jwt_secret: ""
 reva:
   address: 127.0.0.1:9142
+events:
+  endpoint: 127.0.0.1:9233
+  cluster: ocis-cluster
 skip_user_groups_in_token: false
 user_sharing_driver: json
-user_sharin_drivers:
+user_sharing_drivers:
   json:
     file: ~/.ocis/storage/shares.json
-  sql:
-    dbusername: ""
-    dbpassword: ""
-    dbhost: ""
-    dbport: 1433
-    dbname: ""
-    passwordhashcost: 11
-    enableexpiredsharescleanup: true
-    janitorruninterval: 60
-    userstoragemountid: ""
   cs3:
-    provideraddr: 127.0.0.1:9215
-    serviceuserid: ""
-    serviceuseridp: internal
-    machineauthapikey: ""
+    provider_addr: 127.0.0.1:9215
+    service_user_id: ""
+    service_user_idp: internal
+    machine_auth_api_key: ""
+  owncloudsql:
+    db_username: ""
+    db_password: ""
+    db_host: ""
+    db_port: 0
+    db_name: ""
+    user_storage_mount_id: ""
 public_sharing_driver: json
 public_sharing_drivers:
   json:
     file: ~/.ocis/storage/publicshares.json
-  sql:
-    dbusername: ""
-    dbpassword: ""
-    dbhost: ""
-    dbport: 1433
-    dbname: ""
-    passwordhashcost: 11
-    enableexpiredsharescleanup: true
-    janitorruninterval: 60
-    userstoragemountid: ""
   cs3:
-    provideraddr: 127.0.0.1:9215
-    serviceuserid: ""
-    serviceuseridp: internal
-    machineauthapikey: ""
-events:
-  addr: 127.0.0.1:9233
-  clusterid: ocis-cluster
+    provider_addr: 127.0.0.1:9215
+    service_user_id: ""
+    service_user_idp: internal
+    machine_auth_api_key: ""

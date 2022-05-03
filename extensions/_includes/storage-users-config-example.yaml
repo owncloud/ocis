@@ -25,52 +25,20 @@ token_manager:
   jwt_secret: ""
 reva:
   address: 127.0.0.1:9142
-context: null
 skip_user_groups_in_token: false
 driver: ocis
 drivers:
-  eos:
-    root: /eos/dockertest/reva
-    shadow_namespace: ""
-    uploads_namespace: ""
-    eos_binary: /usr/bin/eos
-    xrd_copy_binary: /usr/bin/xrdcopy
-    master_url: root://eos-mgm1.eoscluster.cern.ch:1094
-    slave_url: root://eos-mgm1.eoscluster.cern.ch:1094
-    cache_directory: /tmp
-    sec_protocol: ""
-    keytab: ""
-    single_username: ""
-    enable_logging: false
-    shadow_hidden_files: false
-    force_single_user_mode: false
-    user_keytab: false
-    gateway_svc: 127.0.0.1:9142
-    share_folder: /Shares
-    grpcuri: ""
-    userlayout: '{{substr 0 1 .Username}}/{{.Username}}'
-  local:
-    root: ~/.ocis/storage/local/users
-    share_folder: /Shares
-    userlayout: '{{.Username}}'
   ocis:
     root: ~/.ocis/storage/users
-    userlayout: '{{.Id.OpaqueId}}'
-    permissionsendpoint: 127.0.0.1:9191
+    user_layout: '{{.Id.OpaqueId}}'
+    permissions_endpoint: 127.0.0.1:9191
     personalspacealias_template: '{{.SpaceType}}/{{.User.Username | lower}}'
     generalspacealias_template: '{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}'
     share_folder: /Shares
-  s3:
-    root: ""
-    region: default
-    access_key: ""
-    secret_key: ""
-    endpoint: ""
-    bucket: ""
   s3ng:
     root: ~/.ocis/storage/users
-    userlayout: '{{.Id.OpaqueId}}'
-    permissionsendpoint: 127.0.0.1:9191
+    user_layout: '{{.Id.OpaqueId}}'
+    permissions_endpoint: 127.0.0.1:9191
     region: default
     access_key: ""
     secret_key: ""
@@ -89,13 +57,13 @@ drivers:
     db_host: ""
     db_port: 3306
     db_name: owncloud
-    usersproviderendpoint: ""
+    users_provider_endpoint: ""
 data_server_url: http://localhost:9158/data
 temp_folder: ~/.ocis/tmp/users
 data_provider_insecure: false
 events:
-  addr: 127.0.0.1:9233
-  clusterid: ocis-cluster
+  endpoint: 127.0.0.1:9233
+  cluster: ocis-cluster
 mount_id: 1284d238-aa92-42ce-bdc4-0b0000009157
 expose_data_server: false
 readonly: false

@@ -20,7 +20,6 @@ grpc:
 http:
   addr: 127.0.0.1:9216
   protocol: tcp
-context: null
 token_manager:
   jwt_secret: ""
 reva:
@@ -30,46 +29,8 @@ metadata_user_id: ""
 skip_user_groups_in_token: false
 driver: ocis
 drivers:
-  eos:
-    root: /eos/dockertest/reva
-    shadow_namespace: ""
-    uploads_namespace: ""
-    eos_binary: /usr/bin/eos
-    xrd_copy_binary: /usr/bin/xrdcopy
-    master_url: root://eos-mgm1.eoscluster.cern.ch:1094
-    slave_url: root://eos-mgm1.eoscluster.cern.ch:1094
-    cache_directory: /tmp
-    sec_protocol: ""
-    keytab: ""
-    single_username: ""
-    enable_logging: false
-    shadow_hidden_files: false
-    force_single_user_mode: false
-    user_keytab: false
-    gateway_svc: 127.0.0.1:9215
-    grpcuri: ""
-    userlayout: '{{substr 0 1 .Username}}/{{.Username}}'
-  local:
-    root: ~/.ocis/storage/local/metadata
   ocis:
     root: ~/.ocis/storage/metadata
-    userlayout: '{{.Id.OpaqueId}}'
-    permissionsendpoint: 127.0.0.1:9215
-  s3:
-    region: default
-    access_key: ""
-    secret_key: ""
-    endpoint: ""
-    bucket: ""
-  s3ng:
-    root: ~/.ocis/storage/metadata
-    userlayout: '{{.Id.OpaqueId}}'
-    permissionsendpoint: 127.0.0.1:9215
-    region: default
-    access_key: ""
-    secret_key: ""
-    endpoint: ""
-    bucket: ""
 data_server_url: http://localhost:9216/data
 temp_folder: ~/.ocis/tmp/metadata
 data_provider_insecure: false

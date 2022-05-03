@@ -18,3 +18,5 @@
 | STORAGE_PUBLICLINK_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>STORAGE_PUBLICLINK_JWT_SECRET | string |  | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
+| STORAGE_PUBLICLINK_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
+| STORAGE_PUBLICLINK_STORAGE_PROVIDER_MOUNT_ID | string | 7993447f-687f-490d-875c-ac95e89a62a4 | |

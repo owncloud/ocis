@@ -10,9 +10,9 @@ debug:
   pprof: false
   zpages: false
 events:
-  events_endpoint: 127.0.0.1:9233
-  events_cluster: ocis-cluster
-  events_group: audit
+  endpoint: 127.0.0.1:9233
+  cluster: ocis-cluster
+  group: audit
 auditlog:
   log_to_console: true
   log_to_file: false

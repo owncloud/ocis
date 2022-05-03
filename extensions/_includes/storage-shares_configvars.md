@@ -16,7 +16,8 @@
 | STORAGE_SHARES_DEBUG_ZPAGES | bool | false | |
 | STORAGE_SHARES_GRPC_ADDR | string | 127.0.0.1:9154 | The address of the grpc service.|
 | STORAGE_SHARES_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
-| STORAGE_SHARES_HTTP_ADDR | string | 127.0.0.1:9155 | The address of the grpc service.|
-| STORAGE_SHARES_HTTP_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>STORAGE_SHARES_JWT_SECRET | string |  | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
+| STORAGE_SHARES_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
+| STORAGE_SHARES_READ_ONLY | bool | false | |
+| STORAGE_SHARES_USER_SHARE_PROVIDER_ENDPOINT | string | localhost:9150 | |

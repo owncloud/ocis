@@ -25,58 +25,45 @@ skip_user_groups_in_token: false
 users_cache_expiration: 5
 driver: ldap
 drivers:
-  json:
-    file: ""
   ldap:
     uri: ldaps://localhost:9235
-    cacert: ~/.ocis/idm/ldap.crt
+    ca_cert: ~/.ocis/idm/ldap.crt
     insecure: false
-    binddn: uid=reva,ou=sysusers,o=libregraph-idm
+    bind_dn: uid=reva,ou=sysusers,o=libregraph-idm
     bind_password: ""
-    userbasedn: ou=users,o=libregraph-idm
-    groupbasedn: ou=groups,o=libregraph-idm
-    userscope: sub
-    groupscope: sub
-    userfilter: ""
-    groupfilter: ""
-    userobjectclass: inetOrgPerson
-    groupobjectclass: groupOfNames
-    loginattributes:
+    user_base_dn: ou=users,o=libregraph-idm
+    group_base_dn: ou=groups,o=libregraph-idm
+    user_scope: sub
+    group_scope: sub
+    user_filter: ""
+    group_filter: ""
+    user_object_class: inetOrgPerson
+    group_object_class: groupOfNames
+    login_attributes:
     - uid
     - mail
     idp: https://localhost:9200
-    gatewayendpoint: ""
-    userschema:
+    user_schema:
       id: ownclouduuid
-      idisoctetstring: false
+      id_is_octet_string: false
       mail: mail
-      displayname: displayname
-      username: uid
-    groupschema:
+      display_name: displayname
+      user_name: uid
+    group_schema:
       id: ownclouduuid
-      idisoctetstring: false
+      id_is_octet_string: false
       mail: mail
-      displayname: cn
-      groupname: cn
+      display_name: cn
+      group_name: cn
       member: member
   owncloudsql:
-    dbusername: owncloud
-    dbpassword: secret
-    dbhost: mysql
-    dbport: 3306
-    dbname: owncloud
+    db_username: owncloud
+    db_password: secret
+    db_host: mysql
+    db_port: 3306
+    db_name: owncloud
     idp: https://localhost:9200
     nobody: 90
-    joinusername: false
-    joinownclouduuid: false
-    enablemedialsearch: false
-  rest:
-    clientid: ""
-    clientsecret: ""
-    redisaddr: localhost:6379
-    redisusername: ""
-    redispassword: ""
-    idprovider: ""
-    apibaseurl: ""
-    oidctokenendpoint: ""
-    targetapi: ""
+    join_username: false
+    join_owncloud_uuid: false
+    enable_medial_search: false

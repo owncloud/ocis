@@ -17,14 +17,10 @@ debug:
 grpc:
   addr: 127.0.0.1:9178
   protocol: tcp
-context: null
 token_manager:
   jwt_secret: ""
 reva:
   address: 127.0.0.1:9142
 skip_user_groups_in_token: false
-auth_provider:
-  gatewayendpoint: 127.0.0.1:9142
 storage_provider:
-  mountid: 7993447f-687f-490d-875c-ac95e89a62a4
-  gatewayendpoint: 127.0.0.1:9142
+  mount_id: 7993447f-687f-490d-875c-ac95e89a62a4

@@ -21,7 +21,6 @@ token_manager:
   jwt_secret: ""
 reva:
   address: 127.0.0.1:9142
-skip_user_groups_in_token: false
 external_addr: ""
 driver: ""
 drivers:
@@ -33,5 +32,5 @@ drivers:
     app_name: ""
     app_url: ""
     insecure: false
-    ipo_secret: ""
-    wopi_url: ""
+    wopi_server_iop_secret: ""
+    wopi_server_external_url: ""

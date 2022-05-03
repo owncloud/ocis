@@ -20,7 +20,7 @@ data_path: ~/.ocis/search
 reva:
   address: 127.0.0.1:9142
 events:
-  events_endpoint: 127.0.0.1:9233
-  events_cluster: ocis-cluster
-  events_group: search
+  endpoint: 127.0.0.1:9233
+  cluster: ocis-cluster
+  group: search
 machine_auth_api_key: change-me-please

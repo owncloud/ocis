@@ -16,8 +16,8 @@ notifications:
     smtp_sender: god@example.com
     smtp_password: godisdead
   events:
-    events_endpoint: 127.0.0.1:9233
-    events_cluster: ocis-cluster
-    events_group: notifications
+    endpoint: 127.0.0.1:9233
+    cluster: ocis-cluster
+    group: notifications
   reva_gateway: 127.0.0.1:9142
   machine_auth_api_key: ""

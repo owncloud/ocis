@@ -22,7 +22,4 @@ token_manager:
 reva:
   address: 127.0.0.1:9142
 skip_user_groups_in_token: false
-auth_provider: ldap
-auth_providers:
-  machine:
-    api_key: ""
+machine_auth_api_key: ""

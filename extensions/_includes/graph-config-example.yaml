@@ -51,5 +51,5 @@ identity:
     group_name_attribute: cn
     group_id_attribute: owncloudUUID
 events:
-  events_endpoint: 127.0.0.1:9233
-  events_cluster: ocis-cluster
+  endpoint: 127.0.0.1:9233
+  cluster: ocis-cluster

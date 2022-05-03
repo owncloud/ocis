@@ -21,6 +21,9 @@
 | OCIS_JWT_SECRET<br/>STORAGE_METADATA_JWT_SECRET | string |  | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
 | STORAGE_METADATA_MACHINE_AUTH_API_KEY | string |  | |
+| STORAGE_METADATA_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
 | STORAGE_METADATA_DRIVER | string | ocis | The driver which should be used by the service|
-| STORAGE_METADATA_DRIVER_OCIS_ROOT | string | ~/.ocis/storage/metadata | |
+| STORAGE_METADATA_OCIS_ROOT | string | ~/.ocis/storage/metadata | |
+| STORAGE_METADATA_DATA_SERVER_URL | string | http://localhost:9216/data | |
+| STORAGE_METADATA_TEMP_FOLDER | string | ~/.ocis/tmp/metadata | |
 | OCIS_INSECURE<br/>STORAGE_METADATA_DATAPROVIDER_INSECURE | bool | false | |

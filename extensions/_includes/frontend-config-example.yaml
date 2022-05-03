@@ -24,8 +24,8 @@ token_manager:
 reva:
   address: 127.0.0.1:9142
 machine_auth_api_key: ""
-skip_users_groups_in_token: false
-favorites: false
+skip_user_groups_in_token: false
+enable_favorites: false
 enable_project_spaces: true
 enable_share_jail: true
 upload_max_chunk_size: 100000000
@@ -36,10 +36,6 @@ archiver:
   max_num_files: 10000
   max_size: 1073741824
   insecure: false
-app_provider:
-  external_addr: ""
-  driver: ""
-  insecure: false
 data_gateway:
   prefix: data
 ocs:
@@ -48,15 +44,6 @@ ocs:
   home_namespace: /users/{{.Id.OpaqueId}}
   additional_info_attribute: '{{.Mail}}'
   resource_info_cache_ttl: 0
-  cache_warmup_driver: ""
-  cachewarmupdrivers:
-    cbox:
-      dbusername: ""
-      dbpassword: ""
-      dbhost: ""
-      dbport: 0
-      dbname: ""
-      namespace: ""
 checksums:
   supported_types:
   - sha1

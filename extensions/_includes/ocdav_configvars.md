@@ -16,7 +16,13 @@
 | OCDAV_DEBUG_ZPAGES | bool | false | |
 | OCDAV_HTTP_ADDR | string | 127.0.0.1:0 | The address of the http service.|
 | OCDAV_HTTP_PROTOCOL | string | tcp | The transport protocol of the http service.|
+| OCDAV_HTTP_PREFIX | string |  | |
 | OCIS_JWT_SECRET<br/>OCDAV_JWT_SECRET | string |  | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
+| OCDAV_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
+| OCDAV_WEBDAV_NAMESPACE | string | /users/{{.Id.OpaqueId}} | |
+| OCDAV_FILES_NAMESPACE | string | /users/{{.Id.OpaqueId}} | |
+| OCDAV_SHARES_NAMESPACE | string | /Shares | |
 | OCIS_URL<br/>OCDAV_PUBLIC_URL | string | https://localhost:9200 | |
 | OCIS_INSECURE<br/>OCDAV_INSECURE | bool | false | |
+| OCDAV_GATEWAY_REQUEST_TIMEOUT | int64 | 84300 | |

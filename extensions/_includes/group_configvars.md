@@ -18,6 +18,7 @@
 | GROUPS_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>GROUPS_JWT_SECRET | string |  | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
+| GROUPS_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
 | LDAP_URI<br/>GROUPS_LDAP_URI | string | ldaps://localhost:9235 | |
 | LDAP_CACERT<br/>GROUPS_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | |
 | LDAP_INSECURE<br/>GROUPS_LDAP_INSECURE | bool | false | |
@@ -44,3 +45,13 @@
 | LDAP_GROUP_SCHEMA_DISPLAYNAME<br/>GROUPS_LDAP_GROUP_SCHEMA_DISPLAYNAME | string | cn | |
 | LDAP_GROUP_SCHEMA_GROUPNAME<br/>GROUPS_LDAP_GROUP_SCHEMA_GROUPNAME | string | cn | |
 | LDAP_GROUP_SCHEMA_MEMBER<br/>GROUPS_LDAP_GROUP_SCHEMA_MEMBER | string | member | |
+| GROUPS_OWNCLOUDSQL_DB_USERNAME | string | owncloud | |
+| GROUPS_OWNCLOUDSQL_DB_PASSWORD | string |  | |
+| GROUPS_OWNCLOUDSQL_DB_HOST | string | mysql | |
+| GROUPS_OWNCLOUDSQL_DB_PORT | int | 3306 | |
+| GROUPS_OWNCLOUDSQL_DB_NAME | string | owncloud | |
+| GROUPS_OWNCLOUDSQL_IDP | string | https://localhost:9200 | |
+| GROUPS_OWNCLOUDSQL_NOBODY | int64 | 90 | |
+| GROUPS_OWNCLOUDSQL_JOIN_USERNAME | bool | false | |
+| GROUPS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID | bool | false | |
+| GROUPS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH | bool | false | |
