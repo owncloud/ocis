@@ -33,7 +33,7 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		UserSharingDriver: "cs3",
+		UserSharingDriver: "json", //"cs3",
 		UserSharingDrivers: config.UserSharingDrivers{
 			JSON: config.UserSharingJSONDriver{
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "shares.json"),
@@ -43,7 +43,7 @@ func DefaultConfig() *config.Config {
 				ServiceUserIDP: "internal",
 			},
 		},
-		PublicSharingDriver: "cs3",
+		PublicSharingDriver: "json", // "cs3",
 		PublicSharingDrivers: config.PublicSharingDrivers{
 			JSON: config.PublicSharingJSONDriver{
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "publicshares.json"),
