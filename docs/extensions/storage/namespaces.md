@@ -69,7 +69,7 @@ In ownCloud 10 you can not only create *public links* but also *private links*. 
 |-|-|
 | https://demo.owncloud.com/apps/files/?dir=/Photos/Vacation&fileid=24 | The normal browser URL |
 | https://demo.owncloud.com/apps/files/?fileid=24 | the `dir` is actually not used to find the directory and will be filled when pasting this URL |
-| https://demo.owncloud.com/f/24 | *private links* are the shortened version of this and workh in the same way |
+| https://demo.owncloud.com/f/24 | *private links* are the shortened version of this and work in the same way |
 | https://demo.owncloud.com/s/piLdAAt1m3Bg0Fk | public link |
 
 {{< hint >}}

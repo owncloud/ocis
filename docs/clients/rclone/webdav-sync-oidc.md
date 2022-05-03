@@ -35,9 +35,9 @@ oidc-gen \
 
 If you have dynamic client registration enabled on your OpenID Connect identity provider, you can skip the `--client-id`,  `--client-secret` and `--pub` options.
 
-If your're using a dedicated OpenID Connect client for the OIDC-agent, we recommend a public one with the following two redirect URIs: `http://127.0.0.1:*` and `http://localhost:*`. Alternatively you also may use the already existing OIDC client of the ownCloud Desktop Client (`--client-id=xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69` and `--client-secret=UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh`, no `--pub` set)
+If you're using a dedicated OpenID Connect client for the OIDC-agent, we recommend a public one with the following two redirect URIs: `http://127.0.0.1:*` and `http://localhost:*`. Alternatively you also may use the already existing OIDC client of the ownCloud Desktop Client (`--client-id=xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69` and `--client-secret=UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh`, no `--pub` set)
 
-Please also note that the OIDC-agent will listen on your localhost interface on port 12345 for the time of the intial authentication. If that port is already occupied on your machine, you can easily change that by setting the `--redirect-uri` parameter to a different value.
+Please also note that the OIDC-agent will listen on your localhost interface on port 12345 for the time of the initial authentication. If that port is already occupied on your machine, you can easily change that by setting the `--redirect-uri` parameter to a different value.
 
 After a successful login or an already existing session you will be redirected to success page of the OIDC-agent.
 You will now be asked for a password for your account configuration, so that your OIDC session is secured and cannot be used by other people with access to your computer.

@@ -9,7 +9,7 @@ For simplicity reasons, this document mostly refers to the ownCloud [Infinite Sc
 [I don't want to read this whole thing, I just have a question](#i-dont-want-to-read-this-whole-thing-i-just-have-a-question)
 
 [What should I know before I get started](#what-should-i-know-before-i-get-started)
-*   [ownCloud is hosted on Github](#owncloud-is-hosted-on-github)
+*   [ownCloud is hosted on GitHub](#owncloud-is-hosted-on-github)
 *   [ownCloud Company, Engineering Partners and Community](#owncloud-company,-engineering-partners-and-community)
 *   [Licensing and CLA](#licensing-and-cla)
 
@@ -42,17 +42,17 @@ We also have a [Rocket Chat Server](https://talk.owncloud.com/channel/ocis) to a
 
 ## What should I know before I get started
 
-### ownCloud is hosted on Github
+### ownCloud is hosted on GitHub
 
-To effectively contribute to ownCloud Infinite Scale, you need a Github account. You can get that for free at [Github](https://github.com/join). You can find howtos on the internet, for example [here](https://www.wikihow.com/Create-an-Account-on-GitHub).
+To effectively contribute to ownCloud Infinite Scale, you need a GitHub account. You can get that for free at [GitHub](https://github.com/join). You can find howtos on the internet, for example [here](https://www.wikihow.com/Create-an-Account-on-GitHub).
 
 For other ways of contributing, for example with translations, other systems require you to have an account as well, for example [Transifex](https://www.transifex.com).
 
-The ownCloud project follows the strict Github workflow of development as briefly [described here](https://guides.github.com/introduction/flow/).
+The ownCloud project follows the strict GitHub workflow of development as briefly [described here](https://guides.github.com/introduction/flow/).
 
 ### ownCloud Company, Engineering Partners and Community
 
-ownCloud Infinite Scale is largely created by developers who are employed by the [ownCloud company](https://www.owncloud.com), which is located in Germany. It is providing support for ownCloud for customers worldwide. In addition there are engineering partners who also work full time on ownCloud related code, for example in [CERN REVA](https://github.com/cs3org/reva/).
+ownCloud Infinite Scale is largely created by developers who are employed by the [ownCloud company](https://www.owncloud.com), which is located in Germany. It is providing support for ownCloud for customers worldwide. In addition, there are engineering partners who also work full time on ownCloud related code, for example in [CERN REVA](https://github.com/cs3org/reva/).
 
 Because of that fact, the pace that the development is moving forward is sometimes high for people who are not willing and/or able to spend a comparable amount of time to contribute. Even though this can be a challenge, it should not scare anybody away. Here is our clear commitment that we feel honored by everybody who is interested in our work and improves it, no matter how big the contribution might be.
 
@@ -76,7 +76,7 @@ There are many ways to contribute to open source projects, and all are equally v
 
 This way to contribute to the project can not be overestimated: People who talk about their experience with ownCloud Infinite Scale and help others with that are the key to success of the project.
 
-There are too many ways of doing that to line them up here, but examples are answering questions in [ownCloud Central](https://central.owncloud.org/) or on [ownCloud Talk](https://talk.owncloud.com/channel/ocis), writing blog posts etc pp.
+There are too many ways of doing that to line them up here, but examples are answering questions in [ownCloud Central](https://central.owncloud.org/) or on [ownCloud Talk](https://talk.owncloud.com/channel/ocis), writing blog posts etc. pp.
 
 There is no formal guideline to this, just do it :-)
 
@@ -92,7 +92,7 @@ Before creating bug reports, please check [this list](#before-submitting-a-bug-r
 
 *   **Make sure you are running a recent version** Usually, developers' interest in old versions of software drops very fast once a new shiny version has been released. So the general recommendation is: Use the latest released version or even the current master to reproduce problems that you might encounter. That helps a lot to attract developers attention.
 *   **Determine which [repository](https://github.com/owncloud) the problem should be reported in**.
-*   **Perform a [cursory search](https://github.com/search?q=+is%3Aissue+user%3Aowncloud)** with possibly a more granular filter on the repository, to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one **if you have new information**. Please abstain from adding "plus ones", except using the Github emojis. That might indicate how many users are affected.
+*   **Perform a [cursory search](https://github.com/search?q=+is%3Aissue+user%3Aowncloud)** with possibly a more granular filter on the repository, to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one **if you have new information**. Please abstain from adding "plus ones", except using the GitHub emojis. That might indicate how many users are affected.
 
 #### How Do I Submit A (Good) Bug Report
 
@@ -126,7 +126,7 @@ Before creating enhancement suggestions, please check [this list](#before-submit
 #### Before Submitting An Enhancement Suggestion
 
 *   **Check if there's already an extension or other component which provides that enhancement, even in a different way.**
-*   **Perform a [cursory search](https://github.com/search?q=+is%3Aissue+user%3Aowncloud)** to see if the enhancement has already been suggested. If it has, add a comment to the existing issue instead of opening a new one. Feel free to use the Github emojis to indicate that you are in favour of an enhancement request.
+*   **Perform a [cursory search](https://github.com/search?q=+is%3Aissue+user%3Aowncloud)** to see if the enhancement has already been suggested. If it has, add a comment to the existing issue instead of opening a new one. Feel free to use the GitHub emojis to indicate that you are in favour of an enhancement request.
 
 #### How Do I Submit A (Good) Enhancement Suggestion
 
@@ -152,7 +152,7 @@ To find out how to set up ownCloud Infinite Scale for local development please r
 
 ### Pull Requests
 
-All contributions to ownClouds projects use so called pull requests following the [Github PR workflow](https://guides.github.com/introduction/flow/).
+All contributions to ownClouds projects use so-called pull requests following the [GitHub PR workflow](https://guides.github.com/introduction/flow/).
 
 Please follow these steps to have your contribution considered by the maintainers:
 
@@ -180,7 +180,7 @@ Depending on the ownCloud component, there is complex deployment tooling to inst
 
 ## Styleguides
 
-To keep up with a consistent code and tooling landscape, some of the ownCloud modules maintain styleguides for contributions. It is mandatory to follow them in contributions.
+To keep up with a consistent code and tooling landscape, some ownCloud modules maintain styleguides for contributions. It is mandatory to follow them in contributions.
 
 ### Git Commit Messages
 
@@ -192,7 +192,7 @@ To keep up with a consistent code and tooling landscape, some of the ownCloud mo
 
 ### Golang Styleguide
 
-Use the built in golang code formatter before submitting the patch. Also, consulting documentation like [Effective Go](https://golang.org/doc/effective_go) or [Practical Go](http://bit.ly/gcsg-2019) helps to improve the code quality.
+Use the built-in golang code formatter before submitting the patch. Also, consulting documentation like [Effective Go](https://golang.org/doc/effective_go) or [Practical Go](http://bit.ly/gcsg-2019) helps to improve the code quality.
 
 ### Web Styleguide
 
@@ -216,7 +216,7 @@ The list here contains all the more general categories of issues which are follo
 
 #### Platform
 
-Describes the platform the issue is happening on, ie. iOS or Windows.
+Describes the platform the issue is happening on, i.e. iOS or Windows.
 
 #### Estimation
 
@@ -224,7 +224,7 @@ T-Shirt sizes for effort estimation to fix that bug or implement an enhancement.
 
 #### Priority
 
-P1 to P4 (lowest) to indicate an priority. Mostly a tool for internal project management and support.
+P1 to P4 (lowest) to indicate a priority. Mostly a tool for internal project management and support.
 
 #### QA
 
@@ -260,4 +260,4 @@ Important for browser dependent web issues. It specifies the browser that shows 
 
 #### Early-Adopter
 
-Tags issues that were reported by one of the oCIS early adopters, ie. customers and users who start using ownCloud Infinite Scale before it's general availability.
+Tags issues that were reported by one of the oCIS early adopters, i.e. customers and users who start using ownCloud Infinite Scale before its general availability.

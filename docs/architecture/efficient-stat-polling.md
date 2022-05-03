@@ -132,7 +132,7 @@ It would require client changes that depend on the server side actually having a
 But having to list n storages might become a bottleneck anyway, so we are going to have the gateway calculate a virtual root ETag for all entry points a user has access to and cache that.
 
 ## Server Side Stat Polling
-Every client polls the virtual root ETag (every 30 sec). The gateway will cache the virutal root ETag of every storage for 30 sec as well. That way every storage provider is only stated once every 30 sec (can be throttled dynamically to adapt to storage io load).
+Every client polls the virtual root ETag (every 30 sec). The gateway will cache the virtual root ETag of every storage for 30 sec as well. That way every storage provider is only stated once every 30 sec (can be throttled dynamically to adapt to storage io load).
 
 
 {{<mermaid class="text-center">}}
@@ -182,9 +182,9 @@ Since the active clients will poll the etag for all active users the gateway wil
 
 For a single machine using a local posix storage the linux kernel already caches the inodes that contain the metadata that is necessary to calculate the ETag (even extended attributes are supported). With 4k inodes 256 nodes take 1Mb of RAM, 1k inodes take 4Mb and 1M inodes take 4Gb to completely cache the file metadata. For distributed filesystems a dedicated cache might make sense to prevent hammering it with stat like requests to calculate ETags.
 
-### Bandwith considerations
+### Bandwidth considerations
 
-The bandwith for a single machine might be another bottleneck. Consider a propfind request with roughly 500 bytes and a response with roughly 800 bytes in size:
+The bandwidth for a single machine might be another bottleneck. Consider a propfind request with roughly 500 bytes and a response with roughly 800 bytes in size:
 - At 100Mbit (~10Mb/s) you can receive 20 000 PROPFIND requests
 - At 1000Mbit (~100Mb/s) you can receive 200 000 PROPFIND requests
 - At 10Gbit (~1Gb/s) you can receive 2 000 000 PROPFIND requests
