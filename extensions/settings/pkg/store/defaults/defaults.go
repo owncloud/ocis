@@ -1,6 +1,7 @@
 package defaults
 
 import (
+	"github.com/owncloud/ocis/extensions/settings/pkg/config"
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 )
 
@@ -496,14 +497,14 @@ var languageSetting = settingsmsg.Setting_SingleChoiceValue{
 }
 
 // DefaultRoleAssignments returns (as one might guess) the default role assignments
-func DefaultRoleAssignments() []*settingsmsg.UserRoleAssignment {
+func DefaultRoleAssignments(cfg *config.Config) []*settingsmsg.UserRoleAssignment {
 	return []*settingsmsg.UserRoleAssignment{
 		// default admin users
 		{
 			AccountUuid: "058bff95-6708-4fe5-91e4-9ea3d377588b", // demo user "moss"
 			RoleId:      BundleUUIDRoleAdmin,
 		}, {
-			AccountUuid: "ddc2004c-0977-11eb-9d3f-a793888cd0f8",
+			AccountUuid: cfg.Commons.AdminUserID,
 			RoleId:      BundleUUIDRoleAdmin,
 		},
 		// default users with role "user"

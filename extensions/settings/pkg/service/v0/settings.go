@@ -532,14 +532,14 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 	}
 }
 
-func defaultRoleAssignments() []*settingsmsg.UserRoleAssignment {
+func (g Service) defaultRoleAssignments() []*settingsmsg.UserRoleAssignment {
 	return []*settingsmsg.UserRoleAssignment{
 		// default admin users
 		{
 			AccountUuid: "058bff95-6708-4fe5-91e4-9ea3d377588b", // demo user "moss"
 			RoleId:      BundleUUIDRoleAdmin,
 		}, {
-			AccountUuid: "ddc2004c-0977-11eb-9d3f-a793888cd0f8",
+			AccountUuid: g.config.Commons.AdminUserID,
 			RoleId:      BundleUUIDRoleAdmin,
 		},
 		// default users with role "user"

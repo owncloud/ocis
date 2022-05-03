@@ -14,7 +14,7 @@ import (
 // ListRoleAssignments loads and returns all role assignments matching the given assignment identifier.
 func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRoleAssignment, error) {
 	if s.mdc == nil {
-		return defaultRoleAssignments(accountUUID), nil
+		return s.defaultRoleAssignments(accountUUID), nil
 	}
 	s.Init()
 	ctx := context.TODO()
@@ -92,9 +92,9 @@ func (s *Store) RemoveRoleAssignment(assignmentID string) error {
 	return fmt.Errorf("assignmentID '%s' not found", assignmentID)
 }
 
-func defaultRoleAssignments(accID string) []*settingsmsg.UserRoleAssignment {
+func (s *Store) defaultRoleAssignments(accID string) []*settingsmsg.UserRoleAssignment {
 	var assmnts []*settingsmsg.UserRoleAssignment
-	for _, r := range defaults.DefaultRoleAssignments() {
+	for _, r := range defaults.DefaultRoleAssignments(s.cfg) {
 		if r.AccountUuid == accID {
 			assmnts = append(assmnts, r)
 		}

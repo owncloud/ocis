@@ -90,12 +90,14 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 	type svcUser struct {
 		Name     string
 		Password string
+		ID       string
 	}
 
 	serviceUsers := []svcUser{
 		{
 			Name:     "admin",
 			Password: cfg.ServiceUserPasswords.OcisAdmin,
+			ID:       cfg.Commons.AdminUserID,
 		},
 		{
 			Name:     "libregraph",

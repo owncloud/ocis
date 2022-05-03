@@ -1660,7 +1660,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "name": "wait-for-ocis-server",
             "image": OC_CI_ALPINE,
             "commands": [
-                "curl -k -u admin:admin --fail --retry-connrefused --retry 10 --retry-all-errors 'https://ocis-server:9200/graph/v1.0/users/ddc2004c-0977-11eb-9d3f-a793888cd0f8'",
+                "curl -k -u admin:admin --fail --retry-connrefused --retry 10 --retry-all-errors 'https://ocis-server:9200/graph/v1.0/users/admin'",
             ],
             "depends_on": depends_on,
         }
