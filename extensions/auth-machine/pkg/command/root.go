@@ -29,7 +29,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "ocis-auth-machine",
-		Usage:    "Provide apps for oCIS",
+		Usage:    "Provide machine authentication for oCIS",
 		Commands: GetCommands(cfg),
 	})
 
