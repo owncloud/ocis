@@ -148,9 +148,6 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.TokenManager = &config.TokenManager{}
 	}
 
-	if cfg.TransferSecret == "" && cfg.Commons != nil && cfg.Commons.TransferSecret != "" {
-		cfg.TransferSecret = cfg.Commons.TransferSecret
-	}
 }
 
 func Sanitize(cfg *config.Config) {
