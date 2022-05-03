@@ -33,40 +33,20 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		UserSharingDriver: "json",
+		UserSharingDriver: "cs3",
 		UserSharingDrivers: config.UserSharingDrivers{
 			JSON: config.UserSharingJSONDriver{
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "shares.json"),
-			},
-			SQL: config.UserSharingSQLDriver{
-				DBUsername:                 "",
-				DBPassword:                 "",
-				DBHost:                     "",
-				DBPort:                     1433,
-				DBName:                     "",
-				PasswordHashCost:           11,
-				EnableExpiredSharesCleanup: true,
-				JanitorRunInterval:         60,
 			},
 			CS3: config.UserSharingCS3Driver{
 				ProviderAddr:   "127.0.0.1:9215", // metadata storage
 				ServiceUserIDP: "internal",
 			},
 		},
-		PublicSharingDriver: "json",
+		PublicSharingDriver: "cs3",
 		PublicSharingDrivers: config.PublicSharingDrivers{
 			JSON: config.PublicSharingJSONDriver{
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "publicshares.json"),
-			},
-			SQL: config.PublicSharingSQLDriver{
-				DBUsername:                 "",
-				DBPassword:                 "",
-				DBHost:                     "",
-				DBPort:                     1433,
-				DBName:                     "",
-				PasswordHashCost:           11,
-				EnableExpiredSharesCleanup: true,
-				JanitorRunInterval:         60,
 			},
 			CS3: config.PublicSharingCS3Driver{
 				ProviderAddr:   "127.0.0.1:9215", // metadata storage

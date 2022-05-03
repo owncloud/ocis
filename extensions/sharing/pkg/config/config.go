@@ -17,14 +17,14 @@ type Config struct {
 
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
+	Events       Events        `yaml:"events"`
 
 	SkipUserGroupsInToken bool `yaml:"-"`
 
-	UserSharingDriver    string               `yaml:"user_sharing_driver"`
+	UserSharingDriver    string               `yaml:"user_sharing_driver" env:"SHARING_USER_DRIVER"`
 	UserSharingDrivers   UserSharingDrivers   `yaml:"user_sharin_drivers"`
-	PublicSharingDriver  string               `yaml:"public_sharing_driver"`
+	PublicSharingDriver  string               `yaml:"public_sharing_driver" env:"SHARING_PUBLIC_DRIVER"`
 	PublicSharingDrivers PublicSharingDrivers `yaml:"public_sharing_drivers"`
-	Events               Events               `yaml:"events"`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
@@ -61,64 +61,64 @@ type GRPCConfig struct {
 }
 
 type UserSharingDrivers struct {
-	JSON UserSharingJSONDriver
-	SQL  UserSharingSQLDriver
-	CS3  UserSharingCS3Driver
+	JSON UserSharingJSONDriver `yaml:"json"`
+	CS3  UserSharingCS3Driver  `yaml:"cs3"`
+	SQL  UserSharingSQLDriver  `yaml:"sql,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
 
 type UserSharingJSONDriver struct {
-	File string `env:"SHARING_USER_JSON_FILE"`
+	File string `yaml:"file" env:"SHARING_USER_JSON_FILE"`
 }
 
 type UserSharingSQLDriver struct {
-	DBUsername                 string `env:"SHARING_USER_SQL_USERNAME"`
-	DBPassword                 string `env:"SHARING_USER_SQL_PASSWORD"`
-	DBHost                     string `env:"SHARING_USER_SQL_HOST"`
-	DBPort                     int    `env:"SHARING_USER_SQL_PORT"`
-	DBName                     string `env:"SHARING_USER_SQL_NAME"`
-	PasswordHashCost           int
-	EnableExpiredSharesCleanup bool
-	JanitorRunInterval         int
-	UserStorageMountID         string
+	DBUsername                 string `yaml:"db_username"`
+	DBPassword                 string `yaml:"db_password"`
+	DBHost                     string `yaml:"db_host"`
+	DBPort                     int    `yaml:"db_port"`
+	DBName                     string `yaml:"db_name"`
+	PasswordHashCost           int    `yaml:"password_hash_cost"`
+	EnableExpiredSharesCleanup bool   `yaml:"enable_expired_shares_cleanup"`
+	JanitorRunInterval         int    `yaml:"janitor_run_interval"`
+	UserStorageMountID         string `yaml:"user_storage_mount_id"`
 }
 
 type UserSharingCS3Driver struct {
-	ProviderAddr      string
-	ServiceUserID     string
-	ServiceUserIDP    string `env:"OCIS_URL;SHARING_CS3_SERVICE_USER_IDP"`
-	MachineAuthAPIKey string `env:"OCIS_MACHINE_AUTH_API_KEY"`
+	ProviderAddr      string `yaml:"provider_addr" env:"SHARING_USER_CS3_PROVIDER_ADDR"`
+	ServiceUserID     string `yaml:"service_user_id" env:"SHARING_USER_CS3_SERVICE_USER_ID"`
+	ServiceUserIDP    string `yaml:"service_user_idp" env:"OCIS_URL;SHARING_USER_CS3_SERVICE_USER_IDP"`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;SHARING_USER_CS3_MACHINE_AUTH_API_KEY"`
 }
 
 type PublicSharingDrivers struct {
-	JSON PublicSharingJSONDriver
-	SQL  PublicSharingSQLDriver
-	CS3  PublicSharingCS3Driver
+	JSON PublicSharingJSONDriver `yaml:"json"`
+	CS3  PublicSharingCS3Driver  `yaml:"cs3"`
+	SQL  PublicSharingSQLDriver  `yaml:"sql,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
 
 type PublicSharingJSONDriver struct {
-	File string
+	File string `yaml:"file" env:"SHARING_PUBLIC_JSON_FILE"`
 }
 
 type PublicSharingSQLDriver struct {
-	DBUsername                 string
-	DBPassword                 string
-	DBHost                     string
-	DBPort                     int
-	DBName                     string
-	PasswordHashCost           int
-	EnableExpiredSharesCleanup bool
-	JanitorRunInterval         int
-	UserStorageMountID         string
+	DBUsername                 string `yaml:"db_username"`
+	DBPassword                 string `yaml:"db_password"`
+	DBHost                     string `yaml:"db_host"`
+	DBPort                     int    `yaml:"db_port"`
+	DBName                     string `yaml:"db_name"`
+	PasswordHashCost           int    `yaml:"password_hash_cost"`
+	EnableExpiredSharesCleanup bool   `yaml:"enable_expired_shares_cleanup"`
+	JanitorRunInterval         int    `yaml:"janitor_run_interval"`
+	UserStorageMountID         string `yaml:"user_storage_mount_id"`
 }
 
 type PublicSharingCS3Driver struct {
-	ProviderAddr      string
-	ServiceUserID     string
-	ServiceUserIDP    string
-	MachineAuthAPIKey string `env:"OCIS_MACHINE_AUTH_API_KEY"`
+	ProviderAddr      string `yaml:"provider_addr" env:"SHARING_PUBLIC_CS3_PROVIDER_ADDR"`
+	ServiceUserID     string `yaml:"service_user_id" env:"SHARING_PUBLIC_CS3_SERVICE_USER_ID"`
+	ServiceUserIDP    string `yaml:"service_user_idp" env:"OCIS_URL;SHARING_PUBLIC_CS3_SERVICE_USER_IDP"`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;SHARING_PUBLIC_CS3_MACHINE_AUTH_API_KEY"`
 }
 
 type Events struct {
-	Addr      string
-	ClusterID string
+	Addr      string `yaml:"addr" env:"SHARING_EVENTS_ADDR"`
+	ClusterID string `yaml:"cluster_id" env:"SHARING_EVENTS_CLUSTER_ID"`
 }
