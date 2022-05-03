@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
@@ -44,6 +45,18 @@ func Server(cfg *config.Config) *cli.Command {
 			ctx, cancel := defineContext(cfg)
 
 			defer cancel()
+
+			// precreate folders
+			if cfg.UserSharingDriver == "json" && cfg.UserSharingDrivers.JSON.File != "" {
+				if err := os.MkdirAll(filepath.Dir(cfg.UserSharingDrivers.JSON.File), os.FileMode(0700)); err != nil {
+					return err
+				}
+			}
+			if cfg.PublicSharingDriver == "json" && cfg.PublicSharingDrivers.JSON.File != "" {
+				if err := os.MkdirAll(filepath.Dir(cfg.PublicSharingDrivers.JSON.File), os.FileMode(0700)); err != nil {
+					return err
+				}
+			}
 
 			pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
 
