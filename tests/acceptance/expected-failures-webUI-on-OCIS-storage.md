@@ -475,3 +475,9 @@ Other free text and markdown formatting can be used elsewhere in the document if
 
 ### [Creating group with problematic group name via graph api gives 500 error](https://github.com/owncloud/ocis/issues/3631)
 - [webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature:41](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature:41)
+
+### [Favorites deactivated in ocis temporarily](https://github.com/owncloud/ocis/issues/1228)
+- [webUIFilesDetails/fileDetails.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#42)
+- [webUIFilesDetails/fileDetails.feature:57](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#57)
+- [webUIRenameFiles/renameFiles.feature:246](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#246)
+
