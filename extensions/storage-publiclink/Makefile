@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := ocs
+NAME := storage-publiclink
 
 include ../../.make/recursion.mk
 

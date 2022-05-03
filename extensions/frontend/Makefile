@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := ocs
+NAME := frontend
 
 include ../../.make/recursion.mk
 

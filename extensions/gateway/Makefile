@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := ocs
+NAME := gateway
 
 include ../../.make/recursion.mk
 

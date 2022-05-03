@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := ocs
+NAME := auth-bearer
 
 include ../../.make/recursion.mk
 

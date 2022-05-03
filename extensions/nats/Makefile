@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := ocs
+NAME := nats
 
 include ../../.make/recursion.mk
 

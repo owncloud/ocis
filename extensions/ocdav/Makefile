@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := ocs
+NAME := ocdav
 
 include ../../.make/recursion.mk
 

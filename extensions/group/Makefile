@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := ocs
+NAME := group
 
 include ../../.make/recursion.mk
 

@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := ocs
+NAME := storage-shares
 
 include ../../.make/recursion.mk
 

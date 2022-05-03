@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := sharing
+NAME := app-registry
 
 include ../../.make/recursion.mk
 

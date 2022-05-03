@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := ocs
+NAME := notifications
 
 include ../../.make/recursion.mk
 

@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := ocs
+NAME := auth-machine
 
 include ../../.make/recursion.mk
 

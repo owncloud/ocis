@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := ocs
+NAME := app-provider
 
 include ../../.make/recursion.mk
 
