@@ -2,6 +2,10 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
+| OCIS_LOG_LEVEL;NOTIFICATIONS_LOG_LEVEL | string |  | |
+| OCIS_LOG_PRETTY;NOTIFICATIONS_LOG_PRETTY | bool | false | |
+| OCIS_LOG_COLOR;NOTIFICATIONS_LOG_COLOR | bool | false | |
+| OCIS_LOG_FILE;NOTIFICATIONS_LOG_FILE | string |  | |
 | NOTIFICATIONS_DEBUG_ADDR | string |  | |
 | NOTIFICATIONS_DEBUG_TOKEN | string |  | |
 | NOTIFICATIONS_DEBUG_PPROF | bool | false | |

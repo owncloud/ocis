@@ -2,6 +2,14 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
+| OCIS_TRACING_ENABLED;WEBDAV_TRACING_ENABLED | bool | false | |
+| OCIS_TRACING_TYPE;WEBDAV_TRACING_TYPE | string |  | |
+| OCIS_TRACING_ENDPOINT;WEBDAV_TRACING_ENDPOINT | string |  | |
+| OCIS_TRACING_COLLECTOR;WEBDAV_TRACING_COLLECTOR | string |  | |
+| OCIS_LOG_LEVEL;WEBDAV_LOG_LEVEL | string |  | |
+| OCIS_LOG_PRETTY;WEBDAV_LOG_PRETTY | bool | false | |
+| OCIS_LOG_COLOR;WEBDAV_LOG_COLOR | bool | false | |
+| OCIS_LOG_FILE;WEBDAV_LOG_FILE | string |  | |
 | WEBDAV_DEBUG_ADDR | string | 127.0.0.1:9119 | |
 | WEBDAV_DEBUG_TOKEN | string |  | |
 | WEBDAV_DEBUG_PPROF | bool | false | |

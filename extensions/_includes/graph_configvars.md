@@ -2,12 +2,22 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
+| OCIS_TRACING_ENABLED;GRAPH_TRACING_ENABLED | bool | false | |
+| OCIS_TRACING_TYPE;GRAPH_TRACING_TYPE | string |  | |
+| OCIS_TRACING_ENDPOINT;GRAPH_TRACING_ENDPOINT | string |  | |
+| OCIS_TRACING_COLLECTOR;GRAPH_TRACING_COLLECTOR | string |  | |
+| OCIS_LOG_LEVEL;GRAPH_LOG_LEVEL | string |  | |
+| OCIS_LOG_PRETTY;GRAPH_LOG_PRETTY | bool | false | |
+| OCIS_LOG_COLOR;GRAPH_LOG_COLOR | bool | false | |
+| OCIS_LOG_FILE;GRAPH_LOG_FILE | string |  | |
 | GRAPH_DEBUG_ADDR | string | 127.0.0.1:9124 | |
 | GRAPH_DEBUG_TOKEN | string |  | |
 | GRAPH_DEBUG_PPROF | bool | false | |
 | GRAPH_DEBUG_ZPAGES | bool | false | |
 | GRAPH_HTTP_ADDR | string | 127.0.0.1:9120 | |
 | GRAPH_HTTP_ROOT | string | /graph | |
+| REVA_GATEWAY | string | 127.0.0.1:9142 | |
+| OCIS_JWT_SECRET;GRAPH_JWT_SECRET | string |  | |
 | OCIS_URL;GRAPH_SPACES_WEBDAV_BASE | string | https://localhost:9200 | |
 | GRAPH_SPACES_WEBDAV_PATH | string | /dav/spaces/ | |
 | GRAPH_SPACES_DEFAULT_QUOTA | string | 1000000000 | |

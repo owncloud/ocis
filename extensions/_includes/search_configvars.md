@@ -2,6 +2,14 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
+| OCIS_TRACING_ENABLED;SEARCH_TRACING_ENABLED | bool | false | |
+| OCIS_TRACING_TYPE;SEARCH_TRACING_TYPE | string |  | |
+| OCIS_TRACING_ENDPOINT;SEARCH_TRACING_ENDPOINT | string |  | |
+| OCIS_TRACING_COLLECTOR;SEARCH_TRACING_COLLECTOR | string |  | |
+| OCIS_LOG_LEVEL;SEARCH_LOG_LEVEL | string |  | |
+| OCIS_LOG_PRETTY;SEARCH_LOG_PRETTY | bool | false | |
+| OCIS_LOG_COLOR;SEARCH_LOG_COLOR | bool | false | |
+| OCIS_LOG_FILE;SEARCH_LOG_FILE | string |  | |
 | SEARCH_DEBUG_ADDR | string | 127.0.0.1:9224 | |
 | SEARCH_DEBUG_TOKEN | string |  | |
 | SEARCH_DEBUG_PPROF | bool | false | |

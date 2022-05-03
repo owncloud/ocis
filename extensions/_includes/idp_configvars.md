@@ -3,6 +3,14 @@
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
 | IDP_PASSWORD_RESET_URI | string |  | The URI where a user can reset their password.|
+| OCIS_TRACING_ENABLED;IDP_TRACING_ENABLED | bool | false | |
+| OCIS_TRACING_TYPE;IDP_TRACING_TYPE | string |  | |
+| OCIS_TRACING_ENDPOINT;IDP_TRACING_ENDPOINT | string |  | |
+| OCIS_TRACING_COLLECTOR;IDP_TRACING_COLLECTOR | string |  | |
+| OCIS_LOG_LEVEL;IDP_LOG_LEVEL | string |  | |
+| OCIS_LOG_PRETTY;IDP_LOG_PRETTY | bool | false | |
+| OCIS_LOG_COLOR;IDP_LOG_COLOR | bool | false | |
+| OCIS_LOG_FILE;IDP_LOG_FILE | string |  | |
 | IDP_DEBUG_ADDR | string | 127.0.0.1:9134 | |
 | IDP_DEBUG_TOKEN | string |  | |
 | IDP_DEBUG_PPROF | bool | false | |

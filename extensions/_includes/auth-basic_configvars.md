@@ -2,12 +2,22 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
+| OCIS_TRACING_ENABLED;AUTH_BASIC_TRACING_ENABLED | bool | false | Activates tracing.|
+| OCIS_TRACING_TYPE;AUTH_BASIC_TRACING_TYPE | string |  | |
+| OCIS_TRACING_ENDPOINT;AUTH_BASIC_TRACING_ENDPOINT | string |  | The endpoint to the tracing collector.|
+| OCIS_TRACING_COLLECTOR;AUTH_BASIC_TRACING_COLLECTOR | string |  | |
+| OCIS_LOG_LEVEL;AUTH_BASIC_LOG_LEVEL | string |  | The log level.|
+| OCIS_LOG_PRETTY;AUTH_BASIC_LOG_PRETTY | bool | false | Activates pretty log output.|
+| OCIS_LOG_COLOR;AUTH_BASIC_LOG_COLOR | bool | false | Activates colorized log output.|
+| OCIS_LOG_FILE;AUTH_BASIC_LOG_FILE | string |  | The target log file.|
 | AUTH_BASIC_DEBUG_ADDR | string | 127.0.0.1:9147 | |
 | AUTH_BASIC_DEBUG_TOKEN | string |  | |
 | AUTH_BASIC_DEBUG_PPROF | bool | false | |
 | AUTH_BASIC_DEBUG_ZPAGES | bool | false | |
 | AUTH_BASIC_GRPC_ADDR | string | 127.0.0.1:9146 | The address of the grpc service.|
 | AUTH_BASIC_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
+| OCIS_JWT_SECRET;AUTH_BASIC_JWT_SECRET | string |  | |
+| REVA_GATEWAY | string | 127.0.0.1:9142 | |
 | AUTH_BASIC_AUTH_PROVIDER | string | ldap | The auth provider which should be used by the service|
 | AUTH_BASIC_JSON_PROVIDER_FILE | string |  | The file to which the json provider writes the data.|
 | LDAP_URI;AUTH_BASIC_LDAP_URI | string | ldaps://localhost:9235 | |

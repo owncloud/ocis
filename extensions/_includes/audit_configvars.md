@@ -2,6 +2,10 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
+| OCIS_LOG_LEVEL;AUDIT_LOG_LEVEL | string |  | |
+| OCIS_LOG_PRETTY;AUDIT_LOG_PRETTY | bool | false | |
+| OCIS_LOG_COLOR;AUDIT_LOG_COLOR | bool | false | |
+| OCIS_LOG_FILE;AUDIT_LOG_FILE | string |  | |
 | AUDIT_DEBUG_ADDR | string |  | |
 | AUDIT_DEBUG_TOKEN | string |  | |
 | AUDIT_DEBUG_PPROF | bool | false | |

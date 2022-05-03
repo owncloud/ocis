@@ -2,6 +2,14 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
+| OCIS_TRACING_ENABLED;PROXY_TRACING_ENABLED | bool | false | |
+| OCIS_TRACING_TYPE;PROXY_TRACING_TYPE | string |  | |
+| OCIS_TRACING_ENDPOINT;PROXY_TRACING_ENDPOINT | string |  | |
+| OCIS_TRACING_COLLECTOR;PROXY_TRACING_COLLECTOR | string |  | |
+| OCIS_LOG_LEVEL;PROXY_LOG_LEVEL | string |  | |
+| OCIS_LOG_PRETTY;PROXY_LOG_PRETTY | bool | false | |
+| OCIS_LOG_COLOR;PROXY_LOG_COLOR | bool | false | |
+| OCIS_LOG_FILE;PROXY_LOG_FILE | string |  | |
 | PROXY_DEBUG_ADDR | string | 127.0.0.1:9205 | |
 | PROXY_DEBUG_TOKEN | string |  | |
 | PROXY_DEBUG_PPROF | bool | false | |
@@ -11,10 +19,12 @@
 | PROXY_TRANSPORT_TLS_CERT | string | ~/.ocis/proxy/server.crt | |
 | PROXY_TRANSPORT_TLS_KEY | string | ~/.ocis/proxy/server.key | |
 | PROXY_TLS | bool | true | |
+| REVA_GATEWAY | string | 127.0.0.1:9142 | |
 | OCIS_URL;PROXY_OIDC_ISSUER | string | https://localhost:9200 | |
 | OCIS_INSECURE;PROXY_OIDC_INSECURE | bool | true | |
 | PROXY_OIDC_USERINFO_CACHE_SIZE | int | 1024 | |
 | PROXY_OIDC_USERINFO_CACHE_TTL | int | 10 | |
+| OCIS_JWT_SECRET;PROXY_JWT_SECRET | string |  | |
 | PROXY_ENABLE_PRESIGNEDURLS | bool | true | |
 | PROXY_ACCOUNT_BACKEND_TYPE | string | cs3 | |
 | PROXY_USER_OIDC_CLAIM | string | email | |

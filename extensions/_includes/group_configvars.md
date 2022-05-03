@@ -2,12 +2,22 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
+| OCIS_TRACING_ENABLED;GROUPS_TRACING_ENABLED | bool | false | Activates tracing.|
+| OCIS_TRACING_TYPE;GROUPS_TRACING_TYPE | string |  | |
+| OCIS_TRACING_ENDPOINT;GROUPS_TRACING_ENDPOINT | string |  | The endpoint to the tracing collector.|
+| OCIS_TRACING_COLLECTOR;GROUPS_TRACING_COLLECTOR | string |  | |
+| OCIS_LOG_LEVEL;GROUPS_LOG_LEVEL | string |  | The log level.|
+| OCIS_LOG_PRETTY;GROUPS_LOG_PRETTY | bool | false | Activates pretty log output.|
+| OCIS_LOG_COLOR;GROUPS_LOG_COLOR | bool | false | Activates colorized log output.|
+| OCIS_LOG_FILE;GROUPS_LOG_FILE | string |  | The target log file.|
 | GROUPS_DEBUG_ADDR | string | 127.0.0.1:9161 | |
 | GROUPS_DEBUG_TOKEN | string |  | |
 | GROUPS_DEBUG_PPROF | bool | false | |
 | GROUPS_DEBUG_ZPAGES | bool | false | |
 | GROUPS_GRPC_ADDR | string | 127.0.0.1:9160 | The address of the grpc service.|
 | GROUPS_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
+| OCIS_JWT_SECRET;GROUPS_JWT_SECRET | string |  | |
+| REVA_GATEWAY | string | 127.0.0.1:9142 | |
 | LDAP_URI;GROUPS_LDAP_URI | string | ldaps://localhost:9235 | |
 | LDAP_CACERT;GROUPS_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | |
 | LDAP_INSECURE;GROUPS_LDAP_INSECURE | bool | false | |
