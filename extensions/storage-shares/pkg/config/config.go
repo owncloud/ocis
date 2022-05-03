@@ -20,8 +20,8 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"-"`
 
-	ReadOnly               bool   `yaml:"readonly"`
-	SharesProviderEndpoint string `yaml:"shares_provider_endpoint"`
+	ReadOnly               bool   `yaml:"readonly" env:"STORAGE_SHARES_READ_ONLY"`
+	SharesProviderEndpoint string `yaml:"user_share_provider_endpoint" env:"STORAGE_SHARES_USER_SHARE_PROVIDER_ENDPOINT"`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
