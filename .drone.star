@@ -2293,7 +2293,8 @@ def parallelDeployAcceptancePipeline(ctx):
                          parallelAcceptance(environment) +
                          failEarly(ctx, early_fail),
                 "services": oc10DbService() +
-                            ldapService(),
+                            ldapService() +
+                            redis(),
                 "volumes": [
                     pipeOC10TemplatesVol,
                     pipeOC10PreServerVol,
