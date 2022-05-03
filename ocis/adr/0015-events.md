@@ -25,7 +25,7 @@ A simple example is the notification feature for oCIS: Users should receive an e
 
 * Events are supposed to decouple services and raise flexibility, also considering extensions that are not directly controlled by the ownCloud project.
 * Events should bring flexibility in the implementation of sending and receiving services.
-* Events should not obsolete other mechanisms to communicate, ie. grpc calls.
+* Events should not obsolete other mechanisms to communicate, i.e. grpc calls.
 * Sending an event has to be as little resource consuming for the sender as possible.
 * Events are never user visible.
 

@@ -54,7 +54,7 @@ In order to modify the mime type config you need to set `STORAGE_APP_REGISTRY_MI
 ```json
 [
   {
-    "mime_type": "applition/vnd.oasis.opendocument.text",
+    "mime_type": "application/vnd.oasis.opendocument.text",
     "extension": "odt",
     "name": "OpenDocument",
     "description": "OpenDocument text document",
@@ -82,7 +82,7 @@ Fields:
 - `description` is a human readable description of the file / mime type
 - `icon` URL to an icon which should be used for that mime type
 - `default_app` name of the default app which opens this mime type when the user doesn't specify one
-- `allow_creation` is wether a user should be able to create new file from that mime type (`true` or `false`)
+- `allow_creation` is whether a user should be able to create new file from that mime type (`true` or `false`)
 
 ### Listing available apps / mime types
 

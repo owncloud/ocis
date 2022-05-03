@@ -31,7 +31,7 @@ This API would even allow to provide (WebDAV-) endpoints depending on the kind a
 - No longer the need to make assumptions about WebDAV- and other routes in clients.
 - More meta data available about spaces for a better user experience.
 - Part of the bigger spaces plan.
-- Important to consider in client migration scenarios, ie. in CERN.
+- Important to consider in client migration scenarios, i.e. in CERN.
 
 ## Considered Options
 
