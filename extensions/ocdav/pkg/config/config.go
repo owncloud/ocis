@@ -18,7 +18,7 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool `yaml:"-"`
+	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"OCDAV_SKIP_USER_GROUPS_IN_TOKEN"`
 
 	WebdavNamespace string `yaml:"webdav_namespace" env:"OCDVAV_WEBDAV_NAMESPACE"`
 	FilesNamespace  string `yaml:"files_namespace" env:"OCDAV_FILES_NAMESPACE"`

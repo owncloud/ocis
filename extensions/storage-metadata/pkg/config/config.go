@@ -21,7 +21,7 @@ type Config struct {
 	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"STORAGE_METADATA_MACHINE_AUTH_API_KEY"`
 	MetadataUserID    string        `yaml:"metadata_user_id"`
 
-	SkipUserGroupsInToken bool `yaml:"-"`
+	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_METADATA_SKIP_USER_GROUPS_IN_TOKEN"`
 
 	Driver               string  `yaml:"driver" env:"STORAGE_METADATA_DRIVER" desc:"The driver which should be used by the service"`
 	Drivers              Drivers `yaml:"drivers"`

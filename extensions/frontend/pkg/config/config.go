@@ -23,7 +23,7 @@ type Config struct {
 	Reva              *Reva         `yaml:"reva"`
 	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;FRONTEND_MACHINE_AUTH_API_KEY"`
 
-	SkipUserGroupsInToken bool `yaml:"-"`
+	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"FRONTEND_SKIP_USER_GROUPS_IN_TOKEN"`
 
 	EnableFavorites          bool   `yaml:"enable_favorites" env:"FRONTEND_ENABLE_FAVORITES"`
 	EnableProjectSpaces      bool   `yaml:"enable_project_spaces" env:"FRONTEND_ENABLE_PROJECT_SPACES" desc:"Indicates to clients that project spaces are supposed to be made available."`

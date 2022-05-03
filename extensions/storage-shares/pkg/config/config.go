@@ -18,7 +18,7 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool `yaml:"-"`
+	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_SHARES_SKIP_USER_GROUPS_IN_TOKEN"`
 
 	ReadOnly               bool   `yaml:"readonly" env:"STORAGE_SHARES_READ_ONLY"`
 	SharesProviderEndpoint string `yaml:"user_share_provider_endpoint" env:"STORAGE_SHARES_USER_SHARE_PROVIDER_ENDPOINT"`

@@ -19,10 +19,10 @@ type Config struct {
 	Reva         *Reva         `yaml:"reva"`
 	Events       Events        `yaml:"events"`
 
-	SkipUserGroupsInToken bool `yaml:"-"`
+	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"SHARING_SKIP_USER_GROUPS_IN_TOKEN"`
 
 	UserSharingDriver    string               `yaml:"user_sharing_driver" env:"SHARING_USER_DRIVER"`
-	UserSharingDrivers   UserSharingDrivers   `yaml:"user_sharin_drivers"`
+	UserSharingDrivers   UserSharingDrivers   `yaml:"user_sharing_drivers"`
 	PublicSharingDriver  string               `yaml:"public_sharing_driver" env:"SHARING_PUBLIC_DRIVER"`
 	PublicSharingDrivers PublicSharingDrivers `yaml:"public_sharing_drivers"`
 

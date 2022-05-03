@@ -19,7 +19,7 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool `yaml:"-"`
+	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_USERS_SKIP_USER_GROUPS_IN_TOKEN"`
 
 	Driver               string  `yaml:"driver" env:"STORAGE_USERS_DRIVER" desc:"The storage driver which should be used by the service"`
 	Drivers              Drivers `yaml:"drivers"`

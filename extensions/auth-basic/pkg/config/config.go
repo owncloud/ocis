@@ -18,7 +18,7 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool          `yaml:"-"`
+	SkipUserGroupsInToken bool          `yaml:"skip_user_groups_in_token" env:"AUTH_BASIC_SKIP_USER_GROUPS_IN_TOKEN"`
 	AuthProvider          string        `yaml:"auth_provider" env:"AUTH_BASIC_AUTH_PROVIDER" desc:"The auth provider which should be used by the service"`
 	AuthProviders         AuthProviders `yaml:"auth_providers"`
 
