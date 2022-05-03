@@ -40,7 +40,7 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"enable_expired_shares_cleanup": cfg.UserSharingDrivers.SQL.EnableExpiredSharesCleanup,
 							"janitor_run_interval":          cfg.UserSharingDrivers.SQL.JanitorRunInterval,
 						},
-						"oc10-sql": map[string]interface{}{
+						"owncloudsql": map[string]interface{}{
 							"storage_mount_id": cfg.UserSharingDrivers.SQL.UserStorageMountID,
 							"db_username":      cfg.UserSharingDrivers.SQL.DBUsername,
 							"db_password":      cfg.UserSharingDrivers.SQL.DBPassword,
@@ -73,7 +73,7 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"enable_expired_shares_cleanup": cfg.PublicSharingDrivers.SQL.EnableExpiredSharesCleanup,
 							"janitor_run_interval":          cfg.PublicSharingDrivers.SQL.JanitorRunInterval,
 						},
-						"oc10-sql": map[string]interface{}{
+						"owncloudsql": map[string]interface{}{
 							"storage_mount_id":              cfg.PublicSharingDrivers.SQL.UserStorageMountID,
 							"db_username":                   cfg.PublicSharingDrivers.SQL.DBUsername,
 							"db_password":                   cfg.PublicSharingDrivers.SQL.DBPassword,
