@@ -1790,11 +1790,11 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "STORAGE_USERS_DRIVER_OWNCLOUDSQL_REDIS_ADDR": "redis:6379",
             # ownCloudSQL sharing driver
             "SHARING_USER_DRIVER": "owncloudsql",
-            "SHARING_USER_SQL_USERNAME": "owncloud",
-            "SHARING_USER_SQL_PASSWORD": "owncloud",
-            "SHARING_USER_SQL_HOST": "oc10-db",
-            "SHARING_USER_SQL_PORT": 3306,
-            "SHARING_USER_SQL_NAME": "owncloud",
+            "SHARING_USER_OWNCLOUDSQL_DB_USERNAME": "owncloud",
+            "SHARING_USER_OWNCLOUDSQL_DB_PASSWORD": "owncloud",
+            "SHARING_USER_OWNCLOUDSQL_DB_HOST": "oc10-db",
+            "SHARING_USER_OWNCLOUDSQL_DB_PORT": 3306,
+            "SHARING_USER_OWNCLOUDSQL_DB_NAME": "owncloud",
             # General oCIS config
             # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
             "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,frontend,gateway,user,group,auth-basic,auth-bearer,auth-machine,storage-users,storage-shares,storage-publiclink,appprovider,sharing,proxy,nats,ocdav",
