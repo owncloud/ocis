@@ -39,24 +39,23 @@ func DefaultConfig() *config.Config {
 		HomeMapping:                "",
 		EtagCacheTTL:               0,
 
-		UsersEndpoint:             "localhost:9144",
-		GroupsEndpoint:            "localhost:9160",
-		PermissionsEndpoint:       "localhost:9191",
-		SharingEndpoint:           "localhost:9150",
-		FrontendPublicURL:         "https://localhost:9200",
+		FrontendPublicURL: "https://localhost:9200",
+
+		AppRegistryEndpoint:       "localhost:9222",
 		AuthBasicEndpoint:         "localhost:9146",
 		AuthBearerEndpoint:        "localhost:9148",
 		AuthMachineEndpoint:       "localhost:9166",
+		GroupsEndpoint:            "localhost:9160",
+		PermissionsEndpoint:       "localhost:9191",
+		SharingEndpoint:           "localhost:9150",
 		StoragePublicLinkEndpoint: "localhost:9178",
-		StorageUsersEndpoint:      "localhost:9157",
 		StorageSharesEndpoint:     "localhost:9154",
+		StorageUsersEndpoint:      "localhost:9157",
+		UsersEndpoint:             "localhost:9144",
 
 		StorageRegistry: config.StorageRegistry{
 			Driver: "spaces",
 			JSON:   "",
-		},
-		AppRegistry: config.AppRegistry{
-			MimetypesJSON: "",
 		},
 	}
 }

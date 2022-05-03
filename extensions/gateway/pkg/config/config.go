@@ -21,29 +21,30 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"-"`
 
-	CommitShareToStorageGrant  bool   `yaml:"commit_share_to_storage_grant"`
-	CommitShareToStorageRef    bool   `yaml:"commit_share_to_storage_ref"`
-	ShareFolder                string `yaml:"share_folder"`
-	DisableHomeCreationOnLogin bool   `yaml:"disable_home_creation_on_login"`
-	TransferSecret             string `yaml:"transfer_secret" env:"STORAGE_TRANSFER_SECRET"`
-	TransferExpires            int    `yaml:"transfer_expires"`
-	HomeMapping                string `yaml:"home_mapping"`
-	EtagCacheTTL               int    `yaml:"etag_cache_ttl"`
+	CommitShareToStorageGrant  bool   `yaml:"commit_share_to_storage_grant" env:"GATEWAY_COMMIT_SHARE_TO_STORAGE_GRANT"`
+	CommitShareToStorageRef    bool   `yaml:"commit_share_to_storage_ref" env:"GATEWAY_COMMIT_SHARE_TO_STORAGE_REF"`
+	ShareFolder                string `yaml:"share_folder_name" env:"GATEWAY_SHARE_FOLDER_NAME"`
+	DisableHomeCreationOnLogin bool   `yaml:"disable_home_creation_on_login" env:"GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN"`
+	TransferSecret             string `yaml:"transfer_secret" env:"STORAGE_TRANSFER_SECRET"` // TODO: how to name the env
+	TransferExpires            int    `yaml:"transfer_expires" env:"GATEWAY_TRANSFER_EXPIRES"`
+	HomeMapping                string `yaml:"home_mapping" env:"GATEWAY_HOME_MAPPIN"`
+	EtagCacheTTL               int    `yaml:"etag_cache_ttl" env:"GATEWAY_ETAG_CACHE_TTL"`
 
-	UsersEndpoint             string `yaml:"users_endpoint"`
-	GroupsEndpoint            string `yaml:"groups_endpoint"`
-	PermissionsEndpoint       string `yaml:"permissions_endpoint"`
-	SharingEndpoint           string `yaml:"sharing_endpoint"`
-	FrontendPublicURL         string `yaml:"frontend_public_url" env:"OCIS_URL;GATEWAY_FRONTEND_PUBLIC_URL"`
-	AuthBasicEndpoint         string `yaml:"auth_basic_endpoint"`
-	AuthBearerEndpoint        string `yaml:"auth_bearer_endpoint"`
-	AuthMachineEndpoint       string `yaml:"auth_machine_endpoint"`
-	StoragePublicLinkEndpoint string `yaml:"storage_public_link_endpoint"`
-	StorageUsersEndpoint      string `yaml:"storage_users_endpoint"`
-	StorageSharesEndpoint     string `yaml:"storage_shares_endpoint"`
+	FrontendPublicURL string `yaml:"frontend_public_url" env:"OCIS_URL;GATEWAY_FRONTEND_PUBLIC_URL"`
 
-	StorageRegistry StorageRegistry `yaml:"storage_registry"`
-	AppRegistry     AppRegistry     `yaml:"app_registry"`
+	UsersEndpoint             string `yaml:"users_endpoint" env:"GATEWAY_USERS_ENDPOINT"`
+	GroupsEndpoint            string `yaml:"groups_endpoint" env:"GATEWAY_GROUPS_ENDPOINT"`
+	PermissionsEndpoint       string `yaml:"permissions_endpoint" env:"GATEWAY_PERMISSIONS_ENDPOINT"`
+	SharingEndpoint           string `yaml:"sharing_endpoint" env:"GATEWAY_SHARING_ENDPOINT"`
+	AuthBasicEndpoint         string `yaml:"auth_basic_endpoint" env:"GATEWAY_AUTH_BASIC_ENDPOINT"`
+	AuthBearerEndpoint        string `yaml:"auth_bearer_endpoint" env:"GATEWAY_AUTH_BEARER_ENDPOINT"`
+	AuthMachineEndpoint       string `yaml:"auth_machine_endpoint" env:"GATEWAY_AUTH_MACHINE_ENDPOINT"`
+	StoragePublicLinkEndpoint string `yaml:"storage_public_link_endpoint" env:"GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT"`
+	StorageUsersEndpoint      string `yaml:"storage_users_endpoint" env:"GATEWAY_STORAGE_USERS_ENDPOINT"`
+	StorageSharesEndpoint     string `yaml:"storage_shares_endpoint" env:"GATEWAY_STORAGE_SHARES_ENDPOINT"`
+	AppRegistryEndpoint       string `yaml:"app_registry_endpoint" env:"GATEWAY_APP_REGISTRY_ENDPOINT"`
+
+	StorageRegistry StorageRegistry `yaml:"storage_registry"` //TODO: should we even support switching this?
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
@@ -80,11 +81,7 @@ type GRPCConfig struct {
 }
 
 type StorageRegistry struct {
-	Driver string
-	Rules  []string
-	JSON   string
-}
-
-type AppRegistry struct {
-	MimetypesJSON string
+	Driver string   `yaml:"driver"` //TODO: configure via env?
+	Rules  []string `yaml:"rules"`  //TODO: configure via env?
+	JSON   string   `yaml:"json"`   //TODO: configure via env?
 }

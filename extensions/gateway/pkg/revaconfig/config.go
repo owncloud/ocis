@@ -8,7 +8,6 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/log"
 
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/ocis/extensions/gateway/pkg/config"
 )
 
@@ -35,7 +34,7 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 					// registries is located on the gateway
 					"authregistrysvc":    cfg.Reva.Address,
 					"storageregistrysvc": cfg.Reva.Address,
-					"appregistrysvc":     cfg.Reva.Address,
+					"appregistrysvc":     cfg.AppRegistryEndpoint,
 					// user metadata is located on the users services
 					"preferencessvc":   cfg.UsersEndpoint,
 					"userprovidersvc":  cfg.UsersEndpoint,
@@ -66,14 +65,6 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 								"machine":      cfg.AuthMachineEndpoint,
 								"publicshares": cfg.StoragePublicLinkEndpoint,
 							},
-						},
-					},
-				},
-				"appregistry": map[string]interface{}{
-					"driver": "static",
-					"drivers": map[string]interface{}{
-						"static": map[string]interface{}{
-							"mime_types": mimetypes(cfg, logger),
 						},
 					},
 				},
@@ -167,116 +158,4 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 		},
 		// medatada storage not part of the global namespace
 	}
-}
-
-func mimetypes(cfg *config.Config, logger log.Logger) []map[string]interface{} {
-
-	type mimeTypeConfig struct {
-		MimeType      string `json:"mime_type" mapstructure:"mime_type"`
-		Extension     string `json:"extension" mapstructure:"extension"`
-		Name          string `json:"name" mapstructure:"name"`
-		Description   string `json:"description" mapstructure:"description"`
-		Icon          string `json:"icon" mapstructure:"icon"`
-		DefaultApp    string `json:"default_app" mapstructure:"default_app"`
-		AllowCreation bool   `json:"allow_creation" mapstructure:"allow_creation"`
-	}
-	var mimetypes []mimeTypeConfig
-	var m []map[string]interface{}
-
-	// load default app mimetypes from a json file
-	if cfg.AppRegistry.MimetypesJSON != "" {
-		data, err := ioutil.ReadFile(cfg.AppRegistry.MimetypesJSON)
-		if err != nil {
-			logger.Error().Err(err).Msg("Failed to read app registry mimetypes from JSON file: " + cfg.AppRegistry.MimetypesJSON)
-			return nil
-		}
-		if err = json.Unmarshal(data, &mimetypes); err != nil {
-			logger.Error().Err(err).Msg("Failed to unmarshal storage registry rules")
-			return nil
-		}
-		if err := mapstructure.Decode(mimetypes, &m); err != nil {
-			logger.Error().Err(err).Msg("Failed to decode defaultapp registry mimetypes to mapstructure")
-			return nil
-		}
-		return m
-	}
-
-	logger.Info().Msg("No app registry mimetypes JSON file provided, loading default configuration")
-
-	mimetypes = []mimeTypeConfig{
-		{
-			MimeType:    "application/pdf",
-			Extension:   "pdf",
-			Name:        "PDF",
-			Description: "PDF document",
-		},
-		{
-			MimeType:      "application/vnd.oasis.opendocument.text",
-			Extension:     "odt",
-			Name:          "OpenDocument",
-			Description:   "OpenDocument text document",
-			AllowCreation: true,
-		},
-		{
-			MimeType:      "application/vnd.oasis.opendocument.spreadsheet",
-			Extension:     "ods",
-			Name:          "OpenSpreadsheet",
-			Description:   "OpenDocument spreadsheet document",
-			AllowCreation: true,
-		},
-		{
-			MimeType:      "application/vnd.oasis.opendocument.presentation",
-			Extension:     "odp",
-			Name:          "OpenPresentation",
-			Description:   "OpenDocument presentation document",
-			AllowCreation: true,
-		},
-		{
-			MimeType:      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-			Extension:     "docx",
-			Name:          "Microsoft Word",
-			Description:   "Microsoft Word document",
-			AllowCreation: true,
-		},
-		{
-			MimeType:      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-			Extension:     "xlsx",
-			Name:          "Microsoft Excel",
-			Description:   "Microsoft Excel document",
-			AllowCreation: true,
-		},
-		{
-			MimeType:      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-			Extension:     "pptx",
-			Name:          "Microsoft PowerPoint",
-			Description:   "Microsoft PowerPoint document",
-			AllowCreation: true,
-		},
-		{
-			MimeType:    "application/vnd.jupyter",
-			Extension:   "ipynb",
-			Name:        "Jupyter Notebook",
-			Description: "Jupyter Notebook",
-		},
-		{
-			MimeType:      "text/markdown",
-			Extension:     "md",
-			Name:          "Markdown file",
-			Description:   "Markdown file",
-			AllowCreation: true,
-		},
-		{
-			MimeType:    "application/compressed-markdown",
-			Extension:   "zmd",
-			Name:        "Compressed markdown file",
-			Description: "Compressed markdown file",
-		},
-	}
-
-	if err := mapstructure.Decode(mimetypes, &m); err != nil {
-		logger.Error().Err(err).Msg("Failed to decode defaultapp registry mimetypes to mapstructure")
-		return nil
-	}
-	return m
-
 }
