@@ -1,0 +1,19 @@
+[caption=]
+.Environment variables for the frontend extension
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Name
+| Type
+| Default Value
+| Description
+
+{{- range .}}
+| `{{.Name}}`
+| {{.Type}}
+| {{.DefaultValue}}
+| {{.Description}}
+
+{{- end }}
+|===
+
+Since Version: `+` added, `-` deprecated

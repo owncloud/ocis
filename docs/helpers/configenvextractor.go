@@ -13,6 +13,7 @@ import (
 )
 
 var targets = map[string]string{
+	"adoc-generator.go.tmpl":           "output/adoc/adoc-generator.go",
 	"example-config-generator.go.tmpl": "output/exampleconfig/example-config-generator.go",
 	"extractor.go.tmpl":                "output/env/runner.go",
 }
