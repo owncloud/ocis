@@ -35,7 +35,7 @@ The `docs` folder contains the source for the [oCIS documentation]({{< ref "../"
 
 The `deployments` folder contains documented deployment configurations and templates. On a single node, running a single ocis runtime is a resource efficient way to deploy ocis. For multiple nodes docker compose or helm charts for kubernetes examples can be found here.
 
-The `scripts` folder contains scripts to perform various build, install, analysis, etc operations.
+The `scripts` folder contains scripts to perform various build, install, analysis, etc. operations.
 
 ## Starting points
 

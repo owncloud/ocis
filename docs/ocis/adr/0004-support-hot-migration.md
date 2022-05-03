@@ -55,7 +55,7 @@ Chosen option: "\[option 1\]", because \[justification. e.g., only option, which
 
 ### Cold Migration
 
-The migration happens while the service is offline. File metadata, blobs and share data is exported from ownCloud 10 and imported in oCIS. This can happen user by user, where every user export would contain the file blobs, their metadata, trash, versions, shares and all metadata that belongs to the users storage. To prevent group shares from breaking, users in the same groups must be migrated in batch. Depending on the actual group shares in an instance this may effectively require a complete migration in a single batch.
+The migration happens while the service is offline. File metadata, blobs and share data is exported from ownCloud 10 and imported in oCIS. This can happen user by user, where every user export would contain the file blobs, their metadata, trash, versions, shares and all metadata that belongs to the user's storage. To prevent group shares from breaking, users in the same groups must be migrated in batch. Depending on the actual group shares in an instance this may effectively require a complete migration in a single batch.
 
 - Good, because oCIS can be tested in a staging system without writing to the production system.
 - Good, because file layout on disk can be changed to support new storage driver capabilities.
@@ -69,7 +69,7 @@ The migration happens in subsequent stages while the service is online.
 
 - Good, because the admin can migrate users from old to new backend in a controlled way.
 - Good, because users and admins can learn to trust the new system.
-- Good, because there can be preparations even long before the migrations happens in parallel on the oC10 codebase, ie. addition of metadata that is needed while the system operates.
+- Good, because there can be preparations even long before the migrations happens in parallel on the oC10 codebase, i.e. addition of metadata that is needed while the system operates.
 - Good, because the downtime of the system can be fairly small.
 - Bad, because it is more complex and might drag on for a long time.
 

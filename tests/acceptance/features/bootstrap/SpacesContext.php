@@ -239,7 +239,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * The method finds file by fileName and spaceName and returns data of file wich contains in responseHeader
+	 * The method finds file by fileName and spaceName and returns data of file which contains in responseHeader
 	 * fileName contains the path, if the file is in the folder
 	 *
 	 * @param string $user
@@ -2080,7 +2080,7 @@ class SpacesContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userListAllDeletedFilesinTrash(
+	public function userListAllDeletedFilesInTrash(
 		string $user,
 		string $spaceName
 	): void {
@@ -2122,7 +2122,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName
 	): array {
-		$this->userListAllDeletedFilesinTrash($user, $spaceName);
+		$this->userListAllDeletedFilesInTrash($user, $spaceName);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			207,
 			"Expected response status code should be 207"
@@ -2143,7 +2143,7 @@ class SpacesContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function checkExistanceOfObjectsInTrashbin(
+	public function checkExistenceOfObjectsInTrashbin(
 		string $user,
 		string $object,
 		string $shouldOrNot,

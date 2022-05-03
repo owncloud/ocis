@@ -29,7 +29,7 @@ Feature: Share a file or folder that is inside a space via public link
     And user "Alice" has uploaded a file inside space "share sub-item" with content "some content" to "folder/file.txt"
 
 
-  Scenario Outline: An user-owner can share an entrity inside project space via public link
+  Scenario Outline: An user-owner can share an entity inside project space via public link
     When user "Alice" creates a public link share inside of space "share sub-item" with settings:
       | path        | <entity>      |
       | shareType   | 3             |
@@ -52,7 +52,7 @@ Feature: Share a file or folder that is inside a space via public link
       | folder/file.txt | 3           | 123      | link | 2042-03-25T23:59:59+0100 |
 
 
-  Scenario Outline: An user participant of the project space with space manager role can share an entrity inside project space via public link
+  Scenario Outline: An user participant of the project space with space manager role can share an entity inside project space via public link
     Given user "Alice" has shared a space "share sub-item" to user "Brian" with role "manager"
     When user "Brian" creates a public link share inside of space "share sub-item" with settings:
       | path        | <entity>                 |
@@ -72,7 +72,7 @@ Feature: Share a file or folder that is inside a space via public link
       | folder/file.txt |
 
 
-  Scenario Outline: An user participant of the project space without space manager role cannot share an entrity inside project space via public link
+  Scenario Outline: An user participant of the project space without space manager role cannot share an entity inside project space via public link
     Given user "Alice" has shared a space "share sub-item" to user "Brian" with role "<spaceRole>"
     When user "Brian" creates a public link share inside of space "share sub-item" with settings:
       | path        | <entity>                 |
