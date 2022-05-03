@@ -37,7 +37,7 @@ tpl := template.Must(template.New("").Parse(string(content)))
 
 m := map[string]interface{}{
 {{- range $key, $value := .}}
-	"{{$value}}": *pkg{{$key}}.DefaultConfig(),
+	"{{$value}}": *pkg{{$key}}.FullDefaultConfig(),
 {{- end }}
 }
 
@@ -77,6 +77,14 @@ func GetAnnotatedVariables(s interface{}) []ConfigField {
 			}
 			v := fmt.Sprintf("%v", value.Interface())
 			fields = append(fields, ConfigField{Name: env, DefaultValue: v, Description: desc, Type: value.Type().Name()})
+		case reflect.Ptr:
+			// PolicySelectors in the Proxy are being skipped atm
+			// they are not configurable via env vars, if that changes
+			// they are probably added to the Sanitize() function
+			// and this should not be an issue then
+			if !value.IsZero() && value.Elem().CanInterface() {
+				fields = append(fields, GetAnnotatedVariables(value.Elem().Interface())...)
+			} 
 		case reflect.Struct:
 			fields = append(fields, GetAnnotatedVariables(value.Interface())...)
 		}
