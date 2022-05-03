@@ -29,7 +29,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "storage-metadata",
-		Usage:    "Provide apps for oCIS",
+		Usage:    "Provide metadata storage for oCIS",
 		Commands: GetCommands(cfg),
 	})
 
