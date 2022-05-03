@@ -1776,18 +1776,14 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "LDAP_LOGIN_ATTRIBUTES": "uid,mail",
             # ownCloudSQL storage driver
             "STORAGE_USERS_DRIVER": "owncloudsql",
-            "STORAGE_METADATA_DRIVER": "ocis",
-            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DATADIR": "/mnt/data/files",
-            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_UPLOADINFO_DIR": "/tmp",
-            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_SHARE_FOLDER": "/Shares",
-            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_LAYOUT": "{{.Username}}",
-            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBUSERNAME": "owncloud",
-            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBPASSWORD": "owncloud",
-            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBHOST": "oc10-db",
-            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBPORT": 3306,
-            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBNAME": "owncloud",
-            # TODO: redis is not yet supported
-            "STORAGE_USERS_DRIVER_OWNCLOUDSQL_REDIS_ADDR": "redis:6379",
+            "STORAGE_USERS_OWNCLOUDSQL_DATADIR": "/mnt/data/files",
+            "STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER": "/Shares",
+            "STORAGE_USERS_OWNCLOUDSQL_LAYOUT": "{{.Username}}",
+            "STORAGE_USERS_OWNCLOUDSQL_DB_USERNAME": "owncloud",
+            "STORAGE_USERS_OWNCLOUDSQL_DB_PASSWORD": "owncloud",
+            "STORAGE_USERS_OWNCLOUDSQL_DB_HOST": "oc10-db",
+            "STORAGE_USERS_OWNCLOUDSQL_DB_PORT": 3306,
+            "STORAGE_USERS_OWNCLOUDSQL_DB_NAME": "owncloud",
             # ownCloudSQL sharing driver
             "SHARING_USER_DRIVER": "owncloudsql",
             "SHARING_USER_OWNCLOUDSQL_DB_USERNAME": "owncloud",
@@ -2373,8 +2369,7 @@ def parallelDeployAcceptancePipeline(ctx):
                          parallelAcceptance(environment) +
                          failEarly(ctx, early_fail),
                 "services": oc10DbService() +
-                            ldapService() +
-                            redis(),
+                            ldapService(),
                 "volumes": [
                     pipeOC10TemplatesVol,
                     pipeOC10PreServerVol,
