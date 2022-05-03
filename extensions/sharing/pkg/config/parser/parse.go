@@ -35,23 +35,23 @@ func ParseConfig(cfg *config.Config) error {
 
 func Validate(cfg *config.Config) error {
 	if cfg.TokenManager.JWTSecret == "" {
-		return shared.MissingJWTTokenError(cfg.Service.Name)
+		return shared.MissingJWTToken(cfg.Service.Name)
 	}
 
-	if cfg.PublicSharingDriver == "cs3" && cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey == "" {
-		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
+	if cfg.PublicSharingDriver == "cs3" && cfg.PublicSharingDrivers.CS3.SystemAuthAPIKey == "" {
+		return shared.MissingSystemAuthAPIKey(cfg.Service.Name)
 	}
 
-	if cfg.PublicSharingDriver == "cs3" && cfg.PublicSharingDrivers.CS3.ServiceUserID == "" {
-		return shared.MissingMetadataUserID(cfg.Service.Name)
+	if cfg.PublicSharingDriver == "cs3" && cfg.PublicSharingDrivers.CS3.SystemUserID == "" {
+		return shared.MissingSystemUserID(cfg.Service.Name)
 	}
 
-	if cfg.UserSharingDriver == "cs3" && cfg.UserSharingDrivers.CS3.MachineAuthAPIKey == "" {
-		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
+	if cfg.UserSharingDriver == "cs3" && cfg.UserSharingDrivers.CS3.SystemAuthAPIKey == "" {
+		return shared.MissingSystemAuthAPIKey(cfg.Service.Name)
 	}
 
-	if cfg.UserSharingDriver == "cs3" && cfg.UserSharingDrivers.CS3.ServiceUserID == "" {
-		return shared.MissingMetadataUserID(cfg.Service.Name)
+	if cfg.UserSharingDriver == "cs3" && cfg.UserSharingDrivers.CS3.SystemUserID == "" {
+		return shared.MissingSystemUserID(cfg.Service.Name)
 	}
 
 	return nil

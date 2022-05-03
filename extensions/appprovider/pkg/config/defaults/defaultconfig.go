@@ -84,7 +84,7 @@ func Sanitize(cfg *config.Config) {
 
 func Validate(cfg *config.Config) error {
 	if cfg.TokenManager.JWTSecret == "" {
-		return shared.MissingJWTTokenError(cfg.Service.Name)
+		return shared.MissingJWTToken(cfg.Service.Name)
 	}
 
 	return nil

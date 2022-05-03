@@ -48,8 +48,8 @@ func DefaultConfig() *config.Config {
 				JanitorRunInterval:         60,
 			},
 			CS3: config.UserSharingCS3Driver{
-				ProviderAddr:   "127.0.0.1:9215", // metadata storage
-				ServiceUserIDP: "internal",
+				ProviderAddr:  "127.0.0.1:9215", // metadata storage
+				SystemUserIDP: "internal",
 			},
 		},
 		PublicSharingDriver: "json",
@@ -68,8 +68,8 @@ func DefaultConfig() *config.Config {
 				JanitorRunInterval:         60,
 			},
 			CS3: config.PublicSharingCS3Driver{
-				ProviderAddr:   "127.0.0.1:9215", // metadata storage
-				ServiceUserIDP: "internal",
+				ProviderAddr:  "127.0.0.1:9215", // metadata storage
+				SystemUserIDP: "internal",
 			},
 		},
 		Events: config.Events{
@@ -119,20 +119,20 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.TokenManager = &config.TokenManager{}
 	}
 
-	if cfg.UserSharingDrivers.CS3.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
-		cfg.UserSharingDrivers.CS3.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	if cfg.UserSharingDrivers.CS3.SystemAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemAuthAPIKey != "" {
+		cfg.UserSharingDrivers.CS3.SystemAuthAPIKey = cfg.Commons.SystemAuthAPIKey
 	}
 
-	if cfg.UserSharingDrivers.CS3.ServiceUserID == "" && cfg.Commons != nil && cfg.Commons.MetadataUserID != "" {
-		cfg.UserSharingDrivers.CS3.ServiceUserID = cfg.Commons.MetadataUserID
+	if cfg.UserSharingDrivers.CS3.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
+		cfg.UserSharingDrivers.CS3.SystemUserID = cfg.Commons.SystemUserID
 	}
 
-	if cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
-		cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	if cfg.PublicSharingDrivers.CS3.SystemAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemAuthAPIKey != "" {
+		cfg.PublicSharingDrivers.CS3.SystemAuthAPIKey = cfg.Commons.SystemAuthAPIKey
 	}
 
-	if cfg.PublicSharingDrivers.CS3.ServiceUserID == "" && cfg.Commons != nil && cfg.Commons.MetadataUserID != "" {
-		cfg.PublicSharingDrivers.CS3.ServiceUserID = cfg.Commons.MetadataUserID
+	if cfg.PublicSharingDrivers.CS3.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
+		cfg.PublicSharingDrivers.CS3.SystemUserID = cfg.Commons.SystemUserID
 	}
 }
 

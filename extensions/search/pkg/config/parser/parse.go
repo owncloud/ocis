@@ -35,7 +35,7 @@ func ParseConfig(cfg *config.Config) error {
 
 func Validate(cfg *config.Config) error {
 	if cfg.MachineAuthAPIKey == "" {
-		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
+		return shared.MissingMachineAuthAPIKey(cfg.Service.Name)
 	}
 	return nil
 }

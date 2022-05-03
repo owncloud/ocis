@@ -36,11 +36,11 @@ func ParseConfig(cfg *config.Config) error {
 
 func Validate(cfg *config.Config) error {
 	if cfg.TokenManager.JWTSecret == "" {
-		return shared.MissingJWTTokenError(cfg.Service.Name)
+		return shared.MissingJWTToken(cfg.Service.Name)
 	}
 
 	if cfg.MachineAuthAPIKey == "" {
-		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
+		return shared.MissingMachineAuthAPIKey(cfg.Service.Name)
 	}
 
 	return nil

@@ -34,11 +34,15 @@ func ParseConfig(cfg *config.Config) error {
 
 func Validate(cfg *config.Config) error {
 	if cfg.TokenManager.JWTSecret == "" {
-		return shared.MissingJWTTokenError(cfg.Service.Name)
+		return shared.MissingJWTToken(cfg.Service.Name)
 	}
 
-	if cfg.Metadata.MachineAuthAPIKey == "" {
-		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
+	if cfg.Metadata.SystemUserID == "" {
+		return shared.MissingSystemUserID(cfg.Service.Name)
+	}
+
+	if cfg.Metadata.SystemAuthAPIKey == "" {
+		return shared.MissingSystemAuthAPIKey(cfg.Service.Name)
 	}
 
 	return nil

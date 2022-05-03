@@ -75,10 +75,10 @@ type UserSharingSQLDriver struct {
 }
 
 type UserSharingCS3Driver struct {
-	ProviderAddr      string
-	ServiceUserID     string
-	ServiceUserIDP    string `env:"OCIS_URL;SHARING_CS3_SERVICE_USER_IDP"`
-	MachineAuthAPIKey string `env:"OCIS_MACHINE_AUTH_API_KEY"`
+	ProviderAddr     string
+	SystemUserID     string `env:"SYSTEM_USER_ID;SHARING_USER_SYSTEM_USER_ID"`
+	SystemUserIDP    string `env:"SYSTEM_USER_IDP;SHARING_USER_SYSTEM_USER_IDP"`
+	SystemAuthAPIKey string `env:"SYSTEM_AUTH_API_KEY;SHARING_USER_SYSTEM_AUTH_API_KEY"`
 }
 
 type PublicSharingDrivers struct {
@@ -104,10 +104,10 @@ type PublicSharingSQLDriver struct {
 }
 
 type PublicSharingCS3Driver struct {
-	ProviderAddr      string
-	ServiceUserID     string
-	ServiceUserIDP    string
-	MachineAuthAPIKey string `env:"OCIS_MACHINE_AUTH_API_KEY"`
+	ProviderAddr     string
+	SystemUserID     string `env:"SYSTEM_USER_ID;SHARING_PUBLIC_SYSTEM_USER_ID"`
+	SystemUserIDP    string `env:"SYSTEM_USER_IDP;SHARING_PUBLIC_SYSTEM_USER_IDP"`
+	SystemAuthAPIKey string `env:"SYSTEM_AUTH_API_KEY;SHARING_PUBLIC_SYSTEM_AUTH_API_KEY"`
 }
 
 type Events struct {

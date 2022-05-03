@@ -122,12 +122,12 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.TokenManager = &config.TokenManager{}
 	}
 
-	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
-		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	if cfg.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
+		cfg.SystemUserID = cfg.Commons.SystemUserID
 	}
 
-	if cfg.MetadataUserID == "" && cfg.Commons != nil && cfg.Commons.MetadataUserID != "" {
-		cfg.MetadataUserID = cfg.Commons.MetadataUserID
+	if cfg.SystemAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemAuthAPIKey != "" {
+		cfg.SystemAuthAPIKey = cfg.Commons.SystemAuthAPIKey
 	}
 
 }

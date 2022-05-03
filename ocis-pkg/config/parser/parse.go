@@ -95,26 +95,35 @@ func EnsureCommons(cfg *config.Config) {
 	}
 
 	// copy metadata user id to the commons part if set
-	if cfg.MetadataUserID != "" {
-		cfg.Commons.MetadataUserID = cfg.MetadataUserID
+	if cfg.SystemUserID != "" {
+		cfg.Commons.SystemUserID = cfg.SystemUserID
+	}
+
+	// copy system auth api key to the commons part if set
+	if cfg.SystemAuthAPIKey != "" {
+		cfg.Commons.SystemAuthAPIKey = cfg.SystemAuthAPIKey
 	}
 }
 
 func Validate(cfg *config.Config) error {
 	if cfg.TokenManager.JWTSecret == "" {
-		return shared.MissingJWTTokenError("ocis")
+		return shared.MissingJWTToken("ocis")
 	}
 
 	if cfg.TransferSecret == "" {
-		return shared.MissingRevaTransferSecretError("ocis")
+		return shared.MissingRevaTransferSecret("ocis")
 	}
 
 	if cfg.MachineAuthAPIKey == "" {
-		return shared.MissingMachineAuthApiKeyError("ocis")
+		return shared.MissingMachineAuthAPIKey("ocis")
 	}
 
-	if cfg.MetadataUserID == "" {
-		return shared.MissingMetadataUserID("ocis")
+	if cfg.SystemUserID == "" {
+		return shared.MissingSystemUserID("ocis")
+	}
+
+	if cfg.SystemAuthAPIKey == "" {
+		return shared.MissingSystemAuthAPIKey("ocis")
 	}
 
 	return nil

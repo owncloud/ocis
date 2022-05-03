@@ -160,7 +160,7 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 							"users": map[string]interface{}{
 								"serviceuser": map[string]interface{}{
 									"id": map[string]interface{}{
-										"opaqueId": cfg.MetadataUserID,
+										"opaqueId": cfg.SystemUserID,
 										"idp":      "internal",
 										"type":     userpb.UserType_USER_TYPE_PRIMARY,
 									},
@@ -185,7 +185,7 @@ func storageMetadataFromStruct(c *cli.Context, cfg *config.Config) map[string]in
 					"auth_manager": "machine",
 					"auth_managers": map[string]interface{}{
 						"machine": map[string]interface{}{
-							"api_key":      cfg.MachineAuthAPIKey,
+							"api_key":      cfg.SystemAuthAPIKey,
 							"gateway_addr": cfg.GRPC.Addr,
 						},
 					},

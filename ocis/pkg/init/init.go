@@ -100,7 +100,8 @@ type OcisConfig struct {
 	TokenManager      TokenManager `yaml:"token_manager"`
 	MachineAuthApiKey string       `yaml:"machine_auth_api_key"`
 	TransferSecret    string       `yaml:"transfer_secret"`
-	MetadataUserID    string       `yaml:"metadata_user_id"`
+	SystemUserID      string       `yaml:"system_user_id"`
+	SystemAuthApiKey  string       `yaml:"system_auth_api_key"`
 	Graph             GraphExtension
 	Idp               LdapBasedExtension
 	Idm               IdmExtension
@@ -162,7 +163,11 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		return err
 	}
 
-	metadataUserID := uuid.Must(uuid.NewV4()).String()
+	systemUserID := uuid.Must(uuid.NewV4()).String()
+	systemAuthApiKey, err := generators.GenerateRandomPassword(passwordLength)
+	if err != nil {
+		return fmt.Errorf("could not generate random system auth api key: %s", err)
+	}
 
 	idmServicePassword, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
@@ -190,11 +195,11 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 	}
 	machineAuthApiKey, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
-		return fmt.Errorf("could not generate random password for machineauthsecret: %s", err)
+		return fmt.Errorf("could not generate random machine auth api key: %s", err)
 	}
 	revaTransferSecret, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
-		return fmt.Errorf("could not generate random password for machineauthsecret: %s", err)
+		return fmt.Errorf("could not generate random reva transfer secret: %s", err)
 	}
 
 	cfg := OcisConfig{
@@ -203,7 +208,8 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		},
 		MachineAuthApiKey: machineAuthApiKey,
 		TransferSecret:    revaTransferSecret,
-		MetadataUserID:    metadataUserID,
+		SystemUserID:      systemUserID,
+		SystemAuthApiKey:  systemAuthApiKey,
 		Idm: IdmExtension{
 			ServiceUserPasswords: ServiceUserPasswordsSettings{
 				AdminPassword: ocisAdminServicePassword,

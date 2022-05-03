@@ -6,7 +6,7 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 )
 
-func MissingMachineAuthApiKeyError(service string) error {
+func MissingMachineAuthAPIKey(service string) error {
 	return fmt.Errorf("The Machineauth API key has not been configured for %s. "+
 		"Make sure your %s config contains the proper values "+
 		"(e.g. by running ocis init or setting it manually in "+
@@ -14,7 +14,7 @@ func MissingMachineAuthApiKeyError(service string) error {
 		service, defaults.BaseConfigPath())
 }
 
-func MissingJWTTokenError(service string) error {
+func MissingJWTToken(service string) error {
 	return fmt.Errorf("jwt_secret has not been set properly in your config for %s. "+
 		"Make sure your %s config contains the proper values "+
 		"(e.g. by running ocis init or setting it manually in "+
@@ -22,7 +22,7 @@ func MissingJWTTokenError(service string) error {
 		service, defaults.BaseConfigPath())
 }
 
-func MissingRevaTransferSecretError(service string) error {
+func MissingRevaTransferSecret(service string) error {
 	return fmt.Errorf("transfer_secret has not been set properly in your config for %s. "+
 		"Make sure your %s config contains the proper values "+
 		"(e.g. by running ocis init or setting it manually in "+
@@ -46,8 +46,16 @@ func MissingServiceUserPassword(service, serviceUser string) error {
 		serviceUser, service, defaults.BaseConfigPath())
 }
 
-func MissingMetadataUserID(service string) error {
-	return fmt.Errorf("The metadata user ID has not been configured for %s. "+
+func MissingSystemUserID(service string) error {
+	return fmt.Errorf("The system user ID has not been configured for %s. "+
+		"Make sure your %s config contains the proper values "+
+		"(e.g. by running ocis init or setting it manually in "+
+		"the config/corresponding environment variable).",
+		service, defaults.BaseConfigPath())
+}
+
+func MissingSystemAuthAPIKey(service string) error {
+	return fmt.Errorf("The system auth API key has not been configured for %s. "+
 		"Make sure your %s config contains the proper values "+
 		"(e.g. by running ocis init or setting it manually in "+
 		"the config/corresponding environment variable).",

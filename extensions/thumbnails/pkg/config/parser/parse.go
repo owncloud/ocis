@@ -36,7 +36,7 @@ func ParseConfig(cfg *config.Config) error {
 
 func Validate(cfg *config.Config) error {
 	if cfg.Thumbnail.TransferSecret == "" {
-		return shared.MissingRevaTransferSecretError(cfg.Service.Name)
+		return shared.MissingRevaTransferSecret(cfg.Service.Name)
 	}
 
 	return nil

@@ -23,7 +23,8 @@ type Config struct {
 
 	IdentityManagement IdentityManagement `yaml:"identity_management"`
 
-	AccountBackend     string `yaml:"account_backend" env:"OCS_ACCOUNT_BACKEND_TYPE"`
+	AccountBackend string `yaml:"account_backend" env:"OCS_ACCOUNT_BACKEND_TYPE"`
+	// StorageUsersDriver is used to list and then delete all spaces owned by the user
 	StorageUsersDriver string `yaml:"storage_users_driver" env:"STORAGE_USERS_DRIVER;OCS_STORAGE_USERS_DRIVER"`
 	MachineAuthAPIKey  string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;OCS_MACHINE_AUTH_API_KEY"`
 
