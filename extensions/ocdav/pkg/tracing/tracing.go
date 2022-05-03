@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	// TraceProvider is the global trace provider for the proxy service.
+	// TraceProvider is the global trace provider for the service.
 	TraceProvider = trace.NewNoopTracerProvider()
 )
 
