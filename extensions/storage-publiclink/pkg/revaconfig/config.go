@@ -27,13 +27,13 @@ func StoragePublicLinkConfigFromStruct(cfg *config.Config) map[string]interface{
 			"services": map[string]interface{}{
 				"publicstorageprovider": map[string]interface{}{
 					"mount_id":     cfg.StorageProvider.MountID,
-					"gateway_addr": cfg.StorageProvider.GatewayEndpoint,
+					"gateway_addr": cfg.Reva.Address,
 				},
 				"authprovider": map[string]interface{}{
 					"auth_manager": "publicshares",
 					"auth_managers": map[string]interface{}{
 						"publicshares": map[string]interface{}{
-							"gateway_addr": cfg.AuthProvider.GatewayEndpoint,
+							"gateway_addr": cfg.Reva.Address,
 						},
 					},
 				},

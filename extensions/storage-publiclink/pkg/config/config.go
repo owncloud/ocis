@@ -20,7 +20,6 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"-"`
 
-	AuthProvider    AuthProvider    `yaml:"auth_provider"`
 	StorageProvider StorageProvider `yaml:"storage_provider"`
 
 	Supervised bool            `yaml:"-"`
@@ -57,11 +56,6 @@ type GRPCConfig struct {
 	Protocol  string `yaml:"protocol" env:"STORAGE_PUBLICLINK_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
 }
 
-type AuthProvider struct {
-	GatewayEndpoint string
-}
-
 type StorageProvider struct {
-	MountID         string
-	GatewayEndpoint string
+	MountID string `yaml:"mount_id" env:"STORAGE_PUBLICLINK_STORAGE_PROVIDER_MOUNT_ID"`
 }
