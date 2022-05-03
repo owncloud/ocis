@@ -5,8 +5,10 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/gofrs/uuid"
 	"github.com/owncloud/ocis/extensions/settings/pkg/config/defaults"
 	olog "github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/ocis-pkg/shared"
 	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
 	"github.com/stretchr/testify/require"
 )
@@ -18,7 +20,6 @@ var (
 	s = &Store{
 		Logger: logger,
 		l:      &sync.Mutex{},
-		cfg:    defaults.DefaultConfig(),
 	}
 
 	logger = olog.NewLogger(
@@ -89,6 +90,11 @@ var (
 )
 
 func init() {
+	s.cfg = defaults.DefaultConfig()
+	s.cfg.Commons = &shared.Commons{
+		AdminUserID: uuid.Must(uuid.NewV4()).String(),
+	}
+
 	_ = NewMDC(s)
 	setupRoles()
 }
