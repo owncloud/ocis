@@ -2,14 +2,14 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
-| OCIS_TRACING_ENABLED;ACCOUNTS_TRACING_ENABLED | bool | false | Activates tracing.|
-| OCIS_TRACING_TYPE;ACCOUNTS_TRACING_TYPE | string |  | |
-| OCIS_TRACING_ENDPOINT;ACCOUNTS_TRACING_ENDPOINT | string |  | The endpoint to the tracing collector.|
-| OCIS_TRACING_COLLECTOR;ACCOUNTS_TRACING_COLLECTOR | string |  | |
-| OCIS_LOG_LEVEL;ACCOUNTS_LOG_LEVEL | string |  | The log level.|
-| OCIS_LOG_PRETTY;ACCOUNTS_LOG_PRETTY | bool | false | Activates pretty log output.|
-| OCIS_LOG_COLOR;ACCOUNTS_LOG_COLOR | bool | false | Activates colorized log output.|
-| OCIS_LOG_FILE;ACCOUNTS_LOG_FILE | string |  | The target log file.|
+| OCIS_TRACING_ENABLED<br/>ACCOUNTS_TRACING_ENABLED | bool | false | Activates tracing.|
+| OCIS_TRACING_TYPE<br/>ACCOUNTS_TRACING_TYPE | string |  | |
+| OCIS_TRACING_ENDPOINT<br/>ACCOUNTS_TRACING_ENDPOINT | string |  | The endpoint to the tracing collector.|
+| OCIS_TRACING_COLLECTOR<br/>ACCOUNTS_TRACING_COLLECTOR | string |  | |
+| OCIS_LOG_LEVEL<br/>ACCOUNTS_LOG_LEVEL | string |  | The log level.|
+| OCIS_LOG_PRETTY<br/>ACCOUNTS_LOG_PRETTY | bool | false | Activates pretty log output.|
+| OCIS_LOG_COLOR<br/>ACCOUNTS_LOG_COLOR | bool | false | Activates colorized log output.|
+| OCIS_LOG_FILE<br/>ACCOUNTS_LOG_FILE | string |  | The target log file.|
 | ACCOUNTS_DEBUG_ADDR | string | 127.0.0.1:9182 | |
 | ACCOUNTS_DEBUG_TOKEN | string |  | |
 | ACCOUNTS_DEBUG_PPROF | bool | false | |
@@ -18,7 +18,7 @@
 | ACCOUNTS_HTTP_ROOT | string | / | The root path of the http service.|
 | ACCOUNTS_CACHE_TTL | int | 604800 | The cache time for the static assets.|
 | ACCOUNTS_GRPC_ADDR | string | 127.0.0.1:9180 | The address of the grpc service.|
-| OCIS_JWT_SECRET;ACCOUNTS_JWT_SECRET | string |  | |
+| OCIS_JWT_SECRET<br/>ACCOUNTS_JWT_SECRET | string |  | |
 | ACCOUNTS_ASSET_PATH | string |  | The path to the ui assets.|
 | ACCOUNTS_STORAGE_BACKEND | string | cs3 | Defines which storage implementation is to be used|
 | ACCOUNTS_STORAGE_DISK_PATH | string | ~/.ocis/accounts | The path where the accounts data is stored.|

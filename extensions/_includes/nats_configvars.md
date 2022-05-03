@@ -2,10 +2,10 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
-| OCIS_LOG_LEVEL;NATS_LOG_LEVEL | string |  | |
-| OCIS_LOG_PRETTY;NATS_LOG_PRETTY | bool | false | |
-| OCIS_LOG_COLOR;NATS_LOG_COLOR | bool | false | |
-| OCIS_LOG_FILE;NATS_LOG_FILE | string |  | |
+| OCIS_LOG_LEVEL<br/>NATS_LOG_LEVEL | string |  | |
+| OCIS_LOG_PRETTY<br/>NATS_LOG_PRETTY | bool | false | |
+| OCIS_LOG_COLOR<br/>NATS_LOG_COLOR | bool | false | |
+| OCIS_LOG_FILE<br/>NATS_LOG_FILE | string |  | |
 | NATS_DEBUG_ADDR | string |  | |
 | NATS_DEBUG_TOKEN | string |  | |
 | NATS_DEBUG_PPROF | bool | false | |

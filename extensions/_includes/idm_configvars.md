@@ -2,14 +2,14 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
-| OCIS_TRACING_ENABLED;IDM_TRACING_ENABLED | bool | false | |
-| OCIS_TRACING_TYPE;IDM_TRACING_TYPE | string |  | |
-| OCIS_TRACING_ENDPOINT;IDM_TRACING_ENDPOINT | string |  | |
-| OCIS_TRACING_COLLECTOR;IDM_TRACING_COLLECTOR | string |  | |
-| OCIS_LOG_LEVEL;IDM_LOG_LEVEL | string |  | |
-| OCIS_LOG_PRETTY;IDM_LOG_PRETTY | bool | false | |
-| OCIS_LOG_COLOR;IDM_LOG_COLOR | bool | false | |
-| OCIS_LOG_FILE;IDM_LOG_FILE | string |  | |
+| OCIS_TRACING_ENABLED<br/>IDM_TRACING_ENABLED | bool | false | |
+| OCIS_TRACING_TYPE<br/>IDM_TRACING_TYPE | string |  | |
+| OCIS_TRACING_ENDPOINT<br/>IDM_TRACING_ENDPOINT | string |  | |
+| OCIS_TRACING_COLLECTOR<br/>IDM_TRACING_COLLECTOR | string |  | |
+| OCIS_LOG_LEVEL<br/>IDM_LOG_LEVEL | string |  | |
+| OCIS_LOG_PRETTY<br/>IDM_LOG_PRETTY | bool | false | |
+| OCIS_LOG_COLOR<br/>IDM_LOG_COLOR | bool | false | |
+| OCIS_LOG_FILE<br/>IDM_LOG_FILE | string |  | |
 | IDM_DEBUG_ADDR | string |  | |
 | IDM_DEBUG_TOKEN | string |  | |
 | IDM_DEBUG_PPROF | bool | false | |
@@ -18,7 +18,7 @@
 | IDM_LDAPS_CERT | string | ~/.ocis/idm/ldap.crt | File name of the TLS server certificate for the ldaps listener|
 | IDM_LDAPS_KEY | string | ~/.ocis/idm/ldap.key | File name for the TLS certificate key for the server certificate|
 | IDM_DATABASE_PATH | string | ~/.ocis/idm/ocis.boltdb | Full path to the idm backend database|
-| IDM_CREATE_DEMO_USERS;ACCOUNTS_DEMO_USERS_AND_GROUPS | bool | false | Flag to enabe/disable the creation of the demo users|
+| IDM_CREATE_DEMO_USERS<br/>ACCOUNTS_DEMO_USERS_AND_GROUPS | bool | false | Flag to enabe/disable the creation of the demo users|
 | IDM_ADMIN_PASSWORD | string |  | Password to set for the ocis "admin" user. Either cleartext or an argon2id hash|
 | IDM_SVC_PASSWORD | string |  | Password to set for the "idm" service user. Either cleartext or an argon2id hash|
 | IDM_REVASVC_PASSWORD | string |  | Password to set for the "reva" service user. Either cleartext or an argon2id hash|

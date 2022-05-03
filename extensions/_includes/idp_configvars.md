@@ -3,14 +3,14 @@
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
 | IDP_PASSWORD_RESET_URI | string |  | The URI where a user can reset their password.|
-| OCIS_TRACING_ENABLED;IDP_TRACING_ENABLED | bool | false | |
-| OCIS_TRACING_TYPE;IDP_TRACING_TYPE | string |  | |
-| OCIS_TRACING_ENDPOINT;IDP_TRACING_ENDPOINT | string |  | |
-| OCIS_TRACING_COLLECTOR;IDP_TRACING_COLLECTOR | string |  | |
-| OCIS_LOG_LEVEL;IDP_LOG_LEVEL | string |  | |
-| OCIS_LOG_PRETTY;IDP_LOG_PRETTY | bool | false | |
-| OCIS_LOG_COLOR;IDP_LOG_COLOR | bool | false | |
-| OCIS_LOG_FILE;IDP_LOG_FILE | string |  | |
+| OCIS_TRACING_ENABLED<br/>IDP_TRACING_ENABLED | bool | false | |
+| OCIS_TRACING_TYPE<br/>IDP_TRACING_TYPE | string |  | |
+| OCIS_TRACING_ENDPOINT<br/>IDP_TRACING_ENDPOINT | string |  | |
+| OCIS_TRACING_COLLECTOR<br/>IDP_TRACING_COLLECTOR | string |  | |
+| OCIS_LOG_LEVEL<br/>IDP_LOG_LEVEL | string |  | |
+| OCIS_LOG_PRETTY<br/>IDP_LOG_PRETTY | bool | false | |
+| OCIS_LOG_COLOR<br/>IDP_LOG_COLOR | bool | false | |
+| OCIS_LOG_FILE<br/>IDP_LOG_FILE | string |  | |
 | IDP_DEBUG_ADDR | string | 127.0.0.1:9134 | |
 | IDP_DEBUG_TOKEN | string |  | |
 | IDP_DEBUG_PPROF | bool | false | |
@@ -21,7 +21,7 @@
 | IDP_TRANSPORT_TLS_KEY | string | ~/.ocis/idp/server.key | |
 | IDP_TLS | bool | false | |
 | IDP_ASSET_PATH | string |  | |
-| OCIS_URL;IDP_ISS | string | https://localhost:9200 | |
+| OCIS_URL<br/>IDP_ISS | string | https://localhost:9200 | |
 | IDP_IDENTITY_MANAGER | string | ldap | |
 | IDP_URI_BASE_PATH | string |  | |
 | IDP_SIGN_IN_URI | string |  | |
@@ -43,16 +43,16 @@
 | IDP_ID_TOKEN_EXPIRATION | uint64 | 3600 | |
 | IDP_REFRESH_TOKEN_EXPIRATION | uint64 | 94608000 | |
 |  | uint64 | 0 | |
-| LDAP_URI;IDP_LDAP_URI | string | ldaps://localhost:9235 | |
-| LDAP_CACERT;IDP_LDAP_TLS_CACERT | string | ~/.ocis/idm/ldap.crt | |
-| LDAP_BIND_DN;IDP_LDAP_BIND_DN | string | uid=idp,ou=sysusers,o=libregraph-idm | |
-| LDAP_BIND_PASSWORD;IDP_LDAP_BIND_PASSWORD | string |  | |
+| LDAP_URI<br/>IDP_LDAP_URI | string | ldaps://localhost:9235 | |
+| LDAP_CACERT<br/>IDP_LDAP_TLS_CACERT | string | ~/.ocis/idm/ldap.crt | |
+| LDAP_BIND_DN<br/>IDP_LDAP_BIND_DN | string | uid=idp,ou=sysusers,o=libregraph-idm | |
+| LDAP_BIND_PASSWORD<br/>IDP_LDAP_BIND_PASSWORD | string |  | |
 | LDAP_USER_BASE_DN,IDP_LDAP_BASE_DN | string | ou=users,o=libregraph-idm | |
-| LDAP_USER_SCOPE;IDP_LDAP_SCOPE | string | sub | |
+| LDAP_USER_SCOPE<br/>IDP_LDAP_SCOPE | string | sub | |
 | IDP_LDAP_LOGIN_ATTRIBUTE | string | uid | |
-| LDAP_USER_SCHEMA_MAIL;IDP_LDAP_EMAIL_ATTRIBUTE | string | mail | |
-| LDAP_USER_SCHEMA_USERNAME;IDP_LDAP_NAME_ATTRIBUTE | string | displayName | |
-| LDAP_USER_SCHEMA_ID;IDP_LDAP_UUID_ATTRIBUTE | string | uid | |
+| LDAP_USER_SCHEMA_MAIL<br/>IDP_LDAP_EMAIL_ATTRIBUTE | string | mail | |
+| LDAP_USER_SCHEMA_USERNAME<br/>IDP_LDAP_NAME_ATTRIBUTE | string | displayName | |
+| LDAP_USER_SCHEMA_ID<br/>IDP_LDAP_UUID_ATTRIBUTE | string | uid | |
 | IDP_LDAP_UUID_ATTRIBUTE_TYPE | string | text | |
-| LDAP_USER_FILTER;IDP_LDAP_FILTER | string |  | |
-| LDAP_USER_OBJECTCLASS;IDP_LDAP_OBJECTCLASS | string | inetOrgPerson | |
+| LDAP_USER_FILTER<br/>IDP_LDAP_FILTER | string |  | |
+| LDAP_USER_OBJECTCLASS<br/>IDP_LDAP_OBJECTCLASS | string | inetOrgPerson | |

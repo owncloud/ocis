@@ -2,14 +2,14 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
-| OCIS_TRACING_ENABLED;SETTINGS_TRACING_ENABLED | bool | false | |
-| OCIS_TRACING_TYPE;SETTINGS_TRACING_TYPE | string |  | |
-| OCIS_TRACING_ENDPOINT;SETTINGS_TRACING_ENDPOINT | string |  | |
-| OCIS_TRACING_COLLECTOR;SETTINGS_TRACING_COLLECTOR | string |  | |
-| OCIS_LOG_LEVEL;SETTINGS_LOG_LEVEL | string |  | |
-| OCIS_LOG_PRETTY;SETTINGS_LOG_PRETTY | bool | false | |
-| OCIS_LOG_COLOR;SETTINGS_LOG_COLOR | bool | false | |
-| OCIS_LOG_FILE;SETTINGS_LOG_FILE | string |  | |
+| OCIS_TRACING_ENABLED<br/>SETTINGS_TRACING_ENABLED | bool | false | |
+| OCIS_TRACING_TYPE<br/>SETTINGS_TRACING_TYPE | string |  | |
+| OCIS_TRACING_ENDPOINT<br/>SETTINGS_TRACING_ENDPOINT | string |  | |
+| OCIS_TRACING_COLLECTOR<br/>SETTINGS_TRACING_COLLECTOR | string |  | |
+| OCIS_LOG_LEVEL<br/>SETTINGS_LOG_LEVEL | string |  | |
+| OCIS_LOG_PRETTY<br/>SETTINGS_LOG_PRETTY | bool | false | |
+| OCIS_LOG_COLOR<br/>SETTINGS_LOG_COLOR | bool | false | |
+| OCIS_LOG_FILE<br/>SETTINGS_LOG_FILE | string |  | |
 | SETTINGS_DEBUG_ADDR | string | 127.0.0.1:9194 | |
 | SETTINGS_DEBUG_TOKEN | string |  | |
 | SETTINGS_DEBUG_PPROF | bool | false | |
@@ -26,4 +26,4 @@
 | METADATA_SERVICE_USER_IDP | string | internal | |
 | OCIS_MACHINE_AUTH_API_KEY | string |  | |
 | SETTINGS_ASSET_PATH | string |  | |
-| OCIS_JWT_SECRET;SETTINGS_JWT_SECRET | string |  | |
+| OCIS_JWT_SECRET<br/>SETTINGS_JWT_SECRET | string |  | |
