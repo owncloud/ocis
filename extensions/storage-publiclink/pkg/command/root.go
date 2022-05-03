@@ -25,11 +25,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis-accounts command.
+// Execute is the entry point for the storage-publiclink command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:     "appprovider",
-		Usage:    "Provide apps for oCIS",
+		Name:     "storage-publiclink",
+		Usage:    "Provide publiclink storage for oCIS",
 		Commands: GetCommands(cfg),
 	})
 

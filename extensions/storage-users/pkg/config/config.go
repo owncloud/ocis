@@ -75,7 +75,7 @@ type HTTPConfig struct {
 type Drivers struct {
 	OCIS        OCISDriver        `yaml:"ocis"`
 	S3NG        S3NGDriver        `yaml:"s3ng"`
-	OwnCloudSQL OwnCloudSQLDriver `yaml:"owncloud_sql"`
+	OwnCloudSQL OwnCloudSQLDriver `yaml:"owncloudsql"`
 
 	S3    S3Driver    `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
 	EOS   EOSDriver   `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
