@@ -109,7 +109,7 @@ func NewService(options ...Option) (*Service, error) {
 
 	s.ServicesRegistry[opts.Config.Settings.Service.Name] = settings.NewSutureService
 	s.ServicesRegistry[opts.Config.Nats.Service.Name] = nats.NewSutureService
-	s.ServicesRegistry[opts.Config.StorageMetadata.Service.Name] = storagemetadata.NewStorageMetadata
+	s.ServicesRegistry[opts.Config.StorageMetadata.Service.Name] = storagemetadata.NewSutureService
 	s.ServicesRegistry[opts.Config.GLAuth.Service.Name] = glauth.NewSutureService
 	s.ServicesRegistry[opts.Config.Graph.Service.Name] = graph.NewSutureService
 	s.ServicesRegistry[opts.Config.GraphExplorer.Service.Name] = graphExplorer.NewSutureService
@@ -119,23 +119,23 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.Thumbnails.Service.Name] = thumbnails.NewSutureService
 	s.ServicesRegistry[opts.Config.Web.Service.Name] = web.NewSutureService
 	s.ServicesRegistry[opts.Config.WebDAV.Service.Name] = webdav.NewSutureService
-	s.ServicesRegistry[opts.Config.Frontend.Service.Name] = frontend.NewFrontend
-	s.ServicesRegistry[opts.Config.OCDav.Service.Name] = ocdav.NewOCDav
-	s.ServicesRegistry[opts.Config.Gateway.Service.Name] = gateway.NewGateway
-	s.ServicesRegistry[opts.Config.User.Service.Name] = user.NewUserProvider
-	s.ServicesRegistry[opts.Config.Group.Service.Name] = group.NewGroupProvider
-	s.ServicesRegistry[opts.Config.AuthBasic.Service.Name] = authbasic.NewAuthBasic
-	s.ServicesRegistry[opts.Config.AuthBearer.Service.Name] = authbearer.NewAuthBearer
-	s.ServicesRegistry[opts.Config.AuthMachine.Service.Name] = authmachine.NewAuthMachine
-	s.ServicesRegistry[opts.Config.StorageUsers.Service.Name] = storageusers.NewStorageUsers
-	s.ServicesRegistry[opts.Config.StorageShares.Service.Name] = storageshares.NewStorageShares
-	s.ServicesRegistry[opts.Config.StoragePublicLink.Service.Name] = storagepublic.NewStoragePublicLink
-	s.ServicesRegistry[opts.Config.AppProvider.Service.Name] = appprovider.NewAppProvider
+	s.ServicesRegistry[opts.Config.Frontend.Service.Name] = frontend.NewSutureService
+	s.ServicesRegistry[opts.Config.OCDav.Service.Name] = ocdav.NewSutureService
+	s.ServicesRegistry[opts.Config.Gateway.Service.Name] = gateway.NewSutureService
+	s.ServicesRegistry[opts.Config.User.Service.Name] = user.NewSutureService
+	s.ServicesRegistry[opts.Config.Group.Service.Name] = group.NewSutureService
+	s.ServicesRegistry[opts.Config.AuthBasic.Service.Name] = authbasic.NewSutureService
+	s.ServicesRegistry[opts.Config.AuthBearer.Service.Name] = authbearer.NewSutureService
+	s.ServicesRegistry[opts.Config.AuthMachine.Service.Name] = authmachine.NewSutureService
+	s.ServicesRegistry[opts.Config.StorageUsers.Service.Name] = storageusers.NewSutureService
+	s.ServicesRegistry[opts.Config.StorageShares.Service.Name] = storageshares.NewSutureService
+	s.ServicesRegistry[opts.Config.StoragePublicLink.Service.Name] = storagepublic.NewSutureService
+	s.ServicesRegistry[opts.Config.AppProvider.Service.Name] = appprovider.NewSutureService
 	s.ServicesRegistry[opts.Config.Notifications.Service.Name] = notifications.NewSutureService
 	s.ServicesRegistry[opts.Config.Search.Service.Name] = search.NewSutureService
 
 	// populate delayed services
-	s.Delayed[opts.Config.Sharing.Service.Name] = sharing.NewSharing
+	s.Delayed[opts.Config.Sharing.Service.Name] = sharing.NewSutureService
 	s.Delayed[opts.Config.Accounts.Service.Name] = accounts.NewSutureService
 	s.Delayed[opts.Config.Proxy.Service.Name] = proxy.NewSutureService
 	s.Delayed[opts.Config.IDP.Service.Name] = idp.NewSutureService
@@ -256,7 +256,7 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 	}
 
 	for name := range s.ServicesRegistry {
-		// don't run glauth by default but keep the possiblity to start it via cfg.Runtime.Extensions for now
+		// don't run glauth by default but keep the possibility to start it via cfg.Runtime.Extensions for now
 		if name == "glauth" {
 			continue
 		}
@@ -264,7 +264,7 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 	}
 
 	for name := range s.Delayed {
-		// don't run accounts by default but keep the possiblity to start it via cfg.Runtime.Extensions for now
+		// don't run accounts by default but keep the possibility to start it via cfg.Runtime.Extensions for now
 		if name == "accounts" {
 			continue
 		}

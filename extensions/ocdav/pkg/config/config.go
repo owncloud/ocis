@@ -1,14 +1,17 @@
 package config
 
-import "github.com/owncloud/ocis/ocis-pkg/shared"
+import (
+	"context"
+
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+)
 
 type Config struct {
 	*shared.Commons `yaml:"-"`
 	Service         Service  `yaml:"-"`
 	Tracing         *Tracing `yaml:"tracing"`
-	Logging         *Logging `yaml:"log"`
+	Log             *Log     `yaml:"log"`
 	Debug           Debug    `yaml:"debug"`
-	Supervised      bool     `yaml:"-"`
 
 	HTTP HTTPConfig `yaml:"http"`
 
@@ -28,6 +31,8 @@ type Config struct {
 	// Timeout in seconds when making requests to the gateway
 	Timeout    int64      `yaml:"timeout"`
 	Middleware Middleware `yaml:"middleware"`
+
+	Context context.Context `yaml:"-"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;OCDAV_TRACING_ENABLED" desc:"Activates tracing."`
@@ -36,7 +41,7 @@ type Tracing struct {
 	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;OCDAV_TRACING_COLLECTOR"`
 }
 
-type Logging struct {
+type Log struct {
 	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;OCDAV_LOG_LEVEL" desc:"The log level."`
 	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;OCDAV_LOG_PRETTY" desc:"Activates pretty log output."`
 	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR;OCDAV_LOG_COLOR" desc:"Activates colorized log output."`
@@ -55,9 +60,10 @@ type Debug struct {
 }
 
 type HTTPConfig struct {
-	Addr     string `yaml:"addr" env:"OCDAV_HTTP_ADDR" desc:"The address of the http service."`
-	Protocol string `yaml:"protocol" env:"OCDAV_HTTP_PROTOCOL" desc:"The transport protocol of the http service."`
-	Prefix   string `yaml:"prefix"`
+	Addr      string `yaml:"addr" env:"OCDAV_HTTP_ADDR" desc:"The address of the http service."`
+	Namespace string `yaml:"-"`
+	Protocol  string `yaml:"protocol" env:"OCDAV_HTTP_PROTOCOL" desc:"The transport protocol of the http service."`
+	Prefix    string `yaml:"prefix"`
 }
 
 // Middleware configures reva middlewares.

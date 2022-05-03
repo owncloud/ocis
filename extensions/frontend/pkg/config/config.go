@@ -1,14 +1,17 @@
 package config
 
-import "github.com/owncloud/ocis/ocis-pkg/shared"
+import (
+	"context"
+
+	"github.com/owncloud/ocis/ocis-pkg/shared"
+)
 
 type Config struct {
 	*shared.Commons `yaml:"-"`
 	Service         Service  `yaml:"-"`
 	Tracing         *Tracing `yaml:"tracing"`
-	Logging         *Logging `yaml:"log"`
+	Log             *Log     `yaml:"log"`
 	Debug           Debug    `yaml:"debug"`
-	Supervised      bool     `yaml:"-"`
 
 	HTTP HTTPConfig `yaml:"http"`
 
@@ -38,6 +41,9 @@ type Config struct {
 	Checksums   Checksums   `yaml:"checksums"`
 
 	Middleware Middleware `yaml:"middleware"`
+
+	Supervised bool            `yaml:"-"`
+	Context    context.Context `yaml:"-"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;FRONTEND_TRACING_ENABLED" desc:"Activates tracing."`

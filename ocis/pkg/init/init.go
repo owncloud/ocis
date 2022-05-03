@@ -56,8 +56,7 @@ type IdmExtension struct {
 }
 
 type FrontendExtension struct {
-	Archiver    InsecureExtension
-	AppProvider InsecureExtension `yaml:"app_provider"`
+	Archiver InsecureExtension
 }
 
 type AuthbasicExtension struct {
@@ -256,9 +255,6 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 			},
 		}
 		cfg.Frontend = FrontendExtension{
-			AppProvider: InsecureExtension{
-				Insecure: true,
-			},
 			Archiver: InsecureExtension{
 				Insecure: true,
 			},
