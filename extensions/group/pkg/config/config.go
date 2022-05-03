@@ -61,8 +61,9 @@ type GRPCConfig struct {
 type Drivers struct {
 	LDAP        LDAPDriver        `yaml:"ldap"`
 	OwnCloudSQL OwnCloudSQLDriver `yaml:"owncloud_sql"`
-	JSON        JSONDriver        `yaml:"json,omitempty"` // not supported by the oCIS product, therefore not part of docs
-	REST        RESTProvider      `yaml:"rest,omitempty"` // not supported by the oCIS product, therefore not part of docs
+
+	JSON JSONDriver   `yaml:"json,omitempty"` // not supported by the oCIS product, therefore not part of docs
+	REST RESTProvider `yaml:"rest,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
 type LDAPDriver struct {
 	URI              string          `yaml:"uri" env:"LDAP_URI;GROUPS_LDAP_URI"`

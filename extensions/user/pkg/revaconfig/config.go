@@ -30,18 +30,6 @@ func UsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"users": cfg.Drivers.JSON.File,
 						},
 						"ldap": ldapConfigFromString(cfg.Drivers.LDAP),
-						"rest": map[string]interface{}{
-							"client_id":                    cfg.Drivers.REST.ClientID,
-							"client_secret":                cfg.Drivers.REST.ClientSecret,
-							"redis_address":                cfg.Drivers.REST.RedisAddr,
-							"redis_username":               cfg.Drivers.REST.RedisUsername,
-							"redis_password":               cfg.Drivers.REST.RedisPassword,
-							"user_groups_cache_expiration": cfg.UsersCacheExpiration,
-							"id_provider":                  cfg.Drivers.REST.IDProvider,
-							"api_base_url":                 cfg.Drivers.REST.APIBaseURL,
-							"oidc_token_endpoint":          cfg.Drivers.REST.OIDCTokenEndpoint,
-							"target_api":                   cfg.Drivers.REST.TargetAPI,
-						},
 						"owncloudsql": map[string]interface{}{
 							"dbusername":           cfg.Drivers.OwnCloudSQL.DBUsername,
 							"dbpassword":           cfg.Drivers.OwnCloudSQL.DBPassword,
