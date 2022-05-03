@@ -25,8 +25,8 @@ type Config struct {
 
 	Driver               string  `yaml:"driver" env:"STORAGE_METADATA_DRIVER" desc:"The driver which should be used by the service"`
 	Drivers              Drivers `yaml:"drivers"`
-	DataServerURL        string  `yaml:"data_server_url"`
-	TempFolder           string  `yaml:"temp_folder"`
+	DataServerURL        string  `yaml:"data_server_url" env:"STORAGE_METADATA_DATA_SERVER_URL"`
+	TempFolder           string  `yaml:"temp_folder" env:"STORAGE_METADATA_TEMP_FOLDER"`
 	DataProviderInsecure bool    `yaml:"data_provider_insecure" env:"OCIS_INSECURE;STORAGE_METADATA_DATAPROVIDER_INSECURE"`
 
 	Supervised bool            `yaml:"-"`
@@ -70,85 +70,12 @@ type HTTPConfig struct {
 }
 
 type Drivers struct {
-	EOS   EOSDriver
-	Local LocalDriver
-	OCIS  OCISDriver
-	S3    S3Driver
-	S3NG  S3NGDriver
-}
-
-type EOSDriver struct {
-	// Root is the absolute path to the location of the data
-	Root string `yaml:"root"`
-	// ShadowNamespace for storing shadow data
-	ShadowNamespace string `yaml:"shadow_namespace"`
-	// UploadsNamespace for storing upload data
-	UploadsNamespace string `yaml:"uploads_namespace"`
-	// Location of the eos binary.
-	// Default is /usr/bin/eos.
-	EosBinary string `yaml:"eos_binary"`
-	// Location of the xrdcopy binary.
-	// Default is /usr/bin/xrdcopy.
-	XrdcopyBinary string `yaml:"xrd_copy_binary"`
-	// URL of the Master EOS MGM.
-	// Default is root://eos-example.org
-	MasterURL string `yaml:"master_url"`
-	// URL of the Slave EOS MGM.
-	// Default is root://eos-example.org
-	SlaveURL string `yaml:"slave_url"`
-	// Location on the local fs where to store reads.
-	// Defaults to os.TempDir()
-	CacheDirectory string `yaml:"cache_directory"`
-	// SecProtocol specifies the xrootd security protocol to use between the server and EOS.
-	SecProtocol string `yaml:"sec_protocol"`
-	// Keytab specifies the location of the keytab to use to authenticate to EOS.
-	Keytab string `yaml:"keytab"`
-	// SingleUsername is the username to use when SingleUserMode is enabled
-	SingleUsername string `yaml:"single_username"`
-	// Enables logging of the commands executed
-	// Defaults to false
-	EnableLogging bool `yaml:"enable_logging"`
-	// ShowHiddenSysFiles shows internal EOS files like
-	// .sys.v# and .sys.a# files.
-	ShowHiddenSysFiles bool `yaml:"shadow_hidden_files"`
-	// ForceSingleUserMode will force connections to EOS to use SingleUsername
-	ForceSingleUserMode bool `yaml:"force_single_user_mode"`
-	// UseKeyTabAuth changes will authenticate requests by using an EOS keytab.
-	UseKeytab bool `yaml:"user_keytab"`
-	// gateway service to use for uid lookups
-	GatewaySVC string `yaml:"gateway_svc"`
-	GRPCURI    string
-	UserLayout string
-}
-
-type LocalDriver struct {
-	// Root is the absolute path to the location of the data
-	Root string `yaml:"root"`
+	OCIS OCISDriver `yaml:"ocis"`
 }
 
 type OCISDriver struct {
 	// Root is the absolute path to the location of the data
-	Root                string `yaml:"root" env:"STORAGE_METADATA_DRIVER_OCIS_ROOT"`
-	UserLayout          string
-	PermissionsEndpoint string
-}
-
-type S3Driver struct {
-	Region    string `yaml:"region"`
-	AccessKey string `yaml:"access_key"`
-	SecretKey string `yaml:"secret_key"`
-	Endpoint  string `yaml:"endpoint"`
-	Bucket    string `yaml:"bucket"`
-}
-
-type S3NGDriver struct {
-	// Root is the absolute path to the location of the data
-	Root                string `yaml:"root"`
-	UserLayout          string
-	PermissionsEndpoint string
-	Region              string `yaml:"region"`
-	AccessKey           string `yaml:"access_key"`
-	SecretKey           string `yaml:"secret_key"`
-	Endpoint            string `yaml:"endpoint"`
-	Bucket              string `yaml:"bucket"`
+	Root                string `yaml:"root" env:"STORAGE_METADATA_OCIS_ROOT"`
+	UserLayout          string `yaml:"-"`
+	PermissionsEndpoint string `yaml:"permissions_endpoint" env:"STORAGE_METADATA_OCIS_PERMISSIONS_ENDPOINT"`
 }
