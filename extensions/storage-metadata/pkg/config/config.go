@@ -75,7 +75,5 @@ type Drivers struct {
 
 type OCISDriver struct {
 	// Root is the absolute path to the location of the data
-	Root                string `yaml:"root" env:"STORAGE_METADATA_OCIS_ROOT"`
-	UserLayout          string `yaml:"-"`
-	PermissionsEndpoint string `yaml:"permissions_endpoint" env:"STORAGE_METADATA_OCIS_PERMISSIONS_ENDPOINT"`
+	Root string `yaml:"root" env:"STORAGE_METADATA_OCIS_ROOT"`
 }

@@ -43,8 +43,7 @@ func DefaultConfig() *config.Config {
 		Driver:        "ocis",
 		Drivers: config.Drivers{
 			OCIS: config.OCISDriver{
-				Root:       filepath.Join(defaults.BaseDataPath(), "storage", "metadata"),
-				UserLayout: "{{.Id.OpaqueId}}",
+				Root: filepath.Join(defaults.BaseDataPath(), "storage", "metadata"),
 			},
 		},
 	}

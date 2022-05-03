@@ -92,7 +92,7 @@ func StorageMetadataFromStruct(cfg *config.Config) map[string]interface{} {
 				},
 				"storageprovider": map[string]interface{}{
 					"driver":          cfg.Driver,
-					"drivers":         config.MetadataDrivers(cfg),
+					"drivers":         metadataDrivers(cfg),
 					"data_server_url": cfg.DataServerURL,
 					"tmp_folder":      cfg.TempFolder,
 				},
@@ -106,7 +106,7 @@ func StorageMetadataFromStruct(cfg *config.Config) map[string]interface{} {
 				"dataprovider": map[string]interface{}{
 					"prefix":      "data",
 					"driver":      cfg.Driver,
-					"drivers":     config.MetadataDrivers(cfg),
+					"drivers":     metadataDrivers(cfg),
 					"timeout":     86400,
 					"insecure":    cfg.DataProviderInsecure,
 					"disable_tus": true,
@@ -115,4 +115,16 @@ func StorageMetadataFromStruct(cfg *config.Config) map[string]interface{} {
 		},
 	}
 	return rcfg
+}
+
+func metadataDrivers(cfg *config.Config) map[string]interface{} {
+	return map[string]interface{}{
+		"ocis": map[string]interface{}{
+			"root":                cfg.Drivers.OCIS.Root,
+			"user_layout":         "{{.Id.OpaqueId}}",
+			"treetime_accounting": false,
+			"treesize_accounting": false,
+			"permissionssvc":      cfg.GRPC.Addr,
+		},
+	}
 }
