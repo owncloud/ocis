@@ -20,7 +20,7 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"OCDAV_SKIP_USER_GROUPS_IN_TOKEN"`
 
-	WebdavNamespace string `yaml:"webdav_namespace" env:"OCDVAV_WEBDAV_NAMESPACE"`
+	WebdavNamespace string `yaml:"webdav_namespace" env:"OCDAV_WEBDAV_NAMESPACE"`
 	FilesNamespace  string `yaml:"files_namespace" env:"OCDAV_FILES_NAMESPACE"`
 	SharesNamespace string `yaml:"shares_namespace" env:"OCDAV_SHARES_NAMESPACE"`
 	// PublicURL used to redirect /s/{token} URLs to
