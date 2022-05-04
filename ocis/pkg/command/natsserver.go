@@ -10,11 +10,11 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// NatsServerCommand is the entrypoint for the nats server command.
-func NatsServerCommand(cfg *config.Config) *cli.Command {
+// NatsCommand is the entrypoint for the Nats command.
+func NatsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "nats-server",
-		Usage:    "start nats server",
+		Name:     cfg.Nats.Service.Name,
+		Usage:    subcommandDescription(cfg.Nats.Service.Name),
 		Category: "extensions",
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg); err != nil {
@@ -29,5 +29,5 @@ func NatsServerCommand(cfg *config.Config) *cli.Command {
 }
 
 func init() {
-	register.AddCommand(NatsServerCommand)
+	register.AddCommand(NatsCommand)
 }
