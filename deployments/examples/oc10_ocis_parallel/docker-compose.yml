@@ -50,60 +50,55 @@ services:
     user: "33:33" # equals the user "www-data" for oC10
     environment:
       # Keycloak IDP specific configuration
-      PROXY_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-owncloud}
-      WEB_OIDC_AUTHORITY: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-owncloud}
-      WEB_OIDC_CLIENT_ID: ocis-web
+      OCIS_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-owncloud}
       WEB_OIDC_METADATA_URL: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-owncloud}/.well-known/openid-configuration
-      STORAGE_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
-      STORAGE_LDAP_IDP: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-owncloud}
+      WEB_OIDC_CLIENT_ID: ocis-web
       WEB_OIDC_SCOPE: openid profile email owncloud
+      # external ldap is supposed to be read only
+      GRAPH_IDENTITY_BACKEND: cs3
+      GRAPH_LDAP_SERVER_WRITE_ENABLED: "false"
       # LDAP bind
-      STORAGE_LDAP_URI: "ldaps://openldap"
-      STORAGE_LDAP_INSECURE: "true"
-      STORAGE_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
-      STORAGE_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      LDAP_URI: "ldaps://openldap"
+      LDAP_INSECURE: "true"
+      LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
+      LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
       # LDAP user settings
       PROXY_AUTOPROVISION_ACCOUNTS: "true" # automatically create users when they login
       PROXY_ACCOUNT_BACKEND_TYPE: cs3 # proxy should get users from CS3APIS (which gets it from LDAP)
       PROXY_USER_OIDC_CLAIM: ocis.user.uuid # claim was added in Keycloak
       PROXY_USER_CS3_CLAIM: userid # equals STORAGE_LDAP_USER_SCHEMA_UID
-      STORAGE_LDAP_GROUP_BASE_DN: "dc=owncloud,dc=com"
-      STORAGE_LDAP_GROUP_SCHEMA_DISPLAYNAME: "cn"
-      STORAGE_LDAP_GROUP_SCHEMA_GID_NUMBER: "gidnumber"
-      STORAGE_LDAP_GROUP_SCHEMA_ID: "cn"
-      STORAGE_LDAP_GROUP_SCHEMA_MAIL: "mail"
-      STORAGE_LDAP_GROUP_SCHEMA_MEMBER: "cn"
-      STORAGE_LDAP_GROUP_OBJECTCLASS: "groupOfUniqueNames"
-      STORAGE_LDAP_GROUPFILTER: "(objectclass=owncloud)"
-      STORAGE_LDAP_USER_BASE_DN: "dc=owncloud,dc=com"
-      STORAGE_LDAP_USER_SCHEMA_USERNAME: "cn"
-      STORAGE_LDAP_USER_SCHEMA_DISPLAYNAME: "displayname"
-      STORAGE_LDAP_USER_SCHEMA_GID_NUMBER: "gidnumber"
-      STORAGE_LDAP_USER_SCHEMA_MAIL: "mail"
-      STORAGE_LDAP_USER_SCHEMA_UID_NUMBER: "uidnumber"
-      STORAGE_LDAP_USER_SCHEMA_ID: "ownclouduuid"
-      STORAGE_LDAP_LOGIN_ATTRIBUTES: "uid,mail"
+      LDAP_GROUP_BASE_DN: "dc=owncloud,dc=com"
+      LDAP_GROUP_OBJECTCLASS: "groupOfUniqueNames"
+      LDAP_GROUP_SCHEMA_DISPLAYNAME: "cn"
+      LDAP_GROUP_SCHEMA_ID: "cn"
+      LDAP_GROUP_SCHEMA_MAIL: "mail"
+      LDAP_GROUP_SCHEMA_MEMBER: "cn"
+      LDAP_GROUPFILTER: "(objectclass=owncloud)"
+      LDAP_LOGIN_ATTRIBUTES: "uid,mail"
+      LDAP_USER_BASE_DN: "dc=owncloud,dc=com"
+      LDAP_USER_OBJECTCLASS: "posixAccount"
+      LDAP_USER_SCHEMA_DISPLAYNAME: "displayname"
+      LDAP_USER_SCHEMA_ID: "ownclouduuid"
+      LDAP_USER_SCHEMA_MAIL: "mail"
+      LDAP_USER_SCHEMA_USERNAME: "cn"
+      LDAP_USERFILTER: "(objectclass=owncloud)"
       # ownCloudSQL storage driver
-      STORAGE_USERS_DRIVER: owncloudsql
-      STORAGE_SYSTEM_DRIVER: ocis # keep system data on ocis storage since this are only small files atm
-      STORAGE_USERS_DRIVER_OWNCLOUDSQL_DATADIR: /mnt/data/files
-      STORAGE_USERS_DRIVER_OWNCLOUDSQL_UPLOADINFO_DIR: /tmp
-      STORAGE_USERS_DRIVER_OWNCLOUDSQL_SHARE_FOLDER: "/Shares"
-      STORAGE_USERS_DRIVER_OWNCLOUDSQL_LAYOUT: "{{.Username}}"
-      STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBUSERNAME: owncloud
-      STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBPASSWORD: owncloud
-      STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBHOST: oc10-db
-      STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBPORT: 3306
-      STORAGE_USERS_DRIVER_OWNCLOUDSQL_DBNAME: owncloud
-      STORAGE_USERS_DRIVER_OWNCLOUDSQL_REDIS_ADDR: redis:6379 # TODO: redis is not yet supported
+      STORAGE_USERS_DRIVER: "owncloudsql"
+      STORAGE_USERS_OWNCLOUDSQL_DATADIR: "/mnt/data/files"
+      STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER: "/Shares"
+      STORAGE_USERS_OWNCLOUDSQL_LAYOUT: "{{.Username}}"
+      STORAGE_USERS_OWNCLOUDSQL_DB_USERNAME: "owncloud"
+      STORAGE_USERS_OWNCLOUDSQL_DB_PASSWORD: "owncloud"
+      STORAGE_USERS_OWNCLOUDSQL_DB_HOST: "oc10-db"
+      STORAGE_USERS_OWNCLOUDSQL_DB_PORT: 3306
+      STORAGE_USERS_OWNCLOUDSQL_DB_NAME: "owncloud"
       # ownCloudSQL sharing driver
-      STORAGE_SHARING_USER_DRIVER: owncloudsql
-      STORAGE_SHARING_USER_SQL_USERNAME: owncloud
-      STORAGE_SHARING_USER_SQL_PASSWORD: owncloud
-      STORAGE_SHARING_USER_SQL_HOST: oc10-db
-      STORAGE_SHARING_USER_SQL_PORT: 3306
-      STORAGE_SHARING_USER_SQL_NAME: owncloud
-
+      SHARING_USER_DRIVER: "owncloudsql"
+      SHARING_USER_OWNCLOUDSQL_DB_USERNAME: "owncloud"
+      SHARING_USER_OWNCLOUDSQL_DB_PASSWORD: "owncloud"
+      SHARING_USER_OWNCLOUDSQL_DB_HOST: "oc10-db"
+      SHARING_USER_OWNCLOUDSQL_DB_PORT: 330
+      SHARING_USER_OWNCLOUDSQL_DB_NAME: "owncloud"
       # ownCloud storage readonly
       OCIS_STORAGE_READ_ONLY: "false" # TODO: conflict with OWNCLOUDSQL -> https://github.com/owncloud/ocis/issues/2303
       # General oCIS config

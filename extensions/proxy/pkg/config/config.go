@@ -83,7 +83,7 @@ type AuthMiddleware struct {
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
 // with the configured oidc-provider
 type OIDC struct {
-	Issuer        string        `yaml:"issuer" env:"OCIS_URL;PROXY_OIDC_ISSUER"`
+	Issuer        string        `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER"`
 	Insecure      bool          `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE"`
 	UserinfoCache UserinfoCache `yaml:"user_info_cache"`
 }

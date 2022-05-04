@@ -44,7 +44,7 @@ type WebConfig struct {
 // OIDC defines the available oidc configuration
 type OIDC struct {
 	MetadataURL  string `json:"metadata_url,omitempty" yaml:"metadata_url" env:"WEB_OIDC_METADATA_URL"`
-	Authority    string `json:"authority,omitempty" yaml:"authority" env:"OCIS_URL;WEB_OIDC_AUTHORITY"`
+	Authority    string `json:"authority,omitempty" yaml:"authority" env:"OCIS_URL;OCIS_OIDC_ISSUER;WEB_OIDC_AUTHORITY"`
 	ClientID     string `json:"client_id,omitempty" yaml:"client_id" env:"WEB_OIDC_CLIENT_ID"`
 	ResponseType string `json:"response_type,omitempty" yaml:"response_type" env:"WEB_OIDC_RESPONSE_TYPE"`
 	Scope        string `json:"scope,omitempty" yaml:"scope" env:"WEB_OIDC_SCOPE"`

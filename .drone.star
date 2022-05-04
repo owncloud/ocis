@@ -1663,16 +1663,14 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
     else:
         user = "33:33"
         environment = {
+            # Keycloak IDP specific configuration
+            "OCIS_OIDC_ISSUER": "https://keycloak/auth/realms/owncloud",
+            "WEB_OIDC_METADATA_URL": "https://keycloak/auth/realms/owncloud/.well-known/openid-configuration",
+            "WEB_OIDC_CLIENT_ID": "ocis-web",
+            "WEB_OIDC_SCOPE": "openid profile email owncloud",
+            # external  ldap is supposed to be read only
             "GRAPH_IDENTITY_BACKEND": "cs3",
             "GRAPH_LDAP_SERVER_WRITE_ENABLED": "false",
-            # Keycloak IDP specific configuration
-            "PROXY_OIDC_ISSUER": "https://keycloak/auth/realms/owncloud",
-            "LDAP_IDP": "https://keycloak/auth/realms/owncloud",
-            "WEB_OIDC_AUTHORITY": "https://keycloak/auth/realms/owncloud",
-            "WEB_OIDC_CLIENT_ID": "ocis-web",
-            "WEB_OIDC_METADATA_URL": "https://keycloak/auth/realms/owncloud/.well-known/openid-configuration",
-            "AUTH_BEARER_OIDC_ISSUER": "https://keycloak",
-            "WEB_OIDC_SCOPE": "openid profile email owncloud",
             # LDAP bind
             "LDAP_URI": "ldaps://openldap",
             "LDAP_INSECURE": "true",
@@ -1685,19 +1683,19 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "PROXY_USER_CS3_CLAIM": "userid",  # equals STORAGE_LDAP_USER_SCHEMA_UID
             "LDAP_GROUP_BASE_DN": "ou=testgroups,dc=owncloud,dc=com",
             "LDAP_GROUP_OBJECTCLASS": "groupOfUniqueNames",
-            "LDAP_GROUPFILTER": "(objectclass=owncloud)",
             "LDAP_GROUP_SCHEMA_DISPLAYNAME": "cn",
             "LDAP_GROUP_SCHEMA_ID": "cn",
             "LDAP_GROUP_SCHEMA_MAIL": "mail",
             "LDAP_GROUP_SCHEMA_MEMBER": "cn",
+            "LDAP_GROUPFILTER": "(objectclass=owncloud)",
+            "LDAP_LOGIN_ATTRIBUTES": "uid,mail",
             "LDAP_USER_BASE_DN": "ou=testusers,dc=owncloud,dc=com",
             "LDAP_USER_OBJECTCLASS": "posixAccount",
-            "LDAP_USERFILTER": "(objectclass=owncloud)",
-            "LDAP_USER_SCHEMA_USERNAME": "cn",
             "LDAP_USER_SCHEMA_DISPLAYNAME": "displayname",
-            "LDAP_USER_SCHEMA_MAIL": "mail",
             "LDAP_USER_SCHEMA_ID": "ownclouduuid",
-            "LDAP_LOGIN_ATTRIBUTES": "uid,mail",
+            "LDAP_USER_SCHEMA_MAIL": "mail",
+            "LDAP_USER_SCHEMA_USERNAME": "cn",
+            "LDAP_USERFILTER": "(objectclass=owncloud)",
             # ownCloudSQL storage driver
             "STORAGE_USERS_DRIVER": "owncloudsql",
             "STORAGE_USERS_OWNCLOUDSQL_DATADIR": "/mnt/data/files",
