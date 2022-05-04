@@ -55,7 +55,7 @@ func MissingServiceUserPassword(service, serviceUser string) error {
 }
 
 func MissingSystemUserID(service string) error {
-	return fmt.Errorf("The metadata user ID has not been configured for %s. "+
+	return fmt.Errorf("The system user ID has not been configured for %s. "+
 		"Make sure your %s config contains the proper values "+
 		"(e.g. by running ocis init or setting it manually in "+
 		"the config/corresponding environment variable).",
