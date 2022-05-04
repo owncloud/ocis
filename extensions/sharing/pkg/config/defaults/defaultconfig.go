@@ -100,16 +100,16 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.TokenManager = &config.TokenManager{}
 	}
 
-	if cfg.UserSharingDrivers.CS3.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
-		cfg.UserSharingDrivers.CS3.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	if cfg.UserSharingDrivers.CS3.SystemUserAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemUserAPIKey != "" {
+		cfg.UserSharingDrivers.CS3.SystemUserAPIKey = cfg.Commons.SystemUserAPIKey
 	}
 
 	if cfg.UserSharingDrivers.CS3.ServiceUserID == "" && cfg.Commons != nil && cfg.Commons.MetadataUserID != "" {
 		cfg.UserSharingDrivers.CS3.ServiceUserID = cfg.Commons.MetadataUserID
 	}
 
-	if cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
-		cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	if cfg.PublicSharingDrivers.CS3.SystemUserAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemUserAPIKey != "" {
+		cfg.PublicSharingDrivers.CS3.SystemUserAPIKey = cfg.Commons.SystemUserAPIKey
 	}
 
 	if cfg.PublicSharingDrivers.CS3.ServiceUserID == "" && cfg.Commons != nil && cfg.Commons.MetadataUserID != "" {

@@ -98,6 +98,7 @@ type ThumbNailExtension struct {
 type OcisConfig struct {
 	TokenManager      TokenManager `yaml:"token_manager"`
 	MachineAuthApiKey string       `yaml:"machine_auth_api_key"`
+	SystemUserAPIKey  string       `yaml:"system_user_api_key"`
 	TransferSecret    string       `yaml:"transfer_secret"`
 	MetadataUserID    string       `yaml:"metadata_user_id"`
 	Graph             GraphExtension
@@ -191,6 +192,10 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 	if err != nil {
 		return fmt.Errorf("could not generate random password for machineauthsecret: %s", err)
 	}
+	systemUserApiKey, err := generators.GenerateRandomPassword(passwordLength)
+	if err != nil {
+		return fmt.Errorf("could not generate random password for systemuser: %s", err)
+	}
 	revaTransferSecret, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("could not generate random password for machineauthsecret: %s", err)
@@ -201,6 +206,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 			JWTSecret: tokenManagerJwtSecret,
 		},
 		MachineAuthApiKey: machineAuthApiKey,
+		SystemUserAPIKey:  systemUserApiKey,
 		TransferSecret:    revaTransferSecret,
 		MetadataUserID:    metadataUserID,
 		Idm: IdmExtension{

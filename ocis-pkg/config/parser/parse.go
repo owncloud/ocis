@@ -89,6 +89,10 @@ func EnsureCommons(cfg *config.Config) {
 		cfg.Commons.MachineAuthAPIKey = cfg.MachineAuthAPIKey
 	}
 
+	if cfg.SystemUserAPIKey != "" {
+		cfg.Commons.SystemUserAPIKey = cfg.SystemUserAPIKey
+	}
+
 	// copy transfer secret to the commons part if set
 	if cfg.TransferSecret != "" {
 		cfg.Commons.TransferSecret = cfg.TransferSecret

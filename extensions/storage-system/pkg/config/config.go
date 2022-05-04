@@ -16,10 +16,10 @@ type Config struct {
 	GRPC GRPCConfig `yaml:"grpc"`
 	HTTP HTTPConfig `yaml:"http"`
 
-	TokenManager      *TokenManager `yaml:"token_manager"`
-	Reva              *Reva         `yaml:"reva"`
-	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"STORAGE_SYSTEM_MACHINE_AUTH_API_KEY"`
-	MetadataUserID    string        `yaml:"metadata_user_id"`
+	TokenManager     *TokenManager `yaml:"token_manager"`
+	Reva             *Reva         `yaml:"reva"`
+	SystemUserAPIKey string        `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY"`
+	MetadataUserID   string        `yaml:"metadata_user_id"`
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_SYSTEM_SKIP_USER_GROUPS_IN_TOKEN"`
 
