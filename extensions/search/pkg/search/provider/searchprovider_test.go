@@ -51,7 +51,7 @@ var _ = Describe("Searchprovider", func() {
 				},
 			},
 			Id:   &sprovider.StorageSpaceId{OpaqueId: "personalspace"},
-			Root: &sprovider.ResourceId{OpaqueId: "personalspaceroot"},
+			Root: &sprovider.ResourceId{StorageId: "storageid", OpaqueId: "storageid"},
 			Name: "personalspace",
 		}
 
@@ -174,7 +174,7 @@ var _ = Describe("Searchprovider", func() {
 
 		It("indexes items when they are being moved", func() {
 			called := false
-			indexClient.On("Move", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
+			indexClient.On("Move", mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
 				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
 			})).Return(nil).Run(func(args mock.Arguments) {
 				called = true
@@ -220,10 +220,7 @@ var _ = Describe("Searchprovider", func() {
 
 		Context("with a personal space", func() {
 			BeforeEach(func() {
-				gwClient.On("ListStorageSpaces", mock.Anything, mock.MatchedBy(func(req *sprovider.ListStorageSpacesRequest) bool {
-					p := string(req.Opaque.Map["path"].Value)
-					return p == "/"
-				})).Return(&sprovider.ListStorageSpacesResponse{
+				gwClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
 					StorageSpaces: []*sprovider.StorageSpace{personalSpace},
 				}, nil)
@@ -278,7 +275,7 @@ var _ = Describe("Searchprovider", func() {
 					SpaceType: "grant",
 					Owner:     otherUser,
 					Id:        &sprovider.StorageSpaceId{OpaqueId: "otherspaceroot!otherspacegrant"},
-					Root:      &sprovider.ResourceId{StorageId: "otherspaceroot", OpaqueId: "otherspacegrant"},
+					Root:      &sprovider.ResourceId{StorageId: "otherspaceroot", OpaqueId: "otherspaceroot"},
 					Name:      "grantspace",
 				}
 				gwClient.On("GetPath", mock.Anything, mock.Anything).Return(&sprovider.GetPathResponse{
@@ -288,10 +285,7 @@ var _ = Describe("Searchprovider", func() {
 			})
 
 			It("searches the received spaces (grants)", func() {
-				gwClient.On("ListStorageSpaces", mock.Anything, mock.MatchedBy(func(req *sprovider.ListStorageSpacesRequest) bool {
-					p := string(req.Opaque.Map["path"].Value)
-					return p == "/"
-				})).Return(&sprovider.ListStorageSpacesResponse{
+				gwClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
 					StorageSpaces: []*sprovider.StorageSpace{grantSpace},
 				}, nil)
@@ -329,20 +323,17 @@ var _ = Describe("Searchprovider", func() {
 				Expect(match.Entity.Ref.Path).To(Equal("./to/Shared.pdf"))
 
 				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
-					return req.Query == "foo" && req.Ref.ResourceId.OpaqueId == grantSpace.Root.OpaqueId && req.Ref.Path == "./grant/path"
+					return req.Query == "foo" && req.Ref.ResourceId.StorageId == grantSpace.Root.StorageId && req.Ref.Path == "./grant/path"
 				}))
 			})
 
 			It("finds matches in both the personal space AND the grant", func() {
-				gwClient.On("ListStorageSpaces", mock.Anything, mock.MatchedBy(func(req *sprovider.ListStorageSpacesRequest) bool {
-					p := string(req.Opaque.Map["path"].Value)
-					return p == "/"
-				})).Return(&sprovider.ListStorageSpacesResponse{
+				gwClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
 					StorageSpaces: []*sprovider.StorageSpace{personalSpace, grantSpace},
 				}, nil)
 				indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
-					return req.Ref.ResourceId.OpaqueId == grantSpace.Root.OpaqueId
+					return req.Ref.ResourceId.StorageId == grantSpace.Root.StorageId
 				})).Return(&searchsvc.SearchIndexResponse{
 					Matches: []*searchmsg.Match{
 						{
@@ -364,7 +355,7 @@ var _ = Describe("Searchprovider", func() {
 					},
 				}, nil)
 				indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
-					return req.Ref.ResourceId.OpaqueId == personalSpace.Root.OpaqueId
+					return req.Ref.ResourceId.StorageId == personalSpace.Root.StorageId
 				})).Return(&searchsvc.SearchIndexResponse{
 					Matches: []*searchmsg.Match{
 						{

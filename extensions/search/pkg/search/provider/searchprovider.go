@@ -11,12 +11,12 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/cs3org/reva/v2/pkg/utils/resourceid"
 	"github.com/owncloud/ocis/extensions/search/pkg/search"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"google.golang.org/grpc/metadata"
@@ -63,6 +63,7 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 				statRes, err := p.statResource(ref, owner)
 				if err != nil {
 					p.logger.Error().Err(err).Msg("failed to stat the changed resource")
+					continue
 				}
 
 				switch statRes.Status.Code {
@@ -86,6 +87,7 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 				statRes, err := p.statResource(ref, owner)
 				if err != nil {
 					p.logger.Error().Err(err).Msg("failed to stat the changed resource")
+					continue
 				}
 
 				switch statRes.Status.Code {
@@ -123,18 +125,18 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 			statRes, err := p.statResource(ref, owner)
 			if err != nil {
 				p.logger.Error().Err(err).Msg("failed to stat the changed resource")
+				continue
+			}
+			if statRes.Status.Code != rpc.Code_CODE_OK {
+				p.logger.Error().Interface("statRes", statRes).Msg("failed to stat the changed resource")
+				continue
 			}
 
-			switch statRes.Status.Code {
-			case rpc.Code_CODE_OK:
-				err = p.indexClient.Add(ref, statRes.Info)
-				if err != nil {
-					p.logger.Error().Err(err).Msg("error adding updating the resource in the index")
-				} else {
-					p.logDocCount()
-				}
-			default:
-				p.logger.Error().Interface("statRes", statRes).Msg("failed to stat the changed resource")
+			err = p.indexClient.Add(ref, statRes.Info)
+			if err != nil {
+				p.logger.Error().Err(err).Msg("error adding updating the resource in the index")
+			} else {
+				p.logDocCount()
 			}
 		}
 	}()
@@ -173,12 +175,12 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 	}
 
 	listSpacesRes, err := p.gwClient.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
-		Opaque: &typesv1beta1.Opaque{Map: map[string]*typesv1beta1.OpaqueEntry{
-			"path": {
-				Decoder: "plain",
-				Value:   []byte("/"),
+		Filters: []*provider.ListStorageSpacesRequest_Filter{
+			{
+				Type: provider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
+				Term: &provider.ListStorageSpacesRequest_Filter_SpaceType{SpaceType: "+grant"},
 			},
-		}},
+		},
 	})
 	if err != nil {
 		return nil, err
@@ -200,12 +202,13 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			pathPrefix = utils.MakeRelativePath(gpRes.Path)
 		}
 
+		rootStorageID, _ := resourceid.StorageIDUnwrap(space.Root.StorageId)
 		res, err := p.indexClient.Search(ctx, &searchsvc.SearchIndexRequest{
 			Query: req.Query,
 			Ref: &searchmsg.Reference{
 				ResourceId: &searchmsg.ResourceID{
 					StorageId: space.Root.StorageId,
-					OpaqueId:  space.Root.OpaqueId,
+					OpaqueId:  rootStorageID,
 				},
 				Path: pathPrefix,
 			},
