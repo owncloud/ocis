@@ -110,7 +110,7 @@ type OcisConfig struct {
 	AuthBearer        AuthbearerExtension `yaml:"auth_bearer"`
 	User              UserAndGroupExtension
 	Group             UserAndGroupExtension
-	StorageMetadata   DataProviderInsecureSettings `yaml:"storage_system"`
+	StorageSystem     DataProviderInsecureSettings `yaml:"storage_system"`
 	StorageUsers      DataProviderInsecureSettings `yaml:"storage_users"`
 	Ocdav             InsecureExtension
 	Thumbnails        ThumbNailExtension
@@ -271,7 +271,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		cfg.Proxy = InsecureProxyExtension{
 			Insecure_backends: true,
 		}
-		cfg.StorageMetadata = DataProviderInsecureSettings{
+		cfg.StorageSystem = DataProviderInsecureSettings{
 			Data_provider_insecure: true,
 		}
 		cfg.StorageUsers = DataProviderInsecureSettings{
