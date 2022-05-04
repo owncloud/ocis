@@ -38,16 +38,16 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingJWTTokenError(cfg.Service.Name)
 	}
 
-	if cfg.PublicSharingDriver == "cs3" && cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey == "" {
-		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
+	if cfg.PublicSharingDriver == "cs3" && cfg.PublicSharingDrivers.CS3.SystemUserAPIKey == "" {
+		return shared.MissingSystemUserApiKeyError(cfg.Service.Name)
 	}
 
 	if cfg.PublicSharingDriver == "cs3" && cfg.PublicSharingDrivers.CS3.SystemUserID == "" {
 		return shared.MissingSystemUserID(cfg.Service.Name)
 	}
 
-	if cfg.UserSharingDriver == "cs3" && cfg.UserSharingDrivers.CS3.MachineAuthAPIKey == "" {
-		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
+	if cfg.UserSharingDriver == "cs3" && cfg.UserSharingDrivers.CS3.SystemUserAPIKey == "" {
+		return shared.MissingSystemUserApiKeyError(cfg.Service.Name)
 	}
 
 	if cfg.UserSharingDriver == "cs3" && cfg.UserSharingDrivers.CS3.SystemUserID == "" {

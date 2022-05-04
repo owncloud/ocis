@@ -37,8 +37,8 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingJWTTokenError(cfg.Service.Name)
 	}
 
-	if cfg.Metadata.MachineAuthAPIKey == "" {
-		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
+	if cfg.Metadata.SystemUserAPIKey == "" {
+		return shared.MissingSystemUserApiKeyError(cfg.Service.Name)
 	}
 
 	if cfg.AdminUserID == "" {

@@ -98,6 +98,7 @@ type ThumbNailExtension struct {
 type OcisConfig struct {
 	TokenManager      TokenManager `yaml:"token_manager"`
 	MachineAuthApiKey string       `yaml:"machine_auth_api_key"`
+	SystemUserAPIKey  string       `yaml:"system_user_api_key"`
 	TransferSecret    string       `yaml:"transfer_secret"`
 	SystemUserID      string       `yaml:"system_user_id"`
 	AdminUserID       string       `yaml:"admin_user_id"`
@@ -110,7 +111,7 @@ type OcisConfig struct {
 	AuthBearer        AuthbearerExtension `yaml:"auth_bearer"`
 	User              UserAndGroupExtension
 	Group             UserAndGroupExtension
-	StorageMetadata   DataProviderInsecureSettings `yaml:"storage_system"`
+	StorageSystem     DataProviderInsecureSettings `yaml:"storage_system"`
 	StorageUsers      DataProviderInsecureSettings `yaml:"storage_users"`
 	Ocdav             InsecureExtension
 	Thumbnails        ThumbNailExtension
@@ -193,6 +194,10 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 	if err != nil {
 		return fmt.Errorf("could not generate random password for machineauthsecret: %s", err)
 	}
+	systemUserApiKey, err := generators.GenerateRandomPassword(passwordLength)
+	if err != nil {
+		return fmt.Errorf("could not generate random system user API key: %s", err)
+	}
 	revaTransferSecret, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("could not generate random password for machineauthsecret: %s", err)
@@ -203,6 +208,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 			JWTSecret: tokenManagerJwtSecret,
 		},
 		MachineAuthApiKey: machineAuthApiKey,
+		SystemUserAPIKey:  systemUserApiKey,
 		TransferSecret:    revaTransferSecret,
 		SystemUserID:      systemUserID,
 		AdminUserID:       adminUserID,
@@ -271,7 +277,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		cfg.Proxy = InsecureProxyExtension{
 			Insecure_backends: true,
 		}
-		cfg.StorageMetadata = DataProviderInsecureSettings{
+		cfg.StorageSystem = DataProviderInsecureSettings{
 			Data_provider_insecure: true,
 		}
 		cfg.StorageUsers = DataProviderInsecureSettings{

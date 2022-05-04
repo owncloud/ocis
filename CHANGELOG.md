@@ -16,6 +16,7 @@ The following sections list the changes for unreleased.
 * Change - Switched default configuration to use libregraph/idm: [#3331](https://github.com/owncloud/ocis/pull/3331)
 * Change - Rename MetadataUserID: [#3671](https://github.com/owncloud/ocis/pull/3671)
 * Change - Use new space ID util functions: [#3648](https://github.com/owncloud/ocis/pull/3648)
+* Change - Split MachineAuth from SystemUser: [#3672](https://github.com/owncloud/ocis/pull/3672)
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 * Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
 * Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
@@ -114,6 +115,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3648
    https://github.com/owncloud/ocis/pull/3669
+
+* Change - Split MachineAuth from SystemUser: [#3672](https://github.com/owncloud/ocis/pull/3672)
+
+   We now have two different APIKeys: MachineAuth for the machine-auth service and SystemUser
+   for the system user used e.g. by settings service
+
+   https://github.com/owncloud/ocis/pull/3672
 
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 

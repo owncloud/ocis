@@ -5,8 +5,8 @@ import (
 	"github.com/owncloud/ocis/extensions/storage-system/pkg/config"
 )
 
-// StorageMetadataFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
-func StorageMetadataFromStruct(cfg *config.Config) map[string]interface{} {
+// StorageSystemFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 	rcfg := map[string]interface{}{
 		"core": map[string]interface{}{
 			"tracing_enabled":      cfg.Tracing.Enabled,
@@ -67,7 +67,7 @@ func StorageMetadataFromStruct(cfg *config.Config) map[string]interface{} {
 					"auth_manager": "machine",
 					"auth_managers": map[string]interface{}{
 						"machine": map[string]interface{}{
-							"api_key":      cfg.MachineAuthAPIKey,
+							"api_key":      cfg.SystemUserAPIKey,
 							"gateway_addr": cfg.GRPC.Addr,
 						},
 					},
