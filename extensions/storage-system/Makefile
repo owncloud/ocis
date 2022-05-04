@@ -1,5 +1,5 @@
 SHELL := bash
-NAME := storage-metadata
+NAME := storage-system
 
 include ../../.make/recursion.mk
 

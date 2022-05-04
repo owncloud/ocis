@@ -61,7 +61,7 @@ services:
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       # activate s3ng storage driver
       STORAGE_USERS_DRIVER: s3ng
-      STORAGE_METADATA_DRIVER: ocis # keep metadata on ocis storage since this are only small files atm
+      STORAGE_SYSTEM_DRIVER: ocis # keep system data on ocis storage since this are only small files atm
       # s3ng specific settings
       STORAGE_USERS_DRIVER_S3NG_ENDPOINT: http://minio:9000
       STORAGE_USERS_DRIVER_S3NG_REGION: default

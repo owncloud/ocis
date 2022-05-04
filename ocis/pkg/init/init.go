@@ -109,7 +109,7 @@ type OcisConfig struct {
 	AuthBearer        AuthbearerExtension `yaml:"auth-bearer"`
 	User              UserAndGroupExtension
 	Group             UserAndGroupExtension
-	StorageMetadata   DataProviderInsecureSettings `yaml:"storage-metadata"`
+	StorageMetadata   DataProviderInsecureSettings `yaml:"storage-system"`
 	StorageUsers      DataProviderInsecureSettings `yaml:"storage-users"`
 	Ocdav             InsecureExtension
 	Thumbnails        ThumbNailExtension

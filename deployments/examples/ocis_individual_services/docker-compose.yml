@@ -128,7 +128,7 @@ services:
       ACCOUNTS_GRPC_ADDR: 0.0.0.0:9180
 
       ACCOUNTS_STORAGE_BACKEND: cs3
-      ACCOUNTS_STORAGE_CS3_PROVIDER_ADDR: storage-metadata:9215
+      ACCOUNTS_STORAGE_CS3_PROVIDER_ADDR: storage-system:9215
 
       IDP_LDAP_BIND_PASSWORD: ${IDP_LDAP_BIND_PASSWORD:-idp}
       STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
@@ -366,7 +366,7 @@ services:
       driver: "local"
     restart: always
 
-  storage-metadata:
+  storage-system:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
       replicas: 1
@@ -374,7 +374,7 @@ services:
       ocis-net:
     entrypoint:
       - ocis
-      - storage-metadata
+      - storage-system
       - server
     environment:
       OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
@@ -383,18 +383,18 @@ services:
 
       STORAGE_HOME_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
 
-      STORAGE_METADATA_GRPC_ADDR: 0.0.0.0:9215
-      STORAGE_METADATA_HTTP_ADDR: 0.0.0.0:9216
-      STORAGE_METADATA_DATA_SERVER_URL: http://storage-metadata:9216/data
+      STORAGE_SYSTEM_GRPC_ADDR: 0.0.0.0:9215
+      STORAGE_SYSTEM_HTTP_ADDR: 0.0.0.0:9216
+      STORAGE_SYSTEM_DATA_SERVER_URL: http://storage-system:9216/data
 
       STORAGE_JWT_SECRET: ${OCIS_METADATA_JWT_SECRET:-Pive-Fumkiu4}
       STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
 
-      STORAGE_METADATA_DRIVER: ocis
+      STORAGE_SYSTEM_DRIVER: ocis
 
       REVA_GATEWAY: storage-gateway:9142
     volumes:
-      - "ocis-storage-metadata:/var/lib/ocis"
+      - "ocis-storage-system:/var/lib/ocis"
     logging:
       driver: "local"
     restart: always
@@ -726,7 +726,7 @@ volumes:
   traefik-certs: null
   ocis-settings: null
   ocis-store: null
-  ocis-storage-metadata: null
+  ocis-storage-system: null
   ocis-storage-users: null
   ocis-storage-sharing: null
 

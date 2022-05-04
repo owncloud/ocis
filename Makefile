@@ -38,7 +38,7 @@ OCIS_MODULES = \
 	extensions/proxy \
 	extensions/settings \
 	extensions/sharing \
-	extensions/storage-metadata \
+	extensions/storage-system \
 	extensions/storage-publiclink \
 	extensions/storage-shares \
 	extensions/storage-users \

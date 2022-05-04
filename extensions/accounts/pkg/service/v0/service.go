@@ -66,7 +66,7 @@ func New(opts ...Option) (s *Service, err error) {
 	r := oreg.GetRegistry()
 	if cfg.Repo.Backend == "cs3" {
 		if _, err := r.GetService("com.owncloud.storage.metadata"); err != nil {
-			logger.Error().Err(err).Msg("index: storage-metadata service not present")
+			logger.Error().Err(err).Msg("index: storage-system service not present")
 			return nil, err
 		}
 	}
