@@ -4,8 +4,8 @@ import (
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/config"
+	appProvider "github.com/owncloud/ocis/extensions/app-provider/pkg/config"
 	appRegistry "github.com/owncloud/ocis/extensions/app-registry/pkg/config"
-	appprovider "github.com/owncloud/ocis/extensions/appprovider/pkg/config"
 	audit "github.com/owncloud/ocis/extensions/audit/pkg/config"
 	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/config"
 	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/config"
@@ -73,7 +73,7 @@ type Config struct {
 	Runtime           Runtime              `yaml:"runtime"`
 
 	Accounts          *accounts.Config        `yaml:"accounts"`
-	AppProvider       *appprovider.Config     `yaml:"appprovider"`
+	AppProvider       *appProvider.Config     `yaml:"app-provider"`
 	AppRegistry       *appRegistry.Config     `yaml:"app-registry"`
 	Audit             *audit.Config           `yaml:"audit"`
 	AuthBasic         *authbasic.Config       `yaml:"auth-basic"`

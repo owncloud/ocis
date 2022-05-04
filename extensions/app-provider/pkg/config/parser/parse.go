@@ -3,8 +3,8 @@ package parser
 import (
 	"errors"
 
-	"github.com/owncloud/ocis/extensions/appprovider/pkg/config"
-	"github.com/owncloud/ocis/extensions/appprovider/pkg/config/defaults"
+	"github.com/owncloud/ocis/extensions/app-provider/pkg/config"
+	"github.com/owncloud/ocis/extensions/app-provider/pkg/config/defaults"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 

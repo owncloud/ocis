@@ -1,7 +1,7 @@
 package defaults
 
 import (
-	"github.com/owncloud/ocis/extensions/appprovider/pkg/config"
+	"github.com/owncloud/ocis/extensions/app-provider/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/shared"
 )
 
@@ -26,7 +26,7 @@ func DefaultConfig() *config.Config {
 			Protocol:  "tcp",
 		},
 		Service: config.Service{
-			Name: "appprovider",
+			Name: "app-provider",
 		},
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",

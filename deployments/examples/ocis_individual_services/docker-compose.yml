@@ -664,7 +664,8 @@ services:
       STORAGE_FRONTEND_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       STORAGE_FRONTEND_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      STORAGE_FRONTEND_APPPROVIDER_INSECURE: "true"
+      # FIXME this now lives in a dedicated service
+      APP_PROVIDER_WOPI_INSECURE: "true"
       STORAGE_FRONTEND_ARCHIVER_INSECURE: "true"
       STORAGE_FRONTEND_OCDAV_INSECURE: "true"
 

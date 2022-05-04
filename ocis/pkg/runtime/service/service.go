@@ -20,8 +20,8 @@ import (
 	"github.com/olekukonko/tablewriter"
 
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/command"
-	appregistry "github.com/owncloud/ocis/extensions/app-registry/pkg/command"
-	appprovider "github.com/owncloud/ocis/extensions/appprovider/pkg/command"
+	appProvider "github.com/owncloud/ocis/extensions/app-provider/pkg/command"
+	appRegistry "github.com/owncloud/ocis/extensions/app-registry/pkg/command"
 	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/command"
 	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/command"
 	authmachine "github.com/owncloud/ocis/extensions/auth-machine/pkg/command"
@@ -123,7 +123,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.Frontend.Service.Name] = frontend.NewSutureService
 	s.ServicesRegistry[opts.Config.OCDav.Service.Name] = ocdav.NewSutureService
 	s.ServicesRegistry[opts.Config.Gateway.Service.Name] = gateway.NewSutureService
-	s.ServicesRegistry[opts.Config.AppRegistry.Service.Name] = appregistry.NewSutureService
+	s.ServicesRegistry[opts.Config.AppRegistry.Service.Name] = appRegistry.NewSutureService
 	s.ServicesRegistry[opts.Config.User.Service.Name] = user.NewSutureService
 	s.ServicesRegistry[opts.Config.Group.Service.Name] = group.NewSutureService
 	s.ServicesRegistry[opts.Config.AuthBasic.Service.Name] = authbasic.NewSutureService
@@ -132,7 +132,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.StorageUsers.Service.Name] = storageusers.NewSutureService
 	s.ServicesRegistry[opts.Config.StorageShares.Service.Name] = storageshares.NewSutureService
 	s.ServicesRegistry[opts.Config.StoragePublicLink.Service.Name] = storagepublic.NewSutureService
-	s.ServicesRegistry[opts.Config.AppProvider.Service.Name] = appprovider.NewSutureService
+	s.ServicesRegistry[opts.Config.AppProvider.Service.Name] = appProvider.NewSutureService
 	s.ServicesRegistry[opts.Config.Notifications.Service.Name] = notifications.NewSutureService
 	s.ServicesRegistry[opts.Config.Search.Service.Name] = search.NewSutureService
 
