@@ -33,6 +33,10 @@ func ParseConfig(cfg *config.Config) error {
 }
 
 func Validate(cfg *config.Config) error {
+	if cfg.AdminUserID == "" {
+		return shared.MissingAdminUserID(cfg.Service.Name)
+	}
+
 	if cfg.ServiceUserPasswords.Idm == "" {
 		return shared.MissingServiceUserPassword(cfg.Service.Name, "IDM")
 	}
@@ -44,6 +48,7 @@ func Validate(cfg *config.Config) error {
 	if cfg.ServiceUserPasswords.Idp == "" {
 		return shared.MissingServiceUserPassword(cfg.Service.Name, "IDP")
 	}
+
 	if cfg.ServiceUserPasswords.Reva == "" {
 		return shared.MissingServiceUserPassword(cfg.Service.Name, "REVA")
 	}

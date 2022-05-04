@@ -45,4 +45,5 @@ type Commons struct {
 	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY"`
 	TransferSecret    string        `yaml:"transfer_secret,omitempty" env:"REVA_TRANSFER_SECRET"`
 	SystemUserID      string        `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID"`
+	AdminUserID       string        `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID"`
 }

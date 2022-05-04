@@ -126,7 +126,7 @@ func (g Service) RegisterDefaultRoles() {
 		}
 	}
 
-	for _, req := range defaultRoleAssignments() {
+	for _, req := range g.defaultRoleAssignments() {
 		if _, err := g.manager.WriteRoleAssignment(req.AccountUuid, req.RoleId); err != nil {
 			g.logger.Error().Err(err).Msg("failed to register role assignment")
 		}

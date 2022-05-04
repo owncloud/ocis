@@ -41,5 +41,9 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
 	}
 
+	if cfg.AdminUserID == "" {
+		return shared.MissingAdminUserID(cfg.Service.Name)
+	}
+
 	return nil
 }
