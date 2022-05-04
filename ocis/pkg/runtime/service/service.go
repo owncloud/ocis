@@ -27,7 +27,6 @@ import (
 	authmachine "github.com/owncloud/ocis/v2/extensions/auth-machine/pkg/command"
 	frontend "github.com/owncloud/ocis/v2/extensions/frontend/pkg/command"
 	gateway "github.com/owncloud/ocis/v2/extensions/gateway/pkg/command"
-	glauth "github.com/owncloud/ocis/v2/extensions/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/v2/extensions/graph/pkg/command"
 	groups "github.com/owncloud/ocis/v2/extensions/groups/pkg/command"
@@ -111,7 +110,6 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.Settings.Service.Name] = settings.NewSutureService
 	s.ServicesRegistry[opts.Config.Nats.Service.Name] = nats.NewSutureService
 	s.ServicesRegistry[opts.Config.StorageSystem.Service.Name] = storageSystem.NewSutureService
-	s.ServicesRegistry[opts.Config.GLAuth.Service.Name] = glauth.NewSutureService
 	s.ServicesRegistry[opts.Config.Graph.Service.Name] = graph.NewSutureService
 	s.ServicesRegistry[opts.Config.GraphExplorer.Service.Name] = graphExplorer.NewSutureService
 	s.ServicesRegistry[opts.Config.IDM.Service.Name] = idm.NewSutureService
@@ -258,10 +256,6 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 	}
 
 	for name := range s.ServicesRegistry {
-		// don't run glauth by default but keep the possibility to start it via cfg.Runtime.Extensions for now
-		if name == "glauth" {
-			continue
-		}
 		runset = append(runset, name)
 	}
 

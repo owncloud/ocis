@@ -25,7 +25,6 @@ OCIS_MODULES = \
 	extensions/auth-machine \
 	extensions/frontend \
 	extensions/gateway \
-	extensions/glauth \
 	extensions/graph \
 	extensions/graph-explorer \
 	extensions/groups \
