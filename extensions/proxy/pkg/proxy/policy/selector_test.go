@@ -2,7 +2,6 @@ package policy
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,9 +10,6 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
-	accountsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0"
-	accountssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/accounts/v0"
-	"go-micro.dev/v4/client"
 )
 
 func TestLoadSelector(t *testing.T) {
@@ -22,20 +18,13 @@ func TestLoadSelector(t *testing.T) {
 		expectedErr error
 	}
 	sCfg := &config.StaticSelectorConf{Policy: "reva"}
-	mcfg := &config.MigrationSelectorConf{
-		AccFoundPolicy:        "found",
-		AccNotFoundPolicy:     "not_found",
-		UnauthenticatedPolicy: "unauth",
-	}
 	ccfg := &config.ClaimsSelectorConf{}
 	rcfg := &config.RegexSelectorConf{}
 
 	table := []test{
-		{cfg: &config.PolicySelector{Static: sCfg, Migration: mcfg}, expectedErr: ErrMultipleSelectors},
 		{cfg: &config.PolicySelector{Static: sCfg, Claims: ccfg, Regex: rcfg}, expectedErr: ErrMultipleSelectors},
 		{cfg: &config.PolicySelector{}, expectedErr: ErrSelectorConfigIncomplete},
 		{cfg: &config.PolicySelector{Static: sCfg}, expectedErr: nil},
-		{cfg: &config.PolicySelector{Migration: mcfg}, expectedErr: nil},
 		{cfg: &config.PolicySelector{Claims: ccfg}, expectedErr: nil},
 		{cfg: &config.PolicySelector{Regex: rcfg}, expectedErr: nil},
 	}
@@ -72,60 +61,6 @@ func TestStaticSelector(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
 	}
-}
-
-type migrationTestCase struct {
-	AccSvcShouldReturnError bool
-	Claims                  map[string]interface{}
-	Expected                string
-}
-
-func TestMigrationSelector(t *testing.T) {
-	cfg := config.MigrationSelectorConf{
-		AccFoundPolicy:        "found",
-		AccNotFoundPolicy:     "not_found",
-		UnauthenticatedPolicy: "unauth",
-	}
-	var tests = []migrationTestCase{
-		{true, map[string]interface{}{oidc.PreferredUsername: "Hans"}, "not_found"},
-		{true, map[string]interface{}{oidc.Email: "hans@example.test"}, "not_found"},
-		{false, map[string]interface{}{oidc.PreferredUsername: "Hans"}, "found"},
-		{false, nil, "unauth"},
-	}
-
-	for _, tc := range tests {
-		tc := tc
-		sut := NewMigrationSelector(&cfg, mockAccSvc(tc.AccSvcShouldReturnError))
-		r := httptest.NewRequest("GET", "https://example.com", nil)
-		ctx := oidc.NewContext(r.Context(), tc.Claims)
-		nr := r.WithContext(ctx)
-
-		got, err := sut(nr)
-		if err != nil {
-			t.Errorf("Unexpected error: %v", err)
-		}
-
-		if got != tc.Expected {
-			t.Errorf("Expected Policy %v got %v", tc.Expected, got)
-		}
-	}
-}
-
-func mockAccSvc(retErr bool) accountssvc.AccountsService {
-	if retErr {
-		return &accountssvc.MockAccountsService{
-			GetFunc: func(ctx context.Context, in *accountssvc.GetAccountRequest, opts ...client.CallOption) (record *accountsmsg.Account, err error) {
-				return nil, fmt.Errorf("error returned by mockAccountsService GET")
-			},
-		}
-	}
-
-	return &accountssvc.MockAccountsService{
-		GetFunc: func(ctx context.Context, in *accountssvc.GetAccountRequest, opts ...client.CallOption) (record *accountsmsg.Account, err error) {
-			return &accountsmsg.Account{}, nil
-		},
-	}
-
 }
 
 type testCase struct {

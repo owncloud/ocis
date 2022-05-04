@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	accounts "github.com/owncloud/ocis/v2/extensions/accounts/pkg/service/v0"
 	"github.com/owncloud/ocis/v2/extensions/graph/pkg/service/v0/errorcode"
+	settings "github.com/owncloud/ocis/v2/extensions/settings/pkg/service/v0"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 )
@@ -42,7 +42,7 @@ func RequireAdmin(rm *roles.Manager, logger log.Logger) func(next http.Handler) 
 			}
 
 			// check if permission is present in roles of the authenticated account
-			if rm.FindPermissionByID(r.Context(), roleIDs, accounts.AccountManagementPermissionID) != nil {
+			if rm.FindPermissionByID(r.Context(), roleIDs, settings.AccountManagementPermissionID) != nil {
 				next.ServeHTTP(w, r)
 				return
 			}

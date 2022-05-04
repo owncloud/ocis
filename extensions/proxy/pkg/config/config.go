@@ -96,10 +96,9 @@ type UserinfoCache struct {
 
 // PolicySelector is the toplevel-configuration for different selectors
 type PolicySelector struct {
-	Static    *StaticSelectorConf    `yaml:"static"`
-	Migration *MigrationSelectorConf `yaml:"migration"`
-	Claims    *ClaimsSelectorConf    `yaml:"claims"`
-	Regex     *RegexSelectorConf     `yaml:"regex"`
+	Static *StaticSelectorConf `yaml:"static"`
+	Claims *ClaimsSelectorConf `yaml:"claims"`
+	Regex  *RegexSelectorConf  `yaml:"regex"`
 }
 
 // StaticSelectorConf is the config for the static-policy-selector
@@ -116,13 +115,6 @@ type TokenManager struct {
 type PreSignedURL struct {
 	AllowedHTTPMethods []string `yaml:"allowed_http_methods"`
 	Enabled            bool     `yaml:"enabled" env:"PROXY_ENABLE_PRESIGNEDURLS"`
-}
-
-// MigrationSelectorConf is the config for the migration-selector
-type MigrationSelectorConf struct {
-	AccFoundPolicy        string `yaml:"acc_found_policy"`
-	AccNotFoundPolicy     string `yaml:"acc_not_found_policy"`
-	UnauthenticatedPolicy string `yaml:"unauthenticated_policy"`
 }
 
 // ClaimsSelectorConf is the config for the claims-selector

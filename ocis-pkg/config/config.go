@@ -3,7 +3,6 @@ package config
 import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 
-	accounts "github.com/owncloud/ocis/v2/extensions/accounts/pkg/config"
 	appProvider "github.com/owncloud/ocis/v2/extensions/app-provider/pkg/config"
 	appRegistry "github.com/owncloud/ocis/v2/extensions/app-registry/pkg/config"
 	audit "github.com/owncloud/ocis/v2/extensions/audit/pkg/config"
@@ -73,7 +72,6 @@ type Config struct {
 	AdminUserID       string               `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID"`
 	Runtime           Runtime              `yaml:"runtime"`
 
-	Accounts          *accounts.Config      `yaml:"accounts"`
 	AppProvider       *appProvider.Config   `yaml:"app_provider"`
 	AppRegistry       *appRegistry.Config   `yaml:"app_registry"`
 	Audit             *audit.Config         `yaml:"audit"`

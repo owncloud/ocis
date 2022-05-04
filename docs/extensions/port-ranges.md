@@ -34,7 +34,7 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 | 9130-9134  | [konnectd](https://github.com/owncloud/ocis/tree/master/konnectd)             |
 | 9135-9139  | [graph-explorer](https://github.com/owncloud/ocis/tree/master/graph-explorer) |
 | 9140-9179  | [reva/storage](https://github.com/owncloud/ocis/tree/master/storage)          |
-| 9180-9184  | [accounts](https://github.com/owncloud/ocis/tree/master/accounts)             |
+| 9180-9184  | FREE (formerly used by accounts)                                              |
 | 9185-9189  | [thumbnails](https://github.com/owncloud/ocis/tree/master/thumbnails)         |
 | 9190-9194  | [settings](https://github.com/owncloud/ocis/tree/master/settings)             |
 | 9195-9199  | [store](https://github.com/owncloud/ocis/tree/master/store)                   |

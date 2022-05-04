@@ -1,7 +1,6 @@
 package config
 
 import (
-	accounts "github.com/owncloud/ocis/v2/extensions/accounts/pkg/config/defaults"
 	appProvider "github.com/owncloud/ocis/v2/extensions/app-provider/pkg/config/defaults"
 	appRegistry "github.com/owncloud/ocis/v2/extensions/app-registry/pkg/config/defaults"
 	audit "github.com/owncloud/ocis/v2/extensions/audit/pkg/config/defaults"
@@ -41,7 +40,6 @@ func DefaultConfig() *Config {
 			Host: "localhost",
 		},
 
-		Accounts:          accounts.DefaultConfig(),
 		AppProvider:       appProvider.DefaultConfig(),
 		AppRegistry:       appRegistry.DefaultConfig(),
 		Audit:             audit.DefaultConfig(),

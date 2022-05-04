@@ -16,7 +16,6 @@ L10N_MODULES := $(shell find . -path '*.tx*' -name 'config' | sed 's|/[^/]*$$||'
 
 # if you add a module here please also add it to the .drone.star file
 OCIS_MODULES = \
-	extensions/accounts \
 	extensions/app-provider \
 	extensions/app-registry \
 	extensions/audit \
