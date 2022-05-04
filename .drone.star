@@ -65,7 +65,7 @@ config = {
         "extensions/proxy",
         "extensions/settings",
         "extensions/sharing",
-        "extensions/storage-metadata",
+        "extensions/storage-system",
         "extensions/storage-publiclink",
         "extensions/storage-shares",
         "extensions/storage-users",
@@ -1646,7 +1646,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "STORAGE_USERS_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
             "STORAGE_USERS_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/users",
-            "STORAGE_METADATA_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/metadata",
+            "STORAGE_SYSTEM_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/metadata",
             "SHARING_USER_JSON_FILE": "/srv/app/tmp/ocis/shares.json",
             "PROXY_ENABLE_BASIC_AUTH": True,
             "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
@@ -1721,7 +1721,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "SHARING_USER_OWNCLOUDSQL_DB_NAME": "owncloud",
             # General oCIS config
             # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
-            "OCIS_RUN_EXTENSIONS": "settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,frontend,gateway,user,group,auth-basic,auth-bearer,auth-machine,storage-users,storage-shares,storage-publiclink,app-provider,sharing,proxy,nats,ocdav",
+            "OCIS_RUN_EXTENSIONS": "settings,storage-system,graph,graph-explorer,ocs,store,thumbnails,web,webdav,frontend,gateway,user,group,auth-basic,auth-bearer,auth-machine,storage-users,storage-shares,storage-publiclink,app-provider,sharing,proxy,nats,ocdav",
             "OCIS_LOG_LEVEL": "info",
             "OCIS_URL": OCIS_URL,
             "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",

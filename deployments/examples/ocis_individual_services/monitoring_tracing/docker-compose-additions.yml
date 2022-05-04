@@ -99,14 +99,14 @@ services:
   #    OCIS_TRACING_ENDPOINT: jaeger-agent:6831
   #    # metrics
   #    GRAPH_EXPLORER_DEBUG_ADDR: 0.0.0.0:9136
-  storage-metadata:
+  storage-system:
     environment:
       # tracing
       OCIS_TRACING_ENABLED: "true"
       OCIS_TRACING_TYPE: jaeger
       OCIS_TRACING_ENDPOINT: jaeger-agent:6831
       # metrics
-      STORAGE_METADATA_DEBUG_ADDR: 0.0.0.0:9217
+      STORAGE_SYSTEM_DEBUG_ADDR: 0.0.0.0:9217
   storage-authbasic:
     environment:
       # tracing

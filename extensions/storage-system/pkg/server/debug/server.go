@@ -4,7 +4,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/owncloud/ocis/extensions/storage-metadata/pkg/config"
+	"github.com/owncloud/ocis/extensions/storage-system/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/ocis-pkg/version"
 )
