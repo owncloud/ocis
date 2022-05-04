@@ -41,9 +41,9 @@ import (
 	search "github.com/owncloud/ocis/extensions/search/pkg/command"
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/command"
 	sharing "github.com/owncloud/ocis/extensions/sharing/pkg/command"
-	storagemetadata "github.com/owncloud/ocis/extensions/storage-metadata/pkg/command"
 	storagepublic "github.com/owncloud/ocis/extensions/storage-publiclink/pkg/command"
 	storageshares "github.com/owncloud/ocis/extensions/storage-shares/pkg/command"
+	storageSystem "github.com/owncloud/ocis/extensions/storage-system/pkg/command"
 	storageusers "github.com/owncloud/ocis/extensions/storage-users/pkg/command"
 	store "github.com/owncloud/ocis/extensions/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/command"
@@ -110,7 +110,7 @@ func NewService(options ...Option) (*Service, error) {
 
 	s.ServicesRegistry[opts.Config.Settings.Service.Name] = settings.NewSutureService
 	s.ServicesRegistry[opts.Config.Nats.Service.Name] = nats.NewSutureService
-	s.ServicesRegistry[opts.Config.StorageMetadata.Service.Name] = storagemetadata.NewSutureService
+	s.ServicesRegistry[opts.Config.StorageSystem.Service.Name] = storageSystem.NewSutureService
 	s.ServicesRegistry[opts.Config.GLAuth.Service.Name] = glauth.NewSutureService
 	s.ServicesRegistry[opts.Config.Graph.Service.Name] = graph.NewSutureService
 	s.ServicesRegistry[opts.Config.GraphExplorer.Service.Name] = graphExplorer.NewSutureService

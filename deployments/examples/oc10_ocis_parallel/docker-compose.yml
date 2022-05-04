@@ -85,7 +85,7 @@ services:
       STORAGE_LDAP_LOGIN_ATTRIBUTES: "uid,mail"
       # ownCloudSQL storage driver
       STORAGE_USERS_DRIVER: owncloudsql
-      STORAGE_METADATA_DRIVER: ocis # keep metadata on ocis storage since this are only small files atm
+      STORAGE_SYSTEM_DRIVER: ocis # keep system data on ocis storage since this are only small files atm
       STORAGE_USERS_DRIVER_OWNCLOUDSQL_DATADIR: /mnt/data/files
       STORAGE_USERS_DRIVER_OWNCLOUDSQL_UPLOADINFO_DIR: /tmp
       STORAGE_USERS_DRIVER_OWNCLOUDSQL_SHARE_FOLDER: "/Shares"
@@ -108,7 +108,7 @@ services:
       OCIS_STORAGE_READ_ONLY: "false" # TODO: conflict with OWNCLOUDSQL -> https://github.com/owncloud/ocis/issues/2303
       # General oCIS config
       # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
-      OCIS_RUN_EXTENSIONS: settings,storage-metadata,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,app-provider,storage-sharing,proxy,nats
+      OCIS_RUN_EXTENSIONS: settings,storage-system,graph,graph-explorer,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,app-provider,storage-sharing,proxy,nats
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
       OCIS_URL: https://${CLOUD_DOMAIN:-cloud.owncloud.test}
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS

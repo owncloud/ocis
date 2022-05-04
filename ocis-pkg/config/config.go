@@ -26,9 +26,9 @@ import (
 	search "github.com/owncloud/ocis/extensions/search/pkg/config"
 	settings "github.com/owncloud/ocis/extensions/settings/pkg/config"
 	sharing "github.com/owncloud/ocis/extensions/sharing/pkg/config"
-	storagemetadata "github.com/owncloud/ocis/extensions/storage-metadata/pkg/config"
 	storagepublic "github.com/owncloud/ocis/extensions/storage-publiclink/pkg/config"
 	storageshares "github.com/owncloud/ocis/extensions/storage-shares/pkg/config"
+	storagesystem "github.com/owncloud/ocis/extensions/storage-system/pkg/config"
 	storageusers "github.com/owncloud/ocis/extensions/storage-users/pkg/config"
 	store "github.com/owncloud/ocis/extensions/store/pkg/config"
 	thumbnails "github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
@@ -72,36 +72,36 @@ type Config struct {
 	MetadataUserID    string               `yaml:"metadata_user_id" env:"METADATA_USER_ID"`
 	Runtime           Runtime              `yaml:"runtime"`
 
-	Accounts          *accounts.Config        `yaml:"accounts"`
-	AppProvider       *appProvider.Config     `yaml:"app-provider"`
-	AppRegistry       *appRegistry.Config     `yaml:"app-registry"`
-	Audit             *audit.Config           `yaml:"audit"`
-	AuthBasic         *authbasic.Config       `yaml:"auth-basic"`
-	AuthBearer        *authbearer.Config      `yaml:"auth-bearer"`
-	AuthMachine       *authmachine.Config     `yaml:"auth-machine"`
-	Frontend          *frontend.Config        `yaml:"frontend"`
-	Gateway           *gateway.Config         `yaml:"gateway"`
-	GLAuth            *glauth.Config          `yaml:"glauth"`
-	Graph             *graph.Config           `yaml:"graph"`
-	GraphExplorer     *graphExplorer.Config   `yaml:"graph-explorer"`
-	Group             *group.Config           `yaml:"group"`
-	IDM               *idm.Config             `yaml:"idm"`
-	IDP               *idp.Config             `yaml:"idp"`
-	Nats              *nats.Config            `yaml:"nats"`
-	Notifications     *notifications.Config   `yaml:"notifications"`
-	OCDav             *ocdav.Config           `yaml:"ocdav"`
-	OCS               *ocs.Config             `yaml:"ocs"`
-	Proxy             *proxy.Config           `yaml:"proxy"`
-	Settings          *settings.Config        `yaml:"settings"`
-	Sharing           *sharing.Config         `yaml:"sharing"`
-	StorageMetadata   *storagemetadata.Config `yaml:"storage-metadata"`
-	StoragePublicLink *storagepublic.Config   `yaml:"storage-public"`
-	StorageShares     *storageshares.Config   `yaml:"storage-shares"`
-	StorageUsers      *storageusers.Config    `yaml:"storage-users"`
-	Store             *store.Config           `yaml:"store"`
-	Thumbnails        *thumbnails.Config      `yaml:"thumbnails"`
-	User              *user.Config            `yaml:"user"`
-	Web               *web.Config             `yaml:"web"`
-	WebDAV            *webdav.Config          `yaml:"webdav"`
-	Search            *search.Config          `yaml:"search"`
+	Accounts          *accounts.Config      `yaml:"accounts"`
+	AppProvider       *appProvider.Config   `yaml:"app-provider"`
+	AppRegistry       *appRegistry.Config   `yaml:"app-registry"`
+	Audit             *audit.Config         `yaml:"audit"`
+	AuthBasic         *authbasic.Config     `yaml:"auth-basic"`
+	AuthBearer        *authbearer.Config    `yaml:"auth-bearer"`
+	AuthMachine       *authmachine.Config   `yaml:"auth-machine"`
+	Frontend          *frontend.Config      `yaml:"frontend"`
+	Gateway           *gateway.Config       `yaml:"gateway"`
+	GLAuth            *glauth.Config        `yaml:"glauth"`
+	Graph             *graph.Config         `yaml:"graph"`
+	GraphExplorer     *graphExplorer.Config `yaml:"graph-explorer"`
+	Group             *group.Config         `yaml:"group"`
+	IDM               *idm.Config           `yaml:"idm"`
+	IDP               *idp.Config           `yaml:"idp"`
+	Nats              *nats.Config          `yaml:"nats"`
+	Notifications     *notifications.Config `yaml:"notifications"`
+	OCDav             *ocdav.Config         `yaml:"ocdav"`
+	OCS               *ocs.Config           `yaml:"ocs"`
+	Proxy             *proxy.Config         `yaml:"proxy"`
+	Settings          *settings.Config      `yaml:"settings"`
+	Sharing           *sharing.Config       `yaml:"sharing"`
+	StorageSystem     *storagesystem.Config `yaml:"storage-system"`
+	StoragePublicLink *storagepublic.Config `yaml:"storage-public"`
+	StorageShares     *storageshares.Config `yaml:"storage-shares"`
+	StorageUsers      *storageusers.Config  `yaml:"storage-users"`
+	Store             *store.Config         `yaml:"store"`
+	Thumbnails        *thumbnails.Config    `yaml:"thumbnails"`
+	User              *user.Config          `yaml:"user"`
+	Web               *web.Config           `yaml:"web"`
+	WebDAV            *webdav.Config        `yaml:"webdav"`
+	Search            *search.Config        `yaml:"search"`
 }

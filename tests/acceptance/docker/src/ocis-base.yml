@@ -7,7 +7,7 @@ services:
       STORAGE_USERS_DRIVER: $STORAGE_DRIVER
       STORAGE_USERS_DRIVER_LOCAL_ROOT: /srv/app/tmp/ocis/local/root
       STORAGE_USERS_DRIVER_OCIS_ROOT: /srv/app/tmp/ocis/storage/users
-      STORAGE_METADATA_DRIVER_OCIS_ROOT: /srv/app/tmp/ocis/storage/metadata
+      STORAGE_SYSTEM_DRIVER_OCIS_ROOT: /srv/app/tmp/ocis/storage/metadata
       STORAGE_SHARING_USER_JSON_FILE: /srv/app/tmp/ocis/shares.json
       SETTINGS_DATA_PATH: "/srv/app/tmp/ocis/settings"
       PROXY_ENABLE_BASIC_AUTH: "true"

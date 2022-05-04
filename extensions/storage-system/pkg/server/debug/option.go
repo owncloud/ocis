@@ -3,7 +3,7 @@ package debug
 import (
 	"context"
 
-	"github.com/owncloud/ocis/extensions/storage-metadata/pkg/config"
+	"github.com/owncloud/ocis/extensions/storage-system/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 

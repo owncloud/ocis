@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/owncloud/ocis/extensions/storage-metadata/pkg/config"
+	"github.com/owncloud/ocis/extensions/storage-system/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/clihelper"
 	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
 	"github.com/thejerf/suture/v4"
@@ -25,11 +25,11 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the storage-metadata command.
+// Execute is the entry point for the storage-system command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
-		Name:     "storage-metadata",
-		Usage:    "Provide metadata storage for oCIS",
+		Name:     "storage-system",
+		Usage:    "Provide system storage for oCIS",
 		Commands: GetCommands(cfg),
 	})
 
@@ -41,16 +41,16 @@ func Execute(cfg *config.Config) error {
 	return app.Run(os.Args)
 }
 
-// SutureService allows for the storage-metadata command to be embedded and supervised by a suture supervisor tree.
+// SutureService allows for the storage-system command to be embedded and supervised by a suture supervisor tree.
 type SutureService struct {
 	cfg *config.Config
 }
 
-// NewSutureService creates a new storage-metadata.SutureService
+// NewSutureService creates a new storage-system.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	cfg.StorageMetadata.Commons = cfg.Commons
+	cfg.StorageSystem.Commons = cfg.Commons
 	return SutureService{
-		cfg: cfg.StorageMetadata,
+		cfg: cfg.StorageSystem,
 	}
 }
 

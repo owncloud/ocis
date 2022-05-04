@@ -3,7 +3,7 @@ package defaults
 import (
 	"path/filepath"
 
-	"github.com/owncloud/ocis/extensions/storage-metadata/pkg/config"
+	"github.com/owncloud/ocis/extensions/storage-system/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
 )
 
@@ -33,7 +33,7 @@ func DefaultConfig() *config.Config {
 			Protocol:  "tcp",
 		},
 		Service: config.Service{
-			Name: "storage-metadata",
+			Name: "storage-system",
 		},
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",

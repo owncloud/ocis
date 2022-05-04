@@ -1,7 +1,7 @@
 package logging
 
 import (
-	"github.com/owncloud/ocis/extensions/storage-metadata/pkg/config"
+	"github.com/owncloud/ocis/extensions/storage-system/pkg/config"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 )
 
