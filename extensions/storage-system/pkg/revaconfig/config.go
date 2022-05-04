@@ -67,7 +67,7 @@ func StorageMetadataFromStruct(cfg *config.Config) map[string]interface{} {
 					"auth_manager": "machine",
 					"auth_managers": map[string]interface{}{
 						"machine": map[string]interface{}{
-							"api_key":      cfg.MachineAuthAPIKey,
+							"api_key":      cfg.SystemUserAPIKey,
 							"gateway_addr": cfg.GRPC.Addr,
 						},
 					},
