@@ -102,7 +102,7 @@ SETTINGS_LOG_FILE`
 | string
 | internal
 | 
-| `OCIS_MACHINE_AUTH_API_KEY`
+| `OCIS_SYSTEM_USER_API_KEY`
 | string
 | 
 | 

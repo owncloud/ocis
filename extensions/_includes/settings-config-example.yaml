@@ -46,7 +46,7 @@ metadata_config:
   storage_addr: 127.0.0.1:9215
   service_user_id: ""
   service_user_idp: internal
-  machine_auth_api_key: ""
+  system_user_api_key: ""
 asset:
   path: ""
 token_manager:

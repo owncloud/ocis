@@ -24,6 +24,6 @@
 | STORAGE_GRPC_ADDR | string | 127.0.0.1:9215 | |
 | METADATA_SERVICE_USER_UUID | string |  | |
 | METADATA_SERVICE_USER_IDP | string | internal | |
-| OCIS_MACHINE_AUTH_API_KEY | string |  | |
+| OCIS_SYSTEM_USER_API_KEY | string |  | |
 | SETTINGS_ASSET_PATH | string |  | |
 | OCIS_JWT_SECRET<br/>SETTINGS_JWT_SECRET | string |  | |

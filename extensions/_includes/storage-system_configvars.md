@@ -20,7 +20,7 @@
 | STORAGE_SYSTEM_HTTP_PROTOCOL | string | tcp | The transport protocol of the http service.|
 | OCIS_JWT_SECRET<br/>STORAGE_SYSTEM_JWT_SECRET | string |  | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
-| STORAGE_SYSTEM_MACHINE_AUTH_API_KEY | string |  | |
+| OCIS_SYSTEM_USER_API_KEY | string |  | |
 | STORAGE_SYSTEM_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
 | STORAGE_SYSTEM_DRIVER | string | ocis | The driver which should be used by the service|
 | STORAGE_SYSTEM_OCIS_ROOT | string | ~/.ocis/storage/metadata | |
