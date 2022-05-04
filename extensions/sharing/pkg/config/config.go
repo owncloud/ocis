@@ -95,8 +95,8 @@ type UserSharingOwnCloudSQLDriver struct {
 
 type UserSharingCS3Driver struct {
 	ProviderAddr     string `yaml:"provider_addr" env:"SHARING_USER_CS3_PROVIDER_ADDR"`
-	ServiceUserID    string `yaml:"service_user_id" env:"SHARING_USER_CS3_SERVICE_USER_ID"`
-	ServiceUserIDP   string `yaml:"service_user_idp" env:"OCIS_URL;SHARING_USER_CS3_SERVICE_USER_IDP"`
+	SystemUserID     string `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID;SHARING_USER_CS3_SYSTEM_USER_ID"`
+	SystemUserIDP    string `yaml:"system_user_idp" env:"OCIS_SYSTEM_USER_IDP;SHARING_USER_CS3_SYSTEM_USER_IDP"`
 	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY;SHARING_USER_CS3_SYSTEM_USER_API_KEY"`
 }
 
@@ -125,8 +125,8 @@ type PublicSharingSQLDriver struct {
 
 type PublicSharingCS3Driver struct {
 	ProviderAddr     string `yaml:"provider_addr" env:"SHARING_PUBLIC_CS3_PROVIDER_ADDR"`
-	ServiceUserID    string `yaml:"service_user_id" env:"SHARING_PUBLIC_CS3_SERVICE_USER_ID"`
-	ServiceUserIDP   string `yaml:"service_user_idp" env:"OCIS_URL;SHARING_PUBLIC_CS3_SERVICE_USER_IDP"`
+	SystemUserID     string `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID;SHARING_PUBLIC_CS3_SYSTEM_USER_ID"`
+	SystemUserIDP    string `yaml:"system_user_idp" env:"OCIS_SYSTEM_USER_IDP;SHARING_PUBLIC_CS3_SYSTEM_USER_IDP"`
 	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY;SHARING_USER_CS3_SYSTEM_USER_API_KEY"`
 }
 

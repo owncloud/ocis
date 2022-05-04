@@ -39,7 +39,7 @@ type Metadata struct {
 	GatewayAddress string `yaml:"gateway_addr" env:"STORAGE_GATEWAY_GRPC_ADDR"`
 	StorageAddress string `yaml:"storage_addr" env:"STORAGE_GRPC_ADDR"`
 
-	ServiceUserID    string `yaml:"service_user_id" env:"METADATA_SERVICE_USER_UUID"`
-	ServiceUserIDP   string `yaml:"service_user_idp" env:"METADATA_SERVICE_USER_IDP"`
+	SystemUserID     string `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID;SETTINGS_SYSTEM_USER_ID"`
+	SystemUserIDP    string `yaml:"system_user_idp" env:"OCIS_SYSTEM_USER_IDP;SETTINGS_SYSTEM_USER_IDP"`
 	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY"`
 }
