@@ -113,7 +113,7 @@ var _ = Describe("Searchprovider", func() {
 
 			Eventually(func() bool {
 				return called
-			}).Should(BeTrue())
+			}, "2s").Should(BeTrue())
 		})
 
 		It("removes an entry from the index when the file has been deleted", func() {
@@ -135,7 +135,7 @@ var _ = Describe("Searchprovider", func() {
 
 			Eventually(func() bool {
 				return called
-			}).Should(BeTrue())
+			}, "2s").Should(BeTrue())
 		})
 
 		It("indexes items when they are being restored", func() {
@@ -152,7 +152,7 @@ var _ = Describe("Searchprovider", func() {
 
 			Eventually(func() bool {
 				return called
-			}).Should(BeTrue())
+			}, "2s").Should(BeTrue())
 		})
 
 		It("indexes items when a version has been restored", func() {
@@ -169,7 +169,7 @@ var _ = Describe("Searchprovider", func() {
 
 			Eventually(func() bool {
 				return called
-			}).Should(BeTrue())
+			}, "2s").Should(BeTrue())
 		})
 
 		It("indexes items when they are being moved", func() {
@@ -186,7 +186,7 @@ var _ = Describe("Searchprovider", func() {
 
 			Eventually(func() bool {
 				return called
-			}).Should(BeTrue())
+			}, "2s").Should(BeTrue())
 		})
 	})
 
