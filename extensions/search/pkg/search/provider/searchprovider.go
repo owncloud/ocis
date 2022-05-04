@@ -15,8 +15,8 @@ import (
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/cs3org/reva/v2/pkg/utils/resourceid"
 	"github.com/owncloud/ocis/extensions/search/pkg/search"
 	"github.com/owncloud/ocis/ocis-pkg/log"
 	"google.golang.org/grpc/metadata"
@@ -86,7 +86,8 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			pathPrefix = utils.MakeRelativePath(gpRes.Path)
 		}
 
-		rootStorageID, _ := resourceid.StorageIDUnwrap(space.Root.StorageId)
+		_, rootStorageID := storagespace.SplitStorageID(space.Root.StorageId)
+
 		res, err := p.indexClient.Search(ctx, &searchsvc.SearchIndexRequest{
 			Query: req.Query,
 			Ref: &searchmsg.Reference{
