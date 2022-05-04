@@ -40,8 +40,8 @@
                 "IDM_ADMIN_PASSWORD": "admin",
                 // demo users
                 "IDM_CREATE_DEMO_USERS": "true",
-                // metadata storage
-                "METADATA_USER_ID": "some-metadata-user-id"
+                // system user
+                "OCIS_SYSTEM_USER_ID": "some-system-user-id"
                 // OCIS_RUN_EXTENSIONS allows to start a subset of extensions even in the supervised mode
                 //"OCIS_RUN_EXTENSIONS": "settings,storage-system,glauth,graph,graph-explorer,idp,ocs,store,thumbnails,web,webdav,frontend,gateway,user,group,auth-basic,auth-bearer,storage-authmachine,storage-users,storage-shares,storage-publiclink,app-provider,sharing,accounts,proxy,ocdav",
             }
