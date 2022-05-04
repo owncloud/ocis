@@ -104,6 +104,7 @@ The following sections list the changes for unreleased.
    ID format.
 
    https://github.com/owncloud/ocis/pull/3648
+   https://github.com/owncloud/ocis/pull/3669
 
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 
