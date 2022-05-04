@@ -14,6 +14,7 @@ The following sections list the changes for unreleased.
 * Change - Introduce `ocis init` and remove all default secrets: [#3551](https://github.com/owncloud/ocis/pull/3551)
 * Change - Reduce drives in graph /me/drives API: [#3629](https://github.com/owncloud/ocis/pull/3629)
 * Change - Switched default configuration to use libregraph/idm: [#3331](https://github.com/owncloud/ocis/pull/3331)
+* Change - Rename MetadataUserID: [#3671](https://github.com/owncloud/ocis/pull/3671)
 * Change - Use new space ID util functions: [#3648](https://github.com/owncloud/ocis/pull/3648)
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 * Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
@@ -97,6 +98,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3331
    https://github.com/owncloud/ocis/pull/3633
+
+* Change - Rename MetadataUserID: [#3671](https://github.com/owncloud/ocis/pull/3671)
+
+   MetadataUserID is renamed to SystemUserID including yaml tags and env vars
+
+   https://github.com/owncloud/ocis/pull/3671
 
 * Change - Use new space ID util functions: [#3648](https://github.com/owncloud/ocis/pull/3648)
 
