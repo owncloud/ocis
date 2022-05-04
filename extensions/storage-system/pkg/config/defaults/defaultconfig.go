@@ -93,8 +93,8 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
 
-	if cfg.MetadataUserID == "" && cfg.Commons != nil && cfg.Commons.MetadataUserID != "" {
-		cfg.MetadataUserID = cfg.Commons.MetadataUserID
+	if cfg.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
+		cfg.SystemUserID = cfg.Commons.SystemUserID
 	}
 
 }

@@ -69,7 +69,7 @@ type Config struct {
 	TokenManager      *shared.TokenManager `yaml:"token_manager"`
 	MachineAuthAPIKey string               `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY"`
 	TransferSecret    string               `yaml:"transfer_secret" env:"STORAGE_TRANSFER_SECRET"`
-	MetadataUserID    string               `yaml:"metadata_user_id" env:"METADATA_USER_ID"`
+	SystemUserID      string               `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID"`
 	Runtime           Runtime              `yaml:"runtime"`
 
 	Accounts          *accounts.Config      `yaml:"accounts"`

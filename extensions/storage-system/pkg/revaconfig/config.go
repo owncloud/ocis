@@ -42,7 +42,7 @@ func StorageMetadataFromStruct(cfg *config.Config) map[string]interface{} {
 							"users": map[string]interface{}{
 								"serviceuser": map[string]interface{}{
 									"id": map[string]interface{}{
-										"opaqueId": cfg.MetadataUserID,
+										"opaqueId": cfg.SystemUserID,
 										"idp":      "internal",
 										"type":     userpb.UserType_USER_TYPE_PRIMARY,
 									},
