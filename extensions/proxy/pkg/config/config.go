@@ -53,7 +53,7 @@ type Route struct {
 	Backend string `yaml:"backend"`
 	// Service name to look up in the registry
 	Service     string `yaml:"service"`
-	ApacheVHost bool   `yaml:"apache-vhost"`
+	ApacheVHost bool   `yaml:"apache_vhost"`
 }
 
 // RouteType defines the type of a route
