@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Idp: Check if CA certificate if present: [#3623](https://github.com/owncloud/ocis/issues/3623)
 * Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
 * Bugfix - URL encode the webdav url in the graph API: [#3597](https://github.com/owncloud/ocis/pull/3597)
+* Change - Update ocis packages and imports to V2: [#3678](https://github.com/owncloud/ocis/pull/3678)
 * Change - Load configuration files just from one directory: [#3587](https://github.com/owncloud/ocis/pull/3587)
 * Change - Reduce permissions on docker image predeclared volumes: [#3641](https://github.com/owncloud/ocis/pull/3641)
 * Change - Introduce `ocis init` and remove all default secrets: [#3551](https://github.com/owncloud/ocis/pull/3551)
@@ -51,6 +52,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3538
    https://github.com/owncloud/ocis/pull/3597
+
+* Change - Update ocis packages and imports to V2: [#3678](https://github.com/owncloud/ocis/pull/3678)
+
+   This needs to be done in preparation for the major version bump in ocis.
+
+   https://github.com/owncloud/ocis/pull/3678
 
 * Change - Load configuration files just from one directory: [#3587](https://github.com/owncloud/ocis/pull/3587)
 
