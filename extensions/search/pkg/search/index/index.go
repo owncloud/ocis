@@ -207,7 +207,7 @@ func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (
 		bleve.NewQueryStringQuery("Name:"+req.Query),
 		deletedQuery, // Skip documents that have been marked as deleted
 		bleve.NewQueryStringQuery("RootID:"+req.Ref.ResourceId.StorageId+"!"+req.Ref.ResourceId.OpaqueId), // Limit search to the space
-		bleve.NewQueryStringQuery("Path:"+req.Ref.Path+"*"),                                               // Limit search to this directory in the space
+		bleve.NewQueryStringQuery("Path:"+utils.MakeRelativePath(path.Join(req.Ref.Path, "/"))+"*"),       // Limit search to this directory in the space
 	)
 	bleveReq := bleve.NewSearchRequest(query)
 	bleveReq.Size = 200

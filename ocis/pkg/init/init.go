@@ -101,17 +101,18 @@ type OcisConfig struct {
 	SystemUserAPIKey  string       `yaml:"system_user_api_key"`
 	TransferSecret    string       `yaml:"transfer_secret"`
 	SystemUserID      string       `yaml:"system_user_id"`
+	AdminUserID       string       `yaml:"admin_user_id"`
 	Graph             GraphExtension
 	Idp               LdapBasedExtension
 	Idm               IdmExtension
 	Proxy             InsecureProxyExtension
 	Frontend          FrontendExtension
-	AuthBasic         AuthbasicExtension  `yaml:"auth-basic"`
-	AuthBearer        AuthbearerExtension `yaml:"auth-bearer"`
+	AuthBasic         AuthbasicExtension  `yaml:"auth_basic"`
+	AuthBearer        AuthbearerExtension `yaml:"auth_bearer"`
 	User              UserAndGroupExtension
 	Group             UserAndGroupExtension
-	StorageMetadata   DataProviderInsecureSettings `yaml:"storage-system"`
-	StorageUsers      DataProviderInsecureSettings `yaml:"storage-users"`
+	StorageMetadata   DataProviderInsecureSettings `yaml:"storage_system"`
+	StorageUsers      DataProviderInsecureSettings `yaml:"storage_users"`
 	Ocdav             InsecureExtension
 	Thumbnails        ThumbNailExtension
 }
@@ -163,6 +164,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 	}
 
 	systemUserID := uuid.Must(uuid.NewV4()).String()
+	adminUserID := uuid.Must(uuid.NewV4()).String()
 
 	idmServicePassword, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
@@ -209,6 +211,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		SystemUserAPIKey:  systemUserApiKey,
 		TransferSecret:    revaTransferSecret,
 		SystemUserID:      systemUserID,
+		AdminUserID:       adminUserID,
 		Idm: IdmExtension{
 			ServiceUserPasswords: ServiceUserPasswordsSettings{
 				AdminPassword: ocisAdminServicePassword,

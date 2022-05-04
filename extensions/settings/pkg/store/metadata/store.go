@@ -123,7 +123,7 @@ func (s *Store) initMetadataClient(mdc MetadataClient) error {
 		}
 	}
 
-	for _, p := range defaults.DefaultRoleAssignments() {
+	for _, p := range defaults.DefaultRoleAssignments(s.cfg) {
 		accountUUID := p.AccountUuid
 		roleID := p.RoleId
 		err = mdc.MakeDirIfNotExist(ctx, accountPath(accountUUID))

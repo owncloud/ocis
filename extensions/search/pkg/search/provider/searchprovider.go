@@ -5,17 +5,17 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/extensions/search/pkg/search"
 	"github.com/owncloud/ocis/ocis-pkg/log"
@@ -43,124 +43,14 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 	go func() {
 		for {
 			ev := <-eventsChan
-			var ref *provider.Reference
-			var owner *user.User
-			switch e := ev.(type) {
-			case events.ItemTrashed:
-				err := p.indexClient.Delete(e.ID)
-				if err != nil {
-					p.logger.Error().Err(err).Interface("Id", e.ID).Msg("failed to remove item from index")
-				}
-				continue
-			case events.ItemRestored:
-				ref = e.Ref
-				owner = &user.User{
-					Id: e.Executant,
-				}
-
-				statRes, err := p.statResource(ref, owner)
-				if err != nil {
-					p.logger.Error().Err(err).Msg("failed to stat the changed resource")
-				}
-
-				switch statRes.Status.Code {
-				case rpc.Code_CODE_OK:
-					err = p.indexClient.Restore(statRes.Info.Id)
-					if err != nil {
-						p.logger.Error().Err(err).Msg("failed to restore the changed resource in the index")
-					}
-				default:
-					p.logger.Error().Interface("statRes", statRes).Msg("failed to stat the changed resource")
-				}
-
-				continue
-			case events.ItemMoved:
-				ref = e.Ref
-				owner = &user.User{
-					Id: e.Executant,
-				}
-
-				statRes, err := p.statResource(ref, owner)
-				if err != nil {
-					p.logger.Error().Err(err).Msg("failed to stat the changed resource")
-				}
-
-				switch statRes.Status.Code {
-				case rpc.Code_CODE_OK:
-					err = p.indexClient.Move(statRes.Info)
-					if err != nil {
-						p.logger.Error().Err(err).Msg("failed to restore the changed resource in the index")
-					}
-				default:
-					p.logger.Error().Interface("statRes", statRes).Msg("failed to stat the changed resource")
-				}
-
-				continue
-			case events.ContainerCreated:
-				ref = e.Ref
-				owner = &user.User{
-					Id: e.Executant,
-				}
-			case events.FileUploaded:
-				ref = e.Ref
-				owner = &user.User{
-					Id: e.Executant,
-				}
-			case events.FileVersionRestored:
-				ref = e.Ref
-				owner = &user.User{
-					Id: e.Executant,
-				}
-			default:
-				// Not sure what to do here. Skip.
-				continue
-			}
-
-			statRes, err := p.statResource(ref, owner)
-			if err != nil {
-				p.logger.Error().Err(err).Msg("failed to stat the changed resource")
-			}
-
-			switch statRes.Status.Code {
-			case rpc.Code_CODE_OK:
-				err = p.indexClient.Add(ref, statRes.Info)
-				if err != nil {
-					p.logger.Error().Err(err).Msg("error adding updating the resource in the index")
-				} else {
-					p.logDocCount()
-				}
-			default:
-				p.logger.Error().Interface("statRes", statRes).Msg("failed to stat the changed resource")
-			}
+			go func() {
+				time.Sleep(1 * time.Second) // Give some time to let everything settle down before trying to access it when indexing
+				p.handleEvent(ev)
+			}()
 		}
 	}()
 
 	return p
-}
-
-func (p *Provider) statResource(ref *provider.Reference, owner *user.User) (*provider.StatResponse, error) {
-	// Get auth
-	ownerCtx := ctxpkg.ContextSetUser(context.Background(), owner)
-	authRes, err := p.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
-		Type:         "machine",
-		ClientId:     "userid:" + owner.Id.OpaqueId,
-		ClientSecret: p.machineAuthAPIKey,
-	})
-	if err != nil || authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		p.logger.Error().Err(err).Interface("authRes", authRes).Msg("error using machine auth")
-	}
-	ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token)
-
-	// Stat changed resource resource
-	return p.gwClient.Stat(ownerCtx, &provider.StatRequest{Ref: ref})
-}
-
-func (p *Provider) logDocCount() {
-	c, err := p.indexClient.DocCount()
-	if err != nil {
-		p.logger.Error().Err(err).Msg("error getting document count from the index")
-	}
-	p.logger.Debug().Interface("count", c).Msg("new document count")
 }
 
 func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error) {
@@ -169,12 +59,12 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 	}
 
 	listSpacesRes, err := p.gwClient.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
-		Opaque: &typesv1beta1.Opaque{Map: map[string]*typesv1beta1.OpaqueEntry{
-			"path": {
-				Decoder: "plain",
-				Value:   []byte("/"),
+		Filters: []*provider.ListStorageSpacesRequest_Filter{
+			{
+				Type: provider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
+				Term: &provider.ListStorageSpacesRequest_Filter_SpaceType{SpaceType: "+grant"},
 			},
-		}},
+		},
 	})
 	if err != nil {
 		return nil, err
@@ -196,12 +86,14 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			pathPrefix = utils.MakeRelativePath(gpRes.Path)
 		}
 
+		_, rootStorageID := storagespace.SplitStorageID(space.Root.StorageId)
+
 		res, err := p.indexClient.Search(ctx, &searchsvc.SearchIndexRequest{
 			Query: req.Query,
 			Ref: &searchmsg.Reference{
 				ResourceId: &searchmsg.ResourceID{
 					StorageId: space.Root.StorageId,
-					OpaqueId:  space.Root.OpaqueId,
+					OpaqueId:  rootStorageID,
 				},
 				Path: pathPrefix,
 			},
@@ -275,4 +167,12 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 
 	p.logDocCount()
 	return &searchsvc.IndexSpaceResponse{}, nil
+}
+
+func (p *Provider) logDocCount() {
+	c, err := p.indexClient.DocCount()
+	if err != nil {
+		p.logger.Error().Err(err).Msg("error getting document count from the index")
+	}
+	p.logger.Debug().Interface("count", c).Msg("new document count")
 }
