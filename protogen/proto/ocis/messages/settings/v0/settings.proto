@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package ocis.messages.settings.v0;
 
-option go_package = "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0";
+option go_package = "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0";
 
 // ---
 // messages for settings values

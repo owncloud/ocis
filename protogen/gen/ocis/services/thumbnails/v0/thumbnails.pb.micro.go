@@ -5,18 +5,16 @@ package v0
 
 import (
 	fmt "fmt"
-	math "math"
-
 	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
 	_ "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0"
 	proto "google.golang.org/protobuf/proto"
+	math "math"
+)
 
+import (
 	context "context"
-
 	api "go-micro.dev/v4/api"
-
 	client "go-micro.dev/v4/client"
-
 	server "go-micro.dev/v4/server"
 )
 

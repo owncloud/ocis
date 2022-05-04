@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package ocis.messages.store.v0;
 
-option go_package = "github.com/owncloud/ocis/protogen/gen/ocis/messages/store/v0";
+option go_package = "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/store/v0";
 
 message Field {
 	// type of value e.g string, int, int64, bool, float64

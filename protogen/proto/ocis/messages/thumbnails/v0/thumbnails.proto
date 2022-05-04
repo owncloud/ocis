@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package ocis.messages.thumbnails.v0;
 
-option go_package = "github.com/owncloud/ocis/protogen/gen/ocis/messages/thumbnails/v0";
+option go_package = "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0";
 
 message WebdavSource {
     // REQUIRED.

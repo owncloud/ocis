@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package ocis.messages.accounts.v0;
 
-option go_package = "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0";
+option go_package = "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0";
 
 import "google/protobuf/timestamp.proto";
 // Account follows the properties of the ms graph api user resource.

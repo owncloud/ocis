@@ -4,7 +4,7 @@ package ocis.messages.search.v0;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0";
+option go_package = "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0";
 
 message ResourceID {
 	string storage_id = 1;
