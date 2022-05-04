@@ -1,0 +1,19 @@
+[caption=]
+.Environment variables for the {{ .ExtensionName }} extension
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Name
+| Type
+| Default Value
+| Description
+
+{{- range .Fields}}
+| `{{.Name}}`
+| {{.Type}}
+| {{.DefaultValue}}
+| {{.Description}}
+
+{{- end }}
+|===
+
+Since Version: `+` added, `-` deprecated
