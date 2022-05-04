@@ -12,6 +12,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/owncloud/ocis/extensions/thumbnails/pkg/preprocessor"
 	"github.com/owncloud/ocis/extensions/thumbnails/pkg/service/grpc/v0/decorators"
@@ -257,15 +258,11 @@ func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 
 	var ref *provider.Reference
 	if strings.Contains(path, "!") {
-		parts := strings.Split(path, "!")
-		spaceID, path := parts[0], parts[1]
-		ref = &provider.Reference{
-			ResourceId: &provider.ResourceId{
-				StorageId: spaceID,
-				OpaqueId:  spaceID,
-			},
-			Path: path,
+		parsed, err := storagespace.ParseReference(path)
+		if err != nil {
+			return nil, err
 		}
+		ref = &parsed
 	} else {
 		ref = &provider.Reference{
 			Path: path,

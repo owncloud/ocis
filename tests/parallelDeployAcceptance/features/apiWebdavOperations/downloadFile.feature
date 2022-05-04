@@ -2,7 +2,7 @@
 Feature: download file
   As a user
   I want to be able to download files
-  So that I can work wih local copies of files on my client system
+  So that I can work with local copies of files on my client system
 
   Background:
     Given using "oc10" as owncloud selector

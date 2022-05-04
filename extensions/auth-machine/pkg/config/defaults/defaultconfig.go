@@ -20,8 +20,9 @@ func DefaultConfig() *config.Config {
 			Zpages: false,
 		},
 		GRPC: config.GRPCConfig{
-			Addr:     "127.0.0.1:9166",
-			Protocol: "tcp",
+			Addr:      "127.0.0.1:9166",
+			Namespace: "com.owncloud.api",
+			Protocol:  "tcp",
 		},
 		Service: config.Service{
 			Name: "auth-machine",
@@ -29,21 +30,20 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		AuthProvider: "ldap",
 	}
 }
 
 func EnsureDefaults(cfg *config.Config) {
 	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
-	if cfg.Logging == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
-		cfg.Logging = &config.Logging{
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &config.Log{
 			Level:  cfg.Commons.Log.Level,
 			Pretty: cfg.Commons.Log.Pretty,
 			Color:  cfg.Commons.Log.Color,
 			File:   cfg.Commons.Log.File,
 		}
-	} else if cfg.Logging == nil {
-		cfg.Logging = &config.Logging{}
+	} else if cfg.Log == nil {
+		cfg.Log = &config.Log{}
 	}
 	// provide with defaults for shared tracing, since we need a valid destination address for BindEnv.
 	if cfg.Tracing == nil && cfg.Commons != nil && cfg.Commons.Tracing != nil {
@@ -73,8 +73,8 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.TokenManager = &config.TokenManager{}
 	}
 
-	if cfg.AuthProviders.Machine.APIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
-		cfg.AuthProviders.Machine.APIKey = cfg.Commons.MachineAuthAPIKey
+	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
 }
 

@@ -48,7 +48,7 @@ type SutureService struct {
 
 // NewSutureService creates a new audit.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	cfg.Settings.Commons = cfg.Commons
+	cfg.Audit.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.Audit,
 	}

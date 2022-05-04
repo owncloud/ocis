@@ -10,9 +10,11 @@ The following sections list the changes for unreleased.
 * Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
 * Bugfix - URL encode the webdav url in the graph API: [#3597](https://github.com/owncloud/ocis/pull/3597)
 * Change - Load configuration files just from one directory: [#3587](https://github.com/owncloud/ocis/pull/3587)
+* Change - Reduce permissions on docker image predeclared volumes: [#3641](https://github.com/owncloud/ocis/pull/3641)
 * Change - Introduce `ocis init` and remove all default secrets: [#3551](https://github.com/owncloud/ocis/pull/3551)
 * Change - Reduce drives in graph /me/drives API: [#3629](https://github.com/owncloud/ocis/pull/3629)
 * Change - Switched default configuration to use libregraph/idm: [#3331](https://github.com/owncloud/ocis/pull/3331)
+* Change - Use new space ID util functions: [#3648](https://github.com/owncloud/ocis/pull/3648)
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 * Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
 * Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
@@ -20,6 +22,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 * Enhancement - Update reva to v2.x.x: [#3552](https://github.com/owncloud/ocis/pull/3552)
+* Enhancement - Update ownCloud Web to v5.5.0-rc.2: [#6854](https://github.com/owncloud/web/pull/6854)
 
 ## Details
 
@@ -58,6 +61,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3587
 
+* Change - Reduce permissions on docker image predeclared volumes: [#3641](https://github.com/owncloud/ocis/pull/3641)
+
+   We've lowered the permissions on the predeclared volumes of the oCIS docker image from 777 to
+   750.
+
+   This change doesn't affect you, unless you use the docker image with the non default uid/guid to
+   start oCIS (default is 1000:1000).
+
+   https://github.com/owncloud/ocis/pull/3641
+
 * Change - Introduce `ocis init` and remove all default secrets: [#3551](https://github.com/owncloud/ocis/pull/3551)
 
    We've removed all default secrets. This means you can't start oCIS any longer without setting
@@ -84,6 +97,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3331
    https://github.com/owncloud/ocis/pull/3633
+
+* Change - Use new space ID util functions: [#3648](https://github.com/owncloud/ocis/pull/3648)
+
+   Changed code to use the new space ID util functions so that everything works with the new spaces
+   ID format.
+
+   https://github.com/owncloud/ocis/pull/3648
 
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 
@@ -148,6 +168,17 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/3611
    https://github.com/owncloud/ocis/pull/3637
    https://github.com/owncloud/ocis/pull/3652
+
+* Enhancement - Update ownCloud Web to v5.5.0-rc.2: [#6854](https://github.com/owncloud/web/pull/6854)
+
+   Tags: web
+
+   We updated ownCloud Web to v5.5.0-rc.2. Please refer to the changelog (linked) for details on
+   the web release.
+
+   https://github.com/owncloud/web/pull/6854
+   https://github.com/owncloud/ocis/pull/3664
+   https://github.com/owncloud/web/releases/tag/v5.5.0-rc.2
 # Changelog for [1.20.0] (2022-04-13)
 
 The following sections list the changes for 1.20.0.

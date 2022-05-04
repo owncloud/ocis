@@ -20,8 +20,9 @@ func DefaultConfig() *config.Config {
 			Zpages: false,
 		},
 		GRPC: config.GRPCConfig{
-			Addr:     "127.0.0.1:9142",
-			Protocol: "tcp",
+			Addr:      "127.0.0.1:9142",
+			Namespace: "com.owncloud.api",
+			Protocol:  "tcp",
 		},
 		Service: config.Service{
 			Name: "gateway",
@@ -38,39 +39,38 @@ func DefaultConfig() *config.Config {
 		HomeMapping:                "",
 		EtagCacheTTL:               0,
 
-		UsersEndpoint:             "localhost:9144",
-		GroupsEndpoint:            "localhost:9160",
-		PermissionsEndpoint:       "localhost:9191",
-		SharingEndpoint:           "localhost:9150",
-		FrontendPublicURL:         "https://localhost:9200",
+		FrontendPublicURL: "https://localhost:9200",
+
+		AppRegistryEndpoint:       "localhost:9242",
 		AuthBasicEndpoint:         "localhost:9146",
 		AuthBearerEndpoint:        "localhost:9148",
 		AuthMachineEndpoint:       "localhost:9166",
+		GroupsEndpoint:            "localhost:9160",
+		PermissionsEndpoint:       "localhost:9191",
+		SharingEndpoint:           "localhost:9150",
 		StoragePublicLinkEndpoint: "localhost:9178",
-		StorageUsersEndpoint:      "localhost:9157",
 		StorageSharesEndpoint:     "localhost:9154",
+		StorageUsersEndpoint:      "localhost:9157",
+		UsersEndpoint:             "localhost:9144",
 
 		StorageRegistry: config.StorageRegistry{
 			Driver: "spaces",
 			JSON:   "",
-		},
-		AppRegistry: config.AppRegistry{
-			MimetypesJSON: "",
 		},
 	}
 }
 
 func EnsureDefaults(cfg *config.Config) {
 	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
-	if cfg.Logging == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
-		cfg.Logging = &config.Logging{
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &config.Log{
 			Level:  cfg.Commons.Log.Level,
 			Pretty: cfg.Commons.Log.Pretty,
 			Color:  cfg.Commons.Log.Color,
 			File:   cfg.Commons.Log.File,
 		}
-	} else if cfg.Logging == nil {
-		cfg.Logging = &config.Logging{}
+	} else if cfg.Log == nil {
+		cfg.Log = &config.Log{}
 	}
 	// provide with defaults for shared tracing, since we need a valid destination address for BindEnv.
 	if cfg.Tracing == nil && cfg.Commons != nil && cfg.Commons.Tracing != nil {

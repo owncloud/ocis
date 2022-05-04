@@ -20,9 +20,10 @@ func DefaultConfig() *config.Config {
 			Zpages: false,
 		},
 		HTTP: config.HTTPConfig{
-			Addr:     "127.0.0.1:0", // :0 to pick any free local port
-			Protocol: "tcp",
-			Prefix:   "",
+			Addr:      "127.0.0.1:0", // :0 to pick any free local port
+			Namespace: "",            //TODO: make this configurable for the reva micro service
+			Protocol:  "tcp",
+			Prefix:    "",
 		},
 		Service: config.Service{
 			Name: "ocdav",
@@ -46,15 +47,15 @@ func DefaultConfig() *config.Config {
 
 func EnsureDefaults(cfg *config.Config) {
 	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
-	if cfg.Logging == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
-		cfg.Logging = &config.Logging{
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &config.Log{
 			Level:  cfg.Commons.Log.Level,
 			Pretty: cfg.Commons.Log.Pretty,
 			Color:  cfg.Commons.Log.Color,
 			File:   cfg.Commons.Log.File,
 		}
-	} else if cfg.Logging == nil {
-		cfg.Logging = &config.Logging{}
+	} else if cfg.Log == nil {
+		cfg.Log = &config.Log{}
 	}
 	// provide with defaults for shared tracing, since we need a valid destination address for BindEnv.
 	if cfg.Tracing == nil && cfg.Commons != nil && cfg.Commons.Tracing != nil {

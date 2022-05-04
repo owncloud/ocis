@@ -23,8 +23,9 @@ func DefaultConfig() *config.Config {
 			Zpages: false,
 		},
 		GRPC: config.GRPCConfig{
-			Addr:     "127.0.0.1:9150",
-			Protocol: "tcp",
+			Addr:      "127.0.0.1:9150",
+			Namespace: "com.owncloud.api",
+			Protocol:  "tcp",
 		},
 		Service: config.Service{
 			Name: "sharing",
@@ -32,40 +33,20 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		UserSharingDriver: "json",
+		UserSharingDriver: "json", //"cs3",
 		UserSharingDrivers: config.UserSharingDrivers{
 			JSON: config.UserSharingJSONDriver{
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "shares.json"),
-			},
-			SQL: config.UserSharingSQLDriver{
-				DBUsername:                 "",
-				DBPassword:                 "",
-				DBHost:                     "",
-				DBPort:                     1433,
-				DBName:                     "",
-				PasswordHashCost:           11,
-				EnableExpiredSharesCleanup: true,
-				JanitorRunInterval:         60,
 			},
 			CS3: config.UserSharingCS3Driver{
 				ProviderAddr:   "127.0.0.1:9215", // metadata storage
 				ServiceUserIDP: "internal",
 			},
 		},
-		PublicSharingDriver: "json",
+		PublicSharingDriver: "json", // "cs3",
 		PublicSharingDrivers: config.PublicSharingDrivers{
 			JSON: config.PublicSharingJSONDriver{
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "publicshares.json"),
-			},
-			SQL: config.PublicSharingSQLDriver{
-				DBUsername:                 "",
-				DBPassword:                 "",
-				DBHost:                     "",
-				DBPort:                     1433,
-				DBName:                     "",
-				PasswordHashCost:           11,
-				EnableExpiredSharesCleanup: true,
-				JanitorRunInterval:         60,
 			},
 			CS3: config.PublicSharingCS3Driver{
 				ProviderAddr:   "127.0.0.1:9215", // metadata storage
@@ -81,15 +62,15 @@ func DefaultConfig() *config.Config {
 
 func EnsureDefaults(cfg *config.Config) {
 	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
-	if cfg.Logging == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
-		cfg.Logging = &config.Logging{
+	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
+		cfg.Log = &config.Log{
 			Level:  cfg.Commons.Log.Level,
 			Pretty: cfg.Commons.Log.Pretty,
 			Color:  cfg.Commons.Log.Color,
 			File:   cfg.Commons.Log.File,
 		}
-	} else if cfg.Logging == nil {
-		cfg.Logging = &config.Logging{}
+	} else if cfg.Log == nil {
+		cfg.Log = &config.Log{}
 	}
 	// provide with defaults for shared tracing, since we need a valid destination address for BindEnv.
 	if cfg.Tracing == nil && cfg.Commons != nil && cfg.Commons.Tracing != nil {

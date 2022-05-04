@@ -41,7 +41,7 @@
                 // metadata storage
                 "METADATA_USER_ID": "some-metadata-user-id"
                 // OCIS_RUN_EXTENSIONS allows to start a subset of extensions even in the supervised mode
-                //"OCIS_RUN_EXTENSIONS": "settings,storage-metadata,glauth,graph,graph-explorer,idp,ocs,store,thumbnails,web,webdav,storage-frontend,storage-gateway,storage-userprovider,storage-groupprovider,storage-authbasic,storage-authbearer,storage-authmachine,storage-users,storage-shares,storage-public-link,storage-appprovider,storage-sharing,accounts,proxy,ocdav",
+                //"OCIS_RUN_EXTENSIONS": "settings,storage-metadata,glauth,graph,graph-explorer,idp,ocs,store,thumbnails,web,webdav,frontend,gateway,user,group,auth-basic,auth-bearer,storage-authmachine,storage-users,storage-shares,storage-publiclink,app-provider,sharing,accounts,proxy,ocdav",
             }
         }
     ]

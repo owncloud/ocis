@@ -39,7 +39,7 @@ type SMTP struct {
 
 // Events combines the configuration options for the event bus.
 type Events struct {
-	Endpoint      string `yaml:"events_endpoint" env:"NOTIFICATIONS_EVENTS_ENDPOINT"`
-	Cluster       string `yaml:"events_cluster" env:"NOTIFICATIONS_EVENTS_CLUSTER"`
-	ConsumerGroup string `yaml:"events_group" env:"NOTIFICATIONS_EVENTS_GROUP"`
+	Endpoint      string `yaml:"endpoint" env:"NOTIFICATIONS_EVENTS_ENDPOINT"`
+	Cluster       string `yaml:"cluster" env:"NOTIFICATIONS_EVENTS_CLUSTER"`
+	ConsumerGroup string `yaml:"group" env:"NOTIFICATIONS_EVENTS_GROUP"`
 }

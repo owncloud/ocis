@@ -2,7 +2,8 @@ package config
 
 import (
 	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/config/defaults"
-	appprovider "github.com/owncloud/ocis/extensions/appprovider/pkg/config/defaults"
+	appProvider "github.com/owncloud/ocis/extensions/app-provider/pkg/config/defaults"
+	appRegistry "github.com/owncloud/ocis/extensions/app-registry/pkg/config/defaults"
 	audit "github.com/owncloud/ocis/extensions/audit/pkg/config/defaults"
 	authbasic "github.com/owncloud/ocis/extensions/auth-basic/pkg/config/defaults"
 	authbearer "github.com/owncloud/ocis/extensions/auth-bearer/pkg/config/defaults"
@@ -40,8 +41,10 @@ func DefaultConfig() *Config {
 			Port: "9250",
 			Host: "localhost",
 		},
+
 		Accounts:          accounts.DefaultConfig(),
-		AppProvider:       appprovider.DefaultConfig(),
+		AppProvider:       appProvider.DefaultConfig(),
+		AppRegistry:       appRegistry.DefaultConfig(),
 		Audit:             audit.DefaultConfig(),
 		AuthBasic:         authbasic.DefaultConfig(),
 		AuthBearer:        authbearer.DefaultConfig(),
