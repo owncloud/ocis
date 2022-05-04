@@ -73,17 +73,17 @@ type Config struct {
 	Runtime           Runtime              `yaml:"runtime"`
 
 	Accounts          *accounts.Config      `yaml:"accounts"`
-	AppProvider       *appProvider.Config   `yaml:"app-provider"`
-	AppRegistry       *appRegistry.Config   `yaml:"app-registry"`
+	AppProvider       *appProvider.Config   `yaml:"app_provider"`
+	AppRegistry       *appRegistry.Config   `yaml:"app_registry"`
 	Audit             *audit.Config         `yaml:"audit"`
-	AuthBasic         *authbasic.Config     `yaml:"auth-basic"`
-	AuthBearer        *authbearer.Config    `yaml:"auth-bearer"`
-	AuthMachine       *authmachine.Config   `yaml:"auth-machine"`
+	AuthBasic         *authbasic.Config     `yaml:"auth_basic"`
+	AuthBearer        *authbearer.Config    `yaml:"auth_bearer"`
+	AuthMachine       *authmachine.Config   `yaml:"auth_machine"`
 	Frontend          *frontend.Config      `yaml:"frontend"`
 	Gateway           *gateway.Config       `yaml:"gateway"`
 	GLAuth            *glauth.Config        `yaml:"glauth"`
 	Graph             *graph.Config         `yaml:"graph"`
-	GraphExplorer     *graphExplorer.Config `yaml:"graph-explorer"`
+	GraphExplorer     *graphExplorer.Config `yaml:"graph_explorer"`
 	Group             *group.Config         `yaml:"group"`
 	IDM               *idm.Config           `yaml:"idm"`
 	IDP               *idp.Config           `yaml:"idp"`
@@ -94,10 +94,10 @@ type Config struct {
 	Proxy             *proxy.Config         `yaml:"proxy"`
 	Settings          *settings.Config      `yaml:"settings"`
 	Sharing           *sharing.Config       `yaml:"sharing"`
-	StorageSystem     *storagesystem.Config `yaml:"storage-system"`
-	StoragePublicLink *storagepublic.Config `yaml:"storage-public"`
-	StorageShares     *storageshares.Config `yaml:"storage-shares"`
-	StorageUsers      *storageusers.Config  `yaml:"storage-users"`
+	StorageSystem     *storagesystem.Config `yaml:"storage_system"`
+	StoragePublicLink *storagepublic.Config `yaml:"storage_public"`
+	StorageShares     *storageshares.Config `yaml:"storage_shares"`
+	StorageUsers      *storageusers.Config  `yaml:"storage_users"`
 	Store             *store.Config         `yaml:"store"`
 	Thumbnails        *thumbnails.Config    `yaml:"thumbnails"`
 	User              *user.Config          `yaml:"user"`
