@@ -99,8 +99,8 @@ func EnsureCommons(cfg *config.Config) {
 	}
 
 	// copy metadata user id to the commons part if set
-	if cfg.MetadataUserID != "" {
-		cfg.Commons.MetadataUserID = cfg.MetadataUserID
+	if cfg.SystemUserID != "" {
+		cfg.Commons.SystemUserID = cfg.SystemUserID
 	}
 }
 
@@ -117,8 +117,8 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingMachineAuthApiKeyError("ocis")
 	}
 
-	if cfg.MetadataUserID == "" {
-		return shared.MissingMetadataUserID("ocis")
+	if cfg.SystemUserID == "" {
+		return shared.MissingSystemUserID("ocis")
 	}
 
 	return nil

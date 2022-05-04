@@ -100,7 +100,7 @@ type OcisConfig struct {
 	MachineAuthApiKey string       `yaml:"machine_auth_api_key"`
 	SystemUserAPIKey  string       `yaml:"system_user_api_key"`
 	TransferSecret    string       `yaml:"transfer_secret"`
-	MetadataUserID    string       `yaml:"metadata_user_id"`
+	SystemUserID      string       `yaml:"system_user_id"`
 	Graph             GraphExtension
 	Idp               LdapBasedExtension
 	Idm               IdmExtension
@@ -162,7 +162,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		return err
 	}
 
-	metadataUserID := uuid.Must(uuid.NewV4()).String()
+	systemUserID := uuid.Must(uuid.NewV4()).String()
 
 	idmServicePassword, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
@@ -208,7 +208,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		MachineAuthApiKey: machineAuthApiKey,
 		SystemUserAPIKey:  systemUserApiKey,
 		TransferSecret:    revaTransferSecret,
-		MetadataUserID:    metadataUserID,
+		SystemUserID:      systemUserID,
 		Idm: IdmExtension{
 			ServiceUserPasswords: ServiceUserPasswordsSettings{
 				AdminPassword: ocisAdminServicePassword,

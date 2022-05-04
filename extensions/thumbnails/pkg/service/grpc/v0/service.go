@@ -256,20 +256,16 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context,
 func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 	ctx := metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
 
-	var ref *provider.Reference
-	if strings.Contains(path, "!") {
-		parsed, err := storagespace.ParseReference(path)
-		if err != nil {
-			return nil, err
-		}
-		ref = &parsed
-	} else {
-		ref = &provider.Reference{
+	ref, err := storagespace.ParseReference(path)
+	if err != nil {
+		// If the path is not a spaces reference try to handle it like a plain
+		// path reference.
+		ref = provider.Reference{
 			Path: path,
 		}
 	}
 
-	req := &provider.StatRequest{Ref: ref}
+	req := &provider.StatRequest{Ref: &ref}
 	rsp, err := g.cs3Client.Stat(ctx, req)
 	if err != nil {
 		g.logger.Error().Err(err).Str("path", path).Msg("could not stat file")
