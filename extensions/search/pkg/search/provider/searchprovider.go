@@ -47,12 +47,14 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 			var owner *user.User
 			switch e := ev.(type) {
 			case events.ItemTrashed:
+				p.logger.Debug().Interface("event", ev).Msg("marking document as deleted")
 				err := p.indexClient.Delete(e.ID)
 				if err != nil {
 					p.logger.Error().Err(err).Interface("Id", e.ID).Msg("failed to remove item from index")
 				}
 				continue
 			case events.ItemRestored:
+				p.logger.Debug().Interface("event", ev).Msg("marking document as restored")
 				ref = e.Ref
 				owner = &user.User{
 					Id: e.Executant,
@@ -75,6 +77,7 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 
 				continue
 			case events.ItemMoved:
+				p.logger.Debug().Interface("event", ev).Msg("resource has been moved, updating the document")
 				ref = e.Ref
 				owner = &user.User{
 					Id: e.Executant,
@@ -115,6 +118,7 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 				// Not sure what to do here. Skip.
 				continue
 			}
+			p.logger.Debug().Interface("event", ev).Msg("resource has been changed, updating the document")
 
 			statRes, err := p.statResource(ref, owner)
 			if err != nil {
