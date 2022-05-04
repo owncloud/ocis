@@ -23,4 +23,4 @@ events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster
   group: search
-machine_auth_api_key: change-me-please
+machine_auth_api_key: ""

@@ -25,7 +25,7 @@ token_manager:
 reva:
   address: 127.0.0.1:9142
 machine_auth_api_key: ""
-metadata_user_id: ""
+system_user_id: ""
 skip_user_groups_in_token: false
 driver: ocis
 drivers:
