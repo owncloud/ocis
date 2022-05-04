@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/go-chi/render"
-	accounts "github.com/owncloud/ocis/v2/extensions/accounts/pkg/service/v0"
 	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/response"
+	settings "github.com/owncloud/ocis/v2/extensions/settings/pkg/service/v0"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 )
 
@@ -31,7 +31,7 @@ func RequireAdmin(opts ...Option) func(next http.Handler) http.Handler {
 			}
 
 			// check if permission is present in roles of the authenticated account
-			if opt.RoleManager.FindPermissionByID(r.Context(), roleIDs, accounts.AccountManagementPermissionID) != nil {
+			if opt.RoleManager.FindPermissionByID(r.Context(), roleIDs, settings.AccountManagementPermissionID) != nil {
 				next.ServeHTTP(w, r)
 				return
 			}

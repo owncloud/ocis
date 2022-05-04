@@ -6,10 +6,7 @@ import (
 	"regexp"
 	"sort"
 
-	accountssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/accounts/v0"
-
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/go-micro/plugins/v4/client/grpc"
 	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 )
@@ -58,9 +55,6 @@ type Selector func(r *http.Request) (string, error)
 func LoadSelector(cfg *config.PolicySelector) (Selector, error) {
 	selCount := 0
 
-	if cfg.Migration != nil {
-		selCount++
-	}
 	if cfg.Static != nil {
 		selCount++
 	}
@@ -74,18 +68,12 @@ func LoadSelector(cfg *config.PolicySelector) (Selector, error) {
 		return nil, ErrMultipleSelectors
 	}
 
-	if cfg.Migration == nil && cfg.Static == nil && cfg.Claims == nil && cfg.Regex == nil {
+	if cfg.Static == nil && cfg.Claims == nil && cfg.Regex == nil {
 		return nil, ErrSelectorConfigIncomplete
 	}
 
 	if cfg.Static != nil {
 		return NewStaticSelector(cfg.Static), nil
-	}
-
-	if cfg.Migration != nil {
-		return NewMigrationSelector(
-			cfg.Migration,
-			accountssvc.NewAccountsService("com.owncloud.accounts", grpc.NewClient())), nil
 	}
 
 	if cfg.Claims != nil {
@@ -115,41 +103,6 @@ func LoadSelector(cfg *config.PolicySelector) (Selector, error) {
 func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
 	return func(r *http.Request) (s string, err error) {
 		return cfg.Policy, nil
-	}
-}
-
-// NewMigrationSelector selects the policy based on the existence of the oidc "preferred_username" claim in the accounts-service.
-// The policy for each case is configurable:
-// "policy_selector": {
-//    "migration": {
-//      "acc_found_policy" : "ocis",
-//      "acc_not_found_policy": "oc10",
-//      "unauthenticated_policy": "oc10"
-//    }
-//  },
-//
-// This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OCIS and
-// thus have an entry in ocis-accounts. All users without accounts entry are routed to the legacy ownCloud10 instance.
-func NewMigrationSelector(cfg *config.MigrationSelectorConf, ss accountssvc.AccountsService) Selector {
-	var acc = ss
-	return func(r *http.Request) (s string, err error) {
-		var claims map[string]interface{}
-		if claims = oidc.FromContext(r.Context()); claims == nil {
-			return cfg.UnauthenticatedPolicy, nil
-		}
-
-		var userID string
-		var ok bool
-		if userID, ok = claims[oidc.PreferredUsername].(string); !ok {
-			// TODO clarify: what if the user just has no username ...
-			return cfg.AccNotFoundPolicy, nil
-		}
-
-		if _, err := acc.GetAccount(r.Context(), &accountssvc.GetAccountRequest{Id: userID}); err != nil {
-			return cfg.AccNotFoundPolicy, nil
-		}
-		return cfg.AccFoundPolicy, nil
-
 	}
 }
 

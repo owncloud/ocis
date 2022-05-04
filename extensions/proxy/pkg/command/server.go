@@ -8,12 +8,9 @@ import (
 	"os"
 	"time"
 
-	accountssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/accounts/v0"
-
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 
 	"github.com/coreos/go-oidc/v3/oidc"
-	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
 	"github.com/oklog/run"
@@ -137,22 +134,6 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 	revaClient, err := cs3.GetGatewayServiceClient(cfg.Reva.Address)
 	var userProvider backend.UserBackend
 	switch cfg.AccountBackend {
-	case "accounts":
-		tokenManager, err := jwt.New(map[string]interface{}{
-			"secret":  cfg.TokenManager.JWTSecret,
-			"expires": int64(24 * 60 * 60),
-		})
-		if err != nil {
-			logger.Error().Err(err).
-				Msg("Failed to create token manager")
-		}
-		userProvider = backend.NewAccountsServiceUserBackend(
-			accountssvc.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient),
-			rolesClient,
-			cfg.OIDC.Issuer,
-			tokenManager,
-			logger,
-		)
 	case "cs3":
 		userProvider = backend.NewCS3UserBackend(rolesClient, revaClient, cfg.MachineAuthAPIKey, logger)
 	default:

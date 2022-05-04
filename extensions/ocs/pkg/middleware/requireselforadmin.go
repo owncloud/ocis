@@ -7,9 +7,9 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	accounts "github.com/owncloud/ocis/v2/extensions/accounts/pkg/service/v0"
 	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/response"
+	settings "github.com/owncloud/ocis/v2/extensions/settings/pkg/service/v0"
 	settingsService "github.com/owncloud/ocis/v2/extensions/settings/pkg/service/v0"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 )
@@ -56,13 +56,13 @@ func RequireSelfOrAdmin(opts ...Option) func(next http.Handler) http.Handler {
 			}
 
 			// check if account management permission is present in roles of the authenticated account
-			if opt.RoleManager.FindPermissionByID(r.Context(), roleIDs, accounts.AccountManagementPermissionID) != nil {
+			if opt.RoleManager.FindPermissionByID(r.Context(), roleIDs, settings.AccountManagementPermissionID) != nil {
 				next.ServeHTTP(w, r)
 				return
 			}
 
 			// check if self management permission is present in roles of the authenticated account
-			if opt.RoleManager.FindPermissionByID(r.Context(), roleIDs, accounts.SelfManagementPermissionID) != nil {
+			if opt.RoleManager.FindPermissionByID(r.Context(), roleIDs, settings.SelfManagementPermissionID) != nil {
 				userid := chi.URLParam(r, "userid")
 				var err error
 				if userid, err = url.PathUnescape(userid); err != nil {

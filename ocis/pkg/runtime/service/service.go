@@ -19,7 +19,6 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
 
-	accounts "github.com/owncloud/ocis/v2/extensions/accounts/pkg/command"
 	appProvider "github.com/owncloud/ocis/v2/extensions/app-provider/pkg/command"
 	appRegistry "github.com/owncloud/ocis/v2/extensions/app-registry/pkg/command"
 	authbasic "github.com/owncloud/ocis/v2/extensions/auth-basic/pkg/command"
@@ -136,7 +135,6 @@ func NewService(options ...Option) (*Service, error) {
 
 	// populate delayed services
 	s.Delayed[opts.Config.Sharing.Service.Name] = sharing.NewSutureService
-	s.Delayed[opts.Config.Accounts.Service.Name] = accounts.NewSutureService
 	s.Delayed[opts.Config.Proxy.Service.Name] = proxy.NewSutureService
 	s.Delayed[opts.Config.IDP.Service.Name] = idp.NewSutureService
 
@@ -260,10 +258,6 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 	}
 
 	for name := range s.Delayed {
-		// don't run accounts by default but keep the possibility to start it via cfg.Runtime.Extensions for now
-		if name == "accounts" {
-			continue
-		}
 		runset = append(runset, name)
 	}
 }
