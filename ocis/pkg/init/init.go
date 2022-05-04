@@ -194,7 +194,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 	}
 	systemUserApiKey, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
-		return fmt.Errorf("could not generate random password for systemuser: %s", err)
+		return fmt.Errorf("could not generate random system user API key: %s", err)
 	}
 	revaTransferSecret, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {

@@ -14,6 +14,14 @@ func MissingMachineAuthApiKeyError(service string) error {
 		service, defaults.BaseConfigPath())
 }
 
+func MissingSystemUserApiKeyError(service string) error {
+	return fmt.Errorf("The SystemUser API key has not been configured for %s. "+
+		"Make sure your %s config contains the proper values "+
+		"(e.g. by running ocis init or setting it manually in "+
+		"the config/corresponding environment variable).",
+		service, defaults.BaseConfigPath())
+}
+
 func MissingJWTTokenError(service string) error {
 	return fmt.Errorf("jwt_secret has not been set properly in your config for %s. "+
 		"Make sure your %s config contains the proper values "+

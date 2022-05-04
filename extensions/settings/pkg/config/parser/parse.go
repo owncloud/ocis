@@ -38,7 +38,7 @@ func Validate(cfg *config.Config) error {
 	}
 
 	if cfg.Metadata.SystemUserAPIKey == "" {
-		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
+		return shared.MissingSystemUserApiKeyError(cfg.Service.Name)
 	}
 
 	return nil

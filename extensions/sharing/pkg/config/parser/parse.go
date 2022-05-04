@@ -39,7 +39,7 @@ func Validate(cfg *config.Config) error {
 	}
 
 	if cfg.PublicSharingDriver == "cs3" && cfg.PublicSharingDrivers.CS3.SystemUserAPIKey == "" {
-		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
+		return shared.MissingSystemUserApiKeyError(cfg.Service.Name)
 	}
 
 	if cfg.PublicSharingDriver == "cs3" && cfg.PublicSharingDrivers.CS3.ServiceUserID == "" {
@@ -47,7 +47,7 @@ func Validate(cfg *config.Config) error {
 	}
 
 	if cfg.UserSharingDriver == "cs3" && cfg.UserSharingDrivers.CS3.SystemUserAPIKey == "" {
-		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
+		return shared.MissingSystemUserApiKeyError(cfg.Service.Name)
 	}
 
 	if cfg.UserSharingDriver == "cs3" && cfg.UserSharingDrivers.CS3.ServiceUserID == "" {
