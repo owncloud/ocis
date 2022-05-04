@@ -84,7 +84,7 @@ func New(cfg *config.Config) settings.Manager {
 
 // NewMetadataClient returns the MetadataClient
 func NewMetadataClient(cfg config.Metadata) MetadataClient {
-	mdc, err := metadata.NewCS3Storage(cfg.GatewayAddress, cfg.StorageAddress, cfg.ServiceUserID, cfg.ServiceUserIDP, cfg.MachineAuthAPIKey)
+	mdc, err := metadata.NewCS3Storage(cfg.GatewayAddress, cfg.StorageAddress, cfg.SystemUserID, cfg.SystemUserIDP, cfg.MachineAuthAPIKey)
 	if err != nil {
 		log.Fatal("error connecting to mdc:", err)
 	}

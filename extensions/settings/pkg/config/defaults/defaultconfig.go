@@ -52,7 +52,7 @@ func DefaultConfig() *config.Config {
 		Metadata: config.Metadata{
 			GatewayAddress: "127.0.0.1:9215", // metadata storage
 			StorageAddress: "127.0.0.1:9215",
-			ServiceUserIDP: "internal",
+			SystemUserIDP:  "internal",
 		},
 	}
 }
@@ -93,8 +93,8 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Metadata.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
 
-	if cfg.Metadata.ServiceUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
-		cfg.Metadata.ServiceUserID = cfg.Commons.SystemUserID
+	if cfg.Metadata.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
+		cfg.Metadata.SystemUserID = cfg.Commons.SystemUserID
 	}
 }
 

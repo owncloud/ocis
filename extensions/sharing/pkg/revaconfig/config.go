@@ -50,8 +50,8 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 						},
 						"cs3": map[string]interface{}{
 							"provider_addr":       cfg.UserSharingDrivers.CS3.ProviderAddr,
-							"service_user_id":     cfg.UserSharingDrivers.CS3.ServiceUserID,
-							"service_user_idp":    cfg.UserSharingDrivers.CS3.ServiceUserIDP,
+							"system_user_id":      cfg.UserSharingDrivers.CS3.SystemUserID,
+							"system_user_idp":     cfg.UserSharingDrivers.CS3.SystemUserIDP,
 							"machine_auth_apikey": cfg.UserSharingDrivers.CS3.MachineAuthAPIKey,
 						},
 					},
@@ -75,8 +75,8 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 						},
 						"cs3": map[string]interface{}{
 							"provider_addr":       cfg.PublicSharingDrivers.CS3.ProviderAddr,
-							"service_user_id":     cfg.PublicSharingDrivers.CS3.ServiceUserID,
-							"service_user_idp":    cfg.PublicSharingDrivers.CS3.ServiceUserIDP,
+							"system_user_id":      cfg.PublicSharingDrivers.CS3.SystemUserID,
+							"system_user_idp":     cfg.PublicSharingDrivers.CS3.SystemUserIDP,
 							"machine_auth_apikey": cfg.PublicSharingDrivers.CS3.MachineAuthAPIKey,
 						},
 					},
