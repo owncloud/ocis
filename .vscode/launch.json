@@ -15,14 +15,16 @@
                 "OCIS_LOG_LEVEL": "debug",
                 "OCIS_LOG_PRETTY": "true",
                 "OCIS_LOG_COLOR": "true",
-                // enable basic auth for dev setup so that we can use curl for testing
-                "PROXY_ENABLE_BASIC_AUTH": "true",
+                // user id of "admin", for user creation and admin role assignement
+                "OCIS_ADMIN_USER_ID": "admin-user-id",
                 // set insecure options because we don't have valid certificates in dev environments
                 "OCIS_INSECURE": "true",
                 // set some hardcoded secrets
                 "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
-                "STORAGE_TRANSFER_SECRET": "some-ocis-transfer-secret",
                 "OCIS_MACHINE_AUTH_API_KEY": "some-ocis-machine-auth-api-key",
+                "STORAGE_TRANSFER_SECRET": "some-ocis-transfer-secret",
+                // enable basic auth for dev setup so that we can use curl for testing
+                "PROXY_ENABLE_BASIC_AUTH": "true",
                 // idm ldap
                 "IDM_SVC_PASSWORD": "some-ldap-idm-password",
                 "GRAPH_LDAP_BIND_PASSWORD": "some-ldap-idm-password",
@@ -36,7 +38,6 @@
                 "IDP_LDAP_BIND_PASSWORD": "some-ldap-idp-password",
                 // admin user default password
                 "IDM_ADMIN_PASSWORD": "admin",
-                "ADMIN_USER_ID": "admin",
                 // demo users
                 "IDM_CREATE_DEMO_USERS": "true",
                 // metadata storage
