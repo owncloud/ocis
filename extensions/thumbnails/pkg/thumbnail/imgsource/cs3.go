@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -44,20 +43,16 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	if !ok {
 		return nil, errors.New("cs3source: authorization missing")
 	}
-	var ref *provider.Reference
-	if strings.Contains(path, "!") {
-		parsed, err := storagespace.ParseReference(path)
-		if err != nil {
-			return nil, err
-		}
-		ref = &parsed
-	} else {
-		ref = &provider.Reference{
+	ref, err := storagespace.ParseReference(path)
+	if err != nil {
+		// If the path is not a spaces reference try to handle it like a plain
+		// path reference.
+		ref = provider.Reference{
 			Path: path,
 		}
 	}
 	ctx = metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
-	rsp, err := s.client.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: ref})
+	rsp, err := s.client.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: &ref})
 
 	if err != nil {
 		return nil, err
