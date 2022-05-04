@@ -19,7 +19,7 @@ type Config struct {
 	TokenManager      *TokenManager `yaml:"token_manager"`
 	Reva              *Reva         `yaml:"reva"`
 	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"STORAGE_METADATA_MACHINE_AUTH_API_KEY"`
-	MetadataUserID    string        `yaml:"metadata_user_id"`
+	SystemUserID      string        `yaml:"system_user_id"`
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_METADATA_SKIP_USER_GROUPS_IN_TOKEN"`
 
