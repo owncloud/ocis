@@ -24,8 +24,8 @@
 | SHARING_USER_DRIVER | string | json | |
 | SHARING_USER_JSON_FILE | string | ~/.ocis/storage/shares.json | |
 | SHARING_USER_CS3_PROVIDER_ADDR | string | 127.0.0.1:9215 | |
-| SHARING_USER_CS3_SERVICE_USER_ID | string |  | |
-| OCIS_URL<br/>SHARING_USER_CS3_SERVICE_USER_IDP | string | internal | |
+| OCIS_SYSTEM_USER_ID<br/>SHARING_USER_CS3_SYSTEM_USER_ID | string |  | |
+| OCIS_SYSTEM_USER_IDP<br/>SHARING_USER_CS3_SYSTEM_USER_IDP | string | internal | |
 | OCIS_SYSTEM_USER_API_KEY<br/>SHARING_USER_CS3_SYSTEM_USER_API_KEY | string |  | |
 | SHARING_USER_OWNCLOUDSQL_DB_USERNAME | string |  | |
 | SHARING_USER_OWNCLOUDSQL_DB_PASSWORD | string |  | |
@@ -36,6 +36,6 @@
 | SHARING_PUBLIC_DRIVER | string | json | |
 | SHARING_PUBLIC_JSON_FILE | string | ~/.ocis/storage/publicshares.json | |
 | SHARING_PUBLIC_CS3_PROVIDER_ADDR | string | 127.0.0.1:9215 | |
-| SHARING_PUBLIC_CS3_SERVICE_USER_ID | string |  | |
-| OCIS_URL<br/>SHARING_PUBLIC_CS3_SERVICE_USER_IDP | string | internal | |
+| OCIS_SYSTEM_USER_ID<br/>SHARING_PUBLIC_CS3_SYSTEM_USER_ID | string |  | |
+| OCIS_SYSTEM_USER_IDP<br/>SHARING_PUBLIC_CS3_SYSTEM_USER_IDP | string | internal | |
 | OCIS_SYSTEM_USER_API_KEY<br/>SHARING_USER_CS3_SYSTEM_USER_API_KEY | string |  | |

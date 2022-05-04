@@ -22,8 +22,8 @@
 | SETTINGS_DATA_PATH | string | ~/.ocis/settings | |
 | STORAGE_GATEWAY_GRPC_ADDR | string | 127.0.0.1:9215 | |
 | STORAGE_GRPC_ADDR | string | 127.0.0.1:9215 | |
-| METADATA_SERVICE_USER_UUID | string |  | |
-| METADATA_SERVICE_USER_IDP | string | internal | |
+| OCIS_SYSTEM_USER_ID<br/>SETTINGS_SYSTEM_USER_ID | string |  | |
+| OCIS_SYSTEM_USER_IDP<br/>SETTINGS_SYSTEM_USER_IDP | string | internal | |
 | OCIS_SYSTEM_USER_API_KEY | string |  | |
 | SETTINGS_ASSET_PATH | string |  | |
 | OCIS_JWT_SECRET<br/>SETTINGS_JWT_SECRET | string |  | |

@@ -33,8 +33,8 @@ user_sharing_drivers:
     file: ~/.ocis/storage/shares.json
   cs3:
     provider_addr: 127.0.0.1:9215
-    service_user_id: ""
-    service_user_idp: internal
+    system_user_id: ""
+    system_user_idp: internal
     system_user_api_key: ""
   owncloudsql:
     db_username: ""
@@ -49,6 +49,6 @@ public_sharing_drivers:
     file: ~/.ocis/storage/publicshares.json
   cs3:
     provider_addr: 127.0.0.1:9215
-    service_user_id: ""
-    service_user_idp: internal
+    system_user_id: ""
+    system_user_idp: internal
     system_user_api_key: ""
