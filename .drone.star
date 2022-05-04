@@ -52,7 +52,6 @@ config = {
         "extensions/auth-machine",
         "extensions/frontend",
         "extensions/gateway",
-        "extensions/glauth",
         "extensions/graph-explorer",
         "extensions/graph",
         "extensions/groups",
@@ -1717,7 +1716,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "SHARING_USER_OWNCLOUDSQL_DB_PORT": 3306,
             "SHARING_USER_OWNCLOUDSQL_DB_NAME": "owncloud",
             # General oCIS config
-            # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
+            # OCIS_RUN_EXTENSIONS specifies to start all extensions except idm, idp and accounts. These are replaced by external services
             "OCIS_RUN_EXTENSIONS": "app-registry,app-provider,audit,auth-basic,auth-bearer,auth-machine,frontend,gateway,graph,graph-explorer,groups,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav",
             "OCIS_LOG_LEVEL": "info",
             "OCIS_URL": OCIS_URL,

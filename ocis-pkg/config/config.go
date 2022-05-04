@@ -12,7 +12,6 @@ import (
 	authmachine "github.com/owncloud/ocis/v2/extensions/auth-machine/pkg/config"
 	frontend "github.com/owncloud/ocis/v2/extensions/frontend/pkg/config"
 	gateway "github.com/owncloud/ocis/v2/extensions/gateway/pkg/config"
-	glauth "github.com/owncloud/ocis/v2/extensions/glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/v2/extensions/graph/pkg/config"
 	groups "github.com/owncloud/ocis/v2/extensions/groups/pkg/config"
@@ -83,7 +82,6 @@ type Config struct {
 	AuthMachine       *authmachine.Config   `yaml:"auth_machine"`
 	Frontend          *frontend.Config      `yaml:"frontend"`
 	Gateway           *gateway.Config       `yaml:"gateway"`
-	GLAuth            *glauth.Config        `yaml:"glauth"`
 	Graph             *graph.Config         `yaml:"graph"`
 	GraphExplorer     *graphExplorer.Config `yaml:"graph_explorer"`
 	Groups            *groups.Config        `yaml:"groups"`

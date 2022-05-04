@@ -4,7 +4,6 @@ go 1.17
 
 require (
 	github.com/CiscoM31/godata v1.0.5
-	github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e
 	github.com/Masterminds/semver v1.5.0
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
 	github.com/blevesearch/bleve/v2 v2.3.2
@@ -13,13 +12,11 @@ require (
 	github.com/cs3org/go-cs3apis v0.0.0-20220412090512-93c5918b4bde
 	github.com/cs3org/reva/v2 v2.3.2-0.20220511062620-573cbbef3917
 	github.com/disintegration/imaging v1.6.2
-	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/cors v1.2.1
 	github.com/go-chi/render v1.0.1
 	github.com/go-ldap/ldap/v3 v3.4.3
 	github.com/go-ldap/ldif v0.0.0-20200320164324-fd88d9b715b3
-	github.com/go-logr/logr v1.2.3
 	github.com/go-micro/plugins/v4/client/grpc v1.0.0
 	github.com/go-micro/plugins/v4/events/natsjs v1.0.1
 	github.com/go-micro/plugins/v4/logger/zerolog v1.0.0
@@ -49,8 +46,6 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nats-io/nats-server/v2 v2.8.2
-	github.com/nmcclain/asn1-ber v0.0.0-20170104154839-2661553a0484
-	github.com/nmcclain/ldap v0.0.0-20210720162743-7f8d1e44eeba
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
@@ -120,7 +115,6 @@ require (
 	github.com/blevesearch/zapx/v15 v15.3.3 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f // indirect
-	github.com/boombuler/barcode v1.0.1 // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/ceph/go-ceph v0.15.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
@@ -150,6 +144,7 @@ require (
 	github.com/go-git/go-git/v5 v5.4.2 // indirect
 	github.com/go-kit/log v0.2.0 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
+	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
@@ -220,14 +215,11 @@ require (
 	github.com/pkg/xattr v0.4.5 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/pquerna/cachecontrol v0.1.0 // indirect
-	github.com/pquerna/otp v1.3.0 // indirect
 	github.com/prometheus/alertmanager v0.24.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/prometheus/statsd_exporter v0.22.4 // indirect
-	github.com/rickb777/date v1.17.0 // indirect
-	github.com/rickb777/plural v1.4.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rs/cors v1.8.2 // indirect
 	github.com/rs/xid v1.3.0 // indirect
@@ -246,7 +238,6 @@ require (
 	github.com/tus/tusd v1.8.0 // indirect
 	github.com/wk8/go-ordered-map v0.2.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
-	github.com/yaegashi/msgraph.go v0.1.4 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.2 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.2 // indirect

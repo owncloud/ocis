@@ -30,7 +30,7 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 | 9110-9114  | [ocs](https://github.com/owncloud/ocis/tree/master/ocs)                       |
 | 9115-9119  | [webdav](https://github.com/owncloud/ocis/tree/master/webdav)                 |
 | 9120-9124  | [graph](https://github.com/owncloud/ocis/tree/master/graph)                   |
-| 9125-9129  | [glauth](https://github.com/owncloud/ocis/tree/master/devldap)                |
+| 9125-9129  | FREE (formerly used by glauth)                                                |
 | 9130-9134  | [konnectd](https://github.com/owncloud/ocis/tree/master/konnectd)             |
 | 9135-9139  | [graph-explorer](https://github.com/owncloud/ocis/tree/master/graph-explorer) |
 | 9140-9179  | [reva/storage](https://github.com/owncloud/ocis/tree/master/storage)          |
@@ -45,7 +45,7 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 | 9220-9224  | search                                                                          |
 | 9225-9229  | photoprism (state: PoC)                                                       |
 | 9230-9234  | [nats](https://github.com/owncloud/ocis/tree/master/nats)                     |
-| 9235-9239  | idm TBD                                                                       |
+| 9235-9239  | [idm](https://github.com/owncloud/ocis/tree/master/proxy)                     |
 | 9240-9244  | [app-registry](https://github.com/owncloud/ocis/tree/master/extensions/app-registry)     |
 | 9245-9249  | FREE                                                                          |
 | 9250-9254  | oCIS Runtime                                                                  |
