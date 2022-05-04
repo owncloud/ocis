@@ -89,8 +89,8 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.TokenManager = &config.TokenManager{}
 	}
 
-	if cfg.Metadata.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
-		cfg.Metadata.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	if cfg.Metadata.SystemUserAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemUserAPIKey != "" {
+		cfg.Metadata.SystemUserAPIKey = cfg.Commons.SystemUserAPIKey
 	}
 
 	if cfg.Metadata.ServiceUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
