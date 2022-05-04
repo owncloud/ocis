@@ -1,5 +1,5 @@
 [caption=]
-.Environment variables for the frontend extension
+.Environment variables for the {{ .ExtensionName }} extension
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
@@ -7,7 +7,7 @@
 | Default Value
 | Description
 
-{{- range .}}
+{{- range .Fields}}
 | `{{.Name}}`
 | {{.Type}}
 | {{.DefaultValue}}

@@ -22,6 +22,11 @@ type ConfigField struct {
 	VersionInfo	 string
 }
 
+type templateData struct {
+	ExtensionName string
+	Fields        []ConfigField
+}
+
 func main() {
 fmt.Println("Generating adoc documentation for environment variables:")
 content, err := ioutil.ReadFile("../../docs/templates/ADOC.tmpl")
@@ -52,7 +57,12 @@ m := map[string]interface{}{
 			log.Fatalf("Failed to create target file: %s", err)
 		}
 		defer targetFile.Close()
-		if err := tpl.Execute(targetFile, fields); err != nil {
+
+		td := templateData{
+			ExtensionName: replacer.Replace(pkg),
+			Fields:        fields,
+		}
+		if err := tpl.Execute(targetFile, td); err != nil {
 			log.Fatalf("Failed to execute template: %s", err)
 		}
 	}
