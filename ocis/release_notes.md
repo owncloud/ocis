@@ -460,7 +460,7 @@ Our recommended update strategy to oCIS 1.6.0 is:
 1. let users recreate their shares
 
 If you want to use oCIS 1.6.0 without following our recommended update strategy, you can also keep the pre 1.6.0 behaviour by setting this environment variable:
-`export STORAGE_SYSTEM_ROOT=/var/tmp/ocis/storage/users`
+`export STORAGE_METADATA_ROOT=/var/tmp/ocis/storage/users`
 This may lead to faulty behaviour since both the metadata and user storage driver will be storing their data in the same filesystem path.
 
 ## ownCloud Infinite Scale 1.5.0 Technology Preview
