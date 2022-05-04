@@ -7,10 +7,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
-	ocisinit "github.com/owncloud/ocis/ocis/pkg/init"
-	"github.com/owncloud/ocis/ocis/pkg/register"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
+	ocisinit "github.com/owncloud/ocis/v2/ocis/pkg/init"
+	"github.com/owncloud/ocis/v2/ocis/pkg/register"
 	cli "github.com/urfave/cli/v2"
 )
 

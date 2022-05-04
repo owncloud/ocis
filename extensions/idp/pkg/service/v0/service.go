@@ -19,11 +19,11 @@ import (
 	ldapBackendSupport "github.com/libregraph/lico/bootstrap/backends/ldap"
 	licoconfig "github.com/libregraph/lico/config"
 	"github.com/libregraph/lico/server"
-	"github.com/owncloud/ocis/extensions/idp/pkg/assets"
-	"github.com/owncloud/ocis/extensions/idp/pkg/config"
-	"github.com/owncloud/ocis/extensions/idp/pkg/middleware"
-	"github.com/owncloud/ocis/ocis-pkg/ldap"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/extensions/idp/pkg/assets"
+	"github.com/owncloud/ocis/v2/extensions/idp/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/idp/pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/ldap"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"stash.kopano.io/kgol/rndm"
 )
 

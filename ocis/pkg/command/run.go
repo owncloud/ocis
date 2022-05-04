@@ -9,8 +9,8 @@ import (
 
 	cli "github.com/urfave/cli/v2"
 
-	"github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis/pkg/register"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/ocis/pkg/register"
 )
 
 // RunCommand is the entrypoint for the run command.

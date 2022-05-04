@@ -6,7 +6,7 @@ package v0
 import (
 	fmt "fmt"
 	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
-	_ "github.com/owncloud/ocis/protogen/gen/ocis/messages/store/v0"
+	_ "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/store/v0"
 	proto "google.golang.org/protobuf/proto"
 	math "math"
 )

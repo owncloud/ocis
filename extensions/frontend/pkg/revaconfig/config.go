@@ -4,7 +4,7 @@ import (
 	"path"
 	"strconv"
 
-	"github.com/owncloud/ocis/extensions/frontend/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/frontend/pkg/config"
 )
 
 // FrontendConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.

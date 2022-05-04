@@ -3,10 +3,10 @@ package svc
 import (
 	"net/http"
 
-	"github.com/owncloud/ocis/extensions/ocs/pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/roles"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 )
 
 // Option defines a single option function.

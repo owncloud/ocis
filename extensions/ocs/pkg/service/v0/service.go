@@ -5,24 +5,24 @@ import (
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/accounts/v0"
 
-	"github.com/owncloud/ocis/extensions/ocs/pkg/config"
-	ocsm "github.com/owncloud/ocis/extensions/ocs/pkg/middleware"
-	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/data"
-	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/response"
-	"github.com/owncloud/ocis/extensions/proxy/pkg/user/backend"
-	"github.com/owncloud/ocis/ocis-pkg/account"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	opkgm "github.com/owncloud/ocis/ocis-pkg/middleware"
-	"github.com/owncloud/ocis/ocis-pkg/roles"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/config"
+	ocsm "github.com/owncloud/ocis/v2/extensions/ocs/pkg/middleware"
+	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/data"
+	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/response"
+	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/user/backend"
+	"github.com/owncloud/ocis/v2/ocis-pkg/account"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	opkgm "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 )
 
 // Service defines the extension handlers.

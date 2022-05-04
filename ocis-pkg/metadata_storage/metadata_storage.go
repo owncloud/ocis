@@ -15,7 +15,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/owncloud/ocis/extensions/accounts/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/accounts/pkg/config"
 	"google.golang.org/grpc/metadata"
 )
 

@@ -3,7 +3,7 @@ package decorators
 import (
 	"context"
 
-	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
+	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
 )
 
 // Interface acting as facade, holding all the interfaces that this

@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/owncloud/ocis/extensions/proxy/pkg/user/backend"
+	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/user/backend"
 )
 
 // Ensure, that UserBackendMock does implement UserBackend.

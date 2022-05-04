@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/owncloud/ocis/extensions/audit/pkg/types"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/extensions/audit/pkg/types"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/test-go/testify/require"
 
 	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"

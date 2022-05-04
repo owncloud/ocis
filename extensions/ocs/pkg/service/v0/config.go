@@ -3,8 +3,8 @@ package svc
 import (
 	"net/http"
 
-	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/data"
-	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/response"
+	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/data"
+	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/response"
 )
 
 // GetConfig renders the ocs config endpoint

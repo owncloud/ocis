@@ -3,10 +3,10 @@ package glauth
 import (
 	"context"
 
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/accounts/v0"
 
 	"github.com/glauth/glauth/v2/pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 // Option defines a single option function.

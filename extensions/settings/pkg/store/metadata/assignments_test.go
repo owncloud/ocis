@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/gofrs/uuid"
-	"github.com/owncloud/ocis/extensions/settings/pkg/config/defaults"
-	olog "github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
+	"github.com/owncloud/ocis/v2/extensions/settings/pkg/config/defaults"
+	olog "github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"github.com/stretchr/testify/require"
 )
 

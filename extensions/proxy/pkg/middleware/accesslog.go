@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5/middleware"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 // AccessLog is a middleware to log http requests at info level logging.

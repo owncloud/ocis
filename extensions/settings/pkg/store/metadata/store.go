@@ -9,11 +9,11 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/storage/utils/metadata"
 	"github.com/gofrs/uuid"
-	"github.com/owncloud/ocis/extensions/settings/pkg/config"
-	"github.com/owncloud/ocis/extensions/settings/pkg/settings"
-	"github.com/owncloud/ocis/extensions/settings/pkg/store/defaults"
-	olog "github.com/owncloud/ocis/ocis-pkg/log"
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
+	"github.com/owncloud/ocis/v2/extensions/settings/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/settings/pkg/settings"
+	"github.com/owncloud/ocis/v2/extensions/settings/pkg/store/defaults"
+	olog "github.com/owncloud/ocis/v2/ocis-pkg/log"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 )
 
 var (

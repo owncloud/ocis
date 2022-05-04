@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/owncloud/ocis/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"go-micro.dev/v4/metadata"
 )
 

@@ -9,17 +9,17 @@ import (
 	"testing"
 	"time"
 
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+	accountsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/accounts/v0"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	config "github.com/owncloud/ocis/extensions/accounts/pkg/config/defaults"
-	ssvc "github.com/owncloud/ocis/extensions/settings/pkg/service/v0"
-	olog "github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/middleware"
-	"github.com/owncloud/ocis/ocis-pkg/roles"
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
+	config "github.com/owncloud/ocis/v2/extensions/accounts/pkg/config/defaults"
+	ssvc "github.com/owncloud/ocis/v2/extensions/settings/pkg/service/v0"
+	olog "github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/stretchr/testify/assert"
 	"go-micro.dev/v4/client"
 	merrors "go-micro.dev/v4/errors"
@@ -71,7 +71,7 @@ func TestPermissionsListAccounts(t *testing.T) {
 		query           string
 		permissionError error
 	}{
-		// TODO: remove this test when https://github.com/owncloud/ocis/accounts/pull/111 is merged
+		// TODO: remove this test when https://github.com/owncloud/ocis/v2/accounts/pull/111 is merged
 		// replace with two tests:
 		// 1: "ListAccounts fails with 403 when roleIDs don't exist in context"
 		// 2: "ListAccounts fails with 403 when ('no admin role in context' AND 'empty query')"
@@ -118,7 +118,7 @@ func TestPermissionsListAccounts(t *testing.T) {
 }
 
 // TestPermissionsGetAccount checks permission handling on GetAccount
-// TODO: remove this test function entirely, when https://github.com/owncloud/ocis/accounts/pull/111 is merged. GetAccount will not have permission checks for the time being.
+// TODO: remove this test function entirely, when https://github.com/owncloud/ocis/v2/accounts/pull/111 is merged. GetAccount will not have permission checks for the time being.
 func TestPermissionsGetAccount(t *testing.T) {
 	var scenarios = []struct {
 		name            string
@@ -169,7 +169,7 @@ func TestPermissionsCreateAccount(t *testing.T) {
 		roleIDs         []string
 		permissionError error
 	}{
-		// TODO: remove this test when https://github.com/owncloud/ocis/accounts/pull/111 is merged
+		// TODO: remove this test when https://github.com/owncloud/ocis/v2/accounts/pull/111 is merged
 		// replace with two tests:
 		// 1: "CreateAccount fails with 403 when roleIDs don't exist in context"
 		// 2: "CreateAccount fails with 403 when no admin role in context"
@@ -217,7 +217,7 @@ func TestPermissionsUpdateAccount(t *testing.T) {
 		roleIDs         []string
 		permissionError error
 	}{
-		// TODO: remove this test when https://github.com/owncloud/ocis/accounts/pull/111 is merged
+		// TODO: remove this test when https://github.com/owncloud/ocis/v2/accounts/pull/111 is merged
 		// replace with two tests:
 		// 1: "UpdateAccount fails with 403 when roleIDs don't exist in context"
 		// 2: "UpdateAccount fails with 403 when no admin role in context"
@@ -265,7 +265,7 @@ func TestPermissionsDeleteAccount(t *testing.T) {
 		roleIDs         []string
 		permissionError error
 	}{
-		// TODO: remove this test when https://github.com/owncloud/ocis/accounts/pull/111 is merged
+		// TODO: remove this test when https://github.com/owncloud/ocis/v2/accounts/pull/111 is merged
 		// replace with two tests:
 		// 1: "DeleteAccount fails with 403 when roleIDs don't exist in context"
 		// 2: "DeleteAccount fails with 403 when no admin role in context"

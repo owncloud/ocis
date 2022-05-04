@@ -1,10 +1,10 @@
 package flagset
 
 import (
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	accountsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0"
 
-	"github.com/owncloud/ocis/extensions/accounts/pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/flags"
+	"github.com/owncloud/ocis/v2/extensions/accounts/pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/flags"
 	"github.com/urfave/cli/v2"
 )
 

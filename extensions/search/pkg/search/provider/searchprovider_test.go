@@ -14,11 +14,11 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
-	"github.com/owncloud/ocis/extensions/search/pkg/search/mocks"
-	provider "github.com/owncloud/ocis/extensions/search/pkg/search/provider"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	searchmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0"
-	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
+	"github.com/owncloud/ocis/v2/extensions/search/pkg/search/mocks"
+	provider "github.com/owncloud/ocis/v2/extensions/search/pkg/search/provider"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
+	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 )
 
 var _ = Describe("Searchprovider", func() {

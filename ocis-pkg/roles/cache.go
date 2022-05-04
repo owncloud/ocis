@@ -3,8 +3,8 @@ package roles
 import (
 	"time"
 
-	"github.com/owncloud/ocis/ocis-pkg/sync"
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
+	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 )
 
 // cache is a cache implementation for roles, keyed by roleIDs.

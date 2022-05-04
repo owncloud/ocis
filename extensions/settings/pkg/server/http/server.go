@@ -3,14 +3,14 @@ package http
 import (
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
-	"github.com/owncloud/ocis/extensions/settings/pkg/assets"
-	svc "github.com/owncloud/ocis/extensions/settings/pkg/service/v0"
-	"github.com/owncloud/ocis/ocis-pkg/account"
-	"github.com/owncloud/ocis/ocis-pkg/cors"
-	"github.com/owncloud/ocis/ocis-pkg/middleware"
-	"github.com/owncloud/ocis/ocis-pkg/service/http"
-	"github.com/owncloud/ocis/ocis-pkg/version"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/extensions/settings/pkg/assets"
+	svc "github.com/owncloud/ocis/v2/extensions/settings/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/ocis-pkg/account"
+	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
+	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"go-micro.dev/v4"
 )
 

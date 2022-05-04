@@ -1,6 +1,6 @@
 package option
 
-import "github.com/owncloud/ocis/extensions/accounts/pkg/config"
+import "github.com/owncloud/ocis/v2/extensions/accounts/pkg/config"
 
 // Option defines a single option function.
 type Option func(o *Options)

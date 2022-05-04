@@ -12,11 +12,11 @@ import (
 	"time"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/owncloud/ocis/extensions/proxy/pkg/config"
-	"github.com/owncloud/ocis/extensions/proxy/pkg/user/backend"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	storemsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/store/v0"
-	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v0"
+	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/user/backend"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	storemsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/store/v0"
+	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"golang.org/x/crypto/pbkdf2"
 )
 

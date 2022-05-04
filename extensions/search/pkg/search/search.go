@@ -22,7 +22,7 @@ import (
 	"context"
 
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
+	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 )
 
 //go:generate mockery --name=ProviderClient

@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/urfave/cli/v2"
 )
 

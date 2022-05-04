@@ -6,7 +6,7 @@ package v0
 import (
 	fmt "fmt"
 	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
-	_ "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0"
+	_ "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	proto "google.golang.org/protobuf/proto"
 	_ "google.golang.org/protobuf/types/known/fieldmaskpb"

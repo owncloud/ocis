@@ -3,7 +3,7 @@ package config_test
 import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"gopkg.in/yaml.v2"
 )
 

@@ -5,7 +5,7 @@ import (
 
 	gofig "github.com/gookit/config/v2"
 	gooyaml "github.com/gookit/config/v2/yaml"
-	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 )
 
 var (

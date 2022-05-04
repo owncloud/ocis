@@ -6,12 +6,12 @@ import (
 	"regexp"
 	"sort"
 
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/accounts/v0"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/go-micro/plugins/v4/client/grpc"
-	"github.com/owncloud/ocis/extensions/proxy/pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 )
 
 var (

@@ -4,10 +4,10 @@ import (
 	"net/http"
 
 	"github.com/go-chi/render"
-	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/service/v0"
-	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/data"
-	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/response"
-	"github.com/owncloud/ocis/ocis-pkg/roles"
+	accounts "github.com/owncloud/ocis/v2/extensions/accounts/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/data"
+	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/response"
+	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 )
 
 // RequireAdmin middleware is used to require the user in context to be an admin / have account management permissions

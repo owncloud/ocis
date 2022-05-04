@@ -1,7 +1,7 @@
 package revaconfig
 
 import (
-	"github.com/owncloud/ocis/extensions/storage-users/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/storage-users/pkg/config"
 )
 
 // StorageUsersConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.

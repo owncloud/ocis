@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	gofig "github.com/gookit/config/v2"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
 
 // BindEnv takes a config `c` and a EnvBinding and binds the values from the environment to the address location in cfg.

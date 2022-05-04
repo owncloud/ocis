@@ -6,11 +6,11 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/micro/ocdav"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/extensions/ocdav/pkg/config"
-	"github.com/owncloud/ocis/extensions/ocdav/pkg/config/parser"
-	"github.com/owncloud/ocis/extensions/ocdav/pkg/logging"
-	"github.com/owncloud/ocis/extensions/ocdav/pkg/server/debug"
-	"github.com/owncloud/ocis/extensions/ocdav/pkg/tracing"
+	"github.com/owncloud/ocis/v2/extensions/ocdav/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/ocdav/pkg/config/parser"
+	"github.com/owncloud/ocis/v2/extensions/ocdav/pkg/logging"
+	"github.com/owncloud/ocis/v2/extensions/ocdav/pkg/server/debug"
+	"github.com/owncloud/ocis/v2/extensions/ocdav/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 

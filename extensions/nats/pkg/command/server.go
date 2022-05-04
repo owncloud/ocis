@@ -6,10 +6,10 @@ import (
 
 	"github.com/oklog/run"
 
-	"github.com/owncloud/ocis/extensions/nats/pkg/config"
-	"github.com/owncloud/ocis/extensions/nats/pkg/config/parser"
-	"github.com/owncloud/ocis/extensions/nats/pkg/logging"
-	"github.com/owncloud/ocis/extensions/nats/pkg/server/nats"
+	"github.com/owncloud/ocis/v2/extensions/nats/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/nats/pkg/config/parser"
+	"github.com/owncloud/ocis/v2/extensions/nats/pkg/logging"
+	"github.com/owncloud/ocis/v2/extensions/nats/pkg/server/nats"
 	"github.com/urfave/cli/v2"
 )
 

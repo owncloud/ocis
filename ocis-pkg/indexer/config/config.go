@@ -2,7 +2,7 @@
 package config
 
 import (
-	"github.com/owncloud/ocis/extensions/accounts/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/accounts/pkg/config"
 )
 
 // Repo defines which storage implementation is to be used.

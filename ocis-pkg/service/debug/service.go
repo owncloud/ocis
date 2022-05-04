@@ -6,8 +6,8 @@ import (
 
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
-	"github.com/owncloud/ocis/ocis-pkg/cors"
-	"github.com/owncloud/ocis/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
+	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opencensus.io/zpages"
 )

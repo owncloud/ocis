@@ -15,10 +15,10 @@ import (
 	"github.com/cs3org/reva/v2/pkg/token"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/owncloud/ocis/extensions/accounts/pkg/config"
-	olog "github.com/owncloud/ocis/ocis-pkg/log"
-	metadatastorage "github.com/owncloud/ocis/ocis-pkg/metadata_storage"
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	"github.com/owncloud/ocis/v2/extensions/accounts/pkg/config"
+	olog "github.com/owncloud/ocis/v2/ocis-pkg/log"
+	metadatastorage "github.com/owncloud/ocis/v2/ocis-pkg/metadata_storage"
+	accountsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0"
 	"google.golang.org/grpc/metadata"
 )
 

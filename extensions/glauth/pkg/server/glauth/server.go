@@ -9,7 +9,7 @@ import (
 	"github.com/glauth/glauth/v2/pkg/handler"
 	"github.com/go-logr/logr"
 	"github.com/nmcclain/ldap"
-	"github.com/owncloud/ocis/extensions/glauth/pkg/mlogr"
+	"github.com/owncloud/ocis/v2/extensions/glauth/pkg/mlogr"
 )
 
 // LdapSvc holds the ldap server struct

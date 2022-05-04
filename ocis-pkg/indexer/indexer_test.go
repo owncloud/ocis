@@ -6,12 +6,12 @@ import (
 	"path"
 	"testing"
 
-	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/option"
 
-	"github.com/owncloud/ocis/ocis-pkg/indexer/config"
-	_ "github.com/owncloud/ocis/ocis-pkg/indexer/index/cs3"
-	_ "github.com/owncloud/ocis/ocis-pkg/indexer/index/disk"
-	. "github.com/owncloud/ocis/ocis-pkg/indexer/test"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/config"
+	_ "github.com/owncloud/ocis/v2/ocis-pkg/indexer/index/cs3"
+	_ "github.com/owncloud/ocis/v2/ocis-pkg/indexer/index/disk"
+	. "github.com/owncloud/ocis/v2/ocis-pkg/indexer/test"
 	"github.com/stretchr/testify/assert"
 )
 

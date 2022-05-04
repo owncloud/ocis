@@ -8,21 +8,21 @@ import (
 	"strings"
 	"time"
 
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	accountsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0"
 	"github.com/pkg/errors"
 
-	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 
-	"github.com/owncloud/ocis/extensions/accounts/pkg/storage"
-	"github.com/owncloud/ocis/ocis-pkg/indexer"
-	idxcfg "github.com/owncloud/ocis/ocis-pkg/indexer/config"
-	idxerrs "github.com/owncloud/ocis/ocis-pkg/indexer/errors"
+	"github.com/owncloud/ocis/v2/extensions/accounts/pkg/storage"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer"
+	idxcfg "github.com/owncloud/ocis/v2/ocis-pkg/indexer/config"
+	idxerrs "github.com/owncloud/ocis/v2/ocis-pkg/indexer/errors"
 
-	"github.com/owncloud/ocis/extensions/accounts/pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	oreg "github.com/owncloud/ocis/ocis-pkg/registry"
-	"github.com/owncloud/ocis/ocis-pkg/roles"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/extensions/accounts/pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	oreg "github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 )
 
 // userDefaultGID is the default integer representing the "users" group.

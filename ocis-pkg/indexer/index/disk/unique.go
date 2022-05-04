@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	idxerrs "github.com/owncloud/ocis/ocis-pkg/indexer/errors"
-	"github.com/owncloud/ocis/ocis-pkg/indexer/index"
-	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
-	"github.com/owncloud/ocis/ocis-pkg/indexer/registry"
+	idxerrs "github.com/owncloud/ocis/v2/ocis-pkg/indexer/errors"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/index"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/option"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/registry"
 )
 
 // Unique ensures that only one document of the same type and key-value combination can exist in the index.

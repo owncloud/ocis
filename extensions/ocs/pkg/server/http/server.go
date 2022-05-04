@@ -2,12 +2,12 @@ package http
 
 import (
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
-	ocsmw "github.com/owncloud/ocis/extensions/ocs/pkg/middleware"
-	svc "github.com/owncloud/ocis/extensions/ocs/pkg/service/v0"
-	"github.com/owncloud/ocis/ocis-pkg/cors"
-	"github.com/owncloud/ocis/ocis-pkg/middleware"
-	"github.com/owncloud/ocis/ocis-pkg/service/http"
-	"github.com/owncloud/ocis/ocis-pkg/version"
+	ocsmw "github.com/owncloud/ocis/v2/extensions/ocs/pkg/middleware"
+	svc "github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
+	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"go-micro.dev/v4"
 )
 

@@ -4,14 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+	accountsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/accounts/v0"
 
-	"github.com/owncloud/ocis/extensions/accounts/pkg/storage"
+	"github.com/owncloud/ocis/v2/extensions/accounts/pkg/storage"
 
-	"github.com/owncloud/ocis/ocis-pkg/indexer"
-	"github.com/owncloud/ocis/ocis-pkg/indexer/config"
-	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/option"
 )
 
 // RebuildIndex deletes all indices (in memory and on storage) and rebuilds them from scratch.

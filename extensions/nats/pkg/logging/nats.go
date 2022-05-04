@@ -3,7 +3,7 @@ package logging
 import (
 	"fmt"
 
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 func NewLogWrapper(logger log.Logger) *LogWrapper {

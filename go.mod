@@ -1,4 +1,4 @@
-module github.com/owncloud/ocis
+module github.com/owncloud/ocis/v2
 
 go 1.17
 

@@ -1,6 +1,6 @@
 package indexer
 
-import "github.com/owncloud/ocis/ocis-pkg/indexer/index"
+import "github.com/owncloud/ocis/v2/ocis-pkg/indexer/index"
 
 // typeMap stores the indexer layout at runtime.
 

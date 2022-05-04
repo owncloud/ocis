@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/owncloud/ocis/ocis-pkg/cors"
+	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 
 	chicors "github.com/go-chi/cors"
 )

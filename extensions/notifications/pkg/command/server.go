@@ -6,11 +6,11 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/server"
 	"github.com/go-micro/plugins/v4/events/natsjs"
-	"github.com/owncloud/ocis/extensions/notifications/pkg/channels"
-	"github.com/owncloud/ocis/extensions/notifications/pkg/config"
-	"github.com/owncloud/ocis/extensions/notifications/pkg/config/parser"
-	"github.com/owncloud/ocis/extensions/notifications/pkg/logging"
-	"github.com/owncloud/ocis/extensions/notifications/pkg/service"
+	"github.com/owncloud/ocis/v2/extensions/notifications/pkg/channels"
+	"github.com/owncloud/ocis/v2/extensions/notifications/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/notifications/pkg/config/parser"
+	"github.com/owncloud/ocis/v2/extensions/notifications/pkg/logging"
+	"github.com/owncloud/ocis/v2/extensions/notifications/pkg/service"
 	"github.com/urfave/cli/v2"
 )
 

@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
-	//. "github.com/owncloud/ocis/ocis-pkg/indexer/test"
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/option"
+	//. "github.com/owncloud/ocis/v2/ocis-pkg/indexer/test"
+	accountsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0"
 	"github.com/stretchr/testify/assert"
 )
 

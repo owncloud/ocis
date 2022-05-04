@@ -4,10 +4,10 @@ import (
 	"net/http"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/service/v0"
-	"github.com/owncloud/ocis/extensions/graph/pkg/service/v0/errorcode"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/roles"
+	accounts "github.com/owncloud/ocis/v2/extensions/accounts/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/extensions/graph/pkg/service/v0/errorcode"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 )
 
 // RequireAdmin middleware is used to require the user in context to be an admin / have account management permissions

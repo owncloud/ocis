@@ -10,7 +10,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/config"
 	"github.com/pkg/errors"
 )
 

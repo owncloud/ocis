@@ -6,7 +6,7 @@ package external
 //	"testing"
 //
 //	"github.com/micro/go-micro/v2/registry"
-//	"github.com/owncloud/ocis/ocis-pkg/log"
+//	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 //)
 //
 //func TestRegisterGRPCEndpoint(t *testing.T) {

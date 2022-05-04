@@ -3,10 +3,10 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/owncloud/ocis/extensions/proxy/pkg/config"
-	"github.com/owncloud/ocis/extensions/proxy/pkg/proxy/policy"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/proxy/policy"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 )
 
 // SelectorCookie provides a middleware which

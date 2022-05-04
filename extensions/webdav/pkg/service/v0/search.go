@@ -10,11 +10,11 @@ import (
 	"time"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/owncloud/ocis/extensions/webdav/pkg/net"
-	"github.com/owncloud/ocis/extensions/webdav/pkg/prop"
-	"github.com/owncloud/ocis/extensions/webdav/pkg/propfind"
-	searchmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0"
-	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
+	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/net"
+	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/prop"
+	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/propfind"
+	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
+	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
 )

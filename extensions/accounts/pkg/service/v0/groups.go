@@ -5,12 +5,12 @@ import (
 	"path"
 	"strconv"
 
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+	accountsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/accounts/v0"
 
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/owncloud/ocis/extensions/accounts/pkg/storage"
+	"github.com/owncloud/ocis/v2/extensions/accounts/pkg/storage"
 	merrors "go-micro.dev/v4/errors"
 	p "google.golang.org/protobuf/proto"
 )

@@ -1,10 +1,10 @@
 package grpc
 
 import (
-	svc "github.com/owncloud/ocis/extensions/search/pkg/service/v0"
-	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
-	"github.com/owncloud/ocis/ocis-pkg/version"
-	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
+	svc "github.com/owncloud/ocis/v2/extensions/search/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 )
 
 // Server initializes a new go-micro service ready to run

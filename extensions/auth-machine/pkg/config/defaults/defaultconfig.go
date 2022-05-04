@@ -1,7 +1,7 @@
 package defaults
 
 import (
-	"github.com/owncloud/ocis/extensions/auth-machine/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/auth-machine/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {

@@ -3,11 +3,11 @@ package parser
 import (
 	"errors"
 
-	"github.com/owncloud/ocis/extensions/graph-explorer/pkg/config"
-	"github.com/owncloud/ocis/extensions/graph-explorer/pkg/config/defaults"
-	ociscfg "github.com/owncloud/ocis/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/config/defaults"
+	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
 
-	"github.com/owncloud/ocis/ocis-pkg/config/envdecode"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 )
 
 // ParseConfig loads configuration from known paths.

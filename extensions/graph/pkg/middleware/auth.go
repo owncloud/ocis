@@ -6,8 +6,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/auth/scope"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
-	"github.com/owncloud/ocis/extensions/graph/pkg/service/v0/errorcode"
-	"github.com/owncloud/ocis/ocis-pkg/account"
+	"github.com/owncloud/ocis/v2/extensions/graph/pkg/service/v0/errorcode"
+	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"google.golang.org/grpc/metadata"
 )
 

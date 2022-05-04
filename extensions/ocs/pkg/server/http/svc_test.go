@@ -20,18 +20,18 @@ import (
 	"github.com/cs3org/reva/v2/pkg/token"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/golang/protobuf/ptypes/empty"
-	accountsCfg "github.com/owncloud/ocis/extensions/accounts/pkg/config"
-	accountsLogging "github.com/owncloud/ocis/extensions/accounts/pkg/logging"
-	accountsServiceExt "github.com/owncloud/ocis/extensions/accounts/pkg/service/v0"
-	"github.com/owncloud/ocis/extensions/ocs/pkg/config"
-	svc "github.com/owncloud/ocis/extensions/ocs/pkg/service/v0"
-	ssvc "github.com/owncloud/ocis/extensions/settings/pkg/service/v0"
-	ocisLog "github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
+	accountsCfg "github.com/owncloud/ocis/v2/extensions/accounts/pkg/config"
+	accountsLogging "github.com/owncloud/ocis/v2/extensions/accounts/pkg/logging"
+	accountsServiceExt "github.com/owncloud/ocis/v2/extensions/accounts/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/config"
+	svc "github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0"
+	ssvc "github.com/owncloud/ocis/v2/extensions/settings/pkg/service/v0"
+	ocisLog "github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	accountsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
+	accountssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/accounts/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/stretchr/testify/assert"
 	"go-micro.dev/v4/client"
 )
@@ -805,7 +805,7 @@ func TestCreateUser(t *testing.T) {
 			},
 			nil,
 		},
-		// https://github.com/owncloud/ocis-ocs/issues/49
+		// https://github.com/owncloud/ocis/v2-ocs/issues/49
 		{
 			"User with special character in userid",
 			User{
@@ -1447,7 +1447,7 @@ func TestUpdateUser(t *testing.T) {
 }
 
 // This is a bug verification test for endpoint '/cloud/user'
-// Link to the fixed issue: https://github.com/owncloud/ocis-ocs/issues/52
+// Link to the fixed issue: https://github.com/owncloud/ocis/v2-ocs/issues/52
 func TestGetSingleUser(t *testing.T) {
 	user := User{
 		Enabled:     "true",
@@ -1503,7 +1503,7 @@ func TestGetSingleUser(t *testing.T) {
 }
 
 // This is a bug demonstration test for endpoint '/cloud/user'
-// Link to the issue: https://github.com/owncloud/ocis/issues/53
+// Link to the issue: https://github.com/owncloud/ocis/v2/issues/53
 func TestGetUserSigningKey(t *testing.T) {
 	user := User{
 		Enabled:     "true",
@@ -1830,7 +1830,7 @@ func TestAddUsersToGroupInvalidGroup(t *testing.T) {
 	cleanUp(t)
 }
 
-// Issue: https://github.com/owncloud/ocis/issues/57 - cannot remove user from group
+// Issue: https://github.com/owncloud/ocis/v2/issues/57 - cannot remove user from group
 func TestRemoveUserFromGroup(t *testing.T) {
 	user := User{
 		Enabled:     "true",
@@ -1902,7 +1902,7 @@ func TestRemoveUserFromGroup(t *testing.T) {
 	}
 }
 
-// Issue: https://github.com/owncloud/ocis-ocs/issues/59 - cloud/capabilities endpoint not implemented
+// Issue: https://github.com/owncloud/ocis/v2-ocs/issues/59 - cloud/capabilities endpoint not implemented
 func TestCapabilities(t *testing.T) {
 	for _, ocsVersion := range ocsVersions {
 		for _, format := range formats {

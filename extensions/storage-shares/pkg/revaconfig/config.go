@@ -1,7 +1,7 @@
 package revaconfig
 
 import (
-	"github.com/owncloud/ocis/extensions/storage-shares/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/storage-shares/pkg/config"
 )
 
 // StorageSharesConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.

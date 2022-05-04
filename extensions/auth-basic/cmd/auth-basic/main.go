@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/owncloud/ocis/extensions/auth-basic/pkg/command"
-	"github.com/owncloud/ocis/extensions/auth-basic/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/extensions/auth-basic/pkg/command"
+	"github.com/owncloud/ocis/v2/extensions/auth-basic/pkg/config/defaults"
 )
 
 func main() {

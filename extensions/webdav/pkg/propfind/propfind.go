@@ -6,8 +6,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/owncloud/ocis/extensions/webdav/pkg/errors"
-	"github.com/owncloud/ocis/extensions/webdav/pkg/prop"
+	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/errors"
+	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/prop"
 )
 
 const (

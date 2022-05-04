@@ -13,7 +13,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 
 	ptypesempty "github.com/golang/protobuf/ptypes/empty"
-	accountsv0 "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	accountsv0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0"
 )
 
 type webAccountsServiceHandler struct {

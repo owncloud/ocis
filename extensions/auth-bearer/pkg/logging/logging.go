@@ -1,8 +1,8 @@
 package logging
 
 import (
-	"github.com/owncloud/ocis/extensions/auth-bearer/pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/extensions/auth-bearer/pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 // LoggerFromConfig initializes a service-specific logger instance.

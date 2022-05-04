@@ -16,10 +16,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/extensions/graph/pkg/identity"
-	"github.com/owncloud/ocis/extensions/graph/pkg/service/v0/errorcode"
-	settingssvc "github.com/owncloud/ocis/extensions/settings/pkg/service/v0"
-	settings "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/extensions/graph/pkg/identity"
+	"github.com/owncloud/ocis/v2/extensions/graph/pkg/service/v0/errorcode"
+	settingssvc "github.com/owncloud/ocis/v2/extensions/settings/pkg/service/v0"
+	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 )
 
 // GetMe implements the Service interface.

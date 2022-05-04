@@ -5,11 +5,11 @@ import (
 	"os"
 
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
-	svc "github.com/owncloud/ocis/extensions/idp/pkg/service/v0"
-	pkgcrypto "github.com/owncloud/ocis/ocis-pkg/crypto"
-	"github.com/owncloud/ocis/ocis-pkg/middleware"
-	"github.com/owncloud/ocis/ocis-pkg/service/http"
-	"github.com/owncloud/ocis/ocis-pkg/version"
+	svc "github.com/owncloud/ocis/v2/extensions/idp/pkg/service/v0"
+	pkgcrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
+	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"go-micro.dev/v4"
 )
 

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/owncloud/ocis/ocis-pkg/generators"
+	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"gopkg.in/yaml.v2"
 )
 

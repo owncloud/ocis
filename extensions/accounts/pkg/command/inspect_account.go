@@ -5,14 +5,14 @@ import (
 	"os"
 	"strconv"
 
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+	accountsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/accounts/v0"
 
-	"github.com/owncloud/ocis/extensions/accounts/pkg/flagset"
+	"github.com/owncloud/ocis/v2/extensions/accounts/pkg/flagset"
 
 	"github.com/go-micro/plugins/v4/client/grpc"
 	tw "github.com/olekukonko/tablewriter"
-	"github.com/owncloud/ocis/extensions/accounts/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/accounts/pkg/config"
 	"github.com/urfave/cli/v2"
 )
 

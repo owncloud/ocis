@@ -3,7 +3,7 @@ package defaults
 import (
 	"strings"
 
-	"github.com/owncloud/ocis/extensions/graph-explorer/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {

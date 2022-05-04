@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"sync"
 
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	accountsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0"
 
-	"github.com/owncloud/ocis/extensions/accounts/pkg/config"
-	olog "github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/extensions/accounts/pkg/config"
+	olog "github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 var groupLock sync.Mutex

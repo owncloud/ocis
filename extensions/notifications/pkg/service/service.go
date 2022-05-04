@@ -6,8 +6,8 @@ import (
 	"syscall"
 
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/owncloud/ocis/extensions/notifications/pkg/channels"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/extensions/notifications/pkg/channels"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 type Service interface {
