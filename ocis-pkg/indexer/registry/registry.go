@@ -1,8 +1,8 @@
 package registry
 
 import (
-	"github.com/owncloud/ocis/ocis-pkg/indexer/index"
-	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/index"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/option"
 )
 
 // IndexConstructor is a constructor function for creating index.Index.

@@ -5,10 +5,10 @@ import (
 	"os"
 
 	tw "github.com/olekukonko/tablewriter"
-	"github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/registry"
-	"github.com/owncloud/ocis/ocis-pkg/version"
-	"github.com/owncloud/ocis/ocis/pkg/register"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	"github.com/owncloud/ocis/v2/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
 	mreg "go-micro.dev/v4/registry"
 )

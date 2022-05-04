@@ -7,8 +7,8 @@ import (
 	"fmt"
 
 	"github.com/gofrs/uuid"
-	"github.com/owncloud/ocis/extensions/settings/pkg/store/defaults"
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
+	"github.com/owncloud/ocis/v2/extensions/settings/pkg/store/defaults"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 )
 
 // ListRoleAssignments loads and returns all role assignments matching the given assignment identifier.

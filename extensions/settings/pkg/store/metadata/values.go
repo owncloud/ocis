@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"github.com/gofrs/uuid"
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 )
 
 // ListValues reads all values that match the given bundleId and accountUUID.

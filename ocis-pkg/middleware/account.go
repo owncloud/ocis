@@ -8,7 +8,7 @@ import (
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
-	"github.com/owncloud/ocis/ocis-pkg/account"
+	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"go-micro.dev/v4/metadata"
 )
 
@@ -64,7 +64,7 @@ func ExtractAccountUUID(opts ...account.Option) func(http.Handler) http.Handler 
 			ctx := revactx.ContextSetUser(r.Context(), u)
 
 			// Important: user.Id.OpaqueId is the AccountUUID. Set this way in the account uuid middleware in ocis-proxy.
-			// https://github.com/owncloud/ocis-proxy/blob/ea254d6036592cf9469d757d1295e0c4309d1e63/pkg/middleware/account_uuid.go#L109
+			// https://github.com/owncloud/ocis/v2-proxy/blob/ea254d6036592cf9469d757d1295e0c4309d1e63/pkg/middleware/account_uuid.go#L109
 			// TODO: implement token manager in cs3org/reva that uses generic metadata instead of access token from header.
 			ctx = metadata.Set(ctx, AccountID, u.Id.OpaqueId)
 			if u.Opaque != nil {

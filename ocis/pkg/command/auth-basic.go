@@ -3,10 +3,10 @@ package command
 import (
 	"fmt"
 
-	"github.com/owncloud/ocis/extensions/auth-basic/pkg/command"
-	"github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/config/parser"
-	"github.com/owncloud/ocis/ocis/pkg/register"
+	"github.com/owncloud/ocis/v2/extensions/auth-basic/pkg/command"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
+	"github.com/owncloud/ocis/v2/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
 )
 

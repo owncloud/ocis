@@ -17,15 +17,15 @@ import (
 	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/owncloud/ocis/extensions/webdav/pkg/config"
-	"github.com/owncloud/ocis/extensions/webdav/pkg/dav/requests"
-	thumbnailsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/thumbnails/v0"
-	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
-	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
+	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/dav/requests"
+	thumbnailsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0"
+	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
+	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
 )
 
 const (

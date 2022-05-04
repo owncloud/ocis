@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/owncloud/ocis/ocis-pkg/registry"
-	"github.com/owncloud/ocis/ocis-pkg/version"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 
 	tw "github.com/olekukonko/tablewriter"
-	"github.com/owncloud/ocis/extensions/graph-explorer/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/config"
 	"github.com/urfave/cli/v2"
 )
 

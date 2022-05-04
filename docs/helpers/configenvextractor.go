@@ -25,7 +25,7 @@ func main() {
 		log.Fatal(err)
 	}
 	replacer := strings.NewReplacer(
-		"../../", "github.com/owncloud/ocis/",
+		"../../", "github.com/owncloud/ocis/v2/",
 		"/defaultconfig.go", "",
 	)
 	for i := range paths {

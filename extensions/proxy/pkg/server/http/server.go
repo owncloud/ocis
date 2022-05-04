@@ -4,9 +4,9 @@ import (
 	"crypto/tls"
 	"os"
 
-	pkgcrypto "github.com/owncloud/ocis/ocis-pkg/crypto"
-	svc "github.com/owncloud/ocis/ocis-pkg/service/http"
-	"github.com/owncloud/ocis/ocis-pkg/version"
+	pkgcrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
+	svc "github.com/owncloud/ocis/v2/ocis-pkg/service/http"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"go-micro.dev/v4"
 )
 

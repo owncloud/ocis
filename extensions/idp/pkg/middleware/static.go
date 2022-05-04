@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	idpTracing "github.com/owncloud/ocis/extensions/idp/pkg/tracing"
+	idpTracing "github.com/owncloud/ocis/v2/extensions/idp/pkg/tracing"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 )

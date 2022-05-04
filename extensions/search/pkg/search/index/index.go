@@ -32,8 +32,8 @@ import (
 
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	searchmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0"
-	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
+	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
+	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 )
 
 type indexDocument struct {

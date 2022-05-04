@@ -2,13 +2,13 @@ package grpc
 
 import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	svc "github.com/owncloud/ocis/extensions/thumbnails/pkg/service/grpc/v0"
-	"github.com/owncloud/ocis/extensions/thumbnails/pkg/service/grpc/v0/decorators"
-	"github.com/owncloud/ocis/extensions/thumbnails/pkg/thumbnail/imgsource"
-	"github.com/owncloud/ocis/extensions/thumbnails/pkg/thumbnail/storage"
-	"github.com/owncloud/ocis/ocis-pkg/service/grpc"
-	"github.com/owncloud/ocis/ocis-pkg/version"
-	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
+	svc "github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/service/grpc/v0"
+	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/service/grpc/v0/decorators"
+	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/thumbnail/imgsource"
+	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/thumbnail/storage"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
 )
 
 // NewService initializes the grpc service and server.

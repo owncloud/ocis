@@ -1,6 +1,6 @@
 package revaconfig
 
-import "github.com/owncloud/ocis/extensions/storage-users/pkg/config"
+import "github.com/owncloud/ocis/v2/extensions/storage-users/pkg/config"
 
 func UserDrivers(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{

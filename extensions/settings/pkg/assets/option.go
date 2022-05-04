@@ -3,10 +3,10 @@ package assets
 import (
 	"net/http"
 
-	"github.com/owncloud/ocis/extensions/settings"
-	"github.com/owncloud/ocis/extensions/settings/pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/assetsfs"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/extensions/settings"
+	"github.com/owncloud/ocis/v2/extensions/settings/pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/assetsfs"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 // New returns a new http filesystem to serve assets.

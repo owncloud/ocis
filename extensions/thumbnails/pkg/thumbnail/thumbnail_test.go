@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/owncloud/ocis/extensions/thumbnails/pkg/thumbnail/storage"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/thumbnail/storage"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 type NoOpManager struct {

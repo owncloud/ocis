@@ -3,8 +3,8 @@ package defaults
 import (
 	"path"
 
-	"github.com/owncloud/ocis/extensions/nats/pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/extensions/nats/pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 )
 
 // NOTE: Most of this configuration is not needed to keep it as simple as possible

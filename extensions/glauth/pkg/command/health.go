@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/owncloud/ocis/extensions/glauth/pkg/config"
-	"github.com/owncloud/ocis/extensions/glauth/pkg/config/parser"
-	"github.com/owncloud/ocis/extensions/glauth/pkg/logging"
+	"github.com/owncloud/ocis/v2/extensions/glauth/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/glauth/pkg/config/parser"
+	"github.com/owncloud/ocis/v2/extensions/glauth/pkg/logging"
 	"github.com/urfave/cli/v2"
 )
 

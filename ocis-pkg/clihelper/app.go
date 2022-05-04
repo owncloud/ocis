@@ -1,7 +1,7 @@
 package clihelper
 
 import (
-	"github.com/owncloud/ocis/ocis-pkg/version"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/urfave/cli/v2"
 )
 

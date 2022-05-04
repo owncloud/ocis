@@ -1,7 +1,7 @@
 package util
 
 import (
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 )
 
 const (

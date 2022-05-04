@@ -3,8 +3,8 @@ package settings
 import (
 	"errors"
 
-	"github.com/owncloud/ocis/extensions/settings/pkg/config"
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
+	"github.com/owncloud/ocis/v2/extensions/settings/pkg/config"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 )
 
 var (

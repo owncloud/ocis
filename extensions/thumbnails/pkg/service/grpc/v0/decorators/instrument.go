@@ -3,8 +3,8 @@ package decorators
 import (
 	"context"
 
-	"github.com/owncloud/ocis/extensions/thumbnails/pkg/metrics"
-	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
+	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/metrics"
+	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

@@ -1,6 +1,6 @@
 package revaconfig
 
-import "github.com/owncloud/ocis/extensions/auth-basic/pkg/config"
+import "github.com/owncloud/ocis/v2/extensions/auth-basic/pkg/config"
 
 // AuthBasicConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
 func AuthBasicConfigFromStruct(cfg *config.Config) map[string]interface{} {

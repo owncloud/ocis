@@ -13,12 +13,12 @@ import (
 	"github.com/libregraph/idm/pkg/ldappassword"
 	"github.com/libregraph/idm/pkg/ldbbolt"
 	"github.com/libregraph/idm/server"
-	"github.com/owncloud/ocis/extensions/idm"
-	"github.com/owncloud/ocis/extensions/idm/pkg/config"
-	"github.com/owncloud/ocis/extensions/idm/pkg/config/parser"
-	"github.com/owncloud/ocis/extensions/idm/pkg/logging"
-	pkgcrypto "github.com/owncloud/ocis/ocis-pkg/crypto"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/extensions/idm"
+	"github.com/owncloud/ocis/v2/extensions/idm/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/idm/pkg/config/parser"
+	"github.com/owncloud/ocis/v2/extensions/idm/pkg/logging"
+	pkgcrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/urfave/cli/v2"
 )
 

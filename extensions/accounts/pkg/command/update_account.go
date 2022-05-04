@@ -4,13 +4,13 @@ import (
 	"errors"
 	"fmt"
 
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+	accountsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/accounts/v0"
 
-	"github.com/owncloud/ocis/extensions/accounts/pkg/flagset"
+	"github.com/owncloud/ocis/v2/extensions/accounts/pkg/flagset"
 
 	"github.com/go-micro/plugins/v4/client/grpc"
-	"github.com/owncloud/ocis/extensions/accounts/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/accounts/pkg/config"
 	"github.com/urfave/cli/v2"
 	"google.golang.org/genproto/protobuf/field_mask"
 )

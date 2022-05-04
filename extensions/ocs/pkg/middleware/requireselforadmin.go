@@ -7,11 +7,11 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	accounts "github.com/owncloud/ocis/extensions/accounts/pkg/service/v0"
-	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/data"
-	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/response"
-	settingsService "github.com/owncloud/ocis/extensions/settings/pkg/service/v0"
-	"github.com/owncloud/ocis/ocis-pkg/roles"
+	accounts "github.com/owncloud/ocis/v2/extensions/accounts/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/data"
+	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/response"
+	settingsService "github.com/owncloud/ocis/v2/extensions/settings/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 )
 
 // RequireSelfOrAdmin middleware is used to require the requesting user to be an admin or the requested user himself
@@ -50,7 +50,7 @@ func RequireSelfOrAdmin(opts ...Option) func(next http.Handler) http.Handler {
 				if len(roleIDs) == 0 {
 					roleIDs = append(roleIDs, settingsService.BundleUUIDRoleUser, settingsService.SelfManagementPermissionID)
 					// if roles are empty, assume we haven't seen the user before and assign a default user role. At least until
-					// proper roles are provided. See https://github.com/owncloud/ocis/issues/1825 for more context.
+					// proper roles are provided. See https://github.com/owncloud/ocis/v2/issues/1825 for more context.
 					//return user, nil
 				}
 			}

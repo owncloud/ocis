@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/owncloud/ocis/ocis-pkg/registry"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 
 	mhttps "github.com/go-micro/plugins/v4/server/http"
 	"go-micro.dev/v4"

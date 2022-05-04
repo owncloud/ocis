@@ -3,7 +3,7 @@ package util
 import (
 	"testing"
 
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"gotest.tools/v3/assert"
 )
 

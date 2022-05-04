@@ -4,15 +4,15 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/owncloud/ocis/extensions/proxy/pkg/user/backend"
+	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/user/backend"
 
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
-	storesvc "github.com/owncloud/ocis/protogen/gen/ocis/services/store/v0"
+	accountssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/accounts/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	"github.com/owncloud/ocis/extensions/proxy/pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 // Option defines a single option function.

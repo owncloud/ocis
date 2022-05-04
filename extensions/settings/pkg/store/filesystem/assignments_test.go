@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	olog "github.com/owncloud/ocis/ocis-pkg/log"
-	settingsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/settings/v0"
+	olog "github.com/owncloud/ocis/v2/ocis-pkg/log"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"github.com/stretchr/testify/assert"
 )
 

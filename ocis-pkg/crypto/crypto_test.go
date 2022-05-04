@@ -5,11 +5,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/owncloud/ocis/ocis-pkg/crypto"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/crypto"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 
 	. "github.com/onsi/ginkgo/v2"
-	cfg "github.com/owncloud/ocis/ocis-pkg/config"
+	cfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
 )
 
 var _ = Describe("Crypto", func() {

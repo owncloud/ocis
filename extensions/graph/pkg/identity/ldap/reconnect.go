@@ -11,7 +11,7 @@ import (
 
 	"github.com/go-ldap/ldap/v3"
 
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 var (

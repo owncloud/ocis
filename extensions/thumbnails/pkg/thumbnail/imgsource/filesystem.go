@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/owncloud/ocis/extensions/thumbnails/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/config"
 	"github.com/pkg/errors"
 )
 

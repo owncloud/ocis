@@ -3,7 +3,7 @@ package v0
 import (
 	context "context"
 
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
+	accountsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0"
 	client "go-micro.dev/v4/client"
 	empty "google.golang.org/protobuf/types/known/emptypb"
 )

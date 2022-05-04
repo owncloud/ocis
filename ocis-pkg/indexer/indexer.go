@@ -7,17 +7,17 @@ import (
 	"path"
 	"strings"
 
-	"github.com/owncloud/ocis/ocis-pkg/sync"
+	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
 
 	"github.com/CiscoM31/godata"
 	"github.com/iancoleman/strcase"
-	"github.com/owncloud/ocis/ocis-pkg/indexer/config"
-	"github.com/owncloud/ocis/ocis-pkg/indexer/errors"
-	"github.com/owncloud/ocis/ocis-pkg/indexer/index"
-	_ "github.com/owncloud/ocis/ocis-pkg/indexer/index/cs3"  // to populate index
-	_ "github.com/owncloud/ocis/ocis-pkg/indexer/index/disk" // to populate index
-	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
-	"github.com/owncloud/ocis/ocis-pkg/indexer/registry"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/errors"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/index"
+	_ "github.com/owncloud/ocis/v2/ocis-pkg/indexer/index/cs3"  // to populate index
+	_ "github.com/owncloud/ocis/v2/ocis-pkg/indexer/index/disk" // to populate index
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/option"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/registry"
 )
 
 // Indexer is a facade to configure and query over multiple indices.

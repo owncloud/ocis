@@ -5,18 +5,20 @@ package v0
 
 import (
 	fmt "fmt"
+	math "math"
+
 	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
-	_ "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0"
+	_ "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	proto "google.golang.org/protobuf/proto"
 	_ "google.golang.org/protobuf/types/known/fieldmaskpb"
-	math "math"
-)
 
-import (
 	context "context"
+
 	api "go-micro.dev/v4/api"
+
 	client "go-micro.dev/v4/client"
+
 	server "go-micro.dev/v4/server"
 )
 

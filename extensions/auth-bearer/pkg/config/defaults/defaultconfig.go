@@ -1,7 +1,7 @@
 package defaults
 
 import (
-	"github.com/owncloud/ocis/extensions/auth-bearer/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/auth-bearer/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {

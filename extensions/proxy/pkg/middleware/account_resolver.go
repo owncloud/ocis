@@ -4,11 +4,11 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/owncloud/ocis/extensions/proxy/pkg/user/backend"
+	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/user/backend"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 )
 
 // AccountResolver provides a middleware which mints a jwt and adds it to the proxied request based

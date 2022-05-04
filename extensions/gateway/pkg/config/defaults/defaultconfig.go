@@ -1,7 +1,7 @@
 package defaults
 
 import (
-	"github.com/owncloud/ocis/extensions/gateway/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/gateway/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {

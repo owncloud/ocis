@@ -1,10 +1,10 @@
 package revaconfig
 
 import (
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 
 	"github.com/mitchellh/mapstructure"
-	"github.com/owncloud/ocis/extensions/app-registry/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/app-registry/pkg/config"
 )
 
 // AppRegistryConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.

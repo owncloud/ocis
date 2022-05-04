@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/owncloud/ocis/extensions/thumbnails/pkg/command"
-	"github.com/owncloud/ocis/extensions/thumbnails/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/command"
+	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/config/defaults"
 )
 
 func main() {

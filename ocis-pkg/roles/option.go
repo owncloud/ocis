@@ -3,8 +3,8 @@ package roles
 import (
 	"time"
 
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 )
 
 // Options are all the possible options.

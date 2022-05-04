@@ -17,12 +17,12 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/owncloud/ocis/extensions/search/pkg/search"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/extensions/search/pkg/search"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"google.golang.org/grpc/metadata"
 
-	searchmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/search/v0"
-	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
+	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
+	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 )
 
 type Provider struct {

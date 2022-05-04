@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/owncloud/ocis/extensions/web/pkg/assets"
-	"github.com/owncloud/ocis/extensions/web/pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/extensions/web/pkg/assets"
+	"github.com/owncloud/ocis/v2/extensions/web/pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 var (

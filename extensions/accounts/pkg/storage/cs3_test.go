@@ -4,8 +4,8 @@ package storage
 
 //import (
 //	"context"
-//	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
-//	"github.com/owncloud/ocis/accounts/pkg/config"
+//	accountsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0"
+//	"github.com/owncloud/ocis/v2/accounts/pkg/config"
 //	"github.com/stretchr/testify/assert"
 //	"testing"
 //)

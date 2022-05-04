@@ -3,7 +3,7 @@ package shared
 import (
 	"fmt"
 
-	"github.com/owncloud/ocis/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 )
 
 func MissingMachineAuthApiKeyError(service string) error {

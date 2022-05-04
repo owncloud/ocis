@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/owncloud/ocis/extensions/idp/pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/service/debug"
-	"github.com/owncloud/ocis/ocis-pkg/shared"
-	"github.com/owncloud/ocis/ocis-pkg/version"
+	"github.com/owncloud/ocis/v2/extensions/idp/pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 )
 
 // Server initializes the debug service and server.

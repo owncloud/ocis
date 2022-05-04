@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	"github.com/owncloud/ocis/ocis-pkg/roles"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 )
 
 // Option defines a single option function.

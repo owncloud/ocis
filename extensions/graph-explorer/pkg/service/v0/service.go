@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/owncloud/ocis/extensions/graph-explorer/pkg/assets"
-	"github.com/owncloud/ocis/extensions/graph-explorer/pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/assets"
+	"github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 // Service defines the extension handlers.

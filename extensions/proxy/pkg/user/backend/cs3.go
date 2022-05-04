@@ -8,9 +8,9 @@ import (
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	settingsService "github.com/owncloud/ocis/extensions/settings/pkg/service/v0"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	settingssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/settings/v0"
+	settingsService "github.com/owncloud/ocis/v2/extensions/settings/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 )
 
 type cs3backend struct {
@@ -63,7 +63,7 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 
 	// if roles are empty, assume we haven't seen the user before and assign a
 	// default user role. At least until proper roles are provided. See
-	// https://github.com/owncloud/ocis/issues/1825 for more context.
+	// https://github.com/owncloud/ocis/v2/issues/1825 for more context.
 	if len(roleIDs) == 0 {
 		if user.Id.Type == cs3.UserType_USER_TYPE_PRIMARY {
 			c.logger.Info().Str("userid", user.Id.OpaqueId).Msg("user has no role assigned, assigning default user role")

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/owncloud/ocis/ocis-pkg/shared"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"

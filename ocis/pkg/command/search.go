@@ -1,10 +1,10 @@
 package command
 
 import (
-	"github.com/owncloud/ocis/extensions/search/pkg/command"
-	"github.com/owncloud/ocis/ocis-pkg/config"
-	"github.com/owncloud/ocis/ocis-pkg/config/parser"
-	"github.com/owncloud/ocis/ocis/pkg/register"
+	"github.com/owncloud/ocis/v2/extensions/search/pkg/command"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
+	"github.com/owncloud/ocis/v2/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
 )
 

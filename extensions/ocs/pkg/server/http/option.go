@@ -3,9 +3,9 @@ package http
 import (
 	"context"
 
-	"github.com/owncloud/ocis/extensions/ocs/pkg/config"
-	"github.com/owncloud/ocis/extensions/ocs/pkg/metrics"
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/metrics"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/urfave/cli/v2"
 )
 

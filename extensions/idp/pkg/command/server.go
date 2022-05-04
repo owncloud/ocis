@@ -5,14 +5,14 @@ import (
 	"fmt"
 
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/extensions/idp/pkg/config"
-	"github.com/owncloud/ocis/extensions/idp/pkg/config/parser"
-	"github.com/owncloud/ocis/extensions/idp/pkg/logging"
-	"github.com/owncloud/ocis/extensions/idp/pkg/metrics"
-	"github.com/owncloud/ocis/extensions/idp/pkg/server/debug"
-	"github.com/owncloud/ocis/extensions/idp/pkg/server/http"
-	"github.com/owncloud/ocis/extensions/idp/pkg/tracing"
-	"github.com/owncloud/ocis/ocis-pkg/version"
+	"github.com/owncloud/ocis/v2/extensions/idp/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/idp/pkg/config/parser"
+	"github.com/owncloud/ocis/v2/extensions/idp/pkg/logging"
+	"github.com/owncloud/ocis/v2/extensions/idp/pkg/metrics"
+	"github.com/owncloud/ocis/v2/extensions/idp/pkg/server/debug"
+	"github.com/owncloud/ocis/v2/extensions/idp/pkg/server/http"
+	"github.com/owncloud/ocis/v2/extensions/idp/pkg/tracing"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/urfave/cli/v2"
 )
 

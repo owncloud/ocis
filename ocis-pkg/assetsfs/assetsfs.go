@@ -8,7 +8,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 // FileSystem customized to load assets

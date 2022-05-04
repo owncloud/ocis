@@ -9,14 +9,14 @@ import (
 	"regexp"
 	"strconv"
 
-	accountsmsg "github.com/owncloud/ocis/protogen/gen/ocis/messages/accounts/v0"
-	accountssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/accounts/v0"
+	accountsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/accounts/v0"
+	accountssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/accounts/v0"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/go-chi/chi/v5"
-	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/data"
-	"github.com/owncloud/ocis/extensions/ocs/pkg/service/v0/response"
-	ocstracing "github.com/owncloud/ocis/extensions/ocs/pkg/tracing"
+	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/data"
+	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/response"
+	ocstracing "github.com/owncloud/ocis/v2/extensions/ocs/pkg/tracing"
 	merrors "go-micro.dev/v4/errors"
 	"go.opentelemetry.io/otel/attribute"
 )

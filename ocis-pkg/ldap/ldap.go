@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/owncloud/ocis/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 const _caTimeout = 5

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	oregistry "github.com/owncloud/ocis/ocis-pkg/registry"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	oregistry "github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"go-micro.dev/v4/broker"
 	"go-micro.dev/v4/registry"
 )

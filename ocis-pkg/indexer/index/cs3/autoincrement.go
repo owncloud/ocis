@@ -9,9 +9,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/owncloud/ocis/extensions/accounts/pkg/storage"
+	"github.com/owncloud/ocis/v2/extensions/accounts/pkg/storage"
 
-	idxerrs "github.com/owncloud/ocis/ocis-pkg/indexer/errors"
+	idxerrs "github.com/owncloud/ocis/v2/ocis-pkg/indexer/errors"
 
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -22,10 +22,10 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/owncloud/ocis/ocis-pkg/indexer/index"
-	"github.com/owncloud/ocis/ocis-pkg/indexer/option"
-	"github.com/owncloud/ocis/ocis-pkg/indexer/registry"
-	metadatastorage "github.com/owncloud/ocis/ocis-pkg/metadata_storage"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/index"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/option"
+	"github.com/owncloud/ocis/v2/ocis-pkg/indexer/registry"
+	metadatastorage "github.com/owncloud/ocis/v2/ocis-pkg/metadata_storage"
 )
 
 // Autoincrement are fields for an index of type autoincrement.

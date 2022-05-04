@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	thumbnailssvc "github.com/owncloud/ocis/protogen/gen/ocis/services/thumbnails/v0"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
 )
 
 // NewLogging returns a service that logs messages.

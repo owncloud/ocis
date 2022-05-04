@@ -9,7 +9,7 @@ import (
 	mbreaker "github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker"
 	"github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus"
 	"github.com/go-micro/plugins/v4/wrapper/trace/opencensus"
-	"github.com/owncloud/ocis/ocis-pkg/registry"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/client"
 )

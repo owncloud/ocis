@@ -14,13 +14,13 @@ import (
 	"go-micro.dev/v4/metadata"
 	grpcmetadata "google.golang.org/grpc/metadata"
 
-	"github.com/owncloud/ocis/extensions/audit/pkg/types"
-	"github.com/owncloud/ocis/extensions/search/pkg/config"
-	"github.com/owncloud/ocis/extensions/search/pkg/search"
-	"github.com/owncloud/ocis/extensions/search/pkg/search/index"
-	searchprovider "github.com/owncloud/ocis/extensions/search/pkg/search/provider"
-	"github.com/owncloud/ocis/ocis-pkg/log"
-	searchsvc "github.com/owncloud/ocis/protogen/gen/ocis/services/search/v0"
+	"github.com/owncloud/ocis/v2/extensions/audit/pkg/types"
+	"github.com/owncloud/ocis/v2/extensions/search/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/search/pkg/search"
+	"github.com/owncloud/ocis/v2/extensions/search/pkg/search/index"
+	searchprovider "github.com/owncloud/ocis/v2/extensions/search/pkg/search/provider"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 )
 
 // NewHandler returns a service implementation for Service.
