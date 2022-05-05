@@ -52,11 +52,11 @@ NOTIFICATIONS_LOG_FILE`
 | 
 | `NOTIFICATIONS_SMTP_SENDER`
 | string
-| god@example.com
+| noreply@example.com
 | 
 | `NOTIFICATIONS_SMTP_PASSWORD`
 | string
-| godisdead
+| 
 | 
 | `NOTIFICATIONS_EVENTS_ENDPOINT`
 | string
@@ -74,12 +74,12 @@ NOTIFICATIONS_LOG_FILE`
 NOTIFICATIONS_REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
-| 
+| CS3 gateway used to look up user metadata
 | `OCIS_MACHINE_AUTH_API_KEY +
 NOTIFICATIONS_MACHINE_AUTH_API_KEY`
 | string
 | 
-| 
+| Machine auth API key used to impersonate users when looking up their email
 |===
 
 Since Version: `+` added, `-` deprecated

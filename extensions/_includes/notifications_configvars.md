@@ -12,10 +12,10 @@
 | NOTIFICATIONS_DEBUG_ZPAGES | bool | false | |
 | NOTIFICATIONS_SMTP_HOST | string | 127.0.0.1 | |
 | NOTIFICATIONS_SMTP_PORT | string | 1025 | |
-| NOTIFICATIONS_SMTP_SENDER | string | god@example.com | |
-| NOTIFICATIONS_SMTP_PASSWORD | string | godisdead | |
+| NOTIFICATIONS_SMTP_SENDER | string | noreply@example.com | |
+| NOTIFICATIONS_SMTP_PASSWORD | string |  | |
 | NOTIFICATIONS_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | |
 | NOTIFICATIONS_EVENTS_CLUSTER | string | ocis-cluster | |
 | NOTIFICATIONS_EVENTS_GROUP | string | notifications | |
-| REVA_GATEWAY<br/>NOTIFICATIONS_REVA_GATEWAY | string | 127.0.0.1:9142 | |
-| OCIS_MACHINE_AUTH_API_KEY<br/>NOTIFICATIONS_MACHINE_AUTH_API_KEY | string |  | |
+| REVA_GATEWAY<br/>NOTIFICATIONS_REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to look up user metadata|
+| OCIS_MACHINE_AUTH_API_KEY<br/>NOTIFICATIONS_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to impersonate users when looking up their email|
