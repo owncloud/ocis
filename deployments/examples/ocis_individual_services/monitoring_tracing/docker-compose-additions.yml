@@ -163,7 +163,7 @@ services:
       OCIS_TRACING_ENDPOINT: jaeger-agent:6831
       # metrics
       STORAGE_SHARING_DEBUG_ADDR: 0.0.0.0:9151
-  storage-userprovider:
+  users:
     environment:
       # tracing
       OCIS_TRACING_ENABLED: "true"
@@ -171,7 +171,7 @@ services:
       OCIS_TRACING_ENDPOINT: jaeger-agent:6831
       # metrics
       STORAGE_USERPROVIDER_DEBUG_ADDR: 0.0.0.0:9145
-  storage-groupprovider:
+  groups:
     environment:
       # tracing
       OCIS_TRACING_ENABLED: "true"

@@ -70,7 +70,7 @@ type AuthbearerExtension struct {
 	AuthProviders AuthProviderSettings `yaml:"auth_providers"`
 }
 
-type UserAndGroupExtension struct {
+type UsersAndGroupsExtension struct {
 	Drivers LdapBasedExtension
 }
 
@@ -109,8 +109,8 @@ type OcisConfig struct {
 	Frontend          FrontendExtension
 	AuthBasic         AuthbasicExtension  `yaml:"auth_basic"`
 	AuthBearer        AuthbearerExtension `yaml:"auth_bearer"`
-	User              UserAndGroupExtension
-	Group             UserAndGroupExtension
+	Users             UsersAndGroupsExtension
+	Groups            UsersAndGroupsExtension
 	StorageSystem     DataProviderInsecureSettings `yaml:"storage_system"`
 	StorageUsers      DataProviderInsecureSettings `yaml:"storage_users"`
 	Ocdav             InsecureExtension
@@ -232,14 +232,14 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 				},
 			},
 		},
-		Group: UserAndGroupExtension{
+		Groups: UsersAndGroupsExtension{
 			Drivers: LdapBasedExtension{
 				Ldap: LdapSettings{
 					Bind_password: revaServicePassword,
 				},
 			},
 		},
-		User: UserAndGroupExtension{
+		Users: UsersAndGroupsExtension{
 			Drivers: LdapBasedExtension{
 				Ldap: LdapSettings{
 					Bind_password: revaServicePassword,
