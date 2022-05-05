@@ -154,6 +154,8 @@ Synchronization features like etag propagation, setting mtime and locking files
 - [apiWebdavLocks/publicLink.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L42)
 - [apiWebdavLocks/publicLink.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L43)
 - [apiWebdavLocks/publicLink.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L44)
+- [apiWebdavLocks/publicLink.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L45)
+- [apiWebdavLocks/publicLink.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L46)
 - [apiWebdavLocks/publicLink.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L60)
 - [apiWebdavLocks/publicLink.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L61)
 - [apiWebdavLocks/publicLink.feature:78](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L78)
