@@ -66,8 +66,6 @@ services:
       IDM_ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin}" # this overrides the admin password from the configuration file
       # demo users
       IDM_CREATE_DEMO_USERS: "${DEMO_USERS:-false}"
-
-      OCIS_CONFIG_DIR: /etc/ocis #TODO: remove me after https://github.com/owncloud/ocis/issues/3688
     volumes:
       - ./config/ocis/proxy.yaml:/etc/ocis/proxy.yaml
       - ./config/ocis/web.yaml:/etc/ocis/web.yaml

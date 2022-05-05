@@ -69,8 +69,6 @@ services:
       IDM_ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin}" # this overrides the admin password from the configuration file
       # demo users
       IDM_CREATE_DEMO_USERS: "${DEMO_USERS:-false}"
-
-      OCIS_CONFIG_DIR: /etc/ocis #TODO: remove me after https://github.com/owncloud/ocis/issues/3688
     volumes:
       - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
       - ocis-config:/etc/ocis
@@ -102,8 +100,6 @@ services:
       APP_PROVIDER_WOPI_INSECURE: "${INSECURE:-false}"
       APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET: ${WOPI_IOP_SECRET:-LoremIpsum123}
       APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
-
-      OCIS_CONFIG_DIR: /etc/ocis #TODO: remove me after https://github.com/owncloud/ocis/issues/3688
     volumes:
       - ocis-config:/etc/ocis
     logging:
@@ -130,8 +126,6 @@ services:
       APP_PROVIDER_WOPI_INSECURE: "${INSECURE:-false}"
       APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET: ${WOPI_IOP_SECRET:-LoremIpsum123}
       APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
-
-      OCIS_CONFIG_DIR: /etc/ocis #TODO: remove me after https://github.com/owncloud/ocis/issues/3688
     volumes:
       - ./config/ocis-appdriver-onlyoffice/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-config:/etc/ocis
@@ -160,8 +154,6 @@ services:
       APP_PROVIDER_WOPI_INSECURE: "${INSECURE:-false}"
       APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET: ${WOPI_IOP_SECRET:-LoremIpsum123}
       APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
-
-      OCIS_CONFIG_DIR: /etc/ocis #TODO: remove me after https://github.com/owncloud/ocis/issues/3688
     volumes:
       - ./config/ocis-appdriver-codimd/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-config:/etc/ocis
@@ -184,7 +176,6 @@ services:
       WOPISERVER_DOMAIN: ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
       COLLABORA_DOMAIN: ${COLLABORA_DOMAIN:-collabora.owncloud.test}
     volumes:
-      - /home/kloucek/Projects/github.com/cs3org/wopiserver/src:/app #TODO: remove me
       - ./config/wopiserver/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/wopiserver/wopiserver.conf.dist:/etc/wopi/wopiserver.conf.dist
       - wopi-data:/var/wopi_local_storage
