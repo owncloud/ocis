@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/owncloud/ocis/extensions/webdav/pkg/constants"
+	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/constants"
 )
 
 const (
@@ -47,7 +47,11 @@ func ParseThumbnailRequest(r *http.Request) (*ThumbnailRequest, error) {
 		return nil, errors.New("invalid file path")
 	}
 
-	id := ctx.Value(constants.ContextKeyID).(string)
+	id := ""
+	v := ctx.Value(constants.ContextKeyID)
+	if v != nil {
+		id = v.(string)
+	}
 
 	q := r.URL.Query()
 	width, height, err := parseDimensions(q)

@@ -97,11 +97,9 @@ func NewService(opts ...Option) (Service, error) {
 		})
 
 		r.Group(func(r chi.Router) {
-			// currently not implemented
-			// If we implement this endpoint, we need to get the user from the access token.
-			// We decided against doing it, so that this service can be started without the JWT secret.
-			r.Get("/remote.php/webdav/*", http.NotFound)
-			r.Get("/webdav/*", http.NotFound)
+			r.Use(svc.WebDAVContext())
+			r.Get("/remote.php/webdav/*", svc.Thumbnail)
+			r.Get("/webdav/*", svc.Thumbnail)
 		})
 
 		// r.MethodFunc("REPORT", "/remote.php/dav/files/{id}/*", svc.Search)
@@ -185,6 +183,21 @@ func (g Webdav) DavPublicContext() func(next http.Handler) http.Handler {
 		})
 	}
 }
+func (g Webdav) WebDAVContext() func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+			filePath := r.URL.Path
+			filePath = strings.TrimPrefix(filePath, "/remote.php")
+			filePath = strings.TrimPrefix(filePath, "/webdav/")
+
+			ctx := context.WithValue(r.Context(), constants.ContextKeyPath, filePath)
+
+			next.ServeHTTP(w, r.WithContext(ctx))
+
+		})
+	}
+}
 
 // SpacesThumbnail is the endpoint for retrieving thumbnails inside of spaces.
 func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
@@ -238,18 +251,36 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	t := r.Header.Get(TokenHeader)
-	ctx := metadata.AppendToOutgoingContext(r.Context(), TokenHeader, t)
-	userRes, err := g.revaClient.GetUserByClaim(ctx, &userv1beta1.GetUserByClaimRequest{
-		Claim: "username",
-		Value: tr.Identifier,
-	})
-	if err != nil || userRes.Status.Code != rpcv1beta1.Code_CODE_OK {
-		g.log.Error().Err(err).Msg("could not get user")
-		renderError(w, r, errInternalError("could not get user"))
-		return
+
+	var user *userv1beta1.User
+
+	if tr.Identifier == "" {
+		// look up user from token via WhoAmI
+		userRes, err := g.revaClient.WhoAmI(r.Context(), &gatewayv1beta1.WhoAmIRequest{
+			Token: t,
+		})
+		if err != nil || userRes.Status.Code != rpcv1beta1.Code_CODE_OK {
+			g.log.Error().Err(err).Msg("could not get user")
+			renderError(w, r, errInternalError("could not get user"))
+			return
+		}
+		user = userRes.GetUser()
+	} else {
+		// look up user from URL via GetUserByClaim
+		ctx := metadata.AppendToOutgoingContext(r.Context(), TokenHeader, t)
+		userRes, err := g.revaClient.GetUserByClaim(ctx, &userv1beta1.GetUserByClaimRequest{
+			Claim: "username",
+			Value: tr.Identifier,
+		})
+		if err != nil || userRes.Status.Code != rpcv1beta1.Code_CODE_OK {
+			g.log.Error().Err(err).Msg("could not get user")
+			renderError(w, r, errInternalError("could not get user"))
+			return
+		}
+		user = userRes.GetUser()
 	}
 
-	fullPath := filepath.Join(templates.WithUser(userRes.User, g.config.WebdavNamespace), tr.Filepath)
+	fullPath := filepath.Join(templates.WithUser(user, g.config.WebdavNamespace), tr.Filepath)
 	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
 		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),
