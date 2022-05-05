@@ -13,7 +13,7 @@ import (
 	glauth "github.com/owncloud/ocis/v2/extensions/glauth/pkg/config/defaults"
 	graphExplorer "github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/config/defaults"
 	graph "github.com/owncloud/ocis/v2/extensions/graph/pkg/config/defaults"
-	group "github.com/owncloud/ocis/v2/extensions/group/pkg/config/defaults"
+	groups "github.com/owncloud/ocis/v2/extensions/groups/pkg/config/defaults"
 	idm "github.com/owncloud/ocis/v2/extensions/idm/pkg/config/defaults"
 	idp "github.com/owncloud/ocis/v2/extensions/idp/pkg/config/defaults"
 	nats "github.com/owncloud/ocis/v2/extensions/nats/pkg/config/defaults"
@@ -30,7 +30,7 @@ import (
 	storageusers "github.com/owncloud/ocis/v2/extensions/storage-users/pkg/config/defaults"
 	store "github.com/owncloud/ocis/v2/extensions/store/pkg/config/defaults"
 	thumbnails "github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/config/defaults"
-	user "github.com/owncloud/ocis/v2/extensions/user/pkg/config/defaults"
+	users "github.com/owncloud/ocis/v2/extensions/users/pkg/config/defaults"
 	web "github.com/owncloud/ocis/v2/extensions/web/pkg/config/defaults"
 	webdav "github.com/owncloud/ocis/v2/extensions/webdav/pkg/config/defaults"
 )
@@ -54,7 +54,7 @@ func DefaultConfig() *Config {
 		GLAuth:            glauth.DefaultConfig(),
 		Graph:             graph.DefaultConfig(),
 		GraphExplorer:     graphExplorer.DefaultConfig(),
-		Group:             group.DefaultConfig(),
+		Groups:            groups.DefaultConfig(),
 		IDM:               idm.DefaultConfig(),
 		IDP:               idp.DefaultConfig(),
 		Nats:              nats.DefaultConfig(),
@@ -71,7 +71,7 @@ func DefaultConfig() *Config {
 		StorageUsers:      storageusers.DefaultConfig(),
 		Store:             store.DefaultConfig(),
 		Thumbnails:        thumbnails.DefaultConfig(),
-		User:              user.DefaultConfig(),
+		Users:             users.DefaultConfig(),
 		Web:               web.DefaultConfig(),
 		WebDAV:            webdav.DefaultConfig(),
 	}

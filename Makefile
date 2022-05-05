@@ -28,7 +28,7 @@ OCIS_MODULES = \
 	extensions/glauth \
 	extensions/graph \
 	extensions/graph-explorer \
-	extensions/group \
+	extensions/groups \
 	extensions/idm \
 	extensions/idp \
 	extensions/nats \
@@ -44,7 +44,7 @@ OCIS_MODULES = \
 	extensions/storage-users \
 	extensions/store \
 	extensions/thumbnails \
-	extensions/user \
+	extensions/users \
 	extensions/web \
 	extensions/webdav\
 	ocis \

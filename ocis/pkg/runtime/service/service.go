@@ -30,7 +30,7 @@ import (
 	glauth "github.com/owncloud/ocis/v2/extensions/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/v2/extensions/graph/pkg/command"
-	group "github.com/owncloud/ocis/v2/extensions/group/pkg/command"
+	groups "github.com/owncloud/ocis/v2/extensions/groups/pkg/command"
 	idm "github.com/owncloud/ocis/v2/extensions/idm/pkg/command"
 	idp "github.com/owncloud/ocis/v2/extensions/idp/pkg/command"
 	nats "github.com/owncloud/ocis/v2/extensions/nats/pkg/command"
@@ -47,7 +47,7 @@ import (
 	storageusers "github.com/owncloud/ocis/v2/extensions/storage-users/pkg/command"
 	store "github.com/owncloud/ocis/v2/extensions/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/command"
-	user "github.com/owncloud/ocis/v2/extensions/user/pkg/command"
+	users "github.com/owncloud/ocis/v2/extensions/users/pkg/command"
 	web "github.com/owncloud/ocis/v2/extensions/web/pkg/command"
 	webdav "github.com/owncloud/ocis/v2/extensions/webdav/pkg/command"
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
@@ -124,8 +124,8 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.OCDav.Service.Name] = ocdav.NewSutureService
 	s.ServicesRegistry[opts.Config.Gateway.Service.Name] = gateway.NewSutureService
 	s.ServicesRegistry[opts.Config.AppRegistry.Service.Name] = appRegistry.NewSutureService
-	s.ServicesRegistry[opts.Config.User.Service.Name] = user.NewSutureService
-	s.ServicesRegistry[opts.Config.Group.Service.Name] = group.NewSutureService
+	s.ServicesRegistry[opts.Config.Users.Service.Name] = users.NewSutureService
+	s.ServicesRegistry[opts.Config.Groups.Service.Name] = groups.NewSutureService
 	s.ServicesRegistry[opts.Config.AuthBasic.Service.Name] = authbasic.NewSutureService
 	s.ServicesRegistry[opts.Config.AuthBearer.Service.Name] = authbearer.NewSutureService
 	s.ServicesRegistry[opts.Config.AuthMachine.Service.Name] = authmachine.NewSutureService
