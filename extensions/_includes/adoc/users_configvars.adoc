@@ -1,5 +1,5 @@
 [caption=]
-.Environment variables for the user extension
+.Environment variables for the users extension
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
@@ -79,7 +79,7 @@ USERS_JWT_SECRET`
 | string
 | 127.0.0.1:9142
 | 
-| `USER_SKIP_USER_GROUPS_IN_TOKEN`
+| `USERS_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
 | false
 | 

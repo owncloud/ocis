@@ -1,5 +1,5 @@
 [caption=]
-.Environment variables for the group extension
+.Environment variables for the groups extension
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name

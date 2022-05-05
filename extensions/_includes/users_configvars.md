@@ -18,7 +18,7 @@
 | USERS_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>USERS_JWT_SECRET | string |  | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
-| USER_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
+| USERS_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
 | LDAP_URI<br/>USERS_LDAP_URI | string | ldaps://localhost:9235 | |
 | LDAP_CACERT<br/>USERS_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | |
 | LDAP_INSECURE<br/>USERS_LDAP_INSECURE | bool | false | |
