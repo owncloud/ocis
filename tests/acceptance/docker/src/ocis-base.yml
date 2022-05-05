@@ -16,11 +16,11 @@ services:
       ACCOUNTS_HASH_DIFFICULTY: 4
       OCIS_INSECURE: "true"
       # s3ng specific settings
-      STORAGE_USERS_DRIVER_S3NG_ENDPOINT: http://ceph:8080
-      STORAGE_USERS_DRIVER_S3NG_REGION: default
-      STORAGE_USERS_DRIVER_S3NG_ACCESS_KEY: test
-      STORAGE_USERS_DRIVER_S3NG_SECRET_KEY: test
-      STORAGE_USERS_DRIVER_S3NG_BUCKET: test
+      STORAGE_USERS_S3NG_ENDPOINT: http://ceph:8080
+      STORAGE_USERS_S3NG_REGION: default
+      STORAGE_USERS_S3NG_ACCESS_KEY: test
+      STORAGE_USERS_S3NG_SECRET_KEY: test
+      STORAGE_USERS_S3NG_BUCKET: test
     volumes:
       - ../../../config:/drone/src/tests/config
       - oCISownCloud10testsuite:/srv

@@ -70,16 +70,11 @@ See also [example server setup]({{< ref "preparing_server" >}})
   OCIS_DOCKER_TAG=
   # Domain of oCIS, where you can find the frontend. Defaults to "ocis.owncloud.test"
   OCIS_DOMAIN=
-  # IDP LDAP bind password. Must be changed in order to have a secure oCIS. Defaults to "idp".
-  IDP_LDAP_BIND_PASSWORD=
-  # Storage LDAP bind password. Must be changed in order to have a secure oCIS. Defaults to "reva".
-  STORAGE_LDAP_BIND_PASSWORD=
-  # JWT secret which is used for the storage provider. Must be changed in order to have a secure oCIS. Defaults to "Pive-Fumkiu4"
-  OCIS_JWT_SECRET=
-  # JWT secret which is used for uploads to create transfer tokens. Must be changed in order to have a secure oCIS. Defaults to "replace-me-with-a-transfer-secret"
-  STORAGE_TRANSFER_SECRET=
-  # Machine auth api key secret. Must be changed in order to have a secure oCIS. Defaults to "change-me-please"
-  OCIS_MACHINE_AUTH_API_KEY=
+  # oCIS admin user password. Defaults to "admin".
+  ADMIN_PASSWORD=
+  # The demo users should not be created on a production instance
+  # because their passwords are public. Defaults to "false".
+  DEMO_USERS=
 
   ### MINIO / S3 settings ###
   # Domain of MinIO where the Web UI is accessible. Defaults to "minio.owncloud.test".
@@ -103,6 +98,8 @@ See also [example server setup]({{< ref "preparing_server" >}})
   By default oCIS will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OCIS_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
 
   Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, e.g. `OCIS_DOMAIN=ocis.owncloud.test`.
+
+  Set the initial admin user password in `ADMIN_PASSWORD=`, it defaults to `admin`.
 
   Set your domain for the MinIO frontend in `MINIO_DOMAIN=`, e.g. `MINIO_DOMAIN=minio.owncloud.test`. If you are using other S3-compatible providers you need to configure the respective endpoint here.
 
