@@ -15,7 +15,7 @@ import (
     {{- end}})
 
 type ConfigField struct {
-	Name         string
+	EnvVars      []string
 	DefaultValue string
 	Type         string
 	Description  string
@@ -86,8 +86,9 @@ func GetAnnotatedVariables(s interface{}) []ConfigField {
 			if !ok {
 				continue
 			}
-			v := fmt.Sprintf("%v", value.Interface())
-			fields = append(fields, ConfigField{Name: strings.ReplaceAll(env, ";", " +\n"), DefaultValue: v, Description: desc, Type: value.Type().Name()})
+			v := fmt.Sprintf("%v", value.Interface())			
+			td := strings.Split(env, ";")
+			fields = append(fields, ConfigField{EnvVars: td, DefaultValue: v, Description: desc, Type: value.Type().Name()})
 		case reflect.Ptr:
 			// PolicySelectors in the Proxy are being skipped atm
 			// they are not configurable via env vars, if that changes
