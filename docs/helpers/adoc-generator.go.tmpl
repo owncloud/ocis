@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strings"
 	"text/template"
 
@@ -88,6 +89,8 @@ func GetAnnotatedVariables(s interface{}) []ConfigField {
 			}
 			v := fmt.Sprintf("%v", value.Interface())			
 			td := strings.Split(env, ";")
+			re := regexp.MustCompile(`^(https?:\/\/)`)
+			v = re.ReplaceAllString(v,"\\$1")
 			fields = append(fields, ConfigField{EnvVars: td, DefaultValue: v, Description: desc, Type: value.Type().Name()})
 		case reflect.Ptr:
 			// PolicySelectors in the Proxy are being skipped atm
