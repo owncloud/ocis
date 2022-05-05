@@ -50,6 +50,11 @@ func (t tracing) PatchUser(w http.ResponseWriter, r *http.Request) {
 	t.next.PatchUser(w, r)
 }
 
+// ChangeOwnPassword implements the Service interface.
+func (t tracing) ChangeOwnPassword(w http.ResponseWriter, r *http.Request) {
+	t.next.ChangeOwnPassword(w, r)
+}
+
 // GetGroups implements the Service interface.
 func (t tracing) GetGroups(w http.ResponseWriter, r *http.Request) {
 	t.next.GetGroups(w, r)

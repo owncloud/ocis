@@ -18,6 +18,36 @@ type GatewayClient struct {
 	mock.Mock
 }
 
+// Authenticate provides a mock function with given fields: ctx, in, opts
+func (_m *GatewayClient) Authenticate(ctx context.Context, in *gatewayv1beta1.AuthenticateRequest, opts ...grpc.CallOption) (*gatewayv1beta1.AuthenticateResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *gatewayv1beta1.AuthenticateResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *gatewayv1beta1.AuthenticateRequest, ...grpc.CallOption) *gatewayv1beta1.AuthenticateResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*gatewayv1beta1.AuthenticateResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *gatewayv1beta1.AuthenticateRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // CreateStorageSpace provides a mock function with given fields: ctx, in, opts
 func (_m *GatewayClient) CreateStorageSpace(ctx context.Context, in *providerv1beta1.CreateStorageSpaceRequest, opts ...grpc.CallOption) (*providerv1beta1.CreateStorageSpaceResponse, error) {
 	_va := make([]interface{}, len(opts))

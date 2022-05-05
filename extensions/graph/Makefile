@@ -28,6 +28,7 @@ ci-go-generate: $(MOCKERY) # CI runs ci-node-generate automatically before this 
 	$(MOCKERY) --dir pkg/service/v0 --case underscore --name GatewayClient
 	$(MOCKERY) --dir pkg/service/v0 --case underscore --name HTTPClient
 	$(MOCKERY) --dir pkg/service/v0 --case underscore --name Publisher
+	$(MOCKERY) --srcpkg github.com/go-ldap/ldap/v3 --case underscore --filename ldapclient.go --name Client
 
 
 .PHONY: ci-node-generate

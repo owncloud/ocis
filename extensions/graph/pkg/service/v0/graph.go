@@ -17,12 +17,14 @@ import (
 	"google.golang.org/grpc"
 )
 
-//go:generate make generate
+//go:generate make -C ../../.. generate
 
 // GatewayClient is the subset of the gateway.GatewayAPIClient that is being used to interact with the gateway
 type GatewayClient interface {
 	//gateway.GatewayAPIClient
 
+	// Authenticates a user.
+	Authenticate(ctx context.Context, in *gateway.AuthenticateRequest, opts ...grpc.CallOption) (*gateway.AuthenticateResponse, error)
 	// Returns the home path for the given authenticated user.
 	// When a user has access to multiple storage providers, one of them is the home.
 	GetHome(ctx context.Context, in *provider.GetHomeRequest, opts ...grpc.CallOption) (*provider.GetHomeResponse, error)

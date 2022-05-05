@@ -35,6 +35,7 @@ type Service interface {
 	PostUser(http.ResponseWriter, *http.Request)
 	DeleteUser(http.ResponseWriter, *http.Request)
 	PatchUser(http.ResponseWriter, *http.Request)
+	ChangeOwnPassword(http.ResponseWriter, *http.Request)
 
 	GetGroups(http.ResponseWriter, *http.Request)
 	GetGroup(http.ResponseWriter, *http.Request)
@@ -55,46 +56,10 @@ func NewService(opts ...Option) Service {
 	m := chi.NewMux()
 	m.Use(options.Middleware...)
 
-	var backend identity.Backend
-	switch options.Config.Identity.Backend {
-	case "cs3":
-		backend = &identity.CS3{
-			Config: options.Config.Reva,
-			Logger: &options.Logger,
-		}
-	case "ldap":
-		var err error
-
-		var tlsConf *tls.Config
-		if options.Config.Identity.LDAP.Insecure {
-			tlsConf = &tls.Config{
-				//nolint:gosec // We need the ability to run with "insecure" (dev/testing)
-				InsecureSkipVerify: options.Config.Identity.LDAP.Insecure,
-			}
-		}
-
-		conn := ldap.NewLDAPWithReconnect(&options.Logger,
-			ldap.Config{
-				URI:          options.Config.Identity.LDAP.URI,
-				BindDN:       options.Config.Identity.LDAP.BindDN,
-				BindPassword: options.Config.Identity.LDAP.BindPassword,
-				TLSConfig:    tlsConf,
-			},
-		)
-		if backend, err = identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger); err != nil {
-			options.Logger.Error().Msgf("Error initializing LDAP Backend: '%s'", err)
-			return nil
-		}
-	default:
-		options.Logger.Error().Msgf("Unknown Identity Backend: '%s'", options.Config.Identity.Backend)
-		return nil
-	}
-
 	svc := Graph{
 		config:               options.Config,
 		mux:                  m,
 		logger:               &options.Logger,
-		identityBackend:      backend,
 		spacePropertiesCache: ttlcache.NewCache(),
 		eventsPublisher:      options.EventsPublisher,
 	}
@@ -108,6 +73,44 @@ func NewService(opts ...Option) Service {
 	} else {
 		svc.gatewayClient = options.GatewayClient
 	}
+	if options.IdentityBackend == nil {
+		switch options.Config.Identity.Backend {
+		case "cs3":
+			svc.identityBackend = &identity.CS3{
+				Config: options.Config.Reva,
+				Logger: &options.Logger,
+			}
+		case "ldap":
+			var err error
+
+			var tlsConf *tls.Config
+			if options.Config.Identity.LDAP.Insecure {
+				tlsConf = &tls.Config{
+					//nolint:gosec // We need the ability to run with "insecure" (dev/testing)
+					InsecureSkipVerify: options.Config.Identity.LDAP.Insecure,
+				}
+			}
+
+			conn := ldap.NewLDAPWithReconnect(&options.Logger,
+				ldap.Config{
+					URI:          options.Config.Identity.LDAP.URI,
+					BindDN:       options.Config.Identity.LDAP.BindDN,
+					BindPassword: options.Config.Identity.LDAP.BindPassword,
+					TLSConfig:    tlsConf,
+				},
+			)
+			if svc.identityBackend, err = identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger); err != nil {
+				options.Logger.Error().Msgf("Error initializing LDAP Backend: '%s'", err)
+				return nil
+			}
+		default:
+			options.Logger.Error().Msgf("Unknown Identity Backend: '%s'", options.Config.Identity.Backend)
+			return nil
+		}
+	} else {
+		svc.identityBackend = options.IdentityBackend
+	}
+
 	if options.HTTPClient == nil {
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{
 			InsecureSkipVerify: options.Config.Spaces.Insecure, //nolint:gosec
@@ -143,6 +146,7 @@ func NewService(opts ...Option) Service {
 				r.Get("/", svc.GetMe)
 				r.Get("/drives", svc.GetDrives)
 				r.Get("/drive/root/children", svc.GetRootDriveChildren)
+				r.Post("/changePassword", svc.ChangeOwnPassword)
 			})
 			r.Route("/users", func(r chi.Router) {
 				r.With(requireAdmin).Get("/", svc.GetUsers)
