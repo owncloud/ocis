@@ -177,7 +177,7 @@
 `OCIS_URL` +
 `FRONTEND_PUBLIC_URL`
 | string
-| https://localhost:9200
+| \https://localhost:9200
 | 
 
 |

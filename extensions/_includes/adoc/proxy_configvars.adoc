@@ -127,7 +127,7 @@
 `OCIS_URL` +
 `PROXY_OIDC_ISSUER`
 | string
-| https://localhost:9200
+| \https://localhost:9200
 | 
 
 |

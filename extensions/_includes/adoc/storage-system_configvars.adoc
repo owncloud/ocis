@@ -151,7 +151,7 @@
 |
 `STORAGE_SYSTEM_DATA_SERVER_URL`
 | string
-| http://localhost:9216/data
+| \http://localhost:9216/data
 | 
 
 |

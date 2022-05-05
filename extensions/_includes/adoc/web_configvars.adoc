@@ -127,7 +127,7 @@
 `OCIS_URL` +
 `WEB_UI_THEME_SERVER`
 | string
-| https://localhost:9200
+| \https://localhost:9200
 | 
 
 |
@@ -140,7 +140,7 @@
 `OCIS_URL` +
 `WEB_UI_CONFIG_SERVER`
 | string
-| https://localhost:9200
+| \https://localhost:9200
 | 
 
 |
@@ -158,14 +158,14 @@
 |
 `WEB_OIDC_METADATA_URL`
 | string
-| https://localhost:9200/.well-known/openid-configuration
+| \https://localhost:9200/.well-known/openid-configuration
 | 
 
 |
 `OCIS_URL` +
 `WEB_OIDC_AUTHORITY`
 | string
-| https://localhost:9200
+| \https://localhost:9200
 | 
 
 |

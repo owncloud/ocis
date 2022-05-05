@@ -147,7 +147,7 @@
 |
 `THUMBNAILS_DATA_ENDPOINT`
 | string
-| http://127.0.0.1:9186/thumbnails/data
+| \http://127.0.0.1:9186/thumbnails/data
 | 
 |===
 

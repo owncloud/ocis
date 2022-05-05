@@ -103,7 +103,7 @@
 `OCIS_URL` +
 `OCIS_PUBLIC_URL`
 | string
-| https://127.0.0.1:9200
+| \https://127.0.0.1:9200
 | 
 
 |

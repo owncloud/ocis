@@ -122,7 +122,7 @@
 `OCIS_URL` +
 `AUTH_BEARER_OIDC_ISSUER`
 | string
-| https://localhost:9200
+| \https://localhost:9200
 | 
 
 |
