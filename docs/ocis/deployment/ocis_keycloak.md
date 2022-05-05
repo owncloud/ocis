@@ -49,6 +49,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
 * Open the `.env` file in a text editor
   The file by default looks like this:
+
   ```bash
   # If you're on a internet facing server please comment out following line.
   # It skips certificate validation for various parts of oCIS and is needed if you use self signed certificates.

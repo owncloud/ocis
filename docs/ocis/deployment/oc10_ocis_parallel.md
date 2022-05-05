@@ -54,60 +54,60 @@ See also [example server setup]({{< ref "preparing_server" >}})
   The file by default looks like this:
 
   ```bash
-      # If you're on a internet facing server please comment out following line.
-      # It skips certificate validation for various parts of oCIS and is needed if you use self signed certificates.
-      INSECURE=true
+  # If you're on a internet facing server please comment out following line.
+  # It skips certificate validation for various parts of oCIS and is needed if you use self signed certificates.
+  INSECURE=true
 
-      ### Traefik settings ###
-      TRAEFIK_LOG_LEVEL=
-      # Serve Traefik dashboard. Defaults to "false".
-      TRAEFIK_DASHBOARD=
-      # Domain of Traefik, where you can find the dashboard. Defaults to "traefik.owncloud.test"
-      TRAEFIK_DOMAIN=
-      # Basic authentication for the dashboard. Defaults to user "admin" and password "admin"
-      TRAEFIK_BASIC_AUTH_USERS=
-      # Email address for obtaining LetsEncrypt certificates, needs only be changed if this is a public facing server
-      TRAEFIK_ACME_MAIL=
+  ### Traefik settings ###
+  TRAEFIK_LOG_LEVEL=
+  # Serve Traefik dashboard. Defaults to "false".
+  TRAEFIK_DASHBOARD=
+  # Domain of Traefik, where you can find the dashboard. Defaults to "traefik.owncloud.test"
+  TRAEFIK_DOMAIN=
+  # Basic authentication for the dashboard. Defaults to user "admin" and password "admin"
+  TRAEFIK_BASIC_AUTH_USERS=
+  # Email address for obtaining LetsEncrypt certificates, needs only be changed if this is a public facing server
+  TRAEFIK_ACME_MAIL=
 
-      ### shared oCIS / oC10 settings ###
-      # Domain of oCIS / oC10, where you can find the frontend. Defaults to "cloud.owncloud.test"
-      CLOUD_DOMAIN=
+  ### shared oCIS / oC10 settings ###
+  # Domain of oCIS / oC10, where you can find the frontend. Defaults to "cloud.owncloud.test"
+  CLOUD_DOMAIN=
 
-      ### oCIS settings ###
-      # oCIS version. Defaults to "latest"
-      OCIS_DOCKER_TAG=
-      # JWT secret which is used for the storage provider. Must be changed in order to have a secure oCIS. Defaults to "Pive-Fumkiu4"
-      OCIS_JWT_SECRET=
-      # JWT secret which is used for uploads to create transfer tokens. Must be changed in order to have a secure oCIS. Defaults to "replace-me-with-a-transfer-secret"
-      STORAGE_TRANSFER_SECRET=
-      # Machine auth api key secret. Must be changed in order to have a secure oCIS. Defaults to "change-me-please"
-      OCIS_MACHINE_AUTH_API_KEY=
+  ### oCIS settings ###
+  # oCIS version. Defaults to "latest"
+  OCIS_DOCKER_TAG=
+  # JWT secret which is used for the storage provider. Must be changed in order to have a secure oCIS. Defaults to "Pive-Fumkiu4"
+  OCIS_JWT_SECRET=
+  # JWT secret which is used for uploads to create transfer tokens. Must be changed in order to have a secure oCIS. Defaults to "replace-me-with-a-transfer-secret"
+  STORAGE_TRANSFER_SECRET=
+  # Machine auth api key secret. Must be changed in order to have a secure oCIS. Defaults to "change-me-please"
+  OCIS_MACHINE_AUTH_API_KEY=
 
-      ### oCIS settings ###
-      # oC10 version. Defaults to "latest"
-      OC10_DOCKER_TAG=
-      # client secret which the openidconnect app uses to authenticate to Keycloak. Defaults to "oc10-oidc-secret"
-      OC10_OIDC_CLIENT_SECRET=
-      # app which will be shown when opening the ownCloud 10 UI. Defaults to "files" but also could be set to "web"
-      OWNCLOUD_DEFAULT_APP=
-      # if set to "false" (default) links will be opened in the classic UI, if set to "true" ownCloud Web is used
-      OWNCLOUD_WEB_REWRITE_LINKS=
+  ### oCIS settings ###
+  # oC10 version. Defaults to "latest"
+  OC10_DOCKER_TAG=
+  # client secret which the openidconnect app uses to authenticate to Keycloak. Defaults to "oc10-oidc-secret"
+  OC10_OIDC_CLIENT_SECRET=
+  # app which will be shown when opening the ownCloud 10 UI. Defaults to "files" but also could be set to "web"
+  OWNCLOUD_DEFAULT_APP=
+  # if set to "false" (default) links will be opened in the classic UI, if set to "true" ownCloud Web is used
+  OWNCLOUD_WEB_REWRITE_LINKS=
 
-      ### LDAP settings ###
-      # password for the LDAP admin user "cn=admin,dc=owncloud,dc=com", defaults to "admin"
-      LDAP_ADMIN_PASSWORD=
-      # Domain of the LDAP management frontend. Defaults to "ldap.owncloud.test"
-      LDAP_MANAGER_DOMAIN=
+  ### LDAP settings ###
+  # password for the LDAP admin user "cn=admin,dc=owncloud,dc=com", defaults to "admin"
+  LDAP_ADMIN_PASSWORD=
+  # Domain of the LDAP management frontend. Defaults to "ldap.owncloud.test"
+  LDAP_MANAGER_DOMAIN=
 
-      ### Keycloak ###
-      # Domain of Keycloak, where you can find the management and authentication frontend. Defaults to "keycloak.owncloud.test"
-      KEYCLOAK_DOMAIN=
-      # Realm which to be used with oC10 and oCIS. Defaults to "owncloud"
-      KEYCLOAK_REALM=
-      # Admin user login name. Defaults to "admin"
-      KEYCLOAK_ADMIN_USER=
-      # Admin user login password. Defaults to "admin"
-      KEYCLOAK_ADMIN_PASSWORD=
+  ### Keycloak ###
+  # Domain of Keycloak, where you can find the management and authentication frontend. Defaults to "keycloak.owncloud.test"
+  KEYCLOAK_DOMAIN=
+  # Realm which to be used with oC10 and oCIS. Defaults to "owncloud"
+  KEYCLOAK_REALM=
+  # Admin user login name. Defaults to "admin"
+  KEYCLOAK_ADMIN_USER=
+  # Admin user login password. Defaults to "admin"
+  KEYCLOAK_ADMIN_PASSWORD=
   ```
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.

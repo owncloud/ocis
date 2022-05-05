@@ -77,6 +77,17 @@ func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
 			},
 			// TODO build services dynamically
 			"services": map[string]interface{}{
+				// this reva service called "appprovider" comes from
+				// `internal/http/services/appprovider` and is a translation
+				// layer from the grpc app registry to http, used by eg. ownCloud Web
+				// It should not be confused with `internal/grpc/services/appprovider`
+				// which is currently only has only the driver for the CS3org WOPI server
+				"appprovider": map[string]interface{}{
+					"prefix":                 cfg.AppHandler.Prefix,
+					"transfer_shared_secret": cfg.TransferSecret,
+					"timeout":                86400,
+					"insecure":               cfg.AppHandler.Insecure,
+				},
 				"archiver": map[string]interface{}{
 					"prefix":        cfg.Archiver.Prefix,
 					"timeout":       86400,

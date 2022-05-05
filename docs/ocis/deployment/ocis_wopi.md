@@ -58,64 +58,60 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
 * Open the `.env` file in a text editor
   The file by default looks like this:
+
   ```bash
-    # If you're on a internet facing server please comment out following line.
-    # It skips certificate validation for various parts of oCIS and is needed if you use self signed certificates.
-    INSECURE=true
+  # If you're on a internet facing server please comment out following line.
+  # It skips certificate validation for various parts of oCIS and is needed if you use self signed certificates.
+  INSECURE=true
 
-    ### Traefik settings ###
-    # Serve Traefik dashboard. Defaults to "false".
-    TRAEFIK_DASHBOARD=
-    # Domain of Traefik, where you can find the dashboard. Defaults to "traefik.owncloud.test"
-    TRAEFIK_DOMAIN=
-    # Basic authentication for the dashboard. Defaults to user "admin" and password "admin"
-    TRAEFIK_BASIC_AUTH_USERS=
-    # Email address for obtaining LetsEncrypt certificates, needs only be changed if this is a public facing server
-    TRAEFIK_ACME_MAIL=
+  ### Traefik settings ###
+  # Serve Traefik dashboard. Defaults to "false".
+  TRAEFIK_DASHBOARD=
+  # Domain of Traefik, where you can find the dashboard. Defaults to "traefik.owncloud.test"
+  TRAEFIK_DOMAIN=
+  # Basic authentication for the dashboard. Defaults to user "admin" and password "admin"
+  TRAEFIK_BASIC_AUTH_USERS=
+  # Email address for obtaining LetsEncrypt certificates, needs only be changed if this is a public facing server
+  TRAEFIK_ACME_MAIL=
 
-    ### oCIS settings ###
-    # oCIS version. Defaults to "latest"
-    OCIS_DOCKER_TAG=
-    # Domain of oCIS, where you can find the frontend. Defaults to "ocis.owncloud.test"
-    OCIS_DOMAIN=
-    # IDP LDAP bind password. Must be changed in order to have a secure oCIS. Defaults to "idp".
-    IDP_LDAP_BIND_PASSWORD=
-    # Storage LDAP bind password. Must be changed in order to have a secure oCIS. Defaults to "reva".
-    STORAGE_LDAP_BIND_PASSWORD=
-    # JWT secret which is used for the storage provider. Must be changed in order to have a secure oCIS. Defaults to "Pive-Fumkiu4"
-    OCIS_JWT_SECRET=
-    # JWT secret which is used for uploads to create transfer tokens. Must be changed in order to have a secure oCIS. Defaults to "replace-me-with-a-transfer-secret"
-    STORAGE_TRANSFER_SECRET=
-    # Machine auth api key secret. Must be changed in order to have a secure oCIS. Defaults to "change-me-please"
-    OCIS_MACHINE_AUTH_API_KEY=
+  ### oCIS settings ###
+  # oCIS version. Defaults to "latest"
+  OCIS_DOCKER_TAG=
+  # Domain of oCIS, where you can find the frontend. Defaults to "ocis.owncloud.test"
+  OCIS_DOMAIN=
+  # oCIS admin user password. Defaults to "admin".
+  ADMIN_PASSWORD=
+  # The demo users should not be created on a production instance
+  # because their passwords are public. Defaults to "false".
+  DEMO_USERS=
 
-    ### Wopi server settings ###
-    # cs3org wopi server version. Defaults to "latest"
-    WOPISERVER_DOCKER_TAG=
-    # cs3org wopi server domain. Defaults to "wopiserver.owncloud.test"
-    WOPISERVER_DOMAIN=
-    # JWT secret which is used for the documents to be request by the Wopi client from the cs3org Wopi server. Must be change in order to have a secure Wopi server. Defaults to "LoremIpsum567"
-    WOPI_JWT_SECRET=
-    # JWT secret which is used for the documents to be request by the Wopi client from the cs3org Wopi server. Must be change in order to have a secure Wopi server. Defaults to "LoremIpsum123"
-    WOPI_IOP_SECRET=
+  ### Wopi server settings ###
+  # cs3org wopi server version. Defaults to "latest"
+  WOPISERVER_DOCKER_TAG=
+  # cs3org wopi server domain. Defaults to "wopiserver.owncloud.test"
+  WOPISERVER_DOMAIN=
+  # JWT secret which is used for the documents to be request by the Wopi client from the cs3org Wopi server. Must be change in order to have a secure Wopi server. Defaults to "LoremIpsum567"
+  WOPI_JWT_SECRET=
+  # JWT secret which is used for the documents to be request by the Wopi client from the cs3org Wopi server. Must be change in order to have a secure Wopi server. Defaults to "LoremIpsum123"
+  WOPI_IOP_SECRET=
 
-    ### Collabora settings ###
-    # Domain of Collabora, where you can find the frontend. Defaults to "collabora.owncloud.test"
-    COLLABORA_DOMAIN=
-    # Admin user for Collabora. Defaults to blank, provide one to enable access
-    COLLABORA_ADMIN_USER=
-    # Admin password for Collabora. Defaults to blank, provide one to enable access
-    COLLABORA_ADMIN_PASSWORD=
+  ### Collabora settings ###
+  # Domain of Collabora, where you can find the frontend. Defaults to "collabora.owncloud.test"
+  COLLABORA_DOMAIN=
+  # Admin user for Collabora. Defaults to blank, provide one to enable access
+  COLLABORA_ADMIN_USER=
+  # Admin password for Collabora. Defaults to blank, provide one to enable access
+  COLLABORA_ADMIN_PASSWORD=
 
-    ### OnlyOffice settings ###
-    # Domain of OnlyOffice, where you can find the frontend. Defaults to "onlyoffice.owncloud.test"
-    ONLYOFFICE_DOMAIN=
+  ### OnlyOffice settings ###
+  # Domain of OnlyOffice, where you can find the frontend. Defaults to "onlyoffice.owncloud.test"
+  ONLYOFFICE_DOMAIN=
 
-    ### CodiMD settings ###
-    # Domain of Collabora, where you can find the frontend. Defaults to "codimd.owncloud.test"
-    CODIMD_DOMAIN=
-    # Secret which is used for the communication with the WOPI server. Must be changed in order to have a secure CodiMD. Defaults to "LoremIpsum456"
-    CODIMD_SECRET=
+  ### CodiMD settings ###
+  # Domain of Collabora, where you can find the frontend. Defaults to "codimd.owncloud.test"
+  CODIMD_DOMAIN=
+  # Secret which is used for the communication with the WOPI server. Must be changed in order to have a secure CodiMD. Defaults to "LoremIpsum456"
+  CODIMD_SECRET=
   ```
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
@@ -129,6 +125,8 @@ See also [example server setup]({{< ref "preparing_server" >}})
   By default oCIS will be started in the `latest` version. If you want to start a specific version of oCIS set the version to `OCIS_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/owncloud/ocis/tags?page=1&ordering=last_updated).
 
   Set your domain for the oCIS frontend in `OCIS_DOMAIN=`, e.g. `OCIS_DOMAIN=ocis.owncloud.test`.
+
+  Set the initial admin user password in `ADMIN_PASSWORD=`, it defaults to `admin`.
 
   By default the CS3Org WOPI server will also be started in the `latest` version. If you want to start a specific version of it, you can set the version to `WOPISERVER_DOCKER_TAG=`. Available versions can be found on [Docker Hub](https://hub.docker.com/r/cs3org/wopiserver/tags?page=1&ordering=last_updated).
 

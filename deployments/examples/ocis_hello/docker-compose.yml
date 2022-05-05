@@ -48,33 +48,28 @@ services:
       ocis-net:
     entrypoint:
       - /bin/sh
-      - /entrypoint-override.sh
+    # run ocis init to initialize a configuration file with random secrets
+    # it will fail on subsequent runs, because the config file already exists
+    # therefore we ignore the error and then start the ocis server
+    command: ["-c", "ocis init || true; ocis server"]
     environment:
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
-      # change default secrets
-      IDP_LDAP_BIND_PASSWORD: ${IDP_LDAP_BIND_PASSWORD:-idp}
-      STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
-      OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
-      OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
-      # web ui
-      WEB_UI_CONFIG: "/var/tmp/ocis/.config/web-config.json"
       # make settings service available to oCIS Hello
       SETTINGS_GRPC_ADDR: 0.0.0.0:9191
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
       OCIS_INSECURE: "${INSECURE:-false}"
       # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
       PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
+      # admin user password
+      IDM_ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin}" # this overrides the admin password from the configuration file
       # demo users
-      ACCOUNTS_DEMO_USERS_AND_GROUPS: "${DEMO_USERS:-false}"  # deprecated, remove after switching to LibreIDM
       IDM_CREATE_DEMO_USERS: "${DEMO_USERS:-false}"
     volumes:
-      - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
-      - ./config/ocis/web-config.dist.json:/config/web-config.dist.json
       - ./config/ocis/proxy.yaml:/etc/ocis/proxy.yaml
+      - ./config/ocis/web.yaml:/etc/ocis/web.yaml
+      - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis
     labels:
       - "traefik.enable=true"
@@ -99,6 +94,7 @@ services:
 
 volumes:
   certs:
+  ocis-config:
   ocis-data:
 
 networks:
