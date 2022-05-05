@@ -8,7 +8,10 @@
 | Description
 
 {{- range .Fields}}
-| `{{.Name}}`
+{{ $numVars := len .EnvVars }}
+| {{- range $i, $value := .EnvVars }}{{- if $i }} +{{ end }}
+`{{- $value }}` 
+{{- end }}
 | {{.Type}}
 | {{.DefaultValue}}
 | {{.Description}}
