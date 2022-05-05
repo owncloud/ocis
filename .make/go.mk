@@ -1,4 +1,4 @@
-OCIS_REPO := github.com/owncloud/ocis
+OCIS_REPO := github.com/owncloud/ocis/v2
 IMPORT := ($OCIS_REPO)/$(NAME)
 BIN := bin
 DIST := dist
