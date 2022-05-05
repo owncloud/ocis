@@ -10,7 +10,12 @@
     "scope": "openid profile email"
   },
   "options": {
-    "displayResourcesLazy": false
+    "displayResourcesLazy": false,
+    "sidebar": {
+      "shares": {
+        "showAllOnLoad": true
+      }
+    }
   },
   "apps": [
     "files",
