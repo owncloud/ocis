@@ -25,8 +25,8 @@ type Notifications struct {
 	*shared.Commons   `yaml:"-"`
 	SMTP              SMTP   `yaml:"SMTP"`
 	Events            Events `yaml:"events"`
-	RevaGateway       string `yaml:"reva_gateway" env:"REVA_GATEWAY;NOTIFICATIONS_REVA_GATEWAY"`
-	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;NOTIFICATIONS_MACHINE_AUTH_API_KEY"`
+	RevaGateway       string `yaml:"reva_gateway" env:"REVA_GATEWAY;NOTIFICATIONS_REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata"`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;NOTIFICATIONS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to impersonate users when looking up their email"`
 }
 
 // SMTP combines the smtp configuration options.

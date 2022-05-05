@@ -10,6 +10,7 @@ geekdocCollapseSection: true
 
 ## Abstract
 
+The notifications extension is responsible for making users aware of changes. It listens on the event bus, filters relevant events, looks up the recipients email address and then queues an email with an external MTA.
 
 ## Table of Contents
 
