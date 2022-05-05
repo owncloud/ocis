@@ -125,6 +125,11 @@ FRONTEND_PUBLIC_URL`
 | string
 | https://localhost:9200
 | 
+| `OCIS_INSECURE +
+FRONTEND_APP_HANDLER_INSECURE`
+| bool
+| false
+| 
 | `FRONTEND_ARCHIVER_MAX_NUM_FILES`
 | int64
 | 10000

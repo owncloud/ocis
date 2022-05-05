@@ -18,6 +18,8 @@
 | APP_PROVIDER_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>APP_PROVIDER_JWT_SECRET | string |  | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
+| APP_PROVIDER_EXTERNAL_ADDR | string |  | |
+| APP_PROVIDER_DRIVER | string |  | |
 | APP_PROVIDER_WOPI_APP_API_KEY | string |  | api key for the wopi app|
 | APP_PROVIDER_WOPI_APP_DESKTOP_ONLY | bool | false | offer this app only on desktop|
 | APP_PROVIDER_WOPI_APP_ICON_URI | string |  | uri to an app icon to be used by clients|

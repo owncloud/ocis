@@ -34,6 +34,8 @@ upload_max_chunk_size: 100000000
 upload_http_method_override: ""
 default_upload_protocol: tus
 public_url: https://localhost:9200
+app_handler:
+  insecure: false
 archiver:
   max_num_files: 10000
   max_size: 1073741824

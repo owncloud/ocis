@@ -79,6 +79,14 @@ APP_PROVIDER_JWT_SECRET`
 | string
 | 127.0.0.1:9142
 | 
+| `APP_PROVIDER_EXTERNAL_ADDR`
+| string
+| 
+| 
+| `APP_PROVIDER_DRIVER`
+| string
+| 
+| 
 | `APP_PROVIDER_WOPI_APP_API_KEY`
 | string
 | 
