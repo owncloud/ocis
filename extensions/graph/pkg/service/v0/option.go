@@ -5,6 +5,7 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/extensions/graph/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -19,6 +20,7 @@ type Options struct {
 	Config          *config.Config
 	Middleware      []func(http.Handler) http.Handler
 	GatewayClient   GatewayClient
+	IdentityBackend identity.Backend
 	HTTPClient      HTTPClient
 	RoleService     settingssvc.RoleService
 	RoleManager     *roles.Manager
@@ -61,6 +63,13 @@ func Middleware(val ...func(http.Handler) http.Handler) Option {
 func WithGatewayClient(val GatewayClient) Option {
 	return func(o *Options) {
 		o.GatewayClient = val
+	}
+}
+
+// WithIdentityBackend provides a function to set the IdentityBackend option.
+func WithIdentityBackend(val identity.Backend) Option {
+	return func(o *Options) {
+		o.IdentityBackend = val
 	}
 }
 

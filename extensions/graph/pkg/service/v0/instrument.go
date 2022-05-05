@@ -54,6 +54,11 @@ func (i instrument) PatchUser(w http.ResponseWriter, r *http.Request) {
 	i.next.PatchUser(w, r)
 }
 
+// ChangeOwnPassword implements the Service interface.
+func (i instrument) ChangeOwnPassword(w http.ResponseWriter, r *http.Request) {
+	i.next.ChangeOwnPassword(w, r)
+}
+
 // GetGroups implements the Service interface.
 func (i instrument) GetGroups(w http.ResponseWriter, r *http.Request) {
 	i.next.GetGroups(w, r)
