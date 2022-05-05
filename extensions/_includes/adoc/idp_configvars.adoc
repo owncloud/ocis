@@ -203,18 +203,6 @@
 | 
 
 |
-`IDP_IDENTIFIER_CLIENT_PATH`
-| string
-| ~/.ocis/idp
-| 
-
-|
-`IDP_IDENTIFIER_REGISTRATION_CONF`
-| string
-| ~/.ocis/idp/identifier-registration.yaml
-| 
-
-|
 `IDP_IDENTIFIER_SCOPES_CONF`
 | string
 | 

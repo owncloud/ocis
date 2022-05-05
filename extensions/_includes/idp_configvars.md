@@ -33,8 +33,6 @@
 | IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION | bool | false | |
 | IDP_ENCRYPTION_SECRET | string |  | |
 | IDP_DISABLE_IDENTIFIER_WEBAPP | bool | true | |
-| IDP_IDENTIFIER_CLIENT_PATH | string | ~/.ocis/idp | |
-| IDP_IDENTIFIER_REGISTRATION_CONF | string | ~/.ocis/idp/identifier-registration.yaml | |
 | IDP_IDENTIFIER_SCOPES_CONF | string |  | |
 | IDP_SIGNING_KID | string |  | |
 | IDP_SIGNING_METHOD | string | PS256 | |

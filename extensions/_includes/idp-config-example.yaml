@@ -40,8 +40,6 @@ idp:
   encrypt_secret_file: ""
   listen: ""
   identifier_client_disabled: true
-  identifier_client_path: ~/.ocis/idp
-  identifier_registration_conf: ~/.ocis/idp/identifier-registration.yaml
   identifier_scopes_conf: ""
   identifierdefaultbannerlogo: ""
   identifierdefaultsigninpagetext: ""
@@ -57,6 +55,53 @@ idp:
   id_token_duration_seconds: 3600
   refresh_token_duration_seconds: 94608000
   dynamic_client_secret_duration_seconds: 0
+clients:
+- id: web
+  name: ownCloud Web app
+  trusted: true
+  secret: ""
+  redirect_uris:
+  - '{{OCIS_URL}}/'
+  - '{{OCIS_URL}}/oidc-callback.html'
+  - '{{OCIS_URL}}/oidc-silent-redirect.html'
+  origins:
+  - '{{OCIS_URL}}'
+  application_type: ""
+- id: ocis-explorer.js
+  name: oCIS Graph Explorer
+  trusted: true
+  secret: ""
+  redirect_uris:
+  - '{{OCIS_URL}}/graph-explorer/'
+  origins:
+  - '{{OCIS_URL}}'
+  application_type: ""
+- id: xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69
+  name: ownCloud desktop app
+  trusted: false
+  secret: UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh
+  redirect_uris:
+  - http://127.0.0.1
+  - http://localhost
+  origins: []
+  application_type: native
+- id: e4rAsNUSIUs0lF4nbv9FmCeUkTlV9GdgTLDH1b5uie7syb90SzEVrbN7HIpmWJeD
+  name: ownCloud Android app
+  trusted: false
+  secret: dInFYGV33xKzhbRmpqQltYNdfLdJIfJ9L5ISoKhNoT9qZftpdWSP71VrpGR9pmoD
+  redirect_uris:
+  - oc://android.owncloud.com
+  origins: []
+  application_type: native
+- id: mxd5OQDk6es5LzOzRvidJNfXLUZS2oN3oUFeXPP8LpPrhx3UroJFduGEYIBOxkY1
+  name: ownCloud iOS app
+  trusted: false
+  secret: KFeFWWEZO9TkisIQzR3fo7hfiMXlOpaqP8CFuTbSHzV1TUuGECglPxpiVKJfOXIx
+  redirect_uris:
+  - oc://ios.owncloud.com
+  - oc.ios://ios.owncloud.com
+  origins: []
+  application_type: native
 ldap:
   uri: ldaps://localhost:9235
   cacert: ~/.ocis/idm/ldap.crt
