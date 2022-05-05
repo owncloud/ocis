@@ -32,9 +32,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIFavorites/unfavoriteFile.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/unfavoriteFile.feature#L72)
 - [webUIFavorites/unfavoriteFile.feature:89](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/unfavoriteFile.feature#L89)
 - [webUIFavorites/unfavoriteFile.feature:104](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/unfavoriteFile.feature#L104)
-- [webUIFilesSearch/search.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L50)
 - [webUIFilesSearch/search.feature:103](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L103)
-- [webUIFilesSearch/search.feature:129](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L129)
 - [webUIFilesSearch/search.feature:153](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L153)
 - [webUIFilesSearch/search.feature:165](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L165)
 - [webUIFilesSearch/search.feature:175](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L175)
@@ -248,6 +246,9 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIResharing2/reshareUsers.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L71)
 - [webUIResharing2/reshareUsers.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L72)
 - [webUIResharing2/reshareUsers.feature:73](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L73)
+
+### [Regression during ocis 2.0.0-beta](https://github.com/owncloud/ocis/issues/3627)
+- [webUISharingInternalGroups/shareWithGroups.feature:19](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L19)
 
 ### [Different share permissions provides varying roles in oc10 and ocis](https://github.com/owncloud/ocis/issues/1277)
 - [webUISharingInternalGroups/shareWithGroups.feature:166](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L166)
