@@ -6,76 +6,108 @@
 | Type
 | Default Value
 | Description
-| `OCIS_TRACING_ENABLED +
-APP_REGISTRY_TRACING_ENABLED`
+
+|
+`OCIS_TRACING_ENABLED` +
+`APP_REGISTRY_TRACING_ENABLED`
 | bool
 | false
 | Activates tracing.
-| `OCIS_TRACING_TYPE +
-APP_REGISTRY_TRACING_TYPE`
+
+|
+`OCIS_TRACING_TYPE` +
+`APP_REGISTRY_TRACING_TYPE`
 | string
 | 
 | 
-| `OCIS_TRACING_ENDPOINT +
-APP_REGISTRY_TRACING_ENDPOINT`
+
+|
+`OCIS_TRACING_ENDPOINT` +
+`APP_REGISTRY_TRACING_ENDPOINT`
 | string
 | 
 | The endpoint to the tracing collector.
-| `OCIS_TRACING_COLLECTOR +
-APP_REGISTRY_TRACING_COLLECTOR`
+
+|
+`OCIS_TRACING_COLLECTOR` +
+`APP_REGISTRY_TRACING_COLLECTOR`
 | string
 | 
 | 
-| `OCIS_LOG_LEVEL +
-APP_REGISTRY_LOG_LEVEL`
+
+|
+`OCIS_LOG_LEVEL` +
+`APP_REGISTRY_LOG_LEVEL`
 | string
 | 
 | The log level.
-| `OCIS_LOG_PRETTY +
-APP_REGISTRY_LOG_PRETTY`
+
+|
+`OCIS_LOG_PRETTY` +
+`APP_REGISTRY_LOG_PRETTY`
 | bool
 | false
 | Activates pretty log output.
-| `OCIS_LOG_COLOR +
-APP_REGISTRY_LOG_COLOR`
+
+|
+`OCIS_LOG_COLOR` +
+`APP_REGISTRY_LOG_COLOR`
 | bool
 | false
 | Activates colorized log output.
-| `OCIS_LOG_FILE +
-APP_REGISTRY_LOG_FILE`
+
+|
+`OCIS_LOG_FILE` +
+`APP_REGISTRY_LOG_FILE`
 | string
 | 
 | The target log file.
-| `APP_REGISTRY_DEBUG_ADDR`
+
+|
+`APP_REGISTRY_DEBUG_ADDR`
 | string
 | 127.0.0.1:9243
 | 
-| `APP_REGISTRY_DEBUG_TOKEN`
+
+|
+`APP_REGISTRY_DEBUG_TOKEN`
 | string
 | 
 | 
-| `APP_REGISTRY_DEBUG_PPROF`
+
+|
+`APP_REGISTRY_DEBUG_PPROF`
 | bool
 | false
 | 
-| `APP_REGISTRY_DEBUG_ZPAGES`
+
+|
+`APP_REGISTRY_DEBUG_ZPAGES`
 | bool
 | false
 | 
-| `APP_REGISTRY_GRPC_ADDR`
+
+|
+`APP_REGISTRY_GRPC_ADDR`
 | string
 | 127.0.0.1:9242
 | The address of the grpc service.
-| `APP_REGISTRY_GRPC_PROTOCOL`
+
+|
+`APP_REGISTRY_GRPC_PROTOCOL`
 | string
 | tcp
 | The transport protocol of the grpc service.
-| `OCIS_JWT_SECRET +
-APP_REGISTRY_JWT_SECRET`
+
+|
+`OCIS_JWT_SECRET` +
+`APP_REGISTRY_JWT_SECRET`
 | string
 | 
 | 
-| `REVA_GATEWAY`
+
+|
+`REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
 | 

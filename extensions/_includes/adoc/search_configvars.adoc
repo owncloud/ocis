@@ -6,88 +6,126 @@
 | Type
 | Default Value
 | Description
-| `OCIS_TRACING_ENABLED +
-SEARCH_TRACING_ENABLED`
+
+|
+`OCIS_TRACING_ENABLED` +
+`SEARCH_TRACING_ENABLED`
 | bool
 | false
 | 
-| `OCIS_TRACING_TYPE +
-SEARCH_TRACING_TYPE`
+
+|
+`OCIS_TRACING_TYPE` +
+`SEARCH_TRACING_TYPE`
 | string
 | 
 | 
-| `OCIS_TRACING_ENDPOINT +
-SEARCH_TRACING_ENDPOINT`
+
+|
+`OCIS_TRACING_ENDPOINT` +
+`SEARCH_TRACING_ENDPOINT`
 | string
 | 
 | 
-| `OCIS_TRACING_COLLECTOR +
-SEARCH_TRACING_COLLECTOR`
+
+|
+`OCIS_TRACING_COLLECTOR` +
+`SEARCH_TRACING_COLLECTOR`
 | string
 | 
 | 
-| `OCIS_LOG_LEVEL +
-SEARCH_LOG_LEVEL`
+
+|
+`OCIS_LOG_LEVEL` +
+`SEARCH_LOG_LEVEL`
 | string
 | 
 | 
-| `OCIS_LOG_PRETTY +
-SEARCH_LOG_PRETTY`
+
+|
+`OCIS_LOG_PRETTY` +
+`SEARCH_LOG_PRETTY`
 | bool
 | false
 | 
-| `OCIS_LOG_COLOR +
-SEARCH_LOG_COLOR`
+
+|
+`OCIS_LOG_COLOR` +
+`SEARCH_LOG_COLOR`
 | bool
 | false
 | 
-| `OCIS_LOG_FILE +
-SEARCH_LOG_FILE`
+
+|
+`OCIS_LOG_FILE` +
+`SEARCH_LOG_FILE`
 | string
 | 
 | 
-| `SEARCH_DEBUG_ADDR`
+
+|
+`SEARCH_DEBUG_ADDR`
 | string
 | 127.0.0.1:9224
 | 
-| `SEARCH_DEBUG_TOKEN`
+
+|
+`SEARCH_DEBUG_TOKEN`
 | string
 | 
 | 
-| `SEARCH_DEBUG_PPROF`
+
+|
+`SEARCH_DEBUG_PPROF`
 | bool
 | false
 | 
-| `SEARCH_DEBUG_ZPAGES`
+
+|
+`SEARCH_DEBUG_ZPAGES`
 | bool
 | false
 | 
-| `ACCOUNTS_GRPC_ADDR`
+
+|
+`ACCOUNTS_GRPC_ADDR`
 | string
 | 127.0.0.1:9220
 | The address of the grpc service.
-| `SEARCH_DATA_PATH`
+
+|
+`SEARCH_DATA_PATH`
 | string
 | ~/.ocis/search
 | 
-| `REVA_GATEWAY`
+
+|
+`REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
 | 
-| `SEARCH_EVENTS_ENDPOINT`
+
+|
+`SEARCH_EVENTS_ENDPOINT`
 | string
 | 127.0.0.1:9233
 | the address of the streaming service
-| `SEARCH_EVENTS_CLUSTER`
+
+|
+`SEARCH_EVENTS_CLUSTER`
 | string
 | ocis-cluster
 | the clusterID of the streaming service. Mandatory when using nats
-| `SEARCH_EVENTS_GROUP`
+
+|
+`SEARCH_EVENTS_GROUP`
 | string
 | search
 | the customergroup of the service. One group will only get one copy of an event
-| `OCIS_MACHINE_AUTH_API_KEY +
-SEARCH_MACHINE_AUTH_API_KEY`
+
+|
+`OCIS_MACHINE_AUTH_API_KEY` +
+`SEARCH_MACHINE_AUTH_API_KEY`
 | string
 | 
 | 

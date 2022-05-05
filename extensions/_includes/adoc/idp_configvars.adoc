@@ -6,238 +6,346 @@
 | Type
 | Default Value
 | Description
-| `IDP_PASSWORD_RESET_URI`
+
+|
+`IDP_PASSWORD_RESET_URI`
 | string
 | 
 | The URI where a user can reset their password.
-| `OCIS_TRACING_ENABLED +
-IDP_TRACING_ENABLED`
+
+|
+`OCIS_TRACING_ENABLED` +
+`IDP_TRACING_ENABLED`
 | bool
 | false
 | 
-| `OCIS_TRACING_TYPE +
-IDP_TRACING_TYPE`
+
+|
+`OCIS_TRACING_TYPE` +
+`IDP_TRACING_TYPE`
 | string
 | 
 | 
-| `OCIS_TRACING_ENDPOINT +
-IDP_TRACING_ENDPOINT`
+
+|
+`OCIS_TRACING_ENDPOINT` +
+`IDP_TRACING_ENDPOINT`
 | string
 | 
 | 
-| `OCIS_TRACING_COLLECTOR +
-IDP_TRACING_COLLECTOR`
+
+|
+`OCIS_TRACING_COLLECTOR` +
+`IDP_TRACING_COLLECTOR`
 | string
 | 
 | 
-| `OCIS_LOG_LEVEL +
-IDP_LOG_LEVEL`
+
+|
+`OCIS_LOG_LEVEL` +
+`IDP_LOG_LEVEL`
 | string
 | 
 | 
-| `OCIS_LOG_PRETTY +
-IDP_LOG_PRETTY`
+
+|
+`OCIS_LOG_PRETTY` +
+`IDP_LOG_PRETTY`
 | bool
 | false
 | 
-| `OCIS_LOG_COLOR +
-IDP_LOG_COLOR`
+
+|
+`OCIS_LOG_COLOR` +
+`IDP_LOG_COLOR`
 | bool
 | false
 | 
-| `OCIS_LOG_FILE +
-IDP_LOG_FILE`
+
+|
+`OCIS_LOG_FILE` +
+`IDP_LOG_FILE`
 | string
 | 
 | 
-| `IDP_DEBUG_ADDR`
+
+|
+`IDP_DEBUG_ADDR`
 | string
 | 127.0.0.1:9134
 | 
-| `IDP_DEBUG_TOKEN`
+
+|
+`IDP_DEBUG_TOKEN`
 | string
 | 
 | 
-| `IDP_DEBUG_PPROF`
+
+|
+`IDP_DEBUG_PPROF`
 | bool
 | false
 | 
-| `IDP_DEBUG_ZPAGES`
+
+|
+`IDP_DEBUG_ZPAGES`
 | bool
 | false
 | 
-| `IDP_HTTP_ADDR`
+
+|
+`IDP_HTTP_ADDR`
 | string
 | 127.0.0.1:9130
 | 
-| `IDP_HTTP_ROOT`
+
+|
+`IDP_HTTP_ROOT`
 | string
 | /
 | 
-| `IDP_TRANSPORT_TLS_CERT`
+
+|
+`IDP_TRANSPORT_TLS_CERT`
 | string
 | ~/.ocis/idp/server.crt
 | 
-| `IDP_TRANSPORT_TLS_KEY`
+
+|
+`IDP_TRANSPORT_TLS_KEY`
 | string
 | ~/.ocis/idp/server.key
 | 
-| `IDP_TLS`
+
+|
+`IDP_TLS`
 | bool
 | false
 | 
-| `IDP_ASSET_PATH`
+
+|
+`IDP_ASSET_PATH`
 | string
 | 
 | 
-| `OCIS_URL +
-IDP_ISS`
+
+|
+`OCIS_URL` +
+`IDP_ISS`
 | string
 | https://localhost:9200
 | 
-| `IDP_IDENTITY_MANAGER`
+
+|
+`IDP_IDENTITY_MANAGER`
 | string
 | ldap
 | 
-| `IDP_URI_BASE_PATH`
+
+|
+`IDP_URI_BASE_PATH`
 | string
 | 
 | 
-| `IDP_SIGN_IN_URI`
+
+|
+`IDP_SIGN_IN_URI`
 | string
 | 
 | 
-| `IDP_SIGN_OUT_URI`
+
+|
+`IDP_SIGN_OUT_URI`
 | string
 | 
 | 
-| `IDP_ENDPOINT_URI`
+
+|
+`IDP_ENDPOINT_URI`
 | string
 | 
 | 
-| `IDP_ENDSESSION_ENDPOINT_URI`
+
+|
+`IDP_ENDSESSION_ENDPOINT_URI`
 | string
 | 
 | 
-| `IDP_INSECURE`
+
+|
+`IDP_INSECURE`
 | bool
 | false
 | 
-| `IDP_ALLOW_CLIENT_GUESTS`
+
+|
+`IDP_ALLOW_CLIENT_GUESTS`
 | bool
 | false
 | 
-| `IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION`
+
+|
+`IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION`
 | bool
 | false
 | 
-| `IDP_ENCRYPTION_SECRET`
+
+|
+`IDP_ENCRYPTION_SECRET`
 | string
 | 
 | 
-| `IDP_DISABLE_IDENTIFIER_WEBAPP`
+
+|
+`IDP_DISABLE_IDENTIFIER_WEBAPP`
 | bool
 | true
 | 
-| `IDP_IDENTIFIER_CLIENT_PATH`
+
+|
+`IDP_IDENTIFIER_CLIENT_PATH`
 | string
 | ~/.ocis/idp
 | 
-| `IDP_IDENTIFIER_REGISTRATION_CONF`
+
+|
+`IDP_IDENTIFIER_REGISTRATION_CONF`
 | string
 | ~/.ocis/idp/identifier-registration.yaml
 | 
-| `IDP_IDENTIFIER_SCOPES_CONF`
+
+|
+`IDP_IDENTIFIER_SCOPES_CONF`
 | string
 | 
 | 
-| `IDP_SIGNING_KID`
+
+|
+`IDP_SIGNING_KID`
 | string
 | 
 | 
-| `IDP_SIGNING_METHOD`
+
+|
+`IDP_SIGNING_METHOD`
 | string
 | PS256
 | 
-| `IDP_VALIDATION_KEYS_PATH`
+
+|
+`IDP_VALIDATION_KEYS_PATH`
 | string
 | 
 | 
-| `IDP_ACCESS_TOKEN_EXPIRATION`
+
+|
+`IDP_ACCESS_TOKEN_EXPIRATION`
 | uint64
 | 600
 | 
-| `IDP_ID_TOKEN_EXPIRATION`
+
+|
+`IDP_ID_TOKEN_EXPIRATION`
 | uint64
 | 3600
 | 
-| `IDP_REFRESH_TOKEN_EXPIRATION`
+
+|
+`IDP_REFRESH_TOKEN_EXPIRATION`
 | uint64
 | 94608000
 | 
-| ``
+
+|
+``
 | uint64
 | 0
 | 
-| `LDAP_URI +
-IDP_LDAP_URI`
+
+|
+`LDAP_URI` +
+`IDP_LDAP_URI`
 | string
 | ldaps://localhost:9235
 | 
-| `LDAP_CACERT +
-IDP_LDAP_TLS_CACERT`
+
+|
+`LDAP_CACERT` +
+`IDP_LDAP_TLS_CACERT`
 | string
 | ~/.ocis/idm/ldap.crt
 | 
-| `LDAP_BIND_DN +
-IDP_LDAP_BIND_DN`
+
+|
+`LDAP_BIND_DN` +
+`IDP_LDAP_BIND_DN`
 | string
 | uid=idp,ou=sysusers,o=libregraph-idm
 | 
-| `LDAP_BIND_PASSWORD +
-IDP_LDAP_BIND_PASSWORD`
+
+|
+`LDAP_BIND_PASSWORD` +
+`IDP_LDAP_BIND_PASSWORD`
 | string
 | 
 | 
-| `LDAP_USER_BASE_DN,IDP_LDAP_BASE_DN`
+
+|
+`LDAP_USER_BASE_DN,IDP_LDAP_BASE_DN`
 | string
 | ou=users,o=libregraph-idm
 | 
-| `LDAP_USER_SCOPE +
-IDP_LDAP_SCOPE`
+
+|
+`LDAP_USER_SCOPE` +
+`IDP_LDAP_SCOPE`
 | string
 | sub
 | 
-| `IDP_LDAP_LOGIN_ATTRIBUTE`
+
+|
+`IDP_LDAP_LOGIN_ATTRIBUTE`
 | string
 | uid
 | 
-| `LDAP_USER_SCHEMA_MAIL +
-IDP_LDAP_EMAIL_ATTRIBUTE`
+
+|
+`LDAP_USER_SCHEMA_MAIL` +
+`IDP_LDAP_EMAIL_ATTRIBUTE`
 | string
 | mail
 | 
-| `LDAP_USER_SCHEMA_USERNAME +
-IDP_LDAP_NAME_ATTRIBUTE`
+
+|
+`LDAP_USER_SCHEMA_USERNAME` +
+`IDP_LDAP_NAME_ATTRIBUTE`
 | string
 | displayName
 | 
-| `LDAP_USER_SCHEMA_ID +
-IDP_LDAP_UUID_ATTRIBUTE`
+
+|
+`LDAP_USER_SCHEMA_ID` +
+`IDP_LDAP_UUID_ATTRIBUTE`
 | string
 | uid
 | 
-| `IDP_LDAP_UUID_ATTRIBUTE_TYPE`
+
+|
+`IDP_LDAP_UUID_ATTRIBUTE_TYPE`
 | string
 | text
 | 
-| `LDAP_USER_FILTER +
-IDP_LDAP_FILTER`
+
+|
+`LDAP_USER_FILTER` +
+`IDP_LDAP_FILTER`
 | string
 | 
 | 
-| `LDAP_USER_OBJECTCLASS +
-IDP_LDAP_OBJECTCLASS`
+
+|
+`LDAP_USER_OBJECTCLASS` +
+`IDP_LDAP_OBJECTCLASS`
 | string
 | inetOrgPerson
 | 

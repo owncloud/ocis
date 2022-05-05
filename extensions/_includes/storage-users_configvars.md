@@ -25,8 +25,8 @@
 | STORAGE_USERS_OCIS_ROOT | string | ~/.ocis/storage/users | |
 | STORAGE_USERS_OCIS_USER_LAYOUT | string | {{.Id.OpaqueId}} | |
 | STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT | string | 127.0.0.1:9191 | |
-| STORAGE_USERS_OCIS_PERSONAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.User.Username | lower}} | |
-| STORAGE_USERS_OCIS_GENERAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}} | |
+| STORAGE_USERS_OCIS_PERSONAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.User.Username \| lower}} | |
+| STORAGE_USERS_OCIS_GENERAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.SpaceName \| replace &#34; &#34; &#34;-&#34; \| lower}} | |
 | STORAGE_USERS_OCIS_SHARE_FOLDER | string | /Shares | |
 | STORAGE_USERS_S3NG_ROOT | string | ~/.ocis/storage/users | |
 | STORAGE_USERS_S3NG_USER_LAYOUT | string | {{.Id.OpaqueId}} | |
@@ -36,8 +36,8 @@
 | STORAGE_USERS_S3NG_SECRET_KEY | string |  | |
 | STORAGE_USERS_S3NG_ENDPOINT | string |  | |
 | STORAGE_USERS_S3NG_BUCKET | string |  | |
-| STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.User.Username | lower}} | |
-| STORAGE_USERS_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}} | |
+| STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.User.Username \| lower}} | |
+| STORAGE_USERS_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.SpaceName \| replace &#34; &#34; &#34;-&#34; \| lower}} | |
 | STORAGE_USERS_S3NG_SHARE_FOLDER | string | /Shares | |
 | STORAGE_USERS_OWNCLOUDSQL_DATADIR | string | ~/.ocis/storage/owncloud | |
 | STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER | string | /Shares | |
