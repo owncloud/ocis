@@ -34,6 +34,7 @@ type Config struct {
 
 	PublicURL string `yaml:"public_url" env:"OCIS_URL;FRONTEND_PUBLIC_URL"`
 
+	AppHandler  AppHandler  `yaml:"app_handler"`
 	Archiver    Archiver    `yaml:"archiver"`
 	DataGateway DataGateway `yaml:"data_gateway"`
 	OCS         OCS         `yaml:"ocs"`
@@ -84,6 +85,11 @@ type Middleware struct {
 // Auth configures reva http auth middleware.
 type Auth struct {
 	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agent"`
+}
+
+type AppHandler struct {
+	Prefix   string `yaml:"-"`
+	Insecure bool   `yaml:"insecure" env:"OCIS_INSECURE;FRONTEND_APP_HANDLER_INSECURE"`
 }
 
 type Archiver struct {

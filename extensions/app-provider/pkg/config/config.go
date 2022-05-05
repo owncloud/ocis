@@ -18,8 +18,8 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	ExternalAddr string  `yaml:"external_addr"`
-	Driver       string  `yaml:"driver"`
+	ExternalAddr string  `yaml:"external_addr" env:"APP_PROVIDER_EXTERNAL_ADDR"`
+	Driver       string  `yaml:"driver" env:"APP_PROVIDER_DRIVER"`
 	Drivers      Drivers `yaml:"drivers"`
 
 	Supervised bool            `yaml:"-"`

@@ -695,7 +695,7 @@ services:
       OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      STORAGE_GATEWAY_GRPC_ADDR: 0.0.0.0:9142
+      GATEWAY_GRPC_ADDR: 0.0.0.0:9142
 
       REVA_GATEWAY: storage-gateway:9142
 

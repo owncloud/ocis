@@ -42,6 +42,9 @@ func DefaultConfig() *config.Config {
 			SupportedTypes:      []string{"sha1", "md5", "adler32"},
 			PreferredUploadType: "",
 		},
+		AppHandler: config.AppHandler{
+			Prefix: "app",
+		},
 		Archiver: config.Archiver{
 			Insecure:    false,
 			Prefix:      "archiver",
