@@ -31,7 +31,6 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "idp",
 		},
-		Asset: config.Asset{},
 		IDP: config.Settings{
 			Iss:                               "https://localhost:9200",
 			IdentityManager:                   "ldap",
@@ -49,7 +48,7 @@ func DefaultConfig() *config.Config {
 			Listen:                            "",
 			IdentifierClientDisabled:          true,
 			IdentifierClientPath:              path.Join(defaults.BaseDataPath(), "idp"),
-			IdentifierRegistrationConf:        path.Join(defaults.BaseDataPath(), "idp", "identifier-registration.yaml"),
+			IdentifierRegistrationConf:        path.Join(defaults.BaseDataPath(), "idp", "tmp", "identifier-registration.yaml"),
 			IdentifierScopesConf:              "",
 			IdentifierDefaultBannerLogo:       "",
 			IdentifierDefaultSignInPageText:   "",
@@ -64,6 +63,61 @@ func DefaultConfig() *config.Config {
 			IDTokenDurationSeconds:            60 * 60,                // 1 hour
 			RefreshTokenDurationSeconds:       60 * 60 * 24 * 365 * 3, // 1 year
 			DyamicClientSecretDurationSeconds: 0,
+		},
+		Clients: []config.Client{
+			{
+				ID:      "web",
+				Name:    "ownCloud Web app",
+				Trusted: true,
+				RedirectURIs: []string{
+					"{{OCIS_URL}}/",
+					"{{OCIS_URL}}/oidc-callback.html",
+					"{{OCIS_URL}}/oidc-silent-redirect.html",
+				},
+				Origins: []string{
+					"{{OCIS_URL}}",
+				},
+			},
+			{
+				ID:      "ocis-explorer.js",
+				Name:    "oCIS Graph Explorer",
+				Trusted: true,
+				RedirectURIs: []string{
+					"{{OCIS_URL}}/graph-explorer/",
+				},
+				Origins: []string{
+					"{{OCIS_URL}}",
+				},
+			},
+			{
+				ID:              "xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69",
+				Secret:          "UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh",
+				Name:            "ownCloud desktop app",
+				ApplicationType: "native",
+				RedirectURIs: []string{
+					"http://127.0.0.1",
+					"http://localhost",
+				},
+			},
+			{
+				ID:              "e4rAsNUSIUs0lF4nbv9FmCeUkTlV9GdgTLDH1b5uie7syb90SzEVrbN7HIpmWJeD",
+				Secret:          "dInFYGV33xKzhbRmpqQltYNdfLdJIfJ9L5ISoKhNoT9qZftpdWSP71VrpGR9pmoD",
+				Name:            "ownCloud Android app",
+				ApplicationType: "native",
+				RedirectURIs: []string{
+					"oc://android.owncloud.com",
+				},
+			},
+			{
+				ID:              "mxd5OQDk6es5LzOzRvidJNfXLUZS2oN3oUFeXPP8LpPrhx3UroJFduGEYIBOxkY1",
+				Secret:          "KFeFWWEZO9TkisIQzR3fo7hfiMXlOpaqP8CFuTbSHzV1TUuGECglPxpiVKJfOXIx",
+				Name:            "ownCloud iOS app",
+				ApplicationType: "native",
+				RedirectURIs: []string{
+					"oc://ios.owncloud.com",
+					"oc.ios://ios.owncloud.com",
+				},
+			},
 		},
 		Ldap: config.Ldap{
 			URI:               "ldaps://localhost:9235",
