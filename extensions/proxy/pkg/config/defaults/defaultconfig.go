@@ -107,6 +107,16 @@ func DefaultPolicies() []config.Policy {
 					Backend:  "http://localhost:9115", // TODO use registry?
 				},
 				{
+					Type:     config.QueryRoute,
+					Endpoint: "/dav/?preview=1",
+					Backend:  "http://localhost:9115",
+				},
+				{
+					Type:     config.QueryRoute,
+					Endpoint: "/webdav/?preview=1",
+					Backend:  "http://localhost:9115",
+				},
+				{
 					Endpoint: "/remote.php/",
 					Service:  "ocdav",
 				},
