@@ -15,16 +15,29 @@
                 "OCIS_LOG_LEVEL": "debug",
                 "OCIS_LOG_PRETTY": "true",
                 "OCIS_LOG_COLOR": "true",
-                // user id of "admin", for user creation and admin role assignement
-                "OCIS_ADMIN_USER_ID": "some-admin-user-id-0000-000000000000", // FIXME currently must have the length of a UUID, see reva/pkg/storage/utils/decomposedfs/spaces.go:228
                 // set insecure options because we don't have valid certificates in dev environments
                 "OCIS_INSECURE": "true",
+                // enable basic auth for dev setup so that we can use curl for testing
+                "PROXY_ENABLE_BASIC_AUTH": "true",
+                // demo users
+                "IDM_CREATE_DEMO_USERS": "true",
+                // OCIS_RUN_EXTENSIONS allows to start a subset of extensions even in the supervised mode
+                //"OCIS_RUN_EXTENSIONS": "settings,storage-system,glauth,graph,graph-explorer,idp,ocs,store,thumbnails,web,webdav,frontend,gateway,user,group,auth-basic,auth-bearer,storage-authmachine,storage-users,storage-shares,storage-publiclink,app-provider,sharing,accounts,proxy,ocdav",
+
+                /*
+                 * Keep secrets and passwords in one block to allow easy uncommenting
+                 */
+                // user id of "admin", for user creation and admin role assignement
+                "OCIS_ADMIN_USER_ID": "some-admin-user-id-0000-000000000000", // FIXME currently must have the length of a UUID, see reva/pkg/storage/utils/decomposedfs/spaces.go:228
+                // admin user default password
+                "IDM_ADMIN_PASSWORD": "admin",
+                // system user
+                "OCIS_SYSTEM_USER_ID": "some-system-user-id-000-000000000000", // FIXME currently must have the length of a UUID, see reva/pkg/storage/utils/decomposedfs/spaces.go:228
+                "OCIS_SYSTEM_USER_API_KEY": "some-system-user-machine-auth-api-key",
                 // set some hardcoded secrets
                 "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
                 "OCIS_MACHINE_AUTH_API_KEY": "some-ocis-machine-auth-api-key",
                 "STORAGE_TRANSFER_SECRET": "some-ocis-transfer-secret",
-                // enable basic auth for dev setup so that we can use curl for testing
-                "PROXY_ENABLE_BASIC_AUTH": "true",
                 // idm ldap
                 "IDM_SVC_PASSWORD": "some-ldap-idm-password",
                 "GRAPH_LDAP_BIND_PASSWORD": "some-ldap-idm-password",
@@ -36,14 +49,6 @@
                 // idp ldap
                 "IDM_IDPSVC_PASSWORD": "some-ldap-idp-password",
                 "IDP_LDAP_BIND_PASSWORD": "some-ldap-idp-password",
-                // admin user default password
-                "IDM_ADMIN_PASSWORD": "admin",
-                // demo users
-                "IDM_CREATE_DEMO_USERS": "true",
-                // system user
-                "OCIS_SYSTEM_USER_ID": "some-system-user-id-000-000000000000", // FIXME currently must have the length of a UUID, see reva/pkg/storage/utils/decomposedfs/spaces.go:228
-                // OCIS_RUN_EXTENSIONS allows to start a subset of extensions even in the supervised mode
-                //"OCIS_RUN_EXTENSIONS": "settings,storage-system,glauth,graph,graph-explorer,idp,ocs,store,thumbnails,web,webdav,frontend,gateway,user,group,auth-basic,auth-bearer,storage-authmachine,storage-users,storage-shares,storage-publiclink,app-provider,sharing,accounts,proxy,ocdav",
             }
         }
     ]
