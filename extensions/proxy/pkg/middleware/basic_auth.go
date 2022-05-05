@@ -118,6 +118,7 @@ func (m basicAuth) isPublicLink(req *http.Request) bool {
 		"/remote.php/dav/public-files/",
 		"/remote.php/ocs/apps/files_sharing/api/v1/tokeninfo/unprotected",
 		"/ocs/v1.php/cloud/capabilities",
+		"/data",
 	}
 	isPublic := false
 
