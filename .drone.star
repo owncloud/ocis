@@ -55,7 +55,7 @@ config = {
         "extensions/glauth",
         "extensions/graph-explorer",
         "extensions/graph",
-        "extensions/group",
+        "extensions/groups",
         "extensions/idm",
         "extensions/idp",
         "extensions/nats",
@@ -71,7 +71,7 @@ config = {
         "extensions/storage-users",
         "extensions/store",
         "extensions/thumbnails",
-        "extensions/user",
+        "extensions/users",
         "extensions/web",
         "extensions/webdav",
         "ocis-pkg",
@@ -1721,7 +1721,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "SHARING_USER_OWNCLOUDSQL_DB_NAME": "owncloud",
             # General oCIS config
             # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
-            "OCIS_RUN_EXTENSIONS": "settings,storage-system,graph,graph-explorer,ocs,store,thumbnails,web,webdav,frontend,gateway,user,group,auth-basic,auth-bearer,auth-machine,storage-users,storage-shares,storage-publiclink,app-provider,sharing,proxy,nats,ocdav",
+            "OCIS_RUN_EXTENSIONS": "settings,storage-system,graph,graph-explorer,ocs,store,thumbnails,web,webdav,frontend,gateway,users,groups,auth-basic,auth-bearer,auth-machine,storage-users,storage-shares,storage-publiclink,app-provider,sharing,proxy,nats,ocdav",
             "OCIS_LOG_LEVEL": "info",
             "OCIS_URL": OCIS_URL,
             "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",

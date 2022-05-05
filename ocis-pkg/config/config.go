@@ -15,7 +15,7 @@ import (
 	glauth "github.com/owncloud/ocis/v2/extensions/glauth/pkg/config"
 	graphExplorer "github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/v2/extensions/graph/pkg/config"
-	group "github.com/owncloud/ocis/v2/extensions/group/pkg/config"
+	groups "github.com/owncloud/ocis/v2/extensions/groups/pkg/config"
 	idm "github.com/owncloud/ocis/v2/extensions/idm/pkg/config"
 	idp "github.com/owncloud/ocis/v2/extensions/idp/pkg/config"
 	nats "github.com/owncloud/ocis/v2/extensions/nats/pkg/config"
@@ -32,7 +32,7 @@ import (
 	storageusers "github.com/owncloud/ocis/v2/extensions/storage-users/pkg/config"
 	store "github.com/owncloud/ocis/v2/extensions/store/pkg/config"
 	thumbnails "github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/config"
-	user "github.com/owncloud/ocis/v2/extensions/user/pkg/config"
+	users "github.com/owncloud/ocis/v2/extensions/users/pkg/config"
 	web "github.com/owncloud/ocis/v2/extensions/web/pkg/config"
 	webdav "github.com/owncloud/ocis/v2/extensions/webdav/pkg/config"
 )
@@ -86,7 +86,7 @@ type Config struct {
 	GLAuth            *glauth.Config        `yaml:"glauth"`
 	Graph             *graph.Config         `yaml:"graph"`
 	GraphExplorer     *graphExplorer.Config `yaml:"graph_explorer"`
-	Group             *group.Config         `yaml:"group"`
+	Groups            *groups.Config        `yaml:"groups"`
 	IDM               *idm.Config           `yaml:"idm"`
 	IDP               *idp.Config           `yaml:"idp"`
 	Nats              *nats.Config          `yaml:"nats"`
@@ -102,7 +102,7 @@ type Config struct {
 	StorageUsers      *storageusers.Config  `yaml:"storage_users"`
 	Store             *store.Config         `yaml:"store"`
 	Thumbnails        *thumbnails.Config    `yaml:"thumbnails"`
-	User              *user.Config          `yaml:"user"`
+	Users             *users.Config         `yaml:"users"`
 	Web               *web.Config           `yaml:"web"`
 	WebDAV            *webdav.Config        `yaml:"webdav"`
 	Search            *search.Config        `yaml:"search"`

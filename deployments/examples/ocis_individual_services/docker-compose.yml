@@ -589,7 +589,7 @@ services:
       driver: "local"
     restart: always
 
-  storage-userprovider:
+  users:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
       replicas: ${OCIS_SCALE:-1}
@@ -597,14 +597,14 @@ services:
       ocis-net:
     entrypoint:
       - ocis
-      - storage-userprovider
+      - users
       - server
     environment:
       OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
       OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      STORAGE_USERPROVIDER_ENDPOINT: storage-userprovider:9144
+      STORAGE_USERPROVIDER_ENDPOINT: users:9144
       STORAGE_USERPROVIDER_ADDR: 0.0.0.0:9144
 
       STORAGE_USERPROVIDER_DRIVER: ldap
@@ -619,7 +619,7 @@ services:
       driver: "local"
     restart: always
 
-  storage-groupprovider:
+  groups:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
       replicas: ${OCIS_SCALE:-1}
@@ -627,14 +627,14 @@ services:
       ocis-net:
     entrypoint:
       - ocis
-      - storage-groupprovider
+      - groups
       - server
     environment:
       OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
       OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      STORAGE_GROUPPROVIDER_ENDPOINT: storage-groupprovider:9160
+      STORAGE_GROUPPROVIDER_ENDPOINT: groups:9160
       STORAGE_GROUPPROVIDER_ADDR: 0.0.0.0:9160
 
       STORAGE_GROUPPROVIDER_DRIVER: ldap
@@ -708,10 +708,10 @@ services:
       STORAGE_AUTH_MACHINE_ENDPOINT: storage-authmachine:9148
 
       STORAGE_SHARES_ENDPOINT: storage-shares:9154
-      STORAGE_SHARING_ENDPOINT: storage-sharing:9150
+      STORAGE_SHARING_ENDPOINT: sharing:9150
 
-      STORAGE_GROUPPROVIDER_ENDPOINT: storage-groupprovider:9160
-      STORAGE_USERPROVIDER_ENDPOINT: storage-userprovider:9144
+      STORAGE_GROUPPROVIDER_ENDPOINT: groups:9160
+      STORAGE_USERPROVIDER_ENDPOINT: users:9144
       STORAGE_PERMISSIONS_ENDPOINT: settings:9191
 
       STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
