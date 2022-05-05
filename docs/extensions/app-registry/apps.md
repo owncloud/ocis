@@ -439,7 +439,7 @@ services:
     ...
     environment:
       ...
-      STORAGE_GATEWAY_GRPC_ADDR: 0.0.0.0:9142 # make the REVA gateway accessible to the app drivers
+      GATEWAY_GRPC_ADDR: 0.0.0.0:9142 # make the REVA gateway accessible to the app drivers
 
   ocis-appdriver-collabora:
     image: owncloud/ocis:latest

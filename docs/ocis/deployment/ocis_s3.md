@@ -49,47 +49,47 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
 * Open the `.env` file in a text editor
   The file by default looks like this:
+
   ```bash
-      # If you're on a internet facing server please comment out following line.
-      # It skips certificate validation for various parts of oCIS and is needed if you use self signed certificates.
-      INSECURE=true
+  # If you're on a internet facing server please comment out following line.
+  # It skips certificate validation for various parts of oCIS and is needed if you use self signed certificates.
+  INSECURE=true
 
-      ### Traefik settings ###
-      # Serve Traefik dashboard. Defaults to "false".
-      TRAEFIK_DASHBOARD=
-      # Domain of Traefik, where you can find the dashboard. Defaults to "traefik.owncloud.test"
-      TRAEFIK_DOMAIN=
-      # Basic authentication for the dashboard. Defaults to user "admin" and password "admin"
-      TRAEFIK_BASIC_AUTH_USERS=
-      # Email address for obtaining LetsEncrypt certificates, needs only be changed if this is a public facing server
-      TRAEFIK_ACME_MAIL=
+  ### Traefik settings ###
+  # Serve Traefik dashboard. Defaults to "false".
+  TRAEFIK_DASHBOARD=
+  # Domain of Traefik, where you can find the dashboard. Defaults to "traefik.owncloud.test"
+  TRAEFIK_DOMAIN=
+  # Basic authentication for the dashboard. Defaults to user "admin" and password "admin"
+  TRAEFIK_BASIC_AUTH_USERS=
+  # Email address for obtaining LetsEncrypt certificates, needs only be changed if this is a public facing server
+  TRAEFIK_ACME_MAIL=
 
-      ### oCIS settings ###
-      # oCIS version. Defaults to "latest"
-      OCIS_DOCKER_TAG=
-      # Domain of oCIS, where you can find the frontend. Defaults to "ocis.owncloud.test"
-      OCIS_DOMAIN=
-      # IDP LDAP bind password. Must be changed in order to have a secure oCIS. Defaults to "idp".
-      IDP_LDAP_BIND_PASSWORD=
-      # Storage LDAP bind password. Must be changed in order to have a secure oCIS. Defaults to "reva".
-      STORAGE_LDAP_BIND_PASSWORD=
-      # JWT secret which is used for the storage provider. Must be changed in order to have a secure oCIS. Defaults to "Pive-Fumkiu4"
-      OCIS_JWT_SECRET=
-      # JWT secret which is used for uploads to create transfer tokens. Must be changed in order to have a secure oCIS. Defaults to "replace-me-with-a-transfer-secret"
-      STORAGE_TRANSFER_SECRET=
-      # Machine auth api key secret. Must be changed in order to have a secure oCIS. Defaults to "change-me-please"
-      OCIS_MACHINE_AUTH_API_KEY=
+  ### oCIS settings ###
+  # oCIS version. Defaults to "latest"
+  OCIS_DOCKER_TAG=
+  # Domain of oCIS, where you can find the frontend. Defaults to "ocis.owncloud.test"
+  OCIS_DOMAIN=
+  # IDP LDAP bind password. Must be changed in order to have a secure oCIS. Defaults to "idp".
+  IDP_LDAP_BIND_PASSWORD=
+  # Storage LDAP bind password. Must be changed in order to have a secure oCIS. Defaults to "reva".
+  STORAGE_LDAP_BIND_PASSWORD=
+  # JWT secret which is used for the storage provider. Must be changed in order to have a secure oCIS. Defaults to "Pive-Fumkiu4"
+  OCIS_JWT_SECRET=
+  # JWT secret which is used for uploads to create transfer tokens. Must be changed in order to have a secure oCIS. Defaults to "replace-me-with-a-transfer-secret"
+  STORAGE_TRANSFER_SECRET=
+  # Machine auth api key secret. Must be changed in order to have a secure oCIS. Defaults to "change-me-please"
+  OCIS_MACHINE_AUTH_API_KEY=
 
-      ### MINIO / S3 settings ###
-      # Domain of MinIO where the Web UI is accessible. Defaults to "minio.owncloud.test".
-      MINIO_DOMAIN=
-      # S3 bucket name, where oCIS stores its data in. Defaults to "ocis-bucket".
-      MINIO_BUCKET=
-      # S3 bucket access key, which oCIS uses to authenticate. Defaults to "ocis".
-      MINIO_ACCESS_KEY=
-      # S3 bucket access key secret, which oCIS uses to authenticate. Defaults to "ocis-secret-key".
-      MINIO_SECRET_KEY=
-
+  ### MINIO / S3 settings ###
+  # Domain of MinIO where the Web UI is accessible. Defaults to "minio.owncloud.test".
+  MINIO_DOMAIN=
+  # S3 bucket name, where oCIS stores its data in. Defaults to "ocis-bucket".
+  MINIO_BUCKET=
+  # S3 bucket access key, which oCIS uses to authenticate. Defaults to "ocis".
+  MINIO_ACCESS_KEY=
+  # S3 bucket access key secret, which oCIS uses to authenticate. Defaults to "ocis-secret-key".
+  MINIO_SECRET_KEY=
   ```
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.

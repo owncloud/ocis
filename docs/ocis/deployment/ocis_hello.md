@@ -48,34 +48,34 @@ See also [example server setup]({{< ref "preparing_server" >}})
   The file by default looks like this:
 
   ```bash
-    # If you're on a internet facing server please comment out following line.
-    # It skips certificate validation for various parts of oCIS and is needed if you use self signed certificates.
-    INSECURE=true
+  # If you're on a internet facing server please comment out following line.
+  # It skips certificate validation for various parts of oCIS and is needed if you use self signed certificates.
+  INSECURE=true
 
-    ### Traefik settings ###
-    # Serve Traefik dashboard. Defaults to "false".
-    TRAEFIK_DASHBOARD=
-    # Domain of Traefik, where you can find the dashboard. Defaults to "traefik.owncloud.test"
-    TRAEFIK_DOMAIN=
-    # Basic authentication for the dashboard. Defaults to user "admin" and password "admin"
-    TRAEFIK_BASIC_AUTH_USERS=
-    # Email address for obtaining LetsEncrypt certificates, needs only be changed if this is a public facing server
-    TRAEFIK_ACME_MAIL=
+  ### Traefik settings ###
+  # Serve Traefik dashboard. Defaults to "false".
+  TRAEFIK_DASHBOARD=
+  # Domain of Traefik, where you can find the dashboard. Defaults to "traefik.owncloud.test"
+  TRAEFIK_DOMAIN=
+  # Basic authentication for the dashboard. Defaults to user "admin" and password "admin"
+  TRAEFIK_BASIC_AUTH_USERS=
+  # Email address for obtaining LetsEncrypt certificates, needs only be changed if this is a public facing server
+  TRAEFIK_ACME_MAIL=
 
-    ### oCIS settings ###
-    # oCIS version. Defaults to "latest"
-    OCIS_DOCKER_TAG=
-    # Domain of oCIS, where you can find the frontend. Defaults to "ocis.owncloud.test"
-    OCIS_DOMAIN=
-    # oCIS admin user password. Defaults to "admin".
-    ADMIN_PASSWORD=
-    # The demo users should not be created on a production instance
-    # because their passwords are public. Defaults to "false".
-    DEMO_USERS=
+  ### oCIS settings ###
+  # oCIS version. Defaults to "latest"
+  OCIS_DOCKER_TAG=
+  # Domain of oCIS, where you can find the frontend. Defaults to "ocis.owncloud.test"
+  OCIS_DOMAIN=
+  # oCIS admin user password. Defaults to "admin".
+  ADMIN_PASSWORD=
+  # The demo users should not be created on a production instance
+  # because their passwords are public. Defaults to "false".
+  DEMO_USERS=
 
-    ### oCIS Hello settings ###
-    # oCIS Hello version. Defaults to "latest"
-    OCIS_HELLO_DOCKER_TAG=
+  ### oCIS Hello settings ###
+  # oCIS Hello version. Defaults to "latest"
+  OCIS_HELLO_DOCKER_TAG=
   ```
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
