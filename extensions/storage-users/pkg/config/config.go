@@ -129,7 +129,7 @@ type OwnCloudSQLDriver struct {
 	DBHost                string `yaml:"db_host" env:"STORAGE_USERS_OWNCLOUDSQL_DB_HOST"`
 	DBPort                int    `yaml:"db_port" env:"STORAGE_USERS_OWNCLOUDSQL_DB_PORT"`
 	DBName                string `yaml:"db_name" env:"STORAGE_USERS_OWNCLOUDSQL_DB_NAME"`
-	UsersProviderEndpoint string `yaml:"users_provider_endpoint" env:"STORAGE_USERS_PERMISSION_ENDPOINT;STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT"`
+	UsersProviderEndpoint string `yaml:"users_provider_endpoint" env:"STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT"`
 }
 
 type Events struct {

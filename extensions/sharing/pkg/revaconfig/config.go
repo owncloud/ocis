@@ -41,6 +41,7 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"janitor_run_interval":          cfg.UserSharingDrivers.SQL.JanitorRunInterval,
 						},
 						"owncloudsql": map[string]interface{}{
+							"gateway_addr":     cfg.Reva.Address,
 							"storage_mount_id": cfg.UserSharingDrivers.OwnCloudSQL.UserStorageMountID,
 							"db_username":      cfg.UserSharingDrivers.OwnCloudSQL.DBUsername,
 							"db_password":      cfg.UserSharingDrivers.OwnCloudSQL.DBPassword,
