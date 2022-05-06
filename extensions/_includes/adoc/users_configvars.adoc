@@ -7,355 +7,302 @@
 | Default Value
 | Description
 
-|
-`OCIS_TRACING_ENABLED` +
+|`OCIS_TRACING_ENABLED` +
 `USERS_TRACING_ENABLED`
 | bool
 | false
 | Activates tracing.
 
-|
-`OCIS_TRACING_TYPE` +
+|`OCIS_TRACING_TYPE` +
 `USERS_TRACING_TYPE`
 | string
 | 
 | 
 
-|
-`OCIS_TRACING_ENDPOINT` +
+|`OCIS_TRACING_ENDPOINT` +
 `USERS_TRACING_ENDPOINT`
 | string
 | 
 | The endpoint to the tracing collector.
 
-|
-`OCIS_TRACING_COLLECTOR` +
+|`OCIS_TRACING_COLLECTOR` +
 `USERS_TRACING_COLLECTOR`
 | string
 | 
 | 
 
-|
-`OCIS_LOG_LEVEL` +
+|`OCIS_LOG_LEVEL` +
 `USERS_LOG_LEVEL`
 | string
 | 
 | The log level.
 
-|
-`OCIS_LOG_PRETTY` +
+|`OCIS_LOG_PRETTY` +
 `USERS_LOG_PRETTY`
 | bool
 | false
 | Activates pretty log output.
 
-|
-`OCIS_LOG_COLOR` +
+|`OCIS_LOG_COLOR` +
 `USERS_LOG_COLOR`
 | bool
 | false
 | Activates colorized log output.
 
-|
-`OCIS_LOG_FILE` +
+|`OCIS_LOG_FILE` +
 `USERS_LOG_FILE`
 | string
 | 
 | The target log file.
 
-|
-`USERS_DEBUG_ADDR`
+|`USERS_DEBUG_ADDR`
 | string
 | 127.0.0.1:9145
 | 
 
-|
-`USERS_DEBUG_TOKEN`
+|`USERS_DEBUG_TOKEN`
 | string
 | 
 | 
 
-|
-`USERS_DEBUG_PPROF`
+|`USERS_DEBUG_PPROF`
 | bool
 | false
 | 
 
-|
-`USERS_DEBUG_ZPAGES`
+|`USERS_DEBUG_ZPAGES`
 | bool
 | false
 | 
 
-|
-`USERS_GRPC_ADDR`
+|`USERS_GRPC_ADDR`
 | string
 | 127.0.0.1:9144
 | The address of the grpc service.
 
-|
-`USERS_GRPC_PROTOCOL`
+|`USERS_GRPC_PROTOCOL`
 | string
 | tcp
 | The transport protocol of the grpc service.
 
-|
-`OCIS_JWT_SECRET` +
+|`OCIS_JWT_SECRET` +
 `USERS_JWT_SECRET`
 | string
 | 
 | 
 
-|
-`REVA_GATEWAY`
+|`REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
 | 
 
-|
-`USERS_SKIP_USER_GROUPS_IN_TOKEN`
+|`USERS_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
 | false
 | 
 
-|
-`LDAP_URI` +
+|`LDAP_URI` +
 `USERS_LDAP_URI`
 | string
 | ldaps://localhost:9235
 | 
 
-|
-`LDAP_CACERT` +
+|`LDAP_CACERT` +
 `USERS_LDAP_CACERT`
 | string
 | ~/.ocis/idm/ldap.crt
 | 
 
-|
-`LDAP_INSECURE` +
+|`LDAP_INSECURE` +
 `USERS_LDAP_INSECURE`
 | bool
 | false
 | 
 
-|
-`LDAP_BIND_DN` +
+|`LDAP_BIND_DN` +
 `USERS_LDAP_BIND_DN`
 | string
 | uid=reva,ou=sysusers,o=libregraph-idm
 | 
 
-|
-`LDAP_BIND_PASSWORD` +
+|`LDAP_BIND_PASSWORD` +
 `USERS_LDAP_BIND_PASSWORD`
 | string
 | 
 | 
 
-|
-`LDAP_USER_BASE_DN` +
+|`LDAP_USER_BASE_DN` +
 `USERS_LDAP_USER_BASE_DN`
 | string
 | ou=users,o=libregraph-idm
 | 
 
-|
-`LDAP_GROUP_BASE_DN` +
+|`LDAP_GROUP_BASE_DN` +
 `USERS_LDAP_GROUP_BASE_DN`
 | string
 | ou=groups,o=libregraph-idm
 | 
 
-|
-`LDAP_USER_SCOPE` +
+|`LDAP_USER_SCOPE` +
 `USERS_LDAP_USER_SCOPE`
 | string
 | sub
 | 
 
-|
-`LDAP_GROUP_SCOPE` +
+|`LDAP_GROUP_SCOPE` +
 `USERS_LDAP_GROUP_SCOPE`
 | string
 | sub
 | 
 
-|
-`LDAP_USERFILTER` +
+|`LDAP_USERFILTER` +
 `USERS_LDAP_USERFILTER`
 | string
 | 
 | 
 
-|
-`LDAP_GROUPFILTER` +
+|`LDAP_GROUPFILTER` +
 `USERS_LDAP_USERFILTER`
 | string
 | 
 | 
 
-|
-`LDAP_USER_OBJECTCLASS` +
+|`LDAP_USER_OBJECTCLASS` +
 `USERS_LDAP_USER_OBJECTCLASS`
 | string
 | inetOrgPerson
 | 
 
-|
-`LDAP_GROUP_OBJECTCLASS` +
+|`LDAP_GROUP_OBJECTCLASS` +
 `USERS_LDAP_GROUP_OBJECTCLASS`
 | string
 | groupOfNames
 | 
 
-|
-`LDAP_LOGIN_ATTRIBUTES` +
+|`LDAP_LOGIN_ATTRIBUTES` +
 `USERS_LDAP_LOGIN_ATTRIBUTES`
 | 
 | [uid mail]
 | 
 
-|
-`OCIS_URL` +
+|`OCIS_URL` +
 `USERS_IDP_URL`
 | string
 | \https://localhost:9200
 | 
 
-|
-`LDAP_USER_SCHEMA_ID` +
+|`LDAP_USER_SCHEMA_ID` +
 `USERS_LDAP_USER_SCHEMA_ID`
 | string
 | ownclouduuid
 | 
 
-|
-`LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
+|`LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
 `USERS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 | bool
 | false
 | 
 
-|
-`LDAP_USER_SCHEMA_MAIL` +
+|`LDAP_USER_SCHEMA_MAIL` +
 `USERS_LDAP_USER_SCHEMA_MAIL`
 | string
 | mail
 | 
 
-|
-`LDAP_USER_SCHEMA_DISPLAYNAME` +
+|`LDAP_USER_SCHEMA_DISPLAYNAME` +
 `USERS_LDAP_USER_SCHEMA_DISPLAYNAME`
 | string
 | displayname
 | 
 
-|
-`LDAP_USER_SCHEMA_USERNAME` +
+|`LDAP_USER_SCHEMA_USERNAME` +
 `USERS_LDAP_USER_SCHEMA_USERNAME`
 | string
 | uid
 | 
 
-|
-`LDAP_GROUP_SCHEMA_ID` +
+|`LDAP_GROUP_SCHEMA_ID` +
 `USERS_LDAP_GROUP_SCHEMA_ID`
 | string
 | ownclouduuid
 | 
 
-|
-`LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING` +
+|`LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING` +
 `USERS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 | bool
 | false
 | 
 
-|
-`LDAP_GROUP_SCHEMA_MAIL` +
+|`LDAP_GROUP_SCHEMA_MAIL` +
 `USERS_LDAP_GROUP_SCHEMA_MAIL`
 | string
 | mail
 | 
 
-|
-`LDAP_GROUP_SCHEMA_DISPLAYNAME` +
+|`LDAP_GROUP_SCHEMA_DISPLAYNAME` +
 `USERS_LDAP_GROUP_SCHEMA_DISPLAYNAME`
 | string
 | cn
 | 
 
-|
-`LDAP_GROUP_SCHEMA_GROUPNAME` +
+|`LDAP_GROUP_SCHEMA_GROUPNAME` +
 `USERS_LDAP_GROUP_SCHEMA_GROUPNAME`
 | string
 | cn
 | 
 
-|
-`LDAP_GROUP_SCHEMA_MEMBER` +
+|`LDAP_GROUP_SCHEMA_MEMBER` +
 `USERS_LDAP_GROUP_SCHEMA_MEMBER`
 | string
 | member
 | 
 
-|
-`USERS_OWNCLOUDSQL_DB_USERNAME`
+|`USERS_OWNCLOUDSQL_DB_USERNAME`
 | string
 | owncloud
 | 
 
-|
-`USERS_OWNCLOUDSQL_DB_PASSWORD`
+|`USERS_OWNCLOUDSQL_DB_PASSWORD`
 | string
 | secret
 | 
 
-|
-`USERS_OWNCLOUDSQL_DB_HOST`
+|`USERS_OWNCLOUDSQL_DB_HOST`
 | string
 | mysql
 | 
 
-|
-`USERS_OWNCLOUDSQL_DB_PORT`
+|`USERS_OWNCLOUDSQL_DB_PORT`
 | int
 | 3306
 | 
 
-|
-`USERS_OWNCLOUDSQL_DB_NAME`
+|`USERS_OWNCLOUDSQL_DB_NAME`
 | string
 | owncloud
 | 
 
-|
-`USERS_OWNCLOUDSQL_IDP`
+|`USERS_OWNCLOUDSQL_IDP`
 | string
 | \https://localhost:9200
 | 
 
-|
-`USERS_OWNCLOUDSQL_NOBODY`
+|`USERS_OWNCLOUDSQL_NOBODY`
 | int64
 | 90
 | 
 
-|
-`USERS_OWNCLOUDSQL_JOIN_USERNAME`
+|`USERS_OWNCLOUDSQL_JOIN_USERNAME`
 | bool
 | false
 | 
 
-|
-`USERS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID`
+|`USERS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID`
 | bool
 | false
 | 
 
-|
-`USERS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH`
+|`USERS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH`
 | bool
 | false
 | 

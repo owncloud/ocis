@@ -7,162 +7,137 @@
 | Default Value
 | Description
 
-|
-`OCIS_TRACING_ENABLED` +
+|`OCIS_TRACING_ENABLED` +
 `SETTINGS_TRACING_ENABLED`
 | bool
 | false
 | 
 
-|
-`OCIS_TRACING_TYPE` +
+|`OCIS_TRACING_TYPE` +
 `SETTINGS_TRACING_TYPE`
 | string
 | 
 | 
 
-|
-`OCIS_TRACING_ENDPOINT` +
+|`OCIS_TRACING_ENDPOINT` +
 `SETTINGS_TRACING_ENDPOINT`
 | string
 | 
 | 
 
-|
-`OCIS_TRACING_COLLECTOR` +
+|`OCIS_TRACING_COLLECTOR` +
 `SETTINGS_TRACING_COLLECTOR`
 | string
 | 
 | 
 
-|
-`OCIS_LOG_LEVEL` +
+|`OCIS_LOG_LEVEL` +
 `SETTINGS_LOG_LEVEL`
 | string
 | 
 | 
 
-|
-`OCIS_LOG_PRETTY` +
+|`OCIS_LOG_PRETTY` +
 `SETTINGS_LOG_PRETTY`
 | bool
 | false
 | 
 
-|
-`OCIS_LOG_COLOR` +
+|`OCIS_LOG_COLOR` +
 `SETTINGS_LOG_COLOR`
 | bool
 | false
 | 
 
-|
-`OCIS_LOG_FILE` +
+|`OCIS_LOG_FILE` +
 `SETTINGS_LOG_FILE`
 | string
 | 
 | 
 
-|
-`SETTINGS_DEBUG_ADDR`
+|`SETTINGS_DEBUG_ADDR`
 | string
 | 127.0.0.1:9194
 | 
 
-|
-`SETTINGS_DEBUG_TOKEN`
+|`SETTINGS_DEBUG_TOKEN`
 | string
 | 
 | 
 
-|
-`SETTINGS_DEBUG_PPROF`
+|`SETTINGS_DEBUG_PPROF`
 | bool
 | false
 | 
 
-|
-`SETTINGS_DEBUG_ZPAGES`
+|`SETTINGS_DEBUG_ZPAGES`
 | bool
 | false
 | 
 
-|
-`SETTINGS_HTTP_ADDR`
+|`SETTINGS_HTTP_ADDR`
 | string
 | 127.0.0.1:9190
 | 
 
-|
-`SETTINGS_HTTP_ROOT`
+|`SETTINGS_HTTP_ROOT`
 | string
 | /
 | 
 
-|
-`SETTINGS_CACHE_TTL`
+|`SETTINGS_CACHE_TTL`
 | int
 | 604800
 | 
 
-|
-`SETTINGS_GRPC_ADDR`
+|`SETTINGS_GRPC_ADDR`
 | string
 | 127.0.0.1:9191
 | 
 
-|
-`SETTINGS_STORE_TYPE`
+|`SETTINGS_STORE_TYPE`
 | string
 | metadata
 | 
 
-|
-`SETTINGS_DATA_PATH`
+|`SETTINGS_DATA_PATH`
 | string
 | ~/.ocis/settings
 | 
 
-|
-`STORAGE_GATEWAY_GRPC_ADDR`
+|`STORAGE_GATEWAY_GRPC_ADDR`
 | string
 | 127.0.0.1:9215
 | 
 
-|
-`STORAGE_GRPC_ADDR`
+|`STORAGE_GRPC_ADDR`
 | string
 | 127.0.0.1:9215
 | 
 
-|
-`OCIS_SYSTEM_USER_ID` +
+|`OCIS_SYSTEM_USER_ID` +
 `SETTINGS_SYSTEM_USER_ID`
 | string
 | 
 | 
 
-|
-`OCIS_SYSTEM_USER_IDP` +
+|`OCIS_SYSTEM_USER_IDP` +
 `SETTINGS_SYSTEM_USER_IDP`
 | string
 | internal
 | 
 
-|
-`OCIS_SYSTEM_USER_API_KEY`
+|`OCIS_SYSTEM_USER_API_KEY`
 | string
 | 
 | 
 
-|
-`SETTINGS_ASSET_PATH`
+|`SETTINGS_ASSET_PATH`
 | string
 | 
 | 
 
-|
-`OCIS_JWT_SECRET` +
+|`OCIS_JWT_SECRET` +
 `SETTINGS_JWT_SECRET`
 | string
 | 

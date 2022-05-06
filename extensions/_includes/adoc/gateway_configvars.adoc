@@ -7,234 +7,197 @@
 | Default Value
 | Description
 
-|
-`OCIS_TRACING_ENABLED` +
+|`OCIS_TRACING_ENABLED` +
 `GATEWAY_TRACING_ENABLED`
 | bool
 | false
 | Activates tracing.
 
-|
-`OCIS_TRACING_TYPE` +
+|`OCIS_TRACING_TYPE` +
 `GATEWAY_TRACING_TYPE`
 | string
 | 
 | 
 
-|
-`OCIS_TRACING_ENDPOINT` +
+|`OCIS_TRACING_ENDPOINT` +
 `GATEWAY_TRACING_ENDPOINT`
 | string
 | 
 | The endpoint to the tracing collector.
 
-|
-`OCIS_TRACING_COLLECTOR` +
+|`OCIS_TRACING_COLLECTOR` +
 `GATEWAY_TRACING_COLLECTOR`
 | string
 | 
 | 
 
-|
-`OCIS_LOG_LEVEL` +
+|`OCIS_LOG_LEVEL` +
 `GATEWAY_LOG_LEVEL`
 | string
 | 
 | The log level.
 
-|
-`OCIS_LOG_PRETTY` +
+|`OCIS_LOG_PRETTY` +
 `GATEWAY_LOG_PRETTY`
 | bool
 | false
 | Activates pretty log output.
 
-|
-`OCIS_LOG_COLOR` +
+|`OCIS_LOG_COLOR` +
 `GATEWAY_LOG_COLOR`
 | bool
 | false
 | Activates colorized log output.
 
-|
-`OCIS_LOG_FILE` +
+|`OCIS_LOG_FILE` +
 `GATEWAY_LOG_FILE`
 | string
 | 
 | The target log file.
 
-|
-`GATEWAY_DEBUG_ADDR`
+|`GATEWAY_DEBUG_ADDR`
 | string
 | 127.0.0.1:9143
 | 
 
-|
-`GATEWAY_DEBUG_TOKEN`
+|`GATEWAY_DEBUG_TOKEN`
 | string
 | 
 | 
 
-|
-`GATEWAY_DEBUG_PPROF`
+|`GATEWAY_DEBUG_PPROF`
 | bool
 | false
 | 
 
-|
-`GATEWAY_DEBUG_ZPAGES`
+|`GATEWAY_DEBUG_ZPAGES`
 | bool
 | false
 | 
 
-|
-`GATEWAY_GRPC_ADDR`
+|`GATEWAY_GRPC_ADDR`
 | string
 | 127.0.0.1:9142
 | The address of the grpc service.
 
-|
-`GATEWAY_GRPC_PROTOCOL`
+|`GATEWAY_GRPC_PROTOCOL`
 | string
 | tcp
 | The transport protocol of the grpc service.
 
-|
-`OCIS_JWT_SECRET` +
+|`OCIS_JWT_SECRET` +
 `GATEWAY_JWT_SECRET`
 | string
 | 
 | 
 
-|
-`REVA_GATEWAY`
+|`REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
 | 
 
-|
-`GATEWAY_SKIP_USER_GROUPS_IN_TOKEN`
+|`GATEWAY_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
 | false
 | 
 
-|
-`GATEWAY_COMMIT_SHARE_TO_STORAGE_GRANT`
+|`GATEWAY_COMMIT_SHARE_TO_STORAGE_GRANT`
 | bool
 | true
 | 
 
-|
-`GATEWAY_COMMIT_SHARE_TO_STORAGE_REF`
+|`GATEWAY_COMMIT_SHARE_TO_STORAGE_REF`
 | bool
 | true
 | 
 
-|
-`GATEWAY_SHARE_FOLDER_NAME`
+|`GATEWAY_SHARE_FOLDER_NAME`
 | string
 | Shares
 | 
 
-|
-`GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN`
+|`GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN`
 | bool
 | true
 | 
 
-|
-`STORAGE_TRANSFER_SECRET`
+|`STORAGE_TRANSFER_SECRET`
 | string
 | 
 | 
 
-|
-`GATEWAY_TRANSFER_EXPIRES`
+|`GATEWAY_TRANSFER_EXPIRES`
 | int
 | 86400
 | 
 
-|
-`GATEWAY_HOME_MAPPING`
+|`GATEWAY_HOME_MAPPING`
 | string
 | 
 | 
 
-|
-`GATEWAY_ETAG_CACHE_TTL`
+|`GATEWAY_ETAG_CACHE_TTL`
 | int
 | 0
 | 
 
-|
-`OCIS_URL` +
+|`OCIS_URL` +
 `GATEWAY_FRONTEND_PUBLIC_URL`
 | string
 | \https://localhost:9200
 | 
 
-|
-`GATEWAY_USERS_ENDPOINT`
+|`GATEWAY_USERS_ENDPOINT`
 | string
 | localhost:9144
 | 
 
-|
-`GATEWAY_GROUPS_ENDPOINT`
+|`GATEWAY_GROUPS_ENDPOINT`
 | string
 | localhost:9160
 | 
 
-|
-`GATEWAY_PERMISSIONS_ENDPOINT`
+|`GATEWAY_PERMISSIONS_ENDPOINT`
 | string
 | localhost:9191
 | 
 
-|
-`GATEWAY_SHARING_ENDPOINT`
+|`GATEWAY_SHARING_ENDPOINT`
 | string
 | localhost:9150
 | 
 
-|
-`GATEWAY_AUTH_BASIC_ENDPOINT`
+|`GATEWAY_AUTH_BASIC_ENDPOINT`
 | string
 | localhost:9146
 | 
 
-|
-`GATEWAY_AUTH_BEARER_ENDPOINT`
+|`GATEWAY_AUTH_BEARER_ENDPOINT`
 | string
 | localhost:9148
 | 
 
-|
-`GATEWAY_AUTH_MACHINE_ENDPOINT`
+|`GATEWAY_AUTH_MACHINE_ENDPOINT`
 | string
 | localhost:9166
 | 
 
-|
-`GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT`
+|`GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT`
 | string
 | localhost:9178
 | 
 
-|
-`GATEWAY_STORAGE_USERS_ENDPOINT`
+|`GATEWAY_STORAGE_USERS_ENDPOINT`
 | string
 | localhost:9157
 | 
 
-|
-`GATEWAY_STORAGE_SHARES_ENDPOINT`
+|`GATEWAY_STORAGE_SHARES_ENDPOINT`
 | string
 | localhost:9154
 | 
 
-|
-`GATEWAY_APP_REGISTRY_ENDPOINT`
+|`GATEWAY_APP_REGISTRY_ENDPOINT`
 | string
 | localhost:9242
 | 

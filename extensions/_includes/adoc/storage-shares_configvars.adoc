@@ -7,125 +7,106 @@
 | Default Value
 | Description
 
-|
-`OCIS_TRACING_ENABLED` +
+|`OCIS_TRACING_ENABLED` +
 `STORAGE_SHARES_TRACING_ENABLED`
 | bool
 | false
 | Activates tracing.
 
-|
-`OCIS_TRACING_TYPE` +
+|`OCIS_TRACING_TYPE` +
 `STORAGE_SHARES_TRACING_TYPE`
 | string
 | 
 | 
 
-|
-`OCIS_TRACING_ENDPOINT` +
+|`OCIS_TRACING_ENDPOINT` +
 `STORAGE_SHARES_TRACING_ENDPOINT`
 | string
 | 
 | The endpoint to the tracing collector.
 
-|
-`OCIS_TRACING_COLLECTOR` +
+|`OCIS_TRACING_COLLECTOR` +
 `STORAGE_SHARES_TRACING_COLLECTOR`
 | string
 | 
 | 
 
-|
-`OCIS_LOG_LEVEL` +
+|`OCIS_LOG_LEVEL` +
 `STORAGE_SHARES_LOG_LEVEL`
 | string
 | 
 | The log level.
 
-|
-`OCIS_LOG_PRETTY` +
+|`OCIS_LOG_PRETTY` +
 `STORAGE_SHARES_LOG_PRETTY`
 | bool
 | false
 | Activates pretty log output.
 
-|
-`OCIS_LOG_COLOR` +
+|`OCIS_LOG_COLOR` +
 `STORAGE_SHARES_LOG_COLOR`
 | bool
 | false
 | Activates colorized log output.
 
-|
-`OCIS_LOG_FILE` +
+|`OCIS_LOG_FILE` +
 `STORAGE_SHARES_LOG_FILE`
 | string
 | 
 | The target log file.
 
-|
-`STORAGE_SHARES_DEBUG_ADDR`
+|`STORAGE_SHARES_DEBUG_ADDR`
 | string
 | 127.0.0.1:9156
 | 
 
-|
-`STORAGE_SHARES_DEBUG_TOKEN`
+|`STORAGE_SHARES_DEBUG_TOKEN`
 | string
 | 
 | 
 
-|
-`STORAGE_SHARES_DEBUG_PPROF`
+|`STORAGE_SHARES_DEBUG_PPROF`
 | bool
 | false
 | 
 
-|
-`STORAGE_SHARES_DEBUG_ZPAGES`
+|`STORAGE_SHARES_DEBUG_ZPAGES`
 | bool
 | false
 | 
 
-|
-`STORAGE_SHARES_GRPC_ADDR`
+|`STORAGE_SHARES_GRPC_ADDR`
 | string
 | 127.0.0.1:9154
 | The address of the grpc service.
 
-|
-`STORAGE_SHARES_GRPC_PROTOCOL`
+|`STORAGE_SHARES_GRPC_PROTOCOL`
 | string
 | tcp
 | The transport protocol of the grpc service.
 
-|
-`OCIS_JWT_SECRET` +
+|`OCIS_JWT_SECRET` +
 `STORAGE_SHARES_JWT_SECRET`
 | string
 | 
 | 
 
-|
-`REVA_GATEWAY`
+|`REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
 | 
 
-|
-`STORAGE_SHARES_SKIP_USER_GROUPS_IN_TOKEN`
+|`STORAGE_SHARES_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
 | false
 | 
 
-|
-`STORAGE_SHARES_READ_ONLY`
+|`STORAGE_SHARES_READ_ONLY`
 | bool
 | false
 | 
 
-|
-`STORAGE_SHARES_USER_SHARE_PROVIDER_ENDPOINT`
+|`STORAGE_SHARES_USER_SHARE_PROVIDER_ENDPOINT`
 | string
 | localhost:9150
 | 

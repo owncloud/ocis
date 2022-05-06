@@ -7,137 +7,116 @@
 | Default Value
 | Description
 
-|
-`OCIS_TRACING_ENABLED` +
+|`OCIS_TRACING_ENABLED` +
 `IDM_TRACING_ENABLED`
 | bool
 | false
 | 
 
-|
-`OCIS_TRACING_TYPE` +
+|`OCIS_TRACING_TYPE` +
 `IDM_TRACING_TYPE`
 | string
 | 
 | 
 
-|
-`OCIS_TRACING_ENDPOINT` +
+|`OCIS_TRACING_ENDPOINT` +
 `IDM_TRACING_ENDPOINT`
 | string
 | 
 | 
 
-|
-`OCIS_TRACING_COLLECTOR` +
+|`OCIS_TRACING_COLLECTOR` +
 `IDM_TRACING_COLLECTOR`
 | string
 | 
 | 
 
-|
-`OCIS_LOG_LEVEL` +
+|`OCIS_LOG_LEVEL` +
 `IDM_LOG_LEVEL`
 | string
 | 
 | 
 
-|
-`OCIS_LOG_PRETTY` +
+|`OCIS_LOG_PRETTY` +
 `IDM_LOG_PRETTY`
 | bool
 | false
 | 
 
-|
-`OCIS_LOG_COLOR` +
+|`OCIS_LOG_COLOR` +
 `IDM_LOG_COLOR`
 | bool
 | false
 | 
 
-|
-`OCIS_LOG_FILE` +
+|`OCIS_LOG_FILE` +
 `IDM_LOG_FILE`
 | string
 | 
 | 
 
-|
-`IDM_DEBUG_ADDR`
+|`IDM_DEBUG_ADDR`
 | string
 | 
 | 
 
-|
-`IDM_DEBUG_TOKEN`
+|`IDM_DEBUG_TOKEN`
 | string
 | 
 | 
 
-|
-`IDM_DEBUG_PPROF`
+|`IDM_DEBUG_PPROF`
 | bool
 | false
 | 
 
-|
-`IDM_DEBUG_ZPAGES`
+|`IDM_DEBUG_ZPAGES`
 | bool
 | false
 | 
 
-|
-`IDM_LDAPS_ADDR`
+|`IDM_LDAPS_ADDR`
 | string
 | 127.0.0.1:9235
 | Listen address for the ldaps listener (ip-addr:port)
 
-|
-`IDM_LDAPS_CERT`
+|`IDM_LDAPS_CERT`
 | string
 | ~/.ocis/idm/ldap.crt
 | File name of the TLS server certificate for the ldaps listener
 
-|
-`IDM_LDAPS_KEY`
+|`IDM_LDAPS_KEY`
 | string
 | ~/.ocis/idm/ldap.key
 | File name for the TLS certificate key for the server certificate
 
-|
-`IDM_DATABASE_PATH`
+|`IDM_DATABASE_PATH`
 | string
 | ~/.ocis/idm/ocis.boltdb
 | Full path to the idm backend database
 
-|
-`IDM_CREATE_DEMO_USERS` +
+|`IDM_CREATE_DEMO_USERS` +
 `ACCOUNTS_DEMO_USERS_AND_GROUPS`
 | bool
 | false
 | Flag to enabe/disable the creation of the demo users
 
-|
-`IDM_ADMIN_PASSWORD`
+|`IDM_ADMIN_PASSWORD`
 | string
 | 
 | Password to set for the ocis "admin" user. Either cleartext or an argon2id hash
 
-|
-`IDM_SVC_PASSWORD`
+|`IDM_SVC_PASSWORD`
 | string
 | 
 | Password to set for the "idm" service user. Either cleartext or an argon2id hash
 
-|
-`IDM_REVASVC_PASSWORD`
+|`IDM_REVASVC_PASSWORD`
 | string
 | 
 | Password to set for the "reva" service user. Either cleartext or an argon2id hash
 
-|
-`IDM_IDPSVC_PASSWORD`
+|`IDM_IDPSVC_PASSWORD`
 | string
 | 
 | Password to set for the "idp" service user. Either cleartext or an argon2id hash
