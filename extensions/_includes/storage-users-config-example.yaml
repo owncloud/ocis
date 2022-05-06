@@ -52,7 +52,7 @@ drivers:
   owncloudsql:
     root: ~/.ocis/storage/owncloud
     share_folder: /Shares
-    userlayout: '{{.Username}}'
+    user_layout: '{{.Username}}'
     upload_info_dir: ~/.ocis/storage/uploadinfo
     db_username: owncloud
     db_password: owncloud

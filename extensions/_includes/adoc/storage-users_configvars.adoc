@@ -215,9 +215,9 @@
 |`STORAGE_USERS_OWNCLOUDSQL_LAYOUT`
 | string
 | {{.Username}}
-| 
+| path layout to use to navigate into a users folder in an owncloud data dir
 
-|`STORAGE_USERS_UPLOADINFO_DIR`
+|`STORAGE_USERS_OWNCLOUDSQL_UPLOADINFO_DIR`
 | string
 | ~/.ocis/storage/uploadinfo
 | 

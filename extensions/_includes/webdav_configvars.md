@@ -17,5 +17,5 @@
 | WEBDAV_HTTP_ADDR | string | 127.0.0.1:9115 | |
 | WEBDAV_HTTP_ROOT | string | / | |
 | OCIS_URL<br/>OCIS_PUBLIC_URL | string | https://127.0.0.1:9200 | |
-| STORAGE_WEBDAV_NAMESPACE | string | /users/{{.Id.OpaqueId}} | |
+| WEBDAV_WEBDAV_NAMESPACE | string | /users/{{.Id.OpaqueId}} | CS3 path layout to use when forwarding /webdav requests|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |

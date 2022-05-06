@@ -41,8 +41,8 @@
 | STORAGE_USERS_S3NG_SHARE_FOLDER | string | /Shares | |
 | STORAGE_USERS_OWNCLOUDSQL_DATADIR | string | ~/.ocis/storage/owncloud | |
 | STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER | string | /Shares | |
-| STORAGE_USERS_OWNCLOUDSQL_LAYOUT | string | {{.Username}} | |
-| STORAGE_USERS_UPLOADINFO_DIR | string | ~/.ocis/storage/uploadinfo | |
+| STORAGE_USERS_OWNCLOUDSQL_LAYOUT | string | {{.Username}} | path layout to use to navigate into a users folder in an owncloud data dir|
+| STORAGE_USERS_OWNCLOUDSQL_UPLOADINFO_DIR | string | ~/.ocis/storage/uploadinfo | |
 | STORAGE_USERS_OWNCLOUDSQL_DB_USERNAME | string | owncloud | |
 | STORAGE_USERS_OWNCLOUDSQL_DB_PASSWORD | string | owncloud | |
 | STORAGE_USERS_OWNCLOUDSQL_DB_HOST | string |  | |
