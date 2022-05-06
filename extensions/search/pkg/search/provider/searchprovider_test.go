@@ -267,7 +267,8 @@ var _ = Describe("Searchprovider", func() {
 
 		Context("with received shares", func() {
 			var (
-				grantSpace *sprovider.StorageSpace
+				grantSpace      *sprovider.StorageSpace
+				mountpointSpace *sprovider.StorageSpace
 			)
 
 			BeforeEach(func() {
@@ -275,8 +276,21 @@ var _ = Describe("Searchprovider", func() {
 					SpaceType: "grant",
 					Owner:     otherUser,
 					Id:        &sprovider.StorageSpaceId{OpaqueId: "otherspaceroot!otherspacegrant"},
-					Root:      &sprovider.ResourceId{StorageId: "otherspaceroot", OpaqueId: "otherspaceroot"},
+					Root:      &sprovider.ResourceId{StorageId: "otherspaceroot", OpaqueId: "otherspacegrant"},
 					Name:      "grantspace",
+				}
+				mountpointSpace = &sprovider.StorageSpace{
+					SpaceType: "mountpoint",
+					Owner:     otherUser,
+					Id:        &sprovider.StorageSpaceId{OpaqueId: "otherspaceroot!otherspacemountpoint"},
+					Root:      &sprovider.ResourceId{StorageId: "otherspaceroot", OpaqueId: "otherspacemountpoint"},
+					Name:      "mountpointspace",
+					Opaque: &typesv1beta1.Opaque{
+						Map: map[string]*typesv1beta1.OpaqueEntry{
+							"grantStorageID": {Decoder: "plain", Value: []byte("otherspaceroot")},
+							"grantOpaqueID":  {Decoder: "plain", Value: []byte("otherspacegrant")},
+						},
+					},
 				}
 				gwClient.On("GetPath", mock.Anything, mock.Anything).Return(&sprovider.GetPathResponse{
 					Status: status.NewOK(ctx),
@@ -284,10 +298,10 @@ var _ = Describe("Searchprovider", func() {
 				}, nil)
 			})
 
-			It("searches the received spaces (grants)", func() {
+			It("searches the received spaces", func() {
 				gwClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
-					StorageSpaces: []*sprovider.StorageSpace{grantSpace},
+					StorageSpaces: []*sprovider.StorageSpace{grantSpace, mountpointSpace},
 				}, nil)
 				indexClient.On("Search", mock.Anything, mock.Anything).Return(&searchsvc.SearchIndexResponse{
 					Matches: []*searchmsg.Match{
@@ -319,7 +333,7 @@ var _ = Describe("Searchprovider", func() {
 				match := res.Matches[0]
 				Expect(match.Entity.Id.OpaqueId).To(Equal("grant-shared-id"))
 				Expect(match.Entity.Name).To(Equal("Shared.pdf"))
-				Expect(match.Entity.Ref.ResourceId.OpaqueId).To(Equal(grantSpace.Root.OpaqueId))
+				Expect(match.Entity.Ref.ResourceId.OpaqueId).To(Equal(mountpointSpace.Root.OpaqueId))
 				Expect(match.Entity.Ref.Path).To(Equal("./to/Shared.pdf"))
 
 				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
@@ -330,7 +344,7 @@ var _ = Describe("Searchprovider", func() {
 			It("finds matches in both the personal space AND the grant", func() {
 				gwClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
-					StorageSpaces: []*sprovider.StorageSpace{personalSpace, grantSpace},
+					StorageSpaces: []*sprovider.StorageSpace{personalSpace, grantSpace, mountpointSpace},
 				}, nil)
 				indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
 					return req.Ref.ResourceId.StorageId == grantSpace.Root.StorageId

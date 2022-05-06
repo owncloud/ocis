@@ -14,6 +14,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	sdk "github.com/cs3org/reva/v2/pkg/sdk/common"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
@@ -57,6 +58,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 	if req.Query == "" {
 		return nil, errtypes.PreconditionFailed("empty query provided")
 	}
+	p.logger.Debug().Str("query", req.Query).Msg("performing a search")
 
 	listSpacesRes, err := p.gwClient.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
 		Filters: []*provider.ListStorageSpacesRequest_Filter{
@@ -67,13 +69,36 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 		},
 	})
 	if err != nil {
+		p.logger.Error().Err(err).Msg("failed to list the user's storage spaces")
 		return nil, err
+	}
+
+	mountpointMap := map[string]string{}
+	for _, space := range listSpacesRes.StorageSpaces {
+		if space.SpaceType != "mountpoint" {
+			continue
+		}
+		opaqueMap := sdk.DecodeOpaqueMap(space.Opaque)
+		grantSpaceId := storagespace.FormatResourceID(provider.ResourceId{
+			StorageId: opaqueMap["grantStorageID"],
+			OpaqueId:  opaqueMap["grantOpaqueID"],
+		})
+		mountpointMap[grantSpaceId] = space.Id.OpaqueId
 	}
 
 	matches := []*searchmsg.Match{}
 	for _, space := range listSpacesRes.StorageSpaces {
-		pathPrefix := ""
-		if space.SpaceType == "grant" {
+		var mountpointRootId *searchmsg.ResourceID
+		mountpointPrefix := ""
+		switch space.SpaceType {
+		case "mountpoint":
+			continue // mountpoint spaces are only "links" to the shared spaces. we have to search the shared "grant" space instead
+		case "grant":
+			mountpointId, ok := mountpointMap[space.Id.OpaqueId]
+			if !ok {
+				p.logger.Warn().Interface("space", space).Msg("could not find mountpoint space for grant space")
+				continue
+			}
 			gpRes, err := p.gwClient.GetPath(ctx, &provider.GetPathRequest{
 				ResourceId: space.Root,
 			})
@@ -83,11 +108,19 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			if gpRes.Status.Code != rpcv1beta1.Code_CODE_OK {
 				return nil, errtypes.NewErrtypeFromStatus(gpRes.Status)
 			}
-			pathPrefix = utils.MakeRelativePath(gpRes.Path)
+			mountpointPrefix = utils.MakeRelativePath(gpRes.Path)
+			sid, oid, err := storagespace.SplitID(mountpointId)
+			if err != nil {
+				return nil, err
+			}
+			mountpointRootId = &searchmsg.ResourceID{
+				StorageId: sid,
+				OpaqueId:  oid,
+			}
+			p.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootId).Msg("searching a grant")
 		}
 
 		_, rootStorageID := storagespace.SplitStorageID(space.Root.StorageId)
-
 		res, err := p.indexClient.Search(ctx, &searchsvc.SearchIndexRequest{
 			Query: req.Query,
 			Ref: &searchmsg.Reference{
@@ -95,16 +128,21 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 					StorageId: space.Root.StorageId,
 					OpaqueId:  rootStorageID,
 				},
-				Path: pathPrefix,
+				Path: mountpointPrefix,
 			},
 		})
 		if err != nil {
+			p.logger.Error().Err(err).Str("space", space.Id.OpaqueId).Msg("failed to search the index")
 			return nil, err
 		}
+		p.logger.Debug().Str("space", space.Id.OpaqueId).Int("hits", len(res.Matches)).Msg("space search done")
 
 		for _, match := range res.Matches {
-			if pathPrefix != "" {
-				match.Entity.Ref.Path = utils.MakeRelativePath(strings.TrimPrefix(match.Entity.Ref.Path, pathPrefix))
+			if mountpointPrefix != "" {
+				match.Entity.Ref.Path = utils.MakeRelativePath(strings.TrimPrefix(match.Entity.Ref.Path, mountpointPrefix))
+			}
+			if mountpointRootId != nil {
+				match.Entity.Ref.ResourceId = mountpointRootId
 			}
 			matches = append(matches, match)
 		}
