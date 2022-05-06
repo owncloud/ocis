@@ -4,17 +4,12 @@ import (
 	"path"
 	"strconv"
 
-	"github.com/Masterminds/semver"
 	"github.com/owncloud/ocis/v2/extensions/frontend/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 )
 
 // FrontendConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
 func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
-	parsedVersion, err := semver.NewVersion(version.String)
-	if err != nil {
-		parsedVersion, _ = semver.NewVersion("0.0.0")
-	}
 	archivers := []map[string]interface{}{
 		{
 			"enabled":       true,
@@ -144,10 +139,11 @@ func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
 									"installed":      true,
 									"maintenance":    false,
 									"needsDbUpgrade": false,
-									"version":        version.String + ".0",
-									"versionstring":  version.String,
+									"version":        version.Long(),
+									"versionstring":  version.GetString(),
 									"edition":        "Community",
-									"productname":    "oCIS",
+									"productname":    "Infinite Scale",
+									"product":        "oCIS",
 									"hostname":       "",
 								},
 								"support_url_signing": true,
@@ -218,9 +214,9 @@ func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
 						"version": map[string]interface{}{
 							"product": "oCIS",
 							"edition": "Community",
-							"major":   parsedVersion.Major(),
-							"minor":   parsedVersion.Minor(),
-							"micro":   parsedVersion.Patch(),
+							"major":   version.Parsed().Major(),
+							"minor":   version.Parsed().Minor(),
+							"micro":   version.Parsed().Patch(),
 							"string":  version.String,
 						},
 					},

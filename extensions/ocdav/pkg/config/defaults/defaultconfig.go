@@ -2,6 +2,7 @@ package defaults
 
 import (
 	"github.com/owncloud/ocis/v2/extensions/ocdav/pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 )
 
 func FullDefaultConfig() *config.Config {
@@ -41,6 +42,13 @@ func DefaultConfig() *config.Config {
 			Auth: config.Auth{
 				CredentialsByUserAgent: map[string]string{},
 			},
+		},
+		Status: config.Status{
+			Version:       version.Long(),
+			VersionString: version.GetString(),
+			Product:       "oCIS",
+			ProductName:   "Infinite Scale",
+			Edition:       "Community",
 		},
 	}
 }
