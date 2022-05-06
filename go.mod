@@ -276,4 +276,4 @@ require (
 replace github.com/pkg/xattr => github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7
 
 // temp - don't merge with this line
-replace github.com/cs3org/reva/v2 => github.com/kobergj/reva/v2 v2.0.0-20220506092654-2a2bc414a0b4
+replace github.com/cs3org/reva/v2 => github.com/kobergj/reva/v2 v2.0.0-20220506104026-7d5d9bcb83e3
