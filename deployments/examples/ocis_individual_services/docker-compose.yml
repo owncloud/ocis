@@ -1,9 +1,20 @@
 ---
 version: "3.7"
 
+volumes:
+  traefik-certs: null
+  ocis-settings: null
+  ocis-store: null
+  ocis-storage-system: null
+  ocis-storage-users: null
+  ocis-storage-sharing: null
+
+networks:
+  ocis-net:
+
 services:
   traefik:
-    image: traefik:v2.5
+    image: traefik:v2.6.6
     networks:
       ocis-net:
         aliases:
@@ -15,7 +26,7 @@ services:
       - "--certificatesResolvers.http.acme.storage=/certs/acme.json"
       - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
       # enable dashboard
-      - "--api.dashboard=true"
+      - "--api.dashboard=${TRAEFIK_DASHBOARD:-false}"
       # define entrypoints
       - "--entryPoints.http.address=:80"
       - "--entryPoints.http.http.redirections.entryPoint.to=https"
@@ -42,6 +53,154 @@ services:
       driver: "local"
     restart: always
 
+  app-registry:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    deploy:
+      replicas: ${OCIS_SCALE:-1}
+    networks:
+      ocis-net:
+    entrypoint:
+      - ocis
+      - app-registry
+      - server
+    environment:
+      APP_REGISTRY_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      APP_REGISTRY_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      APP_REGISTRY_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+
+      APP_REGISTRY_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+
+      APP_REGISTRY_GRPC_ADDR: 0.0.0.0:9242
+      REVA_GATEWAY: gateway:9142
+
+    logging:
+      driver: "local"
+    restart: always
+
+  app-provider:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    deploy:
+      replicas: ${OCIS_SCALE:-1}
+    networks:
+      ocis-net:
+    entrypoint:
+      - ocis
+      - app-provider
+      - server
+    environment:
+      APPPROVIDER_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      APPPROVIDER_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      APPPROVIDER_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+
+      APP_PROVIDER_GRPC_ADDR: 0.0.0.0:9164
+      APP_PROVIDER_EXTERNAL_ADDR: app-provider:9164
+
+      REVA_GATEWAY: gateway:9142
+      APP_PROVIDER_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+
+  notifications:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    deploy:
+      replicas: ${OCIS_SCALE:-1}
+    networks:
+      ocis-net:
+    entrypoint:
+      - ocis
+      - notifications
+      - server
+    environment:
+      NOTIFICATIONS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      NOTIFICATIONS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      NOTIFICATIONS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+
+      REVA_GATEWAY: gateway:9142
+      NOTIFICATIONS_EVENTS_ENDPOINT: nats:9233
+      NOTIFICATIONS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
+
+  idm:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    deploy:
+      replicas: ${OCIS_SCALE:-1}
+    networks:
+      ocis-net:
+    entrypoint:
+      - ocis
+      - idm
+      - server
+    environment:
+      IDM_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      IDM_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      IDM_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+
+      IDM_LDAPS_ADDR: 0.0.0.0:9235
+      IDM_ADMIN_USER_ID: ${ADMIN_USER_ID:-09246a85-682a-4cd5-996d-8e8d2aca50af}
+      IDM_ADMIN_PASSWORD: "admin" #TODO: change me
+      IDM_SVC_PASSWORD: ${IDM_SVC_PASSWORD:-changeme}
+      IDM_REVASVC_PASSWORD:  ${IDM_REVASVC_PASSWORD:-changeme}
+      IDM_IDPSVC_PASSWORD:  ${IDM_IDPSVC_PASSWORD:-changeme}
+
+
+      IDM_CREATE_DEMO_USERS: ${DEM_USERS:-true}
+
+      IDM_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+
+  ocdav:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    deploy:
+      replicas: ${OCIS_SCALE:-1}
+    networks:
+      ocis-net:
+    entrypoint:
+      - ocis
+      - ocdav
+      - server
+    environment:
+      OCDAV_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      OCDAV_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      OCDAV_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+
+      OCDAV_HTTP_ADDR: 0.0.0.0:8080
+
+      OCDAV_PUBLIC_URL: ${OCIS_DOMAIN:-ocis.owncloud.test}
+
+      REVA_GATEWAY: gateway:9142
+      OCDAV_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+  graph-explorer:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    deploy:
+      replicas: ${OCIS_SCALE:-1}
+    networks:
+      ocis-net:
+    entrypoint:
+      - ocis
+      - graph-explorer
+      - server
+    environment:
+      GRAPH_EXPLOER_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      GRAPH_EXPLOER_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      GRAPH_EXPLOER_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+
+      GRAPH_EXPLORER_HTTP_ADDR: 0.0.0.0:9135
+      GRAPH_EXPLORER_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      GRAPH_EXPLORER_GRAPH_URL_BASE: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+
+  audit:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    deploy:
+      replicas: ${OCIS_SCALE:-1}
+    networks:
+      ocis-net:
+    entrypoint:
+      - ocis
+      - audit
+      - server
+    environment:
+      AUDIT_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      AUDIT_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      AUDIT_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+
+      AUDIT_EVENTS_ENDPOINT: nats:9233
+
   proxy:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
@@ -59,18 +218,19 @@ services:
 
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
 
-      REVA_GATEWAY: storage-gateway:9142
+      REVA_GATEWAY: gateway:9142
 
       PROXY_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      PROXY_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
-      PROXY_INSECURE_BACKENDS: "false"
+      PROXY_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
 
-      PROXY_OIDC_INSECURE: "${INSECURE:-false}"
+      PROXY_OIDC_INSECURE: "${INSECURE:-true}"
       PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
 
-      PROXY_AUTOPROVISION_ACCOUNTS: "true"
-
+      PROXY_INSECURE_BACKENDS: true
       PROXY_HTTP_ADDR: 0.0.0.0:9200
+
+      PROXY_ENABLE_BASIC_AUTH: true
+
     volumes:
       - "./config/proxy/proxy.yaml:/etc/ocis/proxy.yaml"
     labels:
@@ -93,7 +253,7 @@ services:
       ocis-net:
     entrypoint:
       - ocis
-      - nats-server
+      - nats
       - server
     environment:
       NATS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
@@ -101,66 +261,7 @@ services:
       NATS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       NATS_NATS_HOST: 0.0.0.0
-      NATS_NATS_PORT: 9233
-    logging:
-      driver: "local"
-    restart: always
 
-  accounts:
-    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
-    deploy:
-      replicas: 1
-    networks:
-      ocis-net:
-    entrypoint:
-      - /bin/sh
-      - /entrypoint-override.sh
-    #entrypoint:
-    #  - ocis
-    #  - accounts
-    #  - server
-    environment:
-      ACCOUNTS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
-      ACCOUNTS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      ACCOUNTS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
-
-      ACCOUNTS_HTTP_ADDR: 0.0.0.0:9181
-      ACCOUNTS_GRPC_ADDR: 0.0.0.0:9180
-
-      ACCOUNTS_STORAGE_BACKEND: cs3
-      ACCOUNTS_STORAGE_CS3_PROVIDER_ADDR: storage-system:9215
-
-      IDP_LDAP_BIND_PASSWORD: ${IDP_LDAP_BIND_PASSWORD:-idp}
-      STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
-
-      ACCOUNTS_JWT_SECRET: ${OCIS_METADATA_JWT_SECRET:-Pive-Fumkiu4}
-      # demo users
-      ACCOUNTS_DEMO_USERS_AND_GROUPS: "${DEMO_USERS:-false}"  # deprecated, remove after switching to LibreIDM
-    volumes:
-      - ./config/accounts/entrypoint-override.sh:/entrypoint-override.sh
-    logging:
-      driver: "local"
-    restart: always
-
-  glauth:
-    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
-    deploy:
-      replicas: ${OCIS_SCALE:-1}
-    networks:
-      ocis-net:
-    entrypoint:
-      - ocis
-      - glauth
-      - server
-    environment:
-      GLAUTH_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
-      GLAUTH_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      GLAUTH_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
-
-      GLAUTH_LDAP_ADDR: 0.0.0.0:9125
-      GLAUTH_LDAPS_ADDR: 0.0.0.0:9126
-
-      GLAUTH_BACKEND_INSECURE: "true"
     logging:
       driver: "local"
     restart: always
@@ -182,11 +283,11 @@ services:
 
       IDP_HTTP_ADDR: 0.0.0.0:9130
 
-      IDP_LDAP_URI: ldap://glauth:9125
-      IDP_LDAP_BIND_PASSWORD: ${IDP_LDAP_BIND_PASSWORD:-idp}
+      IDP_LDAP_URI: ldaps://idm:9235
+      IDP_LDAP_BIND_PASSWORD: ${IDM_IDPSVC_PASSWORD:-changeme}
 
       IDP_ISS: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      IDP_INSECURE: "${INSECURE:-false}"
+      IDP_INSECURE: "${INSECURE:-true}"
     logging:
       driver: "local"
     restart: always
@@ -212,12 +313,36 @@ services:
       OCS_IDM_ADDRESS: https://${OCIS_DOMAIN:-ocis.owncloud.test}
 
       OCS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      OCS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
+      OCS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
 
-      REVA_GATEWAY: storage-gateway:9142
+      REVA_GATEWAY: gateway:9142
     logging:
       driver: "local"
     restart: always
+
+  search:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    deploy:
+      replicas: 1
+    networks:
+      ocis-net:
+    entrypoint:
+      - ocis
+      - search
+      - server
+    environment:
+      SEARCH_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      SEARCH_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      SEARCH_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+
+      SEARCH_GRPC_ADDR: 0.0.0.0:9220
+
+      REVA_GATEWAY: gateway:9142
+      SEARCH_EVENTS_ENDPOINT: nats:9233
+
+      OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
+      OCIS_SYSTEM_USER_API_KEY: ${SYSTEM_USER_API_KEY:-changme}
+      OCIS_SYSTEM_USER_ID: ${SYSTEM_USER_ID:-changeme}
 
   settings:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
@@ -238,6 +363,17 @@ services:
       SETTINGS_GRPC_ADDR: 0.0.0.0:9191
 
       SETTINGS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      #STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-changeme}
+
+      OCIS_SYSTEM_USER_API_KEY: ${SYSTEM_USER_API_KEY:-changeme}
+      OCIS_SYSTEM_USER_ID: ${SYSTEM_USER_ID:-changeme}
+      #OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
+
+      SETTINGS_ADMIN_USER_ID: ${ADMIN_USER_ID:-09246a85-682a-4cd5-996d-8e8d2aca50af}
+
+      STORAGE_GATEWAY_GRPC_ADDR: storage-system:9215
+      STORAGE_GRPC_ADDR: storage-system:9215
+
     volumes:
       - "ocis-settings:/var/lib/ocis"
     logging:
@@ -260,6 +396,11 @@ services:
       STORE_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       STORE_GRPC_ADDR: 0.0.0.0:9460
+
+      OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-changeme}
+      OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
+
     volumes:
       - "ocis-settings:/var/lib/ocis"
     logging:
@@ -282,9 +423,10 @@ services:
       THUMBNAILS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       THUMBNAILS_GRPC_ADDR: 0.0.0.0:9185
-
+      THUMBNAILS_HTTP_ADDR: 0.0.0.0:9186
+      THUMBNAILS_DATA_ENDPOINT: http://thumbnails:9186/thumbnails/data
       THUMBNAILS_CS3SOURCE_INSECURE: "true"
-      REVA_GATEWAY: storage-gateway:9142
+      REVA_GATEWAY: gateway:9142
 
     volumes:
       # optional shared thumbnail cache between services
@@ -313,6 +455,7 @@ services:
       WEB_OIDC_AUTHORITY: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       WEB_UI_THEME_SERVER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       WEB_UI_CONFIG_SERVER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      WEB_OIDC_METADATA_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/.well-known/openid-configuration
     logging:
       driver: "local"
     restart: always
@@ -335,7 +478,7 @@ services:
       WEBDAV_HTTP_ADDR: 0.0.0.0:9115
 
       OCIS_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      REVA_GATEWAY: storage-gateway:9142
+      REVA_GATEWAY: gateway:9142
     logging:
       driver: "local"
     restart: always
@@ -358,10 +501,15 @@ services:
       GRAPH_HTTP_ADDR: 0.0.0.0:9120
       GRAPH_SPACES_WEBDAV_BASE: https://${OCIS_DOMAIN:-ocis.owncloud.test}
 
-      REVA_GATEWAY: storage-gateway:9142
+      GRAPH_LDAP_URI: ldaps://localhost:9235
+      GRAPH_LDAP_BIND_PASSWORD: ${IDM_SVC_PASSWORD:-changeme}
+
+      REVA_GATEWAY: gateway:9142
+
+      GRAPH_EVENTS_ENDPOINT: nats:9233
+
       GRAPH_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
 
-      GRAPH_LDAP_URI: ldap://glauth:9125
     logging:
       driver: "local"
     restart: always
@@ -377,29 +525,32 @@ services:
       - storage-system
       - server
     environment:
-      OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
-      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+      STORAGE_SYSTEM_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      STORAGE_SYSTEM_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      STORAGE_SYSTEM_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      STORAGE_HOME_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
+      STORAGE_SYSTEM_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
 
       STORAGE_SYSTEM_GRPC_ADDR: 0.0.0.0:9215
       STORAGE_SYSTEM_HTTP_ADDR: 0.0.0.0:9216
       STORAGE_SYSTEM_DATA_SERVER_URL: http://storage-system:9216/data
 
-      STORAGE_JWT_SECRET: ${OCIS_METADATA_JWT_SECRET:-Pive-Fumkiu4}
-      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
+      STORAGE_SYSTEM_JWT_SECRET: ${OCIS_METADATA_JWT_SECRET:-Pive-Fumkiu4}
+      STORAGE_SYSTEM_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-changeme}
 
+      OCIS_SYSTEM_USER_ID: ${SYSTEM_USER_ID:-changeme}
       STORAGE_SYSTEM_DRIVER: ocis
 
-      REVA_GATEWAY: storage-gateway:9142
+      OCIS_SYSTEM_USER_API_KEY: ${SYSTEM_USER_API_KEY:-changeme}
+
+      REVA_GATEWAY: gateway:9142
     volumes:
       - "ocis-storage-system:/var/lib/ocis"
     logging:
       driver: "local"
     restart: always
 
-  storage-authbasic:
+  auth-basic:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
       replicas: ${OCIS_SCALE:-1}
@@ -407,23 +558,30 @@ services:
       ocis-net:
     entrypoint:
       - ocis
-      - storage-auth-basic
+      - auth-basic
       - server
     environment:
-      OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
-      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+      AUTH_BASIC_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      AUTH_BASIC_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      AUTH_BASIC_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      STORAGE_AUTH_BASIC_GRPC_ADDR: 0.0.0.0:9146
-      STORAGE_AUTH_BASIC_ENDPOINT: storage-authbasic:9146
+      AUTH_BASIC_GRPC_ADDR: 0.0.0.0:9146
+      REVA_GATEWAY: gateway:9142
+      STORAGE_AUTH_BASIC_ENDPOINT: auth-basic:9146
 
-      STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      REVA_GATEWAY: storage-gateway:9142
+      AUTH_BASIC_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+
+      AUTH_BASIC_LDAP_URI: ldaps://idm:9235
+      AUTH_BASIC_LDAP_CACERT: ""
+      AUTH_BASIC_LDAP_INSECURE: "true"
+      AUTH_BASIC_LDAP_BIND_PASSWORD: ${IDM_REVASVC_PASSWORD:-changeme}
+      AUTH_BASIC_IDP_URL: ${OCIS_DOMAIN}
+
     logging:
       driver: "local"
     restart: always
 
-  storage-authmachine:
+  auth-machine:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
       replicas: ${OCIS_SCALE:-1}
@@ -431,23 +589,23 @@ services:
       ocis-net:
     entrypoint:
       - ocis
-      - storage-auth-machine
+      - auth-machine
       - server
     environment:
-      OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
-      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+      AUTH_MACHINE_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      AUTH_MACHINE_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      AUTH_MACHINE_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      STORAGE_AUTH_MACHINE_GRPC_ADDR: 0.0.0.0:9148
-      STORAGE_AUTH_MACHINE_ENDPOINT: storage-authmachine:9148
+      AUTH_MACHINE_GRPC_ADDR: 0.0.0.0:9166
 
-      STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      REVA_GATEWAY: storage-gateway:9142
+      AUTH_MACHINE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      AUTH_MACHINE_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
+      REVA_GATEWAY: gateway:9142
     logging:
       driver: "local"
     restart: always
 
-  storage-authbearer:
+  auth-bearer:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
       replicas: ${OCIS_SCALE:-1}
@@ -455,18 +613,19 @@ services:
       ocis-net:
     entrypoint:
       - ocis
-      - storage-auth-bearer
+      - auth-bearer
       - server
     environment:
       OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
       OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      STORAGE_AUTH_BEARER_GRPC_ADDR: 0.0.0.0:9166
-      STORAGE_AUTH_BEARER_ENDPOINT: storage-authbearer:9166
+      AUTH_BEARER_GRPC_ADDR: 0.0.0.0:9148
 
-      STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      REVA_GATEWAY: storage-gateway:9142
+      AUTH_BEARER_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      REVA_GATEWAY: gateway:9142
+      AUTH_BEARER_OIDC_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+
     logging:
       driver: "local"
     restart: always
@@ -482,18 +641,16 @@ services:
       - storage-shares
       - server
     environment:
-      OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
-      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+      STORAGE_SHARES_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      STORAGE_SHARES_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      STORAGE_SHARES_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       STORAGE_SHARES_GRPC_ADDR: 0.0.0.0:9154
-      STORAGE_SHARES_ENDPOINT: storage-shares:9154
 
-      STORAGE_SHARING_ENDPOINT: storage-sharing:9150
+      STORAGE_SHARES_USER_SHARE_PROVIDER_ENDPOINT: sharing:9150
 
-      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
-      STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      REVA_GATEWAY: storage-gateway:9142
+      STORAGE_SHARES_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      REVA_GATEWAY: gateway:9142
     logging:
       driver: "local"
     restart: always
@@ -509,23 +666,27 @@ services:
       - storage-users
       - server
     environment:
-      OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
-      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+      STORAGE_USERS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      STORAGE_USERS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      STORAGE_USERS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       STORAGE_USERS_DATAPROVIDER_INSECURE: "${INSECURE:-false}"
 
       STORAGE_USERS_DRIVER: ocis
 
       STORAGE_USERS_GRPC_ADDR: 0.0.0.0:9157
-      STORAGE_USERS_ENDPOINT: storage-users:9157
-
       STORAGE_USERS_HTTP_ADDR: 0.0.0.0:9158
+
       STORAGE_USERS_DATA_SERVER_URL: http://storage-users:9158/data
 
-      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
-      STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      REVA_GATEWAY: storage-gateway:9142
+      STORAGE_USERS_PERMISSION_ENDPOINT: settings:9191
+      STORAGE_USERS_EVENTS_ENDPOINT: nats:9233
+
+      REVA_GATEWAY: gateway:9142
+
+      STORAGE_USERS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      STORAGE_USERS_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-changeme}
+
     volumes:
       - "ocis-storage-users:/var/lib/ocis"
     logging:
@@ -540,23 +701,22 @@ services:
       ocis-net:
     entrypoint:
       - ocis
-      - storage-public-link
+      - storage-publiclink
       - server
     environment:
-      OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
-      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+      STORAGE_PUBLICLINK_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      STORAGE_PUBLICLINK_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      STORAGE_PUBLICLINK_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      STORAGE_PUBLIC_LINK_ENDPOINT: storage-publiclink:9178
-      STORAGE_PUBLIC_LINK_GRPC_ADDR: 0.0.0.0:9178
+      STORAGE_PUBLICLINK_GRPC_ADDR: 0.0.0.0:9178
 
-      STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      REVA_GATEWAY: storage-gateway:9142
+      STORAGE_PUBLICLINK_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      REVA_GATEWAY: gateway:9142
     logging:
       driver: "local"
     restart: always
 
-  storage-sharing:
+  sharing:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
       replicas: 1
@@ -564,25 +724,22 @@ services:
       ocis-net:
     entrypoint:
       - ocis
-      - storage-sharing
+      - sharing
       - server
     environment:
-      OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
-      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+      SHARING_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      SHARING_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      SHARING_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      STORAGE_SHARING_ENDPOINT: storage-sharing:9150
-      STORAGE_SHARING_GRPC_ADDR: 0.0.0.0:9150
+      SHARING_GRPC_ADDR: 0.0.0.0:9150
 
-      STORAGE_SHARING_USER_DRIVER: json
-      STORAGE_SHARING_USER_JSON_FILE: /var/lib/ocis/storage/sharing/shares.json
-      STORAGE_SHARING_PUBLIC_DRIVER: json
-      STORAGE_SHARING_PUBLIC_JSON_FILE: /var/lib/ocis/storage/sharing/publicshares.json
+      SHARING_EVENTS_ENDPOINT: nats:9233
 
-      STORAGE_SHARING_EVENTS_ADDRESS: nats:9233
+      SHARING_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      REVA_GATEWAY: gateway:9142
 
-      STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      REVA_GATEWAY: storage-gateway:9142
+      SHARING_USER_DRIVER: json
+      SHARING_PUBLIC_DRIVER: json
     volumes:
       - "ocis-storage-sharing:/var/lib/ocis"
     logging:
@@ -600,21 +757,20 @@ services:
       - users
       - server
     environment:
-      OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
-      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+      USERS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      USERS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      USERS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      STORAGE_USERPROVIDER_ENDPOINT: users:9144
-      STORAGE_USERPROVIDER_ADDR: 0.0.0.0:9144
+      USERS_GRPC_ADDR: 0.0.0.0:9144
+      USERS_LDAP_URI: ldaps://idm:9235
+      USERS_LDAP_CACERT: ""
+      USERS_LDAP_INSECURE: ${INSECURE:-true}
+      USERS_LDAP_BIND_PASSWORD: ${IDM_REVASVC_PASSWORD:-changeme}
+      USERS_IDP_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
 
-      STORAGE_USERPROVIDER_DRIVER: ldap
-      STORAGE_LDAP_URI: "ldaps://glauth:9126"
-      STORAGE_LDAP_INSECURE: "true"
-      STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
-      STORAGE_LDAP_IDP: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      REVA_GATEWAY: gateway:9142
 
-      STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      REVA_GATEWAY: storage-gateway:9142
+      USERS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
     logging:
       driver: "local"
     restart: always
@@ -630,26 +786,26 @@ services:
       - groups
       - server
     environment:
-      OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
-      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+      GROUPS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      GROUPS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      GROUPS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      STORAGE_GROUPPROVIDER_ENDPOINT: groups:9160
-      STORAGE_GROUPPROVIDER_ADDR: 0.0.0.0:9160
+      GROUPS_GRPC_ADDR: 0.0.0.0:9160
 
-      STORAGE_GROUPPROVIDER_DRIVER: ldap
-      STORAGE_LDAP_URI: "ldaps://glauth:9126"
-      STORAGE_LDAP_INSECURE: "true"
-      STORAGE_LDAP_BIND_PASSWORD: ${STORAGE_LDAP_BIND_PASSWORD:-reva}
-      STORAGE_LDAP_IDP: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      GROUPS_LDAP_URI: ldaps://idm:9235
+      GROUPS_LDAP_CACERT: ""
+      GROUPS_LDAP_INSECURE: ${INSECURE:-true}
+      GROUPS_LDAP_BIND_PASSWORD: ${IDM_REVASVC_PASSWORD:-changeme}
+      GROUPS_IDP_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
 
-      STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      REVA_GATEWAY: storage-gateway:9142
+      REVA_GATEWAY: gateway:9142
+
+      GROUPS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
     logging:
       driver: "local"
     restart: always
 
-  storage-frontend:
+  frontend:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
       replicas: ${OCIS_SCALE:-1}
@@ -657,30 +813,26 @@ services:
       ocis-net:
     entrypoint:
       - ocis
-      - storage-frontend
+      - frontend
       - server
     environment:
-      STORAGE_FRONTEND_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
-      STORAGE_FRONTEND_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      STORAGE_FRONTEND_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+      FRONTEND_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      FRONTEND_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      FRONTEND_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      # FIXME this now lives in a dedicated service
-      APP_PROVIDER_WOPI_INSECURE: "true"
-      STORAGE_FRONTEND_ARCHIVER_INSECURE: "true"
-      STORAGE_FRONTEND_OCDAV_INSECURE: "true"
+      FRONTEND_HTTP_ADDR: 0.0.0.0:9140
+      FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.text}
 
-      STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      STORAGE_FRONTEND_HTTP_ADDR: 0.0.0.0:9140
+      FRONTEND_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      REVA_GATEWAY: gateway:9142
+      FRONTEND_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
+      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-changeme}
 
-      STORAGE_SHARING_ENDPOINT: storage-sharing:9150
-
-      STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      REVA_GATEWAY: storage-gateway:9142
     logging:
       driver: "local"
     restart: always
 
-  storage-gateway:
+  gateway:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
       replicas: ${OCIS_SCALE:-1}
@@ -688,47 +840,31 @@ services:
       ocis-net:
     entrypoint:
       - ocis
-      - storage-gateway
+      - gateway
       - server
     environment:
-      OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
-      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+      GATEWAY_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      GATEWAY_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      GATEWAY_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       GATEWAY_GRPC_ADDR: 0.0.0.0:9142
 
-      REVA_GATEWAY: storage-gateway:9142
+      GATEWAY_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
 
-      STORAGE_USERS_ENDPOINT: storage-users:9157
+      GATEWAY_USERS_ENDPOINT: users:9144
+      GATEWAY_GROUPS_ENDPOINT: groups:9160
+      GATEWAY_AUTH_BASIC_ENDPOINT: auth-basic:9146
+      GATEWAY_AUTH_BEARER_ENDPOINT: auth-bearer:9148
+      GATEWAY_AUTH_MACHINE_ENDPOINT: auth-machine:9166
+      GATEWAY_PERMISSIONS_ENDPOINT: settings:9191
+      GATEWAY_SHARING_ENDPOINT: sharing:9150
+      GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT: storage-publiclink:9178
+      GATEWAY_STORAGE_USERS_ENDPOINT: storage-users:9157
+      GATEWAY_STORAGE_SHARES_ENDPOINT: storage-shares:9154
+      GATEWAY_APP_REGISTRY_ENDPOINT: app-registry:9242
 
-      STORAGE_PUBLIC_LINK_ENDPOINT: storage-publiclink:9178
-
-      STORAGE_AUTH_BASIC_ENDPOINT: storage-authbasic:9146
-      STORAGE_AUTH_BEARER_ENDPOINT: storage-authbearer:9166
-      STORAGE_AUTH_MACHINE_ENDPOINT: storage-authmachine:9148
-
-      STORAGE_SHARES_ENDPOINT: storage-shares:9154
-      STORAGE_SHARING_ENDPOINT: sharing:9150
-
-      STORAGE_GROUPPROVIDER_ENDPOINT: groups:9160
-      STORAGE_USERPROVIDER_ENDPOINT: users:9144
-      STORAGE_PERMISSIONS_ENDPOINT: settings:9191
-
-      STORAGE_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-
-      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
-      STORAGE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      GATEWAY_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-changeme}
     logging:
-      driver: "local"
+        driver: "local"
     restart: always
-
-volumes:
-  traefik-certs: null
-  ocis-settings: null
-  ocis-store: null
-  ocis-storage-system: null
-  ocis-storage-users: null
-  ocis-storage-sharing: null
-
-networks:
-  ocis-net:
