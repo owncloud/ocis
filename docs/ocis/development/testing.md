@@ -101,6 +101,8 @@ git clone https://github.com/owncloud/core.git
 
 ### Run ocis
 
+Create an up-to-date ocis binary by [building oCIS]({{< ref "build" >}})
+
 To start ocis:
 
 ```bash
