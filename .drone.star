@@ -1715,7 +1715,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "SHARING_USER_OWNCLOUDSQL_DB_NAME": "owncloud",
             # General oCIS config
             # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
-            "OCIS_RUN_EXTENSIONS": "settings,storage-system,graph,graph-explorer,ocs,store,thumbnails,web,webdav,frontend,gateway,users,groups,auth-basic,auth-bearer,auth-machine,storage-users,storage-shares,storage-publiclink,app-provider,sharing,proxy,nats,ocdav",
+            "OCIS_RUN_EXTENSIONS": "app-registry,app-provider,audit,auth-basic,auth-bearer,auth-machine,frontend,gateway,graph,graph-explorer,groups,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav",
             "OCIS_LOG_LEVEL": "info",
             "OCIS_URL": OCIS_URL,
             "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",
