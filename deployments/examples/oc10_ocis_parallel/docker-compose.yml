@@ -43,11 +43,30 @@ services:
       driver: "local"
     restart: always
 
+  ocis-init-volumes:
+    image: busybox
+    entrypoint:
+      - /bin/sh
+    # prepare the oCIS config volume for oCIS
+    command: ["-c", "chown -R 33:33 /etc/ocis /var/lib/ocis"]
+    volumes:
+      - ocis-config:/etc/ocis
+      - ocis-data:/var/lib/ocis
+
   ocis:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
     user: "33:33" # equals the user "www-data" for oC10
+    entrypoint:
+      - /bin/sh
+    # run ocis init to initialize a configuration file with random secrets
+    # it will fail on subsequent runs, because the config file already exists
+    # therefore we ignore the error and then start the ocis server
+    command: ["-c", "ocis init || true; ocis server"]
+    #entrypoint:
+    #  - /bin/sh
+    #  - /entrypoint-override.sh
     environment:
       # Keycloak IDP specific configuration
       OCIS_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-owncloud}
@@ -97,13 +116,13 @@ services:
       SHARING_USER_OWNCLOUDSQL_DB_USERNAME: "owncloud"
       SHARING_USER_OWNCLOUDSQL_DB_PASSWORD: "owncloud"
       SHARING_USER_OWNCLOUDSQL_DB_HOST: "oc10-db"
-      SHARING_USER_OWNCLOUDSQL_DB_PORT: 330
+      SHARING_USER_OWNCLOUDSQL_DB_PORT: 3306
       SHARING_USER_OWNCLOUDSQL_DB_NAME: "owncloud"
       # ownCloud storage readonly
       OCIS_STORAGE_READ_ONLY: "false" # TODO: conflict with OWNCLOUDSQL -> https://github.com/owncloud/ocis/issues/2303
       # General oCIS config
       # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
-      OCIS_RUN_EXTENSIONS: settings,storage-system,graph,graph-explorer,ocs,store,thumbnails,web,webdav,frontend,gateway,users,groups,auth-basic,auth-bearer,auth-machine,storage-users,storage-shares,storage-publiclink,app-provider,sharing,proxy,nats
+      OCIS_RUN_EXTENSIONS: app-registry,app-provider,audit,auth-basic,auth-bearer,auth-machine,frontend,gateway,graph,graph-explorer,groups,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
       OCIS_URL: https://${CLOUD_DOMAIN:-cloud.owncloud.test}
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
@@ -120,6 +139,7 @@ services:
       IDM_CREATE_DEMO_USERS: "${DEMO_USERS:-false}"
     volumes:
       - ./config/ocis/proxy.yaml:/etc/ocis/proxy.yaml
+      - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis
       # shared volume with oC10
       - oc10-data:/mnt/data
@@ -334,6 +354,7 @@ services:
 
 volumes:
   certs:
+  ocis-config:
   ocis-data:
   keycloak-postgres-data:
   oc10-mysql-data:
