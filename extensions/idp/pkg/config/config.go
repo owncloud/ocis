@@ -18,9 +18,10 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
-	Asset Asset    `yaml:"asset"`
-	IDP   Settings `yaml:"idp"`
-	Ldap  Ldap     `yaml:"ldap"`
+	Asset   Asset    `yaml:"asset"`
+	IDP     Settings `yaml:"idp"`
+	Clients []Client `yaml:"clients"`
+	Ldap    Ldap     `yaml:"ldap"`
 
 	Context context.Context `yaml:"-"`
 }
@@ -49,6 +50,16 @@ type Ldap struct {
 // Asset defines the available asset configuration.
 type Asset struct {
 	Path string `yaml:"asset" env:"IDP_ASSET_PATH"`
+}
+
+type Client struct {
+	ID              string   `yaml:"id"`
+	Name            string   `yaml:"name"`
+	Trusted         bool     `yaml:"trusted"`
+	Secret          string   `yaml:"secret"`
+	RedirectURIs    []string `yaml:"redirect_uris"`
+	Origins         []string `yaml:"origins"`
+	ApplicationType string   `yaml:"application_type"`
 }
 
 type Settings struct {
@@ -80,8 +91,8 @@ type Settings struct {
 	Listen string
 
 	IdentifierClientDisabled          bool   `yaml:"identifier_client_disabled" env:"IDP_DISABLE_IDENTIFIER_WEBAPP"`
-	IdentifierClientPath              string `yaml:"identifier_client_path" env:"IDP_IDENTIFIER_CLIENT_PATH"`
-	IdentifierRegistrationConf        string `yaml:"identifier_registration_conf" env:"IDP_IDENTIFIER_REGISTRATION_CONF"`
+	IdentifierClientPath              string `yaml:"-"`
+	IdentifierRegistrationConf        string `yaml:"-"`
 	IdentifierScopesConf              string `yaml:"identifier_scopes_conf" env:"IDP_IDENTIFIER_SCOPES_CONF"`
 	IdentifierDefaultBannerLogo       string
 	IdentifierDefaultSignInPageText   string

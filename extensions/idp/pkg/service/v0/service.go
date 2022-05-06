@@ -24,6 +24,7 @@ import (
 	"github.com/owncloud/ocis/v2/extensions/idp/pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"gopkg.in/yaml.v2"
 	"stash.kopano.io/kgol/rndm"
 )
 
@@ -54,7 +55,11 @@ func NewService(opts ...Option) Service {
 		logger.Fatal().Err(err).Msg("could not initialize env vars")
 	}
 
-	if err := createConfigsIfNotExist(assetVFS, options.Config.IDP.IdentifierRegistrationConf, options.Config.IDP.Iss); err != nil {
+	if err := createTemporaryClientsConfig(
+		options.Config.IDP.IdentifierRegistrationConf,
+		options.Config.IDP.Iss,
+		options.Config.Clients,
+	); err != nil {
 		logger.Fatal().Err(err).Msg("could not create default config")
 	}
 
@@ -88,7 +93,11 @@ func NewService(opts ...Option) Service {
 	return svc
 }
 
-func createConfigsIfNotExist(assets http.FileSystem, filePath, ocisURL string) error {
+type temporaryClientConfig struct {
+	Clients []config.Client `yaml:"clients"`
+}
+
+func createTemporaryClientsConfig(filePath, ocisURL string, clients []config.Client) error {
 
 	folder := path.Dir(filePath)
 	if _, err := os.Stat(folder); os.IsNotExist(err) {
@@ -97,33 +106,36 @@ func createConfigsIfNotExist(assets http.FileSystem, filePath, ocisURL string) e
 		}
 	}
 
-	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		defaultConf, err := assets.Open("/identifier-registration.yaml")
-		if err != nil {
-			return err
+	for i, client := range clients {
+
+		for i, entry := range client.RedirectURIs {
+			client.RedirectURIs[i] = strings.ReplaceAll(entry, "{{OCIS_URL}}", strings.TrimRight(ocisURL, "/"))
 		}
-
-		defer defaultConf.Close()
-
-		confOnDisk, err := os.Create(filePath)
-		if err != nil {
-			return err
+		for i, entry := range client.Origins {
+			client.Origins[i] = strings.ReplaceAll(entry, "{{OCIS_URL}}", strings.TrimRight(ocisURL, "/"))
 		}
+		clients[i] = client
+	}
 
-		defer confOnDisk.Close()
+	c := temporaryClientConfig{
+		Clients: clients,
+	}
 
-		conf, err := ioutil.ReadAll(defaultConf)
-		if err != nil {
-			return err
-		}
+	conf, err := yaml.Marshal(c)
+	if err != nil {
+		return err
+	}
 
-		// replace placeholder {{OCIS_URL}} with https://localhost:9200 / correct host
-		conf = []byte(strings.ReplaceAll(string(conf), "{{OCIS_URL}}", strings.TrimRight(ocisURL, "/")))
+	confOnDisk, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
 
-		err = ioutil.WriteFile(filePath, conf, 0600)
-		if err != nil {
-			return err
-		}
+	defer confOnDisk.Close()
+
+	err = ioutil.WriteFile(filePath, conf, 0600)
+	if err != nil {
+		return err
 	}
 
 	return nil

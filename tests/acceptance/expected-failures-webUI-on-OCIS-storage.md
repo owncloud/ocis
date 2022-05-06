@@ -247,9 +247,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIResharing2/reshareUsers.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L72)
 - [webUIResharing2/reshareUsers.feature:73](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L73)
 
-### [Regression during ocis 2.0.0-beta](https://github.com/owncloud/ocis/issues/3627)
-- [webUISharingInternalGroups/shareWithGroups.feature:19](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L19)
-
 ### [Different share permissions provides varying roles in oc10 and ocis](https://github.com/owncloud/ocis/issues/1277)
 - [webUISharingInternalGroups/shareWithGroups.feature:166](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L166)
 - [webUISharingInternalGroups/shareWithGroups.feature:180](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L180)

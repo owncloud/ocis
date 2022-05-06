@@ -1,9 +1,11 @@
 package svc
 
 import (
+	"context"
 	"encoding/xml"
 	"io"
 	"net/http"
+	"net/url"
 	"path"
 	"path/filepath"
 	"strings"
@@ -13,16 +15,16 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/templates"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/grpc/metadata"
 
+	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/config"
+	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/constants"
+	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/dav/requests"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/dav/requests"
 	thumbnailsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
@@ -73,10 +75,32 @@ func NewService(opts ...Option) (Service, error) {
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
-		r.Get("/remote.php/dav/spaces/{id}/*", svc.SpacesThumbnail)
-		r.Get("/remote.php/dav/files/{id}/*", svc.Thumbnail)
-		r.Get("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnail)
-		r.Head("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnailHead)
+
+		r.Group(func(r chi.Router) {
+			r.Use(svc.DavUserContext())
+
+			r.Get("/remote.php/dav/spaces/{id}/*", svc.SpacesThumbnail)
+			r.Get("/dav/spaces/{id}/*", svc.SpacesThumbnail)
+
+			r.Get("/remote.php/dav/files/{id}/*", svc.Thumbnail)
+			r.Get("/dav/files/{id}/*", svc.Thumbnail)
+		})
+
+		r.Group(func(r chi.Router) {
+			r.Use(svc.DavPublicContext())
+
+			r.Head("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnailHead)
+			r.Head("/dav/public-files/{token}/*", svc.PublicThumbnailHead)
+
+			r.Get("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnail)
+			r.Get("/dav/public-files/{token}/*", svc.PublicThumbnail)
+		})
+
+		r.Group(func(r chi.Router) {
+			r.Use(svc.WebDAVContext())
+			r.Get("/remote.php/webdav/*", svc.Thumbnail)
+			r.Get("/webdav/*", svc.Thumbnail)
+		})
 
 		// r.MethodFunc("REPORT", "/remote.php/dav/files/{id}/*", svc.Search)
 
@@ -112,6 +136,67 @@ type Webdav struct {
 // ServeHTTP implements the Service interface.
 func (g Webdav) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.mux.ServeHTTP(w, r)
+}
+
+func (g Webdav) DavUserContext() func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			filePath := r.URL.Path
+
+			id := chi.URLParam(r, "id")
+			id, err := url.QueryUnescape(id)
+			if err == nil && id != "" {
+				ctx = context.WithValue(ctx, constants.ContextKeyID, id)
+			}
+
+			if id != "" {
+				filePath = strings.TrimPrefix(filePath, path.Join("/remote.php/dav/spaces", id)+"/")
+				filePath = strings.TrimPrefix(filePath, path.Join("/dav/spaces", id)+"/")
+
+				filePath = strings.TrimPrefix(filePath, path.Join("/remote.php/dav/files", id)+"/")
+				filePath = strings.TrimPrefix(filePath, path.Join("/dav/files", id)+"/")
+			}
+
+			ctx = context.WithValue(ctx, constants.ContextKeyPath, filePath)
+
+			next.ServeHTTP(w, r.WithContext(ctx))
+
+		})
+	}
+}
+
+func (g Webdav) DavPublicContext() func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			filePath := r.URL.Path
+
+			if token := chi.URLParam(r, "token"); token != "" {
+				filePath = strings.TrimPrefix(filePath, path.Join("/remote.php/dav/public-files", token)+"/")
+				filePath = strings.TrimPrefix(filePath, path.Join("/dav/public-files", token)+"/")
+			}
+			ctx = context.WithValue(ctx, constants.ContextKeyPath, filePath)
+
+			next.ServeHTTP(w, r.WithContext(ctx))
+
+		})
+	}
+}
+func (g Webdav) WebDAVContext() func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+			filePath := r.URL.Path
+			filePath = strings.TrimPrefix(filePath, "/remote.php")
+			filePath = strings.TrimPrefix(filePath, "/webdav/")
+
+			ctx := context.WithValue(r.Context(), constants.ContextKeyPath, filePath)
+
+			next.ServeHTTP(w, r.WithContext(ctx))
+
+		})
+	}
 }
 
 // SpacesThumbnail is the endpoint for retrieving thumbnails inside of spaces.
@@ -166,18 +251,36 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	t := r.Header.Get(TokenHeader)
-	ctx := metadata.AppendToOutgoingContext(r.Context(), TokenHeader, t)
-	userRes, err := g.revaClient.GetUserByClaim(ctx, &userv1beta1.GetUserByClaimRequest{
-		Claim: "username",
-		Value: tr.Identifier,
-	})
-	if err != nil || userRes.Status.Code != rpcv1beta1.Code_CODE_OK {
-		g.log.Error().Err(err).Msg("could not get user")
-		renderError(w, r, errInternalError("could not get user"))
-		return
+
+	var user *userv1beta1.User
+
+	if tr.Identifier == "" {
+		// look up user from token via WhoAmI
+		userRes, err := g.revaClient.WhoAmI(r.Context(), &gatewayv1beta1.WhoAmIRequest{
+			Token: t,
+		})
+		if err != nil || userRes.Status.Code != rpcv1beta1.Code_CODE_OK {
+			g.log.Error().Err(err).Msg("could not get user")
+			renderError(w, r, errInternalError("could not get user"))
+			return
+		}
+		user = userRes.GetUser()
+	} else {
+		// look up user from URL via GetUserByClaim
+		ctx := metadata.AppendToOutgoingContext(r.Context(), TokenHeader, t)
+		userRes, err := g.revaClient.GetUserByClaim(ctx, &userv1beta1.GetUserByClaimRequest{
+			Claim: "username",
+			Value: tr.Identifier,
+		})
+		if err != nil || userRes.Status.Code != rpcv1beta1.Code_CODE_OK {
+			g.log.Error().Err(err).Msg("could not get user")
+			renderError(w, r, errInternalError("could not get user"))
+			return
+		}
+		user = userRes.GetUser()
 	}
 
-	fullPath := filepath.Join(templates.WithUser(userRes.User, g.config.WebdavNamespace), tr.Filepath)
+	fullPath := filepath.Join(templates.WithUser(user, g.config.WebdavNamespace), tr.Filepath)
 	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
 		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),

@@ -45,15 +45,15 @@ type Policy struct {
 
 // Route defines forwarding routes
 type Route struct {
-	Type RouteType `yaml:"type"`
+	Type RouteType `yaml:"type,omitempty"`
 	// Method optionally limits the route to this HTTP method
-	Method   string `yaml:"method"`
-	Endpoint string `yaml:"endpoint"`
+	Method   string `yaml:"method,omitempty"`
+	Endpoint string `yaml:"endpoint,omitempty"`
 	// Backend is a static URL to forward the request to
-	Backend string `yaml:"backend"`
+	Backend string `yaml:"backend,omitempty"`
 	// Service name to look up in the registry
-	Service     string `yaml:"service"`
-	ApacheVHost bool   `yaml:"apache_vhost"`
+	Service     string `yaml:"service,omitempty"`
+	ApacheVHost bool   `yaml:"apache_vhost,omitempty"`
 }
 
 // RouteType defines the type of a route
