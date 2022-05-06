@@ -30,6 +30,7 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
+		MountID:                "7639e57c-4433-4a12-8201-722fd0009154",
 		ReadOnly:               false,
 		SharesProviderEndpoint: "localhost:9150",
 	}
