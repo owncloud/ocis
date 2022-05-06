@@ -68,10 +68,10 @@ require (
 	go-micro.dev/v4 v4.6.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.31.0
-	go.opentelemetry.io/otel v1.6.3
+	go.opentelemetry.io/otel v1.7.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.6.3
 	go.opentelemetry.io/otel/sdk v1.6.3
-	go.opentelemetry.io/otel/trace v1.6.3
+	go.opentelemetry.io/otel/trace v1.7.0
 	golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29
 	golang.org/x/image v0.0.0-20220321031419-a8550c1d254a
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
@@ -80,7 +80,7 @@ require (
 	google.golang.org/grpc v1.46.0
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/yaml.v2 v2.4.0
-	gotest.tools/v3 v3.1.0
+	gotest.tools/v3 v3.2.0
 	stash.kopano.io/kgol/rndm v1.1.1
 )
 
