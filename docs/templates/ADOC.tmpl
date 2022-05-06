@@ -9,7 +9,8 @@
 
 {{- range .Fields}}
 {{ $numVars := len .EnvVars }}
-| {{- range $i, $value := .EnvVars }}{{- if $i }} +{{ end }}
+| {{- range $i, $value := .EnvVars }}{{- if $i }} +
+{{ end -}}
 `{{- $value }}` 
 {{- end }}
 | {{.Type}}
