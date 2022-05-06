@@ -55,17 +55,17 @@ policies:
     endpoint: /webdav/?preview=1
     backend: http://localhost:9115
   - endpoint: /remote.php/
-    service: ocdav
+    service: com.owncloud.web.ocdav
   - endpoint: /dav/
-    service: ocdav
+    service: com.owncloud.web.ocdav
   - endpoint: /webdav/
-    service: ocdav
+    service: com.owncloud.web.ocdav
   - endpoint: /status.php
-    service: ocdav
+    service: com.owncloud.web.ocdav
   - endpoint: /index.php/
-    service: ocdav
+    service: com.owncloud.web.ocdav
   - endpoint: /apps/
-    service: ocdav
+    service: com.owncloud.web.ocdav
   - endpoint: /data
     backend: http://localhost:9140
   - endpoint: /app/
