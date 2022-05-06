@@ -82,18 +82,18 @@ config = {
         "earlyFail": True,
     },
     "localApiTests": {
-        "skip": True,
+        "skip": False,
         "earlyFail": True,
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
         "earlyFail": True,
     },
