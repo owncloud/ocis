@@ -318,8 +318,6 @@ github.com/cs3org/go-cs3apis v0.0.0-20220412090512-93c5918b4bde h1:WrD9O8ZaWvsm0
 github.com/cs3org/go-cs3apis v0.0.0-20220412090512-93c5918b4bde/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/cs3org/reva v1.18.0 h1:MbPS5ZAa8RzKcTxAVeSDdISB3XXqLIxqB03BTN5ReBY=
 github.com/cs3org/reva v1.18.0/go.mod h1:e5VDUDu4vVWIeVkZcW//n6UZzhGGMa+Tz/whCiX3N6o=
-github.com/cs3org/reva/v2 v2.3.0 h1:AwDwqqzAKTrkBz1ifOy3U92C12zk92uBw6LyhLAjCBc=
-github.com/cs3org/reva/v2 v2.3.0/go.mod h1:2e/4HcIy54Mic3V7Ow0bz4n5dkZU0dHIZSWomFe5vng=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8/go.mod h1:4abs/jPXcmJzYoYGF91JF9Uq9s/KL5n1jvFDix8KcqY=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
@@ -924,6 +922,8 @@ github.com/klauspost/cpuid/v2 v2.0.1/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa02
 github.com/klauspost/cpuid/v2 v2.0.4/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa0213Md/qVLRg=
 github.com/klauspost/cpuid/v2 v2.0.9 h1:lgaqFMSdTdQYdZ04uHyN2d/eKdOMyi2YLSvlQIBFYa4=
 github.com/klauspost/cpuid/v2 v2.0.9/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa0213Md/qVLRg=
+github.com/kobergj/reva/v2 v2.0.0-20220506092654-2a2bc414a0b4 h1:nUh7QiW6cCQYOoWNrZTZrFKhmx+Q1AAT5XWlALVeZ+U=
+github.com/kobergj/reva/v2 v2.0.0-20220506092654-2a2bc414a0b4/go.mod h1:2e/4HcIy54Mic3V7Ow0bz4n5dkZU0dHIZSWomFe5vng=
 github.com/kolo/xmlrpc v0.0.0-20200310150728-e0350524596b/go.mod h1:o03bZfuBwAXHetKXuInt4S7omeXUu62/A845kiycsSQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.2/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
