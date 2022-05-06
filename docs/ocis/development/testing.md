@@ -98,7 +98,7 @@ git clone https://github.com/owncloud/core.git
 To start ocis:
 
 ```bash
-ocis init
+IDM_ADMIN_PASSWORD=admin bin/ocis init --insecure true
 OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true bin/ocis server
 ```
 
@@ -118,13 +118,16 @@ Then run the api acceptance tests with the following command from the root of th
 ```bash
 make test-acceptance-api \
 TEST_SERVER_URL=https://localhost:9200 \
+TEST_WITH_GRAPH_API=true \
+PATH_TO_OCIS=/var/www/ocis \
+PATH_TO_CORE=. \
 TEST_OCIS=true \
 STORAGE_DRIVER=OCIS \
 SKELETON_DIR=apps/testing/data/apiSkeleton \
 BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS'
 ```
 
-Make sure to adjust the settings `TEST_SERVER_URL` and `OCIS_REVA_DATA_ROOT` according to your environment.
+Make sure to adjust the settings `TEST_SERVER_URL` and `PATH_TO_OCIS` according to your environment.
 
 This will run all tests that are relevant to oCIS.
 
