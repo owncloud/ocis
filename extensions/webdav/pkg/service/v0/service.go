@@ -209,7 +209,7 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 	}
 	t := r.Header.Get(TokenHeader)
 
-	fullPath := tr.Identifier + tr.Filepath
+	fullPath := filepath.Join(tr.Identifier, tr.Filepath)
 	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
 		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
 		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),

@@ -122,8 +122,8 @@ type OwnCloudSQLDriver struct {
 	Root string `yaml:"root" env:"STORAGE_USERS_OWNCLOUDSQL_DATADIR"`
 	//ShareFolder defines the name of the folder jailing all shares
 	ShareFolder           string `yaml:"share_folder" env:"STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER"`
-	UserLayout            string `env:"STORAGE_USERS_OWNCLOUDSQL_LAYOUT"`
-	UploadInfoDir         string `yaml:"upload_info_dir" env:"STORAGE_USERS_UPLOADINFO_DIR"`
+	UserLayout            string `yaml:"user_layout" env:"STORAGE_USERS_OWNCLOUDSQL_LAYOUT" desc:"path layout to use to navigate into a users folder in an owncloud data dir"`
+	UploadInfoDir         string `yaml:"upload_info_dir" env:"STORAGE_USERS_OWNCLOUDSQL_UPLOADINFO_DIR"`
 	DBUsername            string `yaml:"db_username" env:"STORAGE_USERS_OWNCLOUDSQL_DB_USERNAME"`
 	DBPassword            string `yaml:"db_password" env:"STORAGE_USERS_OWNCLOUDSQL_DB_PASSWORD"`
 	DBHost                string `yaml:"db_host" env:"STORAGE_USERS_OWNCLOUDSQL_DB_HOST"`

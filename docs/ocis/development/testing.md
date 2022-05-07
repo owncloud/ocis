@@ -9,7 +9,7 @@ geekdocFilePath: testing.md
 
 {{< toc >}}
 
-For running tests in the test suite you have two options. You may go the easy way and just run the test suite in docker. But for some tasks you could also need to install the test suite natively, which requires a little bit more setup since PHP and some dependencies need to be installed.
+To run tests in the test suite you have two options. You may go the easy way and just run the test suite in docker. But for some tasks you could also need to install the test suite natively, which requires a little more setup since PHP and some dependencies need to be installed.
 
 Both ways to run tests with the test suites are described here.
 
@@ -26,14 +26,14 @@ Basically we have two sources for feature tests and test suites:
 - [oCIS feature test and test suites](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features)
 - [ownCloud feature tests and test suites](https://github.com/owncloud/core/tree/master/tests/acceptance/features)
 
-At the moment both can be applied to oCIS since the api of oCIS is designed to be compatible to ownCloud.
+At the moment both can be applied to oCIS since the api of oCIS is designed to be compatible with ownCloud.
 
-Since we have to offer a migration path to existing users of ownCloud, you can use your existing ownCloud as storage backend for oCIS. As another storage backend we offer oCIS native storage, also called "oCIS". This stores files directly on disk. Which storage backend is used is also reflected in the tests, there are always different tests for oCIS storage and ownCloud storage.
+Since we have to offer a migration path to existing users of ownCloud, you can use your existing ownCloud as the storage backend for oCIS. As another storage backend we offer oCIS native storage, also called "oCIS". This stores files directly on disk. Which storage backend is used is also reflected in the tests, there are always different tests for oCIS storage and ownCloud storage.
 
 You can invoke two types of test suite runs:
 
 - run a full test suite, which consists of multiple feature tests
-- run a single feature test
+- run a single feature or single scenario in a feature
 
 ### Run full test suite
 
@@ -45,7 +45,7 @@ For example `make -C tests/acceptance/docker Core-API-Tests-owncloud-storage-3`r
 
 ### Run single feature test
 
-The single feature tests can also be run against the different storage backends. Therefore multiple make targets with the schema test-<test source>-feature-<storage backend> exists. For selecting a single feature test you have to add an additional `BEHAT_FEATURE=...` parameter when invoking the make command:
+The single feature tests can also be run against the different storage backends. Therefore, multiple make targets with the schema test-<test source>-feature-<storage backend> exist. To select a single feature you have to add an additional `BEHAT_FEATURE=...` parameter when invoking the make command:
 
 ```
 make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature'
@@ -53,9 +53,15 @@ make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='te
 
 This must be pointing to a valid feature definition.
 
+To run a single scenario in a feature, then mention the line number of the scenario:
+
+```
+make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:20'
+```
+
 ### oCIS image to be tested (or: skip build and take existing image)
 
-By default, the tests will be run against the docker image built from your current working state of the oCIS repository. For some purposes it might also be handy to use a oCIS image from Docker Hub. Therefore you can provide the optional flag `OCIS_IMAGE_TAG=...` which must contain an available docker tag of the [owncloud/ocis registry on Docker Hub](https://hub.docker.com/r/owncloud/ocis) (e.g. 'latest').
+By default, the tests will be run against the docker image built from your current working state of the oCIS repository. For some purposes it might also be handy to use an oCIS image from Docker Hub. Therefore, you can provide the optional flag `OCIS_IMAGE_TAG=...` which must contain an available docker tag of the [owncloud/ocis registry on Docker Hub](https://hub.docker.com/r/owncloud/ocis) (e.g. 'latest').
 
 ```
 make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-ocis OCIS_IMAGE_TAG=latest
@@ -95,11 +101,13 @@ git clone https://github.com/owncloud/core.git
 
 ### Run ocis
 
+Create an up-to-date ocis binary by [building oCIS]({{< ref "build" >}})
+
 To start ocis:
 
 ```bash
-ocis init
-OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true bin/ocis server
+IDM_ADMIN_PASSWORD=admin ocis/bin/ocis init --insecure true
+OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true ocis/bin/ocis server
 ```
 
 `PROXY_ENABLE_BASIC_AUTH` will allow the acceptance tests to make requests against the provisioning api (and other endpoints) using basic auth.
@@ -118,29 +126,32 @@ Then run the api acceptance tests with the following command from the root of th
 ```bash
 make test-acceptance-api \
 TEST_SERVER_URL=https://localhost:9200 \
+TEST_WITH_GRAPH_API=true \
+PATH_TO_OCIS=/var/www/ocis \
+PATH_TO_CORE=. \
 TEST_OCIS=true \
 STORAGE_DRIVER=OCIS \
 SKELETON_DIR=apps/testing/data/apiSkeleton \
 BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS'
 ```
 
-Make sure to adjust the settings `TEST_SERVER_URL` and `OCIS_REVA_DATA_ROOT` according to your environment.
+Make sure to adjust the settings `TEST_SERVER_URL` and `PATH_TO_OCIS` according to your environment.
 
 This will run all tests that are relevant to oCIS.
 
-To run a single test add `BEHAT_FEATURE=<feature file>`
+To run a single feature add `BEHAT_FEATURE=<feature file>`
 
 To run tests with a different storage driver set `STORAGE_DRIVER` to the correct value. It can be set to `OCIS` or `OWNCLOUD` and uses `OWNCLOUD` as the default value.
 
 ### use existing tests for BDD
 
 As a lot of scenarios are written for oC10, we can use those tests for Behaviour driven development in ocis.
-Every scenario that does not work in oCIS with "owncloud" storage, is listed in `tests/acceptance/expected-failures-on-OWNCLOUD-storage.md` with a link to the related issue.
 Every scenario that does not work in oCIS with "ocis" storage, is listed in `tests/acceptance/expected-failures-on-OCIS-storage.md` with a link to the related issue.
 
 Those scenarios are run in the ordinary acceptance test pipeline in CI. The scenarios that fail are checked against the
 expected failures. If there are any differences then the CI pipeline fails.
-Similarly, scenarios that do not work in oCIS with EOS storage are listed in `tests/acceptance/expected-failures-on-EOS-storage.md`.
+
+The tests are not currently run in CI with the OWNCLOUD or EOS storage drivers, so there are no expected-failures files for those.
 
 If you want to work on a specific issue
 
@@ -212,7 +223,7 @@ SKELETON_DIR="<path_to_core>/apps/testing/data/apiSkeleton"
 
 Replace `<path_to_core>` with the actual path to the root directory of core repo that you have cloned earlier.
 
-In order to run a single test, use `BEHAT_FEATURE` environment variable.
+In order to run a single test, use the `BEHAT_FEATURE` environment variable.
 
 ```bash
 make test-paralleldeployment-api \

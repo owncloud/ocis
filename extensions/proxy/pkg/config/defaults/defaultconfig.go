@@ -118,27 +118,27 @@ func DefaultPolicies() []config.Policy {
 				},
 				{
 					Endpoint: "/remote.php/",
-					Service:  "ocdav",
+					Service:  "com.owncloud.web.ocdav",
 				},
 				{
 					Endpoint: "/dav/",
-					Service:  "ocdav",
+					Service:  "com.owncloud.web.ocdav",
 				},
 				{
 					Endpoint: "/webdav/",
-					Service:  "ocdav",
+					Service:  "com.owncloud.web.ocdav",
 				},
 				{
 					Endpoint: "/status.php",
-					Service:  "ocdav",
+					Service:  "com.owncloud.web.ocdav",
 				},
 				{
 					Endpoint: "/index.php/",
-					Service:  "ocdav",
+					Service:  "com.owncloud.web.ocdav",
 				},
 				{
 					Endpoint: "/apps/",
-					Service:  "ocdav",
+					Service:  "com.owncloud.web.ocdav",
 				},
 				{
 					Endpoint: "/data",
