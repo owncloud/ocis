@@ -46,7 +46,7 @@ func DefaultConfig() *config.Config {
 		Status: config.Status{
 			Version:       version.Long(),
 			VersionString: version.GetString(),
-			Product:       "oCIS",
+			Product:       "Infinite Scale",
 			ProductName:   "Infinite Scale",
 			Edition:       "Community",
 		},

@@ -21,38 +21,32 @@ func Compiled() time.Time {
 	return t
 }
 
+// GetString returns a version string with pre-releases and metadata
 func GetString() string {
-	if String == "dev" {
-		return "0.0.0+dev"
-	}
-	parsedVersion, err := semver.NewVersion(String)
-	// We have no semver version but a commitid
-	if err != nil {
-		return String
-	}
-	return parsedVersion.String()
+	return Parsed().String()
 }
 
+// Parsed returns a semver Version
 func Parsed() *semver.Version {
-	var versionToParse string
+	versionToParse := String
 	if String == "dev" {
 		versionToParse = "0.0.0+dev"
 	}
 	parsedVersion, err := semver.NewVersion(versionToParse)
 	// We have no semver version but a commitid
 	if err != nil {
-		parsedVersion, _ = semver.NewVersion("0.0.0+" + String)
+		parsedVersion, err = semver.NewVersion("0.0.0+" + String)
+		// this should never happen
+		if err != nil {
+			return &semver.Version{}
+		}
 	}
 	return parsedVersion
 }
 
+// Long returns the legacy version with 4 number parts like 10.9.8.0
 func Long() string {
-	var s string
-	if Parsed().Metadata() == "" {
-		s = "-" + Parsed().Prerelease()
-	}
-	s = "+" + Parsed().Metadata()
 	return strconv.FormatInt(Parsed().Major(), 10) + "." +
 		strconv.FormatInt(Parsed().Minor(), 10) + "." +
-		strconv.FormatInt(Parsed().Patch(), 10) + "." + "0" + s
+		strconv.FormatInt(Parsed().Patch(), 10) + "." + "0"
 }
