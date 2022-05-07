@@ -22,6 +22,7 @@ The following sections list the changes for unreleased.
 * Change - Split MachineAuth from SystemUser: [#3672](https://github.com/owncloud/ocis/pull/3672)
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 * Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
+* Enhancement - Product field in OCS version: [#2918](https://github.com/owncloud/ocis/pull/2918)
 * Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 * Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
@@ -163,6 +164,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3602
    https://github.com/owncloud/ocis/pull/3647
+
+* Enhancement - Product field in OCS version: [#2918](https://github.com/owncloud/ocis/pull/2918)
+
+   We've added a new field to the OCS Version, which is supposed to announce the product name. The
+   web ui as a client will make use of it to make the backend product and version available (e.g. for
+   easier bug reports).
+
+   https://github.com/owncloud/ocis/pull/2918
 
 * Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
 
