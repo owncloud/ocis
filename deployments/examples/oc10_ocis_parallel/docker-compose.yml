@@ -74,7 +74,7 @@ services:
       WEB_OIDC_CLIENT_ID: ocis-web
       WEB_OIDC_SCOPE: openid profile email owncloud
       # external ldap is supposed to be read only
-      GRAPH_IDENTITY_BACKEND: cs3
+      GRAPH_IDENTITY_BACKEND: ldap
       GRAPH_LDAP_SERVER_WRITE_ENABLED: "false"
       # LDAP bind
       LDAP_URI: "ldaps://openldap"
@@ -82,19 +82,17 @@ services:
       LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
       LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
       # LDAP user settings
-      PROXY_AUTOPROVISION_ACCOUNTS: "true" # automatically create users when they login
-      PROXY_ACCOUNT_BACKEND_TYPE: cs3 # proxy should get users from CS3APIS (which gets it from LDAP)
       PROXY_USER_OIDC_CLAIM: ocis.user.uuid # claim was added in Keycloak
       PROXY_USER_CS3_CLAIM: userid # equals STORAGE_LDAP_USER_SCHEMA_UID
-      LDAP_GROUP_BASE_DN: "dc=owncloud,dc=com"
+      LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
       LDAP_GROUP_OBJECTCLASS: "groupOfUniqueNames"
       LDAP_GROUP_SCHEMA_DISPLAYNAME: "cn"
       LDAP_GROUP_SCHEMA_ID: "cn"
       LDAP_GROUP_SCHEMA_MAIL: "mail"
       LDAP_GROUP_SCHEMA_MEMBER: "cn"
       LDAP_GROUPFILTER: "(objectclass=owncloud)"
-      LDAP_LOGIN_ATTRIBUTES: "uid,mail"
-      LDAP_USER_BASE_DN: "dc=owncloud,dc=com"
+      LDAP_LOGIN_ATTRIBUTES: "uid"
+      LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
       LDAP_USER_OBJECTCLASS: "posixAccount"
       LDAP_USER_SCHEMA_DISPLAYNAME: "displayname"
       LDAP_USER_SCHEMA_ID: "ownclouduuid"
@@ -126,17 +124,10 @@ services:
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
       OCIS_URL: https://${CLOUD_DOMAIN:-cloud.owncloud.test}
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
-      # change default secrets
-      OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
-      OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
       OCIS_INSECURE: "${INSECURE:-false}"
       # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
       PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
-      # demo users
-      ACCOUNTS_DEMO_USERS_AND_GROUPS: "${DEMO_USERS:-false}"  # deprecated, remove after switching to LibreIDM
-      IDM_CREATE_DEMO_USERS: "${DEMO_USERS:-false}"
     volumes:
       - ./config/ocis/proxy.yaml:/etc/ocis/proxy.yaml
       - ocis-config:/etc/ocis

@@ -1637,7 +1637,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
     if not testing_parallel_deploy:
         user = "0:0"
         environment = {
-            "OCIS_URL": "https://ocis-server:9200",
+            "OCIS_URL": OCIS_URL,
             "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",  # cs3api-validator needs the cs3api gatway exposed
             "STORAGE_USERS_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
@@ -1669,7 +1669,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "WEB_OIDC_CLIENT_ID": "ocis-web",
             "WEB_OIDC_SCOPE": "openid profile email owncloud",
             # external  ldap is supposed to be read only
-            "GRAPH_IDENTITY_BACKEND": "cs3",
+            "GRAPH_IDENTITY_BACKEND": "ldap",
             "GRAPH_LDAP_SERVER_WRITE_ENABLED": "false",
             # LDAP bind
             "LDAP_URI": "ldaps://openldap",
@@ -1677,19 +1677,17 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "LDAP_BIND_DN": "cn=admin,dc=owncloud,dc=com",
             "LDAP_BIND_PASSWORD": "admin",
             # LDAP user settings
-            "PROXY_AUTOPROVISION_ACCOUNTS": "true",  # automatically create users when they login
-            "PROXY_ACCOUNT_BACKEND_TYPE": "cs3",  # proxy should get users from CS3APIS (which gets it from LDAP)
             "PROXY_USER_OIDC_CLAIM": "ocis.user.uuid",  # claim was added in Keycloak
             "PROXY_USER_CS3_CLAIM": "userid",  # equals STORAGE_LDAP_USER_SCHEMA_UID
-            "LDAP_GROUP_BASE_DN": "ou=testgroups,dc=owncloud,dc=com",
+            "LDAP_GROUP_BASE_DN": "ou=TestGroups,dc=owncloud,dc=com",
             "LDAP_GROUP_OBJECTCLASS": "groupOfUniqueNames",
             "LDAP_GROUP_SCHEMA_DISPLAYNAME": "cn",
             "LDAP_GROUP_SCHEMA_ID": "cn",
             "LDAP_GROUP_SCHEMA_MAIL": "mail",
             "LDAP_GROUP_SCHEMA_MEMBER": "cn",
             "LDAP_GROUPFILTER": "(objectclass=owncloud)",
-            "LDAP_LOGIN_ATTRIBUTES": "uid,mail",
-            "LDAP_USER_BASE_DN": "ou=testusers,dc=owncloud,dc=com",
+            "LDAP_LOGIN_ATTRIBUTES": "uid",
+            "LDAP_USER_BASE_DN": "ou=TestUsers,dc=owncloud,dc=com",
             "LDAP_USER_OBJECTCLASS": "posixAccount",
             "LDAP_USER_SCHEMA_DISPLAYNAME": "displayname",
             "LDAP_USER_SCHEMA_ID": "ownclouduuid",
@@ -1721,8 +1719,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",
             "OCIS_CONFIG_DIR": "/etc/ocis",
             "PROXY_ENABLE_BASIC_AUTH": "true",
-            "IDM_CREATE_DEMO_USERS": True,
-            "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
         }
         wait_for_ocis = {
             "name": "wait-for-ocis-server",
