@@ -55,6 +55,11 @@ func Server(cfg *config.Config) *cli.Command {
 					ocdav.Prefix(cfg.HTTP.Prefix),
 					ocdav.GatewaySvc(cfg.Reva.Address),
 					ocdav.JWTSecret(cfg.TokenManager.JWTSecret),
+					ocdav.ProductName(cfg.Status.ProductName),
+					ocdav.Product(cfg.Status.Product),
+					ocdav.Version(cfg.Status.Version),
+					ocdav.VersionString(cfg.Status.VersionString),
+					ocdav.Edition(cfg.Status.Edition),
 					// ocdav.FavoriteManager() // FIXME needs a proper persistence implementation
 					// ocdav.LockSystem(), // will default to the CS3 lock system
 					// ocdav.TLSConfig() // tls config for the http server
