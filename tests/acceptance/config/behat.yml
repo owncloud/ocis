@@ -43,6 +43,7 @@ default:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
+        - TusContext:
 
     apiArchiver:
       paths:
