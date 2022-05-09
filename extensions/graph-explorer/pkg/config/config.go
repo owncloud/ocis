@@ -26,7 +26,7 @@ type Config struct {
 // GraphExplorer defines the available graph-explorer configuration.
 type GraphExplorer struct {
 	ClientID     string `yaml:"client_id" env:"GRAPH_EXPLORER_CLIENT_ID"`
-	Issuer       string `yaml:"issuer" env:"OCIS_URL;GRAPH_EXPLORER_ISSUER"`
+	Issuer       string `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;GRAPH_EXPLORER_ISSUER"`
 	GraphURLBase string `yaml:"graph_url_base" env:"OCIS_URL;GRAPH_EXPLORER_GRAPH_URL_BASE"`
 	GraphURLPath string `yaml:"graph_url_path" env:"GRAPH_EXPLORER_GRAPH_URL_PATH"`
 }

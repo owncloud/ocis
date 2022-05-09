@@ -110,9 +110,7 @@ config = {
             "suites": [
                 "apiShareManagement",
             ],
-            # The tests fail after the storage config changes
-            # They will be fixed later.
-            "skip": True,
+            "skip": False,
             "earlyFail": True,
             "cron": "nightly",
         },
@@ -120,9 +118,7 @@ config = {
             "suites": [
                 "apiWebdavOperations",
             ],
-            # The tests fail after the storage config changes
-            # They will be fixed later.
-            "skip": True,
+            "skip": False,
             "earlyFail": True,
             "cron": "nightly",
         },
@@ -1641,7 +1637,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
     if not testing_parallel_deploy:
         user = "0:0"
         environment = {
-            "OCIS_URL": "https://ocis-server:9200",
+            "OCIS_URL": OCIS_URL,
             "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",  # cs3api-validator needs the cs3api gatway exposed
             "STORAGE_USERS_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
@@ -1667,41 +1663,37 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
     else:
         user = "33:33"
         environment = {
-            "GRAPH_IDENTITY_BACKEND": "cs3",
-            "GRAPH_LDAP_SERVER_WRITE_ENABLED": "false",
             # Keycloak IDP specific configuration
-            "PROXY_OIDC_ISSUER": "https://keycloak/auth/realms/owncloud",
-            "LDAP_IDP": "https://keycloak/auth/realms/owncloud",
-            "WEB_OIDC_AUTHORITY": "https://keycloak/auth/realms/owncloud",
-            "WEB_OIDC_CLIENT_ID": "ocis-web",
+            "OCIS_OIDC_ISSUER": "https://keycloak/auth/realms/owncloud",
             "WEB_OIDC_METADATA_URL": "https://keycloak/auth/realms/owncloud/.well-known/openid-configuration",
-            "AUTH_BEARER_OIDC_ISSUER": "https://keycloak",
+            "WEB_OIDC_CLIENT_ID": "ocis-web",
             "WEB_OIDC_SCOPE": "openid profile email owncloud",
+            # external  ldap is supposed to be read only
+            "GRAPH_IDENTITY_BACKEND": "ldap",
+            "GRAPH_LDAP_SERVER_WRITE_ENABLED": "false",
             # LDAP bind
             "LDAP_URI": "ldaps://openldap",
             "LDAP_INSECURE": "true",
             "LDAP_BIND_DN": "cn=admin,dc=owncloud,dc=com",
             "LDAP_BIND_PASSWORD": "admin",
             # LDAP user settings
-            "PROXY_AUTOPROVISION_ACCOUNTS": "true",  # automatically create users when they login
-            "PROXY_ACCOUNT_BACKEND_TYPE": "cs3",  # proxy should get users from CS3APIS (which gets it from LDAP)
             "PROXY_USER_OIDC_CLAIM": "ocis.user.uuid",  # claim was added in Keycloak
             "PROXY_USER_CS3_CLAIM": "userid",  # equals STORAGE_LDAP_USER_SCHEMA_UID
-            "LDAP_GROUP_BASE_DN": "ou=testgroups,dc=owncloud,dc=com",
+            "LDAP_GROUP_BASE_DN": "ou=TestGroups,dc=owncloud,dc=com",
             "LDAP_GROUP_OBJECTCLASS": "groupOfUniqueNames",
-            "LDAP_GROUPFILTER": "(objectclass=owncloud)",
             "LDAP_GROUP_SCHEMA_DISPLAYNAME": "cn",
             "LDAP_GROUP_SCHEMA_ID": "cn",
             "LDAP_GROUP_SCHEMA_MAIL": "mail",
             "LDAP_GROUP_SCHEMA_MEMBER": "cn",
-            "LDAP_USER_BASE_DN": "ou=testusers,dc=owncloud,dc=com",
+            "LDAP_GROUPFILTER": "(objectclass=owncloud)",
+            "LDAP_LOGIN_ATTRIBUTES": "uid",
+            "LDAP_USER_BASE_DN": "ou=TestUsers,dc=owncloud,dc=com",
             "LDAP_USER_OBJECTCLASS": "posixAccount",
-            "LDAP_USERFILTER": "(objectclass=owncloud)",
-            "LDAP_USER_SCHEMA_USERNAME": "cn",
             "LDAP_USER_SCHEMA_DISPLAYNAME": "displayname",
-            "LDAP_USER_SCHEMA_MAIL": "mail",
             "LDAP_USER_SCHEMA_ID": "ownclouduuid",
-            "LDAP_LOGIN_ATTRIBUTES": "uid,mail",
+            "LDAP_USER_SCHEMA_MAIL": "mail",
+            "LDAP_USER_SCHEMA_USERNAME": "cn",
+            "LDAP_USERFILTER": "(objectclass=owncloud)",
             # ownCloudSQL storage driver
             "STORAGE_USERS_DRIVER": "owncloudsql",
             "STORAGE_USERS_OWNCLOUDSQL_DATADIR": "/mnt/data/files",
@@ -1721,14 +1713,12 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "SHARING_USER_OWNCLOUDSQL_DB_NAME": "owncloud",
             # General oCIS config
             # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
-            "OCIS_RUN_EXTENSIONS": "settings,storage-system,graph,graph-explorer,ocs,store,thumbnails,web,webdav,frontend,gateway,users,groups,auth-basic,auth-bearer,auth-machine,storage-users,storage-shares,storage-publiclink,app-provider,sharing,proxy,nats,ocdav",
+            "OCIS_RUN_EXTENSIONS": "app-registry,app-provider,audit,auth-basic,auth-bearer,auth-machine,frontend,gateway,graph,graph-explorer,groups,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav",
             "OCIS_LOG_LEVEL": "info",
             "OCIS_URL": OCIS_URL,
             "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",
             "OCIS_CONFIG_DIR": "/etc/ocis",
             "PROXY_ENABLE_BASIC_AUTH": "true",
-            "IDM_CREATE_DEMO_USERS": True,
-            "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
         }
         wait_for_ocis = {
             "name": "wait-for-ocis-server",

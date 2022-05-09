@@ -66,7 +66,7 @@ type Settings struct {
 	// don't change the order of elements in this struct
 	// it needs to match github.com/libregraph/lico/bootstrap.Settings
 
-	Iss string `yaml:"iss" env:"OCIS_URL;IDP_ISS"`
+	Iss string `yaml:"iss" env:"OCIS_URL;OCIS_OIDC_ISSUER;IDP_ISS"`
 
 	IdentityManager string `yaml:"identity_manager" env:"IDP_IDENTITY_MANAGER"`
 

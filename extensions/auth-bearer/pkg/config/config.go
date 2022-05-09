@@ -57,7 +57,7 @@ type GRPCConfig struct {
 }
 
 type OIDC struct {
-	Issuer   string `yaml:"issuer" env:"OCIS_URL;AUTH_BEARER_OIDC_ISSUER"`
+	Issuer   string `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;AUTH_BEARER_OIDC_ISSUER"`
 	Insecure bool   `yaml:"insecure" env:"OCIS_INSECURE;AUTH_BEARER_OIDC_INSECURE"`
 	IDClaim  string `yaml:"id_claim" env:"AUTH_BEARER_OIDC_ID_CLAIM"`
 	UIDClaim string `yaml:"uid_claim" env:"AUTH_BEARER_OIDC_UID_CLAIM"`

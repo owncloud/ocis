@@ -80,7 +80,7 @@ type LDAPDriver struct {
 	UserObjectClass  string          `yaml:"user_object_class" env:"LDAP_USER_OBJECTCLASS;GROUPS_LDAP_USER_OBJECTCLASS"`
 	GroupObjectClass string          `yaml:"group_object_class" env:"LDAP_GROUP_OBJECTCLASS;GROUPS_LDAP_GROUP_OBJECTCLASS"`
 	LoginAttributes  []string        `yaml:"login_attributes" env:"LDAP_LOGIN_ATTRIBUTES;GROUPS_LDAP_LOGIN_ATTRIBUTES"`
-	IDP              string          `yaml:"idp" env:"OCIS_URL;GROUPS_IDP_URL"`
+	IDP              string          `yaml:"idp" env:"OCIS_URL;OCIS_OIDC_ISSUER;GROUPS_IDP_URL"`
 	UserSchema       LDAPUserSchema  `yaml:"user_schema"`
 	GroupSchema      LDAPGroupSchema `yaml:"group_schema"`
 }
