@@ -274,25 +274,6 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 	}
 }
 
-// Start indicates the Service Controller to start a new supervised service as an OS thread.
-func (s *Service) Start(name string, reply *int) error {
-	swap := deepcopy.Copy(s.cfg)
-	if _, ok := s.ServicesRegistry[name]; ok {
-		*reply = 0
-		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](swap.(*ociscfg.Config))))
-		return nil
-	}
-
-	if _, ok := s.Delayed[name]; ok {
-		*reply = 0
-		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.Delayed[name](swap.(*ociscfg.Config))))
-		return nil
-	}
-
-	*reply = 0
-	return fmt.Errorf("cannot start service %s: unknown service", name)
-}
-
 // List running processes for the Service Controller.
 func (s *Service) List(args struct{}, reply *string) error {
 	tableString := &strings.Builder{}
@@ -314,22 +295,6 @@ func (s *Service) List(args struct{}, reply *string) error {
 
 	table.Render()
 	*reply = tableString.String()
-	return nil
-}
-
-// Kill a supervised process by subcommand name.
-func (s *Service) Kill(name string, reply *int) error {
-	if len(s.serviceToken[name]) > 0 {
-		for i := range s.serviceToken[name] {
-			if err := s.Supervisor.RemoveAndWait(s.serviceToken[name][i], 5000*time.Millisecond); err != nil {
-				return err
-			}
-		}
-		delete(s.serviceToken, name)
-	} else {
-		return fmt.Errorf("service %s not found", name)
-	}
-
 	return nil
 }
 
