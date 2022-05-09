@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Check permissions when deleting Space: [#3709](https://github.com/owncloud/ocis/pull/3709)
 * Bugfix - Thumbnails for `/dav/xxx?preview=1` requests: [#3567](https://github.com/owncloud/ocis/pull/3567)
 * Bugfix - Idp: Check if CA certificate if present: [#3623](https://github.com/owncloud/ocis/issues/3623)
 * Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
@@ -31,6 +32,13 @@ The following sections list the changes for unreleased.
 * Enhancement - Update ownCloud Web to v5.5.0-rc.4: [#6854](https://github.com/owncloud/web/pull/6854)
 
 ## Details
+
+* Bugfix - Check permissions when deleting Space: [#3709](https://github.com/owncloud/ocis/pull/3709)
+
+   Check for manager permissions when deleting spaces. Do not allow deleting spaces via dav
+   service
+
+   https://github.com/owncloud/ocis/pull/3709
 
 * Bugfix - Thumbnails for `/dav/xxx?preview=1` requests: [#3567](https://github.com/owncloud/ocis/pull/3567)
 
