@@ -483,7 +483,9 @@ func assertUsersSame(t *testing.T, expected, actual User, quotaAvailable bool) {
 		assert.NotZero(t, actual.Quota.Free)
 		assert.NotZero(t, actual.Quota.Used)
 		assert.NotZero(t, actual.Quota.Total)
-		assert.Equal(t, "default", actual.Quota.Definition)
+		// we cannot properly determine if the definition is `none`, `default` or a human readable string of the quota like `1 GB`
+		// clients have to be able to deal with incomplete data like this
+		//assert.Equal(t, "default", actual.Quota.Definition)
 	} else {
 		assert.Equal(t, expected.Quota, actual.Quota, "Quota match for user %v", expected.ID)
 	}
@@ -1100,7 +1102,7 @@ func TestGetUser(t *testing.T) {
 
 				assertStatusCode(t, 200, res, ocsVersion)
 				assert.True(t, response.Ocs.Meta.Success(ocsVersion), "The response was expected to pass but it failed")
-				assertUsersSame(t, user, response.Ocs.Data, true)
+				assertUsersSame(t, user, response.Ocs.Data, false) // FIXME test with setting the quota
 			}
 			cleanUp(t)
 		}
@@ -1436,9 +1438,9 @@ func TestUpdateUser(t *testing.T) {
 
 				assert.True(t, usersResponse.Ocs.Meta.Success(ocsV1), unsuccessfulResponseText)
 				if data.Error == nil {
-					assertUsersSame(t, updatedUser, usersResponse.Ocs.Data, true)
+					assertUsersSame(t, updatedUser, usersResponse.Ocs.Data, false) // FIXME test with setting the quota
 				} else {
-					assertUsersSame(t, user, usersResponse.Ocs.Data, true)
+					assertUsersSame(t, user, usersResponse.Ocs.Data, false) // FIXME test with setting the quota
 				}
 				cleanUp(t)
 			}
