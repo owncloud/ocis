@@ -9,6 +9,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/extensions/graph/pkg/service/v0/errorcode"
@@ -82,6 +83,15 @@ func (g Graph) ChangeOwnPassword(w http.ResponseWriter, r *http.Request) {
 		g.logger.Debug().Err(err).Str("userid", u.Id.OpaqueId).Msg("failed to update user password")
 		return
 	}
+
+	g.publishEvent(
+		events.UserFeatureChanged{
+			UserID: u.Id.OpaqueId,
+			Features: []events.UserFeature{
+				events.UserFeature{Name: "password", Value: "***"},
+			},
+		},
+	)
 
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
