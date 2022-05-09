@@ -250,6 +250,8 @@ func (o Ocs) fillPersonalQuota(ctx context.Context, d *data.User, u *revauser.Us
 	if total > 0 {
 		d.Quota.Free = int64(total - used)
 		d.Quota.Relative = float32(float64(used) / float64(total))
+	} else {
+		d.Quota.Definition = "none" // this indicates no quota / unlimited to the ui
 	}
 }
 
