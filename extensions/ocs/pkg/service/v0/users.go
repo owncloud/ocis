@@ -16,6 +16,7 @@ import (
 	storemsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/store/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 
+	gatewaypb "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	revauser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -98,9 +99,24 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 	var account *accountsmsg.Account
 
+	u, ok := revactx.ContextGetUser(r.Context())
+	if !ok {
+		response.ErrRender(data.MetaServerError.StatusCode, "missing user in context")
+		return
+	}
+
 	switch {
 	case userid == "":
 		o.mustRender(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context"))
+	case userid == u.Username:
+		account = &accountsmsg.Account{
+			OnPremisesSamAccountName: u.Username,
+			DisplayName:              u.DisplayName,
+			Mail:                     u.Mail,
+			UidNumber:                u.UidNumber,
+			GidNumber:                u.GidNumber,
+			AccountEnabled:           true, // we are logged in after all
+		}
 	case o.config.AccountBackend == "accounts":
 		account, err = o.fetchAccountByUsername(r.Context(), userid)
 	case o.config.AccountBackend == "cs3":
@@ -142,14 +158,12 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 		UIDNumber:         account.UidNumber,
 		GIDNumber:         account.GidNumber,
 		Enabled:           enabled, // TODO include in response only when admin?
-		// TODO query storage registry for free space? of home storage, maybe...
-		Quota: &data.Quota{
-			Free:       2840756224000,
-			Used:       5059416668,
-			Total:      2845815640668,
-			Relative:   0.18,
-			Definition: "default",
-		},
+		Quota:             &data.Quota{},
+	}
+
+	// lightweight and federated accounts don't have access to their storage space
+	if u.Id.Type != revauser.UserType_USER_TYPE_LIGHTWEIGHT && u.Id.Type != revauser.UserType_USER_TYPE_FEDERATED {
+		o.fillPersonalQuota(r.Context(), d, u)
 	}
 
 	_, span := ocstracing.TraceProvider.
@@ -158,6 +172,75 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	defer span.End()
 
 	o.mustRender(w, r, response.DataRender(d))
+}
+
+func (o Ocs) fillPersonalQuota(ctx context.Context, d *data.User, u *revauser.User) {
+
+	gc, err := pool.GetGatewayServiceClient(o.config.Reva.Address)
+	if err != nil {
+		o.logger.Error().Err(err).Msg("error getting gateway client")
+		return
+	}
+
+	t, err := o.mintTokenForUser(ctx, &accountsmsg.Account{Id: u.Id.OpaqueId, UidNumber: d.UIDNumber, GidNumber: d.GIDNumber})
+	if err != nil {
+		o.logger.Error().Err(err).Msg("error minting token")
+		return
+	}
+
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
+
+	res, err := gc.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
+		Filters: []*provider.ListStorageSpacesRequest_Filter{
+			{
+				Type: provider.ListStorageSpacesRequest_Filter_TYPE_OWNER,
+				Term: &provider.ListStorageSpacesRequest_Filter_Owner{
+					Owner: u.Id,
+				},
+			},
+			{
+				Type: provider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
+				Term: &provider.ListStorageSpacesRequest_Filter_SpaceType{
+					SpaceType: "personal",
+				},
+			},
+		},
+	})
+	if err != nil || res.Status.Code != rpcv1beta1.Code_CODE_OK {
+		o.logger.Error().Err(err).Interface("status", res.Status).Msg("error calling ListStorageSpaces")
+		return
+	}
+
+	if len(res.StorageSpaces) == 0 {
+		o.logger.Error().Err(err).Msg("list spaces returned empty list")
+		return
+	}
+
+	getQuotaRes, err := gc.GetQuota(ctx, &gatewaypb.GetQuotaRequest{Ref: &provider.Reference{
+		ResourceId: res.StorageSpaces[0].Root,
+		Path:       ".",
+	}})
+	if err != nil || res.Status.Code != rpcv1beta1.Code_CODE_OK {
+		o.logger.Error().Err(err).Interface("status", res.Status).Msg("error calling GetQuota")
+		return
+	}
+
+	total := getQuotaRes.TotalBytes
+	used := getQuotaRes.UsedBytes
+
+	d.Quota = &data.Quota{
+		Used: int64(used),
+		// TODO support negative values or flags for the quota to carry special meaning: -1 = uncalculated, -2 = unknown, -3 = unlimited
+		// for now we can only report total and used
+		Total:      int64(total),
+		Definition: "default",
+	}
+
+	// only calculate free and relative when total is available
+	if total > 0 {
+		d.Quota.Free = int64(total - used)
+		d.Quota.Relative = float32(float64(used) / float64(total))
+	}
 }
 
 // AddUser creates a new user account
