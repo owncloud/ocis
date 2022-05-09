@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/server"
@@ -24,6 +25,7 @@ func Server(cfg *config.Config) *cli.Command {
 			err := parser.ParseConfig(cfg)
 			if err != nil {
 				fmt.Printf("%v", err)
+				os.Exit(1)
 			}
 			return err
 		},

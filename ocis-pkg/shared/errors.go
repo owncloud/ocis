@@ -23,7 +23,7 @@ func MissingSystemUserApiKeyError(service string) error {
 }
 
 func MissingJWTTokenError(service string) error {
-	return fmt.Errorf("jwt_secret has not been set properly in your config for %s. "+
+	return fmt.Errorf("The jwt_secret has not been set properly in your config for %s. "+
 		"Make sure your %s config contains the proper values "+
 		"(e.g. by running ocis init or setting it manually in "+
 		"the config/corresponding environment variable).",
@@ -31,7 +31,7 @@ func MissingJWTTokenError(service string) error {
 }
 
 func MissingRevaTransferSecretError(service string) error {
-	return fmt.Errorf("transfer_secret has not been set properly in your config for %s. "+
+	return fmt.Errorf("The transfer_secret has not been set properly in your config for %s. "+
 		"Make sure your %s config contains the proper values "+
 		"(e.g. by running ocis init or setting it manually in "+
 		"the config/corresponding environment variable).",
@@ -39,7 +39,7 @@ func MissingRevaTransferSecretError(service string) error {
 }
 
 func MissingLDAPBindPassword(service string) error {
-	return fmt.Errorf("bind_password has not been set properly in your config for %s. "+
+	return fmt.Errorf("The ldap bind_password has not been set properly in your config for %s. "+
 		"Make sure your %s config contains the proper values "+
 		"(e.g. by running ocis init or setting it manually in "+
 		"the config/corresponding environment variable).",
@@ -47,7 +47,7 @@ func MissingLDAPBindPassword(service string) error {
 }
 
 func MissingServiceUserPassword(service, serviceUser string) error {
-	return fmt.Errorf("password of service user %s has not been set properly in your config for %s. "+
+	return fmt.Errorf("The password of service user %s has not been set properly in your config for %s. "+
 		"Make sure your %s config contains the proper values "+
 		"(e.g. by running ocis init or setting it manually in "+
 		"the config/corresponding environment variable).",
