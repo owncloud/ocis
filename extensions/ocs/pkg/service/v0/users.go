@@ -232,8 +232,10 @@ func (o Ocs) fillPersonalQuota(ctx context.Context, d *data.User, u *revauser.Us
 		Used: int64(used),
 		// TODO support negative values or flags for the quota to carry special meaning: -1 = uncalculated, -2 = unknown, -3 = unlimited
 		// for now we can only report total and used
-		Total:      int64(total),
-		Definition: "default",
+		Total: int64(total),
+		// we cannot differentiate between `default` or a human readable `1 GB` defanation.
+		// The web ui can create a human readable string from the actual total if it is sot. Otherwise it has to leave out relative and total anyway.
+		// Definition: "default",
 	}
 
 	// only calculate free and relative when total is available

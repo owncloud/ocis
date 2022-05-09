@@ -8,22 +8,22 @@ type Users struct {
 // User holds the payload for a GetUser response
 type User struct {
 	Enabled           string `json:"enabled" xml:"enabled"`
-	UserID            string `json:"id" xml:"id"`// UserID is mapped to the preferred_name attribute in accounts
+	UserID            string `json:"id" xml:"id"` // UserID is mapped to the preferred_name attribute in accounts
 	DisplayName       string `json:"display-name" xml:"display-name"`
 	LegacyDisplayName string `json:"displayname" xml:"displayname"`
 	Email             string `json:"email" xml:"email"`
-	Quota             *Quota `json:"quota" xml:"quota"`
+	Quota             *Quota `json:"quota,omitempty" xml:"quota,omitempty"`
 	UIDNumber         int64  `json:"uidnumber" xml:"uidnumber"`
 	GIDNumber         int64  `json:"gidnumber" xml:"gidnumber"`
 }
 
 // Quota holds quota information
 type Quota struct {
-	Free       int64   `json:"free" xml:"free"`
-	Used       int64   `json:"used" xml:"used"`
-	Total      int64   `json:"total" xml:"total"`
-	Relative   float32 `json:"relative" xml:"relative"`
-	Definition string  `json:"definition" xml:"definition"`
+	Free       int64   `json:"free,omitempty" xml:"free,omitempty"`
+	Used       int64   `json:"used,omitempty" xml:"used,omitempty"`
+	Total      int64   `json:"total,omitempty" xml:"total,omitempty"`
+	Relative   float32 `json:"relative,omitempty" xml:"relative,omitempty"`
+	Definition string  `json:"definition,omitempty" xml:"definition,omitempty"`
 }
 
 // SigningKey holds the Payload for a GetSigningKey response
