@@ -31,11 +31,12 @@
 | IDP_INSECURE | bool | false | |
 | IDP_ALLOW_CLIENT_GUESTS | bool | false | |
 | IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION | bool | false | |
-| IDP_ENCRYPTION_SECRET | string |  | |
+| IDP_ENCRYPTION_SECRET_FILE | string |  | |
 | IDP_DISABLE_IDENTIFIER_WEBAPP | bool | true | |
 | IDP_IDENTIFIER_SCOPES_CONF | string |  | |
 | IDP_SIGNING_KID | string |  | |
 | IDP_SIGNING_METHOD | string | PS256 | |
+| IDP_SIGNING_PRIVATE_KEY_FILES |  | [] | |
 | IDP_VALIDATION_KEYS_PATH | string |  | |
 | IDP_ACCESS_TOKEN_EXPIRATION | uint64 | 600 | |
 | IDP_ID_TOKEN_EXPIRATION | uint64 | 3600 | |

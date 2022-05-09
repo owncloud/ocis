@@ -162,7 +162,7 @@
 | false
 | 
 
-|`IDP_ENCRYPTION_SECRET`
+|`IDP_ENCRYPTION_SECRET_FILE`
 | string
 | 
 | 
@@ -185,6 +185,11 @@
 |`IDP_SIGNING_METHOD`
 | string
 | PS256
+| 
+
+|`IDP_SIGNING_PRIVATE_KEY_FILES`
+| 
+| []
 | 
 
 |`IDP_VALIDATION_KEYS_PATH`
