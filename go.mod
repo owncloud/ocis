@@ -5,12 +5,13 @@ go 1.17
 require (
 	github.com/CiscoM31/godata v1.0.5
 	github.com/GeertJohan/yubigo v0.0.0-20190917122436-175bc097e60e
+	github.com/Masterminds/semver v1.5.0
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
 	github.com/blevesearch/bleve/v2 v2.3.2
 	github.com/blevesearch/bleve_index_api v1.0.1
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220412090512-93c5918b4bde
-	github.com/cs3org/reva/v2 v2.3.0
+	github.com/cs3org/reva/v2 v2.3.1
 	github.com/disintegration/imaging v1.6.2
 	github.com/glauth/glauth/v2 v2.0.0-20211021011345-ef3151c28733
 	github.com/go-chi/chi/v5 v5.0.7
@@ -53,7 +54,7 @@ require (
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/ginkgo/v2 v2.1.3
+	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.19.0
 	github.com/owncloud/libre-graph-api-go v0.13.3
 	github.com/pkg/errors v0.9.1
@@ -68,10 +69,10 @@ require (
 	go-micro.dev/v4 v4.6.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.31.0
-	go.opentelemetry.io/otel v1.6.3
-	go.opentelemetry.io/otel/exporters/jaeger v1.6.3
-	go.opentelemetry.io/otel/sdk v1.6.3
-	go.opentelemetry.io/otel/trace v1.6.3
+	go.opentelemetry.io/otel v1.7.0
+	go.opentelemetry.io/otel/exporters/jaeger v1.7.0
+	go.opentelemetry.io/otel/sdk v1.7.0
+	go.opentelemetry.io/otel/trace v1.7.0
 	golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29
 	golang.org/x/image v0.0.0-20220321031419-a8550c1d254a
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
@@ -89,7 +90,6 @@ require (
 	github.com/Azure/go-ntlmssp v0.0.0-20211209120228-48547f28849e // indirect
 	github.com/BurntSushi/toml v1.1.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
-	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
 	github.com/Microsoft/go-winio v0.5.1 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20211112122917-428f8eabeeb3 // indirect
@@ -255,12 +255,12 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.19.1 // indirect
-	golang.org/x/mod v0.5.1 // indirect
+	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
-	golang.org/x/tools v0.1.9 // indirect
+	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/ini.v1 v1.66.2 // indirect
@@ -274,6 +274,3 @@ require (
 
 // we need to use a fork to make the windows build pass
 replace github.com/pkg/xattr => github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7
-
-// temp - don't merge with this line
-replace github.com/cs3org/reva/v2 => github.com/kobergj/reva/v2 v2.0.0-20220506104026-7d5d9bcb83e3

@@ -50,9 +50,13 @@ services:
       - ldap-server
     entrypoint:
       - /bin/sh
-      - /entrypoint-override.sh
+    # run ocis init to initialize a configuration file with random secrets
+    # it will fail on subsequent runs, because the config file already exists
+    # therefore we ignore the error and then start the ocis server
+    command: ["-c", "ocis init || true; ocis server"]
     environment:
-      # CS3 users from ldap specific configuration
+
+      # users/gropups from ldap
       LDAP_URI: ldaps://ldap-server
       LDAP_INSECURE: "true"
       LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
@@ -64,32 +68,24 @@ services:
       LDAP_USERFILTER: "(objectclass=owncloud)"
       LDAP_USER_OBEJECTCLASS: "inetOrgPerson"
       LDAP_LOGIN_ATTRIBUTES: "uid,mail"
+      IDP_LDAP_URI: ldap://ldap-server
       IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
       IDP_LDAP_UUID_ATTRIBUTE: "ownclouduuid"
       IDP_LDAP_UUID_ATTRIBUTE_TYPE: binary
-      PROXY_ACCOUNT_BACKEND_TYPE: cs3
-      # web ui
-      WEB_UI_CONFIG: "/var/tmp/ocis/.config/web-config.json"
+      GRAPH_LDAP_SERVER_WRITE_ENABLED: "false" # assuming the external ldap is readonly
+      # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idm and accounts. These are replaced by external services
+      OCIS_RUN_EXTENSIONS: app-registry,app-provider,audit,auth-basic,auth-bearer,auth-machine,frontend,gateway,graph,graph-explorer,groups,idp,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav
       # General oCIS config
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
-      # change default secrets
-      OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-replace-me-with-a-transfer-secret}
-      OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-change-me-please}
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
       OCIS_INSECURE: "${INSECURE:-false}"
       # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
       PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
-      # demo users
-      ACCOUNTS_DEMO_USERS_AND_GROUPS: "${DEMO_USERS:-false}"  # deprecated, remove after switching to LibreIDM
-      IDM_CREATE_DEMO_USERS: "${DEMO_USERS:-false}"
+      # admin user password
     volumes:
-      - ./config/ocis/entrypoint-override.sh:/entrypoint-override.sh
-      - ./config/ocis/web-config.dist.json:/config/web-config.dist.json
-      - ./config/ocis/proxy.yaml:/etc/ocis/proxy.yaml
+      - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis
     labels:
       - "traefik.enable=true"
@@ -124,7 +120,7 @@ services:
     restart: always
 
   ldap-manager:
-    image: osixia/phpldapadmin:0.9.0
+    image: osixia/phpldapadmin:latest
     networks:
       ocis-net:
     environment:
@@ -143,6 +139,7 @@ services:
 
 volumes:
   certs:
+  ocis-config:
   ocis-data:
 
 networks:
