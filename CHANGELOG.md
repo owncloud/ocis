@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Remove runtime kill and run commands: [#3740](https://github.com/owncloud/ocis/pull/3740)
 * Bugfix - Check permissions when deleting Space: [#3709](https://github.com/owncloud/ocis/pull/3709)
 * Bugfix - Make IDP secrets configurable via environment variables: [#3744](https://github.com/owncloud/ocis/pull/3744)
 * Bugfix - Thumbnails for `/dav/xxx?preview=1` requests: [#3567](https://github.com/owncloud/ocis/pull/3567)
@@ -33,6 +34,17 @@ The following sections list the changes for unreleased.
 * Enhancement - Update ownCloud Web to v5.5.0-rc.5: [#6854](https://github.com/owncloud/web/pull/6854)
 
 ## Details
+
+* Bugfix - Remove runtime kill and run commands: [#3740](https://github.com/owncloud/ocis/pull/3740)
+
+   We've removed the kill and run commands from the oCIS runtime. If these dynamic capabilities
+   are needed, one should switch to a full fledged supervisor and start oCIS as individual
+   services.
+
+   If one wants to start a only a subset of services, this is still possible by setting
+   OCIS_RUN_EXTENSIONS.
+
+   https://github.com/owncloud/ocis/pull/3740
 
 * Bugfix - Check permissions when deleting Space: [#3709](https://github.com/owncloud/ocis/pull/3709)
 
