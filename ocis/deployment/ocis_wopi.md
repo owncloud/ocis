@@ -9,15 +9,11 @@ geekdocFilePath: ocis_wopi.md
 
 {{< toc >}}
 
-{{< hint warning >}}
-OnlyOffice and CodiMD are not yet fully integrated and there are known issues. For the current state please have a look at [owncloud/ocis#2595](https://github.com/owncloud/ocis/issues/2595)
-{{< /hint >}}
-
 ## Overview
 
-* oCIS, Wopi server, Collabora, OnlyOffice and CodiMD running behind Traefik as reverse proxy
-* Collabora, OnlyOffice and CodiMD enable you to edit documents in your browser
-* Wopi server acts as a bridge to make the oCIS storage accessible to Collabora, OnlyOffice and CodiMD
+* oCIS, Wopi server, Collabora and OnlyOffice running behind Traefik as reverse proxy
+* Collabora and OnlyOffice enable you to edit documents in your browser
+* Wopi server acts as a bridge to make the oCIS storage accessible to Collabora and OnlyOffice
 * Traefik generating self-signed certificates for local setup or obtaining valid SSL certificates for a server setup
 
 [Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_wopi)
@@ -26,9 +22,9 @@ The docker stack consists of 10 containers. One of them is Traefik, a proxy whic
 
 The next container is oCIS itself in a configuration like the [oCIS with Traefik example]({{< ref "ocis_traefik" >}}), except that for this example a custom mimetype configuration is used.
 
-There are three oCIS app driver containers that register Collabora, OnlyOffice and CodiMD at the app registry.
+There are three oCIS app driver containers that register Collabora and OnlyOffice at the app registry.
 
-The last four containers are the WOPI server, Collabora, OnlyOffice and CodiMD.
+The last four containers are the WOPI server, Collabora and OnlyOffice.
 
 ## Server Deployment
 
@@ -36,15 +32,13 @@ The last four containers are the WOPI server, Collabora, OnlyOffice and CodiMD.
 
 * Linux server with docker and docker-compose installed
 * Three domains set up and pointing to your server
-  - ocis.* for serving oCIS
-  - collabora.* for serving Collabora
-  - onlyoffice.* for serving OnlyOffice
-  - codimd.* for serving CodiMD
-  - wopiserver.* for serving the WOPI server
-  - traefik.* for serving the Traefik dashboard
+  * ocis.* for serving oCIS
+  * collabora.* for serving Collabora
+  * onlyoffice.* for serving OnlyOffice
+  * wopiserver.* for serving the WOPI server
+  * traefik.* for serving the Traefik dashboard
 
 See also [example server setup]({{< ref "preparing_server" >}})
-
 
 ### Install oCIS and Traefik
 
@@ -106,12 +100,6 @@ See also [example server setup]({{< ref "preparing_server" >}})
   ### OnlyOffice settings ###
   # Domain of OnlyOffice, where you can find the frontend. Defaults to "onlyoffice.owncloud.test"
   ONLYOFFICE_DOMAIN=
-
-  ### CodiMD settings ###
-  # Domain of Collabora, where you can find the frontend. Defaults to "codimd.owncloud.test"
-  CODIMD_DOMAIN=
-  # Secret which is used for the communication with the WOPI server. Must be changed in order to have a secure CodiMD. Defaults to "LoremIpsum456"
-  CODIMD_SECRET=
   ```
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
@@ -140,8 +128,6 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   Next up is OnlyOffice, which also needs a domain in `ONLYOFFICE_DOMAIN=`.
 
-  The last configuration options are for CodiMD, which needs a domain in `CODIMD_DOMAIN=` and a random secret in `CODIMD_SECRET=`.
-
   Now you have configured everything and can save the file.
 
 * Start the docker stack
@@ -162,7 +148,6 @@ On Linux and macOS you can add them to your `/etc/hosts` file and on Windows to 
 127.0.0.1 traefik.owncloud.test
 127.0.0.1 collabora.owncloud.test
 127.0.0.1 onlyoffice.owncloud.test
-127.0.0.1 codimd.owncloud.test
 127.0.0.1 wopiserver.owncloud.test
 ```
 
@@ -170,7 +155,7 @@ After that you're ready to start the application stack:
 
 `docker-compose up -d`
 
-Open https://collabora.owncloud.test, https://onlyoffice.owncloud.test, https://codimd.owncloud.test and https://wopiserver.owncloud.test  in your browser and accept the invalid certificate warning.
+Open https://collabora.owncloud.test, https://onlyoffice.owncloud.test and https://wopiserver.owncloud.test  in your browser and accept the invalid certificate warning.
 
 Open https://ocis.owncloud.test in your browser and accept the invalid certificate warning. You are now able to open an office document in your browser. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
 
