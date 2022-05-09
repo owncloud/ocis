@@ -112,6 +112,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3524
    https://github.com/owncloud/ocis/pull/3551
+   https://github.com/owncloud/ocis/pull/3743
 
 * Change - Reduce drives in graph /me/drives API: [#3629](https://github.com/owncloud/ocis/pull/3629)
 
