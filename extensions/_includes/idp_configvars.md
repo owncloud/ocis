@@ -21,7 +21,7 @@
 | IDP_TRANSPORT_TLS_KEY | string | ~/.ocis/idp/server.key | |
 | IDP_TLS | bool | false | |
 | IDP_ASSET_PATH | string |  | |
-| OCIS_URL<br/>IDP_ISS | string | https://localhost:9200 | |
+| OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>IDP_ISS | string | https://localhost:9200 | |
 | IDP_IDENTITY_MANAGER | string | ldap | |
 | IDP_URI_BASE_PATH | string |  | |
 | IDP_SIGN_IN_URI | string |  | |

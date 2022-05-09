@@ -19,7 +19,7 @@
 | OCIS_JWT_SECRET<br/>AUTH_BEARER_JWT_SECRET | string |  | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
 | AUTH_BEARER_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
-| OCIS_URL<br/>AUTH_BEARER_OIDC_ISSUER | string | https://localhost:9200 | |
+| OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>AUTH_BEARER_OIDC_ISSUER | string | https://localhost:9200 | |
 | OCIS_INSECURE<br/>AUTH_BEARER_OIDC_INSECURE | bool | false | |
 | AUTH_BEARER_OIDC_ID_CLAIM | string | preferred_username | |
 | AUTH_BEARER_OIDC_UID_CLAIM | string |  | |

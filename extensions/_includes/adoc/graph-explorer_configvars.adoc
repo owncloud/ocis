@@ -91,6 +91,7 @@
 | 
 
 |`OCIS_URL` +
+`OCIS_OIDC_ISSUER` +
 `GRAPH_EXPLORER_ISSUER`
 | string
 | \https://localhost:9200

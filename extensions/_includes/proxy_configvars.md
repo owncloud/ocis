@@ -20,7 +20,7 @@
 | PROXY_TRANSPORT_TLS_KEY | string | ~/.ocis/proxy/server.key | |
 | PROXY_TLS | bool | true | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
-| OCIS_URL<br/>PROXY_OIDC_ISSUER | string | https://localhost:9200 | |
+| OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>PROXY_OIDC_ISSUER | string | https://localhost:9200 | |
 | OCIS_INSECURE<br/>PROXY_OIDC_INSECURE | bool | true | |
 | PROXY_OIDC_USERINFO_CACHE_SIZE | int | 1024 | |
 | PROXY_OIDC_USERINFO_CACHE_TTL | int | 10 | |

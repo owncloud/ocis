@@ -18,7 +18,7 @@
 | OCS_HTTP_ROOT | string | /ocs | |
 | OCIS_JWT_SECRET<br/>OCS_JWT_SECRET | string |  | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
-| OCIS_URL<br/>OCS_IDM_ADDRESS | string | https://localhost:9200 | |
+| OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>OCS_IDM_ADDRESS | string | https://localhost:9200 | |
 | OCS_ACCOUNT_BACKEND_TYPE | string | cs3 | |
 | STORAGE_USERS_DRIVER<br/>OCS_STORAGE_USERS_DRIVER | string | ocis | |
 | OCIS_MACHINE_AUTH_API_KEY<br/>OCS_MACHINE_AUTH_API_KEY | string |  | |

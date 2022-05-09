@@ -97,6 +97,7 @@
 | 
 
 |`OCIS_URL` +
+`OCIS_OIDC_ISSUER` +
 `OCS_IDM_ADDRESS`
 | string
 | \https://localhost:9200

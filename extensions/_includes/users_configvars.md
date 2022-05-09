@@ -33,7 +33,7 @@
 | LDAP_USER_OBJECTCLASS<br/>USERS_LDAP_USER_OBJECTCLASS | string | inetOrgPerson | |
 | LDAP_GROUP_OBJECTCLASS<br/>USERS_LDAP_GROUP_OBJECTCLASS | string | groupOfNames | |
 | LDAP_LOGIN_ATTRIBUTES<br/>USERS_LDAP_LOGIN_ATTRIBUTES |  | [uid mail] | |
-| OCIS_URL<br/>USERS_IDP_URL | string | https://localhost:9200 | |
+| OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>USERS_IDP_URL | string | https://localhost:9200 | |
 | LDAP_USER_SCHEMA_ID<br/>USERS_LDAP_USER_SCHEMA_ID | string | ownclouduuid | |
 | LDAP_USER_SCHEMA_ID_IS_OCTETSTRING<br/>USERS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING | bool | false | |
 | LDAP_USER_SCHEMA_MAIL<br/>USERS_LDAP_USER_SCHEMA_MAIL | string | mail | |
