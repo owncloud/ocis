@@ -103,11 +103,11 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 				ResourceId: space.Root,
 			})
 			if err != nil {
-				p.logger.Error().Err(err).Str("space", space.Id.OpaqueId).Msg("failed to get patch for grant space root")
+				p.logger.Error().Err(err).Str("space", space.Id.OpaqueId).Msg("failed to get path for grant space root")
 				continue
 			}
 			if gpRes.Status.Code != rpcv1beta1.Code_CODE_OK {
-				p.logger.Error().Interface("status", gpRes.Status).Str("space", space.Id.OpaqueId).Msg("failed to get patch for grant space root")
+				p.logger.Error().Interface("status", gpRes.Status).Str("space", space.Id.OpaqueId).Msg("failed to get path for grant space root")
 				continue
 			}
 			mountpointPrefix = utils.MakeRelativePath(gpRes.Path)

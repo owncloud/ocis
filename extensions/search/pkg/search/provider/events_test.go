@@ -97,7 +97,6 @@ var _ = Describe("Searchprovider", func() {
 
 		It("removes an entry from the index when the file has been deleted", func() {
 			called := false
-
 			gwClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
 				Status: status.NewNotFound(context.Background(), ""),
 			}, nil)
@@ -153,11 +152,16 @@ var _ = Describe("Searchprovider", func() {
 
 		It("indexes items when they are being moved", func() {
 			called := false
+			gwClient.On("GetPath", mock.Anything, mock.Anything).Return(&sprovider.GetPathResponse{
+				Status: status.NewOK(ctx),
+				Path:   "./new/path.pdf",
+			}, nil)
 			indexClient.On("Move", mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
 				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
-			})).Return(nil).Run(func(args mock.Arguments) {
+			}), "./new/path.pdf").Return(nil).Run(func(args mock.Arguments) {
 				called = true
 			})
+			ref.Path = "./new/path.pdf"
 			eventsChan <- events.ItemMoved{
 				Ref:       ref,
 				Executant: user.Id,

@@ -45,7 +45,7 @@ var _ = Describe("Index", func() {
 		}
 		parentRef = &sprovider.Reference{
 			ResourceId: rootId,
-			Path:       "./sudbir",
+			Path:       "./my/sudbir",
 		}
 		parentRi = &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
@@ -59,7 +59,7 @@ var _ = Describe("Index", func() {
 		}
 		childRef = &sprovider.Reference{
 			ResourceId: rootId,
-			Path:       "./sudbir/child.pdf",
+			Path:       "./my/sudbir/child.pdf",
 		}
 		childRi = &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
@@ -349,7 +349,7 @@ var _ = Describe("Index", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			parentRi.Path = "newname"
-			err = i.Move(parentRi)
+			err = i.Move(parentRi, "./somewhere/else/newname")
 			Expect(err).ToNot(HaveOccurred())
 
 			assertDocCount(rootId, "subdir", 0)
@@ -365,7 +365,7 @@ var _ = Describe("Index", func() {
 			})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(res.Matches)).To(Equal(1))
-			Expect(res.Matches[0].Entity.Ref.Path).To(Equal("./newname/child.pdf"))
+			Expect(res.Matches[0].Entity.Ref.Path).To(Equal("./somewhere/else/newname/child.pdf"))
 		})
 	})
 })

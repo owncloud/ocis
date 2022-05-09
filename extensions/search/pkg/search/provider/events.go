@@ -6,6 +6,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
@@ -59,17 +60,25 @@ func (p *Provider) handleEvent(ev interface{}) {
 			p.logger.Error().Err(err).Msg("failed to stat the changed resource")
 			return
 		}
-
-		switch statRes.Status.Code {
-		case rpc.Code_CODE_OK:
-			err = p.indexClient.Move(statRes.Info)
-			if err != nil {
-				p.logger.Error().Err(err).Msg("failed to restore the changed resource in the index")
-			}
-		default:
+		if statRes.Status.Code != rpc.Code_CODE_OK {
 			p.logger.Error().Interface("statRes", statRes).Msg("failed to stat the changed resource")
+			return
 		}
 
+		gpRes, err := p.getPath(statRes.Info.Id, owner)
+		if err != nil {
+			p.logger.Error().Err(err).Interface("ref", ref).Msg("failed to get path for moved resource")
+			return
+		}
+		if gpRes.Status.Code != rpcv1beta1.Code_CODE_OK {
+			p.logger.Error().Interface("status", gpRes.Status).Interface("ref", ref).Msg("failed to get path for moved resource")
+			return
+		}
+
+		err = p.indexClient.Move(statRes.Info, gpRes.Path)
+		if err != nil {
+			p.logger.Error().Err(err).Msg("failed to restore the changed resource in the index")
+		}
 		return
 	case events.ContainerCreated:
 		ref = e.Ref
@@ -125,4 +134,21 @@ func (p *Provider) statResource(ref *provider.Reference, owner *user.User) (*pro
 
 	// Stat changed resource resource
 	return p.gwClient.Stat(ownerCtx, &provider.StatRequest{Ref: ref})
+}
+
+func (p *Provider) getPath(id *provider.ResourceId, owner *user.User) (*provider.GetPathResponse, error) {
+	// Get auth
+	ownerCtx := ctxpkg.ContextSetUser(context.Background(), owner)
+	authRes, err := p.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
+		Type:         "machine",
+		ClientId:     "userid:" + owner.Id.OpaqueId,
+		ClientSecret: p.machineAuthAPIKey,
+	})
+	if err != nil || authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		p.logger.Error().Err(err).Interface("authRes", authRes).Msg("error using machine auth")
+	}
+	ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token)
+
+	// Stat changed resource resource
+	return p.gwClient.GetPath(ownerCtx, &provider.GetPathRequest{ResourceId: id})
 }

@@ -65,13 +65,13 @@ func (_m *IndexClient) DocCount() (uint64, error) {
 	return r0, r1
 }
 
-// Move provides a mock function with given fields: ri
-func (_m *IndexClient) Move(ri *providerv1beta1.ResourceInfo) error {
-	ret := _m.Called(ri)
+// Move provides a mock function with given fields: ri, path
+func (_m *IndexClient) Move(ri *providerv1beta1.ResourceInfo, path string) error {
+	ret := _m.Called(ri, path)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*providerv1beta1.ResourceInfo) error); ok {
-		r0 = rf(ri)
+	if rf, ok := ret.Get(0).(func(*providerv1beta1.ResourceInfo, string) error); ok {
+		r0 = rf(ri, path)
 	} else {
 		r0 = ret.Error(0)
 	}
