@@ -163,3 +163,27 @@ to be updated. E.g. to update the `displayName` Attribute:
 ```
 
 Similar to creating a user via `POST`,  the `PATCH` request will return the user object containing the new attribute values.
+
+### Change password
+
+#### `POST /me/changePassword`
+
+Users can change their own password by sending a POST request to `/me/changePassword`
+
+##### Request Body
+
+```
+{
+  "currentPassword": "current",
+  "newPassword": "new"
+}
+
+```
+
+When successful the API returns no response body and the HTTP status code 204 (No Content)
+
+```
+ curl -i -k --header "Content-Type: application/json" \
+      --request POST  --data '{"currentPassword": "current", "newPassword": "new" }' \
+      'https://localhost:9200/graph/v1.0/me/changePassword' -u user:current
+```
