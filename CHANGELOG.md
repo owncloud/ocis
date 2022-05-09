@@ -27,7 +27,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 * Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
-* Enhancement - Update reva to v2.3.0: [#3552](https://github.com/owncloud/ocis/pull/3552)
+* Enhancement - Update reva to v2.3.1: [#3552](https://github.com/owncloud/ocis/pull/3552)
 * Enhancement - Update ownCloud Web to v5.5.0-rc.4: [#6854](https://github.com/owncloud/web/pull/6854)
 
 ## Details
@@ -204,7 +204,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3579
 
-* Enhancement - Update reva to v2.3.0: [#3552](https://github.com/owncloud/ocis/pull/3552)
+* Enhancement - Update reva to v2.3.1: [#3552](https://github.com/owncloud/ocis/pull/3552)
+
+   Updated reva to version 2.3.1. This update includes
+
+  * Bugfix [cs3org/reva#2827](https://github.com/cs3org/reva/pull/2827): Check permissions when deleting spaces
+  * Bugfix [cs3org/reva#2830](https://github.com/cs3org/reva/pull/2830): Correctly render response when accepting merged shares
+  * Bugfix [cs3org/reva#2831](https://github.com/cs3org/reva/pull/2831): Fix uploads to owncloudsql storage when no mtime is provided
+  * Enhancement [cs3org/reva#2833](https://github.com/cs3org/reva/pull/2833): Make status.php values configurable
+  * Enhancement [cs3org/reva#2832](https://github.com/cs3org/reva/pull/2832): Add version option for ocdav go-micro service
 
    Updated reva to version 2.3.0. This update includes:
 
