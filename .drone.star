@@ -1686,7 +1686,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "LDAP_GROUP_SCHEMA_MAIL": "mail",
             "LDAP_GROUP_SCHEMA_MEMBER": "cn",
             "LDAP_GROUPFILTER": "(objectclass=owncloud)",
-            "LDAP_LOGIN_ATTRIBUTES": "uid,mail",
+            "LDAP_LOGIN_ATTRIBUTES": "uid",
             "LDAP_USER_BASE_DN": "ou=TestUsers,dc=owncloud,dc=com",
             "LDAP_USER_OBJECTCLASS": "posixAccount",
             "LDAP_USER_SCHEMA_DISPLAYNAME": "displayname",
