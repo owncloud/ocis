@@ -793,18 +793,30 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 			OpaqueId: root.StorageId,
 		},
 	})
-	switch {
-	case dRes.Status.Code == cs3rpc.Code_CODE_INVALID_ARGUMENT:
-		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, dRes.Status.Message)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	case err != nil || dRes.Status.Code != cs3rpc.Code_CODE_OK:
+	if err != nil {
 		g.logger.Error().Err(err).Msg("error deleting storage space")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	switch dRes.GetStatus().GetCode() {
+	case cs3rpc.Code_CODE_OK:
+		w.WriteHeader(http.StatusNoContent)
+		return
+	case cs3rpc.Code_CODE_INVALID_ARGUMENT:
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, dRes.Status.Message)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	case cs3rpc.Code_CODE_PERMISSION_DENIED:
+		w.WriteHeader(http.StatusForbidden)
+		return
+	// don't expose internal error codes to the outside world
+	default:
+		g.logger.Error().Err(err).Msg("error deleting storage space")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 }
 
 func sortSpaces(req *godata.GoDataRequest, spaces []*libregraph.Drive) ([]*libregraph.Drive, error) {
