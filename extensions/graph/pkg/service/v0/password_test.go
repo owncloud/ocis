@@ -85,6 +85,7 @@ var _ = Describe("Users changing their own password", func() {
 			},
 		}
 		ctx = revactx.ContextSetUser(ctx, user)
+		eventsPublisher.On("Publish", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	})
 
 	It("fails if no user in context", func() {
