@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Check permissions when deleting Space: [#3709](https://github.com/owncloud/ocis/pull/3709)
 * Bugfix - Thumbnails for `/dav/xxx?preview=1` requests: [#3567](https://github.com/owncloud/ocis/pull/3567)
 * Bugfix - Idp: Check if CA certificate if present: [#3623](https://github.com/owncloud/ocis/issues/3623)
 * Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
@@ -22,14 +23,22 @@ The following sections list the changes for unreleased.
 * Change - Split MachineAuth from SystemUser: [#3672](https://github.com/owncloud/ocis/pull/3672)
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 * Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
+* Enhancement - Product field in OCS version: [#2918](https://github.com/owncloud/ocis/pull/2918)
 * Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 * Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
-* Enhancement - Update reva to v2.3.0: [#3552](https://github.com/owncloud/ocis/pull/3552)
+* Enhancement - Update reva to v2.3.1: [#3552](https://github.com/owncloud/ocis/pull/3552)
 * Enhancement - Update ownCloud Web to v5.5.0-rc.4: [#6854](https://github.com/owncloud/web/pull/6854)
 
 ## Details
+
+* Bugfix - Check permissions when deleting Space: [#3709](https://github.com/owncloud/ocis/pull/3709)
+
+   Check for manager permissions when deleting spaces. Do not allow deleting spaces via dav
+   service
+
+   https://github.com/owncloud/ocis/pull/3709
 
 * Bugfix - Thumbnails for `/dav/xxx?preview=1` requests: [#3567](https://github.com/owncloud/ocis/pull/3567)
 
@@ -164,6 +173,14 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/3602
    https://github.com/owncloud/ocis/pull/3647
 
+* Enhancement - Product field in OCS version: [#2918](https://github.com/owncloud/ocis/pull/2918)
+
+   We've added a new field to the OCS Version, which is supposed to announce the product name. The
+   web ui as a client will make use of it to make the backend product and version available (e.g. for
+   easier bug reports).
+
+   https://github.com/owncloud/ocis/pull/2918
+
 * Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
 
    It is now possible to search for files and directories by their name using the web UI. Therefor
@@ -195,7 +212,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3579
 
-* Enhancement - Update reva to v2.3.0: [#3552](https://github.com/owncloud/ocis/pull/3552)
+* Enhancement - Update reva to v2.3.1: [#3552](https://github.com/owncloud/ocis/pull/3552)
+
+   Updated reva to version 2.3.1. This update includes
+
+  * Bugfix [cs3org/reva#2827](https://github.com/cs3org/reva/pull/2827): Check permissions when deleting spaces
+  * Bugfix [cs3org/reva#2830](https://github.com/cs3org/reva/pull/2830): Correctly render response when accepting merged shares
+  * Bugfix [cs3org/reva#2831](https://github.com/cs3org/reva/pull/2831): Fix uploads to owncloudsql storage when no mtime is provided
+  * Enhancement [cs3org/reva#2833](https://github.com/cs3org/reva/pull/2833): Make status.php values configurable
+  * Enhancement [cs3org/reva#2832](https://github.com/cs3org/reva/pull/2832): Add version option for ocdav go-micro service
 
    Updated reva to version 2.3.0. This update includes:
 

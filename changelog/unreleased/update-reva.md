@@ -1,4 +1,12 @@
-Enhancement: update reva to v2.3.0
+Enhancement: update reva to v2.3.1
+
+Updated reva to version 2.3.1. This update includes
+
+* Bugfix [cs3org/reva#2827](https://github.com/cs3org/reva/pull/2827): Check permissions when deleting spaces
+* Bugfix [cs3org/reva#2830](https://github.com/cs3org/reva/pull/2830): Correctly render response when accepting merged shares
+* Bugfix [cs3org/reva#2831](https://github.com/cs3org/reva/pull/2831): Fix uploads to owncloudsql storage when no mtime is provided
+* Enhancement [cs3org/reva#2833](https://github.com/cs3org/reva/pull/2833): Make status.php values configurable
+* Enhancement [cs3org/reva#2832](https://github.com/cs3org/reva/pull/2832): Add version option for ocdav go-micro service
 
 Updated reva to version 2.3.0. This update includes:
 

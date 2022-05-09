@@ -50,7 +50,7 @@ func InitCommand(cfg *config.Config) *cli.Command {
 			insecureFlag := c.String("insecure")
 			insecure := false
 			if insecureFlag == "ask" {
-				answer := strings.ToLower(stringPrompt("Do you want to configure oCIS with certificate checking disabled?\n This is not recommended for public instances! [yes | no = default]"))
+				answer := strings.ToLower(stringPrompt("Do you want to configure Infinite Scale with certificate checking disabled?\n This is not recommended for public instances! [yes | no = default]"))
 				if answer == "yes" || answer == "y" {
 					insecure = true
 				}

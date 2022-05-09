@@ -1613,10 +1613,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 - [apiMain/checksums.feature:233](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L233)
 
-#### [status does not have new product data item](https://github.com/owncloud/ocis/issues/3317)
-
-- [apiCapabilities/capabilities.feature:959](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L959)
-
 #### public links without permission are allowed now
 
 - [apiShareUpdateToShares/updateShare.feature:113](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L113)
