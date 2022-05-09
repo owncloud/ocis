@@ -30,6 +30,7 @@ func Server(cfg *config.Config) *cli.Command {
 			err := parser.ParseConfig(cfg)
 			if err != nil {
 				fmt.Printf("%v", err)
+				os.Exit(1)
 			}
 			return err
 		},

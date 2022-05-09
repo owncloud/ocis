@@ -10,3 +10,4 @@ bootstrap you a configuration file for a secure oCIS instance.
 
 https://github.com/owncloud/ocis/pull/3551
 https://github.com/owncloud/ocis/issues/3524
+https://github.com/owncloud/ocis/pull/3743
