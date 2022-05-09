@@ -206,13 +206,17 @@ func (o Ocs) fillPersonalQuota(ctx context.Context, d *data.User, u *revauser.Us
 			},
 		},
 	})
-	if err != nil || res.Status.Code != rpcv1beta1.Code_CODE_OK {
-		o.logger.Error().Err(err).Interface("status", res.Status).Msg("error calling ListStorageSpaces")
+	if err != nil {
+		o.logger.Error().Err(err).Msg("error calling ListStorageSpaces")
+		return
+	}
+	if res.Status.Code != rpcv1beta1.Code_CODE_OK {
+		o.logger.Debug().Interface("status", res.Status).Msg("ListStorageSpaces returned non OK result")
 		return
 	}
 
 	if len(res.StorageSpaces) == 0 {
-		o.logger.Error().Err(err).Msg("list spaces returned empty list")
+		o.logger.Debug().Err(err).Msg("list spaces returned empty list")
 		return
 	}
 
@@ -220,8 +224,12 @@ func (o Ocs) fillPersonalQuota(ctx context.Context, d *data.User, u *revauser.Us
 		ResourceId: res.StorageSpaces[0].Root,
 		Path:       ".",
 	}})
-	if err != nil || res.Status.Code != rpcv1beta1.Code_CODE_OK {
-		o.logger.Error().Err(err).Interface("status", res.Status).Msg("error calling GetQuota")
+	if err != nil {
+		o.logger.Error().Err(err).Msg("error calling GetQuota")
+		return
+	}
+	if res.Status.Code != rpcv1beta1.Code_CODE_OK {
+		o.logger.Debug().Interface("status", res.Status).Msg("GetQuota returned non OK result")
 		return
 	}
 
