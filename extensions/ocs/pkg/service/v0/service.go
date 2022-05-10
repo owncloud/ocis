@@ -66,15 +66,6 @@ func NewService(opts ...Option) Service {
 		ocsm.Logger(options.Logger),
 	)
 
-	requireAdmin := ocsm.RequireAdmin(
-		ocsm.RoleManager(roleManager),
-		ocsm.Logger(options.Logger),
-	)
-
-	requireSelfOrAdmin := ocsm.RequireSelfOrAdmin(
-		ocsm.RoleManager(roleManager),
-		ocsm.Logger(options.Logger),
-	)
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.NotFound(svc.NotFound)
 		r.Use(middleware.StripSlashes)
@@ -91,42 +82,7 @@ func NewService(opts ...Option) Service {
 				r.Route("/capabilities", func(r chi.Router) {})
 				// TODO /apps
 				r.Route("/user", func(r chi.Router) {
-					r.With(requireSelfOrAdmin).Get("/", svc.GetSelf)
 					r.Get("/signing-key", svc.GetSigningKey)
-				})
-
-				// for /users endpoints see https://github.com/owncloud/core/blob/master/apps/provisioning_api/appinfo/routes.php#L44-L56
-				r.Route("/users", func(r chi.Router) {
-					r.With(requireAdmin).Get("/", svc.ListUsers)
-					r.With(requireAdmin).Post("/", svc.AddUser)
-					r.Route("/{userid}", func(r chi.Router) {
-						r.With(requireUser).Get("/", svc.GetUser)
-						r.With(requireSelfOrAdmin).Put("/", svc.EditUser)
-						r.With(requireAdmin).Delete("/", svc.DeleteUser)
-						r.With(requireAdmin).Put("/enable", svc.EnableUser)
-						r.With(requireAdmin).Put("/disable", svc.DisableUser)
-					})
-
-					r.Route("/{userid}/groups", func(r chi.Router) {
-						r.With(requireSelfOrAdmin).Get("/", svc.ListUserGroups)
-						r.With(requireAdmin).Post("/", svc.AddToGroup)
-						r.With(requireAdmin).Delete("/", svc.RemoveFromGroup)
-					})
-
-					r.Route("/{userid}/subadmins", func(r chi.Router) {
-						r.With(requireAdmin).Post("/", svc.NotImplementedStub)
-						r.With(requireSelfOrAdmin).Get("/", svc.NotImplementedStub)
-						r.With(requireAdmin).Delete("/", svc.NotImplementedStub)
-					})
-				})
-
-				// for /groups endpoints see https://github.com/owncloud/core/blob/master/apps/provisioning_api/appinfo/routes.php#L65-L69
-				r.Route("/groups", func(r chi.Router) {
-					r.With(requireAdmin).Get("/", svc.ListGroups)
-					r.With(requireAdmin).Post("/", svc.AddGroup)
-					r.With(requireSelfOrAdmin).Get("/{groupid}", svc.GetGroupMembers)
-					r.With(requireAdmin).Delete("/{groupid}", svc.DeleteGroup)
-					r.With(requireAdmin).Get("/{groupid}/subadmins", svc.NotImplementedStub)
 				})
 			})
 			r.Route("/config", func(r chi.Router) {
