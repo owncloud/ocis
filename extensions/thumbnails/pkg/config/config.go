@@ -26,22 +26,17 @@ type Config struct {
 
 // FileSystemStorage defines the available filesystem storage configuration.
 type FileSystemStorage struct {
-	RootDirectory string `yaml:"root_directory" env:"THUMBNAILS_FILESYSTEMSTORAGE_ROOT"`
-}
-
-// FileSystemSource defines the available filesystem source configuration.
-type FileSystemSource struct {
-	BasePath string `yaml:"base_path"`
+	RootDirectory string `yaml:"root_directory" env:"THUMBNAILS_FILESYSTEMSTORAGE_ROOT" desc:"The directory where the filesystem storage will store the thumbnails."`
 }
 
 // Thumbnail defines the available thumbnail related configuration.
 type Thumbnail struct {
-	Resolutions         []string          `yaml:"resolutions"`
+	Resolutions         []string          `yaml:"resolutions" env:"THUMBNAILS_RESOLUTIONS" desc:"The supported target resolutions in the format WidthxHeight e.g. 32x32. You can provide multiple resolutions seperated by a comma."`
 	FileSystemStorage   FileSystemStorage `yaml:"filesystem_storage"`
-	WebdavAllowInsecure bool              `yaml:"webdav_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_WEBDAVSOURCE_INSECURE"`
-	CS3AllowInsecure    bool              `yaml:"cs3_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_CS3SOURCE_INSECURE"`
-	RevaGateway         string            `yaml:"reva_gateway" env:"REVA_GATEWAY"` //TODO: use REVA config
-	FontMapFile         string            `yaml:"font_map_file" env:"THUMBNAILS_TXT_FONTMAP_FILE"`
-	TransferSecret      string            `yaml:"transfer_secret" env:"STORAGE_TRANSFER_TOKEN;THUMBNAILS_TRANSFER_TOKEN"`
-	DataEndpoint        string            `yaml:"data_endpoint" env:"THUMBNAILS_DATA_ENDPOINT"`
+	WebdavAllowInsecure bool              `yaml:"webdav_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_WEBDAVSOURCE_INSECURE" desc:"Ignore untrusted SSL certificates when connecting to the webdav source."`
+	CS3AllowInsecure    bool              `yaml:"cs3_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_CS3SOURCE_INSECURE" desc:"Ignore untrusted SSL certificates when connecting to the CS3 source."`
+	RevaGateway         string            `yaml:"reva_gateway" env:"REVA_GATEWAY" desc:"The CS3 gateway endpoint"` //TODO: use REVA config
+	FontMapFile         string            `yaml:"font_map_file" env:"THUMBNAILS_TXT_FONTMAP_FILE" desc:"The path to a font file for txt thumbnails."`
+	TransferSecret      string            `yaml:"transfer_secret" env:"THUMBNAILS_TRANSFER_TOKEN" desc:"The secret to sign JWT to download the actual thumbnail file."`
+	DataEndpoint        string            `yaml:"data_endpoint" env:"THUMBNAILS_DATA_ENDPOINT" desc:"The HTTP endpoint where the actual thumbnail file can be downloaded."`
 }
