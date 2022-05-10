@@ -6,10 +6,18 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
 * Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
 * Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
 
 ## Details
+
+* Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
+
+   Added descriptions tags to the graph-explorer config tags so that they will be included in the
+   documentation.
+
+   https://github.com/owncloud/ocis/pull/3759
 
 * Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
 
