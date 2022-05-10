@@ -22,7 +22,7 @@ The first beta release of Infinite Scale 2.0.0 (beta1) introduces the 'File Sear
 The most prominent changes in **ownCloud Infinite Scale 2.0.0 beta1** and ownCloud Web 5.5.0 comprise:
 
 * All 'Breaking changes' of Infinite Scale 1.20.0 Technology Preview have been fixed. Especially the [WOPI Server extension](https://github.com/cs3org/wopiserver) is compatible with Infinite Scale 2.0.0 again.
-* The 'Search' feature to find files and folders based on their name is now available in the backend and in ownCloud Web. [ocis#3635](https://github.com/owncloud/ocis/pull/3635) [web#6841](https://github.com/owncloud/web/pull/6841)
+* The 'File Search' feature to find files and folders based on their name is now available in the backend and in ownCloud Web. [ocis#3635](https://github.com/owncloud/ocis/pull/3635) [web#6841](https://github.com/owncloud/web/pull/6841)
 * ownCloud Web introduces a new upload manager based on Uppy (https://uppy.io). Uppy provides a well-designed upload manager overlay, integrates seamlessly with the TUS protocol for upload chunking and provides the ability to cancel, pause and resume uploads. [web#6202](https://github.com/owncloud/web/pull/6202)
 * The existing integrated user management has been replaced by LibreIDM which is a lightweight LDAP server being developed by ownCloud and the LibreGraph community (https://github.com/libregraph/idm). LibreIDM comes with a MS Graph-based API and integrates a user interface for user & group management in ownCloud Web. [ocis#3331](https://github.com/owncloud/ocis/pull/3331) [web#6673](https://github.com/owncloud/web/issues/6673)
 * For security reasons, Infinite Scale will not start anymore without specifying certain secrets. A new command `ocis init` has been added to automatically prepare a new Infinite Scale installation by generating secure default secrets. [ocis#3551](https://github.com/owncloud/ocis/pull/3551)
@@ -32,6 +32,8 @@ The most prominent changes in **ownCloud Infinite Scale 2.0.0 beta1** and ownClo
 * It is now possible to show/hide file extensions in ownCloud Web using the file list settings. [web#6793](https://github.com/owncloud/web/pull/6793)
 * Infinite Scale now provides dedicated quick links that can be created using the quick action in the file list. Once created, the quick link will stay until it's removed and will be copied when the quick action is used. [web#6820](https://github.com/owncloud/web/pull/6820)
 * It is now possible to create links with the 'Editor' role for single files. [web#6787](https://github.com/owncloud/web/pull/6787)
+
+You can also read the full [ownCloud Infinite Scale changelog](https://github.com/owncloud/ocis/releases/tag/v2.0.0) and [ownCloud Web changelog](https://github.com/owncloud/web/releases/tag/v5.5.0) for further details on what has changed.
 
 ### Known issues
 
