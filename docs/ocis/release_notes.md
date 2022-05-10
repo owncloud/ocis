@@ -39,7 +39,7 @@ You can also read the full [ownCloud Infinite Scale changelog](https://github.co
 
 This section will be updated if known issues are discovered.
 
-* Copy & Move in ownCloud Web does not work outside of personal spaces
+* Copy & Move in ownCloud Web does not work outside of personal spaces https://github.com/owncloud/web/issues/6892
 * Single file user shares have no download action and thumbnail creation does not work for the recipient
 * Received shares cannot be renamed https://github.com/owncloud/ocis/issues/3721
 * The personal user quota is currently hardcoded https://github.com/owncloud/ocis/issues/3748
