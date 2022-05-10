@@ -37,8 +37,8 @@ The most prominent changes in **ownCloud Infinite Scale 2.0.0 beta1** and ownClo
 
 This section will be updated if known issues are discovered.
 
-* COPY&MOVE in ownCloud Web is does not work outside of personal spaces
-* Single File Shares have no download action and thumbnail creation does not work for the recipient
+* Copy & Move in ownCloud Web is does not work outside of personal spaces
+* Single file user shares have no download action and thumbnail creation does not work for the recipient
 * Received shares cannot be renamed https://github.com/owncloud/ocis/issues/3721
 * The personal user quota is currently hardcoded https://github.com/owncloud/ocis/issues/3748
 
