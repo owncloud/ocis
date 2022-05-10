@@ -37,7 +37,9 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
+{{< hint warning >}}
 For reasons of simplicity we are using the root user and group to run oCIS which is not recommended. Please use a non-root user in production environments and modify the oCIS service definition accordingly.
+{{< /hint >}}
 
 In the service definition we referenced `/etc/ocis/ocis.env` as our file containing environment variables for the oCIS process.
 In order to create the file we need first to create the folder `/etc/ocis/` and then we can add the actual `/etc/ocis/ocis.env` with following content:
