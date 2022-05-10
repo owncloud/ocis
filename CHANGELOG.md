@@ -29,6 +29,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 * Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
+* Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 * Enhancement - Update reva to v2.3.1: [#3552](https://github.com/owncloud/ocis/pull/3552)
 * Enhancement - Update ownCloud Web to v5.5.0-rc.5: [#6854](https://github.com/owncloud/web/pull/6854)
@@ -224,6 +225,20 @@ The following sections list the changes for unreleased.
    supposed to be shown to users.
 
    https://github.com/owncloud/ocis/pull/3626
+
+* Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
+
+   Added description tags to the config structs in the thumbnails service so they will be included
+   in the config documentation.
+
+  **Important** If you ran `ocis init` with the `v2.0.0-alpha*` version then you have to manually add the `transfer_secret` to the ocis.yaml.
+
+   Just open the `ocis.yaml` config file and look for the thumbnails section. Then add a random
+   `transfer_secret` so that it looks like this:
+
+   ```yaml thumbnails: thumbnail: transfer_secret: <put random value here> ```
+
+   https://github.com/owncloud/ocis/pull/3752
 
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 
