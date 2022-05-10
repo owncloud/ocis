@@ -2,7 +2,39 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.20.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v2.0.0...master
+
+## Summary
+
+* Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
+* Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
+
+## Details
+
+* Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
+
+   Added description tags to the config structs in the thumbnails service so they will be included
+   in the config documentation.
+
+  **Important** If you ran `ocis init` with the `v2.0.0-alpha*` version then you have to manually add the `transfer_secret` to the ocis.yaml.
+
+   Just open the `ocis.yaml` config file and look for the thumbnails section. Then add a random
+   `transfer_secret` so that it looks like this:
+
+   ```yaml thumbnails: thumbnail: transfer_secret: <put random value here> ```
+
+   https://github.com/owncloud/ocis/pull/3752
+
+* Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
+
+   Added descriptions to webdav config structs to include them in the config documentation.
+
+   https://github.com/owncloud/ocis/pull/3755
+# Changelog for [2.0.0-beta1] (2022-05-10)
+
+The following sections list the changes for 2.0.0-beta1.
+
+[2.0.0-beta1]: https://github.com/owncloud/ocis/compare/v1.20.0...v2.0.0-beta1
 
 ## Summary
 
@@ -29,11 +61,9 @@ The following sections list the changes for unreleased.
 * Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 * Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
-* Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 * Enhancement - Update reva to v2.3.1: [#3552](https://github.com/owncloud/ocis/pull/3552)
 * Enhancement - Update ownCloud Web to v5.5.0-rc.5: [#6854](https://github.com/owncloud/web/pull/6854)
-* Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
 
 ## Details
 
@@ -227,20 +257,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3626
 
-* Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
-
-   Added description tags to the config structs in the thumbnails service so they will be included
-   in the config documentation.
-
-  **Important** If you ran `ocis init` with the `v2.0.0-alpha*` version then you have to manually add the `transfer_secret` to the ocis.yaml.
-
-   Just open the `ocis.yaml` config file and look for the thumbnails section. Then add a random
-   `transfer_secret` so that it looks like this:
-
-   ```yaml thumbnails: thumbnail: transfer_secret: <put random value here> ```
-
-   https://github.com/owncloud/ocis/pull/3752
-
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 
    We have updated the capabilities regarding password enforcement and expiration dates of
@@ -334,12 +350,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/3727
    https://github.com/owncloud/ocis/pull/3747
    https://github.com/owncloud/web/releases/tag/v5.5.0-rc.5
-
-* Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
-
-   Added descriptions to webdav config structs to include them in the config documentation.
-
-   https://github.com/owncloud/ocis/pull/3755
 # Changelog for [1.20.0] (2022-04-13)
 
 The following sections list the changes for 1.20.0.
