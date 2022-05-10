@@ -33,6 +33,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 * Enhancement - Update reva to v2.3.1: [#3552](https://github.com/owncloud/ocis/pull/3552)
 * Enhancement - Update ownCloud Web to v5.5.0-rc.5: [#6854](https://github.com/owncloud/web/pull/6854)
+* Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
 
 ## Details
 
@@ -333,6 +334,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/3727
    https://github.com/owncloud/ocis/pull/3747
    https://github.com/owncloud/web/releases/tag/v5.5.0-rc.5
+
+* Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
+
+   Added descriptions to webdav config structs to include them in the config documentation.
+
+   https://github.com/owncloud/ocis/pull/3755
 # Changelog for [1.20.0] (2022-04-13)
 
 The following sections list the changes for 1.20.0.
