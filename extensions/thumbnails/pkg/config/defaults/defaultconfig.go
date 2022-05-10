@@ -2,6 +2,7 @@ package defaults
 
 import (
 	"path"
+	"strings"
 
 	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
@@ -70,12 +71,11 @@ func EnsureDefaults(cfg *config.Config) {
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
 	}
-
-	if cfg.Thumbnail.TransferSecret == "" && cfg.Commons != nil && cfg.Commons.TransferSecret != "" {
-		cfg.Thumbnail.TransferSecret = cfg.Commons.TransferSecret
-	}
 }
 
 func Sanitize(cfg *config.Config) {
 	// nothing to sanitize here atm
+	if len(cfg.Thumbnail.Resolutions) == 1 && strings.Contains(cfg.Thumbnail.Resolutions[0], ",") {
+		cfg.Thumbnail.Resolutions = strings.Split(cfg.Thumbnail.Resolutions[0], ",")
+	}
 }

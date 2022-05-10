@@ -14,8 +14,10 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const configFilename string = "ocis.yaml" // TODO: use also a constant for reading this file
-const passwordLength int = 32
+const (
+	configFilename = "ocis.yaml" // TODO: use also a constant for reading this file
+	passwordLength = 32
+)
 
 type TokenManager struct {
 	JWTSecret string `yaml:"jwt_secret"`
@@ -75,11 +77,12 @@ type UsersAndGroupsExtension struct {
 }
 
 type ThumbnailSettings struct {
-	WebdavAllowInsecure bool `yaml:"webdav_allow_insecure"`
-	Cs3AllowInsecure    bool `yaml:"cs3_allow_insecure"`
+	TransferSecret      string `yaml:"transfer_secret"`
+	WebdavAllowInsecure bool   `yaml:"webdav_allow_insecure"`
+	Cs3AllowInsecure    bool   `yaml:"cs3_allow_insecure"`
 }
 
-type ThumbNailExtension struct {
+type ThumbnailExtension struct {
 	Thumbnail ThumbnailSettings
 }
 
@@ -114,7 +117,7 @@ type OcisConfig struct {
 	StorageSystem     DataProviderInsecureSettings `yaml:"storage_system"`
 	StorageUsers      DataProviderInsecureSettings `yaml:"storage_users"`
 	Ocdav             InsecureExtension
-	Thumbnails        ThumbNailExtension
+	Thumbnails        ThumbnailExtension
 }
 
 func checkConfigPath(configPath string) error {
@@ -200,7 +203,11 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 	}
 	revaTransferSecret, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
-		return fmt.Errorf("could not generate random password for machineauthsecret: %s", err)
+		return fmt.Errorf("could not generate random password for revaTransferSecret: %s", err)
+	}
+	thumbnailsTransferSecret, err := generators.GenerateRandomPassword(passwordLength)
+	if err != nil {
+		return fmt.Errorf("could not generate random password for thumbnailsTransferSecret: %s", err)
 	}
 
 	cfg := OcisConfig{
@@ -253,6 +260,11 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 				},
 			},
 		},
+		Thumbnails: ThumbnailExtension{
+			Thumbnail: ThumbnailSettings{
+				TransferSecret: thumbnailsTransferSecret,
+			},
+		},
 	}
 
 	if insecure {
@@ -283,12 +295,9 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		cfg.StorageUsers = DataProviderInsecureSettings{
 			Data_provider_insecure: true,
 		}
-		cfg.Thumbnails = ThumbNailExtension{
-			Thumbnail: ThumbnailSettings{
-				WebdavAllowInsecure: true,
-				Cs3AllowInsecure:    true,
-			},
-		}
+
+		cfg.Thumbnails.Thumbnail.WebdavAllowInsecure = true
+		cfg.Thumbnails.Thumbnail.Cs3AllowInsecure = true
 	}
 
 	yamlOutput, err := yaml.Marshal(cfg)
