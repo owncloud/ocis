@@ -76,7 +76,7 @@ func (p *Provider) handleEvent(ev interface{}) {
 			return
 		}
 
-		err = p.indexClient.Move(statRes.Info, gpRes.Path)
+		err = p.indexClient.Move(statRes.Info.Id, gpRes.Path)
 		if err != nil {
 			p.logger.Error().Err(err).Msg("failed to restore the changed resource in the index")
 		}

@@ -165,15 +165,16 @@ func (i *Index) Purge(id *sprovider.ResourceId) error {
 }
 
 // Move update the path of an entry and all its children
-func (i *Index) Move(ri *sprovider.ResourceInfo, fullPath string) error {
-	doc, err := i.getEntity(idToBleveId(ri.Id))
+func (i *Index) Move(id *sprovider.ResourceId, fullPath string) error {
+	bleveId := idToBleveId(id)
+	doc, err := i.getEntity(bleveId)
 	if err != nil {
 		return err
 	}
 	oldName := doc.Path
 	newName := utils.MakeRelativePath(fullPath)
 
-	doc, err = i.updateEntity(idToBleveId(ri.Id), func(doc *indexDocument) {
+	doc, err = i.updateEntity(bleveId, func(doc *indexDocument) {
 		doc.Path = newName
 		doc.Name = path.Base(newName)
 	})

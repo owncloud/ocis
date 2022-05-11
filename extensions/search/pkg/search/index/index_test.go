@@ -366,7 +366,7 @@ var _ = Describe("Index", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			parentRi.Path = "newname"
-			err = i.Move(parentRi, "./somewhere/else/newname")
+			err = i.Move(parentRi.Id, "./somewhere/else/newname")
 			Expect(err).ToNot(HaveOccurred())
 
 			assertDocCount(rootId, "subdir", 0)
