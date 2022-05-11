@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
 * Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
+* Enhancement - Update reva: [#3746](https://github.com/owncloud/ocis/pull/3746)
 * Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
 
 ## Details
@@ -32,6 +33,12 @@ The following sections list the changes for unreleased.
    ```yaml thumbnails: thumbnail: transfer_secret: <put random value here> ```
 
    https://github.com/owncloud/ocis/pull/3752
+
+* Enhancement - Update reva: [#3746](https://github.com/owncloud/ocis/pull/3746)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/3746
 
 * Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
 
@@ -362,7 +369,7 @@ The following sections list the changes for 2.0.0-beta1.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
 
 ## Summary
 
@@ -530,11 +537,28 @@ The following sections list the changes for 1.20.0.
    Group member remove
 
    https://github.com/owncloud/ocis/pull/3467
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
@@ -703,23 +727,6 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 # Changelog for [1.18.0] (2022-03-03)
 
 The following sections list the changes for 1.18.0.
