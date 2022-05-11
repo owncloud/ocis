@@ -16,7 +16,7 @@ use TestHelpers\HttpRequestHelper;
 require_once 'bootstrap.php';
 
 /**
- * Context for the provisioning specific steps using the Graph API
+ * Context for the TUS-specific steps using the Graph API
  */
 class TusContext implements Context
 {
@@ -65,7 +65,7 @@ class TusContext implements Context
     }
 
     /**
-     * @Given /^user "([^"]*)" has uploaded a file "([^"]*)" via TUS inside of the space "([^"]*)" using  WebDAV API$/
+     * @Given /^user "([^"]*)" has uploaded a file "([^"]*)" via TUS inside of the space "([^"]*)" using the WebDAV API$/
      *
      * @param string $user
      * @param string $resource
@@ -80,7 +80,7 @@ class TusContext implements Context
     {
         $resourceLocation = $this->getResourceLocation($user, $resource, $spaceName);
         $file = \fopen($this->acceptanceTestsDirLocation() . $resource, 'r');
-        
+
         $this->featureContext->setResponse(
             HttpRequestHelper::sendRequest(
                 $resourceLocation,
@@ -94,7 +94,7 @@ class TusContext implements Context
         );
         $this->featureContext->theHTTPStatusCodeShouldBe(200, "Expected response status code should be 200");
 
-        
+
         $this->featureContext->setResponse(
             HttpRequestHelper::sendRequest(
                 $resourceLocation,
@@ -111,12 +111,13 @@ class TusContext implements Context
 
     /**
      * send POST and return the url of the resource location in the response header
-     * 
+     *
      * @param string $user
      * @param string $resource
      * @param string $spaceName
      *
      * @return string
+     * @throws Exception|GuzzleException
      */
     public function getResourceLocation(string $user, string $resource, string $spaceName): string
     {
@@ -148,5 +149,6 @@ class TusContext implements Context
         if (\sizeof($locationHeader) > 0) {
             return $locationHeader[0];
         }
+        throw new \Exception(__METHOD__ . " Location header could not be found");
     }
 }

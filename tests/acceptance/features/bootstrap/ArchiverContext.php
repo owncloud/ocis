@@ -23,6 +23,7 @@
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
+use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\SetupHelper;
 use wapmorgan\UnifiedArchive\UnifiedArchive;
@@ -101,7 +102,7 @@ class ArchiverContext implements Context {
 	 *
 	 * @return void
 	 *
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 * @throws Exception
 	 */
 	public function userDownloadsTheArchive(
@@ -142,7 +143,7 @@ class ArchiverContext implements Context {
 	 *
 	 * @return void
 	 *
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 * @throws Exception
 	 */
 	public function userDownloadsTheArchiveOfItemOfUser(
@@ -172,7 +173,7 @@ class ArchiverContext implements Context {
 	 *
 	 * @return void
 	 *
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException|Exception
 	 */
 	public function userDownloadsTheArchiveOfTheseItems(
 		string $user,

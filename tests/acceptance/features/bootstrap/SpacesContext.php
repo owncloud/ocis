@@ -69,12 +69,12 @@ class SpacesContext implements Context {
 	/**
 	 * @var string
 	 */
-	private $ocsApiUrl = '/ocs/v2.php/apps/files_sharing/api/v1/shares';
+	private string $ocsApiUrl = '/ocs/v2.php/apps/files_sharing/api/v1/shares';
 
 	/**
 	 * @var string
 	 */
-	private $davSpacesUrl = '/remote.php/dav/spaces/';
+	private string $davSpacesUrl = '/remote.php/dav/spaces/';
 
 	/**
 	 * @param string $spaceName
@@ -214,6 +214,7 @@ class SpacesContext implements Context {
 	 * @param string $spaceName
 	 *
 	 * @return array
+	 * @throws GuzzleException
 	 */
 	public function getSpaceByName(string $user, string $spaceName): array {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
@@ -232,6 +233,7 @@ class SpacesContext implements Context {
 	 * @param string $spaceName
 	 *
 	 * @return array
+	 * @throws GuzzleException
 	 */
 	public function getSpaceByNameManager(string $user, string $spaceName): array {
 		$this->theUserListsAllAvailableSpacesUsingTheGraphApi($user);
@@ -252,6 +254,7 @@ class SpacesContext implements Context {
 	 * @param string $fileName
 	 *
 	 * @return ResponseInterface
+	 * @throws GuzzleException
 	 */
 	public function getFileData(string $user, string $spaceName, string $fileName): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
@@ -282,6 +285,7 @@ class SpacesContext implements Context {
 	 * @param string $fileName
 	 *
 	 * @return string
+	 * @throws GuzzleException
 	 */
 	public function getFileId(string $user, string $spaceName, string $fileName): string {
 		$fileData = $this->getFileData($user, $spaceName, $fileName)->getHeaders();
@@ -296,6 +300,7 @@ class SpacesContext implements Context {
 	 * @param string $fileName
 	 *
 	 * @return string
+	 * @throws GuzzleException
 	 */
 	public function getETag(string $user, string $spaceName, string $fileName): string {
 		$fileData = $this->getFileData($user, $spaceName, $fileName)->getHeaders();
@@ -308,6 +313,7 @@ class SpacesContext implements Context {
 	 * @param string $userName
 	 *
 	 * @return string
+	 * @throws Exception|GuzzleException
 	 */
 	public function getUserIdByUserName(string $userName): string {
 		$this->featureContext->setResponse(GraphHelper::getUser(
@@ -321,12 +327,11 @@ class SpacesContext implements Context {
 			$rawBody = $this->featureContext->getResponse()->getBody()->getContents();
 			$response = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
 			if (isset($response["id"])) {
-				$user = $response;
+				return $response["id"];
 			} else {
 				throw new Exception(__METHOD__ . " accounts-list is empty");
 			}
 		}
-		return $user["id"];
 		throw new Exception(__METHOD__ . " user with name $userName not found");
 	}
 
@@ -362,7 +367,7 @@ class SpacesContext implements Context {
 	 *
 	 * @return void
 	 *
-	 * @throws Exception
+	 * @throws Exception|GuzzleException
 	 */
 	public function cleanDataAfterTests(): void
 	{
@@ -375,7 +380,7 @@ class SpacesContext implements Context {
 	 *
 	 * @return void
 	 *
-	 * @throws Exception
+	 * @throws Exception|GuzzleException
 	 */
 	public function deleteAllSpacesOfTheType(string $driveType): void
 	{
@@ -463,16 +468,16 @@ class SpacesContext implements Context {
 	/**
 	 * Send Graph List Single Space Request
 	 *
-	 * @param  string $user
-	 * @param  string $password
-	 * @param  string $urlArguments
-	 * @param  string $xRequestId
-	 * @param  array  $body
-	 * @param  array  $headers
+	 * @param string $user
+	 * @param string $password
+	 * @param string $spaceId
+	 * @param string $urlArguments
+	 * @param string $xRequestId
+	 * @param array $body
+	 * @param array $headers
 	 *
 	 * @return ResponseInterface
 	 *
-	 * @throws GuzzleException
 	 */
 	public function listSingleSpaceRequest(
 		string $user,
@@ -569,6 +574,7 @@ class SpacesContext implements Context {
 	 * @return void
 	 *
 	 * @throws GuzzleException
+	 * @throws Exception
 	 */
 	public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user): void {
 		$this->featureContext->setResponse(
@@ -587,6 +593,7 @@ class SpacesContext implements Context {
 	 * @return void
 	 *
 	 * @throws GuzzleException
+	 * @throws Exception
 	 */
 	public function theUserListsAllAvailableSpacesUsingTheGraphApi(string $user): void {
 		$this->featureContext->setResponse(
@@ -622,8 +629,7 @@ class SpacesContext implements Context {
 	 * @When /^user "([^"]*)" looks up the single space "([^"]*)" via the GraphApi by using its id$/
 	 *
 	 * @param string $user
-	 * @param string $query
-	 *
+	 * @param string $spaceName
 	 * @return void
 	 *
 	 * @throws GuzzleException
@@ -632,7 +638,7 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($user, $spaceName);
 		Assert::assertIsArray($space);
 		Assert::assertNotEmpty($spaceId = $space["id"]);
-		Assert::assertNotEmpty($spaceWebDavUrl = $space["root"]["webDavUrl"]);
+		Assert::assertNotEmpty($space["root"]["webDavUrl"]);
 		$this->featureContext->setResponse(
 			$this->listSingleSpaceRequest(
 				$user,
@@ -798,8 +804,7 @@ class SpacesContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $spaceName
-	 * @param string $path
-	 *
+	 * @param string $foldersPath
 	 * @return void
 	 *
 	 * @throws GuzzleException
@@ -961,6 +966,7 @@ class SpacesContext implements Context {
 	 *
 	 * @param string $spaceName
 	 * @param string $userName
+	 * @param string $fileName
 	 * @param TableNode $table
 	 *
 	 * @return void
@@ -1032,7 +1038,7 @@ class SpacesContext implements Context {
 	 * @param string $role
 	 *
 	 * @return void
-	 * @throws Exception
+	 * @throws Exception|GuzzleException
 	 */
 	public function checkPermissionsInResponse(
 		string $spaceName,
@@ -1071,7 +1077,7 @@ class SpacesContext implements Context {
 	/**
 	 * @Then /^the json responded should (not|only|)\s?contain spaces of type "([^"]*)"$/
 	 *
-	 * @param string $shoulOrNot (not|only|)
+	 * @param string $onlyOrNot (not|only|)
 	 * @param string $type
 	 *
 	 * @return void
@@ -1250,7 +1256,7 @@ class SpacesContext implements Context {
 		for ($i = 0; $i < \count($exploded); $i++) {
 			$path = $path . $exploded[$i] . '/';
 			$this->theUserCreatesAFolderToAnotherOwnerSpaceUsingTheGraphApi($user, $path, $spaceName);
-		};
+		}
 	}
 
 	/**
@@ -1445,11 +1451,10 @@ class SpacesContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $spaceName
-	 * @param string $newName
-	 *
+	 * @param string $newDescription
 	 * @return void
 	 * @throws GuzzleException
-	 * @throws Exception
+	 * @throws JsonException
 	 */
 	public function updateSpaceDescription(
 		string $user,
@@ -1607,6 +1612,7 @@ class SpacesContext implements Context {
 	 * @param int $quota
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function userHasCreatedSpace(
 		string $user,
@@ -1668,6 +1674,7 @@ class SpacesContext implements Context {
 	 * @param string $destination
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function userHasUploadedFile(
 		string $user,
@@ -2161,7 +2168,7 @@ class SpacesContext implements Context {
 			if ($objectInTrash["name"] === $object) {
 				$expectedObject = $objectInTrash["name"];
 			}
-		};
+		}
 		if ($shouldOrNot === "not") {
 			Assert::assertEmpty($expectedObject, "$object is found in the trash, but should not be there");
 		} else {
@@ -2172,13 +2179,14 @@ class SpacesContext implements Context {
 	/**
 	 * @When /^user "([^"]*)" restores the (?:file|folder) "([^"]*)" from the trash of the space "([^"]*)" to "([^"]*)"$/
 	 *
-	 * @param  string $user
-	 * @param  string $object
-	 * @param  string $spaceName
-	 * @param  string $destination
+	 * @param string $user
+	 * @param string $object
+	 * @param string $spaceName
+	 * @param string $destination
 	 *
 	 * @return void
 	 * @throws GuzzleException
+	 * @throws Exception
 	 */
 	public function userRestoresSpaceObjectsFromTrashRequest(
 		string $user,
@@ -2190,11 +2198,16 @@ class SpacesContext implements Context {
 
 		// find object in trash
 		$objectsInTrash = $this->getObjectsInTrashbin($user, $spaceName);
+		$pathToDeletedObject = "";
 		foreach ($objectsInTrash as $objectInTrash) {
 			if ($objectInTrash["name"] === $object) {
 				$pathToDeletedObject = $objectInTrash["href"];
 			}
-		};
+		}
+
+		if ($pathToDeletedObject === "") {
+			throw new Exception(__METHOD__ . " Object '$object' was not found in the trashbin of user '$user' space '$spaceName'");
+		}
 
 		$destination = $this->baseUrl . $this->davSpacesUrl . $space["id"] . $destination;
 		$header = ["Destination" => $destination, "Overwrite" => "F"];
@@ -2214,7 +2227,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * User downloads a priview of the file inside of the project space
+	 * User downloads a preview of the file inside the project space
 	 * @When /^user "([^"]*)" downloads the preview of "([^"]*)" of the space "([^"]*)" with width "([^"]*)" and height "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param  string $user
@@ -2235,7 +2248,7 @@ class SpacesContext implements Context {
 		$eTag = str_replace("\"", "", $this->getETag($user, $spaceName, $fileName));
 		$urlParameters = [
 			'scalingup' => 0,
-			'preview' => '1', 
+			'preview' => '1',
 			'a' => '1',
 			'c' => $eTag,
 			'x' => $width,

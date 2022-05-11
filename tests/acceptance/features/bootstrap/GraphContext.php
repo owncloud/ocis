@@ -370,7 +370,7 @@ class GraphContext implements Context {
 	 * @param string $displayName
 	 *
 	 * @return void
-	 * @throws Exception
+	 * @throws Exception|GuzzleException
 	 */
 	public function theAdminHasCreatedUser(
 		string $user,
