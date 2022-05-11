@@ -26,7 +26,10 @@ import (
 	"time"
 
 	"github.com/blevesearch/bleve/v2"
+	"github.com/blevesearch/bleve/v2/analysis/analyzer/custom"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/keyword"
+	"github.com/blevesearch/bleve/v2/analysis/token/lowercase"
+	"github.com/blevesearch/bleve/v2/analysis/tokenizer/single"
 	"github.com/blevesearch/bleve/v2/mapping"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -57,7 +60,11 @@ type Index struct {
 
 // NewPersisted returns a new instance of Index with the data being persisted in the given directory
 func NewPersisted(path string) (*Index, error) {
-	bi, err := bleve.New(path, BuildMapping())
+	mapping, err := BuildMapping()
+	if err != nil {
+		return nil, err
+	}
+	bi, err := bleve.New(path, mapping)
 	if err != nil {
 		return nil, err
 	}
@@ -157,14 +164,14 @@ func (i *Index) Purge(id *sprovider.ResourceId) error {
 	return i.bleveIndex.Delete(idToBleveId(id))
 }
 
-// Purge removes an entity from the index
-func (i *Index) Move(ri *sprovider.ResourceInfo) error {
+// Move update the path of an entry and all its children
+func (i *Index) Move(ri *sprovider.ResourceInfo, fullPath string) error {
 	doc, err := i.getEntity(idToBleveId(ri.Id))
 	if err != nil {
 		return err
 	}
 	oldName := doc.Path
-	newName := utils.MakeRelativePath(ri.Path)
+	newName := utils.MakeRelativePath(fullPath)
 
 	doc, err = i.updateEntity(idToBleveId(ri.Id), func(doc *indexDocument) {
 		doc.Path = newName
@@ -204,7 +211,7 @@ func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (
 	deletedQuery := bleve.NewBoolFieldQuery(false)
 	deletedQuery.SetField("Deleted")
 	query := bleve.NewConjunctionQuery(
-		bleve.NewQueryStringQuery("Name:"+req.Query),
+		bleve.NewQueryStringQuery("Name:"+strings.ToLower(req.Query)),
 		deletedQuery, // Skip documents that have been marked as deleted
 		bleve.NewQueryStringQuery("RootID:"+req.Ref.ResourceId.StorageId+"!"+req.Ref.ResourceId.OpaqueId), // Limit search to the space
 		bleve.NewQueryStringQuery("Path:"+utils.MakeRelativePath(path.Join(req.Ref.Path, "/"))+"*"),       // Limit search to this directory in the space
@@ -232,10 +239,29 @@ func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (
 }
 
 // BuildMapping builds a bleve index mapping which can be used for indexing
-func BuildMapping() mapping.IndexMapping {
+func BuildMapping() (mapping.IndexMapping, error) {
+	nameMapping := bleve.NewTextFieldMapping()
+	nameMapping.Analyzer = "lowercaseKeyword"
+
+	docMapping := bleve.NewDocumentMapping()
+	docMapping.AddFieldMappingsAt("Name", nameMapping)
+
 	indexMapping := bleve.NewIndexMapping()
 	indexMapping.DefaultAnalyzer = keyword.Name
-	return indexMapping
+	indexMapping.DefaultMapping = docMapping
+	err := indexMapping.AddCustomAnalyzer("lowercaseKeyword",
+		map[string]interface{}{
+			"type":      custom.Name,
+			"tokenizer": single.Name,
+			"token_filters": []string{
+				lowercase.Name,
+			},
+		})
+	if err != nil {
+		return nil, err
+	}
+
+	return indexMapping, nil
 }
 
 func toEntity(ref *sprovider.Reference, ri *sprovider.ResourceInfo) *indexDocument {

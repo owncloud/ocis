@@ -37,7 +37,7 @@ var _ = Describe("Index", func() {
 				StorageId: "storageid",
 				OpaqueId:  "someopaqueid",
 			},
-			Path:     "foo.pdf",
+			Path:     "Foo.pdf",
 			Size:     12345,
 			Type:     sprovider.ResourceType_RESOURCE_TYPE_FILE,
 			MimeType: "application/pdf",
@@ -45,7 +45,7 @@ var _ = Describe("Index", func() {
 		}
 		parentRef = &sprovider.Reference{
 			ResourceId: rootId,
-			Path:       "./sudbir",
+			Path:       "./my/sudbir",
 		}
 		parentRi = &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
@@ -59,7 +59,7 @@ var _ = Describe("Index", func() {
 		}
 		childRef = &sprovider.Reference{
 			ResourceId: rootId,
-			Path:       "./sudbir/child.pdf",
+			Path:       "./my/sudbir/child.pdf",
 		}
 		childRi = &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
@@ -92,8 +92,10 @@ var _ = Describe("Index", func() {
 	)
 
 	BeforeEach(func() {
-		var err error
-		bleveIndex, err = bleve.NewMemOnly(index.BuildMapping())
+		mapping, err := index.BuildMapping()
+		Expect(err).ToNot(HaveOccurred())
+
+		bleveIndex, err = bleve.NewMemOnly(mapping)
 		Expect(err).ToNot(HaveOccurred())
 
 		i, err = index.New(bleveIndex)
@@ -199,6 +201,21 @@ var _ = Describe("Index", func() {
 					Expect(res.Matches[0].Entity.Name).To(Equal(ri.Path))
 					Expect(res.Matches[0].Entity.Size).To(Equal(ri.Size))
 				}
+			})
+
+			It("is case-insensitive", func() {
+				res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
+					Ref: &searchmsg.Reference{
+						ResourceId: &searchmsg.ResourceID{
+							StorageId: ref.ResourceId.StorageId,
+							OpaqueId:  ref.ResourceId.OpaqueId,
+						},
+					},
+					Query: "Foo*",
+				})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res).ToNot(BeNil())
+				Expect(len(res.Matches)).To(Equal(1))
 			})
 
 			Context("and an additional file in a subdirectory", func() {
@@ -349,7 +366,7 @@ var _ = Describe("Index", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			parentRi.Path = "newname"
-			err = i.Move(parentRi)
+			err = i.Move(parentRi, "./somewhere/else/newname")
 			Expect(err).ToNot(HaveOccurred())
 
 			assertDocCount(rootId, "subdir", 0)
@@ -365,7 +382,7 @@ var _ = Describe("Index", func() {
 			})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(res.Matches)).To(Equal(1))
-			Expect(res.Matches[0].Entity.Ref.Path).To(Equal("./newname/child.pdf"))
+			Expect(res.Matches[0].Entity.Ref.Path).To(Equal("./somewhere/else/newname/child.pdf"))
 		})
 	})
 })
