@@ -48,6 +48,7 @@ The following sections list the changes for unreleased.
    Bumps reva version
 
    https://github.com/owncloud/ocis/pull/3746
+   https://github.com/owncloud/ocis/pull/3771
 
 * Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
 
