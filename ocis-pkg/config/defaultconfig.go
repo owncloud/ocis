@@ -1,7 +1,6 @@
 package config
 
 import (
-	accounts "github.com/owncloud/ocis/v2/extensions/accounts/pkg/config/defaults"
 	appProvider "github.com/owncloud/ocis/v2/extensions/app-provider/pkg/config/defaults"
 	appRegistry "github.com/owncloud/ocis/v2/extensions/app-registry/pkg/config/defaults"
 	audit "github.com/owncloud/ocis/v2/extensions/audit/pkg/config/defaults"
@@ -10,7 +9,6 @@ import (
 	authmachine "github.com/owncloud/ocis/v2/extensions/auth-machine/pkg/config/defaults"
 	frontend "github.com/owncloud/ocis/v2/extensions/frontend/pkg/config/defaults"
 	gateway "github.com/owncloud/ocis/v2/extensions/gateway/pkg/config/defaults"
-	glauth "github.com/owncloud/ocis/v2/extensions/glauth/pkg/config/defaults"
 	graphExplorer "github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/config/defaults"
 	graph "github.com/owncloud/ocis/v2/extensions/graph/pkg/config/defaults"
 	groups "github.com/owncloud/ocis/v2/extensions/groups/pkg/config/defaults"
@@ -42,7 +40,6 @@ func DefaultConfig() *Config {
 			Host: "localhost",
 		},
 
-		Accounts:          accounts.DefaultConfig(),
 		AppProvider:       appProvider.DefaultConfig(),
 		AppRegistry:       appRegistry.DefaultConfig(),
 		Audit:             audit.DefaultConfig(),
@@ -51,7 +48,6 @@ func DefaultConfig() *Config {
 		AuthMachine:       authmachine.DefaultConfig(),
 		Frontend:          frontend.DefaultConfig(),
 		Gateway:           gateway.DefaultConfig(),
-		GLAuth:            glauth.DefaultConfig(),
 		Graph:             graph.DefaultConfig(),
 		GraphExplorer:     graphExplorer.DefaultConfig(),
 		Groups:            groups.DefaultConfig(),

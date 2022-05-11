@@ -28,6 +28,7 @@ func VersionCommand(cfg *config.Config) *cli.Command {
 			serviceList, err := reg.ListServices()
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not list services: %v", err))
+				return err
 			}
 
 			var services []*mreg.Service

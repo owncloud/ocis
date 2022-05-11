@@ -25,7 +25,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 	}
 }
 
-// Execute is the entry point for the ocis-accounts command.
+// Execute is the entry point for the ocis-app-provider command.
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "app-provider",
@@ -41,12 +41,12 @@ func Execute(cfg *config.Config) error {
 	return app.Run(os.Args)
 }
 
-// SutureService allows for the accounts command to be embedded and supervised by a suture supervisor tree.
+// SutureService allows for the app-provider command to be embedded and supervised by a suture supervisor tree.
 type SutureService struct {
 	cfg *config.Config
 }
 
-// NewSutureService creates a new accounts.SutureService
+// NewSutureService creates a new app-provider.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
 	cfg.AppProvider.Commons = cfg.Commons
 	return SutureService{

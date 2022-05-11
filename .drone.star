@@ -43,7 +43,6 @@ DEFAULT_NODEJS_VERSION = "14"
 config = {
     "modules": [
         # if you add a module here please also add it to the root level Makefile
-        "extensions/accounts",
         "extensions/app-provider",
         "extensions/app-registry",
         "extensions/audit",
@@ -52,7 +51,6 @@ config = {
         "extensions/auth-machine",
         "extensions/frontend",
         "extensions/gateway",
-        "extensions/glauth",
         "extensions/graph-explorer",
         "extensions/graph",
         "extensions/groups",
@@ -95,10 +93,6 @@ config = {
         "filterTags": "@ocisSmokeTest",
         "skip": False,
         "skipExceptParts": [],
-        "earlyFail": True,
-    },
-    "accountsUITests": {
-        "skip": True,
         "earlyFail": True,
     },
     "settingsUITests": {
@@ -303,9 +297,6 @@ def testPipelines(ctx):
 
     if "skip" not in config["uiTests"] or not config["uiTests"]["skip"]:
         pipelines += uiTests(ctx)
-
-    if "skip" not in config["accountsUITests"] or not config["accountsUITests"]["skip"]:
-        pipelines.append(accountsUITests(ctx))
 
     if "skip" not in config["settingsUITests"] or not config["settingsUITests"]["skip"]:
         pipelines.append(settingsUITests(ctx))
@@ -740,70 +731,6 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
         ] + failEarly(ctx, early_fail),
         "services": selenium() + middlewareService(),
         "volumes": [pipelineVolumeOC10Tests] +
-                   [{
-                       "name": "uploads",
-                       "temp": {},
-                   }],
-        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/v*",
-                "refs/pull/**",
-            ],
-        },
-    }
-
-def accountsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
-    early_fail = config["accountsUITests"]["earlyFail"] if "earlyFail" in config["accountsUITests"] else False
-
-    return {
-        "kind": "pipeline",
-        "type": "docker",
-        "name": "accountsUITests",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
-        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() + [
-            {
-                "name": "WebUIAcceptanceTests",
-                "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-                "environment": {
-                    "SERVER_HOST": "https://ocis-server:9200",
-                    "BACKEND_HOST": "https://ocis-server:9200",
-                    "RUN_ON_OCIS": "true",
-                    "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/owncloud/data",
-                    "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
-                    "TEST_TAGS": "not @skipOnOCIS and not @skip",
-                    "LOCAL_UPLOAD_DIR": "/uploads",
-                    "NODE_TLS_REJECT_UNAUTHORIZED": 0,
-                    "WEB_PATH": "/srv/app/web",
-                    "FEATURE_PATH": "/drone/src/extensions/accounts/ui/tests/acceptance/features",
-                    "MIDDLEWARE_HOST": "http://middleware:3000",
-                },
-                "commands": [
-                    ". /drone/src/.drone.env",
-                    # we need to have Web around for some general step definitions (eg. how to log in)
-                    "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
-                    "cd /srv/app/web",
-                    "git checkout $WEB_COMMITID",
-                    # TODO: settings/package.json has all the acceptance test dependencies
-                    # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
-                    "cd /drone/src/extensions/accounts",
-                    "yarn install --immutable",
-                    "make test-acceptance-webui",
-                ],
-                "volumes": [stepVolumeOC10Tests] +
-                           [{
-                               "name": "uploads",
-                               "path": "/uploads",
-                           }],
-            },
-        ] + failEarly(ctx, early_fail),
-        "services": selenium() + middlewareService(),
-        "volumes": [stepVolumeOC10Tests] +
                    [{
                        "name": "uploads",
                        "temp": {},
@@ -1717,7 +1644,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "SHARING_USER_OWNCLOUDSQL_DB_PORT": 3306,
             "SHARING_USER_OWNCLOUDSQL_DB_NAME": "owncloud",
             # General oCIS config
-            # OCIS_RUN_EXTENSIONS specifies to start all extensions except glauth, idp and accounts. These are replaced by external services
+            # OCIS_RUN_EXTENSIONS specifies to start all extensions except idm, idp and accounts. These are replaced by external services
             "OCIS_RUN_EXTENSIONS": "app-registry,app-provider,audit,auth-basic,auth-bearer,auth-machine,frontend,gateway,graph,graph-explorer,groups,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav",
             "OCIS_LOG_LEVEL": "info",
             "OCIS_URL": OCIS_URL,
