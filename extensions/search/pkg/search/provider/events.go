@@ -126,7 +126,6 @@ func (p *Provider) statResource(ref *provider.Reference, owner *user.User) (*pro
 		return nil, err
 	}
 
-	// Stat changed resource resource
 	return p.gwClient.Stat(ownerCtx, &provider.StatRequest{Ref: ref})
 }
 
@@ -136,7 +135,6 @@ func (p *Provider) getPath(id *provider.ResourceId, owner *user.User) (*provider
 		return nil, err
 	}
 
-	// Stat changed resource resource
 	return p.gwClient.GetPath(ownerCtx, &provider.GetPathRequest{ResourceId: id})
 }
 
