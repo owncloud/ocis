@@ -61,13 +61,6 @@ proxy:
     pretty: false
     color: false
     level: info
-accounts:
-  http:
-    addr: localhost:2222
-  log:
-    level: debug
-    color: false
-    pretty: false
 log:
   pretty: true
   color: true
@@ -80,21 +73,12 @@ http:
   addr: localhost:3333
 ```
 
-_accounts.yaml_
-```yaml
-http:
-  addr: localhost:4444
-```
-
 Note that the extension files will overwrite values from the main `ocis.yaml`, causing `ocis server` to run with the following configuration:
 
 ```yaml
 proxy:
   http:
     addr: localhost:3333
-accounts:
-  http:
-    addr: localhost:4444
 log:
   pretty: true
   color: true
@@ -109,9 +93,6 @@ The logging configuration if defined in the main ocis.yaml is inherited by all e
 proxy:
   http:
     addr: localhost:5555
-accounts:
-  http:
-    addr: localhost:4444
 log:
   pretty: true
   color: true

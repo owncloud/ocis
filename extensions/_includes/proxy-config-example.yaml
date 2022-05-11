@@ -38,7 +38,7 @@ policies:
   - endpoint: /archiver
     backend: http://localhost:9140
   - type: regex
-    endpoint: /ocs/v[12].php/cloud/(users?|groups)
+    endpoint: /ocs/v[12].php/cloud/user/signing-key
     backend: http://localhost:9110
   - endpoint: /ocs/
     backend: http://localhost:9140
@@ -93,7 +93,6 @@ token_manager:
 policy_selector:
   static:
     policy: ocis
-  migration: null
   claims: null
   regex: null
 pre_signed_url:
