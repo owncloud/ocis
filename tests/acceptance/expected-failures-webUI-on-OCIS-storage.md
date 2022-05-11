@@ -107,9 +107,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIFilesActionMenu/versions.feature:48](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L48)
 - [webUIFilesActionMenu/versions.feature:63](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L63)
 
-### [downloading an old version of a file returns 501](https://github.com/owncloud/ocis/issues/2261)
-- [webUIFilesActionMenu/versions.feature:105](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L105)
-
 ### [No occ command in ocis](https://github.com/owncloud/ocis/issues/1317)
 - [webUIRestrictSharing/restrictReSharing.feature:23](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictReSharing.feature#L23)
 - [webUIRestrictSharing/restrictReSharing.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictReSharing.feature#L42)
