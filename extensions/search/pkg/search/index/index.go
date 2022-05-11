@@ -240,11 +240,11 @@ func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (
 
 // BuildMapping builds a bleve index mapping which can be used for indexing
 func BuildMapping() (mapping.IndexMapping, error) {
-	NameMapping := bleve.NewTextFieldMapping()
-	NameMapping.Analyzer = "lowercaseKeyword"
+	nameMapping := bleve.NewTextFieldMapping()
+	nameMapping.Analyzer = "lowercaseKeyword"
 
 	docMapping := bleve.NewDocumentMapping()
-	docMapping.AddFieldMappingsAt("Name", NameMapping)
+	docMapping.AddFieldMappingsAt("Name", nameMapping)
 
 	indexMapping := bleve.NewIndexMapping()
 	indexMapping.DefaultAnalyzer = keyword.Name
