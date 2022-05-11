@@ -6,12 +6,21 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Change - The `glauth` and `accounts` services are removed: [#3685](https://github.com/owncloud/ocis/pull/3685)
 * Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
 * Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
 * Enhancement - Update reva: [#3746](https://github.com/owncloud/ocis/pull/3746)
 * Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
 
 ## Details
+
+* Change - The `glauth` and `accounts` services are removed: [#3685](https://github.com/owncloud/ocis/pull/3685)
+
+   After switching the default configuration to libregraph/idm we could remove the glauth and
+   accounts services from the source code (they were already disabled by default with the
+   previous release)
+
+   https://github.com/owncloud/ocis/pull/3685
 
 * Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
 
