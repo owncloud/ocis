@@ -72,6 +72,11 @@ class SpacesContext implements Context {
 	private $ocsApiUrl = '/ocs/v2.php/apps/files_sharing/api/v1/shares';
 
 	/**
+	 * @var string
+	 */
+	private $davSpacesUrl = '/remote.php/dav/spaces/';
+
+	/**
 	 * @param string $spaceName
 	 *
 	 * @return string name of the user that created the space
@@ -250,7 +255,7 @@ class SpacesContext implements Context {
 	 */
 	public function getFileData(string $user, string $spaceName, string $fileName): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $this->baseUrl . "/remote.php/dav/spaces/" . $space["id"] . "/" . $fileName;
+		$fullUrl = $this->baseUrl . $this->davSpacesUrl . $space["id"] . "/" . $fileName;
 
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
@@ -2085,7 +2090,7 @@ class SpacesContext implements Context {
 		string $spaceName
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $this->baseUrl . "/remote.php/dav/spaces/trash-bin/" . $space["id"];
+		$fullUrl = $this->baseUrl . $this->davSpacesUrl . "trash-bin/" . $space["id"];
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$fullUrl,
@@ -2191,7 +2196,7 @@ class SpacesContext implements Context {
 			}
 		};
 
-		$destination = $this->baseUrl . "/remote.php/dav/spaces/" . $space["id"] . $destination;
+		$destination = $this->baseUrl . $this->davSpacesUrl . $space["id"] . $destination;
 		$header = ["Destination" => $destination, "Overwrite" => "F"];
 
 		$fullUrl = $this->baseUrl . $pathToDeletedObject;
@@ -2204,6 +2209,49 @@ class SpacesContext implements Context {
 				$this->featureContext->getPasswordForUser($user),
 				$header,
 				""
+			)
+		);
+	}
+
+	/**
+	 * User downloads a priview of the file inside of the project space
+	 * @When /^user "([^"]*)" downloads the preview of "([^"]*)" of the space "([^"]*)" with width "([^"]*)" and height "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param  string $user
+	 * @param  string $fileName
+	 * @param  string $spaceName
+	 * @param  string $width
+	 * @param  string $height
+	 *
+	 * @throws GuzzleException
+	 */
+	public function downloadPreview(
+		string $user,
+		string $fileName,
+		string $spaceName,
+		string $width,
+		string $height
+	): void {
+		$eTag = str_replace("\"", "", $this->getETag($user, $spaceName, $fileName));
+		$urlParameters = [
+			'scalingup' => 0,
+			'preview' => '1', 
+			'a' => '1',
+			'c' => $eTag,
+			'x' => $width,
+			'y' => $height
+		];
+		$urlParameters = \http_build_query($urlParameters, '', '&');
+		$space = $this->getSpaceByName($user, $spaceName);
+
+		$fullUrl = $this->baseUrl . $this->davSpacesUrl . $space['id'] . '/' . $fileName . '?' . $urlParameters;
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::get(
+				$fullUrl,
+				"",
+				$user,
+				$this->featureContext->getPasswordForUser($user)
 			)
 		);
 	}
