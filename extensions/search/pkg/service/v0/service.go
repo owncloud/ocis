@@ -46,7 +46,11 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
 	indexDir := filepath.Join(cfg.Datapath, "index.bleve")
 	bleveIndex, err := bleve.Open(indexDir)
 	if err != nil {
-		bleveIndex, err = bleve.New(indexDir, index.BuildMapping())
+		mapping, err := index.BuildMapping()
+		if err != nil {
+			return nil, err
+		}
+		bleveIndex, err = bleve.New(indexDir, mapping)
 		if err != nil {
 			return nil, err
 		}

@@ -19,7 +19,6 @@ func StorageSharesCommand(cfg *config.Config) *cli.Command {
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg); err != nil {
 				fmt.Printf("%v", err)
-				return err
 			}
 			cfg.StorageShares.Commons = cfg.Commons
 			return nil

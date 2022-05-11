@@ -35,8 +35,6 @@ _ocdav: double check the webdav property parsing when custom namespaces are used
 
 #### [downloading an old version of a file returns 501](https://github.com/owncloud/ocis/issues/2261)
 
-- [apiVersions/fileVersions.feature:444](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L444)
-- [apiVersions/fileVersions.feature:462](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersions.feature#L462)
 - [apiVersions/fileVersionsSharingToShares.feature:306](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L306)
 
 #### [file versions do not report the version author](https://github.com/owncloud/ocis/issues/2914)
@@ -154,14 +152,14 @@ Synchronization features like etag propagation, setting mtime and locking files
 - [apiWebdavLocks/publicLink.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L42)
 - [apiWebdavLocks/publicLink.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L43)
 - [apiWebdavLocks/publicLink.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L44)
-- [apiWebdavLocks/publicLink.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L60)
-- [apiWebdavLocks/publicLink.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L61)
-- [apiWebdavLocks/publicLink.feature:78](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L78)
-- [apiWebdavLocks/publicLink.feature:79](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L79)
-- [apiWebdavLocks/publicLink.feature:98](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L98)
-- [apiWebdavLocks/publicLink.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L99)
-- [apiWebdavLocks/publicLink.feature:117](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L117)
-- [apiWebdavLocks/publicLink.feature:118](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L118)
+- [apiWebdavLocks/publicLink.feature:58](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L58)
+- [apiWebdavLocks/publicLink.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L59)
+- [apiWebdavLocks/publicLink.feature:76](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L76)
+- [apiWebdavLocks/publicLink.feature:77](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L77)
+- [apiWebdavLocks/publicLink.feature:96](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L96)
+- [apiWebdavLocks/publicLink.feature:97](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L97)
+- [apiWebdavLocks/publicLink.feature:115](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L115)
+- [apiWebdavLocks/publicLink.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLink.feature#L116)
 - [apiWebdavLocks/publicLinkLockdiscovery.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLinkLockdiscovery.feature#L23)
 - [apiWebdavLocks/publicLinkLockdiscovery.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLinkLockdiscovery.feature#L24)
 - [apiWebdavLocks/publicLinkLockdiscovery.feature:39](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/publicLinkLockdiscovery.feature#L39)
@@ -1612,10 +1610,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 #### [Trying to modify a shared file using spaces end-point returns 409 HTTP status code](https://github.com/owncloud/ocis/issues/3241)
 
 - [apiMain/checksums.feature:233](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L233)
-
-#### [status does not have new product data item](https://github.com/owncloud/ocis/issues/3317)
-
-- [apiCapabilities/capabilities.feature:959](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilities.feature#L959)
 
 #### public links without permission are allowed now
 

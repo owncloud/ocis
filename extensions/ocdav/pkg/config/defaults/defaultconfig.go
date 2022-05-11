@@ -2,6 +2,7 @@ package defaults
 
 import (
 	"github.com/owncloud/ocis/v2/extensions/ocdav/pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 )
 
 func FullDefaultConfig() *config.Config {
@@ -21,7 +22,7 @@ func DefaultConfig() *config.Config {
 		},
 		HTTP: config.HTTPConfig{
 			Addr:      "127.0.0.1:0", // :0 to pick any free local port
-			Namespace: "",            //TODO: make this configurable for the reva micro service
+			Namespace: "com.owncloud.web",
 			Protocol:  "tcp",
 			Prefix:    "",
 		},
@@ -41,6 +42,13 @@ func DefaultConfig() *config.Config {
 			Auth: config.Auth{
 				CredentialsByUserAgent: map[string]string{},
 			},
+		},
+		Status: config.Status{
+			Version:       version.Long(),
+			VersionString: version.GetString(),
+			Product:       "Infinite Scale",
+			ProductName:   "Infinite Scale",
+			Edition:       "Community",
 		},
 	}
 }

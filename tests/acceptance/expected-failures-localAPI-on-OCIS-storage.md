@@ -22,7 +22,3 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Overwriting a file in the space within the allowed quota does not work](https://github.com/owncloud/ocis/issues/2829)
 - [apiSpaces/quota.feature:56](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/quota.feature#L56)
 
-#### [Viewer and editor has the possibility to disable the space](https://github.com/owncloud/ocis/issues/3031)
-- [apiSpaces/removeSpaceObjects.feature:74](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/removeSpaceObjects.feature#L74)
-- [apiSpaces/deleteSpaces.feature:73](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/deleteSpaces.feature#L73)
-- [apiSpaces/deleteSpaces.feature:84](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/deleteSpaces.feature#L84)

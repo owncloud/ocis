@@ -6,7 +6,6 @@ import (
 	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/config"
 	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/config/defaults"
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 )
@@ -35,9 +34,5 @@ func ParseConfig(cfg *config.Config) error {
 }
 
 func Validate(cfg *config.Config) error {
-	if cfg.Thumbnail.TransferSecret == "" {
-		return shared.MissingRevaTransferSecretError(cfg.Service.Name)
-	}
-
 	return nil
 }

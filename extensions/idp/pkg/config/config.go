@@ -66,7 +66,7 @@ type Settings struct {
 	// don't change the order of elements in this struct
 	// it needs to match github.com/libregraph/lico/bootstrap.Settings
 
-	Iss string `yaml:"iss" env:"OCIS_URL;IDP_ISS"`
+	Iss string `yaml:"iss" env:"OCIS_URL;OCIS_OIDC_ISSUER;IDP_ISS"`
 
 	IdentityManager string `yaml:"identity_manager" env:"IDP_IDENTITY_MANAGER"`
 
@@ -86,7 +86,7 @@ type Settings struct {
 	AllowClientGuests              bool     `yaml:"allow_client_guests" env:"IDP_ALLOW_CLIENT_GUESTS"`
 	AllowDynamicClientRegistration bool     `yaml:"allow_dynamic_client_registration" env:"IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION"`
 
-	EncryptionSecretFile string `yaml:"encrypt_secret_file" env:"IDP_ENCRYPTION_SECRET"`
+	EncryptionSecretFile string `yaml:"encrypt_secret_file" env:"IDP_ENCRYPTION_SECRET_FILE"`
 
 	Listen string
 
@@ -101,7 +101,7 @@ type Settings struct {
 
 	SigningKid             string   `yaml:"signing_kid" env:"IDP_SIGNING_KID"`
 	SigningMethod          string   `yaml:"signing_method" env:"IDP_SIGNING_METHOD"`
-	SigningPrivateKeyFiles []string `yaml:"signing_private_key_files"` // TODO: is this even needed?
+	SigningPrivateKeyFiles []string `yaml:"signing_private_key_files" env:"IDP_SIGNING_PRIVATE_KEY_FILES"`
 	ValidationKeysPath     string   `yaml:"validation_keys_path" env:"IDP_VALIDATION_KEYS_PATH"`
 
 	CookieBackendURI string

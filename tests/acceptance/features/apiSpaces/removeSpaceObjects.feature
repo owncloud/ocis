@@ -74,7 +74,7 @@ Feature: Remove files, folder
   Scenario: An user is unable to delete a Space via the webDav API
     Given user "Alice" has created a space "user deletes a space" of type "project" with quota "20"
     When user "Alice" removes the folder "" from space "user deletes a space"
-    Then the HTTP status code should be "405"
+    Then the HTTP status code should be "400"
     When user "Alice" lists all available spaces via the GraphApi
     Then the json responded should contain a space "user deletes a space" with these key and value pairs:
       | key  | value                |

@@ -33,13 +33,12 @@
         env:
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: wkloucek@owncloud.com
-          OCIS_DOCKER_TAG: 1
+          OCIS_DOCKER_TAG: 2.0.0-beta1
           OCIS_DOMAIN: ocis.ocis-wopi.released.owncloud.works
           WOPISERVER_DOMAIN: wopiserver.ocis-wopi.released.owncloud.works
           COLLABORA_DOMAIN: collabora.ocis-wopi.released.owncloud.works
           ONLYOFFICE_DOMAIN: onlyoffice.ocis-wopi.released.owncloud.works
           DEMO_USERS: "true"
-          CODIMD_DOMAIN: codimd.ocis-wopi.released.owncloud.works
           COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
       - name: monitoring
         git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git

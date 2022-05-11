@@ -2,10 +2,70 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v1.20.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v2.0.0...master
 
 ## Summary
 
+* Change - The `glauth` and `accounts` services are removed: [#3685](https://github.com/owncloud/ocis/pull/3685)
+* Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
+* Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
+* Enhancement - Update reva: [#3746](https://github.com/owncloud/ocis/pull/3746)
+* Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
+
+## Details
+
+* Change - The `glauth` and `accounts` services are removed: [#3685](https://github.com/owncloud/ocis/pull/3685)
+
+   After switching the default configuration to libregraph/idm we could remove the glauth and
+   accounts services from the source code (they were already disabled by default with the
+   previous release)
+
+   https://github.com/owncloud/ocis/pull/3685
+
+* Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
+
+   Added descriptions tags to the graph-explorer config tags so that they will be included in the
+   documentation.
+
+   https://github.com/owncloud/ocis/pull/3759
+
+* Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
+
+   Added description tags to the config structs in the thumbnails service so they will be included
+   in the config documentation.
+
+  **Important** If you ran `ocis init` with the `v2.0.0-alpha*` version then you have to manually add the `transfer_secret` to the ocis.yaml.
+
+   Just open the `ocis.yaml` config file and look for the thumbnails section. Then add a random
+   `transfer_secret` so that it looks like this:
+
+   ```yaml thumbnails: thumbnail: transfer_secret: <put random value here> ```
+
+   https://github.com/owncloud/ocis/pull/3752
+
+* Enhancement - Update reva: [#3746](https://github.com/owncloud/ocis/pull/3746)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/3746
+   https://github.com/owncloud/ocis/pull/3771
+
+* Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
+
+   Added descriptions to webdav config structs to include them in the config documentation.
+
+   https://github.com/owncloud/ocis/pull/3755
+# Changelog for [2.0.0-beta1] (2022-05-10)
+
+The following sections list the changes for 2.0.0-beta1.
+
+[2.0.0-beta1]: https://github.com/owncloud/ocis/compare/v1.20.0...v2.0.0-beta1
+
+## Summary
+
+* Bugfix - Remove runtime kill and run commands: [#3740](https://github.com/owncloud/ocis/pull/3740)
+* Bugfix - Check permissions when deleting Space: [#3709](https://github.com/owncloud/ocis/pull/3709)
+* Bugfix - Make IDP secrets configurable via environment variables: [#3744](https://github.com/owncloud/ocis/pull/3744)
 * Bugfix - Thumbnails for `/dav/xxx?preview=1` requests: [#3567](https://github.com/owncloud/ocis/pull/3567)
 * Bugfix - Idp: Check if CA certificate if present: [#3623](https://github.com/owncloud/ocis/issues/3623)
 * Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
@@ -22,14 +82,40 @@ The following sections list the changes for unreleased.
 * Change - Split MachineAuth from SystemUser: [#3672](https://github.com/owncloud/ocis/pull/3672)
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 * Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
+* Enhancement - Product field in OCS version: [#2918](https://github.com/owncloud/ocis/pull/2918)
 * Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
 * Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
 * Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
-* Enhancement - Update reva to v2.3.0: [#3552](https://github.com/owncloud/ocis/pull/3552)
-* Enhancement - Update ownCloud Web to v5.5.0-rc.3: [#6854](https://github.com/owncloud/web/pull/6854)
+* Enhancement - Update reva to v2.3.1: [#3552](https://github.com/owncloud/ocis/pull/3552)
+* Enhancement - Update ownCloud Web to v5.5.0-rc.5: [#6854](https://github.com/owncloud/web/pull/6854)
 
 ## Details
+
+* Bugfix - Remove runtime kill and run commands: [#3740](https://github.com/owncloud/ocis/pull/3740)
+
+   We've removed the kill and run commands from the oCIS runtime. If these dynamic capabilities
+   are needed, one should switch to a full fledged supervisor and start oCIS as individual
+   services.
+
+   If one wants to start a only a subset of services, this is still possible by setting
+   OCIS_RUN_EXTENSIONS.
+
+   https://github.com/owncloud/ocis/pull/3740
+
+* Bugfix - Check permissions when deleting Space: [#3709](https://github.com/owncloud/ocis/pull/3709)
+
+   Check for manager permissions when deleting spaces. Do not allow deleting spaces via dav
+   service
+
+   https://github.com/owncloud/ocis/pull/3709
+
+* Bugfix - Make IDP secrets configurable via environment variables: [#3744](https://github.com/owncloud/ocis/pull/3744)
+
+   We've fixed the configuration options of the IDP to make the IDP secrets again configurable via
+   environment variables.
+
+   https://github.com/owncloud/ocis/pull/3744
 
 * Bugfix - Thumbnails for `/dav/xxx?preview=1` requests: [#3567](https://github.com/owncloud/ocis/pull/3567)
 
@@ -103,6 +189,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3524
    https://github.com/owncloud/ocis/pull/3551
+   https://github.com/owncloud/ocis/pull/3743
 
 * Change - Reduce drives in graph /me/drives API: [#3629](https://github.com/owncloud/ocis/pull/3629)
 
@@ -164,6 +251,14 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/3602
    https://github.com/owncloud/ocis/pull/3647
 
+* Enhancement - Product field in OCS version: [#2918](https://github.com/owncloud/ocis/pull/2918)
+
+   We've added a new field to the OCS Version, which is supposed to announce the product name. The
+   web ui as a client will make use of it to make the backend product and version available (e.g. for
+   easier bug reports).
+
+   https://github.com/owncloud/ocis/pull/2918
+
 * Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
 
    It is now possible to search for files and directories by their name using the web UI. Therefor
@@ -195,7 +290,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3579
 
-* Enhancement - Update reva to v2.3.0: [#3552](https://github.com/owncloud/ocis/pull/3552)
+* Enhancement - Update reva to v2.3.1: [#3552](https://github.com/owncloud/ocis/pull/3552)
+
+   Updated reva to version 2.3.1. This update includes
+
+  * Bugfix [cs3org/reva#2827](https://github.com/cs3org/reva/pull/2827): Check permissions when deleting spaces
+  * Bugfix [cs3org/reva#2830](https://github.com/cs3org/reva/pull/2830): Correctly render response when accepting merged shares
+  * Bugfix [cs3org/reva#2831](https://github.com/cs3org/reva/pull/2831): Fix uploads to owncloudsql storage when no mtime is provided
+  * Enhancement [cs3org/reva#2833](https://github.com/cs3org/reva/pull/2833): Make status.php values configurable
+  * Enhancement [cs3org/reva#2832](https://github.com/cs3org/reva/pull/2832): Add version option for ocdav go-micro service
 
    Updated reva to version 2.3.0. This update includes:
 
@@ -259,22 +362,24 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/3652
    https://github.com/owncloud/ocis/pull/3681
 
-* Enhancement - Update ownCloud Web to v5.5.0-rc.3: [#6854](https://github.com/owncloud/web/pull/6854)
+* Enhancement - Update ownCloud Web to v5.5.0-rc.5: [#6854](https://github.com/owncloud/web/pull/6854)
 
    Tags: web
 
-   We updated ownCloud Web to v5.5.0-rc.3. Please refer to the changelog (linked) for details on
+   We updated ownCloud Web to v5.5.0-rc.5. Please refer to the changelog (linked) for details on
    the web release.
 
    https://github.com/owncloud/web/pull/6854
    https://github.com/owncloud/ocis/pull/3664
    https://github.com/owncloud/ocis/pull/3680
-   https://github.com/owncloud/web/releases/tag/v5.5.0-rc.3
+   https://github.com/owncloud/ocis/pull/3727
+   https://github.com/owncloud/ocis/pull/3747
+   https://github.com/owncloud/web/releases/tag/v5.5.0-rc.5
 # Changelog for [1.20.0] (2022-04-13)
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
 
 ## Summary
 
@@ -442,11 +547,28 @@ The following sections list the changes for 1.20.0.
    Group member remove
 
    https://github.com/owncloud/ocis/pull/3467
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
@@ -615,23 +737,6 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 # Changelog for [1.18.0] (2022-03-03)
 
 The following sections list the changes for 1.18.0.

@@ -112,16 +112,6 @@ The list command prints all running oCIS extensions.
 ocis list
 {{< / highlight >}}
 
-To stop a particular extension:
-{{< highlight txt >}}
-ocis kill web
-{{< / highlight >}}
-
-To start a particular extension:
-{{< highlight txt >}}
-ocis run web
-{{< / highlight >}}
-
 The version command prints the version of your installed oCIS.
 {{< highlight txt >}}
 ocis --version

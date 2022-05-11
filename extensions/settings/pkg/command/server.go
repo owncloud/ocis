@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/extensions/settings/pkg/config"
@@ -27,6 +28,7 @@ func Server(cfg *config.Config) *cli.Command {
 			err := parser.ParseConfig(cfg)
 			if err != nil {
 				fmt.Printf("%v", err)
+				os.Exit(1)
 			}
 			return err
 		},

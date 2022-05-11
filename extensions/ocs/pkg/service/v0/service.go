@@ -11,8 +11,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 
-	accountssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/accounts/v0"
-
 	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/config"
 	ocsm "github.com/owncloud/ocis/v2/extensions/ocs/pkg/middleware"
 	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/data"
@@ -61,22 +59,13 @@ func NewService(opts ...Option) Service {
 	}
 
 	if svc.config.AccountBackend == "" {
-		svc.config.AccountBackend = "accounts"
+		svc.config.AccountBackend = "cs3"
 	}
 
 	requireUser := ocsm.RequireUser(
 		ocsm.Logger(options.Logger),
 	)
 
-	requireAdmin := ocsm.RequireAdmin(
-		ocsm.RoleManager(roleManager),
-		ocsm.Logger(options.Logger),
-	)
-
-	requireSelfOrAdmin := ocsm.RequireSelfOrAdmin(
-		ocsm.RoleManager(roleManager),
-		ocsm.Logger(options.Logger),
-	)
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.NotFound(svc.NotFound)
 		r.Use(middleware.StripSlashes)
@@ -93,42 +82,7 @@ func NewService(opts ...Option) Service {
 				r.Route("/capabilities", func(r chi.Router) {})
 				// TODO /apps
 				r.Route("/user", func(r chi.Router) {
-					r.With(requireSelfOrAdmin).Get("/", svc.GetSelf)
 					r.Get("/signing-key", svc.GetSigningKey)
-				})
-
-				// for /users endpoints see https://github.com/owncloud/core/blob/master/apps/provisioning_api/appinfo/routes.php#L44-L56
-				r.Route("/users", func(r chi.Router) {
-					r.With(requireAdmin).Get("/", svc.ListUsers)
-					r.With(requireAdmin).Post("/", svc.AddUser)
-					r.Route("/{userid}", func(r chi.Router) {
-						r.With(requireUser).Get("/", svc.GetUser)
-						r.With(requireSelfOrAdmin).Put("/", svc.EditUser)
-						r.With(requireAdmin).Delete("/", svc.DeleteUser)
-						r.With(requireAdmin).Put("/enable", svc.EnableUser)
-						r.With(requireAdmin).Put("/disable", svc.DisableUser)
-					})
-
-					r.Route("/{userid}/groups", func(r chi.Router) {
-						r.With(requireSelfOrAdmin).Get("/", svc.ListUserGroups)
-						r.With(requireAdmin).Post("/", svc.AddToGroup)
-						r.With(requireAdmin).Delete("/", svc.RemoveFromGroup)
-					})
-
-					r.Route("/{userid}/subadmins", func(r chi.Router) {
-						r.With(requireAdmin).Post("/", svc.NotImplementedStub)
-						r.With(requireSelfOrAdmin).Get("/", svc.NotImplementedStub)
-						r.With(requireAdmin).Delete("/", svc.NotImplementedStub)
-					})
-				})
-
-				// for /groups endpoints see https://github.com/owncloud/core/blob/master/apps/provisioning_api/appinfo/routes.php#L65-L69
-				r.Route("/groups", func(r chi.Router) {
-					r.With(requireAdmin).Get("/", svc.ListGroups)
-					r.With(requireAdmin).Post("/", svc.AddGroup)
-					r.With(requireSelfOrAdmin).Get("/{groupid}", svc.GetGroupMembers)
-					r.With(requireAdmin).Delete("/{groupid}", svc.DeleteGroup)
-					r.With(requireAdmin).Get("/{groupid}/subadmins", svc.NotImplementedStub)
 				})
 			})
 			r.Route("/config", func(r chi.Router) {
@@ -159,20 +113,12 @@ func (o Ocs) NotFound(w http.ResponseWriter, r *http.Request) {
 	o.mustRender(w, r, response.ErrRender(data.MetaNotFound.StatusCode, "not found"))
 }
 
-func (o Ocs) getAccountService() accountssvc.AccountsService {
-	return accountssvc.NewAccountsService("com.owncloud.api.accounts", grpc.DefaultClient)
-}
-
 func (o Ocs) getCS3Backend() backend.UserBackend {
 	revaClient, err := pool.GetGatewayServiceClient(o.config.Reva.Address)
 	if err != nil {
 		o.logger.Fatal().Msgf("could not get reva client at address %s", o.config.Reva.Address)
 	}
 	return backend.NewCS3UserBackend(nil, revaClient, o.config.MachineAuthAPIKey, o.logger)
-}
-
-func (o Ocs) getGroupsService() accountssvc.GroupsService {
-	return accountssvc.NewGroupsService("com.owncloud.api.accounts", grpc.DefaultClient)
 }
 
 // NotImplementedStub returns a not implemented error

@@ -85,7 +85,7 @@ func DefaultPolicies() []config.Policy {
 				},
 				{
 					Type:     config.RegexRoute,
-					Endpoint: "/ocs/v[12].php/cloud/(users?|groups)", // we have `user`, `users` and `groups` in ocis-ocs
+					Endpoint: "/ocs/v[12].php/cloud/user/signing-key", // only `user/signing-key` is left in ocis-ocs
 					Backend:  "http://localhost:9110",
 				},
 				{
@@ -118,27 +118,27 @@ func DefaultPolicies() []config.Policy {
 				},
 				{
 					Endpoint: "/remote.php/",
-					Service:  "ocdav",
+					Service:  "com.owncloud.web.ocdav",
 				},
 				{
 					Endpoint: "/dav/",
-					Service:  "ocdav",
+					Service:  "com.owncloud.web.ocdav",
 				},
 				{
 					Endpoint: "/webdav/",
-					Service:  "ocdav",
+					Service:  "com.owncloud.web.ocdav",
 				},
 				{
 					Endpoint: "/status.php",
-					Service:  "ocdav",
+					Service:  "com.owncloud.web.ocdav",
 				},
 				{
 					Endpoint: "/index.php/",
-					Service:  "ocdav",
+					Service:  "com.owncloud.web.ocdav",
 				},
 				{
 					Endpoint: "/apps/",
-					Service:  "ocdav",
+					Service:  "com.owncloud.web.ocdav",
 				},
 				{
 					Endpoint: "/data",

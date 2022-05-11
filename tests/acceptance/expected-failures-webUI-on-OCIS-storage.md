@@ -77,12 +77,13 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUISharingPermissionsUsers/sharePermissionsUsers.feature:196](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L196)
 - [webUISharingPermissionsUsers/sharePermissionsUsers.feature:209](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L209)
 - [webUISharingPermissionsUsers/sharePermissionsUsers.feature:223](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L223)
+- [webUIResharing2/reshareUsers.feature:41](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L41)
+- [webUIResharing2/reshareUsers.feature:69](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L69)
+- [webUIResharing2/reshareUsers.feature:70](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L70)
 - [webUIResharing2/reshareUsers.feature:95](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L95)
 - [webUIResharing2/reshareUsers.feature:96](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L96)
 - [webUIResharing2/reshareUsers.feature:130](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L130)
 - [webUIResharing2/reshareUsers.feature:131](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L131)
-- [webUIResharing2/reshareUsers.feature:69](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L69)
-- [webUIResharing2/reshareUsers.feature:70](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L70)
 - [webUIResharing1/reshareUsers.feature:18](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing1/reshareUsers.feature#L18)
 - [webUIResharing1/reshareUsers.feature:46](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing1/reshareUsers.feature#L46)
 - [webUIResharing1/reshareUsers.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing1/reshareUsers.feature#L74)
@@ -105,9 +106,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIFilesActionMenu/versions.feature:37](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L37)
 - [webUIFilesActionMenu/versions.feature:48](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L48)
 - [webUIFilesActionMenu/versions.feature:63](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L63)
-
-### [downloading an old version of a file returns 501](https://github.com/owncloud/ocis/issues/2261)
-- [webUIFilesActionMenu/versions.feature:105](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L105)
 
 ### [No occ command in ocis](https://github.com/owncloud/ocis/issues/1317)
 - [webUIRestrictSharing/restrictReSharing.feature:23](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictReSharing.feature#L23)
@@ -475,3 +473,11 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIFilesDetails/fileDetails.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#42)
 - [webUIFilesDetails/fileDetails.feature:57](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#57)
 - [webUIRenameFiles/renameFiles.feature:246](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#246)
+
+### [Copy/move not possible from and into shares in oCIS](https://github.com/owncloud/web/issues/6892) 
+- [webUIFilesCopy/copy.feature:89](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copy.feature#L89)
+- [webUIFilesCopy/copy.feature:101](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copy.feature#L101)
+
+### [No share indicators inside share jail (needs concept / PM decision)](https://github.com/owncloud/web/issues/6894)
+- [webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature#L42)
+- [webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:80](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersSharingIndicator/shareWithUsers.feature#L80)

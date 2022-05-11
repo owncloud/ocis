@@ -33,6 +33,7 @@ type Config struct {
 	Middleware Middleware `yaml:"middleware"`
 
 	Context context.Context `yaml:"-"`
+	Status  Status          `yaml:"-"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;OCDAV_TRACING_ENABLED" desc:"Activates tracing."`
@@ -74,4 +75,13 @@ type Middleware struct {
 // Auth configures reva http auth middleware.
 type Auth struct {
 	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agent"`
+}
+
+// Status holds the configurable values for the status.php
+type Status struct {
+	Version       string
+	VersionString string
+	Product       string
+	ProductName   string
+	Edition       string
 }

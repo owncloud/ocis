@@ -6,7 +6,6 @@ import (
 
 	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/user/backend"
 
-	accountssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/accounts/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 
@@ -28,8 +27,6 @@ type Options struct {
 	PolicySelector config.PolicySelector
 	// HTTPClient to use for communication with the oidcAuth provider
 	HTTPClient *http.Client
-	// AccountsClient for resolving accounts
-	AccountsClient accountssvc.AccountsService
 	// UP
 	UserProvider backend.UserBackend
 	// SettingsRoleService for the roles API in settings
@@ -96,13 +93,6 @@ func PolicySelectorConfig(cfg config.PolicySelector) Option {
 func HTTPClient(c *http.Client) Option {
 	return func(o *Options) {
 		o.HTTPClient = c
-	}
-}
-
-// AccountsClient provides a function to set the accounts client config option.
-func AccountsClient(ac accountssvc.AccountsService) Option {
-	return func(o *Options) {
-		o.AccountsClient = ac
 	}
 }
 

@@ -11,7 +11,6 @@ import (
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/owncloud/ocis/v2/extensions/search/pkg/search/mocks"
@@ -55,13 +54,6 @@ var _ = Describe("Searchprovider", func() {
 			Name: "personalspace",
 		}
 
-		ref = &sprovider.Reference{
-			ResourceId: &sprovider.ResourceId{
-				StorageId: "storageid",
-				OpaqueId:  "rootopaqueid",
-			},
-			Path: "./foo.pdf",
-		}
 		ri = &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
 				StorageId: "storageid",
@@ -95,98 +87,6 @@ var _ = Describe("Searchprovider", func() {
 		It("returns a new instance", func() {
 			p := provider.New(gwClient, indexClient, "", eventsChan, logger)
 			Expect(p).ToNot(BeNil())
-		})
-	})
-
-	Describe("events", func() {
-		It("trigger an index update when a file has been uploaded", func() {
-			called := false
-			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
-				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
-			})).Return(nil).Run(func(args mock.Arguments) {
-				called = true
-			})
-			eventsChan <- events.FileUploaded{
-				Ref:       ref,
-				Executant: user.Id,
-			}
-
-			Eventually(func() bool {
-				return called
-			}, "2s").Should(BeTrue())
-		})
-
-		It("removes an entry from the index when the file has been deleted", func() {
-			called := false
-
-			gwClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
-				Status: status.NewNotFound(context.Background(), ""),
-			}, nil)
-			indexClient.On("Delete", mock.MatchedBy(func(id *sprovider.ResourceId) bool {
-				return id.OpaqueId == ri.Id.OpaqueId
-			})).Return(nil).Run(func(args mock.Arguments) {
-				called = true
-			})
-			eventsChan <- events.ItemTrashed{
-				Ref:       ref,
-				ID:        ri.Id,
-				Executant: user.Id,
-			}
-
-			Eventually(func() bool {
-				return called
-			}, "2s").Should(BeTrue())
-		})
-
-		It("indexes items when they are being restored", func() {
-			called := false
-			indexClient.On("Restore", mock.MatchedBy(func(id *sprovider.ResourceId) bool {
-				return id.OpaqueId == ri.Id.OpaqueId
-			})).Return(nil).Run(func(args mock.Arguments) {
-				called = true
-			})
-			eventsChan <- events.ItemRestored{
-				Ref:       ref,
-				Executant: user.Id,
-			}
-
-			Eventually(func() bool {
-				return called
-			}, "2s").Should(BeTrue())
-		})
-
-		It("indexes items when a version has been restored", func() {
-			called := false
-			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
-				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
-			})).Return(nil).Run(func(args mock.Arguments) {
-				called = true
-			})
-			eventsChan <- events.FileVersionRestored{
-				Ref:       ref,
-				Executant: user.Id,
-			}
-
-			Eventually(func() bool {
-				return called
-			}, "2s").Should(BeTrue())
-		})
-
-		It("indexes items when they are being moved", func() {
-			called := false
-			indexClient.On("Move", mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
-				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
-			})).Return(nil).Run(func(args mock.Arguments) {
-				called = true
-			})
-			eventsChan <- events.ItemMoved{
-				Ref:       ref,
-				Executant: user.Id,
-			}
-
-			Eventually(func() bool {
-				return called
-			}, "2s").Should(BeTrue())
 		})
 	})
 
@@ -267,7 +167,8 @@ var _ = Describe("Searchprovider", func() {
 
 		Context("with received shares", func() {
 			var (
-				grantSpace *sprovider.StorageSpace
+				grantSpace      *sprovider.StorageSpace
+				mountpointSpace *sprovider.StorageSpace
 			)
 
 			BeforeEach(func() {
@@ -275,8 +176,21 @@ var _ = Describe("Searchprovider", func() {
 					SpaceType: "grant",
 					Owner:     otherUser,
 					Id:        &sprovider.StorageSpaceId{OpaqueId: "otherspaceroot!otherspacegrant"},
-					Root:      &sprovider.ResourceId{StorageId: "otherspaceroot", OpaqueId: "otherspaceroot"},
+					Root:      &sprovider.ResourceId{StorageId: "otherspaceroot", OpaqueId: "otherspacegrant"},
 					Name:      "grantspace",
+				}
+				mountpointSpace = &sprovider.StorageSpace{
+					SpaceType: "mountpoint",
+					Owner:     otherUser,
+					Id:        &sprovider.StorageSpaceId{OpaqueId: "otherspaceroot!otherspacemountpoint"},
+					Root:      &sprovider.ResourceId{StorageId: "otherspaceroot", OpaqueId: "otherspacemountpoint"},
+					Name:      "mountpointspace",
+					Opaque: &typesv1beta1.Opaque{
+						Map: map[string]*typesv1beta1.OpaqueEntry{
+							"grantStorageID": {Decoder: "plain", Value: []byte("otherspaceroot")},
+							"grantOpaqueID":  {Decoder: "plain", Value: []byte("otherspacegrant")},
+						},
+					},
 				}
 				gwClient.On("GetPath", mock.Anything, mock.Anything).Return(&sprovider.GetPathResponse{
 					Status: status.NewOK(ctx),
@@ -284,10 +198,10 @@ var _ = Describe("Searchprovider", func() {
 				}, nil)
 			})
 
-			It("searches the received spaces (grants)", func() {
+			It("searches the received spaces", func() {
 				gwClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
-					StorageSpaces: []*sprovider.StorageSpace{grantSpace},
+					StorageSpaces: []*sprovider.StorageSpace{grantSpace, mountpointSpace},
 				}, nil)
 				indexClient.On("Search", mock.Anything, mock.Anything).Return(&searchsvc.SearchIndexResponse{
 					Matches: []*searchmsg.Match{
@@ -319,7 +233,7 @@ var _ = Describe("Searchprovider", func() {
 				match := res.Matches[0]
 				Expect(match.Entity.Id.OpaqueId).To(Equal("grant-shared-id"))
 				Expect(match.Entity.Name).To(Equal("Shared.pdf"))
-				Expect(match.Entity.Ref.ResourceId.OpaqueId).To(Equal(grantSpace.Root.OpaqueId))
+				Expect(match.Entity.Ref.ResourceId.OpaqueId).To(Equal(mountpointSpace.Root.OpaqueId))
 				Expect(match.Entity.Ref.Path).To(Equal("./to/Shared.pdf"))
 
 				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
@@ -330,7 +244,7 @@ var _ = Describe("Searchprovider", func() {
 			It("finds matches in both the personal space AND the grant", func() {
 				gwClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
-					StorageSpaces: []*sprovider.StorageSpace{personalSpace, grantSpace},
+					StorageSpaces: []*sprovider.StorageSpace{personalSpace, grantSpace, mountpointSpace},
 				}, nil)
 				indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
 					return req.Ref.ResourceId.StorageId == grantSpace.Root.StorageId

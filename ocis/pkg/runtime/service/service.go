@@ -19,7 +19,6 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
 
-	accounts "github.com/owncloud/ocis/v2/extensions/accounts/pkg/command"
 	appProvider "github.com/owncloud/ocis/v2/extensions/app-provider/pkg/command"
 	appRegistry "github.com/owncloud/ocis/v2/extensions/app-registry/pkg/command"
 	authbasic "github.com/owncloud/ocis/v2/extensions/auth-basic/pkg/command"
@@ -27,7 +26,6 @@ import (
 	authmachine "github.com/owncloud/ocis/v2/extensions/auth-machine/pkg/command"
 	frontend "github.com/owncloud/ocis/v2/extensions/frontend/pkg/command"
 	gateway "github.com/owncloud/ocis/v2/extensions/gateway/pkg/command"
-	glauth "github.com/owncloud/ocis/v2/extensions/glauth/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/v2/extensions/graph/pkg/command"
 	groups "github.com/owncloud/ocis/v2/extensions/groups/pkg/command"
@@ -111,7 +109,6 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.Settings.Service.Name] = settings.NewSutureService
 	s.ServicesRegistry[opts.Config.Nats.Service.Name] = nats.NewSutureService
 	s.ServicesRegistry[opts.Config.StorageSystem.Service.Name] = storageSystem.NewSutureService
-	s.ServicesRegistry[opts.Config.GLAuth.Service.Name] = glauth.NewSutureService
 	s.ServicesRegistry[opts.Config.Graph.Service.Name] = graph.NewSutureService
 	s.ServicesRegistry[opts.Config.GraphExplorer.Service.Name] = graphExplorer.NewSutureService
 	s.ServicesRegistry[opts.Config.IDM.Service.Name] = idm.NewSutureService
@@ -138,7 +135,6 @@ func NewService(options ...Option) (*Service, error) {
 
 	// populate delayed services
 	s.Delayed[opts.Config.Sharing.Service.Name] = sharing.NewSutureService
-	s.Delayed[opts.Config.Accounts.Service.Name] = accounts.NewSutureService
 	s.Delayed[opts.Config.Proxy.Service.Name] = proxy.NewSutureService
 	s.Delayed[opts.Config.IDP.Service.Name] = idp.NewSutureService
 
@@ -258,39 +254,12 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 	}
 
 	for name := range s.ServicesRegistry {
-		// don't run glauth by default but keep the possibility to start it via cfg.Runtime.Extensions for now
-		if name == "glauth" {
-			continue
-		}
 		runset = append(runset, name)
 	}
 
 	for name := range s.Delayed {
-		// don't run accounts by default but keep the possibility to start it via cfg.Runtime.Extensions for now
-		if name == "accounts" {
-			continue
-		}
 		runset = append(runset, name)
 	}
-}
-
-// Start indicates the Service Controller to start a new supervised service as an OS thread.
-func (s *Service) Start(name string, reply *int) error {
-	swap := deepcopy.Copy(s.cfg)
-	if _, ok := s.ServicesRegistry[name]; ok {
-		*reply = 0
-		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.ServicesRegistry[name](swap.(*ociscfg.Config))))
-		return nil
-	}
-
-	if _, ok := s.Delayed[name]; ok {
-		*reply = 0
-		s.serviceToken[name] = append(s.serviceToken[name], s.Supervisor.Add(s.Delayed[name](swap.(*ociscfg.Config))))
-		return nil
-	}
-
-	*reply = 0
-	return fmt.Errorf("cannot start service %s: unknown service", name)
 }
 
 // List running processes for the Service Controller.
@@ -314,22 +283,6 @@ func (s *Service) List(args struct{}, reply *string) error {
 
 	table.Render()
 	*reply = tableString.String()
-	return nil
-}
-
-// Kill a supervised process by subcommand name.
-func (s *Service) Kill(name string, reply *int) error {
-	if len(s.serviceToken[name]) > 0 {
-		for i := range s.serviceToken[name] {
-			if err := s.Supervisor.RemoveAndWait(s.serviceToken[name][i], 5000*time.Millisecond); err != nil {
-				return err
-			}
-		}
-		delete(s.serviceToken, name)
-	} else {
-		return fmt.Errorf("service %s not found", name)
-	}
-
 	return nil
 }
 

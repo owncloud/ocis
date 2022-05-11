@@ -1,19 +1,24 @@
 {{ $allVersions := . }}
 {{- range $index, $changes := . }}{{ with $changes -}}
+{{ $version := .Version -}}
+{{/* ocis beta program */ -}}
+{{ if eq .Version "2.0.0" -}}
+{{ $version = (printf  "%v-%v" $version "beta1") -}}
+{{ end -}}
 {{ if gt (len $allVersions) 1 -}}
-# Changelog for [{{ .Version }}] ({{ .Date }})
+# Changelog for [{{ $version }}] ({{ .Date }})
 
-The following sections list the changes for {{ .Version }}.
+The following sections list the changes for {{ $version }}.
 
 {{/* creating version compare links */ -}}
 {{ $next := add1 $index -}}
 {{ if ne (len $allVersions) $next -}}
 {{ $previousVersion := (index $allVersions $next).Version -}}
 {{ if eq .Version "unreleased" -}}
-[{{ .Version }}]: https://github.com/owncloud/ocis/compare/v{{ $previousVersion }}...master
+[{{ $version }}]: https://github.com/owncloud/ocis/compare/v{{ $previousVersion }}...master
 
 {{ else -}}
-[{{ .Version }}]: https://github.com/owncloud/ocis/compare/v{{ $previousVersion }}...v{{ .Version }}
+[{{ $version }}]: https://github.com/owncloud/ocis/compare/v{{ $previousVersion }}...v{{ $version }}
 
 {{ end -}}
 {{ end -}}
@@ -24,7 +29,7 @@ The following sections list the changes for {{ .Version }}.
 
 {{ end -}}
 {{ else -}}
-# Changes in {{ .Version }}
+# Changes in {{ $version }}
 
 {{ end -}}
 
