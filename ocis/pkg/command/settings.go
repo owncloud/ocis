@@ -19,7 +19,6 @@ func SettingsCommand(cfg *config.Config) *cli.Command {
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg); err != nil {
 				fmt.Printf("%v", err)
-				return err
 			}
 			cfg.Settings.Commons = cfg.Commons
 			return nil

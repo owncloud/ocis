@@ -19,7 +19,6 @@ func WebCommand(cfg *config.Config) *cli.Command {
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg); err != nil {
 				fmt.Printf("%v", err)
-				return err
 			}
 			cfg.Web.Commons = cfg.Commons
 			return nil
