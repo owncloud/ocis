@@ -229,12 +229,17 @@ def main(ctx):
 
     pipelines = test_pipelines + build_release_pipelines + build_release_helpers
 
-    pipelines = \
-        pipelines + \
-        pipelinesDependsOn(
-            example_deploys(ctx),
-            pipelines,
-        )
+    if ctx.build.event == "cron":
+        pipelines = \
+            pipelines + \
+            example_deploys(ctx)
+    else:
+        pipelines = \
+            pipelines + \
+            pipelinesDependsOn(
+                example_deploys(ctx),
+                pipelines,
+            )
 
     # always append notification step
     pipelines.append(
