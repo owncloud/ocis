@@ -125,7 +125,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 
 		_, rootStorageID := storagespace.SplitStorageID(space.Root.StorageId)
 		res, err := p.indexClient.Search(ctx, &searchsvc.SearchIndexRequest{
-			Query: "Name:" + strings.ReplaceAll(strings.ToLower(req.Query), " ", `\ `),
+			Query: formatQuery(req.Query),
 			Ref: &searchmsg.Reference{
 				ResourceId: &searchmsg.ResourceID{
 					StorageId: space.Root.StorageId,
@@ -216,4 +216,14 @@ func (p *Provider) logDocCount() {
 		p.logger.Error().Err(err).Msg("error getting document count from the index")
 	}
 	p.logger.Debug().Interface("count", c).Msg("new document count")
+}
+
+func formatQuery(q string) string {
+	query := q
+	if strings.Contains(q, ":") {
+		return q // Sophisticated field based search
+	}
+
+	// this is a basic filename search
+	return "Name:*" + strings.ReplaceAll(strings.ToLower(query), " ", `\ `) + "*"
 }

@@ -155,6 +155,15 @@ var _ = Describe("Searchprovider", func() {
 				}))
 			})
 
+			It("does not mess with field-based searches", func() {
+				p.Search(ctx, &searchsvc.SearchRequest{
+					Query: "Size:<10",
+				})
+				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+					return req.Query == "Size:<10"
+				}))
+			})
+
 			It("escapes special characters", func() {
 				p.Search(ctx, &searchsvc.SearchRequest{
 					Query: "Foo oo.pdf",
