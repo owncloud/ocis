@@ -26,7 +26,7 @@ var _ = Describe("Index", func() {
 		}
 		ref = &sprovider.Reference{
 			ResourceId: rootId,
-			Path:       "./foo.pdf",
+			Path:       "./Foo.pdf",
 		}
 		ri = &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
@@ -133,14 +133,14 @@ var _ = Describe("Index", func() {
 							OpaqueId:  "differentopaqueid",
 						},
 					},
-					Query: "foo.pdf",
+					Query: "Name:foo.pdf",
 				})
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res).ToNot(BeNil())
 				Expect(len(res.Matches)).To(Equal(0))
 			})
 
-			It("limits the search to the relevant fields", func() {
+			It("limits the search to the specified fields", func() {
 				res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
 					Ref: &searchmsg.Reference{
 						ResourceId: &searchmsg.ResourceID{
@@ -148,7 +148,7 @@ var _ = Describe("Index", func() {
 							OpaqueId:  ref.ResourceId.OpaqueId,
 						},
 					},
-					Query: "*" + ref.ResourceId.OpaqueId + "*",
+					Query: "Name:*" + ref.ResourceId.OpaqueId + "*",
 				})
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res).ToNot(BeNil())
@@ -163,7 +163,7 @@ var _ = Describe("Index", func() {
 							OpaqueId:  ref.ResourceId.OpaqueId,
 						},
 					},
-					Query: "foo.pdf",
+					Query: "Name:foo.pdf",
 				})
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res).ToNot(BeNil())
@@ -203,7 +203,7 @@ var _ = Describe("Index", func() {
 				}
 			})
 
-			It("is case-insensitive", func() {
+			It("uses a lower-case index", func() {
 				res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
 					Ref: &searchmsg.Reference{
 						ResourceId: &searchmsg.ResourceID{
@@ -211,11 +211,24 @@ var _ = Describe("Index", func() {
 							OpaqueId:  ref.ResourceId.OpaqueId,
 						},
 					},
-					Query: "Foo*",
+					Query: "Name:foo*",
 				})
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res).ToNot(BeNil())
 				Expect(len(res.Matches)).To(Equal(1))
+
+				res, err = i.Search(ctx, &searchsvc.SearchIndexRequest{
+					Ref: &searchmsg.Reference{
+						ResourceId: &searchmsg.ResourceID{
+							StorageId: ref.ResourceId.StorageId,
+							OpaqueId:  ref.ResourceId.OpaqueId,
+						},
+					},
+					Query: "Name:Foo*",
+				})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res).ToNot(BeNil())
+				Expect(len(res.Matches)).To(Equal(0))
 			})
 
 			Context("and an additional file in a subdirectory", func() {
@@ -271,7 +284,7 @@ var _ = Describe("Index", func() {
 							},
 							Path: "./nested/",
 						},
-						Query: "foo.pdf",
+						Query: "Name:foo.pdf",
 					})
 					Expect(err).ToNot(HaveOccurred())
 					Expect(res).ToNot(BeNil())
@@ -372,7 +385,7 @@ var _ = Describe("Index", func() {
 			assertDocCount(rootId, "subdir", 0)
 
 			res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
-				Query: "child.pdf",
+				Query: "Name:child.pdf",
 				Ref: &searchmsg.Reference{
 					ResourceId: &searchmsg.ResourceID{
 						StorageId: rootId.StorageId,

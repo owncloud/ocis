@@ -212,7 +212,7 @@ func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (
 	deletedQuery := bleve.NewBoolFieldQuery(false)
 	deletedQuery.SetField("Deleted")
 	query := bleve.NewConjunctionQuery(
-		bleve.NewQueryStringQuery("Name:"+strings.ToLower(req.Query)),
+		bleve.NewQueryStringQuery(req.Query),
 		deletedQuery, // Skip documents that have been marked as deleted
 		bleve.NewQueryStringQuery("RootID:"+req.Ref.ResourceId.StorageId+"!"+req.Ref.ResourceId.OpaqueId), // Limit search to the space
 		bleve.NewQueryStringQuery("Path:"+utils.MakeRelativePath(path.Join(req.Ref.Path, "/"))+"*"),       // Limit search to this directory in the space

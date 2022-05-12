@@ -160,7 +160,7 @@ var _ = Describe("Searchprovider", func() {
 				Expect(match.Entity.Ref.Path).To(Equal("./path/to/Foo.pdf"))
 
 				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
-					return req.Query == "foo" && req.Ref.ResourceId.OpaqueId == personalSpace.Root.OpaqueId && req.Ref.Path == ""
+					return req.Query == "Name:foo" && req.Ref.ResourceId.OpaqueId == personalSpace.Root.OpaqueId && req.Ref.Path == ""
 				}))
 			})
 		})
@@ -225,7 +225,7 @@ var _ = Describe("Searchprovider", func() {
 				}, nil)
 
 				res, err := p.Search(ctx, &searchsvc.SearchRequest{
-					Query: "foo",
+					Query: "Foo",
 				})
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res).ToNot(BeNil())
@@ -237,7 +237,7 @@ var _ = Describe("Searchprovider", func() {
 				Expect(match.Entity.Ref.Path).To(Equal("./to/Shared.pdf"))
 
 				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
-					return req.Query == "foo" && req.Ref.ResourceId.StorageId == grantSpace.Root.StorageId && req.Ref.Path == "./grant/path"
+					return req.Query == "Name:foo" && req.Ref.ResourceId.StorageId == grantSpace.Root.StorageId && req.Ref.Path == "./grant/path"
 				}))
 			})
 
