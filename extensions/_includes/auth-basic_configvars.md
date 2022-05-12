@@ -51,7 +51,7 @@
 | AUTH_BASIC_OWNCLOUDSQL_DB_HOST | string | mysql | Hostname of the database server.|
 | AUTH_BASIC_OWNCLOUDSQL_DB_PORT | int | 3306 | Network port to use for the database connection.|
 | AUTH_BASIC_OWNCLOUDSQL_DB_NAME | string | owncloud | Name of the owncloud database.|
-| AUTH_BASIC_OWNCLOUDSQL_IDP | string | https://localhost:9200 | |
+| AUTH_BASIC_OWNCLOUDSQL_IDP | string | https://localhost:9200 | The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.|
 | AUTH_BASIC_OWNCLOUDSQL_NOBODY | int64 | 90 | |
 | AUTH_BASIC_OWNCLOUDSQL_JOIN_USERNAME | bool | false | Join the user properties table to read usernames|
-| AUTH_BASIC_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID | bool | false | |
+| AUTH_BASIC_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID | bool | false | Join the user properties table to read user ids (boolean).|

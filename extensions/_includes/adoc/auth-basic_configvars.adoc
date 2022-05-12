@@ -291,7 +291,7 @@
 |`AUTH_BASIC_OWNCLOUDSQL_IDP`
 | string
 | \https://localhost:9200
-| 
+| The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 
 |`AUTH_BASIC_OWNCLOUDSQL_NOBODY`
 | int64
@@ -306,7 +306,7 @@
 |`AUTH_BASIC_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID`
 | bool
 | false
-| 
+| Join the user properties table to read user ids (boolean).
 |===
 
 Since Version: `+` added, `-` deprecated

@@ -220,7 +220,7 @@
 `GROUPS_LDAP_GROUP_SCHEMA_ID`
 | string
 | ownclouduuid
-| 
+| LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
 
 |`LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING` +
 `GROUPS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
@@ -295,7 +295,7 @@
 |`GROUPS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID`
 | bool
 | false
-| 
+| Join the user properties table to read user ids (boolean).
 
 |`GROUPS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH`
 | bool

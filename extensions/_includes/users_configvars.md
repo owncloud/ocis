@@ -49,8 +49,8 @@
 | USERS_OWNCLOUDSQL_DB_HOST | string | mysql | Hostname of the database server.|
 | USERS_OWNCLOUDSQL_DB_PORT | int | 3306 | Network port to use for the database connection.|
 | USERS_OWNCLOUDSQL_DB_NAME | string | owncloud | Name of the owncloud database.|
-| USERS_OWNCLOUDSQL_IDP | string | https://localhost:9200 | |
+| USERS_OWNCLOUDSQL_IDP | string | https://localhost:9200 | The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.|
 | USERS_OWNCLOUDSQL_NOBODY | int64 | 90 | |
 | USERS_OWNCLOUDSQL_JOIN_USERNAME | bool | false | Join the user properties table to read usernames|
-| USERS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID | bool | false | |
+| USERS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID | bool | false | Join the user properties table to read user ids (boolean).|
 | USERS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH | bool | false | Allow 'medial search' when searching for users instead of just doing a prefix search. (Allows finding 'Alice' when searching for 'lic'.)|

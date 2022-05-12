@@ -280,7 +280,7 @@
 |`USERS_OWNCLOUDSQL_IDP`
 | string
 | \https://localhost:9200
-| 
+| The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 
 |`USERS_OWNCLOUDSQL_NOBODY`
 | int64
@@ -295,7 +295,7 @@
 |`USERS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID`
 | bool
 | false
-| 
+| Join the user properties table to read user ids (boolean).
 
 |`USERS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH`
 | bool

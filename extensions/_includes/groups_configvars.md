@@ -38,7 +38,7 @@
 | LDAP_USER_SCHEMA_MAIL<br/>GROUPS_LDAP_USER_SCHEMA_MAIL | string | mail | LDAP Attribute to use for the email address of users.|
 | LDAP_USER_SCHEMA_DISPLAYNAME<br/>GROUPS_LDAP_USER_SCHEMA_DISPLAYNAME | string | displayname | LDAP Attribute to use for the displayname of users.|
 | LDAP_USER_SCHEMA_USERNAME<br/>GROUPS_LDAP_USER_SCHEMA_USERNAME | string | uid | LDAP Attribute to use for username of users.|
-| LDAP_GROUP_SCHEMA_ID<br/>GROUPS_LDAP_GROUP_SCHEMA_ID | string | ownclouduuid | |
+| LDAP_GROUP_SCHEMA_ID<br/>GROUPS_LDAP_GROUP_SCHEMA_ID | string | ownclouduuid | LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).|
 | LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING<br/>GROUPS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING | bool | false | Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ids.|
 | LDAP_GROUP_SCHEMA_MAIL<br/>GROUPS_LDAP_GROUP_SCHEMA_MAIL | string | mail | LDAP Attribute to use for the email address of groups (can be empty).|
 | LDAP_GROUP_SCHEMA_DISPLAYNAME<br/>GROUPS_LDAP_GROUP_SCHEMA_DISPLAYNAME | string | cn | LDAP Attribute to use for the displayname of groups (often the same as groupname attribute)|
@@ -52,5 +52,5 @@
 | GROUPS_OWNCLOUDSQL_IDP | string | https://localhost:9200 | The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.|
 | GROUPS_OWNCLOUDSQL_NOBODY | int64 | 90 | |
 | GROUPS_OWNCLOUDSQL_JOIN_USERNAME | bool | false | Join the user properties table to read usernames (boolean)|
-| GROUPS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID | bool | false | |
+| GROUPS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID | bool | false | Join the user properties table to read user ids (boolean).|
 | GROUPS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH | bool | false | Allow 'medial search' when searching for users instead of just doing a prefix search. (Allows finding 'Alice' when searching for 'lic'.)|
