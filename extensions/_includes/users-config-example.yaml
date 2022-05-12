@@ -24,7 +24,6 @@ token_manager:
 reva:
   address: 127.0.0.1:9142
 skip_user_groups_in_token: false
-users_cache_expiration: 5
 driver: ldap
 drivers:
   ldap:
@@ -41,9 +40,6 @@ drivers:
     group_filter: ""
     user_object_class: inetOrgPerson
     group_object_class: groupOfNames
-    login_attributes:
-    - uid
-    - mail
     idp: https://localhost:9200
     user_schema:
       id: ownclouduuid
