@@ -220,8 +220,13 @@ func (p *Provider) logDocCount() {
 
 func formatQuery(q string) string {
 	query := q
-	if strings.Contains(q, ":") {
-		return q // Sophisticated field based search
+	fields := []string{"RootID", "Path", "ID", "Name", "Size", "Mtime", "MimeType", "Type"}
+	for _, field := range fields {
+		query = strings.ReplaceAll(query, strings.ToLower(field)+":", field+":")
+	}
+
+	if strings.Contains(query, ":") {
+		return query // Sophisticated field based search
 	}
 
 	// this is a basic filename search
