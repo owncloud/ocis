@@ -58,11 +58,11 @@ func (p *Provider) handleEvent(ev interface{}) {
 
 		statRes, err := p.statResource(ref, owner)
 		if err != nil {
-			p.logger.Error().Err(err).Msg("failed to stat the changed resource")
+			p.logger.Error().Err(err).Msg("failed to stat the moved resource")
 			return
 		}
 		if statRes.Status.Code != rpc.Code_CODE_OK {
-			p.logger.Error().Interface("statRes", statRes).Msg("failed to stat the changed resource")
+			p.logger.Error().Interface("statRes", statRes).Msg("failed to stat the moved resource")
 			return
 		}
 
@@ -78,7 +78,7 @@ func (p *Provider) handleEvent(ev interface{}) {
 
 		err = p.indexClient.Move(statRes.Info.Id, gpRes.Path)
 		if err != nil {
-			p.logger.Error().Err(err).Msg("failed to restore the changed resource in the index")
+			p.logger.Error().Err(err).Msg("failed to move the changed resource in the index")
 		}
 		return
 	case events.ContainerCreated:
