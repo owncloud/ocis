@@ -3,9 +3,9 @@
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
 | OCIS_TRACING_ENABLED<br/>AUTH_BASIC_TRACING_ENABLED | bool | false | Activates tracing.|
-| OCIS_TRACING_TYPE<br/>AUTH_BASIC_TRACING_TYPE | string |  | |
+| OCIS_TRACING_TYPE<br/>AUTH_BASIC_TRACING_TYPE | string |  | The sampler type: remote, const, probabilistic, ratelimiting (default remote). See also https://www.jaegertracing.io/docs/latest/sampling/.|
 | OCIS_TRACING_ENDPOINT<br/>AUTH_BASIC_TRACING_ENDPOINT | string |  | The endpoint to the tracing collector.|
-| OCIS_TRACING_COLLECTOR<br/>AUTH_BASIC_TRACING_COLLECTOR | string |  | |
+| OCIS_TRACING_COLLECTOR<br/>AUTH_BASIC_TRACING_COLLECTOR | string |  | The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. If specified, the tracing endpoint is ignored.|
 | OCIS_LOG_LEVEL<br/>AUTH_BASIC_LOG_LEVEL | string |  | The log level.|
 | OCIS_LOG_PRETTY<br/>AUTH_BASIC_LOG_PRETTY | bool | false | Activates pretty log output.|
 | OCIS_LOG_COLOR<br/>AUTH_BASIC_LOG_COLOR | bool | false | Activates colorized log output.|
@@ -18,40 +18,40 @@
 | AUTH_BASIC_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>AUTH_BASIC_JWT_SECRET | string |  | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
-| AUTH_BASIC_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
-| AUTH_BASIC_AUTH_PROVIDER | string | ldap | The auth provider which should be used by the service|
-| LDAP_URI<br/>AUTH_BASIC_LDAP_URI | string | ldaps://localhost:9235 | |
-| LDAP_CACERT<br/>AUTH_BASIC_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | |
-| LDAP_INSECURE<br/>AUTH_BASIC_LDAP_INSECURE | bool | false | |
-| LDAP_BIND_DN<br/>AUTH_BASIC_LDAP_BIND_DN | string | uid=reva,ou=sysusers,o=libregraph-idm | |
-| LDAP_BIND_PASSWORD<br/>AUTH_BASIC_LDAP_BIND_PASSWORD | string |  | |
-| LDAP_USER_BASE_DN<br/>AUTH_BASIC_LDAP_USER_BASE_DN | string | ou=users,o=libregraph-idm | |
-| LDAP_GROUP_BASE_DN<br/>AUTH_BASIC_LDAP_GROUP_BASE_DN | string | ou=groups,o=libregraph-idm | |
-| LDAP_USER_SCOPE<br/>AUTH_BASIC_LDAP_USER_SCOPE | string | sub | |
-| LDAP_GROUP_SCOPE<br/>AUTH_BASIC_LDAP_GROUP_SCOPE | string | sub | |
-| LDAP_USERFILTER<br/>AUTH_BASIC_LDAP_USERFILTER | string |  | |
-| LDAP_GROUPFILTER<br/>AUTH_BASIC_LDAP_USERFILTER | string |  | |
-| LDAP_USER_OBJECTCLASS<br/>AUTH_BASIC_LDAP_USER_OBJECTCLASS | string | inetOrgPerson | |
-| LDAP_GROUP_OBJECTCLASS<br/>AUTH_BASIC_LDAP_GROUP_OBJECTCLASS | string | groupOfNames | |
+| AUTH_BASIC_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the encoding of the user's groupmember ships in the reva access token. To reduces token size, especially when users are members of a large number of groups.|
+| AUTH_BASIC_AUTH_PROVIDER | string | ldap | The auth provider which should be used by the service (e.g. 'ldap').|
+| LDAP_URI<br/>AUTH_BASIC_LDAP_URI | string | ldaps://localhost:9235 | URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'|
+| LDAP_CACERT<br/>AUTH_BASIC_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty the system default CA bundle will be used.|
+| LDAP_INSECURE<br/>AUTH_BASIC_LDAP_INSECURE | bool | false | Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.|
+| LDAP_BIND_DN<br/>AUTH_BASIC_LDAP_BIND_DN | string | uid=reva,ou=sysusers,o=libregraph-idm | LDAP DN to use for simple bind authentication with the target LDAP server.|
+| LDAP_BIND_PASSWORD<br/>AUTH_BASIC_LDAP_BIND_PASSWORD | string |  | Password to use for authenticating the 'bind_dn'.|
+| LDAP_USER_BASE_DN<br/>AUTH_BASIC_LDAP_USER_BASE_DN | string | ou=users,o=libregraph-idm | Search base DN for looking up LDAP users.|
+| LDAP_GROUP_BASE_DN<br/>AUTH_BASIC_LDAP_GROUP_BASE_DN | string | ou=groups,o=libregraph-idm | Search base DN for looking up LDAP groups.|
+| LDAP_USER_SCOPE<br/>AUTH_BASIC_LDAP_USER_SCOPE | string | sub | LDAP search scope to use when looking up users ('base', 'one', 'sub').|
+| LDAP_GROUP_SCOPE<br/>AUTH_BASIC_LDAP_GROUP_SCOPE | string | sub | LDAP search scope to use when looking up gruops ('base', 'one', 'sub').|
+| LDAP_USERFILTER<br/>AUTH_BASIC_LDAP_USERFILTER | string |  | LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').|
+| LDAP_GROUPFILTER<br/>AUTH_BASIC_LDAP_GROUPFILTER | string |  | LDAP filter to add to the default filters for group searches.|
+| LDAP_USER_OBJECTCLASS<br/>AUTH_BASIC_LDAP_USER_OBJECTCLASS | string | inetOrgPerson | The object class to use for users in the default user search filter ('inetOrgPerson').|
+| LDAP_GROUP_OBJECTCLASS<br/>AUTH_BASIC_LDAP_GROUP_OBJECTCLASS | string | groupOfNames | The object class to use for groups in the default group search filter ('groupOfNames'). |
 | LDAP_LOGIN_ATTRIBUTES<br/>AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES |  | [uid mail] | |
-| OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>AUTH_BASIC_IDP_URL | string | https://localhost:9200 | |
-| LDAP_USER_SCHEMA_ID<br/>AUTH_BASIC_LDAP_USER_SCHEMA_ID | string | ownclouduuid | |
-| LDAP_USER_SCHEMA_ID_IS_OCTETSTRING<br/>AUTH_BASIC_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING | bool | false | |
-| LDAP_USER_SCHEMA_MAIL<br/>AUTH_BASIC_LDAP_USER_SCHEMA_MAIL | string | mail | |
-| LDAP_USER_SCHEMA_DISPLAYNAME<br/>AUTH_BASIC_LDAP_USER_SCHEMA_DISPLAYNAME | string | displayname | |
-| LDAP_USER_SCHEMA_USERNAME<br/>AUTH_BASIC_LDAP_USER_SCHEMA_USERNAME | string | uid | |
-| LDAP_GROUP_SCHEMA_ID<br/>AUTH_BASIC_LDAP_GROUP_SCHEMA_ID | string | ownclouduuid | |
-| LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING<br/>AUTH_BASIC_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING | bool | false | |
-| LDAP_GROUP_SCHEMA_MAIL<br/>AUTH_BASIC_LDAP_GROUP_SCHEMA_MAIL | string | mail | |
-| LDAP_GROUP_SCHEMA_DISPLAYNAME<br/>AUTH_BASIC_LDAP_GROUP_SCHEMA_DISPLAYNAME | string | cn | |
-| LDAP_GROUP_SCHEMA_GROUPNAME<br/>AUTH_BASIC_LDAP_GROUP_SCHEMA_GROUPNAME | string | cn | |
-| LDAP_GROUP_SCHEMA_MEMBER<br/>AUTH_BASIC_LDAP_GROUP_SCHEMA_MEMBER | string | member | |
-| AUTH_BASIC_OWNCLOUDSQL_DB_USERNAME | string | owncloud | |
-| AUTH_BASIC_OWNCLOUDSQL_DB_PASSWORD | string |  | |
-| AUTH_BASIC_OWNCLOUDSQL_DB_HOST | string | mysql | |
-| AUTH_BASIC_OWNCLOUDSQL_DB_PORT | int | 3306 | |
-| AUTH_BASIC_OWNCLOUDSQL_DB_NAME | string | owncloud | |
+| OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>AUTH_BASIC_IDP_URL | string | https://localhost:9200 | The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.|
+| LDAP_USER_SCHEMA_ID<br/>AUTH_BASIC_LDAP_USER_SCHEMA_ID | string | ownclouduuid | LDAP Attribute to use as the unique id for users. This should be a stable globally unique id (e.g. a UUID).|
+| LDAP_USER_SCHEMA_ID_IS_OCTETSTRING<br/>AUTH_BASIC_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING | bool | false | Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ids.|
+| LDAP_USER_SCHEMA_MAIL<br/>AUTH_BASIC_LDAP_USER_SCHEMA_MAIL | string | mail | LDAP Attribute to use for the email address of users.|
+| LDAP_USER_SCHEMA_DISPLAYNAME<br/>AUTH_BASIC_LDAP_USER_SCHEMA_DISPLAYNAME | string | displayname | LDAP Attribute to use for the displayname of users.|
+| LDAP_USER_SCHEMA_USERNAME<br/>AUTH_BASIC_LDAP_USER_SCHEMA_USERNAME | string | uid | LDAP Attribute to use for username of users.|
+| LDAP_GROUP_SCHEMA_ID<br/>AUTH_BASIC_LDAP_GROUP_SCHEMA_ID | string | ownclouduuid | LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).|
+| LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING<br/>AUTH_BASIC_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING | bool | false | Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ids.|
+| LDAP_GROUP_SCHEMA_MAIL<br/>AUTH_BASIC_LDAP_GROUP_SCHEMA_MAIL | string | mail | LDAP Attribute to use for the email address of groups (can be empty).|
+| LDAP_GROUP_SCHEMA_DISPLAYNAME<br/>AUTH_BASIC_LDAP_GROUP_SCHEMA_DISPLAYNAME | string | cn | LDAP Attribute to use for the displayname of groups (often the same as groupname attribute)|
+| LDAP_GROUP_SCHEMA_GROUPNAME<br/>AUTH_BASIC_LDAP_GROUP_SCHEMA_GROUPNAME | string | cn | LDAP Attribute to use for the name of groups|
+| LDAP_GROUP_SCHEMA_MEMBER<br/>AUTH_BASIC_LDAP_GROUP_SCHEMA_MEMBER | string | member | LDAP Attribute that is used for group members.|
+| AUTH_BASIC_OWNCLOUDSQL_DB_USERNAME | string | owncloud | Database user to use for authenticating with the owncloud database.|
+| AUTH_BASIC_OWNCLOUDSQL_DB_PASSWORD | string |  | Password for the database user.|
+| AUTH_BASIC_OWNCLOUDSQL_DB_HOST | string | mysql | Hostname of the database server.|
+| AUTH_BASIC_OWNCLOUDSQL_DB_PORT | int | 3306 | Network port to use for the database connection.|
+| AUTH_BASIC_OWNCLOUDSQL_DB_NAME | string | owncloud | Name of the owncloud database.|
 | AUTH_BASIC_OWNCLOUDSQL_IDP | string | https://localhost:9200 | |
 | AUTH_BASIC_OWNCLOUDSQL_NOBODY | int64 | 90 | |
-| AUTH_BASIC_OWNCLOUDSQL_JOIN_USERNAME | bool | false | |
+| AUTH_BASIC_OWNCLOUDSQL_JOIN_USERNAME | bool | false | Join the user properties table to read usernames|
 | AUTH_BASIC_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID | bool | false | |

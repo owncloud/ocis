@@ -38,7 +38,7 @@ auth_providers:
     group_scope: sub
     user_filter: ""
     group_filter: ""
-    user_object_filter: inetOrgPerson
+    user_object_class: inetOrgPerson
     group_object_class: groupOfNames
     login_attributes:
     - uid
