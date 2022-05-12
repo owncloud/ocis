@@ -30,7 +30,6 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "groups",
 		},
-		GroupMembersCacheExpiration: 5,
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
@@ -44,7 +43,6 @@ func DefaultConfig() *config.Config {
 				GroupBaseDN:      "ou=groups,o=libregraph-idm",
 				UserScope:        "sub",
 				GroupScope:       "sub",
-				LoginAttributes:  []string{"uid", "mail"},
 				UserFilter:       "",
 				GroupFilter:      "",
 				UserObjectClass:  "inetOrgPerson",
