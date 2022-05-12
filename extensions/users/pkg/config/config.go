@@ -20,9 +20,8 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"USERS_SKIP_USER_GROUPS_IN_TOKEN"`
 
-	UsersCacheExpiration int     `yaml:"users_cache_expiration"`
-	Driver               string  `yaml:"driver"`
-	Drivers              Drivers `yaml:"drivers"`
+	Driver  string  `yaml:"driver"`
+	Drivers Drivers `yaml:"drivers"`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
@@ -83,7 +82,6 @@ type LDAPDriver struct {
 	GroupFilter      string          `yaml:"group_filter" env:"LDAP_GROUPFILTER;USERS_LDAP_USERFILTER"`
 	UserObjectClass  string          `yaml:"user_object_class" env:"LDAP_USER_OBJECTCLASS;USERS_LDAP_USER_OBJECTCLASS"`
 	GroupObjectClass string          `yaml:"group_object_class" env:"LDAP_GROUP_OBJECTCLASS;USERS_LDAP_GROUP_OBJECTCLASS"`
-	LoginAttributes  []string        `yaml:"login_attributes" env:"LDAP_LOGIN_ATTRIBUTES;USERS_LDAP_LOGIN_ATTRIBUTES"`
 	IDP              string          `yaml:"idp" env:"OCIS_URL;OCIS_OIDC_ISSUER;USERS_IDP_URL"`
 	UserSchema       LDAPUserSchema  `yaml:"user_schema"`
 	GroupSchema      LDAPGroupSchema `yaml:"group_schema"`
