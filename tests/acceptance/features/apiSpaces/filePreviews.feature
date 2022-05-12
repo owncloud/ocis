@@ -25,7 +25,7 @@ Feature: Preview file in project space
 
 
   Scenario Outline: An user can preview image files in the project space
-    Given user "Alice" has uploaded a file "<entity>" via TUS inside of the space "previews of the files" using  WebDAV API
+    Given user "Alice" has uploaded a file "<entity>" via TUS inside of the space "previews of the files" using the WebDAV API
     When user "Alice" downloads the preview of "<entity>" of the space "previews of the files" with width "<width>" and height "<height>" using the WebDAV API
     Then the HTTP status code should be "200"
     Examples:
