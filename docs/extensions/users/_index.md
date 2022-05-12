@@ -1,5 +1,5 @@
 ---
-title: User
+title: Users
 date: 2022-03-02T00:00:00+00:00
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
