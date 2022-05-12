@@ -146,6 +146,24 @@ var _ = Describe("Searchprovider", func() {
 				}, nil)
 			})
 
+			It("lowercases the filename", func() {
+				p.Search(ctx, &searchsvc.SearchRequest{
+					Query: "Foo.pdf",
+				})
+				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+					return req.Query == "Name:foo.pdf"
+				}))
+			})
+
+			It("escapes special characters", func() {
+				p.Search(ctx, &searchsvc.SearchRequest{
+					Query: "Foo oo.pdf",
+				})
+				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+					return req.Query == `Name:foo\ oo.pdf`
+				}))
+			})
+
 			It("searches the personal user space", func() {
 				res, err := p.Search(ctx, &searchsvc.SearchRequest{
 					Query: "foo",

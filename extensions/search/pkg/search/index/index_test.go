@@ -24,25 +24,9 @@ var _ = Describe("Index", func() {
 			StorageId: "storageid",
 			OpaqueId:  "rootopaqueid",
 		}
-		ref = &sprovider.Reference{
-			ResourceId: rootId,
-			Path:       "./Foo.pdf",
-		}
-		ri = &sprovider.ResourceInfo{
-			Id: &sprovider.ResourceId{
-				StorageId: "storageid",
-				OpaqueId:  "opaqueid",
-			},
-			ParentId: &sprovider.ResourceId{
-				StorageId: "storageid",
-				OpaqueId:  "someopaqueid",
-			},
-			Path:     "Foo.pdf",
-			Size:     12345,
-			Type:     sprovider.ResourceType_RESOURCE_TYPE_FILE,
-			MimeType: "application/pdf",
-			Mtime:    &typesv1beta1.Timestamp{Seconds: 4000},
-		}
+		filename  string
+		ref       *sprovider.Reference
+		ri        *sprovider.ResourceInfo
 		parentRef = &sprovider.Reference{
 			ResourceId: rootId,
 			Path:       "./my/sudbir",
@@ -92,6 +76,8 @@ var _ = Describe("Index", func() {
 	)
 
 	BeforeEach(func() {
+		filename = "Foo.pdf"
+
 		mapping, err := index.BuildMapping()
 		Expect(err).ToNot(HaveOccurred())
 
@@ -100,6 +86,28 @@ var _ = Describe("Index", func() {
 
 		i, err = index.New(bleveIndex)
 		Expect(err).ToNot(HaveOccurred())
+	})
+
+	JustBeforeEach(func() {
+		ref = &sprovider.Reference{
+			ResourceId: rootId,
+			Path:       "./" + filename,
+		}
+		ri = &sprovider.ResourceInfo{
+			Id: &sprovider.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "opaqueid",
+			},
+			ParentId: &sprovider.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "someopaqueid",
+			},
+			Path:     filename,
+			Size:     12345,
+			Type:     sprovider.ResourceType_RESOURCE_TYPE_FILE,
+			MimeType: "application/pdf",
+			Mtime:    &typesv1beta1.Timestamp{Seconds: 4000},
+		}
 	})
 
 	Describe("New", func() {
@@ -119,8 +127,32 @@ var _ = Describe("Index", func() {
 	})
 
 	Describe("Search", func() {
-		Context("with a file in the root of the space", func() {
+		Context("with a filename with spaces", func() {
 			BeforeEach(func() {
+				filename = "Foo oo.pdf"
+			})
+			It("finds the file", func() {
+				err := i.Add(ref, ri)
+				Expect(err).ToNot(HaveOccurred())
+
+				res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
+					Ref: &searchmsg.Reference{
+						ResourceId: &searchmsg.ResourceID{
+							StorageId: ref.ResourceId.StorageId,
+							OpaqueId:  ref.ResourceId.OpaqueId,
+						},
+					},
+					Query: `Name:foo\ o*`,
+				})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res).ToNot(BeNil())
+				Expect(len(res.Matches)).To(Equal(1))
+			})
+
+		})
+
+		Context("with a file in the root of the space", func() {
+			JustBeforeEach(func() {
 				err := i.Add(ref, ri)
 				Expect(err).ToNot(HaveOccurred())
 			})

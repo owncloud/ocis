@@ -125,7 +125,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 
 		_, rootStorageID := storagespace.SplitStorageID(space.Root.StorageId)
 		res, err := p.indexClient.Search(ctx, &searchsvc.SearchIndexRequest{
-			Query: "Name:" + strings.ToLower(req.Query),
+			Query: "Name:" + strings.ReplaceAll(strings.ToLower(req.Query), " ", `\ `),
 			Ref: &searchmsg.Reference{
 				ResourceId: &searchmsg.ResourceID{
 					StorageId: space.Root.StorageId,
