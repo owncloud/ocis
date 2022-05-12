@@ -23,15 +23,15 @@ type Config struct {
 
 // Events combines the configuration options for the event bus.
 type Events struct {
-	Endpoint      string `yaml:"endpoint" env:"AUDIT_EVENTS_ENDPOINT" desc:"the address of the streaming service"`
-	Cluster       string `yaml:"cluster" env:"AUDIT_EVENTS_CLUSTER" desc:"the clusterID of the streaming service. Mandatory when using nats"`
-	ConsumerGroup string `yaml:"group" env:"AUDIT_EVENTS_GROUP" desc:"the customergroup of the service. One group will only get one copy of an event"`
+	Endpoint      string `yaml:"endpoint" env:"AUDIT_EVENTS_ENDPOINT" desc:"The address of the streaming service."`
+	Cluster       string `yaml:"cluster" env:"AUDIT_EVENTS_CLUSTER" desc:"The clusterID of the streaming service. Mandatory when using nats."`
+	ConsumerGroup string `yaml:"group" env:"AUDIT_EVENTS_GROUP" desc:"The consumergroup of the service. One group will only get one copy of an event."`
 }
 
 // Auditlog holds audit log information
 type Auditlog struct {
-	LogToConsole bool   `yaml:"log_to_console" env:"AUDIT_LOG_TO_CONSOLE" desc:"logs to Stdout if true"`
-	LogToFile    bool   `yaml:"log_to_file" env:"AUDIT_LOG_TO_FILE" desc:"logs to file if true"`
-	FilePath     string `yaml:"filepath" env:"AUDIT_FILEPATH" desc:"filepath to the logfile. Mandatory if LogToFile is true"`
-	Format       string `yaml:"format" env:"AUDIT_FORMAT" desc:"log format. using json is advised"`
+	LogToConsole bool   `yaml:"log_to_console" env:"AUDIT_LOG_TO_CONSOLE" desc:"Logs to Stdout if true."`
+	LogToFile    bool   `yaml:"log_to_file" env:"AUDIT_LOG_TO_FILE" desc:"Logs to file if true."`
+	FilePath     string `yaml:"filepath" env:"AUDIT_FILEPATH" desc:"Filepath to the logfile. Mandatory if LogToFile is true."`
+	Format       string `yaml:"format" env:"AUDIT_FORMAT" desc:"Log format. using json is advised."`
 }

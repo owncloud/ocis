@@ -110,10 +110,10 @@ type OwnCloudSQLDriver struct {
 	DBHost             string `yaml:"db_host" env:"USERS_OWNCLOUDSQL_DB_HOST" desc:"Hostname of the database server."`
 	DBPort             int    `yaml:"db_port" env:"USERS_OWNCLOUDSQL_DB_PORT" desc:"Network port to use for the database connection."`
 	DBName             string `yaml:"db_name" env:"USERS_OWNCLOUDSQL_DB_NAME" desc:"Name of the owncloud database."`
-	IDP                string `yaml:"idp" env:"USERS_OWNCLOUDSQL_IDP" desc:"The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.`
+	IDP                string `yaml:"idp" env:"USERS_OWNCLOUDSQL_IDP" desc:"The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider."`
 	Nobody             int64  `yaml:"nobody" env:"USERS_OWNCLOUDSQL_NOBODY"` // TODO what is this?
 	JoinUsername       bool   `yaml:"join_username" env:"USERS_OWNCLOUDSQL_JOIN_USERNAME" desc:"Join the user properties table to read usernames"`
-	JoinOwnCloudUUID   bool   `yaml:"join_owncloud_uuid" env:"USERS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID" desc="Join the user properties table to read user ids (boolean)."`
+	JoinOwnCloudUUID   bool   `yaml:"join_owncloud_uuid" env:"USERS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID" desc:"Join the user properties table to read user ids (boolean)."`
 	EnableMedialSearch bool   `yaml:"enable_medial_search" env:"USERS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH" desc:"Allow 'medial search' when searching for users instead of just doing a prefix search. (Allows finding 'Alice' when searching for 'lic'.)"`
 }
 type RESTProvider struct {
