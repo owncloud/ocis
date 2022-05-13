@@ -10,7 +10,7 @@ require (
 	github.com/blevesearch/bleve_index_api v1.0.1
 	github.com/coreos/go-oidc/v3 v3.1.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220412090512-93c5918b4bde
-	github.com/cs3org/reva/v2 v2.3.2-0.20220511140414-9205e8486b72
+	github.com/cs3org/reva/v2 v2.3.2-0.20220513093820-4f179b727de6
 	github.com/disintegration/imaging v1.6.2
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/cors v1.2.1
@@ -263,5 +263,3 @@ require (
 
 // we need to use a fork to make the windows build pass
 replace github.com/pkg/xattr => github.com/micbar/xattr v0.4.6-0.20220215112335-88e74d648fb7
-
-replace github.com/cs3org/reva/v2 => github.com/kobergj/reva/v2 v2.0.0-20220512084900-2d603425a2d9
