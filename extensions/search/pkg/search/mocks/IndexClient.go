@@ -30,13 +30,13 @@ func (_m *IndexClient) Add(ref *providerv1beta1.Reference, ri *providerv1beta1.R
 	return r0
 }
 
-// Delete provides a mock function with given fields: ri
-func (_m *IndexClient) Delete(ri *providerv1beta1.ResourceId) error {
-	ret := _m.Called(ri)
+// Delete provides a mock function with given fields: id
+func (_m *IndexClient) Delete(id *providerv1beta1.ResourceId) error {
+	ret := _m.Called(id)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(*providerv1beta1.ResourceId) error); ok {
-		r0 = rf(ri)
+		r0 = rf(id)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -65,13 +65,13 @@ func (_m *IndexClient) DocCount() (uint64, error) {
 	return r0, r1
 }
 
-// Move provides a mock function with given fields: ri, path
-func (_m *IndexClient) Move(ri *providerv1beta1.ResourceInfo, path string) error {
-	ret := _m.Called(ri, path)
+// Move provides a mock function with given fields: id, fullPath
+func (_m *IndexClient) Move(id *providerv1beta1.ResourceId, fullPath string) error {
+	ret := _m.Called(id, fullPath)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*providerv1beta1.ResourceInfo, string) error); ok {
-		r0 = rf(ri, path)
+	if rf, ok := ret.Get(0).(func(*providerv1beta1.ResourceId, string) error); ok {
+		r0 = rf(id, fullPath)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -79,13 +79,13 @@ func (_m *IndexClient) Move(ri *providerv1beta1.ResourceInfo, path string) error
 	return r0
 }
 
-// Purge provides a mock function with given fields: ri
-func (_m *IndexClient) Purge(ri *providerv1beta1.ResourceId) error {
-	ret := _m.Called(ri)
+// Purge provides a mock function with given fields: id
+func (_m *IndexClient) Purge(id *providerv1beta1.ResourceId) error {
+	ret := _m.Called(id)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(*providerv1beta1.ResourceId) error); ok {
-		r0 = rf(ri)
+		r0 = rf(id)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -93,13 +93,13 @@ func (_m *IndexClient) Purge(ri *providerv1beta1.ResourceId) error {
 	return r0
 }
 
-// Restore provides a mock function with given fields: ri
-func (_m *IndexClient) Restore(ri *providerv1beta1.ResourceId) error {
-	ret := _m.Called(ri)
+// Restore provides a mock function with given fields: id
+func (_m *IndexClient) Restore(id *providerv1beta1.ResourceId) error {
+	ret := _m.Called(id)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(*providerv1beta1.ResourceId) error); ok {
-		r0 = rf(ri)
+		r0 = rf(id)
 	} else {
 		r0 = ret.Error(0)
 	}

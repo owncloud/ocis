@@ -24,25 +24,9 @@ var _ = Describe("Index", func() {
 			StorageId: "storageid",
 			OpaqueId:  "rootopaqueid",
 		}
-		ref = &sprovider.Reference{
-			ResourceId: rootId,
-			Path:       "./foo.pdf",
-		}
-		ri = &sprovider.ResourceInfo{
-			Id: &sprovider.ResourceId{
-				StorageId: "storageid",
-				OpaqueId:  "opaqueid",
-			},
-			ParentId: &sprovider.ResourceId{
-				StorageId: "storageid",
-				OpaqueId:  "someopaqueid",
-			},
-			Path:     "Foo.pdf",
-			Size:     12345,
-			Type:     sprovider.ResourceType_RESOURCE_TYPE_FILE,
-			MimeType: "application/pdf",
-			Mtime:    &typesv1beta1.Timestamp{Seconds: 4000},
-		}
+		filename  string
+		ref       *sprovider.Reference
+		ri        *sprovider.ResourceInfo
 		parentRef = &sprovider.Reference{
 			ResourceId: rootId,
 			Path:       "./my/sudbir",
@@ -76,7 +60,7 @@ var _ = Describe("Index", func() {
 			Mtime: &typesv1beta1.Timestamp{Seconds: 4000},
 		}
 
-		assertDocCount = func(rootId *sprovider.ResourceId, query string, expectedCount int) {
+		assertDocCount = func(rootId *sprovider.ResourceId, query string, expectedCount int) []*searchmsg.Match {
 			res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
 				Query: query,
 				Ref: &searchmsg.Reference{
@@ -87,11 +71,14 @@ var _ = Describe("Index", func() {
 				},
 			})
 			ExpectWithOffset(1, err).ToNot(HaveOccurred())
-			ExpectWithOffset(1, len(res.Matches)).To(Equal(expectedCount))
+			ExpectWithOffset(1, len(res.Matches)).To(Equal(expectedCount), "query returned unexpected number of results: "+query)
+			return res.Matches
 		}
 	)
 
 	BeforeEach(func() {
+		filename = "Foo.pdf"
+
 		mapping, err := index.BuildMapping()
 		Expect(err).ToNot(HaveOccurred())
 
@@ -100,6 +87,28 @@ var _ = Describe("Index", func() {
 
 		i, err = index.New(bleveIndex)
 		Expect(err).ToNot(HaveOccurred())
+	})
+
+	JustBeforeEach(func() {
+		ref = &sprovider.Reference{
+			ResourceId: rootId,
+			Path:       "./" + filename,
+		}
+		ri = &sprovider.ResourceInfo{
+			Id: &sprovider.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "opaqueid",
+			},
+			ParentId: &sprovider.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "someopaqueid",
+			},
+			Path:     filename,
+			Size:     12345,
+			Type:     sprovider.ResourceType_RESOURCE_TYPE_FILE,
+			MimeType: "application/pdf",
+			Mtime:    &typesv1beta1.Timestamp{Seconds: 4000},
+		}
 	})
 
 	Describe("New", func() {
@@ -119,163 +128,139 @@ var _ = Describe("Index", func() {
 	})
 
 	Describe("Search", func() {
-		Context("with a file in the root of the space", func() {
-			BeforeEach(func() {
+		Context("by other fields than filename", func() {
+			JustBeforeEach(func() {
 				err := i.Add(ref, ri)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("scopes the search to the specified space", func() {
-				res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
-					Ref: &searchmsg.Reference{
-						ResourceId: &searchmsg.ResourceID{
-							StorageId: "differentstorageid",
-							OpaqueId:  "differentopaqueid",
-						},
-					},
-					Query: "foo.pdf",
-				})
+			It("finds files by size", func() {
+				assertDocCount(ref.ResourceId, `Size:12345`, 1)
+				assertDocCount(ref.ResourceId, `Size:>1000`, 1)
+				assertDocCount(ref.ResourceId, `Size:<100000`, 1)
+
+				assertDocCount(ref.ResourceId, `Size:12344`, 0)
+				assertDocCount(ref.ResourceId, `Size:<1000`, 0)
+				assertDocCount(ref.ResourceId, `Size:>100000`, 0)
+			})
+		})
+
+		Context("by filename", func() {
+			It("finds files with spaces in the filename", func() {
+				ri.Path = "Foo oo.pdf"
+				ref.Path = "./" + ri.Path
+				err := i.Add(ref, ri)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(res).ToNot(BeNil())
-				Expect(len(res.Matches)).To(Equal(0))
+
+				assertDocCount(ref.ResourceId, `Name:foo\ o*`, 1)
 			})
 
-			It("limits the search to the relevant fields", func() {
-				res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
-					Ref: &searchmsg.Reference{
-						ResourceId: &searchmsg.ResourceID{
-							StorageId: ref.ResourceId.StorageId,
-							OpaqueId:  ref.ResourceId.OpaqueId,
-						},
-					},
-					Query: "*" + ref.ResourceId.OpaqueId + "*",
-				})
+			It("finds files by digits in the filename", func() {
+				ri.Path = "12345.pdf"
+				ref.Path = "./" + ri.Path
+				err := i.Add(ref, ri)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(res).ToNot(BeNil())
-				Expect(len(res.Matches)).To(Equal(0))
+
+				assertDocCount(ref.ResourceId, `Name:1234*`, 1)
 			})
 
-			It("returns all desired fields", func() {
-				res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
-					Ref: &searchmsg.Reference{
-						ResourceId: &searchmsg.ResourceID{
-							StorageId: ref.ResourceId.StorageId,
-							OpaqueId:  ref.ResourceId.OpaqueId,
-						},
-					},
-					Query: "foo.pdf",
-				})
-				Expect(err).ToNot(HaveOccurred())
-				Expect(res).ToNot(BeNil())
-				Expect(len(res.Matches)).To(Equal(1))
-				match := res.Matches[0]
-				Expect(match.Entity.Ref.ResourceId.OpaqueId).To(Equal(ref.ResourceId.OpaqueId))
-				Expect(match.Entity.Ref.Path).To(Equal(ref.Path))
-				Expect(match.Entity.Id.OpaqueId).To(Equal(ri.Id.OpaqueId))
-				Expect(match.Entity.Name).To(Equal(ri.Path))
-				Expect(match.Entity.Size).To(Equal(ri.Size))
-				Expect(match.Entity.Type).To(Equal(uint64(ri.Type)))
-				Expect(match.Entity.MimeType).To(Equal(ri.MimeType))
-				Expect(match.Entity.Deleted).To(BeFalse())
-				Expect(uint64(match.Entity.LastModifiedTime.AsTime().Unix())).To(Equal(ri.Mtime.Seconds))
-			})
-
-			It("finds files by name, prefix or substring match", func() {
-				queries := []string{"foo.pdf", "foo*", "*oo.p*"}
-				for _, query := range queries {
-					res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
-						Ref: &searchmsg.Reference{
-							ResourceId: &searchmsg.ResourceID{
-								StorageId: ref.ResourceId.StorageId,
-								OpaqueId:  ref.ResourceId.OpaqueId,
-							},
-						},
-						Query: query,
-					})
-					Expect(err).ToNot(HaveOccurred())
-					Expect(res).ToNot(BeNil())
-					Expect(len(res.Matches)).To(Equal(1), "query returned no result: "+query)
-					Expect(res.Matches[0].Entity.Ref.ResourceId.OpaqueId).To(Equal(ref.ResourceId.OpaqueId))
-					Expect(res.Matches[0].Entity.Ref.Path).To(Equal(ref.Path))
-					Expect(res.Matches[0].Entity.Id.OpaqueId).To(Equal(ri.Id.OpaqueId))
-					Expect(res.Matches[0].Entity.Name).To(Equal(ri.Path))
-					Expect(res.Matches[0].Entity.Size).To(Equal(ri.Size))
-				}
-			})
-
-			It("is case-insensitive", func() {
-				res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
-					Ref: &searchmsg.Reference{
-						ResourceId: &searchmsg.ResourceID{
-							StorageId: ref.ResourceId.StorageId,
-							OpaqueId:  ref.ResourceId.OpaqueId,
-						},
-					},
-					Query: "Foo*",
-				})
-				Expect(err).ToNot(HaveOccurred())
-				Expect(res).ToNot(BeNil())
-				Expect(len(res.Matches)).To(Equal(1))
-			})
-
-			Context("and an additional file in a subdirectory", func() {
-				var (
-					nestedRef *sprovider.Reference
-					nestedRI  *sprovider.ResourceInfo
-				)
-
-				BeforeEach(func() {
-					nestedRef = &sprovider.Reference{
-						ResourceId: &sprovider.ResourceId{
-							StorageId: "storageid",
-							OpaqueId:  "rootopaqueid",
-						},
-						Path: "./nested/nestedpdf.pdf",
-					}
-					nestedRI = &sprovider.ResourceInfo{
-						Id: &sprovider.ResourceId{
-							StorageId: "storageid",
-							OpaqueId:  "nestedopaqueid",
-						},
-						Path: "nestedpdf.pdf",
-						Size: 12345,
-					}
-					err := i.Add(nestedRef, nestedRI)
+			Context("with a file in the root of the space", func() {
+				JustBeforeEach(func() {
+					err := i.Add(ref, ri)
 					Expect(err).ToNot(HaveOccurred())
 				})
 
-				It("finds files living deeper in the tree by filename, prefix or substring match", func() {
-					queries := []string{"nestedpdf.pdf", "nested*", "*tedpdf.*"}
+				It("scopes the search to the specified space", func() {
+					resourceId := &sprovider.ResourceId{
+						StorageId: "differentstorageid",
+						OpaqueId:  "differentopaqueid",
+					}
+					assertDocCount(resourceId, `Name:foo.pdf`, 0)
+				})
+
+				It("limits the search to the specified fields", func() {
+					assertDocCount(ref.ResourceId, "Name:*"+ref.ResourceId.OpaqueId+"*", 0)
+				})
+
+				It("returns all desired fields", func() {
+					matches := assertDocCount(ref.ResourceId, "Name:foo.pdf", 1)
+					match := matches[0]
+					Expect(match.Entity.Ref.ResourceId.OpaqueId).To(Equal(ref.ResourceId.OpaqueId))
+					Expect(match.Entity.Ref.Path).To(Equal(ref.Path))
+					Expect(match.Entity.Id.OpaqueId).To(Equal(ri.Id.OpaqueId))
+					Expect(match.Entity.Name).To(Equal(ri.Path))
+					Expect(match.Entity.Size).To(Equal(ri.Size))
+					Expect(match.Entity.Type).To(Equal(uint64(ri.Type)))
+					Expect(match.Entity.MimeType).To(Equal(ri.MimeType))
+					Expect(match.Entity.Deleted).To(BeFalse())
+					Expect(uint64(match.Entity.LastModifiedTime.AsTime().Unix())).To(Equal(ri.Mtime.Seconds))
+				})
+
+				It("finds files by name, prefix or substring match", func() {
+					queries := []string{"foo.pdf", "foo*", "*oo.p*"}
 					for _, query := range queries {
+						matches := assertDocCount(ref.ResourceId, query, 1)
+						Expect(matches[0].Entity.Ref.ResourceId.OpaqueId).To(Equal(ref.ResourceId.OpaqueId))
+						Expect(matches[0].Entity.Ref.Path).To(Equal(ref.Path))
+						Expect(matches[0].Entity.Id.OpaqueId).To(Equal(ri.Id.OpaqueId))
+						Expect(matches[0].Entity.Name).To(Equal(ri.Path))
+						Expect(matches[0].Entity.Size).To(Equal(ri.Size))
+					}
+				})
+
+				It("uses a lower-case index", func() {
+					assertDocCount(ref.ResourceId, "Name:foo*", 1)
+					assertDocCount(ref.ResourceId, "Name:Foo*", 0)
+				})
+
+				Context("and an additional file in a subdirectory", func() {
+					var (
+						nestedRef *sprovider.Reference
+						nestedRI  *sprovider.ResourceInfo
+					)
+
+					BeforeEach(func() {
+						nestedRef = &sprovider.Reference{
+							ResourceId: &sprovider.ResourceId{
+								StorageId: "storageid",
+								OpaqueId:  "rootopaqueid",
+							},
+							Path: "./nested/nestedpdf.pdf",
+						}
+						nestedRI = &sprovider.ResourceInfo{
+							Id: &sprovider.ResourceId{
+								StorageId: "storageid",
+								OpaqueId:  "nestedopaqueid",
+							},
+							Path: "nestedpdf.pdf",
+							Size: 12345,
+						}
+						err := i.Add(nestedRef, nestedRI)
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					It("finds files living deeper in the tree by filename, prefix or substring match", func() {
+						queries := []string{"nestedpdf.pdf", "nested*", "*tedpdf.*"}
+						for _, query := range queries {
+							assertDocCount(ref.ResourceId, query, 1)
+						}
+					})
+
+					It("does not find the higher levels when limiting the searched directory", func() {
 						res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
 							Ref: &searchmsg.Reference{
 								ResourceId: &searchmsg.ResourceID{
 									StorageId: ref.ResourceId.StorageId,
 									OpaqueId:  ref.ResourceId.OpaqueId,
 								},
+								Path: "./nested/",
 							},
-							Query: query,
+							Query: "Name:foo.pdf",
 						})
 						Expect(err).ToNot(HaveOccurred())
 						Expect(res).ToNot(BeNil())
-						Expect(len(res.Matches)).To(Equal(1), "query returned no result: "+query)
-					}
-				})
-
-				It("does not find the higher levels when limiting the searched directory", func() {
-					res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
-						Ref: &searchmsg.Reference{
-							ResourceId: &searchmsg.ResourceID{
-								StorageId: ref.ResourceId.StorageId,
-								OpaqueId:  ref.ResourceId.OpaqueId,
-							},
-							Path: "./nested/",
-						},
-						Query: "foo.pdf",
+						Expect(len(res.Matches)).To(Equal(0))
 					})
-					Expect(err).ToNot(HaveOccurred())
-					Expect(res).ToNot(BeNil())
-					Expect(len(res.Matches)).To(Equal(0))
 				})
 			})
 		})
@@ -366,23 +351,13 @@ var _ = Describe("Index", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			parentRi.Path = "newname"
-			err = i.Move(parentRi, "./somewhere/else/newname")
+			err = i.Move(parentRi.Id, "./somewhere/else/newname")
 			Expect(err).ToNot(HaveOccurred())
 
 			assertDocCount(rootId, "subdir", 0)
 
-			res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
-				Query: "child.pdf",
-				Ref: &searchmsg.Reference{
-					ResourceId: &searchmsg.ResourceID{
-						StorageId: rootId.StorageId,
-						OpaqueId:  rootId.OpaqueId,
-					},
-				},
-			})
-			Expect(err).ToNot(HaveOccurred())
-			Expect(len(res.Matches)).To(Equal(1))
-			Expect(res.Matches[0].Entity.Ref.Path).To(Equal("./somewhere/else/newname/child.pdf"))
+			matches := assertDocCount(rootId, "Name:child.pdf", 1)
+			Expect(matches[0].Entity.Ref.Path).To(Equal("./somewhere/else/newname/child.pdf"))
 		})
 	})
 })

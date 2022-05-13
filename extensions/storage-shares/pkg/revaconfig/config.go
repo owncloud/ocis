@@ -24,6 +24,7 @@ func StorageSharesConfigFromStruct(cfg *config.Config) map[string]interface{} {
 			"services": map[string]interface{}{
 				"sharesstorageprovider": map[string]interface{}{
 					"usershareprovidersvc": cfg.SharesProviderEndpoint,
+					"mount_id":             cfg.MountID,
 				},
 			},
 		},

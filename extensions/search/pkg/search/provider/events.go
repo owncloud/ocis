@@ -58,11 +58,11 @@ func (p *Provider) handleEvent(ev interface{}) {
 
 		statRes, err := p.statResource(ref, owner)
 		if err != nil {
-			p.logger.Error().Err(err).Msg("failed to stat the changed resource")
+			p.logger.Error().Err(err).Msg("failed to stat the moved resource")
 			return
 		}
 		if statRes.Status.Code != rpc.Code_CODE_OK {
-			p.logger.Error().Interface("statRes", statRes).Msg("failed to stat the changed resource")
+			p.logger.Error().Interface("statRes", statRes).Msg("failed to stat the moved resource")
 			return
 		}
 
@@ -76,9 +76,9 @@ func (p *Provider) handleEvent(ev interface{}) {
 			return
 		}
 
-		err = p.indexClient.Move(statRes.Info, gpRes.Path)
+		err = p.indexClient.Move(statRes.Info.Id, gpRes.Path)
 		if err != nil {
-			p.logger.Error().Err(err).Msg("failed to restore the changed resource in the index")
+			p.logger.Error().Err(err).Msg("failed to move the changed resource in the index")
 		}
 		return
 	case events.ContainerCreated:
@@ -126,7 +126,6 @@ func (p *Provider) statResource(ref *provider.Reference, owner *user.User) (*pro
 		return nil, err
 	}
 
-	// Stat changed resource resource
 	return p.gwClient.Stat(ownerCtx, &provider.StatRequest{Ref: ref})
 }
 
@@ -136,7 +135,6 @@ func (p *Provider) getPath(id *provider.ResourceId, owner *user.User) (*provider
 		return nil, err
 	}
 
-	// Stat changed resource resource
 	return p.gwClient.GetPath(ownerCtx, &provider.GetPathRequest{ResourceId: id})
 }
 

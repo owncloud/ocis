@@ -1,7 +1,6 @@
 package requests
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -43,9 +42,6 @@ func ParseThumbnailRequest(r *http.Request) (*ThumbnailRequest, error) {
 	ctx := r.Context()
 
 	fp := ctx.Value(constants.ContextKeyPath).(string)
-	if fp == "" {
-		return nil, errors.New("invalid file path")
-	}
 
 	id := ""
 	v := ctx.Value(constants.ContextKeyID)

@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/net"
 	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/prop"
@@ -43,7 +44,7 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 	ctx := revactx.ContextSetToken(r.Context(), t)
 	ctx = metadata.Set(ctx, revactx.TokenHeader, t)
 	rsp, err := g.searchClient.Search(ctx, &searchsvc.SearchRequest{
-		Query: "*" + rep.SearchFiles.Search.Pattern + "*",
+		Query: rep.SearchFiles.Search.Pattern,
 	})
 	if err != nil {
 		e := merrors.Parse(err.Error())
@@ -128,9 +129,15 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getcontenttype", match.Entity.MimeType))
 
 	size := strconv.FormatUint(match.Entity.Size, 10)
-	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:size", size))
-	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getcontentlength", size))
-
+	if match.Entity.Type == uint64(provider.ResourceType_RESOURCE_TYPE_CONTAINER) {
+		propstatOK.Prop = append(propstatOK.Prop, prop.Raw("d:resourcetype", "<d:collection/>"))
+		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:size", size))
+	} else {
+		propstatOK.Prop = append(propstatOK.Prop,
+			prop.Escaped("d:resourcetype", ""),
+			prop.Escaped("d:getcontentlength", size),
+		)
+	}
 	// TODO find name for score property
 	score := strconv.FormatFloat(float64(match.Score), 'f', -1, 64)
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:score", score))

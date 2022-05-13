@@ -18,20 +18,19 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"GROUPS_SKIP_USER_GROUPS_IN_TOKEN"`
+	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"GROUPS_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the encoding of the user's groupmember ships in the reva access token. To reduces token size, especially when users are members of a large number of groups."`
 
-	GroupMembersCacheExpiration int     `yaml:"group_members_cache_expiration"`
-	Driver                      string  `yaml:"driver"`
-	Drivers                     Drivers `yaml:"drivers"`
+	Driver  string  `yaml:"driver" desc:"The driver which should be used by the groups service (e.g. ldap)".`
+	Drivers Drivers `yaml:"drivers"`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;GROUPS_TRACING_ENABLED" desc:"Activates tracing."`
-	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;GROUPS_TRACING_TYPE"`
+	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;GROUPS_TRACING_TYPE" desc:"The sampler type: remote, const, probabilistic, ratelimiting (default remote). See also https://www.jaegertracing.io/docs/latest/sampling/."`
 	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;GROUPS_TRACING_ENDPOINT" desc:"The endpoint to the tracing collector."`
-	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;GROUPS_TRACING_COLLECTOR"`
+	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;GROUPS_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. If specified, the tracing endpoint is ignored."`
 }
 
 type Log struct {
@@ -66,53 +65,52 @@ type Drivers struct {
 	REST RESTProvider `yaml:"rest,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
 type LDAPDriver struct {
-	URI              string          `yaml:"uri" env:"LDAP_URI;GROUPS_LDAP_URI"`
-	CACert           string          `yaml:"ca_cert" env:"LDAP_CACERT;GROUPS_LDAP_CACERT"`
-	Insecure         bool            `yaml:"insecure" env:"LDAP_INSECURE;GROUPS_LDAP_INSECURE"`
-	BindDN           string          `yaml:"bind_dn" env:"LDAP_BIND_DN;GROUPS_LDAP_BIND_DN"`
-	BindPassword     string          `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;GROUPS_LDAP_BIND_PASSWORD"`
-	UserBaseDN       string          `yaml:"user_base_dn" env:"LDAP_USER_BASE_DN;GROUPS_LDAP_USER_BASE_DN"`
-	GroupBaseDN      string          `yaml:"group_base_dn" env:"LDAP_GROUP_BASE_DN;GROUPS_LDAP_GROUP_BASE_DN"`
-	UserScope        string          `yaml:"user_scope" env:"LDAP_USER_SCOPE;GROUPS_LDAP_USER_SCOPE"`
-	GroupScope       string          `yaml:"group_scope" env:"LDAP_GROUP_SCOPE;GROUPS_LDAP_GROUP_SCOPE"`
-	UserFilter       string          `yaml:"user_filter" env:"LDAP_USERFILTER;GROUPS_LDAP_USERFILTER"`
-	GroupFilter      string          `yaml:"group_filter" env:"LDAP_GROUPFILTER;GROUPS_LDAP_USERFILTER"`
-	UserObjectClass  string          `yaml:"user_object_class" env:"LDAP_USER_OBJECTCLASS;GROUPS_LDAP_USER_OBJECTCLASS"`
-	GroupObjectClass string          `yaml:"group_object_class" env:"LDAP_GROUP_OBJECTCLASS;GROUPS_LDAP_GROUP_OBJECTCLASS"`
-	LoginAttributes  []string        `yaml:"login_attributes" env:"LDAP_LOGIN_ATTRIBUTES;GROUPS_LDAP_LOGIN_ATTRIBUTES"`
-	IDP              string          `yaml:"idp" env:"OCIS_URL;OCIS_OIDC_ISSUER;GROUPS_IDP_URL"`
+	URI              string          `yaml:"uri" env:"LDAP_URI;GROUPS_LDAP_URI" desc:"URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'"`
+	CACert           string          `yaml:"ca_cert" env:"LDAP_CACERT;GROUPS_LDAP_CACERT" desc:"Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty the system default CA bundle will be used."`
+	Insecure         bool            `yaml:"insecure" env:"LDAP_INSECURE;GROUPS_LDAP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments."`
+	BindDN           string          `yaml:"bind_dn" env:"LDAP_BIND_DN;GROUPS_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server."`
+	BindPassword     string          `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;GROUPS_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'."`
+	UserBaseDN       string          `yaml:"user_base_dn" env:"LDAP_USER_BASE_DN;GROUPS_LDAP_USER_BASE_DN" desc:"Search base DN for looking up LDAP users."`
+	GroupBaseDN      string          `yaml:"group_base_dn" env:"LDAP_GROUP_BASE_DN;GROUPS_LDAP_GROUP_BASE_DN" desc:"Search base DN for looking up LDAP groups."`
+	UserScope        string          `yaml:"user_scope" env:"LDAP_USER_SCOPE;GROUPS_LDAP_USER_SCOPE" desc:"LDAP search scope to use when looking up users ('base', 'one', 'sub')."`
+	GroupScope       string          `yaml:"group_scope" env:"LDAP_GROUP_SCOPE;GROUPS_LDAP_GROUP_SCOPE" desc:"LDAP search scope to use when looking up gruops ('base', 'one', 'sub')."`
+	UserFilter       string          `yaml:"user_filter" env:"LDAP_USERFILTER;GROUPS_LDAP_USERFILTER" desc:"LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)')."`
+	GroupFilter      string          `yaml:"group_filter" env:"LDAP_GROUPFILTER;GROUPS_LDAP_GROUPFILTER" desc:"LDAP filter to add to the default filters for group searches."`
+	UserObjectClass  string          `yaml:"user_object_class" env:"LDAP_USER_OBJECTCLASS;GROUPS_LDAP_USER_OBJECTCLASS" desc:"The object class to use for users in the default user search filter ('inetOrgPerson')."`
+	GroupObjectClass string          `yaml:"group_object_class" env:"LDAP_GROUP_OBJECTCLASS;GROUPS_LDAP_GROUP_OBJECTCLASS" desc:"The object class to use for groups in the default group search filter ('groupOfNames')."`
+	IDP              string          `yaml:"idp" env:"OCIS_URL;OCIS_OIDC_ISSUER;GROUPS_IDP_URL" desc:"The identity provider value to set in the groupids of the CS3 group objects for groups returned by this group provider."`
 	UserSchema       LDAPUserSchema  `yaml:"user_schema"`
 	GroupSchema      LDAPGroupSchema `yaml:"group_schema"`
 }
 
 type LDAPUserSchema struct {
-	ID              string `yaml:"id" env:"LDAP_USER_SCHEMA_ID;GROUPS_LDAP_USER_SCHEMA_ID"`
-	IDIsOctetString bool   `yaml:"id_is_octet_string" env:"LDAP_USER_SCHEMA_ID_IS_OCTETSTRING;GROUPS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING"`
-	Mail            string `yaml:"mail" env:"LDAP_USER_SCHEMA_MAIL;GROUPS_LDAP_USER_SCHEMA_MAIL"`
-	DisplayName     string `yaml:"display_name" env:"LDAP_USER_SCHEMA_DISPLAYNAME;GROUPS_LDAP_USER_SCHEMA_DISPLAYNAME"`
-	Username        string `yaml:"user_name" env:"LDAP_USER_SCHEMA_USERNAME;GROUPS_LDAP_USER_SCHEMA_USERNAME"`
+	ID              string `yaml:"id" env:"LDAP_USER_SCHEMA_ID;GROUPS_LDAP_USER_SCHEMA_ID" desc:"LDAP Attribute to use as the unique id for users. This should be a stable globally unique id (e.g. a UUID)."`
+	IDIsOctetString bool   `yaml:"id_is_octet_string" env:"LDAP_USER_SCHEMA_ID_IS_OCTETSTRING;GROUPS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING" desc:"Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ids."`
+	Mail            string `yaml:"mail" env:"LDAP_USER_SCHEMA_MAIL;GROUPS_LDAP_USER_SCHEMA_MAIL" desc:"LDAP Attribute to use for the email address of users."`
+	DisplayName     string `yaml:"display_name" env:"LDAP_USER_SCHEMA_DISPLAYNAME;GROUPS_LDAP_USER_SCHEMA_DISPLAYNAME" desc:"LDAP Attribute to use for the displayname of users."`
+	Username        string `yaml:"user_name" env:"LDAP_USER_SCHEMA_USERNAME;GROUPS_LDAP_USER_SCHEMA_USERNAME" desc:"LDAP Attribute to use for username of users."`
 }
 
 type LDAPGroupSchema struct {
-	ID              string `yaml:"id" env:"LDAP_GROUP_SCHEMA_ID;GROUPS_LDAP_GROUP_SCHEMA_ID"`
-	IDIsOctetString bool   `yaml:"id_is_octet_string" env:"LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING;GROUPS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING"`
-	Mail            string `yaml:"mail" env:"LDAP_GROUP_SCHEMA_MAIL;GROUPS_LDAP_GROUP_SCHEMA_MAIL"`
-	DisplayName     string `yaml:"display_name" env:"LDAP_GROUP_SCHEMA_DISPLAYNAME;GROUPS_LDAP_GROUP_SCHEMA_DISPLAYNAME"`
-	Groupname       string `yaml:"group_name" env:"LDAP_GROUP_SCHEMA_GROUPNAME;GROUPS_LDAP_GROUP_SCHEMA_GROUPNAME"`
-	Member          string `yaml:"member" env:"LDAP_GROUP_SCHEMA_MEMBER;GROUPS_LDAP_GROUP_SCHEMA_MEMBER"`
+	ID              string `yaml:"id" env:"LDAP_GROUP_SCHEMA_ID;GROUPS_LDAP_GROUP_SCHEMA_ID" desc:"LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID)."`
+	IDIsOctetString bool   `yaml:"id_is_octet_string" env:"LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING;GROUPS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING" desc:"Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ids."`
+	Mail            string `yaml:"mail" env:"LDAP_GROUP_SCHEMA_MAIL;GROUPS_LDAP_GROUP_SCHEMA_MAIL" desc:"LDAP Attribute to use for the email address of groups (can be empty)."`
+	DisplayName     string `yaml:"display_name" env:"LDAP_GROUP_SCHEMA_DISPLAYNAME;GROUPS_LDAP_GROUP_SCHEMA_DISPLAYNAME" desc:"LDAP Attribute to use for the displayname of groups (often the same as groupname attribute)"`
+	Groupname       string `yaml:"group_name" env:"LDAP_GROUP_SCHEMA_GROUPNAME;GROUPS_LDAP_GROUP_SCHEMA_GROUPNAME" desc:"LDAP Attribute to use for the name of groups"`
+	Member          string `yaml:"member" env:"LDAP_GROUP_SCHEMA_MEMBER;GROUPS_LDAP_GROUP_SCHEMA_MEMBER" desc:"LDAP Attribute that is used for group members."`
 }
 
 type OwnCloudSQLDriver struct {
-	DBUsername         string `yaml:"db_username" env:"GROUPS_OWNCLOUDSQL_DB_USERNAME"`
-	DBPassword         string `yaml:"db_password" env:"GROUPS_OWNCLOUDSQL_DB_PASSWORD"`
-	DBHost             string `yaml:"db_host" env:"GROUPS_OWNCLOUDSQL_DB_HOST"`
-	DBPort             int    `yaml:"db_port" env:"GROUPS_OWNCLOUDSQL_DB_PORT"`
-	DBName             string `yaml:"db_name" env:"GROUPS_OWNCLOUDSQL_DB_NAME"`
-	IDP                string `yaml:"idp" env:"GROUPS_OWNCLOUDSQL_IDP"`
+	DBUsername         string `yaml:"db_username" env:"GROUPS_OWNCLOUDSQL_DB_USERNAME" desc:"Database user to use for authenticating with the owncloud database."`
+	DBPassword         string `yaml:"db_password" env:"GROUPS_OWNCLOUDSQL_DB_PASSWORD" desc:"Password for the database user."`
+	DBHost             string `yaml:"db_host" env:"GROUPS_OWNCLOUDSQL_DB_HOST" desc:"Hostname of the database server."`
+	DBPort             int    `yaml:"db_port" env:"GROUPS_OWNCLOUDSQL_DB_PORT" desc:"Network port to use for the database connection."`
+	DBName             string `yaml:"db_name" env:"GROUPS_OWNCLOUDSQL_DB_NAME" desc:"Name of the owncloud database."`
+	IDP                string `yaml:"idp" env:"GROUPS_OWNCLOUDSQL_IDP" desc:"The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider."`
 	Nobody             int64  `yaml:"nobody" env:"GROUPS_OWNCLOUDSQL_NOBODY"` // TODO what is this?
-	JoinUsername       bool   `yaml:"join_username" env:"GROUPS_OWNCLOUDSQL_JOIN_USERNAME"`
-	JoinOwnCloudUUID   bool   `yaml:"join_owncloud_uuid" env:"GROUPS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID"`
-	EnableMedialSearch bool   `yaml:"enable_medial_search" env:"GROUPS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH"`
+	JoinUsername       bool   `yaml:"join_username" env:"GROUPS_OWNCLOUDSQL_JOIN_USERNAME" desc:"Join the user properties table to read usernames (boolean)"`
+	JoinOwnCloudUUID   bool   `yaml:"join_owncloud_uuid" env:"GROUPS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID" desc:"Join the user properties table to read user ids (boolean)."`
+	EnableMedialSearch bool   `yaml:"enable_medial_search" env:"GROUPS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH" desc:"Allow 'medial search' when searching for users instead of just doing a prefix search. (Allows finding 'Alice' when searching for 'lic'.)"`
 }
 
 type JSONDriver struct {
