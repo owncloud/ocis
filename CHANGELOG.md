@@ -95,7 +95,7 @@ The following sections list the changes for 2.0.0-beta1.
 * Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 * Enhancement - Update reva to v2.3.1: [#3552](https://github.com/owncloud/ocis/pull/3552)
-* Enhancement - Update ownCloud Web to v5.5.0-rc.5: [#6854](https://github.com/owncloud/web/pull/6854)
+* Enhancement - Update ownCloud Web to v5.5.0-rc.6: [#6854](https://github.com/owncloud/web/pull/6854)
 
 ## Details
 
@@ -369,11 +369,11 @@ The following sections list the changes for 2.0.0-beta1.
    https://github.com/owncloud/ocis/pull/3652
    https://github.com/owncloud/ocis/pull/3681
 
-* Enhancement - Update ownCloud Web to v5.5.0-rc.5: [#6854](https://github.com/owncloud/web/pull/6854)
+* Enhancement - Update ownCloud Web to v5.5.0-rc.6: [#6854](https://github.com/owncloud/web/pull/6854)
 
    Tags: web
 
-   We updated ownCloud Web to v5.5.0-rc.5. Please refer to the changelog (linked) for details on
+   We updated ownCloud Web to v5.5.0-rc.6. Please refer to the changelog (linked) for details on
    the web release.
 
    https://github.com/owncloud/web/pull/6854
@@ -381,7 +381,8 @@ The following sections list the changes for 2.0.0-beta1.
    https://github.com/owncloud/ocis/pull/3680
    https://github.com/owncloud/ocis/pull/3727
    https://github.com/owncloud/ocis/pull/3747
-   https://github.com/owncloud/web/releases/tag/v5.5.0-rc.5
+   https://github.com/owncloud/ocis/pull/3797
+   https://github.com/owncloud/web/releases/tag/v5.5.0-rc.6
 # Changelog for [1.20.0] (2022-04-13)
 
 The following sections list the changes for 1.20.0.
