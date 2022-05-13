@@ -20,6 +20,7 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_SHARES_SKIP_USER_GROUPS_IN_TOKEN"`
 
+	MountID                string `yaml:"mount_id" env:"STORAGE_SHARES_MOUNT_ID"`
 	ReadOnly               bool   `yaml:"readonly" env:"STORAGE_SHARES_READ_ONLY"`
 	SharesProviderEndpoint string `yaml:"user_share_provider_endpoint" env:"STORAGE_SHARES_USER_SHARE_PROVIDER_ENDPOINT"`
 
