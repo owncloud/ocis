@@ -38,9 +38,9 @@ type ProviderClient interface {
 type IndexClient interface {
 	Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (*searchsvc.SearchIndexResponse, error)
 	Add(ref *providerv1beta1.Reference, ri *providerv1beta1.ResourceInfo) error
-	Move(ri *providerv1beta1.ResourceInfo, path string) error
-	Delete(ri *providerv1beta1.ResourceId) error
-	Restore(ri *providerv1beta1.ResourceId) error
-	Purge(ri *providerv1beta1.ResourceId) error
+	Move(id *providerv1beta1.ResourceId, fullPath string) error
+	Delete(id *providerv1beta1.ResourceId) error
+	Restore(id *providerv1beta1.ResourceId) error
+	Purge(id *providerv1beta1.ResourceId) error
 	DocCount() (uint64, error)
 }
