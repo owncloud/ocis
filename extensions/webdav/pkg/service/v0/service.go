@@ -79,10 +79,14 @@ func NewService(opts ...Option) (Service, error) {
 		r.Group(func(r chi.Router) {
 			r.Use(svc.DavUserContext())
 
+			r.Get("/remote.php/dav/spaces/{id}", svc.SpacesThumbnail)
 			r.Get("/remote.php/dav/spaces/{id}/*", svc.SpacesThumbnail)
+			r.Get("/dav/spaces/{id}", svc.SpacesThumbnail)
 			r.Get("/dav/spaces/{id}/*", svc.SpacesThumbnail)
 
+			r.Get("/remote.php/dav/files/{id}", svc.Thumbnail)
 			r.Get("/remote.php/dav/files/{id}/*", svc.Thumbnail)
+			r.Get("/dav/files/{id}", svc.Thumbnail)
 			r.Get("/dav/files/{id}/*", svc.Thumbnail)
 		})
 
@@ -151,11 +155,12 @@ func (g Webdav) DavUserContext() func(next http.Handler) http.Handler {
 			}
 
 			if id != "" {
-				filePath = strings.TrimPrefix(filePath, path.Join("/remote.php/dav/spaces", id)+"/")
-				filePath = strings.TrimPrefix(filePath, path.Join("/dav/spaces", id)+"/")
+				filePath = strings.TrimPrefix(filePath, path.Join("/remote.php/dav/spaces", id))
+				filePath = strings.TrimPrefix(filePath, path.Join("/dav/spaces", id))
 
-				filePath = strings.TrimPrefix(filePath, path.Join("/remote.php/dav/files", id)+"/")
-				filePath = strings.TrimPrefix(filePath, path.Join("/dav/files", id)+"/")
+				filePath = strings.TrimPrefix(filePath, path.Join("/remote.php/dav/files", id))
+				filePath = strings.TrimPrefix(filePath, path.Join("/dav/files", id))
+				filePath = strings.TrimPrefix(filePath, "/")
 			}
 
 			ctx = context.WithValue(ctx, constants.ContextKeyPath, filePath)
