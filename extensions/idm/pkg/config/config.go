@@ -20,6 +20,7 @@ type Config struct {
 	CreateDemoUsers bool     `yaml:"create_demo_users" env:"IDM_CREATE_DEMO_USERS;ACCOUNTS_DEMO_USERS_AND_GROUPS" desc:"Flag to enabe/disable the creation of the demo users"`
 
 	ServiceUserPasswords ServiceUserPasswords `yaml:"service_user_passwords"`
+	AdminUserID          string               `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID;IDM_ADMIN_USER_ID"`
 
 	Context context.Context `yaml:"-"`
 }

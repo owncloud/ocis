@@ -23,6 +23,8 @@ type Config struct {
 	DataPath  string   `yaml:"data_path" env:"SETTINGS_DATA_PATH"`
 	Metadata  Metadata `yaml:"metadata_config"`
 
+	AdminUserID string `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID;SETTINGS_ADMIN_USER_ID"`
+
 	Asset        Asset         `yaml:"asset"`
 	TokenManager *TokenManager `yaml:"token_manager"`
 
