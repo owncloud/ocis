@@ -101,6 +101,11 @@
 | false
 | 
 
+|`STORAGE_SHARES_MOUNT_ID`
+| string
+| 7639e57c-4433-4a12-8201-722fd0009154
+| 
+
 |`STORAGE_SHARES_READ_ONLY`
 | bool
 | false

@@ -24,5 +24,6 @@ token_manager:
 reva:
   address: 127.0.0.1:9142
 skip_user_groups_in_token: false
+mount_id: 7639e57c-4433-4a12-8201-722fd0009154
 readonly: false
 user_share_provider_endpoint: localhost:9150
