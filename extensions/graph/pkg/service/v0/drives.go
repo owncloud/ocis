@@ -401,10 +401,14 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 		if err != nil {
 			return nil, err
 		}
-		res.Special = g.GetExtendedSpaceProperties(ctx, baseURL, storageSpace)
-		res.Quota, err = g.getDriveQuota(ctx, storageSpace)
-		if err != nil {
-			return nil, err
+
+		// can't access disabled space
+		if utils.ReadPlainFromOpaque(storageSpace.Opaque, "trashed") != "trashed" {
+			res.Special = g.GetExtendedSpaceProperties(ctx, baseURL, storageSpace)
+			res.Quota, err = g.getDriveQuota(ctx, storageSpace)
+			if err != nil {
+				return nil, err
+			}
 		}
 		responses = append(responses, res)
 	}
