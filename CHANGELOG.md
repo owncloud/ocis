@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Remove unused transfer secret from app provider: [#3798](https://github.com/owncloud/ocis/pull/3798)
 * Bugfix - Fix the `ocis search` command: [#3796](https://github.com/owncloud/ocis/pull/3796)
+* Bugfix - Rename search env variable for the grpc server address: [#3800](https://github.com/owncloud/ocis/pull/3800)
 * Bugfix - Fix the idm and settings extensions' admin user id configuration option: [#3799](https://github.com/owncloud/ocis/pull/3799)
 * Bugfix - Fix Thumbnails for IDs without a trailing path: [#3791](https://github.com/owncloud/ocis/pull/3791)
 * Change - The `glauth` and `accounts` services are removed: [#3685](https://github.com/owncloud/ocis/pull/3685)
@@ -35,6 +36,13 @@ The following sections list the changes for unreleased.
    service.
 
    https://github.com/owncloud/ocis/pull/3796
+
+* Bugfix - Rename search env variable for the grpc server address: [#3800](https://github.com/owncloud/ocis/pull/3800)
+
+   We've fixed the gprc server address configuration environment variable by renaming it from
+   `ACCOUNTS_GRPC_ADDR` to `SEARCH_GRPC_ADDR`
+
+   https://github.com/owncloud/ocis/pull/3800
 
 * Bugfix - Fix the idm and settings extensions' admin user id configuration option: [#3799](https://github.com/owncloud/ocis/pull/3799)
 
