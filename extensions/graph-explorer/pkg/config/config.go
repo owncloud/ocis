@@ -8,7 +8,7 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons `yaml:"-"`
+	Commons *shared.Commons `yaml:"-"` // don't use this directly as configuration for a service
 
 	Service Service `yaml:"-"`
 

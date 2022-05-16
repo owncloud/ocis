@@ -8,23 +8,23 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons `ocisConfig:"-" yaml:"-"`
+	Commons *shared.Commons `yaml:"-"` // don't use this directly as configuration for a service
 
-	Service Service `ocisConfig:"-" yaml:"-"`
+	Service Service `yaml:"-"`
 
-	Tracing *Tracing `ocisConfig:"tracing"`
-	Log     *Log     `ocisConfig:"log"`
-	Debug   Debug    `ocisConfig:"debug"`
+	Tracing *Tracing `yaml:"tracing"`
+	Log     *Log     `yaml:"log"`
+	Debug   Debug    `yaml:"debug"`
 
-	GRPC GRPC `ocisConfig:"grpc"`
+	GRPC GRPC `yaml:"grpc"`
 
 	Datapath string `yaml:"data_path" env:"SEARCH_DATA_PATH"`
-	Reva     Reva   `ocisConfig:"reva"`
+	Reva     Reva   `yaml:"reva"`
 	Events   Events `yaml:"events"`
 
 	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;SEARCH_MACHINE_AUTH_API_KEY"`
 
-	Context context.Context `ocisConfig:"-" yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 // Events combines the configuration options for the event bus.
