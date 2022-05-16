@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the idm and settings extensions' admin user id configuration option: [#3799](https://github.com/owncloud/ocis/pull/3799)
 * Bugfix - Fix Thumbnails for IDs without a trailing path: [#3791](https://github.com/owncloud/ocis/pull/3791)
 * Change - The `glauth` and `accounts` services are removed: [#3685](https://github.com/owncloud/ocis/pull/3685)
+* Change - Prevent access to disabled space: [#3779](https://github.com/owncloud/ocis/pull/3779)
 * Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
 * Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
 * Enhancement - Update reva: [#3746](https://github.com/owncloud/ocis/pull/3746)
@@ -58,6 +59,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3685
 
+* Change - Prevent access to disabled space: [#3779](https://github.com/owncloud/ocis/pull/3779)
+
+   Previously managers where allowed to edit the space even when it is disabled This is no longer
+   possible
+
+   https://github.com/owncloud/ocis/pull/3779
+
 * Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
 
    Added descriptions tags to the graph-explorer config tags so that they will be included in the
@@ -85,6 +93,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3746
    https://github.com/owncloud/ocis/pull/3771
+   https://github.com/owncloud/ocis/pull/3778
 
 * Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
 
