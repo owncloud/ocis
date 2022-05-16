@@ -85,15 +85,15 @@
 | tcp
 | The transport protocol of the grpc service.
 
-|`STORAGE_USERS_GRPC_ADDR`
+|`STORAGE_USERS_HTTP_ADDR`
 | string
 | 127.0.0.1:9158
-| The address of the grpc service.
+| The address of the http service.
 
-|`STORAGE_USERS_GRPC_PROTOCOL`
+|`STORAGE_USERS_HTTP_PROTOCOL`
 | string
 | tcp
-| The transport protocol of the grpc service.
+| The transport protocol of the http service.
 
 |`OCIS_JWT_SECRET` +
 `STORAGE_USERS_JWT_SECRET`
@@ -126,7 +126,7 @@
 | {{.Id.OpaqueId}}
 | 
 
-|`STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT`
+|`STORAGE_USERS_PERMISSION_ENDPOINT,STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT`
 | string
 | 127.0.0.1:9191
 | 
@@ -157,7 +157,7 @@
 | 
 
 |`STORAGE_USERS_PERMISSION_ENDPOINT` +
-`STORAGE_USERS_S3NG_USERS_PROVIDER_ENDPOINT`
+`STORAGE_USERS_S3NG_PERMISSIONS_ENDPOINT`
 | string
 | 127.0.0.1:9191
 | 

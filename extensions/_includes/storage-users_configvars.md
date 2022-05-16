@@ -16,21 +16,21 @@
 | STORAGE_USERS_DEBUG_ZPAGES | bool | false | |
 | STORAGE_USERS_GRPC_ADDR | string | 127.0.0.1:9157 | The address of the grpc service.|
 | STORAGE_USERS_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
-| STORAGE_USERS_GRPC_ADDR | string | 127.0.0.1:9158 | The address of the grpc service.|
-| STORAGE_USERS_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
+| STORAGE_USERS_HTTP_ADDR | string | 127.0.0.1:9158 | The address of the http service.|
+| STORAGE_USERS_HTTP_PROTOCOL | string | tcp | The transport protocol of the http service.|
 | OCIS_JWT_SECRET<br/>STORAGE_USERS_JWT_SECRET | string |  | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
 | STORAGE_USERS_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
 | STORAGE_USERS_DRIVER | string | ocis | The storage driver which should be used by the service|
 | STORAGE_USERS_OCIS_ROOT | string | ~/.ocis/storage/users | |
 | STORAGE_USERS_OCIS_USER_LAYOUT | string | {{.Id.OpaqueId}} | |
-| STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT | string | 127.0.0.1:9191 | |
+| STORAGE_USERS_PERMISSION_ENDPOINT,STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT | string | 127.0.0.1:9191 | |
 | STORAGE_USERS_OCIS_PERSONAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.User.Username \| lower}} | |
 | STORAGE_USERS_OCIS_GENERAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.SpaceName \| replace &#34; &#34; &#34;-&#34; \| lower}} | |
 | STORAGE_USERS_OCIS_SHARE_FOLDER | string | /Shares | |
 | STORAGE_USERS_S3NG_ROOT | string | ~/.ocis/storage/users | |
 | STORAGE_USERS_S3NG_USER_LAYOUT | string | {{.Id.OpaqueId}} | |
-| STORAGE_USERS_PERMISSION_ENDPOINT<br/>STORAGE_USERS_S3NG_USERS_PROVIDER_ENDPOINT | string | 127.0.0.1:9191 | |
+| STORAGE_USERS_PERMISSION_ENDPOINT<br/>STORAGE_USERS_S3NG_PERMISSIONS_ENDPOINT | string | 127.0.0.1:9191 | |
 | STORAGE_USERS_S3NG_REGION | string | default | |
 | STORAGE_USERS_S3NG_ACCESS_KEY | string |  | |
 | STORAGE_USERS_S3NG_SECRET_KEY | string |  | |
