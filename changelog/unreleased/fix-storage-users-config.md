@@ -1,4 +1,4 @@
-Bugfix: Fix multiple configuration environment variables for the storage-users extension
+Bugfix: Fix multiple storage-users env variables
 
 We've fixed multiple environment variable configuration options for the storage-users extension:
 
