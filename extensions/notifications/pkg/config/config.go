@@ -8,7 +8,7 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	*shared.Commons `yaml:"-"`
+	Commons *shared.Commons `yaml:"-"` // don't use this directly as configuration for a service
 
 	Service Service `yaml:"-"`
 
@@ -22,7 +22,6 @@ type Config struct {
 
 // Notifications definces the config options for the notifications service.
 type Notifications struct {
-	*shared.Commons   `yaml:"-"`
 	SMTP              SMTP   `yaml:"SMTP"`
 	Events            Events `yaml:"events"`
 	RevaGateway       string `yaml:"reva_gateway" env:"REVA_GATEWAY;NOTIFICATIONS_REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata"`
