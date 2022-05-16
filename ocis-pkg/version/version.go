@@ -13,6 +13,12 @@ var (
 
 	// Date indicates the build date.
 	Date = time.Now().Format("20060102")
+
+	// Legacy defines the old long 4 number ownCloud version needed for some clients
+	Legacy = "10.11.0.0"
+
+	// LegacyString defines the old ownCloud version needed for some clients
+	LegacyString = "10.11.0"
 )
 
 // Compiled returns the compile time of this service.

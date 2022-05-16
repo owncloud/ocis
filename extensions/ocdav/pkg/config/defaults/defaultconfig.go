@@ -44,11 +44,12 @@ func DefaultConfig() *config.Config {
 			},
 		},
 		Status: config.Status{
-			Version:       version.Long(),
-			VersionString: version.GetString(),
-			Product:       "Infinite Scale",
-			ProductName:   "Infinite Scale",
-			Edition:       "Community",
+			Version:        version.Legacy,
+			VersionString:  version.LegacyString,
+			ProductVersion: version.GetString(),
+			Product:        "Infinite Scale",
+			ProductName:    "Infinite Scale",
+			Edition:        "Community",
 		},
 	}
 }
