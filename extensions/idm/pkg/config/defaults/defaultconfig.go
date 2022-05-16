@@ -53,7 +53,7 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
-	if cfg.AdminUserID == "" {
+	if cfg.AdminUserID == "" && cfg.Commons != nil {
 		cfg.AdminUserID = cfg.Commons.AdminUserID
 	}
 }

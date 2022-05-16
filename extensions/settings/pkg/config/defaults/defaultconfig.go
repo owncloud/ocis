@@ -97,7 +97,7 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Metadata.SystemUserID = cfg.Commons.SystemUserID
 	}
 
-	if cfg.AdminUserID == "" {
+	if cfg.AdminUserID == "" && cfg.Commons != nil {
 		cfg.AdminUserID = cfg.Commons.AdminUserID
 	}
 }
