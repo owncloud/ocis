@@ -33,8 +33,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIFavorites/unfavoriteFile.feature:89](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/unfavoriteFile.feature#L89)
 - [webUIFavorites/unfavoriteFile.feature:104](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/unfavoriteFile.feature#L104)
 - [webUIFilesSearch/search.feature:103](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L103)
-- [webUIFilesSearch/search.feature:153](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L153)
-- [webUIFilesSearch/search.feature:165](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L165)
 - [webUIFilesSearch/search.feature:175](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L175)
 - [webUIResharing1/reshareUsers.feature:230](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing1/reshareUsers.feature#L230)
 
@@ -474,7 +472,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIFilesDetails/fileDetails.feature:57](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#57)
 - [webUIRenameFiles/renameFiles.feature:246](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#246)
 
-### [Copy/move not possible from and into shares in oCIS](https://github.com/owncloud/web/issues/6892) 
+### [Copy/move not possible from and into shares in oCIS](https://github.com/owncloud/web/issues/6892)
 - [webUIFilesCopy/copy.feature:89](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copy.feature#L89)
 - [webUIFilesCopy/copy.feature:101](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copy.feature#L101)
 
