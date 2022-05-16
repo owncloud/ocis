@@ -120,6 +120,12 @@
 | string
 | 
 | Password to set for the "idp" service user. Either cleartext or an argon2id hash
+
+|`OCIS_ADMIN_USER_ID` +
+`IDM_ADMIN_USER_ID`
+| string
+| 
+| 
 |===
 
 Since Version: `+` added, `-` deprecated

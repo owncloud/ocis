@@ -27,3 +27,4 @@ service_user_passwords:
   idm_password: ""
   reva_password: ""
   idp_password: ""
+admin_user_id: ""

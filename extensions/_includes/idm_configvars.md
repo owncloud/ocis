@@ -23,3 +23,4 @@
 | IDM_SVC_PASSWORD | string |  | Password to set for the "idm" service user. Either cleartext or an argon2id hash|
 | IDM_REVASVC_PASSWORD | string |  | Password to set for the "reva" service user. Either cleartext or an argon2id hash|
 | IDM_IDPSVC_PASSWORD | string |  | Password to set for the "idp" service user. Either cleartext or an argon2id hash|
+| OCIS_ADMIN_USER_ID<br/>IDM_ADMIN_USER_ID | string |  | |

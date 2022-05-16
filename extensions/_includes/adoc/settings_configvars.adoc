@@ -132,6 +132,12 @@
 | 
 | 
 
+|`OCIS_ADMIN_USER_ID` +
+`SETTINGS_ADMIN_USER_ID`
+| string
+| 
+| 
+
 |`SETTINGS_ASSET_PATH`
 | string
 | 
