@@ -75,7 +75,7 @@
 | false
 | 
 
-|`ACCOUNTS_GRPC_ADDR`
+|`SEARCH_GRPC_ADDR`
 | string
 | 127.0.0.1:9220
 | The address of the grpc service.

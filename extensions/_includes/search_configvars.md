@@ -14,7 +14,7 @@
 | SEARCH_DEBUG_TOKEN | string |  | |
 | SEARCH_DEBUG_PPROF | bool | false | |
 | SEARCH_DEBUG_ZPAGES | bool | false | |
-| ACCOUNTS_GRPC_ADDR | string | 127.0.0.1:9220 | The address of the grpc service.|
+| SEARCH_GRPC_ADDR | string | 127.0.0.1:9220 | The address of the grpc service.|
 | SEARCH_DATA_PATH | string | ~/.ocis/search | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
 | SEARCH_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | the address of the streaming service|
