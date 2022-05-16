@@ -504,7 +504,7 @@ func DefaultRoleAssignments(cfg *config.Config) []*settingsmsg.UserRoleAssignmen
 			AccountUuid: "058bff95-6708-4fe5-91e4-9ea3d377588b", // demo user "moss"
 			RoleId:      BundleUUIDRoleAdmin,
 		}, {
-			AccountUuid: cfg.Commons.AdminUserID,
+			AccountUuid: cfg.AdminUserID,
 			RoleId:      BundleUUIDRoleAdmin,
 		},
 		// default users with role "user"

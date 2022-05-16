@@ -539,7 +539,7 @@ func (g Service) defaultRoleAssignments() []*settingsmsg.UserRoleAssignment {
 			AccountUuid: "058bff95-6708-4fe5-91e4-9ea3d377588b", // demo user "moss"
 			RoleId:      BundleUUIDRoleAdmin,
 		}, {
-			AccountUuid: g.config.Commons.AdminUserID,
+			AccountUuid: g.config.AdminUserID,
 			RoleId:      BundleUUIDRoleAdmin,
 		},
 		// default users with role "user"

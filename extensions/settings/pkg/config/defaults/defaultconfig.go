@@ -96,6 +96,10 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.Metadata.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
 		cfg.Metadata.SystemUserID = cfg.Commons.SystemUserID
 	}
+
+	if cfg.AdminUserID == "" && cfg.Commons != nil {
+		cfg.AdminUserID = cfg.Commons.AdminUserID
+	}
 }
 
 func Sanitize(cfg *config.Config) {

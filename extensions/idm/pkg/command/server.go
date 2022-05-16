@@ -98,7 +98,7 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 		{
 			Name:     "admin",
 			Password: cfg.ServiceUserPasswords.OcisAdmin,
-			ID:       cfg.Commons.AdminUserID,
+			ID:       cfg.AdminUserID,
 		},
 		{
 			Name:     "libregraph",
