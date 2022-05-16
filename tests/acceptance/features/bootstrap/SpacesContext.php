@@ -2268,4 +2268,117 @@ class SpacesContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @When /^user "([^"]*)" downloads the file "([^"]*)" of the space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param  string $user
+	 * @param  string $fileName 
+	 * @param  string $spaceName
+	 *
+	 * @throws GuzzleException
+	 */
+	public function downloadFile(
+		string $user,
+		string $fileName,
+		string $spaceName
+	): void {		
+		$space = $this->getSpaceByName($user, $spaceName);
+		$fullUrl = $this->baseUrl . $this->davSpacesUrl . $space['id'] . '/' . $fileName;
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				"",
+				'HEAD',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				""
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" downloads old version of the file "([^"]*)" of the space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param  string $user
+	 * @param  string $fileName 
+	 * @param  string $spaceName
+	 *
+	 * @throws GuzzleException
+	 */
+	public function downloadVersionOfTheFile(
+		string $user,
+		string $fileName,
+		string $spaceName
+	): void {		
+		$this->listFileVersion($user, $fileName, $spaceName);
+		Assert::assertNotEmpty($this->getResponseXml(), __METHOD__ . ' Response is empty');
+		
+		$response = $this->getResponseXml();
+		$url = $this->baseUrl . $response['value'][1]['value'][0]['value'];		
+		
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$url,
+				"",
+				'HEAD',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				""
+			)
+		);
+	}
+
+	/**
+	 *
+	 * @param  string $user
+	 * @param  string $fileName 
+	 * @param  string $spaceName
+	 *
+	 * @throws GuzzleException
+	 */
+	public function listFileVersion(
+		string $user,
+		string $fileName,
+		string $spaceName
+	): void {		
+
+		$fileId = $this->getFileId($user, $spaceName, $fileName);
+		$fullUrl = $this->baseUrl . '/remote.php/dav/meta/' . $fileId . '/v';
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				"",
+				'PROPFIND',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				""
+			)
+		);
+
+		$this->setResponseXml(
+			HttpRequestHelper::parseResponseAsXml($this->featureContext->getResponse())
+		);
+	}
+
+	/**
+	 * @Then /^the length of the downloaded file must match the content "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $fileName
+	 * @param  string $spaceName
+	 *
+	 * @throws GuzzleException
+	 */
+	public function matchContentAndLength(
+		string $fileContent
+	): void {		
+		$responseHeaders = $this->featureContext->getResponse()->getHeaders();
+		Assert::assertEquals(strlen($fileContent), $responseHeaders['Content-Length'][0], "file length does not match the content");
+	}
 }
