@@ -19,6 +19,3 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiArchiver/downloadById.feature:134](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L134)
 - [apiArchiver/downloadById.feature:135](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L135)
 
-#### [Overwriting a file in the space within the allowed quota does not work](https://github.com/owncloud/ocis/issues/2829)
-- [apiSpaces/quota.feature:56](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/quota.feature#L56)
-
