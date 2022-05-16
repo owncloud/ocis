@@ -1,9 +1,9 @@
-package command
+package helper
 
 import (
 	"fmt"
 )
 
-func subcommandDescription(serviceName string) string {
+func SubcommandDescription(serviceName string) string {
 	return fmt.Sprintf("%s extension commands", serviceName)
 }

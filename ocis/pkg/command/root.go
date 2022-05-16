@@ -15,7 +15,7 @@ func Execute() error {
 
 	app := clihelper.DefaultApp(&cli.App{
 		Name:  "ocis",
-		Usage: "ownCloud Infinite Scale Stack",
+		Usage: "ownCloud Infinite Scale",
 	})
 
 	for _, fn := range register.Commands {

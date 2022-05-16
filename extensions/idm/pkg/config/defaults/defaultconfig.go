@@ -52,6 +52,10 @@ func EnsureDefaults(cfg *config.Config) {
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
 	}
+
+	if cfg.AdminUserID == "" && cfg.Commons != nil {
+		cfg.AdminUserID = cfg.Commons.AdminUserID
+	}
 }
 
 func Sanitize(cfg *config.Config) {

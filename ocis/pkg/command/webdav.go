@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/command"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
+	"github.com/owncloud/ocis/v2/ocis/pkg/command/helper"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
 )
@@ -15,7 +16,7 @@ func WebDAVCommand(cfg *config.Config) *cli.Command {
 
 	return &cli.Command{
 		Name:     cfg.WebDAV.Service.Name,
-		Usage:    subcommandDescription(cfg.WebDAV.Service.Name),
+		Usage:    helper.SubcommandDescription(cfg.WebDAV.Service.Name),
 		Category: "extensions",
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg); err != nil {

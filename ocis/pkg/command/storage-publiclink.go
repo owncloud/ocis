@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/v2/extensions/storage-publiclink/pkg/command"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
+	"github.com/owncloud/ocis/v2/ocis/pkg/command/helper"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
 )
@@ -14,7 +15,7 @@ import (
 func StoragePublicLinkCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     cfg.StoragePublicLink.Service.Name,
-		Usage:    subcommandDescription(cfg.StoragePublicLink.Service.Name),
+		Usage:    helper.SubcommandDescription(cfg.StoragePublicLink.Service.Name),
 		Category: "extensions",
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg); err != nil {

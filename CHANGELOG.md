@@ -6,6 +6,9 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Remove unused transfer secret from app provider: [#3798](https://github.com/owncloud/ocis/pull/3798)
+* Bugfix - Fix the `ocis search` command: [#3796](https://github.com/owncloud/ocis/pull/3796)
+* Bugfix - Fix the idm and settings extensions' admin user id configuration option: [#3799](https://github.com/owncloud/ocis/pull/3799)
 * Bugfix - Fix Thumbnails for IDs without a trailing path: [#3791](https://github.com/owncloud/ocis/pull/3791)
 * Change - The `glauth` and `accounts` services are removed: [#3685](https://github.com/owncloud/ocis/pull/3685)
 * Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
@@ -14,6 +17,32 @@ The following sections list the changes for unreleased.
 * Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
 
 ## Details
+
+* Bugfix - Remove unused transfer secret from app provider: [#3798](https://github.com/owncloud/ocis/pull/3798)
+
+   We've fixed the startup of the app provider by removing the startup dependency on a configured
+   transfer secret, which was not used. This only happend if you start the app provider without
+   runtime (eg. `ocis app-provider server`) and didn't have configured all oCIS secrets.
+
+   https://github.com/owncloud/ocis/pull/3798
+
+* Bugfix - Fix the `ocis search` command: [#3796](https://github.com/owncloud/ocis/pull/3796)
+
+   We've fixed the behavior for `ocis search`, which didn't show further help when not all secrets
+   have been configured. It also was not possible to start the search service standalone from the
+   oCIS binary without configuring all oCIS secrets, even they were not needed by the search
+   service.
+
+   https://github.com/owncloud/ocis/pull/3796
+
+* Bugfix - Fix the idm and settings extensions' admin user id configuration option: [#3799](https://github.com/owncloud/ocis/pull/3799)
+
+   We've fixed the admin user id configuration of the settings and idm extensions. The have
+   previously only been configurable via the oCIS shared configuration and therefore have been
+   undocumented for the extensions. This config option is now part of both extensions'
+   configuration and can now also be used when the extensions are compiled standalone.
+
+   https://github.com/owncloud/ocis/pull/3799
 
 * Bugfix - Fix Thumbnails for IDs without a trailing path: [#3791](https://github.com/owncloud/ocis/pull/3791)
 

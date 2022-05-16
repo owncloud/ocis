@@ -17,11 +17,11 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage:    "start a fullstack server (runtime and all extensions in supervised mode)",
 		Category: "fullstack",
 		Before: func(c *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
+			if err := parser.ParseConfig(cfg); err != nil {
 				fmt.Printf("%v", err)
+				return err
 			}
-			return err
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 			r := runtime.New(cfg)

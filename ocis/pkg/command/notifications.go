@@ -6,15 +6,16 @@ import (
 	"github.com/owncloud/ocis/v2/extensions/notifications/pkg/command"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
+	"github.com/owncloud/ocis/v2/ocis/pkg/command/helper"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
 	"github.com/urfave/cli/v2"
 )
 
-// NatsServerCommand is the entrypoint for the nats server command.
+// NotificationsCommand is the entrypoint for the notifications command.
 func NotificationsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "notifications",
-		Usage:    "start notifications service",
+		Name:     cfg.Notifications.Service.Name,
+		Usage:    helper.SubcommandDescription(cfg.Notifications.Service.Name),
 		Category: "extensions",
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg); err != nil {
