@@ -2372,20 +2372,4 @@ class SpacesContext implements Context {
 		$responseXml = HttpRequestHelper::getResponseXml($this->featureContext->getResponse());
 		return $responseXml->xpath("//d:response/d:href");
 	}
-
-	/**
-	 * @Then /^the length of the downloaded file must match the content "([^"]*)"$/
-	 *
-	 * @param  string $user
-	 * @param  string $fileName
-	 * @param  string $spaceName
-	 *
-	 * @throws GuzzleException
-	 */
-	public function matchContentAndLength(
-		string $fileContent
-	): void {		
-		$responseHeaders = $this->featureContext->getResponse()->getHeaders();
-		Assert::assertEquals(strlen($fileContent), $responseHeaders['Content-Length'][0], "file length does not match the content");
-	}
 }
