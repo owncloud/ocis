@@ -18,6 +18,9 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
+	Reva              *Reva  `yaml:"reva"`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;IDP_MACHINE_AUTH_API_KEY"`
+
 	Asset   Asset    `yaml:"asset"`
 	IDP     Settings `yaml:"idp"`
 	Clients []Client `yaml:"clients"`

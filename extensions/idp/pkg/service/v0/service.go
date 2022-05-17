@@ -13,13 +13,14 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/mux"
 	"github.com/libregraph/lico/bootstrap"
-	dummyBackendSupport "github.com/libregraph/lico/bootstrap/backends/dummy"
 	guestBackendSupport "github.com/libregraph/lico/bootstrap/backends/guest"
 	kcBackendSupport "github.com/libregraph/lico/bootstrap/backends/kc"
 	ldapBackendSupport "github.com/libregraph/lico/bootstrap/backends/ldap"
+	libreGraphBackendSupport "github.com/libregraph/lico/bootstrap/backends/libregraph"
 	licoconfig "github.com/libregraph/lico/config"
 	"github.com/libregraph/lico/server"
 	"github.com/owncloud/ocis/v2/extensions/idp/pkg/assets"
+	cs3BackendSupport "github.com/owncloud/ocis/v2/extensions/idp/pkg/backends/cs3/bootstrap"
 	"github.com/owncloud/ocis/v2/extensions/idp/pkg/config"
 	"github.com/owncloud/ocis/v2/extensions/idp/pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/ldap"
@@ -51,10 +52,6 @@ func NewService(opts ...Option) Service {
 		options.Config.Ldap.TLSCACert = ""
 	}
 
-	if err := initLicoInternalEnvVars(&options.Config.Ldap); err != nil {
-		logger.Fatal().Err(err).Msg("could not initialize env vars")
-	}
-
 	if err := createTemporaryClientsConfig(
 		options.Config.IDP.IdentifierRegistrationConf,
 		options.Config.IDP.Iss,
@@ -63,10 +60,23 @@ func NewService(opts ...Option) Service {
 		logger.Fatal().Err(err).Msg("could not create default config")
 	}
 
-	guestBackendSupport.MustRegister()
-	ldapBackendSupport.MustRegister()
-	dummyBackendSupport.MustRegister()
-	kcBackendSupport.MustRegister()
+	//
+	switch options.Config.IDP.IdentityManager {
+	case "cs3":
+		cs3BackendSupport.MustRegister()
+		if err := initCS3EnvVars(options.Config.Reva.Address, options.Config.MachineAuthAPIKey); err != nil {
+			logger.Fatal().Err(err).Msg("could not initialize cs3 backend env vars")
+		}
+	case "ldap":
+		ldapBackendSupport.MustRegister()
+		if err := initLicoInternalLDAPEnvVars(&options.Config.Ldap); err != nil {
+			logger.Fatal().Err(err).Msg("could not initialize ldap env vars")
+		}
+	default:
+		guestBackendSupport.MustRegister()
+		kcBackendSupport.MustRegister()
+		libreGraphBackendSupport.MustRegister()
+	}
 
 	// https://play.golang.org/p/Mh8AVJCd593
 	idpSettings := bootstrap.Settings(options.Config.IDP)
@@ -142,8 +152,24 @@ func createTemporaryClientsConfig(filePath, ocisURL string, clients []config.Cli
 
 }
 
-// Init vars which are currently not accessible via idp api
-func initLicoInternalEnvVars(ldap *config.Ldap) error {
+// Init cs3 backend vars which are currently not accessible via idp api
+func initCS3EnvVars(cs3Addr, machineAuthAPIKey string) error {
+	var defaults = map[string]string{
+		"CS3_GATEWAY":              cs3Addr,
+		"CS3_MACHINE_AUTH_API_KEY": machineAuthAPIKey,
+	}
+
+	for k, v := range defaults {
+		if err := os.Setenv(k, v); err != nil {
+			return fmt.Errorf("could not set cs3 env var %s=%s", k, v)
+		}
+	}
+
+	return nil
+}
+
+// Init ldap backend vars which are currently not accessible via idp api
+func initLicoInternalLDAPEnvVars(ldap *config.Ldap) error {
 	filter := fmt.Sprintf("(objectclass=%s)", ldap.ObjectClass)
 	if ldap.Filter != "" {
 		filter = fmt.Sprintf("(&%s%s)", ldap.Filter, filter)
@@ -168,7 +194,7 @@ func initLicoInternalEnvVars(ldap *config.Ldap) error {
 
 	for k, v := range defaults {
 		if err := os.Setenv(k, v); err != nil {
-			return fmt.Errorf("could not set env var %s=%s", k, v)
+			return fmt.Errorf("could not set ldap env var %s=%s", k, v)
 		}
 	}
 
