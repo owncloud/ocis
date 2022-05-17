@@ -120,4 +120,20 @@ Feature: Change data of space
       | special@@@0@@@file@@@mimeType      | image/png           |
       | special@@@0@@@id                   | %file_id%           |
       | special@@@0@@@eTag                 | %eTag%              |
-      
+
+
+  Scenario Outline: An admin user set no restriction quota of a Space via the Graph API
+    Given user "Alice" has created a space "Project Earth" of type "project" with quota "20"
+    When user "Alice" changes the quota of the "Project Earth" space to "<quotaValue>"
+    Then the HTTP status code should be "200"
+    When user "Alice" uploads a file inside space "Project Earth" with content "some content" to "file.txt" using the WebDAV API
+    Then the HTTP status code should be "201"
+    When user "Alice" lists all available spaces via the GraphApi
+    Then the json responded should contain a space "Project Earth" with these key and value pairs:
+      | key          | value         |
+      | name         | Project Earth |
+      | quota@@@used | 12            |
+    Examples:
+      | quotaValue |
+      | 0          |
+      | -1         |
