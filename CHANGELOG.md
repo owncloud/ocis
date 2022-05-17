@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Change - The `glauth` and `accounts` services are removed: [#3685](https://github.com/owncloud/ocis/pull/3685)
 * Change - Prevent access to disabled space: [#3779](https://github.com/owncloud/ocis/pull/3779)
 * Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
+* Enhancement - Add /me/changePassword endpoint to GraphAPI: [#3063](https://github.com/owncloud/ocis/issues/3063)
 * Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
 * Enhancement - Update reva: [#3746](https://github.com/owncloud/ocis/pull/3746)
 * Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
@@ -92,6 +93,14 @@ The following sections list the changes for unreleased.
    documentation.
 
    https://github.com/owncloud/ocis/pull/3759
+
+* Enhancement - Add /me/changePassword endpoint to GraphAPI: [#3063](https://github.com/owncloud/ocis/issues/3063)
+
+   When using the builtin user management, allow users to update their own password via the
+   graph/v1.0/me/changePassword endpoint.
+
+   https://github.com/owncloud/ocis/issues/3063
+   https://github.com/owncloud/ocis/pull/3705
 
 * Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
 
