@@ -219,7 +219,7 @@ func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"major":   version.Parsed().Major(),
 							"minor":   version.Parsed().Minor(),
 							"micro":   version.Parsed().Patch(),
-							"string":  version.GetString(),
+							"string":  version.LegacyString,
 						},
 					},
 				},
