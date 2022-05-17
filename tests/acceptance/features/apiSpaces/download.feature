@@ -23,6 +23,10 @@ Feature: Download file in project space
 
     Scenario: An user downloads an old version of the file in the project space
         Given user "Alice" has uploaded a file inside space "download file" with content "new content" to "file.txt"
-        When user "Alice" downloads old version of the file "file.txt" of the space "download file" using the WebDAV API
+        And user "Alice" has uploaded a file inside space "download file" with content "newest content" to "file.txt"
+        When user "Alice" downloads version of the file "file.txt" with the index "1" of the space "download file" using the WebDAV API
+        Then the HTTP status code should be "200"
+        And the length of the downloaded file must match the content "new content"
+        When user "Alice" downloads version of the file "file.txt" with the index "2" of the space "download file" using the WebDAV API
         Then the HTTP status code should be "200"
         And the length of the downloaded file must match the content "some content"
