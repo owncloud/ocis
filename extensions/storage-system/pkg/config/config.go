@@ -13,8 +13,9 @@ type Config struct {
 	Log     *Log            `yaml:"log"`
 	Debug   Debug           `yaml:"debug"`
 
-	GRPC GRPCConfig `yaml:"grpc"`
-	HTTP HTTPConfig `yaml:"http"`
+	GRPC   GRPCConfig `yaml:"grpc"`
+	HTTP   HTTPConfig `yaml:"http"`
+	Events Events     `yaml:"events"`
 
 	TokenManager     *TokenManager `yaml:"token_manager"`
 	Reva             *Reva         `yaml:"reva"`
@@ -76,4 +77,9 @@ type Drivers struct {
 type OCISDriver struct {
 	// Root is the absolute path to the location of the data
 	Root string `yaml:"root" env:"STORAGE_SYSTEM_OCIS_ROOT"`
+}
+
+type Events struct {
+	Addr      string `yaml:"endpoint" env:"STORAGE_SYSTEM_EVENTS_ENDPOINT" desc:"the address of the streaming service"`
+	ClusterID string `yaml:"cluster" env:"STORAGE_SYSTEM_EVENTS_CLUSTER" desc:"the clusterID of the streaming service. Mandatory when using nats"`
 }

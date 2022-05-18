@@ -47,12 +47,14 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"dataprovider": map[string]interface{}{
-					"prefix":      cfg.HTTP.Prefix,
-					"driver":      cfg.Driver,
-					"drivers":     UserDrivers(cfg),
-					"timeout":     86400,
-					"insecure":    cfg.DataProviderInsecure,
-					"disable_tus": false,
+					"prefix":         cfg.HTTP.Prefix,
+					"driver":         cfg.Driver,
+					"drivers":        UserDrivers(cfg),
+					"timeout":        86400,
+					"insecure":       cfg.DataProviderInsecure,
+					"disable_tus":    false,
+					"nats_address":   cfg.Events.Addr,
+					"nats_clusterID": cfg.Events.ClusterID,
 				},
 			},
 		},
