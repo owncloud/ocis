@@ -104,10 +104,10 @@ SHARE_API_PATH=ocs/v2.php/apps/files_sharing/api/v1/shares
 USER=admin
 PASSWORD=admin
 ```
-- create a new user `curl -k -u $USER:$PASSWORD $SERVER_URI/ocs/v2.php/cloud/users -d'userid=<username>&password=<password>&displayname=<displayName>&username=<username>&email=<email>'`
+- create a new user `curl -k -u $USER:$PASSWORD $SERVER_URI/$GRAPH_API_PATH/users -d '{"displayName": "<display name>", "mail": "<mail-address>", "onPremisesSamAccountName": "<username>", "passwordProfile":{ "password": "<password>" }}'`
 - give the user the "Admin" role
   1. get the id of the admin role `curl -k -u $USER:$PASSWORD  $SERVER_URI/api/v0/settings/roles-list -d"{}" | jq '.bundles[] | select (.name | test("admin")) | .id'`
-  2. get the id of the user: `curl -k -u $USER:$PASSWORD  $SERVER_URI/api/v0/accounts/accounts-list -d"{}" | jq '.accounts[] | select (.preferredName | test("<user-name>")) | .id'`
+  2. get the id of the user: `curl -k -u $USER:$PASSWORD  $SERVER_URI/$GRAPH_API_PATH/users/<username>" | jq '.id'`
   3. assign role user to role: `curl -k -u $USER:$PASSWORD  $SERVER_URI/api/v0/settings/assignments-add -d'{"account_uuid":"<user-id>","role_id":"<admin-role-id>"}`
 - create a space: `curl -k -u $USER:$PASSWORD  "$SERVER_URI/$GRAPH_API_PATH/drives" -X POST -d'{"Name":"Space for finance","driveType":"project", "description":"we need some space"}'`
 - list spaces: `curl -k -u $USER:$PASSWORD  $SERVER_URI/$GRAPH_API_PATH/me/drives`
