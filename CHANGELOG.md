@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Rename search env variable for the grpc server address: [#3800](https://github.com/owncloud/ocis/pull/3800)
 * Bugfix - Fix the idm and settings extensions' admin user id configuration option: [#3799](https://github.com/owncloud/ocis/pull/3799)
 * Bugfix - Fix multiple storage-users env variables: [#3802](https://github.com/owncloud/ocis/pull/3802)
+* Bugfix - Save Katherine: [#3823](https://github.com/owncloud/ocis/issues/3823)
 * Bugfix - Fix Thumbnails for IDs without a trailing path: [#3791](https://github.com/owncloud/ocis/pull/3791)
 * Change - The `glauth` and `accounts` services are removed: [#3685](https://github.com/owncloud/ocis/pull/3685)
 * Change - Prevent access to disabled space: [#3779](https://github.com/owncloud/ocis/pull/3779)
@@ -65,6 +66,13 @@ The following sections list the changes for unreleased.
   * It's now possible to configure the permissions service endpoint for all  storage drivers with the environment variable `STORAGE_USERS_PERMISSION_ENDPOINT`, which was previously only used by the S3NG driver.
 
    https://github.com/owncloud/ocis/pull/3802
+
+* Bugfix - Save Katherine: [#3823](https://github.com/owncloud/ocis/issues/3823)
+
+   SpaceManager user katherine was removed with the demo user switch. Now she comes back
+
+   https://github.com/owncloud/ocis/issues/3823
+   https://github.com/owncloud/ocis/pull/3824
 
 * Bugfix - Fix Thumbnails for IDs without a trailing path: [#3791](https://github.com/owncloud/ocis/pull/3791)
 
