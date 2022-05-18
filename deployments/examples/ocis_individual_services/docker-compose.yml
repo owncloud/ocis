@@ -7,7 +7,11 @@ volumes:
   ocis-store: null
   ocis-storage-system: null
   ocis-storage-users: null
-  ocis-storage-sharing: null
+  ocis-sharing: null
+  ocis-thumbnails: null
+  ocis-idm: null
+  ocis-nats: null
+  ocis-search: null
 
 networks:
   ocis-net:
@@ -97,6 +101,9 @@ services:
 
       REVA_GATEWAY: gateway:9142
       APP_PROVIDER_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+    logging:
+      driver: "local"
+    restart: always
 
   notifications:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
@@ -116,13 +123,18 @@ services:
       REVA_GATEWAY: gateway:9142
       NOTIFICATIONS_EVENTS_ENDPOINT: nats:9233
       NOTIFICATIONS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
+    logging:
+      driver: "local"
+    restart: always
 
   idm:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
-      replicas: ${OCIS_SCALE:-1}
+      replicas: 1
     networks:
       ocis-net:
+    volumes:
+      - ocis-idm:/var/lib/ocis
     entrypoint:
       - ocis
       - idm
@@ -134,15 +146,18 @@ services:
 
       IDM_LDAPS_ADDR: 0.0.0.0:9235
       IDM_ADMIN_USER_ID: ${ADMIN_USER_ID:-09246a85-682a-4cd5-996d-8e8d2aca50af}
-      IDM_ADMIN_PASSWORD: "admin" #TODO: change me
+      IDM_ADMIN_PASSWORD: ${ADMIN_USER_PASSWORD:-"changeme"}
       IDM_SVC_PASSWORD: ${IDM_SVC_PASSWORD:-changeme}
       IDM_REVASVC_PASSWORD:  ${IDM_REVASVC_PASSWORD:-changeme}
       IDM_IDPSVC_PASSWORD:  ${IDM_IDPSVC_PASSWORD:-changeme}
 
 
-      IDM_CREATE_DEMO_USERS: ${DEM_USERS:-true}
+      IDM_CREATE_DEMO_USERS: ${DEMO_USERS:-false}
 
       IDM_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+    logging:
+      driver: "local"
+    restart: always
 
   ocdav:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
@@ -165,6 +180,10 @@ services:
 
       REVA_GATEWAY: gateway:9142
       OCDAV_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+    logging:
+      driver: "local"
+    restart: always
+
   graph-explorer:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
@@ -183,11 +202,14 @@ services:
       GRAPH_EXPLORER_HTTP_ADDR: 0.0.0.0:9135
       GRAPH_EXPLORER_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       GRAPH_EXPLORER_GRAPH_URL_BASE: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+    logging:
+      driver: "local"
+    restart: always
 
   audit:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
-      replicas: ${OCIS_SCALE:-1}
+      replicas: 1
     networks:
       ocis-net:
     entrypoint:
@@ -200,6 +222,9 @@ services:
       AUDIT_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       AUDIT_EVENTS_ENDPOINT: nats:9233
+    logging:
+      driver: "local"
+    restart: always
 
   proxy:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
@@ -229,7 +254,7 @@ services:
       PROXY_INSECURE_BACKENDS: true
       PROXY_HTTP_ADDR: 0.0.0.0:9200
 
-      PROXY_ENABLE_BASIC_AUTH: true
+      PROXY_ENABLE_BASIC_AUTH: ${PROXY_ENABLE_BASIC_AUTH:-true}
 
     volumes:
       - "./config/proxy/proxy.yaml:/etc/ocis/proxy.yaml"
@@ -251,6 +276,8 @@ services:
       replicas: 1
     networks:
       ocis-net:
+    volumes:
+      - "ocis-nats:/var/lib/ocis"      
     entrypoint:
       - ocis
       - nats
@@ -323,9 +350,11 @@ services:
   search:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
-      replicas: 1
+      replicas: ${OCIS_SCALE:-1}
     networks:
       ocis-net:
+    volumes:
+      - "ocis-search:/var/lib/ocis"
     entrypoint:
       - ocis
       - search
@@ -343,6 +372,9 @@ services:
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
       OCIS_SYSTEM_USER_API_KEY: ${SYSTEM_USER_API_KEY:-changme}
       OCIS_SYSTEM_USER_ID: ${SYSTEM_USER_ID:-changeme}
+    logging:
+      driver: "local"
+    restart: always
 
   settings:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
@@ -363,11 +395,9 @@ services:
       SETTINGS_GRPC_ADDR: 0.0.0.0:9191
 
       SETTINGS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      #STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-changeme}
 
       OCIS_SYSTEM_USER_API_KEY: ${SYSTEM_USER_API_KEY:-changeme}
       OCIS_SYSTEM_USER_ID: ${SYSTEM_USER_ID:-changeme}
-      #OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
 
       SETTINGS_ADMIN_USER_ID: ${ADMIN_USER_ID:-09246a85-682a-4cd5-996d-8e8d2aca50af}
 
@@ -402,7 +432,7 @@ services:
       OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
 
     volumes:
-      - "ocis-settings:/var/lib/ocis"
+      - "ocis-store:/var/lib/ocis"
     logging:
       driver: "local"
     restart: always
@@ -430,7 +460,7 @@ services:
 
     volumes:
       # optional shared thumbnail cache between services
-      - "ocis-settings:/var/lib/ocis"
+      - "ocis-thumbnails:/var/lib/ocis"
     logging:
       driver: "local"
     restart: always
@@ -501,9 +531,9 @@ services:
       GRAPH_HTTP_ADDR: 0.0.0.0:9120
       GRAPH_SPACES_WEBDAV_BASE: https://${OCIS_DOMAIN:-ocis.owncloud.test}
 
-      GRAPH_LDAP_URI: ldaps://localhost:9235
+      GRAPH_LDAP_URI: ldaps://idm:9235
       GRAPH_LDAP_BIND_PASSWORD: ${IDM_SVC_PASSWORD:-changeme}
-
+      GRAPH_LDAP_INSECURE: true # TODO: fix me https://github.com/owncloud/ocis/issues/3818
       REVA_GATEWAY: gateway:9142
 
       GRAPH_EVENTS_ENDPOINT: nats:9233
@@ -575,7 +605,7 @@ services:
       AUTH_BASIC_LDAP_CACERT: ""
       AUTH_BASIC_LDAP_INSECURE: "true"
       AUTH_BASIC_LDAP_BIND_PASSWORD: ${IDM_REVASVC_PASSWORD:-changeme}
-      AUTH_BASIC_IDP_URL: ${OCIS_DOMAIN}
+      AUTH_BASIC_IDP_URL: https://${OCIS_DOMAIN}
 
     logging:
       driver: "local"
@@ -741,7 +771,7 @@ services:
       SHARING_USER_DRIVER: json
       SHARING_PUBLIC_DRIVER: json
     volumes:
-      - "ocis-storage-sharing:/var/lib/ocis"
+      - "ocis-sharing:/var/lib/ocis"
     logging:
       driver: "local"
     restart: always
@@ -866,5 +896,5 @@ services:
       GATEWAY_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
       STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-changeme}
     logging:
-        driver: "local"
+      driver: "local"
     restart: always
