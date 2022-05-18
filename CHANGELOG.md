@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Remove unused transfer secret from app provider: [#3798](https://github.com/owncloud/ocis/pull/3798)
+* Bugfix - Enable debug server by default: [#3827](https://github.com/owncloud/ocis/pull/3827)
 * Bugfix - Fix the `ocis search` command: [#3796](https://github.com/owncloud/ocis/pull/3796)
 * Bugfix - Rename search env variable for the grpc server address: [#3800](https://github.com/owncloud/ocis/pull/3800)
 * Bugfix - Fix the idm and settings extensions' admin user id configuration option: [#3799](https://github.com/owncloud/ocis/pull/3799)
@@ -30,6 +31,13 @@ The following sections list the changes for unreleased.
    runtime (eg. `ocis app-provider server`) and didn't have configured all oCIS secrets.
 
    https://github.com/owncloud/ocis/pull/3798
+
+* Bugfix - Enable debug server by default: [#3827](https://github.com/owncloud/ocis/pull/3827)
+
+   We've fixed the behavior for the audit, idm, nats and notifications extensions, that did not
+   start their debug server by default.
+
+   https://github.com/owncloud/ocis/pull/3827
 
 * Bugfix - Fix the `ocis search` command: [#3796](https://github.com/owncloud/ocis/pull/3796)
 
