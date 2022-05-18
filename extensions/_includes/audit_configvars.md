@@ -13,7 +13,7 @@
 | AUDIT_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the streaming service.|
 | AUDIT_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the streaming service. Mandatory when using nats.|
 | AUDIT_EVENTS_GROUP | string | audit | The consumergroup of the service. One group will only get one copy of an event.|
-| AUDIT_LOG_TO_CONSOLE | bool | true | Logs to Stdout if true.|
-| AUDIT_LOG_TO_FILE | bool | false | Logs to file if true.|
+| AUDIT_LOG_TO_CONSOLE | bool | true | Logs to Stdout if true. Independent of the log to file option.|
+| AUDIT_LOG_TO_FILE | bool | false | Logs to file if true. Independent of the log to Stdout file option.|
 | AUDIT_FILEPATH | string |  | Filepath to the logfile. Mandatory if LogToFile is true.|
 | AUDIT_FORMAT | string | json | Log format. using json is advised.|
