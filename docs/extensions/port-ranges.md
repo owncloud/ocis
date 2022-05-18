@@ -23,7 +23,7 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 
 | Port range | Service                                                                       |
 | ---------- | ----------------------------------------------------------------------------- |
-| 9000-9010  | [reserved for oCIS]({{< ref "../../../ocis/_index.md" >}})                    |
+| 9000-9010  | [reserved for Infinite Scale]({{< ref "../../../ocis/_index.md" >}})                    |
 | 9100-9104  | [web]({{< ref "./web/_index.md" >}})                                          |
 | 9105-9109  | [hello](https://github.com/owncloud/ocis-hello)                               |
 | 9110-9114  | [ocs]({{< ref "./ocs/_index.md" >}})                                          |
@@ -61,7 +61,7 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 | 9235-9239  | [idm]({{< ref "./idm/_index.md" >}})                                          |
 | 9240-9244  | [app-registry]({{< ref "./app-registry/_index.md" >}})                        |
 | 9245-9249  | FREE                                                                          |
-| 9250-9254  | [oCIS runtime](https://github.com/owncloud/ocis/tree/master/ocis/pkg/runtime) |
+| 9250-9254  | [ocis server (runtime)](https://github.com/owncloud/ocis/tree/master/ocis/pkg/runtime) |
 | 9255-9259  | FREE                                                                          |
 | 9260-9264  | FREE                                                                          |
 | 9265-9269  | FREE                                                                          |
