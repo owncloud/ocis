@@ -2268,4 +2268,108 @@ class SpacesContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @When /^user "([^"]*)" downloads the file "([^"]*)" of the space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param  string $user
+	 * @param  string $fileName 
+	 * @param  string $spaceName
+	 *
+	 * @throws GuzzleException
+	 */
+	public function downloadFile(
+		string $user,
+		string $fileName,
+		string $spaceName
+	): void {		
+		$space = $this->getSpaceByName($user, $spaceName);
+		$fullUrl = $this->baseUrl . $this->davSpacesUrl . $space['id'] . '/' . $fileName;
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				"",
+				'HEAD',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				""
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" downloads version of the file "([^"]*)" with the index "([^"]*)" of the space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param  string $user
+	 * @param  string $fileName 
+	 * @param  string $index
+	 * @param  string $spaceName
+	 *
+	 * @throws GuzzleException
+	 */
+	public function downloadVersionOfTheFile(
+		string $user,
+		string $fileName,
+		string $index,
+		string $spaceName
+	): void {		
+		$fileVersion = $this->listFileVersion($user, $fileName, $spaceName);
+		if (!isset($fileVersion[$index])) {
+			Assert::fail(
+				'could not find version of file "' . $fileName . '" with index "' . $index . '"'
+			);
+		}
+		$url = $this->baseUrl . $fileVersion[$index][0];		
+		
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$url,
+				"",
+				'HEAD',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				""
+			)
+		);
+	}
+
+	/**
+	 * Method returns an array with url values from the propfind request 
+	 * like: /remote.php/dav/meta/spaceUuid%fileUuid/v/fileUuid.REV.2022-05-17T10:39:49.672285951Z
+
+	 * 
+	 * @param  string $user
+	 * @param  string $fileName 
+	 * @param  string $spaceName
+	 *
+	 * @return array
+	 * @throws GuzzleException
+	 */
+	public function listFileVersion(
+		string $user,
+		string $fileName,
+		string $spaceName
+	): array {		
+
+		$fileId = $this->getFileId($user, $spaceName, $fileName);
+		$fullUrl = $this->baseUrl . '/remote.php/dav/meta/' . $fileId . '/v';
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				"",
+				'PROPFIND',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				""
+			)
+		);
+
+		$responseXml = HttpRequestHelper::getResponseXml($this->featureContext->getResponse());
+		return $responseXml->xpath("//d:response/d:href");
+	}
 }

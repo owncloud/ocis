@@ -54,11 +54,11 @@ Feature: List and create spaces
     When user "Alice" creates a space "Project Mars" of type "project" with the default quota using the GraphApi
     Then the HTTP status code should be "201"
     And the json responded should contain a space "Project Mars" with these key and value pairs:
-      | key              | value        |
-      | driveType        | project      |
-      | driveAlias       | project/project-mars |
-      | name             | Project Mars |
-      | quota@@@total    | 1000000000   |
+      | key              | value                            |
+      | driveType        | project                          |
+      | driveAlias       | project/project-mars             |
+      | name             | Project Mars                     |
+      | quota@@@total    | 1000000000                       |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
 
   Scenario: An admin user can create a Space via the Graph API with certain quota
@@ -66,25 +66,25 @@ Feature: List and create spaces
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
     Then the HTTP status code should be "201"
     And the json responded should contain a space "Project Venus" with these key and value pairs:
-      | key              | value         |
-      | driveType        | project       |
-      | name             | Project Venus |
-      | quota@@@total    | 2000          |
+      | key              | value                            |
+      | driveType        | project                          |
+      | name             | Project Venus                    |
+      | quota@@@total    | 2000                             |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
 
   Scenario: A user can list his personal space via multiple endpoints
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'personal'"
     Then the json responded should contain a space "Alice Hansen" owned by "Alice" with these key and value pairs:
-      | key              | value         |
-      | driveType        | personal      |
-      | name             | Alice Hansen  |
-      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
-      | owner@@@user@@@id | %user_id%    |
+      | key               | value                            |
+      | driveType         | personal                         |
+      | name              | Alice Hansen                     |
+      | root@@@webDavUrl  | %base_url%/dav/spaces/%space_id% |
+      | owner@@@user@@@id | %user_id%                        |
     When user "Alice" looks up the single space "Alice Hansen" via the GraphApi by using its id
     Then the json responded should contain a space "Alice Hansen" with these key and value pairs:
-      | key              | value         |
-      | driveType        | personal      |
-      | name             | Alice Hansen  |
+      | key              | value                            |
+      | driveType        | personal                         |
+      | name             | Alice Hansen                     |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
 
   Scenario: A user can list his created spaces via multiple endpoints
@@ -92,17 +92,17 @@ Feature: List and create spaces
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
     Then the HTTP status code should be "201"
     And the json responded should contain a space "Project Venus" with these key and value pairs:
-      | key              | value         |
-      | driveType        | project       |
-      | driveAlias       | project/project-venus |
-      | name             | Project Venus |
-      | quota@@@total    | 2000          |
+      | key              | value                            |
+      | driveType        | project                          |
+      | driveAlias       | project/project-venus            |
+      | name             | Project Venus                    |
+      | quota@@@total    | 2000                             |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
     When user "Alice" looks up the single space "Project Venus" via the GraphApi by using its id
     Then the json responded should contain a space "Project Venus" with these key and value pairs:
-      | key              | value         |
-      | driveType        | project       |
-      | driveAlias       | project/project-venus |
-      | name             | Project Venus |
-      | quota@@@total    | 2000          |
+      | key              | value                            |
+      | driveType        | project                          |
+      | driveAlias       | project/project-venus            |
+      | name             | Project Venus                    |
+      | quota@@@total    | 2000                             |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
