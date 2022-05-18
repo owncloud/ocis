@@ -19,36 +19,49 @@ If you're developing a non-public extension, we recommend using ports outside of
 
 We also suggest to use the last port in your extensions' range as a debug/metrics port.
 
-
 ## Allocations
 
 | Port range | Service                                                                       |
 | ---------- | ----------------------------------------------------------------------------- |
-| 9000-9010  | [ocis](https://github.com/owncloud/ocis)                                      |
-| 9100-9104  | [web](https://github.com/owncloud/ocis/tree/master/web)                       |
+| 9000-9010  | [reserved for Infinite Scale]({{< ref "../../../ocis/_index.md" >}})                    |
+| 9100-9104  | [web]({{< ref "./web/_index.md" >}})                                          |
 | 9105-9109  | [hello](https://github.com/owncloud/ocis-hello)                               |
-| 9110-9114  | [ocs](https://github.com/owncloud/ocis/tree/master/ocs)                       |
-| 9115-9119  | [webdav](https://github.com/owncloud/ocis/tree/master/webdav)                 |
-| 9120-9124  | [graph](https://github.com/owncloud/ocis/tree/master/graph)                   |
+| 9110-9114  | [ocs]({{< ref "./ocs/_index.md" >}})                                          |
+| 9115-9119  | [webdav]({{< ref "./webdav/_index.md" >}})                                    |
+| 9120-9124  | [graph]({{< ref "./graph/_index.md" >}})                                      |
 | 9125-9129  | FREE (formerly used by glauth)                                                |
-| 9130-9134  | [konnectd](https://github.com/owncloud/ocis/tree/master/konnectd)             |
-| 9135-9139  | [graph-explorer](https://github.com/owncloud/ocis/tree/master/graph-explorer) |
-| 9140-9179  | [reva/storage](https://github.com/owncloud/ocis/tree/master/storage)          |
+| 9130-9134  | [idp]({{< ref "./idp/_index.md" >}})                                          |
+| 9135-9139  | [graph-explorer]({{< ref "./graph-explorer/_index.md" >}})                    |
+| 9140-9141  | [frontend]({{< ref "./frontend/_index.md" >}})                                |
+| 9142-9143  | [gateway]({{< ref "./gateway/_index.md" >}})                                  |
+| 9144-9145  | [users]({{< ref "./users/_index.md" >}})                                      |
+| 9146-9147  | [auth-basic]({{< ref "./auth-basic/_index.md" >}})                            |
+| 9148-9149  | [auth-bearer]({{< ref "./auth-bearer/_index.md" >}})                          |
+| 9150-9153  | [sharing]({{< ref "./sharing/_index.md" >}})                                  |
+| 9154-9156  | [storage-shares]({{< ref "./storage-shares/_index.md" >}})                    |
+| 9157-9159  | [storage-users]({{< ref "./storage-users/_index.md" >}})                      |
+| 9160-9162  | [groups]({{< ref "./groups/_index.md" >}})                                    |
+| 9163       | [ocdav]({{< ref "./ocdav/_index.md" >}})                                      |
+| 9164       | [groups]({{< ref "./groups/_index.md" >}})                                    |
+| 9165       | [app-provider]({{< ref "./app-provider/_index.md" >}})                        |
+| 9166-9169  | [auth-machine]({{< ref "./auth-machine/_index.md" >}})                        |
+| 9170-9174  | [notifications]({{< ref "./notifications/_index.md" >}})                      |
+| 9175-9179  | [storage-publiclink]({{< ref "./storage-publiclink/_index.md" >}})            |
 | 9180-9184  | FREE (formerly used by accounts)                                              |
-| 9185-9189  | [thumbnails](https://github.com/owncloud/ocis/tree/master/thumbnails)         |
-| 9190-9194  | [settings](https://github.com/owncloud/ocis/tree/master/settings)             |
-| 9195-9199  | [store](https://github.com/owncloud/ocis/tree/master/store)                   |
-| 9200-9204  | [proxy](https://github.com/owncloud/ocis/tree/master/proxy)                   |
-| 9205-9209  | [markdown-editor](https://github.com/owncloud/ocis-markdown-editor)           |
-| 9210-9214  | [reva](https://github.com/owncloud/ocis-reva) unused?                         |
-| 9215-9219  | reva metadata storage                                                         |
-| 9220-9224  | search                                                                          |
-| 9225-9229  | photoprism (state: PoC)                                                       |
-| 9230-9234  | [nats](https://github.com/owncloud/ocis/tree/master/nats)                     |
-| 9235-9239  | [idm](https://github.com/owncloud/ocis/tree/master/proxy)                     |
-| 9240-9244  | [app-registry](https://github.com/owncloud/ocis/tree/master/extensions/app-registry)     |
+| 9185-9189  | [thumbnails]({{< ref "./thumbnails/_index.md" >}})                            |
+| 9190-9194  | [settings]({{< ref "./settings/_index.md" >}})                                |
+| 9195-9199  | FREE                                                                          |
+| 9200-9204  | [proxy]({{< ref "./proxy/_index.md" >}})                                      |
+| 9205-9209  | [proxy]({{< ref "./proxy/_index.md" >}})                                      |
+| 9210-9214  | FREE                                                                          |
+| 9215-9219  | [storage-system]({{< ref "./storage-system/_index.md" >}})                    |
+| 9220-9224  | [search]({{< ref "./search/_index.md" >}})                                    |
+| 9225-9229  | FREE                                                                          |
+| 9230-9234  | [nats]({{< ref "./nats/_index.md" >}})                                        |
+| 9235-9239  | [idm]({{< ref "./idm/_index.md" >}})                                          |
+| 9240-9244  | [app-registry]({{< ref "./app-registry/_index.md" >}})                        |
 | 9245-9249  | FREE                                                                          |
-| 9250-9254  | oCIS Runtime                                                                  |
+| 9250-9254  | [ocis server (runtime)](https://github.com/owncloud/ocis/tree/master/ocis/pkg/runtime) |
 | 9255-9259  | FREE                                                                          |
 | 9260-9264  | FREE                                                                          |
 | 9265-9269  | FREE                                                                          |
@@ -90,7 +103,7 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 | 9445-9449  | FREE                                                                          |
 | 9450-9454  | FREE                                                                          |
 | 9455-9459  | FREE                                                                          |
-| 9460-9464  | FREE                                                                          |
+| 9460-9464  | [store]({{< ref "./store/_index.md" >}})                                      |
 | 9465-9469  | FREE                                                                          |
 | 9470-9474  | FREE                                                                          |
 | 9475-9479  | FREE                                                                          |
