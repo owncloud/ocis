@@ -7,7 +7,7 @@ log:
   color: false
   file: ""
 debug:
-  addr: ""
+  addr: 127.0.0.1:9174
   token: ""
   pprof: false
   zpages: false

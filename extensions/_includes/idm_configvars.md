@@ -10,7 +10,7 @@
 | OCIS_LOG_PRETTY<br/>IDM_LOG_PRETTY | bool | false | |
 | OCIS_LOG_COLOR<br/>IDM_LOG_COLOR | bool | false | |
 | OCIS_LOG_FILE<br/>IDM_LOG_FILE | string |  | |
-| IDM_DEBUG_ADDR | string |  | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| IDM_DEBUG_ADDR | string | 127.0.0.1:9239 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
 | IDM_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | IDM_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | IDM_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
