@@ -32,6 +32,23 @@ ownCloudUUID: f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c
 userPassword:: e0FSR09OMn0kYXJnb24yaWQkdj0xOSRtPTY1NTM2LHQ9MSxwPTIkUHJzWkpQQW9pMkFwZHlJ
  a2Q1NGkzQSRnalZzR3doTmk2K0djenJ4SVdPalN2UlBpWXhKSXpHVG4vcnpQZzkvSlZN
 
+dn: uid=katherine,ou=users,o=libregraph-idm
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: ownCloud
+objectClass: person
+objectClass: top
+uid: katherine
+givenName: Katherine
+sn: Johnson
+cn: katherine
+displayName: Katherine Johnson
+description: An American mathematician whose calculations of orbital mechanics as a NASA employee were critical to the success of the first and subsequent U.S. crewed spaceflights.
+mail: katherine@example.org
+ownCloudUUID: 534bb038-6f9d-4093-946f-133be61fa4e7
+userPassword:: e0FSR09OMn0kYXJnb24yaWQkdj0xOSRtPTY1NTM2LHQ9MSxwPTIkYVd0b1RXdHdZblZuYjB4
+ Nk0wRm1adyRyeXVESVg0a3JSNGdmcnduZEh3aVpaSjVDUQ==
+
 dn: uid=richard,ou=users,o=libregraph-idm
 objectClass: inetOrgPerson
 objectClass: organizationalPerson
