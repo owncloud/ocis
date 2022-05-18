@@ -10,10 +10,10 @@
 | OCIS_LOG_PRETTY<br/>IDM_LOG_PRETTY | bool | false | |
 | OCIS_LOG_COLOR<br/>IDM_LOG_COLOR | bool | false | |
 | OCIS_LOG_FILE<br/>IDM_LOG_FILE | string |  | |
-| IDM_DEBUG_ADDR | string |  | |
-| IDM_DEBUG_TOKEN | string |  | |
-| IDM_DEBUG_PPROF | bool | false | |
-| IDM_DEBUG_ZPAGES | bool | false | |
+| IDM_DEBUG_ADDR | string |  | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| IDM_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
+| IDM_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| IDM_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
 | IDM_LDAPS_ADDR | string | 127.0.0.1:9235 | Listen address for the ldaps listener (ip-addr:port)|
 | IDM_LDAPS_CERT | string | ~/.ocis/idm/ldap.crt | File name of the TLS server certificate for the ldaps listener|
 | IDM_LDAPS_KEY | string | ~/.ocis/idm/ldap.key | File name for the TLS certificate key for the server certificate|

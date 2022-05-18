@@ -10,10 +10,10 @@
 | OCIS_LOG_PRETTY<br/>GROUPS_LOG_PRETTY | bool | false | Activates pretty log output.|
 | OCIS_LOG_COLOR<br/>GROUPS_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>GROUPS_LOG_FILE | string |  | The target log file.|
-| GROUPS_DEBUG_ADDR | string | 127.0.0.1:9161 | |
-| GROUPS_DEBUG_TOKEN | string |  | |
-| GROUPS_DEBUG_PPROF | bool | false | |
-| GROUPS_DEBUG_ZPAGES | bool | false | |
+| GROUPS_DEBUG_ADDR | string | 127.0.0.1:9161 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| GROUPS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
+| GROUPS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| GROUPS_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
 | GROUPS_GRPC_ADDR | string | 127.0.0.1:9160 | The address of the grpc service.|
 | GROUPS_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>GROUPS_JWT_SECRET | string |  | |

@@ -10,10 +10,10 @@
 | OCIS_LOG_PRETTY<br/>AUTH_BEARER_LOG_PRETTY | bool | false | Activates pretty log output.|
 | OCIS_LOG_COLOR<br/>AUTH_BEARER_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>AUTH_BEARER_LOG_FILE | string |  | The target log file.|
-| AUTH_BEARER_DEBUG_ADDR | string | 127.0.0.1:9149 | |
-| AUTH_BEARER_DEBUG_TOKEN | string |  | |
-| AUTH_BEARER_DEBUG_PPROF | bool | false | |
-| AUTH_BEARER_DEBUG_ZPAGES | bool | false | |
+| AUTH_BEARER_DEBUG_ADDR | string | 127.0.0.1:9149 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| AUTH_BEARER_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
+| AUTH_BEARER_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| AUTH_BEARER_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
 | AUTH_BEARER_GRPC_ADDR | string | 127.0.0.1:9148 | The address of the grpc service.|
 | AUTH_BEARER_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>AUTH_BEARER_JWT_SECRET | string |  | |

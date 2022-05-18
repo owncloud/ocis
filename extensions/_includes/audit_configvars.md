@@ -6,10 +6,10 @@
 | OCIS_LOG_PRETTY<br/>AUDIT_LOG_PRETTY | bool | false | |
 | OCIS_LOG_COLOR<br/>AUDIT_LOG_COLOR | bool | false | |
 | OCIS_LOG_FILE<br/>AUDIT_LOG_FILE | string |  | |
-| AUDIT_DEBUG_ADDR | string |  | |
-| AUDIT_DEBUG_TOKEN | string |  | |
-| AUDIT_DEBUG_PPROF | bool | false | |
-| AUDIT_DEBUG_ZPAGES | bool | false | |
+| AUDIT_DEBUG_ADDR | string |  | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| AUDIT_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
+| AUDIT_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| AUDIT_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
 | AUDIT_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the streaming service.|
 | AUDIT_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the streaming service. Mandatory when using nats.|
 | AUDIT_EVENTS_GROUP | string | audit | The consumergroup of the service. One group will only get one copy of an event.|

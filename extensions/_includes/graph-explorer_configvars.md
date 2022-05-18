@@ -10,10 +10,10 @@
 | OCIS_LOG_PRETTY<br/>GRAPH_EXPLORER_LOG_PRETTY | bool | false | Enable pretty logs.|
 | OCIS_LOG_COLOR<br/>GRAPH_EXPLORER_LOG_COLOR | bool | false | Enable colored logs.|
 | OCIS_LOG_FILE<br/>GRAPH_EXPLORER_LOG_FILE | string |  | The path to the log file when logging to file.|
-| GRAPH_EXPLORER_DEBUG_ADDR | string | 127.0.0.1:9136 | |
-| GRAPH_EXPLORER_DEBUG_TOKEN | string |  | |
-| GRAPH_EXPLORER_DEBUG_PPROF | bool | false | |
-| GRAPH_EXPLORER_DEBUG_ZPAGES | bool | false | |
+| GRAPH_EXPLORER_DEBUG_ADDR | string | 127.0.0.1:9136 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| GRAPH_EXPLORER_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
+| GRAPH_EXPLORER_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| GRAPH_EXPLORER_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
 | GRAPH_EXPLORER_HTTP_ADDR | string | 127.0.0.1:9135 | The HTTP service address.|
 | GRAPH_EXPLORER_HTTP_ROOT | string | /graph-explorer | The HTTP service root path.|
 | GRAPH_EXPLORER_CLIENT_ID | string | ocis-explorer.js | |

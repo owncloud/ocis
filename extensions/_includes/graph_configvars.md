@@ -10,10 +10,10 @@
 | OCIS_LOG_PRETTY<br/>GRAPH_LOG_PRETTY | bool | false | |
 | OCIS_LOG_COLOR<br/>GRAPH_LOG_COLOR | bool | false | |
 | OCIS_LOG_FILE<br/>GRAPH_LOG_FILE | string |  | |
-| GRAPH_DEBUG_ADDR | string | 127.0.0.1:9124 | |
-| GRAPH_DEBUG_TOKEN | string |  | |
-| GRAPH_DEBUG_PPROF | bool | false | |
-| GRAPH_DEBUG_ZPAGES | bool | false | |
+| GRAPH_DEBUG_ADDR | string | 127.0.0.1:9124 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| GRAPH_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
+| GRAPH_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| GRAPH_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
 | GRAPH_HTTP_ADDR | string | 127.0.0.1:9120 | |
 | GRAPH_HTTP_ROOT | string | /graph | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |

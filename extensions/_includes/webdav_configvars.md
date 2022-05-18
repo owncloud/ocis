@@ -10,10 +10,10 @@
 | OCIS_LOG_PRETTY<br/>WEBDAV_LOG_PRETTY | bool | false | Enable pretty log output.|
 | OCIS_LOG_COLOR<br/>WEBDAV_LOG_COLOR | bool | false | Enable colored log output.|
 | OCIS_LOG_FILE<br/>WEBDAV_LOG_FILE | string |  | The path to the file if the log should write to file.|
-| WEBDAV_DEBUG_ADDR | string | 127.0.0.1:9119 | |
-| WEBDAV_DEBUG_TOKEN | string |  | |
-| WEBDAV_DEBUG_PPROF | bool | false | |
-| WEBDAV_DEBUG_ZPAGES | bool | false | |
+| WEBDAV_DEBUG_ADDR | string | 127.0.0.1:9119 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| WEBDAV_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
+| WEBDAV_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| WEBDAV_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
 | WEBDAV_HTTP_ADDR | string | 127.0.0.1:9115 | The HTTP API address.|
 | WEBDAV_HTTP_ROOT | string | / | The HTTP API root path.|
 | OCIS_URL<br/>OCIS_PUBLIC_URL | string | https://127.0.0.1:9200 | |

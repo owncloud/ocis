@@ -10,10 +10,10 @@
 | OCIS_LOG_PRETTY<br/>SHARING_LOG_PRETTY | bool | false | Activates pretty log output.|
 | OCIS_LOG_COLOR<br/>SHARING_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>SHARING_LOG_FILE | string |  | The target log file.|
-| SHARING_DEBUG_ADDR | string | 127.0.0.1:9151 | |
-| SHARING_DEBUG_TOKEN | string |  | |
-| SHARING_DEBUG_PPROF | bool | false | |
-| SHARING_DEBUG_ZPAGES | bool | false | |
+| SHARING_DEBUG_ADDR | string | 127.0.0.1:9151 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| SHARING_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
+| SHARING_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| SHARING_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
 | SHARING_GRPC_ADDR | string | 127.0.0.1:9150 | The address of the grpc service.|
 | SHARING_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>SHARING_JWT_SECRET | string |  | |

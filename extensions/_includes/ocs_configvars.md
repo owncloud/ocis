@@ -10,10 +10,10 @@
 | OCIS_LOG_PRETTY<br/>OCS_LOG_PRETTY | bool | false | |
 | OCIS_LOG_COLOR<br/>OCS_LOG_COLOR | bool | false | |
 | OCIS_LOG_FILE<br/>OCS_LOG_FILE | string |  | |
-| OCS_DEBUG_ADDR | string | 127.0.0.1:9114 | |
-| OCS_DEBUG_TOKEN | string |  | |
-| OCS_DEBUG_PPROF | bool | false | |
-| OCS_DEBUG_ZPAGES | bool | false | |
+| OCS_DEBUG_ADDR | string | 127.0.0.1:9114 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| OCS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
+| OCS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| OCS_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
 | OCS_HTTP_ADDR | string | 127.0.0.1:9110 | |
 | OCS_HTTP_ROOT | string | /ocs | |
 | OCIS_JWT_SECRET<br/>OCS_JWT_SECRET | string |  | |

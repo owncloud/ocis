@@ -10,10 +10,10 @@
 | OCIS_LOG_PRETTY<br/>SEARCH_LOG_PRETTY | bool | false | |
 | OCIS_LOG_COLOR<br/>SEARCH_LOG_COLOR | bool | false | |
 | OCIS_LOG_FILE<br/>SEARCH_LOG_FILE | string |  | |
-| SEARCH_DEBUG_ADDR | string | 127.0.0.1:9224 | |
-| SEARCH_DEBUG_TOKEN | string |  | |
-| SEARCH_DEBUG_PPROF | bool | false | |
-| SEARCH_DEBUG_ZPAGES | bool | false | |
+| SEARCH_DEBUG_ADDR | string | 127.0.0.1:9224 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| SEARCH_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
+| SEARCH_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| SEARCH_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
 | SEARCH_GRPC_ADDR | string | 127.0.0.1:9220 | The address of the grpc service.|
 | SEARCH_DATA_PATH | string | ~/.ocis/search | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |

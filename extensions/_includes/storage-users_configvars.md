@@ -10,10 +10,10 @@
 | OCIS_LOG_PRETTY<br/>STORAGE_USERS_LOG_PRETTY | bool | false | Activates pretty log output.|
 | OCIS_LOG_COLOR<br/>STORAGE_USERS_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>STORAGE_USERS_LOG_FILE | string |  | The target log file.|
-| STORAGE_USERS_DEBUG_ADDR | string | 127.0.0.1:9159 | |
-| STORAGE_USERS_DEBUG_TOKEN | string |  | |
-| STORAGE_USERS_DEBUG_PPROF | bool | false | |
-| STORAGE_USERS_DEBUG_ZPAGES | bool | false | |
+| STORAGE_USERS_DEBUG_ADDR | string | 127.0.0.1:9159 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| STORAGE_USERS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
+| STORAGE_USERS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| STORAGE_USERS_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
 | STORAGE_USERS_GRPC_ADDR | string | 127.0.0.1:9157 | The address of the grpc service.|
 | STORAGE_USERS_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | STORAGE_USERS_HTTP_ADDR | string | 127.0.0.1:9158 | The address of the http service.|

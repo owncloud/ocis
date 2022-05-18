@@ -10,10 +10,10 @@
 | OCIS_LOG_PRETTY<br/>GATEWAY_LOG_PRETTY | bool | false | Activates pretty log output.|
 | OCIS_LOG_COLOR<br/>GATEWAY_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>GATEWAY_LOG_FILE | string |  | The target log file.|
-| GATEWAY_DEBUG_ADDR | string | 127.0.0.1:9143 | |
-| GATEWAY_DEBUG_TOKEN | string |  | |
-| GATEWAY_DEBUG_PPROF | bool | false | |
-| GATEWAY_DEBUG_ZPAGES | bool | false | |
+| GATEWAY_DEBUG_ADDR | string | 127.0.0.1:9143 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| GATEWAY_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
+| GATEWAY_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| GATEWAY_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
 | GATEWAY_GRPC_ADDR | string | 127.0.0.1:9142 | The address of the grpc service.|
 | GATEWAY_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>GATEWAY_JWT_SECRET | string |  | |

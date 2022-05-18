@@ -10,10 +10,10 @@
 | OCIS_LOG_PRETTY<br/>PROXY_LOG_PRETTY | bool | false | |
 | OCIS_LOG_COLOR<br/>PROXY_LOG_COLOR | bool | false | |
 | OCIS_LOG_FILE<br/>PROXY_LOG_FILE | string |  | |
-| PROXY_DEBUG_ADDR | string | 127.0.0.1:9205 | |
-| PROXY_DEBUG_TOKEN | string |  | |
-| PROXY_DEBUG_PPROF | bool | false | |
-| PROXY_DEBUG_ZPAGES | bool | false | |
+| PROXY_DEBUG_ADDR | string | 127.0.0.1:9205 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| PROXY_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
+| PROXY_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| PROXY_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
 | PROXY_HTTP_ADDR | string | 0.0.0.0:9200 | |
 | PROXY_HTTP_ROOT | string | / | |
 | PROXY_TRANSPORT_TLS_CERT | string | ~/.ocis/proxy/server.crt | |
