@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Remove unused transfer secret from app provider: [#3798](https://github.com/owncloud/ocis/pull/3798)
 * Bugfix - Enable debug server by default: [#3827](https://github.com/owncloud/ocis/pull/3827)
+* Bugfix - Set default name for public link via capabilities: [#3834](https://github.com/owncloud/ocis/pull/3834)
 * Bugfix - Remove legacy accounts proxy routes: [#3831](https://github.com/owncloud/ocis/pull/3831)
 * Bugfix - Fix the `ocis search` command: [#3796](https://github.com/owncloud/ocis/pull/3796)
 * Bugfix - Rename search env variable for the grpc server address: [#3800](https://github.com/owncloud/ocis/pull/3800)
@@ -39,6 +40,14 @@ The following sections list the changes for unreleased.
    start their debug server by default.
 
    https://github.com/owncloud/ocis/pull/3827
+
+* Bugfix - Set default name for public link via capabilities: [#3834](https://github.com/owncloud/ocis/pull/3834)
+
+   We have now added a default name for public link shares which is communicated via the
+   capabilities.
+
+   https://github.com/owncloud/ocis/issues/1237
+   https://github.com/owncloud/ocis/pull/3834
 
 * Bugfix - Remove legacy accounts proxy routes: [#3831](https://github.com/owncloud/ocis/pull/3831)
 
