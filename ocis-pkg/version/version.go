@@ -1,7 +1,6 @@
 package version
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/Masterminds/semver"
@@ -50,9 +49,11 @@ func Parsed() *semver.Version {
 	return parsedVersion
 }
 
-// Long returns the legacy version with 4 number parts like 10.9.8.0
-func Long() string {
-	return strconv.FormatInt(Parsed().Major(), 10) + "." +
-		strconv.FormatInt(Parsed().Minor(), 10) + "." +
-		strconv.FormatInt(Parsed().Patch(), 10) + "." + "0"
+// ParsedLegacy returns the legacy version
+func ParsedLegacy() *semver.Version {
+	parsedVersion, err := semver.NewVersion(LegacyString)
+	if err != nil {
+		return &semver.Version{}
+	}
+	return parsedVersion
 }

@@ -216,9 +216,9 @@ func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
 						"version": map[string]interface{}{
 							"product": "Infinite Scale",
 							"edition": "Community",
-							"major":   version.Parsed().Major(),
-							"minor":   version.Parsed().Minor(),
-							"micro":   version.Parsed().Patch(),
+							"major":   version.ParsedLegacy().Major(),
+							"minor":   version.ParsedLegacy().Minor(),
+							"micro":   version.ParsedLegacy().Patch(),
 							"string":  version.LegacyString,
 						},
 					},
