@@ -27,6 +27,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpaces/shareSubItemOfSpace.feature:89](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpace.feature#L89)
 - [apiSpaces/shareSubItemOfSpace.feature:90](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpace.feature#L90)
 - [apiSpaces/shareSubItemOfSpace.feature:91](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpace.feature#L91)
+- [apiSpaces/shareSubItemOfSpace.feature:92](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpace.feature#L92)
 - [apiSpaces/shareSubItemOfSpaceViaPublicLink.feature:89](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpaceViaPublicLink.feature#L89)
 - [apiSpaces/shareSubItemOfSpaceViaPublicLink.feature:90](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpaceViaPublicLink.feature#L90)
 - [apiSpaces/shareSubItemOfSpaceViaPublicLink.feature:91](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpaceViaPublicLink.feature#L91)
