@@ -103,6 +103,10 @@ config = {
         "skipExceptParts": [],
         "earlyFail": True,
     },
+    "e2eTests": {
+        "skip": False,
+        "earlyFail": True,
+    },
     "settingsUITests": {
         "skip": False,
         "earlyFail": True,
@@ -371,6 +375,9 @@ def testPipelines(ctx):
 
     if "skip" not in config["uiTests"] or not config["uiTests"]["skip"]:
         pipelines += uiTests(ctx)
+
+    if "skip" not in config["e2eTests"] or not config["e2eTests"]["skip"]:
+        pipelines += e2eTests(ctx)
 
     if "skip" not in config["settingsUITests"] or not config["settingsUITests"]["skip"]:
         pipelines.append(settingsUITests(ctx))
@@ -834,6 +841,131 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
             ],
         },
     }
+
+def e2eTests(ctx):
+    e2e_trigger = {
+        "ref": [
+            "refs/heads/master",
+            "refs/tags/**",
+            "refs/pull/**",
+        ],
+    }
+
+    e2e_volumes = [{
+        "name": "uploads",
+        "temp": {},
+    }, {
+        "name": "configs",
+        "temp": {},
+    }, {
+        "name": "gopath",
+        "temp": {},
+    }]
+
+    e2e_test_ocis = [{
+        "name": "e2e-tests",
+        "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+        "environment": {
+            "BASE_URL_OCIS": "ocis-server:9200",
+            "HEADLESS": "true",
+            "OCIS": "true",
+            "RETRY": "1",
+            "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
+            "LOCAL_UPLOAD_DIR": "/uploads",
+        },
+        "commands": [
+            ". /drone/src/.drone.env",
+            "git clone -b $WEB_ASSETS_VERSION --single-branch --no-tags https://github.com/owncloud/web.git e2eTests",
+            "cd e2eTests",
+            "retry -t 3 'yarn install --immutable'",
+            "sleep 10 && yarn test:e2e:cucumber tests/e2e/cucumber/**/*[!.oc10].feature",
+        ],
+    }]
+
+    e2eTestsSteps = \
+        restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
+        ocisServer("ocis", 4, []) + \
+        e2e_test_ocis + \
+        uploadTracingResult(ctx) + \
+        publishTracingResult(ctx, "e2e test")
+
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
+        return [{
+            "kind": "pipeline",
+            "type": "docker",
+            "name": "e2e-tests",
+            "steps": e2eTestsSteps,
+            "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+            "trigger": e2e_trigger,
+            "volumes": e2e_volumes,
+        }]
+    return []
+
+def uploadTracingResult(ctx):
+    return [{
+        "name": "upload-tracing-result",
+        "image": PLUGINS_S3,
+        "pull": "if-not-exists",
+        "settings": {
+            "bucket": {
+                "from_secret": "cache_public_s3_bucket",
+            },
+            "endpoint": {
+                "from_secret": "cache_public_s3_server",
+            },
+            "path_style": True,
+            "source": "e2eTests/reports/e2e/playwright/tracing/**/*",
+            "strip_prefix": "e2eTests/reports/e2e/playwright/tracing",
+            "target": "${DRONE_BUILD_NUMBER}/tracing",
+        },
+        "environment": {
+            "AWS_ACCESS_KEY_ID": {
+                "from_secret": "cache_public_s3_access_key",
+            },
+            "AWS_SECRET_ACCESS_KEY": {
+                "from_secret": "cache_public_s3_secret_key",
+            },
+        },
+        "when": {
+            "status": [
+                "failure",
+            ],
+            "event": [
+                "pull_request",
+                "cron",
+            ],
+        },
+    }]
+
+def publishTracingResult(ctx, suite):
+    return [{
+        "name": "publish-tracing-result",
+        "image": OC_UBUNTU,
+        "commands": [
+            "cd e2eTests/reports/e2e/playwright/tracing/",
+            'echo "<details><summary>:boom: To see the trace, please open the link in the console ...</summary>\\n\\n<p>\\n\\n" >>  comments.file',
+            'for f in *.zip; do echo "#### npx playwright show-trace $CACHE_ENDPOINT/$CACHE_BUCKET/${DRONE_BUILD_NUMBER}/tracing/$f \n" >>  comments.file; done',
+            'echo "\n</p></details>" >>  comments.file',
+            "more  comments.file",
+        ],
+        "environment": {
+            "TEST_CONTEXT": suite,
+            "CACHE_ENDPOINT": {
+                "from_secret": "cache_public_s3_server",
+            },
+            "CACHE_BUCKET": {
+                "from_secret": "cache_public_s3_bucket",
+            },
+        },
+        "when": {
+            "status": [
+                "failure",
+            ],
+            "event": [
+                "pull_request",
+            ],
+        },
+    }]
 
 def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
     early_fail = config["settingsUITests"]["earlyFail"] if "earlyFail" in config["settingsUITests"] else False
