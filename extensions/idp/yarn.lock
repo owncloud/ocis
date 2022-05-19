@@ -63,7 +63,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/core@npm:^7.1.0, @babel/core@npm:^7.12.3, @babel/core@npm:^7.15.5, @babel/core@npm:^7.7.5":
+"@babel/core@npm:^7.1.0, @babel/core@npm:^7.12.3, @babel/core@npm:^7.7.5":
   version: 7.15.5
   resolution: "@babel/core@npm:7.15.5"
   dependencies:
@@ -4115,12 +4115,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-plugin-named-asset-import@npm:^0.3.6":
-  version: 0.3.7
-  resolution: "babel-plugin-named-asset-import@npm:0.3.7"
+"babel-plugin-named-asset-import@npm:^0.3.8":
+  version: 0.3.8
+  resolution: "babel-plugin-named-asset-import@npm:0.3.8"
   peerDependencies:
     "@babel/core": ^7.1.0
-  checksum: 4c9a42a2762f3d596a09105d05991525a0553d095030459d0f71449b023801ccc43e90fa20b618c52283dc61ca528a4a59df244e5b1dd583867786088eb473b7
+  checksum: d1e58df8cb75d91d070feea31087bc989906d3465144bde7e9f3c3690b514a90a55d3aebf3e65e76c5d4c743ecedde5f640f09f43a21fa60f1a5d413cb3f7a67
   languageName: node
   linkType: hard
 
@@ -9067,7 +9067,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "identifier@workspace:."
   dependencies:
-    "@babel/core": ^7.15.5
     "@babel/runtime": 7.13.10
     "@material-ui/core": ^4.8.0
     "@material-ui/icons": ^4.5.0
@@ -9078,7 +9077,7 @@ __metadata:
     babel-eslint: 10.1.0
     babel-jest: ^26.6.3
     babel-loader: 8.2.2
-    babel-plugin-named-asset-import: ^0.3.6
+    babel-plugin-named-asset-import: ^0.3.8
     babel-preset-react-app: ^10.0.0
     camelcase: ^6.2.0
     case-sensitive-paths-webpack-plugin: 2.4.0
