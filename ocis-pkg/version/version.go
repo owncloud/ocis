@@ -7,8 +7,16 @@ import (
 )
 
 var (
-	// String gets defined by the build system.
-	String = "dev"
+	// String gets defined by the build system
+	String string
+
+	// Tag gets defined by the build system
+	Tag string
+
+	// LatestTag is the latest released version plus the dev meta version.
+	// Will be overwritten by the release pipeline
+	// Needs a manual change for every tagged release
+	LatestTag = "2.0.0-beta1+dev"
 
 	// Date indicates the build date.
 	Date = time.Now().Format("20060102")
@@ -32,21 +40,27 @@ func GetString() string {
 }
 
 // Parsed returns a semver Version
-func Parsed() *semver.Version {
-	versionToParse := String
-	if String == "dev" {
-		versionToParse = "0.0.0+dev"
+func Parsed() (version *semver.Version) {
+	versionToParse := LatestTag
+	if Tag != "" {
+		versionToParse = Tag
 	}
-	parsedVersion, err := semver.NewVersion(versionToParse)
+	version, err := semver.NewVersion(versionToParse)
 	// We have no semver version but a commitid
 	if err != nil {
-		parsedVersion, err = semver.NewVersion("0.0.0+" + String)
 		// this should never happen
 		if err != nil {
 			return &semver.Version{}
 		}
 	}
-	return parsedVersion
+	if String != "" {
+		nVersion, err := version.SetMetadata(String)
+		if err != nil {
+			return &semver.Version{}
+		}
+		version = &nVersion
+	}
+	return version
 }
 
 // ParsedLegacy returns the legacy version
