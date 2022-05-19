@@ -3,6 +3,7 @@ package registry
 import (
 	"os"
 	"strings"
+	"time"
 
 	consulr "github.com/go-micro/plugins/v4/registry/consul"
 	etcdr "github.com/go-micro/plugins/v4/registry/etcd"
@@ -11,6 +12,7 @@ import (
 	natsr "github.com/go-micro/plugins/v4/registry/nats"
 
 	"go-micro.dev/v4/registry"
+	"go-micro.dev/v4/registry/cache"
 )
 
 var (
@@ -46,5 +48,7 @@ func GetRegistry() registry.Registry {
 		r = mdnsr.NewRegistry()
 	}
 
-	return r
+	// always use cached registry to prevent registry
+	// lookup for every request
+	return cache.New(r, cache.WithTTL(20*time.Second))
 }
