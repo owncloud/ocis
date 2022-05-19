@@ -21,6 +21,7 @@ package index
 import (
 	"context"
 	"errors"
+	"math"
 	"path"
 	"strings"
 	"time"
@@ -113,6 +114,7 @@ func (i *Index) markAsDeleted(id string, deleted bool) error {
 			bleve.NewQueryStringQuery("Path:"+doc.Path+"/*"),
 		)
 		bleveReq := bleve.NewSearchRequest(query)
+		bleveReq.Size = math.MaxInt
 		bleveReq.Fields = []string{"*"}
 		res, err := i.bleveIndex.Search(bleveReq)
 		if err != nil {
@@ -188,6 +190,7 @@ func (i *Index) Move(id *sprovider.ResourceId, fullPath string) error {
 			bleve.NewQueryStringQuery("Path:"+oldName+"/*"),
 		)
 		bleveReq := bleve.NewSearchRequest(query)
+		bleveReq.Size = math.MaxInt
 		bleveReq.Fields = []string{"*"}
 		res, err := i.bleveIndex.Search(bleveReq)
 		if err != nil {
@@ -294,6 +297,7 @@ func fieldsToEntity(fields map[string]interface{}) *indexDocument {
 		Mtime:    fields["Mtime"].(string),
 		MimeType: fields["MimeType"].(string),
 		Type:     uint64(fields["Type"].(float64)),
+		Deleted:  fields["Deleted"].(bool),
 	}
 	return doc
 }
