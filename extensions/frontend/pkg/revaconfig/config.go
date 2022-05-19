@@ -166,12 +166,13 @@ func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
 								"default_permissions":               22,
 								"search_min_length":                 3,
 								"public": map[string]interface{}{
-									"enabled":              true,
-									"send_mail":            true,
-									"social_share":         true,
-									"upload":               true,
-									"multiple":             true,
-									"supports_upload_only": true,
+									"enabled":                    true,
+									"send_mail":                  true,
+									"defaultPublicLinkShareName": "Public link",
+									"social_share":               true,
+									"upload":                     true,
+									"multiple":                   true,
+									"supports_upload_only":       true,
 									"password": map[string]interface{}{
 										"enforced": false,
 										"enforced_for": map[string]interface{}{

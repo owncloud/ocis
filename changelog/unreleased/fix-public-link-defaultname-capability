@@ -1,0 +1,6 @@
+Bugfix: Set default name for public link via capabilities
+
+We have now added a default name for public link shares which is communicated via the capabilities.
+
+https://github.com/owncloud/ocis/pull/3834
+https://github.com/owncloud/ocis/issues/1237
