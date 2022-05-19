@@ -11,8 +11,8 @@ type Cache struct {
 	// capacity and length have to be the first words
 	// in order to be 64-aligned on 32-bit architectures.
 	capacity, length uint64 // access atomically
-	entries  sync.Map
-	pool     sync.Pool
+	entries          sync.Map
+	pool             sync.Pool
 }
 
 // CacheEntry represents an entry on the cache. You can type assert on V.
