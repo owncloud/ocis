@@ -18,6 +18,8 @@
 | STORAGE_SYSTEM_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | STORAGE_SYSTEM_HTTP_ADDR | string | 127.0.0.1:9216 | The address of the http service.|
 | STORAGE_SYSTEM_HTTP_PROTOCOL | string | tcp | The transport protocol of the http service.|
+| STORAGE_SYSTEM_EVENTS_ENDPOINT | string |  | the address of the streaming service|
+| STORAGE_SYSTEM_EVENTS_CLUSTER | string |  | the clusterID of the streaming service. Mandatory when using nats|
 | OCIS_JWT_SECRET<br/>STORAGE_SYSTEM_JWT_SECRET | string |  | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
 | OCIS_SYSTEM_USER_API_KEY | string |  | |

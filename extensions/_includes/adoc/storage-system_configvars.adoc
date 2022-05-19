@@ -95,6 +95,16 @@
 | tcp
 | The transport protocol of the http service.
 
+|`STORAGE_SYSTEM_EVENTS_ENDPOINT`
+| string
+| 
+| the address of the streaming service
+
+|`STORAGE_SYSTEM_EVENTS_CLUSTER`
+| string
+| 
+| the clusterID of the streaming service. Mandatory when using nats
+
 |`OCIS_JWT_SECRET` +
 `STORAGE_SYSTEM_JWT_SECRET`
 | string
