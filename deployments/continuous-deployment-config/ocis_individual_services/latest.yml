@@ -38,6 +38,19 @@
           OCIS_DOMAIN: ocis.ocis-individual-services.latest.owncloud.works
           DEMO_USERS: "true"
           COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
+          IDP_LDAP_BIND_PASSWORD: "elirwlketrwe53453rt"
+          STORAGE_LDAP_BIND_PASSWORD: "ekrwelkjrtlkwertjlkertkert3423"
+          OCIS_JWT_SECRET: "kdfjlkertlk234534534589345"
+          OCIS_MACHINE_AUTH_API_KEY: "rekwelkrjttwer534534-5"
+          SYSTEM_USER_API_KEY: "ekrjwelrtj235345345g,mdfglk.ert"
+          IDM_SVC_PASSWORD: "kljrhewrlkj3479734534t"
+          IDM_REVASVC_PASSWORD: "lklkjhuihir2342839i90o4dsadsd"
+          IDM_IDPSVC_PASSWORD: "jrhekr3453458734tkjert"
+          OCIS_SYSTEM_USER_ID: "d9d0f4d1-fe3c-457e-92e3-e18b3b366bbe"
+          SYSTEM_USER_ID: "3693ecf8-4164-4879-bdf3-ea3425df3c6e"
+          ADMIN_USER_ID: "09246a85-682a-4cd5-996d-8e8d2aca50af"
+          ADMIN_USER_PASSWORD: "admin"
+          PROXY_ENABLE_BASIC_AUTH: "true"
       - name: monitoring
         git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git
         ref: master
