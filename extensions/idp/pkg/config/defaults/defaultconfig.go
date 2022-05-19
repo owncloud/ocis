@@ -36,13 +36,13 @@ func DefaultConfig() *config.Config {
 		},
 		IDP: config.Settings{
 			Iss:                               "https://localhost:9200",
-			IdentityManager:                   "cs3",
+			IdentityManager:                   "ldap",
 			URIBasePath:                       "",
 			SignInURI:                         "",
 			SignedOutURI:                      "",
 			AuthorizationEndpointURI:          "",
 			EndsessionEndpointURI:             "",
-			Insecure:                          true, // TODO grpc requires service certificates
+			Insecure:                          false,
 			TrustedProxy:                      nil,
 			AllowScope:                        nil,
 			AllowClientGuests:                 false,
