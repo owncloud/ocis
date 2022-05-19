@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Remove unused transfer secret from app provider: [#3798](https://github.com/owncloud/ocis/pull/3798)
 * Bugfix - Enable debug server by default: [#3827](https://github.com/owncloud/ocis/pull/3827)
+* Bugfix - Remove legacy accounts proxy routes: [#3831](https://github.com/owncloud/ocis/pull/3831)
 * Bugfix - Fix the `ocis search` command: [#3796](https://github.com/owncloud/ocis/pull/3796)
 * Bugfix - Rename search env variable for the grpc server address: [#3800](https://github.com/owncloud/ocis/pull/3800)
 * Bugfix - Fix the idm and settings extensions' admin user id configuration option: [#3799](https://github.com/owncloud/ocis/pull/3799)
@@ -38,6 +39,14 @@ The following sections list the changes for unreleased.
    start their debug server by default.
 
    https://github.com/owncloud/ocis/pull/3827
+
+* Bugfix - Remove legacy accounts proxy routes: [#3831](https://github.com/owncloud/ocis/pull/3831)
+
+   We've removed the legacy accounts routes from the proxy default config. There were no longer
+   used since the switch to IDM as the default user backend. Also accounts is no longer part of the
+   oCIS binary and therefore should not be part of the proxy default route config.
+
+   https://github.com/owncloud/ocis/pull/3831
 
 * Bugfix - Fix the `ocis search` command: [#3796](https://github.com/owncloud/ocis/pull/3796)
 
