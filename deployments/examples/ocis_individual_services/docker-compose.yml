@@ -22,7 +22,7 @@ services:
     networks:
       ocis-net:
         aliases:
-          - ${OCIS_DOMAIN:-ocis.owncloud.test}
+          - ${OCIS_DOMAIN}
     command:
       - "--log.level=${TRAEFIK_LOG_LEVEL:-ERROR}"
       # letsencrypt configuration
@@ -72,7 +72,7 @@ services:
       APP_REGISTRY_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       APP_REGISTRY_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
-      APP_REGISTRY_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      APP_REGISTRY_JWT_SECRET: ${OCIS_JWT_SECRET}
 
       APP_REGISTRY_GRPC_ADDR: 0.0.0.0:9242
       REVA_GATEWAY: gateway:9142
@@ -100,7 +100,7 @@ services:
       APP_PROVIDER_EXTERNAL_ADDR: app-provider:9164
 
       REVA_GATEWAY: gateway:9142
-      APP_PROVIDER_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      APP_PROVIDER_JWT_SECRET: ${OCIS_JWT_SECRET}
     logging:
       driver: "local"
     restart: always
@@ -122,7 +122,7 @@ services:
 
       REVA_GATEWAY: gateway:9142
       NOTIFICATIONS_EVENTS_ENDPOINT: nats:9233
-      NOTIFICATIONS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
+      NOTIFICATIONS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY}
     logging:
       driver: "local"
     restart: always
@@ -145,16 +145,16 @@ services:
       IDM_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       IDM_LDAPS_ADDR: 0.0.0.0:9235
-      IDM_ADMIN_USER_ID: ${ADMIN_USER_ID:-09246a85-682a-4cd5-996d-8e8d2aca50af}
-      IDM_ADMIN_PASSWORD: ${ADMIN_USER_PASSWORD:-"changeme"}
-      IDM_SVC_PASSWORD: ${IDM_SVC_PASSWORD:-changeme}
-      IDM_REVASVC_PASSWORD:  ${IDM_REVASVC_PASSWORD:-changeme}
-      IDM_IDPSVC_PASSWORD:  ${IDM_IDPSVC_PASSWORD:-changeme}
+      IDM_ADMIN_USER_ID: ${ADMIN_USER_ID}
+      IDM_ADMIN_PASSWORD: ${ADMIN_USER_PASSWORD}
+      IDM_SVC_PASSWORD: ${IDM_SVC_PASSWORD}
+      IDM_REVASVC_PASSWORD:  ${IDM_REVASVC_PASSWORD}
+      IDM_IDPSVC_PASSWORD:  ${IDM_IDPSVC_PASSWORD}
 
 
       IDM_CREATE_DEMO_USERS: ${DEMO_USERS:-false}
 
-      IDM_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      IDM_JWT_SECRET: ${OCIS_JWT_SECRET}
     logging:
       driver: "local"
     restart: always
@@ -176,10 +176,10 @@ services:
 
       OCDAV_HTTP_ADDR: 0.0.0.0:8080
 
-      OCDAV_PUBLIC_URL: ${OCIS_DOMAIN:-ocis.owncloud.test}
+      OCDAV_PUBLIC_URL: ${OCIS_DOMAIN}
 
       REVA_GATEWAY: gateway:9142
-      OCDAV_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      OCDAV_JWT_SECRET: ${OCIS_JWT_SECRET}
     logging:
       driver: "local"
     restart: always
@@ -200,8 +200,8 @@ services:
       GRAPH_EXPLOER_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       GRAPH_EXPLORER_HTTP_ADDR: 0.0.0.0:9135
-      GRAPH_EXPLORER_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      GRAPH_EXPLORER_GRAPH_URL_BASE: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      GRAPH_EXPLORER_ISSUER: https://${OCIS_DOMAIN}
+      GRAPH_EXPLORER_GRAPH_URL_BASE: https://${OCIS_DOMAIN}
     logging:
       driver: "local"
     restart: always
@@ -245,11 +245,11 @@ services:
 
       REVA_GATEWAY: gateway:9142
 
-      PROXY_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      PROXY_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
+      PROXY_JWT_SECRET: ${OCIS_JWT_SECRET}
+      PROXY_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY}
 
       PROXY_OIDC_INSECURE: "${INSECURE:-true}"
-      PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      PROXY_OIDC_ISSUER: https://${OCIS_DOMAIN}
 
       PROXY_INSECURE_BACKENDS: true
       PROXY_HTTP_ADDR: 0.0.0.0:9200
@@ -261,8 +261,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=https"
-      - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test\
-        }`)"
+      - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN}`)"
       - "traefik.http.routers.ocis.tls.certresolver=http"
       - "traefik.http.routers.ocis.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
@@ -311,9 +310,9 @@ services:
       IDP_HTTP_ADDR: 0.0.0.0:9130
 
       IDP_LDAP_URI: ldaps://idm:9235
-      IDP_LDAP_BIND_PASSWORD: ${IDM_IDPSVC_PASSWORD:-changeme}
+      IDP_LDAP_BIND_PASSWORD: ${IDM_IDPSVC_PASSWORD}
 
-      IDP_ISS: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      IDP_ISS: https://${OCIS_DOMAIN}
       IDP_INSECURE: "${INSECURE:-true}"
     logging:
       driver: "local"
@@ -337,10 +336,10 @@ services:
       OCS_HTTP_ADDR: 0.0.0.0:9110
 
       OCS_ACCOUNT_BACKEND_TYPE: accounts
-      OCS_IDM_ADDRESS: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      OCS_IDM_ADDRESS: https://${OCIS_DOMAIN}
 
-      OCS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      OCS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
+      OCS_JWT_SECRET: ${OCIS_JWT_SECRET}
+      OCS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY}
 
       REVA_GATEWAY: gateway:9142
     logging:
@@ -369,9 +368,9 @@ services:
       REVA_GATEWAY: gateway:9142
       SEARCH_EVENTS_ENDPOINT: nats:9233
 
-      SEARCH_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
-      OCIS_SYSTEM_USER_API_KEY: ${SYSTEM_USER_API_KEY:-changme}
-      OCIS_SYSTEM_USER_ID: ${SYSTEM_USER_ID:-changeme}
+      SEARCH_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY}
+      OCIS_SYSTEM_USER_API_KEY: ${SYSTEM_USER_API_KEY}
+      OCIS_SYSTEM_USER_ID: ${SYSTEM_USER_ID}
     logging:
       driver: "local"
     restart: always
@@ -394,12 +393,12 @@ services:
       SETTINGS_HTTP_ADDR: 0.0.0.0:9190
       SETTINGS_GRPC_ADDR: 0.0.0.0:9191
 
-      SETTINGS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      SETTINGS_JWT_SECRET: ${OCIS_JWT_SECRET}
 
-      OCIS_SYSTEM_USER_API_KEY: ${SYSTEM_USER_API_KEY:-changeme}
-      OCIS_SYSTEM_USER_ID: ${SYSTEM_USER_ID:-changeme}
+      OCIS_SYSTEM_USER_API_KEY: ${SYSTEM_USER_API_KEY}
+      OCIS_SYSTEM_USER_ID: ${SYSTEM_USER_ID}
 
-      SETTINGS_ADMIN_USER_ID: ${ADMIN_USER_ID:-09246a85-682a-4cd5-996d-8e8d2aca50af}
+      SETTINGS_ADMIN_USER_ID: ${ADMIN_USER_ID}
 
       STORAGE_GATEWAY_GRPC_ADDR: storage-system:9215
       STORAGE_GRPC_ADDR: storage-system:9215
@@ -427,9 +426,9 @@ services:
 
       STORE_GRPC_ADDR: 0.0.0.0:9460
 
-      OCIS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-changeme}
-      OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
+      OCIS_JWT_SECRET: ${OCIS_JWT_SECRET}
+      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET}
+      OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY}
 
     volumes:
       - "ocis-store:/var/lib/ocis"
@@ -482,10 +481,10 @@ services:
 
       WEB_HTTP_ADDR: 0.0.0.0:9100
 
-      WEB_OIDC_AUTHORITY: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      WEB_UI_THEME_SERVER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      WEB_UI_CONFIG_SERVER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      WEB_OIDC_METADATA_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}/.well-known/openid-configuration
+      WEB_OIDC_AUTHORITY: https://${OCIS_DOMAIN}
+      WEB_UI_THEME_SERVER: https://${OCIS_DOMAIN}
+      WEB_UI_CONFIG_SERVER: https://${OCIS_DOMAIN}
+      WEB_OIDC_METADATA_URL: https://${OCIS_DOMAIN}/.well-known/openid-configuration
     logging:
       driver: "local"
     restart: always
@@ -507,7 +506,7 @@ services:
 
       WEBDAV_HTTP_ADDR: 0.0.0.0:9115
 
-      OCIS_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      OCIS_PUBLIC_URL: https://${OCIS_DOMAIN}
       REVA_GATEWAY: gateway:9142
     logging:
       driver: "local"
@@ -529,16 +528,16 @@ services:
       GRAPH_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       GRAPH_HTTP_ADDR: 0.0.0.0:9120
-      GRAPH_SPACES_WEBDAV_BASE: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      GRAPH_SPACES_WEBDAV_BASE: https://${OCIS_DOMAIN}
 
       GRAPH_LDAP_URI: ldaps://idm:9235
-      GRAPH_LDAP_BIND_PASSWORD: ${IDM_SVC_PASSWORD:-changeme}
+      GRAPH_LDAP_BIND_PASSWORD: ${IDM_SVC_PASSWORD}
       GRAPH_LDAP_INSECURE: true # TODO: fix me https://github.com/owncloud/ocis/issues/3818
       REVA_GATEWAY: gateway:9142
 
       GRAPH_EVENTS_ENDPOINT: nats:9233
 
-      GRAPH_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      GRAPH_JWT_SECRET: ${OCIS_JWT_SECRET}
 
     logging:
       driver: "local"
@@ -565,13 +564,13 @@ services:
       STORAGE_SYSTEM_HTTP_ADDR: 0.0.0.0:9216
       STORAGE_SYSTEM_DATA_SERVER_URL: http://storage-system:9216/data
 
-      STORAGE_SYSTEM_JWT_SECRET: ${OCIS_METADATA_JWT_SECRET:-Pive-Fumkiu4}
-      STORAGE_SYSTEM_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-changeme}
+      STORAGE_SYSTEM_JWT_SECRET: ${OCIS_JWT_SECRET}
+      STORAGE_SYSTEM_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET}
 
-      OCIS_SYSTEM_USER_ID: ${SYSTEM_USER_ID:-changeme}
+      OCIS_SYSTEM_USER_ID: ${SYSTEM_USER_ID}
       STORAGE_SYSTEM_DRIVER: ocis
 
-      OCIS_SYSTEM_USER_API_KEY: ${SYSTEM_USER_API_KEY:-changeme}
+      OCIS_SYSTEM_USER_API_KEY: ${SYSTEM_USER_API_KEY}
 
       REVA_GATEWAY: gateway:9142
     volumes:
@@ -599,12 +598,12 @@ services:
       REVA_GATEWAY: gateway:9142
       STORAGE_AUTH_BASIC_ENDPOINT: auth-basic:9146
 
-      AUTH_BASIC_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      AUTH_BASIC_JWT_SECRET: ${OCIS_JWT_SECRET}
 
       AUTH_BASIC_LDAP_URI: ldaps://idm:9235
       AUTH_BASIC_LDAP_CACERT: ""
       AUTH_BASIC_LDAP_INSECURE: "true"
-      AUTH_BASIC_LDAP_BIND_PASSWORD: ${IDM_REVASVC_PASSWORD:-changeme}
+      AUTH_BASIC_LDAP_BIND_PASSWORD: ${IDM_REVASVC_PASSWORD}
       AUTH_BASIC_IDP_URL: https://${OCIS_DOMAIN}
 
     logging:
@@ -628,8 +627,8 @@ services:
 
       AUTH_MACHINE_GRPC_ADDR: 0.0.0.0:9166
 
-      AUTH_MACHINE_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      AUTH_MACHINE_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
+      AUTH_MACHINE_JWT_SECRET: ${OCIS_JWT_SECRET}
+      AUTH_MACHINE_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY}
       REVA_GATEWAY: gateway:9142
     logging:
       driver: "local"
@@ -652,9 +651,9 @@ services:
 
       AUTH_BEARER_GRPC_ADDR: 0.0.0.0:9148
 
-      AUTH_BEARER_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      AUTH_BEARER_JWT_SECRET: ${OCIS_JWT_SECRET}
       REVA_GATEWAY: gateway:9142
-      AUTH_BEARER_OIDC_ISSUER: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      AUTH_BEARER_OIDC_ISSUER: https://${OCIS_DOMAIN}
 
     logging:
       driver: "local"
@@ -679,7 +678,7 @@ services:
 
       STORAGE_SHARES_USER_SHARE_PROVIDER_ENDPOINT: sharing:9150
 
-      STORAGE_SHARES_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      STORAGE_SHARES_JWT_SECRET: ${OCIS_JWT_SECRET}
       REVA_GATEWAY: gateway:9142
     logging:
       driver: "local"
@@ -714,8 +713,8 @@ services:
 
       REVA_GATEWAY: gateway:9142
 
-      STORAGE_USERS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      STORAGE_USERS_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-changeme}
+      STORAGE_USERS_JWT_SECRET: ${OCIS_JWT_SECRET}
+      STORAGE_USERS_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET}
 
     volumes:
       - "ocis-storage-users:/var/lib/ocis"
@@ -740,7 +739,7 @@ services:
 
       STORAGE_PUBLICLINK_GRPC_ADDR: 0.0.0.0:9178
 
-      STORAGE_PUBLICLINK_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      STORAGE_PUBLICLINK_JWT_SECRET: ${OCIS_JWT_SECRET}
       REVA_GATEWAY: gateway:9142
     logging:
       driver: "local"
@@ -765,7 +764,7 @@ services:
 
       SHARING_EVENTS_ENDPOINT: nats:9233
 
-      SHARING_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      SHARING_JWT_SECRET: ${OCIS_JWT_SECRET}
       REVA_GATEWAY: gateway:9142
 
       SHARING_USER_DRIVER: json
@@ -795,12 +794,12 @@ services:
       USERS_LDAP_URI: ldaps://idm:9235
       USERS_LDAP_CACERT: ""
       USERS_LDAP_INSECURE: ${INSECURE:-true}
-      USERS_LDAP_BIND_PASSWORD: ${IDM_REVASVC_PASSWORD:-changeme}
-      USERS_IDP_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      USERS_LDAP_BIND_PASSWORD: ${IDM_REVASVC_PASSWORD}
+      USERS_IDP_URL: https://${OCIS_DOMAIN}
 
       REVA_GATEWAY: gateway:9142
 
-      USERS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      USERS_JWT_SECRET: ${OCIS_JWT_SECRET}
     logging:
       driver: "local"
     restart: always
@@ -825,12 +824,12 @@ services:
       GROUPS_LDAP_URI: ldaps://idm:9235
       GROUPS_LDAP_CACERT: ""
       GROUPS_LDAP_INSECURE: ${INSECURE:-true}
-      GROUPS_LDAP_BIND_PASSWORD: ${IDM_REVASVC_PASSWORD:-changeme}
-      GROUPS_IDP_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      GROUPS_LDAP_BIND_PASSWORD: ${IDM_REVASVC_PASSWORD}
+      GROUPS_IDP_URL: https://${OCIS_DOMAIN}
 
       REVA_GATEWAY: gateway:9142
 
-      GROUPS_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      GROUPS_JWT_SECRET: ${OCIS_JWT_SECRET}
     logging:
       driver: "local"
     restart: always
@@ -851,12 +850,12 @@ services:
       FRONTEND_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       FRONTEND_HTTP_ADDR: 0.0.0.0:9140
-      FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.text}
+      FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN}
 
-      FRONTEND_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
+      FRONTEND_JWT_SECRET: ${OCIS_JWT_SECRET}
       REVA_GATEWAY: gateway:9142
-      FRONTEND_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY:-changeme}
-      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-changeme}
+      FRONTEND_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY}
+      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET}
 
     logging:
       driver: "local"
@@ -879,7 +878,7 @@ services:
 
       GATEWAY_GRPC_ADDR: 0.0.0.0:9142
 
-      GATEWAY_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      GATEWAY_FRONTEND_PUBLIC_URL: https://${OCIS_DOMAIN}
 
       GATEWAY_USERS_ENDPOINT: users:9144
       GATEWAY_GROUPS_ENDPOINT: groups:9160
@@ -893,8 +892,8 @@ services:
       GATEWAY_STORAGE_SHARES_ENDPOINT: storage-shares:9154
       GATEWAY_APP_REGISTRY_ENDPOINT: app-registry:9242
 
-      GATEWAY_JWT_SECRET: ${OCIS_JWT_SECRET:-Pive-Fumkiu4}
-      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET:-changeme}
+      GATEWAY_JWT_SECRET: ${OCIS_JWT_SECRET}
+      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET}
     logging:
       driver: "local"
     restart: always
