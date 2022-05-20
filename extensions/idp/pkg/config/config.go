@@ -37,7 +37,7 @@ type Ldap struct {
 	BindDN       string `yaml:"bind_dn" env:"LDAP_BIND_DN;IDP_LDAP_BIND_DN"`
 	BindPassword string `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;IDP_LDAP_BIND_PASSWORD"`
 
-	BaseDN string `yaml:"base_dn" env:"LDAP_USER_BASE_DN,IDP_LDAP_BASE_DN"`
+	BaseDN string `yaml:"base_dn" env:"LDAP_USER_BASE_DN;IDP_LDAP_BASE_DN"`
 	Scope  string `yaml:"scope" env:"LDAP_USER_SCOPE;IDP_LDAP_SCOPE"`
 
 	LoginAttribute    string `yaml:"login_attribute" env:"IDP_LDAP_LOGIN_ATTRIBUTE"`
