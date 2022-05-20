@@ -22,6 +22,9 @@ http:
   tls_cert: ~/.ocis/idp/server.crt
   tls_key: ~/.ocis/idp/server.key
   tls: false
+reva:
+  address: 127.0.0.1:9142
+machine_auth_api_key: ""
 asset:
   asset: ""
 idp:

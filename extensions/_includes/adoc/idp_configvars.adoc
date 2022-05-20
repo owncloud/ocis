@@ -105,6 +105,17 @@
 | false
 | 
 
+|`REVA_GATEWAY`
+| string
+| 127.0.0.1:9142
+| CS3 gateway used to authenticate and look up users
+
+|`OCIS_MACHINE_AUTH_API_KEY` +
+`IDP_MACHINE_AUTH_API_KEY`
+| string
+| 
+| Machine auth API key used to impersonate users when looking up their userinfo via the 'cs3' backend.
+
 |`IDP_ASSET_PATH`
 | string
 | 
@@ -115,12 +126,12 @@
 `IDP_ISS`
 | string
 | \https://localhost:9200
-| 
+| The OIDC issuer URL to use.
 
 |`IDP_IDENTITY_MANAGER`
 | string
 | ldap
-| 
+| The identity manager implementation to use, defaults to 'ldap', can be changed to 'cs3', 'kc', 'libregraph', 'cookie' or 'guest'.
 
 |`IDP_URI_BASE_PATH`
 | string
@@ -150,7 +161,7 @@
 |`IDP_INSECURE`
 | bool
 | false
-| 
+| Allow insecure connections to the backend.
 
 |`IDP_ALLOW_CLIENT_GUESTS`
 | bool
