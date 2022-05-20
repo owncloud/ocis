@@ -14,8 +14,6 @@ import (
 	"github.com/owncloud/ocis/v2/extensions/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/extensions/graph/pkg/identity/ldap"
 	graphm "github.com/owncloud/ocis/v2/extensions/graph/pkg/middleware"
-	"github.com/owncloud/ocis/v2/ocis-pkg/account"
-	opkgm "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -171,19 +169,13 @@ func NewService(opts ...Option) Service {
 					})
 				})
 			})
-			r.Group(func(r chi.Router) {
-				r.Use(opkgm.ExtractAccountUUID(
-					account.Logger(options.Logger),
-					account.JWTSecret(options.Config.TokenManager.JWTSecret)),
-				)
-				r.Route("/drives", func(r chi.Router) {
-					r.Get("/", svc.GetAllDrives)
-					r.Post("/", svc.CreateDrive)
-					r.Route("/{driveID}", func(r chi.Router) {
-						r.Patch("/", svc.UpdateDrive)
-						r.Get("/", svc.GetSingleDrive)
-						r.Delete("/", svc.DeleteDrive)
-					})
+			r.Route("/drives", func(r chi.Router) {
+				r.Get("/", svc.GetAllDrives)
+				r.Post("/", svc.CreateDrive)
+				r.Route("/{driveID}", func(r chi.Router) {
+					r.Patch("/", svc.UpdateDrive)
+					r.Get("/", svc.GetSingleDrive)
+					r.Delete("/", svc.DeleteDrive)
 				})
 			})
 		})
