@@ -19,7 +19,7 @@ type Config struct {
 
 	TokenManager     *TokenManager `yaml:"token_manager"`
 	Reva             *Reva         `yaml:"reva"`
-	SystemUserID     string        `yaml:"system_user_id"`
+	SystemUserID     string        `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID"`
 	SystemUserAPIKey string        `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY"`
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_SYSTEM_SKIP_USER_GROUPS_IN_TOKEN"`
