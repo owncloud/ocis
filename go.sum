@@ -802,8 +802,8 @@ github.com/klauspost/cpuid/v2 v2.0.1/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa02
 github.com/klauspost/cpuid/v2 v2.0.4/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa0213Md/qVLRg=
 github.com/klauspost/cpuid/v2 v2.0.9 h1:lgaqFMSdTdQYdZ04uHyN2d/eKdOMyi2YLSvlQIBFYa4=
 github.com/klauspost/cpuid/v2 v2.0.9/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa0213Md/qVLRg=
-github.com/kobergj/reva/v2 v2.0.0-20220516090328-2abecafbde25 h1:2s+c9dXhukbUohBmRjd/3El3SBmeCVVKKOwR8waCnSk=
-github.com/kobergj/reva/v2 v2.0.0-20220516090328-2abecafbde25/go.mod h1:uGeTncJa3FISh8AERkbZYVNXFV40PjYyRht5L09i+LQ=
+github.com/kobergj/reva/v2 v2.0.0-20220524103201-f957c0cab585 h1:Im3x/f1IhmV1UpUvYDXu/xKAwEgINxeKqC1yPFem+hQ=
+github.com/kobergj/reva/v2 v2.0.0-20220524103201-f957c0cab585/go.mod h1:uGeTncJa3FISh8AERkbZYVNXFV40PjYyRht5L09i+LQ=
 github.com/kolo/xmlrpc v0.0.0-20200310150728-e0350524596b/go.mod h1:o03bZfuBwAXHetKXuInt4S7omeXUu62/A845kiycsSQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.2/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
