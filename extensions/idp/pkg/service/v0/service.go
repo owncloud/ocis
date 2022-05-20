@@ -60,7 +60,6 @@ func NewService(opts ...Option) Service {
 		logger.Fatal().Err(err).Msg("could not create default config")
 	}
 
-	//
 	switch options.Config.IDP.IdentityManager {
 	case "cs3":
 		cs3BackendSupport.MustRegister()

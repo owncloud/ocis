@@ -33,16 +33,19 @@ const (
 	identityManagerName = "cs3"
 )
 
+// Register adds the CS3 identity manager to the lico bootstrap
 func Register() error {
 	return bootstrap.RegisterIdentityManager(identityManagerName, NewIdentityManager)
 }
 
+// MustRegister adds the CS3 identity manager to the lico bootstrap or panics
 func MustRegister() {
 	if err := Register(); err != nil {
 		panic(err)
 	}
 }
 
+// NewIdentityManager produces a CS3 backed identity manager instance for the idp
 func NewIdentityManager(bs bootstrap.Bootstrap) (identity.Manager, error) {
 	config := bs.Config()
 
@@ -69,8 +72,9 @@ func NewIdentityManager(bs bootstrap.Bootstrap) (identity.Manager, error) {
 	identifierBackend, identifierErr := cs3.NewCS3Backend(
 		config.Config,
 		config.TLSClientConfig,
-		os.Getenv("CS3_GATEWAY"),              // FIXME how do we pass custom config to backends?
-		os.Getenv("CS3_MACHINE_AUTH_API_KEY"), // FIXME how do we pass custom config to backends?
+		// FIXME add a map[string]interface{} property to the lico config.Config so backends can pass custom config parameters through the bootstrap process
+		os.Getenv("CS3_GATEWAY"),
+		os.Getenv("CS3_MACHINE_AUTH_API_KEY"),
 		config.Settings.Insecure,
 	)
 	if identifierErr != nil {

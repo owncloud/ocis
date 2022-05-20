@@ -71,7 +71,7 @@ type Settings struct {
 
 	Iss string `yaml:"iss" env:"OCIS_URL;OCIS_OIDC_ISSUER;IDP_ISS" desc:"The OIDC issuer URL to use."`
 
-	IdentityManager string `yaml:"identity_manager" env:"IDP_IDENTITY_MANAGER" desc:"The identity manager implementation to use, can be 'ldap', 'cs3', 'kc', 'libregraph', 'cookie' or 'guest'."`
+	IdentityManager string `yaml:"identity_manager" env:"IDP_IDENTITY_MANAGER" desc:"The identity manager implementation to use, defaults to 'ldap', can be changed to 'cs3', 'kc', 'libregraph', 'cookie' or 'guest'."`
 
 	URIBasePath string `yaml:"uri_base_path" env:"IDP_URI_BASE_PATH"`
 

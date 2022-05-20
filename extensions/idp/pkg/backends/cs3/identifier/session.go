@@ -9,7 +9,7 @@ import (
 
 // createSession creates a new Session without the server using the provided
 // data.
-func createSession(ctx context.Context, u *cs3user.User) (*cs3Session, error) {
+func createSession(ctx context.Context, u *cs3user.User) *cs3Session {
 
 	if ctx == nil {
 		ctx = context.Background()
@@ -24,7 +24,7 @@ func createSession(ctx context.Context, u *cs3user.User) (*cs3Session, error) {
 
 	s.when = time.Now()
 
-	return s, nil
+	return s
 }
 
 type cs3Session struct {

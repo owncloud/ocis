@@ -43,6 +43,7 @@ type CS3Backend struct {
 	gateway cs3gateway.GatewayAPIClient
 }
 
+// NewCS3Backend creates a new CS3 backend identifier backend
 func NewCS3Backend(
 	c *config.Config,
 	tlsConfig *tls.Config,
@@ -94,19 +95,16 @@ func (b *CS3Backend) Logon(ctx context.Context, audience, username, password str
 		ClientId:     username,
 		ClientSecret: password,
 	})
-	if err != nil || res.Status.Code != cs3rpc.Code_CODE_OK {
-		return false, nil, nil, nil, nil
+	if err != nil {
+		return false, nil, nil, nil, fmt.Errorf("cs3 backend basic authenticate rpc error: %v", err)
 	}
-	res2, err := client.WhoAmI(ctx, &cs3gateway.WhoAmIRequest{
-		Token: res.Token,
-	})
-	if err != nil || res2.Status.Code != cs3rpc.Code_CODE_OK {
-		return false, nil, nil, nil, nil
+	if res.Status.Code != cs3rpc.Code_CODE_OK {
+		return false, nil, nil, nil, fmt.Errorf("cs3 backend basic authenticate failed with code %s: %s", res.Status.Code.String(), res.Status.Message)
 	}
 
-	session, _ := createSession(ctx, res2.User)
+	session := createSession(ctx, res.User)
 
-	user, err := newCS3User(res2.User)
+	user, err := newCS3User(res.User)
 	if err != nil {
 		return false, nil, nil, nil, fmt.Errorf("cs3 backend resolve entry data error: %v", err)
 	}
@@ -162,17 +160,14 @@ func (b *CS3Backend) ResolveUserByUsername(ctx context.Context, username string)
 		ClientId:     "username:" + username,
 		ClientSecret: b.machineAuthAPIKey,
 	})
-	if err != nil || res.Status.Code != cs3rpc.Code_CODE_OK {
-		return nil, nil
+	if err != nil {
+		return nil, fmt.Errorf("cs3 backend machine authenticate rpc error: %v", err)
 	}
-	res2, err := client.WhoAmI(ctx, &cs3gateway.WhoAmIRequest{
-		Token: res.Token,
-	})
-	if err != nil || res2.Status.Code != cs3rpc.Code_CODE_OK {
-		return nil, nil
+	if res.Status.Code != cs3rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("cs3 backend machine authenticate failed with code %s: %s", res.Status.Code.String(), res.Status.Message)
 	}
 
-	user, err := newCS3User(res2.User)
+	user, err := newCS3User(res.User)
 	if err != nil {
 		return nil, fmt.Errorf("cs3 backend resolve username data error: %v", err)
 	}

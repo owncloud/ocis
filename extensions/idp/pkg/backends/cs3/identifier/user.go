@@ -43,10 +43,6 @@ func (u *cs3User) Username() string {
 	return u.u.GetUsername()
 }
 
-func (u *cs3User) ID() int64 {
-	return u.u.GetUidNumber()
-}
-
 func (u *cs3User) UniqueID() string {
 	return u.u.GetId().GetOpaqueId()
 }
