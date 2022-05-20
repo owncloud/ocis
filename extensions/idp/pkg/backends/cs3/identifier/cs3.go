@@ -29,6 +29,7 @@ var cs3SpportedScopes = []string{
 	lico.ScopeRawSubject,
 }
 
+// CS3 Backend holds the data for the CS3 identifier backend
 type CS3Backend struct {
 	supportedScopes []string
 

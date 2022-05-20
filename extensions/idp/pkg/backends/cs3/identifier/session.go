@@ -34,6 +34,7 @@ type cs3Session struct {
 	when      time.Time
 }
 
+// User returns the cs3 user of the session
 func (s *cs3Session) User() *cs3user.User {
 	return s.u
 }
