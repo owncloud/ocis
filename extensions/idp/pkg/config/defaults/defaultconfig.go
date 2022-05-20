@@ -28,6 +28,9 @@ func DefaultConfig() *config.Config {
 			TLSKey:    path.Join(defaults.BaseDataPath(), "idp", "server.key"),
 			TLS:       false,
 		},
+		Reva: &config.Reva{
+			Address: "127.0.0.1:9142",
+		},
 		Service: config.Service{
 			Name: "idp",
 		},
@@ -158,6 +161,18 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
+		cfg.Reva = &config.Reva{
+			Address: cfg.Commons.Reva.Address,
+		}
+	} else if cfg.Reva == nil {
+		cfg.Reva = &config.Reva{}
+	}
+
+	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
 }
 

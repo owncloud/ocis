@@ -18,6 +18,9 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
+	Reva              *Reva  `yaml:"reva"`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;IDP_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to impersonate users when looking up their userinfo via the 'cs3' backend."`
+
 	Asset   Asset    `yaml:"asset"`
 	IDP     Settings `yaml:"idp"`
 	Clients []Client `yaml:"clients"`
@@ -66,9 +69,9 @@ type Settings struct {
 	// don't change the order of elements in this struct
 	// it needs to match github.com/libregraph/lico/bootstrap.Settings
 
-	Iss string `yaml:"iss" env:"OCIS_URL;OCIS_OIDC_ISSUER;IDP_ISS"`
+	Iss string `yaml:"iss" env:"OCIS_URL;OCIS_OIDC_ISSUER;IDP_ISS" desc:"The OIDC issuer URL to use."`
 
-	IdentityManager string `yaml:"identity_manager" env:"IDP_IDENTITY_MANAGER"`
+	IdentityManager string `yaml:"identity_manager" env:"IDP_IDENTITY_MANAGER" desc:"The identity manager implementation to use, defaults to 'ldap', can be changed to 'cs3', 'kc', 'libregraph', 'cookie' or 'guest'."`
 
 	URIBasePath string `yaml:"uri_base_path" env:"IDP_URI_BASE_PATH"`
 
@@ -78,7 +81,7 @@ type Settings struct {
 	AuthorizationEndpointURI string `yaml:"authorization_endpoint_uri" env:"IDP_ENDPOINT_URI"`
 	EndsessionEndpointURI    string `yaml:"end_session_endpoint_uri" env:"IDP_ENDSESSION_ENDPOINT_URI"`
 
-	Insecure bool `yaml:"insecure" env:"IDP_INSECURE"`
+	Insecure bool `yaml:"insecure" env:"IDP_INSECURE" desc:"Allow insecure connections to the backend."`
 
 	TrustedProxy []string `yaml:"trusted_proxy"` //TODO: how to configure this via env?
 
