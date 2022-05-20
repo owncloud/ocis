@@ -22,6 +22,7 @@
 | STORAGE_SYSTEM_EVENTS_CLUSTER | string |  | the clusterID of the streaming service. Mandatory when using nats|
 | OCIS_JWT_SECRET<br/>STORAGE_SYSTEM_JWT_SECRET | string |  | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
+| OCIS_SYSTEM_USER_ID | string |  | |
 | OCIS_SYSTEM_USER_API_KEY | string |  | |
 | STORAGE_SYSTEM_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
 | STORAGE_SYSTEM_DRIVER | string | ocis | The driver which should be used by the service|
