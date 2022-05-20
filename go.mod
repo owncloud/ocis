@@ -51,7 +51,7 @@ require (
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v0.14.2
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.12.1
+	github.com/prometheus/client_golang v1.12.2
 	github.com/rs/zerolog v1.26.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.4.0
@@ -59,7 +59,7 @@ require (
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.2
 	github.com/urfave/cli/v2 v2.6.0
-	go-micro.dev/v4 v4.6.0
+	go-micro.dev/v4 v4.7.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.32.0
 	go.opentelemetry.io/otel v1.7.0
