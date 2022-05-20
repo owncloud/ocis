@@ -165,6 +165,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/3746
    https://github.com/owncloud/ocis/pull/3771
    https://github.com/owncloud/ocis/pull/3778
+   https://github.com/owncloud/ocis/pull/3842
 
 * Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
 
