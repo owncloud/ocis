@@ -29,21 +29,21 @@ var _ = Describe("Index", func() {
 		ri        *sprovider.ResourceInfo
 		parentRef = &sprovider.Reference{
 			ResourceId: rootId,
-			Path:       "./my/sudbir",
+			Path:       "./my/sub d!r",
 		}
 		parentRi = &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
 				StorageId: "storageid",
 				OpaqueId:  "parentopaqueid",
 			},
-			Path:  "subdir",
+			Path:  "sub d!r",
 			Size:  12345,
 			Type:  sprovider.ResourceType_RESOURCE_TYPE_CONTAINER,
 			Mtime: &typesv1beta1.Timestamp{Seconds: 4000},
 		}
 		childRef = &sprovider.Reference{
 			ResourceId: rootId,
-			Path:       "./my/sudbir/child.pdf",
+			Path:       "./my/sub d!r/child.pdf",
 		}
 		childRi = &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
@@ -298,12 +298,12 @@ var _ = Describe("Index", func() {
 		It("marks a resource as deleted", func() {
 			err := i.Add(parentRef, parentRi)
 			Expect(err).ToNot(HaveOccurred())
-			assertDocCount(rootId, "subdir", 1)
+			assertDocCount(rootId, `sub\ d!r`, 1)
 
 			err = i.Delete(parentRi.Id)
 			Expect(err).ToNot(HaveOccurred())
 
-			assertDocCount(rootId, "subdir", 0)
+			assertDocCount(rootId, `sub\ d!r`, 0)
 		})
 
 		It("also marks child resources as deleted", func() {
@@ -312,13 +312,13 @@ var _ = Describe("Index", func() {
 			err = i.Add(childRef, childRi)
 			Expect(err).ToNot(HaveOccurred())
 
-			assertDocCount(rootId, "subdir", 1)
+			assertDocCount(rootId, `sub\ d\!r`, 1)
 			assertDocCount(rootId, "child.pdf", 1)
 
 			err = i.Delete(parentRi.Id)
 			Expect(err).ToNot(HaveOccurred())
 
-			assertDocCount(rootId, "subdir", 0)
+			assertDocCount(rootId, `sub\ d\!r`, 0)
 			assertDocCount(rootId, "child.pdf", 0)
 		})
 	})
@@ -332,13 +332,13 @@ var _ = Describe("Index", func() {
 			err = i.Delete(parentRi.Id)
 			Expect(err).ToNot(HaveOccurred())
 
-			assertDocCount(rootId, "subdir", 0)
+			assertDocCount(rootId, `sub\ d!r`, 0)
 			assertDocCount(rootId, "child.pdf", 0)
 
 			err = i.Restore(parentRi.Id)
 			Expect(err).ToNot(HaveOccurred())
 
-			assertDocCount(rootId, "subdir", 1)
+			assertDocCount(rootId, `sub\ d!r`, 1)
 			assertDocCount(rootId, "child.pdf", 1)
 		})
 	})
@@ -354,7 +354,7 @@ var _ = Describe("Index", func() {
 			err = i.Move(parentRi.Id, "./somewhere/else/newname")
 			Expect(err).ToNot(HaveOccurred())
 
-			assertDocCount(rootId, "subdir", 0)
+			assertDocCount(rootId, `sub\ d!r`, 0)
 
 			matches := assertDocCount(rootId, "Name:child.pdf", 1)
 			Expect(matches[0].Entity.Ref.Path).To(Equal("./somewhere/else/newname/child.pdf"))

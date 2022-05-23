@@ -23,6 +23,7 @@ import (
 	"errors"
 	"math"
 	"path"
+	"regexp"
 	"strings"
 	"time"
 
@@ -111,7 +112,7 @@ func (i *Index) markAsDeleted(id string, deleted bool) error {
 	if doc.Type == uint64(sprovider.ResourceType_RESOURCE_TYPE_CONTAINER) {
 		query := bleve.NewConjunctionQuery(
 			bleve.NewQueryStringQuery("RootID:"+doc.RootID),
-			bleve.NewQueryStringQuery("Path:"+doc.Path+"/*"),
+			bleve.NewQueryStringQuery("Path:"+queryEscape(doc.Path+"/*")),
 		)
 		bleveReq := bleve.NewSearchRequest(query)
 		bleveReq.Size = math.MaxInt
@@ -187,7 +188,7 @@ func (i *Index) Move(id *sprovider.ResourceId, fullPath string) error {
 	if doc.Type == uint64(sprovider.ResourceType_RESOURCE_TYPE_CONTAINER) {
 		query := bleve.NewConjunctionQuery(
 			bleve.NewQueryStringQuery("RootID:"+doc.RootID),
-			bleve.NewQueryStringQuery("Path:"+oldName+"/*"),
+			bleve.NewQueryStringQuery("Path:"+queryEscape(oldName+"/*")),
 		)
 		bleveReq := bleve.NewSearchRequest(query)
 		bleveReq.Size = math.MaxInt
@@ -217,8 +218,8 @@ func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (
 	query := bleve.NewConjunctionQuery(
 		bleve.NewQueryStringQuery(req.Query),
 		deletedQuery, // Skip documents that have been marked as deleted
-		bleve.NewQueryStringQuery("RootID:"+req.Ref.ResourceId.StorageId+"!"+req.Ref.ResourceId.OpaqueId), // Limit search to the space
-		bleve.NewQueryStringQuery("Path:"+utils.MakeRelativePath(path.Join(req.Ref.Path, "/"))+"*"),       // Limit search to this directory in the space
+		bleve.NewQueryStringQuery("RootID:"+req.Ref.ResourceId.StorageId+"!"+req.Ref.ResourceId.OpaqueId),        // Limit search to the space
+		bleve.NewQueryStringQuery("Path:"+queryEscape(utils.MakeRelativePath(path.Join(req.Ref.Path, "/"))+"*")), // Limit search to this directory in the space
 	)
 	bleveReq := bleve.NewSearchRequest(query)
 	bleveReq.Size = 200
@@ -339,4 +340,9 @@ func idToBleveId(id *sprovider.ResourceId) string {
 		return ""
 	}
 	return id.StorageId + "!" + id.OpaqueId
+}
+
+func queryEscape(s string) string {
+	re := regexp.MustCompile(`([` + regexp.QuoteMeta(`+=&|><!(){}[]^\"~*?:\/`) + `\-\s])`)
+	return re.ReplaceAllString(s, "\\$1")
 }
