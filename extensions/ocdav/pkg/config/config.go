@@ -79,9 +79,10 @@ type Auth struct {
 
 // Status holds the configurable values for the status.php
 type Status struct {
-	Version       string
-	VersionString string
-	Product       string
-	ProductName   string
-	Edition       string
+	Version        string
+	VersionString  string
+	Product        string
+	ProductName    string
+	ProductVersion string
+	Edition        string
 }
