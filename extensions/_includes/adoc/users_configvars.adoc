@@ -101,6 +101,11 @@
 | false
 | Disables the encoding of the user's groupmember ships in the reva access token. To reduces token size, especially when users are members of a large number of groups.
 
+|`USERS_DRIVER`
+| string
+| ldap
+| The user driver which should be used by the users service. Defaults to 'ldap', can be 'owncloudsql', 'json' or 'rest'
+
 |`LDAP_URI` +
 `USERS_LDAP_URI`
 | string

@@ -19,6 +19,7 @@
 | OCIS_JWT_SECRET<br/>USERS_JWT_SECRET | string |  | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | |
 | USERS_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the encoding of the user's groupmember ships in the reva access token. To reduces token size, especially when users are members of a large number of groups.|
+| USERS_DRIVER | string | ldap | The user driver which should be used by the users service. Defaults to 'ldap', can be 'owncloudsql', 'json' or 'rest'|
 | LDAP_URI<br/>USERS_LDAP_URI | string | ldaps://localhost:9235 | URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'|
 | LDAP_CACERT<br/>USERS_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty the system default CA bundle will be used.|
 | LDAP_INSECURE<br/>USERS_LDAP_INSECURE | bool | false | Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.|
