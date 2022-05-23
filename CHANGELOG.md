@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Remove unused transfer secret from app provider: [#3798](https://github.com/owncloud/ocis/pull/3798)
 * Bugfix - Enable debug server by default: [#3827](https://github.com/owncloud/ocis/pull/3827)
+* Bugfix - Fix search index getting out of sync: [#3851](https://github.com/owncloud/ocis/pull/3851)
 * Bugfix - Set default name for public link via capabilities: [#3834](https://github.com/owncloud/ocis/pull/3834)
 * Bugfix - Remove legacy accounts proxy routes: [#3831](https://github.com/owncloud/ocis/pull/3831)
 * Bugfix - Fix the `ocis search` command: [#3796](https://github.com/owncloud/ocis/pull/3796)
@@ -42,6 +43,13 @@ The following sections list the changes for unreleased.
    start their debug server by default.
 
    https://github.com/owncloud/ocis/pull/3827
+
+* Bugfix - Fix search index getting out of sync: [#3851](https://github.com/owncloud/ocis/pull/3851)
+
+   We fixed a problem where the search index got out of sync with child elements of a parent
+   containing special characters.
+
+   https://github.com/owncloud/ocis/pull/3851
 
 * Bugfix - Set default name for public link via capabilities: [#3834](https://github.com/owncloud/ocis/pull/3834)
 
