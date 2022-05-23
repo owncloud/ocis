@@ -60,6 +60,8 @@ policies:
     service: com.owncloud.web.ocdav
   - endpoint: /webdav/
     service: com.owncloud.web.ocdav
+  - endpoint: /status
+    service: com.owncloud.web.ocdav
   - endpoint: /status.php
     service: com.owncloud.web.ocdav
   - endpoint: /index.php/
