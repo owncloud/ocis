@@ -23,7 +23,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpaces/changeSpaces.feature:138](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/changeSpaces.feature#L138)
 
 #### [Resharing is now allowed for viewers and editors](https://github.com/owncloud/ocis/issues/3828)
-- [apiSpaces/shareSpaces.feature:69](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSpaces.feature#L69)
 - [apiSpaces/shareSubItemOfSpace.feature:89](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpace.feature#L89)
 - [apiSpaces/shareSubItemOfSpace.feature:90](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpace.feature#L90)
 - [apiSpaces/shareSubItemOfSpace.feature:91](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpace.feature#L91)
