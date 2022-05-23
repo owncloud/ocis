@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Rename search env variable for the grpc server address: [#3800](https://github.com/owncloud/ocis/pull/3800)
 * Bugfix - Fix the idm and settings extensions' admin user id configuration option: [#3799](https://github.com/owncloud/ocis/pull/3799)
 * Bugfix - Fix multiple storage-users env variables: [#3802](https://github.com/owncloud/ocis/pull/3802)
+* Bugfix - Fix version number in status page: [#3788](https://github.com/owncloud/ocis/issues/3788)
 * Bugfix - Save Katherine: [#3823](https://github.com/owncloud/ocis/issues/3823)
 * Bugfix - Fix Thumbnails for IDs without a trailing path: [#3791](https://github.com/owncloud/ocis/pull/3791)
 * Change - The `glauth` and `accounts` services are removed: [#3685](https://github.com/owncloud/ocis/pull/3685)
@@ -102,6 +103,14 @@ The following sections list the changes for unreleased.
   * It's now possible to configure the permissions service endpoint for all  storage drivers with the environment variable `STORAGE_USERS_PERMISSION_ENDPOINT`, which was previously only used by the S3NG driver.
 
    https://github.com/owncloud/ocis/pull/3802
+
+* Bugfix - Fix version number in status page: [#3788](https://github.com/owncloud/ocis/issues/3788)
+
+   We needed to undo the version number changes on the status page to keep compatibility for legacy
+   clients. We added a new field `productversion` for the actual version of the product.
+
+   https://github.com/owncloud/ocis/issues/3788
+   https://github.com/owncloud/ocis/pull/3805
 
 * Bugfix - Save Katherine: [#3823](https://github.com/owncloud/ocis/issues/3823)
 
