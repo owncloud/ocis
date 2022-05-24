@@ -25,13 +25,13 @@ type Config struct {
 	TokenManager          *TokenManager   `yaml:"token_manager"`
 	PolicySelector        *PolicySelector `yaml:"policy_selector"`
 	PreSignedURL          PreSignedURL    `yaml:"pre_signed_url"`
-	AccountBackend        string          `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE"`
-	UserOIDCClaim         string          `yaml:"user_oidc_claim" env:"PROXY_USER_OIDC_CLAIM"`
-	UserCS3Claim          string          `yaml:"user_cs3_claim" env:"PROXY_USER_CS3_CLAIM"`
-	MachineAuthAPIKey     string          `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY"`
-	AutoprovisionAccounts bool            `yaml:"auto_provision_accounts" env:"PROXY_AUTOPROVISION_ACCOUNTS"`
-	EnableBasicAuth       bool            `yaml:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH"`
-	InsecureBackends      bool            `yaml:"insecure_backends" env:"PROXY_INSECURE_BACKENDS"`
+	AccountBackend        string          `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE" desc:"Account backend the proxy should use, currenly only 'cs3' is possible here."`
+	UserOIDCClaim         string          `yaml:"user_oidc_claim" env:"PROXY_USER_OIDC_CLAIM" desc:"The name of an OpenID Connect claim that should be used for resolving users with the account backend. Currently defaults to 'email'."`
+	UserCS3Claim          string          `yaml:"user_cs3_claim" env:"PROXY_USER_CS3_CLAIM" desc:"The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail' (other possible values are: 'username', 'displayname')"`
+	MachineAuthAPIKey     string          `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY" desc: "Machine auth API key used for accessing the 'auth-machine' service."`
+	AutoprovisionAccounts bool            `yaml:"auto_provision_accounts" env:"PROXY_AUTOPROVISION_ACCOUNTS" desc:"Set this to 'true' to automatically provsion users that do not yet exist in the users service on-demand upon first signin. To use this a write-enabled libregraph user backend needs to be setup an running."`
+	EnableBasicAuth       bool            `yaml:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH" desc:"Set this to true to enable 'basic' (username/password) authentication. (Default: false)"`
+	InsecureBackends      bool            `yaml:"insecure_backends" env:"PROXY_INSECURE_BACKENDS" desc:"Disable TLS certificate validation for all http backend connections. (Default: false)"`
 	AuthMiddleware        AuthMiddleware  `yaml:"auth_middleware"`
 
 	Context context.Context `yaml:"-"`
@@ -83,8 +83,8 @@ type AuthMiddleware struct {
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
 // with the configured oidc-provider
 type OIDC struct {
-	Issuer        string        `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER"`
-	Insecure      bool          `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE"`
+	Issuer        string        `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER" desc:"URL of the OpenID connect identity provider."`
+	Insecure      bool          `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. (not recommended for production environments."`
 	UserinfoCache UserinfoCache `yaml:"user_info_cache"`
 }
 

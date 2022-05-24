@@ -73,8 +73,9 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			}
 			m.logger.Debug().Interface("claims", claims).Msg("Autoprovisioning user")
 			user, err = m.userProvider.CreateUserFromClaims(req.Context(), claims)
-			// TODO instead of creating an account create a personal storage via the CS3 admin api?
-			// see https://cs3org.github.io/cs3apis/#cs3.admin.user.v1beta1.CreateUserRequest
+			if err != nil {
+				m.logger.Error().Err(err).Msg("Autoprovisioning user failed")
+			}
 		}
 
 		if errors.Is(err, backend.ErrAccountDisabled) {
