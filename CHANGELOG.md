@@ -218,7 +218,8 @@ The following sections list the changes for unreleased.
    the web release.
 
    https://github.com/owncloud/web/pull/6854
-   https://github.com/owncloud/ocis/pull/3861
+   https://github.com/owncloud/ocis/pull/3844
+   https://github.com/owncloud/ocis/pull/3862
    https://github.com/owncloud/web/releases/tag/v5.5.0-rc.8
 
 * Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
