@@ -118,7 +118,7 @@ func (o Ocs) getCS3Backend() backend.UserBackend {
 	if err != nil {
 		o.logger.Fatal().Msgf("could not get reva client at address %s", o.config.Reva.Address)
 	}
-	return backend.NewCS3UserBackend(nil, revaClient, o.config.MachineAuthAPIKey, o.logger)
+	return backend.NewCS3UserBackend(nil, revaClient, o.config.MachineAuthAPIKey, "", nil, o.logger)
 }
 
 // NotImplementedStub returns a not implemented error

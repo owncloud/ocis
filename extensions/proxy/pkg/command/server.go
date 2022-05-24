@@ -8,9 +8,8 @@ import (
 	"os"
 	"time"
 
-	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
-
 	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
 	"github.com/oklog/run"
@@ -30,6 +29,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/oauth2"
 )
@@ -135,7 +135,15 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 	var userProvider backend.UserBackend
 	switch cfg.AccountBackend {
 	case "cs3":
-		userProvider = backend.NewCS3UserBackend(rolesClient, revaClient, cfg.MachineAuthAPIKey, logger)
+		tokenManager, err := jwt.New(map[string]interface{}{
+			"secret": cfg.TokenManager.JWTSecret,
+		})
+		if err != nil {
+			logger.Error().Err(err).
+				Msg("Failed to create token manager")
+		}
+
+		userProvider = backend.NewCS3UserBackend(rolesClient, revaClient, cfg.MachineAuthAPIKey, cfg.OIDC.Issuer, tokenManager, logger)
 	default:
 		logger.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)
 	}
