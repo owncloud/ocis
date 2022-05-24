@@ -27,7 +27,7 @@ func authOptions(opts ...account.Option) account.Options {
 // Auth provides a middleware to authenticate requests using the x-access-token header value
 // and write it to the context. If there is no x-access-token the middleware prevents access and renders a json document.
 func Auth(opts ...account.Option) func(http.Handler) http.Handler {
-	// Note: This largely duplicates was ocis-pkg/middleware/account.go already does (apart from a slightly different error
+	// Note: This largely duplicates what ocis-pkg/middleware/account.go already does (apart from a slightly different error
 	// handling). Ideally we should merge both middlewares.
 	opt := authOptions(opts...)
 	tokenManager, err := jwt.New(map[string]interface{}{
