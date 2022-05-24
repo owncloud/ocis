@@ -21,6 +21,7 @@ The following sections list the changes for unreleased.
 * Change - The `glauth` and `accounts` services are removed: [#3685](https://github.com/owncloud/ocis/pull/3685)
 * Change - Prevent access to disabled space: [#3779](https://github.com/owncloud/ocis/pull/3779)
 * Enhancement - Introduce service registry cache: [#3833](https://github.com/owncloud/ocis/pull/3833)
+* Enhancement - Reintroduce user autoprovisioning in proxy: [#3860](https://github.com/owncloud/ocis/pull/3860)
 * Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
 * Enhancement - Add /me/changePassword endpoint to GraphAPI: [#3063](https://github.com/owncloud/ocis/issues/3063)
 * Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
@@ -146,6 +147,14 @@ The following sections list the changes for unreleased.
    20s), so that not every requests has to do a lookup on the registry.
 
    https://github.com/owncloud/ocis/pull/3833
+
+* Enhancement - Reintroduce user autoprovisioning in proxy: [#3860](https://github.com/owncloud/ocis/pull/3860)
+
+   With the removal of the accounts service autoprovisioning of users upon first login was no
+   longer possible. We added this feature back for the cs3 user backend in the proxy. Leveraging
+   the libregraph users API for creating the users.
+
+   https://github.com/owncloud/ocis/pull/3860
 
 * Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
 
