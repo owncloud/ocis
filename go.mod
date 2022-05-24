@@ -10,7 +10,7 @@ require (
 	github.com/blevesearch/bleve_index_api v1.0.1
 	github.com/coreos/go-oidc/v3 v3.2.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220412090512-93c5918b4bde
-	github.com/cs3org/reva/v2 v2.3.2-0.20220523160938-bf5b893fda25
+	github.com/cs3org/reva/v2 v2.4.0
 	github.com/disintegration/imaging v1.6.2
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/cors v1.2.1
