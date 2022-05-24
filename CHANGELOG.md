@@ -25,7 +25,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add /me/changePassword endpoint to GraphAPI: [#3063](https://github.com/owncloud/ocis/issues/3063)
 * Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
 * Enhancement - Update reva to version 2.4.0: [#3746](https://github.com/owncloud/ocis/pull/3746)
-* Enhancement - Update ownCloud Web to v5.5.0-rc.7: [#6854](https://github.com/owncloud/web/pull/6854)
+* Enhancement - Update ownCloud Web to v5.5.0-rc.8: [#6854](https://github.com/owncloud/web/pull/6854)
 * Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
 
 ## Details
@@ -210,16 +210,16 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/3854
    https://github.com/owncloud/ocis/pull/3858
 
-* Enhancement - Update ownCloud Web to v5.5.0-rc.7: [#6854](https://github.com/owncloud/web/pull/6854)
+* Enhancement - Update ownCloud Web to v5.5.0-rc.8: [#6854](https://github.com/owncloud/web/pull/6854)
 
    Tags: web
 
-   We updated ownCloud Web to v5.5.0-rc.7. Please refer to the changelog (linked) for details on
+   We updated ownCloud Web to v5.5.0-rc.8. Please refer to the changelog (linked) for details on
    the web release.
 
    https://github.com/owncloud/web/pull/6854
-   https://github.com/owncloud/ocis/pull/3844
-   https://github.com/owncloud/web/releases/tag/v5.5.0-rc.7
+   https://github.com/owncloud/ocis/pull/3861
+   https://github.com/owncloud/web/releases/tag/v5.5.0-rc.8
 
 * Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
 
