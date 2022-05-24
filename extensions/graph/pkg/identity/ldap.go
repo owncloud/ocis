@@ -161,6 +161,13 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 	ar.Attribute("sn", []string{sn})
 
 	if err := i.conn.Add(&ar); err != nil {
+		var lerr *ldap.Error
+		i.logger.Debug().Err(err).Msg("error adding user")
+		if errors.As(err, &lerr) {
+			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
+				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
+			}
+		}
 		return nil, err
 	}
 
