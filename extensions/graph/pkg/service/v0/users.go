@@ -117,7 +117,12 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if u, err = g.identityBackend.CreateUser(r.Context(), *u); err != nil {
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		var ecErr errorcode.Error
+		if errors.As(err, &ecErr) {
+			ecErr.Render(w, r)
+		} else {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		}
 		return
 	}
 
