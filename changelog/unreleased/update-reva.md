@@ -1,4 +1,15 @@
-Enhancement: update reva to version 2.4.0
+Enhancement: update reva to version 2.4.1
+
+Changelog for reva 2.4.1 (2022-05-24)
+=======================================
+
+The following sections list the changes in reva 2.4.1 relevant to
+reva users. The changes are ordered by importance.
+
+Summary
+-------
+
+* Bugfix [cs3org/reva#2891](https://github.com/cs3org/reva/pull/2891): Add missing http status code
 
 Changelog for reva 2.4.0 (2022-05-24)
 =======================================
@@ -33,3 +44,4 @@ https://github.com/owncloud/ocis/pull/3778
 https://github.com/owncloud/ocis/pull/3842
 https://github.com/owncloud/ocis/pull/3854
 https://github.com/owncloud/ocis/pull/3858
+https://github.com/owncloud/ocis/pull/3867
