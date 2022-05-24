@@ -25,7 +25,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
 * Enhancement - Add /me/changePassword endpoint to GraphAPI: [#3063](https://github.com/owncloud/ocis/issues/3063)
 * Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
-* Enhancement - Update reva to version 2.4.0: [#3746](https://github.com/owncloud/ocis/pull/3746)
+* Enhancement - Update reva to version 2.4.1: [#3746](https://github.com/owncloud/ocis/pull/3746)
 * Enhancement - Update ownCloud Web to v5.5.0-rc.8: [#6854](https://github.com/owncloud/web/pull/6854)
 * Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
 
@@ -185,7 +185,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3752
 
-* Enhancement - Update reva to version 2.4.0: [#3746](https://github.com/owncloud/ocis/pull/3746)
+* Enhancement - Update reva to version 2.4.1: [#3746](https://github.com/owncloud/ocis/pull/3746)
+
+   Changelog for reva 2.4.1 (2022-05-24) =======================================
+
+   The following sections list the changes in reva 2.4.1 relevant to reva users. The changes are
+   ordered by importance.
+
+   Summary -------
+
+  * Bugfix [cs3org/reva#2891](https://github.com/cs3org/reva/pull/2891): Add missing http status code
 
    Changelog for reva 2.4.0 (2022-05-24) =======================================
 
@@ -218,6 +227,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/3842
    https://github.com/owncloud/ocis/pull/3854
    https://github.com/owncloud/ocis/pull/3858
+   https://github.com/owncloud/ocis/pull/3867
 
 * Enhancement - Update ownCloud Web to v5.5.0-rc.8: [#6854](https://github.com/owncloud/web/pull/6854)
 
