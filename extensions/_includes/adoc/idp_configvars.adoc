@@ -252,7 +252,8 @@
 | 
 | 
 
-|`LDAP_USER_BASE_DN,IDP_LDAP_BASE_DN`
+|`LDAP_USER_BASE_DN` +
+`IDP_LDAP_BASE_DN`
 | string
 | ou=users,o=libregraph-idm
 | 

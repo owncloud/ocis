@@ -48,7 +48,7 @@
 | LDAP_CACERT<br/>IDP_LDAP_TLS_CACERT | string | ~/.ocis/idm/ldap.crt | |
 | LDAP_BIND_DN<br/>IDP_LDAP_BIND_DN | string | uid=idp,ou=sysusers,o=libregraph-idm | |
 | LDAP_BIND_PASSWORD<br/>IDP_LDAP_BIND_PASSWORD | string |  | |
-| LDAP_USER_BASE_DN,IDP_LDAP_BASE_DN | string | ou=users,o=libregraph-idm | |
+| LDAP_USER_BASE_DN<br/>IDP_LDAP_BASE_DN | string | ou=users,o=libregraph-idm | |
 | LDAP_USER_SCOPE<br/>IDP_LDAP_SCOPE | string | sub | |
 | IDP_LDAP_LOGIN_ATTRIBUTE | string | uid | |
 | LDAP_USER_SCHEMA_MAIL<br/>IDP_LDAP_EMAIL_ATTRIBUTE | string | mail | |
