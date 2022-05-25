@@ -41,7 +41,11 @@ sequenceDiagram
 
 ### New /dav/spaces/{spaceid} endpoint with spaceid and a relative path
 
-The ocDAV service is responsible for translating ownCloud flavoured WebDAV into CS3 API calls. A PROPFIND finds its way to a storage provider like this:
+The ocDAV service is responsible for translating ownCloud flavoured WebDAV into CS3 API calls.
+
+**General view**
+
+A PROPFIND finds its way to a storage provider like this:
 
 {{<mermaid class="text-center">}}
 %%{init: {"sequence": { "showSequenceNumbers":true, "messageFontFamily":"courier", "messageFontWeight":"normal", "messageFontSize":"11"}}}%%
@@ -123,7 +127,9 @@ sequenceDiagram
 
 ### Old /dav/files/{username} endpoint with username and a path relative to the users home
 
-To route a PROPFIND request against the old webdav endpoints ocdav first has to build a CS3 namespace prefix, eg. `/users/{{.Id.OpaqueId}}` to the users home. 
+**PROPFIND request against old webdav endpoints**
+
+To route a PROPFIND request against the old webdav endpoints like `/dav/files/username`, ocdav first has to build a CS3 namespace prefix, eg. `/users/{{.Id.OpaqueId}}` to the users home. 
 
 {{<mermaid class="text-center">}}
 %%{init: {"sequence": { "showSequenceNumbers":true, "messageFontFamily":"courier", "messageFontWeight":"normal", "messageFontSize":"11"}}}%%
@@ -152,7 +158,9 @@ sequenceDiagram
     end
 {{</mermaid>}}
 
-Why does ocis use a path based lookup instead of looking up the current users home using the user id and a space type filter? There are deployments that use a global namespace at the legacy `/webdav` endpoint. To support that use case the gateway allows looking up spaces using their mount path.
+**Handling legacy global namespace webdav endpoints**
+
+The reason ocis uses a path based lookup instead of looking up the current users home using the user id and a space type filter is, because there are deployments that use a global namespace at the legacy `/webdav` endpoint. To support these use cases, the gateway allows looking up spaces using their mount path.
 
 {{<mermaid class="text-center">}}
 %%{init: {"sequence": { "showSequenceNumbers":true, "messageFontFamily":"courier", "messageFontWeight":"normal", "messageFontSize":"11"}}}%%
