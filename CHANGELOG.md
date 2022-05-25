@@ -1,12 +1,15 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [2.0.0-beta2] (2022-05-10)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 2.0.0-beta2.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v2.0.0...master
+[2.0.0-beta2]: https://github.com/owncloud/ocis/compare/v1.20.0...v2.0.0-beta2
 
 ## Summary
 
+* Bugfix - Remove runtime kill and run commands: [#3740](https://github.com/owncloud/ocis/pull/3740)
+* Bugfix - Check permissions when deleting Space: [#3709](https://github.com/owncloud/ocis/pull/3709)
 * Bugfix - Remove unused transfer secret from app provider: [#3798](https://github.com/owncloud/ocis/pull/3798)
+* Bugfix - Make IDP secrets configurable via environment variables: [#3744](https://github.com/owncloud/ocis/pull/3744)
 * Bugfix - Enable debug server by default: [#3827](https://github.com/owncloud/ocis/pull/3827)
 * Bugfix - Fix search index getting out of sync: [#3851](https://github.com/owncloud/ocis/pull/3851)
 * Bugfix - Set default name for public link via capabilities: [#3834](https://github.com/owncloud/ocis/pull/3834)
@@ -15,21 +18,62 @@ The following sections list the changes for unreleased.
 * Bugfix - Rename search env variable for the grpc server address: [#3800](https://github.com/owncloud/ocis/pull/3800)
 * Bugfix - Fix the idm and settings extensions' admin user id configuration option: [#3799](https://github.com/owncloud/ocis/pull/3799)
 * Bugfix - Fix multiple storage-users env variables: [#3802](https://github.com/owncloud/ocis/pull/3802)
+* Bugfix - Thumbnails for `/dav/xxx?preview=1` requests: [#3567](https://github.com/owncloud/ocis/pull/3567)
 * Bugfix - Fix version number in status page: [#3788](https://github.com/owncloud/ocis/issues/3788)
+* Bugfix - Idp: Check if CA certificate if present: [#3623](https://github.com/owncloud/ocis/issues/3623)
+* Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
 * Bugfix - Save Katherine: [#3823](https://github.com/owncloud/ocis/issues/3823)
 * Bugfix - Fix Thumbnails for IDs without a trailing path: [#3791](https://github.com/owncloud/ocis/pull/3791)
+* Bugfix - URL encode the webdav url in the graph API: [#3597](https://github.com/owncloud/ocis/pull/3597)
+* Change - Update ocis packages and imports to V2: [#3678](https://github.com/owncloud/ocis/pull/3678)
+* Change - Load configuration files just from one directory: [#3587](https://github.com/owncloud/ocis/pull/3587)
+* Change - Reduce permissions on docker image predeclared volumes: [#3641](https://github.com/owncloud/ocis/pull/3641)
+* Change - Introduce `ocis init` and remove all default secrets: [#3551](https://github.com/owncloud/ocis/pull/3551)
 * Change - The `glauth` and `accounts` services are removed: [#3685](https://github.com/owncloud/ocis/pull/3685)
+* Change - Reduce drives in graph /me/drives API: [#3629](https://github.com/owncloud/ocis/pull/3629)
+* Change - Switched default configuration to use libregraph/idm: [#3331](https://github.com/owncloud/ocis/pull/3331)
+* Change - Rename MetadataUserID: [#3671](https://github.com/owncloud/ocis/pull/3671)
+* Change - Use new space ID util functions: [#3648](https://github.com/owncloud/ocis/pull/3648)
 * Change - Prevent access to disabled space: [#3779](https://github.com/owncloud/ocis/pull/3779)
+* Change - Rename serviceUser to systemUser: [#3673](https://github.com/owncloud/ocis/pull/3673)
+* Change - Split MachineAuth from SystemUser: [#3672](https://github.com/owncloud/ocis/pull/3672)
+* Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 * Enhancement - Introduce service registry cache: [#3833](https://github.com/owncloud/ocis/pull/3833)
 * Enhancement - Reintroduce user autoprovisioning in proxy: [#3860](https://github.com/owncloud/ocis/pull/3860)
 * Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
 * Enhancement - Add /me/changePassword endpoint to GraphAPI: [#3063](https://github.com/owncloud/ocis/issues/3063)
+* Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
+* Enhancement - Product field in OCS version: [#2918](https://github.com/owncloud/ocis/pull/2918)
+* Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
+* Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
+* Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
 * Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
+* Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 * Enhancement - Update reva to version 2.4.1: [#3746](https://github.com/owncloud/ocis/pull/3746)
+* Enhancement - Update reva to v2.3.1: [#3552](https://github.com/owncloud/ocis/pull/3552)
 * Enhancement - Update ownCloud Web to v5.5.0-rc.8: [#6854](https://github.com/owncloud/web/pull/6854)
+* Enhancement - Update ownCloud Web to v5.5.0-rc.6: [#6854](https://github.com/owncloud/web/pull/6854)
 * Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
 
 ## Details
+
+* Bugfix - Remove runtime kill and run commands: [#3740](https://github.com/owncloud/ocis/pull/3740)
+
+   We've removed the kill and run commands from the oCIS runtime. If these dynamic capabilities
+   are needed, one should switch to a full fledged supervisor and start oCIS as individual
+   services.
+
+   If one wants to start a only a subset of services, this is still possible by setting
+   OCIS_RUN_EXTENSIONS.
+
+   https://github.com/owncloud/ocis/pull/3740
+
+* Bugfix - Check permissions when deleting Space: [#3709](https://github.com/owncloud/ocis/pull/3709)
+
+   Check for manager permissions when deleting spaces. Do not allow deleting spaces via dav
+   service
+
+   https://github.com/owncloud/ocis/pull/3709
 
 * Bugfix - Remove unused transfer secret from app provider: [#3798](https://github.com/owncloud/ocis/pull/3798)
 
@@ -38,6 +82,13 @@ The following sections list the changes for unreleased.
    runtime (eg. `ocis app-provider server`) and didn't have configured all oCIS secrets.
 
    https://github.com/owncloud/ocis/pull/3798
+
+* Bugfix - Make IDP secrets configurable via environment variables: [#3744](https://github.com/owncloud/ocis/pull/3744)
+
+   We've fixed the configuration options of the IDP to make the IDP secrets again configurable via
+   environment variables.
+
+   https://github.com/owncloud/ocis/pull/3744
 
 * Bugfix - Enable debug server by default: [#3827](https://github.com/owncloud/ocis/pull/3827)
 
@@ -105,209 +156,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3802
 
-* Bugfix - Fix version number in status page: [#3788](https://github.com/owncloud/ocis/issues/3788)
-
-   We needed to undo the version number changes on the status page to keep compatibility for legacy
-   clients. We added a new field `productversion` for the actual version of the product.
-
-   https://github.com/owncloud/ocis/issues/3788
-   https://github.com/owncloud/ocis/pull/3805
-
-* Bugfix - Save Katherine: [#3823](https://github.com/owncloud/ocis/issues/3823)
-
-   SpaceManager user katherine was removed with the demo user switch. Now she comes back
-
-   https://github.com/owncloud/ocis/issues/3823
-   https://github.com/owncloud/ocis/pull/3824
-
-* Bugfix - Fix Thumbnails for IDs without a trailing path: [#3791](https://github.com/owncloud/ocis/pull/3791)
-
-   The routes in the chi router were not matching thumbnail requests without a trailing path.
-
-   https://github.com/owncloud/ocis/pull/3791
-
-* Change - The `glauth` and `accounts` services are removed: [#3685](https://github.com/owncloud/ocis/pull/3685)
-
-   After switching the default configuration to libregraph/idm we could remove the glauth and
-   accounts services from the source code (they were already disabled by default with the
-   previous release)
-
-   https://github.com/owncloud/ocis/pull/3685
-
-* Change - Prevent access to disabled space: [#3779](https://github.com/owncloud/ocis/pull/3779)
-
-   Previously managers where allowed to edit the space even when it is disabled This is no longer
-   possible
-
-   https://github.com/owncloud/ocis/pull/3779
-
-* Enhancement - Introduce service registry cache: [#3833](https://github.com/owncloud/ocis/pull/3833)
-
-   We've improved the service registry / service discovery by setting up registry caching (TTL
-   20s), so that not every requests has to do a lookup on the registry.
-
-   https://github.com/owncloud/ocis/pull/3833
-
-* Enhancement - Reintroduce user autoprovisioning in proxy: [#3860](https://github.com/owncloud/ocis/pull/3860)
-
-   With the removal of the accounts service autoprovisioning of users upon first login was no
-   longer possible. We added this feature back for the cs3 user backend in the proxy. Leveraging
-   the libregraph users API for creating the users.
-
-   https://github.com/owncloud/ocis/pull/3860
-
-* Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
-
-   Added descriptions tags to the graph-explorer config tags so that they will be included in the
-   documentation.
-
-   https://github.com/owncloud/ocis/pull/3759
-
-* Enhancement - Add /me/changePassword endpoint to GraphAPI: [#3063](https://github.com/owncloud/ocis/issues/3063)
-
-   When using the builtin user management, allow users to update their own password via the
-   graph/v1.0/me/changePassword endpoint.
-
-   https://github.com/owncloud/ocis/issues/3063
-   https://github.com/owncloud/ocis/pull/3705
-
-* Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
-
-   Added description tags to the config structs in the thumbnails service so they will be included
-   in the config documentation.
-
-  **Important** If you ran `ocis init` with the `v2.0.0-alpha*` version then you have to manually add the `transfer_secret` to the ocis.yaml.
-
-   Just open the `ocis.yaml` config file and look for the thumbnails section. Then add a random
-   `transfer_secret` so that it looks like this:
-
-   ```yaml thumbnails: thumbnail: transfer_secret: <put random value here> ```
-
-   https://github.com/owncloud/ocis/pull/3752
-
-* Enhancement - Update reva to version 2.4.1: [#3746](https://github.com/owncloud/ocis/pull/3746)
-
-   Changelog for reva 2.4.1 (2022-05-24) =======================================
-
-   The following sections list the changes in reva 2.4.1 relevant to reva users. The changes are
-   ordered by importance.
-
-   Summary -------
-
-  * Bugfix [cs3org/reva#2891](https://github.com/cs3org/reva/pull/2891): Add missing http status code
-
-   Changelog for reva 2.4.0 (2022-05-24) =======================================
-
-   The following sections list the changes in reva 2.4.0 relevant to reva users. The changes are
-   ordered by importance.
-
-   Summary -------
-
-  * Bugfix [cs3org/reva#2854](https://github.com/cs3org/reva/pull/2854): Handle non uuid space and nodeid in decomposedfs
-  * Bugfix [cs3org/reva#2853](https://github.com/cs3org/reva/pull/2853): Filter CS3 share manager listing
-  * Bugfix [cs3org/reva#2868](https://github.com/cs3org/reva/pull/2868): Actually remove blobs when purging
-  * Bugfix [cs3org/reva#2882](https://github.com/cs3org/reva/pull/2882): Fix FileUploaded event being emitted too early
-  * Bugfix [cs3org/reva#2848](https://github.com/cs3org/reva/pull/2848): Fix storage id in the references in the ItemTrashed events
-  * Bugfix [cs3org/reva#2852](https://github.com/cs3org/reva/pull/2852): Fix rcbox dependency on reva 1.18
-  * Bugfix [cs3org/reva#3505](https://github.com/cs3org/reva/pull/3505): Fix creating a new file with wopi
-  * Bugfix [cs3org/reva#2885](https://github.com/cs3org/reva/pull/2885): Move stat out of usershareprovider
-  * Bugfix [cs3org/reva#2883](https://github.com/cs3org/reva/pull/2883): Fix role consideration when updating a share
-  * Bugfix [cs3org/reva#2864](https://github.com/cs3org/reva/pull/2864): Fix Grant Space IDs
-  * Bugfix [cs3org/reva#2870](https://github.com/cs3org/reva/pull/2870): Update quota calculation
-  * Bugfix [cs3org/reva#2876](https://github.com/cs3org/reva/pull/2876): Fix version number in status page
-  * Bugfix [cs3org/reva#2829](https://github.com/cs3org/reva/pull/2829): Don't include versions in quota
-  * Change [cs3org/reva#2856](https://github.com/cs3org/reva/pull/2856): Do not allow to edit disabled spaces
-  * Enhancement [cs3org/reva#3741](https://github.com/cs3org/reva/pull/3741): Add download endpoint to ocdav versions API
-  * Enhancement [cs3org/reva#2884](https://github.com/cs3org/reva/pull/2884): Show mounted shares in virtual share jail root
-  * Enhancement [cs3org/reva#2792](https://github.com/cs3org/reva/pull/2792): Use storageproviderid for spaces routing
-
-   https://github.com/owncloud/ocis/pull/3746
-   https://github.com/owncloud/ocis/pull/3771
-   https://github.com/owncloud/ocis/pull/3778
-   https://github.com/owncloud/ocis/pull/3842
-   https://github.com/owncloud/ocis/pull/3854
-   https://github.com/owncloud/ocis/pull/3858
-   https://github.com/owncloud/ocis/pull/3867
-
-* Enhancement - Update ownCloud Web to v5.5.0-rc.8: [#6854](https://github.com/owncloud/web/pull/6854)
-
-   Tags: web
-
-   We updated ownCloud Web to v5.5.0-rc.8. Please refer to the changelog (linked) for details on
-   the web release.
-
-   https://github.com/owncloud/web/pull/6854
-   https://github.com/owncloud/ocis/pull/3844
-   https://github.com/owncloud/ocis/pull/3862
-   https://github.com/owncloud/web/releases/tag/v5.5.0-rc.8
-
-* Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
-
-   Added descriptions to webdav config structs to include them in the config documentation.
-
-   https://github.com/owncloud/ocis/pull/3755
-# Changelog for [2.0.0-beta1] (2022-05-10)
-
-The following sections list the changes for 2.0.0-beta1.
-
-[2.0.0-beta1]: https://github.com/owncloud/ocis/compare/v1.20.0...v2.0.0-beta1
-
-## Summary
-
-* Bugfix - Remove runtime kill and run commands: [#3740](https://github.com/owncloud/ocis/pull/3740)
-* Bugfix - Check permissions when deleting Space: [#3709](https://github.com/owncloud/ocis/pull/3709)
-* Bugfix - Make IDP secrets configurable via environment variables: [#3744](https://github.com/owncloud/ocis/pull/3744)
-* Bugfix - Thumbnails for `/dav/xxx?preview=1` requests: [#3567](https://github.com/owncloud/ocis/pull/3567)
-* Bugfix - Idp: Check if CA certificate if present: [#3623](https://github.com/owncloud/ocis/issues/3623)
-* Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
-* Bugfix - URL encode the webdav url in the graph API: [#3597](https://github.com/owncloud/ocis/pull/3597)
-* Change - Update ocis packages and imports to V2: [#3678](https://github.com/owncloud/ocis/pull/3678)
-* Change - Load configuration files just from one directory: [#3587](https://github.com/owncloud/ocis/pull/3587)
-* Change - Reduce permissions on docker image predeclared volumes: [#3641](https://github.com/owncloud/ocis/pull/3641)
-* Change - Introduce `ocis init` and remove all default secrets: [#3551](https://github.com/owncloud/ocis/pull/3551)
-* Change - Reduce drives in graph /me/drives API: [#3629](https://github.com/owncloud/ocis/pull/3629)
-* Change - Switched default configuration to use libregraph/idm: [#3331](https://github.com/owncloud/ocis/pull/3331)
-* Change - Rename MetadataUserID: [#3671](https://github.com/owncloud/ocis/pull/3671)
-* Change - Use new space ID util functions: [#3648](https://github.com/owncloud/ocis/pull/3648)
-* Change - Rename serviceUser to systemUser: [#3673](https://github.com/owncloud/ocis/pull/3673)
-* Change - Split MachineAuth from SystemUser: [#3672](https://github.com/owncloud/ocis/pull/3672)
-* Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
-* Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
-* Enhancement - Product field in OCS version: [#2918](https://github.com/owncloud/ocis/pull/2918)
-* Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
-* Enhancement - Add capability for public link single file edit: [#6787](https://github.com/owncloud/web/pull/6787)
-* Enhancement - Added `share_jail` and `projects` feature flags in spaces capability: [#3626](https://github.com/owncloud/ocis/pull/3626)
-* Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
-* Enhancement - Update reva to v2.3.1: [#3552](https://github.com/owncloud/ocis/pull/3552)
-* Enhancement - Update ownCloud Web to v5.5.0-rc.6: [#6854](https://github.com/owncloud/web/pull/6854)
-
-## Details
-
-* Bugfix - Remove runtime kill and run commands: [#3740](https://github.com/owncloud/ocis/pull/3740)
-
-   We've removed the kill and run commands from the oCIS runtime. If these dynamic capabilities
-   are needed, one should switch to a full fledged supervisor and start oCIS as individual
-   services.
-
-   If one wants to start a only a subset of services, this is still possible by setting
-   OCIS_RUN_EXTENSIONS.
-
-   https://github.com/owncloud/ocis/pull/3740
-
-* Bugfix - Check permissions when deleting Space: [#3709](https://github.com/owncloud/ocis/pull/3709)
-
-   Check for manager permissions when deleting spaces. Do not allow deleting spaces via dav
-   service
-
-   https://github.com/owncloud/ocis/pull/3709
-
-* Bugfix - Make IDP secrets configurable via environment variables: [#3744](https://github.com/owncloud/ocis/pull/3744)
-
-   We've fixed the configuration options of the IDP to make the IDP secrets again configurable via
-   environment variables.
-
-   https://github.com/owncloud/ocis/pull/3744
-
 * Bugfix - Thumbnails for `/dav/xxx?preview=1` requests: [#3567](https://github.com/owncloud/ocis/pull/3567)
 
    We've added the thumbnail rendering for `/dav/xxx?preview=1`,
@@ -316,6 +164,14 @@ The following sections list the changes for 2.0.0-beta1.
    now returns the same thumbnails as for `/remote.php/dav/xxx?preview=1`.
 
    https://github.com/owncloud/ocis/pull/3567
+
+* Bugfix - Fix version number in status page: [#3788](https://github.com/owncloud/ocis/issues/3788)
+
+   We needed to undo the version number changes on the status page to keep compatibility for legacy
+   clients. We added a new field `productversion` for the actual version of the product.
+
+   https://github.com/owncloud/ocis/issues/3788
+   https://github.com/owncloud/ocis/pull/3805
 
 * Bugfix - Idp: Check if CA certificate if present: [#3623](https://github.com/owncloud/ocis/issues/3623)
 
@@ -331,6 +187,19 @@ The following sections list the changes for 2.0.0-beta1.
    backend. Now it returns a proper error.
 
    https://github.com/owncloud/ocis/issues/3483
+
+* Bugfix - Save Katherine: [#3823](https://github.com/owncloud/ocis/issues/3823)
+
+   SpaceManager user katherine was removed with the demo user switch. Now she comes back
+
+   https://github.com/owncloud/ocis/issues/3823
+   https://github.com/owncloud/ocis/pull/3824
+
+* Bugfix - Fix Thumbnails for IDs without a trailing path: [#3791](https://github.com/owncloud/ocis/pull/3791)
+
+   The routes in the chi router were not matching thumbnail requests without a trailing path.
+
+   https://github.com/owncloud/ocis/pull/3791
 
 * Bugfix - URL encode the webdav url in the graph API: [#3597](https://github.com/owncloud/ocis/pull/3597)
 
@@ -382,6 +251,14 @@ The following sections list the changes for 2.0.0-beta1.
    https://github.com/owncloud/ocis/pull/3551
    https://github.com/owncloud/ocis/pull/3743
 
+* Change - The `glauth` and `accounts` services are removed: [#3685](https://github.com/owncloud/ocis/pull/3685)
+
+   After switching the default configuration to libregraph/idm we could remove the glauth and
+   accounts services from the source code (they were already disabled by default with the
+   previous release)
+
+   https://github.com/owncloud/ocis/pull/3685
+
 * Change - Reduce drives in graph /me/drives API: [#3629](https://github.com/owncloud/ocis/pull/3629)
 
    Reduced the drives in the graph `/me/drives` API to only the drives the user has access to. The
@@ -412,6 +289,13 @@ The following sections list the changes for 2.0.0-beta1.
    https://github.com/owncloud/ocis/pull/3648
    https://github.com/owncloud/ocis/pull/3669
 
+* Change - Prevent access to disabled space: [#3779](https://github.com/owncloud/ocis/pull/3779)
+
+   Previously managers where allowed to edit the space even when it is disabled This is no longer
+   possible
+
+   https://github.com/owncloud/ocis/pull/3779
+
 * Change - Rename serviceUser to systemUser: [#3673](https://github.com/owncloud/ocis/pull/3673)
 
    We renamed serviceUser to systemUser in all configs and vars including yaml-tags and env vars
@@ -431,6 +315,36 @@ The following sections list the changes for 2.0.0-beta1.
 
    https://github.com/owncloud/ocis/issues/3603
    https://github.com/owncloud/ocis/pull/3606
+
+* Enhancement - Introduce service registry cache: [#3833](https://github.com/owncloud/ocis/pull/3833)
+
+   We've improved the service registry / service discovery by setting up registry caching (TTL
+   20s), so that not every requests has to do a lookup on the registry.
+
+   https://github.com/owncloud/ocis/pull/3833
+
+* Enhancement - Reintroduce user autoprovisioning in proxy: [#3860](https://github.com/owncloud/ocis/pull/3860)
+
+   With the removal of the accounts service autoprovisioning of users upon first login was no
+   longer possible. We added this feature back for the cs3 user backend in the proxy. Leveraging
+   the libregraph users API for creating the users.
+
+   https://github.com/owncloud/ocis/pull/3860
+
+* Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
+
+   Added descriptions tags to the graph-explorer config tags so that they will be included in the
+   documentation.
+
+   https://github.com/owncloud/ocis/pull/3759
+
+* Enhancement - Add /me/changePassword endpoint to GraphAPI: [#3063](https://github.com/owncloud/ocis/issues/3063)
+
+   When using the builtin user management, allow users to update their own password via the
+   graph/v1.0/me/changePassword endpoint.
+
+   https://github.com/owncloud/ocis/issues/3063
+   https://github.com/owncloud/ocis/pull/3705
 
 * Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
 
@@ -473,6 +387,20 @@ The following sections list the changes for 2.0.0-beta1.
 
    https://github.com/owncloud/ocis/pull/3626
 
+* Enhancement - Add description tags to the thumbnails config structs: [#3752](https://github.com/owncloud/ocis/pull/3752)
+
+   Added description tags to the config structs in the thumbnails service so they will be included
+   in the config documentation.
+
+  **Important** If you ran `ocis init` with the `v2.0.0-alpha*` version then you have to manually add the `transfer_secret` to the ocis.yaml.
+
+   Just open the `ocis.yaml` config file and look for the thumbnails section. Then add a random
+   `transfer_secret` so that it looks like this:
+
+   ```yaml thumbnails: thumbnail: transfer_secret: <put random value here> ```
+
+   https://github.com/owncloud/ocis/pull/3752
+
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 
    We have updated the capabilities regarding password enforcement and expiration dates of
@@ -480,6 +408,50 @@ The following sections list the changes for 2.0.0-beta1.
    functionality anymore.
 
    https://github.com/owncloud/ocis/pull/3579
+
+* Enhancement - Update reva to version 2.4.1: [#3746](https://github.com/owncloud/ocis/pull/3746)
+
+   Changelog for reva 2.4.1 (2022-05-24) =======================================
+
+   The following sections list the changes in reva 2.4.1 relevant to reva users. The changes are
+   ordered by importance.
+
+   Summary -------
+
+  * Bugfix [cs3org/reva#2891](https://github.com/cs3org/reva/pull/2891): Add missing http status code
+
+   Changelog for reva 2.4.0 (2022-05-24) =======================================
+
+   The following sections list the changes in reva 2.4.0 relevant to reva users. The changes are
+   ordered by importance.
+
+   Summary -------
+
+  * Bugfix [cs3org/reva#2854](https://github.com/cs3org/reva/pull/2854): Handle non uuid space and nodeid in decomposedfs
+  * Bugfix [cs3org/reva#2853](https://github.com/cs3org/reva/pull/2853): Filter CS3 share manager listing
+  * Bugfix [cs3org/reva#2868](https://github.com/cs3org/reva/pull/2868): Actually remove blobs when purging
+  * Bugfix [cs3org/reva#2882](https://github.com/cs3org/reva/pull/2882): Fix FileUploaded event being emitted too early
+  * Bugfix [cs3org/reva#2848](https://github.com/cs3org/reva/pull/2848): Fix storage id in the references in the ItemTrashed events
+  * Bugfix [cs3org/reva#2852](https://github.com/cs3org/reva/pull/2852): Fix rcbox dependency on reva 1.18
+  * Bugfix [cs3org/reva#3505](https://github.com/cs3org/reva/pull/3505): Fix creating a new file with wopi
+  * Bugfix [cs3org/reva#2885](https://github.com/cs3org/reva/pull/2885): Move stat out of usershareprovider
+  * Bugfix [cs3org/reva#2883](https://github.com/cs3org/reva/pull/2883): Fix role consideration when updating a share
+  * Bugfix [cs3org/reva#2864](https://github.com/cs3org/reva/pull/2864): Fix Grant Space IDs
+  * Bugfix [cs3org/reva#2870](https://github.com/cs3org/reva/pull/2870): Update quota calculation
+  * Bugfix [cs3org/reva#2876](https://github.com/cs3org/reva/pull/2876): Fix version number in status page
+  * Bugfix [cs3org/reva#2829](https://github.com/cs3org/reva/pull/2829): Don't include versions in quota
+  * Change [cs3org/reva#2856](https://github.com/cs3org/reva/pull/2856): Do not allow to edit disabled spaces
+  * Enhancement [cs3org/reva#3741](https://github.com/cs3org/reva/pull/3741): Add download endpoint to ocdav versions API
+  * Enhancement [cs3org/reva#2884](https://github.com/cs3org/reva/pull/2884): Show mounted shares in virtual share jail root
+  * Enhancement [cs3org/reva#2792](https://github.com/cs3org/reva/pull/2792): Use storageproviderid for spaces routing
+
+   https://github.com/owncloud/ocis/pull/3746
+   https://github.com/owncloud/ocis/pull/3771
+   https://github.com/owncloud/ocis/pull/3778
+   https://github.com/owncloud/ocis/pull/3842
+   https://github.com/owncloud/ocis/pull/3854
+   https://github.com/owncloud/ocis/pull/3858
+   https://github.com/owncloud/ocis/pull/3867
 
 * Enhancement - Update reva to v2.3.1: [#3552](https://github.com/owncloud/ocis/pull/3552)
 
@@ -553,6 +525,18 @@ The following sections list the changes for 2.0.0-beta1.
    https://github.com/owncloud/ocis/pull/3652
    https://github.com/owncloud/ocis/pull/3681
 
+* Enhancement - Update ownCloud Web to v5.5.0-rc.8: [#6854](https://github.com/owncloud/web/pull/6854)
+
+   Tags: web
+
+   We updated ownCloud Web to v5.5.0-rc.8. Please refer to the changelog (linked) for details on
+   the web release.
+
+   https://github.com/owncloud/web/pull/6854
+   https://github.com/owncloud/ocis/pull/3844
+   https://github.com/owncloud/ocis/pull/3862
+   https://github.com/owncloud/web/releases/tag/v5.5.0-rc.8
+
 * Enhancement - Update ownCloud Web to v5.5.0-rc.6: [#6854](https://github.com/owncloud/web/pull/6854)
 
    Tags: web
@@ -567,6 +551,12 @@ The following sections list the changes for 2.0.0-beta1.
    https://github.com/owncloud/ocis/pull/3747
    https://github.com/owncloud/ocis/pull/3797
    https://github.com/owncloud/web/releases/tag/v5.5.0-rc.6
+
+* Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
+
+   Added descriptions to webdav config structs to include them in the config documentation.
+
+   https://github.com/owncloud/ocis/pull/3755
 # Changelog for [1.20.0] (2022-04-13)
 
 The following sections list the changes for 1.20.0.
