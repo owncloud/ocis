@@ -4,6 +4,8 @@ version: "3.7"
 services:
   ocis:
     environment:
+      LDAP_GROUP_BASE_DN: "ou=TestGroups,dc=owncloud,dc=com"
+      LDAP_USER_BASE_DN: "ou=TestUsers,dc=owncloud,dc=com"
       PROXY_ENABLE_BASIC_AUTH: "true"
 
   oc10:
