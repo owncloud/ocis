@@ -33,7 +33,7 @@
         env:
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: wkloucek@owncloud.com
-          OCIS_DOCKER_TAG: 2.0.0-beta1
+          OCIS_DOCKER_TAG: 2.0.0-beta2
           OCIS_DOMAIN: ocis.ocis-wopi.released.owncloud.works
           WOPISERVER_DOMAIN: wopiserver.ocis-wopi.released.owncloud.works
           COLLABORA_DOMAIN: collabora.ocis-wopi.released.owncloud.works
