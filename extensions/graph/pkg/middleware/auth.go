@@ -6,7 +6,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/auth/scope"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/extensions/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	opkgm "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
@@ -75,8 +74,10 @@ func Auth(opts ...account.Option) func(http.Handler) http.Handler {
 			ctx = revactx.ContextSetToken(ctx, t)
 			ctx = revactx.ContextSetUser(ctx, u)
 			ctx = gmmetadata.Set(ctx, opkgm.AccountID, u.Id.OpaqueId)
-			if role := utils.ReadPlainFromOpaque(u.Opaque, "roles"); role != "" {
-				ctx = gmmetadata.Set(ctx, opkgm.RoleIDs, role)
+			if u.Opaque != nil && u.Opaque.Map != nil {
+				if roles, ok := u.Opaque.Map["roles"]; ok {
+					ctx = gmmetadata.Set(ctx, opkgm.RoleIDs, string(roles.Value))
+				}
 			}
 			ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
