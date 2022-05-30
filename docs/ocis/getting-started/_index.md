@@ -59,6 +59,13 @@ When you're using oCIS with self-signed certificates, you need to answer the the
 oCIS by default relies on Multicast DNS (mDNS), usually via avahi-daemon. If your system has a firewall, make sure mDNS is allowed in your active zone.
 {{< /hint >}}
 
+{{< hint warning >}}
+
+#### Open Files on macOS
+
+The start command `./ocis server` starts a runtime which runs all oCIS services in one process. On MacOS we have very low limits for open files. oCIS needs more than the default 256. Please raise the limit to 1024 by typing `ulimit -n 1024` within the same cli session where you start ocis from.
+{{< /hint >}}
+
 ### Docker
 
 Docker images for oCIS are available on [Docker Hub](https://hub.docker.com/r/owncloud/ocis).
