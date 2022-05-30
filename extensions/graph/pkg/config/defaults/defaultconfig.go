@@ -1,9 +1,11 @@
 package defaults
 
 import (
+	"path"
 	"strings"
 
 	"github.com/owncloud/ocis/v2/extensions/graph/pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 )
 
 func FullDefaultConfig() *config.Config {
@@ -41,6 +43,7 @@ func DefaultConfig() *config.Config {
 			LDAP: config.LDAP{
 				URI:                      "ldaps://localhost:9235",
 				Insecure:                 true,
+				CACert:                   path.Join(defaults.BaseDataPath(), "idm", "ldap.crt"),
 				BindDN:                   "uid=libregraph,ou=sysusers,o=libregraph-idm",
 				UseServerUUID:            false,
 				WriteEnabled:             true,

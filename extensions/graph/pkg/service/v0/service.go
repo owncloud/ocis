@@ -2,6 +2,8 @@ package svc
 
 import (
 	"crypto/tls"
+	"crypto/x509"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
@@ -14,6 +16,7 @@ import (
 	"github.com/owncloud/ocis/v2/extensions/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/extensions/graph/pkg/identity/ldap"
 	graphm "github.com/owncloud/ocis/v2/extensions/graph/pkg/middleware"
+	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -83,10 +86,31 @@ func NewService(opts ...Option) Service {
 
 			var tlsConf *tls.Config
 			if options.Config.Identity.LDAP.Insecure {
+				// When insecure is set to true then we don't need a certificate.
+				options.Config.Identity.LDAP.CACert = ""
 				tlsConf = &tls.Config{
 					//nolint:gosec // We need the ability to run with "insecure" (dev/testing)
 					InsecureSkipVerify: options.Config.Identity.LDAP.Insecure,
 				}
+			}
+
+			if options.Config.Identity.LDAP.CACert != "" {
+				if err := ocisldap.WaitForCA(options.Logger,
+					options.Config.Identity.LDAP.Insecure,
+					options.Config.Identity.LDAP.CACert); err != nil {
+					options.Logger.Fatal().Err(err).Msg("The configured LDAP CA cert does not exist")
+				}
+				if tlsConf == nil {
+					tlsConf = &tls.Config{}
+				}
+				certs := x509.NewCertPool()
+				pemData, err := ioutil.ReadFile(options.Config.Identity.LDAP.CACert)
+				if err != nil {
+					options.Logger.Error().Msgf("Error initializing LDAP Backend: '%s'", err)
+					return nil
+				}
+				certs.AppendCertsFromPEM(pemData)
+				tlsConf.RootCAs = certs
 			}
 
 			conn := ldap.NewLDAPWithReconnect(&options.Logger,
