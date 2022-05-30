@@ -149,10 +149,11 @@ func decode(target interface{}, strict bool) (int, error) {
 		overrides := strings.Split(parts[0], `;`)
 
 		var env string
+		var envSet bool
 		for _, override := range overrides {
-			v := os.Getenv(override)
-			if v != "" {
+			if v, set := os.LookupEnv(override); set {
 				env = v
+				envSet = true
 			}
 		}
 
@@ -176,13 +177,13 @@ func decode(target interface{}, strict bool) (int, error) {
 		if required && hasDefault {
 			panic(`envdecode: "default" and "required" may not be specified in the same annotation`)
 		}
-		if env == "" && required {
+		if !envSet && required {
 			return 0, fmt.Errorf("the environment variable \"%s\" is missing", parts[0])
 		}
-		if env == "" {
+		if !envSet {
 			env = defaultValue
 		}
-		if env == "" {
+		if !envSet && env == "" {
 			continue
 		}
 
