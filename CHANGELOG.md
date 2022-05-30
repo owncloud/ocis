@@ -1,3 +1,22 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v2.0.0...master
+
+## Summary
+
+* Bugfix - Fix user autoprovisioning: [#3893](https://github.com/owncloud/ocis/issues/3893)
+
+## Details
+
+* Bugfix - Fix user autoprovisioning: [#3893](https://github.com/owncloud/ocis/issues/3893)
+
+   We've fixed the autoprovsioning feature that was introduced in beta2. Due to a bug the role
+   assignment of the privileged user that is used to create accounts wasn't propagated correctly
+   to the `graph` service.
+
+   https://github.com/owncloud/ocis/issues/3893
 # Changelog for [2.0.0-beta2] (2022-05-10)
 
 The following sections list the changes for 2.0.0-beta2.
