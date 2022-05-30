@@ -83,22 +83,22 @@ config = {
         "ocis",
     ],
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "localApiTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
         "earlyFail": True,
     },
@@ -107,22 +107,28 @@ config = {
         "earlyFail": True,
     },
     "parallelApiTests": {
-        "apiSharing": {
-            "suites": [
-                "apiShareManagement",
-            ],
+        "apiTests-matrix1": {
+            "numberOfParts": 10,
             "skip": False,
+            "skipExceptParts": [],
             "earlyFail": True,
-            "cron": "nightly",
+            "oc_selector": {
+                "Given": "oc10",
+                "When": "ocis",
+                "Then": "ocis",
+            },
         },
-        "apiWebdav": {
-            "suites": [
-                "apiWebdavOperations",
-            ],
-            "skip": False,
-            "earlyFail": True,
-            "cron": "nightly",
-        },
+        # "apiTests-matrix2": {
+        #     "numberOfParts": 10,
+        #     "skip": False,
+        #     "skipExceptParts": [],
+        #     "earlyFail": True,
+        #     "oc_selector": {
+        #         "Given": "ocis",
+        #         "When": "oc10",
+        #         "Then": "oc10",
+        #     },
+        # },
     },
     "rocketchat": {
         "channel": "ocis-internal",
@@ -197,15 +203,18 @@ def main(ctx):
         cancelPreviousBuilds() + \
         yarnCache(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
+<<<<<<< HEAD
         cacheCoreReposForTesting(ctx) + \
         testOcisModules(ctx) + \
+=======
+>>>>>>> run all core tests on parallel deployment
         testPipelines(ctx)
 
-    build_release_pipelines = \
-        [licenseCheck(ctx)] + \
-        dockerReleases(ctx) + \
-        binaryReleases(ctx) + \
-        [releaseSubmodule(ctx)]
+    # build_release_pipelines = \
+    #     [licenseCheck(ctx)] + \
+    #     dockerReleases(ctx) + \
+    #     binaryReleases(ctx) + \
+    #     [releaseSubmodule(ctx)]
 
     build_release_helpers = [
         changelog(ctx),
@@ -231,7 +240,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines + build_release_helpers
+    pipelines = test_pipelines + build_release_helpers
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -2243,85 +2252,84 @@ def parallelDeployAcceptancePipeline(ctx):
     pipelines = []
 
     default = {
-        "filterTags": "~@skip",
+        "filterTags": "~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OCIS-Storage&&~@issue-ocis-3023",
     }
 
-    for category, params in config["parallelApiTests"].items():
+    for matrix, options in config["parallelApiTests"].items():
+        default.update(options)
+        params = default
+
         if "skip" in params and params["skip"]:
             return pipelines
 
-        early_fail = params["earlyFail"] if "earlyFail" in params else False
+        debugParts = params["skipExceptParts"]
+        debugPartsEnabled = (len(debugParts) != 0)
 
-        if type(params["suites"]) == "list":
-            suites = {}
-            for suite in params["suites"]:
-                suites[suite] = suite
-        else:
-            suites = params["suites"]
+        for runPart in range(1, params["numberOfParts"] + 1):
+            if (not debugPartsEnabled or (debugPartsEnabled and runPart in debugParts)):
+                early_fail = params["earlyFail"] if "earlyFail" in params else False
 
-        for suite, suiteName in suites.items():
-            params = {}
-            for item in default:
-                params[item] = params[item] if item in params else default[item]
+                environment = {}
+                environment["BEHAT_FILTER_TAGS"] = params["filterTags"]
+                environment["DIVIDE_INTO_NUM_PARTS"] = params["numberOfParts"]
+                environment["RUN_PART"] = runPart
+                environment["GIVEN_OC_SELECTOR"] = params["oc_selector"]["Given"]
+                environment["WHEN_OC_SELECTOR"] = params["oc_selector"]["When"]
+                environment["THEN_OC_SELECTOR"] = params["oc_selector"]["Then"]
 
-            environment = {}
-            environment["BEHAT_FILTER_TAGS"] = params["filterTags"]
-            environment["BEHAT_SUITE"] = suite
+                pipeline = {
+                    "kind": "pipeline",
+                    "type": "docker",
+                    "name": "%s-%s" % (matrix, runPart),
+                    "platform": {
+                        "os": "linux",
+                        "arch": "amd64",
+                    },
+                    "steps": skipIfUnchanged(ctx, "acceptance-tests") +
+                             restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+                             cloneCoreRepos() +
+                             copyConfigs() +
+                             parallelDeploymentOC10Server() +
+                             owncloudLog() +
+                             fixSharedDataPermissions() +
+                             ocisServer(
+                                 "ocis",
+                                 4,
+                                 [stepVolumeOC10OCISData, stepVolumeOCISConfig],
+                                 ["fix-shared-data-permissions"],
+                                 True,
+                             ) +
+                             parallelAcceptanceTests(environment) +
+                             failEarly(ctx, early_fail),
+                    "services": oc10DbService() +
+                                ldapService() +
+                                redis(),
+                    "volumes": [
+                        pipeOC10TemplatesVol,
+                        pipeOC10PreServerVol,
+                        pipeOC10AppsVol,
+                        pipeOC10OCISSharedVol,
+                        pipeOCISConfigVol,
+                        pipelineVolumeOC10Tests,
+                    ],
+                    "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+                    "trigger": {},
+                }
 
-            pipeline = {
-                "kind": "pipeline",
-                "type": "docker",
-                "name": "parallel-%s" % (suiteName),
-                "platform": {
-                    "os": "linux",
-                    "arch": "amd64",
-                },
-                "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                         restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                         restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
-                         restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
-                         copyConfigs() +
-                         parallelDeploymentOC10Server() +
-                         owncloudLog() +
-                         fixSharedDataPermissions() +
-                         ocisServer(
-                             "ocis",
-                             4,
-                             [stepVolumeOC10OCISData, stepVolumeOCISConfig],
-                             ["fix-shared-data-permissions"],
-                             True,
-                         ) +
-                         parallelAcceptance(environment) +
-                         failEarly(ctx, early_fail),
-                "services": oc10DbService() +
-                            ldapService() +
-                            redis(),
-                "volumes": [
-                    pipeOC10TemplatesVol,
-                    pipeOC10PreServerVol,
-                    pipeOC10AppsVol,
-                    pipeOC10OCISSharedVol,
-                    pipeOCISConfigVol,
-                ],
-                "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]) +
-                              getPipelineNames(cacheCoreReposForTesting(ctx)),
-                "trigger": {},
-            }
+                if (ctx.build.event == "cron"):
+                    pipeline["trigger"]["cron"] = params["cron"] if "cron" in params and params["cron"] != "" else "nightly"
+                else:
+                    pipeline["trigger"]["ref"] = [
+                        "refs/heads/master",
+                        "refs/tags/v*",
+                        "refs/pull/**",
+                    ]
 
-            if (ctx.build.event == "cron"):
-                pipeline["trigger"]["cron"] = params["cron"] if "cron" in params and params["cron"] != "" else "nightly"
-            else:
-                pipeline["trigger"]["ref"] = [
-                    "refs/heads/master",
-                    "refs/tags/v*",
-                    "refs/pull/**",
-                ]
-
-            pipelines.append(pipeline)
+                pipelines.append(pipeline)
 
     return pipelines
 
-def parallelAcceptance(env):
+def parallelAcceptanceTests(env):
     environment = {
         "TEST_SERVER_URL": OCIS_URL,
         "TEST_OC10_URL": OC10_URL,
@@ -2335,7 +2343,7 @@ def parallelAcceptance(env):
         "SKELETON_DIR": "/drone/src/%s/data/apiSkeleton" % dirs["testing_app"],
         "PATH_TO_CORE": "/drone/src/%s" % dirs["core"],
         "OCIS_REVA_DATA_ROOT": "/mnt/data/",
-        "EXPECTED_FAILURES_FILE": "/drone/src/tests/parallelDeployAcceptance/expected-failures-API.md",
+        "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-API-on-OCIS-storage.md",
         "OCIS_SKELETON_STRATEGY": "copy",
         "SEND_SCENARIO_LINE_REFERENCES": "true",
         "UPLOAD_DELETE_WAIT_TIME": "1",
@@ -2347,7 +2355,7 @@ def parallelAcceptance(env):
         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
         "environment": environment,
         "commands": [
-            "make test-paralleldeployment-api",
+            "make -C /srv/app/testrunner test-acceptance-api",
         ],
         "depends_on": ["wait-for-oc10", "wait-for-ocis-server"],
         "volumes": [
