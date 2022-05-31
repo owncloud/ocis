@@ -37,11 +37,11 @@ user_sharing_drivers:
     system_user_idp: internal
     system_user_api_key: ""
   owncloudsql:
-    db_username: ""
+    db_username: owncloud
     db_password: ""
-    db_host: ""
-    db_port: 0
-    db_name: ""
+    db_host: mysql
+    db_port: 3306
+    db_name: owncloud
     user_storage_mount_id: ""
 public_sharing_driver: json
 public_sharing_drivers:
