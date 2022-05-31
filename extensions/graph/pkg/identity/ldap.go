@@ -5,11 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/go-ldap/ldap/v3"
 	"github.com/gofrs/uuid"
 	ldapdn "github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+
+	"golang.org/x/exp/slices"
 
 	"github.com/owncloud/ocis/v2/extensions/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/extensions/graph/pkg/service/v0/errorcode"
@@ -399,14 +402,38 @@ func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregra
 	users := make([]*libregraph.User, 0, len(res.Entries))
 
 	for _, e := range res.Entries {
-		users = append(users, i.createUserModelFromLDAP(e))
+		sel := strings.Split(queryParam.Get("$select"), ",")
+		exp := strings.Split(queryParam.Get("$expand"), ",")
+		u := i.createUserModelFromLDAP(e)
+		if slices.Contains(sel, "memberOf") || slices.Contains(exp, "memberOf") {
+			groupFilter := fmt.Sprintf(
+				"(%s=%s)",
+				i.groupAttributeMap.member, e.DN,
+			)
+			userGroups, err := i.getLDAPGroupsByFilter(groupFilter, false, false)
+			if err != nil {
+				return nil, err
+			}
+			if len(userGroups) > 0 {
+				expand := ldap.EscapeFilter(queryParam.Get("expand"))
+				if expand == "" {
+					expand = "false"
+				}
+				groups := make([]libregraph.Group, 0, len(userGroups))
+				for _, g := range userGroups {
+					groups = append(groups, *i.createGroupModelFromLDAP(g))
+				}
+				u.MemberOf = groups
+			}
+		}
+		users = append(users, u)
 	}
 	return users, nil
 }
 
 func (i *LDAP) GetGroup(ctx context.Context, nameOrID string) (*libregraph.Group, error) {
 	i.logger.Debug().Str("backend", "ldap").Msg("GetGroup")
-	e, err := i.getLDAPGroupByNameOrID(nameOrID, false)
+	e, err := i.getLDAPGroupByNameOrID(nameOrID, true)
 	if err != nil {
 		return nil, err
 	}
@@ -550,7 +577,24 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 	groups := make([]*libregraph.Group, 0, len(res.Entries))
 
 	for _, e := range res.Entries {
-		groups = append(groups, i.createGroupModelFromLDAP(e))
+		sel := strings.Split(queryParam.Get("$select"), ",")
+		exp := strings.Split(queryParam.Get("$expand"), ",")
+		g := i.createGroupModelFromLDAP(e)
+		if slices.Contains(sel, "members") || slices.Contains(exp, "members") {
+
+			members, err := i.GetGroupMembers(ctx, *g.Id)
+			if err != nil {
+				return nil, err
+			}
+			if len(members) > 1 {
+				m := make([]libregraph.User, 0, len(members))
+				for _, u := range members {
+					m = append(m, *u)
+				}
+				g.Members = m
+			}
+		}
+		groups = append(groups, g)
 	}
 	return groups, nil
 }
