@@ -6,9 +6,19 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Allow empty environment variables: [#3892](https://github.com/owncloud/ocis/pull/3892)
 * Bugfix - Fix user autoprovisioning: [#3893](https://github.com/owncloud/ocis/issues/3893)
 
 ## Details
+
+* Bugfix - Allow empty environment variables: [#3892](https://github.com/owncloud/ocis/pull/3892)
+
+   We've fixed the behavior for empty environment variables, that previously would not have
+   overwritten default values. Therefore it had the same effect like not setting the environment
+   variable. We now check if the environment variable is set at all and if so, we also allow to
+   override a default value with an empty value.
+
+   https://github.com/owncloud/ocis/pull/3892
 
 * Bugfix - Fix user autoprovisioning: [#3893](https://github.com/owncloud/ocis/issues/3893)
 
