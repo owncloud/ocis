@@ -81,7 +81,7 @@ type Settings struct {
 	AuthorizationEndpointURI string `yaml:"authorization_endpoint_uri" env:"IDP_ENDPOINT_URI"`
 	EndsessionEndpointURI    string `yaml:"end_session_endpoint_uri" env:"IDP_ENDSESSION_ENDPOINT_URI"`
 
-	Insecure bool `yaml:"insecure" env:"IDP_INSECURE" desc:"Allow insecure connections to the backend."`
+	Insecure bool `yaml:"insecure" env:"LDAP_INSECURE;IDP_INSECURE" desc:"Allow insecure connections to the user backend (eg. LDAP, CS3 api, ...)."`
 
 	TrustedProxy []string `yaml:"trusted_proxy"` //TODO: how to configure this via env?
 

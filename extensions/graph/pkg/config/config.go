@@ -39,7 +39,7 @@ type Spaces struct {
 type LDAP struct {
 	URI           string `yaml:"uri" env:"LDAP_URI;GRAPH_LDAP_URI"`
 	CACert        string `yaml:"cacert" env:"LDAP_CACERT;GRAPH_LDAP_CACERT" desc:"The certificate to verify TLS connections"`
-	Insecure      bool   `yaml:"insecure" env:"OCIS_INSECURE;GRAPH_LDAP_INSECURE"`
+	Insecure      bool   `yaml:"insecure" env:"LDAP_INSECURE;GRAPH_LDAP_INSECURE"`
 	BindDN        string `yaml:"bind_dn" env:"LDAP_BIND_DN;GRAPH_LDAP_BIND_DN"`
 	BindPassword  string `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;GRAPH_LDAP_BIND_PASSWORD"`
 	UseServerUUID bool   `yaml:"use_server_uuid" env:"GRAPH_LDAP_SERVER_UUID"`

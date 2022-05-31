@@ -37,6 +37,7 @@ var _ = Describe("Graph", func() {
 	JustBeforeEach(func() {
 		ctx = context.Background()
 		cfg = defaults.FullDefaultConfig()
+		cfg.Identity.LDAP.CACert = "" // skip the startup checks, we don't use LDAP at all in this tests
 		cfg.TokenManager.JWTSecret = "loremipsum"
 
 		gatewayClient = &mocks.GatewayClient{}
