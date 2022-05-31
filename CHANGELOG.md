@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Allow empty environment variables: [#3892](https://github.com/owncloud/ocis/pull/3892)
+* Bugfix - Fix LDAP insecure options: [#3897](https://github.com/owncloud/ocis/pull/3897)
 * Bugfix - Fix user autoprovisioning: [#3893](https://github.com/owncloud/ocis/issues/3893)
 * Enhancement - Add config option to provide TLS certificate: [#3818](https://github.com/owncloud/ocis/issues/3818)
 
@@ -20,6 +21,16 @@ The following sections list the changes for unreleased.
    override a default value with an empty value.
 
    https://github.com/owncloud/ocis/pull/3892
+
+* Bugfix - Fix LDAP insecure options: [#3897](https://github.com/owncloud/ocis/pull/3897)
+
+   We've fixed multiple LDAP insecure options:
+
+  * The Graph LDAP insecure option default was set to `true` and now defaults to `false`. This is possible after #3888, since the Graph also now uses the LDAP CAcert by default.
+  * The Graph LDAP insecure option was configurable by the environment variable `OCIS_INSECURE`, which was replaced by the dedicated `LDAP_INSECURE` variable. This variable is also used by all other services using LDAP.
+  * The IDP insecure option for the user backend now also picks up configuration from `LDAP_INSECURE`.
+
+   https://github.com/owncloud/ocis/pull/3897
 
 * Bugfix - Fix user autoprovisioning: [#3893](https://github.com/owncloud/ocis/issues/3893)
 
