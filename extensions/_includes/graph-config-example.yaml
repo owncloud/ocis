@@ -34,7 +34,7 @@ identity:
   ldap:
     uri: ldaps://localhost:9235
     cacert: ~/.ocis/idm/ldap.crt
-    insecure: true
+    insecure: false
     bind_dn: uid=libregraph,ou=sysusers,o=libregraph-idm
     bind_password: ""
     use_server_uuid: false

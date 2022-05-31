@@ -30,7 +30,7 @@
 | IDP_SIGN_OUT_URI | string |  | |
 | IDP_ENDPOINT_URI | string |  | |
 | IDP_ENDSESSION_ENDPOINT_URI | string |  | |
-| IDP_INSECURE | bool | false | Allow insecure connections to the backend.|
+| LDAP_INSECURE<br/>IDP_INSECURE | bool | false | Allow insecure connections to the user backend (eg. LDAP, CS3 api, ...).|
 | IDP_ALLOW_CLIENT_GUESTS | bool | false | |
 | IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION | bool | false | |
 | IDP_ENCRYPTION_SECRET_FILE | string |  | |

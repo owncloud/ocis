@@ -140,10 +140,10 @@
 | ~/.ocis/idm/ldap.crt
 | The certificate to verify TLS connections
 
-|`OCIS_INSECURE` +
+|`LDAP_INSECURE` +
 `GRAPH_LDAP_INSECURE`
 | bool
-| true
+| false
 | 
 
 |`LDAP_BIND_DN` +

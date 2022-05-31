@@ -158,10 +158,11 @@
 | 
 | 
 
-|`IDP_INSECURE`
+|`LDAP_INSECURE` +
+`IDP_INSECURE`
 | bool
 | false
-| Allow insecure connections to the backend.
+| Allow insecure connections to the user backend (eg. LDAP, CS3 api, ...).
 
 |`IDP_ALLOW_CLIENT_GUESTS`
 | bool
