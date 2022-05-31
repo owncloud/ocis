@@ -25,6 +25,7 @@
 | GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL | int | 0 | |
 | GRAPH_IDENTITY_BACKEND | string | ldap | |
 | LDAP_URI<br/>GRAPH_LDAP_URI | string | ldaps://localhost:9235 | |
+| LDAP_CACERT<br/>GRAPH_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | The certificate to verify TLS connections|
 | OCIS_INSECURE<br/>GRAPH_LDAP_INSECURE | bool | true | |
 | LDAP_BIND_DN<br/>GRAPH_LDAP_BIND_DN | string | uid=libregraph,ou=sysusers,o=libregraph-idm | |
 | LDAP_BIND_PASSWORD<br/>GRAPH_LDAP_BIND_PASSWORD | string |  | |
