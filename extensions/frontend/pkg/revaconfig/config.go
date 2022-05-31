@@ -159,7 +159,7 @@ func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							},
 							"files_sharing": map[string]interface{}{
 								"api_enabled":                       true,
-								"resharing":                         false,
+								"resharing":                         true,
 								"group_sharing":                     true,
 								"auto_accept_share":                 true,
 								"share_with_group_members_only":     true,

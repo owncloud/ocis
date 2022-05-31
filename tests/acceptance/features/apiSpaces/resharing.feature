@@ -65,7 +65,7 @@ Feature: Resharing
     Examples:
       | user  | code | canUpload     |
       | Alice | 100  | should be     |
-      | Brian | 404  | should not be |
+      | Brian | 998  | should not be |
       | Carol | 100  | should be     |
 
   Scenario Outline: Deleting reshares

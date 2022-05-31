@@ -32,3 +32,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpaces/shareSubItemOfSpaceViaPublicLink.feature:91](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpaceViaPublicLink.feature#L91)
 - [apiSpaces/shareSubItemOfSpaceViaPublicLink.feature:92](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpaceViaPublicLink.feature#L92)
 
+### Visibility of shares is still to discuss
+- [apiSpaces/resharing.feature:37](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/resharing.feature#L37)
+- [apiSpaces/resharing.feature:38](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/resharing.feature#L38)
+- [apiSpaces/resharing.feature:39](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/resharing.feature#L39)
