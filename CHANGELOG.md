@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Allow empty environment variables: [#3892](https://github.com/owncloud/ocis/pull/3892)
 * Bugfix - Fix user autoprovisioning: [#3893](https://github.com/owncloud/ocis/issues/3893)
+* Enhancement - Add config option to provide TLS certificate: [#3818](https://github.com/owncloud/ocis/issues/3818)
 
 ## Details
 
@@ -27,6 +28,14 @@ The following sections list the changes for unreleased.
    to the `graph` service.
 
    https://github.com/owncloud/ocis/issues/3893
+
+* Enhancement - Add config option to provide TLS certificate: [#3818](https://github.com/owncloud/ocis/issues/3818)
+
+   Added a config option to the graph service to provide a TLS certificate to be used to verify the
+   LDAP server certificate.
+
+   https://github.com/owncloud/ocis/issues/3818
+   https://github.com/owncloud/ocis/pull/3888
 # Changelog for [2.0.0-beta2] (2022-05-10)
 
 The following sections list the changes for 2.0.0-beta2.
