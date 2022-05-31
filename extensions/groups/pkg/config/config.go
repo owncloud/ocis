@@ -74,8 +74,8 @@ type LDAPDriver struct {
 	GroupBaseDN      string          `yaml:"group_base_dn" env:"LDAP_GROUP_BASE_DN;GROUPS_LDAP_GROUP_BASE_DN" desc:"Search base DN for looking up LDAP groups."`
 	UserScope        string          `yaml:"user_scope" env:"LDAP_USER_SCOPE;GROUPS_LDAP_USER_SCOPE" desc:"LDAP search scope to use when looking up users ('base', 'one', 'sub')."`
 	GroupScope       string          `yaml:"group_scope" env:"LDAP_GROUP_SCOPE;GROUPS_LDAP_GROUP_SCOPE" desc:"LDAP search scope to use when looking up gruops ('base', 'one', 'sub')."`
-	UserFilter       string          `yaml:"user_filter" env:"LDAP_USERFILTER;GROUPS_LDAP_USERFILTER" desc:"LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)')."`
-	GroupFilter      string          `yaml:"group_filter" env:"LDAP_GROUPFILTER;GROUPS_LDAP_GROUPFILTER" desc:"LDAP filter to add to the default filters for group searches."`
+	UserFilter       string          `yaml:"user_filter" env:"LDAP_USER_FILTER;GROUPS_LDAP_USER_FILTER" desc:"LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)')."`
+	GroupFilter      string          `yaml:"group_filter" env:"LDAP_GROUP_FILTER;GROUPS_LDAP_GROUP_FILTER" desc:"LDAP filter to add to the default filters for group searches."`
 	UserObjectClass  string          `yaml:"user_object_class" env:"LDAP_USER_OBJECTCLASS;GROUPS_LDAP_USER_OBJECTCLASS" desc:"The object class to use for users in the default user search filter ('inetOrgPerson')."`
 	GroupObjectClass string          `yaml:"group_object_class" env:"LDAP_GROUP_OBJECTCLASS;GROUPS_LDAP_GROUP_OBJECTCLASS" desc:"The object class to use for groups in the default group search filter ('groupOfNames')."`
 	IDP              string          `yaml:"idp" env:"OCIS_URL;OCIS_OIDC_ISSUER;GROUPS_IDP_URL" desc:"The identity provider value to set in the groupids of the CS3 group objects for groups returned by this group provider."`

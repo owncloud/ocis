@@ -24,7 +24,7 @@
       "s01ldap_expert_uuid_user_attr": "{{ .Env.LDAP_USER_SCHEMA_UID }}",
       "s01ldap_group_display_name": "{{ .Env.LDAP_GROUP_SCHEMA_DISPLAYNAME }}",
       "s01ldap_group_filter_mode": "0",
-      "s01ldap_group_filter": "{{ .Env.LDAP_GROUPFILTER }}",
+      "s01ldap_group_filter": "{{ .Env.LDAP_GROUP_FILTER }}",
       "s01ldap_group_member_assoc_attribute": "{{ .Env.LDAP_GROUP_MEMBER_ASSOC_ATTR }}",
       "s01ldap_groupfilter_groups": "",
       "s01ldap_groupfilter_objectclass": "",
@@ -46,7 +46,7 @@
       "s01ldap_user_filter_mode": "0",
       "s01ldap_userfilter_groups": "",
       "s01ldap_userfilter_objectclass": "",
-      "s01ldap_userlist_filter": "{{ .Env.LDAP_USERFILTER }}",
+      "s01ldap_userlist_filter": "{{ .Env.LDAP_USER_FILTER }}",
       "s01use_memberof_to_detect_membership": "1"
     }
   }

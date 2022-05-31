@@ -1617,7 +1617,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "LDAP_GROUP_SCHEMA_ID": "cn",
             "LDAP_GROUP_SCHEMA_MAIL": "mail",
             "LDAP_GROUP_SCHEMA_MEMBER": "cn",
-            "LDAP_GROUPFILTER": "(objectclass=owncloud)",
+            "LDAP_GROUP_FILTER": "(objectclass=owncloud)",
             "LDAP_LOGIN_ATTRIBUTES": "uid",
             "LDAP_USER_BASE_DN": "ou=TestUsers,dc=owncloud,dc=com",
             "LDAP_USER_OBJECTCLASS": "posixAccount",
@@ -1625,7 +1625,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "LDAP_USER_SCHEMA_ID": "ownclouduuid",
             "LDAP_USER_SCHEMA_MAIL": "mail",
             "LDAP_USER_SCHEMA_USERNAME": "cn",
-            "LDAP_USERFILTER": "(objectclass=owncloud)",
+            "LDAP_USER_FILTER": "(objectclass=owncloud)",
             # ownCloudSQL storage driver
             "STORAGE_USERS_DRIVER": "owncloudsql",
             "STORAGE_USERS_OWNCLOUDSQL_DATADIR": "/mnt/data/files",
@@ -2307,11 +2307,11 @@ def parallelDeploymentOC10Server():
                 "LDAP_LOGINFILTER": "(&(objectclass=owncloud)(|(uid=%uid)(mail=%uid)))",
                 "LDAP_GROUP_SCHEMA_DISPLAYNAME": "cn",
                 "LDAP_USER_SCHEMA_NAME_ATTR": "uid",
-                "LDAP_GROUPFILTER": "(&(objectclass=groupOfUniqueNames)(objectclass=owncloud))",
+                "LDAP_GROUP_FILTER": "(&(objectclass=groupOfUniqueNames)(objectclass=owncloud))",
                 "LDAP_USER_SCHEMA_UID": "ownclouduuid",
                 "LDAP_USERATTRIBUTEFILTERS": "uid",  # ownCloudUUID;cn;uid;mail
                 "LDAP_USER_SCHEMA_MAIL": "mail",
-                "LDAP_USERFILTER": "(&(objectclass=owncloud))",
+                "LDAP_USER_FILTER": "(&(objectclass=owncloud))",
                 "LDAP_GROUP_MEMBER_ASSOC_ATTR": "uniqueMember",
                 # database
                 "OWNCLOUD_DB_TYPE": "mysql",

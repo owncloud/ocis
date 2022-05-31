@@ -61,10 +61,10 @@ services:
       LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
       LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
       LDAP_GROUP_BASE_DN: "dc=owncloud,dc=com"
-      LDAP_GROUPFILTER: "(objectclass=owncloud)"
+      LDAP_GROUP_FILTER: "(objectclass=owncloud)"
       LDAP_GROUP_OBJECTCLASS: "groupOfUniqueNames"
       LDAP_USER_BASE_DN: "dc=owncloud,dc=com"
-      LDAP_USERFILTER: "(objectclass=owncloud)"
+      LDAP_USER_FILTER: "(objectclass=owncloud)"
       LDAP_USER_OBEJECTCLASS: "inetOrgPerson"
       LDAP_LOGIN_ATTRIBUTES: "uid,mail"
       IDP_LDAP_URI: ldap://ldap-server
