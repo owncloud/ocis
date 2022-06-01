@@ -45,6 +45,18 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "shares",
 		Usage: "migrates shares from the previous to the new ",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  "from",
+				Value: "json",
+				Usage: "Share manager to export the data from",
+			},
+			&cli.StringFlag{
+				Name:  "to",
+				Value: "cs3",
+				Usage: "Share manager to import the data to",
+			},
+		},
 		Before: func(c *cli.Context) error {
 			err := parser.ParseConfig(cfg)
 			if err != nil {
@@ -55,8 +67,8 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			rcfg := revaConfig(cfg.Sharing)
-			oldDriver := "json"
-			newDriver := "cs3"
+			oldDriver := c.String("from")
+			newDriver := c.String("to")
 			shareChan := make(chan *collaboration.Share)
 			receivedShareChan := make(chan share.ReceivedShareDump)
 
@@ -71,7 +83,7 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 				os.Exit(1)
 			}
 			if _, ok := oldMgr.(share.DumpableManager); !ok {
-				fmt.Println("Share manager type '" + oldDriver + "' does not support migration.")
+				fmt.Println("Share manager type '" + oldDriver + "' does not support dumping its shares.")
 				os.Exit(1)
 			}
 
@@ -86,16 +98,16 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 				os.Exit(1)
 			}
 			if _, ok := newMgr.(share.LoadableManager); !ok {
-				fmt.Println("Share manager type '" + newDriver + "' does not support migration.")
+				fmt.Println("Share manager type '" + newDriver + "' does not support loading a shares dump.")
 				os.Exit(1)
 			}
 
 			var wg sync.WaitGroup
 			wg.Add(2)
 			go func() {
-				fmt.Println("Loading...")
+				fmt.Println("Migrating shares...")
 				err = newMgr.(share.LoadableManager).Load(shareChan, receivedShareChan)
-				fmt.Println("Finished loading...")
+				fmt.Println("Finished migrating shares.")
 				if err != nil {
 					fmt.Println("Error while loading shares", err)
 					os.Exit(1)
