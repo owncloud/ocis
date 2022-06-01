@@ -32,6 +32,7 @@ composer.lock
 vendor
 vendor-bin/**/vendor
 vendor-bin/**/composer.lock
+vendor-php
 
 # API acceptance tests - auto-generated files
 .php-cs-fixer.cache
