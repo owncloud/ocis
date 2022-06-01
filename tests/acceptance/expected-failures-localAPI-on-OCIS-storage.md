@@ -18,6 +18,3 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 ### Tries to download /Shares/ folder but it cannot be downloaded any more directly
 - [apiArchiver/downloadById.feature:134](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L134)
 - [apiArchiver/downloadById.feature:135](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L135)
-
-### [User can not upload file after setting the quota without restriction](https://github.com/owncloud/ocis/issues/3810)
-- [apiSpaces/changeSpaces.feature:138](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/changeSpaces.feature#L138)
