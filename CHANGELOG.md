@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Allow empty environment variables: [#3892](https://github.com/owncloud/ocis/pull/3892)
+* Bugfix - Inconsistency env var naming for LDAP filter configuration: [#3890](https://github.com/owncloud/ocis/issues/3890)
 * Bugfix - Fix LDAP insecure options: [#3897](https://github.com/owncloud/ocis/pull/3897)
 * Bugfix - Fix user autoprovisioning: [#3893](https://github.com/owncloud/ocis/issues/3893)
 * Enhancement - Add config option to provide TLS certificate: [#3818](https://github.com/owncloud/ocis/issues/3818)
@@ -21,6 +22,18 @@ The following sections list the changes for unreleased.
    override a default value with an empty value.
 
    https://github.com/owncloud/ocis/pull/3892
+
+* Bugfix - Inconsistency env var naming for LDAP filter configuration: [#3890](https://github.com/owncloud/ocis/issues/3890)
+
+   There was a naming inconsitency for the enviroment variables used to define LDAP filters for
+   user and groups queries. Some services used `LDAP_USER_FILTER` while others used
+   `LDAP_USERFILTER`. This is now changed to use `LDAP_USER_FILTER` and `LDAP_GROUP_FILTER`.
+
+   Note: If your oCIS setup is using an LDAP configuration that has any of the `*_LDAP_USERFILTER`
+   or `*_LDAP_GROUPFILTER` environment variables set, please update the configuration to use
+   the new unified names `*_LDAP_USER_FILTER` respectively `*_LDAP_GROUP_FILTER` instead.
+
+   https://github.com/owncloud/ocis/issues/3890
 
 * Bugfix - Fix LDAP insecure options: [#3897](https://github.com/owncloud/ocis/pull/3897)
 
