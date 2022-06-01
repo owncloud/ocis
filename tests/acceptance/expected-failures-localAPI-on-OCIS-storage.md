@@ -19,9 +19,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiArchiver/downloadById.feature:134](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L134)
 - [apiArchiver/downloadById.feature:135](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L135)
 
-### [User can not upload file after setting the quota without restriction](https://github.com/owncloud/ocis/issues/3810)
-- [apiSpaces/changeSpaces.feature:138](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/changeSpaces.feature#L138)
-
 #### [Resharing is now allowed for viewers and editors](https://github.com/owncloud/ocis/issues/3828)
 - [apiSpaces/shareSubItemOfSpace.feature:89](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpace.feature#L89)
 - [apiSpaces/shareSubItemOfSpace.feature:90](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpace.feature#L90)
