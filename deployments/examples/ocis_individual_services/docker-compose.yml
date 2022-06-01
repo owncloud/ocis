@@ -3,7 +3,6 @@ version: "3.7"
 
 volumes:
   traefik-certs: null
-  ocis-settings: null
   ocis-store: null
   ocis-storage-system: null
   ocis-storage-users: null
@@ -335,7 +334,7 @@ services:
 
       OCS_HTTP_ADDR: 0.0.0.0:9110
 
-      OCS_ACCOUNT_BACKEND_TYPE: accounts
+      OCS_ACCOUNT_BACKEND_TYPE: cs3
       OCS_IDM_ADDRESS: https://${OCIS_DOMAIN}
 
       OCS_JWT_SECRET: ${OCIS_JWT_SECRET}
@@ -369,8 +368,6 @@ services:
       SEARCH_EVENTS_ENDPOINT: nats:9233
 
       SEARCH_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY}
-      OCIS_SYSTEM_USER_API_KEY: ${SYSTEM_USER_API_KEY}
-      OCIS_SYSTEM_USER_ID: ${SYSTEM_USER_ID}
     logging:
       driver: "local"
     restart: always
@@ -403,8 +400,6 @@ services:
       STORAGE_GATEWAY_GRPC_ADDR: storage-system:9215
       STORAGE_GRPC_ADDR: storage-system:9215
 
-    volumes:
-      - "ocis-settings:/var/lib/ocis"
     logging:
       driver: "local"
     restart: always
@@ -425,10 +420,6 @@ services:
       STORE_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       STORE_GRPC_ADDR: 0.0.0.0:9460
-
-      OCIS_JWT_SECRET: ${OCIS_JWT_SECRET}
-      STORAGE_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET}
-      OCIS_MACHINE_AUTH_API_KEY: ${OCIS_MACHINE_AUTH_API_KEY}
 
     volumes:
       - "ocis-store:/var/lib/ocis"
@@ -565,7 +556,6 @@ services:
       STORAGE_SYSTEM_DATA_SERVER_URL: http://storage-system:9216/data
 
       STORAGE_SYSTEM_JWT_SECRET: ${OCIS_JWT_SECRET}
-      STORAGE_SYSTEM_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET}
 
       OCIS_SYSTEM_USER_ID: ${SYSTEM_USER_ID}
       STORAGE_SYSTEM_DRIVER: ocis
@@ -645,9 +635,9 @@ services:
       - auth-bearer
       - server
     environment:
-      OCIS_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
-      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      OCIS_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
+      AUTH_BEARER_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
+      AUTH_BEARER_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      AUTH_BEARER_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
 
       AUTH_BEARER_GRPC_ADDR: 0.0.0.0:9148
 
@@ -714,7 +704,6 @@ services:
       REVA_GATEWAY: gateway:9142
 
       STORAGE_USERS_JWT_SECRET: ${OCIS_JWT_SECRET}
-      STORAGE_USERS_TRANSFER_SECRET: ${STORAGE_TRANSFER_SECRET}
 
     volumes:
       - "ocis-storage-users:/var/lib/ocis"
