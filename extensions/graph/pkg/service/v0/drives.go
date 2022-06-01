@@ -498,7 +498,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 				tmp := id
 				identity := libregraph.IdentitySet{User: &libregraph.Identity{Id: &tmp}}
 				switch {
-				case perm.AddGrant:
+				case perm.RemoveGrant:
 					managerIdentities = append(managerIdentities, identity)
 				case perm.InitiateFileUpload:
 					editorIdentities = append(editorIdentities, identity)

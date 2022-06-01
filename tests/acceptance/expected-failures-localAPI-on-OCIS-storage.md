@@ -18,3 +18,19 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 ### Tries to download /Shares/ folder but it cannot be downloaded any more directly
 - [apiArchiver/downloadById.feature:134](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L134)
 - [apiArchiver/downloadById.feature:135](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L135)
+
+#### [Resharing is now allowed for viewers and editors](https://github.com/owncloud/ocis/issues/3828)
+- [apiSpaces/shareSubItemOfSpace.feature:89](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpace.feature#L89)
+- [apiSpaces/shareSubItemOfSpace.feature:90](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpace.feature#L90)
+- [apiSpaces/shareSubItemOfSpace.feature:91](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpace.feature#L91)
+- [apiSpaces/shareSubItemOfSpace.feature:92](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpace.feature#L92)
+- [apiSpaces/shareSubItemOfSpaceViaPublicLink.feature:89](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpaceViaPublicLink.feature#L89)
+- [apiSpaces/shareSubItemOfSpaceViaPublicLink.feature:90](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpaceViaPublicLink.feature#L90)
+- [apiSpaces/shareSubItemOfSpaceViaPublicLink.feature:91](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpaceViaPublicLink.feature#L91)
+- [apiSpaces/shareSubItemOfSpaceViaPublicLink.feature:92](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpaceViaPublicLink.feature#L92)
+
+### Visibility of shares is still to discuss
+- [apiSpaces/resharing.feature:37](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/resharing.feature#L37)
+- [apiSpaces/resharing.feature:38](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/resharing.feature#L38)
+- [apiSpaces/resharing.feature:39](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/resharing.feature#L39)
+
