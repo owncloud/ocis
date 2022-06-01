@@ -51,8 +51,8 @@ If the below defaults don't match your environment change them accordingly:
 export STORAGE_LDAP_HOSTNAME=localhost
 export STORAGE_LDAP_PORT=9126
 export STORAGE_LDAP_BASE_DN='dc=ocis,dc=test'
-export STORAGE_LDAP_USERFILTER='(&(objectclass=posixAccount)(cn=%s))'
-export STORAGE_LDAP_GROUPFILTER='(&(objectclass=posixGroup)(cn=%s))'
+export STORAGE_LDAP_USER_FILTER='(&(objectclass=posixAccount)(cn=%s))'
+export STORAGE_LDAP_GROUP_FILTER='(&(objectclass=posixGroup)(cn=%s))'
 export STORAGE_LDAP_BIND_DN='cn=reva,ou=sysusers,dc=ocis,dc=test'
 export STORAGE_LDAP_BIND_PASSWORD=reva
 export STORAGE_LDAP_USER_SCHEMA_UID=uid

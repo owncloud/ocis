@@ -155,14 +155,14 @@
 | sub
 | LDAP search scope to use when looking up gruops ('base', 'one', 'sub').
 
-|`LDAP_USERFILTER` +
-`GROUPS_LDAP_USERFILTER`
+|`LDAP_USER_FILTER` +
+`GROUPS_LDAP_USER_FILTER`
 | string
 | 
 | LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').
 
-|`LDAP_GROUPFILTER` +
-`GROUPS_LDAP_GROUPFILTER`
+|`LDAP_GROUP_FILTER` +
+`GROUPS_LDAP_GROUP_FILTER`
 | string
 | 
 | LDAP filter to add to the default filters for group searches.

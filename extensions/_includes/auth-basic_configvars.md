@@ -29,8 +29,8 @@
 | LDAP_GROUP_BASE_DN<br/>AUTH_BASIC_LDAP_GROUP_BASE_DN | string | ou=groups,o=libregraph-idm | Search base DN for looking up LDAP groups.|
 | LDAP_USER_SCOPE<br/>AUTH_BASIC_LDAP_USER_SCOPE | string | sub | LDAP search scope to use when looking up users ('base', 'one', 'sub').|
 | LDAP_GROUP_SCOPE<br/>AUTH_BASIC_LDAP_GROUP_SCOPE | string | sub | LDAP search scope to use when looking up gruops ('base', 'one', 'sub').|
-| LDAP_USERFILTER<br/>AUTH_BASIC_LDAP_USERFILTER | string |  | LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').|
-| LDAP_GROUPFILTER<br/>AUTH_BASIC_LDAP_GROUPFILTER | string |  | LDAP filter to add to the default filters for group searches.|
+| LDAP_USER_FILTER<br/>AUTH_BASIC_LDAP_USER_FILTER | string |  | LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').|
+| LDAP_GROUP_FILTER<br/>AUTH_BASIC_LDAP_GROUP_FILTER | string |  | LDAP filter to add to the default filters for group searches.|
 | LDAP_USER_OBJECTCLASS<br/>AUTH_BASIC_LDAP_USER_OBJECTCLASS | string | inetOrgPerson | The object class to use for users in the default user search filter ('inetOrgPerson').|
 | LDAP_GROUP_OBJECTCLASS<br/>AUTH_BASIC_LDAP_GROUP_OBJECTCLASS | string | groupOfNames | The object class to use for groups in the default group search filter ('groupOfNames'). |
 | LDAP_LOGIN_ATTRIBUTES<br/>AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES |  | [uid mail] | |
