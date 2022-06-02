@@ -33,13 +33,13 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		UserSharingDriver: "json", // TODO use "cs3", see https://github.com/owncloud/ocis/pull/3697
+		UserSharingDriver: "cs3",
 		UserSharingDrivers: config.UserSharingDrivers{
 			JSON: config.UserSharingJSONDriver{
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "shares.json"),
 			},
 			CS3: config.UserSharingCS3Driver{
-				ProviderAddr:  "127.0.0.1:9215", // metadata storage
+				ProviderAddr:  "127.0.0.1:9215", // system storage
 				SystemUserIDP: "internal",
 			},
 			OwnCloudSQL: config.UserSharingOwnCloudSQLDriver{
@@ -49,15 +49,16 @@ func DefaultConfig() *config.Config {
 				DBName:     "owncloud",
 			},
 		},
-		PublicSharingDriver: "json", // TODO use "cs3", see https://github.com/owncloud/ocis/pull/3697
+		PublicSharingDriver: "cs3",
 		PublicSharingDrivers: config.PublicSharingDrivers{
 			JSON: config.PublicSharingJSONDriver{
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "publicshares.json"),
 			},
 			CS3: config.PublicSharingCS3Driver{
-				ProviderAddr:  "127.0.0.1:9215", // metadata storage
+				ProviderAddr:  "127.0.0.1:9215", // system storage
 				SystemUserIDP: "internal",
 			},
+			// TODO implement and add owncloudsql publicshare driver
 		},
 		Events: config.Events{
 			Addr:      "127.0.0.1:9233",
