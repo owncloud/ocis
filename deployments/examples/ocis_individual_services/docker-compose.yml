@@ -377,7 +377,7 @@ services:
   settings:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
-      replicas: 1
+      replicas: ${OCIS_SCALE:-1}
     networks:
       ocis-net:
     entrypoint:
@@ -539,7 +539,7 @@ services:
   storage-system:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
-      replicas: 1
+      replicas: ${OCIS_SCALE:-1}
     networks:
       ocis-net:
     entrypoint:
@@ -679,7 +679,7 @@ services:
   storage-users:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
-      replicas: 1
+      replicas: ${OCIS_SCALE:-1}
     networks:
       ocis-net:
     entrypoint:
