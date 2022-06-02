@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Allow empty environment variables: [#3892](https://github.com/owncloud/ocis/pull/3892)
 * Bugfix - Inconsistency env var naming for LDAP filter configuration: [#3890](https://github.com/owncloud/ocis/issues/3890)
 * Bugfix - Fix LDAP insecure options: [#3897](https://github.com/owncloud/ocis/pull/3897)
+* Bugfix - Fix configuration validation for extensions' server commands: [#3911](https://github.com/owncloud/ocis/pull/3911)
 * Bugfix - Fix user autoprovisioning: [#3893](https://github.com/owncloud/ocis/issues/3893)
 * Enhancement - Add config option to provide TLS certificate: [#3818](https://github.com/owncloud/ocis/issues/3818)
 
@@ -44,6 +45,17 @@ The following sections list the changes for unreleased.
   * The IDP insecure option for the user backend now also picks up configuration from `LDAP_INSECURE`.
 
    https://github.com/owncloud/ocis/pull/3897
+
+* Bugfix - Fix configuration validation for extensions' server commands: [#3911](https://github.com/owncloud/ocis/pull/3911)
+
+   We've fixed the configuration validation for the extensions' server commands. Before that
+   fix error messages have occurred when started services which don't need certain
+   configuration values, that are needed for the oCIS fullstack command.
+
+   We now no longer do the common oCIS configuration validation for extensions' server commands
+   and now rely only on the extensions' validation function.
+
+   https://github.com/owncloud/ocis/pull/3911
 
 * Bugfix - Fix user autoprovisioning: [#3893](https://github.com/owncloud/ocis/issues/3893)
 
