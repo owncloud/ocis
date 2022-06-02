@@ -3,7 +3,7 @@ version: "3.7"
 
 services:
   traefik:
-    image: traefik:v2.5
+    image: traefik:v2.6.6
     networks:
       ocis-net:
         aliases:
@@ -90,7 +90,7 @@ services:
       LDAP_GROUP_SCHEMA_ID: "cn"
       LDAP_GROUP_SCHEMA_MAIL: "mail"
       LDAP_GROUP_SCHEMA_MEMBER: "cn"
-      LDAP_GROUP_FILTER: "(objectclass=owncloud)"
+      LDAP_GROUPFILTER: "(objectclass=owncloud)"
       LDAP_LOGIN_ATTRIBUTES: "uid"
       LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
       LDAP_USER_OBJECTCLASS: "posixAccount"
@@ -98,7 +98,7 @@ services:
       LDAP_USER_SCHEMA_ID: "ownclouduuid"
       LDAP_USER_SCHEMA_MAIL: "mail"
       LDAP_USER_SCHEMA_USERNAME: "cn"
-      LDAP_USER_FILTER: "(objectclass=owncloud)"
+      LDAP_USERFILTER: "(objectclass=owncloud)"
       # ownCloudSQL storage driver
       STORAGE_USERS_DRIVER: "owncloudsql"
       STORAGE_USERS_OWNCLOUDSQL_DATADIR: "/mnt/data/files"
@@ -168,11 +168,11 @@ services:
       LDAP_LOGINFILTER: "(&(objectclass=owncloud)(|(uid=%uid)(mail=%uid)))"
       LDAP_GROUP_SCHEMA_DISPLAYNAME: "cn"
       LDAP_USER_SCHEMA_NAME_ATTR: "uid"
-      LDAP_GROUP_FILTER: "(&(objectclass=groupOfUniqueNames)(objectclass=owncloud))"
+      LDAP_GROUPFILTER: "(&(objectclass=groupOfUniqueNames)(objectclass=owncloud))"
       LDAP_USER_SCHEMA_UID: "ownclouduuid"
       LDAP_USERATTRIBUTEFILTERS: "" #"ownclouduuid;cn;uid;mail"
       LDAP_USER_SCHEMA_MAIL: "mail"
-      LDAP_USER_FILTER: "(&(objectclass=owncloud))"
+      LDAP_USERFILTER: "(&(objectclass=owncloud))"
       LDAP_GROUP_MEMBER_ASSOC_ATTR: "uniqueMember"
       # ownCloud config
       OWNCLOUD_DB_TYPE: mysql
