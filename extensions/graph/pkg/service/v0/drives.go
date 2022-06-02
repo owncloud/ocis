@@ -7,6 +7,7 @@ import (
 	"math"
 	"net/http"
 	"net/url"
+	"path"
 	"sort"
 	"strconv"
 	"strings"
@@ -581,8 +582,9 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 		// TODO read from StorageSpace ... needs Opaque for now
 		// TODO how do we build the url?
 		// for now: read from request
-		webDavURL := baseURL.String() + spaceID
-		drive.Root.WebDavUrl = &webDavURL
+		webDavURL := *baseURL
+		webDavURL.Path = path.Join(webDavURL.Path, spaceID)
+		drive.Root.WebDavUrl = libregraph.PtrString(webDavURL.String())
 	}
 
 	// TODO The public space has no owner ... should we even show it?
