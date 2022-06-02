@@ -636,8 +636,8 @@ github.com/googleapis/gax-go/v2 v2.1.0/go.mod h1:Q3nei7sK6ybPYH7twZdmQpAd1MKb7pf
 github.com/googleapis/gax-go/v2 v2.1.1/go.mod h1:hddJymUZASv3XPyGkUpKj8pPO47Rmb0eJc8R6ouapiM=
 github.com/gookit/color v1.5.0 h1:1Opow3+BWDwqor78DcJkJCIwnkviFi+rrOANki9BUFw=
 github.com/gookit/color v1.5.0/go.mod h1:43aQb+Zerm/BWh2GnrgOQm7ffz7tvQXEKV6BFMl7wAo=
-github.com/gookit/config/v2 v2.1.1 h1:pVeNDfvpFC62mvMk5vYDLNmPxtjYIok4I0r7iq7TY50=
-github.com/gookit/config/v2 v2.1.1/go.mod h1:IPaiN75J82aoFsavbpK8SazWLQ0Y4QOYjucqA3ggiVM=
+github.com/gookit/config/v2 v2.1.2 h1:qPW58LTY8CTOnHFN9r9q2NU3jk+6UQ+JYWV6x2JepH4=
+github.com/gookit/config/v2 v2.1.2/go.mod h1:IPaiN75J82aoFsavbpK8SazWLQ0Y4QOYjucqA3ggiVM=
 github.com/gookit/goutil v0.5.0/go.mod h1:pq1eTibwb2wN96jrci0xy7xogWzzo9CihOQJEAvz4yQ=
 github.com/gookit/goutil v0.5.2 h1:1IbfIUiRV+Y+5IdgBeb/O7hWvq8OnnP1+sB/Ua2Q6jE=
 github.com/gookit/goutil v0.5.2/go.mod h1:pq1eTibwb2wN96jrci0xy7xogWzzo9CihOQJEAvz4yQ=
