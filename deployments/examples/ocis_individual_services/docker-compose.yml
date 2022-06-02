@@ -179,6 +179,8 @@ services:
 
       REVA_GATEWAY: gateway:9142
       OCDAV_JWT_SECRET: ${OCIS_JWT_SECRET}
+
+      OCDAV_INSECURE: ${INSECURE:-true}
     logging:
       driver: "local"
     restart: always
