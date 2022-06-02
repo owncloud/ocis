@@ -17,7 +17,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage:    "start a fullstack server (runtime and all extensions in supervised mode)",
 		Category: "fullstack",
 		Before: func(c *cli.Context) error {
-			if err := parser.ParseConfig(cfg); err != nil {
+			if err := parser.ParseConfig(cfg, false); err != nil {
 				fmt.Printf("%v", err)
 				return err
 			}

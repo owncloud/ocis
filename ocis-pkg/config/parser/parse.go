@@ -11,7 +11,7 @@ import (
 // ParseConfig loads the ocis configuration and
 // copies applicable parts into the commons part, from
 // where the extensions can copy it into their own config
-func ParseConfig(cfg *config.Config) error {
+func ParseConfig(cfg *config.Config, skipValidate bool) error {
 	_, err := config.BindSourcesToStructs("ocis", cfg)
 	if err != nil {
 		return err
@@ -28,6 +28,10 @@ func ParseConfig(cfg *config.Config) error {
 	}
 
 	EnsureCommons(cfg)
+
+	if skipValidate {
+		return nil
+	}
 
 	return Validate(cfg)
 }

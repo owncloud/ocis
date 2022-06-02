@@ -18,7 +18,7 @@ func StorageSharesCommand(cfg *config.Config) *cli.Command {
 		Usage:    helper.SubcommandDescription(cfg.StorageShares.Service.Name),
 		Category: "extensions",
 		Before: func(c *cli.Context) error {
-			if err := parser.ParseConfig(cfg); err != nil {
+			if err := parser.ParseConfig(cfg, true); err != nil {
 				fmt.Printf("%v", err)
 			}
 			cfg.StorageShares.Commons = cfg.Commons

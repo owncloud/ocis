@@ -19,7 +19,7 @@ func WebDAVCommand(cfg *config.Config) *cli.Command {
 		Usage:    helper.SubcommandDescription(cfg.WebDAV.Service.Name),
 		Category: "extensions",
 		Before: func(c *cli.Context) error {
-			if err := parser.ParseConfig(cfg); err != nil {
+			if err := parser.ParseConfig(cfg, true); err != nil {
 				fmt.Printf("%v", err)
 			}
 			cfg.WebDAV.Commons = cfg.Commons

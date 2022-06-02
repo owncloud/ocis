@@ -18,7 +18,7 @@ func AppRegistryCommand(cfg *config.Config) *cli.Command {
 		Usage:    helper.SubcommandDescription(cfg.AppRegistry.Service.Name),
 		Category: "extensions",
 		Before: func(c *cli.Context) error {
-			if err := parser.ParseConfig(cfg); err != nil {
+			if err := parser.ParseConfig(cfg, true); err != nil {
 				fmt.Printf("%v", err)
 			}
 			cfg.AppRegistry.Commons = cfg.Commons
