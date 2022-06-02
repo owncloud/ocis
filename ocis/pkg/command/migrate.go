@@ -1,18 +1,21 @@
 package command
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
 	"os"
 	"sync"
 
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/publicshare"
+	publicregistry "github.com/cs3org/reva/v2/pkg/publicshare/manager/registry"
 	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/cs3org/reva/v2/pkg/share/manager/registry"
 	sharing "github.com/owncloud/ocis/v2/extensions/sharing/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
+	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
 )
 
@@ -23,9 +26,7 @@ func Migrate(cfg *config.Config) *cli.Command {
 		Usage:    "migrate data from an existing instance to a new version",
 		Category: "migration",
 		Before: func(c *cli.Context) error {
-			if err := parser.ParseConfig(cfg); err != nil {
-				s, _ := json.MarshalIndent(cfg, "", "	")
-				fmt.Print(string(s))
+			if err := parser.ParseConfig(cfg, true); err != nil {
 				fmt.Printf("%v", err)
 				return err
 			}
@@ -33,6 +34,7 @@ func Migrate(cfg *config.Config) *cli.Command {
 		},
 		Subcommands: []*cli.Command{
 			MigrateShares(cfg),
+			MigratePublicShares(cfg),
 		},
 	}
 }
@@ -44,7 +46,7 @@ func init() {
 func MigrateShares(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "shares",
-		Usage: "migrates shares from the previous to the new ",
+		Usage: "migrates shares from the previous to the new manager",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "from",
@@ -58,7 +60,7 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 			},
 		},
 		Before: func(c *cli.Context) error {
-			err := parser.ParseConfig(cfg)
+			err := parser.ParseConfig(cfg, true)
 			if err != nil {
 				fmt.Printf("%v", err)
 				os.Exit(1)
@@ -66,58 +68,60 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 			return err
 		},
 		Action: func(c *cli.Context) error {
-			rcfg := revaConfig(cfg.Sharing)
+			log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Logger()
+			ctx := log.WithContext(context.Background())
+			rcfg := revaShareConfig(cfg.Sharing)
 			oldDriver := c.String("from")
 			newDriver := c.String("to")
 			shareChan := make(chan *collaboration.Share)
-			receivedShareChan := make(chan share.ReceivedShareDump)
+			receivedShareChan := make(chan share.ReceivedShareWithUser)
 
 			f, ok := registry.NewFuncs[oldDriver]
 			if !ok {
-				fmt.Println("Unknown share manager type '" + oldDriver + "'")
+				log.Error().Msg("Unknown share manager type '" + oldDriver + "'")
 				os.Exit(1)
 			}
 			oldMgr, err := f(rcfg[oldDriver].(map[string]interface{}))
 			if err != nil {
-				fmt.Println("failed to initiate source share manager", err)
+				log.Error().Err(err).Msg("failed to initiate source share manager")
 				os.Exit(1)
 			}
 			if _, ok := oldMgr.(share.DumpableManager); !ok {
-				fmt.Println("Share manager type '" + oldDriver + "' does not support dumping its shares.")
+				log.Error().Msg("Share manager type '" + oldDriver + "' does not support dumping its shares.")
 				os.Exit(1)
 			}
 
 			f, ok = registry.NewFuncs[newDriver]
 			if !ok {
-				fmt.Println("Unknown share manager type '" + oldDriver + "'")
+				log.Error().Msg("Unknown share manager type '" + oldDriver + "'")
 				os.Exit(1)
 			}
 			newMgr, err := f(rcfg[newDriver].(map[string]interface{}))
 			if err != nil {
-				fmt.Println("failed to initiate source share manager", err)
+				log.Error().Err(err).Msg("failed to initiate source share manager")
 				os.Exit(1)
 			}
 			if _, ok := newMgr.(share.LoadableManager); !ok {
-				fmt.Println("Share manager type '" + newDriver + "' does not support loading a shares dump.")
+				log.Error().Msg("Share manager type '" + newDriver + "' does not support loading a shares dump.")
 				os.Exit(1)
 			}
 
 			var wg sync.WaitGroup
 			wg.Add(2)
 			go func() {
-				fmt.Println("Migrating shares...")
-				err = newMgr.(share.LoadableManager).Load(shareChan, receivedShareChan)
-				fmt.Println("Finished migrating shares.")
+				log.Info().Msg("Migrating shares...")
+				err = newMgr.(share.LoadableManager).Load(ctx, shareChan, receivedShareChan)
+				log.Info().Msg("Finished migrating shares.")
 				if err != nil {
-					fmt.Println("Error while loading shares", err)
+					log.Error().Err(err).Msg("Error while loading shares")
 					os.Exit(1)
 				}
 				wg.Done()
 			}()
 			go func() {
-				err = oldMgr.(share.DumpableManager).Dump(shareChan, receivedShareChan)
+				err = oldMgr.(share.DumpableManager).Dump(ctx, shareChan, receivedShareChan)
 				if err != nil {
-					fmt.Println("Error while dumping shares", err)
+					log.Error().Err(err).Msg("Error while dumping shares")
 					os.Exit(1)
 				}
 				wg.Done()
@@ -128,7 +132,96 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 	}
 }
 
-func revaConfig(cfg *sharing.Config) map[string]interface{} {
+func MigratePublicShares(cfg *config.Config) *cli.Command {
+	return &cli.Command{
+		Name:  "publicshares",
+		Usage: "migrates public shares from the previous to the new manager",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  "from",
+				Value: "json",
+				Usage: "Share manager to export the data from",
+			},
+			&cli.StringFlag{
+				Name:  "to",
+				Value: "cs3",
+				Usage: "Share manager to import the data to",
+			},
+		},
+		Before: func(c *cli.Context) error {
+			err := parser.ParseConfig(cfg, true)
+			if err != nil {
+				fmt.Printf("%v", err)
+				os.Exit(1)
+			}
+			return err
+		},
+		Action: func(c *cli.Context) error {
+			log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Logger()
+			ctx := log.WithContext(context.Background())
+
+			rcfg := revaPublicShareConfig(cfg.Sharing)
+			oldDriver := c.String("from")
+			newDriver := c.String("to")
+			shareChan := make(chan *publicshare.WithPassword)
+
+			f, ok := publicregistry.NewFuncs[oldDriver]
+			if !ok {
+				log.Error().Msg("Unknown share manager type '" + oldDriver + "'")
+				os.Exit(1)
+			}
+			oldMgr, err := f(rcfg[oldDriver].(map[string]interface{}))
+			if err != nil {
+				log.Error().Err(err).Msg("failed to initiate source share manager")
+				os.Exit(1)
+			}
+			if _, ok := oldMgr.(publicshare.DumpableManager); !ok {
+				log.Error().Msg("Publicshare manager type '" + oldDriver + "' does not support dumping its shares.")
+				os.Exit(1)
+			}
+
+			f, ok = publicregistry.NewFuncs[newDriver]
+			if !ok {
+				log.Error().Msg("Unknown share manager type '" + oldDriver + "'")
+				os.Exit(1)
+			}
+			newMgr, err := f(rcfg[newDriver].(map[string]interface{}))
+			if err != nil {
+				log.Error().Err(err).Msg("failed to initiate source share manager")
+				os.Exit(1)
+			}
+			if _, ok := newMgr.(publicshare.LoadableManager); !ok {
+				log.Error().Msg("PUblicshare manager type '" + newDriver + "' does not support loading a shares dump.")
+				os.Exit(1)
+			}
+
+			var wg sync.WaitGroup
+			wg.Add(2)
+			go func() {
+				log.Info().Msg("Migrating public shares...")
+				err = newMgr.(publicshare.LoadableManager).Load(ctx, shareChan)
+				log.Info().Msg("Finished migrating public shares.")
+				if err != nil {
+					log.Error().Err(err).Msg("Error while loading shares")
+					os.Exit(1)
+				}
+				wg.Done()
+			}()
+			go func() {
+				err = oldMgr.(publicshare.DumpableManager).Dump(ctx, shareChan)
+				if err != nil {
+					log.Error().Err(err).Msg("Error while dumping public shares")
+					os.Exit(1)
+				}
+				wg.Done()
+			}()
+			wg.Wait()
+			return nil
+		},
+	}
+}
+
+func revaShareConfig(cfg *sharing.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"json": map[string]interface{}{
 			"file":         cfg.UserSharingDrivers.JSON.File,
@@ -161,5 +254,30 @@ func revaConfig(cfg *sharing.Config) map[string]interface{} {
 			"machine_auth_apikey": cfg.UserSharingDrivers.CS3.SystemUserAPIKey,
 		},
 	}
+}
 
+func revaPublicShareConfig(cfg *sharing.Config) map[string]interface{} {
+	return map[string]interface{}{
+		"json": map[string]interface{}{
+			"file":         cfg.PublicSharingDrivers.JSON.File,
+			"gateway_addr": cfg.Reva.Address,
+		},
+		"sql": map[string]interface{}{
+			"db_username":                   cfg.PublicSharingDrivers.SQL.DBUsername,
+			"db_password":                   cfg.PublicSharingDrivers.SQL.DBPassword,
+			"db_host":                       cfg.PublicSharingDrivers.SQL.DBHost,
+			"db_port":                       cfg.PublicSharingDrivers.SQL.DBPort,
+			"db_name":                       cfg.PublicSharingDrivers.SQL.DBName,
+			"password_hash_cost":            cfg.PublicSharingDrivers.SQL.PasswordHashCost,
+			"enable_expired_shares_cleanup": cfg.PublicSharingDrivers.SQL.EnableExpiredSharesCleanup,
+			"janitor_run_interval":          cfg.PublicSharingDrivers.SQL.JanitorRunInterval,
+		},
+		"cs3": map[string]interface{}{
+			"gateway_addr":        cfg.PublicSharingDrivers.CS3.ProviderAddr,
+			"provider_addr":       cfg.PublicSharingDrivers.CS3.ProviderAddr,
+			"service_user_id":     cfg.PublicSharingDrivers.CS3.SystemUserID,
+			"service_user_idp":    cfg.PublicSharingDrivers.CS3.SystemUserIDP,
+			"machine_auth_apikey": cfg.PublicSharingDrivers.CS3.SystemUserAPIKey,
+		},
+	}
 }
