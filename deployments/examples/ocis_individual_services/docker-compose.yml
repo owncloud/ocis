@@ -277,7 +277,7 @@ services:
     networks:
       ocis-net:
     volumes:
-      - "ocis-nats:/var/lib/ocis"      
+      - "ocis-nats:/var/lib/ocis"
     entrypoint:
       - ocis
       - nats
@@ -557,7 +557,7 @@ services:
       STORAGE_SYSTEM_HTTP_ADDR: 0.0.0.0:9216
       STORAGE_SYSTEM_DATA_SERVER_URL: http://storage-system:9216/data
 
-      STORAGE_SYSTEM_JWT_SECRET: ${OCIS_JWT_SECRET}
+      STORAGE_SYSTEM_JWT_SECRET: ${STORAGE_SYSTEM_JWT_SECRET}
 
       OCIS_SYSTEM_USER_ID: ${SYSTEM_USER_ID}
       STORAGE_SYSTEM_DRIVER: ocis
