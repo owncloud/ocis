@@ -7,7 +7,7 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
 	github.com/blevesearch/bleve/v2 v2.3.2
-	github.com/blevesearch/bleve_index_api v1.0.1
+	github.com/blevesearch/bleve_index_api v1.0.2
 	github.com/coreos/go-oidc/v3 v3.2.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220412090512-93c5918b4bde
 	github.com/cs3org/reva/v2 v2.4.2-0.20220601110755-6b47effc3759
