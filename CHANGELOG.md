@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix LDAP insecure options: [#3897](https://github.com/owncloud/ocis/pull/3897)
 * Bugfix - Fix configuration validation for extensions' server commands: [#3911](https://github.com/owncloud/ocis/pull/3911)
 * Bugfix - Fix user autoprovisioning: [#3893](https://github.com/owncloud/ocis/issues/3893)
+* Bugfix - Fix the webdav URL of drive roots: [#3706](https://github.com/owncloud/ocis/issues/3706)
 * Enhancement - Add config option to provide TLS certificate: [#3818](https://github.com/owncloud/ocis/issues/3818)
 
 ## Details
@@ -64,6 +65,13 @@ The following sections list the changes for unreleased.
    to the `graph` service.
 
    https://github.com/owncloud/ocis/issues/3893
+
+* Bugfix - Fix the webdav URL of drive roots: [#3706](https://github.com/owncloud/ocis/issues/3706)
+
+   Fixed the webdav URL of drive roots in the graph API.
+
+   https://github.com/owncloud/ocis/issues/3706
+   https://github.com/owncloud/ocis/pull/3916
 
 * Enhancement - Add config option to provide TLS certificate: [#3818](https://github.com/owncloud/ocis/issues/3818)
 
