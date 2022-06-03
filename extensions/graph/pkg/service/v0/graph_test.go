@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -245,11 +246,12 @@ var _ = Describe("Graph", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(response["value"])).To(Equal(1))
 			value := response["value"][0]
+			webdavURL, _ := url.PathUnescape(*value.Root.WebDavUrl)
 			Expect(*value.DriveAlias).To(Equal("mountpoint/new-folder"))
 			Expect(*value.DriveType).To(Equal("mountpoint"))
 			Expect(*value.Id).To(Equal("prID$aID!differentID"))
 			Expect(*value.Name).To(Equal("New Folder"))
-			Expect(*value.Root.WebDavUrl).To(Equal("https://localhost:9200/dav/spaces/prID$aID!differentID"))
+			Expect(webdavURL).To(Equal("https://localhost:9200/dav/spaces/prID$aID!differentID"))
 			Expect(*value.Root.ETag).To(Equal("101112131415"))
 			Expect(*value.Root.Id).To(Equal("prID$aID!differentID"))
 			Expect(*value.Root.RemoteItem.ETag).To(Equal("123456789"))
