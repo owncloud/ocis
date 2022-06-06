@@ -18,6 +18,7 @@ OC_CI_NODEJS = "owncloudci/nodejs:%s"
 OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
 OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:latest"
+OC_LITMUS = "owncloud/litmus:latest"
 OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.6.0"
 OC_SERVER = "owncloud/server:10"
 OC_UBUNTU = "owncloud/ubuntu:18.04"
@@ -127,6 +128,7 @@ config = {
     "dockerReleases": {
         "architectures": ["arm", "arm64", "amd64"],
     },
+    "litmus": True,
 }
 
 # volume for steps to cache Go dependencies between steps of a pipeline
@@ -283,6 +285,10 @@ def cancelPreviousBuilds():
 
 def testPipelines(ctx):
     pipelines = []
+
+    if config["litmus"]:
+        pipelines += litmus(ctx, "ocis")
+
     if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
         pipelines += [cs3ApiTests(ctx, "ocis", "default")]
     if "skip" not in config["localApiTests"] or not config["localApiTests"]["skip"]:
@@ -2442,4 +2448,148 @@ def fixSharedDataPermissions():
             stepVolumeOC10OCISData,
         ],
         "depends_on": ["wait-for-oc10"],
+    }]
+
+def litmus(ctx, storage):
+    pipelines = []
+
+    default = {
+        "phpVersions": [DEFAULT_PHP_VERSION],
+        "logLevel": "2",
+        "useHttps": True,
+    }
+
+    if "defaults" in config:
+        if "litmus" in config["defaults"]:
+            for item in config["defaults"]["litmus"]:
+                default[item] = config["defaults"]["litmus"][item]
+
+    litmusConfig = config["litmus"]
+
+    if type(litmusConfig) == "bool":
+        if litmusConfig:
+            # the config has 'litmus' true, so specify an empty dict that will get the defaults
+            litmusConfig = {}
+        else:
+            return pipelines
+
+    if len(litmusConfig) == 0:
+        # 'litmus' is an empty dict, so specify a single section that will get the defaults
+        litmusConfig = {"doDefault": {}}
+
+    for category, matrix in litmusConfig.items():
+        params = {}
+        for item in default:
+            params[item] = matrix[item] if item in matrix else default[item]
+
+        for phpVersion in params["phpVersions"]:
+            environment = {
+                "LITMUS_PASSWORD": "admin",
+                "LITMUS_USERNAME": "admin",
+                "TESTS": "basic copymove props http",
+            }
+            litmusCommand = "/usr/local/bin/litmus-wrapper"
+
+            result = {
+                "kind": "pipeline",
+                "type": "docker",
+                "name": "litmus-php%s" % phpVersion,
+                "workspace": {
+                    "base": "/drone",
+                    "path": "src",
+                },
+                "steps": restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+                         ocisServer(storage) +
+                         setupForLitmus(phpVersion) +
+                         [
+                             {
+                                 "name": "old-endpoint",
+                                 "image": OC_LITMUS,
+                                 "environment": environment,
+                                 "commands": [
+                                     "source .env",
+                                     'export LITMUS_URL="https://ocis-server:9200/remote.php/webdav"',
+                                     litmusCommand,
+                                 ],
+                             },
+                             {
+                                 "name": "new-endpoint",
+                                 "image": OC_LITMUS,
+                                 "environment": environment,
+                                 "commands": [
+                                     "source .env",
+                                     'export LITMUS_URL="https://ocis-server:9200/remote.php/dav/files/admin"',
+                                     litmusCommand,
+                                 ],
+                             },
+                             {
+                                 "name": "new-shared",
+                                 "image": OC_LITMUS,
+                                 "environment": environment,
+                                 "commands": [
+                                     "source .env",
+                                     'export LITMUS_URL="https://ocis-server:9200/remote.php/dav/files/admin/Shares/new_folder/"',
+                                     litmusCommand,
+                                 ],
+                             },
+                             {
+                                 "name": "old-shared",
+                                 "image": OC_LITMUS,
+                                 "environment": environment,
+                                 "commands": [
+                                     "source .env",
+                                     'export LITMUS_URL="https://ocis-server:9200/remote.php/webdav/Shares/new_folder/"',
+                                     litmusCommand,
+                                 ],
+                             },
+                             {
+                                 "name": "public-share",
+                                 "image": OC_LITMUS,
+                                 "environment": {
+                                     "LITMUS_PASSWORD": "admin",
+                                     "LITMUS_USERNAME": "admin",
+                                     "TESTS": "basic copymove http",
+                                 },
+                                 "commands": [
+                                     "source .env",
+                                     "export LITMUS_URL='https://ocis-server:9200/remote.php/dav/public-files/'$PUBLIC_TOKEN",
+                                     litmusCommand,
+                                 ],
+                             },
+                             {
+                                 "name": "spaces-endpoint",
+                                 "image": OC_LITMUS,
+                                 "environment": environment,
+                                 "commands": [
+                                     "source .env",
+                                     "export LITMUS_URL='https://ocis-server:9200/remote.php/dav/spaces/'$SPACE_ID",
+                                     litmusCommand,
+                                 ],
+                             },
+                         ],
+                "services": redisForOCStorage(storage),
+                "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+                "trigger": {
+                    "ref": [
+                        "refs/heads/master",
+                        "refs/tags/v*",
+                        "refs/pull/**",
+                    ],
+                },
+            }
+            pipelines.append(result)
+
+    return pipelines
+
+def setupForLitmus(phpVersion):
+    return [{
+        "name": "setup-for-litmus",
+        "image": OC_CI_PHP % phpVersion,
+        "environment": {
+            "TEST_SERVER_URL": OCIS_URL,
+        },
+        "commands": [
+            "bash ./tests/config/drone/setup-for-litmus.sh",
+            "cat .env",
+        ],
     }]
