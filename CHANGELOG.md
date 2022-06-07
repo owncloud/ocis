@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix user autoprovisioning: [#3893](https://github.com/owncloud/ocis/issues/3893)
 * Bugfix - Fix the webdav URL of drive roots: [#3706](https://github.com/owncloud/ocis/issues/3706)
 * Enhancement - Add config option to provide TLS certificate: [#3818](https://github.com/owncloud/ocis/issues/3818)
+* Enhancement - Update reva to version 2.4.2: [#3922](https://github.com/owncloud/ocis/pull/3922)
 
 ## Details
 
@@ -80,6 +81,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3818
    https://github.com/owncloud/ocis/pull/3888
+
+* Enhancement - Update reva to version 2.4.2: [#3922](https://github.com/owncloud/ocis/pull/3922)
+
+   TODO
+
+   https://github.com/owncloud/ocis/pull/3922
 # Changelog for [2.0.0-beta2] (2022-05-10)
 
 The following sections list the changes for 2.0.0-beta2.
