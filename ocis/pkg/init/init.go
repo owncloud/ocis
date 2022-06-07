@@ -28,15 +28,15 @@ type InsecureExtension struct {
 }
 
 type InsecureProxyExtension struct {
-	Insecure_backends bool
+	InsecureBackends bool `yaml:"insecure_backends"`
 }
 
 type DataProviderInsecureSettings struct {
-	Data_provider_insecure bool
+	DataProviderInsecure bool `yaml:"data_provider_insecure"`
 }
 
 type LdapSettings struct {
-	Bind_password string
+	BindPassword string `yaml:"bind_password"`
 }
 type LdapBasedExtension struct {
 	Ldap LdapSettings
@@ -100,7 +100,7 @@ type ThumbnailExtension struct {
 // - marshal it to yaml
 type OcisConfig struct {
 	TokenManager      TokenManager `yaml:"token_manager"`
-	MachineAuthApiKey string       `yaml:"machine_auth_api_key"`
+	MachineAuthAPIKey string       `yaml:"machine_auth_api_key"`
 	SystemUserAPIKey  string       `yaml:"system_user_api_key"`
 	TransferSecret    string       `yaml:"transfer_secret"`
 	SystemUserID      string       `yaml:"system_user_id"`
@@ -193,11 +193,11 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 	if err != nil {
 		return fmt.Errorf("could not generate random password for tokenmanager: %s", err)
 	}
-	machineAuthApiKey, err := generators.GenerateRandomPassword(passwordLength)
+	machineAuthAPIKey, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("could not generate random password for machineauthsecret: %s", err)
 	}
-	systemUserApiKey, err := generators.GenerateRandomPassword(passwordLength)
+	systemUserAPIKey, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
 		return fmt.Errorf("could not generate random system user API key: %s", err)
 	}
@@ -214,8 +214,8 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		TokenManager: TokenManager{
 			JWTSecret: tokenManagerJwtSecret,
 		},
-		MachineAuthApiKey: machineAuthApiKey,
-		SystemUserAPIKey:  systemUserApiKey,
+		MachineAuthAPIKey: machineAuthAPIKey,
+		SystemUserAPIKey:  systemUserAPIKey,
 		TransferSecret:    revaTransferSecret,
 		SystemUserID:      systemUserID,
 		AdminUserID:       adminUserID,
@@ -229,34 +229,34 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		},
 		Idp: LdapBasedExtension{
 			Ldap: LdapSettings{
-				Bind_password: idpServicePassword,
+				BindPassword: idpServicePassword,
 			},
 		},
 		AuthBasic: AuthbasicExtension{
 			AuthProviders: LdapBasedExtension{
 				Ldap: LdapSettings{
-					Bind_password: revaServicePassword,
+					BindPassword: revaServicePassword,
 				},
 			},
 		},
 		Groups: UsersAndGroupsExtension{
 			Drivers: LdapBasedExtension{
 				Ldap: LdapSettings{
-					Bind_password: revaServicePassword,
+					BindPassword: revaServicePassword,
 				},
 			},
 		},
 		Users: UsersAndGroupsExtension{
 			Drivers: LdapBasedExtension{
 				Ldap: LdapSettings{
-					Bind_password: revaServicePassword,
+					BindPassword: revaServicePassword,
 				},
 			},
 		},
 		Graph: GraphExtension{
 			Identity: LdapBasedExtension{
 				Ldap: LdapSettings{
-					Bind_password: idmServicePassword,
+					BindPassword: idmServicePassword,
 				},
 			},
 		},
@@ -287,13 +287,13 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 			Insecure: true,
 		}
 		cfg.Proxy = InsecureProxyExtension{
-			Insecure_backends: true,
+			InsecureBackends: true,
 		}
 		cfg.StorageSystem = DataProviderInsecureSettings{
-			Data_provider_insecure: true,
+			DataProviderInsecure: true,
 		}
 		cfg.StorageUsers = DataProviderInsecureSettings{
-			Data_provider_insecure: true,
+			DataProviderInsecure: true,
 		}
 
 		cfg.Thumbnails.Thumbnail.WebdavAllowInsecure = true
