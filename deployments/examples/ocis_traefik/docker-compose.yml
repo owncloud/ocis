@@ -55,6 +55,7 @@ services:
     environment:
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
+      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
       OCIS_INSECURE: "${INSECURE:-false}"

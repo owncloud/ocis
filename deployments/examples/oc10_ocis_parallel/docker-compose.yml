@@ -122,6 +122,7 @@ services:
       # OCIS_RUN_EXTENSIONS specifies to start all extensions except idm, idp and accounts. These are replaced by external services
       OCIS_RUN_EXTENSIONS: app-registry,app-provider,audit,auth-basic,auth-bearer,auth-machine,frontend,gateway,graph,graph-explorer,groups,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
+      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       OCIS_URL: https://${CLOUD_DOMAIN:-cloud.owncloud.test}
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
