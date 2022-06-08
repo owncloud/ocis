@@ -13,7 +13,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix user autoprovisioning: [#3893](https://github.com/owncloud/ocis/issues/3893)
 * Bugfix - Fix the webdav URL of drive roots: [#3706](https://github.com/owncloud/ocis/issues/3706)
 * Enhancement - Add config option to provide TLS certificate: [#3818](https://github.com/owncloud/ocis/issues/3818)
-* Enhancement - Update reva to version 2.5.1-0.20220608092821-954c578109df: [#3922](https://github.com/owncloud/ocis/pull/3922)
+* Enhancement - Update reva to version 2.5.1: [#3932](https://github.com/owncloud/ocis/pull/3932)
 * Enhancement - Update ownCloud Web to v5.5.0-rc.9: [#6854](https://github.com/owncloud/web/pull/6854)
 
 ## Details
@@ -83,9 +83,17 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/3818
    https://github.com/owncloud/ocis/pull/3888
 
-* Enhancement - Update reva to version 2.5.1-0.20220608092821-954c578109df: [#3922](https://github.com/owncloud/ocis/pull/3922)
+* Enhancement - Update reva to version 2.5.1: [#3932](https://github.com/owncloud/ocis/pull/3932)
 
-   TODO
+   Changelog for reva 2.5.1 (2022-06-08) =======================================
+
+   The following sections list the changes in reva 2.5.1 relevant to reva users. The changes are
+   ordered by importance.
+
+   Summary -------
+
+  * Bugfix [cs3org/reva#2931](https://github.com/cs3org/reva/pull/2931): Allow listing share jail space
+  * Bugfix [cs3org/reva#3704](https://github.com/cs3org/reva/pull/3704): Fix propfinds with depth 0
 
    Changelog for reva 2.5.0 (2022-06-07) =======================================
 
@@ -108,8 +116,9 @@ The following sections list the changes for unreleased.
   * Enhancement [cs3org/reva#2888](https://github.com/cs3org/reva/pull/2888): Introduce spaces field mask
   * Enhancement [cs3org/reva#2922](https://github.com/cs3org/reva/pull/2922): Refactor webdav error handling
 
-   https://github.com/owncloud/ocis/pull/3922
+   https://github.com/owncloud/ocis/pull/3932
    https://github.com/owncloud/ocis/pull/3928
+   https://github.com/owncloud/ocis/pull/3922
 
 * Enhancement - Update ownCloud Web to v5.5.0-rc.9: [#6854](https://github.com/owncloud/web/pull/6854)
 
