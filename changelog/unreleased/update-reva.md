@@ -1,6 +1,18 @@
-Enhancement: update reva to version 2.5.1-0.20220608092821-954c578109df
+Enhancement: update reva to version 2.5.1
 
-TODO
+Changelog for reva 2.5.1 (2022-06-08)
+=======================================
+
+The following sections list the changes in reva 2.5.1 relevant to
+reva users. The changes are ordered by importance.
+
+Summary
+-------
+
+ * Bugfix [cs3org/reva#2931](https://github.com/cs3org/reva/pull/2931): Allow listing share jail space
+ * Bugfix [cs3org/reva#3704](https://github.com/cs3org/reva/pull/3704): Fix propfinds with depth 0
+
+
 
 Changelog for reva 2.5.0 (2022-06-07)
 =======================================
@@ -25,5 +37,6 @@ Summary
 * Enhancement [cs3org/reva#2888](https://github.com/cs3org/reva/pull/2888): Introduce spaces field mask
 * Enhancement [cs3org/reva#2922](https://github.com/cs3org/reva/pull/2922): Refactor webdav error handling
 
-https://github.com/owncloud/ocis/pull/3922
+https://github.com/owncloud/ocis/pull/3932
 https://github.com/owncloud/ocis/pull/3928
+https://github.com/owncloud/ocis/pull/3922
