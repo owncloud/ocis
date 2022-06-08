@@ -39,7 +39,7 @@ func (i *CS3) UpdateUser(ctx context.Context, nameOrID string, user libregraph.U
 	return nil, errNotImplemented
 }
 
-func (i *CS3) GetUser(ctx context.Context, userID string) (*libregraph.User, error) {
+func (i *CS3) GetUser(ctx context.Context, userID string, queryParam url.Values) (*libregraph.User, error) {
 	client, err := pool.GetGatewayServiceClient(i.Config.Address)
 	if err != nil {
 		i.Logger.Error().Err(err).Msg("could not get client")
@@ -147,7 +147,7 @@ func (i *CS3) CreateGroup(ctx context.Context, group libregraph.Group) (*libregr
 	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
 }
 
-func (i *CS3) GetGroup(ctx context.Context, groupID string) (*libregraph.Group, error) {
+func (i *CS3) GetGroup(ctx context.Context, groupID string, queryParam url.Values) (*libregraph.Group, error) {
 	client, err := pool.GetGatewayServiceClient(i.Config.Address)
 	if err != nil {
 		i.Logger.Error().Err(err).Msg("could not get client")
