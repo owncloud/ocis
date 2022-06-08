@@ -59,6 +59,57 @@ Response:
 }
 ```
 
+
+#### `GET /groups?$expand=members`
+
+Returns a list of all groups including its members
+
+Example:
+
+```
+curl -k 'https://localhost:9200/graph/v1.0/groups?$expand=members' -u user:password
+
+```
+
+Response:
+
+```
+{
+    "value": [
+        {
+            "displayName": "group",
+            "id": "38580a2e-7018-42ed-aff6-b2af0b4e9790",
+            "members": [
+                {
+                    "displayName": "user1",
+                    "id": "2e7b7e23-6c42-4d34-81b0-2bed34e51983",
+                    "mail": "user1@example.org",
+                    "onPremisesSamAccountName": "user1"
+                },
+                {
+                    "displayName": "user2",
+                    "id": "b45c9e35-0d95-4165-96bc-68bff4a316ed",
+                    "mail": "user2@example.org",
+                    "onPremisesSamAccountName": "user2"
+                }
+            ]
+        },
+        {
+            "displayName": "Example Users",
+            "id": "7a20f238-8a22-4458-902d-47674c317e5f",
+            "members": [
+                {
+                    "displayName": "user3",
+                    "id": "026fbfef-79ef-4f5d-887b-9eaf42777239",
+                    "mail": "user3@example.org",
+                    "onPremisesSamAccountName": "user3"
+                }
+            ]
+        }
+    ]
+}
+```
+
 #### `GET /groups/{groupid}`
 
 Example:
@@ -73,6 +124,31 @@ Response:
 {
     "displayName": "Example Users",
     "id": "7a20f238-8a22-4458-902d-47674c317e5f"
+}
+```
+
+#### `GET /groups/{groupid}?$expand=members`
+
+Example:
+
+```
+curl -k 'https://localhost:9200/graph/v1.0/groups/7a20f238-8a22-4458-902d-47674c317e5f?$expand=members' -u user:password
+```
+
+Response:
+
+```
+{
+    "displayName": "Example Users",
+    "id": "7a20f238-8a22-4458-902d-47674c317e5f",
+    "members": [
+        {
+            "displayName": "user3",
+            "id": "026fbfef-79ef-4f5d-887b-9eaf42777239",
+            "mail": "user3@example.org",
+            "onPremisesSamAccountName": "user3"
+        }
+    ]
 }
 ```
 ### Getting Group Members
