@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Rework default role provisioning: [#3900](https://github.com/owncloud/ocis/issues/3900)
 * Bugfix - Fix graph endpoint: [#3925](https://github.com/owncloud/ocis/issues/3925)
+* Enhancement - Disable the color logging in docker compose examples: [#871](https://github.com/owncloud/ocis/issues/871)
 
 ## Details
 
@@ -24,6 +25,16 @@ The following sections list the changes for unreleased.
    endpoint
 
    https://github.com/owncloud/ocis/issues/3925
+
+* Enhancement - Disable the color logging in docker compose examples: [#871](https://github.com/owncloud/ocis/issues/871)
+
+   Disabled the color logging in the example docker compose deployments. Although colored logs
+   are helpful during the development process they may be undesired in other situations like
+   production deployments, where the logs aren't consumed by humans directly but instead by a log
+   aggregator.
+
+   https://github.com/owncloud/ocis/issues/871
+   https://github.com/owncloud/ocis/pull/3935
 # Changelog for [2.0.0-beta.3] (2022-06-08)
 
 The following sections list the changes for 2.0.0-beta.3.
