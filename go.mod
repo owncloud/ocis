@@ -1,6 +1,6 @@
 module github.com/owncloud/ocis/v2
 
-go 1.17
+go 1.18
 
 require (
 	github.com/CiscoM31/godata v1.0.5
@@ -49,7 +49,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.19.0
 	github.com/orcaman/concurrent-map v1.0.0
-	github.com/owncloud/libre-graph-api-go v0.14.2
+	github.com/owncloud/libre-graph-api-go v0.14.3
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.12.2
 	github.com/rs/zerolog v1.27.0
@@ -67,6 +67,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.7.0
 	go.opentelemetry.io/otel/trace v1.7.0
 	golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29
+	golang.org/x/exp v0.0.0-20220518171630-0b5c67f07fdf
 	golang.org/x/image v0.0.0-20220321031419-a8550c1d254a
 	golang.org/x/net v0.0.0-20220516155154-20f960328961
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5

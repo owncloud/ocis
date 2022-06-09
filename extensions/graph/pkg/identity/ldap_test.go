@@ -125,7 +125,24 @@ func TestGetUser(t *testing.T) {
 		return nil, ldap.NewError(ldap.LDAPResultSizeLimitExceeded, errors.New("mock"))
 	}
 	b, _ := getMockedBackend(&sf, lconfig, &logger)
-	_, err := b.GetUser(context.Background(), "fred")
+
+	queryParamExpand := url.Values{
+		"$expand": []string{"memberOf"},
+	}
+	queryParamSelect := url.Values{
+		"$select": []string{"memberOf"},
+	}
+	_, err := b.GetUser(context.Background(), "fred", nil)
+	if err == nil || err.Error() != "itemNotFound" {
+		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	}
+
+	_, err = b.GetUser(context.Background(), "fred", queryParamExpand)
+	if err == nil || err.Error() != "itemNotFound" {
+		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	}
+
+	_, err = b.GetUser(context.Background(), "fred", queryParamSelect)
 	if err == nil || err.Error() != "itemNotFound" {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
 	}
@@ -135,7 +152,17 @@ func TestGetUser(t *testing.T) {
 		return &ldap.SearchResult{}, nil
 	}
 	b, _ = getMockedBackend(&sf, lconfig, &logger)
-	_, err = b.GetUser(context.Background(), "fred")
+	_, err = b.GetUser(context.Background(), "fred", nil)
+	if err == nil || err.Error() != "itemNotFound" {
+		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	}
+
+	_, err = b.GetUser(context.Background(), "fred", queryParamExpand)
+	if err == nil || err.Error() != "itemNotFound" {
+		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	}
+
+	_, err = b.GetUser(context.Background(), "fred", queryParamSelect)
 	if err == nil || err.Error() != "itemNotFound" {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
 	}
@@ -147,7 +174,21 @@ func TestGetUser(t *testing.T) {
 		}, nil
 	}
 	b, _ = getMockedBackend(&sf, lconfig, &logger)
-	u, err := b.GetUser(context.Background(), "user")
+	u, err := b.GetUser(context.Background(), "user", nil)
+	if err != nil {
+		t.Errorf("Expected GetUser to succeed. Got %s", err.Error())
+	} else if *u.Id != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id) {
+		t.Errorf("Expected GetUser to return a valid user")
+	}
+
+	u, err = b.GetUser(context.Background(), "user", queryParamExpand)
+	if err != nil {
+		t.Errorf("Expected GetUser to succeed. Got %s", err.Error())
+	} else if *u.Id != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id) {
+		t.Errorf("Expected GetUser to return a valid user")
+	}
+
+	u, err = b.GetUser(context.Background(), "user", queryParamSelect)
 	if err != nil {
 		t.Errorf("Expected GetUser to succeed. Got %s", err.Error())
 	} else if *u.Id != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id) {
@@ -182,8 +223,22 @@ func TestGetGroup(t *testing.T) {
 	var sf searchFunc = func(*ldap.SearchRequest) (*ldap.SearchResult, error) {
 		return nil, ldap.NewError(ldap.LDAPResultSizeLimitExceeded, errors.New("mock"))
 	}
+	queryParamExpand := url.Values{
+		"$expand": []string{"memberOf"},
+	}
+	queryParamSelect := url.Values{
+		"$select": []string{"memberOf"},
+	}
 	b, _ := getMockedBackend(&sf, lconfig, &logger)
-	_, err := b.GetGroup(context.Background(), "group")
+	_, err := b.GetGroup(context.Background(), "group", nil)
+	if err == nil || err.Error() != "itemNotFound" {
+		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	}
+	_, err = b.GetGroup(context.Background(), "group", queryParamExpand)
+	if err == nil || err.Error() != "itemNotFound" {
+		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	}
+	_, err = b.GetGroup(context.Background(), "group", queryParamSelect)
 	if err == nil || err.Error() != "itemNotFound" {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
 	}
@@ -193,7 +248,15 @@ func TestGetGroup(t *testing.T) {
 		return &ldap.SearchResult{}, nil
 	}
 	b, _ = getMockedBackend(&sf, lconfig, &logger)
-	_, err = b.GetGroup(context.Background(), "group")
+	_, err = b.GetGroup(context.Background(), "group", nil)
+	if err == nil || err.Error() != "itemNotFound" {
+		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	}
+	_, err = b.GetGroup(context.Background(), "group", queryParamExpand)
+	if err == nil || err.Error() != "itemNotFound" {
+		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	}
+	_, err = b.GetGroup(context.Background(), "group", queryParamSelect)
 	if err == nil || err.Error() != "itemNotFound" {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
 	}
@@ -205,7 +268,19 @@ func TestGetGroup(t *testing.T) {
 		}, nil
 	}
 	b, _ = getMockedBackend(&sf, lconfig, &logger)
-	g, err := b.GetGroup(context.Background(), "group")
+	g, err := b.GetGroup(context.Background(), "group", nil)
+	if err != nil {
+		t.Errorf("Expected GetGroup to succeed. Got %s", err.Error())
+	} else if *g.Id != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id) {
+		t.Errorf("Expected GetGroup to return a valid group")
+	}
+	g, err = b.GetGroup(context.Background(), "group", queryParamExpand)
+	if err != nil {
+		t.Errorf("Expected GetGroup to succeed. Got %s", err.Error())
+	} else if *g.Id != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id) {
+		t.Errorf("Expected GetGroup to return a valid group")
+	}
+	g, err = b.GetGroup(context.Background(), "group", queryParamSelect)
 	if err != nil {
 		t.Errorf("Expected GetGroup to succeed. Got %s", err.Error())
 	} else if *g.Id != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id) {

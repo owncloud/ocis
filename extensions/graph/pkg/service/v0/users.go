@@ -159,7 +159,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := g.identityBackend.GetUser(r.Context(), userID)
+	user, err := g.identityBackend.GetUser(r.Context(), userID, r.URL.Query())
 
 	if err != nil {
 		var errcode errorcode.Error

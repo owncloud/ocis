@@ -15,14 +15,14 @@ type Backend interface {
 	DeleteUser(ctx context.Context, nameOrID string) error
 	// UpdateUser applies changes to given user, identified by username or id
 	UpdateUser(ctx context.Context, nameOrID string, user libregraph.User) (*libregraph.User, error)
-	GetUser(ctx context.Context, nameOrID string) (*libregraph.User, error)
+	GetUser(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.User, error)
 	GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error)
 
 	// CreateGroup creates the supplied group in the identity backend.
 	CreateGroup(ctx context.Context, group libregraph.Group) (*libregraph.Group, error)
 	// DeleteGroup deletes a given group, identified by id
 	DeleteGroup(ctx context.Context, id string) error
-	GetGroup(ctx context.Context, nameOrID string) (*libregraph.Group, error)
+	GetGroup(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.Group, error)
 	GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error)
 	GetGroupMembers(ctx context.Context, id string) ([]*libregraph.User, error)
 	// AddMembersToGroup adds new members (reference by a slice of IDs) to supplied group in the identity backend.

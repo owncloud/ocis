@@ -162,7 +162,7 @@ func (g Graph) GetGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	group, err := g.identityBackend.GetGroup(r.Context(), groupID)
+	group, err := g.identityBackend.GetGroup(r.Context(), groupID, r.URL.Query())
 	if err != nil {
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
