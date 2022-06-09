@@ -10,7 +10,7 @@ Summary
 -------
 
  * Bugfix [cs3org/reva#2931](https://github.com/cs3org/reva/pull/2931): Allow listing share jail space
- * Bugfix [cs3org/reva#3704](https://github.com/cs3org/reva/pull/3704): Fix propfinds with depth 0
+ * Bugfix [cs3org/reva#2918](https://github.com/cs3org/reva/pull/2918): Fix propfinds with depth 0
 
 
 
@@ -27,8 +27,8 @@ Summary
 * Bugfix [cs3org/reva#2899](https://github.com/cs3org/reva/pull/2899): Empty meta requests should return body
 * Bugfix [cs3org/reva#2928](https://github.com/cs3org/reva/pull/2928): Fix mkcol response code
 * Bugfix [cs3org/reva#2907](https://github.com/cs3org/reva/pull/2907): Correct share jail child aggregation
-* Bugfix [cs3org/reva#3810](https://github.com/cs3org/reva/pull/3810): Fix unlimited quota in spaces
-* Bugfix [cs3org/reva#3498](https://github.com/cs3org/reva/pull/3498): Check user permissions before updating/removing public shares
+* Bugfix [cs3org/reva#2895](https://github.com/cs3org/reva/pull/2895): Fix unlimited quota in spaces
+* Bugfix [cs3org/reva#2905](https://github.com/cs3org/reva/pull/2905): Check user permissions before updating/removing public shares
 * Bugfix [cs3org/reva#2904](https://github.com/cs3org/reva/pull/2904): Share jail now works properly when accessed as a space
 * Bugfix [cs3org/reva#2903](https://github.com/cs3org/reva/pull/2903): User owncloudsql now uses the correct userid
 * Change [cs3org/reva#2920](https://github.com/cs3org/reva/pull/2920): Clean up the propfind code

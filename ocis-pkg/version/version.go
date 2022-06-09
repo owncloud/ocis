@@ -16,7 +16,7 @@ var (
 	// LatestTag is the latest released version plus the dev meta version.
 	// Will be overwritten by the release pipeline
 	// Needs a manual change for every tagged release
-	LatestTag = "2.0.0-beta2+dev"
+	LatestTag = "2.0.0-beta.3+dev"
 
 	// Date indicates the build date.
 	Date = time.Now().Format("20060102")
