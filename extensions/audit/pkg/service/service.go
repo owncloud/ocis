@@ -61,6 +61,8 @@ func StartAuditLogger(ctx context.Context, ch <-chan interface{}, log log.Logger
 				auditEvent = types.LinkAccessed(ev)
 			case events.LinkAccessFailed:
 				auditEvent = types.LinkAccessFailed(ev)
+			case events.ContainerCreated:
+				auditEvent = types.ContainerCreated(ev)
 			case events.FileUploaded:
 				auditEvent = types.FileUploaded(ev)
 			case events.FileDownloaded:

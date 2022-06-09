@@ -232,6 +232,15 @@ func FilesAuditEvent(base AuditEvent, itemid, owner, path string) AuditEventFile
 	}
 }
 
+// ContainerCreated converts a ContainerCreated event to an AuditEventContainerCreated
+func ContainerCreated(ev events.ContainerCreated) AuditEventContainerCreated {
+	iid, path, uid := extractFileDetails(ev.Ref, ev.Executant)
+	base := BasicAuditEvent(uid, "", MessageContainerCreated(iid), ActionContainerCreated)
+	return AuditEventContainerCreated{
+		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
+	}
+}
+
 // FileUploaded converts a FileUploaded event to an AuditEventFileCreated
 func FileUploaded(ev events.FileUploaded) AuditEventFileCreated {
 	iid, path, uid := extractFileDetails(ev.Ref, ev.Owner)
