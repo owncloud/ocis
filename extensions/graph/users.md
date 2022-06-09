@@ -87,6 +87,62 @@ Response:
 }
 ```
 
+#### `GET /users?$expand=memberOf`
+
+Returns a list of all users
+
+Example:
+
+```
+curl -k 'https://localhost:9200/graph/v1.0/users?$expand=memberOf' -u user:password
+
+```
+
+Response:
+
+```
+{
+    "value": [
+        {
+            "displayName": "Albert Einstein",
+            "id": "4c510ada-c86b-4815-8820-42cdf82c3d51",
+            "mail": "einstein@example.org",
+            "onPremisesSamAccountName": "einstein",
+            "memberOf": [
+                {
+                    "displayName": "users",
+                    "id": "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"
+                },
+                {
+                    "displayName": "sailing-lovers",
+                    "id": "6040aa17-9c64-4fef-9bd0-77234d71bad0"
+                },
+                {
+                    "displayName": "violin-haters",
+                    "id": "dd58e5ec-842e-498b-8800-61f2ec6f911f"
+                },
+                {
+                    "displayName": "physics-lovers",
+                    "id": "262982c1-2362-4afa-bfdf-8cbfef64a06e"
+                }
+            ],
+        },
+        {
+            "displayName": "Maurice Moss",
+            "id": "058bff95-6708-4fe5-91e4-9ea3d377588b",
+            "mail": "moss@example.org",
+            "onPremisesSamAccountName": "moss",
+            "memberOf": [
+                {
+                    "displayName": "users",
+                    "id": "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"
+                }
+            ],
+        }
+    ]
+}
+```
+
 #### `GET /users/{userid or accountname}`
 
 Example:
@@ -103,6 +159,31 @@ Response:
     "id": "058bff95-6708-4fe5-91e4-9ea3d377588b",
     "mail": "moss@example.org",
     "onPremisesSamAccountName": "moss"
+}
+```
+
+#### `GET /users/{userid or accountname}?$expand=memberOf`
+
+Example:
+
+```
+curl -k 'https://localhost:9200/graph/v1.0/users/058bff95-6708-4fe5-91e4-9ea3d377588b?$expand=memberOf' -u user:password
+```
+
+Response:
+
+```
+{
+    "displayName": "Maurice Moss",
+    "id": "058bff95-6708-4fe5-91e4-9ea3d377588b",
+    "mail": "moss@example.org",
+    "onPremisesSamAccountName": "moss",
+            "memberOf": [
+                {
+                    "displayName": "users",
+                    "id": "509a9dcd-bb37-4f4f-a01a-19dca27d9cfa"
+                }
+            ],
 }
 ```
 
