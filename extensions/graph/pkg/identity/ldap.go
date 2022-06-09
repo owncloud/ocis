@@ -11,12 +11,10 @@ import (
 	"github.com/gofrs/uuid"
 	ldapdn "github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-
-	"golang.org/x/exp/slices"
-
 	"github.com/owncloud/ocis/v2/extensions/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/extensions/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"golang.org/x/exp/slices"
 )
 
 var (
@@ -361,14 +359,11 @@ func (i *LDAP) GetUser(ctx context.Context, nameOrID string, queryParam url.Valu
 	if err != nil {
 		return nil, err
 	}
-	userGroups, err := i.getGroupsForUser(e.DN)
-	if err != nil {
-		return nil, err
-	}
 	sel := strings.Split(queryParam.Get("$select"), ",")
 	exp := strings.Split(queryParam.Get("$expand"), ",")
 	u := i.createUserModelFromLDAP(e)
 	if slices.Contains(sel, "memberOf") || slices.Contains(exp, "memberOf") {
+		userGroups, err := i.getGroupsForUser(e.DN)
 		if err != nil {
 			return nil, err
 		}
