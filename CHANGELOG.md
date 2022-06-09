@@ -1,3 +1,21 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v2.0.0...master
+
+## Summary
+
+* Bugfix - Rework default role provisioning: [#3900](https://github.com/owncloud/ocis/issues/3900)
+
+## Details
+
+* Bugfix - Rework default role provisioning: [#3900](https://github.com/owncloud/ocis/issues/3900)
+
+   We fixed a race condition in the default role assignment code that could lead to users loosing
+   privileges. When authenticating before the settings service was fully running.
+
+   https://github.com/owncloud/ocis/issues/3900
 # Changelog for [2.0.0-beta.3] (2022-06-08)
 
 The following sections list the changes for 2.0.0-beta.3.
