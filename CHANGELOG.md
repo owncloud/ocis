@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Rework default role provisioning: [#3900](https://github.com/owncloud/ocis/issues/3900)
+* Bugfix - Fix graph endpoint: [#3925](https://github.com/owncloud/ocis/issues/3925)
 
 ## Details
 
@@ -16,6 +17,13 @@ The following sections list the changes for unreleased.
    privileges. When authenticating before the settings service was fully running.
 
    https://github.com/owncloud/ocis/issues/3900
+
+* Bugfix - Fix graph endpoint: [#3925](https://github.com/owncloud/ocis/issues/3925)
+
+   We have added the memberOf slice to the /users endpoint and the member slice to the /group
+   endpoint
+
+   https://github.com/owncloud/ocis/issues/3925
 # Changelog for [2.0.0-beta.3] (2022-06-08)
 
 The following sections list the changes for 2.0.0-beta.3.
