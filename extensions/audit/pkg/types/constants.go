@@ -21,6 +21,7 @@ const (
 	ActionLinkAccessed            = "public_link_accessed"
 
 	// Files
+	ActionContainerCreated    = "container_create"
 	ActionFileCreated         = "file_create"
 	ActionFileRead            = "file_read"
 	ActionFileTrashed         = "file_delete"
@@ -55,7 +56,7 @@ func MessageShareCreated(sharer, item, grantee string) string {
 
 // MessageLinkCreated returns the human readable string that describes the action
 func MessageLinkCreated(sharer, item, shareid string) string {
-	return fmt.Sprintf("user '%s' created a public to file '%s' with id '%s'", sharer, item, shareid)
+	return fmt.Sprintf("user '%s' created a public link to file '%s' with id '%s'", sharer, item, shareid)
 }
 
 // MessageShareUpdated returns the human readable string that describes the action
@@ -91,6 +92,11 @@ func MessageShareDeclined(userid, shareid, sharerid string) string {
 // MessageLinkAccessed returns the human readable string that describes the action
 func MessageLinkAccessed(linkid string, success bool) string {
 	return fmt.Sprintf("link '%s' was accessed. Success: %v", linkid, success)
+}
+
+// MessageContainerCreated returns the human readable string that describes the action
+func MessageContainerCreated(item string) string {
+	return fmt.Sprintf("Folder '%s' was created", item)
 }
 
 // MessageFileCreated returns the human readable string that describes the action

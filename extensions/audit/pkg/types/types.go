@@ -96,6 +96,11 @@ type AuditEventFiles struct {
 	FileID string // The newly created files identifier.
 }
 
+// AuditEventContainerCreated is the event logged when a container is created
+type AuditEventContainerCreated struct {
+	AuditEventFiles
+}
+
 // AuditEventFileCreated is the event logged when a file is created
 type AuditEventFileCreated struct {
 	AuditEventFiles
