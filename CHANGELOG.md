@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Rework default role provisioning: [#3900](https://github.com/owncloud/ocis/issues/3900)
 * Bugfix - Fix graph endpoint: [#3925](https://github.com/owncloud/ocis/issues/3925)
 * Enhancement - Disable the color logging in docker compose examples: [#871](https://github.com/owncloud/ocis/issues/871)
+* Enhancement - Update reva: [#3944](https://github.com/owncloud/ocis/pull/3944)
 
 ## Details
 
@@ -35,6 +36,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/871
    https://github.com/owncloud/ocis/pull/3935
+
+* Enhancement - Update reva: [#3944](https://github.com/owncloud/ocis/pull/3944)
+
+   TBD
+
+   https://github.com/owncloud/ocis/pull/3944
 # Changelog for [2.0.0-beta.3] (2022-06-08)
 
 The following sections list the changes for 2.0.0-beta.3.
