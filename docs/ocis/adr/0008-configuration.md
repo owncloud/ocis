@@ -165,7 +165,7 @@ The outcome of the following set of commands should be having all bootstrapped s
 
 This is a desired use case that is yet not supported due to lacking of flags forwarding.
 
-#### Follow up PR's
+#### Follow-up PR's
 
 - Variadic runtime extensions to run (development mostly)
 - Arg forwarding to command (when running in supervised mode, forward any --config-file flag to supervised subcommands)

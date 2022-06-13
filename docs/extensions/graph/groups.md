@@ -23,10 +23,10 @@ The JSON representation of a Group as handled by the Groups API looks like this:
 
 Our implementation currently supports two Attributes for a Group:
 
-| Attribute	| Description |
-|---------------|-------------|
-| displayName	| The groups name|
-| id		| An unique, stable readonly identifier for the group that stays the same for the whole lifetime of the User, usually a UUID|
+| Attribute	| Description                                                                                                                 |
+|---------------|-----------------------------------------------------------------------------------------------------------------------------|
+| displayName	| The groups name                                                                                                             |
+| id		| An unique, stable readonly identifier for the group that stays the same for the whole lifetime of the Group, usually a UUID |
 
 
 ### Reading groups

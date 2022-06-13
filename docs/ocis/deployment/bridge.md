@@ -15,7 +15,7 @@ This document is a work in progress of the current setup.
 
 ## Current status
 
-Using ocis and the ownCloud 10 [graphapi app](https://github.com/owncloud/graphapi/) it is possible today to use an existing owncloud 10 instance as a userbackend and storage backend for ocis.
+Using ocis and the ownCloud 10 [graphapi app](https://github.com/owncloud/graphapi/) it is possible today to use an existing owncloud 10 instance as a user backend and storage backend for ocis.
 
 ## How to do it
 
@@ -117,7 +117,7 @@ $ ldapsearch -x -H ldap://127.0.0.1:9125 -b dc=ocis,dc=test -D "cn=admin,dc=ocis
 ```
 
 {{< hint >}}
-This is currently a readonly implementation and minimal to the usecase of authenticating users with an IDP.
+This is currently a readonly implementation and minimal to the use-case of authenticating users with an IDP.
 {{< /hint >}}
 
 ### Start ocis storage-gateway, storage-authbasic and storage-userprovider
