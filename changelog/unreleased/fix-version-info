@@ -1,0 +1,10 @@
+Bugfix: Fix version info
+
+We've fixed the version info that is displayed when you run:
+
+- `ocis version`
+- `ocis <extension name> version`
+
+Since #2918, these commands returned an empty version only.
+
+https://github.com/owncloud/ocis/pull/3953

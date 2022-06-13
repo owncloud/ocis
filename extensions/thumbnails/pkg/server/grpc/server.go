@@ -19,11 +19,11 @@ func NewService(opts ...Option) grpc.Service {
 		grpc.Logger(options.Logger),
 		grpc.Namespace(options.Namespace),
 		grpc.Name(options.Name),
-		grpc.Version(version.String),
+		grpc.Version(version.GetString()),
 		grpc.Address(options.Address),
 		grpc.Context(options.Context),
 		grpc.Flags(options.Flags...),
-		grpc.Version(version.String),
+		grpc.Version(version.GetString()),
 	)
 	tconf := options.Config.Thumbnail
 	gc, err := pool.GetGatewayServiceClient(tconf.RevaGateway)

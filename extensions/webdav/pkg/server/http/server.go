@@ -18,7 +18,7 @@ func Server(opts ...Option) (http.Service, error) {
 		http.Logger(options.Logger),
 		http.Namespace(options.Config.HTTP.Namespace),
 		http.Name(options.Config.Service.Name),
-		http.Version(version.String),
+		http.Version(version.GetString()),
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
 		http.Flags(options.Flags...),
@@ -41,7 +41,7 @@ func Server(opts ...Option) (http.Service, error) {
 			middleware.Secure,
 			middleware.Version(
 				options.Config.Service.Name,
-				version.String,
+				version.GetString(),
 			),
 			middleware.Logger(
 				options.Logger,

@@ -69,7 +69,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			m.BuildInfo.WithLabelValues(version.String).Set(1)
+			m.BuildInfo.WithLabelValues(version.GetString()).Set(1)
 
 			rp := proxy.NewMultiHostReverseProxy(
 				proxy.Logger(logger),

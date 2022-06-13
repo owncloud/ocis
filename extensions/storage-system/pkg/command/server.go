@@ -85,7 +85,7 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.GRPC.Namespace+"."+cfg.Service.Name,
 				uuid.Must(uuid.NewV4()).String(),
 				cfg.GRPC.Addr,
-				version.String,
+				version.GetString(),
 				logger,
 			); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the grpc endpoint")
@@ -96,7 +96,7 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.HTTP.Namespace+"."+cfg.Service.Name,
 				uuid.Must(uuid.NewV4()).String(),
 				cfg.HTTP.Addr,
-				version.String,
+				version.GetString(),
 				logger,
 			); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the http endpoint")
