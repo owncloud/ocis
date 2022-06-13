@@ -148,6 +148,12 @@
 | string
 | 
 | 
+
+|`SETTINGS_SETUP_DEFAULT_ASSIGNMENTS` +
+`ACCOUNTS_DEMO_USERS_AND_GROUPS`
+| bool
+| false
+| If the default role assignments for the demo users should be setup.
 |===
 
 Since Version: `+` added, `-` deprecated

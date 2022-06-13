@@ -52,3 +52,4 @@ asset:
   path: ""
 token_manager:
   jwt_secret: ""
+set_default_assignments: false

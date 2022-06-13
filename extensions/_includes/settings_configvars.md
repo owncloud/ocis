@@ -28,3 +28,4 @@
 | OCIS_ADMIN_USER_ID<br/>SETTINGS_ADMIN_USER_ID | string |  | |
 | SETTINGS_ASSET_PATH | string |  | |
 | OCIS_JWT_SECRET<br/>SETTINGS_JWT_SECRET | string |  | |
+| SETTINGS_SETUP_DEFAULT_ASSIGNMENTS<br/>ACCOUNTS_DEMO_USERS_AND_GROUPS | bool | false | If the default role assignments for the demo users should be setup.|
