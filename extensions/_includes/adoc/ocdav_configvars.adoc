@@ -88,7 +88,7 @@
 |`OCDAV_HTTP_PREFIX`
 | string
 | 
-| 
+| A URL path prefix for the handler.
 
 |`OCIS_JWT_SECRET` +
 `OCDAV_JWT_SECRET`
@@ -109,17 +109,17 @@
 |`OCDAV_WEBDAV_NAMESPACE`
 | string
 | /users/{{.Id.OpaqueId}}
-| 
+| Jail requests to /dav/webdav into this CS3 namespace. Supports template layouting with CS3 User properties.
 
 |`OCDAV_FILES_NAMESPACE`
 | string
 | /users/{{.Id.OpaqueId}}
-| 
+| Jail requests to /dav/files/{username} into this CS3 namespace. Supports template layouting with CS3 User properties.
 
 |`OCDAV_SHARES_NAMESPACE`
 | string
 | /Shares
-| 
+| The human readable path for the share jail. Relative to a users personal space root. Upcased intentionally.
 
 |`OCIS_URL` +
 `OCDAV_PUBLIC_URL`
