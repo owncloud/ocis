@@ -2,10 +2,12 @@ package decorators
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
+	merrors "go-micro.dev/v4/errors"
 )
 
 // NewLogging returns a service that logs messages.
@@ -32,9 +34,17 @@ func (l logging) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumbna
 		Logger()
 
 	if err != nil {
-		logger.Warn().
-			Err(err).
-			Msg("Failed to execute")
+		merror := merrors.FromError(err)
+		switch merror.Code {
+		case http.StatusNotFound:
+			logger.Debug().
+				Str("error_detail", merror.Detail).
+				Msg("no thumbnail found")
+		default:
+			logger.Warn().
+				Err(err).
+				Msg("Failed to execute")
+		}
 	} else {
 		logger.Debug().
 			Msg("")
