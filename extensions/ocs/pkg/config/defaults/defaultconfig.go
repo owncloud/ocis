@@ -39,7 +39,6 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		StorageUsersDriver: "ocis",
 		IdentityManagement: config.IdentityManagement{
 			Address: "https://localhost:9200",
 		},
