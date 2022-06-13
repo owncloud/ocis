@@ -26,7 +26,7 @@ Layouts of all pages are located in the `idp/ui/src/containers` folder. By editi
 #### What pages to theme
 - Login
   - Login - login form used to authenticate the users
-  - Consent - consent page used to authorise apps for already signed in users
+  - Consent - consent page used to authorise apps for already signed-in users
   - Chooseaccount - page with a list of accounts to choose from
 - Goodbye
   - Goodbyescreen - goodbye message displayed to users after they signed out

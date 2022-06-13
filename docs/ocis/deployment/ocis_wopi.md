@@ -124,7 +124,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   Now it's time to set up Collabora and you need to configure the domain of Collabora in `COLLABORA_DOMAIN=`.
 
-  If you want to use the Collabora admin panel you need to set user name and password for in `COLLABORA_ADMIN_USER=` and `COLLABORA_ADMIN_PASSWORD=`.
+  If you want to use the Collabora admin panel you need to set the username and password for the administrator in `COLLABORA_ADMIN_USER=` and `COLLABORA_ADMIN_PASSWORD=`.
 
   Next up is OnlyOffice, which also needs a domain in `ONLYOFFICE_DOMAIN=`.
 

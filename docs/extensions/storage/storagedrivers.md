@@ -80,7 +80,7 @@ The storage keeps an activity history, tracking the different actions that have 
 
 ## Storage drivers
 
-Reva currently has several storage driver implementations that can be used for *storage providers* an well as *data providers*.
+Reva currently has several storage driver implementations that can be used for *storage providers* as well as *data providers*.
 
 ### OCIS and S3NG Storage Driver
 
@@ -122,7 +122,7 @@ The *minimal* storage driver for a POSIX based filesystem. It literally supports
   - using extended attributes to implement expiry or sharing that does not require OS level integration
   - fuse filesystem overlay
 - no native trash
-  - could use the [The FreeDesktop.org Trash specification](https://specifications.freedesktop.org/trash-spec/trashspec-latest.html)
+  - could use [The FreeDesktop.org Trash specification](https://specifications.freedesktop.org/trash-spec/trashspec-latest.html)
   - fuse filesystem overlay
 - no native versions, multiple options possible
   - git for folders
@@ -160,7 +160,7 @@ Clients using the CS3 API use an [InitiateFileDownload](https://cs3org.github.io
 
 The *data provider* uses the same *storage driver* as the *storage provider* but can be scaled independently.
 
-The dataprovider allows uploading the file to a quarantine area where further data analysis may happen before making the file accessible again. One use case for this is anti virus scanning for files coming from untrusted sources.
+The dataprovider allows uploading the file to a quarantine area where further data analysis may happen before making the file accessible again. One use case for this is antivirus scanning for files coming from untrusted sources.
 
 ## Future work
 

@@ -176,7 +176,7 @@ graph TD
 
 {{</mermaid>}}
 
-Since the active clients will poll the etag for all active users the gateway will have their ETag cached. This is where sharing comes into play: The gateway also needs to stat the ETag of all other entry points ... or mount points. That may increases the number of stat like requests to storage providers by an order of magnitude.
+Since the active clients will poll the etag for all active users the gateway will have their ETag cached. This is where sharing comes into play: The gateway also needs to stat the ETag of all other entry points ... or mount points. That may increase the number of stat like requests to storage providers by an order of magnitude.
 
 ### Ram considerations
 
@@ -192,7 +192,7 @@ The bandwidth for a single machine might be another bottleneck. Consider a propf
 This can be scaled by adding more gateways and sharding users because these components are stateless.
 
 ## Share mount point polling cache
-What can we do to reduce the number of stat calls to storage providers. Well, the gateway queries the share manager for all mounted shares of a user (or all entry points, not only the users own root/home). The share references contain the storage provider that contains the share. If every user has it's own storage provider id the gateway could check in its own cache if the storage root etag has changed. It will be up to date because another client likely already polled for its etag.
+What can we do to reduce the number of stat calls to storage providers. Well, the gateway queries the share manager for all mounted shares of a user (or all entry points, not only the users own root/home). The share references contain the storage provider that contains the share. If every user has its own storage provider id the gateway could check in its own cache if the storage root etag has changed. It will be up-to-date because another client likely already polled for its etag.
 This would reduce the number of necessary stat requests to active storages.
 
 ### Active share node cache invalidation

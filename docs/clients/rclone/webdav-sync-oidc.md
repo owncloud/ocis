@@ -18,7 +18,7 @@ Rclone itself is not able to open and maintain an OpenID Connect session. But it
 You need to install the [OIDC-agent](https://github.com/indigo-dc/oidc-agent) from your OS' package repository (e.g. [Debian](https://github.com/indigo-dc/oidc-agent#debian-packages) or [MacOS](https://github.com/indigo-dc/oidc-agent#debian-packages)).
 
 
-### Configuring the the OIDC-agent
+### Configuring the OIDC-agent
 
 Run the following command to add a OpenID Connect profile to your OIDC-agent. It will open the login page of OpenID Connect identity provider where you need to log in if you don't have an active session.
 
