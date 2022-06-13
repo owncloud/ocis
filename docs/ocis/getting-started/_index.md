@@ -33,7 +33,7 @@ You can find the latest official release of oCIS at [our download mirror](https:
 The latest build from the master branch can be found at [our download mirrors daily section](https://download.owncloud.com/ocis/ocis/daily/). Pre-Releases are available at [our download mirrors testing section](https://download.owncloud.com/ocis/ocis/testing/).
 
 To run oCIS as binary you need to download it first and then run the following commands.
-For this example, assuming version 2.0.0-beta3 of oCIS running on a Linux AMD64 host:
+For this example, assuming version 2.0.0-beta.3 of oCIS running on a Linux AMD64 host:
 
 ```console
 # download
