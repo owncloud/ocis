@@ -25,13 +25,13 @@ The JSON representation of a User handled by the Users API looks like this:
 
 Our implementation currently supports only a limited set of Attributes of Users:
 
-| Attribute	| Description |
-|---------------|-------------|
-| displayName	| The full name of the user, usually a combination for givenname and lastname|
-| mail		| The user's email address |
-| onPremisesSamAccountName | The loginname/account name of the user|
-| id		| An unique, stable readonly identifier for the user that stays the same for the whole lifetime of the User, usually a UUID|
-| passwordProfile | Contains the password of the users. This is only present when updating or creating users. It is never returned by the API|
+| Attribute	| Description                                                                                                               |
+|---------------|---------------------------------------------------------------------------------------------------------------------------|
+| displayName	| The full name of the user, usually a combination of given name and last name                                              |
+| mail		| The user's email address                                                                                                  |
+| onPremisesSamAccountName | The loginname/account name of the user                                                                                    |
+| id		| An unique, stable readonly identifier for the user that stays the same for the whole lifetime of the User, usually a UUID |
+| passwordProfile | Contains the password of the users. This is only present when updating or creating users. It is never returned by the API |
 
 
 ### Reading users

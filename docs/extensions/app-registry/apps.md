@@ -282,7 +282,7 @@ HTTP status code: 200
   ```json
   {
     "code": "RESOURCE_NOT_FOUND",
-    "message": "error: not found: app 'Collabor' not found"
+    "message": "error: not found: app 'Collabora' not found"
   }
   ```
 

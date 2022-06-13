@@ -79,10 +79,10 @@ sequenceDiagram
     participant proxy
     participant ocDAV1 as ocDAV [a-k]
     participant ocDAV2 as ocDAV [l-z]
-    
+
     Note right of Client: {spaceid} identifies the space<br>{relative/path} is relative to the space root
         Client->>+proxy: PROPFIND /dav/space/{spaceid}/{relative/path}
-        
+
     alt username starting with a-k
         proxy->>+ocDAV1: PROPFIND /dav/space/{spaceid}/{relative/path}
     Note right of ocDAV1: translate ownCloud flavoured webdav<br>into CS3 API requests
@@ -105,8 +105,8 @@ sequenceDiagram
     participant ocDAV
     participant Gateway
     participant StorageRegistry
-    participant StorageProvider1 as StoregeProvider [a-k]
-    participant StorageProvider2 as StoregeProvider [l-z]
+    participant StorageProvider1 as StorageProvider [a-k]
+    participant StorageProvider2 as StorageProvider [l-z]
 
     Note right of ocDAV: translate ownCloud flavoured webdav<br>into CS3 API requests
         ocDAV->>+Gateway: ListContainer({spaceid}, path: {relative/path})
@@ -120,7 +120,7 @@ sequenceDiagram
     else username starting with l-z
         Gateway->>+StorageProvider2: ListContainer({spaceid}, path: {relative/path})
         StorageProvider2-->>-Gateway: []ResourceInfo
-    end 
+    end
         Gateway-->>-ocDAV: []ResourceInfo
 {{</mermaid>}}
 
@@ -129,7 +129,7 @@ sequenceDiagram
 
 **PROPFIND request against old webdav endpoints**
 
-To route a PROPFIND request against the old webdav endpoints like `/dav/files/username`, ocdav first has to build a CS3 namespace prefix, eg. `/users/{{.Id.OpaqueId}}` to the users home. 
+To route a PROPFIND request against the old webdav endpoints like `/dav/files/username`, ocdav first has to build a CS3 namespace prefix, eg. `/users/{{.Id.OpaqueId}}` to the users home.
 
 {{<mermaid class="text-center">}}
 %%{init: {"sequence": { "showSequenceNumbers":true, "messageFontFamily":"courier", "messageFontWeight":"normal", "messageFontSize":"11"}}}%%
@@ -150,11 +150,11 @@ sequenceDiagram
         ocDAV->>+ocDAV: {namespace/prefix} = ApplyLayout({path layout}, User), eg. /users/e/einstein
     Note right of ocDAV: look up the space responsible for a path
         ocDAV->>+Gateway: ListStorageSpaces(path: {namespace/prefix}/{relative/path})
-        Gateway-->>-ocDAV: []StorageSpace 
+        Gateway-->>-ocDAV: []StorageSpace
     Note right of ocDAV: make actual request with space and relative path
         ocDAV->>+Gateway: ListContainer({spaceid}, path: {relative/path})
-        Gateway-->>-ocDAV: []ResourceInfo 
-        ocDAV-->>-Client: 207 Multistatus 
+        Gateway-->>-ocDAV: []ResourceInfo
+        ocDAV-->>-Client: 207 Multistatus
     end
 {{</mermaid>}}
 
@@ -192,9 +192,9 @@ sequenceDiagram
     end
     Note right of ocDAV: look up the space responsible for a path
         ocDAV->>+Gateway: ListStorageSpaces(path: {namespace/prefix}/{relative/path})
-        Gateway-->>-ocDAV: []StorageSpace 
+        Gateway-->>-ocDAV: []StorageSpace
     Note right of ocDAV: make actual request with space and relative path
         ocDAV->>+Gateway: ListContainer({spaceid}, path: {relative/path})
-        Gateway-->>-ocDAV: []ResourceInfo 
-        ocDAV-->>-Client: 207 Multistatus 
+        Gateway-->>-ocDAV: []ResourceInfo
+        ocDAV-->>-Client: 207 Multistatus
 {{</mermaid>}}
