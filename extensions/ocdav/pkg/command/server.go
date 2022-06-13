@@ -47,6 +47,7 @@ func Server(cfg *config.Config) *cli.Command {
 					ocdav.Version(version.GetString()),
 					ocdav.Context(ctx),
 					ocdav.Logger(logger.Logger),
+					ocdav.Tracing(cfg.Tracing.Endpoint, cfg.Tracing.Collector),
 					ocdav.Address(cfg.HTTP.Addr),
 					ocdav.FilesNamespace(cfg.FilesNamespace),
 					ocdav.WebdavNamespace(cfg.WebdavNamespace),
