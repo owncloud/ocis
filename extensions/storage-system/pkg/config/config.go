@@ -35,8 +35,8 @@ type Config struct {
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;STORAGE_SYSTEM_TRACING_ENABLED" desc:"Activates tracing."`
-	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;STORAGE_SYSTEM_TRACING_TYPE"`
-	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;STORAGE_SYSTEM_TRACING_ENDPOINT" desc:"The endpoint to the tracing collector."`
+	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;STORAGE_SYSTEM_TRACING_TYPE" desc:"The type of tracing. Defaults to \"\", which is the same as \"jaeger\". Allowed tracing types are \"jaeger\" and \"\" as of now."`
+	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;STORAGE_SYSTEM_TRACING_ENDPOINT" desc:"The endpoint of the tracing collector."`
 	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;STORAGE_SYSTEM_TRACING_COLLECTOR"`
 }
 
@@ -55,7 +55,7 @@ type Debug struct {
 	Addr   string `yaml:"addr" env:"STORAGE_SYSTEM_DEBUG_ADDR" desc:"Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed."`
 	Token  string `yaml:"token" env:"STORAGE_SYSTEM_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint"`
 	Pprof  bool   `yaml:"pprof" env:"STORAGE_SYSTEM_DEBUG_PPROF" desc:"Enables pprof, which can be used for profiling"`
-	Zpages bool   `yaml:"zpages" env:"STORAGE_SYSTEM_DEBUG_ZPAGES" desc:"Enables zpages, which can  be used for collecting and viewing traces in-me"`
+	Zpages bool   `yaml:"zpages" env:"STORAGE_SYSTEM_DEBUG_ZPAGES" desc:"Enables zpages, which can  be used for collecting and viewing traces in-memory."`
 }
 
 type GRPCConfig struct {

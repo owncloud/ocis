@@ -18,8 +18,8 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	ExternalAddr string  `yaml:"external_addr" env:"APP_PROVIDER_EXTERNAL_ADDR"`
-	Driver       string  `yaml:"driver" env:"APP_PROVIDER_DRIVER"`
+	ExternalAddr string  `yaml:"external_addr" env:"APP_PROVIDER_EXTERNAL_ADDR" desc:"address of the app provider, where the gateway service can reach it"`
+	Driver       string  `yaml:"driver" env:"APP_PROVIDER_DRIVER" desc:"driver, which the app provider uses"`
 	Drivers      Drivers `yaml:"drivers"`
 
 	Supervised bool            `yaml:"-"`
@@ -28,9 +28,9 @@ type Config struct {
 
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;APP_PROVIDER_TRACING_ENABLED" desc:"Activates tracing."`
-	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;APP_PROVIDER_TRACING_TYPE"`
-	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;APP_PROVIDER_TRACING_ENDPOINT" desc:"The endpoint to the tracing collector."`
-	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;APP_PROVIDER_TRACING_COLLECTOR"`
+	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;APP_PROVIDER_TRACING_TYPE" desc:"The type of tracing. Defaults to \"\", which is the same as \"jaeger\". Allowed tracing types are \"jaeger\" and \"\" as of now."`
+	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;APP_PROVIDER_TRACING_ENDPOINT" desc:"The endpoint of the tracing agent."`
+	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;APP_PROVIDER_TRACING_COLLECTOR" desc:"The endpoint of the tracing collector. Has only an effect if the tracing endpoint is unset."`
 }
 
 type Log struct {

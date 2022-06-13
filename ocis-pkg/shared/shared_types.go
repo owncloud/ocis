@@ -19,19 +19,19 @@ type Log struct {
 // Tracing defines the available tracing configuration.
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED"`
-	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE"`
+	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE" desc:"The type of tracing. Defaults to \"\", which is the same as \"jaeger\". Allowed tracing types are \"jaeger\" and \"\" as of now."`
 	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT"`
 	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR"`
 }
 
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
-	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET" desc:"The secret to mint jwt tokens."`
+	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET" desc:"The secret to mint and validate jwt tokens."`
 }
 
 // Reva defines all available REVA configuration.
 type Reva struct {
-	Address string `yaml:"address" env:"REVA_GATEWAY"`
+	Address string `yaml:"address" env:"REVA_GATEWAY" desc:"The CS3 gateway endpoint"`
 }
 
 // Commons holds configuration that are common to all extensions. Each extension can then decide whether
