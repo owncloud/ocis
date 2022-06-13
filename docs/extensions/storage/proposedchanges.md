@@ -158,8 +158,8 @@ Resources can be looked up because the oc_filecache has a unique fileid over all
 
 Now we again migrate the space `345` to another storage driver:
 - the storage registry contains a new entry for `instanceprefix!1` so the storage space root now points to the new storage provider
-- The registry needs to be aware of node ids to route properly. This is a no go. We don't want to keep a cache of *all* nodeids in the registry. Only the root nodes of spaces.
-- The new storage driver only has a nodeid which might collide with other nodeids from other storage spaces, eg when two instances are imported into one ocis instance. Although it would be possible to just set up two storage providers extra care would have to be taken to prevent nodeid collisions when importing a space.
+- The registry needs to be aware of node ids to route properly. This is a no-go. We don't want to keep a cache of *all* nodeids in the registry. Only the root nodes of spaces.
+- The new storage driver only has a nodeid which might collide with other nodeids from other storage spaces, e.g. when two instances are imported into one ocis instance. Although it would be possible to just set up two storage providers extra care would have to be taken to prevent nodeid collisions when importing a space.
 
 If we now have to fetch the path on the `/dav/meta/` endpoint:
 `/dav/meta/instanceprefix!1` would work because it is the root of a space

@@ -68,7 +68,7 @@ While the above is a simplification to get an understanding of what needs to go 
 
 **Proxy can do user based routing**
 
-The ocis proxy authenticates requests an can forward requests to different backends, depending on the logged in user or cookies. For example multiple ocdav services can be configured to shard users based on username or affiliation.
+The ocis proxy authenticates requests and can forward requests to different backends, depending on the logged-in user or cookies. For example multiple ocdav services can be configured to shard users based on username or affiliation.
 
 {{<mermaid class="text-center">}}
 %%{init: {"sequence": { "showSequenceNumbers":true, "messageFontFamily":"courier", "messageFontWeight":"normal", "messageFontSize":"11"}}}%%
@@ -129,7 +129,7 @@ sequenceDiagram
 
 **PROPFIND request against old webdav endpoints**
 
-To route a PROPFIND request against the old webdav endpoints like `/dav/files/username`, ocdav first has to build a CS3 namespace prefix, eg. `/users/{{.Id.OpaqueId}}` to the users home.
+To route a PROPFIND request against the old webdav endpoints like `/dav/files/username`, ocdav first has to build a CS3 namespace prefix, e.g. `/users/{{.Id.OpaqueId}}` to the users home.
 
 {{<mermaid class="text-center">}}
 %%{init: {"sequence": { "showSequenceNumbers":true, "messageFontFamily":"courier", "messageFontWeight":"normal", "messageFontSize":"11"}}}%%

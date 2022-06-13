@@ -27,7 +27,7 @@ oCIS currently is configured to jail users into the CS3 `/home` namespace in the
 
 
 {{< hint warning >}}
-In the global CS3 namespaces we plan to move `/home/Shares`, which currently lists all mounted shares of the currently logged in user to a dedicated `/shares` namespace. See [below]({{< ref "#cs3-namespaces" >}}) and [Move shares folder out from home directory to a separate mount reva#1584](https://github.com/cs3org/reva/pull/1584).
+In the global CS3 namespaces we plan to move `/home/Shares`, which currently lists all mounted shares of the currently logged-in user to a dedicated `/shares` namespace. See [below]({{< ref "#cs3-namespaces" >}}) and [Move shares folder out from home directory to a separate mount reva#1584](https://github.com/cs3org/reva/pull/1584).
 {{< /hint >}}
 
 ## ownCloud namespaces
@@ -73,7 +73,7 @@ In ownCloud 10 you can not only create *public links* but also *private links*. 
 | https://demo.owncloud.com/s/piLdAAt1m3Bg0Fk | public link |
 
 {{< hint >}}
-The `dir` parameter alone cannot be used to look up the directory, because the path for a file may be different depending on the currently logged in user:
+The `dir` parameter alone cannot be used to look up the directory, because the path for a file may be different depending on the currently logged-in user:
 - User A shares his `/path/to/Photos` with User X.
 - User B shares his `/other/path/to/Photos` with User X and Y.
 - User A shares his `/path/to/Photos` with User Y.

@@ -52,7 +52,7 @@ IDM_CREATE_DEMO_USERS=true ./ocis server
 The default primary storage location is `~/.ocis` or `/var/lib/ocis` depending on the packaging format and your operating system user. You can change that value by configuration.
 
 {{< hint info >}}
-When you're using oCIS with self-signed certificates, you need to answer the the question for certificate checking with "yes" or set the environment variable `OCIS_INSECURE=true`, in order to make oCIS work.
+When you're using oCIS with self-signed certificates, you need to answer the question for certificate checking with "yes" or set the environment variable `OCIS_INSECURE=true`, in order to make oCIS work.
 {{< /hint >}}
 
 {{< hint warning >}}
