@@ -7,7 +7,7 @@ geekdocEditPath: edit/master/docs/extensions/app-registry
 geekdocFilePath: apps.md
 ---
 
-oCIS is all about files. But most of the time you want to do something with files that is beyond the basic upload, download and share behavior. Therefore, oCIS has a concept for apps, that can handle specific file types, so called mime types.
+oCIS is all about files. But most of the time you want to do something with files that is beyond the basic upload, download and share behavior. Therefore, oCIS has a concept for apps, that can handle specific file types, so-called mime types.
 
 ## App provider capability
 
@@ -79,7 +79,7 @@ Fields:
 - `mime_type` is the mime type you want to configure
 - `extension` is the file extension to be used for new files
 - `name` is the name of the file / mime type
-- `description` is a human readable description of the file / mime type
+- `description` is a human-readable description of the file / mime type
 - `icon` URL to an icon which should be used for that mime type
 - `default_app` name of the default app which opens this mime type when the user doesn't specify one
 - `allow_creation` is whether a user should be able to create new file from that mime type (`true` or `false`)
@@ -428,7 +428,7 @@ App drivers represent apps, if the app is not able to register itself. Currently
 
 ### CS3org WOPI server app driver
 
-The CS3org WOPI server app driver is included in oCIS by default. It needs at least one WOPI compliant app (e.g. Collabora, OnlyOffice or Microsoft Online Online Server) or a CS3org WOPI bridge supported app (CodiMD or Etherpad) and the CS3org WOPI server.
+The CS3org WOPI server app driver is included in oCIS by default. It needs at least one WOPI compliant app (e.g. Collabora, OnlyOffice or Microsoft Online Server) or a CS3org WOPI bridge supported app (CodiMD or Etherpad) and the CS3org WOPI server.
 
 Here is a closer look at the configuration of the actual app provider in a docker-compose example (see also [full example](https://github.com/owncloud/ocis/blob/master/deployments/examples/ocis_wopi/docker-compose.yml)):
 
