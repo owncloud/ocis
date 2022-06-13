@@ -1809,7 +1809,7 @@ def skipIfUnchanged(ctx, type):
         skip = base + unit
     if type == "unit-tests":
         skip = base + acceptance
-    if type == "build-binary" or type == "build-docker":
+    if type == "build-binary" or type == "build-docker" or type == "litmus":
         skip = base + unit + acceptance
 
     if len(skip) == 0:
@@ -2472,7 +2472,8 @@ def litmus(ctx, storage):
             "base": "/drone",
             "path": "src",
         },
-        "steps": restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+        "steps": skipIfUnchanged(ctx, "litmus") +
+                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
                  ocisServer(storage) +
                  setupForLitmus() +
                  [
