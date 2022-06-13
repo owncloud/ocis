@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Rework default role provisioning: [#3900](https://github.com/owncloud/ocis/issues/3900)
+* Bugfix - Fix version info: [#3953](https://github.com/owncloud/ocis/pull/3953)
 * Bugfix - Fix graph endpoint: [#3925](https://github.com/owncloud/ocis/issues/3925)
 * Enhancement - Add audit events for created containers: [#3941](https://github.com/owncloud/ocis/pull/3941)
 * Enhancement - Disable the color logging in docker compose examples: [#871](https://github.com/owncloud/ocis/issues/871)
@@ -20,6 +21,16 @@ The following sections list the changes for unreleased.
    privileges. When authenticating before the settings service was fully running.
 
    https://github.com/owncloud/ocis/issues/3900
+
+* Bugfix - Fix version info: [#3953](https://github.com/owncloud/ocis/pull/3953)
+
+   We've fixed the version info that is displayed when you run:
+
+   - `ocis version` - `ocis <extension name> version`
+
+   Since #2918, these commands returned an empty version only.
+
+   https://github.com/owncloud/ocis/pull/3953
 
 * Bugfix - Fix graph endpoint: [#3925](https://github.com/owncloud/ocis/issues/3925)
 
