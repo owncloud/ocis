@@ -28,6 +28,8 @@ type Config struct {
 	Asset        Asset         `yaml:"asset"`
 	TokenManager *TokenManager `yaml:"token_manager"`
 
+	SetupDefaultAssignments bool `yaml:"set_default_assignments" env:"SETTINGS_SETUP_DEFAULT_ASSIGNMENTS;ACCOUNTS_DEMO_USERS_AND_GROUPS" desc:"If the default role assignments for the demo users should be setup."`
+
 	Context context.Context `yaml:"-"`
 }
 

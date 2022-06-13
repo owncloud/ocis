@@ -544,15 +544,15 @@ func (g Service) defaultRoleAssignments() []*settingsmsg.UserRoleAssignment {
 		},
 		// default users with role "user"
 		{
-			AccountUuid: "4c510ada-c86b-4815-8820-42cdf82c3d51",
+			AccountUuid: "4c510ada-c86b-4815-8820-42cdf82c3d51", // demo user "einstein"
 			RoleId:      BundleUUIDRoleUser,
 		}, {
-			AccountUuid: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c",
+			AccountUuid: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", // demo user "marie"
 			RoleId:      BundleUUIDRoleUser,
 		},
 		// default users with role "spaceadmin"
 		{
-			AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7",
+			AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7", // demo user "katherine"
 			RoleId:      BundleUUIDRoleSpaceAdmin,
 		},
 	}
