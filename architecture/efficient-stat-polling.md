@@ -123,7 +123,7 @@ graph TD
 
 {{</mermaid>}}
 
-But how can maries client detect the change?
+But how can Marie's client detect the change?
 
 We are trading writes for reads: the client needs to stat the own tree & all shares or entry points into other storage trees.
 

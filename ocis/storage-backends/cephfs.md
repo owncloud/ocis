@@ -17,7 +17,7 @@ The cephfs development happens in a [Reva branch](https://github.com/cs3org/reva
 
 ## Architecture
 
-In the original approach the driver was based on the [localfs](https://github.com/cs3org/reva/blob/a8c61401b662d8e09175416c0556da8ef3ba8ed6/pkg/storage/utils/localfs/localfs.go) driver, relying on a locally mounted cephfs. It would interface with it using the POSIX apis. This has been changed to directly call the Ceph API using https://github.com/ceph/go-ceph. It allows using the ceph admin APIs to create subvolumes for user homes and maintain a file id to path mapping using symlinks.
+In the original approach the driver was based on the [localfs](https://github.com/cs3org/reva/blob/a8c61401b662d8e09175416c0556da8ef3ba8ed6/pkg/storage/utils/localfs/localfs.go) driver, relying on a locally mounted cephfs. It would interface with it using the POSIX apis. This has been changed to directly call the Ceph API using https://github.com/ceph/go-ceph. It allows using the ceph admin APIs to create sub-volumes for user homes and maintain a file id to path mapping using symlinks.
 
 ## Implemented Aspects
 The recursive change time built ino cephfs is used to implement the etag propagation expected by the ownCloud clients. This allows oCIS to pick up changes that have been made by external tools, bypassing any oCIS APIs.
@@ -45,7 +45,7 @@ Trash is not implemented, as cephfs has no native recycle bin and instead relies
 Shares [are mapped to ACLs](https://github.com/cs3org/reva/pull/1209/files#diff-5e532e61f99bffb5754263bc6ce75f84a30c6f507a58ba506b0b487a50eda1d9R168-R224) supported by cephfs. The share manager is used to persist the intent of a share and can be used to periodically verify or reset the ACLs on cephfs.
 
 ## Future work
-- The spaces concept matches cephfs subvolumes. We can implement the CreateStorageSpace call with that, keep track of the list of storage spaces using symlinks, like for the id based lookup.
+- The spaces concept matches cephfs sub-volumes. We can implement the CreateStorageSpace call with that, keep track of the list of storage spaces using symlinks, like for the id based lookup.
 - The share manager needs a persistence layer.
 - Currently we persist using a single json file.
 - As it basically provides two lists, *shared with me* and *shared with others*, we could persist them directly on cephfs!
