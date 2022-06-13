@@ -2453,9 +2453,6 @@ def fixSharedDataPermissions():
 def litmus(ctx, storage):
     pipelines = []
 
-    if ("docs-only" in ctx.build.title.lower()):
-        return pipelines
-
     if (config["litmus"] == False):
         return pipelines
 
