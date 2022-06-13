@@ -18,11 +18,11 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"OCDAV_SKIP_USER_GROUPS_IN_TOKEN"`
+	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"OCDAV_SKIP_USER_GROUPS_IN_TOKEN"` 
 
-	WebdavNamespace string `yaml:"webdav_namespace" env:"OCDAV_WEBDAV_NAMESPACE"`
-	FilesNamespace  string `yaml:"files_namespace" env:"OCDAV_FILES_NAMESPACE"`
-	SharesNamespace string `yaml:"shares_namespace" env:"OCDAV_SHARES_NAMESPACE"`
+	WebdavNamespace string `yaml:"webdav_namespace" env:"OCDAV_WEBDAV_NAMESPACE" desc:"Jail requests to /dav/webdav into this CS3 namespace. Supports template layouting with CS3 User properties."`
+	FilesNamespace  string `yaml:"files_namespace" env:"OCDAV_FILES_NAMESPACE" desc:"Jail requests to /dav/files/{username} into this CS3 namespace. Supports template layouting with CS3 User properties."`
+	SharesNamespace string `yaml:"shares_namespace" env:"OCDAV_SHARES_NAMESPACE" desc:"The human readable path for the share jail. Relative to a users personal space root. Upcased intentionally."`
 	// PublicURL used to redirect /s/{token} URLs to
 	PublicURL string `yaml:"public_url" env:"OCIS_URL;OCDAV_PUBLIC_URL"`
 
@@ -64,7 +64,7 @@ type HTTPConfig struct {
 	Addr      string `yaml:"addr" env:"OCDAV_HTTP_ADDR" desc:"The address of the http service."`
 	Namespace string `yaml:"-"`
 	Protocol  string `yaml:"protocol" env:"OCDAV_HTTP_PROTOCOL" desc:"The transport protocol of the http service."`
-	Prefix    string `yaml:"prefix" env:"OCDAV_HTTP_PREFIX"`
+	Prefix    string `yaml:"prefix" env:"OCDAV_HTTP_PREFIX" desc:"A URL path prefix for the handler."`
 }
 
 // Middleware configures reva middlewares.
