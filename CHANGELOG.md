@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix version info: [#3953](https://github.com/owncloud/ocis/pull/3953)
 * Bugfix - Fix graph endpoint: [#3925](https://github.com/owncloud/ocis/issues/3925)
 * Enhancement - Add audit events for created containers: [#3941](https://github.com/owncloud/ocis/pull/3941)
+* Enhancement - Don't setup demo role assignments on default: [#3661](https://github.com/owncloud/ocis/issues/3661)
 * Enhancement - Disable the color logging in docker compose examples: [#871](https://github.com/owncloud/ocis/issues/871)
 * Enhancement - Update reva: [#3944](https://github.com/owncloud/ocis/pull/3944)
 
@@ -51,6 +52,14 @@ The following sections list the changes for unreleased.
    Handle the event `ContainerCreated` in the audit service.
 
    https://github.com/owncloud/ocis/pull/3941
+
+* Enhancement - Don't setup demo role assignments on default: [#3661](https://github.com/owncloud/ocis/issues/3661)
+
+   Added a configuration option to explicitly tell the settings service to generate the default
+   role assignments.
+
+   https://github.com/owncloud/ocis/issues/3661
+   https://github.com/owncloud/ocis/pull/3956
 
 * Enhancement - Disable the color logging in docker compose examples: [#871](https://github.com/owncloud/ocis/issues/871)
 
