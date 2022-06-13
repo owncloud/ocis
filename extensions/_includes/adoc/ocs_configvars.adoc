@@ -108,12 +108,6 @@
 | cs3
 | 
 
-|`STORAGE_USERS_DRIVER` +
-`OCS_STORAGE_USERS_DRIVER`
-| string
-| ocis
-| 
-
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `OCS_MACHINE_AUTH_API_KEY`
 | string

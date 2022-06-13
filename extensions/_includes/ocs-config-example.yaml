@@ -43,5 +43,4 @@ reva:
 identity_management:
   address: https://localhost:9200
 account_backend: cs3
-storage_users_driver: ocis
 machine_auth_api_key: ""
