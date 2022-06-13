@@ -44,7 +44,7 @@ func Server(opts ...Option) (svc.Service, error) {
 
 	service := svc.NewService(
 		svc.Name(options.Config.Service.Name),
-		svc.Version(version.String),
+		svc.Version(version.GetString()),
 		svc.TLSConfig(tlsConfig),
 		svc.Logger(options.Logger),
 		svc.Address(options.Config.HTTP.Addr),

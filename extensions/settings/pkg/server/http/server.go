@@ -21,7 +21,7 @@ func Server(opts ...Option) http.Service {
 	service := http.NewService(
 		http.Logger(options.Logger),
 		http.Name(options.Name),
-		http.Version(version.String),
+		http.Version(version.GetString()),
 		http.Address(options.Config.HTTP.Addr),
 		http.Namespace(options.Config.HTTP.Namespace),
 		http.Context(options.Context),
@@ -56,7 +56,7 @@ func Server(opts ...Option) http.Service {
 
 	mux.Use(middleware.Version(
 		options.Name,
-		version.String,
+		version.GetString(),
 	))
 
 	mux.Use(middleware.Logger(

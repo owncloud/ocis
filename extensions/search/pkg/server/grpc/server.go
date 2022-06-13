@@ -18,7 +18,7 @@ func Server(opts ...Option) grpc.Service {
 		grpc.Namespace(options.Config.GRPC.Namespace),
 		grpc.Logger(options.Logger),
 		grpc.Flags(options.Flags...),
-		grpc.Version(version.String),
+		grpc.Version(version.GetString()),
 	)
 
 	handle, err := svc.NewHandler(

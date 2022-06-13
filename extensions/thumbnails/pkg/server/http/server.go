@@ -17,7 +17,7 @@ func Server(opts ...Option) (http.Service, error) {
 	service := http.NewService(
 		http.Logger(options.Logger),
 		http.Name(options.Config.Service.Name),
-		http.Version(version.String),
+		http.Version(version.GetString()),
 		http.Namespace(options.Config.HTTP.Namespace),
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
@@ -32,7 +32,7 @@ func Server(opts ...Option) (http.Service, error) {
 			// ocismiddleware.Secure,
 			ocismiddleware.Version(
 				options.Config.Service.Name,
-				version.String,
+				version.GetString(),
 			),
 			ocismiddleware.Logger(options.Logger),
 		),

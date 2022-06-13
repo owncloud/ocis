@@ -52,7 +52,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			metrics.BuildInfo.WithLabelValues(version.String).Set(1)
+			metrics.BuildInfo.WithLabelValues(version.GetString()).Set(1)
 
 			{
 				server, err := http.Server(

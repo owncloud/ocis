@@ -19,7 +19,7 @@ func Server(opts ...Option) grpc.Service {
 	service := grpc.NewService(
 		grpc.Logger(options.Logger),
 		grpc.Name(options.Name),
-		grpc.Version(version.String),
+		grpc.Version(version.GetString()),
 		grpc.Address(options.Config.GRPC.Addr),
 		grpc.Namespace(options.Config.GRPC.Namespace),
 		grpc.Context(options.Context),

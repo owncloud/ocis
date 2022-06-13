@@ -48,7 +48,7 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			mtrcs := metrics.New()
-			mtrcs.BuildInfo.WithLabelValues(version.String).Set(1)
+			mtrcs.BuildInfo.WithLabelValues(version.GetString()).Set(1)
 
 			grpcServer := grpc.Server(
 				grpc.Config(cfg),

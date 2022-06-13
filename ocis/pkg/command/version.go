@@ -20,7 +20,7 @@ func VersionCommand(cfg *config.Config) *cli.Command {
 		Usage:    "print the version of this binary and all running extension instances",
 		Category: "info",
 		Action: func(c *cli.Context) error {
-			fmt.Println("Version: " + version.String)
+			fmt.Println("Version: " + version.GetString())
 			fmt.Printf("Compiled: %s\n", version.Compiled())
 			fmt.Println("")
 

@@ -18,7 +18,7 @@ func Server(opts ...Option) (http.Service, error) {
 		http.Logger(options.Logger),
 		http.Namespace(options.Namespace),
 		http.Name("web"),
-		http.Version(version.String),
+		http.Version(version.GetString()),
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
 		http.Flags(options.Flags...),
@@ -35,7 +35,7 @@ func Server(opts ...Option) (http.Service, error) {
 			webmid.SilentRefresh,
 			middleware.Version(
 				"web",
-				version.String,
+				version.GetString(),
 			),
 			middleware.Logger(
 				options.Logger,

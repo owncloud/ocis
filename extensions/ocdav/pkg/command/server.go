@@ -44,7 +44,7 @@ func Server(cfg *config.Config) *cli.Command {
 			gr.Add(func() error {
 				s, err := ocdav.Service(
 					ocdav.Name(cfg.HTTP.Namespace+"."+cfg.Service.Name),
-					ocdav.Version(version.String),
+					ocdav.Version(version.GetString()),
 					ocdav.Context(ctx),
 					ocdav.Logger(logger.Logger),
 					ocdav.Address(cfg.HTTP.Addr),
