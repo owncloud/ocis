@@ -17,7 +17,7 @@
 | GATEWAY_GRPC_ADDR | string | 127.0.0.1:9142 | The address of the grpc service.|
 | GATEWAY_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>GATEWAY_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | GATEWAY_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
 | GATEWAY_COMMIT_SHARE_TO_STORAGE_GRANT | bool | true | |
 | GATEWAY_COMMIT_SHARE_TO_STORAGE_REF | bool | true | |

@@ -19,8 +19,8 @@
 | PROXY_TRANSPORT_TLS_CERT | string | ~/.ocis/proxy/server.crt | |
 | PROXY_TRANSPORT_TLS_KEY | string | ~/.ocis/proxy/server.key | |
 | PROXY_TLS | bool | true | |
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
-| OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>PROXY_OIDC_ISSUER | string | https://localhost:9200 | URL of the OpenID connect identity provider.|
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
+| OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>PROXY_OIDC_ISSUER | string | https://localhost:9200 | URL of the OIDC issuer. It defaults to URL of the builtin IDP.|
 | OCIS_INSECURE<br/>PROXY_OIDC_INSECURE | bool | true | Disable TLS certificate validation for connections to the IDP. (not recommended for production environments.|
 | PROXY_OIDC_USERINFO_CACHE_SIZE | int | 1024 | |
 | PROXY_OIDC_USERINFO_CACHE_TTL | int | 10 | |

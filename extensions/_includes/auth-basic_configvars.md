@@ -17,7 +17,7 @@
 | AUTH_BASIC_GRPC_ADDR | string | 127.0.0.1:9146 | The address of the grpc service.|
 | AUTH_BASIC_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>AUTH_BASIC_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | AUTH_BASIC_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the encoding of the user's groupmember ships in the reva access token. To reduces token size, especially when users are members of a large number of groups.|
 | AUTH_BASIC_AUTH_PROVIDER | string | ldap | The auth provider which should be used by the service (e.g. 'ldap').|
 | LDAP_URI<br/>AUTH_BASIC_LDAP_URI | string | ldaps://localhost:9235 | URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'|
@@ -33,7 +33,7 @@
 | LDAP_GROUP_FILTER<br/>AUTH_BASIC_LDAP_GROUP_FILTER | string |  | LDAP filter to add to the default filters for group searches.|
 | LDAP_USER_OBJECTCLASS<br/>AUTH_BASIC_LDAP_USER_OBJECTCLASS | string | inetOrgPerson | The object class to use for users in the default user search filter ('inetOrgPerson').|
 | LDAP_GROUP_OBJECTCLASS<br/>AUTH_BASIC_LDAP_GROUP_OBJECTCLASS | string | groupOfNames | The object class to use for groups in the default group search filter ('groupOfNames'). |
-| LDAP_LOGIN_ATTRIBUTES<br/>AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES |  | [uid mail] | |
+| LDAP_LOGIN_ATTRIBUTES<br/>AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES |  | [uid mail] | The user object attributes, that can be used for login.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>AUTH_BASIC_IDP_URL | string | https://localhost:9200 | The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.|
 | LDAP_USER_SCHEMA_ID<br/>AUTH_BASIC_LDAP_USER_SCHEMA_ID | string | ownclouduuid | LDAP Attribute to use as the unique id for users. This should be a stable globally unique id (e.g. a UUID).|
 | LDAP_USER_SCHEMA_ID_IS_OCTETSTRING<br/>AUTH_BASIC_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING | bool | false | Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ids.|
@@ -52,6 +52,6 @@
 | AUTH_BASIC_OWNCLOUDSQL_DB_PORT | int | 3306 | Network port to use for the database connection.|
 | AUTH_BASIC_OWNCLOUDSQL_DB_NAME | string | owncloud | Name of the owncloud database.|
 | AUTH_BASIC_OWNCLOUDSQL_IDP | string | https://localhost:9200 | The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.|
-| AUTH_BASIC_OWNCLOUDSQL_NOBODY | int64 | 90 | |
+| AUTH_BASIC_OWNCLOUDSQL_NOBODY | int64 | 90 | Fallback number if no numeric UID and GID properties are provided.|
 | AUTH_BASIC_OWNCLOUDSQL_JOIN_USERNAME | bool | false | Join the user properties table to read usernames|
 | AUTH_BASIC_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID | bool | false | Join the user properties table to read user ids (boolean).|

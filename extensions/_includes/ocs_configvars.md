@@ -17,7 +17,7 @@
 | OCS_HTTP_ADDR | string | 127.0.0.1:9110 | |
 | OCS_HTTP_ROOT | string | /ocs | |
 | OCIS_JWT_SECRET<br/>OCS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
-| OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>OCS_IDM_ADDRESS | string | https://localhost:9200 | |
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
+| OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>OCS_IDM_ADDRESS | string | https://localhost:9200 | URL of the OIDC issuer. It defaults to URL of the builtin IDP.|
 | OCS_ACCOUNT_BACKEND_TYPE | string | cs3 | |
 | OCIS_MACHINE_AUTH_API_KEY<br/>OCS_MACHINE_AUTH_API_KEY | string |  | |

@@ -26,7 +26,7 @@
 |  | string |  | |
 | WEB_UI_CONFIG_VERSION | string | 0.1.0 | |
 | WEB_OIDC_METADATA_URL | string | https://localhost:9200/.well-known/openid-configuration | |
-| OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>WEB_OIDC_AUTHORITY | string | https://localhost:9200 | |
+| OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>WEB_OIDC_AUTHORITY | string | https://localhost:9200 | URL of the OIDC issuer. It defaults to URL of the builtin IDP.|
 | WEB_OIDC_CLIENT_ID | string | web | |
 | WEB_OIDC_RESPONSE_TYPE | string | code | |
 | WEB_OIDC_SCOPE | string | openid profile email | |

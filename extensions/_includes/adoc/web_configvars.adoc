@@ -142,7 +142,7 @@
 `WEB_OIDC_AUTHORITY`
 | string
 | \https://localhost:9200
-| 
+| URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
 |`WEB_OIDC_CLIENT_ID`
 | string

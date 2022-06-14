@@ -17,7 +17,7 @@
 | STORAGE_SHARES_GRPC_ADDR | string | 127.0.0.1:9154 | The address of the grpc service.|
 | STORAGE_SHARES_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>STORAGE_SHARES_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | STORAGE_SHARES_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
 | STORAGE_SHARES_MOUNT_ID | string | 7639e57c-4433-4a12-8201-722fd0009154 | |
 | STORAGE_SHARES_READ_ONLY | bool | false | |

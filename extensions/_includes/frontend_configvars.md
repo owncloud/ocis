@@ -19,7 +19,7 @@
 | FRONTEND_HTTP_PREFIX | string |  | |
 | STORAGE_TRANSFER_SECRET | string |  | |
 | OCIS_JWT_SECRET<br/>FRONTEND_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | OCIS_MACHINE_AUTH_API_KEY<br/>FRONTEND_MACHINE_AUTH_API_KEY | string |  | |
 | FRONTEND_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
 | FRONTEND_ENABLE_FAVORITES | bool | false | |

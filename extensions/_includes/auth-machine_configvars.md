@@ -17,6 +17,6 @@
 | AUTH_MACHINE_GRPC_ADDR | string | 127.0.0.1:9166 | The address of the grpc service.|
 | AUTH_MACHINE_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>AUTH_MACHINE_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
-| AUTH_MACHINE_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
-| OCIS_MACHINE_AUTH_API_KEY<br/>AUTH_MACHINE_API_KEY | string |  | |
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
+| AUTH_MACHINE_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Skip storing all groups of a user in the jwt token.|
+| OCIS_MACHINE_AUTH_API_KEY<br/>AUTH_MACHINE_API_KEY | string |  | Machine auth API key used for validating requests from other services when impersonating users.|

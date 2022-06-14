@@ -21,7 +21,7 @@
 | STORAGE_SYSTEM_EVENTS_ENDPOINT | string |  | the address of the streaming service|
 | STORAGE_SYSTEM_EVENTS_CLUSTER | string |  | the clusterID of the streaming service. Mandatory when using nats|
 | OCIS_JWT_SECRET<br/>STORAGE_SYSTEM_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | OCIS_SYSTEM_USER_ID | string |  | |
 | OCIS_SYSTEM_USER_API_KEY | string |  | |
 | STORAGE_SYSTEM_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |

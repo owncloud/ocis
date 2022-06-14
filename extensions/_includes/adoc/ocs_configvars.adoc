@@ -94,14 +94,14 @@
 |`REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
-| The CS3 gateway endpoint
+| The CS3 gateway endpoint.
 
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
 `OCS_IDM_ADDRESS`
 | string
 | \https://localhost:9200
-| 
+| URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
 |`OCS_ACCOUNT_BACKEND_TYPE`
 | string

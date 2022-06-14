@@ -103,14 +103,14 @@
 |`REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
-| The CS3 gateway endpoint
+| The CS3 gateway endpoint.
 
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
 `PROXY_OIDC_ISSUER`
 | string
 | \https://localhost:9200
-| URL of the OpenID connect identity provider.
+| URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
 |`OCIS_INSECURE` +
 `PROXY_OIDC_INSECURE`

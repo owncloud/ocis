@@ -94,7 +94,7 @@
 |`REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
-| The CS3 gateway endpoint
+| The CS3 gateway endpoint.
 
 |`STORAGE_SHARES_SKIP_USER_GROUPS_IN_TOKEN`
 | bool

@@ -17,6 +17,6 @@
 | STORAGE_PUBLICLINK_GRPC_ADDR | string | 127.0.0.1:9178 | The address of the grpc service.|
 | STORAGE_PUBLICLINK_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>STORAGE_PUBLICLINK_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | STORAGE_PUBLICLINK_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
 | STORAGE_PUBLICLINK_STORAGE_PROVIDER_MOUNT_ID | string | 7993447f-687f-490d-875c-ac95e89a62a4 | |

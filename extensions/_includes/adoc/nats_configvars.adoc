@@ -54,22 +54,22 @@
 |`NATS_NATS_HOST`
 | string
 | 127.0.0.1
-| 
+| Bind address.
 
 |`NATS_NATS_PORT`
 | int
 | 9233
-| 
+| Bind port:
 
 |`NATS_NATS_CLUSTER_ID`
 | string
 | ocis-cluster
-| 
+| ID of the NATS cluster.
 
 |`NATS_NATS_STORE_DIR`
 | string
 | ~/.ocis/nats
-| 
+| Path for the NATS JetStream persistence directory.
 |===
 
 Since Version: `+` added, `-` deprecated

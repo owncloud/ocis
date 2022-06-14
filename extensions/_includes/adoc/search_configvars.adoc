@@ -88,7 +88,7 @@
 |`REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
-| The CS3 gateway endpoint
+| The CS3 gateway endpoint.
 
 |`SEARCH_EVENTS_ENDPOINT`
 | string

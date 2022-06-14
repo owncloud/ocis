@@ -17,10 +17,10 @@
 | AUTH_BEARER_GRPC_ADDR | string | 127.0.0.1:9148 | The address of the grpc service.|
 | AUTH_BEARER_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>AUTH_BEARER_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
-| AUTH_BEARER_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
-| OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>AUTH_BEARER_OIDC_ISSUER | string | https://localhost:9200 | |
-| OCIS_INSECURE<br/>AUTH_BEARER_OIDC_INSECURE | bool | false | |
-| AUTH_BEARER_OIDC_ID_CLAIM | string | preferred_username | |
-| AUTH_BEARER_OIDC_UID_CLAIM | string |  | |
-| AUTH_BEARER_OIDC_GID_CLAIM | string |  | |
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
+| AUTH_BEARER_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Skip storing all groups of a user in the jwt token.|
+| OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>AUTH_BEARER_OIDC_ISSUER | string | https://localhost:9200 | URL of the OIDC issuer. It defaults to URL of the builtin IDP.|
+| OCIS_INSECURE<br/>AUTH_BEARER_OIDC_INSECURE | bool | false | Allow insecure connections to the OIDC issuer.|
+| AUTH_BEARER_OIDC_ID_CLAIM | string | preferred_username | Name of the claim, which holds the user identifier.|
+| AUTH_BEARER_OIDC_UID_CLAIM | string |  | Name of the claim, which holds the UID.|
+| AUTH_BEARER_OIDC_GID_CLAIM | string |  | Name of the claim, which holds the GID.|

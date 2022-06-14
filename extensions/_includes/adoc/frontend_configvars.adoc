@@ -104,7 +104,7 @@
 |`REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
-| The CS3 gateway endpoint
+| The CS3 gateway endpoint.
 
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `FRONTEND_MACHINE_AUTH_API_KEY`

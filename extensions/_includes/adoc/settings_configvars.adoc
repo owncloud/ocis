@@ -136,7 +136,7 @@
 `SETTINGS_ADMIN_USER_ID`
 | string
 | 
-| 
+| ID of a user, that should receive admin privileges.
 
 |`SETTINGS_ASSET_PATH`
 | string

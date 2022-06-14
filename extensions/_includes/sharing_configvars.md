@@ -17,7 +17,7 @@
 | SHARING_GRPC_ADDR | string | 127.0.0.1:9150 | The address of the grpc service.|
 | SHARING_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>SHARING_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | SHARING_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | the address of the streaming service|
 | SHARING_EVENTS_CLUSTER | string | ocis-cluster | the clusterID of the streaming service. Mandatory when using nats|
 | SHARING_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |

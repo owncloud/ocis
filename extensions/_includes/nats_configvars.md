@@ -10,7 +10,7 @@
 | NATS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | NATS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | NATS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| NATS_NATS_HOST | string | 127.0.0.1 | |
-| NATS_NATS_PORT | int | 9233 | |
-| NATS_NATS_CLUSTER_ID | string | ocis-cluster | |
-| NATS_NATS_STORE_DIR | string | ~/.ocis/nats | |
+| NATS_NATS_HOST | string | 127.0.0.1 | Bind address.|
+| NATS_NATS_PORT | int | 9233 | Bind port:|
+| NATS_NATS_CLUSTER_ID | string | ocis-cluster | ID of the NATS cluster.|
+| NATS_NATS_STORE_DIR | string | ~/.ocis/nats | Path for the NATS JetStream persistence directory.|

@@ -94,18 +94,18 @@
 |`REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
-| The CS3 gateway endpoint
+| The CS3 gateway endpoint.
 
 |`AUTH_MACHINE_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
 | false
-| 
+| Skip storing all groups of a user in the jwt token.
 
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `AUTH_MACHINE_API_KEY`
 | string
 | 
-| 
+| Machine auth API key used for validating requests from other services when impersonating users.
 |===
 
 Since Version: `+` added, `-` deprecated

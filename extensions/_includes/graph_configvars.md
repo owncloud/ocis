@@ -16,7 +16,7 @@
 | GRAPH_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | GRAPH_HTTP_ADDR | string | 127.0.0.1:9120 | |
 | GRAPH_HTTP_ROOT | string | /graph | |
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | OCIS_JWT_SECRET<br/>GRAPH_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | OCIS_URL<br/>GRAPH_SPACES_WEBDAV_BASE | string | https://localhost:9200 | |
 | GRAPH_SPACES_WEBDAV_PATH | string | /dav/spaces/ | |

@@ -94,7 +94,7 @@
 |`REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
-| The CS3 gateway endpoint
+| The CS3 gateway endpoint.
 
 |`AUTH_BASIC_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
@@ -188,7 +188,7 @@
 `AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES`
 | 
 | [uid mail]
-| 
+| The user object attributes, that can be used for login.
 
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
@@ -296,7 +296,7 @@
 |`AUTH_BASIC_OWNCLOUDSQL_NOBODY`
 | int64
 | 90
-| 
+| Fallback number if no numeric UID and GID properties are provided.
 
 |`AUTH_BASIC_OWNCLOUDSQL_JOIN_USERNAME`
 | bool

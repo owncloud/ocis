@@ -17,7 +17,7 @@
 | GROUPS_GRPC_ADDR | string | 127.0.0.1:9160 | The address of the grpc service.|
 | GROUPS_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>GROUPS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | GROUPS_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the encoding of the user's groupmember ships in the reva access token. To reduces token size, especially when users are members of a large number of groups.|
 | LDAP_URI<br/>GROUPS_LDAP_URI | string | ldaps://localhost:9235 | URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'|
 | LDAP_CACERT<br/>GROUPS_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty the system default CA bundle will be used.|
@@ -50,7 +50,7 @@
 | GROUPS_OWNCLOUDSQL_DB_PORT | int | 3306 | Network port to use for the database connection.|
 | GROUPS_OWNCLOUDSQL_DB_NAME | string | owncloud | Name of the owncloud database.|
 | GROUPS_OWNCLOUDSQL_IDP | string | https://localhost:9200 | The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.|
-| GROUPS_OWNCLOUDSQL_NOBODY | int64 | 90 | |
+| GROUPS_OWNCLOUDSQL_NOBODY | int64 | 90 | Fallback number if no numeric UID and GID properties are provided.|
 | GROUPS_OWNCLOUDSQL_JOIN_USERNAME | bool | false | Join the user properties table to read usernames (boolean)|
 | GROUPS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID | bool | false | Join the user properties table to read user ids (boolean).|
 | GROUPS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH | bool | false | Allow 'medial search' when searching for users instead of just doing a prefix search. (Allows finding 'Alice' when searching for 'lic'.)|

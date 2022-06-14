@@ -114,7 +114,7 @@
 `IDP_MACHINE_AUTH_API_KEY`
 | string
 | 
-| Machine auth API key used to impersonate users when looking up their userinfo via the 'cs3' backend.
+| Machine auth API key used for accessing the 'auth-machine' service to impersonate users when looking up their userinfo via the 'cs3' backend.
 
 |`IDP_ASSET_PATH`
 | string

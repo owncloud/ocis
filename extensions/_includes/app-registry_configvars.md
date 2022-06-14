@@ -17,4 +17,4 @@
 | APP_REGISTRY_GRPC_ADDR | string | 127.0.0.1:9242 | The address of the grpc service.|
 | APP_REGISTRY_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>APP_REGISTRY_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|

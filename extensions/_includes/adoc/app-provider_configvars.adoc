@@ -94,62 +94,62 @@
 |`REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
-| The CS3 gateway endpoint
+| The CS3 gateway endpoint.
 
 |`APP_PROVIDER_EXTERNAL_ADDR`
 | string
 | 
-| Address of the app provider, where the gateway service can reach it
+| Address of the app provider, where the gateway service can reach it.
 
 |`APP_PROVIDER_DRIVER`
 | string
 | 
-| Driver, which the app provider uses
+| Driver, which the app provider uses. Only "wopi" is supported as of now.
 
 |`APP_PROVIDER_WOPI_APP_API_KEY`
 | string
 | 
-| api key for the wopi app
+| API key for the wopi app.
 
 |`APP_PROVIDER_WOPI_APP_DESKTOP_ONLY`
 | bool
 | false
-| offer this app only on desktop
+| Offer this app only on desktop.
 
 |`APP_PROVIDER_WOPI_APP_ICON_URI`
 | string
 | 
-| uri to an app icon to be used by clients
+| URI to an app icon to be used by clients.
 
 |`APP_PROVIDER_WOPI_APP_INTERNAL_URL`
 | string
 | 
-| internal url to the app, eg in your DMZ
+| Internal URL to the app, eg in your DMZ.
 
 |`APP_PROVIDER_WOPI_APP_NAME`
 | string
 | 
-| human readable app name
+| Human readable app name.
 
 |`APP_PROVIDER_WOPI_APP_URL`
 | string
 | 
-| url for end users to access the app
+| URL for end users to access the app.
 
 |`APP_PROVIDER_WOPI_INSECURE`
 | bool
 | false
-| allow insecure connections to the app
+| Allow insecure connections to the app.
 
 |`APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET`
 | string
 | 
-| shared secret of the CS3org WOPI server
+| Shared secret of the CS3org WOPI server.
 
 |`APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL`
 | string
 | 
-| external url of the CS3org WOPI server
+| External url of the CS3org WOPI server.
 |===
 
 Since Version: `+` added, `-` deprecated

@@ -54,37 +54,37 @@
 |`NOTIFICATIONS_SMTP_HOST`
 | string
 | 127.0.0.1
-| 
+| SMTP host, to connect to.
 
 |`NOTIFICATIONS_SMTP_PORT`
 | string
 | 1025
-| 
+| Port of the SMTP host, to connect to.
 
 |`NOTIFICATIONS_SMTP_SENDER`
 | string
 | noreply@example.com
-| 
+| Sender of emails, that will be sent.
 
 |`NOTIFICATIONS_SMTP_PASSWORD`
 | string
 | 
-| 
+| Password of the SMTP host, to connect to.
 
 |`NOTIFICATIONS_EVENTS_ENDPOINT`
 | string
 | 127.0.0.1:9233
-| 
+| Endpoint of the event system.
 
 |`NOTIFICATIONS_EVENTS_CLUSTER`
 | string
 | ocis-cluster
-| 
+| Cluster ID of the event system.
 
 |`NOTIFICATIONS_EVENTS_GROUP`
 | string
 | notifications
-| 
+| Name of the event group / queue on the event system.
 
 |`REVA_GATEWAY` +
 `NOTIFICATIONS_REVA_GATEWAY`
@@ -96,7 +96,7 @@
 `NOTIFICATIONS_MACHINE_AUTH_API_KEY`
 | string
 | 
-| Machine auth API key used to impersonate users when looking up their email
+| Machine auth API key used for accessing the 'auth-machine' service to look up their email.
 |===
 
 Since Version: `+` added, `-` deprecated

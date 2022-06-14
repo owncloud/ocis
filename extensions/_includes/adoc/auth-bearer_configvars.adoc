@@ -94,40 +94,40 @@
 |`REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
-| The CS3 gateway endpoint
+| The CS3 gateway endpoint.
 
 |`AUTH_BEARER_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
 | false
-| 
+| Skip storing all groups of a user in the jwt token.
 
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
 `AUTH_BEARER_OIDC_ISSUER`
 | string
 | \https://localhost:9200
-| 
+| URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
 |`OCIS_INSECURE` +
 `AUTH_BEARER_OIDC_INSECURE`
 | bool
 | false
-| 
+| Allow insecure connections to the OIDC issuer.
 
 |`AUTH_BEARER_OIDC_ID_CLAIM`
 | string
 | preferred_username
-| 
+| Name of the claim, which holds the user identifier.
 
 |`AUTH_BEARER_OIDC_UID_CLAIM`
 | string
 | 
-| 
+| Name of the claim, which holds the UID.
 
 |`AUTH_BEARER_OIDC_GID_CLAIM`
 | string
 | 
-| 
+| Name of the claim, which holds the GID.
 |===
 
 Since Version: `+` added, `-` deprecated

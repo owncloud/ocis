@@ -18,7 +18,7 @@
 | OCDAV_HTTP_PROTOCOL | string | tcp | The transport protocol of the http service.|
 | OCDAV_HTTP_PREFIX | string |  | A URL path prefix for the handler.|
 | OCIS_JWT_SECRET<br/>OCDAV_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | OCDAV_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
 | OCDAV_WEBDAV_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Jail requests to /dav/webdav into this CS3 namespace. Supports template layouting with CS3 User properties.|
 | OCDAV_FILES_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Jail requests to /dav/files/{username} into this CS3 namespace. Supports template layouting with CS3 User properties.|

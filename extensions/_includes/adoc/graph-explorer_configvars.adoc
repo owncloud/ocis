@@ -88,25 +88,25 @@
 |`GRAPH_EXPLORER_CLIENT_ID`
 | string
 | ocis-explorer.js
-| 
+| OIDC client id, the graph explorer uses. This client needs to be set up in your IDP.
 
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
 `GRAPH_EXPLORER_ISSUER`
 | string
 | \https://localhost:9200
-| 
+| URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
 |`OCIS_URL` +
 `GRAPH_EXPLORER_GRAPH_URL_BASE`
 | string
 | \https://localhost:9200
-| 
+| Base URL, where the graph explorer is reachable for users.
 
 |`GRAPH_EXPLORER_GRAPH_URL_PATH`
 | string
 | /graph
-| 
+| URL path, where the graph explorer is reachable for users.
 |===
 
 Since Version: `+` added, `-` deprecated

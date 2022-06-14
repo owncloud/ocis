@@ -25,7 +25,7 @@
 | OCIS_SYSTEM_USER_ID<br/>SETTINGS_SYSTEM_USER_ID | string |  | |
 | OCIS_SYSTEM_USER_IDP<br/>SETTINGS_SYSTEM_USER_IDP | string | internal | |
 | OCIS_SYSTEM_USER_API_KEY | string |  | |
-| OCIS_ADMIN_USER_ID<br/>SETTINGS_ADMIN_USER_ID | string |  | |
+| OCIS_ADMIN_USER_ID<br/>SETTINGS_ADMIN_USER_ID | string |  | ID of a user, that should receive admin privileges.|
 | SETTINGS_ASSET_PATH | string |  | |
 | OCIS_JWT_SECRET<br/>SETTINGS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | SETTINGS_SETUP_DEFAULT_ASSIGNMENTS<br/>ACCOUNTS_DEMO_USERS_AND_GROUPS | bool | false | If the default role assignments for the demo users should be setup.|

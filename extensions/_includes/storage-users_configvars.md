@@ -19,7 +19,7 @@
 | STORAGE_USERS_HTTP_ADDR | string | 127.0.0.1:9158 | The address of the http service.|
 | STORAGE_USERS_HTTP_PROTOCOL | string | tcp | The transport protocol of the http service.|
 | OCIS_JWT_SECRET<br/>STORAGE_USERS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | STORAGE_USERS_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
 | STORAGE_USERS_DRIVER | string | ocis | The storage driver which should be used by the service|
 | STORAGE_USERS_OCIS_ROOT | string | ~/.ocis/storage/users | |

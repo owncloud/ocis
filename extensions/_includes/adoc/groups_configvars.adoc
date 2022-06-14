@@ -94,7 +94,7 @@
 |`REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
-| The CS3 gateway endpoint
+| The CS3 gateway endpoint.
 
 |`GROUPS_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
@@ -285,7 +285,7 @@
 |`GROUPS_OWNCLOUDSQL_NOBODY`
 | int64
 | 90
-| 
+| Fallback number if no numeric UID and GID properties are provided.
 
 |`GROUPS_OWNCLOUDSQL_JOIN_USERNAME`
 | bool
