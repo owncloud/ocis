@@ -21,7 +21,7 @@ type Config struct {
 
 	TokenManager      *TokenManager `yaml:"token_manager"`
 	Reva              *Reva         `yaml:"reva"`
-	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;FRONTEND_MACHINE_AUTH_API_KEY"`
+	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;FRONTEND_MACHINE_AUTH_API_KEY"  desc: "Machine auth API key used for accessing the 'auth-machine' service to impersonate users."`
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"FRONTEND_SKIP_USER_GROUPS_IN_TOKEN"`
 

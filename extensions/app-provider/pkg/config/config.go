@@ -18,8 +18,8 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	ExternalAddr string  `yaml:"external_addr" env:"APP_PROVIDER_EXTERNAL_ADDR" desc:"Address of the app provider, where the gateway service can reach it"`
-	Driver       string  `yaml:"driver" env:"APP_PROVIDER_DRIVER" desc:"Driver, which the app provider uses"`
+	ExternalAddr string  `yaml:"external_addr" env:"APP_PROVIDER_EXTERNAL_ADDR" desc:"Address of the app provider, where the gateway service can reach it."`
+	Driver       string  `yaml:"driver" env:"APP_PROVIDER_DRIVER" desc:"Driver, which the app provider uses. Only \"wopi\" is supported as of now."`
 	Drivers      Drivers `yaml:"drivers"`
 
 	Supervised bool            `yaml:"-"`
@@ -62,13 +62,13 @@ type Drivers struct {
 }
 
 type WOPIDriver struct {
-	AppAPIKey      string `yaml:"app_api_key" env:"APP_PROVIDER_WOPI_APP_API_KEY" desc:"api key for the wopi app"`
-	AppDesktopOnly bool   `yaml:"app_desktop_only" env:"APP_PROVIDER_WOPI_APP_DESKTOP_ONLY" desc:"offer this app only on desktop"`
-	AppIconURI     string `yaml:"app_icon_uri" env:"APP_PROVIDER_WOPI_APP_ICON_URI" desc:"uri to an app icon to be used by clients"`
-	AppInternalURL string `yaml:"app_internal_url" env:"APP_PROVIDER_WOPI_APP_INTERNAL_URL" desc:"internal url to the app, eg in your DMZ"`
-	AppName        string `yaml:"app_name" env:"APP_PROVIDER_WOPI_APP_NAME" desc:"human readable app name"`
-	AppURL         string `yaml:"app_url" env:"APP_PROVIDER_WOPI_APP_URL" desc:"url for end users to access the app"`
-	Insecure       bool   `yaml:"insecure" env:"APP_PROVIDER_WOPI_INSECURE" desc:"allow insecure connections to the app"`
-	IopSecret      string `yaml:"wopi_server_iop_secret" env:"APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET" desc:"shared secret of the CS3org WOPI server"`
-	WopiURL        string `yaml:"wopi_server_external_url" env:"APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL" desc:"external url of the CS3org WOPI server"`
+	AppAPIKey      string `yaml:"app_api_key" env:"APP_PROVIDER_WOPI_APP_API_KEY" desc:"API key for the wopi app."`
+	AppDesktopOnly bool   `yaml:"app_desktop_only" env:"APP_PROVIDER_WOPI_APP_DESKTOP_ONLY" desc:"Offer this app only on desktop."`
+	AppIconURI     string `yaml:"app_icon_uri" env:"APP_PROVIDER_WOPI_APP_ICON_URI" desc:"URI to an app icon to be used by clients."`
+	AppInternalURL string `yaml:"app_internal_url" env:"APP_PROVIDER_WOPI_APP_INTERNAL_URL" desc:"Internal URL to the app, eg in your DMZ."`
+	AppName        string `yaml:"app_name" env:"APP_PROVIDER_WOPI_APP_NAME" desc:"Human readable app name."`
+	AppURL         string `yaml:"app_url" env:"APP_PROVIDER_WOPI_APP_URL" desc:"URL for end users to access the app."`
+	Insecure       bool   `yaml:"insecure" env:"APP_PROVIDER_WOPI_INSECURE" desc:"Allow insecure connections to the app."`
+	IopSecret      string `yaml:"wopi_server_iop_secret" env:"APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET" desc:"Shared secret of the CS3org WOPI server."`
+	WopiURL        string `yaml:"wopi_server_external_url" env:"APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL" desc:"External url of the CS3org WOPI server."`
 }

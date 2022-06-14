@@ -18,8 +18,9 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
-	Reva              *Reva  `yaml:"reva"`
-	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;IDP_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to impersonate users when looking up their userinfo via the 'cs3' backend."`
+	Reva *Reva `yaml:"reva"`
+
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;IDP_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used for accessing the 'auth-machine' service to impersonate users when looking up their userinfo via the 'cs3' backend."`
 
 	Asset   Asset    `yaml:"asset"`
 	IDP     Settings `yaml:"idp"`

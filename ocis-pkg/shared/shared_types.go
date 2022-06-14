@@ -31,7 +31,7 @@ type TokenManager struct {
 
 // Reva defines all available REVA configuration.
 type Reva struct {
-	Address string `yaml:"address" env:"REVA_GATEWAY" desc:"The CS3 gateway endpoint"`
+	Address string `yaml:"address" env:"REVA_GATEWAY" desc:"The CS3 gateway endpoint."`
 }
 
 // Commons holds configuration that are common to all extensions. Each extension can then decide whether
@@ -42,9 +42,9 @@ type Commons struct {
 	OcisURL           string        `yaml:"ocis_url" env:"OCIS_URL"`
 	TokenManager      *TokenManager `yaml:"token_manager"`
 	Reva              *Reva         `yaml:"reva"`
-	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY"`
+	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used for accessing the 'auth-machine' service to impersonate users."`
 	TransferSecret    string        `yaml:"transfer_secret,omitempty" env:"REVA_TRANSFER_SECRET"`
 	SystemUserID      string        `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID"`
 	SystemUserAPIKey  string        `yaml:"system_user_api_key" env:"SYSTEM_USER_API_KEY"`
-	AdminUserID       string        `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID"`
+	AdminUserID       string        `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID" desc:"ID of a user, that should receive admin privileges."`
 }

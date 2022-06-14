@@ -18,7 +18,7 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"AUTH_BEARER_SKIP_USER_GROUPS_IN_TOKEN"`
+	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"AUTH_BEARER_SKIP_USER_GROUPS_IN_TOKEN" desc:"Skip storing all groups of a user in the jwt token."`
 
 	OIDC OIDC `yaml:"oidc"`
 
@@ -57,9 +57,9 @@ type GRPCConfig struct {
 }
 
 type OIDC struct {
-	Issuer   string `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;AUTH_BEARER_OIDC_ISSUER"`
-	Insecure bool   `yaml:"insecure" env:"OCIS_INSECURE;AUTH_BEARER_OIDC_INSECURE"`
-	IDClaim  string `yaml:"id_claim" env:"AUTH_BEARER_OIDC_ID_CLAIM"`
-	UIDClaim string `yaml:"uid_claim" env:"AUTH_BEARER_OIDC_UID_CLAIM"`
-	GIDClaim string `yaml:"gid_claim" env:"AUTH_BEARER_OIDC_GID_CLAIM"`
+	Issuer   string `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;AUTH_BEARER_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP."`
+	Insecure bool   `yaml:"insecure" env:"OCIS_INSECURE;AUTH_BEARER_OIDC_INSECURE" desc:"Allow insecure connections to the OIDC issuer."`
+	IDClaim  string `yaml:"id_claim" env:"AUTH_BEARER_OIDC_ID_CLAIM" desc:"Name of the claim, which holds the user identifier."`
+	UIDClaim string `yaml:"uid_claim" env:"AUTH_BEARER_OIDC_UID_CLAIM" desc:"Name of the claim, which holds the UID."`
+	GIDClaim string `yaml:"gid_claim" env:"AUTH_BEARER_OIDC_GID_CLAIM" desc:"Name of the claim, which holds the GID."`
 }

@@ -22,7 +22,7 @@ type Config struct {
 	Reva     Reva   `yaml:"reva"`
 	Events   Events `yaml:"events"`
 
-	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;SEARCH_MACHINE_AUTH_API_KEY"`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;SEARCH_MACHINE_AUTH_API_KEY" desc: "Machine auth API key used for accessing the 'auth-machine' service to impersonate users."`
 
 	Context context.Context `yaml:"-"`
 }
