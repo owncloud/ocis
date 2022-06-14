@@ -17,25 +17,25 @@
 `USERS_TRACING_TYPE`
 | string
 | 
-| The sampler type: remote, const, probabilistic, ratelimiting (default remote). See also https://www.jaegertracing.io/docs/latest/sampling/.
+| The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
 
 |`OCIS_TRACING_ENDPOINT` +
 `USERS_TRACING_ENDPOINT`
 | string
 | 
-| The endpoint to the tracing collector.
+| The endpoint of the tracing agent.
 
 |`OCIS_TRACING_COLLECTOR` +
 `USERS_TRACING_COLLECTOR`
 | string
 | 
-| The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. If specified, the tracing endpoint is ignored.
+| The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 |`OCIS_LOG_LEVEL` +
 `USERS_LOG_LEVEL`
 | string
 | 
-| The log level.
+| The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 
 |`OCIS_LOG_PRETTY` +
 `USERS_LOG_PRETTY`
@@ -53,7 +53,7 @@
 `USERS_LOG_FILE`
 | string
 | 
-| The target log file.
+| The path to the log file. Activates logging to this file if set.
 
 |`USERS_DEBUG_ADDR`
 | string
@@ -73,7 +73,7 @@
 |`USERS_DEBUG_ZPAGES`
 | bool
 | false
-| Enables zpages, which can  be used for collecting and viewing traces in-me
+| Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 |`USERS_GRPC_ADDR`
 | string
@@ -89,12 +89,12 @@
 `USERS_JWT_SECRET`
 | string
 | 
-| 
+| The secret to mint and validate jwt tokens.
 
 |`REVA_GATEWAY`
 | string
 | 127.0.0.1:9142
-| 
+| The CS3 gateway endpoint
 
 |`USERS_SKIP_USER_GROUPS_IN_TOKEN`
 | bool

@@ -2,18 +2,18 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
-| OCIS_TRACING_ENABLED<br/>IDM_TRACING_ENABLED | bool | false | |
-| OCIS_TRACING_TYPE<br/>IDM_TRACING_TYPE | string |  | |
-| OCIS_TRACING_ENDPOINT<br/>IDM_TRACING_ENDPOINT | string |  | |
-| OCIS_TRACING_COLLECTOR<br/>IDM_TRACING_COLLECTOR | string |  | |
-| OCIS_LOG_LEVEL<br/>IDM_LOG_LEVEL | string |  | |
-| OCIS_LOG_PRETTY<br/>IDM_LOG_PRETTY | bool | false | |
-| OCIS_LOG_COLOR<br/>IDM_LOG_COLOR | bool | false | |
-| OCIS_LOG_FILE<br/>IDM_LOG_FILE | string |  | |
+| OCIS_TRACING_ENABLED<br/>IDM_TRACING_ENABLED | bool | false | Activates tracing.|
+| OCIS_TRACING_TYPE<br/>IDM_TRACING_TYPE | string |  | The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.|
+| OCIS_TRACING_ENDPOINT<br/>IDM_TRACING_ENDPOINT | string |  | The endpoint of the tracing agent.|
+| OCIS_TRACING_COLLECTOR<br/>IDM_TRACING_COLLECTOR | string |  | The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
+| OCIS_LOG_LEVEL<br/>IDM_LOG_LEVEL | string |  | The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".|
+| OCIS_LOG_PRETTY<br/>IDM_LOG_PRETTY | bool | false | Activates pretty log output.|
+| OCIS_LOG_COLOR<br/>IDM_LOG_COLOR | bool | false | Activates colorized log output.|
+| OCIS_LOG_FILE<br/>IDM_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
 | IDM_DEBUG_ADDR | string | 127.0.0.1:9239 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
 | IDM_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | IDM_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
-| IDM_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
+| IDM_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | IDM_LDAPS_ADDR | string | 127.0.0.1:9235 | Listen address for the ldaps listener (ip-addr:port)|
 | IDM_LDAPS_CERT | string | ~/.ocis/idm/ldap.crt | File name of the TLS server certificate for the ldaps listener|
 | IDM_LDAPS_KEY | string | ~/.ocis/idm/ldap.key | File name for the TLS certificate key for the server certificate|

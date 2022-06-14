@@ -2,14 +2,14 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
-| OCIS_LOG_LEVEL<br/>NOTIFICATIONS_LOG_LEVEL | string |  | |
-| OCIS_LOG_PRETTY<br/>NOTIFICATIONS_LOG_PRETTY | bool | false | |
-| OCIS_LOG_COLOR<br/>NOTIFICATIONS_LOG_COLOR | bool | false | |
-| OCIS_LOG_FILE<br/>NOTIFICATIONS_LOG_FILE | string |  | |
+| OCIS_LOG_LEVEL<br/>NOTIFICATIONS_LOG_LEVEL | string |  | The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".|
+| OCIS_LOG_PRETTY<br/>NOTIFICATIONS_LOG_PRETTY | bool | false | Activates pretty log output.|
+| OCIS_LOG_COLOR<br/>NOTIFICATIONS_LOG_COLOR | bool | false | Activates colorized log output.|
+| OCIS_LOG_FILE<br/>NOTIFICATIONS_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
 | NOTIFICATIONS_DEBUG_ADDR | string | 127.0.0.1:9174 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
 | NOTIFICATIONS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | NOTIFICATIONS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
-| NOTIFICATIONS_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
+| NOTIFICATIONS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | NOTIFICATIONS_SMTP_HOST | string | 127.0.0.1 | |
 | NOTIFICATIONS_SMTP_PORT | string | 1025 | |
 | NOTIFICATIONS_SMTP_SENDER | string | noreply@example.com | |

@@ -2,22 +2,22 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
-| OCIS_TRACING_ENABLED<br/>GRAPH_TRACING_ENABLED | bool | false | |
-| OCIS_TRACING_TYPE<br/>GRAPH_TRACING_TYPE | string |  | |
-| OCIS_TRACING_ENDPOINT<br/>GRAPH_TRACING_ENDPOINT | string |  | |
-| OCIS_TRACING_COLLECTOR<br/>GRAPH_TRACING_COLLECTOR | string |  | |
-| OCIS_LOG_LEVEL<br/>GRAPH_LOG_LEVEL | string |  | |
-| OCIS_LOG_PRETTY<br/>GRAPH_LOG_PRETTY | bool | false | |
-| OCIS_LOG_COLOR<br/>GRAPH_LOG_COLOR | bool | false | |
-| OCIS_LOG_FILE<br/>GRAPH_LOG_FILE | string |  | |
+| OCIS_TRACING_ENABLED<br/>GRAPH_TRACING_ENABLED | bool | false | Activates tracing.|
+| OCIS_TRACING_TYPE<br/>GRAPH_TRACING_TYPE | string |  | The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.|
+| OCIS_TRACING_ENDPOINT<br/>GRAPH_TRACING_ENDPOINT | string |  | The endpoint of the tracing agent.|
+| OCIS_TRACING_COLLECTOR<br/>GRAPH_TRACING_COLLECTOR | string |  | The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
+| OCIS_LOG_LEVEL<br/>GRAPH_LOG_LEVEL | string |  | The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".|
+| OCIS_LOG_PRETTY<br/>GRAPH_LOG_PRETTY | bool | false | Activates pretty log output.|
+| OCIS_LOG_COLOR<br/>GRAPH_LOG_COLOR | bool | false | Activates colorized log output.|
+| OCIS_LOG_FILE<br/>GRAPH_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
 | GRAPH_DEBUG_ADDR | string | 127.0.0.1:9124 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
 | GRAPH_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | GRAPH_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
-| GRAPH_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
+| GRAPH_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | GRAPH_HTTP_ADDR | string | 127.0.0.1:9120 | |
 | GRAPH_HTTP_ROOT | string | /graph | |
-| REVA_GATEWAY | string | 127.0.0.1:9142 | |
-| OCIS_JWT_SECRET<br/>GRAPH_JWT_SECRET | string |  | |
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
+| OCIS_JWT_SECRET<br/>GRAPH_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | OCIS_URL<br/>GRAPH_SPACES_WEBDAV_BASE | string | https://localhost:9200 | |
 | GRAPH_SPACES_WEBDAV_PATH | string | /dav/spaces/ | |
 | GRAPH_SPACES_DEFAULT_QUOTA | string | 1000000000 | |

@@ -11,25 +11,25 @@
 `NATS_LOG_LEVEL`
 | string
 | 
-| 
+| The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 
 |`OCIS_LOG_PRETTY` +
 `NATS_LOG_PRETTY`
 | bool
 | false
-| 
+| Activates pretty log output.
 
 |`OCIS_LOG_COLOR` +
 `NATS_LOG_COLOR`
 | bool
 | false
-| 
+| Activates colorized log output.
 
 |`OCIS_LOG_FILE` +
 `NATS_LOG_FILE`
 | string
 | 
-| 
+| The path to the log file. Activates logging to this file if set.
 
 |`NATS_DEBUG_ADDR`
 | string
@@ -49,7 +49,7 @@
 |`NATS_DEBUG_ZPAGES`
 | bool
 | false
-| Enables zpages, which can  be used for collecting and viewing traces in-me
+| Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 |`NATS_NATS_HOST`
 | string

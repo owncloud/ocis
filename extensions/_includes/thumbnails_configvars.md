@@ -2,18 +2,18 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
-| OCIS_TRACING_ENABLED<br/>THUMBNAILS_TRACING_ENABLED | bool | false | Enable tracing.|
-| OCIS_TRACING_TYPE<br/>THUMBNAILS_TRACING_TYPE | string |  | The tracing type.|
-| OCIS_TRACING_ENDPOINT<br/>THUMBNAILS_TRACING_ENDPOINT | string |  | The endpoint of the tracing service.|
-| OCIS_TRACING_COLLECTOR<br/>THUMBNAILS_TRACING_COLLECTOR | string |  | The tracing collector.|
-| OCIS_LOG_LEVEL<br/>THUMBNAILS_LOG_LEVEL | string |  | The log level.|
-| OCIS_LOG_PRETTY<br/>THUMBNAILS_LOG_PRETTY | bool | false | Enable pretty logs.|
-| OCIS_LOG_COLOR<br/>THUMBNAILS_LOG_COLOR | bool | false | Enable colored logs.|
-| OCIS_LOG_FILE<br/>THUMBNAILS_LOG_FILE | string |  | The path to the log file when logging to file.|
+| OCIS_TRACING_ENABLED<br/>THUMBNAILS_TRACING_ENABLED | bool | false | Activates tracing.|
+| OCIS_TRACING_TYPE<br/>THUMBNAILS_TRACING_TYPE | string |  | The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.|
+| OCIS_TRACING_ENDPOINT<br/>THUMBNAILS_TRACING_ENDPOINT | string |  | The endpoint of the tracing agent.|
+| OCIS_TRACING_COLLECTOR<br/>THUMBNAILS_TRACING_COLLECTOR | string |  | The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
+| OCIS_LOG_LEVEL<br/>THUMBNAILS_LOG_LEVEL | string |  | The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".|
+| OCIS_LOG_PRETTY<br/>THUMBNAILS_LOG_PRETTY | bool | false | Activates pretty log output.|
+| OCIS_LOG_COLOR<br/>THUMBNAILS_LOG_COLOR | bool | false | Activates colorized log output.|
+| OCIS_LOG_FILE<br/>THUMBNAILS_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
 | THUMBNAILS_DEBUG_ADDR | string | 127.0.0.1:9189 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
 | THUMBNAILS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | THUMBNAILS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
-| THUMBNAILS_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
+| THUMBNAILS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | THUMBNAILS_GRPC_ADDR | string | 127.0.0.1:9185 | The address off the grpc service.|
 | THUMBNAILS_HTTP_ADDR | string | 127.0.0.1:9186 | The address of the HTTP service.|
 | THUMBNAILS_HTTP_ROOT | string | /thumbnails | The root path of the HTTP service.|

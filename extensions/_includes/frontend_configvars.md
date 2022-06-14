@@ -3,23 +3,23 @@
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
 | OCIS_TRACING_ENABLED<br/>FRONTEND_TRACING_ENABLED | bool | false | Activates tracing.|
-| OCIS_TRACING_TYPE<br/>FRONTEND_TRACING_TYPE | string |  | |
-| OCIS_TRACING_ENDPOINT<br/>FRONTEND_TRACING_ENDPOINT | string |  | The endpoint to the tracing collector.|
-| OCIS_TRACING_COLLECTOR<br/>FRONTEND_TRACING_COLLECTOR | string |  | |
-| OCIS_LOG_LEVEL<br/>FRONTEND_LOG_LEVEL | string |  | The log level.|
+| OCIS_TRACING_TYPE<br/>FRONTEND_TRACING_TYPE | string |  | The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.|
+| OCIS_TRACING_ENDPOINT<br/>FRONTEND_TRACING_ENDPOINT | string |  | The endpoint of the tracing agent.|
+| OCIS_TRACING_COLLECTOR<br/>FRONTEND_TRACING_COLLECTOR | string |  | The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
+| OCIS_LOG_LEVEL<br/>FRONTEND_LOG_LEVEL | string |  | The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".|
 | OCIS_LOG_PRETTY<br/>FRONTEND_LOG_PRETTY | bool | false | Activates pretty log output.|
 | OCIS_LOG_COLOR<br/>FRONTEND_LOG_COLOR | bool | false | Activates colorized log output.|
-| OCIS_LOG_FILE<br/>FRONTEND_LOG_FILE | string |  | The target log file.|
+| OCIS_LOG_FILE<br/>FRONTEND_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
 | FRONTEND_DEBUG_ADDR | string | 127.0.0.1:9141 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
 | FRONTEND_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | FRONTEND_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
-| FRONTEND_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
+| FRONTEND_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | FRONTEND_HTTP_ADDR | string | 127.0.0.1:9140 | The address of the http service.|
 | FRONTEND_HTTP_PROTOCOL | string | tcp | The transport protocol of the http service.|
 | FRONTEND_HTTP_PREFIX | string |  | |
 | STORAGE_TRANSFER_SECRET | string |  | |
-| OCIS_JWT_SECRET<br/>FRONTEND_JWT_SECRET | string |  | |
-| REVA_GATEWAY | string | 127.0.0.1:9142 | |
+| OCIS_JWT_SECRET<br/>FRONTEND_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
+| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint|
 | OCIS_MACHINE_AUTH_API_KEY<br/>FRONTEND_MACHINE_AUTH_API_KEY | string |  | |
 | FRONTEND_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
 | FRONTEND_ENABLE_FAVORITES | bool | false | |

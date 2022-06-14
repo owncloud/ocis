@@ -3,18 +3,18 @@
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
 | IDP_PASSWORD_RESET_URI | string |  | The URI where a user can reset their password.|
-| OCIS_TRACING_ENABLED<br/>IDP_TRACING_ENABLED | bool | false | |
-| OCIS_TRACING_TYPE<br/>IDP_TRACING_TYPE | string |  | |
-| OCIS_TRACING_ENDPOINT<br/>IDP_TRACING_ENDPOINT | string |  | |
-| OCIS_TRACING_COLLECTOR<br/>IDP_TRACING_COLLECTOR | string |  | |
-| OCIS_LOG_LEVEL<br/>IDP_LOG_LEVEL | string |  | |
-| OCIS_LOG_PRETTY<br/>IDP_LOG_PRETTY | bool | false | |
-| OCIS_LOG_COLOR<br/>IDP_LOG_COLOR | bool | false | |
-| OCIS_LOG_FILE<br/>IDP_LOG_FILE | string |  | |
+| OCIS_TRACING_ENABLED<br/>IDP_TRACING_ENABLED | bool | false | Activates tracing.|
+| OCIS_TRACING_TYPE<br/>IDP_TRACING_TYPE | string |  | The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.|
+| OCIS_TRACING_ENDPOINT<br/>IDP_TRACING_ENDPOINT | string |  | The endpoint of the tracing agent.|
+| OCIS_TRACING_COLLECTOR<br/>IDP_TRACING_COLLECTOR | string |  | The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
+| OCIS_LOG_LEVEL<br/>IDP_LOG_LEVEL | string |  | The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".|
+| OCIS_LOG_PRETTY<br/>IDP_LOG_PRETTY | bool | false | Activates pretty log output.|
+| OCIS_LOG_COLOR<br/>IDP_LOG_COLOR | bool | false | Activates colorized log output.|
+| OCIS_LOG_FILE<br/>IDP_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
 | IDP_DEBUG_ADDR | string | 127.0.0.1:9134 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
 | IDP_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | IDP_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
-| IDP_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-me|
+| IDP_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | IDP_HTTP_ADDR | string | 127.0.0.1:9130 | |
 | IDP_HTTP_ROOT | string | / | |
 | IDP_TRANSPORT_TLS_CERT | string | ~/.ocis/idp/server.crt | |
