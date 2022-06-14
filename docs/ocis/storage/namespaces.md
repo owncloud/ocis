@@ -10,7 +10,7 @@ geekdocFilePath: namespaces.md
 A *namespace* is a set of paths with a common prefix. Depending on the endpoint you are talking to you will encounter a different kind of namespace:
 In ownCloud 10 all paths are considered relative to the users home. The CS3 API uses a global namespace and the *storage providers* use a local namespace with paths relative to the storage providers root.
 
-{{< figure src="/extensions/storage/static/namespaces.drawio.svg" >}}
+{{< figure src="/ocis/storage/static/namespaces.drawio.svg" >}}
 
 The different paths in the namespaces need to be translated while passing [*references*]({{< ref "./terminology.md#references" >}}) from service to service. While the oc10 endpoints all work on paths we internally reference shared resources by id, so the shares don't break when a file is renamed or moved inside a storage [*space*]({{< ref "./spaces" >}}). The following table lists the various namespaces, paths and id based references:
 

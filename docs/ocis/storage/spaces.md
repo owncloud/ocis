@@ -186,7 +186,7 @@ The current implementation in oCIS might not yet fully reflect this concept. Fee
 A storage *space* is a logical concept. It organizes a set of [*resources*]({{< ref "#resources" >}}) in a hierarchical tree. It has a single *owner* (*user* or *group*),
 a *quota*, *permissions* and is identified by a `storage space id`.
 
-{{< figure src="/extensions/storage/static/storagespace.drawio.svg" >}}
+{{< figure src="/ocis/storage/static/storagespace.drawio.svg" >}}
 
 Examples would be every user's personal storage *space*, project storage *spaces* or group storage *spaces*. While they all serve different purposes and may or may not have workflows like antivirus scanning enabled, we need a way to identify and manage these subtrees in a generic way. By creating a dedicated concept for them this becomes easier and literally makes the codebase cleaner. A storage [*Spaces Registry*]({{< ref "./spacesregistry.md" >}}) then allows listing the capabilities of storage *spaces*, e.g. free space, quota, owner, syncable, root etag, upload workflow steps, ...
 

@@ -64,12 +64,12 @@ Technically, this means that every storage driver needs to have a map of a `uuid
 ## Technical concepts
 
 ### Storage Systems
-{{< figure src="/extensions/storage/static/storageprovider.drawio.svg" >}}
+{{< figure src="/ocis/storage/static/storageprovider.drawio.svg" >}}
 
 A *storage provider* manages multiple [*storage spaces*]({{< ref "#storage-space" >}})
 by accessing a [*storage system*]({{< ref "#storage-systems" >}}) with a [*storage driver*]({{< ref "#storage-drivers" >}}).
 
-{{< figure src="/extensions/storage/static/storageprovider-spaces.drawio.svg" >}}
+{{< figure src="/ocis/storage/static/storageprovider-spaces.drawio.svg" >}}
 
 ## Storage Space Registries
 
@@ -81,7 +81,7 @@ It is a tree of [*resources*]({{< ref "#resources" >}})*resources*
 with a single *owner* (*user* or *group*),
 a *quota* and *permissions*, identified by a `storage space id`.
 
-{{< figure src="/extensions/storage/static/storagespace.drawio.svg" >}}
+{{< figure src="/ocis/storage/static/storagespace.drawio.svg" >}}
 
 Examples would be every user's home storage space, project storage spaces or group storage spaces. While they all serve different purposes and may or may not have workflows like antivirus scanning enabled, we need a way to identify and manage these subtrees in a generic way. By creating a dedicated concept for them this becomes easier and literally makes the codebase cleaner. A [*storage space registry*]({{< ref "#storage-space-registries" >}}) then allows listing the capabilities of [*storage spaces*]({{< ref "#storage-spaces" >}}), e.g. free space, quota, owner, syncable, root etag, upload workflow steps, ...
 

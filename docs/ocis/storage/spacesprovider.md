@@ -17,7 +17,7 @@ The current implementation in oCIS might not yet fully reflect this concept. Fee
 A *storage provider* manages [*resources*]({{< ref "#resources" >}}) identified by a [*reference*]({{< ref "#references" >}})
 by accessing a [*storage system*]({{< ref "#storage-systems" >}}) with a [*storage driver*]({{< ref "./storagedrivers.md" >}}).
 
-{{< figure src="/extensions/storage/static/spacesprovider.drawio.svg" >}}
+{{< figure src="/ocis/storage/static/spacesprovider.drawio.svg" >}}
 
 
 ## Frontend
@@ -28,7 +28,7 @@ The oCIS frontend service starts all services that handle incoming HTTP requests
 - *datagateway* for up and downloads
 - TODO: *ocm*
 
-{{< figure src="/extensions/storage/static/frontend.drawio.svg" >}}
+{{< figure src="/ocis/storage/static/frontend.drawio.svg" >}}
 
 ### WebDAV
 
@@ -109,4 +109,4 @@ It is used by the reva *gateway*
 to look up `address` and `port` of the [*storage provider*]({{< ref "#storage-providers" >}})
 that should handle a [*reference*]({{< ref "#references" >}}).
 
-{{< figure src="/extensions/storage/static/storageregistry.drawio.svg" >}}
+{{< figure src="/ocis/storage/static/storageregistry.drawio.svg" >}}
