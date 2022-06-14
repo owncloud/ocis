@@ -44,14 +44,6 @@ func NewService(opts ...Option) Service {
 		assets.Config(options.Config),
 	)
 
-	if err := ldap.WaitForCA(options.Logger, options.Config.IDP.Insecure, options.Config.Ldap.TLSCACert); err != nil {
-		logger.Fatal().Err(err).Msg("The configured LDAP CA cert does not exist")
-	}
-	if options.Config.IDP.Insecure {
-		// force CACert to be empty to avoid lico try to load it
-		options.Config.Ldap.TLSCACert = ""
-	}
-
 	if err := createTemporaryClientsConfig(
 		options.Config.IDP.IdentifierRegistrationConf,
 		options.Config.IDP.Iss,
@@ -67,6 +59,15 @@ func NewService(opts ...Option) Service {
 			logger.Fatal().Err(err).Msg("could not initialize cs3 backend env vars")
 		}
 	case "ldap":
+
+		if err := ldap.WaitForCA(options.Logger, options.Config.IDP.Insecure, options.Config.Ldap.TLSCACert); err != nil {
+			logger.Fatal().Err(err).Msg("The configured LDAP CA cert does not exist")
+		}
+		if options.Config.IDP.Insecure {
+			// force CACert to be empty to avoid lico try to load it
+			options.Config.Ldap.TLSCACert = ""
+		}
+
 		ldapBackendSupport.MustRegister()
 		if err := initLicoInternalLDAPEnvVars(&options.Config.Ldap); err != nil {
 			logger.Fatal().Err(err).Msg("could not initialize ldap env vars")
