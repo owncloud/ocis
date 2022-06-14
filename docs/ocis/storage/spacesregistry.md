@@ -17,4 +17,4 @@ The current implementation in oCIS might not yet fully reflect this concept. Fee
 
 A storage *spaces registry* manages the [*namespace*]({{< ref "./namespaces.md" >}}) for a *user*: it is used by *clients* to look up storage spaces a user has access to, the `/dav/spaces` endpoint to access it via WabDAV, and where the client should mount it in the users personal namespace.
 
-{{< figure src="/extensions/storage/static/spacesregistry.drawio.svg" >}}
+{{< figure src="/ocis/storage/static/spacesregistry.drawio.svg" >}}
