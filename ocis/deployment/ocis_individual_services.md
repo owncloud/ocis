@@ -19,7 +19,7 @@ geekdocFilePath: ocis_individual_services.md
 
 The docker stack consists of at least 24 containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
 
-The other containers are oCIS extensions, running each one in a separate container. In this example oCIS uses its internal IDP [LibreGraph Connect]({{< ref "../../extensions/idp" >}}) and the [oCIS storage driver]({{< ref "../../extensions/storage/storagedrivers" >}}). You also can start more than one container of each service by setting `OCIS_SCALE` to a number greater than 1. Currently this won't scale all services, but we are working on making all service easily scalable.
+The other containers are oCIS extensions, running each one in a separate container. In this example, oCIS uses its internal IDP [LibreGraph Connect]({{< ref "../../extensions/idp" >}}) and the [oCIS storage driver]({{< ref "../storage/storagedrivers" >}}). You also can start more than one container of each service by setting `OCIS_SCALE` to a number greater than 1. Currently this won't scale all services, but we are working on making all service easily scalable.
 
 ## Server Deployment
 
