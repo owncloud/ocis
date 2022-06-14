@@ -10,15 +10,15 @@ type EnvBinding struct {
 
 // Log defines the available logging configuration.
 type Log struct {
-	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL"`
-	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY"`
-	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR"`
-	File   string `yaml:"file" env:"OCIS_LOG_FILE"`
+	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL" desc:"The log level. Valid values are: \"panic\", \"fatal\", \"error\", \"warn\", \"info\", \"debug\", \"trace\"."`
+	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY" desc:"Activates pretty log output."`
+	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR" desc:"Activates colorized log output."`
+	File   string `yaml:"file" env:"OCIS_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set."`
 }
 
 // Tracing defines the available tracing configuration.
 type Tracing struct {
-	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED"`
+	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED" desc:"Activates tracing."`
 	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE" desc:"The type of tracing. Defaults to \"\", which is the same as \"jaeger\". Allowed tracing types are \"jaeger\" and \"\" as of now."`
 	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT" desc:"The endpoint of the tracing agent."`
 	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset."`
