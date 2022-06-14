@@ -18,8 +18,8 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	ExternalAddr string  `yaml:"external_addr" env:"APP_PROVIDER_EXTERNAL_ADDR" desc:"address of the app provider, where the gateway service can reach it"`
-	Driver       string  `yaml:"driver" env:"APP_PROVIDER_DRIVER" desc:"driver, which the app provider uses"`
+	ExternalAddr string  `yaml:"external_addr" env:"APP_PROVIDER_EXTERNAL_ADDR" desc:"Address of the app provider, where the gateway service can reach it"`
+	Driver       string  `yaml:"driver" env:"APP_PROVIDER_DRIVER" desc:"Driver, which the app provider uses"`
 	Drivers      Drivers `yaml:"drivers"`
 
 	Supervised bool            `yaml:"-"`
