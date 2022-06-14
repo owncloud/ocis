@@ -42,8 +42,9 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			gr.Add(func() error {
-				s, err := ocdav.Service(
-					ocdav.Name(cfg.HTTP.Namespace+"."+cfg.Service.Name),
+
+				opts := []ocdav.Option{
+					ocdav.Name(cfg.HTTP.Namespace + "." + cfg.Service.Name),
 					ocdav.Version(version.GetString()),
 					ocdav.Context(ctx),
 					ocdav.Logger(logger.Logger),
@@ -63,10 +64,16 @@ func Server(cfg *config.Config) *cli.Command {
 					ocdav.Version(cfg.Status.Version),
 					ocdav.VersionString(cfg.Status.VersionString),
 					ocdav.Edition(cfg.Status.Edition),
-					// ocdav.FavoriteManager() // FIXME needs a proper persistence implementation
+					// ocdav.FavoriteManager() // FIXME needs a proper persistence implementation https://github.com/owncloud/ocis/issues/1228
 					// ocdav.LockSystem(), // will default to the CS3 lock system
 					// ocdav.TLSConfig() // tls config for the http server
-				)
+				}
+
+				if cfg.Tracing.Enabled {
+					opts = append(opts, ocdav.Tracing(cfg.Tracing.Endpoint, cfg.Tracing.Collector))
+				}
+
+				s, err := ocdav.Service(opts...)
 				if err != nil {
 					return err
 				}
@@ -89,6 +96,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			gr.Add(debugServer.ListenAndServe, func(_ error) {
+				_ = debugServer.Shutdown(ctx)
 				cancel()
 			})
 
