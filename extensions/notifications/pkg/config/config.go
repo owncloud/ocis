@@ -25,20 +25,20 @@ type Notifications struct {
 	SMTP              SMTP   `yaml:"SMTP"`
 	Events            Events `yaml:"events"`
 	RevaGateway       string `yaml:"reva_gateway" env:"REVA_GATEWAY;NOTIFICATIONS_REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata"`
-	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;NOTIFICATIONS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to impersonate users when looking up their email"`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;NOTIFICATIONS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used for accessing the 'auth-machine' service to look up their email."`
 }
 
 // SMTP combines the smtp configuration options.
 type SMTP struct {
-	Host     string `yaml:"smtp_host" env:"NOTIFICATIONS_SMTP_HOST"`
-	Port     string `yaml:"smtp_port" env:"NOTIFICATIONS_SMTP_PORT"`
-	Sender   string `yaml:"smtp_sender" env:"NOTIFICATIONS_SMTP_SENDER"`
-	Password string `yaml:"smtp_password" env:"NOTIFICATIONS_SMTP_PASSWORD"`
+	Host     string `yaml:"smtp_host" env:"NOTIFICATIONS_SMTP_HOST" desc:"SMTP host, to connect to."`
+	Port     string `yaml:"smtp_port" env:"NOTIFICATIONS_SMTP_PORT" desc:"Port of the SMTP host, to connect to."`
+	Sender   string `yaml:"smtp_sender" env:"NOTIFICATIONS_SMTP_SENDER" desc:"Sender of emails, that will be sent."`
+	Password string `yaml:"smtp_password" env:"NOTIFICATIONS_SMTP_PASSWORD" desc:"Password of the SMTP host, to connect to."`
 }
 
 // Events combines the configuration options for the event bus.
 type Events struct {
-	Endpoint      string `yaml:"endpoint" env:"NOTIFICATIONS_EVENTS_ENDPOINT"`
-	Cluster       string `yaml:"cluster" env:"NOTIFICATIONS_EVENTS_CLUSTER"`
-	ConsumerGroup string `yaml:"group" env:"NOTIFICATIONS_EVENTS_GROUP"`
+	Endpoint      string `yaml:"endpoint" env:"NOTIFICATIONS_EVENTS_ENDPOINT" desc:"Endpoint of the event system."`
+	Cluster       string `yaml:"cluster" env:"NOTIFICATIONS_EVENTS_CLUSTER" desc:"Cluster ID of the event system."`
+	ConsumerGroup string `yaml:"group" env:"NOTIFICATIONS_EVENTS_GROUP" desc:"Name of the event group / queue on the event system."`
 }

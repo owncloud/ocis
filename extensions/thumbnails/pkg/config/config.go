@@ -35,7 +35,7 @@ type Thumbnail struct {
 	FileSystemStorage   FileSystemStorage `yaml:"filesystem_storage"`
 	WebdavAllowInsecure bool              `yaml:"webdav_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_WEBDAVSOURCE_INSECURE" desc:"Ignore untrusted SSL certificates when connecting to the webdav source."`
 	CS3AllowInsecure    bool              `yaml:"cs3_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_CS3SOURCE_INSECURE" desc:"Ignore untrusted SSL certificates when connecting to the CS3 source."`
-	RevaGateway         string            `yaml:"reva_gateway" env:"REVA_GATEWAY" desc:"The CS3 gateway endpoint"` //TODO: use REVA config
+	RevaGateway         string            `yaml:"reva_gateway" env:"REVA_GATEWAY" desc:"The CS3 gateway endpoint."` //TODO: use REVA config
 	FontMapFile         string            `yaml:"font_map_file" env:"THUMBNAILS_TXT_FONTMAP_FILE" desc:"The path to a font file for txt thumbnails."`
 	TransferSecret      string            `yaml:"transfer_secret" env:"THUMBNAILS_TRANSFER_TOKEN" desc:"The secret to sign JWT to download the actual thumbnail file."`
 	DataEndpoint        string            `yaml:"data_endpoint" env:"THUMBNAILS_DATA_ENDPOINT" desc:"The HTTP endpoint where the actual thumbnail file can be downloaded."`

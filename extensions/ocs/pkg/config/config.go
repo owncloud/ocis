@@ -24,7 +24,7 @@ type Config struct {
 	IdentityManagement IdentityManagement `yaml:"identity_management"`
 
 	AccountBackend    string `yaml:"account_backend" env:"OCS_ACCOUNT_BACKEND_TYPE"`
-	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;OCS_MACHINE_AUTH_API_KEY"`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;OCS_MACHINE_AUTH_API_KEY" desc: "Machine auth API key used for accessing the 'auth-machine' service to impersonate users."`
 
 	Context context.Context `yaml:"-"`
 }
@@ -33,5 +33,5 @@ type Config struct {
 // is based in the combination of IDP hostname + UserID. For more information see:
 // https://github.com/cs3org/reva/blob/4fd0229f13fae5bc9684556a82dbbd0eced65ef9/pkg/storage/utils/decomposedfs/node/node.go#L856-L865
 type IdentityManagement struct {
-	Address string `yaml:"address" env:"OCIS_URL;OCIS_OIDC_ISSUER;OCS_IDM_ADDRESS"`
+	Address string `yaml:"address" env:"OCIS_URL;OCIS_OIDC_ISSUER;OCS_IDM_ADDRESS" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP."`
 }

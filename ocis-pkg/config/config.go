@@ -65,11 +65,11 @@ type Config struct {
 
 	Registry          string               `yaml:"registry"`
 	TokenManager      *shared.TokenManager `yaml:"token_manager"`
-	MachineAuthAPIKey string               `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY"`
+	MachineAuthAPIKey string               `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used for accessing the 'auth-machine' service to impersonate users."`
 	TransferSecret    string               `yaml:"transfer_secret" env:"STORAGE_TRANSFER_SECRET"`
 	SystemUserID      string               `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID"`
 	SystemUserAPIKey  string               `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY"`
-	AdminUserID       string               `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID"`
+	AdminUserID       string               `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID" desc:"ID of a user, that should receive admin privileges."`
 	Runtime           Runtime              `yaml:"runtime"`
 
 	AppProvider       *appProvider.Config   `yaml:"app_provider"`
