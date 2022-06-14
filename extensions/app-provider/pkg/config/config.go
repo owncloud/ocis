@@ -18,8 +18,8 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	ExternalAddr string  `yaml:"external_addr" env:"APP_PROVIDER_EXTERNAL_ADDR"`
-	Driver       string  `yaml:"driver" env:"APP_PROVIDER_DRIVER"`
+	ExternalAddr string  `yaml:"external_addr" env:"APP_PROVIDER_EXTERNAL_ADDR" desc:"Address of the app provider, where the gateway service can reach it"`
+	Driver       string  `yaml:"driver" env:"APP_PROVIDER_DRIVER" desc:"Driver, which the app provider uses"`
 	Drivers      Drivers `yaml:"drivers"`
 
 	Supervised bool            `yaml:"-"`
@@ -28,16 +28,16 @@ type Config struct {
 
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;APP_PROVIDER_TRACING_ENABLED" desc:"Activates tracing."`
-	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;APP_PROVIDER_TRACING_TYPE"`
-	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;APP_PROVIDER_TRACING_ENDPOINT" desc:"The endpoint to the tracing collector."`
-	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;APP_PROVIDER_TRACING_COLLECTOR"`
+	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;APP_PROVIDER_TRACING_TYPE" desc:"The type of tracing. Defaults to \"\", which is the same as \"jaeger\". Allowed tracing types are \"jaeger\" and \"\" as of now."`
+	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;APP_PROVIDER_TRACING_ENDPOINT" desc:"The endpoint of the tracing agent."`
+	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;APP_PROVIDER_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset."`
 }
 
 type Log struct {
-	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;APP_PROVIDER_LOG_LEVEL" desc:"The log level."`
+	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;APP_PROVIDER_LOG_LEVEL" desc:"The log level. Valid values are: \"panic\", \"fatal\", \"error\", \"warn\", \"info\", \"debug\", \"trace\"."`
 	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;APP_PROVIDER_LOG_PRETTY" desc:"Activates pretty log output."`
 	Color  bool   `yaml:"color" env:"OCIS_LOG_COLOR;APP_PROVIDER_LOG_COLOR" desc:"Activates colorized log output."`
-	File   string `yaml:"file" env:"OCIS_LOG_FILE;APP_PROVIDER_LOG_FILE" desc:"The target log file."`
+	File   string `yaml:"file" env:"OCIS_LOG_FILE;APP_PROVIDER_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set."`
 }
 
 type Service struct {
