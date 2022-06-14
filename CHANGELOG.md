@@ -10,9 +10,11 @@ The following sections list the changes for unreleased.
 * Bugfix - Remove unused OCS storage configuration: [#3955](https://github.com/owncloud/ocis/pull/3955)
 * Bugfix - Fix version info: [#3953](https://github.com/owncloud/ocis/pull/3953)
 * Bugfix - Fix graph endpoint: [#3925](https://github.com/owncloud/ocis/issues/3925)
+* Bugfix - Make ocdav service behave properly: [#3957](https://github.com/owncloud/ocis/pull/3957)
 * Enhancement - Add audit events for created containers: [#3941](https://github.com/owncloud/ocis/pull/3941)
 * Enhancement - Don't setup demo role assignments on default: [#3661](https://github.com/owncloud/ocis/issues/3661)
 * Enhancement - Disable the color logging in docker compose examples: [#871](https://github.com/owncloud/ocis/issues/871)
+* Enhancement - Make thumbnails service log less noisy: [#3959](https://github.com/owncloud/ocis/pull/3959)
 * Enhancement - Update reva: [#3944](https://github.com/owncloud/ocis/pull/3944)
 
 ## Details
@@ -47,6 +49,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3925
 
+* Bugfix - Make ocdav service behave properly: [#3957](https://github.com/owncloud/ocis/pull/3957)
+
+   The ocdav service now properly passes the tracing config and shuts down when receiving a kill
+   signal.
+
+   https://github.com/owncloud/ocis/pull/3957
+
 * Enhancement - Add audit events for created containers: [#3941](https://github.com/owncloud/ocis/pull/3941)
 
    Handle the event `ContainerCreated` in the audit service.
@@ -70,6 +79,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/871
    https://github.com/owncloud/ocis/pull/3935
+
+* Enhancement - Make thumbnails service log less noisy: [#3959](https://github.com/owncloud/ocis/pull/3959)
+
+   Reduced the log severity when no thumbnail was found from warn to debug. This reduces the spam in
+   the logs.
+
+   https://github.com/owncloud/ocis/pull/3959
 
 * Enhancement - Update reva: [#3944](https://github.com/owncloud/ocis/pull/3944)
 
