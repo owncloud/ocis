@@ -144,7 +144,6 @@ services:
       WOPISECRET: ${WOPI_JWT_SECRET:-LoremIpsum567}
       IOPSECRET: ${WOPI_IOP_SECRET:-LoremIpsum123}
       WOPISERVER_DOMAIN: ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
-      COLLABORA_DOMAIN: ${COLLABORA_DOMAIN:-collabora.owncloud.test}
     volumes:
       - ./config/wopiserver/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/wopiserver/wopiserver.conf.dist:/etc/wopi/wopiserver.conf.dist
