@@ -61,14 +61,14 @@ type Config struct {
 
 	Mode    Mode // DEPRECATED
 	File    string
-	OcisURL string `yaml:"ocis_url"`
+	OcisURL string `yaml:"ocis_url" desc:"URL, where oCIS is reachable for users."`
 
 	Registry          string               `yaml:"registry"`
 	TokenManager      *shared.TokenManager `yaml:"token_manager"`
 	MachineAuthAPIKey string               `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used for accessing the 'auth-machine' service to impersonate users."`
 	TransferSecret    string               `yaml:"transfer_secret" env:"STORAGE_TRANSFER_SECRET"`
-	SystemUserID      string               `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID"`
-	SystemUserAPIKey  string               `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY"`
+	SystemUserID      string               `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID" desc:"ID of the oCIS storage-system system user."`
+	SystemUserAPIKey  string               `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY" desc:"API key for the storage-system system user."`
 	AdminUserID       string               `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID" desc:"ID of a user, that should receive admin privileges."`
 	Runtime           Runtime              `yaml:"runtime"`
 

@@ -8,4 +8,11 @@ geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---
 
+## Abstract
+
+
 This service embeds [Graph-Explorer](https://github.com/owncloud/ocis/tree/master/graph-explorer) to provide a UI for ownCloud Infinite Scale.
+
+## Table of Contents
+
+{{< toc-tree >}}

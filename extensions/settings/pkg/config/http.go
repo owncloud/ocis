@@ -2,10 +2,10 @@ package config
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string `yaml:"addr" env:"SETTINGS_HTTP_ADDR"`
+	Addr      string `yaml:"addr" env:"SETTINGS_HTTP_ADDR" desc:"The bind address of the HTTP service."`
 	Namespace string `yaml:"-"`
-	Root      string `yaml:"root" env:"SETTINGS_HTTP_ROOT"`
-	CacheTTL  int    `yaml:"cache_ttl" env:"SETTINGS_CACHE_TTL"`
+	Root      string `yaml:"root" env:"SETTINGS_HTTP_ROOT" desc:"The root path of the HTTP service."`
+	CacheTTL  int    `yaml:"cache_ttl" env:"SETTINGS_CACHE_TTL" desc:"Cache TTL policy."`
 	CORS      CORS   `yaml:"cors"`
 }
 

@@ -29,7 +29,7 @@ type Config struct {
 }
 
 type Spaces struct {
-	WebDavBase                      string `yaml:"webdav_base" env:"OCIS_URL;GRAPH_SPACES_WEBDAV_BASE"`
+	WebDavBase                      string `yaml:"webdav_base" env:"OCIS_URL;GRAPH_SPACES_WEBDAV_BASE" desc:"URL, where oCIS is reachable for users."`
 	WebDavPath                      string `yaml:"webdav_path" env:"GRAPH_SPACES_WEBDAV_PATH"`
 	DefaultQuota                    string `yaml:"default_quota" env:"GRAPH_SPACES_DEFAULT_QUOTA"`
 	Insecure                        bool   `yaml:"insecure" env:"OCIS_INSECURE;GRAPH_SPACES_INSECURE"`

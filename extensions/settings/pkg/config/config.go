@@ -19,8 +19,8 @@ type Config struct {
 	HTTP HTTP `yaml:"http"`
 	GRPC GRPC `yaml:"grpc"`
 
-	StoreType string   `yaml:"store_type" env:"SETTINGS_STORE_TYPE"`
-	DataPath  string   `yaml:"data_path" env:"SETTINGS_DATA_PATH"`
+	StoreType string   `yaml:"store_type" env:"SETTINGS_STORE_TYPE" desc:"Store type configures the persistency driver. Possible values are \"metadata\" and \"filesystem\"."`
+	DataPath  string   `yaml:"data_path" env:"SETTINGS_DATA_PATH" desc:"Path for the persistence directory."`
 	Metadata  Metadata `yaml:"metadata_config"`
 
 	AdminUserID string `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID;SETTINGS_ADMIN_USER_ID" desc:"ID of a user, that should receive admin privileges."`
@@ -35,15 +35,15 @@ type Config struct {
 
 // Asset defines the available asset configuration.
 type Asset struct {
-	Path string `yaml:"path" env:"SETTINGS_ASSET_PATH"`
+	Path string `yaml:"path" env:"SETTINGS_ASSET_PATH" desc:"Serve settings assets from a path on the filesystem instead of the builtin assets."`
 }
 
 // Metadata configures the metadata store to use
 type Metadata struct {
-	GatewayAddress string `yaml:"gateway_addr" env:"STORAGE_GATEWAY_GRPC_ADDR"`
-	StorageAddress string `yaml:"storage_addr" env:"STORAGE_GRPC_ADDR"`
+	GatewayAddress string `yaml:"gateway_addr" env:"STORAGE_GATEWAY_GRPC_ADDR" desc:"GRPC address of the storage-system extension."`
+	StorageAddress string `yaml:"storage_addr" env:"STORAGE_GRPC_ADDR" desc:"GRPC address of the storage-system extension."`
 
-	SystemUserID     string `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID;SETTINGS_SYSTEM_USER_ID"`
-	SystemUserIDP    string `yaml:"system_user_idp" env:"OCIS_SYSTEM_USER_IDP;SETTINGS_SYSTEM_USER_IDP"`
-	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY"`
+	SystemUserID     string `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID;SETTINGS_SYSTEM_USER_ID" desc:"ID of the oCIS storage-system system user."`
+	SystemUserIDP    string `yaml:"system_user_idp" env:"OCIS_SYSTEM_USER_IDP;SETTINGS_SYSTEM_USER_IDP" desc:"IDP of the oCIS storage-system system user."`
+	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY" desc:"API key for the storage-system system user."`
 }

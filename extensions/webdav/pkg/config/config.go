@@ -18,7 +18,7 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
-	OcisPublicURL   string `yaml:"ocis_public_url" env:"OCIS_URL;OCIS_PUBLIC_URL"`
+	OcisPublicURL   string `yaml:"ocis_public_url" env:"OCIS_URL;OCIS_PUBLIC_URL" desc:"URL, where oCIS is reachable for users."`
 	WebdavNamespace string `yaml:"webdav_namespace" env:"WEBDAV_WEBDAV_NAMESPACE" desc:"CS3 path layout to use when forwarding /webdav requests"`
 	RevaGateway     string `yaml:"reva_gateway" env:"REVA_GATEWAY" desc:"The CS3 gateway endpoint."`
 

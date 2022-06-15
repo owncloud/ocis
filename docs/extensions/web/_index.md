@@ -8,4 +8,11 @@ geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---
 
+## Abstract
+
 This service embeds [ownCloud Web](https://github.com/owncloud/web) to provide a UI for ownCloud Infinite Scale.
+
+
+## Table of Contents
+
+{{< toc-tree >}}

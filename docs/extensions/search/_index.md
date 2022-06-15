@@ -7,4 +7,10 @@ geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---
 
+## Abstract
+
 This service provides search functionality.
+
+## Table of Contents
+
+{{< toc-tree >}}

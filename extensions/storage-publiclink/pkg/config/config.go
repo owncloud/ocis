@@ -18,7 +18,7 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_PUBLICLINK_SKIP_USER_GROUPS_IN_TOKEN"`
+	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_PUBLICLINK_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token."`
 
 	StorageProvider StorageProvider `yaml:"storage_provider"`
 
@@ -51,11 +51,11 @@ type Debug struct {
 }
 
 type GRPCConfig struct {
-	Addr      string `yaml:"addr" env:"STORAGE_PUBLICLINK_GRPC_ADDR" desc:"The address of the grpc service."`
+	Addr      string `yaml:"addr" env:"STORAGE_PUBLICLINK_GRPC_ADDR" desc:"The bind address of the GRPC service."`
 	Namespace string `yaml:"-"`
 	Protocol  string `yaml:"protocol" env:"STORAGE_PUBLICLINK_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
 }
 
 type StorageProvider struct {
-	MountID string `yaml:"mount_id" env:"STORAGE_PUBLICLINK_STORAGE_PROVIDER_MOUNT_ID"`
+	MountID string `yaml:"mount_id" env:"STORAGE_PUBLICLINK_STORAGE_PROVIDER_MOUNT_ID" desc:"Mount ID of this storage."`
 }

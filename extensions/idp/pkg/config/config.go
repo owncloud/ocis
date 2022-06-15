@@ -53,7 +53,7 @@ type Ldap struct {
 
 // Asset defines the available asset configuration.
 type Asset struct {
-	Path string `yaml:"asset" env:"IDP_ASSET_PATH" desc:"Defines the path for the IDP assets."`
+	Path string `yaml:"asset" env:"IDP_ASSET_PATH" desc:"Serve IDP assets from a path on the filesystem instead of the builtin assets."`
 }
 
 type Client struct {

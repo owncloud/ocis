@@ -8,4 +8,11 @@ geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---
 
+## Abstract
+
 This service provides an ocis extensions which generates thumbnails for image files.
+
+
+## Table of Contents
+
+{{< toc-tree >}}

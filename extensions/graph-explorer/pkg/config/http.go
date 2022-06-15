@@ -2,8 +2,8 @@ package config
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string `yaml:"addr" env:"GRAPH_EXPLORER_HTTP_ADDR" desc:"The HTTP service address."`
-	Root      string `yaml:"root" env:"GRAPH_EXPLORER_HTTP_ROOT" desc:"The HTTP service root path."`
+	Addr      string `yaml:"addr" env:"GRAPH_EXPLORER_HTTP_ADDR" desc:"The bind address of the HTTP service."`
+	Root      string `yaml:"root" env:"GRAPH_EXPLORER_HTTP_ROOT" desc:"The root path of the HTTP service."`
 	Namespace string `yaml:"-"`
 }
 
