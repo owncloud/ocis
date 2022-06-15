@@ -19,4 +19,4 @@ These guides should extend the generic documentation and help admins to learn In
 oCIS deployments are super simple, yet there are many configurations possible for advanced setups.
 
 - {{< icon "docker" >}} [Discover oCIS with Docker]({{< ref "ocis-local-docker" >}}) - configure domain, certificates and port
-- [Migrate data to Infinte Scale]({{< ref "migrate-data-rclone" >}})
+- {{< icon "person-walking-luggage" >}} [Migrate data to Infinte Scale]({{< ref "migrate-data-rclone" >}})
