@@ -126,7 +126,7 @@
 |`GRAPH_IDENTITY_BACKEND`
 | string
 | ldap
-| 
+| The user identity backend to use, defaults to 'ldap', can be 'cs3'.
 
 |`LDAP_URI` +
 `GRAPH_LDAP_URI`

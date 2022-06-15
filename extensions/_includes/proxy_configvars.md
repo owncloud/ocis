@@ -29,7 +29,7 @@
 | PROXY_ACCOUNT_BACKEND_TYPE | string | cs3 | Account backend the proxy should use, currenly only 'cs3' is possible here.|
 | PROXY_USER_OIDC_CLAIM | string | email | The name of an OpenID Connect claim that should be used for resolving users with the account backend. Currently defaults to 'email'.|
 | PROXY_USER_CS3_CLAIM | string | mail | The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail' (other possible values are: 'username', 'displayname')|
-| OCIS_MACHINE_AUTH_API_KEY<br/>PROXY_MACHINE_AUTH_API_KEY | string |  | |
+| OCIS_MACHINE_AUTH_API_KEY<br/>PROXY_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used for accessing the 'auth-machine' service to impersonate users.|
 | PROXY_AUTOPROVISION_ACCOUNTS | bool | false | Set this to 'true' to automatically provsion users that do not yet exist in the users service on-demand upon first signin. To use this a write-enabled libregraph user backend needs to be setup an running.|
 | PROXY_ENABLE_BASIC_AUTH | bool | false | Set this to true to enable 'basic' (username/password) authentication. (Default: false)|
 | PROXY_INSECURE_BACKENDS | bool | false | Disable TLS certificate validation for all http backend connections. (Default: false)|

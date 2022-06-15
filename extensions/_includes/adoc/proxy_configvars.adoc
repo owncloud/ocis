@@ -158,7 +158,7 @@
 `PROXY_MACHINE_AUTH_API_KEY`
 | string
 | 
-| 
+| Machine auth API key used for accessing the 'auth-machine' service to impersonate users.
 
 |`PROXY_AUTOPROVISION_ACCOUNTS`
 | bool

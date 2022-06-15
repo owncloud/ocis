@@ -23,7 +23,7 @@
 | GRAPH_SPACES_DEFAULT_QUOTA | string | 1000000000 | |
 | OCIS_INSECURE<br/>GRAPH_SPACES_INSECURE | bool | false | |
 | GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL | int | 0 | |
-| GRAPH_IDENTITY_BACKEND | string | ldap | |
+| GRAPH_IDENTITY_BACKEND | string | ldap | The user identity backend to use, defaults to 'ldap', can be 'cs3'.|
 | LDAP_URI<br/>GRAPH_LDAP_URI | string | ldaps://localhost:9235 | |
 | LDAP_CACERT<br/>GRAPH_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | The certificate to verify TLS connections|
 | LDAP_INSECURE<br/>GRAPH_LDAP_INSECURE | bool | false | |
