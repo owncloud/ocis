@@ -21,18 +21,18 @@ type Config struct {
 
 	TokenManager      *TokenManager `yaml:"token_manager"`
 	Reva              *Reva         `yaml:"reva"`
-	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;FRONTEND_MACHINE_AUTH_API_KEY"  desc: "Machine auth API key used for accessing the 'auth-machine' service to impersonate users."`
+	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;FRONTEND_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used for accessing the 'auth-machine' service."`
 
-	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"FRONTEND_SKIP_USER_GROUPS_IN_TOKEN"`
+	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"FRONTEND_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the encoding of the user's groupmember ships in the reva access token. To reduces token size, especially when users are members of a large number of groups."`
 
-	EnableFavorites          bool   `yaml:"enable_favorites" env:"FRONTEND_ENABLE_FAVORITES"`
+	EnableFavorites          bool   `yaml:"enable_favorites" env:"FRONTEND_ENABLE_FAVORITES" desc:"Disables the support for favorites in the frontend."`
 	EnableProjectSpaces      bool   `yaml:"enable_project_spaces" env:"FRONTEND_ENABLE_PROJECT_SPACES" desc:"Indicates to clients that project spaces are supposed to be made available."`
 	EnableShareJail          bool   `yaml:"enable_share_jail" env:"FRONTEND_ENABLE_SHARE_JAIL" desc:"Indicates to clients that the share jail is supposed to be used."`
-	UploadMaxChunkSize       int    `yaml:"upload_max_chunk_size" env:"FRONTEND_UPLOAD_MAX_CHUNK_SIZE"`
-	UploadHTTPMethodOverride string `yaml:"upload_http_method_override" env:"FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE"`
-	DefaultUploadProtocol    string `yaml:"default_upload_protocol" env:"FRONTEND_DEFAULT_UPLOAD_PROTOCOL"`
+	UploadMaxChunkSize       int    `yaml:"upload_max_chunk_size" env:"FRONTEND_UPLOAD_MAX_CHUNK_SIZE" desc:"Sets the max chunk sizes for uploads via the frontent." `
+	UploadHTTPMethodOverride string `yaml:"upload_http_method_override" env:"FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE" desc:"Advice TUS which to replace PATCH requests by POST requests."`
+	DefaultUploadProtocol    string `yaml:"default_upload_protocol" env:"FRONTEND_DEFAULT_UPLOAD_PROTOCOL" desc:"The default upload protocol to use in the frontend (e.g. tus)."`
 
-	PublicURL string `yaml:"public_url" env:"OCIS_URL;FRONTEND_PUBLIC_URL"`
+	PublicURL string `yaml:"public_url" env:"OCIS_URL;FRONTEND_PUBLIC_URL" desc:"The public facing url of the ocis frontend."`
 
 	AppHandler  AppHandler  `yaml:"app_handler"`
 	Archiver    Archiver    `yaml:"archiver"`
@@ -74,7 +74,7 @@ type HTTPConfig struct {
 	Addr      string `yaml:"addr" env:"FRONTEND_HTTP_ADDR" desc:"The address of the http service."`
 	Namespace string `yaml:"-"`
 	Protocol  string `yaml:"protocol" env:"FRONTEND_HTTP_PROTOCOL" desc:"The transport protocol of the http service."`
-	Prefix    string `yaml:"prefix" env:"FRONTEND_HTTP_PREFIX"`
+	Prefix    string `yaml:"prefix" env:"FRONTEND_HTTP_PREFIX" desc:"The Path prefix where the frontend can be accesses (defaults to /)."`
 }
 
 // Middleware configures reva middlewares.
@@ -89,14 +89,14 @@ type Auth struct {
 
 type AppHandler struct {
 	Prefix   string `yaml:"-"`
-	Insecure bool   `yaml:"insecure" env:"OCIS_INSECURE;FRONTEND_APP_HANDLER_INSECURE"`
+	Insecure bool   `yaml:"insecure" env:"OCIS_INSECURE;FRONTEND_APP_HANDLER_INSECURE" desc:"Allow insecure connections to the frontend."`
 }
 
 type Archiver struct {
-	MaxNumFiles int64  `yaml:"max_num_files" env:"FRONTEND_ARCHIVER_MAX_NUM_FILES"`
-	MaxSize     int64  `yaml:"max_size" env:"FRONTEND_ARCHIVER_MAX_SIZE"`
+	MaxNumFiles int64  `yaml:"max_num_files" env:"FRONTEND_ARCHIVER_MAX_NUM_FILES" desc:"Max number of files that can be packed into an archive."`
+	MaxSize     int64  `yaml:"max_size" env:"FRONTEND_ARCHIVER_MAX_SIZE" desc:"Max size of the zip archive the archiver can create."`
 	Prefix      string `yaml:"-"`
-	Insecure    bool   `yaml:"insecure" env:"OCIS_INSECURE;FRONTEND_ARCHIVER_INSECURE"`
+	Insecure    bool   `yaml:"insecure" env:"OCIS_INSECURE;FRONTEND_ARCHIVER_INSECURE" desc:"Allow insecure connections to the archiver."`
 }
 
 type DataGateway struct {
@@ -104,11 +104,11 @@ type DataGateway struct {
 }
 
 type OCS struct {
-	Prefix                  string             `yaml:"prefix" env:"FRONTEND_OCS_PREFIX"`
-	SharePrefix             string             `yaml:"share_prefix" env:"FRONTEND_OCS_SHARE_PREFIX"`
-	HomeNamespace           string             `yaml:"home_namespace" env:"FRONTEND_OCS_HOME_NAMESPACE"`
-	AdditionalInfoAttribute string             `yaml:"additional_info_attribute" env:"FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE"`
-	ResourceInfoCacheTTL    int                `yaml:"resource_info_cache_ttl" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL"`
+	Prefix                  string             `yaml:"prefix" env:"FRONTEND_OCS_PREFIX" desc:"Path prefix for the ocs service"`
+	SharePrefix             string             `yaml:"share_prefix" env:"FRONTEND_OCS_SHARE_PREFIX" desc:"Path prefix for shares."`
+	HomeNamespace           string             `yaml:"home_namespace" env:"FRONTEND_OCS_HOME_NAMESPACE" desc:"Homespace namespace identifier."`
+	AdditionalInfoAttribute string             `yaml:"additional_info_attribute" env:"FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE" desc:"Additional information attribute for the user (e.g. {{.Mail}}"`
+	ResourceInfoCacheTTL    int                `yaml:"resource_info_cache_ttl" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL" desc:"Max TTL for the resource info cache"`
 	CacheWarmupDriver       string             `yaml:"cache_warmup_driver,omitempty"`  // not supported by the oCIS product, therefore not part of docs
 	CacheWarmupDrivers      CacheWarmupDrivers `yaml:"cache_warmup_drivers,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
@@ -127,6 +127,6 @@ type CBOXDriver struct {
 }
 
 type Checksums struct {
-	SupportedTypes      []string `yaml:"supported_types" env:"FRONTEND_CHECKSUMS_SUPPORTED_TYPES"`
-	PreferredUploadType string   `yaml:"preferred_upload_type" env:"FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPES"`
+	SupportedTypes      []string `yaml:"supported_types" env:"FRONTEND_CHECKSUMS_SUPPORTED_TYPES" desc:"Supported checksum types to be announced to the client (e.g. md5)"`
+	PreferredUploadType string   `yaml:"preferred_upload_type" env:"FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPES" desc:"Prefered checksum types to be announced to the client for uploads (e.g. md5)"`
 }
