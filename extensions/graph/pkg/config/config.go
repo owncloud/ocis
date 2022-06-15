@@ -63,7 +63,7 @@ type LDAP struct {
 }
 
 type Identity struct {
-	Backend string `yaml:"backend" env:"GRAPH_IDENTITY_BACKEND"`
+	Backend string `yaml:"backend" env:"GRAPH_IDENTITY_BACKEND" desc:"The user identity backend to use, defaults to 'ldap', can be 'cs3'."`
 	LDAP    LDAP   `yaml:"ldap"`
 }
 

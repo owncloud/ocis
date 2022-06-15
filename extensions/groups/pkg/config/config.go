@@ -20,7 +20,7 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"GROUPS_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the encoding of the user's groupmember ships in the reva access token. To reduces token size, especially when users are members of a large number of groups."`
 
-	Driver  string  `yaml:"driver" desc:"The driver which should be used by the groups service (e.g. ldap)".`
+	Driver  string  `yaml:"driver" desc:"The driver which should be used by the groups service (e.g. ldap)."`
 	Drivers Drivers `yaml:"drivers"`
 
 	Supervised bool            `yaml:"-"`

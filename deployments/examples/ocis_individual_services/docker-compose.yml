@@ -175,7 +175,7 @@ services:
 
       OCDAV_HTTP_ADDR: 0.0.0.0:8080
 
-      OCDAV_PUBLIC_URL: ${OCIS_DOMAIN}
+      OCDAV_PUBLIC_URL: https://${OCIS_DOMAIN}
 
       REVA_GATEWAY: gateway:9142
       OCDAV_JWT_SECRET: ${OCIS_JWT_SECRET}
