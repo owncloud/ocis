@@ -1603,7 +1603,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         environment = {
             # Keycloak IDP specific configuration
             "OCIS_OIDC_ISSUER": "https://keycloak/auth/realms/owncloud",
-            "WEB_OIDC_METADATA_URL": "https://keycloak/auth/realms/owncloud/.well-known/openid-configuration",
             "WEB_OIDC_CLIENT_ID": "ocis-web",
             "WEB_OIDC_SCOPE": "openid profile email owncloud",
             # external  ldap is supposed to be read only
@@ -1618,19 +1617,10 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "PROXY_USER_OIDC_CLAIM": "ocis.user.uuid",  # claim was added in Keycloak
             "PROXY_USER_CS3_CLAIM": "userid",  # equals STORAGE_LDAP_USER_SCHEMA_UID
             "LDAP_GROUP_BASE_DN": "ou=TestGroups,dc=owncloud,dc=com",
-            "LDAP_GROUP_OBJECTCLASS": "groupOfUniqueNames",
-            "LDAP_GROUP_SCHEMA_DISPLAYNAME": "cn",
-            "LDAP_GROUP_SCHEMA_ID": "cn",
-            "LDAP_GROUP_SCHEMA_MAIL": "mail",
-            "LDAP_GROUP_SCHEMA_MEMBER": "cn",
+            "LDAP_GROUP_SCHEMA_ID": "ownclouduuid",
             "LDAP_GROUP_FILTER": "(objectclass=owncloud)",
-            "LDAP_LOGIN_ATTRIBUTES": "uid",
             "LDAP_USER_BASE_DN": "ou=TestUsers,dc=owncloud,dc=com",
-            "LDAP_USER_OBJECTCLASS": "posixAccount",
-            "LDAP_USER_SCHEMA_DISPLAYNAME": "displayname",
             "LDAP_USER_SCHEMA_ID": "ownclouduuid",
-            "LDAP_USER_SCHEMA_MAIL": "mail",
-            "LDAP_USER_SCHEMA_USERNAME": "cn",
             "LDAP_USER_FILTER": "(objectclass=owncloud)",
             # ownCloudSQL storage driver
             "STORAGE_USERS_DRIVER": "owncloudsql",
@@ -1650,8 +1640,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "SHARING_USER_OWNCLOUDSQL_DB_PORT": 3306,
             "SHARING_USER_OWNCLOUDSQL_DB_NAME": "owncloud",
             # General oCIS config
-            # OCIS_RUN_EXTENSIONS specifies to start all extensions except idm, idp and accounts. These are replaced by external services
-            "OCIS_RUN_EXTENSIONS": "app-registry,app-provider,audit,auth-basic,auth-bearer,auth-machine,frontend,gateway,graph,graph-explorer,groups,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav",
+            # OCIS_RUN_EXTENSIONS specifies to start all fullstack extensions except idm and idp. These are replaced by external services
+            "OCIS_RUN_EXTENSIONS": "app-registry,app-provider,auth-basic,auth-bearer,auth-machine,frontend,gateway,graph,graph-explorer,groups,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav",
             "OCIS_LOG_LEVEL": "info",
             "OCIS_URL": OCIS_URL,
             "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",
@@ -2313,7 +2303,7 @@ def parallelDeploymentOC10Server():
                 "LDAP_LOGINFILTER": "(&(objectclass=owncloud)(|(uid=%uid)(mail=%uid)))",
                 "LDAP_GROUP_SCHEMA_DISPLAYNAME": "cn",
                 "LDAP_USER_SCHEMA_NAME_ATTR": "uid",
-                "LDAP_GROUP_FILTER": "(&(objectclass=groupOfUniqueNames)(objectclass=owncloud))",
+                "LDAP_GROUP_FILTER": "(&(objectclass=groupOfNames)(objectclass=owncloud))",
                 "LDAP_USER_SCHEMA_UID": "ownclouduuid",
                 "LDAP_USERATTRIBUTEFILTERS": "uid",  # ownCloudUUID;cn;uid;mail
                 "LDAP_USER_SCHEMA_MAIL": "mail",
