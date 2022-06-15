@@ -497,11 +497,15 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 				// will have the same id.
 				tmp := id
 				identity := libregraph.IdentitySet{User: &libregraph.Identity{Id: &tmp}}
+				// we need to map the permissions to the roles
 				switch {
+				// having RemoveGrant qualifies you as a manager
 				case perm.RemoveGrant:
 					managerIdentities = append(managerIdentities, identity)
+				// InitiateFileUpload means you are an editor
 				case perm.InitiateFileUpload:
 					editorIdentities = append(editorIdentities, identity)
+				// Stat permission at least makes you a viewer
 				case perm.Stat:
 					viewerIdentities = append(viewerIdentities, identity)
 				}
