@@ -581,11 +581,6 @@ cannot share a folder with create permission
 - [apiShareReshareToShares2/reShareDisabled.feature:28](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares2/reShareDisabled.feature#L28)
 - [apiSharePublicLink3/uploadToPublicLinkShare.feature:198](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/uploadToPublicLinkShare.feature#L198)
 
-#### [500 status code on update share](https://github.com/owncloud/ocis/issues/2011)
-
-- [apiShareReshareToShares3/reShareUpdate.feature:152](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareUpdate.feature#L152)
-- [apiShareReshareToShares3/reShareUpdate.feature:153](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareReshareToShares3/reShareUpdate.feature#L153)
-
 #### [deleting a file inside a received shared folder is moved to the trash-bin of the sharer not the receiver](https://github.com/owncloud/ocis/issues/1124)
 
 - [apiTrashbin/trashbinSharingToShares.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L29)
