@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add audit events for created containers: [#3941](https://github.com/owncloud/ocis/pull/3941)
 * Enhancement - Don't setup demo role assignments on default: [#3661](https://github.com/owncloud/ocis/issues/3661)
 * Enhancement - Disable the color logging in docker compose examples: [#871](https://github.com/owncloud/ocis/issues/871)
+* Enhancement - Allow resharing: [#3903](https://github.com/owncloud/ocis/pull/3903)
 * Enhancement - Make thumbnails service log less noisy: [#3959](https://github.com/owncloud/ocis/pull/3959)
 * Enhancement - Update reva: [#3944](https://github.com/owncloud/ocis/pull/3944)
 
@@ -86,6 +87,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/871
    https://github.com/owncloud/ocis/pull/3935
+
+* Enhancement - Allow resharing: [#3903](https://github.com/owncloud/ocis/pull/3903)
+
+   This will allow resharing files
+
+   https://github.com/owncloud/ocis/pull/3903
 
 * Enhancement - Make thumbnails service log less noisy: [#3959](https://github.com/owncloud/ocis/pull/3959)
 
