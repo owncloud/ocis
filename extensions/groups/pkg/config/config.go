@@ -64,6 +64,7 @@ type Drivers struct {
 	JSON JSONDriver   `yaml:"json,omitempty"` // not supported by the oCIS product, therefore not part of docs
 	REST RESTProvider `yaml:"rest,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
+
 type LDAPDriver struct {
 	URI              string          `yaml:"uri" env:"LDAP_URI;GROUPS_LDAP_URI" desc:"URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'"`
 	CACert           string          `yaml:"ca_cert" env:"LDAP_CACERT;GROUPS_LDAP_CACERT" desc:"Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty the system default CA bundle will be used."`

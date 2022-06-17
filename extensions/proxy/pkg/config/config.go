@@ -90,8 +90,8 @@ type OIDC struct {
 
 // UserinfoCache is a TTL cache configuration.
 type UserinfoCache struct {
-	Size int `yaml:"size" env:"PROXY_OIDC_USERINFO_CACHE_SIZE"`
-	TTL  int `yaml:"ttl" env:"PROXY_OIDC_USERINFO_CACHE_TTL"`
+	Size int `yaml:"size" env:"PROXY_OIDC_USERINFO_CACHE_SIZE" desc:"Cache size for oidc user info."`
+	TTL  int `yaml:"ttl" env:"PROXY_OIDC_USERINFO_CACHE_TTL" desc:"Max TTL for the oidc user info cache."`
 }
 
 // PolicySelector is the toplevel-configuration for different selectors
@@ -114,7 +114,7 @@ type TokenManager struct {
 // PreSignedURL is the config for the presigned url middleware
 type PreSignedURL struct {
 	AllowedHTTPMethods []string `yaml:"allowed_http_methods"`
-	Enabled            bool     `yaml:"enabled" env:"PROXY_ENABLE_PRESIGNEDURLS"`
+	Enabled            bool     `yaml:"enabled" env:"PROXY_ENABLE_PRESIGNEDURLS" desc:"Allow ocs to get a signing key to sign requests."`
 }
 
 // ClaimsSelectorConf is the config for the claims-selector
