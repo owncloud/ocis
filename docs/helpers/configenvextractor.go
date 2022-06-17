@@ -47,12 +47,18 @@ func GenerateIntermediateCode(templatePath string, intermediateCodePath string, 
 	}
 	fmt.Println("Generating intermediate go code for " + intermediateCodePath + " using template " + templatePath)
 	tpl := template.Must(template.New("").Parse(string(content)))
-	os.MkdirAll(path.Dir(intermediateCodePath), 0700)
+	err = os.MkdirAll(path.Dir(intermediateCodePath), 0700)
+	if err != nil {
+		log.Fatal(err)
+	}
 	runner, err := os.Create(intermediateCodePath)
 	if err != nil {
 		log.Fatal(err)
 	}
-	tpl.Execute(runner, paths)
+	err = tpl.Execute(runner, paths)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func RunIntermediateCode(intermediateCodePath string) {
