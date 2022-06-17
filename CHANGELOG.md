@@ -107,6 +107,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/3944
    https://github.com/owncloud/ocis/pull/3975
+   https://github.com/owncloud/ocis/pull/3982
 # Changelog for [2.0.0-beta.3] (2022-06-08)
 
 The following sections list the changes for 2.0.0-beta.3.
