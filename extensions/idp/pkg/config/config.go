@@ -103,7 +103,7 @@ type Settings struct {
 	IdentifierDefaultUsernameHintText string
 	IdentifierUILocales               []string
 
-	SigningKid             string   `yaml:"signing_kid" env:"IDP_SIGNING_KID" desc:"Value of kid field to use in created tokens (uniquely identifying the signing-private-key)."`
+	SigningKid             string   `yaml:"signing_kid" env:"IDP_SIGNING_KID" desc:"Value of the KID (Key ID) field which is used in created tokens to uniquely identify the signing-private-key."`
 	SigningMethod          string   `yaml:"signing_method" env:"IDP_SIGNING_METHOD" desc:"Signing method of idp requests (e.g. PS256)"`
 	SigningPrivateKeyFiles []string `yaml:"signing_private_key_files" env:"IDP_SIGNING_PRIVATE_KEY_FILES" desc:"Private key files for signing idp requests."`
 	ValidationKeysPath     string   `yaml:"validation_keys_path" env:"IDP_VALIDATION_KEYS_PATH" desc:"Path to validation keys for idp requests."`
