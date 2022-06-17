@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"strings"
 
+	rtrace "github.com/cs3org/reva/v2/pkg/trace"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/propagation"
@@ -54,6 +55,7 @@ func GetTraceProvider(agentEndpoint, collectorEndpoint, serviceName, traceType s
 			return nil, err
 		}
 
+		rtrace.InitDefaultTracerProvider(collectorEndpoint, agentEndpoint)
 		return sdktrace.NewTracerProvider(
 			sdktrace.WithBatcher(exp),
 			sdktrace.WithResource(resource.NewWithAttributes(
