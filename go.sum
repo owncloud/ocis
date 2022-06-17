@@ -294,8 +294,8 @@ github.com/crewjam/httperr v0.2.0/go.mod h1:Jlz+Sg/XqBQhyMjdDiC+GNNRzZTD7x39Gu3p
 github.com/crewjam/saml v0.4.6 h1:XCUFPkQSJLvzyl4cW9OvpWUbRf0gE7VUpU8ZnilbeM4=
 github.com/crewjam/saml v0.4.6/go.mod h1:ZBOXnNPFzB3CgOkRm7Nd6IVdkG+l/wF+0ZXLqD96t1A=
 github.com/cs3org/cato v0.0.0-20200828125504-e418fc54dd5e/go.mod h1:XJEZ3/EQuI3BXTp/6DUzFr850vlxq11I6satRtz0YQ4=
-github.com/cs3org/reva/v2 v2.5.2-0.20220616180355-84264e82e451 h1:0AW5wwavrqL7rBvvwyvy8B49aYLGiNUkiSSpaAAZ/y8=
-github.com/cs3org/reva/v2 v2.5.2-0.20220616180355-84264e82e451/go.mod h1:TwD1FmU0tcnZbIzwMt01BxcEP42o220tBvGOeFPmSEg=
+github.com/cs3org/reva/v2 v2.5.2-0.20220617144643-4758360f5d55 h1:N1E8H+pgrDW//X315BniqmvDYYPoMBkbJZhQEQ3Y+98=
+github.com/cs3org/reva/v2 v2.5.2-0.20220617144643-4758360f5d55/go.mod h1:zAHqzr36X4lIalonDQeNbwrIXjn66C38lp5A+MTRS1c=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8/go.mod h1:4abs/jPXcmJzYoYGF91JF9Uq9s/KL5n1jvFDix8KcqY=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
@@ -797,8 +797,6 @@ github.com/klauspost/cpuid/v2 v2.0.1/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa02
 github.com/klauspost/cpuid/v2 v2.0.4/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa0213Md/qVLRg=
 github.com/klauspost/cpuid/v2 v2.0.9 h1:lgaqFMSdTdQYdZ04uHyN2d/eKdOMyi2YLSvlQIBFYa4=
 github.com/klauspost/cpuid/v2 v2.0.9/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa0213Md/qVLRg=
-github.com/kobergj/go-cs3apis v0.0.0-20220610101249-8067918fe8bf h1:zQRKsQOGgt5aiPs4DoosUCnY8lmKbgHY7x9lpN6aWVA=
-github.com/kobergj/go-cs3apis v0.0.0-20220610101249-8067918fe8bf/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/kolo/xmlrpc v0.0.0-20200310150728-e0350524596b/go.mod h1:o03bZfuBwAXHetKXuInt4S7omeXUu62/A845kiycsSQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.2/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
@@ -882,6 +880,8 @@ github.com/maxymania/go-system v0.0.0-20170110133659-647cc364bf0b h1:Q53idHrTuQD
 github.com/maxymania/go-system v0.0.0-20170110133659-647cc364bf0b/go.mod h1:KirJrATYGbTyUwVR26xIkaipRqRcMRXBf8N5dacvGus=
 github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103 h1:Z/i1e+gTZrmcGeZyWckaLfucYG6KYOXLWo4co8pZYNY=
 github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103/go.mod h1:o9YPB5aGP8ob35Vy6+vyq3P3bWe7NQWzf+JLiXCiMaE=
+github.com/micbar/go-cs3apis v0.0.0-20220617090231-703c04619761 h1:vpejExni287rOeBsJxzCDSYJ4d981KXq7HnnaCt2Wn4=
+github.com/micbar/go-cs3apis v0.0.0-20220617090231-703c04619761/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
 github.com/miekg/dns v1.0.14/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
 github.com/miekg/dns v1.1.26/go.mod h1:bPDLeHnStXmXAq1m/Ch/hvfNHr14JKNPMBo3VZKjuso=
 github.com/miekg/dns v1.1.40/go.mod h1:KNUDUusw/aVsxyTYZM1oqvCicbwhgbNgztCETuNZ7xM=
