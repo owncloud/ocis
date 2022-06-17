@@ -16,28 +16,28 @@
 | FRONTEND_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | FRONTEND_HTTP_ADDR | string | 127.0.0.1:9140 | The address of the http service.|
 | FRONTEND_HTTP_PROTOCOL | string | tcp | The transport protocol of the http service.|
-| FRONTEND_HTTP_PREFIX | string |  | |
+| FRONTEND_HTTP_PREFIX | string |  | The Path prefix where the frontend can be accessed (defaults to /).|
 | STORAGE_TRANSFER_SECRET | string |  | |
 | OCIS_JWT_SECRET<br/>FRONTEND_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
-| OCIS_MACHINE_AUTH_API_KEY<br/>FRONTEND_MACHINE_AUTH_API_KEY | string |  | |
-| FRONTEND_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
-| FRONTEND_ENABLE_FAVORITES | bool | false | |
+| OCIS_MACHINE_AUTH_API_KEY<br/>FRONTEND_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used for accessing the 'auth-machine' service.|
+| FRONTEND_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the encoding of the user's group memberships in the reva access token. This reduces token size, especially when users are members of a large number of groups.|
+| FRONTEND_ENABLE_FAVORITES | bool | false | Disables the support for favorites in the frontend.|
 | FRONTEND_ENABLE_PROJECT_SPACES | bool | true | Indicates to clients that project spaces are supposed to be made available.|
 | FRONTEND_ENABLE_SHARE_JAIL | bool | true | Indicates to clients that the share jail is supposed to be used.|
-| FRONTEND_UPLOAD_MAX_CHUNK_SIZE | int | 100000000 | |
-| FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE | string |  | |
-| FRONTEND_DEFAULT_UPLOAD_PROTOCOL | string | tus | |
-| OCIS_URL<br/>FRONTEND_PUBLIC_URL | string | https://localhost:9200 | |
-| OCIS_INSECURE<br/>FRONTEND_APP_HANDLER_INSECURE | bool | false | |
-| FRONTEND_ARCHIVER_MAX_NUM_FILES | int64 | 10000 | |
-| FRONTEND_ARCHIVER_MAX_SIZE | int64 | 1073741824 | |
-| OCIS_INSECURE<br/>FRONTEND_ARCHIVER_INSECURE | bool | false | |
+| FRONTEND_UPLOAD_MAX_CHUNK_SIZE | int | 100000000 | Sets the max chunk sizes for uploads via the frontend.|
+| FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE | string |  | Advise TUS to replace PATCH requests by POST requests.|
+| FRONTEND_DEFAULT_UPLOAD_PROTOCOL | string | tus | The default upload protocol to use in the frontend (e.g. tus).|
+| OCIS_URL<br/>FRONTEND_PUBLIC_URL | string | https://localhost:9200 | The public facing url of the ocis frontend.|
+| OCIS_INSECURE<br/>FRONTEND_APP_HANDLER_INSECURE | bool | false | Allow insecure connections to the frontend.|
+| FRONTEND_ARCHIVER_MAX_NUM_FILES | int64 | 10000 | Max number of files that can be packed into an archive.|
+| FRONTEND_ARCHIVER_MAX_SIZE | int64 | 1073741824 | Max size of the zip archive the archiver can create.|
+| OCIS_INSECURE<br/>FRONTEND_ARCHIVER_INSECURE | bool | false | Allow insecure connections to the archiver.|
 | FRONTEND_DATA_GATEWAY_PREFIX | string | data | |
-| FRONTEND_OCS_PREFIX | string | ocs | |
-| FRONTEND_OCS_SHARE_PREFIX | string | /Shares | |
-| FRONTEND_OCS_HOME_NAMESPACE | string | /users/{{.Id.OpaqueId}} | |
-| FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE | string | {{.Mail}} | |
-| FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL | int | 0 | |
-| FRONTEND_CHECKSUMS_SUPPORTED_TYPES |  | [sha1 md5 adler32] | |
-| FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPES | string |  | |
+| FRONTEND_OCS_PREFIX | string | ocs | Path prefix for the ocs service|
+| FRONTEND_OCS_SHARE_PREFIX | string | /Shares | Path prefix for shares.|
+| FRONTEND_OCS_HOME_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Homespace namespace identifier.|
+| FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE | string | {{.Mail}} | Additional information attribute for the user (e.g. {{.Mail}}|
+| FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL | int | 0 | Max TTL for the resource info cache|
+| FRONTEND_CHECKSUMS_SUPPORTED_TYPES |  | [sha1 md5 adler32] | Supported checksum types to be announced to the client (e.g. md5)|
+| FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPES | string |  | Preferred checksum types to be announced to the client for uploads (e.g. md5)|

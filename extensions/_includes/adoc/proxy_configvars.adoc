@@ -163,14 +163,14 @@ Disable TLS certificate validation for connections to the IDP. (not recommended 
 a| [subs=-attributes]
 1024 
 a| [subs=-attributes]
-
+Cache size for oidc user info.
 
 |`PROXY_OIDC_USERINFO_CACHE_TTL`
 | int
 a| [subs=-attributes]
 10 
 a| [subs=-attributes]
-
+Max TTL for the oidc user info cache.
 
 |`OCIS_JWT_SECRET` +
 `PROXY_JWT_SECRET`
@@ -185,7 +185,7 @@ The secret to mint and validate jwt tokens.
 a| [subs=-attributes]
 true 
 a| [subs=-attributes]
-
+Allow ocs to get a signing key to sign requests.
 
 |`PROXY_ACCOUNT_BACKEND_TYPE`
 | string

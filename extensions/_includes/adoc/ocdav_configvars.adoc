@@ -140,7 +140,7 @@ The CS3 gateway endpoint.
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Disables the encoding of the user's group memberships in the reva access token. This reduces token size, especially when users are members of a large number of groups.
 
 |`OCDAV_WEBDAV_NAMESPACE`
 | string

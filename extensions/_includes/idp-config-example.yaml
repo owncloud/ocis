@@ -34,7 +34,6 @@ idp:
   sign_in_uri: ""
   signed_out_uri: ""
   authorization_endpoint_uri: ""
-  end_session_endpoint_uri: ""
   insecure: false
   trusted_proxy: []
   allow_scope: []
@@ -42,8 +41,6 @@ idp:
   allow_dynamic_client_registration: false
   encrypt_secret_file: ""
   listen: ""
-  identifier_client_disabled: true
-  identifier_scopes_conf: ""
   identifierdefaultbannerlogo: ""
   identifierdefaultsigninpagetext: ""
   identifierdefaultusernamehinttext: ""

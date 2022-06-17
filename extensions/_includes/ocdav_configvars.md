@@ -19,7 +19,7 @@
 | OCDAV_HTTP_PREFIX | string |  | A URL path prefix for the handler.|
 | OCIS_JWT_SECRET<br/>OCDAV_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
-| OCDAV_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
+| OCDAV_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the encoding of the user's group memberships in the reva access token. This reduces token size, especially when users are members of a large number of groups.|
 | OCDAV_WEBDAV_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Jail requests to /dav/webdav into this CS3 namespace. Supports template layouting with CS3 User properties.|
 | OCDAV_FILES_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Jail requests to /dav/files/{username} into this CS3 namespace. Supports template layouting with CS3 User properties.|
 | OCDAV_SHARES_NAMESPACE | string | /Shares | The human readable path for the share jail. Relative to a users personal space root. Upcased intentionally.|

@@ -118,7 +118,7 @@ The transport protocol of the http service.
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+The Path prefix where the frontend can be accessed (defaults to /).
 
 |`STORAGE_TRANSFER_SECRET`
 | string
@@ -148,21 +148,21 @@ The CS3 gateway endpoint.
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+Machine auth API key used for accessing the 'auth-machine' service.
 
 |`FRONTEND_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Disables the encoding of the user's group memberships in the reva access token. This reduces token size, especially when users are members of a large number of groups.
 
 |`FRONTEND_ENABLE_FAVORITES`
 | bool
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Disables the support for favorites in the frontend.
 
 |`FRONTEND_ENABLE_PROJECT_SPACES`
 | bool
@@ -183,21 +183,21 @@ Indicates to clients that the share jail is supposed to be used.
 a| [subs=-attributes]
 100000000 
 a| [subs=-attributes]
-
+Sets the max chunk sizes for uploads via the frontend.
 
 |`FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE`
 | string
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+Advise TUS to replace PATCH requests by POST requests.
 
 |`FRONTEND_DEFAULT_UPLOAD_PROTOCOL`
 | string
 a| [subs=-attributes]
 tus 
 a| [subs=-attributes]
-
+The default upload protocol to use in the frontend (e.g. tus).
 
 |`OCIS_URL` +
 `FRONTEND_PUBLIC_URL`
@@ -205,7 +205,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 \https://localhost:9200 
 a| [subs=-attributes]
-
+The public facing url of the ocis frontend.
 
 |`OCIS_INSECURE` +
 `FRONTEND_APP_HANDLER_INSECURE`
@@ -213,21 +213,21 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Allow insecure connections to the frontend.
 
 |`FRONTEND_ARCHIVER_MAX_NUM_FILES`
 | int64
 a| [subs=-attributes]
 10000 
 a| [subs=-attributes]
-
+Max number of files that can be packed into an archive.
 
 |`FRONTEND_ARCHIVER_MAX_SIZE`
 | int64
 a| [subs=-attributes]
 1073741824 
 a| [subs=-attributes]
-
+Max size of the zip archive the archiver can create.
 
 |`OCIS_INSECURE` +
 `FRONTEND_ARCHIVER_INSECURE`
@@ -235,7 +235,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Allow insecure connections to the archiver.
 
 |`FRONTEND_DATA_GATEWAY_PREFIX`
 | string
@@ -249,49 +249,49 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ocs 
 a| [subs=-attributes]
-
+Path prefix for the ocs service
 
 |`FRONTEND_OCS_SHARE_PREFIX`
 | string
 a| [subs=-attributes]
 /Shares 
 a| [subs=-attributes]
-
+Path prefix for shares.
 
 |`FRONTEND_OCS_HOME_NAMESPACE`
 | string
 a| [subs=-attributes]
 /users/{{.Id.OpaqueId}} 
 a| [subs=-attributes]
-
+Homespace namespace identifier.
 
 |`FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE`
 | string
 a| [subs=-attributes]
 {{.Mail}} 
 a| [subs=-attributes]
-
+Additional information attribute for the user (e.g. {{.Mail}}
 
 |`FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL`
 | int
 a| [subs=-attributes]
 0 
 a| [subs=-attributes]
-
+Max TTL for the resource info cache
 
 |`FRONTEND_CHECKSUMS_SUPPORTED_TYPES`
 | 
 a| [subs=-attributes]
 [sha1 md5 adler32] 
 a| [subs=-attributes]
-
+Supported checksum types to be announced to the client (e.g. md5)
 
 |`FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPES`
 | string
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+Preferred checksum types to be announced to the client for uploads (e.g. md5)
 |===
 
 Since Version: `+` added, `-` deprecated

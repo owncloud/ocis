@@ -22,10 +22,10 @@
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>PROXY_OIDC_ISSUER | string | https://localhost:9200 | URL of the OIDC issuer. It defaults to URL of the builtin IDP.|
 | OCIS_INSECURE<br/>PROXY_OIDC_INSECURE | bool | true | Disable TLS certificate validation for connections to the IDP. (not recommended for production environments.|
-| PROXY_OIDC_USERINFO_CACHE_SIZE | int | 1024 | |
-| PROXY_OIDC_USERINFO_CACHE_TTL | int | 10 | |
+| PROXY_OIDC_USERINFO_CACHE_SIZE | int | 1024 | Cache size for oidc user info.|
+| PROXY_OIDC_USERINFO_CACHE_TTL | int | 10 | Max TTL for the oidc user info cache.|
 | OCIS_JWT_SECRET<br/>PROXY_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| PROXY_ENABLE_PRESIGNEDURLS | bool | true | |
+| PROXY_ENABLE_PRESIGNEDURLS | bool | true | Allow ocs to get a signing key to sign requests.|
 | PROXY_ACCOUNT_BACKEND_TYPE | string | cs3 | Account backend the proxy should use, currenly only 'cs3' is possible here.|
 | PROXY_USER_OIDC_CLAIM | string | email | The name of an OpenID Connect claim that should be used for resolving users with the account backend. Currently defaults to 'email'.|
 | PROXY_USER_CS3_CLAIM | string | mail | The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail' (other possible values are: 'username', 'displayname')|
