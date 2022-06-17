@@ -10,170 +10,232 @@
 |`OCIS_TRACING_ENABLED` +
 `PROXY_TRACING_ENABLED`
 | bool
-| false
-| Activates tracing.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates tracing.
 
 |`OCIS_TRACING_TYPE` +
 `PROXY_TRACING_TYPE`
 | string
-| 
-| The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
 
 |`OCIS_TRACING_ENDPOINT` +
 `PROXY_TRACING_ENDPOINT`
 | string
-| 
-| The endpoint of the tracing agent.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The endpoint of the tracing agent.
 
 |`OCIS_TRACING_COLLECTOR` +
 `PROXY_TRACING_COLLECTOR`
 | string
-| 
-| The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 |`OCIS_LOG_LEVEL` +
 `PROXY_LOG_LEVEL`
 | string
-| 
-| The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 
 |`OCIS_LOG_PRETTY` +
 `PROXY_LOG_PRETTY`
 | bool
-| false
-| Activates pretty log output.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates pretty log output.
 
 |`OCIS_LOG_COLOR` +
 `PROXY_LOG_COLOR`
 | bool
-| false
-| Activates colorized log output.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates colorized log output.
 
 |`OCIS_LOG_FILE` +
 `PROXY_LOG_FILE`
 | string
-| 
-| The path to the log file. Activates logging to this file if set.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
 
 |`PROXY_DEBUG_ADDR`
 | string
-| 127.0.0.1:9205
-| Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+a| [subs=-attributes]
+127.0.0.1:9205 
+a| [subs=-attributes]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
 |`PROXY_DEBUG_TOKEN`
 | string
-| 
-| Token to secure the metrics endpoint
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+Token to secure the metrics endpoint
 
 |`PROXY_DEBUG_PPROF`
 | bool
-| false
-| Enables pprof, which can be used for profiling
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Enables pprof, which can be used for profiling
 
 |`PROXY_DEBUG_ZPAGES`
 | bool
-| false
-| Enables zpages, which can be used for collecting and viewing in-memory traces.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 |`PROXY_HTTP_ADDR`
 | string
-| 0.0.0.0:9200
-| 
+a| [subs=-attributes]
+0.0.0.0:9200 
+a| [subs=-attributes]
+
 
 |`PROXY_HTTP_ROOT`
 | string
-| /
-| 
+a| [subs=-attributes]
+/ 
+a| [subs=-attributes]
+
 
 |`PROXY_TRANSPORT_TLS_CERT`
 | string
-| ~/.ocis/proxy/server.crt
-| 
+a| [subs=-attributes]
+~/.ocis/proxy/server.crt 
+a| [subs=-attributes]
+
 
 |`PROXY_TRANSPORT_TLS_KEY`
 | string
-| ~/.ocis/proxy/server.key
-| 
+a| [subs=-attributes]
+~/.ocis/proxy/server.key 
+a| [subs=-attributes]
+
 
 |`PROXY_TLS`
 | bool
-| true
-| 
+a| [subs=-attributes]
+true 
+a| [subs=-attributes]
+
 
 |`REVA_GATEWAY`
 | string
-| 127.0.0.1:9142
-| The CS3 gateway endpoint.
+a| [subs=-attributes]
+127.0.0.1:9142 
+a| [subs=-attributes]
+The CS3 gateway endpoint.
 
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
 `PROXY_OIDC_ISSUER`
 | string
-| \https://localhost:9200
-| URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+a| [subs=-attributes]
+\https://localhost:9200 
+a| [subs=-attributes]
+URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
 |`OCIS_INSECURE` +
 `PROXY_OIDC_INSECURE`
 | bool
-| true
-| Disable TLS certificate validation for connections to the IDP. (not recommended for production environments.
+a| [subs=-attributes]
+true 
+a| [subs=-attributes]
+Disable TLS certificate validation for connections to the IDP. (not recommended for production environments.
 
 |`PROXY_OIDC_USERINFO_CACHE_SIZE`
 | int
-| 1024
-| 
+a| [subs=-attributes]
+1024 
+a| [subs=-attributes]
+
 
 |`PROXY_OIDC_USERINFO_CACHE_TTL`
 | int
-| 10
-| 
+a| [subs=-attributes]
+10 
+a| [subs=-attributes]
+
 
 |`OCIS_JWT_SECRET` +
 `PROXY_JWT_SECRET`
 | string
-| 
-| The secret to mint and validate jwt tokens.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The secret to mint and validate jwt tokens.
 
 |`PROXY_ENABLE_PRESIGNEDURLS`
 | bool
-| true
-| 
+a| [subs=-attributes]
+true 
+a| [subs=-attributes]
+
 
 |`PROXY_ACCOUNT_BACKEND_TYPE`
 | string
-| cs3
-| Account backend the proxy should use, currenly only 'cs3' is possible here.
+a| [subs=-attributes]
+cs3 
+a| [subs=-attributes]
+Account backend the proxy should use, currenly only 'cs3' is possible here.
 
 |`PROXY_USER_OIDC_CLAIM`
 | string
-| email
-| The name of an OpenID Connect claim that should be used for resolving users with the account backend. Currently defaults to 'email'.
+a| [subs=-attributes]
+email 
+a| [subs=-attributes]
+The name of an OpenID Connect claim that should be used for resolving users with the account backend. Currently defaults to 'email'.
 
 |`PROXY_USER_CS3_CLAIM`
 | string
-| mail
-| The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail' (other possible values are: 'username', 'displayname')
+a| [subs=-attributes]
+mail 
+a| [subs=-attributes]
+The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail' (other possible values are: 'username', 'displayname')
 
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `PROXY_MACHINE_AUTH_API_KEY`
 | string
-| 
-| Machine auth API key used for accessing the 'auth-machine' service to impersonate users.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+Machine auth API key used for accessing the 'auth-machine' service to impersonate users.
 
 |`PROXY_AUTOPROVISION_ACCOUNTS`
 | bool
-| false
-| Set this to 'true' to automatically provsion users that do not yet exist in the users service on-demand upon first signin. To use this a write-enabled libregraph user backend needs to be setup an running.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Set this to 'true' to automatically provsion users that do not yet exist in the users service on-demand upon first signin. To use this a write-enabled libregraph user backend needs to be setup an running.
 
 |`PROXY_ENABLE_BASIC_AUTH`
 | bool
-| false
-| Set this to true to enable 'basic' (username/password) authentication. (Default: false)
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Set this to true to enable 'basic' (username/password) authentication. (Default: false)
 
 |`PROXY_INSECURE_BACKENDS`
 | bool
-| false
-| Disable TLS certificate validation for all http backend connections. (Default: false)
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Disable TLS certificate validation for all http backend connections. (Default: false)
 |===
 
 Since Version: `+` added, `-` deprecated

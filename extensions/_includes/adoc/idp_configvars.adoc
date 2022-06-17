@@ -9,301 +9,411 @@
 
 |`IDP_PASSWORD_RESET_URI`
 | string
-| 
-| The URI where a user can reset their password.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The URI where a user can reset their password.
 
 |`OCIS_TRACING_ENABLED` +
 `IDP_TRACING_ENABLED`
 | bool
-| false
-| Activates tracing.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates tracing.
 
 |`OCIS_TRACING_TYPE` +
 `IDP_TRACING_TYPE`
 | string
-| 
-| The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
 
 |`OCIS_TRACING_ENDPOINT` +
 `IDP_TRACING_ENDPOINT`
 | string
-| 
-| The endpoint of the tracing agent.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The endpoint of the tracing agent.
 
 |`OCIS_TRACING_COLLECTOR` +
 `IDP_TRACING_COLLECTOR`
 | string
-| 
-| The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 |`OCIS_LOG_LEVEL` +
 `IDP_LOG_LEVEL`
 | string
-| 
-| The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 
 |`OCIS_LOG_PRETTY` +
 `IDP_LOG_PRETTY`
 | bool
-| false
-| Activates pretty log output.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates pretty log output.
 
 |`OCIS_LOG_COLOR` +
 `IDP_LOG_COLOR`
 | bool
-| false
-| Activates colorized log output.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates colorized log output.
 
 |`OCIS_LOG_FILE` +
 `IDP_LOG_FILE`
 | string
-| 
-| The path to the log file. Activates logging to this file if set.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
 
 |`IDP_DEBUG_ADDR`
 | string
-| 127.0.0.1:9134
-| Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+a| [subs=-attributes]
+127.0.0.1:9134 
+a| [subs=-attributes]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
 |`IDP_DEBUG_TOKEN`
 | string
-| 
-| Token to secure the metrics endpoint
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+Token to secure the metrics endpoint
 
 |`IDP_DEBUG_PPROF`
 | bool
-| false
-| Enables pprof, which can be used for profiling
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Enables pprof, which can be used for profiling
 
 |`IDP_DEBUG_ZPAGES`
 | bool
-| false
-| Enables zpages, which can be used for collecting and viewing in-memory traces.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 |`IDP_HTTP_ADDR`
 | string
-| 127.0.0.1:9130
-| 
+a| [subs=-attributes]
+127.0.0.1:9130 
+a| [subs=-attributes]
+
 
 |`IDP_HTTP_ROOT`
 | string
-| /
-| 
+a| [subs=-attributes]
+/ 
+a| [subs=-attributes]
+
 
 |`IDP_TRANSPORT_TLS_CERT`
 | string
-| ~/.ocis/idp/server.crt
-| 
+a| [subs=-attributes]
+~/.ocis/idp/server.crt 
+a| [subs=-attributes]
+
 
 |`IDP_TRANSPORT_TLS_KEY`
 | string
-| ~/.ocis/idp/server.key
-| 
+a| [subs=-attributes]
+~/.ocis/idp/server.key 
+a| [subs=-attributes]
+
 
 |`IDP_TLS`
 | bool
-| false
-| 
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+
 
 |`REVA_GATEWAY`
 | string
-| 127.0.0.1:9142
-| CS3 gateway used to authenticate and look up users
+a| [subs=-attributes]
+127.0.0.1:9142 
+a| [subs=-attributes]
+CS3 gateway used to authenticate and look up users
 
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `IDP_MACHINE_AUTH_API_KEY`
 | string
-| 
-| Machine auth API key used for accessing the 'auth-machine' service to impersonate users when looking up their userinfo via the 'cs3' backend.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+Machine auth API key used for accessing the 'auth-machine' service to impersonate users when looking up their userinfo via the 'cs3' backend.
 
 |`IDP_ASSET_PATH`
 | string
-| 
-| 
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+
 
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
 `IDP_ISS`
 | string
-| \https://localhost:9200
-| The OIDC issuer URL to use.
+a| [subs=-attributes]
+\https://localhost:9200 
+a| [subs=-attributes]
+The OIDC issuer URL to use.
 
 |`IDP_IDENTITY_MANAGER`
 | string
-| ldap
-| The identity manager implementation to use, defaults to 'ldap', can be changed to 'cs3', 'kc', 'libregraph', 'cookie' or 'guest'.
+a| [subs=-attributes]
+ldap 
+a| [subs=-attributes]
+The identity manager implementation to use, defaults to 'ldap', can be changed to 'cs3', 'kc', 'libregraph', 'cookie' or 'guest'.
 
 |`IDP_URI_BASE_PATH`
 | string
-| 
-| 
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+
 
 |`IDP_SIGN_IN_URI`
 | string
-| 
-| 
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+
 
 |`IDP_SIGN_OUT_URI`
 | string
-| 
-| 
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+
 
 |`IDP_ENDPOINT_URI`
 | string
-| 
-| 
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+
 
 |`IDP_ENDSESSION_ENDPOINT_URI`
 | string
-| 
-| 
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+
 
 |`LDAP_INSECURE` +
 `IDP_INSECURE`
 | bool
-| false
-| Allow insecure connections to the user backend (eg. LDAP, CS3 api, ...).
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Allow insecure connections to the user backend (eg. LDAP, CS3 api, ...).
 
 |`IDP_ALLOW_CLIENT_GUESTS`
 | bool
-| false
-| 
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+
 
 |`IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION`
 | bool
-| false
-| 
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+
 
 |`IDP_ENCRYPTION_SECRET_FILE`
 | string
-| 
-| 
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+
 
 |`IDP_DISABLE_IDENTIFIER_WEBAPP`
 | bool
-| true
-| 
+a| [subs=-attributes]
+true 
+a| [subs=-attributes]
+
 
 |`IDP_IDENTIFIER_SCOPES_CONF`
 | string
-| 
-| 
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+
 
 |`IDP_SIGNING_KID`
 | string
-| 
-| 
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+
 
 |`IDP_SIGNING_METHOD`
 | string
-| PS256
-| 
+a| [subs=-attributes]
+PS256 
+a| [subs=-attributes]
+
 
 |`IDP_SIGNING_PRIVATE_KEY_FILES`
 | 
-| []
-| 
+a| [subs=-attributes]
+[] 
+a| [subs=-attributes]
+
 
 |`IDP_VALIDATION_KEYS_PATH`
 | string
-| 
-| 
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+
 
 |`IDP_ACCESS_TOKEN_EXPIRATION`
 | uint64
-| 86400
-| 
+a| [subs=-attributes]
+86400 
+a| [subs=-attributes]
+
 
 |`IDP_ID_TOKEN_EXPIRATION`
 | uint64
-| 3600
-| 
+a| [subs=-attributes]
+3600 
+a| [subs=-attributes]
+
 
 |`IDP_REFRESH_TOKEN_EXPIRATION`
 | uint64
-| 94608000
-| 
+a| [subs=-attributes]
+94608000 
+a| [subs=-attributes]
+
 
 |``
 | uint64
-| 0
-| 
+a| [subs=-attributes]
+0 
+a| [subs=-attributes]
+
 
 |`LDAP_URI` +
 `IDP_LDAP_URI`
 | string
-| ldaps://localhost:9235
-| 
+a| [subs=-attributes]
+ldaps://localhost:9235 
+a| [subs=-attributes]
+
 
 |`LDAP_CACERT` +
 `IDP_LDAP_TLS_CACERT`
 | string
-| ~/.ocis/idm/ldap.crt
-| 
+a| [subs=-attributes]
+~/.ocis/idm/ldap.crt 
+a| [subs=-attributes]
+
 
 |`LDAP_BIND_DN` +
 `IDP_LDAP_BIND_DN`
 | string
-| uid=idp,ou=sysusers,o=libregraph-idm
-| 
+a| [subs=-attributes]
+uid=idp,ou=sysusers,o=libregraph-idm 
+a| [subs=-attributes]
+
 
 |`LDAP_BIND_PASSWORD` +
 `IDP_LDAP_BIND_PASSWORD`
 | string
-| 
-| 
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+
 
 |`LDAP_USER_BASE_DN` +
 `IDP_LDAP_BASE_DN`
 | string
-| ou=users,o=libregraph-idm
-| 
+a| [subs=-attributes]
+ou=users,o=libregraph-idm 
+a| [subs=-attributes]
+
 
 |`LDAP_USER_SCOPE` +
 `IDP_LDAP_SCOPE`
 | string
-| sub
-| 
+a| [subs=-attributes]
+sub 
+a| [subs=-attributes]
+
 
 |`IDP_LDAP_LOGIN_ATTRIBUTE`
 | string
-| uid
-| 
+a| [subs=-attributes]
+uid 
+a| [subs=-attributes]
+
 
 |`LDAP_USER_SCHEMA_MAIL` +
 `IDP_LDAP_EMAIL_ATTRIBUTE`
 | string
-| mail
-| 
+a| [subs=-attributes]
+mail 
+a| [subs=-attributes]
+
 
 |`LDAP_USER_SCHEMA_USERNAME` +
 `IDP_LDAP_NAME_ATTRIBUTE`
 | string
-| displayName
-| 
+a| [subs=-attributes]
+displayName 
+a| [subs=-attributes]
+
 
 |`LDAP_USER_SCHEMA_ID` +
 `IDP_LDAP_UUID_ATTRIBUTE`
 | string
-| uid
-| 
+a| [subs=-attributes]
+uid 
+a| [subs=-attributes]
+
 
 |`IDP_LDAP_UUID_ATTRIBUTE_TYPE`
 | string
-| text
-| 
+a| [subs=-attributes]
+text 
+a| [subs=-attributes]
+
 
 |`LDAP_USER_FILTER` +
 `IDP_LDAP_FILTER`
 | string
-| 
-| 
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+
 
 |`LDAP_USER_OBJECTCLASS` +
 `IDP_LDAP_OBJECTCLASS`
 | string
-| inetOrgPerson
-| 
+a| [subs=-attributes]
+inetOrgPerson 
+a| [subs=-attributes]
+
 |===
 
 Since Version: `+` added, `-` deprecated

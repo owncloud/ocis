@@ -10,302 +10,408 @@
 |`OCIS_TRACING_ENABLED` +
 `USERS_TRACING_ENABLED`
 | bool
-| false
-| Activates tracing.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates tracing.
 
 |`OCIS_TRACING_TYPE` +
 `USERS_TRACING_TYPE`
 | string
-| 
-| The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
 
 |`OCIS_TRACING_ENDPOINT` +
 `USERS_TRACING_ENDPOINT`
 | string
-| 
-| The endpoint of the tracing agent.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The endpoint of the tracing agent.
 
 |`OCIS_TRACING_COLLECTOR` +
 `USERS_TRACING_COLLECTOR`
 | string
-| 
-| The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 |`OCIS_LOG_LEVEL` +
 `USERS_LOG_LEVEL`
 | string
-| 
-| The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 
 |`OCIS_LOG_PRETTY` +
 `USERS_LOG_PRETTY`
 | bool
-| false
-| Activates pretty log output.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates pretty log output.
 
 |`OCIS_LOG_COLOR` +
 `USERS_LOG_COLOR`
 | bool
-| false
-| Activates colorized log output.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates colorized log output.
 
 |`OCIS_LOG_FILE` +
 `USERS_LOG_FILE`
 | string
-| 
-| The path to the log file. Activates logging to this file if set.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
 
 |`USERS_DEBUG_ADDR`
 | string
-| 127.0.0.1:9145
-| Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+a| [subs=-attributes]
+127.0.0.1:9145 
+a| [subs=-attributes]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
 |`USERS_DEBUG_TOKEN`
 | string
-| 
-| Token to secure the metrics endpoint
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+Token to secure the metrics endpoint
 
 |`USERS_DEBUG_PPROF`
 | bool
-| false
-| Enables pprof, which can be used for profiling
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Enables pprof, which can be used for profiling
 
 |`USERS_DEBUG_ZPAGES`
 | bool
-| false
-| Enables zpages, which can be used for collecting and viewing in-memory traces.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 |`USERS_GRPC_ADDR`
 | string
-| 127.0.0.1:9144
-| The address of the grpc service.
+a| [subs=-attributes]
+127.0.0.1:9144 
+a| [subs=-attributes]
+The address of the grpc service.
 
 |`USERS_GRPC_PROTOCOL`
 | string
-| tcp
-| The transport protocol of the grpc service.
+a| [subs=-attributes]
+tcp 
+a| [subs=-attributes]
+The transport protocol of the grpc service.
 
 |`OCIS_JWT_SECRET` +
 `USERS_JWT_SECRET`
 | string
-| 
-| The secret to mint and validate jwt tokens.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The secret to mint and validate jwt tokens.
 
 |`REVA_GATEWAY`
 | string
-| 127.0.0.1:9142
-| The CS3 gateway endpoint.
+a| [subs=-attributes]
+127.0.0.1:9142 
+a| [subs=-attributes]
+The CS3 gateway endpoint.
 
 |`USERS_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
-| false
-| Disables the encoding of the user's groupmember ships in the reva access token. To reduces token size, especially when users are members of a large number of groups.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Disables the encoding of the user's groupmember ships in the reva access token. To reduces token size, especially when users are members of a large number of groups.
 
 |`USERS_DRIVER`
 | string
-| ldap
-| The user driver which should be used by the users service. Defaults to 'ldap', can be 'owncloudsql', 'json' or 'rest'
+a| [subs=-attributes]
+ldap 
+a| [subs=-attributes]
+The user driver which should be used by the users service. Defaults to 'ldap', can be 'owncloudsql', 'json' or 'rest'
 
 |`LDAP_URI` +
 `USERS_LDAP_URI`
 | string
-| ldaps://localhost:9235
-| URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
+a| [subs=-attributes]
+ldaps://localhost:9235 
+a| [subs=-attributes]
+URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
 
 |`LDAP_CACERT` +
 `USERS_LDAP_CACERT`
 | string
-| ~/.ocis/idm/ldap.crt
-| Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty the system default CA bundle will be used.
+a| [subs=-attributes]
+~/.ocis/idm/ldap.crt 
+a| [subs=-attributes]
+Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty the system default CA bundle will be used.
 
 |`LDAP_INSECURE` +
 `USERS_LDAP_INSECURE`
 | bool
-| false
-| Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.
 
 |`LDAP_BIND_DN` +
 `USERS_LDAP_BIND_DN`
 | string
-| uid=reva,ou=sysusers,o=libregraph-idm
-| LDAP DN to use for simple bind authentication with the target LDAP server.
+a| [subs=-attributes]
+uid=reva,ou=sysusers,o=libregraph-idm 
+a| [subs=-attributes]
+LDAP DN to use for simple bind authentication with the target LDAP server.
 
 |`LDAP_BIND_PASSWORD` +
 `USERS_LDAP_BIND_PASSWORD`
 | string
-| 
-| Password to use for authenticating the 'bind_dn'.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+Password to use for authenticating the 'bind_dn'.
 
 |`LDAP_USER_BASE_DN` +
 `USERS_LDAP_USER_BASE_DN`
 | string
-| ou=users,o=libregraph-idm
-| Search base DN for looking up LDAP users.
+a| [subs=-attributes]
+ou=users,o=libregraph-idm 
+a| [subs=-attributes]
+Search base DN for looking up LDAP users.
 
 |`LDAP_GROUP_BASE_DN` +
 `USERS_LDAP_GROUP_BASE_DN`
 | string
-| ou=groups,o=libregraph-idm
-| Search base DN for looking up LDAP groups.
+a| [subs=-attributes]
+ou=groups,o=libregraph-idm 
+a| [subs=-attributes]
+Search base DN for looking up LDAP groups.
 
 |`LDAP_USER_SCOPE` +
 `USERS_LDAP_USER_SCOPE`
 | string
-| sub
-| LDAP search scope to use when looking up users ('base', 'one', 'sub').
+a| [subs=-attributes]
+sub 
+a| [subs=-attributes]
+LDAP search scope to use when looking up users ('base', 'one', 'sub').
 
 |`LDAP_GROUP_SCOPE` +
 `USERS_LDAP_GROUP_SCOPE`
 | string
-| sub
-| LDAP search scope to use when looking up gruops ('base', 'one', 'sub').
+a| [subs=-attributes]
+sub 
+a| [subs=-attributes]
+LDAP search scope to use when looking up gruops ('base', 'one', 'sub').
 
 |`LDAP_USER_FILTER` +
 `USERS_LDAP_USER_FILTER`
 | string
-| 
-| LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').
 
 |`LDAP_GROUP_FILTER` +
 `USERS_LDAP_GROUP_FILTER`
 | string
-| 
-| LDAP filter to add to the default filters for group searches.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+LDAP filter to add to the default filters for group searches.
 
 |`LDAP_USER_OBJECTCLASS` +
 `USERS_LDAP_USER_OBJECTCLASS`
 | string
-| inetOrgPerson
-| The object class to use for users in the default user search filter ('inetOrgPerson').
+a| [subs=-attributes]
+inetOrgPerson 
+a| [subs=-attributes]
+The object class to use for users in the default user search filter ('inetOrgPerson').
 
 |`LDAP_GROUP_OBJECTCLASS` +
 `USERS_LDAP_GROUP_OBJECTCLASS`
 | string
-| groupOfNames
-| The object class to use for groups in the default group search filter ('groupOfNames'). 
+a| [subs=-attributes]
+groupOfNames 
+a| [subs=-attributes]
+The object class to use for groups in the default group search filter ('groupOfNames'). 
 
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
 `USERS_IDP_URL`
 | string
-| \https://localhost:9200
-| The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
+a| [subs=-attributes]
+\https://localhost:9200 
+a| [subs=-attributes]
+The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 
 |`LDAP_USER_SCHEMA_ID` +
 `USERS_LDAP_USER_SCHEMA_ID`
 | string
-| ownclouduuid
-| LDAP Attribute to use as the unique id for users. This should be a stable globally unique id (e.g. a UUID).
+a| [subs=-attributes]
+ownclouduuid 
+a| [subs=-attributes]
+LDAP Attribute to use as the unique id for users. This should be a stable globally unique id (e.g. a UUID).
 
 |`LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
 `USERS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 | bool
-| false
-| Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ids.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ids.
 
 |`LDAP_USER_SCHEMA_MAIL` +
 `USERS_LDAP_USER_SCHEMA_MAIL`
 | string
-| mail
-| LDAP Attribute to use for the email address of users.
+a| [subs=-attributes]
+mail 
+a| [subs=-attributes]
+LDAP Attribute to use for the email address of users.
 
 |`LDAP_USER_SCHEMA_DISPLAYNAME` +
 `USERS_LDAP_USER_SCHEMA_DISPLAYNAME`
 | string
-| displayname
-| LDAP Attribute to use for the displayname of users.
+a| [subs=-attributes]
+displayname 
+a| [subs=-attributes]
+LDAP Attribute to use for the displayname of users.
 
 |`LDAP_USER_SCHEMA_USERNAME` +
 `USERS_LDAP_USER_SCHEMA_USERNAME`
 | string
-| uid
-| LDAP Attribute to use for username of users.
+a| [subs=-attributes]
+uid 
+a| [subs=-attributes]
+LDAP Attribute to use for username of users.
 
 |`LDAP_GROUP_SCHEMA_ID` +
 `USERS_LDAP_GROUP_SCHEMA_ID`
 | string
-| ownclouduuid
-| LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
+a| [subs=-attributes]
+ownclouduuid 
+a| [subs=-attributes]
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
 
 |`LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING` +
 `USERS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 | bool
-| false
-| Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ids.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ids.
 
 |`LDAP_GROUP_SCHEMA_MAIL` +
 `USERS_LDAP_GROUP_SCHEMA_MAIL`
 | string
-| mail
-| LDAP Attribute to use for the email address of groups (can be empty).
+a| [subs=-attributes]
+mail 
+a| [subs=-attributes]
+LDAP Attribute to use for the email address of groups (can be empty).
 
 |`LDAP_GROUP_SCHEMA_DISPLAYNAME` +
 `USERS_LDAP_GROUP_SCHEMA_DISPLAYNAME`
 | string
-| cn
-| LDAP Attribute to use for the displayname of groups (often the same as groupname attribute)
+a| [subs=-attributes]
+cn 
+a| [subs=-attributes]
+LDAP Attribute to use for the displayname of groups (often the same as groupname attribute)
 
 |`LDAP_GROUP_SCHEMA_GROUPNAME` +
 `USERS_LDAP_GROUP_SCHEMA_GROUPNAME`
 | string
-| cn
-| LDAP Attribute to use for the name of groups
+a| [subs=-attributes]
+cn 
+a| [subs=-attributes]
+LDAP Attribute to use for the name of groups
 
 |`LDAP_GROUP_SCHEMA_MEMBER` +
 `USERS_LDAP_GROUP_SCHEMA_MEMBER`
 | string
-| member
-| LDAP Attribute that is used for group members.
+a| [subs=-attributes]
+member 
+a| [subs=-attributes]
+LDAP Attribute that is used for group members.
 
 |`USERS_OWNCLOUDSQL_DB_USERNAME`
 | string
-| owncloud
-| Database user to use for authenticating with the owncloud database.
+a| [subs=-attributes]
+owncloud 
+a| [subs=-attributes]
+Database user to use for authenticating with the owncloud database.
 
 |`USERS_OWNCLOUDSQL_DB_PASSWORD`
 | string
-| secret
-| Password for the database user.
+a| [subs=-attributes]
+secret 
+a| [subs=-attributes]
+Password for the database user.
 
 |`USERS_OWNCLOUDSQL_DB_HOST`
 | string
-| mysql
-| Hostname of the database server.
+a| [subs=-attributes]
+mysql 
+a| [subs=-attributes]
+Hostname of the database server.
 
 |`USERS_OWNCLOUDSQL_DB_PORT`
 | int
-| 3306
-| Network port to use for the database connection.
+a| [subs=-attributes]
+3306 
+a| [subs=-attributes]
+Network port to use for the database connection.
 
 |`USERS_OWNCLOUDSQL_DB_NAME`
 | string
-| owncloud
-| Name of the owncloud database.
+a| [subs=-attributes]
+owncloud 
+a| [subs=-attributes]
+Name of the owncloud database.
 
 |`USERS_OWNCLOUDSQL_IDP`
 | string
-| \https://localhost:9200
-| The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
+a| [subs=-attributes]
+\https://localhost:9200 
+a| [subs=-attributes]
+The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 
 |`USERS_OWNCLOUDSQL_NOBODY`
 | int64
-| 90
-| Fallback number if no numeric UID and GID properties are provided.
+a| [subs=-attributes]
+90 
+a| [subs=-attributes]
+Fallback number if no numeric UID and GID properties are provided.
 
 |`USERS_OWNCLOUDSQL_JOIN_USERNAME`
 | bool
-| false
-| Join the user properties table to read usernames
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Join the user properties table to read usernames
 
 |`USERS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID`
 | bool
-| false
-| Join the user properties table to read user ids (boolean).
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Join the user properties table to read user ids (boolean).
 
 |`USERS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH`
 | bool
-| false
-| Allow 'medial search' when searching for users instead of just doing a prefix search. (Allows finding 'Alice' when searching for 'lic'.)
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Allow 'medial search' when searching for users instead of just doing a prefix search. (Allows finding 'Alice' when searching for 'lic'.)
 |===
 
 Since Version: `+` added, `-` deprecated

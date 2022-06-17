@@ -14,8 +14,10 @@
 `{{- $value }}` 
 {{- end }}
 | {{.Type}}
-| {{.DefaultValue}}
-| {{.Description}}
+a| [subs=-attributes]
+{{.DefaultValue}} 
+a| [subs=-attributes]
+{{.Description}}
 
 {{- end }}
 |===

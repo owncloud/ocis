@@ -10,93 +10,127 @@
 |`OCIS_LOG_LEVEL` +
 `NOTIFICATIONS_LOG_LEVEL`
 | string
-| 
-| The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 
 |`OCIS_LOG_PRETTY` +
 `NOTIFICATIONS_LOG_PRETTY`
 | bool
-| false
-| Activates pretty log output.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates pretty log output.
 
 |`OCIS_LOG_COLOR` +
 `NOTIFICATIONS_LOG_COLOR`
 | bool
-| false
-| Activates colorized log output.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates colorized log output.
 
 |`OCIS_LOG_FILE` +
 `NOTIFICATIONS_LOG_FILE`
 | string
-| 
-| The path to the log file. Activates logging to this file if set.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
 
 |`NOTIFICATIONS_DEBUG_ADDR`
 | string
-| 127.0.0.1:9174
-| Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+a| [subs=-attributes]
+127.0.0.1:9174 
+a| [subs=-attributes]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
 |`NOTIFICATIONS_DEBUG_TOKEN`
 | string
-| 
-| Token to secure the metrics endpoint
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+Token to secure the metrics endpoint
 
 |`NOTIFICATIONS_DEBUG_PPROF`
 | bool
-| false
-| Enables pprof, which can be used for profiling
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Enables pprof, which can be used for profiling
 
 |`NOTIFICATIONS_DEBUG_ZPAGES`
 | bool
-| false
-| Enables zpages, which can be used for collecting and viewing in-memory traces.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 |`NOTIFICATIONS_SMTP_HOST`
 | string
-| 127.0.0.1
-| SMTP host, to connect to.
+a| [subs=-attributes]
+127.0.0.1 
+a| [subs=-attributes]
+SMTP host, to connect to.
 
 |`NOTIFICATIONS_SMTP_PORT`
 | string
-| 1025
-| Port of the SMTP host, to connect to.
+a| [subs=-attributes]
+1025 
+a| [subs=-attributes]
+Port of the SMTP host, to connect to.
 
 |`NOTIFICATIONS_SMTP_SENDER`
 | string
-| noreply@example.com
-| Sender of emails, that will be sent.
+a| [subs=-attributes]
+noreply@example.com 
+a| [subs=-attributes]
+Sender of emails, that will be sent.
 
 |`NOTIFICATIONS_SMTP_PASSWORD`
 | string
-| 
-| Password of the SMTP host, to connect to.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+Password of the SMTP host, to connect to.
 
 |`NOTIFICATIONS_EVENTS_ENDPOINT`
 | string
-| 127.0.0.1:9233
-| Endpoint of the event system.
+a| [subs=-attributes]
+127.0.0.1:9233 
+a| [subs=-attributes]
+Endpoint of the event system.
 
 |`NOTIFICATIONS_EVENTS_CLUSTER`
 | string
-| ocis-cluster
-| Cluster ID of the event system.
+a| [subs=-attributes]
+ocis-cluster 
+a| [subs=-attributes]
+Cluster ID of the event system.
 
 |`NOTIFICATIONS_EVENTS_GROUP`
 | string
-| notifications
-| Name of the event group / queue on the event system.
+a| [subs=-attributes]
+notifications 
+a| [subs=-attributes]
+Name of the event group / queue on the event system.
 
 |`REVA_GATEWAY` +
 `NOTIFICATIONS_REVA_GATEWAY`
 | string
-| 127.0.0.1:9142
-| CS3 gateway used to look up user metadata
+a| [subs=-attributes]
+127.0.0.1:9142 
+a| [subs=-attributes]
+CS3 gateway used to look up user metadata
 
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `NOTIFICATIONS_MACHINE_AUTH_API_KEY`
 | string
-| 
-| Machine auth API key used for accessing the 'auth-machine' service to look up their email.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+Machine auth API key used for accessing the 'auth-machine' service to look up their email.
 |===
 
 Since Version: `+` added, `-` deprecated

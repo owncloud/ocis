@@ -10,101 +10,137 @@
 |`OCIS_TRACING_ENABLED` +
 `STORAGE_PUBLICLINK_TRACING_ENABLED`
 | bool
-| false
-| Activates tracing.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates tracing.
 
 |`OCIS_TRACING_TYPE` +
 `STORAGE_PUBLICLINK_TRACING_TYPE`
 | string
-| 
-| The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
 
 |`OCIS_TRACING_ENDPOINT` +
 `STORAGE_PUBLICLINK_TRACING_ENDPOINT`
 | string
-| 
-| The endpoint of the tracing agent.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The endpoint of the tracing agent.
 
 |`OCIS_TRACING_COLLECTOR` +
 `STORAGE_PUBLICLINK_TRACING_COLLECTOR`
 | string
-| 
-| The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 |`OCIS_LOG_LEVEL` +
 `STORAGE_PUBLICLINK_LOG_LEVEL`
 | string
-| 
-| The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 
 |`OCIS_LOG_PRETTY` +
 `STORAGE_PUBLICLINK_LOG_PRETTY`
 | bool
-| false
-| Activates pretty log output.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates pretty log output.
 
 |`OCIS_LOG_COLOR` +
 `STORAGE_PUBLICLINK_LOG_COLOR`
 | bool
-| false
-| Activates colorized log output.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates colorized log output.
 
 |`OCIS_LOG_FILE` +
 `STORAGE_PUBLICLINK_LOG_FILE`
 | string
-| 
-| The path to the log file. Activates logging to this file if set.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
 
 |`STORAGE_PUBLICLINK_DEBUG_ADDR`
 | string
-| 127.0.0.1:9179
-| Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+a| [subs=-attributes]
+127.0.0.1:9179 
+a| [subs=-attributes]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
 |`STORAGE_PUBLICLINK_DEBUG_TOKEN`
 | string
-| 
-| Token to secure the metrics endpoint
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+Token to secure the metrics endpoint
 
 |`STORAGE_PUBLICLINK_DEBUG_PPROF`
 | bool
-| false
-| Enables pprof, which can be used for profiling
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Enables pprof, which can be used for profiling
 
 |`STORAGE_PUBLICLINK_DEBUG_ZPAGES`
 | bool
-| false
-| Enables zpages, which can be used for collecting and viewing in-memory traces.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 |`STORAGE_PUBLICLINK_GRPC_ADDR`
 | string
-| 127.0.0.1:9178
-| The address of the grpc service.
+a| [subs=-attributes]
+127.0.0.1:9178 
+a| [subs=-attributes]
+The address of the grpc service.
 
 |`STORAGE_PUBLICLINK_GRPC_PROTOCOL`
 | string
-| tcp
-| The transport protocol of the grpc service.
+a| [subs=-attributes]
+tcp 
+a| [subs=-attributes]
+The transport protocol of the grpc service.
 
 |`OCIS_JWT_SECRET` +
 `STORAGE_PUBLICLINK_JWT_SECRET`
 | string
-| 
-| The secret to mint and validate jwt tokens.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The secret to mint and validate jwt tokens.
 
 |`REVA_GATEWAY`
 | string
-| 127.0.0.1:9142
-| The CS3 gateway endpoint.
+a| [subs=-attributes]
+127.0.0.1:9142 
+a| [subs=-attributes]
+The CS3 gateway endpoint.
 
 |`STORAGE_PUBLICLINK_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
-| false
-| 
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+
 
 |`STORAGE_PUBLICLINK_STORAGE_PROVIDER_MOUNT_ID`
 | string
-| 7993447f-687f-490d-875c-ac95e89a62a4
-| 
+a| [subs=-attributes]
+7993447f-687f-490d-875c-ac95e89a62a4 
+a| [subs=-attributes]
+
 |===
 
 Since Version: `+` added, `-` deprecated

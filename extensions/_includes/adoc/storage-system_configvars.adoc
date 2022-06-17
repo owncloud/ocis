@@ -10,152 +10,208 @@
 |`OCIS_TRACING_ENABLED` +
 `STORAGE_SYSTEM_TRACING_ENABLED`
 | bool
-| false
-| Activates tracing.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates tracing.
 
 |`OCIS_TRACING_TYPE` +
 `STORAGE_SYSTEM_TRACING_TYPE`
 | string
-| 
-| The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
 
 |`OCIS_TRACING_ENDPOINT` +
 `STORAGE_SYSTEM_TRACING_ENDPOINT`
 | string
-| 
-| The endpoint of the tracing agent.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The endpoint of the tracing agent.
 
 |`OCIS_TRACING_COLLECTOR` +
 `STORAGE_SYSTEM_TRACING_COLLECTOR`
 | string
-| 
-| The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 |`OCIS_LOG_LEVEL` +
 `STORAGE_SYSTEM_LOG_LEVEL`
 | string
-| 
-| The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 
 |`OCIS_LOG_PRETTY` +
 `STORAGE_SYSTEM_LOG_PRETTY`
 | bool
-| false
-| Activates pretty log output.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates pretty log output.
 
 |`OCIS_LOG_COLOR` +
 `STORAGE_SYSTEM_LOG_COLOR`
 | bool
-| false
-| Activates colorized log output.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Activates colorized log output.
 
 |`OCIS_LOG_FILE` +
 `STORAGE_SYSTEM_LOG_FILE`
 | string
-| 
-| The path to the log file. Activates logging to this file if set.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
 
 |`STORAGE_SYSTEM_DEBUG_ADDR`
 | string
-| 127.0.0.1:9217
-| Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+a| [subs=-attributes]
+127.0.0.1:9217 
+a| [subs=-attributes]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
 |`STORAGE_SYSTEM_DEBUG_TOKEN`
 | string
-| 
-| Token to secure the metrics endpoint
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+Token to secure the metrics endpoint
 
 |`STORAGE_SYSTEM_DEBUG_PPROF`
 | bool
-| false
-| Enables pprof, which can be used for profiling
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Enables pprof, which can be used for profiling
 
 |`STORAGE_SYSTEM_DEBUG_ZPAGES`
 | bool
-| false
-| Enables zpages, which can be used for collecting and viewing in-memory traces.
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 |`STORAGE_SYSTEM_GRPC_ADDR`
 | string
-| 127.0.0.1:9215
-| The address of the grpc service.
+a| [subs=-attributes]
+127.0.0.1:9215 
+a| [subs=-attributes]
+The address of the grpc service.
 
 |`STORAGE_SYSTEM_GRPC_PROTOCOL`
 | string
-| tcp
-| The transport protocol of the grpc service.
+a| [subs=-attributes]
+tcp 
+a| [subs=-attributes]
+The transport protocol of the grpc service.
 
 |`STORAGE_SYSTEM_HTTP_ADDR`
 | string
-| 127.0.0.1:9216
-| The address of the http service.
+a| [subs=-attributes]
+127.0.0.1:9216 
+a| [subs=-attributes]
+The address of the http service.
 
 |`STORAGE_SYSTEM_HTTP_PROTOCOL`
 | string
-| tcp
-| The transport protocol of the http service.
+a| [subs=-attributes]
+tcp 
+a| [subs=-attributes]
+The transport protocol of the http service.
 
 |`STORAGE_SYSTEM_EVENTS_ENDPOINT`
 | string
-| 
-| the address of the streaming service
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+the address of the streaming service
 
 |`STORAGE_SYSTEM_EVENTS_CLUSTER`
 | string
-| 
-| the clusterID of the streaming service. Mandatory when using nats
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+the clusterID of the streaming service. Mandatory when using nats
 
 |`OCIS_JWT_SECRET` +
 `STORAGE_SYSTEM_JWT_SECRET`
 | string
-| 
-| The secret to mint and validate jwt tokens.
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+The secret to mint and validate jwt tokens.
 
 |`REVA_GATEWAY`
 | string
-| 127.0.0.1:9142
-| The CS3 gateway endpoint.
+a| [subs=-attributes]
+127.0.0.1:9142 
+a| [subs=-attributes]
+The CS3 gateway endpoint.
 
 |`OCIS_SYSTEM_USER_ID`
 | string
-| 
-| 
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+
 
 |`OCIS_SYSTEM_USER_API_KEY`
 | string
-| 
-| 
+a| [subs=-attributes]
+ 
+a| [subs=-attributes]
+
 
 |`STORAGE_SYSTEM_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
-| false
-| 
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+
 
 |`STORAGE_SYSTEM_DRIVER`
 | string
-| ocis
-| The driver which should be used by the service
+a| [subs=-attributes]
+ocis 
+a| [subs=-attributes]
+The driver which should be used by the service
 
 |`STORAGE_SYSTEM_OCIS_ROOT`
 | string
-| ~/.ocis/storage/metadata
-| 
+a| [subs=-attributes]
+~/.ocis/storage/metadata 
+a| [subs=-attributes]
+
 
 |`STORAGE_SYSTEM_DATA_SERVER_URL`
 | string
-| \http://localhost:9216/data
-| 
+a| [subs=-attributes]
+\http://localhost:9216/data 
+a| [subs=-attributes]
+
 
 |`STORAGE_SYSTEM_TEMP_FOLDER`
 | string
-| ~/.ocis/tmp/metadata
-| 
+a| [subs=-attributes]
+~/.ocis/tmp/metadata 
+a| [subs=-attributes]
+
 
 |`OCIS_INSECURE` +
 `STORAGE_SYSTEM_DATAPROVIDER_INSECURE`
 | bool
-| false
-| 
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+
 |===
 
 Since Version: `+` added, `-` deprecated
