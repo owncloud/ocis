@@ -234,7 +234,7 @@ func FilesAuditEvent(base AuditEvent, itemid, owner, path string) AuditEventFile
 
 // ContainerCreated converts a ContainerCreated event to an AuditEventContainerCreated
 func ContainerCreated(ev events.ContainerCreated) AuditEventContainerCreated {
-	iid, path, uid := extractFileDetails(ev.Ref, ev.Executant)
+	iid, path, uid := extractFileDetails(ev.Ref, ev.Owner)
 	base := BasicAuditEvent(uid, "", MessageContainerCreated(iid), ActionContainerCreated)
 	return AuditEventContainerCreated{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
@@ -480,18 +480,18 @@ func formatTime(t *types.Timestamp) string {
 }
 
 func updateType(u string) string {
-	switch {
-	case u == "permissions":
+	switch u {
+	case "permissions":
 		return ActionSharePermissionUpdated
-	case u == "displayname":
+	case "displayname":
 		return ActionShareDisplayNameUpdated
-	case u == "TYPE_PERMISSIONS":
+	case "TYPE_PERMISSIONS":
 		return ActionSharePermissionUpdated
-	case u == "TYPE_DISPLAYNAME":
+	case "TYPE_DISPLAYNAME":
 		return ActionShareDisplayNameUpdated
-	case u == "TYPE_PASSWORD":
+	case "TYPE_PASSWORD":
 		return ActionSharePasswordUpdated
-	case u == "TYPE_EXPIRATION":
+	case "TYPE_EXPIRATION":
 		return ActionShareExpirationUpdated
 	default:
 		fmt.Println("Unknown update type", u)
