@@ -29,7 +29,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIFavorites/unfavoriteFile.feature:70](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/unfavoriteFile.feature#L70)
 - [webUIFavorites/unfavoriteFile.feature:87](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/unfavoriteFile.feature#L87)
 - [webUIFavorites/unfavoriteFile.feature:102](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/unfavoriteFile.feature#L102)
-- [webUIFilesSearch/search.feature:178](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L178)
 - [webUIResharing1/reshareUsers.feature:219](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing1/reshareUsers.feature#L219)
 
 ### [file_path property is not unique for a share created with same resource name i.e already present in sharee](https://github.com/owncloud/ocis/issues/2249)
@@ -46,9 +45,9 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUISharingInternalUsers/shareWithUsers.feature:276](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L276)
 - [webUISharingInternalUsers/shareWithUsers.feature:277](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L277)
 - [webUISharingInternalUsersShareWithPage/shareWithUsers.feature:140](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersShareWithPage/shareWithUsers.feature#L140)
-- [webUISharingPermissionsUsers/sharePermissionsUsers.feature:196](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L196)
-- [webUISharingPermissionsUsers/sharePermissionsUsers.feature:209](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L209)
-- [webUISharingPermissionsUsers/sharePermissionsUsers.feature:223](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L223)
+- [webUISharingPermissionsUsers/sharePermissionsUsers.feature:187](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L196)
+- [webUISharingPermissionsUsers/sharePermissionsUsers.feature:200](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L209)
+- [webUISharingPermissionsUsers/sharePermissionsUsers.feature:214](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L223)
 - [webUIResharing2/reshareUsers.feature:41](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L41)
 - [webUIResharing2/reshareUsers.feature:69](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L69)
 - [webUIResharing2/reshareUsers.feature:70](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L70)
@@ -60,8 +59,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIResharing1/reshareUsers.feature:46](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing1/reshareUsers.feature#L46)
 - [webUIResharing1/reshareUsers.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing1/reshareUsers.feature#L74)
 
-
-### [No share indicators inside share jail (needs concept / PM decision)](https://github.com/owncloud/web/issues/6894)
+### [No share indicators inside share jail](https://github.com/owncloud/web/issues/6894)
 - [webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:100](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersSharingIndicator/shareWithUsers.feature#L100)
 - [webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:121](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersSharingIndicator/shareWithUsers.feature#L121)
 - [webUISharingPublicManagement/publicLinkIndicator.feature:64](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkIndicator.feature#L64)
@@ -151,22 +149,15 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:52](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature#L52)
 - [webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature#L71)
 - [webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature#L72)
-- [webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:75](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature#L75)
 - [webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:86](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature#L86)
 - [webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:106](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature#L106)
 - [webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:130](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature#L130)
 - [webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature:147](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicExpire/shareByPublicLinkExpiringLinks.feature#L147)
 - [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:276](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L276)
-- [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:284](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L284)
-- [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:293](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L293)
-- [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:302](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L302)
-- [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:311](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L311)
 - [webUIMoveFilesFolders/moveFiles.feature:97](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIMoveFilesFolders/moveFiles.feature#L97)
 - [webUIMoveFilesFolders/moveFolders.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIMoveFilesFolders/moveFolders.feature#L72)
 - [webUIFilesActionMenu/versions.feature:93](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L93)
 
-### [PROPFIND to sub-folder of a shared resources with same name gives 404](https://github.com/owncloud/ocis/issues/3859)
-- [webUISharingAcceptShares/acceptShares.feature:245](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L245)
 
 ### [Share not created with default permissions](https://github.com/owncloud/ocis/issues/1277)
 - [webUISharingInternalGroups/shareWithGroups.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L74)
@@ -202,18 +193,12 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUISharingNotifications/shareWithUsers.feature:40](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingNotifications/shareWithUsers.feature#L40)
 - [webUISharingNotifications/shareWithUsers.feature:53](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingNotifications/shareWithUsers.feature#L53)
 
-### [name of public link is empty and not "Public link" when not specified in the create request](https://github.com/owncloud/ocis/issues/1237)
-- [webUISharingPublicBasic/publicLinkCreate.feature:11](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicBasic/publicLinkCreate.feature#L11)
-- [webUISharingPublicBasic/publicLinkCreate.feature:28](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicBasic/publicLinkCreate.feature#L28)
-- [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:33](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L33)
-- [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:34](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L34)
-- [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:35](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L35)
-- [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:60](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L60)
-
 ### [Listing shares via ocs API does not show path for parent folders](https://github.com/owncloud/ocis/issues/1231)
 - [webUISharingPublicManagement/shareByPublicLink.feature:133](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/shareByPublicLink.feature#L133)
 
 ### [Propfind response to trashbin endpoint is different in ocis](https://github.com/owncloud/product/issues/186)
+- [webUIFilesSearch/search.feature:178](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L178)
+
 ### [restoring a file from "Deleted files" (trashbin) is not possible if the original folder does not exist any-more](https://github.com/owncloud/web/issues/1753)
 - [webUITrashbinRestore/trashbinRestore.feature:138](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinRestore/trashbinRestore.feature#L138)
 
@@ -244,9 +229,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIFilesDetails/fileDetails.feature:107](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L107)
 - [webUIFilesDetails/fileDetails.feature:124](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L124)
 - [webUIFilesDetails/fileDetails.feature:153](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L153)
-
-### [Group shares support](https://github.com/owncloud/ocis/issues/1289)
-- [webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:80](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature#L80)
 
 ### [Deletion of a recursive folder from trashbin is not possible](https://github.com/owncloud/product/issues/188)
 - [webUITrashbinDelete/trashbinDelete.feature:85](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L85)
@@ -396,10 +378,9 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIFilesDetails/fileDetails.feature:57](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L57)
 - [webUIRenameFiles/renameFiles.feature:257](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L257)
 
-### [Copy/move not possible from and into shares in oCIS](https://github.com/owncloud/web/issues/6892)
+### [Copy/move not possible from and into shares in oCIS](https://github.com/owncloud/web/issues/6892) 
 - [webUIFilesCopy/copy.feature:89](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copy.feature#L89)
 - [webUIFilesCopy/copy.feature:101](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copy.feature#L101)
 
-### WebUI shows wrong role name
-- [webUISharingPermissionsUsers/sharePermissionsUsers.feature:169](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L169)
-
+### [PROPFIND to sub-folder of a shared resources with same name gives 404](https://github.com/owncloud/ocis/issues/3859)
+- [webUISharingAcceptShares/acceptShares.feature:245](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L245)

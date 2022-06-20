@@ -1,4 +1,4 @@
-Enhancement: Update web to v5.5.0-rc.10
+Enhancement: Update web to v5.5.0
 
 TBD
 
