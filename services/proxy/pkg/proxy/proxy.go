@@ -16,12 +16,12 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 
-	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/proxy/policy"
-	proxytracing "github.com/owncloud/ocis/v2/extensions/proxy/pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	pkgtrace "github.com/owncloud/ocis/v2/ocis-pkg/tracing"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/proxy/policy"
+	proxytracing "github.com/owncloud/ocis/v2/services/proxy/pkg/tracing"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )

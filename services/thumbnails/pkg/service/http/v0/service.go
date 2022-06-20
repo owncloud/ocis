@@ -9,10 +9,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/golang-jwt/jwt/v4"
 
-	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/config"
-	tjwt "github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/service/jwt"
-	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/thumbnail"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
+	tjwt "github.com/owncloud/ocis/v2/services/thumbnails/pkg/service/jwt"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail"
 )
 
 type contextKey string

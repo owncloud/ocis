@@ -9,10 +9,10 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/chi/v5"
-	"github.com/owncloud/ocis/v2/extensions/graph/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	mevents "go-micro.dev/v4/events"
 	"google.golang.org/grpc"
 )

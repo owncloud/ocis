@@ -14,7 +14,7 @@ import (
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "server",
-		Usage:    "start a fullstack server (runtime and all extensions in supervised mode)",
+		Usage:    "start a fullstack server (runtime and all services in supervised mode)",
 		Category: "fullstack",
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg, false); err != nil {

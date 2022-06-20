@@ -5,8 +5,8 @@ import (
 	"net/url"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/data"
-	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/response"
+	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/data"
+	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/response"
 )
 
 // ListUserGroups lists a users groups

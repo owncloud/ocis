@@ -8,13 +8,13 @@ import (
 	"os"
 
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/v2/extensions/web/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/web/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/extensions/web/pkg/logging"
-	"github.com/owncloud/ocis/v2/extensions/web/pkg/metrics"
-	"github.com/owncloud/ocis/v2/extensions/web/pkg/server/debug"
-	"github.com/owncloud/ocis/v2/extensions/web/pkg/server/http"
-	"github.com/owncloud/ocis/v2/extensions/web/pkg/tracing"
+	"github.com/owncloud/ocis/v2/services/web/pkg/config"
+	"github.com/owncloud/ocis/v2/services/web/pkg/config/parser"
+	"github.com/owncloud/ocis/v2/services/web/pkg/logging"
+	"github.com/owncloud/ocis/v2/services/web/pkg/metrics"
+	"github.com/owncloud/ocis/v2/services/web/pkg/server/debug"
+	"github.com/owncloud/ocis/v2/services/web/pkg/server/http"
+	"github.com/owncloud/ocis/v2/services/web/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 

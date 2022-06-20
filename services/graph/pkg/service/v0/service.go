@@ -13,13 +13,13 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	"github.com/owncloud/ocis/v2/extensions/graph/pkg/identity"
-	"github.com/owncloud/ocis/v2/extensions/graph/pkg/identity/ldap"
-	graphm "github.com/owncloud/ocis/v2/extensions/graph/pkg/middleware"
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/identity/ldap"
+	graphm "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 )
 
 const (

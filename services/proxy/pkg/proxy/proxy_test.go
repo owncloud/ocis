@@ -7,8 +7,8 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config/defaults"
 )
 
 type matchertest struct {

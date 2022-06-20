@@ -2,11 +2,11 @@ package http
 
 import (
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
-	webmid "github.com/owncloud/ocis/v2/extensions/web/pkg/middleware"
-	svc "github.com/owncloud/ocis/v2/extensions/web/pkg/service/v0"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	webmid "github.com/owncloud/ocis/v2/services/web/pkg/middleware"
+	svc "github.com/owncloud/ocis/v2/services/web/pkg/service/v0"
 	"go-micro.dev/v4"
 )
 

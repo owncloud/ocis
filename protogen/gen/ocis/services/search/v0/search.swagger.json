@@ -315,6 +315,6 @@
   },
   "externalDocs": {
     "description": "Developer Manual",
-    "url": "https://owncloud.dev/extensions/search/"
+    "url": "https://owncloud.dev/services/search/"
   }
 }

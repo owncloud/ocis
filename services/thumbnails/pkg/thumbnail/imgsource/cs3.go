@@ -13,7 +13,7 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/config"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/metadata"
 )

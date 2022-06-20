@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/user/backend"
-	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/webdav"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/webdav"
 )
 
 // BasicAuth provides a middleware to check if BasicAuth is provided

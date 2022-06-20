@@ -1,8 +1,8 @@
 package defaults
 
 import (
-	"github.com/owncloud/ocis/v2/extensions/app-provider/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/owncloud/ocis/v2/services/app-provider/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {

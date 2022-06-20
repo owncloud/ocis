@@ -7,8 +7,8 @@ import (
 	"sort"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 )
 
 var (

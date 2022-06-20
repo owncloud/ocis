@@ -9,10 +9,10 @@ import (
 
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/keyword"
-	"github.com/owncloud/ocis/v2/extensions/store/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	storemsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/store/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
+	"github.com/owncloud/ocis/v2/services/store/pkg/config"
 	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/protobuf/encoding/protojson"
 )

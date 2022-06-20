@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/owncloud/ocis/v2/extensions/auth-machine/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/auth-machine/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/extensions/auth-machine/pkg/logging"
+	"github.com/owncloud/ocis/v2/services/auth-machine/pkg/config"
+	"github.com/owncloud/ocis/v2/services/auth-machine/pkg/config/parser"
+	"github.com/owncloud/ocis/v2/services/auth-machine/pkg/logging"
 	"github.com/urfave/cli/v2"
 )
 

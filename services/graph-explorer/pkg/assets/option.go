@@ -3,10 +3,10 @@ package assets
 import (
 	"net/http"
 
-	graphexplorer "github.com/owncloud/ocis/v2/extensions/graph-explorer"
-	"github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/assetsfs"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	graphexplorer "github.com/owncloud/ocis/v2/services/graph-explorer"
+	"github.com/owncloud/ocis/v2/services/graph-explorer/pkg/config"
 )
 
 // New returns a new http filesystem to serve assets.

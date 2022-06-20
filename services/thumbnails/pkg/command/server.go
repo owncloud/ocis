@@ -6,15 +6,15 @@ import (
 	"os"
 
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/logging"
-	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/metrics"
-	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/server/debug"
-	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/server/grpc"
-	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/server/http"
-	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config/parser"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/logging"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/metrics"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/server/debug"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/server/grpc"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/server/http"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 

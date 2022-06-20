@@ -7,9 +7,9 @@ import (
 	"os"
 
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/owncloud/ocis/v2/extensions/audit/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/audit/pkg/types"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/audit/pkg/config"
+	"github.com/owncloud/ocis/v2/services/audit/pkg/types"
 )
 
 // Log is used to log to different outputs

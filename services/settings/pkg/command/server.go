@@ -6,15 +6,15 @@ import (
 	"os"
 
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/v2/extensions/settings/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/settings/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/extensions/settings/pkg/logging"
-	"github.com/owncloud/ocis/v2/extensions/settings/pkg/metrics"
-	"github.com/owncloud/ocis/v2/extensions/settings/pkg/server/debug"
-	"github.com/owncloud/ocis/v2/extensions/settings/pkg/server/grpc"
-	"github.com/owncloud/ocis/v2/extensions/settings/pkg/server/http"
-	"github.com/owncloud/ocis/v2/extensions/settings/pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/config/parser"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/logging"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/metrics"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/server/debug"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/server/grpc"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/server/http"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 

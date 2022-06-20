@@ -5,8 +5,8 @@ import (
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/go-chi/render"
-	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/data"
-	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/response"
+	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/data"
+	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/response"
 )
 
 // RequireUser middleware is used to require a user in context

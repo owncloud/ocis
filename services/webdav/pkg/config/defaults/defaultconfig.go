@@ -3,7 +3,7 @@ package defaults
 import (
 	"strings"
 
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/config"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {

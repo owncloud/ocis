@@ -3,9 +3,9 @@ package parser
 import (
 	"errors"
 
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/config/defaults"
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/config"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/config/defaults"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 )

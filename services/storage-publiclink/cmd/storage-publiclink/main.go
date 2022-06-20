@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/owncloud/ocis/v2/extensions/storage-publiclink/pkg/command"
-	"github.com/owncloud/ocis/v2/extensions/storage-publiclink/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/storage-publiclink/pkg/command"
+	"github.com/owncloud/ocis/v2/services/storage-publiclink/pkg/config/defaults"
 )
 
 func main() {

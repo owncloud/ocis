@@ -6,9 +6,9 @@ import (
 	"github.com/blevesearch/bleve/v2"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/owncloud/ocis/v2/extensions/search/pkg/search/index"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
+	"github.com/owncloud/ocis/v2/services/search/pkg/search/index"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

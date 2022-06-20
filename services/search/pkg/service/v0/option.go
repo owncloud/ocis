@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/owncloud/ocis/v2/extensions/search/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 )
 
 // Option defines a single option function.

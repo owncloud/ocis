@@ -11,9 +11,9 @@ import (
 	"github.com/gofrs/uuid"
 	ldapdn "github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/extensions/graph/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/graph/pkg/service/v0/errorcode"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	"golang.org/x/exp/slices"
 )
 

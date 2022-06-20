@@ -6,14 +6,14 @@ import (
 	"os"
 
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/logging"
-	"github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/metrics"
-	"github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/server/debug"
-	"github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/server/http"
-	"github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	"github.com/owncloud/ocis/v2/services/graph-explorer/pkg/config"
+	"github.com/owncloud/ocis/v2/services/graph-explorer/pkg/config/parser"
+	"github.com/owncloud/ocis/v2/services/graph-explorer/pkg/logging"
+	"github.com/owncloud/ocis/v2/services/graph-explorer/pkg/metrics"
+	"github.com/owncloud/ocis/v2/services/graph-explorer/pkg/server/debug"
+	"github.com/owncloud/ocis/v2/services/graph-explorer/pkg/server/http"
+	"github.com/owncloud/ocis/v2/services/graph-explorer/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 

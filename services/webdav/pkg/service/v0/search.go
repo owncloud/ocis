@@ -11,11 +11,11 @@ import (
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/net"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/prop"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/propfind"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/net"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/prop"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/propfind"
 	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
 )

@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/owncloud/ocis/v2/extensions/storage-shares/pkg/command"
-	"github.com/owncloud/ocis/v2/extensions/storage-shares/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/storage-shares/pkg/command"
+	"github.com/owncloud/ocis/v2/services/storage-shares/pkg/config/defaults"
 )
 
 func main() {

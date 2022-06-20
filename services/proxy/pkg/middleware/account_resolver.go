@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/user/backend"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"

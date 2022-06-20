@@ -5,10 +5,10 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 
-	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/thumbnail/imgsource"
-	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/thumbnail/storage"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail/imgsource"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail/storage"
 )
 
 // Option defines a single option function.

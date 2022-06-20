@@ -3,8 +3,8 @@ package defaults
 import (
 	"path/filepath"
 
-	"github.com/owncloud/ocis/v2/extensions/groups/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/groups/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {

@@ -1,8 +1,8 @@
 package debug
 
 import (
-	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
 )
 
 // Option defines a single option function.

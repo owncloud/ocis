@@ -1,7 +1,7 @@
 package defaults
 
 import (
-	"github.com/owncloud/ocis/v2/extensions/audit/pkg/config"
+	"github.com/owncloud/ocis/v2/services/audit/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {

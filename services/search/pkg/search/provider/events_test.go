@@ -13,9 +13,9 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
-	"github.com/owncloud/ocis/v2/extensions/search/pkg/search/mocks"
-	provider "github.com/owncloud/ocis/v2/extensions/search/pkg/search/provider"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/search/pkg/search/mocks"
+	provider "github.com/owncloud/ocis/v2/services/search/pkg/search/provider"
 )
 
 var _ = Describe("Searchprovider", func() {

@@ -6,8 +6,8 @@ import (
 	"image/gif"
 	"mime"
 
-	"github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/thumbnail/storage"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail/storage"
 )
 
 var (

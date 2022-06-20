@@ -6,14 +6,14 @@ import (
 	"os"
 
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/logging"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/metrics"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/server/debug"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/server/http"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/config"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/config/parser"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/logging"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/metrics"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/server/debug"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/server/http"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 

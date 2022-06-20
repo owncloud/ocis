@@ -1,7 +1,7 @@
 package defaults
 
 import (
-	"github.com/owncloud/ocis/v2/extensions/storage-shares/pkg/config"
+	"github.com/owncloud/ocis/v2/services/storage-shares/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {

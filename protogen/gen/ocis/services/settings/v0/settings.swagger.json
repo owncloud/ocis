@@ -1109,6 +1109,6 @@
   },
   "externalDocs": {
     "description": "Developer Manual",
-    "url": "https://owncloud.dev/extensions/settings/"
+    "url": "https://owncloud.dev/services/settings/"
   }
 }

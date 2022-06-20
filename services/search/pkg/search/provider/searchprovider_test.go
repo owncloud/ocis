@@ -13,11 +13,11 @@ import (
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
-	"github.com/owncloud/ocis/v2/extensions/search/pkg/search/mocks"
-	provider "github.com/owncloud/ocis/v2/extensions/search/pkg/search/provider"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
+	"github.com/owncloud/ocis/v2/services/search/pkg/search/mocks"
+	provider "github.com/owncloud/ocis/v2/services/search/pkg/search/provider"
 )
 
 var _ = Describe("Searchprovider", func() {

@@ -16,12 +16,12 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/extensions/graph/mocks"
-	"github.com/owncloud/ocis/v2/extensions/graph/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/graph/pkg/config/defaults"
-	"github.com/owncloud/ocis/v2/extensions/graph/pkg/identity"
-	service "github.com/owncloud/ocis/v2/extensions/graph/pkg/service/v0"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/graph/mocks"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
+	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 	"github.com/stretchr/testify/mock"
 )
 

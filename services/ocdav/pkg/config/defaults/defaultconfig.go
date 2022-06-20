@@ -1,8 +1,8 @@
 package defaults
 
 import (
-	"github.com/owncloud/ocis/v2/extensions/ocdav/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	"github.com/owncloud/ocis/v2/services/ocdav/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {

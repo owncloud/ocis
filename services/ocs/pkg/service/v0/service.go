@@ -11,16 +11,16 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 
-	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/config"
-	ocsm "github.com/owncloud/ocis/v2/extensions/ocs/pkg/middleware"
-	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/data"
-	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/response"
-	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	opkgm "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/services/ocs/pkg/config"
+	ocsm "github.com/owncloud/ocis/v2/services/ocs/pkg/middleware"
+	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/data"
+	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/response"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 )
 
 // Service defines the extension handlers.

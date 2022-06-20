@@ -10,11 +10,11 @@ import (
 	"github.com/cs3org/reva/v2/pkg/auth/scope"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
-	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/user/backend"
-	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/user/backend/test"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend/test"
 	"github.com/stretchr/testify/assert"
 )
 

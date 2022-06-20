@@ -1,7 +1,7 @@
 package defaults
 
 import (
-	"github.com/owncloud/ocis/v2/extensions/notifications/pkg/config"
+	"github.com/owncloud/ocis/v2/services/notifications/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {

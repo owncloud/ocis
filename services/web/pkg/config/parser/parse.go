@@ -3,9 +3,9 @@ package parser
 import (
 	"errors"
 
-	"github.com/owncloud/ocis/v2/extensions/web/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/web/pkg/config/defaults"
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/services/web/pkg/config"
+	"github.com/owncloud/ocis/v2/services/web/pkg/config/defaults"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 )

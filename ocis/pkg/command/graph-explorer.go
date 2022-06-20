@@ -3,11 +3,11 @@ package command
 import (
 	"fmt"
 
-	"github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/command"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
 	"github.com/owncloud/ocis/v2/ocis/pkg/command/helper"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
+	"github.com/owncloud/ocis/v2/services/graph-explorer/pkg/command"
 	"github.com/urfave/cli/v2"
 )
 

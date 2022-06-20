@@ -24,11 +24,11 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/extensions/graph/pkg/service/v0/errorcode"
-	settingsServiceExt "github.com/owncloud/ocis/v2/extensions/settings/pkg/service/v0"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+	settingsServiceExt "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
 	merrors "go-micro.dev/v4/errors"
 )
 

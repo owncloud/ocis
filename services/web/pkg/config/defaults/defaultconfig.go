@@ -3,7 +3,7 @@ package defaults
 import (
 	"strings"
 
-	"github.com/owncloud/ocis/v2/extensions/web/pkg/config"
+	"github.com/owncloud/ocis/v2/services/web/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {

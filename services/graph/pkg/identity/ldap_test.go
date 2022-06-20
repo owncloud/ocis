@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/go-ldap/ldap/v3"
-	"github.com/owncloud/ocis/v2/extensions/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 )
 
 // ldapMock implements the ldap.Client interfac

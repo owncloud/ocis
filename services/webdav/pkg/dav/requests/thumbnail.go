@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/constants"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/constants"
 )
 
 const (

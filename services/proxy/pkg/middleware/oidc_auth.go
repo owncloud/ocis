@@ -9,10 +9,10 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 
 	gOidc "github.com/coreos/go-oidc/v3/oidc"
-	"github.com/owncloud/ocis/v2/extensions/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"golang.org/x/oauth2"
 )
 

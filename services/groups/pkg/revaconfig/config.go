@@ -1,7 +1,7 @@
 package revaconfig
 
 import (
-	"github.com/owncloud/ocis/v2/extensions/groups/pkg/config"
+	"github.com/owncloud/ocis/v2/services/groups/pkg/config"
 )
 
 // GroupsConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.

@@ -4,8 +4,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/owncloud/ocis/v2/extensions/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 )
 
 func FullDefaultConfig() *config.Config {

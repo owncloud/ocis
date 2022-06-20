@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/owncloud/ocis/v2/extensions/notifications/pkg/command"
-	"github.com/owncloud/ocis/v2/extensions/notifications/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/notifications/pkg/command"
+	"github.com/owncloud/ocis/v2/services/notifications/pkg/config/defaults"
 )
 
 func main() {

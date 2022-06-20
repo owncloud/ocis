@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/owncloud/ocis/v2/extensions/audit/pkg/config"
+	"github.com/owncloud/ocis/v2/services/audit/pkg/config"
 	"github.com/urfave/cli/v2"
 )
 

@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/owncloud/ocis/v2/extensions/nats/pkg/command"
-	"github.com/owncloud/ocis/v2/extensions/nats/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/nats/pkg/command"
+	"github.com/owncloud/ocis/v2/services/nats/pkg/config/defaults"
 )
 
 func main() {

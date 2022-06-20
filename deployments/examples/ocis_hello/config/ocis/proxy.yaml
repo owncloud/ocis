@@ -5,7 +5,7 @@ policy_selector:
 policies:
   - name: ocis
     routes:
-      # defaults, taken from https://owncloud.dev/extensions/proxy/configuration/
+      # defaults, taken from https://owncloud.dev/services/proxy/configuration/
       - endpoint: /
         backend: http://localhost:9100
       - endpoint: /.well-known/

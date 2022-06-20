@@ -7,11 +7,11 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/data"
-	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/service/v0/response"
-	settings "github.com/owncloud/ocis/v2/extensions/settings/pkg/service/v0"
-	settingsService "github.com/owncloud/ocis/v2/extensions/settings/pkg/service/v0"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
+	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/data"
+	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/response"
+	settings "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
+	settingsService "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
 )
 
 // RequireSelfOrAdmin middleware is used to require the requesting user to be an admin or the requested user himself

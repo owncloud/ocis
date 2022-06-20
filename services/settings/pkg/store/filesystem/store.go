@@ -4,9 +4,9 @@ package store
 import (
 	"os"
 
-	"github.com/owncloud/ocis/v2/extensions/settings/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/settings/pkg/settings"
 	olog "github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 )
 
 var (

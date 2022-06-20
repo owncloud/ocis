@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	ocstracing "github.com/owncloud/ocis/v2/extensions/ocs/pkg/tracing"
+	ocstracing "github.com/owncloud/ocis/v2/services/ocs/pkg/tracing"
 	"go.opentelemetry.io/otel/propagation"
 )
 

@@ -20,14 +20,14 @@ import (
 	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/constants"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/dav/requests"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	thumbnailsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/config"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/constants"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/dav/requests"
 )
 
 const (

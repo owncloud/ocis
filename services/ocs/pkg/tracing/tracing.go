@@ -1,8 +1,8 @@
 package tracing
 
 import (
-	"github.com/owncloud/ocis/v2/extensions/ocs/pkg/config"
 	pkgtrace "github.com/owncloud/ocis/v2/ocis-pkg/tracing"
+	"github.com/owncloud/ocis/v2/services/ocs/pkg/config"
 	"go.opentelemetry.io/otel/trace"
 )
 

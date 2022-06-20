@@ -4,9 +4,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/owncloud/ocis/v2/extensions/store/pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/clihelper"
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/services/store/pkg/config"
 	"github.com/thejerf/suture/v4"
 	"github.com/urfave/cli/v2"
 )
@@ -29,7 +29,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 func Execute(cfg *config.Config) error {
 	app := clihelper.DefaultApp(&cli.App{
 		Name:     "store",
-		Usage:    "Service to store values for ocis extensions",
+		Usage:    "Service to store values for ocis services",
 		Commands: GetCommands(cfg),
 	})
 

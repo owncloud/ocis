@@ -3,9 +3,9 @@ package grpc
 import (
 	"context"
 
-	"github.com/owncloud/ocis/v2/extensions/store/pkg/config"
-	"github.com/owncloud/ocis/v2/extensions/store/pkg/metrics"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/store/pkg/config"
+	"github.com/owncloud/ocis/v2/services/store/pkg/metrics"
 	"github.com/urfave/cli/v2"
 )
 

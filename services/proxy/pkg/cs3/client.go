@@ -2,7 +2,7 @@ package cs3
 
 import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	proxytracing "github.com/owncloud/ocis/v2/extensions/proxy/pkg/tracing"
+	proxytracing "github.com/owncloud/ocis/v2/services/proxy/pkg/tracing"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

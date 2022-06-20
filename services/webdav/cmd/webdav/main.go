@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/command"
-	"github.com/owncloud/ocis/v2/extensions/webdav/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/command"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/config/defaults"
 )
 
 func main() {

@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/owncloud/ocis/v2/extensions/settings/pkg/store/errortypes"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/errortypes"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )

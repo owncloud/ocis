@@ -8,7 +8,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 
 	tw "github.com/olekukonko/tablewriter"
-	"github.com/owncloud/ocis/v2/extensions/app-registry/pkg/config"
+	"github.com/owncloud/ocis/v2/services/app-registry/pkg/config"
 	"github.com/urfave/cli/v2"
 )
 
