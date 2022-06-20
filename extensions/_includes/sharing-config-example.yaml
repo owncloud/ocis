@@ -27,7 +27,7 @@ events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster
 skip_user_groups_in_token: false
-user_sharing_driver: json
+user_sharing_driver: cs3
 user_sharing_drivers:
   json:
     file: ~/.ocis/storage/shares.json
@@ -43,7 +43,7 @@ user_sharing_drivers:
     db_port: 3306
     db_name: owncloud
     user_storage_mount_id: ""
-public_sharing_driver: json
+public_sharing_driver: cs3
 public_sharing_drivers:
   json:
     file: ~/.ocis/storage/publicshares.json

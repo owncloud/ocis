@@ -21,7 +21,7 @@
 | SHARING_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | the address of the streaming service|
 | SHARING_EVENTS_CLUSTER | string | ocis-cluster | the clusterID of the streaming service. Mandatory when using nats|
 | SHARING_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
-| SHARING_USER_DRIVER | string | json | |
+| SHARING_USER_DRIVER | string | cs3 | |
 | SHARING_USER_JSON_FILE | string | ~/.ocis/storage/shares.json | |
 | SHARING_USER_CS3_PROVIDER_ADDR | string | 127.0.0.1:9215 | |
 | OCIS_SYSTEM_USER_ID<br/>SHARING_USER_CS3_SYSTEM_USER_ID | string |  | |
@@ -33,7 +33,7 @@
 | SHARING_USER_OWNCLOUDSQL_DB_PORT | int | 3306 | |
 | SHARING_USER_OWNCLOUDSQL_DB_NAME | string | owncloud | |
 | SHARING_USER_OWNCLOUDSQL_USER_STORAGE_MOUNT_ID | string |  | |
-| SHARING_PUBLIC_DRIVER | string | json | |
+| SHARING_PUBLIC_DRIVER | string | cs3 | |
 | SHARING_PUBLIC_JSON_FILE | string | ~/.ocis/storage/publicshares.json | |
 | SHARING_PUBLIC_CS3_PROVIDER_ADDR | string | 127.0.0.1:9215 | |
 | OCIS_SYSTEM_USER_ID<br/>SHARING_PUBLIC_CS3_SYSTEM_USER_ID | string |  | |

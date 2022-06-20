@@ -152,7 +152,7 @@ a| [subs=-attributes]
 |`SHARING_USER_DRIVER`
 | string
 a| [subs=-attributes]
-json 
+cs3 
 a| [subs=-attributes]
 
 
@@ -239,7 +239,7 @@ a| [subs=-attributes]
 |`SHARING_PUBLIC_DRIVER`
 | string
 a| [subs=-attributes]
-json 
+cs3 
 a| [subs=-attributes]
 
 
