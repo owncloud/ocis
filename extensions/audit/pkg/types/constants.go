@@ -75,8 +75,8 @@ func MessageShareRemoved(sharer, shareid, itemid string) string {
 }
 
 // MessageLinkRemoved returns the human readable string that describes the action
-func MessageLinkRemoved(shareid string) string {
-	return fmt.Sprintf("public link id:'%s' was removed", shareid)
+func MessageLinkRemoved(executant, shareid string) string {
+	return fmt.Sprintf("user '%s' removed public link with id:'%s'", executant, shareid)
 }
 
 // MessageShareAccepted returns the human readable string that describes the action
@@ -95,87 +95,89 @@ func MessageLinkAccessed(linkid string, success bool) string {
 }
 
 // MessageContainerCreated returns the human readable string that describes the action
-func MessageContainerCreated(item string) string {
-	return fmt.Sprintf("Folder '%s' was created", item)
+func MessageContainerCreated(executant, item string) string {
+	return fmt.Sprintf("user '%s' created folder '%s'", executant, item)
 }
 
 // MessageFileCreated returns the human readable string that describes the action
-func MessageFileCreated(item string) string {
-	return fmt.Sprintf("File '%s' was created", item)
+func MessageFileCreated(executant, item string) string {
+	return fmt.Sprintf("user '%s' created file '%s'", executant, item)
 }
 
 // MessageFileRead returns the human readable string that describes the action
-func MessageFileRead(item string) string {
-	return fmt.Sprintf("File '%s' was read", item)
+func MessageFileRead(executant, item string) string {
+	return fmt.Sprintf("user '%s' read file '%s'", executant, item)
 }
 
 // MessageFileTrashed returns the human readable string that describes the action
-func MessageFileTrashed(item string) string {
-	return fmt.Sprintf("File '%s' was trashed", item)
+func MessageFileTrashed(executant, item string) string {
+	return fmt.Sprintf("user '%s' trashed file '%s'", executant, item)
 }
 
 // MessageFileRenamed returns the human readable string that describes the action
-func MessageFileRenamed(item, oldpath, newpath string) string {
-	return fmt.Sprintf("File '%s' was moved from '%s' to '%s'", item, oldpath, newpath)
+func MessageFileRenamed(executant, item, oldpath, newpath string) string {
+	return fmt.Sprintf("user '%s' moved file '%s' from '%s' to '%s'", executant, item, oldpath, newpath)
 }
 
 // MessageFilePurged returns the human readable string that describes the action
-func MessageFilePurged(item string) string {
-	return fmt.Sprintf("File '%s' was removed from trashbin", item)
+func MessageFilePurged(executant, item string) string {
+	return fmt.Sprintf("user '%s' removed file '%s' from trashbin", executant, item)
 }
 
 // MessageFileRestored returns the human readable string that describes the action
-func MessageFileRestored(item, path string) string {
-	return fmt.Sprintf("File '%s' was restored from trashbin to '%s'", item, path)
+func MessageFileRestored(executant, item, path string) string {
+	return fmt.Sprintf("user '%s' restored file '%s' from trashbin to '%s'", executant, item, path)
 }
 
 // MessageFileVersionRestored returns the human readable string that describes the action
-func MessageFileVersionRestored(item string, version string) string {
-	return fmt.Sprintf("File '%s' was restored in version '%s'", item, version)
+func MessageFileVersionRestored(executant, item, version string) string {
+	return fmt.Sprintf("user '%s' restored file '%s' in version '%s'", executant, item, version)
 }
 
 // MessageSpaceCreated returns the human readable string that describes the action
-func MessageSpaceCreated(spaceID string, name string) string {
-	return fmt.Sprintf("Space '%s' with name '%s' was created", spaceID, name)
+func MessageSpaceCreated(executant, spaceID, name string) string {
+	return fmt.Sprintf("user '%s' created a space '%s' with name '%s'", executant, spaceID, name)
 }
 
 // MessageSpaceRenamed returns the human readable string that describes the action
-func MessageSpaceRenamed(spaceID string, name string) string {
-	return fmt.Sprintf("Space '%s' was renamed to '%s'", spaceID, name)
+func MessageSpaceRenamed(executant, spaceID, name string) string {
+	return fmt.Sprintf("user '%s' renamed space '%s' to '%s'", executant, spaceID, name)
 }
 
 // MessageSpaceDisabled returns the human readable string that describes the action
-func MessageSpaceDisabled(spaceID string) string {
-	return fmt.Sprintf("Space '%s' was disabled", spaceID)
+func MessageSpaceDisabled(executant, spaceID string) string {
+	return fmt.Sprintf("user '%s' disabled the space '%s'", executant, spaceID)
 }
 
 // MessageSpaceEnabled returns the human readable string that describes the action
-func MessageSpaceEnabled(spaceID string) string {
-	return fmt.Sprintf("Space '%s' was (re-) enabled", spaceID)
+func MessageSpaceEnabled(executant, spaceID string) string {
+	return fmt.Sprintf("user '%s' (re-) enabled the space '%s'", executant, spaceID)
 }
 
 // MessageSpaceDeleted returns the human readable string that describes the action
-func MessageSpaceDeleted(spaceID string) string {
-	return fmt.Sprintf("Space '%s' was deleted", spaceID)
+func MessageSpaceDeleted(executant, spaceID string) string {
+	return fmt.Sprintf("user '%s' deleted the space '%s'", executant, spaceID)
 }
 
 // MessageUserCreated returns the human readable string that describes the action
-func MessageUserCreated(userID string) string {
-	return fmt.Sprintf("User '%s' was created", userID)
+func MessageUserCreated(executant, userID string) string {
+	return fmt.Sprintf("user '%s' created the user '%s'", executant, userID)
 }
 
 // MessageUserDeleted returns the human readable string that describes the action
-func MessageUserDeleted(userID string) string {
-	return fmt.Sprintf("User '%s' was deleted", userID)
+func MessageUserDeleted(executant, userID string) string {
+	return fmt.Sprintf("user '%s' deleted the user '%s'", executant, userID)
 }
 
 // MessageUserFeatureChanged returns the human readable string that describes the action
-func MessageUserFeatureChanged(userID string, features []events.UserFeature) string {
-	// Result is: "User %username%'s feature changed: %featurename%=%featurevalue% %featurename%=%featurevalue%"
+func MessageUserFeatureChanged(executant, userID string, features []events.UserFeature) string {
+	// Result is: "user '%executant%' changed user %username%'s features: %featurename%=%featurevalue% %featurename%=%featurevalue%"
 	var sb strings.Builder
-	sb.WriteString("User ")
+	sb.WriteString("user '")
+	sb.WriteString(executant)
+	sb.WriteString("' changed user ")
 	sb.WriteString(userID)
-	sb.WriteString("'s feature changed: ")
+	sb.WriteString("'s features:")
 	for _, f := range features {
 		sb.WriteString(f.Name)
 		sb.WriteRune('=')
@@ -186,21 +188,21 @@ func MessageUserFeatureChanged(userID string, features []events.UserFeature) str
 }
 
 // MessageGroupCreated returns the human readable string that describes the action
-func MessageGroupCreated(groupID string) string {
-	return fmt.Sprintf("Group '%s' was created", groupID)
+func MessageGroupCreated(executant, groupID string) string {
+	return fmt.Sprintf("user '%s' created group '%s'", executant, groupID)
 }
 
 // MessageGroupDeleted returns the human readable string that describes the action
-func MessageGroupDeleted(groupID string) string {
-	return fmt.Sprintf("Group '%s' was deleted", groupID)
+func MessageGroupDeleted(executant, groupID string) string {
+	return fmt.Sprintf("user '%s' deleted group '%s'", executant, groupID)
 }
 
 // MessageGroupMemberAdded returns the human readable string that describes the action
-func MessageGroupMemberAdded(userID, groupID string) string {
-	return fmt.Sprintf("User '%s' was added to group '%s'", userID, groupID)
+func MessageGroupMemberAdded(executant, userID, groupID string) string {
+	return fmt.Sprintf("user '%s' added user '%s' was added to group '%s'", executant, userID, groupID)
 }
 
 // MessageGroupMemberRemoved returns the human readable string that describes the action
-func MessageGroupMemberRemoved(userID, groupID string) string {
-	return fmt.Sprintf("User '%s' was removed from group '%s'", userID, groupID)
+func MessageGroupMemberRemoved(executant, userID, groupID string) string {
+	return fmt.Sprintf("user '%s' added user '%s' was removed from group '%s'", executant, userID, groupID)
 }

@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/CiscoM31/godata"
+	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/chi/v5"
@@ -140,7 +141,8 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g.publishEvent(events.UserCreated{UserID: *u.Id})
+	currentUser := ctxpkg.ContextMustGetUser(r.Context())
+	g.publishEvent(events.UserCreated{Executant: currentUser.Id, UserID: *u.Id})
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, u)
@@ -197,7 +199,8 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	g.publishEvent(events.UserDeleted{UserID: userID})
+	currentUser := ctxpkg.ContextMustGetUser(r.Context())
+	g.publishEvent(events.UserDeleted{Executant: currentUser.Id, UserID: userID})
 
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
@@ -247,10 +250,12 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	currentUser := ctxpkg.ContextMustGetUser(r.Context())
 	g.publishEvent(
 		events.UserFeatureChanged{
-			UserID:   nameOrID,
-			Features: features,
+			Executant: currentUser.Id,
+			UserID:    nameOrID,
+			Features:  features,
 		},
 	)
 	render.Status(r, http.StatusOK)
