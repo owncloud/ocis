@@ -2,7 +2,7 @@
 title: "Tests"
 weight: 90
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/settings
+geekdocEditPath: edit/master/docs/services/settings
 geekdocFilePath: tests.md
 ---
 

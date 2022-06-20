@@ -2,7 +2,7 @@
 title: Search
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/search
+geekdocEditPath: edit/master/docs/services/search
 geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---

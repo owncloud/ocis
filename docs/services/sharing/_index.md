@@ -2,7 +2,7 @@
 title: Sharing
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/sharing
+geekdocEditPath: edit/master/docs/services/sharing
 geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---

@@ -2,7 +2,7 @@
 title: Theming
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/theming
+geekdocEditPath: edit/master/docs/services/theming
 geekdocFilePath: theming.md
 ---
 

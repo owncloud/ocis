@@ -3,7 +3,7 @@ title: App-Registry
 date: 2022-03-02T00:00:00+00:00
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/app-registry
+geekdocEditPath: edit/master/docs/services/app-registry
 geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---

@@ -3,7 +3,7 @@ title: Service Configuration
 date: 2018-05-02T00:00:00+00:00
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/audit
+geekdocEditPath: edit/master/docs/services/audit
 geekdocFilePath: configuration.md
 geekdocCollapseSection: true
 ---
@@ -11,6 +11,6 @@ geekdocCollapseSection: true
 
 ## Example YAML Config
 
-{{< include file="extensions/_includes/audit-config-example.yaml"  language="yaml" >}}
+{{< include file="services/_includes/audit-config-example.yaml"  language="yaml" >}}
 
-{{< include file="extensions/_includes/audit_configvars.md" >}}
+{{< include file="services/_includes/audit_configvars.md" >}}

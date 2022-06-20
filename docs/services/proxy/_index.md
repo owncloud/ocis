@@ -2,7 +2,7 @@
 title: Proxy
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/proxy
+geekdocEditPath: edit/master/docs/services/proxy
 geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---

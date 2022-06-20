@@ -3,7 +3,7 @@ title: Configuration Hints
 date: 2022-04-27:00:00+00:00
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/idm
+geekdocEditPath: edit/master/docs/services/idm
 geekdocFilePath: configuration_hints.md
 geekdocCollapseSection: true
 ---

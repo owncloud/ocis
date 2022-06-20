@@ -3,7 +3,7 @@ title: "Glossary"
 date: 2020-05-04T12:35:00+01:00
 weight: 80
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/settings
+geekdocEditPath: edit/master/docs/services/settings
 geekdocFilePath: glossary.md
 ---
 
