@@ -50,6 +50,7 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"db_name":          cfg.UserSharingDrivers.OwnCloudSQL.DBName,
 						},
 						"cs3": map[string]interface{}{
+							"gateway_addr":        cfg.UserSharingDrivers.CS3.ProviderAddr,
 							"provider_addr":       cfg.UserSharingDrivers.CS3.ProviderAddr,
 							"service_user_id":     cfg.UserSharingDrivers.CS3.SystemUserID,
 							"service_user_idp":    cfg.UserSharingDrivers.CS3.SystemUserIDP,
@@ -75,6 +76,7 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"janitor_run_interval":          cfg.PublicSharingDrivers.SQL.JanitorRunInterval,
 						},
 						"cs3": map[string]interface{}{
+							"gateway_addr":        cfg.PublicSharingDrivers.CS3.ProviderAddr,
 							"provider_addr":       cfg.PublicSharingDrivers.CS3.ProviderAddr,
 							"service_user_id":     cfg.PublicSharingDrivers.CS3.SystemUserID,
 							"service_user_idp":    cfg.PublicSharingDrivers.CS3.SystemUserIDP,
