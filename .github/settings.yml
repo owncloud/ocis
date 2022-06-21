@@ -43,6 +43,8 @@ teams:
     permission: push
   - name: cern
     permission: triage
+  - name: ocis-contractors
+    permission: push
 
 branches:
   - name: master
