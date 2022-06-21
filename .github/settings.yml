@@ -63,6 +63,7 @@ branches:
         teams:
           - ci
           - employees
+          - ocis-contractors
 
 ...
 
