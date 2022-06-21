@@ -16,7 +16,7 @@ func AuthBasicCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     cfg.AuthBasic.Service.Name,
 		Usage:    helper.SubcommandDescription(cfg.AuthBasic.Service.Name),
-		Category: "extensions",
+		Category: "services",
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg, true); err != nil {
 				fmt.Printf("%v", err)

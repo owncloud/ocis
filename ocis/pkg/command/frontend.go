@@ -16,7 +16,7 @@ func FrontendCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     cfg.Frontend.Service.Name,
 		Usage:    helper.SubcommandDescription(cfg.Frontend.Service.Name),
-		Category: "extensions",
+		Category: "services",
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg, true); err != nil {
 				fmt.Printf("%v", err)

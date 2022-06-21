@@ -16,7 +16,7 @@ func OCDavCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     cfg.OCDav.Service.Name,
 		Usage:    helper.SubcommandDescription(cfg.OCDav.Service.Name),
-		Category: "extensions",
+		Category: "services",
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg, true); err != nil {
 				fmt.Printf("%v", err)

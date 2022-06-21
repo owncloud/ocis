@@ -16,7 +16,7 @@ func IDMCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     cfg.IDM.Service.Name,
 		Usage:    helper.SubcommandDescription(cfg.IDM.Service.Name),
-		Category: "extensions",
+		Category: "services",
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg, true); err != nil {
 				fmt.Printf("%v", err)

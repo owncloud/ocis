@@ -16,7 +16,7 @@ func WebCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     cfg.Web.Service.Name,
 		Usage:    helper.SubcommandDescription(cfg.Web.Service.Name),
-		Category: "extensions",
+		Category: "services",
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg, true); err != nil {
 				fmt.Printf("%v", err)
