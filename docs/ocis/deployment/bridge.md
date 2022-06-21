@@ -204,15 +204,6 @@ export IDP_LDAP_NAME_ATTRIBUTE=givenName
 ```
 Don't forget to use an existing user with admin permissions (only admins are allowed to list all users via the graph api) and the correct password.
 
-{{< hint warning >}}
-* TODO: change the default values in glauth & ocis to use an `ownclouduuid` attribute.
-* TODO: split `OCIS_URL` and `IDP_ISS` env vars and use `OCIS_URL` to generate the clients in the `identifier-registration.yaml`.
-{{< /hint >}}
-
-### Configure clients
-
-When the `identifier-registration.yaml` does not exist it will be generated based on the `OCIS_URL` environment variable.
-
 #### Run it!
 
 You can now bring up `ocis/bin/ocis idp` with:
@@ -276,7 +267,7 @@ $ bin/web server --web-config-server https://cloud.example.com --oidc-authority 
 - `--web-config-server https://cloud.example.com` is ownCloud url with webdav and ocs endpoints (oc10 or ocis)
 - `--oidc-authority https://192.168.1.100:9130` the openid connect issuing authority, in our case `oidc-idp`, running on port 9130
 - `--oidc-metadata-url https://192.168.1.100:9130/.well-known/openid-configuration` the openid connect configuration endpoint, typically the issuer host with `.well-known/openid-configuration`, but there are cases when another endpoint is used, e.g. ping identity provides multiple endpoints to separate domains
-- `--oidc-client-id ocis` the client id we will register later with `ocis-idp` in the `identifier-registration.yaml`
+- `--oidc-client-id ocis` the client id we will register later with `ocis-idp` in idp OIDC client settings
 
 ### Patch owncloud
 
@@ -324,4 +315,4 @@ In the above configuration replace
 
 Aside from the above todos these are the next steps
 - tie it all together behind `ocis-proxy`
-- create an `ocis bridge` command that runs all the ocis services in one step with a properly preconfigured `ocis-idp` `identifier-registration.yaml` file for `ownCloud Web` and the owncloud 10 `openidconnect` app, as well as a randomized `--signing-kid`.
+- create an `ocis bridge` command that runs all the ocis services in one step with a properly preconfigured idp OIDC client `ocis-idp` for `ownCloud Web` and the owncloud 10 `openidconnect` app, as well as a randomized `--signing-kid`.

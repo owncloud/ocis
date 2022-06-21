@@ -12,7 +12,6 @@ services:
       SETTINGS_DATA_PATH: "/srv/app/tmp/ocis/settings"
       PROXY_ENABLE_BASIC_AUTH: "true"
       WEB_UI_CONFIG: /drone/src/tests/config/drone/ocis-config.json
-      IDP_IDENTIFIER_REGISTRATION_CONF: /drone/src/tests/config/drone/identifier-registration.yml
       ACCOUNTS_HASH_DIFFICULTY: 4
       OCIS_INSECURE: "true"
       # s3ng specific settings
