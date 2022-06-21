@@ -27,15 +27,15 @@ A clear and concise description of what happened.
 
 ## Setup
 
-Please describe how you started the server and provide a list of relevant environment variables.
+Please describe how you started the server and provide a list of relevant environment variables or configuration files.
 
 <details>
 <p>
 
 ```console
-OCIS_VERSION=vX.X.X
-BRANCH=vX.X.X
-STORAGE_FRONTEND_UPLOAD_DISABLE_TUS=false
+OCIS_XXX=somevalue
+OCIS_YYY=somevalue
+PROXY_XXX=somevalue
 ```
 
 </p>
