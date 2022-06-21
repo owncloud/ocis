@@ -161,11 +161,11 @@ services:
     restart: always
 
   collabora:
-    image: collabora/code:6.4.11.3
+    image: collabora/code:21.11.5.3.1
     networks:
       ocis-net:
     environment:
-      domain: ${OCIS_DOMAIN:-ocis.owncloud.test}
+      aliasgroup1: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}:443
       DONT_GEN_SSL_CERT: "YES"
       extra_params: --o:ssl.enable=false --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=${OCIS_DOMAIN:-ocis.owncloud.test}
       username: ${COLLABORA_ADMIN_USER}
@@ -184,11 +184,12 @@ services:
     restart: always
 
   onlyoffice:
-    image: onlyoffice/documentserver:6.4.0
+    image: onlyoffice/documentserver:7.1
     networks:
       ocis-net:
     environment:
-      USE_UNAUTHORIZED_STORAGE: "${INSECURE:-false}" # selfsigned certificates
+      WOPI_ENABLED: "true"
+      USE_UNAUTHORIZED_STORAGE: "${INSECURE:-false}" # self signed certificates
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.onlyoffice.entrypoints=https"
