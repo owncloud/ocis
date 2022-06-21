@@ -23,7 +23,7 @@ import (
 func Migrate(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "migrate",
-		Usage:    "migrate data from an existing instance to a new version",
+		Usage:    "migrate data from an existing to another instance",
 		Category: "migration",
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg, true); err != nil {
@@ -46,7 +46,7 @@ func init() {
 func MigrateShares(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "shares",
-		Usage: "migrates shares from the previous to the new manager",
+		Usage: "migrates shares from the previous to the new share manager",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "from",
@@ -56,7 +56,7 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 			&cli.StringFlag{
 				Name:  "to",
 				Value: "cs3",
-				Usage: "Share manager to import the data to",
+				Usage: "Share manager to import the data into",
 			},
 		},
 		Before: func(c *cli.Context) error {
@@ -65,7 +65,7 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 				fmt.Printf("%v", err)
 				os.Exit(1)
 			}
-			return err
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 			log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Logger()
@@ -86,22 +86,24 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 				log.Error().Err(err).Msg("failed to initiate source share manager")
 				os.Exit(1)
 			}
-			if _, ok := oldMgr.(share.DumpableManager); !ok {
+			dumpMgr, ok := oldMgr.(share.DumpableManager)
+			if !ok {
 				log.Error().Msg("Share manager type '" + oldDriver + "' does not support dumping its shares.")
 				os.Exit(1)
 			}
 
 			f, ok = registry.NewFuncs[newDriver]
 			if !ok {
-				log.Error().Msg("Unknown share manager type '" + oldDriver + "'")
+				log.Error().Msg("Unknown share manager type '" + newDriver + "'")
 				os.Exit(1)
 			}
 			newMgr, err := f(rcfg[newDriver].(map[string]interface{}))
 			if err != nil {
-				log.Error().Err(err).Msg("failed to initiate source share manager")
+				log.Error().Err(err).Msg("failed to initiate destination share manager")
 				os.Exit(1)
 			}
-			if _, ok := newMgr.(share.LoadableManager); !ok {
+			loadMgr, ok := newMgr.(share.LoadableManager)
+			if !ok {
 				log.Error().Msg("Share manager type '" + newDriver + "' does not support loading a shares dump.")
 				os.Exit(1)
 			}
@@ -110,7 +112,7 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 			wg.Add(2)
 			go func() {
 				log.Info().Msg("Migrating shares...")
-				err = newMgr.(share.LoadableManager).Load(ctx, shareChan, receivedShareChan)
+				err = loadMgr.Load(ctx, shareChan, receivedShareChan)
 				log.Info().Msg("Finished migrating shares.")
 				if err != nil {
 					log.Error().Err(err).Msg("Error while loading shares")
@@ -119,11 +121,13 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 				wg.Done()
 			}()
 			go func() {
-				err = oldMgr.(share.DumpableManager).Dump(ctx, shareChan, receivedShareChan)
+				err = dumpMgr.Dump(ctx, shareChan, receivedShareChan)
 				if err != nil {
 					log.Error().Err(err).Msg("Error while dumping shares")
 					os.Exit(1)
 				}
+				close(shareChan)
+				close(receivedShareChan)
 				wg.Done()
 			}()
 			wg.Wait()
@@ -135,17 +139,17 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 func MigratePublicShares(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "publicshares",
-		Usage: "migrates public shares from the previous to the new manager",
+		Usage: "migrates public shares from the previous to the new public share manager",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "from",
 				Value: "json",
-				Usage: "Share manager to export the data from",
+				Usage: "Public share manager to export the data from",
 			},
 			&cli.StringFlag{
 				Name:  "to",
 				Value: "cs3",
-				Usage: "Share manager to import the data to",
+				Usage: "Public share manager to import the data into",
 			},
 		},
 		Before: func(c *cli.Context) error {
@@ -167,31 +171,33 @@ func MigratePublicShares(cfg *config.Config) *cli.Command {
 
 			f, ok := publicregistry.NewFuncs[oldDriver]
 			if !ok {
-				log.Error().Msg("Unknown share manager type '" + oldDriver + "'")
+				log.Error().Msg("Unknown public share manager type '" + oldDriver + "'")
 				os.Exit(1)
 			}
 			oldMgr, err := f(rcfg[oldDriver].(map[string]interface{}))
 			if err != nil {
-				log.Error().Err(err).Msg("failed to initiate source share manager")
+				log.Error().Err(err).Msg("failed to initiate source public share manager")
 				os.Exit(1)
 			}
-			if _, ok := oldMgr.(publicshare.DumpableManager); !ok {
-				log.Error().Msg("Publicshare manager type '" + oldDriver + "' does not support dumping its shares.")
+			dumpMgr, ok := oldMgr.(publicshare.DumpableManager)
+			if !ok {
+				log.Error().Msg("Public share manager type '" + oldDriver + "' does not support dumping its public shares.")
 				os.Exit(1)
 			}
 
 			f, ok = publicregistry.NewFuncs[newDriver]
 			if !ok {
-				log.Error().Msg("Unknown share manager type '" + oldDriver + "'")
+				log.Error().Msg("Unknown public share manager type '" + newDriver + "'")
 				os.Exit(1)
 			}
 			newMgr, err := f(rcfg[newDriver].(map[string]interface{}))
 			if err != nil {
-				log.Error().Err(err).Msg("failed to initiate source share manager")
+				log.Error().Err(err).Msg("failed to initiate destination public share manager")
 				os.Exit(1)
 			}
-			if _, ok := newMgr.(publicshare.LoadableManager); !ok {
-				log.Error().Msg("PUblicshare manager type '" + newDriver + "' does not support loading a shares dump.")
+			loadMgr, ok := newMgr.(publicshare.LoadableManager)
+			if !ok {
+				log.Error().Msg("Public share manager type '" + newDriver + "' does not support loading a public shares dump.")
 				os.Exit(1)
 			}
 
@@ -199,20 +205,21 @@ func MigratePublicShares(cfg *config.Config) *cli.Command {
 			wg.Add(2)
 			go func() {
 				log.Info().Msg("Migrating public shares...")
-				err = newMgr.(publicshare.LoadableManager).Load(ctx, shareChan)
+				err = loadMgr.Load(ctx, shareChan)
 				log.Info().Msg("Finished migrating public shares.")
 				if err != nil {
-					log.Error().Err(err).Msg("Error while loading shares")
+					log.Error().Err(err).Msg("Error while loading public shares")
 					os.Exit(1)
 				}
 				wg.Done()
 			}()
 			go func() {
-				err = oldMgr.(publicshare.DumpableManager).Dump(ctx, shareChan)
+				err = dumpMgr.Dump(ctx, shareChan)
 				if err != nil {
 					log.Error().Err(err).Msg("Error while dumping public shares")
 					os.Exit(1)
 				}
+				close(shareChan)
 				wg.Done()
 			}()
 			wg.Wait()
