@@ -49,7 +49,6 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"prefix":         cfg.HTTP.Prefix,
 					"driver":         cfg.Driver,
 					"drivers":        UserDrivers(cfg),
-					"timeout":        86400,
 					"nats_address":   cfg.Events.Addr,
 					"nats_clusterID": cfg.Events.ClusterID,
 				},

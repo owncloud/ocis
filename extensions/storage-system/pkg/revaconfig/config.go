@@ -106,7 +106,6 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 					"prefix":  "data",
 					"driver":  cfg.Driver,
 					"drivers": metadataDrivers(cfg),
-					"timeout": 86400,
 				},
 			},
 		},
