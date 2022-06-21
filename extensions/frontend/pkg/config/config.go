@@ -32,7 +32,7 @@ type Config struct {
 	UploadHTTPMethodOverride string `yaml:"upload_http_method_override" env:"FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE" desc:"Advise TUS to replace PATCH requests by POST requests."`
 	DefaultUploadProtocol    string `yaml:"default_upload_protocol" env:"FRONTEND_DEFAULT_UPLOAD_PROTOCOL" desc:"The default upload protocol to use in the frontend (e.g. tus)."`
 
-	PublicURL string `yaml:"public_url" env:"OCIS_URL;FRONTEND_PUBLIC_URL" desc:"URL, where oCIS is reachable for users."`
+	PublicURL string `yaml:"public_url" env:"OCIS_URL;FRONTEND_PUBLIC_URL" desc:"The public facing url of the ocis frontend."`
 
 	AppHandler  AppHandler  `yaml:"app_handler"`
 	Archiver    Archiver    `yaml:"archiver"`
