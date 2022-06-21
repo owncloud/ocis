@@ -18,6 +18,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow resharing: [#3903](https://github.com/owncloud/ocis/pull/3903)
 * Enhancement - Make thumbnails service log less noisy: [#3959](https://github.com/owncloud/ocis/pull/3959)
 * Enhancement - Update reva: [#3944](https://github.com/owncloud/ocis/pull/3944)
+* Enhancement - Update web to v5.5.0: [#3990](https://github.com/owncloud/ocis/pull/3990)
 
 ## Details
 
@@ -109,6 +110,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/3975
    https://github.com/owncloud/ocis/pull/3982
    https://github.com/owncloud/ocis/pull/4000
+
+* Enhancement - Update web to v5.5.0: [#3990](https://github.com/owncloud/ocis/pull/3990)
+
+   TBD
+
+   https://github.com/owncloud/ocis/pull/3990
 # Changelog for [2.0.0-beta.3] (2022-06-08)
 
 The following sections list the changes for 2.0.0-beta.3.
