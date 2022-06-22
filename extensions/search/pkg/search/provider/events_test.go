@@ -95,6 +95,23 @@ var _ = Describe("Searchprovider", func() {
 			}, "2s").Should(BeTrue())
 		})
 
+		It("triggers an index update when a file has been touched", func() {
+			called := false
+			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
+				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
+			})).Return(nil).Run(func(args mock.Arguments) {
+				called = true
+			})
+			eventsChan <- events.FileTouched{
+				Ref:       ref,
+				Executant: user.Id,
+			}
+
+			Eventually(func() bool {
+				return called
+			}, "2s").Should(BeTrue())
+		})
+
 		It("removes an entry from the index when the file has been deleted", func() {
 			called := false
 			gwClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{

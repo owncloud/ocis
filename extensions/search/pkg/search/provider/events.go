@@ -91,6 +91,11 @@ func (p *Provider) handleEvent(ev interface{}) {
 		owner = &user.User{
 			Id: e.Executant,
 		}
+	case events.FileTouched:
+		ref = e.Ref
+		owner = &user.User{
+			Id: e.Executant,
+		}
 	case events.FileVersionRestored:
 		ref = e.Ref
 		owner = &user.User{
