@@ -9,7 +9,7 @@ repository:
 
   private: false
   has_issues: true
-  has_projects: true.
+  has_projects: true
   has_wiki: false
   has_downloads: false
 
