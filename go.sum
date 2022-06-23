@@ -296,6 +296,8 @@ github.com/crewjam/saml v0.4.6/go.mod h1:ZBOXnNPFzB3CgOkRm7Nd6IVdkG+l/wF+0ZXLqD9
 github.com/cs3org/cato v0.0.0-20200828125504-e418fc54dd5e/go.mod h1:XJEZ3/EQuI3BXTp/6DUzFr850vlxq11I6satRtz0YQ4=
 github.com/cs3org/reva/v2 v2.6.1-0.20220622100918-317fb93c2990 h1:xjbf0G+Xq3fYkv7eJYwMBIPI3N+tr1nqOz7Kn2/dkAQ=
 github.com/cs3org/reva/v2 v2.6.1-0.20220622100918-317fb93c2990/go.mod h1:zAHqzr36X4lIalonDQeNbwrIXjn66C38lp5A+MTRS1c=
+github.com/cs3org/reva/v2 v2.6.1-0.20220623153649-1f3daf91c2a8 h1:NOWYoNEV9I4UUy51Py5YlhyTE67V7pIu2mEeKa51t/Y=
+github.com/cs3org/reva/v2 v2.6.1-0.20220623153649-1f3daf91c2a8/go.mod h1:zAHqzr36X4lIalonDQeNbwrIXjn66C38lp5A+MTRS1c=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8/go.mod h1:4abs/jPXcmJzYoYGF91JF9Uq9s/KL5n1jvFDix8KcqY=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
