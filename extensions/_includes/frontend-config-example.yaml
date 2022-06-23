@@ -33,6 +33,7 @@ enable_share_jail: true
 upload_max_chunk_size: 100000000
 upload_http_method_override: ""
 default_upload_protocol: tus
+enable_resharing: false
 public_url: https://localhost:9200
 app_handler:
   insecure: false

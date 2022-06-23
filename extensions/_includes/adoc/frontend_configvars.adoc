@@ -199,6 +199,13 @@ tus
 a| [subs=-attributes]
 The default upload protocol to use in the frontend (e.g. tus).
 
+|`FRONTEND_ENABLE_RESHARING`
+| bool
+a| [subs=-attributes]
+false 
+a| [subs=-attributes]
+Disables the support for resharing in the frontend.
+
 |`OCIS_URL` +
 `FRONTEND_PUBLIC_URL`
 | string
