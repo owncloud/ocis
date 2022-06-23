@@ -23,8 +23,9 @@ var (
 )
 
 type LDAP struct {
-	useServerUUID bool
-	writeEnabled  bool
+	useServerUUID   bool
+	writeEnabled    bool
+	usePwModifyExOp bool
 
 	userBaseDN       string
 	userFilter       string
@@ -90,6 +91,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 
 	return &LDAP{
 		useServerUUID:     config.UseServerUUID,
+		usePwModifyExOp:   config.UsePasswordModExOp,
 		userBaseDN:        config.UserBaseDN,
 		userFilter:        config.UserFilter,
 		userObjectClass:   config.UserObjectClass,
@@ -138,11 +140,10 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 
 	objectClasses := []string{"inetOrgPerson", "organizationalPerson", "person", "top"}
 
-	if user.PasswordProfile != nil && user.PasswordProfile.Password != nil {
-		// TODO? This relies to the LDAP server to properly hash the password.
-		// We might want to add support for the Password Modify LDAP Extended
-		// Operation for servers that implement it. (Or implement client-side
-		// hashing here.
+	if !i.usePwModifyExOp && user.PasswordProfile != nil && user.PasswordProfile.Password != nil {
+		// Depending on the LDAP server implementation this might cause the
+		// password to be stored in cleartext in the LDAP database. Using the
+		// "Password Modify LDAP Extended Operation" is recommended.
 		ar.Attribute("userPassword", []string{*user.PasswordProfile.Password})
 	}
 	if !i.useServerUUID {
@@ -170,6 +171,12 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 			}
 		}
 		return nil, err
+	}
+
+	if i.usePwModifyExOp && user.PasswordProfile != nil && user.PasswordProfile.Password != nil {
+		if err := i.updateUserPassowrd(ar.DN, user.PasswordProfile.GetPassword()); err != nil {
+			return nil, err
+		}
 	}
 
 	// Read	back user from LDAP to get the generated UUID
@@ -224,6 +231,8 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 		return nil, err
 	}
 
+	var updateNeeded bool
+
 	// Don't allow updates of the ID
 	if user.Id != nil && *user.Id != "" {
 		if e.GetEqualFoldAttributeValue(i.userAttributeMap.id) != *user.Id {
@@ -243,21 +252,32 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	if user.DisplayName != nil && *user.DisplayName != "" {
 		if e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName) != *user.DisplayName {
 			mr.Replace(i.userAttributeMap.displayName, []string{*user.DisplayName})
+			updateNeeded = true
 		}
 	}
 	if user.Mail != nil && *user.Mail != "" {
 		if e.GetEqualFoldAttributeValue(i.userAttributeMap.mail) != *user.Mail {
 			mr.Replace(i.userAttributeMap.mail, []string{*user.Mail})
+			updateNeeded = true
 		}
 	}
 	if user.PasswordProfile != nil && user.PasswordProfile.Password != nil && *user.PasswordProfile.Password != "" {
-		// password are hashed server side there is no need to check if the new password
-		// is actually different from the old one.
-		mr.Replace("userPassword", []string{*user.PasswordProfile.Password})
+		if i.usePwModifyExOp {
+			if err := i.updateUserPassowrd(e.DN, user.PasswordProfile.GetPassword()); err != nil {
+				return nil, err
+			}
+		} else {
+			// password are hashed server side there is no need to check if the new password
+			// is actually different from the old one.
+			mr.Replace("userPassword", []string{*user.PasswordProfile.Password})
+			updateNeeded = true
+		}
 	}
 
-	if err := i.conn.Modify(&mr); err != nil {
-		return nil, err
+	if updateNeeded {
+		if err := i.conn.Modify(&mr); err != nil {
+			return nil, err
+		}
 	}
 
 	// Read	back user from LDAP to get the generated UUID
@@ -806,6 +826,26 @@ func (i *LDAP) RemoveMemberFromGroup(ctx context.Context, groupID string, member
 		return i.conn.Modify(mr)
 	}
 	return nil
+}
+
+func (i *LDAP) updateUserPassowrd(dn, password string) error {
+	pwMod := ldap.PasswordModifyRequest{
+		UserIdentity: dn,
+		NewPassword:  password,
+	}
+	// Note: We can ignore the result message here, as it were only relevant if we requested
+	// the server to generate a new Password
+	_, err := i.conn.PasswordModify(&pwMod)
+	if err != nil {
+		var lerr *ldap.Error
+		i.logger.Debug().Err(err).Msg("error setting password for user")
+		if errors.As(err, &lerr) {
+			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
+				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
+			}
+		}
+	}
+	return err
 }
 
 func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
