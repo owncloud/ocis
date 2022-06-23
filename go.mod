@@ -265,3 +265,5 @@ require (
 )
 
 replace github.com/cs3org/go-cs3apis => github.com/micbar/go-cs3apis v0.0.0-20220617090231-703c04619761 // temp fork
+
+replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20220624153535-1aaf40d0c473
