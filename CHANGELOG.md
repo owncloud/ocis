@@ -75,7 +75,7 @@ The following sections list the changes for 2.0.0-beta.4.
 * Enhancement - Update ownCloud Web to v5.5.0-rc.8: [#6854](https://github.com/owncloud/web/pull/6854)
 * Enhancement - Update ownCloud Web to v5.5.0-rc.9: [#6854](https://github.com/owncloud/web/pull/6854)
 * Enhancement - Update ownCloud Web to v5.5.0-rc.6: [#6854](https://github.com/owncloud/web/pull/6854)
-* Enhancement - Update ownCloud Web to v5.6.0: [#4005](https://github.com/owncloud/ocis/pull/4005)
+* Enhancement - Update ownCloud Web to v5.7.0-rc.1: [#4005](https://github.com/owncloud/ocis/pull/4005)
 * Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
 
 ## Details
@@ -821,12 +821,12 @@ The following sections list the changes for 2.0.0-beta.4.
    https://github.com/owncloud/ocis/pull/3797
    https://github.com/owncloud/web/releases/tag/v5.5.0-rc.6
 
-* Enhancement - Update ownCloud Web to v5.6.0: [#4005](https://github.com/owncloud/ocis/pull/4005)
+* Enhancement - Update ownCloud Web to v5.7.0-rc.1: [#4005](https://github.com/owncloud/ocis/pull/4005)
 
    Tags: web
 
-   We updated ownCloud Web to v5.6.0. Please refer to the changelog (linked) for details on the web
-   release.
+   We updated ownCloud Web to v5.7.0-rc.1. Please refer to the changelog (linked) for details on
+   the web release.
 
   * Enhancement [owncloud/web#7119](https://github.com/owncloud/web/pull/7119): Copy/Move conflict dialog
   * Enhancement [owncloud/web#7122](https://github.com/owncloud/web/pull/7122): Enable Drag&Drop and keyboard shortcuts for all views
@@ -846,12 +846,14 @@ The following sections list the changes for 2.0.0-beta.4.
   * Bugfix [owncloud/web#6846](https://github.com/owncloud/web/pull/6846): Upload meta data serialization
   * Bugfix [owncloud/web#7100](https://github.com/owncloud/web/pull/7100): Complete-state of the upload overlay
   * Bugfix [owncloud/web#7104](https://github.com/owncloud/web/pull/7104): Parent folder name on public links
+  * Bugfix [owncloud/web#7173](https://github.com/owncloud/web/pull/7173): Re-introduce dynamic app name in document title
+  * Bugfix [owncloud/web#7166](https://github.com/owncloud/web/pull/7166): External apps fixes
 
    https://github.com/owncloud/ocis/pull/4005
    https://github.com/owncloud/web/pull/7158
    https://github.com/owncloud/ocis/pull/3990
    https://github.com/owncloud/web/pull/6854
-   https://github.com/owncloud/web/releases/tag/v5.6.0
+   https://github.com/owncloud/web/releases/tag/v5.7.0-rc.1
 
 * Enhancement - Add descriptions to webdav configuration: [#3755](https://github.com/owncloud/ocis/pull/3755)
 
