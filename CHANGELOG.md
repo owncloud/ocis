@@ -1,3 +1,22 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v2.0.0...master
+
+## Summary
+
+* Enhancement - Add FRONTEND_ENABLE_RESHARING env variable: [#4023](https://github.com/owncloud/ocis/pull/4023)
+
+## Details
+
+* Enhancement - Add FRONTEND_ENABLE_RESHARING env variable: [#4023](https://github.com/owncloud/ocis/pull/4023)
+
+   We introduced resharing which was enabled by default, this is now configurable and can be
+   enabled by setting the env `FRONTEND_ENABLE_RESHARING` to `true`. By default resharing is
+   now disabled.
+
+   https://github.com/owncloud/ocis/pull/4023
 # Changelog for [2.0.0-beta.4] (2022-06-22)
 
 The following sections list the changes for 2.0.0-beta.4.
