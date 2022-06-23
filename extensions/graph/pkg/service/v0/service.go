@@ -106,10 +106,13 @@ func NewService(opts ...Option) Service {
 				certs := x509.NewCertPool()
 				pemData, err := ioutil.ReadFile(options.Config.Identity.LDAP.CACert)
 				if err != nil {
-					options.Logger.Error().Msgf("Error initializing LDAP Backend: '%s'", err)
+					options.Logger.Error().Err(err).Msgf("Error initializing LDAP Backend")
 					return nil
 				}
-				certs.AppendCertsFromPEM(pemData)
+				if !certs.AppendCertsFromPEM(pemData) {
+					options.Logger.Error().Msgf("Error initializing LDAP Backend. Adding CA cert failed")
+					return nil
+				}
 				tlsConf.RootCAs = certs
 			}
 
