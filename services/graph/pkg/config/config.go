@@ -37,13 +37,14 @@ type Spaces struct {
 }
 
 type LDAP struct {
-	URI           string `yaml:"uri" env:"LDAP_URI;GRAPH_LDAP_URI" desc:"URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'"`
-	CACert        string `yaml:"cacert" env:"LDAP_CACERT;GRAPH_LDAP_CACERT" desc:"The certificate to verify TLS connections"`
-	Insecure      bool   `yaml:"insecure" env:"LDAP_INSECURE;GRAPH_LDAP_INSECURE"`
-	BindDN        string `yaml:"bind_dn" env:"LDAP_BIND_DN;GRAPH_LDAP_BIND_DN"`
-	BindPassword  string `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;GRAPH_LDAP_BIND_PASSWORD"`
-	UseServerUUID bool   `yaml:"use_server_uuid" env:"GRAPH_LDAP_SERVER_UUID"`
-	WriteEnabled  bool   `yaml:"write_enabled" env:"GRAPH_LDAP_SERVER_WRITE_ENABLED"`
+	URI                string `yaml:"uri" env:"LDAP_URI;GRAPH_LDAP_URI" desc:"URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'"`
+	CACert             string `yaml:"cacert" env:"LDAP_CACERT;GRAPH_LDAP_CACERT" desc:"The certificate to verify TLS connections"`
+	Insecure           bool   `yaml:"insecure" env:"LDAP_INSECURE;GRAPH_LDAP_INSECURE"`
+	BindDN             string `yaml:"bind_dn" env:"LDAP_BIND_DN;GRAPH_LDAP_BIND_DN"`
+	BindPassword       string `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;GRAPH_LDAP_BIND_PASSWORD"`
+	UseServerUUID      bool   `yaml:"use_server_uuid" env:"GRAPH_LDAP_SERVER_UUID"`
+	UsePasswordModExOp bool   `yaml:"use_password_modify_exop" env:"GRAPH_LDAP_SERVER_USE_PASSWORD_MODIFY_EXOP" desc:"User the Password Modify Extended Operation for updating user passwords"`
+	WriteEnabled       bool   `yaml:"write_enabled" env:"GRAPH_LDAP_SERVER_WRITE_ENABLED"`
 
 	UserBaseDN               string `yaml:"user_base_dn" env:"LDAP_USER_BASE_DN;GRAPH_LDAP_USER_BASE_DN"`
 	UserSearchScope          string `yaml:"user_search_scope" env:"LDAP_USER_SCOPE;GRAPH_LDAP_USER_SCOPE"`

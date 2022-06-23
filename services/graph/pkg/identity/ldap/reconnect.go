@@ -146,6 +146,31 @@ func (c ConnWithReconnect) Modify(m *ldap.ModifyRequest) error {
 	return ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
+func (c ConnWithReconnect) PasswordModify(m *ldap.PasswordModifyRequest) (*ldap.PasswordModifyResult, error) {
+	conn, err := c.GetConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	var res *ldap.PasswordModifyResult
+	for try := 0; try <= c.retries; try++ {
+		res, err = conn.PasswordModify(m)
+		if !ldap.IsErrorWithCode(err, ldap.ErrorNetwork) {
+			// non network error, return it to the client
+			return res, err
+		}
+
+		c.logger.Debug().Msgf("Network Error. attempt %d", try)
+		conn, err = c.reconnect(conn)
+		if err != nil {
+			return nil, err
+		}
+		c.logger.Debug().Msg("retrying LDAP Password Modify")
+	}
+	// if we get here we reached the maximum retries. So return an error
+	return nil, ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
+}
+
 func (c ConnWithReconnect) ModifyDN(m *ldap.ModifyDNRequest) error {
 	conn, err := c.GetConnection()
 	if err != nil {
@@ -287,10 +312,6 @@ func (c ConnWithReconnect) ModifyWithResult(m *ldap.ModifyRequest) (*ldap.Modify
 
 func (c ConnWithReconnect) Compare(dn, attribute, value string) (bool, error) {
 	return false, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
-}
-
-func (c ConnWithReconnect) PasswordModify(*ldap.PasswordModifyRequest) (*ldap.PasswordModifyResult, error) {
-	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
 
 func (c ConnWithReconnect) SearchWithPaging(searchRequest *ldap.SearchRequest, pagingSize uint32) (*ldap.SearchResult, error) {
