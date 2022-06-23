@@ -29,15 +29,15 @@ type Config struct {
 }
 
 type Spaces struct {
-	WebDavBase                      string `yaml:"webdav_base" env:"OCIS_URL;GRAPH_SPACES_WEBDAV_BASE"`
-	WebDavPath                      string `yaml:"webdav_path" env:"GRAPH_SPACES_WEBDAV_PATH"`
-	DefaultQuota                    string `yaml:"default_quota" env:"GRAPH_SPACES_DEFAULT_QUOTA"`
-	Insecure                        bool   `yaml:"insecure" env:"OCIS_INSECURE;GRAPH_SPACES_INSECURE"`
-	ExtendedSpacePropertiesCacheTTL int    `yaml:"extended_space_properties_cache_ttl" env:"GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL"`
+	WebDavBase                      string `yaml:"webdav_base" env:"OCIS_URL;GRAPH_SPACES_WEBDAV_BASE" desc:"The public facing URL of WebDAV."`
+	WebDavPath                      string `yaml:"webdav_path" env:"GRAPH_SPACES_WEBDAV_PATH" desc:"The WebDAV subpath for spaces."`
+	DefaultQuota                    string `yaml:"default_quota" env:"GRAPH_SPACES_DEFAULT_QUOTA" desc:"The default quota in bytes."`
+	Insecure                        bool   `yaml:"insecure" env:"OCIS_INSECURE;GRAPH_SPACES_INSECURE" desc:"Allow insecure connetctions to the spaces."`
+	ExtendedSpacePropertiesCacheTTL int    `yaml:"extended_space_properties_cache_ttl" env:"GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL" desc:"Max TTL for the spaces property cache."`
 }
 
 type LDAP struct {
-	URI           string `yaml:"uri" env:"LDAP_URI;GRAPH_LDAP_URI"`
+	URI           string `yaml:"uri" env:"LDAP_URI;GRAPH_LDAP_URI" desc:"URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'"`
 	CACert        string `yaml:"cacert" env:"LDAP_CACERT;GRAPH_LDAP_CACERT" desc:"The certificate to verify TLS connections"`
 	Insecure      bool   `yaml:"insecure" env:"LDAP_INSECURE;GRAPH_LDAP_INSECURE"`
 	BindDN        string `yaml:"bind_dn" env:"LDAP_BIND_DN;GRAPH_LDAP_BIND_DN"`
