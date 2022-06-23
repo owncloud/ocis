@@ -31,6 +31,7 @@ type Config struct {
 	UploadMaxChunkSize       int    `yaml:"upload_max_chunk_size" env:"FRONTEND_UPLOAD_MAX_CHUNK_SIZE" desc:"Sets the max chunk sizes for uploads via the frontend." `
 	UploadHTTPMethodOverride string `yaml:"upload_http_method_override" env:"FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE" desc:"Advise TUS to replace PATCH requests by POST requests."`
 	DefaultUploadProtocol    string `yaml:"default_upload_protocol" env:"FRONTEND_DEFAULT_UPLOAD_PROTOCOL" desc:"The default upload protocol to use in the frontend (e.g. tus)."`
+	EnableResharing          bool   `yaml:"enable_resharing" env:"FRONTEND_ENABLE_RESHARING" desc:"Disables the support for resharing in the frontend."`
 
 	PublicURL string `yaml:"public_url" env:"OCIS_URL;FRONTEND_PUBLIC_URL" desc:"The public facing url of the ocis frontend."`
 
