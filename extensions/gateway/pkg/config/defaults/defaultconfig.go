@@ -36,7 +36,6 @@ func DefaultConfig() *config.Config {
 		ShareFolder:                "Shares",
 		DisableHomeCreationOnLogin: true,
 		TransferExpires:            24 * 60 * 60,
-		HomeMapping:                "",
 		EtagCacheTTL:               0,
 
 		FrontendPublicURL: "https://localhost:9200",
