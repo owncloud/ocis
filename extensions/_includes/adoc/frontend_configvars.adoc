@@ -162,7 +162,7 @@ Disables the encoding of the user's group memberships in the reva access token. 
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-Disables the support for favorites in the frontend.
+Enables the support for favorites in the frontend.
 
 |`FRONTEND_ENABLE_PROJECT_SPACES`
 | bool
@@ -204,7 +204,7 @@ The default upload protocol to use in the frontend (e.g. tus).
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-Disables the support for resharing in the frontend.
+Enables the support for resharing in the frontend.
 
 |`OCIS_URL` +
 `FRONTEND_PUBLIC_URL`
