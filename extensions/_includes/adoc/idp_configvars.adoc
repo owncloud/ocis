@@ -220,14 +220,14 @@ Allow insecure connections to the user backend (eg. LDAP, CS3 api, ...).
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Allow guest clients to access ocis.
 
 |`IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION`
 | bool
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Allow dynamic client registration.
 
 |`IDP_ENCRYPTION_SECRET_FILE`
 | string
@@ -285,12 +285,12 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Expiration time for refresh tokens (in seconds).
 
-|``
+|`IDP_DYNAMIC_CLIENT_SECRET_DURATION`
 | uint64
 a| [subs=-attributes]
 0 
 a| [subs=-attributes]
-
+Expiration time for dynamic clients (in seconds).
 
 |`LDAP_URI` +
 `IDP_LDAP_URI`

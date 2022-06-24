@@ -133,63 +133,56 @@ The CS3 gateway endpoint.
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Disables the encoding of the user's groupmember ships in the reva access token. To reduces token size, especially when users are members of a large number of groups.
 
 |`GATEWAY_COMMIT_SHARE_TO_STORAGE_GRANT`
 | bool
 a| [subs=-attributes]
 true 
 a| [subs=-attributes]
-
+Commit shares to storage grants (default: true).
 
 |`GATEWAY_COMMIT_SHARE_TO_STORAGE_REF`
 | bool
 a| [subs=-attributes]
 true 
 a| [subs=-attributes]
-
+Commit shares to storage (default: true)
 
 |`GATEWAY_SHARE_FOLDER_NAME`
 | string
 a| [subs=-attributes]
 Shares 
 a| [subs=-attributes]
-
+Name of the gateway share folder
 
 |`GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN`
 | bool
 a| [subs=-attributes]
 true 
 a| [subs=-attributes]
-
+Disable creation of the homespace on login
 
 |`STORAGE_TRANSFER_SECRET`
 | string
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+The storage transfer secret
 
 |`GATEWAY_TRANSFER_EXPIRES`
 | int
 a| [subs=-attributes]
 86400 
 a| [subs=-attributes]
-
-
-|`GATEWAY_HOME_MAPPING`
-| string
-a| [subs=-attributes]
- 
-a| [subs=-attributes]
-
+Expiry for the gateway tokens
 
 |`GATEWAY_ETAG_CACHE_TTL`
 | int
 a| [subs=-attributes]
 0 
 a| [subs=-attributes]
-
+Max TTL for the gatways ETAG cache.
 
 |`OCIS_URL` +
 `GATEWAY_FRONTEND_PUBLIC_URL`
@@ -197,84 +190,84 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 \https://localhost:9200 
 a| [subs=-attributes]
-
+The public facing url of the ocis frontend.
 
 |`GATEWAY_USERS_ENDPOINT`
 | string
 a| [subs=-attributes]
 localhost:9144 
 a| [subs=-attributes]
-
+The users api endpoint.
 
 |`GATEWAY_GROUPS_ENDPOINT`
 | string
 a| [subs=-attributes]
 localhost:9160 
 a| [subs=-attributes]
-
+The groups api endpoint.
 
 |`GATEWAY_PERMISSIONS_ENDPOINT`
 | string
 a| [subs=-attributes]
 localhost:9191 
 a| [subs=-attributes]
-
+The permission api endpoint.
 
 |`GATEWAY_SHARING_ENDPOINT`
 | string
 a| [subs=-attributes]
 localhost:9150 
 a| [subs=-attributes]
-
+The share api endpoint.
 
 |`GATEWAY_AUTH_BASIC_ENDPOINT`
 | string
 a| [subs=-attributes]
 localhost:9146 
 a| [subs=-attributes]
-
+The auth basic api endpoint.
 
 |`GATEWAY_AUTH_BEARER_ENDPOINT`
 | string
 a| [subs=-attributes]
 localhost:9148 
 a| [subs=-attributes]
-
+The auth bearer api endpoint.
 
 |`GATEWAY_AUTH_MACHINE_ENDPOINT`
 | string
 a| [subs=-attributes]
 localhost:9166 
 a| [subs=-attributes]
-
+The auth machine api endpoint.
 
 |`GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT`
 | string
 a| [subs=-attributes]
 localhost:9178 
 a| [subs=-attributes]
-
+The storage puliclink api endpoint.
 
 |`GATEWAY_STORAGE_USERS_ENDPOINT`
 | string
 a| [subs=-attributes]
 localhost:9157 
 a| [subs=-attributes]
-
+The storage users api endpoint.
 
 |`GATEWAY_STORAGE_SHARES_ENDPOINT`
 | string
 a| [subs=-attributes]
 localhost:9154 
 a| [subs=-attributes]
-
+The storage shares api endpoint.
 
 |`GATEWAY_APP_REGISTRY_ENDPOINT`
 | string
 a| [subs=-attributes]
 localhost:9242 
 a| [subs=-attributes]
-
+The app registry api endpoint.
 |===
 
 Since Version: `+` added, `-` deprecated

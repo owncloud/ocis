@@ -134,21 +134,21 @@ The secret to mint and validate jwt tokens.
 a| [subs=-attributes]
 \https://localhost:9200 
 a| [subs=-attributes]
-
+The public facing URL of WebDAV.
 
 |`GRAPH_SPACES_WEBDAV_PATH`
 | string
 a| [subs=-attributes]
 /dav/spaces/ 
 a| [subs=-attributes]
-
+The WebDAV subpath for spaces.
 
 |`GRAPH_SPACES_DEFAULT_QUOTA`
 | string
 a| [subs=-attributes]
 1000000000 
 a| [subs=-attributes]
-
+The default quota in bytes.
 
 |`OCIS_INSECURE` +
 `GRAPH_SPACES_INSECURE`
@@ -156,14 +156,14 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Allow insecure connetctions to the spaces.
 
 |`GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL`
 | int
 a| [subs=-attributes]
 0 
 a| [subs=-attributes]
-
+Max TTL for the spaces property cache.
 
 |`GRAPH_IDENTITY_BACKEND`
 | string
@@ -178,7 +178,7 @@ The user identity backend to use, defaults to 'ldap', can be 'cs3'.
 a| [subs=-attributes]
 ldaps://localhost:9235 
 a| [subs=-attributes]
-
+URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
 
 |`LDAP_CACERT` +
 `GRAPH_LDAP_CACERT`

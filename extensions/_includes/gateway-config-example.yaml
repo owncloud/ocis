@@ -30,7 +30,6 @@ share_folder_name: Shares
 disable_home_creation_on_login: true
 transfer_secret: ""
 transfer_expires: 86400
-home_mapping: ""
 etag_cache_ttl: 0
 frontend_public_url: https://localhost:9200
 users_endpoint: localhost:9144
