@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Add FRONTEND_ENABLE_RESHARING env variable: [#4023](https://github.com/owncloud/ocis/pull/4023)
+* Enhancement - Update reva: [#4025](https://github.com/owncloud/ocis/pull/4025)
 
 ## Details
 
@@ -17,6 +18,10 @@ The following sections list the changes for unreleased.
    now disabled.
 
    https://github.com/owncloud/ocis/pull/4023
+
+* Enhancement - Update reva: [#4025](https://github.com/owncloud/ocis/pull/4025)
+
+   https://github.com/owncloud/ocis/pull/4025
 # Changelog for [2.0.0-beta.4] (2022-06-22)
 
 The following sections list the changes for 2.0.0-beta.4.
