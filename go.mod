@@ -10,7 +10,7 @@ require (
 	github.com/blevesearch/bleve_index_api v1.0.2
 	github.com/coreos/go-oidc/v3 v3.2.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220512100524-551800f020d8
-	github.com/cs3org/reva/v2 v2.6.1-0.20220623153649-1f3daf91c2a8
+	github.com/cs3org/reva/v2 v2.6.1-0.20220625133157-47ade515fb1e
 	github.com/disintegration/imaging v1.6.2
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/cors v1.2.1
@@ -265,5 +265,3 @@ require (
 )
 
 replace github.com/cs3org/go-cs3apis => github.com/micbar/go-cs3apis v0.0.0-20220617090231-703c04619761 // temp fork
-
-replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20220624153535-1aaf40d0c473
