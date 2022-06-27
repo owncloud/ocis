@@ -15,7 +15,7 @@ yarn.lock
 # build artifacts
 */bin
 extensions/*/bin
-dist/
+extensions/**/dist/
 extensions/*/assets
 ocis/ocis
 ocis/cmd/ocis/__debug_bin
