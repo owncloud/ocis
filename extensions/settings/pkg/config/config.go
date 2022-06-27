@@ -35,7 +35,7 @@ type Config struct {
 
 // Asset defines the available asset configuration.
 type Asset struct {
-	Path string `yaml:"path" env:"SETTINGS_ASSET_PATH" desc:"Serve settings assets from a path on the filesystem instead of the builtin assets."`
+	Path string `yaml:"path" env:"SETTINGS_ASSET_PATH" desc:"Serve settings Web UI assets from a path on the filesystem instead of the builtin assets. Can be used for development and customization."`
 }
 
 // Metadata configures the metadata store to use

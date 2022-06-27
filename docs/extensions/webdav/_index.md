@@ -10,8 +10,7 @@ geekdocCollapseSection: true
 
 ## Abstract
 
-This service provides the WebDAV API which is required by some ownCloud clients.
-
+This service provides preview (thumbnails) endpoints on the WebDAV API and therefore extends the main WebDAV API provided by the [oCDAV service]({{ ../../ocdav }}).
 
 ## Table of Contents
 

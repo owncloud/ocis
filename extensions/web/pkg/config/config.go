@@ -71,7 +71,7 @@ type ExternalAppConfig struct {
 
 // Web defines the available web configuration.
 type Web struct {
-	Path        string    `yaml:"path" env:"WEB_UI_PATH" desc:"Read the ownCloud Web configuration from a file."`
+	Path        string    `yaml:"path" env:"WEB_UI_PATH" desc:"Read the ownCloud Web configuration from this file path."`
 	ThemeServer string    `yaml:"theme_server" env:"OCIS_URL;WEB_UI_THEME_SERVER" desc:"URL to load themes from. Will be prepended to the theme path."` // used to build Theme in WebConfig
 	ThemePath   string    `yaml:"theme_path" env:"WEB_UI_THEME_PATH" desc:"URL path to load themes from. The theme server will be prepended."`          // used to build Theme in WebConfig
 	Config      WebConfig `yaml:"config"`

@@ -90,7 +90,7 @@ type UserSharingOwnCloudSQLDriver struct {
 	DBHost             string `yaml:"db_host" env:"SHARING_USER_OWNCLOUDSQL_DB_HOST" desc:"Hostname or IP of the database server."`
 	DBPort             int    `yaml:"db_port" env:"SHARING_USER_OWNCLOUDSQL_DB_PORT" desc:"Port, the database server is listening on."`
 	DBName             string `yaml:"db_name" env:"SHARING_USER_OWNCLOUDSQL_DB_NAME" desc:"Name of the database to be used."`
-	UserStorageMountID string `yaml:"user_storage_mount_id" env:"SHARING_USER_OWNCLOUDSQL_USER_STORAGE_MOUNT_ID" desc:"Mount ID of this storage."`
+	UserStorageMountID string `yaml:"user_storage_mount_id" env:"SHARING_USER_OWNCLOUDSQL_USER_STORAGE_MOUNT_ID" desc:"Mount ID of the ownCloudSQL users storage for mapping ownCloud 10 shares."`
 }
 
 type UserSharingCS3Driver struct {
@@ -108,7 +108,7 @@ type PublicSharingDrivers struct {
 }
 
 type PublicSharingJSONDriver struct {
-	File string `yaml:"file" env:"SHARING_PUBLIC_JSON_FILE" desc:"Path to the json file where public shares will be persisted."`
+	File string `yaml:"file" env:"SHARING_PUBLIC_JSON_FILE" desc:"Path to the JSON file where public share meta-data will be stored. This JSON file contains the information about public shares that have been created."`
 }
 
 type PublicSharingSQLDriver struct {
