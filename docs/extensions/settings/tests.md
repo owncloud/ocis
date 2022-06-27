@@ -16,15 +16,6 @@ You need a working installation of [the Go programming language](https://golang.
 
 Make sure you've cloned the [web frontend repo](https://github.com/owncloud/web/) and the [infinite scale repo](https://github.com/owncloud/ocis/) next to each other. If your file/folder structure is different, you'll have to change the paths below accordingly.
 
-{{< hint info >}}
-For now, an IDP configuration file gets generated once and will fail upon changing the oCIS url as done below. To avoid any clashes, remove this file before starting the tests:
-
-```bash
-rm ~/.ocis/idp/identifier-registration.yaml
-```
-
-{{< /hint >}}
-
 ### In the web repo
 
 #### **Optional:** Build web to test local changes

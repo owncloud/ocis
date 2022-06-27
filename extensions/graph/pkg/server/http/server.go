@@ -59,6 +59,10 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.EventsPublisher(publisher),
 	)
 
+	if handle == nil {
+		return http.Service{}, errors.New("could not initialize graph service")
+	}
+
 	{
 		handle = svc.NewInstrument(handle, options.Metrics)
 		handle = svc.NewLogging(handle, options.Logger)

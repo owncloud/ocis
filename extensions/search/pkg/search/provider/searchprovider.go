@@ -14,6 +14,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/events"
 	sdk "github.com/cs3org/reva/v2/pkg/sdk/common"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -25,6 +26,16 @@ import (
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 )
+
+var ListenEvents = []events.Unmarshaller{
+	events.ItemTrashed{},
+	events.ItemRestored{},
+	events.ItemMoved{},
+	events.ContainerCreated{},
+	events.FileUploaded{},
+	events.FileTouched{},
+	events.FileVersionRestored{},
+}
 
 type Provider struct {
 	logger            log.Logger

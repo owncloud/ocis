@@ -467,7 +467,7 @@ func (i *LDAP) GetGroup(ctx context.Context, nameOrID string, queryParam url.Val
 		if err != nil {
 			return nil, err
 		}
-		if len(members) > 1 {
+		if len(members) > 0 {
 			m := make([]libregraph.User, 0, len(members))
 			for _, u := range members {
 				m = append(m, *u)
@@ -623,7 +623,7 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 			if err != nil {
 				return nil, err
 			}
-			if len(members) > 1 {
+			if len(members) > 0 {
 				m := make([]libregraph.User, 0, len(members))
 				for _, u := range members {
 					m = append(m, *u)

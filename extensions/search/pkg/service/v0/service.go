@@ -14,7 +14,6 @@ import (
 	"go-micro.dev/v4/metadata"
 	grpcmetadata "google.golang.org/grpc/metadata"
 
-	"github.com/owncloud/ocis/v2/extensions/audit/pkg/types"
 	"github.com/owncloud/ocis/v2/extensions/search/pkg/config"
 	"github.com/owncloud/ocis/v2/extensions/search/pkg/search"
 	"github.com/owncloud/ocis/v2/extensions/search/pkg/search/index"
@@ -38,7 +37,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
 	if err != nil {
 		return nil, err
 	}
-	evts, err := events.Consume(client, evtsCfg.ConsumerGroup, types.RegisteredEvents()...)
+	evts, err := events.Consume(client, evtsCfg.ConsumerGroup, searchprovider.ListenEvents...)
 	if err != nil {
 		return nil, err
 	}

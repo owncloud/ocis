@@ -52,7 +52,6 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 					"datagateway":                    strings.TrimRight(cfg.FrontendPublicURL, "/") + "/data",
 					"transfer_shared_secret":         cfg.TransferSecret,
 					"transfer_expires":               cfg.TransferExpires,
-					"home_mapping":                   cfg.HomeMapping,
 					"etag_cache_ttl":                 cfg.EtagCacheTTL,
 				},
 				"authregistry": map[string]interface{}{

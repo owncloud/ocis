@@ -1,7 +1,7 @@
 package defaults
 
 import (
-	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/owncloud/ocis/v2/extensions/idp/pkg/config"
@@ -24,8 +24,8 @@ func DefaultConfig() *config.Config {
 			Addr:      "127.0.0.1:9130",
 			Root:      "/",
 			Namespace: "com.owncloud.web",
-			TLSCert:   path.Join(defaults.BaseDataPath(), "idp", "server.crt"),
-			TLSKey:    path.Join(defaults.BaseDataPath(), "idp", "server.key"),
+			TLSCert:   filepath.Join(defaults.BaseDataPath(), "idp", "server.crt"),
+			TLSKey:    filepath.Join(defaults.BaseDataPath(), "idp", "server.key"),
 			TLS:       false,
 		},
 		Reva: &config.Reva{
@@ -47,18 +47,18 @@ func DefaultConfig() *config.Config {
 			AllowScope:                        nil,
 			AllowClientGuests:                 false,
 			AllowDynamicClientRegistration:    false,
-			EncryptionSecretFile:              "",
+			EncryptionSecretFile:              filepath.Join(defaults.BaseDataPath(), "idp", "encryption.key"),
 			Listen:                            "",
 			IdentifierClientDisabled:          true,
-			IdentifierClientPath:              path.Join(defaults.BaseDataPath(), "idp"),
-			IdentifierRegistrationConf:        path.Join(defaults.BaseDataPath(), "idp", "tmp", "identifier-registration.yaml"),
+			IdentifierClientPath:              filepath.Join(defaults.BaseDataPath(), "idp"),
+			IdentifierRegistrationConf:        filepath.Join(defaults.BaseDataPath(), "idp", "tmp", "identifier-registration.yaml"),
 			IdentifierScopesConf:              "",
 			IdentifierDefaultBannerLogo:       "",
 			IdentifierDefaultSignInPageText:   "",
 			IdentifierDefaultUsernameHintText: "",
-			SigningKid:                        "",
+			SigningKid:                        "private-key",
 			SigningMethod:                     "PS256",
-			SigningPrivateKeyFiles:            nil,
+			SigningPrivateKeyFiles:            []string{filepath.Join(defaults.BaseDataPath(), "idp", "private-key.pem")},
 			ValidationKeysPath:                "",
 			CookieBackendURI:                  "",
 			CookieNames:                       nil,
@@ -124,7 +124,7 @@ func DefaultConfig() *config.Config {
 		},
 		Ldap: config.Ldap{
 			URI:               "ldaps://localhost:9235",
-			TLSCACert:         path.Join(defaults.BaseDataPath(), "idm", "ldap.crt"),
+			TLSCACert:         filepath.Join(defaults.BaseDataPath(), "idm", "ldap.crt"),
 			BindDN:            "uid=idp,ou=sysusers,o=libregraph-idm",
 			BaseDN:            "ou=users,o=libregraph-idm",
 			Scope:             "sub",

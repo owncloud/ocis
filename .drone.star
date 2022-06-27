@@ -1576,6 +1576,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         user = "0:0"
         environment = {
             "OCIS_URL": OCIS_URL,
+            "FRONTEND_ENABLE_RESHARING": "true",
             "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",  # cs3api-validator needs the cs3api gatway exposed
             "STORAGE_USERS_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
@@ -1584,7 +1585,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "SHARING_USER_JSON_FILE": "/srv/app/tmp/ocis/shares.json",
             "PROXY_ENABLE_BASIC_AUTH": True,
             "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
-            "IDP_IDENTIFIER_REGISTRATION_CONF": "/drone/src/tests/config/drone/identifier-registration.yml",
             "OCIS_LOG_LEVEL": "error",
             "SETTINGS_DATA_PATH": "/srv/app/tmp/ocis/settings",
             "IDM_CREATE_DEMO_USERS": True,
@@ -1594,7 +1594,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "name": "wait-for-ocis-server",
             "image": OC_CI_ALPINE,
             "commands": [
-                "curl -k -u admin:admin --fail --retry-connrefused --retry 10 --retry-all-errors 'https://ocis-server:9200/graph/v1.0/users/admin'",
+                "curl -k -u admin:admin --fail --retry-connrefused --retry 7 --retry-all-errors 'https://ocis-server:9200/graph/v1.0/users/admin'",
             ],
             "depends_on": depends_on,
         }
@@ -1644,6 +1644,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_RUN_EXTENSIONS": "app-registry,app-provider,auth-basic,auth-bearer,auth-machine,frontend,gateway,graph,graph-explorer,groups,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav",
             "OCIS_LOG_LEVEL": "info",
             "OCIS_URL": OCIS_URL,
+            "FRONTEND_ENABLE_RESHARING": "true",
             "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",
             "OCIS_CONFIG_DIR": "/etc/ocis",
             "PROXY_ENABLE_BASIC_AUTH": "true",
@@ -2260,6 +2261,7 @@ def parallelAcceptance(env):
         "OCIS_SKELETON_STRATEGY": "copy",
         "SEND_SCENARIO_LINE_REFERENCES": "true",
         "UPLOAD_DELETE_WAIT_TIME": "1",
+        "FRONTEND_ENABLE_RESHARING": "true",
     }
     environment.update(env)
 

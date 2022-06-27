@@ -9,7 +9,7 @@ repository:
 
   private: false
   has_issues: true
-  has_projects: false
+  has_projects: true
   has_wiki: false
   has_downloads: false
 
@@ -43,6 +43,8 @@ teams:
     permission: push
   - name: cern
     permission: triage
+  - name: ocis-contractors
+    permission: push
 
 branches:
   - name: master
@@ -63,6 +65,7 @@ branches:
         teams:
           - ci
           - employees
+          - ocis-contractors
 
 ...
 
