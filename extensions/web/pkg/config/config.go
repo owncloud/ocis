@@ -19,7 +19,7 @@ type Config struct {
 	HTTP HTTP `yaml:"http"`
 
 	Asset Asset  `yaml:"asset"`
-	File  string `yaml:"file" env:"WEB_UI_CONFIG" desc:"Read the ownCloud Web configuration from a file."` // TODO: rename this to a more self explaining string
+	File  string `yaml:"file" env:"WEB_UI_CONFIG" desc:"Read the ownCloud Web configuration from this file."` // TODO: rename this to a more self explaining string
 	Web   Web    `yaml:"web"`
 
 	Context context.Context `yaml:"-"`
