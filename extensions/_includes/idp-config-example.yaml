@@ -39,15 +39,16 @@ idp:
   allow_scope: []
   allow_client_guests: false
   allow_dynamic_client_registration: false
-  encrypt_secret_file: ""
+  encrypt_secret_file: ~/.ocis/idp/encryption.key
   listen: ""
   identifierdefaultbannerlogo: ""
   identifierdefaultsigninpagetext: ""
   identifierdefaultusernamehinttext: ""
   identifieruilocales: []
-  signing_kid: ""
+  signing_kid: private-key
   signing_method: PS256
-  signing_private_key_files: []
+  signing_private_key_files:
+  - ~/.ocis/idp/private-key.pem
   validation_keys_path: ""
   cookiebackenduri: ""
   cookienames: []
