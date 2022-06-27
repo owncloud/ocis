@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Enhancement - Add FRONTEND_ENABLE_RESHARING env variable: [#4023](https://github.com/owncloud/ocis/pull/4023)
 * Enhancement - Generate signing key and encryption secret: [#3909](https://github.com/owncloud/ocis/issues/3909)
+* Enhancement - New migrate command for migrating shares and public shares: [#3987](https://github.com/owncloud/ocis/pull/3987)
 * Enhancement - Update reva: [#4025](https://github.com/owncloud/ocis/pull/4025)
 
 ## Details
@@ -27,6 +28,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3909
    https://github.com/owncloud/ocis/pull/4022
+
+* Enhancement - New migrate command for migrating shares and public shares: [#3987](https://github.com/owncloud/ocis/pull/3987)
+
+   We added a new `migrate` subcommand which can be used to migrate shares and public shares
+   between different share and publicshare managers.
+
+   https://github.com/owncloud/ocis/pull/3987
+   https://github.com/owncloud/ocis/pull/4019
 
 * Enhancement - Update reva: [#4025](https://github.com/owncloud/ocis/pull/4025)
 
