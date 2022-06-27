@@ -1,0 +1,8 @@
+generate:
+  go_options:
+    import_path: github.com/cs3org/reva/cmd/revad/svcs/grpcsvcs/helloworldsvc/proto
+  plugins:
+    - name : go
+      type: go
+      flags: plugins=grpc
+      output: ./

@@ -1,0 +1,23 @@
+language: go
+
+go:
+  - "1.17.x"
+  - "1.16.x"
+
+git:
+  depth: 1
+
+install:
+  - go install -race std
+  - go install golang.org/x/tools/cmd/cover
+  - go install golang.org/x/lint/golint
+  - export PATH=$HOME/gopath/bin:$PATH
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/mattn/goveralls
+
+script:
+  - golint .
+  - go test -cover -race -count=1 -timeout=30s -run .
+  - go test -covermode=count -coverprofile=coverage.out -timeout=90s -run .
+  - if test ! -z "$COVERALLS_TOKEN"; then $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN; fi
+  - cd bench; go test -run=Bench.* -bench=. -benchmem; cd ..

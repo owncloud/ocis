@@ -1,0 +1,59 @@
+#
+# Copyright 2019 Kopano and its licensors
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License, version 3 or
+# later, as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+FROM golang:1.17.2-buster
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+ARG GOLANGCI_LINT_TAG=v1.23.8
+RUN curl -sfL \
+	https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
+	sh -s -- -b /usr/local/bin ${GOLANGCI_LINT_TAG}
+
+RUN GOBIN=/usr/local/bin go get -v \
+	github.com/tebeka/go2xunit \
+	github.com/axw/gocov/... \
+	github.com/AlekSi/gocov-xml \
+	github.com/wadey/gocovmerge \
+	&& go clean -cache && rm -rf /root/go
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends \
+		build-essential \
+		gettext-base \
+		imagemagick \
+		python-scour \
+		nodejs \
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/*
+
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends \
+		yarn \
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+ENV GOCACHE=/tmp/go-build
+ENV GOPATH=""
+ENV HOME=/tmp
+
+CMD ["make", "DATE=reproducible"]

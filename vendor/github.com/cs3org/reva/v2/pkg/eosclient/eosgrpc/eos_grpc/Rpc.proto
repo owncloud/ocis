@@ -1,0 +1,537 @@
+// @project        The CERN Tape Archive (CTA)
+// @brief          CTA-EOS gRPC API for CASTOR-EOS migration
+// @copyright      Copyright 2019 CERN
+// @license        This program is free software: you can redistribute it and/or modify
+//                 it under the terms of the GNU General Public License as published by
+//                 the Free Software Foundation, either version 3 of the License, or
+//                 (at your option) any later version.
+//
+//                 This program is distributed in the hope that it will be useful,
+//                 but WITHOUT ANY WARRANTY; without even the implied warranty of
+//                 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//                 GNU General Public License for more details.
+//
+//                 You should have received a copy of the GNU General Public License
+//                 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+// NOTE: Compile for Go with:
+// protoc ./eos_grpc.proto --go_out=plugins=grpc:.
+
+
+syntax = "proto3";
+
+package eos.rpc;
+
+option java_multiple_files = true;
+option java_package = "io.grpc.eos.rpc";
+option java_outer_classname = "EosProto";
+option objc_class_prefix = "EOS";
+option go_package = "github.com/cern-eos/grpc-proto/protobuf;eos_grpc";
+
+
+service Eos {
+  // Replies to a ping
+  rpc Ping (PingRequest) returns (PingReply) {}  
+
+  // ---------------------------------------------------------------------
+  // NAMESPACE
+  // ---------------------------------------------------------------------
+
+  // Replies to MD requests with a stream 
+  rpc MD (MDRequest) returns (stream MDResponse) {}
+
+  // Replies to Find requests with a stream
+  rpc Find (FindRequest) returns (stream MDResponse) {}
+
+  // Replies to a NsStat operation
+  rpc NsStat (NsStatRequest) returns (NsStatResponse) {}
+
+  // Replies to an insert
+  rpc ContainerInsert (ContainerInsertRequest) returns (InsertReply) {}  
+  rpc FileInsert (FileInsertRequest) returns (InsertReply) {}
+
+  // Replies to a NsRequest operation
+  rpc Exec (NSRequest) returns (NSResponse) {}
+
+  // ---------------------------------------------------------------------
+  // OPENSTACK
+  // ---------------------------------------------------------------------
+
+  // Manila Driver
+  rpc ManilaServerRequest (ManilaRequest) returns (ManilaResponse) {}  
+}
+
+message PingRequest {
+  string authkey = 1;
+  bytes message = 2;
+}
+
+message PingReply {
+  bytes message = 1;
+}
+
+// ---------------------------------------------------------------------
+// NAMESPACE
+// ---------------------------------------------------------------------
+
+message ContainerInsertRequest {
+  repeated ContainerMdProto container = 1;
+  string authkey = 2;
+  bool inherit_md = 3;
+}
+
+message FileInsertRequest {
+  repeated FileMdProto files = 1;
+  string authkey = 2;
+}
+
+message InsertReply {
+  repeated string message = 1;
+  repeated uint32 retc = 2;
+}
+
+message Time {
+  uint64 sec = 1;
+  uint64 n_sec = 2;
+}
+
+message Checksum {
+  bytes value = 1;
+  string type = 2;
+}
+
+message FileMdProto {
+  uint64 id = 1;
+  uint64 cont_id = 2;
+  uint64 uid = 3;
+  uint64 gid = 4;
+  uint64 size = 5;
+  uint32 layout_id = 6;
+  uint32 flags = 7;
+  bytes name = 8;
+  bytes link_name = 9;
+  Time ctime = 10; // change time
+  Time mtime = 11; // modification time
+  Checksum checksum =12;
+  repeated uint32 locations = 13;
+  repeated uint32 unlink_locations = 14;
+  map<string, bytes> xattrs = 15;
+  bytes path = 16;
+  string etag = 17;
+}
+
+message ContainerMdProto {
+  uint64 id = 1;
+  uint64 parent_id = 2;
+  uint64 uid = 3;
+  uint64 gid = 4;
+  int64 tree_size = 6;
+  uint32 mode = 5;
+  uint32 flags = 7;
+  bytes name = 8;
+  Time ctime = 9;  // change time
+  Time mtime = 10; // modification time
+  Time stime = 11; // sync time
+  map<string, bytes> xattrs = 12;
+  bytes path = 13;
+  string etag = 14;
+}
+
+enum TYPE { FILE = 0; CONTAINER = 1; LISTING = 2; STAT = 3;}  
+
+enum QUOTATYPE { USER = 0; GROUP = 2; PROJECT = 3;}
+
+enum QUOTAOP { GET = 0; SET = 1; RM = 2; RMNODE = 3;}
+
+enum QUOTAENTRY { NONE = 0; VOLUME = 1; INODE = 2;}
+     
+message QuotaProto { 
+  bytes path = 1;                // quota node path
+  string name = 2;               // associated name for the given type
+  QUOTATYPE type = 3;            // user,group,project or all quota
+  uint64 usedbytes = 4;          // bytes used physical
+  uint64 usedlogicalbytes = 5;   // bytes used logical 
+  uint64 usedfiles = 6;          // number of files used
+  uint64 maxbytes = 7;           // maximum number of bytes (volume quota)
+  uint64 maxlogicalbytes = 8;    // maximum number of logical bytes (logical volume quota)
+  uint64 maxfiles = 9;           // maximum number of files (inode quota)
+  float percentageusedbytes = 10; // percentage of volume quota used from 0 to 100
+  float percentageusedfiles = 11; // percentag of inode quota used from 0 to 100
+  string statusbytes = 12;       // status string for volume quota ok,warning,exceeded
+  string statusfiles = 13;       // status string for inode quota ok,warning,exceeded
+}
+  
+message RoleId {
+  uint64 uid = 1;
+  uint64 gid = 2;
+  string username = 3;
+  string groupname = 4;
+}
+
+message MDId {
+  bytes path = 1;
+  fixed64 id = 2;
+  fixed64 ino = 3;
+  TYPE type = 4;
+}
+
+message Limit {
+  bool zero = 1;
+  uint64 min = 2;
+  uint64 max = 3;
+}
+
+message MDSelection {
+  bool select = 1;
+  Limit ctime = 2;
+  Limit mtime = 3;
+  Limit stime = 4;
+  Limit size = 5;
+  Limit treesize = 6;
+  Limit children = 7;
+  Limit locations = 8;
+  Limit unlinked_locations = 9;
+  uint64 layoutid = 10;
+  uint64 flags = 11;
+  bool symlink = 12;
+  Checksum checksum = 13;
+  uint32 owner = 14;
+  uint32 group = 15;
+  bool owner_root = 16;
+  bool group_root = 17;
+  bytes regexp_filename = 18;
+  bytes regexp_dirname = 19;
+  map<string, bytes> xattr = 20;
+}
+
+message MDRequest {
+  TYPE type = 1;
+  MDId id = 2;
+  string authkey = 3;
+  RoleId role = 4;
+  MDSelection selection = 5;
+}
+
+message MDResponse {
+  TYPE type = 1;
+  FileMdProto fmd = 2;
+  ContainerMdProto cmd = 3;
+}
+
+message FindRequest {
+  TYPE type = 1;
+  MDId id = 2;
+  RoleId role = 3;	
+  string authkey = 4;
+  uint64 maxdepth = 5;
+  MDSelection selection = 6;
+}
+
+message ShareAuth {
+ string prot = 1;
+ string name = 2;
+ string host = 3;
+}
+
+
+message ShareProto {
+  string permission = 1;
+  uint64 expires    = 2;
+  string owner      = 3;
+  string group      = 4;
+  uint64 generation = 5;
+  string path    = 6;
+  bool allowtree = 7;
+  string vtoken = 8;
+  repeated ShareAuth origins = 9;
+}
+
+message ShareToken {
+  ShareProto token = 1;
+  bytes signature = 2;
+  bytes serialized = 3;
+  int32 seed = 4;
+}
+
+message NSRequest {
+  message MkdirRequest {
+    MDId id = 1;
+    bool recursive = 2;
+    int64 mode = 3;
+  }
+  
+  message RmdirRequest {
+    MDId id = 1;
+  }
+ 
+  message TouchRequest {
+    MDId id = 1;
+  }
+
+  message UnlinkRequest {
+    MDId id = 1;
+    bool norecycle = 3;
+  }
+
+  message RmRequest {
+    MDId id = 1;
+    bool recursive = 2;
+    bool norecycle = 3;
+  }
+
+  message RenameRequest {
+    MDId id = 1;
+    bytes target = 2;
+  }
+
+  message SymlinkRequest {
+    MDId id = 1;
+    bytes target = 2;
+  }
+
+  message VersionRequest {
+    enum VERSION_CMD {
+     CREATE= 0;
+     PURGE = 1;
+     LIST = 2;
+     GRAB = 3;
+   }
+   MDId id = 1;
+   VERSION_CMD cmd = 2;
+   int32 maxversion = 3;
+   string grabversion = 4;
+  }
+
+  message RecycleRequest {
+    string key = 1; 
+    enum RECYCLE_CMD {
+      RESTORE = 0;
+      PURGE = 1;
+      LIST = 2;
+    }
+    RECYCLE_CMD cmd = 2;
+
+    message RestoreFlags {
+      bool force = 1;
+      bool mkpath = 2;
+      bool versions = 3;
+    }
+
+    message PurgeDate {
+      int32 year = 1;
+      int32 month = 2;
+      int32 day = 3;
+    }
+
+    RestoreFlags restoreflag = 3;
+    PurgeDate purgedate = 4;
+  }
+
+  message SetXAttrRequest {
+    MDId id = 1;
+    map<string, bytes> xattrs = 2;
+    bool recursive = 3;
+    repeated string keystodelete = 4;
+  }
+
+  message ChownRequest {
+    MDId id = 1;
+    RoleId owner = 2;  
+  }
+
+  message ChmodRequest {
+    MDId id = 1;
+    int64 mode = 2;
+  }
+
+  message AclRequest {
+    enum ACL_COMMAND {
+      NONE = 0;
+      MODIFY = 1;
+      LIST   = 2;
+    }
+
+    enum ACL_TYPE {
+      USER_ACL = 0;
+      SYS_ACL = 1;
+    }
+
+    MDId id = 1;
+    ACL_COMMAND cmd = 2;
+    bool recursive = 3;
+    ACL_TYPE type = 4;
+    string rule    = 5;
+    uint32 position = 6;
+  }
+
+  message TokenRequest {
+    ShareToken token = 1;
+  }
+
+  message QuotaRequest {
+    bytes path = 1;
+    RoleId id = 2;
+    QUOTAOP op = 3; // get or set, rm or rmnode
+    uint64 maxfiles = 4; // maximum number of bytes (volume quota) for setting
+    uint64 maxbytes = 5; // maximum number of bytes (volume quota) for setting
+    QUOTAENTRY entry = 6; // select volume or inode entry for deletion
+  }
+
+  string authkey = 1;
+  RoleId role = 2;
+  // Actual request data object
+  oneof command {
+    MkdirRequest mkdir       = 21;
+    RmdirRequest rmdir       = 22;
+    TouchRequest touch       = 23;
+    UnlinkRequest unlink     = 24;
+    RmRequest rm             = 25;
+    RenameRequest rename     = 26;
+    SymlinkRequest symlink   = 27;
+    VersionRequest version   = 28;
+    RecycleRequest recycle   = 29;
+    SetXAttrRequest xattr    = 30;
+    ChownRequest chown       = 31;
+    ChmodRequest chmod       = 32;
+    AclRequest acl           = 33;
+    TokenRequest token       = 34;
+    QuotaRequest quota       = 35;
+  }
+}
+
+
+
+message NSResponse {
+  message ErrorResponse {
+    int64 code = 1;
+    string msg = 2;	
+  }
+
+  message VersionResponse {
+    message VersionInfo {
+      MDId   id = 1;
+      Time   mtime = 2;
+    }
+    int64 code = 1;
+    string msg = 2;	
+    repeated VersionInfo versions = 3;
+  }
+
+  message RecycleResponse {
+    int64 code = 1;
+    string msg = 2;	
+    
+    message RecycleInfo {
+      enum DELETIONTYPE { FILE = 0;  TREE = 1; }
+      MDId   id = 1;
+      RoleId owner = 2;
+      Time   dtime = 3;
+      uint64 size = 4;
+      DELETIONTYPE type = 5;
+      string key = 6;
+    }   
+    
+    repeated RecycleInfo recycles = 3;
+  }
+
+  message AclResponse {
+    int64 code = 1;
+    string msg = 2;	
+    string rule = 3;
+  }
+
+  message QuotaResponse {
+    int64 code = 1;   
+    string msg = 2;   	
+    repeated QuotaProto quotanode = 3;
+  }
+
+  ErrorResponse       error = 1;
+  VersionResponse     version = 2;
+  RecycleResponse     recycle = 3;
+  AclResponse         acl = 4;
+  QuotaResponse       quota = 5;
+}
+
+message NsStatRequest {
+  string authkey = 1;
+}
+
+message NsStatResponse {
+  int64 code = 1;
+  string emsg = 2;
+  string state = 3;
+  uint64 nfiles = 4;
+  uint64 ncontainers = 5;
+  uint64 boot_time = 6;
+  uint64 current_fid = 7;
+  uint64 current_cid = 8;
+  uint64 mem_virtual = 9;
+  uint64 mem_resident = 10;
+  uint64 mem_share = 11;
+  uint64 mem_growth = 12;
+  uint64 threads = 13;
+  uint64 fds = 14;
+  uint64 uptime = 15;
+}
+
+// ---------------------------------------------------------------------
+// OPENSTACK
+// ---------------------------------------------------------------------
+
+enum MANILA_REQUEST_TYPE {
+   CREATE_SHARE = 0;
+   DELETE_SHARE = 1;
+   EXTEND_SHARE = 2;
+   SHRINK_SHARE = 3;
+   MANAGE_EXISTING = 4;
+   UNMANAGE = 5;
+   GET_CAPACITIES = 6;
+/* EXTRA FUNCTIONS NOT IMPLEMENTED */
+   /*
+   CREATE_SNAPSHOT = 7;
+   DELETE_SNAPSHOT = 8;
+   CREATE_SHARE_FROM_SNAPSHOT = 9;
+   ENSURE_SHARE = 10;
+   ALLOW_ACCESS = 11;
+   DENY_ACCESS = 12;
+   GET_SHARE_STATS = 13;
+   DO_SETUP = 14;
+   SETUP_SERVER = 15;
+   TEARDOWN_SERVER = 16;
+   GET_NETWORK_ALLOCATIONS_NUMBER = 17;
+   VERIFY_SHARE_SERVER_HANDLING = 18;
+   CREATE_SHARE_GROUP = 19;
+   DELETE_SHARE_GROUP = 20;
+   */
+
+}
+
+message ManilaRequest {
+   MANILA_REQUEST_TYPE request_type = 1;
+   string auth_key = 2;
+   string protocol = 3;
+   string share_name = 4;
+   string description = 5;
+   string share_id = 6;
+   string share_group_id = 7;
+   int32 quota = 8;
+   string creator = 9;
+   string egroup = 10;
+   string admin_egroup = 11;
+   string share_host = 12;
+   string share_location = 13;
+}
+
+message ManilaResponse {
+   string msg = 1; //for generic messages
+   int32 code = 2; // < 1 is an error -- > 1 is OK
+   int64 total_used = 3;
+   int64 total_capacity = 4;
+   int64 new_share_quota = 5;
+   string new_share_path = 6;
+
+}
+
+

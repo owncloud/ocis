@@ -1,0 +1,25 @@
+.*
+
+# We don't want to ignore the following even if they are dot-files
+!.editorconfig
+!.gitattributes
+!.gitignore
+!.gitlab-ci.yml
+!.env
+!.chglog
+!.dependabot.yml
+
+/vendor
+/bin
+/cmd/licod/debug
+/test/tests.*
+/test/coverage.*
+/golint.txt
+/govet.txt
+/dist
+/examples
+/identifier/node_modules
+/Caddyfile
+/3rdparty-LICENSES.md
+/identifier-registration.yaml
+/scopes.yaml

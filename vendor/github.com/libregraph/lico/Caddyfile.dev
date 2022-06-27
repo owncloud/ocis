@@ -1,0 +1,53 @@
+# Example Caddyfile to use with https://caddyserver.com
+#
+# This assumes Konnect is running with identifier on 127.0.0.1:8777. In addition
+# for development, the identifier is used directly from webpack-dev-server
+# running on 127.0.0.1:3001. Additional examples are included for third party
+# login provides which use cookie passthrough backend.
+
+*:8443 {
+	errors stderr
+	log stdout
+
+	tls self_signed
+
+	# konnect oidc
+	proxy /.well-known/openid-configuration 127.0.0.1:8777
+	proxy /konnect/v1/jwks.json 127.0.0.1:8777
+	proxy /konnect/v1/token 127.0.0.1:8777
+	proxy /konnect/v1/userinfo 127.0.0.1:8777
+	proxy /konnect/v1/static 127.0.0.1:8777
+	proxy /konnect/v1/session 127.0.0.1:8777
+	proxy /konnect/v1/register 127.0.0.1:8777
+
+	# konnect identifier development via webpack-dev-server
+	proxy /signin/v1/ 127.0.0.1:3001 {
+		header_downstream Cache-Control "no-cache, max-age=0, public"
+		header_downstream Referrer-Policy origin
+		header_downstream Content-Security-Policy "object-src 'none'; script-src 'self'; base-uri 'none'; frame-ancestors 'none';"
+	}
+	proxy /sockjs-node 127.0.0.1:3001 {
+		websocket
+	}
+	proxy /static 127.0.0.1:3001
+	proxy /signin/v1/identifier/_/ 127.0.0.1:8777 {
+		transparent
+	}
+
+	# konnect identifier login area
+	proxy /signin/ 127.0.0.1:8777 {
+		transparent
+	}
+
+	# third party login area provider example
+	# proxy /provider/simple 127.0.0.1:8999
+
+	# konnect authorize endpoint below third party login area provider
+	#proxy /provider/simple/konnect/v1/authorize 127.0.0.1:8777 {
+	#	without /provider/simple
+	#	header_upstream X-Forwarded-Prefix /provider/simple
+	#}
+
+	# konnect cookieserver, start with python3 ./examples/cookieserver.py 8088
+	#proxy /cookieserver/simple-userinfo 127.0.0.1:8088
+}

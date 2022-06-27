@@ -1,0 +1,351 @@
+// Copyright 2018-2021 CERN
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// In applying this license, CERN does not waive the privileges and immunities
+// granted to it by virtue of its status as an Intergovernmental Organization
+// or submit itself to any jurisdiction.
+
+package node
+
+import (
+	"context"
+	"encoding/json"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"time"
+
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/appctx"
+	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/filelocks"
+	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/pkg/errors"
+)
+
+// SetLock sets a lock on the node
+func (n *Node) SetLock(ctx context.Context, lock *provider.Lock) error {
+	lockFilePath := n.LockFilePath()
+
+	// ensure parent path exists
+	if err := os.MkdirAll(filepath.Dir(lockFilePath), 0700); err != nil {
+		return errors.Wrap(err, "Decomposedfs: error creating parent folder for lock")
+	}
+
+	// get file lock, so that nobody can create the lock in the meantime
+	fileLock, err := filelocks.AcquireWriteLock(n.InternalPath())
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		rerr := filelocks.ReleaseLock(fileLock)
+
+		// if err is non nil we do not overwrite that
+		if err == nil {
+			err = rerr
+		}
+	}()
+
+	// check if already locked
+	l, err := n.ReadLock(ctx, true) // we already have a write file lock, so ReadLock() would fail to acquire a read file lock -> skip it
+	switch err.(type) {
+	case errtypes.NotFound:
+		// file not locked, continue
+	case nil:
+		if l != nil {
+			return errtypes.Aborted("already locked")
+		}
+	default:
+		return errors.Wrap(err, "Decomposedfs: could check if file already is locked")
+	}
+
+	// O_EXCL to make open fail when the file already exists
+	f, err := os.OpenFile(lockFilePath, os.O_EXCL|os.O_CREATE|os.O_WRONLY, 0600)
+	if err != nil {
+		return errors.Wrap(err, "Decomposedfs: could not create lock file")
+	}
+	defer f.Close()
+
+	if err := json.NewEncoder(f).Encode(lock); err != nil {
+		return errors.Wrap(err, "Decomposedfs: could not write lock file")
+	}
+
+	return err
+}
+
+// ReadLock reads the lock id for a node
+func (n Node) ReadLock(ctx context.Context, skipFileLock bool) (*provider.Lock, error) {
+
+	// ensure parent path exists
+	if err := os.MkdirAll(filepath.Dir(n.InternalPath()), 0700); err != nil {
+		return nil, errors.Wrap(err, "Decomposedfs: error creating parent folder for lock")
+	}
+
+	// the caller of ReadLock already may hold a file lock
+	if !skipFileLock {
+		fileLock, err := filelocks.AcquireReadLock(n.InternalPath())
+
+		if err != nil {
+			return nil, err
+		}
+
+		defer func() {
+			rerr := filelocks.ReleaseLock(fileLock)
+
+			// if err is non nil we do not overwrite that
+			if err == nil {
+				err = rerr
+			}
+		}()
+	}
+
+	f, err := os.Open(n.LockFilePath())
+	if err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			return nil, errtypes.NotFound("no lock found")
+		}
+		return nil, errors.Wrap(err, "Decomposedfs: could not open lock file")
+	}
+	defer f.Close()
+
+	lock := &provider.Lock{}
+	if err := json.NewDecoder(f).Decode(lock); err != nil {
+		appctx.GetLogger(ctx).Error().Err(err).Msg("Decomposedfs: could not decode lock file, ignoring")
+		return nil, errors.Wrap(err, "Decomposedfs: could not read lock file")
+	}
+
+	// lock already expired
+	if lock.Expiration != nil && time.Now().After(time.Unix(int64(lock.Expiration.Seconds), int64(lock.Expiration.Nanos))) {
+		if err = os.Remove(f.Name()); err != nil {
+			return nil, errors.Wrap(err, "Decomposedfs: could not remove expired lock file")
+		}
+		// we successfully deleted the expired lock
+		return nil, errtypes.NotFound("no lock found")
+	}
+
+	return lock, nil
+}
+
+// RefreshLock refreshes the node's lock
+func (n *Node) RefreshLock(ctx context.Context, lock *provider.Lock) error {
+
+	// ensure parent path exists
+	if err := os.MkdirAll(filepath.Dir(n.InternalPath()), 0700); err != nil {
+		return errors.Wrap(err, "Decomposedfs: error creating parent folder for lock")
+	}
+	fileLock, err := filelocks.AcquireWriteLock(n.InternalPath())
+
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		rerr := filelocks.ReleaseLock(fileLock)
+
+		// if err is non nil we do not overwrite that
+		if err == nil {
+			err = rerr
+		}
+	}()
+
+	f, err := os.OpenFile(n.LockFilePath(), os.O_RDWR, os.ModeExclusive)
+	switch {
+	case errors.Is(err, fs.ErrNotExist):
+		return errtypes.Aborted("lock does not exist")
+	case err != nil:
+		return errors.Wrap(err, "Decomposedfs: could not open lock file")
+	}
+	defer f.Close()
+
+	oldLock := &provider.Lock{}
+	if err := json.NewDecoder(f).Decode(oldLock); err != nil {
+		return errors.Wrap(err, "Decomposedfs: could not read lock")
+	}
+
+	// check lock
+	if oldLock.LockId != lock.LockId {
+		return errtypes.Aborted("mismatching lock")
+	}
+
+	if ok, err := isLockModificationAllowed(ctx, oldLock, lock); !ok {
+		return err
+	}
+
+	if err := json.NewEncoder(f).Encode(lock); err != nil {
+		return errors.Wrap(err, "Decomposedfs: could not write lock file")
+	}
+
+	return err
+}
+
+// Unlock unlocks the node
+func (n *Node) Unlock(ctx context.Context, lock *provider.Lock) error {
+
+	// ensure parent path exists
+	if err := os.MkdirAll(filepath.Dir(n.InternalPath()), 0700); err != nil {
+		return errors.Wrap(err, "Decomposedfs: error creating parent folder for lock")
+	}
+	fileLock, err := filelocks.AcquireWriteLock(n.InternalPath())
+
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		rerr := filelocks.ReleaseLock(fileLock)
+
+		// if err is non nil we do not overwrite that
+		if err == nil {
+			err = rerr
+		}
+	}()
+
+	f, err := os.OpenFile(n.LockFilePath(), os.O_RDONLY, os.ModeExclusive)
+	switch {
+	case errors.Is(err, fs.ErrNotExist):
+		return errtypes.Aborted("lock does not exist")
+	case err != nil:
+		return errors.Wrap(err, "Decomposedfs: could not open lock file")
+	}
+	defer f.Close()
+
+	oldLock := &provider.Lock{}
+	if err := json.NewDecoder(f).Decode(oldLock); err != nil {
+		return errors.Wrap(err, "Decomposedfs: could not read lock")
+	}
+
+	// check lock
+	if lock == nil || (oldLock.LockId != lock.LockId) {
+		return errtypes.Locked(oldLock.LockId)
+	}
+
+	if ok, err := isLockModificationAllowed(ctx, oldLock, lock); !ok {
+		return err
+	}
+
+	if err = os.Remove(f.Name()); err != nil {
+		return errors.Wrap(err, "Decomposedfs: could not remove lock file")
+	}
+	return err
+}
+
+// CheckLock compares the context lock with the node lock
+func (n *Node) CheckLock(ctx context.Context) error {
+	lockID, _ := ctxpkg.ContextGetLockID(ctx)
+	lock, _ := n.ReadLock(ctx, false)
+	if lock != nil {
+		switch lockID {
+		case "":
+			return errtypes.Locked(lock.LockId) // no lockid in request
+		case lock.LockId:
+			return nil // ok
+		default:
+			return errtypes.Aborted("mismatching lock")
+		}
+	}
+	if lockID != "" {
+		return errtypes.Aborted("not locked")
+	}
+	return nil // ok
+}
+
+func readLocksIntoOpaque(ctx context.Context, n *Node, ri *provider.ResourceInfo) error {
+
+	// ensure parent path exists
+	if err := os.MkdirAll(filepath.Dir(n.InternalPath()), 0700); err != nil {
+		return errors.Wrap(err, "Decomposedfs: error creating parent folder for lock")
+	}
+	fileLock, err := filelocks.AcquireReadLock(n.InternalPath())
+
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		rerr := filelocks.ReleaseLock(fileLock)
+
+		// if err is non nil we do not overwrite that
+		if err == nil {
+			err = rerr
+		}
+	}()
+
+	f, err := os.Open(n.LockFilePath())
+	if err != nil {
+		appctx.GetLogger(ctx).Error().Err(err).Msg("Decomposedfs: could not open lock file")
+		return err
+	}
+	defer f.Close()
+
+	lock := &provider.Lock{}
+	if err := json.NewDecoder(f).Decode(lock); err != nil {
+		appctx.GetLogger(ctx).Error().Err(err).Msg("Decomposedfs: could not read lock file")
+	}
+
+	// reencode to ensure valid json
+	var b []byte
+	if b, err = json.Marshal(lock); err != nil {
+		appctx.GetLogger(ctx).Error().Err(err).Msg("Decomposedfs: could not marshal locks")
+	}
+	if ri.Opaque == nil {
+		ri.Opaque = &types.Opaque{
+			Map: map[string]*types.OpaqueEntry{},
+		}
+	}
+	ri.Opaque.Map["lock"] = &types.OpaqueEntry{
+		Decoder: "json",
+		Value:   b,
+	}
+	return err
+}
+
+func (n *Node) hasLocks(ctx context.Context) bool {
+	_, err := os.Stat(n.LockFilePath()) // FIXME better error checking
+	return err == nil
+}
+
+func isLockModificationAllowed(ctx context.Context, oldLock *provider.Lock, newLock *provider.Lock) (bool, error) {
+	if oldLock.Type == provider.LockType_LOCK_TYPE_SHARED {
+		return true, nil
+	}
+
+	appNameEquals := oldLock.AppName == newLock.AppName
+	if !appNameEquals {
+		return false, errtypes.PermissionDenied("app names of the locks are mismatching")
+	}
+
+	var lockUserEquals, contextUserEquals bool
+	if oldLock.User == nil && newLock.GetUser() == nil {
+		// no user lock set
+		lockUserEquals = true
+		contextUserEquals = true
+	} else {
+		lockUserEquals = utils.UserEqual(oldLock.User, newLock.GetUser())
+		if !lockUserEquals {
+			return false, errtypes.PermissionDenied("users of the locks are mismatching")
+		}
+
+		u := ctxpkg.ContextMustGetUser(ctx)
+		contextUserEquals = utils.UserEqual(oldLock.User, u.Id)
+		if !contextUserEquals {
+			return false, errtypes.PermissionDenied("lock holder and current user are mismatching")
+		}
+	}
+
+	return appNameEquals && lockUserEquals && contextUserEquals, nil
+
+}

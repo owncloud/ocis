@@ -29,7 +29,6 @@ ocis/cmd/ocis/config/
 
 # Composer - used for API acceptance tests
 composer.lock
-vendor
 vendor-bin/**/vendor
 vendor-bin/**/composer.lock
 vendor-php
