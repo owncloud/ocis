@@ -48,3 +48,6 @@ protogen/buf.sha1.lock
 
 # third-party-licenses
 /third-party-licenses
+
+# misc
+go.work
