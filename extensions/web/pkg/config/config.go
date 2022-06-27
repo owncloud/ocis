@@ -44,7 +44,7 @@ type WebConfig struct {
 type OIDC struct {
 	MetadataURL  string `json:"metadata_url,omitempty" yaml:"metadata_url" env:"WEB_OIDC_METADATA_URL" desc:"URL for the OIDC well-known configuration endpoint. Defaults to the oCIS API URL + \"/.well-known/openid-configuration\"."`
 	Authority    string `json:"authority,omitempty" yaml:"authority" env:"OCIS_URL;OCIS_OIDC_ISSUER;WEB_OIDC_AUTHORITY" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP."`
-	ClientID     string `json:"client_id,omitempty" yaml:"client_id" env:"WEB_OIDC_CLIENT_ID" desc:"OIDC client id, which ownCloud Web uses. This client needs to be set up in your IDP."`
+	ClientID     string `json:"client_id,omitempty" yaml:"client_id" env:"WEB_OIDC_CLIENT_ID" desc:"OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP."`
 	ResponseType string `json:"response_type,omitempty" yaml:"response_type" env:"WEB_OIDC_RESPONSE_TYPE" desc:"OIDC response type to use for authentication."`
 	Scope        string `json:"scope,omitempty" yaml:"scope" env:"WEB_OIDC_SCOPE" desc:"OIDC scopes to request during authentication."`
 }

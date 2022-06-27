@@ -23,7 +23,7 @@ type Config struct {
 
 	Driver           string  `yaml:"driver" env:"STORAGE_USERS_DRIVER" desc:"The storage driver which should be used by the service"`
 	Drivers          Drivers `yaml:"drivers"`
-	DataServerURL    string  `yaml:"data_server_url" env:"STORAGE_USERS_DATA_SERVER_URL" desc:"URL of the data server, needs to be reachable by the data gateway provided by the frontend extension or the user if directly expose."`
+	DataServerURL    string  `yaml:"data_server_url" env:"STORAGE_USERS_DATA_SERVER_URL" desc:"URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly expose."`
 	Events           Events  `yaml:"events"`
 	MountID          string  `yaml:"mount_id" env:"STORAGE_USERS_MOUNT_ID" desc:"Mount ID of this storage."`
 	ExposeDataServer bool    `yaml:"expose_data_server" env:"STORAGE_USERS_EXPOSE_DATA_SERVER" desc:"Exposes the data server directly to users and bypasses the data gateway. Ensure that the data server address is reachable by users."`
@@ -92,7 +92,7 @@ type OCISDriver struct {
 	// the general space alias, eg: `{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}`
 	GeneralSpaceAliasTemplate string `yaml:"generalspacealias_template" env:"STORAGE_USERS_OCIS_GENERAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct general space aliases."`
 	//ShareFolder defines the name of the folder jailing all shares
-	ShareFolder string `yaml:"share_folder" env:"STORAGE_USERS_OCIS_SHARE_FOLDER" desc:"name of the folder jailing all shares."`
+	ShareFolder string `yaml:"share_folder" env:"STORAGE_USERS_OCIS_SHARE_FOLDER" desc:"Name of the folder jailing all shares."`
 }
 
 type S3NGDriver struct {
@@ -112,7 +112,7 @@ type S3NGDriver struct {
 	// the general space alias, eg: `{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}`
 	GeneralSpaceAliasTemplate string `yaml:"generalspacealias_template" env:"STORAGE_USERS_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct general space aliases."`
 	//ShareFolder defines the name of the folder jailing all shares
-	ShareFolder string `yaml:"share_folder" env:"STORAGE_USERS_S3NG_SHARE_FOLDER" desc:"name of the folder jailing all shares."`
+	ShareFolder string `yaml:"share_folder" env:"STORAGE_USERS_S3NG_SHARE_FOLDER" desc:"Name of the folder jailing all shares."`
 }
 
 type OwnCloudSQLDriver struct {
