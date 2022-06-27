@@ -1,9 +1,18 @@
 package command
 
 import (
+	"bytes"
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
+	"errors"
 	"fmt"
+	"io"
+	"io/fs"
 	"os"
+	"path/filepath"
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/extensions/idp/pkg/config"
@@ -17,6 +26,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+const _rsaKeySize = 4096
+
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
@@ -28,6 +39,15 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				fmt.Printf("%v", err)
 				os.Exit(1)
+			}
+
+			if cfg.IDP.EncryptionSecretFile != "" {
+				if err := ensureEncryptionSecretExists(cfg.IDP.EncryptionSecretFile); err != nil {
+					return err
+				}
+				if err := ensureSigningPrivateKeyExists(cfg.IDP.SigningPrivateKeyFiles); err != nil {
+					return err
+				}
 			}
 			return err
 		},
@@ -101,4 +121,78 @@ func Server(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+func ensureEncryptionSecretExists(path string) error {
+	_, err := os.Stat(path)
+	if err == nil {
+		// If the file exists we can just return
+		return nil
+	}
+	if !errors.Is(err, fs.ErrNotExist) {
+		return err
+	}
+
+	dir := filepath.Dir(path)
+	err = os.MkdirAll(dir, 0700)
+	if err != nil {
+		return err
+	}
+
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0600)
+	if err != nil {
+		return nil
+	}
+	defer f.Close()
+
+	secret := make([]byte, 32)
+	_, err = rand.Read(secret)
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(f, bytes.NewReader(secret))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ensureSigningPrivateKeyExists(paths []string) error {
+	for _, path := range paths {
+		_, err := os.Stat(path)
+		if err == nil {
+			// If the file exists we can just return
+			return nil
+		}
+		if !errors.Is(err, fs.ErrNotExist) {
+			return err
+		}
+
+		dir := filepath.Dir(path)
+		err = os.MkdirAll(dir, 0700)
+		if err != nil {
+			return err
+		}
+
+		f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0600)
+		if err != nil {
+			return nil
+		}
+		defer f.Close()
+
+		pk, err := rsa.GenerateKey(rand.Reader, _rsaKeySize)
+		if err != nil {
+			return err
+		}
+
+		pb := &pem.Block{
+			Type:  "RSA PRIVATE KEY",
+			Bytes: x509.MarshalPKCS1PrivateKey(pk),
+		}
+		if err := pem.Encode(f, pb); err != nil {
+			return err
+		}
+	}
+	return nil
 }
