@@ -75,7 +75,7 @@ require (
 	google.golang.org/grpc v1.47.0
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/yaml.v2 v2.4.0
-	gotest.tools/v3 v3.2.0
+	gotest.tools/v3 v3.3.0
 	stash.kopano.io/kgol/oidc-go v0.3.2
 	stash.kopano.io/kgol/rndm v1.1.1
 )
