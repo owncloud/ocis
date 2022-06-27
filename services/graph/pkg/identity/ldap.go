@@ -385,17 +385,17 @@ func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregra
 	if search == "" {
 		search = queryParam.Get("$search")
 	}
-	userFilter := fmt.Sprintf("%s(objectClass=%s)", i.userFilter, i.userObjectClass)
+	var userFilter string
 	if search != "" {
 		search = ldap.EscapeFilter(search)
 		userFilter = fmt.Sprintf(
-			"(&(%s)(|(%s=%s*)(%s=%s*)(%s=%s*)))",
-			userFilter,
+			"(|(%s=%s*)(%s=%s*)(%s=%s*))",
 			i.userAttributeMap.userName, search,
 			i.userAttributeMap.mail, search,
 			i.userAttributeMap.displayName, search,
 		)
 	}
+	userFilter = fmt.Sprintf("(&%s(objectClass=%s)%s)", i.userFilter, i.userObjectClass, userFilter)
 	searchRequest := ldap.NewSearchRequest(
 		i.userBaseDN, i.userScope, ldap.NeverDerefAliases, 0, 0, false,
 		userFilter,
@@ -587,16 +587,16 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 	if search == "" {
 		search = queryParam.Get("$search")
 	}
-	groupFilter := fmt.Sprintf("%s(objectClass=%s)", i.groupFilter, i.groupObjectClass)
+	var groupFilter string
 	if search != "" {
 		search = ldap.EscapeFilter(search)
 		groupFilter = fmt.Sprintf(
-			"(&(%s)(|(%s=%s*)(%s=%s*)))",
-			groupFilter,
+			"(|(%s=%s*)(%s=%s*))",
 			i.groupAttributeMap.name, search,
 			i.groupAttributeMap.id, search,
 		)
 	}
+	groupFilter = fmt.Sprintf("(&%s(objectClass=%s)%s)", i.groupFilter, i.groupObjectClass, groupFilter)
 	searchRequest := ldap.NewSearchRequest(
 		i.groupBaseDN, i.groupScope, ldap.NeverDerefAliases, 0, 0, false,
 		groupFilter,
