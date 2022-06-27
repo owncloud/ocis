@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Add FRONTEND_ENABLE_RESHARING env variable: [#4023](https://github.com/owncloud/ocis/pull/4023)
+* Enhancement - Generate signing key and encryption secret: [#3909](https://github.com/owncloud/ocis/issues/3909)
 * Enhancement - Update reva: [#4025](https://github.com/owncloud/ocis/pull/4025)
 
 ## Details
@@ -18,6 +19,14 @@ The following sections list the changes for unreleased.
    now disabled.
 
    https://github.com/owncloud/ocis/pull/4023
+
+* Enhancement - Generate signing key and encryption secret: [#3909](https://github.com/owncloud/ocis/issues/3909)
+
+   The idp service now automatically generates a signing key and encryption secret when they
+   don't exist. This will enable service restarts without invalidating existing sessions.
+
+   https://github.com/owncloud/ocis/issues/3909
+   https://github.com/owncloud/ocis/pull/4022
 
 * Enhancement - Update reva: [#4025](https://github.com/owncloud/ocis/pull/4025)
 
