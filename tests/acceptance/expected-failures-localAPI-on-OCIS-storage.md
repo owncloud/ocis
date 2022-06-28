@@ -19,3 +19,5 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiArchiver/downloadById.feature:134](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L134)
 - [apiArchiver/downloadById.feature:135](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L135)
 
+### [Search by shares jail works incorrect](https://github.com/owncloud/ocis/issues/4014)
+- [apiSpaces/search.feature:43](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/search.feature#L43)

@@ -316,13 +316,15 @@ class SpacesContext implements Context {
 	 * @throws Exception|GuzzleException
 	 */
 	public function getUserIdByUserName(string $userName): string {
-		$this->featureContext->setResponse(GraphHelper::getUser(
-                        $this->featureContext->getBaseUrl(),
-                        $this->featureContext->getStepLineRef(),
-                        $this->featureContext->getAdminUsername(),
-                        $this->featureContext->getAdminPassword(),
-                        $userName
-                ));
+		$this->featureContext->setResponse(
+			GraphHelper::getUser(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$this->featureContext->getAdminUsername(),
+				$this->featureContext->getAdminPassword(),
+				$userName
+			)
+		);
 		if ($this->featureContext->getResponse()) {
 			$rawBody = $this->featureContext->getResponse()->getBody()->getContents();
 			$response = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
@@ -369,21 +371,20 @@ class SpacesContext implements Context {
 	 *
 	 * @throws Exception|GuzzleException
 	 */
-	public function cleanDataAfterTests(): void
-	{
+	public function cleanDataAfterTests(): void {
 		$this->deleteAllSpacesOfTheType('project');
 	}
 
 	/**
 	 * The method first disables and then deletes spaces
+	 *
 	 * @param  string $driveType
 	 *
 	 * @return void
 	 *
 	 * @throws Exception|GuzzleException
 	 */
-	public function deleteAllSpacesOfTheType(string $driveType): void
-	{
+	public function deleteAllSpacesOfTheType(string $driveType): void {
 		$query = "\$filter=driveType eq $driveType";
 		$userAdmin = $this->featureContext->getAdminUsername();
 
@@ -401,7 +402,7 @@ class SpacesContext implements Context {
 
 			if (!empty($drives)) {
 				foreach ($drives as $value) {
-					if (!array_key_exists("deleted", $value["root"])) {
+					if (!\array_key_exists("deleted", $value["root"])) {
 						$this->sendDisableSpaceRequest($userAdmin, $value["name"]);
 					} else {
 						$this->sendDeleteSpaceRequest($userAdmin, $value["name"]);
@@ -744,13 +745,15 @@ class SpacesContext implements Context {
 		}
 		Assert::assertNotEmpty($roleToAssign, "The selected role $role could not be found");
 
-		$this->featureContext->setResponse(GraphHelper::getUser(
-                        $this->featureContext->getBaseUrl(),
-                        $this->featureContext->getStepLineRef(),
-                        $this->featureContext->getAdminUsername(),
-                        $this->featureContext->getAdminPassword(),
-                        $user
-                ));
+		$this->featureContext->setResponse(
+			GraphHelper::getUser(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$this->featureContext->getAdminUsername(),
+				$this->featureContext->getAdminPassword(),
+				$user
+			)
+		);
 		if ($this->featureContext->getResponse()) {
 			$rawBody = $this->featureContext->getResponse()->getBody()->getContents();
 			if (isset(\json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["id"])) {
@@ -2228,6 +2231,7 @@ class SpacesContext implements Context {
 
 	/**
 	 * User downloads a preview of the file inside the project space
+	 *
 	 * @When /^user "([^"]*)" downloads the preview of "([^"]*)" of the space "([^"]*)" with width "([^"]*)" and height "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param  string $user
@@ -2273,7 +2277,7 @@ class SpacesContext implements Context {
 	 * @When /^user "([^"]*)" downloads the file "([^"]*)" of the space "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param  string $user
-	 * @param  string $fileName 
+	 * @param  string $fileName
 	 * @param  string $spaceName
 	 *
 	 * @throws GuzzleException
@@ -2282,7 +2286,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $fileName,
 		string $spaceName
-	): void {		
+	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$fullUrl = $this->baseUrl . $this->davSpacesUrl . $space['id'] . '/' . $fileName;
 
@@ -2303,7 +2307,7 @@ class SpacesContext implements Context {
 	 * @When /^user "([^"]*)" downloads version of the file "([^"]*)" with the index "([^"]*)" of the space "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param  string $user
-	 * @param  string $fileName 
+	 * @param  string $fileName
 	 * @param  string $index
 	 * @param  string $spaceName
 	 *
@@ -2314,14 +2318,14 @@ class SpacesContext implements Context {
 		string $fileName,
 		string $index,
 		string $spaceName
-	): void {		
+	): void {
 		$fileVersion = $this->listFileVersion($user, $fileName, $spaceName);
 		if (!isset($fileVersion[$index])) {
 			Assert::fail(
 				'could not find version of file "' . $fileName . '" with index "' . $index . '"'
 			);
 		}
-		$url = $this->baseUrl . $fileVersion[$index][0];		
+		$url = $this->baseUrl . $fileVersion[$index][0];
 		
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
@@ -2337,12 +2341,11 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * Method returns an array with url values from the propfind request 
+	 * Method returns an array with url values from the propfind request
 	 * like: /remote.php/dav/meta/spaceUuid%fileUuid/v/fileUuid.REV.2022-05-17T10:39:49.672285951Z
-
-	 * 
+	 *
 	 * @param  string $user
-	 * @param  string $fileName 
+	 * @param  string $fileName
 	 * @param  string $spaceName
 	 *
 	 * @return array
@@ -2352,8 +2355,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $fileName,
 		string $spaceName
-	): array {		
-
+	): array {
 		$fileId = $this->getFileId($user, $spaceName, $fileName);
 		$fullUrl = $this->baseUrl . '/remote.php/dav/meta/' . $fileId . '/v';
 
