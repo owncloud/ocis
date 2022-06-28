@@ -20,24 +20,14 @@ const defaultPathPrefix = (() => {
   return pathPrefix;
 })();
 
-const defaultPasswordResetLink = (() => {
-  const root = document.getElementById('root');
-  let link = root ? root.getAttribute('passwort-reset-link') : null;
-  if (!link || link === '__PASSWORD_RESET_LINK__') {
-    // Not replaced, probably we are running in debug mode or whatever. Use sane default.
-    link = '';
-  }
-  return link;
-})();
-
 const defaultState = {
   hello: null,
+  branding: null,
   error: null,
   flow: flow,
   query: query,
   updateAvailable: false,
-  pathPrefix: defaultPathPrefix,
-  passwordResetLink: defaultPasswordResetLink
+  pathPrefix: defaultPathPrefix
 };
 
 function commonReducer(state = defaultState, action) {
@@ -49,7 +39,8 @@ function commonReducer(state = defaultState, action) {
 
     case RESET_HELLO:
       return Object.assign({}, state, {
-        hello: null
+        hello: null,
+        branding: null
       });
 
     case RECEIVE_HELLO:
@@ -59,7 +50,8 @@ function commonReducer(state = defaultState, action) {
           username: action.username,
           displayName: action.displayName,
           details: action.hello
-        }
+        },
+        branding: action.hello.branding ? action.hello.branding : state.branding
       });
 
     case SERVICE_WORKER_NEW_CONTENT:

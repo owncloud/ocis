@@ -1,0 +1,94 @@
+{
+    "konnect": {
+        "consent": {
+            "message": "<0><0><0></0></0></0> möchte",
+            "allowButton": {
+                "label": "Einverstanden"
+            },
+            "question": "<1><0></0></1> den Zugriff gestatten?",
+            "consequence": "Wenn Sie Einverstanden klicken, erhält die App Zugriff auf Ihre Informationen.",
+            "cancelButton": {
+                "label": "Abbrechen"
+            },
+            "tooltip": {
+                "client": "Wenn Sie \"Einverstanden\" klicken werden Sie zu {{redirectURI}} weitergeleitet"
+            },
+            "headline": "Hallo {{displayName}}"
+        },
+        "chooseaccount": {
+            "useOther": {
+                "persona": {
+                    "label": "?"
+                },
+                "label": "Anderes Konto"
+            },
+            "headline": "Konto auswählen",
+            "subHeader": "das angemeldet werden soll"
+        },
+        "scopeDescription": {
+            "aliasBasic": "Zugriff auf Ihre grundlegenden Benutzerinformationen",
+            "offlineAccess": "Dauerhaften Zugriff (läuft nicht ab)",
+            "scope": "Geltungsbereich: {{scope}}"
+        },
+        "login": {
+            "usernameField": {
+                "placeholder": {
+                    "email": "E-Mail",
+                    "identity": "Identität",
+                    "username": "Benutzername"
+                }
+            },
+            "nextButton": {
+                "label": "Weiter"
+            },
+            "passwordField": {
+                "label": "Passwort"
+            },
+            "retryButton": {
+                "label": "Wiederholen"
+            },
+            "headline": "Anmelden"
+        },
+        "error": {
+            "login": {
+                "validate": {
+                    "missingUsername": "Geben Sie einen gültigen Wert ein.",
+                    "missingPassword": "Geben Sie ein Passwort ein."
+                },
+                "failed": "Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es noch einmal."
+            },
+            "http": {
+                "networkError": "Netzwerkfehler. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es noch einmal.",
+                "unexpectedResponseStatus": "Unerwartete HTTP-Antwort: {{status}}. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es noch einmal.",
+                "unexpectedResponseState": "Unerwarteter Antwort-Status: {{state}}"
+            }
+        },
+        "loading": {
+            "error": {
+                "headline": "Verbindung zum Server fehlgeschlagen"
+            }
+        },
+        "goodbye": {
+            "headline": "Bis bald",
+            "confirm": {
+                "headline": "Hallo {{displayName}}",
+                "subHeader": "Bitte bestätigen Sie, dass Sie sich abmelden möchten"
+            },
+            "message": {
+                "confirm": "Klicken Sie auf die Schaltfläche unten um sich aus Ihrem Konto abzumelden.",
+                "close": "Sie können dieses Fenster jetzt schließen."
+            },
+            "signoutButton": {
+                "label": "Abmelden"
+            },
+            "subHeader": "sie sind jetzt abgemeldet"
+        },
+        "welcome": {
+            "signoutButton": {
+                "label": "Abmelden"
+            },
+            "headline": "Willkommen {{displayName}}",
+            "message": "Sie sind angemeldet - super!"
+        }
+    }
+}

@@ -1,4 +1,4 @@
-import { injectIntl, defineMessages } from 'react-intl';
+import { withTranslation } from 'react-i18next';
 
 export const ERROR_LOGIN_VALIDATE_MISSINGUSERNAME = 'konnect.error.login.validate.missingUsername';
 export const ERROR_LOGIN_VALIDATE_MISSINGPASSWORD = 'konnect.error.login.validate.missingPassword';
@@ -6,34 +6,6 @@ export const ERROR_LOGIN_FAILED = 'konnect.error.login.failed';
 export const ERROR_HTTP_NETWORK_ERROR = 'konnect.error.http.networkError';
 export const ERROR_HTTP_UNEXPECTED_RESPONSE_STATUS = 'konnect.error.http.unexpectedResponseStatus';
 export const ERROR_HTTP_UNEXPECTED_RESPONSE_STATE = 'konnect.error.http.unexpectedResponseState';
-
-// Translatable error messages.
-const translations = defineMessages({
-  [ERROR_LOGIN_VALIDATE_MISSINGUSERNAME]: {
-    id: ERROR_LOGIN_VALIDATE_MISSINGUSERNAME,
-    defaultMessage: 'Please enter a valid username'
-  },
-  [ERROR_LOGIN_VALIDATE_MISSINGPASSWORD]: {
-    id: ERROR_LOGIN_VALIDATE_MISSINGPASSWORD,
-    defaultMessage: 'Please enter a valid password'
-  },
-  [ERROR_LOGIN_FAILED]: {
-    id: ERROR_LOGIN_FAILED,
-    defaultMessage: 'Logon failed. Please verify your credentials and try again.'
-  },
-  [ERROR_HTTP_NETWORK_ERROR]: {
-    id: ERROR_HTTP_NETWORK_ERROR,
-    defaultMessage: 'Network error. Please check your connection and try again.'
-  },
-  [ERROR_HTTP_UNEXPECTED_RESPONSE_STATUS]: {
-    id: ERROR_HTTP_UNEXPECTED_RESPONSE_STATUS,
-    defaultMessage: 'Unexpected HTTP response: {status}. Please check your connection and try again.'
-  },
-  [ERROR_HTTP_UNEXPECTED_RESPONSE_STATE]: {
-    id: ERROR_HTTP_UNEXPECTED_RESPONSE_STATE,
-    defaultMessage: 'Unexpected response state: {state}'
-  }
-});
 
 // Error with values.
 export class ExtendedError extends Error {
@@ -50,7 +22,7 @@ export class ExtendedError extends Error {
 
 // Component to translate error text with values.
 function ErrorMessageComponent(props) {
-  const { error, intl } = props;
+  const { error, t, values } = props;
 
   if (!error) {
     return null;
@@ -59,10 +31,31 @@ function ErrorMessageComponent(props) {
   const id = error.id ? error.id : error.message;
   const messageDescriptor = Object.assign({}, {
     id,
-    defaultMessage: error.id ? error.message : undefined
-  }, translations[id]);
+    defaultMessage: error.id ? error.message : undefined,
+    values: {
+      ...error.values,
+      ...values,
+    },
+  });
 
-  return intl.formatMessage(messageDescriptor, error.values);
+  switch (messageDescriptor.id) {
+    case ERROR_LOGIN_VALIDATE_MISSINGUSERNAME:
+      return t("konnect.error.login.validate.missingUsername", "Enter a valid value.", messageDescriptor.values);
+    case ERROR_LOGIN_VALIDATE_MISSINGPASSWORD:
+      return t("konnect.error.login.validate.missingPassword", "Enter your password.");
+    case ERROR_LOGIN_FAILED:
+      return t("konnect.error.login.failed", "Logon failed. Please verify your credentials and try again.");
+    case ERROR_HTTP_NETWORK_ERROR:
+      return t("konnect.error.http.networkError", "Network error. Please check your connection and try again.");
+    case ERROR_HTTP_UNEXPECTED_RESPONSE_STATUS:
+      return t("konnect.error.http.unexpectedResponseStatus", "Unexpected HTTP response: {{status}}. Please check your connection and try again.", messageDescriptor.values);
+    case ERROR_HTTP_UNEXPECTED_RESPONSE_STATE:
+      return t("konnect.error.http.unexpectedResponseState", "Unexpected response state: {{state}}", messageDescriptor.values);
+    default:
+  }
+
+  const f = t;
+  return f(messageDescriptor.defaultMessage, messageDescriptor.values);
 }
 
-export const ErrorMessage = injectIntl(ErrorMessageComponent);
+export const ErrorMessage = withTranslation()(ErrorMessageComponent);
