@@ -1,3 +1,21 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v2.0.0...master
+
+## Summary
+
+* Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
+
+## Details
+
+* Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
+
+   We have decided to name all extensions, we maintain and provide with ocis, services from here on
+   to avoid confusion between external extensions and code we provide and maintain.
+
+   https://github.com/owncloud/ocis/pull/3980
 # Changelog for [2.0.0-beta.4] (2022-06-28)
 
 The following sections list the changes for 2.0.0-beta.4.
