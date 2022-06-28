@@ -1,46 +1,4 @@
-# Changelog for [unreleased] (UNRELEASED)
-
-The following sections list the changes for unreleased.
-
-[unreleased]: https://github.com/owncloud/ocis/compare/v2.0.0...master
-
-## Summary
-
-* Enhancement - Add FRONTEND_ENABLE_RESHARING env variable: [#4023](https://github.com/owncloud/ocis/pull/4023)
-* Enhancement - Generate signing key and encryption secret: [#3909](https://github.com/owncloud/ocis/issues/3909)
-* Enhancement - New migrate command for migrating shares and public shares: [#3987](https://github.com/owncloud/ocis/pull/3987)
-* Enhancement - Update reva: [#4025](https://github.com/owncloud/ocis/pull/4025)
-
-## Details
-
-* Enhancement - Add FRONTEND_ENABLE_RESHARING env variable: [#4023](https://github.com/owncloud/ocis/pull/4023)
-
-   We introduced resharing which was enabled by default, this is now configurable and can be
-   enabled by setting the env `FRONTEND_ENABLE_RESHARING` to `true`. By default resharing is
-   now disabled.
-
-   https://github.com/owncloud/ocis/pull/4023
-
-* Enhancement - Generate signing key and encryption secret: [#3909](https://github.com/owncloud/ocis/issues/3909)
-
-   The idp service now automatically generates a signing key and encryption secret when they
-   don't exist. This will enable service restarts without invalidating existing sessions.
-
-   https://github.com/owncloud/ocis/issues/3909
-   https://github.com/owncloud/ocis/pull/4022
-
-* Enhancement - New migrate command for migrating shares and public shares: [#3987](https://github.com/owncloud/ocis/pull/3987)
-
-   We added a new `migrate` subcommand which can be used to migrate shares and public shares
-   between different share and publicshare managers.
-
-   https://github.com/owncloud/ocis/pull/3987
-   https://github.com/owncloud/ocis/pull/4019
-
-* Enhancement - Update reva: [#4025](https://github.com/owncloud/ocis/pull/4025)
-
-   https://github.com/owncloud/ocis/pull/4025
-# Changelog for [2.0.0-beta.4] (2022-06-22)
+# Changelog for [2.0.0-beta.4] (2022-06-28)
 
 The following sections list the changes for 2.0.0-beta.4.
 
@@ -91,6 +49,7 @@ The following sections list the changes for 2.0.0-beta.4.
 * Change - Prevent access to disabled space: [#3779](https://github.com/owncloud/ocis/pull/3779)
 * Change - Rename serviceUser to systemUser: [#3673](https://github.com/owncloud/ocis/pull/3673)
 * Change - Split MachineAuth from SystemUser: [#3672](https://github.com/owncloud/ocis/pull/3672)
+* Enhancement - Add FRONTEND_ENABLE_RESHARING env variable: [#4023](https://github.com/owncloud/ocis/pull/4023)
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 * Enhancement - Add acting user to the audit log: [#3753](https://github.com/owncloud/ocis/issues/3753)
 * Enhancement - Add audit events for created containers: [#3941](https://github.com/owncloud/ocis/pull/3941)
@@ -101,7 +60,9 @@ The following sections list the changes for 2.0.0-beta.4.
 * Enhancement - Add config option to provide TLS certificate: [#3818](https://github.com/owncloud/ocis/issues/3818)
 * Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
 * Enhancement - Add /me/changePassword endpoint to GraphAPI: [#3063](https://github.com/owncloud/ocis/issues/3063)
+* Enhancement - Generate signing key and encryption secret: [#3909](https://github.com/owncloud/ocis/issues/3909)
 * Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
+* Enhancement - New migrate command for migrating shares and public shares: [#3987](https://github.com/owncloud/ocis/pull/3987)
 * Enhancement - Product field in OCS version: [#2918](https://github.com/owncloud/ocis/pull/2918)
 * Enhancement - Allow resharing: [#3904](https://github.com/owncloud/ocis/pull/3904)
 * Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
@@ -111,6 +72,7 @@ The following sections list the changes for 2.0.0-beta.4.
 * Enhancement - Make thumbnails service log less noisy: [#3959](https://github.com/owncloud/ocis/pull/3959)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 * Enhancement - Update reva: [#3944](https://github.com/owncloud/ocis/pull/3944)
+* Enhancement - Update reva: [#4025](https://github.com/owncloud/ocis/pull/4025)
 * Enhancement - Update reva to version 2.4.1: [#3746](https://github.com/owncloud/ocis/pull/3746)
 * Enhancement - Update reva to version 2.5.1: [#3932](https://github.com/owncloud/ocis/pull/3932)
 * Enhancement - Update reva to v2.3.1: [#3552](https://github.com/owncloud/ocis/pull/3552)
@@ -474,6 +436,14 @@ The following sections list the changes for 2.0.0-beta.4.
 
    https://github.com/owncloud/ocis/pull/3672
 
+* Enhancement - Add FRONTEND_ENABLE_RESHARING env variable: [#4023](https://github.com/owncloud/ocis/pull/4023)
+
+   We introduced resharing which was enabled by default, this is now configurable and can be
+   enabled by setting the env `FRONTEND_ENABLE_RESHARING` to `true`. By default resharing is
+   now disabled.
+
+   https://github.com/owncloud/ocis/pull/4023
+
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 
    We now reflect the configured service names when listing them in the ocis runtime
@@ -550,6 +520,14 @@ The following sections list the changes for 2.0.0-beta.4.
    https://github.com/owncloud/ocis/issues/3063
    https://github.com/owncloud/ocis/pull/3705
 
+* Enhancement - Generate signing key and encryption secret: [#3909](https://github.com/owncloud/ocis/issues/3909)
+
+   The idp service now automatically generates a signing key and encryption secret when they
+   don't exist. This will enable service restarts without invalidating existing sessions.
+
+   https://github.com/owncloud/ocis/issues/3909
+   https://github.com/owncloud/ocis/pull/4022
+
 * Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
 
    We wrapped the metadata storage in a minimal reva instance with a dedicated gateway, including
@@ -559,6 +537,14 @@ The following sections list the changes for 2.0.0-beta.4.
 
    https://github.com/owncloud/ocis/pull/3602
    https://github.com/owncloud/ocis/pull/3647
+
+* Enhancement - New migrate command for migrating shares and public shares: [#3987](https://github.com/owncloud/ocis/pull/3987)
+
+   We added a new `migrate` subcommand which can be used to migrate shares and public shares
+   between different share and publicshare managers.
+
+   https://github.com/owncloud/ocis/pull/3987
+   https://github.com/owncloud/ocis/pull/4019
 
 * Enhancement - Product field in OCS version: [#2918](https://github.com/owncloud/ocis/pull/2918)
 
@@ -670,6 +656,10 @@ The following sections list the changes for 2.0.0-beta.4.
    https://github.com/owncloud/ocis/pull/3982
    https://github.com/owncloud/ocis/pull/4000
    https://github.com/owncloud/ocis/pull/4006
+
+* Enhancement - Update reva: [#4025](https://github.com/owncloud/ocis/pull/4025)
+
+   https://github.com/owncloud/ocis/pull/4025
 
 * Enhancement - Update reva to version 2.4.1: [#3746](https://github.com/owncloud/ocis/pull/3746)
 
