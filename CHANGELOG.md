@@ -628,6 +628,19 @@ The following sections list the changes for 2.0.0-beta.4.
 
 * Enhancement - Update reva: [#3944](https://github.com/owncloud/ocis/pull/3944)
 
+   Changelog for reva 2.6.1 (2022-06-27) =======================================
+
+   The following sections list the changes in reva 2.6.1 relevant to reva users. The changes are
+   ordered by importance.
+
+   Summary -------
+
+  * Bugfix [cs3org/reva#2998](https://github.com/cs3org/reva/pull/2998): Fix 0-byte-uploads
+  * Enhancement [cs3org/reva#3983](https://github.com/cs3org/reva/pull/3983): Add capability for alias links
+  * Enhancement [cs3org/reva#3000](https://github.com/cs3org/reva/pull/3000): Make less stat requests
+  * Enhancement [cs3org/reva#3003](https://github.com/cs3org/reva/pull/3003): Distinguish GRPC FAILED_PRECONDITION and ABORTED codes
+  * Enhancement [cs3org/reva#3005](https://github.com/cs3org/reva/pull/3005): Remove unused HomeMapping variable
+
    Changelog for reva 2.6.0 (2022-06-21) =======================================
 
    The following sections list the changes in reva 2.6.0 relevant to reva users. The changes are
