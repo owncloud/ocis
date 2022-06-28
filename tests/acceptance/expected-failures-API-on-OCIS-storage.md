@@ -942,7 +942,7 @@ _ocdav: api compatibility, return correct status code_
 
 - [apiCapabilities/capabilitiesWithNormalUser.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilitiesWithNormalUser.feature#L11) Scenario: getting default capabilities with normal user
 
-#### [REPORT request not implemented](https://github.com/owncloud/ocis/issues/1330)
+#### [/webdav and spaces endpoint does not alloow REPORT requests](https://github.com/owncloud/ocis/issues/4034)
 
 - [apiWebdavOperations/search.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L42)
 - [apiWebdavOperations/search.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L48)
@@ -951,6 +951,7 @@ _ocdav: api compatibility, return correct status code_
 - [apiWebdavOperations/search.feature:87](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L87)
 - [apiWebdavOperations/search.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L93)
 - [apiWebdavOperations/search.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L102)
+- [apiWebdavOperations/search.feature:108](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L108)
 - [apiWebdavOperations/search.feature:126](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L126)
 - [apiWebdavOperations/search.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L132)
 - [apiWebdavOperations/search.feature:150](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L150)
@@ -958,7 +959,6 @@ _ocdav: api compatibility, return correct status code_
 - [apiWebdavOperations/search.feature:174](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L174)
 - [apiWebdavOperations/search.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L180)
 - [apiWebdavOperations/search.feature:207](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L207)
-- [apiWebdavOperations/search.feature:208](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L208)
 - [apiWebdavOperations/search.feature:213](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L213)
 - [apiWebdavOperations/search.feature:239](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L239)
 - [apiWebdavOperations/search.feature:245](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L245)
@@ -971,7 +971,7 @@ _ocdav: api compatibility, return correct status code_
 
 ### [No permisions propertry in response while searching for files and folders on ocis with new webdav](https://github.com/owncloud/ocis/issues/4009)
 
-- [apiWebdavOperations/search.feature:108](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L108)
+- [apiWebdavOperations/search.feature:208](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L208)
 - [apiWebdavOperations/search.feature:240](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L240)
 
 ### [Search with limit does not give required response with new webdav](https://github.com/owncloud/ocis/issues/4017)
