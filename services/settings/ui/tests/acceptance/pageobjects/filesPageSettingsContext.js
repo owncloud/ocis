@@ -14,6 +14,7 @@ module.exports = {
             this.api.elementIdText(item.ELEMENT, res => {
               menu.push(res.value)
             })
+            return undefined
           })
         })
       return menu
@@ -30,6 +31,7 @@ module.exports = {
             this.api.elementIdText(item.ELEMENT, res => {
               menu.push(res.value)
             })
+            return undefined
           })
         })
       await this
@@ -46,6 +48,7 @@ module.exports = {
             this.api.elementIdText(item.ELEMENT, res => {
               menu.push(res.value)
             })
+            return undefined
           })
         })
       return menu
