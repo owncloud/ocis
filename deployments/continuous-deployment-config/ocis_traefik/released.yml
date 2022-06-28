@@ -33,7 +33,7 @@
         env:
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: wkloucek@owncloud.com
-          OCIS_DOCKER_TAG: 2.0.0-beta.3
+          OCIS_DOCKER_TAG: 2.0.0-beta.4
           OCIS_DOMAIN: ocis.ocis-traefik.released.owncloud.works
           DEMO_USERS: "true"
           COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml

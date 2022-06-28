@@ -15,7 +15,7 @@ import (
 
 func main() {
 	replacer := strings.NewReplacer(
-		"github.com/owncloud/ocis/v2/extensions/", "",
+		"github.com/owncloud/ocis/v2/services/", "",
 		"/pkg/config/defaults", "",
 	)
 	cfg := map[string]string{
@@ -35,7 +35,7 @@ func main() {
 		targetFolders := []string{
 			// TODO: comment in when it is clear how to commit this to the structure of the master|main branch
 			// filepath.Join("../../", pkg, "/config"),
-			"../../docs/extensions/_includes/",
+			"../../docs/services/_includes/",
 		}
 		for _, targetFolder := range targetFolders {
 			os.MkdirAll(targetFolder, 0700)

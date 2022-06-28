@@ -11,10 +11,12 @@ import (
 	publicregistry "github.com/cs3org/reva/v2/pkg/publicshare/manager/registry"
 	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/cs3org/reva/v2/pkg/share/manager/registry"
-	sharing "github.com/owncloud/ocis/v2/extensions/sharing/pkg/config"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
+	sharing "github.com/owncloud/ocis/v2/services/sharing/pkg/config"
+	sharingparser "github.com/owncloud/ocis/v2/services/sharing/pkg/config/parser"
 	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
 )
@@ -26,7 +28,15 @@ func Migrate(cfg *config.Config) *cli.Command {
 		Usage:    "migrate data from an existing to another instance",
 		Category: "migration",
 		Before: func(c *cli.Context) error {
+			// Parse base config
 			if err := parser.ParseConfig(cfg, true); err != nil {
+				fmt.Printf("%v", err)
+				return err
+			}
+
+			// Parse sharing config
+			cfg.Sharing.Commons = cfg.Commons
+			if err := sharingparser.ParseConfig(cfg.Sharing); err != nil {
 				fmt.Printf("%v", err)
 				return err
 			}
@@ -58,14 +68,6 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 				Value: "cs3",
 				Usage: "Share manager to import the data into",
 			},
-		},
-		Before: func(c *cli.Context) error {
-			err := parser.ParseConfig(cfg, true)
-			if err != nil {
-				fmt.Printf("%v", err)
-				os.Exit(1)
-			}
-			return nil
 		},
 		Action: func(c *cli.Context) error {
 			log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Logger()
@@ -151,14 +153,6 @@ func MigratePublicShares(cfg *config.Config) *cli.Command {
 				Value: "cs3",
 				Usage: "Public share manager to import the data into",
 			},
-		},
-		Before: func(c *cli.Context) error {
-			err := parser.ParseConfig(cfg, true)
-			if err != nil {
-				fmt.Printf("%v", err)
-				os.Exit(1)
-			}
-			return err
 		},
 		Action: func(c *cli.Context) error {
 			log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Logger()

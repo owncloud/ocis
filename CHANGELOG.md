@@ -6,32 +6,27 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
-* Enhancement - Add FRONTEND_ENABLE_RESHARING env variable: [#4023](https://github.com/owncloud/ocis/pull/4023)
-* Enhancement - Generate signing key and encryption secret: [#3909](https://github.com/owncloud/ocis/issues/3909)
-* Enhancement - Update reva: [#4025](https://github.com/owncloud/ocis/pull/4025)
+* Bugfix - CSP rules for silent token refresh in iframe: [#4031](https://github.com/owncloud/ocis/pull/4031)
+* Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
 
 ## Details
 
-* Enhancement - Add FRONTEND_ENABLE_RESHARING env variable: [#4023](https://github.com/owncloud/ocis/pull/4023)
+* Bugfix - CSP rules for silent token refresh in iframe: [#4031](https://github.com/owncloud/ocis/pull/4031)
 
-   We introduced resharing which was enabled by default, this is now configurable and can be
-   enabled by setting the env `FRONTEND_ENABLE_RESHARING` to `true`. By default resharing is
-   now disabled.
+   When renewing the access token silently web needs to be opened in an iframe. This was previously
+   blocked by a restrictive iframe CSP rule in the `Secure` middleware and has now been fixed by
+   allow `self` for iframes.
 
-   https://github.com/owncloud/ocis/pull/4023
+   https://github.com/owncloud/web/issues/7030
+   https://github.com/owncloud/ocis/pull/4031
 
-* Enhancement - Generate signing key and encryption secret: [#3909](https://github.com/owncloud/ocis/issues/3909)
+* Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
 
-   The idp service now automatically generates a signing key and encryption secret when they
-   don't exist. This will enable service restarts without invalidating existing sessions.
+   We have decided to name all extensions, we maintain and provide with ocis, services from here on
+   to avoid confusion between external extensions and code we provide and maintain.
 
-   https://github.com/owncloud/ocis/issues/3909
-   https://github.com/owncloud/ocis/pull/4022
-
-* Enhancement - Update reva: [#4025](https://github.com/owncloud/ocis/pull/4025)
-
-   https://github.com/owncloud/ocis/pull/4025
-# Changelog for [2.0.0-beta.4] (2022-06-22)
+   https://github.com/owncloud/ocis/pull/3980
+# Changelog for [2.0.0-beta.4] (2022-06-28)
 
 The following sections list the changes for 2.0.0-beta.4.
 
@@ -82,6 +77,7 @@ The following sections list the changes for 2.0.0-beta.4.
 * Change - Prevent access to disabled space: [#3779](https://github.com/owncloud/ocis/pull/3779)
 * Change - Rename serviceUser to systemUser: [#3673](https://github.com/owncloud/ocis/pull/3673)
 * Change - Split MachineAuth from SystemUser: [#3672](https://github.com/owncloud/ocis/pull/3672)
+* Enhancement - Add FRONTEND_ENABLE_RESHARING env variable: [#4023](https://github.com/owncloud/ocis/pull/4023)
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 * Enhancement - Add acting user to the audit log: [#3753](https://github.com/owncloud/ocis/issues/3753)
 * Enhancement - Add audit events for created containers: [#3941](https://github.com/owncloud/ocis/pull/3941)
@@ -92,7 +88,9 @@ The following sections list the changes for 2.0.0-beta.4.
 * Enhancement - Add config option to provide TLS certificate: [#3818](https://github.com/owncloud/ocis/issues/3818)
 * Enhancement - Add descriptions for graph-explorer config: [#3759](https://github.com/owncloud/ocis/pull/3759)
 * Enhancement - Add /me/changePassword endpoint to GraphAPI: [#3063](https://github.com/owncloud/ocis/issues/3063)
+* Enhancement - Generate signing key and encryption secret: [#3909](https://github.com/owncloud/ocis/issues/3909)
 * Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
+* Enhancement - New migrate command for migrating shares and public shares: [#3987](https://github.com/owncloud/ocis/pull/3987)
 * Enhancement - Product field in OCS version: [#2918](https://github.com/owncloud/ocis/pull/2918)
 * Enhancement - Allow resharing: [#3904](https://github.com/owncloud/ocis/pull/3904)
 * Enhancement - Add initial version of the search extensions: [#3635](https://github.com/owncloud/ocis/pull/3635)
@@ -102,6 +100,7 @@ The following sections list the changes for 2.0.0-beta.4.
 * Enhancement - Make thumbnails service log less noisy: [#3959](https://github.com/owncloud/ocis/pull/3959)
 * Enhancement - Update linkshare capabilities: [#3579](https://github.com/owncloud/ocis/pull/3579)
 * Enhancement - Update reva: [#3944](https://github.com/owncloud/ocis/pull/3944)
+* Enhancement - Update reva: [#4025](https://github.com/owncloud/ocis/pull/4025)
 * Enhancement - Update reva to version 2.4.1: [#3746](https://github.com/owncloud/ocis/pull/3746)
 * Enhancement - Update reva to version 2.5.1: [#3932](https://github.com/owncloud/ocis/pull/3932)
 * Enhancement - Update reva to v2.3.1: [#3552](https://github.com/owncloud/ocis/pull/3552)
@@ -465,6 +464,14 @@ The following sections list the changes for 2.0.0-beta.4.
 
    https://github.com/owncloud/ocis/pull/3672
 
+* Enhancement - Add FRONTEND_ENABLE_RESHARING env variable: [#4023](https://github.com/owncloud/ocis/pull/4023)
+
+   We introduced resharing which was enabled by default, this is now configurable and can be
+   enabled by setting the env `FRONTEND_ENABLE_RESHARING` to `true`. By default resharing is
+   now disabled.
+
+   https://github.com/owncloud/ocis/pull/4023
+
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 
    We now reflect the configured service names when listing them in the ocis runtime
@@ -541,6 +548,14 @@ The following sections list the changes for 2.0.0-beta.4.
    https://github.com/owncloud/ocis/issues/3063
    https://github.com/owncloud/ocis/pull/3705
 
+* Enhancement - Generate signing key and encryption secret: [#3909](https://github.com/owncloud/ocis/issues/3909)
+
+   The idp service now automatically generates a signing key and encryption secret when they
+   don't exist. This will enable service restarts without invalidating existing sessions.
+
+   https://github.com/owncloud/ocis/issues/3909
+   https://github.com/owncloud/ocis/pull/4022
+
 * Enhancement - Wrap metadata storage with dedicated reva gateway: [#3602](https://github.com/owncloud/ocis/pull/3602)
 
    We wrapped the metadata storage in a minimal reva instance with a dedicated gateway, including
@@ -550,6 +565,14 @@ The following sections list the changes for 2.0.0-beta.4.
 
    https://github.com/owncloud/ocis/pull/3602
    https://github.com/owncloud/ocis/pull/3647
+
+* Enhancement - New migrate command for migrating shares and public shares: [#3987](https://github.com/owncloud/ocis/pull/3987)
+
+   We added a new `migrate` subcommand which can be used to migrate shares and public shares
+   between different share and publicshare managers.
+
+   https://github.com/owncloud/ocis/pull/3987
+   https://github.com/owncloud/ocis/pull/4019
 
 * Enhancement - Product field in OCS version: [#2918](https://github.com/owncloud/ocis/pull/2918)
 
@@ -619,6 +642,19 @@ The following sections list the changes for 2.0.0-beta.4.
 
 * Enhancement - Update reva: [#3944](https://github.com/owncloud/ocis/pull/3944)
 
+   Changelog for reva 2.6.1 (2022-06-27) =======================================
+
+   The following sections list the changes in reva 2.6.1 relevant to reva users. The changes are
+   ordered by importance.
+
+   Summary -------
+
+  * Bugfix [cs3org/reva#2998](https://github.com/cs3org/reva/pull/2998): Fix 0-byte-uploads
+  * Enhancement [cs3org/reva#3983](https://github.com/cs3org/reva/pull/3983): Add capability for alias links
+  * Enhancement [cs3org/reva#3000](https://github.com/cs3org/reva/pull/3000): Make less stat requests
+  * Enhancement [cs3org/reva#3003](https://github.com/cs3org/reva/pull/3003): Distinguish GRPC FAILED_PRECONDITION and ABORTED codes
+  * Enhancement [cs3org/reva#3005](https://github.com/cs3org/reva/pull/3005): Remove unused HomeMapping variable
+
    Changelog for reva 2.6.0 (2022-06-21) =======================================
 
    The following sections list the changes in reva 2.6.0 relevant to reva users. The changes are
@@ -648,6 +684,10 @@ The following sections list the changes for 2.0.0-beta.4.
    https://github.com/owncloud/ocis/pull/3982
    https://github.com/owncloud/ocis/pull/4000
    https://github.com/owncloud/ocis/pull/4006
+
+* Enhancement - Update reva: [#4025](https://github.com/owncloud/ocis/pull/4025)
+
+   https://github.com/owncloud/ocis/pull/4025
 
 * Enhancement - Update reva to version 2.4.1: [#3746](https://github.com/owncloud/ocis/pull/3746)
 

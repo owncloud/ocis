@@ -16,35 +16,35 @@ L10N_MODULES := $(shell find . -path '*.tx*' -name 'config' | sed 's|/[^/]*$$||'
 
 # if you add a module here please also add it to the .drone.star file
 OCIS_MODULES = \
-	extensions/app-provider \
-	extensions/app-registry \
-	extensions/audit \
-	extensions/auth-basic \
-	extensions/auth-bearer \
-	extensions/auth-machine \
-	extensions/frontend \
-	extensions/gateway \
-	extensions/graph \
-	extensions/graph-explorer \
-	extensions/groups \
-	extensions/idm \
-	extensions/idp \
-	extensions/nats \
-	extensions/notifications \
-	extensions/ocdav \
-	extensions/ocs \
-	extensions/proxy \
-	extensions/settings \
-	extensions/sharing \
-	extensions/storage-system \
-	extensions/storage-publiclink \
-	extensions/storage-shares \
-	extensions/storage-users \
-	extensions/store \
-	extensions/thumbnails \
-	extensions/users \
-	extensions/web \
-	extensions/webdav\
+	services/app-provider \
+	services/app-registry \
+	services/audit \
+	services/auth-basic \
+	services/auth-bearer \
+	services/auth-machine \
+	services/frontend \
+	services/gateway \
+	services/graph \
+	services/graph-explorer \
+	services/groups \
+	services/idm \
+	services/idp \
+	services/nats \
+	services/notifications \
+	services/ocdav \
+	services/ocs \
+	services/proxy \
+	services/settings \
+	services/sharing \
+	services/storage-system \
+	services/storage-publiclink \
+	services/storage-shares \
+	services/storage-users \
+	services/store \
+	services/thumbnails \
+	services/users \
+	services/web \
+	services/webdav\
 	ocis \
 	ocis-pkg
 

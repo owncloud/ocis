@@ -1,10 +1,10 @@
 # coverage reports
 */coverage.out
-extensions/*/coverage.out
+services/*/coverage.out
 
 # unit test reports
 */checkstyle.xml
-extensions/*/checkstyle.xml
+services/*/checkstyle.xml
 
 # nodejs / yarn
 */package-lock.json
@@ -14,9 +14,9 @@ yarn.lock
 
 # build artifacts
 */bin
-extensions/*/bin
+services/*/bin
 dist/
-extensions/*/assets
+services/*/assets
 ocis/ocis
 ocis/cmd/ocis/__debug_bin
 ocis/cmd/ocis/config/
@@ -48,3 +48,6 @@ protogen/buf.sha1.lock
 
 # third-party-licenses
 /third-party-licenses
+
+# misc
+go.work
