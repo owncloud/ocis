@@ -97,7 +97,7 @@ config = {
         "earlyFail": True,
     },
     "settingsUITests": {
-        "skip": True,
+        "skip": False,
         "earlyFail": True,
     },
     "parallelApiTests": {
