@@ -11,12 +11,12 @@ import (
 	publicregistry "github.com/cs3org/reva/v2/pkg/publicshare/manager/registry"
 	"github.com/cs3org/reva/v2/pkg/share"
 	"github.com/cs3org/reva/v2/pkg/share/manager/registry"
-	sharing "github.com/owncloud/ocis/v2/extensions/sharing/pkg/config"
-	sharingparser "github.com/owncloud/ocis/v2/extensions/sharing/pkg/config/parser"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
-
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
+	sharing "github.com/owncloud/ocis/v2/services/sharing/pkg/config"
+	sharingparser "github.com/owncloud/ocis/v2/services/sharing/pkg/config/parser"
 	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
 )

@@ -1,6 +1,6 @@
 
 SKIP_CONFIG_DOCS_GENERATE ?= 0
-CONFIG_DOCS_BASE_PATH ?= ../../docs/extensions
+CONFIG_DOCS_BASE_PATH ?= ../../docs/services
 
 .PHONY: config-docs-generate
 config-docs-generate: #$(FLAEX)

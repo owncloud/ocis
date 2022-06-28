@@ -29,7 +29,7 @@ if err != nil {
     log.Fatal(err)
 }
 replacer := strings.NewReplacer(
-		"github.com/owncloud/ocis/v2/extensions/", "",
+		"github.com/owncloud/ocis/v2/services/", "",
 		"/pkg/config/defaults", "",
 	)
 var fields []ConfigField
@@ -42,7 +42,7 @@ m := map[string]interface{}{
 {{- end }}
 }
 
-    targetFolder := "../../docs/extensions/_includes/"
+    targetFolder := "../../docs/services/_includes/"
     for pkg, conf := range m {
 	fields = GetAnnotatedVariables(conf)
 	if len(fields) > 0 {

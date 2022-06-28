@@ -19,7 +19,7 @@ geekdocFilePath: ocis_individual_services.md
 
 The docker stack consists of at least 24 containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
 
-The other containers are oCIS extensions, running each one in a separate container. In this example, oCIS uses its internal IDP [LibreGraph Connect]({{< ref "../../extensions/idp" >}}) and the [oCIS storage driver]({{< ref "../storage/storagedrivers" >}}). You also can start more than one container of each service by setting `OCIS_SCALE` to a number greater than 1. Currently this won't scale all services, but we are working on making all service easily scalable.
+The other containers are oCIS services, running each one in a separate container. In this example, oCIS uses its internal IDP [LibreGraph Connect]({{< ref "../../services/idp" >}}) and the [oCIS storage driver]({{< ref "../storage/storagedrivers" >}}). You also can start more than one container of each service by setting `OCIS_SCALE` to a number greater than 1. Currently this won't scale all services, but we are working on making all service easily scalable.
 
 ## Server Deployment
 
@@ -76,7 +76,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
   STORAGE_TRANSFER_SECRET=
   # Machine auth api key secret. Must be changed in order to have a secure oCIS. Defaults to "change-me-please"
   OCIS_MACHINE_AUTH_API_KEY=
-  # Number of services to run for extensions, that currently can be easily scaled. Defaults to 1.
+  # Number of services to run for services, that currently can be easily scaled. Defaults to 1.
   OCIS_SCALE=
   ```
 

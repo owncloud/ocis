@@ -30,7 +30,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   produces: "application/json";
   external_docs: {
     description: "Developer Manual";
-    url: "https://owncloud.dev/extensions/search/";
+    url: "https://owncloud.dev/services/search/";
   };
 };
 

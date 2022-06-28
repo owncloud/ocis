@@ -15,7 +15,7 @@ func List(cfg *config.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:     "list",
 		Aliases: []string{"r"},
-		Short:   "List running extensions",
+		Short:   "List running services",
 		Run: func(cmd *cobra.Command, args []string) {
 			client, err := rpc.DialHTTP("tcp", net.JoinHostPort(cfg.Hostname, cfg.Port))
 			if err != nil {

@@ -3,36 +3,36 @@ package config
 import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 
-	appProvider "github.com/owncloud/ocis/v2/extensions/app-provider/pkg/config"
-	appRegistry "github.com/owncloud/ocis/v2/extensions/app-registry/pkg/config"
-	audit "github.com/owncloud/ocis/v2/extensions/audit/pkg/config"
-	authbasic "github.com/owncloud/ocis/v2/extensions/auth-basic/pkg/config"
-	authbearer "github.com/owncloud/ocis/v2/extensions/auth-bearer/pkg/config"
-	authmachine "github.com/owncloud/ocis/v2/extensions/auth-machine/pkg/config"
-	frontend "github.com/owncloud/ocis/v2/extensions/frontend/pkg/config"
-	gateway "github.com/owncloud/ocis/v2/extensions/gateway/pkg/config"
-	graphExplorer "github.com/owncloud/ocis/v2/extensions/graph-explorer/pkg/config"
-	graph "github.com/owncloud/ocis/v2/extensions/graph/pkg/config"
-	groups "github.com/owncloud/ocis/v2/extensions/groups/pkg/config"
-	idm "github.com/owncloud/ocis/v2/extensions/idm/pkg/config"
-	idp "github.com/owncloud/ocis/v2/extensions/idp/pkg/config"
-	nats "github.com/owncloud/ocis/v2/extensions/nats/pkg/config"
-	notifications "github.com/owncloud/ocis/v2/extensions/notifications/pkg/config"
-	ocdav "github.com/owncloud/ocis/v2/extensions/ocdav/pkg/config"
-	ocs "github.com/owncloud/ocis/v2/extensions/ocs/pkg/config"
-	proxy "github.com/owncloud/ocis/v2/extensions/proxy/pkg/config"
-	search "github.com/owncloud/ocis/v2/extensions/search/pkg/config"
-	settings "github.com/owncloud/ocis/v2/extensions/settings/pkg/config"
-	sharing "github.com/owncloud/ocis/v2/extensions/sharing/pkg/config"
-	storagepublic "github.com/owncloud/ocis/v2/extensions/storage-publiclink/pkg/config"
-	storageshares "github.com/owncloud/ocis/v2/extensions/storage-shares/pkg/config"
-	storagesystem "github.com/owncloud/ocis/v2/extensions/storage-system/pkg/config"
-	storageusers "github.com/owncloud/ocis/v2/extensions/storage-users/pkg/config"
-	store "github.com/owncloud/ocis/v2/extensions/store/pkg/config"
-	thumbnails "github.com/owncloud/ocis/v2/extensions/thumbnails/pkg/config"
-	users "github.com/owncloud/ocis/v2/extensions/users/pkg/config"
-	web "github.com/owncloud/ocis/v2/extensions/web/pkg/config"
-	webdav "github.com/owncloud/ocis/v2/extensions/webdav/pkg/config"
+	appProvider "github.com/owncloud/ocis/v2/services/app-provider/pkg/config"
+	appRegistry "github.com/owncloud/ocis/v2/services/app-registry/pkg/config"
+	audit "github.com/owncloud/ocis/v2/services/audit/pkg/config"
+	authbasic "github.com/owncloud/ocis/v2/services/auth-basic/pkg/config"
+	authbearer "github.com/owncloud/ocis/v2/services/auth-bearer/pkg/config"
+	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/config"
+	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/config"
+	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/config"
+	graphExplorer "github.com/owncloud/ocis/v2/services/graph-explorer/pkg/config"
+	graph "github.com/owncloud/ocis/v2/services/graph/pkg/config"
+	groups "github.com/owncloud/ocis/v2/services/groups/pkg/config"
+	idm "github.com/owncloud/ocis/v2/services/idm/pkg/config"
+	idp "github.com/owncloud/ocis/v2/services/idp/pkg/config"
+	nats "github.com/owncloud/ocis/v2/services/nats/pkg/config"
+	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/config"
+	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/config"
+	ocs "github.com/owncloud/ocis/v2/services/ocs/pkg/config"
+	proxy "github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	search "github.com/owncloud/ocis/v2/services/search/pkg/config"
+	settings "github.com/owncloud/ocis/v2/services/settings/pkg/config"
+	sharing "github.com/owncloud/ocis/v2/services/sharing/pkg/config"
+	storagepublic "github.com/owncloud/ocis/v2/services/storage-publiclink/pkg/config"
+	storageshares "github.com/owncloud/ocis/v2/services/storage-shares/pkg/config"
+	storagesystem "github.com/owncloud/ocis/v2/services/storage-system/pkg/config"
+	storageusers "github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
+	store "github.com/owncloud/ocis/v2/services/store/pkg/config"
+	thumbnails "github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
+	users "github.com/owncloud/ocis/v2/services/users/pkg/config"
+	web "github.com/owncloud/ocis/v2/services/web/pkg/config"
+	webdav "github.com/owncloud/ocis/v2/services/webdav/pkg/config"
 )
 
 const (
@@ -49,7 +49,7 @@ type Mode int
 type Runtime struct {
 	Port       string `yaml:"port" env:"OCIS_RUNTIME_PORT"`
 	Host       string `yaml:"host" env:"OCIS_RUNTIME_HOST"`
-	Extensions string `yaml:"extensions" env:"OCIS_RUN_EXTENSIONS"`
+	Extensions string `yaml:"services" env:"OCIS_RUN_EXTENSIONS,OCIS_RUN_SERVICES"`
 }
 
 // Config combines all available configuration parts.
