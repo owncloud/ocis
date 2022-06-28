@@ -66,6 +66,7 @@ services:
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
       OCIS_INSECURE: "${INSECURE:-false}"
     volumes:
+      - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis
     labels:
       - "traefik.enable=true"
@@ -137,6 +138,7 @@ services:
 
 volumes:
   certs:
+  ocis-config:
   ocis-data:
   keycloak_postgres_data:
 
