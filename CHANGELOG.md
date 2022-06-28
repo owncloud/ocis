@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - CSP rules for silent token refresh in iframe: [#4031](https://github.com/owncloud/ocis/pull/4031)
+* Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
 * Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
 
 ## Details
@@ -19,6 +20,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/web/issues/7030
    https://github.com/owncloud/ocis/pull/4031
+
+* Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
+
+   For better UX clients need a way to discover if alias links are supported by the server. We added a
+   capability under "files_sharing/public/alias"
+
+   https://github.com/owncloud/ocis/issues/3983
+   https://github.com/owncloud/ocis/pull/3991
 
 * Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
 
