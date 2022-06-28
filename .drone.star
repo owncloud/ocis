@@ -38,7 +38,7 @@ SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:latest"
 THEGEEKLAB_DRONE_GITHUB_COMMENT = "thegeeklab/drone-github-comment:1"
 
 DEFAULT_PHP_VERSION = "7.4"
-DEFAULT_NODEJS_VERSION = "14"
+DEFAULT_NODEJS_VERSION = "16"
 
 # configuration
 config = {
