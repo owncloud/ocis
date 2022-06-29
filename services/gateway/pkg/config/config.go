@@ -27,7 +27,7 @@ type Config struct {
 	DisableHomeCreationOnLogin bool   `yaml:"disable_home_creation_on_login" env:"GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN" desc:"Disable creation of the home space on login."`
 	TransferSecret             string `yaml:"transfer_secret" env:"STORAGE_TRANSFER_SECRET" desc:"The storage transfer secret"` // TODO: how to name the env
 	TransferExpires            int    `yaml:"transfer_expires" env:"GATEWAY_TRANSFER_EXPIRES" desc:"Expiry for the gateway tokens"`
-	EtagCacheTTL               int    `yaml:"etag_cache_ttl" env:"GATEWAY_ETAG_CACHE_TTL" desc:"Max TTL for the gateway's ETAG cache."`
+	EtagCacheTTL               int    `yaml:"etag_cache_ttl" env:"GATEWAY_ETAG_CACHE_TTL" desc:"Max TTL in seconds for the gateway's ETAG cache."`
 
 	FrontendPublicURL string `yaml:"frontend_public_url" env:"OCIS_URL;GATEWAY_FRONTEND_PUBLIC_URL" desc:"The public facing url of the ocis frontend."`
 

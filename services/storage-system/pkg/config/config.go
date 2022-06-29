@@ -26,7 +26,7 @@ type Config struct {
 
 	Driver        string  `yaml:"driver" env:"STORAGE_SYSTEM_DRIVER" desc:"The driver which should be used by the service"`
 	Drivers       Drivers `yaml:"drivers"`
-	DataServerURL string  `yaml:"data_server_url" env:"STORAGE_SYSTEM_DATA_SERVER_URL" desc:"URL of the data server, needs to be reachable by services using the this service."`
+	DataServerURL string  `yaml:"data_server_url" env:"STORAGE_SYSTEM_DATA_SERVER_URL" desc:"URL of the data server, needs to be reachable by services using this service."`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`

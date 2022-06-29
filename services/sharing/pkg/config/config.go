@@ -88,7 +88,7 @@ type UserSharingOwnCloudSQLDriver struct {
 	DBUsername         string `yaml:"db_username" env:"SHARING_USER_OWNCLOUDSQL_DB_USERNAME" desc:"Username for the database."`
 	DBPassword         string `yaml:"db_password" env:"SHARING_USER_OWNCLOUDSQL_DB_PASSWORD" desc:"Password for the database."`
 	DBHost             string `yaml:"db_host" env:"SHARING_USER_OWNCLOUDSQL_DB_HOST" desc:"Hostname or IP of the database server."`
-	DBPort             int    `yaml:"db_port" env:"SHARING_USER_OWNCLOUDSQL_DB_PORT" desc:"Port, the database server is listening on."`
+	DBPort             int    `yaml:"db_port" env:"SHARING_USER_OWNCLOUDSQL_DB_PORT" desc:"Port that the database server is listening on."`
 	DBName             string `yaml:"db_name" env:"SHARING_USER_OWNCLOUDSQL_DB_NAME" desc:"Name of the database to be used."`
 	UserStorageMountID string `yaml:"user_storage_mount_id" env:"SHARING_USER_OWNCLOUDSQL_USER_STORAGE_MOUNT_ID" desc:"Mount ID of the ownCloudSQL users storage for mapping ownCloud 10 shares."`
 }

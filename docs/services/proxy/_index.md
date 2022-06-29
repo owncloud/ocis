@@ -9,7 +9,7 @@ geekdocCollapseSection: true
 
 ## Abstract
 
-This service provides a proxy service that routes requests to the correct extensions.
+The proxy service acts as an API Gateway and routes requests to the correct target service. It also provides standard proxy services.
 
 ## Table of Contents
 

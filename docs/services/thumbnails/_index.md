@@ -10,7 +10,7 @@ geekdocCollapseSection: true
 
 ## Abstract
 
-This service provides an ocis extensions which generates thumbnails for image files.
+The thumbnail service generates thumbnails for image files.
 
 
 ## Table of Contents

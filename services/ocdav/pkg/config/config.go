@@ -29,7 +29,7 @@ type Config struct {
 	// Insecure certificates allowed when making requests to the gateway
 	Insecure bool `yaml:"insecure" env:"OCIS_INSECURE;OCDAV_INSECURE"`
 	// Timeout in seconds when making requests to the gateway
-	Timeout    int64      `yaml:"gateway_request_timeout" env:"OCDAV_GATEWAY_REQUEST_TIMEOUT" desc:"Request timeout for requests from the oCDAV service to the gateway service."`
+	Timeout    int64      `yaml:"gateway_request_timeout" env:"OCDAV_GATEWAY_REQUEST_TIMEOUT" desc:"Request timeout in seconds for requests from the oCDAV service to the gateway service."`
 	Middleware Middleware `yaml:"middleware"`
 
 	Context context.Context `yaml:"-"`
