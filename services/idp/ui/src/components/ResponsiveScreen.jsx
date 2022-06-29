@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+import { Trans } from 'react-i18next';
+
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -18,25 +20,21 @@ const styles = theme => ({
     flex: 1,
   },
   content: {
-    paddingTop: 24,
-    paddingBottom: 12,
-    minHeight: 350,
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
-    position: 'relative'
-  },
-  dialog: {
-    maxWidth: 440,
-  },
-  logo: {
-    height: 24,
+    position: 'relative',
+    width: '100%'
   },
   actions: {
     marginTop: -40,
-    minHeight: 45,
     justifyContent: 'flex-start',
     paddingLeft: theme.spacing(3),
     paddingRight: theme.spacing(3)
+  },
+  wrapper: {
+    width: '100%',
+    maxWidth: 300,
+    display: 'flex',
+    flex: 1,
+    alignItems: 'center'
   }
 });
 
@@ -56,26 +54,22 @@ const ResponsiveScreen = (props) => {
 
   const bannerLogoSrc = branding?.bannerLogo ? branding.bannerLogo : Logo;
   const logo = withoutLogo ? null :
-    <DialogContent><img src={bannerLogoSrc} className={classes.logo} alt=""/></DialogContent>;
+    <img src={process.env.PUBLIC_URL + '/static/logo.svg'} className="oc-logo" alt="ownCloud Logo"/>;
 
   const content = loading ? <Loading/> : (withoutPadding ? children : <DialogContent>{children}</DialogContent>);
 
   return (
-    <Grid container justifyContent="center" alignItems="center" spacing={0}
+    <Grid container justifyContent="center" alignItems="center" direction="column" spacing={0}
       className={classNames(classes.root, className)} {...other}>
-      <ResponsiveDialog open fullWidth maxWidth="sm" disableEscapeKeyDown hideBackdrop
-        {...DialogProps}
-        PaperProps={{elevation: 4, ...PaperProps}}
-        classes={{
-          paperWidthSm: classes.dialog,
-        }}
-      >
-        <div className={classes.content}>
-          {logo}
-          {content}
+        <div className={classes.wrapper}>
+            <div className={classes.content}>
+              {logo}
+              {content}
+            </div>
         </div>
-        {!loading && <DialogActions className={classes.actions} disableSpacing><LocaleSelect disableUnderline locales={branding?.locales}/></DialogActions>}
-      </ResponsiveDialog>
+        <footer className="oc-footer-message">
+              <Trans i18nKey="konnect.footer.slogan"><strong>ownCloud</strong> - a safe home for all your data</Trans>
+        </footer>
     </Grid>
   );
 };

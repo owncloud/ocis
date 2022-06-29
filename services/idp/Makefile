@@ -30,9 +30,7 @@ ci-go-generate: # CI runs ci-node-generate automatically before this target
 ci-node-generate: assets
 
 .PHONY: assets
-assets: i18n \
-		ui-images \
-		yarn-build \
+assets: yarn-build \
 		assets/identifier/static \
 		assets/identifier/static/logo.svg \
 		assets/identifier/static/favicon.ico

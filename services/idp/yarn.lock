@@ -6133,6 +6133,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cldr@npm:^5.2.0":
+  version: 5.8.0
+  resolution: "cldr@npm:5.8.0"
+  dependencies:
+    escodegen: ^2.0.0
+    esprima: ^4.0.1
+    memoizeasync: ^1.1.0
+    passerror: ^1.1.1
+    pegjs: ^0.10.0
+    seq: ^0.3.5
+    unicoderegexp: ^0.4.1
+    xmldom: ^0.4.0
+    xpath: ^0.0.32
+  checksum: 614f7867382c6958b8440523911dac8f4f664c64916da391ee666060af03e17d664f5adff93dd3ec1cf7386be2bf1cbb1e934fce896d71243efe2229139a1aa3
+  languageName: node
+  linkType: hard
+
 "cldr@npm:^7.1.1":
   version: 7.2.0
   resolution: "cldr@npm:7.2.0"
@@ -6669,6 +6686,15 @@ __metadata:
     path-type: ^4.0.0
     yaml: ^1.10.0
   checksum: 4be63e7117955fd88333d7460e4c466a90f556df6ef34efd59034d2463484e339666c41f02b523d574a797ec61f4a91918c5b89a316db2ea2f834e0d2d09465b
+  languageName: node
+  linkType: hard
+
+"crc32@npm:^0.2.2":
+  version: 0.2.2
+  resolution: "crc32@npm:0.2.2"
+  bin:
+    crc32: ./bin/runner.js
+  checksum: e4301b6bfbc081dc44a02246657581a8df27c42528bfb4879d0c93afca68040ffd4d87eb8b483df04ee8dd4ad6538844512169156be69b1a4cec23c48b81881d
   languageName: node
   linkType: hard
 
@@ -9697,6 +9723,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"hsv-rgb@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "hsv-rgb@npm:1.0.0"
+  checksum: eb1f616bd43dceb9ed322167d8007747c075e9429cfbf81721a524d0454c68140b4593a5f97d0b215d61e2ddca722edc856734fcc3e10f37fc4b770ca526eb38
+  languageName: node
+  linkType: hard
+
 "html-encoding-sniffer@npm:^2.0.1":
   version: 2.0.1
   resolution: "html-encoding-sniffer@npm:2.0.1"
@@ -10056,6 +10089,7 @@ __metadata:
     i18next-http-backend: ^1.3.2
     i18next-parser: ^5.4.0
     i18next-resources-to-backend: ^1.0.0
+    kpop: "https://download.kopano.io/community/kapp:/kpop-2.2.0.tgz"
     query-string: ^7.1.1
     react: ^17.0.2
     react-dev-utils: ^11.0.4
@@ -10900,6 +10934,13 @@ __metadata:
   version: 2.0.0
   resolution: "isexe@npm:2.0.0"
   checksum: 26bf6c5480dda5161c820c5b5c751ae1e766c587b1f951ea3fcfc973bafb7831ae5b54a31a69bd670220e42e99ec154475025a468eae58ea262f813fdc8d1c62
+  languageName: node
+  linkType: hard
+
+"iso-639-1@npm:^2.0.5":
+  version: 2.1.15
+  resolution: "iso-639-1@npm:2.1.15"
+  checksum: a201530819d33e9ce077b02c786d67b35be5d823be27b5aacc18d880e580e559e39ec5055f8e2abcdc210f46618a643bf3c74e6fe6e8255fe62059682750e595
   languageName: node
   linkType: hard
 
@@ -11890,6 +11931,28 @@ __metadata:
   version: 2.0.4
   resolution: "klona@npm:2.0.4"
   checksum: abc6690882e0e6f5cf70451b79a6de95a27be56ced283d1d6d7e610db7d824e5da1f142f8073466dfbcfa887ee001b98f6dcfbcf02759828ba356b90202a74c5
+  languageName: node
+  linkType: hard
+
+"kpop@https://download.kopano.io/community/kapp:/kpop-2.2.0.tgz":
+  version: 2.2.0
+  resolution: "kpop@https://download.kopano.io/community/kapp:/kpop-2.2.0.tgz"
+  dependencies:
+    cldr: ^5.2.0
+    crc32: ^0.2.2
+    hsv-rgb: ^1.0.0
+    iso-639-1: ^2.0.5
+  peerDependencies:
+    "@gluejs/glue": ^0.3.0
+    "@material-ui/core": ^4.8.0
+    "@material-ui/icons": ^4.5.1
+    notistack: ^0.8.8
+    oidc-client: ^1.9.1
+    react: ^16.8.0
+    react-dom: ^16.8.0
+    react-intl: ^2.6.0
+    render-if: ^0.1.1
+  checksum: 37e981756f26f396f0d1a6e9acb87eb4a4dc6ad6272f84860a236da27cea152e029daffb81e04307eba366cf4279d18a19cba50ddfdcc38d66d060593caa50ce
   languageName: node
   linkType: hard
 
@@ -19057,6 +19120,13 @@ __metadata:
   version: 2.2.0
   resolution: "xmlchars@npm:2.2.0"
   checksum: 8c70ac94070ccca03f47a81fcce3b271bd1f37a591bf5424e787ae313fcb9c212f5f6786e1fa82076a2c632c0141552babcd85698c437506dfa6ae2d58723062
+  languageName: node
+  linkType: hard
+
+"xmldom@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "xmldom@npm:0.4.0"
+  checksum: ea975a7bd87109542ce24b19a70e50a3d64d20c757affa1a6c8cf906cbb39f0071a1bea9016beb5532388bc61dcbefddb92f3db2197dceee2b4c46343348ab3c
   languageName: node
   linkType: hard
 

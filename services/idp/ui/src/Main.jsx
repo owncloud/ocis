@@ -8,24 +8,14 @@ import { withStyles } from '@material-ui/core/styles';
 
 import Routes from './Routes';
 
-const styles = () => ({
-  root: {
-    position: 'relative',
-    display: 'flex',
-    flex: 1
-  }
-});
-
 class Main extends PureComponent {
   render() {
     const { classes, hello, pathPrefix } = this.props;
 
     return (
-      <div className={classes.root}>
-        <BrowserRouter basename={pathPrefix}>
-          <Routes hello={hello}/>
-        </BrowserRouter>
-      </div>
+      <BrowserRouter basename={pathPrefix}>
+        <Routes hello={hello}/>
+      </BrowserRouter>
     );
   }
 
@@ -54,4 +44,4 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(withStyles(styles)(Main));
+export default connect(mapStateToProps)(Main);

@@ -15,14 +15,12 @@ import Typography from '@material-ui/core/Typography';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 
+import TextInput from '../../components/TextInput'
+
 import { updateInput, executeLogonIfFormValid, advanceLogonFlow } from '../../actions/login';
 import { ErrorMessage } from '../../errors';
 
 const styles = theme => ({
-  button: {
-    margin: theme.spacing(1),
-    minWidth: 100
-  },
   buttonProgress: {
     color: green[500],
     position: 'absolute',
@@ -36,14 +34,12 @@ const styles = theme => ({
   },
   wrapper: {
     position: 'relative',
-    display: 'inline-block'
-  },
-  slideContainer: {
-    overflowX: 'hidden',
+    width: '100%',
+    textAlign: 'center'
   },
   message: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2)
+    marginTop: 5,
+    marginBottom: 5
   }
 });
 
@@ -61,6 +57,29 @@ function Login(props) {
   } = props;
 
   const { t } = useTranslation();
+  const loginFailed = errors.http;
+  const hasError = errors.http || errors.username || errors.password;
+  const errorMessage = errors.http
+    ? <ErrorMessage error={errors.http}></ErrorMessage>
+    : (errors.username
+      ? <ErrorMessage error={errors.username}></ErrorMessage>
+      : <ErrorMessage error={errors.password}></ErrorMessage>);
+  const extraPropsUsername = {
+    "aria-invalid" : (errors.username || errors.http) ? 'true' : 'false'
+  };
+  const extraPropsPassword = {
+    "aria-invalid" : (errors.password || errors.http) ? 'true' : 'false',
+  };
+
+  if(errors.username || errors.http){
+    extraPropsUsername['extraClassName'] = 'error';
+    extraPropsUsername['aria-describedby'] = 'oc-login-error-message';
+  }
+
+  if(errors.password || errors.http){
+    extraPropsPassword['extraClassName'] = 'error';
+    extraPropsPassword['aria-describedby'] = 'oc-login-error-message';
+  }
 
   useEffect(() => {
     if (hello && hello.state && history.action !== 'PUSH') {
@@ -106,62 +125,48 @@ function Login(props) {
   }, [hello, t]);
 
   return (
-    <DialogContent>
-      <Typography variant="h5" component="h3" gutterBottom>
-        {t("konnect.login.headline", "Sign in")}
-      </Typography>
-
-      <form action="" onSubmit={(event) => this.logon(event)}>
-        <TextField
-          placeholder={usernamePlaceHolder}
-          error={!!errors.username}
-          helperText={<ErrorMessage error={errors.username} values={{what: usernamePlaceHolder}}></ErrorMessage>}
-          fullWidth
-          margin="dense"
-          autoFocus
-          inputProps={{
-            autoCapitalize: 'off',
-            spellCheck: 'false'
-          }}
-          value={username}
-          onChange={handleChange('username')}
-          autoComplete="kopano-account username"
-        />
-        <TextField
-          type="password"
-          placeholder={t("konnect.login.passwordField.label", "Password")}
-          error={!!errors.password}
-          helperText={<ErrorMessage error={errors.password}></ErrorMessage>}
-          fullWidth
-          margin="dense"
-          onChange={handleChange('password')}
-          autoComplete="kopano-account current-password"
-        />
-        <DialogActions>
+      <div>
+      <h1 className="oc-invisible-sr"> Login </h1>
+      <form action="" className="oc-login-form" onSubmit={(event) => handleNextClick(event)}>
+        <TextInput
+              autoFocus
+              autoCapitalize="off"
+              spellCheck="false"
+              value={username}
+              onChange={handleChange('username')}
+              autoComplete="kopano-account username"
+              placeholder={t("konnect.login.usernameField.label", "Username")}
+              label={t("konnect.login.usernameField.label", "Username")}
+              id="oc-login-username"
+              {...extraPropsUsername}
+          />
+          <TextInput
+              type="password"
+              margin="normal"
+              onChange={handleChange('password')}
+              autoComplete="kopano-account current-password"
+              placeholder={t("konnect.login.usernameField.label", "Password")}
+              label={t("konnect.login.usernameField.label", "Password")}
+              id="oc-login-password"
+              {...extraPropsPassword}
+          />
+          {hasError && <Typography id="oc-login-error-message" variant="subtitle2" component="span" color="error" className={classes.message}>{errorMessage}</Typography>}
           <div className={classes.wrapper}>
+            <br />
             <Button
               type="submit"
               color="primary"
               variant="contained"
-              className={classes.button}
+              className="oc-button-primary oc-mt-l"
               disabled={!!loading}
               onClick={handleNextClick}
             >
-              {t("konnect.login.nextButton.label", "Next")}
+              {t("konnect.login.nextButton.label", "Log in")}
             </Button>
             {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
           </div>
-        </DialogActions>
-
-        {renderIf(errors.http)(() => (
-          <Typography variant="subtitle2" color="error" className={classes.message}>
-            <ErrorMessage error={errors.http}></ErrorMessage>
-          </Typography>
-        ))}
-
-        {hello?.details?.branding?.signinPageText && <Typography variant="body2">{hello.details.branding.signinPageText}</Typography>}
       </form>
-    </DialogContent>
+    </div>
   );
 }
 

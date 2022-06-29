@@ -28,7 +28,7 @@ const theme = createMuiTheme({
     tonalOffset: 0.2,
   },
   typography: {
-    fontSize: 12,
+    fontSize: 16,
     useNextVariants: true,
     button: {
       textTransform: 'none',

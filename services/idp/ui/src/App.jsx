@@ -1,15 +1,14 @@
 import React, { Suspense, lazy } from 'react';
 
 import { MuiThemeProvider } from '@material-ui/core/styles';
-import {
-  CssBaseline,
- } from '@material-ui/core';
+import { defaultTheme as theme } from 'kpop/es/theme';
 
+import 'kpop/static/css/base.css';
+import 'kpop/static/css/scrollbar.css';
 import './App.css';
-import './fancy-background.css';
+
 import Spinner from './components/Spinner';
 import * as version from './version';
-import theme from './theme';
 
 const LazyMain = lazy(() => import(/* webpackChunkName: "identifier-main" */ './Main'));
 
@@ -18,7 +17,6 @@ console.info(`Kopano Identifier build version: ${version.build}`); // eslint-dis
 const App = () => {
   return (
     <MuiThemeProvider theme={theme}>
-      <CssBaseline/>
       <Suspense fallback={<Spinner/>}>
         <LazyMain />
       </Suspense>
