@@ -14,11 +14,11 @@
 | STORAGE_SHARES_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | STORAGE_SHARES_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | STORAGE_SHARES_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| STORAGE_SHARES_GRPC_ADDR | string | 127.0.0.1:9154 | The address of the grpc service.|
+| STORAGE_SHARES_GRPC_ADDR | string | 127.0.0.1:9154 | The bind address of the GRPC service.|
 | STORAGE_SHARES_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>STORAGE_SHARES_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
-| STORAGE_SHARES_SKIP_USER_GROUPS_IN_TOKEN | bool | false | |
-| STORAGE_SHARES_MOUNT_ID | string | 7639e57c-4433-4a12-8201-722fd0009154 | |
-| STORAGE_SHARES_READ_ONLY | bool | false | |
-| STORAGE_SHARES_USER_SHARE_PROVIDER_ENDPOINT | string | localhost:9150 | |
+| STORAGE_SHARES_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
+| STORAGE_SHARES_MOUNT_ID | string | 7639e57c-4433-4a12-8201-722fd0009154 | Mount ID of this storage. Admins can set the ID for the storage in this config option manually which is then used to reference the storage. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|
+| STORAGE_SHARES_READ_ONLY | bool | false | Set this storage to be read-only.|
+| STORAGE_SHARES_USER_SHARE_PROVIDER_ENDPOINT | string | localhost:9150 | GRPC endpoint of the sharing extension.|

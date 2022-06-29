@@ -1,5 +1,5 @@
 ---
-title: WebDaV
+title: WebDAV
 date: 2018-05-02T00:00:00+00:00
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
@@ -8,4 +8,10 @@ geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---
 
-This service provides the WebDAV API which is required by some ownCloud clients.
+## Abstract
+
+This service provides preview (thumbnails) endpoints on the WebDAV API and therefore extends the main WebDAV API provided by the [oCDAV service]({{ ../../ocdav }}).
+
+## Table of Contents
+
+{{< toc-tree >}}

@@ -7,4 +7,10 @@ geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---
 
+## Abstract
+
 This service provides an OpenID Connect provider which is the default way to authenticate in oCIS.
+
+## Table of Contents
+
+{{< toc-tree >}}

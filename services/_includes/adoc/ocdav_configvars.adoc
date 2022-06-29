@@ -104,7 +104,7 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a| [subs=-attributes]
 127.0.0.1:0 
 a| [subs=-attributes]
-The address of the http service.
+The bind address of the HTTP service.
 
 |`OCDAV_HTTP_PROTOCOL`
 | string
@@ -140,7 +140,7 @@ The CS3 gateway endpoint.
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-Disables the encoding of the user's group memberships in the reva access token. This reduces token size, especially when users are members of a large number of groups.
+Disables the loading of user's group memberships from the reva access token.
 
 |`OCDAV_WEBDAV_NAMESPACE`
 | string
@@ -169,7 +169,7 @@ The human readable path for the share jail. Relative to a users personal space r
 a| [subs=-attributes]
 \https://localhost:9200 
 a| [subs=-attributes]
-
+URL, where oCIS is reachable for users.
 
 |`OCIS_INSECURE` +
 `OCDAV_INSECURE`
@@ -184,7 +184,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 84300 
 a| [subs=-attributes]
-
+Request timeout in seconds for requests from the oCDAV service to the gateway service.
 |===
 
 Since Version: `+` added, `-` deprecated

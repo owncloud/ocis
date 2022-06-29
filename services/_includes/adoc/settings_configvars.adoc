@@ -104,56 +104,56 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a| [subs=-attributes]
 127.0.0.1:9190 
 a| [subs=-attributes]
-
+The bind address of the HTTP service.
 
 |`SETTINGS_HTTP_ROOT`
 | string
 a| [subs=-attributes]
 / 
 a| [subs=-attributes]
-
+Subdirectory that serves as the root for this HTTP service.
 
 |`SETTINGS_CACHE_TTL`
 | int
 a| [subs=-attributes]
 604800 
 a| [subs=-attributes]
-
+Browser cache control max-age value in seconds for settings Web UI assets.
 
 |`SETTINGS_GRPC_ADDR`
 | string
 a| [subs=-attributes]
 127.0.0.1:9191 
 a| [subs=-attributes]
-
+The bind address of the GRPC service.
 
 |`SETTINGS_STORE_TYPE`
 | string
 a| [subs=-attributes]
 metadata 
 a| [subs=-attributes]
-
+Store type configures the persistency driver. Possible values are "metadata" and "filesystem".
 
 |`SETTINGS_DATA_PATH`
 | string
 a| [subs=-attributes]
 ~/.ocis/settings 
 a| [subs=-attributes]
-
+Path for the persistence directory.
 
 |`STORAGE_GATEWAY_GRPC_ADDR`
 | string
 a| [subs=-attributes]
 127.0.0.1:9215 
 a| [subs=-attributes]
-
+GRPC address of the storage-system service.
 
 |`STORAGE_GRPC_ADDR`
 | string
 a| [subs=-attributes]
 127.0.0.1:9215 
 a| [subs=-attributes]
-
+GRPC address of the storage-system service.
 
 |`OCIS_SYSTEM_USER_ID` +
 `SETTINGS_SYSTEM_USER_ID`
@@ -161,7 +161,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
 
 |`OCIS_SYSTEM_USER_IDP` +
 `SETTINGS_SYSTEM_USER_IDP`
@@ -169,14 +169,14 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 internal 
 a| [subs=-attributes]
-
+IDP of the oCIS storage-system system user.
 
 |`OCIS_SYSTEM_USER_API_KEY`
 | string
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+API key for the storage-system system user.
 
 |`OCIS_ADMIN_USER_ID` +
 `SETTINGS_ADMIN_USER_ID`
@@ -191,7 +191,7 @@ ID of a user, that should receive admin privileges.
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+Serve settings Web UI assets from a path on the filesystem instead of the builtin assets. Can be used for development and customization.
 
 |`OCIS_JWT_SECRET` +
 `SETTINGS_JWT_SECRET`

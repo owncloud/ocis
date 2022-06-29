@@ -104,14 +104,14 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a| [subs=-attributes]
 127.0.0.1:9120 
 a| [subs=-attributes]
-
+The bind address of the HTTP service.
 
 |`GRAPH_HTTP_ROOT`
 | string
 a| [subs=-attributes]
 /graph 
 a| [subs=-attributes]
-
+Subdirectory that serves as the root for this HTTP service.
 
 |`REVA_GATEWAY`
 | string

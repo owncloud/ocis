@@ -25,7 +25,6 @@ reva:
   address: 127.0.0.1:9142
 skip_user_groups_in_token: false
 commit_share_to_storage_grant: true
-commit_share_to_storage_ref: true
 share_folder_name: Shares
 disable_home_creation_on_login: true
 transfer_secret: ""

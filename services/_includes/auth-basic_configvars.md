@@ -14,11 +14,11 @@
 | AUTH_BASIC_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | AUTH_BASIC_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | AUTH_BASIC_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-memory.|
-| AUTH_BASIC_GRPC_ADDR | string | 127.0.0.1:9146 | The address of the grpc service.|
+| AUTH_BASIC_GRPC_ADDR | string | 127.0.0.1:9146 | The bind address of the GRPC service.|
 | AUTH_BASIC_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>AUTH_BASIC_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
-| AUTH_BASIC_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the encoding of the user's groupmember ships in the reva access token. To reduces token size, especially when users are members of a large number of groups.|
+| AUTH_BASIC_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the encoding of the user's group memberships in the reva access token. This reduces the token size, especially when users are members of a large number of groups.|
 | AUTH_BASIC_AUTH_PROVIDER | string | ldap | The auth provider which should be used by the service (e.g. 'ldap').|
 | LDAP_URI<br/>AUTH_BASIC_LDAP_URI | string | ldaps://localhost:9235 | URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'|
 | LDAP_CACERT<br/>AUTH_BASIC_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty the system default CA bundle will be used.|

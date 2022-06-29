@@ -104,14 +104,14 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a| [subs=-attributes]
 127.0.0.1:9110 
 a| [subs=-attributes]
-
+The bind address of the HTTP service.
 
 |`OCS_HTTP_ROOT`
 | string
 a| [subs=-attributes]
 /ocs 
 a| [subs=-attributes]
-
+Subdirectory that serves as the root for this HTTP service.
 
 |`OCIS_JWT_SECRET` +
 `OCS_JWT_SECRET`

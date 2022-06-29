@@ -104,7 +104,7 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a| [subs=-attributes]
 127.0.0.1:9142 
 a| [subs=-attributes]
-The address of the grpc service.
+The bind address of the GRPC service.
 
 |`GATEWAY_GRPC_PROTOCOL`
 | string
@@ -133,35 +133,28 @@ The CS3 gateway endpoint.
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-Disables the encoding of the user's groupmember ships in the reva access token. To reduces token size, especially when users are members of a large number of groups.
+Disables the loading of user's group memberships from the reva access token.
 
 |`GATEWAY_COMMIT_SHARE_TO_STORAGE_GRANT`
 | bool
 a| [subs=-attributes]
 true 
 a| [subs=-attributes]
-Commit shares to storage grants (default: true).
-
-|`GATEWAY_COMMIT_SHARE_TO_STORAGE_REF`
-| bool
-a| [subs=-attributes]
-true 
-a| [subs=-attributes]
-Commit shares to storage (default: true)
+Commit shares to storage grants. This grants access to shared resources for the share receiver directly on the storage.
 
 |`GATEWAY_SHARE_FOLDER_NAME`
 | string
 a| [subs=-attributes]
 Shares 
 a| [subs=-attributes]
-Name of the gateway share folder
+Name of the share folder in users' home space.
 
 |`GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN`
 | bool
 a| [subs=-attributes]
 true 
 a| [subs=-attributes]
-Disable creation of the homespace on login
+Disable creation of the home space on login.
 
 |`STORAGE_TRANSFER_SECRET`
 | string
@@ -182,7 +175,7 @@ Expiry for the gateway tokens
 a| [subs=-attributes]
 0 
 a| [subs=-attributes]
-Max TTL for the gatways ETAG cache.
+Max TTL in seconds for the gateway's ETAG cache.
 
 |`OCIS_URL` +
 `GATEWAY_FRONTEND_PUBLIC_URL`

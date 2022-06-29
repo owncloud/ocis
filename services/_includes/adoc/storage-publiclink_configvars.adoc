@@ -104,7 +104,7 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a| [subs=-attributes]
 127.0.0.1:9178 
 a| [subs=-attributes]
-The address of the grpc service.
+The bind address of the GRPC service.
 
 |`STORAGE_PUBLICLINK_GRPC_PROTOCOL`
 | string
@@ -133,14 +133,14 @@ The CS3 gateway endpoint.
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Disables the loading of user's group memberships from the reva access token.
 
 |`STORAGE_PUBLICLINK_STORAGE_PROVIDER_MOUNT_ID`
 | string
 a| [subs=-attributes]
 7993447f-687f-490d-875c-ac95e89a62a4 
 a| [subs=-attributes]
-
+Mount ID of this storage.
 |===
 
 Since Version: `+` added, `-` deprecated

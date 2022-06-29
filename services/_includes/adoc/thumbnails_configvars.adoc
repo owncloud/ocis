@@ -111,14 +111,14 @@ The address off the grpc service.
 a| [subs=-attributes]
 127.0.0.1:9186 
 a| [subs=-attributes]
-The address of the HTTP service.
+The bind address of the HTTP service.
 
 |`THUMBNAILS_HTTP_ROOT`
 | string
 a| [subs=-attributes]
 /thumbnails 
 a| [subs=-attributes]
-The root path of the HTTP service.
+Subdirectory that serves as the root for this HTTP service.
 
 |`THUMBNAILS_RESOLUTIONS`
 | 

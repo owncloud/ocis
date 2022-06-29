@@ -14,5 +14,5 @@
 | STORE_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | STORE_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | STORE_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| STORE_GRPC_ADDR | string | 127.0.0.1:9460 | |
-| STORE_DATA_PATH | string | ~/.ocis/store | |
+| STORE_GRPC_ADDR | string | 127.0.0.1:9460 | The bind address of the GRPC service.|
+| STORE_DATA_PATH | string | ~/.ocis/store | Path for the store persistence directory.|

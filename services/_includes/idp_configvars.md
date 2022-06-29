@@ -15,14 +15,14 @@
 | IDP_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | IDP_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | IDP_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| IDP_HTTP_ADDR | string | 127.0.0.1:9130 | |
-| IDP_HTTP_ROOT | string | / | |
+| IDP_HTTP_ADDR | string | 127.0.0.1:9130 | The bind address of the HTTP service.|
+| IDP_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
 | IDP_TRANSPORT_TLS_CERT | string | ~/.ocis/idp/server.crt | |
 | IDP_TRANSPORT_TLS_KEY | string | ~/.ocis/idp/server.key | |
 | IDP_TLS | bool | false | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to authenticate and look up users|
 | OCIS_MACHINE_AUTH_API_KEY<br/>IDP_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used for accessing the 'auth-machine' service to impersonate users when looking up their userinfo via the 'cs3' backend.|
-| IDP_ASSET_PATH | string |  | Defines the path for the IDP assets.|
+| IDP_ASSET_PATH | string |  | Serve IDP assets from a path on the filesystem instead of the builtin assets.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>IDP_ISS | string | https://localhost:9200 | The OIDC issuer URL to use.|
 | IDP_IDENTITY_MANAGER | string | ldap | The identity manager implementation to use, defaults to 'ldap', can be changed to 'cs3', 'kc', 'libregraph', 'cookie' or 'guest'.|
 | IDP_URI_BASE_PATH | string |  | Idp uri base path (defaults to "").|

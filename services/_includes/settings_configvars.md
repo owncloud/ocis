@@ -14,18 +14,18 @@
 | SETTINGS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | SETTINGS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | SETTINGS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| SETTINGS_HTTP_ADDR | string | 127.0.0.1:9190 | |
-| SETTINGS_HTTP_ROOT | string | / | |
-| SETTINGS_CACHE_TTL | int | 604800 | |
-| SETTINGS_GRPC_ADDR | string | 127.0.0.1:9191 | |
-| SETTINGS_STORE_TYPE | string | metadata | |
-| SETTINGS_DATA_PATH | string | ~/.ocis/settings | |
-| STORAGE_GATEWAY_GRPC_ADDR | string | 127.0.0.1:9215 | |
-| STORAGE_GRPC_ADDR | string | 127.0.0.1:9215 | |
-| OCIS_SYSTEM_USER_ID<br/>SETTINGS_SYSTEM_USER_ID | string |  | |
-| OCIS_SYSTEM_USER_IDP<br/>SETTINGS_SYSTEM_USER_IDP | string | internal | |
-| OCIS_SYSTEM_USER_API_KEY | string |  | |
+| SETTINGS_HTTP_ADDR | string | 127.0.0.1:9190 | The bind address of the HTTP service.|
+| SETTINGS_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
+| SETTINGS_CACHE_TTL | int | 604800 | Browser cache control max-age value in seconds for settings Web UI assets.|
+| SETTINGS_GRPC_ADDR | string | 127.0.0.1:9191 | The bind address of the GRPC service.|
+| SETTINGS_STORE_TYPE | string | metadata | Store type configures the persistency driver. Possible values are "metadata" and "filesystem".|
+| SETTINGS_DATA_PATH | string | ~/.ocis/settings | Path for the persistence directory.|
+| STORAGE_GATEWAY_GRPC_ADDR | string | 127.0.0.1:9215 | GRPC address of the storage-system service.|
+| STORAGE_GRPC_ADDR | string | 127.0.0.1:9215 | GRPC address of the storage-system service.|
+| OCIS_SYSTEM_USER_ID<br/>SETTINGS_SYSTEM_USER_ID | string |  | ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|
+| OCIS_SYSTEM_USER_IDP<br/>SETTINGS_SYSTEM_USER_IDP | string | internal | IDP of the oCIS storage-system system user.|
+| OCIS_SYSTEM_USER_API_KEY | string |  | API key for the storage-system system user.|
 | OCIS_ADMIN_USER_ID<br/>SETTINGS_ADMIN_USER_ID | string |  | ID of a user, that should receive admin privileges.|
-| SETTINGS_ASSET_PATH | string |  | |
+| SETTINGS_ASSET_PATH | string |  | Serve settings Web UI assets from a path on the filesystem instead of the builtin assets. Can be used for development and customization.|
 | OCIS_JWT_SECRET<br/>SETTINGS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | SETTINGS_SETUP_DEFAULT_ASSIGNMENTS<br/>ACCOUNTS_DEMO_USERS_AND_GROUPS | bool | false | If the default role assignments for the demo users should be setup.|

@@ -14,8 +14,8 @@
 | WEBDAV_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | WEBDAV_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | WEBDAV_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| WEBDAV_HTTP_ADDR | string | 127.0.0.1:9115 | The HTTP API address.|
-| WEBDAV_HTTP_ROOT | string | / | The HTTP API root path.|
-| OCIS_URL<br/>OCIS_PUBLIC_URL | string | https://127.0.0.1:9200 | |
+| WEBDAV_HTTP_ADDR | string | 127.0.0.1:9115 | The bind address of the HTTP service.|
+| WEBDAV_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
+| OCIS_URL<br/>OCIS_PUBLIC_URL | string | https://127.0.0.1:9200 | URL, where oCIS is reachable for users.|
 | WEBDAV_WEBDAV_NAMESPACE | string | /users/{{.Id.OpaqueId}} | CS3 path layout to use when forwarding /webdav requests|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|

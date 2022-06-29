@@ -14,8 +14,8 @@
 | OCS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | OCS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | OCS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| OCS_HTTP_ADDR | string | 127.0.0.1:9110 | |
-| OCS_HTTP_ROOT | string | /ocs | |
+| OCS_HTTP_ADDR | string | 127.0.0.1:9110 | The bind address of the HTTP service.|
+| OCS_HTTP_ROOT | string | /ocs | Subdirectory that serves as the root for this HTTP service.|
 | OCIS_JWT_SECRET<br/>OCS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>OCS_IDM_ADDRESS | string | https://localhost:9200 | URL of the OIDC issuer. It defaults to URL of the builtin IDP.|

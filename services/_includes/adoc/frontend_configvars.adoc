@@ -104,7 +104,7 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a| [subs=-attributes]
 127.0.0.1:9140 
 a| [subs=-attributes]
-The address of the http service.
+The bind address of the HTTP service.
 
 |`FRONTEND_HTTP_PROTOCOL`
 | string
@@ -125,7 +125,7 @@ The Path prefix where the frontend can be accessed (defaults to /).
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+Transfer secret for signing file up- and download requests.
 
 |`OCIS_JWT_SECRET` +
 `FRONTEND_JWT_SECRET`
@@ -148,14 +148,14 @@ The CS3 gateway endpoint.
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-Machine auth API key used for accessing the 'auth-machine' service.
+Machine auth API key used for accessing the 'auth-machine' service to impersonate users.
 
 |`FRONTEND_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-Disables the encoding of the user's group memberships in the reva access token. This reduces token size, especially when users are members of a large number of groups.
+Disables the loading of user's group memberships from the reva access token.
 
 |`FRONTEND_ENABLE_FAVORITES`
 | bool

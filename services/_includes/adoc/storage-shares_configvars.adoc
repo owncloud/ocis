@@ -104,7 +104,7 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a| [subs=-attributes]
 127.0.0.1:9154 
 a| [subs=-attributes]
-The address of the grpc service.
+The bind address of the GRPC service.
 
 |`STORAGE_SHARES_GRPC_PROTOCOL`
 | string
@@ -133,28 +133,28 @@ The CS3 gateway endpoint.
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Disables the loading of user's group memberships from the reva access token.
 
 |`STORAGE_SHARES_MOUNT_ID`
 | string
 a| [subs=-attributes]
 7639e57c-4433-4a12-8201-722fd0009154 
 a| [subs=-attributes]
-
+Mount ID of this storage. Admins can set the ID for the storage in this config option manually which is then used to reference the storage. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
 
 |`STORAGE_SHARES_READ_ONLY`
 | bool
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Set this storage to be read-only.
 
 |`STORAGE_SHARES_USER_SHARE_PROVIDER_ENDPOINT`
 | string
 a| [subs=-attributes]
 localhost:9150 
 a| [subs=-attributes]
-
+GRPC endpoint of the sharing extension.
 |===
 
 Since Version: `+` added, `-` deprecated

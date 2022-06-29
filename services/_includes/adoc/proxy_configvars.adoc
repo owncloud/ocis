@@ -104,14 +104,14 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a| [subs=-attributes]
 0.0.0.0:9200 
 a| [subs=-attributes]
-
+The bind address of the HTTP service.
 
 |`PROXY_HTTP_ROOT`
 | string
 a| [subs=-attributes]
 / 
 a| [subs=-attributes]
-
+Subdirectory that serves as the root for this HTTP service.
 
 |`PROXY_TRANSPORT_TLS_CERT`
 | string
@@ -228,14 +228,14 @@ Set this to 'true' to automatically provsion users that do not yet exist in the 
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-Set this to true to enable 'basic' (username/password) authentication. (Default: false)
+Set this to true to enable 'basic' (username/password) authentication.
 
 |`PROXY_INSECURE_BACKENDS`
 | bool
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-Disable TLS certificate validation for all http backend connections. (Default: false)
+Disable TLS certificate validation for all http backend connections.
 |===
 
 Since Version: `+` added, `-` deprecated

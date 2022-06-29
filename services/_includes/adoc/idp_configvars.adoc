@@ -111,14 +111,14 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a| [subs=-attributes]
 127.0.0.1:9130 
 a| [subs=-attributes]
-
+The bind address of the HTTP service.
 
 |`IDP_HTTP_ROOT`
 | string
 a| [subs=-attributes]
 / 
 a| [subs=-attributes]
-
+Subdirectory that serves as the root for this HTTP service.
 
 |`IDP_TRANSPORT_TLS_CERT`
 | string
@@ -161,7 +161,7 @@ Machine auth API key used for accessing the 'auth-machine' service to impersonat
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-Defines the path for the IDP assets.
+Serve IDP assets from a path on the filesystem instead of the builtin assets.
 
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +

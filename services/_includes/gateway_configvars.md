@@ -14,18 +14,17 @@
 | GATEWAY_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | GATEWAY_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | GATEWAY_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| GATEWAY_GRPC_ADDR | string | 127.0.0.1:9142 | The address of the grpc service.|
+| GATEWAY_GRPC_ADDR | string | 127.0.0.1:9142 | The bind address of the GRPC service.|
 | GATEWAY_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>GATEWAY_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
-| GATEWAY_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the encoding of the user's groupmember ships in the reva access token. To reduces token size, especially when users are members of a large number of groups.|
-| GATEWAY_COMMIT_SHARE_TO_STORAGE_GRANT | bool | true | Commit shares to storage grants (default: true).|
-| GATEWAY_COMMIT_SHARE_TO_STORAGE_REF | bool | true | Commit shares to storage (default: true)|
-| GATEWAY_SHARE_FOLDER_NAME | string | Shares | Name of the gateway share folder|
-| GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN | bool | true | Disable creation of the homespace on login|
+| GATEWAY_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
+| GATEWAY_COMMIT_SHARE_TO_STORAGE_GRANT | bool | true | Commit shares to storage grants. This grants access to shared resources for the share receiver directly on the storage.|
+| GATEWAY_SHARE_FOLDER_NAME | string | Shares | Name of the share folder in users' home space.|
+| GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN | bool | true | Disable creation of the home space on login.|
 | STORAGE_TRANSFER_SECRET | string |  | The storage transfer secret|
 | GATEWAY_TRANSFER_EXPIRES | int | 86400 | Expiry for the gateway tokens|
-| GATEWAY_ETAG_CACHE_TTL | int | 0 | Max TTL for the gatways ETAG cache.|
+| GATEWAY_ETAG_CACHE_TTL | int | 0 | Max TTL in seconds for the gateway's ETAG cache.|
 | OCIS_URL<br/>GATEWAY_FRONTEND_PUBLIC_URL | string | https://localhost:9200 | The public facing url of the ocis frontend.|
 | GATEWAY_USERS_ENDPOINT | string | localhost:9144 | The users api endpoint.|
 | GATEWAY_GROUPS_ENDPOINT | string | localhost:9160 | The groups api endpoint.|

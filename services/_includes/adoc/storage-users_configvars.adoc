@@ -104,7 +104,7 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a| [subs=-attributes]
 127.0.0.1:9157 
 a| [subs=-attributes]
-The address of the grpc service.
+The bind address of the GRPC service.
 
 |`STORAGE_USERS_GRPC_PROTOCOL`
 | string
@@ -118,7 +118,7 @@ The transport protocol of the grpc service.
 a| [subs=-attributes]
 127.0.0.1:9158 
 a| [subs=-attributes]
-The address of the http service.
+The bind address of the HTTP service.
 
 |`STORAGE_USERS_HTTP_PROTOCOL`
 | string
@@ -147,7 +147,7 @@ The CS3 gateway endpoint.
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Disables the loading of user's group memberships from the reva access token.
 
 |`STORAGE_USERS_DRIVER`
 | string
@@ -161,56 +161,56 @@ The storage driver which should be used by the service
 a| [subs=-attributes]
 ~/.ocis/storage/users 
 a| [subs=-attributes]
-
+Path for the persistence directory.
 
 |`STORAGE_USERS_OCIS_USER_LAYOUT`
 | string
 a| [subs=-attributes]
 {{.Id.OpaqueId}} 
 a| [subs=-attributes]
-
+Template string for the user storage layout in the persistence directory.
 
 |`STORAGE_USERS_PERMISSION_ENDPOINT,STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT`
 | string
 a| [subs=-attributes]
 127.0.0.1:9191 
 a| [subs=-attributes]
-
+Endpoint of the permissions service.
 
 |`STORAGE_USERS_OCIS_PERSONAL_SPACE_ALIAS_TEMPLATE`
 | string
 a| [subs=-attributes]
 {{.SpaceType}}/{{.User.Username \| lower}} 
 a| [subs=-attributes]
-
+Template string to construct personal space aliases.
 
 |`STORAGE_USERS_OCIS_GENERAL_SPACE_ALIAS_TEMPLATE`
 | string
 a| [subs=-attributes]
 {{.SpaceType}}/{{.SpaceName \| replace " " "-" \| lower}} 
 a| [subs=-attributes]
-
+Template string to construct general space aliases.
 
 |`STORAGE_USERS_OCIS_SHARE_FOLDER`
 | string
 a| [subs=-attributes]
 /Shares 
 a| [subs=-attributes]
-
+Name of the folder jailing all shares.
 
 |`STORAGE_USERS_S3NG_ROOT`
 | string
 a| [subs=-attributes]
 ~/.ocis/storage/users 
 a| [subs=-attributes]
-
+Path for the persistence directory.
 
 |`STORAGE_USERS_S3NG_USER_LAYOUT`
 | string
 a| [subs=-attributes]
 {{.Id.OpaqueId}} 
 a| [subs=-attributes]
-
+Template string for the user storage layout in the persistence directory.
 
 |`STORAGE_USERS_PERMISSION_ENDPOINT` +
 `STORAGE_USERS_S3NG_PERMISSIONS_ENDPOINT`
@@ -218,77 +218,77 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 127.0.0.1:9191 
 a| [subs=-attributes]
-
+Endpoint of the permissions service.
 
 |`STORAGE_USERS_S3NG_REGION`
 | string
 a| [subs=-attributes]
 default 
 a| [subs=-attributes]
-
+Region of the S3 bucket.
 
 |`STORAGE_USERS_S3NG_ACCESS_KEY`
 | string
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+Access key for the S3 bucket.
 
 |`STORAGE_USERS_S3NG_SECRET_KEY`
 | string
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+Secret key for the S3 bucket.
 
 |`STORAGE_USERS_S3NG_ENDPOINT`
 | string
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+Endpoint for the S3 bucket.
 
 |`STORAGE_USERS_S3NG_BUCKET`
 | string
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+Name of the S3 bucket.
 
 |`STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE`
 | string
 a| [subs=-attributes]
 {{.SpaceType}}/{{.User.Username \| lower}} 
 a| [subs=-attributes]
-
+Template string to construct personal space aliases.
 
 |`STORAGE_USERS_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE`
 | string
 a| [subs=-attributes]
 {{.SpaceType}}/{{.SpaceName \| replace " " "-" \| lower}} 
 a| [subs=-attributes]
-
+Template string to construct general space aliases.
 
 |`STORAGE_USERS_S3NG_SHARE_FOLDER`
 | string
 a| [subs=-attributes]
 /Shares 
 a| [subs=-attributes]
-
+Name of the folder jailing all shares.
 
 |`STORAGE_USERS_OWNCLOUDSQL_DATADIR`
 | string
 a| [subs=-attributes]
 ~/.ocis/storage/owncloud 
 a| [subs=-attributes]
-
+Path for the persistence directory.
 
 |`STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER`
 | string
 a| [subs=-attributes]
 /Shares 
 a| [subs=-attributes]
-
+name of the folder jailing all shares.
 
 |`STORAGE_USERS_OWNCLOUDSQL_LAYOUT`
 | string
@@ -302,71 +302,56 @@ path layout to use to navigate into a users folder in an owncloud data dir
 a| [subs=-attributes]
 ~/.ocis/storage/uploadinfo 
 a| [subs=-attributes]
-
+Path to a directory, where uploads will be stored temporarily.
 
 |`STORAGE_USERS_OWNCLOUDSQL_DB_USERNAME`
 | string
 a| [subs=-attributes]
 owncloud 
 a| [subs=-attributes]
-
+Username for the database.
 
 |`STORAGE_USERS_OWNCLOUDSQL_DB_PASSWORD`
 | string
 a| [subs=-attributes]
 owncloud 
 a| [subs=-attributes]
-
+Password for the database.
 
 |`STORAGE_USERS_OWNCLOUDSQL_DB_HOST`
 | string
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+Hostname or IP of the database server.
 
 |`STORAGE_USERS_OWNCLOUDSQL_DB_PORT`
 | int
 a| [subs=-attributes]
 3306 
 a| [subs=-attributes]
-
+Port that the database server is listening on.
 
 |`STORAGE_USERS_OWNCLOUDSQL_DB_NAME`
 | string
 a| [subs=-attributes]
 owncloud 
 a| [subs=-attributes]
-
+Name of the database to be used.
 
 |`STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT`
 | string
 a| [subs=-attributes]
 localhost:9144 
 a| [subs=-attributes]
-
+Endpoint of the users provider.
 
 |`STORAGE_USERS_DATA_SERVER_URL`
 | string
 a| [subs=-attributes]
 \http://localhost:9158/data 
 a| [subs=-attributes]
-
-
-|`STORAGE_USERS_TEMP_FOLDER`
-| string
-a| [subs=-attributes]
-~/.ocis/tmp/users 
-a| [subs=-attributes]
-
-
-|`OCIS_INSECURE` +
-`STORAGE_USERS_DATAPROVIDER_INSECURE`
-| bool
-a| [subs=-attributes]
-false 
-a| [subs=-attributes]
-
+URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed.
 
 |`STORAGE_USERS_EVENTS_ENDPOINT`
 | string
@@ -387,21 +372,21 @@ the clusterID of the streaming service. Mandatory when using nats
 a| [subs=-attributes]
 1284d238-aa92-42ce-bdc4-0b0000009157 
 a| [subs=-attributes]
-
+Mount ID of this storage.
 
 |`STORAGE_USERS_EXPOSE_DATA_SERVER`
 | bool
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Exposes the data server directly to users and bypasses the data gateway. Ensure that the data server address is reachable by users.
 
 |`STORAGE_USERS_READ_ONLY`
 | bool
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Set this storage to be read-only.
 |===
 
 Since Version: `+` added, `-` deprecated

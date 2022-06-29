@@ -104,7 +104,7 @@ Enables zpages, which can  be used for collecting and viewing traces in-memory.
 a| [subs=-attributes]
 127.0.0.1:9146 
 a| [subs=-attributes]
-The address of the grpc service.
+The bind address of the GRPC service.
 
 |`AUTH_BASIC_GRPC_PROTOCOL`
 | string
@@ -133,7 +133,7 @@ The CS3 gateway endpoint.
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-Disables the encoding of the user's groupmember ships in the reva access token. To reduces token size, especially when users are members of a large number of groups.
+Disables the encoding of the user's group memberships in the reva access token. This reduces the token size, especially when users are members of a large number of groups.
 
 |`AUTH_BASIC_AUTH_PROVIDER`
 | string

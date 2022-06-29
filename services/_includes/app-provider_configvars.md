@@ -14,7 +14,7 @@
 | APP_PROVIDER_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | APP_PROVIDER_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | APP_PROVIDER_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-memory.|
-| APP_PROVIDER_GRPC_ADDR | string | 127.0.0.1:9164 | The address of the grpc service.|
+| APP_PROVIDER_GRPC_ADDR | string | 127.0.0.1:9164 | The bind address of the GRPC service.|
 | APP_PROVIDER_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>APP_PROVIDER_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|

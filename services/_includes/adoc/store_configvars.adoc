@@ -104,14 +104,14 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a| [subs=-attributes]
 127.0.0.1:9460 
 a| [subs=-attributes]
-
+The bind address of the GRPC service.
 
 |`STORE_DATA_PATH`
 | string
 a| [subs=-attributes]
 ~/.ocis/store 
 a| [subs=-attributes]
-
+Path for the store persistence directory.
 |===
 
 Since Version: `+` added, `-` deprecated

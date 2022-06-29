@@ -29,9 +29,7 @@ web:
   theme_path: /themes/owncloud/theme.json
   config:
     server: https://localhost:9200
-    theme: ""
-    version: 0.1.0
-    oids:
+    oidc:
       metadata_url: https://localhost:9200/.well-known/openid-configuration
       authority: https://localhost:9200
       client_id: web

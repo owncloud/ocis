@@ -104,14 +104,14 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a| [subs=-attributes]
 127.0.0.1:9115 
 a| [subs=-attributes]
-The HTTP API address.
+The bind address of the HTTP service.
 
 |`WEBDAV_HTTP_ROOT`
 | string
 a| [subs=-attributes]
 / 
 a| [subs=-attributes]
-The HTTP API root path.
+Subdirectory that serves as the root for this HTTP service.
 
 |`OCIS_URL` +
 `OCIS_PUBLIC_URL`
@@ -119,7 +119,7 @@ The HTTP API root path.
 a| [subs=-attributes]
 \https://127.0.0.1:9200 
 a| [subs=-attributes]
-
+URL, where oCIS is reachable for users.
 
 |`WEBDAV_WEBDAV_NAMESPACE`
 | string

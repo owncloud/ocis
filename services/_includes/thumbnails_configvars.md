@@ -15,8 +15,8 @@
 | THUMBNAILS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | THUMBNAILS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | THUMBNAILS_GRPC_ADDR | string | 127.0.0.1:9185 | The address off the grpc service.|
-| THUMBNAILS_HTTP_ADDR | string | 127.0.0.1:9186 | The address of the HTTP service.|
-| THUMBNAILS_HTTP_ROOT | string | /thumbnails | The root path of the HTTP service.|
+| THUMBNAILS_HTTP_ADDR | string | 127.0.0.1:9186 | The bind address of the HTTP service.|
+| THUMBNAILS_HTTP_ROOT | string | /thumbnails | Subdirectory that serves as the root for this HTTP service.|
 | THUMBNAILS_RESOLUTIONS |  | [16x16 32x32 64x64 128x128 1920x1080 3840x2160 7680x4320] | The supported target resolutions in the format WidthxHeight e.g. 32x32. You can provide multiple resolutions seperated by a comma.|
 | THUMBNAILS_FILESYSTEMSTORAGE_ROOT | string | ~/.ocis/thumbnails | The directory where the filesystem storage will store the thumbnails.|
 | OCIS_INSECURE<br/>THUMBNAILS_WEBDAVSOURCE_INSECURE | bool | false | Ignore untrusted SSL certificates when connecting to the webdav source.|

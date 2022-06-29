@@ -8,4 +8,10 @@ geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---
 
+## Abstract
+
 This service provides the OCS API which is required by some ownCloud clients.
+
+## Table of Contents
+
+{{< toc-tree >}}

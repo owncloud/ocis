@@ -14,14 +14,14 @@
 | FRONTEND_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | FRONTEND_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | FRONTEND_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| FRONTEND_HTTP_ADDR | string | 127.0.0.1:9140 | The address of the http service.|
+| FRONTEND_HTTP_ADDR | string | 127.0.0.1:9140 | The bind address of the HTTP service.|
 | FRONTEND_HTTP_PROTOCOL | string | tcp | The transport protocol of the http service.|
 | FRONTEND_HTTP_PREFIX | string |  | The Path prefix where the frontend can be accessed (defaults to /).|
-| STORAGE_TRANSFER_SECRET | string |  | |
+| STORAGE_TRANSFER_SECRET | string |  | Transfer secret for signing file up- and download requests.|
 | OCIS_JWT_SECRET<br/>FRONTEND_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
-| OCIS_MACHINE_AUTH_API_KEY<br/>FRONTEND_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used for accessing the 'auth-machine' service.|
-| FRONTEND_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the encoding of the user's group memberships in the reva access token. This reduces token size, especially when users are members of a large number of groups.|
+| OCIS_MACHINE_AUTH_API_KEY<br/>FRONTEND_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used for accessing the 'auth-machine' service to impersonate users.|
+| FRONTEND_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
 | FRONTEND_ENABLE_FAVORITES | bool | false | Enables the support for favorites in the frontend.|
 | FRONTEND_ENABLE_PROJECT_SPACES | bool | true | Indicates to clients that project spaces are supposed to be made available.|
 | FRONTEND_ENABLE_SHARE_JAIL | bool | true | Indicates to clients that the share jail is supposed to be used.|

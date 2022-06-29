@@ -7,4 +7,10 @@ geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---
 
-This service provides a proxy service that routes requests to the correct extensions.
+## Abstract
+
+The proxy service acts as an API Gateway and routes requests to the correct target service. It also provides standard proxy services.
+
+## Table of Contents
+
+{{< toc-tree >}}

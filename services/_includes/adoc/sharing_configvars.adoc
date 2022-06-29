@@ -104,7 +104,7 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a| [subs=-attributes]
 127.0.0.1:9150 
 a| [subs=-attributes]
-The address of the grpc service.
+The bind address of the GRPC service.
 
 |`SHARING_GRPC_PROTOCOL`
 | string
@@ -147,28 +147,28 @@ the clusterID of the streaming service. Mandatory when using nats
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Disables the loading of user's group memberships from the reva access token.
 
 |`SHARING_USER_DRIVER`
 | string
 a| [subs=-attributes]
 cs3 
 a| [subs=-attributes]
-
+Driver to be used to persist shares. Possible values: "json", "cs3", "owncloudsql"
 
 |`SHARING_USER_JSON_FILE`
 | string
 a| [subs=-attributes]
 ~/.ocis/storage/shares.json 
 a| [subs=-attributes]
-
+Path to the json file where shares will be persisted.
 
 |`SHARING_USER_CS3_PROVIDER_ADDR`
 | string
 a| [subs=-attributes]
 127.0.0.1:9215 
 a| [subs=-attributes]
-
+GRPC address of the storage-system extension.
 
 |`OCIS_SYSTEM_USER_ID` +
 `SHARING_USER_CS3_SYSTEM_USER_ID`
@@ -176,7 +176,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
 
 |`OCIS_SYSTEM_USER_IDP` +
 `SHARING_USER_CS3_SYSTEM_USER_IDP`
@@ -184,7 +184,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 internal 
 a| [subs=-attributes]
-
+IDP of the oCIS storage-system system user.
 
 |`OCIS_SYSTEM_USER_API_KEY` +
 `SHARING_USER_CS3_SYSTEM_USER_API_KEY`
@@ -192,70 +192,70 @@ a| [subs=-attributes]
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+API key for the storage-system system user.
 
 |`SHARING_USER_OWNCLOUDSQL_DB_USERNAME`
 | string
 a| [subs=-attributes]
 owncloud 
 a| [subs=-attributes]
-
+Username for the database.
 
 |`SHARING_USER_OWNCLOUDSQL_DB_PASSWORD`
 | string
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+Password for the database.
 
 |`SHARING_USER_OWNCLOUDSQL_DB_HOST`
 | string
 a| [subs=-attributes]
 mysql 
 a| [subs=-attributes]
-
+Hostname or IP of the database server.
 
 |`SHARING_USER_OWNCLOUDSQL_DB_PORT`
 | int
 a| [subs=-attributes]
 3306 
 a| [subs=-attributes]
-
+Port that the database server is listening on.
 
 |`SHARING_USER_OWNCLOUDSQL_DB_NAME`
 | string
 a| [subs=-attributes]
 owncloud 
 a| [subs=-attributes]
-
+Name of the database to be used.
 
 |`SHARING_USER_OWNCLOUDSQL_USER_STORAGE_MOUNT_ID`
 | string
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+Mount ID of the ownCloudSQL users storage for mapping ownCloud 10 shares.
 
 |`SHARING_PUBLIC_DRIVER`
 | string
 a| [subs=-attributes]
 cs3 
 a| [subs=-attributes]
-
+Driver to be used to persist public shares. Possible values: "json", "cs3"
 
 |`SHARING_PUBLIC_JSON_FILE`
 | string
 a| [subs=-attributes]
 ~/.ocis/storage/publicshares.json 
 a| [subs=-attributes]
-
+Path to the JSON file where public share meta-data will be stored. This JSON file contains the information about public shares that have been created.
 
 |`SHARING_PUBLIC_CS3_PROVIDER_ADDR`
 | string
 a| [subs=-attributes]
 127.0.0.1:9215 
 a| [subs=-attributes]
-
+GRPC address of the storage-system extension.
 
 |`OCIS_SYSTEM_USER_ID` +
 `SHARING_PUBLIC_CS3_SYSTEM_USER_ID`
@@ -263,7 +263,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
 
 |`OCIS_SYSTEM_USER_IDP` +
 `SHARING_PUBLIC_CS3_SYSTEM_USER_IDP`
@@ -271,7 +271,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 internal 
 a| [subs=-attributes]
-
+IDP of the oCIS storage-system system user.
 
 |`OCIS_SYSTEM_USER_API_KEY` +
 `SHARING_USER_CS3_SYSTEM_USER_API_KEY`
@@ -279,7 +279,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+API key for the storage-system system user.
 |===
 
 Since Version: `+` added, `-` deprecated

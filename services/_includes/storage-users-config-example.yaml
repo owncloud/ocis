@@ -61,8 +61,6 @@ drivers:
     db_name: owncloud
     users_provider_endpoint: localhost:9144
 data_server_url: http://localhost:9158/data
-temp_folder: ~/.ocis/tmp/users
-data_provider_insecure: false
 events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster

@@ -37,5 +37,3 @@ drivers:
   ocis:
     root: ~/.ocis/storage/metadata
 data_server_url: http://localhost:9216/data
-temp_folder: ~/.ocis/tmp/metadata
-data_provider_insecure: false

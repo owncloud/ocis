@@ -104,7 +104,7 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a| [subs=-attributes]
 127.0.0.1:9215 
 a| [subs=-attributes]
-The address of the grpc service.
+The bind address of the GRPC service.
 
 |`STORAGE_SYSTEM_GRPC_PROTOCOL`
 | string
@@ -118,7 +118,7 @@ The transport protocol of the grpc service.
 a| [subs=-attributes]
 127.0.0.1:9216 
 a| [subs=-attributes]
-The address of the http service.
+The bind address of the HTTP service.
 
 |`STORAGE_SYSTEM_HTTP_PROTOCOL`
 | string
@@ -161,21 +161,21 @@ The CS3 gateway endpoint.
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
 
 |`OCIS_SYSTEM_USER_API_KEY`
 | string
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+API key for the storage-system system user.
 
 |`STORAGE_SYSTEM_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
 a| [subs=-attributes]
 false 
 a| [subs=-attributes]
-
+Disables the loading of user's group memberships from the reva access token.
 
 |`STORAGE_SYSTEM_DRIVER`
 | string
@@ -189,29 +189,14 @@ The driver which should be used by the service
 a| [subs=-attributes]
 ~/.ocis/storage/metadata 
 a| [subs=-attributes]
-
+Path for the directory where the storage-system service stores it's persistent data.
 
 |`STORAGE_SYSTEM_DATA_SERVER_URL`
 | string
 a| [subs=-attributes]
 \http://localhost:9216/data 
 a| [subs=-attributes]
-
-
-|`STORAGE_SYSTEM_TEMP_FOLDER`
-| string
-a| [subs=-attributes]
-~/.ocis/tmp/metadata 
-a| [subs=-attributes]
-
-
-|`OCIS_INSECURE` +
-`STORAGE_SYSTEM_DATAPROVIDER_INSECURE`
-| bool
-a| [subs=-attributes]
-false 
-a| [subs=-attributes]
-
+URL of the data server, needs to be reachable by services using this service.
 |===
 
 Since Version: `+` added, `-` deprecated

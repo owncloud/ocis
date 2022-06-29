@@ -14,11 +14,11 @@
 | GROUPS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | GROUPS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | GROUPS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| GROUPS_GRPC_ADDR | string | 127.0.0.1:9160 | The address of the grpc service.|
+| GROUPS_GRPC_ADDR | string | 127.0.0.1:9160 | The bind address of the GRPC service.|
 | GROUPS_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
 | OCIS_JWT_SECRET<br/>GROUPS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
-| GROUPS_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the encoding of the user's groupmember ships in the reva access token. To reduces token size, especially when users are members of a large number of groups.|
+| GROUPS_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
 | LDAP_URI<br/>GROUPS_LDAP_URI | string | ldaps://localhost:9235 | URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'|
 | LDAP_CACERT<br/>GROUPS_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty the system default CA bundle will be used.|
 | LDAP_INSECURE<br/>GROUPS_LDAP_INSECURE | bool | false | Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.|

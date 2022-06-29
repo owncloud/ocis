@@ -14,8 +14,8 @@
 | PROXY_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | PROXY_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | PROXY_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| PROXY_HTTP_ADDR | string | 0.0.0.0:9200 | |
-| PROXY_HTTP_ROOT | string | / | |
+| PROXY_HTTP_ADDR | string | 0.0.0.0:9200 | The bind address of the HTTP service.|
+| PROXY_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
 | PROXY_TRANSPORT_TLS_CERT | string | ~/.ocis/proxy/server.crt | |
 | PROXY_TRANSPORT_TLS_KEY | string | ~/.ocis/proxy/server.key | |
 | PROXY_TLS | bool | true | |
@@ -31,5 +31,5 @@
 | PROXY_USER_CS3_CLAIM | string | mail | The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail' (other possible values are: 'username', 'displayname')|
 | OCIS_MACHINE_AUTH_API_KEY<br/>PROXY_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used for accessing the 'auth-machine' service to impersonate users.|
 | PROXY_AUTOPROVISION_ACCOUNTS | bool | false | Set this to 'true' to automatically provsion users that do not yet exist in the users service on-demand upon first signin. To use this a write-enabled libregraph user backend needs to be setup an running.|
-| PROXY_ENABLE_BASIC_AUTH | bool | false | Set this to true to enable 'basic' (username/password) authentication. (Default: false)|
-| PROXY_INSECURE_BACKENDS | bool | false | Disable TLS certificate validation for all http backend connections. (Default: false)|
+| PROXY_ENABLE_BASIC_AUTH | bool | false | Set this to true to enable 'basic' (username/password) authentication.|
+| PROXY_INSECURE_BACKENDS | bool | false | Disable TLS certificate validation for all http backend connections.|

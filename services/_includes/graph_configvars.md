@@ -14,8 +14,8 @@
 | GRAPH_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | GRAPH_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | GRAPH_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| GRAPH_HTTP_ADDR | string | 127.0.0.1:9120 | |
-| GRAPH_HTTP_ROOT | string | /graph | |
+| GRAPH_HTTP_ADDR | string | 127.0.0.1:9120 | The bind address of the HTTP service.|
+| GRAPH_HTTP_ROOT | string | /graph | Subdirectory that serves as the root for this HTTP service.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | OCIS_JWT_SECRET<br/>GRAPH_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | OCIS_URL<br/>GRAPH_SPACES_WEBDAV_BASE | string | https://localhost:9200 | The public facing URL of WebDAV.|

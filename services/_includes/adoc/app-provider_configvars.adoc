@@ -104,7 +104,7 @@ Enables zpages, which can  be used for collecting and viewing traces in-memory.
 a| [subs=-attributes]
 127.0.0.1:9164 
 a| [subs=-attributes]
-The address of the grpc service.
+The bind address of the GRPC service.
 
 |`APP_PROVIDER_GRPC_PROTOCOL`
 | string

@@ -14,8 +14,8 @@
 | GRAPH_EXPLORER_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
 | GRAPH_EXPLORER_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | GRAPH_EXPLORER_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| GRAPH_EXPLORER_HTTP_ADDR | string | 127.0.0.1:9135 | The HTTP service address.|
-| GRAPH_EXPLORER_HTTP_ROOT | string | /graph-explorer | The HTTP service root path.|
+| GRAPH_EXPLORER_HTTP_ADDR | string | 127.0.0.1:9135 | The bind address of the HTTP service.|
+| GRAPH_EXPLORER_HTTP_ROOT | string | /graph-explorer | Subdirectory that serves as the root for this HTTP service.|
 | GRAPH_EXPLORER_CLIENT_ID | string | ocis-explorer.js | OIDC client id, the graph explorer uses. This client needs to be set up in your IDP.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>GRAPH_EXPLORER_ISSUER | string | https://localhost:9200 | URL of the OIDC issuer. It defaults to URL of the builtin IDP.|
 | OCIS_URL<br/>GRAPH_EXPLORER_GRAPH_URL_BASE | string | https://localhost:9200 | Base URL, where the graph explorer is reachable for users.|
