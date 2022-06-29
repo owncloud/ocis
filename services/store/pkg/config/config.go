@@ -18,7 +18,7 @@ type Config struct {
 
 	GRPC GRPC `yaml:"grpc"`
 
-	Datapath string `yaml:"data_path" env:"STORE_DATA_PATH"`
+	Datapath string `yaml:"data_path" env:"STORE_DATA_PATH" desc:"Path for the store persistence directory."`
 
 	Context context.Context `yaml:"-"`
 }

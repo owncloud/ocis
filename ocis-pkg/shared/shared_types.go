@@ -39,12 +39,12 @@ type Reva struct {
 type Commons struct {
 	Log               *Log          `yaml:"log"`
 	Tracing           *Tracing      `yaml:"tracing"`
-	OcisURL           string        `yaml:"ocis_url" env:"OCIS_URL"`
+	OcisURL           string        `yaml:"ocis_url" env:"OCIS_URL" desc:"URL, where oCIS is reachable for users."`
 	TokenManager      *TokenManager `yaml:"token_manager"`
 	Reva              *Reva         `yaml:"reva"`
 	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used for accessing the 'auth-machine' service to impersonate users."`
 	TransferSecret    string        `yaml:"transfer_secret,omitempty" env:"REVA_TRANSFER_SECRET"`
-	SystemUserID      string        `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID"`
+	SystemUserID      string        `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID" desc:"ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
 	SystemUserAPIKey  string        `yaml:"system_user_api_key" env:"SYSTEM_USER_API_KEY"`
 	AdminUserID       string        `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID" desc:"ID of a user, that should receive admin privileges."`
 }

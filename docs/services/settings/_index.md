@@ -45,3 +45,7 @@ The forms are generated from the registered *settings bundles*.
 if it's available. The SDK uses sensible defaults when ocis-settings is not part of the setup.
 
 For compatibility with ownCloud 10, a migration of ownCloud 10 settings into the storage of ocis-settings will be available.
+
+## Table of Contents
+
+{{< toc-tree >}}

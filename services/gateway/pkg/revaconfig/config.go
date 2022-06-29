@@ -45,7 +45,6 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 					"publicshareprovidersvc":        cfg.SharingEndpoint,
 					"ocmshareprovidersvc":           cfg.SharingEndpoint,
 					"commit_share_to_storage_grant": cfg.CommitShareToStorageGrant,
-					"commit_share_to_storage_ref":   cfg.CommitShareToStorageRef,
 					"share_folder":                  cfg.ShareFolder, // ShareFolder is the location where to create shares in the recipient's storage provider.
 					// other
 					"disable_home_creation_on_login": cfg.DisableHomeCreationOnLogin,

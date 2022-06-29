@@ -10,8 +10,8 @@ type CORS struct {
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string `yaml:"addr" env:"WEBDAV_HTTP_ADDR" desc:"The HTTP API address."`
+	Addr      string `yaml:"addr" env:"WEBDAV_HTTP_ADDR" desc:"The bind address of the HTTP service."`
 	Namespace string `yaml:"-"`
-	Root      string `yaml:"root" env:"WEBDAV_HTTP_ROOT" desc:"The HTTP API root path."`
+	Root      string `yaml:"root" env:"WEBDAV_HTTP_ROOT" desc:"Subdirectory that serves as the root for this HTTP service."`
 	CORS      CORS   `yaml:"cors"`
 }

@@ -29,7 +29,6 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"mount_id":           cfg.MountID,
 					"expose_data_server": cfg.ExposeDataServer,
 					"data_server_url":    cfg.DataServerURL,
-					"tmp_folder":         cfg.TempFolder,
 				},
 			},
 			"interceptors": map[string]interface{}{
@@ -50,9 +49,6 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"prefix":         cfg.HTTP.Prefix,
 					"driver":         cfg.Driver,
 					"drivers":        UserDrivers(cfg),
-					"timeout":        86400,
-					"insecure":       cfg.DataProviderInsecure,
-					"disable_tus":    false,
 					"nats_address":   cfg.Events.Addr,
 					"nats_clusterID": cfg.Events.ClusterID,
 				},
