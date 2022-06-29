@@ -32,7 +32,6 @@ func DefaultConfig() *config.Config {
 		},
 
 		CommitShareToStorageGrant:  true,
-		CommitShareToStorageRef:    true,
 		ShareFolder:                "Shares",
 		DisableHomeCreationOnLogin: true,
 		TransferExpires:            24 * 60 * 60,
