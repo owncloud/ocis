@@ -28,10 +28,10 @@ module.exports = {
 
     getSettingsValue: async function (key) {
       let output
+      let elemfound = true
+
       switch (key) {
         case 'Language':
-          let elemfound = true
-
           // Language value is set to empty at beginning
           // In that case just return false
           await this.api.element('@languageValue', result => {

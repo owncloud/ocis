@@ -31,8 +31,8 @@ ci-node-generate: pull-assets
 
 .PHONY: pull-assets
 pull-assets:
-	@git clean -xfd assets
-	@curl --fail -slL -o- https://github.com/owncloud/graph-explorer/releases/download/v1.7.10.3/release.tar.gz | tar xvzf - -C assets/
+	git clean -xfd assets
+	curl --fail -slL -o- https://github.com/owncloud/graph-explorer/releases/download/v1.7.10.3/release.tar.gz | tar xvzf - -C assets/
 
 ############ licenses ############
 .PHONY: ci-node-check-licenses
