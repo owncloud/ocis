@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/CiscoM31/godata"
+	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
@@ -21,6 +22,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	settingssvc "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
+	"golang.org/x/exp/slices"
 )
 
 // GetMe implements the Service interface.
@@ -170,6 +172,35 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		} else {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
+	}
+	sel := strings.Split(r.URL.Query().Get("$select"), ",")
+	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
+	if slices.Contains(sel, "drive") || slices.Contains(sel, "drives") || slices.Contains(exp, "drive") || slices.Contains(exp, "drives") {
+		wdu, err := url.Parse(g.config.Spaces.WebDavBase + g.config.Spaces.WebDavPath)
+		// TODO: filter this request for the user
+		f := listStorageSpacesUserFilter(user.GetId())
+		lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
+			Opaque:  nil,
+			Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
+		})
+		if err != nil {
+			g.logger.Err(err).Interface("query", r.URL.Query()).Msg("error getting storages")
+		}
+		drives := []libregraph.Drive{}
+		for _, sp := range lspr.GetStorageSpaces() {
+			d, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, sp)
+			if err != nil {
+				g.logger.Err(err).Interface("query", r.URL.Query()).Msg("error converting space to drive")
+			}
+			if slices.Contains(sel, "drive") || slices.Contains(exp, "drive") {
+				if *d.DriveType == "personal" {
+					drives = append(drives, *d)
+				}
+			} else {
+				drives = append(drives, *d)
+			}
+		}
+		user.Drives = drives
 	}
 
 	render.Status(r, http.StatusOK)
