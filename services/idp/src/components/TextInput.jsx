@@ -22,7 +22,7 @@ TextInput.propTypes = {
     placeholder: PropTypes.object,
     label: PropTypes.object,
     id: PropTypes.string,
-    extraClassName: props.string,
+    extraClassName: PropTypes.string,
 }
 
 export default TextInput;

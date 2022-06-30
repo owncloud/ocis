@@ -15,7 +15,7 @@ import { ErrorMessage } from '../errors';
 
 class Loading extends React.PureComponent {
   render() {
-    const { classes, error, t } = this.props;
+    const { error, t } = this.props;
 
     return (
         <Grid item align="center">

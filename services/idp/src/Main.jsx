@@ -4,13 +4,11 @@ import { connect } from 'react-redux';
 
 import { BrowserRouter } from 'react-router-dom';
 
-import { withStyles } from '@material-ui/core/styles';
-
 import Routes from './Routes';
 
 class Main extends PureComponent {
   render() {
-    const { classes, hello, pathPrefix } = this.props;
+    const { hello, pathPrefix } = this.props;
 
     return (
       <BrowserRouter basename={pathPrefix}>

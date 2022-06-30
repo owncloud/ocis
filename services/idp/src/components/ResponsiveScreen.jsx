@@ -6,12 +6,9 @@ import { Trans } from 'react-i18next';
 
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 
-import ResponsiveDialog from './ResponsiveDialog';
 import Loading from './Loading';
-import LocaleSelect from './LocaleSelect';
 
 const styles = theme => ({
   root: {
@@ -43,11 +40,8 @@ const ResponsiveScreen = (props) => {
     withoutLogo,
     withoutPadding,
     loading,
-    branding,
     children,
     className,
-    DialogProps,
-    PaperProps,
     ...other
   } = props;
 
