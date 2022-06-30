@@ -41,6 +41,7 @@ default:
         - FilesVersionsContext:
         - OCSContext:
         - PublicWebDavContext:
+        - SearchContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
         - TusContext:
