@@ -18,7 +18,7 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"AUTH_BEARER_SKIP_USER_GROUPS_IN_TOKEN" desc:"Skip storing all groups of a user in the jwt token."`
+	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"AUTH_BEARER_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the encoding of the user's group memberships in the reva access token. This reduces the token size, especially when users are members of a large number of groups."`
 
 	OIDC OIDC `yaml:"oidc"`
 
@@ -51,7 +51,7 @@ type Debug struct {
 }
 
 type GRPCConfig struct {
-	Addr      string `yaml:"addr" env:"AUTH_BEARER_GRPC_ADDR" desc:"The address of the grpc service."`
+	Addr      string `yaml:"addr" env:"AUTH_BEARER_GRPC_ADDR" desc:"The bind address of the GRPC service."`
 	Namespace string `yaml:"-"`
 	Protocol  string `yaml:"protocol" env:"AUTH_BEARER_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
 }

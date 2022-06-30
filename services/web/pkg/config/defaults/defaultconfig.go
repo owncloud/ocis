@@ -38,9 +38,8 @@ func DefaultConfig() *config.Config {
 			ThemeServer: "https://localhost:9200",
 			ThemePath:   "/themes/owncloud/theme.json",
 			Config: config.WebConfig{
-				Server:  "https://localhost:9200",
-				Theme:   "",
-				Version: "0.1.0",
+				Server: "https://localhost:9200",
+				Theme:  "",
 				OpenIDConnect: config.OIDC{
 					MetadataURL:  "",
 					Authority:    "https://localhost:9200",

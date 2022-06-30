@@ -2,53 +2,53 @@ const filesMenu = {
   English: [
     'Personal',
     'Shares',
-    'Spaces\nbeta',
+    'Spaces',
     'Deleted files'
   ],
   Deutsch: [
     'Persönlich',
     'Geteilt',
-    'Spaces\nbeta',
+    'Spaces',
     'Gelöschte Dateien'
   ],
   Español: [
     'Personal',
     'Shares',
-    'Spaces\nbeta',
+    'Spaces',
     'Archivos borrados'
   ],
   Français: [
     'Personal',
     'Shares',
-    'Spaces\nbeta',
+    'Spaces',
     'Fichiers supprimés'
   ]
 }
 
 const accountMenu = {
   English: [
-    'N\nnull\nuser1@example.com',
+    'U\nuser1\nuser1@example.org',
     'Settings',
     'Log out',
-    'Personal storage (0.2% used)\n5.06 GB of 2.85 TB used'
+    'Personal storage\n0 B used'
   ],
   Deutsch: [
-    'N\nnull\nuser1@example.com',
+    'U\nuser1\nuser1@example.org',
     'Einstellungen',
     'Abmelden',
-    'Persönlicher Speicher (0.2% benutzt)\n5.06 GB von 2.85 TB benutzt'
+    'Persönlicher Speicherplatz\n0 B verwendet'
   ],
   Español: [
-    'N\nnull\nuser1@example.com',
+    'U\nuser1\nuser1@example.org',
     'Configuración',
     'Salir',
-    'Personal storage (0.2% used)\n5.06 GB of 2.85 TB used'
+    'Personal storage\n0 B used'
   ],
   Français: [
-    'N\nnull\nuser1@example.com',
+    'U\nuser1\nuser1@example.org',
     'Settings',
     'Se déconnecter',
-    'Personal storage (0.2% used)\n5.06 GB of 2.85 TB used'
+    'Personal storage\n0 B used'
   ]
 }
 

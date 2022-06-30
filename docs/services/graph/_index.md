@@ -8,6 +8,10 @@ geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---
 
+## Abstract
+
 This service provides a simple graph world API which can be used by clients or other extensions.
+
+## Table of Contents
 
 {{< toc-tree >}}

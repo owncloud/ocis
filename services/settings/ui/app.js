@@ -4,7 +4,7 @@ import store from './store'
 import translations from './../l10n/translations.json'
 
 // just a dummy function to trick gettext tools
-function $gettext(msg) {
+function $gettext (msg) {
   return msg
 }
 

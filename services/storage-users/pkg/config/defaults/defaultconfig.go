@@ -39,7 +39,6 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		TempFolder:    filepath.Join(defaults.BaseDataPath(), "tmp", "users"),
 		DataServerURL: "http://localhost:9158/data",
 		MountID:       "1284d238-aa92-42ce-bdc4-0b0000009157",
 		Driver:        "ocis",

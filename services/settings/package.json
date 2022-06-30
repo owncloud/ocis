@@ -15,25 +15,34 @@
     "acceptance-tests": "cucumber-js --retry 1 --require-module @babel/register --require-module @babel/polyfill --require ${TEST_INFRA_DIRECTORY}/setup.js --require ui/tests/acceptance/stepDefinitions --require ${TEST_INFRA_DIRECTORY}/stepDefinitions --format @cucumber/pretty-formatter -t \"${TEST_TAGS:-not @skip and not @skipOnOC10}\"",
     "build": "rollup -c",
     "generate-api": "node node_modules/swagger-vue-generator/bin/generate-api.js --package-version v0 --source pkg/proto/v0/settings.swagger.json --moduleName settings --destination ui/client/settings/index.js",
-    "lint": "eslint ui/**/*.vue ui/**/*.js --color --global requirejs --global require",
-    "test": "echo 'Not implemented'",
-    "watch": "rollup -c -w",
     "licenses:check": "license-checker-rseidelsohn --summary --relativeLicensePath --onlyAllow 'Python-2.0;Apache*;Apache License, Version 2.0;Apache-2.0;Apache 2.0;Artistic-2.0;BSD;BSD-3-Clause;CC-BY-3.0;CC-BY-4.0;CC0-1.0;ISC;MIT;MPL-2.0;Public Domain;Unicode-TOU;Unlicense;WTFPL' --excludePackages 'ocis-settings@0.0.0'",
     "licenses:csv": "license-checker-rseidelsohn --relativeLicensePath --csv --out ../third-party-licenses/node/settings/third-party-licenses.csv",
-    "licenses:save": "license-checker-rseidelsohn --relativeLicensePath --out /dev/null --files ../third-party-licenses/node/settings/third-party-licenses"
+    "licenses:save": "license-checker-rseidelsohn --relativeLicensePath --out /dev/null --files ../third-party-licenses/node/settings/third-party-licenses",
+    "lint": "eslint 'ui/**/*.{js,ts,vue}' --color",
+    "test": "echo 'Not implemented'",
+    "watch": "rollup -c -w"
   },
   "browserslist": [
-    "> 1%",
-    "not dead"
+    "last 2 versions",
+    "> .2%",
+    "not dead",
+    "not Explorer > 0",
+    "not ExplorerMobile > 0",
+    "not BlackBerry > 0",
+    "not OperaMini all",
+    "not OperaMobile > 0"
   ],
   "dependencies": {
     "axios": "^0.27.2",
-    "core-js": "^3.22.5",
+    "core-js": "^3.23.3",
     "debounce": "^1.2.1",
+    "lodash-es": "^4.17.21",
+    "qs": "^6.11.0",
+    "vue": "^2.6.10",
     "vuex": "^3.6.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.15.5",
+    "@babel/core": "^7.18.6",
     "@babel/plugin-proposal-class-properties": "^7.7.4",
     "@babel/plugin-proposal-export-default-from": "^7.16.7",
     "@babel/plugin-proposal-object-rest-spread": "^7.15.6",
@@ -52,25 +61,23 @@
     "chromedriver": "^93.0.1",
     "cross-env": "^7.0.3",
     "easygettext": "^2.7.0",
-    "eslint": "7.32.0",
-    "eslint-config-standard": "^16.0.2",
+    "eslint": "^8.18.0",
+    "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.3",
     "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-promise": "^4.1.1",
-    "eslint-plugin-standard": "^5.0.0",
-    "eslint-plugin-vue": "^7.8.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "eslint-plugin-vue": "^9.1.1",
     "fs-extra": "^10.0.0",
     "join-path": "^1.1.1",
     "ldapjs": "^2.3.2",
     "license-checker-rseidelsohn": "^3.1.0",
-    "lodash-es": "^4.17.21",
     "nightwatch": "1.7.11",
     "nightwatch-api": "3.0.2",
     "nightwatch-vrt": "^0.2.10",
     "node-fetch": "^2.6.7",
-    "qs": "^6.10.3",
-    "rimraf": "^3.0.0",
-    "rollup": "^2.70.1",
+    "rollup": "^2.75.7",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-eslint": "^7.0.0",
     "rollup-plugin-filesize": "^9.1.2",
@@ -84,6 +91,6 @@
     "xml-js": "^1.6.11"
   },
   "peerDependencies": {
-    "owncloud-design-system": "^13.0.0"
+    "owncloud-design-system": "^13.1.0"
   }
 }

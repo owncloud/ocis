@@ -94,7 +94,6 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 					"driver":          cfg.Driver,
 					"drivers":         metadataDrivers(cfg),
 					"data_server_url": cfg.DataServerURL,
-					"tmp_folder":      cfg.TempFolder,
 				},
 			},
 		},
@@ -104,12 +103,9 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 			// no datagateway needed as the metadata clients directly talk to the dataprovider with the simple protocol
 			"services": map[string]interface{}{
 				"dataprovider": map[string]interface{}{
-					"prefix":      "data",
-					"driver":      cfg.Driver,
-					"drivers":     metadataDrivers(cfg),
-					"timeout":     86400,
-					"insecure":    cfg.DataProviderInsecure,
-					"disable_tus": true,
+					"prefix":  "data",
+					"driver":  cfg.Driver,
+					"drivers": metadataDrivers(cfg),
 				},
 			},
 		},

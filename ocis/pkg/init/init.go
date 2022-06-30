@@ -31,10 +31,6 @@ type InsecureProxyExtension struct {
 	InsecureBackends bool `yaml:"insecure_backends"`
 }
 
-type DataProviderInsecureSettings struct {
-	DataProviderInsecure bool `yaml:"data_provider_insecure"`
-}
-
 type LdapSettings struct {
 	BindPassword string `yaml:"bind_password"`
 }
@@ -114,8 +110,6 @@ type OcisConfig struct {
 	AuthBearer        AuthbearerExtension `yaml:"auth_bearer"`
 	Users             UsersAndGroupsExtension
 	Groups            UsersAndGroupsExtension
-	StorageSystem     DataProviderInsecureSettings `yaml:"storage_system"`
-	StorageUsers      DataProviderInsecureSettings `yaml:"storage_users"`
 	Ocdav             InsecureExtension
 	Thumbnails        ThumbnailExtension
 }
@@ -288,12 +282,6 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		}
 		cfg.Proxy = InsecureProxyExtension{
 			InsecureBackends: true,
-		}
-		cfg.StorageSystem = DataProviderInsecureSettings{
-			DataProviderInsecure: true,
-		}
-		cfg.StorageUsers = DataProviderInsecureSettings{
-			DataProviderInsecure: true,
 		}
 
 		cfg.Thumbnails.Thumbnail.WebdavAllowInsecure = true

@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - CSP rules for silent token refresh in iframe: [#4031](https://github.com/owncloud/ocis/pull/4031)
+* Bugfix - Remove unused configuration options: [#3973](https://github.com/owncloud/ocis/pull/3973)
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
 * Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
 
@@ -20,6 +21,19 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/web/issues/7030
    https://github.com/owncloud/ocis/pull/4031
+
+* Bugfix - Remove unused configuration options: [#3973](https://github.com/owncloud/ocis/pull/3973)
+
+   We've removed multiple unused configuration options:
+
+   - `STORAGE_SYSTEM_DATAPROVIDER_INSECURE`, see also cs3org/reva#2993 -
+   `STORAGE_USERS_DATAPROVIDER_INSECURE`, see also cs3org/reva#2993 -
+   `STORAGE_SYSTEM_TEMP_FOLDER`, see also cs3org/reva#2993 -
+   `STORAGE_USERS_TEMP_FOLDER`, see also cs3org/reva#2993 - `WEB_UI_CONFIG_VERSION`, see
+   also owncloud/web#7130 - `GATEWAY_COMMIT_SHARE_TO_STORAGE_REF`, see also
+   cs3org/reva#3017
+
+   https://github.com/owncloud/ocis/pull/3973
 
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
 
