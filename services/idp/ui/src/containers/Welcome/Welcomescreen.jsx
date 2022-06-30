@@ -29,14 +29,14 @@ class Welcomescreen extends React.PureComponent {
     const loading = hello === null;
     return (
       <ResponsiveScreen loading={loading} branding={branding}>
-        <Typography variant="h5" component="h3">
+        <Typography variant="h5" component="h3" className="oc-light" >
           {t("konnect.welcome.headline", "Welcome {{displayName}}", {displayName: hello.displayName})}
         </Typography>
-        <Typography variant="subtitle1" className={classes.subHeader}>
+        <Typography variant="subtitle1" className={classes.subHeader + " oc-light"}>
           {hello.username}
         </Typography>
 
-        <Typography gutterBottom>
+        <Typography gutterBottom className="oc-light">
           {t("konnect.welcome.message", "You are signed in - awesome!")}
         </Typography>
 

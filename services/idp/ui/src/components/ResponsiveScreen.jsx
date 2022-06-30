@@ -10,7 +10,6 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 
 import ResponsiveDialog from './ResponsiveDialog';
-import Logo from '../images/app-icon.svg';
 import Loading from './Loading';
 import LocaleSelect from './LocaleSelect';
 
@@ -52,7 +51,6 @@ const ResponsiveScreen = (props) => {
     ...other
   } = props;
 
-  const bannerLogoSrc = branding?.bannerLogo ? branding.bannerLogo : Logo;
   const logo = withoutLogo ? null :
     <img src={process.env.PUBLIC_URL + '/static/logo.svg'} className="oc-logo" alt="ownCloud Logo"/>;
 

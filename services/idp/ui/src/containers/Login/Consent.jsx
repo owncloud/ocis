@@ -95,14 +95,14 @@ class Consent extends React.PureComponent {
 
     return (
       <DialogContent>
-        <Typography variant="h5" component="h3">
+        <Typography variant="h5" component="h3" className="oc-light">
           {t("konnect.consent.headline", "Hi {{displayName}}", { displayName: hello.displayName })}
         </Typography>
-        <Typography variant="subtitle1" className={classes.subHeader}>
+        <Typography variant="subtitle1" className={classes.subHeader + " oc-light oc-mb-m"}>
           {hello.username}
         </Typography>
 
-        <Typography variant="subtitle1" gutterBottom>
+        <Typography variant="subtitle1" gutterBottom className="oc-light">
           <Trans t={t} i18nKey="konnect.consent.message">
             <Tooltip
               placement="bottom"
@@ -114,12 +114,12 @@ class Consent extends React.PureComponent {
         </Typography>
         <ScopesList dense disablePadding className={classes.scopesList} scopes={scopes} meta={meta.scopes}></ScopesList>
 
-        <Typography variant="subtitle1" gutterBottom>
+        <Typography variant="subtitle1" gutterBottom className="oc-light">
           <Trans t={t} i18nKey="konnect.consent.question">
             Allow <em><ClientDisplayName client={client}/></em> to do this?
           </Trans>
         </Typography>
-        <Typography color="secondary">
+        <Typography className="oc-light">
           {t("konnect.consent.consequence", "By clicking Allow, you allow this app to use your information.")}
         </Typography>
 
@@ -128,7 +128,6 @@ class Consent extends React.PureComponent {
             <div className={classes.wrapper}>
               <Button
                 color="secondary"
-                variant="outlined"
                 className={classes.button}
                 disabled={!!loading}
                 onClick={this.action(false, scopes)}
@@ -143,7 +142,7 @@ class Consent extends React.PureComponent {
                 type="submit"
                 color="primary"
                 variant="contained"
-                className={classes.button}
+                className="oc-button-primary"
                 disabled={!!loading}
                 onClick={this.action(true, scopes)}
               >

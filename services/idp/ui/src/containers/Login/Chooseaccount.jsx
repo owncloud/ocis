@@ -61,10 +61,10 @@ class Chooseaccount extends React.PureComponent {
 
     return (
       <DialogContent className={classes.content}>
-        <Typography variant="h5" component="h3">
+        <Typography variant="h5" component="h3" className="oc-light">
           {t("konnect.chooseaccount.headline", "Choose an account")}
         </Typography>
-        <Typography variant="subtitle1" className={classes.subHeader}>
+        <Typography variant="subtitle1" className={classes.subHeader + " oc-light"}>
           {t("konnect.chooseaccount.subHeader", "to sign in")}
         </Typography>
 
@@ -77,7 +77,7 @@ class Chooseaccount extends React.PureComponent {
               disabled={!!loading}
               onClick={(event) => this.logon(event)}
             ><ListItemAvatar><Avatar>{username.substr(0, 1)}</Avatar></ListItemAvatar>
-              <ListItemText primary={username} />
+              <ListItemText className="oc-light" primary={username} />
             </ListItem>
             <ListItem
               button
@@ -92,6 +92,7 @@ class Chooseaccount extends React.PureComponent {
                 </Avatar>
               </ListItemAvatar>
               <ListItemText
+                className="oc-light"
                 primary={
                   t("konnect.chooseaccount.useOther.label", "Use another account")
                 }
