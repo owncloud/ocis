@@ -26,24 +26,25 @@
 | GRAPH_IDENTITY_BACKEND | string | ldap | The user identity backend to use, defaults to 'ldap', can be 'cs3'.|
 | LDAP_URI<br/>GRAPH_LDAP_URI | string | ldaps://localhost:9235 | URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'|
 | LDAP_CACERT<br/>GRAPH_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | The certificate to verify TLS connections|
-| LDAP_INSECURE<br/>GRAPH_LDAP_INSECURE | bool | false | |
-| LDAP_BIND_DN<br/>GRAPH_LDAP_BIND_DN | string | uid=libregraph,ou=sysusers,o=libregraph-idm | |
-| LDAP_BIND_PASSWORD<br/>GRAPH_LDAP_BIND_PASSWORD | string |  | |
-| GRAPH_LDAP_SERVER_UUID | bool | false | |
-| GRAPH_LDAP_SERVER_WRITE_ENABLED | bool | true | |
-| LDAP_USER_BASE_DN<br/>GRAPH_LDAP_USER_BASE_DN | string | ou=users,o=libregraph-idm | |
-| LDAP_USER_SCOPE<br/>GRAPH_LDAP_USER_SCOPE | string | sub | |
-| LDAP_USER_FILTER<br/>GRAPH_LDAP_USER_FILTER | string |  | |
-| LDAP_USER_OBJECTCLASS<br/>GRAPH_LDAP_USER_OBJECTCLASS | string | inetOrgPerson | |
-| LDAP_USER_SCHEMA_MAIL<br/>GRAPH_LDAP_USER_EMAIL_ATTRIBUTE | string | mail | |
-| LDAP_USER_SCHEMA_DISPLAY_NAME<br/>GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE | string | displayName | |
-| LDAP_USER_SCHEMA_USERNAME<br/>GRAPH_LDAP_USER_NAME_ATTRIBUTE | string | uid | |
-| LDAP_USER_SCHEMA_ID<br/>GRAPH_LDAP_USER_UID_ATTRIBUTE | string | owncloudUUID | |
-| LDAP_GROUP_BASE_DN<br/>GRAPH_LDAP_GROUP_BASE_DN | string | ou=groups,o=libregraph-idm | |
-| LDAP_GROUP_SCOPE<br/>GRAPH_LDAP_GROUP_SEARCH_SCOPE | string | sub | |
-| LDAP_GROUP_FILTER<br/>GRAPH_LDAP_GROUP_FILTER | string |  | |
-| LDAP_GROUP_OBJECTCLASS<br/>GRAPH_LDAP_GROUP_OBJECTCLASS | string | groupOfNames | |
-| LDAP_GROUP_SCHEMA_GROUPNAME<br/>GRAPH_LDAP_GROUP_NAME_ATTRIBUTE | string | cn | |
-| LDAP_GROUP_SCHEMA_ID<br/>GRAPH_LDAP_GROUP_ID_ATTRIBUTE | string | owncloudUUID | |
+| LDAP_INSECURE<br/>GRAPH_LDAP_INSECURE | bool | false | Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.|
+| LDAP_BIND_DN<br/>GRAPH_LDAP_BIND_DN | string | uid=libregraph,ou=sysusers,o=libregraph-idm | LDAP DN to use for simple bind authentication with the target LDAP server.|
+| LDAP_BIND_PASSWORD<br/>GRAPH_LDAP_BIND_PASSWORD | string |  | Password to use for authenticating the 'bind_dn'.|
+| GRAPH_LDAP_SERVER_UUID | bool | false | If set to true, rely on the LDAP Server to generate a unique ID for users and groups, e.g. when using 'entryUUID' as the user id attribute.|
+| GRAPH_LDAP_SERVER_USE_PASSWORD_MODIFY_EXOP | bool | true | User the Password Modify Extended Operation for updating user passwords|
+| GRAPH_LDAP_SERVER_WRITE_ENABLED | bool | true | Allow to create, modify and delete LDAP users via graph API. This is only works when the default Schema is used.|
+| LDAP_USER_BASE_DN<br/>GRAPH_LDAP_USER_BASE_DN | string | ou=users,o=libregraph-idm | Search base DN for looking up LDAP users.|
+| LDAP_USER_SCOPE<br/>GRAPH_LDAP_USER_SCOPE | string | sub | LDAP search scope to use when looking up users ('base', 'one', 'sub').|
+| LDAP_USER_FILTER<br/>GRAPH_LDAP_USER_FILTER | string |  | LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').|
+| LDAP_USER_OBJECTCLASS<br/>GRAPH_LDAP_USER_OBJECTCLASS | string | inetOrgPerson | The object class to use for users in the default user search filter ('inetOrgPerson').|
+| LDAP_USER_SCHEMA_MAIL<br/>GRAPH_LDAP_USER_EMAIL_ATTRIBUTE | string | mail | LDAP Attribute to use for the email address of users.|
+| LDAP_USER_SCHEMA_DISPLAY_NAME<br/>GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE | string | displayName | LDAP Attribute to use for the displayname of users.|
+| LDAP_USER_SCHEMA_USERNAME<br/>GRAPH_LDAP_USER_NAME_ATTRIBUTE | string | uid | LDAP Attribute to use for username of users.|
+| LDAP_USER_SCHEMA_ID<br/>GRAPH_LDAP_USER_UID_ATTRIBUTE | string | owncloudUUID | LDAP Attribute to use as the unique id for users. This should be a stable globally unique id (e.g. a UUID).|
+| LDAP_GROUP_BASE_DN<br/>GRAPH_LDAP_GROUP_BASE_DN | string | ou=groups,o=libregraph-idm | Search base DN for looking up LDAP groups.|
+| LDAP_GROUP_SCOPE<br/>GRAPH_LDAP_GROUP_SEARCH_SCOPE | string | sub | LDAP search scope to use when looking up gruops ('base', 'one', 'sub').|
+| LDAP_GROUP_FILTER<br/>GRAPH_LDAP_GROUP_FILTER | string |  | LDAP filter to add to the default filters for group searches.|
+| LDAP_GROUP_OBJECTCLASS<br/>GRAPH_LDAP_GROUP_OBJECTCLASS | string | groupOfNames | The object class to use for groups in the default group search filter ('groupOfNames'). |
+| LDAP_GROUP_SCHEMA_GROUPNAME<br/>GRAPH_LDAP_GROUP_NAME_ATTRIBUTE | string | cn | LDAP Attribute to use for the name of groups|
+| LDAP_GROUP_SCHEMA_ID<br/>GRAPH_LDAP_GROUP_ID_ATTRIBUTE | string | owncloudUUID | LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).|
 | GRAPH_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | the address of the streaming service|
 | GRAPH_EVENTS_CLUSTER | string | ocis-cluster | the clusterID of the streaming service. Mandatory when using nats|

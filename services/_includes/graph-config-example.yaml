@@ -38,6 +38,7 @@ identity:
     bind_dn: uid=libregraph,ou=sysusers,o=libregraph-idm
     bind_password: ""
     use_server_uuid: false
+    use_password_modify_exop: true
     write_enabled: true
     user_base_dn: ou=users,o=libregraph-idm
     user_search_scope: sub
