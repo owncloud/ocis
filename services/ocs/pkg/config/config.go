@@ -23,8 +23,8 @@ type Config struct {
 
 	IdentityManagement IdentityManagement `yaml:"identity_management"`
 
-	AccountBackend    string `yaml:"account_backend" env:"OCS_ACCOUNT_BACKEND_TYPE"`
-	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;OCS_MACHINE_AUTH_API_KEY" desc: "Machine auth API key used for accessing the 'auth-machine' service to impersonate users."`
+	AccountBackend    string `yaml:"-"` // we only support cs3 backend, no need to have this configurable
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;OCS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used for accessing the 'auth-machine' service to impersonate users."`
 
 	Context context.Context `yaml:"-"`
 }

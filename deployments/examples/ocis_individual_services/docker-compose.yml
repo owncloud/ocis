@@ -336,7 +336,6 @@ services:
 
       OCS_HTTP_ADDR: 0.0.0.0:9110
 
-      OCS_ACCOUNT_BACKEND_TYPE: cs3
       OCS_IDM_ADDRESS: https://${OCIS_DOMAIN}
 
       OCS_JWT_SECRET: ${OCIS_JWT_SECRET}

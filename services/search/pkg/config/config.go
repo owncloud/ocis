@@ -18,11 +18,11 @@ type Config struct {
 
 	GRPC GRPC `yaml:"grpc"`
 
-	Datapath string `yaml:"data_path" env:"SEARCH_DATA_PATH"`
+	Datapath string `yaml:"data_path" env:"SEARCH_DATA_PATH" desc:"Path for the search persistence directory."`
 	Reva     Reva   `yaml:"reva"`
 	Events   Events `yaml:"events"`
 
-	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;SEARCH_MACHINE_AUTH_API_KEY" desc: "Machine auth API key used for accessing the 'auth-machine' service to impersonate users."`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;SEARCH_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used for accessing the 'auth-machine' service to impersonate users."`
 
 	Context context.Context `yaml:"-"`
 }
