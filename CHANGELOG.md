@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - CSP rules for silent token refresh in iframe: [#4031](https://github.com/owncloud/ocis/pull/4031)
 * Bugfix - Remove unused configuration options: [#3973](https://github.com/owncloud/ocis/pull/3973)
+* Bugfix - Remove static ocs user backend config: [#4077](https://github.com/owncloud/ocis/pull/4077)
 * Bugfix - Store user passwords hashed in idm: [#3778](https://github.com/owncloud/ocis/issues/3778)
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
 * Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
@@ -35,6 +36,14 @@ The following sections list the changes for unreleased.
    cs3org/reva#3017
 
    https://github.com/owncloud/ocis/pull/3973
+
+* Bugfix - Remove static ocs user backend config: [#4077](https://github.com/owncloud/ocis/pull/4077)
+
+   We've remove the `OCS_ACCOUNT_BACKEND_TYPE` configuration option. It was intended to allow
+   configuration of different user backends for the ocs service. Right now the ocs service only
+   has a "cs3" backend. Therefor it's a static entry and not configurable.
+
+   https://github.com/owncloud/ocis/pull/4077
 
 * Bugfix - Store user passwords hashed in idm: [#3778](https://github.com/owncloud/ocis/issues/3778)
 
