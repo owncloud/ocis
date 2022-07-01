@@ -1,4 +1,4 @@
-import React, { lazy } from 'react';
+import React, { ReactElement, lazy } from 'react';
 import PropTypes from 'prop-types';
 
 import { Route, Switch } from 'react-router-dom';
@@ -12,7 +12,7 @@ const AsyncWelcome = lazy(() =>
 const AsyncGoodbye = lazy(() =>
   import(/* webpackChunkName: "containers-goodbye" */ './containers/Goodbye'));
 
-const Routes = ({ hello }) => (
+const Routes = ({ hello  }: {hello: PropTypes.object}): ReactElement => (
   <Switch>
     <PrivateRoute
       path="/welcome"

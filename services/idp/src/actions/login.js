@@ -90,6 +90,8 @@ export function executeLogon(username, password, mode=ModeLogonUsernamePassword)
         // Username with empty password - this only works when the user is already signed in.
         params.push(username, '', mode);
         break;
+
+      // no default
     }
 
     const r = withClientRequestState({

@@ -91,7 +91,7 @@ function Login(props) {
       history.replace(`/chooseaccount${history.location.search}${history.location.hash}`);
       return;
     }
-  }, [ /* no dependencies */ ]);
+  });
 
   const handleChange = (name) => (event) => {
     dispatch(updateInput(name, event.target.value));
