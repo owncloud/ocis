@@ -5,7 +5,7 @@
   "homepage": ".",
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "build": "react-scripts build",
+    "build": "node scripts/build.js && rm -f build/service-worker.js",
     "eject": "react-scripts eject",
     "licenses": "NODE_PATH=./node_modules node ../scripts/js-license-ranger.js",
     "licenses:check": "license-checker-rseidelsohn --summary --relativeLicensePath --onlyAllow 'Python-2.0;Apache*;Apache License, Version 2.0;Apache-2.0;Apache 2.0;Artistic-2.0;BSD;BSD-3-Clause;CC-BY-3.0;CC-BY-4.0;CC0-1.0;ISC;MIT;MPL-2.0;Public Domain;Unicode-TOU;Unlicense;WTFPL'  --excludePackages 'identifier;kpop;po2json;unicoderegexp'",
@@ -99,11 +99,16 @@
     "web-vitals": "^1.0.1"
   },
   "devDependencies": {
+    "babel-loader": "8.1.0",
+    "babel-plugin-named-asset-import": "^0.3.8",
     "cldr": "^7.1.1",
+    "eslint-loader": "^4.0.2",
     "eslint-plugin-i18next": "^5.1.2",
     "i18next-conv": "^12.1.0",
     "i18next-parser": "^5.4.0",
+    "license-checker-rseidelsohn": "^3.1.0",
     "source-map-explorer": "^1.8.0",
+    "webpack-manifest-plugin": "4.1.1",
     "yarn-deduplicate": "^1.1.1"
   }
 }

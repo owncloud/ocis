@@ -56,16 +56,6 @@ yarn-build: node_modules
 	#yarn test #TODO: activate
 	yarn build
 
-.PHONY: i18n
-i18n:
-	@$(MAKE) -C ui/i18n
-
-.PHONY: ui-images
-ui-images:
-	@$(MAKE) -C ui/src/images
-
-
-
 .PHONY: node_modules
 node_modules:
 	yarn install --immutable
