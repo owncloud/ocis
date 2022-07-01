@@ -43,6 +43,7 @@ func DefaultConfig() *config.Config {
 				CredentialsByUserAgent: map[string]string{},
 			},
 		},
+		MachineAuthAPIKey: "",
 		Status: config.Status{
 			Version:        version.Legacy,
 			VersionString:  version.LegacyString,
