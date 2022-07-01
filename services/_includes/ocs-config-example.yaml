@@ -42,5 +42,4 @@ reva:
   address: 127.0.0.1:9142
 identity_management:
   address: https://localhost:9200
-account_backend: cs3
 machine_auth_api_key: ""

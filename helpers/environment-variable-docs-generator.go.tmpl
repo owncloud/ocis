@@ -77,7 +77,11 @@ func GetAnnotatedVariables(s interface{}) []ConfigField {
 				continue
 			}
 			v := fmt.Sprintf("%v", value.Interface())
-			fields = append(fields, ConfigField{Name: strings.ReplaceAll(env, ";", "<br/>"), DefaultValue: html.EscapeString(strings.Replace(v, "|", "\\|", -1)), Description: desc, Type: value.Type().Name()})
+			typeName := value.Type().Name()
+			if typeName == "" {
+				typeName = value.Type().String()
+			}
+			fields = append(fields, ConfigField{Name: strings.ReplaceAll(env, ";", "<br/>"), DefaultValue: html.EscapeString(strings.Replace(v, "|", "\\|", -1)), Description: desc, Type: typeName})
 		case reflect.Ptr:
 			// PolicySelectors in the Proxy are being skipped atm
 			// they are not configurable via env vars, if that changes

@@ -111,7 +111,7 @@ The bind address of the GRPC service.
 a| [subs=-attributes]
 ~/.ocis/search 
 a| [subs=-attributes]
-
+Path for the search persistence directory.
 
 |`REVA_GATEWAY`
 | string
@@ -147,7 +147,7 @@ the customergroup of the service. One group will only get one copy of an event
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+Machine auth API key used for accessing the 'auth-machine' service to impersonate users.
 |===
 
 Since Version: `+` added, `-` deprecated

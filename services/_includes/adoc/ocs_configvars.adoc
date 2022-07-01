@@ -137,20 +137,13 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
-|`OCS_ACCOUNT_BACKEND_TYPE`
-| string
-a| [subs=-attributes]
-cs3 
-a| [subs=-attributes]
-
-
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `OCS_MACHINE_AUTH_API_KEY`
 | string
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-
+Machine auth API key used for accessing the 'auth-machine' service to impersonate users.
 |===
 
 Since Version: `+` added, `-` deprecated

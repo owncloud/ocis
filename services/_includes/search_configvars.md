@@ -15,9 +15,9 @@
 | SEARCH_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | SEARCH_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | SEARCH_GRPC_ADDR | string | 127.0.0.1:9220 | The bind address of the GRPC service.|
-| SEARCH_DATA_PATH | string | ~/.ocis/search | |
+| SEARCH_DATA_PATH | string | ~/.ocis/search | Path for the search persistence directory.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | SEARCH_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | the address of the streaming service|
 | SEARCH_EVENTS_CLUSTER | string | ocis-cluster | the clusterID of the streaming service. Mandatory when using nats|
 | SEARCH_EVENTS_GROUP | string | search | the customergroup of the service. One group will only get one copy of an event|
-| OCIS_MACHINE_AUTH_API_KEY<br/>SEARCH_MACHINE_AUTH_API_KEY | string |  | |
+| OCIS_MACHINE_AUTH_API_KEY<br/>SEARCH_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used for accessing the 'auth-machine' service to impersonate users.|
