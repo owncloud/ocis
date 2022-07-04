@@ -12,6 +12,7 @@ require (
 	github.com/cs3org/go-cs3apis v0.0.0-20220512100524-551800f020d8
 	github.com/cs3org/reva/v2 v2.6.1
 	github.com/disintegration/imaging v1.6.2
+	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/cors v1.2.1
 	github.com/go-chi/render v1.0.1
