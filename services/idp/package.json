@@ -115,7 +115,7 @@
     "eslint-loader": "4.0.2",
     "eslint-plugin-flowtype": "5.7.2",
     "eslint-plugin-i18n-text": "^1.0.0",
-    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-import": "2.26.0",
     "eslint-plugin-jest": "^24.2.1",
     "eslint-plugin-react": "7.22.0",
     "eslint-plugin-react-hooks": "^4.2.0",
