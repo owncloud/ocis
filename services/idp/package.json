@@ -39,8 +39,16 @@
     "extends": [
       "react-app",
       "react-app/jest",
-      "plugin:i18next/recommended"
+      "plugin:i18next/recommended",
+      "plugin:react/recommended",
+      "plugin:jest/recommended"
     ],
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
+    },
+    "parser": "babel-eslint",
     "rules": {
       "no-unused-vars": "off",
       "no-use-before-define": "off",
@@ -55,7 +63,8 @@
         {
           "markupOnly": true
         }
-      ]
+      ],
+      "react/display-name": "off"
     }
   },
   "jest": {
