@@ -48,7 +48,7 @@
         "version": "detect"
       }
     },
-    "parser": "babel-eslint",
+    "parser": "@typescript-eslint/parser",
     "rules": {
       "no-unused-vars": "off",
       "no-use-before-define": "off",
@@ -135,6 +135,7 @@
     "html-webpack-plugin": "4.5.0",
     "i18next-conv": "^12.1.0",
     "i18next-parser": "^5.4.0",
+    "jest": "26.6.0",
     "license-checker-rseidelsohn": "^3.1.0",
     "mini-css-extract-plugin": "0.11.3",
     "optimize-css-assets-webpack-plugin": "5.0.4",
