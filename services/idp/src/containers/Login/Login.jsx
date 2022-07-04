@@ -14,6 +14,7 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
+import Link from '@material-ui/core/Link';
 
 import TextInput from '../../components/TextInput'
 
@@ -54,6 +55,7 @@ function Login(props) {
     classes,
     username,
     password,
+    passwordResetLink,
   } = props;
 
   const { t } = useTranslation();
@@ -152,6 +154,7 @@ function Login(props) {
           />
           {hasError && <Typography id="oc-login-error-message" variant="subtitle2" component="span" color="error" className={classes.message}>{errorMessage}</Typography>}
           <div className={classes.wrapper}>
+            {loginFailed && passwordResetLink && <Link id="oc-login-password-reset" href={passwordResetLink} variant="subtitle2">{"Reset password?"}</Link>}
             <br />
             <Button
               type="submit"
@@ -176,6 +179,7 @@ Login.propTypes = {
   loading: PropTypes.string.isRequired,
   username: PropTypes.string.isRequired,
   password: PropTypes.string.isRequired,
+  passwordResetLink: PropTypes.string.isRequired,
   errors: PropTypes.object.isRequired,
   branding: PropTypes.object,
   hello: PropTypes.object,
@@ -187,7 +191,7 @@ Login.propTypes = {
 
 const mapStateToProps = (state) => {
   const { loading, username, password, errors} = state.login;
-  const { branding, hello, query } = state.common;
+  const { branding, hello, query, passwordResetLink } = state.common;
 
   return {
     loading,
@@ -196,7 +200,8 @@ const mapStateToProps = (state) => {
     errors,
     branding,
     hello,
-    query
+    query,
+    passwordResetLink
   };
 };
 
