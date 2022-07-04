@@ -7,10 +7,12 @@ import (
 
 	"github.com/blevesearch/bleve/v2"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/server"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/go-micro/plugins/v4/events/natsjs"
+	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
 	grpcmetadata "google.golang.org/grpc/metadata"
 
@@ -95,7 +97,12 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 		Query: in.Query,
 	})
 	if err != nil {
-		return err
+		switch err.(type) {
+		case errtypes.BadRequest:
+			return merrors.BadRequest(s.id, err.Error())
+		default:
+			return merrors.InternalServerError(s.id, err.Error())
+		}
 	}
 
 	out.Matches = res.Matches

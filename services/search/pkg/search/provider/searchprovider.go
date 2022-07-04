@@ -67,7 +67,7 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 
 func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error) {
 	if req.Query == "" {
-		return nil, errtypes.PreconditionFailed("empty query provided")
+		return nil, errtypes.BadRequest("empty query provided")
 	}
 	p.logger.Debug().Str("query", req.Query).Msg("performing a search")
 
