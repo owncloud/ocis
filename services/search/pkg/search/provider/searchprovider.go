@@ -144,6 +144,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 				},
 				Path: mountpointPrefix,
 			},
+			PageSize: req.PageSize,
 		})
 		if err != nil {
 			p.logger.Error().Err(err).Str("space", space.Id.OpaqueId).Msg("failed to search the index")

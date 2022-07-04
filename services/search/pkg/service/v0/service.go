@@ -94,7 +94,8 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 	ctx = grpcmetadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
 	res, err := s.provider.Search(ctx, &searchsvc.SearchRequest{
-		Query: in.Query,
+		Query:    in.Query,
+		PageSize: in.PageSize,
 	})
 	if err != nil {
 		switch err.(type) {

@@ -223,6 +223,9 @@ func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (
 	)
 	bleveReq := bleve.NewSearchRequest(query)
 	bleveReq.Size = 200
+	if req.PageSize > 0 {
+		bleveReq.Size = int(req.PageSize)
+	}
 	bleveReq.Fields = []string{"*"}
 	res, err := i.bleveIndex.Search(bleveReq)
 	if err != nil {
