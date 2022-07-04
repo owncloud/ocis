@@ -57,6 +57,10 @@ const Tooltip = ({children, ...other } = {}) => {
   return <BaseTooltip {...other}><span>{children}</span></BaseTooltip>;
 }
 
+Tooltip.propTypes = {
+    children: PropTypes.node,
+};
+
 class Consent extends React.PureComponent {
   componentDidMount() {
     const { dispatch, hello, history, client } = this.props;

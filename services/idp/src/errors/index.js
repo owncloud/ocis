@@ -1,4 +1,5 @@
 import { withTranslation } from 'react-i18next';
+import PropTypes from 'prop-types';
 
 export const ERROR_LOGIN_VALIDATE_MISSINGUSERNAME = 'konnect.error.login.validate.missingUsername';
 export const ERROR_LOGIN_VALIDATE_MISSINGPASSWORD = 'konnect.error.login.validate.missingPassword';
@@ -58,4 +59,9 @@ function ErrorMessageComponent(props) {
   return f(messageDescriptor.defaultMessage, messageDescriptor.values);
 }
 
+ErrorMessageComponent.propTypes = {
+  error: PropTypes.object,
+  t: PropTypes.func,
+  values: PropTypes.any,
+};
 export const ErrorMessage = withTranslation()(ErrorMessageComponent);
