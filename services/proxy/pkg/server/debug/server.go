@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 
+	masker "github.com/ggwhite/go-masker"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
@@ -65,7 +66,12 @@ func configDump(cfg *config.Config) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
-		b, err := json.Marshal(cfg)
+		maskedCfg, err := masker.Struct(cfg)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+
+		b, err := json.Marshal(maskedCfg)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
