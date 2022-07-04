@@ -61,7 +61,7 @@
     "chromedriver": "^93.0.1",
     "cross-env": "^7.0.3",
     "easygettext": "^2.7.0",
-    "eslint": "^8.18.0",
+    "eslint": "^8.19.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^15.2.3",
