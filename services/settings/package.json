@@ -52,7 +52,7 @@
     "@babel/preset-env": "^7.16.11",
     "@babel/register": "^7.17.7",
     "@cucumber/cucumber": "^7.3.2",
-    "@cucumber/pretty-formatter": "^1.0.0-alpha.2",
+    "@cucumber/pretty-formatter": "^1.0.0",
     "@erquhart/rollup-plugin-node-builtins": "^2.1.5",
     "@rollup/plugin-commonjs": "^17.1.0",
     "@rollup/plugin-json": "^4.0.1",
