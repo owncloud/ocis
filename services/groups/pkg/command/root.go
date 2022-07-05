@@ -33,11 +33,6 @@ func Execute(cfg *config.Config) error {
 		Commands: GetCommands(cfg),
 	})
 
-	cli.HelpFlag = &cli.BoolFlag{
-		Name:  "help,h",
-		Usage: "Show the help",
-	}
-
 	return app.Run(os.Args)
 }
 
