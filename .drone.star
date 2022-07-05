@@ -201,6 +201,7 @@ def main(ctx):
 
     test_pipelines = \
         cancelPreviousBuilds() + \
+        yarnCache(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
         testOcisModules(ctx) + \
         testPipelines(ctx)
@@ -248,6 +249,47 @@ def main(ctx):
     pipelines += checkStarlark()
     pipelineSanityChecks(ctx, pipelines)
     return pipelines
+
+def yarnCache(ctx):
+    return [{
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "cache-yarn",
+        "steps": skipIfUnchanged(ctx, "cache") +
+                 installWebTestRunner() +
+                 yarnInstallUITests() +
+                 rebuildBuildArtifactCache(ctx, "tests-yarn", "webTestRunner/tests/acceptance/.yarn"),
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/tags/**",
+                "refs/pull/**",
+            ],
+        },
+    }]
+
+def installWebTestRunner():
+    return [{
+        "name": "install-web-test-runner",
+        "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+        "commands": [
+            ". /drone/src/.drone.env",
+            "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git webTestRunner",
+        ],
+    }]
+
+def yarnInstallUITests():
+    return [{
+        "name": "yarn-install",
+        "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+        "commands": [
+            ". /drone/src/.drone.env",
+            "cd webTestRunner",
+            "git checkout $WEB_COMMITID",
+            "cd tests/acceptance/",
+            "yarn install --immutable",
+        ],
+    }]
 
 def testOcisModules(ctx):
     pipelines = []
@@ -703,38 +745,35 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() + [
-            {
-                "name": "webUITests",
-                "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-                "environment": {
-                    "SERVER_HOST": "https://ocis-server:9200",
-                    "BACKEND_HOST": "https://ocis-server:9200",
-                    "RUN_ON_OCIS": "true",
-                    "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/owncloud/data",
-                    "TESTING_DATA_DIR": "/srv/app/testing/data",
-                    "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
-                    "TEST_TAGS": finalFilterTags,
-                    "LOCAL_UPLOAD_DIR": "/uploads",
-                    "NODE_TLS_REJECT_UNAUTHORIZED": 0,
-                    "RUN_PART": runPart,
-                    "DIVIDE_INTO_NUM_PARTS": numberOfParts,
-                    "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-webUI-on-%s-storage%s.md" % (storage.upper(), expectedFailuresFileFilterTags),
-                    "MIDDLEWARE_HOST": "http://middleware:3000",
-                },
-                "commands": [
-                    ". /drone/src/.drone.env",
-                    "git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing",
-                    "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
-                    "cd /srv/app/web",
-                    "git checkout $WEB_COMMITID",
-                    "cd tests/acceptance/",
-                    "yarn install --immutable",
-                    "./run.sh",
-                ],
-            },
-        ] + failEarly(ctx, early_fail),
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + installWebTestRunner() +
+                 restoreBuildArtifactCache(ctx, "tests-yarn", "webTestRunner/tests/acceptance/.yarn") + yarnInstallUITests() +
+                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() +
+                 [
+                     {
+                         "name": "webUITests",
+                         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+                         "environment": {
+                             "SERVER_HOST": "https://ocis-server:9200",
+                             "BACKEND_HOST": "https://ocis-server:9200",
+                             "RUN_ON_OCIS": "true",
+                             "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/owncloud/data",
+                             "TESTING_DATA_DIR": "/srv/app/testing/data",
+                             "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
+                             "TEST_TAGS": finalFilterTags,
+                             "LOCAL_UPLOAD_DIR": "/uploads",
+                             "NODE_TLS_REJECT_UNAUTHORIZED": 0,
+                             "RUN_PART": runPart,
+                             "DIVIDE_INTO_NUM_PARTS": numberOfParts,
+                             "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-webUI-on-%s-storage%s.md" % (storage.upper(), expectedFailuresFileFilterTags),
+                             "MIDDLEWARE_HOST": "http://middleware:3000",
+                         },
+                         "commands": [
+                             "git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing",
+                             "cd webTestRunner/tests/acceptance",
+                             "./run.sh",
+                         ],
+                     },
+                 ] + failEarly(ctx, early_fail),
         "services": selenium() + middlewareService(),
         "volumes": [pipelineVolumeOC10Tests] +
                    [{
@@ -1802,7 +1841,8 @@ def skipIfUnchanged(ctx, type):
         skip = base + acceptance
     if type == "build-binary" or type == "build-docker" or type == "litmus":
         skip = base + unit + acceptance
-
+    if type == "cache":
+        skip = base
     if len(skip) == 0:
         return []
 
