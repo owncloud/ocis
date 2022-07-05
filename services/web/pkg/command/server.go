@@ -92,7 +92,7 @@ func Server(cfg *config.Config) *cli.Command {
 							Msg("Failed to start server")
 					}
 					return err
-				}, func(_ error) {
+				}, func(err error) {
 					logger.Info().
 						Str("transport", "http").
 						Msg("Shutting down server")

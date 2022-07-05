@@ -52,9 +52,10 @@ func Server(cfg *config.Config) *cli.Command {
 			gr.Add(func() error {
 				runtime.RunWithOptions(rcfg, pidFile, runtime.WithLogger(&logger.Logger))
 				return nil
-			}, func(_ error) {
-				logger.Info().
+			}, func(err error) {
+				logger.Error().
 					Str("server", cfg.Service.Name).
+					Err(err).
 					Msg("Shutting down server")
 
 				cancel()
