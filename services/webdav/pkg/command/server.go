@@ -73,8 +73,8 @@ func Server(cfg *config.Config) *cli.Command {
 				gr.Add(func() error {
 					return server.Run()
 				}, func(err error) {
-					logger.Error().Err(err).Msg("error ")
-					logger.Info().
+					logger.Error().
+						Err(err).
 						Str("transport", "http").
 						Msg("Shutting down server")
 

@@ -62,8 +62,9 @@ func Server(cfg *config.Config) *cli.Command {
 					return <-err
 				}
 
-			}, func(_ error) {
-				logger.Info().
+			}, func(err error) {
+				logger.Error().
+					Err(err).
 					Msg("Shutting down server")
 
 				natsServer.Shutdown()

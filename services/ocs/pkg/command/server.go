@@ -63,7 +63,7 @@ func Server(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Info().
+					logger.Error().
 						Err(err).
 						Str("transport", "http").
 						Msg("Failed to initialize server")
@@ -73,8 +73,9 @@ func Server(cfg *config.Config) *cli.Command {
 
 				gr.Add(func() error {
 					return server.Run()
-				}, func(_ error) {
-					logger.Info().
+				}, func(err error) {
+					logger.Error().
+						Err(err).
 						Str("transport", "http").
 						Msg("Shutting down server")
 

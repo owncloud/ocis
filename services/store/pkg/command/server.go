@@ -62,8 +62,9 @@ func Server(cfg *config.Config) *cli.Command {
 					grpc.Metrics(metrics),
 				)
 
-				gr.Add(server.Run, func(_ error) {
-					logger.Info().
+				gr.Add(server.Run, func(err error) {
+					logger.Error().
+						Err(err).
 						Str("server", "grpc").
 						Msg("Shutting down server")
 

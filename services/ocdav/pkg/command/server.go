@@ -80,7 +80,10 @@ func Server(cfg *config.Config) *cli.Command {
 
 				return s.Run()
 			}, func(err error) {
-				logger.Info().Err(err).Str("server", c.Command.Name).Msg("Shutting down server")
+				logger.Error().
+					Err(err).
+					Str("server", c.Command.Name).
+					Msg("Shutting down server")
 				cancel()
 			})
 
