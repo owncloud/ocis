@@ -965,10 +965,6 @@ _ocdav: api compatibility, return correct status code_
 - [apiWebdavOperations/search.feature:264](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L264)
 - [apiWebdavOperations/search.feature:270](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L270)
 
-### [Different response status code while searching with empty pattern with new webdav](https://github.com/owncloud/ocis/issues/4016)
-
-- [apiWebdavOperations/search.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L103)
-
 ### [No permisions propertry in response while searching for files and folders on ocis with new webdav](https://github.com/owncloud/ocis/issues/4009)
 
 - [apiWebdavOperations/search.feature:208](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L208)
