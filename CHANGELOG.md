@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Remove unused configuration options: [#3973](https://github.com/owncloud/ocis/pull/3973)
 * Bugfix - Remove static ocs user backend config: [#4077](https://github.com/owncloud/ocis/pull/4077)
 * Bugfix - Fix make sensitive config values in the proxy's debug server: [#4086](https://github.com/owncloud/ocis/pull/4086)
+* Bugfix - Fix startup error logging: [#4093](https://github.com/owncloud/ocis/pull/4093)
 * Bugfix - Store user passwords hashed in idm: [#3778](https://github.com/owncloud/ocis/issues/3778)
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
 * Enhancement - Update IdP UI: [#3493](https://github.com/owncloud/ocis/issues/3493)
@@ -53,6 +54,14 @@ The following sections list the changes for unreleased.
    sensitive configuration values haven't been masked. We now mask these values.
 
    https://github.com/owncloud/ocis/pull/4086
+
+* Bugfix - Fix startup error logging: [#4093](https://github.com/owncloud/ocis/pull/4093)
+
+   We've fixed the startup error logging, so that users will the reason for a failed startup even on
+   "error" log level. Previously they would only see it on "info" log level. Also in a lot of cases
+   the reason for the failed shutdown was omitted.
+
+   https://github.com/owncloud/ocis/pull/4093
 
 * Bugfix - Store user passwords hashed in idm: [#3778](https://github.com/owncloud/ocis/issues/3778)
 
