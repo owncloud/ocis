@@ -6,151 +6,154 @@
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "build": "node scripts/build.js && rm -f build/service-worker.js",
-    "start": "node scripts/start.js",
-    "test": "node scripts/test.js --env=jsdom",
-    "licenses:check": "license-checker-rseidelsohn --summary --relativeLicensePath --onlyAllow 'Python-2.0;Apache*;Apache License, Version 2.0;Apache-2.0;Apache 2.0;Artistic-2.0;BSD;BSD-3-Clause;CC-BY-3.0;CC-BY-4.0;CC0-1.0;ISC;MIT;MPL-2.0;Public Domain;Unicode-TOU;Unlicense;WTFPL'  --excludePackages 'identifier;kpop;po2json;unicoderegexp'",
+    "eject": "react-scripts eject",
+    "licenses": "NODE_PATH=./node_modules node ../scripts/js-license-ranger.js",
+    "licenses:check": "license-checker-rseidelsohn --summary --relativeLicensePath --onlyAllow 'Python-2.0;Apache*;Apache License, Version 2.0;Apache-2.0;Apache 2.0;Artistic-2.0;BSD;BSD-3-Clause;CC-BY-3.0;CC-BY-4.0;CC0-1.0;ISC;MIT;MPL-2.0;Public Domain;Unicode-TOU;Unlicense;WTFPL;ODC-By-1.0'  --excludePackages 'identifier;kpop;po2json;unicoderegexp'",
     "licenses:csv": "license-checker-rseidelsohn --relativeLicensePath --csv --out ../third-party-licenses/node/idp/third-party-licenses.csv",
-    "licenses:save": "license-checker-rseidelsohn --relativeLicensePath --out /dev/null --files ../third-party-licenses/node/idp/third-party-licenses"
+    "licenses:save": "license-checker-rseidelsohn --relativeLicensePath --out /dev/null --files ../third-party-licenses/node/idp/third-party-licenses",
+    "lint": "eslint ./**/*.{tsx,ts,jsx,js}",
+    "start": "node scripts/start.js",
+    "test": "node scripts/test.js --env=jsdom"
   },
   "babel": {
     "presets": [
       "react-app"
     ]
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "eslintConfig": {
+    "plugins": [
+      "i18next"
+    ],
+    "extends": [
+      "react-app",
+      "react-app/jest",
+      "plugin:i18next/recommended",
+      "plugin:react/recommended",
+      "plugin:jest/recommended"
+    ],
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
+    },
+    "parser": "@typescript-eslint/parser",
+    "rules": {
+      "no-unused-vars": "off",
+      "no-use-before-define": "off",
+      "@typescript-eslint/no-unused-vars": [
+        0
+      ],
+      "@typescript-eslint/no-use-before-define": [
+        0
+      ],
+      "i18next/no-literal-string": [
+        "off",
+        {
+          "markupOnly": true
+        }
+      ],
+      "react/display-name": "off"
+    }
+  },
   "jest": {
     "collectCoverageFrom": [
-      "src/**/*.js"
-    ],
-    "moduleFileExtensions": [
-      "web.js",
-      "js",
-      "web.ts",
-      "ts",
-      "web.tsx",
-      "tsx",
-      "json",
-      "web.jsx",
-      "jsx",
-      "node"
-    ],
-    "moduleNameMapper": {
-      "^react-native$": "react-native-web",
-      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
-    },
-    "modulePaths": [],
-    "roots": [
-      "<rootDir>/src"
-    ],
-    "setupFiles": [
-      "react-app-polyfill/jsdom"
-    ],
-    "setupFilesAfterEnv": [],
-    "testEnvironment": "jest-environment-jsdom-fourteen",
-    "testMatch": [
-      "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
-      "<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"
-    ],
-    "transform": {
-      "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/node_modules/babel-jest",
-      "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
-      "^(?!.*\\.(js|jsx|ts|tsx|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
-    },
-    "transformIgnorePatterns": [
-      "node_modules/?!(kpop)"
-    ],
-    "watchPlugins": [
-      "jest-watch-typeahead/filename",
-      "jest-watch-typeahead/testname"
+      "src/**/*.{js,jsx,ts,tsx}"
     ]
   },
   "dependencies": {
-    "@babel/runtime": "7.17.9",
-    "@material-ui/core": "^4.8.0",
-    "@material-ui/icons": "^4.5.0",
-    "axios": "^0.21.1",
-    "classnames": "^2.3.1",
-    "dotenv": "10.0.0",
-    "dotenv-expand": "5.1.0",
-    "file-loader": "6.2.0",
-    "fs-extra": "^9.1.0",
-    "identity-obj-proxy": "3.0.0",
+    "@fontsource/roboto": "^4.5.1",
+    "@material-ui/core": "^4.12.3",
+    "@material-ui/icons": "^4.11.2",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^12.0.0",
+    "@types/react": "^17.0.2",
+    "@types/react-dom": "^17.0.2",
+    "@types/react-redux": "^7.1.19",
+    "@types/redux-logger": "^3.0.9",
+    "axios": "^0.27.2",
+    "classnames": "^2.2.6",
+    "i18next": "^21.6.13",
+    "i18next-browser-languagedetector": "^6.1.3",
+    "i18next-http-backend": "^1.3.2",
+    "i18next-resources-to-backend": "^1.0.0",
     "kpop": "https://download.kopano.io/community/kapp:/kpop-2.2.0.tgz",
-    "query-string": "^6.14.1",
-    "react": "^17.0.1",
+    "query-string": "^7.1.1",
+    "react": "^17.0.2",
     "react-app-polyfill": "^2.0.0",
-    "react-dom": "17.0.1",
-    "react-intl": "^5.20.6",
-    "react-loadable": "^5.3.1",
-    "react-redux": "^7.2.4",
-    "react-router": "^5.0.0",
-    "react-router-dom": "^5.2.0",
-    "redux": "^4.0.5",
+    "react-dom": "^17.0.2",
+    "react-i18next": "^11.15.6",
+    "react-redux": "^7.2.5",
+    "react-router": "^5.2.1",
+    "react-router-dom": "5.2.1",
+    "redux": "^3.7.2",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "render-if": "^0.1.1",
-    "semver": "7.3.4",
-    "typeface-roboto": "^1.1.13"
+    "web-vitals": "^1.0.1"
   },
   "devDependencies": {
-    "@babel/runtime": "7.13.10",
-    "@svgr/webpack": "5.5.0",
-    "@typescript-eslint/eslint-plugin": "^4.17.0",
-    "@typescript-eslint/parser": "^4.32.0",
-    "babel-eslint": "10.1.0",
-    "babel-jest": "^26.6.3",
-    "babel-loader": "8.2.2",
+    "@babel/core": "7.12.3",
+    "@typescript-eslint/eslint-plugin": "^4.5.0",
+    "@typescript-eslint/parser": "^4.5.0",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "8.1.0",
     "babel-plugin-named-asset-import": "^0.3.8",
     "babel-preset-react-app": "^10.0.0",
-    "camelcase": "^6.2.0",
-    "case-sensitive-paths-webpack-plugin": "2.4.0",
-    "css-loader": "5.2.6",
-    "eslint": "^7.21.0",
+    "case-sensitive-paths-webpack-plugin": "2.3.0",
+    "cldr": "^7.1.1",
+    "css-loader": "4.3.0",
+    "dotenv": "8.2.0",
+    "dotenv-expand": "5.1.0",
+    "eslint": "^7.11.0",
     "eslint-config-react-app": "^6.0.0",
-    "eslint-loader": "4.0.2",
-    "eslint-plugin-flowtype": "5.7.2",
-    "eslint-plugin-i18n-text": "^1.0.0",
-    "eslint-plugin-import": "2.22.1",
-    "eslint-plugin-jest": "^24.2.1",
-    "eslint-plugin-react": "7.22.0",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-flowtype": "^5.2.0",
+    "eslint-plugin-i18next": "^5.1.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.1.0",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "eslint-plugin-react-intl-format": "^1.1.6",
-    "html-webpack-plugin": "4.5.2",
-    "jest": "26.6.3",
-    "jest-environment-jsdom-fourteen": "1.0.1",
-    "jest-resolve": "27.2.2",
-    "jest-watch-typeahead": "0.6.1",
+    "eslint-plugin-testing-library": "^3.9.2",
+    "eslint-webpack-plugin": "^2.5.2",
+    "file-loader": "6.1.1",
+    "html-webpack-plugin": "4.5.0",
+    "i18next-conv": "^12.1.0",
+    "i18next-parser": "^5.4.0",
+    "jest": "26.6.0",
     "license-checker-rseidelsohn": "^3.1.0",
-    "mini-css-extract-plugin": "1.3.9",
+    "mini-css-extract-plugin": "0.11.3",
     "optimize-css-assets-webpack-plugin": "5.0.4",
     "pnp-webpack-plugin": "1.6.4",
-    "postcss-flexbugs-fixes": "4.1.0",
+    "postcss-flexbugs-fixes": "4.2.1",
     "postcss-loader": "3.0.0",
-    "postcss-normalize": "9.0.0",
+    "postcss-normalize": "8.0.1",
     "postcss-preset-env": "6.7.0",
     "postcss-safe-parser": "5.0.2",
-    "prop-types": "^15.6.2",
-    "react-dev-utils": "11.0.4",
-    "react-intl-cra": "^0.3.3",
-    "react-intl-po": "^2.2.2",
-    "resolve": "1.20.0",
+    "react-dev-utils": "^11.0.3",
+    "resolve": "1.18.1",
     "resolve-url-loader": "^3.1.2",
-    "sass-loader": "11.0.1",
-    "source-map-explorer": "^2.5.2",
-    "style-loader": "2.0.0",
-    "terser-webpack-plugin": "4.2.3",
-    "ts-pnp": "1.2.0",
+    "sass-loader": "^10.0.5",
+    "source-map-explorer": "^1.8.0",
+    "typescript": "^4.1.2",
     "url-loader": "4.1.1",
-    "webpack": "4.46.0",
-    "webpack-dev-server": "^3.11.2",
-    "webpack-manifest-plugin": "3.1.0",
-    "workbox-webpack-plugin": "4.3.1",
-    "yarn-deduplicate": "^3.1.0"
-  },
-  "packageManager": "yarn@3.1.0"
+    "webpack": "4.44.2",
+    "webpack-manifest-plugin": "4.1.1",
+    "workbox-webpack-plugin": "5.1.4"
+  }
 }
