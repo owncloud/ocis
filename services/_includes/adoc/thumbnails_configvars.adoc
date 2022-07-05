@@ -125,7 +125,7 @@ Subdirectory that serves as the root for this HTTP service.
 a| [subs=-attributes]
 [16x16 32x32 64x64 128x128 1920x1080 3840x2160 7680x4320] 
 a| [subs=-attributes]
-The supported target resolutions in the format WidthxHeight e.g. 32x32. You can provide multiple resolutions seperated by a comma.
+The supported target resolutions in the format WidthxHeight e.g. 32x32. You can provide multiple resolutions separated by a comma.
 
 |`THUMBNAILS_FILESYSTEMSTORAGE_ROOT`
 | string
