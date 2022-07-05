@@ -94,6 +94,10 @@ func EnsureDefaults(cfg *config.Config) {
 	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
 	}
+
+	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	}
 }
 
 func Sanitize(cfg *config.Config) {
