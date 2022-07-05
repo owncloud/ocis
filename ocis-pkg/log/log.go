@@ -10,9 +10,6 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	mdlog "go-micro.dev/v4/debug/log"
-	mlog "go-micro.dev/v4/util/log"
-	"go-micro.dev/v4/util/ring"
 )
 
 // Logger simply wraps the zerolog logger.
@@ -35,31 +32,27 @@ func LoggerFromConfig(name string, cfg *shared.Log) Logger {
 func NewLogger(opts ...Option) Logger {
 	options := newOptions(opts...)
 
+	// set GlobalLevel() to the minimum value -1 = TraceLevel, so that only the services' log level matter
+	zerolog.SetGlobalLevel(zerolog.TraceLevel)
+
+	var logLevel zerolog.Level
 	switch strings.ToLower(options.Level) {
 	case "panic":
-		zerolog.SetGlobalLevel(zerolog.PanicLevel)
-		mlog.SetLevel(mlog.LevelFatal)
+		logLevel = zerolog.PanicLevel
 	case "fatal":
-		zerolog.SetGlobalLevel(zerolog.FatalLevel)
-		mlog.SetLevel(mlog.LevelFatal)
+		logLevel = zerolog.FatalLevel
 	case "error":
-		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-		mlog.SetLevel(mlog.LevelError)
+		logLevel = zerolog.ErrorLevel
 	case "warn":
-		zerolog.SetGlobalLevel(zerolog.WarnLevel)
-		mlog.SetLevel(mlog.LevelWarn)
+		logLevel = zerolog.WarnLevel
 	case "info":
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-		mlog.SetLevel(mlog.LevelInfo)
+		logLevel = zerolog.InfoLevel
 	case "debug":
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-		mlog.SetLevel(mlog.LevelDebug)
+		logLevel = zerolog.DebugLevel
 	case "trace":
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-		mlog.SetLevel(mlog.LevelTrace)
+		logLevel = zerolog.TraceLevel
 	default:
-		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-		mlog.SetLevel(mlog.LevelError)
+		logLevel = zerolog.ErrorLevel
 	}
 
 	var logger zerolog.Logger
@@ -88,105 +81,9 @@ func NewLogger(opts ...Option) Logger {
 	logger = logger.With().
 		Str("service", options.Name).
 		Timestamp().
-		Logger()
-
-	mlog.SetLogger(
-		microZerolog{
-			logger: logger,
-			buffer: ring.New(mdlog.DefaultSize),
-		},
-	)
+		Logger().Level(logLevel)
 
 	return Logger{
 		logger,
-	}
-}
-
-// microZerolog implements the required interface for the go-micro logger.
-type microZerolog struct {
-	logger zerolog.Logger
-	buffer *ring.Buffer
-}
-
-func (mz microZerolog) Read(opts ...mdlog.ReadOption) ([]mdlog.Record, error) {
-	options := mdlog.ReadOptions{}
-	for _, o := range opts {
-		o(&options)
-	}
-
-	var entries []*ring.Entry
-
-	if !options.Since.IsZero() {
-		entries = mz.buffer.Since(options.Since)
-	}
-
-	if options.Count > 0 {
-		switch len(entries) > 0 {
-		case true:
-			if options.Count > len(entries) {
-				entries = entries[0:options.Count]
-			}
-		default:
-			entries = mz.buffer.Get(options.Count)
-		}
-	}
-
-	records := make([]mdlog.Record, 0, len(entries))
-	for _, entry := range entries {
-		record := mdlog.Record{
-			Timestamp: entry.Timestamp,
-			Message:   entry.Value,
-		}
-		records = append(records, record)
-	}
-
-	return records, nil
-}
-
-func (mz microZerolog) Write(record mdlog.Record) error {
-	level := record.Metadata["level"]
-	mz.log(level, fmt.Sprint(record.Message))
-	mz.buffer.Put(record.Message)
-	return nil
-}
-
-func (mz microZerolog) Stream() (mdlog.Stream, error) {
-	stream, stop := mz.buffer.Stream()
-	records := make(chan mdlog.Record, 128)
-	last10 := mz.buffer.Get(10)
-
-	go func() {
-		for _, entry := range last10 {
-			records <- mdlog.Record{
-				Timestamp: entry.Timestamp,
-				Message:   entry.Value,
-				Metadata:  make(map[string]string),
-			}
-		}
-		for entry := range stream {
-			records <- mdlog.Record{
-				Timestamp: entry.Timestamp,
-				Message:   entry.Value,
-				Metadata:  make(map[string]string),
-			}
-		}
-	}()
-	return &logStream{
-		stream: records,
-		stop:   stop,
-	}, nil
-}
-
-func (mz microZerolog) log(level string, msg string) {
-	l, err := zerolog.ParseLevel(level)
-	if err != nil {
-		l = zerolog.InfoLevel
-	}
-
-	mz.logger.WithLevel(l).Msg(msg)
-
-	// Invoke os.Exit because unlike zerolog.Logger.Fatal zerolog.Logger.WithLevel won't stop the execution.
-	if l == zerolog.FatalLevel {
-		os.Exit(1)
 	}
 }

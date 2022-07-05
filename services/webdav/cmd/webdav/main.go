@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	_ "github.com/owncloud/ocis/v2/ocis-pkg/log/gomicro"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/command"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/config/defaults"
 )

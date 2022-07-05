@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	_ "github.com/owncloud/ocis/v2/ocis-pkg/log/gomicro"
 	"github.com/owncloud/ocis/v2/services/storage-publiclink/pkg/command"
 	"github.com/owncloud/ocis/v2/services/storage-publiclink/pkg/config/defaults"
 )
