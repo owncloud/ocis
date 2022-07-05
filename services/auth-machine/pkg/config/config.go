@@ -20,7 +20,7 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"AUTH_MACHINE_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the encoding of the user's group memberships in the reva access token. This reduces the token size, especially when users are members of a large number of groups."`
 
-	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;AUTH_MACHINE_API_KEY" desc:"Machine auth API key used for validating requests from other services when impersonating users."`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;AUTH_MACHINE_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services."`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`

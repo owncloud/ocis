@@ -64,6 +64,7 @@ func Server(cfg *config.Config) *cli.Command {
 					ocdav.Version(cfg.Status.Version),
 					ocdav.VersionString(cfg.Status.VersionString),
 					ocdav.Edition(cfg.Status.Edition),
+					ocdav.MachineAuthAPIKey(cfg.MachineAuthAPIKey),
 					// ocdav.FavoriteManager() // FIXME needs a proper persistence implementation https://github.com/owncloud/ocis/issues/1228
 					// ocdav.LockSystem(), // will default to the CS3 lock system
 					// ocdav.TLSConfig() // tls config for the http server
