@@ -59,11 +59,7 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 				return
 			}
 
-			// inject claims to the request context for the account_uuid middleware.
-			req = req.WithContext(oidc.NewContext(req.Context(), claims))
-
-			// store claims in context
-			// uses the original context, not the one with probably reduced security
+			// inject claims to the request context for the account_resolver middleware.
 			next.ServeHTTP(w, req.WithContext(oidc.NewContext(req.Context(), claims)))
 		})
 	}
