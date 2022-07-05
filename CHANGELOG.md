@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix make sensitive config values in the proxy's debug server: [#4086](https://github.com/owncloud/ocis/pull/4086)
 * Bugfix - Store user passwords hashed in idm: [#3778](https://github.com/owncloud/ocis/issues/3778)
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
+* Enhancement - Update IdP UI: [#3493](https://github.com/owncloud/ocis/issues/3493)
 * Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
 
 ## Details
@@ -69,6 +70,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3983
    https://github.com/owncloud/ocis/pull/3991
+
+* Enhancement - Update IdP UI: [#3493](https://github.com/owncloud/ocis/issues/3493)
+
+   Updated our fork of the lico IdP UI. This also updated the used npm dependencies. The design
+   didn't change.
+
+   https://github.com/owncloud/ocis/issues/3493
+   https://github.com/owncloud/ocis/pull/4074
 
 * Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
 
