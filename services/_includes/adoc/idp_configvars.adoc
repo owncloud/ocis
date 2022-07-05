@@ -154,7 +154,7 @@ CS3 gateway used to authenticate and look up users
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-Machine auth API key used for accessing the 'auth-machine' service to impersonate users when looking up their userinfo via the 'cs3' backend.
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
 
 |`IDP_ASSET_PATH`
 | string

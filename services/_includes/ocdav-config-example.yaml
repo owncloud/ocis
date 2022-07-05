@@ -34,3 +34,4 @@ gateway_request_timeout: 84300
 middleware:
   auth:
     credentials_by_user_agent: {}
+machine_auth_api_key: ""

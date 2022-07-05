@@ -19,4 +19,4 @@
 | OCIS_JWT_SECRET<br/>OCS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>OCS_IDM_ADDRESS | string | https://localhost:9200 | URL of the OIDC issuer. It defaults to URL of the builtin IDP.|
-| OCIS_MACHINE_AUTH_API_KEY<br/>OCS_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used for accessing the 'auth-machine' service to impersonate users.|
+| OCIS_MACHINE_AUTH_API_KEY<br/>OCS_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|

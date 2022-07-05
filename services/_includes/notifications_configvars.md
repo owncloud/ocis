@@ -18,4 +18,4 @@
 | NOTIFICATIONS_EVENTS_CLUSTER | string | ocis-cluster | Cluster ID of the event system.|
 | NOTIFICATIONS_EVENTS_GROUP | string | notifications | Name of the event group / queue on the event system.|
 | REVA_GATEWAY<br/>NOTIFICATIONS_REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to look up user metadata|
-| OCIS_MACHINE_AUTH_API_KEY<br/>NOTIFICATIONS_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used for accessing the 'auth-machine' service to look up their email.|
+| OCIS_MACHINE_AUTH_API_KEY<br/>NOTIFICATIONS_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|

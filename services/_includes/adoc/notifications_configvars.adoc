@@ -130,7 +130,7 @@ CS3 gateway used to look up user metadata
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-Machine auth API key used for accessing the 'auth-machine' service to look up their email.
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
 |===
 
 Since Version: `+` added, `-` deprecated

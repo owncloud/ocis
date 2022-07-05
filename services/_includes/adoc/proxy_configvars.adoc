@@ -214,7 +214,7 @@ The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-Machine auth API key used for accessing the 'auth-machine' service to impersonate users.
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
 
 |`PROXY_AUTOPROVISION_ACCOUNTS`
 | bool

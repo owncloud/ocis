@@ -20,7 +20,7 @@
 | STORAGE_TRANSFER_SECRET | string |  | Transfer secret for signing file up- and download requests.|
 | OCIS_JWT_SECRET<br/>FRONTEND_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
-| OCIS_MACHINE_AUTH_API_KEY<br/>FRONTEND_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used for accessing the 'auth-machine' service to impersonate users.|
+| OCIS_MACHINE_AUTH_API_KEY<br/>FRONTEND_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|
 | FRONTEND_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
 | FRONTEND_ENABLE_FAVORITES | bool | false | Enables the support for favorites in the frontend.|
 | FRONTEND_ENABLE_PROJECT_SPACES | bool | true | Indicates to clients that project spaces are supposed to be made available.|

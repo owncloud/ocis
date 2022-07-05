@@ -21,7 +21,7 @@
 | IDP_TRANSPORT_TLS_KEY | string | ~/.ocis/idp/server.key | |
 | IDP_TLS | bool | false | |
 | REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to authenticate and look up users|
-| OCIS_MACHINE_AUTH_API_KEY<br/>IDP_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used for accessing the 'auth-machine' service to impersonate users when looking up their userinfo via the 'cs3' backend.|
+| OCIS_MACHINE_AUTH_API_KEY<br/>IDP_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|
 | IDP_ASSET_PATH | string |  | Serve IDP assets from a path on the filesystem instead of the builtin assets.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>IDP_ISS | string | https://localhost:9200 | The OIDC issuer URL to use.|
 | IDP_IDENTITY_MANAGER | string | ldap | The identity manager implementation to use, defaults to 'ldap', can be changed to 'cs3', 'kc', 'libregraph', 'cookie' or 'guest'.|

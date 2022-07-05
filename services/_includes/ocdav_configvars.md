@@ -26,3 +26,4 @@
 | OCIS_URL<br/>OCDAV_PUBLIC_URL | string | https://localhost:9200 | URL, where oCIS is reachable for users.|
 | OCIS_INSECURE<br/>OCDAV_INSECURE | bool | false | |
 | OCDAV_GATEWAY_REQUEST_TIMEOUT | int64 | 84300 | Request timeout in seconds for requests from the oCDAV service to the gateway service.|
+| OCIS_MACHINE_AUTH_API_KEY<br/>OCDAV_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|

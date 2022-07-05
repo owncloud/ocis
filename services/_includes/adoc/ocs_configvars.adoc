@@ -143,7 +143,7 @@ URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-Machine auth API key used for accessing the 'auth-machine' service to impersonate users.
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
 |===
 
 Since Version: `+` added, `-` deprecated

@@ -19,4 +19,4 @@
 | OCIS_JWT_SECRET<br/>AUTH_MACHINE_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | AUTH_MACHINE_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the encoding of the user's group memberships in the reva access token. This reduces the token size, especially when users are members of a large number of groups.|
-| OCIS_MACHINE_AUTH_API_KEY<br/>AUTH_MACHINE_API_KEY | string |  | Machine auth API key used for validating requests from other services when impersonating users.|
+| OCIS_MACHINE_AUTH_API_KEY<br/>AUTH_MACHINE_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|

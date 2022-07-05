@@ -148,7 +148,7 @@ The CS3 gateway endpoint.
 a| [subs=-attributes]
  
 a| [subs=-attributes]
-Machine auth API key used for accessing the 'auth-machine' service to impersonate users.
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
 
 |`FRONTEND_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
