@@ -34,11 +34,6 @@ func Execute(cfg *config.Config) error {
 		Usage:    "Serve search API for oCIS",
 		Commands: GetCommands(cfg),
 	})
-	cli.HelpFlag = &cli.BoolFlag{
-		Name:  "help,h",
-		Usage: "Show the help",
-	}
-
 	return app.Run(os.Args)
 }
 
