@@ -31,7 +31,7 @@ type FileSystemStorage struct {
 
 // Thumbnail defines the available thumbnail related configuration.
 type Thumbnail struct {
-	Resolutions         []string          `yaml:"resolutions" env:"THUMBNAILS_RESOLUTIONS" desc:"The supported target resolutions in the format WidthxHeight e.g. 32x32. You can provide multiple resolutions separated by a comma."`
+	Resolutions         []string          `yaml:"resolutions" env:"THUMBNAILS_RESOLUTIONS" desc:"The supported target resolutions in the format WidthxHeight e.g. 32x32. You can define any resolution as required and separate multiple resolutions by blank or comma."`
 	FileSystemStorage   FileSystemStorage `yaml:"filesystem_storage"`
 	WebdavAllowInsecure bool              `yaml:"webdav_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_WEBDAVSOURCE_INSECURE" desc:"Ignore untrusted SSL certificates when connecting to the webdav source."`
 	CS3AllowInsecure    bool              `yaml:"cs3_allow_insecure" env:"OCIS_INSECURE;THUMBNAILS_CS3SOURCE_INSECURE" desc:"Ignore untrusted SSL certificates when connecting to the CS3 source."`
