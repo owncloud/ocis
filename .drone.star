@@ -198,7 +198,6 @@ def main(ctx):
         yarnCache(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
         cacheCoreReposForTesting(ctx) + \
-        testOcisModules(ctx) + \
         testPipelines(ctx)
 
     # build_release_pipelines = \
@@ -2283,7 +2282,7 @@ def parallelDeployAcceptancePipeline(ctx):
                     },
                     "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                              restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                             cloneCoreRepos() +
+                             restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
                              copyConfigs() +
                              parallelDeploymentOC10Server() +
                              owncloudLog() +
@@ -2306,9 +2305,9 @@ def parallelDeployAcceptancePipeline(ctx):
                         pipeOC10AppsVol,
                         pipeOC10OCISSharedVol,
                         pipeOCISConfigVol,
-                        pipelineVolumeOC10Tests,
                     ],
-                    "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+                    "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]) +
+                                  getPipelineNames(cacheCoreReposForTesting(ctx)),
                     "trigger": {},
                 }
 
