@@ -48,7 +48,7 @@ graph TD
 
   ec( client ) -->|"stat()"|ert
 
-  subgraph
+  subgraph  
     ert(( )) --- el(( )) & er(( ))
     er --- erl(( )) & err(( ))
   end
@@ -65,21 +65,21 @@ graph TD
 
   ec( client ) -->|"stat()"|ert
 
-  subgraph
+  subgraph  
     ert(( )) --- el(( )) & er(( ))
     er --- erl(( )) & err(( ))
   end
 
   mc( client ) -->|"stat()"|mrt
 
-  subgraph
+  subgraph  
     mrt(( )) --- ml(( )) & mr(( ))
     mr --- mrl(( )) & mrr(( ))
   end
 
   fc( client ) -->|"stat()"|frt
 
-  subgraph
+  subgraph  
     frt(( )) --- fl(( )) & fr(( ))
     fr --- frl(( )) & frr(( ))
   end
@@ -106,7 +106,7 @@ graph TD
 
   ec( einsteins client ) -->|"stat()"|ert
 
-  subgraph
+  subgraph  
     ml --- mlr(( ))
     mrt(( )) --- ml(( )) & mr(( ))
     mr --- mrl(( )) & mrr(( ))
@@ -114,7 +114,7 @@ graph TD
 
   mlr -. reference .-> er
 
-  subgraph
+  subgraph  
     ert(( )) --- el(( )) & er(( ))
     er --- erl(( )) & err(( ))
   end
@@ -151,14 +151,14 @@ graph TD
   mvr --- mrt
   fvr --- frt
 
-  subgraph
+  subgraph  
     ert(( )) --- el(( )) & er(( ))
     er --- erl(( )) & err(( ))
   end
 
   mc( client ) -->|"stat()"|mvr
 
-  subgraph
+  subgraph  
     mrt(( )) --- ml(( )) & mr(( ))
     ml --- mlm(( ))
     mr --- mrl(( )) & mrr(( ))
@@ -169,7 +169,7 @@ graph TD
 
   fc( client ) -->|"stat()"|fvr
 
-  subgraph
+  subgraph  
     frt(( )) --- fl(( )) & fr(( ))
     fr --- frl(( )) & frr(( ))
   end
