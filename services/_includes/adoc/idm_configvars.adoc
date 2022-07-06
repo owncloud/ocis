@@ -11,165 +11,165 @@
 `IDM_TRACING_ENABLED`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates tracing.
+pass:[Activates tracing.]
 
 |`OCIS_TRACING_TYPE` +
 `IDM_TRACING_TYPE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
 
 |`OCIS_TRACING_ENDPOINT` +
 `IDM_TRACING_ENDPOINT`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The endpoint of the tracing agent.
+pass:[The endpoint of the tracing agent.]
 
 |`OCIS_TRACING_COLLECTOR` +
 `IDM_TRACING_COLLECTOR`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
 
 |`OCIS_LOG_LEVEL` +
 `IDM_LOG_LEVEL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
 
 |`OCIS_LOG_PRETTY` +
 `IDM_LOG_PRETTY`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates pretty log output.
+pass:[Activates pretty log output.]
 
 |`OCIS_LOG_COLOR` +
 `IDM_LOG_COLOR`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates colorized log output.
+pass:[Activates colorized log output.]
 
 |`OCIS_LOG_FILE` +
 `IDM_LOG_FILE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The path to the log file. Activates logging to this file if set.
+pass:[The path to the log file. Activates logging to this file if set.]
 
 |`IDM_DEBUG_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9239 
+pass:[127.0.0.1:9239]
 a| [subs=-attributes]
-Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
 
 |`IDM_DEBUG_TOKEN`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+pass:[Token to secure the metrics endpoint]
 
 |`IDM_DEBUG_PPROF`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+pass:[Enables pprof, which can be used for profiling]
 
 |`IDM_DEBUG_ZPAGES`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables zpages, which can be used for collecting and viewing in-memory traces.
+pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
 
 |`IDM_LDAPS_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9235 
+pass:[127.0.0.1:9235]
 a| [subs=-attributes]
-Listen address for the ldaps listener (ip-addr:port)
+pass:[Listen address for the ldaps listener (ip-addr:port)]
 
 |`IDM_LDAPS_CERT`
 | string
 a| [subs=-attributes]
-~/.ocis/idm/ldap.crt 
+pass:[~/.ocis/idm/ldap.crt]
 a| [subs=-attributes]
-File name of the TLS server certificate for the ldaps listener
+pass:[File name of the TLS server certificate for the ldaps listener]
 
 |`IDM_LDAPS_KEY`
 | string
 a| [subs=-attributes]
-~/.ocis/idm/ldap.key 
+pass:[~/.ocis/idm/ldap.key]
 a| [subs=-attributes]
-File name for the TLS certificate key for the server certificate
+pass:[File name for the TLS certificate key for the server certificate]
 
 |`IDM_DATABASE_PATH`
 | string
 a| [subs=-attributes]
-~/.ocis/idm/ocis.boltdb 
+pass:[~/.ocis/idm/ocis.boltdb]
 a| [subs=-attributes]
-Full path to the idm backend database
+pass:[Full path to the idm backend database]
 
 |`IDM_CREATE_DEMO_USERS` +
 `ACCOUNTS_DEMO_USERS_AND_GROUPS`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Flag to enabe/disable the creation of the demo users
+pass:[Flag to enabe/disable the creation of the demo users]
 
 |`IDM_ADMIN_PASSWORD`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Password to set for the ocis "admin" user. Either cleartext or an argon2id hash
+pass:[Password to set for the ocis "admin" user. Either cleartext or an argon2id hash]
 
 |`IDM_SVC_PASSWORD`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Password to set for the "idm" service user. Either cleartext or an argon2id hash
+pass:[Password to set for the "idm" service user. Either cleartext or an argon2id hash]
 
 |`IDM_REVASVC_PASSWORD`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Password to set for the "reva" service user. Either cleartext or an argon2id hash
+pass:[Password to set for the "reva" service user. Either cleartext or an argon2id hash]
 
 |`IDM_IDPSVC_PASSWORD`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Password to set for the "idp" service user. Either cleartext or an argon2id hash
+pass:[Password to set for the "idp" service user. Either cleartext or an argon2id hash]
 
 |`OCIS_ADMIN_USER_ID` +
 `IDM_ADMIN_USER_ID`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-ID of a user, that should receive admin privileges.
+pass:[ID of a user, that should receive admin privileges.]
 |===
 
 Since Version: `+` added, `-` deprecated

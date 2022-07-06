@@ -11,150 +11,150 @@
 `STORAGE_SHARES_TRACING_ENABLED`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates tracing.
+pass:[Activates tracing.]
 
 |`OCIS_TRACING_TYPE` +
 `STORAGE_SHARES_TRACING_TYPE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
 
 |`OCIS_TRACING_ENDPOINT` +
 `STORAGE_SHARES_TRACING_ENDPOINT`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The endpoint of the tracing agent.
+pass:[The endpoint of the tracing agent.]
 
 |`OCIS_TRACING_COLLECTOR` +
 `STORAGE_SHARES_TRACING_COLLECTOR`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
 
 |`OCIS_LOG_LEVEL` +
 `STORAGE_SHARES_LOG_LEVEL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
 
 |`OCIS_LOG_PRETTY` +
 `STORAGE_SHARES_LOG_PRETTY`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates pretty log output.
+pass:[Activates pretty log output.]
 
 |`OCIS_LOG_COLOR` +
 `STORAGE_SHARES_LOG_COLOR`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates colorized log output.
+pass:[Activates colorized log output.]
 
 |`OCIS_LOG_FILE` +
 `STORAGE_SHARES_LOG_FILE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The path to the log file. Activates logging to this file if set.
+pass:[The path to the log file. Activates logging to this file if set.]
 
 |`STORAGE_SHARES_DEBUG_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9156 
+pass:[127.0.0.1:9156]
 a| [subs=-attributes]
-Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
 
 |`STORAGE_SHARES_DEBUG_TOKEN`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+pass:[Token to secure the metrics endpoint]
 
 |`STORAGE_SHARES_DEBUG_PPROF`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+pass:[Enables pprof, which can be used for profiling]
 
 |`STORAGE_SHARES_DEBUG_ZPAGES`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables zpages, which can be used for collecting and viewing in-memory traces.
+pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
 
 |`STORAGE_SHARES_GRPC_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9154 
+pass:[127.0.0.1:9154]
 a| [subs=-attributes]
-The bind address of the GRPC service.
+pass:[The bind address of the GRPC service.]
 
 |`STORAGE_SHARES_GRPC_PROTOCOL`
 | string
 a| [subs=-attributes]
-tcp 
+pass:[tcp]
 a| [subs=-attributes]
-The transport protocol of the grpc service.
+pass:[The transport protocol of the grpc service.]
 
 |`OCIS_JWT_SECRET` +
 `STORAGE_SHARES_JWT_SECRET`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The secret to mint and validate jwt tokens.
+pass:[The secret to mint and validate jwt tokens.]
 
 |`REVA_GATEWAY`
 | string
 a| [subs=-attributes]
-127.0.0.1:9142 
+pass:[127.0.0.1:9142]
 a| [subs=-attributes]
-The CS3 gateway endpoint.
+pass:[The CS3 gateway endpoint.]
 
 |`STORAGE_SHARES_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Disables the loading of user's group memberships from the reva access token.
+pass:[Disables the loading of user's group memberships from the reva access token.]
 
 |`STORAGE_SHARES_MOUNT_ID`
 | string
 a| [subs=-attributes]
-7639e57c-4433-4a12-8201-722fd0009154 
+pass:[7639e57c-4433-4a12-8201-722fd0009154]
 a| [subs=-attributes]
-Mount ID of this storage. Admins can set the ID for the storage in this config option manually which is then used to reference the storage. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
+pass:[Mount ID of this storage. Admins can set the ID for the storage in this config option manually which is then used to reference the storage. Any reasonable long string is possible, preferably this would be an UUIDv4 format.]
 
 |`STORAGE_SHARES_READ_ONLY`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Set this storage to be read-only.
+pass:[Set this storage to be read-only.]
 
 |`STORAGE_SHARES_USER_SHARE_PROVIDER_ENDPOINT`
 | string
 a| [subs=-attributes]
-localhost:9150 
+pass:[localhost:9150]
 a| [subs=-attributes]
-GRPC endpoint of the sharing extension.
+pass:[GRPC endpoint of the sharing extension.]
 |===
 
 Since Version: `+` added, `-` deprecated

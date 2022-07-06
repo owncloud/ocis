@@ -11,188 +11,188 @@
 `OCDAV_TRACING_ENABLED`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates tracing.
+pass:[Activates tracing.]
 
 |`OCIS_TRACING_TYPE` +
 `OCDAV_TRACING_TYPE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
 
 |`OCIS_TRACING_ENDPOINT` +
 `OCDAV_TRACING_ENDPOINT`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The endpoint of the tracing agent.
+pass:[The endpoint of the tracing agent.]
 
 |`OCIS_TRACING_COLLECTOR` +
 `OCDAV_TRACING_COLLECTOR`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
 
 |`OCIS_LOG_LEVEL` +
 `OCDAV_LOG_LEVEL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
 
 |`OCIS_LOG_PRETTY` +
 `OCDAV_LOG_PRETTY`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates pretty log output.
+pass:[Activates pretty log output.]
 
 |`OCIS_LOG_COLOR` +
 `OCDAV_LOG_COLOR`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates colorized log output.
+pass:[Activates colorized log output.]
 
 |`OCIS_LOG_FILE` +
 `OCDAV_LOG_FILE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The path to the log file. Activates logging to this file if set.
+pass:[The path to the log file. Activates logging to this file if set.]
 
 |`OCDAV_DEBUG_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9163 
+pass:[127.0.0.1:9163]
 a| [subs=-attributes]
-Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
 
 |`OCDAV_DEBUG_TOKEN`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+pass:[Token to secure the metrics endpoint]
 
 |`OCDAV_DEBUG_PPROF`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+pass:[Enables pprof, which can be used for profiling]
 
 |`OCDAV_DEBUG_ZPAGES`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables zpages, which can be used for collecting and viewing in-memory traces.
+pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
 
 |`OCDAV_HTTP_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:0 
+pass:[127.0.0.1:0]
 a| [subs=-attributes]
-The bind address of the HTTP service.
+pass:[The bind address of the HTTP service.]
 
 |`OCDAV_HTTP_PROTOCOL`
 | string
 a| [subs=-attributes]
-tcp 
+pass:[tcp]
 a| [subs=-attributes]
-The transport protocol of the http service.
+pass:[The transport protocol of the http service.]
 
 |`OCDAV_HTTP_PREFIX`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-A URL path prefix for the handler.
+pass:[A URL path prefix for the handler.]
 
 |`OCIS_JWT_SECRET` +
 `OCDAV_JWT_SECRET`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The secret to mint and validate jwt tokens.
+pass:[The secret to mint and validate jwt tokens.]
 
 |`REVA_GATEWAY`
 | string
 a| [subs=-attributes]
-127.0.0.1:9142 
+pass:[127.0.0.1:9142]
 a| [subs=-attributes]
-The CS3 gateway endpoint.
+pass:[The CS3 gateway endpoint.]
 
 |`OCDAV_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Disables the loading of user's group memberships from the reva access token.
+pass:[Disables the loading of user's group memberships from the reva access token.]
 
 |`OCDAV_WEBDAV_NAMESPACE`
 | string
 a| [subs=-attributes]
-/users/{{.Id.OpaqueId}} 
+pass:[/users/{{.Id.OpaqueId}}]
 a| [subs=-attributes]
-Jail requests to /dav/webdav into this CS3 namespace. Supports template layouting with CS3 User properties.
+pass:[Jail requests to /dav/webdav into this CS3 namespace. Supports template layouting with CS3 User properties.]
 
 |`OCDAV_FILES_NAMESPACE`
 | string
 a| [subs=-attributes]
-/users/{{.Id.OpaqueId}} 
+pass:[/users/{{.Id.OpaqueId}}]
 a| [subs=-attributes]
-Jail requests to /dav/files/{username} into this CS3 namespace. Supports template layouting with CS3 User properties.
+pass:[Jail requests to /dav/files/{username} into this CS3 namespace. Supports template layouting with CS3 User properties.]
 
 |`OCDAV_SHARES_NAMESPACE`
 | string
 a| [subs=-attributes]
-/Shares 
+pass:[/Shares]
 a| [subs=-attributes]
-The human readable path for the share jail. Relative to a users personal space root. Upcased intentionally.
+pass:[The human readable path for the share jail. Relative to a users personal space root. Upcased intentionally.]
 
 |`OCIS_URL` +
 `OCDAV_PUBLIC_URL`
 | string
 a| [subs=-attributes]
-\https://localhost:9200 
+pass:[https://localhost:9200]
 a| [subs=-attributes]
-URL, where oCIS is reachable for users.
+pass:[URL, where oCIS is reachable for users.]
 
 |`OCIS_INSECURE` +
 `OCDAV_INSECURE`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-
+pass:[]
 
 |`OCDAV_GATEWAY_REQUEST_TIMEOUT`
 | int64
 a| [subs=-attributes]
-84300 
+pass:[84300]
 a| [subs=-attributes]
-Request timeout in seconds for requests from the oCDAV service to the gateway service.
+pass:[Request timeout in seconds for requests from the oCDAV service to the gateway service.]
 
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `OCDAV_MACHINE_AUTH_API_KEY`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+pass:[Machine auth API key used to validate internal requests necessary for the access to resources from other services.]
 |===
 
 Since Version: `+` added, `-` deprecated

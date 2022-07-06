@@ -11,294 +11,294 @@
 `FRONTEND_TRACING_ENABLED`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates tracing.
+pass:[Activates tracing.]
 
 |`OCIS_TRACING_TYPE` +
 `FRONTEND_TRACING_TYPE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
 
 |`OCIS_TRACING_ENDPOINT` +
 `FRONTEND_TRACING_ENDPOINT`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The endpoint of the tracing agent.
+pass:[The endpoint of the tracing agent.]
 
 |`OCIS_TRACING_COLLECTOR` +
 `FRONTEND_TRACING_COLLECTOR`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
 
 |`OCIS_LOG_LEVEL` +
 `FRONTEND_LOG_LEVEL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
 
 |`OCIS_LOG_PRETTY` +
 `FRONTEND_LOG_PRETTY`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates pretty log output.
+pass:[Activates pretty log output.]
 
 |`OCIS_LOG_COLOR` +
 `FRONTEND_LOG_COLOR`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates colorized log output.
+pass:[Activates colorized log output.]
 
 |`OCIS_LOG_FILE` +
 `FRONTEND_LOG_FILE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The path to the log file. Activates logging to this file if set.
+pass:[The path to the log file. Activates logging to this file if set.]
 
 |`FRONTEND_DEBUG_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9141 
+pass:[127.0.0.1:9141]
 a| [subs=-attributes]
-Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
 
 |`FRONTEND_DEBUG_TOKEN`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+pass:[Token to secure the metrics endpoint]
 
 |`FRONTEND_DEBUG_PPROF`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+pass:[Enables pprof, which can be used for profiling]
 
 |`FRONTEND_DEBUG_ZPAGES`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables zpages, which can be used for collecting and viewing in-memory traces.
+pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
 
 |`FRONTEND_HTTP_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9140 
+pass:[127.0.0.1:9140]
 a| [subs=-attributes]
-The bind address of the HTTP service.
+pass:[The bind address of the HTTP service.]
 
 |`FRONTEND_HTTP_PROTOCOL`
 | string
 a| [subs=-attributes]
-tcp 
+pass:[tcp]
 a| [subs=-attributes]
-The transport protocol of the http service.
+pass:[The transport protocol of the http service.]
 
 |`FRONTEND_HTTP_PREFIX`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The Path prefix where the frontend can be accessed (defaults to /).
+pass:[The Path prefix where the frontend can be accessed (defaults to /).]
 
 |`STORAGE_TRANSFER_SECRET`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Transfer secret for signing file up- and download requests.
+pass:[Transfer secret for signing file up- and download requests.]
 
 |`OCIS_JWT_SECRET` +
 `FRONTEND_JWT_SECRET`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The secret to mint and validate jwt tokens.
+pass:[The secret to mint and validate jwt tokens.]
 
 |`REVA_GATEWAY`
 | string
 a| [subs=-attributes]
-127.0.0.1:9142 
+pass:[127.0.0.1:9142]
 a| [subs=-attributes]
-The CS3 gateway endpoint.
+pass:[The CS3 gateway endpoint.]
 
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `FRONTEND_MACHINE_AUTH_API_KEY`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+pass:[Machine auth API key used to validate internal requests necessary for the access to resources from other services.]
 
 |`FRONTEND_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Disables the loading of user's group memberships from the reva access token.
+pass:[Disables the loading of user's group memberships from the reva access token.]
 
 |`FRONTEND_ENABLE_FAVORITES`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables the support for favorites in the frontend.
+pass:[Enables the support for favorites in the frontend.]
 
 |`FRONTEND_ENABLE_PROJECT_SPACES`
 | bool
 a| [subs=-attributes]
-true 
+pass:[true]
 a| [subs=-attributes]
-Indicates to clients that project spaces are supposed to be made available.
+pass:[Indicates to clients that project spaces are supposed to be made available.]
 
 |`FRONTEND_ENABLE_SHARE_JAIL`
 | bool
 a| [subs=-attributes]
-true 
+pass:[true]
 a| [subs=-attributes]
-Indicates to clients that the share jail is supposed to be used.
+pass:[Indicates to clients that the share jail is supposed to be used.]
 
 |`FRONTEND_UPLOAD_MAX_CHUNK_SIZE`
 | int
 a| [subs=-attributes]
-100000000 
+pass:[100000000]
 a| [subs=-attributes]
-Sets the max chunk sizes for uploads via the frontend.
+pass:[Sets the max chunk sizes for uploads via the frontend.]
 
 |`FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Advise TUS to replace PATCH requests by POST requests.
+pass:[Advise TUS to replace PATCH requests by POST requests.]
 
 |`FRONTEND_DEFAULT_UPLOAD_PROTOCOL`
 | string
 a| [subs=-attributes]
-tus 
+pass:[tus]
 a| [subs=-attributes]
-The default upload protocol to use in the frontend (e.g. tus).
+pass:[The default upload protocol to use in the frontend (e.g. tus).]
 
 |`FRONTEND_ENABLE_RESHARING`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables the support for resharing in the frontend.
+pass:[Enables the support for resharing in the frontend.]
 
 |`OCIS_URL` +
 `FRONTEND_PUBLIC_URL`
 | string
 a| [subs=-attributes]
-\https://localhost:9200 
+pass:[https://localhost:9200]
 a| [subs=-attributes]
-The public facing url of the ocis frontend.
+pass:[The public facing url of the ocis frontend.]
 
 |`OCIS_INSECURE` +
 `FRONTEND_APP_HANDLER_INSECURE`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Allow insecure connections to the frontend.
+pass:[Allow insecure connections to the frontend.]
 
 |`FRONTEND_ARCHIVER_MAX_NUM_FILES`
 | int64
 a| [subs=-attributes]
-10000 
+pass:[10000]
 a| [subs=-attributes]
-Max number of files that can be packed into an archive.
+pass:[Max number of files that can be packed into an archive.]
 
 |`FRONTEND_ARCHIVER_MAX_SIZE`
 | int64
 a| [subs=-attributes]
-1073741824 
+pass:[1073741824]
 a| [subs=-attributes]
-Max size of the zip archive the archiver can create.
+pass:[Max size of the zip archive the archiver can create.]
 
 |`OCIS_INSECURE` +
 `FRONTEND_ARCHIVER_INSECURE`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Allow insecure connections to the archiver.
+pass:[Allow insecure connections to the archiver.]
 
 |`FRONTEND_DATA_GATEWAY_PREFIX`
 | string
 a| [subs=-attributes]
-data 
+pass:[data]
 a| [subs=-attributes]
-
+pass:[]
 
 |`FRONTEND_OCS_PREFIX`
 | string
 a| [subs=-attributes]
-ocs 
+pass:[ocs]
 a| [subs=-attributes]
-Path prefix for the ocs service
+pass:[Path prefix for the ocs service]
 
 |`FRONTEND_OCS_SHARE_PREFIX`
 | string
 a| [subs=-attributes]
-/Shares 
+pass:[/Shares]
 a| [subs=-attributes]
-Path prefix for shares.
+pass:[Path prefix for shares.]
 
 |`FRONTEND_OCS_HOME_NAMESPACE`
 | string
 a| [subs=-attributes]
-/users/{{.Id.OpaqueId}} 
+pass:[/users/{{.Id.OpaqueId}}]
 a| [subs=-attributes]
-Homespace namespace identifier.
+pass:[Homespace namespace identifier.]
 
 |`FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE`
 | string
 a| [subs=-attributes]
-{{.Mail}} 
+pass:[{{.Mail}}]
 a| [subs=-attributes]
-Additional information attribute for the user (e.g. {{.Mail}}
+pass:[Additional information attribute for the user (e.g. {{.Mail}}]
 
 |`FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL`
 | int
 a| [subs=-attributes]
-0 
+pass:[0]
 a| [subs=-attributes]
-Max TTL for the resource info cache
+pass:[Max TTL for the resource info cache]
 
 |`FRONTEND_CHECKSUMS_SUPPORTED_TYPES`
 | 
 a| [subs=-attributes]
-[sha1 md5 adler32] 
+pass:[[sha1 md5 adler32]]
 a| [subs=-attributes]
-Supported checksum types to be announced to the client (e.g. md5)
+pass:[Supported checksum types to be announced to the client (e.g. md5)]
 
 |`FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPES`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Preferred checksum types to be announced to the client for uploads (e.g. md5)
+pass:[Preferred checksum types to be announced to the client for uploads (e.g. md5)]
 |===
 
 Since Version: `+` added, `-` deprecated

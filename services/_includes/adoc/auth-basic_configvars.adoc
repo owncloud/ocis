@@ -11,408 +11,408 @@
 `AUTH_BASIC_TRACING_ENABLED`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates tracing.
+pass:[Activates tracing.]
 
 |`OCIS_TRACING_TYPE` +
 `AUTH_BASIC_TRACING_TYPE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
 
 |`OCIS_TRACING_ENDPOINT` +
 `AUTH_BASIC_TRACING_ENDPOINT`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The endpoint of the tracing agent.
+pass:[The endpoint of the tracing agent.]
 
 |`OCIS_TRACING_COLLECTOR` +
 `AUTH_BASIC_TRACING_COLLECTOR`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
 
 |`OCIS_LOG_LEVEL` +
 `AUTH_BASIC_LOG_LEVEL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
 
 |`OCIS_LOG_PRETTY` +
 `AUTH_BASIC_LOG_PRETTY`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates pretty log output.
+pass:[Activates pretty log output.]
 
 |`OCIS_LOG_COLOR` +
 `AUTH_BASIC_LOG_COLOR`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates colorized log output.
+pass:[Activates colorized log output.]
 
 |`OCIS_LOG_FILE` +
 `AUTH_BASIC_LOG_FILE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The path to the log file. Activates logging to this file if set.
+pass:[The path to the log file. Activates logging to this file if set.]
 
 |`AUTH_BASIC_DEBUG_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9147 
+pass:[127.0.0.1:9147]
 a| [subs=-attributes]
-Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
 
 |`AUTH_BASIC_DEBUG_TOKEN`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+pass:[Token to secure the metrics endpoint]
 
 |`AUTH_BASIC_DEBUG_PPROF`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+pass:[Enables pprof, which can be used for profiling]
 
 |`AUTH_BASIC_DEBUG_ZPAGES`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables zpages, which can  be used for collecting and viewing traces in-memory.
+pass:[Enables zpages, which can  be used for collecting and viewing traces in-memory.]
 
 |`AUTH_BASIC_GRPC_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9146 
+pass:[127.0.0.1:9146]
 a| [subs=-attributes]
-The bind address of the GRPC service.
+pass:[The bind address of the GRPC service.]
 
 |`AUTH_BASIC_GRPC_PROTOCOL`
 | string
 a| [subs=-attributes]
-tcp 
+pass:[tcp]
 a| [subs=-attributes]
-The transport protocol of the grpc service.
+pass:[The transport protocol of the grpc service.]
 
 |`OCIS_JWT_SECRET` +
 `AUTH_BASIC_JWT_SECRET`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The secret to mint and validate jwt tokens.
+pass:[The secret to mint and validate jwt tokens.]
 
 |`REVA_GATEWAY`
 | string
 a| [subs=-attributes]
-127.0.0.1:9142 
+pass:[127.0.0.1:9142]
 a| [subs=-attributes]
-The CS3 gateway endpoint.
+pass:[The CS3 gateway endpoint.]
 
 |`AUTH_BASIC_SKIP_USER_GROUPS_IN_TOKEN`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Disables the encoding of the user's group memberships in the reva access token. This reduces the token size, especially when users are members of a large number of groups.
+pass:[Disables the encoding of the user's group memberships in the reva access token. This reduces the token size, especially when users are members of a large number of groups.]
 
 |`AUTH_BASIC_AUTH_PROVIDER`
 | string
 a| [subs=-attributes]
-ldap 
+pass:[ldap]
 a| [subs=-attributes]
-The auth provider which should be used by the service (e.g. 'ldap').
+pass:[The auth provider which should be used by the service (e.g. 'ldap').]
 
 |`LDAP_URI` +
 `AUTH_BASIC_LDAP_URI`
 | string
 a| [subs=-attributes]
-ldaps://localhost:9235 
+pass:[ldaps://localhost:9235]
 a| [subs=-attributes]
-URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
+pass:[URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://']
 
 |`LDAP_CACERT` +
 `AUTH_BASIC_LDAP_CACERT`
 | string
 a| [subs=-attributes]
-~/.ocis/idm/ldap.crt 
+pass:[~/.ocis/idm/ldap.crt]
 a| [subs=-attributes]
-Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty the system default CA bundle will be used.
+pass:[Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty the system default CA bundle will be used.]
 
 |`LDAP_INSECURE` +
 `AUTH_BASIC_LDAP_INSECURE`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.
+pass:[Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.]
 
 |`LDAP_BIND_DN` +
 `AUTH_BASIC_LDAP_BIND_DN`
 | string
 a| [subs=-attributes]
-uid=reva,ou=sysusers,o=libregraph-idm 
+pass:[uid=reva,ou=sysusers,o=libregraph-idm]
 a| [subs=-attributes]
-LDAP DN to use for simple bind authentication with the target LDAP server.
+pass:[LDAP DN to use for simple bind authentication with the target LDAP server.]
 
 |`LDAP_BIND_PASSWORD` +
 `AUTH_BASIC_LDAP_BIND_PASSWORD`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Password to use for authenticating the 'bind_dn'.
+pass:[Password to use for authenticating the 'bind_dn'.]
 
 |`LDAP_USER_BASE_DN` +
 `AUTH_BASIC_LDAP_USER_BASE_DN`
 | string
 a| [subs=-attributes]
-ou=users,o=libregraph-idm 
+pass:[ou=users,o=libregraph-idm]
 a| [subs=-attributes]
-Search base DN for looking up LDAP users.
+pass:[Search base DN for looking up LDAP users.]
 
 |`LDAP_GROUP_BASE_DN` +
 `AUTH_BASIC_LDAP_GROUP_BASE_DN`
 | string
 a| [subs=-attributes]
-ou=groups,o=libregraph-idm 
+pass:[ou=groups,o=libregraph-idm]
 a| [subs=-attributes]
-Search base DN for looking up LDAP groups.
+pass:[Search base DN for looking up LDAP groups.]
 
 |`LDAP_USER_SCOPE` +
 `AUTH_BASIC_LDAP_USER_SCOPE`
 | string
 a| [subs=-attributes]
-sub 
+pass:[sub]
 a| [subs=-attributes]
-LDAP search scope to use when looking up users ('base', 'one', 'sub').
+pass:[LDAP search scope to use when looking up users ('base', 'one', 'sub').]
 
 |`LDAP_GROUP_SCOPE` +
 `AUTH_BASIC_LDAP_GROUP_SCOPE`
 | string
 a| [subs=-attributes]
-sub 
+pass:[sub]
 a| [subs=-attributes]
-LDAP search scope to use when looking up gruops ('base', 'one', 'sub').
+pass:[LDAP search scope to use when looking up gruops ('base', 'one', 'sub').]
 
 |`LDAP_USER_FILTER` +
 `AUTH_BASIC_LDAP_USER_FILTER`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').
+pass:[LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').]
 
 |`LDAP_GROUP_FILTER` +
 `AUTH_BASIC_LDAP_GROUP_FILTER`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-LDAP filter to add to the default filters for group searches.
+pass:[LDAP filter to add to the default filters for group searches.]
 
 |`LDAP_USER_OBJECTCLASS` +
 `AUTH_BASIC_LDAP_USER_OBJECTCLASS`
 | string
 a| [subs=-attributes]
-inetOrgPerson 
+pass:[inetOrgPerson]
 a| [subs=-attributes]
-The object class to use for users in the default user search filter ('inetOrgPerson').
+pass:[The object class to use for users in the default user search filter ('inetOrgPerson').]
 
 |`LDAP_GROUP_OBJECTCLASS` +
 `AUTH_BASIC_LDAP_GROUP_OBJECTCLASS`
 | string
 a| [subs=-attributes]
-groupOfNames 
+pass:[groupOfNames]
 a| [subs=-attributes]
-The object class to use for groups in the default group search filter ('groupOfNames'). 
+pass:[The object class to use for groups in the default group search filter ('groupOfNames'). ]
 
 |`LDAP_LOGIN_ATTRIBUTES` +
 `AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES`
 | 
 a| [subs=-attributes]
-[uid mail] 
+pass:[[uid mail]]
 a| [subs=-attributes]
-The user object attributes, that can be used for login.
+pass:[The user object attributes, that can be used for login.]
 
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
 `AUTH_BASIC_IDP_URL`
 | string
 a| [subs=-attributes]
-\https://localhost:9200 
+pass:[https://localhost:9200]
 a| [subs=-attributes]
-The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
+pass:[The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.]
 
 |`LDAP_USER_SCHEMA_ID` +
 `AUTH_BASIC_LDAP_USER_SCHEMA_ID`
 | string
 a| [subs=-attributes]
-ownclouduuid 
+pass:[ownclouduuid]
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for users. This should be a stable globally unique id (e.g. a UUID).
+pass:[LDAP Attribute to use as the unique id for users. This should be a stable globally unique id (e.g. a UUID).]
 
 |`LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
 `AUTH_BASIC_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ids.
+pass:[Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ids.]
 
 |`LDAP_USER_SCHEMA_MAIL` +
 `AUTH_BASIC_LDAP_USER_SCHEMA_MAIL`
 | string
 a| [subs=-attributes]
-mail 
+pass:[mail]
 a| [subs=-attributes]
-LDAP Attribute to use for the email address of users.
+pass:[LDAP Attribute to use for the email address of users.]
 
 |`LDAP_USER_SCHEMA_DISPLAYNAME` +
 `AUTH_BASIC_LDAP_USER_SCHEMA_DISPLAYNAME`
 | string
 a| [subs=-attributes]
-displayname 
+pass:[displayname]
 a| [subs=-attributes]
-LDAP Attribute to use for the displayname of users.
+pass:[LDAP Attribute to use for the displayname of users.]
 
 |`LDAP_USER_SCHEMA_USERNAME` +
 `AUTH_BASIC_LDAP_USER_SCHEMA_USERNAME`
 | string
 a| [subs=-attributes]
-uid 
+pass:[uid]
 a| [subs=-attributes]
-LDAP Attribute to use for username of users.
+pass:[LDAP Attribute to use for username of users.]
 
 |`LDAP_GROUP_SCHEMA_ID` +
 `AUTH_BASIC_LDAP_GROUP_SCHEMA_ID`
 | string
 a| [subs=-attributes]
-ownclouduuid 
+pass:[ownclouduuid]
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
+pass:[LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).]
 
 |`LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING` +
 `AUTH_BASIC_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ids.
+pass:[Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ids.]
 
 |`LDAP_GROUP_SCHEMA_MAIL` +
 `AUTH_BASIC_LDAP_GROUP_SCHEMA_MAIL`
 | string
 a| [subs=-attributes]
-mail 
+pass:[mail]
 a| [subs=-attributes]
-LDAP Attribute to use for the email address of groups (can be empty).
+pass:[LDAP Attribute to use for the email address of groups (can be empty).]
 
 |`LDAP_GROUP_SCHEMA_DISPLAYNAME` +
 `AUTH_BASIC_LDAP_GROUP_SCHEMA_DISPLAYNAME`
 | string
 a| [subs=-attributes]
-cn 
+pass:[cn]
 a| [subs=-attributes]
-LDAP Attribute to use for the displayname of groups (often the same as groupname attribute)
+pass:[LDAP Attribute to use for the displayname of groups (often the same as groupname attribute)]
 
 |`LDAP_GROUP_SCHEMA_GROUPNAME` +
 `AUTH_BASIC_LDAP_GROUP_SCHEMA_GROUPNAME`
 | string
 a| [subs=-attributes]
-cn 
+pass:[cn]
 a| [subs=-attributes]
-LDAP Attribute to use for the name of groups
+pass:[LDAP Attribute to use for the name of groups]
 
 |`LDAP_GROUP_SCHEMA_MEMBER` +
 `AUTH_BASIC_LDAP_GROUP_SCHEMA_MEMBER`
 | string
 a| [subs=-attributes]
-member 
+pass:[member]
 a| [subs=-attributes]
-LDAP Attribute that is used for group members.
+pass:[LDAP Attribute that is used for group members.]
 
 |`AUTH_BASIC_OWNCLOUDSQL_DB_USERNAME`
 | string
 a| [subs=-attributes]
-owncloud 
+pass:[owncloud]
 a| [subs=-attributes]
-Database user to use for authenticating with the owncloud database.
+pass:[Database user to use for authenticating with the owncloud database.]
 
 |`AUTH_BASIC_OWNCLOUDSQL_DB_PASSWORD`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Password for the database user.
+pass:[Password for the database user.]
 
 |`AUTH_BASIC_OWNCLOUDSQL_DB_HOST`
 | string
 a| [subs=-attributes]
-mysql 
+pass:[mysql]
 a| [subs=-attributes]
-Hostname of the database server.
+pass:[Hostname of the database server.]
 
 |`AUTH_BASIC_OWNCLOUDSQL_DB_PORT`
 | int
 a| [subs=-attributes]
-3306 
+pass:[3306]
 a| [subs=-attributes]
-Network port to use for the database connection.
+pass:[Network port to use for the database connection.]
 
 |`AUTH_BASIC_OWNCLOUDSQL_DB_NAME`
 | string
 a| [subs=-attributes]
-owncloud 
+pass:[owncloud]
 a| [subs=-attributes]
-Name of the owncloud database.
+pass:[Name of the owncloud database.]
 
 |`AUTH_BASIC_OWNCLOUDSQL_IDP`
 | string
 a| [subs=-attributes]
-\https://localhost:9200 
+pass:[https://localhost:9200]
 a| [subs=-attributes]
-The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
+pass:[The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.]
 
 |`AUTH_BASIC_OWNCLOUDSQL_NOBODY`
 | int64
 a| [subs=-attributes]
-90 
+pass:[90]
 a| [subs=-attributes]
-Fallback number if no numeric UID and GID properties are provided.
+pass:[Fallback number if no numeric UID and GID properties are provided.]
 
 |`AUTH_BASIC_OWNCLOUDSQL_JOIN_USERNAME`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Join the user properties table to read usernames
+pass:[Join the user properties table to read usernames]
 
 |`AUTH_BASIC_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Join the user properties table to read user ids (boolean).
+pass:[Join the user properties table to read user ids (boolean).]
 |===
 
 Since Version: `+` added, `-` deprecated

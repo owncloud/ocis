@@ -11,89 +11,89 @@
 `NATS_LOG_LEVEL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
 
 |`OCIS_LOG_PRETTY` +
 `NATS_LOG_PRETTY`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates pretty log output.
+pass:[Activates pretty log output.]
 
 |`OCIS_LOG_COLOR` +
 `NATS_LOG_COLOR`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates colorized log output.
+pass:[Activates colorized log output.]
 
 |`OCIS_LOG_FILE` +
 `NATS_LOG_FILE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The path to the log file. Activates logging to this file if set.
+pass:[The path to the log file. Activates logging to this file if set.]
 
 |`NATS_DEBUG_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9234 
+pass:[127.0.0.1:9234]
 a| [subs=-attributes]
-Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
 
 |`NATS_DEBUG_TOKEN`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+pass:[Token to secure the metrics endpoint]
 
 |`NATS_DEBUG_PPROF`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+pass:[Enables pprof, which can be used for profiling]
 
 |`NATS_DEBUG_ZPAGES`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables zpages, which can be used for collecting and viewing in-memory traces.
+pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
 
 |`NATS_NATS_HOST`
 | string
 a| [subs=-attributes]
-127.0.0.1 
+pass:[127.0.0.1]
 a| [subs=-attributes]
-Bind address.
+pass:[Bind address.]
 
 |`NATS_NATS_PORT`
 | int
 a| [subs=-attributes]
-9233 
+pass:[9233]
 a| [subs=-attributes]
-Bind port:
+pass:[Bind port:]
 
 |`NATS_NATS_CLUSTER_ID`
 | string
 a| [subs=-attributes]
-ocis-cluster 
+pass:[ocis-cluster]
 a| [subs=-attributes]
-ID of the NATS cluster.
+pass:[ID of the NATS cluster.]
 
 |`NATS_NATS_STORE_DIR`
 | string
 a| [subs=-attributes]
-~/.ocis/nats 
+pass:[~/.ocis/nats]
 a| [subs=-attributes]
-Path for the NATS JetStream persistence directory.
+pass:[Path for the NATS JetStream persistence directory.]
 |===
 
 Since Version: `+` added, `-` deprecated

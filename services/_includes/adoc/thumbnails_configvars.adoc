@@ -11,172 +11,172 @@
 `THUMBNAILS_TRACING_ENABLED`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates tracing.
+pass:[Activates tracing.]
 
 |`OCIS_TRACING_TYPE` +
 `THUMBNAILS_TRACING_TYPE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
 
 |`OCIS_TRACING_ENDPOINT` +
 `THUMBNAILS_TRACING_ENDPOINT`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The endpoint of the tracing agent.
+pass:[The endpoint of the tracing agent.]
 
 |`OCIS_TRACING_COLLECTOR` +
 `THUMBNAILS_TRACING_COLLECTOR`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
 
 |`OCIS_LOG_LEVEL` +
 `THUMBNAILS_LOG_LEVEL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
 
 |`OCIS_LOG_PRETTY` +
 `THUMBNAILS_LOG_PRETTY`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates pretty log output.
+pass:[Activates pretty log output.]
 
 |`OCIS_LOG_COLOR` +
 `THUMBNAILS_LOG_COLOR`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates colorized log output.
+pass:[Activates colorized log output.]
 
 |`OCIS_LOG_FILE` +
 `THUMBNAILS_LOG_FILE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The path to the log file. Activates logging to this file if set.
+pass:[The path to the log file. Activates logging to this file if set.]
 
 |`THUMBNAILS_DEBUG_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9189 
+pass:[127.0.0.1:9189]
 a| [subs=-attributes]
-Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
 
 |`THUMBNAILS_DEBUG_TOKEN`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+pass:[Token to secure the metrics endpoint]
 
 |`THUMBNAILS_DEBUG_PPROF`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+pass:[Enables pprof, which can be used for profiling]
 
 |`THUMBNAILS_DEBUG_ZPAGES`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables zpages, which can be used for collecting and viewing in-memory traces.
+pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
 
 |`THUMBNAILS_GRPC_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9185 
+pass:[127.0.0.1:9185]
 a| [subs=-attributes]
-The address off the grpc service.
+pass:[The address off the grpc service.]
 
 |`THUMBNAILS_HTTP_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9186 
+pass:[127.0.0.1:9186]
 a| [subs=-attributes]
-The bind address of the HTTP service.
+pass:[The bind address of the HTTP service.]
 
 |`THUMBNAILS_HTTP_ROOT`
 | string
 a| [subs=-attributes]
-/thumbnails 
+pass:[/thumbnails]
 a| [subs=-attributes]
-Subdirectory that serves as the root for this HTTP service.
+pass:[Subdirectory that serves as the root for this HTTP service.]
 
 |`THUMBNAILS_RESOLUTIONS`
 | 
 a| [subs=-attributes]
-[16x16 32x32 64x64 128x128 1920x1080 3840x2160 7680x4320] 
+pass:[[16x16 32x32 64x64 128x128 1920x1080 3840x2160 7680x4320]]
 a| [subs=-attributes]
-The supported target resolutions in the format WidthxHeight e.g. 32x32. You can provide multiple resolutions separated by a comma.
+pass:[The supported target resolutions in the format WidthxHeight e.g. 32x32. You can provide multiple resolutions separated by a comma.]
 
 |`THUMBNAILS_FILESYSTEMSTORAGE_ROOT`
 | string
 a| [subs=-attributes]
-~/.ocis/thumbnails 
+pass:[~/.ocis/thumbnails]
 a| [subs=-attributes]
-The directory where the filesystem storage will store the thumbnails.
+pass:[The directory where the filesystem storage will store the thumbnails.]
 
 |`OCIS_INSECURE` +
 `THUMBNAILS_WEBDAVSOURCE_INSECURE`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Ignore untrusted SSL certificates when connecting to the webdav source.
+pass:[Ignore untrusted SSL certificates when connecting to the webdav source.]
 
 |`OCIS_INSECURE` +
 `THUMBNAILS_CS3SOURCE_INSECURE`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Ignore untrusted SSL certificates when connecting to the CS3 source.
+pass:[Ignore untrusted SSL certificates when connecting to the CS3 source.]
 
 |`REVA_GATEWAY`
 | string
 a| [subs=-attributes]
-127.0.0.1:9142 
+pass:[127.0.0.1:9142]
 a| [subs=-attributes]
-The CS3 gateway endpoint.
+pass:[The CS3 gateway endpoint.]
 
 |`THUMBNAILS_TXT_FONTMAP_FILE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The path to a font file for txt thumbnails.
+pass:[The path to a font file for txt thumbnails.]
 
 |`THUMBNAILS_TRANSFER_TOKEN`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The secret to sign JWT to download the actual thumbnail file.
+pass:[The secret to sign JWT to download the actual thumbnail file.]
 
 |`THUMBNAILS_DATA_ENDPOINT`
 | string
 a| [subs=-attributes]
-\http://127.0.0.1:9186/thumbnails/data 
+pass:[http://127.0.0.1:9186/thumbnails/data]
 a| [subs=-attributes]
-The HTTP endpoint where the actual thumbnail file can be downloaded.
+pass:[The HTTP endpoint where the actual thumbnail file can be downloaded.]
 |===
 
 Since Version: `+` added, `-` deprecated

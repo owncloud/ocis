@@ -11,110 +11,110 @@
 `AUDIT_LOG_LEVEL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
 
 |`OCIS_LOG_PRETTY` +
 `AUDIT_LOG_PRETTY`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates pretty log output.
+pass:[Activates pretty log output.]
 
 |`OCIS_LOG_COLOR` +
 `AUDIT_LOG_COLOR`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates colorized log output.
+pass:[Activates colorized log output.]
 
 |`OCIS_LOG_FILE` +
 `AUDIT_LOG_FILE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The path to the log file. Activates logging to this file if set.
+pass:[The path to the log file. Activates logging to this file if set.]
 
 |`AUDIT_DEBUG_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9234 
+pass:[127.0.0.1:9234]
 a| [subs=-attributes]
-Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
 
 |`AUDIT_DEBUG_TOKEN`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+pass:[Token to secure the metrics endpoint]
 
 |`AUDIT_DEBUG_PPROF`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+pass:[Enables pprof, which can be used for profiling]
 
 |`AUDIT_DEBUG_ZPAGES`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables zpages, which can be used for collecting and viewing in-memory traces.
+pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
 
 |`AUDIT_EVENTS_ENDPOINT`
 | string
 a| [subs=-attributes]
-127.0.0.1:9233 
+pass:[127.0.0.1:9233]
 a| [subs=-attributes]
-The address of the streaming service.
+pass:[The address of the streaming service.]
 
 |`AUDIT_EVENTS_CLUSTER`
 | string
 a| [subs=-attributes]
-ocis-cluster 
+pass:[ocis-cluster]
 a| [subs=-attributes]
-The clusterID of the streaming service. Mandatory when using nats.
+pass:[The clusterID of the streaming service. Mandatory when using nats.]
 
 |`AUDIT_EVENTS_GROUP`
 | string
 a| [subs=-attributes]
-audit 
+pass:[audit]
 a| [subs=-attributes]
-The consumergroup of the service. One group will only get one copy of an event.
+pass:[The consumergroup of the service. One group will only get one copy of an event.]
 
 |`AUDIT_LOG_TO_CONSOLE`
 | bool
 a| [subs=-attributes]
-true 
+pass:[true]
 a| [subs=-attributes]
-Logs to Stdout if true. Independent of the log to file option.
+pass:[Logs to Stdout if true. Independent of the log to file option.]
 
 |`AUDIT_LOG_TO_FILE`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Logs to file if true. Independent of the log to Stdout file option.
+pass:[Logs to file if true. Independent of the log to Stdout file option.]
 
 |`AUDIT_FILEPATH`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Filepath to the logfile. Mandatory if LogToFile is true.
+pass:[Filepath to the logfile. Mandatory if LogToFile is true.]
 
 |`AUDIT_FORMAT`
 | string
 a| [subs=-attributes]
-json 
+pass:[json]
 a| [subs=-attributes]
-Log format. using json is advised.
+pass:[Log format. using json is advised.]
 |===
 
 Since Version: `+` added, `-` deprecated

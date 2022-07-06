@@ -11,231 +11,231 @@
 `PROXY_TRACING_ENABLED`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates tracing.
+pass:[Activates tracing.]
 
 |`OCIS_TRACING_TYPE` +
 `PROXY_TRACING_TYPE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
 
 |`OCIS_TRACING_ENDPOINT` +
 `PROXY_TRACING_ENDPOINT`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The endpoint of the tracing agent.
+pass:[The endpoint of the tracing agent.]
 
 |`OCIS_TRACING_COLLECTOR` +
 `PROXY_TRACING_COLLECTOR`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
 
 |`OCIS_LOG_LEVEL` +
 `PROXY_LOG_LEVEL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
 
 |`OCIS_LOG_PRETTY` +
 `PROXY_LOG_PRETTY`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates pretty log output.
+pass:[Activates pretty log output.]
 
 |`OCIS_LOG_COLOR` +
 `PROXY_LOG_COLOR`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates colorized log output.
+pass:[Activates colorized log output.]
 
 |`OCIS_LOG_FILE` +
 `PROXY_LOG_FILE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The path to the log file. Activates logging to this file if set.
+pass:[The path to the log file. Activates logging to this file if set.]
 
 |`PROXY_DEBUG_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9205 
+pass:[127.0.0.1:9205]
 a| [subs=-attributes]
-Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
 
 |`PROXY_DEBUG_TOKEN`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+pass:[Token to secure the metrics endpoint]
 
 |`PROXY_DEBUG_PPROF`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+pass:[Enables pprof, which can be used for profiling]
 
 |`PROXY_DEBUG_ZPAGES`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables zpages, which can be used for collecting and viewing in-memory traces.
+pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
 
 |`PROXY_HTTP_ADDR`
 | string
 a| [subs=-attributes]
-0.0.0.0:9200 
+pass:[0.0.0.0:9200]
 a| [subs=-attributes]
-The bind address of the HTTP service.
+pass:[The bind address of the HTTP service.]
 
 |`PROXY_HTTP_ROOT`
 | string
 a| [subs=-attributes]
-/ 
+pass:[/]
 a| [subs=-attributes]
-Subdirectory that serves as the root for this HTTP service.
+pass:[Subdirectory that serves as the root for this HTTP service.]
 
 |`PROXY_TRANSPORT_TLS_CERT`
 | string
 a| [subs=-attributes]
-~/.ocis/proxy/server.crt 
+pass:[~/.ocis/proxy/server.crt]
 a| [subs=-attributes]
-
+pass:[]
 
 |`PROXY_TRANSPORT_TLS_KEY`
 | string
 a| [subs=-attributes]
-~/.ocis/proxy/server.key 
+pass:[~/.ocis/proxy/server.key]
 a| [subs=-attributes]
-
+pass:[]
 
 |`PROXY_TLS`
 | bool
 a| [subs=-attributes]
-true 
+pass:[true]
 a| [subs=-attributes]
-
+pass:[]
 
 |`REVA_GATEWAY`
 | string
 a| [subs=-attributes]
-127.0.0.1:9142 
+pass:[127.0.0.1:9142]
 a| [subs=-attributes]
-The CS3 gateway endpoint.
+pass:[The CS3 gateway endpoint.]
 
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
 `PROXY_OIDC_ISSUER`
 | string
 a| [subs=-attributes]
-\https://localhost:9200 
+pass:[https://localhost:9200]
 a| [subs=-attributes]
-URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+pass:[URL of the OIDC issuer. It defaults to URL of the builtin IDP.]
 
 |`OCIS_INSECURE` +
 `PROXY_OIDC_INSECURE`
 | bool
 a| [subs=-attributes]
-true 
+pass:[true]
 a| [subs=-attributes]
-Disable TLS certificate validation for connections to the IDP. (not recommended for production environments.
+pass:[Disable TLS certificate validation for connections to the IDP. (not recommended for production environments.]
 
 |`PROXY_OIDC_USERINFO_CACHE_SIZE`
 | int
 a| [subs=-attributes]
-1024 
+pass:[1024]
 a| [subs=-attributes]
-Cache size for oidc user info.
+pass:[Cache size for oidc user info.]
 
 |`PROXY_OIDC_USERINFO_CACHE_TTL`
 | int
 a| [subs=-attributes]
-10 
+pass:[10]
 a| [subs=-attributes]
-Max TTL for the oidc user info cache.
+pass:[Max TTL for the oidc user info cache.]
 
 |`OCIS_JWT_SECRET` +
 `PROXY_JWT_SECRET`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The secret to mint and validate jwt tokens.
+pass:[The secret to mint and validate jwt tokens.]
 
 |`PROXY_ENABLE_PRESIGNEDURLS`
 | bool
 a| [subs=-attributes]
-true 
+pass:[true]
 a| [subs=-attributes]
-Allow ocs to get a signing key to sign requests.
+pass:[Allow ocs to get a signing key to sign requests.]
 
 |`PROXY_ACCOUNT_BACKEND_TYPE`
 | string
 a| [subs=-attributes]
-cs3 
+pass:[cs3]
 a| [subs=-attributes]
-Account backend the proxy should use, currenly only 'cs3' is possible here.
+pass:[Account backend the proxy should use, currenly only 'cs3' is possible here.]
 
 |`PROXY_USER_OIDC_CLAIM`
 | string
 a| [subs=-attributes]
-email 
+pass:[email]
 a| [subs=-attributes]
-The name of an OpenID Connect claim that should be used for resolving users with the account backend. Currently defaults to 'email'.
+pass:[The name of an OpenID Connect claim that should be used for resolving users with the account backend. Currently defaults to 'email'.]
 
 |`PROXY_USER_CS3_CLAIM`
 | string
 a| [subs=-attributes]
-mail 
+pass:[mail]
 a| [subs=-attributes]
-The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail' (other possible values are: 'username', 'displayname')
+pass:[The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail' (other possible values are: 'username', 'displayname')]
 
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `PROXY_MACHINE_AUTH_API_KEY`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+pass:[Machine auth API key used to validate internal requests necessary for the access to resources from other services.]
 
 |`PROXY_AUTOPROVISION_ACCOUNTS`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Set this to 'true' to automatically provsion users that do not yet exist in the users service on-demand upon first signin. To use this a write-enabled libregraph user backend needs to be setup an running.
+pass:[Set this to 'true' to automatically provsion users that do not yet exist in the users service on-demand upon first signin. To use this a write-enabled libregraph user backend needs to be setup an running.]
 
 |`PROXY_ENABLE_BASIC_AUTH`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Set this to true to enable 'basic' (username/password) authentication.
+pass:[Set this to true to enable 'basic' (username/password) authentication.]
 
 |`PROXY_INSECURE_BACKENDS`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Disable TLS certificate validation for all http backend connections.
+pass:[Disable TLS certificate validation for all http backend connections.]
 |===
 
 Since Version: `+` added, `-` deprecated

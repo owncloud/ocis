@@ -11,203 +11,203 @@
 `SETTINGS_TRACING_ENABLED`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates tracing.
+pass:[Activates tracing.]
 
 |`OCIS_TRACING_TYPE` +
 `SETTINGS_TRACING_TYPE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
 
 |`OCIS_TRACING_ENDPOINT` +
 `SETTINGS_TRACING_ENDPOINT`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The endpoint of the tracing agent.
+pass:[The endpoint of the tracing agent.]
 
 |`OCIS_TRACING_COLLECTOR` +
 `SETTINGS_TRACING_COLLECTOR`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
 
 |`OCIS_LOG_LEVEL` +
 `SETTINGS_LOG_LEVEL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
 
 |`OCIS_LOG_PRETTY` +
 `SETTINGS_LOG_PRETTY`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates pretty log output.
+pass:[Activates pretty log output.]
 
 |`OCIS_LOG_COLOR` +
 `SETTINGS_LOG_COLOR`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates colorized log output.
+pass:[Activates colorized log output.]
 
 |`OCIS_LOG_FILE` +
 `SETTINGS_LOG_FILE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The path to the log file. Activates logging to this file if set.
+pass:[The path to the log file. Activates logging to this file if set.]
 
 |`SETTINGS_DEBUG_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9194 
+pass:[127.0.0.1:9194]
 a| [subs=-attributes]
-Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
 
 |`SETTINGS_DEBUG_TOKEN`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+pass:[Token to secure the metrics endpoint]
 
 |`SETTINGS_DEBUG_PPROF`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+pass:[Enables pprof, which can be used for profiling]
 
 |`SETTINGS_DEBUG_ZPAGES`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables zpages, which can be used for collecting and viewing in-memory traces.
+pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
 
 |`SETTINGS_HTTP_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9190 
+pass:[127.0.0.1:9190]
 a| [subs=-attributes]
-The bind address of the HTTP service.
+pass:[The bind address of the HTTP service.]
 
 |`SETTINGS_HTTP_ROOT`
 | string
 a| [subs=-attributes]
-/ 
+pass:[/]
 a| [subs=-attributes]
-Subdirectory that serves as the root for this HTTP service.
+pass:[Subdirectory that serves as the root for this HTTP service.]
 
 |`SETTINGS_CACHE_TTL`
 | int
 a| [subs=-attributes]
-604800 
+pass:[604800]
 a| [subs=-attributes]
-Browser cache control max-age value in seconds for settings Web UI assets.
+pass:[Browser cache control max-age value in seconds for settings Web UI assets.]
 
 |`SETTINGS_GRPC_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9191 
+pass:[127.0.0.1:9191]
 a| [subs=-attributes]
-The bind address of the GRPC service.
+pass:[The bind address of the GRPC service.]
 
 |`SETTINGS_STORE_TYPE`
 | string
 a| [subs=-attributes]
-metadata 
+pass:[metadata]
 a| [subs=-attributes]
-Store type configures the persistency driver. Possible values are "metadata" and "filesystem".
+pass:[Store type configures the persistency driver. Possible values are "metadata" and "filesystem".]
 
 |`SETTINGS_DATA_PATH`
 | string
 a| [subs=-attributes]
-~/.ocis/settings 
+pass:[~/.ocis/settings]
 a| [subs=-attributes]
-Path for the persistence directory.
+pass:[Path for the persistence directory.]
 
 |`STORAGE_GATEWAY_GRPC_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9215 
+pass:[127.0.0.1:9215]
 a| [subs=-attributes]
-GRPC address of the storage-system service.
+pass:[GRPC address of the storage-system service.]
 
 |`STORAGE_GRPC_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9215 
+pass:[127.0.0.1:9215]
 a| [subs=-attributes]
-GRPC address of the storage-system service.
+pass:[GRPC address of the storage-system service.]
 
 |`OCIS_SYSTEM_USER_ID` +
 `SETTINGS_SYSTEM_USER_ID`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
+pass:[ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.]
 
 |`OCIS_SYSTEM_USER_IDP` +
 `SETTINGS_SYSTEM_USER_IDP`
 | string
 a| [subs=-attributes]
-internal 
+pass:[internal]
 a| [subs=-attributes]
-IDP of the oCIS storage-system system user.
+pass:[IDP of the oCIS storage-system system user.]
 
 |`OCIS_SYSTEM_USER_API_KEY`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-API key for the storage-system system user.
+pass:[API key for the storage-system system user.]
 
 |`OCIS_ADMIN_USER_ID` +
 `SETTINGS_ADMIN_USER_ID`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-ID of a user, that should receive admin privileges.
+pass:[ID of a user, that should receive admin privileges.]
 
 |`SETTINGS_ASSET_PATH`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Serve settings Web UI assets from a path on the filesystem instead of the builtin assets. Can be used for development and customization.
+pass:[Serve settings Web UI assets from a path on the filesystem instead of the builtin assets. Can be used for development and customization.]
 
 |`OCIS_JWT_SECRET` +
 `SETTINGS_JWT_SECRET`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The secret to mint and validate jwt tokens.
+pass:[The secret to mint and validate jwt tokens.]
 
 |`SETTINGS_SETUP_DEFAULT_ASSIGNMENTS` +
 `ACCOUNTS_DEMO_USERS_AND_GROUPS`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-If the default role assignments for the demo users should be setup.
+pass:[If the default role assignments for the demo users should be setup.]
 |===
 
 Since Version: `+` added, `-` deprecated

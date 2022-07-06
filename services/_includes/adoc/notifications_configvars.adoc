@@ -11,126 +11,126 @@
 `NOTIFICATIONS_LOG_LEVEL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
 
 |`OCIS_LOG_PRETTY` +
 `NOTIFICATIONS_LOG_PRETTY`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates pretty log output.
+pass:[Activates pretty log output.]
 
 |`OCIS_LOG_COLOR` +
 `NOTIFICATIONS_LOG_COLOR`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates colorized log output.
+pass:[Activates colorized log output.]
 
 |`OCIS_LOG_FILE` +
 `NOTIFICATIONS_LOG_FILE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The path to the log file. Activates logging to this file if set.
+pass:[The path to the log file. Activates logging to this file if set.]
 
 |`NOTIFICATIONS_DEBUG_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9174 
+pass:[127.0.0.1:9174]
 a| [subs=-attributes]
-Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
 
 |`NOTIFICATIONS_DEBUG_TOKEN`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+pass:[Token to secure the metrics endpoint]
 
 |`NOTIFICATIONS_DEBUG_PPROF`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+pass:[Enables pprof, which can be used for profiling]
 
 |`NOTIFICATIONS_DEBUG_ZPAGES`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables zpages, which can be used for collecting and viewing in-memory traces.
+pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
 
 |`NOTIFICATIONS_SMTP_HOST`
 | string
 a| [subs=-attributes]
-127.0.0.1 
+pass:[127.0.0.1]
 a| [subs=-attributes]
-SMTP host, to connect to.
+pass:[SMTP host, to connect to.]
 
 |`NOTIFICATIONS_SMTP_PORT`
 | string
 a| [subs=-attributes]
-1025 
+pass:[1025]
 a| [subs=-attributes]
-Port of the SMTP host, to connect to.
+pass:[Port of the SMTP host, to connect to.]
 
 |`NOTIFICATIONS_SMTP_SENDER`
 | string
 a| [subs=-attributes]
-noreply@example.com 
+pass:[noreply@example.com]
 a| [subs=-attributes]
-Sender of emails, that will be sent.
+pass:[Sender of emails, that will be sent.]
 
 |`NOTIFICATIONS_SMTP_PASSWORD`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Password of the SMTP host, to connect to.
+pass:[Password of the SMTP host, to connect to.]
 
 |`NOTIFICATIONS_EVENTS_ENDPOINT`
 | string
 a| [subs=-attributes]
-127.0.0.1:9233 
+pass:[127.0.0.1:9233]
 a| [subs=-attributes]
-Endpoint of the event system.
+pass:[Endpoint of the event system.]
 
 |`NOTIFICATIONS_EVENTS_CLUSTER`
 | string
 a| [subs=-attributes]
-ocis-cluster 
+pass:[ocis-cluster]
 a| [subs=-attributes]
-Cluster ID of the event system.
+pass:[Cluster ID of the event system.]
 
 |`NOTIFICATIONS_EVENTS_GROUP`
 | string
 a| [subs=-attributes]
-notifications 
+pass:[notifications]
 a| [subs=-attributes]
-Name of the event group / queue on the event system.
+pass:[Name of the event group / queue on the event system.]
 
 |`REVA_GATEWAY` +
 `NOTIFICATIONS_REVA_GATEWAY`
 | string
 a| [subs=-attributes]
-127.0.0.1:9142 
+pass:[127.0.0.1:9142]
 a| [subs=-attributes]
-CS3 gateway used to look up user metadata
+pass:[CS3 gateway used to look up user metadata]
 
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `NOTIFICATIONS_MACHINE_AUTH_API_KEY`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+pass:[Machine auth API key used to validate internal requests necessary for the access to resources from other services.]
 |===
 
 Since Version: `+` added, `-` deprecated

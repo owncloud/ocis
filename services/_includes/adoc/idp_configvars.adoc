@@ -10,389 +10,389 @@
 |`IDP_PASSWORD_RESET_URI`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The URI where a user can reset their password.
+pass:[The URI where a user can reset their password.]
 
 |`OCIS_TRACING_ENABLED` +
 `IDP_TRACING_ENABLED`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates tracing.
+pass:[Activates tracing.]
 
 |`OCIS_TRACING_TYPE` +
 `IDP_TRACING_TYPE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
 
 |`OCIS_TRACING_ENDPOINT` +
 `IDP_TRACING_ENDPOINT`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The endpoint of the tracing agent.
+pass:[The endpoint of the tracing agent.]
 
 |`OCIS_TRACING_COLLECTOR` +
 `IDP_TRACING_COLLECTOR`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
 
 |`OCIS_LOG_LEVEL` +
 `IDP_LOG_LEVEL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
 
 |`OCIS_LOG_PRETTY` +
 `IDP_LOG_PRETTY`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates pretty log output.
+pass:[Activates pretty log output.]
 
 |`OCIS_LOG_COLOR` +
 `IDP_LOG_COLOR`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates colorized log output.
+pass:[Activates colorized log output.]
 
 |`OCIS_LOG_FILE` +
 `IDP_LOG_FILE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The path to the log file. Activates logging to this file if set.
+pass:[The path to the log file. Activates logging to this file if set.]
 
 |`IDP_DEBUG_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9134 
+pass:[127.0.0.1:9134]
 a| [subs=-attributes]
-Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
 
 |`IDP_DEBUG_TOKEN`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+pass:[Token to secure the metrics endpoint]
 
 |`IDP_DEBUG_PPROF`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+pass:[Enables pprof, which can be used for profiling]
 
 |`IDP_DEBUG_ZPAGES`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables zpages, which can be used for collecting and viewing in-memory traces.
+pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
 
 |`IDP_HTTP_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9130 
+pass:[127.0.0.1:9130]
 a| [subs=-attributes]
-The bind address of the HTTP service.
+pass:[The bind address of the HTTP service.]
 
 |`IDP_HTTP_ROOT`
 | string
 a| [subs=-attributes]
-/ 
+pass:[/]
 a| [subs=-attributes]
-Subdirectory that serves as the root for this HTTP service.
+pass:[Subdirectory that serves as the root for this HTTP service.]
 
 |`IDP_TRANSPORT_TLS_CERT`
 | string
 a| [subs=-attributes]
-~/.ocis/idp/server.crt 
+pass:[~/.ocis/idp/server.crt]
 a| [subs=-attributes]
-
+pass:[]
 
 |`IDP_TRANSPORT_TLS_KEY`
 | string
 a| [subs=-attributes]
-~/.ocis/idp/server.key 
+pass:[~/.ocis/idp/server.key]
 a| [subs=-attributes]
-
+pass:[]
 
 |`IDP_TLS`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-
+pass:[]
 
 |`REVA_GATEWAY`
 | string
 a| [subs=-attributes]
-127.0.0.1:9142 
+pass:[127.0.0.1:9142]
 a| [subs=-attributes]
-CS3 gateway used to authenticate and look up users
+pass:[CS3 gateway used to authenticate and look up users]
 
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `IDP_MACHINE_AUTH_API_KEY`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+pass:[Machine auth API key used to validate internal requests necessary for the access to resources from other services.]
 
 |`IDP_ASSET_PATH`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Serve IDP assets from a path on the filesystem instead of the builtin assets.
+pass:[Serve IDP assets from a path on the filesystem instead of the builtin assets.]
 
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
 `IDP_ISS`
 | string
 a| [subs=-attributes]
-\https://localhost:9200 
+pass:[https://localhost:9200]
 a| [subs=-attributes]
-The OIDC issuer URL to use.
+pass:[The OIDC issuer URL to use.]
 
 |`IDP_IDENTITY_MANAGER`
 | string
 a| [subs=-attributes]
-ldap 
+pass:[ldap]
 a| [subs=-attributes]
-The identity manager implementation to use, defaults to 'ldap', can be changed to 'cs3', 'kc', 'libregraph', 'cookie' or 'guest'.
+pass:[The identity manager implementation to use, defaults to 'ldap', can be changed to 'cs3', 'kc', 'libregraph', 'cookie' or 'guest'.]
 
 |`IDP_URI_BASE_PATH`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Idp uri base path (defaults to "").
+pass:[Idp uri base path (defaults to "").]
 
 |`IDP_SIGN_IN_URI`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Idp sign-in url.
+pass:[Idp sign-in url.]
 
 |`IDP_SIGN_OUT_URI`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Idp sign-out url.
+pass:[Idp sign-out url.]
 
 |`IDP_ENDPOINT_URI`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Url of IDP endpoint.
+pass:[Url of IDP endpoint.]
 
 |`LDAP_INSECURE` +
 `IDP_INSECURE`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Allow insecure connections to the user backend (eg. LDAP, CS3 api, ...).
+pass:[Allow insecure connections to the user backend (eg. LDAP, CS3 api, ...).]
 
 |`IDP_ALLOW_CLIENT_GUESTS`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Allow guest clients to access ocis.
+pass:[Allow guest clients to access ocis.]
 
 |`IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Allow dynamic client registration.
+pass:[Allow dynamic client registration.]
 
 |`IDP_ENCRYPTION_SECRET_FILE`
 | string
 a| [subs=-attributes]
-~/.ocis/idp/encryption.key 
+pass:[~/.ocis/idp/encryption.key]
 a| [subs=-attributes]
-Path to the encryption secret file, if unset, a new certificate will be autogenerated upon each restart, thus invalidating all existing sessions.
+pass:[Path to the encryption secret file, if unset, a new certificate will be autogenerated upon each restart, thus invalidating all existing sessions.]
 
 |`IDP_SIGNING_KID`
 | string
 a| [subs=-attributes]
-private-key 
+pass:[private-key]
 a| [subs=-attributes]
-Value of the KID (Key ID) field which is used in created tokens to uniquely identify the signing-private-key.
+pass:[Value of the KID (Key ID) field which is used in created tokens to uniquely identify the signing-private-key.]
 
 |`IDP_SIGNING_METHOD`
 | string
 a| [subs=-attributes]
-PS256 
+pass:[PS256]
 a| [subs=-attributes]
-Signing method of idp requests (e.g. PS256)
+pass:[Signing method of idp requests (e.g. PS256)]
 
 |`IDP_SIGNING_PRIVATE_KEY_FILES`
 | 
 a| [subs=-attributes]
-[~/.ocis/idp/private-key.pem] 
+pass:[[~/.ocis/idp/private-key.pem]]
 a| [subs=-attributes]
-Private key files for signing idp requests.
+pass:[Private key files for signing idp requests.]
 
 |`IDP_VALIDATION_KEYS_PATH`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Path to validation keys for idp requests.
+pass:[Path to validation keys for idp requests.]
 
 |`IDP_ACCESS_TOKEN_EXPIRATION`
 | uint64
 a| [subs=-attributes]
-86400 
+pass:[86400]
 a| [subs=-attributes]
-Expiration time for idp access token (in seconds).
+pass:[Expiration time for idp access token (in seconds).]
 
 |`IDP_ID_TOKEN_EXPIRATION`
 | uint64
 a| [subs=-attributes]
-3600 
+pass:[3600]
 a| [subs=-attributes]
-Expiration time for idp id tokens (in seconds).
+pass:[Expiration time for idp id tokens (in seconds).]
 
 |`IDP_REFRESH_TOKEN_EXPIRATION`
 | uint64
 a| [subs=-attributes]
-94608000 
+pass:[94608000]
 a| [subs=-attributes]
-Expiration time for refresh tokens (in seconds).
+pass:[Expiration time for refresh tokens (in seconds).]
 
 |`IDP_DYNAMIC_CLIENT_SECRET_DURATION`
 | uint64
 a| [subs=-attributes]
-0 
+pass:[0]
 a| [subs=-attributes]
-Expiration time for dynamic clients (in seconds).
+pass:[Expiration time for dynamic clients (in seconds).]
 
 |`LDAP_URI` +
 `IDP_LDAP_URI`
 | string
 a| [subs=-attributes]
-ldaps://localhost:9235 
+pass:[ldaps://localhost:9235]
 a| [subs=-attributes]
-Url of the LDAP service to use as idp.
+pass:[Url of the LDAP service to use as idp.]
 
 |`LDAP_CACERT` +
 `IDP_LDAP_TLS_CACERT`
 | string
 a| [subs=-attributes]
-~/.ocis/idm/ldap.crt 
+pass:[~/.ocis/idm/ldap.crt]
 a| [subs=-attributes]
-Path to the tls cert for the ldap service.
+pass:[Path to the tls cert for the ldap service.]
 
 |`LDAP_BIND_DN` +
 `IDP_LDAP_BIND_DN`
 | string
 a| [subs=-attributes]
-uid=idp,ou=sysusers,o=libregraph-idm 
+pass:[uid=idp,ou=sysusers,o=libregraph-idm]
 a| [subs=-attributes]
-LDAP DN to use for simple bind authentication with the target LDAP server.
+pass:[LDAP DN to use for simple bind authentication with the target LDAP server.]
 
 |`LDAP_BIND_PASSWORD` +
 `IDP_LDAP_BIND_PASSWORD`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Password to use for authenticating the 'bind_dn'.
+pass:[Password to use for authenticating the 'bind_dn'.]
 
 |`LDAP_USER_BASE_DN` +
 `IDP_LDAP_BASE_DN`
 | string
 a| [subs=-attributes]
-ou=users,o=libregraph-idm 
+pass:[ou=users,o=libregraph-idm]
 a| [subs=-attributes]
-Search base DN for looking up LDAP users.
+pass:[Search base DN for looking up LDAP users.]
 
 |`LDAP_USER_SCOPE` +
 `IDP_LDAP_SCOPE`
 | string
 a| [subs=-attributes]
-sub 
+pass:[sub]
 a| [subs=-attributes]
-LDAP search scope to use when looking up users ('base', 'one', 'sub').
+pass:[LDAP search scope to use when looking up users ('base', 'one', 'sub').]
 
 |`IDP_LDAP_LOGIN_ATTRIBUTE`
 | string
 a| [subs=-attributes]
-uid 
+pass:[uid]
 a| [subs=-attributes]
-LDAP User attribute to use for login (e.g. uid).
+pass:[LDAP User attribute to use for login (e.g. uid).]
 
 |`LDAP_USER_SCHEMA_MAIL` +
 `IDP_LDAP_EMAIL_ATTRIBUTE`
 | string
 a| [subs=-attributes]
-mail 
+pass:[mail]
 a| [subs=-attributes]
-LDAP User email attribute (e.g. mail).
+pass:[LDAP User email attribute (e.g. mail).]
 
 |`LDAP_USER_SCHEMA_USERNAME` +
 `IDP_LDAP_NAME_ATTRIBUTE`
 | string
 a| [subs=-attributes]
-displayName 
+pass:[displayName]
 a| [subs=-attributes]
-LDAP User name attribute (e.g. displayName).
+pass:[LDAP User name attribute (e.g. displayName).]
 
 |`LDAP_USER_SCHEMA_ID` +
 `IDP_LDAP_UUID_ATTRIBUTE`
 | string
 a| [subs=-attributes]
-uid 
+pass:[uid]
 a| [subs=-attributes]
-LDAP User uuid attribute (e.g. uid).
+pass:[LDAP User uuid attribute (e.g. uid).]
 
 |`IDP_LDAP_UUID_ATTRIBUTE_TYPE`
 | string
 a| [subs=-attributes]
-text 
+pass:[text]
 a| [subs=-attributes]
-LDAP User uuid attribute type (e.g. text).
+pass:[LDAP User uuid attribute type (e.g. text).]
 
 |`LDAP_USER_FILTER` +
 `IDP_LDAP_FILTER`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').
+pass:[LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').]
 
 |`LDAP_USER_OBJECTCLASS` +
 `IDP_LDAP_OBJECTCLASS`
 | string
 a| [subs=-attributes]
-inetOrgPerson 
+pass:[inetOrgPerson]
 a| [subs=-attributes]
-LDAP User ObjectClass (e.g. inetOrgPerson).
+pass:[LDAP User ObjectClass (e.g. inetOrgPerson).]
 |===
 
 Since Version: `+` added, `-` deprecated

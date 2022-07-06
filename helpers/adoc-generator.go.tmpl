@@ -89,9 +89,9 @@ func GetAnnotatedVariables(s interface{}) []ConfigField {
 			}
 			v := fmt.Sprintf("%v", value.Interface())			
 			td := strings.Split(env, ";")
-			re := regexp.MustCompile(`^(https?:\/\/)`)
-			v = re.ReplaceAllString(v,"\\$1")
-			re = regexp.MustCompile(`(https?:\/\/)`)
+			// re := regexp.MustCompile(`^(https?:\/\/)`)
+			// v = re.ReplaceAllString(v,"\\$1")
+			re := regexp.MustCompile(`(https?:\/\/)`)
 			desc = re.ReplaceAllString(desc, "\\$1")
 			re = regexp.MustCompile(`(\|)`)
 			v = re.ReplaceAllString(v, "\\$1")

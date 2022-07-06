@@ -11,353 +11,353 @@
 `GRAPH_TRACING_ENABLED`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates tracing.
+pass:[Activates tracing.]
 
 |`OCIS_TRACING_TYPE` +
 `GRAPH_TRACING_TYPE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
 
 |`OCIS_TRACING_ENDPOINT` +
 `GRAPH_TRACING_ENDPOINT`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The endpoint of the tracing agent.
+pass:[The endpoint of the tracing agent.]
 
 |`OCIS_TRACING_COLLECTOR` +
 `GRAPH_TRACING_COLLECTOR`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
 
 |`OCIS_LOG_LEVEL` +
 `GRAPH_LOG_LEVEL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
 
 |`OCIS_LOG_PRETTY` +
 `GRAPH_LOG_PRETTY`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates pretty log output.
+pass:[Activates pretty log output.]
 
 |`OCIS_LOG_COLOR` +
 `GRAPH_LOG_COLOR`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates colorized log output.
+pass:[Activates colorized log output.]
 
 |`OCIS_LOG_FILE` +
 `GRAPH_LOG_FILE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The path to the log file. Activates logging to this file if set.
+pass:[The path to the log file. Activates logging to this file if set.]
 
 |`GRAPH_DEBUG_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9124 
+pass:[127.0.0.1:9124]
 a| [subs=-attributes]
-Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
 
 |`GRAPH_DEBUG_TOKEN`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+pass:[Token to secure the metrics endpoint]
 
 |`GRAPH_DEBUG_PPROF`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+pass:[Enables pprof, which can be used for profiling]
 
 |`GRAPH_DEBUG_ZPAGES`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables zpages, which can be used for collecting and viewing in-memory traces.
+pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
 
 |`GRAPH_HTTP_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9120 
+pass:[127.0.0.1:9120]
 a| [subs=-attributes]
-The bind address of the HTTP service.
+pass:[The bind address of the HTTP service.]
 
 |`GRAPH_HTTP_ROOT`
 | string
 a| [subs=-attributes]
-/graph 
+pass:[/graph]
 a| [subs=-attributes]
-Subdirectory that serves as the root for this HTTP service.
+pass:[Subdirectory that serves as the root for this HTTP service.]
 
 |`REVA_GATEWAY`
 | string
 a| [subs=-attributes]
-127.0.0.1:9142 
+pass:[127.0.0.1:9142]
 a| [subs=-attributes]
-The CS3 gateway endpoint.
+pass:[The CS3 gateway endpoint.]
 
 |`OCIS_JWT_SECRET` +
 `GRAPH_JWT_SECRET`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The secret to mint and validate jwt tokens.
+pass:[The secret to mint and validate jwt tokens.]
 
 |`OCIS_URL` +
 `GRAPH_SPACES_WEBDAV_BASE`
 | string
 a| [subs=-attributes]
-\https://localhost:9200 
+pass:[https://localhost:9200]
 a| [subs=-attributes]
-The public facing URL of WebDAV.
+pass:[The public facing URL of WebDAV.]
 
 |`GRAPH_SPACES_WEBDAV_PATH`
 | string
 a| [subs=-attributes]
-/dav/spaces/ 
+pass:[/dav/spaces/]
 a| [subs=-attributes]
-The WebDAV subpath for spaces.
+pass:[The WebDAV subpath for spaces.]
 
 |`GRAPH_SPACES_DEFAULT_QUOTA`
 | string
 a| [subs=-attributes]
-1000000000 
+pass:[1000000000]
 a| [subs=-attributes]
-The default quota in bytes.
+pass:[The default quota in bytes.]
 
 |`OCIS_INSECURE` +
 `GRAPH_SPACES_INSECURE`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Allow insecure connetctions to the spaces.
+pass:[Allow insecure connetctions to the spaces.]
 
 |`GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL`
 | int
 a| [subs=-attributes]
-0 
+pass:[0]
 a| [subs=-attributes]
-Max TTL for the spaces property cache.
+pass:[Max TTL for the spaces property cache.]
 
 |`GRAPH_IDENTITY_BACKEND`
 | string
 a| [subs=-attributes]
-ldap 
+pass:[ldap]
 a| [subs=-attributes]
-The user identity backend to use, defaults to 'ldap', can be 'cs3'.
+pass:[The user identity backend to use, defaults to 'ldap', can be 'cs3'.]
 
 |`LDAP_URI` +
 `GRAPH_LDAP_URI`
 | string
 a| [subs=-attributes]
-ldaps://localhost:9235 
+pass:[ldaps://localhost:9235]
 a| [subs=-attributes]
-URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
+pass:[URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://']
 
 |`LDAP_CACERT` +
 `GRAPH_LDAP_CACERT`
 | string
 a| [subs=-attributes]
-~/.ocis/idm/ldap.crt 
+pass:[~/.ocis/idm/ldap.crt]
 a| [subs=-attributes]
-The certificate to verify TLS connections
+pass:[The certificate to verify TLS connections]
 
 |`LDAP_INSECURE` +
 `GRAPH_LDAP_INSECURE`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.
+pass:[Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.]
 
 |`LDAP_BIND_DN` +
 `GRAPH_LDAP_BIND_DN`
 | string
 a| [subs=-attributes]
-uid=libregraph,ou=sysusers,o=libregraph-idm 
+pass:[uid=libregraph,ou=sysusers,o=libregraph-idm]
 a| [subs=-attributes]
-LDAP DN to use for simple bind authentication with the target LDAP server.
+pass:[LDAP DN to use for simple bind authentication with the target LDAP server.]
 
 |`LDAP_BIND_PASSWORD` +
 `GRAPH_LDAP_BIND_PASSWORD`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Password to use for authenticating the 'bind_dn'.
+pass:[Password to use for authenticating the 'bind_dn'.]
 
 |`GRAPH_LDAP_SERVER_UUID`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-If set to true, rely on the LDAP Server to generate a unique ID for users and groups, e.g. when using 'entryUUID' as the user id attribute.
+pass:[If set to true, rely on the LDAP Server to generate a unique ID for users and groups, e.g. when using 'entryUUID' as the user id attribute.]
 
 |`GRAPH_LDAP_SERVER_USE_PASSWORD_MODIFY_EXOP`
 | bool
 a| [subs=-attributes]
-true 
+pass:[true]
 a| [subs=-attributes]
-User the Password Modify Extended Operation for updating user passwords
+pass:[User the Password Modify Extended Operation for updating user passwords]
 
 |`GRAPH_LDAP_SERVER_WRITE_ENABLED`
 | bool
 a| [subs=-attributes]
-true 
+pass:[true]
 a| [subs=-attributes]
-Allow to create, modify and delete LDAP users via graph API. This is only works when the default Schema is used.
+pass:[Allow to create, modify and delete LDAP users via graph API. This is only works when the default Schema is used.]
 
 |`LDAP_USER_BASE_DN` +
 `GRAPH_LDAP_USER_BASE_DN`
 | string
 a| [subs=-attributes]
-ou=users,o=libregraph-idm 
+pass:[ou=users,o=libregraph-idm]
 a| [subs=-attributes]
-Search base DN for looking up LDAP users.
+pass:[Search base DN for looking up LDAP users.]
 
 |`LDAP_USER_SCOPE` +
 `GRAPH_LDAP_USER_SCOPE`
 | string
 a| [subs=-attributes]
-sub 
+pass:[sub]
 a| [subs=-attributes]
-LDAP search scope to use when looking up users ('base', 'one', 'sub').
+pass:[LDAP search scope to use when looking up users ('base', 'one', 'sub').]
 
 |`LDAP_USER_FILTER` +
 `GRAPH_LDAP_USER_FILTER`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').
+pass:[LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').]
 
 |`LDAP_USER_OBJECTCLASS` +
 `GRAPH_LDAP_USER_OBJECTCLASS`
 | string
 a| [subs=-attributes]
-inetOrgPerson 
+pass:[inetOrgPerson]
 a| [subs=-attributes]
-The object class to use for users in the default user search filter ('inetOrgPerson').
+pass:[The object class to use for users in the default user search filter ('inetOrgPerson').]
 
 |`LDAP_USER_SCHEMA_MAIL` +
 `GRAPH_LDAP_USER_EMAIL_ATTRIBUTE`
 | string
 a| [subs=-attributes]
-mail 
+pass:[mail]
 a| [subs=-attributes]
-LDAP Attribute to use for the email address of users.
+pass:[LDAP Attribute to use for the email address of users.]
 
 |`LDAP_USER_SCHEMA_DISPLAY_NAME` +
 `GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE`
 | string
 a| [subs=-attributes]
-displayName 
+pass:[displayName]
 a| [subs=-attributes]
-LDAP Attribute to use for the displayname of users.
+pass:[LDAP Attribute to use for the displayname of users.]
 
 |`LDAP_USER_SCHEMA_USERNAME` +
 `GRAPH_LDAP_USER_NAME_ATTRIBUTE`
 | string
 a| [subs=-attributes]
-uid 
+pass:[uid]
 a| [subs=-attributes]
-LDAP Attribute to use for username of users.
+pass:[LDAP Attribute to use for username of users.]
 
 |`LDAP_USER_SCHEMA_ID` +
 `GRAPH_LDAP_USER_UID_ATTRIBUTE`
 | string
 a| [subs=-attributes]
-owncloudUUID 
+pass:[owncloudUUID]
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for users. This should be a stable globally unique id (e.g. a UUID).
+pass:[LDAP Attribute to use as the unique id for users. This should be a stable globally unique id (e.g. a UUID).]
 
 |`LDAP_GROUP_BASE_DN` +
 `GRAPH_LDAP_GROUP_BASE_DN`
 | string
 a| [subs=-attributes]
-ou=groups,o=libregraph-idm 
+pass:[ou=groups,o=libregraph-idm]
 a| [subs=-attributes]
-Search base DN for looking up LDAP groups.
+pass:[Search base DN for looking up LDAP groups.]
 
 |`LDAP_GROUP_SCOPE` +
 `GRAPH_LDAP_GROUP_SEARCH_SCOPE`
 | string
 a| [subs=-attributes]
-sub 
+pass:[sub]
 a| [subs=-attributes]
-LDAP search scope to use when looking up gruops ('base', 'one', 'sub').
+pass:[LDAP search scope to use when looking up gruops ('base', 'one', 'sub').]
 
 |`LDAP_GROUP_FILTER` +
 `GRAPH_LDAP_GROUP_FILTER`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-LDAP filter to add to the default filters for group searches.
+pass:[LDAP filter to add to the default filters for group searches.]
 
 |`LDAP_GROUP_OBJECTCLASS` +
 `GRAPH_LDAP_GROUP_OBJECTCLASS`
 | string
 a| [subs=-attributes]
-groupOfNames 
+pass:[groupOfNames]
 a| [subs=-attributes]
-The object class to use for groups in the default group search filter ('groupOfNames'). 
+pass:[The object class to use for groups in the default group search filter ('groupOfNames'). ]
 
 |`LDAP_GROUP_SCHEMA_GROUPNAME` +
 `GRAPH_LDAP_GROUP_NAME_ATTRIBUTE`
 | string
 a| [subs=-attributes]
-cn 
+pass:[cn]
 a| [subs=-attributes]
-LDAP Attribute to use for the name of groups
+pass:[LDAP Attribute to use for the name of groups]
 
 |`LDAP_GROUP_SCHEMA_ID` +
 `GRAPH_LDAP_GROUP_ID_ATTRIBUTE`
 | string
 a| [subs=-attributes]
-owncloudUUID 
+pass:[owncloudUUID]
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
+pass:[LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).]
 
 |`GRAPH_EVENTS_ENDPOINT`
 | string
 a| [subs=-attributes]
-127.0.0.1:9233 
+pass:[127.0.0.1:9233]
 a| [subs=-attributes]
-the address of the streaming service
+pass:[the address of the streaming service]
 
 |`GRAPH_EVENTS_CLUSTER`
 | string
 a| [subs=-attributes]
-ocis-cluster 
+pass:[ocis-cluster]
 a| [subs=-attributes]
-the clusterID of the streaming service. Mandatory when using nats
+pass:[the clusterID of the streaming service. Mandatory when using nats]
 |===
 
 Since Version: `+` added, `-` deprecated

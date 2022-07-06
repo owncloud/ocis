@@ -11,199 +11,199 @@
 `APP_PROVIDER_TRACING_ENABLED`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates tracing.
+pass:[Activates tracing.]
 
 |`OCIS_TRACING_TYPE` +
 `APP_PROVIDER_TRACING_TYPE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
 
 |`OCIS_TRACING_ENDPOINT` +
 `APP_PROVIDER_TRACING_ENDPOINT`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The endpoint of the tracing agent.
+pass:[The endpoint of the tracing agent.]
 
 |`OCIS_TRACING_COLLECTOR` +
 `APP_PROVIDER_TRACING_COLLECTOR`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
 
 |`OCIS_LOG_LEVEL` +
 `APP_PROVIDER_LOG_LEVEL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
 
 |`OCIS_LOG_PRETTY` +
 `APP_PROVIDER_LOG_PRETTY`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates pretty log output.
+pass:[Activates pretty log output.]
 
 |`OCIS_LOG_COLOR` +
 `APP_PROVIDER_LOG_COLOR`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Activates colorized log output.
+pass:[Activates colorized log output.]
 
 |`OCIS_LOG_FILE` +
 `APP_PROVIDER_LOG_FILE`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The path to the log file. Activates logging to this file if set.
+pass:[The path to the log file. Activates logging to this file if set.]
 
 |`APP_PROVIDER_DEBUG_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9165 
+pass:[127.0.0.1:9165]
 a| [subs=-attributes]
-Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
 
 |`APP_PROVIDER_DEBUG_TOKEN`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+pass:[Token to secure the metrics endpoint]
 
 |`APP_PROVIDER_DEBUG_PPROF`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+pass:[Enables pprof, which can be used for profiling]
 
 |`APP_PROVIDER_DEBUG_ZPAGES`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Enables zpages, which can  be used for collecting and viewing traces in-memory.
+pass:[Enables zpages, which can  be used for collecting and viewing traces in-memory.]
 
 |`APP_PROVIDER_GRPC_ADDR`
 | string
 a| [subs=-attributes]
-127.0.0.1:9164 
+pass:[127.0.0.1:9164]
 a| [subs=-attributes]
-The bind address of the GRPC service.
+pass:[The bind address of the GRPC service.]
 
 |`APP_PROVIDER_GRPC_PROTOCOL`
 | string
 a| [subs=-attributes]
-tcp 
+pass:[tcp]
 a| [subs=-attributes]
-The transport protocol of the grpc service.
+pass:[The transport protocol of the grpc service.]
 
 |`OCIS_JWT_SECRET` +
 `APP_PROVIDER_JWT_SECRET`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-The secret to mint and validate jwt tokens.
+pass:[The secret to mint and validate jwt tokens.]
 
 |`REVA_GATEWAY`
 | string
 a| [subs=-attributes]
-127.0.0.1:9142 
+pass:[127.0.0.1:9142]
 a| [subs=-attributes]
-The CS3 gateway endpoint.
+pass:[The CS3 gateway endpoint.]
 
 |`APP_PROVIDER_EXTERNAL_ADDR`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Address of the app provider, where the gateway service can reach it.
+pass:[Address of the app provider, where the gateway service can reach it.]
 
 |`APP_PROVIDER_DRIVER`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Driver, which the app provider uses. Only "wopi" is supported as of now.
+pass:[Driver, which the app provider uses. Only "wopi" is supported as of now.]
 
 |`APP_PROVIDER_WOPI_APP_API_KEY`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-API key for the wopi app.
+pass:[API key for the wopi app.]
 
 |`APP_PROVIDER_WOPI_APP_DESKTOP_ONLY`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Offer this app only on desktop.
+pass:[Offer this app only on desktop.]
 
 |`APP_PROVIDER_WOPI_APP_ICON_URI`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-URI to an app icon to be used by clients.
+pass:[URI to an app icon to be used by clients.]
 
 |`APP_PROVIDER_WOPI_APP_INTERNAL_URL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Internal URL to the app, eg in your DMZ.
+pass:[Internal URL to the app, eg in your DMZ.]
 
 |`APP_PROVIDER_WOPI_APP_NAME`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Human readable app name.
+pass:[Human readable app name.]
 
 |`APP_PROVIDER_WOPI_APP_URL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-URL for end users to access the app.
+pass:[URL for end users to access the app.]
 
 |`APP_PROVIDER_WOPI_INSECURE`
 | bool
 a| [subs=-attributes]
-false 
+pass:[false]
 a| [subs=-attributes]
-Allow insecure connections to the app.
+pass:[Allow insecure connections to the app.]
 
 |`APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-Shared secret of the CS3org WOPI server.
+pass:[Shared secret of the CS3org WOPI server.]
 
 |`APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL`
 | string
 a| [subs=-attributes]
- 
+pass:[]
 a| [subs=-attributes]
-External url of the CS3org WOPI server.
+pass:[External url of the CS3org WOPI server.]
 |===
 
 Since Version: `+` added, `-` deprecated
