@@ -20,6 +20,6 @@ var _ = Describe("ldap", func() {
 		Entry("only one space", " ", "\\ "),
 		Entry("two spaces", "  ", "\\ \\ "),
 		Entry("ending with space", "foobar ", "foobar\\ "),
-		Entry("containing multiple special chars", `f+o>o,b<a;r="\00"`, `f\+o\>o\,b\<a\;r\=\\"\\00\\"`),
+		Entry("containing multiple special chars", "f+o>o,b<a;r=\"\000", `f\+o\>o\,b\<a\;r\=\\"\00`),
 	)
 })
