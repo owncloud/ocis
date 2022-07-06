@@ -208,8 +208,8 @@ def main(ctx):
         [releaseSubmodule(ctx)]
 
     build_release_helpers = [
-        changelog(ctx),
-        docs(ctx),
+        changelog(),
+        docs(),
     ]
 
     test_pipelines.append(
@@ -248,7 +248,7 @@ def main(ctx):
     # always append notification step
     pipelines.append(
         pipelineDependsOn(
-            notify(ctx),
+            notify(),
             pipelines,
         ),
     )
@@ -269,7 +269,6 @@ def yarnCache(ctx):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/**",
                 "refs/pull/**",
             ],
         },
@@ -416,7 +415,6 @@ def testOcisModule(ctx, module):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/tags/%s/v*" % (module),
                 "refs/pull/**",
             ],
@@ -441,7 +439,6 @@ def buildOcisBinaryForTesting(ctx):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
@@ -558,7 +555,6 @@ def uploadScanResults(ctx):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
@@ -613,7 +609,6 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
@@ -645,7 +640,6 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
@@ -701,7 +695,6 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
@@ -735,7 +728,7 @@ def uiTests(ctx):
     filterTags = params["filterTags"]
     earlyFail = params["earlyFail"]
 
-    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "tag" or ctx.build.event == "cron"):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
         numberOfParts = params["numberOfParts"]
         skipExceptParts = params["skipExceptParts"]
         debugPartsEnabled = (len(skipExceptParts) != 0)
@@ -818,7 +811,6 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
@@ -885,7 +877,6 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
@@ -959,7 +950,7 @@ def dockerReleases(ctx):
     for arch in config["dockerReleases"]["architectures"]:
         pipelines.append(dockerRelease(ctx, arch))
 
-    manifest = releaseDockerManifest(ctx)
+    manifest = releaseDockerManifest()
     manifest["depends_on"] = getPipelineNames(pipelines)
     pipelines.append(manifest)
 
@@ -974,6 +965,10 @@ def dockerRelease(ctx, arch):
         "REVISION=%s" % (ctx.build.commit),
         "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "latest"),
     ]
+    depends_on = getPipelineNames(testOcisModules(ctx) + testPipelines(ctx))
+
+    if ctx.build.event == "tag":
+        depends_on = []
 
     return {
         "kind": "pipeline",
@@ -1038,7 +1033,7 @@ def dockerRelease(ctx, arch):
                 },
             },
         ],
-        "depends_on": getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
+        "depends_on": depends_on,
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -1059,6 +1054,7 @@ def binaryReleases(ctx):
 def binaryRelease(ctx, name):
     # uploads binary to https://download.owncloud.com/ocis/ocis/daily/
     target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
+    depends_on = getPipelineNames(testOcisModules(ctx) + testPipelines(ctx))
     if ctx.build.event == "tag":
         # uploads binary to eg. https://download.owncloud.com/ocis/ocis/1.0.0-beta9/
         folder = "stable"
@@ -1067,6 +1063,7 @@ def binaryRelease(ctx, name):
         if buildref.find("-") != -1:  # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
             folder = "testing"
         target = "/ocis/%s/%s/%s" % (ctx.repo.name.replace("ocis-", ""), folder, buildref)
+        depends_on = []
 
     settings = {
         "endpoint": {
@@ -1163,7 +1160,7 @@ def binaryRelease(ctx, name):
                 },
             },
         ],
-        "depends_on": getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
+        "depends_on": depends_on,
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -1177,7 +1174,6 @@ def binaryRelease(ctx, name):
 def licenseCheck(ctx):
     # uploads third-party-licenses to https://download.owncloud.com/ocis/ocis/daily/
     target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
-    depends_on = []
     if ctx.build.event == "tag":
         # uploads third-party-licenses to eg. https://download.owncloud.com/ocis/ocis/1.0.0-beta9/
         folder = "stable"
@@ -1186,7 +1182,6 @@ def licenseCheck(ctx):
         if buildref.find("-") != -1:  # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
             folder = "testing"
         target = "/ocis/%s/%s/%s" % (ctx.repo.name.replace("ocis-", ""), folder, buildref)
-        depends_on = getPipelineNames(testOcisModules(ctx) + testPipelines(ctx))
 
     settings = {
         "endpoint": {
@@ -1297,7 +1292,6 @@ def licenseCheck(ctx):
                 },
             },
         ],
-        "depends_on": depends_on,
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -1351,7 +1345,7 @@ def releaseSubmodule(ctx):
         },
     }
 
-def releaseDockerManifest(ctx):
+def releaseDockerManifest():
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -1385,7 +1379,7 @@ def releaseDockerManifest(ctx):
         },
     }
 
-def changelog(ctx):
+def changelog():
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -1487,7 +1481,7 @@ def releaseDockerReadme(ctx):
         },
     }
 
-def docs(ctx):
+def docs():
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -1609,7 +1603,7 @@ def makeGoGenerate(module):
         },
     ]
 
-def notify(ctx):
+def notify():
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -2313,7 +2307,6 @@ def parallelDeployAcceptancePipeline(ctx):
             else:
                 pipeline["trigger"]["ref"] = [
                     "refs/heads/master",
-                    "refs/tags/v*",
                     "refs/pull/**",
                 ]
 
@@ -2615,7 +2608,6 @@ def litmus(ctx, storage):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
