@@ -9,355 +9,401 @@
 
 |`OCIS_TRACING_ENABLED` +
 `GRAPH_TRACING_ENABLED`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates tracing.]
+Activates tracing.
 
 |`OCIS_TRACING_TYPE` +
 `GRAPH_TRACING_TYPE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
+The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
 
 |`OCIS_TRACING_ENDPOINT` +
 `GRAPH_TRACING_ENDPOINT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The endpoint of the tracing agent.]
+The endpoint of the tracing agent.
 
 |`OCIS_TRACING_COLLECTOR` +
 `GRAPH_TRACING_COLLECTOR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 |`OCIS_LOG_LEVEL` +
 `GRAPH_LOG_LEVEL`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
+The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 
 |`OCIS_LOG_PRETTY` +
 `GRAPH_LOG_PRETTY`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates pretty log output.]
+Activates pretty log output.
 
 |`OCIS_LOG_COLOR` +
 `GRAPH_LOG_COLOR`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates colorized log output.]
+Activates colorized log output.
 
 |`OCIS_LOG_FILE` +
 `GRAPH_LOG_FILE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The path to the log file. Activates logging to this file if set.]
+The path to the log file. Activates logging to this file if set.
 
 |`GRAPH_DEBUG_ADDR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9124]
 a| [subs=-attributes]
-pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
 |`GRAPH_DEBUG_TOKEN`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Token to secure the metrics endpoint]
+Token to secure the metrics endpoint
 
 |`GRAPH_DEBUG_PPROF`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Enables pprof, which can be used for profiling]
+Enables pprof, which can be used for profiling
 
 |`GRAPH_DEBUG_ZPAGES`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 |`GRAPH_HTTP_ADDR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9120]
 a| [subs=-attributes]
-pass:[The bind address of the HTTP service.]
+The bind address of the HTTP service.
 
 |`GRAPH_HTTP_ROOT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[/graph]
 a| [subs=-attributes]
-pass:[Subdirectory that serves as the root for this HTTP service.]
+Subdirectory that serves as the root for this HTTP service.
 
 |`REVA_GATEWAY`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9142]
 a| [subs=-attributes]
-pass:[The CS3 gateway endpoint.]
+The CS3 gateway endpoint.
 
 |`OCIS_JWT_SECRET` +
 `GRAPH_JWT_SECRET`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The secret to mint and validate jwt tokens.]
+The secret to mint and validate jwt tokens.
 
 |`OCIS_URL` +
 `GRAPH_SPACES_WEBDAV_BASE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[https://localhost:9200]
 a| [subs=-attributes]
-pass:[The public facing URL of WebDAV.]
+The public facing URL of WebDAV.
 
 |`GRAPH_SPACES_WEBDAV_PATH`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[/dav/spaces/]
 a| [subs=-attributes]
-pass:[The WebDAV subpath for spaces.]
+The WebDAV subpath for spaces.
 
 |`GRAPH_SPACES_DEFAULT_QUOTA`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[1000000000]
 a| [subs=-attributes]
-pass:[The default quota in bytes.]
+The default quota in bytes.
 
 |`OCIS_INSECURE` +
 `GRAPH_SPACES_INSECURE`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Allow insecure connetctions to the spaces.]
+Allow insecure connetctions to the spaces.
 
 |`GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL`
-| int
+a| [subs=-attributes]
++int+
 a| [subs=-attributes]
 pass:[0]
 a| [subs=-attributes]
-pass:[Max TTL for the spaces property cache.]
+Max TTL for the spaces property cache.
 
 |`GRAPH_IDENTITY_BACKEND`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[ldap]
 a| [subs=-attributes]
-pass:[The user identity backend to use, defaults to 'ldap', can be 'cs3'.]
+The user identity backend to use, defaults to 'ldap', can be 'cs3'.
 
 |`LDAP_URI` +
 `GRAPH_LDAP_URI`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[ldaps://localhost:9235]
 a| [subs=-attributes]
-pass:[URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://']
+URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
 
 |`LDAP_CACERT` +
 `GRAPH_LDAP_CACERT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[~/.ocis/idm/ldap.crt]
 a| [subs=-attributes]
-pass:[The certificate to verify TLS connections]
+The certificate to verify TLS connections
 
 |`LDAP_INSECURE` +
 `GRAPH_LDAP_INSECURE`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.]
+Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.
 
 |`LDAP_BIND_DN` +
 `GRAPH_LDAP_BIND_DN`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[uid=libregraph,ou=sysusers,o=libregraph-idm]
 a| [subs=-attributes]
-pass:[LDAP DN to use for simple bind authentication with the target LDAP server.]
+LDAP DN to use for simple bind authentication with the target LDAP server.
 
 |`LDAP_BIND_PASSWORD` +
 `GRAPH_LDAP_BIND_PASSWORD`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Password to use for authenticating the 'bind_dn'.]
+Password to use for authenticating the 'bind_dn'.
 
 |`GRAPH_LDAP_SERVER_UUID`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[If set to true, rely on the LDAP Server to generate a unique ID for users and groups, e.g. when using 'entryUUID' as the user id attribute.]
+If set to true, rely on the LDAP Server to generate a unique ID for users and groups, e.g. when using 'entryUUID' as the user id attribute.
 
 |`GRAPH_LDAP_SERVER_USE_PASSWORD_MODIFY_EXOP`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[true]
 a| [subs=-attributes]
-pass:[User the Password Modify Extended Operation for updating user passwords]
+User the Password Modify Extended Operation for updating user passwords
 
 |`GRAPH_LDAP_SERVER_WRITE_ENABLED`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[true]
 a| [subs=-attributes]
-pass:[Allow to create, modify and delete LDAP users via graph API. This is only works when the default Schema is used.]
+Allow to create, modify and delete LDAP users via graph API. This is only works when the default Schema is used.
 
 |`LDAP_USER_BASE_DN` +
 `GRAPH_LDAP_USER_BASE_DN`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[ou=users,o=libregraph-idm]
 a| [subs=-attributes]
-pass:[Search base DN for looking up LDAP users.]
+Search base DN for looking up LDAP users.
 
 |`LDAP_USER_SCOPE` +
 `GRAPH_LDAP_USER_SCOPE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[sub]
 a| [subs=-attributes]
-pass:[LDAP search scope to use when looking up users ('base', 'one', 'sub').]
+LDAP search scope to use when looking up users ('base', 'one', 'sub').
 
 |`LDAP_USER_FILTER` +
 `GRAPH_LDAP_USER_FILTER`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').]
+LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').
 
 |`LDAP_USER_OBJECTCLASS` +
 `GRAPH_LDAP_USER_OBJECTCLASS`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[inetOrgPerson]
 a| [subs=-attributes]
-pass:[The object class to use for users in the default user search filter ('inetOrgPerson').]
+The object class to use for users in the default user search filter ('inetOrgPerson').
 
 |`LDAP_USER_SCHEMA_MAIL` +
 `GRAPH_LDAP_USER_EMAIL_ATTRIBUTE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[mail]
 a| [subs=-attributes]
-pass:[LDAP Attribute to use for the email address of users.]
+LDAP Attribute to use for the email address of users.
 
 |`LDAP_USER_SCHEMA_DISPLAY_NAME` +
 `GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[displayName]
 a| [subs=-attributes]
-pass:[LDAP Attribute to use for the displayname of users.]
+LDAP Attribute to use for the displayname of users.
 
 |`LDAP_USER_SCHEMA_USERNAME` +
 `GRAPH_LDAP_USER_NAME_ATTRIBUTE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[uid]
 a| [subs=-attributes]
-pass:[LDAP Attribute to use for username of users.]
+LDAP Attribute to use for username of users.
 
 |`LDAP_USER_SCHEMA_ID` +
 `GRAPH_LDAP_USER_UID_ATTRIBUTE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[owncloudUUID]
 a| [subs=-attributes]
-pass:[LDAP Attribute to use as the unique id for users. This should be a stable globally unique id (e.g. a UUID).]
+LDAP Attribute to use as the unique id for users. This should be a stable globally unique id (e.g. a UUID).
 
 |`LDAP_GROUP_BASE_DN` +
 `GRAPH_LDAP_GROUP_BASE_DN`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[ou=groups,o=libregraph-idm]
 a| [subs=-attributes]
-pass:[Search base DN for looking up LDAP groups.]
+Search base DN for looking up LDAP groups.
 
 |`LDAP_GROUP_SCOPE` +
 `GRAPH_LDAP_GROUP_SEARCH_SCOPE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[sub]
 a| [subs=-attributes]
-pass:[LDAP search scope to use when looking up gruops ('base', 'one', 'sub').]
+LDAP search scope to use when looking up gruops ('base', 'one', 'sub').
 
 |`LDAP_GROUP_FILTER` +
 `GRAPH_LDAP_GROUP_FILTER`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[LDAP filter to add to the default filters for group searches.]
+LDAP filter to add to the default filters for group searches.
 
 |`LDAP_GROUP_OBJECTCLASS` +
 `GRAPH_LDAP_GROUP_OBJECTCLASS`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[groupOfNames]
 a| [subs=-attributes]
-pass:[The object class to use for groups in the default group search filter ('groupOfNames'). ]
+The object class to use for groups in the default group search filter ('groupOfNames'). 
 
 |`LDAP_GROUP_SCHEMA_GROUPNAME` +
 `GRAPH_LDAP_GROUP_NAME_ATTRIBUTE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[cn]
 a| [subs=-attributes]
-pass:[LDAP Attribute to use for the name of groups]
+LDAP Attribute to use for the name of groups
 
 |`LDAP_GROUP_SCHEMA_ID` +
 `GRAPH_LDAP_GROUP_ID_ATTRIBUTE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[owncloudUUID]
 a| [subs=-attributes]
-pass:[LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).]
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
 
 |`GRAPH_EVENTS_ENDPOINT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9233]
 a| [subs=-attributes]
-pass:[the address of the streaming service]
+the address of the streaming service
 
 |`GRAPH_EVENTS_CLUSTER`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[ocis-cluster]
 a| [subs=-attributes]
-pass:[the clusterID of the streaming service. Mandatory when using nats]
+the clusterID of the streaming service. Mandatory when using nats
 |===
 
 Since Version: `+` added, `-` deprecated

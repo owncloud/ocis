@@ -9,91 +9,103 @@
 
 |`OCIS_LOG_LEVEL` +
 `NATS_LOG_LEVEL`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
+The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 
 |`OCIS_LOG_PRETTY` +
 `NATS_LOG_PRETTY`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates pretty log output.]
+Activates pretty log output.
 
 |`OCIS_LOG_COLOR` +
 `NATS_LOG_COLOR`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates colorized log output.]
+Activates colorized log output.
 
 |`OCIS_LOG_FILE` +
 `NATS_LOG_FILE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The path to the log file. Activates logging to this file if set.]
+The path to the log file. Activates logging to this file if set.
 
 |`NATS_DEBUG_ADDR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9234]
 a| [subs=-attributes]
-pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
 |`NATS_DEBUG_TOKEN`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Token to secure the metrics endpoint]
+Token to secure the metrics endpoint
 
 |`NATS_DEBUG_PPROF`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Enables pprof, which can be used for profiling]
+Enables pprof, which can be used for profiling
 
 |`NATS_DEBUG_ZPAGES`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 |`NATS_NATS_HOST`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1]
 a| [subs=-attributes]
-pass:[Bind address.]
+Bind address.
 
 |`NATS_NATS_PORT`
-| int
+a| [subs=-attributes]
++int+
 a| [subs=-attributes]
 pass:[9233]
 a| [subs=-attributes]
-pass:[Bind port:]
+Bind port:
 
 |`NATS_NATS_CLUSTER_ID`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[ocis-cluster]
 a| [subs=-attributes]
-pass:[ID of the NATS cluster.]
+ID of the NATS cluster.
 
 |`NATS_NATS_STORE_DIR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[~/.ocis/nats]
 a| [subs=-attributes]
-pass:[Path for the NATS JetStream persistence directory.]
+Path for the NATS JetStream persistence directory.
 |===
 
 Since Version: `+` added, `-` deprecated

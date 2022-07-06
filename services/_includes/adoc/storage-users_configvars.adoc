@@ -9,384 +9,437 @@
 
 |`OCIS_TRACING_ENABLED` +
 `STORAGE_USERS_TRACING_ENABLED`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates tracing.]
+Activates tracing.
 
 |`OCIS_TRACING_TYPE` +
 `STORAGE_USERS_TRACING_TYPE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
+The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
 
 |`OCIS_TRACING_ENDPOINT` +
 `STORAGE_USERS_TRACING_ENDPOINT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The endpoint of the tracing agent.]
+The endpoint of the tracing agent.
 
 |`OCIS_TRACING_COLLECTOR` +
 `STORAGE_USERS_TRACING_COLLECTOR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 |`OCIS_LOG_LEVEL` +
 `STORAGE_USERS_LOG_LEVEL`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
+The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 
 |`OCIS_LOG_PRETTY` +
 `STORAGE_USERS_LOG_PRETTY`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates pretty log output.]
+Activates pretty log output.
 
 |`OCIS_LOG_COLOR` +
 `STORAGE_USERS_LOG_COLOR`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates colorized log output.]
+Activates colorized log output.
 
 |`OCIS_LOG_FILE` +
 `STORAGE_USERS_LOG_FILE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The path to the log file. Activates logging to this file if set.]
+The path to the log file. Activates logging to this file if set.
 
 |`STORAGE_USERS_DEBUG_ADDR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9159]
 a| [subs=-attributes]
-pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
 |`STORAGE_USERS_DEBUG_TOKEN`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Token to secure the metrics endpoint]
+Token to secure the metrics endpoint
 
 |`STORAGE_USERS_DEBUG_PPROF`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Enables pprof, which can be used for profiling]
+Enables pprof, which can be used for profiling
 
 |`STORAGE_USERS_DEBUG_ZPAGES`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 |`STORAGE_USERS_GRPC_ADDR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9157]
 a| [subs=-attributes]
-pass:[The bind address of the GRPC service.]
+The bind address of the GRPC service.
 
 |`STORAGE_USERS_GRPC_PROTOCOL`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[tcp]
 a| [subs=-attributes]
-pass:[The transport protocol of the grpc service.]
+The transport protocol of the grpc service.
 
 |`STORAGE_USERS_HTTP_ADDR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9158]
 a| [subs=-attributes]
-pass:[The bind address of the HTTP service.]
+The bind address of the HTTP service.
 
 |`STORAGE_USERS_HTTP_PROTOCOL`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[tcp]
 a| [subs=-attributes]
-pass:[The transport protocol of the http service.]
+The transport protocol of the http service.
 
 |`OCIS_JWT_SECRET` +
 `STORAGE_USERS_JWT_SECRET`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The secret to mint and validate jwt tokens.]
+The secret to mint and validate jwt tokens.
 
 |`REVA_GATEWAY`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9142]
 a| [subs=-attributes]
-pass:[The CS3 gateway endpoint.]
+The CS3 gateway endpoint.
 
 |`STORAGE_USERS_SKIP_USER_GROUPS_IN_TOKEN`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Disables the loading of user's group memberships from the reva access token.]
+Disables the loading of user's group memberships from the reva access token.
 
 |`STORAGE_USERS_DRIVER`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[ocis]
 a| [subs=-attributes]
-pass:[The storage driver which should be used by the service]
+The storage driver which should be used by the service
 
 |`STORAGE_USERS_OCIS_ROOT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[~/.ocis/storage/users]
 a| [subs=-attributes]
-pass:[Path for the persistence directory.]
+Path for the persistence directory.
 
 |`STORAGE_USERS_OCIS_USER_LAYOUT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[{{.Id.OpaqueId}}]
 a| [subs=-attributes]
-pass:[Template string for the user storage layout in the persistence directory.]
+Template string for the user storage layout in the persistence directory.
 
 |`STORAGE_USERS_PERMISSION_ENDPOINT,STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9191]
 a| [subs=-attributes]
-pass:[Endpoint of the permissions service.]
+Endpoint of the permissions service.
 
 |`STORAGE_USERS_OCIS_PERSONAL_SPACE_ALIAS_TEMPLATE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[{{.SpaceType}}/{{.User.Username \| lower}}]
 a| [subs=-attributes]
-pass:[Template string to construct personal space aliases.]
+Template string to construct personal space aliases.
 
 |`STORAGE_USERS_OCIS_GENERAL_SPACE_ALIAS_TEMPLATE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[{{.SpaceType}}/{{.SpaceName \| replace " " "-" \| lower}}]
 a| [subs=-attributes]
-pass:[Template string to construct general space aliases.]
+Template string to construct general space aliases.
 
 |`STORAGE_USERS_OCIS_SHARE_FOLDER`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[/Shares]
 a| [subs=-attributes]
-pass:[Name of the folder jailing all shares.]
+Name of the folder jailing all shares.
 
 |`STORAGE_USERS_S3NG_ROOT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[~/.ocis/storage/users]
 a| [subs=-attributes]
-pass:[Path for the persistence directory.]
+Path for the persistence directory.
 
 |`STORAGE_USERS_S3NG_USER_LAYOUT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[{{.Id.OpaqueId}}]
 a| [subs=-attributes]
-pass:[Template string for the user storage layout in the persistence directory.]
+Template string for the user storage layout in the persistence directory.
 
 |`STORAGE_USERS_PERMISSION_ENDPOINT` +
 `STORAGE_USERS_S3NG_PERMISSIONS_ENDPOINT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9191]
 a| [subs=-attributes]
-pass:[Endpoint of the permissions service.]
+Endpoint of the permissions service.
 
 |`STORAGE_USERS_S3NG_REGION`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[default]
 a| [subs=-attributes]
-pass:[Region of the S3 bucket.]
+Region of the S3 bucket.
 
 |`STORAGE_USERS_S3NG_ACCESS_KEY`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Access key for the S3 bucket.]
+Access key for the S3 bucket.
 
 |`STORAGE_USERS_S3NG_SECRET_KEY`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Secret key for the S3 bucket.]
+Secret key for the S3 bucket.
 
 |`STORAGE_USERS_S3NG_ENDPOINT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Endpoint for the S3 bucket.]
+Endpoint for the S3 bucket.
 
 |`STORAGE_USERS_S3NG_BUCKET`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Name of the S3 bucket.]
+Name of the S3 bucket.
 
 |`STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[{{.SpaceType}}/{{.User.Username \| lower}}]
 a| [subs=-attributes]
-pass:[Template string to construct personal space aliases.]
+Template string to construct personal space aliases.
 
 |`STORAGE_USERS_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[{{.SpaceType}}/{{.SpaceName \| replace " " "-" \| lower}}]
 a| [subs=-attributes]
-pass:[Template string to construct general space aliases.]
+Template string to construct general space aliases.
 
 |`STORAGE_USERS_S3NG_SHARE_FOLDER`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[/Shares]
 a| [subs=-attributes]
-pass:[Name of the folder jailing all shares.]
+Name of the folder jailing all shares.
 
 |`STORAGE_USERS_OWNCLOUDSQL_DATADIR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[~/.ocis/storage/owncloud]
 a| [subs=-attributes]
-pass:[Path for the persistence directory.]
+Path for the persistence directory.
 
 |`STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[/Shares]
 a| [subs=-attributes]
-pass:[name of the folder jailing all shares.]
+name of the folder jailing all shares.
 
 |`STORAGE_USERS_OWNCLOUDSQL_LAYOUT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[{{.Username}}]
 a| [subs=-attributes]
-pass:[path layout to use to navigate into a users folder in an owncloud data dir]
+path layout to use to navigate into a users folder in an owncloud data dir
 
 |`STORAGE_USERS_OWNCLOUDSQL_UPLOADINFO_DIR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[~/.ocis/storage/uploadinfo]
 a| [subs=-attributes]
-pass:[Path to a directory, where uploads will be stored temporarily.]
+Path to a directory, where uploads will be stored temporarily.
 
 |`STORAGE_USERS_OWNCLOUDSQL_DB_USERNAME`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[owncloud]
 a| [subs=-attributes]
-pass:[Username for the database.]
+Username for the database.
 
 |`STORAGE_USERS_OWNCLOUDSQL_DB_PASSWORD`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[owncloud]
 a| [subs=-attributes]
-pass:[Password for the database.]
+Password for the database.
 
 |`STORAGE_USERS_OWNCLOUDSQL_DB_HOST`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Hostname or IP of the database server.]
+Hostname or IP of the database server.
 
 |`STORAGE_USERS_OWNCLOUDSQL_DB_PORT`
-| int
+a| [subs=-attributes]
++int+
 a| [subs=-attributes]
 pass:[3306]
 a| [subs=-attributes]
-pass:[Port that the database server is listening on.]
+Port that the database server is listening on.
 
 |`STORAGE_USERS_OWNCLOUDSQL_DB_NAME`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[owncloud]
 a| [subs=-attributes]
-pass:[Name of the database to be used.]
+Name of the database to be used.
 
 |`STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[localhost:9144]
 a| [subs=-attributes]
-pass:[Endpoint of the users provider.]
+Endpoint of the users provider.
 
 |`STORAGE_USERS_DATA_SERVER_URL`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[http://localhost:9158/data]
 a| [subs=-attributes]
-pass:[URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed.]
+URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed.
 
 |`STORAGE_USERS_EVENTS_ENDPOINT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9233]
 a| [subs=-attributes]
-pass:[the address of the streaming service]
+the address of the streaming service
 
 |`STORAGE_USERS_EVENTS_CLUSTER`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[ocis-cluster]
 a| [subs=-attributes]
-pass:[the clusterID of the streaming service. Mandatory when using nats]
+the clusterID of the streaming service. Mandatory when using nats
 
 |`STORAGE_USERS_MOUNT_ID`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[1284d238-aa92-42ce-bdc4-0b0000009157]
 a| [subs=-attributes]
-pass:[Mount ID of this storage.]
+Mount ID of this storage.
 
 |`STORAGE_USERS_EXPOSE_DATA_SERVER`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Exposes the data server directly to users and bypasses the data gateway. Ensure that the data server address is reachable by users.]
+Exposes the data server directly to users and bypasses the data gateway. Ensure that the data server address is reachable by users.
 
 |`STORAGE_USERS_READ_ONLY`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Set this storage to be read-only.]
+Set this storage to be read-only.
 |===
 
 Since Version: `+` added, `-` deprecated

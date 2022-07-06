@@ -9,194 +9,220 @@
 
 |`OCIS_TRACING_ENABLED` +
 `STORAGE_SYSTEM_TRACING_ENABLED`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates tracing.]
+Activates tracing.
 
 |`OCIS_TRACING_TYPE` +
 `STORAGE_SYSTEM_TRACING_TYPE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
+The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
 
 |`OCIS_TRACING_ENDPOINT` +
 `STORAGE_SYSTEM_TRACING_ENDPOINT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The endpoint of the tracing agent.]
+The endpoint of the tracing agent.
 
 |`OCIS_TRACING_COLLECTOR` +
 `STORAGE_SYSTEM_TRACING_COLLECTOR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 |`OCIS_LOG_LEVEL` +
 `STORAGE_SYSTEM_LOG_LEVEL`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
+The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 
 |`OCIS_LOG_PRETTY` +
 `STORAGE_SYSTEM_LOG_PRETTY`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates pretty log output.]
+Activates pretty log output.
 
 |`OCIS_LOG_COLOR` +
 `STORAGE_SYSTEM_LOG_COLOR`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates colorized log output.]
+Activates colorized log output.
 
 |`OCIS_LOG_FILE` +
 `STORAGE_SYSTEM_LOG_FILE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The path to the log file. Activates logging to this file if set.]
+The path to the log file. Activates logging to this file if set.
 
 |`STORAGE_SYSTEM_DEBUG_ADDR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9217]
 a| [subs=-attributes]
-pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
 |`STORAGE_SYSTEM_DEBUG_TOKEN`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Token to secure the metrics endpoint]
+Token to secure the metrics endpoint
 
 |`STORAGE_SYSTEM_DEBUG_PPROF`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Enables pprof, which can be used for profiling]
+Enables pprof, which can be used for profiling
 
 |`STORAGE_SYSTEM_DEBUG_ZPAGES`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 |`STORAGE_SYSTEM_GRPC_ADDR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9215]
 a| [subs=-attributes]
-pass:[The bind address of the GRPC service.]
+The bind address of the GRPC service.
 
 |`STORAGE_SYSTEM_GRPC_PROTOCOL`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[tcp]
 a| [subs=-attributes]
-pass:[The transport protocol of the grpc service.]
+The transport protocol of the grpc service.
 
 |`STORAGE_SYSTEM_HTTP_ADDR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9216]
 a| [subs=-attributes]
-pass:[The bind address of the HTTP service.]
+The bind address of the HTTP service.
 
 |`STORAGE_SYSTEM_HTTP_PROTOCOL`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[tcp]
 a| [subs=-attributes]
-pass:[The transport protocol of the http service.]
+The transport protocol of the http service.
 
 |`STORAGE_SYSTEM_EVENTS_ENDPOINT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[the address of the streaming service]
+the address of the streaming service
 
 |`STORAGE_SYSTEM_EVENTS_CLUSTER`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[the clusterID of the streaming service. Mandatory when using nats]
+the clusterID of the streaming service. Mandatory when using nats
 
 |`OCIS_JWT_SECRET` +
 `STORAGE_SYSTEM_JWT_SECRET`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The secret to mint and validate jwt tokens.]
+The secret to mint and validate jwt tokens.
 
 |`REVA_GATEWAY`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9142]
 a| [subs=-attributes]
-pass:[The CS3 gateway endpoint.]
+The CS3 gateway endpoint.
 
 |`OCIS_SYSTEM_USER_ID`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.]
+ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
 
 |`OCIS_SYSTEM_USER_API_KEY`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[API key for the storage-system system user.]
+API key for the storage-system system user.
 
 |`STORAGE_SYSTEM_SKIP_USER_GROUPS_IN_TOKEN`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Disables the loading of user's group memberships from the reva access token.]
+Disables the loading of user's group memberships from the reva access token.
 
 |`STORAGE_SYSTEM_DRIVER`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[ocis]
 a| [subs=-attributes]
-pass:[The driver which should be used by the service]
+The driver which should be used by the service
 
 |`STORAGE_SYSTEM_OCIS_ROOT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[~/.ocis/storage/metadata]
 a| [subs=-attributes]
-pass:[Path for the directory where the storage-system service stores it's persistent data.]
+Path for the directory where the storage-system service stores it's persistent data.
 
 |`STORAGE_SYSTEM_DATA_SERVER_URL`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[http://localhost:9216/data]
 a| [subs=-attributes]
-pass:[URL of the data server, needs to be reachable by services using this service.]
+URL of the data server, needs to be reachable by services using this service.
 |===
 
 Since Version: `+` added, `-` deprecated

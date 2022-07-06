@@ -9,197 +9,223 @@
 
 |`OCIS_TRACING_ENABLED` +
 `WEB_TRACING_ENABLED`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates tracing.]
+Activates tracing.
 
 |`OCIS_TRACING_TYPE` +
 `WEB_TRACING_TYPE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
+The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
 
 |`OCIS_TRACING_ENDPOINT` +
 `WEB_TRACING_ENDPOINT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The endpoint of the tracing agent.]
+The endpoint of the tracing agent.
 
 |`OCIS_TRACING_COLLECTOR` +
 `WEB_TRACING_COLLECTOR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 |`OCIS_LOG_LEVEL` +
 `WEB_LOG_LEVEL`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
+The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 
 |`OCIS_LOG_PRETTY` +
 `WEB_LOG_PRETTY`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates pretty log output.]
+Activates pretty log output.
 
 |`OCIS_LOG_COLOR` +
 `WEB_LOG_COLOR`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates colorized log output.]
+Activates colorized log output.
 
 |`OCIS_LOG_FILE` +
 `WEB_LOG_FILE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The path to the log file. Activates logging to this file if set.]
+The path to the log file. Activates logging to this file if set.
 
 |`WEB_DEBUG_ADDR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9104]
 a| [subs=-attributes]
-pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
 |`WEB_DEBUG_TOKEN`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Token to secure the metrics endpoint]
+Token to secure the metrics endpoint
 
 |`WEB_DEBUG_PPROF`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Enables pprof, which can be used for profiling]
+Enables pprof, which can be used for profiling
 
 |`WEB_DEBUG_ZPAGES`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 |`WEB_HTTP_ADDR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9100]
 a| [subs=-attributes]
-pass:[The bind address of the HTTP service.]
+The bind address of the HTTP service.
 
 |`WEB_HTTP_ROOT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[/]
 a| [subs=-attributes]
-pass:[Subdirectory that serves as the root for this HTTP service.]
+Subdirectory that serves as the root for this HTTP service.
 
 |`WEB_CACHE_TTL`
-| int
+a| [subs=-attributes]
++int+
 a| [subs=-attributes]
 pass:[604800]
 a| [subs=-attributes]
-pass:[Cache policy in seconds for ownCloud Web assets.]
+Cache policy in seconds for ownCloud Web assets.
 
 |`WEB_ASSET_PATH`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets.]
+Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets.
 
 |`WEB_UI_CONFIG`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Read the ownCloud Web configuration from this file.]
+Read the ownCloud Web configuration from this file.
 
 |`WEB_UI_PATH`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Read the ownCloud Web configuration from this file path.]
+Read the ownCloud Web configuration from this file path.
 
 |`OCIS_URL` +
 `WEB_UI_THEME_SERVER`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[https://localhost:9200]
 a| [subs=-attributes]
-pass:[URL to load themes from. Will be prepended to the theme path.]
+URL to load themes from. Will be prepended to the theme path.
 
 |`WEB_UI_THEME_PATH`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[/themes/owncloud/theme.json]
 a| [subs=-attributes]
-pass:[URL path to load themes from. The theme server will be prepended.]
+URL path to load themes from. The theme server will be prepended.
 
 |`OCIS_URL` +
 `WEB_UI_CONFIG_SERVER`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[https://localhost:9200]
 a| [subs=-attributes]
-pass:[URL, where the oCIS APIs are reachable for ownCloud Web.]
+URL, where the oCIS APIs are reachable for ownCloud Web.
 
 |`WEB_OIDC_METADATA_URL`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[https://localhost:9200/.well-known/openid-configuration]
 a| [subs=-attributes]
-pass:[URL for the OIDC well-known configuration endpoint. Defaults to the oCIS API URL + "/.well-known/openid-configuration".]
+URL for the OIDC well-known configuration endpoint. Defaults to the oCIS API URL + "/.well-known/openid-configuration".
 
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
 `WEB_OIDC_AUTHORITY`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[https://localhost:9200]
 a| [subs=-attributes]
-pass:[URL of the OIDC issuer. It defaults to URL of the builtin IDP.]
+URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
 |`WEB_OIDC_CLIENT_ID`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[web]
 a| [subs=-attributes]
-pass:[OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP.]
+OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP.
 
 |`WEB_OIDC_RESPONSE_TYPE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[code]
 a| [subs=-attributes]
-pass:[OIDC response type to use for authentication.]
+OIDC response type to use for authentication.
 
 |`WEB_OIDC_SCOPE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[openid profile email]
 a| [subs=-attributes]
-pass:[OIDC scopes to request during authentication.]
+OIDC scopes to request during authentication.
 |===
 
 Since Version: `+` added, `-` deprecated

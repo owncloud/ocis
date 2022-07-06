@@ -40,5 +40,5 @@
 | FRONTEND_OCS_HOME_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Homespace namespace identifier.|
 | FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE | string | {{.Mail}} | Additional information attribute for the user (e.g. {{.Mail}}|
 | FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL | int | 0 | Max TTL for the resource info cache|
-| FRONTEND_CHECKSUMS_SUPPORTED_TYPES | []string | [sha1 md5 adler32] | Supported checksum types to be announced to the client (e.g. md5)|
+| FRONTEND_CHECKSUMS_SUPPORTED_TYPES | []string | [sha1 md5 adler32] | Supported checksum types to be announced to the client. You can provide multiple types separated by blank or comma.|
 | FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPES | string |  | Preferred checksum types to be announced to the client for uploads (e.g. md5)|

@@ -9,190 +9,215 @@
 
 |`OCIS_TRACING_ENABLED` +
 `OCDAV_TRACING_ENABLED`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates tracing.]
+Activates tracing.
 
 |`OCIS_TRACING_TYPE` +
 `OCDAV_TRACING_TYPE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
+The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
 
 |`OCIS_TRACING_ENDPOINT` +
 `OCDAV_TRACING_ENDPOINT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The endpoint of the tracing agent.]
+The endpoint of the tracing agent.
 
 |`OCIS_TRACING_COLLECTOR` +
 `OCDAV_TRACING_COLLECTOR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 |`OCIS_LOG_LEVEL` +
 `OCDAV_LOG_LEVEL`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
+The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 
 |`OCIS_LOG_PRETTY` +
 `OCDAV_LOG_PRETTY`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates pretty log output.]
+Activates pretty log output.
 
 |`OCIS_LOG_COLOR` +
 `OCDAV_LOG_COLOR`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates colorized log output.]
+Activates colorized log output.
 
 |`OCIS_LOG_FILE` +
 `OCDAV_LOG_FILE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The path to the log file. Activates logging to this file if set.]
+The path to the log file. Activates logging to this file if set.
 
 |`OCDAV_DEBUG_ADDR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9163]
 a| [subs=-attributes]
-pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
 |`OCDAV_DEBUG_TOKEN`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Token to secure the metrics endpoint]
+Token to secure the metrics endpoint
 
 |`OCDAV_DEBUG_PPROF`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Enables pprof, which can be used for profiling]
+Enables pprof, which can be used for profiling
 
 |`OCDAV_DEBUG_ZPAGES`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 |`OCDAV_HTTP_ADDR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:0]
 a| [subs=-attributes]
-pass:[The bind address of the HTTP service.]
+The bind address of the HTTP service.
 
 |`OCDAV_HTTP_PROTOCOL`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[tcp]
 a| [subs=-attributes]
-pass:[The transport protocol of the http service.]
+The transport protocol of the http service.
 
 |`OCDAV_HTTP_PREFIX`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[A URL path prefix for the handler.]
+A URL path prefix for the handler.
 
 |`OCIS_JWT_SECRET` +
 `OCDAV_JWT_SECRET`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The secret to mint and validate jwt tokens.]
+The secret to mint and validate jwt tokens.
 
 |`REVA_GATEWAY`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9142]
 a| [subs=-attributes]
-pass:[The CS3 gateway endpoint.]
+The CS3 gateway endpoint.
 
 |`OCDAV_SKIP_USER_GROUPS_IN_TOKEN`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Disables the loading of user's group memberships from the reva access token.]
+Disables the loading of user's group memberships from the reva access token.
 
 |`OCDAV_WEBDAV_NAMESPACE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[/users/{{.Id.OpaqueId}}]
 a| [subs=-attributes]
-pass:[Jail requests to /dav/webdav into this CS3 namespace. Supports template layouting with CS3 User properties.]
+Jail requests to /dav/webdav into this CS3 namespace. Supports template layouting with CS3 User properties.
 
 |`OCDAV_FILES_NAMESPACE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[/users/{{.Id.OpaqueId}}]
 a| [subs=-attributes]
-pass:[Jail requests to /dav/files/{username} into this CS3 namespace. Supports template layouting with CS3 User properties.]
+Jail requests to /dav/files/{username} into this CS3 namespace. Supports template layouting with CS3 User properties.
 
 |`OCDAV_SHARES_NAMESPACE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[/Shares]
 a| [subs=-attributes]
-pass:[The human readable path for the share jail. Relative to a users personal space root. Upcased intentionally.]
+The human readable path for the share jail. Relative to a users personal space root. Upcased intentionally.
 
 |`OCIS_URL` +
 `OCDAV_PUBLIC_URL`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[https://localhost:9200]
 a| [subs=-attributes]
-pass:[URL, where oCIS is reachable for users.]
+URL, where oCIS is reachable for users.
 
 |`OCIS_INSECURE` +
 `OCDAV_INSECURE`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[]
+
 
 |`OCDAV_GATEWAY_REQUEST_TIMEOUT`
-| int64
+a| [subs=-attributes]
++int64+
 a| [subs=-attributes]
 pass:[84300]
 a| [subs=-attributes]
-pass:[Request timeout in seconds for requests from the oCDAV service to the gateway service.]
+Request timeout in seconds for requests from the oCDAV service to the gateway service.
 
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `OCDAV_MACHINE_AUTH_API_KEY`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Machine auth API key used to validate internal requests necessary for the access to resources from other services.]
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
 |===
 
 Since Version: `+` added, `-` deprecated

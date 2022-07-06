@@ -9,140 +9,158 @@
 
 |`OCIS_TRACING_ENABLED` +
 `GRAPH_EXPLORER_TRACING_ENABLED`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates tracing.]
+Activates tracing.
 
 |`OCIS_TRACING_TYPE` +
 `GRAPH_EXPLORER_TRACING_TYPE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.]
+The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
 
 |`OCIS_TRACING_ENDPOINT` +
 `GRAPH_EXPLORER_TRACING_ENDPOINT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The endpoint of the tracing agent.]
+The endpoint of the tracing agent.
 
 |`OCIS_TRACING_COLLECTOR` +
 `GRAPH_EXPLORER_TRACING_COLLECTOR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 |`OCIS_LOG_LEVEL` +
 `GRAPH_EXPLORER_LOG_LEVEL`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".]
+The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 
 |`OCIS_LOG_PRETTY` +
 `GRAPH_EXPLORER_LOG_PRETTY`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates pretty log output.]
+Activates pretty log output.
 
 |`OCIS_LOG_COLOR` +
 `GRAPH_EXPLORER_LOG_COLOR`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Activates colorized log output.]
+Activates colorized log output.
 
 |`OCIS_LOG_FILE` +
 `GRAPH_EXPLORER_LOG_FILE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[The path to the log file. Activates logging to this file if set.]
+The path to the log file. Activates logging to this file if set.
 
 |`GRAPH_EXPLORER_DEBUG_ADDR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9136]
 a| [subs=-attributes]
-pass:[Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 
 |`GRAPH_EXPLORER_DEBUG_TOKEN`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-pass:[Token to secure the metrics endpoint]
+Token to secure the metrics endpoint
 
 |`GRAPH_EXPLORER_DEBUG_PPROF`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Enables pprof, which can be used for profiling]
+Enables pprof, which can be used for profiling
 
 |`GRAPH_EXPLORER_DEBUG_ZPAGES`
-| bool
+a| [subs=-attributes]
++bool+
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-pass:[Enables zpages, which can be used for collecting and viewing in-memory traces.]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 |`GRAPH_EXPLORER_HTTP_ADDR`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9135]
 a| [subs=-attributes]
-pass:[The bind address of the HTTP service.]
+The bind address of the HTTP service.
 
 |`GRAPH_EXPLORER_HTTP_ROOT`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[/graph-explorer]
 a| [subs=-attributes]
-pass:[Subdirectory that serves as the root for this HTTP service.]
+Subdirectory that serves as the root for this HTTP service.
 
 |`GRAPH_EXPLORER_CLIENT_ID`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[ocis-explorer.js]
 a| [subs=-attributes]
-pass:[OIDC client id, the graph explorer uses. This client needs to be set up in your IDP.]
+OIDC client id, the graph explorer uses. This client needs to be set up in your IDP.
 
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
 `GRAPH_EXPLORER_ISSUER`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[https://localhost:9200]
 a| [subs=-attributes]
-pass:[URL of the OIDC issuer. It defaults to URL of the builtin IDP.]
+URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
 |`OCIS_URL` +
 `GRAPH_EXPLORER_GRAPH_URL_BASE`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[https://localhost:9200]
 a| [subs=-attributes]
-pass:[Base URL, where the graph explorer is reachable for users.]
+Base URL, where the graph explorer is reachable for users.
 
 |`GRAPH_EXPLORER_GRAPH_URL_PATH`
-| string
+a| [subs=-attributes]
++string+
 a| [subs=-attributes]
 pass:[/graph]
 a| [subs=-attributes]
-pass:[URL path, where the graph explorer is reachable for users.]
+URL path, where the graph explorer is reachable for users.
 |===
 
 Since Version: `+` added, `-` deprecated
