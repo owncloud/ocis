@@ -67,7 +67,7 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 
 func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error) {
 	if req.Query == "" {
-		return nil, errtypes.PreconditionFailed("empty query provided")
+		return nil, errtypes.BadRequest("empty query provided")
 	}
 	p.logger.Debug().Str("query", req.Query).Msg("performing a search")
 
@@ -144,6 +144,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 				},
 				Path: mountpointPrefix,
 			},
+			PageSize: req.PageSize,
 		})
 		if err != nil {
 			p.logger.Error().Err(err).Str("space", space.Id.OpaqueId).Msg("failed to search the index")
