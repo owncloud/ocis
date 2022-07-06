@@ -128,6 +128,6 @@ type CBOXDriver struct {
 }
 
 type Checksums struct {
-	SupportedTypes      []string `yaml:"supported_types" env:"FRONTEND_CHECKSUMS_SUPPORTED_TYPES" desc:"Supported checksum types to be announced to the client (e.g. md5)"`
+	SupportedTypes      []string `yaml:"supported_types" env:"FRONTEND_CHECKSUMS_SUPPORTED_TYPES" desc:"Supported checksum types to be announced to the client. You can provide multiple types separated by blank or comma."`
 	PreferredUploadType string   `yaml:"preferred_upload_type" env:"FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPES" desc:"Preferred checksum types to be announced to the client for uploads (e.g. md5)"`
 }
