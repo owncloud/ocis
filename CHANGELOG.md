@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Remove static ocs user backend config: [#4077](https://github.com/owncloud/ocis/pull/4077)
 * Bugfix - Fix make sensitive config values in the proxy's debug server: [#4086](https://github.com/owncloud/ocis/pull/4086)
 * Bugfix - Fix startup error logging: [#4093](https://github.com/owncloud/ocis/pull/4093)
+* Bugfix - Polish search: [#4094](https://github.com/owncloud/ocis/pull/4094)
 * Bugfix - Store user passwords hashed in idm: [#3778](https://github.com/owncloud/ocis/issues/3778)
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
 * Enhancement - Update IdP UI: [#3493](https://github.com/owncloud/ocis/issues/3493)
@@ -62,6 +63,13 @@ The following sections list the changes for unreleased.
    the reason for the failed shutdown was omitted.
 
    https://github.com/owncloud/ocis/pull/4093
+
+* Bugfix - Polish search: [#4094](https://github.com/owncloud/ocis/pull/4094)
+
+   We improved the feedback when providing invalid search queries and added support for limiting
+   the number of results returned.
+
+   https://github.com/owncloud/ocis/pull/4094
 
 * Bugfix - Store user passwords hashed in idm: [#3778](https://github.com/owncloud/ocis/issues/3778)
 
