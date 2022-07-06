@@ -13,7 +13,7 @@ Feature: Remove files, folder
       | username |
       | Alice    |
       | Brian    |
-    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "delete objects" with the default quota using the GraphApi
     And user "Alice" has created a folder "folderForDeleting/sub1/sub2" in space "delete objects"
     And user "Alice" has uploaded a file inside space "delete objects" with content "some content" to "text.txt"

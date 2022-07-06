@@ -398,6 +398,8 @@ class GraphContext implements Context {
 	/**
 	 * adds a user to a group
 	 *
+	 * @Given /^the administrator has added a user "([^"]*)" to the group "([^"]*)" using GraphApi$/
+	 *
 	 * @param string $user
 	 * @param string $group
 	 * @param bool $checkResult

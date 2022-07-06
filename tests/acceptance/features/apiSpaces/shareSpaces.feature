@@ -12,7 +12,7 @@ Feature: Share spaces
       | Alice    |
       | Brian    |
       | Bob      |
-    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "share space" with the default quota using the GraphApi
 
 

@@ -11,7 +11,7 @@ Feature: Search
       | Alice    |
       | Brian    |
     And using new DAV path
-    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "find data" with the default quota using the GraphApi
     And user "Alice" has created a folder "folder/SubFolder1/subFOLDER2" in space "find data"
     And user "Alice" has uploaded a file inside space "find data" with content "some content" to "folder/SubFolder1/subFOLDER2/insideTheFolder.txt"
