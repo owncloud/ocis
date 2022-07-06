@@ -128,7 +128,7 @@ config = {
     "dockerReleases": {
         "architectures": ["arm", "arm64", "amd64"],
     },
-    "litmus": True,
+    "litmus": False,
 }
 
 # volume for steps to cache Go dependencies between steps of a pipeline
@@ -202,6 +202,7 @@ def main(ctx):
     test_pipelines = \
         cancelPreviousBuilds() + \
         yarnCache(ctx) + \
+        printBranch(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
         testOcisModules(ctx) + \
         testPipelines(ctx)
@@ -224,7 +225,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines + build_release_helpers
+    pipelines = test_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -266,6 +267,31 @@ def yarnCache(ctx):
                 "refs/pull/**",
             ],
         },
+    }]
+
+def printBranch(ctx):
+    return [{
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "test",
+        "steps": printBranches(ctx),
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/tags/**",
+                "refs/pull/**",
+            ],
+        },
+    }]
+
+def printBranches(ctx):
+    return [{
+        "name": "test",
+        "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+        "commands": [
+            "echo %s" % ctx.build.source,
+            "echo %s" % ctx.build.target,
+        ],
     }]
 
 def installWebTestRunner():
