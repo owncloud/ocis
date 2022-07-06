@@ -33,5 +33,5 @@ type Auditlog struct {
 	LogToConsole bool   `yaml:"log_to_console" env:"AUDIT_LOG_TO_CONSOLE" desc:"Logs to Stdout if true. Independent of the log to file option."`
 	LogToFile    bool   `yaml:"log_to_file" env:"AUDIT_LOG_TO_FILE" desc:"Logs to file if true. Independent of the log to Stdout file option."`
 	FilePath     string `yaml:"filepath" env:"AUDIT_FILEPATH" desc:"Filepath to the logfile. Mandatory if LogToFile is true."`
-	Format       string `yaml:"format" env:"AUDIT_FORMAT" desc:"Log format. using json is advised."`
+	Format       string `yaml:"format" env:"AUDIT_FORMAT" desc:"Log format. Using json is advised."`
 }

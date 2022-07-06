@@ -19,14 +19,14 @@ type Config struct {
 
 	TokenManager     *TokenManager `yaml:"token_manager"`
 	Reva             *Reva         `yaml:"reva"`
-	SystemUserID     string        `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID" desc:"ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
-	SystemUserAPIKey string        `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY" desc:"API key for the storage-system system user."`
+	SystemUserID     string        `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID" desc:"ID of the oCIS storage-system system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
+	SystemUserAPIKey string        `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY" desc:"API key for the STORAGE-SYSTEM system user."`
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_SYSTEM_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token."`
 
-	Driver        string  `yaml:"driver" env:"STORAGE_SYSTEM_DRIVER" desc:"The driver which should be used by the service"`
+	Driver        string  `yaml:"driver" env:"STORAGE_SYSTEM_DRIVER" desc:"The driver which should be used by the service."`
 	Drivers       Drivers `yaml:"drivers"`
-	DataServerURL string  `yaml:"data_server_url" env:"STORAGE_SYSTEM_DATA_SERVER_URL" desc:"URL of the data server, needs to be reachable by services using this service."`
+	DataServerURL string  `yaml:"data_server_url" env:"STORAGE_SYSTEM_DATA_SERVER_URL" desc:"URL of the data server, needs to be reachable by other services using this service."`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
@@ -59,13 +59,13 @@ type Debug struct {
 type GRPCConfig struct {
 	Addr      string `yaml:"addr" env:"STORAGE_SYSTEM_GRPC_ADDR" desc:"The bind address of the GRPC service."`
 	Namespace string `yaml:"-"`
-	Protocol  string `yaml:"protocol" env:"STORAGE_SYSTEM_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
+	Protocol  string `yaml:"protocol" env:"STORAGE_SYSTEM_GRPC_PROTOCOL" desc:"The transport protocol of the GPRC service."`
 }
 
 type HTTPConfig struct {
 	Addr      string `yaml:"addr" env:"STORAGE_SYSTEM_HTTP_ADDR" desc:"The bind address of the HTTP service."`
 	Namespace string `yaml:"-"`
-	Protocol  string `yaml:"protocol" env:"STORAGE_SYSTEM_HTTP_PROTOCOL" desc:"The transport protocol of the http service."`
+	Protocol  string `yaml:"protocol" env:"STORAGE_SYSTEM_HTTP_PROTOCOL" desc:"The transport protocol of the HTTP service."`
 }
 
 type Drivers struct {
@@ -74,10 +74,10 @@ type Drivers struct {
 
 type OCISDriver struct {
 	// Root is the absolute path to the location of the data
-	Root string `yaml:"root" env:"STORAGE_SYSTEM_OCIS_ROOT" desc:"Path for the directory where the storage-system service stores it's persistent data."`
+	Root string `yaml:"root" env:"STORAGE_SYSTEM_OCIS_ROOT" desc:"Path for the directory where the STORAGE-SYSTEM service stores it's persistent data."`
 }
 
 type Events struct {
-	Addr      string `yaml:"endpoint" env:"STORAGE_SYSTEM_EVENTS_ENDPOINT" desc:"the address of the streaming service"`
-	ClusterID string `yaml:"cluster" env:"STORAGE_SYSTEM_EVENTS_CLUSTER" desc:"the clusterID of the streaming service. Mandatory when using nats"`
+	Addr      string `yaml:"endpoint" env:"STORAGE_SYSTEM_EVENTS_ENDPOINT" desc:"The address of the streaming service."`
+	ClusterID string `yaml:"cluster" env:"STORAGE_SYSTEM_EVENTS_CLUSTER" desc:"The clusterID of the streaming service. Mandatory when using the NATS service."`
 }

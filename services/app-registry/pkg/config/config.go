@@ -44,15 +44,15 @@ type Service struct {
 
 type Debug struct {
 	Addr   string `yaml:"addr" env:"APP_REGISTRY_DEBUG_ADDR" desc:"Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed."`
-	Token  string `yaml:"token" env:"APP_REGISTRY_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint"`
-	Pprof  bool   `yaml:"pprof" env:"APP_REGISTRY_DEBUG_PPROF" desc:"Enables pprof, which can be used for profiling"`
+	Token  string `yaml:"token" env:"APP_REGISTRY_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint."`
+	Pprof  bool   `yaml:"pprof" env:"APP_REGISTRY_DEBUG_PPROF" desc:"Enables pprof, which can be used for profiling."`
 	Zpages bool   `yaml:"zpages" env:"APP_REGISTRY_DEBUG_ZPAGES" desc:"Enables zpages, which can be used for collecting and viewing in-memory traces."`
 }
 
 type GRPCConfig struct {
 	Addr      string `yaml:"addr" env:"APP_REGISTRY_GRPC_ADDR" desc:"The bind address of the GRPC service."`
 	Namespace string `yaml:"-"`
-	Protocol  string `yaml:"protocol" env:"APP_REGISTRY_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
+	Protocol  string `yaml:"protocol" env:"APP_REGISTRY_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service."`
 }
 
 type AppRegistry struct {

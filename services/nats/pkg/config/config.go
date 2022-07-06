@@ -23,7 +23,7 @@ type Config struct {
 // Nats is the nats config
 type Nats struct {
 	Host      string `yaml:"host" env:"NATS_NATS_HOST" desc:"Bind address."`
-	Port      int    `yaml:"port" env:"NATS_NATS_PORT" desc:"Bind port:"`
+	Port      int    `yaml:"port" env:"NATS_NATS_PORT" desc:"Bind port."`
 	ClusterID string `yaml:"clusterid" env:"NATS_NATS_CLUSTER_ID" desc:"ID of the NATS cluster."`
 	StoreDir  string `yaml:"store_dir" env:"NATS_NATS_STORE_DIR" desc:"Path for the NATS JetStream persistence directory."`
 }

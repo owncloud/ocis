@@ -21,9 +21,9 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"SHARING_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token."`
 
-	UserSharingDriver    string               `yaml:"user_sharing_driver" env:"SHARING_USER_DRIVER" desc:"Driver to be used to persist shares. Possible values: \"json\", \"cs3\", \"owncloudsql\""`
+	UserSharingDriver    string               `yaml:"user_sharing_driver" env:"SHARING_USER_DRIVER" desc:"Driver to be used to persist shares. Supported values are 'json', 'cs3' and 'owncloudsql'."`
 	UserSharingDrivers   UserSharingDrivers   `yaml:"user_sharing_drivers"`
-	PublicSharingDriver  string               `yaml:"public_sharing_driver" env:"SHARING_PUBLIC_DRIVER" desc:"Driver to be used to persist public shares. Possible values: \"json\", \"cs3\""`
+	PublicSharingDriver  string               `yaml:"public_sharing_driver" env:"SHARING_PUBLIC_DRIVER" desc:"Driver to be used to persist public shares. Supported values are 'json' and 'cs3'."`
 	PublicSharingDrivers PublicSharingDrivers `yaml:"public_sharing_drivers"`
 
 	Supervised bool            `yaml:"-"`
@@ -49,15 +49,15 @@ type Service struct {
 
 type Debug struct {
 	Addr   string `yaml:"addr" env:"SHARING_DEBUG_ADDR" desc:"Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed."`
-	Token  string `yaml:"token" env:"SHARING_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint"`
-	Pprof  bool   `yaml:"pprof" env:"SHARING_DEBUG_PPROF" desc:"Enables pprof, which can be used for profiling"`
+	Token  string `yaml:"token" env:"SHARING_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint."`
+	Pprof  bool   `yaml:"pprof" env:"SHARING_DEBUG_PPROF" desc:"Enables pprof, which can be used for profiling."`
 	Zpages bool   `yaml:"zpages" env:"SHARING_DEBUG_ZPAGES" desc:"Enables zpages, which can be used for collecting and viewing in-memory traces."`
 }
 
 type GRPCConfig struct {
 	Addr      string `yaml:"addr" env:"SHARING_GRPC_ADDR" desc:"The bind address of the GRPC service."`
 	Namespace string `yaml:"-"`
-	Protocol  string `yaml:"protocol" env:"SHARING_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
+	Protocol  string `yaml:"protocol" env:"SHARING_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service."`
 }
 
 type UserSharingDrivers struct {
@@ -69,7 +69,7 @@ type UserSharingDrivers struct {
 }
 
 type UserSharingJSONDriver struct {
-	File string `yaml:"file" env:"SHARING_USER_JSON_FILE" desc:"Path to the json file where shares will be persisted."`
+	File string `yaml:"file" env:"SHARING_USER_JSON_FILE" desc:"Path to the JSON file where shares will be persisted."`
 }
 
 type UserSharingSQLDriver struct {
@@ -94,10 +94,10 @@ type UserSharingOwnCloudSQLDriver struct {
 }
 
 type UserSharingCS3Driver struct {
-	ProviderAddr     string `yaml:"provider_addr" env:"SHARING_USER_CS3_PROVIDER_ADDR" desc:"GRPC address of the storage-system extension."`
-	SystemUserID     string `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID;SHARING_USER_CS3_SYSTEM_USER_ID" desc:"ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
-	SystemUserIDP    string `yaml:"system_user_idp" env:"OCIS_SYSTEM_USER_IDP;SHARING_USER_CS3_SYSTEM_USER_IDP" desc:"IDP of the oCIS storage-system system user."`
-	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY;SHARING_USER_CS3_SYSTEM_USER_API_KEY" desc:"API key for the storage-system system user."`
+	ProviderAddr     string `yaml:"provider_addr" env:"SHARING_USER_CS3_PROVIDER_ADDR" desc:"GRPC address of the STORAGE-SYSTEM service."`
+	SystemUserID     string `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID;SHARING_USER_CS3_SYSTEM_USER_ID" desc:"ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
+	SystemUserIDP    string `yaml:"system_user_idp" env:"OCIS_SYSTEM_USER_IDP;SHARING_USER_CS3_SYSTEM_USER_IDP" desc:"IDP of the oCIS STORAGE-SYSTEM system user."`
+	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY;SHARING_USER_CS3_SYSTEM_USER_API_KEY" desc:"API key for the STORAGE-SYSTEM system user."`
 }
 
 type PublicSharingDrivers struct {
@@ -124,13 +124,13 @@ type PublicSharingSQLDriver struct {
 }
 
 type PublicSharingCS3Driver struct {
-	ProviderAddr     string `yaml:"provider_addr" env:"SHARING_PUBLIC_CS3_PROVIDER_ADDR" desc:"GRPC address of the storage-system extension."`
-	SystemUserID     string `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID;SHARING_PUBLIC_CS3_SYSTEM_USER_ID" desc:"ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
-	SystemUserIDP    string `yaml:"system_user_idp" env:"OCIS_SYSTEM_USER_IDP;SHARING_PUBLIC_CS3_SYSTEM_USER_IDP" desc:"IDP of the oCIS storage-system system user."`
-	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY;SHARING_USER_CS3_SYSTEM_USER_API_KEY" desc:"API key for the storage-system system user."`
+	ProviderAddr     string `yaml:"provider_addr" env:"SHARING_PUBLIC_CS3_PROVIDER_ADDR" desc:"GRPC address of the STORAGE-SYSTEM extension."`
+	SystemUserID     string `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID;SHARING_PUBLIC_CS3_SYSTEM_USER_ID" desc:"ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
+	SystemUserIDP    string `yaml:"system_user_idp" env:"OCIS_SYSTEM_USER_IDP;SHARING_PUBLIC_CS3_SYSTEM_USER_IDP" desc:"IDP of the oCIS STORAGE-SYSTEM system user."`
+	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY;SHARING_USER_CS3_SYSTEM_USER_API_KEY" desc:"API key for the STORAGE-SYSTEM system user."`
 }
 
 type Events struct {
-	Addr      string `yaml:"endpoint" env:"SHARING_EVENTS_ENDPOINT" desc:"the address of the streaming service"`
-	ClusterID string `yaml:"cluster" env:"SHARING_EVENTS_CLUSTER" desc:"the clusterID of the streaming service. Mandatory when using nats"`
+	Addr      string `yaml:"endpoint" env:"SHARING_EVENTS_ENDPOINT" desc:"The address of the streaming service"`
+	ClusterID string `yaml:"cluster" env:"SHARING_EVENTS_CLUSTER" desc:"The clusterID of the streaming service. Mandatory when using the NATS service"`
 }
