@@ -17,6 +17,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
 * Enhancement - Update IdP UI: [#3493](https://github.com/owncloud/ocis/issues/3493)
 * Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
+* Enhancement - Update reva: [#4115](https://github.com/owncloud/ocis/pull/4115)
 * Enhancement - Search service at the old webdav endpoint: [#4118](https://github.com/owncloud/ocis/pull/4118)
 
 ## Details
@@ -110,6 +111,10 @@ The following sections list the changes for unreleased.
    to avoid confusion between external extensions and code we provide and maintain.
 
    https://github.com/owncloud/ocis/pull/3980
+
+* Enhancement - Update reva: [#4115](https://github.com/owncloud/ocis/pull/4115)
+
+   https://github.com/owncloud/ocis/pull/4115
 
 * Enhancement - Search service at the old webdav endpoint: [#4118](https://github.com/owncloud/ocis/pull/4118)
 
