@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - CSP rules for silent token refresh in iframe: [#4031](https://github.com/owncloud/ocis/pull/4031)
+* Bugfix - Fix unused config option `GRAPH_SPACES_INSECURE`: [#55555](https://github.com/owncloud/ocis/pull/55555)
 * Bugfix - Remove unused configuration options: [#3973](https://github.com/owncloud/ocis/pull/3973)
 * Bugfix - Remove static ocs user backend config: [#4077](https://github.com/owncloud/ocis/pull/4077)
 * Bugfix - Fix make sensitive config values in the proxy's debug server: [#4086](https://github.com/owncloud/ocis/pull/4086)
@@ -30,6 +31,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/web/issues/7030
    https://github.com/owncloud/ocis/pull/4031
+
+* Bugfix - Fix unused config option `GRAPH_SPACES_INSECURE`: [#55555](https://github.com/owncloud/ocis/pull/55555)
+
+   We've removed the unused config option `GRAPH_SPACES_INSECURE` from the GRAPH service.
+
+   https://github.com/owncloud/ocis/pull/55555
 
 * Bugfix - Remove unused configuration options: [#3973](https://github.com/owncloud/ocis/pull/3973)
 
