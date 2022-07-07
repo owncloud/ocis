@@ -24,7 +24,7 @@ Feature: Share a file or folder that is inside a space
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
-    And user "Brian" accepts share "/<entity>" offered by user "Alice" using the sharing API
+    When user "Brian" accepts share "/<entity>" offered by user "Alice" using the sharing API
     And as "Brian" <type> "Shares/<entity>" should exist
     Examples:
       | entity   | type   | role   |
@@ -40,7 +40,7 @@ Feature: Share a file or folder that is inside a space
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
-    And user "Bob" accepts share "/<entity>" offered by user "Brian" using the sharing API
+    When user "Bob" accepts share "/<entity>" offered by user "Brian" using the sharing API
     And as "Bob" <type> "Shares/<entity>" should exist
     Examples:
       | entity   | type   | role   |

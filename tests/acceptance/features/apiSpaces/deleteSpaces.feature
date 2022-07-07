@@ -22,13 +22,11 @@ Feature: Disabling and deleting space
   Scenario Outline: A space admin user can disable a Space via the Graph API
     When user "Alice" disables a space "Project Moon"
     Then the HTTP status code should be "204"
-    When user "Alice" lists all available spaces via the GraphApi
-    Then the json responded should contain a space "Project Moon" with these key and value pairs:
+    And the user "Alice" should have a space called "Project Moon" with these key and value pairs:
       | key                    | value        |
       | name                   | Project Moon |
       | root@@@deleted@@@state | trashed      |
-    When user "<user>" lists all available spaces via the GraphApi
-    Then the json responded should not contain a space with name "Project Moon"
+    And the user "<user>" should not have a space called "Project Moon"
     Examples:
       | user  |
       | Brian |
@@ -38,8 +36,7 @@ Feature: Disabling and deleting space
   Scenario Outline: An user without space admin role cannot disable a Space via the Graph API
     When user "<user>" disables a space "Project Moon"
     Then the HTTP status code should be "403"
-    When user "<user>" lists all available spaces via the GraphApi
-    Then the json responded should contain a space "Project Moon" with these key and value pairs:
+    And the user "<user>" should have a space called "Project Moon" with these key and value pairs:
       | key  | value        |
       | name | Project Moon |
     Examples:
@@ -52,8 +49,7 @@ Feature: Disabling and deleting space
     Given user "Alice" has disabled a space "Project Moon"
     When user "Alice" deletes a space "Project Moon"
     Then the HTTP status code should be "204"
-    When user "Alice" lists all available spaces via the GraphApi
-    Then the json responded should not contain a space with name "Project Moon"
+    And the user "Alice" should not have a space called "Project Moon"
 
 
   Scenario: An space manager can disable and delete Space in which files and folders exist via the webDav API
@@ -63,14 +59,12 @@ Feature: Disabling and deleting space
     Then the HTTP status code should be "204"
     When user "Alice" deletes a space "Project Moon"
     Then the HTTP status code should be "204"
-    When user "Alice" lists all available spaces via the GraphApi
-    Then the json responded should not contain a space with name "Project Moon"
+    And the user "Alice" should not have a space called "Project Moon"
 
 
   Scenario: An space manager cannot delete a space via the webDav API without first disabling it
     When user "Alice" deletes a space "Project Moon"
     Then the HTTP status code should be "400"
-    When user "Alice" lists all available spaces via the GraphApi
-    Then the json responded should contain a space "Project Moon" with these key and value pairs:
+    And the user "Alice" should have a space called "Project Moon" with these key and value pairs:
       | key  | value        |
       | name | Project Moon |

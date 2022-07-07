@@ -24,21 +24,22 @@ Feature: Restoring space
     Then the HTTP status code should be "200"
 
 
-  Scenario Outline: Participants can see the data after the space is restored
+  Scenario: Participants can see the data after the space is restored
     Given user "Alice" has created a folder "mainFolder" in space "restore a space"
     And user "Alice" has uploaded a file inside space "restore a space" with content "example" to "test.txt"
     And user "Alice" has shared a space "restore a space" to user "Brian" with role "editor"
     And user "Alice" has shared a space "restore a space" to user "Bob" with role "viewer"
     And user "Alice" has disabled a space "restore a space"
     When user "Alice" restores a disabled space "restore a space"
-    Then for user "<user>" the space "restore a space" should contain these entries:
+    Then for user "Alice" the space "restore a space" should contain these entries:
       | test.txt   |
       | mainFolder |
-    Examples:
-      | user  |
-      | Alice |
-      | Brian |
-      | Bob   |
+    And for user "Brian" the space "restore a space" should contain these entries:
+      | test.txt   |
+      | mainFolder |
+    And for user "Bob" the space "restore a space" should contain these entries:
+      | test.txt   |
+      | mainFolder |
 
 
   Scenario: Participant can create data in the space after restoring
