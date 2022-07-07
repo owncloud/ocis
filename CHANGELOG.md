@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Remove static ocs user backend config: [#4077](https://github.com/owncloud/ocis/pull/4077)
 * Bugfix - Fix make sensitive config values in the proxy's debug server: [#4086](https://github.com/owncloud/ocis/pull/4086)
 * Bugfix - Fix startup error logging: [#4093](https://github.com/owncloud/ocis/pull/4093)
+* Bugfix - Escape DN attribute value: [#4117](https://github.com/owncloud/ocis/pull/4117)
 * Bugfix - Polish search: [#4094](https://github.com/owncloud/ocis/pull/4094)
 * Bugfix - Store user passwords hashed in idm: [#3778](https://github.com/owncloud/ocis/issues/3778)
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
@@ -64,6 +65,12 @@ The following sections list the changes for unreleased.
    the reason for the failed shutdown was omitted.
 
    https://github.com/owncloud/ocis/pull/4093
+
+* Bugfix - Escape DN attribute value: [#4117](https://github.com/owncloud/ocis/pull/4117)
+
+   Escaped the DN attribute value on creating users and groups.
+
+   https://github.com/owncloud/ocis/pull/4117
 
 * Bugfix - Polish search: [#4094](https://github.com/owncloud/ocis/pull/4094)
 
