@@ -41,8 +41,8 @@ DEFAULT_PHP_VERSION = "7.4"
 DEFAULT_NODEJS_VERSION = "14"
 
 dirs = {
-    "core": "/drone/src/oc10/testrunner",
-    "testing": "/drone/src/oc10/testing",
+    "core": "oc10/testrunner",
+    "testing": "oc10/testing",
 }
 
 # configuration
@@ -458,8 +458,8 @@ def cacheCoreReposForTesting(ctx):
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +  # skip for those pipelines where core repos are not needed
                  cloneCoreRepos() +
-                 rebuildBuildArtifactCache(ctx, "testrunner", "oc10/testrunner") +
-                 rebuildBuildArtifactCache(ctx, "testing_app", "oc10/testing"),
+                 rebuildBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
+                 rebuildBuildArtifactCache(ctx, "testing_app", dirs["testing"]),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -577,8 +577,8 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
                  ocisServer(storage, accounts_hash_difficulty) +
-                 restoreBuildArtifactCache(ctx, "testrunner", "oc10/testrunner") +
-                 restoreBuildArtifactCache(ctx, "testing_app", "oc10/testing") +
+                 restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
+                 restoreBuildArtifactCache(ctx, "testing_app", dirs["testing"]) +
                  [
                      {
                          "name": "localApiTests-%s-%s" % (suite, storage),
@@ -666,8 +666,8 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
                  ocisServer(storage, accounts_hash_difficulty) +
-                 restoreBuildArtifactCache(ctx, "testrunner", "oc10/testrunner") +
-                 restoreBuildArtifactCache(ctx, "testing_app", "oc10/testing") +
+                 restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
+                 restoreBuildArtifactCache(ctx, "testing_app", dirs["testing"]) +
                  [
                      {
                          "name": "oC10ApiTests-%s-storage-%s" % (storage, part_number),
@@ -2271,8 +2271,8 @@ def parallelDeployAcceptancePipeline(ctx):
                 },
                 "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                          restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                         restoreBuildArtifactCache(ctx, "testrunner", "oc10/testrunner") +
-                         restoreBuildArtifactCache(ctx, "testing_app", "oc10/testing") +
+                         restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
+                         restoreBuildArtifactCache(ctx, "testing_app", dirs["testing"]) +
                          copyConfigs() +
                          parallelDeploymentOC10Server() +
                          owncloudLog() +
