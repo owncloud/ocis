@@ -115,20 +115,14 @@ config = {
             "oc_selector": {
                 "Given": "oc10",
                 "When": "ocis",
+                "Then": "oc10",
+            },
+            {
+                "Given": "ocis",
+                "When": "oc10",
                 "Then": "ocis",
             },
-        },
-        # "apiTests-matrix2": {
-        #     "numberOfParts": 10,
-        #     "skip": False,
-        #     "skipExceptParts": [],
-        #     "earlyFail": True,
-        #     "oc_selector": {
-        #         "Given": "ocis",
-        #         "When": "oc10",
-        #         "Then": "oc10",
-        #     },
-        # },
+        ],
     },
     "rocketchat": {
         "channel": "ocis-internal",
@@ -2252,12 +2246,16 @@ def parallelDeployAcceptancePipeline(ctx):
     pipelines = []
 
     default = {
-        "filterTags": "~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OCIS-Storage&&~@issue-ocis-3023",
+        "filterTags": "~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@skipOnLdap&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OCIS-Storage&&~@files_external-app-required",
     }
 
-    for matrix, options in config["parallelApiTests"].items():
-        default.update(options)
-        params = default
+    test_type = ""
+    if ctx.build.event != "cron":
+        default["filterTags"] += "&&@smokeTest"
+        test_type = "-smoke"
+
+    default.update(config["parallelApiTests"])
+    params = default
 
         if "skip" in params and params["skip"]:
             return pipelines
@@ -2280,7 +2278,7 @@ def parallelDeployAcceptancePipeline(ctx):
                 pipeline = {
                     "kind": "pipeline",
                     "type": "docker",
-                    "name": "%s-%s" % (matrix, runPart),
+                    "name": "parallel%s-%s-%s-%s-%s" % (test_type, matrix["Given"], matrix["When"], matrix["Then"], runPart),
                     "platform": {
                         "os": "linux",
                         "arch": "amd64",
@@ -2299,7 +2297,7 @@ def parallelDeployAcceptancePipeline(ctx):
                                  ["fix-shared-data-permissions"],
                                  True,
                              ) +
-                             parallelAcceptanceTests(environment) +
+                             parallelAcceptanceTests(environment, matrix) +
                              failEarly(ctx, early_fail),
                     "services": oc10DbService() +
                                 ldapService() +
@@ -2329,7 +2327,7 @@ def parallelDeployAcceptancePipeline(ctx):
 
     return pipelines
 
-def parallelAcceptanceTests(env):
+def parallelAcceptanceTests(env, matrix):
     environment = {
         "TEST_SERVER_URL": OCIS_URL,
         "TEST_OC10_URL": OC10_URL,
@@ -2343,7 +2341,7 @@ def parallelAcceptanceTests(env):
         "SKELETON_DIR": "/drone/src/%s/data/apiSkeleton" % dirs["testing_app"],
         "PATH_TO_CORE": "/drone/src/%s" % dirs["core"],
         "OCIS_REVA_DATA_ROOT": "/mnt/data/",
-        "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-API-on-OCIS-storage.md",
+        "EXPECTED_FAILURES_FILE": "/drone/src/tests/parallelDeployAcceptance/expected-failures-API-%s-%s-%s.md" % (matrix["Given"], matrix["When"], matrix["Then"]),
         "OCIS_SKELETON_STRATEGY": "copy",
         "SEND_SCENARIO_LINE_REFERENCES": "true",
         "UPLOAD_DELETE_WAIT_TIME": "1",
