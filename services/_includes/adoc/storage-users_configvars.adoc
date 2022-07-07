@@ -93,7 +93,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+Token to secure the metrics endpoint.
 
 |`STORAGE_USERS_DEBUG_PPROF`
 a| [subs=-attributes]
@@ -101,7 +101,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+Enables pprof, which can be used for profiling.
 
 |`STORAGE_USERS_DEBUG_ZPAGES`
 a| [subs=-attributes]
@@ -125,7 +125,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[tcp]
 a| [subs=-attributes]
-The transport protocol of the grpc service.
+The transport protocol of the GPRC service.
 
 |`STORAGE_USERS_HTTP_ADDR`
 a| [subs=-attributes]
@@ -141,7 +141,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[tcp]
 a| [subs=-attributes]
-The transport protocol of the http service.
+The transport protocol of the HTTP service.
 
 |`OCIS_JWT_SECRET` +
 `STORAGE_USERS_JWT_SECRET`
@@ -327,7 +327,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[/Shares]
 a| [subs=-attributes]
-name of the folder jailing all shares.
+Name of the folder jailing all shares.
 
 |`STORAGE_USERS_OWNCLOUDSQL_LAYOUT`
 a| [subs=-attributes]
@@ -335,7 +335,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[{{.Username}}]
 a| [subs=-attributes]
-path layout to use to navigate into a users folder in an owncloud data dir
+Path layout to use to navigate into a users folder in an owncloud data directory
 
 |`STORAGE_USERS_OWNCLOUDSQL_UPLOADINFO_DIR`
 a| [subs=-attributes]
@@ -407,7 +407,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[127.0.0.1:9233]
 a| [subs=-attributes]
-the address of the streaming service
+The address of the streaming service
 
 |`STORAGE_USERS_EVENTS_CLUSTER`
 a| [subs=-attributes]
@@ -415,7 +415,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[ocis-cluster]
 a| [subs=-attributes]
-the clusterID of the streaming service. Mandatory when using nats
+The clusterID of the streaming service. Mandatory when using the NATS service.
 
 |`STORAGE_USERS_MOUNT_ID`
 a| [subs=-attributes]

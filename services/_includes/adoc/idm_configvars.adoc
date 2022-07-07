@@ -93,7 +93,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+Token to secure the metrics endpoint.
 
 |`IDM_DEBUG_PPROF`
 a| [subs=-attributes]
@@ -101,7 +101,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+Enables pprof, which can be used for profiling.
 
 |`IDM_DEBUG_ZPAGES`
 a| [subs=-attributes]
@@ -117,7 +117,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[127.0.0.1:9235]
 a| [subs=-attributes]
-Listen address for the ldaps listener (ip-addr:port)
+Listen address for the LDAPS listener (ip-addr:port).
 
 |`IDM_LDAPS_CERT`
 a| [subs=-attributes]
@@ -125,7 +125,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[~/.ocis/idm/ldap.crt]
 a| [subs=-attributes]
-File name of the TLS server certificate for the ldaps listener
+File name of the TLS server certificate for the LDAPS listener.
 
 |`IDM_LDAPS_KEY`
 a| [subs=-attributes]
@@ -133,7 +133,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[~/.ocis/idm/ldap.key]
 a| [subs=-attributes]
-File name for the TLS certificate key for the server certificate
+File name for the TLS certificate key for the server certificate.
 
 |`IDM_DATABASE_PATH`
 a| [subs=-attributes]
@@ -141,7 +141,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[~/.ocis/idm/ocis.boltdb]
 a| [subs=-attributes]
-Full path to the idm backend database
+Full path to the IDM backend database.
 
 |`IDM_CREATE_DEMO_USERS` +
 `ACCOUNTS_DEMO_USERS_AND_GROUPS`
@@ -150,7 +150,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Flag to enabe/disable the creation of the demo users
+Flag to enable or disable the creation of the demo users.
 
 |`IDM_ADMIN_PASSWORD`
 a| [subs=-attributes]
@@ -158,7 +158,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Password to set for the ocis "admin" user. Either cleartext or an argon2id hash
+Password to set for the oCIS "admin" user. Either cleartext or an argon2id hash.
 
 |`IDM_SVC_PASSWORD`
 a| [subs=-attributes]
@@ -166,7 +166,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Password to set for the "idm" service user. Either cleartext or an argon2id hash
+Password to set for the "idm" service user. Either cleartext or an argon2id hash.
 
 |`IDM_REVASVC_PASSWORD`
 a| [subs=-attributes]
@@ -174,7 +174,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Password to set for the "reva" service user. Either cleartext or an argon2id hash
+Password to set for the "reva" service user. Either cleartext or an argon2id hash.
 
 |`IDM_IDPSVC_PASSWORD`
 a| [subs=-attributes]
@@ -182,7 +182,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Password to set for the "idp" service user. Either cleartext or an argon2id hash
+Password to set for the "idp" service user. Either cleartext or an argon2id hash.
 
 |`OCIS_ADMIN_USER_ID` +
 `IDM_ADMIN_USER_ID`
@@ -191,7 +191,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-ID of a user, that should receive admin privileges.
+ID of the user that should receive admin privileges.
 |===
 
 Since Version: `+` added, `-` deprecated

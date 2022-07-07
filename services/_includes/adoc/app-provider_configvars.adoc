@@ -125,7 +125,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[tcp]
 a| [subs=-attributes]
-The transport protocol of the grpc service.
+The transport protocol of the GPRC service.
 
 |`OCIS_JWT_SECRET` +
 `APP_PROVIDER_JWT_SECRET`
@@ -150,7 +150,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Address of the app provider, where the gateway service can reach it.
+Address of the app provider, where the GATEWAY service can reach it.
 
 |`APP_PROVIDER_DRIVER`
 a| [subs=-attributes]
@@ -158,7 +158,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Driver, which the app provider uses. Only "wopi" is supported as of now.
+Driver, the APP PROVIDER services uses. Only "wopi" is supported as of now.
 
 |`APP_PROVIDER_WOPI_APP_API_KEY`
 a| [subs=-attributes]
@@ -190,7 +190,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Internal URL to the app, eg in your DMZ.
+Internal URL to the app, like in your DMZ.
 
 |`APP_PROVIDER_WOPI_APP_NAME`
 a| [subs=-attributes]

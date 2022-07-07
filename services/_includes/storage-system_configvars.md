@@ -15,16 +15,16 @@
 | STORAGE_SYSTEM_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | STORAGE_SYSTEM_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | STORAGE_SYSTEM_GRPC_ADDR | string | 127.0.0.1:9215 | The bind address of the GRPC service.|
-| STORAGE_SYSTEM_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
+| STORAGE_SYSTEM_GRPC_PROTOCOL | string | tcp | The transport protocol of the GPRC service.|
 | STORAGE_SYSTEM_HTTP_ADDR | string | 127.0.0.1:9216 | The bind address of the HTTP service.|
-| STORAGE_SYSTEM_HTTP_PROTOCOL | string | tcp | The transport protocol of the http service.|
-| STORAGE_SYSTEM_EVENTS_ENDPOINT | string |  | the address of the streaming service|
-| STORAGE_SYSTEM_EVENTS_CLUSTER | string |  | the clusterID of the streaming service. Mandatory when using nats|
+| STORAGE_SYSTEM_HTTP_PROTOCOL | string | tcp | The transport protocol of the HTTP service.|
+| STORAGE_SYSTEM_EVENTS_ENDPOINT | string |  | The address of the streaming service.|
+| STORAGE_SYSTEM_EVENTS_CLUSTER | string |  | The clusterID of the streaming service. Mandatory when using the NATS service.|
 | OCIS_JWT_SECRET<br/>STORAGE_SYSTEM_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
-| OCIS_SYSTEM_USER_ID | string |  | ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|
-| OCIS_SYSTEM_USER_API_KEY | string |  | API key for the storage-system system user.|
+| OCIS_SYSTEM_USER_ID | string |  | ID of the oCIS storage-system system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|
+| OCIS_SYSTEM_USER_API_KEY | string |  | API key for the STORAGE-SYSTEM system user.|
 | STORAGE_SYSTEM_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
-| STORAGE_SYSTEM_DRIVER | string | ocis | The driver which should be used by the service|
-| STORAGE_SYSTEM_OCIS_ROOT | string | ~/.ocis/storage/metadata | Path for the directory where the storage-system service stores it's persistent data.|
-| STORAGE_SYSTEM_DATA_SERVER_URL | string | http://localhost:9216/data | URL of the data server, needs to be reachable by services using this service.|
+| STORAGE_SYSTEM_DRIVER | string | ocis | The driver which should be used by the service.|
+| STORAGE_SYSTEM_OCIS_ROOT | string | ~/.ocis/storage/metadata | Path for the directory where the STORAGE-SYSTEM service stores it's persistent data.|
+| STORAGE_SYSTEM_DATA_SERVER_URL | string | http://localhost:9216/data | URL of the data server, needs to be reachable by other services using this service.|

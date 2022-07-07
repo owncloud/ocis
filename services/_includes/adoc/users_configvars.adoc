@@ -93,7 +93,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+Token to secure the metrics endpoint.
 
 |`USERS_DEBUG_PPROF`
 a| [subs=-attributes]
@@ -101,7 +101,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+Enables pprof, which can be used for profiling.
 
 |`USERS_DEBUG_ZPAGES`
 a| [subs=-attributes]
@@ -125,7 +125,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[tcp]
 a| [subs=-attributes]
-The transport protocol of the grpc service.
+The transport protocol of the GPRC service.
 
 |`OCIS_JWT_SECRET` +
 `USERS_JWT_SECRET`
@@ -158,7 +158,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[ldap]
 a| [subs=-attributes]
-The user driver which should be used by the users service. Defaults to 'ldap', can be 'owncloudsql', 'json' or 'rest'
+The user driver which should be used by the users service. Supported values are 'ldap', 'owncloudsql', 'json' and 'rest'.
 
 |`LDAP_URI` +
 `USERS_LDAP_URI`
@@ -230,7 +230,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[sub]
 a| [subs=-attributes]
-LDAP search scope to use when looking up users ('base', 'one', 'sub').
+LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.
 
 |`LDAP_GROUP_SCOPE` +
 `USERS_LDAP_GROUP_SCOPE`
@@ -239,7 +239,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[sub]
 a| [subs=-attributes]
-LDAP search scope to use when looking up gruops ('base', 'one', 'sub').
+LDAP search scope to use when looking up groups. Supported values are 'base', 'one' and 'sub'.
 
 |`LDAP_USER_FILTER` +
 `USERS_LDAP_USER_FILTER`
@@ -248,7 +248,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').
+LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.
 
 |`LDAP_GROUP_FILTER` +
 `USERS_LDAP_GROUP_FILTER`
@@ -266,7 +266,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[inetOrgPerson]
 a| [subs=-attributes]
-The object class to use for users in the default user search filter ('inetOrgPerson').
+The object class to use for users in the default user search filter like 'inetOrgPerson'.
 
 |`LDAP_GROUP_OBJECTCLASS` +
 `USERS_LDAP_GROUP_OBJECTCLASS`
@@ -275,7 +275,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[groupOfNames]
 a| [subs=-attributes]
-The object class to use for groups in the default group search filter ('groupOfNames'). 
+The object class to use for groups in the default group search filter like 'groupOfNames'. 
 
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
@@ -294,7 +294,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[ownclouduuid]
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for users. This should be a stable globally unique id (e.g. a UUID).
+LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
 
 |`LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
 `USERS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
@@ -303,7 +303,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ids.
+Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's.
 
 |`LDAP_USER_SCHEMA_MAIL` +
 `USERS_LDAP_USER_SCHEMA_MAIL`
@@ -339,7 +339,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[ownclouduuid]
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
+LDAP Attribute to use as the unique ID for groups. This should be a stable globally unique ID like a UUID.
 
 |`LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING` +
 `USERS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
@@ -348,7 +348,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ids.
+Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ID's.
 
 |`LDAP_GROUP_SCHEMA_MAIL` +
 `USERS_LDAP_GROUP_SCHEMA_MAIL`
@@ -366,7 +366,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[cn]
 a| [subs=-attributes]
-LDAP Attribute to use for the displayname of groups (often the same as groupname attribute)
+LDAP Attribute to use for the displayname of groups (often the same as groupname attribute).
 
 |`LDAP_GROUP_SCHEMA_GROUPNAME` +
 `USERS_LDAP_GROUP_SCHEMA_GROUPNAME`
@@ -375,7 +375,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[cn]
 a| [subs=-attributes]
-LDAP Attribute to use for the name of groups
+LDAP Attribute to use for the name of groups.
 
 |`LDAP_GROUP_SCHEMA_MEMBER` +
 `USERS_LDAP_GROUP_SCHEMA_MEMBER`
@@ -456,7 +456,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Join the user properties table to read user ids (boolean).
+Join the user properties table to read user IDs.
 
 |`USERS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH`
 a| [subs=-attributes]
@@ -464,7 +464,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Allow 'medial search' when searching for users instead of just doing a prefix search. (Allows finding 'Alice' when searching for 'lic'.)
+Allow 'medial search' when searching for users instead of just doing a prefix search. This allows finding 'Alice' when searching for 'lic'.
 |===
 
 Since Version: `+` added, `-` deprecated

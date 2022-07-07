@@ -93,7 +93,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+Token to secure the metrics endpoint.
 
 |`FRONTEND_DEBUG_PPROF`
 a| [subs=-attributes]
@@ -101,7 +101,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+Enables pprof, which can be used for profiling.
 
 |`FRONTEND_DEBUG_ZPAGES`
 a| [subs=-attributes]
@@ -125,7 +125,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[tcp]
 a| [subs=-attributes]
-The transport protocol of the http service.
+The transport protocol of the HTTP service.
 
 |`FRONTEND_HTTP_PREFIX`
 a| [subs=-attributes]
@@ -167,7 +167,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+Machine auth API key used to validate internal requests necessary to access resources from other services.
 
 |`FRONTEND_SKIP_USER_GROUPS_IN_TOKEN`
 a| [subs=-attributes]
@@ -240,7 +240,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[https://localhost:9200]
 a| [subs=-attributes]
-The public facing url of the ocis frontend.
+The public facing URL of the oCIS frontend.
 
 |`OCIS_INSECURE` +
 `FRONTEND_APP_HANDLER_INSECURE`
@@ -290,7 +290,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[ocs]
 a| [subs=-attributes]
-Path prefix for the ocs service
+Path prefix for the OCS service
 
 |`FRONTEND_OCS_SHARE_PREFIX`
 a| [subs=-attributes]
@@ -314,7 +314,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[{{.Mail}}]
 a| [subs=-attributes]
-Additional information attribute for the user (e.g. {{.Mail}}
+Additional information attribute for the user like {{.Mail}}.
 
 |`FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL`
 a| [subs=-attributes]
@@ -322,7 +322,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[0]
 a| [subs=-attributes]
-Max TTL for the resource info cache
+Max TTL for the resource info cache.
 
 |`FRONTEND_CHECKSUMS_SUPPORTED_TYPES`
 a| [subs=-attributes]

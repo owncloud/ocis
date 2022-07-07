@@ -93,7 +93,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+Token to secure the metrics endpoint.
 
 |`SHARING_DEBUG_PPROF`
 a| [subs=-attributes]
@@ -101,7 +101,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+Enables pprof, which can be used for profiling.
 
 |`SHARING_DEBUG_ZPAGES`
 a| [subs=-attributes]
@@ -125,7 +125,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[tcp]
 a| [subs=-attributes]
-The transport protocol of the grpc service.
+The transport protocol of the GRPC service.
 
 |`OCIS_JWT_SECRET` +
 `SHARING_JWT_SECRET`
@@ -150,7 +150,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[127.0.0.1:9233]
 a| [subs=-attributes]
-the address of the streaming service
+The address of the streaming service
 
 |`SHARING_EVENTS_CLUSTER`
 a| [subs=-attributes]
@@ -158,7 +158,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[ocis-cluster]
 a| [subs=-attributes]
-the clusterID of the streaming service. Mandatory when using nats
+The clusterID of the streaming service. Mandatory when using the NATS service
 
 |`SHARING_SKIP_USER_GROUPS_IN_TOKEN`
 a| [subs=-attributes]
@@ -174,7 +174,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[cs3]
 a| [subs=-attributes]
-Driver to be used to persist shares. Possible values: "json", "cs3", "owncloudsql"
+Driver to be used to persist shares. Supported values are 'json', 'cs3' and 'owncloudsql'.
 
 |`SHARING_USER_JSON_FILE`
 a| [subs=-attributes]
@@ -182,7 +182,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[~/.ocis/storage/shares.json]
 a| [subs=-attributes]
-Path to the json file where shares will be persisted.
+Path to the JSON file where shares will be persisted.
 
 |`SHARING_USER_CS3_PROVIDER_ADDR`
 a| [subs=-attributes]
@@ -190,7 +190,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[127.0.0.1:9215]
 a| [subs=-attributes]
-GRPC address of the storage-system extension.
+GRPC address of the STORAGE-SYSTEM service.
 
 |`OCIS_SYSTEM_USER_ID` +
 `SHARING_USER_CS3_SYSTEM_USER_ID`
@@ -199,7 +199,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
+ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
 
 |`OCIS_SYSTEM_USER_IDP` +
 `SHARING_USER_CS3_SYSTEM_USER_IDP`
@@ -208,7 +208,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[internal]
 a| [subs=-attributes]
-IDP of the oCIS storage-system system user.
+IDP of the oCIS STORAGE-SYSTEM system user.
 
 |`OCIS_SYSTEM_USER_API_KEY` +
 `SHARING_USER_CS3_SYSTEM_USER_API_KEY`
@@ -217,7 +217,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-API key for the storage-system system user.
+API key for the STORAGE-SYSTEM system user.
 
 |`SHARING_USER_OWNCLOUDSQL_DB_USERNAME`
 a| [subs=-attributes]
@@ -273,7 +273,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[cs3]
 a| [subs=-attributes]
-Driver to be used to persist public shares. Possible values: "json", "cs3"
+Driver to be used to persist public shares. Supported values are 'json' and 'cs3'.
 
 |`SHARING_PUBLIC_JSON_FILE`
 a| [subs=-attributes]
@@ -289,7 +289,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[127.0.0.1:9215]
 a| [subs=-attributes]
-GRPC address of the storage-system extension.
+GRPC address of the STORAGE-SYSTEM extension.
 
 |`OCIS_SYSTEM_USER_ID` +
 `SHARING_PUBLIC_CS3_SYSTEM_USER_ID`
@@ -298,7 +298,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
+ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
 
 |`OCIS_SYSTEM_USER_IDP` +
 `SHARING_PUBLIC_CS3_SYSTEM_USER_IDP`
@@ -307,7 +307,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[internal]
 a| [subs=-attributes]
-IDP of the oCIS storage-system system user.
+IDP of the oCIS STORAGE-SYSTEM system user.
 
 |`OCIS_SYSTEM_USER_API_KEY` +
 `SHARING_USER_CS3_SYSTEM_USER_API_KEY`
@@ -316,7 +316,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-API key for the storage-system system user.
+API key for the STORAGE-SYSTEM system user.
 |===
 
 Since Version: `+` added, `-` deprecated

@@ -93,7 +93,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+Token to secure the metrics endpoint.
 
 |`GATEWAY_DEBUG_PPROF`
 a| [subs=-attributes]
@@ -101,7 +101,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+Enables pprof, which can be used for profiling.
 
 |`GATEWAY_DEBUG_ZPAGES`
 a| [subs=-attributes]
@@ -125,7 +125,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[tcp]
 a| [subs=-attributes]
-The transport protocol of the grpc service.
+The transport protocol of the GRPC service.
 
 |`OCIS_JWT_SECRET` +
 `GATEWAY_JWT_SECRET`
@@ -182,7 +182,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-The storage transfer secret
+The storage transfer secret.
 
 |`GATEWAY_TRANSFER_EXPIRES`
 a| [subs=-attributes]
@@ -190,7 +190,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[86400]
 a| [subs=-attributes]
-Expiry for the gateway tokens
+Expiry for the gateway tokens.
 
 |`GATEWAY_ETAG_CACHE_TTL`
 a| [subs=-attributes]
@@ -207,7 +207,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[https://localhost:9200]
 a| [subs=-attributes]
-The public facing url of the ocis frontend.
+The public facing URL of the oCIS frontend.
 
 |`GATEWAY_USERS_ENDPOINT`
 a| [subs=-attributes]
@@ -215,7 +215,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[localhost:9144]
 a| [subs=-attributes]
-The users api endpoint.
+The USERS API endpoint.
 
 |`GATEWAY_GROUPS_ENDPOINT`
 a| [subs=-attributes]
@@ -223,7 +223,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[localhost:9160]
 a| [subs=-attributes]
-The groups api endpoint.
+The GROUPS API endpoint.
 
 |`GATEWAY_PERMISSIONS_ENDPOINT`
 a| [subs=-attributes]
@@ -231,7 +231,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[localhost:9191]
 a| [subs=-attributes]
-The permission api endpoint.
+The SETTINGS API endpoint.
 
 |`GATEWAY_SHARING_ENDPOINT`
 a| [subs=-attributes]
@@ -239,7 +239,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[localhost:9150]
 a| [subs=-attributes]
-The share api endpoint.
+The SHARE API endpoint.
 
 |`GATEWAY_AUTH_BASIC_ENDPOINT`
 a| [subs=-attributes]
@@ -247,7 +247,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[localhost:9146]
 a| [subs=-attributes]
-The auth basic api endpoint.
+The AUTH BASIC API endpoint.
 
 |`GATEWAY_AUTH_BEARER_ENDPOINT`
 a| [subs=-attributes]
@@ -255,7 +255,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[localhost:9148]
 a| [subs=-attributes]
-The auth bearer api endpoint.
+The AUTH BEARER API endpoint.
 
 |`GATEWAY_AUTH_MACHINE_ENDPOINT`
 a| [subs=-attributes]
@@ -263,7 +263,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[localhost:9166]
 a| [subs=-attributes]
-The auth machine api endpoint.
+The AUTH MACHINE API endpoint.
 
 |`GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT`
 a| [subs=-attributes]
@@ -271,7 +271,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[localhost:9178]
 a| [subs=-attributes]
-The storage puliclink api endpoint.
+The STORAGE PUBLICLINK API endpoint.
 
 |`GATEWAY_STORAGE_USERS_ENDPOINT`
 a| [subs=-attributes]
@@ -279,7 +279,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[localhost:9157]
 a| [subs=-attributes]
-The storage users api endpoint.
+The STORAGE USERS API endpoint.
 
 |`GATEWAY_STORAGE_SHARES_ENDPOINT`
 a| [subs=-attributes]
@@ -287,7 +287,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[localhost:9154]
 a| [subs=-attributes]
-The storage shares api endpoint.
+The STORAGE SHARES API endpoint.
 
 |`GATEWAY_APP_REGISTRY_ENDPOINT`
 a| [subs=-attributes]
@@ -295,7 +295,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[localhost:9242]
 a| [subs=-attributes]
-The app registry api endpoint.
+The APP REGISTRY API endpoint.
 |===
 
 Since Version: `+` added, `-` deprecated

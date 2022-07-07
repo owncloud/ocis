@@ -11,12 +11,12 @@
 | OCIS_LOG_COLOR<br/>OCS_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>OCS_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
 | OCS_DEBUG_ADDR | string | 127.0.0.1:9114 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
-| OCS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
-| OCS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| OCS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
+| OCS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | OCS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | OCS_HTTP_ADDR | string | 127.0.0.1:9110 | The bind address of the HTTP service.|
 | OCS_HTTP_ROOT | string | /ocs | Subdirectory that serves as the root for this HTTP service.|
 | OCIS_JWT_SECRET<br/>OCS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>OCS_IDM_ADDRESS | string | https://localhost:9200 | URL of the OIDC issuer. It defaults to URL of the builtin IDP.|
-| OCIS_MACHINE_AUTH_API_KEY<br/>OCS_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|
+| OCIS_MACHINE_AUTH_API_KEY<br/>OCS_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary to access resources from other services.|

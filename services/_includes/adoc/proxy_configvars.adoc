@@ -93,7 +93,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+Token to secure the metrics endpoint.
 
 |`PROXY_DEBUG_PPROF`
 a| [subs=-attributes]
@@ -101,7 +101,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+Enables pprof, which can be used for profiling.
 
 |`PROXY_DEBUG_ZPAGES`
 a| [subs=-attributes]
@@ -176,7 +176,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[true]
 a| [subs=-attributes]
-Disable TLS certificate validation for connections to the IDP. (not recommended for production environments.
+Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments.
 
 |`PROXY_OIDC_USERINFO_CACHE_SIZE`
 a| [subs=-attributes]
@@ -184,7 +184,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[1024]
 a| [subs=-attributes]
-Cache size for oidc user info.
+Cache size for OIDC user info.
 
 |`PROXY_OIDC_USERINFO_CACHE_TTL`
 a| [subs=-attributes]
@@ -192,7 +192,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[10]
 a| [subs=-attributes]
-Max TTL for the oidc user info cache.
+Max TTL in seconds for the OIDC user info cache.
 
 |`OCIS_JWT_SECRET` +
 `PROXY_JWT_SECRET`
@@ -201,7 +201,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-The secret to mint and validate jwt tokens.
+The secret to mint and validate JWT tokens.
 
 |`PROXY_ENABLE_PRESIGNEDURLS`
 a| [subs=-attributes]
@@ -209,7 +209,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[true]
 a| [subs=-attributes]
-Allow ocs to get a signing key to sign requests.
+Allow OCS to get a signing key to sign requests.
 
 |`PROXY_ACCOUNT_BACKEND_TYPE`
 a| [subs=-attributes]
@@ -217,7 +217,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[cs3]
 a| [subs=-attributes]
-Account backend the proxy should use, currenly only 'cs3' is possible here.
+Account backend the PROXY service should use. Currently only 'cs3' is possible here.
 
 |`PROXY_USER_OIDC_CLAIM`
 a| [subs=-attributes]
@@ -233,7 +233,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[mail]
 a| [subs=-attributes]
-The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail' (other possible values are: 'username', 'displayname')
+The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail'. Supported values are 'username' and 'displayname'.
 
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `PROXY_MACHINE_AUTH_API_KEY`
@@ -242,7 +242,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+Machine auth API key used to validate internal requests necessary to access resources from other services.
 
 |`PROXY_AUTOPROVISION_ACCOUNTS`
 a| [subs=-attributes]
@@ -266,7 +266,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Disable TLS certificate validation for all http backend connections.
+Disable TLS certificate validation for all HTTP backend connections.
 |===
 
 Since Version: `+` added, `-` deprecated

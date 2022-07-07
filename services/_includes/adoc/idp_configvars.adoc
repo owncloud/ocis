@@ -101,7 +101,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+Token to secure the metrics endpoint.
 
 |`IDP_DEBUG_PPROF`
 a| [subs=-attributes]
@@ -109,7 +109,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+Enables pprof, which can be used for profiling.
 
 |`IDP_DEBUG_ZPAGES`
 a| [subs=-attributes]
@@ -200,7 +200,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[ldap]
 a| [subs=-attributes]
-The identity manager implementation to use, defaults to 'ldap', can be changed to 'cs3', 'kc', 'libregraph', 'cookie' or 'guest'.
+The identity manager implementation to use. Supported identity managers are 'ldap', 'cs3', 'kc', 'libregraph', 'cookie' and 'guest'.
 
 |`IDP_URI_BASE_PATH`
 a| [subs=-attributes]
@@ -208,7 +208,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Idp uri base path (defaults to "").
+IDP uri base path (defaults to "").
 
 |`IDP_SIGN_IN_URI`
 a| [subs=-attributes]
@@ -216,7 +216,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Idp sign-in url.
+IDP sign-in url.
 
 |`IDP_SIGN_OUT_URI`
 a| [subs=-attributes]
@@ -224,7 +224,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Idp sign-out url.
+IDP sign-out url.
 
 |`IDP_ENDPOINT_URI`
 a| [subs=-attributes]
@@ -232,7 +232,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Url of IDP endpoint.
+URL of the IDP endpoint.
 
 |`LDAP_INSECURE` +
 `IDP_INSECURE`
@@ -241,7 +241,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Allow insecure connections to the user backend (eg. LDAP, CS3 api, ...).
+Allow insecure connections to the user backend like LDAP, CS3 api, ...
 
 |`IDP_ALLOW_CLIENT_GUESTS`
 a| [subs=-attributes]
@@ -249,7 +249,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Allow guest clients to access ocis.
+Allow guest clients to access oCIS.
 
 |`IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION`
 a| [subs=-attributes]
@@ -281,7 +281,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[PS256]
 a| [subs=-attributes]
-Signing method of idp requests (e.g. PS256)
+Signing method of IDP requests like 'PS256'
 
 |`IDP_SIGNING_PRIVATE_KEY_FILES`
 a| [subs=-attributes]
@@ -289,7 +289,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[[~/.ocis/idp/private-key.pem]]
 a| [subs=-attributes]
-Private key files for signing idp requests.
+Private key files for signing IDP requests.
 
 |`IDP_VALIDATION_KEYS_PATH`
 a| [subs=-attributes]
@@ -297,7 +297,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Path to validation keys for idp requests.
+Path to validation keys for IDP requests.
 
 |`IDP_ACCESS_TOKEN_EXPIRATION`
 a| [subs=-attributes]
@@ -305,7 +305,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[86400]
 a| [subs=-attributes]
-Expiration time for idp access token (in seconds).
+Expiration time in seconds for IDP access token.
 
 |`IDP_ID_TOKEN_EXPIRATION`
 a| [subs=-attributes]
@@ -313,7 +313,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[3600]
 a| [subs=-attributes]
-Expiration time for idp id tokens (in seconds).
+Expiration time in seconds for IDP ID tokens.
 
 |`IDP_REFRESH_TOKEN_EXPIRATION`
 a| [subs=-attributes]
@@ -321,7 +321,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[94608000]
 a| [subs=-attributes]
-Expiration time for refresh tokens (in seconds).
+Expiration time in seconds for refresh tokens.
 
 |`IDP_DYNAMIC_CLIENT_SECRET_DURATION`
 a| [subs=-attributes]
@@ -329,7 +329,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[0]
 a| [subs=-attributes]
-Expiration time for dynamic clients (in seconds).
+Expiration time in seconds for dynamic clients.
 
 |`LDAP_URI` +
 `IDP_LDAP_URI`
@@ -338,7 +338,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[ldaps://localhost:9235]
 a| [subs=-attributes]
-Url of the LDAP service to use as idp.
+Url of the LDAP service to use as IDP.
 
 |`LDAP_CACERT` +
 `IDP_LDAP_TLS_CACERT`
@@ -347,7 +347,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[~/.ocis/idm/ldap.crt]
 a| [subs=-attributes]
-Path to the tls cert for the ldap service.
+Path to the TLS cert for the LDAP service.
 
 |`LDAP_BIND_DN` +
 `IDP_LDAP_BIND_DN`
@@ -383,7 +383,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[sub]
 a| [subs=-attributes]
-LDAP search scope to use when looking up users ('base', 'one', 'sub').
+LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
 
 |`IDP_LDAP_LOGIN_ATTRIBUTE`
 a| [subs=-attributes]
@@ -391,7 +391,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[uid]
 a| [subs=-attributes]
-LDAP User attribute to use for login (e.g. uid).
+LDAP User attribute to use for login like 'uid'.
 
 |`LDAP_USER_SCHEMA_MAIL` +
 `IDP_LDAP_EMAIL_ATTRIBUTE`
@@ -400,7 +400,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[mail]
 a| [subs=-attributes]
-LDAP User email attribute (e.g. mail).
+LDAP User email attribute like 'mail'.
 
 |`LDAP_USER_SCHEMA_USERNAME` +
 `IDP_LDAP_NAME_ATTRIBUTE`
@@ -409,7 +409,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[displayName]
 a| [subs=-attributes]
-LDAP User name attribute (e.g. displayName).
+LDAP User name attribute like 'displayName'.
 
 |`LDAP_USER_SCHEMA_ID` +
 `IDP_LDAP_UUID_ATTRIBUTE`
@@ -418,7 +418,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[uid]
 a| [subs=-attributes]
-LDAP User uuid attribute (e.g. uid).
+LDAP User uuid attribute like 'uid'.
 
 |`IDP_LDAP_UUID_ATTRIBUTE_TYPE`
 a| [subs=-attributes]
@@ -426,7 +426,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[text]
 a| [subs=-attributes]
-LDAP User uuid attribute type (e.g. text).
+LDAP User uuid attribute type like 'text'.
 
 |`LDAP_USER_FILTER` +
 `IDP_LDAP_FILTER`
@@ -435,7 +435,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').
+LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.
 
 |`LDAP_USER_OBJECTCLASS` +
 `IDP_LDAP_OBJECTCLASS`
@@ -444,7 +444,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[inetOrgPerson]
 a| [subs=-attributes]
-LDAP User ObjectClass (e.g. inetOrgPerson).
+LDAP User ObjectClass like 'inetOrgPerson'.
 |===
 
 Since Version: `+` added, `-` deprecated

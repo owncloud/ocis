@@ -93,7 +93,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+Token to secure the metrics endpoint.
 
 |`GRAPH_DEBUG_PPROF`
 a| [subs=-attributes]
@@ -101,7 +101,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+Enables pprof, which can be used for profiling.
 
 |`GRAPH_DEBUG_ZPAGES`
 a| [subs=-attributes]
@@ -175,7 +175,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[0]
 a| [subs=-attributes]
-Max TTL for the spaces property cache.
+Max TTL in seconds for the spaces property cache.
 
 |`GRAPH_IDENTITY_BACKEND`
 a| [subs=-attributes]
@@ -183,7 +183,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[ldap]
 a| [subs=-attributes]
-The user identity backend to use, defaults to 'ldap', can be 'cs3'.
+The user identity backend to use. Supported backend types are 'ldap' and 'cs3'.
 
 |`LDAP_URI` +
 `GRAPH_LDAP_URI`
@@ -201,7 +201,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[~/.ocis/idm/ldap.crt]
 a| [subs=-attributes]
-The certificate to verify TLS connections
+The certificate to verify TLS connections.
 
 |`LDAP_INSECURE` +
 `GRAPH_LDAP_INSECURE`
@@ -236,7 +236,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-If set to true, rely on the LDAP Server to generate a unique ID for users and groups, e.g. when using 'entryUUID' as the user id attribute.
+If set to true, rely on the LDAP Server to generate a unique ID for users and groups, like when using 'entryUUID' as the user ID attribute.
 
 |`GRAPH_LDAP_SERVER_USE_PASSWORD_MODIFY_EXOP`
 a| [subs=-attributes]
@@ -244,7 +244,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[true]
 a| [subs=-attributes]
-User the Password Modify Extended Operation for updating user passwords
+User the Password Modify Extended Operation for updating user passwords.
 
 |`GRAPH_LDAP_SERVER_WRITE_ENABLED`
 a| [subs=-attributes]
@@ -252,7 +252,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[true]
 a| [subs=-attributes]
-Allow to create, modify and delete LDAP users via graph API. This is only works when the default Schema is used.
+Allow to create, modify and delete LDAP users via GRAPH API. This is only works when the default Schema is used.
 
 |`LDAP_USER_BASE_DN` +
 `GRAPH_LDAP_USER_BASE_DN`
@@ -270,7 +270,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[sub]
 a| [subs=-attributes]
-LDAP search scope to use when looking up users ('base', 'one', 'sub').
+LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
 
 |`LDAP_USER_FILTER` +
 `GRAPH_LDAP_USER_FILTER`
@@ -279,7 +279,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-LDAP filter to add to the default filters for user search (e.g. '(objectclass=ownCloud)').
+LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.
 
 |`LDAP_USER_OBJECTCLASS` +
 `GRAPH_LDAP_USER_OBJECTCLASS`
@@ -324,7 +324,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[owncloudUUID]
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for users. This should be a stable globally unique id (e.g. a UUID).
+LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.
 
 |`LDAP_GROUP_BASE_DN` +
 `GRAPH_LDAP_GROUP_BASE_DN`
@@ -342,7 +342,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[sub]
 a| [subs=-attributes]
-LDAP search scope to use when looking up gruops ('base', 'one', 'sub').
+LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
 
 |`LDAP_GROUP_FILTER` +
 `GRAPH_LDAP_GROUP_FILTER`
@@ -369,7 +369,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[cn]
 a| [subs=-attributes]
-LDAP Attribute to use for the name of groups
+LDAP Attribute to use for the name of groups.
 
 |`LDAP_GROUP_SCHEMA_ID` +
 `GRAPH_LDAP_GROUP_ID_ATTRIBUTE`
@@ -378,7 +378,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[owncloudUUID]
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
 
 |`GRAPH_EVENTS_ENDPOINT`
 a| [subs=-attributes]
@@ -386,7 +386,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[127.0.0.1:9233]
 a| [subs=-attributes]
-the address of the streaming service
+The address of the streaming service.
 
 |`GRAPH_EVENTS_CLUSTER`
 a| [subs=-attributes]
@@ -394,7 +394,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[ocis-cluster]
 a| [subs=-attributes]
-the clusterID of the streaming service. Mandatory when using nats
+The clusterID of the streaming service. Mandatory when using the NATS service.
 |===
 
 Since Version: `+` added, `-` deprecated

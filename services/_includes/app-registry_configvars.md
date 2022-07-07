@@ -11,10 +11,10 @@
 | OCIS_LOG_COLOR<br/>APP_REGISTRY_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>APP_REGISTRY_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
 | APP_REGISTRY_DEBUG_ADDR | string | 127.0.0.1:9243 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
-| APP_REGISTRY_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
-| APP_REGISTRY_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| APP_REGISTRY_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
+| APP_REGISTRY_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | APP_REGISTRY_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | APP_REGISTRY_GRPC_ADDR | string | 127.0.0.1:9242 | The bind address of the GRPC service.|
-| APP_REGISTRY_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
+| APP_REGISTRY_GRPC_PROTOCOL | string | tcp | The transport protocol of the GRPC service.|
 | OCIS_JWT_SECRET<br/>APP_REGISTRY_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|

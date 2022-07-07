@@ -15,15 +15,15 @@
 | APP_PROVIDER_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | APP_PROVIDER_DEBUG_ZPAGES | bool | false | Enables zpages, which can  be used for collecting and viewing traces in-memory.|
 | APP_PROVIDER_GRPC_ADDR | string | 127.0.0.1:9164 | The bind address of the GRPC service.|
-| APP_PROVIDER_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
+| APP_PROVIDER_GRPC_PROTOCOL | string | tcp | The transport protocol of the GPRC service.|
 | OCIS_JWT_SECRET<br/>APP_PROVIDER_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
-| APP_PROVIDER_EXTERNAL_ADDR | string |  | Address of the app provider, where the gateway service can reach it.|
-| APP_PROVIDER_DRIVER | string |  | Driver, which the app provider uses. Only "wopi" is supported as of now.|
+| APP_PROVIDER_EXTERNAL_ADDR | string |  | Address of the app provider, where the GATEWAY service can reach it.|
+| APP_PROVIDER_DRIVER | string |  | Driver, the APP PROVIDER services uses. Only "wopi" is supported as of now.|
 | APP_PROVIDER_WOPI_APP_API_KEY | string |  | API key for the wopi app.|
 | APP_PROVIDER_WOPI_APP_DESKTOP_ONLY | bool | false | Offer this app only on desktop.|
 | APP_PROVIDER_WOPI_APP_ICON_URI | string |  | URI to an app icon to be used by clients.|
-| APP_PROVIDER_WOPI_APP_INTERNAL_URL | string |  | Internal URL to the app, eg in your DMZ.|
+| APP_PROVIDER_WOPI_APP_INTERNAL_URL | string |  | Internal URL to the app, like in your DMZ.|
 | APP_PROVIDER_WOPI_APP_NAME | string |  | Human readable app name.|
 | APP_PROVIDER_WOPI_APP_URL | string |  | URL for end users to access the app.|
 | APP_PROVIDER_WOPI_INSECURE | bool | false | Allow insecure connections to the app.|

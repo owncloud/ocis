@@ -57,7 +57,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+Token to secure the metrics endpoint.
 
 |`NOTIFICATIONS_DEBUG_PPROF`
 a| [subs=-attributes]
@@ -65,7 +65,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+Enables pprof, which can be used for profiling.
 
 |`NOTIFICATIONS_DEBUG_ZPAGES`
 a| [subs=-attributes]
@@ -81,7 +81,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[127.0.0.1]
 a| [subs=-attributes]
-SMTP host, to connect to.
+SMTP host to connect to.
 
 |`NOTIFICATIONS_SMTP_PORT`
 a| [subs=-attributes]
@@ -89,7 +89,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[1025]
 a| [subs=-attributes]
-Port of the SMTP host, to connect to.
+Port of the SMTP host to connect to.
 
 |`NOTIFICATIONS_SMTP_SENDER`
 a| [subs=-attributes]
@@ -97,7 +97,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[noreply@example.com]
 a| [subs=-attributes]
-Sender of emails, that will be sent.
+Sender of emails that will be sent.
 
 |`NOTIFICATIONS_SMTP_PASSWORD`
 a| [subs=-attributes]
@@ -105,7 +105,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Password of the SMTP host, to connect to.
+Password of the SMTP host to connect to.
 
 |`NOTIFICATIONS_EVENTS_ENDPOINT`
 a| [subs=-attributes]
@@ -147,7 +147,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+Machine auth API key used to validate internal requests necessary to access resources from other services.
 |===
 
 Since Version: `+` added, `-` deprecated

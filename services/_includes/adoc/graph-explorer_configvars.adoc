@@ -93,7 +93,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+Token to secure the metrics endpoint.
 
 |`GRAPH_EXPLORER_DEBUG_PPROF`
 a| [subs=-attributes]
@@ -101,7 +101,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+Enables pprof, which can be used for profiling.
 
 |`GRAPH_EXPLORER_DEBUG_ZPAGES`
 a| [subs=-attributes]
@@ -133,7 +133,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[ocis-explorer.js]
 a| [subs=-attributes]
-OIDC client id, the graph explorer uses. This client needs to be set up in your IDP.
+OIDC client ID the graph explorer uses. This client needs to be set up in your IDP.
 
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
@@ -152,7 +152,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[https://localhost:9200]
 a| [subs=-attributes]
-Base URL, where the graph explorer is reachable for users.
+Base URL where the graph explorer is reachable for users.
 
 |`GRAPH_EXPLORER_GRAPH_URL_PATH`
 a| [subs=-attributes]
@@ -160,7 +160,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[/graph]
 a| [subs=-attributes]
-URL path, where the graph explorer is reachable for users.
+URL path where the graph explorer is reachable for users.
 |===
 
 Since Version: `+` added, `-` deprecated

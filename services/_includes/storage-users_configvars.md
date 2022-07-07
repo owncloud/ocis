@@ -11,13 +11,13 @@
 | OCIS_LOG_COLOR<br/>STORAGE_USERS_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>STORAGE_USERS_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
 | STORAGE_USERS_DEBUG_ADDR | string | 127.0.0.1:9159 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
-| STORAGE_USERS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
-| STORAGE_USERS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| STORAGE_USERS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
+| STORAGE_USERS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | STORAGE_USERS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | STORAGE_USERS_GRPC_ADDR | string | 127.0.0.1:9157 | The bind address of the GRPC service.|
-| STORAGE_USERS_GRPC_PROTOCOL | string | tcp | The transport protocol of the grpc service.|
+| STORAGE_USERS_GRPC_PROTOCOL | string | tcp | The transport protocol of the GPRC service.|
 | STORAGE_USERS_HTTP_ADDR | string | 127.0.0.1:9158 | The bind address of the HTTP service.|
-| STORAGE_USERS_HTTP_PROTOCOL | string | tcp | The transport protocol of the http service.|
+| STORAGE_USERS_HTTP_PROTOCOL | string | tcp | The transport protocol of the HTTP service.|
 | OCIS_JWT_SECRET<br/>STORAGE_USERS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | STORAGE_USERS_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
@@ -40,8 +40,8 @@
 | STORAGE_USERS_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.SpaceName \| replace &#34; &#34; &#34;-&#34; \| lower}} | Template string to construct general space aliases.|
 | STORAGE_USERS_S3NG_SHARE_FOLDER | string | /Shares | Name of the folder jailing all shares.|
 | STORAGE_USERS_OWNCLOUDSQL_DATADIR | string | ~/.ocis/storage/owncloud | Path for the persistence directory.|
-| STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER | string | /Shares | name of the folder jailing all shares.|
-| STORAGE_USERS_OWNCLOUDSQL_LAYOUT | string | {{.Username}} | path layout to use to navigate into a users folder in an owncloud data dir|
+| STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER | string | /Shares | Name of the folder jailing all shares.|
+| STORAGE_USERS_OWNCLOUDSQL_LAYOUT | string | {{.Username}} | Path layout to use to navigate into a users folder in an owncloud data directory|
 | STORAGE_USERS_OWNCLOUDSQL_UPLOADINFO_DIR | string | ~/.ocis/storage/uploadinfo | Path to a directory, where uploads will be stored temporarily.|
 | STORAGE_USERS_OWNCLOUDSQL_DB_USERNAME | string | owncloud | Username for the database.|
 | STORAGE_USERS_OWNCLOUDSQL_DB_PASSWORD | string | owncloud | Password for the database.|
@@ -50,8 +50,8 @@
 | STORAGE_USERS_OWNCLOUDSQL_DB_NAME | string | owncloud | Name of the database to be used.|
 | STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT | string | localhost:9144 | Endpoint of the users provider.|
 | STORAGE_USERS_DATA_SERVER_URL | string | http://localhost:9158/data | URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed.|
-| STORAGE_USERS_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | the address of the streaming service|
-| STORAGE_USERS_EVENTS_CLUSTER | string | ocis-cluster | the clusterID of the streaming service. Mandatory when using nats|
+| STORAGE_USERS_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the streaming service|
+| STORAGE_USERS_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the streaming service. Mandatory when using the NATS service.|
 | STORAGE_USERS_MOUNT_ID | string | 1284d238-aa92-42ce-bdc4-0b0000009157 | Mount ID of this storage.|
 | STORAGE_USERS_EXPOSE_DATA_SERVER | bool | false | Exposes the data server directly to users and bypasses the data gateway. Ensure that the data server address is reachable by users.|
 | STORAGE_USERS_READ_ONLY | bool | false | Set this storage to be read-only.|

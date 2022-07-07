@@ -93,7 +93,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Token to secure the metrics endpoint
+Token to secure the metrics endpoint.
 
 |`SEARCH_DEBUG_PPROF`
 a| [subs=-attributes]
@@ -101,7 +101,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Enables pprof, which can be used for profiling
+Enables pprof, which can be used for profiling.
 
 |`SEARCH_DEBUG_ZPAGES`
 a| [subs=-attributes]
@@ -141,7 +141,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[127.0.0.1:9233]
 a| [subs=-attributes]
-the address of the streaming service
+The address of the streaming service
 
 |`SEARCH_EVENTS_CLUSTER`
 a| [subs=-attributes]
@@ -149,7 +149,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[ocis-cluster]
 a| [subs=-attributes]
-the clusterID of the streaming service. Mandatory when using nats
+The clusterID of the streaming service. Mandatory when using NATS
 
 |`SEARCH_EVENTS_GROUP`
 a| [subs=-attributes]
@@ -157,7 +157,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[search]
 a| [subs=-attributes]
-the customergroup of the service. One group will only get one copy of an event
+The customer group of the service. One group will only get one copy of an event
 
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `SEARCH_MACHINE_AUTH_API_KEY`

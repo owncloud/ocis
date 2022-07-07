@@ -11,11 +11,11 @@
 | OCIS_LOG_COLOR<br/>OCDAV_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>OCDAV_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
 | OCDAV_DEBUG_ADDR | string | 127.0.0.1:9163 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
-| OCDAV_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint|
-| OCDAV_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
+| OCDAV_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
+| OCDAV_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | OCDAV_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | OCDAV_HTTP_ADDR | string | 127.0.0.1:0 | The bind address of the HTTP service.|
-| OCDAV_HTTP_PROTOCOL | string | tcp | The transport protocol of the http service.|
+| OCDAV_HTTP_PROTOCOL | string | tcp | The transport protocol of the HTTP service.|
 | OCDAV_HTTP_PREFIX | string |  | A URL path prefix for the handler.|
 | OCIS_JWT_SECRET<br/>OCDAV_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
@@ -23,7 +23,7 @@
 | OCDAV_WEBDAV_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Jail requests to /dav/webdav into this CS3 namespace. Supports template layouting with CS3 User properties.|
 | OCDAV_FILES_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Jail requests to /dav/files/{username} into this CS3 namespace. Supports template layouting with CS3 User properties.|
 | OCDAV_SHARES_NAMESPACE | string | /Shares | The human readable path for the share jail. Relative to a users personal space root. Upcased intentionally.|
-| OCIS_URL<br/>OCDAV_PUBLIC_URL | string | https://localhost:9200 | URL, where oCIS is reachable for users.|
+| OCIS_URL<br/>OCDAV_PUBLIC_URL | string | https://localhost:9200 | URL where oCIS is reachable for users.|
 | OCIS_INSECURE<br/>OCDAV_INSECURE | bool | false | |
-| OCDAV_GATEWAY_REQUEST_TIMEOUT | int64 | 84300 | Request timeout in seconds for requests from the oCDAV service to the gateway service.|
+| OCDAV_GATEWAY_REQUEST_TIMEOUT | int64 | 84300 | Request timeout in seconds for requests from the oCDAV service to the GATEWAY service.|
 | OCIS_MACHINE_AUTH_API_KEY<br/>OCDAV_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|
