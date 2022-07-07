@@ -118,9 +118,9 @@ Feature: Resharing
     And the administrator has added a user "Fred" to the group "security department" using GraphApi
     When user "Brian" shares folder "Shares/folder" with group "security department" with permissions "<permissions>" using the sharing API
     Then the OCS status code should be "100"
-    When user "Ember" accepts share "/folder" offered by user "<user>" using the sharing API
+    When user "Ember" accepts share "/folder" offered by user "Brian" using the sharing API
     Then user "Ember" <canUpload> able to upload file "filesForUpload/textfile.txt" to "/Shares/folder/textfile.txt"
-    When user "Fred" accepts share "/folder" offered by user "<user>" using the sharing API
+    When user "Fred" accepts share "/folder" offered by user "Brian" using the sharing API
     Then user "Fred" <canUpload> able to upload file "filesForUpload/textfile.txt" to "/Shares/folder/textfile.txt"
     Examples:
       | permissions | canUpload     |
