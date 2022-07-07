@@ -339,7 +339,7 @@ def testPipelines(ctx):
         pipelines += litmus(ctx, "ocis")
 
     if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
-        pipelines += [cs3ApiTests(ctx, "ocis", "default")]
+        pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
     if "skip" not in config["localApiTests"] or not config["localApiTests"]["skip"]:
         pipelines += [
             localApiTests(ctx, "ocis", "apiAccountsHashDifficulty"),
@@ -1672,6 +1672,10 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
     else:
         user = "33:33"
         environment = {
+            # Keycloak IDP specific configuration
+            "OCIS_OIDC_ISSUER": "https://keycloak/auth/realms/owncloud",
+            "WEB_OIDC_CLIENT_ID": "ocis-web",
+            "WEB_OIDC_SCOPE": "openid profile email owncloud",
             # external  ldap is supposed to be read only
             "GRAPH_IDENTITY_BACKEND": "ldap",
             "GRAPH_LDAP_SERVER_WRITE_ENABLED": "false",
@@ -1681,6 +1685,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "LDAP_BIND_DN": "cn=admin,dc=owncloud,dc=com",
             "LDAP_BIND_PASSWORD": "admin",
             # LDAP user settings
+            "PROXY_USER_OIDC_CLAIM": "ocis.user.uuid",  # claim was added in Keycloak
             "PROXY_USER_CS3_CLAIM": "userid",  # equals STORAGE_LDAP_USER_SCHEMA_UID
             "LDAP_GROUP_BASE_DN": "ou=TestGroups,dc=owncloud,dc=com",
             "LDAP_GROUP_SCHEMA_ID": "ownclouduuid",
@@ -2249,6 +2254,7 @@ def parallelDeployAcceptancePipeline(ctx):
     default.update(config["parallelApiTests"])
     params = default
 
+    for matrix in params["matrices"]:
         if "skip" in params and params["skip"]:
             return pipelines
 
@@ -2263,9 +2269,9 @@ def parallelDeployAcceptancePipeline(ctx):
                 environment["BEHAT_FILTER_TAGS"] = params["filterTags"]
                 environment["DIVIDE_INTO_NUM_PARTS"] = params["numberOfParts"]
                 environment["RUN_PART"] = runPart
-                environment["GIVEN_OC_SELECTOR"] = params["oc_selector"]["Given"]
-                environment["WHEN_OC_SELECTOR"] = params["oc_selector"]["When"]
-                environment["THEN_OC_SELECTOR"] = params["oc_selector"]["Then"]
+                environment["GIVEN_OC_SELECTOR"] = matrix["Given"]
+                environment["WHEN_OC_SELECTOR"] = matrix["When"]
+                environment["THEN_OC_SELECTOR"] = matrix["Then"]
 
                 pipeline = {
                     "kind": "pipeline",
@@ -2364,6 +2370,9 @@ def parallelDeploymentOC10Server():
                 # can be switched to "web"
                 "OWNCLOUD_DEFAULT_APP": "files",
                 "OWNCLOUD_WEB_REWRITE_LINKS": "false",
+                # script / config variables
+                "IDP_OIDC_ISSUER": "https://keycloak/auth/realms/owncloud",
+                "IDP_OIDC_CLIENT_SECRET": "oc10-oidc-secret",
                 "CLOUD_DOMAIN": OCIS_DOMAIN,
                 # LDAP bind configuration
                 "LDAP_HOST": "openldap",
@@ -2471,6 +2480,7 @@ def copyConfigs():
             # oc10 configs
             "mkdir -p /etc/templates",
             "mkdir -p /etc/pre_server.d",
+            "cp %s/oc10/oidc.config.php /etc/templates/oidc.config.php" % (PARALLEL_DEPLOY_CONFIG_PATH),
             "cp %s/oc10/ldap-config.tmpl.json /etc/templates/ldap-config.tmpl.json" % (PARALLEL_DEPLOY_CONFIG_PATH),
             "cp %s/oc10/10-custom-config.sh /etc/pre_server.d/10-custom-config.sh" % (PARALLEL_DEPLOY_CONFIG_PATH),
         ],

@@ -74,3 +74,5 @@ The expected failures in this file are from features in the owncloud/core repo.
 - [apiSharePublicLink2/multilinkSharing.feature:44](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/multilinkSharing.feature#L44)
 - [apiSharePublicLink3/updatePublicLinkShare.feature:78](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/updatePublicLinkShare.feature#L78)
 - [apiSharePublicLink3/updatePublicLinkShare.feature:79](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/updatePublicLinkShare.feature#L79)
+
+### [Shares are auto-accepted with ocis selector]()
