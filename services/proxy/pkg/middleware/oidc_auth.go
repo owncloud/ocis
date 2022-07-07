@@ -74,7 +74,6 @@ type oidcAuth struct {
 func (m oidcAuth) getClaims(token string, req *http.Request) (claims map[string]interface{}, status int) {
 	hit := m.tokenCache.Load(token)
 	if hit == nil {
-		// TODO cache userinfo for access token if we can determine the expiry (which works in case it is a jwt based access token)
 		oauth2Token := &oauth2.Token{
 			AccessToken: token,
 		}
