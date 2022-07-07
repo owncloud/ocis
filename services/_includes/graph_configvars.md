@@ -21,7 +21,6 @@
 | OCIS_URL<br/>GRAPH_SPACES_WEBDAV_BASE | string | https://localhost:9200 | The public facing URL of WebDAV.|
 | GRAPH_SPACES_WEBDAV_PATH | string | /dav/spaces/ | The WebDAV subpath for spaces.|
 | GRAPH_SPACES_DEFAULT_QUOTA | string | 1000000000 | The default quota in bytes.|
-| OCIS_INSECURE<br/>GRAPH_SPACES_INSECURE | bool | false | Allow insecure connetctions to the spaces.|
 | GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL | int | 0 | Max TTL for the spaces property cache.|
 | GRAPH_IDENTITY_BACKEND | string | ldap | The user identity backend to use, defaults to 'ldap', can be 'cs3'.|
 | LDAP_URI<br/>GRAPH_LDAP_URI | string | ldaps://localhost:9235 | URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'|

@@ -169,15 +169,6 @@ pass:[1000000000]
 a| [subs=-attributes]
 The default quota in bytes.
 
-|`OCIS_INSECURE` +
-`GRAPH_SPACES_INSECURE`
-a| [subs=-attributes]
-+bool+
-a| [subs=-attributes]
-pass:[false]
-a| [subs=-attributes]
-Allow insecure connetctions to the spaces.
-
 |`GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL`
 a| [subs=-attributes]
 +int+

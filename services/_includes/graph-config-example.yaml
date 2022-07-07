@@ -27,7 +27,6 @@ spaces:
   webdav_base: https://localhost:9200
   webdav_path: /dav/spaces/
   default_quota: "1000000000"
-  insecure: false
   extended_space_properties_cache_ttl: 0
 identity:
   backend: ldap
