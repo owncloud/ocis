@@ -15,6 +15,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 
+	mzlog "github.com/go-micro/plugins/v4/logger/zerolog"
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
 
@@ -49,9 +50,9 @@ import (
 	users "github.com/owncloud/ocis/v2/services/users/pkg/command"
 	web "github.com/owncloud/ocis/v2/services/web/pkg/command"
 	webdav "github.com/owncloud/ocis/v2/services/webdav/pkg/command"
+	"github.com/rs/zerolog"
 	"github.com/thejerf/suture/v4"
-
-	_ "github.com/owncloud/ocis/v2/ocis-pkg/log/gomicro"
+	"go-micro.dev/v4/logger"
 )
 
 var (
@@ -155,6 +156,8 @@ func Start(o ...Option) error {
 	// halt listens for interrupt signals and blocks.
 	halt := make(chan os.Signal, 1)
 	signal.Notify(halt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
+
+	setMicroLogger()
 
 	// tolerance controls backoff cycles from the supervisor.
 	tolerance := 5
@@ -297,4 +300,18 @@ func trap(s *Service, halt chan os.Signal) {
 	}
 	s.Log.Debug().Str("service", "runtime service").Msgf("terminating with signal: %v", s)
 	os.Exit(0)
+}
+
+// for logging reasons we don't want the same logging level on both oCIS and micro. As a framework builder we do not
+// want to expose to the end user the internal framework logs unless explicitly specified.
+func setMicroLogger() {
+	if os.Getenv("MICRO_LOG_LEVEL") == "" {
+		_ = os.Setenv("MICRO_LOG_LEVEL", "error")
+	}
+
+	lev, err := zerolog.ParseLevel(os.Getenv("MICRO_LOG_LEVEL"))
+	if err != nil {
+		lev = zerolog.ErrorLevel
+	}
+	logger.DefaultLogger = mzlog.NewLogger(logger.WithLevel(logger.Level(lev)))
 }
