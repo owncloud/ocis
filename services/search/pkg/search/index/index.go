@@ -33,6 +33,7 @@ import (
 	"github.com/blevesearch/bleve/v2/analysis/token/lowercase"
 	"github.com/blevesearch/bleve/v2/analysis/tokenizer/single"
 	"github.com/blevesearch/bleve/v2/mapping"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -218,7 +219,11 @@ func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (
 	query := bleve.NewConjunctionQuery(
 		bleve.NewQueryStringQuery(req.Query),
 		deletedQuery, // Skip documents that have been marked as deleted
-		bleve.NewQueryStringQuery("RootID:"+req.Ref.ResourceId.StorageId+"!"+req.Ref.ResourceId.OpaqueId),        // Limit search to the space
+		bleve.NewQueryStringQuery("RootID:"+idToBleveId(&sprovider.ResourceId{
+			StorageId: req.Ref.GetResourceId().GetStorageId(),
+			SpaceId:   req.Ref.GetResourceId().GetSpaceId(),
+			OpaqueId:  req.Ref.GetResourceId().GetOpaqueId(),
+		})), // Limit search to the space
 		bleve.NewQueryStringQuery("Path:"+queryEscape(utils.MakeRelativePath(path.Join(req.Ref.Path, "/"))+"*")), // Limit search to this directory in the space
 	)
 	bleveReq := bleve.NewSearchRequest(query)
@@ -307,22 +312,22 @@ func fieldsToEntity(fields map[string]interface{}) *indexDocument {
 }
 
 func fromFields(fields map[string]interface{}) (*searchmsg.Match, error) {
-	rootIDParts := strings.SplitN(fields["RootID"].(string), "!", 2)
-	IDParts := strings.SplitN(fields["ID"].(string), "!", 2)
+	rootID, err := storagespace.ParseID(fields["RootID"].(string))
+	if err != nil {
+		return nil, err
+	}
+	rID, err := storagespace.ParseID(fields["ID"].(string))
+	if err != nil {
+		return nil, err
+	}
 
 	match := &searchmsg.Match{
 		Entity: &searchmsg.Entity{
 			Ref: &searchmsg.Reference{
-				ResourceId: &searchmsg.ResourceID{
-					StorageId: rootIDParts[0],
-					OpaqueId:  rootIDParts[1],
-				},
-				Path: fields["Path"].(string),
+				ResourceId: resourceIDtoSearchID(rootID),
+				Path:       fields["Path"].(string),
 			},
-			Id: &searchmsg.ResourceID{
-				StorageId: IDParts[0],
-				OpaqueId:  IDParts[1],
-			},
+			Id:       resourceIDtoSearchID(rID),
 			Name:     fields["Name"].(string),
 			Size:     uint64(fields["Size"].(float64)),
 			Type:     uint64(fields["Type"].(float64)),
@@ -342,7 +347,14 @@ func idToBleveId(id *sprovider.ResourceId) string {
 	if id == nil {
 		return ""
 	}
-	return id.StorageId + "!" + id.OpaqueId
+	return storagespace.FormatResourceID(*id)
+}
+
+func resourceIDtoSearchID(id sprovider.ResourceId) *searchmsg.ResourceID {
+	return &searchmsg.ResourceID{
+		StorageId: id.GetStorageId(),
+		SpaceId:   id.GetSpaceId(),
+		OpaqueId:  id.GetOpaqueId()}
 }
 
 func queryEscape(s string) string {

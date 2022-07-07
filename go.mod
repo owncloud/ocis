@@ -9,8 +9,8 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.3
 	github.com/blevesearch/bleve_index_api v1.0.2
 	github.com/coreos/go-oidc/v3 v3.2.0
-	github.com/cs3org/go-cs3apis v0.0.0-20220512100524-551800f020d8
-	github.com/cs3org/reva/v2 v2.6.2-0.20220706093852-e2232b5a63df
+	github.com/cs3org/go-cs3apis v0.0.0-20220621145831-c38cca0796c2
+	github.com/cs3org/reva/v2 v2.0.0-00010101000000-000000000000
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
@@ -267,4 +267,4 @@ require (
 	stash.kopano.io/kgol/kcc-go/v5 v5.0.1 // indirect
 )
 
-replace github.com/cs3org/go-cs3apis => github.com/micbar/go-cs3apis v0.0.0-20220617090231-703c04619761 // temp fork
+replace github.com/cs3org/reva/v2 => github.com/micbar/reva/v2 v2.0.0-20220711074018-2773fa144658

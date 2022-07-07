@@ -92,6 +92,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 		opaqueMap := sdk.DecodeOpaqueMap(space.Opaque)
 		grantSpaceId := storagespace.FormatResourceID(provider.ResourceId{
 			StorageId: opaqueMap["grantStorageID"],
+			SpaceId:   opaqueMap["grantSpaceID"],
 			OpaqueId:  opaqueMap["grantOpaqueID"],
 		})
 		mountpointMap[grantSpaceId] = space.Id.OpaqueId
@@ -122,25 +123,26 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 				continue
 			}
 			mountpointPrefix = utils.MakeRelativePath(gpRes.Path)
-			sid, oid, err := storagespace.SplitID(mountpointId)
+			sid, spid, oid, err := storagespace.SplitID(mountpointId)
 			if err != nil {
 				p.logger.Error().Err(err).Str("space", space.Id.OpaqueId).Str("mountpointId", mountpointId).Msg("invalid mountpoint space id")
 				continue
 			}
 			mountpointRootId = &searchmsg.ResourceID{
 				StorageId: sid,
+				SpaceId:   spid,
 				OpaqueId:  oid,
 			}
 			p.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootId).Msg("searching a grant")
 		}
 
-		_, rootStorageID := storagespace.SplitStorageID(space.Root.StorageId)
 		res, err := p.indexClient.Search(ctx, &searchsvc.SearchIndexRequest{
 			Query: formatQuery(req.Query),
 			Ref: &searchmsg.Reference{
 				ResourceId: &searchmsg.ResourceID{
 					StorageId: space.Root.StorageId,
-					OpaqueId:  rootStorageID,
+					SpaceId:   space.Root.SpaceId,
+					OpaqueId:  space.Root.OpaqueId,
 				},
 				Path: mountpointPrefix,
 			},
@@ -197,14 +199,18 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 
 	// Walk the space and index all files
 	walker := walker.NewWalker(p.gwClient)
-	rootId := &provider.ResourceId{StorageId: req.SpaceId, OpaqueId: req.SpaceId}
-	err = walker.Walk(ownerCtx, rootId, func(wd string, info *provider.ResourceInfo, err error) error {
+	rootId, err := storagespace.ParseID(req.SpaceId)
+	if err != nil {
+		p.logger.Error().Err(err).Msg(err.Error())
+		return nil, err
+	}
+	err = walker.Walk(ownerCtx, &rootId, func(wd string, info *provider.ResourceInfo, err error) error {
 		if err != nil {
 			p.logger.Error().Err(err).Msg("error walking the tree")
 		}
 		ref := &provider.Reference{
 			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
-			ResourceId: rootId,
+			ResourceId: &rootId,
 		}
 		err = p.indexClient.Add(ref, info)
 		if err != nil {

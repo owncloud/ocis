@@ -389,7 +389,7 @@ class SpacesContext implements Context {
 		$userAdmin = $this->featureContext->getAdminUsername();
 
 		for ($i = 0; $i < 2; ++$i) {
-			$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi(
+			$this->theUserListsAllAvailableSpacesUsingTheGraphApi(
 				$userAdmin,
 				$query
 			);
@@ -593,17 +593,19 @@ class SpacesContext implements Context {
 	/**
 	 *
 	 * @param string $user
+	 * @param string $query
 	 *
 	 * @return void
 	 *
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function theUserListsAllAvailableSpacesUsingTheGraphApi(string $user): void {
+	public function theUserListsAllAvailableSpacesUsingTheGraphApi(string $user, string $query = ''): void {
 		$this->featureContext->setResponse(
 			$this->listAllSpacesRequest(
 				$user,
-				$this->featureContext->getPasswordForUser($user)
+				$this->featureContext->getPasswordForUser($user),
+				"?" . $query
 			)
 		);
 		$this->rememberTheAvailableSpaces();
@@ -2366,7 +2368,7 @@ class SpacesContext implements Context {
 			);
 		}
 		$url = $this->baseUrl . $fileVersion[$index][0];
-		
+
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$url,
