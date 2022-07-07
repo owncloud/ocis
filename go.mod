@@ -39,7 +39,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.3
 	github.com/justinas/alice v1.2.0
-	github.com/libregraph/idm v0.3.1-0.20220627110322-41a5a73f50b0
+	github.com/libregraph/idm v0.3.1-0.20220713065559-45c5c6bd5a58
 	github.com/libregraph/lico v0.54.1-0.20220325072321-31efc3995d63
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
