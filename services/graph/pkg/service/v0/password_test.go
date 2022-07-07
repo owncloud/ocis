@@ -36,7 +36,6 @@ var _ = Describe("Users changing their own password", func() {
 	var (
 		svc             service.Service
 		gatewayClient   *mocks.GatewayClient
-		httpClient      *mocks.HTTPClient
 		ldapClient      *mocks.Client
 		ldapConfig      config.LDAP
 		identityBackend identity.Backend
@@ -70,13 +69,11 @@ var _ = Describe("Users changing their own password", func() {
 		identityBackend, err = identity.NewLDAPBackend(ldapClient, ldapConfig, &loggger)
 		Expect(err).To(BeNil())
 
-		httpClient = &mocks.HTTPClient{}
 		eventsPublisher = mocks.Publisher{}
 		svc = service.NewService(
 			service.Config(cfg),
 			service.WithGatewayClient(gatewayClient),
 			service.WithIdentityBackend(identityBackend),
-			service.WithHTTPClient(httpClient),
 			service.EventsPublisher(&eventsPublisher),
 		)
 		user = &userv1beta1.User{
