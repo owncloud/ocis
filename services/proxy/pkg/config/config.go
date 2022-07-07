@@ -25,7 +25,7 @@ type Config struct {
 	TokenManager          *TokenManager   `mask:"struct" yaml:"token_manager"`
 	PolicySelector        *PolicySelector `yaml:"policy_selector"`
 	PreSignedURL          PreSignedURL    `yaml:"pre_signed_url"`
-	AccountBackend        string          `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE" desc:"Account backend the PROXY service should use. Currenly only 'cs3' is possible here."`
+	AccountBackend        string          `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE" desc:"Account backend the PROXY service should use. Currently only 'cs3' is possible here."`
 	UserOIDCClaim         string          `yaml:"user_oidc_claim" env:"PROXY_USER_OIDC_CLAIM" desc:"The name of an OpenID Connect claim that should be used for resolving users with the account backend. Currently defaults to 'email'."`
 	UserCS3Claim          string          `yaml:"user_cs3_claim" env:"PROXY_USER_CS3_CLAIM" desc:"The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail'. Supported values are 'username' and 'displayname'."`
 	MachineAuthAPIKey     string          `mask:"password" yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services."`
