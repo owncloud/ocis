@@ -79,7 +79,7 @@ type LDAPDriver struct {
 	GroupFilter      string          `yaml:"group_filter" env:"LDAP_GROUP_FILTER;GROUPS_LDAP_GROUP_FILTER" desc:"LDAP filter to add to the default filters for group searches."`
 	UserObjectClass  string          `yaml:"user_object_class" env:"LDAP_USER_OBJECTCLASS;GROUPS_LDAP_USER_OBJECTCLASS" desc:"The object class to use for users in the default user search filter ('inetOrgPerson')."`
 	GroupObjectClass string          `yaml:"group_object_class" env:"LDAP_GROUP_OBJECTCLASS;GROUPS_LDAP_GROUP_OBJECTCLASS" desc:"The object class to use for groups in the default group search filter ('groupOfNames')."`
-	IDP              string          `yaml:"idp" env:"OCIS_URL;OCIS_OIDC_ISSUER;GROUPS_IDP_URL" desc:"The identity provider value to set in the group ID's of the CS3 group objects for groups returned by this group provider."`
+	IDP              string          `yaml:"idp" env:"OCIS_URL;OCIS_OIDC_ISSUER;GROUPS_IDP_URL" desc:"The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider."`
 	UserSchema       LDAPUserSchema  `yaml:"user_schema"`
 	GroupSchema      LDAPGroupSchema `yaml:"group_schema"`
 }
@@ -110,7 +110,7 @@ type OwnCloudSQLDriver struct {
 	IDP                string `yaml:"idp" env:"GROUPS_OWNCLOUDSQL_IDP" desc:"The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider."`
 	Nobody             int64  `yaml:"nobody" env:"GROUPS_OWNCLOUDSQL_NOBODY" desc:"Fallback number if no numeric UID and GID properties are provided."`
 	JoinUsername       bool   `yaml:"join_username" env:"GROUPS_OWNCLOUDSQL_JOIN_USERNAME" desc:"Join the user properties table to read usernames."`
-	JoinOwnCloudUUID   bool   `yaml:"join_owncloud_uuid" env:"GROUPS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID" desc:"Join the user properties table to read user ID's."`
+	JoinOwnCloudUUID   bool   `yaml:"join_owncloud_uuid" env:"GROUPS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID" desc:"Join the user properties table to read user IDs."`
 	EnableMedialSearch bool   `yaml:"enable_medial_search" env:"GROUPS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH" desc:"Allow 'medial search' when searching for users instead of just doing a prefix search. This allows finding 'Alice' when searching for 'lic'."`
 }
 
