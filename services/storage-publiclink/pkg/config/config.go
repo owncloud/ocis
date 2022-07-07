@@ -45,15 +45,15 @@ type Service struct {
 
 type Debug struct {
 	Addr   string `yaml:"addr" env:"STORAGE_PUBLICLINK_DEBUG_ADDR" desc:"Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed."`
-	Token  string `yaml:"token" env:"STORAGE_PUBLICLINK_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint"`
-	Pprof  bool   `yaml:"pprof" env:"STORAGE_PUBLICLINK_DEBUG_PPROF" desc:"Enables pprof, which can be used for profiling"`
+	Token  string `yaml:"token" env:"STORAGE_PUBLICLINK_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint."`
+	Pprof  bool   `yaml:"pprof" env:"STORAGE_PUBLICLINK_DEBUG_PPROF" desc:"Enables pprof, which can be used for profiling."`
 	Zpages bool   `yaml:"zpages" env:"STORAGE_PUBLICLINK_DEBUG_ZPAGES" desc:"Enables zpages, which can be used for collecting and viewing in-memory traces."`
 }
 
 type GRPCConfig struct {
 	Addr      string `yaml:"addr" env:"STORAGE_PUBLICLINK_GRPC_ADDR" desc:"The bind address of the GRPC service."`
 	Namespace string `yaml:"-"`
-	Protocol  string `yaml:"protocol" env:"STORAGE_PUBLICLINK_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
+	Protocol  string `yaml:"protocol" env:"STORAGE_PUBLICLINK_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service."`
 }
 
 type StorageProvider struct {
