@@ -49,7 +49,7 @@ type Mode int
 type Runtime struct {
 	Port       string `yaml:"port" env:"OCIS_RUNTIME_PORT"`
 	Host       string `yaml:"host" env:"OCIS_RUNTIME_HOST"`
-	Extensions string `yaml:"services" env:"OCIS_RUN_EXTENSIONS,OCIS_RUN_SERVICES"`
+	Extensions string `yaml:"services" env:"OCIS_RUN_EXTENSIONS;OCIS_RUN_SERVICES"`
 }
 
 // Config combines all available configuration parts.
