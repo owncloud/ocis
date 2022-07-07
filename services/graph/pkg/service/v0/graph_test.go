@@ -29,7 +29,6 @@ var _ = Describe("Graph", func() {
 	var (
 		svc             service.Service
 		gatewayClient   *mocks.GatewayClient
-		httpClient      *mocks.HTTPClient
 		eventsPublisher mocks.Publisher
 		ctx             context.Context
 		cfg             *config.Config
@@ -42,12 +41,10 @@ var _ = Describe("Graph", func() {
 		cfg.TokenManager.JWTSecret = "loremipsum"
 
 		gatewayClient = &mocks.GatewayClient{}
-		httpClient = &mocks.HTTPClient{}
 		eventsPublisher = mocks.Publisher{}
 		svc = service.NewService(
 			service.Config(cfg),
 			service.WithGatewayClient(gatewayClient),
-			service.WithHTTPClient(httpClient),
 			service.EventsPublisher(&eventsPublisher),
 		)
 	})
