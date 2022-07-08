@@ -45,8 +45,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUISharingInternalUsers/shareWithUsers.feature:276](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L276)
 - [webUISharingInternalUsers/shareWithUsers.feature:277](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L277)
 - [webUISharingInternalUsersShareWithPage/shareWithUsers.feature:140](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersShareWithPage/shareWithUsers.feature#L140)
-- [webUISharingPermissionsUsers/sharePermissionsUsers.feature:187](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L196)
-- [webUISharingPermissionsUsers/sharePermissionsUsers.feature:200](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L209)
 - [webUISharingPermissionsUsers/sharePermissionsUsers.feature:214](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L223)
 - [webUIResharing2/reshareUsers.feature:41](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L41)
 - [webUIResharing2/reshareUsers.feature:69](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L69)
