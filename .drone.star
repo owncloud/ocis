@@ -269,10 +269,7 @@ def testOcisModules(ctx):
     for module in config["modules"]:
         pipelines.append(testOcisModule(ctx, module))
 
-    scan_result_upload = uploadScanResults(ctx)
-    scan_result_upload["depends_on"] = getPipelineNames(pipelines)
-
-    return pipelines + [scan_result_upload]
+    return pipelines
 
 def cancelPreviousBuilds():
     return [{
