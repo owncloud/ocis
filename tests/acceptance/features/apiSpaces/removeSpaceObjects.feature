@@ -13,7 +13,7 @@ Feature: Remove files, folder
       | username |
       | Alice    |
       | Brian    |
-    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "delete objects" with the default quota using the GraphApi
     And user "Alice" has created a folder "folderForDeleting/sub1/sub2" in space "delete objects"
     And user "Alice" has uploaded a file inside space "delete objects" with content "some content" to "text.txt"
@@ -58,8 +58,7 @@ Feature: Remove files, folder
     And for user "<user>" the space "delete objects" <shouldOrNotBeInSpace> contain these entries:
       | text.txt |
     And as "<user>" file "text.txt" <shouldOrNotBeInTrash> exist in the trashbin of the space "delete objects"
-    When user "<user>" lists all available spaces via the GraphApi
-    Then the json responded should contain a space "delete objects" with these key and value pairs:
+    And the user "<user>" should have a space called "delete objects" with these key and value pairs:
       | key          | value          |
       | name         | delete objects |
       | quota@@@used | <quotaValue>   |
@@ -72,10 +71,8 @@ Feature: Remove files, folder
 
 
   Scenario: An user is unable to delete a Space via the webDav API
-    Given user "Alice" has created a space "user deletes a space" of type "project" with quota "20"
-    When user "Alice" removes the folder "" from space "user deletes a space"
+    When user "Alice" removes the folder "" from space "delete objects"
     Then the HTTP status code should be "400"
-    When user "Alice" lists all available spaces via the GraphApi
-    Then the json responded should contain a space "user deletes a space" with these key and value pairs:
-      | key  | value                |
-      | name | user deletes a space |
+    And the user "Alice" should have a space called "delete objects" with these key and value pairs:
+      | key  | value          |
+      | name | delete objects |
