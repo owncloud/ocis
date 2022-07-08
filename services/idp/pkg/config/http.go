@@ -7,5 +7,5 @@ type HTTP struct {
 	Namespace string `yaml:"-"`
 	TLSCert   string `yaml:"tls_cert" env:"IDP_TRANSPORT_TLS_CERT" desc:"File name of the TLS server certificate for the HTTPS server."`
 	TLSKey    string `yaml:"tls_key" env:"IDP_TRANSPORT_TLS_KEY" desc:"File name of the TLS server certificate key for the HTTPS server."`
-	TLS       bool   `yaml:"tls" env:"IDP_TLS" desc:"Use HTTPS server instead of HTTP server."`
+	TLS       bool   `yaml:"tls" env:"IDP_TLS" desc:"Use the HTTPS server instead of the HTTP server."`
 }
