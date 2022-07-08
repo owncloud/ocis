@@ -115,7 +115,7 @@ export default {
 function injectAuthToken (rootGetters) {
   axios.interceptors.request.use(config => {
     if (typeof config.headers.Authorization === 'undefined') {
-      const token = rootGetters.user.token
+      const token = rootGetters['runtime/auth/accessToken']
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
       }
