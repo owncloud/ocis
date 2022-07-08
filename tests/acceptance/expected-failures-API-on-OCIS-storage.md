@@ -944,30 +944,20 @@ _ocdav: api compatibility, return correct status code_
 
 #### [/webdav and spaces endpoint does not alloow REPORT requests](https://github.com/owncloud/ocis/issues/4034)
 
-- [apiWebdavOperations/search.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L42)
 - [apiWebdavOperations/search.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L48)
-- [apiWebdavOperations/search.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L64)
 - [apiWebdavOperations/search.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L70)
-- [apiWebdavOperations/search.feature:87](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L87)
 - [apiWebdavOperations/search.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L93)
-- [apiWebdavOperations/search.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L102)
 - [apiWebdavOperations/search.feature:108](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L108)
 - [apiWebdavOperations/search.feature:126](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L126)
 - [apiWebdavOperations/search.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L132)
 - [apiWebdavOperations/search.feature:150](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L150)
 - [apiWebdavOperations/search.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L156)
-- [apiWebdavOperations/search.feature:174](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L174)
 - [apiWebdavOperations/search.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L180)
 - [apiWebdavOperations/search.feature:207](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L207)
 - [apiWebdavOperations/search.feature:213](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L213)
 - [apiWebdavOperations/search.feature:239](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L239)
 - [apiWebdavOperations/search.feature:245](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L245)
-- [apiWebdavOperations/search.feature:264](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L264)
 - [apiWebdavOperations/search.feature:270](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L270)
-
-### [Different response status code while searching with empty pattern with new webdav](https://github.com/owncloud/ocis/issues/4016)
-
-- [apiWebdavOperations/search.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L103)
 
 ### [No permisions propertry in response while searching for files and folders on ocis with new webdav](https://github.com/owncloud/ocis/issues/4009)
 
@@ -1350,17 +1340,6 @@ And other missing implementation of favorites
 - [apiShareOperationsToShares2/shareAccessByID.feature:162](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L162)
 - [apiShareOperationsToShares2/shareAccessByID.feature:163](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L163)
 
-#### [[OC-storage] share-types field empty for shared file folder in webdav response](https://github.com/owncloud/ocis/issues/2144)
-
-- [apiWebdavProperties2/getFileProperties.feature:215](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L215)
-- [apiWebdavProperties2/getFileProperties.feature:216](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L216)
-- [apiWebdavProperties2/getFileProperties.feature:221](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L221)
-
-### [Different share permissions provides varying roles in oc10 and ocis](https://github.com/owncloud/ocis/issues/1277)
-
-- [apiWebdavProperties2/getFileProperties.feature:275](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L275)
-- [apiWebdavProperties2/getFileProperties.feature:276](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L276)
-- [apiWebdavProperties2/getFileProperties.feature:281](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L281)
 
 #### [Shares to deleted group listed in the response](https://github.com/owncloud/ocis/issues/2441)
 
@@ -1539,10 +1518,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiWebdavOperations/search.feature:289](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L289)
 - [apiWebdavOperations/search.feature:314](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L314)
 
-#### [Incorrect response while listing resources of a folder with depth infinity](https://github.com/owncloud/ocis/issues/3073)
-
-- [apiWebdavOperations/listFiles.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L182)
-
 #### [Cannot disable the dav propfind depth infinity for resources](https://github.com/owncloud/ocis/issues/3720)
 - [apiWebdavOperations/listFiles.feature:398](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L398)
 - [apiWebdavOperations/listFiles.feature:399](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L399)
@@ -1575,19 +1550,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 #### [Trying to modify a shared file using spaces end-point returns 409 HTTP status code](https://github.com/owncloud/ocis/issues/3241)
 
 - [apiMain/checksums.feature:233](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/checksums.feature#L233)
-
-#### public links without permission are allowed now
-
-- [apiShareUpdateToShares/updateShare.feature:113](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L113)
-- [apiShareUpdateToShares/updateShare.feature:114](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L114)
-- [apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature#L26)
-- [apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature#L27)
-- [apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:28](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature#L28)
-- [apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareWithInvalidPermissions.feature#L29)
-- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:117](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L117)
-- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:118](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L118)
-- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L132)
-- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:133](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L133)
 
 ### [graph/users: enable/disable users](https://github.com/owncloud/ocis/issues/3064)
 

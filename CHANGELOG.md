@@ -7,14 +7,20 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - CSP rules for silent token refresh in iframe: [#4031](https://github.com/owncloud/ocis/pull/4031)
+* Bugfix - Fix `OCIS_RUN_SERVICES`: [#4133](https://github.com/owncloud/ocis/pull/4133)
+* Bugfix - Fix unused config option `GRAPH_SPACES_INSECURE`: [#55555](https://github.com/owncloud/ocis/pull/55555)
 * Bugfix - Remove unused configuration options: [#3973](https://github.com/owncloud/ocis/pull/3973)
 * Bugfix - Remove static ocs user backend config: [#4077](https://github.com/owncloud/ocis/pull/4077)
 * Bugfix - Fix make sensitive config values in the proxy's debug server: [#4086](https://github.com/owncloud/ocis/pull/4086)
 * Bugfix - Fix startup error logging: [#4093](https://github.com/owncloud/ocis/pull/4093)
+* Bugfix - Escape DN attribute value: [#4117](https://github.com/owncloud/ocis/pull/4117)
+* Bugfix - Polish search: [#4094](https://github.com/owncloud/ocis/pull/4094)
 * Bugfix - Store user passwords hashed in idm: [#3778](https://github.com/owncloud/ocis/issues/3778)
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
 * Enhancement - Update IdP UI: [#3493](https://github.com/owncloud/ocis/issues/3493)
 * Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
+* Enhancement - Update reva: [#4115](https://github.com/owncloud/ocis/pull/4115)
+* Enhancement - Search service at the old webdav endpoint: [#4118](https://github.com/owncloud/ocis/pull/4118)
 
 ## Details
 
@@ -26,6 +32,26 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/web/issues/7030
    https://github.com/owncloud/ocis/pull/4031
+
+* Bugfix - Fix `OCIS_RUN_SERVICES`: [#4133](https://github.com/owncloud/ocis/pull/4133)
+
+   `OCIS_RUN_SERVICES` was introduced as successor to `OCIS_RUN_EXTENSIONS` because we
+   wanted to call oCIS "core" extensions services. We kept `OCIS_RUN_EXTENSIONS` for backwards
+   compatibility reasons.
+
+   It turned out, that setting `OCIS_RUN_SERVICES` has no effect since introduced.
+   `OCIS_RUN_EXTENSIONS`. `OCIS_RUN_EXTENSIONS` was working fine all the time.
+
+   We now fixed `OCIS_RUN_SERVICES`, so that you can use it as a equivalent replacement for
+   `OCIS_RUN_EXTENSIONS`
+
+   https://github.com/owncloud/ocis/pull/4133
+
+* Bugfix - Fix unused config option `GRAPH_SPACES_INSECURE`: [#55555](https://github.com/owncloud/ocis/pull/55555)
+
+   We've removed the unused config option `GRAPH_SPACES_INSECURE` from the GRAPH service.
+
+   https://github.com/owncloud/ocis/pull/55555
 
 * Bugfix - Remove unused configuration options: [#3973](https://github.com/owncloud/ocis/pull/3973)
 
@@ -63,6 +89,19 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/4093
 
+* Bugfix - Escape DN attribute value: [#4117](https://github.com/owncloud/ocis/pull/4117)
+
+   Escaped the DN attribute value on creating users and groups.
+
+   https://github.com/owncloud/ocis/pull/4117
+
+* Bugfix - Polish search: [#4094](https://github.com/owncloud/ocis/pull/4094)
+
+   We improved the feedback when providing invalid search queries and added support for limiting
+   the number of results returned.
+
+   https://github.com/owncloud/ocis/pull/4094
+
 * Bugfix - Store user passwords hashed in idm: [#3778](https://github.com/owncloud/ocis/issues/3778)
 
    Support for hashing user passwords was added to libregraph/idm. The graph API will now set
@@ -94,6 +133,16 @@ The following sections list the changes for unreleased.
    to avoid confusion between external extensions and code we provide and maintain.
 
    https://github.com/owncloud/ocis/pull/3980
+
+* Enhancement - Update reva: [#4115](https://github.com/owncloud/ocis/pull/4115)
+
+   https://github.com/owncloud/ocis/pull/4115
+
+* Enhancement - Search service at the old webdav endpoint: [#4118](https://github.com/owncloud/ocis/pull/4118)
+
+   We made the search service available for legacy clients at the old webdav endpoint.
+
+   https://github.com/owncloud/ocis/pull/4118
 # Changelog for [2.0.0-beta.4] (2022-06-28)
 
 The following sections list the changes for 2.0.0-beta.4.

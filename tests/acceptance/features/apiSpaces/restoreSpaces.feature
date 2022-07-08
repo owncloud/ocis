@@ -14,58 +14,51 @@ Feature: Restoring space
       | Alice    |
       | Brian    |
       | Bob      |
-    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And user "Alice" has created a space "restore a space" of type "project" with quota "10"
 
 
   Scenario: An owner can restore a Space via the Graph API
-    Given user "Alice" has created a space "restore a space" of type "project" with quota "10"
-    And user "Alice" has disabled a space "restore a space"
+    Given user "Alice" has disabled a space "restore a space"
     When user "Alice" restores a disabled space "restore a space"
     Then the HTTP status code should be "200"
 
 
   Scenario: Participants can see the data after the space is restored
-    Given user "Alice" has created a space "data exists" of type "project" with quota "10"
-    And user "Alice" has created a folder "mainFolder" in space "data exists"
-    And user "Alice" has uploaded a file inside space "data exists" with content "example" to "test.txt"
-    And user "Alice" has shared a space "data exists" to user "Brian" with role "editor"
-    And user "Alice" has shared a space "data exists" to user "Bob" with role "viewer"
-    And user "Alice" has disabled a space "data exists"
-    When user "Alice" restores a disabled space "data exists"
-    Then for user "Alice" the space "data exists" should contain these entries:
-      | test.txt         |
-      | mainFolder       |
-    And for user "Brian" the space "data exists" should contain these entries:
-      | test.txt         |
-      | mainFolder       |
-    And for user "Bob" the space "data exists" should contain these entries:
-      | test.txt         |
-      | mainFolder       |
+    Given user "Alice" has created a folder "mainFolder" in space "restore a space"
+    And user "Alice" has uploaded a file inside space "restore a space" with content "example" to "test.txt"
+    And user "Alice" has shared a space "restore a space" to user "Brian" with role "editor"
+    And user "Alice" has shared a space "restore a space" to user "Bob" with role "viewer"
+    And user "Alice" has disabled a space "restore a space"
+    When user "Alice" restores a disabled space "restore a space"
+    Then for user "Alice" the space "restore a space" should contain these entries:
+      | test.txt   |
+      | mainFolder |
+    And for user "Brian" the space "restore a space" should contain these entries:
+      | test.txt   |
+      | mainFolder |
+    And for user "Bob" the space "restore a space" should contain these entries:
+      | test.txt   |
+      | mainFolder |
 
 
-  Scenario: Participants can create data in the space after restoring
-    Given user "Alice" has created a space "create data in restored space" of type "project" with quota "10"
-    And user "Alice" has shared a space "create data in restored space" to user "Brian" with role "editor"
-    And user "Alice" has disabled a space "create data in restored space"
-    And user "Alice" has restored a disabled space "create data in restored space"
-    When user "Brian" creates a folder "mainFolder" in space "create data in restored space" using the WebDav Api
-    And user "Brian" uploads a file inside space "create data in restored space" with content "test" to "test.txt" using the WebDAV API
-    Then for user "Brian" the space "create data in restored space" should contain these entries:
-      | test.txt         |
-      | mainFolder       |
-    
+  Scenario: Participant can create data in the space after restoring
+    Given user "Alice" has shared a space "restore a space" to user "Brian" with role "editor"
+    And user "Alice" has disabled a space "restore a space"
+    And user "Alice" has restored a disabled space "restore a space"
+    When user "Brian" creates a folder "mainFolder" in space "restore a space" using the WebDav Api
+    And user "Brian" uploads a file inside space "restore a space" with content "test" to "test.txt" using the WebDAV API
+    Then for user "Brian" the space "restore a space" should contain these entries:
+      | test.txt   |
+      | mainFolder |
 
-  Scenario: User with viewer permissions cannot restore space
-    Given user "Alice" has created a space "viewer restores space" of type "project" with quota "10"
-    And user "Alice" has shared a space "viewer restores space" to user "Brian" with role "viewer"
-    And user "Alice" has disabled a space "viewer restores space"
-    When user "Brian" restores a disabled space "viewer restores space" without manager rights
+
+  Scenario Outline: User without space manager role cannot restore space
+    Given user "Alice" has shared a space "restore a space" to user "Brian" with role "<role>"
+    And user "Alice" has disabled a space "restore a space"
+    When user "Brian" restores a disabled space "restore a space" without manager rights
     Then the HTTP status code should be "404"
-
-
-  Scenario: User with editor permissions cannot restore space
-    Given user "Alice" has created a space "editor restores space" of type "project" with quota "10"
-    And user "Alice" has shared a space "editor restores space" to user "Brian" with role "editor"
-    And user "Alice" has disabled a space "editor restores space"
-    When user "Brian" restores a disabled space "editor restores space" without manager rights
-    Then the HTTP status code should be "404"
+    Examples:
+      | role   |
+      | viewer |
+      | editor |

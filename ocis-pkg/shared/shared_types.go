@@ -42,7 +42,7 @@ type Commons struct {
 	OcisURL           string        `yaml:"ocis_url" env:"OCIS_URL" desc:"URL, where oCIS is reachable for users."`
 	TokenManager      *TokenManager `mask:"struct" yaml:"token_manager"`
 	Reva              *Reva         `yaml:"reva"`
-	MachineAuthAPIKey string        `mask:"password" yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used for accessing the 'auth-machine' service to impersonate users."`
+	MachineAuthAPIKey string        `mask:"password" yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services."`
 	TransferSecret    string        `mask:"password" yaml:"transfer_secret,omitempty" env:"REVA_TRANSFER_SECRET"`
 	SystemUserID      string        `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID" desc:"ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
 	SystemUserAPIKey  string        `mask:"password" yaml:"system_user_api_key" env:"SYSTEM_USER_API_KEY"`

@@ -9,8 +9,7 @@ Feature: Preview file in project space
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Alice    |
-      | Brian    |
-    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "previews of the files" with the default quota using the GraphApi
 
 

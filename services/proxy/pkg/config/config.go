@@ -25,13 +25,13 @@ type Config struct {
 	TokenManager          *TokenManager   `mask:"struct" yaml:"token_manager"`
 	PolicySelector        *PolicySelector `yaml:"policy_selector"`
 	PreSignedURL          PreSignedURL    `yaml:"pre_signed_url"`
-	AccountBackend        string          `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE" desc:"Account backend the proxy should use, currenly only 'cs3' is possible here."`
+	AccountBackend        string          `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE" desc:"Account backend the PROXY service should use. Currently only 'cs3' is possible here."`
 	UserOIDCClaim         string          `yaml:"user_oidc_claim" env:"PROXY_USER_OIDC_CLAIM" desc:"The name of an OpenID Connect claim that should be used for resolving users with the account backend. Currently defaults to 'email'."`
-	UserCS3Claim          string          `yaml:"user_cs3_claim" env:"PROXY_USER_CS3_CLAIM" desc:"The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail' (other possible values are: 'username', 'displayname')"`
-	MachineAuthAPIKey     string          `mask:"password" yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used for accessing the 'auth-machine' service to impersonate users."`
+	UserCS3Claim          string          `yaml:"user_cs3_claim" env:"PROXY_USER_CS3_CLAIM" desc:"The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail'. Supported values are 'username' and 'displayname'."`
+	MachineAuthAPIKey     string          `mask:"password" yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services."`
 	AutoprovisionAccounts bool            `yaml:"auto_provision_accounts" env:"PROXY_AUTOPROVISION_ACCOUNTS" desc:"Set this to 'true' to automatically provsion users that do not yet exist in the users service on-demand upon first signin. To use this a write-enabled libregraph user backend needs to be setup an running."`
 	EnableBasicAuth       bool            `yaml:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH" desc:"Set this to true to enable 'basic' (username/password) authentication."`
-	InsecureBackends      bool            `yaml:"insecure_backends" env:"PROXY_INSECURE_BACKENDS" desc:"Disable TLS certificate validation for all http backend connections."`
+	InsecureBackends      bool            `yaml:"insecure_backends" env:"PROXY_INSECURE_BACKENDS" desc:"Disable TLS certificate validation for all HTTP backend connections."`
 	AuthMiddleware        AuthMiddleware  `yaml:"auth_middleware"`
 
 	Context context.Context `yaml:"-" json:"-"`
@@ -84,14 +84,14 @@ type AuthMiddleware struct {
 // with the configured oidc-provider
 type OIDC struct {
 	Issuer        string        `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP."`
-	Insecure      bool          `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. (not recommended for production environments."`
+	Insecure      bool          `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments."`
 	UserinfoCache UserinfoCache `yaml:"user_info_cache"`
 }
 
 // UserinfoCache is a TTL cache configuration.
 type UserinfoCache struct {
-	Size int `yaml:"size" env:"PROXY_OIDC_USERINFO_CACHE_SIZE" desc:"Cache size for oidc user info."`
-	TTL  int `yaml:"ttl" env:"PROXY_OIDC_USERINFO_CACHE_TTL" desc:"Max TTL for the oidc user info cache."`
+	Size int `yaml:"size" env:"PROXY_OIDC_USERINFO_CACHE_SIZE" desc:"Cache size for OIDC user info."`
+	TTL  int `yaml:"ttl" env:"PROXY_OIDC_USERINFO_CACHE_TTL" desc:"Max TTL in seconds for the OIDC user info cache."`
 }
 
 // PolicySelector is the toplevel-configuration for different selectors
@@ -108,13 +108,13 @@ type StaticSelectorConf struct {
 
 // TokenManager is the config for using the reva token manager
 type TokenManager struct {
-	JWTSecret string `mask:"password" yaml:"jwt_secret" env:"OCIS_JWT_SECRET;PROXY_JWT_SECRET" desc:"The secret to mint and validate jwt tokens."`
+	JWTSecret string `mask:"password" yaml:"jwt_secret" env:"OCIS_JWT_SECRET;PROXY_JWT_SECRET" desc:"The secret to mint and validate JWT tokens."`
 }
 
 // PreSignedURL is the config for the presigned url middleware
 type PreSignedURL struct {
 	AllowedHTTPMethods []string `yaml:"allowed_http_methods"`
-	Enabled            bool     `yaml:"enabled" env:"PROXY_ENABLE_PRESIGNEDURLS" desc:"Allow ocs to get a signing key to sign requests."`
+	Enabled            bool     `yaml:"enabled" env:"PROXY_ENABLE_PRESIGNEDURLS" desc:"Allow OCS to get a signing key to sign requests."`
 }
 
 // ClaimsSelectorConf is the config for the claims-selector

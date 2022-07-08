@@ -21,7 +21,6 @@ type Options struct {
 	Middleware      []func(http.Handler) http.Handler
 	GatewayClient   GatewayClient
 	IdentityBackend identity.Backend
-	HTTPClient      HTTPClient
 	RoleService     settingssvc.RoleService
 	RoleManager     *roles.Manager
 	EventsPublisher events.Publisher
@@ -70,13 +69,6 @@ func WithGatewayClient(val GatewayClient) Option {
 func WithIdentityBackend(val identity.Backend) Option {
 	return func(o *Options) {
 		o.IdentityBackend = val
-	}
-}
-
-// WithHTTPClient provides a function to set the http client option.
-func WithHTTPClient(val HTTPClient) Option {
-	return func(o *Options) {
-		o.HTTPClient = val
 	}
 }
 

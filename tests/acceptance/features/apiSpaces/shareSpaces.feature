@@ -12,7 +12,7 @@ Feature: Share spaces
       | Alice    |
       | Brian    |
       | Bob      |
-    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "share space" with the default quota using the GraphApi
 
 
@@ -21,8 +21,7 @@ Feature: Share spaces
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
-    When user "Brian" lists all available spaces via the GraphApi
-    Then the json responded should contain a space "share space" with these key and value pairs:
+    And the user "Brian" should have a space called "share space" with these key and value pairs:
       | key       | value       |
       | driveType | project     |
       | id        | %space_id%  |
@@ -36,8 +35,7 @@ Feature: Share spaces
 
   Scenario: A user can see who has been granted access
     Given user "Alice" has shared a space "share space" to user "Brian" with role "viewer"
-    When user "Alice" lists all available spaces via the GraphApi
-    Then the json responded should contain a space "share space" granted to "Brian" with these key and value pairs:
+    And the user "Alice" should have a space called "share space" granted to "Brian" with these key and value pairs:
       | key                                                | value     |
       | root@@@permissions@@@1@@@grantedTo@@@0@@@user@@@id | %user_id% |
       | root@@@permissions@@@1@@@roles@@@0                 | viewer    |
@@ -54,25 +52,21 @@ Feature: Share spaces
 
   Scenario: When a user unshares a space, the space becomes unavailable to the receiver
     Given user "Alice" has shared a space "share space" to user "Brian" with role "viewer"
-    When user "Brian" lists all available spaces via the GraphApi
-    Then the json responded should contain a space "share space" with these key and value pairs:
+    And the user "Brian" should have a space called "share space" with these key and value pairs:
       | key       | value       |
       | driveType | project     |
       | id        | %space_id%  |
       | name      | share space |
     When user "Alice" unshares a space "share space" to user "Brian"
     Then the HTTP status code should be "200"
-    And user "Brian" lists all available spaces via the GraphApi
-    And the json responded should not contain a space with name "share space"
+    Then the user "Brian" should not have a space called "share space"
 
 
   Scenario: A user can add another user to the space managers to enable him
     Given user "Alice" has uploaded a file inside space "share space" with content "Test" to "test.txt"
-    And user "Alice" has shared a space "share space" to user "Brian" with role "manager"
-    When user "Brian" lists all available spaces via the GraphApi
-    Then the json responded should contain a space "share space" granted to "Brian" with role "manager"
-    When user "Brian" has shared a space "share space" to user "Bob" with role "viewer"
-    And user "Bob" lists all available spaces via the GraphApi
-    Then the json responded should contain a space "share space" granted to "Bob" with role "viewer"
+    When user "Alice" shares a space "share space" to user "Brian" with role "manager"
+    Then the user "Brian" should have a space called "share space" granted to "Brian" with role "manager"
+    When user "Brian" shares a space "share space" to user "Bob" with role "viewer"
+    Then the user "Bob" should have a space called "share space" granted to "Bob" with role "viewer"
     And for user "Bob" the space "share space" should contain these entries:
       | test.txt |

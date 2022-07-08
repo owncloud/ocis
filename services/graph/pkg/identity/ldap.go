@@ -11,6 +11,7 @@ import (
 	"github.com/gofrs/uuid"
 	ldapdn "github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	oldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
@@ -116,7 +117,7 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 		return nil, errReadOnly
 	}
 	ar := ldap.AddRequest{
-		DN: fmt.Sprintf("uid=%s,%s", *user.OnPremisesSamAccountName, i.userBaseDN),
+		DN: fmt.Sprintf("uid=%s,%s", oldap.EscapeDNAttributeValue(*user.OnPremisesSamAccountName), i.userBaseDN),
 		Attributes: []ldap.Attribute{
 			// inetOrgPerson requires "cn"
 			{
@@ -691,7 +692,7 @@ func (i *LDAP) CreateGroup(ctx context.Context, group libregraph.Group) (*libreg
 		return nil, errorcode.New(errorcode.NotAllowed, "server is configured read-only")
 	}
 	ar := ldap.AddRequest{
-		DN: fmt.Sprintf("cn=%s,%s", *group.DisplayName, i.groupBaseDN),
+		DN: fmt.Sprintf("cn=%s,%s", oldap.EscapeDNAttributeValue(*group.DisplayName), i.groupBaseDN),
 		Attributes: []ldap.Attribute{
 			{
 				Type: i.groupAttributeMap.name,

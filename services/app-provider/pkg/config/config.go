@@ -18,8 +18,8 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *Reva         `yaml:"reva"`
 
-	ExternalAddr string  `yaml:"external_addr" env:"APP_PROVIDER_EXTERNAL_ADDR" desc:"Address of the app provider, where the gateway service can reach it."`
-	Driver       string  `yaml:"driver" env:"APP_PROVIDER_DRIVER" desc:"Driver, which the app provider uses. Only \"wopi\" is supported as of now."`
+	ExternalAddr string  `yaml:"external_addr" env:"APP_PROVIDER_EXTERNAL_ADDR" desc:"Address of the app provider, where the GATEWAY service can reach it."`
+	Driver       string  `yaml:"driver" env:"APP_PROVIDER_DRIVER" desc:"Driver, the APP PROVIDER services uses. Only \"wopi\" is supported as of now."`
 	Drivers      Drivers `yaml:"drivers"`
 
 	Supervised bool            `yaml:"-"`
@@ -54,7 +54,7 @@ type Debug struct {
 type GRPCConfig struct {
 	Addr      string `yaml:"addr" env:"APP_PROVIDER_GRPC_ADDR" desc:"The bind address of the GRPC service."`
 	Namespace string `yaml:"-"`
-	Protocol  string `yaml:"protocol" env:"APP_PROVIDER_GRPC_PROTOCOL" desc:"The transport protocol of the grpc service."`
+	Protocol  string `yaml:"protocol" env:"APP_PROVIDER_GRPC_PROTOCOL" desc:"The transport protocol of the GPRC service."`
 }
 
 type Drivers struct {
@@ -65,7 +65,7 @@ type WOPIDriver struct {
 	AppAPIKey      string `yaml:"app_api_key" env:"APP_PROVIDER_WOPI_APP_API_KEY" desc:"API key for the wopi app."`
 	AppDesktopOnly bool   `yaml:"app_desktop_only" env:"APP_PROVIDER_WOPI_APP_DESKTOP_ONLY" desc:"Offer this app only on desktop."`
 	AppIconURI     string `yaml:"app_icon_uri" env:"APP_PROVIDER_WOPI_APP_ICON_URI" desc:"URI to an app icon to be used by clients."`
-	AppInternalURL string `yaml:"app_internal_url" env:"APP_PROVIDER_WOPI_APP_INTERNAL_URL" desc:"Internal URL to the app, eg in your DMZ."`
+	AppInternalURL string `yaml:"app_internal_url" env:"APP_PROVIDER_WOPI_APP_INTERNAL_URL" desc:"Internal URL to the app, like in your DMZ."`
 	AppName        string `yaml:"app_name" env:"APP_PROVIDER_WOPI_APP_NAME" desc:"Human readable app name."`
 	AppURL         string `yaml:"app_url" env:"APP_PROVIDER_WOPI_APP_URL" desc:"URL for end users to access the app."`
 	Insecure       bool   `yaml:"insecure" env:"APP_PROVIDER_WOPI_INSECURE" desc:"Allow insecure connections to the app."`

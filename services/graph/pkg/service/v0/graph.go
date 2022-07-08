@@ -75,7 +75,6 @@ type Graph struct {
 	logger               *log.Logger
 	identityBackend      identity.Backend
 	gatewayClient        GatewayClient
-	httpClient           HTTPClient
 	roleService          settingssvc.RoleService
 	spacePropertiesCache *ttlcache.Cache
 	eventsPublisher      events.Publisher
@@ -89,11 +88,6 @@ func (g Graph) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // GetClient returns a gateway client to talk to reva
 func (g Graph) GetGatewayClient() GatewayClient {
 	return g.gatewayClient
-}
-
-// GetClient returns a gateway client to talk to reva
-func (g Graph) GetHTTPClient() HTTPClient {
-	return g.httpClient
 }
 
 func (g Graph) publishEvent(ev interface{}) {

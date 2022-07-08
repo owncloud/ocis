@@ -13,14 +13,13 @@ Feature: State of the quota
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has given "Alice" the role "Space Admin" using the settings api
 
 
   Scenario Outline: Quota information is returned in the list of spaces returned via the Graph API
     Given user "Alice" has created a space "<spaceName>" of type "project" with quota "<total>"
-    And user "Alice" has uploaded a file inside space "<spaceName>" with content "<fileContent>" to "test.txt"
-    When user "Alice" lists all available spaces via the GraphApi
-    Then the json responded should contain a space "<spaceName>" with these key and value pairs:
+    When user "Alice" uploads a file inside space "<spaceName>" with content "<fileContent>" to "test.txt" using the WebDAV API
+    Then the user "Alice" should have a space called "<spaceName>" with these key and value pairs:
       | key              | value       |
       | name             | <spaceName> |
       | quota@@@state    | <state>     |
