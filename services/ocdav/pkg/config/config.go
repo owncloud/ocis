@@ -27,7 +27,7 @@ type Config struct {
 	PublicURL string `yaml:"public_url" env:"OCIS_URL;OCDAV_PUBLIC_URL" desc:"URL where oCIS is reachable for users."`
 
 	// Insecure certificates allowed when making requests to the gateway
-	Insecure bool `yaml:"insecure" env:"OCIS_INSECURE;OCDAV_INSECURE"`
+	Insecure bool `yaml:"insecure" env:"OCIS_INSECURE;OCDAV_INSECURE" desc:"Allow insecure connections to the GATEWAY service."`
 	// Timeout in seconds when making requests to the gateway
 	Timeout    int64      `yaml:"gateway_request_timeout" env:"OCDAV_GATEWAY_REQUEST_TIMEOUT" desc:"Request timeout in seconds for requests from the oCDAV service to the GATEWAY service."`
 	Middleware Middleware `yaml:"middleware"`
