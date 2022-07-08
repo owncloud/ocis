@@ -65,7 +65,7 @@ services:
       LDAP_GROUP_OBJECTCLASS: "groupOfUniqueNames"
       LDAP_USER_BASE_DN: "dc=owncloud,dc=com"
       LDAP_USER_FILTER: "(objectclass=owncloud)"
-      LDAP_USER_OBEJECTCLASS: "inetOrgPerson"
+      LDAP_USER_OBJECTCLASS: "inetOrgPerson"
       LDAP_LOGIN_ATTRIBUTES: "uid,mail"
       IDP_LDAP_URI: ldap://ldap-server
       IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
