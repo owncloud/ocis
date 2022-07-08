@@ -129,7 +129,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIPrivateLinks/accessingPrivateLinks.feature:17](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L17)
 - [webUIPrivateLinks/accessingPrivateLinks.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L25)
 - [webUIPrivateLinks/accessingPrivateLinks.feature:35](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L35)
-- [webUIPrivateLinks/accessingPrivateLinks.feature:45](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L45)
 
 ### [various sharing settings cannot be set](https://github.com/owncloud/ocis/issues/1328)
 - [webUIRestrictSharing/disableSharing.feature:16](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/disableSharing.feature#L16)
