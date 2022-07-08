@@ -1,11 +1,13 @@
-Enhancement: Update ownCloud Web to v5.7.0-rc.3
+Enhancement: Update ownCloud Web to v5.7.0-rc.4
 
 Tags: web
 
-We updated ownCloud Web to v5.7.0-rc.3. Please refer to the changelog (linked) for details on the web release.
+We updated ownCloud Web to v5.7.0-rc.4. Please refer to the changelog (linked) for details on the web release.
 
 * Bugfix [owncloud/web#7230](https://github.com/owncloud/web/pull/7230): Context menu misplaced when triggered by keyboard navigation
 * Bugfix [owncloud/web#7214](https://github.com/owncloud/web/pull/7214): Prevent error when pasting with empty clipboard
+* Bugfix [owncloud/web#7173](https://github.com/owncloud/web/pull/7173): Re-introduce dynamic app name in document title
+* Bugfix [owncloud/web#7166](https://github.com/owncloud/web/pull/7166): External apps fixes
 * Bugfix [owncloud/web#4677](https://github.com/owncloud/web/issues/4677): Logout deleted user on page reload
 * Bugfix [owncloud/web#7216](https://github.com/owncloud/web/pull/7216): Filename hovers over the image in the preview app
 * Bugfix [owncloud/web#7228](https://github.com/owncloud/web/pull/7228): Shared with others page apps not working with oc10 as backend
@@ -21,8 +23,8 @@ We updated ownCloud Web to v5.7.0-rc.3. Please refer to the changelog (linked) f
 * Enhancement [owncloud/web#7030](https://github.com/owncloud/web/issues/7030): Resolve bookmarked public links with password protection
 * Enhancement [owncloud/web#7038](https://github.com/owncloud/web/issues/7038): Improve performance of share indicators
 * Enhancement [owncloud/web#6661](https://github.com/owncloud/web/issues/6661): Option to block file extensions from text-editor app
-* Enhancement [owncloud/web#7139](https://github.com/owncloud/web/pull/7139): Update ODS to v14.0.0-alpha.2
+* Enhancement [owncloud/web#7139](https://github.com/owncloud/web/pull/7139): Update ODS to v14.0.0-alpha.4
 * Enhancement [owncloud/web#7176](https://github.com/owncloud/web/pull/7176): Introduce group assignments
 
 https://github.com/owncloud/ocis/pull/4140
-https://github.com/owncloud/web/releases/tag/v5.7.0-rc.3
+https://github.com/owncloud/web/releases/tag/v5.7.0-rc.4
