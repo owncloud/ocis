@@ -6,7 +6,7 @@ require (
 	github.com/CiscoM31/godata v1.0.5
 	github.com/Masterminds/semver v1.5.0
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
-	github.com/blevesearch/bleve/v2 v2.3.2
+	github.com/blevesearch/bleve/v2 v2.3.3
 	github.com/blevesearch/bleve_index_api v1.0.2
 	github.com/coreos/go-oidc/v3 v3.2.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220512100524-551800f020d8
@@ -101,19 +101,20 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/bits-and-blooms/bitset v1.2.1 // indirect
+	github.com/blevesearch/geo v0.1.12-0.20220606102651-aab42add3121 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.3 // indirect
 	github.com/blevesearch/gtreap v0.1.1 // indirect
-	github.com/blevesearch/mmap-go v1.0.3 // indirect
+	github.com/blevesearch/mmap-go v1.0.4 // indirect
 	github.com/blevesearch/scorch_segment_api/v2 v2.1.0 // indirect
 	github.com/blevesearch/segment v0.9.0 // indirect
 	github.com/blevesearch/snowballstem v0.9.0 // indirect
 	github.com/blevesearch/upsidedown_store_api v1.0.1 // indirect
-	github.com/blevesearch/vellum v1.0.7 // indirect
-	github.com/blevesearch/zapx/v11 v11.3.3 // indirect
-	github.com/blevesearch/zapx/v12 v12.3.3 // indirect
-	github.com/blevesearch/zapx/v13 v13.3.3 // indirect
-	github.com/blevesearch/zapx/v14 v14.3.3 // indirect
-	github.com/blevesearch/zapx/v15 v15.3.3 // indirect
+	github.com/blevesearch/vellum v1.0.8 // indirect
+	github.com/blevesearch/zapx/v11 v11.3.4 // indirect
+	github.com/blevesearch/zapx/v12 v12.3.4 // indirect
+	github.com/blevesearch/zapx/v13 v13.3.4 // indirect
+	github.com/blevesearch/zapx/v14 v14.3.4 // indirect
+	github.com/blevesearch/zapx/v15 v15.3.4 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
@@ -153,6 +154,7 @@ require (
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551 // indirect
 	github.com/golang/glog v1.0.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.4 // indirect
