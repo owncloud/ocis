@@ -137,7 +137,7 @@ Subdirectory that serves as the root for this HTTP service.
 
 |`THUMBNAILS_RESOLUTIONS`
 a| [subs=-attributes]
-++
++[]string+
 a| [subs=-attributes]
 pass:[[16x16 32x32 64x64 128x128 1920x1080 3840x2160 7680x4320]]
 a| [subs=-attributes]

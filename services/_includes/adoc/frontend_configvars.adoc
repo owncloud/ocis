@@ -326,7 +326,7 @@ Max TTL for the resource info cache.
 
 |`FRONTEND_CHECKSUMS_SUPPORTED_TYPES`
 a| [subs=-attributes]
-++
++[]string+
 a| [subs=-attributes]
 pass:[[sha1 md5 adler32]]
 a| [subs=-attributes]

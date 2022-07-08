@@ -285,7 +285,7 @@ Signing method of IDP requests like 'PS256'
 
 |`IDP_SIGNING_PRIVATE_KEY_FILES`
 a| [subs=-attributes]
-++
++[]string+
 a| [subs=-attributes]
 pass:[[~/.ocis/idp/private-key.pem]]
 a| [subs=-attributes]

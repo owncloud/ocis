@@ -280,7 +280,7 @@ The object class to use for groups in the default group search filter ('groupOfN
 |`LDAP_LOGIN_ATTRIBUTES` +
 `AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES`
 a| [subs=-attributes]
-++
++[]string+
 a| [subs=-attributes]
 pass:[[uid mail]]
 a| [subs=-attributes]
