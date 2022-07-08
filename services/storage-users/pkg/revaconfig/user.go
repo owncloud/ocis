@@ -95,6 +95,11 @@ func UserDrivers(cfg *config.Config) map[string]interface{} {
 			"treetime_accounting":         true,
 			"treesize_accounting":         true,
 			"permissionssvc":              cfg.Drivers.OCIS.PermissionsEndpoint,
+			"asyncfileuploads":            true,
+			"events": map[string]interface{}{
+				"natsaddress":   cfg.Events.Addr,
+				"natsclusterid": cfg.Events.ClusterID,
+			},
 		},
 		"s3": map[string]interface{}{
 			"enable_home": false,
