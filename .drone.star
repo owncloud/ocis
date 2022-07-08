@@ -48,62 +48,28 @@ dirs = {
 
 # configuration
 config = {
-    "modules": [
-        # if you add a module here please also add it to the root level Makefile
-        "services/app-provider",
-        "services/app-registry",
-        "services/audit",
-        "services/auth-basic",
-        "services/auth-bearer",
-        "services/auth-machine",
-        "services/frontend",
-        "services/gateway",
-        "services/graph-explorer",
-        "services/graph",
-        "services/groups",
-        "services/idm",
-        "services/idp",
-        "services/nats",
-        "services/notifications",
-        "services/ocdav",
-        "services/ocs",
-        "services/proxy",
-        "services/settings",
-        "services/sharing",
-        "services/storage-system",
-        "services/storage-publiclink",
-        "services/storage-shares",
-        "services/storage-users",
-        "services/store",
-        "services/thumbnails",
-        "services/users",
-        "services/web",
-        "services/webdav",
-        "ocis-pkg",
-        "ocis",
-    ],
+    "modules": [],
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "localApiTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "apiTests": {
-        "numberOfParts": 10,
         "skip": False,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "settingsUITests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "parallelApiTests": {
@@ -111,7 +77,7 @@ config = {
             "suites": [
                 "apiShareManagement",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
             "cron": "nightly",
         },
@@ -119,7 +85,7 @@ config = {
             "suites": [
                 "apiWebdavOperations",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
             "cron": "nightly",
         },
@@ -134,7 +100,7 @@ config = {
     "dockerReleases": {
         "architectures": ["arm", "arm64", "amd64"],
     },
-    "litmus": True,
+    "litmus": False,
 }
 
 # volume for steps to cache Go dependencies between steps of a pipeline
@@ -653,7 +619,6 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
     early_fail = config["apiTests"]["earlyFail"] if "earlyFail" in config["apiTests"] else False
-    filterTags = "~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
     expectedFailuresFile = "/drone/src/tests/acceptance/expected-failures-API-on-%s-storage.md" % (storage.upper())
 
     return {
@@ -664,37 +629,33 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                 ocisServer(storage, accounts_hash_difficulty) +
-                 restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
-                 restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
-                 [
-                     {
-                         "name": "oC10ApiTests-%s-storage-%s" % (storage, part_number),
-                         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
-                         "environment": {
-                             "TEST_WITH_GRAPH_API": "true",
-                             "PATH_TO_OCIS": "/drone/src",
-                             "PATH_TO_CORE": "/drone/src/%s" % dirs["core"],
-                             "TEST_SERVER_URL": "https://ocis-server:9200",
-                             "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
-                             "SKELETON_DIR": "/drone/src/%s/data/apiSkeleton" % dirs["testing_app"],
-                             "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
-                             "TEST_OCIS": "true",
-                             "SEND_SCENARIO_LINE_REFERENCES": "true",
-                             "STORAGE_DRIVER": storage,
-                             "BEHAT_FILTER_TAGS": filterTags,
-                             "DIVIDE_INTO_NUM_PARTS": number_of_parts,
-                             "RUN_PART": part_number,
-                             "EXPECTED_FAILURES_FILE": expectedFailuresFile,
-                             "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
-                         },
-                         "commands": [
-                             "make -C /drone/src/%s test-acceptance-api" % dirs["core"],
-                         ],
-                     },
-                 ] + failEarly(ctx, early_fail),
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) +
+                 cloneCoreRepos() + [
+            {
+                "name": "oC10ApiTests-%s-storage-%s" % (storage, part_number),
+                "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
+                "environment": {
+                    "TEST_WITH_GRAPH_API": "true",
+                    "PATH_TO_OCIS": "/drone/src",
+                    "PATH_TO_CORE": "/srv/app/testrunner",
+                    "TEST_SERVER_URL": "https://ocis-server:9200",
+                    "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
+                    "SKELETON_DIR": "/srv/app/tmp/testing/data/apiSkeleton",
+                    "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
+                    "TEST_OCIS": "true",
+                    "SEND_SCENARIO_LINE_REFERENCES": "true",
+                    "STORAGE_DRIVER": storage,
+                    "BEHAT_FILTER_TAGS": "@focus",
+                    "EXPECTED_FAILURES_FILE": expectedFailuresFile,
+                    "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
+                },
+                "commands": [
+                    "make -C /srv/app/testrunner test-acceptance-api",
+                ],
+                "volumes": [stepVolumeOC10Tests],
+            },
+        ] + failEarly(ctx, early_fail),
         "services": redisForOCStorage(storage),
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]) +
                       getPipelineNames(cacheCoreReposForTesting(ctx)),
@@ -711,9 +672,7 @@ def apiTests(ctx):
     pipelines = []
     debugParts = config["apiTests"]["skipExceptParts"]
     debugPartsEnabled = (len(debugParts) != 0)
-    for runPart in range(1, config["apiTests"]["numberOfParts"] + 1):
-        if (not debugPartsEnabled or (debugPartsEnabled and runPart in debugParts)):
-            pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "ocis"))
+    pipelines.append(coreApiTests(ctx, 0, 0, "ocis"))
 
     return pipelines
 
