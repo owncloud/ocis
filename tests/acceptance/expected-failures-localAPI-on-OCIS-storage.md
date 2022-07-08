@@ -23,5 +23,5 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpaces/search.feature:43](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/search.feature#L43)
 
 ### [Space Admin still has access to the project despite being removed from it](https://github.com/owncloud/ocis/issues/4127)
-- [apiSpaces/shareSpace.feature:77](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSpace.feature#L77)
-- [apiSpaces/shareSpace.feature:78](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSpace.feature#L78)
+- [apiSpaces/shareSpaces.feature:77](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSpaces.feature#L77)
+- [apiSpaces/shareSpaces.feature:78](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSpaces.feature#L78)
