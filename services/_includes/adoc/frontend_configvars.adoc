@@ -229,7 +229,7 @@ The default upload protocol to use in the frontend (e.g. tus).
 a| [subs=-attributes]
 +bool+
 a| [subs=-attributes]
-pass:[false]
+pass:[true]
 a| [subs=-attributes]
 Enables the support for resharing in the frontend.
 

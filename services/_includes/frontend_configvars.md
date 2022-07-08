@@ -28,7 +28,7 @@
 | FRONTEND_UPLOAD_MAX_CHUNK_SIZE | int | 100000000 | Sets the max chunk sizes for uploads via the frontend.|
 | FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE | string |  | Advise TUS to replace PATCH requests by POST requests.|
 | FRONTEND_DEFAULT_UPLOAD_PROTOCOL | string | tus | The default upload protocol to use in the frontend (e.g. tus).|
-| FRONTEND_ENABLE_RESHARING | bool | false | Enables the support for resharing in the frontend.|
+| FRONTEND_ENABLE_RESHARING | bool | true | Enables the support for resharing in the frontend.|
 | OCIS_URL<br/>FRONTEND_PUBLIC_URL | string | https://localhost:9200 | The public facing URL of the oCIS frontend.|
 | OCIS_INSECURE<br/>FRONTEND_APP_HANDLER_INSECURE | bool | false | Allow insecure connections to the frontend.|
 | FRONTEND_ARCHIVER_MAX_NUM_FILES | int64 | 10000 | Max number of files that can be packed into an archive.|
