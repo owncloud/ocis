@@ -11,7 +11,7 @@
 # `make -C ocis dev-docker`
 # It will build a `owncloud/ocis:dev` image for you
 # and use your local Yarn and Go caches and therefore
-# is a lot faster than the below build steps.
+# is a lot faster than the build steps below.
 
 
 FROM owncloudci/nodejs:14 as generate

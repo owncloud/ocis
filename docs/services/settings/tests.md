@@ -61,9 +61,9 @@ ocis init
 OCIS_URL=https://host.docker.internal:9200 OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true WEB_UI_CONFIG=../../web/dev/docker/ocis.web.config.json ./bin/ocis server
 ```
 
-If you've built the web bundle locally in its repository, you also need to reference the bundle output in the above command: `WEB_ASSET_PATH=../../web/dist`
+If you've built the web bundle locally in its repository, you also need to reference the bundle output in the command above: `WEB_ASSET_PATH=../../web/dist`
 
-If you've built the settings UI bundle locally, you also need to reference the bundle output in the above command: `SETTINGS_ASSET_PATH=../settings/assets/`
+If you've built the settings UI bundle locally, you also need to reference the bundle output in the command above: `SETTINGS_ASSET_PATH=../settings/assets/`
 
 #### Run settings acceptance tests
 
