@@ -57,7 +57,7 @@ All parse errors will fail fast and return an error in this mode.
 ## Supported types
 
 - Structs (and pointer to structs)
-- Slices of below defined types, separated by semicolon
+- Slices of defined types below, separated by semicolon
 - `bool`
 - `float32`, `float64`
 - `int`, `int8`, `int16`, `int32`, `int64`

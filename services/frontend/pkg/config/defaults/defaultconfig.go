@@ -38,7 +38,7 @@ func DefaultConfig() *config.Config {
 		UploadMaxChunkSize:       1e+8,
 		UploadHTTPMethodOverride: "",
 		DefaultUploadProtocol:    "tus",
-		EnableResharing:          false,
+		EnableResharing:          true,
 		Checksums: config.Checksums{
 			SupportedTypes:      []string{"sha1", "md5", "adler32"},
 			PreferredUploadType: "",

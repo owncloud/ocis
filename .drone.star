@@ -1615,7 +1615,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         user = "0:0"
         environment = {
             "OCIS_URL": OCIS_URL,
-            "FRONTEND_ENABLE_RESHARING": "true",
             "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",  # cs3api-validator needs the cs3api gatway exposed
             "STORAGE_USERS_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
@@ -1683,7 +1682,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_RUN_SERVICES": "app-registry,app-provider,auth-basic,auth-bearer,auth-machine,frontend,gateway,graph,graph-explorer,groups,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav",
             "OCIS_LOG_LEVEL": "info",
             "OCIS_URL": OCIS_URL,
-            "FRONTEND_ENABLE_RESHARING": "true",
             "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",
             "OCIS_CONFIG_DIR": "/etc/ocis",
             "PROXY_ENABLE_BASIC_AUTH": "true",
@@ -2301,7 +2299,6 @@ def parallelAcceptance(env):
         "OCIS_SKELETON_STRATEGY": "copy",
         "SEND_SCENARIO_LINE_REFERENCES": "true",
         "UPLOAD_DELETE_WAIT_TIME": "1",
-        "FRONTEND_ENABLE_RESHARING": "true",
     }
     environment.update(env)
 

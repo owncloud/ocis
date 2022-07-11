@@ -46,7 +46,7 @@ For the format of the users.json have a look at the [reva examples](https://gith
 
 This is the default user driver.
 
-If the below defaults don't match your environment change them accordingly:
+If the following defaults don't match your environment then change them accordingly:
 ```
 export STORAGE_LDAP_HOSTNAME=localhost
 export STORAGE_LDAP_PORT=9126

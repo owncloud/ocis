@@ -71,7 +71,7 @@ $ make -C ocis build
 This should give you an `ocis/bin/ocis` binary. Try listing the help with `ocis/bin/ocis --help`.
 
 {{< hint >}}
-You can check out a custom branch and build a custom binary which can then be used for the below steps.
+You can check out a custom branch and build a custom binary which can then be used for the steps below.
 {{< /hint >}}
 
 ### Start ocis glauth
