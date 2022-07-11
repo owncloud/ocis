@@ -49,7 +49,7 @@
     "@babel/plugin-syntax-dynamic-import": "^7.7.4",
     "@babel/plugin-transform-runtime": "^7.15.0",
     "@babel/polyfill": "^7.10.1",
-    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-env": "^7.18.6",
     "@babel/register": "^7.17.7",
     "@cucumber/cucumber": "^7.3.2",
     "@cucumber/pretty-formatter": "^1.0.0",
