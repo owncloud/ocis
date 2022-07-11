@@ -7,6 +7,9 @@ import (
 	"path/filepath"
 	"strconv"
 
+	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/constants"
@@ -37,6 +40,15 @@ type ThumbnailRequest struct {
 	Identifier string
 }
 
+func addMissingStorageID(id string) string {
+	rid := providerv1beta1.ResourceId{}
+	rid.StorageId, rid.SpaceId, rid.OpaqueId, _ = storagespace.SplitID(id)
+	if rid.StorageId == "" && rid.SpaceId == utils.ShareStorageSpaceID {
+		rid.StorageId = utils.ShareStorageProviderID
+	}
+	return storagespace.FormatResourceID(rid)
+}
+
 // ParseThumbnailRequest extracts all required parameters from a http request.
 func ParseThumbnailRequest(r *http.Request) (*ThumbnailRequest, error) {
 	ctx := r.Context()
@@ -46,7 +58,7 @@ func ParseThumbnailRequest(r *http.Request) (*ThumbnailRequest, error) {
 	id := ""
 	v := ctx.Value(constants.ContextKeyID)
 	if v != nil {
-		id = v.(string)
+		id = addMissingStorageID(v.(string))
 	}
 
 	q := r.URL.Query()
