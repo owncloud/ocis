@@ -200,7 +200,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-
+Allow insecure connections to the GATEWAY service.
 
 |`OCDAV_GATEWAY_REQUEST_TIMEOUT`
 a| [subs=-attributes]

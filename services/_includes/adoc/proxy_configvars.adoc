@@ -133,7 +133,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[~/.ocis/proxy/server.crt]
 a| [subs=-attributes]
-
+File name of the TLS server certificate for the HTTPS server.
 
 |`PROXY_TRANSPORT_TLS_KEY`
 a| [subs=-attributes]
@@ -141,7 +141,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[~/.ocis/proxy/server.key]
 a| [subs=-attributes]
-
+File name of the TLS server certificate key for the HTTPS server.
 
 |`PROXY_TLS`
 a| [subs=-attributes]
@@ -149,7 +149,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[true]
 a| [subs=-attributes]
-
+Use the HTTPS server instead of the HTTP server.
 
 |`REVA_GATEWAY`
 a| [subs=-attributes]

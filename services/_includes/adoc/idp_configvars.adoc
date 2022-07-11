@@ -141,7 +141,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[~/.ocis/idp/server.crt]
 a| [subs=-attributes]
-
+File name of the TLS server certificate for the HTTPS server.
 
 |`IDP_TRANSPORT_TLS_KEY`
 a| [subs=-attributes]
@@ -149,7 +149,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[~/.ocis/idp/server.key]
 a| [subs=-attributes]
-
+File name of the TLS server certificate key for the HTTPS server.
 
 |`IDP_TLS`
 a| [subs=-attributes]
@@ -157,7 +157,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-
+Use the HTTPS server instead of the HTTP server.
 
 |`REVA_GATEWAY`
 a| [subs=-attributes]

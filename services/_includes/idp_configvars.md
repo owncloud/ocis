@@ -17,9 +17,9 @@
 | IDP_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | IDP_HTTP_ADDR | string | 127.0.0.1:9130 | The bind address of the HTTP service.|
 | IDP_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
-| IDP_TRANSPORT_TLS_CERT | string | ~/.ocis/idp/server.crt | |
-| IDP_TRANSPORT_TLS_KEY | string | ~/.ocis/idp/server.key | |
-| IDP_TLS | bool | false | |
+| IDP_TRANSPORT_TLS_CERT | string | ~/.ocis/idp/server.crt | File name of the TLS server certificate for the HTTPS server.|
+| IDP_TRANSPORT_TLS_KEY | string | ~/.ocis/idp/server.key | File name of the TLS server certificate key for the HTTPS server.|
+| IDP_TLS | bool | false | Use the HTTPS server instead of the HTTP server.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to authenticate and look up users|
 | OCIS_MACHINE_AUTH_API_KEY<br/>IDP_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|
 | IDP_ASSET_PATH | string |  | Serve IDP assets from a path on the filesystem instead of the builtin assets.|

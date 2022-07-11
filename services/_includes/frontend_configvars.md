@@ -34,7 +34,7 @@
 | FRONTEND_ARCHIVER_MAX_NUM_FILES | int64 | 10000 | Max number of files that can be packed into an archive.|
 | FRONTEND_ARCHIVER_MAX_SIZE | int64 | 1073741824 | Max size of the zip archive the archiver can create.|
 | OCIS_INSECURE<br/>FRONTEND_ARCHIVER_INSECURE | bool | false | Allow insecure connections to the archiver.|
-| FRONTEND_DATA_GATEWAY_PREFIX | string | data | |
+| FRONTEND_DATA_GATEWAY_PREFIX | string | data | Path prefix for the data gateway.|
 | FRONTEND_OCS_PREFIX | string | ocs | Path prefix for the OCS service|
 | FRONTEND_OCS_SHARE_PREFIX | string | /Shares | Path prefix for shares.|
 | FRONTEND_OCS_HOME_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Homespace namespace identifier.|

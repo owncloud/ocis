@@ -16,9 +16,9 @@
 | PROXY_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | PROXY_HTTP_ADDR | string | 0.0.0.0:9200 | The bind address of the HTTP service.|
 | PROXY_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
-| PROXY_TRANSPORT_TLS_CERT | string | ~/.ocis/proxy/server.crt | |
-| PROXY_TRANSPORT_TLS_KEY | string | ~/.ocis/proxy/server.key | |
-| PROXY_TLS | bool | true | |
+| PROXY_TRANSPORT_TLS_CERT | string | ~/.ocis/proxy/server.crt | File name of the TLS server certificate for the HTTPS server.|
+| PROXY_TRANSPORT_TLS_KEY | string | ~/.ocis/proxy/server.key | File name of the TLS server certificate key for the HTTPS server.|
+| PROXY_TLS | bool | true | Use the HTTPS server instead of the HTTP server.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>PROXY_OIDC_ISSUER | string | https://localhost:9200 | URL of the OIDC issuer. It defaults to URL of the builtin IDP.|
 | OCIS_INSECURE<br/>PROXY_OIDC_INSECURE | bool | true | Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments.|

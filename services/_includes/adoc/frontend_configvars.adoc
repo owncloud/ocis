@@ -282,7 +282,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[data]
 a| [subs=-attributes]
-
+Path prefix for the data gateway.
 
 |`FRONTEND_OCS_PREFIX`
 a| [subs=-attributes]
