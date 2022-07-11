@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - CSP rules for silent token refresh in iframe: [#4031](https://github.com/owncloud/ocis/pull/4031)
+* Bugfix - Fix logging levels: [#4102](https://github.com/owncloud/ocis/pull/4102)
 * Bugfix - Fix `OCIS_RUN_SERVICES`: [#4133](https://github.com/owncloud/ocis/pull/4133)
 * Bugfix - Fix unused config option `GRAPH_SPACES_INSECURE`: [#55555](https://github.com/owncloud/ocis/pull/55555)
 * Bugfix - Remove unused configuration options: [#3973](https://github.com/owncloud/ocis/pull/3973)
@@ -33,6 +34,22 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/web/issues/7030
    https://github.com/owncloud/ocis/pull/4031
+
+* Bugfix - Fix logging levels: [#4102](https://github.com/owncloud/ocis/pull/4102)
+
+   We've fixed the configuration of logging levels. Previously it was not possible to configure a
+   service with a more or less verbose log level then all other services when running in the
+   supervised / runtime mode `ocis server`.
+
+   For example `OCIS_LOG_LEVEL=error PROXY_LOG_LEVEL=debug ocis server` did not configure
+   error logging for all services except the proxy, which should be on debug logging. This is now
+   fixed and working properly.
+
+   Also we fixed the format of go-micro logs to always default to error level. Previously this was
+   only ensured in the supervised / runtime mode.
+
+   https://github.com/owncloud/ocis/issues/4089
+   https://github.com/owncloud/ocis/pull/4102
 
 * Bugfix - Fix `OCIS_RUN_SERVICES`: [#4133](https://github.com/owncloud/ocis/pull/4133)
 
