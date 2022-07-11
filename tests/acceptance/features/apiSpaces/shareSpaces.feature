@@ -62,6 +62,22 @@ Feature: Share spaces
     Then the user "Brian" should not have a space called "share space"
 
 
+  Scenario Outline: Owner of a space cannot see the space after removing his access to the space
+    Given user "Alice" has shared a space "share space" to user "Brian" with role "manager"
+    When user "<user>" unshares a space "share space" to user "Alice"
+    Then the HTTP status code should be "200"
+    And the user "Brian" should have a space called "share space" owned by "Alice" with these key and value pairs:
+      | key       | value       |
+      | driveType | project     |
+      | id        | %space_id%  |
+      | name      | share space |
+    But the user "Alice" should not have a space called "share space"
+    Examples:
+      | user  |
+      | Alice |
+      | Brian |
+
+
   Scenario: A user can add another user to the space managers to enable him
     Given user "Alice" has uploaded a file inside space "share space" with content "Test" to "test.txt"
     When user "Alice" shares a space "share space" to user "Brian" with role "manager"

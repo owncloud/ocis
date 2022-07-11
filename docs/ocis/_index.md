@@ -15,7 +15,7 @@ Welcome to oCIS, the modern file-sync and share platform, which is based on our 
 ### The idea of federated storage
 To create a truly federated storage architecture oCIS breaks down the old ownCloud 10 user specific namespace, which is assembled on the server side, and makes the individual parts accessible to clients as storage spaces and storage space registries.
 
-The below diagram shows the core concepts that are the foundation for the new architecture:
+The diagram below shows the core concepts that are the foundation for the new architecture:
 - End user devices can fetch the list of *storage spaces* a user has access to, by querying one or multiple *storage space registries*. The list contains a unique endpoint for every *storage space*.
 - [*Storage space registries*]({{< ref "./storage/terminology#storage-space-registries" >}}) manage the list of storage spaces a user has access to. They may subscribe to *storage spaces* in order to receive notifications about changes on behalf of an end users mobile or desktop client.
 - [*Storage spaces*]({{< ref "./storage/terminology#storage-spaces" >}}) represent a collection of files and folders. A users personal files are contained in a *storage space*, a group or project drive is a *storage space*, and even incoming shares are treated and implemented as *storage spaces*. Each with properties like owners, permissions, quota and type.
@@ -61,6 +61,6 @@ We run a huge [test suite](https://github.com/owncloud/core/tree/master/tests), 
 
 ### Architecture Overview
 
-Running `bin/ocis server` will start the below services, all of which can be scaled and deployed on a single node or in a cloud native environment, as needed.
+Running `bin/ocis server` will start the following services, all of which can be scaled and deployed on a single node or in a cloud native environment, as needed.
 
 {{< figure src="/ocis/static/architecture-overview.drawio.svg" >}}
