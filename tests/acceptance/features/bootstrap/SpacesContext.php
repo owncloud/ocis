@@ -74,6 +74,23 @@ class SpacesContext implements Context {
 	 */
 	private string $davSpacesUrl = '/remote.php/dav/spaces/';
 
+    /**
+     * @var array map with user as key, spaces and file etags as value
+     * @example
+     * [
+     *   "user1" => [
+     *     "Personal" => [
+     *       "file1.txt": "etag1",
+     *     ],
+     *     "Shares Jail" => []
+     *   ],
+     *   "user2" => [
+     *     ...
+     *   ]
+     * ]
+     */
+    private $storedEtags = [];
+
 	/**
 	 * @param string $spaceName
 	 *
@@ -215,7 +232,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function getSpaceByName(string $user, string $spaceName): array {
-        if($spaceName === "Personal"){
+        if($spaceName === "Personal") {
             $spaceName = $this->featureContext->getUserDisplayName($user);
         }
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
@@ -2460,4 +2477,163 @@ class SpacesContext implements Context {
 		$responseXml = HttpRequestHelper::getResponseXml($this->featureContext->getResponse());
 		return $responseXml->xpath("//d:response/d:href");
 	}
+
+    /**
+     * @throws GuzzleException
+     */
+    public function userGetsEtagOfElementInASpace($user, $space, $path) {
+        $properties = '<?xml version="1.0"?>'
+            . '<d:propfind xmlns:d="DAV:" '
+            . 'xmlns:oc="http://owncloud.org/ns" '
+            . 'xmlns:ocs="http://open-collaboration-services.org/ns">'
+            .'<d:prop><d:getetag/></d:prop></d:propfind>';
+        $user = $this->featureContext->getActualUsername($user);
+        $spaceId = $this->getSpaceByName($user, $space)['id'];
+
+        // trim leading slash from the $path
+        $path = ltrim($path, '/');
+
+        $fullUrl = $this->baseUrl . $this->davSpacesUrl . $spaceId . '/' . $path;
+        $response = HttpRequestHelper::sendRequest(
+            $fullUrl,
+            $this->featureContext->getStepLineRef(),
+            'PROPFIND',
+            $user,
+            $this->featureContext->getPasswordForUser($user),
+            [],
+            $properties
+        );
+        $responseXml = HttpRequestHelper::getResponseXml($response);
+        $this->featureContext->setResponseXmlObject($responseXml);
+        return $this->featureContext->getEtagFromResponseXmlObject();
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function storeEtagOfElementInSpaceForUser(string $user, string $space, string $path, ?string $storePath = ""): void
+    {
+        if ($storePath === "") $storePath = $path;
+        $this->storedEtags[$user][$space][$storePath]
+            = $this->userGetsEtagOfElementInASpace(
+                $user,
+                $space,
+                $path,
+            );
+    }
+
+    /**
+     * @param string $user
+     * @param string $space
+     * @param string $path
+     *
+     * @return mixed
+     */
+    public function getStoredEtagForPathInSpaceOfAUser(string $user, string $space, string $path): mixed
+    {
+        Assert::assertArrayHasKey(
+            $user,
+            $this->storedEtags
+        );
+        Assert::assertArrayHasKey(
+            $space,
+            $this->storedEtags[$user]
+        );
+        Assert::assertArrayHasKey(
+            $path,
+            $this->storedEtags[$user][$space]
+        );
+        return $this->storedEtags[$user][$space][$path];
+    }
+
+    /**
+     * @Given /^these etags should have changed$/
+     *
+     * @throws GuzzleException
+     */
+    public function theseEtagsShouldHaveChanged(TableNode $table): void
+    {
+        $this->featureContext->verifyTableNodeColumns($table, ["user", "path", "space"]);
+        $this->featureContext->verifyTableNodeColumnsCount($table, 3);
+        $unchangedEtagCount = 0;
+        $unchangedEtagMessage = __METHOD__;
+        foreach ($table->getColumnsHash() as $row) {
+            $user = $row['user'];
+            $path = $row['path'];
+            $space = $row['space'];
+            $etag = $this->userGetsEtagOfElementInASpace($user, $space, $path);
+            $storedEtag = $this->getStoredEtagForPathInSpaceOfAUser($user, $space, $path);
+            if ($etag === $storedEtag) {
+                $unchangedEtagCount++;
+                $unchangedEtagMessage .= "\nThe '$storedEtag' of '$path' in '$space' of '$user' has not changed";
+            }
+        }
+
+        Assert::assertEquals(0, $unchangedEtagMessage, $unchangedEtagMessage);
+    }
+
+    /**
+     * @Given /^these etags should not have changed$/
+     *
+     * @throws GuzzleException
+     */
+    public function theseEtagsShouldNotHaveChanged(TableNode $table): void
+    {
+        $this->featureContext->verifyTableNodeColumns($table, ["user", "path", "space"]);
+        $this->featureContext->verifyTableNodeColumnsCount($table, 3);
+        $changedEtagCount = 0;
+        $changedEtagMessage = __METHOD__;
+        foreach ($table->getColumnsHash() as $row) {
+            $user = $row['user'];
+            $path = $row['path'];
+            $space = $row['space'];
+            $actualEtag = $this->userGetsEtagOfElementInASpace($user, $space, $path);
+            $storedEtag = $this->getStoredEtagForPathInSpaceOfAUser($user, $space, $path);
+            if ($actualEtag !== $storedEtag) {
+                $changedEtagCount++;
+                $changedEtagMessage .= "\nThe etag '$storedEtag' of element '$path' inside space '$space' of user '$user' has changed to '$actualEtag'";
+            }
+        }
+
+        Assert::assertEquals(0, $changedEtagMessage, $changedEtagMessage);
+    }
+
+    /**
+     * @Given /^user "([^"]*)" has stored etag of element "([^"]*)" from space "([^"]*)"$/
+     *
+     * @throws GuzzleException
+     * @throws Exception
+     */
+    public function userHasStoredEtagOfElementFromSpace(string $user, string $path, string $space):void
+    {
+        $user = $this->featureContext->getActualUsername($user);
+        $this->storeEtagOfElementInSpaceForUser(
+            $user,
+            $space,
+            $path,
+        );
+        if ($this->storedEtags[$user][$space][$path] === "" || $this->storedEtags[$user][$space][$path] === null) {
+            throw new Exception("Expected stored etag to be some string but found null!");
+        }
+    }
+
+    /**
+     * @Given /^user "([^"]*)" has stored etag of element "([^"]*)" on path "([^"]*)" from space "([^"]*)"$/
+     *
+     * @throws Exception
+     * @throws GuzzleException
+     */
+    public function userHasStoredEtagOfElementOnPathFromSpace($user, $path, $space, $storePath)
+    {
+        $user = $this->featureContext->getActualUsername($user);
+        $this->storeEtagOfElementInSpaceForUser(
+            $user,
+            $path,
+            $space,
+            $storePath
+        );
+        if ($this->storedEtags[$user][$space][$storePath] === "" || $this->storedEtags[$user][$space][$storePath] === null) {
+            throw new Exception("Expected stored etag to be some string but found null!");
+        }
+    }
 }
