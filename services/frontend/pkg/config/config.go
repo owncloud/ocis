@@ -101,7 +101,7 @@ type Archiver struct {
 }
 
 type DataGateway struct {
-	Prefix string `yaml:"prefix" env:"FRONTEND_DATA_GATEWAY_PREFIX"`
+	Prefix string `yaml:"prefix" env:"FRONTEND_DATA_GATEWAY_PREFIX" desc:"Path prefix for the data gateway."`
 }
 
 type OCS struct {
