@@ -215,8 +215,10 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function getSpaceByName(string $user, string $spaceName): array {
+        if($spaceName === "Personal"){
+            $spaceName = $this->featureContext->getUserDisplayName($user);
+        }
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
-
 		$spaces = $this->getAvailableSpaces();
 		Assert::assertIsArray($spaces[$spaceName], "Space with name $spaceName for user $user not found");
 		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName for user $user not found");
@@ -1657,6 +1659,98 @@ class SpacesContext implements Context {
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201 (Created)"
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" to "([^"]*)" in space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $fileSource
+	 * @param string $fileDestination
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 */
+	public function userCopiesFileWithinSpaceUsingTheWebDAVAPI(
+		string $user,
+		string $fileSource,
+		string $fileDestination,
+		string $spaceName
+	):void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName(
+			$user,
+			$fileDestination,
+			$spaceName
+		);
+
+		$fullUrl = $this->baseUrl . "/dav/spaces/" . $space['id'] . '/' . $fileSource;
+		$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" from space "([^"]*)" to "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $fileSource
+	 * @param string $fromSpaceName
+	 * @param string $fileDestination
+	 * @param string $toSpaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userCopiesFileFromAndToSpaceBetweenSpaces(
+		string $user,
+		string $fileSource,
+		string $fromSpaceName,
+		string $fileDestination,
+		string $toSpaceName
+	):void {
+        $space = $this->getSpaceByName($user, $fromSpaceName);
+		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName);
+		$fullUrl = $this->baseUrl . "/dav/spaces/" . $space['id'] . '/' . $fileSource;
+		$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
+	}
+
+	/**
+	 * returns a url for destination with spacename
+	 *
+	 * @param string $user
+	 * @param string $fileDestination
+	 * @param string $spaceName
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 */
+	public function destinationHeaderValueWithSpaceName(string $user, string $fileDestination, string $spaceName):string {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$fullUrl = $this->baseUrl . "/dav/spaces/" . $space['id'];
+		return \rtrim($fullUrl, '/') . '/' . \ltrim($fileDestination, '/');
+	}
+
+	/**
+	 * COPY request for files|folders
+	 *
+	 * @param string $user
+	 * @param string $fullUrl
+	 * @param string $headers
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function copyFilesAndFoldersRequest(string $user, string $fullUrl, array $headers):void {
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				"",
+				'COPY',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$headers,
+				""
+			)
 		);
 	}
 
