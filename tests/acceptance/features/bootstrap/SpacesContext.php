@@ -126,6 +126,11 @@ class SpacesContext implements Context {
 	private array $availableSpaces;
 
 	/**
+	 * @var array
+	 */
+	private array $lastPublicLinkData = [];
+
+	/**
 	 * @return array
 	 */
 	public function getAvailableSpaces(): array {
@@ -359,7 +364,7 @@ class SpacesContext implements Context {
 		}
 		throw new Exception(__METHOD__ . " user with name $userName not found");
 	}
-
+	
 	/**
 	 * @BeforeScenario
 	 *
@@ -2651,5 +2656,55 @@ class SpacesContext implements Context {
 		if ($this->storedEtags[$user][$space][$storePath] === "" || $this->storedEtags[$user][$space][$storePath] === null) {
 			throw new Exception("Expected stored etag to be some string but found null!");
 		}
+	}
+
+	/**
+	 * @When /^user "([^"]*)" creates public link share of the space "([^"]*)" with settings:$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param TableNode|null $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function sendShareSpaceViaLinkRequest(
+		string $user,
+		string $spaceName,
+		?TableNode $table
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$rows = $table->getRowsHash();
+
+		$rows["shareType"] = \array_key_exists("shareType", $rows) ? $rows["shareType"] : 3;
+		$rows["permissions"] = \array_key_exists("permissions", $rows) ? $rows["permissions"] : null;
+		$rows["password"] = \array_key_exists("password", $rows) ? $rows["password"] : null;
+		$rows["name"] = \array_key_exists("name", $rows) ? $rows["name"] : null;
+		$rows["expireDate"] = \array_key_exists("expireDate", $rows) ? $rows["expireDate"] : null;
+		
+		$body = [
+			"space_ref" => $space['id'],
+			"shareType" => $rows["shareType"],
+			"permissions" => $rows["permissions"],
+			"password" => $rows["password"],
+			"name" => $rows["name"],
+			"expireDate" => $rows["expireDate"]
+		];
+
+		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::post(
+				$fullUrl,
+				"",
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				$body
+			)
+		);
+	
+		// set last response as PublicShareData. using method from core
+		$this->featureContext->setLastPublicShareData($this->featureContext->getResponseXml(null, __METHOD__));
 	}
 }
