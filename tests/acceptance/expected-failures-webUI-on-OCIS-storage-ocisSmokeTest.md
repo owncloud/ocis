@@ -17,8 +17,3 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. This 
 
 ### [impossible to navigate into a folder in the trashbin](https://github.com/owncloud/web/issues/1725)
 - [webUITrashbinDelete/trashbinDelete.feature:29](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L29)
-
-### [Sharing seems to work but does not work](https://github.com/owncloud/ocis/issues/1303)
-- [webUISharingInternalUsers/shareWithUsers.feature:52](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L52)
-- [webUISharingInternalUsers/shareWithUsers.feature:53](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L53)
-- [webUISharingInternalUsers/shareWithUsers.feature:54](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L54)
