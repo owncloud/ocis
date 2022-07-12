@@ -1063,8 +1063,6 @@ And other missing implementation of favorites
 - [apiWebdavEtagPropagation1/deleteFileFolder.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/deleteFileFolder.feature#L156)
 - [apiWebdavEtagPropagation1/deleteFileFolder.feature:194](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/deleteFileFolder.feature#L194)
 - [apiWebdavEtagPropagation1/deleteFileFolder.feature:232](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation1/deleteFileFolder.feature#L232)
-- [apiWebdavEtagPropagation2/copyFileFolder.feature:194](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/copyFileFolder.feature#L194)
-- [apiWebdavEtagPropagation2/copyFileFolder.feature:238](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/copyFileFolder.feature#L238)
 - [apiWebdavEtagPropagation2/createFolder.feature:85](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/createFolder.feature#L85)
 - [apiWebdavEtagPropagation2/createFolder.feature:116](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/createFolder.feature#L116)
 - [apiWebdavEtagPropagation2/upload.feature:83](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavEtagPropagation2/upload.feature#L83)
