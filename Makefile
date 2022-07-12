@@ -181,7 +181,7 @@ go-coverage:
 
 .PHONY: protobuf
 protobuf:
-	@for mod in $(OCIS_MODULES); do \
+	@for mod in ./services/thumbnails ./services/store ./services/settings; do \
         echo -n "% protobuf $$mod: "; $(MAKE) --no-print-directory -C $$mod protobuf || exit 1; \
     done
 
