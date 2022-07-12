@@ -548,7 +548,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user, string $query = ''): void {
+	public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user, string $query = '', bool $remember = true): void {
 		$this->featureContext->setResponse(
 			$this->listMySpacesRequest(
 				$user,
@@ -556,7 +556,9 @@ class SpacesContext implements Context {
 				"?" . $query
 			)
 		);
-		$this->rememberTheAvailableSpaces();
+		if ($remember) {
+            $this->rememberTheAvailableSpaces($user);
+        }
 	}
 
 	/**
@@ -2488,12 +2490,12 @@ class SpacesContext implements Context {
             . 'xmlns:ocs="http://open-collaboration-services.org/ns">'
             .'<d:prop><d:getetag/></d:prop></d:propfind>';
         $user = $this->featureContext->getActualUsername($user);
-        $spaceId = $this->getSpaceByName($user, $space)['id'];
+        $space = $this->getSpaceByName($user, $space);
 
         // trim leading slash from the $path
         $path = ltrim($path, '/');
 
-        $fullUrl = $this->baseUrl . $this->davSpacesUrl . $spaceId . '/' . $path;
+        $fullUrl = $space['root']['webDavUrl'] . '/' . $path;
         $response = HttpRequestHelper::sendRequest(
             $fullUrl,
             $this->featureContext->getStepLineRef(),
@@ -2527,21 +2529,27 @@ class SpacesContext implements Context {
      * @param string $space
      * @param string $path
      *
-     * @return mixed
+     * @return string
      */
-    public function getStoredEtagForPathInSpaceOfAUser(string $user, string $space, string $path): mixed
+    public function getStoredEtagForPathInSpaceOfAUser(string $user, string $space, string $path): string
     {
         Assert::assertArrayHasKey(
             $user,
-            $this->storedEtags
+            $this->storedEtags,
+            __METHOD__ . " No stored etags for user '$user' found"
+            . "\nFound: " . print_r($this->storedEtags, true)
         );
         Assert::assertArrayHasKey(
             $space,
-            $this->storedEtags[$user]
+            $this->storedEtags[$user],
+            __METHOD__ . " No stored etags for user '$user' with space '$space' found"
+            . "\nFound: " . implode(', ', array_keys($this->storedEtags[$user]))
         );
         Assert::assertArrayHasKey(
             $path,
-            $this->storedEtags[$user][$space]
+            $this->storedEtags[$user][$space],
+            __METHOD__ . " No stored etags for user '$user' with space '$space' with path '$path' found"
+            . '\nFound: ' . print_r($this->storedEtags[$user][$space], true)
         );
         return $this->storedEtags[$user][$space][$path];
     }
@@ -2565,11 +2573,11 @@ class SpacesContext implements Context {
             $storedEtag = $this->getStoredEtagForPathInSpaceOfAUser($user, $space, $path);
             if ($etag === $storedEtag) {
                 $unchangedEtagCount++;
-                $unchangedEtagMessage .= "\nThe '$storedEtag' of '$path' in '$space' of '$user' has not changed";
+                $unchangedEtagMessage .= "\nExpected etag of element '$path' for  user '$user' in space '$space' to change, but it did not.";
             }
         }
 
-        Assert::assertEquals(0, $unchangedEtagMessage, $unchangedEtagMessage);
+        Assert::assertEquals(0, $unchangedEtagCount, $unchangedEtagMessage);
     }
 
     /**
@@ -2591,11 +2599,11 @@ class SpacesContext implements Context {
             $storedEtag = $this->getStoredEtagForPathInSpaceOfAUser($user, $space, $path);
             if ($actualEtag !== $storedEtag) {
                 $changedEtagCount++;
-                $changedEtagMessage .= "\nThe etag '$storedEtag' of element '$path' inside space '$space' of user '$user' has changed to '$actualEtag'";
+                $changedEtagMessage .= "\nExpected etag of element '$path' for  user '$user' in space '$space' not to change, but it did.";
             }
         }
 
-        Assert::assertEquals(0, $changedEtagMessage, $changedEtagMessage);
+        Assert::assertEquals(0, $changedEtagCount, $changedEtagMessage);
     }
 
     /**
@@ -2623,13 +2631,13 @@ class SpacesContext implements Context {
      * @throws Exception
      * @throws GuzzleException
      */
-    public function userHasStoredEtagOfElementOnPathFromSpace($user, $path, $space, $storePath)
+    public function userHasStoredEtagOfElementOnPathFromSpace($user, $path, $storePath, $space)
     {
         $user = $this->featureContext->getActualUsername($user);
         $this->storeEtagOfElementInSpaceForUser(
             $user,
-            $path,
             $space,
+            $path,
             $storePath
         );
         if ($this->storedEtags[$user][$space][$storePath] === "" || $this->storedEtags[$user][$space][$storePath] === null) {

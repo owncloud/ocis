@@ -16,7 +16,7 @@ Feature: check etag propagation after copying files or folders
     And user "Brian" has stored etag of element "/" from space "Shares Jail"
     And user "Brian" has stored etag of element "/upload" from space "Shares Jail"
     And user "Brian" has stored etag of element "/upload/file.txt" from space "Shares Jail"
-    And user "Brian" has stored etag of element "upload/file.txt" on path "upload/renamed.txt" from space "Shares Jail"
+    And user "Brian" has stored etag of element "upload/file.txt" on path "/upload/renamed.txt" from space "Shares Jail"
     When user "Brian" copies file "/upload/file.txt" to "/upload/renamed.txt" in space "Shares Jail" using the WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed
@@ -62,4 +62,3 @@ Feature: check etag propagation after copying files or folders
       | user  | path             | space       |
       | Alice | /upload/file.txt | Personal    |
       | Brian | /upload/file.txt | Shares Jail |
-
