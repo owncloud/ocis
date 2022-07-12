@@ -603,6 +603,7 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
                          "commands": [
                              "pwd",
                              "ls -la",
+                             "composer --version",
                              "make test-acceptance-api",
                          ],
                      },
