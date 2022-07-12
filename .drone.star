@@ -647,7 +647,6 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "SEND_SCENARIO_LINE_REFERENCES": "true",
                              "STORAGE_DRIVER": storage,
                              "BEHAT_FILTER_TAGS": "@focus",
-                             "EXPECTED_FAILURES_FILE": expectedFailuresFile,
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                          },
                          "commands": [
