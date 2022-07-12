@@ -17,6 +17,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Escape DN attribute value: [#4117](https://github.com/owncloud/ocis/pull/4117)
 * Bugfix - Polish search: [#4094](https://github.com/owncloud/ocis/pull/4094)
 * Bugfix - Store user passwords hashed in idm: [#3778](https://github.com/owncloud/ocis/issues/3778)
+* Change - Use the spaceID on the cs3 resource: [#4748](https://github.com/owncloud/ocis/pull/4748)
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
 * Enhancement - Update IdP UI: [#3493](https://github.com/owncloud/ocis/issues/3493)
 * Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
@@ -128,6 +129,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3778
    https://github.com/owncloud/ocis/pull/4053
+
+* Change - Use the spaceID on the cs3 resource: [#4748](https://github.com/owncloud/ocis/pull/4748)
+
+   We cleaned up the CS3Api to use a proper attribute for the space id.
+
+   https://github.com/owncloud/ocis/pull/4748
 
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
 
