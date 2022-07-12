@@ -1,7 +1,7 @@
 ---
 title: "ocis.messages.search.v0"
 url: /grpc_apis/ocis_messages_search_v0
-date: 2022-07-12T09:00:41Z
+date: 2022-07-12T13:27:13Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
@@ -55,6 +55,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 | ----- | ---- | ----- | ----------- |
 | storage_id | [string](#string) |  |  |
 | opaque_id | [string](#string) |  |  |
+| space_id | [string](#string) |  |  |
 
 
 ## Scalar Value Types
