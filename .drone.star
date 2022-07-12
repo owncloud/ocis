@@ -1647,6 +1647,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         user = "0:0"
         environment = {
             "OCIS_URL": OCIS_URL,
+            "OCIS_CONFIG_DIR": "/root/.ocis/config",
             "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",  # cs3api-validator needs the cs3api gatway exposed
             "STORAGE_USERS_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
@@ -1743,6 +1744,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "user": user,
             "commands": [
                 "ocis/bin/ocis init --insecure true",
+                "cat $OCIS_CONFIG_DIR/ocis.yaml",
                 "ocis/bin/ocis server",
             ],
             "volumes": volumes,
