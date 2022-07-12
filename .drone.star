@@ -2350,7 +2350,7 @@ def parallelAcceptanceTests(env, matrix):
         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
         "environment": environment,
         "commands": [
-            "make -C /srv/app/testrunner test-acceptance-api",
+            "make -C /drone/src/%s test-acceptance-api" % dirs["core"],
         ],
         "depends_on": ["wait-for-oc10", "wait-for-ocis-server"],
         "volumes": [
