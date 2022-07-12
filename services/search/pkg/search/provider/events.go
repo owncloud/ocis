@@ -147,14 +147,14 @@ func (p *Provider) getAuthContext(owner *user.User) (context.Context, error) {
 	ownerCtx := ctxpkg.ContextSetUser(context.Background(), owner)
 	authRes, err := p.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
 		Type:         "machine",
-		ClientId:     "userid:" + owner.Id.OpaqueId,
+		ClientId:     "userid:" + owner.GetId().GetOpaqueId(),
 		ClientSecret: p.machineAuthAPIKey,
 	})
 	if err == nil && authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		err = errtypes.NewErrtypeFromStatus(authRes.Status)
 	}
 	if err != nil {
-		p.logger.Error().Err(err).Interface("authRes", authRes).Msg("error using machine auth")
+		p.logger.Error().Err(err).Interface("owner", owner).Interface("authRes", authRes).Msg("error using machine auth")
 		return nil, err
 	}
 	return metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token), nil

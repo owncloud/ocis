@@ -113,7 +113,14 @@ func (g Graph) getRemoteItem(ctx context.Context, root *storageprovider.Resource
 		return nil, err
 	}
 
-	item.WebDavUrl = libregraph.PtrString(baseURL.String() + storagespace.FormatResourceID(*root))
+	if baseURL != nil {
+		// TODO read from StorageSpace ... needs Opaque for now
+		// TODO how do we build the url?
+		// for now: read from request
+		webDavURL := *baseURL
+		webDavURL.Path = path.Join(webDavURL.Path, storagespace.FormatResourceID(*root))
+		item.WebDavUrl = libregraph.PtrString(webDavURL.String())
+	}
 	return item, nil
 }
 
@@ -231,7 +238,7 @@ func (g Graph) GetExtendedSpaceProperties(ctx context.Context, baseURL *url.URL,
 
 func (g Graph) getSpecialDriveItem(ctx context.Context, id storageprovider.ResourceId, itemName string, baseURL *url.URL, space *storageprovider.StorageSpace) *libregraph.DriveItem {
 	var spaceItem *libregraph.DriveItem
-	if id.StorageId == "" && id.OpaqueId == "" {
+	if id.SpaceId == "" && id.OpaqueId == "" {
 		return nil
 	}
 

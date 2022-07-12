@@ -242,6 +242,9 @@
         },
         "opaqueId": {
           "type": "string"
+        },
+        "spaceId": {
+          "type": "string"
         }
       }
     },

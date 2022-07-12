@@ -21,7 +21,8 @@ var _ = Describe("Index", func() {
 		ctx        context.Context
 
 		rootId = &sprovider.ResourceId{
-			StorageId: "storageid",
+			StorageId: "provider-1",
+			SpaceId:   "spaceid",
 			OpaqueId:  "rootopaqueid",
 		}
 		filename  string
@@ -33,7 +34,8 @@ var _ = Describe("Index", func() {
 		}
 		parentRi = &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
-				StorageId: "storageid",
+				StorageId: "provider-1",
+				SpaceId:   "spaceid",
 				OpaqueId:  "parentopaqueid",
 			},
 			Path:  "sub d!r",
@@ -47,11 +49,13 @@ var _ = Describe("Index", func() {
 		}
 		childRi = &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
-				StorageId: "storageid",
+				StorageId: "provider-1",
+				SpaceId:   "spaceid",
 				OpaqueId:  "childopaqueid",
 			},
 			ParentId: &sprovider.ResourceId{
-				StorageId: "storageid",
+				StorageId: "provider-1",
+				SpaceId:   "spaceid",
 				OpaqueId:  "parentopaqueid",
 			},
 			Path:  "child.pdf",
@@ -65,7 +69,8 @@ var _ = Describe("Index", func() {
 				Query: query,
 				Ref: &searchmsg.Reference{
 					ResourceId: &searchmsg.ResourceID{
-						StorageId: rootId.StorageId,
+						StorageId: "provider-1",
+						SpaceId:   rootId.SpaceId,
 						OpaqueId:  rootId.OpaqueId,
 					},
 				},
@@ -96,11 +101,13 @@ var _ = Describe("Index", func() {
 		}
 		ri = &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
-				StorageId: "storageid",
+				StorageId: "provider-1",
+				SpaceId:   "spaceid",
 				OpaqueId:  "opaqueid",
 			},
 			ParentId: &sprovider.ResourceId{
-				StorageId: "storageid",
+				StorageId: "provider-1",
+				SpaceId:   "spaceid",
 				OpaqueId:  "someopaqueid",
 			},
 			Path:     filename,
@@ -172,7 +179,8 @@ var _ = Describe("Index", func() {
 
 				It("scopes the search to the specified space", func() {
 					resourceId := &sprovider.ResourceId{
-						StorageId: "differentstorageid",
+						StorageId: "provider-1",
+						SpaceId:   "differentspaceid",
 						OpaqueId:  "differentopaqueid",
 					}
 					assertDocCount(resourceId, `Name:foo.pdf`, 0)
@@ -222,14 +230,16 @@ var _ = Describe("Index", func() {
 					BeforeEach(func() {
 						nestedRef = &sprovider.Reference{
 							ResourceId: &sprovider.ResourceId{
-								StorageId: "storageid",
+								StorageId: "provider-1",
+								SpaceId:   "spaceid",
 								OpaqueId:  "rootopaqueid",
 							},
 							Path: "./nested/nestedpdf.pdf",
 						}
 						nestedRI = &sprovider.ResourceInfo{
 							Id: &sprovider.ResourceId{
-								StorageId: "storageid",
+								StorageId: "provider-1",
+								SpaceId:   "spaceid",
 								OpaqueId:  "nestedopaqueid",
 							},
 							Path: "nestedpdf.pdf",
@@ -251,6 +261,7 @@ var _ = Describe("Index", func() {
 							Ref: &searchmsg.Reference{
 								ResourceId: &searchmsg.ResourceID{
 									StorageId: ref.ResourceId.StorageId,
+									SpaceId:   ref.ResourceId.SpaceId,
 									OpaqueId:  ref.ResourceId.OpaqueId,
 								},
 								Path: "./nested/",

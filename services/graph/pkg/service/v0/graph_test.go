@@ -76,7 +76,8 @@ var _ = Describe("Graph", func() {
 						Id:        &provider.StorageSpaceId{OpaqueId: "sameID"},
 						SpaceType: "aspacetype",
 						Root: &provider.ResourceId{
-							StorageId: "sameID",
+							StorageId: "pro-1",
+							SpaceId:   "sameID",
 							OpaqueId:  "sameID",
 						},
 						Name: "aspacename",
@@ -102,11 +103,11 @@ var _ = Describe("Graph", func() {
 				"value":[
 					{
 						"driveType":"aspacetype",
-						"id":"sameID",
+						"id":"pro-1$sameID",
 						"name":"aspacename",
 						"root":{
-							"id":"sameID!sameID",
-							"webDavUrl":"https://localhost:9200/dav/spaces/sameID"
+							"id":"pro-1$sameID",
+							"webDavUrl":"https://localhost:9200/dav/spaces/pro-1$sameID"
 						}
 					}
 				]
@@ -121,7 +122,8 @@ var _ = Describe("Graph", func() {
 						Id:        &provider.StorageSpaceId{OpaqueId: "bsameID"},
 						SpaceType: "bspacetype",
 						Root: &provider.ResourceId{
-							StorageId: "bsameID",
+							StorageId: "pro-1",
+							SpaceId:   "bsameID",
 							OpaqueId:  "bsameID",
 						},
 						Name: "bspacename",
@@ -136,7 +138,8 @@ var _ = Describe("Graph", func() {
 						Id:        &provider.StorageSpaceId{OpaqueId: "asameID"},
 						SpaceType: "aspacetype",
 						Root: &provider.ResourceId{
-							StorageId: "asameID",
+							StorageId: "pro-1",
+							SpaceId:   "asameID",
 							OpaqueId:  "asameID",
 						},
 						Name: "aspacename",
@@ -169,23 +172,23 @@ var _ = Describe("Graph", func() {
 					{
 						"driveAlias":"aspacetype/aspacename",
 						"driveType":"aspacetype",
-						"id":"asameID",
+						"id":"pro-1$asameID",
 						"name":"aspacename",
 						"root":{
 							"eTag":"101112131415",
-							"id":"asameID!asameID",
-							"webDavUrl":"https://localhost:9200/dav/spaces/asameID"
+							"id":"pro-1$asameID",
+							"webDavUrl":"https://localhost:9200/dav/spaces/pro-1$asameID"
 						}
 					},
 					{
 						"driveAlias":"bspacetype/bspacename",
 						"driveType":"bspacetype",
-						"id":"bsameID",
+						"id":"pro-1$bsameID",
 						"name":"bspacename",
 						"root":{
 							"eTag":"123456789",
-							"id":"bsameID!bsameID",
-							"webDavUrl":"https://localhost:9200/dav/spaces/bsameID"
+							"id":"pro-1$bsameID",
+							"webDavUrl":"https://localhost:9200/dav/spaces/pro-1$bsameID"
 						}
 					}
 				]
@@ -197,10 +200,11 @@ var _ = Describe("Graph", func() {
 				Status: status.NewOK(ctx),
 				StorageSpaces: []*provider.StorageSpace{
 					{
-						Id:        &provider.StorageSpaceId{OpaqueId: "aID!differentID"},
+						Id:        &provider.StorageSpaceId{OpaqueId: "prID$aID!differentID"},
 						SpaceType: "mountpoint",
 						Root: &provider.ResourceId{
-							StorageId: "prID$aID",
+							StorageId: "prID",
+							SpaceId:   "aID",
 							OpaqueId:  "differentID",
 						},
 						Name: "New Folder",
@@ -209,6 +213,7 @@ var _ = Describe("Graph", func() {
 								"spaceAlias":     {Decoder: "plain", Value: []byte("mountpoint/new-folder")},
 								"etag":           {Decoder: "plain", Value: []byte("101112131415")},
 								"grantStorageID": {Decoder: "plain", Value: []byte("ownerStorageID")},
+								"grantSpaceID":   {Decoder: "plain", Value: []byte("spaceID")},
 								"grantOpaqueID":  {Decoder: "plain", Value: []byte("opaqueID")},
 							},
 						},
@@ -220,7 +225,7 @@ var _ = Describe("Graph", func() {
 				Info: &provider.ResourceInfo{
 					Etag:  "123456789",
 					Type:  provider.ResourceType_RESOURCE_TYPE_CONTAINER,
-					Id:    &provider.ResourceId{StorageId: "ownerStorageID", OpaqueId: "opaqueID"},
+					Id:    &provider.ResourceId{StorageId: "ownerStorageID", SpaceId: "spaceID", OpaqueId: "opaqueID"},
 					Path:  "New Folder",
 					Mtime: &typesv1beta1.Timestamp{Seconds: 1648327606, Nanos: 0},
 					Size:  uint64(1234),
@@ -252,12 +257,12 @@ var _ = Describe("Graph", func() {
 			Expect(*value.Root.ETag).To(Equal("101112131415"))
 			Expect(*value.Root.Id).To(Equal("prID$aID!differentID"))
 			Expect(*value.Root.RemoteItem.ETag).To(Equal("123456789"))
-			Expect(*value.Root.RemoteItem.Id).To(Equal("ownerStorageID!opaqueID"))
+			Expect(*value.Root.RemoteItem.Id).To(Equal("ownerStorageID$spaceID!opaqueID"))
 			Expect(value.Root.RemoteItem.LastModifiedDateTime.UTC()).To(Equal(time.Unix(1648327606, 0).UTC()))
 			Expect(*value.Root.RemoteItem.Folder).To(Equal(libregraph.Folder{}))
 			Expect(*value.Root.RemoteItem.Name).To(Equal("New Folder"))
 			Expect(*value.Root.RemoteItem.Size).To(Equal(int64(1234)))
-			Expect(*value.Root.RemoteItem.WebDavUrl).To(Equal("https://localhost:9200/dav/spaces/ownerStorageID!opaqueID"))
+			Expect(*value.Root.RemoteItem.WebDavUrl).To(Equal("https://localhost:9200/dav/spaces/ownerStorageID$spaceID%21opaqueID"))
 		})
 		It("can not list spaces with wrong sort parameter", func() {
 			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
