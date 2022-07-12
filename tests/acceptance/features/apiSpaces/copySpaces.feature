@@ -17,7 +17,7 @@ Feature: copy file
     And user "Alice" has created a folder "newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "insideSpace.txt"
     And user "Alice" has shared a space "Project" to user "Brian" with role "<role>"
-    When user "Brian" copies file "insideSpace.txt" to "/newfolder/insideSpace.txt" in space "Project" using the WebDAV API
+    When user "Brian" copies file "insideSpace.txt" to "/newfolder/insideSpace.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Brian" the space "Project" should contain these entries:
       | newfolder/insideSpace.txt |
@@ -34,7 +34,7 @@ Feature: copy file
     And user "Alice" has created a folder "newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "insideSpace.txt"
     And user "Alice" has shared a space "Project" to user "Brian" with role "viewer"
-    When user "Brian" copies file "insideSpace.txt" to "newfolder/insideSpace.txt" in space "Project" using the WebDAV API
+    When user "Brian" copies file "insideSpace.txt" to "newfolder/insideSpace.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Brian" the space "Project" should not contain these entries:
       | newfolder/insideSpace.txt |
@@ -45,37 +45,21 @@ Feature: copy file
     And user "Brian" has created a space "Project1" with the default quota using the GraphApi
     And user "Brian" has created a space "Project2" with the default quota using the GraphApi
     And user "Brian" has uploaded a file inside space "Project1" with content "Project1 content" to "project1.txt"
-    And user "Brian" has shared a space "Project2" to user "Alice" with role "manager"
-    And user "Brian" has shared a space "Project1" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project2" to user "Alice" with role "<from_role>"
+    And user "Brian" has shared a space "Project1" to user "Alice" with role "<to_role>"
     When user "Alice" copies file "project1.txt" from space "Project1" to "project1.txt" inside space "Project2" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Project2" should contain these entries:
       | project1.txt |
     And for user "Alice" the content of the file "project1.txt" of the space "Project2" should be "Project1 content"
     Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
-
-
-  Scenario Outline: User copy a file from a space project with different role to a space project with editor role
-    Given the administrator has given "Brian" the role "Space Admin" using the settings api
-    And user "Brian" has created a space "Project1" with the default quota using the GraphApi
-    And user "Brian" has created a space "Project2" with the default quota using the GraphApi
-    And user "Brian" has uploaded a file inside space "Project1" with content "Project1 content" to "project1.txt"
-    And user "Brian" has shared a space "Project2" to user "Alice" with role "editor"
-    And user "Brian" has shared a space "Project1" to user "Alice" with role "<role>"
-    When user "Alice" copies file "project1.txt" from space "Project1" to "project1.txt" inside space "Project2" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And for user "Alice" the space "Project2" should contain these entries:
-      | project1.txt |
-    And for user "Alice" the content of the file "project1.txt" of the space "Project2" should be "Project1 content"
-    Examples:
-      | role    |
-      | manager |
-      | editor  |
-      | viewer  |
+      | from_role | to_role |
+      | manager   | manager |
+      | manager   | editor  |
+      | manager   | viewer  |
+      | editor    | manager |
+      | editor    | editor  |
+      | editor    | viewer  |
 
 
   Scenario Outline: User copy a file from a space project with different role to a space project with viewer role
