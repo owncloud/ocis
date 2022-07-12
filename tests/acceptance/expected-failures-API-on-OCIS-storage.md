@@ -1482,12 +1482,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiShareManagementToShares/moveShareInsideAnotherShare.feature:86](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/moveShareInsideAnotherShare.feature#L86)
 - [apiShareManagementToShares/moveShareInsideAnotherShare.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/moveShareInsideAnotherShare.feature#L100)
 
-#### [TUS upload file with invalid name sends false response](https://github.com/owncloud/ocis/issues/3050)
-
-- [apiWebdavUploadTUS/uploadFile.feature:215](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L215)
-- [apiWebdavUploadTUS/uploadFile.feature:216](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L216)
-- [apiWebdavUploadTUS/uploadFile.feature:218](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFile.feature#L218)
-
 #### [unable to create resource using TUS inside Shares dir](https://github.com/owncloud/ocis/issues/3048)
 
 - [apiWebdavUploadTUS/uploadFileMtimeShares.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavUploadTUS/uploadFileMtimeShares.feature#L33)
