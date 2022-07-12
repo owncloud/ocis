@@ -1,5 +1,5 @@
 @api
-Feature: check etag propagation after copying files or folders
+Feature: check etag propagation after different file alterations
 
   Scenario: as share receiver copying a file inside a folder changes its etag for all collaborators
     Given user "Alice" has been created with default attributes and without skeleton files
