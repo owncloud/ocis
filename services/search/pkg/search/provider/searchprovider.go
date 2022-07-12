@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -45,6 +46,16 @@ type Provider struct {
 }
 
 type MatchArray []*searchmsg.Match
+
+func (s MatchArray) Len() int {
+	return len(s)
+}
+func (s MatchArray) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s MatchArray) Less(i, j int) bool {
+	return s[i].Score > s[j].Score
+}
 
 func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, machineAuthAPIKey string, eventsChan <-chan interface{}, logger log.Logger) *Provider {
 	p := &Provider{
@@ -167,6 +178,16 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			}
 			matches = append(matches, match)
 		}
+	}
+
+	// compile one sorted list of matches from all spaces and apply the limit if needed
+	sort.Sort(matches)
+	limit := req.PageSize
+	if limit == 0 {
+		limit = 200
+	}
+	if int32(len(matches)) > limit {
+		matches = matches[0:limit]
 	}
 
 	return &searchsvc.SearchResponse{
