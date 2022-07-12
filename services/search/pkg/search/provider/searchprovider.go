@@ -44,6 +44,8 @@ type Provider struct {
 	machineAuthAPIKey string
 }
 
+type MatchArray []*searchmsg.Match
+
 func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, machineAuthAPIKey string, eventsChan <-chan interface{}, logger log.Logger) *Provider {
 	p := &Provider{
 		gwClient:          gwClient,
@@ -98,7 +100,8 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 		mountpointMap[grantSpaceId] = space.Id.OpaqueId
 	}
 
-	matches := []*searchmsg.Match{}
+	matches := MatchArray{}
+	total := int32(0)
 	for _, space := range listSpacesRes.StorageSpaces {
 		var mountpointRootId *searchmsg.ResourceID
 		mountpointPrefix := ""
@@ -154,6 +157,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 		}
 		p.logger.Debug().Str("space", space.Id.OpaqueId).Int("hits", len(res.Matches)).Msg("space search done")
 
+		total += res.TotalMatches
 		for _, match := range res.Matches {
 			if mountpointPrefix != "" {
 				match.Entity.Ref.Path = utils.MakeRelativePath(strings.TrimPrefix(match.Entity.Ref.Path, mountpointPrefix))
@@ -166,7 +170,8 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 	}
 
 	return &searchsvc.SearchResponse{
-		Matches: matches,
+		Matches:      matches,
+		TotalMatches: total,
 	}, nil
 }
 

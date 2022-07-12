@@ -27,13 +27,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blevesearch/bleve/v2"
+	bleve "github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/custom"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/keyword"
 	"github.com/blevesearch/bleve/v2/analysis/token/lowercase"
 	"github.com/blevesearch/bleve/v2/analysis/tokenizer/single"
 	"github.com/blevesearch/bleve/v2/mapping"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/blevesearch/bleve/v2/search"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -239,7 +240,7 @@ func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (
 
 	matches := []*searchmsg.Match{}
 	for _, h := range res.Hits {
-		match, err := fromFields(h.Fields)
+		match, err := fromDocumentMatch(h)
 		if err != nil {
 			return nil, err
 		}
@@ -247,7 +248,8 @@ func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (
 	}
 
 	return &searchsvc.SearchIndexResponse{
-		Matches: matches,
+		Matches:      matches,
+		TotalMatches: int32(res.Total),
 	}, nil
 }
 
@@ -311,7 +313,7 @@ func fieldsToEntity(fields map[string]interface{}) *indexDocument {
 	return doc
 }
 
-func fromFields(fields map[string]interface{}) (*searchmsg.Match, error) {
+func fromDocumentMatch(hit *search.DocumentMatch) (*searchmsg.Match, error) {
 	rootID, err := storagespace.ParseID(fields["RootID"].(string))
 	if err != nil {
 		return nil, err
@@ -322,21 +324,22 @@ func fromFields(fields map[string]interface{}) (*searchmsg.Match, error) {
 	}
 
 	match := &searchmsg.Match{
+		Score: float32(hit.Score),
 		Entity: &searchmsg.Entity{
 			Ref: &searchmsg.Reference{
 				ResourceId: resourceIDtoSearchID(rootID),
-				Path:       fields["Path"].(string),
+				Path:       hit.Fields["Path"].(string),
 			},
 			Id:       resourceIDtoSearchID(rID),
-			Name:     fields["Name"].(string),
-			Size:     uint64(fields["Size"].(float64)),
-			Type:     uint64(fields["Type"].(float64)),
-			MimeType: fields["MimeType"].(string),
-			Deleted:  fields["Deleted"].(bool),
+			Name:     hit.Fields["Name"].(string),
+			Size:     uint64(hit.Fields["Size"].(float64)),
+			Type:     uint64(hit.Fields["Type"].(float64)),
+			MimeType: hit.Fields["MimeType"].(string),
+			Deleted:  hit.Fields["Deleted"].(bool),
 		},
 	}
 
-	if mtime, err := time.Parse(time.RFC3339, fields["Mtime"].(string)); err == nil {
+	if mtime, err := time.Parse(time.RFC3339, hit.Fields["Mtime"].(string)); err == nil {
 		match.Entity.LastModifiedTime = &timestamppb.Timestamp{Seconds: mtime.Unix(), Nanos: int32(mtime.Nanosecond())}
 	}
 
