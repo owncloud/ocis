@@ -842,6 +842,8 @@ github.com/liquidweb/liquidweb-go v1.6.3/go.mod h1:SuXXp+thr28LnjEw18AYtWwIbWMHS
 github.com/longsleep/go-metrics v0.0.0-20170706183227-c1943bcf9047/go.mod h1:Eq9KjddJTZCHG0ja+SEJNp739Um4URrcBuccq3Ih/NI=
 github.com/longsleep/go-metrics v1.0.0 h1:o2A6Dbu4MhLpZuL444WFoZzM7X7igewrj2MouwTlmVM=
 github.com/longsleep/go-metrics v1.0.0/go.mod h1:w6QO1LBkVla70FZrrF6XcB0YN+jTEYugjkn3+6RYTSM=
+github.com/loov/hrtime v1.0.3 h1:LiWKU3B9skJwRPUf0Urs9+0+OE3TxdMuiRPOTwR0gcU=
+github.com/loov/hrtime v1.0.3/go.mod h1:yDY3Pwv2izeY4sq7YcPX/dtLwzg5NU1AxWuWxKwd0p0=
 github.com/magiconair/properties v1.8.0/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/magiconair/properties v1.8.1/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/magiconair/properties v1.8.4/go.mod h1:y3VJvCyxH9uVvJTWEGAELF3aiYNyPKd5NZ3oSwXrF60=
