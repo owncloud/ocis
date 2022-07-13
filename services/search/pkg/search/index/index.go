@@ -33,8 +33,8 @@ import (
 	"github.com/blevesearch/bleve/v2/analysis/token/lowercase"
 	"github.com/blevesearch/bleve/v2/analysis/tokenizer/single"
 	"github.com/blevesearch/bleve/v2/mapping"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/blevesearch/bleve/v2/search"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -314,11 +314,11 @@ func fieldsToEntity(fields map[string]interface{}) *indexDocument {
 }
 
 func fromDocumentMatch(hit *search.DocumentMatch) (*searchmsg.Match, error) {
-	rootID, err := storagespace.ParseID(fields["RootID"].(string))
+	rootID, err := storagespace.ParseID(hit.Fields["RootID"].(string))
 	if err != nil {
 		return nil, err
 	}
-	rID, err := storagespace.ParseID(fields["ID"].(string))
+	rID, err := storagespace.ParseID(hit.Fields["ID"].(string))
 	if err != nil {
 		return nil, err
 	}
