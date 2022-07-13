@@ -1,7 +1,7 @@
 ---
 title: "ocis.services.search.v0"
 url: /grpc_apis/ocis_services_search_v0
-date: 2022-07-13T10:47:22Z
+date: 2022-07-13T12:00:57Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
@@ -45,6 +45,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 | ----- | ---- | ----- | ----------- |
 | matches | [ocis.messages.search.v0.Match](/grpc_apis/ocis_messages_search_v0/#match) | repeated |  |
 | next_page_token | [string](#string) |  | Token to retrieve the next page of results, or empty if there are no<br>more results in the list |
+| total_matches | [int32](#int32) |  |  |
 
 ### SearchRequest
 
@@ -64,6 +65,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 | ----- | ---- | ----- | ----------- |
 | matches | [ocis.messages.search.v0.Match](/grpc_apis/ocis_messages_search_v0/#match) | repeated |  |
 | next_page_token | [string](#string) |  | Token to retrieve the next page of results, or empty if there are no<br>more results in the list |
+| total_matches | [int32](#int32) |  |  |
 
 
 ### IndexProvider
