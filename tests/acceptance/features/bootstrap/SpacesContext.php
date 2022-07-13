@@ -24,9 +24,7 @@ declare(strict_types=1);
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Behat\Hook\Call\AfterScenario;
 use Behat\Gherkin\Node\TableNode;
-use Behat\Testwork\Environment\Environment;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
@@ -362,17 +360,6 @@ class SpacesContext implements Context {
 			$this->baseUrl,
 			$this->featureContext->getOcPath()
 		);
-	}
-
-	/**
-	 * @AfterScenario
-	 *
-	 * @return void
-	 *
-	 * @throws Exception|GuzzleException
-	 */
-	public function cleanDataAfterTests(): void {
-		$this->deleteAllSpacesOfTheType('project');
 	}
 
 	/**
