@@ -83,27 +83,27 @@ config = {
         "ocis",
     ],
     "cs3ApiTests": {
-        "skip": True,
+        "skip": False,
         "earlyFail": True,
     },
     "localApiTests": {
-        "skip": True,
+        "skip": False,
         "earlyFail": True,
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "settingsUITests": {
-        "skip": True,
+        "skip": False,
         "earlyFail": True,
     },
     "parallelApiTests": {
@@ -117,11 +117,6 @@ config = {
                 "When": "ocis",
                 "Then": "oc10",
             },
-            # {
-            #     "Given": "ocis",
-            #     "When": "oc10",
-            #     "Then": "ocis",
-            # },
         ],
     },
     "rocketchat": {
@@ -134,7 +129,7 @@ config = {
     "dockerReleases": {
         "architectures": ["arm", "arm64", "amd64"],
     },
-    "litmus": False,
+    "litmus": True,
 }
 
 # volume for steps to cache Go dependencies between steps of a pipeline
@@ -198,13 +193,14 @@ def main(ctx):
         yarnCache(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
         cacheCoreReposForTesting(ctx) + \
+        testOcisModules(ctx) + \
         testPipelines(ctx)
 
-    # build_release_pipelines = \
-    #     [licenseCheck(ctx)] + \
-    #     dockerReleases(ctx) + \
-    #     binaryReleases(ctx) + \
-    #     [releaseSubmodule(ctx)]
+    build_release_pipelines = \
+        [licenseCheck(ctx)] + \
+        dockerReleases(ctx) + \
+        binaryReleases(ctx) + \
+        [releaseSubmodule(ctx)]
 
     build_release_helpers = [
         changelog(ctx),
@@ -230,7 +226,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_helpers
+    pipelines = test_pipelines + build_release_pipelines + build_release_helpers
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -2242,7 +2238,7 @@ def parallelDeployAcceptancePipeline(ctx):
     pipelines = []
 
     default = {
-        "filterTags": "~@skipOnParallelDeployment&&~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@skipOnLdap&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OCIS-Storage&&~@files_external-app-required",
+        "filterTags": "~@skipOnParallelDeployment&&~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~@skipOnLdap&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OCIS-Storage&&~@files_external-app-required&&~@carddav&&~@caldav",
     }
 
     test_type = ""
@@ -2294,7 +2290,7 @@ def parallelDeployAcceptancePipeline(ctx):
                                  ["fix-shared-data-permissions"],
                                  True,
                              ) +
-                             parallelAcceptanceTests(environment, matrix) +
+                             parallelAcceptanceTests(environment, matrix, test_type) +
                              failEarly(ctx, early_fail),
                     "services": oc10DbService() +
                                 ldapService() +
@@ -2324,7 +2320,7 @@ def parallelDeployAcceptancePipeline(ctx):
 
     return pipelines
 
-def parallelAcceptanceTests(env, matrix):
+def parallelAcceptanceTests(env, matrix, test_type = ""):
     environment = {
         "TEST_SERVER_URL": OCIS_URL,
         "TEST_OC10_URL": OC10_URL,
@@ -2337,7 +2333,7 @@ def parallelAcceptanceTests(env, matrix):
         "REVA_LDAP_BIND_DN": "cn=admin,dc=owncloud,dc=com",
         "PATH_TO_CORE": "/srv/app/testrunner",
         "OCIS_REVA_DATA_ROOT": "/mnt/data/",
-        "EXPECTED_FAILURES_FILE": "/drone/src/tests/parallelDeployAcceptance/expected-failures-API-%s-%s-%s.md" % (matrix["Given"], matrix["When"], matrix["Then"]),
+        "EXPECTED_FAILURES_FILE": "/drone/src/tests/parallelDeployAcceptance/expected-failures-API-%s-%s-%s%s.md" % (matrix["Given"], matrix["When"], matrix["Then"], test_type),
         "OCIS_SKELETON_STRATEGY": "copy",
         "SEND_SCENARIO_LINE_REFERENCES": "true",
         "UPLOAD_DELETE_WAIT_TIME": "1",
