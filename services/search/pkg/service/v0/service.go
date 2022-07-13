@@ -107,6 +107,7 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 	}
 
 	out.Matches = res.Matches
+	out.TotalMatches = res.TotalMatches
 	out.NextPageToken = res.NextPageToken
 	return nil
 }

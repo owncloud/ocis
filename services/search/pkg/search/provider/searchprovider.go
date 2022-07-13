@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -42,6 +43,18 @@ type Provider struct {
 	gwClient          gateway.GatewayAPIClient
 	indexClient       search.IndexClient
 	machineAuthAPIKey string
+}
+
+type MatchArray []*searchmsg.Match
+
+func (s MatchArray) Len() int {
+	return len(s)
+}
+func (s MatchArray) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s MatchArray) Less(i, j int) bool {
+	return s[i].Score > s[j].Score
 }
 
 func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, machineAuthAPIKey string, eventsChan <-chan interface{}, logger log.Logger) *Provider {
@@ -98,7 +111,8 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 		mountpointMap[grantSpaceId] = space.Id.OpaqueId
 	}
 
-	matches := []*searchmsg.Match{}
+	matches := MatchArray{}
+	total := int32(0)
 	for _, space := range listSpacesRes.StorageSpaces {
 		var mountpointRootId *searchmsg.ResourceID
 		mountpointPrefix := ""
@@ -154,6 +168,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 		}
 		p.logger.Debug().Str("space", space.Id.OpaqueId).Int("hits", len(res.Matches)).Msg("space search done")
 
+		total += res.TotalMatches
 		for _, match := range res.Matches {
 			if mountpointPrefix != "" {
 				match.Entity.Ref.Path = utils.MakeRelativePath(strings.TrimPrefix(match.Entity.Ref.Path, mountpointPrefix))
@@ -165,8 +180,19 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 		}
 	}
 
+	// compile one sorted list of matches from all spaces and apply the limit if needed
+	sort.Sort(matches)
+	limit := req.PageSize
+	if limit == 0 {
+		limit = 200
+	}
+	if int32(len(matches)) > limit {
+		matches = matches[0:limit]
+	}
+
 	return &searchsvc.SearchResponse{
-		Matches: matches,
+		Matches:      matches,
+		TotalMatches: total,
 	}, nil
 }
 

@@ -190,6 +190,19 @@ var _ = Describe("Index", func() {
 					assertDocCount(ref.ResourceId, "Name:*"+ref.ResourceId.OpaqueId+"*", 0)
 				})
 
+				It("returns the total number of hits", func() {
+					res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
+						Query: "Name:foo.pdf",
+						Ref: &searchmsg.Reference{
+							ResourceId: &searchmsg.ResourceID{
+								StorageId: ref.ResourceId.StorageId,
+								OpaqueId:  ref.ResourceId.OpaqueId,
+							},
+						},
+					})
+					Expect(err).ToNot(HaveOccurred())
+					Expect(res.TotalMatches).To(Equal(int32(1)))
+				})
 				It("returns all desired fields", func() {
 					matches := assertDocCount(ref.ResourceId, "Name:foo.pdf", 1)
 					match := matches[0]
@@ -201,6 +214,7 @@ var _ = Describe("Index", func() {
 					Expect(match.Entity.Type).To(Equal(uint64(ri.Type)))
 					Expect(match.Entity.MimeType).To(Equal(ri.MimeType))
 					Expect(match.Entity.Deleted).To(BeFalse())
+					Expect(match.Score > 0).To(BeTrue())
 					Expect(uint64(match.Entity.LastModifiedTime.AsTime().Unix())).To(Equal(ri.Mtime.Seconds))
 				})
 

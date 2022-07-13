@@ -3,6 +3,7 @@ package svc
 import (
 	"context"
 	"encoding/xml"
+	"fmt"
 	"io"
 	"net/http"
 	"path"
@@ -71,6 +72,9 @@ func (g Webdav) sendSearchResponse(rsp *searchsvc.SearchResponse, w http.Respons
 	}
 	w.Header().Set(net.HeaderDav, "1, 3, extended-mkcol")
 	w.Header().Set(net.HeaderContentType, "application/xml; charset=utf-8")
+	if len(rsp.Matches) > 0 {
+		w.Header().Set(net.HeaderContentRange, fmt.Sprintf("rows 0-%d/%d", len(rsp.Matches)-1, rsp.TotalMatches))
+	}
 	w.WriteHeader(http.StatusMultiStatus)
 	if _, err := w.Write(responsesXML); err != nil {
 		g.log.Err(err).Msg("error writing response")
