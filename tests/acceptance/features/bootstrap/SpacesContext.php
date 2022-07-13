@@ -91,6 +91,12 @@ class SpacesContext implements Context {
 	 */
 	private $storedEtags = [];
 
+    private $etagPropfindBody = '<?xml version="1.0"?>'
+        . '<d:propfind xmlns:d="DAV:" '
+        . 'xmlns:oc="http://owncloud.org/ns" '
+        . 'xmlns:ocs="http://open-collaboration-services.org/ns">'
+        .'<d:prop><d:getetag/></d:prop></d:propfind>';
+
 	/**
 	 * @param string $spaceName
 	 *
@@ -1680,7 +1686,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" to "([^"]*)" in space "([^"]*)" using the WebDAV API$/
+	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" to "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $fileSource
@@ -1752,7 +1758,7 @@ class SpacesContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $fullUrl
-	 * @param string $headers
+	 * @param array $headers
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -2488,11 +2494,6 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userGetsEtagOfElementInASpace(string $user, string $space, string $path) {
-		$properties = '<?xml version="1.0"?>'
-			. '<d:propfind xmlns:d="DAV:" '
-			. 'xmlns:oc="http://owncloud.org/ns" '
-			. 'xmlns:ocs="http://open-collaboration-services.org/ns">'
-			.'<d:prop><d:getetag/></d:prop></d:propfind>';
 		$user = $this->featureContext->getActualUsername($user);
 		$space = $this->getSpaceByName($user, $space);
 
@@ -2504,7 +2505,7 @@ class SpacesContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			[],
-			$properties
+			$this->etagPropfindBody
 		);
 		$responseXml = HttpRequestHelper::getResponseXml($response);
 		$this->featureContext->setResponseXmlObject($responseXml);
@@ -2566,7 +2567,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^these etags should have changed$/
+	 * @Then /^these etags should have changed$/
 	 *
 	 * @throws GuzzleException
 	 */
@@ -2591,7 +2592,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^these etags should not have changed$/
+	 * @Then /^these etags should not have changed$/
 	 *
 	 * @param TableNode $table
 	 *
@@ -2618,7 +2619,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has stored etag of element "([^"]*)" from space "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has stored etag of element "([^"]*)" inside space "([^"]*)"$/
 	 *
 	 * @throws GuzzleException | Exception
 	 */
@@ -2635,7 +2636,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has stored etag of element "([^"]*)" on path "([^"]*)" from space "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has stored etag of element "([^"]*)" on path "([^"]*)" inside space "([^"]*)"$/
 	 *
 	 * @throws Exception | GuzzleException
 	 */
