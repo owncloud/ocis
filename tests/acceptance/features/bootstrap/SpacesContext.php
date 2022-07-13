@@ -548,7 +548,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user, string $query = '', bool $remember = true): void {
+	public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user, string $query = ''): void {
 		$this->featureContext->setResponse(
 			$this->listMySpacesRequest(
 				$user,
@@ -556,9 +556,7 @@ class SpacesContext implements Context {
 				"?" . $query
 			)
 		);
-		if ($remember) {
-			$this->rememberTheAvailableSpaces($user);
-		}
+		$this->rememberTheAvailableSpaces();
 	}
 
 	/**
@@ -1690,6 +1688,7 @@ class SpacesContext implements Context {
 	 * @param string $spaceName
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function userCopiesFileWithinSpaceUsingTheWebDAVAPI(
 		string $user,
@@ -1704,7 +1703,7 @@ class SpacesContext implements Context {
 			$spaceName
 		);
 
-		$fullUrl = $this->baseUrl . "/dav/spaces/" . $space['id'] . '/' . $fileSource;
+		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileSource, "/");
 		$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
 	}
 
@@ -1729,7 +1728,7 @@ class SpacesContext implements Context {
 	):void {
 		$space = $this->getSpaceByName($user, $fromSpaceName);
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName);
-		$fullUrl = $this->baseUrl . "/dav/spaces/" . $space['id'] . '/' . $fileSource;
+		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileSource, "/");
 		$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
 	}
 
@@ -1745,8 +1744,7 @@ class SpacesContext implements Context {
 	 */
 	public function destinationHeaderValueWithSpaceName(string $user, string $fileDestination, string $spaceName):string {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $this->baseUrl . "/dav/spaces/" . $space['id'];
-		return \rtrim($fullUrl, '/') . '/' . \ltrim($fileDestination, '/');
+		return $space["root"]["webDavUrl"] . '/' . \ltrim($fileDestination, '/');
 	}
 
 	/**
@@ -1763,12 +1761,11 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$fullUrl,
-				"",
+				$this->featureContext->getStepLineRef(),
 				'COPY',
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$headers,
-				""
 			)
 		);
 	}
@@ -2481,9 +2478,16 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * return the etag for an element inside a space
+	 *
+	 * @param string $user requestor
+	 * @param string $space space name
+	 * @param string $path path to the file
+	 *
+	 * @return string
 	 * @throws GuzzleException
 	 */
-	public function userGetsEtagOfElementInASpace($user, $space, $path) {
+	public function userGetsEtagOfElementInASpace(string $user, string $space, string $path) {
 		$properties = '<?xml version="1.0"?>'
 			. '<d:propfind xmlns:d="DAV:" '
 			. 'xmlns:oc="http://owncloud.org/ns" '
@@ -2492,10 +2496,7 @@ class SpacesContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$space = $this->getSpaceByName($user, $space);
 
-		// trim leading slash from the $path
-		$path = ltrim($path, '/');
-
-		$fullUrl = $space['root']['webDavUrl'] . '/' . $path;
+		$fullUrl = $space['root']['webDavUrl'] . '/' . ltrim($path, '/');
 		$response = HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),
@@ -2511,6 +2512,14 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * saves the etag of an element in a space
+	 *
+	 * @param string $user requestor
+	 * @param string $space space name
+	 * @param string $path path to the file
+	 * @param ?string $storePath path to the file in the store
+	 *
+	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function storeEtagOfElementInSpaceForUser(string $user, string $space, string $path, ?string $storePath = ""): void {
@@ -2526,6 +2535,8 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * returns stored etag for an element if present
+	 *
 	 * @param string $user
 	 * @param string $space
 	 * @param string $path
@@ -2582,6 +2593,8 @@ class SpacesContext implements Context {
 	/**
 	 * @Given /^these etags should not have changed$/
 	 *
+	 * @param TableNode $table
+	 *
 	 * @throws GuzzleException
 	 */
 	public function theseEtagsShouldNotHaveChanged(TableNode $table): void {
@@ -2607,8 +2620,7 @@ class SpacesContext implements Context {
 	/**
 	 * @Given /^user "([^"]*)" has stored etag of element "([^"]*)" from space "([^"]*)"$/
 	 *
-	 * @throws GuzzleException
-	 * @throws Exception
+	 * @throws GuzzleException | Exception
 	 */
 	public function userHasStoredEtagOfElementFromSpace(string $user, string $path, string $space):void {
 		$user = $this->featureContext->getActualUsername($user);
@@ -2625,8 +2637,7 @@ class SpacesContext implements Context {
 	/**
 	 * @Given /^user "([^"]*)" has stored etag of element "([^"]*)" on path "([^"]*)" from space "([^"]*)"$/
 	 *
-	 * @throws Exception
-	 * @throws GuzzleException
+	 * @throws Exception | GuzzleException
 	 */
 	public function userHasStoredEtagOfElementOnPathFromSpace($user, $path, $storePath, $space) {
 		$user = $this->featureContext->getActualUsername($user);

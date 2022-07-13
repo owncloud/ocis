@@ -1,7 +1,7 @@
 @api
 Feature: check etag propagation after different file alterations
 
-  Scenario: as share receiver copying a file inside a folder changes its etag for all collaborators
+  Scenario: copying a file inside a folder as a share receiver changes its etag for all collaborators
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Brian" has been created with default attributes and without skeleton files
     And using spaces DAV path
@@ -32,7 +32,7 @@ Feature: check etag propagation after different file alterations
       | Alice | /upload/file.txt | Personal    |
       | Brian | /upload/file.txt | Shares Jail |
 
-  Scenario: as sharer copying a file inside a folder changes its etag for all collaborators
+  Scenario: copying a file inside a folder as a sharer changes its etag for all collaborators
     Given user "Alice" has been created with default attributes and without skeleton files
     Given user "Brian" has been created with default attributes and without skeleton files
     And using spaces DAV path
