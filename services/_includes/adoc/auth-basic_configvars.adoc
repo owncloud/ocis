@@ -282,7 +282,7 @@ The object class to use for groups in the default group search filter ('groupOfN
 a| [subs=-attributes]
 +[]string+
 a| [subs=-attributes]
-pass:[[uid mail]]
+pass:[[uid]]
 a| [subs=-attributes]
 The user object attributes, that can be used for login.
 
