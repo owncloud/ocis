@@ -1237,15 +1237,6 @@ And other missing implementation of favorites
 - [apiShareCreateSpecialToShares2/createShareWhenShareWithOnlyMembershipGroups.feature:87](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareWhenShareWithOnlyMembershipGroups.feature#L87)
 - [apiShareCreateSpecialToShares2/createShareWhenShareWithOnlyMembershipGroups.feature:88](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareWhenShareWithOnlyMembershipGroups.feature#L88)
 
-- [apiMain/caldav.feature:8](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/caldav.feature#L8)
-- [apiMain/caldav.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/caldav.feature#L15)
-- [apiMain/caldav.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/caldav.feature#L23)
-- [apiMain/caldav.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/caldav.feature#L31)
-- [apiMain/carddav.feature:8](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/carddav.feature#L8)
-- [apiMain/carddav.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/carddav.feature#L15)
-- [apiMain/carddav.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/carddav.feature#L23)
-- [apiMain/carddav.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/carddav.feature#L31)
-
 - [apiTranslation/translation.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L21)
 - [apiTranslation/translation.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L22)
 - [apiTranslation/translation.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTranslation/translation.feature#L23)
