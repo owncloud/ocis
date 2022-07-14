@@ -46,7 +46,7 @@ func TestStoreMultiple(t *testing.T) {
 		testname := fmt.Sprintf("%v", test)
 		t.Run(testname, func(t *testing.T) {
 			eCache := NewEmptyCache()
-			eCache.Initialize(map[string]interface{}{})
+			_ = eCache.Initialize(map[string]interface{}{})
 			err := eCache.Store(test.key, test.value, test.ttl)
 			if err != nil {
 				t.Errorf("Storing failed for params %+v, got error %v", test, err)
@@ -74,11 +74,11 @@ func TestRetrieveMultiple(t *testing.T) {
 	}
 
 	eCache := NewEmptyCache()
-	eCache.Initialize(map[string]interface{}{})
-	eCache.Store("key1", "value1", 222)
-	eCache.Store("üñoKey", "välòç", 555)
-	eCache.Store("5566", "välòç", 1555)
-	eCache.Store("üñòKey", "98685", 55)
+	_ = eCache.Initialize(map[string]interface{}{})
+	_ = eCache.Store("key1", "value1", 222)
+	_ = eCache.Store("üñoKey", "välòç", 555)
+	_ = eCache.Store("5566", "välòç", 1555)
+	_ = eCache.Store("üñòKey", "98685", 55)
 	for _, test := range tests {
 		testname := fmt.Sprintf("%v", test)
 		t.Run(testname, func(t *testing.T) {
@@ -106,11 +106,11 @@ func TestRemoveMultiple(t *testing.T) {
 	}
 
 	eCache := NewEmptyCache()
-	eCache.Initialize(map[string]interface{}{})
-	eCache.Store("key1", "value1", 222)
-	eCache.Store("üñoKey", "välòç", 555)
-	eCache.Store("5566", "välòç", 1555)
-	eCache.Store("üñòKey", "98685", 55)
+	_ = eCache.Initialize(map[string]interface{}{})
+	_ = eCache.Store("key1", "value1", 222)
+	_ = eCache.Store("üñoKey", "välòç", 555)
+	_ = eCache.Store("5566", "välòç", 1555)
+	_ = eCache.Store("üñòKey", "98685", 55)
 	for _, test := range tests {
 		testname := fmt.Sprintf("%v", test)
 		t.Run(testname, func(t *testing.T) {

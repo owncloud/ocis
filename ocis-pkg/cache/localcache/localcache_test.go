@@ -62,7 +62,7 @@ func storeMultiple(t *testing.T) {
 		testname := fmt.Sprintf("%v", test)
 		t.Run(testname, func(t *testing.T) {
 			lCache := NewLocalCache()
-			lCache.Initialize(map[string]interface{}{}) // 512 cap is enough
+			_ = lCache.Initialize(map[string]interface{}{}) // 512 cap is enough
 			err := lCache.Store(test.key, test.value, test.ttl)
 			if err != nil {
 				t.Errorf("Storing failed for params %+v, got error %v", test, err)
@@ -84,7 +84,7 @@ func storeMultipleLimitedCap(t *testing.T) {
 	}
 
 	lCache := NewLocalCache()
-	lCache.Initialize(map[string]interface{}{
+	_ = lCache.Initialize(map[string]interface{}{
 		"capacity": 2,
 	})
 
@@ -142,8 +142,8 @@ func retrieveMiss(t *testing.T) {
 		testname := fmt.Sprintf("%v", test)
 		t.Run(testname, func(t *testing.T) {
 			lCache := NewLocalCache()
-			lCache.Initialize(map[string]interface{}{}) // 512 cap is enough
-			lCache.Store("goodKey", "goodValue", 500)
+			_ = lCache.Initialize(map[string]interface{}{}) // 512 cap is enough
+			_ = lCache.Store("goodKey", "goodValue", 500)
 			value, exists, err := lCache.Retrieve(test.key)
 			if err != nil {
 				t.Errorf("Retrieving failed for params %+v, got error %v", test, err)
@@ -174,12 +174,12 @@ func retrieveMissObsolete(t *testing.T) {
 		testname := fmt.Sprintf("%v", test)
 		t.Run(testname, func(t *testing.T) {
 			lCache := NewLocalCache()
-			lCache.Initialize(map[string]interface{}{
+			_ = lCache.Initialize(map[string]interface{}{
 				"capacity": 2,
 			})
-			lCache.Store(test.key, test.value, test.ttl)
-			lCache.Store("goodKey", "goodValue", 500)
-			lCache.Store("goodKey2", "goodValue2", 500)
+			_ = lCache.Store(test.key, test.value, test.ttl)
+			_ = lCache.Store("goodKey", "goodValue", 500)
+			_ = lCache.Store("goodKey2", "goodValue2", 500)
 			// test key should have been removed to free space
 			value, exists, err := lCache.Retrieve(test.key)
 			if err != nil {
@@ -211,8 +211,8 @@ func retrieveHit(t *testing.T) {
 		testname := fmt.Sprintf("%v", test)
 		t.Run(testname, func(t *testing.T) {
 			lCache := NewLocalCache()
-			lCache.Initialize(map[string]interface{}{}) // 512 cap is enough
-			lCache.Store(test.key, test.value, test.ttl)
+			_ = lCache.Initialize(map[string]interface{}{}) // 512 cap is enough
+			_ = lCache.Store(test.key, test.value, test.ttl)
 			value, exists, err := lCache.Retrieve(test.key)
 			if err != nil {
 				t.Errorf("Retrieving failed for params %+v, got error %v", test, err)
@@ -240,8 +240,8 @@ func retrieveHitExpired(t *testing.T) {
 		testname := fmt.Sprintf("%v", test)
 		t.Run(testname, func(t *testing.T) {
 			lCache := NewLocalCache()
-			lCache.Initialize(map[string]interface{}{}) // 512 cap is enough
-			lCache.Store(test.key, test.value, test.ttl)
+			_ = lCache.Initialize(map[string]interface{}{}) // 512 cap is enough
+			_ = lCache.Store(test.key, test.value, test.ttl)
 			value, exists, err := lCache.Retrieve(test.key)
 			if err != nil {
 				t.Errorf("Retrieving failed for params %+v, got error %v", test, err)
@@ -279,8 +279,8 @@ func removeHit(t *testing.T) {
 		testname := fmt.Sprintf("%v", test)
 		t.Run(testname, func(t *testing.T) {
 			lCache := NewLocalCache()
-			lCache.Initialize(map[string]interface{}{}) // 512 cap is enough
-			lCache.Store(test.key, test.value, test.ttl)
+			_ = lCache.Initialize(map[string]interface{}{}) // 512 cap is enough
+			_ = lCache.Store(test.key, test.value, test.ttl)
 			if err := lCache.Remove(test.key); err != nil {
 				t.Errorf("Removing failed for params %+v, got error %v", test, err)
 			}
@@ -311,7 +311,7 @@ func removeMiss(t *testing.T) {
 		testname := fmt.Sprintf("%v", test)
 		t.Run(testname, func(t *testing.T) {
 			lCache := NewLocalCache()
-			lCache.Initialize(map[string]interface{}{}) // 512 cap is enough
+			_ = lCache.Initialize(map[string]interface{}{}) // 512 cap is enough
 			if err := lCache.Remove(test.key); err != nil {
 				t.Errorf("Removing failed for params %+v, got error %v", test, err)
 			}
@@ -346,7 +346,7 @@ func concurrentStoreWithCap(t *testing.T, lCacheCap int) {
 	for _, threads := range concurrentThreads {
 		t.Run("Threads"+strconv.Itoa(threads), func(t *testing.T) {
 			lCache := NewLocalCache()
-			lCache.Initialize(map[string]interface{}{
+			_ = lCache.Initialize(map[string]interface{}{
 				"capacity": lCacheCap,
 			})
 
@@ -356,7 +356,7 @@ func concurrentStoreWithCap(t *testing.T, lCacheCap int) {
 			for i := 0; i < threads; i++ {
 				go func(i int) {
 					v := strconv.Itoa(i)
-					lCache.Store(v, v, 500)
+					_ = lCache.Store(v, v, 500)
 					wg.Done()
 				}(i)
 			}
@@ -399,7 +399,7 @@ func concurrentRetrieveWithCap(t *testing.T, lCacheCap int) {
 	for _, threads := range concurrentThreads {
 		t.Run("Threads"+strconv.Itoa(threads), func(t *testing.T) {
 			lCache := NewLocalCache()
-			lCache.Initialize(map[string]interface{}{
+			_ = lCache.Initialize(map[string]interface{}{
 				"capacity": lCacheCap,
 			})
 
@@ -411,7 +411,7 @@ func concurrentRetrieveWithCap(t *testing.T, lCacheCap int) {
 					// if i is odd
 					ttl = -500 // ensure it's expired
 				}
-				lCache.Store(v, v, ttl)
+				_ = lCache.Store(v, v, ttl)
 			}
 
 			wg := sync.WaitGroup{}
@@ -476,7 +476,7 @@ func concurrentRemoveWithCap(t *testing.T, lCacheCap int) {
 	for _, threads := range concurrentThreads {
 		t.Run("Threads"+strconv.Itoa(threads), func(t *testing.T) {
 			lCache := NewLocalCache()
-			lCache.Initialize(map[string]interface{}{
+			_ = lCache.Initialize(map[string]interface{}{
 				"capacity": lCacheCap,
 			})
 
@@ -488,7 +488,7 @@ func concurrentRemoveWithCap(t *testing.T, lCacheCap int) {
 					// if i is odd
 					ttl = -500 // ensure it's expired
 				}
-				lCache.Store(v, v, ttl)
+				_ = lCache.Store(v, v, ttl)
 			}
 
 			wg := sync.WaitGroup{}
@@ -528,7 +528,7 @@ func concurrentMix(t *testing.T) {
 	capacities := []int{2, 35, 100, 10000}
 	for _, capacity := range capacities {
 		t.Run("Cap"+strconv.Itoa(capacity), func(t *testing.T) {
-			concurrentRemoveWithCap(t, capacity)
+			concurrentMixWithCap(t, capacity)
 		})
 	}
 }
@@ -539,7 +539,7 @@ func concurrentMixWithCap(t *testing.T, lCacheCap int) {
 	for _, threads := range concurrentThreads {
 		t.Run("Threads"+strconv.Itoa(threads), func(t *testing.T) {
 			lCache := NewLocalCache()
-			lCache.Initialize(map[string]interface{}{
+			_ = lCache.Initialize(map[string]interface{}{
 				"capacity": lCacheCap,
 			})
 
@@ -636,13 +636,13 @@ func BenchmarkStore(b *testing.B) {
 		var bench *hrtime.Benchmark
 		b.Run(testname, func(b *testing.B) {
 			lCache := NewLocalCache()
-			lCache.Initialize(initParams)
+			_ = lCache.Initialize(initParams)
 
 			bench = hrtime.NewBenchmark(b.N)
 			i := 0
 			for bench.Next() {
 				v := strconv.Itoa(i)
-				lCache.Store(v, v, 222)
+				_ = lCache.Store(v, v, 222)
 				i++
 			}
 		})
@@ -664,11 +664,11 @@ func BenchmarkStoreSame(b *testing.B) {
 		var bench *hrtime.Benchmark
 		b.Run(testname, func(b *testing.B) {
 			lCache := NewLocalCache()
-			lCache.Initialize(initParams)
+			_ = lCache.Initialize(initParams)
 
 			bench = hrtime.NewBenchmark(b.N)
 			for bench.Next() {
-				lCache.Store("key1", "value1", 222)
+				_ = lCache.Store("key1", "value1", 222)
 			}
 		})
 		fmt.Println(bench.Histogram(10).StringStats())
@@ -689,18 +689,18 @@ func BenchmarkRetrieveMiss(b *testing.B) {
 		var bench *hrtime.Benchmark
 		b.Run(testname, func(b *testing.B) {
 			lCache := NewLocalCache()
-			lCache.Initialize(initParams)
+			_ = lCache.Initialize(initParams)
 
 			for i := 0; i < lCache.MaxCap(); i++ {
 				v := strconv.Itoa(-i)
-				lCache.Store(v, v, 222)
+				_ = lCache.Store(v, v, 222)
 			}
 
 			bench = hrtime.NewBenchmark(b.N)
 			i := 0
 			for bench.Next() {
 				v := strconv.Itoa(i)
-				lCache.Retrieve(v)
+				_, _, _ = lCache.Retrieve(v)
 				i++
 			}
 		})
@@ -722,18 +722,18 @@ func BenchmarkRetrieveHit(b *testing.B) {
 		var bench *hrtime.Benchmark
 		b.Run(testname, func(b *testing.B) {
 			lCache := NewLocalCache()
-			lCache.Initialize(initParams)
+			_ = lCache.Initialize(initParams)
 
 			for i := 0; i < lCache.MaxCap(); i++ {
 				v := strconv.Itoa(i)
-				lCache.Store(v, v, 222)
+				_ = lCache.Store(v, v, 222)
 			}
 
 			bench = hrtime.NewBenchmark(b.N)
 			i := 0
 			for bench.Next() {
 				v := strconv.Itoa(i % lCache.MaxCap())
-				lCache.Retrieve(v)
+				_, _, _ = lCache.Retrieve(v)
 				i++
 			}
 		})
@@ -755,7 +755,7 @@ func concurrentStoreBench(b *testing.B, threads int) {
 		var stopwatch *hrtime.Stopwatch
 		b.Run(testname, func(b *testing.B) {
 			lCache := NewLocalCache()
-			lCache.Initialize(initParams)
+			_ = lCache.Initialize(initParams)
 
 			stopwatch = hrtime.NewStopwatch(b.N)
 			maxThreads := threads
@@ -771,7 +771,7 @@ func concurrentStoreBench(b *testing.B, threads int) {
 					for j := 0; j < lapsToDo; j++ {
 						lap := sw.Start()
 						v := strconv.FormatInt(int64(lap), 10)
-						lCache.Store(v, v, 500)
+						_ = lCache.Store(v, v, 500)
 						sw.Stop(lap)
 					}
 				}(i, lapsToDo, stopwatch)
@@ -796,11 +796,11 @@ func concurrentRetrieveBench(b *testing.B, threads int) {
 		var stopwatch *hrtime.Stopwatch
 		b.Run(testname, func(b *testing.B) {
 			lCache := NewLocalCache()
-			lCache.Initialize(initParams)
+			_ = lCache.Initialize(initParams)
 
 			for i := 0; i < lCache.MaxCap(); i++ {
 				v := strconv.Itoa(i)
-				lCache.Store(v, v, 500)
+				_ = lCache.Store(v, v, 500)
 			}
 
 			stopwatch = hrtime.NewStopwatch(b.N)
@@ -817,7 +817,7 @@ func concurrentRetrieveBench(b *testing.B, threads int) {
 					for j := 0; j < lapsToDo; j++ {
 						lap := sw.Start()
 						v := strconv.FormatInt(int64(lap), 10)
-						lCache.Retrieve(v)
+						_, _, _ = lCache.Retrieve(v)
 						sw.Stop(lap)
 					}
 				}(i, lapsToDo, stopwatch)
@@ -842,11 +842,11 @@ func concurrentRemoveBench(b *testing.B, threads int) {
 		var stopwatch *hrtime.Stopwatch
 		b.Run(testname, func(b *testing.B) {
 			lCache := NewLocalCache()
-			lCache.Initialize(initParams)
+			_ = lCache.Initialize(initParams)
 
 			for i := 0; i < lCache.MaxCap(); i++ {
 				v := strconv.Itoa(i)
-				lCache.Store(v, v, 500)
+				_ = lCache.Store(v, v, 500)
 			}
 
 			stopwatch = hrtime.NewStopwatch(b.N)
@@ -863,7 +863,7 @@ func concurrentRemoveBench(b *testing.B, threads int) {
 					for j := 0; j < lapsToDo; j++ {
 						lap := sw.Start()
 						v := strconv.FormatInt(int64(lap), 10)
-						lCache.Remove(v)
+						_ = lCache.Remove(v)
 						sw.Stop(lap)
 					}
 				}(i, lapsToDo, stopwatch)
@@ -882,10 +882,10 @@ func BenchmarkConcurrent(b *testing.B) {
 			concurrentStoreBench(b, nThreads)
 		})
 		b.Run("RetrieveT"+nt, func(b *testing.B) {
-			concurrentStoreBench(b, nThreads)
+			concurrentRetrieveBench(b, nThreads)
 		})
 		b.Run("RemoveT"+nt, func(b *testing.B) {
-			concurrentStoreBench(b, nThreads)
+			concurrentRemoveBench(b, nThreads)
 		})
 	}
 }

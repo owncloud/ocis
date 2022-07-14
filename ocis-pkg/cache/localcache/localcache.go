@@ -152,16 +152,19 @@ func (c *LocalCache) Retrieve(key string) (string, bool, error) {
 	}
 	info := elem.Value.(*cacheinfo)
 
+	value := info.value
+	exists := true
 	// check ttl
 	if info.validUntil.After(time.Now()) {
 		c.keyList.MoveToBack(elem)
-		return info.value, true, nil
 	} else {
 		// expired item
 		delete(c.data, key)
 		c.keyList.Remove(elem)
-		return "", false, nil
+		value = ""
+		exists = false
 	}
+	return value, exists, nil
 }
 
 // Remove the target key. If the key doesn't exist, this method won't
@@ -203,7 +206,7 @@ func (c *LocalCache) ListLen() int {
 // will be traversed using the expected deletion order at a given time. This
 // should guarantee a more or less predictable order. Note that this order
 // will change based on the access and new addition of elements in the cache.
-type LocalCacheCallback func(key string, value string)
+type LCCallback func(key string, value string)
 
 // This function isn't part if the interface and it's intended to be used
 // only for debugging.
@@ -212,7 +215,7 @@ type LocalCacheCallback func(key string, value string)
 // traversal is ongoing. Don't use this function in production code.
 // The order will be the expected deletion order of items at a given time. This
 // means that it will change based on the cache usage.
-func (c *LocalCache) TraverseList(callback LocalCacheCallback) {
+func (c *LocalCache) TraverseList(callback LCCallback) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
