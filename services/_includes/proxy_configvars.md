@@ -27,8 +27,8 @@
 | OCIS_JWT_SECRET<br/>PROXY_JWT_SECRET | string |  | The secret to mint and validate JWT tokens.|
 | PROXY_ENABLE_PRESIGNEDURLS | bool | true | Allow OCS to get a signing key to sign requests.|
 | PROXY_ACCOUNT_BACKEND_TYPE | string | cs3 | Account backend the PROXY service should use. Currently only 'cs3' is possible here.|
-| PROXY_USER_OIDC_CLAIM | string | preferred_username | The name of an OpenID Connect claim that should be used for resolving users with the account backend. Currently defaults to 'email'.|
-| PROXY_USER_CS3_CLAIM | string | username | The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail'. Supported values are 'username' and 'displayname'.|
+| PROXY_USER_OIDC_CLAIM | string | email | The name of an OpenID Connect claim that should be used for resolving users with the account backend. Currently defaults to 'email'.|
+| PROXY_USER_CS3_CLAIM | string | mail | The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail'. Supported values are 'username' and 'displayname'.|
 | OCIS_MACHINE_AUTH_API_KEY<br/>PROXY_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary to access resources from other services.|
 | PROXY_AUTOPROVISION_ACCOUNTS | bool | false | Set this to 'true' to automatically provsion users that do not yet exist in the users service on-demand upon first signin. To use this a write-enabled libregraph user backend needs to be setup an running.|
 | PROXY_ENABLE_BASIC_AUTH | bool | false | Set this to true to enable 'basic' (username/password) authentication.|

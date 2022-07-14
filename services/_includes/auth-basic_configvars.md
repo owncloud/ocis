@@ -33,7 +33,7 @@
 | LDAP_GROUP_FILTER<br/>AUTH_BASIC_LDAP_GROUP_FILTER | string |  | LDAP filter to add to the default filters for group searches.|
 | LDAP_USER_OBJECTCLASS<br/>AUTH_BASIC_LDAP_USER_OBJECTCLASS | string | inetOrgPerson | The object class to use for users in the default user search filter ('inetOrgPerson').|
 | LDAP_GROUP_OBJECTCLASS<br/>AUTH_BASIC_LDAP_GROUP_OBJECTCLASS | string | groupOfNames | The object class to use for groups in the default group search filter ('groupOfNames'). |
-| LDAP_LOGIN_ATTRIBUTES<br/>AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES | []string | [uid] | The user object attributes, that can be used for login.|
+| LDAP_LOGIN_ATTRIBUTES<br/>AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES | []string | [uid mail] | The user object attributes, that can be used for login.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>AUTH_BASIC_IDP_URL | string | https://localhost:9200 | The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.|
 | LDAP_USER_SCHEMA_ID<br/>AUTH_BASIC_LDAP_USER_SCHEMA_ID | string | ownclouduuid | LDAP Attribute to use as the unique id for users. This should be a stable globally unique ID like a UUID.|
 | LDAP_USER_SCHEMA_ID_IS_OCTETSTRING<br/>AUTH_BASIC_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING | bool | false | Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user IDs.|
