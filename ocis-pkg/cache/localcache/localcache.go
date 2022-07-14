@@ -41,10 +41,12 @@ type cacheinfo struct {
 // * A least-recently-used policy is used when the cache needs to free space. As said
 // expired items won't be removed preferently unless explicitly accessed.
 type LocalCache struct {
-	data    map[string]*list.Element
-	keyList *list.List
-	mutex   sync.Mutex
-	maxCap  int
+	data      map[string]*list.Element
+	keyList   *list.List
+	mutex     sync.RWMutex // used for all operations
+	mapMutex  sync.RWMutex // used only in the retrieve operation to access the underlying map
+	listMutex sync.RWMutex // used only in the retrieve operation to access the underlying list
+	maxCap    int
 }
 
 // Creates a LocalCache instance. You must call the `Initialize` afterwards
@@ -101,6 +103,8 @@ func (c *LocalCache) Store(key string, value string, ttl int64) error {
 		validUntil = time.Now().Add(duration)
 	}
 
+	// Lock for writing. The mapMutex and listMutex aren't needed because
+	// this thread will be the only one modifying them
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -143,10 +147,15 @@ func (c *LocalCache) Store(key string, value string, ttl int64) error {
 //
 // Errors aren't expected in this method.
 func (c *LocalCache) Retrieve(key string) (string, bool, error) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+	// Lock for reading.
+	c.mutex.RLock()
+	defer c.mutex.RUnlock()
 
+	// Lock the map for reading. A different thread might be deleting expired values
+	c.mapMutex.RLock()
 	elem, ok := c.data[key]
+	c.mapMutex.RUnlock()
+
 	if !ok {
 		return "", false, nil
 	}
@@ -156,11 +165,17 @@ func (c *LocalCache) Retrieve(key string) (string, bool, error) {
 	exists := true
 	// check ttl
 	if info.validUntil.After(time.Now()) {
+		c.listMutex.Lock()
 		c.keyList.MoveToBack(elem)
+		c.listMutex.Unlock()
 	} else {
 		// expired item
+		c.mapMutex.Lock()
 		delete(c.data, key)
+		c.mapMutex.Unlock()
+		c.listMutex.Lock()
 		c.keyList.Remove(elem)
+		c.listMutex.Unlock()
 		value = ""
 		exists = false
 	}
@@ -171,6 +186,8 @@ func (c *LocalCache) Retrieve(key string) (string, bool, error) {
 // do anything.
 // No error is expected in this method.
 func (c *LocalCache) Remove(key string) error {
+	// Lock for writing. The mapMutex and listMutex aren't needed because
+	// this thread will be the only one modifying them
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
