@@ -6,13 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
-
 	gOidc "github.com/coreos/go-oidc/v3/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"golang.org/x/oauth2"
 )
 
@@ -27,13 +24,12 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	tokenCache := sync.NewCache(options.UserinfoCacheSize)
 
 	h := oidcAuth{
-		logger:             options.Logger,
-		providerFunc:       options.OIDCProviderFunc,
-		httpClient:         options.HTTPClient,
-		oidcIss:            options.OIDCIss,
-		TokenManagerConfig: options.TokenManagerConfig,
-		tokenCache:         &tokenCache,
-		tokenCacheTTL:      options.UserinfoCacheTTL,
+		logger:        options.Logger,
+		providerFunc:  options.OIDCProviderFunc,
+		httpClient:    options.HTTPClient,
+		oidcIss:       options.OIDCIss,
+		tokenCache:    &tokenCache,
+		tokenCacheTTL: options.UserinfoCacheTTL,
 	}
 
 	return func(next http.Handler) http.Handler {
@@ -59,25 +55,20 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 				return
 			}
 
-			// inject claims to the request context for the account_uuid middleware.
-			req = req.WithContext(oidc.NewContext(req.Context(), claims))
-
-			// store claims in context
-			// uses the original context, not the one with probably reduced security
+			// inject claims to the request context for the account_resolver middleware.
 			next.ServeHTTP(w, req.WithContext(oidc.NewContext(req.Context(), claims)))
 		})
 	}
 }
 
 type oidcAuth struct {
-	logger             log.Logger
-	provider           OIDCProvider
-	providerFunc       func() (OIDCProvider, error)
-	httpClient         *http.Client
-	oidcIss            string
-	tokenCache         *sync.Cache
-	tokenCacheTTL      time.Duration
-	TokenManagerConfig config.TokenManager
+	logger        log.Logger
+	provider      OIDCProvider
+	providerFunc  func() (OIDCProvider, error)
+	httpClient    *http.Client
+	oidcIss       string
+	tokenCache    *sync.Cache
+	tokenCacheTTL time.Duration
 }
 
 func (m oidcAuth) getClaims(token string, req *http.Request) (claims map[string]interface{}, status int) {
@@ -120,25 +111,21 @@ func (m oidcAuth) getClaims(token string, req *http.Request) (claims map[string]
 	return
 }
 
-// extractExpiration tries to parse and extract the expiration from the provided token. It might not even be a jwt.
-// defaults to the configured fallback TTL.
-// TODO: use introspection endpoint if available in the oidc configuration. Still needs a fallback to configured TTL.
+// extractExpiration currently just returns a hardcoded default for now. It was
+// supposed to parse and extract the expiration time from the provided
+// access_token.
+// As the access_token is defined as an opaque string. Validating and parsing it
+// can be tricky:
+// 1. Try to treat it as a JWT:
+//    - Verifying the validity of the token requires downloading the propoer public
+//      key from the IDP (uri in "jwks_uri" in ".well-known/openid-configuration"
+// 2. Verify and extract it via the introspection endpoint of the IDP (RFC7662) for
+//    IDPs that provide that feature
+// 3. Other IDP implementation specific methods.
+// 4. Fallback to default value
 func (m oidcAuth) extractExpiration(token string) time.Time {
 	defaultExpiration := time.Now().Add(m.tokenCacheTTL)
-
-	t, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
-		return []byte(m.TokenManagerConfig.JWTSecret), nil
-	})
-	if err != nil {
-		return defaultExpiration
-	}
-
-	at, ok := t.Claims.(jwt.StandardClaims)
-	if !ok || at.ExpiresAt == 0 {
-		return defaultExpiration
-	}
-
-	return time.Unix(at.ExpiresAt, 0)
+	return defaultExpiration
 }
 
 func (m oidcAuth) shouldServe(req *http.Request) bool {

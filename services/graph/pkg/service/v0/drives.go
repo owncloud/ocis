@@ -285,18 +285,13 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 
 	root := &storageprovider.ResourceId{}
 
-	identifierParts := strings.Split(driveID, "!")
-	switch len(identifierParts) {
-	case 1:
-		_, sID := storagespace.SplitStorageID(identifierParts[0])
-		root.StorageId, root.OpaqueId = identifierParts[0], sID
-	case 2:
-		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[1]
-	default:
-		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid resource id: %v", driveID))
+	rid, err := storagespace.ParseID(driveID)
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid resource id: %v", rid))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	root = &rid
 
 	client := g.GetGatewayClient()
 
@@ -305,7 +300,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		// the original storage space.
 		StorageSpace: &storageprovider.StorageSpace{
 			Id: &storageprovider.StorageSpaceId{
-				OpaqueId: root.StorageId + "!" + root.OpaqueId,
+				OpaqueId: storagespace.FormatResourceID(rid),
 			},
 			Root: root,
 		},
@@ -453,25 +448,15 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 	return res, err
 }
 
-func generateSpaceId(id *storageprovider.ResourceId) (spaceID string) {
-	spaceID = id.GetStorageId()
-	// 2nd ID to compare is the opaque ID of the Space Root
-	spaceID2 := id.GetOpaqueId()
-	if strings.Contains(spaceID, "$") {
-		_, spaceID2 = storagespace.SplitStorageID(spaceID)
-	}
-	// Append opaqueID only if it is different from the spaceID2
-	if id.OpaqueId != spaceID2 {
-		spaceID += "!" + id.OpaqueId
-	}
-	return spaceID
-}
-
 func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace) (*libregraph.Drive, error) {
 	if space.Root == nil {
 		return nil, fmt.Errorf("space has no root")
 	}
-	spaceID := generateSpaceId(space.Root)
+	spaceRid := *space.Root
+	if space.Root.GetSpaceId() == space.Root.GetOpaqueId() {
+		spaceRid.OpaqueId = ""
+	}
+	spaceID := storagespace.FormatResourceID(spaceRid)
 
 	var permissions []libregraph.Permission
 	if space.Opaque != nil {
@@ -540,7 +525,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 		//"description": "string", // TODO read from StorageSpace ... needs Opaque for now
 		DriveType: &space.SpaceType,
 		Root: &libregraph.DriveItem{
-			Id:          libregraph.PtrString(storagespace.FormatResourceID(*space.Root)),
+			Id:          libregraph.PtrString(storagespace.FormatResourceID(spaceRid)),
 			Permissions: permissions,
 		},
 	}
@@ -548,9 +533,10 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 		var remoteItem *libregraph.RemoteItem
 		grantID := storageprovider.ResourceId{
 			StorageId: utils.ReadPlainFromOpaque(space.Opaque, "grantStorageID"),
+			SpaceId:   utils.ReadPlainFromOpaque(space.Opaque, "grantSpaceID"),
 			OpaqueId:  utils.ReadPlainFromOpaque(space.Opaque, "grantOpaqueID"),
 		}
-		if grantID.StorageId != "" && grantID.OpaqueId != "" {
+		if grantID.SpaceId != "" && grantID.OpaqueId != "" {
 			var err error
 			remoteItem, err = g.getRemoteItem(ctx, &grantID, baseURL)
 			if err != nil {
@@ -625,11 +611,8 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 
 	req := &gateway.GetQuotaRequest{
 		Ref: &storageprovider.Reference{
-			ResourceId: &storageprovider.ResourceId{
-				StorageId: space.Root.StorageId,
-				OpaqueId:  space.Root.OpaqueId,
-			},
-			Path: ".",
+			ResourceId: space.Root,
+			Path:       ".",
 		},
 	}
 	res, err := client.GetQuota(ctx, req)
@@ -771,17 +754,9 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	root := &storageprovider.ResourceId{}
-
-	identifierParts := strings.Split(driveID, "!")
-	_, sID := storagespace.SplitStorageID(identifierParts[0])
-	switch len(identifierParts) {
-	case 1:
-		root.StorageId, root.OpaqueId = identifierParts[0], sID
-	case 2:
-		root.StorageId, root.OpaqueId = identifierParts[0], identifierParts[1]
-	default:
-		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid resource id: %v", driveID))
+	rid, err := storagespace.ParseID(driveID)
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid resource id: %v", rid))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -800,7 +775,7 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 	dRes, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 		Opaque: opaque,
 		Id: &storageprovider.StorageSpaceId{
-			OpaqueId: root.StorageId,
+			OpaqueId: storagespace.FormatResourceID(rid),
 		},
 	})
 	if err != nil {

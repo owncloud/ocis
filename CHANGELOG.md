@@ -7,14 +7,24 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - CSP rules for silent token refresh in iframe: [#4031](https://github.com/owncloud/ocis/pull/4031)
+* Bugfix - Fix logging levels: [#4102](https://github.com/owncloud/ocis/pull/4102)
+* Bugfix - Fix `OCIS_RUN_SERVICES`: [#4133](https://github.com/owncloud/ocis/pull/4133)
+* Bugfix - Fix unused config option `GRAPH_SPACES_INSECURE`: [#55555](https://github.com/owncloud/ocis/pull/55555)
 * Bugfix - Remove unused configuration options: [#3973](https://github.com/owncloud/ocis/pull/3973)
 * Bugfix - Remove static ocs user backend config: [#4077](https://github.com/owncloud/ocis/pull/4077)
 * Bugfix - Fix make sensitive config values in the proxy's debug server: [#4086](https://github.com/owncloud/ocis/pull/4086)
 * Bugfix - Fix startup error logging: [#4093](https://github.com/owncloud/ocis/pull/4093)
+* Bugfix - Escape DN attribute value: [#4117](https://github.com/owncloud/ocis/pull/4117)
+* Bugfix - Polish search: [#4094](https://github.com/owncloud/ocis/pull/4094)
 * Bugfix - Store user passwords hashed in idm: [#3778](https://github.com/owncloud/ocis/issues/3778)
+* Change - Use the spaceID on the cs3 resource: [#4748](https://github.com/owncloud/ocis/pull/4748)
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
+* Enhancement - Add number of total matches to the search result: [#4189](https://github.com/owncloud/ocis/issues/4189)
 * Enhancement - Update IdP UI: [#3493](https://github.com/owncloud/ocis/issues/3493)
 * Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
+* Enhancement - Update reva: [#4115](https://github.com/owncloud/ocis/pull/4115)
+* Enhancement - Update ownCloud Web to v5.7.0-rc.4: [#4140](https://github.com/owncloud/ocis/pull/4140)
+* Enhancement - Search service at the old webdav endpoint: [#4118](https://github.com/owncloud/ocis/pull/4118)
 
 ## Details
 
@@ -26,6 +36,42 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/web/issues/7030
    https://github.com/owncloud/ocis/pull/4031
+
+* Bugfix - Fix logging levels: [#4102](https://github.com/owncloud/ocis/pull/4102)
+
+   We've fixed the configuration of logging levels. Previously it was not possible to configure a
+   service with a more or less verbose log level then all other services when running in the
+   supervised / runtime mode `ocis server`.
+
+   For example `OCIS_LOG_LEVEL=error PROXY_LOG_LEVEL=debug ocis server` did not configure
+   error logging for all services except the proxy, which should be on debug logging. This is now
+   fixed and working properly.
+
+   Also we fixed the format of go-micro logs to always default to error level. Previously this was
+   only ensured in the supervised / runtime mode.
+
+   https://github.com/owncloud/ocis/issues/4089
+   https://github.com/owncloud/ocis/pull/4102
+
+* Bugfix - Fix `OCIS_RUN_SERVICES`: [#4133](https://github.com/owncloud/ocis/pull/4133)
+
+   `OCIS_RUN_SERVICES` was introduced as successor to `OCIS_RUN_EXTENSIONS` because we
+   wanted to call oCIS "core" extensions services. We kept `OCIS_RUN_EXTENSIONS` for backwards
+   compatibility reasons.
+
+   It turned out, that setting `OCIS_RUN_SERVICES` has no effect since introduced.
+   `OCIS_RUN_EXTENSIONS`. `OCIS_RUN_EXTENSIONS` was working fine all the time.
+
+   We now fixed `OCIS_RUN_SERVICES`, so that you can use it as a equivalent replacement for
+   `OCIS_RUN_EXTENSIONS`
+
+   https://github.com/owncloud/ocis/pull/4133
+
+* Bugfix - Fix unused config option `GRAPH_SPACES_INSECURE`: [#55555](https://github.com/owncloud/ocis/pull/55555)
+
+   We've removed the unused config option `GRAPH_SPACES_INSECURE` from the GRAPH service.
+
+   https://github.com/owncloud/ocis/pull/55555
 
 * Bugfix - Remove unused configuration options: [#3973](https://github.com/owncloud/ocis/pull/3973)
 
@@ -63,6 +109,19 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/4093
 
+* Bugfix - Escape DN attribute value: [#4117](https://github.com/owncloud/ocis/pull/4117)
+
+   Escaped the DN attribute value on creating users and groups.
+
+   https://github.com/owncloud/ocis/pull/4117
+
+* Bugfix - Polish search: [#4094](https://github.com/owncloud/ocis/pull/4094)
+
+   We improved the feedback when providing invalid search queries and added support for limiting
+   the number of results returned.
+
+   https://github.com/owncloud/ocis/pull/4094
+
 * Bugfix - Store user passwords hashed in idm: [#3778](https://github.com/owncloud/ocis/issues/3778)
 
    Support for hashing user passwords was added to libregraph/idm. The graph API will now set
@@ -72,6 +131,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/3778
    https://github.com/owncloud/ocis/pull/4053
 
+* Change - Use the spaceID on the cs3 resource: [#4748](https://github.com/owncloud/ocis/pull/4748)
+
+   We cleaned up the CS3Api to use a proper attribute for the space id.
+
+   https://github.com/owncloud/ocis/pull/4748
+
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
 
    For better UX clients need a way to discover if alias links are supported by the server. We added a
@@ -79,6 +144,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3983
    https://github.com/owncloud/ocis/pull/3991
+
+* Enhancement - Add number of total matches to the search result: [#4189](https://github.com/owncloud/ocis/issues/4189)
+
+   The search service now returns the number of total matches alongside the results.
+
+   https://github.com/owncloud/ocis/issues/4189
 
 * Enhancement - Update IdP UI: [#3493](https://github.com/owncloud/ocis/issues/3493)
 
@@ -94,6 +165,50 @@ The following sections list the changes for unreleased.
    to avoid confusion between external extensions and code we provide and maintain.
 
    https://github.com/owncloud/ocis/pull/3980
+
+* Enhancement - Update reva: [#4115](https://github.com/owncloud/ocis/pull/4115)
+
+   https://github.com/owncloud/ocis/pull/4115
+
+* Enhancement - Update ownCloud Web to v5.7.0-rc.4: [#4140](https://github.com/owncloud/ocis/pull/4140)
+
+   Tags: web
+
+   We updated ownCloud Web to v5.7.0-rc.4. Please refer to the changelog (linked) for details on
+   the web release.
+
+  * Bugfix [owncloud/web#7230](https://github.com/owncloud/web/pull/7230): Context menu misplaced when triggered by keyboard navigation
+  * Bugfix [owncloud/web#7214](https://github.com/owncloud/web/pull/7214): Prevent error when pasting with empty clipboard
+  * Bugfix [owncloud/web#7173](https://github.com/owncloud/web/pull/7173): Re-introduce dynamic app name in document title
+  * Bugfix [owncloud/web#7166](https://github.com/owncloud/web/pull/7166): External apps fixes
+  * Bugfix [owncloud/web#7248](https://github.com/owncloud/web/pull/7248): Hide empty trash bin modal on error
+  * Bugfix [owncloud/web#4677](https://github.com/owncloud/web/issues/4677): Logout deleted user on page reload
+  * Bugfix [owncloud/web#7216](https://github.com/owncloud/web/pull/7216): Filename hovers over the image in the preview app
+  * Bugfix [owncloud/web#7228](https://github.com/owncloud/web/pull/7228): Shared with others page apps not working with oc10 as backend
+  * Bugfix [owncloud/web#7197](https://github.com/owncloud/web/pull/7197): Create space and access user management permission
+  * Bugfix [owncloud/web#6921](https://github.com/owncloud/web/pull/6921): Space sidebar sharing indicators
+  * Bugfix [owncloud/web#7030](https://github.com/owncloud/web/issues/7030): Access token renewal
+  * Enhancement [owncloud/web#7217](https://github.com/owncloud/web/pull/7217): Add app top bar component
+  * Enhancement [owncloud/web#7153](https://github.com/owncloud/web/pull/7153): Add Keyboard navigation/selection
+  * Enhancement [owncloud/web#7030](https://github.com/owncloud/web/issues/7030): Loading context blocks application bootstrap
+  * Enhancement [owncloud/web#7206](https://github.com/owncloud/web/pull/7206): Add change own password dialog to the account info page
+  * Enhancement [owncloud/web#7086](https://github.com/owncloud/web/pull/7086): Re-sharing for ocis
+  * Enhancement [owncloud/web#7201](https://github.com/owncloud/web/pull/7201): Added a toolbar to pdf-viewer app
+  * Enhancement [owncloud/web#7139](https://github.com/owncloud/web/pull/7139): Reposition notifications
+  * Enhancement [owncloud/web#7030](https://github.com/owncloud/web/issues/7030): Resolve bookmarked public links with password protection
+  * Enhancement [owncloud/web#7038](https://github.com/owncloud/web/issues/7038): Improve performance of share indicators
+  * Enhancement [owncloud/web#6661](https://github.com/owncloud/web/issues/6661): Option to block file extensions from text-editor app
+  * Enhancement [owncloud/web#7139](https://github.com/owncloud/web/pull/7139): Update ODS to v14.0.0-alpha.4
+  * Enhancement [owncloud/web#7176](https://github.com/owncloud/web/pull/7176): Introduce group assignments
+
+   https://github.com/owncloud/ocis/pull/4140
+   https://github.com/owncloud/web/releases/tag/v5.7.0-rc.4
+
+* Enhancement - Search service at the old webdav endpoint: [#4118](https://github.com/owncloud/ocis/pull/4118)
+
+   We made the search service available for legacy clients at the old webdav endpoint.
+
+   https://github.com/owncloud/ocis/pull/4118
 # Changelog for [2.0.0-beta.4] (2022-06-28)
 
 The following sections list the changes for 2.0.0-beta.4.

@@ -17,7 +17,7 @@ OC_CI_GOLANG = "owncloudci/golang:1.18"
 OC_CI_NODEJS = "owncloudci/nodejs:%s"
 OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
-OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:latest"
+OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:0.2.0"
 OC_LITMUS = "owncloud/litmus:latest"
 OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.6.0"
 OC_SERVER = "owncloud/server:10"
@@ -39,6 +39,12 @@ THEGEEKLAB_DRONE_GITHUB_COMMENT = "thegeeklab/drone-github-comment:1"
 
 DEFAULT_PHP_VERSION = "7.4"
 DEFAULT_NODEJS_VERSION = "14"
+
+dirs = {
+    # relative paths from /drone/src
+    "core": "oc10/testrunner",
+    "testing_app": "oc10/testing",
+}
 
 # configuration
 config = {
@@ -147,18 +153,6 @@ pipelineVolumeGo = \
         "temp": {},
     }
 
-stepVolumeOC10Tests = \
-    {
-        "name": "oC10Tests",
-        "path": "/srv/app",
-    }
-
-pipelineVolumeOC10Tests = \
-    {
-        "name": "oC10Tests",
-        "temp": {},
-    }
-
 def pipelineDependsOn(pipeline, dependant_pipelines):
     if "depends_on" in pipeline.keys():
         pipeline["depends_on"] = pipeline["depends_on"] + getPipelineNames(dependant_pipelines)
@@ -201,7 +195,9 @@ def main(ctx):
 
     test_pipelines = \
         cancelPreviousBuilds() + \
+        yarnCache(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
+        cacheCoreReposForTesting(ctx) + \
         testOcisModules(ctx) + \
         testPipelines(ctx)
 
@@ -219,6 +215,18 @@ def main(ctx):
     test_pipelines.append(
         pipelineDependsOn(
             purgeBuildArtifactCache(ctx, "ocis-binary-amd64"),
+            testPipelines(ctx),
+        ),
+    )
+    test_pipelines.append(
+        pipelineDependsOn(
+            purgeBuildArtifactCache(ctx, "testrunner"),
+            testPipelines(ctx),
+        ),
+    )
+    test_pipelines.append(
+        pipelineDependsOn(
+            purgeBuildArtifactCache(ctx, "testing_app"),
             testPipelines(ctx),
         ),
     )
@@ -248,6 +256,47 @@ def main(ctx):
     pipelines += checkStarlark()
     pipelineSanityChecks(ctx, pipelines)
     return pipelines
+
+def yarnCache(ctx):
+    return [{
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "cache-yarn",
+        "steps": skipIfUnchanged(ctx, "cache") +
+                 installWebTestRunner() +
+                 yarnInstallUITests() +
+                 rebuildBuildArtifactCache(ctx, "tests-yarn", "webTestRunner/tests/acceptance/.yarn"),
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/tags/**",
+                "refs/pull/**",
+            ],
+        },
+    }]
+
+def installWebTestRunner():
+    return [{
+        "name": "install-web-test-runner",
+        "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+        "commands": [
+            ". /drone/src/.drone.env",
+            "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git webTestRunner",
+        ],
+    }]
+
+def yarnInstallUITests():
+    return [{
+        "name": "yarn-install",
+        "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+        "commands": [
+            ". /drone/src/.drone.env",
+            "cd webTestRunner",
+            "git checkout $WEB_COMMITID",
+            "cd tests/acceptance/",
+            "yarn install --immutable",
+        ],
+    }]
 
 def testOcisModules(ctx):
     pipelines = []
@@ -399,6 +448,28 @@ def buildOcisBinaryForTesting(ctx):
         "volumes": [pipelineVolumeGo],
     }
 
+def cacheCoreReposForTesting(ctx):
+    return [{
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "cache_core_repos_for_testing",
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") +  # skip for those pipelines where core repos are not needed
+                 cloneCoreRepos() +
+                 rebuildBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
+                 rebuildBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]),
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/tags/v*",
+                "refs/pull/**",
+            ],
+        },
+    }]
+
 def uploadScanResults(ctx):
     sonar_env = {
         "SONAR_TOKEN": {
@@ -504,36 +575,41 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) +
-                 cloneCoreRepos() + [
-            {
-                "name": "localApiTests-%s-%s" % (suite, storage),
-                "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
-                "environment": {
-                    "TEST_WITH_GRAPH_API": "true",
-                    "PATH_TO_OCIS": "/drone/src",
-                    "PATH_TO_CORE": "/srv/app/testrunner",
-                    "TEST_SERVER_URL": "https://ocis-server:9200",
-                    "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
-                    "SKELETON_DIR": "/srv/app/tmp/testing/data/apiSkeleton",
-                    "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
-                    "TEST_OCIS": "true",
-                    "SEND_SCENARIO_LINE_REFERENCES": "true",
-                    "STORAGE_DRIVER": storage,
-                    "BEHAT_SUITE": suite,
-                    "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
-                    "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (storage.upper()),
-                    "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
-                },
-                "commands": [
-                    "make test-acceptance-api",
-                ],
-                "volumes": [stepVolumeOC10Tests],
-            },
-        ] + failEarly(ctx, early_fail),
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") +
+                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+                 ocisServer(storage, accounts_hash_difficulty) +
+                 restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
+                 restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
+                 [
+                     {
+                         "name": "localApiTests-%s-%s" % (suite, storage),
+                         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
+                         "environment": {
+                             "TEST_WITH_GRAPH_API": "true",
+                             "PATH_TO_OCIS": "/drone/src",
+                             "PATH_TO_CORE": "/drone/src/%s" % dirs["core"],
+                             "TEST_SERVER_URL": "https://ocis-server:9200",
+                             "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
+                             "SKELETON_DIR": "%s/data/apiSkeleton" % dirs["testing_app"],
+                             "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
+                             "TEST_OCIS": "true",
+                             "SEND_SCENARIO_LINE_REFERENCES": "true",
+                             "STORAGE_DRIVER": storage,
+                             "BEHAT_SUITE": suite,
+                             "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
+                             "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (storage.upper()),
+                             "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
+                         },
+                         "commands": [
+                             "pwd",
+                             "ls -la",
+                             "make test-acceptance-api",
+                         ],
+                     },
+                 ] + failEarly(ctx, early_fail),
         "services": redisForOCStorage(storage),
-        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]) +
+                      getPipelineNames(cacheCoreReposForTesting(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -541,7 +617,6 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
                 "refs/pull/**",
             ],
         },
-        "volumes": [pipelineVolumeOC10Tests],
     }
 
 def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
@@ -578,7 +653,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
     early_fail = config["apiTests"]["earlyFail"] if "earlyFail" in config["apiTests"] else False
-    filterTags = "~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage&&~@issue-ocis-3023" % ("OC" if storage == "owncloud" else "OCIS")
+    filterTags = "~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
     expectedFailuresFile = "/drone/src/tests/acceptance/expected-failures-API-on-%s-storage.md" % (storage.upper())
 
     return {
@@ -589,37 +664,40 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) +
-                 cloneCoreRepos() + [
-            {
-                "name": "oC10ApiTests-%s-storage-%s" % (storage, part_number),
-                "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
-                "environment": {
-                    "TEST_WITH_GRAPH_API": "true",
-                    "PATH_TO_OCIS": "/drone/src",
-                    "PATH_TO_CORE": "/srv/app/testrunner",
-                    "TEST_SERVER_URL": "https://ocis-server:9200",
-                    "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
-                    "SKELETON_DIR": "/srv/app/tmp/testing/data/apiSkeleton",
-                    "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
-                    "TEST_OCIS": "true",
-                    "SEND_SCENARIO_LINE_REFERENCES": "true",
-                    "STORAGE_DRIVER": storage,
-                    "BEHAT_FILTER_TAGS": filterTags,
-                    "DIVIDE_INTO_NUM_PARTS": number_of_parts,
-                    "RUN_PART": part_number,
-                    "EXPECTED_FAILURES_FILE": expectedFailuresFile,
-                    "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
-                },
-                "commands": [
-                    "make -C /srv/app/testrunner test-acceptance-api",
-                ],
-                "volumes": [stepVolumeOC10Tests],
-            },
-        ] + failEarly(ctx, early_fail),
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") +
+                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+                 ocisServer(storage, accounts_hash_difficulty) +
+                 restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
+                 restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
+                 [
+                     {
+                         "name": "oC10ApiTests-%s-storage-%s" % (storage, part_number),
+                         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
+                         "environment": {
+                             "TEST_WITH_GRAPH_API": "true",
+                             "PATH_TO_OCIS": "/drone/src",
+                             "PATH_TO_CORE": "/drone/src/%s" % dirs["core"],
+                             "TEST_SERVER_URL": "https://ocis-server:9200",
+                             "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
+                             "SKELETON_DIR": "/drone/src/%s/data/apiSkeleton" % dirs["testing_app"],
+                             "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
+                             "TEST_OCIS": "true",
+                             "SEND_SCENARIO_LINE_REFERENCES": "true",
+                             "STORAGE_DRIVER": storage,
+                             "BEHAT_FILTER_TAGS": filterTags,
+                             "DIVIDE_INTO_NUM_PARTS": number_of_parts,
+                             "RUN_PART": part_number,
+                             "EXPECTED_FAILURES_FILE": expectedFailuresFile,
+                             "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
+                         },
+                         "commands": [
+                             "make -C /drone/src/%s test-acceptance-api" % dirs["core"],
+                         ],
+                     },
+                 ] + failEarly(ctx, early_fail),
         "services": redisForOCStorage(storage),
-        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]) +
+                      getPipelineNames(cacheCoreReposForTesting(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -627,7 +705,6 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                 "refs/pull/**",
             ],
         },
-        "volumes": [pipelineVolumeOC10Tests],
     }
 
 def apiTests(ctx):
@@ -703,44 +780,40 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() + [
-            {
-                "name": "webUITests",
-                "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-                "environment": {
-                    "SERVER_HOST": "https://ocis-server:9200",
-                    "BACKEND_HOST": "https://ocis-server:9200",
-                    "RUN_ON_OCIS": "true",
-                    "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/owncloud/data",
-                    "TESTING_DATA_DIR": "/srv/app/testing/data",
-                    "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
-                    "TEST_TAGS": finalFilterTags,
-                    "LOCAL_UPLOAD_DIR": "/uploads",
-                    "NODE_TLS_REJECT_UNAUTHORIZED": 0,
-                    "RUN_PART": runPart,
-                    "DIVIDE_INTO_NUM_PARTS": numberOfParts,
-                    "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-webUI-on-%s-storage%s.md" % (storage.upper(), expectedFailuresFileFilterTags),
-                    "MIDDLEWARE_HOST": "http://middleware:3000",
-                },
-                "commands": [
-                    ". /drone/src/.drone.env",
-                    "git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/testing",
-                    "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
-                    "cd /srv/app/web",
-                    "git checkout $WEB_COMMITID",
-                    "cd tests/acceptance/",
-                    "yarn install --immutable",
-                    "./run.sh",
-                ],
-            },
-        ] + failEarly(ctx, early_fail),
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + installWebTestRunner() +
+                 restoreBuildArtifactCache(ctx, "tests-yarn", "webTestRunner/tests/acceptance/.yarn") + yarnInstallUITests() +
+                 ocisServer(storage, accounts_hash_difficulty) + waitForSeleniumService() + waitForMiddlewareService() +
+                 restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
+                 [
+                     {
+                         "name": "webUITests",
+                         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+                         "environment": {
+                             "SERVER_HOST": "https://ocis-server:9200",
+                             "BACKEND_HOST": "https://ocis-server:9200",
+                             "RUN_ON_OCIS": "true",
+                             "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/owncloud/data",
+                             "TESTING_DATA_DIR": "/drone/src/%s" % dirs["testing_app"],
+                             "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
+                             "TEST_TAGS": finalFilterTags,
+                             "LOCAL_UPLOAD_DIR": "/uploads",
+                             "NODE_TLS_REJECT_UNAUTHORIZED": 0,
+                             "RUN_PART": runPart,
+                             "DIVIDE_INTO_NUM_PARTS": numberOfParts,
+                             "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-webUI-on-%s-storage%s.md" % (storage.upper(), expectedFailuresFileFilterTags),
+                             "MIDDLEWARE_HOST": "http://middleware:3000",
+                         },
+                         "commands": [
+                             "cd webTestRunner/tests/acceptance",
+                             "./run.sh",
+                         ],
+                     },
+                 ] + failEarly(ctx, early_fail),
         "services": selenium() + middlewareService(),
-        "volumes": [pipelineVolumeOC10Tests] +
-                   [{
-                       "name": "uploads",
-                       "temp": {},
-                   }],
+        "volumes": [{
+            "name": "uploads",
+            "temp": {},
+        }],
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
             "ref": [
@@ -763,7 +836,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                 ocisServer(storage, accounts_hash_difficulty, [stepVolumeOC10Tests]) + waitForSeleniumService() + waitForMiddlewareService() + [
+                 ocisServer(storage, accounts_hash_difficulty) + waitForSeleniumService() + waitForMiddlewareService() + [
             {
                 "name": "WebUIAcceptanceTests",
                 "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
@@ -792,11 +865,10 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "yarn install --immutable",
                     "make test-acceptance-webui",
                 ],
-                "volumes": [stepVolumeOC10Tests] +
-                           [{
-                               "name": "uploads",
-                               "path": "/uploads",
-                           }],
+                "volumes": [{
+                    "name": "uploads",
+                    "path": "/uploads",
+                }],
             },
         ] + failEarly(ctx, early_fail),
         "services": [
@@ -805,11 +877,10 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                 "image": REDIS,
             },
         ] + selenium() + middlewareService(),
-        "volumes": [stepVolumeOC10Tests] +
-                   [{
-                       "name": "uploads",
-                       "temp": {},
-                   }],
+        "volumes": [{
+            "name": "uploads",
+            "temp": {},
+        }],
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
             "ref": [
@@ -1576,7 +1647,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         user = "0:0"
         environment = {
             "OCIS_URL": OCIS_URL,
-            "FRONTEND_ENABLE_RESHARING": "true",
+            "OCIS_CONFIG_DIR": "/root/.ocis/config",
             "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",  # cs3api-validator needs the cs3api gatway exposed
             "STORAGE_USERS_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
@@ -1644,7 +1715,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_RUN_SERVICES": "app-registry,app-provider,auth-basic,auth-bearer,auth-machine,frontend,gateway,graph,graph-explorer,groups,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav",
             "OCIS_LOG_LEVEL": "info",
             "OCIS_URL": OCIS_URL,
-            "FRONTEND_ENABLE_RESHARING": "true",
             "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",
             "OCIS_CONFIG_DIR": "/etc/ocis",
             "PROXY_ENABLE_BASIC_AUTH": "true",
@@ -1674,6 +1744,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "user": user,
             "commands": [
                 "ocis/bin/ocis init --insecure true",
+                "cat $OCIS_CONFIG_DIR/ocis.yaml",
                 "ocis/bin/ocis server",
             ],
             "volumes": volumes,
@@ -1720,13 +1791,14 @@ def cloneCoreRepos():
             "name": "clone-core-repos",
             "image": OC_CI_ALPINE,
             "commands": [
-                "source /drone/src/.drone.env",
-                "git clone -b master --depth=1 https://github.com/owncloud/testing.git /srv/app/tmp/testing",
-                "git clone -b $CORE_BRANCH --single-branch --no-tags https://github.com/owncloud/core.git /srv/app/testrunner",
-                "cd /srv/app/testrunner",
+                "source .drone.env",
+                "git clone -b master --depth=1 https://github.com/owncloud/testing.git %s" % dirs["testing_app"],
+                "ls -la %s" % dirs["testing_app"],
+                "git clone -b $CORE_BRANCH --single-branch --no-tags https://github.com/owncloud/core.git %s" % dirs["core"],
+                "ls -la %s" % dirs["core"],
+                "cd %s" % dirs["core"],
                 "git checkout $CORE_COMMITID",
             ],
-            "volumes": [stepVolumeOC10Tests],
         },
     ]
 
@@ -1802,7 +1874,8 @@ def skipIfUnchanged(ctx, type):
         skip = base + acceptance
     if type == "build-binary" or type == "build-docker" or type == "litmus":
         skip = base + unit + acceptance
-
+    if type == "cache":
+        skip = base
     if len(skip) == 0:
         return []
 
@@ -2201,7 +2274,8 @@ def parallelDeployAcceptancePipeline(ctx):
                 },
                 "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                          restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
-                         cloneCoreRepos() +
+                         restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
+                         restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
                          copyConfigs() +
                          parallelDeploymentOC10Server() +
                          owncloudLog() +
@@ -2224,9 +2298,9 @@ def parallelDeployAcceptancePipeline(ctx):
                     pipeOC10AppsVol,
                     pipeOC10OCISSharedVol,
                     pipeOCISConfigVol,
-                    pipelineVolumeOC10Tests,
                 ],
-                "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+                "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]) +
+                              getPipelineNames(cacheCoreReposForTesting(ctx)),
                 "trigger": {},
             }
 
@@ -2254,14 +2328,13 @@ def parallelAcceptance(env):
         "REVA_LDAP_BASE_DN": "dc=owncloud,dc=com",
         "REVA_LDAP_HOSTNAME": "openldap",
         "REVA_LDAP_BIND_DN": "cn=admin,dc=owncloud,dc=com",
-        "SKELETON_DIR": "/var/www/owncloud/apps/testing/data/apiSkeleton",
-        "PATH_TO_CORE": "/srv/app/testrunner",
+        "SKELETON_DIR": "/drone/src/%s/data/apiSkeleton" % dirs["testing_app"],
+        "PATH_TO_CORE": "/drone/src/%s" % dirs["core"],
         "OCIS_REVA_DATA_ROOT": "/mnt/data/",
         "EXPECTED_FAILURES_FILE": "/drone/src/tests/parallelDeployAcceptance/expected-failures-API.md",
         "OCIS_SKELETON_STRATEGY": "copy",
         "SEND_SCENARIO_LINE_REFERENCES": "true",
         "UPLOAD_DELETE_WAIT_TIME": "1",
-        "FRONTEND_ENABLE_RESHARING": "true",
     }
     environment.update(env)
 
@@ -2272,10 +2345,9 @@ def parallelAcceptance(env):
         "commands": [
             "make test-paralleldeployment-api",
         ],
-        "depends_on": ["clone-core-repos", "wait-for-oc10", "wait-for-ocis-server"],
+        "depends_on": ["wait-for-oc10", "wait-for-ocis-server"],
         "volumes": [
             stepVolumeOC10Apps,
-            stepVolumeOC10Tests,
             stepVolumeOC10OCISData,
         ],
     }]

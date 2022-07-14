@@ -6,11 +6,11 @@ require (
 	github.com/CiscoM31/godata v1.0.5
 	github.com/Masterminds/semver v1.5.0
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
-	github.com/blevesearch/bleve/v2 v2.3.2
+	github.com/blevesearch/bleve/v2 v2.3.3
 	github.com/blevesearch/bleve_index_api v1.0.2
 	github.com/coreos/go-oidc/v3 v3.2.0
-	github.com/cs3org/go-cs3apis v0.0.0-20220512100524-551800f020d8
-	github.com/cs3org/reva/v2 v2.6.2-0.20220701123317-b001142209a1
+	github.com/cs3org/go-cs3apis v0.0.0-20220621145831-c38cca0796c2
+	github.com/cs3org/reva/v2 v2.6.2-0.20220712113935-66029006fc69
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
@@ -39,7 +39,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.3
 	github.com/justinas/alice v1.2.0
-	github.com/libregraph/idm v0.3.1-0.20220627110322-41a5a73f50b0
+	github.com/libregraph/idm v0.3.1-0.20220713065559-45c5c6bd5a58
 	github.com/libregraph/lico v0.54.1-0.20220325072321-31efc3995d63
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
@@ -59,14 +59,14 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.2
-	github.com/urfave/cli/v2 v2.10.3
+	github.com/urfave/cli/v2 v2.11.0
 	go-micro.dev/v4 v4.7.0
 	go.opencensus.io v0.23.0
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.32.0
-	go.opentelemetry.io/otel v1.7.0
-	go.opentelemetry.io/otel/exporters/jaeger v1.7.0
-	go.opentelemetry.io/otel/sdk v1.7.0
-	go.opentelemetry.io/otel/trace v1.7.0
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.33.0
+	go.opentelemetry.io/otel v1.8.0
+	go.opentelemetry.io/otel/exporters/jaeger v1.8.0
+	go.opentelemetry.io/otel/sdk v1.8.0
+	go.opentelemetry.io/otel/trace v1.8.0
 	golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29
 	golang.org/x/exp v0.0.0-20220518171630-0b5c67f07fdf
 	golang.org/x/image v0.0.0-20220321031419-a8550c1d254a
@@ -77,7 +77,7 @@ require (
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/v3 v3.3.0
-	stash.kopano.io/kgol/oidc-go v0.3.2
+	stash.kopano.io/kgol/oidc-go v0.3.4
 	stash.kopano.io/kgol/rndm v1.1.1
 )
 
@@ -101,19 +101,20 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/bits-and-blooms/bitset v1.2.1 // indirect
+	github.com/blevesearch/geo v0.1.12-0.20220606102651-aab42add3121 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.3 // indirect
 	github.com/blevesearch/gtreap v0.1.1 // indirect
-	github.com/blevesearch/mmap-go v1.0.3 // indirect
+	github.com/blevesearch/mmap-go v1.0.4 // indirect
 	github.com/blevesearch/scorch_segment_api/v2 v2.1.0 // indirect
 	github.com/blevesearch/segment v0.9.0 // indirect
 	github.com/blevesearch/snowballstem v0.9.0 // indirect
 	github.com/blevesearch/upsidedown_store_api v1.0.1 // indirect
-	github.com/blevesearch/vellum v1.0.7 // indirect
-	github.com/blevesearch/zapx/v11 v11.3.3 // indirect
-	github.com/blevesearch/zapx/v12 v12.3.3 // indirect
-	github.com/blevesearch/zapx/v13 v13.3.3 // indirect
-	github.com/blevesearch/zapx/v14 v14.3.3 // indirect
-	github.com/blevesearch/zapx/v15 v15.3.3 // indirect
+	github.com/blevesearch/vellum v1.0.8 // indirect
+	github.com/blevesearch/zapx/v11 v11.3.4 // indirect
+	github.com/blevesearch/zapx/v12 v12.3.4 // indirect
+	github.com/blevesearch/zapx/v13 v13.3.4 // indirect
+	github.com/blevesearch/zapx/v14 v14.3.4 // indirect
+	github.com/blevesearch/zapx/v15 v15.3.4 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
@@ -153,6 +154,7 @@ require (
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551 // indirect
 	github.com/golang/glog v1.0.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.4 // indirect
@@ -264,5 +266,3 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	stash.kopano.io/kgol/kcc-go/v5 v5.0.1 // indirect
 )
-
-replace github.com/cs3org/go-cs3apis => github.com/micbar/go-cs3apis v0.0.0-20220617090231-703c04619761 // temp fork

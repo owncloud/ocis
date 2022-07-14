@@ -22,14 +22,14 @@ type Config struct {
 	Reva     Reva   `yaml:"reva"`
 	Events   Events `yaml:"events"`
 
-	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;SEARCH_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used for accessing the 'auth-machine' service to impersonate users."`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;SEARCH_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services."`
 
 	Context context.Context `yaml:"-"`
 }
 
 // Events combines the configuration options for the event bus.
 type Events struct {
-	Endpoint      string `yaml:"endpoint" env:"SEARCH_EVENTS_ENDPOINT" desc:"the address of the streaming service"`
-	Cluster       string `yaml:"cluster" env:"SEARCH_EVENTS_CLUSTER" desc:"the clusterID of the streaming service. Mandatory when using nats"`
-	ConsumerGroup string `yaml:"group" env:"SEARCH_EVENTS_GROUP" desc:"the customergroup of the service. One group will only get one copy of an event"`
+	Endpoint      string `yaml:"endpoint" env:"SEARCH_EVENTS_ENDPOINT" desc:"The address of the streaming service"`
+	Cluster       string `yaml:"cluster" env:"SEARCH_EVENTS_CLUSTER" desc:"The clusterID of the streaming service. Mandatory when using NATS"`
+	ConsumerGroup string `yaml:"group" env:"SEARCH_EVENTS_GROUP" desc:"The customer group of the service. One group will only get one copy of an event"`
 }

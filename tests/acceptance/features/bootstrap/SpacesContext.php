@@ -24,9 +24,7 @@ declare(strict_types=1);
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Behat\Hook\Call\AfterScenario;
 use Behat\Gherkin\Node\TableNode;
-use Behat\Testwork\Environment\Environment;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
@@ -365,54 +363,6 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @AfterScenario
-	 *
-	 * @return void
-	 *
-	 * @throws Exception|GuzzleException
-	 */
-	public function cleanDataAfterTests(): void {
-		$this->deleteAllSpacesOfTheType('project');
-	}
-
-	/**
-	 * The method first disables and then deletes spaces
-	 *
-	 * @param  string $driveType
-	 *
-	 * @return void
-	 *
-	 * @throws Exception|GuzzleException
-	 */
-	public function deleteAllSpacesOfTheType(string $driveType): void {
-		$query = "\$filter=driveType eq $driveType";
-		$userAdmin = $this->featureContext->getAdminUsername();
-
-		for ($i = 0; $i < 2; ++$i) {
-			$this->theUserListsAllHisAvailableSpacesUsingTheGraphApiWithFilter(
-				$userAdmin,
-				$query
-			);
-
-			$rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
-			$drives = json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
-			if (isset($drives["value"])) {
-				$drives = $drives["value"];
-			}
-
-			if (!empty($drives)) {
-				foreach ($drives as $value) {
-					if (!\array_key_exists("deleted", $value["root"])) {
-						$this->sendDisableSpaceRequest($userAdmin, $value["name"]);
-					} else {
-						$this->sendDeleteSpaceRequest($userAdmin, $value["name"]);
-					}
-				}
-			}
-		}
-	}
-
-	/**
 	 * Send Graph List My Spaces Request
 	 *
 	 * @param  string $user
@@ -569,44 +519,6 @@ class SpacesContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" lists all available spaces via the GraphApi$/
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 *
-	 * @throws GuzzleException
-	 * @throws Exception
-	 */
-	public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user): void {
-		$this->featureContext->setResponse(
-			$this->listMySpacesRequest(
-				$user,
-				$this->featureContext->getPasswordForUser($user)
-			)
-		);
-		$this->rememberTheAvailableSpaces();
-	}
-
-	/**
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 *
-	 * @throws GuzzleException
-	 * @throws Exception
-	 */
-	public function theUserListsAllAvailableSpacesUsingTheGraphApi(string $user): void {
-		$this->featureContext->setResponse(
-			$this->listAllSpacesRequest(
-				$user,
-				$this->featureContext->getPasswordForUser($user)
-			)
-		);
-		$this->rememberTheAvailableSpaces();
-	}
-
-	/**
 	 * @When /^user "([^"]*)" lists all available spaces via the GraphApi with query "([^"]*)"$/
 	 *
 	 * @param string $user
@@ -615,8 +527,9 @@ class SpacesContext implements Context {
 	 * @return void
 	 *
 	 * @throws GuzzleException
+	 * @throws Exception
 	 */
-	public function theUserListsAllHisAvailableSpacesUsingTheGraphApiWithFilter(string $user, string $query): void {
+	public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user, string $query = ''): void {
 		$this->featureContext->setResponse(
 			$this->listMySpacesRequest(
 				$user,
@@ -624,6 +537,28 @@ class SpacesContext implements Context {
 				"?" . $query
 			)
 		);
+		$this->rememberTheAvailableSpaces();
+	}
+
+	/**
+	 *
+	 * @param string $user
+	 * @param string $query
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserListsAllAvailableSpacesUsingTheGraphApi(string $user, string $query = ''): void {
+		$this->featureContext->setResponse(
+			$this->listAllSpacesRequest(
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				"?" . $query
+			)
+		);
+		$this->rememberTheAvailableSpaces();
 	}
 
 	/**
@@ -966,7 +901,6 @@ class SpacesContext implements Context {
 
 	/**
 	 * @Then /^the json responded should contain a space "([^"]*)" (?:|(?:owned by|granted to) "([^"]*)" )(?:|(?:with description file|with space image) "([^"]*)" )with these key and value pairs:$/
-	 *
 	 * @param string $spaceName
 	 * @param string $userName
 	 * @param string $fileName
@@ -1034,23 +968,60 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^the json responded should contain a space "([^"]*)" granted to "([^"]*)" with role "([^"]*)"$/
+	 * @Then /^the user "([^"]*)" should have a space called "([^"]*)" with these key and value pairs:$/
+	 * @Then /^the user "([^"]*)" should have a space called "([^"]*)" (?:owned by|granted to) "([^"]*)" with these key and value pairs:$/
+	 * @Then /^the user "([^"]*)" should have a space called "([^"]*)" (?:with description file|with space image) "([^"]*)" with these key and value pairs:$/
+	 * @Then /^the user "([^"]*)" should have a space called "([^"]*)" (?:owned by|granted to) "([^"]*)" (?:with description file|with space image) "([^"]*)" with these key and value pairs:$/
 	 *
+	 * @param string $user
 	 * @param string $spaceName
-	 * @param string $userName
+	 * @param string $grantedUser
+	 * @param string $fileName
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userHasSpaceWith(
+		string $user,
+		string $spaceName,
+		string $grantedUser = '',
+		string $fileName = '',
+		TableNode $table
+	): void {
+		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+		$this->jsonRespondedShouldContain($spaceName, $grantedUser, $fileName, $table);
+	}
+
+	/**
+	 * @Then /^the user "([^"]*)" should have a space called "([^"]*)" granted to "([^"]*)" with role "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $grantedUser
 	 * @param string $role
 	 *
 	 * @return void
 	 * @throws Exception|GuzzleException
 	 */
 	public function checkPermissionsInResponse(
+		string $user,
 		string $spaceName,
-		string $userName,
+		string $grantedUser,
 		string $role
 	): void {
+		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
 		Assert::assertIsArray($spaceAsArray = $this->getSpaceByNameFromResponse($spaceName), "No space with name $spaceName found");
 		$permissions = $spaceAsArray["root"]["permissions"];
-		$userId = $this->getUserIdByUserName($userName);
+		$userId = $this->getUserIdByUserName($grantedUser);
 
 		$userRole = "";
 		foreach ($permissions as $permission) {
@@ -1060,7 +1031,7 @@ class SpacesContext implements Context {
 				}
 			}
 		}
-		Assert::assertEquals($userRole, $role, "the user $userName with the role $role could not be found");
+		Assert::assertEquals($userRole, $role, "the user $grantedUser with the role $role could not be found");
 	}
 
 	/**
@@ -1075,6 +1046,27 @@ class SpacesContext implements Context {
 		string $spaceName
 	): void {
 		Assert::assertEmpty($this->getSpaceByNameFromResponse($spaceName), "space $spaceName should not be available for a user");
+	}
+
+	/**
+	 * @Then /^the user "([^"]*)" should not have a space called "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function usershouldNotHaveSpace(
+		string $user,
+		string $spaceName
+	): void {
+		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+		$this->jsonRespondedShouldNotContain($spaceName);
 	}
 
 	/**
@@ -2326,7 +2318,7 @@ class SpacesContext implements Context {
 			);
 		}
 		$url = $this->baseUrl . $fileVersion[$index][0];
-		
+
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$url,

@@ -136,15 +136,6 @@ func NewService(opts ...Option) Service {
 		svc.identityBackend = options.IdentityBackend
 	}
 
-	if options.HTTPClient == nil {
-		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{
-			InsecureSkipVerify: options.Config.Spaces.Insecure, //nolint:gosec
-		}
-		svc.httpClient = &http.Client{}
-	} else {
-		svc.httpClient = options.HTTPClient
-	}
-
 	if options.RoleService == nil {
 		svc.roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
 	} else {

@@ -43,6 +43,7 @@ func DefaultConfig() *config.Config {
 				CredentialsByUserAgent: map[string]string{},
 			},
 		},
+		MachineAuthAPIKey: "",
 		Status: config.Status{
 			Version:        version.Legacy,
 			VersionString:  version.LegacyString,
@@ -92,6 +93,10 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
+	}
+
+	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
 }
 

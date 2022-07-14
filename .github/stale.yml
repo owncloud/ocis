@@ -7,6 +7,7 @@ daysUntilClose: 10
 exemptLabels:
   - "Type:Bug"
   - "Type:Technical-Debt"
+  - "Category:Enhancement"
   - "Category:Research"
   - "QA:team"
 # Label to use when marking an issue as stale

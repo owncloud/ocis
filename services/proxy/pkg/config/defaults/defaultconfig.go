@@ -97,13 +97,18 @@ func DefaultPolicies() []config.Policy {
 					Endpoint: "/remote.php/?preview=1",
 					Backend:  "http://localhost:9115",
 				},
+				// TODO the actual REPORT goes to /dav/files/{username}, which is user specific ... how would this work in a spaces world?
+				// TODO what paths are returned? the href contains the full path so it should be possible to return urls from other spaces?
+				// TODO or we allow a REPORT on /dav/spaces to search all spaces and /dav/space/{spaceid} to search a specific space
+				// send webdav REPORT requests to search service
 				{
-					// TODO the actual REPORT goes to /dav/files/{username}, which is user specific ... how would this work in a spaces world?
-					// TODO what paths are returned? the href contains the full path so it should be possible to return urls from other spaces?
-					// TODO or we allow a REPORT on /dav/spaces to search all spaces and /dav/space/{spaceid} to search a specific space
-					// send webdav REPORT requests to search service
 					Method:   "REPORT",
 					Endpoint: "/remote.php/dav/",
+					Backend:  "http://localhost:9115", // TODO use registry?
+				},
+				{
+					Method:   "REPORT",
+					Endpoint: "/remote.php/webdav",
 					Backend:  "http://localhost:9115", // TODO use registry?
 				},
 				{

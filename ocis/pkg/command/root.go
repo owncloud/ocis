@@ -25,10 +25,5 @@ func Execute() error {
 		)
 	}
 
-	cli.HelpFlag = &cli.BoolFlag{
-		Name:  "help,h",
-		Usage: "Show the help",
-	}
-
 	return app.Run(os.Args)
 }

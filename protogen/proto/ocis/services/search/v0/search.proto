@@ -76,6 +76,7 @@ message SearchResponse {
   // Token to retrieve the next page of results, or empty if there are no
   // more results in the list
   string next_page_token = 2;
+  int32 total_matches = 3;
 }
 
 message SearchIndexRequest {
@@ -91,11 +92,12 @@ message SearchIndexRequest {
 }
 
 message SearchIndexResponse {
-    repeated ocis.messages.search.v0.Match matches = 1;
+  repeated ocis.messages.search.v0.Match matches = 1;
 
-    // Token to retrieve the next page of results, or empty if there are no
-    // more results in the list
-    string next_page_token = 2;
+  // Token to retrieve the next page of results, or empty if there are no
+  // more results in the list
+  string next_page_token = 2;
+  int32 total_matches = 3;
 }
 
 message IndexSpaceRequest {
