@@ -43,7 +43,7 @@ func DefaultConfig() *config.Config {
 				GroupBaseDN:      "ou=groups,o=libregraph-idm",
 				UserScope:        "sub",
 				GroupScope:       "sub",
-				LoginAttributes:  []string{"uid", "mail"},
+				LoginAttributes:  []string{"uid"},
 				UserFilter:       "",
 				GroupFilter:      "",
 				UserObjectClass:  "inetOrgPerson",
