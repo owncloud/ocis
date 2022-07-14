@@ -14,11 +14,10 @@ type cacheinfo struct {
 
 // Implements a thread-safe local cache with a LRU replacement mechanism.
 // The local cache has a maximum capacity (configurable) which will be guaranteed.
-// The implementation is focused on performance and guarantees constant time
-// in all the operations. In order to do so, it's important to know that the
-// replacement mechanism **WON'T** take into account expired items. This means that
-// a valid element might be removed from the cache even having expired elements
-// in the cache.
+// The implementation is focused on performance. In order to do so, it's important
+// to know that the replacement mechanism **WON'T** take into account expired items.
+// This means that a valid element might be removed from the cache even having
+// expired elements in the cache.
 //
 // To clarify, this cache guarantees that **AT MOST** an element will be accessible
 // during its ttl, but not later. However, it doesn't guarantee that such element
@@ -28,9 +27,12 @@ type cacheinfo struct {
 // added at the end of the list, so they'll be the last ones to be removed. All
 // operations affect this linked list one way or another, usually moving the target
 // element to the last position.
-// Note that there is also a map which is used to guarantee a constant time for
-// access operations.
+// Note that there is also a map which is used to guarantee fast access to the items.
 // All of this is handled transparently.
+//
+// Note that there are additional operations not covered by the interface. Those
+// operations are NOT intended to be used. Those additional operations don't
+// guarantee thread-safety and they should be used only for testing.
 //
 // * Ensures the max capacity is respected, preventing using too much memory
 // * Ensures constant time in all operations of the interface regardless of
@@ -187,10 +189,12 @@ func (c *LocalCache) MaxCap() int {
 	return c.maxCap
 }
 
+// Get the length of the underlying map
 func (c *LocalCache) MapLen() int {
 	return len(c.data)
 }
 
+// Get the length of the underlying list
 func (c *LocalCache) ListLen() int {
 	return c.keyList.Len()
 }

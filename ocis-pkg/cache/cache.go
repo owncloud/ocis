@@ -4,7 +4,7 @@ package cache
 //
 // This interface just focus on access methods, with the additional `Initialize`
 // one. The only expectation here is that the `Initialize` method is called
-// before any other one, just after the cache instance is create
+// before any other one, just after the cache instance is created
 //
 // ```
 // func NewCustomInstance() *Cache {
@@ -26,12 +26,17 @@ package cache
 // * Connectivity with external services
 type Cache interface {
 	// Initialize the cache. The parameters will be used to setup the cache
-	// with the corresponding values. The setup can include capacity, default ttl,
+	// with the corresponding values. The setup might include capacity, default ttl,
 	// eviction policy, connectivity parameters with external services, etc.
 	// If the cache requires a prefix because it could be shared among multiple
 	// services, it should be configured here.
 	//
-	// The specific parameters will depend in the implementation. Additional
+	// This interface doesn't force any mandatory parameters. Some implementations
+	// might allow a configurable capacity while others not. Each implementation
+	// should document its own parameters, whether they're mandatory or not,
+	// default values, expected errors, etc.
+	//
+	// The specific parameters will depend on the implementation. Additional
 	// parameters might be sent, but the implementation should ignore them and
 	// not throw an error.
 	//
@@ -41,10 +46,11 @@ type Cache interface {
 	// Store the value in the key. A ttl of 0 should be used to indicate
 	// that the key shouldn't expire.
 	// Unless the cache uses a different policy (it should be explicitly
-	// documented), the new value will overwrite the previous one
+	// documented), a new value for a specific key will overwrite the
+	// previous one
 	//
 	// The cache shouldn't need to guarantee that the key is removed when
-	// the ttl is reached, but it MUST guarantee that the value won't be
+	// the ttl is reached, but it MUST guarantee that such key won't be
 	// retrieved.
 	// There are 2 main approaches to take if the key has reached its ttl:
 	// * The key will stay in the cache and it will be removed when it's
@@ -52,6 +58,9 @@ type Cache interface {
 	// a expired key, and the key will be removed at that point.
 	// * A service will be started to monitor the ttl of the keys. This
 	// service must be handled completely internally to the cache implementation
+	//
+	// int64 is used for convenience because the time package uses those
+	// type of ints, but we don't expect such high values to be used.
 	//
 	// Return an error if the value couldn't be saved.
 	Store(key string, value string, ttl int64) error
@@ -67,6 +76,11 @@ type Cache interface {
 	// Return the value stored or an empty string as the first return value,
 	// whether the value exists or not in the cache as the second return value,
 	// and any possible error as third return value.
+	//
+	// Expired values MUST NOT be returned. It isn't mandatory to immediately
+	// remove the expired value, and the implementation might take whatever
+	// approach fits best for it. Keeping the expired value is an option as long
+	// as it isn't returned.
 	Retrieve(key string) (string, bool, error)
 
 	// Explicitly remove the key from the cache. If the key doesn't exists, the
