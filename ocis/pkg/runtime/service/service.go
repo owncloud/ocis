@@ -36,6 +36,7 @@ import (
 	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/command"
 	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/command"
 	ocs "github.com/owncloud/ocis/v2/services/ocs/pkg/command"
+	postprocessing "github.com/owncloud/ocis/v2/services/postprocessing/pkg/command"
 	proxy "github.com/owncloud/ocis/v2/services/proxy/pkg/command"
 	search "github.com/owncloud/ocis/v2/services/search/pkg/command"
 	settings "github.com/owncloud/ocis/v2/services/settings/pkg/command"
@@ -129,6 +130,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.AppProvider.Service.Name] = appProvider.NewSutureService
 	s.ServicesRegistry[opts.Config.Notifications.Service.Name] = notifications.NewSutureService
 	s.ServicesRegistry[opts.Config.Search.Service.Name] = search.NewSutureService
+	s.ServicesRegistry[opts.Config.Postprocessing.Service.Name] = postprocessing.NewSutureService
 
 	// populate delayed services
 	s.Delayed[opts.Config.Sharing.Service.Name] = sharing.NewSutureService

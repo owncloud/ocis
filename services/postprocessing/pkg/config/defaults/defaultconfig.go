@@ -11,23 +11,18 @@ func FullDefaultConfig() *config.Config {
 	return cfg
 }
 
-// NOTE: Most of this configuration is not needed to keep it as simple as possible
-// TODO: Clean up unneeded configuration
-
 func DefaultConfig() *config.Config {
 	return &config.Config{
-		Debug: config.Debug{
-			Addr: "127.0.0.1:9174",
-		},
 		Service: config.Service{
 			Name: "postprocessing",
 		},
 		Postprocessing: config.Postprocessing{
 			Events: config.Events{
-				Endpoint:      "127.0.0.1:9233",
-				Cluster:       "ocis-cluster",
-				ConsumerGroup: "postprocessing",
+				Endpoint: "127.0.0.1:9233",
+				Cluster:  "ocis-cluster",
 			},
+			// Virusscan: true,
+			// FTSIndex: true,
 		},
 	}
 }

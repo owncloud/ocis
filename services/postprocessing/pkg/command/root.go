@@ -43,17 +43,14 @@ type SutureService struct {
 
 // NewSutureService creates a new postprocessing.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	cfg.Notifications.Commons = cfg.Commons
+	cfg.Postprocessing.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.Postprocessing,
 	}
 }
 
+// Serve to implement Server interface
 func (s SutureService) Serve(ctx context.Context) error {
 	s.cfg.Context = ctx
-	if err := Execute(s.cfg); err != nil {
-		return err
-	}
-
-	return nil
+	return Execute(s.cfg)
 }

@@ -19,6 +19,7 @@ type PostprocessingService struct {
 func NewPostprocessingService(stream events.Stream, logger log.Logger, c config.Postprocessing) (*PostprocessingService, error) {
 	evs, err := events.Consume(stream, "postprocessing",
 		events.BytesReceived{},
+		events.StartPostprocessingStep{},
 		events.VirusscanFinished{},
 		events.UploadReady{},
 	)
@@ -47,6 +48,12 @@ func (pps *PostprocessingService) Run() error {
 		case events.VirusscanFinished:
 			pp := current[ev.UploadID]
 			next = pp.Virusscan(ev)
+		case events.StartPostprocessingStep:
+			if ev.StepToStart != events.PPStepDelay {
+				continue
+			}
+			pp := current[ev.UploadID]
+			next = pp.Delay(ev)
 		case events.UploadReady:
 			// the storage provider thinks the upload is done - so no need to keep it any more
 			delete(current, ev.UploadID)

@@ -18,6 +18,7 @@ import (
 	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/config/defaults"
 	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/config/defaults"
 	ocs "github.com/owncloud/ocis/v2/services/ocs/pkg/config/defaults"
+	postprocessing "github.com/owncloud/ocis/v2/services/postprocessing/pkg/config/defaults"
 	proxy "github.com/owncloud/ocis/v2/services/proxy/pkg/config/defaults"
 	search "github.com/owncloud/ocis/v2/services/search/pkg/config/defaults"
 	settings "github.com/owncloud/ocis/v2/services/settings/pkg/config/defaults"
@@ -57,6 +58,7 @@ func DefaultConfig() *Config {
 		Notifications:     notifications.DefaultConfig(),
 		OCDav:             ocdav.DefaultConfig(),
 		OCS:               ocs.DefaultConfig(),
+		Postprocessing:    postprocessing.DefaultConfig(),
 		Proxy:             proxy.DefaultConfig(),
 		Search:            search.FullDefaultConfig(),
 		Settings:          settings.DefaultConfig(),

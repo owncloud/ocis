@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
@@ -12,8 +13,7 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	Log   *Log  `yaml:"log"`
-	Debug Debug `yaml:"debug"`
+	Log *Log `yaml:"log"`
 
 	Postprocessing Postprocessing `yaml:"postprocessing"`
 
@@ -22,27 +22,14 @@ type Config struct {
 
 // Postprocessing definces the config options for the postprocessing service.
 type Postprocessing struct {
-	Events Events `yaml:"events"`
-
-	Steps []string
-	// TODO: optional steps?
-
-	// TODO: still needed?
-	// RevaGateway       string `yaml:"reva_gateway" env:"REVA_GATEWAY;NOTIFICATIONS_REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata"`
-	// MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;NOTIFICATIONS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services."`
-}
-
-// SMTP combines the smtp configuration options.
-type SMTP struct {
-	Host     string `yaml:"smtp_host" env:"NOTIFICATIONS_SMTP_HOST" desc:"SMTP host, to connect to."`
-	Port     string `yaml:"smtp_port" env:"NOTIFICATIONS_SMTP_PORT" desc:"Port of the SMTP host, to connect to."`
-	Sender   string `yaml:"smtp_sender" env:"NOTIFICATIONS_SMTP_SENDER" desc:"Sender of emails, that will be sent."`
-	Password string `yaml:"smtp_password" env:"NOTIFICATIONS_SMTP_PASSWORD" desc:"Password of the SMTP host, to connect to."`
+	Events          Events        `yaml:"events"`
+	Virusscan       bool          `yaml:"virusscan" env:"POSTPROCESSING_VIRUSSCAN" desc:"should the system do a virusscan? Needs antivirus service"`
+	FTSIndex        bool          `yaml:"fulltextsearch" env:"POSTPROCESSING_FTS" desc:"should the system index files for fts? Needs search service"`
+	Delayprocessing time.Duration `yaml:"delayprocessing" env:"POSTPROCESSING_DELAY" desc:"the sytem sleeps for this time while postprocessing"`
 }
 
 // Events combines the configuration options for the event bus.
 type Events struct {
-	Endpoint      string `yaml:"endpoint" env:"NOTIFICATIONS_EVENTS_ENDPOINT" desc:"Endpoint of the event system."`
-	Cluster       string `yaml:"cluster" env:"NOTIFICATIONS_EVENTS_CLUSTER" desc:"Cluster ID of the event system."`
-	ConsumerGroup string `yaml:"group" env:"NOTIFICATIONS_EVENTS_GROUP" desc:"Name of the event group / queue on the event system."`
+	Endpoint string `yaml:"endpoint" env:"POSTPROCESSING_EVENTS_ENDPOINT" desc:"Endpoint of the event system."`
+	Cluster  string `yaml:"cluster" env:"POSTPROCESSING_EVENTS_CLUSTER" desc:"Cluster ID of the event system."`
 }

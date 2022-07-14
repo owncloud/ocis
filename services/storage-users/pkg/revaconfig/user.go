@@ -95,10 +95,16 @@ func UserDrivers(cfg *config.Config) map[string]interface{} {
 			"treetime_accounting":         true,
 			"treesize_accounting":         true,
 			"permissionssvc":              cfg.Drivers.OCIS.PermissionsEndpoint,
-			"asyncfileuploads":            true,
+			// "asyncfileuploads":            true,
 			"events": map[string]interface{}{
 				"natsaddress":   cfg.Events.Addr,
 				"natsclusterid": cfg.Events.ClusterID,
+			},
+			"tokens": map[string]interface{}{
+				"transfer_shared_secret": cfg.Commons.TransferSecret,
+				"transfer_expires":       cfg.TransferExpires,
+				"download_endpoint":      cfg.DataServerURL,
+				"datagateway_endpoint":   cfg.DataGatewayURL,
 			},
 		},
 		"s3": map[string]interface{}{
