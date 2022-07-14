@@ -125,8 +125,10 @@ var _ = Describe("Searchprovider", func() {
 					StorageSpaces: []*sprovider.StorageSpace{personalSpace},
 				}, nil)
 				indexClient.On("Search", mock.Anything, mock.Anything).Return(&searchsvc.SearchIndexResponse{
+					TotalMatches: 1,
 					Matches: []*searchmsg.Match{
 						{
+							Score: 1,
 							Entity: &searchmsg.Entity{
 								Ref: &searchmsg.Reference{
 									ResourceId: &searchmsg.ResourceID{
@@ -196,6 +198,7 @@ var _ = Describe("Searchprovider", func() {
 				})
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res).ToNot(BeNil())
+				Expect(res.TotalMatches).To(Equal(int32(1)))
 				Expect(len(res.Matches)).To(Equal(1))
 				match := res.Matches[0]
 				Expect(match.Entity.Id.OpaqueId).To(Equal("foo-id"))
@@ -248,6 +251,7 @@ var _ = Describe("Searchprovider", func() {
 					StorageSpaces: []*sprovider.StorageSpace{grantSpace, mountpointSpace},
 				}, nil)
 				indexClient.On("Search", mock.Anything, mock.Anything).Return(&searchsvc.SearchIndexResponse{
+					TotalMatches: 1,
 					Matches: []*searchmsg.Match{
 						{
 							Entity: &searchmsg.Entity{
@@ -285,64 +289,101 @@ var _ = Describe("Searchprovider", func() {
 				}))
 			})
 
-			It("finds matches in both the personal space AND the grant", func() {
-				gwClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
-					Status:        status.NewOK(ctx),
-					StorageSpaces: []*sprovider.StorageSpace{personalSpace, grantSpace, mountpointSpace},
-				}, nil)
-				indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
-					return req.Ref.ResourceId.StorageId == grantSpace.Root.StorageId
-				})).Return(&searchsvc.SearchIndexResponse{
-					Matches: []*searchmsg.Match{
-						{
-							Entity: &searchmsg.Entity{
-								Ref: &searchmsg.Reference{
-									ResourceId: &searchmsg.ResourceID{
+			Context("when searching both spaces", func() {
+				BeforeEach(func() {
+					gwClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
+						Status:        status.NewOK(ctx),
+						StorageSpaces: []*sprovider.StorageSpace{personalSpace, grantSpace, mountpointSpace},
+					}, nil)
+					indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+						return req.Ref.ResourceId.StorageId == grantSpace.Root.StorageId
+					})).Return(&searchsvc.SearchIndexResponse{
+						TotalMatches: 2,
+						Matches: []*searchmsg.Match{
+							{
+								Score: 2,
+								Entity: &searchmsg.Entity{
+									Ref: &searchmsg.Reference{
+										ResourceId: &searchmsg.ResourceID{
+											StorageId: grantSpace.Root.StorageId,
+											OpaqueId:  grantSpace.Root.OpaqueId,
+										},
+										Path: "./grant/path/to/Shared.pdf",
+									},
+									Id: &searchmsg.ResourceID{
 										StorageId: grantSpace.Root.StorageId,
-										OpaqueId:  grantSpace.Root.OpaqueId,
+										OpaqueId:  "grant-shared-id",
 									},
-									Path: "./grant/path/to/Shared.pdf",
+									Name: "Shared.pdf",
 								},
-								Id: &searchmsg.ResourceID{
-									StorageId: grantSpace.Root.StorageId,
-									OpaqueId:  "grant-shared-id",
+							},
+							{
+								Score: 0.01,
+								Entity: &searchmsg.Entity{
+									Ref: &searchmsg.Reference{
+										ResourceId: &searchmsg.ResourceID{
+											StorageId: grantSpace.Root.StorageId,
+											OpaqueId:  grantSpace.Root.OpaqueId,
+										},
+										Path: "./grant/path/to/Irrelevant.pdf",
+									},
+									Id: &searchmsg.ResourceID{
+										StorageId: grantSpace.Root.StorageId,
+										OpaqueId:  "grant-irrelevant-id",
+									},
+									Name: "Irrelevant.pdf",
 								},
-								Name: "Shared.pdf",
 							},
 						},
-					},
-				}, nil)
-				indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
-					return req.Ref.ResourceId.StorageId == personalSpace.Root.StorageId
-				})).Return(&searchsvc.SearchIndexResponse{
-					Matches: []*searchmsg.Match{
-						{
-							Entity: &searchmsg.Entity{
-								Ref: &searchmsg.Reference{
-									ResourceId: &searchmsg.ResourceID{
+					}, nil)
+					indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+						return req.Ref.ResourceId.StorageId == personalSpace.Root.StorageId
+					})).Return(&searchsvc.SearchIndexResponse{
+						TotalMatches: 1,
+						Matches: []*searchmsg.Match{
+							{
+								Score: 1,
+								Entity: &searchmsg.Entity{
+									Ref: &searchmsg.Reference{
+										ResourceId: &searchmsg.ResourceID{
+											StorageId: personalSpace.Root.StorageId,
+											OpaqueId:  personalSpace.Root.OpaqueId,
+										},
+										Path: "./path/to/Foo.pdf",
+									},
+									Id: &searchmsg.ResourceID{
 										StorageId: personalSpace.Root.StorageId,
-										OpaqueId:  personalSpace.Root.OpaqueId,
+										OpaqueId:  "foo-id",
 									},
-									Path: "./path/to/Foo.pdf",
+									Name: "Foo.pdf",
 								},
-								Id: &searchmsg.ResourceID{
-									StorageId: personalSpace.Root.StorageId,
-									OpaqueId:  "foo-id",
-								},
-								Name: "Foo.pdf",
 							},
 						},
-					},
-				}, nil)
-
-				res, err := p.Search(ctx, &searchsvc.SearchRequest{
-					Query: "foo",
+					}, nil)
 				})
-				Expect(err).ToNot(HaveOccurred())
-				Expect(res).ToNot(BeNil())
-				Expect(len(res.Matches)).To(Equal(2))
-				ids := []string{res.Matches[0].Entity.Id.OpaqueId, res.Matches[1].Entity.Id.OpaqueId}
-				Expect(ids).To(ConsistOf("foo-id", "grant-shared-id"))
+
+				It("finds matches in both the personal space AND the grant", func() {
+					res, err := p.Search(ctx, &searchsvc.SearchRequest{
+						Query: "foo",
+					})
+					Expect(err).ToNot(HaveOccurred())
+					Expect(res).ToNot(BeNil())
+					Expect(len(res.Matches)).To(Equal(3))
+					ids := []string{res.Matches[0].Entity.Id.OpaqueId, res.Matches[1].Entity.Id.OpaqueId, res.Matches[2].Entity.Id.OpaqueId}
+					Expect(ids).To(ConsistOf("foo-id", "grant-shared-id", "grant-irrelevant-id"))
+				})
+
+				It("sorts and limits the combined results from all spaces", func() {
+					res, err := p.Search(ctx, &searchsvc.SearchRequest{
+						Query:    "foo",
+						PageSize: 2,
+					})
+					Expect(err).ToNot(HaveOccurred())
+					Expect(res).ToNot(BeNil())
+					Expect(len(res.Matches)).To(Equal(2))
+					ids := []string{res.Matches[0].Entity.Id.OpaqueId, res.Matches[1].Entity.Id.OpaqueId}
+					Expect(ids).To(Equal([]string{"grant-shared-id", "foo-id"}))
+				})
 			})
 		})
 	})

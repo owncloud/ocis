@@ -27,12 +27,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blevesearch/bleve/v2"
+	bleve "github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/custom"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/keyword"
 	"github.com/blevesearch/bleve/v2/analysis/token/lowercase"
 	"github.com/blevesearch/bleve/v2/analysis/tokenizer/single"
 	"github.com/blevesearch/bleve/v2/mapping"
+	"github.com/blevesearch/bleve/v2/search"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -218,7 +220,11 @@ func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (
 	query := bleve.NewConjunctionQuery(
 		bleve.NewQueryStringQuery(req.Query),
 		deletedQuery, // Skip documents that have been marked as deleted
-		bleve.NewQueryStringQuery("RootID:"+req.Ref.ResourceId.StorageId+"!"+req.Ref.ResourceId.OpaqueId),        // Limit search to the space
+		bleve.NewQueryStringQuery("RootID:"+idToBleveId(&sprovider.ResourceId{
+			StorageId: req.Ref.GetResourceId().GetStorageId(),
+			SpaceId:   req.Ref.GetResourceId().GetSpaceId(),
+			OpaqueId:  req.Ref.GetResourceId().GetOpaqueId(),
+		})), // Limit search to the space
 		bleve.NewQueryStringQuery("Path:"+queryEscape(utils.MakeRelativePath(path.Join(req.Ref.Path, "/"))+"*")), // Limit search to this directory in the space
 	)
 	bleveReq := bleve.NewSearchRequest(query)
@@ -234,7 +240,7 @@ func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (
 
 	matches := []*searchmsg.Match{}
 	for _, h := range res.Hits {
-		match, err := fromFields(h.Fields)
+		match, err := fromDocumentMatch(h)
 		if err != nil {
 			return nil, err
 		}
@@ -242,7 +248,8 @@ func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (
 	}
 
 	return &searchsvc.SearchIndexResponse{
-		Matches: matches,
+		Matches:      matches,
+		TotalMatches: int32(res.Total),
 	}, nil
 }
 
@@ -306,32 +313,33 @@ func fieldsToEntity(fields map[string]interface{}) *indexDocument {
 	return doc
 }
 
-func fromFields(fields map[string]interface{}) (*searchmsg.Match, error) {
-	rootIDParts := strings.SplitN(fields["RootID"].(string), "!", 2)
-	IDParts := strings.SplitN(fields["ID"].(string), "!", 2)
+func fromDocumentMatch(hit *search.DocumentMatch) (*searchmsg.Match, error) {
+	rootID, err := storagespace.ParseID(hit.Fields["RootID"].(string))
+	if err != nil {
+		return nil, err
+	}
+	rID, err := storagespace.ParseID(hit.Fields["ID"].(string))
+	if err != nil {
+		return nil, err
+	}
 
 	match := &searchmsg.Match{
+		Score: float32(hit.Score),
 		Entity: &searchmsg.Entity{
 			Ref: &searchmsg.Reference{
-				ResourceId: &searchmsg.ResourceID{
-					StorageId: rootIDParts[0],
-					OpaqueId:  rootIDParts[1],
-				},
-				Path: fields["Path"].(string),
+				ResourceId: resourceIDtoSearchID(rootID),
+				Path:       hit.Fields["Path"].(string),
 			},
-			Id: &searchmsg.ResourceID{
-				StorageId: IDParts[0],
-				OpaqueId:  IDParts[1],
-			},
-			Name:     fields["Name"].(string),
-			Size:     uint64(fields["Size"].(float64)),
-			Type:     uint64(fields["Type"].(float64)),
-			MimeType: fields["MimeType"].(string),
-			Deleted:  fields["Deleted"].(bool),
+			Id:       resourceIDtoSearchID(rID),
+			Name:     hit.Fields["Name"].(string),
+			Size:     uint64(hit.Fields["Size"].(float64)),
+			Type:     uint64(hit.Fields["Type"].(float64)),
+			MimeType: hit.Fields["MimeType"].(string),
+			Deleted:  hit.Fields["Deleted"].(bool),
 		},
 	}
 
-	if mtime, err := time.Parse(time.RFC3339, fields["Mtime"].(string)); err == nil {
+	if mtime, err := time.Parse(time.RFC3339, hit.Fields["Mtime"].(string)); err == nil {
 		match.Entity.LastModifiedTime = &timestamppb.Timestamp{Seconds: mtime.Unix(), Nanos: int32(mtime.Nanosecond())}
 	}
 
@@ -342,7 +350,14 @@ func idToBleveId(id *sprovider.ResourceId) string {
 	if id == nil {
 		return ""
 	}
-	return id.StorageId + "!" + id.OpaqueId
+	return storagespace.FormatResourceID(*id)
+}
+
+func resourceIDtoSearchID(id sprovider.ResourceId) *searchmsg.ResourceID {
+	return &searchmsg.ResourceID{
+		StorageId: id.GetStorageId(),
+		SpaceId:   id.GetSpaceId(),
+		OpaqueId:  id.GetOpaqueId()}
 }
 
 func queryEscape(s string) string {

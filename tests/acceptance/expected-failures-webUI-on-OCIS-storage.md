@@ -29,33 +29,13 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIFavorites/unfavoriteFile.feature:70](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/unfavoriteFile.feature#L70)
 - [webUIFavorites/unfavoriteFile.feature:87](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/unfavoriteFile.feature#L87)
 - [webUIFavorites/unfavoriteFile.feature:102](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFavorites/unfavoriteFile.feature#L102)
-- [webUIResharing1/reshareUsers.feature:219](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing1/reshareUsers.feature#L219)
+- [webUIResharing1/reshareUsers.feature:194](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing1/reshareUsers.feature#L194)
 
 ### [file_path property is not unique for a share created with same resource name i.e already present in sharee](https://github.com/owncloud/ocis/issues/2249)
 - [webUIRenameFiles/renameFiles.feature:209](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L209)
 
 ### [when sharer renames the shared resource, sharee get the updated name](https://github.com/owncloud/ocis/issues/2256)
 - [webUIRenameFiles/renameFiles.feature:234](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L234)
-
-### [Viewer cannot share a shared resource](https://github.com/owncloud/ocis/issues/2260)
-- [webUISharingInternalUsers/shareWithUsers.feature:52](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L52)
-- [webUISharingInternalUsers/shareWithUsers.feature:53](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L53)
-- [webUISharingInternalUsers/shareWithUsers.feature:54](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L54)
-- [webUISharingInternalUsers/shareWithUsers.feature:275](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L275)
-- [webUISharingInternalUsers/shareWithUsers.feature:276](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L276)
-- [webUISharingInternalUsers/shareWithUsers.feature:277](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L277)
-- [webUISharingInternalUsersShareWithPage/shareWithUsers.feature:140](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersShareWithPage/shareWithUsers.feature#L140)
-- [webUISharingPermissionsUsers/sharePermissionsUsers.feature:214](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPermissionsUsers/sharePermissionsUsers.feature#L223)
-- [webUIResharing2/reshareUsers.feature:41](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L41)
-- [webUIResharing2/reshareUsers.feature:69](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L69)
-- [webUIResharing2/reshareUsers.feature:70](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L70)
-- [webUIResharing2/reshareUsers.feature:95](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L95)
-- [webUIResharing2/reshareUsers.feature:96](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L96)
-- [webUIResharing2/reshareUsers.feature:130](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L130)
-- [webUIResharing2/reshareUsers.feature:131](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L131)
-- [webUIResharing1/reshareUsers.feature:18](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing1/reshareUsers.feature#L18)
-- [webUIResharing1/reshareUsers.feature:46](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing1/reshareUsers.feature#L46)
-- [webUIResharing1/reshareUsers.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing1/reshareUsers.feature#L74)
 
 ### [No share indicators inside share jail](https://github.com/owncloud/web/issues/6894)
 - [webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:100](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersSharingIndicator/shareWithUsers.feature#L100)
@@ -120,7 +100,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:52](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L52)
 - [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:70](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L70)
 - [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:82](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L82)
-- [webUISharingInternalGroups/shareWithGroups.feature:200](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L200)
+- [webUISharingInternalGroups/shareWithGroups.feature:202](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L202)
 
 ### webUI-Private-Links
 - [webUIPrivateLinks/accessingPrivateLinks.feature:9](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L9)
@@ -153,33 +133,18 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIMoveFilesFolders/moveFiles.feature:97](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIMoveFilesFolders/moveFiles.feature#L97)
 - [webUIMoveFilesFolders/moveFolders.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIMoveFilesFolders/moveFolders.feature#L72)
 - [webUIFilesActionMenu/versions.feature:93](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesActionMenu/versions.feature#L93)
-
-
-### [Share not created with default permissions](https://github.com/owncloud/ocis/issues/1277)
-- [webUISharingInternalGroups/shareWithGroups.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L74)
-- [webUISharingInternalGroups/shareWithGroups.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L72)
-- [webUISharingInternalGroups/shareWithGroups.feature:73](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L73)
-- [webUIResharing2/reshareUsers.feature:97](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L97)
-- [webUIResharing2/reshareUsers.feature:98](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L98)
-- [webUIResharing2/reshareUsers.feature:99](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L99)
-- [webUIResharing2/reshareUsers.feature:132](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L132)
-- [webUIResharing2/reshareUsers.feature:133](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L133)
-- [webUIResharing2/reshareUsers.feature:134](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L134)
-- [webUIResharing2/reshareUsers.feature:29](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L29)
-- [webUIResharing2/reshareUsers.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L71)
-- [webUIResharing2/reshareUsers.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L72)
-- [webUIResharing2/reshareUsers.feature:73](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIResharing2/reshareUsers.feature#L73)
+- [webUISharingInternalUsersShareWithPage/shareWithUsers.feature:140](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersShareWithPage/shareWithUsers.feature#L140)
 
 ### [No occ command in ocis](https://github.com/owncloud/ocis/issues/1317)
 ### [Expiration date set is not implemented in user share](https://github.com/owncloud/ocis/issues/1250)
-- [webUISharingInternalGroups/shareWithGroups.feature:277](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L277)
+- [webUISharingInternalGroups/shareWithGroups.feature:279](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L279)
 
 ### [Different path for shares inside folder](https://github.com/owncloud/ocis/issues/1231)
 
 ### [Implement expiration date for shares](https://github.com/owncloud/ocis/issues/1250)
-- [webUISharingInternalGroups/shareWithGroups.feature:255](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L255)
-- [webUISharingInternalGroups/shareWithGroups.feature:307](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L307)
-- [webUISharingInternalGroups/shareWithGroups.feature:308](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L308)
+- [webUISharingInternalGroups/shareWithGroups.feature:257](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L257)
+- [webUISharingInternalGroups/shareWithGroups.feature:309](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L309)
+- [webUISharingInternalGroups/shareWithGroups.feature:310](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L310)
 - [webUISharingExpirationDate/shareWithExpirationDate.feature:21](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingExpirationDate/shareWithExpirationDate.feature#L21)
 
 ### [Notifications endpoint](https://github.com/owncloud/ocis/issues/14)
@@ -357,17 +322,14 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUISharingAcceptShares/acceptShares.feature:201](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L201)
 
 ### [not possible to overwrite a received shared file](https://github.com/owncloud/ocis/issues/2267)
-- [webUISharingInternalGroups/shareWithGroups.feature:77](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L77)
-- [webUISharingInternalUsers/shareWithUsers.feature:57](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L57)
+- [webUISharingInternalGroups/shareWithGroups.feature:79](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L79)
+- [webUISharingInternalUsers/shareWithUsers.feature:59](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L59)
 
 ### [web config update is not properly reflected after the ocis start](https://github.com/owncloud/ocis/issues/2944)
 - [webUIFiles/breadcrumb.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/breadcrumb.feature#L50)
 
 ### [empty subfolder inside a folder to be uploaded is not created on the server](https://github.com/owncloud/web/issues/6348)
 - [webUIUpload/upload.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/upload.feature#L42)
-
-### [Creating group with problematic group name via graph api gives 500 error](https://github.com/owncloud/ocis/issues/3631)
-- [webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature:41](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsEdgeCases/shareWithGroupsEdgeCases.feature#L41)
 
 ### [Favorites deactivated in ocis temporarily](https://github.com/owncloud/ocis/issues/1228)
 - [webUIFilesDetails/fileDetails.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L42)

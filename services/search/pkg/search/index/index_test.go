@@ -21,7 +21,8 @@ var _ = Describe("Index", func() {
 		ctx        context.Context
 
 		rootId = &sprovider.ResourceId{
-			StorageId: "storageid",
+			StorageId: "provider-1",
+			SpaceId:   "spaceid",
 			OpaqueId:  "rootopaqueid",
 		}
 		filename  string
@@ -33,7 +34,8 @@ var _ = Describe("Index", func() {
 		}
 		parentRi = &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
-				StorageId: "storageid",
+				StorageId: "provider-1",
+				SpaceId:   "spaceid",
 				OpaqueId:  "parentopaqueid",
 			},
 			Path:  "sub d!r",
@@ -47,11 +49,13 @@ var _ = Describe("Index", func() {
 		}
 		childRi = &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
-				StorageId: "storageid",
+				StorageId: "provider-1",
+				SpaceId:   "spaceid",
 				OpaqueId:  "childopaqueid",
 			},
 			ParentId: &sprovider.ResourceId{
-				StorageId: "storageid",
+				StorageId: "provider-1",
+				SpaceId:   "spaceid",
 				OpaqueId:  "parentopaqueid",
 			},
 			Path:  "child.pdf",
@@ -65,7 +69,8 @@ var _ = Describe("Index", func() {
 				Query: query,
 				Ref: &searchmsg.Reference{
 					ResourceId: &searchmsg.ResourceID{
-						StorageId: rootId.StorageId,
+						StorageId: "provider-1",
+						SpaceId:   rootId.SpaceId,
 						OpaqueId:  rootId.OpaqueId,
 					},
 				},
@@ -96,11 +101,13 @@ var _ = Describe("Index", func() {
 		}
 		ri = &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
-				StorageId: "storageid",
+				StorageId: "provider-1",
+				SpaceId:   "spaceid",
 				OpaqueId:  "opaqueid",
 			},
 			ParentId: &sprovider.ResourceId{
-				StorageId: "storageid",
+				StorageId: "provider-1",
+				SpaceId:   "spaceid",
 				OpaqueId:  "someopaqueid",
 			},
 			Path:     filename,
@@ -172,7 +179,8 @@ var _ = Describe("Index", func() {
 
 				It("scopes the search to the specified space", func() {
 					resourceId := &sprovider.ResourceId{
-						StorageId: "differentstorageid",
+						StorageId: "provider-1",
+						SpaceId:   "differentspaceid",
 						OpaqueId:  "differentopaqueid",
 					}
 					assertDocCount(resourceId, `Name:foo.pdf`, 0)
@@ -182,6 +190,19 @@ var _ = Describe("Index", func() {
 					assertDocCount(ref.ResourceId, "Name:*"+ref.ResourceId.OpaqueId+"*", 0)
 				})
 
+				It("returns the total number of hits", func() {
+					res, err := i.Search(ctx, &searchsvc.SearchIndexRequest{
+						Query: "Name:foo.pdf",
+						Ref: &searchmsg.Reference{
+							ResourceId: &searchmsg.ResourceID{
+								StorageId: ref.ResourceId.StorageId,
+								OpaqueId:  ref.ResourceId.OpaqueId,
+							},
+						},
+					})
+					Expect(err).ToNot(HaveOccurred())
+					Expect(res.TotalMatches).To(Equal(int32(1)))
+				})
 				It("returns all desired fields", func() {
 					matches := assertDocCount(ref.ResourceId, "Name:foo.pdf", 1)
 					match := matches[0]
@@ -193,6 +214,7 @@ var _ = Describe("Index", func() {
 					Expect(match.Entity.Type).To(Equal(uint64(ri.Type)))
 					Expect(match.Entity.MimeType).To(Equal(ri.MimeType))
 					Expect(match.Entity.Deleted).To(BeFalse())
+					Expect(match.Score > 0).To(BeTrue())
 					Expect(uint64(match.Entity.LastModifiedTime.AsTime().Unix())).To(Equal(ri.Mtime.Seconds))
 				})
 
@@ -222,14 +244,16 @@ var _ = Describe("Index", func() {
 					BeforeEach(func() {
 						nestedRef = &sprovider.Reference{
 							ResourceId: &sprovider.ResourceId{
-								StorageId: "storageid",
+								StorageId: "provider-1",
+								SpaceId:   "spaceid",
 								OpaqueId:  "rootopaqueid",
 							},
 							Path: "./nested/nestedpdf.pdf",
 						}
 						nestedRI = &sprovider.ResourceInfo{
 							Id: &sprovider.ResourceId{
-								StorageId: "storageid",
+								StorageId: "provider-1",
+								SpaceId:   "spaceid",
 								OpaqueId:  "nestedopaqueid",
 							},
 							Path: "nestedpdf.pdf",
@@ -251,6 +275,7 @@ var _ = Describe("Index", func() {
 							Ref: &searchmsg.Reference{
 								ResourceId: &searchmsg.ResourceID{
 									StorageId: ref.ResourceId.StorageId,
+									SpaceId:   ref.ResourceId.SpaceId,
 									OpaqueId:  ref.ResourceId.OpaqueId,
 								},
 								Path: "./nested/",

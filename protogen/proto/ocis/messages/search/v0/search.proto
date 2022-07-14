@@ -9,6 +9,7 @@ option go_package = "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/sear
 message ResourceID {
 	string storage_id = 1;
 	string opaque_id = 2;
+	string space_id = 3;
 }
 
 message Reference {

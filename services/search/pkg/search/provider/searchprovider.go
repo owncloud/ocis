@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -42,6 +43,18 @@ type Provider struct {
 	gwClient          gateway.GatewayAPIClient
 	indexClient       search.IndexClient
 	machineAuthAPIKey string
+}
+
+type MatchArray []*searchmsg.Match
+
+func (s MatchArray) Len() int {
+	return len(s)
+}
+func (s MatchArray) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s MatchArray) Less(i, j int) bool {
+	return s[i].Score > s[j].Score
 }
 
 func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, machineAuthAPIKey string, eventsChan <-chan interface{}, logger log.Logger) *Provider {
@@ -92,12 +105,14 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 		opaqueMap := sdk.DecodeOpaqueMap(space.Opaque)
 		grantSpaceId := storagespace.FormatResourceID(provider.ResourceId{
 			StorageId: opaqueMap["grantStorageID"],
+			SpaceId:   opaqueMap["grantSpaceID"],
 			OpaqueId:  opaqueMap["grantOpaqueID"],
 		})
 		mountpointMap[grantSpaceId] = space.Id.OpaqueId
 	}
 
-	matches := []*searchmsg.Match{}
+	matches := MatchArray{}
+	total := int32(0)
 	for _, space := range listSpacesRes.StorageSpaces {
 		var mountpointRootId *searchmsg.ResourceID
 		mountpointPrefix := ""
@@ -122,25 +137,26 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 				continue
 			}
 			mountpointPrefix = utils.MakeRelativePath(gpRes.Path)
-			sid, oid, err := storagespace.SplitID(mountpointId)
+			sid, spid, oid, err := storagespace.SplitID(mountpointId)
 			if err != nil {
 				p.logger.Error().Err(err).Str("space", space.Id.OpaqueId).Str("mountpointId", mountpointId).Msg("invalid mountpoint space id")
 				continue
 			}
 			mountpointRootId = &searchmsg.ResourceID{
 				StorageId: sid,
+				SpaceId:   spid,
 				OpaqueId:  oid,
 			}
 			p.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootId).Msg("searching a grant")
 		}
 
-		_, rootStorageID := storagespace.SplitStorageID(space.Root.StorageId)
 		res, err := p.indexClient.Search(ctx, &searchsvc.SearchIndexRequest{
 			Query: formatQuery(req.Query),
 			Ref: &searchmsg.Reference{
 				ResourceId: &searchmsg.ResourceID{
 					StorageId: space.Root.StorageId,
-					OpaqueId:  rootStorageID,
+					SpaceId:   space.Root.SpaceId,
+					OpaqueId:  space.Root.OpaqueId,
 				},
 				Path: mountpointPrefix,
 			},
@@ -152,6 +168,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 		}
 		p.logger.Debug().Str("space", space.Id.OpaqueId).Int("hits", len(res.Matches)).Msg("space search done")
 
+		total += res.TotalMatches
 		for _, match := range res.Matches {
 			if mountpointPrefix != "" {
 				match.Entity.Ref.Path = utils.MakeRelativePath(strings.TrimPrefix(match.Entity.Ref.Path, mountpointPrefix))
@@ -163,8 +180,19 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 		}
 	}
 
+	// compile one sorted list of matches from all spaces and apply the limit if needed
+	sort.Sort(matches)
+	limit := req.PageSize
+	if limit == 0 {
+		limit = 200
+	}
+	if int32(len(matches)) > limit {
+		matches = matches[0:limit]
+	}
+
 	return &searchsvc.SearchResponse{
-		Matches: matches,
+		Matches:      matches,
+		TotalMatches: total,
 	}, nil
 }
 
@@ -197,14 +225,18 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 
 	// Walk the space and index all files
 	walker := walker.NewWalker(p.gwClient)
-	rootId := &provider.ResourceId{StorageId: req.SpaceId, OpaqueId: req.SpaceId}
-	err = walker.Walk(ownerCtx, rootId, func(wd string, info *provider.ResourceInfo, err error) error {
+	rootId, err := storagespace.ParseID(req.SpaceId)
+	if err != nil {
+		p.logger.Error().Err(err).Msg(err.Error())
+		return nil, err
+	}
+	err = walker.Walk(ownerCtx, &rootId, func(wd string, info *provider.ResourceInfo, err error) error {
 		if err != nil {
 			p.logger.Error().Err(err).Msg("error walking the tree")
 		}
 		ref := &provider.Reference{
 			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
-			ResourceId: rootId,
+			ResourceId: &rootId,
 		}
 		err = p.indexClient.Add(ref, info)
 		if err != nil {

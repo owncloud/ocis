@@ -24,9 +24,7 @@ declare(strict_types=1);
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Behat\Hook\Call\AfterScenario;
 use Behat\Gherkin\Node\TableNode;
-use Behat\Testwork\Environment\Environment;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
@@ -365,54 +363,6 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @AfterScenario
-	 *
-	 * @return void
-	 *
-	 * @throws Exception|GuzzleException
-	 */
-	public function cleanDataAfterTests(): void {
-		$this->deleteAllSpacesOfTheType('project');
-	}
-
-	/**
-	 * The method first disables and then deletes spaces
-	 *
-	 * @param  string $driveType
-	 *
-	 * @return void
-	 *
-	 * @throws Exception|GuzzleException
-	 */
-	public function deleteAllSpacesOfTheType(string $driveType): void {
-		$query = "\$filter=driveType eq $driveType";
-		$userAdmin = $this->featureContext->getAdminUsername();
-
-		for ($i = 0; $i < 2; ++$i) {
-			$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi(
-				$userAdmin,
-				$query
-			);
-
-			$rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
-			$drives = json_decode($rawBody, true, 512);
-			if (isset($drives["value"])) {
-				$drives = $drives["value"];
-			}
-
-			if (!empty($drives)) {
-				foreach ($drives as $value) {
-					if (!\array_key_exists("deleted", $value["root"])) {
-						$this->sendDisableSpaceRequest($userAdmin, $value["name"]);
-					} else {
-						$this->sendDeleteSpaceRequest($userAdmin, $value["name"]);
-					}
-				}
-			}
-		}
-	}
-
-	/**
 	 * Send Graph List My Spaces Request
 	 *
 	 * @param  string $user
@@ -593,17 +543,19 @@ class SpacesContext implements Context {
 	/**
 	 *
 	 * @param string $user
+	 * @param string $query
 	 *
 	 * @return void
 	 *
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function theUserListsAllAvailableSpacesUsingTheGraphApi(string $user): void {
+	public function theUserListsAllAvailableSpacesUsingTheGraphApi(string $user, string $query = ''): void {
 		$this->featureContext->setResponse(
 			$this->listAllSpacesRequest(
 				$user,
-				$this->featureContext->getPasswordForUser($user)
+				$this->featureContext->getPasswordForUser($user),
+				"?" . $query
 			)
 		);
 		$this->rememberTheAvailableSpaces();
@@ -2366,7 +2318,7 @@ class SpacesContext implements Context {
 			);
 		}
 		$url = $this->baseUrl . $fileVersion[$index][0];
-		
+
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$url,

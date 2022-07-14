@@ -29,7 +29,7 @@ var testCases = []struct {
 			Sharer:         userID("sharing-userid"),
 			GranteeUserID:  userID("beshared-userid"),
 			GranteeGroupID: nil,
-			ItemID:         resourceID("storage-1", "itemid-1"),
+			ItemID:         resourceID("provider-1", "storage-1", "itemid-1"),
 			CTime:          timestamp(0),
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
@@ -56,7 +56,7 @@ var testCases = []struct {
 			Sharer:         userID("sharing-userid"),
 			GranteeUserID:  nil,
 			GranteeGroupID: groupID("beshared-groupid"),
-			ItemID:         resourceID("storage-1", "itemid-1"),
+			ItemID:         resourceID("provider-1", "storage-1", "itemid-1"),
 			CTime:          timestamp(10e8),
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
@@ -85,7 +85,7 @@ var testCases = []struct {
 			Sharer:         userID("sharing-userid"),
 			GranteeUserID:  nil,
 			GranteeGroupID: groupID("beshared-groupid"),
-			ItemID:         resourceID("storage-1", "itemid-1"),
+			ItemID:         resourceID("provider-1", "storage-1", "itemid-1"),
 			Permissions:    sharePermissions("stat", "get_quota"),
 			MTime:          timestamp(10e8),
 			Updated:        "permissions",
@@ -113,7 +113,7 @@ var testCases = []struct {
 		SystemEvent: events.LinkUpdated{
 			ShareID:           linkID("shareid"),
 			Sharer:            userID("sharing-userid"),
-			ItemID:            resourceID("storage-1", "itemid-1"),
+			ItemID:            resourceID("provider-1", "storage-1", "itemid-1"),
 			Permissions:       linkPermissions("stat"),
 			CTime:             timestamp(10e8),
 			DisplayName:       "link",
@@ -203,7 +203,7 @@ var testCases = []struct {
 		Alias: "Share accepted",
 		SystemEvent: events.ReceivedShareUpdated{
 			ShareID:        shareID("shareid"),
-			ItemID:         resourceID("storageid-1", "itemid-1"),
+			ItemID:         resourceID("provider-1", "storageid-1", "itemid-1"),
 			Permissions:    sharePermissions("get_quota"),
 			GranteeUserID:  userID("beshared-userid"),
 			GranteeGroupID: nil,
@@ -228,7 +228,7 @@ var testCases = []struct {
 		Alias: "Share declined",
 		SystemEvent: events.ReceivedShareUpdated{
 			ShareID:        shareID("shareid"),
-			ItemID:         resourceID("storageid-1", "itemid-1"),
+			ItemID:         resourceID("provider-1", "storageid-1", "itemid-1"),
 			Permissions:    sharePermissions("get_quota"),
 			GranteeUserID:  userID("beshared-userid"),
 			GranteeGroupID: nil,
@@ -254,7 +254,7 @@ var testCases = []struct {
 		SystemEvent: events.LinkAccessed{
 			ShareID:           linkID("shareid"),
 			Sharer:            userID("sharing-userid"),
-			ItemID:            resourceID("storage-1", "itemid-1"),
+			ItemID:            resourceID("provider-1", "storage-1", "itemid-1"),
 			Permissions:       linkPermissions("stat"),
 			DisplayName:       "link",
 			Expiration:        timestamp(10e8 + 10e5),
@@ -300,7 +300,7 @@ var testCases = []struct {
 		Alias: "File created",
 		SystemEvent: events.FileUploaded{
 			Executant: userID("uid-123"),
-			Ref:       reference("sto-123", "iid-123", "./item"),
+			Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
 			Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
@@ -308,15 +308,15 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' created file 'sto-123!iid-123/item'", "file_create")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' created file 'pro-1$sto-123!iid-123/item'", "file_create")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123/item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-123", "./item")
 		},
 	}, {
 		Alias: "File read",
 		SystemEvent: events.FileDownloaded{
 			Executant: userID("uid-123"),
-			Ref:       reference("sto-123", "iid-123", "./item"),
+			Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
 			Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
@@ -324,15 +324,15 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' read file 'sto-123!iid-123/item'", "file_read")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' read file 'pro-1$sto-123!iid-123/item'", "file_read")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123/item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-123", "./item")
 		},
 	}, {
 		Alias: "File trashed",
 		SystemEvent: events.ItemTrashed{
 			Executant: userID("uid-123"),
-			Ref:       reference("sto-123", "iid-123", "./item"),
+			Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
 			Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
@@ -340,16 +340,16 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' trashed file 'sto-123!iid-123/item'", "file_delete")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' trashed file 'pro-1$sto-123!iid-123/item'", "file_delete")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123/item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-123", "./item")
 		},
 	}, {
 		Alias: "File renamed",
 		SystemEvent: events.ItemMoved{
 			Executant:    userID("uid-123"),
-			Ref:          reference("sto-123", "iid-123", "./item"),
-			OldReference: reference("sto-123", "iid-123", "./anotheritem"),
+			Ref:          reference("pro-1", "sto-123", "iid-123", "./item"),
+			OldReference: reference("pro-1", "sto-123", "iid-123", "./anotheritem"),
 			Owner:        userID("uid-123"), // NOTE: owner not yet implemented in reva
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
@@ -357,9 +357,9 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' moved file 'sto-123!iid-123/item' from './anotheritem' to './item'", "file_rename")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' moved file 'pro-1$sto-123!iid-123/item' from './anotheritem' to './item'", "file_rename")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123/item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-123", "./item")
 			// AuditEventFileRenamed fields
 			require.Equal(t, "./anotheritem", ev.OldPath)
 
@@ -368,7 +368,7 @@ var testCases = []struct {
 		Alias: "File purged",
 		SystemEvent: events.ItemPurged{
 			Executant: userID("uid-123"),
-			Ref:       reference("sto-123", "iid-123", "./item"),
+			Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
 			Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
@@ -376,17 +376,17 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' removed file 'sto-123!iid-123/item' from trashbin", "file_trash_delete")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' removed file 'pro-1$sto-123!iid-123/item' from trashbin", "file_trash_delete")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123/item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-123", "./item")
 		},
 	}, {
 		Alias: "File restored",
 		SystemEvent: events.ItemRestored{
 			Executant:    userID("uid-123"),
-			Ref:          reference("sto-123", "iid-123", "./item"),
+			Ref:          reference("pro-1", "sto-123", "iid-123", "./item"),
 			Owner:        userID("uid-123"), // NOTE: owner not yet implemented in reva
-			OldReference: reference("sto-123", "sto-123!iid-123/item", "./oldpath"),
+			OldReference: reference("pro-1", "sto-123", "sto-123!iid-123/item", "./oldpath"),
 			Key:          "",
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
@@ -394,9 +394,9 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' restored file 'sto-123!iid-123/item' from trashbin to './item'", "file_trash_restore")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' restored file 'pro-1$sto-123!iid-123/item' from trashbin to './item'", "file_trash_restore")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123/item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-123", "./item")
 			// AuditEventFileRestored fields
 			require.Equal(t, "./oldpath", ev.OldPath)
 
@@ -405,7 +405,7 @@ var testCases = []struct {
 		Alias: "File version restored",
 		SystemEvent: events.FileVersionRestored{
 			Executant: userID("uid-123"),
-			Ref:       reference("sto-123", "iid-123", "./item"),
+			Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
 			Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
 			Key:       "v1",
 		},
@@ -414,9 +414,9 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' restored file 'sto-123!iid-123/item' in version 'v1'", "file_version_restore")
+			checkBaseAuditEvent(t, ev.AuditEvent, "uid-123", "", "user 'uid-123' restored file 'pro-1$sto-123!iid-123/item' in version 'v1'", "file_version_restore")
 			// AuditEventSharing fields
-			checkFilesAuditEvent(t, ev.AuditEventFiles, "sto-123!iid-123/item", "uid-123", "./item")
+			checkFilesAuditEvent(t, ev.AuditEventFiles, "pro-1$sto-123!iid-123/item", "uid-123", "./item")
 			// AuditEventFileRestored fields
 			require.Equal(t, "v1", ev.Key)
 
@@ -427,7 +427,7 @@ var testCases = []struct {
 			Executant: userID("uid-123"),
 			ID:        &provider.StorageSpaceId{OpaqueId: "space-123"},
 			Owner:     userID("uid-123"),
-			Root:      resourceID("sto-123", "iid-123"),
+			Root:      resourceID("pro-1", "sto-123", "iid-123"),
 			Name:      "test-space",
 			Type:      "project",
 			Quota:     nil, // Quota not interesting atm
@@ -443,7 +443,7 @@ var testCases = []struct {
 			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "space-123")
 			// AuditEventFileRestored fields
 			require.Equal(t, "uid-123", ev.Owner)
-			require.Equal(t, "sto-123!iid-123", ev.RootItem)
+			require.Equal(t, "pro-1$sto-123!iid-123", ev.RootItem)
 			require.Equal(t, "test-space", ev.Name)
 			require.Equal(t, "project", ev.Type)
 		},
@@ -595,16 +595,17 @@ func groupID(id string) *group.GroupId {
 	}
 }
 
-func resourceID(sid, oid string) *provider.ResourceId {
+func resourceID(sid, spid, oid string) *provider.ResourceId {
 	return &provider.ResourceId{
 		StorageId: sid,
+		SpaceId:   spid,
 		OpaqueId:  oid,
 	}
 }
 
-func reference(sid, oid, path string) *provider.Reference {
+func reference(sid, spid, oid, path string) *provider.Reference {
 	return &provider.Reference{
-		ResourceId: resourceID(sid, oid),
+		ResourceId: resourceID(sid, spid, oid),
 		Path:       path,
 	}
 }

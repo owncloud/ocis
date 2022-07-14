@@ -17,7 +17,9 @@ The following sections list the changes for unreleased.
 * Bugfix - Escape DN attribute value: [#4117](https://github.com/owncloud/ocis/pull/4117)
 * Bugfix - Polish search: [#4094](https://github.com/owncloud/ocis/pull/4094)
 * Bugfix - Store user passwords hashed in idm: [#3778](https://github.com/owncloud/ocis/issues/3778)
+* Change - Use the spaceID on the cs3 resource: [#4748](https://github.com/owncloud/ocis/pull/4748)
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
+* Enhancement - Add number of total matches to the search result: [#4189](https://github.com/owncloud/ocis/issues/4189)
 * Enhancement - Update IdP UI: [#3493](https://github.com/owncloud/ocis/issues/3493)
 * Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
 * Enhancement - Update reva: [#4115](https://github.com/owncloud/ocis/pull/4115)
@@ -129,6 +131,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/3778
    https://github.com/owncloud/ocis/pull/4053
 
+* Change - Use the spaceID on the cs3 resource: [#4748](https://github.com/owncloud/ocis/pull/4748)
+
+   We cleaned up the CS3Api to use a proper attribute for the space id.
+
+   https://github.com/owncloud/ocis/pull/4748
+
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
 
    For better UX clients need a way to discover if alias links are supported by the server. We added a
@@ -136,6 +144,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3983
    https://github.com/owncloud/ocis/pull/3991
+
+* Enhancement - Add number of total matches to the search result: [#4189](https://github.com/owncloud/ocis/issues/4189)
+
+   The search service now returns the number of total matches alongside the results.
+
+   https://github.com/owncloud/ocis/issues/4189
 
 * Enhancement - Update IdP UI: [#3493](https://github.com/owncloud/ocis/issues/3493)
 
@@ -167,6 +181,7 @@ The following sections list the changes for unreleased.
   * Bugfix [owncloud/web#7214](https://github.com/owncloud/web/pull/7214): Prevent error when pasting with empty clipboard
   * Bugfix [owncloud/web#7173](https://github.com/owncloud/web/pull/7173): Re-introduce dynamic app name in document title
   * Bugfix [owncloud/web#7166](https://github.com/owncloud/web/pull/7166): External apps fixes
+  * Bugfix [owncloud/web#7248](https://github.com/owncloud/web/pull/7248): Hide empty trash bin modal on error
   * Bugfix [owncloud/web#4677](https://github.com/owncloud/web/issues/4677): Logout deleted user on page reload
   * Bugfix [owncloud/web#7216](https://github.com/owncloud/web/pull/7216): Filename hovers over the image in the preview app
   * Bugfix [owncloud/web#7228](https://github.com/owncloud/web/pull/7228): Shared with others page apps not working with oc10 as backend
@@ -174,6 +189,7 @@ The following sections list the changes for unreleased.
   * Bugfix [owncloud/web#6921](https://github.com/owncloud/web/pull/6921): Space sidebar sharing indicators
   * Bugfix [owncloud/web#7030](https://github.com/owncloud/web/issues/7030): Access token renewal
   * Enhancement [owncloud/web#7217](https://github.com/owncloud/web/pull/7217): Add app top bar component
+  * Enhancement [owncloud/web#7153](https://github.com/owncloud/web/pull/7153): Add Keyboard navigation/selection
   * Enhancement [owncloud/web#7030](https://github.com/owncloud/web/issues/7030): Loading context blocks application bootstrap
   * Enhancement [owncloud/web#7206](https://github.com/owncloud/web/pull/7206): Add change own password dialog to the account info page
   * Enhancement [owncloud/web#7086](https://github.com/owncloud/web/pull/7086): Re-sharing for ocis

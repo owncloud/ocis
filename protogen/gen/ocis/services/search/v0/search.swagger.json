@@ -242,6 +242,9 @@
         },
         "opaqueId": {
           "type": "string"
+        },
+        "spaceId": {
+          "type": "string"
         }
       }
     },
@@ -277,6 +280,10 @@
         "nextPageToken": {
           "type": "string",
           "title": "Token to retrieve the next page of results, or empty if there are no\nmore results in the list"
+        },
+        "totalMatches": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -309,6 +316,10 @@
         "nextPageToken": {
           "type": "string",
           "title": "Token to retrieve the next page of results, or empty if there are no\nmore results in the list"
+        },
+        "totalMatches": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     }
