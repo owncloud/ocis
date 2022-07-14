@@ -6,6 +6,8 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix DN parsing issues and sizelimit handling in libregraph/idm: [#3631](https://github.com/owncloud/ocis/issues/3631)
+* Bugfix - Logging in on the wrong account when an email address is not unique: [#4039](https://github.com/owncloud/ocis/issues/4039)
 * Bugfix - CSP rules for silent token refresh in iframe: [#4031](https://github.com/owncloud/ocis/pull/4031)
 * Bugfix - Fix logging levels: [#4102](https://github.com/owncloud/ocis/pull/4102)
 * Bugfix - Fix `OCIS_RUN_SERVICES`: [#4133](https://github.com/owncloud/ocis/pull/4133)
@@ -27,6 +29,25 @@ The following sections list the changes for unreleased.
 * Enhancement - Search service at the old webdav endpoint: [#4118](https://github.com/owncloud/ocis/pull/4118)
 
 ## Details
+
+* Bugfix - Fix DN parsing issues and sizelimit handling in libregraph/idm: [#3631](https://github.com/owncloud/ocis/issues/3631)
+
+   We fixed a couple on issues in libregraph/idm related to correctly parsing LDAP DNs for
+   usernames contain characters that require escaping.
+
+   Also libregraph/idm was not properly returning "Size limit exceeded" errors when the result
+   set exceeded the requested size.
+
+   https://github.com/owncloud/ocis/issues/3631
+   https://github.com/owncloud/ocis/issues/4039
+   https://github.com/owncloud/ocis/issues/4078
+
+* Bugfix - Logging in on the wrong account when an email address is not unique: [#4039](https://github.com/owncloud/ocis/issues/4039)
+
+   The default configuration to use the same logon attribute for all services. Also, if the
+   configured logon attribute is not unique access to ocis is denied.
+
+   https://github.com/owncloud/ocis/issues/4039
 
 * Bugfix - CSP rules for silent token refresh in iframe: [#4031](https://github.com/owncloud/ocis/pull/4031)
 
