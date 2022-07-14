@@ -101,8 +101,8 @@ pre_signed_url:
   - GET
   enabled: true
 account_backend: cs3
-user_oidc_claim: email
-user_cs3_claim: mail
+user_oidc_claim: preferred_username
+user_cs3_claim: username
 machine_auth_api_key: ""
 auto_provision_accounts: false
 enable_basic_auth: false

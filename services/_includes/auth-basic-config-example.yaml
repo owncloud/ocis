@@ -42,7 +42,6 @@ auth_providers:
     group_object_class: groupOfNames
     login_attributes:
     - uid
-    - mail
     idp: https://localhost:9200
     user_schema:
       id: ownclouduuid

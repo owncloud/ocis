@@ -223,7 +223,7 @@ Account backend the PROXY service should use. Currently only 'cs3' is possible h
 a| [subs=-attributes]
 +string+
 a| [subs=-attributes]
-pass:[email]
+pass:[preferred_username]
 a| [subs=-attributes]
 The name of an OpenID Connect claim that should be used for resolving users with the account backend. Currently defaults to 'email'.
 
@@ -231,7 +231,7 @@ The name of an OpenID Connect claim that should be used for resolving users with
 a| [subs=-attributes]
 +string+
 a| [subs=-attributes]
-pass:[mail]
+pass:[username]
 a| [subs=-attributes]
 The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail'. Supported values are 'username' and 'displayname'.
 
