@@ -1859,6 +1859,10 @@ def skipIfUnchanged(ctx, type):
         "^changelog/.*",
         "^docs/.*",
         "^deployments/.*",
+        "CHANGELOG.md",
+        "CONTRIBUTING.md",
+        "LICENSE",
+        "README.md",
     ]
     unit = [
         ".*_test.go$",
