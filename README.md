@@ -16,10 +16,10 @@ Please see [Getting Started](https://owncloud.dev/ocis/getting-started/)
 
 ## Documentation
 
-* **Development Documentation**  
+*   **Development Documentation**  
 Please see [Development Documentation - Getting Started](https://owncloud.dev/ocis/development/getting-started/)
 
-* **Admin Documentation**  
+*   **Admin Documentation**  
 Please see [Admin Documentation - Introduction to Infinite Scale](https://doc.owncloud.com/ocis/next/)
 
 ## Security
