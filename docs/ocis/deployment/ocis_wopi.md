@@ -86,8 +86,6 @@ See also [example server setup]({{< ref "preparing_server" >}})
   WOPISERVER_DOMAIN=
   # JWT secret which is used for the documents to be request by the Wopi client from the cs3org Wopi server. Must be change in order to have a secure Wopi server. Defaults to "LoremIpsum567"
   WOPI_JWT_SECRET=
-  # JWT secret which is used for the documents to be request by the Wopi client from the cs3org Wopi server. Must be change in order to have a secure Wopi server. Defaults to "LoremIpsum123"
-  WOPI_IOP_SECRET=
 
   ### Collabora settings ###
   # Domain of Collabora, where you can find the frontend. Defaults to "collabora.owncloud.test"
@@ -120,7 +118,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   Set your domain for the CS3Org WOPI server in `WOPISERVER_DOMAIN=`, where all office suites can download the files via the WOPI protocol.
 
-  You also must override the default WOPI JWT secret and the WOPI IOP secret, in order to have a secure setup. Do this by setting `WOPI_JWT_SECRET` and `WOPI_IOP_SECRET` to a long and random string.
+  You also must override the default WOPI JWT secret in order to have a secure setup. Do this by setting `WOPI_JWT_SECRET` to a long and random string.
 
   Now it's time to set up Collabora and you need to configure the domain of Collabora in `COLLABORA_DOMAIN=`.
 
