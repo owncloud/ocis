@@ -29,7 +29,7 @@ func DefaultConfig() *config.Config {
 			Name: "search",
 		},
 		Datapath: path.Join(defaults.BaseDataPath(), "search"),
-		Reva: config.Reva{
+		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
 		Events: config.Events{
@@ -67,6 +67,14 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
 		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	}
+
+	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
+		cfg.Reva = &config.Reva{
+			Address: cfg.Commons.Reva.Address,
+		}
+	} else if cfg.Reva == nil {
+		cfg.Reva = &config.Reva{}
 	}
 }
 
