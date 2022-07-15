@@ -386,7 +386,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[127.0.0.1:9233]
 a| [subs=-attributes]
-The address of the streaming service.
+The address of the streaming service. Set to a empty string to disable emitting events.
 
 |`GRAPH_EVENTS_CLUSTER`
 a| [subs=-attributes]
