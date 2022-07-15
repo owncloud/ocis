@@ -22,6 +22,7 @@ The following sections list the changes for unreleased.
 * Change - Use the spaceID on the cs3 resource: [#4748](https://github.com/owncloud/ocis/pull/4748)
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
 * Enhancement - Add number of total matches to the search result: [#4189](https://github.com/owncloud/ocis/issues/4189)
+* Enhancement - Optional events in graph service: [#55555](https://github.com/owncloud/ocis/pull/55555)
 * Enhancement - Update IdP UI: [#3493](https://github.com/owncloud/ocis/issues/3493)
 * Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
 * Enhancement - Update reva: [#4115](https://github.com/owncloud/ocis/pull/4115)
@@ -171,6 +172,14 @@ The following sections list the changes for unreleased.
    The search service now returns the number of total matches alongside the results.
 
    https://github.com/owncloud/ocis/issues/4189
+
+* Enhancement - Optional events in graph service: [#55555](https://github.com/owncloud/ocis/pull/55555)
+
+   We've changed the graph service so that you also can start it without any event bus. Therefore
+   you need to set `GRAPH_EVENTS_ENDPOINT` to an empty string. The graph API will not emit any
+   events in this case.
+
+   https://github.com/owncloud/ocis/pull/55555
 
 * Enhancement - Update IdP UI: [#3493](https://github.com/owncloud/ocis/issues/3493)
 
