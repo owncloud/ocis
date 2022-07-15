@@ -12,6 +12,7 @@ import (
 	svc "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 	"github.com/pkg/errors"
 	"go-micro.dev/v4"
+	"go-micro.dev/v4/events"
 )
 
 // Server initializes the http service and server.
@@ -28,15 +29,20 @@ func Server(opts ...Option) (http.Service, error) {
 		http.Flags(options.Flags...),
 	)
 
-	publisher, err := server.NewNatsStream(
-		natsjs.Address(options.Config.Events.Endpoint),
-		natsjs.ClusterID(options.Config.Events.Cluster),
-	)
-	if err != nil {
-		options.Logger.Error().
-			Err(err).
-			Msg("Error initializing events publisher")
-		return http.Service{}, errors.Wrap(err, "could not initialize events publisher")
+	var publisher events.Stream
+
+	if options.Config.Events.Endpoint != "" {
+		var err error
+		publisher, err = server.NewNatsStream(
+			natsjs.Address(options.Config.Events.Endpoint),
+			natsjs.ClusterID(options.Config.Events.Cluster),
+		)
+		if err != nil {
+			options.Logger.Error().
+				Err(err).
+				Msg("Error initializing events publisher")
+			return http.Service{}, errors.Wrap(err, "could not initialize events publisher")
+		}
 	}
 
 	handle := svc.NewService(

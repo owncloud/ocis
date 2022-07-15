@@ -69,6 +69,6 @@ type Identity struct {
 
 // Events combines the configuration options for the event bus.
 type Events struct {
-	Endpoint string `yaml:"endpoint" env:"GRAPH_EVENTS_ENDPOINT" desc:"The address of the streaming service."`
+	Endpoint string `yaml:"endpoint" env:"GRAPH_EVENTS_ENDPOINT" desc:"The address of the streaming service. Set to a empty string to disable emitting events."`
 	Cluster  string `yaml:"cluster" env:"GRAPH_EVENTS_CLUSTER" desc:"The clusterID of the streaming service. Mandatory when using the NATS service."`
 }
