@@ -81,7 +81,8 @@ detectexternallocks = False
 # Location of the secret files. Requires a restart of the
 # WOPI server when either the files or their content change.
 wopisecretfile = /etc/wopi/wopisecret
-iopsecretfile = /etc/wopi/iopsecret
+# iop secret is not used for cs3 storage type
+#iopsecretfile = /etc/wopi/iopsecret
 
 # Use https as opposed to http (requires certificate)
 usehttps = no
