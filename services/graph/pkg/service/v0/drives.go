@@ -223,6 +223,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	csr := storageprovider.CreateStorageSpaceRequest{
+		Owner: us,
 		Type:  driveType,
 		Name:  spaceName,
 		Quota: getQuota(drive.Quota, g.config.Spaces.DefaultQuota),
@@ -234,10 +235,6 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 
 	if drive.DriveAlias != nil {
 		csr.Opaque = utils.AppendPlainToOpaque(csr.Opaque, "spaceAlias", *drive.DriveAlias)
-	}
-
-	if driveType == "personal" {
-		csr.Owner = us
 	}
 
 	resp, err := client.CreateStorageSpace(r.Context(), &csr)
