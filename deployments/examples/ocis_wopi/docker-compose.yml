@@ -158,7 +158,7 @@ services:
     restart: always
 
   collabora:
-    image: collabora/code:22.05.0.1
+    image: collabora/code:22.05.4.1.1
     networks:
       ocis-net:
     environment:
