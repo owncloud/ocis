@@ -40,13 +40,13 @@ Feature: copy file
       | newfolder/insideSpace.txt |
 
 
-  Scenario Outline: User copy a file from a space project with different role to a space project with manager role
+  Scenario Outline: User copies a file from a space project with a different role to a space project with the manager role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project1" with the default quota using the GraphApi
     And user "Brian" has created a space "Project2" with the default quota using the GraphApi
     And user "Brian" has uploaded a file inside space "Project1" with content "Project1 content" to "project1.txt"
-    And user "Brian" has shared a space "Project2" to user "Alice" with role "<from_role>"
-    And user "Brian" has shared a space "Project1" to user "Alice" with role "<to_role>"
+    And user "Brian" has shared a space "Project2" to user "Alice" with role "<to_role>"
+    And user "Brian" has shared a space "Project1" to user "Alice" with role "<from_role>"
     When user "Alice" copies file "project1.txt" from space "Project1" to "project1.txt" inside space "Project2" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Project2" should contain these entries:
@@ -56,13 +56,11 @@ Feature: copy file
       | from_role | to_role |
       | manager   | manager |
       | manager   | editor  |
-      | manager   | viewer  |
       | editor    | manager |
       | editor    | editor  |
-      | editor    | viewer  |
 
 
-  Scenario Outline: User copy a file from a space project with different role to a space project with viewer role
+  Scenario Outline: User copies a file from a space project with a different role to a space project with a viewer role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project1" with the default quota using the GraphApi
     And user "Brian" has created a space "Project2" with the default quota using the GraphApi
@@ -79,7 +77,7 @@ Feature: copy file
       | editor  |
 
 
-  Scenario Outline: User copy a file from space project with different role to space personal
+  Scenario Outline: User copies a file from space project with different role to space personal
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "project.txt"
@@ -96,7 +94,7 @@ Feature: copy file
       | viewer  |
 
 
-  Scenario Outline: User copy a file from space project with different role to space shares jail with editor role
+  Scenario Outline: User copies a file from space project with different role to space shares jail with editor role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has created folder "/testshare"
@@ -116,7 +114,7 @@ Feature: copy file
       | viewer  |
 
 
-  Scenario Outline: User copy a file from space project with different role to shares jail with viewer role
+  Scenario Outline: User copies a file from space project with different role to shares jail with viewer role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has created folder "/testshare"
@@ -135,7 +133,7 @@ Feature: copy file
       | viewer  |
 
 
-  Scenario Outline: User copy a file from space personal to space project with different role
+  Scenario Outline: User copies a file from space personal to space project with different role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
@@ -151,7 +149,7 @@ Feature: copy file
       | editor  |
 
 
-  Scenario: User copy a file from space personal to space project with role viewer
+  Scenario: User copies a file from space personal to space project with role viewer
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has shared a space "Project" to user "Alice" with role "viewer"
@@ -162,7 +160,7 @@ Feature: copy file
       | personal.txt |
 
 
-  Scenario: User copy a file from space personal to space shares jail with role editor
+  Scenario: User copies a file from space personal to space shares jail with role editor
     Given user "Brian" has created folder "/testshare"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "31"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
@@ -174,7 +172,7 @@ Feature: copy file
     And for user "Alice" the content of the file "/testshare/personal.txt" of the space "Shares Jail" should be "personal content"
 
 
-  Scenario: User copy a file from space personal to space shares jail with role viewer
+  Scenario: User copies a file from space personal to space shares jail with role viewer
     Given user "Brian" has created folder "/testshare"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "17"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
@@ -185,7 +183,7 @@ Feature: copy file
       | /testshare/personal.txt |
 
 
-  Scenario Outline: User copy a file from space shares jail with different role to space personal
+  Scenario Outline: User copies a file from space shares jail with different role to space personal
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
@@ -202,7 +200,7 @@ Feature: copy file
       | 17          |
 
 
-  Scenario Outline: User copy a file from space shares jail with different role to space project with different role
+  Scenario Outline: User copies a file from space shares jail with different role to space project with different role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
@@ -223,7 +221,7 @@ Feature: copy file
       | editor  | 17          |
 
 
-  Scenario Outline: User copy a file from space shares jail with different role to space project with role viewer
+  Scenario Outline: User copies a file from space shares jail with different role to space project with role viewer
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has shared a space "Project" to user "Alice" with role "viewer"
@@ -241,7 +239,7 @@ Feature: copy file
       | 17          |
 
 
-  Scenario Outline: User copy a file from space shares jail with different role to space shares jail with role editor
+  Scenario Outline: User copies a file from space shares jail with different role to space shares jail with role editor
     Given user "Brian" has created folder "/testshare1"
     And user "Brian" has created folder "/testshare2"
     And user "Brian" has uploaded file with content "testshare1 content" to "/testshare1/testshare1.txt"
@@ -263,7 +261,7 @@ Feature: copy file
       | 17          |
 
 
-  Scenario Outline: User copy a file from space shares jail with different role to space shares jail with role editor
+  Scenario Outline: User copies a file from space shares jail with different role to space shares jail with role editor
     Given user "Brian" has created folder "/testshare1"
     And user "Brian" has created folder "/testshare2"
     And user "Brian" has uploaded file with content "testshare1 content" to "/testshare1/testshare1.txt"
