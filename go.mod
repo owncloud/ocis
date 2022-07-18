@@ -266,3 +266,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	stash.kopano.io/kgol/kcc-go/v5 v5.0.1 // indirect
 )
+
+replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20220718111151-9e683197d0f3
