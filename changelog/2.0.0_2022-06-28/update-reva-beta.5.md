@@ -1,10 +1,17 @@
-Enhancement: Update reva to version 2.7.1
+Enhancement: Update reva to version 2.7.2
+
+Changelog for reva 2.7.2 (2022-07-18)
+=======================================
+
+* Bugfix [cs3org/reva#3079](https://github.com/cs3org/reva/pull/3079): Allow empty permissions
+* Bugfix [cs3org/reva#3084](https://github.com/cs3org/reva/pull/3084): Spaces related permissions and providerID cleanup
+* Bugfix [cs3org/reva#3083](https://github.com/cs3org/reva/pull/3083): Add space id to ItemTrashed event
 
 Changelog for reva 2.7.1 (2022-07-15)
 =======================================
 
 * Bugfix [cs3org/reva#3080](https://github.com/cs3org/reva/pull/3080): Make dataproviders return more headers
-* Enhancement [cs3org/reva#4072](https://github.com/cs3org/reva/pull/4072): Add user filter
+* Enhancement [cs3org/reva#3046](https://github.com/cs3org/reva/pull/3046): Add user filter
 
 Changelog for reva 2.7.0 (2022-07-15)
 =======================================
