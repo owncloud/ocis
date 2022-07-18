@@ -11,10 +11,12 @@ import (
 	"strings"
 
 	"github.com/CiscoM31/godata"
+	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -177,7 +179,6 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
 	if slices.Contains(sel, "drive") || slices.Contains(sel, "drives") || slices.Contains(exp, "drive") || slices.Contains(exp, "drives") {
 		wdu, err := url.Parse(g.config.Spaces.WebDavBase + g.config.Spaces.WebDavPath)
-		// TODO: filter this request for the user
 		f := listStorageSpacesUserFilter(user.GetId())
 		lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
 			Opaque:  nil,
@@ -185,6 +186,15 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		})
 		if err != nil {
 			g.logger.Err(err).Interface("query", r.URL.Query()).Msg("error getting storages")
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, user)
+			return
+		}
+		if lspr.Status.Code != cs3rpc.Code_CODE_OK {
+			// in case of NOT_OK, we can just return the user object with empty drives
+			render.Status(r, status.HTTPStatusFromCode(http.StatusOK))
+			render.JSON(w, r, user)
+			return
 		}
 		drives := []libregraph.Drive{}
 		for _, sp := range lspr.GetStorageSpaces() {
