@@ -408,12 +408,6 @@ File and sync features in a shared scenario
 
 #### [Searching sharee with displayname](https://github.com/owncloud/ocis/issues/547)
 
-- [apiSharees/sharees.feature:32](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L32)
-- [apiSharees/sharees.feature:33](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L33)
-- [apiSharees/sharees.feature:54](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L54)
-- [apiSharees/sharees.feature:55](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L55)
-- [apiSharees/sharees.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L100)
-- [apiSharees/sharees.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L101)
 - [apiSharees/sharees.feature:350](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L350)
 - [apiSharees/sharees.feature:351](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L351)
 - [apiSharees/sharees.feature:370](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L370)
@@ -424,12 +418,6 @@ File and sync features in a shared scenario
 - [apiSharees/sharees.feature:411](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L411)
 - [apiSharees/sharees.feature:430](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L430)
 - [apiSharees/sharees.feature:431](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L431)
-- [apiSharees/sharees.feature:583](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L583)
-- [apiSharees/sharees.feature:584](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L584)
-- [apiSharees/sharees.feature:655](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L655)
-- [apiSharees/sharees.feature:656](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L656)
-- [apiSharees/sharees.feature:680](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L680)
-- [apiSharees/sharees.feature:681](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L681)
 
 #### User cannot create a folder named Share
 

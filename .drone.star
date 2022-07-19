@@ -1643,6 +1643,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         environment = {
             "OCIS_URL": OCIS_URL,
             "OCIS_CONFIG_DIR": "/root/.ocis/config",
+            "LDAP_GROUP_SUBSTRING_FILTER_TYPE": "any",
+            "LDAP_USER_SUBSTRING_FILTER_TYPE": "any",
             "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",  # cs3api-validator needs the cs3api gatway exposed
             "STORAGE_USERS_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
@@ -1655,6 +1657,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "SETTINGS_DATA_PATH": "/srv/app/tmp/ocis/settings",
             "IDM_CREATE_DEMO_USERS": True,
             "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
+            "FRONTEND_SEARCH_MIN_LENGTH": "2",
         }
         wait_for_ocis = {
             "name": "wait-for-ocis-server",
@@ -1688,6 +1691,8 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "LDAP_USER_BASE_DN": "ou=TestUsers,dc=owncloud,dc=com",
             "LDAP_USER_SCHEMA_ID": "ownclouduuid",
             "LDAP_USER_FILTER": "(objectclass=owncloud)",
+            "LDAP_GROUP_SUBSTRING_FILTER_TYPE": "any",
+            "LDAP_USER_SUBSTRING_FILTER_TYPE": "any",
             # ownCloudSQL storage driver
             "STORAGE_USERS_DRIVER": "owncloudsql",
             "STORAGE_USERS_OWNCLOUDSQL_DATADIR": "/mnt/data/files",
@@ -1713,6 +1718,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",
             "OCIS_CONFIG_DIR": "/etc/ocis",
             "PROXY_ENABLE_BASIC_AUTH": "true",
+            "FRONTEND_SEARCH_MIN_LENGTH": "2",
         }
         wait_for_ocis = {
             "name": "wait-for-ocis-server",
