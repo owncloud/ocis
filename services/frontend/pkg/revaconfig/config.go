@@ -165,7 +165,7 @@ func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
 								"share_with_group_members_only":     true,
 								"share_with_membership_groups_only": true,
 								"default_permissions":               22,
-								"search_min_length":                 3,
+								"search_min_length":                 cfg.SearchMinLength,
 								"public": map[string]interface{}{
 									"alias":                      true,
 									"enabled":                    true,
