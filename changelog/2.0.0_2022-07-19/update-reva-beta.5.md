@@ -32,5 +32,8 @@ Changelog for reva 2.7.0 (2022-07-15)
 * Enhancement [cs3org/reva#3009](https://github.com/cs3org/reva/pull/3009): Prevent recursive copy/move operations
 * Enhancement [cs3org/reva#2977](https://github.com/cs3org/reva/pull/2977): Skip space lookup on space propfind
 
+https://github.com/owncloud/ocis/pull/4115
+https://github.com/owncloud/ocis/pull/4201
+https://github.com/owncloud/ocis/pull/4203
 https://github.com/owncloud/ocis/pull/4025
 https://github.com/owncloud/ocis/pull/4211
