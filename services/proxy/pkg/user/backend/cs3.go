@@ -65,7 +65,7 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 		if res.Status.Code == rpcv1beta1.Code_CODE_NOT_FOUND {
 			return nil, "", ErrAccountNotFound
 		}
-		return nil, "", fmt.Errorf("could not get user by claim %v with value %v : %w ", claim, value, err)
+		return nil, "", fmt.Errorf("could not get user by claim %v with value %v : %s ", claim, value, res.Status.Message)
 	}
 
 	user := res.User
