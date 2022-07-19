@@ -915,9 +915,7 @@ _ocdav: api compatibility, return correct status code_
 - [apiWebdavOperations/search.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L70)
 - [apiWebdavOperations/search.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L93)
 - [apiWebdavOperations/search.feature:108](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L108)
-- [apiWebdavOperations/search.feature:126](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L126)
 - [apiWebdavOperations/search.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L132)
-- [apiWebdavOperations/search.feature:150](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L150)
 - [apiWebdavOperations/search.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L156)
 - [apiWebdavOperations/search.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L180)
 - [apiWebdavOperations/search.feature:207](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L207)
@@ -930,11 +928,6 @@ _ocdav: api compatibility, return correct status code_
 
 - [apiWebdavOperations/search.feature:208](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L208)
 - [apiWebdavOperations/search.feature:240](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L240)
-
-### [Search with limit does not give required response with new webdav](https://github.com/owncloud/ocis/issues/4017)
-
-- [apiWebdavOperations/search.feature:127](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L127)
-- [apiWebdavOperations/search.feature:151](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L151)
 
 #### [Support for favorites](https://github.com/owncloud/ocis/issues/1228)
 
