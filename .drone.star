@@ -289,11 +289,12 @@ def yarnInstallUITests():
         "name": "yarn-install",
         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
         "commands": [
+            "curl -SsfL -o /usr/local/bin/retry https://raw.githubusercontent.com/owncloud-ci/retry/master/retry && chmod +x /usr/local/bin/retry",
             ". /drone/src/.drone.env",
             "cd webTestRunner",
             "git checkout $WEB_COMMITID",
             "cd tests/acceptance/",
-            "yarn install --immutable",
+            "retry -t 3 'yarn install --immutable'",
         ],
     }]
 
@@ -846,6 +847,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "MIDDLEWARE_HOST": "http://middleware:3000",
                 },
                 "commands": [
+                    "curl -SsfL -o /usr/local/bin/retry https://raw.githubusercontent.com/owncloud-ci/retry/master/retry && chmod +x /usr/local/bin/retry",
                     ". /drone/src/.drone.env",
                     # we need to have Web around for some general step definitions (eg. how to log in)
                     "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
@@ -854,7 +856,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     # TODO: settings/package.json has all the acceptance test dependencies
                     # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
                     "cd /drone/src/services/settings",
-                    "yarn install --immutable",
+                    "retry -t 3 'yarn install --immutable'",
                     "make test-acceptance-webui",
                 ],
                 "volumes": [{
