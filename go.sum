@@ -830,8 +830,8 @@ github.com/labbsr0x/goh v1.0.1/go.mod h1:8K2UhVoaWXcCU7Lxoa2omWnC8gyW8px7/lmO61c
 github.com/labstack/echo/v4 v4.1.11/go.mod h1:i541M3Fj6f76NZtHSj7TXnyM8n2gaodfvfxNnFqi74g=
 github.com/labstack/gommon v0.3.0/go.mod h1:MULnywXg0yavhxWKc+lOruYdAhDwPK9wf0OL7NoOu+k=
 github.com/leodido/go-urn v1.2.0/go.mod h1:+8+nEpDfqqsY+g338gtMEUOtuK+4dEMhiQEgxpxOKII=
-github.com/libregraph/idm v0.3.1-0.20220714094919-c0f30ff05beb h1:kY+TjOyeXQ5kTzp66+c5C0sf5o9eLkYbxBPbB3iRQVk=
-github.com/libregraph/idm v0.3.1-0.20220714094919-c0f30ff05beb/go.mod h1:ggVmYkaK5fu680QOnxkuyCRW5Wl5qzaYXgIiieNBOJE=
+github.com/libregraph/idm v0.3.1-0.20220718103124-c4f6613dce2b h1:/BNTnfP6lqixKUP2kP9gKWiPRaBWvE5BJcFcIVd2Ekg=
+github.com/libregraph/idm v0.3.1-0.20220718103124-c4f6613dce2b/go.mod h1:ggVmYkaK5fu680QOnxkuyCRW5Wl5qzaYXgIiieNBOJE=
 github.com/libregraph/lico v0.54.1-0.20220325072321-31efc3995d63 h1:oPqyRePmq+59YF1tAur7WXuM/z/epRd+HGGyPPx2Vv8=
 github.com/libregraph/lico v0.54.1-0.20220325072321-31efc3995d63/go.mod h1:KZ4X+bEbOQMSV6iPysZEqVO/Pa5Mvo7xhhcLwUNPjmw=
 github.com/linode/linodego v0.25.3/go.mod h1:GSBKPpjoQfxEfryoCRcgkuUOCuVtGHWhzI8OMdycNTE=
