@@ -97,6 +97,12 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   Set your domain for the LDAP manager UI in `LDAP_MANAGER_DOMAIN=`, e.g. `ldap.owncloud.test`.
 
+  Grant the oCIS Admin role to the admin user from your LDAP in `OCIS_ADMIN_USER_ID:`. You need to enter the uuid of LDAP user.
+
+  {{< hint type=tip title=Encoding >}}
+  In the .ldif file in this example, the admin user id is base64 encoded. You need to decode it to make it work.
+  {{< /hint >}}
+
   Now you have configured everything and can save the file.
 
 - Start the docker stack
