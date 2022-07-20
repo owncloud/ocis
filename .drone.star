@@ -284,6 +284,7 @@ def yarnCache(ctx):
                  restoreBuildArtifactCache(ctx, "web-dist", "webTestRunner") +
                  yarnInstallUITests() +
                  rebuildBuildArtifactCache(ctx, "tests-yarn", "webTestRunner/tests/acceptance/.yarn"),
+        "depends_on": getPipelineNames(buildCacheWeb(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/master",
