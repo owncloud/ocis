@@ -1,3 +1,21 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v2.0.0...master
+
+## Summary
+
+* Enhancement - Improve error log for "could not get user by claim" error: [#4227](https://github.com/owncloud/ocis/pull/4227)
+
+## Details
+
+* Enhancement - Improve error log for "could not get user by claim" error: [#4227](https://github.com/owncloud/ocis/pull/4227)
+
+   We've improved the error log for "could not get user by claim" error where previously only the
+   "nil" error has been logged. Now we're logging the message from the transport.
+
+   https://github.com/owncloud/ocis/pull/4227
 # Changelog for [2.0.0-beta.5] (2022-07-19)
 
 The following sections list the changes for 2.0.0-beta.5.
