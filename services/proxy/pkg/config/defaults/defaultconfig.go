@@ -36,6 +36,7 @@ func DefaultConfig() *config.Config {
 			Issuer:   "https://localhost:9200",
 			Insecure: true,
 			//Insecure: true,
+			AccessTokenVerifyMethod: config.AccessTokenVerificationJWT,
 			UserinfoCache: config.UserinfoCache{
 				Size: 1024,
 				TTL:  10,
