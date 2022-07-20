@@ -195,6 +195,7 @@ def main(ctx):
 
     test_pipelines = \
         cancelPreviousBuilds() + \
+        buildCacheWeb(ctx) + \
         yarnCache(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
         cacheCoreReposForTesting(ctx) + \
@@ -257,13 +258,30 @@ def main(ctx):
     pipelineSanityChecks(ctx, pipelines)
     return pipelines
 
+def buildCacheWeb(ctx):
+    return [{
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "cache-web",
+        "steps": skipIfUnchanged(ctx, "cache") +
+                 installWebTestRunner() +
+                 rebuildBuildArtifactCache(ctx, "web-dist", "webTestRunner"),
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/tags/**",
+                "refs/pull/**",
+            ],
+        },
+    }]
+
 def yarnCache(ctx):
     return [{
         "kind": "pipeline",
         "type": "docker",
         "name": "cache-yarn",
         "steps": skipIfUnchanged(ctx, "cache") +
-                 installWebTestRunner() +
+                 restoreBuildArtifactCache(ctx, "web-dist", "webTestRunner") +
                  yarnInstallUITests() +
                  rebuildBuildArtifactCache(ctx, "tests-yarn", "webTestRunner/tests/acceptance/.yarn"),
         "trigger": {
@@ -773,7 +791,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + installWebTestRunner() +
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + restoreBuildArtifactCache(ctx, "web-dist", "webTestRunner") +
                  restoreBuildArtifactCache(ctx, "tests-yarn", "webTestRunner/tests/acceptance/.yarn") + yarnInstallUITests() +
                  ocisServer(storage, accounts_hash_difficulty) + waitForSeleniumService() + waitForMiddlewareService() +
                  restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
