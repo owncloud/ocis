@@ -462,7 +462,6 @@ def cacheCoreReposForTesting(ctx):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
@@ -2077,7 +2076,6 @@ def genericCachePurge(ctx, name, cache_key):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
             "status": [
