@@ -80,12 +80,20 @@ type AuthMiddleware struct {
 	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agent"`
 }
 
+const (
+	AccessTokenVerificationNone = "none"
+	AccessTokenVerificationJWT  = "jwt"
+	// tdb:
+	// AccessTokenVerificationIntrospect = "introspect"
+)
+
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
 // with the configured oidc-provider
 type OIDC struct {
-	Issuer        string        `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP."`
-	Insecure      bool          `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments."`
-	UserinfoCache UserinfoCache `yaml:"user_info_cache"`
+	Issuer                  string        `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP."`
+	Insecure                bool          `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments."`
+	AccessTokenVerifyMethod string        `yaml:"access_token_verify_method" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD" desc:"Sets how OIDC access tokens should be verified. Possible values: 'none', which means that no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. Or 'jwt', which tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'."`
+	UserinfoCache           UserinfoCache `yaml:"user_info_cache"`
 }
 
 // UserinfoCache is a TTL cache configuration.

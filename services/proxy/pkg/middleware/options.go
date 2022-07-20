@@ -55,6 +55,9 @@ type Options struct {
 	UserinfoCacheTTL time.Duration
 	// CredentialsByUserAgent sets the auth challenges on a per user-agent basis
 	CredentialsByUserAgent map[string]string
+	// AccessTokenVerifyMethod configures how access_tokens should be verified but the oidc_auth middleware.
+	// Possible values currently: "jwt" and "none"
+	AccessTokenVerifyMethod string
 }
 
 // newOptions initializes the available default options.
@@ -191,5 +194,12 @@ func TokenCacheTTL(ttl time.Duration) Option {
 func UserProvider(up backend.UserBackend) Option {
 	return func(o *Options) {
 		o.UserProvider = up
+	}
+}
+
+// AccessTokenVerifyMethod set the mechanism for access token verification
+func AccessTokenVerifyMethod(method string) Option {
+	return func(o *Options) {
+		o.AccessTokenVerifyMethod = method
 	}
 }
