@@ -134,7 +134,7 @@ config = {
     "dockerReleases": {
         "architectures": ["arm", "arm64", "amd64"],
     },
-    "litmus": False,
+    "litmus": True,
 }
 
 # volume for steps to cache Go dependencies between steps of a pipeline
@@ -196,11 +196,11 @@ def main(ctx):
     test_pipelines = \
         cancelPreviousBuilds() + \
         buildCacheWeb(ctx) + \
-        yarnCache(ctx)
-    # [buildOcisBinaryForTesting(ctx)] + \
-    # cacheCoreReposForTesting(ctx) + \
-    # testOcisModules(ctx) + \
-    # testPipelines(ctx)
+        yarnCache(ctx) + \
+        [buildOcisBinaryForTesting(ctx)] + \
+        cacheCoreReposForTesting(ctx) + \
+        testOcisModules(ctx) + \
+        testPipelines(ctx)
 
     build_release_pipelines = \
         [licenseCheck(ctx)] + \
@@ -213,26 +213,26 @@ def main(ctx):
         docs(),
     ]
 
-    # test_pipelines.append(
-    #     pipelineDependsOn(
-    #         purgeBuildArtifactCache(ctx, "ocis-binary-amd64"),
-    #         testPipelines(ctx),
-    #     ),
-    # )
-    # test_pipelines.append(
-    #     pipelineDependsOn(
-    #         purgeBuildArtifactCache(ctx, "testrunner"),
-    #         testPipelines(ctx),
-    #     ),
-    # )
-    # test_pipelines.append(
-    #     pipelineDependsOn(
-    #         purgeBuildArtifactCache(ctx, "testing_app"),
-    #         testPipelines(ctx),
-    #     ),
-    # )
+    test_pipelines.append(
+        pipelineDependsOn(
+            purgeBuildArtifactCache(ctx, "ocis-binary-amd64"),
+            testPipelines(ctx),
+        ),
+    )
+    test_pipelines.append(
+        pipelineDependsOn(
+            purgeBuildArtifactCache(ctx, "testrunner"),
+            testPipelines(ctx),
+        ),
+    )
+    test_pipelines.append(
+        pipelineDependsOn(
+            purgeBuildArtifactCache(ctx, "testing_app"),
+            testPipelines(ctx),
+        ),
+    )
 
-    pipelines = test_pipelines
+    pipelines = test_pipelines + build_release_pipelines + build_release_helpers
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -310,7 +310,6 @@ def yarnInstallUITests():
         "commands": [
             "curl -SsfL -o /usr/local/bin/retry https://raw.githubusercontent.com/owncloud-ci/retry/master/retry && chmod +x /usr/local/bin/retry",
             ". /drone/src/.drone.env",
-            "ls",
             "cd webTestRunner",
             "git checkout $WEB_COMMITID",
             "cd tests/acceptance/",
