@@ -233,6 +233,14 @@ pass:[true]
 a| [subs=-attributes]
 Enables the support for resharing in the frontend.
 
+|`FRONTEND_SEARCH_MIN_LENGTH`
+a| [subs=-attributes]
++int+
+a| [subs=-attributes]
+pass:[3]
+a| [subs=-attributes]
+Minimum number of characters to enter before starting a search for Sharees.
+
 |`OCIS_URL` +
 `FRONTEND_PUBLIC_URL`
 a| [subs=-attributes]

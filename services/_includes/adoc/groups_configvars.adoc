@@ -168,7 +168,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[~/.ocis/idm/ldap.crt]
 a| [subs=-attributes]
-Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty the system default CA bundle will be used.
+Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty, the system default CA bundle will be used.
 
 |`LDAP_INSECURE` +
 `GROUPS_LDAP_INSECURE`
@@ -232,6 +232,15 @@ a| [subs=-attributes]
 pass:[sub]
 a| [subs=-attributes]
 LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
+
+|`LDAP_GROUP_SUBSTRING_FILTER_TYPE` +
+`GROUP_LDAP_GROUP_SUBSTRING_FILTER_TYPE`
+a| [subs=-attributes]
++string+
+a| [subs=-attributes]
+pass:[initial]
+a| [subs=-attributes]
+Type of substring search filter to use for substring searches for groups. Possible values: 'initial' for doing prefix only searches, 'final' for doing suffix only searches or 'any' for doing full substring searches
 
 |`LDAP_USER_FILTER` +
 `GROUPS_LDAP_USER_FILTER`

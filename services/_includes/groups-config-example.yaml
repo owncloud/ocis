@@ -36,6 +36,7 @@ drivers:
     group_base_dn: ou=groups,o=libregraph-idm
     user_scope: sub
     group_scope: sub
+    group_substring_filter_type: initial
     user_filter: ""
     group_filter: ""
     user_object_class: inetOrgPerson

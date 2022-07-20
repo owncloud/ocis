@@ -21,7 +21,7 @@
 | USERS_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
 | USERS_DRIVER | string | ldap | The user driver which should be used by the users service. Supported values are 'ldap', 'owncloudsql', 'json' and 'rest'.|
 | LDAP_URI<br/>USERS_LDAP_URI | string | ldaps://localhost:9235 | URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'|
-| LDAP_CACERT<br/>USERS_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty the system default CA bundle will be used.|
+| LDAP_CACERT<br/>USERS_LDAP_CACERT | string | ~/.ocis/idm/ldap.crt | Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty, the system default CA bundle will be used.|
 | LDAP_INSECURE<br/>USERS_LDAP_INSECURE | bool | false | Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.|
 | LDAP_BIND_DN<br/>USERS_LDAP_BIND_DN | string | uid=reva,ou=sysusers,o=libregraph-idm | LDAP DN to use for simple bind authentication with the target LDAP server.|
 | LDAP_BIND_PASSWORD<br/>USERS_LDAP_BIND_PASSWORD | string |  | Password to use for authenticating the 'bind_dn'.|
@@ -29,6 +29,7 @@
 | LDAP_GROUP_BASE_DN<br/>USERS_LDAP_GROUP_BASE_DN | string | ou=groups,o=libregraph-idm | Search base DN for looking up LDAP groups.|
 | LDAP_USER_SCOPE<br/>USERS_LDAP_USER_SCOPE | string | sub | LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.|
 | LDAP_GROUP_SCOPE<br/>USERS_LDAP_GROUP_SCOPE | string | sub | LDAP search scope to use when looking up groups. Supported values are 'base', 'one' and 'sub'.|
+| LDAP_USER_SUBSTRING_FILTER_TYPE<br/>USERS_LDAP_USER_SUBSTRING_FILTER_TYPE | string | initial | Type of substring search filter to use for substring searches for users. Possible values: 'initial' for doing prefix only searches, 'final' for doing suffix only searches or 'any' for doing full substring searches|
 | LDAP_USER_FILTER<br/>USERS_LDAP_USER_FILTER | string |  | LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.|
 | LDAP_GROUP_FILTER<br/>USERS_LDAP_GROUP_FILTER | string |  | LDAP filter to add to the default filters for group searches.|
 | LDAP_USER_OBJECTCLASS<br/>USERS_LDAP_USER_OBJECTCLASS | string | inetOrgPerson | The object class to use for users in the default user search filter like 'inetOrgPerson'.|

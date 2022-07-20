@@ -34,6 +34,7 @@ upload_max_chunk_size: 100000000
 upload_http_method_override: ""
 default_upload_protocol: tus
 enable_resharing: true
+search_min_length: 3
 public_url: https://localhost:9200
 app_handler:
   insecure: false
