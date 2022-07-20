@@ -91,10 +91,12 @@ func (g Graph) GetGatewayClient() GatewayClient {
 }
 
 func (g Graph) publishEvent(ev interface{}) {
-	if err := events.Publish(g.eventsPublisher, ev); err != nil {
-		g.logger.Error().
-			Err(err).
-			Msg("could not publish user created event")
+	if g.eventsPublisher != nil {
+		if err := events.Publish(g.eventsPublisher, ev); err != nil {
+			g.logger.Error().
+				Err(err).
+				Msg("could not publish user created event")
+		}
 	}
 }
 

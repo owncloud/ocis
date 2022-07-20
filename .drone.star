@@ -208,8 +208,8 @@ def main(ctx):
         [releaseSubmodule(ctx)]
 
     build_release_helpers = [
-        changelog(ctx),
-        docs(ctx),
+        changelog(),
+        docs(),
     ]
 
     test_pipelines.append(
@@ -248,7 +248,7 @@ def main(ctx):
     # always append notification step
     pipelines.append(
         pipelineDependsOn(
-            notify(ctx),
+            notify(),
             pipelines,
         ),
     )
@@ -269,7 +269,6 @@ def yarnCache(ctx):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/**",
                 "refs/pull/**",
             ],
         },
@@ -290,11 +289,12 @@ def yarnInstallUITests():
         "name": "yarn-install",
         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
         "commands": [
+            "curl -SsfL -o /usr/local/bin/retry https://raw.githubusercontent.com/owncloud-ci/retry/master/retry && chmod +x /usr/local/bin/retry",
             ". /drone/src/.drone.env",
             "cd webTestRunner",
             "git checkout $WEB_COMMITID",
             "cd tests/acceptance/",
-            "yarn install --immutable",
+            "retry -t 3 'yarn install --immutable'",
         ],
     }]
 
@@ -416,7 +416,6 @@ def testOcisModule(ctx, module):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/tags/%s/v*" % (module),
                 "refs/pull/**",
             ],
@@ -441,7 +440,6 @@ def buildOcisBinaryForTesting(ctx):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
@@ -464,7 +462,6 @@ def cacheCoreReposForTesting(ctx):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
@@ -558,7 +555,6 @@ def uploadScanResults(ctx):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
@@ -613,7 +609,6 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
@@ -645,7 +640,6 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
@@ -653,7 +647,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
     early_fail = config["apiTests"]["earlyFail"] if "earlyFail" in config["apiTests"] else False
-    filterTags = "~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
+    filterTags = "~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage&&~@caldav&&~@carddav" % ("OC" if storage == "owncloud" else "OCIS")
     expectedFailuresFile = "/drone/src/tests/acceptance/expected-failures-API-on-%s-storage.md" % (storage.upper())
 
     return {
@@ -701,7 +695,6 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
@@ -735,7 +728,7 @@ def uiTests(ctx):
     filterTags = params["filterTags"]
     earlyFail = params["earlyFail"]
 
-    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "tag" or ctx.build.event == "cron"):
+    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
         numberOfParts = params["numberOfParts"]
         skipExceptParts = params["skipExceptParts"]
         debugPartsEnabled = (len(skipExceptParts) != 0)
@@ -818,7 +811,6 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
@@ -854,6 +846,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     "MIDDLEWARE_HOST": "http://middleware:3000",
                 },
                 "commands": [
+                    "curl -SsfL -o /usr/local/bin/retry https://raw.githubusercontent.com/owncloud-ci/retry/master/retry && chmod +x /usr/local/bin/retry",
                     ". /drone/src/.drone.env",
                     # we need to have Web around for some general step definitions (eg. how to log in)
                     "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /srv/app/web",
@@ -862,7 +855,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                     # TODO: settings/package.json has all the acceptance test dependencies
                     # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
                     "cd /drone/src/services/settings",
-                    "yarn install --immutable",
+                    "retry -t 3 'yarn install --immutable'",
                     "make test-acceptance-webui",
                 ],
                 "volumes": [{
@@ -885,7 +878,6 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },
@@ -959,7 +951,7 @@ def dockerReleases(ctx):
     for arch in config["dockerReleases"]["architectures"]:
         pipelines.append(dockerRelease(ctx, arch))
 
-    manifest = releaseDockerManifest(ctx)
+    manifest = releaseDockerManifest()
     manifest["depends_on"] = getPipelineNames(pipelines)
     pipelines.append(manifest)
 
@@ -974,6 +966,10 @@ def dockerRelease(ctx, arch):
         "REVISION=%s" % (ctx.build.commit),
         "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "latest"),
     ]
+    depends_on = getPipelineNames(testOcisModules(ctx) + testPipelines(ctx))
+
+    if ctx.build.event == "tag":
+        depends_on = []
 
     return {
         "kind": "pipeline",
@@ -1038,7 +1034,7 @@ def dockerRelease(ctx, arch):
                 },
             },
         ],
-        "depends_on": getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
+        "depends_on": depends_on,
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -1059,6 +1055,7 @@ def binaryReleases(ctx):
 def binaryRelease(ctx, name):
     # uploads binary to https://download.owncloud.com/ocis/ocis/daily/
     target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
+    depends_on = getPipelineNames(testOcisModules(ctx) + testPipelines(ctx))
     if ctx.build.event == "tag":
         # uploads binary to eg. https://download.owncloud.com/ocis/ocis/1.0.0-beta9/
         folder = "stable"
@@ -1067,6 +1064,7 @@ def binaryRelease(ctx, name):
         if buildref.find("-") != -1:  # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
             folder = "testing"
         target = "/ocis/%s/%s/%s" % (ctx.repo.name.replace("ocis-", ""), folder, buildref)
+        depends_on = []
 
     settings = {
         "endpoint": {
@@ -1163,7 +1161,7 @@ def binaryRelease(ctx, name):
                 },
             },
         ],
-        "depends_on": getPipelineNames(testOcisModules(ctx) + testPipelines(ctx)),
+        "depends_on": depends_on,
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -1177,7 +1175,6 @@ def binaryRelease(ctx, name):
 def licenseCheck(ctx):
     # uploads third-party-licenses to https://download.owncloud.com/ocis/ocis/daily/
     target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
-    depends_on = []
     if ctx.build.event == "tag":
         # uploads third-party-licenses to eg. https://download.owncloud.com/ocis/ocis/1.0.0-beta9/
         folder = "stable"
@@ -1186,7 +1183,6 @@ def licenseCheck(ctx):
         if buildref.find("-") != -1:  # "x.x.x-alpha", "x.x.x-beta", "x.x.x-rc"
             folder = "testing"
         target = "/ocis/%s/%s/%s" % (ctx.repo.name.replace("ocis-", ""), folder, buildref)
-        depends_on = getPipelineNames(testOcisModules(ctx) + testPipelines(ctx))
 
     settings = {
         "endpoint": {
@@ -1297,7 +1293,6 @@ def licenseCheck(ctx):
                 },
             },
         ],
-        "depends_on": depends_on,
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -1351,7 +1346,7 @@ def releaseSubmodule(ctx):
         },
     }
 
-def releaseDockerManifest(ctx):
+def releaseDockerManifest():
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -1385,7 +1380,7 @@ def releaseDockerManifest(ctx):
         },
     }
 
-def changelog(ctx):
+def changelog():
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -1487,7 +1482,7 @@ def releaseDockerReadme(ctx):
         },
     }
 
-def docs(ctx):
+def docs():
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -1609,7 +1604,7 @@ def makeGoGenerate(module):
         },
     ]
 
-def notify(ctx):
+def notify():
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -1859,6 +1854,10 @@ def skipIfUnchanged(ctx, type):
         "^changelog/.*",
         "^docs/.*",
         "^deployments/.*",
+        "CHANGELOG.md",
+        "CONTRIBUTING.md",
+        "LICENSE",
+        "README.md",
     ]
     unit = [
         ".*_test.go$",
@@ -2077,7 +2076,6 @@ def genericCachePurge(ctx, name, cache_key):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
             "status": [
@@ -2309,7 +2307,6 @@ def parallelDeployAcceptancePipeline(ctx):
             else:
                 pipeline["trigger"]["ref"] = [
                     "refs/heads/master",
-                    "refs/tags/v*",
                     "refs/pull/**",
                 ]
 
@@ -2611,7 +2608,6 @@ def litmus(ctx, storage):
         "trigger": {
             "ref": [
                 "refs/heads/master",
-                "refs/tags/v*",
                 "refs/pull/**",
             ],
         },

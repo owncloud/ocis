@@ -98,7 +98,6 @@ services:
       APP_PROVIDER_WOPI_APP_ICON_URI: https://${COLLABORA_DOMAIN:-collabora.owncloud.test}/favicon.ico
       APP_PROVIDER_WOPI_APP_URL: https://${COLLABORA_DOMAIN:-collabora.owncloud.test}
       APP_PROVIDER_WOPI_INSECURE: "${INSECURE:-false}"
-      APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET: ${WOPI_IOP_SECRET:-LoremIpsum123}
       APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
     volumes:
       - ocis-config:/etc/ocis
@@ -124,7 +123,6 @@ services:
       APP_PROVIDER_WOPI_APP_ICON_URI: https://${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}/web-apps/apps/documenteditor/main/resources/img/favicon.ico
       APP_PROVIDER_WOPI_APP_URL: https://${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
       APP_PROVIDER_WOPI_INSECURE: "${INSECURE:-false}"
-      APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET: ${WOPI_IOP_SECRET:-LoremIpsum123}
       APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
     volumes:
       - ./config/ocis-appdriver-onlyoffice/entrypoint-override.sh:/entrypoint-override.sh
@@ -142,7 +140,6 @@ services:
     environment:
       WOPISERVER_INSECURE: "${INSECURE:-false}"
       WOPISECRET: ${WOPI_JWT_SECRET:-LoremIpsum567}
-      IOPSECRET: ${WOPI_IOP_SECRET:-LoremIpsum123}
       WOPISERVER_DOMAIN: ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
     volumes:
       - ./config/wopiserver/entrypoint-override.sh:/entrypoint-override.sh
@@ -161,7 +158,7 @@ services:
     restart: always
 
   collabora:
-    image: collabora/code:21.11.5.3.1
+    image: collabora/code:22.05.4.1.1@sha256:157cfc71fe9fe09b672dd28222f91e0c3f307e593fbb449fb297f8659ac8f960
     networks:
       ocis-net:
     environment:
@@ -184,7 +181,7 @@ services:
     restart: always
 
   onlyoffice:
-    image: onlyoffice/documentserver:7.1
+    image: onlyoffice/documentserver:7.1.1
     networks:
       ocis-net:
     environment:
