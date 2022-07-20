@@ -7,6 +7,10 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc v1.2.2
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
+	github.com/armon/go-radix v1.0.0
+	github.com/blevesearch/bleve/v2 v2.3.3
+	github.com/blevesearch/bleve_index_api v1.0.2
+	github.com/coreos/go-oidc/v3 v3.2.0
 	github.com/blevesearch/bleve/v2 v2.3.4
 	github.com/blevesearch/bleve_index_api v1.0.3
 	github.com/coreos/go-oidc/v3 v3.4.0
@@ -29,6 +33,7 @@ require (
 	github.com/go-micro/plugins/v4/registry/nats v1.1.0
 	github.com/go-micro/plugins/v4/server/grpc v1.1.1
 	github.com/go-micro/plugins/v4/server/http v1.1.0
+	github.com/go-micro/plugins/v4/store/redis v1.1.0
 	github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.1.0
 	github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus v1.1.0
 	github.com/go-micro/plugins/v4/wrapper/trace/opencensus v1.1.0

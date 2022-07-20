@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/ReneKroon/ttlcache/v2"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
@@ -145,8 +144,6 @@ func NewService(opts ...Option) Service {
 	roleManager := options.RoleManager
 	if roleManager == nil {
 		m := roles.NewManager(
-			roles.CacheSize(1024),
-			roles.CacheTTL(time.Hour),
 			roles.Logger(options.Logger),
 			roles.RoleService(svc.roleService),
 		)

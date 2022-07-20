@@ -2,7 +2,6 @@ package svc
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
@@ -43,8 +42,6 @@ func NewService(opts ...Option) Service {
 	roleManager := options.RoleManager
 	if roleManager == nil {
 		m := roles.NewManager(
-			roles.CacheSize(1024),
-			roles.CacheTTL(time.Hour*24*7),
 			roles.Logger(options.Logger),
 			roles.RoleService(roleService),
 		)
