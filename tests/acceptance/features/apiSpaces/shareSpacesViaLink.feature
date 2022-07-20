@@ -32,9 +32,7 @@ Feature: Share spaces via link
             | path                   | /                     |
             | permissions            | <expectedPermissions> |
             | share_type             | public_link           |
-            | displayname_file_owner | %displayname%         |
             | displayname_owner      | %displayname%         |
-            | uid_file_owner         | %username%            |
             | uid_owner              | %username%            |
             | name                   | <linkName>            |
         And the public should be able to download file "/test.txt" from inside the last public link shared folder using the new public WebDAV API with password "<password>"
@@ -57,17 +55,15 @@ Feature: Share spaces via link
         And the OCS status code should be "200"
         And the OCS status message should be "OK"
         And the fields of the last response to user "Alice" should include
-            | item_type              | folder               |
-            | mimetype               | httpd/unix-directory |
-            | file_target            | /                    |
-            | path                   | /                    |
-            | permissions            | create               |
-            | share_type             | public_link          |
-            | displayname_file_owner | %displayname%        |
-            | displayname_owner      | %displayname%        |
-            | uid_file_owner         | %username%           |
-            | uid_owner              | %username%           |
-            | name                   | forUpload            |
+            | item_type         | folder               |
+            | mimetype          | httpd/unix-directory |
+            | file_target       | /                    |
+            | path              | /                    |
+            | permissions       | create               |
+            | share_type        | public_link          |
+            | displayname_owner | %displayname%        |
+            | uid_owner         | %username%           |
+            | name              | forUpload            |
         And the public should be able to upload file "lorem.txt" into the last public link shared folder using the new public WebDAV API with password "123"
         And for user "Alice" the space "share space" should contain these entries:
             | lorem.txt |

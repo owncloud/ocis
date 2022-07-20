@@ -2843,18 +2843,12 @@ class SpacesContext implements Context {
 		string $shouldOrNot
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$url = "/apps/files_sharing/api/v1/shares";
-
-		$bodyTable = new TableNode([
-			["space_ref", $space['id']],
-			["reshares", true],
-		]);
+		$url = "/apps/files_sharing/api/v1/shares?reshares=true&space_ref=" . $space['id'];
 
 		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			'GET',
 			$url,
-			$bodyTable
 		);
 
 		$should = ($shouldOrNot !== "not");
