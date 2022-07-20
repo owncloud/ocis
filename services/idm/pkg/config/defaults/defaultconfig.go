@@ -33,7 +33,7 @@ func DefaultConfig() *config.Config {
 }
 
 func EnsureDefaults(cfg *config.Config) {
-	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
+	// provide with defaults for shared logging, since we need a valid destination address for "envdecode".
 	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
 		cfg.Log = &config.Log{
 			Level:  cfg.Commons.Log.Level,
@@ -44,7 +44,7 @@ func EnsureDefaults(cfg *config.Config) {
 	} else if cfg.Log == nil {
 		cfg.Log = &config.Log{}
 	}
-	// provide with defaults for shared tracing, since we need a valid destination address for BindEnv.
+	// provide with defaults for shared tracing, since we need a valid destination address for "envdecode".
 	if cfg.Tracing == nil && cfg.Commons != nil && cfg.Commons.Tracing != nil {
 		cfg.Tracing = &config.Tracing{
 			Enabled:   cfg.Commons.Tracing.Enabled,

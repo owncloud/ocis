@@ -66,7 +66,8 @@ services:
       LDAP_USER_BASE_DN: "dc=owncloud,dc=com"
       LDAP_USER_FILTER: "(objectclass=owncloud)"
       LDAP_USER_OBJECTCLASS: "inetOrgPerson"
-      LDAP_LOGIN_ATTRIBUTES: "uid,mail"
+      LDAP_LOGIN_ATTRIBUTES: "uid"
+      OCIS_ADMIN_USER_ID: "ddc2004c-0977-11eb-9d3f-a793888cd0f8"
       IDP_LDAP_URI: ldap://ldap-server
       IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
       IDP_LDAP_UUID_ATTRIBUTE: "ownclouduuid"

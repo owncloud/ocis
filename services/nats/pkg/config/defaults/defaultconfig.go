@@ -35,7 +35,7 @@ func DefaultConfig() *config.Config {
 }
 
 func EnsureDefaults(cfg *config.Config) {
-	// provide with defaults for shared logging, since we need a valid destination address for BindEnv.
+	// provide with defaults for shared logging, since we need a valid destination address for "envdecode".
 	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
 		cfg.Log = &config.Log{
 			Level:  cfg.Commons.Log.Level,

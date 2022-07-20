@@ -75,6 +75,29 @@ class SpacesContext implements Context {
 	private string $davSpacesUrl = '/remote.php/dav/spaces/';
 
 	/**
+	 * @var array map with user as key, spaces and file etags as value
+	 * @example
+	 * [
+	 *   "user1" => [
+	 *     "Personal" => [
+	 *       "file1.txt": "etag1",
+	 *     ],
+	 *     "Shares Jail" => []
+	 *   ],
+	 *   "user2" => [
+	 *     ...
+	 *   ]
+	 * ]
+	 */
+	private $storedEtags = [];
+
+    private $etagPropfindBody = '<?xml version="1.0"?>'
+        . '<d:propfind xmlns:d="DAV:" '
+        . 'xmlns:oc="http://owncloud.org/ns" '
+        . 'xmlns:ocs="http://open-collaboration-services.org/ns">'
+        .'<d:prop><d:getetag/></d:prop></d:propfind>';
+
+	/**
 	 * @param string $spaceName
 	 *
 	 * @return string name of the user that created the space
@@ -215,8 +238,10 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function getSpaceByName(string $user, string $spaceName): array {
+		if ($spaceName === "Personal") {
+			$spaceName = $this->featureContext->getUserDisplayName($user);
+		}
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
-
 		$spaces = $this->getAvailableSpaces();
 		Assert::assertIsArray($spaces[$spaceName], "Space with name $spaceName for user $user not found");
 		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName for user $user not found");
@@ -1661,6 +1686,97 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" to "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $fileSource
+	 * @param string $fileDestination
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userCopiesFileWithinSpaceUsingTheWebDAVAPI(
+		string $user,
+		string $fileSource,
+		string $fileDestination,
+		string $spaceName
+	):void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName(
+			$user,
+			$fileDestination,
+			$spaceName
+		);
+
+		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileSource, "/");
+		$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" from space "([^"]*)" to "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $fileSource
+	 * @param string $fromSpaceName
+	 * @param string $fileDestination
+	 * @param string $toSpaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userCopiesFileFromAndToSpaceBetweenSpaces(
+		string $user,
+		string $fileSource,
+		string $fromSpaceName,
+		string $fileDestination,
+		string $toSpaceName
+	):void {
+		$space = $this->getSpaceByName($user, $fromSpaceName);
+		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName);
+		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileSource, "/");
+		$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
+	}
+
+	/**
+	 * returns a url for destination with spacename
+	 *
+	 * @param string $user
+	 * @param string $fileDestination
+	 * @param string $spaceName
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 */
+	public function destinationHeaderValueWithSpaceName(string $user, string $fileDestination, string $spaceName):string {
+		$space = $this->getSpaceByName($user, $spaceName);
+		return $space["root"]["webDavUrl"] . '/' . \ltrim($fileDestination, '/');
+	}
+
+	/**
+	 * COPY request for files|folders
+	 *
+	 * @param string $user
+	 * @param string $fullUrl
+	 * @param array $headers
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function copyFilesAndFoldersRequest(string $user, string $fullUrl, array $headers):void {
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				$this->featureContext->getStepLineRef(),
+				'COPY',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$headers,
+			)
+		);
+	}
+
+	/**
 	 * @Given /^user "([^"]*)" has uploaded a file inside space "([^"]*)" with content "([^"]*)" to "([^"]*)"$/
 	 *
 	 * @param string $user
@@ -2365,5 +2481,175 @@ class SpacesContext implements Context {
 
 		$responseXml = HttpRequestHelper::getResponseXml($this->featureContext->getResponse());
 		return $responseXml->xpath("//d:response/d:href");
+	}
+
+	/**
+	 * return the etag for an element inside a space
+	 *
+	 * @param string $user requestor
+	 * @param string $space space name
+	 * @param string $path path to the file
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 */
+	public function userGetsEtagOfElementInASpace(string $user, string $space, string $path) {
+		$user = $this->featureContext->getActualUsername($user);
+		$space = $this->getSpaceByName($user, $space);
+
+		$fullUrl = $space['root']['webDavUrl'] . '/' . ltrim($path, '/');
+		$response = HttpRequestHelper::sendRequest(
+			$fullUrl,
+			$this->featureContext->getStepLineRef(),
+			'PROPFIND',
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			[],
+			$this->etagPropfindBody
+		);
+		$responseXml = HttpRequestHelper::getResponseXml($response);
+		$this->featureContext->setResponseXmlObject($responseXml);
+		return $this->featureContext->getEtagFromResponseXmlObject();
+	}
+
+	/**
+	 * saves the etag of an element in a space
+	 *
+	 * @param string $user requestor
+	 * @param string $space space name
+	 * @param string $path path to the file
+	 * @param ?string $storePath path to the file in the store
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function storeEtagOfElementInSpaceForUser(string $user, string $space, string $path, ?string $storePath = ""): void {
+		if ($storePath === "") {
+			$storePath = $path;
+		}
+		$this->storedEtags[$user][$space][$storePath]
+			= $this->userGetsEtagOfElementInASpace(
+				$user,
+				$space,
+				$path,
+			);
+	}
+
+	/**
+	 * returns stored etag for an element if present
+	 *
+	 * @param string $user
+	 * @param string $space
+	 * @param string $path
+	 *
+	 * @return string
+	 */
+	public function getStoredEtagForPathInSpaceOfAUser(string $user, string $space, string $path): string {
+		Assert::assertArrayHasKey(
+			$user,
+			$this->storedEtags,
+			__METHOD__ . " No stored etags for user '$user' found"
+			. "\nFound: " . print_r($this->storedEtags, true)
+		);
+		Assert::assertArrayHasKey(
+			$space,
+			$this->storedEtags[$user],
+			__METHOD__ . " No stored etags for user '$user' with space '$space' found"
+			. "\nFound: " . implode(', ', array_keys($this->storedEtags[$user]))
+		);
+		Assert::assertArrayHasKey(
+			$path,
+			$this->storedEtags[$user][$space],
+			__METHOD__ . " No stored etags for user '$user' with space '$space' with path '$path' found"
+			. '\nFound: ' . print_r($this->storedEtags[$user][$space], true)
+		);
+		return $this->storedEtags[$user][$space][$path];
+	}
+
+	/**
+	 * @Then /^these etags should have changed$/
+	 *
+	 * @throws GuzzleException
+	 */
+	public function theseEtagsShouldHaveChanged(TableNode $table): void {
+		$this->featureContext->verifyTableNodeColumns($table, ["user", "path", "space"]);
+		$this->featureContext->verifyTableNodeColumnsCount($table, 3);
+		$unchangedEtagCount = 0;
+		$unchangedEtagMessage = __METHOD__;
+		foreach ($table->getColumnsHash() as $row) {
+			$user = $row['user'];
+			$path = $row['path'];
+			$space = $row['space'];
+			$etag = $this->userGetsEtagOfElementInASpace($user, $space, $path);
+			$storedEtag = $this->getStoredEtagForPathInSpaceOfAUser($user, $space, $path);
+			if ($etag === $storedEtag) {
+				$unchangedEtagCount++;
+				$unchangedEtagMessage .= "\nExpected etag of element '$path' for  user '$user' in space '$space' to change, but it did not.";
+			}
+		}
+
+		Assert::assertEquals(0, $unchangedEtagCount, $unchangedEtagMessage);
+	}
+
+	/**
+	 * @Then /^these etags should not have changed$/
+	 *
+	 * @param TableNode $table
+	 *
+	 * @throws GuzzleException
+	 */
+	public function theseEtagsShouldNotHaveChanged(TableNode $table): void {
+		$this->featureContext->verifyTableNodeColumns($table, ["user", "path", "space"]);
+		$this->featureContext->verifyTableNodeColumnsCount($table, 3);
+		$changedEtagCount = 0;
+		$changedEtagMessage = __METHOD__;
+		foreach ($table->getColumnsHash() as $row) {
+			$user = $row['user'];
+			$path = $row['path'];
+			$space = $row['space'];
+			$actualEtag = $this->userGetsEtagOfElementInASpace($user, $space, $path);
+			$storedEtag = $this->getStoredEtagForPathInSpaceOfAUser($user, $space, $path);
+			if ($actualEtag !== $storedEtag) {
+				$changedEtagCount++;
+				$changedEtagMessage .= "\nExpected etag of element '$path' for  user '$user' in space '$space' not to change, but it did.";
+			}
+		}
+
+		Assert::assertEquals(0, $changedEtagCount, $changedEtagMessage);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has stored etag of element "([^"]*)" inside space "([^"]*)"$/
+	 *
+	 * @throws GuzzleException | Exception
+	 */
+	public function userHasStoredEtagOfElementFromSpace(string $user, string $path, string $space):void {
+		$user = $this->featureContext->getActualUsername($user);
+		$this->storeEtagOfElementInSpaceForUser(
+			$user,
+			$space,
+			$path,
+		);
+		if ($this->storedEtags[$user][$space][$path] === "" || $this->storedEtags[$user][$space][$path] === null) {
+			throw new Exception("Expected stored etag to be some string but found null!");
+		}
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has stored etag of element "([^"]*)" on path "([^"]*)" inside space "([^"]*)"$/
+	 *
+	 * @throws Exception | GuzzleException
+	 */
+	public function userHasStoredEtagOfElementOnPathFromSpace($user, $path, $storePath, $space) {
+		$user = $this->featureContext->getActualUsername($user);
+		$this->storeEtagOfElementInSpaceForUser(
+			$user,
+			$space,
+			$path,
+			$storePath
+		);
+		if ($this->storedEtags[$user][$space][$storePath] === "" || $this->storedEtags[$user][$space][$storePath] === null) {
+			throw new Exception("Expected stored etag to be some string but found null!");
+		}
 	}
 }
