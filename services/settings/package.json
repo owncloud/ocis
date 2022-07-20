@@ -38,7 +38,7 @@
     "debounce": "^1.2.1",
     "lodash-es": "^4.17.21",
     "qs": "^6.11.0",
-    "vue": "^2.6.10",
+    "vue": "^3.2.37",
     "vuex": "^3.6.2"
   },
   "devDependencies": {
