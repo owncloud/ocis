@@ -839,6 +839,7 @@ class SpacesContext implements Context {
 		Assert::assertIsArray($space);
 		Assert::assertNotEmpty($spaceId = $space["id"]);
 		Assert::assertNotEmpty($spaceWebDavUrl = $space["root"]["webDavUrl"]);
+		$headers['Depth'] = 'infinity';
 		$this->featureContext->setResponse(
 			$this->sendPropfindRequestToUrl(
 				$spaceWebDavUrl . '/' . $foldersPath,
