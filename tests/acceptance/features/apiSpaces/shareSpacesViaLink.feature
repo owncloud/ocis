@@ -17,8 +17,7 @@ Feature: Share spaces via link
 
 
     Scenario Outline: A manager can share a space to public via link with different permissions
-        When user "Alice" creates public link share of the space "share space" with settings:
-            | shareType   | 3             |
+        When user "Alice" creates a public link share of the space "share space" with settings:
             | permissions | <permissions> |
             | password    | <password>    |
             | name        | <linkName>    |
@@ -31,7 +30,7 @@ Feature: Share spaces via link
             | mimetype               | httpd/unix-directory  |
             | file_target            | /                     |
             | path                   | /                     |
-            | permissions            | <permissionsMatching> |
+            | permissions            | <expectedPermissions> |
             | share_type             | public_link           |
             | displayname_file_owner | %displayname%         |
             | displayname_owner      | %displayname%         |
@@ -41,15 +40,14 @@ Feature: Share spaces via link
         And the public should be able to download file "/test.txt" from inside the last public link shared folder using the new public WebDAV API with password "123"
         And the downloaded content should be "some content"
         Examples:
-            | permissions | permissionsMatching       | password | linkName | expireDate               |
+            | permissions | expectedPermissions       | password | linkName | expireDate               |
             | 1           | read                      | 123      | link     | 2042-03-25T23:59:59+0100 |
             | 5           | read,create               | 123      |          | 2042-03-25T23:59:59+0100 |
             | 15          | read,update,create,delete |          | link     |                          |
 
 
-    Scenario: An uploader should be abble to upload a file
-        When user "Alice" creates public link share of the space "share space" with settings:
-            | shareType   | 3                        |
+    Scenario: An uploader should be able to upload a file
+        When user "Alice" creates a public link share of the space "share space" with settings:
             | permissions | 4                        |
             | password    | 123                      |
             | name        | forUpload                |
@@ -76,7 +74,7 @@ Feature: Share spaces via link
 
     Scenario Outline: An user without manager role cannot share a space to public via link
         Given user "Alice" has shared a space "share space" to user "Brian" with role "<role>"
-        When user "Brian" creates public link share of the space "share space" with settings:
+        When user "Brian" creates a public link share of the space "share space" with settings:
             | permissions | 1 |
         Then the HTTP status code should be "404"
         And the OCS status code should be "404"

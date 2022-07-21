@@ -364,7 +364,7 @@ class SpacesContext implements Context {
 		}
 		throw new Exception(__METHOD__ . " user with name $userName not found");
 	}
-	
+
 	/**
 	 * @BeforeScenario
 	 *
@@ -507,6 +507,7 @@ class SpacesContext implements Context {
 	 * @param  string $password
 	 * @param  string $xRequestId
 	 * @param  array  $headers
+	 * @param mixed $body
 	 *
 	 * @return ResponseInterface
 	 *
@@ -517,9 +518,10 @@ class SpacesContext implements Context {
 		string $user,
 		string $password,
 		string $xRequestId = '',
-		array $headers = []
+		array $headers = [],
+		$body = null
 	): ResponseInterface {
-		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, 'PROPFIND', $user, $password, $headers);
+		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, 'PROPFIND', $user, $password, $headers, $body);
 	}
 
 	/**
@@ -545,6 +547,57 @@ class SpacesContext implements Context {
 		string $content = ""
 	): ResponseInterface {
 		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, 'PUT', $user, $password, $headers, $content);
+	}
+
+	/**
+	 * Send POST Request to url
+	 *
+	 * @param string $fullUrl
+	 * @param string $user
+	 * @param string $password
+	 * @param mixed $body
+	 * @param string $xRequestId
+	 * @param array $headers
+	 * 
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 */
+	public function sendPostRequestToUrl(
+		string $fullUrl,
+		string $user,
+		string $password,
+		$body,
+		string $xRequestId = '',
+		array $headers = []
+	): ResponseInterface {
+		return HttpRequestHelper::post($fullUrl, $xRequestId, $user, $password, $headers, $body);
+	}
+
+	/**
+	 * Send Graph Create Folder Request
+	 *
+	 * @param  string $fullUrl
+	 * @param  string $method
+	 * @param  string $user
+	 * @param  string $password
+	 * @param  string $xRequestId
+	 * @param  array  $headers
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 */
+	public function sendCreateFolderRequest(
+		string $fullUrl,
+		string $method,
+		string $user,
+		string $password,
+		string $xRequestId = '',
+		array $headers = []
+	): ResponseInterface {
+		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers);
 	}
 
 	/**
@@ -688,13 +741,13 @@ class SpacesContext implements Context {
 	public function theAdministratorGivesUserTheRole(string $user, string $role): void {
 		$admin = $this->featureContext->getAdminUsername();
 		$password = $this->featureContext->getAdminPassword();
-		$headers = [];
 		$bundles = [];
 		$assignment = [];
 
 		// get the roles list first
 		$fullUrl = $this->baseUrl . "/api/v0/settings/roles-list";
-		$this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, "{}"));
+		$this->featureContext->setResponse($this->sendPostRequestToUrl($fullUrl, $admin, $password, "{}"));
+
 		if ($this->featureContext->getResponse()) {
 			$rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
 			if (isset(\json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["bundles"])) {
@@ -732,7 +785,7 @@ class SpacesContext implements Context {
 		$fullUrl = $this->baseUrl . "/api/v0/settings/assignments-add";
 		$body = json_encode(["account_uuid" => $accountToChange["id"], "role_id" => $roleToAssign["id"]], JSON_THROW_ON_ERROR);
 
-		$this->featureContext->setResponse(HttpRequestHelper::post($fullUrl, "", $admin, $password, $headers, $body));
+		$this->featureContext->setResponse($this->sendPostRequestToUrl($fullUrl, $admin, $password, $body));
 		if ($this->featureContext->getResponse()) {
 			$rawBody = $this->featureContext->getResponse()->getBody()->getContents();
 			if (isset(\json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["assignment"])) {
@@ -790,9 +843,7 @@ class SpacesContext implements Context {
 			$this->sendPropfindRequestToUrl(
 				$spaceWebDavUrl . '/' . $foldersPath,
 				$user,
-				$this->featureContext->getPasswordForUser($user),
-				"",
-				[],
+				$this->featureContext->getPasswordForUser($user)
 			)
 		);
 		$this->setResponseSpaceId($spaceId);
@@ -1415,31 +1466,6 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * Send Graph Create Folder Request
-	 *
-	 * @param  string $fullUrl
-	 * @param  string $method
-	 * @param  string $user
-	 * @param  string $password
-	 * @param  string $xRequestId
-	 * @param  array  $headers
-	 *
-	 * @return ResponseInterface
-	 *
-	 * @throws GuzzleException
-	 */
-	public function sendCreateFolderRequest(
-		string $fullUrl,
-		string $method,
-		string $user,
-		string $password,
-		string $xRequestId = '',
-		array $headers = []
-	): ResponseInterface {
-		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers);
-	}
-
-	/**
 	 * @When /^user "([^"]*)" changes the name of the "([^"]*)" space to "([^"]*)"$/
 	 *
 	 * @param string $user
@@ -1846,12 +1872,10 @@ class SpacesContext implements Context {
 		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
 
 		$this->featureContext->setResponse(
-			HttpRequestHelper::post(
+			$this->sendPostRequestToUrl(
 				$fullUrl,
-				"",
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				[],
 				$body
 			)
 		);
@@ -1887,12 +1911,10 @@ class SpacesContext implements Context {
 		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
 
 		$this->featureContext->setResponse(
-			HttpRequestHelper::post(
+			$this->sendPostRequestToUrl(
 				$fullUrl,
-				"",
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				[],
 				$body
 			)
 		);
@@ -1935,12 +1957,10 @@ class SpacesContext implements Context {
 		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
 
 		$this->featureContext->setResponse(
-			HttpRequestHelper::post(
+			$this->sendPostRequestToUrl(
 				$fullUrl,
-				"",
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				[],
 				$body
 			)
 		);
@@ -2215,14 +2235,10 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$fullUrl = $this->baseUrl . $this->davSpacesUrl . "trash-bin/" . $space["id"];
 		$this->featureContext->setResponse(
-			HttpRequestHelper::sendRequest(
+			$this->sendPropfindRequestToUrl(
 				$fullUrl,
-				"",
-				'PROPFIND',
 				$user,
-				$this->featureContext->getPasswordForUser($user),
-				[],
-				""
+				$this->featureContext->getPasswordForUser($user)
 			)
 		);
 	}
@@ -2473,14 +2489,10 @@ class SpacesContext implements Context {
 		$fullUrl = $this->baseUrl . '/remote.php/dav/meta/' . $fileId . '/v';
 
 		$this->featureContext->setResponse(
-			HttpRequestHelper::sendRequest(
+			$this->sendPropfindRequestToUrl(
 				$fullUrl,
-				"",
-				'PROPFIND',
 				$user,
-				$this->featureContext->getPasswordForUser($user),
-				[],
-				""
+				$this->featureContext->getPasswordForUser($user)
 			)
 		);
 
@@ -2503,12 +2515,11 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($user, $space);
 
 		$fullUrl = $space['root']['webDavUrl'] . '/' . ltrim($path, '/');
-		$response = HttpRequestHelper::sendRequest(
+		$response = $this->sendPropfindRequestToUrl(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
-			'PROPFIND',
 			$user,
 			$this->featureContext->getPasswordForUser($user),
+			$this->featureContext->getStepLineRef(),
 			[],
 			$this->etagPropfindBody
 		);
@@ -2659,7 +2670,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" creates public link share of the space "([^"]*)" with settings:$/
+	 * @When /^user "([^"]*)" creates a public link share of the space "([^"]*)" with settings:$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
@@ -2694,12 +2705,10 @@ class SpacesContext implements Context {
 		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
 
 		$this->featureContext->setResponse(
-			HttpRequestHelper::post(
+			$this->sendPostRequestToUrl(
 				$fullUrl,
-				"",
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				[],
 				$body
 			)
 		);
