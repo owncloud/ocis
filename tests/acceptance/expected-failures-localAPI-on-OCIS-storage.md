@@ -25,3 +25,11 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 ### [Space Admin still has access to the project despite being removed from it](https://github.com/owncloud/ocis/issues/4127)
 - [apiSpaces/shareSpaces.feature:77](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSpaces.feature#L77)
 - [apiSpaces/shareSpaces.feature:78](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSpaces.feature#L78)
+
+### [Depth infinity not supported for space Shares Jail](https://github.com/owncloud/ocis/issues/4188)
+- [apiSpaces/copySpaces.feature:112](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/copySpaces.feature#L112)
+- [apiSpaces/copySpaces.feature:113](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/copySpaces.feature#L113)
+- [apiSpaces/copySpaces.feature:114](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/copySpaces.feature#L114)
+- [apiSpaces/copySpaces.feature:163](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/copySpaces.feature#L163)
+- [apiSpaces/copySpaces.feature:260](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/copySpaces.feature#L260)
+- [apiSpaces/copySpaces.feature:261](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/copySpaces.feature#L261)
