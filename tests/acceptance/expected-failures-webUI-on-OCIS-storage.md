@@ -68,11 +68,9 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUISharingAutocompletion/shareAutocompletion.feature:168](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L168)
 - [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:55](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L55)
 - [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:56](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L56)
-- [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:57](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L57)
 - [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:73](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L73)
 - [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L74)
 - [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:75](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L75)
-- [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:76](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L76)
 
 ### [Minimum of three characters required for autocompletion](https://github.com/owncloud/ocis/issues/1961)
 - [webUISharingAutocompletion/shareAutocompletion.feature:32](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletion.feature#L32)
