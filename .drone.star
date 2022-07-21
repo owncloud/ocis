@@ -1599,7 +1599,7 @@ def makeNodeGenerate(module):
                 "CHROMEDRIVER_SKIP_DOWNLOAD": "true",  # install fails on arm and chromedriver is a test only dependency
             },
             "commands": [
-                "%s ci-node-generate" % (make),
+                "retry -t 3 '%s ci-node-generate'" % (make),
             ],
             "volumes": [stepVolumeGo],
         },
@@ -1615,7 +1615,7 @@ def makeGoGenerate(module):
             "name": "generate go",
             "image": OC_CI_GOLANG,
             "commands": [
-                "%s ci-go-generate" % (make),
+                "retry -t 3 '%s ci-go-generate'" % (make),
             ],
             "volumes": [stepVolumeGo],
         },
@@ -1861,7 +1861,7 @@ def build():
             "name": "build",
             "image": OC_CI_GOLANG,
             "commands": [
-                "make -C ocis build",
+                "retry -t 3 'make -C ocis build'",
             ],
             "volumes": [stepVolumeGo],
         },
