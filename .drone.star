@@ -83,7 +83,7 @@ config = {
         "ocis",
     ],
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "localApiTests": {
@@ -93,17 +93,17 @@ config = {
     "apiTests": {
         "numberOfParts": 10,
         "skip": False,
-        "skipExceptParts": [],
+        "skipExceptParts": [9],
         "earlyFail": True,
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "settingsUITests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "parallelApiTests": {
@@ -123,6 +123,7 @@ config = {
             "earlyFail": True,
             "cron": "nightly",
         },
+        "skip": True,
     },
     "rocketchat": {
         "channel": "ocis-internal",
