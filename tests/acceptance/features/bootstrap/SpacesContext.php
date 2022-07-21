@@ -844,7 +844,9 @@ class SpacesContext implements Context {
 			$this->sendPropfindRequestToUrl(
 				$spaceWebDavUrl . '/' . $foldersPath,
 				$user,
-				$this->featureContext->getPasswordForUser($user)
+				$this->featureContext->getPasswordForUser($user),
+				'',
+				$headers
 			)
 		);
 		$this->setResponseSpaceId($spaceId);

@@ -19,8 +19,8 @@ Feature: copy file
     And user "Alice" has shared a space "Project" to user "Brian" with role "<role>"
     When user "Brian" copies file "insideSpace.txt" to "/newfolder/insideSpace.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Brian" folder "newfolder" of the space "Project" should contain these entries:
-      | insideSpace.txt |
+    And for user "Brian" the space "Project" should contain these entries:
+      | newfolder/insideSpace.txt |
     And for user "Alice" the content of the file "newfolder/insideSpace.txt" of the space "Project" should be "some content"
     Examples:
       | role    |
@@ -106,7 +106,9 @@ Feature: copy file
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Shares Jail" should contain these entries:
       | /testshare/project.txt |
-    And for user "Alice" the content of the file "/testshare/project.txt" of the space "Shares Jail" should be "Project content"
+    #  And for user "Alice" folder "testshare" of the space "Shares Jail" should contain these entries:
+    #   | project.txt |
+    # And for user "Alice" the content of the file "/testshare/project.txt" of the space "Shares Jail" should be "Project content"
     Examples:
       | role    |
       | manager |
