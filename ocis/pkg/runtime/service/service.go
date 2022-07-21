@@ -54,7 +54,7 @@ import (
 
 var (
 	// runset keeps track of which extensions to start supervised.
-	runset []string
+	runset map[string]struct{}
 )
 
 type serviceFuncMap map[string]func(*ociscfg.Config) suture.Service
@@ -227,7 +227,7 @@ func Start(o ...Option) error {
 
 // scheduleServiceTokens adds service tokens to the service supervisor.
 func scheduleServiceTokens(s *Service, funcSet serviceFuncMap) {
-	for _, name := range runset {
+	for name := range runset {
 		if _, ok := funcSet[name]; !ok {
 			continue
 		}
@@ -240,31 +240,27 @@ func scheduleServiceTokens(s *Service, funcSet serviceFuncMap) {
 // generateRunSet interprets the cfg.Runtime.Extensions config option to cherry-pick which services to start using
 // the runtime.
 func (s *Service) generateRunSet(cfg *ociscfg.Config) {
+	runset = make(map[string]struct{})
 	if cfg.Runtime.Extensions != "" {
 		e := strings.Split(strings.ReplaceAll(cfg.Runtime.Extensions, " ", ""), ",")
-		for i := range e {
-			runset = append(runset, e[i])
+		for _, name := range e {
+			runset[name] = struct{}{}
 		}
 		return
 	}
 
-	disabled := make(map[string]bool)
-	if cfg.Runtime.Disabled != "" {
-		e := strings.Split(strings.ReplaceAll(cfg.Runtime.Disabled, " ", ""), ",")
-		for _, s := range e {
-			disabled[s] = true
-		}
-	}
-
 	for name := range s.ServicesRegistry {
-		if !disabled[name] {
-			runset = append(runset, name)
-		}
+		runset[name] = struct{}{}
 	}
 
 	for name := range s.Delayed {
-		if !disabled[name] {
-			runset = append(runset, name)
+		runset[name] = struct{}{}
+	}
+
+	if cfg.Runtime.Disabled != "" {
+		e := strings.Split(strings.ReplaceAll(cfg.Runtime.Disabled, " ", ""), ",")
+		for _, name := range e {
+			delete(runset, name)
 		}
 	}
 }
