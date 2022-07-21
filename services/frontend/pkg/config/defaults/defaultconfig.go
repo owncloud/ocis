@@ -39,6 +39,7 @@ func DefaultConfig() *config.Config {
 		UploadHTTPMethodOverride: "",
 		DefaultUploadProtocol:    "tus",
 		EnableResharing:          true,
+		SearchMinLength:          3,
 		Checksums: config.Checksums{
 			SupportedTypes:      []string{"sha1", "md5", "adler32"},
 			PreferredUploadType: "",

@@ -32,6 +32,7 @@ type Config struct {
 	UploadHTTPMethodOverride string `yaml:"upload_http_method_override" env:"FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE" desc:"Advise TUS to replace PATCH requests by POST requests."`
 	DefaultUploadProtocol    string `yaml:"default_upload_protocol" env:"FRONTEND_DEFAULT_UPLOAD_PROTOCOL" desc:"The default upload protocol to use in the frontend (e.g. tus)."`
 	EnableResharing          bool   `yaml:"enable_resharing" env:"FRONTEND_ENABLE_RESHARING" desc:"Enables the support for resharing in the frontend."`
+	SearchMinLength          int    `yaml:"search_min_length" env:"FRONTEND_SEARCH_MIN_LENGTH" desc:"Minimum number of characters to enter before starting a search for Sharees."`
 
 	PublicURL string `yaml:"public_url" env:"OCIS_URL;FRONTEND_PUBLIC_URL" desc:"The public facing URL of the oCIS frontend."`
 

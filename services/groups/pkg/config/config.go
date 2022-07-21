@@ -66,22 +66,23 @@ type Drivers struct {
 }
 
 type LDAPDriver struct {
-	URI              string          `yaml:"uri" env:"LDAP_URI;GROUPS_LDAP_URI" desc:"URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'"`
-	CACert           string          `yaml:"ca_cert" env:"LDAP_CACERT;GROUPS_LDAP_CACERT" desc:"Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty the system default CA bundle will be used."`
-	Insecure         bool            `yaml:"insecure" env:"LDAP_INSECURE;GROUPS_LDAP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments."`
-	BindDN           string          `yaml:"bind_dn" env:"LDAP_BIND_DN;GROUPS_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server."`
-	BindPassword     string          `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;GROUPS_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'."`
-	UserBaseDN       string          `yaml:"user_base_dn" env:"LDAP_USER_BASE_DN;GROUPS_LDAP_USER_BASE_DN" desc:"Search base DN for looking up LDAP users."`
-	GroupBaseDN      string          `yaml:"group_base_dn" env:"LDAP_GROUP_BASE_DN;GROUPS_LDAP_GROUP_BASE_DN" desc:"Search base DN for looking up LDAP groups."`
-	UserScope        string          `yaml:"user_scope" env:"LDAP_USER_SCOPE;GROUPS_LDAP_USER_SCOPE" desc:"LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'."`
-	GroupScope       string          `yaml:"group_scope" env:"LDAP_GROUP_SCOPE;GROUPS_LDAP_GROUP_SCOPE" desc:"LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'."`
-	UserFilter       string          `yaml:"user_filter" env:"LDAP_USER_FILTER;GROUPS_LDAP_USER_FILTER" desc:"LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'."`
-	GroupFilter      string          `yaml:"group_filter" env:"LDAP_GROUP_FILTER;GROUPS_LDAP_GROUP_FILTER" desc:"LDAP filter to add to the default filters for group searches."`
-	UserObjectClass  string          `yaml:"user_object_class" env:"LDAP_USER_OBJECTCLASS;GROUPS_LDAP_USER_OBJECTCLASS" desc:"The object class to use for users in the default user search filter ('inetOrgPerson')."`
-	GroupObjectClass string          `yaml:"group_object_class" env:"LDAP_GROUP_OBJECTCLASS;GROUPS_LDAP_GROUP_OBJECTCLASS" desc:"The object class to use for groups in the default group search filter ('groupOfNames')."`
-	IDP              string          `yaml:"idp" env:"OCIS_URL;OCIS_OIDC_ISSUER;GROUPS_IDP_URL" desc:"The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider."`
-	UserSchema       LDAPUserSchema  `yaml:"user_schema"`
-	GroupSchema      LDAPGroupSchema `yaml:"group_schema"`
+	URI                      string          `yaml:"uri" env:"LDAP_URI;GROUPS_LDAP_URI" desc:"URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'"`
+	CACert                   string          `yaml:"ca_cert" env:"LDAP_CACERT;GROUPS_LDAP_CACERT" desc:"Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty, the system default CA bundle will be used."`
+	Insecure                 bool            `yaml:"insecure" env:"LDAP_INSECURE;GROUPS_LDAP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments."`
+	BindDN                   string          `yaml:"bind_dn" env:"LDAP_BIND_DN;GROUPS_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server."`
+	BindPassword             string          `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;GROUPS_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'."`
+	UserBaseDN               string          `yaml:"user_base_dn" env:"LDAP_USER_BASE_DN;GROUPS_LDAP_USER_BASE_DN" desc:"Search base DN for looking up LDAP users."`
+	GroupBaseDN              string          `yaml:"group_base_dn" env:"LDAP_GROUP_BASE_DN;GROUPS_LDAP_GROUP_BASE_DN" desc:"Search base DN for looking up LDAP groups."`
+	UserScope                string          `yaml:"user_scope" env:"LDAP_USER_SCOPE;GROUPS_LDAP_USER_SCOPE" desc:"LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'."`
+	GroupScope               string          `yaml:"group_scope" env:"LDAP_GROUP_SCOPE;GROUPS_LDAP_GROUP_SCOPE" desc:"LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'."`
+	GroupSubstringFilterType string          `yaml:"group_substring_filter_type" env:"LDAP_GROUP_SUBSTRING_FILTER_TYPE;GROUP_LDAP_GROUP_SUBSTRING_FILTER_TYPE" desc:"Type of substring search filter to use for substring searches for groups. Possible values: 'initial' for doing prefix only searches, 'final' for doing suffix only searches or 'any' for doing full substring searches"`
+	UserFilter               string          `yaml:"user_filter" env:"LDAP_USER_FILTER;GROUPS_LDAP_USER_FILTER" desc:"LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'."`
+	GroupFilter              string          `yaml:"group_filter" env:"LDAP_GROUP_FILTER;GROUPS_LDAP_GROUP_FILTER" desc:"LDAP filter to add to the default filters for group searches."`
+	UserObjectClass          string          `yaml:"user_object_class" env:"LDAP_USER_OBJECTCLASS;GROUPS_LDAP_USER_OBJECTCLASS" desc:"The object class to use for users in the default user search filter ('inetOrgPerson')."`
+	GroupObjectClass         string          `yaml:"group_object_class" env:"LDAP_GROUP_OBJECTCLASS;GROUPS_LDAP_GROUP_OBJECTCLASS" desc:"The object class to use for groups in the default group search filter ('groupOfNames')."`
+	IDP                      string          `yaml:"idp" env:"OCIS_URL;OCIS_OIDC_ISSUER;GROUPS_IDP_URL" desc:"The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider."`
+	UserSchema               LDAPUserSchema  `yaml:"user_schema"`
+	GroupSchema              LDAPGroupSchema `yaml:"group_schema"`
 }
 
 type LDAPUserSchema struct {
