@@ -19,8 +19,8 @@ Feature: copy file
     And user "Alice" has shared a space "Project" to user "Brian" with role "<role>"
     When user "Brian" copies file "insideSpace.txt" to "/newfolder/insideSpace.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Brian" the space "Project" should contain these entries:
-      | newfolder/insideSpace.txt |
+    And for user "Brian" folder "newfolder" of the space "Project" should contain these entries:
+      | insideSpace.txt |
     And for user "Alice" the content of the file "newfolder/insideSpace.txt" of the space "Project" should be "some content"
     Examples:
       | role    |
