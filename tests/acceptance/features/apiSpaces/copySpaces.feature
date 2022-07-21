@@ -106,9 +106,7 @@ Feature: copy file
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Shares Jail" should contain these entries:
       | /testshare/project.txt |
-    #  And for user "Alice" folder "testshare" of the space "Shares Jail" should contain these entries:
-    #   | project.txt |
-    # And for user "Alice" the content of the file "/testshare/project.txt" of the space "Shares Jail" should be "Project content"
+    And for user "Alice" the content of the file "/testshare/project.txt" of the space "Shares Jail" should be "Project content"
     Examples:
       | role    |
       | manager |
