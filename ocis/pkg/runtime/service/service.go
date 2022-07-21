@@ -248,12 +248,24 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 		return
 	}
 
+	disabled := make(map[string]bool)
+	if cfg.Runtime.Disabled != "" {
+		e := strings.Split(strings.ReplaceAll(cfg.Runtime.Disabled, " ", ""), ",")
+		for _, s := range e {
+			disabled[s] = true
+		}
+	}
+
 	for name := range s.ServicesRegistry {
-		runset = append(runset, name)
+		if !disabled[name] {
+			runset = append(runset, name)
+		}
 	}
 
 	for name := range s.Delayed {
-		runset = append(runset, name)
+		if !disabled[name] {
+			runset = append(runset, name)
+		}
 	}
 }
 
