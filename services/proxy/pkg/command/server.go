@@ -190,6 +190,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			middleware.TokenCacheSize(cfg.OIDC.UserinfoCache.Size),
 			middleware.TokenCacheTTL(time.Second*time.Duration(cfg.OIDC.UserinfoCache.TTL)),
 			middleware.AccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
+			middleware.JWKSOptions(cfg.OIDC.JWKS),
 
 			// basic Options
 			middleware.Logger(logger),

@@ -41,6 +41,12 @@ func DefaultConfig() *config.Config {
 				Size: 1024,
 				TTL:  10,
 			},
+			JWKS: config.JWKS{
+				RefreshInterval:   60, // minutes
+				RefreshRateLimit:  60, // seconds
+				RefreshTimeout:    10, // seconds
+				RefreshUnknownKID: true,
+			},
 		},
 		PolicySelector: nil,
 		Reva: &config.Reva{
