@@ -196,6 +196,7 @@ var _ = Describe("Index", func() {
 						Ref: &searchmsg.Reference{
 							ResourceId: &searchmsg.ResourceID{
 								StorageId: ref.ResourceId.StorageId,
+								SpaceId:   ref.ResourceId.SpaceId,
 								OpaqueId:  ref.ResourceId.OpaqueId,
 							},
 						},
