@@ -29,7 +29,7 @@ type Config struct {
 
 // Events combines the configuration options for the event bus.
 type Events struct {
-	Endpoint      string `yaml:"endpoint" env:"SEARCH_EVENTS_ENDPOINT" desc:"The address of the streaming service"`
-	Cluster       string `yaml:"cluster" env:"SEARCH_EVENTS_CLUSTER" desc:"The clusterID of the streaming service. Mandatory when using NATS"`
+	Endpoint      string `yaml:"endpoint" env:"SEARCH_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.`
+	Cluster       string `yaml:"cluster" env:"SEARCH_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system."`
 	ConsumerGroup string `yaml:"group" env:"SEARCH_EVENTS_GROUP" desc:"The customer group of the service. One group will only get one copy of an event"`
 }

@@ -78,6 +78,6 @@ type OCISDriver struct {
 }
 
 type Events struct {
-	Addr      string `yaml:"endpoint" env:"STORAGE_SYSTEM_EVENTS_ENDPOINT" desc:"The address of the streaming service."`
-	ClusterID string `yaml:"cluster" env:"STORAGE_SYSTEM_EVENTS_CLUSTER" desc:"The clusterID of the streaming service. Mandatory when using the NATS service."`
+	Addr      string `yaml:"endpoint" env:"STORAGE_SYSTEM_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.`
+	ClusterID string `yaml:"cluster" env:"STORAGE_SYSTEM_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system."`
 }
