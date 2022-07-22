@@ -1747,6 +1747,56 @@ class SpacesContext implements Context {
 		$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
 	}
 
+    /**
+     * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" to "([^"]*)" in space "([^"]*)" using the WebDAV API$/
+     *
+     * @param string $user
+     * @param string $fileSource
+     * @param string $fileDestination
+     * @param string $spaceName
+     *
+     * @return void
+     */
+    public function userMovesFileWithinSpaceUsingTheWebDAVAPI(
+        string $user,
+        string $fileSource,
+        string $fileDestination,
+        string $spaceName
+    ):void {
+        $space = $this->getSpaceByName($user, $spaceName);
+        $headers['Destination'] = $this->destinationHeaderValueWithSpaceName(
+            $user,
+            $fileDestination,
+            $spaceName
+        );
+
+        $fullUrl = $space["root"]["webDavUrl"] . '/' . \trim($fileSource, "/");
+        $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
+    }
+
+    /**
+     * MOVE request for files|folders
+     *
+     * @param string $user
+     * @param string $fullUrl
+     * @param string $headers
+     *
+     * @return void
+     * @throws GuzzleException
+     */
+    public function moveFilesAndFoldersRequest(string $user, string $fullUrl, array $headers):void {
+        $this->featureContext->setResponse(
+            HttpRequestHelper::sendRequest(
+                $fullUrl,
+                $this->featureContext->getStepLineRef(),
+                'MOVE',
+                $user,
+                $this->featureContext->getPasswordForUser($user),
+                $headers,
+            )
+        );
+    }
+
 	/**
 	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" from space "([^"]*)" to "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
 	 *
@@ -1771,6 +1821,32 @@ class SpacesContext implements Context {
 		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileSource, "/");
 		$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
 	}
+
+
+    /**
+     * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" from space "([^"]*)" to "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
+     *
+     * @param string $user
+     * @param string $fileSource
+     * @param string $fromSpaceName
+     * @param string $fileDestination
+     * @param string $toSpaceName
+     *
+     * @return void
+     * @throws GuzzleException
+     */
+    public function userMovesFileFromAndToSpaceBetweenSpaces(
+        string $user,
+        string $fileSource,
+        string $fromSpaceName,
+        string $fileDestination,
+        string $toSpaceName
+    ):void {
+        $space = $this->getSpaceByName($user, $fromSpaceName);
+        $headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName);
+        $fullUrl = $space["root"]["webDavUrl"] . '/' . \ltrim($fileSource, "/");
+        $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
+    }
 
 	/**
 	 * returns a url for destination with spacename
