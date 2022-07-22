@@ -58,6 +58,8 @@ type Options struct {
 	// AccessTokenVerifyMethod configures how access_tokens should be verified but the oidc_auth middleware.
 	// Possible values currently: "jwt" and "none"
 	AccessTokenVerifyMethod string
+	// JWKS sets the options for fetching the JWKS from the IDP
+	JWKS config.JWKS
 }
 
 // newOptions initializes the available default options.
@@ -201,5 +203,12 @@ func UserProvider(up backend.UserBackend) Option {
 func AccessTokenVerifyMethod(method string) Option {
 	return func(o *Options) {
 		o.AccessTokenVerifyMethod = method
+	}
+}
+
+// JWKS sets the options for fetching the JWKS from the IDP
+func JWKSOptions(jo config.JWKS) Option {
+	return func(o *Options) {
+		o.JWKS = jo
 	}
 }

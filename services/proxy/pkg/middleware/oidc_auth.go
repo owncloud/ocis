@@ -37,6 +37,7 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 		tokenCache:              &tokenCache,
 		tokenCacheTTL:           options.UserinfoCacheTTL,
 		accessTokenVerifyMethod: options.AccessTokenVerifyMethod,
+		jwksOptions:             options.JWKS,
 	}
 
 	return func(next http.Handler) http.Handler {
@@ -77,6 +78,7 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 type oidcAuth struct {
 	logger                  log.Logger
 	provider                OIDCProvider
+	jwksOptions             config.JWKS
 	jwks                    *keyfunc.JWKS
 	providerFunc            func() (OIDCProvider, error)
 	httpClient              *http.Client
@@ -233,16 +235,15 @@ func (m *oidcAuth) getKeyfunc() *keyfunc.JWKS {
 			return nil
 		}
 		m.logger.Debug().Str("jwks", j.JWKSURL).Msg("discovered jwks endpoint")
-		// FIXME: make configurable
 		options := keyfunc.Options{
 			Client: m.httpClient,
 			RefreshErrorHandler: func(err error) {
 				m.logger.Error().Err(err).Msg("There was an error with the jwt.Keyfunc")
 			},
-			RefreshInterval:   time.Hour,
-			RefreshRateLimit:  time.Minute * 5,
-			RefreshTimeout:    time.Second * 10,
-			RefreshUnknownKID: true,
+			RefreshInterval:   time.Minute * time.Duration(m.jwksOptions.RefreshInterval),
+			RefreshRateLimit:  time.Second * time.Duration(m.jwksOptions.RefreshRateLimit),
+			RefreshTimeout:    time.Second * time.Duration(m.jwksOptions.RefreshTimeout),
+			RefreshUnknownKID: m.jwksOptions.RefreshUnknownKID,
 		}
 		m.jwks, err = keyfunc.Get(j.JWKSURL, options)
 		if err != nil {

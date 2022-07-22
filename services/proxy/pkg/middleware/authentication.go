@@ -116,6 +116,7 @@ func newOIDCAuth(options Options) func(http.Handler) http.Handler {
 		TokenCacheTTL(options.UserinfoCacheTTL),
 		CredentialsByUserAgent(options.CredentialsByUserAgent),
 		AccessTokenVerifyMethod(options.AccessTokenVerifyMethod),
+		JWKSOptions(options.JWKS),
 	)
 }
 
