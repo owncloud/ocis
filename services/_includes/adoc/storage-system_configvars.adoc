@@ -149,7 +149,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-The address of the streaming service.
+
 
 |`STORAGE_SYSTEM_EVENTS_CLUSTER`
 a| [subs=-attributes]
@@ -157,7 +157,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-The clusterID of the streaming service. Mandatory when using the NATS service.
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
 
 |`OCIS_JWT_SECRET` +
 `STORAGE_SYSTEM_JWT_SECRET`

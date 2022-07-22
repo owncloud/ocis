@@ -18,8 +18,8 @@
 | STORAGE_SYSTEM_GRPC_PROTOCOL | string | tcp | The transport protocol of the GPRC service.|
 | STORAGE_SYSTEM_HTTP_ADDR | string | 127.0.0.1:9216 | The bind address of the HTTP service.|
 | STORAGE_SYSTEM_HTTP_PROTOCOL | string | tcp | The transport protocol of the HTTP service.|
-| STORAGE_SYSTEM_EVENTS_ENDPOINT | string |  | The address of the streaming service.|
-| STORAGE_SYSTEM_EVENTS_CLUSTER | string |  | The clusterID of the streaming service. Mandatory when using the NATS service.|
+| STORAGE_SYSTEM_EVENTS_ENDPOINT | string |  | |
+| STORAGE_SYSTEM_EVENTS_CLUSTER | string |  | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | OCIS_JWT_SECRET<br/>STORAGE_SYSTEM_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | OCIS_SYSTEM_USER_ID | string |  | ID of the oCIS storage-system system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|

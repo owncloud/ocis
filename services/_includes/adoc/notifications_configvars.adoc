@@ -113,7 +113,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[127.0.0.1:9233]
 a| [subs=-attributes]
-Endpoint of the event system.
+
 
 |`NOTIFICATIONS_EVENTS_CLUSTER`
 a| [subs=-attributes]
@@ -121,7 +121,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[ocis-cluster]
 a| [subs=-attributes]
-Cluster ID of the event system.
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
 
 |`NOTIFICATIONS_EVENTS_GROUP`
 a| [subs=-attributes]

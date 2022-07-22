@@ -45,5 +45,5 @@
 | LDAP_GROUP_OBJECTCLASS<br/>GRAPH_LDAP_GROUP_OBJECTCLASS | string | groupOfNames | The object class to use for groups in the default group search filter ('groupOfNames'). |
 | LDAP_GROUP_SCHEMA_GROUPNAME<br/>GRAPH_LDAP_GROUP_NAME_ATTRIBUTE | string | cn | LDAP Attribute to use for the name of groups.|
 | LDAP_GROUP_SCHEMA_ID<br/>GRAPH_LDAP_GROUP_ID_ATTRIBUTE | string | owncloudUUID | LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.|
-| GRAPH_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the streaming service. Set to a empty string to disable emitting events.|
-| GRAPH_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the streaming service. Mandatory when using the NATS service.|
+| GRAPH_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events.|
+| GRAPH_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|

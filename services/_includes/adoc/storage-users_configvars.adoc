@@ -407,7 +407,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[127.0.0.1:9233]
 a| [subs=-attributes]
-The address of the streaming service
+
 
 |`STORAGE_USERS_EVENTS_CLUSTER`
 a| [subs=-attributes]
@@ -415,7 +415,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[ocis-cluster]
 a| [subs=-attributes]
-The clusterID of the streaming service. Mandatory when using the NATS service.
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
 
 |`STORAGE_USERS_MOUNT_ID`
 a| [subs=-attributes]

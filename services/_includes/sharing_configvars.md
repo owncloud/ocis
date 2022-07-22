@@ -18,8 +18,8 @@
 | SHARING_GRPC_PROTOCOL | string | tcp | The transport protocol of the GRPC service.|
 | OCIS_JWT_SECRET<br/>SHARING_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
-| SHARING_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the streaming service|
-| SHARING_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the streaming service. Mandatory when using the NATS service|
+| SHARING_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | |
+| SHARING_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | SHARING_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
 | SHARING_USER_DRIVER | string | cs3 | Driver to be used to persist shares. Supported values are 'json', 'cs3' and 'owncloudsql'.|
 | SHARING_USER_JSON_FILE | string | ~/.ocis/storage/shares.json | Path to the JSON file where shares will be persisted.|

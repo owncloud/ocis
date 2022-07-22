@@ -50,8 +50,8 @@
 | STORAGE_USERS_OWNCLOUDSQL_DB_NAME | string | owncloud | Name of the database to be used.|
 | STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT | string | localhost:9144 | Endpoint of the users provider.|
 | STORAGE_USERS_DATA_SERVER_URL | string | http://localhost:9158/data | URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed.|
-| STORAGE_USERS_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the streaming service|
-| STORAGE_USERS_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the streaming service. Mandatory when using the NATS service.|
+| STORAGE_USERS_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | |
+| STORAGE_USERS_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | STORAGE_USERS_MOUNT_ID | string | 1284d238-aa92-42ce-bdc4-0b0000009157 | Mount ID of this storage.|
 | STORAGE_USERS_EXPOSE_DATA_SERVER | bool | false | Exposes the data server directly to users and bypasses the data gateway. Ensure that the data server address is reachable by users.|
 | STORAGE_USERS_READ_ONLY | bool | false | Set this storage to be read-only.|
