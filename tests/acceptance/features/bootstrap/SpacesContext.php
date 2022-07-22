@@ -2794,5 +2794,79 @@ class SpacesContext implements Context {
 	
 		// set last response as PublicShareData. using method from core
 		$this->featureContext->setLastPublicShareData($this->featureContext->getResponseXml(null, __METHOD__));
+		// set last shareId if ShareData exists. using method from core
+		if (isset($this->featureContext->getLastPublicShareData()->data)) {
+			$this->featureContext->setLastPublicLinkShareId((string) $this->featureContext->getLastPublicShareData()->data[0]->id);
+		}
+	}
+
+	/**
+	 * @When /^user "([^"]*)" has created a public link share of the space "([^"]*)" with settings:$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param TableNode|null $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function sendHasShareSpaceViaLinkRequest(
+		string $user,
+		string $spaceName,
+		?TableNode $table
+	): void {
+		$this->sendShareSpaceViaLinkRequest($user, $spaceName, $table);
+
+		$expectedHTTPStatus = "200";
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			$expectedHTTPStatus,
+			"Expected response status code should be $expectedHTTPStatus"
+		);
+		$this->featureContext->setLastPublicLinkShareId((string) $this->featureContext->getLastPublicShareData()->data[0]->id);
+	}
+
+	/**
+	 * @Then /^for user "([^"]*)" the space "([^"]*)" should (not|)\s?contain the last created public link$/
+	 *
+	 * @param string    $user
+	 * @param string    $spaceName
+	 * @param string    $shouldOrNot   (not|)
+	 *
+	 * @return void
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function userTheSpaceShouldContainLinks(
+		string $user,
+		string $spaceName,
+		string $shouldOrNot
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$url = "/apps/files_sharing/api/v1/shares";
+
+		$bodyTable = new TableNode([
+			["space_ref", $space['id']],
+			["reshares", true],
+		]);
+
+		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+			$user,
+			'GET',
+			$url,
+			$bodyTable
+		);
+
+		$should = ($shouldOrNot !== "not");
+		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml()->data),true, 512, JSON_THROW_ON_ERROR);
+
+		if ($should) { 		
+			Assert::assertNotEmpty($responseArray, __METHOD__ . ' Response should contain a link, but it is empty');
+			foreach ($responseArray as $element) {
+				$expectedLinkId = $this->featureContext->getLastPublicLinkShareId();
+				Assert::assertEquals($element["id"], $expectedLinkId, "link IDs are different");
+			}
+		} else {
+			Assert::assertEmpty($responseArray, __METHOD__ . ' Response should be empty');
+		}
 	}
 }

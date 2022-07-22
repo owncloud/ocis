@@ -43,3 +43,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpaces/moveSpaces.feature:186](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/moveSpaces.feature#L186)
 - [apiSpaces/moveSpaces.feature:189](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/moveSpaces.feature#L189)
 
+### [Removing the public link password is broken](https://github.com/owncloud/ocis/issues/4262)
+- [apiSpaces/editPublicLinkOfSpace.feature:54](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/editPublicLinkOfSpace.feature#L54)
+
+### [A space manager cannot see the public links of another manager](https://github.com/owncloud/ocis/issues/4260)
+- [apiSpaces/editPublicLinkOfSpace.feature:64](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/editPublicLinkOfSpace.feature#L64)
