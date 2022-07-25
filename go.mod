@@ -267,4 +267,4 @@ require (
 	stash.kopano.io/kgol/kcc-go/v5 v5.0.1 // indirect
 )
 
-replace github.com/cs3org/reva/v2 => github.com/kobergj/reva/v2 v2.0.0-20220720121959-a7530031a79d
+replace github.com/cs3org/reva/v2 => github.com/kobergj/reva/v2 v2.0.0-20220725130116-63262f3de019
