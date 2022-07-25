@@ -7,7 +7,7 @@ SHA1_LOCK_FILE := $(abspath $(CURDIR)/../../protogen/buf.sha1.lock)
 .PHONY: protoc-deps
 protoc-deps: $(BINGO)
 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l google.golang.org/protobuf/cmd/protoc-gen-go
-	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/asim/go-micro/cmd/protoc-gen-micro/v4
+	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/go-micro/generator/cmd/protoc-gen-micro
 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/owncloud/protoc-gen-microweb
 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
