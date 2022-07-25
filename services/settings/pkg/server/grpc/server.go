@@ -59,7 +59,6 @@ func RegisterCS3PermissionsServiceHandler(s server.Server, hdlr permissions.Perm
 		Name:    "PermissionsService.Checkpermission",
 		Path:    []string{"/api/v0/permissions/check-permission"},
 		Method:  []string{"POST"},
-		Body:    "*",
 		Handler: "rpc",
 	}))
 	return s.Handle(s.NewHandler(&PermissionsAPI{h}, opts...))
