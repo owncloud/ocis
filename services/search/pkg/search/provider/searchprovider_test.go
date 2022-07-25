@@ -222,19 +222,20 @@ var _ = Describe("Searchprovider", func() {
 				grantSpace = &sprovider.StorageSpace{
 					SpaceType: "grant",
 					Owner:     otherUser,
-					Id:        &sprovider.StorageSpaceId{OpaqueId: "otherspaceroot!otherspacegrant"},
-					Root:      &sprovider.ResourceId{StorageId: "otherspaceroot", OpaqueId: "otherspacegrant"},
+					Id:        &sprovider.StorageSpaceId{OpaqueId: "storageproviderid$spaceid!otherspacegrant"},
+					Root:      &sprovider.ResourceId{StorageId: "storageproviderid", SpaceId: "spaceid", OpaqueId: "otherspacegrant"},
 					Name:      "grantspace",
 				}
 				mountpointSpace = &sprovider.StorageSpace{
 					SpaceType: "mountpoint",
 					Owner:     otherUser,
-					Id:        &sprovider.StorageSpaceId{OpaqueId: "otherspaceroot!otherspacemountpoint"},
-					Root:      &sprovider.ResourceId{StorageId: "otherspaceroot", OpaqueId: "otherspacemountpoint"},
+					Id:        &sprovider.StorageSpaceId{OpaqueId: "storageproviderid$spaceid!otherspacemountpoint"},
+					Root:      &sprovider.ResourceId{StorageId: "storageproviderid", SpaceId: "spaceid", OpaqueId: "otherspacemountpoint"},
 					Name:      "mountpointspace",
 					Opaque: &typesv1beta1.Opaque{
 						Map: map[string]*typesv1beta1.OpaqueEntry{
-							"grantStorageID": {Decoder: "plain", Value: []byte("otherspaceroot")},
+							"grantStorageID": {Decoder: "plain", Value: []byte("storageproviderid")},
+							"grantSpaceID":   {Decoder: "plain", Value: []byte("spaceid")},
 							"grantOpaqueID":  {Decoder: "plain", Value: []byte("otherspacegrant")},
 						},
 					},

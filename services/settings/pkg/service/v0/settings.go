@@ -536,9 +536,6 @@ func (g Service) defaultRoleAssignments() []*settingsmsg.UserRoleAssignment {
 	return []*settingsmsg.UserRoleAssignment{
 		// default admin users
 		{
-			AccountUuid: "058bff95-6708-4fe5-91e4-9ea3d377588b", // demo user "moss"
-			RoleId:      BundleUUIDRoleAdmin,
-		}, {
 			AccountUuid: g.config.AdminUserID,
 			RoleId:      BundleUUIDRoleAdmin,
 		},
@@ -552,6 +549,9 @@ func (g Service) defaultRoleAssignments() []*settingsmsg.UserRoleAssignment {
 		},
 		// default users with role "spaceadmin"
 		{
+			AccountUuid: "058bff95-6708-4fe5-91e4-9ea3d377588b", // demo user "moss"
+			RoleId:      BundleUUIDRoleSpaceAdmin,
+		}, {
 			AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7", // demo user "katherine"
 			RoleId:      BundleUUIDRoleSpaceAdmin,
 		},

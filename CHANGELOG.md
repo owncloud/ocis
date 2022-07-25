@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Substring search for sharees: [#547](https://github.com/owncloud/ocis/issues/547)
 * Enhancement - Improve error log for "could not get user by claim" error: [#4227](https://github.com/owncloud/ocis/pull/4227)
+* Enhancement - Allow providing list of services NOT to start: [#4254](https://github.com/owncloud/ocis/pull/4254)
 
 ## Details
 
@@ -32,6 +33,14 @@ The following sections list the changes for unreleased.
    "nil" error has been logged. Now we're logging the message from the transport.
 
    https://github.com/owncloud/ocis/pull/4227
+
+* Enhancement - Allow providing list of services NOT to start: [#4254](https://github.com/owncloud/ocis/pull/4254)
+
+   Until now if one wanted to use a custom version of a service, one needed to provide
+   `OCIS_RUN_SERVICES` which is a list of all services to start. Now one can provide
+   `OCIS_EXCLUDE_RUN_SERVICES` which is a list of only services not to start
+
+   https://github.com/owncloud/ocis/pull/4254
 # Changelog for [2.0.0-beta.5] (2022-07-19)
 
 The following sections list the changes for 2.0.0-beta.5.
