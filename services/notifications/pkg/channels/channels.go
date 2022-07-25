@@ -70,17 +70,11 @@ func (m Mail) SendMessage(userIDs []string, msg string) error {
 
 	email := mail.NewMSG()
 
-	email.SetFrom(m.conf.Notifications.SMTP.Sender).
-		AddTo(to...)
+	email.SetFrom(m.conf.Notifications.SMTP.Sender).AddTo(to...)
 
 	email.SetBody(mail.TextPlain, msg)
 
-	err = email.Send(smtpClient)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return email.Send(smtpClient)
 }
 
 // SendMessageToGroup sends a message to all members of the given group.
