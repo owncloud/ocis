@@ -92,16 +92,16 @@ const (
 type OIDC struct {
 	Issuer                  string        `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP."`
 	Insecure                bool          `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments."`
-	AccessTokenVerifyMethod string        `yaml:"access_token_verify_method" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD" desc:"Sets how OIDC access tokens should be verified. Possible values: 'none', which means that no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. Or 'jwt', which tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'."`
+	AccessTokenVerifyMethod string        `yaml:"access_token_verify_method" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD" desc:"Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'."`
 	UserinfoCache           UserinfoCache `yaml:"user_info_cache"`
 	JWKS                    JWKS          `yaml:"jwks"`
 }
 
 type JWKS struct {
-	RefreshInterval   uint64 `yaml:"refresh_interval" env:"PROXY_OIDC_JWKS_REFRESH_INTERVAL" desc:"The interval for refreshing the JWKS in the background via a new HTTP request to the IDP in minutes."`
-	RefreshTimeout    uint64 `yaml:"refresh_timeout" env:"PROXY_OIDC_JWKS_REFRESH_TIMEOUT" desc:"The timeout, in seconds, for and outgoing JWKS request."`
-	RefreshRateLimit  uint64 `yaml:"refresh_limit" env:"PROXY_OIDC_JWKS_REFRESH_RATE_LIMIT" desc:"Limits the rate at which refresh requests are performed for unknown keys in seconds. (To prevent malicious client from imposing high network load on the IDP via ocis)"`
-	RefreshUnknownKID bool   `yaml:"refresh_unknown_kid" env:"PROXY_OIDC_JWKS_REFRESH_UNKNOWN_KID" desc:"If true the JWKS refresh request will occur every time an unknown key id (kid) is seen. Always set a 'refresh_limit' when enabling this"`
+	RefreshInterval   uint64 `yaml:"refresh_interval" env:"PROXY_OIDC_JWKS_REFRESH_INTERVAL" desc:"The interval for refreshing the JWKS (JSON Web Key Set) in minutes in the background via a new HTTP request to the IDP."`
+	RefreshTimeout    uint64 `yaml:"refresh_timeout" env:"PROXY_OIDC_JWKS_REFRESH_TIMEOUT" desc:"The timeout in seconds for an outgoing JWKS request."`
+	RefreshRateLimit  uint64 `yaml:"refresh_limit" env:"PROXY_OIDC_JWKS_REFRESH_RATE_LIMIT" desc:"Limits the rate in seconds at which refresh requests are performed for unknown keys. This is used to prevent malicious clients from imposing high network load on the IDP via ocis."`
+	RefreshUnknownKID bool   `yaml:"refresh_unknown_kid" env:"PROXY_OIDC_JWKS_REFRESH_UNKNOWN_KID" desc:"If set to 'true', the JWKS refresh request will occur every time an unknown KEY ID (KID) is seen. Always set a 'refresh_limit' when enabling this."`
 }
 
 // UserinfoCache is a TTL cache configuration.
