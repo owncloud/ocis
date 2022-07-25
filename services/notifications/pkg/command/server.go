@@ -34,6 +34,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			evs := []events.Unmarshaller{
 				events.ShareCreated{},
+				events.VirusscanFinished{},
 			}
 
 			evtsCfg := cfg.Notifications.Events

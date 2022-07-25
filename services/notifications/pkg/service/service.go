@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -52,6 +53,21 @@ func (s eventsNotifier) Run() error {
 							Err(err).
 							Str("event", "ShareCreated").
 							Msg("failed to send a message")
+					}
+				case events.VirusscanFinished:
+					if !e.Infected {
+						// no need to annoy the user
+						return
+					}
+
+					if e.ExecutingUser == nil {
+						s.logger.Error().Str("events", "VirusscanFinished").Str("uploadid", e.UploadID).Msg("no executing user")
+						return
+					}
+					m := "Dear %s,\nThe virusscan of file '%s' discovered it is infected with '%s'.\nThe system is configured to handle infected files like: %s.\nContact your administrator for more information."
+					msg := fmt.Sprintf(m, e.ExecutingUser.GetUsername(), e.Filename, e.Description, e.Outcome)
+					if err := s.channel.SendMessage([]string{e.ExecutingUser.GetId().GetOpaqueId()}, msg); err != nil {
+						s.logger.Error().Err(err).Str("event", "VirusScanFinished").Msg("failed to send a message")
 					}
 				}
 			}()
