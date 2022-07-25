@@ -14,6 +14,8 @@
 
 Please see [Getting Started](https://owncloud.dev/ocis/getting-started/)
 
+Check if drone CI is being triggered.
+
 ## Documentation
 
 *   **Development Documentation**  
