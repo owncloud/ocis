@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/MicahParks/keyfunc"
@@ -14,7 +15,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
-	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
+	osync "github.com/owncloud/ocis/v2/ocis-pkg/sync"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"golang.org/x/oauth2"
 )
@@ -27,7 +28,7 @@ type OIDCProvider interface {
 // OIDCAuth provides a middleware to check access secured by a static token.
 func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
-	tokenCache := sync.NewCache(options.UserinfoCacheSize)
+	tokenCache := osync.NewCache(options.UserinfoCacheSize)
 
 	h := oidcAuth{
 		logger:                  options.Logger,
@@ -38,6 +39,8 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 		tokenCacheTTL:           options.UserinfoCacheTTL,
 		accessTokenVerifyMethod: options.AccessTokenVerifyMethod,
 		jwksOptions:             options.JWKS,
+		jwksLock:                &sync.Mutex{},
+		providerLock:            &sync.Mutex{},
 	}
 
 	return func(next http.Handler) http.Handler {
@@ -78,12 +81,14 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 type oidcAuth struct {
 	logger                  log.Logger
 	provider                OIDCProvider
+	providerLock            *sync.Mutex
 	jwksOptions             config.JWKS
 	jwks                    *keyfunc.JWKS
+	jwksLock                *sync.Mutex
 	providerFunc            func() (OIDCProvider, error)
 	httpClient              *http.Client
 	oidcIss                 string
-	tokenCache              *sync.Cache
+	tokenCache              *osync.Cache
 	tokenCacheTTL           time.Duration
 	accessTokenVerifyMethod string
 }
@@ -207,6 +212,8 @@ type jwksJSON struct {
 }
 
 func (m *oidcAuth) getKeyfunc() *keyfunc.JWKS {
+	m.jwksLock.Lock()
+	defer m.jwksLock.Unlock()
 	if m.jwks == nil {
 		wellKnown := strings.TrimSuffix(m.oidcIss, "/") + "/.well-known/openid-configuration"
 
@@ -256,6 +263,8 @@ func (m *oidcAuth) getKeyfunc() *keyfunc.JWKS {
 }
 
 func (m *oidcAuth) getProvider() OIDCProvider {
+	m.providerLock.Lock()
+	defer m.providerLock.Unlock()
 	if m.provider == nil {
 		// Lazily initialize a provider
 
