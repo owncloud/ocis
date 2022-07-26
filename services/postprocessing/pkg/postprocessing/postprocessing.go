@@ -3,27 +3,32 @@ package postprocessing
 import (
 	"time"
 
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
 )
 
 // Postprocessing handles postprocessing of a file
 type Postprocessing struct {
-	id    string
-	url   string
-	m     map[events.Postprocessingstep]interface{}
-	c     config.Postprocessing
-	steps []events.Postprocessingstep
+	id       string
+	url      string
+	u        *user.User
+	m        map[events.Postprocessingstep]interface{}
+	filename string
+	c        config.Postprocessing
+	steps    []events.Postprocessingstep
 }
 
 // New returns a new postprocessing instance
-func New(uploadID string, uploadURL string, c config.Postprocessing) *Postprocessing {
+func New(uploadID string, uploadURL string, user *user.User, filename string, c config.Postprocessing) *Postprocessing {
 	return &Postprocessing{
-		id:    uploadID,
-		url:   uploadURL,
-		m:     make(map[events.Postprocessingstep]interface{}),
-		c:     c,
-		steps: getSteps(c),
+		id:       uploadID,
+		url:      uploadURL,
+		u:        user,
+		m:        make(map[events.Postprocessingstep]interface{}),
+		c:        c,
+		filename: filename,
+		steps:    getSteps(c),
 	}
 }
 
@@ -32,7 +37,7 @@ func (pp *Postprocessing) Init(ev events.BytesReceived) interface{} {
 	pp.m["init"] = ev
 
 	if len(pp.steps) == 0 {
-		return pp.finished("continue")
+		return pp.finished(events.PPOutcomeContinue)
 	}
 
 	return pp.nextStep(pp.steps[0])
@@ -42,13 +47,12 @@ func (pp *Postprocessing) Init(ev events.BytesReceived) interface{} {
 func (pp *Postprocessing) Virusscan(ev events.VirusscanFinished) interface{} {
 	pp.m[events.PPStepAntivirus] = ev
 
-	switch {
-	case ev.Infected:
-		return pp.finished("delete")
-	case ev.Error != nil:
-		return pp.finished("abort")
-	default:
+	switch ev.Outcome {
+	case events.PPOutcomeContinue:
 		return pp.next(events.PPStepAntivirus)
+	default:
+		return pp.finished(ev.Outcome)
+
 	}
 }
 
@@ -66,22 +70,26 @@ func (pp *Postprocessing) next(current events.Postprocessingstep) interface{} {
 			return pp.next(pp.steps[i+1])
 		}
 	}
-	return pp.finished("continue")
+	return pp.finished(events.PPOutcomeContinue)
 }
 
 func (pp *Postprocessing) nextStep(next events.Postprocessingstep) events.StartPostprocessingStep {
 	return events.StartPostprocessingStep{
-		UploadID:    pp.id,
-		URL:         pp.url,
-		StepToStart: next,
+		UploadID:      pp.id,
+		URL:           pp.url,
+		ExecutingUser: pp.u,
+		Filename:      pp.filename,
+		StepToStart:   next,
 	}
 }
 
-func (pp *Postprocessing) finished(action string) events.PostprocessingFinished {
+func (pp *Postprocessing) finished(outcome events.PostprocessingOutcome) events.PostprocessingFinished {
 	return events.PostprocessingFinished{
-		UploadID: pp.id,
-		Result:   pp.m,
-		Action:   action,
+		UploadID:      pp.id,
+		Result:        pp.m,
+		ExecutingUser: pp.u,
+		Filename:      pp.filename,
+		Outcome:       outcome,
 	}
 }
 
