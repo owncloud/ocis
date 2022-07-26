@@ -28,7 +28,7 @@ use TestHelpers\HttpRequestHelper;
 require_once 'bootstrap.php';
 
 /**
- * Steps related to parallel deploy setup
+ * Steps related to parallel deployment setup
  */
 class ParallelContext implements Context {
 
