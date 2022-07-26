@@ -1,3 +1,3 @@
-services/settings/ @kulmann @pascalwengerter @lookacat
-services/web/ @kulmann @pascalwengerter 
+services/settings/ @kulmann @lookacat
+services/web/ @kulmann
 .drone.star @wkloucek @micbar @phil-davis @individual-it

@@ -1,0 +1,83 @@
+@api @skipOnOcV10
+Feature: A manager of the space can edit public link
+  As an user with manager space role
+  I want to be able to edit a public link.
+  So that I can remove or change permission, password, expireDate, and name attributes
+  Users without the manager role cannot see or edit the public link
+
+
+  Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
+  See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
+
+  Background:
+    Given these users have been created with default attributes and without skeleton files:
+      | username |
+      | Alice    |
+      | Brian    |
+    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And user "Alice" has created a space "edit space" with the default quota using the GraphApi
+    And user "Alice" has created a public link share of the space "edit space" with settings:
+      | permissions | 1                        |
+      | password    | qwerty                   |
+      | expireDate  | 2040-01-01T23:59:59+0100 |
+      | name        | someName                 |
+    And user "Alice" has uploaded a file inside space "edit space" with content "some content" to "test.txt"
+
+
+  Scenario Outline: A manager of the space can edit public link.
+    Given using OCS API version "2"
+    When user "Alice" updates the last public link share using the sharing API with
+      | permissions | <permissions> |
+      | password    | <password>    |
+      | name        | <linkName>    |
+      | expireDate  | <expireDate>  |
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "200"
+    And the OCS status message should be "OK"
+    And the fields of the last response to user "Alice" should include
+      | item_type              | folder                |
+      | mimetype               | httpd/unix-directory  |
+      | file_target            | /                     |
+      | path                   | /                     |
+      | permissions            | <expectedPermissions> |
+      | share_type             | public_link           |
+      | displayname_file_owner | %displayname%         |
+      | displayname_owner      | %displayname%         |
+      | uid_file_owner         | %username%            |
+      | uid_owner              | %username%            |
+      | name                   | <linkName>            |
+      | expiration             | <expireDate>          |
+    And the public should be able to download file "/test.txt" from inside the last public link shared folder using the new public WebDAV API with password "<password>"
+    And the downloaded content should be "some content"
+    Examples:
+      | permissions | expectedPermissions       | password | linkName | expireDate               |
+      | 5           | read,create               | newPass  |          |                          |
+      | 15          | read,update,create,delete |          | newName  | 2042-03-25T23:59:59+0100 |
+
+
+  Scenario Outline: Only users with manager role can see a created public link
+    Given using OCS API version "2"
+    When user "Alice" shares a space "edit space" to user "Brian" with role "<role>"
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "200"
+    And for user "Alice" the space "edit space" should contain the last created public link
+    And for user "Brian" the space "edit space" <shouldOrNot> contain the last created public link
+    Examples:
+      | role    | shouldOrNot |
+      | manager | should      |
+      | editor  | should not  |
+      | viewer  | should not  |
+
+
+  Scenario Outline: Members of the space try to edit a public link
+    Given using OCS API version "2"
+    And user "Alice" has shared a space "edit space" to user "Brian" with role "<role>"
+    When user "Brian" updates the last public link share using the sharing API with
+      | permissions | 15 |
+    Then the HTTP status code should be "<code>"
+    And the OCS status code should be "<codeOCS>"
+    Examples:
+      | role    | code | codeOCS |
+      | manager | 200  | 200     |
+      | editor  | 401  | 997     |
+      | viewer  | 401  | 997     |
