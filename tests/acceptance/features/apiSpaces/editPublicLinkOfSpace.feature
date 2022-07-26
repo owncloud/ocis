@@ -1,7 +1,8 @@
 @api @skipOnOcV10
 Feature: A manager of the space can edit public link
   As an user with manager space role
-  I want to be able to edit a public link. I can remove or change permission, password, expireDate, name
+  I want to be able to edit a public link.
+  So that I can remove or change permission, password, expireDate, and name attributes
   Users without the manager role cannot see or edit the public link
 
 
@@ -57,7 +58,9 @@ Feature: A manager of the space can edit public link
   Scenario Outline: Only users with manager role can see a created public link
     Given using OCS API version "2"
     When user "Alice" shares a space "edit space" to user "Brian" with role "<role>"
-    Then for user "Alice" the space "edit space" should contain the last created public link
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "200"
+    And for user "Alice" the space "edit space" should contain the last created public link
     And for user "Brian" the space "edit space" <shouldOrNot> contain the last created public link
     Examples:
       | role    | shouldOrNot |

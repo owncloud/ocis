@@ -2810,7 +2810,7 @@ class SpacesContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function sendHasShareSpaceViaLinkRequest(
+	public function userHasCreatedPublicLinkShareOfSpace(
 		string $user,
 		string $spaceName,
 		?TableNode $table
@@ -2836,7 +2836,7 @@ class SpacesContext implements Context {
 	 *
 	 * @throws Exception|GuzzleException
 	 */
-	public function userTheSpaceShouldContainLinks(
+	public function forUserSpaceShouldContainLinks(
 		string $user,
 		string $spaceName,
 		string $shouldOrNot

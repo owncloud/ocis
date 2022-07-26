@@ -91,4 +91,6 @@ Feature: Share spaces via link
         Given user "Alice" has shared a space "share space" to user "Brian" with role "manager"
         When user "Brian" creates a public link share of the space "share space" with settings:
             | permissions | 1 |
-        Then for user "Alice" the space "share space" should contain the last created public link
+        Then the HTTP status code should be "200"
+        And the OCS status code should be "200"
+        And for user "Alice" the space "share space" should contain the last created public link
