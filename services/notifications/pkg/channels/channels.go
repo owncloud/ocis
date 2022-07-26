@@ -3,7 +3,7 @@ package channels
 
 import (
 	"context"
-	"net/smtp"
+	"crypto/tls"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	groups "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
@@ -12,6 +12,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/config"
 	"github.com/pkg/errors"
+	mail "github.com/xhit/go-simple-mail/v2"
 )
 
 // Channel defines the methods of a communication channel.
@@ -29,6 +30,7 @@ func NewMailChannel(cfg config.Config, logger log.Logger) (Channel, error) {
 		logger.Error().Err(err).Msg("could not get gateway client")
 		return nil, err
 	}
+
 	return Mail{
 		gatewayClient: gc,
 		conf:          cfg,
@@ -36,7 +38,7 @@ func NewMailChannel(cfg config.Config, logger log.Logger) (Channel, error) {
 	}, nil
 }
 
-// Mail is the communcation channel for email.
+// Mail is the communication channel for email.
 type Mail struct {
 	gatewayClient gateway.GatewayAPIClient
 	conf          config.Config
@@ -45,18 +47,34 @@ type Mail struct {
 
 // SendMessage sends a message to all given users.
 func (m Mail) SendMessage(userIDs []string, msg string) error {
+	if m.conf.Notifications.SMTP.Host == "" {
+		return nil
+	}
+
 	to, err := m.getReceiverAddresses(userIDs)
 	if err != nil {
 		return err
 	}
-	body := []byte(msg)
 
-	smtpConf := m.conf.Notifications.SMTP
-	auth := smtp.PlainAuth("", smtpConf.Sender, smtpConf.Password, smtpConf.Host)
-	if err := smtp.SendMail(smtpConf.Host+":"+smtpConf.Port, auth, smtpConf.Sender, to, body); err != nil {
-		return errors.Wrap(err, "could not send mail")
+	server := mail.NewSMTPClient()
+	server.Host = m.conf.Notifications.SMTP.Host
+	server.Port = m.conf.Notifications.SMTP.Port
+	server.Username = m.conf.Notifications.SMTP.Sender
+	server.Password = m.conf.Notifications.SMTP.Password
+	server.TLSConfig = &tls.Config{InsecureSkipVerify: m.conf.Notifications.SMTP.Insecure}
+
+	smtpClient, err := server.Connect()
+	if err != nil {
+		return err
 	}
-	return nil
+
+	email := mail.NewMSG()
+
+	email.SetFrom(m.conf.Notifications.SMTP.Sender).AddTo(to...)
+
+	email.SetBody(mail.TextPlain, msg)
+
+	return email.Send(smtpClient)
 }
 
 // SendMessageToGroup sends a message to all members of the given group.
