@@ -79,13 +79,13 @@ Enables zpages, which can be used for collecting and viewing in-memory traces.
 a| [subs=-attributes]
 +string+
 a| [subs=-attributes]
-pass:[127.0.0.1]
+pass:[]
 a| [subs=-attributes]
 SMTP host to connect to.
 
 |`NOTIFICATIONS_SMTP_PORT`
 a| [subs=-attributes]
-+string+
++int+
 a| [subs=-attributes]
 pass:[1025]
 a| [subs=-attributes]
@@ -107,13 +107,21 @@ pass:[]
 a| [subs=-attributes]
 Password of the SMTP host to connect to.
 
+|`NOTIFICATIONS_SMTP_INSECURE`
+a| [subs=-attributes]
++bool+
+a| [subs=-attributes]
+pass:[false]
+a| [subs=-attributes]
+Allow insecure connections to the SMTP server.
+
 |`NOTIFICATIONS_EVENTS_ENDPOINT`
 a| [subs=-attributes]
 +string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9233]
 a| [subs=-attributes]
-
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 
 |`NOTIFICATIONS_EVENTS_CLUSTER`
 a| [subs=-attributes]

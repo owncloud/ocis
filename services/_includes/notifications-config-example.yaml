@@ -13,10 +13,11 @@ debug:
   zpages: false
 notifications:
   SMTP:
-    smtp_host: 127.0.0.1
-    smtp_port: "1025"
+    smtp_host: ""
+    smtp_port: 1025
     smtp_sender: noreply@example.com
     smtp_password: ""
+    insecure: false
   events:
     endpoint: 127.0.0.1:9233
     cluster: ocis-cluster
