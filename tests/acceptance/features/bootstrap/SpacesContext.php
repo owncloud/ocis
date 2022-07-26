@@ -558,7 +558,7 @@ class SpacesContext implements Context {
 	 * @param mixed $body
 	 * @param string $xRequestId
 	 * @param array $headers
-	 * 
+	 *
 	 *
 	 * @return ResponseInterface
 	 *
@@ -2771,7 +2771,7 @@ class SpacesContext implements Context {
 		$rows["password"] = \array_key_exists("password", $rows) ? $rows["password"] : null;
 		$rows["name"] = \array_key_exists("name", $rows) ? $rows["name"] : null;
 		$rows["expireDate"] = \array_key_exists("expireDate", $rows) ? $rows["expireDate"] : null;
-		
+
 		$body = [
 			"space_ref" => $space['id'],
 			"shareType" => $rows["shareType"],
@@ -2791,7 +2791,7 @@ class SpacesContext implements Context {
 				$body
 			)
 		);
-	
+
 		// set last response as PublicShareData. using method from core
 		$this->featureContext->setLastPublicShareData($this->featureContext->getResponseXml(null, __METHOD__));
 		// set last shareId if ShareData exists. using method from core
@@ -2801,7 +2801,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" has created a public link share of the space "([^"]*)" with settings:$/
+	 * @Given /^user "([^"]*)" has created a public link share of the space "([^"]*)" with settings:$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
@@ -2859,7 +2859,7 @@ class SpacesContext implements Context {
 		$should = ($shouldOrNot !== "not");
 		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml()->data),true, 512, JSON_THROW_ON_ERROR);
 
-		if ($should) { 		
+		if ($should) {
 			Assert::assertNotEmpty($responseArray, __METHOD__ . ' Response should contain a link, but it is empty');
 			foreach ($responseArray as $element) {
 				$expectedLinkId = $this->featureContext->getLastPublicLinkShareId();
