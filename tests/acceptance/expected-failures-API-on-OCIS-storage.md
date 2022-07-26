@@ -533,7 +533,6 @@ cannot share a folder with create permission
 #### [Removing the public link password is broken](https://github.com/owncloud/ocis/issues/4262)
 
 - [apiSharePublicLink3/updatePublicLinkShare.feature:165](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/updatePublicLinkShare.feature#L165)
-- [apiSharePublicLink3/updatePublicLinkShare.feature:166](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/updatePublicLinkShare.feature#L166)
 
 #### [Adding public upload to a read only shared folder as a recipient is allowed ](https://github.com/owncloud/ocis/issues/2164)
 
