@@ -18,19 +18,19 @@ require (
 	github.com/go-chi/render v1.0.1
 	github.com/go-ldap/ldap/v3 v3.4.3
 	github.com/go-ldap/ldif v0.0.0-20200320164324-fd88d9b715b3
-	github.com/go-micro/plugins/v4/client/grpc v1.0.0
-	github.com/go-micro/plugins/v4/events/natsjs v1.0.1
-	github.com/go-micro/plugins/v4/logger/zerolog v1.0.0
-	github.com/go-micro/plugins/v4/registry/consul v1.0.0
-	github.com/go-micro/plugins/v4/registry/etcd v1.0.0
-	github.com/go-micro/plugins/v4/registry/kubernetes v1.0.0
-	github.com/go-micro/plugins/v4/registry/mdns v1.0.0
-	github.com/go-micro/plugins/v4/registry/nats v1.0.0
-	github.com/go-micro/plugins/v4/server/grpc v1.0.1
-	github.com/go-micro/plugins/v4/server/http v1.0.0
-	github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.0.0
-	github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus v1.0.0
-	github.com/go-micro/plugins/v4/wrapper/trace/opencensus v1.0.0
+	github.com/go-micro/plugins/v4/client/grpc v1.1.0
+	github.com/go-micro/plugins/v4/events/natsjs v1.1.0
+	github.com/go-micro/plugins/v4/logger/zerolog v1.1.0
+	github.com/go-micro/plugins/v4/registry/consul v1.1.0
+	github.com/go-micro/plugins/v4/registry/etcd v1.1.0
+	github.com/go-micro/plugins/v4/registry/kubernetes v1.1.0
+	github.com/go-micro/plugins/v4/registry/mdns v1.1.0
+	github.com/go-micro/plugins/v4/registry/nats v1.1.0
+	github.com/go-micro/plugins/v4/server/grpc v1.1.1
+	github.com/go-micro/plugins/v4/server/http v1.1.0
+	github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.1.0
+	github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus v1.1.0
+	github.com/go-micro/plugins/v4/wrapper/trace/opencensus v1.1.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.4.2
@@ -60,7 +60,7 @@ require (
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.2
 	github.com/urfave/cli/v2 v2.11.1
-	go-micro.dev/v4 v4.7.0
+	go-micro.dev/v4 v4.8.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.33.0
 	go.opentelemetry.io/otel v1.8.0
@@ -136,10 +136,13 @@ require (
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/eternnoir/gncp v0.0.0-20170707042257-c70df2d0cd68 // indirect
+	github.com/evanphx/json-patch/v5 v5.5.0 // indirect
 	github.com/fatih/color v1.13.0 // indirect
+	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.0 // indirect
 	github.com/gdexlab/go-render v1.0.1 // indirect
+	github.com/go-acme/lego/v4 v4.4.0 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.4 // indirect
 	github.com/go-chi/chi v4.0.2+incompatible // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
@@ -151,6 +154,9 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
+	github.com/gobwas/httphead v0.1.0 // indirect
+	github.com/gobwas/pool v0.2.1 // indirect
+	github.com/gobwas/ws v1.0.4 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
@@ -163,6 +169,7 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gookit/goutil v0.5.2 // indirect
+	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
 	github.com/hashicorp/consul/api v1.11.0 // indirect
