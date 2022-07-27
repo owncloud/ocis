@@ -1389,7 +1389,7 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiWebdavOperations/refuseAccess.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L36)
 - [apiWebdavOperations/refuseAccess.feature:41](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L41)
 
-### [Group name is case-insensitive](https://github.com/owncloud/ocis/issues/3167#issuecomment-1090045359)
+### [GraphAPI groups are case in-sensitive](https://github.com/owncloud/ocis/issues/4291)
 
 - [apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature:49](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature#L49)
 - [apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature:50](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareGroupCaseSensitive.feature#L50)
