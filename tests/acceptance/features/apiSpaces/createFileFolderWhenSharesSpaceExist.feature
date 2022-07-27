@@ -43,13 +43,13 @@ Feature: create file or folder named similar to Shares folder
   Scenario: try to create a folder named Shares
     Given using spaces DAV path
     When user "Brian" creates folder "/Shares" using the WebDAV API
-    Then the HTTP status code should be "405"
+    Then the HTTP status code should be "201"
     And for user "Brian" the space "Shares Jail" should contain these entries:
       | /FOLDER |
 
   Scenario: try to create a file named Shares
     Given using spaces DAV path
     When user "Brian" uploads file with content "some text" to "/Shares" using the WebDAV API
-    Then the HTTP status code should be "409"
+    Then the HTTP status code should be "201"
     And for user "Brian" the space "Shares Jail" should contain these entries:
       | /FOLDER |

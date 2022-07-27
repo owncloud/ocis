@@ -45,7 +45,3 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 ### [A space manager cannot see the public links of another manager](https://github.com/owncloud/ocis/issues/4260)
 - [apiSpaces/editPublicLinkOfSpace.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/editPublicLinkOfSpace.feature#L67)
-
-### [Shares named (file | folder) can be created in Personal space with spaces webdav](https://github.com/owncloud/ocis/issues/4286)
-- [apiSpaces/createFileFolderWhenSharesSpaceExist.feature:43](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/createFileFolderWhenSharesSpaceExist.feature#L43)
-- [apiSpaces/createFileFolderWhenSharesSpaceExist.feature:50](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/createFileFolderWhenSharesSpaceExist.feature#L50)
