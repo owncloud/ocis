@@ -536,16 +536,12 @@ cannot share a folder with create permission
 - [apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:181](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature#L181)
 - [apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink2/reShareAsPublicLinkToSharesNewDav.feature#L182)
 
-#### [Removing the public link password is broken](https://github.com/owncloud/ocis/issues/4262)
-
-- [apiSharePublicLink3/updatePublicLinkShare.feature:165](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/updatePublicLinkShare.feature#L165)
-
 #### [Adding public upload to a read only shared folder as a recipient is allowed ](https://github.com/owncloud/ocis/issues/2164)
 
-- [apiSharePublicLink3/updatePublicLinkShare.feature:356](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/updatePublicLinkShare.feature#L356)
-- [apiSharePublicLink3/updatePublicLinkShare.feature:357](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/updatePublicLinkShare.feature#L357)
-- [apiSharePublicLink3/updatePublicLinkShare.feature:416](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/updatePublicLinkShare.feature#L416)
-- [apiSharePublicLink3/updatePublicLinkShare.feature:417](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/updatePublicLinkShare.feature#L417)
+- [apiSharePublicLink3/updatePublicLinkShare.feature:364](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/updatePublicLinkShare.feature#L364)
+- [apiSharePublicLink3/updatePublicLinkShare.feature:365](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/updatePublicLinkShare.feature#L365)
+- [apiSharePublicLink3/updatePublicLinkShare.feature:424](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/updatePublicLinkShare.feature#L424)
+- [apiSharePublicLink3/updatePublicLinkShare.feature:425](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/updatePublicLinkShare.feature#L425)
 
 #### [Upload-only shares must not overwrite but create a separate file](https://github.com/owncloud/ocis-reva/issues/286)
 
