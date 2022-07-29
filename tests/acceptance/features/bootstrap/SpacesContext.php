@@ -267,8 +267,9 @@ class SpacesContext implements Context {
 		$this->theUserListsAllAvailableSpacesUsingTheGraphApi($user);
 
 		$spaces = $this->getAvailableSpaces();
-		Assert::assertIsArray($spaces[$spaceName], "Space with name $spaceName for user $user not found");
-		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName for user $user not found");
+		Assert::assertArrayHasKey($spaceName, $spaces, "Space with name '$spaceName' for user '$user' not found");
+		Assert::assertIsArray($spaces[$spaceName], "Data for space with name '$spaceName' for user '$user' not found");
+		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name '$spaceName' for user '$user' not found");
 
 		return $spaces[$spaceName];
 	}
