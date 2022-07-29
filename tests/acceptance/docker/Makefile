@@ -219,6 +219,7 @@ clean-docker-volumes: ## clean docker volumes created during acceptance tests
 	docker-compose down --remove-orphans -v
 
 .PHONY: clean-files
+clean-files:
 	@$(MAKE) --no-print-directory -C ../. clean-tests
 
 .PHONY: clean
