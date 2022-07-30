@@ -1,0 +1,30 @@
+package content
+
+import (
+	"context"
+	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"time"
+)
+
+type Basic struct {
+	logger log.Logger
+}
+
+func NewBasicExtractor(logger log.Logger) (*Basic, error) {
+	return &Basic{logger: logger}, nil
+}
+
+func (b Basic) Extract(ctx context.Context, ref *storageProvider.Reference, ri *storageProvider.ResourceInfo) (Document, error) {
+	doc := Document{
+		Name:     ri.Path,
+		Size:     ri.Size,
+		MimeType: ri.MimeType,
+	}
+
+	if ri.Mtime != nil {
+		doc.Mtime = time.Unix(int64(ri.Mtime.Seconds), int64(ri.Mtime.Nanos)).UTC().Format(time.RFC3339)
+	}
+
+	return doc, nil
+}

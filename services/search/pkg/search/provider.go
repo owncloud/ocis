@@ -1,13 +1,8 @@
-package provider
+package search
 
 import (
 	"context"
 	"fmt"
-	"path/filepath"
-	"sort"
-	"strings"
-	"time"
-
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -15,67 +10,38 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
-	"github.com/cs3org/reva/v2/pkg/events"
 	sdk "github.com/cs3org/reva/v2/pkg/sdk/common"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/search/pkg/search"
+	"github.com/owncloud/ocis/v2/services/search/pkg/content"
+	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
 	"google.golang.org/grpc/metadata"
+	"path/filepath"
+	"sort"
+	"strings"
 
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 )
 
-var ListenEvents = []events.Unmarshaller{
-	events.ItemTrashed{},
-	events.ItemRestored{},
-	events.ItemMoved{},
-	events.ContainerCreated{},
-	events.FileUploaded{},
-	events.FileTouched{},
-	events.FileVersionRestored{},
-}
-
 type Provider struct {
-	logger            log.Logger
-	gwClient          gateway.GatewayAPIClient
-	indexClient       search.IndexClient
-	machineAuthAPIKey string
+	logger    log.Logger
+	gateway   gateway.GatewayAPIClient
+	engine    engine.Engine
+	extractor content.Extractor
+	secret    string
 }
 
-type MatchArray []*searchmsg.Match
-
-func (s MatchArray) Len() int {
-	return len(s)
-}
-func (s MatchArray) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s MatchArray) Less(i, j int) bool {
-	return s[i].Score > s[j].Score
-}
-
-func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, machineAuthAPIKey string, eventsChan <-chan interface{}, logger log.Logger) *Provider {
-	p := &Provider{
-		gwClient:          gwClient,
-		indexClient:       indexClient,
-		machineAuthAPIKey: machineAuthAPIKey,
-		logger:            logger,
+func NewProvider(gw gateway.GatewayAPIClient, eng engine.Engine, extractor content.Extractor, logger log.Logger, secret string) *Provider {
+	return &Provider{
+		gateway:   gw,
+		engine:    eng,
+		secret:    secret,
+		logger:    logger,
+		extractor: extractor,
 	}
-
-	go func() {
-		for {
-			ev := <-eventsChan
-			go func() {
-				time.Sleep(1 * time.Second) // Give some time to let everything settle down before trying to access it when indexing
-				p.handleEvent(ev)
-			}()
-		}
-	}()
-
-	return p
 }
 
 func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error) {
@@ -84,7 +50,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 	}
 	p.logger.Debug().Str("query", req.Query).Msg("performing a search")
 
-	listSpacesRes, err := p.gwClient.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
+	listSpacesRes, err := p.gateway.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
 		Filters: []*provider.ListStorageSpacesRequest_Filter{
 			{
 				Type: provider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
@@ -132,7 +98,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 				p.logger.Warn().Interface("space", space).Msg("could not find mountpoint space for grant space")
 				continue
 			}
-			gpRes, err := p.gwClient.GetPath(ctx, &provider.GetPathRequest{
+			gpRes, err := p.gateway.GetPath(ctx, &provider.GetPathRequest{
 				ResourceId: space.Root,
 			})
 			if err != nil {
@@ -157,8 +123,8 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			p.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootId).Msg("searching a grant")
 		}
 
-		res, err := p.indexClient.Search(ctx, &searchsvc.SearchIndexRequest{
-			Query: formatQuery(req.Query),
+		res, err := p.engine.Search(ctx, &searchsvc.SearchIndexRequest{
+			Query: req.Query,
 			Ref: &searchmsg.Reference{
 				ResourceId: searchRootId,
 				Path:       mountpointPrefix,
@@ -201,7 +167,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 
 func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequest) (*searchsvc.IndexSpaceResponse, error) {
 	// get user
-	res, err := p.gwClient.GetUserByClaim(context.Background(), &user.GetUserByClaimRequest{
+	res, err := p.gateway.GetUserByClaim(context.Background(), &user.GetUserByClaimRequest{
 		Claim: "username",
 		Value: req.UserId,
 	})
@@ -212,10 +178,10 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 
 	// Get auth context
 	ownerCtx := ctxpkg.ContextSetUser(context.Background(), res.User)
-	authRes, err := p.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
+	authRes, err := p.gateway.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     "userid:" + res.User.Id.OpaqueId,
-		ClientSecret: p.machineAuthAPIKey,
+		ClientSecret: p.secret,
 	})
 	if err != nil || authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		return nil, err
@@ -227,13 +193,13 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 	ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token)
 
 	// Walk the space and index all files
-	walker := walker.NewWalker(p.gwClient)
+	w := walker.NewWalker(p.gateway)
 	rootId, err := storagespace.ParseID(req.SpaceId)
 	if err != nil {
 		p.logger.Error().Err(err).Msg(err.Error())
 		return nil, err
 	}
-	err = walker.Walk(ownerCtx, &rootId, func(wd string, info *provider.ResourceInfo, err error) error {
+	err = w.Walk(ownerCtx, &rootId, func(wd string, info *provider.ResourceInfo, err error) error {
 		if err != nil {
 			p.logger.Error().Err(err).Msg("error walking the tree")
 		}
@@ -241,7 +207,21 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
 			ResourceId: &rootId,
 		}
-		err = p.indexClient.Add(ref, info)
+
+		doc, err := p.extractor.Extract(ctx, ref, info)
+		if err != nil {
+			p.logger.Error().Err(err).Msg("error extracting content")
+		}
+
+		ent := engine.Entity{
+			ID:       storagespace.FormatResourceID(*info.Id),
+			RootID:   storagespace.FormatResourceID(*ref.ResourceId),
+			Path:     ref.Path,
+			Type:     uint64(info.Type),
+			Document: doc,
+		}
+
+		err = p.engine.Upsert(ent.ID, ent)
 		if err != nil {
 			p.logger.Error().Err(err).Msg("error adding resource to the index")
 		} else {
@@ -253,29 +233,6 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 		return nil, err
 	}
 
-	p.logDocCount()
+	logDocCount(p.engine, p.logger)
 	return &searchsvc.IndexSpaceResponse{}, nil
-}
-
-func (p *Provider) logDocCount() {
-	c, err := p.indexClient.DocCount()
-	if err != nil {
-		p.logger.Error().Err(err).Msg("error getting document count from the index")
-	}
-	p.logger.Debug().Interface("count", c).Msg("new document count")
-}
-
-func formatQuery(q string) string {
-	query := q
-	fields := []string{"RootID", "Path", "ID", "Name", "Size", "Mtime", "MimeType", "Type"}
-	for _, field := range fields {
-		query = strings.ReplaceAll(query, strings.ToLower(field)+":", field+":")
-	}
-
-	if strings.Contains(query, ":") {
-		return query // Sophisticated field based search
-	}
-
-	// this is a basic filename search
-	return "Name:*" + strings.ReplaceAll(strings.ToLower(query), " ", `\ `) + "*"
 }

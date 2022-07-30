@@ -73,6 +73,7 @@ func DefaultConfig() *config.Config {
 				PersonalSpaceAliasTemplate: "{{.SpaceType}}/{{.User.Username | lower}}",
 				GeneralSpaceAliasTemplate:  "{{.SpaceType}}/{{.SpaceName | replace \" \" \"-\" | lower}}",
 				PermissionsEndpoint:        "127.0.0.1:9191",
+				AsyncUploads:               false,
 			},
 		},
 		Events: config.Events{

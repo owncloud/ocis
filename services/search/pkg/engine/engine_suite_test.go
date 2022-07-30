@@ -1,4 +1,4 @@
-package index_test
+package engine_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestIndex(t *testing.T) {
+func TestEngine(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Index Suite")
+	RunSpecs(t, "Engine Suite")
 }
