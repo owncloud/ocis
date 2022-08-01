@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Substring search for sharees: [#547](https://github.com/owncloud/ocis/issues/547)
+* Bugfix - Space Creators can hand over spaces: [#4244](https://github.com/owncloud/ocis/pull/4244)
 * Enhancement - Add drives field to users endpoint: [#4072](https://github.com/owncloud/ocis/pull/4072)
 * Enhancement - Improve error log for "could not get user by claim" error: [#4227](https://github.com/owncloud/ocis/pull/4227)
 * Enhancement - Allow providing list of services NOT to start: [#4254](https://github.com/owncloud/ocis/pull/4254)
@@ -29,6 +30,12 @@ The following sections list the changes for unreleased.
    This setting is e.g. evaluated by the web ui via the capabilities endpoint.
 
    https://github.com/owncloud/ocis/issues/547
+
+* Bugfix - Space Creators can hand over spaces: [#4244](https://github.com/owncloud/ocis/pull/4244)
+
+   Set no owner on non personal spaces to be able to pass the space manager role to a new user.
+
+   https://github.com/owncloud/ocis/pull/4244
 
 * Enhancement - Add drives field to users endpoint: [#4072](https://github.com/owncloud/ocis/pull/4072)
 
