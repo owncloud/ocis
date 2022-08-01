@@ -114,12 +114,19 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 	matches := MatchArray{}
 	total := int32(0)
 	for _, space := range listSpacesRes.StorageSpaces {
+		searchRootId := &searchmsg.ResourceID{
+			StorageId: space.Root.StorageId,
+			SpaceId:   space.Root.SpaceId,
+			OpaqueId:  space.Root.OpaqueId,
+		}
 		var mountpointRootId *searchmsg.ResourceID
 		mountpointPrefix := ""
 		switch space.SpaceType {
 		case "mountpoint":
 			continue // mountpoint spaces are only "links" to the shared spaces. we have to search the shared "grant" space instead
 		case "grant":
+			// In case of grant spaces we search the root of the outer space and translate the paths to the according mountpoint
+			searchRootId.OpaqueId = space.Root.SpaceId
 			mountpointId, ok := mountpointMap[space.Id.OpaqueId]
 			if !ok {
 				p.logger.Warn().Interface("space", space).Msg("could not find mountpoint space for grant space")
@@ -153,12 +160,8 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 		res, err := p.indexClient.Search(ctx, &searchsvc.SearchIndexRequest{
 			Query: formatQuery(req.Query),
 			Ref: &searchmsg.Reference{
-				ResourceId: &searchmsg.ResourceID{
-					StorageId: space.Root.StorageId,
-					SpaceId:   space.Root.SpaceId,
-					OpaqueId:  space.Root.OpaqueId,
-				},
-				Path: mountpointPrefix,
+				ResourceId: searchRootId,
+				Path:       mountpointPrefix,
 			},
 			PageSize: req.PageSize,
 		})
