@@ -45,3 +45,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 ### [A space manager cannot see the public links of another manager](https://github.com/owncloud/ocis/issues/4260)
 - [apiSpaces/editPublicLinkOfSpace.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/editPublicLinkOfSpace.feature#L67)
+
+### [User without space manager role cannot restore space](https://github.com/owncloud/ocis/issues/4027)
+ - [apiSpaces/restoreSpaces.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/restoreSpaces.feature#L63)
+ - [apiSpaces/restoreSpaces.feature:64](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/restoreSpaces.feature#L64)
+
