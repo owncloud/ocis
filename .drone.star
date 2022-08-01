@@ -232,6 +232,18 @@ def main(ctx):
             testPipelines(ctx),
         ),
     )
+    test_pipelines.append(
+        pipelineDependsOn(
+            purgeBuildArtifactCache(ctx, "web-dist"),
+            testPipelines(ctx),
+        ),
+    )
+    test_pipelines.append(
+        pipelineDependsOn(
+            purgeBuildArtifactCache(ctx, "tests-yarn"),
+            testPipelines(ctx),
+        ),
+    )
 
     pipelines = test_pipelines + build_release_pipelines + build_release_helpers
 
