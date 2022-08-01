@@ -733,6 +733,17 @@ func listStorageSpacesIDFilter(id string) *storageprovider.ListStorageSpacesRequ
 	}
 }
 
+func listStorageSpacesUserFilter(id string) *storageprovider.ListStorageSpacesRequest_Filter {
+	return &storageprovider.ListStorageSpacesRequest_Filter{
+		Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_USER,
+		Term: &storageprovider.ListStorageSpacesRequest_Filter_User{
+			User: &userv1beta1.UserId{
+				OpaqueId: id,
+			},
+		},
+	}
+}
+
 func listStorageSpacesTypeFilter(spaceType string) *storageprovider.ListStorageSpacesRequest_Filter {
 	return &storageprovider.ListStorageSpacesRequest_Filter{
 		Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
