@@ -22,10 +22,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 ### [Search by shares jail works incorrect](https://github.com/owncloud/ocis/issues/4014)
 - [apiSpaces/search.feature:43](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/search.feature#L43)
 
-### [Space Admin still has access to the project despite being removed from it](https://github.com/owncloud/ocis/issues/4127)
-- [apiSpaces/shareSpaces.feature:77](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSpaces.feature#L77)
-- [apiSpaces/shareSpaces.feature:78](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSpaces.feature#L78)
-
 ### [Depth infinity not supported for space Shares Jail](https://github.com/owncloud/ocis/issues/4188)
 - [apiSpaces/copySpaces.feature:112](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/copySpaces.feature#L112)
 - [apiSpaces/copySpaces.feature:113](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/copySpaces.feature#L113)
@@ -42,9 +38,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpaces/moveSpaces.feature:185](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/moveSpaces.feature#L185)
 - [apiSpaces/moveSpaces.feature:186](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/moveSpaces.feature#L186)
 - [apiSpaces/moveSpaces.feature:189](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/moveSpaces.feature#L189)
-
-### [A space manager cannot see the public links of another manager](https://github.com/owncloud/ocis/issues/4260)
-- [apiSpaces/editPublicLinkOfSpace.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/editPublicLinkOfSpace.feature#L67)
 
 ### [User without space manager role cannot restore space](https://github.com/owncloud/ocis/issues/4027)
  - [apiSpaces/restoreSpaces.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/restoreSpaces.feature#L63)
