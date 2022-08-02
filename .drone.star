@@ -2104,7 +2104,7 @@ def genericCachePurge(name, cache_key):
                         "from_secret": "cache_s3_endpoint",
                     },
                     "flush": True,
-                    "flush_age": "14",
+                    "flush_age": "1",
                     "filename": "%s.tar" % (cache_key),
                 },
             },
