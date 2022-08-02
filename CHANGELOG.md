@@ -6,13 +6,22 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix search in received shares: [#4308](https://github.com/owncloud/ocis/issues/4308)
 * Bugfix - Substring search for sharees: [#547](https://github.com/owncloud/ocis/issues/547)
+* Bugfix - Space Creators can hand over spaces: [#4244](https://github.com/owncloud/ocis/pull/4244)
+* Enhancement - Add drives field to users endpoint: [#4072](https://github.com/owncloud/ocis/pull/4072)
 * Enhancement - Improve error log for "could not get user by claim" error: [#4227](https://github.com/owncloud/ocis/pull/4227)
 * Enhancement - Allow providing list of services NOT to start: [#4254](https://github.com/owncloud/ocis/pull/4254)
 * Enhancement - Introduce insecure flag for smtp email notifications: [#4279](https://github.com/owncloud/ocis/pull/4279)
 * Enhancement - Update reva to vx.x.x: [#4272](https://github.com/owncloud/ocis/pull/4272)
 
 ## Details
+
+* Bugfix - Fix search in received shares: [#4308](https://github.com/owncloud/ocis/issues/4308)
+
+   We fixed a problem where items in received shares were not found.
+
+   https://github.com/owncloud/ocis/issues/4308
 
 * Bugfix - Substring search for sharees: [#547](https://github.com/owncloud/ocis/issues/547)
 
@@ -28,6 +37,20 @@ The following sections list the changes for unreleased.
    This setting is e.g. evaluated by the web ui via the capabilities endpoint.
 
    https://github.com/owncloud/ocis/issues/547
+
+* Bugfix - Space Creators can hand over spaces: [#4244](https://github.com/owncloud/ocis/pull/4244)
+
+   Set no owner on non personal spaces to be able to pass the space manager role to a new user.
+
+   https://github.com/owncloud/ocis/pull/4244
+
+* Enhancement - Add drives field to users endpoint: [#4072](https://github.com/owncloud/ocis/pull/4072)
+
+   We have added `$expand=drives` to the `/users/{id}/` endpoint using the user filter
+   implemented in reva.
+
+   https://github.com/owncloud/ocis/pull/4072
+   https://github.com/cs3org/reva/pull/3046
 
 * Enhancement - Improve error log for "could not get user by claim" error: [#4227](https://github.com/owncloud/ocis/pull/4227)
 
@@ -56,6 +79,7 @@ The following sections list the changes for unreleased.
    Updated reva to version x.x.x. This update includes:
 
    https://github.com/owncloud/ocis/pull/4272
+   https://github.com/cs3org/reva/pull/3096
    *
    todo:
 # Changelog for [2.0.0-beta.5] (2022-07-19)

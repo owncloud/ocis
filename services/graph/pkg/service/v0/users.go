@@ -11,9 +11,12 @@ import (
 	"strings"
 
 	"github.com/CiscoM31/godata"
+	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -21,6 +24,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	settingssvc "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
+	"golang.org/x/exp/slices"
 )
 
 // GetMe implements the Service interface.
@@ -170,6 +174,43 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		} else {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
+	}
+	sel := strings.Split(r.URL.Query().Get("$select"), ",")
+	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
+	if slices.Contains(sel, "drive") || slices.Contains(sel, "drives") || slices.Contains(exp, "drive") || slices.Contains(exp, "drives") {
+		wdu, err := url.Parse(g.config.Spaces.WebDavBase + g.config.Spaces.WebDavPath)
+		f := listStorageSpacesUserFilter(user.GetId())
+		lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
+			Opaque:  nil,
+			Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
+		})
+		if err != nil {
+			g.logger.Err(err).Interface("query", r.URL.Query()).Msg("error getting storages")
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, user)
+			return
+		}
+		if lspr.Status.Code != cs3rpc.Code_CODE_OK {
+			// in case of NOT_OK, we can just return the user object with empty drives
+			render.Status(r, status.HTTPStatusFromCode(http.StatusOK))
+			render.JSON(w, r, user)
+			return
+		}
+		drives := []libregraph.Drive{}
+		for _, sp := range lspr.GetStorageSpaces() {
+			d, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, sp)
+			if err != nil {
+				g.logger.Err(err).Interface("query", r.URL.Query()).Msg("error converting space to drive")
+			}
+			if slices.Contains(sel, "drive") || slices.Contains(exp, "drive") {
+				if *d.DriveType == "personal" {
+					drives = append(drives, *d)
+				}
+			} else {
+				drives = append(drives, *d)
+			}
+		}
+		user.Drives = drives
 	}
 
 	render.Status(r, http.StatusOK)

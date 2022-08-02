@@ -112,7 +112,7 @@ config = {
             "suites": [
                 "apiShareManagement",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
             "cron": "nightly",
         },
@@ -120,7 +120,7 @@ config = {
             "suites": [
                 "apiWebdavOperations",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
             "cron": "nightly",
         },

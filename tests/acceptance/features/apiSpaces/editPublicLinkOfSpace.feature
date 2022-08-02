@@ -35,18 +35,15 @@ Feature: A manager of the space can edit public link
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
     And the fields of the last response to user "Alice" should include
-      | item_type              | folder                |
-      | mimetype               | httpd/unix-directory  |
-      | file_target            | /                     |
-      | path                   | /                     |
-      | permissions            | <expectedPermissions> |
-      | share_type             | public_link           |
-      | displayname_file_owner | %displayname%         |
-      | displayname_owner      | %displayname%         |
-      | uid_file_owner         | %username%            |
-      | uid_owner              | %username%            |
-      | name                   | <linkName>            |
-      | expiration             | <expireDate>          |
+      | item_type         | folder                |
+      | mimetype          | httpd/unix-directory  |
+      | file_target       | /                     |
+      | path              | /                     |
+      | permissions       | <expectedPermissions> |
+      | share_type        | public_link           |
+      | displayname_owner | %displayname%         |
+      | name              | <linkName>            |
+      | expiration        | <expireDate>          |
     And the public should be able to download file "/test.txt" from inside the last public link shared folder using the new public WebDAV API with password "<password>"
     And the downloaded content should be "some content"
     Examples:
@@ -65,8 +62,8 @@ Feature: A manager of the space can edit public link
     Examples:
       | role    | shouldOrNot |
       | manager | should      |
-      | editor  | should not  |
-      | viewer  | should not  |
+      | editor  | should      |
+      | viewer  | should      |
 
 
   Scenario Outline: Members of the space try to edit a public link

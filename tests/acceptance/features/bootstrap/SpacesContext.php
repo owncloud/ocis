@@ -267,8 +267,9 @@ class SpacesContext implements Context {
 		$this->theUserListsAllAvailableSpacesUsingTheGraphApi($user);
 
 		$spaces = $this->getAvailableSpaces();
-		Assert::assertIsArray($spaces[$spaceName], "Space with name $spaceName for user $user not found");
-		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName for user $user not found");
+		Assert::assertArrayHasKey($spaceName, $spaces, "Space with name '$spaceName' for user '$user' not found");
+		Assert::assertIsArray($spaces[$spaceName], "Data for space with name '$spaceName' for user '$user' not found");
+		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name '$spaceName' for user '$user' not found");
 
 		return $spaces[$spaceName];
 	}
@@ -2842,18 +2843,12 @@ class SpacesContext implements Context {
 		string $shouldOrNot
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$url = "/apps/files_sharing/api/v1/shares";
-
-		$bodyTable = new TableNode([
-			["space_ref", $space['id']],
-			["reshares", true],
-		]);
+		$url = "/apps/files_sharing/api/v1/shares?reshares=true&space_ref=" . $space['id'];
 
 		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
 			'GET',
 			$url,
-			$bodyTable
 		);
 
 		$should = ($shouldOrNot !== "not");
