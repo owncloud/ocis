@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix search in received shares: [#4308](https://github.com/owncloud/ocis/issues/4308)
 * Bugfix - Substring search for sharees: [#547](https://github.com/owncloud/ocis/issues/547)
 * Bugfix - Space Creators can hand over spaces: [#4244](https://github.com/owncloud/ocis/pull/4244)
 * Enhancement - Add drives field to users endpoint: [#4072](https://github.com/owncloud/ocis/pull/4072)
@@ -15,6 +16,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Update reva to vx.x.x: [#4272](https://github.com/owncloud/ocis/pull/4272)
 
 ## Details
+
+* Bugfix - Fix search in received shares: [#4308](https://github.com/owncloud/ocis/issues/4308)
+
+   We fixed a problem where items in received shares were not found.
+
+   https://github.com/owncloud/ocis/issues/4308
 
 * Bugfix - Substring search for sharees: [#547](https://github.com/owncloud/ocis/issues/547)
 
