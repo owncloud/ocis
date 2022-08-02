@@ -14,7 +14,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 )
 
-// ldapMock implements the ldap.Client interfac
+// ldapMock implements the ldap.Client interface
 type ldapMock struct {
 	SearchFunc *searchFunc
 }
