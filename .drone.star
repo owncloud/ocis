@@ -223,25 +223,25 @@ def main(ctx):
     test_pipelines.append(
         pipelineDependsOn(
             purgeBuildArtifactCache(ctx, "testrunner"),
-            testPipelines(ctx),
+            failEarly(ctx, True) + testPipelines(ctx),
         ),
     )
     test_pipelines.append(
         pipelineDependsOn(
             purgeBuildArtifactCache(ctx, "testing_app"),
-            testPipelines(ctx),
+            failEarly(ctx, True) + testPipelines(ctx),
         ),
     )
     test_pipelines.append(
         pipelineDependsOn(
             purgeBuildArtifactCache(ctx, "web-dist"),
-            testPipelines(ctx),
+            failEarly(ctx, True) + testPipelines(ctx),
         ),
     )
     test_pipelines.append(
         pipelineDependsOn(
             purgeBuildArtifactCache(ctx, "tests-yarn"),
-            testPipelines(ctx),
+            failEarly(ctx, True) + testPipelines(ctx),
         ),
     )
 
@@ -2104,7 +2104,7 @@ def genericCachePurge(name, cache_key):
                         "from_secret": "cache_s3_endpoint",
                     },
                     "flush": True,
-                    "flush_age": "0",
+                    "flush_age": "1",
                     "filename": "%s.tar" % (cache_key),
                 },
             },
