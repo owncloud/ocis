@@ -13,7 +13,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Improve error log for "could not get user by claim" error: [#4227](https://github.com/owncloud/ocis/pull/4227)
 * Enhancement - Allow providing list of services NOT to start: [#4254](https://github.com/owncloud/ocis/pull/4254)
 * Enhancement - Introduce insecure flag for smtp email notifications: [#4279](https://github.com/owncloud/ocis/pull/4279)
-* Enhancement - Update reva to vx.x.x: [#4272](https://github.com/owncloud/ocis/pull/4272)
+* Enhancement - Update reva to vx.x.x: [#4294](https://github.com/owncloud/ocis/pull/4294)
 
 ## Details
 
@@ -74,15 +74,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/4279
 
-* Enhancement - Update reva to vx.x.x: [#4272](https://github.com/owncloud/ocis/pull/4272)
+* Enhancement - Update reva to vx.x.x: [#4294](https://github.com/owncloud/ocis/pull/4294)
 
    Updated reva to version x.x.x. This update includes:
 
-   https://github.com/owncloud/ocis/pull/4272
-   https://github.com/cs3org/reva/pull/3096
+  * TODO:
+
+   Https://github.com/owncloud/ocis/pull/4272
+   https://github.com/cs3org/reva/pull/3096 https://github.com/cs3org/reva/pull/4315
+
    https://github.com/owncloud/ocis/pull/4294
-   *
-   todo:
 # Changelog for [2.0.0-beta.5] (2022-07-19)
 
 The following sections list the changes for 2.0.0-beta.5.
