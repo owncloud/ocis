@@ -904,7 +904,7 @@ def e2eTests(ctx):
     if ("skip-e2e" in ctx.build.title.lower()):
         return []
 
-    if (ctx.build.event != "tag"):   
+    if (ctx.build.event != "tag"):
         return [{
             "kind": "pipeline",
             "type": "docker",
