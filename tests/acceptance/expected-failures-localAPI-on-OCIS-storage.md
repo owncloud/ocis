@@ -38,8 +38,3 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpaces/moveSpaces.feature:185](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/moveSpaces.feature#L185)
 - [apiSpaces/moveSpaces.feature:186](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/moveSpaces.feature#L186)
 - [apiSpaces/moveSpaces.feature:189](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/moveSpaces.feature#L189)
-
-### [User without space manager role cannot restore space](https://github.com/owncloud/ocis/issues/4027)
- - [apiSpaces/restoreSpaces.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/restoreSpaces.feature#L63)
- - [apiSpaces/restoreSpaces.feature:64](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/restoreSpaces.feature#L64)
-
