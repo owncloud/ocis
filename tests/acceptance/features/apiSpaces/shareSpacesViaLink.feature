@@ -32,18 +32,17 @@ Feature: Share spaces via link
             | path                   | /                     |
             | permissions            | <expectedPermissions> |
             | share_type             | public_link           |
-            | displayname_file_owner | %displayname%         |
             | displayname_owner      | %displayname%         |
-            | uid_file_owner         | %username%            |
             | uid_owner              | %username%            |
             | name                   | <linkName>            |
-        And the public should be able to download file "/test.txt" from inside the last public link shared folder using the new public WebDAV API with password "123"
+        And the public should be able to download file "/test.txt" from inside the last public link shared folder using the new public WebDAV API with password "<password>"
         And the downloaded content should be "some content"
+        But the public should not be able to download file "/test.txt" from inside the last public link shared folder using the new public WebDAV API with password "wrong pass"
         Examples:
-            | permissions | expectedPermissions       | password | linkName | expireDate               |
-            | 1           | read                      | 123      | link     | 2042-03-25T23:59:59+0100 |
-            | 5           | read,create               | 123      |          | 2042-03-25T23:59:59+0100 |
-            | 15          | read,update,create,delete |          | link     |                          |
+            | permissions | expectedPermissions       | password       | linkName | expireDate               |
+            | 1           | read                      | 123234         | link     | 2042-03-25T23:59:59+0100 |
+            | 5           | read,create               | qwerty 123     |          | 2042-03-25T23:59:59+0100 |
+            | 15          | read,update,create,delete | d*V^o*Y03R9n8Z | link     |                          |
 
 
     Scenario: An uploader should be able to upload a file
@@ -56,17 +55,15 @@ Feature: Share spaces via link
         And the OCS status code should be "200"
         And the OCS status message should be "OK"
         And the fields of the last response to user "Alice" should include
-            | item_type              | folder               |
-            | mimetype               | httpd/unix-directory |
-            | file_target            | /                    |
-            | path                   | /                    |
-            | permissions            | create               |
-            | share_type             | public_link          |
-            | displayname_file_owner | %displayname%        |
-            | displayname_owner      | %displayname%        |
-            | uid_file_owner         | %username%           |
-            | uid_owner              | %username%           |
-            | name                   | forUpload            |
+            | item_type         | folder               |
+            | mimetype          | httpd/unix-directory |
+            | file_target       | /                    |
+            | path              | /                    |
+            | permissions       | create               |
+            | share_type        | public_link          |
+            | displayname_owner | %displayname%        |
+            | uid_owner         | %username%           |
+            | name              | forUpload            |
         And the public should be able to upload file "lorem.txt" into the last public link shared folder using the new public WebDAV API with password "123"
         And for user "Alice" the space "share space" should contain these entries:
             | lorem.txt |
@@ -79,7 +76,17 @@ Feature: Share spaces via link
         Then the HTTP status code should be "404"
         And the OCS status code should be "404"
         And the OCS status message should be "No share permission"
+        And for user "Alice" the space "share space" should not contain the last created public link
         Examples:
             | role   |
             | viewer |
             | editor |
+
+
+    Scenario: An user with manager role can share a space to public via link
+        Given user "Alice" has shared a space "share space" to user "Brian" with role "manager"
+        When user "Brian" creates a public link share of the space "share space" with settings:
+            | permissions | 1 |
+        Then the HTTP status code should be "200"
+        And the OCS status code should be "200"
+        And for user "Alice" the space "share space" should contain the last created public link

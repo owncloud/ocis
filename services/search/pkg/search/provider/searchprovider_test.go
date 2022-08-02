@@ -49,8 +49,8 @@ var _ = Describe("Searchprovider", func() {
 					},
 				},
 			},
-			Id:   &sprovider.StorageSpaceId{OpaqueId: "personalspace"},
-			Root: &sprovider.ResourceId{StorageId: "storageid", OpaqueId: "storageid"},
+			Id:   &sprovider.StorageSpaceId{OpaqueId: "storageid$personalspace!personalspace"},
+			Root: &sprovider.ResourceId{StorageId: "storageid", SpaceId: "personalspace", OpaqueId: "storageid"},
 			Name: "personalspace",
 		}
 
@@ -133,6 +133,7 @@ var _ = Describe("Searchprovider", func() {
 								Ref: &searchmsg.Reference{
 									ResourceId: &searchmsg.ResourceID{
 										StorageId: personalSpace.Root.StorageId,
+										SpaceId:   personalSpace.Root.SpaceId,
 										OpaqueId:  personalSpace.Root.OpaqueId,
 									},
 									Path: "./path/to/Foo.pdf",
@@ -259,6 +260,7 @@ var _ = Describe("Searchprovider", func() {
 								Ref: &searchmsg.Reference{
 									ResourceId: &searchmsg.ResourceID{
 										StorageId: grantSpace.Root.StorageId,
+										SpaceId:   grantSpace.Root.SpaceId,
 										OpaqueId:  grantSpace.Root.OpaqueId,
 									},
 									Path: "./grant/path/to/Shared.pdf",
@@ -297,7 +299,8 @@ var _ = Describe("Searchprovider", func() {
 						StorageSpaces: []*sprovider.StorageSpace{personalSpace, grantSpace, mountpointSpace},
 					}, nil)
 					indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
-						return req.Ref.ResourceId.StorageId == grantSpace.Root.StorageId
+						return req.Ref.ResourceId.OpaqueId == grantSpace.Root.SpaceId &&
+							req.Ref.ResourceId.SpaceId == grantSpace.Root.SpaceId
 					})).Return(&searchsvc.SearchIndexResponse{
 						TotalMatches: 2,
 						Matches: []*searchmsg.Match{
@@ -307,6 +310,7 @@ var _ = Describe("Searchprovider", func() {
 									Ref: &searchmsg.Reference{
 										ResourceId: &searchmsg.ResourceID{
 											StorageId: grantSpace.Root.StorageId,
+											SpaceId:   grantSpace.Root.SpaceId,
 											OpaqueId:  grantSpace.Root.OpaqueId,
 										},
 										Path: "./grant/path/to/Shared.pdf",
@@ -324,6 +328,7 @@ var _ = Describe("Searchprovider", func() {
 									Ref: &searchmsg.Reference{
 										ResourceId: &searchmsg.ResourceID{
 											StorageId: grantSpace.Root.StorageId,
+											SpaceId:   grantSpace.Root.SpaceId,
 											OpaqueId:  grantSpace.Root.OpaqueId,
 										},
 										Path: "./grant/path/to/Irrelevant.pdf",
@@ -338,7 +343,8 @@ var _ = Describe("Searchprovider", func() {
 						},
 					}, nil)
 					indexClient.On("Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
-						return req.Ref.ResourceId.StorageId == personalSpace.Root.StorageId
+						return req.Ref.ResourceId.OpaqueId == personalSpace.Root.OpaqueId &&
+							req.Ref.ResourceId.SpaceId == personalSpace.Root.SpaceId
 					})).Return(&searchsvc.SearchIndexResponse{
 						TotalMatches: 1,
 						Matches: []*searchmsg.Match{
@@ -348,6 +354,7 @@ var _ = Describe("Searchprovider", func() {
 									Ref: &searchmsg.Reference{
 										ResourceId: &searchmsg.ResourceID{
 											StorageId: personalSpace.Root.StorageId,
+											SpaceId:   personalSpace.Root.SpaceId,
 											OpaqueId:  personalSpace.Root.OpaqueId,
 										},
 										Path: "./path/to/Foo.pdf",

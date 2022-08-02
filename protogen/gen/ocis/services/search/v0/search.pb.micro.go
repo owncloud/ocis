@@ -39,14 +39,12 @@ func NewSearchProviderEndpoints() []*api.Endpoint {
 			Name:    "SearchProvider.Search",
 			Path:    []string{"/api/v0/search/search"},
 			Method:  []string{"POST"},
-			Body:    "*",
 			Handler: "rpc",
 		},
 		{
 			Name:    "SearchProvider.IndexSpace",
 			Path:    []string{"/api/v0/search/index-space"},
 			Method:  []string{"POST"},
-			Body:    "*",
 			Handler: "rpc",
 		},
 	}
@@ -111,14 +109,12 @@ func RegisterSearchProviderHandler(s server.Server, hdlr SearchProviderHandler, 
 		Name:    "SearchProvider.Search",
 		Path:    []string{"/api/v0/search/search"},
 		Method:  []string{"POST"},
-		Body:    "*",
 		Handler: "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:    "SearchProvider.IndexSpace",
 		Path:    []string{"/api/v0/search/index-space"},
 		Method:  []string{"POST"},
-		Body:    "*",
 		Handler: "rpc",
 	}))
 	return s.Handle(s.NewHandler(&SearchProvider{h}, opts...))
@@ -144,7 +140,6 @@ func NewIndexProviderEndpoints() []*api.Endpoint {
 			Name:    "IndexProvider.Search",
 			Path:    []string{"/api/v0/search/index/search"},
 			Method:  []string{"POST"},
-			Body:    "*",
 			Handler: "rpc",
 		},
 	}
@@ -196,7 +191,6 @@ func RegisterIndexProviderHandler(s server.Server, hdlr IndexProviderHandler, op
 		Name:    "IndexProvider.Search",
 		Path:    []string{"/api/v0/search/index/search"},
 		Method:  []string{"POST"},
-		Body:    "*",
 		Handler: "rpc",
 	}))
 	return s.Handle(s.NewHandler(&IndexProvider{h}, opts...))

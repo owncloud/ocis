@@ -6,7 +6,6 @@ ALPINE_GIT = "alpine/git:latest"
 CHKO_DOCKER_PUSHRM = "chko/docker-pushrm:1"
 DRONE_CLI = "drone/cli:alpine"
 MARIADB = "mariadb:10.6"
-MELTWATER_DRONE_CACHE = "meltwater/drone-cache:v1"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
 OC_CI_ALPINE = "owncloudci/alpine:latest"
 OC_CI_BAZEL_BUILDIFIER = "owncloudci/bazel-buildifier:latest"
@@ -31,6 +30,7 @@ PLUGINS_GITHUB_RELEASE = "plugins/github-release:1"
 PLUGINS_GIT_ACTION = "plugins/git-action:1"
 PLUGINS_MANIFEST = "plugins/manifest:1"
 PLUGINS_S3 = "plugins/s3:latest"
+PLUGINS_S3_CACHE = "plugins/s3-cache:1"
 PLUGINS_SLACK = "plugins/slack:1"
 REDIS = "redis:6-alpine"
 SELENIUM_STANDALONE_CHROME_DEBUG = "selenium/standalone-chrome-debug:3.141.59"
@@ -112,7 +112,7 @@ config = {
             "suites": [
                 "apiShareManagement",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
             "cron": "nightly",
         },
@@ -120,7 +120,7 @@ config = {
             "suites": [
                 "apiWebdavOperations",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
             "cron": "nightly",
         },
@@ -455,7 +455,7 @@ def buildOcisBinaryForTesting(ctx):
                  makeNodeGenerate("") +
                  makeGoGenerate("") +
                  build() +
-                 rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis"),
+                 rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin"),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -591,7 +591,7 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  ocisServer(storage, accounts_hash_difficulty) +
                  restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
                  restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
@@ -644,7 +644,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  ocisServer(storage, accounts_hash_difficulty, []) + [
             {
                 "name": "cs3ApiTests-%s" % (storage),
@@ -678,7 +678,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  ocisServer(storage, accounts_hash_difficulty) +
                  restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
                  restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
@@ -792,7 +792,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + restoreBuildArtifactCache(ctx, "web-dist", "webTestRunner") +
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") + restoreBuildArtifactCache(ctx, "web-dist", "webTestRunner") +
                  restoreBuildArtifactCache(ctx, "tests-yarn", "webTestRunner/tests/acceptance/.yarn") + yarnInstallUITests() +
                  ocisServer(storage, accounts_hash_difficulty) + waitForSeleniumService() + waitForMiddlewareService() +
                  restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
@@ -846,7 +846,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
             "os": "linux",
             "arch": "amd64",
         },
-        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") + restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  ocisServer(storage, accounts_hash_difficulty) + waitForSeleniumService() + waitForMiddlewareService() + [
             {
                 "name": "WebUIAcceptanceTests",
@@ -2049,31 +2049,26 @@ def genericCache(name, action, mounts, cache_key):
 
     step = {
         "name": "%s_%s" % (action, name),
-        "image": MELTWATER_DRONE_CACHE,
-        "environment": {
-            "AWS_ACCESS_KEY_ID": {
-                "from_secret": "cache_s3_access_key",
-            },
-            "AWS_SECRET_ACCESS_KEY": {
-                "from_secret": "cache_s3_secret_key",
-            },
-        },
+        "image": PLUGINS_S3_CACHE,
         "settings": {
             "endpoint": {
                 "from_secret": "cache_s3_endpoint",
             },
-            "bucket": "cache",
-            "region": "us-east-1",  # not used at all, but fails if not given!
-            "path_style": "true",
-            "cache_key": cache_key,
             "rebuild": rebuild,
             "restore": restore,
             "mount": mounts,
+            "access_key": {
+                "from_secret": "cache_s3_access_key",
+            },
+            "secret_key": {
+                "from_secret": "cache_s3_secret_key",
+            },
+            "filename": "%s.tar" % (cache_key),
         },
     }
     return step
 
-def genericCachePurge(ctx, name, cache_key):
+def genericCachePurge(name, cache_key):
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -2085,16 +2080,21 @@ def genericCachePurge(ctx, name, cache_key):
         "steps": [
             {
                 "name": "purge-cache",
-                "image": MINIO_MC,
-                "failure": "ignore",
-                "environment": {
-                    "MC_HOST_cache": {
-                        "from_secret": "cache_s3_connection_url",
+                "image": PLUGINS_S3_CACHE,
+                "settings": {
+                    "access_key": {
+                        "from_secret": "cache_s3_access_key",
                     },
+                    "secret_key": {
+                        "from_secret": "cache_s3_secret_key",
+                    },
+                    "endpoint": {
+                        "from_secret": "cache_s3_endpoint",
+                    },
+                    "flush": True,
+                    "flush_age": "14",
+                    "filename": "%s.tar" % (cache_key),
                 },
-                "commands": [
-                    "mc rm --recursive --force cache/cache/%s/%s" % (ctx.repo.name, cache_key),
-                ],
             },
         ],
         "trigger": {
@@ -2115,7 +2115,7 @@ def genericBuildArtifactCache(ctx, name, action, path):
     if action == "rebuild" or action == "restore":
         return genericCache(name, action, [path], cache_key)
     if action == "purge":
-        return genericCachePurge(ctx, name, cache_key)
+        return genericCachePurge(name, cache_key)
     return []
 
 def restoreBuildArtifactCache(ctx, name, path):
@@ -2295,7 +2295,7 @@ def parallelDeployAcceptancePipeline(ctx):
                     "arch": "amd64",
                 },
                 "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                         restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+                         restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                          restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
                          restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
                          copyConfigs() +
@@ -2558,7 +2558,7 @@ def litmus(ctx, storage):
             "path": "src",
         },
         "steps": skipIfUnchanged(ctx, "litmus") +
-                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") +
+                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  ocisServer(storage) +
                  setupForLitmus() +
                  [

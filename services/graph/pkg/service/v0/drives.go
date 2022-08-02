@@ -223,7 +223,6 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	csr := storageprovider.CreateStorageSpaceRequest{
-		Owner: us,
 		Type:  driveType,
 		Name:  spaceName,
 		Quota: getQuota(drive.Quota, g.config.Spaces.DefaultQuota),
@@ -235,6 +234,10 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 
 	if drive.DriveAlias != nil {
 		csr.Opaque = utils.AppendPlainToOpaque(csr.Opaque, "spaceAlias", *drive.DriveAlias)
+	}
+
+	if driveType == "personal" {
+		csr.Owner = us
 	}
 
 	resp, err := client.CreateStorageSpace(r.Context(), &csr)
@@ -727,6 +730,17 @@ func listStorageSpacesIDFilter(id string) *storageprovider.ListStorageSpacesRequ
 		Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_ID,
 		Term: &storageprovider.ListStorageSpacesRequest_Filter_Id{
 			Id: &storageprovider.StorageSpaceId{
+				OpaqueId: id,
+			},
+		},
+	}
+}
+
+func listStorageSpacesUserFilter(id string) *storageprovider.ListStorageSpacesRequest_Filter {
+	return &storageprovider.ListStorageSpacesRequest_Filter{
+		Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_USER,
+		Term: &storageprovider.ListStorageSpacesRequest_Filter_User{
+			User: &userv1beta1.UserId{
 				OpaqueId: id,
 			},
 		},

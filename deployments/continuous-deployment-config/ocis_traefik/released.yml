@@ -23,7 +23,6 @@
       - https://github.com/fschade.keys
       - https://github.com/kulmann.keys
       - https://github.com/micbar.keys
-      - https://github.com/pascalwengerter.keys
       - https://github.com/wkloucek.keys
     docker_compose_projects:
       - name: ocis
@@ -36,6 +35,7 @@
           OCIS_DOCKER_TAG: 2.0.0-beta.5
           OCIS_DOMAIN: ocis.ocis-traefik.released.owncloud.works
           DEMO_USERS: "true"
+          INBUCKET_DOMAIN: mail.ocis-traefik.released.owncloud.works
           COMPOSE_FILE: docker-compose.yml:monitoring_tracing/docker-compose-additions.yml
       - name: monitoring
         git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git

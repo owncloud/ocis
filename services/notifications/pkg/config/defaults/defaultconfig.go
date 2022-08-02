@@ -24,8 +24,8 @@ func DefaultConfig() *config.Config {
 		},
 		Notifications: config.Notifications{
 			SMTP: config.SMTP{
-				Host:   "127.0.0.1",
-				Port:   "1025",
+				Host:   "",
+				Port:   1025,
 				Sender: "noreply@example.com",
 			},
 			Events: config.Events{

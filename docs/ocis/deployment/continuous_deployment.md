@@ -25,10 +25,12 @@ Credentials:
 ## Latest
 
 - oCIS: [ocis.ocis-traefik.latest.owncloud.works](https://ocis.ocis-traefik.latest.owncloud.works)
+- Mail: [mail.ocis-traefik.latest.owncloud.works](https://mail.ocis-traefik.latest.owncloud.works)
 
 ## Released
 
 - oCIS: [ocis.ocis-traefik.released.owncloud.works](https://ocis.ocis-traefik.released.owncloud.works)
+- Mail: [mail.ocis-traefik.released.owncloud.works](https://mail.ocis-traefik.released.owncloud.works)
 
 # oCIS with WOPI server
 

@@ -267,8 +267,9 @@ class SpacesContext implements Context {
 		$this->theUserListsAllAvailableSpacesUsingTheGraphApi($user);
 
 		$spaces = $this->getAvailableSpaces();
-		Assert::assertIsArray($spaces[$spaceName], "Space with name $spaceName for user $user not found");
-		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName for user $user not found");
+		Assert::assertArrayHasKey($spaceName, $spaces, "Space with name '$spaceName' for user '$user' not found");
+		Assert::assertIsArray($spaces[$spaceName], "Data for space with name '$spaceName' for user '$user' not found");
+		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name '$spaceName' for user '$user' not found");
 
 		return $spaces[$spaceName];
 	}
@@ -558,7 +559,7 @@ class SpacesContext implements Context {
 	 * @param mixed $body
 	 * @param string $xRequestId
 	 * @param array $headers
-	 * 
+	 *
 	 *
 	 * @return ResponseInterface
 	 *
@@ -1747,6 +1748,56 @@ class SpacesContext implements Context {
 		$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
 	}
 
+    /**
+     * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" to "([^"]*)" in space "([^"]*)" using the WebDAV API$/
+     *
+     * @param string $user
+     * @param string $fileSource
+     * @param string $fileDestination
+     * @param string $spaceName
+     *
+     * @return void
+     */
+    public function userMovesFileWithinSpaceUsingTheWebDAVAPI(
+        string $user,
+        string $fileSource,
+        string $fileDestination,
+        string $spaceName
+    ):void {
+        $space = $this->getSpaceByName($user, $spaceName);
+        $headers['Destination'] = $this->destinationHeaderValueWithSpaceName(
+            $user,
+            $fileDestination,
+            $spaceName
+        );
+
+        $fullUrl = $space["root"]["webDavUrl"] . '/' . \trim($fileSource, "/");
+        $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
+    }
+
+    /**
+     * MOVE request for files|folders
+     *
+     * @param string $user
+     * @param string $fullUrl
+     * @param string $headers
+     *
+     * @return void
+     * @throws GuzzleException
+     */
+    public function moveFilesAndFoldersRequest(string $user, string $fullUrl, array $headers):void {
+        $this->featureContext->setResponse(
+            HttpRequestHelper::sendRequest(
+                $fullUrl,
+                $this->featureContext->getStepLineRef(),
+                'MOVE',
+                $user,
+                $this->featureContext->getPasswordForUser($user),
+                $headers,
+            )
+        );
+    }
+
 	/**
 	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" from space "([^"]*)" to "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
 	 *
@@ -1771,6 +1822,32 @@ class SpacesContext implements Context {
 		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileSource, "/");
 		$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
 	}
+
+
+    /**
+     * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" from space "([^"]*)" to "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
+     *
+     * @param string $user
+     * @param string $fileSource
+     * @param string $fromSpaceName
+     * @param string $fileDestination
+     * @param string $toSpaceName
+     *
+     * @return void
+     * @throws GuzzleException
+     */
+    public function userMovesFileFromAndToSpaceBetweenSpaces(
+        string $user,
+        string $fileSource,
+        string $fromSpaceName,
+        string $fileDestination,
+        string $toSpaceName
+    ):void {
+        $space = $this->getSpaceByName($user, $fromSpaceName);
+        $headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName);
+        $fullUrl = $space["root"]["webDavUrl"] . '/' . \ltrim($fileSource, "/");
+        $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
+    }
 
 	/**
 	 * returns a url for destination with spacename
@@ -2695,7 +2772,7 @@ class SpacesContext implements Context {
 		$rows["password"] = \array_key_exists("password", $rows) ? $rows["password"] : null;
 		$rows["name"] = \array_key_exists("name", $rows) ? $rows["name"] : null;
 		$rows["expireDate"] = \array_key_exists("expireDate", $rows) ? $rows["expireDate"] : null;
-		
+
 		$body = [
 			"space_ref" => $space['id'],
 			"shareType" => $rows["shareType"],
@@ -2715,8 +2792,76 @@ class SpacesContext implements Context {
 				$body
 			)
 		);
-	
+
 		// set last response as PublicShareData. using method from core
 		$this->featureContext->setLastPublicShareData($this->featureContext->getResponseXml(null, __METHOD__));
+		// set last shareId if ShareData exists. using method from core
+		if (isset($this->featureContext->getLastPublicShareData()->data)) {
+			$this->featureContext->setLastPublicLinkShareId((string) $this->featureContext->getLastPublicShareData()->data[0]->id);
+		}
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has created a public link share of the space "([^"]*)" with settings:$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param TableNode|null $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasCreatedPublicLinkShareOfSpace(
+		string $user,
+		string $spaceName,
+		?TableNode $table
+	): void {
+		$this->sendShareSpaceViaLinkRequest($user, $spaceName, $table);
+
+		$expectedHTTPStatus = "200";
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			$expectedHTTPStatus,
+			"Expected response status code should be $expectedHTTPStatus"
+		);
+		$this->featureContext->setLastPublicLinkShareId((string) $this->featureContext->getLastPublicShareData()->data[0]->id);
+	}
+
+	/**
+	 * @Then /^for user "([^"]*)" the space "([^"]*)" should (not|)\s?contain the last created public link$/
+	 *
+	 * @param string    $user
+	 * @param string    $spaceName
+	 * @param string    $shouldOrNot   (not|)
+	 *
+	 * @return void
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function forUserSpaceShouldContainLinks(
+		string $user,
+		string $spaceName,
+		string $shouldOrNot
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$url = "/apps/files_sharing/api/v1/shares?reshares=true&space_ref=" . $space['id'];
+
+		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+			$user,
+			'GET',
+			$url,
+		);
+
+		$should = ($shouldOrNot !== "not");
+		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml()->data),true, 512, JSON_THROW_ON_ERROR);
+
+		if ($should) {
+			Assert::assertNotEmpty($responseArray, __METHOD__ . ' Response should contain a link, but it is empty');
+			foreach ($responseArray as $element) {
+				$expectedLinkId = $this->featureContext->getLastPublicLinkShareId();
+				Assert::assertEquals($element["id"], $expectedLinkId, "link IDs are different");
+			}
+		} else {
+			Assert::assertEmpty($responseArray, __METHOD__ . ' Response should be empty');
+		}
 	}
 }
