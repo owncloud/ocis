@@ -239,20 +239,8 @@ def main(ctx):
 
     test_pipelines.append(
         pipelineDependsOn(
-            purgeBuildArtifactCache(ctx, "ocis-binary-amd64"),
-            testPipelines(ctx),
-        ),
-    )
-    test_pipelines.append(
-        pipelineDependsOn(
-            purgeBuildArtifactCache(ctx, "testrunner"),
-            testPipelines(ctx),
-        ),
-    )
-    test_pipelines.append(
-        pipelineDependsOn(
-            purgeBuildArtifactCache(ctx, "testing_app"),
-            testPipelines(ctx),
+            purgeBuildArtifactCache(ctx),
+            failEarly(ctx, True) + testPipelines(ctx),
         ),
     )
 
@@ -2163,7 +2151,7 @@ def checkStarlark():
         },
     }]
 
-def genericCache(name, action, mounts, cache_key):
+def genericCache(name, action, mounts, cache_path):
     rebuild = "false"
     restore = "false"
     if action == "rebuild":
@@ -2189,16 +2177,18 @@ def genericCache(name, action, mounts, cache_key):
             "secret_key": {
                 "from_secret": "cache_s3_secret_key",
             },
-            "filename": "%s.tar" % (cache_key),
+            "filename": "%s.tar" % (name),
+            "path": cache_path,
+            "fallback_path": cache_path,
         },
     }
     return step
 
-def genericCachePurge(name, cache_key):
+def genericCachePurge(flush_path):
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "purge_%s" % (name),
+        "name": "purge_build_artifact_cache",
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -2218,8 +2208,8 @@ def genericCachePurge(name, cache_key):
                         "from_secret": "cache_s3_endpoint",
                     },
                     "flush": True,
-                    "flush_age": "14",
-                    "filename": "%s.tar" % (cache_key),
+                    "flush_age": 1,
+                    "flush_path": flush_path,
                 },
             },
         ],
@@ -2236,12 +2226,14 @@ def genericCachePurge(name, cache_key):
     }
 
 def genericBuildArtifactCache(ctx, name, action, path):
-    name = "%s_build_artifact_cache" % (name)
-    cache_key = "%s/%s/%s" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}", name)
     if action == "rebuild" or action == "restore":
-        return genericCache(name, action, [path], cache_key)
+        cache_path = "%s/%s/%s" % ("cache", ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}")
+        name = "%s_build_artifact_cache" % (name)
+        return genericCache(name, action, [path], cache_path)
+
     if action == "purge":
-        return genericCachePurge(name, cache_key)
+        flush_path = "%s/%s" % ("cache", ctx.repo.slug)
+        return genericCachePurge(flush_path)
     return []
 
 def restoreBuildArtifactCache(ctx, name, path):
@@ -2250,8 +2242,8 @@ def restoreBuildArtifactCache(ctx, name, path):
 def rebuildBuildArtifactCache(ctx, name, path):
     return [genericBuildArtifactCache(ctx, name, "rebuild", path)]
 
-def purgeBuildArtifactCache(ctx, name):
-    return genericBuildArtifactCache(ctx, name, "purge", [])
+def purgeBuildArtifactCache(ctx):
+    return genericBuildArtifactCache(ctx, "", "purge", [])
 
 def pipelineSanityChecks(ctx, pipelines):
     """pipelineSanityChecks helps the CI developers to find errors before running it
