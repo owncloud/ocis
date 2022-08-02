@@ -80,6 +80,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/4272
    https://github.com/cs3org/reva/pull/3096
+   https://github.com/owncloud/ocis/pull/4294
    *
    todo:
 # Changelog for [2.0.0-beta.5] (2022-07-19)
