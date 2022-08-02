@@ -163,6 +163,20 @@ func (_m *Client) ModifyWithResult(_a0 *ldap.ModifyRequest) (*ldap.ModifyResult,
 	return r0, r1
 }
 
+// NTLMUnauthenticatedBind provides a mock function with given fields: domain, username
+func (_m *Client) NTLMUnauthenticatedBind(domain string, username string) error {
+	ret := _m.Called(domain, username)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(domain, username)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // PasswordModify provides a mock function with given fields: _a0
 func (_m *Client) PasswordModify(_a0 *ldap.PasswordModifyRequest) (*ldap.PasswordModifyResult, error) {
 	ret := _m.Called(_a0)
@@ -279,6 +293,27 @@ func (_m *Client) StartTLS(_a0 *tls.Config) error {
 	return r0
 }
 
+// TLSConnectionState provides a mock function with given fields:
+func (_m *Client) TLSConnectionState() (tls.ConnectionState, bool) {
+	ret := _m.Called()
+
+	var r0 tls.ConnectionState
+	if rf, ok := ret.Get(0).(func() tls.ConnectionState); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(tls.ConnectionState)
+	}
+
+	var r1 bool
+	if rf, ok := ret.Get(1).(func() bool); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Get(1).(bool)
+	}
+
+	return r0, r1
+}
+
 // UnauthenticatedBind provides a mock function with given fields: username
 func (_m *Client) UnauthenticatedBind(username string) error {
 	ret := _m.Called(username)
@@ -286,6 +321,20 @@ func (_m *Client) UnauthenticatedBind(username string) error {
 	var r0 error
 	if rf, ok := ret.Get(0).(func(string) error); ok {
 		r0 = rf(username)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Unbind provides a mock function with given fields:
+func (_m *Client) Unbind() error {
+	ret := _m.Called()
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
 	} else {
 		r0 = ret.Error(0)
 	}

@@ -317,3 +317,18 @@ func (c ConnWithReconnect) Compare(dn, attribute, value string) (bool, error) {
 func (c ConnWithReconnect) SearchWithPaging(searchRequest *ldap.SearchRequest, pagingSize uint32) (*ldap.SearchResult, error) {
 	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
+
+// NTLMUnauthenticatedBind implements the ldap.Client interface
+func (c ConnWithReconnect) NTLMUnauthenticatedBind(domain, username string) error {
+	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}
+
+// TLSConnectionState implements the ldap.Client interface
+func (c ConnWithReconnect) TLSConnectionState() (tls.ConnectionState, bool) {
+	return tls.ConnectionState{}, false
+}
+
+// Unbind implements the ldap.Client interface
+func (c ConnWithReconnect) Unbind() error {
+	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+}
