@@ -104,8 +104,8 @@ Feature: copy file
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" copies file "project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares Jail" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Shares Jail" should contain these entries:
-      | /testshare/project.txt |
+    And for user "Alice" folder "testshare" of the space "Shares Jail" should contain these files:
+      | project.txt |
     And for user "Alice" the content of the file "/testshare/project.txt" of the space "Shares Jail" should be "Project content"
     Examples:
       | role    |
@@ -167,8 +167,8 @@ Feature: copy file
     And user "Alice" has uploaded file with content "personal content" to "personal.txt"
     When user "Alice" copies file "personal.txt" from space "Personal" to "/testshare/personal.txt" inside space "Shares Jail" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Shares Jail" should contain these entries:
-      | /testshare/personal.txt |
+    And for user "Alice" folder "testshare" of the space "Shares Jail" should contain these files:
+      | personal.txt |
     And for user "Alice" the content of the file "/testshare/personal.txt" of the space "Shares Jail" should be "personal content"
 
 
@@ -249,8 +249,8 @@ Feature: copy file
     And user "Alice" has accepted share "/testshare2" offered by user "Brian"
     When user "Alice" copies file "/testshare1/testshare1.txt" from space "Shares Jail" to "/testshare2/testshare1.txt" inside space "Shares Jail" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Shares Jail" should contain these entries:
-      | /testshare2/testshare1.txt |
+    And for user "Alice" folder "testshare2" of the space "Shares Jail" should contain these files:
+      | testshare1.txt |
     And for user "Brian" the space "Personal" should contain these entries:
       | /testshare2/testshare1.txt |
     And for user "Alice" the content of the file "/testshare2/testshare1.txt" of the space "Shares Jail" should be "testshare1 content"
@@ -275,6 +275,178 @@ Feature: copy file
       | /testshare2/testshare1.txt |
     And for user "Brian" the space "Personal" should not contain these entries:
       | /testshare2/testshare1.txt |
+    Examples:
+      | permissions |
+      | 31          |
+      | 17          |
+
+
+  Scenario Outline: Copying a folder within the same space project with different role
+    Given the administrator has given "Alice" the role "Space Admin" using the settings api
+    And user "Alice" has created a space "Project" with the default quota using the GraphApi
+    And user "Alice" has created a folder "folder1" in space "Project"
+    And user "Alice" has created a folder "folder2" in space "Project"
+    And user "Alice" has uploaded a file inside space "Project" with content "some content" to "folder2/demo.txt"
+    And user "Alice" has shared a space "Project" to user "Brian" with role "<role>"
+    When user "Brian" copies folder "folder2" to "folder1/folder2" inside space "Project" using the WebDAV API
+    Then the HTTP status code should be "<status-code>"
+    And for user "Brian" the space "Project" <shouldOrNot> contain these entries:
+      | folder1/folder2/demo.txt |
+    Examples:
+      | role    | shouldOrNot | status-code |
+      | manager | should      | 201         |
+      | editor  | should      | 201         |
+      | viewer  | should not  | 403         |
+
+
+
+  Scenario Outline: User copies a folder from a space project with different role to a space project with different role
+    Given the administrator has given "Brian" the role "Space Admin" using the settings api
+    And user "Brian" has created a space "Project1" with the default quota using the GraphApi
+    And user "Brian" has created a space "Project2" with the default quota using the GraphApi
+    And user "Brian" has created a folder "folder1" in space "Project1"
+    And user "Brian" has uploaded a file inside space "Project1" with content "some content" to "/folder1/demo.txt"
+    And user "Brian" has shared a space "Project2" to user "Alice" with role "<to_role>"
+    And user "Brian" has shared a space "Project1" to user "Alice" with role "<from_role>"
+    When user "Alice" copies folder "folder1" from space "Project1" to "folder1" inside space "Project2" using the WebDAV API
+    Then the HTTP status code should be "<status-code>"
+    And for user "Alice" the space "Project2" <shouldOrNot> contain these entries:
+      | folder1/demo.txt |
+    Examples:
+      | from_role | to_role | status-code | shouldOrNot |
+      | manager   | manager | 201         | should      |
+      | manager   | editor  | 201         | should      |
+      | editor    | manager | 201         | should      |
+      | editor    | editor  | 201         | should      |
+      | manager   | viewer  | 403         | should not  |
+      | editor    | viewer  | 403         | should not  |
+      | viewer    | viewer  | 403         | should not  |
+
+
+  Scenario Outline: User copies a folder from space project with different role to space personal
+    Given the administrator has given "Brian" the role "Space Admin" using the settings api
+    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has created a folder "folder1" in space "Project"
+    And user "Brian" has uploaded a file inside space "Project" with content "some content" to "/folder1/demo.txt"
+    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    When user "Alice" copies file "folder1" from space "Project" to "folder1" inside space "Personal" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the space "Personal" should contain these entries:
+      | folder1/demo.txt |
+    Examples:
+      | role    |
+      | manager |
+      | editor  |
+      | viewer  |
+
+
+  Scenario Outline: User copies a folder from space project with different role to space shares jail with different role
+    Given the administrator has given "Brian" the role "Space Admin" using the settings api
+    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has created folder "/testshare"
+    And user "Brian" has created a folder "folder1" in space "Project"
+    And user "Brian" has uploaded a file inside space "Project" with content "some content" to "/folder1/demo.txt"
+    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
+    And user "Alice" has accepted share "/testshare" offered by user "Brian"
+    When user "Alice" copies folder "folder1" from space "Project" to "/testshare/folder1" inside space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "<status-code>"
+    And for user "Alice" folder "testshare" of the space "Shares Jail" <shouldOrNot> contain these files:
+      | folder1/demo.txt |
+    Examples:
+      | role    | shouldOrNot | permissions | status-code |
+      | manager | should      | 31          | 201         |
+      | editor  | should      | 31          | 201         |
+      | viewer  | should      | 31          | 201         |
+      | manager | should not  | 17          | 403         |
+      | editor  | should not  | 17          | 403         |
+      | viewer  | should not  | 17          | 403         |
+
+
+  Scenario Outline: User copies a folder from space personal to space project with different role
+    Given the administrator has given "Brian" the role "Space Admin" using the settings api
+    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Alice" has created folder "folder1"
+    And user "Alice" has uploaded file with content "some content" to "folder1/demo.txt"
+    When user "Alice" copies folder "folder1" from space "Personal" to "folder1" inside space "Project" using the WebDAV API
+    Then the HTTP status code should be "<status-code>"
+    And for user "Alice" the space "Project" <shouldOrNot> contain these entries:
+      | folder1/demo.txt |
+    Examples:
+      | role    | shouldOrNot | status-code |
+      | manager | should      | 201         |
+      | editor  | should      | 201         |
+      | viewer  | should not  | 403         |
+
+
+  Scenario Outline: User copies a folder from space personal to space shares jail with different permmissions
+    Given user "Brian" has created folder "/testshare"
+    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
+    And user "Alice" has accepted share "/testshare" offered by user "Brian"
+    And user "Alice" has created folder "folder1"
+    And user "Alice" has uploaded file with content "some content" to "folder1/demo.txt"
+    When user "Alice" copies folder "folder1" from space "Personal" to "/testshare/folder1" inside space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "<status-code>"
+    And for user "Alice" folder "testshare" of the space "Shares Jail" <shouldOrNot> contain these files:
+      | folder1/demo.txt |
+    Examples:
+      | permissions | shouldOrNot | status-code |
+      | 31          | should      | 201         |
+      | 17          | should not  | 403         |
+
+
+  Scenario Outline: User copies a folder from space shares jail with different role to space personal
+    Given the administrator has given "Brian" the role "Space Admin" using the settings api
+    And user "Brian" has created folder "/testshare"
+    And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
+    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
+    And user "Alice" has accepted share "/testshare" offered by user "Brian"
+    When user "Alice" copies file "/testshare/testshare.txt" from space "Shares Jail" to "testshare.txt" inside space "Personal" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the space "Personal" should contain these entries:
+      | /testshare.txt |
+    And for user "Alice" the content of the file "/testshare.txt" of the space "Personal" should be "testshare content"
+    Examples:
+      | permissions |
+      | 31          |
+      | 17          |
+
+
+  Scenario Outline: User copies a folder from space shares jail with different role to space project with different role
+    Given the administrator has given "Brian" the role "Space Admin" using the settings api
+    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has created folder "/testshare"
+    And user "Brian" has created folder "/testshare/folder1"
+    And user "Brian" has uploaded file with content "testshare content" to "/testshare/folder1/testshare.txt"
+    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
+    And user "Alice" has accepted share "/testshare" offered by user "Brian"
+    When user "Alice" copies folder "/testshare/folder1" from space "Shares Jail" to "folder1" inside space "Project" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the space "Project" should contain these entries:
+      | /folder1/testshare.txt |
+    Examples:
+      | role    | permissions |
+      | manager | 31          |
+      | manager | 17          |
+      | editor  | 31          |
+      | editor  | 17          |
+
+
+  Scenario Outline: User copies a folder from space shares jail with different role to space project with role viewer
+    Given the administrator has given "Brian" the role "Space Admin" using the settings api
+    And user "Brian" has created a space "Project" with the default quota using the GraphApi
+    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has created folder "/testshare"
+    And user "Brian" has created folder "/testshare/folder1"
+    And user "Brian" has uploaded file with content "testshare content" to "/testshare/folder1/testshare.txt"
+    And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
+    And user "Alice" has accepted share "/testshare" offered by user "Brian"
+    When user "Alice" copies folder "/testshare/folder1" from space "Shares Jail" to "folder1" inside space "Project" using the WebDAV API
+    Then the HTTP status code should be "403"
+    And for user "Alice" the space "Project" should not contain these entries:
+      | /folder1/testshare.txt |
     Examples:
       | permissions |
       | 31          |

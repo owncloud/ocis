@@ -154,8 +154,8 @@ Feature: move (rename) file
     Then the HTTP status code should be "502"
     And for user "Alice" the space "Personal" should not contain these entries:
       | testshare.txt |
-    And for user "Alice" the space "Shares Jail" should contain these entries:
-      | /testshare/testshare.txt |
+    And for user "Alice" folder "testshare" of the space "Shares Jail" should contain these entries:
+      | testshare.txt |
     Examples:
       | permissions |
       | 31          |
@@ -174,8 +174,8 @@ Feature: move (rename) file
     Then the HTTP status code should be "502"
     And for user "Alice" the space "Project" should not contain these entries:
       | /testshare.txt |
-    And for user "Alice" the space "Shares Jail" should contain these entries:
-      | /testshare/testshare.txt |
+    And for user "Alice" folder "testshare" of the space "Shares Jail" should contain these entries:
+      | testshare.txt |
     Examples:
       | role    | permissions |
       | manager | 31          |
@@ -196,8 +196,8 @@ Feature: move (rename) file
     And user "Alice" has accepted share "/testshare2" offered by user "Brian"
     When user "Alice" moves file "/testshare1/testshare1.txt" from space "Shares Jail" to "/testshare2/testshare1.txt" inside space "Shares Jail" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Alice" the space "Shares Jail" should contain these entries:
-      | /testshare2/testshare1.txt |
+    And for user "Alice" folder "testshare2" of the space "Shares Jail" should contain these entries:
+      | testshare1.txt |
     And for user "Brian" the space "Personal" should contain these entries:
       | /testshare2/testshare1.txt |
 
