@@ -321,6 +321,18 @@ def yarnInstallUITests():
         ],
     }]
 
+def yarnInstallE2eTests():
+    return [{
+        "name": "yarn-install-e2e",
+        "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+        "commands": [
+            ". /drone/src/.drone.env",
+            "cd webTestRunner",
+            "git checkout $WEB_COMMITID",
+            "retry -t 3 'yarn install --immutable'",
+        ],
+    }]
+
 def testOcisModules(ctx):
     pipelines = []
     for module in config["modules"]:
@@ -874,16 +886,15 @@ def e2eTests(ctx):
             "LOCAL_UPLOAD_DIR": "/uploads",
         },
         "commands": [
-            ". /drone/src/.drone.env",
-            "git clone -b $WEB_ASSETS_VERSION --single-branch --no-tags https://github.com/owncloud/web.git e2eTests",
-            "cd e2eTests",
-            "retry -t 3 'yarn install --immutable'",
+            "cd webTestRunner",
             "sleep 10 && yarn test:e2e:cucumber tests/e2e/cucumber/**/*[!.oc10].feature",
         ],
     }]
 
     e2eTestsSteps = \
         restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
+        restoreBuildArtifactCache(ctx, "web-dist", "webTestRunner") + \
+        yarnInstallE2eTests() + \
         ocisServer("ocis", 4, []) + \
         e2e_test_ocis + \
         uploadTracingResult(ctx) + \
@@ -914,8 +925,8 @@ def uploadTracingResult(ctx):
                 "from_secret": "cache_public_s3_server",
             },
             "path_style": True,
-            "source": "e2eTests/reports/e2e/playwright/tracing/**/*",
-            "strip_prefix": "e2eTests/reports/e2e/playwright/tracing",
+            "source": "webTestRunner/reports/e2e/playwright/tracing/**/*",
+            "strip_prefix": "webTestRunner/reports/e2e/playwright/tracing",
             "target": "${DRONE_BUILD_NUMBER}/tracing",
         },
         "environment": {
@@ -942,7 +953,7 @@ def publishTracingResult(ctx, suite):
         "name": "publish-tracing-result",
         "image": OC_UBUNTU,
         "commands": [
-            "cd e2eTests/reports/e2e/playwright/tracing/",
+            "cd webTestRunner/reports/e2e/playwright/tracing/",
             'echo "<details><summary>:boom: To see the trace, please open the link in the console ...</summary>\\n\\n<p>\\n\\n" >>  comments.file',
             'for f in *.zip; do echo "#### npx playwright show-trace $CACHE_ENDPOINT/$CACHE_BUCKET/${DRONE_BUILD_NUMBER}/tracing/$f \n" >>  comments.file; done',
             'echo "\n</p></details>" >>  comments.file',
@@ -963,6 +974,7 @@ def publishTracingResult(ctx, suite):
             ],
             "event": [
                 "pull_request",
+                "cron",
             ],
         },
     }]
