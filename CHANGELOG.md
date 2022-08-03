@@ -53,6 +53,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/4072
    https://github.com/cs3org/reva/pull/3046
+   https://github.com/owncloud/ocis/pull/4323
 
 * Enhancement - Improve validation of OIDC access tokens: [#3841](https://github.com/owncloud/ocis/issues/3841)
 
