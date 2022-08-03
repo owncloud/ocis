@@ -892,6 +892,7 @@ def e2eTests(ctx):
     }]
 
     e2eTestsSteps = \
+        skipIfUnchanged(ctx, "e2e-tests") + \
         restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
         restoreBuildArtifactCache(ctx, "web-dist", "webTestRunner") + \
         yarnInstallE2eTests() + \
@@ -900,7 +901,10 @@ def e2eTests(ctx):
         uploadTracingResult(ctx) + \
         publishTracingResult(ctx, "e2e test")
 
-    if ("full-ci" in ctx.build.title.lower() or ctx.build.event == "cron"):
+    if ("skip-e2e" in ctx.build.title.lower()):
+        return []
+
+    if (ctx.build.event != "tag"):
         return [{
             "kind": "pipeline",
             "type": "docker",
@@ -910,7 +914,6 @@ def e2eTests(ctx):
             "trigger": e2e_trigger,
             "volumes": e2e_volumes,
         }]
-    return []
 
 def uploadTracingResult(ctx):
     return [{
@@ -2043,6 +2046,8 @@ def skipIfUnchanged(ctx, type):
         skip = base + unit + acceptance
     if type == "cache":
         skip = base
+    if type == "e2e-tests":
+        skip = base + unit
     if len(skip) == 0:
         return []
 
