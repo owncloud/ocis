@@ -86,9 +86,15 @@ policies:
 oidc:
   issuer: https://localhost:9200
   insecure: true
+  access_token_verify_method: jwt
   user_info_cache:
     size: 1024
     ttl: 10
+  jwks:
+    refresh_interval: 60
+    refresh_timeout: 10
+    refresh_limit: 60
+    refresh_unknown_kid: true
 token_manager:
   jwt_secret: ""
 policy_selector:

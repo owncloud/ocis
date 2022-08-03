@@ -178,6 +178,14 @@ pass:[true]
 a| [subs=-attributes]
 Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments.
 
+|`PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD`
+a| [subs=-attributes]
++string+
+a| [subs=-attributes]
+pass:[jwt]
+a| [subs=-attributes]
+Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'.
+
 |`PROXY_OIDC_USERINFO_CACHE_SIZE`
 a| [subs=-attributes]
 +int+
@@ -193,6 +201,38 @@ a| [subs=-attributes]
 pass:[10]
 a| [subs=-attributes]
 Max TTL in seconds for the OIDC user info cache.
+
+|`PROXY_OIDC_JWKS_REFRESH_INTERVAL`
+a| [subs=-attributes]
++uint64+
+a| [subs=-attributes]
+pass:[60]
+a| [subs=-attributes]
+The interval for refreshing the JWKS (JSON Web Key Set) in minutes in the background via a new HTTP request to the IDP.
+
+|`PROXY_OIDC_JWKS_REFRESH_TIMEOUT`
+a| [subs=-attributes]
++uint64+
+a| [subs=-attributes]
+pass:[10]
+a| [subs=-attributes]
+The timeout in seconds for an outgoing JWKS request.
+
+|`PROXY_OIDC_JWKS_REFRESH_RATE_LIMIT`
+a| [subs=-attributes]
++uint64+
+a| [subs=-attributes]
+pass:[60]
+a| [subs=-attributes]
+Limits the rate in seconds at which refresh requests are performed for unknown keys. This is used to prevent malicious clients from imposing high network load on the IDP via ocis.
+
+|`PROXY_OIDC_JWKS_REFRESH_UNKNOWN_KID`
+a| [subs=-attributes]
++bool+
+a| [subs=-attributes]
+pass:[true]
+a| [subs=-attributes]
+If set to 'true', the JWKS refresh request will occur every time an unknown KEY ID (KID) is seen. Always set a 'refresh_limit' when enabling this.
 
 |`OCIS_JWT_SECRET` +
 `PROXY_JWT_SECRET`

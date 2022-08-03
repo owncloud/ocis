@@ -22,8 +22,13 @@
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>PROXY_OIDC_ISSUER | string | https://localhost:9200 | URL of the OIDC issuer. It defaults to URL of the builtin IDP.|
 | OCIS_INSECURE<br/>PROXY_OIDC_INSECURE | bool | true | Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments.|
+| PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD | string | jwt | Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'.|
 | PROXY_OIDC_USERINFO_CACHE_SIZE | int | 1024 | Cache size for OIDC user info.|
 | PROXY_OIDC_USERINFO_CACHE_TTL | int | 10 | Max TTL in seconds for the OIDC user info cache.|
+| PROXY_OIDC_JWKS_REFRESH_INTERVAL | uint64 | 60 | The interval for refreshing the JWKS (JSON Web Key Set) in minutes in the background via a new HTTP request to the IDP.|
+| PROXY_OIDC_JWKS_REFRESH_TIMEOUT | uint64 | 10 | The timeout in seconds for an outgoing JWKS request.|
+| PROXY_OIDC_JWKS_REFRESH_RATE_LIMIT | uint64 | 60 | Limits the rate in seconds at which refresh requests are performed for unknown keys. This is used to prevent malicious clients from imposing high network load on the IDP via ocis.|
+| PROXY_OIDC_JWKS_REFRESH_UNKNOWN_KID | bool | true | If set to 'true', the JWKS refresh request will occur every time an unknown KEY ID (KID) is seen. Always set a 'refresh_limit' when enabling this.|
 | OCIS_JWT_SECRET<br/>PROXY_JWT_SECRET | string |  | The secret to mint and validate JWT tokens.|
 | PROXY_ENABLE_PRESIGNEDURLS | bool | true | Allow OCS to get a signing key to sign requests.|
 | PROXY_ACCOUNT_BACKEND_TYPE | string | cs3 | Account backend the PROXY service should use. Currently only 'cs3' is possible here.|
