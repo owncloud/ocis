@@ -45,6 +45,10 @@ var groupEntry = ldap.NewEntry("cn=group",
 		"cn":        {"group"},
 		"entryuuid": {"abcd-defg"},
 	})
+var invalidGroupEntry = ldap.NewEntry("cn=invalid",
+	map[string][]string{
+		"cn": {"invalid"},
+	})
 
 var logger = log.NewLogger(log.Level("debug"))
 
@@ -266,15 +270,32 @@ func TestGetGroup(t *testing.T) {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
 	}
 
-	// Mock a valid	Search Result
+	// Mock an invalid Search Result
 	lm = &mocks.Client{}
-	lm.On("Search", mock.Anything, mock.Anything, mock.Anything, mock.Anything,
-		mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-		Return(&ldap.SearchResult{
-			Entries: []*ldap.Entry{groupEntry},
-		}, nil)
+	lm.On("Search", mock.Anything).Return(&ldap.SearchResult{
+		Entries: []*ldap.Entry{invalidGroupEntry},
+	}, nil)
 	b, _ = getMockedBackend(lm, lconfig, &logger)
 	g, err := b.GetGroup(context.Background(), "group", nil)
+	if err == nil || err.Error() != "itemNotFound" {
+		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	}
+	g, err = b.GetGroup(context.Background(), "group", queryParamExpand)
+	if err == nil || err.Error() != "itemNotFound" {
+		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	}
+	g, err = b.GetGroup(context.Background(), "group", queryParamSelect)
+	if err == nil || err.Error() != "itemNotFound" {
+		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	}
+
+	// Mock a valid	Search Result
+	lm = &mocks.Client{}
+	lm.On("Search", mock.Anything).Return(&ldap.SearchResult{
+		Entries: []*ldap.Entry{groupEntry},
+	}, nil)
+	b, _ = getMockedBackend(lm, lconfig, &logger)
+	g, err = b.GetGroup(context.Background(), "group", nil)
 	if err != nil {
 		t.Errorf("Expected GetGroup to succeed. Got %s", err.Error())
 	} else if *g.Id != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id) {
