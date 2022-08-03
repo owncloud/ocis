@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Substring search for sharees: [#547](https://github.com/owncloud/ocis/issues/547)
 * Bugfix - Space Creators can hand over spaces: [#4244](https://github.com/owncloud/ocis/pull/4244)
 * Enhancement - Add drives field to users endpoint: [#4072](https://github.com/owncloud/ocis/pull/4072)
+* Enhancement - Improve validation of OIDC access tokens: [#3841](https://github.com/owncloud/ocis/issues/3841)
 * Enhancement - Improve error log for "could not get user by claim" error: [#4227](https://github.com/owncloud/ocis/pull/4227)
 * Enhancement - Allow providing list of services NOT to start: [#4254](https://github.com/owncloud/ocis/pull/4254)
 * Enhancement - Introduce insecure flag for smtp email notifications: [#4279](https://github.com/owncloud/ocis/pull/4279)
@@ -52,6 +53,20 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/4072
    https://github.com/cs3org/reva/pull/3046
+
+* Enhancement - Improve validation of OIDC access tokens: [#3841](https://github.com/owncloud/ocis/issues/3841)
+
+   Previously OIDC access tokes were only validated by requesting the userinfo from the IDP. It is
+   now possible to enable additional verification if the IDP issues access tokens in JWT format.
+   In that case the oCIS proxy service will now verify the signature of the token using the public
+   keys provided by jwks_uri endpoint of the IDP. It will also verify if the issuer claim (iss)
+   matches the expected values.
+
+   The new validation is enabled by setting `PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD` to
+   "jwt". Which is also the default. Setting it to "none" will disable the feature.
+
+   https://github.com/owncloud/ocis/issues/3841
+   https://github.com/owncloud/ocis/pull/4227
 
 * Enhancement - Improve error log for "could not get user by claim" error: [#4227](https://github.com/owncloud/ocis/pull/4227)
 
