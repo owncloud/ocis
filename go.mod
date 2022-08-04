@@ -6,11 +6,11 @@ require (
 	github.com/CiscoM31/godata v1.0.5
 	github.com/Masterminds/semver v1.5.0
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
+	github.com/bbalet/stopwords v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.3
-	github.com/blevesearch/bleve_index_api v1.0.2
 	github.com/coreos/go-oidc/v3 v3.2.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220711084433-8f71d4e812a3
-	github.com/cs3org/reva/v2 v2.7.3-0.20220802090121-ae119033c2cc
+	github.com/cs3org/reva/v2 v2.7.3-0.20220802154801-7dd63f110056
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
@@ -35,6 +35,7 @@ require (
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/golang/protobuf v1.5.2
+	github.com/google/go-tika v0.2.0
 	github.com/gookit/config/v2 v2.1.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.0
@@ -102,6 +103,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/bits-and-blooms/bitset v1.2.1 // indirect
+	github.com/blevesearch/bleve_index_api v1.0.2 // indirect
 	github.com/blevesearch/geo v0.1.12-0.20220606102651-aab42add3121 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.3 // indirect
 	github.com/blevesearch/gtreap v0.1.1 // indirect

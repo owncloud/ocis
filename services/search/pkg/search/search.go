@@ -1,46 +1,73 @@
-// Copyright 2018-2022 CERN
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// In applying this license, CERN does not waive the privileges and immunities
-// granted to it by virtue of its status as an Intergovernmental Organization
-// or submit itself to any jurisdiction.
-
 package search
 
 import (
 	"context"
-
-	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
+	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
+	"google.golang.org/grpc/metadata"
 )
 
-//go:generate mockery --name=ProviderClient
-//go:generate mockery --name=IndexClient
+type matchArray []*searchmsg.Match
 
-// ProviderClient is the interface to the search provider service
-type ProviderClient interface {
-	Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error)
-	IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequest) (*searchsvc.IndexSpaceResponse, error)
+func (ma matchArray) Len() int {
+	return len(ma)
+}
+func (ma matchArray) Swap(i, j int) {
+	ma[i], ma[j] = ma[j], ma[i]
+}
+func (ma matchArray) Less(i, j int) bool {
+	return ma[i].Score > ma[j].Score
 }
 
-// IndexClient is the interface to the search index
-type IndexClient interface {
-	Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (*searchsvc.SearchIndexResponse, error)
-	Add(ref *providerv1beta1.Reference, ri *providerv1beta1.ResourceInfo) error
-	Move(id *providerv1beta1.ResourceId, fullPath string) error
-	Delete(id *providerv1beta1.ResourceId) error
-	Restore(id *providerv1beta1.ResourceId) error
-	Purge(id *providerv1beta1.ResourceId) error
-	DocCount() (uint64, error)
+func logDocCount(engine engine.Engine, logger log.Logger) {
+	c, err := engine.DocCount()
+	if err != nil {
+		logger.Error().Err(err).Msg("error getting document count from the index")
+	}
+	logger.Debug().Interface("count", c).Msg("new document count")
+}
+
+func getAuthContext(owner *user.User, gw gateway.GatewayAPIClient, secret string, logger log.Logger) (context.Context, error) {
+	ownerCtx := ctxpkg.ContextSetUser(context.Background(), owner)
+	authRes, err := gw.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
+		Type:         "machine",
+		ClientId:     "userid:" + owner.GetId().GetOpaqueId(),
+		ClientSecret: secret,
+	})
+
+	if err == nil && authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		err = errtypes.NewErrtypeFromStatus(authRes.Status)
+	}
+
+	if err != nil {
+		logger.Error().Err(err).Interface("owner", owner).Interface("authRes", authRes).Msg("error using machine auth")
+		return nil, err
+	}
+
+	return metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token), nil
+}
+
+func statResource(ref *provider.Reference, owner *user.User, gw gateway.GatewayAPIClient, secret string, logger log.Logger) (*provider.StatResponse, error) {
+	ownerCtx, err := getAuthContext(owner, gw, secret, logger)
+	if err != nil {
+		return nil, err
+	}
+
+	return gw.Stat(ownerCtx, &provider.StatRequest{Ref: ref})
+}
+
+func getPath(id *provider.ResourceId, owner *user.User, gw gateway.GatewayAPIClient, secret string, logger log.Logger) (*provider.GetPathResponse, error) {
+	ownerCtx, err := getAuthContext(owner, gw, secret, logger)
+	if err != nil {
+		return nil, err
+	}
+
+	return gw.GetPath(ownerCtx, &provider.GetPathRequest{ResourceId: id})
 }

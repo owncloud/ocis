@@ -28,14 +28,26 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "search",
 		},
-		Datapath: path.Join(defaults.BaseDataPath(), "search"),
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
+		Engine: config.Engine{
+			Type: "bleve",
+			Bleve: config.EngineBleve{
+				Datapath: path.Join(defaults.BaseDataPath(), "search"),
+			},
+		},
+		Extractor: config.Extractor{
+			Type:             "basic",
+			CS3AllowInsecure: false,
+			Tika: config.ExtractorTika{
+				TikaURL: "http://127.0.0.1:9998",
+			},
+		},
 		Events: config.Events{
-			Endpoint:      "127.0.0.1:9233",
-			Cluster:       "ocis-cluster",
-			ConsumerGroup: "search",
+			Endpoint:     "127.0.0.1:9233",
+			Cluster:      "ocis-cluster",
+			AsyncUploads: false,
 		},
 		MachineAuthAPIKey: "",
 	}
